@@ -1,0 +1,7 @@
+run=2 sde=1793337970
+rc=0
+41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611  build/artifacts/vd-app
+bytes=6002112 mtime=2026-10-30 05:29:21.693971046 +0000
+selftest_exit=0
+selftest_exit=0
+BUILD + XVFB SMOKE OK

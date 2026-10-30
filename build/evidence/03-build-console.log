@@ -1,5 +1,5 @@
 == container environment ==
-date_utc=2026-10-30T05:11:16Z
+date_utc=2026-10-30T05:26:45Z
 container=CentOS Linux release 7.9.2009 (Core)
 glibc=glibc-2.17-326.el7_9.3.x86_64
 gtk3=gtk3-3.22.30-8.el7_9.x86_64
@@ -16,83 +16,82 @@ home=/vedit-build/target/home
 == installed RPM set vs scripts/docker/rpm-baseline.txt ==
 rpm set matches the baseline (382 packages)
 == cargo build --release --workspace ==
-    Blocking waiting for file lock on build directory
    Compiling proc-macro2 v1.0.107
    Compiling unicode-ident v1.0.27
    Compiling quote v1.0.47
    Compiling serde_core v1.0.229
    Compiling serde v1.0.229
-   Compiling hashbrown v0.17.1
    Compiling equivalent v1.0.3
+   Compiling hashbrown v0.17.1
    Compiling winnow v0.5.40
    Compiling target-lexicon v0.12.16
    Compiling pkg-config v0.3.34
    Compiling smallvec v1.16.4
-   Compiling heck v0.5.0
    Compiling version-compare v0.2.1
+   Compiling heck v0.5.0
    Compiling libc v0.2.191
    Compiling memchr v2.8.3
    Compiling once_cell v1.21.4
-   Compiling pin-project-lite v0.2.17
    Compiling version_check v0.9.5
+   Compiling pin-project-lite v0.2.17
    Compiling futures-sink v0.3.34
    Compiling futures-core v0.3.34
    Compiling futures-io v0.3.34
    Compiling bitflags v2.13.2
-   Compiling slab v0.4.12
+   Compiling futures-task v0.3.34
    Compiling futures-channel v0.3.34
    Compiling syn v1.0.109
-   Compiling futures-task v0.3.34
    Compiling proc-macro-error-attr v1.0.4
+   Compiling slab v0.4.12
    Compiling proc-macro-error v1.0.4
    Compiling stable_deref_trait v1.2.1
    Compiling thiserror v1.0.69
    Compiling heck v0.4.1
    Compiling itoa v1.0.18
    Compiling zmij v1.0.23
-   Compiling writeable v0.6.4
-   Compiling gio v0.18.4
-   Compiling find-msvc-tools v0.1.15
-   Compiling indexmap v2.14.2
    Compiling litemap v0.8.3
-   Compiling cfg-expr v0.15.8
    Compiling cfg-if v1.0.5
+   Compiling indexmap v2.14.2
+   Compiling cfg-expr v0.15.8
    Compiling serde_json v1.0.154
    Compiling utf_types v1.0.0
    Compiling shlex v2.0.1
-   Compiling autocfg v1.5.1
-   Compiling icu_normalizer_data v2.4.0
+   Compiling writeable v0.6.4
+   Compiling gio v0.18.4
+   Compiling find-msvc-tools v0.1.15
    Compiling semver v1.0.28
    Compiling icu_properties_data v2.4.0
-   Compiling utf8_iter v1.1.0
+   Compiling autocfg v1.5.1
    Compiling cc v1.10.0
-   Compiling rustc_version v0.4.1
-   Compiling bytes v1.12.1
+   Compiling utf8_iter v1.1.0
    Compiling syn v3.0.9
    Compiling syn v2.0.119
+   Compiling icu_normalizer_data v2.4.0
+   Compiling rustc_version v0.4.1
    Compiling memoffset v0.9.1
+   Compiling bytes v1.12.1
    Compiling percent-encoding v2.3.2
-   Compiling field-offset v0.3.6
-   Compiling zeroize v1.9.1
    Compiling anyhow v1.0.104
+   Compiling field-offset v0.3.6
    Compiling rustix v1.1.6
+   Compiling zeroize v1.9.1
    Compiling gtk v0.18.2
-   Compiling rustls-pki-types v1.15.1
-   Compiling getrandom v0.2.17
    Compiling httparse v1.10.1
+   Compiling rustls-pki-types v1.15.1
    Compiling linux-raw-sys v0.12.1
    Compiling untrusted v0.9.0
-   Compiling log v0.4.34
    Compiling rustls v0.23.46
-   Compiling errno v0.3.14
-   Compiling http v1.5.0
+   Compiling log v0.4.34
    Compiling form_urlencoded v1.2.2
    Compiling base64 v0.23.1
+   Compiling getrandom v0.2.17
+   Compiling http v1.5.0
+   Compiling errno v0.3.14
    Compiling getrandom v0.4.3
    Compiling subtle v2.6.1
    Compiling thiserror v2.0.21
-   Compiling webpki-roots v1.0.11
    Compiling signal-hook-registry v1.4.8
+   Compiling webpki-roots v1.0.11
    Compiling mio v1.2.4
    Compiling tracing-core v0.1.36
    Compiling winnow v1.0.4
@@ -105,47 +104,47 @@ rpm set matches the baseline (382 packages)
    Compiling toml_parser v1.1.5+spec-1.1.0
    Compiling ring v0.17.14
    Compiling ureq-proto v0.6.5
+   Compiling toml_datetime v1.1.2+spec-1.1.0
+   Compiling serde_spanned v1.1.2
    Compiling toml_datetime v0.6.3
    Compiling serde_spanned v0.6.9
    Compiling toml_edit v0.20.2
    Compiling toml_edit v0.19.15
-   Compiling toml_datetime v1.1.2+spec-1.1.0
-   Compiling serde_spanned v1.1.2
    Compiling toml v1.1.8+spec-1.1.0
-   Compiling synstructure v0.14.0
-   Compiling proc-macro-crate v1.3.1
    Compiling thiserror-impl v1.0.69
+   Compiling proc-macro-crate v1.3.1
    Compiling tracing-attributes v0.1.31
+   Compiling synstructure v0.14.0
    Compiling waitpid-any v0.3.0
+   Compiling tempfile v3.27.0
    Compiling toml v0.8.2
    Compiling proc-macro-crate v2.0.2
-   Compiling tempfile v3.27.0
    Compiling gtk3-macros v0.18.2
-   Compiling system-deps v6.2.2
    Compiling zerofrom-derive v0.1.8
+   Compiling system-deps v6.2.2
    Compiling futures-macro v0.3.34
    Compiling yoke-derive v0.8.4
    Compiling zerovec-derive v0.11.7
    Compiling displaydoc v0.2.7
    Compiling serde_derive v1.0.229
-   Compiling tokio-macros v2.7.2
    Compiling serde_repr v0.1.21
-   Compiling glib-macros v0.18.5
    Compiling thiserror-impl v2.0.21
-   Compiling tracing v0.1.44
+   Compiling glib-macros v0.18.5
+   Compiling tokio-macros v2.7.2
    Compiling glib-sys v0.18.1
    Compiling gobject-sys v0.18.0
    Compiling gio-sys v0.18.1
-   Compiling atk-sys v0.18.2
    Compiling gdk-sys v0.18.2
-   Compiling gdk-pixbuf-sys v0.18.0
+   Compiling atk-sys v0.18.2
    Compiling pango-sys v0.18.0
-   Compiling futures-util v0.3.34
    Compiling cairo-sys-rs v0.18.2
+   Compiling futures-util v0.3.34
+   Compiling gdk-pixbuf-sys v0.18.0
    Compiling gtk-sys v0.18.2
    Compiling sourceview4-sys v0.5.0
-   Compiling zerofrom v0.1.8
    Compiling tokio v1.54.1
+   Compiling tracing v0.1.44
+   Compiling zerofrom v0.1.8
    Compiling yoke v0.8.4
    Compiling zerovec v0.11.9
    Compiling zerotrie v0.2.5
@@ -156,8 +155,8 @@ rpm set matches the baseline (382 packages)
    Compiling icu_provider v2.4.0
    Compiling vd-deeplint v0.1.0 (/vedit-build/crates/vd-deeplint)
    Compiling vd-config v0.1.0 (/vedit-build/crates/vd-config)
-   Compiling icu_properties v2.4.0
    Compiling icu_normalizer v2.4.0
+   Compiling icu_properties v2.4.0
    Compiling futures-executor v0.3.34
    Compiling futures v0.3.34
    Compiling glib v0.18.5
@@ -180,96 +179,96 @@ rpm set matches the baseline (382 packages)
    Compiling vd-syntax v0.1.0 (/vedit-build/crates/vd-syntax)
    Compiling vd-editor v0.1.0 (/vedit-build/crates/vd-editor)
    Compiling vd-app v0.1.0 (/vedit-build/crates/vd-app)
-    Finished `release` profile [optimized] target(s) in 45.62s
+    Finished `release` profile [optimized] target(s) in 38.23s
 artifact=build/artifacts/vd-app
-809cf95326172fc58975b38cea390dcffd8d78d1261b4f1d75059a8950c6d77d  /vedit-build/target/release/vd-app
+41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611  /vedit-build/target/release/vd-app
 size_bytes=6002112
-/vedit-build/target/release/vd-app: ELF 64-bit LSB shared object, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.32, BuildID[sha1]=fd19aaacb9439ec7a71c2c35c3aee7bff904f689, stripped
+/vedit-build/target/release/vd-app: ELF 64-bit LSB shared object, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.32, BuildID[sha1]=a00afe22ae5200fa3346bbbb5c5d64ad2ee43080, stripped
 ## ldd:
-	linux-vdso.so.1 =>  (0x000075f8fd9f0000)
-	libgtksourceview-4.so.0 => /opt/gsv4/lib64/libgtksourceview-4.so.0 (0x000075f8fcb59000)
-	libgtk-3.so.0 => /lib64/libgtk-3.so.0 (0x000075f8fc251000)
-	libgdk-3.so.0 => /lib64/libgdk-3.so.0 (0x000075f8fbf67000)
-	libgio-2.0.so.0 => /lib64/libgio-2.0.so.0 (0x000075f8fbbc7000)
-	libgdk_pixbuf-2.0.so.0 => /lib64/libgdk_pixbuf-2.0.so.0 (0x000075f8fb99f000)
-	libcairo-gobject.so.2 => /lib64/libcairo-gobject.so.2 (0x000075f8fb796000)
-	libpango-1.0.so.0 => /lib64/libpango-1.0.so.0 (0x000075f8fb550000)
-	libcairo.so.2 => /lib64/libcairo.so.2 (0x000075f8fb219000)
-	libgobject-2.0.so.0 => /lib64/libgobject-2.0.so.0 (0x000075f8fafc8000)
-	libglib-2.0.so.0 => /lib64/libglib-2.0.so.0 (0x000075f8facb2000)
-	libgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x000075f8faa9c000)
-	librt.so.1 => /lib64/librt.so.1 (0x000075f8fa894000)
-	libpthread.so.0 => /lib64/libpthread.so.0 (0x000075f8fa678000)
-	libm.so.6 => /lib64/libm.so.6 (0x000075f8fa376000)
-	libdl.so.2 => /lib64/libdl.so.2 (0x000075f8fa172000)
-	libc.so.6 => /lib64/libc.so.6 (0x000075f8f9da4000)
-	/lib64/ld-linux-x86-64.so.2 (0x000075f8fd600000)
-	libfribidi.so.0 => /lib64/libfribidi.so.0 (0x000075f8f9b88000)
-	libatk-1.0.so.0 => /lib64/libatk-1.0.so.0 (0x000075f8f9962000)
-	libpangocairo-1.0.so.0 => /lib64/libpangocairo-1.0.so.0 (0x000075f8f9754000)
-	libxml2.so.2 => /lib64/libxml2.so.2 (0x000075f8f93ea000)
-	libgmodule-2.0.so.0 => /lib64/libgmodule-2.0.so.0 (0x000075f8f91e6000)
-	libX11.so.6 => /lib64/libX11.so.6 (0x000075f8f8ea8000)
-	libXi.so.6 => /lib64/libXi.so.6 (0x000075f8f8c98000)
-	libXfixes.so.3 => /lib64/libXfixes.so.3 (0x000075f8f8a92000)
-	libatk-bridge-2.0.so.0 => /lib64/libatk-bridge-2.0.so.0 (0x000075f8f8863000)
-	libwayland-client.so.0 => /lib64/libwayland-client.so.0 (0x000075f8f8654000)
-	libepoxy.so.0 => /lib64/libepoxy.so.0 (0x000075f8f8328000)
-	libpangoft2-1.0.so.0 => /lib64/libpangoft2-1.0.so.0 (0x000075f8f8112000)
-	libfontconfig.so.1 => /lib64/libfontconfig.so.1 (0x000075f8f7ed0000)
-	libXinerama.so.1 => /lib64/libXinerama.so.1 (0x000075f8f7ccd000)
-	libXrandr.so.2 => /lib64/libXrandr.so.2 (0x000075f8f7ac2000)
-	libXcursor.so.1 => /lib64/libXcursor.so.1 (0x000075f8f78b7000)
-	libXcomposite.so.1 => /lib64/libXcomposite.so.1 (0x000075f8f76b4000)
-	libXdamage.so.1 => /lib64/libXdamage.so.1 (0x000075f8f74b1000)
-	libxkbcommon.so.0 => /lib64/libxkbcommon.so.0 (0x000075f8f7271000)
-	libwayland-cursor.so.0 => /lib64/libwayland-cursor.so.0 (0x000075f8f7069000)
-	libwayland-egl.so.1 => /lib64/libwayland-egl.so.1 (0x000075f8f6e67000)
-	libXext.so.6 => /lib64/libXext.so.6 (0x000075f8f6c55000)
-	libffi.so.6 => /lib64/libffi.so.6 (0x000075f8f6a4d000)
-	libpcre.so.1 => /lib64/libpcre.so.1 (0x000075f8f67eb000)
-	libz.so.1 => /lib64/libz.so.1 (0x000075f8f65d5000)
-	libselinux.so.1 => /lib64/libselinux.so.1 (0x000075f8f63ae000)
-	libresolv.so.2 => /lib64/libresolv.so.2 (0x000075f8f6194000)
-	libmount.so.1 => /lib64/libmount.so.1 (0x000075f8f5f51000)
-	libpng15.so.15 => /lib64/libpng15.so.15 (0x000075f8f5d26000)
-	libpixman-1.so.0 => /lib64/libpixman-1.so.0 (0x000075f8f5a7d000)
-	libfreetype.so.6 => /lib64/libfreetype.so.6 (0x000075f8f57be000)
-	libEGL.so.1 => /lib64/libEGL.so.1 (0x000075f8f55aa000)
-	libxcb-shm.so.0 => /lib64/libxcb-shm.so.0 (0x000075f8f53a6000)
-	libxcb.so.1 => /lib64/libxcb.so.1 (0x000075f8f517e000)
-	libxcb-render.so.0 => /lib64/libxcb-render.so.0 (0x000075f8f4f70000)
-	libXrender.so.1 => /lib64/libXrender.so.1 (0x000075f8f4d65000)
-	libGL.so.1 => /lib64/libGL.so.1 (0x000075f8f4ad9000)
-	libthai.so.0 => /lib64/libthai.so.0 (0x000075f8f48cd000)
-	liblzma.so.5 => /lib64/liblzma.so.5 (0x000075f8f46a7000)
-	libatspi.so.0 => /lib64/libatspi.so.0 (0x000075f8f4476000)
-	libdbus-1.so.3 => /lib64/libdbus-1.so.3 (0x000075f8f4226000)
-	libharfbuzz.so.0 => /lib64/libharfbuzz.so.0 (0x000075f8f3f89000)
-	libexpat.so.1 => /lib64/libexpat.so.1 (0x000075f8f3d5e000)
-	libuuid.so.1 => /lib64/libuuid.so.1 (0x000075f8f3b59000)
-	libblkid.so.1 => /lib64/libblkid.so.1 (0x000075f8f3919000)
-	libbz2.so.1 => /lib64/libbz2.so.1 (0x000075f8f3709000)
-	libGLdispatch.so.0 => /lib64/libGLdispatch.so.0 (0x000075f8f3453000)
-	libXau.so.6 => /lib64/libXau.so.6 (0x000075f8f324f000)
-	libGLX.so.0 => /lib64/libGLX.so.0 (0x000075f8f301d000)
-	libsystemd.so.0 => /lib64/libsystemd.so.0 (0x000075f8f2dec000)
-	libgraphite2.so.3 => /lib64/libgraphite2.so.3 (0x000075f8f2bbe000)
-	libcap.so.2 => /lib64/libcap.so.2 (0x000075f8f29b9000)
-	liblz4.so.1 => /lib64/liblz4.so.1 (0x000075f8f27aa000)
-	libgcrypt.so.11 => /lib64/libgcrypt.so.11 (0x000075f8f2529000)
-	libgpg-error.so.0 => /lib64/libgpg-error.so.0 (0x000075f8f2324000)
-	libdw.so.1 => /lib64/libdw.so.1 (0x000075f8f20d3000)
-	libattr.so.1 => /lib64/libattr.so.1 (0x000075f8f1ece000)
-	libelf.so.1 => /lib64/libelf.so.1 (0x000075f8f1cb6000)
+	linux-vdso.so.1 =>  (0x0000767894d1a000)
+	libgtksourceview-4.so.0 => /opt/gsv4/lib64/libgtksourceview-4.so.0 (0x0000767893f59000)
+	libgtk-3.so.0 => /lib64/libgtk-3.so.0 (0x0000767893651000)
+	libgdk-3.so.0 => /lib64/libgdk-3.so.0 (0x0000767893367000)
+	libgio-2.0.so.0 => /lib64/libgio-2.0.so.0 (0x0000767892fc7000)
+	libgdk_pixbuf-2.0.so.0 => /lib64/libgdk_pixbuf-2.0.so.0 (0x0000767892d9f000)
+	libcairo-gobject.so.2 => /lib64/libcairo-gobject.so.2 (0x0000767892b96000)
+	libpango-1.0.so.0 => /lib64/libpango-1.0.so.0 (0x0000767892950000)
+	libcairo.so.2 => /lib64/libcairo.so.2 (0x0000767892619000)
+	libgobject-2.0.so.0 => /lib64/libgobject-2.0.so.0 (0x00007678923c8000)
+	libglib-2.0.so.0 => /lib64/libglib-2.0.so.0 (0x00007678920b2000)
+	libgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x0000767891e9c000)
+	librt.so.1 => /lib64/librt.so.1 (0x0000767891c94000)
+	libpthread.so.0 => /lib64/libpthread.so.0 (0x0000767891a78000)
+	libm.so.6 => /lib64/libm.so.6 (0x0000767891776000)
+	libdl.so.2 => /lib64/libdl.so.2 (0x0000767891572000)
+	libc.so.6 => /lib64/libc.so.6 (0x00007678911a4000)
+	/lib64/ld-linux-x86-64.so.2 (0x0000767894a00000)
+	libfribidi.so.0 => /lib64/libfribidi.so.0 (0x0000767890f88000)
+	libatk-1.0.so.0 => /lib64/libatk-1.0.so.0 (0x0000767890d62000)
+	libpangocairo-1.0.so.0 => /lib64/libpangocairo-1.0.so.0 (0x0000767890b54000)
+	libxml2.so.2 => /lib64/libxml2.so.2 (0x00007678907ea000)
+	libgmodule-2.0.so.0 => /lib64/libgmodule-2.0.so.0 (0x00007678905e6000)
+	libX11.so.6 => /lib64/libX11.so.6 (0x00007678902a8000)
+	libXi.so.6 => /lib64/libXi.so.6 (0x0000767890098000)
+	libXfixes.so.3 => /lib64/libXfixes.so.3 (0x000076788fe92000)
+	libatk-bridge-2.0.so.0 => /lib64/libatk-bridge-2.0.so.0 (0x000076788fc63000)
+	libwayland-client.so.0 => /lib64/libwayland-client.so.0 (0x000076788fa54000)
+	libepoxy.so.0 => /lib64/libepoxy.so.0 (0x000076788f728000)
+	libpangoft2-1.0.so.0 => /lib64/libpangoft2-1.0.so.0 (0x000076788f512000)
+	libfontconfig.so.1 => /lib64/libfontconfig.so.1 (0x000076788f2d0000)
+	libXinerama.so.1 => /lib64/libXinerama.so.1 (0x000076788f0cd000)
+	libXrandr.so.2 => /lib64/libXrandr.so.2 (0x000076788eec2000)
+	libXcursor.so.1 => /lib64/libXcursor.so.1 (0x000076788ecb7000)
+	libXcomposite.so.1 => /lib64/libXcomposite.so.1 (0x000076788eab4000)
+	libXdamage.so.1 => /lib64/libXdamage.so.1 (0x000076788e8b1000)
+	libxkbcommon.so.0 => /lib64/libxkbcommon.so.0 (0x000076788e671000)
+	libwayland-cursor.so.0 => /lib64/libwayland-cursor.so.0 (0x000076788e469000)
+	libwayland-egl.so.1 => /lib64/libwayland-egl.so.1 (0x000076788e267000)
+	libXext.so.6 => /lib64/libXext.so.6 (0x000076788e055000)
+	libffi.so.6 => /lib64/libffi.so.6 (0x000076788de4d000)
+	libpcre.so.1 => /lib64/libpcre.so.1 (0x000076788dbeb000)
+	libz.so.1 => /lib64/libz.so.1 (0x000076788d9d5000)
+	libselinux.so.1 => /lib64/libselinux.so.1 (0x000076788d7ae000)
+	libresolv.so.2 => /lib64/libresolv.so.2 (0x000076788d594000)
+	libmount.so.1 => /lib64/libmount.so.1 (0x000076788d351000)
+	libpng15.so.15 => /lib64/libpng15.so.15 (0x000076788d126000)
+	libpixman-1.so.0 => /lib64/libpixman-1.so.0 (0x000076788ce7d000)
+	libfreetype.so.6 => /lib64/libfreetype.so.6 (0x000076788cbbe000)
+	libEGL.so.1 => /lib64/libEGL.so.1 (0x000076788c9aa000)
+	libxcb-shm.so.0 => /lib64/libxcb-shm.so.0 (0x000076788c7a6000)
+	libxcb.so.1 => /lib64/libxcb.so.1 (0x000076788c57e000)
+	libxcb-render.so.0 => /lib64/libxcb-render.so.0 (0x000076788c370000)
+	libXrender.so.1 => /lib64/libXrender.so.1 (0x000076788c165000)
+	libGL.so.1 => /lib64/libGL.so.1 (0x000076788bed9000)
+	libthai.so.0 => /lib64/libthai.so.0 (0x000076788bccd000)
+	liblzma.so.5 => /lib64/liblzma.so.5 (0x000076788baa7000)
+	libatspi.so.0 => /lib64/libatspi.so.0 (0x000076788b876000)
+	libdbus-1.so.3 => /lib64/libdbus-1.so.3 (0x000076788b626000)
+	libharfbuzz.so.0 => /lib64/libharfbuzz.so.0 (0x000076788b389000)
+	libexpat.so.1 => /lib64/libexpat.so.1 (0x000076788b15e000)
+	libuuid.so.1 => /lib64/libuuid.so.1 (0x000076788af59000)
+	libblkid.so.1 => /lib64/libblkid.so.1 (0x000076788ad19000)
+	libbz2.so.1 => /lib64/libbz2.so.1 (0x000076788ab09000)
+	libGLdispatch.so.0 => /lib64/libGLdispatch.so.0 (0x000076788a853000)
+	libXau.so.6 => /lib64/libXau.so.6 (0x000076788a64f000)
+	libGLX.so.0 => /lib64/libGLX.so.0 (0x000076788a41d000)
+	libsystemd.so.0 => /lib64/libsystemd.so.0 (0x000076788a1ec000)
+	libgraphite2.so.3 => /lib64/libgraphite2.so.3 (0x0000767889fbe000)
+	libcap.so.2 => /lib64/libcap.so.2 (0x0000767889db9000)
+	liblz4.so.1 => /lib64/liblz4.so.1 (0x0000767889baa000)
+	libgcrypt.so.11 => /lib64/libgcrypt.so.11 (0x0000767889929000)
+	libgpg-error.so.0 => /lib64/libgpg-error.so.0 (0x0000767889724000)
+	libdw.so.1 => /lib64/libdw.so.1 (0x00007678894d3000)
+	libattr.so.1 => /lib64/libattr.so.1 (0x00007678892ce000)
+	libelf.so.1 => /lib64/libelf.so.1 (0x00007678890b6000)
 == Xvfb main-window smoke test ==
-# Xvfb main-window smoke (2026-10-30T05:12:07Z)
+# Xvfb main-window smoke (2026-10-30T05:27:28Z)
 selftest_exit=0
 ## window entry from the X server (xwininfo -root -tree):
      0x200002 "VEdit": ("vd-app" "Vd-app")  1120x780+0+0  +0+0
 selftest JSON valid: suite=smoke ok=True checks=19
 == Xvfb selftest suites (smoke/highlight/config/fim, plus lsp/slang when the binaries are provided) ==
-# Xvfb selftest suites (2026-10-30T05:12:08Z)
+# Xvfb selftest suites (2026-10-30T05:27:30Z)
 suite=all
 selftest_exit=0
 VEDIT_SLANG=/vedit-build/build/slang/out/slang
