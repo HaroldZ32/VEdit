@@ -1,0 +1,35 @@
+# independent instrument-sanity check of probe-cpu.sh (extended protocol)
+# date: 2026-10-30T16:12:58+08:00  host_nproc=16  host_loadavg=7.37 3.96 2.25 1/1770 5
+# binary: archived pre-fix build (sha256 41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611)
+# NOTE: run while the writer lane may be building -> loadavg above; not the official BEFORE column.
+
+container_loadavg_start=7.37 3.96 2.25 1/1783 14
+binary=/vedit-build/target/probe-prefix/vd-app
+file=/vedit-build/crates/vd-app/tests/fixtures/definition/a.sv
+alive=yes pid=20
+--- toplevel windows ---
+
+xwininfo: Window id: 0x43 (the root window) (has no name)
+
+  Root window id: 0x43 (the root window) (has no name)
+  Parent window id: 0x0 (none)
+     4 children:
+     0x60000f (has no name): ()  1x1+-1+-1  +-1+-1
+     0x600002 "VEdit": ("vd-app" "Vd-app")  1120x780+0+0  +0+0
+        1 child:
+        0x600003 (has no name): ()  1x1+-1+-1  +-1+-1
+     0x600001 "vd-app": ("vd-app" "Vd-app")  10x10+10+10  +10+10
+     0x200001 (has no name): ()  10x10+-20+-20  +-20+-20
+baseline ticks=113 (app age ~3s + 2s)
+sampling window 3s: ticks=225 delta=112 -> 37.3% of one core
+sampling window 5s: ticks=486 delta=261 -> 52.2% of one core
+sampling window 10s: ticks=1280 delta=794 -> 79.4% of one core
+sampling window 20s: ticks=3211 delta=1931 -> 96.5% of one core
+sampling window 20s: ticks=5169 delta=1958 -> 97.9% of one core
+--- app log (last 8) ---
+vd-app: configuration warnings: 1
+evidence/github/repro/probe-cpu.sh: line 84:    20 Terminated              "$APP_BIN" "$TARGET_FILE" > /tmp/app.log 2>&1
+SUMMARY: app_age=60s first_window_pct=37.3 last_window_20s_pct=97.9 growth_pp=60.6
+RESULT: OK
+probe_exit=0
+container_loadavg_end=4.29 3.71 2.28 4/1768 85

@@ -1,0 +1,27 @@
+binary=/vedit-build/target/release/vd-app
+file=/vedit-build/crates/vd-app/tests/fixtures/definition/a.sv
+alive=yes pid=11
+--- toplevel windows ---
+
+xwininfo: Window id: 0x43 (the root window) (has no name)
+
+  Root window id: 0x43 (the root window) (has no name)
+  Parent window id: 0x0 (none)
+     4 children:
+     0x60000f (has no name): ()  1x1+-1+-1  +-1+-1
+     0x600002 "VEdit": ("vd-app" "Vd-app")  1120x780+0+0  +0+0
+        1 child:
+        0x600003 (has no name): ()  1x1+-1+-1  +-1+-1
+     0x600001 "vd-app": ("vd-app" "Vd-app")  10x10+10+10  +10+10
+     0x200001 (has no name): ()  10x10+-20+-20  +-20+-20
+baseline ticks=11 (app age ~3s + 2s)
+sampling window 3s: ticks=12 delta=1 -> 0.3% of one core
+sampling window 5s: ticks=13 delta=1 -> 0.2% of one core
+sampling window 10s: ticks=16 delta=3 -> 0.3% of one core
+sampling window 20s: ticks=19 delta=3 -> 0.1% of one core
+sampling window 20s: ticks=23 delta=4 -> 0.2% of one core
+--- app log (last 8) ---
+vd-app: configuration warnings: 1
+evidence/github/repro/probe-cpu.sh: line 84:    11 Terminated              "$APP_BIN" "$TARGET_FILE" > /tmp/app.log 2>&1
+SUMMARY: app_age=60s first_window_pct=0.3 last_window_20s_pct=0.2 growth_pp=-0.1
+RESULT: OK
