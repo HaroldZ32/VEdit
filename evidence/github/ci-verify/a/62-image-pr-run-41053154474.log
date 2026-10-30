@@ -1,0 +1,608 @@
+build the pinned image	UNKNOWN STEP	﻿2026-10-30T12:08:47.9244574Z Current runner version: '2.338.0'
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9281429Z ##[group]Runner Image Provisioner
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9282737Z Hosted Compute Agent
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9283955Z Version: 20261021.618
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9284977Z Commit: 21505ad2541d5be6135ed84fc33697146cf75b8e
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9286335Z Build Date: 2026-10-21T00:45:21Z
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9287538Z Worker ID: {2f6071f4-8b95-4939-9df7-85350ffa532c}
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9288803Z Region: eastus
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9289814Z Cloud: Azure
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9291013Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9293354Z ##[group]Operating System
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9294493Z Ubuntu
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9295492Z 24.04.5
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9296421Z LTS
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9297224Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9298250Z ##[group]Runner Image
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9299292Z Image: ubuntu-24.04
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9300614Z Version: 20261025.353.1
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9302729Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20261025.353/images/ubuntu/Ubuntu2404-Readme.md
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9305566Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu24%2F20261025.353
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9307255Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9309485Z ##[group]GITHUB_TOKEN Permissions
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9312780Z Contents: read
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9313899Z Metadata: read
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9314800Z Packages: write
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9315682Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9318761Z Secret source: Actions
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9320675Z Cache mode: write
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9321834Z Prepare workflow directory
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9811774Z Prepare all required actions
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:47.9883947Z Getting action download info
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:48.2647012Z Download action repository 'actions/checkout@v4' (SHA:11d5960a326750d5838078e36cf38b85af677262)
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:48.3698673Z Download action repository 'docker/login-action@v3' (SHA:c94ce9fb468520275223c153574b00df6fe4bcc9)
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:48.5896508Z Download action repository 'docker/setup-buildx-action@v3' (SHA:8d2750c68a42422c14e847fe6c8ac0403b4cbd6f)
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:48.7782436Z Download action repository 'actions/cache@v4' (SHA:0057852bfaa89a56745cba8c7296529d2fc39830)
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:48.9969258Z Complete job name: build the pinned image
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.1030669Z ##[group]Run actions/checkout@v4
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.1031813Z with:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.1032333Z   repository: HaroldZ32/VEdit
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.1041430Z   token: ***
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.1041937Z   ssh-strict: true
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.1042456Z   ssh-user: git
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.1042990Z   persist-credentials: true
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.1043611Z   clean: true
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.1044139Z   sparse-checkout-cone-mode: true
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.1044828Z   fetch-depth: 1
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.1045342Z   fetch-tags: false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.1045878Z   show-progress: true
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.1046428Z   lfs: false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.1046919Z   submodules: false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.1047468Z   set-safe-directory: true
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.1048156Z   allow-unsafe-pr-checkout: false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.1049164Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3532916Z Syncing repository: HaroldZ32/VEdit
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3535511Z ##[group]Getting Git version info
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3536758Z Working directory is '/home/runner/work/VEdit/VEdit'
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3538610Z [command]/usr/bin/git version
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3613463Z git version 2.56.0
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3639087Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3661856Z Temporarily overriding HOME='/home/runner/work/_temp/6449ab25-6565-435a-b367-4d4e75f4134d' before making global git config changes
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3683324Z Adding repository directory to the temporary git global config as a safe directory
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3703536Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/VEdit/VEdit
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3737509Z Deleting the contents of '/home/runner/work/VEdit/VEdit'
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3748116Z ##[group]Initializing the repository
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3765722Z [command]/usr/bin/git init /home/runner/work/VEdit/VEdit
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3871082Z hint: Using 'master' as the name for the initial branch. This default branch name
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3876206Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3879941Z hint: to use in all of your new repositories, which will suppress this warning,
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3882960Z hint: call:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3884748Z hint:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3886654Z hint: 	git config --global init.defaultBranch <name>
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3889146Z hint:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3892691Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3896201Z hint: 'development'. The just-created branch can be renamed via this command:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3898832Z hint:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3900889Z hint: 	git branch -m <name>
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3902860Z hint:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3905457Z hint: Disable this message with "git config set advice.defaultBranchName false"
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3909429Z Initialized empty Git repository in /home/runner/work/VEdit/VEdit/.git/
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3915869Z [command]/usr/bin/git remote add origin https://github.com/HaroldZ32/VEdit
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3947481Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3950635Z ##[group]Disabling automatic garbage collection
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3953027Z [command]/usr/bin/git config --local gc.auto 0
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3993943Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.3996522Z ##[group]Setting up auth
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.4004349Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.4053939Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.4464470Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.4516432Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.4766972Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.4814918Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.5079060Z [command]/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.5133926Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.5136127Z ##[group]Fetching the repository
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.5149544Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +12fd9aaf37fe434cb5dce296ff3d361401805d57:refs/remotes/pull/6/merge
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.9066821Z From https://github.com/HaroldZ32/VEdit
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.9068170Z  * [new ref]         12fd9aaf37fe434cb5dce296ff3d361401805d57 -> pull/6/merge
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.9073021Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.9074430Z ##[group]Determining the checkout info
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.9076187Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.9082729Z [command]/usr/bin/git sparse-checkout disable
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.9150558Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.9203304Z ##[group]Checking out the ref
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:49.9207007Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/6/merge
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0101841Z Note: switching to 'refs/remotes/pull/6/merge'.
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0103009Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0103973Z You are in 'detached HEAD' state. You can look around, make experimental
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0106184Z changes and commit them, and you can discard any commits you make in this
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0108226Z state without impacting any branches by switching back to a branch.
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0109395Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0110640Z If you want to create a new branch to retain commits you create, you may
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0113107Z do so (now or later) by using -c with the switch command. Example:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0114312Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0115018Z   git switch -c <new-branch-name>
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0115709Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0116191Z Or undo this operation with:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0116754Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0117172Z   git switch -
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0117700Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0118415Z Turn off this advice by setting config variable advice.detachedHead to false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0119411Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0120651Z HEAD is now at 12fd9aa Merge 2b3e54016d327e3c983d466b8abc868647c670ae into 30ba54e50a34aca9b8f583487773d94e5e05bb70
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0123845Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0174780Z [command]/usr/bin/git log -1 --format=%H
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0212069Z 12fd9aaf37fe434cb5dce296ff3d361401805d57
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0557352Z ##[group]Run docker/login-action@v3
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0558283Z with:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0559064Z   registry: ghcr.io
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0559917Z   username: HaroldZ32
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0564463Z   password: ***
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0565284Z   logout: true
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.0566068Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.3946463Z Logging into ghcr.io...
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.3974079Z (node:2141) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.3977087Z (Use `node --trace-deprecation ...` to show where the warning was created)
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.6475685Z Login Succeeded!
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.6697089Z ##[group]Run docker/setup-buildx-action@v3
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.6697569Z with:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.6697915Z   driver: docker-container
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.6698281Z   use: true
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.6698601Z   keep-state: false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.6698955Z   cache-binary: true
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.6699311Z   cleanup: true
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.6699649Z   install: false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.6699977Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9471848Z (node:2161) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9473348Z (Use `node --trace-deprecation ...` to show where the warning was created)
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9556515Z ##[group]Docker info
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9586594Z [command]/usr/bin/docker version
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9889818Z Client: Docker Engine - Community
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9891566Z  Version:           28.0.4
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9892821Z  API version:       1.48
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9894307Z  Go version:        go1.23.7
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9895096Z  Git commit:        b8034c0
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9896111Z  Built:             Tue Mar 25 15:07:16 2025
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9896711Z  OS/Arch:           linux/amd64
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9897550Z  Context:           default
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9897886Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9898128Z Server: Docker Engine - Community
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9898975Z  Engine:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9899427Z   Version:          28.0.4
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9900214Z   API version:      1.48 (minimum version 1.24)
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9901235Z   Go version:       go1.23.7
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9901756Z   Git commit:       6430e49
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9902297Z   Built:            Tue Mar 25 15:07:16 2025
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9902877Z   OS/Arch:          linux/amd64
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9903396Z   Experimental:     false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9903999Z  containerd:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9904411Z   Version:          v2.4.2
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9904980Z   GitCommit:        b7a25261e029d68978bbf290df0a62fc819b3c51
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9905612Z  runc:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9906007Z   Version:          1.5.2
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9906476Z   GitCommit:        v1.5.2-0-g29dd3dc2
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9906992Z  docker-init:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9907423Z   Version:          0.19.0
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9907897Z   GitCommit:        de40ad0
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:50.9951684Z [command]/usr/bin/docker info
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1872712Z Client: Docker Engine - Community
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1881328Z  Version:    28.0.4
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1882392Z  Context:    default
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1882899Z  Debug Mode: false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1883378Z  Plugins:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1883902Z   buildx: Docker Buildx (Docker Inc.)
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1884489Z     Version:  v0.38.1
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1885110Z     Path:     /usr/libexec/docker/cli-plugins/docker-buildx
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1885926Z   compose: Docker Compose (Docker Inc.)
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1886566Z     Version:  v2.38.2
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1887241Z     Path:     /usr/libexec/docker/cli-plugins/docker-compose
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1887769Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1887986Z Server:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1888457Z  Containers: 0
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1888950Z   Running: 0
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1889439Z   Paused: 0
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1889914Z   Stopped: 0
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1890722Z  Images: 6
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1891175Z  Server Version: 28.0.4
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1891608Z  Storage Driver: overlay2
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1892088Z   Backing Filesystem: extfs
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1892617Z   Supports d_type: true
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1893019Z   Using metacopy: false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1893352Z   Native Overlay Diff: false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1893798Z   userxattr: false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1894117Z  Logging Driver: json-file
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1894404Z  Cgroup Driver: systemd
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1894693Z  Cgroup Version: 2
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1894941Z  Plugins:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1895175Z   Volume: local
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1895471Z   Network: bridge host ipvlan macvlan null overlay
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1896289Z   Log: awslogs fluentd gcplogs gelf journald json-file local splunk syslog
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1896748Z  Swarm: inactive
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1897025Z  Runtimes: io.containerd.runc.v2 runc
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1897347Z  Default Runtime: runc
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1897625Z  Init Binary: docker-init
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1897982Z  containerd version: b7a25261e029d68978bbf290df0a62fc819b3c51
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1898404Z  runc version: v1.5.2-0-g29dd3dc2
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1898883Z  init version: de40ad0
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1899391Z  Security Options:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1899807Z   apparmor
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1900154Z   seccomp
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1900735Z    Profile: builtin
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1900998Z   cgroupns
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1901244Z  Kernel Version: 7.0.0-1017-azure
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1901597Z  Operating System: Ubuntu 24.04.5 LTS
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1901925Z  OSType: linux
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1902188Z  Architecture: x86_64
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1902469Z  CPUs: 4
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1902718Z  Total Memory: 15.61GiB
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1903011Z  Name: runnervm48cm3
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1903309Z  ID: 66e228d3-4823-4830-aecc-3d27b286e9c6
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1903844Z  Docker Root Dir: /var/lib/docker
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1904234Z  Debug Mode: false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1904537Z  Username: githubactions
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1904820Z  Experimental: false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1905171Z  Insecure Registries:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1911052Z   ::1/128
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1911467Z   127.0.0.0/8
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1911790Z  Live Restore Enabled: false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1911995Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.1912517Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.2735084Z ##[group]Buildx version
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.2771238Z [command]/usr/bin/docker buildx version
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.3526606Z github.com/docker/buildx v0.38.1 0dbe87f36ed472fe36b6796c3f70b4210a731fc5
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.3578381Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.3792237Z ##[group]Inspecting default docker context
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.3991261Z [
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.3992163Z   {
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.3992688Z     "Name": "default",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.3993162Z     "Metadata": {},
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.3993856Z     "Endpoints": {
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.3994338Z       "docker": {
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.3994799Z         "Host": "unix:///var/run/docker.sock",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.3995510Z         "SkipTLSVerify": false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.3995987Z       }
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.3996403Z     },
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.3996799Z     "TLSMaterial": {},
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.3997366Z     "Storage": {
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.3998725Z       "MetadataPath": "<IN MEMORY>",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.3999703Z       "TLSPath": "<IN MEMORY>"
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.4001254Z     }
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.4001949Z   }
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.4002700Z ]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.4004357Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.4005655Z ##[group]Creating a new builder instance
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.5974877Z [command]/usr/bin/docker buildx create --name builder-e24db94f-6544-4ccc-92a3-e2cc715667c1 --driver docker-container --buildkitd-flags --allow-insecure-entitlement security.insecure --allow-insecure-entitlement network.host --use
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.7031858Z builder-e24db94f-6544-4ccc-92a3-e2cc715667c1
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.7086823Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.7098219Z ##[group]Booting builder
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.7162058Z [command]/usr/bin/docker buildx inspect --bootstrap --builder builder-e24db94f-6544-4ccc-92a3-e2cc715667c1
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.7929948Z #1 [internal] booting buildkit
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:51.9438309Z #1 pulling image moby/buildkit:buildx-stable-1
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.4985216Z #1 pulling image moby/buildkit:buildx-stable-1 2.7s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.6498440Z #1 creating container buildx_buildkit_builder-e24db94f-6544-4ccc-92a3-e2cc715667c10
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8165452Z #1 creating container buildx_buildkit_builder-e24db94f-6544-4ccc-92a3-e2cc715667c10 0.3s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8559269Z #1 DONE 3.0s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8935148Z Name:          builder-e24db94f-6544-4ccc-92a3-e2cc715667c1
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8941250Z Driver:        docker-container
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8942524Z Last Activity: 2026-10-30 12:08:51 +0000 UTC
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8942794Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8942874Z Nodes:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8943149Z Name:                  builder-e24db94f-6544-4ccc-92a3-e2cc715667c10
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8943534Z Endpoint:              unix:///var/run/docker.sock
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8943849Z Status:                running
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8944391Z BuildKit daemon flags: --allow-insecure-entitlement security.insecure --allow-insecure-entitlement network.host
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8944958Z BuildKit version:      v0.33.1
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8945327Z Platforms:             linux/amd64, linux/amd64/v2, linux/amd64/v3, linux/386
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8945698Z Labels:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8945949Z  org.mobyproject.buildkit.worker.executor:         oci
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8946360Z  org.mobyproject.buildkit.worker.hostname:         f51565a4a774
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8946783Z  org.mobyproject.buildkit.worker.network:          host
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8947215Z  org.mobyproject.buildkit.worker.oci.process-mode: sandbox
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8947649Z  org.mobyproject.buildkit.worker.selinux.enabled:  false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8948066Z  org.mobyproject.buildkit.worker.snapshotter:      overlayfs
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8948404Z GC Policy rule#0:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8948608Z  All:            false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8948947Z  Filters:        type==source.local type==exec.cachemount type==source.git.checkout
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8949427Z  Keep Duration:  48h0m0s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8949678Z  Max Used Space: 488.3MiB
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8949936Z GC Policy rule#1:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8950437Z  All:            false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8950662Z  Keep Duration:  1440h0m0s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8950898Z  Reserved Space: 9.313GiB
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8951118Z  Max Used Space: 93.13GiB
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8951494Z  Min Free Space: 27.01GiB
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8951712Z GC Policy rule#2:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8951908Z  All:            false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8952125Z  Reserved Space: 9.313GiB
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8952362Z  Max Used Space: 93.13GiB
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8952577Z  Min Free Space: 27.01GiB
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8952788Z GC Policy rule#3:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8952981Z  All:            true
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8953191Z  Reserved Space: 9.313GiB
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8953407Z  Max Used Space: 93.13GiB
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.8953629Z  Min Free Space: 27.01GiB
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:54.9009864Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0131223Z ##[group]Inspect builder
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0196197Z {
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0197052Z   "nodes": [
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0197400Z     {
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0197889Z       "name": "builder-e24db94f-6544-4ccc-92a3-e2cc715667c10",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0198545Z       "endpoint": "unix:///var/run/docker.sock",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0199075Z       "status": "running",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0199996Z       "buildkitd-flags": "--allow-insecure-entitlement security.insecure --allow-insecure-entitlement network.host",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0201190Z       "buildkit": "v0.33.1",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0201813Z       "platforms": "linux/amd64,linux/amd64/v2,linux/amd64/v3,linux/386",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0202455Z       "features": {
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0203006Z         "Automatically load images to the Docker Engine image store": true,
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0203667Z         "Cache export": true,
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0204093Z         "Direct push": true,
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0204527Z         "Docker exporter": true,
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0204979Z         "Multi-platform build": true,
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0205458Z         "OCI exporter": true
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0205864Z       },
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0206189Z       "labels": {
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0206694Z         "org.mobyproject.buildkit.worker.executor": "oci",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0207471Z         "org.mobyproject.buildkit.worker.hostname": "f51565a4a774",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0208232Z         "org.mobyproject.buildkit.worker.network": "host",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0208989Z         "org.mobyproject.buildkit.worker.oci.process-mode": "sandbox",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0209809Z         "org.mobyproject.buildkit.worker.selinux.enabled": "false",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0210664Z         "org.mobyproject.buildkit.worker.snapshotter": "overlayfs"
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0211095Z       },
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0211309Z       "gcPolicy": [
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0211539Z         {
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0211751Z           "all": false,
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0211993Z           "filter": [
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0212395Z             "type==source.local type==exec.cachemount type==source.git.checkout"
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0212874Z           ],
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0213131Z           "keepDuration": "48h0m0s",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0213420Z           "maxUsedSpace": "488.3MiB"
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0213668Z         },
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0213844Z         {
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0214041Z           "all": false,
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0214282Z           "keepDuration": "1440h0m0s",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0214562Z           "reservedSpace": "9.313GiB",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0214819Z           "maxUsedSpace": "93.13GiB",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0215106Z           "minFreeSpace": "27.01GiB"
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0215362Z         },
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0215533Z         {
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0215738Z           "all": false,
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0215987Z           "reservedSpace": "9.313GiB",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0216261Z           "maxUsedSpace": "93.13GiB",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0216528Z           "minFreeSpace": "27.01GiB"
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0216781Z         },
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0216973Z         {
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0217168Z           "all": true,
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0217390Z           "reservedSpace": "9.313GiB",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0217636Z           "maxUsedSpace": "93.13GiB",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0217902Z           "minFreeSpace": "27.01GiB"
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0218152Z         }
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0218320Z       ]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0218485Z     }
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0218655Z   ],
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0218895Z   "name": "builder-e24db94f-6544-4ccc-92a3-e2cc715667c1",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0219223Z   "driver": "docker-container",
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0219486Z   "lastActivity": "2026-10-30T12:08:51.000Z"
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0219746Z }
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0220543Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0220986Z ##[group]BuildKit version
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0221275Z builder-e24db94f-6544-4ccc-92a3-e2cc715667c10: v0.33.1
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.0221722Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.1060006Z ##[group]Run actions/cache@v4
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.1060613Z with:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.1060857Z   path: /tmp/vedit-buildx-cache
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.1083477Z   key: buildx-Linux-e321202901b32664c2a7c38b5bdc10000a0f079678482e6eb008ba51b14b9466
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.1083951Z   restore-keys: buildx-Linux-
+build the pinned image	UNKNOWN STEP	
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.1084223Z   enableCrossOsArchive: false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.1084480Z   fail-on-cache-miss: false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.1084715Z   lookup-only: false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.1084939Z   save-always: false
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.1085147Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.2224233Z (node:2664) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.2225861Z (Use `node --trace-deprecation ...` to show where the warning was created)
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.3207752Z Cache hit for: buildx-Linux-e321202901b32664c2a7c38b5bdc10000a0f079678482e6eb008ba51b14b9466
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:55.3325019Z (node:2664) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:56.3876052Z Received 209715200 of 566567272 (37.0%), 199.4 MBs/sec
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:57.3891062Z Received 461373440 of 566567272 (81.4%), 219.6 MBs/sec
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:57.9395035Z Received 566567272 of 566567272 (100.0%), 212.0 MBs/sec
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:57.9401378Z Cache Size: ~540 MB (566567272 B)
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:57.9485146Z [command]/usr/bin/tar -xf /home/runner/work/_temp/571861a3-8d08-44dc-8f9a-a4b0f53e9c09/cache.tzst -P -C /home/runner/work/VEdit/VEdit --use-compress-program unzstd
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:58.8024845Z Cache restored successfully
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:58.8410000Z Cache restored from key: buildx-Linux-e321202901b32664c2a7c38b5bdc10000a0f079678482e6eb008ba51b14b9466
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:58.8632174Z ##[group]Run set -euo pipefail
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:58.8632589Z ^[[36;1mset -euo pipefail^[[0m
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:58.8633027Z ^[[36;1mowner="$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"^[[0m
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:58.8633515Z ^[[36;1mrepo="ghcr.io/${owner}/vedit-build"^[[0m
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:58.8633982Z ^[[36;1mVEDIT_BUILD_IMAGE_REF="${repo}:${GITHUB_SHA}" bash scripts/build-image.sh^[[0m
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:58.8634479Z ^[[36;1mecho "IMAGE_REF=${repo}:${GITHUB_SHA}" >> "$GITHUB_ENV"^[[0m
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:58.8634867Z ^[[36;1mecho "IMAGE_REPO=${repo}" >> "$GITHUB_ENV"^[[0m
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:58.8659818Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:58.8660505Z env:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:58.8660862Z   VEDIT_BUILD_CACHE_FROM: type=local,src=/tmp/vedit-buildx-cache
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:58.8661357Z   VEDIT_BUILD_CACHE_TO: type=local,dest=/tmp/vedit-buildx-cache,mode=min
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:58.8661742Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:08:58.8998432Z [image] pulling docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4 (attempt 1/3)
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:08.3711256Z docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4: Pulling from library/centos
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:13.6441853Z 2d473b07cdd5: Pulling fs layer
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:29.0642799Z 2d473b07cdd5: Verifying Checksum
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:29.0643311Z 2d473b07cdd5: Download complete
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:31.8669062Z 2d473b07cdd5: Pull complete
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:31.8704606Z Digest: sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:31.8712383Z Status: Downloaded newer image for docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:31.8719230Z docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:31.8904839Z [image] building ghcr.io/haroldz32/vedit-build:12fd9aaf37fe434cb5dce296ff3d361401805d57 from the pinned inputs
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:31.8906253Z [image] base image: docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:32.0693942Z [image] build cache: from=type=local,src=/tmp/vedit-buildx-cache to=type=local,dest=/tmp/vedit-buildx-cache,mode=min (docker buildx --load)
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:32.3700682Z #0 building with "builder-e24db94f-6544-4ccc-92a3-e2cc715667c1" instance using docker-container driver
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:32.3701396Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:32.3701681Z #1 [internal] load build definition from Dockerfile.build
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:32.3702380Z #1 transferring dockerfile: 6.15kB done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:32.3702924Z #1 DONE 0.0s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:32.3703156Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:32.3703840Z #2 [internal] load metadata for docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.2215999Z #2 DONE 11.0s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4074928Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4075751Z #3 [internal] load .dockerignore
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4076581Z #3 transferring context: 2B done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4077009Z #3 DONE 0.0s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4077191Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4077737Z #4 importing cache manifest from local:12571468952589853489
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4078519Z #4 inferred cache manifest type: application/vnd.oci.image.manifest.v1+json done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4079549Z #4 DONE 0.0s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4079744Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4080582Z #5 [1/9] FROM docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4081946Z #5 resolve docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4 done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4082924Z #5 DONE 0.0s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4083159Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4083366Z #6 [internal] load build context
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4083868Z #6 transferring context: 310B done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4084350Z #6 DONE 0.0s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4084579Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4093006Z #7 [7/9] RUN set -eux;     curl -fsSL -o /tmp/rustup-init "https://static.rust-lang.org/rustup/archive/1.29.2/x86_64-unknown-linux-gnu/rustup-init";     echo "5be191e8c70a5007074254cb74d78dbfdd25cd5a61c27de7b8e5410122ec24f4  /tmp/rustup-init" | sha256sum -c -;     chmod 755 /tmp/rustup-init;     RUSTUP_HOME=/opt/rust CARGO_HOME=/opt/cargo /tmp/rustup-init       -y --no-modify-path --profile minimal --default-toolchain "1.99.0";     RUSTUP_HOME=/opt/rust CARGO_HOME=/opt/cargo /opt/cargo/bin/rustup component add       --toolchain "1.99.0" rustfmt clippy;     chmod -R a+rX /opt/rust /opt/cargo;     RUSTUP_HOME=/opt/rust CARGO_HOME=/opt/cargo /opt/cargo/bin/rustc --version
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4105787Z #7 CACHED
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4105976Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4107533Z #8 [3/9] RUN rm -f /etc/yum.repos.d/CentOS-*.repo  && sed "s|@CENTOS_VAULT_BASE@|https://mirrors.tuna.tsinghua.edu.cn/centos-vault/7.9.2009|g" /tmp/vault.repo.in > /etc/yum.repos.d/vault.repo  && rm -f /tmp/vault.repo.in  && cat /etc/yum.repos.d/vault.repo
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4109561Z #8 CACHED
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4109699Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4111599Z #9 [5/9] RUN mkdir -p /opt/vedit  && { echo "## gtk3 immodule packages in the CentOS 7.9.2009 vault:";       for pkg in gtk3-immodule-xim gtk3-immodule-ibus ibus-gtk3; do         if yum -y install "$pkg" >/dev/null 2>&1; then echo "installed $pkg";         else echo "not available: $pkg"; fi;       done;       echo "## immodule files:";       ls -l /usr/lib64/gtk-3.0/3.0.0/immodules/ 2>&1 || true;     } | tee /opt/vedit/immodules.txt
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4113847Z #9 CACHED
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4114047Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4121497Z #10 [6/9] RUN set -eux;     curl -fsSL -o /tmp/meson.whl "https://files.pythonhosted.org/packages/01/48/b4ba2490ed26c73618736dece01a68a609713f1a7923563d4c41ac966b3b/meson-0.59.4-py3-none-any.whl";     echo "9db5bb89d3bd1c8e9c15974be5fa656f50491c48d53c43b6eb5cfe406dff3fd6  /tmp/meson.whl" | sha256sum -c -;     curl -fsSL -o /tmp/ninja.whl "https://files.pythonhosted.org/packages/0f/58/854ce5aab0ff5c33d66e1341b0be42f0330797335011880f7fbd88449996/ninja-1.11.1-py2.py3-none-manylinux_2_12_x86_64.manylinux2010_x86_64.whl";     echo "817e2aee2a4d28a708a67bcfba1817ae502c32c6d8ef80e50d63b0f23adf3a08  /tmp/ninja.whl" | sha256sum -c -;     mkdir -p /opt/wheels/meson /opt/wheels/ninja;     python3 -m zipfile -e /tmp/meson.whl /opt/wheels/meson;     pysite=$(python3 -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])');     mkdir -p "$pysite";     cp -a /opt/wheels/meson/mesonbuild "$pysite/";     { echo '#!/usr/bin/python3';       echo 'import sys';       echo 'from mesonbuild.mesonmain import main';       echo 'if __name__ == "__main__":';       echo '    sys.exit(main())';     } > /usr/local/bin/meson;     chmod 755 /usr/local/bin/meson;     python3 -m zipfile -e /tmp/ninja.whl /opt/wheels/ninja;     cp /opt/wheels/ninja/ninja/data/bin/ninja /usr/local/bin/ninja;     chmod 755 /usr/local/bin/ninja;     meson --version; ninja --version
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4129577Z #10 CACHED
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4129790Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4133869Z #11 [8/9] RUN set -eux;     curl -fsSL -o /tmp/gtksourceview.tar.xz "https://download.gnome.org/sources/gtksourceview/4.6/gtksourceview-4.6.1.tar.xz";     echo "63f487a7ab59612ffa9e7be1883dbd274ab1016afcede3239b93b0fc384df874  /tmp/gtksourceview.tar.xz" | sha256sum -c -;     mkdir -p /opt/src/gtksourceview;     tar -xJf /tmp/gtksourceview.tar.xz -C /opt/src/gtksourceview --strip-components=1;     cd /opt/src/gtksourceview;     meson setup build --prefix=/opt/gsv4 --libdir=lib64       -Dgtk_doc=false -Dgir=false -Dvapi=false -Dinstall_tests=false -Dglade_catalog=false;     ninja -C build;     ninja -C build install;     rm -rf /opt/src/gtksourceview /tmp/gtksourceview.tar.xz
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4136279Z #11 CACHED
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4136401Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4136528Z #12 [2/9] COPY vault.repo.in /tmp/vault.repo.in
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4136827Z #12 CACHED
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4136931Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4138426Z #13 [4/9] RUN yum -y install       gcc gcc-c++ make pkgconfig git curl tar xz bzip2 which findutils file       glib2-devel gtk3-devel libxml2-devel gettext       gdk-pixbuf2 gdk-pixbuf2-devel       python3       dejavu-sans-fonts dejavu-sans-mono-fonts fontconfig       xorg-x11-server-Xvfb xorg-x11-utils mesa-demos mesa-libGL  && yum clean all
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4139923Z #13 CACHED
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4140040Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4142156Z #14 [9/9] RUN { echo "## image facts"; cat /etc/centos-release;       echo "glibc: $(rpm -q glibc)";       echo "gtk3: $(rpm -q gtk3)";       echo "rust: $(/opt/cargo/bin/rustc --version)";       echo "gsv4: $(PKG_CONFIG_PATH=/opt/gsv4/lib64/pkgconfig pkg-config --modversion gtksourceview-4)";     } > /opt/vedit/build-image.txt  && rpm -qa --qf '%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n' | sort > /opt/vedit/rpm-snapshot.txt
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.4143999Z #14 sha256:2d473b07cdd5f0912cd6f1a703352c82b512407db6b05b43f2553732b55df3bc 23.07MB / 76.10MB 0.2s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.5600535Z #14 sha256:2d473b07cdd5f0912cd6f1a703352c82b512407db6b05b43f2553732b55df3bc 44.04MB / 76.10MB 0.3s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.7148015Z #14 sha256:2d473b07cdd5f0912cd6f1a703352c82b512407db6b05b43f2553732b55df3bc 72.35MB / 76.10MB 0.5s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.9067304Z #14 sha256:2d473b07cdd5f0912cd6f1a703352c82b512407db6b05b43f2553732b55df3bc 76.10MB / 76.10MB 0.5s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:43.9068922Z #14 extracting sha256:2d473b07cdd5f0912cd6f1a703352c82b512407db6b05b43f2553732b55df3bc
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:45.6112496Z #14 extracting sha256:2d473b07cdd5f0912cd6f1a703352c82b512407db6b05b43f2553732b55df3bc 1.9s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:45.7976104Z #14 sha256:458c8cf126fcca77539ea84ac2dd1de3a386fd00cbc109ee5fb0820f20ffeade 258B / 258B done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:45.7977174Z #14 extracting sha256:458c8cf126fcca77539ea84ac2dd1de3a386fd00cbc109ee5fb0820f20ffeade done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:45.7977959Z #14 sha256:0852e66177445b04ccd0952aa3f0350a619633ffba7374d34b5dc1dbc5e988c4 481B / 481B done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:45.7978617Z #14 extracting sha256:0852e66177445b04ccd0952aa3f0350a619633ffba7374d34b5dc1dbc5e988c4 done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:45.7995881Z #14 sha256:5647c6bbb08e27c5fea18c75aee01bd836092acf188d8a34a68c222cd1e3a08a 23.07MB / 147.64MB 0.2s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:45.9494381Z #14 sha256:5647c6bbb08e27c5fea18c75aee01bd836092acf188d8a34a68c222cd1e3a08a 48.23MB / 147.64MB 0.3s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:46.0996880Z #14 sha256:5647c6bbb08e27c5fea18c75aee01bd836092acf188d8a34a68c222cd1e3a08a 78.64MB / 147.64MB 0.5s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:46.2496210Z #14 sha256:5647c6bbb08e27c5fea18c75aee01bd836092acf188d8a34a68c222cd1e3a08a 101.71MB / 147.64MB 0.6s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:46.4006177Z #14 sha256:5647c6bbb08e27c5fea18c75aee01bd836092acf188d8a34a68c222cd1e3a08a 126.88MB / 147.64MB 0.8s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:46.5495992Z #14 sha256:5647c6bbb08e27c5fea18c75aee01bd836092acf188d8a34a68c222cd1e3a08a 147.64MB / 147.64MB 0.9s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:46.7614941Z #14 sha256:5647c6bbb08e27c5fea18c75aee01bd836092acf188d8a34a68c222cd1e3a08a 147.64MB / 147.64MB 1.0s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:46.7616260Z #14 extracting sha256:5647c6bbb08e27c5fea18c75aee01bd836092acf188d8a34a68c222cd1e3a08a
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:50.7940179Z #14 extracting sha256:5647c6bbb08e27c5fea18c75aee01bd836092acf188d8a34a68c222cd1e3a08a 4.2s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:50.9517650Z #14 sha256:58180179d21cd66306a7b7eb5b754a0cd07ac6af2488719d3259777a2cb5b974 23.07MB / 102.75MB 0.2s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:51.1155303Z #14 sha256:58180179d21cd66306a7b7eb5b754a0cd07ac6af2488719d3259777a2cb5b974 47.19MB / 102.75MB 0.3s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:51.2532272Z #14 sha256:58180179d21cd66306a7b7eb5b754a0cd07ac6af2488719d3259777a2cb5b974 68.16MB / 102.75MB 0.5s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:51.4008431Z #14 sha256:58180179d21cd66306a7b7eb5b754a0cd07ac6af2488719d3259777a2cb5b974 96.47MB / 102.75MB 0.6s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:51.6089640Z #14 sha256:58180179d21cd66306a7b7eb5b754a0cd07ac6af2488719d3259777a2cb5b974 102.75MB / 102.75MB 0.7s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:51.6091263Z #14 extracting sha256:58180179d21cd66306a7b7eb5b754a0cd07ac6af2488719d3259777a2cb5b974
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:52.5444351Z #14 extracting sha256:58180179d21cd66306a7b7eb5b754a0cd07ac6af2488719d3259777a2cb5b974 1.1s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:52.7049057Z #14 sha256:476c77b2f5b73ff7d6ebde14fc22c577af07c3bb38f4e601f6a054b20526880d 3.26MB / 3.26MB 0.0s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:52.7050786Z #14 extracting sha256:476c77b2f5b73ff7d6ebde14fc22c577af07c3bb38f4e601f6a054b20526880d 0.1s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:52.8642945Z #14 sha256:96cc38950ce4119190f79c45b794c91710465c10f1da5114ce9bb9198ea6bff2 24.12MB / 240.19MB 0.2s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:53.0128921Z #14 sha256:96cc38950ce4119190f79c45b794c91710465c10f1da5114ce9bb9198ea6bff2 50.33MB / 240.19MB 0.3s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:53.1635554Z #14 sha256:96cc38950ce4119190f79c45b794c91710465c10f1da5114ce9bb9198ea6bff2 83.89MB / 240.19MB 0.5s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:53.3134008Z #14 sha256:96cc38950ce4119190f79c45b794c91710465c10f1da5114ce9bb9198ea6bff2 111.15MB / 240.19MB 0.6s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:53.4634907Z #14 sha256:96cc38950ce4119190f79c45b794c91710465c10f1da5114ce9bb9198ea6bff2 137.36MB / 240.19MB 0.8s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:53.6133952Z #14 sha256:96cc38950ce4119190f79c45b794c91710465c10f1da5114ce9bb9198ea6bff2 166.72MB / 240.19MB 0.9s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:53.7635670Z #14 sha256:96cc38950ce4119190f79c45b794c91710465c10f1da5114ce9bb9198ea6bff2 192.94MB / 240.19MB 1.1s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:53.9130746Z #14 sha256:96cc38950ce4119190f79c45b794c91710465c10f1da5114ce9bb9198ea6bff2 214.96MB / 240.19MB 1.2s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:54.0628769Z #14 sha256:96cc38950ce4119190f79c45b794c91710465c10f1da5114ce9bb9198ea6bff2 240.12MB / 240.19MB 1.4s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:54.5213073Z #14 sha256:96cc38950ce4119190f79c45b794c91710465c10f1da5114ce9bb9198ea6bff2 240.19MB / 240.19MB 1.7s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:54.5214450Z #14 extracting sha256:96cc38950ce4119190f79c45b794c91710465c10f1da5114ce9bb9198ea6bff2
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:57.0828210Z #14 extracting sha256:96cc38950ce4119190f79c45b794c91710465c10f1da5114ce9bb9198ea6bff2 2.7s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:57.2356627Z #14 sha256:a64cd819f711864f3d9b56b8010f5bcb1cbeaff69d05b7e674200d596e209e47 2.14MB / 2.14MB 0.0s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:57.2358654Z #14 extracting sha256:a64cd819f711864f3d9b56b8010f5bcb1cbeaff69d05b7e674200d596e209e47 0.1s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:57.4433065Z #14 sha256:1a6fcab742a97d4654b26f74645f9bedfbe9df3ca50982dbfbc870da820750d9 521.45kB / 521.45kB done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:57.4436191Z #14 extracting sha256:1a6fcab742a97d4654b26f74645f9bedfbe9df3ca50982dbfbc870da820750d9 0.0s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:57.4437670Z #14 CACHED
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:57.4437991Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:57.4438492Z #15 exporting to docker image format
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:57.4438946Z #15 exporting layers done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:57.4439737Z #15 exporting manifest sha256:5dbfdd372bc5767b9b3415e587aee22ac4ed0d9ce8f69cc955329267ac769e3b done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:57.4441296Z #15 exporting config sha256:93f31dc75fbcf01dfc45906bc15ab37465d4d9e56f39c0dd018ab133b71f1487 done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:09:57.4442148Z #15 sending tarball
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:08.0027104Z #15 ...
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:08.0027577Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:08.0028339Z #16 importing to docker
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:08.0028821Z #16 loading layer 15179c34c0a0 258B / 258B
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:08.0029369Z #16 loading layer 460d62a14fb3 481B / 481B
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:08.0029750Z #16 loading layer de61cd6ee440 119.21MB / 147.64MB 4.1s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:11.5427559Z #16 loading layer 9b804dbafe6f 557.06kB / 102.75MB
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:13.3188917Z #16 loading layer 8d3b6a23756d 32.77kB / 3.26MB
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:13.5404259Z #16 loading layer 17173ed5d3bf 557.06kB / 240.19MB
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:15.6346986Z #16 loading layer 17173ed5d3bf 176.03MB / 240.19MB 2.1s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:17.8720057Z #16 loading layer d616bba2eb82 32.77kB / 2.14MB
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.0191008Z #16 loading layer 3318532f8817 32.77kB / 521.45kB
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1059392Z #16 loading layer 15179c34c0a0 258B / 258B 17.6s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1060098Z #16 loading layer 460d62a14fb3 481B / 481B 14.3s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1060937Z #16 loading layer de61cd6ee440 147.64MB / 147.64MB 14.2s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1061586Z #16 loading layer 9b804dbafe6f 102.75MB / 102.75MB 6.5s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1062599Z #16 loading layer 8d3b6a23756d 3.26MB / 3.26MB 4.8s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1063268Z #16 loading layer 17173ed5d3bf 240.19MB / 240.19MB 4.5s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1063840Z #16 loading layer d616bba2eb82 2.14MB / 2.14MB 0.2s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1064461Z #16 loading layer 3318532f8817 521.45kB / 521.45kB 0.1s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1065071Z #16 DONE 17.6s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1065297Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1065476Z #15 exporting to docker image format
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1065975Z #15 sending tarball 20.8s done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1066392Z #15 DONE 20.8s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1066592Z 
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1066778Z #17 exporting cache to client directory
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1067213Z #17 preparing build cache for export done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1067724Z #17 sending cache export done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1068450Z #17 writing layer sha256:0852e66177445b04ccd0952aa3f0350a619633ffba7374d34b5dc1dbc5e988c4 done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1069582Z #17 writing layer sha256:458c8cf126fcca77539ea84ac2dd1de3a386fd00cbc109ee5fb0820f20ffeade done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1070947Z #17 writing layer sha256:1a6fcab742a97d4654b26f74645f9bedfbe9df3ca50982dbfbc870da820750d9 done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1072080Z #17 writing layer sha256:2d473b07cdd5f0912cd6f1a703352c82b512407db6b05b43f2553732b55df3bc done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1073120Z #17 writing layer sha256:476c77b2f5b73ff7d6ebde14fc22c577af07c3bb38f4e601f6a054b20526880d done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1073907Z #17 writing layer sha256:5647c6bbb08e27c5fea18c75aee01bd836092acf188d8a34a68c222cd1e3a08a done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1074842Z #17 writing layer sha256:58180179d21cd66306a7b7eb5b754a0cd07ac6af2488719d3259777a2cb5b974 done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1075778Z #17 writing layer sha256:96cc38950ce4119190f79c45b794c91710465c10f1da5114ce9bb9198ea6bff2 done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1076644Z #17 writing layer sha256:a64cd819f711864f3d9b56b8010f5bcb1cbeaff69d05b7e674200d596e209e47 done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1077651Z #17 writing config sha256:f31b5ae48d219c4c07aa5e31836273b677d1a97ec28f36282889a7305e8f3c2e done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1078689Z #17 writing cache image manifest sha256:f38453b75fc88dea2b7b505bb5175dd7acbee0c12f14cc993380584a1a035b2b done
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1079245Z #17 DONE 0.0s
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1192492Z [image] ref=ghcr.io/haroldz32/vedit-build:12fd9aaf37fe434cb5dce296ff3d361401805d57
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.1331228Z image_id=sha256:93f31dc75fbcf01dfc45906bc15ab37465d4d9e56f39c0dd018ab133b71f1487
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.2119977Z Post job cleanup.
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.3290757Z Cache hit occurred on the primary key buildx-Linux-e321202901b32664c2a7c38b5bdc10000a0f079678482e6eb008ba51b14b9466, not saving cache.
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.3292985Z (node:3222) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.3294430Z (Use `node --trace-deprecation ...` to show where the warning was created)
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.3423348Z Post job cleanup.
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.6172315Z ##[group]Removing builder
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.6181342Z (node:3230) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.6182787Z (Use `node --trace-deprecation ...` to show where the warning was created)
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:18.7594659Z [command]/usr/bin/docker buildx rm builder-e24db94f-6544-4ccc-92a3-e2cc715667c1
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:21.6319776Z builder-e24db94f-6544-4ccc-92a3-e2cc715667c1 removed
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:21.6374057Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:21.6374747Z ##[group]Cleaning up certificates
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:21.6377015Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:21.6377769Z ##[group]Post cache
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:21.6380142Z State not set
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:21.6381269Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:21.6564196Z Post job cleanup.
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:21.9902555Z ##[group]Logout from ghcr.io
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:21.9928151Z (node:3368) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:21.9929734Z (Use `node --trace-deprecation ...` to show where the warning was created)
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.0012074Z [command]/usr/bin/docker logout ghcr.io
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.0238740Z Removing login credentials for ghcr.io
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.0283353Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.0284010Z ##[group]Post cache
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.0285049Z State not set
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.0285876Z ##[endgroup]
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.0570162Z Post job cleanup.
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.1541206Z [command]/usr/bin/git version
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.1581765Z git version 2.56.0
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.1655082Z Temporarily overriding HOME='/home/runner/work/_temp/a371cd28-dc5c-434d-860f-3a08076c2fc1' before making global git config changes
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.1656457Z Adding repository directory to the temporary git global config as a safe directory
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.1662693Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/VEdit/VEdit
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.1712848Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.1757452Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.2038724Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.2072808Z http.https://github.com/.extraheader
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.2099038Z [command]/usr/bin/git config --local --unset-all http.https://github.com/.extraheader
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.2149889Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.2447916Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.2498296Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.2942417Z Cleaning up orphan processes
+build the pinned image	UNKNOWN STEP	2026-10-30T12:10:22.3449112Z ##[warning]Node.js 20 is deprecated. The following actions target Node.js 20 but are being forced to run on Node.js 24: actions/cache@v4, actions/checkout@v4, docker/login-action@v3, docker/setup-buildx-action@v3. For more information see: https://github.blog/changelog/2025-09-19-deprecation-of-node-20-on-github-actions-runners/

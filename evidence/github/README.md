@@ -55,6 +55,27 @@ gutter 诊断签名去抖、`poll_background` 去早退、overlay pass-through�
   （sha256 `41d02dca…`），自测报 51 项。要真正拿到修复，需要重新打包（`docs/RELEASING.md`）。
 - 修的是源码与回归测试；没有新增依赖，没有改 `Cargo.toml` / `Cargo.lock` / `rust-toolchain.toml`。
 
+## CI/CD（PR #6，合并入 `dev` 于 `5b818bd`）
+
+仓库现在有三条 GitHub Actions 工作流（`.github/workflows/`）：
+
+| 工作流 | 触发 | 作用 |
+|---|---|---|
+| `ci.yml` | PR → `dev`/`main`、push → `dev` | 拉取 GHCR 上的 pinned 镜像（拉不到才本地构建），`build/slang/build.sh` + `scripts/fetch-verible.sh` 之后跑 `scripts/gates.sh` 与 `scripts/build.sh`（release build、Xvfb、**6 套件 62 checks**、GLIBC ≤ 2.17），上传 `build/evidence/` 与二进制 |
+| `image.yml` | `scripts/docker/**`、`versions.env`、`lib.sh`、`build-image.sh` 变更 | buildx（container driver）构建 pinned 镜像；**PR 只构建、push 到 `dev`/`main` 才推 GHCR**；层缓存用 `actions/cache` + `type=local` |
+| `release.yml` | tag `v*` | slang → release build → AppImage → tar.gz/.run → `SHA256SUMS` → GitHub Release（**无 tag 未验证**） |
+
+真实运行证据（逐 AC 判定见 `ci-verify/T5-REPORT.md`、`T12-REPORT.md`、`T14-REPORT.md`）：
+
+- PR `ci` run `41047244806`：success，`real_slang` 6/6、`verible_ls` 8/8、225 tests、6 套件 62/62、GLIBC ≤ 2.17；
+- `image` run `41053154474`：层缓存命中 **7 个 `CACHED`**，耗时 1m40s（冷构建 6m14s）；
+- `image` run `41056011790`（dev push）：`published ghcr.io/haroldz32/vedit-build:5b818bd8… and :latest`；
+- dev `ci` run `41056011838`：`using the published image ghcr.io/haroldz32/vedit-build:latest`。
+
+CI 期间修掉的真实缺陷：干净 checkout 缺 slang / verible（6+8 条集成测试必挂）、
+`build-in-container.sh` 把四个套件名当单参数传给 `--selftest`、root daemon 下容器以 root 写工作区导致
+`build.sh` 末尾 `cp` 被拒、镜像源 TLS 抖动直接判红（重试 + digest/tag 回退）。
+
 ## 后续项（本次未做，均有证据）
 
 - **F1**（既有，Medium）状态栏 FIM 原因重复渲染一次：修复前二进制即如此，非本次回归。
