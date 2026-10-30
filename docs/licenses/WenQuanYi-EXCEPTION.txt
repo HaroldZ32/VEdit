@@ -1,0 +1,26 @@
+WenQuanYi Zen Hei — GPL v2 with font embedding exception
+=========================================================
+
+Upstream statement (WenQuanYi Zen Hei README, release 0.9.46):
+
+    License  : GPL v2 (with font embedding exception **)
+               Read COPYING for details
+
+    ** GPL v2 license with font embedding exception:
+       http://www.gnu.org/licenses/old-licenses/gpl-2.0-faq.html#FontException
+
+    As a special exception, if you create a document which uses this
+    font, and embed this font or unaltered portions of this font into
+    the document, this font does not by itself cause the resulting
+    document to be covered by the GNU General Public License. This
+    exception does not however invalidate any other reasons why the
+    document might be covered by the GNU General Public License. If you
+    modify this font, you may extend this exception to your version of
+    the font, but you are not obligated to do so. If you do not wish to
+    do so, delete this exception statement from your version.
+
+Base licence text: docs/licenses/GPL-2.0.txt (GNU GPL version 2, June 1991).
+The CentOS 7 package metadata agrees: `wqy-zenhei-fonts-0.9.46-11.el7` has
+`License: GPLv2 with exceptions`, and the bundled file is
+`share/fonts/wqy-zenhei/wqy-zenhei.ttc`
+(sha256 38ed4249f9a655c15cb0f4574336e23db46b569f867fb35d0ac7f7b8d83ad623).
