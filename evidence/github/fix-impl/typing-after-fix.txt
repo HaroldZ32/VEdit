@@ -1,0 +1,8 @@
+binary=/vedit-build/target/release/vd-app
+xtype: window=0x600002
+xtype_exit=0
+RESULT: TYPING_WORKS (keystroke reached the buffer)
+--- saved file (first 2 lines) ---
+module a_top;
+  b_top u_b ();
+evidence/github/repro/probe-typing.sh: line 78:    20 Terminated              "$APP_BIN" "$WORK/target.sv" > /tmp/app-typing.log 2>&1

@@ -1,0 +1,351 @@
+   Compiling vd-app v0.1.0 (/vedit-build/crates/vd-app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.35s
+     Running unittests src/main.rs (target/debug/deps/vd_app-abf59cacf07355f2)
+
+running 13 tests
+test commands::tests::contract_shortcuts_are_all_present_exactly_once ... ok
+test commands::tests::table_text_lists_every_shortcut ... ok
+test config_glue::tests::accelerators_are_converted_for_gtk ... ok
+test app::tests::repeated_lsp_status_refreshes_keep_the_status_text_bounded ... ok
+test config_glue::tests::editor_defaults_match_the_config_defaults ... ok
+test app::tests::status_text_renders_the_message_and_at_most_one_lsp_state ... ok
+test config_glue::tests::key_binding_falls_back_to_the_default ... ok
+test diagnostics::tests::lsp_diagnostics_are_clamped_and_keep_the_derived_rule ... ok
+test diagnostics::tests::slang_diagnostics_keep_a_positionless_entry ... ok
+test diagnostics::tests::worst_severity_per_line_prefers_errors ... ok
+test position_adapter::tests::clamping_handles_out_of_range_positions ... ok
+test position_adapter::tests::lsp_positions_are_utf16_and_round_trip ... ok
+test position_adapter::tests::lsp_ranges_are_clamped_into_document_ranges ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_config-12b7b22329bb91d1)
+
+running 31 tests
+test env::tests::no_home_means_no_default_directories ... ok
+test env::tests::xdg_defaults_come_from_home ... ok
+test env::tests::relative_xdg_value_falls_back_and_is_reported ... ok
+test env::tests::xdg_explicit_absolute_values_win ... ok
+test model::tests::defaults_match_the_requirements ... ok
+test model::tests::default_binding_ids_are_unique_and_have_no_legacy_alias ... ok
+test model::tests::a_partial_document_keeps_the_defaults_for_absent_keys ... ok
+test model::tests::known_actions_are_unique ... ok
+test model::tests::every_default_binding_names_a_known_action ... ok
+test project::tests::define_parsing ... ok
+test provenance::tests::empty_secret_is_reported_as_unset ... ok
+test provenance::tests::lists_reduce_to_their_length ... ok
+test filelist::tests::missing_nested_filelist_is_reported_not_fatal ... ok
+test filelist::tests::detects_cycles_and_duplicates ... ok
+test provenance::tests::precedence_chain_is_recorded_nearest_first_in_overridden_by ... ok
+test project::tests::root_discovery_falls_back_to_the_start_directory ... ok
+test provenance::tests::secret_leaf_is_redacted_even_when_the_layer_carries_the_raw_value ... ok
+test filelist::tests::parses_entries_comments_incdirs_defines_and_nested_filelists ... ok
+test secret::tests::debug_is_redacted ... ok
+test render::tests::json_carries_the_schema_version_and_tool_attempts_even_on_success ... ok
+test project::tests::root_discovery_prefers_vedit_toml_then_git ... ok
+test secret::tests::serialization_is_redacted ... ok
+test secret::tests::expose_secret_is_the_only_way_out ... ok
+test tests::deep_merge_keeps_unrelated_keys_and_replaces_lists ... ok
+test tests::parse_layer_reports_a_line_without_quoting_the_source ... ok
+test render::tests::table_renders_redacted_secret_and_overridden_by ... ok
+test tools::tests::configured_path_wins ... ok
+test tools::tests::failure_lists_every_attempt_and_never_mentions_path_lookup ... ok
+test tools::tests::bundled_payload_is_found_next_to_the_executable ... ok
+test tools::tests::missing_config_falls_through_to_env_and_records_both_attempts ... ok
+test filelist::tests::depth_limit_is_enforced ... ok
+
+test result: ok. 31 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/config_behaviour.rs (target/debug/deps/config_behaviour-4e134bf0495b6a7c)
+
+running 14 tests
+test a_legacy_key_name_is_reported_with_its_replacement ... ok
+test environment_variables_override_fim_settings_and_record_their_source ... ok
+test a_known_action_rebinds_and_an_unknown_action_is_reported ... ok
+test defaults_apply_when_nothing_is_configured ... ok
+test a_relative_configured_tool_path_is_resolved_against_the_project_root ... ok
+test an_unknown_key_is_ignored_while_the_rest_of_the_file_applies ... ok
+test a_relative_xdg_variable_is_reported_and_the_default_is_used ... ok
+test project_discovery_finds_filelists_rules_includes_defines_and_upward_rules ... ok
+test an_invalid_configuration_file_degrades_to_the_lower_layer ... ok
+test configured_filelists_and_project_settings_are_merged_with_discovered_ones ... ok
+test tool_resolution_records_every_attempt_even_on_success ... ok
+test the_two_renderings_agree_and_stay_safe ... ok
+test the_project_layer_overrides_the_user_layer_per_key_and_inherits_the_rest ... ok
+test the_user_layer_applies_from_the_xdg_config_home ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/secret_discipline.rs (target/debug/deps/secret_discipline-62453af0593d6965)
+
+running 4 tests
+test the_secret_is_only_reachable_through_the_explicit_accessor ... ok
+test the_default_configuration_carries_no_endpoint_or_key ... ok
+test a_rejected_configuration_file_never_quotes_its_secret_in_the_warning ... ok
+test a_configured_and_an_environment_secret_never_leave_the_config_layer ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_deeplint-ee46bb90426d3781)
+
+running 25 tests
+test diagnostic::tests::conversion_rejects_bad_lines_columns_and_split_characters ... ok
+test diagnostic::tests::calibration_table_converts_byte_columns_to_utf16 ... ok
+test diagnostic::tests::byte_columns_convert_to_utf16_on_cjk_and_emoji ... ok
+test diagnostic::tests::invalid_utf8_source_is_rejected ... ok
+test diagnostic::tests::crlf_trailing_carriage_return_is_not_part_of_the_line ... ok
+test diagnostic::tests::byte_columns_convert_inside_a_tab_line ... ok
+test diagnostic::tests::a_diagnostic_without_location_or_ranges_is_kept ... ok
+test diagnostic::tests::location_string_with_colons_in_the_path_is_parsed_from_the_right ... ok
+test binary::tests::all_attempts_are_listed_when_nothing_is_found ... ok
+test diagnostic::tests::implicit_net_has_a_location_but_no_ranges_and_keeps_option_name ... ok
+test diagnostic::tests::an_unparsable_location_string_is_a_note_not_a_failure ... ok
+test binary::tests::non_executable_file_is_not_chosen ... ok
+test binary::tests::environment_variable_is_used_when_set ... ok
+test diagnostic::tests::a_diagnostic_without_ranges_converts_the_location_as_a_point ... ok
+test binary::tests::explicit_option_wins_and_is_recorded ... ok
+test service::tests::std_summary_messages_are_short ... ok
+test diagnostic::tests::malformed_json_is_rejected ... ok
+test service::tests::stream_capture_truncates_at_the_limit ... ok
+test diagnostic::tests::location_falls_back_to_first_range ... ok
+test binary::tests::package_layout_is_found_relative_to_the_executable ... ok
+test diagnostic::tests::parses_recorded_undeclared_diagnostic ... ok
+test diagnostic::tests::parses_the_empty_clean_report ... ok
+test diagnostic::tests::severity_mapping_includes_unknown ... ok
+test service::tests::failure_user_messages_are_actionable ... ok
+test diagnostic::tests::parses_recorded_unicode_diagnostics_without_losing_fields ... ok
+
+test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/fake_binary.rs (target/debug/deps/fake_binary-41c10307fdb3a2c1)
+
+running 13 tests
+test cancel_kills_and_reaps_the_child ... ok
+test clean_file_is_a_success_with_no_diagnostics ... ok
+test diagnostics_are_capped_and_the_total_is_reported ... ok
+test a_new_run_cancels_the_previous_one ... ok
+test diagnostics_are_parsed_and_converted_to_utf16_positions ... ok
+test executable_with_a_missing_interpreter_is_a_spawn_failure ... ok
+test missing_binary_lists_every_attempt ... ok
+test non_executable_binary_is_not_found ... ok
+test malformed_json_is_a_typed_failure ... ok
+test oversized_json_is_rejected_before_parsing ... ok
+test nonzero_exit_without_json_reports_stderr ... ok
+test report_captures_stderr_of_a_successful_run ... ok
+test timeout_kills_and_reaps_the_child ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+
+     Running tests/real_slang.rs (target/debug/deps/real_slang-5d37ed955bd5a99e)
+
+running 6 tests
+test real_slang_clean_file_has_no_diagnostics ... ok
+test real_slang_implicit_net_has_no_ranges_but_keeps_its_location ... ok
+test real_slang_reports_undeclared_identifier_exactly ... ok
+test real_slang_unicode_columns_map_to_utf16_positions ... ok
+test real_slang_binary_attempts_are_recorded_even_on_success ... ok
+test real_slang_calibration_set_matches_independent_utf16_positions ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_editor-62ff8407b3a495dc)
+
+running 42 tests
+test document::tests::atomic_save_failure_keeps_the_file_and_the_dirty_flag ... ok
+test document::tests::batch_edits_are_one_undo_step ... ok
+test document::tests::batch_edits_keep_mixed_line_endings_line_by_line ... ok
+test document::tests::crlf_file_saves_with_crlf_line_endings ... ok
+test document::tests::delete_spanning_lines_returns_the_removed_text ... ok
+test document::tests::dirty_tracking_and_close_confirmation ... ok
+test document::tests::edit_undo_redo_round_trip ... ok
+test document::tests::empty_batch_is_a_noop_without_undo_step ... ok
+test document::tests::empty_insert_does_not_create_an_undo_step ... ok
+test line_ending::tests::assemble_falls_back_to_the_default_when_breaks_run_out ... ok
+test document::tests::find_and_replace ... ok
+test line_ending::tests::delete_bookkeeping_keeps_the_surviving_ending ... ok
+test line_ending::tests::delete_through_the_end_drops_the_last_ending ... ok
+test line_ending::tests::detects_lf_crlf_and_cr ... ok
+test document::tests::find_is_case_insensitive_when_asked ... ok
+test line_ending::tests::insert_at_end_without_trailing_break ... ok
+test line_ending::tests::insert_bookkeeping_moves_the_original_ending_to_the_last_new_line ... ok
+test line_ending::tests::mixed_line_endings_keep_their_order ... ok
+test position::tests::ascii_offsets ... ok
+test position::tests::chinese_and_emoji_utf16_offsets ... ok
+test position::tests::line_utf16_len_counts_units_not_chars ... ok
+test document::tests::freshly_loaded_document_cannot_undo_the_load ... ok
+test position::tests::positions_round_trip_on_mixed_text ... ok
+test document::tests::line_ranges_support_go_to_line ... ok
+test document::tests::lsp_positions_on_chinese_and_emoji ... ok
+test save::tests::missing_parent_directory_is_rejected_without_touching_anything ... ok
+test save::tests::failure_while_writing_the_temp_file_keeps_the_original ... ok
+test save::tests::crash_before_rename_keeps_the_original ... ok
+test save::tests::permission_denied_at_rename_keeps_the_original ... ok
+test save::tests::temp_file_lives_in_the_target_directory ... ok
+test save::tests::writes_a_new_file ... ok
+test save::tests::replaces_existing_content ... ok
+test document::tests::mixed_line_endings_are_preserved_line_by_line ... ok
+test document::tests::new_document_is_clean ... ok
+test document::tests::overlapping_batch_edits_are_rejected_without_changes ... ok
+test document::tests::readonly_probe_does_not_matter_because_rename_is_the_guard ... ok
+test document::tests::replace_is_one_undo_step ... ok
+test document::tests::same_position_insertions_keep_input_order ... ok
+test document::tests::save_and_reopen_round_trip ... ok
+test document::tests::save_as_rejects_a_missing_directory ... ok
+test document::tests::undo_after_an_edit_keeps_the_original_line_endings ... ok
+test document::tests::unsorted_batch_edits_apply_in_offset_order ... ok
+
+test result: ok. 42 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_fim-8faf8ff117f884ba)
+
+running 40 tests
+test backends::tests::llama_cpp_does_not_require_a_model ... ok
+test backends::tests::a_failing_transport_propagates_the_sanitised_error ... ok
+test backends::tests::an_empty_key_never_produces_an_authorization_header ... ok
+test backends::tests::llama_cpp_request_sends_input_prefix_and_suffix_without_model ... ok
+test backends::tests::unusable_settings_do_not_produce_a_backend ... ok
+test backends::tests::openai_request_sends_prompt_suffix_model_and_bearer ... ok
+test error::tests::configuration_failures_are_classified_as_such ... ok
+test error::tests::every_reason_is_short_and_not_empty ... ok
+test error::tests::reasons_never_contain_a_secret_or_a_url ... ok
+test error::tests::status_and_timeout_reasons_carry_the_number ... ok
+test protocol::tests::llama_cpp_body_has_exactly_the_contract_fields ... ok
+test protocol::tests::llama_cpp_response_parses_content ... ok
+test protocol::tests::malformed_bodies_are_invalid_response_not_a_panic ... ok
+test protocol::tests::openai_body_has_exactly_the_contract_fields ... ok
+test protocol::tests::response_cap_is_a_documented_constant ... ok
+test protocol::tests::openai_response_parses_choices_zero_text ... ok
+test protocol::tests::trailing_line_breaks_are_removed_but_leading_spaces_kept ... ok
+test secret::tests::debug_is_redacted ... ok
+test secret::tests::deserialization_round_trips_the_plaintext ... ok
+test secret::tests::expose_secret_is_the_only_way_to_read_plaintext ... ok
+test secret::tests::serialization_inside_a_struct_is_redacted ... ok
+test secret::tests::serialization_is_redacted ... ok
+test settings::tests::default_settings_are_disabled_and_unconfigured ... ok
+test settings::tests::timeout_and_token_budget_are_clamped ... ok
+test transport::tests::io_errors_are_classified_without_their_message ... ok
+test transport::tests::a_bad_uri_never_echoes_the_url ... ok
+test settings::tests::half_configured_settings_are_reported_not_guessed ... ok
+test service::tests::unavailable_reason_never_contains_configuration_detail ... ok
+test transport::tests::host_lookup_failure_is_sanitised ... ok
+test transport::tests::the_response_cap_is_enforced_at_the_byte ... ok
+test transport::tests::timeout_maps_to_the_configured_milliseconds ... ok
+test transport::tests::http_status_maps_to_the_status_code_only ... ok
+test settings::tests::url_join_uses_the_protocol_path_without_doubling_it ... ok
+test service::tests::a_completion_round_trips_through_one_worker ... ok
+test service::tests::a_failed_request_reaches_the_ui_as_a_short_reason ... ok
+test service::tests::disabled_service_is_inert_and_never_touches_a_transport ... ok
+test service::tests::half_configured_service_reports_without_requesting ... ok
+test service::tests::cancelling_drops_any_late_result ... ok
+test service::tests::from_settings_does_not_spawn_anything_while_disabled ... ok
+test service::tests::rapid_typing_does_not_spawn_more_workers_or_queue_requests ... ok
+
+test result: ok. 40 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+     Running unittests src/bin/fim-probe.rs (target/debug/deps/fim_probe-e3e6dfadc34fa102)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/default_off.rs (target/debug/deps/default_off-4d9f681f1a26917f)
+
+running 4 tests
+test llama_cpp_needs_no_model_but_sends_nothing_until_started ... ok
+test default_settings_send_nothing_and_start_no_worker ... ok
+test the_real_transport_is_not_constructed_while_disabled ... ok
+test openai_without_a_model_is_reported_without_a_request ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_lsp-fe0d8763babe70c6)
+
+running 16 tests
+test config::tests::default_timeouts_are_bounded ... ok
+test config::tests::no_rules_file_means_no_rules_flag ... ok
+test config::tests::filelist_and_extra_args_are_appended_in_order ... ok
+test config::tests::rules_are_passed_explicitly_and_never_searched ... ok
+test diagnostics::tests::recording_bumps_the_generation_and_replaces_per_uri ... ok
+test diagnostics::tests::rule_is_taken_from_code_or_from_the_verible_message ... ok
+test documents::tests::versions_and_text_track_changes ... ok
+test documents::tests::change_on_an_unopened_document_is_an_error ... ok
+test edits::tests::incremental_changes_track_a_document ... ok
+test edits::tests::edits_are_applied_in_document_order_regardless_of_input_order ... ok
+test edits::tests::utf16_columns_apply_to_multibyte_text ... ok
+test edits::tests::overlapping_edits_are_rejected ... ok
+test position::tests::ascii_round_trip ... ok
+test position::tests::cjk_and_emoji_use_utf16_units ... ok
+test position::tests::crlf_lines_are_handled ... ok
+test position::tests::out_of_range_positions_are_errors ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/verible_ls.rs (target/debug/deps/verible_ls-0220fc475d864f3d)
+
+running 8 tests
+test definition_references_symbols_rename_and_highlight ... ok
+test capabilities_are_the_measured_ten_and_start_is_lazy ... ok
+test diagnostics_arrive_within_three_seconds_and_clear_after_a_fix ... ok
+test rules_config_is_passed_explicitly_and_changes_diagnostics ... ok
+test formatting_edits_reproduce_the_bundled_formatter_byte_for_byte ... ok
+test lazy_start_crash_restart_and_shutdown_leave_no_zombie ... ok
+test request_timeout_and_cancellation_are_enforced ... ok
+test initialize_timeout_is_enforced_and_the_child_is_reaped ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.32s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_syntax-842d48256375d759)
+
+running 6 tests
+test detect::tests::extension_matching_is_case_insensitive ... ok
+test detect::tests::supported_table_is_exactly_the_contract_table ... ok
+test detect::tests::language_ids_are_the_upstream_gtksourceview_ids ... ok
+test detect::tests::unknown_extensions_are_plain_text ... ok
+test detect::tests::systemverilog_extensions_map_to_systemverilog ... ok
+test detect::tests::verilog_extensions_map_to_verilog ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/highlight-probe.rs (target/debug/deps/highlight_probe-407dfcdee364a582)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_config
+
+running 1 test
+test crates/vd-config/src/lib.rs - (line 27) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.32s
+
+   Doc-tests vd_deeplint
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_editor
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_fim
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_lsp
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_syntax
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

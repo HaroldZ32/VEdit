@@ -1,0 +1,59 @@
+# pre-fix baseline check inventory (from committed evidence/wiring/selftest-all.json @ b6c31d3)
+# suites=6 total_checks=51 ok=True app=0.1.0
+## suite smoke  ok=True
+  [PASS] window realized  :: realized=true
+  [PASS] notebook has an initial tab  :: pages=1
+  [PASS] open .sv applies the SystemVerilog language  :: language=Some("systemverilog")
+  [PASS] the current tab follows the opened file  :: current=Some(2), expected=Some(2), titles=["Untitled", "clean.sv", "format_me.sv"]
+  [PASS] edit marks the document modified  :: needs_close_confirmation=true
+  [PASS] undo shortcut restores the text through Document  :: restored=true, dispatch=undo, action_fallback=true, can_undo_before=true, status="1:1  |  /tmp/vd-app-selftest-2177/format_me.sv  |  systemverilog  |  verible 1  |  slang 0  |  FIM: FIM 未启用  |  LSP running (pid 2217), restarts 0 (running: true, restarts: 0)  Verible LSP: generation 2"
+  [PASS] save-as writes the document  :: path=/tmp/vd-app-selftest-2177/smoke-saved.sv
+  [PASS] several tabs are open  :: pages=3
+  [PASS] problem panel lists the diagnostic  :: rows=2, panel_texts=["warning  [module-filename] Declared module does not match the first dot-delimited component of file name: \"format_me\" [Style: file-names][module-filename] (fix available)", "error  [Smoke] smoke diagnostic"]
+  [PASS] gutter mark is placed at the diagnostic line  :: all_marks=1, categories=["vedit-error"], worst={0: Error}, line_count=2
+  [PASS] the contract shortcuts exist in the table  :: format/slang/definition/references/outline/fim
+  [PASS] shortcut actions are installed  :: actions=["toggle-panel", "fim", "definition", "new", "save", "rename", "close-tab", "open", "find", "save-as", "format", "find-next", "undo", "replace", "redo", "slang", "goto-line", "outline", "quit", "references"]
+  [PASS] format accelerator is Ctrl+Shift+F  :: accels=["<Primary><Shift>f"]
+  [PASS] goto-line moves the cursor and clamps to the last line  :: jumped=true, at_first=true, clamped=true, at_last=true, cursor=Position { line: 1, character: 0 }, last_line=1
+  [PASS] line numbers are visible in the view  :: shows_line_numbers=true
+  [PASS] replace-next changes the text and undo restores it  :: changed=true, restored=true, original_len=62, replaced_len=62
+  [PASS] unsaved close is refused and the confirmation was requested  :: tabs_before=3, tabs_after=3, recorded=Some("smoke-saved.sv"), window_visible=true
+  [PASS] find-next finds the needle through Document  :: anchor=Some(Position { line: 1, character: 6 }), contains=true, cursor=Position { line: 1, character: 0 }, direct=Some(Range { start: Position { line: 1, character: 0 }, end: Position { line: 1, character: 6 } }), entry="module", titles=["Untitled", "clean.sv", "smoke-saved.sv"], current_page=Some(2)
+  [PASS] status bar reports the cursor  :: 2:1  |  /tmp/vd-app-selftest-2177/smoke-saved.sv  |  systemverilog  |  verible 1  |  slang 1  |  FIM: FIM 未启用  |  match at line 2
+  [PASS] VEDIT_SLANG is configured for the SLANG suite  :: path=/vedit-build/build/slang/out/slang
+## suite highlight  ok=True
+  [PASS] systemverilog language definition is available  :: is_language_available(systemverilog)
+  [PASS] verilog language definition is available  :: is_language_available(verilog)
+  [PASS] no language definitions are missing  :: missing=[]
+  [PASS] opened .sv with CJK/emoji content has a language  :: language=Some(Language { inner: TypedObjectRef { inner: 0x637887af2570, type: GtkSourceLanguage } })
+  [PASS] CJK/emoji content is in the buffer  :: buffer contains 你好 and 😀
+  [PASS] opened .sv buffer has a language  :: language=Some(Language { inner: TypedObjectRef { inner: 0x637887ac1160, type: GtkSourceLanguage } })
+  [PASS] style scheme applies (cobalt)  :: scheme=Some("cobalt")
+  [PASS] startup language warning is absent in this image  :: warning=None
+## suite config  ok=True
+  [PASS] configuration loads  :: error=None
+  [PASS] editor settings are present  :: tab_width=4
+  [PASS] Verible tool resolution records every attempt  :: attempts=["env: /vedit-build/target/verible-pin/extract/verible-v0.0-4298-g085eef05/bin/verible-verilog-ls [found]", "env: /vedit-build/target/verible-pin/extract/verible-v0.0-4298-g085eef05/bin/verible-verilog-format [found]", "env: /vedit-build/target/verible-pin/extract/verible-v0.0-4298-g085eef05/bin/verible-verilog-lint [found]"]
+  [PASS] tool resolution never uses PATH  :: no PATH attempt recorded
+  [PASS] formatter and linter tool paths were resolved (or explicitly recorded as missing)  :: format=Some("/vedit-build/target/verible-pin/extract/verible-v0.0-4298-g085eef05/bin/verible-verilog-format"), lint=Some("/vedit-build/target/verible-pin/extract/verible-v0.0-4298-g085eef05/bin/verible-verilog-lint")
+  [PASS] FIM defaults to off  :: enabled=false
+## suite lsp  ok=True
+  [PASS] Verible language server binary exists  :: path=/vedit-build/target/verible-pin/extract/verible-v0.0-4298-g085eef05/bin/verible-verilog-ls
+  [PASS] the real LSP publishes diagnostics  :: generation=Some(3)
+  [PASS] one-key formatting returns and applies  :: result=formatted
+  [PASS] formatting changed the buffer  :: before=62 bytes, after=81 bytes
+  [PASS] one undo restores the pre-format content (apply_edits_one_step)  :: restored=true
+  [PASS] F12 definition jumps to the target file/line/column  :: path=Some("/vedit-build/crates/vd-app/tests/fixtures/definition/b.sv"), cursor=Position { line: 0, character: 7 }
+## suite slang  ok=True
+  [PASS] SLANG binary exists  :: path=/vedit-build/build/slang/out/slang
+  [PASS] SLANG runs without a failure  :: failure=None
+  [PASS] SLANG reports the undeclared identifier  :: total=1
+  [PASS] SLANG positions convert to editor ranges  :: ranges=[Some(Range { start: Position { line: 2, character: 4 }, end: Position { line: 2, character: 19 } })]
+  [PASS] problem panel receives the SLANG diagnostics  :: verible=0, slang=1, rows=1
+  [PASS] gutter marks the SLANG line  :: marks=1, categories=["vedit-error"]
+## suite fim  ok=True
+  [PASS] FIM is disabled by default  :: enabled=false
+  [PASS] a disabled FIM has a short reason  :: reason=Some("FIM 未启用")
+  [PASS] the off path starts no worker  :: before=0, after=0
+  [PASS] the off path shows no ghost text  :: pending=false, visible=false
+  [PASS] the status bar explains why FIM is unavailable  :: 6:1  |  /tmp/vd-app-selftest-2177/undeclared.sv  |  systemverilog  |  verible 1  |  slang 1  |  FIM: FIM 未启用  |  LSP running (pid 2217), restarts 0 (running: true, restarts: 0)  Verible LSP: generation 6

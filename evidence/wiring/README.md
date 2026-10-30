@@ -68,8 +68,14 @@ running the lsp suite with the override pointing outside the repository: exit 0,
 | `xvfb-run -a vd-app --selftest lsp` | 0 | `selftest-lsp.json` |
 | `xvfb-run -a vd-app --selftest config` / `fim` | 0 | included in `all` |
 
-`all` = 51 checks: smoke 20, highlight 8, config 6, lsp 6, slang 6, fim 5. The
-JSON reports are the report object extracted from stdout; `.raw` keeps the full
+`all` = **58 checks** at the issue #1/#2 fix (commit `7acd487`): smoke **27**,
+highlight 8, config 6, lsp 6, slang 6, fim 5. Before that fix the same suites
+reported 51 checks (smoke 20); the seven added smoke checks cover editor
+keyboard focus (startup, open, page switch), overlay pass-through, bounded
+status text, gutter-mark churn and SLANG polling without an LSP bridge. The
+already-shipped v0.1.0 artefacts still report 51 checks — they were built
+before the fix and are not rebuilt by it.
+The JSON reports are the report object extracted from stdout; `.raw` keeps the full
 process output (GLib may print warnings before the JSON).
 
 ## What each suite proves (AC ↔ check)

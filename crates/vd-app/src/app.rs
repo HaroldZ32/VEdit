@@ -45,7 +45,49 @@ pub struct ScreenshotSummary {
 /// Test seam for the modal close confirmation (`None` restores the dialog).
 pub type CloseConfirmation = Box<dyn Fn(&str) -> bool>;
 
-/// Shared, mutable app state (widgets live in [`Ui`]).
+/// The status bar's model: the last message plus the live LSP state.
+///
+/// Rendering is pure. A background poll only REFRESHES the LSP status; it never
+/// appends to the message, so polling cannot grow the composed text (issue #2 /
+/// AC-4) and the LSP state is rendered at most once.
+#[derive(Debug, Clone, Default)]
+pub struct StatusModel {
+    info: String,
+    lsp: Option<String>,
+}
+
+impl StatusModel {
+    pub fn set_info(&mut self, info: impl Into<String>) {
+        self.info = info.into();
+    }
+
+    #[must_use]
+    pub fn info(&self) -> &str {
+        &self.info
+    }
+
+    pub fn set_lsp(&mut self, status: String) {
+        self.lsp = Some(status);
+    }
+
+    /// Compose the bar: the fixed columns, the last message, then the live LSP
+    /// status unless the message already names it.
+    #[must_use]
+    pub fn text(&self, parts: &[String]) -> String {
+        let mut all: Vec<&str> = parts.iter().map(String::as_str).collect();
+        if !self.info.is_empty() {
+            all.push(&self.info);
+        }
+        if let Some(status) = self.lsp.as_deref() {
+            if !all.iter().any(|part| part.contains("Verible LSP")) {
+                all.push(status);
+            }
+        }
+        all.join("  |  ")
+    }
+}
+
+/// Shared state (widgets live in [`Ui`]).
 pub struct State {
     pub startup: Startup,
     pub settings: EditorSettings,
@@ -53,7 +95,7 @@ pub struct State {
     pub lsp: RefCell<Option<LspBridge>>,
     pub slang_rx: RefCell<Option<Receiver<vd_deeplint::LintReport>>>,
     pub ghost: Ghost,
-    pub info: RefCell<String>,
+    pub status: RefCell<StatusModel>,
     pub format_result: RefCell<Option<Result<String, String>>>,
     pub find_anchor: RefCell<Option<Position>>,
     pub lsp_generation: Cell<u64>,
@@ -71,7 +113,10 @@ pub struct Ui {
     pub replace_entry: gtk::Entry,
     pub panel_rows: RefCell<Vec<ViewDiagnostic>>,
     pub state: Rc<State>,
-    ghost_fixed: gtk::Fixed,
+    /// The overlay that carries the ghost text; its child must be pointer
+    /// transparent (issue #2 / AC-3).
+    pub overlay: gtk::Overlay,
+    pub ghost_fixed: gtk::Fixed,
     gutter_refresh: Cell<bool>,
     close_confirm: RefCell<Option<CloseConfirmation>>,
     close_request: RefCell<Option<String>>,
@@ -86,6 +131,17 @@ impl Ui {
     pub fn current_tab(&self) -> Option<Rc<Tab>> {
         let index = self.current_index()?;
         self.state.tabs.borrow().get(index).cloned()
+    }
+
+    /// Put keyboard focus on the current tab's editor.
+    ///
+    /// Issue #1: the window opened with focus on the toolbar / tab strip, so
+    /// ordinary characters never reached the buffer. The editor view must own
+    /// the focus at startup and after every tab change (AC-1, AC-2).
+    fn focus_editor(&self) {
+        if let Some(tab) = self.current_tab() {
+            tab.view.grab_focus();
+        }
     }
 
     /// Open a file in a new tab (or switch to it when it is already open).
@@ -674,7 +730,7 @@ impl Ui {
     }
 
     pub fn set_info(&self, info: impl Into<String>) {
-        *self.state.info.borrow_mut() = info.into();
+        self.state.status.borrow_mut().set_info(info);
         self.refresh_status();
     }
 
@@ -739,13 +795,19 @@ impl Ui {
         let Some(tab) = self.current_tab() else {
             return;
         };
+        let worst = tab.store.borrow().worst_severity_per_line();
+        // AC-5: an unchanged diagnostic set must not delete and recreate every
+        // mark (each mark change used to re-enter refresh_status through
+        // `mark-set`, which made the 50 ms poll the main CPU cost of issue #2).
+        if *tab.marks_key.borrow() == worst {
+            return;
+        }
         let previous = std::mem::take(&mut *tab.marks.borrow_mut());
         for mark in previous {
             tab.buffer.delete_mark(&mark);
         }
-        let worst = tab.store.borrow().worst_severity_per_line();
         let mut created = Vec::new();
-        for (line, severity) in worst {
+        for (&line, &severity) in &worst {
             let Some(position) = tab.document.line_start_position(line) else {
                 continue;
             };
@@ -760,6 +822,7 @@ impl Ui {
             }
         }
         *tab.marks.borrow_mut() = created;
+        *tab.marks_key.borrow_mut() = worst;
     }
 
     fn refresh_titles(&self) {
@@ -800,15 +863,16 @@ impl Ui {
         if let Some(reason) = self.state.ghost.reason() {
             parts.push(format!("FIM: {reason}"));
         }
-        let info = self.state.info.borrow().clone();
-        if !info.is_empty() {
-            parts.push(info);
-        }
-        parts.join("  |  ")
+        // The live LSP status is composed here, never stored in the message:
+        // repeated polls therefore cannot grow the text (AC-4).
+        self.state.status.borrow().text(&parts)
     }
 
-    fn refresh_status(&self) {
-        self.status.set_text(&self.status_text());
+    pub(crate) fn refresh_status(&self) {
+        let text = self.status_text();
+        if self.status.text() != text {
+            self.status.set_text(&text);
+        }
         // Marks are owned and deleted explicitly now, so this cannot duplicate
         // them; keeping the gutter in sync here covers every store change.
         self.refresh_gutter_marks();
@@ -862,14 +926,15 @@ impl Ui {
 
     /// Poll all background producers; called on a 50 ms timer and by the tests.
     pub fn poll_background(self: &Rc<Self>) {
+        // R3: a missing LSP bridge only means there are no LSP events — it must
+        // not hide the SLANG and FIM producers (AC-6).
         let events: Vec<LspEvent> = {
             let mut lsp = self.state.lsp.borrow_mut();
-            let Some(bridge) = lsp.as_mut() else {
-                return;
-            };
             let mut events = Vec::new();
-            while let Ok(event) = bridge.events.try_recv() {
-                events.push(event);
+            if let Some(bridge) = lsp.as_mut() {
+                while let Ok(event) = bridge.events.try_recv() {
+                    events.push(event);
+                }
             }
             events
         };
@@ -918,12 +983,8 @@ impl Ui {
                 }
             }
         };
-        let mut info = self.state.info.borrow().clone();
-        if !info.starts_with("Verible LSP") {
-            info.push_str(if info.is_empty() { "" } else { "  " });
-            info.push_str(&message);
-        }
-        *self.state.info.borrow_mut() = info;
+        // REPLACE the live status; never append it to the message (AC-4).
+        self.state.status.borrow_mut().set_lsp(message);
         self.refresh_status();
     }
 
@@ -1457,6 +1518,9 @@ fn build_ui(application: &gtk::Application, opts: &Options) -> Result<Rc<Ui>> {
     let overlay = gtk::Overlay::new();
     overlay.set_child(Some(&notebook));
     overlay.add_overlay(&ghost_fixed);
+    // R4: the ghost text is decoration only, so its overlay must never consume
+    // a pointer event (issue #2: the wheel stopped reaching the editor).
+    overlay.set_overlay_pass_through(&ghost_fixed, true);
 
     let panel_list = gtk::ListBox::new();
     let panel_scroller =
@@ -1523,7 +1587,7 @@ fn build_ui(application: &gtk::Application, opts: &Options) -> Result<Rc<Ui>> {
         lsp: RefCell::new(None),
         slang_rx: RefCell::new(None),
         ghost,
-        info: RefCell::new(String::new()),
+        status: RefCell::new(StatusModel::default()),
         format_result: RefCell::new(None),
         find_anchor: RefCell::new(None),
         lsp_generation: Cell::new(0),
@@ -1539,6 +1603,7 @@ fn build_ui(application: &gtk::Application, opts: &Options) -> Result<Rc<Ui>> {
         replace_entry,
         panel_rows: RefCell::new(Vec::new()),
         state,
+        overlay,
         ghost_fixed,
         gutter_refresh: Cell::new(false),
         close_confirm: RefCell::new(None),
@@ -1555,12 +1620,14 @@ fn build_ui(application: &gtk::Application, opts: &Options) -> Result<Rc<Ui>> {
         });
     }
     {
-        // Switching tabs must re-render that tab's problems and gutter marks.
+        // Switching tabs must re-render that tab's problems and gutter marks,
+        // and the keyboard focus must follow the visible editor (AC-2).
         let weak = Rc::downgrade(&ui);
         ui.notebook.connect_switch_page(move |_, _, _| {
             if let Some(ui) = weak.upgrade() {
                 ui.refresh_panel();
                 ui.refresh_status();
+                ui.focus_editor();
                 if ui.state.ghost.has_pending() {
                     ui.position_ghost();
                 }
@@ -1713,11 +1780,13 @@ fn build_ui(application: &gtk::Application, opts: &Options) -> Result<Rc<Ui>> {
         ));
     }
     if let Some(reason) = ui.state.ghost.reason() {
-        let info = format!("{}  |  FIM: {reason}", ui.state.info.borrow());
-        *ui.state.info.borrow_mut() = info;
+        let info = format!("{}  |  FIM: {reason}", ui.state.status.borrow().info());
+        ui.state.status.borrow_mut().set_info(info);
     }
 
     ui.window.show_all();
+    // AC-1: the editor owns the keyboard focus as soon as the window is shown.
+    ui.focus_editor();
     ghost_label_hidden(&ui);
     {
         let weak = Rc::downgrade(&ui);
@@ -1813,4 +1882,57 @@ pub fn run_interactive(opts: &Options) -> Result<()> {
     let app = App::new(opts);
     app.run();
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::StatusModel;
+
+    /// AC-4 regression (display-free): 200 background-poll refreshes with no
+    /// new event must keep the composed status text byte-identical, and the
+    /// live LSP state must appear at most once. This is what the 50 ms timer
+    /// did NOT do before the fix: it appended the status to the message on
+    /// every tick, so the bar grew without bound (issue #2).
+    #[test]
+    fn repeated_lsp_status_refreshes_keep_the_status_text_bounded() {
+        let parts = vec!["1:1".to_string(), "a.sv".to_string()];
+        let mut model = StatusModel::default();
+        model.set_info("LSP running (pid 7), restarts 0 (running: true, restarts: 0)");
+        model.set_lsp("Verible LSP: generation 3".to_string());
+        let expected = model.text(&parts);
+        assert_eq!(expected.matches("Verible LSP").count(), 1, "{expected}");
+        for _ in 0..200 {
+            // Exactly what `sync_lsp_status` does on every poll: replace.
+            model.set_lsp("Verible LSP: generation 3".to_string());
+            let text = model.text(&parts);
+            assert_eq!(text, expected, "the status text grew across polls");
+            assert_eq!(text.matches("Verible LSP").count(), 1, "{text}");
+        }
+        assert_eq!(
+            model.info(),
+            "LSP running (pid 7), restarts 0 (running: true, restarts: 0)",
+            "polling must not rewrite the message"
+        );
+    }
+
+    /// The message and exactly one LSP state are rendered; a message that
+    /// already names the LSP is not duplicated.
+    #[test]
+    fn status_text_renders_the_message_and_at_most_one_lsp_state() {
+        let parts = vec!["1:1".to_string()];
+        let mut model = StatusModel::default();
+        model.set_lsp("Verible LSP: not available".to_string());
+        assert_eq!(model.text(&parts), "1:1  |  Verible LSP: not available");
+
+        model.set_info("saved a.sv");
+        assert_eq!(
+            model.text(&parts),
+            "1:1  |  saved a.sv  |  Verible LSP: not available"
+        );
+
+        let mut named = StatusModel::default();
+        named.set_info("Verible LSP starting…");
+        named.set_lsp("Verible LSP: generation 0".to_string());
+        assert_eq!(named.text(&parts), "1:1  |  Verible LSP starting…");
+    }
 }

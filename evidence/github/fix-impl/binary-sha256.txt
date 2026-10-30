@@ -1,0 +1,2 @@
+82477a6aa65de1b1061b0df8a0e85c1ca87c0d75e4fc7497bdf89a864a4f9e52  target/release/vd-app
+c5216c184e327c83ce8ce5f3fab07c91ca2bbc41

@@ -1,0 +1,21 @@
+# Issue #1 end-to-end typing evidence (BEFORE fix) — RAW capture
+# date: 2026-10-30T16:15:53+08:00  git HEAD: c5216c1
+# pre-fix binary sha256: 41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611
+# verdict is only valid when xtype_exit=0
+
+=== CONTROL: same XTest injection into a minimal focused GtkTextView ===
+xtype: window=0x200002
+xtype_exit=0
+RESULT: CONTROL_WORKS (injected keystroke reached a focused GtkTextView)
+control buffer: a
+evidence/github/repro/probe-typing-control.sh: line 51:    23 Terminated              "$WORK/xtype-control" > /tmp/control.log 2>&1
+
+=== VEDIT (pre-fix): same injection into the app window ===
+binary=/probebin/vd-app
+xtype: window=0x600002
+xtype_exit=0
+RESULT: TYPING_BROKEN (keystroke did not reach the buffer)
+--- saved file (first 2 lines) ---
+module a_top;
+  b_top u_b ();
+evidence/github/repro/probe-typing.sh: line 78:    20 Terminated              "$APP_BIN" "$WORK/target.sv" > /tmp/app-typing.log 2>&1

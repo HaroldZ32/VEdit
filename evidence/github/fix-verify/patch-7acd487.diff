@@ -1,0 +1,588 @@
+diff --git a/crates/vd-app/src/app.rs b/crates/vd-app/src/app.rs
+index a0f754d..1ec9521 100644
+--- a/crates/vd-app/src/app.rs
++++ b/crates/vd-app/src/app.rs
+@@ -45,7 +45,49 @@ pub struct ScreenshotSummary {
+ /// Test seam for the modal close confirmation (`None` restores the dialog).
+ pub type CloseConfirmation = Box<dyn Fn(&str) -> bool>;
+ 
+-/// Shared, mutable app state (widgets live in [`Ui`]).
++/// The status bar's model: the last message plus the live LSP state.
++///
++/// Rendering is pure. A background poll only REFRESHES the LSP status; it never
++/// appends to the message, so polling cannot grow the composed text (issue #2 /
++/// AC-4) and the LSP state is rendered at most once.
++#[derive(Debug, Clone, Default)]
++pub struct StatusModel {
++    info: String,
++    lsp: Option<String>,
++}
++
++impl StatusModel {
++    pub fn set_info(&mut self, info: impl Into<String>) {
++        self.info = info.into();
++    }
++
++    #[must_use]
++    pub fn info(&self) -> &str {
++        &self.info
++    }
++
++    pub fn set_lsp(&mut self, status: String) {
++        self.lsp = Some(status);
++    }
++
++    /// Compose the bar: the fixed columns, the last message, then the live LSP
++    /// status unless the message already names it.
++    #[must_use]
++    pub fn text(&self, parts: &[String]) -> String {
++        let mut all: Vec<&str> = parts.iter().map(String::as_str).collect();
++        if !self.info.is_empty() {
++            all.push(&self.info);
++        }
++        if let Some(status) = self.lsp.as_deref() {
++            if !all.iter().any(|part| part.contains("Verible LSP")) {
++                all.push(status);
++            }
++        }
++        all.join("  |  ")
++    }
++}
++
++/// Shared state (widgets live in [`Ui`]).
+ pub struct State {
+     pub startup: Startup,
+     pub settings: EditorSettings,
+@@ -53,7 +95,7 @@ pub struct State {
+     pub lsp: RefCell<Option<LspBridge>>,
+     pub slang_rx: RefCell<Option<Receiver<vd_deeplint::LintReport>>>,
+     pub ghost: Ghost,
+-    pub info: RefCell<String>,
++    pub status: RefCell<StatusModel>,
+     pub format_result: RefCell<Option<Result<String, String>>>,
+     pub find_anchor: RefCell<Option<Position>>,
+     pub lsp_generation: Cell<u64>,
+@@ -71,7 +113,10 @@ pub struct Ui {
+     pub replace_entry: gtk::Entry,
+     pub panel_rows: RefCell<Vec<ViewDiagnostic>>,
+     pub state: Rc<State>,
+-    ghost_fixed: gtk::Fixed,
++    /// The overlay that carries the ghost text; its child must be pointer
++    /// transparent (issue #2 / AC-3).
++    pub overlay: gtk::Overlay,
++    pub ghost_fixed: gtk::Fixed,
+     gutter_refresh: Cell<bool>,
+     close_confirm: RefCell<Option<CloseConfirmation>>,
+     close_request: RefCell<Option<String>>,
+@@ -88,6 +133,17 @@ impl Ui {
+         self.state.tabs.borrow().get(index).cloned()
+     }
+ 
++    /// Put keyboard focus on the current tab's editor.
++    ///
++    /// Issue #1: the window opened with focus on the toolbar / tab strip, so
++    /// ordinary characters never reached the buffer. The editor view must own
++    /// the focus at startup and after every tab change (AC-1, AC-2).
++    fn focus_editor(&self) {
++        if let Some(tab) = self.current_tab() {
++            tab.view.grab_focus();
++        }
++    }
++
+     /// Open a file in a new tab (or switch to it when it is already open).
+     ///
+     /// # Errors
+@@ -674,7 +730,7 @@ impl Ui {
+     }
+ 
+     pub fn set_info(&self, info: impl Into<String>) {
+-        *self.state.info.borrow_mut() = info.into();
++        self.state.status.borrow_mut().set_info(info);
+         self.refresh_status();
+     }
+ 
+@@ -739,13 +795,19 @@ impl Ui {
+         let Some(tab) = self.current_tab() else {
+             return;
+         };
++        let worst = tab.store.borrow().worst_severity_per_line();
++        // AC-5: an unchanged diagnostic set must not delete and recreate every
++        // mark (each mark change used to re-enter refresh_status through
++        // `mark-set`, which made the 50 ms poll the main CPU cost of issue #2).
++        if *tab.marks_key.borrow() == worst {
++            return;
++        }
+         let previous = std::mem::take(&mut *tab.marks.borrow_mut());
+         for mark in previous {
+             tab.buffer.delete_mark(&mark);
+         }
+-        let worst = tab.store.borrow().worst_severity_per_line();
+         let mut created = Vec::new();
+-        for (line, severity) in worst {
++        for (&line, &severity) in &worst {
+             let Some(position) = tab.document.line_start_position(line) else {
+                 continue;
+             };
+@@ -760,6 +822,7 @@ impl Ui {
+             }
+         }
+         *tab.marks.borrow_mut() = created;
++        *tab.marks_key.borrow_mut() = worst;
+     }
+ 
+     fn refresh_titles(&self) {
+@@ -800,15 +863,16 @@ impl Ui {
+         if let Some(reason) = self.state.ghost.reason() {
+             parts.push(format!("FIM: {reason}"));
+         }
+-        let info = self.state.info.borrow().clone();
+-        if !info.is_empty() {
+-            parts.push(info);
+-        }
+-        parts.join("  |  ")
++        // The live LSP status is composed here, never stored in the message:
++        // repeated polls therefore cannot grow the text (AC-4).
++        self.state.status.borrow().text(&parts)
+     }
+ 
+-    fn refresh_status(&self) {
+-        self.status.set_text(&self.status_text());
++    pub(crate) fn refresh_status(&self) {
++        let text = self.status_text();
++        if self.status.text() != text {
++            self.status.set_text(&text);
++        }
+         // Marks are owned and deleted explicitly now, so this cannot duplicate
+         // them; keeping the gutter in sync here covers every store change.
+         self.refresh_gutter_marks();
+@@ -862,14 +926,15 @@ impl Ui {
+ 
+     /// Poll all background producers; called on a 50 ms timer and by the tests.
+     pub fn poll_background(self: &Rc<Self>) {
++        // R3: a missing LSP bridge only means there are no LSP events — it must
++        // not hide the SLANG and FIM producers (AC-6).
+         let events: Vec<LspEvent> = {
+             let mut lsp = self.state.lsp.borrow_mut();
+-            let Some(bridge) = lsp.as_mut() else {
+-                return;
+-            };
+             let mut events = Vec::new();
+-            while let Ok(event) = bridge.events.try_recv() {
+-                events.push(event);
++            if let Some(bridge) = lsp.as_mut() {
++                while let Ok(event) = bridge.events.try_recv() {
++                    events.push(event);
++                }
+             }
+             events
+         };
+@@ -918,12 +983,8 @@ impl Ui {
+                 }
+             }
+         };
+-        let mut info = self.state.info.borrow().clone();
+-        if !info.starts_with("Verible LSP") {
+-            info.push_str(if info.is_empty() { "" } else { "  " });
+-            info.push_str(&message);
+-        }
+-        *self.state.info.borrow_mut() = info;
++        // REPLACE the live status; never append it to the message (AC-4).
++        self.state.status.borrow_mut().set_lsp(message);
+         self.refresh_status();
+     }
+ 
+@@ -1457,6 +1518,9 @@ fn build_ui(application: &gtk::Application, opts: &Options) -> Result<Rc<Ui>> {
+     let overlay = gtk::Overlay::new();
+     overlay.set_child(Some(&notebook));
+     overlay.add_overlay(&ghost_fixed);
++    // R4: the ghost text is decoration only, so its overlay must never consume
++    // a pointer event (issue #2: the wheel stopped reaching the editor).
++    overlay.set_overlay_pass_through(&ghost_fixed, true);
+ 
+     let panel_list = gtk::ListBox::new();
+     let panel_scroller =
+@@ -1523,7 +1587,7 @@ fn build_ui(application: &gtk::Application, opts: &Options) -> Result<Rc<Ui>> {
+         lsp: RefCell::new(None),
+         slang_rx: RefCell::new(None),
+         ghost,
+-        info: RefCell::new(String::new()),
++        status: RefCell::new(StatusModel::default()),
+         format_result: RefCell::new(None),
+         find_anchor: RefCell::new(None),
+         lsp_generation: Cell::new(0),
+@@ -1539,6 +1603,7 @@ fn build_ui(application: &gtk::Application, opts: &Options) -> Result<Rc<Ui>> {
+         replace_entry,
+         panel_rows: RefCell::new(Vec::new()),
+         state,
++        overlay,
+         ghost_fixed,
+         gutter_refresh: Cell::new(false),
+         close_confirm: RefCell::new(None),
+@@ -1555,12 +1620,14 @@ fn build_ui(application: &gtk::Application, opts: &Options) -> Result<Rc<Ui>> {
+         });
+     }
+     {
+-        // Switching tabs must re-render that tab's problems and gutter marks.
++        // Switching tabs must re-render that tab's problems and gutter marks,
++        // and the keyboard focus must follow the visible editor (AC-2).
+         let weak = Rc::downgrade(&ui);
+         ui.notebook.connect_switch_page(move |_, _, _| {
+             if let Some(ui) = weak.upgrade() {
+                 ui.refresh_panel();
+                 ui.refresh_status();
++                ui.focus_editor();
+                 if ui.state.ghost.has_pending() {
+                     ui.position_ghost();
+                 }
+@@ -1713,11 +1780,13 @@ fn build_ui(application: &gtk::Application, opts: &Options) -> Result<Rc<Ui>> {
+         ));
+     }
+     if let Some(reason) = ui.state.ghost.reason() {
+-        let info = format!("{}  |  FIM: {reason}", ui.state.info.borrow());
+-        *ui.state.info.borrow_mut() = info;
++        let info = format!("{}  |  FIM: {reason}", ui.state.status.borrow().info());
++        ui.state.status.borrow_mut().set_info(info);
+     }
+ 
+     ui.window.show_all();
++    // AC-1: the editor owns the keyboard focus as soon as the window is shown.
++    ui.focus_editor();
+     ghost_label_hidden(&ui);
+     {
+         let weak = Rc::downgrade(&ui);
+@@ -1814,3 +1883,56 @@ pub fn run_interactive(opts: &Options) -> Result<()> {
+     app.run();
+     Ok(())
+ }
++
++#[cfg(test)]
++mod tests {
++    use super::StatusModel;
++
++    /// AC-4 regression (display-free): 200 background-poll refreshes with no
++    /// new event must keep the composed status text byte-identical, and the
++    /// live LSP state must appear at most once. This is what the 50 ms timer
++    /// did NOT do before the fix: it appended the status to the message on
++    /// every tick, so the bar grew without bound (issue #2).
++    #[test]
++    fn repeated_lsp_status_refreshes_keep_the_status_text_bounded() {
++        let parts = vec!["1:1".to_string(), "a.sv".to_string()];
++        let mut model = StatusModel::default();
++        model.set_info("LSP running (pid 7), restarts 0 (running: true, restarts: 0)");
++        model.set_lsp("Verible LSP: generation 3".to_string());
++        let expected = model.text(&parts);
++        assert_eq!(expected.matches("Verible LSP").count(), 1, "{expected}");
++        for _ in 0..200 {
++            // Exactly what `sync_lsp_status` does on every poll: replace.
++            model.set_lsp("Verible LSP: generation 3".to_string());
++            let text = model.text(&parts);
++            assert_eq!(text, expected, "the status text grew across polls");
++            assert_eq!(text.matches("Verible LSP").count(), 1, "{text}");
++        }
++        assert_eq!(
++            model.info(),
++            "LSP running (pid 7), restarts 0 (running: true, restarts: 0)",
++            "polling must not rewrite the message"
++        );
++    }
++
++    /// The message and exactly one LSP state are rendered; a message that
++    /// already names the LSP is not duplicated.
++    #[test]
++    fn status_text_renders_the_message_and_at_most_one_lsp_state() {
++        let parts = vec!["1:1".to_string()];
++        let mut model = StatusModel::default();
++        model.set_lsp("Verible LSP: not available".to_string());
++        assert_eq!(model.text(&parts), "1:1  |  Verible LSP: not available");
++
++        model.set_info("saved a.sv");
++        assert_eq!(
++            model.text(&parts),
++            "1:1  |  saved a.sv  |  Verible LSP: not available"
++        );
++
++        let mut named = StatusModel::default();
++        named.set_info("Verible LSP starting…");
++        named.set_lsp("Verible LSP: generation 0".to_string());
++        assert_eq!(named.text(&parts), "1:1  |  Verible LSP starting…");
++    }
++}
+diff --git a/crates/vd-app/src/document_tab.rs b/crates/vd-app/src/document_tab.rs
+index bc4338c..7ba3586 100644
+--- a/crates/vd-app/src/document_tab.rs
++++ b/crates/vd-app/src/document_tab.rs
+@@ -5,6 +5,7 @@
+ //! document's line-ending bookkeeping see the same buffer.
+ 
+ use std::cell::RefCell;
++use std::collections::BTreeMap;
+ use std::path::{Path, PathBuf};
+ 
+ use anyhow::{Context as _, Result};
+@@ -14,7 +15,7 @@ use sourceview4::prelude::*;
+ use vd_editor::{Document, Position, Range};
+ 
+ use crate::config_glue::EditorSettings;
+-use crate::diagnostics::DiagnosticsStore;
++use crate::diagnostics::{DiagnosticsStore, Severity};
+ use crate::position_adapter;
+ 
+ /// A tab: document + view + per-tab diagnostics.
+@@ -29,6 +30,9 @@ pub struct Tab {
+     /// Gutter marks created for the current diagnostics (owned so they can be
+     /// removed precisely; removing by category is not reliable in GtkSourceView).
+     pub marks: RefCell<Vec<sourceview4::Mark>>,
++    /// The diagnostic set the current gutter marks were built from (line → worst
++    /// severity). An unchanged set never rebuilds the marks (issue #2 / AC-5).
++    pub marks_key: RefCell<BTreeMap<u32, Severity>>,
+ }
+ 
+ impl Tab {
+@@ -79,6 +83,7 @@ impl Tab {
+             language: RefCell::new(None),
+             store: RefCell::new(DiagnosticsStore::new()),
+             marks: RefCell::new(Vec::new()),
++            marks_key: RefCell::new(BTreeMap::new()),
+         }
+     }
+ 
+diff --git a/crates/vd-app/src/selftest.rs b/crates/vd-app/src/selftest.rs
+index 79c48ae..e9e9e88 100644
+--- a/crates/vd-app/src/selftest.rs
++++ b/crates/vd-app/src/selftest.rs
+@@ -18,6 +18,7 @@ use crate::cli::{Options, SELFTEST_SUITES};
+ use crate::commands;
+ use crate::config_glue;
+ use crate::diagnostics::{self, DiagnosticSource, Severity, ViewDiagnostic};
++use crate::document_tab::Tab;
+ 
+ /// One observed check.
+ struct Check {
+@@ -230,6 +231,27 @@ fn smoke(ui: &std::rc::Rc<Ui>, fixtures: &Fixtures) -> SuiteReport {
+         ui.notebook.n_pages() >= 1,
+         format!("pages={}", ui.notebook.n_pages()),
+     );
++    // AC-1: the editor view — not a toolbar button or a tab label — owns the
++    // keyboard focus once the window is shown.
++    let initial_focus = ui
++        .current_tab()
++        .is_some_and(|tab| focus_is_editor(ui, &tab));
++    report.check(
++        "AC-1 the current tab's editor view has the keyboard focus at startup",
++        initial_focus,
++        format!(
++            "focus_is_editor={initial_focus}, focused={:?}, current={:?}",
++            focused_widget_name(ui),
++            ui.current_tab().map(|tab| tab.title())
++        ),
++    );
++    // AC-3: the ghost-text overlay must be pointer transparent.
++    let pass_through = ui.overlay.is_overlay_pass_through(&ui.ghost_fixed);
++    report.check(
++        "AC-3 the ghost-text overlay is pass-through",
++        pass_through,
++        format!("overlay_pass_through={pass_through}"),
++    );
+ 
+     let clean = ui.open_path(&fixtures.clean);
+     match clean {
+@@ -267,6 +289,36 @@ fn smoke(ui: &std::rc::Rc<Ui>, fixtures: &Fixtures) -> SuiteReport {
+                         .collect::<Vec<_>>()
+                 ),
+             );
++            // AC-2: the keyboard focus follows the newly opened tab…
++            let opened_focus = focus_is_editor(ui, &tab);
++            report.check(
++                "AC-2 the editor view has the keyboard focus after opening a file",
++                opened_focus,
++                format!(
++                    "focus_is_editor={opened_focus}, focused={:?}, expected={:?}",
++                    focused_widget_name(ui),
++                    tab.title()
++                ),
++            );
++            // …and a switch to another page.
++            let previous_page = ui.notebook.current_page();
++            ui.notebook.set_current_page(Some(0));
++            pump(20);
++            let switched_focus = ui
++                .current_tab()
++                .is_some_and(|current| focus_is_editor(ui, &current));
++            if let Some(page) = previous_page {
++                ui.notebook.set_current_page(Some(page));
++            }
++            pump(20);
++            report.check(
++                "AC-2 the editor view has the keyboard focus after a page switch",
++                switched_focus,
++                format!(
++                    "focus_is_editor={switched_focus}, focused={:?}",
++                    focused_widget_name(ui)
++                ),
++            );
+             let original = tab.text();
+             tab.document
+                 .insert(Position::new(0, 0), "-- smoke edit\n")
+@@ -390,6 +442,95 @@ fn smoke(ui: &std::rc::Rc<Ui>, fixtures: &Fixtures) -> SuiteReport {
+         );
+     }
+ 
++    // AC-4: a background poll with no new event must not grow the status text.
++    {
++        let saved_lsp = ui.state.lsp.borrow_mut().take();
++        ui.set_info("status probe: no new events");
++        // The removed bridge is the one event; let the first poll settle it,
++        // then 120 polls must leave the text byte-identical.
++        ui.poll_background();
++        let first = ui.status_text();
++        let mut polls = 0;
++        let mut stable = true;
++        while polls < 120 {
++            ui.poll_background();
++            polls += 1;
++            if ui.status_text() != first {
++                stable = false;
++                break;
++            }
++        }
++        let last_len = ui.status_text().len();
++        let lsp_occurrences = first.matches("Verible LSP").count();
++        *ui.state.lsp.borrow_mut() = saved_lsp;
++        report.check(
++            "AC-4 120 background polls keep the status text byte-identical",
++            stable && lsp_occurrences == 1,
++            format!(
++                "polls={polls}, len={}, lsp_occurrences={lsp_occurrences}, len_after={last_len}",
++                first.len()
++            ),
++        );
++    }
++
++    // AC-5: an unchanged diagnostic set must not delete/recreate gutter marks.
++    if let Some(tab) = ui.current_tab() {
++        ui.refresh_status();
++        let marks_before: Vec<usize> = tab
++            .marks
++            .borrow()
++            .iter()
++            .map(|mark| mark.as_ptr() as usize)
++            .collect();
++        for _ in 0..50 {
++            ui.refresh_status();
++        }
++        let marks_after: Vec<usize> = tab
++            .marks
++            .borrow()
++            .iter()
++            .map(|mark| mark.as_ptr() as usize)
++            .collect();
++        report.check(
++            "AC-5 unchanged diagnostics keep the same gutter mark objects",
++            !marks_before.is_empty() && marks_before == marks_after,
++            format!(
++                "marks_before={}, marks_after={}, same_objects={}, worst={:?}",
++                marks_before.len(),
++                marks_after.len(),
++                marks_before == marks_after,
++                tab.store.borrow().worst_severity_per_line()
++            ),
++        );
++    }
++
++    // AC-6: without an LSP bridge the SLANG producer is still polled.
++    {
++        let saved_lsp = ui.state.lsp.borrow_mut().take();
++        let saved_rx = ui.state.slang_rx.borrow_mut().take();
++        let (sender, receiver) = std::sync::mpsc::channel();
++        let sent = sender.send(probe_lint_report()).is_ok();
++        *ui.state.slang_rx.borrow_mut() = Some(receiver);
++        let has_probe = || {
++            ui.current_tab().is_some_and(|tab| {
++                tab.store
++                    .borrow()
++                    .all()
++                    .any(|diagnostic| diagnostic.code.as_deref() == Some("Ac6Probe"))
++            })
++        };
++        let before = has_probe();
++        ui.poll_background();
++        let after = has_probe();
++        *ui.state.slang_rx.borrow_mut() = saved_rx;
++        *ui.state.lsp.borrow_mut() = saved_lsp;
++        report.check(
++            "AC-6 poll_background consumes a SLANG report while the LSP bridge is absent",
++            sent && !before && after,
++            format!("sent={sent}, before={before}, after={after}, lsp_present=false"),
++        );
++    }
++
+     // Shortcuts installed as window actions with the contract accelerators.
+     let contract_ok = [
+         "format",
+@@ -917,6 +1058,66 @@ fn fim(ui: &std::rc::Rc<Ui>) -> SuiteReport {
+     report
+ }
+ 
++/// True when the window's keyboard focus IS this tab's editor view (AC-1, AC-2).
++fn focus_is_editor(ui: &Ui, tab: &Tab) -> bool {
++    let Some(focused) = ui.window.focused_widget() else {
++        return false;
++    };
++    let focused: gtk::glib::Object = focused.upcast();
++    let view: gtk::glib::Object = tab.view.clone().upcast();
++    std::ptr::eq(focused.as_ptr(), view.as_ptr())
++}
++
++/// The focused widget's type, for the check detail.
++fn focused_widget_name(ui: &Ui) -> Option<String> {
++    ui.window
++        .focused_widget()
++        .map(|widget| widget.type_().name().to_string())
++}
++
++/// The SLANG report value the AC-6 check feeds into the real polling path.
++///
++/// The point under test is `Ui::poll_background` consuming the channel when no
++/// LSP bridge exists; the report value itself goes through the production
++/// `diagnostics::from_slang` conversion.
++fn probe_lint_report() -> vd_deeplint::LintReport {
++    vd_deeplint::LintReport {
++        diagnostics: vec![vd_deeplint::Diagnostic {
++            severity: vd_deeplint::Severity::Error,
++            message: "AC-6 probe diagnostic".to_string(),
++            code: "Ac6Probe".to_string(),
++            location: None,
++            ranges: Vec::new(),
++            symbol_path: None,
++            raw: serde_json::json!({"code": "Ac6Probe"}),
++            editor_range: Some(vd_deeplint::EditorRange {
++                start: vd_deeplint::EditorPosition {
++                    line: 0,
++                    character: 0,
++                },
++                end: vd_deeplint::EditorPosition {
++                    line: 0,
++                    character: 1,
++                },
++            }),
++            conversion_note: None,
++            parse_note: None,
++        }],
++        total_diagnostics: 1,
++        truncated: false,
++        binary: vd_deeplint::BinaryResolution {
++            chosen: None,
++            attempts: Vec::new(),
++        },
++        failure: None,
++        exit_code: Some(1),
++        stdout: String::new(),
++        stderr: String::new(),
++        elapsed: Duration::ZERO,
++        child_pid: None,
++    }
++}
++
+ struct Fixtures {
+     dir: PathBuf,
+     clean: PathBuf,
