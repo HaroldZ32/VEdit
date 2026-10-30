@@ -1,0 +1,13 @@
+AC-01	glibc max	PASS	tool=readelf highest=GLIBC_2.14
+AC-02	selftest all	PASS	exit=0
+AC-02	selftest checks	PASS	51 checks (52 with --screenshot)
+AC-02	screenshot non-blank	PASS	bytes=33484 sha256=5daf55267d13d26219da9889a80cfc52501f16e98964aa87db4a89e26ea8bed9
+AC-02	single toplevel	PASS	1
+AC-02	runtime_dir valid	PASS	XDG_RUNTIME_DIR
+AC-02	runtime_dir TMPDIR fallback	PASS	unset->TMPDIR
+AC-02	runtime_dir loud failure	FAIL	rc=0
+AC-19	payload vd-app == canonical	PASS	41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611
+AC-19	vd-app size	PASS	6002112 bytes
+AC-19	payload path	RECORD	usr
+AC-18	artifact size	RECORD	47745528 bytes
+AC-09	no leftover processes	PASS	none

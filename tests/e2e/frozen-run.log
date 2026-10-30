@@ -1,0 +1,35 @@
+== appimage ==
+AC-01	glibc max	PASS	tool=readelf highest=GLIBC_2.14
+AC-02	selftest all	PASS	exit=0
+AC-02	selftest checks	PASS	51 checks (52 with --screenshot)
+AC-02	screenshot non-blank	PASS	bytes=33484 sha256=5daf55267d13d26219da9889a80cfc52501f16e98964aa87db4a89e26ea8bed9
+AC-02	single toplevel	PASS	1
+AC-02	runtime_dir valid	PASS	XDG_RUNTIME_DIR
+AC-02	runtime_dir TMPDIR fallback	PASS	unset->TMPDIR
+AC-02	runtime_dir loud failure	FAIL	rc=0
+AC-19	payload vd-app == canonical	PASS	41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611
+AC-19	vd-app size	PASS	6002112 bytes
+AC-19	payload path	RECORD	usr
+AC-18	artifact size	RECORD	47745528 bytes
+AC-09	no leftover processes	PASS	none
+== tarball ==
+AC-01	glibc max	PASS	tool=readelf highest=GLIBC_2.14
+AC-02	selftest all	PASS	exit=0
+AC-02	selftest checks	PASS	51 checks (52 with --screenshot)
+AC-02	screenshot non-blank	PASS	bytes=33780 sha256=2f405f485814114c21f9a7506d0383866ea96e0d3c9a67d550fc36b9ef5a1b25
+AC-02	single toplevel	PASS	1
+AC-02	runtime_dir valid	PASS	XDG_RUNTIME_DIR
+AC-02	runtime_dir TMPDIR fallback	PASS	unset->TMPDIR
+AC-02	runtime_dir loud failure	FAIL	rc=0
+AC-19	payload vd-app == canonical	PASS	41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611
+AC-19	vd-app size	PASS	6002112 bytes
+AC-19	payload path	RECORD	VEdit
+AC-18	artifact size	RECORD	40493353 bytes
+AC-09	no leftover processes	PASS	none
+== manifest ==
+4f800ab97368de6f379efdc15a582bfbb615bcc3e2b7a0a3f5a19935de21ce44  /vedit-build/packaging/appimage/out/VEdit-0.1.0-x86_64.AppImage
+ddf389733b3bc82d68c4f22d6bc2a09ab87b76aaf2eaa3bfbd10655ded9e6e81  /vedit-build/packaging/tarball/out/vedit-0.1.0-linux-x86_64.tar.gz
+0ef44b3576905c2ae09547eeaa74a9d5d7f2426e92bce7a999633938fee788ea  /vedit-build/packaging/tarball/out/VEdit-0.1.0-x86_64.run
+41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611  build/artifacts/vd-app
+T27E2E FAILURES=3
+HARNESS_EXIT=1

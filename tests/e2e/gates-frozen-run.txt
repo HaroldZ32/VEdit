@@ -1,0 +1,19 @@
+timestamp_utc=2026-10-30T05:35:46Z
+HEAD=463d96562a5045b004bc8b8d4f5281b95d97ae80
+git_status_short:
+ M tests/e2e/run.sh
+?? evidence/github/
+?? tests/e2e/frozen-run.log
+?? tests/e2e/gates-frozen-run.txt
+?? tests/e2e/out/
+tracked_modified=1
+$ cargo fmt --all -- --check
+exit=0
+$ cargo clippy --workspace --all-targets -- -D warnings
+exit=0
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.21s
+$ cargo test --workspace
+exit=0
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
