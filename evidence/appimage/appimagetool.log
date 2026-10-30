@@ -8,18 +8,18 @@ Downloading runtime file from https://github.com/AppImage/type2-runtime/releases
 Downloaded runtime binary of size 944632
 Parallel mksquashfs: Using 16 processors
 Creating 4.0 filesystem on /vedit-build/packaging/appimage/out/VEdit-0.1.0-x86_64.AppImage, block size 131072.
-[=============================================================\] 6522/6522 100%
+[=============================================================\] 6507/6507 100%
 
 Exportable Squashfs 4.0 filesystem, zstd compressed, data block size 131072
 	compressed data, compressed metadata, compressed fragments,
 	compressed xattrs, compressed ids
 	duplicates are removed
-Filesystem size 46055.05 Kbytes (44.98 Mbytes)
-	40.08% of uncompressed filesystem size (114907.24 Kbytes)
-Inode table size 51111 bytes (49.91 Kbytes)
-	24.66% of uncompressed inode table size (207223 bytes)
-Directory table size 68679 bytes (67.07 Kbytes)
-	30.17% of uncompressed directory table size (227617 bytes)
+Filesystem size 45700.60 Kbytes (44.63 Mbytes)
+	40.42% of uncompressed filesystem size (113061.75 Kbytes)
+Inode table size 50977 bytes (49.78 Kbytes)
+	24.61% of uncompressed inode table size (207163 bytes)
+Directory table size 68700 bytes (67.09 Kbytes)
+	30.18% of uncompressed directory table size (227617 bytes)
 Number of duplicate files found 338
 Number of inodes 6363
 Number of files 5825

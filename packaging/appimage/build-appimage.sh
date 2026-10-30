@@ -33,32 +33,45 @@ log_cmd() {
   return $status
 }
 
-echo "== [1/9] build the application binary (same image as the deliverable) =="
-# Deterministic source: if the working tree has uncommitted changes to code or
-# manifests (other lanes are often mid-edit), package the committed HEAD export
-# instead of certifying somebody's half-saved file. Both cases are recorded.
-GIT_HEAD=$( (cd "$ROOT" && git rev-parse HEAD 2>/dev/null) || echo unknown)
-DIRTY=$( (cd "$ROOT" && git status --porcelain -- crates Cargo.toml Cargo.lock rust-toolchain.toml 2>/dev/null) | head -20 || true)
-SRC=$ROOT
-SOURCE_MODE=worktree
-if [ -n "$DIRTY" ]; then
-  SOURCE_MODE=head-export
-  SRC="$CACHE/src-head-$GIT_HEAD"
-  rm -rf "$SRC"
-  mkdir -p "$SRC"
-  (cd "$ROOT" && git archive HEAD) | tar -x -C "$SRC"
+echo "== [1/9] consume the shared release binary (identical in all three products) =="
+# The tar.gz/.run lanes and this AppImage MUST install byte-identical binaries;
+# T27 asserts it across products. scripts/build.sh builds the release binary at
+# build/artifacts/vd-app (with the RELEASE_RUSTFLAGS remap); this lane therefore
+# consumes that artefact instead of compiling its own variant, and the assertion
+# below turns "same source" into "same bytes" at build time.
+SHARED_APP="$ROOT/build/artifacts/vd-app"
+if [ ! -f "$SHARED_APP" ]; then
+  echo "ERROR: $SHARED_APP is missing; run \`bash scripts/build.sh\` (release build) first." >&2
+  exit 1
 fi
+SHARED_SHA=$(sha256sum "$SHARED_APP" | cut -d' ' -f1)
+GIT_HEAD=$( (cd "$ROOT" && git rev-parse HEAD 2>/dev/null) || echo unknown)
+GIT_STATUS=$( (cd "$ROOT" && git status --porcelain 2>/dev/null) || true)
+# The fixtures are payload support data, so they come from the same revision as
+# the shared binary (a worktree copy could be a half-saved edit).
+ARCHIVE_DIR="$CACHE/src-head"
+rm -rf "$ARCHIVE_DIR"
+mkdir -p "$ARCHIVE_DIR"
+(cd "$ROOT" && git archive HEAD) | tar -x -C "$ARCHIVE_DIR"
 {
-  echo "source_mode=$SOURCE_MODE"
+  echo "source_mode=shared-release-artifact"
   echo "git_head=$GIT_HEAD"
-  echo "dirty_code_paths:"
-  if [ -n "$DIRTY" ]; then printf '%s\n' "$DIRTY"; else echo "  none"; fi
+  echo "git_status_porcelain:"
+  if [ -n "$GIT_STATUS" ]; then printf '%s\n' "$GIT_STATUS"; else echo "  clean"; fi
+  echo "shared_vd_app=$SHARED_APP"
+  echo "shared_vd_app_sha256=$SHARED_SHA"
+  echo "archive_revision=$GIT_HEAD"
+  echo "archive_dir=$ARCHIVE_DIR (git archive HEAD, fixtures + provenance)"
 } | tee "$EVID/source-tree.txt"
-# Keep build-machine paths out of the shipped ELF: Rust embeds panic locations.
-export RUSTFLAGS="${RUSTFLAGS:-} --remap-path-prefix=/vedit-build/target/cargo-home=/cargo --remap-path-prefix=/root/.cargo=/cargo --remap-path-prefix=$SRC=/vedit"
-log_cmd cargo build --release -p vd-app --manifest-path "$SRC/Cargo.toml" | tee "$EVID/cargo-build.log"
-APP_BINARY="$SRC/target/release/vd-app"
-test -x "$APP_BINARY"
+if [ -n "${VEDIT_VD_APP_SHA256:-}" ] && [ "$SHARED_SHA" != "$VEDIT_VD_APP_SHA256" ]; then
+  echo "ERROR: build/artifacts/vd-app sha256 $SHARED_SHA != pinned $VEDIT_VD_APP_SHA256" >&2
+  exit 1
+fi
+LEAKS=$(tr '\0' '\n' < "$SHARED_APP" | grep -c '/vedit-build' || true)
+if [ "$LEAKS" -ne 0 ]; then
+  echo "ERROR: shared vd-app embeds /vedit-build (count=$LEAKS); the release build is not remapped" >&2
+  exit 1
+fi
 
 echo "== [2/9] fetch and verify the pinned Verible suite =="
 TARBALL="$CACHE/verible.tar.gz"
@@ -97,8 +110,19 @@ VBIN=$(find "$CACHE/verible-extract" -type d -name bin | head -1)
 rm -rf "$APPDIR"
 mkdir -p "$APPDIR"/usr/bin "$APPDIR"/usr/lib "$APPDIR"/usr/share "$APPDIR"/etc
 mkdir -p "$APPDIR"/usr/lib/vedit/bin
-cp "$APP_BINARY" "$APPDIR/usr/bin/vd-app"
+cp "$SHARED_APP" "$APPDIR/usr/bin/vd-app"
 chmod 0755 "$APPDIR/usr/bin/vd-app"
+PAYLOAD_SHA=$(sha256sum "$APPDIR/usr/bin/vd-app" | cut -d' ' -f1)
+if [ "$PAYLOAD_SHA" != "$SHARED_SHA" ]; then
+  echo "ERROR: payload vd-app sha256 $PAYLOAD_SHA != shared $SHARED_SHA" >&2
+  exit 1
+fi
+{
+  echo "shared_vd_app_sha256=$SHARED_SHA"
+  echo "payload_vd_app_sha256=$PAYLOAD_SHA"
+  echo "BYTES_EQUAL=true"
+  echo "VEDIT_BUILD_LEAKS=$(tr '\0' '\n' < "$APPDIR/usr/bin/vd-app" | grep -c '/vedit-build' || true)"
+} | tee "$EVID/payload-vd-app.txt"
 cp "$VBIN/verible-verilog-ls" "$VBIN/verible-verilog-format" "$VBIN/verible-verilog-lint" \
    "$APPDIR/usr/lib/vedit/bin/"
 for binary in verible-verilog-ls verible-verilog-format verible-verilog-lint; do
@@ -201,7 +225,7 @@ cp -a /usr/share/fonts/wqy-zenhei/*.ttc "$APPDIR/usr/share/fonts/wqy-zenhei/"
 # Selftest fixtures are part of the packaged acceptance surface (T25 shares the
 # same convention: share/vedit/testdata + VEDIT_SELFTEST_FIXTURES).
 mkdir -p "$APPDIR/usr/share/vedit/testdata"
-cp -a "$SRC/crates/vd-app/tests/fixtures/." "$APPDIR/usr/share/vedit/testdata/"
+cp -a "$ARCHIVE_DIR/crates/vd-app/tests/fixtures/." "$APPDIR/usr/share/vedit/testdata/"
 find "$APPDIR/usr/share/vedit/testdata" -type f | sort | tee "$EVID/selftest-fixtures.txt"
 # Complete icon themes: a partial Adwaita tree makes GTK warn about missing
 # symbolic icons, and the CSD/toolbar need the full index (cursors included).
@@ -241,8 +265,34 @@ cat > "$APPDIR/AppRun" <<'APPRUN'
 # resolve inside $HERE. No host path is exported.
 set -e
 HERE=$(dirname "$(readlink -f "$0")")
-RUNTIME="${TMPDIR:-/tmp}/vedit-runtime"
-mkdir -p "$RUNTIME"
+
+# Per-user runtime directory for the rewritten caches; mirrors the tar.gz/.run
+# launcher (T25): XDG_RUNTIME_DIR -> TMPDIR -> explicit failure. mkdir can fail
+# (a /proc path, a read-only mount, someone else's directory), which must not
+# abort the launch silently.
+make_runtime() {
+  _base=$1
+  _dir="$_base/vedit-runtime-$(id -u)"
+  if mkdir -p "$_dir" 2>/dev/null; then
+    printf '%s' "$_dir"
+    return 0
+  fi
+  return 1
+}
+
+PREFERRED=${XDG_RUNTIME_DIR:-}
+FALLBACK=${TMPDIR:-/tmp}
+if [ -n "$PREFERRED" ] && RUNTIME=$(make_runtime "$PREFERRED"); then
+  :
+elif RUNTIME=$(make_runtime "$FALLBACK"); then
+  if [ -n "$PREFERRED" ]; then
+    echo "vedit: cannot use XDG_RUNTIME_DIR=$PREFERRED (not writable or not creatable); using $FALLBACK instead" >&2
+  fi
+else
+  echo "vedit: cannot create a runtime directory; tried '$PREFERRED' and '$FALLBACK'" >&2
+  echo "vedit: set XDG_RUNTIME_DIR (or TMPDIR) to a writable directory and retry" >&2
+  exit 1
+fi
 sed "s|@APPDIR@|$HERE|g" "$HERE/etc/loaders.cache.in" > "$RUNTIME/loaders.cache"
 sed "s|@APPDIR@|$HERE|g" "$HERE/etc/immodules.cache.in" > "$RUNTIME/immodules.cache"
 sed "s|@APPDIR@|$HERE|g" "$HERE/etc/fonts.conf.in" > "$RUNTIME/fonts.conf"
@@ -274,8 +324,24 @@ sed 's/^/  /' "$APPDIR/AppRun" > "$EVID/AppRun.txt"
 echo "== [7/9] host-path audit, RUNPATH gate, GLIBC gate =="
 {
   echo "# build-tree path leakage audit"
-  echo "# 1) main binary strings:"
-  strings "$APPDIR/usr/bin/vd-app" | grep -E '/vedit-build|/root/\.cargo|/home/' | head -5 || echo "none"
+  echo "# 1) build-host checkout paths (the release remap target is /vedit, never /vedit-build):"
+  host_hits=$(tr '\0' '\n' < "$APPDIR/usr/bin/vd-app" | grep -E '/vedit-build|/root/\.cargo|/home/' || true)
+  if [ -n "$host_hits" ]; then printf '%s\n' "$host_hits" | head -5; else echo "none"; fi
+  host_count=$(printf '%s' "$host_hits" | grep -c . || true)
+  echo "BUILD_HOST_PATH_HITS=$host_count"
+  echo
+  echo "# 1b) remapped source paths under the sandbox root /vedit (panic locations):"
+  sandbox_hits=$(tr '\0' '\n' < "$APPDIR/usr/bin/vd-app" | grep -c '/vedit/' || true)
+  echo "SANDBOX_SOURCE_PATH_LITERALS=$sandbox_hits"
+  sample=$(tr '\0' '\n' < "$APPDIR/usr/bin/vd-app" | grep -a -m 2 -E '^/vedit/(crates|target)/' | tr -cd '[:print:]\n' | cut -c1-140 || true)
+  if [ -n "$sample" ]; then printf '%s\n' "$sample"; else echo "none"; fi
+  echo "CONCLUSION: /vedit-build count is 0 (measured on NUL-delimited strings, not"
+  echo "\`strings\` output, which glues adjacent literals). What remains are $sandbox_hits"
+  echo "panic source locations remapped to the sandbox root /vedit — build metadata,"
+  echo "not a host checkout path, and no runtime lookup. The former env!() fixture"
+  echo "fallback is gone: vd-app derives the fixtures at runtime and the payload's"
+  echo "VEDIT_SELFTEST_FIXTURES points at <payload>/usr/share/vedit/testdata."
+  echo
   echo "# 2) launcher/config templates (expect @APPDIR@ placeholders only):"
   grep -nE '/vedit-build|/root/\.cargo|/home/' "$APPDIR"/etc/*.in || echo "none"
   echo "# 3) @APPDIR@ placeholder counts:"

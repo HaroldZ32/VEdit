@@ -1,18 +1,18 @@
 
-(process:273): Gtk-WARNING **: 04:58:06.685: Locale not supported by C library.
+(process:321): Gtk-WARNING **: 05:20:47.054: Locale not supported by C library.
 	Using the fallback 'C' locale.
 
-(vd-app:273): GLib-GIO-CRITICAL **: 04:58:06.701: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:321): GLib-GIO-CRITICAL **: 05:20:47.075: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: configuration warnings: 1
 
-(process:353): Gtk-WARNING **: 04:58:06.911: Locale not supported by C library.
+(process:404): Gtk-WARNING **: 05:20:47.284: Locale not supported by C library.
 	Using the fallback 'C' locale.
 
-(vd-app:353): GLib-GIO-CRITICAL **: 04:58:06.927: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:404): GLib-GIO-CRITICAL **: 05:20:47.301: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: configuration warnings: 1
 
-(process:432): Gtk-WARNING **: 04:58:07.128: Locale not supported by C library.
+(process:486): Gtk-WARNING **: 05:20:47.499: Locale not supported by C library.
 	Using the fallback 'C' locale.
 
-(vd-app:432): GLib-GIO-CRITICAL **: 04:58:07.143: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:486): GLib-GIO-CRITICAL **: 05:20:47.521: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: configuration warnings: 1

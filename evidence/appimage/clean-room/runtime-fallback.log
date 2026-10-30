@@ -1,0 +1,2 @@
+vedit: cannot use XDG_RUNTIME_DIR=/proc/nonexistent (not writable or not creatable); using /tmp instead
+VEdit 0.1.0

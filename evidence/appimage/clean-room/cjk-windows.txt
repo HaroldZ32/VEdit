@@ -4,15 +4,11 @@ xwininfo: Window id: 0x43 (the root window) (has no name)
 
   Root window id: 0x43 (the root window) (has no name)
   Parent window id: 0x0 (none)
-     4 children:
-     0x20000e (has no name): ()  1x1+-1+-1  +-1+-1
-     0x200009 "VEdit": ("vd-app" "Vd-app")  1120x780+0+0  +0+0
-        1 child:
-        0x20000a (has no name): ()  1x1+-1+-1  +-1+-1
+     3 children:
+     0x20000a (has no name): ()  1x1+-1+-1  +-1+-1
      0x200002 "VEdit": ("vd-app" "Vd-app")  1120x780+0+0  +0+0
         1 child:
         0x200003 (has no name): ()  1x1+-1+-1  +-1+-1
      0x200001 "vd-app": ("vd-app" "Vd-app")  10x10+10+10  +10+10
 
-window 0x200009 png_bytes=22033
-window 0x200002 png_bytes=201
+window 0x200002 png_bytes=22025

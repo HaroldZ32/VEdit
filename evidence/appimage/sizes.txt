@@ -1,6 +1,12 @@
-AppImage_bytes=48105976
-b589416e9492c6a2df333d861163d71ba3674305788a77e5b1f9c541e72412a4  /art/VEdit-0.1.0-x86_64.AppImage
-extracted_payload_bytes=119281789
-run=1 exec_to_window_ms=195
+AppImage_bytes=47745528
+b24d0bfb5f1945d86be108d9e4cf27ee942e7469af1e7574df4b69d108863119  /art/VEdit-0.1.0-x86_64.AppImage
+payload_canonical_bytes=115285986   # method: find -type f -printf '%s' | awk sum (regular files only)
+payload_regular_file_count=5825
+payload_symlink_count=68 payload_symlink_target_bytes=743
+payload_directory_count=470
+payload_du_sb=117392073   # method: du -sb (apparent size incl. 4096 B per directory inode)
+payload_du_sb_apparent_size=117392073
+payload_tar_stream_bytes=120023040   # method: tar -cf - . | wc -c (adds 512 B headers)
+run=1 exec_to_window_ms=196
 run=2 exec_to_window_ms=196
-run=3 exec_to_window_ms=194
+run=3 exec_to_window_ms=196

@@ -1,7 +1,7 @@
 # host fontconfig zh fonts:
 0
 # payload fontconfig zh fonts (FONTCONFIG_FILE from AppRun):
-/tmp/appimage_extracted_2661ca0ea704059c3dc41aad25e202a6/usr/share/fonts/wqy-zenhei/wqy-zenhei.ttc: WenQuanYi Zen Hei Mono:style=Regular
-/tmp/appimage_extracted_2661ca0ea704059c3dc41aad25e202a6/usr/share/fonts/wqy-zenhei/wqy-zenhei.ttc: WenQuanYi Zen Hei:style=Regular
-/tmp/appimage_extracted_2661ca0ea704059c3dc41aad25e202a6/usr/share/fonts/wqy-zenhei/wqy-zenhei.ttc: WenQuanYi Zen Hei Sharp,文泉驛點陣正黑:style=Regular
+/tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/share/fonts/wqy-zenhei/wqy-zenhei.ttc: WenQuanYi Zen Hei:style=Regular
+/tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/share/fonts/wqy-zenhei/wqy-zenhei.ttc: WenQuanYi Zen Hei Mono:style=Regular
+/tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/share/fonts/wqy-zenhei/wqy-zenhei.ttc: WenQuanYi Zen Hei Sharp,文泉驛點陣正黑:style=Regular
 payload_cjk_count=3

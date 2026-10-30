@@ -5,8 +5,34 @@
   # resolve inside $HERE. No host path is exported.
   set -e
   HERE=$(dirname "$(readlink -f "$0")")
-  RUNTIME="${TMPDIR:-/tmp}/vedit-runtime"
-  mkdir -p "$RUNTIME"
+  
+  # Per-user runtime directory for the rewritten caches; mirrors the tar.gz/.run
+  # launcher (T25): XDG_RUNTIME_DIR -> TMPDIR -> explicit failure. mkdir can fail
+  # (a /proc path, a read-only mount, someone else's directory), which must not
+  # abort the launch silently.
+  make_runtime() {
+    _base=$1
+    _dir="$_base/vedit-runtime-$(id -u)"
+    if mkdir -p "$_dir" 2>/dev/null; then
+      printf '%s' "$_dir"
+      return 0
+    fi
+    return 1
+  }
+  
+  PREFERRED=${XDG_RUNTIME_DIR:-}
+  FALLBACK=${TMPDIR:-/tmp}
+  if [ -n "$PREFERRED" ] && RUNTIME=$(make_runtime "$PREFERRED"); then
+    :
+  elif RUNTIME=$(make_runtime "$FALLBACK"); then
+    if [ -n "$PREFERRED" ]; then
+      echo "vedit: cannot use XDG_RUNTIME_DIR=$PREFERRED (not writable or not creatable); using $FALLBACK instead" >&2
+    fi
+  else
+    echo "vedit: cannot create a runtime directory; tried '$PREFERRED' and '$FALLBACK'" >&2
+    echo "vedit: set XDG_RUNTIME_DIR (or TMPDIR) to a writable directory and retry" >&2
+    exit 1
+  fi
   sed "s|@APPDIR@|$HERE|g" "$HERE/etc/loaders.cache.in" > "$RUNTIME/loaders.cache"
   sed "s|@APPDIR@|$HERE|g" "$HERE/etc/immodules.cache.in" > "$RUNTIME/immodules.cache"
   sed "s|@APPDIR@|$HERE|g" "$HERE/etc/fonts.conf.in" > "$RUNTIME/fonts.conf"

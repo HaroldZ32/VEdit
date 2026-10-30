@@ -1,6 +1,19 @@
 # build-tree path leakage audit
-# 1) main binary strings:
-/vedit-build/crates/vd-apptests/fixturesthe GTK window did not startsystemverilogsmoke-saved.svshiftprimaryunicode_highlight.svcalled `Result::unwrap()` on an `Err` valueformat_me.svundeclared.svmodule clean;
+# 1) build-host checkout paths (the release remap target is /vedit, never /vedit-build):
+none
+BUILD_HOST_PATH_HITS=0
+
+# 1b) remapped source paths under the sandbox root /vedit (panic locations):
+SANDBOX_SOURCE_PATH_LITERALS=508
+/vedit/target/cargo-home/registry/src/index.crates.io-1949cf8c6b5b557f/glib-0.18.5/src/object.rs
+/vedit/target/cargo-home/registry/src/index.crates.io-1949cf8c6b5b557f/futures-channel-0.3.34/src/mpsc/queue.rs
+CONCLUSION: /vedit-build count is 0 (measured on NUL-delimited strings, not
+`strings` output, which glues adjacent literals). What remains are 508
+panic source locations remapped to the sandbox root /vedit — build metadata,
+not a host checkout path, and no runtime lookup. The former env!() fixture
+fallback is gone: vd-app derives the fixtures at runtime and the payload's
+VEDIT_SELFTEST_FIXTURES points at <payload>/usr/share/vedit/testdata.
+
 # 2) launcher/config templates (expect @APPDIR@ placeholders only):
 none
 # 3) @APPDIR@ placeholder counts:
