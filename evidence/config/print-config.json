@@ -147,16 +147,7 @@
       }
     },
     {
-      "key": "keys.deep_lint",
-      "shadowed": [],
-      "source": "default",
-      "value": {
-        "kind": "text",
-        "text": "Ctrl+Shift+L"
-      }
-    },
-    {
-      "key": "keys.fim_accept",
+      "key": "keys.accept-fim",
       "shadowed": [],
       "source": "default",
       "value": {
@@ -165,7 +156,7 @@
       }
     },
     {
-      "key": "keys.fim_cancel",
+      "key": "keys.cancel-fim",
       "shadowed": [],
       "source": "default",
       "value": {
@@ -174,21 +165,21 @@
       }
     },
     {
-      "key": "keys.fim_manual",
+      "key": "keys.definition",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "F12"
+      }
+    },
+    {
+      "key": "keys.fim",
       "shadowed": [],
       "source": "default",
       "value": {
         "kind": "text",
         "text": "Alt+\\"
-      }
-    },
-    {
-      "key": "keys.find_references",
-      "shadowed": [],
-      "source": "default",
-      "value": {
-        "kind": "text",
-        "text": "Shift+F12"
       }
     },
     {
@@ -204,21 +195,30 @@
       }
     },
     {
-      "key": "keys.goto_definition",
-      "shadowed": [],
-      "source": "default",
-      "value": {
-        "kind": "text",
-        "text": "F12"
-      }
-    },
-    {
-      "key": "keys.symbol_outline",
+      "key": "keys.outline",
       "shadowed": [],
       "source": "default",
       "value": {
         "kind": "text",
         "text": "Ctrl+Shift+O"
+      }
+    },
+    {
+      "key": "keys.references",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "Shift+F12"
+      }
+    },
+    {
+      "key": "keys.slang",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "Ctrl+Shift+L"
       }
     },
     {

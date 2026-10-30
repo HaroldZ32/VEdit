@@ -156,6 +156,62 @@ fn an_unknown_key_is_ignored_while_the_rest_of_the_file_applies() -> Result<()> 
 }
 
 #[test]
+fn a_legacy_key_name_is_reported_with_its_replacement() -> Result<()> {
+    let (_temp, home, project, exe_dir) = fixture()?;
+    write(
+        &project_config(&project),
+        "[keys]\ndeep_lint = \"Ctrl+Alt+L\"\n",
+    )?;
+    let loaded = loader(&home, &project, &exe_dir, &[]).load()?;
+
+    let warning = loaded
+        .warnings
+        .iter()
+        .find(|warning| warning.code == WarningCode::ConfigUnknownKey)
+        .ok_or_else(|| anyhow::anyhow!("no config.unknown_key warning for the legacy name"))?;
+    assert!(
+        warning.message.contains("keys.deep_lint"),
+        "{}",
+        warning.message
+    );
+    assert!(warning.message.contains("slang"), "{}", warning.message);
+    // The legacy name is not a second spelling of the action: it is ignored, and
+    // the real action keeps its default.
+    assert_eq!(loaded.config.keys.binding("deep_lint"), None);
+    assert_eq!(loaded.config.keys.binding("slang"), Some("Ctrl+Shift+L"));
+    Ok(())
+}
+
+#[test]
+fn a_known_action_rebinds_and_an_unknown_action_is_reported() -> Result<()> {
+    let (_temp, home, project, exe_dir) = fixture()?;
+    write(
+        &project_config(&project),
+        "[keys]\nslang = \"Ctrl+Alt+L\"\nfrobnicate = \"F9\"\n",
+    )?;
+    let loaded = loader(&home, &project, &exe_dir, &[]).load()?;
+
+    assert_eq!(loaded.config.keys.binding("slang"), Some("Ctrl+Alt+L"));
+    let unknown: Vec<&str> = loaded
+        .warnings
+        .iter()
+        .filter(|warning| warning.code == WarningCode::ConfigUnknownKey)
+        .map(|warning| warning.message.as_str())
+        .collect();
+    assert!(
+        unknown
+            .iter()
+            .any(|message| message.contains("keys.frobnicate")),
+        "unknown action must be reported: {unknown:?}"
+    );
+    assert!(
+        !unknown.iter().any(|message| message.contains("keys.slang")),
+        "the rebind itself must not warn: {unknown:?}"
+    );
+    Ok(())
+}
+
+#[test]
 fn environment_variables_override_fim_settings_and_record_their_source() -> Result<()> {
     let (_temp, home, project, exe_dir) = fixture()?;
     write(

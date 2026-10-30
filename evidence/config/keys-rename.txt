@@ -1,0 +1,378 @@
+# [keys] action names after the vd-config / vd-app unification
+# command: `cargo run -q -p vd-config --example print-config -- --json evidence/config/fixture-keys` (pinned image)
+
+## legacy name -> current action id
+deep_lint       -> slang
+goto_definition -> definition
+find_references -> references
+symbol_outline  -> outline
+fim_accept      -> accept-fim
+fim_cancel      -> cancel-fim
+fim_manual      -> fim
+
+## input: evidence/config/fixture-keys/vedit.toml
+# Legacy name (renamed), the current action id, and a typo.
+[keys]
+deep_lint = "Ctrl+Alt+L"
+slang = "Ctrl+Alt+S"
+frobnicate = "F9"
+
+## resolved json (config.keys and warnings)
+{
+  "config": {
+    "editor": {
+      "highlight_current_line": false,
+      "insert_spaces": false,
+      "show_line_numbers": true,
+      "tab_width": 2
+    },
+    "fim": {
+      "api_key": "<redacted>",
+      "enabled": false,
+      "endpoint": "https://env.local/v1",
+      "model": "env-model",
+      "protocol": "open_ai",
+      "timeout_ms": 5000
+    },
+    "keys": {
+      "format": "Ctrl+Alt+F",
+      "slang": "Ctrl+Alt+S"
+    },
+    "project": {
+      "defines": [],
+      "filelists": [],
+      "include_dirs": []
+    },
+    "ui": {
+      "language": "zh-CN",
+      "theme": "cobalt"
+    },
+    "verible": {}
+  },
+  "entries": [
+    {
+      "key": "editor.highlight_current_line",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "bool",
+        "value": false
+      }
+    },
+    {
+      "key": "editor.insert_spaces",
+      "overridden_by": "default",
+      "shadowed": [
+        "default"
+      ],
+      "source": "user",
+      "value": {
+        "kind": "bool",
+        "value": false
+      }
+    },
+    {
+      "key": "editor.show_line_numbers",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "bool",
+        "value": true
+      }
+    },
+    {
+      "key": "editor.tab_width",
+      "overridden_by": "default",
+      "shadowed": [
+        "default"
+      ],
+      "source": "user",
+      "value": {
+        "kind": "number",
+        "value": 2
+      }
+    },
+    {
+      "key": "fim.api_key",
+      "shadowed": [],
+      "source": "env",
+      "value": {
+        "kind": "redacted",
+        "set": true
+      }
+    },
+    {
+      "key": "fim.enabled",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "bool",
+        "value": false
+      }
+    },
+    {
+      "key": "fim.endpoint",
+      "overridden_by": "default",
+      "shadowed": [
+        "default"
+      ],
+      "source": "env",
+      "value": {
+        "kind": "text",
+        "text": "https://env.local/v1"
+      }
+    },
+    {
+      "key": "fim.model",
+      "overridden_by": "default",
+      "shadowed": [
+        "default"
+      ],
+      "source": "env",
+      "value": {
+        "kind": "text",
+        "text": "env-model"
+      }
+    },
+    {
+      "key": "fim.protocol",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "open_ai"
+      }
+    },
+    {
+      "key": "fim.timeout_ms",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "number",
+        "value": 5000
+      }
+    },
+    {
+      "key": "keys.accept-fim",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "Tab"
+      }
+    },
+    {
+      "key": "keys.cancel-fim",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "Esc"
+      }
+    },
+    {
+      "key": "keys.definition",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "F12"
+      }
+    },
+    {
+      "key": "keys.fim",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "Alt+\\"
+      }
+    },
+    {
+      "key": "keys.format",
+      "overridden_by": "default",
+      "shadowed": [
+        "default"
+      ],
+      "source": "user",
+      "value": {
+        "kind": "text",
+        "text": "Ctrl+Alt+F"
+      }
+    },
+    {
+      "key": "keys.outline",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "Ctrl+Shift+O"
+      }
+    },
+    {
+      "key": "keys.references",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "Shift+F12"
+      }
+    },
+    {
+      "key": "keys.slang",
+      "overridden_by": "default",
+      "shadowed": [
+        "default"
+      ],
+      "source": "project",
+      "value": {
+        "kind": "text",
+        "text": "Ctrl+Alt+S"
+      }
+    },
+    {
+      "key": "project.defines",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "list",
+        "len": 0
+      }
+    },
+    {
+      "key": "project.filelists",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "list",
+        "len": 0
+      }
+    },
+    {
+      "key": "project.include_dirs",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "list",
+        "len": 0
+      }
+    },
+    {
+      "key": "ui.language",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "zh-CN"
+      }
+    },
+    {
+      "key": "ui.theme",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "cobalt"
+      }
+    }
+  ],
+  "project": {
+    "defines": [],
+    "filelists": [],
+    "include_dirs": [],
+    "root": "/vedit-build/evidence/config/fixture-keys",
+    "root_source": "vedit_toml",
+    "rules_search_stop": "/",
+    "search_stop": "/vedit-build/evidence/config/fixture-keys"
+  },
+  "schema_version": 1,
+  "sources": [
+    "default",
+    "user",
+    "project",
+    "env"
+  ],
+  "tools": {
+    "format": {
+      "attempts": [
+        {
+          "found": false,
+          "path": "/vedit-build/target/debug/lib/vedit/bin/verible-verilog-format",
+          "source": "bundled"
+        },
+        {
+          "found": false,
+          "path": "/vedit-build/target/debug/bin/verible-verilog-format",
+          "source": "bundled"
+        },
+        {
+          "found": false,
+          "path": "/vedit-build/target/debug/examples/verible-verilog-format",
+          "source": "bundled"
+        }
+      ],
+      "error": "verible-verilog-format was not found (PATH is never consulted); probed 3 location(s):\n  source=bundled path=/vedit-build/target/debug/lib/vedit/bin/verible-verilog-format found=false\n  source=bundled path=/vedit-build/target/debug/bin/verible-verilog-format found=false\n  source=bundled path=/vedit-build/target/debug/examples/verible-verilog-format found=false",
+      "tool": "format"
+    },
+    "lint": {
+      "attempts": [
+        {
+          "found": false,
+          "path": "/vedit-build/target/debug/lib/vedit/bin/verible-verilog-lint",
+          "source": "bundled"
+        },
+        {
+          "found": false,
+          "path": "/vedit-build/target/debug/bin/verible-verilog-lint",
+          "source": "bundled"
+        },
+        {
+          "found": false,
+          "path": "/vedit-build/target/debug/examples/verible-verilog-lint",
+          "source": "bundled"
+        }
+      ],
+      "error": "verible-verilog-lint was not found (PATH is never consulted); probed 3 location(s):\n  source=bundled path=/vedit-build/target/debug/lib/vedit/bin/verible-verilog-lint found=false\n  source=bundled path=/vedit-build/target/debug/bin/verible-verilog-lint found=false\n  source=bundled path=/vedit-build/target/debug/examples/verible-verilog-lint found=false",
+      "tool": "lint"
+    },
+    "ls": {
+      "attempts": [
+        {
+          "found": false,
+          "path": "/vedit-build/target/debug/lib/vedit/bin/verible-verilog-ls",
+          "source": "bundled"
+        },
+        {
+          "found": false,
+          "path": "/vedit-build/target/debug/bin/verible-verilog-ls",
+          "source": "bundled"
+        },
+        {
+          "found": false,
+          "path": "/vedit-build/target/debug/examples/verible-verilog-ls",
+          "source": "bundled"
+        }
+      ],
+      "error": "verible-verilog-ls was not found (PATH is never consulted); probed 3 location(s):\n  source=bundled path=/vedit-build/target/debug/lib/vedit/bin/verible-verilog-ls found=false\n  source=bundled path=/vedit-build/target/debug/bin/verible-verilog-ls found=false\n  source=bundled path=/vedit-build/target/debug/examples/verible-verilog-ls found=false",
+      "tool": "ls"
+    }
+  },
+  "warnings": [
+    {
+      "code": "config.unknown_key",
+      "file": "/vedit-build/evidence/config/fixture-keys/vedit.toml",
+      "message": "configuration key `keys.deep_lint` was renamed to `slang`; ignored"
+    },
+    {
+      "code": "config.unknown_key",
+      "file": "/vedit-build/evidence/config/fixture-keys/vedit.toml",
+      "message": "unknown configuration key `keys.frobnicate`; ignored"
+    },
+    {
+      "code": "rules.search_stopped",
+      "file": "/",
+      "message": "no .rules.verible_lint found from the project root upward; search stopped at /"
+    }
+  ]
+}
+EXIT=0

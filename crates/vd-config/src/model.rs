@@ -17,17 +17,74 @@ pub const DEFAULT_LANGUAGE: &str = "zh-CN";
 /// Default GtkSourceView style scheme (verified to colour SystemVerilog keywords).
 pub const DEFAULT_THEME: &str = "cobalt";
 
+/// Every action name accepted under `[keys]`.
+///
+/// These are the ids the shell registers as GAction names (`vd-app`'s shortcut
+/// table); `[keys]` is keyed by the action, not by a config-only alias, because
+/// the shell looks a binding up by the id it is about to install. A name that is
+/// not in this list is reported as `config.unknown_key` and dropped, so a typo
+/// can never look like a working rebinding.
+pub const KNOWN_BINDING_ACTIONS: &[&str] = &[
+    "open",
+    "new",
+    "save",
+    "save-as",
+    "close-tab",
+    "quit",
+    "undo",
+    "redo",
+    "find",
+    "replace",
+    "find-next",
+    "goto-line",
+    "format",
+    "slang",
+    "definition",
+    "references",
+    "outline",
+    "rename",
+    "fim",
+    "toggle-panel",
+    "accept-fim",
+    "cancel-fim",
+];
+
+/// Renamed actions: old configuration name -> current action id.
+///
+/// Kept as a migration aid only: the old name is *not* accepted (two names for
+/// one action is worse than one breaking warning), but a file that still uses it
+/// gets an explicit `config.unknown_key` message naming the replacement.
+pub const LEGACY_BINDING_ACTIONS: &[(&str, &str)] = &[
+    ("deep_lint", "slang"),
+    ("goto_definition", "definition"),
+    ("find_references", "references"),
+    ("symbol_outline", "outline"),
+    ("fim_accept", "accept-fim"),
+    ("fim_cancel", "cancel-fim"),
+    ("fim_manual", "fim"),
+];
+
+/// The current action id for a legacy binding name.
+#[must_use]
+pub fn renamed_binding(action: &str) -> Option<&'static str> {
+    LEGACY_BINDING_ACTIONS
+        .iter()
+        .find(|(old, _)| *old == action)
+        .map(|(_, new)| *new)
+}
+
 /// Default key bindings. The requirements make these rebindable via `[keys]`;
-/// this table is the baseline the configuration starts from.
+/// this table is the baseline the configuration starts from. Every id here is
+/// an action the shell actually registers.
 pub const DEFAULT_KEY_BINDINGS: &[(&str, &str)] = &[
     ("format", "Ctrl+Shift+F"),
-    ("deep_lint", "Ctrl+Shift+L"),
-    ("goto_definition", "F12"),
-    ("find_references", "Shift+F12"),
-    ("symbol_outline", "Ctrl+Shift+O"),
-    ("fim_accept", "Tab"),
-    ("fim_cancel", "Esc"),
-    ("fim_manual", "Alt+\\"),
+    ("slang", "Ctrl+Shift+L"),
+    ("definition", "F12"),
+    ("references", "Shift+F12"),
+    ("outline", "Ctrl+Shift+O"),
+    ("accept-fim", "Tab"),
+    ("cancel-fim", "Esc"),
+    ("fim", "Alt+\\"),
 ];
 
 /// The complete resolved configuration.
@@ -197,7 +254,8 @@ mod tests {
         assert_eq!(config.editor.tab_width, 4);
         assert!(config.editor.show_line_numbers);
         assert_eq!(config.keys.binding("format"), Some("Ctrl+Shift+F"));
-        assert_eq!(config.keys.binding("deep_lint"), Some("Ctrl+Shift+L"));
+        assert_eq!(config.keys.binding("slang"), Some("Ctrl+Shift+L"));
+        assert_eq!(config.keys.binding("deep_lint"), None);
         assert!(!config.fim.enabled, "FIM must default to off");
         assert!(config.fim.endpoint.is_empty(), "no default endpoint");
         assert!(config.fim.model.is_empty(), "no default model");
@@ -215,7 +273,47 @@ mod tests {
         assert_eq!(config.editor.tab_width, 2);
         assert!(config.editor.insert_spaces);
         assert_eq!(config.ui.language, "zh-CN");
-        assert_eq!(config.keys.binding("goto_definition"), Some("F12"));
+        assert_eq!(config.keys.binding("definition"), Some("F12"));
         Ok(())
+    }
+
+    #[test]
+    fn every_default_binding_names_a_known_action() {
+        for (action, _) in crate::model::DEFAULT_KEY_BINDINGS {
+            assert!(
+                crate::model::KNOWN_BINDING_ACTIONS.contains(action),
+                "default binding `{action}` is not a known action id"
+            );
+        }
+    }
+
+    #[test]
+    fn default_binding_ids_are_unique_and_have_no_legacy_alias() {
+        let mut seen = std::collections::BTreeSet::new();
+        for (action, _) in crate::model::DEFAULT_KEY_BINDINGS {
+            assert!(seen.insert(*action), "duplicate default binding `{action}`");
+            assert!(
+                crate::model::renamed_binding(action).is_none(),
+                "default table still uses the legacy name `{action}`"
+            );
+        }
+        for (legacy, current) in crate::model::LEGACY_BINDING_ACTIONS {
+            assert!(
+                crate::model::KNOWN_BINDING_ACTIONS.contains(current),
+                "legacy `{legacy}` maps to unknown action `{current}`"
+            );
+            assert!(
+                !crate::model::KNOWN_BINDING_ACTIONS.contains(legacy),
+                "legacy name `{legacy}` must not remain a known action"
+            );
+        }
+    }
+
+    #[test]
+    fn known_actions_are_unique() {
+        let mut seen = std::collections::BTreeSet::new();
+        for action in crate::model::KNOWN_BINDING_ACTIONS {
+            assert!(seen.insert(*action), "duplicate known action `{action}`");
+        }
     }
 }

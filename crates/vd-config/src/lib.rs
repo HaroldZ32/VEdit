@@ -61,7 +61,7 @@ use anyhow::{Context, Result};
 pub use env::{Env, XdgDirs};
 pub use model::{
     Config, EditorConfig, FimConfig, FimProtocol, KeysConfig, ProjectSettings, UiConfig,
-    VeribleConfig, DEFAULT_KEY_BINDINGS, DEFAULT_LANGUAGE, DEFAULT_THEME,
+    VeribleConfig, DEFAULT_KEY_BINDINGS, DEFAULT_LANGUAGE, DEFAULT_THEME, KNOWN_BINDING_ACTIONS,
 };
 pub use project::{
     Define, Filelist, ProjectContext, RootSource, CONFIG_FILE_NAME, VERIBLE_RULES_FILE_NAME,
@@ -319,6 +319,15 @@ fn apply_config_file(
     };
     match parse_layer(&text) {
         Ok(parsed) => {
+            for (old, new) in &parsed.renamed_keys {
+                warnings.push(
+                    Warning::new(
+                        WarningCode::ConfigUnknownKey,
+                        format!("configuration key `keys.{old}` was renamed to `{new}`; ignored"),
+                    )
+                    .with_file(path.to_path_buf()),
+                );
+            }
             for key in &parsed.unknown_keys {
                 warnings.push(
                     Warning::new(
@@ -356,6 +365,7 @@ struct LayerError {
 struct ParsedLayer {
     value: serde_json::Value,
     unknown_keys: Vec<String>,
+    renamed_keys: Vec<(String, String)>,
 }
 
 /// Known configuration layout: section -> scalar keys. `keys` accepts any
@@ -401,22 +411,32 @@ fn parse_layer(text: &str) -> Result<ParsedLayer, LayerError> {
         line: None,
         message: "the TOML document cannot be represented as JSON",
     })?;
-    let unknown_keys = strip_unknown_keys(&mut json);
+    let stripped = strip_unknown_keys(&mut json);
     let _validated: Config = serde_json::from_value(json.clone()).map_err(|_| LayerError {
         line: None,
         message: "configuration schema mismatch",
     })?;
     Ok(ParsedLayer {
         value: json,
-        unknown_keys,
+        unknown_keys: stripped.unknown,
+        renamed_keys: stripped.renamed,
     })
 }
 
+/// What `strip_unknown_keys` removed from one layer.
+struct StrippedKeys {
+    /// Dotted paths that are not part of the contract at all.
+    unknown: Vec<String>,
+    /// Legacy `[keys]` names and the action they were renamed to.
+    renamed: Vec<(String, String)>,
+}
+
 /// Remove unknown sections/keys, returning their dotted paths.
-fn strip_unknown_keys(value: &mut serde_json::Value) -> Vec<String> {
+fn strip_unknown_keys(value: &mut serde_json::Value) -> StrippedKeys {
     let mut unknown = Vec::new();
+    let mut renamed = Vec::new();
     let Some(root) = value.as_object_mut() else {
-        return unknown;
+        return StrippedKeys { unknown, renamed };
     };
     root.retain(|section, child| {
         let Some((name, known)) = KNOWN_SECTIONS
@@ -428,6 +448,24 @@ fn strip_unknown_keys(value: &mut serde_json::Value) -> Vec<String> {
             return false;
         };
         if name == "keys" {
+            if let Some(map) = child.as_object_mut() {
+                map.retain(|action, _| {
+                    if crate::model::KNOWN_BINDING_ACTIONS.contains(&action.as_str()) {
+                        return true;
+                    }
+                    if let Some(replacement) = crate::model::renamed_binding(action) {
+                        renamed.push((action.clone(), replacement.to_string()));
+                    } else {
+                        unknown.push(format!("keys.{action}"));
+                    }
+                    false
+                });
+                // A layer whose every [keys] entry was dropped must not replace
+                // the defaults with an empty map.
+                if map.is_empty() {
+                    return false;
+                }
+            }
             return true;
         }
         let Some(map) = child.as_object_mut() else {
@@ -442,7 +480,7 @@ fn strip_unknown_keys(value: &mut serde_json::Value) -> Vec<String> {
         });
         true
     });
-    unknown
+    StrippedKeys { unknown, renamed }
 }
 
 /// 1-based line of a TOML error, when its span is available.
@@ -551,10 +589,7 @@ fn merge_json(base: &mut serde_json::Value, overlay: &serde_json::Value) {
 }
 
 fn warn_unknown_actions(config: &Config, warnings: &mut Vec<Warning>) {
-    let known: Vec<&str> = DEFAULT_KEY_BINDINGS
-        .iter()
-        .map(|(action, _)| *action)
-        .collect();
+    let known: Vec<&str> = KNOWN_BINDING_ACTIONS.to_vec();
     for action in config.keys.0.keys() {
         if !known.contains(&action.as_str()) {
             warnings.push(Warning::new(

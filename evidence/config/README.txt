@@ -5,6 +5,7 @@ Files:
   print-config.json       stable JSON document (schema_version 1)
   print-config-debug.txt  Debug rendering of Loaded (secret redaction proof)
   print-config-degrade.txt invalid project TOML -> config.parse_failed, user layer kept
+  keys-rename.txt         [keys] contract: legacy rename warning, current id rebinds, typo warned
   secret-grep.txt         grep -c assertions: 0 matches for every secret pattern
   schema-assertions.txt   machine assertions over the JSON contract
   scoped-gates.log        cargo fmt/clippy/test for crates/vd-config

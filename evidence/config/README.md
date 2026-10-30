@@ -53,6 +53,46 @@ Top-level keys: `schema_version` (**1**), `sources`, `entries`, `config`,
   `filelist.duplicate_entry`, `rules.search_stopped`, `config.parse_failed`,
   `config.unknown_key`, `config.invalid_value`, `xdg.invalid`.
 
+## `[keys]` action-name contract (cross-lane fix)
+
+`[keys]` is keyed by the **action id the shell installs** (`vd-app`'s GAction
+names), never by a config-only alias: the shell looks a binding up with the id it
+is about to install (`config_glue::key_binding(keys, shortcut.id, fallback)`).
+The old table used config-only names (`deep_lint`, `goto_definition`, …), so a
+user rebinding `deep_lint` got a silent no-op. The table and the contract are now
+one:
+
+| legacy name (ignored, warned) | current action id |
+|---|---|
+| `deep_lint` | `slang` |
+| `goto_definition` | `definition` |
+| `find_references` | `references` |
+| `symbol_outline` | `outline` |
+| `fim_accept` | `accept-fim` |
+| `fim_cancel` | `cancel-fim` |
+| `fim_manual` | `fim` |
+
+Behaviour, locked by tests (`model.rs` unit tests +
+`tests/config_behaviour.rs`):
+
+- `KNOWN_BINDING_ACTIONS` lists every accepted action id (the full shell
+  registry, so non-default actions such as `open` are rebindable too);
+- `DEFAULT_KEY_BINDINGS` only uses those ids, with no duplicates and no legacy
+  alias (a test rejects a table that reintroduces one);
+- an unknown action (`frobnicate`) is stripped with
+  `config.unknown_key: unknown configuration key `keys.frobnicate`; ignored`;
+- a legacy name is stripped with an explicit replacement message:
+  `configuration key `keys.deep_lint` was renamed to `slang`; ignored` — the old
+  name is **not** accepted as a second spelling;
+- a layer whose every `[keys]` entry was dropped does not replace the defaults
+  with an empty map;
+- `docs/USER_GUIDE.md` (T29) already uses `slang` / `accept-fim`, matching this
+  contract (checked: no legacy name appears under `docs/`).
+
+Evidence: `keys-rename.txt` (mapping table + resolved JSON with both warnings),
+`fixture-keys/vedit.toml` (the input), and `scoped-gates.log` (fmt/clippy/test:
+31 unit + 14 integration + 4 secret tests pass).
+
 ## Secret discipline (AC-15)
 
 `ApiKey` has a redacted `Debug`/`Serialize`, **no `Display`**, and the only

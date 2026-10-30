@@ -11,14 +11,14 @@ fim.endpoint             https://env.local/v1           source=env  overridden_b
 fim.model                env-model                      source=env  overridden_by=default  shadowed=[default]
 fim.protocol             open_ai                        source=default
 fim.timeout_ms           5000                           source=default
-keys.deep_lint           Ctrl+Shift+L                   source=default
-keys.fim_accept          Tab                            source=default
-keys.fim_cancel          Esc                            source=default
-keys.fim_manual          Alt+\                          source=default
-keys.find_references     Shift+F12                      source=default
+keys.accept-fim          Tab                            source=default
+keys.cancel-fim          Esc                            source=default
+keys.definition          F12                            source=default
+keys.fim                 Alt+\                          source=default
 keys.format              Ctrl+Alt+F                     source=user  overridden_by=default  shadowed=[default]
-keys.goto_definition     F12                            source=default
-keys.symbol_outline      Ctrl+Shift+O                   source=default
+keys.outline             Ctrl+Shift+O                   source=default
+keys.references          Shift+F12                      source=default
+keys.slang               Ctrl+Shift+L                   source=default
 project.defines          [0 item(s)]                    source=default
 project.filelists        [0 item(s)]                    source=default
 project.include_dirs     [0 item(s)]                    source=default

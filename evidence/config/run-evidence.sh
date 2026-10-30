@@ -13,6 +13,9 @@ INVALID="$OUT/fixture-invalid"
 EXAMPLE="cargo run -q -p vd-config --example print-config --"
 
 cd "$ROOT" || exit 1
+# Fail loudly if the example does not compile: otherwise every captured output
+# below would be an empty file that looks like "no findings".
+cargo build -q -p vd-config --example print-config || { echo "print-config example failed to build" >&2; exit 1; }
 export HOME="$FIX/home"
 export VEDIT_FIM_ENDPOINT="https://env.local/v1"
 export VEDIT_FIM_MODEL="env-model"
@@ -58,6 +61,39 @@ $EXAMPLE "$FIX/project" > "$OUT/print-config-table.txt" 2>> "$OUT/print-config.s
 
 # Degradation: the project file is invalid TOML, the user layer must survive.
 $EXAMPLE "$INVALID/project" > "$OUT/print-config-degrade.txt" 2>&1
+
+# [keys] action-name contract: legacy names are reported (not silently kept),
+# current action ids rebind, and anything else is reported as unknown.
+RENAME="$OUT/fixture-keys"
+rm -rf "$RENAME"
+mkdir -p "$RENAME"
+cat > "$RENAME/vedit.toml" <<'TOML'
+# Legacy name (renamed), the current action id, and a typo.
+[keys]
+deep_lint = "Ctrl+Alt+L"
+slang = "Ctrl+Alt+S"
+frobnicate = "F9"
+TOML
+{
+  echo "# [keys] action names after the vd-config / vd-app unification"
+  echo "# command: \`$EXAMPLE --json evidence/config/fixture-keys\` (pinned image)"
+  echo
+  echo "## legacy name -> current action id"
+  echo "deep_lint       -> slang"
+  echo "goto_definition -> definition"
+  echo "find_references -> references"
+  echo "symbol_outline  -> outline"
+  echo "fim_accept      -> accept-fim"
+  echo "fim_cancel      -> cancel-fim"
+  echo "fim_manual      -> fim"
+  echo
+  echo "## input: evidence/config/fixture-keys/vedit.toml"
+  cat "$RENAME/vedit.toml"
+  echo
+  echo "## resolved json (config.keys and warnings)"
+  $EXAMPLE --json "$RENAME"
+  echo "EXIT=$?"
+} > "$OUT/keys-rename.txt" 2>&1
 
 {
   echo "# secret leakage assertions (grep -c; 0 matches required)"
@@ -124,6 +160,12 @@ for name in ("format", "lint"):
 codes = {warning["code"] for warning in doc["warnings"]}
 assert "filelist.unknown_token" in codes, codes
 
+keys = doc["config"]["keys"]
+assert keys.get("format") == "Ctrl+Alt+F", keys
+assert "deep_lint" not in keys and "fim_accept" not in keys, keys
+assert entries["keys.slang"]["source"] == "default", entries["keys.slang"]
+assert "keys.deep_lint" not in entries, entries.get("keys.deep_lint")
+
 assert "test-env-secret" not in raw, "JSON leaked the environment secret"
 assert "test-config-secret" not in raw, "JSON leaked the config secret"
 print("ALL_SCHEMA_ASSERTIONS_PASS")
@@ -137,6 +179,7 @@ Files:
   print-config.json       stable JSON document (schema_version 1)
   print-config-debug.txt  Debug rendering of Loaded (secret redaction proof)
   print-config-degrade.txt invalid project TOML -> config.parse_failed, user layer kept
+  keys-rename.txt         [keys] contract: legacy rename warning, current id rebinds, typo warned
   secret-grep.txt         grep -c assertions: 0 matches for every secret pattern
   schema-assertions.txt   machine assertions over the JSON contract
   scoped-gates.log        cargo fmt/clippy/test for crates/vd-config

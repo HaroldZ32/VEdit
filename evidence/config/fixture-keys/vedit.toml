@@ -1,0 +1,5 @@
+# Legacy name (renamed), the current action id, and a typo.
+[keys]
+deep_lint = "Ctrl+Alt+L"
+slang = "Ctrl+Alt+S"
+frobnicate = "F9"
