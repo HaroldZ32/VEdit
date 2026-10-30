@@ -60,10 +60,30 @@ impl SuiteReport {
 /// only the source-tree fallback and MUST NOT be the only source, otherwise
 /// `--selftest` can only ever pass inside the build directory.
 fn fixture_root() -> PathBuf {
-    std::env::var_os("VEDIT_SELFTEST_FIXTURES")
-        .filter(|value| !value.is_empty())
-        .map(PathBuf::from)
-        .unwrap_or_else(|| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures"))
+    if let Some(value) = std::env::var_os("VEDIT_SELFTEST_FIXTURES") {
+        if !value.is_empty() {
+            return PathBuf::from(value);
+        }
+    }
+    // No compile-time path: `env!("CARGO_MANIFEST_DIR")` would embed the build
+    // machine's absolute path in the shipped ELF. Discover the source-tree
+    // layout at runtime instead; packaged builds set VEDIT_SELFTEST_FIXTURES.
+    let relative = Path::new("crates/vd-app/tests/fixtures");
+    if let Ok(cwd) = std::env::current_dir() {
+        let candidate = cwd.join(relative);
+        if candidate.is_dir() {
+            return candidate;
+        }
+    }
+    if let Ok(exe) = std::env::current_exe() {
+        for ancestor in exe.ancestors().skip(1).take(6) {
+            let candidate = ancestor.join(relative);
+            if candidate.is_dir() {
+                return candidate;
+            }
+        }
+    }
+    PathBuf::from(relative)
 }
 
 /// Run a suite (or every suite with `all`).
@@ -101,9 +121,45 @@ pub fn run(suite: &str, opts: &Options) -> Result<()> {
     }
 
     if let Some(path) = &opts.screenshot {
-        match ui.capture_screenshot(path) {
-            Ok(()) => eprintln!("vd-app: screenshot written to {}", path.display()),
-            Err(error) => eprintln!("vd-app: screenshot failed: {error:#}"),
+        let (ok, detail) = match ui.capture_screenshot(path) {
+            Ok(summary) => {
+                eprintln!(
+                    "vd-app: screenshot written to {} ({} bytes, {}x{}, {} sampled colours)",
+                    path.display(),
+                    summary.bytes,
+                    summary.width,
+                    summary.height,
+                    summary.sampled_colours
+                );
+                // `capture_screenshot` already refuses to write a uniform image
+                // (pixel samples checked before writing), which makes this an
+                // independent of gdk-pixbuf loaders assertion: the clean room has
+                // no PNG loader module, so reloading the file there would fail
+                // for reasons unrelated to the image.
+                let ok = summary.bytes > 1_000
+                    && summary.sampled_colours >= 4
+                    && summary.channel_range >= 8;
+                (
+                    ok,
+                    format!(
+                        "path={} bytes={} size={}x{} sampled_colours={} channel_range={}",
+                        path.display(),
+                        summary.bytes,
+                        summary.width,
+                        summary.height,
+                        summary.sampled_colours,
+                        summary.channel_range
+                    ),
+                )
+            }
+            Err(error) => (false, format!("capture failed: {error:#}")),
+        };
+        if let Some(first) = reports.first_mut() {
+            first.checks.push(Check {
+                name: "--screenshot produces a non-blank PNG".to_string(),
+                ok,
+                detail,
+            });
         }
     }
     if opts.probe_hold_ms > 0 {

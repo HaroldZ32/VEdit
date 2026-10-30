@@ -34,12 +34,12 @@ vd-app: configuration warnings: 1
           "ok": true
         },
         {
-          "detail": "restored=true, dispatch=undo, action_fallback=true, can_undo_before=true, status=\"1:1  |  /tmp/vd-app-selftest-654/format_me.sv  |  systemverilog  |  verible 1  |  slang 0  |  FIM: FIM 未启用  |  LSP running (pid 694), restarts 0 (running: true, restarts: 0)  Verible LSP: generation 2  Verible LSP: generation 2\"",
+          "detail": "restored=true, dispatch=undo, action_fallback=true, can_undo_before=true, status=\"1:1  |  /tmp/vd-app-selftest-2507/format_me.sv  |  systemverilog  |  verible 1  |  slang 0  |  FIM: FIM 未启用  |  LSP running (pid 2547), restarts 0 (running: true, restarts: 0)  Verible LSP: generation 2  Verible LSP: generation 2\"",
           "name": "undo shortcut restores the text through Document",
           "ok": true
         },
         {
-          "detail": "path=/tmp/vd-app-selftest-654/smoke-saved.sv",
+          "detail": "path=/tmp/vd-app-selftest-2507/smoke-saved.sv",
           "name": "save-as writes the document",
           "ok": true
         },
@@ -99,7 +99,7 @@ vd-app: configuration warnings: 1
           "ok": true
         },
         {
-          "detail": "2:1  |  /tmp/vd-app-selftest-654/smoke-saved.sv  |  systemverilog  |  verible 1  |  slang 1  |  FIM: FIM 未启用  |  match at line 2  Verible LSP: generation 2",
+          "detail": "2:1  |  /tmp/vd-app-selftest-2507/smoke-saved.sv  |  systemverilog  |  verible 1  |  slang 1  |  FIM: FIM 未启用  |  match at line 2  Verible LSP: generation 2",
           "name": "status bar reports the cursor",
           "ok": true
         },

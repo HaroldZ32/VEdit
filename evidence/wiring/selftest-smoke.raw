@@ -1,6 +1,6 @@
 vd-app selftest: fixture_root=/vedit-build/crates/vd-app/tests/fixtures (VEDIT_SELFTEST_FIXTURES=None)
 vd-app: configuration warnings: 1
-vd-app: screenshot written to evidence/wiring/smoke-window.png
+vd-app: screenshot written to evidence/wiring/smoke-window.png (34414 bytes, 1120x780, 11 sampled colours)
 {
   "app": "VEdit",
   "fixture_root": "/vedit-build/crates/vd-app/tests/fixtures",
@@ -34,12 +34,12 @@ vd-app: screenshot written to evidence/wiring/smoke-window.png
           "ok": true
         },
         {
-          "detail": "restored=true, dispatch=undo, action_fallback=true, can_undo_before=true, status=\"1:1  |  /tmp/vd-app-selftest-402/format_me.sv  |  systemverilog  |  verible 1  |  slang 0  |  FIM: FIM 未启用  |  LSP running (pid 442), restarts 0 (running: true, restarts: 0)  Verible LSP: generation 2\"",
+          "detail": "restored=true, dispatch=undo, action_fallback=true, can_undo_before=true, status=\"1:1  |  /tmp/vd-app-selftest-2255/format_me.sv  |  systemverilog  |  verible 1  |  slang 0  |  FIM: FIM 未启用  |  LSP running (pid 2295), restarts 0 (running: true, restarts: 0)  Verible LSP: generation 2\"",
           "name": "undo shortcut restores the text through Document",
           "ok": true
         },
         {
-          "detail": "path=/tmp/vd-app-selftest-402/smoke-saved.sv",
+          "detail": "path=/tmp/vd-app-selftest-2255/smoke-saved.sv",
           "name": "save-as writes the document",
           "ok": true
         },
@@ -99,13 +99,18 @@ vd-app: screenshot written to evidence/wiring/smoke-window.png
           "ok": true
         },
         {
-          "detail": "2:1  |  /tmp/vd-app-selftest-402/smoke-saved.sv  |  systemverilog  |  verible 1  |  slang 1  |  FIM: FIM 未启用  |  match at line 2",
+          "detail": "2:1  |  /tmp/vd-app-selftest-2255/smoke-saved.sv  |  systemverilog  |  verible 1  |  slang 1  |  FIM: FIM 未启用  |  match at line 2",
           "name": "status bar reports the cursor",
           "ok": true
         },
         {
           "detail": "path=/vedit-build/build/slang/out/slang",
           "name": "VEDIT_SLANG is configured for the SLANG suite",
+          "ok": true
+        },
+        {
+          "detail": "path=evidence/wiring/smoke-window.png bytes=34414 size=1120x780 sampled_colours=11 channel_range=255",
+          "name": "--screenshot produces a non-blank PNG",
           "ok": true
         }
       ],

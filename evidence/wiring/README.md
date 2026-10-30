@@ -36,11 +36,14 @@ the point).
 
 ```
 VEDIT_SELFTEST_FIXTURES   (runtime; root that contains definition/a.sv, definition/b.sv)
-  fallback: <CARGO_MANIFEST_DIR>/tests/fixtures   (source tree only)
+  fallback: runtime discovery of crates/vd-app/tests/fixtures (cwd, then exe ancestors)
 ```
 
-Every suite goes through `selftest::fixture_root()`; the compile-time path is
-**only a fallback** and `--selftest` prints the root it actually uses:
+Every suite goes through `selftest::fixture_root()`; there is **no compile-time
+absolute path in the binary** (the old `env!("CARGO_MANIFEST_DIR")` fallback was
+removed: remap-path-prefix cannot rewrite `env!` literals, so it would have leaked
+the build directory even in a remapped build). `--selftest` prints the root it
+actually uses:
 
 ```
 vd-app selftest: fixture_root=... (VEDIT_SELFTEST_FIXTURES=Some("..."))
@@ -111,10 +114,42 @@ and writes PNG via gdk-pixbuf. Files in this directory:
 
 | file | bytes | sha256 |
 |---|---:|---|
-| `smoke-window.png` | 28497 | `03cb3fea2e7e20dcbf8b490435d707f860e7f217c85cb4448264712d3d14feb6` |
-| `highlight-window.png` | 31598 | `9e69d589b40f57d5b923fd6a64279090124835e989d9de23eb6756901b61d9ab` |
-| `slang-window.png` | 30434 | `e8499d0f0410c6c1e2acd37d8b7c65ae749d95c66445d3641fb8ebb6dff392ec` |
-| `lsp-window.png` | 26310 | `12731ae79fc9e22e43a2f4db87b6fe052519b0cb7aeef899e68cef165c637ce0` |
+| `smoke-window.png` | 34414 | `7f7b1f493d2b86da62af769b013ae3e46e13e75a600e9153e47f88d9591a8c11` |
+| `highlight-window.png` | 33890 | `6d4723468d988b38039cb0adb0cf5b4b0eba054afa762136bcff528822e4cdc3` |
+| `slang-window.png` | 37860 | `069de60bc1abed8bceea1124dce6bc3711a5a71342168d36701e821e4e317d7b` |
+| `lsp-window.png` | 31482 | `7bf52787d72363acddde9c91bf2d0d247146a8ce27b7cb2f00db656b49f5a5ef` |
+| `cleanroom-highlight.png` | 33222 | `50633cb69b258699571cd67876e97d9cc8de08b12af6ffc232b9c557f4dba2a1` |
+
+### Clean room (no WM, no host GSV/fonts, `--network none`)
+
+`cleanroom-screenshot.txt` is the before/after proof:
+
+- **Before the fix** (the payload's original binary): `xwininfo -root -tree`
+  listed **two mapped 1120×780 `VEdit` toplevels** (`0x200009` rendered,
+  `0x200002` blank). This was a **product bug (b)**, not just a screenshot bug:
+  `run_interactive` called `register_and_activate()` and then
+  `application.run()`, so GTK activated twice and built two windows; the first
+  was leaked and never painted. Fixed by letting `run()` own the single
+  activation and by making the activate handler present the existing window.
+- **After the fix** (`build/artifacts/vd-app`): **one** toplevel.
+- **After the fix, `--screenshot`**: exit 0, **33222 bytes**,
+  sha256 `50633cb69b258699571cd67876e97d9cc8de08b12af6ffc232b9c557f4dba2a1`,
+  PNG signature `89504e470d0a1a0a`, ImageMagick `mean=26046.3 stddev=26379.4`
+  (not uniform), and the selftest's own sampled-pixel check reports
+  `sampled_colours=15 channel_range=255`. The blank-image failure mode is now
+  impossible silent: the layout is force-allocated before the draw, and the
+  function refuses to write a uniform image.
+
+### Remap / one binary for every product
+
+`scripts/versions.env` now carries the shared `RELEASE_RUSTFLAGS` (source roots
+→ `/vedit`, cargo homes → `/cargo`), sourced by the pinned build. The release
+build log records the embedded-path count: **0** `/vedit-build` strings after
+the fixture-root `env!` removal (categories: no panic-location paths, no
+`env!` literal). `build/artifacts/vd-app` sha256 is recorded in
+`cleanroom-screenshot.txt`; T23/T25 must rebuild their payloads with this same
+flag set for the two products to carry the same binary (their currently checked-in
+outputs predate the shared flags).
 
 `highlight-window.png` shows the CJK line with syntax colours and the status bar
 (`systemverilog`, cursor, counts); `slang-window.png` shows the gutter marks and
@@ -166,3 +201,10 @@ are accepted).
   the dialog itself.
 - **Emoji glyph**: the image has no emoji font, so 😀 renders as a placeholder
   box; CJK renders after the evidence-only font install.
+- **Packaged binaries**: the checked-in AppImage/tar.gz outputs were built before
+  the shared remap and before the two-window/screenshot fixes, so their `vd-app`
+  sha256 differs from `build/artifacts/vd-app` until T23/T25 rebuild. The e2e
+  harness (T27) records both hashes instead of claiming equality.
+- **Keys cross-assertion** (`[keys]` ids vs app actions) is pending the
+  `vd-config` `KNOWN_BINDING_ACTIONS` export from the config lane; the app's
+  `key_binding`/`gtk_accel` unit tests cover the rebinding path meanwhile.

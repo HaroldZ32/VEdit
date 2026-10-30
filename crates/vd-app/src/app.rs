@@ -9,9 +9,9 @@ use std::cell::{Cell, RefCell};
 use std::path::Path;
 use std::rc::Rc;
 use std::sync::mpsc::Receiver;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
-use anyhow::{anyhow, Context as _, Result};
+use anyhow::{anyhow, bail, Context as _, Result};
 use gtk::gdk::prelude::*;
 use gtk::prelude::*;
 use sourceview4::prelude::*;
@@ -30,6 +30,17 @@ use crate::slang_worker;
 
 /// Message shown when a feature needs a saved file.
 const NEEDS_FILE: &str = "save the file first";
+
+/// What `capture_screenshot` wrote (the pre-write pixel validation is the
+/// authoritative "not blank" check; the file size/signature is checked too).
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ScreenshotSummary {
+    pub width: i32,
+    pub height: i32,
+    pub bytes: u64,
+    pub sampled_colours: usize,
+    pub channel_range: u8,
+}
 
 /// Test seam for the modal close confirmation (`None` restores the dialog).
 pub type CloseConfirmation = Box<dyn Fn(&str) -> bool>;
@@ -1142,58 +1153,128 @@ impl Ui {
     ///
     /// # Errors
     /// Returns an error when Cairo cannot create the surface or write the PNG.
-    pub fn capture_screenshot(&self, path: &Path) -> Result<()> {
-        // Render the REAL widget tree with its own draw handler (the T11
-        // highlight-probe path): reading pixels back from the X window is blank
-        // under Xvfb because the image has no compositor.
-        self.window.queue_draw();
+    pub fn capture_screenshot(&self, path: &Path) -> Result<ScreenshotSummary> {
+        // `gtk_widget_draw` is a no-op while the toplevel still has a pending
+        // size allocation (`widget->priv->alloc_needed`, a Gtk-CRITICAL we saw in
+        // the clean room), which would silently produce a black PNG. Map the
+        // window, force an explicit allocation right before the draw, verify the
+        // pixels are not uniform, and only then write the file.
         let main_context = gtk::glib::MainContext::default();
-        for _ in 0..80 {
+        self.window.show_all();
+        self.window.present();
+        let deadline = Instant::now() + Duration::from_secs(3);
+        loop {
             while main_context.iteration(false) {}
-            std::thread::sleep(Duration::from_millis(2));
+            if self.window.is_mapped()
+                && self.window.allocated_width() > 0
+                && self.window.allocated_height() > 0
+            {
+                break;
+            }
+            if Instant::now() >= deadline {
+                break;
+            }
+            std::thread::sleep(Duration::from_millis(5));
         }
-        let allocation = self.window.allocation();
-        let width = allocation.width().max(1);
-        let height = allocation.height().max(1);
-        let mut surface =
-            gtk::cairo::ImageSurface::create(gtk::cairo::Format::Rgb24, width, height)
-                .context("creating the screenshot surface")?;
-        {
-            let context = gtk::cairo::Context::new(&surface).context("creating a Cairo context")?;
-            self.window.draw(&context);
-        }
-        surface.flush();
-        let stride = usize::try_from(surface.stride()).context("negative surface stride")?;
-        let data = surface.data().context("reading the screenshot pixels")?;
-        let width_usize = usize::try_from(width).context("negative width")?;
-        let height_usize = usize::try_from(height).context("negative height")?;
-        // cairo RGB24 is BGRx in memory; gdk-pixbuf wants RGBA for a PNG with alpha.
-        let mut rgba = Vec::with_capacity(width_usize * height_usize * 4);
-        for row in 0..height_usize {
-            let start = row * stride;
-            for pixel in 0..width_usize {
-                let offset = start + pixel * 4;
-                rgba.push(data[offset + 2]);
-                rgba.push(data[offset + 1]);
-                rgba.push(data[offset]);
-                rgba.push(0xff);
+        let (default_width, default_height) = self.window.default_size();
+        let mut last_detail = String::from("no draw attempt");
+        for attempt in 0..3 {
+            if !self.window.is_mapped() {
+                last_detail = "the window is not mapped (no window manager?)".to_string();
+                break;
+            }
+            let allocation = self.window.allocation();
+            let width = if allocation.width() > 0 {
+                allocation.width()
+            } else {
+                default_width.max(1)
+            };
+            let height = if allocation.height() > 0 {
+                allocation.height()
+            } else {
+                default_height.max(1)
+            };
+            // Clear the pending allocation synchronously; do not pump the main
+            // loop afterwards (a late resize idle would set alloc_needed again).
+            self.window
+                .size_allocate(&gtk::Allocation::new(0, 0, width, height));
+            let mut surface =
+                gtk::cairo::ImageSurface::create(gtk::cairo::Format::Rgb24, width, height)
+                    .context("creating the screenshot surface")?;
+            {
+                let context =
+                    gtk::cairo::Context::new(&surface).context("creating a Cairo context")?;
+                self.window.draw(&context);
+            }
+            surface.flush();
+            let stride = usize::try_from(surface.stride()).context("negative surface stride")?;
+            let data = surface.data().context("reading the screenshot pixels")?;
+            let width_usize = usize::try_from(width).context("negative width")?;
+            let height_usize = usize::try_from(height).context("negative height")?;
+            let mut rgba = Vec::with_capacity(width_usize * height_usize * 4);
+            let mut samples = std::collections::BTreeSet::new();
+            let mut min_channel = 255u8;
+            let mut max_channel = 0u8;
+            for row in 0..height_usize {
+                let start = row * stride;
+                for pixel in 0..width_usize {
+                    let offset = start + pixel * 4;
+                    let (blue, green, red) = (data[offset], data[offset + 1], data[offset + 2]);
+                    rgba.push(red);
+                    rgba.push(green);
+                    rgba.push(blue);
+                    rgba.push(0xff);
+                    min_channel = min_channel.min(red).min(green).min(blue);
+                    max_channel = max_channel.max(red).max(green).max(blue);
+                    if row % 64 == 0 && pixel % 64 == 0 {
+                        samples.insert((red, green, blue));
+                    }
+                }
+            }
+            drop(data);
+            if max_channel.saturating_sub(min_channel) >= 8 && samples.len() >= 4 {
+                let bytes = glib::Bytes::from(&rgba);
+                let pixbuf = gtk::gdk_pixbuf::Pixbuf::from_bytes(
+                    &bytes,
+                    gtk::gdk_pixbuf::Colorspace::Rgb,
+                    true,
+                    8,
+                    width,
+                    height,
+                    width * 4,
+                );
+                pixbuf
+                    .savev(path, "png", &[])
+                    .with_context(|| format!("writing {}", path.display()))?;
+                let bytes = std::fs::metadata(path)
+                    .with_context(|| format!("stat {}", path.display()))?
+                    .len();
+                return Ok(ScreenshotSummary {
+                    width,
+                    height,
+                    bytes,
+                    sampled_colours: samples.len(),
+                    channel_range: max_channel.saturating_sub(min_channel),
+                });
+            }
+            last_detail = format!(
+                "attempt {}: the rendered window is uniform/blank ({} sampled colours, channel range {})",
+                attempt + 1,
+                samples.len(),
+                max_channel.saturating_sub(min_channel)
+            );
+            // Give the toolkit one more frame and retry the explicit allocation.
+            for _ in 0..20 {
+                while main_context.iteration(false) {}
+                std::thread::sleep(Duration::from_millis(3));
             }
         }
-        drop(data);
-        let bytes = glib::Bytes::from(&rgba);
-        let pixbuf = gtk::gdk_pixbuf::Pixbuf::from_bytes(
-            &bytes,
-            gtk::gdk_pixbuf::Colorspace::Rgb,
-            true,
-            8,
-            width,
-            height,
-            width * 4,
+        bail!(
+            "refusing to write a blank screenshot ({last_detail}); window mapped={}, allocated={}x{}",
+            self.window.is_mapped(),
+            self.window.allocated_width(),
+            self.window.allocated_height()
         );
-        pixbuf
-            .savev(path, "png", &[])
-            .with_context(|| format!("writing {}", path.display()))?;
-        Ok(())
     }
 }
 
@@ -1727,8 +1808,9 @@ fn install_shortcuts(ui: &Rc<Ui>) {
 /// # Errors
 /// Returns an error when the GTK application cannot be registered.
 pub fn run_interactive(opts: &Options) -> Result<()> {
+    // `run()` performs registration and activation; calling register/activate
+    // here as well made GTK create a second ApplicationWindow (one blank).
     let app = App::new(opts);
-    app.register_and_activate()?;
     app.run();
     Ok(())
 }

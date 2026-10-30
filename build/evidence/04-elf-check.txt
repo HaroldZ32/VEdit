@@ -1,6 +1,6 @@
-# generated 2026-10-30T04:46:20Z by scripts/build.sh
+# generated 2026-10-30T05:12:09Z by scripts/build.sh
 $ file target/release/vd-app
-/home/haroldzhao/MyProj/DshProj/VEdit/target/release/vd-app: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.6.32, BuildID[sha1]=b06a3c472ed8a223e7b2ca9bdf0646ee76c2e559, stripped
+/home/haroldzhao/MyProj/DshProj/VEdit/target/release/vd-app: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.6.32, BuildID[sha1]=fd19aaacb9439ec7a71c2c35c3aee7bff904f689, stripped
 exit=0
 
 $ readelf -h | Class/Machine/Type
@@ -47,5 +47,5 @@ $ objdump -T | grep -o GLIBC_[0-9.]* | sort -V -u | tail -1
 GLIBC_2.16
 
 $ sha256sum target/release/vd-app
-a974e3d957bf86239e195b2c51ce020167ece789cd70d85432ad6c86c7a42f29  /home/haroldzhao/MyProj/DshProj/VEdit/target/release/vd-app
-size_bytes=5993920
+809cf95326172fc58975b38cea390dcffd8d78d1261b4f1d75059a8950c6d77d  /home/haroldzhao/MyProj/DshProj/VEdit/target/release/vd-app
+size_bytes=6002112

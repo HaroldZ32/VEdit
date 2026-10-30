@@ -1,79 +1,211 @@
-# Workspace gates for T21 follow-up (2026-10-30T04:45:24Z)
+# Workspace gates for T21 follow-up (screenshot/two-window/remap) 2026-10-30T05:14:53Z
+HEAD=dada4b7a0ed9b5d06f7b943cbabb88ab488aeea6
+tree=52 dirty paths
 $ cargo fmt --all -- --check
 exit=0
 $ cargo clippy --workspace --all-targets -- -D warnings
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.09s
+    Checking memchr v2.8.3
+    Checking once_cell v1.21.4
+    Checking bitflags v2.13.2
+    Checking libc v0.2.191
+    Checking itoa v1.0.18
+    Checking pin-project-lite v0.2.17
+    Checking smallvec v1.16.4
+    Checking serde_core v1.0.229
+    Checking futures-sink v0.3.34
+    Checking zmij v1.0.23
+    Checking futures-core v0.3.34
+    Checking futures-io v0.3.34
+    Checking cfg-if v1.0.5
+    Checking slab v0.4.12
+    Checking futures-task v0.3.34
+    Checking anyhow v1.0.104
+    Checking zerofrom v0.1.8
+    Checking linux-raw-sys v0.12.1
+    Checking stable_deref_trait v1.2.1
+    Checking thiserror v1.0.69
+    Checking futures-channel v0.3.34
+    Checking bytes v1.12.1
+    Checking percent-encoding v2.3.2
+    Checking yoke v0.8.4
+    Checking litemap v0.8.3
+    Checking utf_types v1.0.0
+    Checking writeable v0.6.4
+    Checking fastrand v2.5.0
+    Checking icu_properties_data v2.4.0
+    Checking icu_normalizer_data v2.4.0
+    Checking zeroize v1.9.1
+    Checking memoffset v0.9.1
+    Checking untrusted v0.9.0
+    Checking zerovec v0.11.9
+    Checking zerotrie v0.2.5
+    Checking field-offset v0.3.6
+    Checking log v0.4.34
+    Checking httparse v1.10.1
+    Checking rustls-pki-types v1.15.1
+    Checking form_urlencoded v1.2.2
+    Checking base64 v0.23.1
+    Checking winnow v1.0.4
+    Checking utf8_iter v1.1.0
+    Checking subtle v2.6.1
+   Compiling proc-macro-crate v1.3.1
+    Checking tracing-core v0.1.36
+    Checking rustix v1.1.6
+    Checking toml_writer v1.1.3+spec-1.1.0
+    Checking utf8-zero v0.8.1
+    Checking bitflags v1.3.2
+    Checking thiserror v2.0.21
+    Checking futures-util v0.3.34
+    Checking tower-layer v0.3.3
+    Checking tower-service v0.3.3
+    Checking webpki-roots v1.0.11
+    Checking http v1.5.0
+   Compiling gtk3-macros v0.18.2
+    Checking toml_parser v1.1.5+spec-1.1.0
+    Checking tracing v0.1.44
+    Checking tinystr v0.8.5
+    Checking potential_utf v0.1.6
+    Checking icu_collections v2.4.0
+    Checking icu_locale_core v2.4.0
+    Checking glib-sys v0.18.1
+    Checking getrandom v0.4.3
+    Checking getrandom v0.2.17
+    Checking errno v0.3.14
+    Checking mio v1.2.4
+    Checking ureq-proto v0.6.5
+    Checking signal-hook-registry v1.4.8
+    Checking ring v0.17.14
+    Checking gobject-sys v0.18.0
+    Checking cairo-sys-rs v0.18.2
+    Checking tokio v1.54.1
+    Checking gio-sys v0.18.1
+    Checking pango-sys v0.18.0
+    Checking atk-sys v0.18.2
+    Checking icu_provider v2.4.0
+    Checking icu_normalizer v2.4.0
+    Checking icu_properties v2.4.0
+    Checking serde v1.0.229
+    Checking serde_json v1.0.154
+    Checking toml_datetime v1.1.2+spec-1.1.0
+    Checking serde_spanned v1.1.2
+    Checking toml v1.1.8+spec-1.1.0
+    Checking gdk-pixbuf-sys v0.18.0
+    Checking rustls-webpki v0.103.16
+    Checking gdk-sys v0.18.2
+    Checking gtk-sys v0.18.2
+    Checking tempfile v3.27.0
+    Checking waitpid-any v0.3.0
+    Checking rustls v0.23.46
+    Checking vd-deeplint v0.1.0 (/vedit-build/crates/vd-deeplint)
+    Checking vd-config v0.1.0 (/vedit-build/crates/vd-config)
+    Checking futures-executor v0.3.34
+    Checking futures v0.3.34
+    Checking idna_adapter v1.2.2
+    Checking idna v1.1.0
+    Checking glib v0.18.5
+    Checking url v2.5.8
+    Checking lsp-types v0.95.1
+    Checking sourceview4-sys v0.5.0
+    Checking tokio-util v0.7.20
+    Checking ureq v3.5.0
+    Checking vd-fim v0.1.0 (/vedit-build/crates/vd-fim)
+    Checking gio v0.18.4
+    Checking cairo-rs v0.18.5
+    Checking atk v0.18.2
+    Checking async-lsp v0.2.4
+    Checking vd-lsp v0.1.0 (/vedit-build/crates/vd-lsp)
+    Checking gdk-pixbuf v0.18.5
+    Checking pango v0.18.3
+    Checking gdk v0.18.2
+    Checking gtk v0.18.2
+    Checking sourceview4 v0.5.0
+    Checking vd-syntax v0.1.0 (/vedit-build/crates/vd-syntax)
+    Checking vd-editor v0.1.0 (/vedit-build/crates/vd-editor)
+    Checking vd-app v0.1.0 (/vedit-build/crates/vd-app)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 20.20s
 exit=0
 $ cargo test --workspace
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.09s
+   Compiling vd-deeplint v0.1.0 (/vedit-build/crates/vd-deeplint)
+   Compiling vd-fim v0.1.0 (/vedit-build/crates/vd-fim)
+   Compiling vd-config v0.1.0 (/vedit-build/crates/vd-config)
+   Compiling vd-app v0.1.0 (/vedit-build/crates/vd-app)
+   Compiling vd-syntax v0.1.0 (/vedit-build/crates/vd-syntax)
+   Compiling vd-editor v0.1.0 (/vedit-build/crates/vd-editor)
+   Compiling vd-lsp v0.1.0 (/vedit-build/crates/vd-lsp)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 6.00s
      Running unittests src/main.rs (target/debug/deps/vd_app-abf59cacf07355f2)
 
 running 11 tests
 test commands::tests::contract_shortcuts_are_all_present_exactly_once ... ok
-test commands::tests::table_text_lists_every_shortcut ... ok
-test config_glue::tests::accelerators_are_converted_for_gtk ... ok
 test config_glue::tests::key_binding_falls_back_to_the_default ... ok
 test config_glue::tests::editor_defaults_match_the_config_defaults ... ok
+test config_glue::tests::accelerators_are_converted_for_gtk ... ok
+test commands::tests::table_text_lists_every_shortcut ... ok
 test diagnostics::tests::lsp_diagnostics_are_clamped_and_keep_the_derived_rule ... ok
 test diagnostics::tests::slang_diagnostics_keep_a_positionless_entry ... ok
 test position_adapter::tests::clamping_handles_out_of_range_positions ... ok
-test diagnostics::tests::worst_severity_per_line_prefers_errors ... ok
 test position_adapter::tests::lsp_positions_are_utf16_and_round_trip ... ok
 test position_adapter::tests::lsp_ranges_are_clamped_into_document_ranges ... ok
+test diagnostics::tests::worst_severity_per_line_prefers_errors ... ok
 
-test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
 
      Running unittests src/lib.rs (target/debug/deps/vd_config-12b7b22329bb91d1)
 
-running 28 tests
-test env::tests::no_home_means_no_default_directories ... ok
-test env::tests::xdg_explicit_absolute_values_win ... ok
-test env::tests::relative_xdg_value_falls_back_and_is_reported ... ok
-test env::tests::xdg_defaults_come_from_home ... ok
-test model::tests::defaults_match_the_requirements ... ok
-test project::tests::define_parsing ... ok
-test model::tests::a_partial_document_keeps_the_defaults_for_absent_keys ... ok
-test provenance::tests::lists_reduce_to_their_length ... ok
-test provenance::tests::empty_secret_is_reported_as_unset ... ok
-test provenance::tests::secret_leaf_is_redacted_even_when_the_layer_carries_the_raw_value ... ok
-test secret::tests::debug_is_redacted ... ok
-test provenance::tests::precedence_chain_is_recorded_nearest_first_in_overridden_by ... ok
-test tests::parse_layer_reports_a_line_without_quoting_the_source ... ok
-test render::tests::json_carries_the_schema_version_and_tool_attempts_even_on_success ... ok
-test tests::deep_merge_keeps_unrelated_keys_and_replaces_lists ... ok
-test project::tests::root_discovery_falls_back_to_the_start_directory ... ok
-test secret::tests::expose_secret_is_the_only_way_out ... ok
-test filelist::tests::missing_nested_filelist_is_reported_not_fatal ... ok
-test secret::tests::serialization_is_redacted ... ok
-test render::tests::table_renders_redacted_secret_and_overridden_by ... ok
-test filelist::tests::detects_cycles_and_duplicates ... ok
+running 31 tests
 test filelist::tests::parses_entries_comments_incdirs_defines_and_nested_filelists ... ok
+test env::tests::xdg_explicit_absolute_values_win ... ok
+test model::tests::a_partial_document_keeps_the_defaults_for_absent_keys ... ok
+test filelist::tests::missing_nested_filelist_is_reported_not_fatal ... ok
+test filelist::tests::detects_cycles_and_duplicates ... ok
+test env::tests::no_home_means_no_default_directories ... ok
+test env::tests::xdg_defaults_come_from_home ... ok
+test env::tests::relative_xdg_value_falls_back_and_is_reported ... ok
+test filelist::tests::depth_limit_is_enforced ... ok
+test model::tests::default_binding_ids_are_unique_and_have_no_legacy_alias ... ok
+test provenance::tests::precedence_chain_is_recorded_nearest_first_in_overridden_by ... ok
+test provenance::tests::lists_reduce_to_their_length ... ok
+test provenance::tests::secret_leaf_is_redacted_even_when_the_layer_carries_the_raw_value ... ok
+test secret::tests::serialization_is_redacted ... ok
+test project::tests::root_discovery_falls_back_to_the_start_directory ... ok
+test provenance::tests::empty_secret_is_reported_as_unset ... ok
+test model::tests::defaults_match_the_requirements ... ok
+test model::tests::every_default_binding_names_a_known_action ... ok
+test project::tests::define_parsing ... ok
+test model::tests::known_actions_are_unique ... ok
+test secret::tests::debug_is_redacted ... ok
+test render::tests::json_carries_the_schema_version_and_tool_attempts_even_on_success ... ok
 test project::tests::root_discovery_prefers_vedit_toml_then_git ... ok
-test tools::tests::configured_path_wins ... ok
+test secret::tests::expose_secret_is_the_only_way_out ... ok
 test tools::tests::failure_lists_every_attempt_and_never_mentions_path_lookup ... ok
 test tools::tests::missing_config_falls_through_to_env_and_records_both_attempts ... ok
+test render::tests::table_renders_redacted_secret_and_overridden_by ... ok
+test tools::tests::configured_path_wins ... ok
 test tools::tests::bundled_payload_is_found_next_to_the_executable ... ok
-test filelist::tests::depth_limit_is_enforced ... ok
+test tests::deep_merge_keeps_unrelated_keys_and_replaces_lists ... ok
+test tests::parse_layer_reports_a_line_without_quoting_the_source ... ok
 
-test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 31 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
 
      Running tests/config_behaviour.rs (target/debug/deps/config_behaviour-4e134bf0495b6a7c)
 
-running 12 tests
-test environment_variables_override_fim_settings_and_record_their_source ... ok
-test an_unknown_key_is_ignored_while_the_rest_of_the_file_applies ... ok
-test a_relative_configured_tool_path_is_resolved_against_the_project_root ... ok
-test a_relative_xdg_variable_is_reported_and_the_default_is_used ... ok
+running 14 tests
 test an_invalid_configuration_file_degrades_to_the_lower_layer ... ok
-test defaults_apply_when_nothing_is_configured ... ok
-test the_two_renderings_agree_and_stay_safe ... ok
 test the_project_layer_overrides_the_user_layer_per_key_and_inherits_the_rest ... ok
+test environment_variables_override_fim_settings_and_record_their_source ... ok
 test the_user_layer_applies_from_the_xdg_config_home ... ok
-test tool_resolution_records_every_attempt_even_on_success ... ok
-test project_discovery_finds_filelists_rules_includes_defines_and_upward_rules ... ok
+test a_relative_configured_tool_path_is_resolved_against_the_project_root ... ok
+test an_unknown_key_is_ignored_while_the_rest_of_the_file_applies ... ok
 test configured_filelists_and_project_settings_are_merged_with_discovered_ones ... ok
+test a_relative_xdg_variable_is_reported_and_the_default_is_used ... ok
+test a_legacy_key_name_is_reported_with_its_replacement ... ok
+test a_known_action_rebinds_and_an_unknown_action_is_reported ... ok
+test tool_resolution_records_every_attempt_even_on_success ... ok
+test the_two_renderings_agree_and_stay_safe ... ok
+test project_discovery_finds_filelists_rules_includes_defines_and_upward_rules ... ok
+test defaults_apply_when_nothing_is_configured ... ok
 
-test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
 
      Running tests/secret_discipline.rs (target/debug/deps/secret_discipline-62453af0593d6965)
 
@@ -88,71 +220,71 @@ test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
      Running unittests src/lib.rs (target/debug/deps/vd_deeplint-ee46bb90426d3781)
 
 running 25 tests
-test diagnostic::tests::a_diagnostic_without_ranges_converts_the_location_as_a_point ... ok
-test diagnostic::tests::a_diagnostic_without_location_or_ranges_is_kept ... ok
-test diagnostic::tests::an_unparsable_location_string_is_a_note_not_a_failure ... ok
-test diagnostic::tests::byte_columns_convert_to_utf16_on_cjk_and_emoji ... ok
-test diagnostic::tests::calibration_table_converts_byte_columns_to_utf16 ... ok
-test diagnostic::tests::byte_columns_convert_inside_a_tab_line ... ok
-test binary::tests::all_attempts_are_listed_when_nothing_is_found ... ok
-test binary::tests::environment_variable_is_used_when_set ... ok
-test binary::tests::explicit_option_wins_and_is_recorded ... ok
-test binary::tests::non_executable_file_is_not_chosen ... ok
-test diagnostic::tests::conversion_rejects_bad_lines_columns_and_split_characters ... ok
-test diagnostic::tests::crlf_trailing_carriage_return_is_not_part_of_the_line ... ok
-test diagnostic::tests::invalid_utf8_source_is_rejected ... ok
 test diagnostic::tests::implicit_net_has_a_location_but_no_ranges_and_keeps_option_name ... ok
-test diagnostic::tests::location_string_with_colons_in_the_path_is_parsed_from_the_right ... ok
+test diagnostic::tests::invalid_utf8_source_is_rejected ... ok
 test diagnostic::tests::location_falls_back_to_first_range ... ok
+test binary::tests::environment_variable_is_used_when_set ... ok
+test diagnostic::tests::an_unparsable_location_string_is_a_note_not_a_failure ... ok
+test diagnostic::tests::crlf_trailing_carriage_return_is_not_part_of_the_line ... ok
+test diagnostic::tests::a_diagnostic_without_ranges_converts_the_location_as_a_point ... ok
 test diagnostic::tests::malformed_json_is_rejected ... ok
-test diagnostic::tests::parses_the_empty_clean_report ... ok
-test diagnostic::tests::severity_mapping_includes_unknown ... ok
-test service::tests::failure_user_messages_are_actionable ... ok
-test diagnostic::tests::parses_recorded_undeclared_diagnostic ... ok
-test diagnostic::tests::parses_recorded_unicode_diagnostics_without_losing_fields ... ok
+test diagnostic::tests::calibration_table_converts_byte_columns_to_utf16 ... ok
+test binary::tests::all_attempts_are_listed_when_nothing_is_found ... ok
+test diagnostic::tests::byte_columns_convert_to_utf16_on_cjk_and_emoji ... ok
 test binary::tests::package_layout_is_found_relative_to_the_executable ... ok
+test diagnostic::tests::conversion_rejects_bad_lines_columns_and_split_characters ... ok
+test binary::tests::explicit_option_wins_and_is_recorded ... ok
+test diagnostic::tests::location_string_with_colons_in_the_path_is_parsed_from_the_right ... ok
+test diagnostic::tests::byte_columns_convert_inside_a_tab_line ... ok
+test diagnostic::tests::a_diagnostic_without_location_or_ranges_is_kept ... ok
+test diagnostic::tests::severity_mapping_includes_unknown ... ok
+test diagnostic::tests::parses_recorded_undeclared_diagnostic ... ok
 test service::tests::std_summary_messages_are_short ... ok
 test service::tests::stream_capture_truncates_at_the_limit ... ok
+test binary::tests::non_executable_file_is_not_chosen ... ok
+test diagnostic::tests::parses_recorded_unicode_diagnostics_without_losing_fields ... ok
+test service::tests::failure_user_messages_are_actionable ... ok
+test diagnostic::tests::parses_the_empty_clean_report ... ok
 
-test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
 
      Running tests/fake_binary.rs (target/debug/deps/fake_binary-41c10307fdb3a2c1)
 
 running 13 tests
 test non_executable_binary_is_not_found ... ok
 test missing_binary_lists_every_attempt ... ok
-test executable_with_a_missing_interpreter_is_a_spawn_failure ... ok
-test nonzero_exit_without_json_reports_stderr ... ok
-test clean_file_is_a_success_with_no_diagnostics ... ok
-test diagnostics_are_capped_and_the_total_is_reported ... ok
-test malformed_json_is_a_typed_failure ... ok
-test diagnostics_are_parsed_and_converted_to_utf16_positions ... ok
-test report_captures_stderr_of_a_successful_run ... ok
 test oversized_json_is_rejected_before_parsing ... ok
+test executable_with_a_missing_interpreter_is_a_spawn_failure ... ok
+test report_captures_stderr_of_a_successful_run ... ok
+test diagnostics_are_capped_and_the_total_is_reported ... ok
+test clean_file_is_a_success_with_no_diagnostics ... ok
+test nonzero_exit_without_json_reports_stderr ... ok
+test diagnostics_are_parsed_and_converted_to_utf16_positions ... ok
+test malformed_json_is_a_typed_failure ... ok
 test cancel_kills_and_reaps_the_child ... ok
 test a_new_run_cancels_the_previous_one ... ok
 test timeout_kills_and_reaps_the_child ... ok
 
-test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
 
      Running tests/real_slang.rs (target/debug/deps/real_slang-5d37ed955bd5a99e)
 
 running 6 tests
-test real_slang_binary_attempts_are_recorded_even_on_success ... ok
+test real_slang_implicit_net_has_no_ranges_but_keeps_its_location ... ok
 test real_slang_calibration_set_matches_independent_utf16_positions ... ok
 test real_slang_unicode_columns_map_to_utf16_positions ... ok
 test real_slang_clean_file_has_no_diagnostics ... ok
-test real_slang_implicit_net_has_no_ranges_but_keeps_its_location ... ok
+test real_slang_binary_attempts_are_recorded_even_on_success ... ok
 test real_slang_reports_undeclared_identifier_exactly ... ok
 
-test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
 
      Running unittests src/lib.rs (target/debug/deps/vd_editor-62ff8407b3a495dc)
 
 running 42 tests
 test document::tests::atomic_save_failure_keeps_the_file_and_the_dirty_flag ... ok
-test document::tests::batch_edits_keep_mixed_line_endings_line_by_line ... ok
 test document::tests::batch_edits_are_one_undo_step ... ok
+test document::tests::batch_edits_keep_mixed_line_endings_line_by_line ... ok
 test document::tests::crlf_file_saves_with_crlf_line_endings ... ok
 test document::tests::delete_spanning_lines_returns_the_removed_text ... ok
 test document::tests::dirty_tracking_and_close_confirmation ... ok
@@ -160,28 +292,28 @@ test document::tests::edit_undo_redo_round_trip ... ok
 test document::tests::empty_batch_is_a_noop_without_undo_step ... ok
 test document::tests::empty_insert_does_not_create_an_undo_step ... ok
 test line_ending::tests::assemble_falls_back_to_the_default_when_breaks_run_out ... ok
-test document::tests::find_and_replace ... ok
 test line_ending::tests::delete_bookkeeping_keeps_the_surviving_ending ... ok
+test document::tests::find_and_replace ... ok
 test line_ending::tests::delete_through_the_end_drops_the_last_ending ... ok
 test line_ending::tests::detects_lf_crlf_and_cr ... ok
-test document::tests::find_is_case_insensitive_when_asked ... ok
 test line_ending::tests::insert_at_end_without_trailing_break ... ok
-test document::tests::freshly_loaded_document_cannot_undo_the_load ... ok
+test document::tests::find_is_case_insensitive_when_asked ... ok
 test line_ending::tests::insert_bookkeeping_moves_the_original_ending_to_the_last_new_line ... ok
 test line_ending::tests::mixed_line_endings_keep_their_order ... ok
+test document::tests::freshly_loaded_document_cannot_undo_the_load ... ok
 test position::tests::ascii_offsets ... ok
-test position::tests::chinese_and_emoji_utf16_offsets ... ok
 test document::tests::line_ranges_support_go_to_line ... ok
+test position::tests::chinese_and_emoji_utf16_offsets ... ok
 test position::tests::line_utf16_len_counts_units_not_chars ... ok
-test position::tests::positions_round_trip_on_mixed_text ... ok
 test document::tests::lsp_positions_on_chinese_and_emoji ... ok
+test position::tests::positions_round_trip_on_mixed_text ... ok
 test save::tests::missing_parent_directory_is_rejected_without_touching_anything ... ok
 test save::tests::failure_while_writing_the_temp_file_keeps_the_original ... ok
 test save::tests::crash_before_rename_keeps_the_original ... ok
 test save::tests::permission_denied_at_rename_keeps_the_original ... ok
-test save::tests::replaces_existing_content ... ok
-test save::tests::writes_a_new_file ... ok
 test save::tests::temp_file_lives_in_the_target_directory ... ok
+test save::tests::writes_a_new_file ... ok
+test save::tests::replaces_existing_content ... ok
 test document::tests::mixed_line_endings_are_preserved_line_by_line ... ok
 test document::tests::new_document_is_clean ... ok
 test document::tests::overlapping_batch_edits_are_rejected_without_changes ... ok
@@ -198,13 +330,13 @@ test result: ok. 42 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fin
      Running unittests src/lib.rs (target/debug/deps/vd_fim-8faf8ff117f884ba)
 
 running 40 tests
-test error::tests::configuration_failures_are_classified_as_such ... ok
 test backends::tests::llama_cpp_does_not_require_a_model ... ok
-test backends::tests::unusable_settings_do_not_produce_a_backend ... ok
 test backends::tests::a_failing_transport_propagates_the_sanitised_error ... ok
 test backends::tests::an_empty_key_never_produces_an_authorization_header ... ok
-test backends::tests::openai_request_sends_prompt_suffix_model_and_bearer ... ok
+test backends::tests::unusable_settings_do_not_produce_a_backend ... ok
 test backends::tests::llama_cpp_request_sends_input_prefix_and_suffix_without_model ... ok
+test backends::tests::openai_request_sends_prompt_suffix_model_and_bearer ... ok
+test error::tests::configuration_failures_are_classified_as_such ... ok
 test error::tests::every_reason_is_short_and_not_empty ... ok
 test error::tests::reasons_never_contain_a_secret_or_a_url ... ok
 test error::tests::status_and_timeout_reasons_carry_the_number ... ok
@@ -212,8 +344,8 @@ test protocol::tests::llama_cpp_body_has_exactly_the_contract_fields ... ok
 test protocol::tests::llama_cpp_response_parses_content ... ok
 test protocol::tests::malformed_bodies_are_invalid_response_not_a_panic ... ok
 test protocol::tests::openai_body_has_exactly_the_contract_fields ... ok
-test protocol::tests::openai_response_parses_choices_zero_text ... ok
 test protocol::tests::response_cap_is_a_documented_constant ... ok
+test protocol::tests::openai_response_parses_choices_zero_text ... ok
 test protocol::tests::trailing_line_breaks_are_removed_but_leading_spaces_kept ... ok
 test secret::tests::debug_is_redacted ... ok
 test secret::tests::deserialization_round_trips_the_plaintext ... ok
@@ -250,10 +382,10 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
      Running tests/default_off.rs (target/debug/deps/default_off-4d9f681f1a26917f)
 
 running 4 tests
-test the_real_transport_is_not_constructed_while_disabled ... ok
 test openai_without_a_model_is_reported_without_a_request ... ok
 test default_settings_send_nothing_and_start_no_worker ... ok
 test llama_cpp_needs_no_model_but_sends_nothing_until_started ... ok
+test the_real_transport_is_not_constructed_while_disabled ... ok
 
 test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
 
@@ -261,49 +393,49 @@ test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 
 running 16 tests
 test config::tests::default_timeouts_are_bounded ... ok
-test config::tests::rules_are_passed_explicitly_and_never_searched ... ok
-test config::tests::no_rules_file_means_no_rules_flag ... ok
-test config::tests::filelist_and_extra_args_are_appended_in_order ... ok
 test diagnostics::tests::recording_bumps_the_generation_and_replaces_per_uri ... ok
+test config::tests::no_rules_file_means_no_rules_flag ... ok
 test diagnostics::tests::rule_is_taken_from_code_or_from_the_verible_message ... ok
-test documents::tests::change_on_an_unopened_document_is_an_error ... ok
 test documents::tests::versions_and_text_track_changes ... ok
+test documents::tests::change_on_an_unopened_document_is_an_error ... ok
 test edits::tests::edits_are_applied_in_document_order_regardless_of_input_order ... ok
 test edits::tests::incremental_changes_track_a_document ... ok
-test edits::tests::overlapping_edits_are_rejected ... ok
-test edits::tests::utf16_columns_apply_to_multibyte_text ... ok
-test position::tests::cjk_and_emoji_use_utf16_units ... ok
-test position::tests::ascii_round_trip ... ok
-test position::tests::crlf_lines_are_handled ... ok
+test config::tests::rules_are_passed_explicitly_and_never_searched ... ok
+test config::tests::filelist_and_extra_args_are_appended_in_order ... ok
 test position::tests::out_of_range_positions_are_errors ... ok
+test edits::tests::overlapping_edits_are_rejected ... ok
+test position::tests::crlf_lines_are_handled ... ok
+test edits::tests::utf16_columns_apply_to_multibyte_text ... ok
+test position::tests::ascii_round_trip ... ok
+test position::tests::cjk_and_emoji_use_utf16_units ... ok
 
-test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
 
      Running tests/verible_ls.rs (target/debug/deps/verible_ls-0220fc475d864f3d)
 
 running 8 tests
-test capabilities_are_the_measured_ten_and_start_is_lazy ... ok
 test diagnostics_arrive_within_three_seconds_and_clear_after_a_fix ... ok
-test definition_references_symbols_rename_and_highlight ... ok
 test rules_config_is_passed_explicitly_and_changes_diagnostics ... ok
+test capabilities_are_the_measured_ten_and_start_is_lazy ... ok
+test definition_references_symbols_rename_and_highlight ... ok
 test formatting_edits_reproduce_the_bundled_formatter_byte_for_byte ... ok
 test lazy_start_crash_restart_and_shutdown_leave_no_zombie ... ok
 test request_timeout_and_cancellation_are_enforced ... ok
 test initialize_timeout_is_enforced_and_the_child_is_reaped ... ok
 
-test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.32s
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.33s
 
      Running unittests src/lib.rs (target/debug/deps/vd_syntax-842d48256375d759)
 
 running 6 tests
-test detect::tests::extension_matching_is_case_insensitive ... ok
-test detect::tests::language_ids_are_the_upstream_gtksourceview_ids ... ok
+test detect::tests::systemverilog_extensions_map_to_systemverilog ... ok
 test detect::tests::verilog_extensions_map_to_verilog ... ok
 test detect::tests::supported_table_is_exactly_the_contract_table ... ok
-test detect::tests::systemverilog_extensions_map_to_systemverilog ... ok
 test detect::tests::unknown_extensions_are_plain_text ... ok
+test detect::tests::extension_matching_is_case_insensitive ... ok
+test detect::tests::language_ids_are_the_upstream_gtksourceview_ids ... ok
 
-test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
 
      Running unittests src/bin/highlight-probe.rs (target/debug/deps/highlight_probe-407dfcdee364a582)
 
@@ -316,7 +448,7 @@ test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
 running 1 test
 test crates/vd-config/src/lib.rs - (line 27) ... ok
 
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.34s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.68s
 
    Doc-tests vd_deeplint
 

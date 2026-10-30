@@ -8,6 +8,8 @@
 set -euo pipefail
 
 ROOT=/vedit-build
+# shellcheck source=versions.env
+source "$ROOT/scripts/versions.env"
 EVID="$ROOT/build/evidence"
 ARTIFACTS="$ROOT/build/artifacts"
 mkdir -p "$EVID" "$ARTIFACTS"
@@ -52,7 +54,9 @@ fi
 
 echo "== cargo build --release --workspace =="
 # Keep build-machine paths out of the shipped ELF (Rust embeds panic locations).
-export RUSTFLAGS="${RUSTFLAGS:-} --remap-path-prefix=/vedit-build=/vedit-build --remap-path-prefix=/opt/cargo=/cargo"
+# The workspace is mounted at /vedit-build in the pinned image; remap it to a
+# neutral /build prefix instead of a no-op.
+export RUSTFLAGS="${RUSTFLAGS:-} ${RELEASE_RUSTFLAGS:?RELEASE_RUSTFLAGS is defined in scripts/versions.env}"
 cargo build --release --workspace 2>&1 | tee "$EVID/06-cargo-build.log"
 
 BIN="$ROOT/target/release/vd-app"
@@ -62,6 +66,18 @@ if [ ! -x "$BIN" ]; then
 fi
 strip --strip-all "$BIN"
 cp "$BIN" "$ARTIFACTS/vd-app"
+{
+  echo "# Embedded build-machine paths (panic locations must not leak /vedit-build)"
+  echo "\$ strings vd-app | grep -c /vedit-build"
+  PATH_LEAKS=$(strings "$BIN" | grep -c '/vedit-build' || true)
+  echo "leaks=$PATH_LEAKS"
+  echo "remap_flags=$RUSTFLAGS"
+} > "$EVID/13-remap-check.txt" 2>&1
+PATH_LEAKS=$(strings "$BIN" | grep -c '/vedit-build' || true)
+if [ "$PATH_LEAKS" -ne 0 ]; then
+  echo "FATAL: $PATH_LEAKS embedded /vedit-build path(s) remain in $BIN" >&2
+  exit 1
+fi
 {
   echo "artifact=build/artifacts/vd-app"
   sha256sum "$BIN"

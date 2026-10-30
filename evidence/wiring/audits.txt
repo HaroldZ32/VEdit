@@ -1,47 +1,26 @@
-# Audit 1: buffer calls that write TEXT in crates/vd-app/src (must be EMPTY)
-# (mark bookkeeping such as create_source_mark/delete_mark is allowed: it does not change text)
-$ grep -rnE "(buffer|source_buffer)\.(insert|insert_at_cursor|delete|delete_range|set_text|apply_tag|backspace|cut_clipboard|paste_clipboard|create_tag)" crates/vd-app/src/
-crates/vd-app/src/app.rs:733:            tab.buffer.delete_mark(&mark);
+# Audit 1: buffer calls that write TEXT (must be EMPTY)
+crates/vd-app/src/app.rs:744:            tab.buffer.delete_mark(&mark);
 
-# Audit 1b: the only non-Document buffer calls are gutter mark bookkeeping (no text change)
-$ grep -rnE "buffer\.(create_source_mark|delete_mark|remove_source_marks)" crates/vd-app/src/
-crates/vd-app/src/app.rs:733:            tab.buffer.delete_mark(&mark);
-crates/vd-app/src/app.rs:747:            if let Some(mark) = tab.buffer.create_source_mark(Some(&name), &category, &iter) {
+# Audit 1b: allowed non-text buffer calls (gutter marks only)
+crates/vd-app/src/app.rs:744:            tab.buffer.delete_mark(&mark);
+crates/vd-app/src/app.rs:758:            if let Some(mark) = tab.buffer.create_source_mark(Some(&name), &category, &iter) {
 
-# Audit 2: every TEXT change goes through vd_editor::Document
-$ grep -rnE "document\.(insert|delete|replace|apply_edits_one_step|replace_next|replace_all|undo|redo)" crates/vd-app/src/
-crates/vd-app/src/selftest.rs:246:                let undone = tab.document.undo();
-crates/vd-app/src/app.rs:352:            if tab.document.undo() {
-crates/vd-app/src/app.rs:363:            if tab.document.redo() {
-crates/vd-app/src/app.rs:418:        match tab.document.replace_next(&needle, &replacement, from, true) {
-crates/vd-app/src/app.rs:438:        match tab.document.replace_all(&needle, &replacement, true) {
-crates/vd-app/src/app.rs:646:        match tab.document.insert(position, &text) {
+# Audit 2: text changes through vd_editor::Document
+crates/vd-app/src/selftest.rs:302:                let undone = tab.document.undo();
+crates/vd-app/src/app.rs:363:            if tab.document.undo() {
+crates/vd-app/src/app.rs:374:            if tab.document.redo() {
+crates/vd-app/src/app.rs:429:        match tab.document.replace_next(&needle, &replacement, from, true) {
+crates/vd-app/src/app.rs:449:        match tab.document.replace_all(&needle, &replacement, true) {
+crates/vd-app/src/app.rs:657:        match tab.document.insert(position, &text) {
 
-# Audit 3: no lane logic re-implemented (no JSON-RPC framing or SV parsing in the app)
-$ grep -rnE "Content-Length|jsonrpc|serde_json::from_str|tree_sitter" crates/vd-app/src/
+# Audit 3: no lane logic (JSON-RPC/SV parsing)
 (no matches)
 
-# Audit 4: the app spawns no processes itself (vd-lsp / vd-deeplint own that)
-$ grep -rn "Command::new" crates/vd-app/src/
+# Audit 4: no process spawning in the app
 (no matches)
 
-# Audit 5: selftest fixture paths - runtime override, compile-time fallback only
-$ grep -rn "CARGO_MANIFEST_DIR" crates/vd-app/src/
-crates/vd-app/src/selftest.rs:66:        .unwrap_or_else(|| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures"))
+# Audit 5: no compile-time absolute fixture path
+crates/vd-app/src/selftest.rs:68:    // No compile-time path: `env!("CARGO_MANIFEST_DIR")` would embed the build
 
-# Dependencies of vd-app (the wiring crate)
-[dependencies]
-anyhow.workspace = true
-glib.workspace = true
-gtk.workspace = true
-lsp-types.workspace = true
-serde.workspace = true
-serde_json.workspace = true
-sourceview4.workspace = true
-tokio.workspace = true
-vd-config = { path = "../vd-config" }
-vd-deeplint = { path = "../vd-deeplint" }
-vd-editor = { path = "../vd-editor" }
-vd-fim = { path = "../vd-fim" }
-vd-lsp = { path = "../vd-lsp" }
-vd-syntax = { path = "../vd-syntax" }
+# Shared release remap (scripts/versions.env)
+RELEASE_RUSTFLAGS="--remap-path-prefix=/vedit-build/target/cargo-home=/cargo --remap-path-prefix=/root/.cargo=/cargo --remap-path-prefix=/opt/cargo=/cargo --remap-path-prefix=/vedit-build=/vedit"

@@ -97,7 +97,17 @@ binaries are present, and it now validates the current JSON report shape.
 - **Documented deviation from the literal contract text**: none in behaviour;
   the selftest menu grew a `config` suite (useful evidence for tool resolution)
   and `all`; this is additive.
-- **Screenshots**: `--screenshot` now renders the realized widget tree with its
+- **Two toplevels (fixed product bug)**: the clean room showed two mapped
+  `VEdit` windows because the interactive path activated the GApplication twice
+  (`register_and_activate()` followed by `run()`), leaking an unpainted window.
+  `run()` now owns activation and the activate handler refuses to build a second
+  UI; the clean room goes from 2 to 1 toplevels (`cleanroom-screenshot.txt`).
+- **Blank screenshots (fixed)**: `gtk_widget_draw` was called while a layout
+  allocation was pending (`Gtk-CRITICAL alloc_needed`). The capture now maps the
+  window, forces `size_allocate` immediately before the draw, refuses to write a
+  uniform image, and the selftest reports the sampled colours/channel range. The
+  clean-room PNG is non-black (33222 bytes, sha256 in README).
+- **Screenshots**: `--screenshot` renders the realized widget tree with its
   own draw handler into a Cairo surface (the T11 highlight-probe path) and writes
   a PNG through gdk-pixbuf; four real renders are in this directory with bytes +
   sha256 in `README.md`. Reading pixels back from the X window is what returns

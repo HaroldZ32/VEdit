@@ -1,6 +1,6 @@
 vd-app selftest: fixture_root=/vedit-build/crates/vd-app/tests/fixtures (VEDIT_SELFTEST_FIXTURES=None)
 vd-app: configuration warnings: 1
-vd-app: screenshot written to evidence/wiring/slang-window.png
+vd-app: screenshot written to evidence/wiring/slang-window.png (37860 bytes, 1120x780, 16 sampled colours)
 {
   "app": "VEdit",
   "fixture_root": "/vedit-build/crates/vd-app/tests/fixtures",
@@ -36,6 +36,11 @@ vd-app: screenshot written to evidence/wiring/slang-window.png
         {
           "detail": "marks=1, categories=[\"vedit-error\"]",
           "name": "gutter marks the SLANG line",
+          "ok": true
+        },
+        {
+          "detail": "path=evidence/wiring/slang-window.png bytes=37860 size=1120x780 sampled_colours=16 channel_range=255",
+          "name": "--screenshot produces a non-blank PNG",
           "ok": true
         }
       ],

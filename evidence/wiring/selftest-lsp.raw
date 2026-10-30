@@ -1,6 +1,6 @@
 vd-app selftest: fixture_root=/vedit-build/crates/vd-app/tests/fixtures (VEDIT_SELFTEST_FIXTURES=None)
 vd-app: configuration warnings: 1
-vd-app: screenshot written to evidence/wiring/lsp-window.png
+vd-app: screenshot written to evidence/wiring/lsp-window.png (31482 bytes, 1120x780, 15 sampled colours)
 {
   "app": "VEdit",
   "fixture_root": "/vedit-build/crates/vd-app/tests/fixtures",
@@ -36,6 +36,11 @@ vd-app: screenshot written to evidence/wiring/lsp-window.png
         {
           "detail": "path=Some(\"/vedit-build/crates/vd-app/tests/fixtures/definition/b.sv\"), cursor=Position { line: 0, character: 7 }",
           "name": "F12 definition jumps to the target file/line/column",
+          "ok": true
+        },
+        {
+          "detail": "path=evidence/wiring/lsp-window.png bytes=31482 size=1120x780 sampled_colours=15 channel_range=255",
+          "name": "--screenshot produces a non-blank PNG",
           "ok": true
         }
       ],

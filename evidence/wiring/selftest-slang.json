@@ -34,6 +34,11 @@
           "detail": "marks=1, categories=[\"vedit-error\"]",
           "name": "gutter marks the SLANG line",
           "ok": true
+        },
+        {
+          "detail": "path=evidence/wiring/slang-window.png bytes=37860 size=1120x780 sampled_colours=16 channel_range=255",
+          "name": "--screenshot produces a non-blank PNG",
+          "ok": true
         }
       ],
       "ok": true,

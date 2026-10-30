@@ -1,0 +1,25 @@
+# Clean-room verification (vedit-tarball-cleanroom, --network none) 2026-10-30T05:12:46Z
+# payload: extracted AppImage; usr/bin/vd-app replaced with build/artifacts/vd-app for the AFTER runs
+
+## BEFORE the fix (original payload binary via AppRun, interactive launch)
+     0x200009 "VEdit": ("vd-app" "Vd-app")  1120x780+0+0  +0+0
+     0x200002 "VEdit": ("vd-app" "Vd-app")  1120x780+0+0  +0+0
+toplevel_count_before=2
+bash: line 36:    15 Terminated              "$APPDIR/AppRun" --file /vedit-build/crates/vd-app/tests/fixtures/definition/a.sv > /tmp/before.log 2>&1
+
+## AFTER the fix (build/artifacts/vd-app via AppRun, interactive launch)
+     0x200002 "VEdit": ("vd-app" "Vd-app")  1120x780+0+0  +0+0
+toplevel_count_after=1
+bash: line 36:    76 Terminated              "$APPDIR/AppRun" --file /vedit-build/crates/vd-app/tests/fixtures/definition/a.sv > /tmp/after.log 2>&1
+
+## AFTER the fix: --screenshot in the clean room (no WM, no host GSV/fonts)
+screenshot_exit=0
+vd-app: screenshot written to /tmp/clean.png (33222 bytes, 1120x780, 15 sampled colours)
+png_bytes=33222
+png_signature_hex=89504e470d0a1a0a
+identify_mean=26046.3 stddev=26379.4
+"name": "--screenshot produces a non-blank PNG",
+
+## hashes (host)
+build_artifacts_vd_app_sha256=809cf95326172fc58975b38cea390dcffd8d78d1261b4f1d75059a8950c6d77d
+png_sha256=50633cb69b258699571cd67876e97d9cc8de08b12af6ffc232b9c557f4dba2a1

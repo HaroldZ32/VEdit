@@ -31,12 +31,12 @@
           "ok": true
         },
         {
-          "detail": "restored=true, dispatch=undo, action_fallback=true, can_undo_before=true, status=\"1:1  |  /tmp/vd-app-selftest-3091/format_me.sv  |  systemverilog  |  verible 0  |  slang 0  |  FIM: FIM 未启用  |  configuration warnings: 1\"",
+          "detail": "restored=true, dispatch=undo, action_fallback=true, can_undo_before=true, status=\"1:1  |  /tmp/vd-app-selftest-3097/format_me.sv  |  systemverilog  |  verible 0  |  slang 0  |  FIM: FIM 未启用  |  configuration warnings: 1\"",
           "name": "undo shortcut restores the text through Document",
           "ok": true
         },
         {
-          "detail": "path=/tmp/vd-app-selftest-3091/smoke-saved.sv",
+          "detail": "path=/tmp/vd-app-selftest-3097/smoke-saved.sv",
           "name": "save-as writes the document",
           "ok": true
         },
@@ -96,7 +96,7 @@
           "ok": true
         },
         {
-          "detail": "2:1  |  /tmp/vd-app-selftest-3091/smoke-saved.sv  |  systemverilog  |  verible 0  |  slang 1  |  FIM: FIM 未启用  |  match at line 2",
+          "detail": "2:1  |  /tmp/vd-app-selftest-3097/smoke-saved.sv  |  systemverilog  |  verible 0  |  slang 1  |  FIM: FIM 未启用  |  match at line 2",
           "name": "status bar reports the cursor",
           "ok": true
         }

@@ -34,6 +34,11 @@
           "detail": "path=Some(\"/vedit-build/crates/vd-app/tests/fixtures/definition/b.sv\"), cursor=Position { line: 0, character: 7 }",
           "name": "F12 definition jumps to the target file/line/column",
           "ok": true
+        },
+        {
+          "detail": "path=evidence/wiring/lsp-window.png bytes=31482 size=1120x780 sampled_colours=15 channel_range=255",
+          "name": "--screenshot produces a non-blank PNG",
+          "ok": true
         }
       ],
       "ok": true,

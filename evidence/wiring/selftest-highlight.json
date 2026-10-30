@@ -21,7 +21,7 @@
           "ok": true
         },
         {
-          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x56a076162100, type: GtkSourceLanguage } })",
+          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5abe3f1aa8e0, type: GtkSourceLanguage } })",
           "name": "opened .sv with CJK/emoji content has a language",
           "ok": true
         },
@@ -31,7 +31,7 @@
           "ok": true
         },
         {
-          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x56a07613b900, type: GtkSourceLanguage } })",
+          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5abe3f181900, type: GtkSourceLanguage } })",
           "name": "opened .sv buffer has a language",
           "ok": true
         },
@@ -43,6 +43,11 @@
         {
           "detail": "warning=None",
           "name": "startup language warning is absent in this image",
+          "ok": true
+        },
+        {
+          "detail": "path=evidence/wiring/highlight-window.png bytes=33890 size=1120x780 sampled_colours=14 channel_range=255",
+          "name": "--screenshot produces a non-blank PNG",
           "ok": true
         }
       ],
