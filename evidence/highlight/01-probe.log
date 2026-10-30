@@ -1,0 +1,66 @@
+GTK_VERSION=3.22.30
+SEARCH_PATH=/vedit-build/target/home/.local/share/gtksourceview-4/language-specs:/usr/local/share/gtksourceview-4/language-specs:/usr/share/gtksourceview-4/language-specs:/opt/gsv4/share/gtksourceview-4/language-specs
+LANG id=Some("systemverilog") name=Some("SystemVerilog")
+LANGUAGES verilog=true systemverilog=true missing=[]
+STYLE_SCHEME=cobalt
+WINDOW_MAPPED=true
+STYLE_ID_UNRESOLVED def:operator
+STYLE_ID_UNRESOLVED systemverilog:compiler-directive
+STYLE_ID_UNRESOLVED systemverilog:system-task
+STYLE_ID_UNRESOLVED verilog:base-n-integer
+STYLE_ID_UNRESOLVED verilog:compiler-directive
+STYLE_ID_UNRESOLVED verilog:escaped-character
+STYLE_ID_UNRESOLVED verilog:gate
+STYLE_ID_UNRESOLVED verilog:ieee-system-task
+STYLE_ID_UNRESOLVED verilog:integer-number
+STYLE_ID_UNRESOLVED verilog:lrm-additional-system-task
+STYLE_ID_UNRESOLVED verilog:printf
+STYLE_ID_UNRESOLVED verilog:real-number
+STYLE_TABLE id=def:boolean color=#ff0044 bold=false
+STYLE_TABLE id=def:builtin color=#ff9d00 bold=true
+STYLE_TABLE id=def:comment color=#0088ff bold=false
+STYLE_TABLE id=def:constant color=#ffee80 bold=false
+STYLE_TABLE id=def:error color=#ffffff bold=true
+STYLE_TABLE id=def:function color=#cccccc bold=false
+STYLE_TABLE id=def:identifier color=#cccccc bold=false
+STYLE_TABLE id=def:keyword color=#ff9d00 bold=true
+STYLE_TABLE id=def:number color=#ff0044 bold=false
+STYLE_TABLE id=def:preprocessor color=#cccccc bold=false
+STYLE_TABLE id=def:special-char color=#cccccc bold=false
+STYLE_TABLE id=def:string color=#3ad900 bold=false
+STYLE_TABLE id=def:type color=#80ffbb bold=false
+TOKEN name=module pos=4:1 style=def:builtin|def:keyword color=#ff9d00 weight=700 PASS
+TOKEN name=interface pos=18:1 style=def:builtin|def:keyword color=#ff9d00 weight=700 PASS
+TOKEN name=package pos=23:1 style=def:builtin|def:keyword color=#ff9d00 weight=700 PASS
+TOKEN name=class pos=27:1 style=def:builtin|def:keyword color=#ff9d00 weight=700 PASS
+TOKEN name=always_ff pos=11:3 style=def:builtin|def:keyword color=#ff9d00 weight=700 PASS
+TOKEN name=constraint pos=29:3 style=def:builtin|def:keyword color=#ff9d00 weight=700 PASS
+TOKEN name=covergroup pos=32:1 style=def:builtin|def:keyword color=#ff9d00 weight=700 PASS
+TOKEN name=macro_define pos=3:1 style=def:function|def:identifier|def:preprocessor|def:special-char color=#cccccc weight=400 PASS
+TOKEN name=comment pos=2:4 style=def:comment color=#0088ff weight=400 PASS
+TOKEN name=string pos=15:21 style=def:string color=#3ad900 weight=400 PASS
+TOKEN name=system_task pos=15:11 style=def:builtin|def:keyword color=#ff9d00 weight=700 PASS
+TOKEN name=number pos=5:21 style=def:boolean|def:number color=#ff0044 weight=400 PASS
+TOKEN name=data_type pos=7:10 style=def:type color=#80ffbb weight=400 PASS
+CHECK window_mapped PASS
+CHECK highlight_ready PASS
+CHECK language_bound==systemverilog PASS
+CHECK keyword_style_present PASS
+CHECK keyword_style_shared:interface PASS
+CHECK keyword_style_shared:package PASS
+CHECK keyword_style_shared:class PASS
+CHECK keyword_style_shared:always_ff PASS
+CHECK keyword_style_shared:constraint PASS
+CHECK keyword_style_shared:covergroup PASS
+CHECK distinct_from_keyword:comment PASS
+CHECK distinct_from_keyword:string PASS
+CHECK distinct_from_keyword:number PASS
+CHECK distinct_from_keyword:macro_define PASS
+CHECK distinct_from_keyword:data_type PASS
+CHECK inheritance:verilog_token_in_systemverilog PASS
+CHECK styled:system_task PASS
+CHECK inheritance:systemverilog_only_token PASS
+DISTINCT=6
+CHECK distinct_style_colours>=6 PASS
+SCREENSHOT path=/vedit-build/evidence/highlight/probe-ac05.ppm width=900 height=700 bytes=1890015
+PROBE PASS

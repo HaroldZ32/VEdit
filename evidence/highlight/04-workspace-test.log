@@ -1,0 +1,251 @@
+# cargo test --workspace (shared working tree) — 2026-10-30T03:54:08Z
+
+$ cargo test --workspace
+   Compiling thiserror-impl v1.0.69
+   Compiling glib-macros v0.18.5
+   Compiling gtk3-macros v0.18.2
+   Compiling ring v0.17.14
+   Compiling rustls v0.23.46
+   Compiling tracing-attributes v0.1.31
+   Compiling vd-config v0.1.0 (/vedit-build/crates/vd-config)
+   Compiling lsp-types v0.95.1
+   Compiling vd-deeplint v0.1.0 (/vedit-build/crates/vd-deeplint)
+error[E0583]: file not found for module `diagnostic`
+  --> crates/vd-deeplint/src/lib.rs:43:1
+   |
+43 | mod diagnostic;
+   | ^^^^^^^^^^^^^^^
+   |
+   = help: to create the module `diagnostic`, create file "crates/vd-deeplint/src/diagnostic.rs" or "crates/vd-deeplint/src/diagnostic/mod.rs"
+   = note: if there is a `mod diagnostic` elsewhere in the crate already, import it with `use crate::...` instead
+
+error[E0583]: file not found for module `service`
+  --> crates/vd-deeplint/src/lib.rs:44:1
+   |
+44 | mod service;
+   | ^^^^^^^^^^^^
+   |
+   = help: to create the module `service`, create file "crates/vd-deeplint/src/service.rs" or "crates/vd-deeplint/src/service/mod.rs"
+   = note: if there is a `mod service` elsewhere in the crate already, import it with `use crate::...` instead
+
+For more information about this error, try `rustc --explain E0583`.
+error: could not compile `vd-deeplint` (lib) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `vd-deeplint` (lib test) due to 2 previous errors
+EXIT=101
+
+--------------------------------------------------------------------------
+$ cargo test --workspace --exclude vd-deeplint
+   Compiling thiserror v1.0.69
+   Compiling rustls-webpki v0.103.16
+   Compiling tracing v0.1.44
+   Compiling vd-config v0.1.0 (/vedit-build/crates/vd-config)
+   Compiling glib v0.18.5
+   Compiling async-lsp v0.2.4
+   Compiling rustls v0.23.46
+   Compiling vd-lsp v0.1.0 (/vedit-build/crates/vd-lsp)
+   Compiling ureq v3.5.0
+   Compiling vd-fim v0.1.0 (/vedit-build/crates/vd-fim)
+   Compiling gio v0.18.4
+   Compiling cairo-rs v0.18.5
+   Compiling atk v0.18.2
+   Compiling gdk-pixbuf v0.18.5
+   Compiling pango v0.18.3
+   Compiling gdk v0.18.2
+   Compiling gtk v0.18.2
+   Compiling sourceview4 v0.5.0
+   Compiling vd-syntax v0.1.0 (/vedit-build/crates/vd-syntax)
+   Compiling vd-editor v0.1.0 (/vedit-build/crates/vd-editor)
+   Compiling vd-app v0.1.0 (/vedit-build/crates/vd-app)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 23.70s
+     Running unittests src/main.rs (target/debug/deps/vd_app-1ce80c6015e28b23)
+
+running 4 tests
+test cli::tests::positional_file_is_opened ... ok
+test cli::tests::unknown_option_is_rejected ... ok
+test cli::tests::selftest_smoke_is_accepted ... ok
+test cli::tests::unknown_selftest_suite_is_rejected ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_config-12b7b22329bb91d1)
+
+running 28 tests
+test env::tests::no_home_means_no_default_directories ... ok
+test env::tests::relative_xdg_value_falls_back_and_is_reported ... ok
+test env::tests::xdg_explicit_absolute_values_win ... ok
+test env::tests::xdg_defaults_come_from_home ... ok
+test model::tests::defaults_match_the_requirements ... ok
+test model::tests::a_partial_document_keeps_the_defaults_for_absent_keys ... ok
+test project::tests::define_parsing ... ok
+test provenance::tests::empty_secret_is_reported_as_unset ... ok
+test filelist::tests::detects_cycles_and_duplicates ... ok
+test provenance::tests::lists_reduce_to_their_length ... ok
+test provenance::tests::precedence_chain_is_recorded_nearest_first_in_overridden_by ... ok
+test filelist::tests::missing_nested_filelist_is_reported_not_fatal ... ok
+test project::tests::root_discovery_falls_back_to_the_start_directory ... ok
+test provenance::tests::secret_leaf_is_redacted_even_when_the_layer_carries_the_raw_value ... ok
+test render::tests::table_renders_redacted_secret_and_overridden_by ... ok
+test secret::tests::debug_is_redacted ... ok
+test filelist::tests::parses_entries_comments_incdirs_defines_and_nested_filelists ... ok
+test secret::tests::expose_secret_is_the_only_way_out ... ok
+test render::tests::json_carries_the_schema_version_and_tool_attempts_even_on_success ... ok
+test secret::tests::serialization_is_redacted ... ok
+test tests::deep_merge_keeps_unrelated_keys_and_replaces_lists ... ok
+test tests::parse_layer_reports_a_line_without_quoting_the_source ... ok
+test project::tests::root_discovery_prefers_vedit_toml_then_git ... ok
+test tools::tests::configured_path_wins ... ok
+test tools::tests::failure_lists_every_attempt_and_never_mentions_path_lookup ... ok
+test tools::tests::missing_config_falls_through_to_env_and_records_both_attempts ... ok
+test tools::tests::bundled_payload_is_found_next_to_the_executable ... ok
+test filelist::tests::depth_limit_is_enforced ... ok
+
+test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/config_behaviour.rs (target/debug/deps/config_behaviour-4e134bf0495b6a7c)
+
+running 12 tests
+test defaults_apply_when_nothing_is_configured ... ok
+test a_relative_xdg_variable_is_reported_and_the_default_is_used ... ok
+test a_relative_configured_tool_path_is_resolved_against_the_project_root ... ok
+test an_unknown_key_is_ignored_while_the_rest_of_the_file_applies ... ok
+test environment_variables_override_fim_settings_and_record_their_source ... ok
+test the_project_layer_overrides_the_user_layer_per_key_and_inherits_the_rest ... ok
+test an_invalid_configuration_file_degrades_to_the_lower_layer ... ok
+test project_discovery_finds_filelists_rules_includes_defines_and_upward_rules ... ok
+test the_user_layer_applies_from_the_xdg_config_home ... ok
+test configured_filelists_and_project_settings_are_merged_with_discovered_ones ... ok
+test the_two_renderings_agree_and_stay_safe ... ok
+test tool_resolution_records_every_attempt_even_on_success ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/secret_discipline.rs (target/debug/deps/secret_discipline-62453af0593d6965)
+
+running 4 tests
+test the_secret_is_only_reachable_through_the_explicit_accessor ... ok
+test a_rejected_configuration_file_never_quotes_its_secret_in_the_warning ... ok
+test the_default_configuration_carries_no_endpoint_or_key ... ok
+test a_configured_and_an_environment_secret_never_leave_the_config_layer ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_editor-62ff8407b3a495dc)
+
+running 36 tests
+test document::tests::atomic_save_failure_keeps_the_file_and_the_dirty_flag ... ok
+test document::tests::crlf_file_saves_with_crlf_line_endings ... ok
+test document::tests::delete_spanning_lines_returns_the_removed_text ... ok
+test line_ending::tests::assemble_falls_back_to_the_default_when_breaks_run_out ... ok
+test line_ending::tests::delete_bookkeeping_keeps_the_surviving_ending ... ok
+test document::tests::dirty_tracking_and_close_confirmation ... ok
+test line_ending::tests::delete_through_the_end_drops_the_last_ending ... ok
+test line_ending::tests::detects_lf_crlf_and_cr ... ok
+test line_ending::tests::insert_at_end_without_trailing_break ... ok
+test document::tests::edit_undo_redo_round_trip ... ok
+test line_ending::tests::insert_bookkeeping_moves_the_original_ending_to_the_last_new_line ... ok
+test line_ending::tests::mixed_line_endings_keep_their_order ... ok
+test document::tests::empty_insert_does_not_create_an_undo_step ... ok
+test position::tests::ascii_offsets ... ok
+test document::tests::find_is_case_insensitive_when_asked ... ok
+test position::tests::chinese_and_emoji_utf16_offsets ... ok
+test position::tests::positions_round_trip_on_mixed_text ... ok
+test position::tests::line_utf16_len_counts_units_not_chars ... ok
+test document::tests::find_and_replace ... ok
+test document::tests::freshly_loaded_document_cannot_undo_the_load ... ok
+test document::tests::line_ranges_support_go_to_line ... ok
+test document::tests::lsp_positions_on_chinese_and_emoji ... ok
+test save::tests::missing_parent_directory_is_rejected_without_touching_anything ... ok
+test save::tests::failure_while_writing_the_temp_file_keeps_the_original ... ok
+test save::tests::crash_before_rename_keeps_the_original ... ok
+test save::tests::permission_denied_at_rename_keeps_the_original ... ok
+test save::tests::writes_a_new_file ... ok
+test save::tests::temp_file_lives_in_the_target_directory ... ok
+test save::tests::replaces_existing_content ... ok
+test document::tests::mixed_line_endings_are_preserved_line_by_line ... ok
+test document::tests::new_document_is_clean ... ok
+test document::tests::readonly_probe_does_not_matter_because_rename_is_the_guard ... ok
+test document::tests::replace_is_one_undo_step ... ok
+test document::tests::save_and_reopen_round_trip ... ok
+test document::tests::save_as_rejects_a_missing_directory ... ok
+test document::tests::undo_after_an_edit_keeps_the_original_line_endings ... ok
+
+test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_fim-8faf8ff117f884ba)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_lsp-fe0d8763babe70c6)
+
+running 15 tests
+test config::tests::default_timeouts_are_bounded ... ok
+test config::tests::filelist_and_extra_args_are_appended_in_order ... ok
+test config::tests::no_rules_file_means_no_rules_flag ... ok
+test config::tests::rules_are_passed_explicitly_and_never_searched ... ok
+test diagnostics::tests::recording_bumps_the_generation_and_replaces_per_uri ... ok
+test documents::tests::change_on_an_unopened_document_is_an_error ... ok
+test documents::tests::versions_and_text_track_changes ... ok
+test edits::tests::edits_are_applied_in_document_order_regardless_of_input_order ... ok
+test edits::tests::incremental_changes_track_a_document ... ok
+test edits::tests::utf16_columns_apply_to_multibyte_text ... ok
+test edits::tests::overlapping_edits_are_rejected ... ok
+test position::tests::ascii_round_trip ... ok
+test position::tests::cjk_and_emoji_use_utf16_units ... ok
+test position::tests::crlf_lines_are_handled ... ok
+test position::tests::out_of_range_positions_are_errors ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_syntax-842d48256375d759)
+
+running 6 tests
+test detect::tests::extension_matching_is_case_insensitive ... ok
+test detect::tests::language_ids_are_the_upstream_gtksourceview_ids ... ok
+test detect::tests::systemverilog_extensions_map_to_systemverilog ... ok
+test detect::tests::supported_table_is_exactly_the_contract_table ... ok
+test detect::tests::unknown_extensions_are_plain_text ... ok
+test detect::tests::verilog_extensions_map_to_verilog ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/highlight-probe.rs (target/debug/deps/highlight_probe-407dfcdee364a582)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_config
+
+running 1 test
+test crates/vd-config/src/lib.rs - (line 27) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.39s
+
+   Doc-tests vd_editor
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_fim
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_lsp
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_syntax
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+EXIT=0

@@ -1,0 +1,30 @@
+# GtkSourceView data assets bundled by the product — provenance (T11)
+# generated in the pinned centos:7 build image at 2026-10-30T03:53:55Z
+
+$ pkg-config --modversion gtksourceview-4
+4.6.1
+EXIT=0
+
+$ ls /opt/gsv4/share/gtksourceview-4/language-specs | wc -l   # .lang files
+166
+
+$ sha256sum /opt/gsv4/share/gtksourceview-4/language-specs/{verilog,systemverilog}.lang
+7670ddfd7b443f5f99c202bfa79de31834c1bd8968ed74c39474dca4f439d464  /opt/gsv4/share/gtksourceview-4/language-specs/verilog.lang
+9d1f67411f2674d93f035620ce004da4beca5bbf469eb9955a83c332edb79b04  /opt/gsv4/share/gtksourceview-4/language-specs/systemverilog.lang
+
+$ sha256sum /opt/gsv4/share/gtksourceview-4/styles/cobalt.xml
+3c8997e4539e56a7bfde7e51e52dd6768fc41f818f30af6497a2a28a5e133b94  /opt/gsv4/share/gtksourceview-4/styles/cobalt.xml
+
+$ wc -l verilog.lang systemverilog.lang
+  475 /opt/gsv4/share/gtksourceview-4/language-specs/verilog.lang
+  262 /opt/gsv4/share/gtksourceview-4/language-specs/systemverilog.lang
+  737 total
+
+# inheritance reference inside systemverilog.lang (context ref to the verilog root):
+256:        <context ref="verilog:verilog"/>
+
+# NOTE: \x60module\x60 does NOT appear as a keyword in systemverilog.lang; it is inherited.
+$ grep -c \x27<keyword>module</keyword>\x27 systemverilog.lang
+0
+$ grep -c \x27<keyword>module</keyword>\x27 verilog.lang
+1

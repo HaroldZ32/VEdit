@@ -1,0 +1,39 @@
+# T11 scope gates — pinned centos:7 build image, run at 2026-10-30T03:53:41Z
+# working tree (uncommitted at run time); repo-wide gates are not this lane's judgement
+
+$ cargo fmt -p vd-syntax -- --check
+EXIT=0
+
+$ cargo clippy -p vd-syntax --all-targets -- -D warnings
+    Checking vd-syntax v0.1.0 (/vedit-build/crates/vd-syntax)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.22s
+EXIT=0
+
+$ cargo test -p vd-syntax
+   Compiling vd-syntax v0.1.0 (/vedit-build/crates/vd-syntax)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.54s
+     Running unittests src/lib.rs (target/debug/deps/vd_syntax-db848a5b8c200b94)
+
+running 6 tests
+test detect::tests::language_ids_are_the_upstream_gtksourceview_ids ... ok
+test detect::tests::systemverilog_extensions_map_to_systemverilog ... ok
+test detect::tests::supported_table_is_exactly_the_contract_table ... ok
+test detect::tests::extension_matching_is_case_insensitive ... ok
+test detect::tests::verilog_extensions_map_to_verilog ... ok
+test detect::tests::unknown_extensions_are_plain_text ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/highlight-probe.rs (target/debug/deps/highlight_probe-329ad3d78ec13617)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_syntax
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+EXIT=0
