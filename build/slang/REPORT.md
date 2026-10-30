@@ -174,6 +174,11 @@ and their scripts are documented in `build/gates/README.md` and `AGENT.md §4`.
 - The AppImage lane (T23) must still bundle this binary and verify it inside its
   own root; that is not claimed here.
 
+The AC-19 hardening that follows from the first two bounds is scheduled for T7
+(pin the base image digest, yum NEVRAs and FetchContent commits; every archive
+sha256-checked) and T27 (second-build comparison). The concrete checklist and the
+verified facts it needs are in **`build/slang/REPRODUCIBILITY.md`**.
+
 ## 6. Reproduce
 
 ```sh

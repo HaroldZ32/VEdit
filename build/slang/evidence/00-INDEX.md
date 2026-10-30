@@ -4,6 +4,10 @@ Every file in this directory is output captured on disk, not a retelling. Each
 entry below names the exact command that produced it and its exit code, so a
 verifier can re-run the command and compare byte for byte.
 
+Related handoff document (not evidence, a plan for T7/T27):
+`build/slang/REPRODUCIBILITY.md` — current pin status, the missing pins, and the
+second-build comparison procedure.
+
 Reproduce everything with:
 
 ```sh
