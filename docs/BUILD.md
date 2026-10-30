@@ -56,6 +56,9 @@ bash scripts/build.sh
 - 换源只需改 `scripts/versions.env` 的 **`CENTOS_VAULT_BASE`**（构建镜像与 slang 构建都读它），
   不要改 Dockerfile 里的 URL 拼接；
 - 举例：`CENTOS_VAULT_BASE="https://mirrors.aliyun.com/centos-vault/7.9.2009"`。
+- 拉取基础镜像失败时 `scripts/lib.sh` 会重试 3 次（2 s / 4 s 退避），仍失败则用**同一 digest**
+  回退到 `VEDIT_BASE_IMAGE_FALLBACK`（默认 `docker.io`），并把解析出的 ref 通过 `--build-arg BASE_IMAGE`
+  传给 Dockerfile；主镜像源可用 `VEDIT_BASE_IMAGE` 覆盖（digest 不变）。
 
 ## 5. GtkSourceView 4.6.1（源码构建）
 
@@ -175,5 +178,5 @@ VEDIT_SKIP_IMAGE_BUILD=1 \
 - GHCR 包默认私有：同仓库的 `GITHUB_TOKEN` 可以拉取，fork PR 拉不到时工作流退回本地构建；
 - `scripts/build.sh` 在镜像内跑两处 `--selftest`：先 `--selftest smoke --probe-hold-ms 2500`
   做 Xvfb 窗口冒烟，再跑套件集合——`VEDIT_SLANG` 与 `VEDIT_VERIBLE_LS` 同时可用时是一次 `all`
-  （6 个套件），否则**逐个**跑 `smoke highlight config fim`（CI 只构建 slang、没有 verible，走这条）；
-  任一套件非 0 即 `FATAL` 退出。
+  （6 个套件），否则**逐个**跑 `smoke highlight config fim`；任一套件非 0 即 `FATAL` 退出。
+  CI 会先 `bash build/slang/build.sh` 与 `bash scripts/fetch-verible.sh`，因此走 `all` 六套件。

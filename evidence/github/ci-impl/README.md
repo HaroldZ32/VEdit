@@ -265,3 +265,97 @@ lrwxrwxrwx 1 … .mpd/recon/verible/bin -> ../../../target/verible-pin/extract/v
   `realpath`/platform-specific tool is needed.
 - The 17.5 MB tarball is re-downloaded on every clean CI run (a GHA cache for
   `target/verible-pin` would be an optional follow-up).
+
+---
+
+# T10 — base-image pull: bounded retry + Docker Hub digest fallback
+
+## Why
+
+CI run 41042343838 failed in "Resolve the pinned build image" — not code:
+
+```
+[image] pulling pinned base image docker.m.daocloud.io/library/centos@sha256:be65f488…
+Error response from daemon: … net/http: TLS handshake timeout
+FATAL: cannot obtain the pinned base image …
+```
+
+The same step had succeeded in other runs, so the mirror is intermittently
+unreliable; CI must not go red on that.
+
+## Change
+
+`scripts/lib.sh`:
+
+- `BASE_IMAGE_OVERRIDE` captures an incoming `VEDIT_BASE_IMAGE` **before**
+  `versions.env` is sourced (the pin can be pointed elsewhere for a test/mirror
+  without editing the pin); with no override the pinned value is used unchanged.
+- `VEDIT_BASE_IMAGE_FALLBACK` — fallback registry host, default `docker.io`.
+- `BASE_IMAGE_PULL_ATTEMPTS=3`, `BASE_IMAGE_PULL_BACKOFF_SECONDS=2` (2 s / 4 s).
+- `base_image_repository()` / `image_ref()` / `image_fallback_ref()` — the
+  fallback ref keeps the **same `@sha256:<digest>`**, only the registry host
+  changes (`docker.m.daocloud.io/library/centos@sha256:…` →
+  `docker.io/library/centos@sha256:…`).
+- `pull_base_image()` — `docker pull` with the bounded retry; every attempt is
+  logged as `pulling <ref> (attempt N/3)` and a retry line with the delay.
+- `ensure_base_image()` — present → unchanged (no pull); otherwise retry the
+  primary, then retry the fallback with the same digest; both failing keeps the
+  existing `FATAL:` + exit 1; on success it exports `BASE_IMAGE_RESOLVED_REF`.
+- `build_build_image()` — passes `--build-arg BASE_IMAGE=<resolved ref>` and
+  logs `[image] base image: <ref>`; a normal build passes the pinned ref, i.e.
+  the Dockerfile default (identical build graph).
+
+`scripts/docker/Dockerfile.build` (**necessary deviation, see below**):
+`ARG BASE_IMAGE=<pinned centos digest>` + `FROM ${BASE_IMAGE}`.
+
+### Why the Dockerfile had to change
+
+The task asked to `docker tag` the fallback image back to the original ref.
+That is impossible for a digest reference — proven:
+`docker tag <image> repo@sha256:…` → `refusing to create a tag with a digest
+reference` (exit 1). And BuildKit does **not** resolve a digest ref from the
+local image store when its registry is unreachable — proven with a probe
+Dockerfile `FROM localhost:9/library/centos@sha256:<digest>` whose content was
+present locally: the build failed trying to reach `localhost:9`. So the resolved
+fallback reference is carried into the build as `--build-arg BASE_IMAGE`
+instead; the digest is unchanged, so the base layers and the layer cache are
+identical.
+
+## Verification (actually run)
+
+| # | Path | Command | Exit | Observed | File |
+|---|---|---|---|---|---|
+| 1 | normal | `bash scripts/build-image.sh` | **0** | 0.429 s; no `pulling …`/retry lines (image present → unchanged behaviour); `[image] base image: <pinned mirror ref>` | `17-base-image-normal.txt` |
+| 2 | fallback | `VEDIT_BASE_IMAGE=localhost:9/library/centos VEDIT_BASE_IMAGE_FALLBACK=docker.m.daocloud.io VEDIT_BUILD_IMAGE_REF=vedit-build:t10-check bash scripts/build-image.sh` | **0** | 6.677 s; primary `attempt 1/3, 2/3, 3/3` with 2 s/4 s backoff (connection refused); `primary registry failed after 3 attempts; falling back to docker.m.daocloud.io: …@sha256:be65…`; fallback pull ok; `the build will use …@sha256:be65… (same pinned @sha256 digest)`; build + tag exit 0 | `18-base-image-fallback.txt` |
+| 3a | both down | `VEDIT_BASE_IMAGE=localhost:9/library/centos VEDIT_BASE_IMAGE_FALLBACK=localhost:10 VEDIT_BUILD_IMAGE_REF=vedit-build:t10-fail bash scripts/build-image.sh` | **1** | 3 attempts on each registry; `FATAL: cannot obtain the pinned base image … (primary registry and the localhost:10 fallback both failed)` | `19-base-image-both-fail.txt` |
+| 3b | real Docker Hub | `VEDIT_BASE_IMAGE=localhost:9/library/centos VEDIT_BUILD_IMAGE_REF=vedit-build:t10-hub bash scripts/build-image.sh` (fallback unset → `docker.io`) | **1** | 3 primary attempts → `falling back to docker.io: docker.io/library/centos@sha256:be65…` → 3 fallback attempts all fail (`registry-1.docker.io` … `read: connection reset by peer`) → `FATAL … (primary registry and the docker.io fallback both failed)` | `21-base-image-dockerhub.txt` |
+| 4 | build-arg proof | Dockerfile default *temporarily* mutated to the unreachable `localhost:9/...`, then `bash scripts/build-image.sh` | **0** | the build resolved `FROM docker.m.daocloud.io/library/centos@sha256:be65…` (the `--build-arg BASE_IMAGE` value), not the mutated default → the arg is genuinely used; Dockerfile restored (sha256 verified) | `20-base-image-buildarg-proof.txt` |
+
+## Docker Hub fallback: really usable?
+
+**Not from this host.** All `docker.io` attempts fail at the TCP level
+(`registry-1.docker.io` … IPv6 `read: connection reset by peer`), independent of
+this change (a plain `docker pull docker.io/library/centos@sha256:be65…` fails the
+same way). So path 2 proves the *mechanism* with a reachable fallback registry
+(the pinned daocloud mirror) and path 3b proves the failure semantics with the
+real default.
+
+Alternatives if a runner also cannot reach Docker Hub:
+1. GitHub-hosted runners do reach Docker Hub, so the default fallback applies there.
+2. `VEDIT_BASE_IMAGE_FALLBACK=<another mirror>` reuses any registry that serves
+   the same digest (the repo's pin is a public CentOS 7 manifest digest).
+3. The bounded retry alone already covers *transient* mirror failures (the
+   observed CI error was a TLS handshake timeout), even without a fallback.
+
+## Not verified / notes
+
+- No real `docker.io` fallback *success* on this host (network) and no GitHub
+  Actions run (AC-A7).
+- The Dockerfile ARG is outside the task's listed write scope (`scripts/lib.sh`,
+  `scripts/build-image.sh`); it is required for the fallback to actually make the
+  build work, as proven above. A normal build passes the pinned ref, so the
+  image workflow's build graph is unchanged.
+- `VEDIT_BASE_IMAGE` / `VEDIT_BASE_IMAGE_FALLBACK` default to the pinned
+  reference / `docker.io`; unset behaviour is the previous one (no extra pulls).
+- The 3-attempt retry costs ~6 s of backoff only when the primary registry is
+  down; nothing changes on the happy path.

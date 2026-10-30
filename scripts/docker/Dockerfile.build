@@ -5,7 +5,12 @@
 # pinned by sha256 in scripts/versions.env and verified before use, and the
 # full installed RPM set is snapshotted (scripts/docker/rpm-baseline.txt) and
 # compared on every build by scripts/build-in-container.sh.
-FROM docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+# The CentOS base is a build argument so a transient mirror outage can be served
+# by the Docker Hub fallback with the SAME digest (scripts/lib.sh resolves it);
+# with no fallback the pinned reference below is used, so a normal build is
+# identical to before.
+ARG BASE_IMAGE=docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+FROM ${BASE_IMAGE}
 
 ARG CENTOS_VAULT_BASE
 ARG RUSTUP_URL

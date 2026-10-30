@@ -22,6 +22,19 @@ if [ -z "${DOCKER_CONFIG:-}" ]; then
   fi
 fi
 
+# The base-image pin lives in scripts/versions.env. Honour an incoming
+# VEDIT_BASE_IMAGE (captured BEFORE the pin is sourced, so versions.env cannot
+# silently overwrite it): a test or an alternative mirror can point the primary
+# registry elsewhere without editing the pin. With no override the pinned value
+# is used unchanged.
+BASE_IMAGE_OVERRIDE="${VEDIT_BASE_IMAGE:-}"
+# Registry used only when the primary registry cannot deliver the image after
+# the bounded retries; the SAME digest is requested there (Docker Hub default).
+VEDIT_BASE_IMAGE_FALLBACK="${VEDIT_BASE_IMAGE_FALLBACK:-docker.io}"
+# Bounded pull retry: three attempts with a 2 s / 4 s exponential backoff.
+BASE_IMAGE_PULL_ATTEMPTS=3
+BASE_IMAGE_PULL_BACKOFF_SECONDS=2
+
 # Export every pinned input, then refuse to continue with a missing one.
 load_versions() {
   # shellcheck source=versions.env
@@ -37,25 +50,89 @@ load_versions() {
   : "${NINJA_WHEEL_URL:?missing pin}" "${NINJA_WHEEL_SHA256:?missing pin}"
 }
 
+# The repository path of an image reference, without its registry host
+# ("docker.m.daocloud.io/library/centos" -> "library/centos").
+base_image_repository() {
+  local image="$1"
+  local first="${image%%/*}"
+  case "$first" in
+    *.* | *:* | localhost) printf '%s\n' "${image#*/}" ;;
+    *) printf '%s\n' "$image" ;;
+  esac
+}
+
+# The pinned base image at its digest (primary registry, overridable).
 image_ref() {
-  printf '%s@%s\n' "$VEDIT_BASE_IMAGE" "$VEDIT_BASE_IMAGE_DIGEST"
+  printf '%s@%s\n' "${BASE_IMAGE_OVERRIDE:-$VEDIT_BASE_IMAGE}" "$VEDIT_BASE_IMAGE_DIGEST"
+}
+
+# The same pinned digest served by the fallback registry (Docker Hub default).
+image_fallback_ref() {
+  printf '%s/%s@%s\n' "$VEDIT_BASE_IMAGE_FALLBACK" \
+    "$(base_image_repository "${BASE_IMAGE_OVERRIDE:-$VEDIT_BASE_IMAGE}")" \
+    "$VEDIT_BASE_IMAGE_DIGEST"
+}
+
+# `docker pull` a base image with the bounded retry; every attempt is logged.
+pull_base_image() {
+  local ref="$1"
+  local attempt=1
+  local delay="$BASE_IMAGE_PULL_BACKOFF_SECONDS"
+  while [ "$attempt" -le "$BASE_IMAGE_PULL_ATTEMPTS" ]; do
+    echo "[image] pulling $ref (attempt $attempt/$BASE_IMAGE_PULL_ATTEMPTS)"
+    if docker pull "$ref"; then
+      return 0
+    fi
+    if [ "$attempt" -lt "$BASE_IMAGE_PULL_ATTEMPTS" ]; then
+      echo "[image] pull attempt $attempt/$BASE_IMAGE_PULL_ATTEMPTS failed; retrying in ${delay}s" >&2
+      sleep "$delay"
+      delay=$((delay * 2))
+    fi
+    attempt=$((attempt + 1))
+  done
+  return 1
 }
 
 # Make the base image available at its pinned digest (never by mutable tag).
+#
+# The primary registry is retried a bounded number of times; when it still
+# cannot deliver the image, the SAME @sha256 digest is pulled from the fallback
+# registry (Docker Hub by default). `docker tag` refuses a digest reference as
+# its target ("refusing to create a tag with a digest reference"), so the
+# resolved reference is exported in BASE_IMAGE_RESOLVED_REF and handed to the
+# build as the BASE_IMAGE build argument; the digest is unchanged, so the
+# layers and the cache stay the same.
 ensure_base_image() {
-  local ref
+  local ref fallback
   ref=$(image_ref)
-  if ! docker image inspect "$ref" >/dev/null 2>&1; then
-    echo "[image] pulling pinned base image $ref"
-    docker pull "$ref" || {
-      echo "FATAL: cannot obtain the pinned base image $ref" >&2
+  BASE_IMAGE_RESOLVED_REF="$ref"
+  if docker image inspect "$ref" >/dev/null 2>&1; then
+    return 0
+  fi
+  if pull_base_image "$ref"; then
+    docker image inspect "$ref" >/dev/null 2>&1 || {
+      echo "FATAL: pinned base image $ref is not present after pull" >&2
       exit 1
     }
+    return 0
   fi
-  docker image inspect "$ref" >/dev/null 2>&1 || {
-    echo "FATAL: pinned base image $ref is not present after pull" >&2
+  fallback=$(image_fallback_ref)
+  if [ "$fallback" = "$ref" ]; then
+    echo "FATAL: cannot obtain the pinned base image $ref (no distinct fallback registry)" >&2
     exit 1
-  }
+  fi
+  echo "[image] primary registry failed after $BASE_IMAGE_PULL_ATTEMPTS attempts; falling back to $VEDIT_BASE_IMAGE_FALLBACK: $fallback"
+  if pull_base_image "$fallback"; then
+    if ! docker image inspect "$fallback" >/dev/null 2>&1; then
+      echo "FATAL: fallback base image $fallback is not present after pull" >&2
+      exit 1
+    fi
+    BASE_IMAGE_RESOLVED_REF="$fallback"
+    echo "[image] fallback pull succeeded; the build will use $fallback (same pinned @sha256 digest)"
+    return 0
+  fi
+  echo "FATAL: cannot obtain the pinned base image $ref (primary registry and the $VEDIT_BASE_IMAGE_FALLBACK fallback both failed)" >&2
+  exit 1
 }
 
 # Fetch the build image when a CI run points VEDIT_BUILD_IMAGE_PULL=1 at a
@@ -90,7 +167,12 @@ build_build_image() {
   fi
   ensure_base_image
   echo "[image] building $BUILD_IMAGE_TAG from the pinned inputs"
+  # BASE_IMAGE is the primary pinned ref, or the Docker Hub fallback ref after a
+  # mirror outage (same digest); a normal build passes the Dockerfile default.
+  local base_image="${BASE_IMAGE_RESOLVED_REF:-$(image_ref)}"
+  echo "[image] base image: $base_image"
   local args=(
+    --build-arg BASE_IMAGE="$base_image"
     --build-arg CENTOS_VAULT_BASE="$CENTOS_VAULT_BASE"
     --build-arg RUSTUP_URL="$RUSTUP_URL"
     --build-arg RUSTUP_SHA256="$RUSTUP_SHA256"
