@@ -1541,7 +1541,7 @@ checksum = "3a3b425286980a367278453f3b6d28cdcb134b574e5a35824a6ff5eebad50bb6"
 
 [[package]]
 name = "vd-app"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "glib",
@@ -1561,7 +1561,7 @@ dependencies = [
 
 [[package]]
 name = "vd-config"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "serde",
@@ -1572,7 +1572,7 @@ dependencies = [
 
 [[package]]
 name = "vd-deeplint"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "serde",
@@ -1582,7 +1582,7 @@ dependencies = [
 
 [[package]]
 name = "vd-editor"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "gtk",
  "sourceview4",
@@ -1590,7 +1590,7 @@ dependencies = [
 
 [[package]]
 name = "vd-fim"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "serde",
@@ -1600,7 +1600,7 @@ dependencies = [
 
 [[package]]
 name = "vd-lsp"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "async-lsp",
@@ -1613,7 +1613,7 @@ dependencies = [
 
 [[package]]
 name = "vd-syntax"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "gtk",
  "sourceview4",
