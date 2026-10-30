@@ -53,19 +53,19 @@ Equality is judged by `vd-app` sha256 + size (and that is what AC-19 uses here).
 |---|---|---|
 | AC-01 | PASS — `tool=readelf`, highest `GLIBC_2.14` (≤ 2.17) for both products | `out/*/results.tsv` |
 | AC-02 | PASS (AppImage, tar.gz): selftest all exit 0, 51 checks (52 with `--screenshot`), single toplevel = 1, screenshot non-blank (AppImage 33,484 B `5daf5526…`; tar.gz 33,780 B `2f405f48…`) | `out/*/selftest-all.log`, `screenshot.png` |
-| AC-03/04 | PASS within the suite coverage (edit/save, undo, multi-tab, find/replace, goto, close confirm) | selftest smoke checks |
+| AC-03/04 | PASS within suite coverage (edit/save, undo, multi-tab, find/replace, goto, close confirm) | `tests/e2e/out/*/selftest-all.log` |
 | AC-05 | PASS AUTO (language manager/cobalt) + MANUAL token-colour review | selftest highlight + screenshot |
-| AC-06 | PARTIAL — diagnostics suite passes; the ≤3s timing and click-to-line are not separately asserted | — |
-| AC-07 | PARTIAL — format applied in one undo step is asserted; byte equality with the bundled `verible-verilog-format` is not driven by a UI harness | — |
-| AC-08 | PARTIAL — F12 cross-file definition PASS; references/outline/rename preview wired but MANUAL | selftest lsp |
+| AC-06 | PARTIAL — diagnostics suite passes; ≤3s timing and click-to-line are not separately asserted | `tests/e2e/out/*/selftest-all.log` |
+| AC-07 | PARTIAL — format applied in one undo step asserted; byte equality with the bundled `verible-verilog-format` not driven by a UI harness | `tests/e2e/out/*/selftest-all.log` |
+| AC-08 | PARTIAL — F12 cross-file definition PASS; references/outline/rename preview wired but not asserted | `tests/e2e/out/*/selftest-all.log` |
 | AC-09 | PASS — no verible-ls/vd-app left after suites | `out/*/results.tsv` |
 | AC-10 | PASS within suite (SLANG diagnostics reach panel/gutter); direct-JSON count equality is lane-tested | selftest slang |
-| AC-11 | PARTIAL — corrupt-binary degradation is lane-tested, not re-run here | — |
+| AC-11 | PARTIAL — corrupt-binary degradation is lane-tested, not re-run here | lane test evidence (vd-deeplint) |
 | AC-12 | PASS (SLANG is in the payload; lane evidence covers glibc/version/lint) | packaging evidence |
 | AC-13 | PASS — FIM default off (worker_spawns unchanged, no endpoint) | selftest fim |
-| AC-14 | MANUAL — needs a local mock endpoint and UI driver | steps below |
+| AC-14 | MANUAL — real endpoint run in progress by the FIM lane; suite only proves default-off | steps below / `evidence/fim` when landed |
 | AC-15 | PASS/PARTIAL — no default secrets in repo; log scan by config lane | — |
-| AC-16 | MANUAL — see steps below | — |
+| AC-16 | **AUTO (Tier 2)** — real IME pinyin→Chinese commit in the offline payload: `GTK_IM_MODULE=ibus`, `ibus-daemon`+`libpinyin`, `xdotool type "nihao"` + space → buffer `你好` (hex `e4bda0e5a5bd`), candidate-window screenshot; Tier 1 (GtkIMContext is xim/ibus) and Tier 3 (`simple` + Unicode injection) also covered | `evidence/ime/logs/99-results.txt`, `evidence/ime/shots/tier2-before-commit.png`, `tier2-after-commit.png`, `tier3-unicode.png` |
 | AC-17 | PASS — README/THIRD_PARTY_NOTICES/licences present (packaging/docs lanes) | — |
 | AC-18 | RECORD — AppImage 47,745,528 B, tar.gz 40,493,353 B; cold-start recorded by packaging clean room | — |
 | AC-19 | PASS — four `vd-app` copies equal `41d02dca…`; 3/3 reproducible builds | `build/evidence/determinism/` |
@@ -95,7 +95,8 @@ report and explicit FAIL when neither exists, explicit per-product launcher
 selection, `.run` launcher + cleanup checks, and the runtime test now uses
 `/proc/nonexistent` (a genuinely unusable path; `/nonexistent` is creatable by
 root and caused the second-run misjudgement). Both harness defects are kept in
-the evidence (`first-run-harness-defect.log`, `runtime-repro.txt`); after the
+the reproducible second finding (`runtime-repro.txt`); the first-run defect is
+documented by this report's root-cause and fix record; after the
 fix **product-level FAIL = 0**.
 
 ## 6. `/vedit-build` embedded-path counts (methods stated)
@@ -134,16 +135,15 @@ such a run. The harness asserts the count, not a hard-coded sentence.
 
 ## 9. Gates — re-run for this report
 
-**This run:** `tests/e2e/gates-frozen-run.txt` — `timestamp_utc=2026-10-30T05:45:13Z`,
-`HEAD=80fdf9fbaa06d32ad9c613ba3cb5ef90e968045e`, `tracked_modified=0` (the only
-untracked entries were another lane's `evidence/github/` and two stray
-selftest tmp dirs, removed before this report commit).
-`cargo fmt --all -- --check` exit 0; `cargo clippy --workspace --all-targets --
--D warnings` exit 0; `cargo test --workspace` exit 0 with per-binary result lines
-(11/31/14/4/25/13 passed plus the remaining 0-test targets) recorded in the file.
-The product source is still frozen2 `f1f9622`; only tests/evidence changed.
-Rebuilding from this HEAD gives canonical **41d02dca…**, 6,002,112 B — identical
-to frozen2, so the three artifacts remain valid and are not rebuilt.
+**Release-head run:** `tests/e2e/gates-frozen-run.txt` — `timestamp_utc=2026-10-30T05:52:37Z`,
+`HEAD=b3eae25632379d3362ee940cd39d9cbc69a60c55`, `tracked_modified=0` (only an
+untracked lane-owned evidence directory). `cargo fmt --all -- --check` exit 0;
+`cargo clippy --workspace --all-targets -- -D warnings` exit 0;
+`cargo test --workspace` exit 0 with per-binary result lines
+(11/31/14/4/25/13/6/42/40 passed plus the remaining 0-test targets) recorded in
+the file. The product source is still frozen2 `f1f9622`; only tests/evidence
+changed, so rebuilding gives the identical canonical **41d02dca…**, 6,002,112 B
+and the three frozen artifacts remain valid.
 
 ## 10. MANUAL acceptance steps
 
