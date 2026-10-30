@@ -422,3 +422,60 @@ The captain's workflows already set `VEDIT_CONTAINER_USER: '1'` at job level
   scope; without it, `VEDIT_CONTAINER_USER=1` (already enabled in the captain's
   workflows) would abort `scripts/build.sh` in the container (probe 6).
 - No GitHub Actions run from here (AC-A7).
+
+---
+
+# T13 — slang build image: bounded retry + Docker Hub same-tag fallback
+
+## Why
+
+CI run 41051285962 failed in "Build the slang deep-lint binary": the slang lane
+is a **standalone script** (`build/slang/build.sh`) that pulled
+`docker.m.daocloud.io/library/centos:7` itself, and hit the same transient
+`net/http: TLS handshake timeout` the T10 fix covered only for
+`scripts/lib.sh`.
+
+## Change (`build/slang/`)
+
+- **`build/slang/fetch-image.sh` (new, 755)** — makes the build image available:
+  - image already present → **no pull at all**;
+  - otherwise `docker pull` with **3 attempts** and 2 s / 4 s backoff, every
+    attempt logged;
+  - retries exhausted → the **same tag** is pulled from the fallback registry
+    (`SLANG_BUILD_IMAGE_FALLBACK`, default `docker.io`; the ref is split into
+    registry host + `repo:tag`, so only the host changes) and tagged back as the
+    expected ref (`docker tag` with a tag target — valid here, unlike T10's
+    digest case);
+  - both failing → `FATAL:` + exit 1 (no silent continue).
+- **`build/slang/versions.env`** — single source of truth for the two refs:
+  `SLANG_BUILD_IMAGE="${SLANG_BUILD_IMAGE:-docker.m.daocloud.io/library/centos:7}"`
+  and `SLANG_BUILD_IMAGE_FALLBACK="${SLANG_BUILD_IMAGE_FALLBACK:-docker.io}"`
+  (env overrides work, defaults unchanged).
+- **`build/slang/build.sh`** — `IMAGE="$SLANG_BUILD_IMAGE"`; the inline
+  `image_present`/`docker pull` block is replaced by
+  `== stage 0: … == https://… bash "$HERE/fetch-image.sh"`; header documents
+  stage 0. Later stages still use `$IMAGE`, so the cache/refs are unchanged.
+
+## Verification (actually run)
+
+| # | Path | Command | Exit | Observed | File |
+|---|---|---|---|---|---|
+| 1 | normal | `bash build/slang/fetch-image.sh` | **0** | 0.026 s; `image … is already present; no pull needed` | `25-slang-image-normal.txt` |
+| 2 | build.sh flow | `PATH=stub:$PATH bash build/slang/build.sh` (only `docker run` stubbed, to skip the multi-minute rebuild; stage 0 and the host ELF checks are real) | **0** | 0.102 s; stage 0 prints `already present; no pull needed`; the argv log has **no `docker pull`**; `BUILD OK: 63cb60a0…` (the pinned `SLANG_BIN_SHA256`, existing verified artifact) | `28-slang-build-flow.txt` |
+| 3 | fallback | `SLANG_BUILD_IMAGE=localhost:9/library/centos:7 SLANG_BUILD_IMAGE_FALLBACK=docker.m.daocloud.io bash build/slang/fetch-image.sh` | **0** | 7.315 s; primary `attempt 1/3,2/3,3/3` + 2 s/4 s backoff (connection refused); `primary registry failed after 3 attempts; falling back to docker.m.daocloud.io: docker.m.daocloud.io/library/centos:7`; same-tag pull ok; `tagging … as localhost:9/library/centos:7`; both refs now resolve to `sha256:be65f488…` | `26-slang-image-fallback.txt` |
+| 4 | both down | `SLANG_BUILD_IMAGE=localhost:9/library/centos:7 bash build/slang/fetch-image.sh` (fallback unset → `docker.io`) | **1** | 13.206 s; 3 attempts on each; `FATAL: cannot obtain the slang build image … (primary registry and the docker.io fallback both failed)` | `27-slang-image-fail.txt` |
+
+## Not verified / notes
+
+- Docker Hub is **not reachable from this host** (the same IPv6 reset T10
+  documented), so path 3 proves the fallback *mechanism* with a reachable
+  registry as the fallback, and path 4 records the real `docker.io` failure
+  semantics. The real Docker Hub fallback can only be exercised on a GitHub
+  runner.
+- The full slang rebuild was **not** re-run (multi-minute); path 2 verifies the
+  script flow with the container steps stubbed and the previously verified
+  artifact, path 1/3/4 exercise the real acquisition logic.
+- Tracked `build/slang/evidence/*` files rewritten by the stubbed flow were
+  restored with `git checkout --`.
+- No GitHub Actions run (AC-A7); `crates/`, `.github/`, `Cargo.*` and `scripts/`
+  untouched; no git commit.
