@@ -7,7 +7,7 @@
 #
 # crates: 192
 # The seven vd-* rows are VEdit's own crates: their licence is the project
-# licence in ./LICENSE, not a third-party licence.
+# licence (MIT, see ./LICENSE), not a third-party licence.
 #
 # name	version	license	repository
 anyhow	1.0.104	MIT OR Apache-2.0	https://github.com/dtolnay/anyhow

@@ -1,6 +1,8 @@
 # Third-party notices / 第三方组件与许可
 
-VEdit 的代码是胶水层；下面这些组件随产物一起分发（AppImage、tar.gz、`.run` 三者相同）。
+**VEdit 自身以 MIT 许可发布**（根目录 `LICENSE`，Copyright (c) 2026 Harold Zhao）。
+下面这些第三方组件随产物一起分发（AppImage、tar.gz、`.run` 三者相同），并**各自保留其许可**——
+MIT 只覆盖本项目自己的代码，不改变任何第三方组件的许可条款。
 本文件是**分发用的许可声明**：每个组件的版本、许可、来源与验证方式。
 许可全文见 [`docs/licenses/`](docs/licenses/)，Rust crate 清单见 [`docs/rust-crates.txt`](docs/rust-crates.txt)（生成物）。
 

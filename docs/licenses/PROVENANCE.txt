@@ -1,0 +1,32 @@
+Project licence provenance
+==========================
+
+VEdit's own code is MIT. The LICENSE file at the repository root is taken
+verbatim from the project's upstream repository (the user's decision); it was
+not rewritten or reformatted here.
+
+Remote source
+  repository : https://github.com/HaroldZ32/VEdit
+  commit     : 4b9e17cebf669d2096ea7d5c20f78fed8d602365  ("Initial commit")
+  path       : LICENSE
+  fetch      : git fetch --no-tags https://github.com/HaroldZ32/VEdit.git main
+
+Byte-identical check (run at integration time)
+  $ git show FETCH_HEAD:LICENSE | sha256sum
+  afa04875817679369807eb8cf8c1518eff07dcea4e922e443cfd5482fd8f0a69  -
+  $ sha256sum LICENSE
+  afa04875817679369807eb8cf8c1518eff07dcea4e922e443cfd5482fd8f0a69  LICENSE
+  => identical (1068 bytes, 21 lines)
+
+Content check (MIT)
+  $ head -3 LICENSE
+  MIT License
+
+  Copyright (c) 2026 Harold Zhao
+
+  $ grep -cE 'MIT License|Permission is hereby granted, free of charge|THE SOFTWARE IS PROVIDED' LICENSE
+  3
+
+Scope
+  MIT covers VEdit's own code only. The third-party components bundled in the
+  packages keep their own licences; see ../../THIRD_PARTY_NOTICES.md.

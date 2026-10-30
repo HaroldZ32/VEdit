@@ -176,7 +176,6 @@ timeout_ms = 5000
 
 ## 许可
 
-- 第三方组件许可见 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)；**GtkSourceView / GTK3 为 LGPL**，
-  源码获取方式在 NOTICES 的 "LGPL source availability" 一节。
-- **项目自身代码的许可尚未选定**：作者保留所有权利。选定后会以根目录 `LICENSE` 文件形式加入；
-  在此之前，本仓库的代码不随上述第三方许可一起被授权使用。
+- **项目自身代码以 MIT 许可发布**：见根目录 [`LICENSE`](LICENSE)（Copyright (c) 2026 Harold Zhao）。
+- 第三方组件各自保留其许可，见 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)；
+  **GtkSourceView / GTK3 为 LGPL**，源码获取方式在 NOTICES 的 "LGPL source availability" 一节。
