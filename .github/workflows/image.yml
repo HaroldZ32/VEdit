@@ -53,11 +53,22 @@ jobs:
       - name: Set up buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build the pinned image with a GHA layer cache
+      # buildx's type=gha backend did not materialise a cache on these runners (no
+      # buildkit cache entry, zero CACHED on a repeat build), so the layer cache is
+      # persisted through actions/cache instead and handed to buildx as type=local.
+      - name: Restore the buildx layer cache
+        uses: actions/cache@v4
+        with:
+          path: /tmp/vedit-buildx-cache
+          key: buildx-${{ runner.os }}-${{ hashFiles('scripts/docker/**', 'scripts/versions.env') }}
+          restore-keys: |
+            buildx-${{ runner.os }}-
+
+      - name: Build the pinned image with a layer cache
         shell: bash
         env:
-          VEDIT_BUILD_CACHE_FROM: type=gha
-          VEDIT_BUILD_CACHE_TO: type=gha,mode=max
+          VEDIT_BUILD_CACHE_FROM: type=local,src=/tmp/vedit-buildx-cache
+          VEDIT_BUILD_CACHE_TO: type=local,dest=/tmp/vedit-buildx-cache,mode=min
         run: |
           set -euo pipefail
           owner="$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"

@@ -1,0 +1,33 @@
+# frozen2 f1f9622 canonical verification (2026-10-30T05:27:40Z)
+canonical_sha256=41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611
+canonical_bytes=6002112
+canonical_stripped=1
+artifact_tracked=0
+
+## fix evidence 1: --selftest all
+selftest_exit=0
+  "ok": true,
+          "ok": true
+          "ok": true
+selftest_ok= True checks= 51
+
+## fix evidence 2: xwininfo single toplevel
+     0x600002 "VEdit": ("vd-app" "Vd-app")  1120x780+0+0  +0+0
+toplevel_count=1
+bash: line 44:    94 Terminated              build/artifacts/vd-app --file crates/vd-app/tests/fixtures/definition/a.sv > /tmp/canon-interactive.log 2>&1
+
+## fix evidence 3: --screenshot non-blank
+screenshot_exit=0
+vd-app: screenshot written to /tmp/canon-shot.png (33022 bytes, 1120x780, 17 sampled colours)
+          "detail": "path=/tmp/canon-shot.png bytes=33022 size=1120x780 sampled_colours=17 channel_range=255",
+png_bytes=33022
+png_sha256=006db6a0c69e8d8cca4827792b0dd281f9caecc0c8410ce6827edfb2c23dc9ed
+
+## determinism env
+source_date_epoch=1793337970
+source_date_epoch_source=host:git show -s --format=%ct HEAD
+cargo_incremental=0 (set inside the container)
+remap_flags=RELEASE_RUSTFLAGS="--remap-path-prefix=/vedit-build/target/cargo-home=/cargo --remap-path-prefix=/root/.cargo=/cargo --remap-path-prefix=/opt/cargo=/cargo --remap-path-prefix=/opt/rust=/rust --remap-path-prefix=/vedit-build=/vedit"
+source_date_epoch=1793337970
+cargo_incremental=0
+remap_flags=--remap-path-prefix=/vedit-build/target/cargo-home=/cargo --remap-path-prefix=/root/.cargo=/cargo --remap-path-prefix=/opt/cargo=/cargo --remap-path-prefix=/opt/rust=/rust --remap-path-prefix=/vedit-build=/vedit

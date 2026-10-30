@@ -1,0 +1,162 @@
+{
+  "app": "VEdit",
+  "fixture_root": "/vedit-build/crates/vd-app/tests/fixtures",
+  "ok": true,
+  "reports": [
+    {
+      "checks": [
+        {
+          "detail": "realized=true",
+          "name": "window realized",
+          "ok": true
+        },
+        {
+          "detail": "pages=1",
+          "name": "notebook has an initial tab",
+          "ok": true
+        },
+        {
+          "detail": "focus_is_editor=true, focused=Some(\"GtkSourceView\"), current=Some(\"Untitled\")",
+          "name": "AC-1 the current tab's editor view has the keyboard focus at startup",
+          "ok": true
+        },
+        {
+          "detail": "overlay_pass_through=true",
+          "name": "AC-3 the ghost-text overlay is pass-through",
+          "ok": true
+        },
+        {
+          "detail": "reason=\"FIM 未启用\", occurrences=1, text=\"1:1  |  systemverilog  |  verible 0  |  slang 0  |  FIM 未启用  |  configuration warnings: 1  |  Verible LSP: not available\"",
+          "name": "AC-B1 the FIM reason appears exactly once at startup",
+          "ok": true
+        },
+        {
+          "detail": "language=Some(\"systemverilog\")",
+          "name": "open .sv applies the SystemVerilog language",
+          "ok": true
+        },
+        {
+          "detail": "cursor=Position { line: 0, character: 0 }",
+          "name": "AC-B2 opening a file puts the cursor at 1:1",
+          "ok": true
+        },
+        {
+          "detail": "1:1  |  /tmp/vd-app-selftest-3085/clean.sv  |  systemverilog  |  verible 0  |  slang 0  |  FIM 未启用  |  configuration warnings: 1  |  Verible LSP: not available",
+          "name": "AC-B2 the status bar reports 1:1 after opening a file",
+          "ok": true
+        },
+        {
+          "detail": "current=Some(2), expected=Some(2), titles=[\"Untitled\", \"clean.sv\", \"format_me.sv\"]",
+          "name": "the current tab follows the opened file",
+          "ok": true
+        },
+        {
+          "detail": "focus_is_editor=true, focused=Some(\"GtkSourceView\"), expected=\"format_me.sv\"",
+          "name": "AC-2 the editor view has the keyboard focus after opening a file",
+          "ok": true
+        },
+        {
+          "detail": "focus_is_editor=true, focused=Some(\"GtkSourceView\")",
+          "name": "AC-2 the editor view has the keyboard focus after a page switch",
+          "ok": true
+        },
+        {
+          "detail": "needs_close_confirmation=true",
+          "name": "edit marks the document modified",
+          "ok": true
+        },
+        {
+          "detail": "restored=true, dispatch=undo, action_fallback=true, can_undo_before=true, status=\"1:1  |  /tmp/vd-app-selftest-3085/format_me.sv  |  systemverilog  |  verible 0  |  slang 0  |  FIM 未启用  |  configuration warnings: 1  |  Verible LSP: not available\"",
+          "name": "undo shortcut restores the text through Document",
+          "ok": true
+        },
+        {
+          "detail": "path=/tmp/vd-app-selftest-3085/smoke-saved.sv",
+          "name": "save-as writes the document",
+          "ok": true
+        },
+        {
+          "detail": "pages=3",
+          "name": "several tabs are open",
+          "ok": true
+        },
+        {
+          "detail": "rows=1, panel_texts=[\"error  [Smoke] smoke diagnostic\"]",
+          "name": "problem panel lists the diagnostic",
+          "ok": true
+        },
+        {
+          "detail": "all_marks=1, categories=[\"vedit-error\"], worst={0: Error}, line_count=2",
+          "name": "gutter mark is placed at the diagnostic line",
+          "ok": true
+        },
+        {
+          "detail": "polls=120, len=173, lsp_occurrences=1, len_after=173",
+          "name": "AC-4 120 background polls keep the status text byte-identical",
+          "ok": true
+        },
+        {
+          "detail": "marks_before=1, marks_after=1, same_objects=true, worst={0: Error}",
+          "name": "AC-5 unchanged diagnostics keep the same gutter mark objects",
+          "ok": true
+        },
+        {
+          "detail": "sent=true, before=false, after=true, lsp_present=false",
+          "name": "AC-6 poll_background consumes a SLANG report while the LSP bridge is absent",
+          "ok": true
+        },
+        {
+          "detail": "format/slang/definition/references/outline/fim",
+          "name": "the contract shortcuts exist in the table",
+          "ok": true
+        },
+        {
+          "detail": "actions=[\"toggle-panel\", \"fim\", \"definition\", \"new\", \"save\", \"rename\", \"close-tab\", \"open\", \"find\", \"save-as\", \"format\", \"find-next\", \"undo\", \"replace\", \"redo\", \"slang\", \"goto-line\", \"outline\", \"quit\", \"references\"]",
+          "name": "shortcut actions are installed",
+          "ok": true
+        },
+        {
+          "detail": "accels=[\"<Primary><Shift>f\"]",
+          "name": "format accelerator is Ctrl+Shift+F",
+          "ok": true
+        },
+        {
+          "detail": "jumped=true, at_first=true, clamped=true, at_last=true, cursor=Position { line: 1, character: 0 }, last_line=1",
+          "name": "goto-line moves the cursor and clamps to the last line",
+          "ok": true
+        },
+        {
+          "detail": "shows_line_numbers=true",
+          "name": "line numbers are visible in the view",
+          "ok": true
+        },
+        {
+          "detail": "changed=true, restored=true, original_len=62, replaced_len=62",
+          "name": "replace-next changes the text and undo restores it",
+          "ok": true
+        },
+        {
+          "detail": "tabs_before=3, tabs_after=3, recorded=Some(\"smoke-saved.sv\"), window_visible=true",
+          "name": "unsaved close is refused and the confirmation was requested",
+          "ok": true
+        },
+        {
+          "detail": "anchor=Some(Position { line: 1, character: 6 }), contains=true, cursor=Position { line: 1, character: 0 }, direct=Some(Range { start: Position { line: 1, character: 0 }, end: Position { line: 1, character: 6 } }), entry=\"module\", titles=[\"Untitled\", \"clean.sv\", \"smoke-saved.sv\"], current_page=Some(2)",
+          "name": "find-next finds the needle through Document",
+          "ok": true
+        },
+        {
+          "detail": "2:1  |  /tmp/vd-app-selftest-3085/smoke-saved.sv  |  systemverilog  |  verible 0  |  slang 1  |  FIM 未启用  |  match at line 2  |  Verible LSP: not available",
+          "name": "status bar reports the cursor",
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "suite": "smoke"
+    }
+  ],
+  "shortcut_table": "| action | shortcut | description |\n|---|---|---|\n| `open` | <Ctrl>o | open a file in a new tab |\n| `new` | <Ctrl>n | new untitled tab |\n| `save` | <Ctrl>s | save the current tab |\n| `save-as` | <Ctrl><Shift>s | save the current tab under a new path |\n| `close-tab` | <Ctrl>w | close the tab (confirms unsaved changes) |\n| `quit` | <Ctrl>q | quit the editor |\n| `undo` | <Ctrl>z | undo the last edit (native GtkSource undo) |\n| `redo` | <Ctrl><Shift>z | redo |\n| `find` | <Ctrl>f | show the find bar |\n| `replace` | <Ctrl>h | show the replace bar |\n| `find-next` | F3 | jump to the next match |\n| `goto-line` | <Ctrl>g | jump to a line |\n| `format` | <Ctrl><Shift>f | one-key format through the LSP, one undo step |\n| `slang` | <Ctrl><Shift>l | run SLANG deep lint into the problem panel |\n| `definition` | F12 | jump to the definition (LSP) |\n| `references` | <Shift>F12 | list references (LSP) |\n| `outline` | <Ctrl><Shift>o | document symbols of the current file |\n| `rename` | F2 | preview the LSP rename edits (nothing is applied) |\n| `fim` | <Alt>backslash | request an FIM completion as ghost text |\n| `toggle-panel` | <Ctrl><Shift>p | show/hide the problem panel |\n| `accept-fim` | Tab | insert the pending FIM completion through Document |\n| `cancel-fim` | Esc | discard the pending completion / cancel the request |\n",
+  "shortcuts": 22,
+  "suite": "smoke",
+  "version": "0.1.0"
+}

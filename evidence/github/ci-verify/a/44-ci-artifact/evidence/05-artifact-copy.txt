@@ -1,0 +1,3 @@
+artifact=build/artifacts/vd-app
+b1d81ec632858ceec4c115cabc40cbcec27c7db69eaa46ce89d7675dafd6fc34  /home/runner/work/VEdit/VEdit/build/artifacts/vd-app
+size_bytes=6018496
