@@ -1,0 +1,2 @@
+LISTENING <local-port>
+PROXY 1 req_bytes=150 req_keys=max_tokens,model,prompt,suffix status=200 resp_bytes=427 resp_keys=id,choices,created,model,system_fingerprint,object,usage delayed=True

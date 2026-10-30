@@ -1,0 +1,6 @@
+key_present=true
+key_length=35
+key_occurrences_in_evidence_tree=0
+key_occurrences_in_proxy_logs=0
+key_in_proxy_cmdline=0
+auth_header=Bearer <redacted>

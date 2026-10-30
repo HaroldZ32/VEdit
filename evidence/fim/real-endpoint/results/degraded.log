@@ -1,0 +1,1 @@
+RESULT {"mode":"degraded","ok":true,"reason_len":9,"max_reason_chars":80,"contains_url_or_header":false,"latency_ms":50,"reason":"FIM 连接被拒绝"}

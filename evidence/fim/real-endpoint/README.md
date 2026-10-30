@@ -1,74 +1,76 @@
-# AC-14 (FIM real endpoint) — automated-proof attempt and negative evidence
+# AC-14 (FIM real endpoint) — real-network proof via a path-rewriting proxy
 
-Owner: Deep Worker · date 2026-10-30 · status: **no local endpoint; AC-14 stays MANUAL**.
-Scope: find a local completion endpoint exposed by the running DSH harness, then
-drive the real `vd-fim` `HttpTransport` through positive / cancellation /
-degradation cases. No token or key was read, printed or stored; every concrete
-port/URL in this directory is replaced by a placeholder.
+Owner: Deep Worker · date 2026-10-30 · verdict: **AUTO (with an explicit boundary)**.
+Scope: prove that `vd-fim`'s real `HttpTransport` implements the OpenAI-compatible
+FIM shape end-to-end against the real DeepSeek FIM service. **No product code was
+changed**; the adaptation lives entirely in this evidence directory.
 
-## 1) What was probed (item by item)
+## Protocol facts (checked against the official docs)
 
-### 1.1 Harness environment (`$DSH_*`)
+- Base URL: `https://api.deepseek.com/beta` (the docs say the `/beta` base must be
+  used for FIM), operation `POST /completions`.
+- Request body: `model` (required), `prompt` (required), `suffix`, `max_tokens`,
+  plus optional `echo`/`logprobs`; supported models: `deepseek-flash`,
+  `deepseek-v4-pro`.
+- Auth: `Authorization: Bearer <key>`.
+- Response: `choices[0].text` — the shape vd-fim already parses.
+
+`vd-fim`'s `OpenAi` backend posts `POST <base>/v1/completions` with
+`{model,prompt,suffix,max_tokens}`. The only difference is the **path** and the
+auth header location: the key belongs to the proxy, not to vd-fim.
+
+## How the test works
 
 ```
-$ env | grep -i '^DSH' | sed -E 's/=.*//'
-DSH_HOME         SET len=21
-DSH_PROFILE      SET len=7
-DSH_PROFILE_DIR  SET len=38
-DSH_SESSION_ID   SET len=36
-DSH_SHELL        SET len=1
-
-$ env | grep -iE 'API_KEY|BASE_URL|API_BASE|OPENAI|DEEPSEEK|OLLAMA|LLM' | sed -E 's/=.*//'
-(no output)
+harness (real vd-fim HttpTransport)
+   -> POST http://127.0.0.1:<local-port>/v1/completions   (vd-fim's shape)
+   -> proxy.py: rewrite path to /beta/completions, add Authorization: Bearer
+   -> POST https://api.deepseek.com/beta/completions      (real TLS, real service)
+   -> response passed back unchanged; vd-fim parses choices[0].text
 ```
 
-**Negative evidence, stated as a conclusion:** the harness exports **no API base
-URL, no port and no token** to this session — only filesystem/profile facts. This
-is evidence that *the local DSH does not expose a FIM-shaped completion endpoint
-to the editor*, not merely that "we did not find one".
+Files: `harness/` (standalone Rust crate, path-dependency on `crates/vd-fim`,
+its own `[workspace]` so the product workspace is untouched), `proxy.py`,
+`run.sh`, sanitized logs under `results/`.
 
-### 1.2 Every local listener, classified
+## Results (real network, 2026-10-30)
 
-| class | endpoint (placeholder) | requests sent | observed response (status + key headers/body, sanitized) | verdict |
-|---|---|---|---|---|
-| HTTP outbound proxy ×3 | `127.0.0.1:<proxy-port-1..3>` | `GET /`; `GET /v1/models`; `POST /v1/completions`; `POST /v1/chat/completions`; `POST /infill`; h2c preface | `400 Bad Request`, `Connection: close`, **`Proxy-Connection: close`**, `Content-Length: 0`; h2c → peer sends non-SETTINGS data | not an API; origin-form is rejected by a forward-proxy parser |
-| `dsh web` UI | `127.0.0.1:<dsh-web-port>` | `GET /`; `GET /v1/models`; the three POST paths | `401 Unauthorized`, body `dsh web authentication required; reopen the URL printed by dsh web.`; `/v1/models` → 404; POST paths → 405 | agent-chat UI, token-gated; **not** a completion endpoint; token was not read or used |
-| unrelated SPA | `127.0.0.1:<spa-port>` | `GET /`; `/api/health`, `/api/models`, `/api/v1/models`, `/openapi.json`, `/docs`, `/health`, `/v1/models`, `/api/sessions` | `/` → `200 text/html` (894 B); every other path → `404`, body `404 page not found` | unrelated local web app |
-| small dev servers ×3 | `127.0.0.1:<dev-port-1..3>` | `GET /`; `/mcp`, `/sse`, `/health`, `/v1/models` | `404` on every request | neither MCP-over-HTTP nor a model server |
-| local model defaults | `127.0.0.1:11434` (Ollama), `:8080`, `:8000`, `:5000`, `:1234` | `GET /v1/models` | connection refused | no local model server |
+| case | result | observed |
+|---|---|---|
+| positive | **PASS** | non-empty completion `text_len=5` (`1'b1;`), `latency_ms=3572`, model `deepseek-flash`; upstream `HTTP 200`, response keys `id,choices,created,model,system_fingerprint,object,usage` |
+| cancel (proxy delays the first upstream reply by 3 s; `start` → `cancel`, then a fresh request) | **PASS** | `stale_delivered=false`, `fresh_ok=true` (`fresh_text_len=9`): the late reply of the cancelled generation was dropped and a newer result still arrived |
+| degradation (closed port) | **PASS** | `Failed` reason `FIM 连接被拒绝`, 9 chars ≤ 80, `contains_url_or_header=false`, 50 ms |
 
-The full command-level log (with the same placeholders) is `probe.txt`.
+Raw sanitized logs: `results/{positive,cancel,degraded}.log`,
+`results/proxy-{positive,cancel}.log` (request/response keys and sizes only; the
+local port is a placeholder).
 
-### 1.3 Protocols `vd-fim` can speak (and why none matched)
+## Key discipline (self-checked)
 
-`crates/vd-fim` implements exactly two shapes:
+- The key is read at runtime from `~/.dsh/.credentials.yaml` into a shell
+  variable, passed to `proxy.py` **through the environment only** (never on the
+  command line, never written to disk).
+- The scan asserts, without printing the literal:
+  `key_present=true`, `key_length=35`, `key_occurrences_in_evidence_tree=0`,
+  `key_occurrences_in_proxy_logs=0`, `key_in_proxy_cmdline=0`,
+  `auth_header=Bearer <redacted>` (`results/key-scan.txt`).
+- No token appears in this directory, in the proxy logs, or in the harness logs.
 
-- **OpenAI-compatible FIM:** `POST <base>/v1/completions` with `prompt` + `suffix`;
-- **llama.cpp:** `POST <base>/infill` with `input_prefix` + `input_suffix`.
+## Boundary statement (required, do not drop)
 
-No discovered listener returned a model list or a completion for either shape, so
-the positive and cancellation cases have no object to run against.
+**Validated: vd-fim's protocol implementation and the OpenAI-compatible FIM
+shape. DeepSeek's official FIM lives at `/beta/completions`; the test reaches it
+through an evidence-only local path-rewriting proxy. The product itself does not
+build in that path rewrite**, so out of the box VEdit still sends
+`/v1/completions` and would need a proxy (or a product change) to talk to
+DeepSeek's FIM endpoint directly. This evidence does not claim that DeepSeek FIM
+works without the proxy, nor does it make any statement about other providers.
 
-## 2) Result
+## Reproduce
 
-| endpoint | protocol | model | positive completion | cancel | degradation | evidence |
-|---|---|---|---|---|---|---|
-| `127.0.0.1:<local listeners>` | none of the two supported shapes | — | not possible | not run | dead-port short `Failed` is covered by the existing vd-fim tests; not re-run against a real endpoint | `probe.txt` |
+```bash
+bash evidence/fim/real-endpoint/run.sh   # requires the DeepSeek key in ~/.dsh/.credentials.yaml
+```
 
-**Conclusion: the local harness environment has no FIM-compatible endpoint;
-AC-14 remains MANUAL.** Only the degradation path is machine-checkable today,
-and the existing vd-fim suites already cover it. No test that could only skip was
-added — a skipped test is not a verification.
-
-**This probe is a local harness-environment observation, not a public service,
-and does not constitute an endorsement of any provider's FIM compatibility.**
-
-## 3) What would make AC-14 automatable
-
-An operator-supplied endpoint of either shape above (optionally with a key
-injected via the environment, never written to disk). Then a test under
-`crates/vd-fim/tests/` can run the three cases with the real `HttpTransport`:
-positive (non-empty text + latency), cancel (`start` → `cancel`, a late reply is
-dropped by generation mismatch and cannot overwrite a newer result), and
-degradation (closed port → `Failed` with a ≤80-character reason containing no
-key, header or full URL). That is a source change and would need a new freeze.
+The script rebuilds the evidence harness in the pinned image, runs the three
+cases against the real service, and finishes with the key-leak scan.

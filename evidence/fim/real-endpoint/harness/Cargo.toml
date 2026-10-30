@@ -1,0 +1,12 @@
+[package]
+name = "fim-real-endpoint-harness"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# Standalone evidence crate: it must be its own workspace so the product
+# workspace is untouched.
+[workspace]
+
+[dependencies]
+vd-fim = { path = "../../../../crates/vd-fim" }

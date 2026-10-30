@@ -1,3 +1,7 @@
+# HISTORICAL (superseded): this is the local-harness probe that found no FIM
+# endpoint. AC-14 was later proven against the real DeepSeek FIM service via
+# the evidence-only proxy documented in README.md. Kept for the record.
+
 # FIM real-endpoint discovery — raw probe log (sanitized)
 # Date: 2026-10-30 (Asia/Shanghai)
 # No token/key value was read, printed or stored; no port or URL below is a
