@@ -1,3 +1,12 @@
 # Finished products and in-tree staging stay out of git (T25 evidence is kept).
 out/
 stage/
+
+# Regenerable clean-room artifacts: the in-process `--screenshot` output is blank in
+# a WM-less container (see README "Bounds"), so only the X-server capture is kept
+# as a reviewable image; the blank ones are described in the text evidence.
+evidence/shots/targz-cjk.png
+evidence/shots/targz-window.png
+evidence/shots/targz-window-smoke.png
+evidence/shots/targz-window-highlight.png
+evidence/xvfb.log
