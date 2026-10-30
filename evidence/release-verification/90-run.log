@@ -1,0 +1,25 @@
+[release-verify] assets under /art (downloaded from GitHub Release v0.1.0, not local builds):
+total 125728
+-rw-r--r-- 1 root root      281 Oct 30 06:03 SHA256SUMS
+-rw-r--r-- 1 root root 40493353 Oct 30 06:03 vedit-0.1.0-linux-x86_64.tar.gz
+-rw-r--r-- 1 root root 47745528 Oct 30 06:03 VEdit-0.1.0-x86_64.AppImage
+-rw-r--r-- 1 root root 40496151 Oct 30 06:03 VEdit-0.1.0-x86_64.run
+[release-verify] negative assertion: no gtk3 / gtksourceview rpms in this image
+[release-verify] PASS no_system_gtk (clean image)
+[release-verify] glibc: 2.17-317.el7
+[release-verify] PASS xvfb_up (DISPLAY=:99)
+[release-verify] == AppImage ==
+[release-verify] PASS appimage_selftest_all (exit=0  (log 10-appimage-selftest.log))
+[release-verify] PASS appimage_check_count (checks=51 (expected 51))
+[release-verify] == tar.gz ==
+[release-verify] PASS targz_selftest_all (exit=0  (log 11-targz-selftest.log))
+[release-verify] PASS targz_check_count (checks=51 (expected 51))
+[release-verify] == self-extracting .run ==
+[release-verify] PASS run_selftest_all (exit=0  (log 12-run-selftest.log))
+[release-verify] PASS run_check_count (checks=51 (expected 51))
+[release-verify] PASS run_cleanup (no extracted tree left behind)
+[release-verify] expected vd-app sha256: 41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611
+[release-verify] PASS vd_app_matches_frozen:appimage (sha=41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611)
+[release-verify] PASS vd_app_matches_frozen:targz (sha=41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611)
+[release-verify] PASS vd_app_matches_frozen:run (sha=41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611)
+[release-verify] RELEASE VERIFICATION RESULT: failures=0

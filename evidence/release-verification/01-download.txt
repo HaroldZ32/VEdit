@@ -1,0 +1,15 @@
+# Downloading the public release assets (v0.1.0)
+$ gh release download v0.1.0 -D /home/haroldzhao/MyProj/DshProj/VEdit/target/release-verify-download
+
+$ ls -l
+total 125728
+-rw-r--r-- 1 haroldzhao haroldzhao      281 Oct 30 14:03 SHA256SUMS
+-rw-r--r-- 1 haroldzhao haroldzhao 47745528 Oct 30 14:03 VEdit-0.1.0-x86_64.AppImage
+-rw-r--r-- 1 haroldzhao haroldzhao 40496151 Oct 30 14:03 VEdit-0.1.0-x86_64.run
+-rw-r--r-- 1 haroldzhao haroldzhao 40493353 Oct 30 14:03 vedit-0.1.0-linux-x86_64.tar.gz
+
+$ sha256sum -c SHA256SUMS
+VEdit-0.1.0-x86_64.AppImage: OK
+vedit-0.1.0-linux-x86_64.tar.gz: OK
+VEdit-0.1.0-x86_64.run: OK
+EXIT=0

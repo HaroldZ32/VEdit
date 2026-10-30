@@ -1,0 +1,13 @@
+RESULT no_system_gtk=PASS
+RESULT xvfb_up=PASS
+RESULT appimage_selftest_all=PASS
+RESULT appimage_check_count=PASS
+RESULT targz_selftest_all=PASS
+RESULT targz_check_count=PASS
+RESULT run_selftest_all=PASS
+RESULT run_check_count=PASS
+RESULT run_cleanup=PASS
+RESULT vd_app_matches_frozen:appimage=PASS
+RESULT vd_app_matches_frozen:targz=PASS
+RESULT vd_app_matches_frozen:run=PASS
+FAILURES=0

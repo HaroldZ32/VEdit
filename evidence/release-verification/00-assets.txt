@@ -1,0 +1,20 @@
+# Public release assets verified (GitHub Release v0.1.0, NOT local builds)
+# download: gh release download v0.1.0 -D target/release-verify-download
+release_url=https://github.com/HaroldZ32/VEdit/releases/tag/v0.1.0
+tag_commit=main / 6c50bcb140dbd49e4ec2078acf16446e9f678b1b
+
+## sha256 and size of each downloaded file
+6620304c5158c00c54ccc4db9ac93e16877fc143bc88faac2a5d2994704b7b8e  target/release-verify-download/SHA256SUMS
+ddf389733b3bc82d68c4f22d6bc2a09ab87b76aaf2eaa3bfbd10655ded9e6e81  target/release-verify-download/vedit-0.1.0-linux-x86_64.tar.gz
+4f800ab97368de6f379efdc15a582bfbb615bcc3e2b7a0a3f5a19935de21ce44  target/release-verify-download/VEdit-0.1.0-x86_64.AppImage
+0ef44b3576905c2ae09547eeaa74a9d5d7f2426e92bce7a999633938fee788ea  target/release-verify-download/VEdit-0.1.0-x86_64.run
+
+281 target/release-verify-download/SHA256SUMS
+40493353 target/release-verify-download/vedit-0.1.0-linux-x86_64.tar.gz
+47745528 target/release-verify-download/VEdit-0.1.0-x86_64.AppImage
+40496151 target/release-verify-download/VEdit-0.1.0-x86_64.run
+
+## in-payload vd-app sha256
+APPIMAGE_vd_app_sha256=41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611
+TARBALL_vd_app_sha256=41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611
+RUN_vd_app_sha256=41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611
