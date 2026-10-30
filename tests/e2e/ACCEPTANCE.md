@@ -135,8 +135,8 @@ such a run. The harness asserts the count, not a hard-coded sentence.
 
 ## 9. Gates — re-run for this report
 
-**Release-head run:** `tests/e2e/gates-frozen-run.txt` — `timestamp_utc=2026-10-30T05:52:37Z`,
-`HEAD=b3eae25632379d3362ee940cd39d9cbc69a60c55`, `tracked_modified=0` (only an
+**Release-head run:** `tests/e2e/gates-frozen-run.txt` — `timestamp_utc=2026-10-30T05:53:53Z`,
+`HEAD=8698a5edcdf47439c3d3007fb912bd1f2af71d7c`, `tracked_modified=0` (only an
 untracked lane-owned evidence directory). `cargo fmt --all -- --check` exit 0;
 `cargo clippy --workspace --all-targets -- -D warnings` exit 0;
 `cargo test --workspace` exit 0 with per-binary result lines
