@@ -24,10 +24,6 @@ jobs:
     name: build and publish the release artefacts
     runs-on: ubuntu-latest
     timeout-minutes: 360
-    # The runner's docker daemon is root; run the containers as the invoking user so
-    # the workspace files they write stay writable by the host-side steps.
-    env:
-      VEDIT_CONTAINER_USER: '1'
     steps:
       - name: "Check out (full history: SOURCE_DATE_EPOCH and git archive)"
         uses: actions/checkout@v4
@@ -81,6 +77,10 @@ jobs:
         env:
           VEDIT_SKIP_IMAGE_BUILD: '1'
           VEDIT_BUILD_IMAGE_REF: ${{ steps.image.outputs.ref }}
+          # build.sh runs containers and then writes to the workspace from the host,
+          # so those containers must use the runner's uid. The packaging lanes below
+          # install packages inside their containers and need root there.
+          VEDIT_CONTAINER_USER: '1'
         run: bash scripts/build.sh
 
       - name: AppImage with its clean-room acceptance
