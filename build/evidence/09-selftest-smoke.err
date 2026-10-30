@@ -1,0 +1,2 @@
+
+(vd-app:75): GLib-GIO-CRITICAL **: 03:32:18.804: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed

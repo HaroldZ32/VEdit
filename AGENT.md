@@ -27,35 +27,32 @@ Operating instructions for any AI agent working in this repository. Replace ever
 
 ## 4. Commands
 
-The product is Rust (GTK3 + GtkSourceView); the CentOS 7 packaging lane builds
-inside a container. `package.json` is verification orchestration ONLY (it maps
-the MPD gate ids to `build/gates/*.sh`) and is never a product runtime or build
-dependency.
+The product is Rust (GTK3 + GtkSourceView 4.6.1) and is built inside a pinned
+CentOS 7 image, because the deliverable must run on CentOS 7 (glibc 2.17).
+`package.json` is verification orchestration ONLY (it maps the MPD gate ids to
+`build/gates/*.sh`) and is never a product runtime or build dependency.
 
-- Install dependencies: no host install step — the system toolchain is pinned by
-  `rust-toolchain.toml` (T7) and the slang artifact is built in a fresh
-  `docker.m.daocloud.io/library/centos:7` container by `build/slang/build.sh`.
-- Build: `bash build/slang/build.sh` (one command: build `build/slang/out/slang`
-  in a CentOS 7 container, assert highest GLIBC symbol <= 2.17, run the offline
-  smoke test). Gate wrapper: `bun run verify:gates`
-  (`GATES_REBUILD=1` forces the full rebuild).
-- Test: `cargo test --workspace` (gate wrapper: `bun run verify:tests`)
+- Install dependencies: none on the host. The pinned image (base digest, Rust
+  1.99.0, GtkSourceView 4.6.1, meson/ninja) is built by `bash scripts/build.sh`;
+  every download's sha256 is pinned in `scripts/versions.env`.
+- Build: `bash scripts/build.sh` (one command: pinned image ->
+  `cargo build --release --workspace` -> ELF assertion that the highest GLIBC
+  symbol is <= 2.17 -> Xvfb `--selftest smoke` window check).
+  Gate wrapper: `bun run verify:gates`.
+- Test: `bash scripts/gates.sh` runs `cargo test --workspace` (in the pinned
+  image when the host has no GTK development files).
 - Type check and lint: `cargo clippy --workspace --all-targets -- -D warnings`
-  (`bun run verify:typecheck`; falls back to `cargo check --workspace` only when
-  clippy is unavailable, and prints that it did so)
-- Format: `cargo fmt --all` (check form: `cargo fmt --all -- --check`)
+  (through `bash scripts/gates.sh`).
+- Format: `cargo fmt --all`; check form `cargo fmt --all -- --check`
+  (through `bash scripts/gates.sh`).
 
-At this milestone (slang spike) only `bun run verify:gates` can be green: the
-Cargo workspace does not exist until T7. The other `verify:*` gates exit 1 and
-say why (they never fake a pass). `verify:gates` folds in `cargo test --workspace`
-once `Cargo.toml` exists, and from then on a test failure fails the gate (the
-`N/A` line is only legal before T7).
+The slang deep-lint binary has its own one-command build:
+`bash build/slang/build.sh`.
 
-The evidence tool's fixed gate table can only reach `gates`, `docs`, `manifest`,
-`comments`, `rows` (`bun run verify:<id>`) and `typecheck` (alias). `tests`
-(`bun test packages`) and `vendor`/`dist`/`pack` (`node scripts/verify-*.ts`) are
-unreachable in a Rust project, so they produce no evidence; those scripts exist
-for humans only. Details: `build/gates/README.md`.
+Dependency ownership: the root `Cargo.toml`, `Cargo.lock` and
+`rust-toolchain.toml` are workspace-level and owned by the skeleton task. The
+lane crates ship with their dependencies pre-installed, so a lane must not add a
+dependency or edit those files; ask the captain if one is genuinely missing.
 
 ## 5. Verification
 
@@ -64,11 +61,18 @@ for humans only. Details: `build/gates/README.md`.
 
 ## 6. Git discipline
 
-- Work on a branch, never directly on the main branch.
-- Use a commit format such as `<type>(<scope>): <summary>`.
-- Open a pull request describing what changed, the evidence, the checks run and any
-  unverified bound.
-- One writer per working tree; never rewrite published history.
+- All commits land directly on the default branch as linear history. A
+  branch-per-task flow is deliberately NOT used: the task board plus a different
+  reviewer per task already carries the pull-request duties, and disjoint write
+  scopes (never two writers in one path set) carry "one writer per tree". The
+  history is never rewritten (no amend/rebase of published commits).
+- Stage only your own task's declared write scope, with explicit paths; never
+  `git add -A` and never `git commit -a`. If `index.lock` contends, retry instead
+  of deleting the lock.
+- Use a commit format such as `<type>(<scope>): <summary>` and put the role
+  identity on the commit (`-c user.name="…" -c user.email="…"`).
+- Record evidence (command, observed result, path) on disk under a path that
+  contains `evidence/`, so a verifier can read it without reading implementation.
 
 ## 7. Delegation and evidence
 

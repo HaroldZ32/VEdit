@@ -1,0 +1,16 @@
+[package]
+name = "vd-deeplint"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# SLANG deep lint (T17): serde for --diag-json parsing, tempfile for scratch files.
+anyhow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tempfile.workspace = true

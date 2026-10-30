@@ -1,0 +1,3 @@
+artifact=build/artifacts/vd-app
+7082ab7a4e83cbbadbad05f9fe8862942c870190c625b882833a6097cdf2c666  /home/haroldzhao/MyProj/DshProj/VEdit/build/artifacts/vd-app
+size_bytes=562168

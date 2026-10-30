@@ -37,11 +37,14 @@ echo "[gates] sha256: $(sha256sum "$BIN" | cut -d' ' -f1)"
 # only reachable id that may run a heavy command, so the Rust test suite is
 # folded in here (its result is what the ledger sees).
 if [ -f "$ROOT/Cargo.toml" ]; then
-  echo "[gates] Cargo workspace present -> cargo test --workspace is a HARD requirement"
-  ( cd "$ROOT" && cargo test --workspace ) \
-    || no_gate "[gates] FAIL: cargo test --workspace failed"
+  # The Rust workspace exists, so the compile gates are a HARD requirement.
+  # scripts/gates.sh owns them (fmt/clippy/test + the dependency-policy checks)
+  # and runs them in the pinned CentOS 7 image when the host lacks GTK dev files.
+  echo "[gates] Cargo workspace present -> scripts/gates.sh is a HARD requirement"
+  bash "$ROOT/scripts/gates.sh" \
+    || no_gate "[gates] FAIL: scripts/gates.sh failed"
 else
-  echo "[gates] N/A: no Cargo workspace yet (T7 owns the Rust skeleton); the test step has nothing to run."
-  echo "[gates] this N/A is only valid before T7: once Cargo.toml exists, a test failure fails this gate."
+  echo "[gates] N/A: no Cargo workspace yet (the skeleton task owns it); the test step has nothing to run."
+  echo "[gates] this N/A is only valid before the skeleton lands: once Cargo.toml exists, a test failure fails this gate."
 fi
 echo "[gates] PASS"

@@ -1,0 +1,3 @@
+image_tag=vedit-build:local
+image_id=sha256:21bc713ccbf020cdc76f566f12c15e46e84cb40529e48263e6f09a04d6b4048f
+base_ref=docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4

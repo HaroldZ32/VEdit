@@ -1,0 +1,7 @@
+# Pinned compiler for the workspace and for the CentOS 7 build image.
+# The same version is installed inside the build image (scripts/versions.env),
+# so host gates and container gates run the same rustc/clippy.
+[toolchain]
+channel = "1.99.0"
+profile = "minimal"
+components = ["rustfmt", "clippy"]

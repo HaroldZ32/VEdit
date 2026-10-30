@@ -1,0 +1,12 @@
+
+xwininfo: Window id: 0x43 (the root window) (has no name)
+
+  Root window id: 0x43 (the root window) (has no name)
+  Parent window id: 0x0 (none)
+     3 children:
+     0x20000b (has no name): ()  1x1+-1+-1  +-1+-1
+     0x200002 "Untitled - VEdit": ("vd-app" "Vd-app")  1000x720+0+0  +0+0
+        1 child:
+        0x200003 (has no name): ()  1x1+-1+-1  +-1+-1
+     0x200001 "vd-app": ("vd-app" "Vd-app")  10x10+10+10  +10+10
+

@@ -1,0 +1,52 @@
+# VEdit — a Verilog/SystemVerilog editor for CentOS 7.
+#
+# This root manifest is owned by T7 and by the workspace owner; the lane tasks
+# (editor baseline, syntax, config, LSP, deep lint, FIM, app wiring) must not
+# change it. They may add dependencies to their own crate manifest instead.
+[workspace]
+resolver = "2"
+members = [
+    "crates/vd-app",
+    "crates/vd-config",
+    "crates/vd-deeplint",
+    "crates/vd-editor",
+    "crates/vd-fim",
+    "crates/vd-lsp",
+    "crates/vd-syntax",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.99"
+publish = false
+
+# One place for the versions every crate shares. Lanes opt in with
+# `dep.workspace = true`; a lane that needs an unlisted crate adds it directly
+# to its own crate manifest.
+[workspace.dependencies]
+anyhow = "1"
+glib = "0.18"
+gtk = "0.18"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sourceview4 = "0.5"
+# Lane dependencies, pre-installed by T7 so the parallel lanes never have to add
+# a dependency themselves (which would make five writers race on Cargo.lock).
+toml = "1"
+tempfile = "3"
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "process", "io-util", "time", "sync"] }
+# LSP: async-lsp 0.2 depends on lsp-types 0.95, so the shared lsp-types entry is
+# pinned to the same 0.95 line to keep exactly one lsp-types in Cargo.lock.
+async-lsp = "0.2"
+lsp-types = "0.95"
+# FIM: rustls only. `native-tls` (OpenSSL) is forbidden by the project constraints,
+# and the lock file is checked for openssl/native-tls in scripts/gates.sh.
+ureq = { version = "3", default-features = false, features = ["rustls", "json"] }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"

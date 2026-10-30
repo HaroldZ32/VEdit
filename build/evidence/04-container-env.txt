@@ -1,0 +1,14 @@
+date_utc=2026-10-30T03:32:17Z
+container=CentOS Linux release 7.9.2009 (Core)
+glibc=glibc-2.17-326.el7_9.3.x86_64
+gtk3=gtk3-3.22.30-8.el7_9.x86_64
+gtk3_pkg=3.22.30
+glib_pkg=2.56.1
+gsv4_pkg=4.6.1
+rustc=rustc 1.99.0 (b940084d7 2026-09-28)
+cargo=cargo 1.99.0 (5f94df478 2026-08-27)
+python3=Python 3.6.8
+meson=0.59.4
+ninja=1.11.1.git.kitware.jobserver-1
+cargo_home=/vedit-build/target/cargo-home
+home=/vedit-build/target/home
