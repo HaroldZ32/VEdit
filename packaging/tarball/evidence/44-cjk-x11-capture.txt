@@ -1,4 +1,4 @@
 # X-server capture of the packaged editor showing Chinese text
-50807 bytes  /evid/shots/targz-cjk-x11.png
-fafcd3f59b6d8a3cc8ac462330752aae40b4644a4aa2968ffe69fa6e9d69675c  /evid/shots/targz-cjk-x11.png
+50713 bytes  /evid/shots/targz-cjk-x11.png
+d8efd172d459c1c08e18dedec8a45bb0c2ed37e64ff284768640e8d1b9daa05e  /evid/shots/targz-cjk-x11.png
 identify mean/stddev: mean=0.30408 stddev=0.392207 size=1280x900

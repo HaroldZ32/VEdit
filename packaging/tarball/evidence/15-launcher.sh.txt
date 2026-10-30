@@ -8,10 +8,35 @@ set -eu
 HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
 
 # Per-user runtime directory for the rewritten caches. XDG_RUNTIME_DIR is a
-# tmpfs on a normal desktop; /tmp is the fallback. Nothing here is executable.
-RUNTIME_BASE=${XDG_RUNTIME_DIR:-${TMPDIR:-/tmp}}
-RUNTIME="$RUNTIME_BASE/vedit-runtime-$(id -u)"
-mkdir -p "$RUNTIME"
+# tmpfs on a normal desktop; TMPDIR is the fallback. Nothing here is executable.
+#
+# `mkdir -p` can fail (an XDG_RUNTIME_DIR pointing at a path the user cannot
+# create, `/proc/...`, a read-only bind mount). That must not abort the launch:
+# fall back to TMPDIR with a one-line explanation, and only give up when both
+# candidates fail — listing both paths in the error.
+make_runtime() {
+  _base=$1
+  _dir="$_base/vedit-runtime-$(id -u)"
+  if mkdir -p "$_dir" 2>/dev/null; then
+    printf '%s' "$_dir"
+    return 0
+  fi
+  return 1
+}
+
+PREFERRED=${XDG_RUNTIME_DIR:-}
+FALLBACK=${TMPDIR:-/tmp}
+if [ -n "$PREFERRED" ] && RUNTIME=$(make_runtime "$PREFERRED"); then
+  :
+elif RUNTIME=$(make_runtime "$FALLBACK"); then
+  if [ -n "$PREFERRED" ]; then
+    echo "vedit: cannot use XDG_RUNTIME_DIR=$PREFERRED (not writable or not creatable); using $FALLBACK instead" >&2
+  fi
+else
+  echo "vedit: cannot create a runtime directory; tried '$PREFERRED' and '$FALLBACK'" >&2
+  echo "vedit: set XDG_RUNTIME_DIR (or TMPDIR) to a writable directory and retry" >&2
+  exit 1
+fi
 
 expand() {
   # Rewrites the @APPDIR@ placeholder in one cache template.

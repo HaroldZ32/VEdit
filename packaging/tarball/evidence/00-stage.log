@@ -1,6 +1,7 @@
 [stage] version=0.1.0 verible=v0.0-4298-g085eef05
 [stage] building vd-app (release)
-    Finished `release` profile [optimized] target(s) in 0.10s
+   Compiling vd-app v0.1.0 (/vedit-build/crates/vd-app)
+    Finished `release` profile [optimized] target(s) in 41.38s
 [stage] fetching verible from the pinned URL
 /tmp/verible.tar.gz: OK
 verible-verilog-ls: OK
@@ -48,19 +49,19 @@ verible-verilog-lint: none
 verible-verilog-ls: none
 
 ## 4) embedded build-tree strings in the app binary (panic locations only)
-count(/vedit-build): 507
+count(/vedit-build): 506
 These are Rust source paths inside panic messages; they are not resolved at
 runtime. They are recorded as a known, non-functional bound (see README).
 [stage] creating the tar.gz
 [stage] creating the self-extracting .run
-# products (2026-10-30T04:57:35Z)
-40884328  /vedit-build/packaging/tarball/out/vedit-0.1.0-linux-x86_64.tar.gz
-40887126  /vedit-build/packaging/tarball/out/VEdit-0.1.0-x86_64.run
+# products (2026-10-30T05:11:58Z)
+40890922  /vedit-build/packaging/tarball/out/vedit-0.1.0-linux-x86_64.tar.gz
+40893720  /vedit-build/packaging/tarball/out/VEdit-0.1.0-x86_64.run
 
 payload tree: 105M
 files in payload: 4106
 ELF files in payload: 95
 
-5d7e1e9624b651079d510733b7ed5dacfb94c4c1002a049bf3c8d90e00a586a0  /vedit-build/packaging/tarball/out/vedit-0.1.0-linux-x86_64.tar.gz
-7faf6fa60ec37bc5b0a31cbf75b518eaf18793b4b1d211d5fc17eefaa9a1e025  /vedit-build/packaging/tarball/out/VEdit-0.1.0-x86_64.run
+a1bda356540fbc88c16b20c0cf2372fcd76885e484ad3954c86b498af9f25f89  /vedit-build/packaging/tarball/out/vedit-0.1.0-linux-x86_64.tar.gz
+299827fe2155f8b54e60a1c5d1c7662bcaddb49e93a7238a38b291e6ff3d71e5  /vedit-build/packaging/tarball/out/VEdit-0.1.0-x86_64.run
 [stage] STAGE OK

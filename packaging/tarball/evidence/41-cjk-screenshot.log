@@ -1,13 +1,11 @@
 vd-app selftest: fixture_root=/tmp/tarroot/VEdit/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/tarroot/VEdit/share/vedit/testdata"))
 
-(process:289): Gtk-WARNING **: 04:57:53.898: Locale not supported by C library.
+(process:303): Gtk-WARNING **: 05:12:16.626: Locale not supported by C library.
 	Using the fallback 'C' locale.
 
-(vd-app:289): GLib-GIO-CRITICAL **: 04:57:53.913: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:303): GLib-GIO-CRITICAL **: 05:12:16.641: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: configuration warnings: 1
-
-(vd-app:289): Gtk-CRITICAL **: 04:57:54.411: gtk_widget_draw: assertion '!widget->priv->alloc_needed' failed
-vd-app: screenshot written to /evid/shots/targz-cjk.png
+vd-app: screenshot written to /evid/shots/targz-cjk.png (58080 bytes, 1120x780, 13 sampled colours)
 {
   "app": "VEdit",
   "fixture_root": "/tmp/tarroot/VEdit/share/vedit/testdata",
@@ -43,6 +41,11 @@ vd-app: screenshot written to /evid/shots/targz-cjk.png
         {
           "detail": "enabled=false",
           "name": "FIM defaults to off",
+          "ok": true
+        },
+        {
+          "detail": "path=/evid/shots/targz-cjk.png bytes=58080 size=1120x780 sampled_colours=13 channel_range=255",
+          "name": "--screenshot produces a non-blank PNG",
           "ok": true
         }
       ],

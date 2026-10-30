@@ -1,9 +1,9 @@
 vd-app selftest: fixture_root=/tmp/tarroot/VEdit/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/tarroot/VEdit/share/vedit/testdata"))
 
-(process:62): Gtk-WARNING **: 04:57:50.472: Locale not supported by C library.
+(process:64): Gtk-WARNING **: 05:12:13.149: Locale not supported by C library.
 	Using the fallback 'C' locale.
 
-(vd-app:62): GLib-GIO-CRITICAL **: 04:57:50.486: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:64): GLib-GIO-CRITICAL **: 05:12:13.163: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: configuration warnings: 1
 {
   "app": "VEdit",
@@ -28,7 +28,7 @@ vd-app: configuration warnings: 1
           "ok": true
         },
         {
-          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x55e50fb32780, type: GtkSourceLanguage } })",
+          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x55b5a450a780, type: GtkSourceLanguage } })",
           "name": "opened .sv with CJK/emoji content has a language",
           "ok": true
         },
@@ -38,7 +38,7 @@ vd-app: configuration warnings: 1
           "ok": true
         },
         {
-          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x55e50fb366f0, type: GtkSourceLanguage } })",
+          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x55b5a450fef0, type: GtkSourceLanguage } })",
           "name": "opened .sv buffer has a language",
           "ok": true
         },

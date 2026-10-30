@@ -1,14 +1,14 @@
-VEdit: extracting to /root/.cache/vedit/run.8Wv5N6
-vd-app selftest: fixture_root=/root/.cache/vedit/run.8Wv5N6/VEdit/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/root/.cache/vedit/run.8Wv5N6/VEdit/share/vedit/testdata"))
+VEdit: extracting to /root/.cache/vedit/run.mWQJgX
+vd-app selftest: fixture_root=/root/.cache/vedit/run.mWQJgX/VEdit/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/root/.cache/vedit/run.mWQJgX/VEdit/share/vedit/testdata"))
 
-(process:44): Gtk-WARNING **: 04:58:11.691: Locale not supported by C library.
+(process:44): Gtk-WARNING **: 05:12:36.577: Locale not supported by C library.
 	Using the fallback 'C' locale.
 
-(vd-app:44): GLib-GIO-CRITICAL **: 04:58:11.706: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:44): GLib-GIO-CRITICAL **: 05:12:36.591: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: configuration warnings: 1
 {
   "app": "VEdit",
-  "fixture_root": "/root/.cache/vedit/run.8Wv5N6/VEdit/share/vedit/testdata",
+  "fixture_root": "/root/.cache/vedit/run.mWQJgX/VEdit/share/vedit/testdata",
   "ok": true,
   "reports": [
     {
@@ -39,7 +39,7 @@ vd-app: configuration warnings: 1
           "ok": true
         },
         {
-          "detail": "restored=true, dispatch=undo, action_fallback=true, can_undo_before=true, status=\"1:1  |  /tmp/vd-app-selftest-44/format_me.sv  |  systemverilog  |  verible 1  |  slang 0  |  FIM: FIM 未启用  |  LSP running (pid 76), restarts 0 (running: true, restarts: 0)  Verible LSP: generation 2\"",
+          "detail": "restored=true, dispatch=undo, action_fallback=true, can_undo_before=true, status=\"1:1  |  /tmp/vd-app-selftest-44/format_me.sv  |  systemverilog  |  verible 1  |  slang 0  |  FIM: FIM 未启用  |  LSP running (pid 78), restarts 0 (running: true, restarts: 0)  Verible LSP: generation 2\"",
           "name": "undo shortcut restores the text through Document",
           "ok": true
         },
@@ -109,7 +109,7 @@ vd-app: configuration warnings: 1
           "ok": true
         },
         {
-          "detail": "path=/root/.cache/vedit/run.8Wv5N6/VEdit/bin/slang",
+          "detail": "path=/root/.cache/vedit/run.mWQJgX/VEdit/bin/slang",
           "name": "VEDIT_SLANG is configured for the SLANG suite",
           "ok": true
         }

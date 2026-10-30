@@ -1,13 +1,13 @@
-vd-app selftest: fixture_root=/opt/relocated-1793336286/VEdit/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/opt/relocated-1793336286/VEdit/share/vedit/testdata"))
+vd-app selftest: fixture_root=/opt/relocated-1793337151/VEdit/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/opt/relocated-1793337151/VEdit/share/vedit/testdata"))
 
-(process:713): Gtk-WARNING **: 04:58:07.084: Locale not supported by C library.
+(process:857): Gtk-WARNING **: 05:12:32.090: Locale not supported by C library.
 	Using the fallback 'C' locale.
 
-(vd-app:713): GLib-GIO-CRITICAL **: 04:58:07.100: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:857): GLib-GIO-CRITICAL **: 05:12:32.105: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: configuration warnings: 1
 {
   "app": "VEdit",
-  "fixture_root": "/opt/relocated-1793336286/VEdit/share/vedit/testdata",
+  "fixture_root": "/opt/relocated-1793337151/VEdit/share/vedit/testdata",
   "ok": true,
   "reports": [
     {
@@ -38,12 +38,12 @@ vd-app: configuration warnings: 1
           "ok": true
         },
         {
-          "detail": "restored=true, dispatch=undo, action_fallback=true, can_undo_before=true, status=\"1:1  |  /tmp/vd-app-selftest-713/format_me.sv  |  systemverilog  |  verible 1  |  slang 0  |  FIM: FIM 未启用  |  LSP running (pid 745), restarts 0 (running: true, restarts: 0)  Verible LSP: generation 2\"",
+          "detail": "restored=true, dispatch=undo, action_fallback=true, can_undo_before=true, status=\"1:1  |  /tmp/vd-app-selftest-857/format_me.sv  |  systemverilog  |  verible 1  |  slang 0  |  FIM: FIM 未启用  |  LSP running (pid 891), restarts 0 (running: true, restarts: 0)  Verible LSP: generation 2\"",
           "name": "undo shortcut restores the text through Document",
           "ok": true
         },
         {
-          "detail": "path=/tmp/vd-app-selftest-713/smoke-saved.sv",
+          "detail": "path=/tmp/vd-app-selftest-857/smoke-saved.sv",
           "name": "save-as writes the document",
           "ok": true
         },
@@ -103,12 +103,12 @@ vd-app: configuration warnings: 1
           "ok": true
         },
         {
-          "detail": "2:1  |  /tmp/vd-app-selftest-713/smoke-saved.sv  |  systemverilog  |  verible 1  |  slang 1  |  FIM: FIM 未启用  |  match at line 2  Verible LSP: generation 2",
+          "detail": "2:1  |  /tmp/vd-app-selftest-857/smoke-saved.sv  |  systemverilog  |  verible 1  |  slang 1  |  FIM: FIM 未启用  |  match at line 2",
           "name": "status bar reports the cursor",
           "ok": true
         },
         {
-          "detail": "path=/opt/relocated-1793336286/VEdit/bin/slang",
+          "detail": "path=/opt/relocated-1793337151/VEdit/bin/slang",
           "name": "VEDIT_SLANG is configured for the SLANG suite",
           "ok": true
         }

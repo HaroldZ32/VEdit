@@ -1,7 +1,7 @@
-# payload manifest (2026-10-30T04:57:13Z)
+# payload manifest (2026-10-30T05:11:34Z)
 # every file, its sha256 and where it came from
 63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  bin/slang
-9f80c05d0c1d0130ec85590a407e11e98c96e1d1cb33d7773d4a932ca21cfeb9  bin/vd-app
+2dbc81fa1f9a6b25175f6fadbf53ea6acf149b8d265c32d6d8d61115e3120229  bin/vd-app
 5814ac30b9273bdc227a28e668a56d86ac89d180b6e36983dceb5f6e72e1c8f2  bin/vedit
 b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473  bin/verible-verilog-format
 b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29  bin/verible-verilog-lint
@@ -4105,4 +4105,4 @@ b9d1788db4d57965d09017c64d614fe0a8ee7fc7212bce4f1645ec4e4f718bfa  share/icons/hi
 b629fe81ea87c7c5b01c0f5f1f69cf01f89f0b139158c2695f71ec0bc08267d5  share/icons/hicolor/scalable/apps/ibus.svg
 dd16ef8bfaf272064b77f6402b4c3d44806e88e1dbd7a72ece30e144efc3560d  share/vedit/testdata/definition/a.sv
 a52baa724fb63b48cca73e29c4658178a49be748a152520fdf2a9dbedb961b02  share/vedit/testdata/definition/b.sv
-e57edb8805a5f0379bcd9d0b1581b975938867fd70318f89d2a2cd559e965e47  vedit.sh
+74959746a8dd8ce955a75fa43c4733a63c2f12901b9165af7ab6e9c7beed81fb  vedit.sh
