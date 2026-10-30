@@ -40,15 +40,57 @@ set +a
 say "version=$VERSION verible=$VERIBLE_VERSION"
 
 # --- 0. build the application -----------------------------------------------
-say "building vd-app (release)"
-# Every product must ship the SAME vd-app binary: the release remap (source roots
-# and cargo homes) is defined once in scripts/versions.env and applied here too.
-: "${RELEASE_RUSTFLAGS:?RELEASE_RUSTFLAGS is defined in scripts/versions.env}"
-export RUSTFLAGS="${RUSTFLAGS:-} ${RELEASE_RUSTFLAGS}"
-echo "RUSTFLAGS=$RUSTFLAGS" | tee "$EVID/01a-rustflags.txt"
-cargo build --release -p vd-app 2>&1 | tee "$EVID/01-cargo-build.log" | tail -2
-APP="$ROOT/target/release/vd-app"
-[ -x "$APP" ] || { say "FAIL: $APP missing"; exit 1; }
+# The release ships ONE vd-app binary. build/artifacts/vd-app is the canonical
+# artifact (built from the frozen commit with RELEASE_RUSTFLAGS and stripped);
+# this lane consumes it verbatim so the tar.gz/.run payload is byte-identical to
+# the AppImage's. Only when it is missing does this lane build + strip locally,
+# and it says so in the evidence.
+CANONICAL="$ROOT/build/artifacts/vd-app"
+if [ -x "$CANONICAL" ]; then
+  say "using the canonical release binary: build/artifacts/vd-app"
+  APP="$CANONICAL"
+  VD_APP_SOURCE="canonical:build/artifacts/vd-app"
+elif [ -x "$ROOT/target/release/vd-app" ]; then
+  say "canonical artifact missing; reusing the workspace release build"
+  APP="$ROOT/target/release/vd-app"
+  VD_APP_SOURCE="workspace:target/release/vd-app"
+else
+  say "canonical artifact and release build missing; building vd-app here"
+  : "${RELEASE_RUSTFLAGS:?RELEASE_RUSTFLAGS is defined in scripts/versions.env}"
+  export RUSTFLAGS="${RUSTFLAGS:-} ${RELEASE_RUSTFLAGS}"
+  echo "RUSTFLAGS=$RUSTFLAGS" | tee "$EVID/01a-rustflags.txt"
+  cargo build --release -p vd-app 2>&1 | tee "$EVID/01-cargo-build.log" | tail -2
+  APP="$ROOT/target/release/vd-app"
+  VD_APP_SOURCE="local-build:target/release/vd-app"
+fi
+[ -x "$APP" ] || { say "FAIL: no usable vd-app ($APP)"; exit 1; }
+
+# The canonical pipeline strips the binary (scripts/build-in-container.sh): an
+# unstripped 7.9 MB binary is a different file from the shipped 6.0 MB one, which
+# is exactly how the products stopped being byte-identical. Strip a local build;
+# refuse an artifact that still carries a symbol table.
+case "$VD_APP_SOURCE" in
+  canonical:*)
+    if readelf -S "$APP" 2>/dev/null | grep -q '\.symtab'; then
+      say "FAIL: $APP is not stripped; the canonical artifact must be stripped"
+      exit 1
+    fi
+    ;;
+  *)
+    strip --strip-all "$APP"
+    ;;
+esac
+{
+  echo "# vd-app shipped in this payload"
+  echo "source=$VD_APP_SOURCE"
+  sha256sum "$APP"
+  stat -c 'bytes=%s' "$APP"
+  if readelf -S "$APP" 2>/dev/null | grep -q '\.symtab'; then
+    echo "stripped=no"
+  else
+    echo "stripped=yes"
+  fi
+} | tee "$EVID/01b-vd-app-identity.txt"
 
 # --- 1. binaries --------------------------------------------------------------
 install -m 0755 "$APP" "$PKG/bin/vd-app"

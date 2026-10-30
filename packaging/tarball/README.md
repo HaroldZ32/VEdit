@@ -13,7 +13,14 @@ Two relocatable products, built from the same payload, that run on a clean, offl
 | `out/VEdit-0.1.0-x86_64.run` | 40,893,720 | `299827fe2155f8b54e60a1c5d1c7662bcaddb49e93a7238a38b291e6ff3d71e5` |
 
 The `.run` is the tarball plus a POSIX-sh stub: the payload is stored **once**, so the
-overhead is 2,798 bytes. (These numbers describe the 0.1.0 build in `evidence/16-products.txt`;
+overhead is 2,798 bytes.
+
+`bin/vd-app` is **the canonical release artifact** (`build/artifacts/vd-app`, built from the
+frozen commit with `RELEASE_RUSTFLAGS` and stripped): this lane copies it verbatim so the
+tar.gz/.run payload and the AppImage carry the same bytes. A local build is only a fallback
+(and is stripped with the canonical pipeline's `strip --strip-all`); the identity, size and
+stripped state are recorded in `evidence/01b-vd-app-identity.txt`. Rejected intermediate
+binaries and why they were rejected: `evidence/18-abandoned-intermediates.txt`. (These numbers describe the 0.1.0 build in `evidence/16-products.txt`;
 the next rebuild changes them, and the evidence file is the authority.)
 
 ## Layout (identical inside both products)
