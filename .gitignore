@@ -3,6 +3,9 @@
 # so keeping it out of the product repo avoids a nested repository.
 .mpd/
 
+# Code analysis index written by codegraph tooling (tool state, not source).
+.codegraph/
+
 # --- Rust build output -------------------------------------------------------
 target/
 
