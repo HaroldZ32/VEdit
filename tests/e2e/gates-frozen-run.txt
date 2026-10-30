@@ -1,17 +1,15 @@
-timestamp_utc=2026-10-30T05:44:14Z
-HEAD=4dcff964783cdbeff7a540ad326fa9848fa97e6a
+timestamp_utc=2026-10-30T05:45:13Z
+HEAD=80fdf9fbaa06d32ad9c613ba3cb5ef90e968045e
 git_status_short:
- M tests/e2e/gates-frozen-run.txt
 ?? evidence/github/
 ?? vd-app-selftest-39/
 ?? vd-app-selftest-41/
-tracked_modified=1
+tracked_modified=0
 $ cargo fmt --all -- --check
 exit=0
 $ cargo clippy --workspace --all-targets -- -D warnings
 exit=0
-    Checking vd-app v0.1.0 (/vedit-build/crates/vd-app)
-    Finished `dev` profile [unoptimized + debuginfo] target(s) in 20.45s
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.10s
 $ cargo test --workspace
 exit=0
 test result: ok. 11 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
@@ -20,7 +18,7 @@ test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fin
 test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 test result: ok. 25 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
-test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
 test result: ok. 42 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
 test result: ok. 40 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
 test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
@@ -29,7 +27,7 @@ test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fin
 test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.32s
 test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.34s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.35s
 test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

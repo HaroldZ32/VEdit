@@ -134,12 +134,16 @@ such a run. The harness asserts the count, not a hard-coded sentence.
 
 ## 9. Gates — re-run for this report
 
-`tests/e2e/gates-frozen-run.txt`: `timestamp_utc=2026-10-30T05:35:46Z`,
-`HEAD=463d96562a5045b004bc8b8d4f5281b95d97ae80` (evidence-only commits after
-frozen2; product source still `f1f9622`), `cargo fmt --all -- --check` exit 0,
-`cargo clippy --workspace --all-targets -- -D warnings` exit 0,
-`cargo test --workspace` exit 0. Working tree at that moment had uncommitted
-T27 report/harness files (this report is committed next).
+**This run:** `tests/e2e/gates-frozen-run.txt` — `timestamp_utc=2026-10-30T05:45:13Z`,
+`HEAD=80fdf9fbaa06d32ad9c613ba3cb5ef90e968045e`, `tracked_modified=0` (the only
+untracked entries were another lane's `evidence/github/` and two stray
+selftest tmp dirs, removed before this report commit).
+`cargo fmt --all -- --check` exit 0; `cargo clippy --workspace --all-targets --
+-D warnings` exit 0; `cargo test --workspace` exit 0 with per-binary result lines
+(11/31/14/4/25/13 passed plus the remaining 0-test targets) recorded in the file.
+The product source is still frozen2 `f1f9622`; only tests/evidence changed.
+Rebuilding from this HEAD gives canonical **41d02dca…**, 6,002,112 B — identical
+to frozen2, so the three artifacts remain valid and are not rebuilt.
 
 ## 10. MANUAL acceptance steps
 
