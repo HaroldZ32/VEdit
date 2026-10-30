@@ -1,9 +1,9 @@
 vd-app selftest: fixture_root=/tmp/tarroot/VEdit/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/tarroot/VEdit/share/vedit/testdata"))
 
-(process:28): Gtk-WARNING **: 05:12:12.052: Locale not supported by C library.
+(process:28): Gtk-WARNING **: 05:31:44.446: Locale not supported by C library.
 	Using the fallback 'C' locale.
 
-(vd-app:28): GLib-GIO-CRITICAL **: 05:12:12.066: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:28): GLib-GIO-CRITICAL **: 05:31:44.461: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: configuration warnings: 1
 {
   "app": "VEdit",
@@ -103,7 +103,7 @@ vd-app: configuration warnings: 1
           "ok": true
         },
         {
-          "detail": "2:1  |  /tmp/vd-app-selftest-28/smoke-saved.sv  |  systemverilog  |  verible 1  |  slang 1  |  FIM: FIM 未启用  |  match at line 2  Verible LSP: generation 2",
+          "detail": "2:1  |  /tmp/vd-app-selftest-28/smoke-saved.sv  |  systemverilog  |  verible 1  |  slang 1  |  FIM: FIM 未启用  |  match at line 2",
           "name": "status bar reports the cursor",
           "ok": true
         },

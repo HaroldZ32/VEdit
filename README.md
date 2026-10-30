@@ -21,8 +21,8 @@ IDE 能力全部复用上游组件（Verible、SLANG、GtkSourceView），自研
 | 产物 | 大小（0.1.0） | 适用场景 |
 |---|---|---|
 | `VEdit-<ver>-x86_64.AppImage` | ≈ 48 MB | 最省事。`chmod +x` 后直接运行；**需要 FUSE**。没有 FUSE 时用 `--appimage-extract-and-run`（或 `APPIMAGE_EXTRACT_AND_RUN=1`） |
-| `vedit-<ver>-linux-x86_64.tar.gz` | ≈ 41 MB | **不需要 FUSE**。解压后跑 `VEdit/vedit.sh`；适合内网、无 FUSE、无 `/tmp` 可执行位的老机器 |
-| `VEdit-<ver>-x86_64.run` | ≈ 41 MB | **单文件自解压**，不依赖 FUSE。`sh VEdit-<ver>-x86_64.run` 或 `chmod +x && ./VEdit-*.run`；自动挑选可执行的临时目录，失败时明确报错并给出替代方案 |
+| `vedit-<ver>-linux-x86_64.tar.gz` | ≈ 40 MB | **不需要 FUSE**。解压后跑 `VEdit/vedit.sh`；适合内网、无 FUSE、无 `/tmp` 可执行位的老机器 |
+| `VEdit-<ver>-x86_64.run` | ≈ 40 MB | **单文件自解压**，不依赖 FUSE。`sh VEdit-<ver>-x86_64.run` 或 `chmod +x && ./VEdit-*.run`；自动挑选可执行的临时目录，失败时明确报错并给出替代方案 |
 
 > **FUSE 缺失时优先用 `.run` 或 tar.gz**：CentOS 7 通常没有 `fusermount3`，AppImage 直接运行可能以
 > `No suitable fusermount binary found` 退出 127。
@@ -155,8 +155,8 @@ timeout_ms = 5000
   已上报；在此之前请用上表的动作名。
 - **FIM 的真实端点不在自动验收范围内**：mock 传输层证明"默认 0 请求/协议体逐字正确/取消丢弃陈旧结果"，
   真实服务连通性属于人工项。取消是**结果级**的：网络 I/O 不会中途 abort，迟到结果会被丢弃。
-- **`--screenshot` 在无窗口管理器的容器里会得到空白图**（GTK `gtk_widget_draw ... alloc_needed`）；
-  无头环境的视觉证据用 X server 捕获。见 `packaging/tarball/README.md` 的 Bounds。
+- **无头/无窗口管理器环境**：`--screenshot` 已修复（frozen2 起产出非空白图）；
+  另保留 X server 捕获（`import -window root`）作为独立视觉证据。见 `packaging/tarball/README.md` 的 Bounds。
 - **emoji 字体未捆绑**（体积/许可），中文（CJK）字体已捆绑。
 - **构建机路径**：Rust 会把 panic 位置（源码 `file:line`）编译进二进制。发布构建统一用
   `RELEASE_RUSTFLAGS`（`--remap-path-prefix`，定义在 `scripts/versions.env`）把它们重映射到中性的

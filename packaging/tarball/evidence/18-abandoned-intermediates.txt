@@ -18,18 +18,20 @@ candidate A (rejected): 809cf95326172fc58975b38cea390dcffd8d78d1261b4f1d75059a89
                screenshots), but a release artifact must be traceable to the
                frozen source; this one is not.
 
-candidate B (rejected): 41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611
+candidate B (ADOPTED as the frozen2 canonical):
+41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611
   bytes      : 6002112 (stripped in the pinned image)
   provenance : rebuilt by this lane from the frozen source (cargo build
                --release --workspace + strip --strip-all), i.e. the correct
                source, and it is the value the canonical pipeline produces when
                re-run from that source.
-  rejection  : it was never adopted as the canonical artifact; the previous
-               tar.gz/.run had in fact shipped an *unstripped* 7,904,808-byte
-               binary (d93440edab9e564b0ea2e8f3517068cf355cc9148844bffc0c6811c85e7b9272),
-               which is a third, also-rejected value (see below), so no product
-               pair ever shared 41d02dca. It is recorded here as the reproducibility
-               evidence for the re-freeze, not as a release hash.
+  decision   : ADOPTED. Senior Engineer rebuilt it from frozen2 f1f9622 three
+               times with a clean target/release (SOURCE_DATE_EPOCH from the host
+               commit time, CARGO_INCREMENTAL=0, toolchain remap) and got the same
+               sha256 3/3, so it is reproducible from the frozen commit. The
+               frozen2 build of build/artifacts/vd-app has this hash and both
+               packaging lanes consume that file; the tar.gz, the .run and the
+               AppImage all carry it (see 01b-vd-app-identity.txt).
 
 candidate C (rejected): d93440edab9e564b0ea2e8f3517068cf355cc9148844bffc0c6811c85e7b9272
   bytes      : 7904808 (NOT stripped)
@@ -38,7 +40,13 @@ candidate C (rejected): d93440edab9e564b0ea2e8f3517068cf355cc9148844bffc0c6811c8
                binary; the payload was therefore never "the same binary" as the
                AppImage.
 
-Decision: the frozen2 pipeline rebuilds build/artifacts/vd-app from the frozen
-commit (Senior Engineer), and both packaging lanes consume that single file. The
-adopted hash is whatever that artifact has, recorded in
-packaging/tarball/evidence/01b-vd-app-identity.txt for this lane.
+Final chain:
+  809cf953...  built from a dirty tree, predates source commit b6c31d3 -> REJECTED
+  41d02dca...  rebuilt from frozen2, reproducible 3/3                 -> ADOPTED
+  d93440ed...  unstripped 7,904,808-byte payload binary               -> REJECTED
+
+Adopted values for the frozen2 release:
+  canonical build/artifacts/vd-app : 41d02dca... 6,002,112 B stripped
+  tar.gz  bin/vd-app               : 41d02dca... (identical)
+  .run    bin/vd-app               : 41d02dca... (identical)
+  AppImage usr/bin/vd-app          : 41d02dca... (identical)

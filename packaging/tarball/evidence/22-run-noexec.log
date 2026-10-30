@@ -1,14 +1,14 @@
-VEdit: extracting to /root/.cache/vedit/run.mWQJgX
-vd-app selftest: fixture_root=/root/.cache/vedit/run.mWQJgX/VEdit/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/root/.cache/vedit/run.mWQJgX/VEdit/share/vedit/testdata"))
+VEdit: extracting to /root/.cache/vedit/run.Qo5Frd
+vd-app selftest: fixture_root=/root/.cache/vedit/run.Qo5Frd/VEdit/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/root/.cache/vedit/run.Qo5Frd/VEdit/share/vedit/testdata"))
 
-(process:44): Gtk-WARNING **: 05:12:36.577: Locale not supported by C library.
+(process:44): Gtk-WARNING **: 05:32:08.803: Locale not supported by C library.
 	Using the fallback 'C' locale.
 
-(vd-app:44): GLib-GIO-CRITICAL **: 05:12:36.591: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:44): GLib-GIO-CRITICAL **: 05:32:08.817: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: configuration warnings: 1
 {
   "app": "VEdit",
-  "fixture_root": "/root/.cache/vedit/run.mWQJgX/VEdit/share/vedit/testdata",
+  "fixture_root": "/root/.cache/vedit/run.Qo5Frd/VEdit/share/vedit/testdata",
   "ok": true,
   "reports": [
     {
@@ -109,7 +109,7 @@ vd-app: configuration warnings: 1
           "ok": true
         },
         {
-          "detail": "path=/root/.cache/vedit/run.mWQJgX/VEdit/bin/slang",
+          "detail": "path=/root/.cache/vedit/run.Qo5Frd/VEdit/bin/slang",
           "name": "VEDIT_SLANG is configured for the SLANG suite",
           "ok": true
         }

@@ -9,8 +9,8 @@ Two relocatable products, built from the same payload, that run on a clean, offl
 
 | product | bytes | sha256 |
 |---|---|---|
-| `out/vedit-0.1.0-linux-x86_64.tar.gz` | 40,890,922 | `a1bda356540fbc88c16b20c0cf2372fcd76885e484ad3954c86b498af9f25f89` |
-| `out/VEdit-0.1.0-x86_64.run` | 40,893,720 | `299827fe2155f8b54e60a1c5d1c7662bcaddb49e93a7238a38b291e6ff3d71e5` |
+| `out/vedit-0.1.0-linux-x86_64.tar.gz` | 40,493,353 | `ddf389733b3bc82d68c4f22d6bc2a09ab87b76aaf2eaa3bfbd10655ded9e6e81` |
+| `out/VEdit-0.1.0-x86_64.run` | 40,496,151 | `0ef44b3576905c2ae09547eeaa74a9d5d7f2426e92bce7a999633938fee788ea` |
 
 The `.run` is the tarball plus a POSIX-sh stub: the payload is stored **once**, so the
 overhead is 2,798 bytes.
@@ -76,7 +76,7 @@ and the tree is removed; the exit status is propagated unchanged.
   no `gtk3`/`gtksourceview3`/`gtksourceview4` rpm exists, both products pass `--selftest all`
   (51 checks, exit 0), the window is visible to `xwininfo`, and Chinese text renders.
 * **AC-18 (size / cold start, record item)** — tar.gz 40.9 MB, `.run` 40.9 MB; window visible
-  after **111 / 119 / 64 ms** (three runs, `evidence/36-cold-start.txt`). Target was ≤ 300 MB and
+  after **109 / 64 / 63 ms** (three runs, `evidence/36-cold-start.txt`). Target was ≤ 300 MB and
   ≤ 10 s, so both metrics are far inside it.
 * **GLIBC ≤ 2.17 for every bundled ELF** — `evidence/11-glibc-rpath.txt`:
   `ELF_SCANNED=95 ELF_WITH_RUNPATH=1 ALLOWLIST_HITS=1 UNKNOWN=0 GLIBC_GATE=PASS`.
@@ -173,20 +173,16 @@ and once with `--network none --tmpfs /tmp:noexec`.)
 
 ## Bounds (recorded, not hidden)
 
-1. **`--screenshot` is blank in a window-manager-less container.** `gtk_widget_draw: assertion
-   '!widget->priv->alloc_needed' failed` — the in-process capture draws before the pending
-   allocation is flushed (T21's capture path; it works in the build image, so it is a timing
-   sensitivity, not an unconditional bug). Recorded in `38-known-limitations.txt`; the visual
-   evidence in this lane therefore comes from an **X-server capture** (`import -window root`),
-   which is the stronger proof anyway because it is what a user sees.
-2. **Build-tree strings in the app binary.** The release build injects
-   `RELEASE_RUSTFLAGS` (a shared `--remap-path-prefix` set from `scripts/versions.env`) so the
-   panic locations become `/vedit/...` and no `/vedit-build` prefix survives; the packaging audit
-   counts the surviving strings, lists each distinct value and asks the reviewer to classify it
-   (`13-host-path-audit.txt` §4) — the count is reported, not assumed to be 0, because
-   `--remap-path-prefix` does not always cover compile-time literals such as an `env!()` default. All products must use
-   that same flag set, otherwise their `vd-app` binaries differ; this lane consumes it in
-   `stage.sh` and fails loudly when the variable is missing.
+1. **`--screenshot` used to be blank in a window-manager-less container.** The frozen2 `vd-app`
+   fixes the capture ("layout-safe screenshots"): the clean-room run now writes non-blank
+   `--screenshot` PNGs (34,550 / 33,880 bytes; the CJK shot at stddev ≈ 0.40), so this is no
+   longer a bound. The X-server capture (`import -window root`) is kept as independent visual
+   evidence of what a user actually sees.
+2. **Build-tree strings in the app binary.** The canonical artifact is built with
+   `RELEASE_RUSTFLAGS` (a shared `--remap-path-prefix` set from `scripts/versions.env`), so the
+   panic locations read `/vedit/...`; the audit in `13-host-path-audit.txt` §4 reports the count
+   and each distinct value instead of assuming 0, because `--remap-path-prefix` does not always
+   cover compile-time literals such as an `env!()` default. Measured on frozen2: `0` and `508`.
 3. **Determinism.** `tar` on CentOS 7 is 1.26 and has no `--sort=name`; entries are normalized by
    owner/group (0/0) and `gzip -n` drops the timestamp, but directory order follows the
    filesystem. Byte-identical rebuilds are therefore not claimed here.

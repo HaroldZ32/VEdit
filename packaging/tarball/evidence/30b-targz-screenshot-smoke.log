@@ -1,11 +1,11 @@
 vd-app selftest: fixture_root=/tmp/tarroot/VEdit/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/tarroot/VEdit/share/vedit/testdata"))
 
-(process:413): Gtk-WARNING **: 05:12:18.425: Locale not supported by C library.
+(process:413): Gtk-WARNING **: 05:31:50.762: Locale not supported by C library.
 	Using the fallback 'C' locale.
 
-(vd-app:413): GLib-GIO-CRITICAL **: 05:12:18.441: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:413): GLib-GIO-CRITICAL **: 05:31:50.777: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: configuration warnings: 1
-vd-app: screenshot written to /evid/shots/targz-window-smoke.png (35286 bytes, 1120x780, 10 sampled colours)
+vd-app: screenshot written to /evid/shots/targz-window-smoke.png (34550 bytes, 1120x780, 8 sampled colours)
 {
   "app": "VEdit",
   "fixture_root": "/tmp/tarroot/VEdit/share/vedit/testdata",
@@ -104,7 +104,7 @@ vd-app: screenshot written to /evid/shots/targz-window-smoke.png (35286 bytes, 1
           "ok": true
         },
         {
-          "detail": "2:1  |  /tmp/vd-app-selftest-413/smoke-saved.sv  |  systemverilog  |  verible 1  |  slang 1  |  FIM: FIM 未启用  |  match at line 2  Verible LSP: generation 2",
+          "detail": "2:1  |  /tmp/vd-app-selftest-413/smoke-saved.sv  |  systemverilog  |  verible 1  |  slang 1  |  FIM: FIM 未启用  |  match at line 2",
           "name": "status bar reports the cursor",
           "ok": true
         },
@@ -114,7 +114,7 @@ vd-app: screenshot written to /evid/shots/targz-window-smoke.png (35286 bytes, 1
           "ok": true
         },
         {
-          "detail": "path=/evid/shots/targz-window-smoke.png bytes=35286 size=1120x780 sampled_colours=10 channel_range=255",
+          "detail": "path=/evid/shots/targz-window-smoke.png bytes=34550 size=1120x780 sampled_colours=8 channel_range=255",
           "name": "--screenshot produces a non-blank PNG",
           "ok": true
         }

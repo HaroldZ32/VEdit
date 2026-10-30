@@ -1,7 +1,10 @@
 [stage] version=0.1.0 verible=v0.0-4298-g085eef05
-[stage] building vd-app (release)
-   Compiling vd-app v0.1.0 (/vedit-build/crates/vd-app)
-    Finished `release` profile [optimized] target(s) in 41.38s
+[stage] using the canonical release binary: build/artifacts/vd-app
+# vd-app shipped in this payload
+source=canonical:build/artifacts/vd-app
+41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611  /vedit-build/build/artifacts/vd-app
+bytes=6002112
+stripped=yes
 [stage] fetching verible from the pinned URL
 /tmp/verible.tar.gz: OK
 verible-verilog-ls: OK
@@ -48,20 +51,20 @@ verible-verilog-format: none
 verible-verilog-lint: none
 verible-verilog-ls: none
 
-## 4) embedded build-tree strings in the app binary (panic locations only)
-count(/vedit-build): 506
-These are Rust source paths inside panic messages; they are not resolved at
-runtime. They are recorded as a known, non-functional bound (see README).
+## 4) embedded build-tree strings in the app binary (panic locations)
+count(/vedit-build): 0
+PASS: the release remap (RELEASE_RUSTFLAGS) removed the build-tree prefix
+count(/vedit/ remapped prefix): 508
 [stage] creating the tar.gz
 [stage] creating the self-extracting .run
-# products (2026-10-30T05:11:58Z)
-40890922  /vedit-build/packaging/tarball/out/vedit-0.1.0-linux-x86_64.tar.gz
-40893720  /vedit-build/packaging/tarball/out/VEdit-0.1.0-x86_64.run
+# products (2026-10-30T05:31:30Z)
+40493353  /vedit-build/packaging/tarball/out/vedit-0.1.0-linux-x86_64.tar.gz
+40496151  /vedit-build/packaging/tarball/out/VEdit-0.1.0-x86_64.run
 
-payload tree: 105M
+payload tree: 103M
 files in payload: 4106
 ELF files in payload: 95
 
-a1bda356540fbc88c16b20c0cf2372fcd76885e484ad3954c86b498af9f25f89  /vedit-build/packaging/tarball/out/vedit-0.1.0-linux-x86_64.tar.gz
-299827fe2155f8b54e60a1c5d1c7662bcaddb49e93a7238a38b291e6ff3d71e5  /vedit-build/packaging/tarball/out/VEdit-0.1.0-x86_64.run
+ddf389733b3bc82d68c4f22d6bc2a09ab87b76aaf2eaa3bfbd10655ded9e6e81  /vedit-build/packaging/tarball/out/vedit-0.1.0-linux-x86_64.tar.gz
+0ef44b3576905c2ae09547eeaa74a9d5d7f2426e92bce7a999633938fee788ea  /vedit-build/packaging/tarball/out/VEdit-0.1.0-x86_64.run
 [stage] STAGE OK

@@ -1,11 +1,11 @@
 vd-app selftest: fixture_root=/tmp/tarroot/VEdit/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/tarroot/VEdit/share/vedit/testdata"))
 
-(process:451): Gtk-WARNING **: 05:12:20.361: Locale not supported by C library.
+(process:452): Gtk-WARNING **: 05:31:52.685: Locale not supported by C library.
 	Using the fallback 'C' locale.
 
-(vd-app:451): GLib-GIO-CRITICAL **: 05:12:20.376: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:452): GLib-GIO-CRITICAL **: 05:31:52.700: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: configuration warnings: 1
-vd-app: screenshot written to /evid/shots/targz-window-highlight.png (33744 bytes, 1120x780, 15 sampled colours)
+vd-app: screenshot written to /evid/shots/targz-window-highlight.png (33880 bytes, 1120x780, 15 sampled colours)
 {
   "app": "VEdit",
   "fixture_root": "/tmp/tarroot/VEdit/share/vedit/testdata",
@@ -29,7 +29,7 @@ vd-app: screenshot written to /evid/shots/targz-window-highlight.png (33744 byte
           "ok": true
         },
         {
-          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x6519002f7780, type: GtkSourceLanguage } })",
+          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5d909b51cf80, type: GtkSourceLanguage } })",
           "name": "opened .sv with CJK/emoji content has a language",
           "ok": true
         },
@@ -39,7 +39,7 @@ vd-app: screenshot written to /evid/shots/targz-window-highlight.png (33744 byte
           "ok": true
         },
         {
-          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x6519002fcef0, type: GtkSourceLanguage } })",
+          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5d909b5216f0, type: GtkSourceLanguage } })",
           "name": "opened .sv buffer has a language",
           "ok": true
         },
@@ -54,7 +54,7 @@ vd-app: screenshot written to /evid/shots/targz-window-highlight.png (33744 byte
           "ok": true
         },
         {
-          "detail": "path=/evid/shots/targz-window-highlight.png bytes=33744 size=1120x780 sampled_colours=15 channel_range=255",
+          "detail": "path=/evid/shots/targz-window-highlight.png bytes=33880 size=1120x780 sampled_colours=15 channel_range=255",
           "name": "--screenshot produces a non-blank PNG",
           "ok": true
         }

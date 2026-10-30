@@ -34,9 +34,9 @@ d8efd172d459c1c08e18dedec8a45bb0c2ed37e64ff284768640e8d1b9daa05e  /evid/shots/ta
 identify mean/stddev: mean=0.30408 stddev=0.392207 size=1280x900
 [clean-room:full] PASS the X-server capture shows the rendered editor (stddev=0.392207)
 [clean-room:full] == tar.gz: window presence + screenshot ==
-[clean-room:full] PASS targz_screenshot_smoke (exit=0  (/evid/shots/targz-window-smoke.png 35286 bytes))
-[clean-room:full] PASS targz_screenshot_highlight (exit=0  (/evid/shots/targz-window-highlight.png 33744 bytes))
-[clean-room:full] PASS targz_window_visible (first xwininfo hit at 115ms)
+[clean-room:full] PASS targz_screenshot_smoke (exit=0  (/evid/shots/targz-window-smoke.png 34550 bytes))
+[clean-room:full] PASS targz_screenshot_highlight (exit=0  (/evid/shots/targz-window-highlight.png 33880 bytes))
+[clean-room:full] PASS targz_window_visible (first xwininfo hit at 63ms)
 [clean-room:full] == tar.gz: launcher environment (GTK_IM_MODULE_FILE etc.) ==
 LAUNCHER_DIR=/tmp/tarroot/VEdit
 LD_LIBRARY_PATH=/tmp/tarroot/VEdit/lib
@@ -67,22 +67,22 @@ VEDIT_SELFTEST_FIXTURES=/tmp/tarroot/VEdit/share/vedit/testdata
 [clean-room:full] PASS run_selftest_smoke (exit=0  (log 31a-run-smoke.log))
 [clean-room:full] PASS run_selftest_all (exit=0)
 [clean-room:full] PASS run_keeptmp (exit=0)
-[clean-room:full] PASS VEDIT_KEEP_TMP kept the tree at /tmp/vedit.uvysRn
+[clean-room:full] PASS VEDIT_KEEP_TMP kept the tree at /tmp/vedit.P0hb6a
 [clean-room:full] PASS self-extracting run cleaned up its temporary tree
 [clean-room:full] == relocation: unpack to a second, unrelated path and run again ==
-[clean-room:full] PASS relocated_selftest (exit=0  (root /opt/relocated-1793337151))
+[clean-room:full] PASS relocated_selftest (exit=0  (root /opt/relocated-1793338323))
 [clean-room:full] == leftovers: no verible/slang process, no zombie ==
 [clean-room:full] PASS no zombie process
 [clean-room:full] PASS no verible/slang process left behind
 [clean-room:full] == cold start: three window-visible timings ==
-run1_ms=111
-run2_ms=119
-run3_ms=64
+run1_ms=109
+run2_ms=64
+run3_ms=63
 [clean-room:full] == sizes and checksums ==
-# sizes (2026-10-30T05:12:33Z)
-40890922  /art/vedit-0.1.0-linux-x86_64.tar.gz
-40893720  /art/VEdit-0.1.0-x86_64.run
-a1bda356540fbc88c16b20c0cf2372fcd76885e484ad3954c86b498af9f25f89  /art/vedit-0.1.0-linux-x86_64.tar.gz
-299827fe2155f8b54e60a1c5d1c7662bcaddb49e93a7238a38b291e6ff3d71e5  /art/VEdit-0.1.0-x86_64.run
-cold_start=run1_ms=111 run2_ms=119 run3_ms=64 
+# sizes (2026-10-30T05:32:05Z)
+40493353  /art/vedit-0.1.0-linux-x86_64.tar.gz
+40496151  /art/VEdit-0.1.0-x86_64.run
+ddf389733b3bc82d68c4f22d6bc2a09ab87b76aaf2eaa3bfbd10655ded9e6e81  /art/vedit-0.1.0-linux-x86_64.tar.gz
+0ef44b3576905c2ae09547eeaa74a9d5d7f2426e92bce7a999633938fee788ea  /art/VEdit-0.1.0-x86_64.run
+cold_start=run1_ms=109 run2_ms=64 run3_ms=63 
 [clean-room:full] CLEAN-ROOM FULL RESULT: PASS failures=0

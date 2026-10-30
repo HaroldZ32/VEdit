@@ -15,7 +15,7 @@ verible-verilog-format: none
 verible-verilog-lint: none
 verible-verilog-ls: none
 
-## 4) embedded build-tree strings in the app binary (panic locations only)
-count(/vedit-build): 506
-These are Rust source paths inside panic messages; they are not resolved at
-runtime. They are recorded as a known, non-functional bound (see README).
+## 4) embedded build-tree strings in the app binary (panic locations)
+count(/vedit-build): 0
+PASS: the release remap (RELEASE_RUSTFLAGS) removed the build-tree prefix
+count(/vedit/ remapped prefix): 508

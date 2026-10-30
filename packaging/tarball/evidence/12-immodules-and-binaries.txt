@@ -1,5 +1,5 @@
 # bundled binary identities
-2dbc81fa1f9a6b25175f6fadbf53ea6acf149b8d265c32d6d8d61115e3120229  /vedit-build/packaging/tarball/stage/VEdit/bin/vd-app
+41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611  /vedit-build/packaging/tarball/stage/VEdit/bin/vd-app
 63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  /vedit-build/packaging/tarball/stage/VEdit/bin/slang
 07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845  /vedit-build/packaging/tarball/stage/VEdit/bin/verible-verilog-ls
 b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29  /vedit-build/packaging/tarball/stage/VEdit/bin/verible-verilog-lint
