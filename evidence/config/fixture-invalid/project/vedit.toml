@@ -1,0 +1,4 @@
+# Deliberately invalid TOML: the unterminated string must be rejected, and the
+# secret-looking value inside it must never reach a warning or a rendering.
+[fim]
+api_key = "test-broken-secret-555555

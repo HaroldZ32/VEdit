@@ -1,0 +1,16 @@
+# Project-level configuration (T13 evidence fixture).
+[editor]
+tab_width = 8
+
+[verible]
+ls = "tools/verible-verilog-ls"
+
+[project]
+filelists = ["extra.f"]
+defines = ["CHIP=spike"]
+
+[fim]
+enabled = true
+endpoint = "https://config.local/v1"
+model = "config-model"
+api_key = "test-config-secret-123456"

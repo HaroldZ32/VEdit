@@ -1,0 +1,62 @@
+schema_version=1
+
+# config
+editor.highlight_current_line false                          source=default
+editor.insert_spaces     false                          source=user  overridden_by=default  shadowed=[default]
+editor.show_line_numbers true                           source=default
+editor.tab_width         2                              source=user  overridden_by=default  shadowed=[default]
+fim.api_key              <redacted>                     source=env
+fim.enabled              false                          source=default
+fim.endpoint             https://env.local/v1           source=env  overridden_by=default  shadowed=[default]
+fim.model                env-model                      source=env  overridden_by=default  shadowed=[default]
+fim.protocol             open_ai                        source=default
+fim.timeout_ms           5000                           source=default
+keys.deep_lint           Ctrl+Shift+L                   source=default
+keys.fim_accept          Tab                            source=default
+keys.fim_cancel          Esc                            source=default
+keys.fim_manual          Alt+\                          source=default
+keys.find_references     Shift+F12                      source=default
+keys.format              Ctrl+Alt+F                     source=user  overridden_by=default  shadowed=[default]
+keys.goto_definition     F12                            source=default
+keys.symbol_outline      Ctrl+Shift+O                   source=default
+project.defines          [0 item(s)]                    source=default
+project.filelists        [0 item(s)]                    source=default
+project.include_dirs     [0 item(s)]                    source=default
+ui.language              zh-CN                          source=default
+ui.theme                 cobalt                         source=default
+
+# project
+root                     /vedit-build/evidence/config/fixture-invalid/project source=vedit_toml
+search_stop              /vedit-build/evidence/config/fixture-invalid/project
+rules                    <not found>
+rules_search_stop        /
+
+# tools
+verible-verilog-ls       <not found>
+  attempt:verible-verilog-ls source=bundled path=/vedit-build/target/debug/lib/vedit/bin/verible-verilog-ls found=false
+  attempt:verible-verilog-ls source=bundled path=/vedit-build/target/debug/bin/verible-verilog-ls found=false
+  attempt:verible-verilog-ls source=bundled path=/vedit-build/target/debug/examples/verible-verilog-ls found=false
+  error                  verible-verilog-ls was not found (PATH is never consulted); probed 3 location(s):
+    source=bundled path=/vedit-build/target/debug/lib/vedit/bin/verible-verilog-ls found=false
+    source=bundled path=/vedit-build/target/debug/bin/verible-verilog-ls found=false
+    source=bundled path=/vedit-build/target/debug/examples/verible-verilog-ls found=false
+verible-verilog-format   <not found>
+  attempt:verible-verilog-format source=bundled path=/vedit-build/target/debug/lib/vedit/bin/verible-verilog-format found=false
+  attempt:verible-verilog-format source=bundled path=/vedit-build/target/debug/bin/verible-verilog-format found=false
+  attempt:verible-verilog-format source=bundled path=/vedit-build/target/debug/examples/verible-verilog-format found=false
+  error                  verible-verilog-format was not found (PATH is never consulted); probed 3 location(s):
+    source=bundled path=/vedit-build/target/debug/lib/vedit/bin/verible-verilog-format found=false
+    source=bundled path=/vedit-build/target/debug/bin/verible-verilog-format found=false
+    source=bundled path=/vedit-build/target/debug/examples/verible-verilog-format found=false
+verible-verilog-lint     <not found>
+  attempt:verible-verilog-lint source=bundled path=/vedit-build/target/debug/lib/vedit/bin/verible-verilog-lint found=false
+  attempt:verible-verilog-lint source=bundled path=/vedit-build/target/debug/bin/verible-verilog-lint found=false
+  attempt:verible-verilog-lint source=bundled path=/vedit-build/target/debug/examples/verible-verilog-lint found=false
+  error                  verible-verilog-lint was not found (PATH is never consulted); probed 3 location(s):
+    source=bundled path=/vedit-build/target/debug/lib/vedit/bin/verible-verilog-lint found=false
+    source=bundled path=/vedit-build/target/debug/bin/verible-verilog-lint found=false
+    source=bundled path=/vedit-build/target/debug/examples/verible-verilog-lint found=false
+
+# warnings
+warning config.parse_failed file=/vedit-build/evidence/config/fixture-invalid/project/vedit.toml line=4 message=configuration file rejected (invalid TOML syntax); lower layers kept
+warning rules.search_stopped file=/ message=no .rules.verible_lint found from the project root upward; search stopped at /

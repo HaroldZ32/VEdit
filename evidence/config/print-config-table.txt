@@ -1,0 +1,61 @@
+schema_version=1
+
+# config
+editor.highlight_current_line false                          source=default
+editor.insert_spaces     false                          source=user  overridden_by=default  shadowed=[default]
+editor.show_line_numbers true                           source=default
+editor.tab_width         8                              source=project  overridden_by=user  shadowed=[default,user]
+fim.api_key              <redacted>                     source=env  overridden_by=project  shadowed=[project]
+fim.enabled              true                           source=project  overridden_by=default  shadowed=[default]
+fim.endpoint             https://env.local/v1           source=env  overridden_by=project  shadowed=[default,project]
+fim.model                env-model                      source=env  overridden_by=project  shadowed=[default,project]
+fim.protocol             open_ai                        source=default
+fim.timeout_ms           5000                           source=default
+keys.deep_lint           Ctrl+Shift+L                   source=default
+keys.fim_accept          Tab                            source=default
+keys.fim_cancel          Esc                            source=default
+keys.fim_manual          Alt+\                          source=default
+keys.find_references     Shift+F12                      source=default
+keys.format              Ctrl+Alt+F                     source=user  overridden_by=default  shadowed=[default]
+keys.goto_definition     F12                            source=default
+keys.symbol_outline      Ctrl+Shift+O                   source=default
+project.defines          [1 item(s)]                    source=project  overridden_by=default  shadowed=[default]
+project.filelists        [1 item(s)]                    source=project  overridden_by=default  shadowed=[default]
+project.include_dirs     [0 item(s)]                    source=default
+ui.language              zh-CN                          source=default
+ui.theme                 cobalt                         source=default
+verible.ls               /vedit-build/evidence/config/fixture/project/tools/verible-verilog-ls source=project
+
+# project
+root                     /vedit-build/evidence/config/fixture/project source=vedit_toml
+search_stop              /vedit-build/evidence/config/fixture/project
+filelist                 /vedit-build/evidence/config/fixture/project/extra.f  entries=1 include_dirs=0 defines=0
+filelist                 /vedit-build/evidence/config/fixture/project/top.f  entries=1 include_dirs=1 defines=1
+include_dir              /vedit-build/evidence/config/fixture/project/inc
+define                   CHIP=spike
+define                   WIDTH=8
+rules                    /vedit-build/evidence/config/fixture/.rules.verible_lint
+rules_search_stop        /vedit-build/evidence/config/fixture
+
+# tools
+verible-verilog-ls       /vedit-build/evidence/config/fixture/project/tools/verible-verilog-ls source=config
+  attempt:verible-verilog-ls source=config path=/vedit-build/evidence/config/fixture/project/tools/verible-verilog-ls found=true
+verible-verilog-format   <not found>
+  attempt:verible-verilog-format source=bundled path=/vedit-build/target/debug/lib/vedit/bin/verible-verilog-format found=false
+  attempt:verible-verilog-format source=bundled path=/vedit-build/target/debug/bin/verible-verilog-format found=false
+  attempt:verible-verilog-format source=bundled path=/vedit-build/target/debug/examples/verible-verilog-format found=false
+  error                  verible-verilog-format was not found (PATH is never consulted); probed 3 location(s):
+    source=bundled path=/vedit-build/target/debug/lib/vedit/bin/verible-verilog-format found=false
+    source=bundled path=/vedit-build/target/debug/bin/verible-verilog-format found=false
+    source=bundled path=/vedit-build/target/debug/examples/verible-verilog-format found=false
+verible-verilog-lint     <not found>
+  attempt:verible-verilog-lint source=bundled path=/vedit-build/target/debug/lib/vedit/bin/verible-verilog-lint found=false
+  attempt:verible-verilog-lint source=bundled path=/vedit-build/target/debug/bin/verible-verilog-lint found=false
+  attempt:verible-verilog-lint source=bundled path=/vedit-build/target/debug/examples/verible-verilog-lint found=false
+  error                  verible-verilog-lint was not found (PATH is never consulted); probed 3 location(s):
+    source=bundled path=/vedit-build/target/debug/lib/vedit/bin/verible-verilog-lint found=false
+    source=bundled path=/vedit-build/target/debug/bin/verible-verilog-lint found=false
+    source=bundled path=/vedit-build/target/debug/examples/verible-verilog-lint found=false
+
+# warnings
+warning filelist.unknown_token file=/vedit-build/evidence/config/fixture/project line=5 message=unsupported filelist token `+libext+.v+.sv`; skipped

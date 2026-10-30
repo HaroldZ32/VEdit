@@ -1,0 +1,512 @@
+# T13 evidence: resolved configuration for evidence/config/fixture/project
+# command: `cargo run -q -p vd-config --example print-config -- [--json|--debug] <dir>` inside the pinned CentOS 7 image
+# env: HOME=<fixture home>, VEDIT_FIM_ENDPOINT/MODEL/API_KEY set (FIM env overrides)
+
+## input: user config (XDG)
+# User-level configuration (XDG), inherited where the project does not override.
+[editor]
+tab_width = 2
+insert_spaces = false
+
+[keys]
+format = "Ctrl+Alt+F"
+
+## input: project config
+# Project-level configuration (T13 evidence fixture).
+[editor]
+tab_width = 8
+
+[verible]
+ls = "tools/verible-verilog-ls"
+
+[project]
+filelists = ["extra.f"]
+defines = ["CHIP=spike"]
+
+[fim]
+enabled = true
+endpoint = "https://config.local/v1"
+model = "config-model"
+api_key = "test-config-secret-123456"
+
+## input: project filelists
+--- extra.f
+other.sv
+--- top.f
+// top-level filelist of the evidence project
+rtl/top.sv
++incdir+inc
++define+WIDTH=8
++libext+.v+.sv
+
+## resolved table
+schema_version=1
+
+# config
+editor.highlight_current_line false                          source=default
+editor.insert_spaces     false                          source=user  overridden_by=default  shadowed=[default]
+editor.show_line_numbers true                           source=default
+editor.tab_width         8                              source=project  overridden_by=user  shadowed=[default,user]
+fim.api_key              <redacted>                     source=env  overridden_by=project  shadowed=[project]
+fim.enabled              true                           source=project  overridden_by=default  shadowed=[default]
+fim.endpoint             https://env.local/v1           source=env  overridden_by=project  shadowed=[default,project]
+fim.model                env-model                      source=env  overridden_by=project  shadowed=[default,project]
+fim.protocol             open_ai                        source=default
+fim.timeout_ms           5000                           source=default
+keys.deep_lint           Ctrl+Shift+L                   source=default
+keys.fim_accept          Tab                            source=default
+keys.fim_cancel          Esc                            source=default
+keys.fim_manual          Alt+\                          source=default
+keys.find_references     Shift+F12                      source=default
+keys.format              Ctrl+Alt+F                     source=user  overridden_by=default  shadowed=[default]
+keys.goto_definition     F12                            source=default
+keys.symbol_outline      Ctrl+Shift+O                   source=default
+project.defines          [1 item(s)]                    source=project  overridden_by=default  shadowed=[default]
+project.filelists        [1 item(s)]                    source=project  overridden_by=default  shadowed=[default]
+project.include_dirs     [0 item(s)]                    source=default
+ui.language              zh-CN                          source=default
+ui.theme                 cobalt                         source=default
+verible.ls               /vedit-build/evidence/config/fixture/project/tools/verible-verilog-ls source=project
+
+# project
+root                     /vedit-build/evidence/config/fixture/project source=vedit_toml
+search_stop              /vedit-build/evidence/config/fixture/project
+filelist                 /vedit-build/evidence/config/fixture/project/extra.f  entries=1 include_dirs=0 defines=0
+filelist                 /vedit-build/evidence/config/fixture/project/top.f  entries=1 include_dirs=1 defines=1
+include_dir              /vedit-build/evidence/config/fixture/project/inc
+define                   CHIP=spike
+define                   WIDTH=8
+rules                    /vedit-build/evidence/config/fixture/.rules.verible_lint
+rules_search_stop        /vedit-build/evidence/config/fixture
+
+# tools
+verible-verilog-ls       /vedit-build/evidence/config/fixture/project/tools/verible-verilog-ls source=config
+  attempt:verible-verilog-ls source=config path=/vedit-build/evidence/config/fixture/project/tools/verible-verilog-ls found=true
+verible-verilog-format   <not found>
+  attempt:verible-verilog-format source=bundled path=/vedit-build/target/debug/lib/vedit/bin/verible-verilog-format found=false
+  attempt:verible-verilog-format source=bundled path=/vedit-build/target/debug/bin/verible-verilog-format found=false
+  attempt:verible-verilog-format source=bundled path=/vedit-build/target/debug/examples/verible-verilog-format found=false
+  error                  verible-verilog-format was not found (PATH is never consulted); probed 3 location(s):
+    source=bundled path=/vedit-build/target/debug/lib/vedit/bin/verible-verilog-format found=false
+    source=bundled path=/vedit-build/target/debug/bin/verible-verilog-format found=false
+    source=bundled path=/vedit-build/target/debug/examples/verible-verilog-format found=false
+verible-verilog-lint     <not found>
+  attempt:verible-verilog-lint source=bundled path=/vedit-build/target/debug/lib/vedit/bin/verible-verilog-lint found=false
+  attempt:verible-verilog-lint source=bundled path=/vedit-build/target/debug/bin/verible-verilog-lint found=false
+  attempt:verible-verilog-lint source=bundled path=/vedit-build/target/debug/examples/verible-verilog-lint found=false
+  error                  verible-verilog-lint was not found (PATH is never consulted); probed 3 location(s):
+    source=bundled path=/vedit-build/target/debug/lib/vedit/bin/verible-verilog-lint found=false
+    source=bundled path=/vedit-build/target/debug/bin/verible-verilog-lint found=false
+    source=bundled path=/vedit-build/target/debug/examples/verible-verilog-lint found=false
+
+# warnings
+warning filelist.unknown_token file=/vedit-build/evidence/config/fixture/project line=5 message=unsupported filelist token `+libext+.v+.sv`; skipped
+EXIT=0
+
+## resolved json
+{
+  "config": {
+    "editor": {
+      "highlight_current_line": false,
+      "insert_spaces": false,
+      "show_line_numbers": true,
+      "tab_width": 8
+    },
+    "fim": {
+      "api_key": "<redacted>",
+      "enabled": true,
+      "endpoint": "https://env.local/v1",
+      "model": "env-model",
+      "protocol": "open_ai",
+      "timeout_ms": 5000
+    },
+    "keys": {
+      "format": "Ctrl+Alt+F"
+    },
+    "project": {
+      "defines": [
+        "CHIP=spike"
+      ],
+      "filelists": [
+        "extra.f"
+      ],
+      "include_dirs": []
+    },
+    "ui": {
+      "language": "zh-CN",
+      "theme": "cobalt"
+    },
+    "verible": {
+      "ls": "/vedit-build/evidence/config/fixture/project/tools/verible-verilog-ls"
+    }
+  },
+  "entries": [
+    {
+      "key": "editor.highlight_current_line",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "bool",
+        "value": false
+      }
+    },
+    {
+      "key": "editor.insert_spaces",
+      "overridden_by": "default",
+      "shadowed": [
+        "default"
+      ],
+      "source": "user",
+      "value": {
+        "kind": "bool",
+        "value": false
+      }
+    },
+    {
+      "key": "editor.show_line_numbers",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "bool",
+        "value": true
+      }
+    },
+    {
+      "key": "editor.tab_width",
+      "overridden_by": "user",
+      "shadowed": [
+        "default",
+        "user"
+      ],
+      "source": "project",
+      "value": {
+        "kind": "number",
+        "value": 8
+      }
+    },
+    {
+      "key": "fim.api_key",
+      "overridden_by": "project",
+      "shadowed": [
+        "project"
+      ],
+      "source": "env",
+      "value": {
+        "kind": "redacted",
+        "set": true
+      }
+    },
+    {
+      "key": "fim.enabled",
+      "overridden_by": "default",
+      "shadowed": [
+        "default"
+      ],
+      "source": "project",
+      "value": {
+        "kind": "bool",
+        "value": true
+      }
+    },
+    {
+      "key": "fim.endpoint",
+      "overridden_by": "project",
+      "shadowed": [
+        "default",
+        "project"
+      ],
+      "source": "env",
+      "value": {
+        "kind": "text",
+        "text": "https://env.local/v1"
+      }
+    },
+    {
+      "key": "fim.model",
+      "overridden_by": "project",
+      "shadowed": [
+        "default",
+        "project"
+      ],
+      "source": "env",
+      "value": {
+        "kind": "text",
+        "text": "env-model"
+      }
+    },
+    {
+      "key": "fim.protocol",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "open_ai"
+      }
+    },
+    {
+      "key": "fim.timeout_ms",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "number",
+        "value": 5000
+      }
+    },
+    {
+      "key": "keys.deep_lint",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "Ctrl+Shift+L"
+      }
+    },
+    {
+      "key": "keys.fim_accept",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "Tab"
+      }
+    },
+    {
+      "key": "keys.fim_cancel",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "Esc"
+      }
+    },
+    {
+      "key": "keys.fim_manual",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "Alt+\\"
+      }
+    },
+    {
+      "key": "keys.find_references",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "Shift+F12"
+      }
+    },
+    {
+      "key": "keys.format",
+      "overridden_by": "default",
+      "shadowed": [
+        "default"
+      ],
+      "source": "user",
+      "value": {
+        "kind": "text",
+        "text": "Ctrl+Alt+F"
+      }
+    },
+    {
+      "key": "keys.goto_definition",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "F12"
+      }
+    },
+    {
+      "key": "keys.symbol_outline",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "Ctrl+Shift+O"
+      }
+    },
+    {
+      "key": "project.defines",
+      "overridden_by": "default",
+      "shadowed": [
+        "default"
+      ],
+      "source": "project",
+      "value": {
+        "kind": "list",
+        "len": 1
+      }
+    },
+    {
+      "key": "project.filelists",
+      "overridden_by": "default",
+      "shadowed": [
+        "default"
+      ],
+      "source": "project",
+      "value": {
+        "kind": "list",
+        "len": 1
+      }
+    },
+    {
+      "key": "project.include_dirs",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "list",
+        "len": 0
+      }
+    },
+    {
+      "key": "ui.language",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "zh-CN"
+      }
+    },
+    {
+      "key": "ui.theme",
+      "shadowed": [],
+      "source": "default",
+      "value": {
+        "kind": "text",
+        "text": "cobalt"
+      }
+    },
+    {
+      "key": "verible.ls",
+      "shadowed": [],
+      "source": "project",
+      "value": {
+        "kind": "text",
+        "text": "/vedit-build/evidence/config/fixture/project/tools/verible-verilog-ls"
+      }
+    }
+  ],
+  "project": {
+    "defines": [
+      {
+        "name": "CHIP",
+        "value": "spike"
+      },
+      {
+        "name": "WIDTH",
+        "value": "8"
+      }
+    ],
+    "filelists": [
+      {
+        "defines": [],
+        "entries": [
+          "/vedit-build/evidence/config/fixture/project/other.sv"
+        ],
+        "include_dirs": [],
+        "path": "/vedit-build/evidence/config/fixture/project/extra.f"
+      },
+      {
+        "defines": [
+          {
+            "name": "WIDTH",
+            "value": "8"
+          }
+        ],
+        "entries": [
+          "/vedit-build/evidence/config/fixture/project/rtl/top.sv"
+        ],
+        "include_dirs": [
+          "/vedit-build/evidence/config/fixture/project/inc"
+        ],
+        "path": "/vedit-build/evidence/config/fixture/project/top.f"
+      }
+    ],
+    "include_dirs": [
+      "/vedit-build/evidence/config/fixture/project/inc"
+    ],
+    "root": "/vedit-build/evidence/config/fixture/project",
+    "root_source": "vedit_toml",
+    "rules_path": "/vedit-build/evidence/config/fixture/.rules.verible_lint",
+    "rules_search_stop": "/vedit-build/evidence/config/fixture",
+    "search_stop": "/vedit-build/evidence/config/fixture/project"
+  },
+  "schema_version": 1,
+  "sources": [
+    "default",
+    "user",
+    "project",
+    "env"
+  ],
+  "tools": {
+    "format": {
+      "attempts": [
+        {
+          "found": false,
+          "path": "/vedit-build/target/debug/lib/vedit/bin/verible-verilog-format",
+          "source": "bundled"
+        },
+        {
+          "found": false,
+          "path": "/vedit-build/target/debug/bin/verible-verilog-format",
+          "source": "bundled"
+        },
+        {
+          "found": false,
+          "path": "/vedit-build/target/debug/examples/verible-verilog-format",
+          "source": "bundled"
+        }
+      ],
+      "error": "verible-verilog-format was not found (PATH is never consulted); probed 3 location(s):\n  source=bundled path=/vedit-build/target/debug/lib/vedit/bin/verible-verilog-format found=false\n  source=bundled path=/vedit-build/target/debug/bin/verible-verilog-format found=false\n  source=bundled path=/vedit-build/target/debug/examples/verible-verilog-format found=false",
+      "tool": "format"
+    },
+    "lint": {
+      "attempts": [
+        {
+          "found": false,
+          "path": "/vedit-build/target/debug/lib/vedit/bin/verible-verilog-lint",
+          "source": "bundled"
+        },
+        {
+          "found": false,
+          "path": "/vedit-build/target/debug/bin/verible-verilog-lint",
+          "source": "bundled"
+        },
+        {
+          "found": false,
+          "path": "/vedit-build/target/debug/examples/verible-verilog-lint",
+          "source": "bundled"
+        }
+      ],
+      "error": "verible-verilog-lint was not found (PATH is never consulted); probed 3 location(s):\n  source=bundled path=/vedit-build/target/debug/lib/vedit/bin/verible-verilog-lint found=false\n  source=bundled path=/vedit-build/target/debug/bin/verible-verilog-lint found=false\n  source=bundled path=/vedit-build/target/debug/examples/verible-verilog-lint found=false",
+      "tool": "lint"
+    },
+    "ls": {
+      "attempts": [
+        {
+          "found": true,
+          "path": "/vedit-build/evidence/config/fixture/project/tools/verible-verilog-ls",
+          "source": "config"
+        }
+      ],
+      "path": "/vedit-build/evidence/config/fixture/project/tools/verible-verilog-ls",
+      "source": "config",
+      "tool": "ls"
+    }
+  },
+  "warnings": [
+    {
+      "code": "filelist.unknown_token",
+      "file": "/vedit-build/evidence/config/fixture/project",
+      "line": 5,
+      "message": "unsupported filelist token `+libext+.v+.sv`; skipped"
+    }
+  ]
+}
+EXIT=0
+
+## Debug rendering (secrets must be redacted)
+Loaded { config: Config { ui: UiConfig { language: "zh-CN", theme: "cobalt" }, editor: EditorConfig { tab_width: 8, insert_spaces: false, show_line_numbers: true, highlight_current_line: false }, keys: KeysConfig({"format": "Ctrl+Alt+F"}), verible: VeribleConfig { ls: Some("/vedit-build/evidence/config/fixture/project/tools/verible-verilog-ls"), format: None, lint: None }, project: ProjectSettings { filelists: ["extra.f"], include_dirs: [], defines: ["CHIP=spike"] }, fim: FimConfig { enabled: true, protocol: OpenAi, endpoint: "https://env.local/v1", model: "env-model", timeout_ms: 5000, api_key: Some(ApiKey(<redacted>)) } }, project: ProjectContext { root: "/vedit-build/evidence/config/fixture/project", root_source: VeditToml, search_stop: "/vedit-build/evidence/config/fixture/project", filelists: [Filelist { path: "/vedit-build/evidence/config/fixture/project/extra.f", entries: ["/vedit-build/evidence/config/fixture/project/other.sv"], include_dirs: [], defines: [] }, Filelist { path: "/vedit-build/evidence/config/fixture/project/top.f", entries: ["/vedit-build/evidence/config/fixture/project/rtl/top.sv"], include_dirs: ["/vedit-build/evidence/config/fixture/project/inc"], defines: [Define { name: "WIDTH", value: Some("8") }] }], include_dirs: ["/vedit-build/evidence/config/fixture/project/inc"], defines: [Define { name: "CHIP", value: Some("spike") }, Define { name: "WIDTH", value: Some("8") }], rules_path: Some("/vedit-build/evidence/config/fixture/.rules.verible_lint"), rules_search_stop: "/vedit-build/evidence/config/fixture" }, entries: [Entry { key: "editor.highlight_current_line", value: Bool { value: false }, source: Default, overridden_by: None, shadowed: [] }, Entry { key: "editor.insert_spaces", value: Bool { value: false }, source: User, overridden_by: Some(Default), shadowed: [Default] }, Entry { key: "editor.show_line_numbers", value: Bool { value: true }, source: Default, overridden_by: None, shadowed: [] }, Entry { key: "editor.tab_width", value: Number { value: 8 }, source: Project, overridden_by: Some(User), shadowed: [Default, User] }, Entry { key: "fim.api_key", value: Redacted { set: true }, source: Env, overridden_by: Some(Project), shadowed: [Project] }, Entry { key: "fim.enabled", value: Bool { value: true }, source: Project, overridden_by: Some(Default), shadowed: [Default] }, Entry { key: "fim.endpoint", value: Text { text: "https://env.local/v1" }, source: Env, overridden_by: Some(Project), shadowed: [Default, Project] }, Entry { key: "fim.model", value: Text { text: "env-model" }, source: Env, overridden_by: Some(Project), shadowed: [Default, Project] }, Entry { key: "fim.protocol", value: Text { text: "open_ai" }, source: Default, overridden_by: None, shadowed: [] }, Entry { key: "fim.timeout_ms", value: Number { value: 5000 }, source: Default, overridden_by: None, shadowed: [] }, Entry { key: "keys.deep_lint", value: Text { text: "Ctrl+Shift+L" }, source: Default, overridden_by: None, shadowed: [] }, Entry { key: "keys.fim_accept", value: Text { text: "Tab" }, source: Default, overridden_by: None, shadowed: [] }, Entry { key: "keys.fim_cancel", value: Text { text: "Esc" }, source: Default, overridden_by: None, shadowed: [] }, Entry { key: "keys.fim_manual", value: Text { text: "Alt+\\" }, source: Default, overridden_by: None, shadowed: [] }, Entry { key: "keys.find_references", value: Text { text: "Shift+F12" }, source: Default, overridden_by: None, shadowed: [] }, Entry { key: "keys.format", value: Text { text: "Ctrl+Alt+F" }, source: User, overridden_by: Some(Default), shadowed: [Default] }, Entry { key: "keys.goto_definition", value: Text { text: "F12" }, source: Default, overridden_by: None, shadowed: [] }, Entry { key: "keys.symbol_outline", value: Text { text: "Ctrl+Shift+O" }, source: Default, overridden_by: None, shadowed: [] }, Entry { key: "project.defines", value: List { len: 1 }, source: Project, overridden_by: Some(Default), shadowed: [Default] }, Entry { key: "project.filelists", value: List { len: 1 }, source: Project, overridden_by: Some(Default), shadowed: [Default] }, Entry { key: "project.include_dirs", value: List { len: 0 }, source: Default, overridden_by: None, shadowed: [] }, Entry { key: "ui.language", value: Text { text: "zh-CN" }, source: Default, overridden_by: None, shadowed: [] }, Entry { key: "ui.theme", value: Text { text: "cobalt" }, source: Default, overridden_by: None, shadowed: [] }, Entry { key: "verible.ls", value: Text { text: "/vedit-build/evidence/config/fixture/project/tools/verible-verilog-ls" }, source: Project, overridden_by: None, shadowed: [] }], warnings: [Warning { code: FilelistUnknownToken, file: Some("/vedit-build/evidence/config/fixture/project"), line: Some(5), message: "unsupported filelist token `+libext+.v+.sv`; skipped" }], tools: ToolsResolution { ls: ResolvedTool { tool: Ls, path: Some("/vedit-build/evidence/config/fixture/project/tools/verible-verilog-ls"), source: Some(Config), attempts: [Attempt { source: Config, path: "/vedit-build/evidence/config/fixture/project/tools/verible-verilog-ls", found: true }], error: None }, format: ResolvedTool { tool: Format, path: None, source: None, attempts: [Attempt { source: Bundled, path: "/vedit-build/target/debug/lib/vedit/bin/verible-verilog-format", found: false }, Attempt { source: Bundled, path: "/vedit-build/target/debug/bin/verible-verilog-format", found: false }, Attempt { source: Bundled, path: "/vedit-build/target/debug/examples/verible-verilog-format", found: false }], error: Some("verible-verilog-format was not found (PATH is never consulted); probed 3 location(s):\n  source=bundled path=/vedit-build/target/debug/lib/vedit/bin/verible-verilog-format found=false\n  source=bundled path=/vedit-build/target/debug/bin/verible-verilog-format found=false\n  source=bundled path=/vedit-build/target/debug/examples/verible-verilog-format found=false") }, lint: ResolvedTool { tool: Lint, path: None, source: None, attempts: [Attempt { source: Bundled, path: "/vedit-build/target/debug/lib/vedit/bin/verible-verilog-lint", found: false }, Attempt { source: Bundled, path: "/vedit-build/target/debug/bin/verible-verilog-lint", found: false }, Attempt { source: Bundled, path: "/vedit-build/target/debug/examples/verible-verilog-lint", found: false }], error: Some("verible-verilog-lint was not found (PATH is never consulted); probed 3 location(s):\n  source=bundled path=/vedit-build/target/debug/lib/vedit/bin/verible-verilog-lint found=false\n  source=bundled path=/vedit-build/target/debug/bin/verible-verilog-lint found=false\n  source=bundled path=/vedit-build/target/debug/examples/verible-verilog-lint found=false") } } }
+EXIT=0

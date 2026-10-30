@@ -1,0 +1,7 @@
+# User-level configuration (XDG), inherited where the project does not override.
+[editor]
+tab_width = 2
+insert_spaces = false
+
+[keys]
+format = "Ctrl+Alt+F"
