@@ -1,0 +1,10 @@
+# modules in the payload
+total 72
+-rwxr-xr-x 1 root root 33416 Sep 12  2023 im-ibus.so
+-rwxr-xr-x 1 root root 33000 Apr  5  2022 im-xim.so
+b550938d5f264674738965d5d19efdc26ce9ea94fc8c4f4e3c111f1e1ca6c5af  /tmp/appimg/squashfs-root/usr/lib/gtk-3.0/3.0.0/immodules/im-ibus.so
+0b328924152726c0685e04e06482b4bc55e6799f64a44b8a493081c6775dc24e  /tmp/appimg/squashfs-root/usr/lib/gtk-3.0/3.0.0/immodules/im-xim.so
+
+# effective GTK_IM_MODULE_FILE (from AppRun xtrace)
++ export GTK_IM_MODULE_FILE=/tmp/vedit-runtime/immodules.cache
++ GTK_IM_MODULE_FILE=/tmp/vedit-runtime/immodules.cache

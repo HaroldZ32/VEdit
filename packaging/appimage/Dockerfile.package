@@ -1,0 +1,20 @@
+# Packaging environment for T23: the pinned CentOS 7 build image plus the GTK
+# input-method modules the AppImage must carry (AC-16). Everything else
+# (Rust toolchain, GtkSourceView 4.6.1, GTK3 runtime) comes from the pinned
+# build image owned by the skeleton task.
+ARG BUILD_IMAGE=vedit-build:local
+FROM ${BUILD_IMAGE}
+
+ARG CENTOS_VAULT_BASE
+RUN rm -f /etc/yum.repos.d/CentOS-*.repo \
+ && printf '[base]\nname=CentOS-7.9.2009-Base\nbaseurl=%s/os/x86_64/\ngpgcheck=0\n[updates]\nname=CentOS-7.9.2009-Updates\nbaseurl=%s/updates/x86_64/\ngpgcheck=0\n' \
+      "$CENTOS_VAULT_BASE" "$CENTOS_VAULT_BASE" > /etc/yum.repos.d/packaging.repo \
+ && yum -y install gtk3-immodule-xim ibus-gtk3 wqy-zenhei-fonts file \
+ && yum clean all
+
+# Negative assertion: the packaging image is allowed to have GTK, but the
+# AppImage payload must be assembled from explicit inputs, not from a GUI app.
+RUN rpm -q gtk3-immodule-xim ibus-gtk3 wqy-zenhei-fonts \
+ && ls -l /usr/lib64/gtk-3.0/3.0.0/immodules/im-xim.so \
+           /usr/lib64/gtk-3.0/3.0.0/immodules/im-ibus.so \
+           /usr/share/fonts/wqy-zenhei/wqy-zenhei.ttc

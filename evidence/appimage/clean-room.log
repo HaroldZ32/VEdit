@@ -1,0 +1,55 @@
+[clean-room] host: CentOS Linux release 7.9.2009 (Core)
+[clean-room] glibc: glibc-2.17-317.el7.x86_64
+[clean-room] PASS: no system gtk3/gsv package installed (negative assertion)
+[clean-room] host CJK fonts available before the payload runs: 0
+[clean-room] PASS: clean room has no CJK font (negative assertion)
+[clean-room] test harness: wrote a 32-hex /etc/machine-id (real CentOS 7 has one)
+[clean-room] PASS: Xvfb :99 up
+[clean-room] appimage=/art/VEdit-0.1.0-x86_64.AppImage
+[clean-room] AppImage --appimage-extract-and-run --selftest all exit=0
+      "checks": [
+      "suite": "smoke"
+      "checks": [
+      "suite": "highlight"
+      "checks": [
+      "suite": "config"
+      "checks": [
+      "suite": "lsp"
+      "checks": [
+      "suite": "slang"
+      "checks": [
+      "suite": "fim"
+  "suite": "all",
+[clean-room] selftest all: 51 checks, 0 failed
+[clean-room] app --screenshot (highlight) exit=0 bytes=5270
+[clean-room] CJK window capture: largest window PNG bytes=22033
+[clean-room] PASS: rendered window captured to screenshots/cjk-window.png (22033 bytes)
+[clean-room] APPIMAGE_EXTRACT_AND_RUN=1 --selftest smoke exit=0
+[clean-room] AppImage direct exec exit=127 (expected 127 without /dev/fuse)
+for more information
+open dir error: No such file or directory
+run=1 exec_to_window_ms=194
+run=2 exec_to_window_ms=194
+run=3 exec_to_window_ms=193
+[clean-room] effective GTK_IM_MODULE_FILE=/tmp/vedit-runtime/immodules.cache
+[clean-room] PASS: immodules cache has im-xim and im-ibus with payload paths
+[clean-room] GTK_IM_MODULE=xim selftest smoke exit=0
+[clean-room] PASS: fontconfig resolves the bundled wqy-zenhei CJK font
+[clean-room] PASS: every dependency of vd-app resolves inside the payload
+[clean-room] deps resolved from payload: 67; from host glibc family: 8
+[clean-room] PASS: no verible/slang process or zombie left behind
+AppImage_bytes=48105976
+extracted_payload_bytes=119281789
+run=1 exec_to_window_ms=165
+run=2 exec_to_window_ms=171
+run=3 exec_to_window_ms=175
+run=1 exec_to_window_ms=168
+run=2 exec_to_window_ms=1
+run=3 exec_to_window_ms=2
+run=1 exec_to_window_ms=175
+run=2 exec_to_window_ms=173
+run=3 exec_to_window_ms=173
+run=1 exec_to_window_ms=194
+run=2 exec_to_window_ms=194
+run=3 exec_to_window_ms=193
+[clean-room] RESULT=PASS

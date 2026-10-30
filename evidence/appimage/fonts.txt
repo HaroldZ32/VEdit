@@ -1,0 +1,27 @@
+# fonts bundled in the payload (no host font is required)
+wqy-zenhei-fonts-0.9.46-11.el7.noarch
+dejavu-sans-fonts-2.33-6.el7.noarch
+dejavu-sans-mono-fonts-2.33-6.el7.noarch
+
+# CJK font licence (recorded for THIRD_PARTY_NOTICES)
+wqy-zenhei-fonts 0.9.46 | licence=GPLv2 with exceptions | url=http://wenq.org/enindex.cgi
+
+/vedit-build/packaging/appimage/AppDir/usr/share/fonts/dejavu:
+total 6396
+-rw-r--r-- 1 root root 672300 Feb 27  2011 DejaVuSans-Bold.ttf
+-rw-r--r-- 1 root root 611212 Feb 27  2011 DejaVuSans-BoldOblique.ttf
+-rw-r--r-- 1 root root 345204 Feb 27  2011 DejaVuSans-ExtraLight.ttf
+-rw-r--r-- 1 root root 611556 Feb 27  2011 DejaVuSans-Oblique.ttf
+-rw-r--r-- 1 root root 720012 Feb 27  2011 DejaVuSans.ttf
+-rw-r--r-- 1 root root 631992 Feb 27  2011 DejaVuSansCondensed-Bold.ttf
+-rw-r--r-- 1 root root 580168 Feb 27  2011 DejaVuSansCondensed-BoldOblique.ttf
+-rw-r--r-- 1 root root 576004 Feb 27  2011 DejaVuSansCondensed-Oblique.ttf
+-rw-r--r-- 1 root root 643852 Feb 27  2011 DejaVuSansCondensed.ttf
+-rw-r--r-- 1 root root 313856 Feb 27  2011 DejaVuSansMono-Bold.ttf
+-rw-r--r-- 1 root root 235848 Feb 27  2011 DejaVuSansMono-BoldOblique.ttf
+-rw-r--r-- 1 root root 241968 Feb 27  2011 DejaVuSansMono-Oblique.ttf
+-rw-r--r-- 1 root root 333632 Feb 27  2011 DejaVuSansMono.ttf
+
+/vedit-build/packaging/appimage/AppDir/usr/share/fonts/wqy-zenhei:
+total 16684
+-rw-r--r-- 1 root root 17083583 May  2  2011 wqy-zenhei.ttc

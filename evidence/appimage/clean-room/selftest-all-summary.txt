@@ -1,0 +1,23 @@
+suite_headers=7
+checks=51
+failed_checks=0
+          "ok": true
+          "ok": true
+      "ok": true,
+      "suite": "lsp"
+          "ok": true
+          "ok": true
+          "ok": true
+          "ok": true
+          "ok": true
+          "ok": true
+      "ok": true,
+      "suite": "slang"
+          "ok": true
+          "ok": true
+          "ok": true
+          "ok": true
+          "ok": true
+      "ok": true,
+      "suite": "fim"
+  "suite": "all",

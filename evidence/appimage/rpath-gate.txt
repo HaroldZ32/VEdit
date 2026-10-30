@@ -1,0 +1,9 @@
+# RUNPATH/RPATH gate — 2026-10-30T04:56:06Z
+# appdir: /vedit-build/packaging/appimage/AppDir
+# allowlist: /vedit-build/packaging/appimage/rpath-allowlist.txt
+ALLOWED	/usr/lib64/elfutils	usr/lib/libdw.so.1
+ELF_SCANNED=95
+ELF_WITH_RUNPATH=1
+ALLOWLIST_HITS=1
+UNKNOWN=0
+RESULT=PASS

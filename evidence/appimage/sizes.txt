@@ -1,0 +1,5 @@
+AppImage_bytes=48105976
+extracted_payload_bytes=119281789
+run=1 exec_to_window_ms=198
+run=2 exec_to_window_ms=194
+run=3 exec_to_window_ms=197

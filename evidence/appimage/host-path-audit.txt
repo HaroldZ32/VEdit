@@ -1,0 +1,10 @@
+# build-tree path leakage audit
+# 1) main binary strings:
+/vedit-build/crates/vd-apptests/fixturesthe GTK window did not startsystemverilogsmoke-saved.svshiftprimaryunicode_highlight.svcalled `Result::unwrap()` on an `Err` valueformat_me.svundeclared.svmodule clean;
+# 2) launcher/config templates (expect @APPDIR@ placeholders only):
+none
+# 3) @APPDIR@ placeholder counts:
+loaders.cache.in: 14
+immodules.cache.in: 2
+# 4) RPATH/RUNPATH on the main binary:
+none

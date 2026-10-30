@@ -1,0 +1,15 @@
+# RUNPATH/RPATH allowlist for the VEdit AppImage payload (T23).
+#
+# One absolute runpath per line; every entry MUST carry its justification, so a
+# new exception is a one-line diff a reviewer can see. The check-rpaths.sh gate
+# scans every ELF in the AppDir and fails on any runpath that is not listed
+# here; it also prints ELF_SCANNED / ELF_WITH_RUNPATH / ALLOWLIST_HITS / UNKNOWN
+# so the totals are auditable, not just the verdict.
+#
+# Known absolute paths (decided: do not neutralise, list and assert):
+/usr/lib64/elfutils
+# ^ CentOS 7 elfutils installs libdw.so.1 with RUNPATH=/usr/lib64/elfutils. The
+#   ebl backends under that directory are loaded lazily by dwfl only; the editor
+#   (GTK3 + GtkSourceView + verible + slang) never creates a dwfl session, and
+#   the dynamic loader searches RUNPATH after LD_LIBRARY_PATH, so the bundled
+#   libdw is the one that loads. Not patched; recorded as a known absolute path.

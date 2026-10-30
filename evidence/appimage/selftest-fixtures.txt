@@ -1,0 +1,2 @@
+/vedit-build/packaging/appimage/AppDir/usr/share/vedit/testdata/definition/a.sv
+/vedit-build/packaging/appimage/AppDir/usr/share/vedit/testdata/definition/b.sv

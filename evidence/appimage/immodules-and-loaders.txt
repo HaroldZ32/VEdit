@@ -1,0 +1,35 @@
+# gdk-pixbuf loaders
+libpixbufloader-ani.so
+libpixbufloader-bmp.so
+libpixbufloader-gif.so
+libpixbufloader-icns.so
+libpixbufloader-ico.so
+libpixbufloader-jasper.so
+libpixbufloader-jpeg.so
+libpixbufloader-pnm.so
+libpixbufloader-qtif.so
+libpixbufloader-svg.so
+libpixbufloader-tga.so
+libpixbufloader-tiff.so
+libpixbufloader-xbm.so
+libpixbufloader-xpm.so
+
+# GTK input-method modules (AC-16)
+total 72
+-rwxr-xr-x 1 root root 33416 Sep 12  2023 im-ibus.so
+-rwxr-xr-x 1 root root 33000 Apr  5  2022 im-xim.so
+b550938d5f264674738965d5d19efdc26ce9ea94fc8c4f4e3c111f1e1ca6c5af  /vedit-build/packaging/appimage/AppDir/usr/lib/gtk-3.0/3.0.0/immodules/im-ibus.so
+0b328924152726c0685e04e06482b4bc55e6799f64a44b8a493081c6775dc24e  /vedit-build/packaging/appimage/AppDir/usr/lib/gtk-3.0/3.0.0/immodules/im-xim.so
+
+# gtk-query-immodules-3.0-64 output (before @APPDIR@ substitution)
+# GTK+ Input Method Modules file
+# Automatically generated file, do not edit
+# Created by gtk-query-immodules-3.0-64 from gtk+-3.22.30
+#
+"@APPDIR@/usr/lib/gtk-3.0/3.0.0/immodules/im-ibus.so" 
+"ibus" "IBus (Intelligent Input Bus)" "ibus" "" "ja:ko:zh:*" 
+
+"@APPDIR@/usr/lib/gtk-3.0/3.0.0/immodules/im-xim.so" 
+"xim" "X Input Method" "gtk30" "/usr/share/locale" "ko:ja:th:zh" 
+
+

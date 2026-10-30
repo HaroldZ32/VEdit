@@ -1,0 +1,2 @@
+$ cargo build --release -p vd-app --manifest-path /vedit-build/Cargo.toml
+EXIT=0

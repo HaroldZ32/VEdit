@@ -1,0 +1,5 @@
+$ ps -eo pid,ppid,stat,comm | grep -Ei 'verible|slang' || echo none
+none
+
+$ ps -eo stat,comm | awk '$1 ~ /^Z/ {print}' | grep -Ei 'verible|slang|vd-app' || echo 'no zombie'
+no zombie

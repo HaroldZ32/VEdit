@@ -1,0 +1,33 @@
+  #!/bin/sh
+  # Relocatable launcher for VEdit (tested on CentOS 7, glibc 2.17).
+  # The payload is self-contained: GTK3, GtkSourceView 4, gdk-pixbuf loaders,
+  # input-method modules, GSettings schemas, fonts, icons, verible and slang all
+  # resolve inside $HERE. No host path is exported.
+  set -e
+  HERE=$(dirname "$(readlink -f "$0")")
+  RUNTIME="${TMPDIR:-/tmp}/vedit-runtime"
+  mkdir -p "$RUNTIME"
+  sed "s|@APPDIR@|$HERE|g" "$HERE/etc/loaders.cache.in" > "$RUNTIME/loaders.cache"
+  sed "s|@APPDIR@|$HERE|g" "$HERE/etc/immodules.cache.in" > "$RUNTIME/immodules.cache"
+  sed "s|@APPDIR@|$HERE|g" "$HERE/etc/fonts.conf.in" > "$RUNTIME/fonts.conf"
+  # libdbus aborts when /etc/machine-id is empty (bare containers). The AT-SPI
+  # bridge is not bundled, so disable it only in that degenerate environment.
+  mid=$(cat /etc/machine-id 2>/dev/null || true)
+  if [ "${#mid}" -ne 32 ] && [ -z "${NO_AT_BRIDGE:-}" ]; then
+    export NO_AT_BRIDGE=1
+    echo "vedit: /etc/machine-id is not a 32-hex id; disabling the AT-SPI bridge." >&2
+  fi
+  export LD_LIBRARY_PATH="$HERE/usr/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+  export GDK_PIXBUF_MODULE_FILE="$RUNTIME/loaders.cache"
+  export GTK_IM_MODULE_FILE="$RUNTIME/immodules.cache"
+  export GSETTINGS_SCHEMA_DIR="$HERE/usr/share/glib-2.0/schemas"
+  export GTK_DATA_PREFIX="$HERE/usr"
+  export GTK_EXE_PREFIX="$HERE/usr"
+  export GTK_PATH="$HERE/usr/lib/gtk-3.0"
+  export FONTCONFIG_FILE="$RUNTIME/fonts.conf"
+  export FONTCONFIG_PATH="$HERE/etc"
+  export XDG_DATA_DIRS="$HERE/usr/share${XDG_DATA_DIRS:+:$XDG_DATA_DIRS}"
+  export VEDIT_GSV_DATADIR="$HERE/usr/share/gtksourceview-4"
+  export VEDIT_SLANG="${VEDIT_SLANG:-$HERE/usr/lib/vedit/bin/slang}"
+  export VEDIT_SELFTEST_FIXTURES="${VEDIT_SELFTEST_FIXTURES:-$HERE/usr/share/vedit/testdata}"
+  exec "$HERE/usr/bin/vd-app" "$@"

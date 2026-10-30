@@ -1,0 +1,15 @@
+# Clean-room acceptance image for T23.
+# Contains ONLY CentOS 7.9.2009 + test-side Xvfb/GLX info tooling. No GTK, no
+# GtkSourceView, no verible, no slang, no rust, no python — the payload must
+# bring everything it needs.
+FROM docker.m.daocloud.io/library/centos:7
+
+ARG CENTOS_VAULT_BASE=https://mirrors.tuna.tsinghua.edu.cn/centos-vault/7.9.2009
+RUN rm -f /etc/yum.repos.d/CentOS-*.repo \
+ && printf '[base]\nname=CentOS-7.9.2009-Base\nbaseurl=%s/os/x86_64/\ngpgcheck=0\n[updates]\nname=CentOS-7.9.2009-Updates\nbaseurl=%s/updates/x86_64/\ngpgcheck=0\n' \
+      "$CENTOS_VAULT_BASE" "$CENTOS_VAULT_BASE" > /etc/yum.repos.d/test.repo \
+ && yum -y install xorg-x11-server-Xvfb xorg-x11-utils xorg-x11-apps netpbm netpbm-progs glx-utils mesa-libGL fontconfig \
+ && yum clean all
+
+# The clean room must not provide the GUI stack the payload is supposed to ship.
+RUN ! rpm -q gtk3 gtksourceview3 gtksourceview4 && echo "clean-room: no gtk/gsv packages present"

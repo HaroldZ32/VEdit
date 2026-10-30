@@ -1,0 +1,9 @@
+GTK_IM_MODULE_FILE=/tmp/vedit-runtime/immodules.cache
+
+# expanded cache entries (paths must be inside the payload)
+"/tmp/appimg/squashfs-root/usr/lib/gtk-3.0/3.0.0/immodules/im-ibus.so" 
+"ibus" "IBus (Intelligent Input Bus)" "ibus" "" "ja:ko:zh:*" 
+
+"/tmp/appimg/squashfs-root/usr/lib/gtk-3.0/3.0.0/immodules/im-xim.so" 
+"xim" "X Input Method" "gtk30" "/usr/share/locale" "ko:ja:th:zh" 
+
