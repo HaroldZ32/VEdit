@@ -160,7 +160,8 @@ timeout_ms = 5000
 - **emoji 字体未捆绑**（体积/许可），中文（CJK）字体已捆绑。
 - **构建机路径**：Rust 会把 panic 位置（源码 `file:line`）编译进二进制。发布构建统一用
   `RELEASE_RUSTFLAGS`（`--remap-path-prefix`，定义在 `scripts/versions.env`）把它们重映射到中性的
-  `/vedit`，打包审计会断言产物里**不出现**构建机路径；这不是运行期会去解析的路径。
+  `/vedit`，打包审计会**统计并分类**产物里残存的构建机路径（目标 0；`--remap-path-prefix` 不保证覆盖所有
+  编译期字面量，若有残留会逐个列出供评审判断，而非静默接受）。
 - CentOS 7 的 `tar 1.26` 无 `--sort=name`，因此**不声称** tar 包的字节级可复现。
 - 非目标：GTK4、Windows/macOS、非 x86_64、VHDL/SystemC、仿真/综合/波形/调试、内置终端、
   Git 集成、语义自动补全、内置 AI 模型、默认 FIM 端点或密钥。

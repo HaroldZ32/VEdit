@@ -175,7 +175,9 @@ and once with `--network none --tmpfs /tmp:noexec`.)
 2. **Build-tree strings in the app binary.** The release build injects
    `RELEASE_RUSTFLAGS` (a shared `--remap-path-prefix` set from `scripts/versions.env`) so the
    panic locations become `/vedit/...` and no `/vedit-build` prefix survives; the packaging audit
-   prints the count and flags a regression (`13-host-path-audit.txt` §4). All products must use
+   counts the surviving strings, lists each distinct value and asks the reviewer to classify it
+   (`13-host-path-audit.txt` §4) — the count is reported, not assumed to be 0, because
+   `--remap-path-prefix` does not always cover compile-time literals such as an `env!()` default. All products must use
    that same flag set, otherwise their `vd-app` binaries differ; this lane consumes it in
    `stage.sh` and fails loudly when the variable is missing.
 3. **Determinism.** `tar` on CentOS 7 is 1.26 and has no `--sort=name`; entries are normalized by

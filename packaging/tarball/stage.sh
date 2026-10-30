@@ -254,14 +254,22 @@ tail -6 "$EVID/11-glibc-rpath.txt"
   done
   echo
   echo "## 4) embedded build-tree strings in the app binary (panic locations)"
+  # --remap-path-prefix rewrites the paths rustc emits; it does not necessarily
+  # rewrite every compile-time literal (e.g. an `env!("CARGO_MANIFEST_DIR")`
+  # default). So the count is REPORTED and classified, not assumed to be 0: a
+  # single surviving literal is acceptable if it is a default value that is never
+  # opened, and it must be named here so a reviewer can judge it.
   build_strings=$(strings "$PKG/bin/vd-app" | grep -c '/vedit-build' || true)
   echo "count(/vedit-build): $build_strings"
   if [ "$build_strings" -eq 0 ]; then
     echo "PASS: the release remap (RELEASE_RUSTFLAGS) removed the build-tree prefix"
   else
-    echo "WARN: $build_strings build-tree strings remain (release remap not applied?)"
+    echo "WARN: $build_strings build-tree strings remain; distinct values:"
+    strings "$PKG/bin/vd-app" | grep '/vedit-build' | sort -u | head -5
+    echo "classify each: a rustc-emitted source path means the remap was not applied;"
+    echo "a compile-time literal default (env!) is inert unless opened at run time."
   fi
-  echo "count(/vedit ) remapped prefix: $(strings "$PKG/bin/vd-app" | grep -c '/vedit/' || true)"
+  echo "count(/vedit/ remapped prefix): $(strings "$PKG/bin/vd-app" | grep -c '/vedit/' || true)"
 } > "$EVID/13-host-path-audit.txt"
 cat "$EVID/13-host-path-audit.txt"
 
