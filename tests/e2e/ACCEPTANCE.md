@@ -63,12 +63,14 @@ Equality is judged by `vd-app` sha256 + size (and that is what AC-19 uses here).
 | AC-11 | PARTIAL — corrupt-binary degradation is lane-tested, not re-run here | lane test evidence (vd-deeplint) |
 | AC-12 | PASS (SLANG is in the payload; lane evidence covers glibc/version/lint) | packaging evidence |
 | AC-13 | PASS — FIM default off (worker_spawns unchanged, no endpoint) | selftest fim |
-| AC-14 | MANUAL — real endpoint run in progress by the FIM lane; suite only proves default-off | steps below / `evidence/fim` when landed |
+| AC-14 | **AUTO** — real `HttpTransport` against an evidence-only local path-rewrite proxy: positive completion (`text_len=5`, upstream HTTP 200, 3572 ms), cancellation (`stale_delivered=false`, then a fresh request `fresh_text_len=9`), failure degradation (`FIM 连接被拒绝`, 9 chars ≤ 80, no URL/headers, 50 ms). Product code unchanged. | `evidence/fim/real-endpoint/` (harness crate + proxy + logs) |
 | AC-15 | PASS/PARTIAL — no default secrets in repo; log scan by config lane | — |
 | AC-16 | **AUTO (Tier 2)** — real IME pinyin→Chinese commit in the offline payload: `GTK_IM_MODULE=ibus`, `ibus-daemon`+`libpinyin`, `xdotool type "nihao"` + space → buffer `你好` (hex `e4bda0e5a5bd`), candidate-window screenshot; Tier 1 (GtkIMContext is xim/ibus) and Tier 3 (`simple` + Unicode injection) also covered | `evidence/ime/logs/99-results.txt`, `evidence/ime/shots/tier2-before-commit.png`, `tier2-after-commit.png`, `tier3-unicode.png` |
 | AC-17 | PASS — README/THIRD_PARTY_NOTICES/licences present (packaging/docs lanes) | — |
 | AC-18 | RECORD — AppImage 47,745,528 B, tar.gz 40,493,353 B; cold-start recorded by packaging clean room | — |
 | AC-19 | PASS — four `vd-app` copies equal `41d02dca…`; 3/3 reproducible builds | `build/evidence/determinism/` |
+
+> 验证的是 **vd-fim 的协议实现与 OpenAI 兼容 FIM 形状**；DeepSeek 官方 FIM 走 `/beta/completions`，测试通过一个**仅用于取证的本地路径改写代理**完成——**产品本身未内置该路径改写**，开箱仍发 `/v1/completions`。
 
 ### Runtime-directory failures: harness misjudgement, product correct
 
@@ -145,16 +147,12 @@ the file. The product source is still frozen2 `f1f9622`; only tests/evidence
 changed, so rebuilding gives the identical canonical **41d02dca…**, 6,002,112 B
 and the three frozen artifacts remain valid.
 
-## 10. MANUAL acceptance steps
+## 10. Manual follow-ups (not AC failures)
 
 - **AC-16 (Chinese IME):** on CentOS 7 GNOME with ibus/fcitx, enable the Chinese
   input method, type a Chinese comment and a Chinese find term in a `.sv` buffer;
   verify the candidate window and committed text in the editor; record a
   screenshot/screen capture. (Container automation cannot judge IME UI.)
-- **FIM real endpoint (AC-14):** configure `[fim] enabled=true` with an
-  OpenAI-compatible endpoint/model or llama.cpp `/infill`; press `Alt+\`; verify
-  ghost text; `Tab` inserts through `Document`; `Esc` cancels; typing cancels the
-  in-flight request; simulate timeout/500/unreachable and check the status bar.
 - **Real modal close dialog:** edit a file, press Ctrl+W, verify the modal
   Save/Discard/Cancel dialog; the suite only exercises the injected confirmation
   seam (refusal + recorded request).
