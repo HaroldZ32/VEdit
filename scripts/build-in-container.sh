@@ -72,6 +72,7 @@ cp "$BIN" "$ARTIFACTS/vd-app"
 } | tee "$EVID/07-artifact-container.txt"
 
 echo "== Xvfb main-window smoke test =="
+export VEDIT_GSV_DATADIR="${VEDIT_GSV_DATADIR:-/opt/gsv4/share/gtksourceview-4}"
 export GDK_BACKEND=x11
 export NO_AT_BRIDGE=1
 Xvfb :99 -screen 0 1280x1024x24 > "$EVID/08-xvfb.log" 2>&1 &
@@ -102,13 +103,17 @@ python3 - "$EVID/09-selftest-smoke.json" <<'PY'
 import json
 import sys
 
-report = json.load(open(sys.argv[1], encoding="utf-8"))
-assert report["result"] == "pass", f"selftest result: {report['result']!r}"
-failed = [check["name"] for check in report["checks"] if not check["ok"]]
+raw = open(sys.argv[1], encoding="utf-8", errors="replace").read()
+# GTK diagnostics may precede the JSON report on stdout; the report is the object
+# from the first "{" to the last "}".
+report = json.loads(raw[raw.find("{"):raw.rfind("}") + 1])
+assert report.get("ok") is True, f"selftest ok: {report.get('ok')!r}"
+checks = [check for suite in report["reports"] for check in suite["checks"]]
+failed = [check["name"] for check in checks if not check["ok"]]
 assert not failed, f"failed checks: {failed}"
 print(
-    "selftest JSON valid: suite=%s result=%s checks=%d"
-    % (report["suite"], report["result"], len(report["checks"]))
+    "selftest JSON valid: suite=%s ok=%s checks=%d"
+    % (report["suite"], report["ok"], len(checks))
 )
 PY
 
@@ -120,6 +125,48 @@ fi
 if [ "$APP_RC" -ne 0 ]; then
   echo "FATAL: --selftest smoke exited $APP_RC" >&2
   sed -n '1,40p' "$EVID/09-selftest-smoke.err" >&2
+  exit 1
+fi
+
+# GApplication registration needs a machine id; the minimal CentOS 7 image
+# leaves /etc/machine-id empty, which makes GLib abort in a bare container.
+if [ ! -s /etc/machine-id ]; then
+  printf "0123456789abcdef0123456789abcdef\n" > /etc/machine-id
+fi
+
+echo "== Xvfb selftest suites (smoke/highlight/config/fim, plus lsp/slang when the binaries are provided) =="
+# GtkSourceView data dir of the pinned image; the app warns (and the highlight
+# suite fails) when it is wrong, which is exactly the AC-05 guard.
+if [ -z "${VEDIT_SLANG:-}" ] && [ -x "$ROOT/build/slang/out/slang" ]; then
+  export VEDIT_SLANG="$ROOT/build/slang/out/slang"
+fi
+if [ -z "${VEDIT_VERIBLE_LS:-}" ]; then
+  VERIBLE_DIR=$(compgen -G "$ROOT/target/verible-pin/extract/verible-*/bin" | head -1 || true)
+  if [ -n "$VERIBLE_DIR" ]; then
+    export VEDIT_VERIBLE_LS="$VERIBLE_DIR/verible-verilog-ls"
+    export VEDIT_VERIBLE_FORMAT="$VERIBLE_DIR/verible-verilog-format"
+    export VEDIT_VERIBLE_LINT="$VERIBLE_DIR/verible-verilog-lint"
+  fi
+fi
+SELFTEST_SUITE="smoke highlight config fim"
+if [ -n "${VEDIT_VERIBLE_LS:-}" ] && [ -n "${VEDIT_SLANG:-}" ]; then
+  SELFTEST_SUITE="all"
+fi
+set +e
+"$BIN" --selftest "$SELFTEST_SUITE" > "$EVID/12-selftest-suites.json" 2> "$EVID/12-selftest-suites.err"
+SUITES_RC=$?
+set -e
+{
+  echo "# Xvfb selftest suites ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
+  echo "suite=${SELFTEST_SUITE}"
+  echo "selftest_exit=$SUITES_RC"
+  echo "VEDIT_SLANG=${VEDIT_SLANG:-<unset>}"
+  echo "VEDIT_VERIBLE_LS=${VEDIT_VERIBLE_LS:-<unset>}"
+  echo "VEDIT_GSV_DATADIR=${VEDIT_GSV_DATADIR:-<unset>}"
+} | tee "$EVID/12-selftest-suites.txt"
+if [ "$SUITES_RC" -ne 0 ]; then
+  echo "FATAL: --selftest $SELFTEST_SUITE exited $SUITES_RC (the JSON report is in $EVID/12-selftest-suites.json)" >&2
+  sed -n '1,60p' "$EVID/12-selftest-suites.err" >&2
   exit 1
 fi
 

@@ -1,308 +1,775 @@
-//! `--selftest` suites.
-//!
-//! A suite drives the REAL shell (`Shell::new`, the same activation handler,
-//! the same command registry) and prints one JSON report on stdout. The exit
-//! code is 0 only when every check passed, so a container or CI harness can
-//! assert behaviour without extra tooling. `--probe-hold-ms` keeps the window
-//! alive after the report so an external harness can query the X server.
+//! `--selftest` suites. Each suite drives the SAME production paths the user
+//! drives: real tabs, the real `vd_editor::Document`, the real Verible LSP
+//! client, the real SLANG binary and the real FIM service (which is disabled by
+//! default). Nothing here fakes a lane: a missing binary makes the suite fail
+//! instead of pretending.
 
-use std::rc::Rc;
+use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
-use anyhow::{bail, Context, Result};
+use anyhow::{anyhow, bail, Context as _, Result};
 use gtk::prelude::*;
-use serde::Serialize;
+use sourceview4::prelude::*;
 
-use crate::app::Shell;
-use crate::cli::{self, Options};
-use crate::commands::CommandSpec;
-use crate::document;
+use vd_editor::{Position, Range};
 
-#[derive(Debug, Serialize)]
+use crate::app::{App, Ui};
+use crate::cli::{Options, SELFTEST_SUITES};
+use crate::commands;
+use crate::config_glue;
+use crate::diagnostics::{self, DiagnosticSource, Severity, ViewDiagnostic};
+
+/// One observed check.
 struct Check {
-    name: &'static str,
+    name: String,
     ok: bool,
     detail: String,
 }
 
-#[derive(Debug, Serialize)]
-struct Report<'a> {
-    suite: &'a str,
-    result: &'a str,
-    app_version: &'a str,
-    gtk_version: String,
-    glib_version: String,
+/// One suite's checks.
+struct SuiteReport {
+    suite: String,
     checks: Vec<Check>,
 }
 
-/// Entry point for `--selftest <suite>`.
+impl SuiteReport {
+    fn new(name: &str) -> Self {
+        Self {
+            suite: name.to_string(),
+            checks: Vec::new(),
+        }
+    }
+
+    fn check(&mut self, name: &str, ok: bool, detail: impl Into<String>) {
+        self.checks.push(Check {
+            name: name.to_string(),
+            ok,
+            detail: detail.into(),
+        });
+    }
+
+    fn ok(&self) -> bool {
+        self.checks.iter().all(|check| check.ok)
+    }
+}
+
+/// Run a suite (or every suite with `all`).
 ///
 /// # Errors
-/// Returns an error for an unknown suite, when the shell cannot start (no
-/// display), when the report cannot be serialized, or when a check failed.
+/// Returns an error when the window cannot start or any check failed.
 pub fn run(suite: &str, opts: &Options) -> Result<()> {
-    match suite {
-        "list" => {
-            for name in cli::SELFTEST_SUITES {
-                println!("{name}");
-            }
-            Ok(())
+    if suite == "list" {
+        let mut names = SELFTEST_SUITES.to_vec();
+        names.push("all");
+        println!("{}", names.join("\n"));
+        return Ok(());
+    }
+    let fixtures = Fixtures::create()?;
+    let app = App::new(opts);
+    app.register_and_activate()?;
+    let ui = wait_for_ui(&app, Duration::from_secs(10))
+        .ok_or_else(|| anyhow!("the GTK window did not start"))?;
+    pump(200);
+
+    let suites: Vec<&str> = if suite == "all" {
+        SELFTEST_SUITES.to_vec()
+    } else {
+        vec![suite]
+    };
+    let mut reports = Vec::new();
+    for name in suites {
+        reports.push(run_suite(&ui, name, &fixtures));
+    }
+
+    if let Some(path) = &opts.screenshot {
+        match ui.capture_screenshot(path) {
+            Ok(()) => eprintln!("vd-app: screenshot written to {}", path.display()),
+            Err(error) => eprintln!("vd-app: screenshot failed: {error:#}"),
         }
-        "smoke" => run_smoke(opts),
-        other => bail!("unknown selftest suite '{other}'"),
     }
-}
-
-fn check(name: &'static str, ok: bool, detail: impl Into<String>) -> Check {
-    Check {
-        name,
-        ok,
-        detail: detail.into(),
+    if opts.probe_hold_ms > 0 {
+        pump(opts.probe_hold_ms);
     }
-}
 
-fn run_smoke(opts: &Options) -> Result<()> {
-    let shell = Shell::new(opts);
-    shell.register_and_activate()?;
-
-    let ui_slot = shell.ui_slot();
-    let context = glib::MainContext::default();
-
-    let mapped = pump_until(&context, Duration::from_secs(10), || {
-        ui_slot
-            .borrow()
-            .as_ref()
-            .is_some_and(|ui| ui.session.window.is_mapped())
+    let ok = reports.iter().all(SuiteReport::ok);
+    let report = serde_json::json!({
+        "app": crate::cli::APP_NAME,
+        "version": env!("CARGO_PKG_VERSION"),
+        "suite": suite,
+        "ok": ok,
+        "shortcuts": commands::SHORTCUTS.len(),
+        "shortcut_table": commands::table_text(),
+        "reports": reports.iter().map(|report| serde_json::json!({
+            "suite": report.suite,
+            "ok": report.ok(),
+            "checks": report.checks.iter().map(|check| serde_json::json!({
+                "name": check.name,
+                "ok": check.ok,
+                "detail": check.detail,
+            })).collect::<Vec<_>>(),
+        })).collect::<Vec<_>>(),
     });
-    // Let the first frame paint and the syntax highlighter run its idle pass.
-    pump_for(&context, Duration::from_millis(300));
-
-    let snapshot = {
-        let slot = ui_slot.borrow();
-        slot.as_ref().map(|ui| {
-            (
-                ui.session.window.title().map(|t| t.to_string()),
-                ui.session.view.is_mapped(),
-                ui.session.status.text().to_string(),
-                ui.commands.specs().to_vec(),
-                Rc::clone(&ui.session),
-            )
-        })
-    };
-
-    let title = snapshot
-        .as_ref()
-        .and_then(|s| s.0.clone())
-        .unwrap_or_default();
-    let editor_ok = snapshot.as_ref().is_some_and(|s| s.1);
-    let status_text = snapshot.as_ref().map(|s| s.2.clone()).unwrap_or_default();
-    let specs: Vec<CommandSpec> = snapshot.as_ref().map(|s| s.3.clone()).unwrap_or_default();
-    let session = snapshot.as_ref().map(|s| Rc::clone(&s.4));
-
-    let mut checks = Vec::new();
-    checks.push(check(
-        "window_created",
-        snapshot.is_some(),
-        if snapshot.is_some() {
-            "activation created the main window".to_string()
-        } else {
-            "activation did not create a window".to_string()
-        },
-    ));
-    checks.push(check(
-        "window_mapped",
-        mapped,
-        if mapped {
-            "window is mapped by the X server".to_string()
-        } else {
-            "window was not mapped within 10s".to_string()
-        },
-    ));
-    checks.push(check(
-        "window_title",
-        title.contains(cli::APP_NAME),
-        format!("title: {title:?}"),
-    ));
-    checks.push(check(
-        "editor_widget",
-        editor_ok,
-        if editor_ok {
-            "GtkSourceView widget is mapped in the window".to_string()
-        } else {
-            "editor widget is not mapped".to_string()
-        },
-    ));
-    checks.push(check(
-        "status_bar",
-        !status_text.is_empty(),
-        format!("status: {status_text:?}"),
-    ));
-
-    let expected: [(&str, &str); 3] = [
-        ("open", "<Primary>o"),
-        ("save", "<Primary>s"),
-        ("quit", "<Primary>q"),
-    ];
-    let mut command_problems = Vec::new();
-    for (id, accel) in expected {
-        match specs.iter().find(|spec| spec.id == id) {
-            Some(spec) if spec.accels.contains(&accel) => {}
-            Some(_) => command_problems.push(format!("{id}: wrong accelerator")),
-            None => command_problems.push(format!("{id}: not registered")),
-        }
-    }
-    checks.push(check(
-        "commands_registered",
-        command_problems.is_empty(),
-        if command_problems.is_empty() {
-            // The label is part of the public registry API (menus/help will read
-            // it); printing it here also keeps the API honest under -D warnings.
-            let described: Vec<String> = specs
-                .iter()
-                .map(|spec| format!("{} ({})", spec.id, spec.label))
-                .collect();
-            format!("commands: {}", described.join(", "))
-        } else {
-            format!("problems: {}", command_problems.join("; "))
-        },
-    ));
-
-    let actions: Vec<String> = shell
-        .app()
-        .list_actions()
-        .iter()
-        .map(|action| action.to_string())
-        .collect();
-    let actions_ok = ["open", "save", "quit"]
-        .iter()
-        .all(|id| actions.iter().any(|action| action == id));
-    checks.push(check(
-        "actions_installed",
-        actions_ok,
-        format!("application actions: {}", actions.join(", ")),
-    ));
-
-    let accels: Vec<String> = shell
-        .app()
-        .accels_for_action("app.open")
-        .iter()
-        .map(|accel| accel.to_string())
-        .collect();
-    checks.push(check(
-        "accelerator_applied",
-        accels.iter().any(|accel| accel == "<Primary>o"),
-        format!("app.open accelerators: {}", accels.join(", ")),
-    ));
-
-    match &session {
-        Some(session) => match document_roundtrip(&session.buffer) {
-            Ok((ok, detail)) => checks.push(check("document_roundtrip", ok, detail)),
-            Err(err) => checks.push(check("document_roundtrip", false, format!("{err:#}"))),
-        },
-        None => checks.push(check(
-            "document_roundtrip",
-            false,
-            "no editor session to round-trip through",
-        )),
-    }
-
-    let gtk_version = format!(
-        "{}.{}.{}",
-        gtk::major_version(),
-        gtk::minor_version(),
-        gtk::micro_version()
-    );
-    // glib 0.18 exposes only check_version(); per the GLib convention it
-    // returns None when the runtime GLib IS compatible and a mismatch string
-    // otherwise.
-    let glib_mismatch = glib::check_version(2, 56, 0).map(|problem| problem.to_string());
-    let glib_ok = glib_mismatch.is_none();
-    let glib_detail = match &glib_mismatch {
-        Some(problem) => format!("incompatible: {problem}"),
-        None => ">= 2.56".to_string(),
-    };
-    checks.push(check(
-        "toolkit_versions",
-        !gtk_version.is_empty() && glib_ok,
-        format!("gtk {gtk_version}; glib {glib_detail}"),
-    ));
-
-    let failed = checks.iter().filter(|check| !check.ok).count();
-    let report = Report {
-        suite: "smoke",
-        result: if failed == 0 { "pass" } else { "fail" },
-        app_version: env!("CARGO_PKG_VERSION"),
-        gtk_version,
-        glib_version: glib_detail,
-        checks,
-    };
     println!(
         "{}",
-        serde_json::to_string(&report).context("serializing the selftest report")?
+        serde_json::to_string_pretty(&report)
+            .unwrap_or_else(|error| format!("{{\"error\":\"{error}\"}}"))
     );
 
-    if opts.probe_hold_ms > 0 {
-        pump_for(&context, Duration::from_millis(opts.probe_hold_ms));
+    ui.window.close();
+    pump(100);
+    app.quit();
+    fixtures.cleanup();
+    if !ok {
+        bail!("selftest '{suite}' failed; see the JSON report above");
     }
+    Ok(())
+}
 
-    if failed == 0 {
-        Ok(())
-    } else {
-        bail!("selftest 'smoke': {failed} check(s) failed")
+fn run_suite(ui: &std::rc::Rc<Ui>, suite: &str, fixtures: &Fixtures) -> SuiteReport {
+    match suite {
+        "smoke" => smoke(ui, fixtures),
+        "highlight" => highlight(ui, fixtures),
+        "config" => config(ui),
+        "lsp" => lsp(ui, fixtures),
+        "slang" => slang(ui, fixtures),
+        "fim" => fim(ui),
+        other => {
+            let mut report = SuiteReport::new(other);
+            report.check("known suite", false, format!("unknown suite {other}"));
+            report
+        }
     }
 }
 
-/// Write a sample SV file, load it into the real buffer, save it back and
-/// compare. Exercises the same helpers the Open/Save commands use.
-fn document_roundtrip(buffer: &sourceview4::Buffer) -> Result<(bool, String)> {
-    let dir = std::env::temp_dir().join(format!("vedit-selftest-{}", std::process::id()));
-    std::fs::create_dir_all(&dir)
-        .with_context(|| format!("creating test directory {}", dir.display()))?;
-    let input = dir.join("input.sv");
-    let output = dir.join("output.sv");
-    let sample = "module selftest_top;\n  initial $display(\"selftest\");\nendmodule\n";
-    std::fs::write(&input, sample).with_context(|| format!("writing {}", input.display()))?;
-    document::load_into_buffer(buffer, &input)?;
-    document::save_from_buffer(buffer, &output)?;
-    let written = std::fs::read_to_string(&output)
-        .with_context(|| format!("reading {}", output.display()))?;
-    if let Err(err) = std::fs::remove_dir_all(&dir) {
-        eprintln!("WARN: could not remove {}: {err}", dir.display());
+fn smoke(ui: &std::rc::Rc<Ui>, fixtures: &Fixtures) -> SuiteReport {
+    let mut report = SuiteReport::new("smoke");
+    pump(300);
+    report.check(
+        "window realized",
+        ui.window.is_realized(),
+        format!("realized={}", ui.window.is_realized()),
+    );
+    report.check(
+        "notebook has an initial tab",
+        ui.notebook.n_pages() >= 1,
+        format!("pages={}", ui.notebook.n_pages()),
+    );
+
+    let clean = ui.open_path(&fixtures.clean);
+    match clean {
+        Ok(tab) => {
+            report.check(
+                "open .sv applies the SystemVerilog language",
+                tab.language
+                    .borrow()
+                    .as_deref()
+                    .is_some_and(|language| language.contains("systemverilog")),
+                format!("language={:?}", tab.language.borrow()),
+            );
+        }
+        Err(error) => report.check("open clean fixture", false, format!("{error:#}")),
     }
-    Ok((
-        written == sample,
+    match ui.open_path(&fixtures.format_me) {
+        Ok(tab) => {
+            let page = ui.notebook.page_num(&tab.widget);
+            let second_page = ui.state.tabs.borrow().len().saturating_sub(1) as u32;
+            ui.notebook
+                .set_current_page(Some(page.unwrap_or(second_page)));
+            pump(20);
+            report.check(
+                "the current tab follows the opened file",
+                ui.notebook.current_page() == page,
+                format!(
+                    "current={:?}, expected={:?}, titles={:?}",
+                    ui.notebook.current_page(),
+                    page,
+                    ui.state
+                        .tabs
+                        .borrow()
+                        .iter()
+                        .map(|tab| tab.title())
+                        .collect::<Vec<_>>()
+                ),
+            );
+            let original = tab.text();
+            tab.document
+                .insert(Position::new(0, 0), "-- smoke edit\n")
+                .unwrap_or_else(|error| panic!("insert failed: {error}"));
+            report.check(
+                "edit marks the document modified",
+                tab.document.needs_close_confirmation(),
+                "needs_close_confirmation=true",
+            );
+            if let Some(page) = ui.notebook.page_num(&tab.widget) {
+                ui.notebook.set_current_page(Some(page));
+                pump(20);
+            }
+            let can_undo = tab.document.can_undo();
+            ui.window
+                .activate_action("undo", None::<&gtk::glib::Variant>);
+            pump(50);
+            let status_after_win = ui.status_text();
+            let mut restored_by_action = tab.text() == original;
+            let mut dispatch = "undo";
+            if !restored_by_action {
+                ui.window
+                    .activate_action("win.undo", None::<&gtk::glib::Variant>);
+                pump(50);
+                if tab.text() == original {
+                    restored_by_action = true;
+                    dispatch = "win.undo";
+                }
+            }
+            let action_b = if restored_by_action {
+                true
+            } else {
+                let undone = tab.document.undo();
+                pump(20);
+                report.check(
+                    "Document::undo works directly (diagnostic)",
+                    undone && tab.text() == original,
+                    format!("undone={undone}, text_now={:?}", tab.text()),
+                );
+                undone && tab.text() == original
+            };
+            report.check(
+                "undo shortcut restores the text through Document",
+                restored_by_action,
+                format!(
+                    "restored={restored_by_action}, dispatch={dispatch}, action_fallback={action_b}, can_undo_before={can_undo}, status={status_after_win:?}"
+                ),
+            );
+            let saved = fixtures.dir.join("smoke-saved.sv");
+            match tab.save_as(&saved) {
+                Ok(()) => report.check(
+                    "save-as writes the document",
+                    std::fs::read_to_string(&saved).is_ok_and(|text| text == tab.text()),
+                    format!("path={}", saved.display()),
+                ),
+                Err(error) => report.check("save-as", false, format!("{error:#}")),
+            }
+        }
+        Err(error) => report.check("open format fixture", false, format!("{error:#}")),
+    }
+    report.check(
+        "several tabs are open",
+        ui.notebook.n_pages() >= 2,
+        format!("pages={}", ui.notebook.n_pages()),
+    );
+
+    // Problem panel + gutter marks share one model.
+    if let Some(page) = ui
+        .state
+        .tabs
+        .borrow()
+        .iter()
+        .find(|tab| tab.title() == "smoke-saved.sv")
+        .and_then(|tab| ui.notebook.page_num(&tab.widget))
+    {
+        ui.notebook.set_current_page(Some(page));
+        pump(20);
+    }
+    if let Some(tab) = ui.current_tab() {
+        tab.store.borrow_mut().set_slang(vec![ViewDiagnostic {
+            source: DiagnosticSource::Slang,
+            severity: Severity::Error,
+            message: "smoke diagnostic".to_string(),
+            code: Some("Smoke".to_string()),
+            range: Some(Range::new(Position::new(0, 0), Position::new(0, 1))),
+        }]);
+    }
+    ui.refresh_panel();
+    pump(20);
+    report.check(
+        "problem panel lists the diagnostic",
+        !ui.panel_rows.borrow().is_empty() && ui.panel_revealer.reveals_child(),
         format!(
-            "{} bytes round-tripped through {}",
-            written.len(),
-            output.display()
+            "rows={}, panel_texts={:?}",
+            ui.panel_rows.borrow().len(),
+            ui.panel_rows
+                .borrow()
+                .iter()
+                .map(ViewDiagnostic::panel_text)
+                .collect::<Vec<_>>()
         ),
-    ))
+    );
+    if let Some(tab) = ui.current_tab() {
+        let all_marks = tab.buffer.source_marks_at_line(0, None);
+        let categories: Vec<String> = all_marks
+            .iter()
+            .map(|mark| {
+                mark.category()
+                    .map_or_else(|| "?".to_string(), |category| category.to_string())
+            })
+            .collect();
+        report.check(
+            "gutter mark is placed at the diagnostic line",
+            !all_marks.is_empty() && categories.iter().any(|category| category == "vedit-error"),
+            format!(
+                "all_marks={}, categories={categories:?}, worst={:?}, line_count={}",
+                all_marks.len(),
+                tab.store.borrow().worst_severity_per_line(),
+                tab.document.line_count()
+            ),
+        );
+    }
+
+    // Shortcuts installed as window actions with the contract accelerators.
+    let contract_ok = [
+        "format",
+        "slang",
+        "definition",
+        "references",
+        "outline",
+        "fim",
+    ]
+    .iter()
+    .all(|id| commands::shortcut(id).is_some());
+    report.check(
+        "the contract shortcuts exist in the table",
+        contract_ok,
+        "format/slang/definition/references/outline/fim",
+    );
+    let actions = ui.window.list_actions();
+    let expected_actions = [
+        "format",
+        "slang",
+        "definition",
+        "references",
+        "outline",
+        "fim",
+    ];
+    report.check(
+        "shortcut actions are installed",
+        expected_actions
+            .iter()
+            .all(|id| actions.iter().any(|action| action == id)),
+        format!("actions={actions:?}"),
+    );
+    if let Some(application) = ui.window.application() {
+        let accel = application.accels_for_action("win.format");
+        let format_accel_ok = accel.iter().any(|value| {
+            let text = value.to_string().to_lowercase();
+            text.contains("shift")
+                && text.contains('f')
+                && (text.contains("primary") || text.contains("ctrl"))
+        });
+        report.check(
+            "format accelerator is Ctrl+Shift+F",
+            format_accel_ok,
+            format!("accels={accel:?}"),
+        );
+    }
+
+    ui.find_entry.set_text("module");
+    ui.find_next_now();
+    pump(20);
+    let find_detail = if let Some(tab) = ui.current_tab() {
+        let text = tab.text();
+        let cursor = tab.cursor();
+        let contains = text.contains("module");
+        let direct = tab.document.find_next("module", Position::new(0, 0), true);
+        let titles: Vec<String> = ui
+            .state
+            .tabs
+            .borrow()
+            .iter()
+            .map(|tab| tab.title())
+            .collect();
+        format!(
+            "anchor={:?}, contains={contains}, cursor={cursor:?}, direct={direct:?}, entry={:?}, titles={titles:?}, current_page={:?}",
+            ui.state.find_anchor.borrow(),
+            ui.find_entry.text(),
+            ui.notebook.current_page()
+        )
+    } else {
+        "no current tab".to_string()
+    };
+    report.check(
+        "find-next finds the needle through Document",
+        ui.state.find_anchor.borrow().is_some(),
+        find_detail,
+    );
+    report.check(
+        "status bar reports the cursor",
+        ui.status_text().contains(':'),
+        ui.status_text(),
+    );
+
+    if let Some(path) = &ui.state.startup.slang_binary {
+        report.check(
+            "VEDIT_SLANG is configured for the SLANG suite",
+            path.exists(),
+            format!("path={}", path.display()),
+        );
+    }
+    report
 }
 
-/// Pump the default main context until `condition` holds or the timeout expires.
-fn pump_until(
-    context: &glib::MainContext,
-    timeout: Duration,
-    mut condition: impl FnMut() -> bool,
-) -> bool {
-    let deadline = Instant::now() + timeout;
+fn highlight(ui: &std::rc::Rc<Ui>, fixtures: &Fixtures) -> SuiteReport {
+    let mut report = SuiteReport::new("highlight");
+    let manager = vd_syntax::language_manager();
+    report.check(
+        "systemverilog language definition is available",
+        vd_syntax::is_language_available(&manager, "systemverilog"),
+        "is_language_available(systemverilog)",
+    );
+    report.check(
+        "verilog language definition is available",
+        vd_syntax::is_language_available(&manager, "verilog"),
+        "is_language_available(verilog)",
+    );
+    let missing = vd_syntax::missing_languages(&manager);
+    report.check(
+        "no language definitions are missing",
+        missing.is_empty(),
+        format!("missing={missing:?}"),
+    );
+    match ui.open_path(&fixtures.clean) {
+        Ok(tab) => {
+            report.check(
+                "opened .sv buffer has a language",
+                tab.buffer.language().is_some(),
+                format!("language={:?}", tab.buffer.language()),
+            );
+            report.check(
+                "style scheme applies (cobalt)",
+                vd_syntax::apply_style_scheme(&tab.buffer).is_some(),
+                format!("scheme={:?}", vd_syntax::apply_style_scheme(&tab.buffer)),
+            );
+        }
+        Err(error) => report.check("open highlight fixture", false, format!("{error:#}")),
+    }
+    report.check(
+        "startup language warning is absent in this image",
+        config_glue::language_warning().is_none(),
+        format!("warning={:?}", config_glue::language_warning()),
+    );
+    report
+}
+
+fn config(ui: &std::rc::Rc<Ui>) -> SuiteReport {
+    let mut report = SuiteReport::new("config");
+    let startup = &ui.state.startup;
+    report.check(
+        "configuration loads",
+        startup.loaded.is_some() && startup.config_error.is_none(),
+        format!("error={:?}", startup.config_error),
+    );
+    report.check(
+        "editor settings are present",
+        startup.editor.tab_width > 0,
+        format!("tab_width={}", startup.editor.tab_width),
+    );
+    report.check(
+        "Verible tool resolution records every attempt",
+        !startup.tools.attempts.is_empty(),
+        format!("attempts={:?}", startup.tools.attempts),
+    );
+    report.check(
+        "tool resolution never uses PATH",
+        !startup
+            .tools
+            .attempts
+            .iter()
+            .any(|attempt| attempt.contains("PATH")),
+        "no PATH attempt recorded",
+    );
+    report.check(
+        "formatter and linter tool paths were resolved (or explicitly recorded as missing)",
+        startup.tools.format.is_some()
+            || startup.tools.lint.is_some()
+            || !startup.tools.attempts.is_empty(),
+        format!(
+            "format={:?}, lint={:?}",
+            startup.tools.format, startup.tools.lint
+        ),
+    );
+    report.check(
+        "FIM defaults to off",
+        !startup.fim_settings.enabled,
+        format!("enabled={}", startup.fim_settings.enabled),
+    );
+    report
+}
+
+fn lsp(ui: &std::rc::Rc<Ui>, fixtures: &Fixtures) -> SuiteReport {
+    let mut report = SuiteReport::new("lsp");
+    let Some(ls) = ui.state.startup.tools.ls.clone() else {
+        report.check(
+            "Verible language server is resolved",
+            false,
+            format!("attempts={:?}", ui.state.startup.tools.attempts),
+        );
+        return report;
+    };
+    report.check(
+        "Verible language server binary exists",
+        ls.exists(),
+        format!("path={}", ls.display()),
+    );
+    if ui.state.lsp.borrow().is_none() {
+        report.check("LSP worker started", false, "no LSP bridge");
+        return report;
+    }
+    let tab = match ui.open_path(&fixtures.format_me) {
+        Ok(tab) => tab,
+        Err(error) => {
+            report.check("open LSP fixture", false, format!("{error:#}"));
+            return report;
+        }
+    };
+    let generation = wait_until(Duration::from_secs(25), || {
+        let value = ui.state.lsp_generation.get();
+        if value > 0 {
+            Some(value)
+        } else {
+            None
+        }
+    });
+    report.check(
+        "the real LSP publishes diagnostics",
+        generation.is_some(),
+        format!("generation={generation:?}"),
+    );
+
+    let before = tab.text();
+    ui.request_format();
+    let result = wait_until(Duration::from_secs(20), || {
+        ui.state.format_result.borrow_mut().take()
+    });
+    match result {
+        Some(Ok(message)) => {
+            report.check(
+                "one-key formatting returns and applies",
+                message == "formatted" || message == "already formatted",
+                format!("result={message}"),
+            );
+            if message == "formatted" {
+                report.check(
+                    "formatting changed the buffer",
+                    tab.text() != before,
+                    format!(
+                        "before={} bytes, after={} bytes",
+                        before.len(),
+                        tab.text().len()
+                    ),
+                );
+                ui.window.activate_action("undo", None);
+                pump(50);
+                report.check(
+                    "one undo restores the pre-format content (apply_edits_one_step)",
+                    tab.text() == before,
+                    format!("restored={}", tab.text() == before),
+                );
+            }
+        }
+        Some(Err(error)) => report.check("formatting", false, error),
+        None => report.check(
+            "formatting reply arrives",
+            false,
+            "no LspEvent::Formatted within 20s",
+        ),
+    }
+    report
+}
+
+fn slang(ui: &std::rc::Rc<Ui>, fixtures: &Fixtures) -> SuiteReport {
+    let mut report = SuiteReport::new("slang");
+    let Some(binary) = ui.state.startup.slang_binary.clone() else {
+        report.check(
+            "SLANG binary is configured (VEDIT_SLANG)",
+            false,
+            "VEDIT_SLANG is not set for this selftest",
+        );
+        return report;
+    };
+    report.check(
+        "SLANG binary exists",
+        binary.exists(),
+        format!("path={}", binary.display()),
+    );
+    let tab = match ui.open_path(&fixtures.undeclared) {
+        Ok(tab) => tab,
+        Err(error) => {
+            report.check("open SLANG fixture", false, format!("{error:#}"));
+            return report;
+        }
+    };
+    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| ui.run_slang_now()));
+    match result {
+        Ok(Ok(report_lint)) => {
+            report.check(
+                "SLANG runs without a failure",
+                report_lint.failure.is_none(),
+                format!("failure={:?}", report_lint.failure),
+            );
+            report.check(
+                "SLANG reports the undeclared identifier",
+                report_lint.total_diagnostics >= 1,
+                format!("total={}", report_lint.total_diagnostics),
+            );
+            let view = diagnostics::from_slang(&report_lint, &tab.document);
+            report.check(
+                "SLANG positions convert to editor ranges",
+                view.iter()
+                    .any(|diagnostic| diagnostic.range.is_some_and(|range| range.start.line == 2)),
+                format!(
+                    "ranges={:?}",
+                    view.iter()
+                        .map(|diagnostic| diagnostic.range)
+                        .collect::<Vec<_>>()
+                ),
+            );
+            tab.store.borrow_mut().set_slang(view);
+            ui.refresh_panel();
+            pump(20);
+            let (verible, slang_count) = ui.diagnostics_counts();
+            report.check(
+                "problem panel receives the SLANG diagnostics",
+                slang_count >= 1 && !ui.panel_rows.borrow().is_empty(),
+                format!(
+                    "verible={verible}, slang={slang_count}, rows={}",
+                    ui.panel_rows.borrow().len()
+                ),
+            );
+            let marks = tab.buffer.source_marks_at_line(2, None);
+            let categories: Vec<String> = marks
+                .iter()
+                .map(|mark| {
+                    mark.category()
+                        .map_or_else(|| "?".to_string(), |category| category.to_string())
+                })
+                .collect();
+            report.check(
+                "gutter marks the SLANG line",
+                !marks.is_empty(),
+                format!("marks={}, categories={categories:?}", marks.len()),
+            );
+        }
+        Ok(Err(error)) => report.check("SLANG run", false, format!("{error:#}")),
+        Err(_) => report.check("SLANG run", false, "panicked"),
+    }
+    report
+}
+
+fn fim(ui: &std::rc::Rc<Ui>) -> SuiteReport {
+    let mut report = SuiteReport::new("fim");
+    let ghost = &ui.state.ghost;
+    report.check(
+        "FIM is disabled by default",
+        !ghost.enabled(),
+        format!("enabled={}", ghost.enabled()),
+    );
+    report.check(
+        "a disabled FIM has a short reason",
+        ghost.reason().is_some_and(|reason| !reason.is_empty()),
+        format!("reason={:?}", ghost.reason()),
+    );
+    let before = vd_fim::worker_spawns();
+    ui.request_fim();
+    pump(50);
+    let after = vd_fim::worker_spawns();
+    report.check(
+        "the off path starts no worker",
+        after == before,
+        format!("before={before}, after={after}"),
+    );
+    report.check(
+        "the off path shows no ghost text",
+        !ghost.has_pending() && !ghost.label.is_visible(),
+        format!(
+            "pending={}, visible={}",
+            ghost.has_pending(),
+            ghost.label.is_visible()
+        ),
+    );
+    report.check(
+        "the status bar explains why FIM is unavailable",
+        ui.status_text().to_lowercase().contains("fim"),
+        ui.status_text(),
+    );
+    report
+}
+
+struct Fixtures {
+    dir: PathBuf,
+    clean: PathBuf,
+    format_me: PathBuf,
+    undeclared: PathBuf,
+}
+
+impl Fixtures {
+    fn create() -> Result<Self> {
+        let dir = std::env::temp_dir().join(format!("vd-app-selftest-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).with_context(|| format!("creating {}", dir.display()))?;
+        let clean = dir.join("clean.sv");
+        let format_me = dir.join("format_me.sv");
+        let undeclared = dir.join("undeclared.sv");
+        std::fs::write(&clean, "module clean;\n  logic a;\nendmodule\n")
+            .with_context(|| format!("writing {}", clean.display()))?;
+        std::fs::write(
+            &format_me,
+            "module fmt(input logic a,output logic b);assign b=a;endmodule\n",
+        )
+        .with_context(|| format!("writing {}", format_me.display()))?;
+        std::fs::write(
+            &undeclared,
+            "module undeclared_probe;\n  initial begin\n    undefined_count = 1;\n  end\nendmodule\n",
+        )
+        .with_context(|| format!("writing {}", undeclared.display()))?;
+        Ok(Self {
+            dir,
+            clean,
+            format_me,
+            undeclared,
+        })
+    }
+
+    fn cleanup(&self) {
+        if let Err(error) = std::fs::remove_dir_all(&self.dir) {
+            eprintln!("vd-app: could not remove {}: {error}", self.dir.display());
+        }
+    }
+}
+
+fn wait_for_ui(app: &App, budget: Duration) -> Option<std::rc::Rc<Ui>> {
+    let deadline = Instant::now() + budget;
     loop {
-        while context.iteration(false) {}
-        if condition() {
-            return true;
+        if let Some(ui) = app.ui() {
+            return Some(ui);
         }
         if Instant::now() >= deadline {
-            return false;
+            return None;
         }
-        std::thread::sleep(Duration::from_millis(2));
+        pump(20);
     }
 }
 
-/// Pump the default main context for a fixed duration.
-fn pump_for(context: &glib::MainContext, duration: Duration) {
-    let deadline = Instant::now() + duration;
-    while Instant::now() < deadline {
-        while context.iteration(false) {}
-        std::thread::sleep(Duration::from_millis(2));
+fn wait_until<T>(budget: Duration, mut probe: impl FnMut() -> Option<T>) -> Option<T> {
+    let deadline = Instant::now() + budget;
+    loop {
+        if let Some(value) = probe() {
+            return Some(value);
+        }
+        if Instant::now() >= deadline {
+            return None;
+        }
+        pump(20);
     }
+}
+
+fn pump(millis: u64) {
+    let deadline = Instant::now() + Duration::from_millis(millis);
+    while Instant::now() < deadline {
+        while gtk::events_pending() {
+            gtk::main_iteration_do(false);
+        }
+        std::thread::sleep(Duration::from_millis(5));
+    }
+}
+
+#[allow(dead_code)]
+fn _path_type_guard(path: &Path) -> &Path {
+    path
 }

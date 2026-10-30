@@ -1,0 +1,37 @@
+# Audit 1: direct buffer writes in crates/vd-app/src (must be EMPTY)
+$ grep -rnE "(buffer|source_buffer)\.(insert|insert_at_cursor|delete|delete_range|set_text|apply_tag|backspace|cut_clipboard|paste_clipboard|create_tag)" crates/vd-app/src/
+crates/vd-app/src/app.rs:686:            tab.buffer.delete_mark(&mark);
+
+# Audit 2: every text change goes through vd_editor::Document
+$ grep -rnE "document\.(insert|delete|replace|apply_edits_one_step|replace_next|replace_all|undo|redo)" crates/vd-app/src/
+crates/vd-app/src/selftest.rs:226:                let undone = tab.document.undo();
+crates/vd-app/src/app.rs:302:            if tab.document.undo() {
+crates/vd-app/src/app.rs:313:            if tab.document.redo() {
+crates/vd-app/src/app.rs:368:        match tab.document.replace_next(&needle, &replacement, from, true) {
+crates/vd-app/src/app.rs:388:        match tab.document.replace_all(&needle, &replacement, true) {
+crates/vd-app/src/app.rs:599:        match tab.document.insert(position, &text) {
+
+# Audit 3: no lane logic re-implemented (no JSON-RPC framing or SV parsing in the app)
+$ grep -rnE "Content-Length|jsonrpc|serde_json::from_str|fn parse_systemverilog|tree_sitter" crates/vd-app/src/
+(no matches)
+
+# Audit 4: the app spawns no processes itself (vd-lsp / vd-deeplint own that)
+$ grep -rn "Command::new" crates/vd-app/src/
+(no matches)
+
+# Dependencies of vd-app (the wiring crate)
+[dependencies]
+anyhow.workspace = true
+glib.workspace = true
+gtk.workspace = true
+lsp-types.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sourceview4.workspace = true
+tokio.workspace = true
+vd-config = { path = "../vd-config" }
+vd-deeplint = { path = "../vd-deeplint" }
+vd-editor = { path = "../vd-editor" }
+vd-fim = { path = "../vd-fim" }
+vd-lsp = { path = "../vd-lsp" }
+vd-syntax = { path = "../vd-syntax" }

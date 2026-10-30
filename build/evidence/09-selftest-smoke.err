@@ -1,2 +1,4 @@
 
-(vd-app:75): GLib-GIO-CRITICAL **: 03:32:18.804: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:75): GLib-GIO-CRITICAL **: 04:32:37.482: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+vd-app: Verible LS not found (9 resolution attempt(s)); LSP features are unavailable
+vd-app: configuration warnings: 1

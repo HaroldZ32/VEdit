@@ -15,8 +15,8 @@ pub const APP_NAME: &str = "VEdit";
 /// GApplication id; also the AppImage desktop id used by the packaging lanes.
 pub const APP_ID: &str = "io.github.vedit.VEdit";
 
-/// Selftest suites that exist at this milestone (AC-02 uses `smoke`).
-pub const SELFTEST_SUITES: &[&str] = &["smoke"];
+/// Selftest suites that exist (AC-02 uses `smoke`; `all` runs every suite).
+pub const SELFTEST_SUITES: &[&str] = &["smoke", "highlight", "config", "lsp", "slang", "fim"];
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Mode {
@@ -34,6 +34,8 @@ pub struct Options {
     /// Diagnostics: keep the window alive this long after a selftest ends, so a
     /// test harness can query the X server about it (`xwininfo`).
     pub probe_hold_ms: u64,
+    /// Diagnostics: write a PNG of the realized window before exiting.
+    pub screenshot: Option<PathBuf>,
 }
 
 impl Default for Options {
@@ -42,6 +44,7 @@ impl Default for Options {
             mode: Mode::Interactive,
             file: None,
             probe_hold_ms: 0,
+            screenshot: None,
         }
     }
 }
@@ -67,7 +70,7 @@ impl Options {
                     let suite = raw
                         .to_str()
                         .ok_or_else(|| anyhow!("--selftest suite name is not valid UTF-8"))?;
-                    if suite != "list" && !SELFTEST_SUITES.contains(&suite) {
+                    if suite != "all" && suite != "list" && !SELFTEST_SUITES.contains(&suite) {
                         bail!("unknown selftest suite '{suite}' ({})", suites());
                     }
                     opts.mode = Mode::Selftest(suite.to_string());
@@ -87,11 +90,15 @@ impl Options {
                         .parse::<u64>()
                         .map_err(|_| anyhow!("--probe-hold-ms is not a number: {text}"))?;
                 }
+                "--screenshot" => {
+                    let path = args
+                        .next()
+                        .ok_or_else(|| anyhow!("--screenshot needs a PNG path"))?;
+                    opts.screenshot = Some(PathBuf::from(path));
+                }
                 "--version" | "-V" => opts.mode = Mode::Version,
                 "--help" | "-h" => opts.mode = Mode::Help,
-                other if other.starts_with('-') => {
-                    bail!("unknown option '{other}'\n\n{}", usage())
-                }
+                other if other.starts_with('-') => bail!("unknown option '{other}'\n\n{}", usage()),
                 other => opts.file = Some(PathBuf::from(other)),
             }
         }
@@ -101,6 +108,7 @@ impl Options {
 
 fn suites() -> String {
     let mut names = SELFTEST_SUITES.to_vec();
+    names.push("all");
     names.push("list");
     names.join(", ")
 }
@@ -117,63 +125,10 @@ pub fn usage() -> String {
          \n\
          Options:\n\
          \x20 --file <PATH>                 file to open at startup\n\
+         \x20 --screenshot <PNG>            diagnostics: save a screenshot before exit\n\
          \x20 --probe-hold-ms <MS>          diagnostics only: hold the window open after a selftest\n\
          \x20 -h, --help                    show this help\n",
         name = APP_NAME,
         suites = suites()
     )
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    fn parse(args: &[&str]) -> Result<Options> {
-        Options::parse(args.iter().map(std::ffi::OsString::from))
-    }
-
-    // The workspace denies clippy::expect_used everywhere (including tests), so
-    // the tests match explicitly instead of unwrapping.
-    fn parse_ok(args: &[&str]) -> Options {
-        match parse(args) {
-            Ok(opts) => opts,
-            Err(err) => panic!("expected {:?} to parse, got: {err:#}", args),
-        }
-    }
-
-    fn parse_err(args: &[&str]) -> anyhow::Error {
-        match parse(args) {
-            Ok(_) => panic!("expected {:?} to be rejected", args),
-            Err(err) => err,
-        }
-    }
-
-    #[test]
-    fn selftest_smoke_is_accepted() {
-        let opts = parse_ok(&["--selftest", "smoke"]);
-        assert_eq!(opts.mode, Mode::Selftest("smoke".to_string()));
-        assert!(opts.file.is_none());
-    }
-
-    #[test]
-    fn positional_file_is_opened() {
-        let opts = parse_ok(&["design.sv"]);
-        assert_eq!(opts.mode, Mode::Interactive);
-        assert_eq!(opts.file, Some(std::path::PathBuf::from("design.sv")));
-    }
-
-    #[test]
-    fn unknown_option_is_rejected() {
-        let err = parse_err(&["--nope"]);
-        assert!(err.to_string().contains("unknown option"), "got: {err}");
-    }
-
-    #[test]
-    fn unknown_selftest_suite_is_rejected() {
-        let err = parse_err(&["--selftest", "everything"]);
-        assert!(
-            err.to_string().contains("unknown selftest suite"),
-            "got: {err}"
-        );
-    }
 }

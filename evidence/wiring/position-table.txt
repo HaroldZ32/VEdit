@@ -1,0 +1,16 @@
+# text: "module m;\n  // 你好😀 e\u{301}\nendmodule\n"
+# line 2: "  // 你好😀 e\u{301}"
+# char | byte_col(1) | gtk_char_offset | utf16(1) | char
+   0  |        1 |              0 |       1 | ' '
+   1  |        2 |              1 |       2 | ' '
+   2  |        3 |              2 |       3 | '/'
+   3  |        4 |              3 |       4 | '/'
+   4  |        5 |              4 |       5 | ' '
+   5  |        6 |              5 |       6 | '你'
+   6  |        9 |              6 |       7 | '好'
+   7  |       12 |              7 |       8 | '😀'
+   8  |       16 |              8 |      10 | ' '
+   9  |       17 |              9 |      11 | 'e'
+  10  |       18 |             10 |      12 | '\u{301}'
+# probe position: utf16 Position { line: 1, character: 9 } -> iter.offset Some(18) -> position_at_iter Some(Position { line: 1, character: 9 })
+# deeplint byte column (line 2, col 19) -> editor position: Err("byte column 19 on line 2 is inside a multi-byte character")

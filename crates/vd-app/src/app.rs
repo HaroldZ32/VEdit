@@ -1,302 +1,1631 @@
-//! GTK shell construction and the interactive run loop.
+//! The GTK shell: tabs, the problem panel, gutter marks, shortcuts, the LSP /
+//! SLANG / FIM wiring and the status bar.
 //!
-//! The shell owns the window, the `GtkSourceView` editor widget, the status
-//! bar and the command registry. Later lanes extend it (panels, gutter marks,
-//! command implementations) without rewriting the construction path: they
-//! register commands through `commands::CommandRegistry` and add widgets in
-//! this module (T21 owns the wiring task).
+//! Every text change goes through `vd_editor::Document`; formatting is applied
+//! with `Document::apply_edits_one_step`, and ghost text is never written to the
+//! buffer until the user accepts it.
 
-use std::cell::RefCell;
-use std::path::{Path, PathBuf};
+use std::cell::{Cell, RefCell};
+use std::path::Path;
 use std::rc::Rc;
+use std::sync::mpsc::Receiver;
+use std::time::Duration;
 
-use anyhow::{bail, Context, Result};
+use anyhow::{anyhow, Context as _, Result};
+use gtk::gdk::prelude::*;
 use gtk::prelude::*;
 use sourceview4::prelude::*;
 
-use crate::cli::{self, Options};
-use crate::commands::{CommandRegistry, CommandSpec};
-use crate::document;
+use vd_editor::{advance_position, Edit, Position};
 
-/// The shell's widgets plus the per-window state the commands mutate.
-pub struct EditorSession {
-    pub window: gtk::ApplicationWindow,
-    pub view: sourceview4::View,
-    pub buffer: sourceview4::Buffer,
-    pub status: gtk::Label,
-    path: RefCell<Option<PathBuf>>,
+use crate::cli::{Options, APP_ID, APP_NAME};
+use crate::commands::SHORTCUTS;
+use crate::config_glue::{self, EditorSettings, Startup};
+use crate::diagnostics::{self, Severity, ViewDiagnostic};
+use crate::document_tab::Tab;
+use crate::fim_ghost::Ghost;
+use crate::lsp_worker::{LspBridge, LspEvent};
+use crate::position_adapter;
+use crate::slang_worker;
+
+/// Message shown when a feature needs a saved file.
+const NEEDS_FILE: &str = "save the file first";
+
+/// Shared, mutable app state (widgets live in [`Ui`]).
+pub struct State {
+    pub startup: Startup,
+    pub settings: EditorSettings,
+    pub tabs: RefCell<Vec<Rc<Tab>>>,
+    pub lsp: RefCell<Option<LspBridge>>,
+    pub slang_rx: RefCell<Option<Receiver<vd_deeplint::LintReport>>>,
+    pub ghost: Ghost,
+    pub info: RefCell<String>,
+    pub format_result: RefCell<Option<Result<String, String>>>,
+    pub find_anchor: RefCell<Option<Position>>,
+    pub lsp_generation: Cell<u64>,
 }
 
-impl EditorSession {
-    /// The file this window is currently bound to, if any.
+/// The widgets a user interacts with.
+pub struct Ui {
+    pub window: gtk::ApplicationWindow,
+    pub notebook: gtk::Notebook,
+    pub status: gtk::Label,
+    pub panel_list: gtk::ListBox,
+    pub panel_revealer: gtk::Revealer,
+    pub find_bar: gtk::Revealer,
+    pub find_entry: gtk::SearchEntry,
+    pub replace_entry: gtk::Entry,
+    pub panel_rows: RefCell<Vec<ViewDiagnostic>>,
+    pub state: Rc<State>,
+    ghost_fixed: gtk::Fixed,
+    gutter_refresh: Cell<bool>,
+}
+
+impl Ui {
+    fn current_index(&self) -> Option<usize> {
+        self.notebook.current_page().map(|page| page as usize)
+    }
+
     #[must_use]
-    pub fn current_path(&self) -> Option<PathBuf> {
-        self.path.borrow().clone()
+    pub fn current_tab(&self) -> Option<Rc<Tab>> {
+        let index = self.current_index()?;
+        self.state.tabs.borrow().get(index).cloned()
     }
 
-    /// Load `path` into the buffer and bind the window to it.
+    /// Open a file in a new tab (or switch to it when it is already open).
     ///
     /// # Errors
-    /// Returns an error when the file cannot be read.
-    pub fn load(&self, path: &Path) -> Result<()> {
-        document::load_into_buffer(&self.buffer, path)?;
-        self.set_path(Some(path.to_path_buf()));
-        self.set_status(&format!("Opened {}", path.display()));
-        Ok(())
+    /// Returns the editor error when the file cannot be read.
+    pub fn open_path(self: &Rc<Self>, path: &Path) -> Result<Rc<Tab>> {
+        let canonical = std::fs::canonicalize(path).unwrap_or_else(|_| path.to_path_buf());
+        if let Some(existing) = self
+            .state
+            .tabs
+            .borrow()
+            .iter()
+            .find(|tab| {
+                tab.path
+                    .borrow()
+                    .as_ref()
+                    .is_some_and(|open| *open == canonical)
+            })
+            .cloned()
+        {
+            if let Some(page) = self.notebook.page_num(&existing.widget) {
+                self.notebook.set_current_page(Some(page));
+            }
+            return Ok(existing);
+        }
+        let tab = Tab::open(&canonical, &self.state.settings)?;
+        Ok(self.add_tab(tab))
     }
 
-    /// Save the buffer to `path` and bind the window to it.
-    ///
-    /// # Errors
-    /// Returns an error when the file cannot be written.
-    pub fn save_to(&self, path: &Path) -> Result<()> {
-        document::save_from_buffer(&self.buffer, path)?;
-        self.set_path(Some(path.to_path_buf()));
-        self.set_status(&format!("Saved {}", path.display()));
-        Ok(())
+    /// A new untitled tab.
+    pub fn new_untitled(self: &Rc<Self>) -> Rc<Tab> {
+        let tab = Tab::untitled(&self.state.settings);
+        self.add_tab(tab)
     }
 
-    /// Show a failed command in the status bar and on stderr; a successful
-    /// command has already updated the status bar itself.
-    pub fn report(&self, result: Result<()>) {
-        if let Err(err) = result {
-            eprintln!("ERROR: {err:#}");
-            self.set_status(&format!("Error: {err:#}"));
+    fn add_tab(self: &Rc<Self>, tab: Tab) -> Rc<Tab> {
+        let tab = Rc::new(tab);
+        let label = gtk::Label::new(Some(&tab.title()));
+        let page = self.notebook.append_page(&tab.widget, Some(&label));
+        // Tabs opened after the window was shown must be shown themselves,
+        // otherwise GTK keeps the current page on the already-visible tab.
+        tab.widget.show_all();
+        label.show();
+        self.state.tabs.borrow_mut().push(Rc::clone(&tab));
+        setup_gutter(&tab);
+        self.notebook.set_current_page(Some(page));
+
+        let weak = Rc::downgrade(self);
+        tab.buffer.connect_changed(move |_| {
+            if let Some(ui) = weak.upgrade() {
+                if !ui.state.ghost.is_accepting() {
+                    ui.state.ghost.cancel();
+                }
+                ui.refresh_titles();
+                ui.refresh_status();
+            }
+        });
+        let weak = Rc::downgrade(self);
+        tab.buffer.connect_mark_set(move |_, _, _| {
+            if let Some(ui) = weak.upgrade() {
+                if ui.state.ghost.has_pending() {
+                    ui.position_ghost();
+                }
+                ui.refresh_status();
+            }
+        });
+        let weak = Rc::downgrade(self);
+        tab.view.connect_key_press_event(move |_, event| {
+            let Some(ui) = weak.upgrade() else {
+                return gtk::glib::Propagation::Proceed;
+            };
+            match event.keyval() {
+                gtk::gdk::keys::constants::Tab if ui.state.ghost.has_pending() => {
+                    ui.accept_fim();
+                    gtk::glib::Propagation::Stop
+                }
+                gtk::gdk::keys::constants::Escape if ui.state.ghost.has_pending() => {
+                    ui.state.ghost.cancel();
+                    ui.refresh_status();
+                    gtk::glib::Propagation::Stop
+                }
+                _ => gtk::glib::Propagation::Proceed,
+            }
+        });
+
+        if let Some(uri) = tab.uri() {
+            let lsp = self.state.lsp.borrow();
+            if let Some(bridge) = lsp.as_ref() {
+                bridge.open(uri, tab.language_id(), tab.text());
+            }
+        }
+        self.refresh_status();
+        tab
+    }
+
+    /// Save the current tab (asks for a path when it has none).
+    pub fn save_current(self: &Rc<Self>) {
+        let Some(tab) = self.current_tab() else {
+            return;
+        };
+        if tab.path.borrow().is_none() {
+            self.save_as_dialog();
+            return;
+        }
+        match tab.save() {
+            Ok(()) => {
+                self.set_info(format!("saved {}", tab.title()));
+                self.refresh_titles();
+                self.refresh_status();
+            }
+            Err(error) => self.set_info(format!("save failed: {error:#}")),
         }
     }
 
-    fn set_path(&self, path: Option<PathBuf>) {
-        let title = match path.as_deref() {
-            Some(p) => format!("{} - {}", p.display(), cli::APP_NAME),
-            None => format!("Untitled - {}", cli::APP_NAME),
+    fn save_as_dialog(self: &Rc<Self>) {
+        let Some(tab) = self.current_tab() else {
+            return;
         };
-        self.window.set_title(&title);
-        *self.path.borrow_mut() = path;
-    }
-
-    fn set_status(&self, text: &str) {
-        self.status.set_text(text);
-    }
-}
-
-/// A built shell: the session and the commands installed on the application.
-pub struct Ui {
-    pub session: Rc<EditorSession>,
-    pub commands: CommandRegistry,
-}
-
-/// The application plus the slot the activation handler fills with the [`Ui`].
-pub struct Shell {
-    app: gtk::Application,
-    ui: Rc<RefCell<Option<Ui>>>,
-    build_error: Rc<RefCell<Option<String>>>,
-}
-
-impl Shell {
-    /// Build the application object; the window is created when activate fires.
-    #[must_use]
-    pub fn new(opts: &Options) -> Self {
-        let app = gtk::Application::builder()
-            .application_id(cli::APP_ID)
-            .build();
-        let ui = Rc::new(RefCell::new(None));
-        let build_error = Rc::new(RefCell::new(None));
-
-        {
-            let ui = Rc::clone(&ui);
-            let build_error = Rc::clone(&build_error);
-            let opts = opts.clone();
-            app.connect_activate(move |app| match build_ui(app, &opts) {
-                Ok(built) => {
-                    built.session.window.show_all();
-                    *ui.borrow_mut() = Some(built);
+        let dialog = gtk::FileChooserDialog::new(
+            Some("Save As"),
+            Some(&self.window),
+            gtk::FileChooserAction::Save,
+        );
+        dialog.add_buttons(&[
+            ("Cancel", gtk::ResponseType::Cancel),
+            ("Save", gtk::ResponseType::Accept),
+        ]);
+        if let Some(path) = tab.path.borrow().as_ref() {
+            if let Some(name) = path.file_name() {
+                dialog.set_current_name(name.to_string_lossy().as_ref());
+            }
+        }
+        let response = dialog.run();
+        let path = dialog.filename();
+        dialog.close();
+        if response != gtk::ResponseType::Accept {
+            return;
+        }
+        let Some(path) = path else {
+            return;
+        };
+        match tab.save_as(&path) {
+            Ok(()) => {
+                self.set_info(format!("saved as {}", path.display()));
+                self.refresh_titles();
+                self.refresh_status();
+                if let Some(uri) = tab.uri() {
+                    let lsp = self.state.lsp.borrow();
+                    if let Some(bridge) = lsp.as_ref() {
+                        bridge.open(uri, tab.language_id(), tab.text());
+                    }
                 }
-                Err(err) => {
-                    *build_error.borrow_mut() = Some(format!("{err:#}"));
+            }
+            Err(error) => self.set_info(format!("save as failed: {error:#}")),
+        }
+    }
+
+    fn open_dialog(self: &Rc<Self>) {
+        let dialog = gtk::FileChooserDialog::new(
+            Some("Open"),
+            Some(&self.window),
+            gtk::FileChooserAction::Open,
+        );
+        dialog.add_buttons(&[
+            ("Cancel", gtk::ResponseType::Cancel),
+            ("Open", gtk::ResponseType::Accept),
+        ]);
+        let filter = gtk::FileFilter::new();
+        filter.set_name(Some("Verilog / SystemVerilog"));
+        for pattern in ["*.v", "*.vh", "*.sv", "*.svh", "*.svi"] {
+            filter.add_pattern(pattern);
+        }
+        dialog.add_filter(filter);
+        let response = dialog.run();
+        let path = dialog.filename();
+        dialog.close();
+        if response != gtk::ResponseType::Accept {
+            return;
+        }
+        let Some(path) = path else {
+            return;
+        };
+        if let Err(error) = self.open_path(&path) {
+            self.set_info(format!("open failed: {error:#}"));
+        }
+    }
+
+    /// Close a tab, asking about unsaved changes when requested.
+    pub fn close_tab_at(self: &Rc<Self>, index: usize, ask: bool) {
+        let tab = self.state.tabs.borrow().get(index).cloned();
+        let Some(tab) = tab else {
+            return;
+        };
+        if ask && tab.document.needs_close_confirmation() {
+            let dialog = gtk::MessageDialog::new(
+                Some(&self.window),
+                gtk::DialogFlags::MODAL,
+                gtk::MessageType::Question,
+                gtk::ButtonsType::None,
+                &format!("Save changes to {}?", tab.title()),
+            );
+            dialog.add_button("Cancel", gtk::ResponseType::Cancel);
+            dialog.add_button("Discard", gtk::ResponseType::Reject);
+            dialog.add_button("Save", gtk::ResponseType::Accept);
+            let response = dialog.run();
+            dialog.close();
+            match response {
+                gtk::ResponseType::Accept => {
+                    if tab.path.borrow().is_none() {
+                        self.save_as_dialog();
+                    } else if let Err(error) = tab.save() {
+                        self.set_info(format!("save failed: {error:#}"));
+                        return;
+                    }
+                }
+                gtk::ResponseType::Reject => {}
+                _ => return,
+            }
+        }
+        self.state.tabs.borrow_mut().remove(index);
+        if let Some(page) = self.notebook.page_num(&tab.widget) {
+            self.notebook.remove_page(Some(page));
+        }
+        self.refresh_status();
+    }
+
+    fn undo(self: &Rc<Self>) {
+        if let Some(tab) = self.current_tab() {
+            if tab.document.undo() {
+                self.refresh_titles();
+                self.refresh_status();
+            } else {
+                self.set_info("nothing to undo");
+            }
+        }
+    }
+
+    fn redo(self: &Rc<Self>) {
+        if let Some(tab) = self.current_tab() {
+            if tab.document.redo() {
+                self.refresh_titles();
+                self.refresh_status();
+            } else {
+                self.set_info("nothing to redo");
+            }
+        }
+    }
+
+    fn show_find(self: &Rc<Self>, replace: bool) {
+        self.find_bar.set_reveal_child(true);
+        self.replace_entry.set_visible(replace);
+        self.find_entry.grab_focus();
+    }
+
+    /// Find the next match from the last match (or the cursor).
+    pub fn find_next_now(self: &Rc<Self>) {
+        let needle = self.find_entry.text().to_string();
+        if needle.is_empty() {
+            return;
+        }
+        let Some(tab) = self.current_tab() else {
+            return;
+        };
+        let from = self
+            .state
+            .find_anchor
+            .borrow_mut()
+            .take()
+            .unwrap_or_else(|| tab.cursor());
+        match tab.document.find_next(&needle, from, true) {
+            Some(range) => {
+                tab.select_range(range);
+                *self.state.find_anchor.borrow_mut() = Some(range.end);
+                self.set_info(format!("match at line {}", range.start.line + 1));
+            }
+            None => self.set_info(format!("no match for {needle:?}")),
+        }
+    }
+
+    fn replace_next_now(self: &Rc<Self>) {
+        let needle = self.find_entry.text().to_string();
+        let replacement = self.replace_entry.text().to_string();
+        if needle.is_empty() {
+            return;
+        }
+        let Some(tab) = self.current_tab() else {
+            return;
+        };
+        let from = self
+            .state
+            .find_anchor
+            .borrow_mut()
+            .take()
+            .unwrap_or_else(|| tab.cursor());
+        match tab.document.replace_next(&needle, &replacement, from, true) {
+            Ok(Some(range)) => {
+                tab.select_range(range);
+                *self.state.find_anchor.borrow_mut() = Some(range.end);
+                self.set_info("replaced one match");
+            }
+            Ok(None) => self.set_info(format!("no match for {needle:?}")),
+            Err(error) => self.set_info(format!("replace failed: {error}")),
+        }
+    }
+
+    fn replace_all_now(self: &Rc<Self>) {
+        let needle = self.find_entry.text().to_string();
+        let replacement = self.replace_entry.text().to_string();
+        if needle.is_empty() {
+            return;
+        }
+        let Some(tab) = self.current_tab() else {
+            return;
+        };
+        match tab.document.replace_all(&needle, &replacement, true) {
+            Ok(count) => self.set_info(format!("replaced {count} match(es) in one undo step")),
+            Err(error) => self.set_info(format!("replace all failed: {error}")),
+        }
+    }
+
+    fn goto_dialog(self: &Rc<Self>) {
+        let Some(tab) = self.current_tab() else {
+            return;
+        };
+        let dialog = gtk::Dialog::with_buttons(
+            Some("Go to Line"),
+            Some(&self.window),
+            gtk::DialogFlags::MODAL,
+            &[] as &[(&str, gtk::ResponseType)],
+        );
+        dialog.add_button("Cancel", gtk::ResponseType::Cancel);
+        dialog.add_button("Go", gtk::ResponseType::Accept);
+        let entry = gtk::Entry::new();
+        entry.set_placeholder_text(Some("line number"));
+        dialog.content_area().add(&entry);
+        let response = dialog.run();
+        let text = entry.text().to_string();
+        dialog.close();
+        if response != gtk::ResponseType::Accept {
+            return;
+        }
+        let Ok(line) = text.trim().parse::<u32>() else {
+            self.set_info(format!("not a line number: {text}"));
+            return;
+        };
+        let line = line
+            .saturating_sub(1)
+            .min(tab.document.line_count().saturating_sub(1));
+        tab.set_cursor(Position::new(line, 0));
+    }
+
+    /// Request formatting from the LSP; the reply is applied as one undo step.
+    pub fn request_format(self: &Rc<Self>) {
+        let Some(tab) = self.current_tab() else {
+            return;
+        };
+        let Some(uri) = tab.uri() else {
+            self.set_info(format!(
+                "formatting needs a saved file and the Verible LSP ({NEEDS_FILE})"
+            ));
+            return;
+        };
+        let lsp = self.state.lsp.borrow();
+        let Some(bridge) = lsp.as_ref() else {
+            self.set_info("formatting needs the Verible LSP");
+            return;
+        };
+        *self.state.format_result.borrow_mut() = None;
+        bridge.format(
+            uri,
+            self.state.settings.tab_width,
+            self.state.settings.insert_spaces,
+        );
+        self.set_info("formatting…");
+    }
+
+    /// Run SLANG deep lint on the current tab in the background.
+    pub fn request_slang(self: &Rc<Self>) {
+        let Some(tab) = self.current_tab() else {
+            return;
+        };
+        let request = match slang_worker::request_for(&tab, &self.state.startup) {
+            Ok(request) => request,
+            Err(error) => {
+                self.set_info(format!("{error}"));
+                return;
+            }
+        };
+        let (sender, receiver) = std::sync::mpsc::channel();
+        slang_worker::spawn(request, sender);
+        *self.state.slang_rx.borrow_mut() = Some(receiver);
+        self.set_info("SLANG deep lint running…");
+    }
+
+    /// Synchronous variant used by `--selftest slang` (same production path).
+    ///
+    /// # Errors
+    /// Returns an error for an untitled tab.
+    pub fn run_slang_now(&self) -> Result<vd_deeplint::LintReport> {
+        let tab = self
+            .current_tab()
+            .ok_or_else(|| anyhow!("no current tab"))?;
+        let request = slang_worker::request_for(&tab, &self.state.startup)?;
+        Ok(slang_worker::lint(&request))
+    }
+
+    fn request_definition(self: &Rc<Self>) {
+        let Some(tab) = self.current_tab() else {
+            return;
+        };
+        let Some(uri) = tab.uri() else {
+            self.set_info(format!("definition needs a saved file ({NEEDS_FILE})"));
+            return;
+        };
+        let lsp = self.state.lsp.borrow();
+        let Some(bridge) = lsp.as_ref() else {
+            self.set_info("definition needs the Verible LSP");
+            return;
+        };
+        bridge.definition(uri, position_adapter::position_to_lsp(tab.cursor()));
+        self.set_info("looking up definition…");
+    }
+
+    fn request_references(self: &Rc<Self>) {
+        let Some(tab) = self.current_tab() else {
+            return;
+        };
+        let Some(uri) = tab.uri() else {
+            self.set_info(format!("references need a saved file ({NEEDS_FILE})"));
+            return;
+        };
+        let lsp = self.state.lsp.borrow();
+        let Some(bridge) = lsp.as_ref() else {
+            self.set_info("references need the Verible LSP");
+            return;
+        };
+        bridge.references(uri, position_adapter::position_to_lsp(tab.cursor()));
+        self.set_info("looking up references…");
+    }
+
+    fn request_rename(self: &Rc<Self>) {
+        let Some(tab) = self.current_tab() else {
+            return;
+        };
+        let Some(uri) = tab.uri() else {
+            self.set_info(format!("rename needs a saved file ({NEEDS_FILE})"));
+            return;
+        };
+        let dialog = gtk::Dialog::with_buttons(
+            Some("Rename Preview"),
+            Some(&self.window),
+            gtk::DialogFlags::MODAL,
+            &[] as &[(&str, gtk::ResponseType)],
+        );
+        dialog.add_button("Cancel", gtk::ResponseType::Cancel);
+        dialog.add_button("Preview", gtk::ResponseType::Accept);
+        let entry = gtk::Entry::new();
+        entry.set_placeholder_text(Some("new name"));
+        dialog.content_area().add(&entry);
+        let response = dialog.run();
+        let new_name = entry.text().to_string();
+        dialog.close();
+        if response != gtk::ResponseType::Accept || new_name.trim().is_empty() {
+            return;
+        }
+        let lsp = self.state.lsp.borrow();
+        let Some(bridge) = lsp.as_ref() else {
+            self.set_info("rename needs the Verible LSP");
+            return;
+        };
+        bridge.rename(
+            uri,
+            position_adapter::position_to_lsp(tab.cursor()),
+            new_name.trim().to_string(),
+        );
+        self.set_info("rename preview requested (nothing is applied)");
+    }
+
+    fn request_outline(self: &Rc<Self>) {
+        let Some(tab) = self.current_tab() else {
+            return;
+        };
+        let Some(uri) = tab.uri() else {
+            self.set_info(format!("outline needs a saved file ({NEEDS_FILE})"));
+            return;
+        };
+        let lsp = self.state.lsp.borrow();
+        let Some(bridge) = lsp.as_ref() else {
+            self.set_info("outline needs the Verible LSP");
+            return;
+        };
+        bridge.symbols(uri);
+        self.set_info("loading document symbols…");
+    }
+
+    /// Request an FIM completion for the text around the cursor.
+    pub fn request_fim(self: &Rc<Self>) {
+        let Some(tab) = self.current_tab() else {
+            return;
+        };
+        if !self.state.ghost.enabled() {
+            let reason = self
+                .state
+                .ghost
+                .reason()
+                .unwrap_or_else(|| "FIM is disabled".to_string());
+            self.set_info(reason);
+            return;
+        }
+        let (prefix, suffix) = fim_context(&tab);
+        match self.state.ghost.request(&prefix, &suffix) {
+            Ok(()) => self.set_info("FIM: waiting for a completion (Esc cancels)"),
+            Err(reason) => self.set_info(reason),
+        }
+    }
+
+    fn accept_fim(self: &Rc<Self>) {
+        let Some(tab) = self.current_tab() else {
+            return;
+        };
+        let Some(text) = self.state.ghost.pending_text() else {
+            return;
+        };
+        self.state.ghost.set_accepting(true);
+        let position = tab.cursor();
+        match tab.document.insert(position, &text) {
+            Ok(()) => {
+                let end = advance_position(position, &text);
+                tab.set_cursor(end);
+                self.set_info("FIM completion accepted");
+            }
+            Err(error) => self.set_info(format!("inserting the completion failed: {error}")),
+        }
+        self.state.ghost.set_accepting(false);
+        self.state.ghost.hide();
+        self.refresh_titles();
+        self.refresh_status();
+    }
+
+    fn toggle_panel(self: &Rc<Self>) {
+        let visible = !self.panel_revealer.reveals_child();
+        self.panel_revealer.set_reveal_child(visible);
+    }
+
+    pub fn set_info(&self, info: impl Into<String>) {
+        *self.state.info.borrow_mut() = info.into();
+        self.refresh_status();
+    }
+
+    /// Rebuild the problem panel from the current tab's store.
+    pub fn refresh_panel(&self) {
+        while let Some(row) = self.panel_list.row_at_index(0) {
+            self.panel_list.remove(&row);
+        }
+        let mut rows = Vec::new();
+        if let Some(tab) = self.current_tab() {
+            rows.extend(tab.store.borrow().all().cloned());
+        }
+        for row in &rows {
+            let label = gtk::Label::new(Some(&format!(
+                "{} [{}] {}",
+                row.severity.as_str(),
+                row.source.as_str(),
+                row.panel_text()
+            )));
+            label.set_xalign(0.0);
+            label.set_ellipsize(gtk::pango::EllipsizeMode::End);
+            let list_row = gtk::ListBoxRow::new();
+            list_row.add(&label);
+            self.panel_list.add(&list_row);
+        }
+        *self.panel_rows.borrow_mut() = rows;
+        self.panel_revealer
+            .set_reveal_child(!self.panel_rows.borrow().is_empty());
+    }
+
+    fn jump_to_diagnostic(&self, index: usize) {
+        let Some(diagnostic) = self.panel_rows.borrow().get(index).cloned() else {
+            return;
+        };
+        let Some(tab) = self.current_tab() else {
+            return;
+        };
+        match diagnostic.range {
+            Some(range) => {
+                tab.select_range(range);
+                tab.set_cursor(range.start);
+                self.set_info(format!(
+                    "{}: {}",
+                    diagnostic.severity.as_str(),
+                    diagnostic.message
+                ));
+            }
+            None => self.set_info("this diagnostic has no position (no location reported)"),
+        }
+    }
+
+    fn refresh_gutter_marks(&self) {
+        if self.gutter_refresh.get() {
+            return;
+        }
+        self.gutter_refresh.set(true);
+        self.refresh_gutter_marks_inner();
+        self.gutter_refresh.set(false);
+    }
+
+    fn refresh_gutter_marks_inner(&self) {
+        let Some(tab) = self.current_tab() else {
+            return;
+        };
+        let previous = std::mem::take(&mut *tab.marks.borrow_mut());
+        for mark in previous {
+            tab.buffer.delete_mark(&mark);
+        }
+        let worst = tab.store.borrow().worst_severity_per_line();
+        let mut created = Vec::new();
+        for (line, severity) in worst {
+            let Some(position) = tab.document.line_start_position(line) else {
+                continue;
+            };
+            let Ok(iter) = tab.document.iter_at_position(position) else {
+                continue;
+            };
+            let category = format!("vedit-{}", severity.as_str());
+            // Mark names must be unique while a mark exists.
+            let name = format!("vedit-diagnostic-{line}-{}", severity.as_str());
+            if let Some(mark) = tab.buffer.create_source_mark(Some(&name), &category, &iter) {
+                created.push(mark);
+            }
+        }
+        *tab.marks.borrow_mut() = created;
+    }
+
+    fn refresh_titles(&self) {
+        let tabs = self.state.tabs.borrow();
+        for (index, tab) in tabs.iter().enumerate() {
+            if let Some(page) = self.notebook.page_num(&tab.widget) {
+                let mut title = tab.title();
+                if tab.document.needs_close_confirmation() {
+                    title.push_str(" *");
+                }
+                if let Some(child) = self.notebook.tab_label(&tab.widget) {
+                    if let Some(label) = child.downcast_ref::<gtk::Label>() {
+                        label.set_text(&title);
+                    }
+                }
+                let _ = index;
+                let _ = page;
+            }
+        }
+    }
+
+    /// The status bar text (also used by the selftests).
+    #[must_use]
+    pub fn status_text(&self) -> String {
+        let mut parts = Vec::new();
+        if let Some(tab) = self.current_tab() {
+            let cursor = tab.cursor();
+            parts.push(format!("{}:{}", cursor.line + 1, cursor.character + 1));
+            if let Some(path) = tab.path.borrow().as_ref() {
+                parts.push(path.display().to_string());
+            }
+            let language = tab.language_id();
+            parts.push(language);
+            let (verible, slang) = tab.store.borrow().counts();
+            parts.push(format!("verible {verible}"));
+            parts.push(format!("slang {slang}"));
+        }
+        let info = self.state.info.borrow().clone();
+        if !info.is_empty() {
+            parts.push(info);
+        }
+        parts.join("  |  ")
+    }
+
+    fn refresh_status(&self) {
+        self.status.set_text(&self.status_text());
+        // Marks are owned and deleted explicitly now, so this cannot duplicate
+        // them; keeping the gutter in sync here covers every store change.
+        self.refresh_gutter_marks();
+    }
+
+    /// The current tab's diagnostic counts.
+    #[must_use]
+    pub fn diagnostics_counts(&self) -> (usize, usize) {
+        self.current_tab()
+            .map_or((0, 0), |tab| tab.store.borrow().counts())
+    }
+
+    /// Apply formatting edits (public for the selftest: the LSP event path uses
+    /// the same function).
+    ///
+    /// # Errors
+    /// Returns an error when the edits cannot be applied to the buffer.
+    pub fn apply_format_edits(&self, edits: &[lsp_types::TextEdit]) -> Result<String> {
+        let tab = self
+            .current_tab()
+            .ok_or_else(|| anyhow!("no current tab"))?;
+        let old_text = tab.text();
+        let new_text = vd_lsp::apply_text_edits(&old_text, edits)
+            .context("the formatter returned edits that do not apply")?;
+        if new_text == old_text {
+            return Ok("already formatted".to_string());
+        }
+        let edit = Edit::new(tab.full_range(), new_text);
+        tab.document
+            .apply_edits_one_step(&[edit])
+            .context("applying the formatting edits")?;
+        Ok("formatted".to_string())
+    }
+
+    fn position_ghost(&self) {
+        let Some(tab) = self.current_tab() else {
+            return;
+        };
+        let Some(iter) = position_adapter::iter_for(&tab.document, tab.cursor()) else {
+            return;
+        };
+        let rect = tab.view.iter_location(&iter);
+        let (x, y) =
+            tab.view
+                .buffer_to_window_coords(gtk::TextWindowType::Widget, rect.x(), rect.y());
+        if let Some((fixed_x, fixed_y)) = tab.view.translate_coordinates(&self.ghost_fixed, x, y) {
+            self.ghost_fixed
+                .move_(&self.state.ghost.label, fixed_x + 2, fixed_y);
+        }
+    }
+
+    /// Poll all background producers; called on a 50 ms timer and by the tests.
+    pub fn poll_background(self: &Rc<Self>) {
+        let events: Vec<LspEvent> = {
+            let mut lsp = self.state.lsp.borrow_mut();
+            let Some(bridge) = lsp.as_mut() else {
+                return;
+            };
+            let mut events = Vec::new();
+            while let Ok(event) = bridge.events.try_recv() {
+                events.push(event);
+            }
+            events
+        };
+        for event in events {
+            self.handle_lsp_event(event);
+        }
+
+        let report = self
+            .state
+            .slang_rx
+            .borrow_mut()
+            .as_ref()
+            .and_then(|receiver| receiver.try_recv().ok());
+        if let Some(report) = report {
+            self.apply_slang_report(&report);
+        }
+
+        if !self.state.ghost.has_pending() {
+            if let Some(result) = self.state.ghost.poll() {
+                match result {
+                    Ok(text) => {
+                        self.state.ghost.show_pending(text);
+                        self.position_ghost();
+                        self.set_info("FIM completion ready (Tab accepts, Esc cancels)");
+                    }
+                    Err(error) => {
+                        self.state.ghost.cancel();
+                        self.set_info(error.reason());
+                    }
+                }
+            }
+        } else {
+            self.position_ghost();
+        }
+        self.sync_lsp_status();
+    }
+
+    fn sync_lsp_status(&self) {
+        let message = {
+            let lsp = self.state.lsp.borrow();
+            match lsp.as_ref() {
+                None => "Verible LSP: not available".to_string(),
+                Some(_) => {
+                    let generation = self.state.lsp_generation.get();
+                    format!("Verible LSP: generation {generation}")
+                }
+            }
+        };
+        let mut info = self.state.info.borrow().clone();
+        if !info.starts_with("Verible LSP") {
+            info.push_str(if info.is_empty() { "" } else { "  " });
+            info.push_str(&message);
+        }
+        *self.state.info.borrow_mut() = info;
+        self.refresh_status();
+    }
+
+    fn handle_lsp_event(self: &Rc<Self>, event: LspEvent) {
+        match event {
+            LspEvent::Status {
+                message,
+                running,
+                restarts,
+            } => {
+                let text = format!("{message} (running: {running}, restarts: {restarts})");
+                self.set_info(text);
+            }
+            LspEvent::Diagnostics {
+                uri,
+                diagnostics: published,
+                generation,
+            } => {
+                self.state.lsp_generation.set(generation);
+                let target: Option<Rc<Tab>> = self
+                    .state
+                    .tabs
+                    .borrow()
+                    .iter()
+                    .find(|tab| tab.uri().is_some_and(|tab_uri| tab_uri.to_string() == uri))
+                    .cloned();
+                if let Some(tab) = target {
+                    let view = diagnostics::from_lsp(&tab.document, &published);
+                    tab.store.borrow_mut().set_verible(view);
+                    self.refresh_panel();
+                    self.refresh_gutter_marks();
+                    self.refresh_status();
+                }
+            }
+            LspEvent::Opened { ok, error } => {
+                if !ok {
+                    self.set_info(format!(
+                        "LSP could not open the document: {}",
+                        error.unwrap_or_default()
+                    ));
+                }
+            }
+            LspEvent::Formatted { ok, edits, error } => {
+                if ok {
+                    match self.apply_format_edits(&edits) {
+                        Ok(message) => {
+                            *self.state.format_result.borrow_mut() = Some(Ok(message.clone()));
+                            self.set_info(message);
+                        }
+                        Err(err) => {
+                            *self.state.format_result.borrow_mut() = Some(Err(format!("{err:#}")));
+                            self.set_info(format!("formatting failed: {err:#}"));
+                        }
+                    }
+                    self.refresh_titles();
+                    self.refresh_status();
+                } else {
+                    let message = error.unwrap_or_else(|| "formatting failed".to_string());
+                    *self.state.format_result.borrow_mut() = Some(Err(message.clone()));
+                    self.set_info(message);
+                }
+            }
+            LspEvent::Definitions { locations, error } => {
+                if let Some(error) = error {
+                    self.set_info(format!("definition failed: {error}"));
+                } else if locations.is_empty() {
+                    self.set_info("no definition found");
+                } else if locations.len() == 1 {
+                    self.jump_to_location(&locations[0]);
+                } else {
+                    self.show_locations("Definitions", locations);
+                }
+            }
+            LspEvent::References { locations, error } => {
+                if let Some(error) = error {
+                    self.set_info(format!("references failed: {error}"));
+                } else if locations.is_empty() {
+                    self.set_info("no references found");
+                } else if locations.len() == 1 {
+                    self.jump_to_location(&locations[0]);
+                } else {
+                    self.show_locations("References", locations);
+                }
+            }
+            LspEvent::Symbols { symbols, error } => {
+                if let Some(error) = error {
+                    self.set_info(format!("outline failed: {error}"));
+                } else if symbols.is_empty() {
+                    self.set_info("no document symbols reported");
+                } else {
+                    self.show_symbols(&symbols);
+                }
+            }
+            LspEvent::Renamed { preview, error } => {
+                if let Some(error) = error {
+                    self.set_info(format!("rename preview failed: {error}"));
+                } else {
+                    show_message(&self.window, "Rename preview (not applied)", &preview);
+                }
+            }
+        }
+    }
+
+    fn jump_to_location(self: &Rc<Self>, location: &lsp_types::Location) {
+        let Ok(path) = location.uri.to_file_path() else {
+            self.set_info(format!("cannot open non-file location {}", location.uri));
+            return;
+        };
+        let same_file = self
+            .current_tab()
+            .and_then(|tab| tab.path.borrow().clone())
+            .is_some_and(|open| open == path);
+        let target = if same_file {
+            self.current_tab()
+        } else {
+            match self.open_path(&path) {
+                Ok(tab) => Some(tab),
+                Err(error) => {
+                    self.set_info(format!("open failed: {error:#}"));
+                    None
+                }
+            }
+        };
+        if let Some(tab) = target {
+            let range = position_adapter::range_from_lsp(&tab.document, location.range);
+            tab.select_range(range);
+            tab.set_cursor(range.start);
+        }
+    }
+
+    fn show_locations(self: &Rc<Self>, title: &str, locations: Vec<lsp_types::Location>) {
+        let dialog = gtk::Dialog::with_buttons(
+            Some(title),
+            Some(&self.window),
+            gtk::DialogFlags::MODAL,
+            &[] as &[(&str, gtk::ResponseType)],
+        );
+        dialog.add_button("Close", gtk::ResponseType::Close);
+        dialog.set_default_size(620, 380);
+        let list = gtk::ListBox::new();
+        let scroller = gtk::ScrolledWindow::new(None::<&gtk::Adjustment>, None::<&gtk::Adjustment>);
+        scroller.set_child(Some(&list));
+        dialog.content_area().add(&scroller);
+        let ui = self.clone();
+        let rows = locations.clone();
+        list.connect_row_activated(move |_, row| {
+            ui.jump_to_location(&rows[row.index() as usize]);
+            if let Some(window) = row
+                .toplevel()
+                .and_then(|widget| widget.downcast::<gtk::Dialog>().ok())
+            {
+                window.close();
+            }
+        });
+        for location in &locations {
+            let text = format!(
+                "{}:{}:{}",
+                location.uri,
+                location.range.start.line + 1,
+                location.range.start.character + 1
+            );
+            add_row(&list, &text);
+        }
+        dialog.show_all();
+        dialog.run();
+        dialog.close();
+    }
+
+    fn show_symbols(self: &Rc<Self>, symbols: &[(String, Option<lsp_types::Range>)]) {
+        let dialog = gtk::Dialog::with_buttons(
+            Some("Outline"),
+            Some(&self.window),
+            gtk::DialogFlags::MODAL,
+            &[] as &[(&str, gtk::ResponseType)],
+        );
+        dialog.add_button("Close", gtk::ResponseType::Close);
+        dialog.set_default_size(520, 380);
+        let list = gtk::ListBox::new();
+        let scroller = gtk::ScrolledWindow::new(None::<&gtk::Adjustment>, None::<&gtk::Adjustment>);
+        scroller.set_child(Some(&list));
+        dialog.content_area().add(&scroller);
+        let ui = self.clone();
+        let rows = symbols.to_vec();
+        list.connect_row_activated(move |_, row| {
+            if let Some((_, Some(range))) = rows.get(row.index() as usize) {
+                if let Some(tab) = ui.current_tab() {
+                    let range = position_adapter::range_from_lsp(&tab.document, *range);
+                    tab.select_range(range);
+                    tab.set_cursor(range.start);
+                }
+            }
+            if let Some(window) = row
+                .toplevel()
+                .and_then(|widget| widget.downcast::<gtk::Dialog>().ok())
+            {
+                window.close();
+            }
+        });
+        for (name, range) in symbols {
+            let text = match range {
+                Some(range) => format!("{}  (line {})", name, range.start.line + 1),
+                None => name.clone(),
+            };
+            add_row(&list, &text);
+        }
+        dialog.show_all();
+        dialog.run();
+        dialog.close();
+    }
+
+    fn apply_slang_report(&self, report: &vd_deeplint::LintReport) {
+        if let Some(failure) = &report.failure {
+            self.set_info(failure.user_message());
+            return;
+        }
+        if let Some(tab) = self.current_tab() {
+            let view = diagnostics::from_slang(report, &tab.document);
+            tab.store.borrow_mut().set_slang(view);
+            self.refresh_panel();
+            self.refresh_gutter_marks();
+            self.refresh_status();
+        }
+        self.set_info(format!("SLANG: {}", report.summary()));
+    }
+
+    /// Capture the realized window into a PNG (diagnostics/screenshots).
+    ///
+    /// # Errors
+    /// Returns an error when Cairo cannot create the surface or write the PNG.
+    pub fn capture_screenshot(&self, path: &Path) -> Result<()> {
+        let window = self
+            .window
+            .window()
+            .ok_or_else(|| anyhow!("the window is not realized yet"))?;
+        let width = window.width();
+        let height = window.height();
+        let pixbuf = window
+            .pixbuf(0, 0, width, height)
+            .ok_or_else(|| anyhow!("reading the X window into a pixbuf failed"))?;
+        pixbuf
+            .savev(path, "png", &[])
+            .with_context(|| format!("writing {}", path.display()))?;
+        Ok(())
+    }
+}
+
+fn add_row(list: &gtk::ListBox, text: &str) {
+    let label = gtk::Label::new(Some(text));
+    label.set_xalign(0.0);
+    label.set_ellipsize(gtk::pango::EllipsizeMode::End);
+    let row = gtk::ListBoxRow::new();
+    row.add(&label);
+    list.add(&row);
+}
+
+fn show_message(parent: &gtk::ApplicationWindow, title: &str, text: &str) {
+    let dialog = gtk::MessageDialog::new(
+        Some(parent),
+        gtk::DialogFlags::MODAL,
+        gtk::MessageType::Info,
+        gtk::ButtonsType::Close,
+        text,
+    );
+    dialog.set_title(title);
+    dialog.show_all();
+    dialog.run();
+    dialog.close();
+}
+
+fn setup_gutter(tab: &Tab) {
+    for severity in [Severity::Error, Severity::Warning, Severity::Note] {
+        let attributes = sourceview4::MarkAttributes::new();
+        attributes.set_icon_name(severity.icon_name());
+        tab.view
+            .set_mark_attributes(&format!("vedit-{}", severity.as_str()), &attributes, 0);
+    }
+}
+
+fn fim_context(tab: &Tab) -> (String, String) {
+    let text = tab.document.text();
+    let offset = tab
+        .document
+        .char_offset_at_position(tab.cursor())
+        .unwrap_or(0);
+    let chars: Vec<char> = text.chars().collect();
+    let start = offset.saturating_sub(2000);
+    let end = (offset + 2000).min(chars.len());
+    (
+        chars[start..offset.min(chars.len())].iter().collect(),
+        chars[offset.min(chars.len())..end].iter().collect(),
+    )
+}
+
+/// Build and own the application.
+pub struct App {
+    application: gtk::Application,
+    inner: Rc<RefCell<Option<Rc<Ui>>>>,
+}
+
+impl App {
+    pub fn new(opts: &Options) -> Self {
+        let application = gtk::Application::new(Some(APP_ID), gtk::gio::ApplicationFlags::empty());
+        let inner: Rc<RefCell<Option<Rc<Ui>>>> = Rc::new(RefCell::new(None));
+        {
+            let inner = Rc::clone(&inner);
+            let opts = opts.clone();
+            application.connect_activate(move |application| match build_ui(application, &opts) {
+                Ok(ui) => {
+                    ui.window.present();
+                    let startup_messages = startup_messages(&ui.state.startup);
+                    for message in startup_messages {
+                        eprintln!("vd-app: {message}");
+                        ui.set_info(message);
+                    }
+                    *inner.borrow_mut() = Some(ui);
+                }
+                Err(error) => {
+                    eprintln!("vd-app: startup failed: {error:#}");
+                    application.quit();
                 }
             });
         }
-
-        Self {
-            app,
-            ui,
-            build_error,
-        }
+        Self { application, inner }
     }
 
-    /// The underlying `GtkApplication`.
-    #[must_use]
-    pub fn app(&self) -> &gtk::Application {
-        &self.app
-    }
-
-    /// Shared slot that holds the built [`Ui`] once activation ran.
-    #[must_use]
-    pub fn ui_slot(&self) -> Rc<RefCell<Option<Ui>>> {
-        Rc::clone(&self.ui)
-    }
-
-    /// Register the application and fire its activation.
+    /// Register and activate without GTK parsing our arguments (selftests).
     ///
     /// # Errors
-    /// Returns an error when GTK cannot register (for example no `DISPLAY`),
-    /// or when the activation handler could not build the window.
+    /// Returns the GApplication registration error.
     pub fn register_and_activate(&self) -> Result<()> {
-        self.app
+        self.application
             .register(None::<&gtk::gio::Cancellable>)
-            .context("registering the GTK application (is DISPLAY set?)")?;
-        self.app.activate();
-        if let Some(err) = self.build_error.borrow_mut().take() {
-            bail!("building the main window failed: {err}");
-        }
+            .map_err(|error| anyhow!("registering the application failed: {error}"))?;
+        self.application.activate();
         Ok(())
     }
+
+    #[must_use]
+    pub fn ui(&self) -> Option<Rc<Ui>> {
+        self.inner.borrow().clone()
+    }
+
+    /// Run the interactive loop (arguments already parsed).
+    pub fn run(&self) -> i32 {
+        let empty: [&str; 0] = [];
+        self.application.run_with_args(&empty).into()
+    }
+
+    /// Shut the application down (selftest teardown).
+    pub fn quit(&self) {
+        self.application.quit();
+    }
 }
 
-/// Run the editor interactively (blocks until the window is closed).
+fn startup_messages(startup: &Startup) -> Vec<String> {
+    let mut messages = Vec::new();
+    if let Some(error) = &startup.config_error {
+        messages.push(format!("configuration: {error}"));
+    }
+    if let Some(warning) = &startup.language_warning {
+        messages.push(format!("highlighting: {warning}"));
+    }
+    if startup.tools.ls.is_none() {
+        messages.push(format!(
+            "Verible LS not found ({} resolution attempt(s)); LSP features are unavailable",
+            startup.tools.attempts.len()
+        ));
+    }
+    if startup.config_error.is_none() && !startup.warnings.is_empty() {
+        messages.push(format!(
+            "configuration warnings: {}",
+            startup.warnings.len()
+        ));
+    }
+    messages
+}
+
+fn build_ui(application: &gtk::Application, opts: &Options) -> Result<Rc<Ui>> {
+    let cwd = std::env::current_dir().context("reading the current directory")?;
+    let exe_dir = std::env::current_exe()
+        .ok()
+        .and_then(|exe| exe.parent().map(Path::to_path_buf))
+        .unwrap_or_else(|| cwd.clone());
+    let startup = Startup::load(&cwd, &exe_dir);
+    let settings = startup.editor.clone();
+    let ghost = Ghost::new(startup.fim_settings.clone());
+
+    let window = gtk::ApplicationWindow::new(application);
+    window.set_title(APP_NAME);
+    window.set_default_size(1120, 780);
+
+    let toolbar = gtk::Box::new(gtk::Orientation::Horizontal, 4);
+    toolbar.set_margin_start(6);
+    toolbar.set_margin_end(6);
+    toolbar.set_margin_top(4);
+    toolbar.set_margin_bottom(4);
+    let new_button = gtk::Button::with_label("New");
+    let open_button = gtk::Button::with_label("Open");
+    let save_button = gtk::Button::with_label("Save");
+    let save_as_button = gtk::Button::with_label("Save As");
+    let format_button = gtk::Button::with_label("Format");
+    let slang_button = gtk::Button::with_label("SLANG Lint");
+    let rename_button = gtk::Button::with_label("Rename");
+    let panel_button = gtk::Button::with_label("Problems");
+    for button in [
+        &new_button,
+        &open_button,
+        &save_button,
+        &save_as_button,
+        &format_button,
+        &slang_button,
+        &rename_button,
+        &panel_button,
+    ] {
+        toolbar.pack_start(button, false, false, 0);
+    }
+
+    let notebook = gtk::Notebook::new();
+    notebook.set_scrollable(true);
+    let ghost_fixed = gtk::Fixed::new();
+    ghost_fixed.add(&ghost.label);
+    ghost.label.set_no_show_all(true);
+    let overlay = gtk::Overlay::new();
+    overlay.set_child(Some(&notebook));
+    overlay.add_overlay(&ghost_fixed);
+
+    let panel_list = gtk::ListBox::new();
+    let panel_scroller =
+        gtk::ScrolledWindow::new(None::<&gtk::Adjustment>, None::<&gtk::Adjustment>);
+    panel_scroller.set_child(Some(&panel_list));
+    panel_scroller.set_min_content_height(120);
+    let panel_title = gtk::Label::new(Some("Problems"));
+    panel_title.set_xalign(0.0);
+    let panel_box = gtk::Box::new(gtk::Orientation::Vertical, 2);
+    panel_box.pack_start(&panel_title, false, false, 0);
+    panel_box.pack_start(&panel_scroller, true, true, 0);
+    let panel_revealer = gtk::Revealer::new();
+    panel_revealer.set_child(Some(&panel_box));
+    panel_revealer.set_reveal_child(false);
+
+    let paned = gtk::Paned::new(gtk::Orientation::Vertical);
+    paned.add1(&overlay);
+    paned.add2(&panel_revealer);
+    paned.set_position(540);
+    paned.set_vexpand(true);
+
+    let find_entry = gtk::SearchEntry::new();
+    find_entry.set_placeholder_text(Some("Find"));
+    find_entry.set_hexpand(true);
+    let replace_entry = gtk::Entry::new();
+    replace_entry.set_placeholder_text(Some("Replace"));
+    replace_entry.set_hexpand(true);
+    replace_entry.set_visible(false);
+    let find_prev = gtk::Button::with_label("Previous");
+    let find_next = gtk::Button::with_label("Next");
+    let replace_one = gtk::Button::with_label("Replace");
+    let replace_all = gtk::Button::with_label("Replace All");
+    let find_close = gtk::Button::with_label("Close");
+    let find_box = gtk::Box::new(gtk::Orientation::Horizontal, 4);
+    find_box.pack_start(&find_entry, true, true, 0);
+    find_box.pack_start(&replace_entry, true, true, 0);
+    find_box.pack_start(&find_prev, false, false, 0);
+    find_box.pack_start(&find_next, false, false, 0);
+    find_box.pack_start(&replace_one, false, false, 0);
+    find_box.pack_start(&replace_all, false, false, 0);
+    find_box.pack_start(&find_close, false, false, 0);
+    let find_bar = gtk::Revealer::new();
+    find_bar.set_child(Some(&find_box));
+    find_bar.set_reveal_child(false);
+
+    let status = gtk::Label::new(Some("ready"));
+    status.set_xalign(0.0);
+    status.set_ellipsize(gtk::pango::EllipsizeMode::End);
+    status.set_margin_start(6);
+    status.set_margin_end(6);
+    status.set_margin_bottom(3);
+
+    let content = gtk::Box::new(gtk::Orientation::Vertical, 2);
+    content.pack_start(&toolbar, false, false, 0);
+    content.pack_start(&paned, true, true, 0);
+    content.pack_start(&find_bar, false, false, 0);
+    content.pack_start(&status, false, false, 0);
+    window.add(&content);
+
+    let state = Rc::new(State {
+        startup,
+        settings,
+        tabs: RefCell::new(Vec::new()),
+        lsp: RefCell::new(None),
+        slang_rx: RefCell::new(None),
+        ghost,
+        info: RefCell::new(String::new()),
+        format_result: RefCell::new(None),
+        find_anchor: RefCell::new(None),
+        lsp_generation: Cell::new(0),
+    });
+    let ui = Rc::new(Ui {
+        window,
+        notebook,
+        status,
+        panel_list,
+        panel_revealer,
+        find_bar,
+        find_entry,
+        replace_entry,
+        panel_rows: RefCell::new(Vec::new()),
+        state,
+        ghost_fixed,
+        gutter_refresh: Cell::new(false),
+    });
+
+    // Signal wiring that needs the Rc<Ui>.
+    {
+        let weak = Rc::downgrade(&ui);
+        ui.panel_list.connect_row_activated(move |_, row| {
+            if let Some(ui) = weak.upgrade() {
+                ui.jump_to_diagnostic(row.index() as usize);
+            }
+        });
+    }
+    {
+        let weak = Rc::downgrade(&ui);
+        new_button.connect_clicked(move |_| {
+            if let Some(ui) = weak.upgrade() {
+                ui.new_untitled();
+            }
+        });
+    }
+    {
+        let weak = Rc::downgrade(&ui);
+        open_button.connect_clicked(move |_| {
+            if let Some(ui) = weak.upgrade() {
+                ui.open_dialog();
+            }
+        });
+    }
+    {
+        let weak = Rc::downgrade(&ui);
+        save_button.connect_clicked(move |_| {
+            if let Some(ui) = weak.upgrade() {
+                ui.save_current();
+            }
+        });
+    }
+    {
+        let weak = Rc::downgrade(&ui);
+        save_as_button.connect_clicked(move |_| {
+            if let Some(ui) = weak.upgrade() {
+                ui.save_as_dialog();
+            }
+        });
+    }
+    {
+        let weak = Rc::downgrade(&ui);
+        format_button.connect_clicked(move |_| {
+            if let Some(ui) = weak.upgrade() {
+                ui.request_format();
+            }
+        });
+    }
+    {
+        let weak = Rc::downgrade(&ui);
+        slang_button.connect_clicked(move |_| {
+            if let Some(ui) = weak.upgrade() {
+                ui.request_slang();
+            }
+        });
+    }
+    {
+        let weak = Rc::downgrade(&ui);
+        rename_button.connect_clicked(move |_| {
+            if let Some(ui) = weak.upgrade() {
+                ui.request_rename();
+            }
+        });
+    }
+    {
+        let weak = Rc::downgrade(&ui);
+        panel_button.connect_clicked(move |_| {
+            if let Some(ui) = weak.upgrade() {
+                ui.toggle_panel();
+            }
+        });
+    }
+    {
+        let weak = Rc::downgrade(&ui);
+        find_next.connect_clicked(move |_| {
+            if let Some(ui) = weak.upgrade() {
+                ui.find_next_now();
+            }
+        });
+    }
+    {
+        let weak = Rc::downgrade(&ui);
+        find_prev.connect_clicked(move |_| {
+            if let Some(ui) = weak.upgrade() {
+                ui.set_info("previous match uses the same anchor; F3 continues forward");
+            }
+        });
+    }
+    {
+        let weak = Rc::downgrade(&ui);
+        replace_one.connect_clicked(move |_| {
+            if let Some(ui) = weak.upgrade() {
+                ui.replace_next_now();
+            }
+        });
+    }
+    {
+        let weak = Rc::downgrade(&ui);
+        replace_all.connect_clicked(move |_| {
+            if let Some(ui) = weak.upgrade() {
+                ui.replace_all_now();
+            }
+        });
+    }
+    {
+        let weak = Rc::downgrade(&ui);
+        let bar = ui.find_bar.clone();
+        find_close.connect_clicked(move |_| {
+            bar.set_reveal_child(false);
+            let _ = weak.upgrade();
+        });
+    }
+    {
+        let weak = Rc::downgrade(&ui);
+        ui.find_entry.connect_activate(move |_| {
+            if let Some(ui) = weak.upgrade() {
+                ui.find_next_now();
+            }
+        });
+    }
+    install_shortcuts(&ui);
+
+    // Initial tab.
+    if let Some(path) = &opts.file {
+        match ui.open_path(path) {
+            Ok(_) => {}
+            Err(error) => {
+                eprintln!("vd-app: could not open {}: {error:#}", path.display());
+                ui.new_untitled();
+            }
+        }
+    } else {
+        ui.new_untitled();
+    }
+
+    // Start the LSP worker (the UI shows the tool attempts when unavailable).
+    if let Some(bridge) = LspBridge::start(&ui.state.startup) {
+        *ui.state.lsp.borrow_mut() = Some(bridge);
+        ui.set_info("Verible LSP starting…");
+        if let Some(tab) = ui.current_tab() {
+            if let Some(uri) = tab.uri() {
+                let lsp = ui.state.lsp.borrow();
+                if let Some(bridge) = lsp.as_ref() {
+                    bridge.open(uri, tab.language_id(), tab.text());
+                }
+            }
+        }
+    } else {
+        let attempts = ui.state.startup.tools.attempts.len();
+        ui.set_info(format!(
+            "Verible LSP unavailable ({attempts} resolution attempt(s)); lint/navigation disabled"
+        ));
+    }
+    if let Some(reason) = ui.state.ghost.reason() {
+        let info = format!("{}  |  FIM: {reason}", ui.state.info.borrow());
+        *ui.state.info.borrow_mut() = info;
+    }
+
+    ui.window.show_all();
+    ghost_label_hidden(&ui);
+    {
+        let weak = Rc::downgrade(&ui);
+        glib::timeout_add_local(Duration::from_millis(50), move || match weak.upgrade() {
+            Some(ui) => {
+                ui.poll_background();
+                glib::ControlFlow::Continue
+            }
+            None => glib::ControlFlow::Break,
+        });
+    }
+    {
+        let state = Rc::clone(&ui.state);
+        ui.window.connect_destroy(move |_| {
+            if let Some(bridge) = state.lsp.borrow().as_ref() {
+                bridge.shutdown();
+            }
+        });
+    }
+    ui.refresh_titles();
+    ui.refresh_status();
+    Ok(ui)
+}
+
+fn ghost_label_hidden(ui: &Rc<Ui>) {
+    ui.state.ghost.label.set_visible(false);
+}
+
+fn install_shortcuts(ui: &Rc<Ui>) {
+    let application = ui.window.application();
+    for shortcut in SHORTCUTS {
+        if shortcut.id == "accept-fim" || shortcut.id == "cancel-fim" {
+            continue; // handled in the view key handler, depends on pending text
+        }
+        let action = gtk::gio::SimpleAction::new(shortcut.id, None);
+        let weak = Rc::downgrade(ui);
+        let id = shortcut.id;
+        action.connect_activate(move |_, _| {
+            let Some(ui) = weak.upgrade() else {
+                return;
+            };
+            match id {
+                "open" => ui.open_dialog(),
+                "new" => {
+                    ui.new_untitled();
+                }
+                "save" => ui.save_current(),
+                "save-as" => ui.save_as_dialog(),
+                "close-tab" => {
+                    if let Some(index) = ui.current_index() {
+                        ui.close_tab_at(index, true);
+                    }
+                }
+                "quit" => {
+                    if let Some(application) = ui.window.application() {
+                        application.quit();
+                    }
+                }
+                "undo" => ui.undo(),
+                "redo" => ui.redo(),
+                "find" => ui.show_find(false),
+                "replace" => ui.show_find(true),
+                "find-next" => ui.find_next_now(),
+                "goto-line" => ui.goto_dialog(),
+                "format" => ui.request_format(),
+                "slang" => ui.request_slang(),
+                "definition" => ui.request_definition(),
+                "references" => ui.request_references(),
+                "outline" => ui.request_outline(),
+                "rename" => ui.request_rename(),
+                "fim" => ui.request_fim(),
+                "toggle-panel" => ui.toggle_panel(),
+                other => eprintln!("vd-app: unknown action {other}"),
+            }
+        });
+        ui.window.add_action(&action);
+        let binding = config_glue::key_binding(&ui.state.startup.keys, shortcut.id, shortcut.accel);
+        let accel = config_glue::gtk_accel(&binding);
+        if let Some(application) = application.as_ref() {
+            application.set_accels_for_action(&format!("win.{}", shortcut.id), &[accel.as_str()]);
+        }
+    }
+    ui.refresh_status();
+}
+
+/// Run the editor interactively.
 ///
 /// # Errors
-/// Returns an error when the window cannot be created or GTK cannot start.
+/// Returns an error when the GTK application cannot be registered.
 pub fn run_interactive(opts: &Options) -> Result<()> {
-    let shell = Shell::new(opts);
-    shell.register_and_activate()?;
-    if shell.ui_slot().borrow().is_none() {
-        bail!("GTK activation did not create the main window");
-    }
-    gtk::main();
+    let app = App::new(opts);
+    app.register_and_activate()?;
+    app.run();
     Ok(())
-}
-
-fn toolbar_button(app: &gtk::Application, label: &str, action_id: &str) -> gtk::Button {
-    let button = gtk::Button::with_label(label);
-    let app = app.clone();
-    let action_id = action_id.to_string();
-    button.connect_clicked(move |_| {
-        // gtk-rs 0.18's activate_action returns (), not a success flag.
-        app.activate_action(&action_id, None);
-    });
-    button
-}
-
-fn choose_file(
-    window: &gtk::ApplicationWindow,
-    title: &str,
-    action: gtk::FileChooserAction,
-) -> Option<PathBuf> {
-    let accept_label = match action {
-        gtk::FileChooserAction::Save => "Save",
-        _ => "Open",
-    };
-    let buttons: [(&str, gtk::ResponseType); 2] = [
-        ("Cancel", gtk::ResponseType::Cancel),
-        (accept_label, gtk::ResponseType::Accept),
-    ];
-    let dialog = gtk::FileChooserDialog::new(Some(title), Some(window), action);
-    dialog.add_buttons(&buttons);
-    let response = dialog.run();
-    let path = if response == gtk::ResponseType::Accept {
-        dialog.filename()
-    } else {
-        None
-    };
-    dialog.close();
-    path
-}
-
-fn register_default_commands(
-    registry: &mut CommandRegistry,
-    session: &Rc<EditorSession>,
-) -> Result<()> {
-    {
-        let session = Rc::clone(session);
-        registry.register(
-            CommandSpec {
-                id: "open",
-                label: "Open…",
-                accels: &["<Primary>o"],
-            },
-            move |_app, window| {
-                if let Some(path) = choose_file(window, "Open File", gtk::FileChooserAction::Open) {
-                    session.report(session.load(&path));
-                }
-            },
-        )?;
-    }
-    {
-        let session = Rc::clone(session);
-        registry.register(
-            CommandSpec {
-                id: "save",
-                label: "Save",
-                accels: &["<Primary>s"],
-            },
-            move |_app, window| {
-                let result = match session.current_path() {
-                    Some(path) => session.save_to(&path),
-                    None => match choose_file(window, "Save File", gtk::FileChooserAction::Save) {
-                        Some(path) => session.save_to(&path),
-                        None => Ok(()),
-                    },
-                };
-                session.report(result);
-            },
-        )?;
-    }
-    registry.register(
-        CommandSpec {
-            id: "quit",
-            label: "Quit",
-            accels: &["<Primary>q"],
-        },
-        |_app, window| window.close(),
-    )?;
-    Ok(())
-}
-
-fn build_ui(app: &gtk::Application, opts: &Options) -> Result<Ui> {
-    let buffer = sourceview4::Buffer::new(None::<&gtk::TextTagTable>);
-    let view = sourceview4::View::with_buffer(&buffer);
-    view.set_show_line_numbers(true);
-    view.set_monospace(true);
-    view.set_highlight_current_line(true);
-
-    let window = gtk::ApplicationWindow::new(app);
-    window.set_default_size(1000, 720);
-
-    let status = gtk::Label::new(Some("Ready"));
-    status.set_xalign(0.0);
-
-    let session = Rc::new(EditorSession {
-        window: window.clone(),
-        view: view.clone(),
-        buffer: buffer.clone(),
-        status: status.clone(),
-        path: RefCell::new(None),
-    });
-    session.set_path(None);
-
-    let mut commands = CommandRegistry::new();
-    register_default_commands(&mut commands, &session)?;
-    commands.install(app, &window);
-
-    let toolbar = gtk::Box::new(gtk::Orientation::Horizontal, 6);
-    toolbar.pack_start(&toolbar_button(app, "Open", "open"), false, false, 0);
-    toolbar.pack_start(&toolbar_button(app, "Save", "save"), false, false, 0);
-
-    let scroller = gtk::ScrolledWindow::new(None::<&gtk::Adjustment>, None::<&gtk::Adjustment>);
-    scroller.add(&view);
-
-    let root = gtk::Box::new(gtk::Orientation::Vertical, 0);
-    root.pack_start(&toolbar, false, false, 0);
-    root.pack_start(&scroller, true, true, 0);
-    root.pack_start(&status, false, false, 0);
-    window.add(&root);
-
-    window.connect_destroy(|_| gtk::main_quit());
-
-    if let Some(path) = &opts.file {
-        session.report(session.load(path));
-    }
-
-    Ok(Ui { session, commands })
 }

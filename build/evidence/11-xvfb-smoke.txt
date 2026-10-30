@@ -1,4 +1,4 @@
-# Xvfb main-window smoke (2026-10-30T03:32:21Z)
+# Xvfb main-window smoke (2026-10-30T04:32:40Z)
 selftest_exit=0
 ## window entry from the X server (xwininfo -root -tree):
-     0x200002 "Untitled - VEdit": ("vd-app" "Vd-app")  1000x720+0+0  +0+0
+     0x200002 "VEdit": ("vd-app" "Vd-app")  1120x780+0+0  +0+0

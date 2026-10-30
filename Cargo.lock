@@ -1546,9 +1546,17 @@ dependencies = [
  "anyhow",
  "glib",
  "gtk",
+ "lsp-types",
  "serde",
  "serde_json",
  "sourceview4",
+ "tokio",
+ "vd-config",
+ "vd-deeplint",
+ "vd-editor",
+ "vd-fim",
+ "vd-lsp",
+ "vd-syntax",
 ]
 
 [[package]]

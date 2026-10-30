@@ -1,0 +1,6 @@
+# Xvfb selftest suites (2026-10-30T04:32:41Z)
+suite=all
+selftest_exit=0
+VEDIT_SLANG=/vedit-build/build/slang/out/slang
+VEDIT_VERIBLE_LS=/vedit-build/target/verible-pin/extract/verible-v0.0-4298-g085eef05/bin/verible-verilog-ls
+VEDIT_GSV_DATADIR=/opt/gsv4/share/gtksourceview-4

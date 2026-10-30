@@ -1,6 +1,6 @@
-# generated 2026-10-30T03:32:21Z by scripts/build.sh
+# generated 2026-10-30T04:32:42Z by scripts/build.sh
 $ file target/release/vd-app
-/home/haroldzhao/MyProj/DshProj/VEdit/target/release/vd-app: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.6.32, BuildID[sha1]=07bfb9b9c191c576bb50a1194dc41bfedd12357c, stripped
+/home/haroldzhao/MyProj/DshProj/VEdit/target/release/vd-app: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.6.32, BuildID[sha1]=54236c320693ee984ebf7309971ca3bbba398e93, stripped
 exit=0
 
 $ readelf -h | Class/Machine/Type
@@ -22,6 +22,7 @@ $ readelf -d | NEEDED
  0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
  0x0000000000000001 (NEEDED)             Shared library: [librt.so.1]
  0x0000000000000001 (NEEDED)             Shared library: [libpthread.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
  0x0000000000000001 (NEEDED)             Shared library: [libdl.so.2]
  0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
  0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]
@@ -29,9 +30,14 @@ $ readelf -d | NEEDED
 $ readelf -V | grep -o GLIBC_[0-9.]* | sort -V -u
 GLIBC_2.2.5
 GLIBC_2.3
+GLIBC_2.3.2
 GLIBC_2.3.4
 GLIBC_2.4
+GLIBC_2.7
+GLIBC_2.9
+GLIBC_2.12
 GLIBC_2.14
+GLIBC_2.15
 GLIBC_2.16
 
 $ readelf -V | grep -o GLIBC_[0-9.]* | sort -V -u | tail -1
@@ -41,5 +47,5 @@ $ objdump -T | grep -o GLIBC_[0-9.]* | sort -V -u | tail -1
 GLIBC_2.16
 
 $ sha256sum target/release/vd-app
-7082ab7a4e83cbbadbad05f9fe8862942c870190c625b882833a6097cdf2c666  /home/haroldzhao/MyProj/DshProj/VEdit/target/release/vd-app
-size_bytes=562168
+db42ecd97af3a97ec1b46f1df8dc7a65c9027bbc23964e9ec0f274bb88b149ec  /home/haroldzhao/MyProj/DshProj/VEdit/target/release/vd-app
+size_bytes=5940672
