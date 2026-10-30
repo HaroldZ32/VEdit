@@ -5,6 +5,7 @@
 //! document's line-ending bookkeeping see the same buffer.
 
 use std::cell::RefCell;
+use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
 use anyhow::{Context as _, Result};
@@ -14,7 +15,7 @@ use sourceview4::prelude::*;
 use vd_editor::{Document, Position, Range};
 
 use crate::config_glue::EditorSettings;
-use crate::diagnostics::DiagnosticsStore;
+use crate::diagnostics::{DiagnosticsStore, Severity};
 use crate::position_adapter;
 
 /// A tab: document + view + per-tab diagnostics.
@@ -29,6 +30,9 @@ pub struct Tab {
     /// Gutter marks created for the current diagnostics (owned so they can be
     /// removed precisely; removing by category is not reliable in GtkSourceView).
     pub marks: RefCell<Vec<sourceview4::Mark>>,
+    /// The diagnostic set the current gutter marks were built from (line → worst
+    /// severity). An unchanged set never rebuilds the marks (issue #2 / AC-5).
+    pub marks_key: RefCell<BTreeMap<u32, Severity>>,
 }
 
 impl Tab {
@@ -79,6 +83,7 @@ impl Tab {
             language: RefCell::new(None),
             store: RefCell::new(DiagnosticsStore::new()),
             marks: RefCell::new(Vec::new()),
+            marks_key: RefCell::new(BTreeMap::new()),
         }
     }
 
