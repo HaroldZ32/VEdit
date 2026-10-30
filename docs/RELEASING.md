@@ -1,42 +1,48 @@
 # 分支、提交与发版
 
-本项目采用 **trunk-based（主干开发）**：`main` 始终可发布，改动通过**短生命周期分支**
-以 **rebase / squash** 合入，历史保持线性，**永不重写**。
+本项目采用 **分支推进 + PR 合入**：`dev` 是集成分支，改动通过短生命周期的
+`feat/` `fix/` `chore/` `docs/` 分支以 **PR** 合入 `dev`；发版时从 `dev` 切出
+`release/<ver>`，验证与打包通过后合入 `main`，并在 `main` 上打 tag。
+已发布的历史**永不重写**。
 
-## 1. 为什么是 trunk-based，而不是 git-flow
+## 1. 为什么是 dev + release，而不是单线
 
-- **本项目的历史本来就是线性的**：截至目前所有提交都直接落在默认分支，没有 merge commit，
-  也没有长期存在的 `develop`。git-flow 要求的双长期分支与 release 分支在这里没有对应的需求。
-- **并行度低、写作用域不相交**：每个任务有独立的写作用域（路径集），同一时刻同一路径只有一个写者；
-  任务板 + 独立评审已经承担了 PR 的"审查 + 合并门槛"职责，不需要再引入一道分支结构。
-- **发布产物不进 git**（见第 5 节）：一个 40–48 MB 的二进制每次发版都进历史会让仓库迅速不可用；
-  git-flow 的 release 分支常见用途（在分支里固化产物）在这里被 GitHub Release 附件取代。
-- **回滚更直接**：`main` 线性 ⇒ 回滚就是 `git revert <sha>` 或重新打一个 tag，不需要在分支图上找落点。
+- **`main` 只放已发布的内容**：`main` 上每个提交都对应一次发版或一个 tag，
+  发布线因此始终可对照产物、可回滚。
+- **`dev` 承担日常集成**：多个 `fix/` `feat/` 分支并行时先在 `dev` 汇合、跑门禁，
+  未发版的中间状态不会被带进 `main`。
+- **发版走 `release/<ver>`**：从 `dev` 切出后只做"冻结 + 验证 + 打包 + 打 tag"，
+  通过后合入 `main`；pre-release 的修正留在 release 分支内，不夹带 `dev` 上仍在进行的改动。
+- **发布产物不进 git**（见第 5 节）：一个 40–48 MB 的二进制每次发版都进历史会让仓库迅速不可用，
+  产物作为 GitHub Release 附件分发。
+- **回滚直接**：`main` 上按 tag `git revert` 或重发一个 PATCH，不需要在分支图上找落点。
 
 ## 2. 分支
 
 | 分支 | 用途 | 生命期 |
 |---|---|---|
-| `main` | **始终可发布**；线性历史；禁止 merge commit；禁止 `push --force` / 改写历史 | 永久 |
-| `feat/<slug>` | 新功能 | 短（合入即删） |
-| `fix/<slug>` | 缺陷修复 | 短（合入即删） |
-| `chore/<slug>` | 工程/依赖/构建 | 短（合入即删） |
-| `docs/<slug>` | 文档 | 短（合入即删） |
+| `main` | **发布线**：只接收 `release/<ver>` 的合并；每个提交对应一次发版 | 永久 |
+| `dev` | **集成分支**：所有 PR 的合入目标；发版时从这里切出 release | 永久 |
+| `feat/<slug>` | 新功能 | 短（合入 `dev` 即删） |
+| `fix/<slug>` | 缺陷修复 | 短（合入 `dev` 即删） |
+| `chore/<slug>` | 工程/依赖/构建 | 短（合入 `dev` 即删） |
+| `docs/<slug>` | 文档 | 短（合入 `dev` 即删） |
+| `release/<ver>` | 冻结、验证、打包、打 tag | 短（合入 `main` 即删） |
 
-**没有 `develop`**，也没有长期 release 分支。
+日常开发：从 `dev` 拉分支，PR 合回 `dev`（**允许 merge commit**）：
 
 ```sh
-git switch main && git pull --ff-only
-git switch -c feat/format-on-save
-# … 开发、提交 …
-git fetch origin && git rebase origin/main     # 合入前先 rebase 到最新 main
-# 评审通过后，用 squash merge（或 rebase merge）合入，保持线性：
-git switch main && git pull --ff-only
-git merge --squash feat/format-on-save && git commit
-git branch -d feat/format-on-save
+git switch dev && git pull --ff-only
+git switch -c fix/issue-1-focus
+# … 开发、提交、自测 …
+git push -u origin fix/issue-1-focus
+gh pr create --base dev --head fix/issue-1-focus
+gh pr merge <n> --merge
+git switch dev && git pull --ff-only
+git branch -d fix/issue-1-focus
 ```
 
-禁止：`git merge` 产生 merge commit、`git push --force` 到 `main`、`git rebase` 已发布的历史。
+禁止：直接向 `main` 提交、`git push --force`、`git rebase` / `amend` 已发布的历史。
 
 ## 3. 提交信息（Conventional Commits）
 
@@ -62,7 +68,7 @@ docs(evidence): workspace gate green at T19 delivery (T17 deeplint landed)
 - `MAJOR.MINOR.PATCH`；首个版本 **`v0.1.0`**（0.x 表示接口尚未冻结）。
 - `MAJOR`：不兼容变更；`MINOR`：向后兼容的新功能；`PATCH`：向后兼容的修复。
 - 预发布：`v0.2.0-rc.1`（后缀递增）。
-- tag 打在 `main` 上，**annotated**：
+- tag 打在 `main` 上（`release/<ver>` 合入之后），**annotated**：
 
 ```sh
 git switch main && git pull --ff-only
@@ -94,23 +100,26 @@ sha256sum VEdit/bin/verible-verilog-{ls,lint,format} VEdit/bin/slang >> SHA256SU
 
 ## 6. 发布前检查单
 
-1. `bash scripts/gates.sh` 全绿（fmt / clippy / test / 依赖策略）；
+1. `git switch dev && git pull --ff-only`，`bash scripts/gates.sh` 全绿（fmt / clippy / test / 依赖策略）；
 2. `bash scripts/build.sh` 全绿（pinned 镜像构建 + Xvfb 冒烟 + GLIBC 断言）；
 3. `bash packaging/appimage/run-evidence.sh` 与 `bash packaging/tarball/build.sh` 的**干净无网**验收全绿
-   （`--selftest all` 51/51，两个产物各自独立）；
-4. 证据目录中有本次运行的日志（带时间戳，**不要引用旧绿灯**）；
-5. 文档与实际行为一致：`README.md`、`docs/USER_GUIDE.md`、`THIRD_PARTY_NOTICES.md`；
-6. 打 annotated tag，上传三个产物与 `SHA256SUMS`，Release notes 写"变更 + 已知限制 + 证据路径"。
+   （`--selftest all` 全部通过；数量随版本变化，不要在文档里写死，两个产物各自独立）；
+4. 从 `dev` 切出 `release/<ver>`，该分支只做冻结、验证与打包，**不要加新功能**；
+5. 证据目录中有本次运行的日志（带时间戳，**不要引用旧绿灯**）；
+6. 文档与实际行为一致：`README.md`、`docs/USER_GUIDE.md`、`THIRD_PARTY_NOTICES.md`；
+7. `release/<ver>` 以 PR 合入 `main`（merge commit），打 annotated tag，上传三个产物与 `SHA256SUMS`，
+   Release notes 写"变更 + 已知限制 + 证据路径"；若发版期间 `dev` 又有新提交，把 `main` 合回 `dev`。
 
 ## 7. 热修（hotfix）
 
-从**最近的 tag** 拉分支，PATCH 递增，修完合回 `main`，重新打 tag：
+从**最近的 tag** 拉分支，PATCH 递增；修完先合 `dev`，再按第 6 节走 release 流程进 `main`：
 
 ```sh
 git switch -c fix/crash-on-empty-file v0.1.0     # 注意：从 tag 起步
 # … 修复 + 测试 …
-git switch main && git merge --squash fix/crash-on-empty-file && git commit
-git tag -a v0.1.1 -m "VEdit 0.1.1 — fix crash on empty file"
+git push -u origin fix/crash-on-empty-file
+gh pr create --base dev --head fix/crash-on-empty-file
+# 合入 dev 后按第 6 节发一个 PATCH：release/v0.1.1 → main → tag
 ```
 
 ## 8. 历史纪律
