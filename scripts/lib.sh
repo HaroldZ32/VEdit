@@ -75,6 +75,7 @@ run_in_build_container() {
     -e CARGO_HOME=/vedit-build/target/cargo-home \
     -e RUSTUP_HOME=/opt/rust \
     -e RUSTUP_TOOLCHAIN="$RUST_TOOLCHAIN" \
+    -e SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-}" \
     -e NO_AT_BRIDGE=1 \
     -v "$ROOT:/vedit-build" \
     -w /vedit-build \

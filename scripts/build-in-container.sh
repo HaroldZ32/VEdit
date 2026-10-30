@@ -14,6 +14,23 @@ EVID="$ROOT/build/evidence"
 ARTIFACTS="$ROOT/build/artifacts"
 mkdir -p "$EVID" "$ARTIFACTS"
 
+# Reproducible-build inputs: SDE must arrive from the host (there is no .git in
+# the container); an empty or non-numeric value is a hard failure, never a
+# silent fallback. Incremental compilation is pinned off for the release build.
+: "${SOURCE_DATE_EPOCH:?SOURCE_DATE_EPOCH must be passed in from the host build}"
+case "$SOURCE_DATE_EPOCH" in
+  ''|*[!0-9]*)
+    echo "FATAL: SOURCE_DATE_EPOCH is not a numeric epoch: '$SOURCE_DATE_EPOCH'" >&2
+    exit 1
+    ;;
+esac
+export CARGO_INCREMENTAL=0
+{
+  echo "source_date_epoch=$SOURCE_DATE_EPOCH"
+  echo "cargo_incremental=$CARGO_INCREMENTAL"
+  echo "remap_flags=$RELEASE_RUSTFLAGS"
+} >> "$EVID/14-determinism-env.txt"
+
 echo "== container environment =="
 {
   echo "date_utc=$(date -u +%Y-%m-%dT%H:%M:%SZ)"

@@ -37,6 +37,26 @@ IMAGE_ID=$(docker image inspect "$BUILD_IMAGE_TAG" --format '{{.Id}}')
   echo "base_ref=$(image_ref)"
 } | tee "$EVID/02-image-id.txt"
 
+# Reproducibility: SOURCE_DATE_EPOCH is taken from the commit on the HOST (the
+# container receives no .git) and must be non-empty and numeric. It changes the
+# canonical bytes, so it must be set before a freeze, never after.
+if [ -z "${SOURCE_DATE_EPOCH:-}" ]; then
+  SOURCE_DATE_EPOCH=$(git -C "$ROOT" show -s --format=%ct HEAD 2>/dev/null || true)
+  export SOURCE_DATE_EPOCH
+fi
+case "${SOURCE_DATE_EPOCH:-}" in
+  ''|*[!0-9]*)
+    echo "FATAL: SOURCE_DATE_EPOCH must be a non-empty numeric epoch (got '${SOURCE_DATE_EPOCH:-}')" >&2
+    exit 1
+    ;;
+esac
+{
+  echo "source_date_epoch=$SOURCE_DATE_EPOCH"
+  echo "source_date_epoch_source=${SOURCE_DATE_EPOCH_SOURCE:-host:git show -s --format=%ct HEAD}"
+  echo "cargo_incremental=0 (set inside the container)"
+  echo "remap_flags=$(grep '^RELEASE_RUSTFLAGS=' "$VERSIONS_FILE")"
+} | tee "$EVID/14-determinism-env.txt"
+
 echo "== stage 2/4: release build + Xvfb smoke in the image =="
 run_in_build_container bash scripts/build-in-container.sh 2>&1 | tee "$EVID/03-build-console.log"
 
