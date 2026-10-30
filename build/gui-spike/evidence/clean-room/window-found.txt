@@ -1,0 +1,1 @@
+     0x200002 "VEdit T5 spike": ("vedit-gui-spike" "Vedit-gui-spike")  900x700+0+0  +0+0

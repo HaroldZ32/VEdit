@@ -1,0 +1,10 @@
+vedit: /etc/machine-id is not a 32-hex id; disabling the AT-SPI bridge (no D-Bus session here).
+
+(process:157): Gtk-WARNING **: 03:08:40.301: Locale not supported by C library.
+	Using the fallback 'C' locale.
+GTK_VERSION=3.22.30
+EXE=/tmp/tarroot/vedit-spike-0.1.0-linux-x86_64/usr/bin/vedit-gui-spike
+LANGSPECS=/tmp/tarroot/vedit-spike-0.1.0-linux-x86_64/usr/share/gtksourceview-4/language-specs
+LANG id=Some("systemverilog") name=Some("SystemVerilog")
+STYLE_SCHEME=cobalt
+WINDOW_MAPPED_MS=32

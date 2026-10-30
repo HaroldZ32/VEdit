@@ -1,0 +1,2 @@
+efb64eb7098bfd6db44ca7faebeefcee1fbc54d161da5ce25b1cae1562b5d1de  /work/out/VEdit-Spike-0.1.0-x86_64.AppImage
+0c8488c3fa770eb2839769efb0b7b1691daa16e8ad162d80bbdf0fff7419c84c  /work/out/vedit-spike-0.1.0-linux-x86_64.tar.gz

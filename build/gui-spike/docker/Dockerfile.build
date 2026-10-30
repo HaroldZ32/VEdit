@@ -1,0 +1,46 @@
+# Build environment for the VEdit GTK3/gui-spike (T5).
+# Base: CentOS 7.9.2009 x86_64 (glibc 2.17), the deployment target itself.
+FROM docker.m.daocloud.io/library/centos:7
+
+COPY tuna.repo /etc/yum.repos.d/tuna.repo
+RUN rm -f /etc/yum.repos.d/CentOS-*.repo
+
+RUN yum -y install \
+      gcc gcc-c++ make pkgconfig git curl tar xz bzip2 which findutils file \
+      glib2-devel gtk3-devel libxml2-devel gettext \
+      gdk-pixbuf2 gdk-pixbuf2-devel \
+      python3 \
+      dejavu-sans-fonts dejavu-sans-mono-fonts fontconfig \
+      xorg-x11-server-Xvfb xorg-x11-utils mesa-demos mesa-libGL \
+ && yum clean all
+
+# meson 0.59.4 / ninja for the GtkSourceView 4.6 source build (pip is the verified route on COS7).
+RUN curl -fsSL https://bootstrap.pypa.io/pip/3.6/get-pip.py -o /tmp/get-pip.py \
+ && python3 /tmp/get-pip.py 'pip<22' \
+ && python3 -m pip install 'meson>=0.59,<0.60' ninja==1.11.1 \
+ && meson --version && ninja --version && python3 --version
+
+# Rust toolchain: built inside the target distro so the ELF floor is COS7's glibc.
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
+      | sh -s -- -y --profile minimal --default-toolchain stable
+ENV PATH=/root/.cargo/bin:/usr/local/bin:/usr/bin:/bin
+
+# GtkSourceView 4.6.1 from the pinned upstream tarball (LGPL-2.1+), installed under /opt/gsv4.
+# 4.6.x is the newest upstream gsv4 line whose meson requires gtk+-3.0 >= 3.22; 4.8 requires
+# >= 3.24 and therefore cannot build on CentOS 7's GTK 3.22.30 (measured: meson configure error).
+ARG GSV_VERSION=4.6.1
+ARG GSV_SHA256=
+RUN curl -fsSL "https://download.gnome.org/sources/gtksourceview/4.6/gtksourceview-${GSV_VERSION}.tar.xz" -o /tmp/gsv.tar.xz \
+ && if [ -n "$GSV_SHA256" ]; then echo "${GSV_SHA256}  /tmp/gsv.tar.xz" | sha256sum -c -; fi \
+ && mkdir -p /tmp/gsv && tar -xJf /tmp/gsv.tar.xz -C /tmp/gsv --strip-components=1 \
+ && cd /tmp/gsv \
+ && meson setup build --prefix=/opt/gsv4 --libdir=lib64 \
+      -Dgtk_doc=false -Dgir=false -Dvapi=false -Dinstall_tests=false -Dglade_catalog=false \
+ && ninja -C build && ninja -C build install \
+ && rm -rf /tmp/gsv /tmp/gsv.tar.xz
+
+ENV PKG_CONFIG_PATH=/opt/gsv4/lib64/pkgconfig:/opt/gsv4/lib/pkgconfig
+ENV LD_LIBRARY_PATH=/opt/gsv4/lib64:/opt/gsv4/lib
+
+# rustfmt + clippy for the declared repo gates (AGENT.md §4).
+RUN rustup component add rustfmt clippy

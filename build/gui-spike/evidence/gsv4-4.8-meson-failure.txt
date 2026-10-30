@@ -1,0 +1,15 @@
+# GtkSourceView 4.8.4 meson configure against CentOS 7 (gtk+-3.0 3.22.30)
+# command: curl <tarball> && tar xJf && meson setup build --prefix=/opt/gsv48
+Found pkg-config: /usr/bin/pkg-config (0.27.1)
+Run-time dependency glib-2.0 found: YES 2.56.1
+Run-time dependency gobject-2.0 found: YES 2.56.1
+Run-time dependency gio-2.0 found: YES 2.56.1
+Dependency gtk+-3.0 found: NO found 3.22.30 but need: '>= 3.24'
+Did not find CMake 'cmake'
+Found CMake: NO
+Run-time dependency gtk+-3.0 found: NO 
+
+meson.build:86:0: ERROR: Invalid version of dependency, need 'gtk+-3.0' ['>= 3.24'] found '3.22.30'.
+
+A full log can be found at /tmp/g48/build/meson-logs/meson-log.txt
+MESON_EXIT=1

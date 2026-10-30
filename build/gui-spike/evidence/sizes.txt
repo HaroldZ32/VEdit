@@ -1,0 +1,4 @@
+-rwxr-xr-x 1 root root 18430456 Oct 30 03:06 /work/out/VEdit-Spike-0.1.0-x86_64.AppImage
+-rw-r--r-- 1 root root 19169299 Oct 30 03:06 /work/out/vedit-spike-0.1.0-linux-x86_64.tar.gz
+55M	/work/AppDir
+bytes: AppImage 18430456, tar.gz 19169299

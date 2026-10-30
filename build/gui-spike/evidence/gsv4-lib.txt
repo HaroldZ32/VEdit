@@ -1,0 +1,4 @@
+command: ls -l /opt/gsv4/lib64/libgtksourceview-4.so.0 && readelf --version-info /opt/gsv4/lib64/libgtksourceview-4.so.0
+lrwxrwxrwx 1 root root 27 Oct 30 02:57 /opt/gsv4/lib64/libgtksourceview-4.so.0 -> libgtksourceview-4.so.0.0.0
+max GLIBC symbol version required by libgtksourceview-4.so.0:
+GLIBC_2.14

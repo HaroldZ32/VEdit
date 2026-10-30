@@ -1,0 +1,319 @@
+== environment facts ==
+date_utc=2026-10-30T03:05:42Z
+centos_release=CentOS Linux release 7.9.2009 (Core)
+glibc=glibc-2.17-326.el7_9.3.x86_64
+gcc=gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-44)
+meson=0.59.4
+ninja=1.11.1.git.kitware.jobserver-1
+python3=Python 3.6.8
+gtk3_pkg=3.22.30
+glib_pkg=2.56.1
+gsv4_pkg=4.6.1
+gsv4_libdir=/opt/gsv4/lib64
+gtk3_rpm=gtk3-3.22.30-8.el7_9.x86_64
+language_specs=163
+== gsv4 artifact + its own GLIBC floor ==
+command: ls -l /opt/gsv4/lib64/libgtksourceview-4.so.0 && readelf --version-info /opt/gsv4/lib64/libgtksourceview-4.so.0
+lrwxrwxrwx 1 root root 27 Oct 30 02:57 /opt/gsv4/lib64/libgtksourceview-4.so.0 -> libgtksourceview-4.so.0.0.0
+max GLIBC symbol version required by libgtksourceview-4.so.0:
+GLIBC_2.14
+== toolchain ==
+rustc 1.99.1 (58cf8f9c3 2026-10-13)
+cargo 1.99.1 (5f94df478 2026-08-27)
+gcc (GCC) 4.8.5 20150623 (Red Hat 4.8.5-44)
+gtk+-3.0 3.22.30
+gtksourceview-4 4.6.1
+== cargo fmt / clippy / build (gtk-rs 0.18 + sourceview4 0.5) ==
+cargo fmt --check: exit 0
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded gio-sys v0.18.1
+  Downloaded equivalent v1.0.3
+  Downloaded autocfg v1.5.1
+  Downloaded futures-util v0.3.34
+  Downloaded gobject-sys v0.18.0
+  Downloaded gtk3-macros v0.18.2
+  Downloaded atk v0.18.2
+  Downloaded cairo-sys-rs v0.18.2
+  Downloaded futures-executor v0.3.34
+  Downloaded atk-sys v0.18.2
+  Downloaded gdk-pixbuf v0.18.5
+  Downloaded glib-sys v0.18.1
+  Downloaded futures-task v0.3.34
+  Downloaded futures-macro v0.3.34
+  Downloaded gdk-pixbuf-sys v0.18.0
+  Downloaded futures-channel v0.3.34
+  Downloaded glib-macros v0.18.5
+  Downloaded cairo-rs v0.18.5
+  Downloaded futures-io v0.3.34
+  Downloaded futures-core v0.3.34
+  Downloaded cfg-expr v0.15.8
+  Downloaded bitflags v2.13.2
+  Downloaded hashbrown v0.17.1
+  Downloaded field-offset v0.3.6
+  Downloaded gtk-sys v0.18.2
+  Downloaded gio v0.18.4
+  Downloaded gdk v0.18.2
+  Downloaded gdk-sys v0.18.2
+  Downloaded serde_spanned v0.6.9
+  Downloaded heck v0.4.1
+  Downloaded version_check v0.9.5
+  Downloaded memoffset v0.9.1
+  Downloaded proc-macro-crate v1.3.1
+  Downloaded proc-macro-error-attr v1.0.4
+  Downloaded version-compare v0.2.1
+  Downloaded heck v0.5.0
+  Downloaded proc-macro-crate v2.0.2
+  Downloaded rustc_version v0.4.1
+  Downloaded toml_datetime v0.6.3
+  Downloaded thiserror-impl v1.0.69
+  Downloaded sourceview4-sys v0.5.0
+  Downloaded system-deps v6.2.2
+  Downloaded pin-project-lite v0.2.17
+  Downloaded slab v0.4.12
+  Downloaded thiserror v1.0.69
+  Downloaded pkg-config v0.3.34
+  Downloaded quote v1.0.47
+  Downloaded pango-sys v0.18.0
+  Downloaded sourceview4 v0.5.0
+  Downloaded glib v0.18.5
+  Downloaded once_cell v1.21.4
+  Downloaded smallvec v1.16.4
+  Downloaded proc-macro-error v1.0.4
+  Downloaded semver v1.0.28
+  Downloaded unicode-ident v1.0.27
+  Downloaded target-lexicon v0.12.16
+  Downloaded pango v0.18.3
+  Downloaded toml v0.8.2
+  Downloaded proc-macro2 v1.0.107
+  Downloaded serde_core v1.0.229
+  Downloaded toml_edit v0.20.2
+  Downloaded serde v1.0.229
+  Downloaded memchr v2.8.3
+  Downloaded toml_edit v0.19.15
+  Downloaded indexmap v2.14.2
+  Downloaded winnow v0.5.40
+  Downloaded gtk v0.18.2
+  Downloaded syn v1.0.109
+  Downloaded syn v3.0.9
+  Downloaded syn v2.0.119
+  Downloaded libc v0.2.191
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling hashbrown v0.17.1
+   Compiling equivalent v1.0.3
+   Compiling winnow v0.5.40
+   Compiling target-lexicon v0.12.16
+   Compiling smallvec v1.16.4
+   Compiling pkg-config v0.3.34
+   Compiling version-compare v0.2.1
+   Compiling heck v0.5.0
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling libc v0.2.191
+   Compiling version_check v0.9.5
+   Compiling syn v1.0.109
+    Checking futures-core v0.3.34
+    Checking futures-task v0.3.34
+    Checking slab v0.4.12
+    Checking pin-project-lite v0.2.17
+   Compiling thiserror v1.0.69
+   Compiling heck v0.4.1
+    Checking futures-channel v0.3.34
+    Checking once_cell v1.21.4
+    Checking memchr v2.8.3
+   Compiling proc-macro-error-attr v1.0.4
+   Compiling proc-macro-error v1.0.4
+    Checking bitflags v2.13.2
+   Compiling gio v0.18.4
+   Compiling autocfg v1.5.1
+   Compiling semver v1.0.28
+    Checking futures-io v0.3.34
+   Compiling gtk v0.18.2
+   Compiling rustc_version v0.4.1
+   Compiling indexmap v2.14.2
+   Compiling memoffset v0.9.1
+   Compiling cfg-expr v0.15.8
+   Compiling field-offset v0.3.6
+   Compiling syn v2.0.119
+   Compiling syn v3.0.9
+   Compiling toml_datetime v0.6.3
+   Compiling serde_spanned v0.6.9
+   Compiling toml_edit v0.20.2
+   Compiling toml_edit v0.19.15
+   Compiling futures-macro v0.3.34
+   Compiling thiserror-impl v1.0.69
+    Checking futures-util v0.3.34
+   Compiling proc-macro-crate v1.3.1
+   Compiling toml v0.8.2
+   Compiling proc-macro-crate v2.0.2
+   Compiling gtk3-macros v0.18.2
+   Compiling glib-macros v0.18.5
+   Compiling system-deps v6.2.2
+   Compiling glib-sys v0.18.1
+   Compiling gobject-sys v0.18.0
+   Compiling gio-sys v0.18.1
+   Compiling gdk-sys v0.18.2
+   Compiling atk-sys v0.18.2
+   Compiling cairo-sys-rs v0.18.2
+   Compiling gdk-pixbuf-sys v0.18.0
+   Compiling pango-sys v0.18.0
+   Compiling gtk-sys v0.18.2
+   Compiling sourceview4-sys v0.5.0
+    Checking futures-executor v0.3.34
+    Checking glib v0.18.5
+    Checking cairo-rs v0.18.5
+    Checking atk v0.18.2
+    Checking pango v0.18.3
+    Checking gdk-pixbuf v0.18.5
+    Checking gdk v0.18.2
+    Checking sourceview4 v0.5.0
+    Checking vedit-gui-spike v0.1.0 (/work/app)
+    Finished `release` profile [optimized] target(s) in 27.98s
+   Compiling futures-core v0.3.34
+   Compiling futures-task v0.3.34
+   Compiling slab v0.4.12
+   Compiling pin-project-lite v0.2.17
+   Compiling smallvec v1.16.4
+   Compiling once_cell v1.21.4
+   Compiling memchr v2.8.3
+   Compiling libc v0.2.191
+   Compiling bitflags v2.13.2
+   Compiling futures-io v0.3.34
+   Compiling thiserror v1.0.69
+   Compiling memoffset v0.9.1
+   Compiling field-offset v0.3.6
+   Compiling futures-channel v0.3.34
+   Compiling futures-util v0.3.34
+   Compiling glib-sys v0.18.1
+   Compiling gobject-sys v0.18.0
+   Compiling cairo-sys-rs v0.18.2
+   Compiling gio-sys v0.18.1
+   Compiling pango-sys v0.18.0
+   Compiling atk-sys v0.18.2
+   Compiling futures-executor v0.3.34
+   Compiling glib v0.18.5
+   Compiling gdk-pixbuf-sys v0.18.0
+   Compiling gdk-sys v0.18.2
+   Compiling gtk-sys v0.18.2
+   Compiling sourceview4-sys v0.5.0
+   Compiling gio v0.18.4
+   Compiling cairo-rs v0.18.5
+   Compiling atk v0.18.2
+   Compiling pango v0.18.3
+   Compiling gdk-pixbuf v0.18.5
+   Compiling gdk v0.18.2
+   Compiling gtk v0.18.2
+   Compiling sourceview4 v0.5.0
+   Compiling vedit-gui-spike v0.1.0 (/work/app)
+    Finished `release` profile [optimized] target(s) in 23.78s
+BIN=/work/app/target/release/vedit-gui-spike
+	linux-vdso.so.1 =>  (0x00007900beb74000)
+	libgtksourceview-4.so.0 => /opt/gsv4/lib64/libgtksourceview-4.so.0 (0x00007900be159000)
+	libgtk-3.so.0 => /lib64/libgtk-3.so.0 (0x00007900bd851000)
+	libgdk-3.so.0 => /lib64/libgdk-3.so.0 (0x00007900bd567000)
+	libgio-2.0.so.0 => /lib64/libgio-2.0.so.0 (0x00007900bd1c7000)
+	libgdk_pixbuf-2.0.so.0 => /lib64/libgdk_pixbuf-2.0.so.0 (0x00007900bcf9f000)
+	libcairo-gobject.so.2 => /lib64/libcairo-gobject.so.2 (0x00007900bcd96000)
+	libpango-1.0.so.0 => /lib64/libpango-1.0.so.0 (0x00007900bcb50000)
+	libcairo.so.2 => /lib64/libcairo.so.2 (0x00007900bc819000)
+	libgobject-2.0.so.0 => /lib64/libgobject-2.0.so.0 (0x00007900bc5c8000)
+	libglib-2.0.so.0 => /lib64/libglib-2.0.so.0 (0x00007900bc2b2000)
+	libgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x00007900bc09c000)
+	librt.so.1 => /lib64/librt.so.1 (0x00007900bbe94000)
+	libpthread.so.0 => /lib64/libpthread.so.0 (0x00007900bbc78000)
+	libdl.so.2 => /lib64/libdl.so.2 (0x00007900bba74000)
+	libc.so.6 => /lib64/libc.so.6 (0x00007900bb6a6000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007900be800000)
+	libm.so.6 => /lib64/libm.so.6 (0x00007900bb3a4000)
+	libfribidi.so.0 => /lib64/libfribidi.so.0 (0x00007900bb188000)
+	libatk-1.0.so.0 => /lib64/libatk-1.0.so.0 (0x00007900baf62000)
+	libpangocairo-1.0.so.0 => /lib64/libpangocairo-1.0.so.0 (0x00007900bad54000)
+	libxml2.so.2 => /lib64/libxml2.so.2 (0x00007900ba9ea000)
+	libgmodule-2.0.so.0 => /lib64/libgmodule-2.0.so.0 (0x00007900ba7e6000)
+	libX11.so.6 => /lib64/libX11.so.6 (0x00007900ba4a8000)
+	libXi.so.6 => /lib64/libXi.so.6 (0x00007900ba298000)
+	libXfixes.so.3 => /lib64/libXfixes.so.3 (0x00007900ba092000)
+	libatk-bridge-2.0.so.0 => /lib64/libatk-bridge-2.0.so.0 (0x00007900b9e63000)
+	libwayland-client.so.0 => /lib64/libwayland-client.so.0 (0x00007900b9c54000)
+	libepoxy.so.0 => /lib64/libepoxy.so.0 (0x00007900b9928000)
+	libpangoft2-1.0.so.0 => /lib64/libpangoft2-1.0.so.0 (0x00007900b9712000)
+	libfontconfig.so.1 => /lib64/libfontconfig.so.1 (0x00007900b94d0000)
+	libXinerama.so.1 => /lib64/libXinerama.so.1 (0x00007900b92cd000)
+	libXrandr.so.2 => /lib64/libXrandr.so.2 (0x00007900b90c2000)
+	libXcursor.so.1 => /lib64/libXcursor.so.1 (0x00007900b8eb7000)
+	libXcomposite.so.1 => /lib64/libXcomposite.so.1 (0x00007900b8cb4000)
+	libXdamage.so.1 => /lib64/libXdamage.so.1 (0x00007900b8ab1000)
+	libxkbcommon.so.0 => /lib64/libxkbcommon.so.0 (0x00007900b8871000)
+	libwayland-cursor.so.0 => /lib64/libwayland-cursor.so.0 (0x00007900b8669000)
+	libwayland-egl.so.1 => /lib64/libwayland-egl.so.1 (0x00007900b8467000)
+	libXext.so.6 => /lib64/libXext.so.6 (0x00007900b8255000)
+	libffi.so.6 => /lib64/libffi.so.6 (0x00007900b804d000)
+	libpcre.so.1 => /lib64/libpcre.so.1 (0x00007900b7deb000)
+	libz.so.1 => /lib64/libz.so.1 (0x00007900b7bd5000)
+	libselinux.so.1 => /lib64/libselinux.so.1 (0x00007900b79ae000)
+	libresolv.so.2 => /lib64/libresolv.so.2 (0x00007900b7794000)
+	libmount.so.1 => /lib64/libmount.so.1 (0x00007900b7551000)
+	libpng15.so.15 => /lib64/libpng15.so.15 (0x00007900b7326000)
+	libpixman-1.so.0 => /lib64/libpixman-1.so.0 (0x00007900b707d000)
+	libfreetype.so.6 => /lib64/libfreetype.so.6 (0x00007900b6dbe000)
+	libEGL.so.1 => /lib64/libEGL.so.1 (0x00007900b6baa000)
+	libxcb-shm.so.0 => /lib64/libxcb-shm.so.0 (0x00007900b69a6000)
+	libxcb.so.1 => /lib64/libxcb.so.1 (0x00007900b677e000)
+	libxcb-render.so.0 => /lib64/libxcb-render.so.0 (0x00007900b6570000)
+	libXrender.so.1 => /lib64/libXrender.so.1 (0x00007900b6365000)
+	libGL.so.1 => /lib64/libGL.so.1 (0x00007900b60d9000)
+	libthai.so.0 => /lib64/libthai.so.0 (0x00007900b5ecd000)
+	liblzma.so.5 => /lib64/liblzma.so.5 (0x00007900b5ca7000)
+	libatspi.so.0 => /lib64/libatspi.so.0 (0x00007900b5a76000)
+	libdbus-1.so.3 => /lib64/libdbus-1.so.3 (0x00007900b5826000)
+	libharfbuzz.so.0 => /lib64/libharfbuzz.so.0 (0x00007900b5589000)
+	libexpat.so.1 => /lib64/libexpat.so.1 (0x00007900b535e000)
+	libuuid.so.1 => /lib64/libuuid.so.1 (0x00007900b5159000)
+	libblkid.so.1 => /lib64/libblkid.so.1 (0x00007900b4f19000)
+	libbz2.so.1 => /lib64/libbz2.so.1 (0x00007900b4d09000)
+	libGLdispatch.so.0 => /lib64/libGLdispatch.so.0 (0x00007900b4a53000)
+	libXau.so.6 => /lib64/libXau.so.6 (0x00007900b484f000)
+	libGLX.so.0 => /lib64/libGLX.so.0 (0x00007900b461d000)
+	libsystemd.so.0 => /lib64/libsystemd.so.0 (0x00007900b43ec000)
+	libgraphite2.so.3 => /lib64/libgraphite2.so.3 (0x00007900b41be000)
+	libcap.so.2 => /lib64/libcap.so.2 (0x00007900b3fb9000)
+	liblz4.so.1 => /lib64/liblz4.so.1 (0x00007900b3daa000)
+	libgcrypt.so.11 => /lib64/libgcrypt.so.11 (0x00007900b3b29000)
+	libgpg-error.so.0 => /lib64/libgpg-error.so.0 (0x00007900b3924000)
+	libdw.so.1 => /lib64/libdw.so.1 (0x00007900b36d3000)
+	libattr.so.1 => /lib64/libattr.so.1 (0x00007900b34ce000)
+	libelf.so.1 => /lib64/libelf.so.1 (0x00007900b32b6000)
+command: readelf --version-info /work/app/target/release/vedit-gui-spike
+max GLIBC symbol version required by the spike binary:
+GLIBC_2.16
+vedit-gui-spike v0.1.0 (/work/app)
+├── cairo-rs v0.18.5
+├── gdk v0.18.2
+├── gdk-pixbuf v0.18.5
+├── glib v0.18.5
+├── gtk v0.18.2
+└── sourceview4 v0.5.0
+name = "gdk"
+version = "0.18.2"
+--
+name = "gdk-pixbuf"
+version = "0.18.5"
+--
+name = "glib"
+version = "0.18.5"
+--
+name = "gtk"
+version = "0.18.2"
+--
+name = "gtk-sys"
+version = "0.18.2"
+--
+name = "sourceview4"
+version = "0.5.0"
+--
+name = "sourceview4-sys"
+version = "0.5.0"
+d7f479f0245f2c39570e82bda3988b37a1b0588fc14df06471369b886210864c  /work/out/vedit-gui-spike
+BUILD APP OK

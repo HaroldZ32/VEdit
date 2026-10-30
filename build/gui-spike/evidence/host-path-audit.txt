@@ -1,0 +1,10 @@
+# build-tree path leakage audit (upstream icon artwork is out of scope:
+#   several Adwaita SVGs carry the upstream author's /home/sam/... metadata)
+# 1) build-machine paths embedded in the main binary (Rust panic locations):
+count=0
+# 2) launch-time config templates (expect @APPDIR@ placeholders only):
+none
+# 3) @APPDIR@ placeholder count in etc/loaders.cache.in:
+13
+# 4) RPATH/RUNPATH on the main binary:
+none

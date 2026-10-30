@@ -1,0 +1,3 @@
+command: readelf --version-info /work/app/target/release/vedit-gui-spike
+max GLIBC symbol version required by the spike binary:
+GLIBC_2.16

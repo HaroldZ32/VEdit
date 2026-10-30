@@ -1,0 +1,2 @@
+gtk+-3.0 3.22.30
+gtksourceview-4 4.6.1

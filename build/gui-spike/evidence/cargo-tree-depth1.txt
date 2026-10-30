@@ -1,0 +1,7 @@
+vedit-gui-spike v0.1.0 (/work/app)
+├── cairo-rs v0.18.5
+├── gdk v0.18.2
+├── gdk-pixbuf v0.18.5
+├── glib v0.18.5
+├── gtk v0.18.2
+└── sourceview4 v0.5.0

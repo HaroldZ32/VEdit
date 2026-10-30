@@ -1,0 +1,16 @@
+[package]
+name = "vedit-gui-spike"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+gtk = "0.18"
+glib = "0.18"
+gdk = "0.18"
+gdk-pixbuf = "0.18"
+sourceview4 = "0.5"
+cairo-rs = { version = "0.18", features = ["png"] }
+
+[profile.release]
+strip = "debuginfo"

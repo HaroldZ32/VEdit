@@ -1,0 +1,8 @@
+schemas: 6
+gschemas.compiled
+org.gtk.Demo.gschema.xml
+org.gtk.Settings.ColorChooser.gschema.xml
+org.gtk.Settings.Debug.gschema.xml
+org.gtk.Settings.EmojiChooser.gschema.xml
+org.gtk.Settings.FileChooser.gschema.xml
+org.gtk.exampleapp.gschema.xml

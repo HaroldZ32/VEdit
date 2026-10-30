@@ -1,0 +1,11 @@
+# Are the Verilog/SystemVerilog language definitions identical between the
+# GtkSourceView release used (4.6.1) and the 4.8.4 release named in the task?
+== verilog.lang ==
+4.6.1: 7670ddfd7b443f5f99c202bfa79de31834c1bd8968ed74c39474dca4f439d464  lines=475 keywords=282
+4.8.4: 7670ddfd7b443f5f99c202bfa79de31834c1bd8968ed74c39474dca4f439d464  lines=475 keywords=282
+diff lines: 0
+== systemverilog.lang ==
+4.6.1: 9d1f67411f2674d93f035620ce004da4beca5bbf469eb9955a83c332edb79b04  lines=262 keywords=197
+4.8.4: 9d1f67411f2674d93f035620ce004da4beca5bbf469eb9955a83c332edb79b04  lines=262 keywords=197
+diff lines: 0
+total .lang files: 4.6.1=164 4.8.4=170

@@ -1,0 +1,12 @@
+# Clean-room acceptance image for T5.
+# Contains ONLY: CentOS 7.9.2009 base + test-side Xvfb/Mesa/glxinfo.
+# No GTK, no GtkSourceView, no verible, no slang, no rust, no python.
+FROM docker.m.daocloud.io/library/centos:7
+
+COPY tuna.repo /etc/yum.repos.d/tuna.repo
+RUN rm -f /etc/yum.repos.d/CentOS-*.repo \
+ && yum -y install xorg-x11-server-Xvfb xorg-x11-utils mesa-demos glx-utils mesa-libGL fontconfig \
+ && yum clean all
+
+# Negative assertion used by the smoke script: the GUI stack must NOT be installed here.
+RUN ! rpm -q gtk3 gtksourceview3 gtksourceview4 && echo "clean-room: no gtk/gsv packages present"

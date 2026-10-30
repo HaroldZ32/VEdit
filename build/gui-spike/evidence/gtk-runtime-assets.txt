@@ -1,0 +1,3 @@
+themes: 
+icons:  Adwaita hicolor 
+fonts:  DejaVuSans-Bold.ttf DejaVuSans-BoldOblique.ttf DejaVuSans-ExtraLight.ttf DejaVuSans-Oblique.ttf DejaVuSans.ttf DejaVuSansCondensed-Bold.ttf DejaVuSansCondensed-BoldOblique.ttf DejaVuSansCondensed-Oblique.ttf DejaVuSansCondensed.ttf DejaVuSansMono-Bold.ttf DejaVuSansMono-BoldOblique.ttf DejaVuSansMono-Oblique.ttf DejaVuSansMono.ttf 

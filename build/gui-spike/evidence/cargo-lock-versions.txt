@@ -1,0 +1,23 @@
+name = "cairo-rs"
+version = "0.18.5"
+--
+name = "gdk"
+version = "0.18.2"
+--
+name = "gdk-pixbuf"
+version = "0.18.5"
+--
+name = "glib"
+version = "0.18.5"
+--
+name = "gtk"
+version = "0.18.2"
+--
+name = "gtk-sys"
+version = "0.18.2"
+--
+name = "sourceview4"
+version = "0.5.0"
+--
+name = "sourceview4-sys"
+version = "0.5.0"

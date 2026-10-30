@@ -1,0 +1,134 @@
+[clean-room] host: CentOS Linux release 7.9.2009 (Core)
+[clean-room] glibc: glibc-2.17-317.el7.x86_64
+[clean-room] software rendering: LIBGL_ALWAYS_SOFTWARE=1
+[clean-room] PASS: no system gtk3/gsv package installed (negative assertion)
+[clean-room] PASS: Xvfb :99 up
+[clean-room] appimage=/art/VEdit-Spike-0.1.0-x86_64.AppImage
+[clean-room] tarball=/art/vedit-spike-0.1.0-linux-x86_64.tar.gz
+[clean-room] tar.gz selftest exit=0
+[clean-room] vedit: /etc/machine-id is not a 32-hex id; disabling the AT-SPI bridge (no D-Bus session here).
+[clean-room] 
+[clean-room] (process:37): Gtk-WARNING **: 03:08:34.994: Locale not supported by C library.
+[clean-room] 	Using the fallback 'C' locale.
+[clean-room] GTK_VERSION=3.22.30
+[clean-room] EXE=/tmp/tarroot/vedit-spike-0.1.0-linux-x86_64/usr/bin/vedit-gui-spike
+[clean-room] LANGSPECS=/tmp/tarroot/vedit-spike-0.1.0-linux-x86_64/usr/share/gtksourceview-4/language-specs
+[clean-room] LANG id=Some("systemverilog") name=Some("SystemVerilog")
+[clean-room] STYLE_SCHEME=cobalt
+[clean-room] WINDOW_MAPPED_MS=36
+[clean-room] SELFTEST lang_id=systemverilog
+[clean-room] SELFTEST highlight_ready=true
+[clean-room] SELFTEST token module classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+[clean-room] SELFTEST token interface classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+[clean-room] SELFTEST token package classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+[clean-room] SELFTEST token class classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+[clean-room] SELFTEST token always_ff classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+[clean-room] SELFTEST token constraint classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+[clean-room] SELFTEST token covergroup classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+[clean-room] SELFTEST token macro_define classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#cccccc") weight=400 PASS
+[clean-room] SELFTEST token comment classes=["comment"] tags=["gtksourceview:context-classes:comment"] color=Some("#0088ff") weight=400 PASS
+[clean-room] SELFTEST token string classes=["string"] tags=["gtksourceview:context-classes:string"] color=Some("#3ad900") weight=400 PASS
+[clean-room] SELFTEST token number classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff0044") weight=400 PASS
+[clean-room] SELFTEST token system_task classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+[clean-room] SELFTEST token data_type classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#80ffbb") weight=400 PASS
+[clean-room] CHECK lang_id==systemverilog PASS
+[clean-room] CHECK highlight_ready PASS
+[clean-room] CHECK keyword_colored PASS
+[clean-room] CHECK keyword_style_shared:interface PASS
+[clean-room] CHECK keyword_style_shared:package PASS
+[clean-room] CHECK keyword_style_shared:class PASS
+[clean-room] CHECK keyword_style_shared:always_ff PASS
+[clean-room] CHECK keyword_style_shared:constraint PASS
+[clean-room] CHECK keyword_style_shared:covergroup PASS
+[clean-room] CHECK distinct_from_keyword:comment PASS
+[clean-room] CHECK distinct_from_keyword:string PASS
+[clean-room] CHECK distinct_from_keyword:number PASS
+[clean-room] CHECK distinct_from_keyword:macro_define PASS
+[clean-room] CHECK distinct_from_keyword:data_type PASS
+[clean-room] CHECK distinct_style_colors>=5 PASS
+[clean-room] DISTINCT_COLORS=6
+[clean-room] COLOR module #ff9d00
+[clean-room] COLOR interface #ff9d00
+[clean-room] COLOR package #ff9d00
+[clean-room] COLOR class #ff9d00
+[clean-room] COLOR always_ff #ff9d00
+[clean-room] COLOR constraint #ff9d00
+[clean-room] COLOR covergroup #ff9d00
+[clean-room] COLOR macro_define #cccccc
+[clean-room] COLOR comment #0088ff
+[clean-room] COLOR string #3ad900
+[clean-room] COLOR number #ff0044
+[clean-room] COLOR system_task #ff9d00
+[clean-room] COLOR data_type #80ffbb
+[clean-room] SELFTEST PASS
+[clean-room] tar.gz screenshot exit=0 path=/evid/screenshots/targz.png
+[clean-room] AppImage direct exec exit=127 (expected 127/1 without /dev/fuse)
+[clean-room] for more information
+[clean-room] open dir error: No such file or directory
+[clean-room] AppImage --appimage-extract-and-run selftest exit=0
+[clean-room] vedit: /etc/machine-id is not a 32-hex id; disabling the AT-SPI bridge (no D-Bus session here).
+[clean-room] 
+[clean-room] (process:72): Gtk-WARNING **: 03:08:36.812: Locale not supported by C library.
+[clean-room] 	Using the fallback 'C' locale.
+[clean-room] GTK_VERSION=3.22.30
+[clean-room] EXE=/tmp/appimage_extracted_5c4a5c6d9fcd884622162f378386b15a/usr/bin/vedit-gui-spike
+[clean-room] LANGSPECS=/tmp/appimage_extracted_5c4a5c6d9fcd884622162f378386b15a/usr/share/gtksourceview-4/language-specs
+[clean-room] LANG id=Some("systemverilog") name=Some("SystemVerilog")
+[clean-room] STYLE_SCHEME=cobalt
+[clean-room] WINDOW_MAPPED_MS=34
+[clean-room] SELFTEST lang_id=systemverilog
+[clean-room] SELFTEST highlight_ready=true
+[clean-room] SELFTEST token module classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+[clean-room] SELFTEST token interface classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+[clean-room] SELFTEST token package classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+[clean-room] SELFTEST token class classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+[clean-room] SELFTEST token always_ff classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+[clean-room] SELFTEST token constraint classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+[clean-room] SELFTEST token covergroup classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+[clean-room] SELFTEST token macro_define classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#cccccc") weight=400 PASS
+[clean-room] SELFTEST token comment classes=["comment"] tags=["gtksourceview:context-classes:comment"] color=Some("#0088ff") weight=400 PASS
+[clean-room] SELFTEST token string classes=["string"] tags=["gtksourceview:context-classes:string"] color=Some("#3ad900") weight=400 PASS
+[clean-room] SELFTEST token number classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff0044") weight=400 PASS
+[clean-room] SELFTEST token system_task classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+[clean-room] SELFTEST token data_type classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#80ffbb") weight=400 PASS
+[clean-room] CHECK lang_id==systemverilog PASS
+[clean-room] CHECK highlight_ready PASS
+[clean-room] CHECK keyword_colored PASS
+[clean-room] CHECK keyword_style_shared:interface PASS
+[clean-room] CHECK keyword_style_shared:package PASS
+[clean-room] CHECK keyword_style_shared:class PASS
+[clean-room] CHECK keyword_style_shared:always_ff PASS
+[clean-room] CHECK keyword_style_shared:constraint PASS
+[clean-room] CHECK keyword_style_shared:covergroup PASS
+[clean-room] CHECK distinct_from_keyword:comment PASS
+[clean-room] CHECK distinct_from_keyword:string PASS
+[clean-room] CHECK distinct_from_keyword:number PASS
+[clean-room] CHECK distinct_from_keyword:macro_define PASS
+[clean-room] CHECK distinct_from_keyword:data_type PASS
+[clean-room] CHECK distinct_style_colors>=5 PASS
+[clean-room] DISTINCT_COLORS=6
+[clean-room] COLOR module #ff9d00
+[clean-room] COLOR interface #ff9d00
+[clean-room] COLOR package #ff9d00
+[clean-room] COLOR class #ff9d00
+[clean-room] COLOR always_ff #ff9d00
+[clean-room] COLOR constraint #ff9d00
+[clean-room] COLOR covergroup #ff9d00
+[clean-room] COLOR macro_define #cccccc
+[clean-room] COLOR comment #0088ff
+[clean-room] COLOR string #3ad900
+[clean-room] COLOR number #ff0044
+[clean-room] COLOR system_task #ff9d00
+[clean-room] COLOR data_type #80ffbb
+[clean-room] SELFTEST PASS
+run=1 exit=0 wall_ms=823
+run=2 exit=0 wall_ms=833
+run=3 exit=0 wall_ms=823
+WINDOW_MAPPED_MS=31
+WINDOW_MAPPED_MS=34
+WINDOW_MAPPED_MS=31
+[clean-room] PASS: every dependency of the app resolves inside the extracted payload
+[clean-room] deps resolved from payload: 67; deps still taken from host: 8
+     0x200002 "VEdit T5 spike": ("vedit-gui-spike" "Vedit-gui-spike")  900x700+0+0  +0+0
+[clean-room] APPIMAGE_EXTRACT_AND_RUN=1 selftest exit=0
+[clean-room] RESULT=PASS

@@ -1,0 +1,33 @@
+vedit: /etc/machine-id is not a 32-hex id; disabling the AT-SPI bridge (no D-Bus session here).
+
+(process:89): Gtk-WARNING **: 03:08:37.626: Locale not supported by C library.
+	Using the fallback 'C' locale.
+GTK_VERSION=3.22.30
+EXE=/tmp/appimage_extracted_5c4a5c6d9fcd884622162f378386b15a/usr/bin/vedit-gui-spike
+LANGSPECS=/tmp/appimage_extracted_5c4a5c6d9fcd884622162f378386b15a/usr/share/gtksourceview-4/language-specs
+LANG id=Some("systemverilog") name=Some("SystemVerilog")
+STYLE_SCHEME=cobalt
+WINDOW_MAPPED_MS=31
+SCREENSHOT path=/evid/screenshots/appimage-1.png width=900 height=700 bytes=76237
+vedit: /etc/machine-id is not a 32-hex id; disabling the AT-SPI bridge (no D-Bus session here).
+
+(process:108): Gtk-WARNING **: 03:08:38.455: Locale not supported by C library.
+	Using the fallback 'C' locale.
+GTK_VERSION=3.22.30
+EXE=/tmp/appimage_extracted_5c4a5c6d9fcd884622162f378386b15a/usr/bin/vedit-gui-spike
+LANGSPECS=/tmp/appimage_extracted_5c4a5c6d9fcd884622162f378386b15a/usr/share/gtksourceview-4/language-specs
+LANG id=Some("systemverilog") name=Some("SystemVerilog")
+STYLE_SCHEME=cobalt
+WINDOW_MAPPED_MS=34
+SCREENSHOT path=/evid/screenshots/appimage-2.png width=900 height=700 bytes=76237
+vedit: /etc/machine-id is not a 32-hex id; disabling the AT-SPI bridge (no D-Bus session here).
+
+(process:127): Gtk-WARNING **: 03:08:39.289: Locale not supported by C library.
+	Using the fallback 'C' locale.
+GTK_VERSION=3.22.30
+EXE=/tmp/appimage_extracted_5c4a5c6d9fcd884622162f378386b15a/usr/bin/vedit-gui-spike
+LANGSPECS=/tmp/appimage_extracted_5c4a5c6d9fcd884622162f378386b15a/usr/share/gtksourceview-4/language-specs
+LANG id=Some("systemverilog") name=Some("SystemVerilog")
+STYLE_SCHEME=cobalt
+WINDOW_MAPPED_MS=31
+SCREENSHOT path=/evid/screenshots/appimage-3.png width=900 height=700 bytes=76237

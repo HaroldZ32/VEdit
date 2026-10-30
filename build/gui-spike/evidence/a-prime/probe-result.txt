@@ -1,0 +1,8 @@
+gsv3=3.24.8
+command: gcc -std=gnu99 probe.c $(pkg-config --cflags --libs gtksourceview-3.0) -o probe
+COMPILE_EXIT=0
+command: NO_AT_BRIDGE=1 xvfb-run -a ./probe /specs   (specs = gsv 4.8.4 data/language-specs)
+LANG id=systemverilog name=SystemVerilog section=Source
+STYLE_IDS=4
+COMPAT_OK
+RUN_EXIT=0

@@ -1,0 +1,55 @@
+vedit: /etc/machine-id is not a 32-hex id; disabling the AT-SPI bridge (no D-Bus session here).
+
+(process:176): Gtk-WARNING **: 03:08:43.356: Locale not supported by C library.
+	Using the fallback 'C' locale.
+GTK_VERSION=3.22.30
+EXE=/tmp/appimage_extracted_5c4a5c6d9fcd884622162f378386b15a/usr/bin/vedit-gui-spike
+LANGSPECS=/tmp/appimage_extracted_5c4a5c6d9fcd884622162f378386b15a/usr/share/gtksourceview-4/language-specs
+LANG id=Some("systemverilog") name=Some("SystemVerilog")
+STYLE_SCHEME=cobalt
+WINDOW_MAPPED_MS=32
+SELFTEST lang_id=systemverilog
+SELFTEST highlight_ready=true
+SELFTEST token module classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+SELFTEST token interface classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+SELFTEST token package classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+SELFTEST token class classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+SELFTEST token always_ff classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+SELFTEST token constraint classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+SELFTEST token covergroup classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+SELFTEST token macro_define classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#cccccc") weight=400 PASS
+SELFTEST token comment classes=["comment"] tags=["gtksourceview:context-classes:comment"] color=Some("#0088ff") weight=400 PASS
+SELFTEST token string classes=["string"] tags=["gtksourceview:context-classes:string"] color=Some("#3ad900") weight=400 PASS
+SELFTEST token number classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff0044") weight=400 PASS
+SELFTEST token system_task classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#ff9d00") weight=700 PASS
+SELFTEST token data_type classes=[] tags=["gtksourceview:context-classes:no-spell-check"] color=Some("#80ffbb") weight=400 PASS
+CHECK lang_id==systemverilog PASS
+CHECK highlight_ready PASS
+CHECK keyword_colored PASS
+CHECK keyword_style_shared:interface PASS
+CHECK keyword_style_shared:package PASS
+CHECK keyword_style_shared:class PASS
+CHECK keyword_style_shared:always_ff PASS
+CHECK keyword_style_shared:constraint PASS
+CHECK keyword_style_shared:covergroup PASS
+CHECK distinct_from_keyword:comment PASS
+CHECK distinct_from_keyword:string PASS
+CHECK distinct_from_keyword:number PASS
+CHECK distinct_from_keyword:macro_define PASS
+CHECK distinct_from_keyword:data_type PASS
+CHECK distinct_style_colors>=5 PASS
+DISTINCT_COLORS=6
+COLOR module #ff9d00
+COLOR interface #ff9d00
+COLOR package #ff9d00
+COLOR class #ff9d00
+COLOR always_ff #ff9d00
+COLOR constraint #ff9d00
+COLOR covergroup #ff9d00
+COLOR macro_define #cccccc
+COLOR comment #0088ff
+COLOR string #3ad900
+COLOR number #ff0044
+COLOR system_task #ff9d00
+COLOR data_type #80ffbb
+SELFTEST PASS

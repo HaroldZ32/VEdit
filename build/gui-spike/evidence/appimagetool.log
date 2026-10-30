@@ -1,0 +1,44 @@
+appimagetool, continuous build (git version b082d2e), build 333 built on 2026-10-29 19:15:25 UTC
+Using architecture x86_64
+/work/AppDir should be packaged as /work/out/VEdit-Spike-0.1.0-x86_64.AppImage
+Creating .DirIcon symlink based on information from desktop file
+Generating squashfs...
+Downloading runtime file from https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-x86_64
+Downloaded runtime binary of size 944632
+Parallel mksquashfs: Using 16 processors
+Creating 4.0 filesystem on /work/out/VEdit-Spike-0.1.0-x86_64.AppImage, block size 131072.
+[=============================================================/] 4328/4328 100%
+
+Exportable Squashfs 4.0 filesystem, zstd compressed, data block size 131072
+	compressed data, compressed metadata, compressed fragments,
+	compressed xattrs, compressed ids
+	duplicates are removed
+Filesystem size 17072.21 Kbytes (16.67 Mbytes)
+	40.59% of uncompressed filesystem size (42062.38 Kbytes)
+Inode table size 34305 bytes (33.50 Kbytes)
+	23.63% of uncompressed inode table size (145175 bytes)
+Directory table size 45624 bytes (44.55 Kbytes)
+	29.55% of uncompressed directory table size (154390 bytes)
+Number of duplicate files found 227
+Number of inodes 4488
+Number of files 4079
+Number of fragments 62
+Number of symbolic links 1
+Number of device nodes 0
+Number of fifo nodes 0
+Number of socket nodes 0
+Number of directories 408
+Number of hard-links 0
+Number of ids (unique uids + gids) 1
+Number of uids 1
+	root (0)
+Number of gids 1
+	root (0)
+Embedding ELF...
+Marking the AppImage as executable...
+Embedding MD5 digest
+Success
+
+Please consider submitting your AppImage to AppImageHub, the crowd-sourced
+central directory of available AppImages, by opening a pull request
+at https://github.com/AppImage/appimage.github.io

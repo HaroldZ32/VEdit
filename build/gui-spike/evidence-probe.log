@@ -1,0 +1,5 @@
+GTK_VERSION=3.22.30
+EXE=/work/out/vedit-gui-spike
+LANGSPECS=<compiled-in default>
+LANG id=systemverilog name=<not-found>
+STYLE_SCHEME=<none>

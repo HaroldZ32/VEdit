@@ -1,0 +1,8 @@
+command: xdpyinfo | grep -i glx   (does this X server offer GLX at all?)
+GLX extension: absent
+
+command: glxinfo -B   (LIBGL_ALWAYS_SOFTWARE=1)
+Error: couldn't find RGB GLX visual or fbconfig
+name of display: :99
+
+EXIT=0

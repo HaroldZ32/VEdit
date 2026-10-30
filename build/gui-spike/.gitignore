@@ -1,0 +1,6 @@
+# Reproducible build products and caches: rebuilt by scripts/build-all.sh, never committed.
+out/
+AppDir/
+tarroot/
+.cache/
+app/target/

@@ -1,0 +1,176 @@
+== collect GTK3 runtime closure (recursive ldd) ==
+# GTK3 runtime + transitive closure bundled into the AppDir
+# method: recursive ldd from the spike binary, excluding glibc/libgcc/libstdc++
+# count: 67
+libEGL.so.1	/lib64/libEGL.so.1
+libGL.so.1	/lib64/libGL.so.1
+libGLX.so.0	/lib64/libGLX.so.0
+libGLdispatch.so.0	/lib64/libGLdispatch.so.0
+libX11.so.6	/lib64/libX11.so.6
+libXau.so.6	/lib64/libXau.so.6
+libXcomposite.so.1	/lib64/libXcomposite.so.1
+libXcursor.so.1	/lib64/libXcursor.so.1
+libXdamage.so.1	/lib64/libXdamage.so.1
+libXext.so.6	/lib64/libXext.so.6
+libXfixes.so.3	/lib64/libXfixes.so.3
+libXi.so.6	/lib64/libXi.so.6
+libXinerama.so.1	/lib64/libXinerama.so.1
+libXrandr.so.2	/lib64/libXrandr.so.2
+libXrender.so.1	/lib64/libXrender.so.1
+libatk-1.0.so.0	/lib64/libatk-1.0.so.0
+libatk-bridge-2.0.so.0	/lib64/libatk-bridge-2.0.so.0
+libatspi.so.0	/lib64/libatspi.so.0
+libattr.so.1	/lib64/libattr.so.1
+libblkid.so.1	/lib64/libblkid.so.1
+libbz2.so.1	/lib64/libbz2.so.1
+libcairo-gobject.so.2	/lib64/libcairo-gobject.so.2
+libcairo.so.2	/lib64/libcairo.so.2
+libcap.so.2	/lib64/libcap.so.2
+libdbus-1.so.3	/lib64/libdbus-1.so.3
+libdw.so.1	/lib64/libdw.so.1
+libelf.so.1	/lib64/libelf.so.1
+libepoxy.so.0	/lib64/libepoxy.so.0
+libexpat.so.1	/lib64/libexpat.so.1
+libffi.so.6	/lib64/libffi.so.6
+libfontconfig.so.1	/lib64/libfontconfig.so.1
+libfreetype.so.6	/lib64/libfreetype.so.6
+libfribidi.so.0	/lib64/libfribidi.so.0
+libgcrypt.so.11	/lib64/libgcrypt.so.11
+libgdk-3.so.0	/lib64/libgdk-3.so.0
+libgdk_pixbuf-2.0.so.0	/lib64/libgdk_pixbuf-2.0.so.0
+libgio-2.0.so.0	/lib64/libgio-2.0.so.0
+libglib-2.0.so.0	/lib64/libglib-2.0.so.0
+libgmodule-2.0.so.0	/lib64/libgmodule-2.0.so.0
+libgobject-2.0.so.0	/lib64/libgobject-2.0.so.0
+libgpg-error.so.0	/lib64/libgpg-error.so.0
+libgraphite2.so.3	/lib64/libgraphite2.so.3
+libgtk-3.so.0	/lib64/libgtk-3.so.0
+libgtksourceview-4.so.0	/opt/gsv4/lib64/libgtksourceview-4.so.0
+libharfbuzz.so.0	/lib64/libharfbuzz.so.0
+liblz4.so.1	/lib64/liblz4.so.1
+liblzma.so.5	/lib64/liblzma.so.5
+libmount.so.1	/lib64/libmount.so.1
+libpango-1.0.so.0	/lib64/libpango-1.0.so.0
+libpangocairo-1.0.so.0	/lib64/libpangocairo-1.0.so.0
+libpangoft2-1.0.so.0	/lib64/libpangoft2-1.0.so.0
+libpcre.so.1	/lib64/libpcre.so.1
+libpixman-1.so.0	/lib64/libpixman-1.so.0
+libpng15.so.15	/lib64/libpng15.so.15
+libselinux.so.1	/lib64/libselinux.so.1
+libsystemd.so.0	/lib64/libsystemd.so.0
+libthai.so.0	/lib64/libthai.so.0
+libuuid.so.1	/lib64/libuuid.so.1
+libwayland-client.so.0	/lib64/libwayland-client.so.0
+libwayland-cursor.so.0	/lib64/libwayland-cursor.so.0
+libwayland-egl.so.1	/lib64/libwayland-egl.so.1
+libxcb-render.so.0	/lib64/libxcb-render.so.0
+libxcb-shm.so.0	/lib64/libxcb-shm.so.0
+libxcb.so.1	/lib64/libxcb.so.1
+libxkbcommon.so.0	/lib64/libxkbcommon.so.0
+libxml2.so.2	/lib64/libxml2.so.2
+libz.so.1	/lib64/libz.so.1
+== GtkSourceView 4 data (language specs + styles) ==
+systemverilog.lang
+verilog.lang
+== gdk-pixbuf loaders ==
+loaders bundled: 13
+cache file: etc/loaders.cache.in (paths hold an @APPDIR@ placeholder, rewritten by AppRun)
+libpixbufloader-ani.so
+libpixbufloader-bmp.so
+libpixbufloader-gif.so
+libpixbufloader-icns.so
+libpixbufloader-ico.so
+libpixbufloader-jasper.so
+libpixbufloader-jpeg.so
+libpixbufloader-pnm.so
+libpixbufloader-qtif.so
+libpixbufloader-tga.so
+libpixbufloader-tiff.so
+libpixbufloader-xbm.so
+libpixbufloader-xpm.so
+== GTK input-method modules ==
+== GSettings schemas ==
+schemas: 6
+gschemas.compiled
+org.gtk.Demo.gschema.xml
+org.gtk.Settings.ColorChooser.gschema.xml
+org.gtk.Settings.Debug.gschema.xml
+org.gtk.Settings.EmojiChooser.gschema.xml
+org.gtk.Settings.FileChooser.gschema.xml
+org.gtk.exampleapp.gschema.xml
+== themes, icons, fonts, fontconfig ==
+themes: 
+icons:  Adwaita hicolor 
+fonts:  DejaVuSans-Bold.ttf DejaVuSans-BoldOblique.ttf DejaVuSans-ExtraLight.ttf DejaVuSans-Oblique.ttf DejaVuSans.ttf DejaVuSansCondensed-Bold.ttf DejaVuSansCondensed-BoldOblique.ttf DejaVuSansCondensed-Oblique.ttf DejaVuSansCondensed.ttf DejaVuSansMono-Bold.ttf DejaVuSansMono-BoldOblique.ttf DejaVuSansMono-Oblique.ttf DejaVuSansMono.ttf 
+== launcher (AppRun) ==
+== desktop entry + icon ==
+== relaunch/host-path leakage audit ==
+# build-tree path leakage audit (upstream icon artwork is out of scope:
+#   several Adwaita SVGs carry the upstream author's /home/sam/... metadata)
+# 1) build-machine paths embedded in the main binary (Rust panic locations):
+count=0
+# 2) launch-time config templates (expect @APPDIR@ placeholders only):
+none
+# 3) @APPDIR@ placeholder count in etc/loaders.cache.in:
+13
+# 4) RPATH/RUNPATH on the main binary:
+none
+== ELF audit + GLIBC <= 2.17 gate for every bundled ELF ==
+ELFS_SCANNED=81
+MAX_REQUIRED_GLIBC=2.17
+RESULT=PASS
+== AppImage ==
+appimagetool sha256: 793fca0ce4bcc309dc65d3f66669f58e3755643e4dadbe03932e7b436128494f
+appimagetool, continuous build (git version b082d2e), build 333 built on 2026-10-29 19:15:25 UTC
+Using architecture x86_64
+/work/AppDir should be packaged as /work/out/VEdit-Spike-0.1.0-x86_64.AppImage
+Creating .DirIcon symlink based on information from desktop file
+Generating squashfs...
+Downloading runtime file from https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-x86_64
+Downloaded runtime binary of size 944632
+Parallel mksquashfs: Using 16 processors
+Creating 4.0 filesystem on /work/out/VEdit-Spike-0.1.0-x86_64.AppImage, block size 131072.
+[=============================================================/] 4328/4328 100%
+
+Exportable Squashfs 4.0 filesystem, zstd compressed, data block size 131072
+	compressed data, compressed metadata, compressed fragments,
+	compressed xattrs, compressed ids
+	duplicates are removed
+Filesystem size 17072.21 Kbytes (16.67 Mbytes)
+	40.59% of uncompressed filesystem size (42062.38 Kbytes)
+Inode table size 34305 bytes (33.50 Kbytes)
+	23.63% of uncompressed inode table size (145175 bytes)
+Directory table size 45624 bytes (44.55 Kbytes)
+	29.55% of uncompressed directory table size (154390 bytes)
+Number of duplicate files found 227
+Number of inodes 4488
+Number of files 4079
+Number of fragments 62
+Number of symbolic links 1
+Number of device nodes 0
+Number of fifo nodes 0
+Number of socket nodes 0
+Number of directories 408
+Number of hard-links 0
+Number of ids (unique uids + gids) 1
+Number of uids 1
+	root (0)
+Number of gids 1
+	root (0)
+Embedding ELF...
+Marking the AppImage as executable...
+Embedding MD5 digest
+Success
+
+Please consider submitting your AppImage to AppImageHub, the crowd-sourced
+central directory of available AppImages, by opening a pull request
+at https://github.com/AppImage/appimage.github.io
+== tar.gz (FUSE-free fallback) ==
+== sizes + checksums ==
+-rwxr-xr-x 1 root root 18430456 Oct 30 03:06 /work/out/VEdit-Spike-0.1.0-x86_64.AppImage
+-rw-r--r-- 1 root root 19169299 Oct 30 03:06 /work/out/vedit-spike-0.1.0-linux-x86_64.tar.gz
+55M	/work/AppDir
+bytes: AppImage 18430456, tar.gz 19169299
+efb64eb7098bfd6db44ca7faebeefcee1fbc54d161da5ce25b1cae1562b5d1de  /work/out/VEdit-Spike-0.1.0-x86_64.AppImage
+0c8488c3fa770eb2839769efb0b7b1691daa16e8ad162d80bbdf0fff7419c84c  /work/out/vedit-spike-0.1.0-linux-x86_64.tar.gz
+PACKAGE OK
