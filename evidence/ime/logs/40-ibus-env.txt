@@ -1,0 +1,28 @@
+DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-I547ijcsTL,guid=9631103b6de2a201121ac3d66ae43019
+## ibus version
+IBus 1.5.17
+## ibus engines
+language: Finnish
+  xkb:fi::fin - Finnish
+language: Malay
+  xkb:my::msa - Malay (Jawi)
+language: Mongolian
+  xkb:mn::mon - Mongolian
+language: German
+  xkb:de:nodeadkeys:ger - German (eliminate dead keys)
+  xkb:de::ger - German
+  xkb:be::ger - Belgian
+  xkb:de:neo:ger - German (Neo 2)
+  xkb:ch::ger - German (Switzerland)
+  xkb:de:dvorak:ger - German (Dvorak)
+language: Bulgarian
+  xkb:bg:phonetic:bul - Bulgarian (traditional phonetic)
+  xkb:bg::bul - Bulgarian
+language: Italian
+  xkb:it::ita - Italian
+language: Danish
+  xkb:dk::dan - Danish
+## current engine
+xkb:us::eng
+engine_requested=libpinyin
+engine_active=libpinyin

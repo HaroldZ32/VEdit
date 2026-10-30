@@ -1,0 +1,98 @@
+# which GTK / immodules are actually used
+payload=/tmp/payload/VEdit
+GTK_IM_MODULE_FILE=/tmp/vedit-runtime/immodules.cache
+LD_LIBRARY_PATH=/tmp/payload/VEdit/lib
+
+## immodule files in the payload
+total 72
+-rwxr-xr-x 1 root root 33416 Sep 12  2023 im-ibus.so
+-rwxr-xr-x 1 root root 33000 Apr  5  2022 im-xim.so
+
+## payload immodule cache
+# GTK+ Input Method Modules file
+# Automatically generated file, do not edit
+# Created by gtk-query-immodules-3.0-64 from gtk+-3.22.30
+#
+"@APPDIR@/lib/gtk-3.0/3.0.0/immodules/im-ibus.so" 
+"ibus" "IBus (Intelligent Input Bus)" "ibus" "" "ja:ko:zh:*" 
+
+"@APPDIR@/lib/gtk-3.0/3.0.0/immodules/im-xim.so" 
+"xim" "X Input Method" "gtk30" "/usr/share/locale" "ko:ja:th:zh" 
+
+
+
+## ldd of the probe (GTK must resolve inside the payload)
+	linux-vdso.so.1 =>  (0x000076ed63c5a000)
+	libgtk-3.so.0 => /tmp/payload/VEdit/lib/libgtk-3.so.0 (0x000076ed630f8000)
+	libgdk-3.so.0 => /tmp/payload/VEdit/lib/libgdk-3.so.0 (0x000076ed62e0e000)
+	libatk-1.0.so.0 => /tmp/payload/VEdit/lib/libatk-1.0.so.0 (0x000076ed62be8000)
+	libgio-2.0.so.0 => /tmp/payload/VEdit/lib/libgio-2.0.so.0 (0x000076ed62848000)
+	libpangocairo-1.0.so.0 => /tmp/payload/VEdit/lib/libpangocairo-1.0.so.0 (0x000076ed6263a000)
+	libgdk_pixbuf-2.0.so.0 => /tmp/payload/VEdit/lib/libgdk_pixbuf-2.0.so.0 (0x000076ed62412000)
+	libcairo-gobject.so.2 => /tmp/payload/VEdit/lib/libcairo-gobject.so.2 (0x000076ed62209000)
+	libpango-1.0.so.0 => /tmp/payload/VEdit/lib/libpango-1.0.so.0 (0x000076ed61fc3000)
+	libcairo.so.2 => /tmp/payload/VEdit/lib/libcairo.so.2 (0x000076ed61c8c000)
+	libgobject-2.0.so.0 => /tmp/payload/VEdit/lib/libgobject-2.0.so.0 (0x000076ed61a3b000)
+	libglib-2.0.so.0 => /tmp/payload/VEdit/lib/libglib-2.0.so.0 (0x000076ed61725000)
+	libpthread.so.0 => /lib64/libpthread.so.0 (0x000076ed61509000)
+	libc.so.6 => /lib64/libc.so.6 (0x000076ed6113b000)
+	libgmodule-2.0.so.0 => /tmp/payload/VEdit/lib/libgmodule-2.0.so.0 (0x000076ed60f37000)
+	libX11.so.6 => /tmp/payload/VEdit/lib/libX11.so.6 (0x000076ed60bf9000)
+	libXi.so.6 => /tmp/payload/VEdit/lib/libXi.so.6 (0x000076ed609e9000)
+	libXfixes.so.3 => /tmp/payload/VEdit/lib/libXfixes.so.3 (0x000076ed607e3000)
+	libatk-bridge-2.0.so.0 => /tmp/payload/VEdit/lib/libatk-bridge-2.0.so.0 (0x000076ed605b4000)
+	libwayland-client.so.0 => /tmp/payload/VEdit/lib/libwayland-client.so.0 (0x000076ed603a5000)
+	libepoxy.so.0 => /tmp/payload/VEdit/lib/libepoxy.so.0 (0x000076ed60079000)
+	libpangoft2-1.0.so.0 => /tmp/payload/VEdit/lib/libpangoft2-1.0.so.0 (0x000076ed5fe63000)
+	libfontconfig.so.1 => /tmp/payload/VEdit/lib/libfontconfig.so.1 (0x000076ed5fc21000)
+	libm.so.6 => /lib64/libm.so.6 (0x000076ed5f91f000)
+	libXinerama.so.1 => /tmp/payload/VEdit/lib/libXinerama.so.1 (0x000076ed5f71c000)
+	libXrandr.so.2 => /tmp/payload/VEdit/lib/libXrandr.so.2 (0x000076ed5f511000)
+	libXcursor.so.1 => /tmp/payload/VEdit/lib/libXcursor.so.1 (0x000076ed5f306000)
+	libXcomposite.so.1 => /tmp/payload/VEdit/lib/libXcomposite.so.1 (0x000076ed5f103000)
+	libXdamage.so.1 => /tmp/payload/VEdit/lib/libXdamage.so.1 (0x000076ed5ef00000)
+	libxkbcommon.so.0 => /tmp/payload/VEdit/lib/libxkbcommon.so.0 (0x000076ed5ecc0000)
+	libwayland-cursor.so.0 => /tmp/payload/VEdit/lib/libwayland-cursor.so.0 (0x000076ed5eab8000)
+	libwayland-egl.so.1 => /tmp/payload/VEdit/lib/libwayland-egl.so.1 (0x000076ed5e8b6000)
+	libXext.so.6 => /tmp/payload/VEdit/lib/libXext.so.6 (0x000076ed5e6a4000)
+	librt.so.1 => /lib64/librt.so.1 (0x000076ed5e49c000)
+	libffi.so.6 => /tmp/payload/VEdit/lib/libffi.so.6 (0x000076ed5e294000)
+	libdl.so.2 => /lib64/libdl.so.2 (0x000076ed5e090000)
+	libpcre.so.1 => /tmp/payload/VEdit/lib/libpcre.so.1 (0x000076ed5de2e000)
+	libz.so.1 => /tmp/payload/VEdit/lib/libz.so.1 (0x000076ed5dc18000)
+	libselinux.so.1 => /tmp/payload/VEdit/lib/libselinux.so.1 (0x000076ed5d9f1000)
+	libresolv.so.2 => /lib64/libresolv.so.2 (0x000076ed5d7d7000)
+	libmount.so.1 => /tmp/payload/VEdit/lib/libmount.so.1 (0x000076ed5d594000)
+	libgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x000076ed5d37e000)
+	libfreetype.so.6 => /tmp/payload/VEdit/lib/libfreetype.so.6 (0x000076ed5d0bf000)
+	libpng15.so.15 => /tmp/payload/VEdit/lib/libpng15.so.15 (0x000076ed5ce94000)
+	libpixman-1.so.0 => /tmp/payload/VEdit/lib/libpixman-1.so.0 (0x000076ed5cbeb000)
+	libEGL.so.1 => /tmp/payload/VEdit/lib/libEGL.so.1 (0x000076ed5c9d7000)
+	libxcb-shm.so.0 => /tmp/payload/VEdit/lib/libxcb-shm.so.0 (0x000076ed5c7d3000)
+	libxcb.so.1 => /tmp/payload/VEdit/lib/libxcb.so.1 (0x000076ed5c5ab000)
+	libxcb-render.so.0 => /tmp/payload/VEdit/lib/libxcb-render.so.0 (0x000076ed5c39d000)
+	libXrender.so.1 => /tmp/payload/VEdit/lib/libXrender.so.1 (0x000076ed5c192000)
+	libGL.so.1 => /tmp/payload/VEdit/lib/libGL.so.1 (0x000076ed5bf06000)
+	libthai.so.0 => /tmp/payload/VEdit/lib/libthai.so.0 (0x000076ed5bcfa000)
+	libfribidi.so.0 => /tmp/payload/VEdit/lib/libfribidi.so.0 (0x000076ed5bade000)
+	/lib64/ld-linux-x86-64.so.2 (0x000076ed63a00000)
+	libatspi.so.0 => /tmp/payload/VEdit/lib/libatspi.so.0 (0x000076ed5b8ad000)
+	libdbus-1.so.3 => /tmp/payload/VEdit/lib/libdbus-1.so.3 (0x000076ed5b65d000)
+	libharfbuzz.so.0 => /tmp/payload/VEdit/lib/libharfbuzz.so.0 (0x000076ed5b3c0000)
+	libexpat.so.1 => /tmp/payload/VEdit/lib/libexpat.so.1 (0x000076ed5b195000)
+	libuuid.so.1 => /tmp/payload/VEdit/lib/libuuid.so.1 (0x000076ed5af90000)
+	libblkid.so.1 => /tmp/payload/VEdit/lib/libblkid.so.1 (0x000076ed5ad50000)
+	libbz2.so.1 => /tmp/payload/VEdit/lib/libbz2.so.1 (0x000076ed5ab40000)
+	libGLdispatch.so.0 => /tmp/payload/VEdit/lib/libGLdispatch.so.0 (0x000076ed5a88a000)
+	libXau.so.6 => /tmp/payload/VEdit/lib/libXau.so.6 (0x000076ed5a686000)
+	libGLX.so.0 => /tmp/payload/VEdit/lib/libGLX.so.0 (0x000076ed5a454000)
+	libsystemd.so.0 => /tmp/payload/VEdit/lib/libsystemd.so.0 (0x000076ed5a223000)
+	libgraphite2.so.3 => /tmp/payload/VEdit/lib/libgraphite2.so.3 (0x000076ed59ff5000)
+	libcap.so.2 => /tmp/payload/VEdit/lib/libcap.so.2 (0x000076ed59df0000)
+	liblzma.so.5 => /tmp/payload/VEdit/lib/liblzma.so.5 (0x000076ed59bca000)
+	liblz4.so.1 => /tmp/payload/VEdit/lib/liblz4.so.1 (0x000076ed599bb000)
+	libgcrypt.so.11 => /tmp/payload/VEdit/lib/libgcrypt.so.11 (0x000076ed5973a000)
+	libgpg-error.so.0 => /tmp/payload/VEdit/lib/libgpg-error.so.0 (0x000076ed59535000)
+	libdw.so.1 => /tmp/payload/VEdit/lib/libdw.so.1 (0x000076ed592e4000)
+	libattr.so.1 => /tmp/payload/VEdit/lib/libattr.so.1 (0x000076ed590df000)
+	libelf.so.1 => /tmp/payload/VEdit/lib/libelf.so.1 (0x000076ed58ec7000)

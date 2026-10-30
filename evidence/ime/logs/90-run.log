@@ -1,0 +1,17 @@
+[ime] Xvfb :99 up
+[ime] == extract the packaged payload (the GTK that must be used) ==
+[ime] PASS payload_gtk_used
+[ime] == Tier 1: which GtkIMContext does GTK create? ==
+[ime] PASS tier1_probe_runs_xim
+[ime] PASS tier1_probe_runs_ibus
+[ime] Tier 1 context ids: xim='xim' ibus='ibus'
+[ime] PASS tier1_context_is_xim
+[ime] PASS tier1_context_is_ibus
+[ime] == Tier 2: real IME (ibus + libpinyin) commits Chinese ==
+[ime] selecting ibus engine 'libpinyin'
+[ime] active ibus engine: libpinyin
+[ime] probe window id='10485762'
+[ime] PASS tier2_ime_commits_chinese
+[ime] == Tier 3: X11 Unicode injection (no IME conversion) ==
+[ime] PASS tier3_unicode_injection
+[ime] IME RESULT: failures=0

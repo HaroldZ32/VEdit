@@ -1,0 +1,25 @@
+# IME acceptance image for AC-16.
+#
+# It deliberately installs NO gtk3 / GtkSourceView: the GTK that runs is the one
+# from the packaged payload (LD_LIBRARY_PATH), and the immodules come from the
+# payload's own GTK_IM_MODULE_FILE. What this image adds is only what a *real
+# desktop* would provide around the app: an X server (Xvfb), an IME daemon
+# (ibus + libpinyin), the test driver (xdotool) and a font for the panel.
+FROM docker.m.daocloud.io/library/centos:7
+
+COPY tuna.repo /etc/yum.repos.d/tuna.repo
+RUN rm -f /etc/yum.repos.d/CentOS-*.repo \
+ && yum -y install xorg-x11-server-Xvfb xorg-x11-utils procps-ng \
+        dbus-x11 ibus ibus-libpinyin xdotool ImageMagick \
+        fontconfig wqy-zenhei-fonts \
+ && yum clean all
+
+# A container has an empty /etc/machine-id; D-Bus (and therefore ibus) refuses to
+# start without a valid 32-hex id. Generate one, as a normal install would.
+RUN dbus-uuidgen > /etc/machine-id && cat /etc/machine-id
+
+# The GTK stack must come from the payload, not from the image.
+RUN ! rpm -q gtk3 gtksourceview3 gtksourceview4 \
+ && echo "ime-image: no gtk/gsv packages present (payload supplies them)"
+RUN ibus-daemon --version 2>/dev/null | head -1 || true; \
+    printf 'ibus: '; rpm -q ibus ibus-libpinyin xdotool 2>/dev/null | tr '\n' ' '; echo

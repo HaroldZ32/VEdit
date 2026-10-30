@@ -1,0 +1,4 @@
+# Compiled probes and extracted payloads stay out of git.
+out/
+payload/
+logs/*.tmp

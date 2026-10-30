@@ -1,0 +1,5 @@
+# environment actually used
+GTK_IM_MODULE_FILE=/tmp/vedit-runtime/immodules.cache
+XMODIFIERS=<unset>
+DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-I547ijcsTL,guid=9631103b6de2a201121ac3d66ae43019
+engine=libpinyin current=libpinyin

@@ -1,0 +1,34 @@
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            BuildKit is currently disabled; enable it by removing the DOCKER_BUILDKIT=0
+            environment-variable.
+
+Sending build context to Docker daemon  4.096kB
+Step 1/6 : FROM docker.m.daocloud.io/library/centos:7
+ ---> be65f488b776
+Step 2/6 : COPY tuna.repo /etc/yum.repos.d/tuna.repo
+ ---> Using cache
+ ---> 4a5d239648cc
+Step 3/6 : RUN rm -f /etc/yum.repos.d/CentOS-*.repo  && yum -y install xorg-x11-server-Xvfb xorg-x11-utils procps-ng         dbus-x11 ibus ibus-libpinyin xdotool ImageMagick         fontconfig wqy-zenhei-fonts  && yum clean all
+ ---> Using cache
+ ---> 8f63aa816485
+Step 4/6 : RUN dbus-uuidgen > /etc/machine-id && cat /etc/machine-id
+ ---> Running in c83e1944e9c2
+70db620d86bb3c03ca12a3156ae42fac
+ ---> Removed intermediate container c83e1944e9c2
+ ---> dffb002ab9f5
+Step 5/6 : RUN ! rpm -q gtk3 gtksourceview3 gtksourceview4  && echo "ime-image: no gtk/gsv packages present (payload supplies them)"
+ ---> Running in 06111cc40208
+gtk3-3.22.30-8.el7_9.x86_64
+package gtksourceview3 is not installed
+package gtksourceview4 is not installed
+ime-image: no gtk/gsv packages present (payload supplies them)
+ ---> Removed intermediate container 06111cc40208
+ ---> 50284b8c4c30
+Step 6/6 : RUN ibus-daemon --version 2>/dev/null | head -1 || true;     printf 'ibus: '; rpm -q ibus ibus-libpinyin xdotool 2>/dev/null | tr '\n' ' '; echo
+ ---> Running in 28c6efd550e3
+ibus-daemon - Version 1.5.17
+ibus: ibus-1.5.17-14.el7_9.x86_64 ibus-libpinyin-1.6.91-4.el7.x86_64 xdotool-3.20150503.1-1.el7.x86_64 
+ ---> Removed intermediate container 28c6efd550e3
+ ---> d6d3a8c1747c
+Successfully built d6d3a8c1747c
+Successfully tagged vedit-ime:local

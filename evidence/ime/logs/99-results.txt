@@ -1,0 +1,7 @@
+RESULT payload_gtk_used=PASS
+RESULT tier1_probe_runs_xim=PASS
+RESULT tier1_probe_runs_ibus=PASS
+RESULT tier1_context_is_xim=PASS
+RESULT tier1_context_is_ibus=PASS
+RESULT tier2_ime_commits_chinese=PASS
+RESULT tier3_unicode_injection=PASS

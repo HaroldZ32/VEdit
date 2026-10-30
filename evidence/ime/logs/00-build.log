@@ -1,0 +1,4 @@
+gtk+-3.0 (dev, pinned image) = 3.22.30
+built:
+out/bin/im-probe:    ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.32, BuildID[sha1]=06e9031c5e88f6a2c6db1db50ebb139de0f0a5b5, not stripped
+out/bin/input-probe: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.32, BuildID[sha1]=500e6d7fbb87a7c63862ff53a43f698f7835fbce, not stripped
