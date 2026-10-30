@@ -1,0 +1,5 @@
+$ cargo run -q -p vd-deeplint --example runtime_probe
+TIMEOUT: elapsed_ms=301 failure=Some(Timeout { after: 300ms }) pid=Some(1683) reaped=true
+CANCEL: failure=Some(Cancelled) pid=Some(1687) reaped=true
+RESULT: timeout=PASS cancel=PASS
+exit=0

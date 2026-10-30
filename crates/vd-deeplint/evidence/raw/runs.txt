@@ -1,0 +1,30 @@
+$ build/slang/out/slang --lint-only -Weverything  --diag-json crates/vd-deeplint/evidence/raw/clean-display.json crates/vd-deeplint/tests/fixtures/clean.sv
+exit=0
+
+$ build/slang/out/slang --lint-only -Weverything --diag-column-unit byte --diag-json crates/vd-deeplint/evidence/raw/clean-byte.json crates/vd-deeplint/tests/fixtures/clean.sv
+exit=0
+
+$ build/slang/out/slang --lint-only -Weverything  --diag-json crates/vd-deeplint/evidence/raw/undeclared-display.json crates/vd-deeplint/tests/fixtures/undeclared.sv
+exit=1
+
+$ build/slang/out/slang --lint-only -Weverything --diag-column-unit byte --diag-json crates/vd-deeplint/evidence/raw/undeclared-byte.json crates/vd-deeplint/tests/fixtures/undeclared.sv
+exit=1
+
+$ build/slang/out/slang --lint-only -Weverything  --diag-json crates/vd-deeplint/evidence/raw/unicode-display.json crates/vd-deeplint/tests/fixtures/unicode_columns.sv
+exit=1
+
+$ build/slang/out/slang --lint-only -Weverything --diag-column-unit byte --diag-json crates/vd-deeplint/evidence/raw/unicode-byte.json crates/vd-deeplint/tests/fixtures/unicode_columns.sv
+exit=1
+
+$ build/slang/out/slang --lint-only -Weverything  --diag-json crates/vd-deeplint/evidence/raw/implicit-display.json crates/vd-deeplint/tests/fixtures/implicit_net.sv
+exit=0
+
+$ build/slang/out/slang --lint-only -Weverything --diag-column-unit byte --diag-json crates/vd-deeplint/evidence/raw/implicit-byte.json crates/vd-deeplint/tests/fixtures/implicit_net.sv
+exit=0
+
+$ build/slang/out/slang --lint-only -Weverything  --diag-json crates/vd-deeplint/evidence/raw/calibration-display.json crates/vd-deeplint/tests/fixtures/display_calibration.sv
+exit=1
+
+$ build/slang/out/slang --lint-only -Weverything --diag-column-unit byte --diag-json crates/vd-deeplint/evidence/raw/calibration-byte.json crates/vd-deeplint/tests/fixtures/display_calibration.sv
+exit=1
+

@@ -1,0 +1,23 @@
+$ VEDIT_SLANG=build/slang/out/slang cargo run -q -p vd-deeplint --example diag_table -- crates/vd-deeplint/tests/fixtures/display_calibration.sv
+# file: crates/vd-deeplint/tests/fixtures/display_calibration.sv
+# binary attempts:
+  options.binary: build/slang/out/slang [found]
+  VEDIT_SLANG: build/slang/out/slang [found]
+  exe_dir/../lib/vedit/bin/slang: /vedit-build/target/debug/examples/../lib/vedit/bin/slang [not found]
+  exe_dir/../bin/slang: /vedit-build/target/debug/examples/../bin/slang [not found]
+  exe_dir/slang: /vedit-build/target/debug/examples/slang [not found]
+# exit_code=Some(1)
+# failure: none
+# total=10 shown=10 truncated=false elapsed_ms=6 summary=10 diagnostic(s)
+# raw_line:byte_col -> editor_line:char (UTF-16) | severity code message
+3:17..3:33 -> 2:16..2:32 | error UndeclaredIdentifier use of undeclared identifier 'undeclared_plain'
+4:18..4:32 -> 3:17..3:31 | error UndeclaredIdentifier use of undeclared identifier 'undeclared_tab'
+5:15..5:30 -> 4:12..4:27 | error UndeclaredIdentifier use of undeclared identifier 'undeclared_cjk1'
+6:18..6:33 -> 5:13..5:28 | error UndeclaredIdentifier use of undeclared identifier 'undeclared_cjk2'
+7:21..7:36 -> 6:14..6:29 | error UndeclaredIdentifier use of undeclared identifier 'undeclared_cjk3'
+8:16..8:29 -> 7:13..7:26 | error UndeclaredIdentifier use of undeclared identifier 'undeclared_e1'
+9:20..9:33 -> 8:15..8:28 | error UndeclaredIdentifier use of undeclared identifier 'undeclared_e2'
+10:24..10:37 -> 9:17..9:30 | error UndeclaredIdentifier use of undeclared identifier 'undeclared_e3'
+11:19..11:32 -> 10:14..10:27 | error UndeclaredIdentifier use of undeclared identifier 'undeclared_ce'
+12:19..12:34 -> 11:18..11:33 | error UndeclaredIdentifier use of undeclared identifier 'undeclared_comb'
+exit=0

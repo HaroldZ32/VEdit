@@ -1,0 +1,10 @@
+$ VEDIT_SLANG=/nonexistent/slang cargo run -q -p vd-deeplint --example binary_attempts
+VEDIT_SLANG=Some("/nonexistent/slang")
+exe_dir=Some("/vedit-build/target/debug/examples")
+attempts (in order):
+  VEDIT_SLANG: /nonexistent/slang [not found]
+  exe_dir/../lib/vedit/bin/slang: /vedit-build/target/debug/examples/../lib/vedit/bin/slang [not found]
+  exe_dir/../bin/slang: /vedit-build/target/debug/examples/../bin/slang [not found]
+  exe_dir/slang: /vedit-build/target/debug/examples/slang [not found]
+chosen=<none>
+exit=0

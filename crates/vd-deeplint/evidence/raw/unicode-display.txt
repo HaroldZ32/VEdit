@@ -1,0 +1,8 @@
+crates/vd-deeplint/tests/fixtures/unicode_columns.sv:4:16: error: use of undeclared identifier 'undefined_cjk'
+    /* 你好 */ undefined_cjk = 1;
+               ^~~~~~~~~~~~~
+crates/vd-deeplint/tests/fixtures/unicode_columns.sv:5:13: error: use of undeclared identifier 'undefined_emoji'
+    /* 😀 */ undefined_emoji = 2;
+            ^~~~~~~~~~~~~~~
+
+Build failed: 2 errors, 0 warnings

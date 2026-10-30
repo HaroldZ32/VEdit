@@ -1,0 +1,32 @@
+crates/vd-deeplint/tests/fixtures/display_calibration.sv:3:17: error: use of undeclared identifier 'undeclared_plain'
+    /* plain */ undeclared_plain = 1;
+                ^~~~~~~~~~~~~~~~
+crates/vd-deeplint/tests/fixtures/display_calibration.sv:4:18: error: use of undeclared identifier 'undeclared_tab'
+    /* tab->     */ undeclared_tab = 1;
+                    ^~~~~~~~~~~~~~
+crates/vd-deeplint/tests/fixtures/display_calibration.sv:5:15: error: use of undeclared identifier 'undeclared_cjk1'
+    /* 你 */ undeclared_cjk1 = 1;
+             ^~~~~~~~~~~~~~~
+crates/vd-deeplint/tests/fixtures/display_calibration.sv:6:18: error: use of undeclared identifier 'undeclared_cjk2'
+    /* 你好 */ undeclared_cjk2 = 1;
+               ^~~~~~~~~~~~~~~
+crates/vd-deeplint/tests/fixtures/display_calibration.sv:7:21: error: use of undeclared identifier 'undeclared_cjk3'
+    /* 你好呀 */ undeclared_cjk3 = 1;
+                 ^~~~~~~~~~~~~~~
+crates/vd-deeplint/tests/fixtures/display_calibration.sv:8:16: error: use of undeclared identifier 'undeclared_e1'
+    /* 😀 */ undeclared_e1 = 1;
+            ^~~~~~~~~~~~~
+crates/vd-deeplint/tests/fixtures/display_calibration.sv:9:20: error: use of undeclared identifier 'undeclared_e2'
+    /* 😀😀 */ undeclared_e2 = 1;
+             ^~~~~~~~~~~~~
+crates/vd-deeplint/tests/fixtures/display_calibration.sv:10:24: error: use of undeclared identifier 'undeclared_e3'
+    /* 😀😀😀 */ undeclared_e3 = 1;
+              ^~~~~~~~~~~~~
+crates/vd-deeplint/tests/fixtures/display_calibration.sv:11:19: error: use of undeclared identifier 'undeclared_ce'
+    /* 中😀 */ undeclared_ce = 1;
+              ^~~~~~~~~~~~~
+crates/vd-deeplint/tests/fixtures/display_calibration.sv:12:19: error: use of undeclared identifier 'undeclared_comb'
+    /* e<comb> */ undeclared_comb = 1;
+                  ^~~~~~~~~~~~~~~
+
+Build failed: 10 errors, 0 warnings

@@ -1,0 +1,15 @@
+$ VEDIT_SLANG=build/slang/out/slang cargo run -q -p vd-deeplint --example diag_table -- crates/vd-deeplint/tests/fixtures/unicode_columns.sv
+# file: crates/vd-deeplint/tests/fixtures/unicode_columns.sv
+# binary attempts:
+  options.binary: build/slang/out/slang [found]
+  VEDIT_SLANG: build/slang/out/slang [found]
+  exe_dir/../lib/vedit/bin/slang: /vedit-build/target/debug/examples/../lib/vedit/bin/slang [not found]
+  exe_dir/../bin/slang: /vedit-build/target/debug/examples/../bin/slang [not found]
+  exe_dir/slang: /vedit-build/target/debug/examples/slang [not found]
+# exit_code=Some(1)
+# failure: none
+# total=2 shown=2 truncated=false elapsed_ms=5 summary=2 diagnostic(s)
+# raw_line:byte_col -> editor_line:char (UTF-16) | severity code message
+4:18..4:31 -> 3:13..3:26 | error UndeclaredIdentifier use of undeclared identifier 'undefined_cjk'
+5:16..5:31 -> 4:13..4:28 | error UndeclaredIdentifier use of undeclared identifier 'undefined_emoji'
+exit=0

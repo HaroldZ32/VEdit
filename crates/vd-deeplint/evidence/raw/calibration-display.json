@@ -1,0 +1,212 @@
+[
+  {
+    "severity": "error",
+    "message": "use of undeclared identifier 'undeclared_plain'",
+    "code": "UndeclaredIdentifier",
+    "location": "crates/vd-deeplint/tests/fixtures/display_calibration.sv:3:17",
+    "ranges": [
+      {
+        "start": {
+          "file": "crates/vd-deeplint/tests/fixtures/display_calibration.sv",
+          "line": 3,
+          "column": 17
+        },
+        "end": {
+          "file": "crates/vd-deeplint/tests/fixtures/display_calibration.sv",
+          "line": 3,
+          "column": 33
+        }
+      }
+    ],
+    "symbolPath": "$unit"
+  },
+  {
+    "severity": "error",
+    "message": "use of undeclared identifier 'undeclared_tab'",
+    "code": "UndeclaredIdentifier",
+    "location": "crates/vd-deeplint/tests/fixtures/display_calibration.sv:4:21",
+    "ranges": [
+      {
+        "start": {
+          "file": "crates/vd-deeplint/tests/fixtures/display_calibration.sv",
+          "line": 4,
+          "column": 21
+        },
+        "end": {
+          "file": "crates/vd-deeplint/tests/fixtures/display_calibration.sv",
+          "line": 4,
+          "column": 35
+        }
+      }
+    ],
+    "symbolPath": "$unit"
+  },
+  {
+    "severity": "error",
+    "message": "use of undeclared identifier 'undeclared_cjk1'",
+    "code": "UndeclaredIdentifier",
+    "location": "crates/vd-deeplint/tests/fixtures/display_calibration.sv:5:14",
+    "ranges": [
+      {
+        "start": {
+          "file": "crates/vd-deeplint/tests/fixtures/display_calibration.sv",
+          "line": 5,
+          "column": 14
+        },
+        "end": {
+          "file": "crates/vd-deeplint/tests/fixtures/display_calibration.sv",
+          "line": 5,
+          "column": 29
+        }
+      }
+    ],
+    "symbolPath": "$unit"
+  },
+  {
+    "severity": "error",
+    "message": "use of undeclared identifier 'undeclared_cjk2'",
+    "code": "UndeclaredIdentifier",
+    "location": "crates/vd-deeplint/tests/fixtures/display_calibration.sv:6:16",
+    "ranges": [
+      {
+        "start": {
+          "file": "crates/vd-deeplint/tests/fixtures/display_calibration.sv",
+          "line": 6,
+          "column": 16
+        },
+        "end": {
+          "file": "crates/vd-deeplint/tests/fixtures/display_calibration.sv",
+          "line": 6,
+          "column": 31
+        }
+      }
+    ],
+    "symbolPath": "$unit"
+  },
+  {
+    "severity": "error",
+    "message": "use of undeclared identifier 'undeclared_cjk3'",
+    "code": "UndeclaredIdentifier",
+    "location": "crates/vd-deeplint/tests/fixtures/display_calibration.sv:7:18",
+    "ranges": [
+      {
+        "start": {
+          "file": "crates/vd-deeplint/tests/fixtures/display_calibration.sv",
+          "line": 7,
+          "column": 18
+        },
+        "end": {
+          "file": "crates/vd-deeplint/tests/fixtures/display_calibration.sv",
+          "line": 7,
+          "column": 33
+        }
+      }
+    ],
+    "symbolPath": "$unit"
+  },
+  {
+    "severity": "error",
+    "message": "use of undeclared identifier 'undeclared_e1'",
+    "code": "UndeclaredIdentifier",
+    "location": "crates/vd-deeplint/tests/fixtures/display_calibration.sv:8:13",
+    "ranges": [
+      {
+        "start": {
+          "file": "crates/vd-deeplint/tests/fixtures/display_calibration.sv",
+          "line": 8,
+          "column": 13
+        },
+        "end": {
+          "file": "crates/vd-deeplint/tests/fixtures/display_calibration.sv",
+          "line": 8,
+          "column": 26
+        }
+      }
+    ],
+    "symbolPath": "$unit"
+  },
+  {
+    "severity": "error",
+    "message": "use of undeclared identifier 'undeclared_e2'",
+    "code": "UndeclaredIdentifier",
+    "location": "crates/vd-deeplint/tests/fixtures/display_calibration.sv:9:14",
+    "ranges": [
+      {
+        "start": {
+          "file": "crates/vd-deeplint/tests/fixtures/display_calibration.sv",
+          "line": 9,
+          "column": 14
+        },
+        "end": {
+          "file": "crates/vd-deeplint/tests/fixtures/display_calibration.sv",
+          "line": 9,
+          "column": 27
+        }
+      }
+    ],
+    "symbolPath": "$unit"
+  },
+  {
+    "severity": "error",
+    "message": "use of undeclared identifier 'undeclared_e3'",
+    "code": "UndeclaredIdentifier",
+    "location": "crates/vd-deeplint/tests/fixtures/display_calibration.sv:10:15",
+    "ranges": [
+      {
+        "start": {
+          "file": "crates/vd-deeplint/tests/fixtures/display_calibration.sv",
+          "line": 10,
+          "column": 15
+        },
+        "end": {
+          "file": "crates/vd-deeplint/tests/fixtures/display_calibration.sv",
+          "line": 10,
+          "column": 28
+        }
+      }
+    ],
+    "symbolPath": "$unit"
+  },
+  {
+    "severity": "error",
+    "message": "use of undeclared identifier 'undeclared_ce'",
+    "code": "UndeclaredIdentifier",
+    "location": "crates/vd-deeplint/tests/fixtures/display_calibration.sv:11:15",
+    "ranges": [
+      {
+        "start": {
+          "file": "crates/vd-deeplint/tests/fixtures/display_calibration.sv",
+          "line": 11,
+          "column": 15
+        },
+        "end": {
+          "file": "crates/vd-deeplint/tests/fixtures/display_calibration.sv",
+          "line": 11,
+          "column": 28
+        }
+      }
+    ],
+    "symbolPath": "$unit"
+  },
+  {
+    "severity": "error",
+    "message": "use of undeclared identifier 'undeclared_comb'",
+    "code": "UndeclaredIdentifier",
+    "location": "crates/vd-deeplint/tests/fixtures/display_calibration.sv:12:19",
+    "ranges": [
+      {
+        "start": {
+          "file": "crates/vd-deeplint/tests/fixtures/display_calibration.sv",
+          "line": 12,
+          "column": 19
+        },
+        "end": {
+          "file": "crates/vd-deeplint/tests/fixtures/display_calibration.sv",
+          "line": 12,
+          "column": 34
+        }
+      }
+    ],
+    "symbolPath": "$unit"
+  }
+]

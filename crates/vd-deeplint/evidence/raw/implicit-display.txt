@@ -1,0 +1,5 @@
+crates/vd-deeplint/tests/fixtures/implicit_net.sv:2:10: warning: implicit net 'q' created [-Wimplicit-net]
+  assign q = 1;
+         ^
+
+Build succeeded: 0 errors, 1 warning

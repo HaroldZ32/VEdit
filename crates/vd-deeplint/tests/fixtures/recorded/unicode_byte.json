@@ -1,0 +1,44 @@
+[
+  {
+    "severity": "error",
+    "message": "use of undeclared identifier 'undefined_cjk'",
+    "code": "UndeclaredIdentifier",
+    "location": "crates/vd-deeplint/tests/fixtures/unicode_columns.sv:4:18",
+    "ranges": [
+      {
+        "start": {
+          "file": "crates/vd-deeplint/tests/fixtures/unicode_columns.sv",
+          "line": 4,
+          "column": 18
+        },
+        "end": {
+          "file": "crates/vd-deeplint/tests/fixtures/unicode_columns.sv",
+          "line": 4,
+          "column": 31
+        }
+      }
+    ],
+    "symbolPath": "$unit"
+  },
+  {
+    "severity": "error",
+    "message": "use of undeclared identifier 'undefined_emoji'",
+    "code": "UndeclaredIdentifier",
+    "location": "crates/vd-deeplint/tests/fixtures/unicode_columns.sv:5:16",
+    "ranges": [
+      {
+        "start": {
+          "file": "crates/vd-deeplint/tests/fixtures/unicode_columns.sv",
+          "line": 5,
+          "column": 16
+        },
+        "end": {
+          "file": "crates/vd-deeplint/tests/fixtures/unicode_columns.sv",
+          "line": 5,
+          "column": 31
+        }
+      }
+    ],
+    "symbolPath": "$unit"
+  }
+]

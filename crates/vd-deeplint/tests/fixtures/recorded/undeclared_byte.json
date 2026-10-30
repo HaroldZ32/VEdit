@@ -1,0 +1,23 @@
+[
+  {
+    "severity": "error",
+    "message": "use of undeclared identifier 'undefined_count'",
+    "code": "UndeclaredIdentifier",
+    "location": "crates/vd-deeplint/tests/fixtures/undeclared.sv:3:5",
+    "ranges": [
+      {
+        "start": {
+          "file": "crates/vd-deeplint/tests/fixtures/undeclared.sv",
+          "line": 3,
+          "column": 5
+        },
+        "end": {
+          "file": "crates/vd-deeplint/tests/fixtures/undeclared.sv",
+          "line": 3,
+          "column": 20
+        }
+      }
+    ],
+    "symbolPath": "$unit"
+  }
+]

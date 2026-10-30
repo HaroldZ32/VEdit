@@ -1,0 +1,10 @@
+[
+  {
+    "severity": "warning",
+    "message": "implicit net 'q' created",
+    "code": "ImplicitNet",
+    "optionName": "implicit-net",
+    "location": "crates/vd-deeplint/evidence/lab/implicit_net.sv:2:10",
+    "symbolPath": "$unit"
+  }
+]

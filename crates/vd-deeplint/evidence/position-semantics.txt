@@ -1,0 +1,57 @@
+# T17 column semantics measurement - slang 12.1.0+0 (pinned artifact)
+#
+# Fixture: crates/vd-deeplint/tests/fixtures/display_calibration.sv
+# Every line is: '    /* <prefix> */ undeclared_<label> = 1;' with a different
+# display-width hazard in <prefix> (tab, CJK, emoji, combining mark).
+#
+# Command A (slang default = display columns):
+#   build/slang/out/slang --lint-only -Weverything --diag-json OUT display_calibration.sv
+# Command B (the invocation vd-deeplint uses, byte columns):
+#   build/slang/out/slang --lint-only -Weverything --diag-column-unit byte --diag-json OUT display_calibration.sv
+# Raw outputs: crates/vd-deeplint/evidence/raw/calibration-{display,byte}.json
+
+## Independent computation from the fixture bytes (Python; NOT from slang numbers)
+
+label             line byte_col display byte_indep char_idx  utf16_0 editor_char
+--------------------------------------------------------------------------------
+undeclared_plain     3       17      17         16       16       16          16
+undeclared_tab       4       18      21         17       17       17          17
+undeclared_cjk1      5       15      14         14       12       12          12
+undeclared_cjk2      6       18      16         17       13       13          13
+undeclared_cjk3      7       21      18         20       14       14          14
+undeclared_e1        8       16      13         15       12       13          13
+undeclared_e2        9       20      14         19       13       15          15
+undeclared_e3       10       24      15         23       14       17          17
+undeclared_ce       11       19      15         18       13       14          14
+undeclared_comb     12       19      19         18       18       18          18
+
+## Findings
+- byte_col equals the independently computed byte offset for every row (byte columns are exact).
+- editor character (0-based UTF-16) equals the independent UTF-16 offset for every row.
+- display column differs from the 1-based UTF-16 column on 7 of 10 rows:
+    undeclared_tab: display=21 vs utf16(1-based)=18
+    undeclared_cjk1: display=14 vs utf16(1-based)=13
+    undeclared_cjk2: display=16 vs utf16(1-based)=14
+    undeclared_cjk3: display=18 vs utf16(1-based)=15
+    undeclared_e1: display=13 vs utf16(1-based)=14
+    undeclared_e2: display=14 vs utf16(1-based)=16
+    undeclared_e3: display=15 vs utf16(1-based)=18
+- Therefore display columns cannot be mapped back to text offsets without a
+  width table identical to slang own (tab=8, CJK=2, emoji=1, combining=0);
+  the runner asks for byte columns instead and converts exactly.
+
+## ranges[].end uses the same byte unit
+  line  3: end-start = 16 bytes, identifier 'undeclared_plain' = 16 bytes -> OK
+  line  4: end-start = 14 bytes, identifier 'undeclared_tab' = 14 bytes -> OK
+  line  5: end-start = 15 bytes, identifier 'undeclared_cjk1' = 15 bytes -> OK
+  line  6: end-start = 15 bytes, identifier 'undeclared_cjk2' = 15 bytes -> OK
+  line  7: end-start = 15 bytes, identifier 'undeclared_cjk3' = 15 bytes -> OK
+  line  8: end-start = 13 bytes, identifier 'undeclared_e1' = 13 bytes -> OK
+  line  9: end-start = 13 bytes, identifier 'undeclared_e2' = 13 bytes -> OK
+  line 10: end-start = 13 bytes, identifier 'undeclared_e3' = 13 bytes -> OK
+  line 11: end-start = 13 bytes, identifier 'undeclared_ce' = 13 bytes -> OK
+  line 12: end-start = 15 bytes, identifier 'undeclared_comb' = 15 bytes -> OK
+
+## unicode_columns.sv (CJK and emoji before the identifier on the same line)
+  line 4: byte start 18 end 31 -> editor line 3, character 13..26 (undefined_cjk)
+  line 5: byte start 16 end 31 -> editor line 4, character 13..28 (undefined_emoji)

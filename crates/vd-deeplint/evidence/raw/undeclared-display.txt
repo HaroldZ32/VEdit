@@ -1,0 +1,5 @@
+crates/vd-deeplint/tests/fixtures/undeclared.sv:3:5: error: use of undeclared identifier 'undefined_count'
+    undefined_count = 1;
+    ^~~~~~~~~~~~~~~
+
+Build failed: 1 error, 0 warnings
