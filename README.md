@@ -155,8 +155,10 @@ timeout_ms = 5000
   已上报；在此之前请用上表的动作名。
 - **FIM 的真实端点不在自动验收范围内**：mock 传输层证明"默认 0 请求/协议体逐字正确/取消丢弃陈旧结果"，
   真实服务连通性属于人工项。取消是**结果级**的：网络 I/O 不会中途 abort，迟到结果会被丢弃。
-- **无头/无窗口管理器环境**：`--screenshot` 已修复（frozen2 起产出非空白图）；
-  另保留 X server 捕获（`import -window root`）作为独立视觉证据。见 `packaging/tarball/README.md` 的 Bounds。
+- **无头/无窗口管理器环境**：`--screenshot` 已修复（frozen2 `f1f9622` 起产出非空白图）；
+  另保留 X server 捕获（`import -window root`）作为独立视觉证据。
+  **更正说明**：此条原为"无 WM 容器下截图为空白"的已知限制，frozen2 修复该问题后改为现状描述，
+  原限制不再成立。见 `packaging/tarball/README.md` 的 Bounds。
 - **emoji 字体未捆绑**（体积/许可），中文（CJK）字体已捆绑。
 - **构建机路径**：Rust 会把 panic 位置（源码 `file:line`）编译进二进制。发布构建统一用
   `RELEASE_RUSTFLAGS`（`--remap-path-prefix`，定义在 `scripts/versions.env`）把它们重映射到中性的

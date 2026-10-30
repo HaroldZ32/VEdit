@@ -173,8 +173,11 @@ and once with `--network none --tmpfs /tmp:noexec`.)
 
 ## Bounds (recorded, not hidden)
 
-1. **`--screenshot` used to be blank in a window-manager-less container.** The frozen2 `vd-app`
-   fixes the capture ("layout-safe screenshots"): the clean-room run now writes non-blank
+1. **`--screenshot` used to be blank in a window-manager-less container.**
+   *Correction (after frozen2 `f1f9622`): the capture was fixed in `vd-app`
+   ("layout-safe screenshots"), so the original limitation no longer holds — this paragraph is
+   the updated statement, not the original one.* The frozen2 `vd-app`
+   fixes the capture: the clean-room run now writes non-blank
    `--screenshot` PNGs (34,550 / 33,880 bytes; the CJK shot at stddev ≈ 0.40), so this is no
    longer a bound. The X-server capture (`import -window root`) is kept as independent visual
    evidence of what a user actually sees.
