@@ -72,6 +72,8 @@ Equality is judged by `vd-app` sha256 + size (and that is what AC-19 uses here).
 
 > 验证的是 **vd-fim 的协议实现与 OpenAI 兼容 FIM 形状**；DeepSeek 官方 FIM 走 `/beta/completions`，测试通过一个**仅用于取证的本地路径改写代理**完成——**产品本身未内置该路径改写**，开箱仍发 `/v1/completions`。
 
+**Summary: 15 PASS + 4 PARTIAL + 0 MANUAL** (the four PARTIALs are AC-06/07/08/11; AC-14 and AC-16 are AUTO).
+
 ### Runtime-directory failures: harness misjudgement, product correct
 
 The first harness run used `XDG_RUNTIME_DIR=/nonexistent TMPDIR=/nonexistent`
