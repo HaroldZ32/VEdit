@@ -9,3 +9,7 @@ publish.workspace = true
 workspace = true
 
 [dependencies]
+# Editor baseline (T9): branch A stores the text in GtkTextBuffer, so the
+# GTK 0.18 stack is installed here. T21 upcasts a sourceview4::Buffer into it.
+gtk.workspace = true
+sourceview4.workspace = true

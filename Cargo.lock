@@ -1561,6 +1561,10 @@ dependencies = [
 [[package]]
 name = "vd-editor"
 version = "0.1.0"
+dependencies = [
+ "gtk",
+ "sourceview4",
+]
 
 [[package]]
 name = "vd-fim"
@@ -1587,6 +1591,10 @@ dependencies = [
 [[package]]
 name = "vd-syntax"
 version = "0.1.0"
+dependencies = [
+ "gtk",
+ "sourceview4",
+]
 
 [[package]]
 name = "version-compare"

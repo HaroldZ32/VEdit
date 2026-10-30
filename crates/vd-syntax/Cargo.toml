@@ -9,3 +9,7 @@ publish.workspace = true
 workspace = true
 
 [dependencies]
+# Syntax (T11) drives GtkSourceView's LanguageManager/language specs, so the
+# same GTK 0.18 stack is installed here.
+gtk.workspace = true
+sourceview4.workspace = true
