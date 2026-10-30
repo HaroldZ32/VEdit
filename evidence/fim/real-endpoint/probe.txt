@@ -1,0 +1,87 @@
+# FIM real-endpoint discovery — raw probe log (sanitized)
+# Date: 2026-10-30 (Asia/Shanghai)
+# No token/key value was read, printed or stored; no port or URL below is a
+# verbatim endpoint (placeholders are used where a concrete value was observed).
+
+## 1) Harness environment variables ($DSH_*), names and presence only
+$ env | grep -i '^DSH' | sed -E 's/=.*//'
+DSH_HOME            SET  len=21
+DSH_PROFILE         SET  len=7
+DSH_PROFILE_DIR     SET  len=38
+DSH_SESSION_ID      SET  len=36
+DSH_SHELL           SET  len=1
+
+$ env | grep -iE 'API_KEY|BASE_URL|API_BASE|OPENAI|DEEPSEEK|OLLAMA|LLM' | sed -E 's/=.*//'
+(no output — no model-API variable is exported to this session)
+
+Conclusion: the harness exposes no API base URL, port or token via $DSH_*.
+Only filesystem/profile facts are visible.
+
+## 2) Local listening TCP sockets (sanitized classification)
+# Classification table (full detail in README §1.2):
+#   proxy ×3      GET/POST origin-form -> 400, Connection: close,
+#                 Proxy-Connection: close, Content-Length: 0
+#   dsh web       GET / -> 401 "dsh web authentication required; reopen the URL
+#                 printed by dsh web."; /v1/models -> 404; POST -> 405
+#   SPA           GET / -> 200 text/html 894 B; /api/*, /v1/*, /docs -> 404
+#                 "404 page not found"
+#   dev ×3        GET /, /mcp, /sse, /health, /v1/models -> 404
+#   11434/8080/8000/5000/1234  GET /v1/models -> connection refused
+$ ss -ltn
+127.0.0.1:<proxy-port-1> … <proxy-port-3>     # see 3a
+127.0.0.1:<dsh-web-port>                      # see 3b
+127.0.0.1:<spa-port>                          # see 3c
+127.0.0.1:<dev-port-1> … <dev-port-3>         # see 3d
+127.0.0.1:631 (CUPS default, unrelated)          # other desktop services omitted
+(loopback only; port values deliberately replaced by placeholders)
+
+## 3) Protocol probes against every candidate listener
+### 3a) HTTP proxy listeners
+$ curl -sv http://127.0.0.1:<proxy-port>/
+< HTTP/1.1 400 Bad Request
+< Connection: close
+< Proxy-Connection: close
+< Content-Length: 0
+$ curl --http2-prior-knowledge …   -> peer sends non-HTTP/2 data
+→ origin-form requests are rejected and the response carries Proxy-Connection:
+  these are outbound HTTP proxies, not an API. They also answered 400 to
+  /v1/models, /v1/completions (POST), /v1/chat/completions and /infill.
+
+### 3b) dsh web UI
+$ curl -s -D - http://127.0.0.1:<dsh-web-port>/
+HTTP/1.1 401 Unauthorized
+dsh web authentication required; reopen the URL printed by dsh web.
+→ This is the `dsh web` UI (token-gated, token only in the printed URL).
+  It is an agent chat surface, not a completion endpoint; /v1/models -> 404.
+  No token was read or used.
+
+### 3c) single-page web app
+$ curl -s http://127.0.0.1:<spa-port>/
+200 text/html (SPA index, 894 bytes); every probed /api/* and /v1/* path -> 404
+"404 page not found" (Go-style)
+→ unrelated local web app, not an LLM service.
+
+### 3d) three small HTTP dev servers
+GET / -> 404; /mcp, /sse, /health, /v1/models -> 404
+→ not MCP-over-HTTP and not completion endpoints.
+
+### 3e) common local-model ports
+127.0.0.1:11434 (Ollama), :8080, :8000, :5000, :1234
+curl /v1/models -> connection refused on every one (no local model server).
+
+## 4) Endpoint shapes vd-fim can speak (for a future real endpoint)
+vd-fim (crates/vd-fim) has exactly two protocols:
+  - OpenAiFim:  POST <base>/v1/completions  {"prompt":…, "suffix":…}
+  - LlamaCpp:   POST <base>/infill          {"input_prefix":…, "input_suffix":…}
+No discovered listener implements either shape.
+
+## 5) Conclusion
+No local DSH-exposed OpenAI-compatible `/v1/completions` or llama.cpp `/infill`
+endpoint exists in this environment, so AC-14 cannot be moved from MANUAL to an
+automated positive-path proof on this machine. The degradation path (dead
+endpoint -> short Failed reason) is automatable and is covered by the existing
+vd-fim unit/integration tests; the positive and cancellation-with-late-reply
+cases need a real endpoint of one of the two shapes above.
+
+This is a local harness environment probe, not a public service; it makes no
+claim about any provider's FIM compatibility.
