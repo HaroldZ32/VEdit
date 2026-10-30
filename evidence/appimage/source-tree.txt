@@ -1,8 +1,10 @@
 source_mode=shared-release-artifact
-git_head=e1e09d69033707adbb6f3cd7d7de4058c985613f
+git_head=63bf415495edb65f54ec102ee396f39787d857cc
 git_status_porcelain:
+ M packaging/tarball/evidence/00-stage.log
 ?? evidence/github/
+?? packaging/tarball/evidence/01b-vd-app-identity.txt
 shared_vd_app=/vedit-build/build/artifacts/vd-app
-shared_vd_app_sha256=809cf95326172fc58975b38cea390dcffd8d78d1261b4f1d75059a8950c6d77d
-archive_revision=e1e09d69033707adbb6f3cd7d7de4058c985613f
+shared_vd_app_sha256=41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611
+archive_revision=63bf415495edb65f54ec102ee396f39787d857cc
 archive_dir=/vedit-build/packaging/appimage/.cache/src-head (git archive HEAD, fixtures + provenance)

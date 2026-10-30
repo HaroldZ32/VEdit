@@ -6,12 +6,13 @@ Owner: Deep Worker · board **T23** (split key **T11**) · scope
 ## Deliverable (current build)
 
 `packaging/appimage/out/VEdit-0.1.0-x86_64.AppImage`
-— **47,745,528 B**, sha256 **`60b111899444e9743a33750ebfdbbd6a5359fe690e6417120d9101bcede6b7ad`**
-(frozen build; the container hash changes on a rebuild because squashfs stores
+— **47,745,528 B**, sha256 **`4f800ab97368de6f379efdc15a582bfbb615bcc3e2b7a0a3f5a19935de21ce44`**
+(frozen2 build; the container hash changes on a rebuild because squashfs stores
 file timestamps — the payload `vd-app` sha256 does not).
 
 The payload installs **the same `vd-app` binary as the tar.gz and `.run`**:
-`sha256 809cf95326172fc58975b338cea390dcffd8d78d1261b4f1d75059a8950c6d77d`
+`sha256 41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611`
+(6,002,112 B, stripped; "3/3 identical" reproducibility from frozen2)
 (`payload-vd-app.txt`; the value equals `build/artifacts/vd-app`). `build-appimage.sh`
 copies that artefact and **fails the build** unless the packaged copy has the same
 sha256, so "one source, three products" is enforced, not just promised.
@@ -36,10 +37,25 @@ verible/slang/zombie process behind.
    build moment, and `archive_revision` (= `git_head`), which is what the freeze
    protocol asks for.
 
-The frozen revision is
-`e1e09d69033707adbb6f3cd7d7de4058c985613f`; `source-tree.txt` records
-`git status --porcelain` = only the untracked readiness report, and
-`archive_revision` = the frozen SHA. No script was changed after the freeze.
+The frozen2 revision is
+`63bf415495edb65f54ec102ee396f39787d857cc` (= `f1f9622` plus the Senior
+Engineer's canonical/determinism evidence commit); `source-tree.txt` records
+that HEAD, the build-moment status (only T25's uncommitted
+`packaging/tarball/evidence/*`, the untracked readiness report and T25's new
+evidence file) and `archive_revision` = the same HEAD. No script was changed
+after the freeze.
+
+### `vd-app` canonical chain (why this number)
+
+| sha256 | status |
+|---|---|
+| `809cf95326172fc58975b338cea390dcffd8d78d1261b4f1d75059a8950c6d77d` | dirty-tree build, not reproducible from the frozen source — **discarded** (this is what the earlier T24/T23 evidence used) |
+| `41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611` | rebuilt from frozen2, **3/3 identical** builds, stripped, 6,002,112 B — **adopted (final value)** |
+| `d93440ed…` | reproducible but **not stripped** — discarded (size/consistency) |
+
+The AppImage, tar.gz and `.run` all install the adopted binary; the build-time
+assertion in `build-appimage.sh` compares the packaged copy against
+`build/artifacts/vd-app` and fails on any difference.
 
 ## Pinned inputs (all verified, nothing copied from `.mpd/recon/`)
 
@@ -55,7 +71,7 @@ The frozen revision is
 ## Payload layout
 
 ```
-usr/bin/vd-app                      <- build/artifacts/vd-app (sha 809cf953…)
+usr/bin/vd-app                      <- build/artifacts/vd-app (sha 41d02dca…)
 usr/lib/                            67-library GTK3/GtkSourceView closure
 usr/lib/vedit/bin/                  verible-verilog-ls/-format/-lint (static), slang
 usr/lib/gdk-pixbuf-2.0/2.10.0/loaders/   13 loaders
@@ -125,7 +141,8 @@ only; it asserts it has no gtk3/gsv packages. Harness sets a 32-hex
 |---|---|
 | no system GTK/gsv | PASS (negative assertion) |
 | no system CJK font | `host CJK fonts available before the payload runs: 0` → PASS |
-| `--selftest all` via `--appimage-extract-and-run` | **exit 0, 52 checks, 0 failed** (`clean-room/selftest-all-summary.txt`) |
+| `--selftest all` (plain) | **exit 0, 51 checks, 0 failed** (`clean-room/selftest-all-plain.log`: smoke 20, highlight 8, config 6, lsp 6, slang 6, fim 5) |
+| `--selftest all --screenshot` (the AC-02 visual run) | **exit 0, 52 checks, 0 failed** (`clean-room/selftest-all-summary.txt`): the extra check is `--screenshot produces a non-blank PNG`, which `selftest.rs` pushes only when `--screenshot` was passed — same binary, one conditional check, not a count mismatch |
 | `APPIMAGE_EXTRACT_AND_RUN=1 --selftest smoke` | exit 0 |
 | direct execution (no `/dev/fuse`) | exit 127, FUSE error recorded (expected) |
 | runtime dir: unusable `XDG_RUNTIME_DIR` | exit 0 + `cannot use XDG_RUNTIME_DIR=/proc/nonexistent …; using /tmp instead` |
@@ -136,7 +153,7 @@ only; it asserts it has no gtk3/gsv packages. Harness sets a 32-hex
 | app `--screenshot` | **33,223 B real image** (`screenshots/app-selftest-highlight.png`); the T24-era black capture was fixed by T21's single-window/layout-safe capture |
 | dynamic dependencies of `vd-app` | 67 from payload, 8 from the host glibc family only; no `not found` |
 | residual processes | no verible/slang process, no zombie |
-| cold start (exec → window) | 191 / 193 / 191 ms (`sizes.txt`) |
+| cold start (exec → window) | 194 / 192 / 191 ms (`sizes.txt`) |
 
 ## Payload size: how it is measured
 
@@ -166,10 +183,11 @@ canonical number is the one that corresponds to what an installed tree occupies;
 | T24 acceptance | `b589416e9492c6a2df333d861163d71ba3674305788a77e5b1f9c541e72412a4` | 48,105,976 | first clean-room-accepted AppImage |
 | intermediate | `a102aaf69338832204040dfdec361e49fc8b6694a17e1540ea292f5dcacc667e` | 48,110,072 | AppRun runtime-dir alignment with T25 + `/vedit` sandbox remap |
 | pre-freeze | `b24d0bfb5f1945d86be108d9e4cf27ee942e7469af1e7574df4b69d108863119` | 47,745,528 | consumes shared `vd-app` 809cf953… + T21 single-window/runtime-fixture fixes + T25 shared remap |
-| **frozen `e1e09d69`** | **`60b111899444e9743a33750ebfdbbd6a5359fe690e6417120d9101bcede6b7ad`** | **47,745,528** | rebuild from the frozen commit; same `vd-app` sha256 (`payload-vd-app.txt`) |
+| frozen `e1e09d69` | `60b111899444e9743a33750ebfdbbd6a5359fe690e6417120d9101bcede6b7ad` | 47,745,528 | rebuild from the first freeze; used `vd-app` 809cf953 (later found not reproducible) |
+| **frozen2 `f1f9622`/`63bf415`** | **`4f800ab97368de6f379efdc15a582bfbb615bcc3e2b7a0a3f5a19935de21ce44`** | **47,745,528** | adopted canonical `vd-app` 41d02dca (3/3 reproducible, stripped) |
 
 The **container** hash is not byte-reproducible across builds (squashfs stores
-file timestamps); the **payload binary** is (`809cf953…` every time). T27/T28
+file timestamps); the **payload binary** is not (`41d02dca…` on 3/3 builds). T27/T28
 should key on the frozen container hash plus the `vd-app` sha256, both recorded
 above.
 
@@ -180,7 +198,7 @@ usr/lib/vedit/bin/verible-verilog-ls      07bf6b45…  (static)
 usr/lib/vedit/bin/verible-verilog-format  b0a7b1ae…  (static)
 usr/lib/vedit/bin/verible-verilog-lint    b9d56f9a…  (static)
 usr/lib/vedit/bin/slang                   63cb60a0…  (dynamic, glibc ≤ 2.17)
-usr/bin/vd-app                            809cf953…  (same bytes as tar.gz/.run)
+usr/bin/vd-app                            41d02dca…  (same bytes as tar.gz/.run)
 ```
 
 - run as `usr/bin/vd-app` via `AppRun`; `--selftest all` is the single command
