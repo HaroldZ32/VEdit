@@ -1,0 +1,82 @@
+-- CMake version: 3.31.6
+-- slang version: 12.1.0+0
+-- The CXX compiler identification is GNU 11.2.1
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /opt/rh/devtoolset-11/root/usr/bin/g++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found Python: /opt/python3/bin/python3 (found version "3.12.8") found components: Interpreter
+-- Build STATIC library as: svlang
+-- Dependency URL prefix: https://github.com/
+Cloning into 'fmt-src'...
+HEAD is now at 1be298e... Update version
+-- {fmt} version: 12.2.0
+-- Build type: Release
+-- Using remote fmt library (header-only)
+-- Using vendored boost_unordered header
+-- Using FetchContent for boost::regex (header-only)
+Cloning into 'boost_regex-src'...
+HEAD is now at 2b3ac08... More no_except fixes
+Cloning into 'mimalloc-src'...
+HEAD is now at d4881d3... fix arena allocation for exclusive child arenas, PR #1404
+-- The C compiler identification is GNU 11.2.1
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /opt/rh/devtoolset-11/root/usr/bin/gcc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Found Git: /usr/bin/git (found version "1.8.3.1")
+-- 
+-- Architecture: x64 (64 bit)
+-- Use the C++ compiler to compile (MI_USE_CXX=ON)
+-- Override standard malloc (MI_OVERRIDE=ON)
+-- Skip collecting memory on program exit (MI_SKIP_COLLECT_ON_EXIT=ON)
+-- Disable assertion checks (MI_DEBUG=OFF)
+-- Enable detailed statistics (MI_STATS=ON)
+-- Enable sampled profiling (MI_PROFILE=ON)
+-- Enable full transparent huge pages support, where purging avoids splitting huge pages (MI_ALLOW_THP=FULL)
+-- Looking for include file execinfo.h
+-- Looking for include file execinfo.h - found
+-- Performing Test mi_has_libpthread
+-- Performing Test mi_has_libpthread - Success
+-- Performing Test mi_has_librt
+-- Performing Test mi_has_librt - Success
+-- Performing Test mi_has_libatomic
+-- Performing Test mi_has_libatomic - Failed
+-- 
+-- Library name     : mimalloc
+-- Version          : 3.5.3
+-- Build type       : release
+-- C++ Compiler     : /opt/rh/devtoolset-11/root/usr/bin/g++
+-- Compiler flags   : -Wall;-Wextra;-Wno-unknown-pragmas;-fvisibility=hidden;-ftls-model=initial-exec;-fno-builtin-malloc
+-- Compiler defines : MI_SKIP_COLLECT_ON_EXIT=1;NDEBUG=1;MI_GUARDED=0;MI_STATS=1;MI_PROFILE=1;MI_DEFAULT_ALLOW_THP=2;MI_HAS_EXECINFOH=1;MI_CMAKE_BUILD_TYPE=release;MI_BUILD_RELEASE
+-- Link libraries   : pthread;rt
+-- Build targets    : static;object
+-- 
+-- Using remote mimalloc library
+Cloning into 'tomlplusplus-src'...
+HEAD is now at 3017243... v3.4.0
+-- Using remote tomlplusplus library
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Failed
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - found
+-- Found Threads: TRUE
+-- Performing Test COMPILER_HAS_HIDDEN_VISIBILITY
+-- Performing Test COMPILER_HAS_HIDDEN_VISIBILITY - Success
+-- Performing Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY
+-- Performing Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY - Success
+-- Performing Test COMPILER_HAS_DEPRECATED_ATTR
+-- Performing Test COMPILER_HAS_DEPRECATED_ATTR - Success
+-- Configuring done (15.6s)
+-- Generating done (0.0s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    PYTHON_EXECUTABLE
+
+
+-- Build files have been written to: /build/obj

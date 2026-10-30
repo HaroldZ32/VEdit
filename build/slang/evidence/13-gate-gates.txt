@@ -1,0 +1,17 @@
+# Gate 'gates' run through the MPD-reachable argv
+# generated: 2026-10-30T02:46:56Z  cwd: /home/haroldzhao/MyProj/DshProj/VEdit
+
+$ bun run verify:gates
+$ bash build/gates/gates.sh
+[gates] artifact present, re-checking it (GATES_REBUILD=1 rebuilds): /home/haroldzhao/MyProj/DshProj/VEdit/build/slang/out/slang
+[gates] readelf -d NEEDED entries:
+ 0x0000000000000001 (NEEDED)             Shared library: [libpthread.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]
+[gates] highest GLIBC symbol version required: GLIBC_2.17
+[gates] sha256: 63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252
+[gates] N/A: no Cargo workspace yet (T7 owns the Rust skeleton); the test step has nothing to run.
+[gates] this N/A is only valid before T7: once Cargo.toml exists, a test failure fails this gate.
+[gates] PASS
+exit=0

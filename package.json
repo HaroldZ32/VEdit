@@ -13,6 +13,7 @@
     "verify:rows": "bash build/gates/rows.sh",
     "verify:vendor": "bash build/gates/vendor.sh",
     "verify:dist": "bash build/gates/dist.sh",
-    "verify:pack": "bash build/gates/pack.sh"
+    "verify:pack": "bash build/gates/pack.sh",
+    "typecheck": "bash build/gates/typecheck.sh"
   }
 }

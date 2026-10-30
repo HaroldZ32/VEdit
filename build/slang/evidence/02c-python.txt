@@ -1,0 +1,6 @@
+# build-time python (2026-10-30T02:44:15Z)
+## system python (CentOS 7 base): Python 2.7.5
+## build-time python:
+Python 3.12.8
+## executable: /opt/python3/bin/python3
+## path: /opt/python3/bin/python3

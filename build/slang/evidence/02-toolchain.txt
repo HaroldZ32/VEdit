@@ -1,0 +1,20 @@
+# toolchain inside the build container (2026-10-30T02:43:35Z)
+## container
+CentOS Linux release 7.9.2009 (Core)
+## glibc
+ldd (GNU libc) 2.17
+## gcc
+gcc (GCC) 11.2.1 20220127 (Red Hat 11.2.1-9)
+## g++
+g++ (GCC) 11.2.1 20220127 (Red Hat 11.2.1-9)
+## ld
+GNU ld version 2.36.1-1.el7.2
+## make
+GNU Make 3.82
+## git
+git version 1.8.3.1
+## static libstdc++: /opt/rh/devtoolset-11/root/usr/lib/gcc/x86_64-redhat-linux/11/32/libstdc++.a
+## bash
+GNU bash, version 4.2.46(2)-release (x86_64-redhat-linux-gnu)
+## cpus
+16

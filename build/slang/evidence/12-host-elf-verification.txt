@@ -1,0 +1,64 @@
+# Host-side ELF verification of build/slang/out/slang
+# generated: 2026-10-30T02:46:52Z
+# host: Linux 7.0.0-38-generic x86_64 | host glibc: ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43
+# purpose: independent re-run of the contract's ELF claims, with the exact
+#          command line and its exit code so a verifier can repeat them.
+
+$ file out/slang
+out/slang: ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=8db83818f200644cede808a232bf79cd535ef68f, for GNU/Linux 2.6.32, stripped
+exit=0
+
+$ sha256sum out/slang
+63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  out/slang
+exit=0
+
+$ stat -c "size=%s bytes" out/slang
+size=9526400 bytes
+exit=0
+
+$ readelf -h out/slang | sed -n "/Class:\|Machine:\|Type:/p"
+  Class:                             ELF64
+  Type:                              EXEC (Executable file)
+  Machine:                           Advanced Micro Devices X86-64
+exit=0
+
+$ readelf -d out/slang | grep NEEDED
+ 0x0000000000000001 (NEEDED)             Shared library: [libpthread.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]
+exit=0
+
+$ readelf -V out/slang | grep -o "GLIBC_[0-9.]*" | sort -V -u
+GLIBC_2.2.5
+GLIBC_2.3
+GLIBC_2.3.2
+GLIBC_2.4
+GLIBC_2.6
+GLIBC_2.14
+GLIBC_2.17
+exit=0
+
+$ readelf -V out/slang | grep -o "GLIBC_[0-9.]*" | sort -V -u | tail -1
+GLIBC_2.17
+
+$ # assertion: is the highest GLIBC symbol <= GLIBC_2.17 ?
+assertion_exit=0 (0 = max <= GLIBC_2.17)
+
+$ objdump -T out/slang | grep -o "GLIBC_[0-9.]*" | sort -V -u | tail -1
+GLIBC_2.17
+
+$ objdump -T out/slang | grep -oE "GLIBCXX_[0-9.]+|CXXABI_[0-9.]+|GCC_[0-9.]+" | sort -u
+(no output)
+exit=0 (1 = no libstdc++/C++ ABI symbols at all, as expected for a static libstdc++)
+
+$ # assertion: no NEEDED entry for libstdc++ / libgcc_s
+assertion_exit=1 (1 = absent, as expected)
+
+$ ldd out/slang   # host glibc is newer; the authoritative runtime check is evidence/09-offline-smoke.txt
+	linux-vdso.so.1 (0x0000789b181fe000)
+	libpthread.so.0 => /usr/lib/x86_64-linux-gnu/libpthread.so.0 (0x0000789b181d8000)
+	libm.so.6 => /usr/lib/x86_64-linux-gnu/libm.so.6 (0x0000789b180b2000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x0000789b17e00000)
+	/lib64/ld-linux-x86-64.so.2 (0x0000789b18200000)
+exit=0

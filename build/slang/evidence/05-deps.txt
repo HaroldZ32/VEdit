@@ -1,0 +1,5 @@
+# FetchContent dependency checkouts (2026-10-30T02:44:36Z)
+boost_regex-src commit=2b3ac0834f31086c6e3c0e0ceb8516e427d5c39d describe=boost-1.91.0
+fmt-src commit=1be298e1bd68957e4cd352e1f676f00e07dcfb57 describe=12.2.0
+mimalloc-src commit=d4881d338125e1cb7c47ba4cfb398d6f7c0c8d45 describe=v3.5.3
+tomlplusplus-src commit=30172438cee64926dc41fdd9c11fb3ba5b2ba9de describe=v3.4.0

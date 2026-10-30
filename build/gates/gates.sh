@@ -31,4 +31,17 @@ if [ "$(printf '%s\n%s\n' "$max_glibc" "GLIBC_2.17" | sort -V | tail -1)" != "GL
   no_gate "[gates] FAIL: $max_glibc is newer than the CentOS 7 baseline GLIBC_2.17"
 fi
 echo "[gates] sha256: $(sha256sum "$BIN" | cut -d' ' -f1)"
+
+# The MPD gate table reaches `gates` but NOT `tests`: its fixed argv for `tests`
+# is `bun test packages`, which a Rust product can never satisfy. `gates` is the
+# only reachable id that may run a heavy command, so the Rust test suite is
+# folded in here (its result is what the ledger sees).
+if [ -f "$ROOT/Cargo.toml" ]; then
+  echo "[gates] Cargo workspace present -> cargo test --workspace is a HARD requirement"
+  ( cd "$ROOT" && cargo test --workspace ) \
+    || no_gate "[gates] FAIL: cargo test --workspace failed"
+else
+  echo "[gates] N/A: no Cargo workspace yet (T7 owns the Rust skeleton); the test step has nothing to run."
+  echo "[gates] this N/A is only valid before T7: once Cargo.toml exists, a test failure fails this gate."
+fi
 echo "[gates] PASS"

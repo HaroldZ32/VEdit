@@ -1,0 +1,23 @@
+[
+  {
+    "severity": "error",
+    "message": "use of undeclared identifier 'undefined_count'",
+    "code": "UndeclaredIdentifier",
+    "location": "fixtures/undeclared.sv:6:19",
+    "ranges": [
+      {
+        "start": {
+          "file": "fixtures/undeclared.sv",
+          "line": 6,
+          "column": 19
+        },
+        "end": {
+          "file": "fixtures/undeclared.sv",
+          "line": 6,
+          "column": 34
+        }
+      }
+    ],
+    "symbolPath": "$unit"
+  }
+]

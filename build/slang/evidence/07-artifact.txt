@@ -1,0 +1,12 @@
+# artifact (2026-10-30T02:46:13Z)
+-rwxr-xr-x 1 root root 9526400 Oct 30 02:46 /work/out/slang
+/work/out/slang: ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), dynamically linked (uses shared libs), BuildID[sha1]=8db83818f200644cede808a232bf79cd535ef68f, for GNU/Linux 2.6.32, stripped
+63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  /work/out/slang
+unstripped_bytes=12244592
+stripped_bytes=9526400
+## ldd inside the build container:
+	linux-vdso.so.1 =>  (0x00007c1bb8ebc000)
+	libpthread.so.0 => /lib64/libpthread.so.0 (0x00007c1bb89e4000)
+	libm.so.6 => /lib64/libm.so.6 (0x00007c1bb86e2000)
+	libc.so.6 => /lib64/libc.so.6 (0x00007c1bb8314000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007c1bb8c00000)

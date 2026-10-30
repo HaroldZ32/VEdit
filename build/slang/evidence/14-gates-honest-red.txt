@@ -1,0 +1,43 @@
+# Gates that are honestly RED at the slang-spike milestone
+# generated: 2026-10-30T02:46:56Z  cwd: /home/haroldzhao/MyProj/DshProj/VEdit
+# Each line shows the exact argv, the message, and the exit code.
+
+$ bun run verify:tests
+[tests] 本项目无此门禁：尚无 Cargo workspace（Cargo.toml 不存在），Rust 骨架由 T7 交付；此门禁保持 RED，不跳过。
+exit=1
+
+$ bun run verify:typecheck
+[typecheck] 本项目无此门禁：尚无 Cargo workspace（Cargo.toml 不存在），Rust 骨架由 T7 交付；此门禁保持 RED，不跳过。
+exit=1
+
+$ bun run verify:docs
+[docs] 本项目暂无文档门禁产物（T29 负责）：缺少 README.md docs/BUILD.md docs/USER_GUIDE.md THIRD_PARTY_NOTICES.md
+exit=1
+
+$ bun run verify:manifest
+[manifest] 本项目无此门禁：尚无 Cargo workspace（Cargo.toml 不存在），Rust 骨架由 T7 交付；此门禁保持 RED，不跳过。
+exit=1
+
+$ bun run verify:comments
+[comments] 本项目无此门禁：本产品未接入 comment-checker（该检查属于 MPD bundle 自身）；此门禁不伪装通过。
+exit=1
+
+$ bun run verify:rows
+[rows] 本项目无此门禁：rows 是 MPD bundle 的 ledger 门禁，本产品没有对应实体；此门禁不伪装通过。
+exit=1
+
+$ bun run verify:vendor
+[vendor] 本项目暂无第三方许可清单（T29 负责）：THIRD_PARTY_NOTICES.md 缺失
+exit=1
+
+$ bun run verify:dist
+[dist] 本项目暂无分发产物（T23 负责）：未找到 *.AppImage
+exit=1
+
+$ bun run verify:pack
+[pack] 本项目暂无 tar.gz 目录包（T25 负责）：未找到 *.tar.gz
+exit=1
+
+$ bun run typecheck   # the alias the MPD gate table actually calls
+[typecheck] 本项目无此门禁：尚无 Cargo workspace（Cargo.toml 不存在），Rust 骨架由 T7 交付；此门禁保持 RED，不跳过。
+exit=1

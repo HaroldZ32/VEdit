@@ -1,0 +1,65 @@
+# offline smoke test (2026-10-30T02:46:14Z)
+## container
+CentOS Linux release 7.9.2009 (Core)
+## glibc
+ldd (GNU libc) 2.17
+## routing table (no default route expected under --network none):
+Iface	Destination	Gateway 	Flags	RefCnt	Use	Metric	Mask		MTU	Window	IRTT                                                       
+
+## 1) slang --version
+slang version 12.1.0+0
+version_exit=0
+PASS: --version exits 0 on a stock CentOS 7 (glibc 2.17)
+PASS: version string names slang 12.1
+
+## 2) lint a clean fixture (expect exit 0)
+clean_lint_exit=0
+
+Build succeeded: 0 errors, 0 warnings
+PASS: clean fixture lints with exit 0
+
+## 3) lint a fixture with an undeclared identifier (expect non-zero + JSON array)
+lint_exit=1 (expected non-zero: the fixture contains an error)
+fixtures/undeclared.sv:6:19: error: use of undeclared identifier 'undefined_count'
+    else q <= q + undefined_count;
+                  ^~~~~~~~~~~~~~~
+
+Build failed: 1 error, 0 warnings
+PASS: lint reports failure exit for a broken fixture
+## raw --diag-json output (first 800 bytes):
+[
+  {
+    "severity": "error",
+    "message": "use of undeclared identifier 'undefined_count'",
+    "code": "UndeclaredIdentifier",
+    "location": "fixtures/undeclared.sv:6:19",
+    "ranges": [
+      {
+        "start": {
+          "file": "fixtures/undeclared.sv",
+          "line": 6,
+          "column": 19
+        },
+        "end": {
+          "file": "fixtures/undeclared.sv",
+          "line": 6,
+          "column": 34
+        }
+      }
+    ],
+    "symbolPath": "$unit"
+  }
+]
+json_array_len=1
+first_diagnostic_keys=[u'code', u'location', u'message', u'ranges', u'severity', u'symbolPath']
+PASS: --diag-json output parses as a non-empty JSON array
+
+## 4) runtime dependency check (libc only, no libstdc++/libgcc_s)
+	linux-vdso.so.1 =>  (0x00007a1b3b784000)
+	libpthread.so.0 => /lib64/libpthread.so.0 (0x00007a1b3b1e4000)
+	libm.so.6 => /lib64/libm.so.6 (0x00007a1b3aee2000)
+	libc.so.6 => /lib64/libc.so.6 (0x00007a1b3ab14000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007a1b3b400000)
+PASS: binary needs neither libstdc++ nor libgcc_s
+
+OFFLINE SMOKE: PASS

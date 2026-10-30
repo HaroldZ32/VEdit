@@ -1,0 +1,7 @@
+# slang source provenance (2026-10-30T02:44:20Z)
+repository=https://github.com/MikePopoloski/slang.git
+tag=v12.1
+pinned_commit=42710c788ce76cd08ce2080773e0b8286c428a05
+checked_out_commit=42710c788ce76cd08ce2080773e0b8286c428a05
+git_describe=v12.1
+working_tree_status_lines=0

@@ -1,0 +1,32 @@
+diff --git a/include/slang/util/Hash.h b/include/slang/util/Hash.h
+index d044c0a..aeb8cf9 100644
+--- a/include/slang/util/Hash.h
++++ b/include/slang/util/Hash.h
+@@ -9,6 +9,7 @@
+ 
+ #include <array>
+ #include <cstring>
++#include <filesystem>
+ #include <memory>
+ #include <vector>
+ 
+@@ -150,6 +151,19 @@ struct hash {
+     }
+ };
+ 
++// libstdc++ only gained std::hash<std::filesystem::path> after GCC 11.2 (it is
++// present from GCC 11.3 / 12 on); CentOS 7's newest compiler, devtoolset-11,
++// is GCC 11.2.1, so the std::hash<T> fallback above does not compile there.
++// Provide the specialization through slang's own hash template instead.
++template<>
++struct hash<std::filesystem::path> {
++    using is_avalanching = void;
++    uint64_t operator()(const std::filesystem::path& p) const noexcept {
++        const auto& native = p.native();
++        return detail::hashing::hash(native.data(), sizeof(native[0]) * native.size());
++    }
++};
++
+ template<typename CharT>
+ struct hash<std::basic_string<CharT>> {
+     using is_avalanching = void;

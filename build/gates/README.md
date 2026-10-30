@@ -22,3 +22,27 @@ Rules:
 
 `GATES_REBUILD=1 bun run verify:gates` forces a full rebuild instead of
 re-verifying the existing `build/slang/out/slang`.
+
+## Exit-0 rule for `gates`
+
+`gates.sh` may exit 0 only after it verified something that really exists: the
+slang artifact, its `GLIBC <= 2.17` symbol bound, and its offline smoke test. The
+folded-in `cargo test --workspace` step is allowed to print
+`N/A: no Cargo workspace yet (T7)` **only while `Cargo.toml` is absent**. The
+moment the Rust workspace exists, the same step becomes a hard requirement: a
+test failure fails the gate. Printing N/A and exiting 0 after T7 is fake green
+and is treated as a violation.
+
+## Reachability in the MPD ledger
+
+The evidence tool's gate table uses fixed argv. Measured reachability:
+
+| gate id | argv the tool runs | reachable |
+|---|---|---|
+| `gates`, `docs`, `manifest`, `comments`, `rows` | `bun run verify:<id>` | yes |
+| `typecheck` | `bun run typecheck` | yes, via the `typecheck` alias in package.json |
+| `tests` | `bun test packages` (hardcoded) | **no** - a Rust product can never match; the ledger-visible test run is folded into `gates` |
+| `vendor`, `dist`, `pack` | `node scripts/verify-*.ts` (hardcoded path) | **no** - node hits ENOENT before our script; no evidence can be produced from them |
+
+The unreachable scripts stay in the tree for humans running them by hand; they are
+not evidence sources and must not be claimed as such in a verification record.

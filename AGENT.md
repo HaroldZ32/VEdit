@@ -47,7 +47,15 @@ dependency.
 
 At this milestone (slang spike) only `bun run verify:gates` can be green: the
 Cargo workspace does not exist until T7. The other `verify:*` gates exit 1 and
-say why (they never fake a pass).
+say why (they never fake a pass). `verify:gates` folds in `cargo test --workspace`
+once `Cargo.toml` exists, and from then on a test failure fails the gate (the
+`N/A` line is only legal before T7).
+
+The evidence tool's fixed gate table can only reach `gates`, `docs`, `manifest`,
+`comments`, `rows` (`bun run verify:<id>`) and `typecheck` (alias). `tests`
+(`bun test packages`) and `vendor`/`dist`/`pack` (`node scripts/verify-*.ts`) are
+unreachable in a Rust project, so they produce no evidence; those scripts exist
+for humans only. Details: `build/gates/README.md`.
 
 ## 5. Verification
 
