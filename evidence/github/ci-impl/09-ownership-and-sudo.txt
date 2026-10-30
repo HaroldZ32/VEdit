@@ -1,0 +1,10 @@
+### rootless / ownership check after the BuildKit builds
+host_uid=1000 host_user=haroldzhao
+drwxrwxr-x 14 haroldzhao haroldzhao 4096 Oct 30 16:54 target
+drwxrwxr-x  3 haroldzhao haroldzhao 4096 Oct 30 17:12 target/cargo-home
+drwxr-xr-x  7 haroldzhao haroldzhao 4096 Oct 30 17:08 target/debug
+drwxrwxr-x  8 haroldzhao haroldzhao 4096 Oct 30 17:08 target/home
+--- newest files under target (should be host-owned) ---
+(empty above = no foreign-owned files)
+--- sudo/su in the seam scripts ---
+no sudo/su

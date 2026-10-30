@@ -1,0 +1,127 @@
+name: ci
+
+# The repository's own gates, run inside the pinned CentOS 7 image:
+#   * scripts/gates.sh  -> Cargo.lock policy, cargo fmt --check, clippy -D warnings, cargo test
+#   * scripts/build.sh  -> release build, path-leak check, Xvfb --selftest smoke,
+#                          and the GLIBC <= 2.17 assertion for the shipped binary
+# A published image is reused when available; otherwise this job builds it.
+
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gates:
+    name: gates and release build (pinned image)
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    # The runner's docker daemon is root; run the containers as the invoking user so
+    # the workspace files they write stay writable by the host-side steps.
+    env:
+      VEDIT_CONTAINER_USER: '1'
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Cache the container cargo home
+        uses: actions/cache@v4
+        with:
+          path: |
+            target/cargo-home
+            target/home
+          key: cargo-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
+          restore-keys: |
+            cargo-${{ runner.os }}-
+
+      - name: Log in to GHCR (best effort; fork PRs fall back to a local build)
+        continue-on-error: true
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resolve the pinned build image
+        id: image
+        shell: bash
+        run: |
+          set -euo pipefail
+          owner="$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
+          ref="ghcr.io/${owner}/vedit-build:latest"
+          if docker pull "$ref"; then
+            echo "using the published image ${ref}"
+            echo "ref=${ref}" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::published image unavailable; building it in this job"
+            VEDIT_BUILD_IMAGE_REF=vedit-build:local bash scripts/build-image.sh
+            echo "ref=vedit-build:local" >> "$GITHUB_OUTPUT"
+          fi
+
+      # vd-deeplint's real_slang integration tests look for build/slang/out/slang and
+      # panic when it is absent, so the gate needs the deep-lint binary. It is built in
+      # its own pinned container and cached by the pinned inputs.
+      - name: Cache the slang deep-lint binary
+        uses: actions/cache@v4
+        with:
+          path: build/slang/out
+          key: slang-${{ runner.os }}-${{ hashFiles('build/slang/versions.env') }}
+          restore-keys: |
+            slang-${{ runner.os }}-
+
+      - name: Build the slang deep-lint binary
+        shell: bash
+        run: bash build/slang/build.sh
+
+      # vd-lsp's integration tests and the lsp/slang selftest suites need the pinned
+      # Verible binaries, which a clean checkout does not have.
+      - name: Cache the pinned Verible binaries
+        uses: actions/cache@v4
+        with:
+          path: target/verible-pin
+          key: verible-${{ runner.os }}-${{ hashFiles('scripts/versions.env') }}
+          restore-keys: |
+            verible-${{ runner.os }}-
+
+      - name: Fetch the pinned Verible binaries
+        shell: bash
+        run: bash scripts/fetch-verible.sh
+
+      - name: Gates (lock policy, fmt, clippy, test)
+        shell: bash
+        env:
+          VEDIT_SKIP_IMAGE_BUILD: '1'
+          VEDIT_BUILD_IMAGE_REF: ${{ steps.image.outputs.ref }}
+        run: bash scripts/gates.sh
+
+      - name: Release build, Xvfb selftest and GLIBC assertion
+        shell: bash
+        env:
+          VEDIT_SKIP_IMAGE_BUILD: '1'
+          VEDIT_BUILD_IMAGE_REF: ${{ steps.image.outputs.ref }}
+        run: bash scripts/build.sh
+
+      - name: Hand the workspace back to the runner user
+        if: always()
+        shell: bash
+        run: sudo chown -R "$(id -u):$(id -g)" target build || true
+
+      - name: Upload build evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence
+          path: |
+            build/evidence/
+            build/artifacts/vd-app
+          if-no-files-found: warn

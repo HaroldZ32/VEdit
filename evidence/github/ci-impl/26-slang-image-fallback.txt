@@ -1,0 +1,23 @@
+### Path 2 — primary registry unreachable, fallback registry reachable (same tag)
+# command: SLANG_BUILD_IMAGE=localhost:9/library/centos:7 SLANG_BUILD_IMAGE_FALLBACK=docker.m.daocloud.io bash build/slang/fetch-image.sh
+== pulling localhost:9/library/centos:7 (attempt 1/3) ==
+Error response from daemon: failed to resolve reference "localhost:9/library/centos:7": failed to do request: Head "https://localhost:9/v2/library/centos/manifests/7": dial tcp [::1]:9: connect: connection refused
+== pull attempt 1/3 failed; retrying in 2s ==
+== pulling localhost:9/library/centos:7 (attempt 2/3) ==
+Error response from daemon: failed to resolve reference "localhost:9/library/centos:7": failed to do request: Head "https://localhost:9/v2/library/centos/manifests/7": dial tcp [::1]:9: connect: connection refused
+== pull attempt 2/3 failed; retrying in 4s ==
+== pulling localhost:9/library/centos:7 (attempt 3/3) ==
+Error response from daemon: failed to resolve reference "localhost:9/library/centos:7": failed to do request: Head "https://localhost:9/v2/library/centos/manifests/7": dial tcp [::1]:9: connect: connection refused
+== primary registry failed after 3 attempts; falling back to docker.m.daocloud.io: docker.m.daocloud.io/library/centos:7 ==
+== pulling docker.m.daocloud.io/library/centos:7 (attempt 1/3) ==
+7: Pulling from library/centos
+Digest: sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+Status: Image is up to date for docker.m.daocloud.io/library/centos:7
+docker.m.daocloud.io/library/centos:7
+== tagging docker.m.daocloud.io/library/centos:7 as localhost:9/library/centos:7 (same tag, so later stages are unchanged) ==
+fallback_elapsed=7.315 s
+fallback_exit=0
+
+--- the expected local ref now exists (tagged back) ---
+localhost:9/library/centos:7 -> id=sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+mirror ref      -> id=sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4

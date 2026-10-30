@@ -1,0 +1,24 @@
+### Path 3 — primary unreachable and the REAL default fallback (Docker Hub) unavailable
+# pre-step: docker rmi localhost:9/library/centos:7 (remove the tag left by path 2)
+# command: SLANG_BUILD_IMAGE=localhost:9/library/centos:7 bash build/slang/fetch-image.sh
+# (SLANG_BUILD_IMAGE_FALLBACK unset -> docker.io)
+== pulling localhost:9/library/centos:7 (attempt 1/3) ==
+Error response from daemon: failed to resolve reference "localhost:9/library/centos:7": failed to do request: Head "https://localhost:9/v2/library/centos/manifests/7": dial tcp [::1]:9: connect: connection refused
+== pull attempt 1/3 failed; retrying in 2s ==
+== pulling localhost:9/library/centos:7 (attempt 2/3) ==
+Error response from daemon: failed to resolve reference "localhost:9/library/centos:7": failed to do request: Head "https://localhost:9/v2/library/centos/manifests/7": dial tcp [::1]:9: connect: connection refused
+== pull attempt 2/3 failed; retrying in 4s ==
+== pulling localhost:9/library/centos:7 (attempt 3/3) ==
+Error response from daemon: failed to resolve reference "localhost:9/library/centos:7": failed to do request: Head "https://localhost:9/v2/library/centos/manifests/7": dial tcp [::1]:9: connect: connection refused
+== primary registry failed after 3 attempts; falling back to docker.io: docker.io/library/centos:7 ==
+== pulling docker.io/library/centos:7 (attempt 1/3) ==
+Error response from daemon: failed to resolve reference "docker.io/library/centos:7": failed to do request: Head "https://registry-1.docker.io/v2/library/centos/manifests/7": read tcp [2408:820c:8f1a:28f1:bed1:4557:2d4a:8c3e]:52004->[2600:1f18:2148:bc02:8c85:47a0:be8d:6e7f]:443: read: connection reset by peer
+== pull attempt 1/3 failed; retrying in 2s ==
+== pulling docker.io/library/centos:7 (attempt 2/3) ==
+Error response from daemon: failed to resolve reference "docker.io/library/centos:7": failed to do request: Head "https://registry-1.docker.io/v2/library/centos/manifests/7": read tcp [2408:820c:8f1a:28f1:bed1:4557:2d4a:8c3e]:52010->[2600:1f18:2148:bc02:8c85:47a0:be8d:6e7f]:443: read: connection reset by peer
+== pull attempt 2/3 failed; retrying in 4s ==
+== pulling docker.io/library/centos:7 (attempt 3/3) ==
+Error response from daemon: failed to resolve reference "docker.io/library/centos:7": failed to do request: Head "https://registry-1.docker.io/v2/library/centos/manifests/7": read tcp [2408:820c:8f1a:28f1:bed1:4557:2d4a:8c3e]:52012->[2600:1f18:2148:bc02:8c85:47a0:be8d:6e7f]:443: read: connection reset by peer
+FATAL: cannot obtain the slang build image localhost:9/library/centos:7 (primary registry and the docker.io fallback both failed)
+both_fail_elapsed=13.206 s
+both_fail_exit=1

@@ -1,0 +1,142 @@
+name: release
+
+# Cuts the three shipped artefacts from a tag and publishes them with the GitHub
+# release: build the slang binary, run the release build with the GLIBC <= 2.17
+# assertion, package the AppImage and the tar.gz/.run pair with their clean-room
+# acceptance runs, then publish SHA256SUMS for the artefacts and the bundled
+# external binaries.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  package:
+    name: build and publish the release artefacts
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    # The runner's docker daemon is root; run the containers as the invoking user so
+    # the workspace files they write stay writable by the host-side steps.
+    env:
+      VEDIT_CONTAINER_USER: '1'
+    steps:
+      - name: "Check out (full history: SOURCE_DATE_EPOCH and git archive)"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Cache the container cargo home
+        uses: actions/cache@v4
+        with:
+          path: |
+            target/cargo-home
+            target/home
+          key: cargo-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
+          restore-keys: |
+            cargo-${{ runner.os }}-
+
+      - name: Log in to GHCR (best effort; falls back to a local image build)
+        continue-on-error: true
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resolve the pinned build image
+        id: image
+        shell: bash
+        run: |
+          set -euo pipefail
+          owner="$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
+          ref="ghcr.io/${owner}/vedit-build:latest"
+          if docker pull "$ref"; then
+            echo "using the published image ${ref}"
+            echo "ref=${ref}" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::published image unavailable; building it in this job"
+            VEDIT_BUILD_IMAGE_REF=vedit-build:local bash scripts/build-image.sh
+            echo "ref=vedit-build:local" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build the slang deep-lint binary
+        shell: bash
+        run: bash build/slang/build.sh
+
+      - name: Fetch the pinned Verible binaries
+        shell: bash
+        run: bash scripts/fetch-verible.sh
+
+      - name: Release build, Xvfb selftest and GLIBC assertion
+        shell: bash
+        env:
+          VEDIT_SKIP_IMAGE_BUILD: '1'
+          VEDIT_BUILD_IMAGE_REF: ${{ steps.image.outputs.ref }}
+        run: bash scripts/build.sh
+
+      - name: AppImage with its clean-room acceptance
+        shell: bash
+        env:
+          VEDIT_SKIP_IMAGE_BUILD: '1'
+          VEDIT_BUILD_IMAGE_REF: ${{ steps.image.outputs.ref }}
+        run: bash packaging/appimage/run-evidence.sh
+
+      - name: tar.gz and .run with their clean-room acceptance
+        shell: bash
+        env:
+          VEDIT_SKIP_IMAGE_BUILD: '1'
+          VEDIT_BUILD_IMAGE_REF: ${{ steps.image.outputs.ref }}
+        run: bash packaging/tarball/build.sh
+
+      - name: Collect the artefacts and write SHA256SUMS
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(awk -F'"' '/^version = /{print $2; exit}' Cargo.toml)"
+          echo "version=${version}"
+          mkdir -p dist
+          cp "packaging/appimage/out/VEdit-${version}-x86_64.AppImage" dist/
+          cp "packaging/tarball/out/vedit-${version}-linux-x86_64.tar.gz" dist/
+          cp "packaging/tarball/out/VEdit-${version}-x86_64.run" dist/
+          ( cd dist && sha256sum VEdit-*-x86_64.AppImage vedit-*-linux-x86_64.tar.gz VEdit-*-x86_64.run > SHA256SUMS )
+          rm -rf /tmp/vedit-package
+          mkdir -p /tmp/vedit-package
+          tar xzf "dist/vedit-${version}-linux-x86_64.tar.gz" -C /tmp/vedit-package
+          ( cd /tmp/vedit-package && sha256sum VEdit/bin/verible-verilog-ls VEdit/bin/verible-verilog-lint \
+              VEdit/bin/verible-verilog-format VEdit/bin/slang >> "${GITHUB_WORKSPACE}/dist/SHA256SUMS" )
+          cat dist/SHA256SUMS
+
+      - name: Hand the workspace back to the runner user
+        if: always()
+        shell: bash
+        run: sudo chown -R "$(id -u):$(id -g)" target build || true
+
+      - name: Publish the GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.AppImage
+            dist/*.tar.gz
+            dist/*.run
+            dist/SHA256SUMS
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+
+      - name: Upload the release evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-evidence
+          path: |
+            build/evidence/
+            evidence/appimage/
+          if-no-files-found: warn

@@ -1,0 +1,26 @@
+### Condition B — both external binaries present (slang + target/verible-pin)
+
+# Setup: the same clean copy with target/verible-pin added.
+# Command: cd target/t8-clean && SOURCE_DATE_EPOCH=<HEAD epoch> bash scripts/build.sh
+# Exit: 0 (8.012 s incremental).
+#
+# Both binaries were detected, so the script kept the single `all` invocation
+# (historical evidence filename 12-selftest-suites.json).
+
+## summary written by the fixed script (build/evidence/12-selftest-suites.txt)
+# Xvfb selftest suites (2026-10-30T10:09:07Z)
+VEDIT_SLANG=/vedit-build/build/slang/out/slang
+VEDIT_VERIBLE_LS=/vedit-build/target/verible-pin/extract/verible-v0.0-4298-g085eef05/bin/verible-verilog-ls
+VEDIT_GSV_DATADIR=/opt/gsv4/share/gtksourceview-4
+suite=all
+exit=0
+report=/vedit-build/build/evidence/12-selftest-suites.json
+stderr=/vedit-build/build/evidence/12-selftest-suites.err
+
+## 12-selftest-suites.json (single all run): ok=True suite=all checks=62
+  smoke ok=True checks=30
+  highlight ok=True checks=8
+  config ok=True checks=6
+  lsp ok=True checks=6
+  slang ok=True checks=6
+  fim ok=True checks=6

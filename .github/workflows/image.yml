@@ -1,0 +1,88 @@
+name: image
+
+# Builds the pinned CentOS 7 build image and publishes it to GHCR so that every
+# other job can reuse it instead of paying a cold build. The image is what makes
+# this repository's gates trustworthy: CentOS 7.9.2009, Rust 1.99.0, GTK 3.22.30
+# and a GtkSourceView 4.6.1 built from source.
+#
+# On a pull request the image is built (and the GHA layer cache is exercised)
+# but not pushed; only pushes to dev/main publish it.
+
+on:
+  push:
+    branches: [dev, main]
+    paths:
+      - 'scripts/docker/**'
+      - 'scripts/versions.env'
+      - 'scripts/lib.sh'
+      - 'scripts/build-image.sh'
+  pull_request:
+    paths:
+      - 'scripts/docker/**'
+      - 'scripts/versions.env'
+      - 'scripts/lib.sh'
+      - 'scripts/build-image.sh'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: image-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    name: build the pinned image
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR (best effort; pull requests do not push)
+        continue-on-error: true
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # The default docker driver cannot export a GHA cache; the container driver can.
+      - name: Set up buildx
+        uses: docker/setup-buildx-action@v3
+
+      # buildx's type=gha backend did not materialise a cache on these runners (no
+      # buildkit cache entry, zero CACHED on a repeat build), so the layer cache is
+      # persisted through actions/cache instead and handed to buildx as type=local.
+      - name: Restore the buildx layer cache
+        uses: actions/cache@v4
+        with:
+          path: /tmp/vedit-buildx-cache
+          key: buildx-${{ runner.os }}-${{ hashFiles('scripts/docker/**', 'scripts/versions.env') }}
+          restore-keys: |
+            buildx-${{ runner.os }}-
+
+      - name: Build the pinned image with a layer cache
+        shell: bash
+        env:
+          VEDIT_BUILD_CACHE_FROM: type=local,src=/tmp/vedit-buildx-cache
+          VEDIT_BUILD_CACHE_TO: type=local,dest=/tmp/vedit-buildx-cache,mode=min
+        run: |
+          set -euo pipefail
+          owner="$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
+          repo="ghcr.io/${owner}/vedit-build"
+          VEDIT_BUILD_IMAGE_REF="${repo}:${GITHUB_SHA}" bash scripts/build-image.sh
+          echo "IMAGE_REF=${repo}:${GITHUB_SHA}" >> "$GITHUB_ENV"
+          echo "IMAGE_REPO=${repo}" >> "$GITHUB_ENV"
+
+      - name: Push to GHCR (pushes and manual runs only, never a pull request)
+        if: github.event_name != 'pull_request'
+        shell: bash
+        run: |
+          set -euo pipefail
+          docker tag "$IMAGE_REF" "$IMAGE_REPO:latest"
+          docker push "$IMAGE_REF"
+          docker push "$IMAGE_REPO:latest"
+          echo "published ${IMAGE_REF} and ${IMAGE_REPO}:latest"

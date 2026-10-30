@@ -1,0 +1,214 @@
+diff --git a/crates/vd-app/src/app.rs b/crates/vd-app/src/app.rs
+index 1ec9521..dde5d4b 100644
+--- a/crates/vd-app/src/app.rs
++++ b/crates/vd-app/src/app.rs
+@@ -61,11 +61,6 @@ impl StatusModel {
+         self.info = info.into();
+     }
+ 
+-    #[must_use]
+-    pub fn info(&self) -> &str {
+-        &self.info
+-    }
+-
+     pub fn set_lsp(&mut self, status: String) {
+         self.lsp = Some(status);
+     }
+@@ -686,18 +681,20 @@ impl Ui {
+             return;
+         };
+         if !self.state.ghost.enabled() {
+-            let reason = self
+-                .state
+-                .ghost
+-                .reason()
+-                .unwrap_or_else(|| "FIM is disabled".to_string());
+-            self.set_info(reason);
++            // AC-B1: the status bar's FIM column already renders this reason; a
++            // `set_info` copy here printed it a second time.
+             return;
+         }
+         let (prefix, suffix) = fim_context(&tab);
+         match self.state.ghost.request(&prefix, &suffix) {
+             Ok(()) => self.set_info("FIM: waiting for a completion (Esc cancels)"),
+-            Err(reason) => self.set_info(reason),
++            // A transient rejection is still worth a message unless it is the
++            // persistent reason the FIM column already renders.
++            Err(reason) => {
++                if self.state.ghost.reason().as_deref() != Some(reason.as_str()) {
++                    self.set_info(reason);
++                }
++            }
+         }
+     }
+ 
+@@ -860,8 +857,12 @@ impl Ui {
+             parts.push(format!("verible {verible}"));
+             parts.push(format!("slang {slang}"));
+         }
++        // AC-B1: the reason already carries its "FIM" tag, so the column adds no
++        // label of its own (the old `"FIM: {reason}"` printed "FIM: FIM …"). The
++        // column is the ONLY place the reason is rendered: no `set_info` path
++        // repeats it, so it appears exactly once and never flickers in/out.
+         if let Some(reason) = self.state.ghost.reason() {
+-            parts.push(format!("FIM: {reason}"));
++            parts.push(reason);
+         }
+         // The live LSP status is composed here, never stored in the message:
+         // repeated polls therefore cannot grow the text (AC-4).
+@@ -1779,10 +1780,9 @@ fn build_ui(application: &gtk::Application, opts: &Options) -> Result<Rc<Ui>> {
+             "Verible LSP unavailable ({attempts} resolution attempt(s)); lint/navigation disabled"
+         ));
+     }
+-    if let Some(reason) = ui.state.ghost.reason() {
+-        let info = format!("{}  |  FIM: {reason}", ui.state.status.borrow().info());
+-        ui.state.status.borrow_mut().set_info(info);
+-    }
++    // AC-B1: the FIM column of `status_text` is the single producer of the
++    // reason. Appending it to the message here as well printed it twice (and as
++    // "FIM: FIM …", because the reason carries its own tag).
+ 
+     ui.window.show_all();
+     // AC-1: the editor owns the keyboard focus as soon as the window is shown.
+@@ -1908,9 +1908,10 @@ mod tests {
+             assert_eq!(text, expected, "the status text grew across polls");
+             assert_eq!(text.matches("Verible LSP").count(), 1, "{text}");
+         }
+-        assert_eq!(
+-            model.info(),
+-            "LSP running (pid 7), restarts 0 (running: true, restarts: 0)",
++        assert!(
++            model
++                .text(&parts)
++                .contains("LSP running (pid 7), restarts 0 (running: true, restarts: 0)"),
+             "polling must not rewrite the message"
+         );
+     }
+diff --git a/crates/vd-app/src/selftest.rs b/crates/vd-app/src/selftest.rs
+index e9e9e88..38ce600 100644
+--- a/crates/vd-app/src/selftest.rs
++++ b/crates/vd-app/src/selftest.rs
+@@ -252,6 +252,24 @@ fn smoke(ui: &std::rc::Rc<Ui>, fixtures: &Fixtures) -> SuiteReport {
+         pass_through,
+         format!("overlay_pass_through={pass_through}"),
+     );
++    // AC-B1 (startup path): the FIM column is the only producer of the reason,
++    // so it appears exactly once and without the "FIM: FIM …" label doubling.
++    match ui.state.ghost.reason() {
++        Some(reason) => {
++            let text = ui.status_text();
++            let occurrences = text.matches(reason.as_str()).count();
++            report.check(
++                "AC-B1 the FIM reason appears exactly once at startup",
++                occurrences == 1 && !text.contains("FIM: FIM"),
++                format!("reason={reason:?}, occurrences={occurrences}, text={text:?}"),
++            );
++        }
++        None => report.check(
++            "AC-B1 the FIM reason appears exactly once at startup",
++            false,
++            "no persistent FIM reason (the check expects the default disabled FIM)",
++        ),
++    }
+ 
+     let clean = ui.open_path(&fixtures.clean);
+     match clean {
+@@ -264,6 +282,18 @@ fn smoke(ui: &std::rc::Rc<Ui>, fixtures: &Fixtures) -> SuiteReport {
+                     .is_some_and(|language| language.contains("systemverilog")),
+                 format!("language={:?}", tab.language.borrow()),
+             );
++            // AC-B2: opening a file leaves the cursor at the document start.
++            let cursor = tab.cursor();
++            report.check(
++                "AC-B2 opening a file puts the cursor at 1:1",
++                cursor == Position::new(0, 0),
++                format!("cursor={cursor:?}"),
++            );
++            report.check(
++                "AC-B2 the status bar reports 1:1 after opening a file",
++                ui.status_text().starts_with("1:1"),
++                ui.status_text(),
++            );
+         }
+         Err(error) => report.check("open clean fixture", false, format!("{error:#}")),
+     }
+@@ -1055,6 +1085,19 @@ fn fim(ui: &std::rc::Rc<Ui>) -> SuiteReport {
+         ui.status_text().to_lowercase().contains("fim"),
+         ui.status_text(),
+     );
++    // AC-B1 (rejection path): a rejected request must not write the reason into
++    // the message again — the FIM column is the only producer. Read the text
++    // synchronously: the next poll can overwrite a transient message, which
++    // would hide a duplicate instead of proving its absence.
++    let reason = ghost.reason().unwrap_or_default();
++    ui.request_fim();
++    let text = ui.status_text();
++    let occurrences = text.matches(reason.as_str()).count();
++    report.check(
++        "AC-B1 the FIM reason appears exactly once after a rejected request",
++        !reason.is_empty() && occurrences == 1 && !text.contains("FIM: FIM"),
++        format!("reason={reason:?}, occurrences={occurrences}, text={text:?}"),
++    );
+     report
+ }
+ 
+diff --git a/crates/vd-editor/src/document.rs b/crates/vd-editor/src/document.rs
+index bb8ddcd..3ad73f4 100644
+--- a/crates/vd-editor/src/document.rs
++++ b/crates/vd-editor/src/document.rs
+@@ -113,6 +113,11 @@ impl Document {
+         let buffer = new_buffer();
+         buffer.set_text(&contents);
+         let document = Self::from_buffer(&buffer);
++        // AC-B2: a freshly opened document starts with the cursor at the top.
++        // `from_buffer` normalises CRLF by replacing the text a second time, and
++        // `set_text` leaves the insert mark at the end, so the placement has to
++        // happen on the finished (normalised) buffer.
++        document.buffer.place_cursor(&document.buffer.start_iter());
+         document.state.borrow_mut().path = Some(path.to_path_buf());
+         Ok(document)
+     }
+@@ -1180,6 +1185,43 @@ mod tests {
+         assert!(!document.can_undo());
+     }
+ 
++    /// AC-B2 helper: the insert mark must sit at the document start.
++    fn assert_insert_mark_at_start(document: &Document, label: &str) {
++        let buffer = document.buffer();
++        let mark = buffer
++            .get_insert()
++            .unwrap_or_else(|| panic!("{label}: buffer has no insert mark"));
++        let iter = buffer.iter_at_mark(&mark);
++        let start = buffer.start_iter();
++        assert!(
++            iter == start,
++            "{label}: insert mark is at offset {} instead of the document start",
++            iter.offset()
++        );
++    }
++
++    #[test]
++    fn opening_an_lf_file_puts_the_cursor_at_the_start() {
++        let _gtk = gtk_test_lock();
++        let dir = TestDir::new("cursor-lf");
++        let path = dir.file("lf.sv");
++        fs::write(&path, "module lf;\n  logic a;\nendmodule\n")
++            .unwrap_or_else(|error| panic!("write failed: {error}"));
++        let document = Document::open(&path).unwrap_or_else(|error| panic!("open failed: {error}"));
++        assert_insert_mark_at_start(&document, "lf");
++    }
++
++    #[test]
++    fn opening_a_crlf_file_puts_the_cursor_at_the_start() {
++        let _gtk = gtk_test_lock();
++        let dir = TestDir::new("cursor-crlf");
++        let path = dir.file("crlf.sv");
++        fs::write(&path, "module crlf;\r\n  logic a;\r\nendmodule\r\n")
++            .unwrap_or_else(|error| panic!("write failed: {error}"));
++        let document = Document::open(&path).unwrap_or_else(|error| panic!("open failed: {error}"));
++        assert_insert_mark_at_start(&document, "crlf");
++    }
++
+     #[test]
+     fn readonly_probe_does_not_matter_because_rename_is_the_guard() {
+         let _gtk = gtk_test_lock();

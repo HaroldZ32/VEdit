@@ -113,6 +113,11 @@ impl Document {
         let buffer = new_buffer();
         buffer.set_text(&contents);
         let document = Self::from_buffer(&buffer);
+        // AC-B2: a freshly opened document starts with the cursor at the top.
+        // `from_buffer` normalises CRLF by replacing the text a second time, and
+        // `set_text` leaves the insert mark at the end, so the placement has to
+        // happen on the finished (normalised) buffer.
+        document.buffer.place_cursor(&document.buffer.start_iter());
         document.state.borrow_mut().path = Some(path.to_path_buf());
         Ok(document)
     }
@@ -1178,6 +1183,43 @@ mod tests {
             .unwrap_or_else(|error| panic!("empty batch failed: {error}"));
         assert_eq!(document.text(), "abc");
         assert!(!document.can_undo());
+    }
+
+    /// AC-B2 helper: the insert mark must sit at the document start.
+    fn assert_insert_mark_at_start(document: &Document, label: &str) {
+        let buffer = document.buffer();
+        let mark = buffer
+            .get_insert()
+            .unwrap_or_else(|| panic!("{label}: buffer has no insert mark"));
+        let iter = buffer.iter_at_mark(&mark);
+        let start = buffer.start_iter();
+        assert!(
+            iter == start,
+            "{label}: insert mark is at offset {} instead of the document start",
+            iter.offset()
+        );
+    }
+
+    #[test]
+    fn opening_an_lf_file_puts_the_cursor_at_the_start() {
+        let _gtk = gtk_test_lock();
+        let dir = TestDir::new("cursor-lf");
+        let path = dir.file("lf.sv");
+        fs::write(&path, "module lf;\n  logic a;\nendmodule\n")
+            .unwrap_or_else(|error| panic!("write failed: {error}"));
+        let document = Document::open(&path).unwrap_or_else(|error| panic!("open failed: {error}"));
+        assert_insert_mark_at_start(&document, "lf");
+    }
+
+    #[test]
+    fn opening_a_crlf_file_puts_the_cursor_at_the_start() {
+        let _gtk = gtk_test_lock();
+        let dir = TestDir::new("cursor-crlf");
+        let path = dir.file("crlf.sv");
+        fs::write(&path, "module crlf;\r\n  logic a;\r\nendmodule\r\n")
+            .unwrap_or_else(|error| panic!("write failed: {error}"));
+        let document = Document::open(&path).unwrap_or_else(|error| panic!("open failed: {error}"));
+        assert_insert_mark_at_start(&document, "crlf");
     }
 
     #[test]

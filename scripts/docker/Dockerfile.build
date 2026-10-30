@@ -5,7 +5,12 @@
 # pinned by sha256 in scripts/versions.env and verified before use, and the
 # full installed RPM set is snapshotted (scripts/docker/rpm-baseline.txt) and
 # compared on every build by scripts/build-in-container.sh.
-FROM docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+# The CentOS base is a build argument so a transient mirror outage can be served
+# by the Docker Hub fallback with the SAME digest (scripts/lib.sh resolves it);
+# with no fallback the pinned reference below is used, so a normal build is
+# identical to before.
+ARG BASE_IMAGE=docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+FROM ${BASE_IMAGE}
 
 ARG CENTOS_VAULT_BASE
 ARG RUSTUP_URL
@@ -19,23 +24,13 @@ ARG NINJA_WHEEL_URL
 ARG NINJA_WHEEL_SHA256
 
 # The stock CentOS-*.repo files point at dead mirrors; use the vault snapshot
-# (recipe: .mpd/recon/build-recipe-centos7.md). Written with printf because the
-# classic Docker builder does not support heredocs inside RUN.
+# (recipe: .mpd/recon/build-recipe-centos7.md). The repo file lives in the build
+# context and is rendered with the pinned CENTOS_VAULT_BASE argument, so the
+# image builds under BuildKit (no legacy-builder-only syntax).
+COPY vault.repo.in /tmp/vault.repo.in
 RUN rm -f /etc/yum.repos.d/CentOS-*.repo \
- && printf '%s\n' \
-      '[base]' \
-      'name=CentOS-7.9.2009-Base' \
-      "baseurl=${CENTOS_VAULT_BASE}/os/x86_64/" \
-      'gpgcheck=0' \
-      '[updates]' \
-      'name=CentOS-7.9.2009-Updates' \
-      "baseurl=${CENTOS_VAULT_BASE}/updates/x86_64/" \
-      'gpgcheck=0' \
-      '[extras]' \
-      'name=CentOS-7.9.2009-Extras' \
-      "baseurl=${CENTOS_VAULT_BASE}/extras/x86_64/" \
-      'gpgcheck=0' \
-    > /etc/yum.repos.d/vault.repo \
+ && sed "s|@CENTOS_VAULT_BASE@|${CENTOS_VAULT_BASE}|g" /tmp/vault.repo.in > /etc/yum.repos.d/vault.repo \
+ && rm -f /tmp/vault.repo.in \
  && cat /etc/yum.repos.d/vault.repo
 
 # GTK3 + GtkSourceView build/runtime dependencies, an X server for the window

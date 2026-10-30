@@ -1,0 +1,17 @@
+# e2e check of AC-B2: the first keystroke after opening a file must land at offset 0
+# date: 2026-10-30T17:40:38+08:00  binary sha256: ac830b04aa4ec38641ff1a20846ec3701851119f28767d68a44fd1339baaf6c7
+# (probe used unchanged, then the file the probe saved is diffed)
+RESULT: CONTROL_WORKS (injected keystroke reached a focused GtkTextView)
+control buffer: a
+probe_exit=0
+xtype_exit=0
+RESULT: TYPING_WORKS (keystroke reached the buffer)
+--- diff original vs saved ---
+--- /tmp/vedit-typing/original.sv	2026-10-30 09:40:45.640877484 +0000
++++ /tmp/vedit-typing/target.sv	2026-10-30 09:40:51.520164105 +0000
+@@ -1,3 +1,3 @@
+-module a_top;
++amodule a_top;
+   b_top u_b ();
+ endmodule
+diff_exit=1

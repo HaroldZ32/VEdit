@@ -61,11 +61,6 @@ impl StatusModel {
         self.info = info.into();
     }
 
-    #[must_use]
-    pub fn info(&self) -> &str {
-        &self.info
-    }
-
     pub fn set_lsp(&mut self, status: String) {
         self.lsp = Some(status);
     }
@@ -686,18 +681,20 @@ impl Ui {
             return;
         };
         if !self.state.ghost.enabled() {
-            let reason = self
-                .state
-                .ghost
-                .reason()
-                .unwrap_or_else(|| "FIM is disabled".to_string());
-            self.set_info(reason);
+            // AC-B1: the status bar's FIM column already renders this reason; a
+            // `set_info` copy here printed it a second time.
             return;
         }
         let (prefix, suffix) = fim_context(&tab);
         match self.state.ghost.request(&prefix, &suffix) {
             Ok(()) => self.set_info("FIM: waiting for a completion (Esc cancels)"),
-            Err(reason) => self.set_info(reason),
+            // A transient rejection is still worth a message unless it is the
+            // persistent reason the FIM column already renders.
+            Err(reason) => {
+                if self.state.ghost.reason().as_deref() != Some(reason.as_str()) {
+                    self.set_info(reason);
+                }
+            }
         }
     }
 
@@ -860,8 +857,12 @@ impl Ui {
             parts.push(format!("verible {verible}"));
             parts.push(format!("slang {slang}"));
         }
+        // AC-B1: the reason already carries its "FIM" tag, so the column adds no
+        // label of its own (the old `"FIM: {reason}"` printed "FIM: FIM …"). The
+        // column is the ONLY place the reason is rendered: no `set_info` path
+        // repeats it, so it appears exactly once and never flickers in/out.
         if let Some(reason) = self.state.ghost.reason() {
-            parts.push(format!("FIM: {reason}"));
+            parts.push(reason);
         }
         // The live LSP status is composed here, never stored in the message:
         // repeated polls therefore cannot grow the text (AC-4).
@@ -1779,10 +1780,9 @@ fn build_ui(application: &gtk::Application, opts: &Options) -> Result<Rc<Ui>> {
             "Verible LSP unavailable ({attempts} resolution attempt(s)); lint/navigation disabled"
         ));
     }
-    if let Some(reason) = ui.state.ghost.reason() {
-        let info = format!("{}  |  FIM: {reason}", ui.state.status.borrow().info());
-        ui.state.status.borrow_mut().set_info(info);
-    }
+    // AC-B1: the FIM column of `status_text` is the single producer of the
+    // reason. Appending it to the message here as well printed it twice (and as
+    // "FIM: FIM …", because the reason carries its own tag).
 
     ui.window.show_all();
     // AC-1: the editor owns the keyboard focus as soon as the window is shown.
@@ -1908,10 +1908,13 @@ mod tests {
             assert_eq!(text, expected, "the status text grew across polls");
             assert_eq!(text.matches("Verible LSP").count(), 1, "{text}");
         }
-        assert_eq!(
-            model.info(),
-            "LSP running (pid 7), restarts 0 (running: true, restarts: 0)",
-            "polling must not rewrite the message"
+        // The message is rendered as its own segment; assert that segment by
+        // equality (not as a substring) so a rewritten/merged message fails.
+        let message = "LSP running (pid 7), restarts 0 (running: true, restarts: 0)";
+        let composed = model.text(&parts);
+        assert!(
+            composed.split("  |  ").any(|part| part == message),
+            "polling must not rewrite the message: {composed:?}"
         );
     }
 

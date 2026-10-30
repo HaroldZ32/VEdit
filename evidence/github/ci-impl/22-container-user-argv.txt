@@ -1,0 +1,18 @@
+### Argument assembly proof (fake docker wrapper logs the exact argv, then execs the real docker)
+
+## default path (no VEDIT_CONTAINER_USER): no --user
+default_rc=0
+--- logged argv ---
+argv: run --rm -e HOME=/vedit-build/target/home -e CARGO_HOME=/vedit-build/target/cargo-home -e RUSTUP_HOME=/opt/rust -e RUSTUP_TOOLCHAIN=1.99.0 -e SOURCE_DATE_EPOCH= -e NO_AT_BRIDGE=1 -v /home/haroldzhao/MyProj/DshProj/VEdit:/vedit-build -w /vedit-build vedit-build:local true
+
+## VEDIT_CONTAINER_USER=1: --user <uid>:<gid> is added, the rest is unchanged
+[image] container user: 1000:1000 (VEDIT_CONTAINER_USER=1)
+user_rc=0
+--- logged argv ---
+argv: run --rm --user 1000:1000 -e HOME=/vedit-build/target/home -e CARGO_HOME=/vedit-build/target/cargo-home -e RUSTUP_HOME=/opt/rust -e RUSTUP_TOOLCHAIN=1.99.0 -e SOURCE_DATE_EPOCH= -e NO_AT_BRIDGE=1 -v /home/haroldzhao/MyProj/DshProj/VEdit:/vedit-build -w /vedit-build vedit-build:local true
+
+## VEDIT_CONTAINER_USER=1 with id unavailable: explicit FATAL, no container start
+FATAL: VEDIT_CONTAINER_USER=1, but 'id -u' is unavailable; cannot pick the container user
+id_unavailable_rc=1
+--- logged argv (must be empty: docker was never called) ---
+(no docker call)

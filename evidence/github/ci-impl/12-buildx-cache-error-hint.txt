@@ -1,0 +1,13 @@
+### cache option that cannot be exported — exercises the FATAL hint path
+# VEDIT_BUILD_CACHE_TO=type=does-not-exist bash scripts/build-image.sh
+[image] building vedit-build:local from the pinned inputs
+[image] build cache: from=<none> to=type=does-not-exist (docker buildx --load)
+ERROR: failed to build: failed to solve: unknown cache exporter: "does-not-exist"
+FATAL: the buildx build failed (exit 1); the requested cache was not usable.
+       Cache import/export depends on the buildx builder and the cache type
+       (type=gha needs the GitHub Actions cache environment). If the error above
+       is about cache support, create a container-driver builder:
+         docker buildx create --driver docker-container --name vedit-builder --use
+       (GitHub Actions does this with docker/setup-buildx-action.)
+       Or unset VEDIT_BUILD_CACHE_FROM/VEDIT_BUILD_CACHE_TO.
+bogus_exit=1

@@ -1,0 +1,34 @@
+# Verible suite pin verification (AC-01 / AC-07) - 2026-10-30T04:03:21Z
+# Pins live in scripts/versions.env; this file proves the pinned URL really
+# reproduces the three binaries with the pinned sha256 values.
+
+$ curl -fsSL -o <tarball> 'https://github.com/chipsalliance/verible/releases/download/v0.0-4298-g085eef05/verible-v0.0-4298-g085eef05-linux-static-x86_64.tar.gz'
+exit=0 (size 17582801 bytes; sha256 below)
+
+$ sha256sum <tarball>
+ca83778c7c2b73272277bd670d1851c8caf973fd3283688aeb0d36d4b3598a90  target/verible-pin/verible.tar.gz
+pinned VERIBLE_TARBALL_SHA256=ca83778c7c2b73272277bd670d1851c8caf973fd3283688aeb0d36d4b3598a90
+
+$ tar xzf <tarball> -C <dir> && sha256sum <dir>/verible-v0.0-4298-g085eef05/bin/{ls,lint,format}
+07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845  target/verible-pin/extract/verible-v0.0-4298-g085eef05/bin/verible-verilog-ls
+b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29  target/verible-pin/extract/verible-v0.0-4298-g085eef05/bin/verible-verilog-lint
+b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473  target/verible-pin/extract/verible-v0.0-4298-g085eef05/bin/verible-verilog-format
+
+# Comparison with the pins in scripts/versions.env:
+verible-verilog-format: MATCH sha256=b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473
+verible-verilog-lint: MATCH sha256=b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29
+verible-verilog-ls: MATCH sha256=07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845
+
+$ verible-verilog-ls --version
+Verible Verilog Language Server built at v0.0-4298-g085eef05
+$ verible-verilog-lint --version
+Version	v0.0-4298-g085eef05
+Commit-Timestamp	2026-10-29T12:47:31Z
+Built	2026-10-29T12:52:33Z
+$ verible-verilog-format --version
+Version	v0.0-4298-g085eef05
+Commit-Timestamp	2026-10-29T12:47:31Z
+Built	2026-10-29T12:52:33Z
+
+RESULT: the pinned URL reproduces all three binaries with the pinned sha256
+values, so T23/T25 can rebuild the bundle from the repository pins.

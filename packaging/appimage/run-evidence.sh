@@ -9,16 +9,17 @@ set -euo pipefail
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 PKG="$ROOT/packaging/appimage"
 EVID="$ROOT/evidence/appimage"
-set -a
-# shellcheck source=/dev/null
-. "$ROOT/scripts/versions.env"
-set +a
+# shellcheck source=../../scripts/lib.sh
+source "$ROOT/scripts/lib.sh"
+load_versions
 mkdir -p "$EVID" "$PKG/out"
 
 echo "== [1/3] package image (vedit-build + gtk3-immodule-xim + ibus-gtk3) =="
-DOCKER_BUILDKIT=0 docker build \
+# The pinned image is whatever scripts/lib.sh resolved (VEDIT_BUILD_IMAGE_REF
+# lets a CI run reuse the image it pulled from the registry).
+docker build \
   -f "$PKG/Dockerfile.package" \
-  --build-arg BUILD_IMAGE=vedit-build:local \
+  --build-arg BUILD_IMAGE="$BUILD_IMAGE_TAG" \
   --build-arg CENTOS_VAULT_BASE="$CENTOS_VAULT_BASE" \
   -t vedit-appimage-package:local "$PKG"
 
@@ -31,7 +32,7 @@ docker run --rm -e HOME=/vedit-build/target/home \
   2>&1 | tee "$EVID/build.log"
 
 echo "== [3/3] clean-room image + offline acceptance =="
-DOCKER_BUILDKIT=0 docker build \
+docker build \
   -f "$PKG/Dockerfile.test" \
   --build-arg CENTOS_VAULT_BASE="$CENTOS_VAULT_BASE" \
   -t vedit-appimage-test:local "$PKG"
