@@ -1,11 +1,17 @@
-== [1/9] build the application binary (same image as the deliverable) ==
-source_mode=worktree
-git_head=12655203dd23c6dcd3d03825404d6941b2b895ef
-dirty_code_paths:
-  none
-$ cargo build --release -p vd-app --manifest-path /vedit-build/Cargo.toml
-    Finished `release` profile [optimized] target(s) in 0.06s
-EXIT=0
+# frozen2 AppImage build console (HEAD 63bf415, canonical vd-app 41d02dca…)
+# produced by packaging/appimage/build-appimage.sh; see source-tree.txt
+
+== [1/9] consume the shared release binary (identical in all three products) ==
+source_mode=shared-release-artifact
+git_head=63bf415495edb65f54ec102ee396f39787d857cc
+git_status_porcelain:
+ M packaging/tarball/evidence/00-stage.log
+?? evidence/github/
+?? packaging/tarball/evidence/01b-vd-app-identity.txt
+shared_vd_app=/vedit-build/build/artifacts/vd-app
+shared_vd_app_sha256=41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611
+archive_revision=63bf415495edb65f54ec102ee396f39787d857cc
+archive_dir=/vedit-build/packaging/appimage/.cache/src-head (git archive HEAD, fixtures + provenance)
 == [2/9] fetch and verify the pinned Verible suite ==
 using cached /vedit-build/packaging/appimage/.cache/verible.tar.gz
 /vedit-build/packaging/appimage/.cache/verible.tar.gz: OK
@@ -33,6 +39,10 @@ b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29  /vedit-build/p
 expected=b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29
 /vedit-build/packaging/appimage/.cache/verible-extract/verible-v0.0-4298-g085eef05/bin/verible-verilog-lint: OK
 EXIT=0
+shared_vd_app_sha256=41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611
+payload_vd_app_sha256=41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611
+BYTES_EQUAL=true
+VEDIT_BUILD_LEAKS=0
 == [3/9] consume the T3 slang artifact by its pinned sha256 (never rebuilt) ==
 $ sha256sum /vedit-build/build/slang/out/slang
 63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  /vedit-build/build/slang/out/slang
@@ -44,7 +54,7 @@ EXIT=0
 verible-verilog-ls	6300864	07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845		not a dynamic executable
 verible-verilog-format	4231008	b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473		not a dynamic executable
 verible-verilog-lint	4759200	b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29		not a dynamic executable
-slang	9526400	63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252		linux-vdso.so.1 =>  (0x000076783d7b0000)
+slang	9526400	63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252		linux-vdso.so.1 =>  (0x000072bbbf0f2000)
 == [4/9] GTK3 runtime closure, GtkSourceView data, loaders, immodules ==
 # GTK3 runtime + transitive closure (recursive ldd; glibc/libgcc/libstdc++ excluded)
 # count: 74
@@ -192,8 +202,21 @@ total 16684
 == [6/9] AppRun (relocatable launcher) ==
 == [7/9] host-path audit, RUNPATH gate, GLIBC gate ==
 # build-tree path leakage audit
-# 1) main binary strings:
-/vedit-build/crates/vd-apptests/fixturesthe GTK window did not startsystemverilogsmoke-saved.svshiftprimaryunicode_highlight.svcalled `Result::unwrap()` on an `Err` valueformat_me.svundeclared.svmodule clean;
+# 1) build-host checkout paths (the release remap target is /vedit, never /vedit-build):
+none
+BUILD_HOST_PATH_HITS=0
+
+# 1b) remapped source paths under the sandbox root /vedit (panic locations):
+SANDBOX_SOURCE_PATH_LITERALS=508
+/vedit/target/cargo-home/registry/src/index.crates.io-1949cf8c6b5b557f/glib-0.18.5/src/object.rs
+/vedit/target/cargo-home/registry/src/index.crates.io-1949cf8c6b5b557f/futures-channel-0.3.34/src/mpsc/queue.rs
+CONCLUSION: /vedit-build count is 0 (measured on NUL-delimited strings, not
+`strings` output, which glues adjacent literals). What remains are 508
+panic source locations remapped to the sandbox root /vedit — build metadata,
+not a host checkout path, and no runtime lookup. The former env!() fixture
+fallback is gone: vd-app derives the fixtures at runtime and the payload's
+VEDIT_SELFTEST_FIXTURES points at <payload>/usr/share/vedit/testdata.
+
 # 2) launcher/config templates (expect @APPDIR@ placeholders only):
 none
 # 3) @APPDIR@ placeholder counts:
@@ -223,18 +246,18 @@ Downloading runtime file from https://github.com/AppImage/type2-runtime/releases
 Downloaded runtime binary of size 944632
 Parallel mksquashfs: Using 16 processors
 Creating 4.0 filesystem on /vedit-build/packaging/appimage/out/VEdit-0.1.0-x86_64.AppImage, block size 131072.
-[=============================================================\] 6522/6522 100%
+[=============================================================\] 6507/6507 100%
 
 Exportable Squashfs 4.0 filesystem, zstd compressed, data block size 131072
 	compressed data, compressed metadata, compressed fragments,
 	compressed xattrs, compressed ids
 	duplicates are removed
-Filesystem size 46055.05 Kbytes (44.98 Mbytes)
-	40.08% of uncompressed filesystem size (114907.24 Kbytes)
-Inode table size 51111 bytes (49.91 Kbytes)
-	24.66% of uncompressed inode table size (207223 bytes)
-Directory table size 68679 bytes (67.07 Kbytes)
-	30.17% of uncompressed directory table size (227617 bytes)
+Filesystem size 45701.93 Kbytes (44.63 Mbytes)
+	40.42% of uncompressed filesystem size (113061.75 Kbytes)
+Inode table size 50976 bytes (49.78 Kbytes)
+	24.61% of uncompressed inode table size (207163 bytes)
+Directory table size 68705 bytes (67.09 Kbytes)
+	30.18% of uncompressed directory table size (227617 bytes)
 Number of duplicate files found 338
 Number of inodes 6363
 Number of files 5825
@@ -259,9 +282,9 @@ Please consider submitting your AppImage to AppImageHub, the crowd-sourced
 central directory of available AppImages, by opening a pull request
 at https://github.com/AppImage/appimage.github.io
 == [9/9] sizes and checksums ==
--rwxr-xr-x 1 root root 48105976 Oct 30 04:56 /vedit-build/packaging/appimage/out/VEdit-0.1.0-x86_64.AppImage
-131M	/vedit-build/packaging/appimage/AppDir
-AppImage_bytes=48105976
-AppDir_bytes=119298173
-b589416e9492c6a2df333d861163d71ba3674305788a77e5b1f9c541e72412a4  /vedit-build/packaging/appimage/out/VEdit-0.1.0-x86_64.AppImage
+-rwxr-xr-x 1 root root 47745528 Oct 30 05:31 /vedit-build/packaging/appimage/out/VEdit-0.1.0-x86_64.AppImage
+129M	/vedit-build/packaging/appimage/AppDir
+AppImage_bytes=47745528
+AppDir_bytes=117408457
+4f800ab97368de6f379efdc15a582bfbb615bcc3e2b7a0a3f5a19935de21ce44  /vedit-build/packaging/appimage/out/VEdit-0.1.0-x86_64.AppImage
 BUILD APPIMAGE OK: /vedit-build/packaging/appimage/out/VEdit-0.1.0-x86_64.AppImage

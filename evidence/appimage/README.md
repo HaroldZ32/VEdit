@@ -49,7 +49,7 @@ after the freeze.
 
 | sha256 | status |
 |---|---|
-| `809cf95326172fc58975b338cea390dcffd8d78d1261b4f1d75059a8950c6d77d` | dirty-tree build, not reproducible from the frozen source — **discarded** (this is what the earlier T24/T23 evidence used) |
+| `809cf95326172fc58975b338cea390dcffd8d78d1261b4f1d75059a8950c6d77d` | **历史，已弃用**：dirty-tree build, not reproducible from the frozen source (used by the earlier T24/T23 evidence) |
 | `41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611` | rebuilt from frozen2, **3/3 identical** builds, stripped, 6,002,112 B — **adopted (final value)** |
 | `d93440ed…` | reproducible but **not stripped** — discarded (size/consistency) |
 
@@ -151,6 +151,7 @@ only; it asserts it has no gtk3/gsv packages. Harness sets a 32-hex
 | input method modules | cache has `im-xim` and `im-ibus` with payload paths; effective `GTK_IM_MODULE_FILE=/tmp/vedit-runtime-0/immodules.cache`; `GTK_IM_MODULE=xim --selftest smoke` exit 0 without `Failed to load module` |
 | bundled CJK font | fontconfig resolves `wqy-zenhei`; `screenshots/cjk-window.png` (22,025 B) shows `// 中文注释：你好，世界` and `logic 信号;` rendered, not tofu |
 | app `--screenshot` | **33,223 B real image** (`screenshots/app-selftest-highlight.png`); the T24-era black capture was fixed by T21's single-window/layout-safe capture |
+| check-count convention | `--selftest all` = **51** checks; adding `--screenshot <path>` appends exactly one conditional check (`--screenshot produces a non-blank PNG`) → **52**. Same binary, same suites, both exit 0; both logs are committed (`selftest-all-plain.log`, `selftest-all-summary.txt`). |
 | dynamic dependencies of `vd-app` | 67 from payload, 8 from the host glibc family only; no `not found` |
 | residual processes | no verible/slang process, no zombie |
 | cold start (exec → window) | 194 / 192 / 191 ms (`sizes.txt`) |
@@ -178,13 +179,13 @@ canonical number is the one that corresponds to what an installed tree occupies;
 
 ## Hash chain (why the artifact changed)
 
-| build | AppImage sha256 | bytes | reason |
+| build | AppImage sha256 | bytes | status / reason |
 |---|---|---|---|
-| T24 acceptance | `b589416e9492c6a2df333d861163d71ba3674305788a77e5b1f9c541e72412a4` | 48,105,976 | first clean-room-accepted AppImage |
-| intermediate | `a102aaf69338832204040dfdec361e49fc8b6694a17e1540ea292f5dcacc667e` | 48,110,072 | AppRun runtime-dir alignment with T25 + `/vedit` sandbox remap |
-| pre-freeze | `b24d0bfb5f1945d86be108d9e4cf27ee942e7469af1e7574df4b69d108863119` | 47,745,528 | consumes shared `vd-app` 809cf953… + T21 single-window/runtime-fixture fixes + T25 shared remap |
-| frozen `e1e09d69` | `60b111899444e9743a33750ebfdbbd6a5359fe690e6417120d9101bcede6b7ad` | 47,745,528 | rebuild from the first freeze; used `vd-app` 809cf953 (later found not reproducible) |
-| **frozen2 `f1f9622`/`63bf415`** | **`4f800ab97368de6f379efdc15a582bfbb615bcc3e2b7a0a3f5a19935de21ce44`** | **47,745,528** | adopted canonical `vd-app` 41d02dca (3/3 reproducible, stripped) |
+| T24 acceptance | `b589416e9492c6a2df333d861163d71ba3674305788a77e5b1f9c541e72412a4` | 48,105,976 | **历史，已弃用**：first clean-room-accepted AppImage |
+| intermediate | `a102aaf69338832204040dfdec361e49fc8b6694a17e1540ea292f5dcacc667e` | 48,110,072 | **历史，已弃用**：AppRun runtime-dir alignment with T25 + `/vedit` sandbox remap |
+| pre-freeze | `b24d0bfb5f1945d86be108d9e4cf27ee942e7469af1e7574df4b69d108863119` | 47,745,528 | **历史，已弃用**：consumed shared `vd-app` 809cf953… (later found not reproducible) |
+| frozen `e1e09d69` | `60b111899444e9743a33750ebfdbbd6a5359fe690e6417120d9101bcede6b7ad` | 47,745,528 | **历史，已弃用**：first freeze; used `vd-app` 809cf953 (not reproducible) |
+| **frozen2 `f1f9622`/`63bf415`** | **`4f800ab97368de6f379efdc15a582bfbb615bcc3e2b7a0a3f5a19935de21ce44`** | **47,745,528** | **当前值（唯一采纳）**：adopted canonical `vd-app` 41d02dca (3/3 reproducible, stripped) |
 
 The **container** hash is not byte-reproducible across builds (squashfs stores
 file timestamps); the **payload binary** is not (`41d02dca…` on 3/3 builds). T27/T28
