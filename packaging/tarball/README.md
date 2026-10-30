@@ -9,11 +9,12 @@ Two relocatable products, built from the same payload, that run on a clean, offl
 
 | product | bytes | sha256 |
 |---|---|---|
-| `out/vedit-0.1.0-linux-x86_64.tar.gz` | 40,884,328 | `5d7e1e9624b651079d510733b7ed5dacfb94c4c1002a049bf3c8d90e00a586a0` |
-| `out/VEdit-0.1.0-x86_64.run` | 40,887,126 | `7faf6fa60ec37bc5b0a31cbf75b518eaf18793b4b1d211d5fc17eefaa9a1e025` |
+| `out/vedit-0.1.0-linux-x86_64.tar.gz` | 40,890,922 | `a1bda356540fbc88c16b20c0cf2372fcd76885e484ad3954c86b498af9f25f89` |
+| `out/VEdit-0.1.0-x86_64.run` | 40,893,720 | `299827fe2155f8b54e60a1c5d1c7662bcaddb49e93a7238a38b291e6ff3d71e5` |
 
 The `.run` is the tarball plus a POSIX-sh stub: the payload is stored **once**, so the
-overhead is 2,798 bytes.
+overhead is 2,798 bytes. (These numbers describe the 0.1.0 build in `evidence/16-products.txt`;
+the next rebuild changes them, and the evidence file is the authority.)
 
 ## Layout (identical inside both products)
 
@@ -68,7 +69,7 @@ and the tree is removed; the exit status is propagated unchanged.
   no `gtk3`/`gtksourceview3`/`gtksourceview4` rpm exists, both products pass `--selftest all`
   (51 checks, exit 0), the window is visible to `xwininfo`, and Chinese text renders.
 * **AC-18 (size / cold start, record item)** — tar.gz 40.9 MB, `.run` 40.9 MB; window visible
-  after **109 / 64 / 66 ms** (three runs, `evidence/36-cold-start.txt`). Target was ≤ 300 MB and
+  after **111 / 119 / 64 ms** (three runs, `evidence/36-cold-start.txt`). Target was ≤ 300 MB and
   ≤ 10 s, so both metrics are far inside it.
 * **GLIBC ≤ 2.17 for every bundled ELF** — `evidence/11-glibc-rpath.txt`:
   `ELF_SCANNED=95 ELF_WITH_RUNPATH=1 ALLOWLIST_HITS=1 UNKNOWN=0 GLIBC_GATE=PASS`.
