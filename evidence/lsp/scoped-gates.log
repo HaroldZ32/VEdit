@@ -1,5 +1,5 @@
 # scoped gates for crates/vd-lsp (T15), run in the pinned CentOS 7 image
-# date: 2026-10-30T03:56:56Z; rustc: rustc 1.99.0 (b940084d7 2026-09-28)
+# date: 2026-10-30T04:03:07Z; rustc: rustc 1.99.0 (b940084d7 2026-09-28)
 
 $ cargo fmt -p vd-lsp -- --check
 EXIT=0
@@ -9,21 +9,20 @@ $ cargo clippy -p vd-lsp --all-targets -- -D warnings
 EXIT=0
 
 $ cargo test -p vd-lsp
-   Compiling vd-lsp v0.1.0 (/vedit-build/crates/vd-lsp)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.92s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
      Running unittests src/lib.rs (target/debug/deps/vd_lsp-91dbfec637d0e997)
 
 running 16 tests
 test config::tests::default_timeouts_are_bounded ... ok
-test config::tests::rules_are_passed_explicitly_and_never_searched ... ok
 test config::tests::filelist_and_extra_args_are_appended_in_order ... ok
-test diagnostics::tests::rule_is_taken_from_code_or_from_the_verible_message ... ok
 test config::tests::no_rules_file_means_no_rules_flag ... ok
-test diagnostics::tests::recording_bumps_the_generation_and_replaces_per_uri ... ok
+test config::tests::rules_are_passed_explicitly_and_never_searched ... ok
+test diagnostics::tests::rule_is_taken_from_code_or_from_the_verible_message ... ok
 test documents::tests::change_on_an_unopened_document_is_an_error ... ok
+test diagnostics::tests::recording_bumps_the_generation_and_replaces_per_uri ... ok
+test documents::tests::versions_and_text_track_changes ... ok
 test edits::tests::edits_are_applied_in_document_order_regardless_of_input_order ... ok
 test edits::tests::incremental_changes_track_a_document ... ok
-test documents::tests::versions_and_text_track_changes ... ok
 test edits::tests::overlapping_edits_are_rejected ... ok
 test edits::tests::utf16_columns_apply_to_multibyte_text ... ok
 test position::tests::ascii_round_trip ... ok
@@ -37,8 +36,8 @@ test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fin
 
 running 8 tests
 test capabilities_are_the_measured_ten_and_start_is_lazy ... ok
-test definition_references_symbols_rename_and_highlight ... ok
 test diagnostics_arrive_within_three_seconds_and_clear_after_a_fix ... ok
+test definition_references_symbols_rename_and_highlight ... ok
 test formatting_edits_reproduce_the_bundled_formatter_byte_for_byte ... ok
 test rules_config_is_passed_explicitly_and_changes_diagnostics ... ok
 test lazy_start_crash_restart_and_shutdown_leave_no_zombie ... ok

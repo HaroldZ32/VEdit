@@ -61,12 +61,20 @@ optional filelist.
   `--rules_config_search`, so the rule file in force can never differ from the
   one reported by the configuration layer.
 
-Both argv cases are printed in `probe-transcript.txt`:
+Both argv cases are printed in `probe-transcript.txt`, and the printed argv is
+the argv of the client that actually ran:
 
 ```
-server_argv(no rules)=[]
-server_argv(with rules)=["--rules_config=/vedit-build/crates/vd-lsp/fixtures/project_with_rules/.rules.verible_lint"]
+rules_file=<none>
+server_argv=[]
+
+rules_file=/vedit-build/crates/vd-lsp/fixtures/project_with_rules/.rules.verible_lint
+server_argv=["--rules_config=/vedit-build/crates/vd-lsp/fixtures/project_with_rules/.rules.verible_lint"]
 ```
+
+The contrast is behavioural, not only textual: the no-rules run reports
+`derived_rule=Some("line-length")`, while the explicit-rules run suppresses that
+rule (the same file, the same violation).
 
 ## Lifecycle (AC-09)
 
@@ -148,7 +156,7 @@ cargo test -p vd-lsp
 
 | file | content |
 |---|---|
-| `probe-transcript.txt` | argv (with/without rules), initialize request/result JSON, diagnostics with latency and rule, definition location, formatting byte-equality, shutdown/pid state |
+| `probe-transcript.txt` | argv (with/without rules) used by the client, initialize request/result JSON, diagnostics with latency plus **derived rule / raw code / message**, definition location, formatting byte-equality, shutdown/pid state |
 | `scoped-gates.log` | fmt/clippy/test exit codes |
 | `timeouts-cancellation-lifecycle.txt` | timeout, cancellation and crash-restart test output |
 | `zombie-proof.txt` | `ps` after the probe: no verible process and no verible zombie |

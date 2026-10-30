@@ -4,16 +4,18 @@
 //! cargo run -p vd-lsp --example lsp-probe -- [WORKSPACE_DIR]
 //! ```
 //!
-//! It prints: the exact server argv, the `initialize` request/result JSON, a
-//! real diagnostics round trip with its latency, a definition lookup, and a
-//! formatting edit set compared byte-for-byte with the bundled formatter.
+//! It prints: the exact server argv, the `initialize` request/result JSON, a real
+//! diagnostics round trip with its latency and the **derived** lint rule, a
+//! definition lookup, and a formatting edit set compared byte-for-byte with the
+//! bundled formatter. A fixture that does not contain the optional files prints
+//! an explicit `SKIP` line instead of failing.
 
 use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 use anyhow::{anyhow, Context, Result};
 use lsp_types::{Position, Url};
-use vd_lsp::{apply_text_edits, LspClient, LspConfig};
+use vd_lsp::{apply_text_edits, diagnostic_rule, LspClient, LspConfig};
 
 fn binary_dir() -> PathBuf {
     std::env::var("VEDIT_VERIBLE_BIN_DIR")
@@ -46,29 +48,29 @@ async fn main() -> Result<()> {
 
     println!("workspace_root={}", root.display());
     println!("ls_path={}", ls.display());
-    let plain = LspConfig::new(&ls, &root);
+    // One configuration source for both the printed argv and the real client:
+    // the rules file is passed exactly when the project has one (T13 policy).
+    let rules = root.join(".rules.verible_lint");
+    let mut config = LspConfig::new(&ls, &root);
+    if rules.is_file() {
+        config = config.with_rules_config(&rules);
+    }
+    let rules_label = if rules.is_file() {
+        rules.display().to_string()
+    } else {
+        "<none>".to_string()
+    };
+    println!("rules_file={rules_label}");
     println!(
-        "server_argv(no rules)={:?}",
-        plain
+        "server_argv={:?}",
+        config
             .command_args()
             .iter()
             .map(|argument| argument.to_string_lossy().to_string())
             .collect::<Vec<_>>()
     );
-    let rules = root.join(".rules.verible_lint");
-    if rules.is_file() {
-        let configured = LspConfig::new(&ls, &root).with_rules_config(&rules);
-        println!(
-            "server_argv(with rules)={:?}",
-            configured
-                .command_args()
-                .iter()
-                .map(|argument| argument.to_string_lossy().to_string())
-                .collect::<Vec<_>>()
-        );
-    }
 
-    let mut client = LspClient::new(LspConfig::new(&ls, &root));
+    let mut client = LspClient::new(config);
     println!("lazy_start_running={}", client.is_running());
 
     let bad_path = root.join("bad_line_length.sv");
@@ -101,74 +103,85 @@ async fn main() -> Result<()> {
     );
     for diagnostic in &published.diagnostics {
         println!(
-            "  {}:{} severity={:?} rule={:?} message={}",
+            "  {}:{} severity={:?} derived_rule={:?} raw_code={:?} message={}",
             diagnostic.range.start.line + 1,
             diagnostic.range.start.character + 1,
             diagnostic.severity,
+            diagnostic_rule(diagnostic),
             diagnostic.code,
             diagnostic.message
         );
     }
 
     let a_path = root.join("a.sv");
-    let a_uri = uri(&a_path)?;
-    client
-        .open_document(
-            a_uri.clone(),
-            "systemverilog",
-            std::fs::read_to_string(&a_path)?,
-        )
-        .await?;
     let b_path = root.join("b.sv");
-    let b_uri = uri(&b_path)?;
-    client
-        .open_document(
-            b_uri.clone(),
-            "systemverilog",
-            std::fs::read_to_string(&b_path)?,
-        )
-        .await?;
-    let definition = client
-        .definition(
-            &a_uri,
-            Position {
-                line: 1,
-                character: 3,
-            },
-        )
-        .await?;
-    println!(
-        "\n## definition of b_top in a.sv -> {} location(s)",
-        definition.len()
-    );
-    for location in &definition {
+    if a_path.is_file() && b_path.is_file() {
+        let a_uri = uri(&a_path)?;
+        client
+            .open_document(
+                a_uri.clone(),
+                "systemverilog",
+                std::fs::read_to_string(&a_path)?,
+            )
+            .await?;
+        let b_uri = uri(&b_path)?;
+        client
+            .open_document(
+                b_uri.clone(),
+                "systemverilog",
+                std::fs::read_to_string(&b_path)?,
+            )
+            .await?;
+        let definition = client
+            .definition(
+                &a_uri,
+                Position {
+                    line: 1,
+                    character: 3,
+                },
+            )
+            .await?;
         println!(
-            "  {}:{}:{}",
-            location.uri.path(),
-            location.range.start.line + 1,
-            location.range.start.character + 1
+            "\n## definition of b_top in a.sv -> {} location(s)",
+            definition.len()
+        );
+        for location in &definition {
+            println!(
+                "  {}:{}:{}",
+                location.uri.path(),
+                location.range.start.line + 1,
+                location.range.start.character + 1
+            );
+        }
+    } else {
+        println!(
+            "\n## definition: SKIP — this project has no a.sv/b.sv pair (by design, not a failure)"
         );
     }
 
     let messy_path = root.join("messy.sv");
-    let messy_uri = uri(&messy_path)?;
-    let messy_text = std::fs::read_to_string(&messy_path)?;
-    client
-        .open_document(messy_uri.clone(), "systemverilog", messy_text.clone())
-        .await?;
-    let edits = client.formatting(&messy_uri, 2, true).await?;
-    let applied = apply_text_edits(&messy_text, &edits)?;
-    let output = tokio::process::Command::new(&formatter)
-        .arg(&messy_path)
-        .output()
-        .await
-        .context("running verible-verilog-format")?;
-    let expected = String::from_utf8(output.stdout)?;
-    println!(
-        "\n## formatting: {} edit(s), byte_equal_to_bundled_formatter={}",
-        edits.len(),
-        applied == expected
-    );
+    if messy_path.is_file() {
+        let messy_uri = uri(&messy_path)?;
+        let messy_text = std::fs::read_to_string(&messy_path)?;
+        client
+            .open_document(messy_uri.clone(), "systemverilog", messy_text.clone())
+            .await?;
+        let edits = client.formatting(&messy_uri, 2, true).await?;
+        let applied = apply_text_edits(&messy_text, &edits)?;
+        let output = tokio::process::Command::new(&formatter)
+            .arg(&messy_path)
+            .output()
+            .await
+            .context("running verible-verilog-format")?;
+        let expected = String::from_utf8(output.stdout)?;
+        println!(
+            "\n## formatting: {} edit(s), byte_equal_to_bundled_formatter={}",
+            edits.len(),
+            applied == expected
+        );
+    } else {
+        println!("\n## formatting: SKIP — this project has no messy.sv (by design, not a failure)");
+    }
 
     let pid = client.pid();
     client.shutdown().await?;

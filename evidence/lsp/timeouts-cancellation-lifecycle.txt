@@ -1,12 +1,11 @@
 $ cargo test -p vd-lsp --test verible_ls request_timeout_and_cancellation_are_enforced -- --exact --nocapture
-   Compiling vd-lsp v0.1.0 (/vedit-build/crates/vd-lsp)
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.45s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s
      Running tests/verible_ls.rs (target/debug/deps/verible_ls-34ae68e02196cc79)
 
 running 1 test
 test request_timeout_and_cancellation_are_enforced ... ok
 
-test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.16s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.17s
 
 EXIT=0
 
