@@ -1,0 +1,68 @@
+# frozen3 equivalence proof (2026-10-30T05:46:12Z)
+frozen2 = f1f96223025ecb51124557e5efabd6bee2af6210 (product source)
+frozen3 = 4bb4912371987def53c74717077ffeddb57b54e0 (product source still f1f9622; F1-F5 are test/evidence only)
+
+## canonical rebuilt from frozen3
+41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611  build/artifacts/vd-app
+bytes=6002112 mtime=2026-10-30 13:44:59.006154356 +0800
+expected frozen2 canonical = 41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611 (6002112 B)
+
+## why the bytes cannot change: no product/script path differs from frozen2
+$ git diff --stat f1f9622..HEAD -- crates scripts packaging build/slang Cargo.toml Cargo.lock rust-toolchain.toml
+ crates/vd-deeplint/tests/fake_binary.rs            | 24 ++++++
+ packaging/tarball/README.md                        | 33 ++++----
+ packaging/tarball/evidence/00-stage.log            | 29 ++++---
+ packaging/tarball/evidence/01b-vd-app-identity.txt |  5 ++
+ packaging/tarball/evidence/10-payload-manifest.txt |  4 +-
+ .../tarball/evidence/12-immodules-and-binaries.txt |  2 +-
+ packaging/tarball/evidence/13-host-path-audit.txt  |  8 +-
+ packaging/tarball/evidence/14-run-selfcheck.txt    |  2 +-
+ packaging/tarball/evidence/16-products.txt         | 12 +--
+ .../evidence/18-abandoned-intermediates.txt        | 30 ++++---
+ .../tarball/evidence/19-run-payload-identity.txt   | 19 +++++
+ packaging/tarball/evidence/20-cleanroom-full.log   | 28 +++----
+ packaging/tarball/evidence/21-cleanroom-noexec.log |  2 +-
+ packaging/tarball/evidence/22-run-noexec.log       | 12 +--
+ packaging/tarball/evidence/30-targz-config.log     |  4 +-
+ packaging/tarball/evidence/30-targz-fim.log        |  4 +-
+ packaging/tarball/evidence/30-targz-highlight.log  |  8 +-
+ packaging/tarball/evidence/30-targz-selftest.log   | 10 +--
+ packaging/tarball/evidence/30-targz-slang.log      |  4 +-
+ packaging/tarball/evidence/30-targz-smoke.log      |  6 +-
+ .../evidence/30b-targz-screenshot-highlight.log    | 12 +--
+ .../evidence/30b-targz-screenshot-smoke.log        | 10 +--
+ packaging/tarball/evidence/30c-targz-window.log    |  5 +-
+ packaging/tarball/evidence/31-run-selftest.log     | 34 ++++----
+ packaging/tarball/evidence/31a-run-smoke.log       | 18 ++--
+ packaging/tarball/evidence/31b-run-keeptmp.log     | 20 ++---
+ packaging/tarball/evidence/33-immodule-xim.log     | 10 +--
+ packaging/tarball/evidence/34-relocated.log        | 16 ++--
+ packaging/tarball/evidence/35-processes.txt        |  2 +-
+ packaging/tarball/evidence/36-cold-0.log           |  4 +-
+ packaging/tarball/evidence/36-cold-1.log           |  5 +-
+ packaging/tarball/evidence/36-cold-2.log           |  4 +-
+ packaging/tarball/evidence/36-cold-start.txt       |  6 +-
+ packaging/tarball/evidence/37-sizes.txt            | 12 +--
+ packaging/tarball/evidence/41-cjk-screenshot.log   |  4 +-
+ packaging/tarball/evidence/43-x11-capture.log      |  4 +-
+ .../tarball/evidence/45-runtime-fallback-targz.log | 10 +--
+ .../tarball/evidence/46-runtime-fallback-run.log   | 18 ++--
+ .../tarball/evidence/48-runtime-fatal-matrix.txt   | 95 ++++++++++++++++++++++
+ 39 files changed, 343 insertions(+), 192 deletions(-)
+(empty above = only tests/evidence changed; cargo build --release --workspace excludes test targets)
+
+## F3 touched only test code
+$ git show --stat --oneline 4dcff96 | head -8
+4dcff96 test(e2e,deeplint): measure checks, remove broken evidence link and serialise fake-binary tests (T28 F1-F3/F5)
+ crates/vd-deeplint/tests/fake_binary.rs | 24 ++++++++++++++++++++++++
+ tests/e2e/ACCEPTANCE.md                 | 13 ++++++++-----
+ tests/e2e/run.sh                        | 10 +++++++++-
+ 3 files changed, 41 insertions(+), 6 deletions(-)
+
+## determinism inputs of the rebuild
+remap_flags=RELEASE_RUSTFLAGS="--remap-path-prefix=/vedit-build/target/cargo-home=/cargo --remap-path-prefix=/root/.cargo=/cargo --remap-path-prefix=/opt/cargo=/cargo --remap-path-prefix=/opt/rust=/rust --remap-path-prefix=/vedit-build=/vedit"
+source_date_epoch=1793339049
+cargo_incremental=0
+remap_flags=--remap-path-prefix=/vedit-build/target/cargo-home=/cargo --remap-path-prefix=/root/.cargo=/cargo --remap-path-prefix=/opt/cargo=/cargo --remap-path-prefix=/opt/rust=/rust --remap-path-prefix=/vedit-build=/vedit
+leaks=0
+remap_flags= --remap-path-prefix=/vedit-build/target/cargo-home=/cargo --remap-path-prefix=/root/.cargo=/cargo --remap-path-prefix=/opt/cargo=/cargo --remap-path-prefix=/opt/rust=/rust --remap-path-prefix=/vedit-build=/vedit
