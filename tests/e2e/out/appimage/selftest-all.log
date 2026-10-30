@@ -1,9 +1,9 @@
 vd-app selftest: fixture_root=/tmp/e2e-appimage/usr/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/e2e-appimage/usr/share/vedit/testdata"))
 
-(vd-app:24173): GLib-GIO-CRITICAL **: 05:35:13.481: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:24173): GLib-GIO-CRITICAL **: 05:38:02.710: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: configuration warnings: 1
 
-(vd-app:24173): Gtk-WARNING **: 05:35:14.126: Could not load a pixbuf from icon theme.
+(vd-app:24173): Gtk-WARNING **: 05:38:03.364: Could not load a pixbuf from icon theme.
 This may indicate that pixbuf loaders or the mime database could not be found.
 {
   "app": "VEdit",
@@ -38,7 +38,7 @@ This may indicate that pixbuf loaders or the mime database could not be found.
           "ok": true
         },
         {
-          "detail": "restored=true, dispatch=undo, action_fallback=true, can_undo_before=true, status=\"1:1  |  /tmp/vd-app-selftest-24173/format_me.sv  |  systemverilog  |  verible 1  |  slang 0  |  FIM: FIM 未启用  |  LSP running (pid 24209), restarts 0 (running: true, restarts: 0)  Verible LSP: generation 1  Verible LSP: generation 2\"",
+          "detail": "restored=true, dispatch=undo, action_fallback=true, can_undo_before=true, status=\"1:1  |  /tmp/vd-app-selftest-24173/format_me.sv  |  systemverilog  |  verible 1  |  slang 0  |  FIM: FIM 未启用  |  LSP running (pid 24209), restarts 0 (running: true, restarts: 0)  Verible LSP: generation 2\"",
           "name": "undo shortcut restores the text through Document",
           "ok": true
         },
@@ -134,7 +134,7 @@ This may indicate that pixbuf loaders or the mime database could not be found.
           "ok": true
         },
         {
-          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x585d7df51480, type: GtkSourceLanguage } })",
+          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5e6c61319c80, type: GtkSourceLanguage } })",
           "name": "opened .sv with CJK/emoji content has a language",
           "ok": true
         },
@@ -144,7 +144,7 @@ This may indicate that pixbuf loaders or the mime database could not be found.
           "ok": true
         },
         {
-          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x585d7ddc48f0, type: GtkSourceLanguage } })",
+          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5e6c6118f8f0, type: GtkSourceLanguage } })",
           "name": "opened .sv buffer has a language",
           "ok": true
         },

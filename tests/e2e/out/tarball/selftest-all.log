@@ -1,6 +1,6 @@
 vd-app selftest: fixture_root=/tmp/e2e-tarball/VEdit/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/e2e-tarball/VEdit/share/vedit/testdata"))
 
-(vd-app:41647): GLib-GIO-CRITICAL **: 05:35:28.812: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:41647): GLib-GIO-CRITICAL **: 05:38:17.874: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: configuration warnings: 1
 {
   "app": "VEdit",
@@ -131,7 +131,7 @@ vd-app: configuration warnings: 1
           "ok": true
         },
         {
-          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x629969f8dfa0, type: GtkSourceLanguage } })",
+          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5a9b150a07a0, type: GtkSourceLanguage } })",
           "name": "opened .sv with CJK/emoji content has a language",
           "ok": true
         },
@@ -141,7 +141,7 @@ vd-app: configuration warnings: 1
           "ok": true
         },
         {
-          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x629969e378f0, type: GtkSourceLanguage } })",
+          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5a9b14f3d0f0, type: GtkSourceLanguage } })",
           "name": "opened .sv buffer has a language",
           "ok": true
         },

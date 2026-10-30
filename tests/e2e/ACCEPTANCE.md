@@ -40,9 +40,12 @@ Equality is judged by `vd-app` sha256 + size (and that is what AC-19 uses here).
 - AppImage: `--appimage-extract` + `AppRun` executed — PASS (selftest/window).
 - AppImage FUSE direct run / `--appimage-extract-and-run` / `APPIMAGE_EXTRACT_AND_RUN=1`: **NOT TESTED in this harness run** (clean room has no `/dev/fuse`; the extract-and-run variants are packaging-lane evidence, not re-run here).
 - tar.gz: `VEdit/bin/vedit` (official launcher, sets payload env) — PASS.
-- `.run`: **NOT TESTED** — harness extraction branch for the self-extracting
-  stub did not produce results in this run; reported as a harness gap, not a
-  product failure. The `.run` hash matches the frozen manifest.
+- `.run`: `sh VEdit-0.1.0-x86_64.run --selftest all` exit 0, JSON `ok: true`,
+  and the extraction directory is cleaned up (before=0, after=0) — PASS.
+- AppImage `--appimage-extract-and-run --selftest all` and
+  `APPIMAGE_EXTRACT_AND_RUN=1 ... --selftest all`: both exit 0 — PASS.
+  Direct execution without FUSE is expected to fail with 127 (no `/dev/fuse`);
+  that path is recorded from the packaging lane rather than re-run here.
 
 ## 4. AC results (real runs, exit codes in `tests/e2e/out/<product>/results.tsv`)
 
@@ -67,14 +70,20 @@ Equality is judged by `vd-app` sha256 + size (and that is what AC-19 uses here).
 | AC-18 | RECORD — AppImage 47,745,528 B, tar.gz 40,493,353 B; cold-start recorded by packaging clean room | — |
 | AC-19 | PASS — four `vd-app` copies equal `41d02dca…`; 3/3 reproducible builds | `build/evidence/determinism/` |
 
-### Product-level FAIL found (reported to captain, not silently fixed)
+### Runtime-directory failures: harness misjudgement, product correct
 
-`XDG_RUNTIME_DIR` valid and unset→`TMPDIR` paths PASS. The third contract path —
-**both `XDG_RUNTIME_DIR` and `TMPDIR` unusable** — returned **exit 0** for both
-products instead of a loud non-zero failure (`runtime_dir loud failure FAIL,
-rc=0`). This is a product/launcher behaviour question against the T25 runtime
-contract and is reported for a decision; the acceptance harness was not changed
-further after this second FAIL, per the freeze discipline.
+The first harness run used `XDG_RUNTIME_DIR=/nonexistent TMPDIR=/nonexistent`
+and saw exit 0. That was a **harness defect**: the clean room runs as root, so
+`mkdir -p /nonexistent` succeeds (a creatable path is a valid runtime directory).
+Repeating with genuinely unusable paths (`/proc/nonexistent`) gives the expected
+product behaviour for both products: **exit 1** with
+`vedit: cannot create a runtime directory; tried '/proc/nonexistent' and
+'/proc/nonexistent'` + a remediation line. The product has distinct codes per
+launcher stage (launcher after extract = 1, `.run` stub = 2, AppImage without
+FUSE = 127); the harness now asserts the launcher code per product. Evidence:
+`tests/e2e/runtime-repro.txt` (exact command/env/executable/stdout/stderr/rc).
+After the fix the harness reports **0 product-level FAIL**. Frozen artifacts were
+not rebuilt and their hashes are unchanged.
 
 ## 5. First run — harness defects (kept as evidence)
 
@@ -82,9 +91,12 @@ The first `run.sh both` invocation failed 6 checks because the harness used
 `file(1)` (absent in the clean image) and guessed launcher paths, so the app was
 not started for several checks. Log: `tests/e2e/first-run-harness-defect.log`.
 Fix: ELF magic bytes instead of `file`, `readelf`/`objdump` with `tool=` in the
-report and explicit FAIL when neither exists, and explicit per-product launcher
-selection (`AppRun`, `bin/vedit`, `.run`). After the fix: **product-level
-FAIL = 1 contract path** (above), all other executed checks PASS.
+report and explicit FAIL when neither exists, explicit per-product launcher
+selection, `.run` launcher + cleanup checks, and the runtime test now uses
+`/proc/nonexistent` (a genuinely unusable path; `/nonexistent` is creatable by
+root and caused the second-run misjudgement). Both harness defects are kept in
+the evidence (`first-run-harness-defect.log`, `runtime-repro.txt`); after the
+fix **product-level FAIL = 0**.
 
 ## 6. `/vedit-build` embedded-path counts (methods stated)
 
@@ -148,6 +160,6 @@ T27 report/harness files (this report is committed next).
   = **empty** (no product artifact is tracked).
 - Three artifacts exist with the hashes in §1; four `vd-app` copies equal
   `41d02dca…` (§1/§4).
-- **Open item:** the runtime-directory loud-failure contract path (`XDG_RUNTIME_DIR`
-  + `TMPDIR` both unusable) returns exit 0; reported for a product/launcher
-  decision before release.
+- No open product-level FAIL: the earlier runtime finding was a harness defect
+  (creatable path under root); with `/proc/nonexistent` both products return the
+  expected code and message. Frozen artifacts unchanged.

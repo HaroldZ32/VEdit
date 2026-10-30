@@ -1,6 +1,6 @@
 
-(vd-app:24276): GLib-GIO-CRITICAL **: 05:35:15.643: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:24276): GLib-GIO-CRITICAL **: 05:38:04.870: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: configuration warnings: 1
 
-(vd-app:24276): Gtk-WARNING **: 05:35:15.763: Could not load a pixbuf from icon theme.
+(vd-app:24276): Gtk-WARNING **: 05:38:04.990: Could not load a pixbuf from icon theme.
 This may indicate that pixbuf loaders or the mime database could not be found.

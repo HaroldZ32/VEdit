@@ -1,0 +1,307 @@
+VEdit: extracting to /tmp/vedit.cM7Sos
+vd-app selftest: fixture_root=/tmp/vedit.cM7Sos/VEdit/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/vedit.cM7Sos/VEdit/share/vedit/testdata"))
+
+(vd-app:41866): GLib-GIO-CRITICAL **: 05:38:25.692: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+vd-app: configuration warnings: 1
+{
+  "app": "VEdit",
+  "fixture_root": "/tmp/vedit.cM7Sos/VEdit/share/vedit/testdata",
+  "ok": true,
+  "reports": [
+    {
+      "checks": [
+        {
+          "detail": "realized=true",
+          "name": "window realized",
+          "ok": true
+        },
+        {
+          "detail": "pages=1",
+          "name": "notebook has an initial tab",
+          "ok": true
+        },
+        {
+          "detail": "language=Some(\"systemverilog\")",
+          "name": "open .sv applies the SystemVerilog language",
+          "ok": true
+        },
+        {
+          "detail": "current=Some(2), expected=Some(2), titles=[\"Untitled\", \"clean.sv\", \"format_me.sv\"]",
+          "name": "the current tab follows the opened file",
+          "ok": true
+        },
+        {
+          "detail": "needs_close_confirmation=true",
+          "name": "edit marks the document modified",
+          "ok": true
+        },
+        {
+          "detail": "restored=true, dispatch=undo, action_fallback=true, can_undo_before=true, status=\"1:1  |  /tmp/vd-app-selftest-41866/format_me.sv  |  systemverilog  |  verible 1  |  slang 0  |  FIM: FIM 未启用  |  LSP running (pid 41900), restarts 0 (running: true, restarts: 0)  Verible LSP: generation 1  Verible LSP: generation 2\"",
+          "name": "undo shortcut restores the text through Document",
+          "ok": true
+        },
+        {
+          "detail": "path=/tmp/vd-app-selftest-41866/smoke-saved.sv",
+          "name": "save-as writes the document",
+          "ok": true
+        },
+        {
+          "detail": "pages=3",
+          "name": "several tabs are open",
+          "ok": true
+        },
+        {
+          "detail": "rows=2, panel_texts=[\"warning  [module-filename] Declared module does not match the first dot-delimited component of file name: \\\"format_me\\\" [Style: file-names][module-filename] (fix available)\", \"error  [Smoke] smoke diagnostic\"]",
+          "name": "problem panel lists the diagnostic",
+          "ok": true
+        },
+        {
+          "detail": "all_marks=1, categories=[\"vedit-error\"], worst={0: Error}, line_count=2",
+          "name": "gutter mark is placed at the diagnostic line",
+          "ok": true
+        },
+        {
+          "detail": "format/slang/definition/references/outline/fim",
+          "name": "the contract shortcuts exist in the table",
+          "ok": true
+        },
+        {
+          "detail": "actions=[\"toggle-panel\", \"fim\", \"definition\", \"new\", \"save\", \"rename\", \"close-tab\", \"open\", \"find\", \"save-as\", \"format\", \"find-next\", \"undo\", \"replace\", \"redo\", \"slang\", \"goto-line\", \"outline\", \"quit\", \"references\"]",
+          "name": "shortcut actions are installed",
+          "ok": true
+        },
+        {
+          "detail": "accels=[\"<Primary><Shift>f\"]",
+          "name": "format accelerator is Ctrl+Shift+F",
+          "ok": true
+        },
+        {
+          "detail": "jumped=true, at_first=true, clamped=true, at_last=true, cursor=Position { line: 1, character: 0 }, last_line=1",
+          "name": "goto-line moves the cursor and clamps to the last line",
+          "ok": true
+        },
+        {
+          "detail": "shows_line_numbers=true",
+          "name": "line numbers are visible in the view",
+          "ok": true
+        },
+        {
+          "detail": "changed=true, restored=true, original_len=62, replaced_len=62",
+          "name": "replace-next changes the text and undo restores it",
+          "ok": true
+        },
+        {
+          "detail": "tabs_before=3, tabs_after=3, recorded=Some(\"smoke-saved.sv\"), window_visible=true",
+          "name": "unsaved close is refused and the confirmation was requested",
+          "ok": true
+        },
+        {
+          "detail": "anchor=Some(Position { line: 1, character: 6 }), contains=true, cursor=Position { line: 1, character: 0 }, direct=Some(Range { start: Position { line: 1, character: 0 }, end: Position { line: 1, character: 6 } }), entry=\"module\", titles=[\"Untitled\", \"clean.sv\", \"smoke-saved.sv\"], current_page=Some(2)",
+          "name": "find-next finds the needle through Document",
+          "ok": true
+        },
+        {
+          "detail": "2:1  |  /tmp/vd-app-selftest-41866/smoke-saved.sv  |  systemverilog  |  verible 1  |  slang 1  |  FIM: FIM 未启用  |  match at line 2  Verible LSP: generation 2",
+          "name": "status bar reports the cursor",
+          "ok": true
+        },
+        {
+          "detail": "path=/tmp/vedit.cM7Sos/VEdit/bin/slang",
+          "name": "VEDIT_SLANG is configured for the SLANG suite",
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "suite": "smoke"
+    },
+    {
+      "checks": [
+        {
+          "detail": "is_language_available(systemverilog)",
+          "name": "systemverilog language definition is available",
+          "ok": true
+        },
+        {
+          "detail": "is_language_available(verilog)",
+          "name": "verilog language definition is available",
+          "ok": true
+        },
+        {
+          "detail": "missing=[]",
+          "name": "no language definitions are missing",
+          "ok": true
+        },
+        {
+          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5a94eb016fa0, type: GtkSourceLanguage } })",
+          "name": "opened .sv with CJK/emoji content has a language",
+          "ok": true
+        },
+        {
+          "detail": "buffer contains 你好 and 😀",
+          "name": "CJK/emoji content is in the buffer",
+          "ok": true
+        },
+        {
+          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5a94eae7e8f0, type: GtkSourceLanguage } })",
+          "name": "opened .sv buffer has a language",
+          "ok": true
+        },
+        {
+          "detail": "scheme=Some(\"cobalt\")",
+          "name": "style scheme applies (cobalt)",
+          "ok": true
+        },
+        {
+          "detail": "warning=None",
+          "name": "startup language warning is absent in this image",
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "suite": "highlight"
+    },
+    {
+      "checks": [
+        {
+          "detail": "error=None",
+          "name": "configuration loads",
+          "ok": true
+        },
+        {
+          "detail": "tab_width=4",
+          "name": "editor settings are present",
+          "ok": true
+        },
+        {
+          "detail": "attempts=[\"env: /tmp/vedit.cM7Sos/VEdit/bin/verible-verilog-ls [found]\", \"env: /tmp/vedit.cM7Sos/VEdit/bin/verible-verilog-format [found]\", \"env: /tmp/vedit.cM7Sos/VEdit/bin/verible-verilog-lint [found]\"]",
+          "name": "Verible tool resolution records every attempt",
+          "ok": true
+        },
+        {
+          "detail": "no PATH attempt recorded",
+          "name": "tool resolution never uses PATH",
+          "ok": true
+        },
+        {
+          "detail": "format=Some(\"/tmp/vedit.cM7Sos/VEdit/bin/verible-verilog-format\"), lint=Some(\"/tmp/vedit.cM7Sos/VEdit/bin/verible-verilog-lint\")",
+          "name": "formatter and linter tool paths were resolved (or explicitly recorded as missing)",
+          "ok": true
+        },
+        {
+          "detail": "enabled=false",
+          "name": "FIM defaults to off",
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "suite": "config"
+    },
+    {
+      "checks": [
+        {
+          "detail": "path=/tmp/vedit.cM7Sos/VEdit/bin/verible-verilog-ls",
+          "name": "Verible language server binary exists",
+          "ok": true
+        },
+        {
+          "detail": "generation=Some(3)",
+          "name": "the real LSP publishes diagnostics",
+          "ok": true
+        },
+        {
+          "detail": "result=formatted",
+          "name": "one-key formatting returns and applies",
+          "ok": true
+        },
+        {
+          "detail": "before=62 bytes, after=81 bytes",
+          "name": "formatting changed the buffer",
+          "ok": true
+        },
+        {
+          "detail": "restored=true",
+          "name": "one undo restores the pre-format content (apply_edits_one_step)",
+          "ok": true
+        },
+        {
+          "detail": "path=Some(\"/tmp/vedit.cM7Sos/VEdit/share/vedit/testdata/definition/b.sv\"), cursor=Position { line: 0, character: 7 }",
+          "name": "F12 definition jumps to the target file/line/column",
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "suite": "lsp"
+    },
+    {
+      "checks": [
+        {
+          "detail": "path=/tmp/vedit.cM7Sos/VEdit/bin/slang",
+          "name": "SLANG binary exists",
+          "ok": true
+        },
+        {
+          "detail": "failure=None",
+          "name": "SLANG runs without a failure",
+          "ok": true
+        },
+        {
+          "detail": "total=1",
+          "name": "SLANG reports the undeclared identifier",
+          "ok": true
+        },
+        {
+          "detail": "ranges=[Some(Range { start: Position { line: 2, character: 4 }, end: Position { line: 2, character: 19 } })]",
+          "name": "SLANG positions convert to editor ranges",
+          "ok": true
+        },
+        {
+          "detail": "verible=1, slang=1, rows=2",
+          "name": "problem panel receives the SLANG diagnostics",
+          "ok": true
+        },
+        {
+          "detail": "marks=1, categories=[\"vedit-error\"]",
+          "name": "gutter marks the SLANG line",
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "suite": "slang"
+    },
+    {
+      "checks": [
+        {
+          "detail": "enabled=false",
+          "name": "FIM is disabled by default",
+          "ok": true
+        },
+        {
+          "detail": "reason=Some(\"FIM 未启用\")",
+          "name": "a disabled FIM has a short reason",
+          "ok": true
+        },
+        {
+          "detail": "before=0, after=0",
+          "name": "the off path starts no worker",
+          "ok": true
+        },
+        {
+          "detail": "pending=false, visible=false",
+          "name": "the off path shows no ghost text",
+          "ok": true
+        },
+        {
+          "detail": "6:1  |  /tmp/vd-app-selftest-41866/undeclared.sv  |  systemverilog  |  verible 1  |  slang 1  |  FIM: FIM 未启用  |  FIM 未启用  Verible LSP: generation 6",
+          "name": "the status bar explains why FIM is unavailable",
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "suite": "fim"
+    }
+  ],
+  "shortcut_table": "| action | shortcut | description |\n|---|---|---|\n| `open` | <Ctrl>o | open a file in a new tab |\n| `new` | <Ctrl>n | new untitled tab |\n| `save` | <Ctrl>s | save the current tab |\n| `save-as` | <Ctrl><Shift>s | save the current tab under a new path |\n| `close-tab` | <Ctrl>w | close the tab (confirms unsaved changes) |\n| `quit` | <Ctrl>q | quit the editor |\n| `undo` | <Ctrl>z | undo the last edit (native GtkSource undo) |\n| `redo` | <Ctrl><Shift>z | redo |\n| `find` | <Ctrl>f | show the find bar |\n| `replace` | <Ctrl>h | show the replace bar |\n| `find-next` | F3 | jump to the next match |\n| `goto-line` | <Ctrl>g | jump to a line |\n| `format` | <Ctrl><Shift>f | one-key format through the LSP, one undo step |\n| `slang` | <Ctrl><Shift>l | run SLANG deep lint into the problem panel |\n| `definition` | F12 | jump to the definition (LSP) |\n| `references` | <Shift>F12 | list references (LSP) |\n| `outline` | <Ctrl><Shift>o | document symbols of the current file |\n| `rename` | F2 | preview the LSP rename edits (nothing is applied) |\n| `fim` | <Alt>backslash | request an FIM completion as ghost text |\n| `toggle-panel` | <Ctrl><Shift>p | show/hide the problem panel |\n| `accept-fim` | Tab | insert the pending FIM completion through Document |\n| `cancel-fim` | Esc | discard the pending completion / cancel the request |\n",
+  "shortcuts": 22,
+  "suite": "all",
+  "version": "0.1.0"
+}

@@ -55,7 +55,7 @@ runtime_dirs() {
   mkdir -p /tmp/rtg /tmp/rtt
   XDG_RUNTIME_DIR=/tmp/rtg TMPDIR=/tmp/rtt "$APP" --selftest list >/dev/null 2>&1 && record AC-02 "runtime_dir valid" PASS "XDG_RUNTIME_DIR" || record AC-02 "runtime_dir valid" FAIL "XDG_RUNTIME_DIR"
   env -u XDG_RUNTIME_DIR TMPDIR=/tmp/rtt "$APP" --selftest list >/dev/null 2>&1 && record AC-02 "runtime_dir TMPDIR fallback" PASS "unset->TMPDIR" || record AC-02 "runtime_dir TMPDIR fallback" FAIL "unset->TMPDIR"
-  env XDG_RUNTIME_DIR=/nonexistent TMPDIR=/nonexistent "$APP" --selftest list >/tmp/badrt.log 2>&1; local rc=$?
+  env XDG_RUNTIME_DIR=/proc/nonexistent TMPDIR=/proc/nonexistent "$APP" --selftest list >/tmp/badrt.log 2>&1; local rc=$?
   [ $rc -ne 0 ] && grep -qiE 'runtime|tmp|tmpdir' /tmp/badrt.log && record AC-02 "runtime_dir loud failure" PASS "rc=$rc" || record AC-02 "runtime_dir loud failure" FAIL "rc=$rc"
 }
 
@@ -72,7 +72,7 @@ glibc() {
   [ $bad -eq 0 ] && record AC-01 "glibc max" PASS "tool=$tool highest=$max" || record AC-01 "glibc max" FAIL "tool=$tool highest=$max"
 }
 
-for artifact in $([ "$MODE" = both ] && echo "appimage tarball run" || echo "$MODE"); do
+for artifact in $([ "$MODE" = both ] && echo "appimage tarball" || echo "$MODE"); do
   mkdir -p "$OUT/$artifact"; REC=""
   if ! extract "$artifact"; then record AC-02 "extract" FAIL "$artifact"; printf "$REC" > "$OUT/$artifact/results.tsv"; continue; fi
   glibc
@@ -88,6 +88,25 @@ for artifact in $([ "$MODE" = both ] && echo "appimage tarball run" || echo "$MO
   printf "$REC" > "$OUT/$artifact/results.tsv"
   echo "== $artifact =="; cat "$OUT/$artifact/results.tsv"
 done
+# .run contract: official launcher runs the suite and cleans its extraction dir
+if [ "$MODE" = both ] || [ "$MODE" = run ]; then
+  mkdir -p "$OUT/run"
+  before=$(find /tmp -maxdepth 1 -name 'vedit.*' 2>/dev/null | wc -l)
+  sh "$RUNFILE" --selftest all > "$OUT/run/selftest-all.log" 2>&1
+  rc=$?
+  after=$(find /tmp -maxdepth 1 -name 'vedit.*' 2>/dev/null | wc -l)
+  [ $rc -eq 0 ] && grep -q '"ok": true' "$OUT/run/selftest-all.log" && record AC-02 ".run launcher selftest all" PASS "exit=0"; _=""
+  rec="AC-02	.run launcher selftest all	PASS	exit=0
+"; [ $rc -ne 0 ] && rec="AC-02	.run launcher selftest all	FAIL	exit=$rc
+"
+  rec2="AC-02	.run extraction cleanup	PASS	before=$before after=$after
+"; [ "$before" != "$after" ] && rec2="AC-02	.run extraction cleanup	FAIL	before=$before after=$after
+"
+  printf "$rec$rec2" > "$OUT/run/results.tsv"
+  echo "== run =="; cat "$OUT/run/results.tsv"
+  [ $rc -ne 0 ] && FAILS=$((FAILS+1))
+  [ "$before" != "$after" ] && FAILS=$((FAILS+1))
+fi
 echo "== manifest =="
 sha256sum "$APPIMAGE" "$TARBALL" "$RUNFILE" build/artifacts/vd-app 2>/dev/null
 [ "$FAILS" -eq 0 ] && { echo "T27E2E PASS"; exit 0; } || { echo "T27E2E FAILURES=$FAILS"; exit 1; }

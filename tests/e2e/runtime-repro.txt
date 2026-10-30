@@ -1,0 +1,76 @@
+# runtime-dir repro 2026-10-30T05:36:47Z  (clean room root, no WM)
+# Q1/Q2/Q3/Q4 per case: command line, executable, stdout/stderr, rc
+
+## case=none product=appimage
+CMD: XDG_RUNTIME_DIR=/nonexistent TMPDIR=/nonexistent /tmp/a/squashfs-root/AppRun --selftest list
+APP_PATH=/tmp/a/squashfs-root/AppRun
+RC=0
+STDOUT:
+smoke
+highlight
+config
+lsp
+slang
+fim
+STDERR:
+
+## case=none product=tar.gz
+CMD: XDG_RUNTIME_DIR=/nonexistent TMPDIR=/nonexistent /tmp/t/VEdit/bin/vedit --selftest list
+APP_PATH=/tmp/t/VEdit/bin/vedit
+RC=0
+STDOUT:
+smoke
+highlight
+config
+lsp
+slang
+fim
+STDERR:
+
+## case=proc product=appimage
+CMD: XDG_RUNTIME_DIR=/proc/nonexistent TMPDIR=/proc/nonexistent /tmp/a/squashfs-root/AppRun --selftest list
+APP_PATH=/tmp/a/squashfs-root/AppRun
+RC=1
+STDOUT:
+STDERR:
+vedit: cannot create a runtime directory; tried '/proc/nonexistent' and '/proc/nonexistent'
+vedit: set XDG_RUNTIME_DIR (or TMPDIR) to a writable directory and retry
+
+## case=proc product=tar.gz
+CMD: XDG_RUNTIME_DIR=/proc/nonexistent TMPDIR=/proc/nonexistent /tmp/t/VEdit/bin/vedit --selftest list
+APP_PATH=/tmp/t/VEdit/bin/vedit
+RC=1
+STDOUT:
+STDERR:
+vedit: cannot create a runtime directory; tried '/proc/nonexistent' and '/proc/nonexistent'
+vedit: set XDG_RUNTIME_DIR (or TMPDIR) to a writable directory and retry
+
+## .run
+CMD: sh /tmp/a/...run --selftest all (from /tmp)
+RC=0
+{
+  "app": "VEdit",
+  "fixture_root": "/tmp/vedit.nj1GOF/VEdit/share/vedit/testdata",
+  "ok": true,
+  "reports": [
+VEdit: extracting to /tmp/vedit.nj1GOF
+vd-app selftest: fixture_root=/tmp/vedit.nj1GOF/VEdit/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/vedit.nj1GOF/VEdit/share/vedit/testdata"))
+
+(vd-app:89): GLib-GIO-CRITICAL **: 05:36:47.692: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+vd-app: configuration warnings: 1
+
+## AppImage FUSE variants (no /dev/fuse expected)
+EXTRACT_AND_RUN_RC=0
+{
+  "app": "VEdit",
+  "fixture_root": "/tmp/appimage_extracted_5b97834aec649e3cff4c072d62eba520/usr/share/vedit/testdata",
+vd-app selftest: fixture_root=/tmp/appimage_extracted_5b97834aec649e3cff4c072d62eba520/usr/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/appimage_extracted_5b97834aec649e3cff4c072d62eba520/usr/share/vedit/testdata"))
+
+(vd-app:148): GLib-GIO-CRITICAL **: 05:36:49.803: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+ENV_EXTRACT_RUN_RC=0
+{
+  "app": "VEdit",
+  "fixture_root": "/tmp/appimage_extracted_5b97834aec649e3cff4c072d62eba520/usr/share/vedit/testdata",
+vd-app selftest: fixture_root=/tmp/appimage_extracted_5b97834aec649e3cff4c072d62eba520/usr/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/appimage_extracted_5b97834aec649e3cff4c072d62eba520/usr/share/vedit/testdata"))
+
+(vd-app:208): GLib-GIO-CRITICAL **: 05:36:51.490: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed

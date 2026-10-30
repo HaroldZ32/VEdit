@@ -1,1 +1,2 @@
-AC-02	extract	FAIL	run
+AC-02	.run launcher selftest all	PASS	exit=0
+AC-02	.run extraction cleanup	PASS	before=0 after=0
