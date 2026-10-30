@@ -26,6 +26,28 @@ pub struct Document {
     state: RefCell<State>,
 }
 
+/// One replacement edit in a batch applied by
+/// [`Document::apply_edits_one_step`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Edit {
+    /// The range to replace.
+    pub range: Range,
+    /// Replacement text. Its own line endings are preserved for the line breaks
+    /// it introduces (a plain `\n` stays `\n`).
+    pub text: String,
+}
+
+impl Edit {
+    /// A replacement of `range` with `text`.
+    #[must_use]
+    pub fn new(range: Range, text: impl Into<String>) -> Self {
+        Self {
+            range,
+            text: text.into(),
+        }
+    }
+}
+
 struct State {
     path: Option<PathBuf>,
     /// One line ending per `'\n'` in the buffer text.
@@ -174,6 +196,58 @@ impl Document {
     /// Returns an error for an invalid range.
     pub fn replace(&self, range: Range, text: &str) -> Result<String, Error> {
         self.with_user_action(|| self.replace_impl(range, text))
+    }
+
+    /// Apply several non-overlapping edits as **one undo step**.
+    ///
+    /// The edits go through the same text path as [`Document::replace`], so the
+    /// per-line line-ending bookkeeping stays in sync with the buffer. Edits are
+    /// applied from the end of the document backwards, so the offsets of edits
+    /// that come earlier stay valid; two edits that overlap are rejected with
+    /// [`Error::OverlappingEdits`] *before* anything is changed.
+    ///
+    /// This is the entry the UI lane must use for multi-edit responses and for
+    /// formatting: writing to the buffer directly would desynchronise the
+    /// line-ending bookkeeping.
+    ///
+    /// # Errors
+    /// Returns [`Error::InvalidPosition`] / [`Error::SplitSurrogate`] for an
+    /// invalid range and [`Error::OverlappingEdits`] for overlapping edits.
+    pub fn apply_edits_one_step(&self, edits: &[Edit]) -> Result<(), Error> {
+        if edits.is_empty() {
+            return Ok(());
+        }
+        let text = self.text();
+        let mut resolved: Vec<(usize, usize, usize, &Edit)> = Vec::with_capacity(edits.len());
+        for (index, edit) in edits.iter().enumerate() {
+            let start = resolve_offset(&text, edit.range.start)?;
+            let end = resolve_offset(&text, edit.range.end)?;
+            if start > end {
+                return Err(Error::InvalidPosition(edit.range.start));
+            }
+            resolved.push((start, end, index, edit));
+        }
+        // Sort by start offset, then by input order. Applying from the back keeps
+        // the offsets of the edits that come earlier valid; same-position
+        // insertions end up in input order.
+        resolved.sort_by_key(|(start, _, index, _)| (*start, *index));
+        for pair in resolved.windows(2) {
+            if pair[1].0 < pair[0].1 {
+                return Err(Error::OverlappingEdits {
+                    first: pair[0].3.range,
+                    second: pair[1].3.range,
+                });
+            }
+        }
+        self.with_user_action(|| {
+            let mut changed = false;
+            for (_, _, _, edit) in resolved.iter().rev() {
+                let (_, deleted) = self.delete_impl(edit.range)?;
+                let inserted = self.insert_impl(edit.range.start, &edit.text)?;
+                changed |= deleted || inserted;
+            }
+            Ok(((), changed))
+        })
     }
 
     fn insert_impl(&self, position: Position, text: &str) -> Result<bool, Error> {
@@ -983,6 +1057,127 @@ mod tests {
             "a no-op edit must not add an undo step"
         );
         assert!(!document.is_modified());
+    }
+
+    #[test]
+    fn batch_edits_are_one_undo_step() {
+        let _gtk = gtk_test_lock();
+        let document = Document::from_text("alpha beta gamma");
+        let original = document.text();
+        document
+            .apply_edits_one_step(&[
+                Edit::new(
+                    Range::new(Position::new(0, 0), Position::new(0, 5)),
+                    "ALPHA",
+                ),
+                Edit::new(
+                    Range::new(Position::new(0, 11), Position::new(0, 16)),
+                    "GAMMA",
+                ),
+            ])
+            .unwrap_or_else(|error| panic!("batch edit failed: {error}"));
+        assert_eq!(document.text(), "ALPHA beta GAMMA");
+        assert!(document.undo());
+        assert_eq!(document.text(), original, "one undo restores the original");
+        assert!(document.redo());
+        assert_eq!(document.text(), "ALPHA beta GAMMA");
+    }
+
+    #[test]
+    fn batch_edits_keep_mixed_line_endings_line_by_line() {
+        let _gtk = gtk_test_lock();
+        let dir = TestDir::new("batch-endings");
+        let path = dir.file("mixed.sv");
+        fs::write(&path, "a\r\nb\nc\r\n").unwrap_or_else(|error| panic!("write failed: {error}"));
+        let document = Document::open(&path).unwrap_or_else(|error| panic!("open failed: {error}"));
+        document
+            .apply_edits_one_step(&[
+                Edit::new(Range::new(Position::new(0, 0), Position::new(0, 1)), "A"),
+                Edit::new(Range::new(Position::new(2, 0), Position::new(2, 1)), "C"),
+            ])
+            .unwrap_or_else(|error| panic!("batch edit failed: {error}"));
+        document
+            .save()
+            .unwrap_or_else(|error| panic!("save failed: {error}"));
+        assert_eq!(
+            fs::read_to_string(&path).unwrap_or_default(),
+            "A\r\nb\nC\r\n",
+            "unchanged line breaks keep CRLF/LF per line"
+        );
+        assert!(document.undo());
+        document
+            .save()
+            .unwrap_or_else(|error| panic!("save after undo failed: {error}"));
+        assert_eq!(
+            fs::read_to_string(&path).unwrap_or_default(),
+            "a\r\nb\nc\r\n",
+            "undo restores the original line endings too"
+        );
+    }
+
+    #[test]
+    fn overlapping_batch_edits_are_rejected_without_changes() {
+        let _gtk = gtk_test_lock();
+        let document = Document::from_text("0123456789");
+        let error = match document.apply_edits_one_step(&[
+            Edit::new(Range::new(Position::new(0, 0), Position::new(0, 5)), "A"),
+            Edit::new(Range::new(Position::new(0, 3), Position::new(0, 8)), "B"),
+        ]) {
+            Ok(()) => panic!("overlapping edits must be rejected"),
+            Err(error) => error,
+        };
+        match error {
+            Error::OverlappingEdits { .. } => {}
+            other => panic!("expected OverlappingEdits, got {other:?}"),
+        }
+        assert_eq!(document.text(), "0123456789");
+        assert!(
+            !document.can_undo(),
+            "a rejected batch must not add an undo step"
+        );
+    }
+
+    #[test]
+    fn unsorted_batch_edits_apply_in_offset_order() {
+        let _gtk = gtk_test_lock();
+        let document = Document::from_text("one two three");
+        let original = document.text();
+        document
+            .apply_edits_one_step(&[
+                Edit::new(
+                    Range::new(Position::new(0, 8), Position::new(0, 13)),
+                    "THREE",
+                ),
+                Edit::new(Range::new(Position::new(0, 0), Position::new(0, 3)), "ONE"),
+            ])
+            .unwrap_or_else(|error| panic!("batch edit failed: {error}"));
+        assert_eq!(document.text(), "ONE two THREE");
+        assert!(document.undo());
+        assert_eq!(document.text(), original);
+    }
+
+    #[test]
+    fn same_position_insertions_keep_input_order() {
+        let _gtk = gtk_test_lock();
+        let document = Document::from_text("ab");
+        document
+            .apply_edits_one_step(&[
+                Edit::new(Range::point(Position::new(0, 1)), "X"),
+                Edit::new(Range::point(Position::new(0, 1)), "Y"),
+            ])
+            .unwrap_or_else(|error| panic!("batch insert failed: {error}"));
+        assert_eq!(document.text(), "aXYb");
+    }
+
+    #[test]
+    fn empty_batch_is_a_noop_without_undo_step() {
+        let _gtk = gtk_test_lock();
+        let document = Document::from_text("abc");
+        document
+            .apply_edits_one_step(&[])
+            .unwrap_or_else(|error| panic!("empty batch failed: {error}"));
+        assert_eq!(document.text(), "abc");
+        assert!(!document.can_undo());
     }
 
     #[test]

@@ -23,6 +23,7 @@ mod position;
 mod save;
 
 pub use document::Document;
+pub use document::Edit;
 pub use line_ending::LineEnding;
 pub use position::{
     advance_position, char_index_to_utf16, char_offset_to_position, line_start_char_offset,
@@ -47,6 +48,13 @@ pub enum Error {
     SplitSurrogate(Position),
     /// The bookkeeping of line endings and the buffer text disagree.
     LineEndingMismatch,
+    /// A batch of edits contained two overlapping ranges.
+    OverlappingEdits {
+        /// The earlier range (by start offset).
+        first: Range,
+        /// The range that overlaps it.
+        second: Range,
+    },
 }
 
 impl fmt::Display for Error {
@@ -67,6 +75,9 @@ impl fmt::Display for Error {
             ),
             Self::LineEndingMismatch => {
                 f.write_str("line-ending bookkeeping does not match the buffer text")
+            }
+            Self::OverlappingEdits { first, second } => {
+                write!(f, "edits overlap: {:?} and {:?}", first, second)
             }
         }
     }
