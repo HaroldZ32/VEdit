@@ -1,0 +1,56 @@
+# Why the editor storage is GtkSourceBuffer + native undo (no rope) — T9
+# generated: 2026-10-30T03:43:35Z
+# Container: sha256:21bc713ccbf020cdc76f566f12c15e46e84cb40529e48263e6f09a04d6b4048f (pinned CentOS 7 image)
+
+## Probe 1: a GtkTextBuffer works with no DISPLAY (headless unit tests)
+$ docker run --rm vedit-build:local bash -c "gcc /tmp/t.c -o /tmp/t $(pkg-config --cflags --libs gtk+-3.0) && /tmp/t"
+--- source (compiled inside the container):
+#include <gtk/gtk.h>
+#include <stdio.h>
+int main(void) {
+  GtkTextBuffer *b = gtk_text_buffer_new(NULL);
+  gtk_text_buffer_set_text(b, "hello", -1);
+  GtkTextIter start, end;
+  gtk_text_buffer_get_bounds(b, &start, &end);
+  char *text = gtk_text_buffer_get_text(b, &start, &end, TRUE);
+  printf("no-display buffer ok: %s\n", text);
+  g_free(text);
+  return 0;
+}
+--- observed output:
+no-display buffer ok: hello
+exit=0
+
+## Probe 2: the GtkSourceBuffer native undo manager works headless
+$ docker run --rm vedit-build:local bash -c "gcc /tmp/u.c ... $(pkg-config --cflags --libs gtksourceview-4) && /tmp/u"
+--- source (compiled inside the container):
+#include <gtksourceview/gtksource.h>
+#include <stdio.h>
+int main(void) {
+  GtkSourceBuffer *b = gtk_source_buffer_new(NULL);
+  GtkTextIter it;
+  gtk_text_buffer_get_start_iter(GTK_TEXT_BUFFER(b), &it);
+  gtk_text_buffer_insert(GTK_TEXT_BUFFER(b), &it, "hello", -1);
+  GtkSourceUndoManager *m = gtk_source_buffer_get_undo_manager(b);
+  printf("manager=%p can_undo=%d\n", (void*)m, gtk_source_buffer_can_undo(b));
+  gtk_source_buffer_undo(b);
+  GtkTextIter s, e; gtk_text_buffer_get_bounds(GTK_TEXT_BUFFER(b), &s, &e);
+  char *t = gtk_text_buffer_get_text(GTK_TEXT_BUFFER(b), &s, &e, TRUE);
+  printf("after undo text=[%s] can_undo=%d can_redo=%d\n", t, gtk_source_buffer_can_undo(b), gtk_source_buffer_can_redo(b));
+  gtk_source_buffer_redo(b);
+  gtk_text_buffer_get_bounds(GTK_TEXT_BUFFER(b), &s, &e);
+  t = gtk_text_buffer_get_text(GTK_TEXT_BUFFER(b), &s, &e, TRUE);
+  printf("after redo text=[%s]\n", t);
+  return 0;
+}
+--- observed output:
+manager=0x274bba0 can_undo=1
+after undo text=[] can_undo=0 can_redo=1
+after redo text=[hello]
+exit=0
+
+## Probe 3: the buffer records its initial load as an undo action
+$ docker run --rm vedit-build:local ... gtk_text_buffer_set_text(...) then can_undo
+observed: after-load can_undo=1; after an edit inside a user action: undo1 -> loaded text, undo2 -> empty buffer.
+=> Document exposes only its own edits through can_undo/undo; the load action stays in the
+   native stack but is never reachable (a freshly opened document cannot be undone to empty).

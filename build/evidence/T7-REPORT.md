@@ -2,9 +2,18 @@
 
 Cell `cell-20261030T020634155Z` · task **T7** · owner **Senior Engineer**
 Write scope used: `Cargo.toml`, `Cargo.lock`, `rust-toolchain.toml`,
-`crates/*/Cargo.toml`, `crates/vd-app/**`, `scripts/**`, `AGENT.md`, plus the two
-gate-wiring files the captain's rulings made necessary (`build/gates/gates.sh`
-delegating to `scripts/gates.sh`).
+`crates/*/Cargo.toml`, `crates/vd-app/**`, `scripts/**`, `AGENT.md`, plus:
+1. the six lane stub modules `crates/vd-editor/src/lib.rs`,
+   `crates/vd-syntax/src/lib.rs`, `crates/vd-lsp/src/lib.rs`,
+   `crates/vd-deeplint/src/lib.rs`, `crates/vd-fim/src/lib.rs`,
+   `crates/vd-config/src/lib.rs` — the contract's Deliverable requires a stub per
+   crate but its Allowed write scopes list only `crates/*/Cargo.toml` and
+   `crates/vd-app/**`; without the stub module the workspace does not compile.
+   **Retroactively authorised by the captain on 2026-10-30** (contract conflict
+   between §Deliverable and §Allowed write scopes), limited to exactly these six
+   files — not to the lanes' full write scopes;
+2. the gate-wiring file `build/gates/gates.sh` (delegates to `scripts/gates.sh`),
+   as required by the captain's gate ruling.
 Governing contract: the cell record's skeleton contract (`contracts/T3.md`,
 matching the dispatched T7 text) — branch A locked by T5
 (`build/gui-spike/REPORT.md`): gtk-rs **0.18** generation + GtkSourceView

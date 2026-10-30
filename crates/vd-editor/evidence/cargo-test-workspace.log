@@ -1,0 +1,164 @@
+   Compiling vd-config v0.1.0 (/vedit-build/crates/vd-config)
+   Compiling vd-syntax v0.1.0 (/vedit-build/crates/vd-syntax)
+   Compiling vd-editor v0.1.0 (/vedit-build/crates/vd-editor)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.26s
+     Running unittests src/main.rs (target/debug/deps/vd_app-a8614d22a89fffe0)
+
+running 4 tests
+test cli::tests::positional_file_is_opened ... ok
+test cli::tests::unknown_selftest_suite_is_rejected ... ok
+test cli::tests::unknown_option_is_rejected ... ok
+test cli::tests::selftest_smoke_is_accepted ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_config-12b7b22329bb91d1)
+
+running 28 tests
+test env::tests::no_home_means_no_default_directories ... ok
+test env::tests::xdg_explicit_absolute_values_win ... ok
+test env::tests::relative_xdg_value_falls_back_and_is_reported ... ok
+test env::tests::xdg_defaults_come_from_home ... ok
+test model::tests::defaults_match_the_requirements ... ok
+test model::tests::a_partial_document_keeps_the_defaults_for_absent_keys ... ok
+test project::tests::define_parsing ... ok
+test provenance::tests::lists_reduce_to_their_length ... ok
+test provenance::tests::precedence_chain_is_recorded_nearest_first_in_overridden_by ... ok
+test filelist::tests::parses_entries_comments_incdirs_defines_and_nested_filelists ... ok
+test provenance::tests::secret_leaf_is_redacted_even_when_the_layer_carries_the_raw_value ... ok
+test filelist::tests::missing_nested_filelist_is_reported_not_fatal ... ok
+test project::tests::root_discovery_falls_back_to_the_start_directory ... ok
+test provenance::tests::empty_secret_is_reported_as_unset ... ok
+test secret::tests::expose_secret_is_the_only_way_out ... ok
+test filelist::tests::detects_cycles_and_duplicates ... ok
+test render::tests::json_carries_the_schema_version_and_tool_attempts_even_on_success ... ok
+test secret::tests::serialization_is_redacted ... ok
+test secret::tests::debug_is_redacted ... ok
+test tests::parse_layer_reports_a_line_without_quoting_the_source ... ok
+test render::tests::table_renders_redacted_secret_and_overridden_by ... ok
+test tests::deep_merge_keeps_unrelated_keys_and_replaces_lists ... ok
+test project::tests::root_discovery_prefers_vedit_toml_then_git ... ok
+test tools::tests::failure_lists_every_attempt_and_never_mentions_path_lookup ... ok
+test tools::tests::configured_path_wins ... ok
+test tools::tests::missing_config_falls_through_to_env_and_records_both_attempts ... ok
+test tools::tests::bundled_payload_is_found_next_to_the_executable ... ok
+test filelist::tests::depth_limit_is_enforced ... ok
+
+test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/config_behaviour.rs (target/debug/deps/config_behaviour-4e134bf0495b6a7c)
+
+running 12 tests
+test environment_variables_override_fim_settings_and_record_their_source ... ok
+test an_invalid_configuration_file_degrades_to_the_lower_layer ... ok
+test defaults_apply_when_nothing_is_configured ... ok
+test the_user_layer_applies_from_the_xdg_config_home ... ok
+test an_unknown_key_is_ignored_while_the_rest_of_the_file_applies ... ok
+test a_relative_configured_tool_path_is_resolved_against_the_project_root ... ok
+test a_relative_xdg_variable_is_reported_and_the_default_is_used ... ok
+test project_discovery_finds_filelists_rules_includes_defines_and_upward_rules ... ok
+test configured_filelists_and_project_settings_are_merged_with_discovered_ones ... ok
+test the_project_layer_overrides_the_user_layer_per_key_and_inherits_the_rest ... ok
+test the_two_renderings_agree_and_stay_safe ... ok
+test tool_resolution_records_every_attempt_even_on_success ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/secret_discipline.rs (target/debug/deps/secret_discipline-62453af0593d6965)
+
+running 4 tests
+test the_secret_is_only_reachable_through_the_explicit_accessor ... ok
+test a_configured_and_an_environment_secret_never_leave_the_config_layer ... ok
+test the_default_configuration_carries_no_endpoint_or_key ... ok
+test a_rejected_configuration_file_never_quotes_its_secret_in_the_warning ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_deeplint-ee46bb90426d3781)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_editor-622766084adcb803)
+
+running 36 tests
+test document::tests::atomic_save_failure_keeps_the_file_and_the_dirty_flag ... ok
+test document::tests::delete_spanning_lines_returns_the_removed_text ... ok
+test document::tests::crlf_file_saves_with_crlf_line_endings ... ok
+test line_ending::tests::assemble_falls_back_to_the_default_when_breaks_run_out ... ok
+test line_ending::tests::delete_bookkeeping_keeps_the_surviving_ending ... ok
+test document::tests::dirty_tracking_and_close_confirmation ... ok
+test line_ending::tests::delete_through_the_end_drops_the_last_ending ... ok
+test document::tests::empty_insert_does_not_create_an_undo_step ... ok
+test line_ending::tests::detects_lf_crlf_and_cr ... ok
+test line_ending::tests::insert_at_end_without_trailing_break ... ok
+test line_ending::tests::insert_bookkeeping_moves_the_original_ending_to_the_last_new_line ... ok
+test line_ending::tests::mixed_line_endings_keep_their_order ... ok
+test position::tests::ascii_offsets ... ok
+test document::tests::edit_undo_redo_round_trip ... ok
+test position::tests::chinese_and_emoji_utf16_offsets ... ok
+test position::tests::line_utf16_len_counts_units_not_chars ... ok
+test position::tests::positions_round_trip_on_mixed_text ... ok
+test document::tests::find_and_replace ... ok
+test save::tests::missing_parent_directory_is_rejected_without_touching_anything ... ok
+test save::tests::failure_while_writing_the_temp_file_keeps_the_original ... ok
+test document::tests::find_is_case_insensitive_when_asked ... ok
+test document::tests::line_ranges_support_go_to_line ... ok
+test document::tests::freshly_loaded_document_cannot_undo_the_load ... ok
+test document::tests::lsp_positions_on_chinese_and_emoji ... ok
+test save::tests::crash_before_rename_keeps_the_original ... ok
+test save::tests::permission_denied_at_rename_keeps_the_original ... ok
+test document::tests::mixed_line_endings_are_preserved_line_by_line ... ok
+test document::tests::new_document_is_clean ... ok
+test save::tests::replaces_existing_content ... ok
+test save::tests::temp_file_lives_in_the_target_directory ... ok
+test save::tests::writes_a_new_file ... ok
+test document::tests::readonly_probe_does_not_matter_because_rename_is_the_guard ... ok
+test document::tests::replace_is_one_undo_step ... ok
+test document::tests::save_and_reopen_round_trip ... ok
+test document::tests::save_as_rejects_a_missing_directory ... ok
+test document::tests::undo_after_an_edit_keeps_the_original_line_endings ... ok
+
+test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_fim-8faf8ff117f884ba)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_lsp-fc1c3de30c321f8d)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_syntax-0963751058142327)
+
+running 6 tests
+test detect::tests::extension_matching_is_case_insensitive ... ok
+test detect::tests::language_ids_are_the_upstream_gtksourceview_ids ... ok
+test detect::tests::systemverilog_extensions_map_to_systemverilog ... ok
+test detect::tests::unknown_extensions_are_plain_text ... ok
+test detect::tests::verilog_extensions_map_to_verilog ... ok
+test detect::tests::supported_table_is_exactly_the_contract_table ... FAILED
+
+failures:
+
+---- detect::tests::supported_table_is_exactly_the_contract_table stdout ----
+
+thread 'detect::tests::supported_table_is_exactly_the_contract_table' (1087) panicked at crates/vd-syntax/src/detect.rs:159:9:
+assertion `left == right` failed
+  left: [("sv", SystemVerilog), ("svh", SystemVerilog), ("svi", SystemVerilog), ("v", Verilog), ("vh", Verilog)]
+ right: [("svi", SystemVerilog), ("sv", SystemVerilog), ("svh", SystemVerilog), ("v", Verilog), ("vh", Verilog)]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    detect::tests::supported_table_is_exactly_the_contract_table
+
+test result: FAILED. 5 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p vd-syntax --lib`
+exit=101

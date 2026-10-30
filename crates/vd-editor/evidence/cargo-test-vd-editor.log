@@ -1,0 +1,51 @@
+   Compiling vd-editor v0.1.0 (/vedit-build/crates/vd-editor)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.76s
+     Running unittests src/lib.rs (target/debug/deps/vd_editor-323923454ee5b20b)
+
+running 36 tests
+test document::tests::atomic_save_failure_keeps_the_file_and_the_dirty_flag ... ok
+test document::tests::delete_spanning_lines_returns_the_removed_text ... ok
+test document::tests::crlf_file_saves_with_crlf_line_endings ... ok
+test line_ending::tests::assemble_falls_back_to_the_default_when_breaks_run_out ... ok
+test line_ending::tests::delete_bookkeeping_keeps_the_surviving_ending ... ok
+test document::tests::dirty_tracking_and_close_confirmation ... ok
+test line_ending::tests::delete_through_the_end_drops_the_last_ending ... ok
+test line_ending::tests::detects_lf_crlf_and_cr ... ok
+test line_ending::tests::insert_at_end_without_trailing_break ... ok
+test document::tests::edit_undo_redo_round_trip ... ok
+test line_ending::tests::insert_bookkeeping_moves_the_original_ending_to_the_last_new_line ... ok
+test line_ending::tests::mixed_line_endings_keep_their_order ... ok
+test document::tests::empty_insert_does_not_create_an_undo_step ... ok
+test position::tests::ascii_offsets ... ok
+test position::tests::chinese_and_emoji_utf16_offsets ... ok
+test position::tests::line_utf16_len_counts_units_not_chars ... ok
+test position::tests::positions_round_trip_on_mixed_text ... ok
+test document::tests::find_is_case_insensitive_when_asked ... ok
+test document::tests::find_and_replace ... ok
+test document::tests::line_ranges_support_go_to_line ... ok
+test save::tests::missing_parent_directory_is_rejected_without_touching_anything ... ok
+test save::tests::failure_while_writing_the_temp_file_keeps_the_original ... ok
+test document::tests::lsp_positions_on_chinese_and_emoji ... ok
+test save::tests::crash_before_rename_keeps_the_original ... ok
+test save::tests::permission_denied_at_rename_keeps_the_original ... ok
+test save::tests::temp_file_lives_in_the_target_directory ... ok
+test save::tests::writes_a_new_file ... ok
+test save::tests::replaces_existing_content ... ok
+test document::tests::mixed_line_endings_are_preserved_line_by_line ... ok
+test document::tests::freshly_loaded_document_cannot_undo_the_load ... ok
+test document::tests::new_document_is_clean ... ok
+test document::tests::readonly_probe_does_not_matter_because_rename_is_the_guard ... ok
+test document::tests::replace_is_one_undo_step ... ok
+test document::tests::save_and_reopen_round_trip ... ok
+test document::tests::save_as_rejects_a_missing_directory ... ok
+test document::tests::undo_after_an_edit_keeps_the_original_line_endings ... ok
+
+test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+   Doc-tests vd_editor
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+exit=0
