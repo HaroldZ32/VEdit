@@ -36,6 +36,11 @@ VEdit/
   etc/{loaders.cache,immodules.cache,fonts.conf}.in   @APPDIR@ placeholders
 ```
 
+The launcher resolves its runtime cache directory `XDG_RUNTIME_DIR` first and falls back to
+`$TMPDIR` with a one-line explanation when that directory cannot be created (an unusable
+`XDG_RUNTIME_DIR`, `/proc/...`, a read-only mount); only when both fail does it exit 1 listing
+both attempted paths (`evidence/45-runtime-fallback-*.log`).
+
 The launcher sets, relative to `$HERE`: `LD_LIBRARY_PATH`, `GDK_PIXBUF_MODULE_FILE`,
 `GTK_IM_MODULE_FILE`, `GSETTINGS_SCHEMA_DIR`, `GTK_DATA_PREFIX`/`GTK_EXE_PREFIX`/`GTK_PATH`,
 `FONTCONFIG_FILE`/`FONTCONFIG_PATH`, `XDG_DATA_DIRS`, `VEDIT_GSV_DATADIR`,

@@ -237,6 +237,33 @@ grep -q 'VEDIT_SELFTEST_FIXTURES=.*share/vedit/testdata' "$EVID/32-launcher-env.
   && say "PASS VEDIT_SELFTEST_FIXTURES points at the packaged fixtures" \
   || fail "VEDIT_SELFTEST_FIXTURES is not pointing at the payload"
 
+say "== runtime directory: unusable XDG_RUNTIME_DIR must fall back, not abort =="
+XDG_RUNTIME_DIR=/proc/nonexistent timeout 120 "$TARDIR/vedit.sh" --selftest smoke \
+  >"$EVID/45-runtime-fallback-targz.log" 2>&1
+check "runtime_fallback_targz" "$?" "exit=$?  (log 45-runtime-fallback-targz.log)"
+if grep -q 'cannot use XDG_RUNTIME_DIR=/proc/nonexistent' "$EVID/45-runtime-fallback-targz.log"; then
+  say "PASS the launcher reported the runtime-directory fallback"
+else
+  fail "the launcher did not report the runtime-directory fallback"
+fi
+XDG_RUNTIME_DIR=/proc/nonexistent timeout 120 sh "$RUNFILE" --selftest smoke \
+  >"$EVID/46-runtime-fallback-run.log" 2>&1
+check "runtime_fallback_run" "$?" "exit=$?  (log 46-runtime-fallback-run.log)"
+grep -q 'cannot use XDG_RUNTIME_DIR=/proc/nonexistent' "$EVID/46-runtime-fallback-run.log" \
+  && say "PASS the .run path reports the same fallback" \
+  || fail "the .run path did not report the fallback"
+
+say "== runtime directory: both candidates unusable must fail with both paths =="
+XDG_RUNTIME_DIR=/proc/nonexistent TMPDIR=/proc/nonexistent timeout 60 "$TARDIR/vedit.sh" --selftest smoke \
+  >"$EVID/47-runtime-both-fail.log" 2>&1
+rc=$?
+if [ "$rc" -eq 1 ] \
+   && grep -q "'/proc/nonexistent' and '/proc/nonexistent'" "$EVID/47-runtime-both-fail.log"; then
+  say "PASS both-unusable exits 1 and names both attempted paths"
+else
+  fail "both-unusable did not fail as expected (exit=$rc)"
+fi
+
 say "== tar.gz: input-method modules really load =="
 grep -c 'im-xim\.so' "$TARDIR/etc/immodules.cache.in" >/dev/null 2>&1 \
   && say "PASS immodules cache contains im-xim.so" || fail "im-xim.so missing from the cache"

@@ -21,23 +21,22 @@
 [clean-room:full] == CJK: a real screenshot with Chinese comments (product path) ==
 [clean-room:full] PASS cjk_screenshot (exit=0  (path /evid/shots/targz-cjk.png))
 # CJK screenshot evidence
-5270 bytes  /evid/shots/targz-cjk.png
-b7bb79ab7208ca74ba80636714b5ae857165bbb33ff28ade6f4be55e1f5f502d  /evid/shots/targz-cjk.png
+58080 bytes  /evid/shots/targz-cjk.png
+6631e9419e24d837c0d89b9dd36edfe801fd97bb7c7f5190accf741b9780eac3  /evid/shots/targz-cjk.png
 identify mean/stddev (stddev>0.02 means real content, not a blank surface):
-mean=0 stddev=0 size=1120x780
-[clean-room:full] KNOWN-LIMITATION --screenshot is blank in a WM-less container (stddev=0):
-[clean-room:full]   gtk_widget_draw: assertion '!widget->priv->alloc_needed' failed (T21 capture path)
+mean=0.400183 stddev=0.402578 size=1120x780
+[clean-room:full] PASS the CJK screenshot renders content (stddev=0.402578)
 [clean-room:full] == CJK: X-server capture of the real window (authoritative) ==
 [clean-room:full] PASS cjk_x11_capture (import -window root exit=0)
 # X-server capture of the packaged editor showing Chinese text
-50807 bytes  /evid/shots/targz-cjk-x11.png
-fafcd3f59b6d8a3cc8ac462330752aae40b4644a4aa2968ffe69fa6e9d69675c  /evid/shots/targz-cjk-x11.png
+50713 bytes  /evid/shots/targz-cjk-x11.png
+d8efd172d459c1c08e18dedec8a45bb0c2ed37e64ff284768640e8d1b9daa05e  /evid/shots/targz-cjk-x11.png
 identify mean/stddev: mean=0.30408 stddev=0.392207 size=1280x900
 [clean-room:full] PASS the X-server capture shows the rendered editor (stddev=0.392207)
 [clean-room:full] == tar.gz: window presence + screenshot ==
-[clean-room:full] PASS targz_screenshot_smoke (exit=0  (/evid/shots/targz-window-smoke.png 5270 bytes))
-[clean-room:full] PASS targz_screenshot_highlight (exit=0  (/evid/shots/targz-window-highlight.png 5270 bytes))
-[clean-room:full] PASS targz_window_visible (first xwininfo hit at 62ms)
+[clean-room:full] PASS targz_screenshot_smoke (exit=0  (/evid/shots/targz-window-smoke.png 35286 bytes))
+[clean-room:full] PASS targz_screenshot_highlight (exit=0  (/evid/shots/targz-window-highlight.png 33744 bytes))
+[clean-room:full] PASS targz_window_visible (first xwininfo hit at 115ms)
 [clean-room:full] == tar.gz: launcher environment (GTK_IM_MODULE_FILE etc.) ==
 LAUNCHER_DIR=/tmp/tarroot/VEdit
 LD_LIBRARY_PATH=/tmp/tarroot/VEdit/lib
@@ -52,6 +51,13 @@ VEDIT_SLANG=/tmp/tarroot/VEdit/bin/slang
 VEDIT_SELFTEST_FIXTURES=/tmp/tarroot/VEdit/share/vedit/testdata
 [clean-room:full] PASS GTK_IM_MODULE_FILE points at the rewritten cache
 [clean-room:full] PASS VEDIT_SELFTEST_FIXTURES points at the packaged fixtures
+[clean-room:full] == runtime directory: unusable XDG_RUNTIME_DIR must fall back, not abort ==
+[clean-room:full] PASS runtime_fallback_targz (exit=0  (log 45-runtime-fallback-targz.log))
+[clean-room:full] PASS the launcher reported the runtime-directory fallback
+[clean-room:full] PASS runtime_fallback_run (exit=0  (log 46-runtime-fallback-run.log))
+[clean-room:full] PASS the .run path reports the same fallback
+[clean-room:full] == runtime directory: both candidates unusable must fail with both paths ==
+[clean-room:full] PASS both-unusable exits 1 and names both attempted paths
 [clean-room:full] == tar.gz: input-method modules really load ==
 [clean-room:full] PASS immodules cache contains im-xim.so
 [clean-room:full] PASS immodules cache contains im-ibus.so
@@ -61,22 +67,22 @@ VEDIT_SELFTEST_FIXTURES=/tmp/tarroot/VEdit/share/vedit/testdata
 [clean-room:full] PASS run_selftest_smoke (exit=0  (log 31a-run-smoke.log))
 [clean-room:full] PASS run_selftest_all (exit=0)
 [clean-room:full] PASS run_keeptmp (exit=0)
-[clean-room:full] PASS VEDIT_KEEP_TMP kept the tree at /tmp/vedit.ODBLnQ
+[clean-room:full] PASS VEDIT_KEEP_TMP kept the tree at /tmp/vedit.uvysRn
 [clean-room:full] PASS self-extracting run cleaned up its temporary tree
 [clean-room:full] == relocation: unpack to a second, unrelated path and run again ==
-[clean-room:full] PASS relocated_selftest (exit=0  (root /opt/relocated-1793336286))
+[clean-room:full] PASS relocated_selftest (exit=0  (root /opt/relocated-1793337151))
 [clean-room:full] == leftovers: no verible/slang process, no zombie ==
 [clean-room:full] PASS no zombie process
 [clean-room:full] PASS no verible/slang process left behind
 [clean-room:full] == cold start: three window-visible timings ==
-run1_ms=109
-run2_ms=64
-run3_ms=66
+run1_ms=111
+run2_ms=119
+run3_ms=64
 [clean-room:full] == sizes and checksums ==
-# sizes (2026-10-30T04:58:08Z)
-40884328  /art/vedit-0.1.0-linux-x86_64.tar.gz
-40887126  /art/VEdit-0.1.0-x86_64.run
-5d7e1e9624b651079d510733b7ed5dacfb94c4c1002a049bf3c8d90e00a586a0  /art/vedit-0.1.0-linux-x86_64.tar.gz
-7faf6fa60ec37bc5b0a31cbf75b518eaf18793b4b1d211d5fc17eefaa9a1e025  /art/VEdit-0.1.0-x86_64.run
-cold_start=run1_ms=109 run2_ms=64 run3_ms=66 
+# sizes (2026-10-30T05:12:33Z)
+40890922  /art/vedit-0.1.0-linux-x86_64.tar.gz
+40893720  /art/VEdit-0.1.0-x86_64.run
+a1bda356540fbc88c16b20c0cf2372fcd76885e484ad3954c86b498af9f25f89  /art/vedit-0.1.0-linux-x86_64.tar.gz
+299827fe2155f8b54e60a1c5d1c7662bcaddb49e93a7238a38b291e6ff3d71e5  /art/VEdit-0.1.0-x86_64.run
+cold_start=run1_ms=111 run2_ms=119 run3_ms=64 
 [clean-room:full] CLEAN-ROOM FULL RESULT: PASS failures=0

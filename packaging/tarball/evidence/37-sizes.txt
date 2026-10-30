@@ -1,6 +1,6 @@
-# sizes (2026-10-30T04:58:08Z)
-40884328  /art/vedit-0.1.0-linux-x86_64.tar.gz
-40887126  /art/VEdit-0.1.0-x86_64.run
-5d7e1e9624b651079d510733b7ed5dacfb94c4c1002a049bf3c8d90e00a586a0  /art/vedit-0.1.0-linux-x86_64.tar.gz
-7faf6fa60ec37bc5b0a31cbf75b518eaf18793b4b1d211d5fc17eefaa9a1e025  /art/VEdit-0.1.0-x86_64.run
-cold_start=run1_ms=109 run2_ms=64 run3_ms=66 
+# sizes (2026-10-30T05:12:33Z)
+40890922  /art/vedit-0.1.0-linux-x86_64.tar.gz
+40893720  /art/VEdit-0.1.0-x86_64.run
+a1bda356540fbc88c16b20c0cf2372fcd76885e484ad3954c86b498af9f25f89  /art/vedit-0.1.0-linux-x86_64.tar.gz
+299827fe2155f8b54e60a1c5d1c7662bcaddb49e93a7238a38b291e6ff3d71e5  /art/VEdit-0.1.0-x86_64.run
+cold_start=run1_ms=111 run2_ms=119 run3_ms=64 

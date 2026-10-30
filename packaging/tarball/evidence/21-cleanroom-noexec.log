@@ -7,6 +7,6 @@
 [clean-room:noexec] PASS /tmp is noexec (a file there cannot be executed)
 [clean-room:noexec] running the self-extracting package under noexec /tmp
 [clean-room:noexec] PASS run_noexec_selftest (exit=0  (log 22-run-noexec.log))
-[clean-room:noexec] PASS fallback to the cache directory (extracting to /root/.cache/vedit/run.8Wv5N6)
+[clean-room:noexec] PASS fallback to the cache directory (extracting to /root/.cache/vedit/run.mWQJgX)
 [clean-room:noexec] PASS extracted tree cleaned up on exit
 [clean-room:noexec] CLEAN-ROOM NOEXEC RESULT: PASS failures=0
