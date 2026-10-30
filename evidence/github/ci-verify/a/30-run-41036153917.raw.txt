@@ -1,0 +1,21 @@
+# AC-A7: raw gh output for run 41036153917 (pull_request -> dev, PR #6)
+# polling started 2026-10-30T17:50:39+08:00
+2026-10-30T17:50:40+08:00 status=in_progress | 
+2026-10-30T17:51:02+08:00 status=in_progress | 
+2026-10-30T17:51:23+08:00 status=in_progress | 
+2026-10-30T17:51:44+08:00 status=in_progress | 
+2026-10-30T17:52:06+08:00 status=in_progress | 
+2026-10-30T17:52:28+08:00 status=in_progress | 
+2026-10-30T17:52:50+08:00 status=in_progress | 
+2026-10-30T17:53:11+08:00 status=in_progress | 
+2026-10-30T17:53:33+08:00 status=in_progress | 
+2026-10-30T17:53:54+08:00 status=in_progress | 
+2026-10-30T17:54:16+08:00 status=completed | failure
+
+=== gh run view --json (final) ===
+{"conclusion":"failure","createdAt":"2026-10-30T09:48:49Z","databaseId":41036153917,"event":"pull_request","headSha":"9c315e591b2c3a105223d9a60891b6342431b4d0","jobs":[{"completedAt":"2026-10-30T09:54:09Z","conclusion":"failure","databaseId":123997364683,"name":"gates and release build (pinned image)","startedAt":"2026-10-30T09:48:51Z","status":"completed","steps":[{"completedAt":"2026-10-30T09:48:53Z","conclusion":"success","name":"Set up job","number":1,"startedAt":"2026-10-30T09:48:52Z","status":"completed"},{"completedAt":"2026-10-30T09:48:54Z","conclusion":"success","name":"Check out","number":2,"startedAt":"2026-10-30T09:48:53Z","status":"completed"},{"completedAt":"2026-10-30T09:48:54Z","conclusion":"success","name":"Cache the container cargo home","number":3,"startedAt":"2026-10-30T09:48:54Z","status":"completed"},{"completedAt":"2026-10-30T09:48:55Z","conclusion":"success","name":"Log in to GHCR (best effort; fork PRs fall back to a local build)","number":4,"startedAt":"2026-10-30T09:48:54Z","status":"completed"},{"completedAt":"2026-10-30T09:52:37Z","conclusion":"success","name":"Resolve the pinned build image","number":5,"startedAt":"2026-10-30T09:48:55Z","status":"completed"},{"completedAt":"2026-10-30T09:54:06Z","conclusion":"failure","name":"Gates (lock policy, fmt, clippy, test)","number":6,"startedAt":"2026-10-30T09:52:37Z","status":"completed"},{"completedAt":"2026-10-30T09:54:06Z","conclusion":"skipped","name":"Release build, Xvfb selftest and GLIBC assertion","number":7,"startedAt":"2026-10-30T09:54:06Z","status":"completed"},{"completedAt":"2026-10-30T09:54:06Z","conclusion":"success","name":"Hand the workspace back to the runner user","number":8,"startedAt":"2026-10-30T09:54:06Z","status":"completed"},{"completedAt":"2026-10-30T09:54:07Z","conclusion":"success","name":"Upload build evidence","number":9,"startedAt":"2026-10-30T09:54:06Z","status":"completed"},{"completedAt":"2026-10-30T09:54:07Z","conclusion":"success","name":"Post Log in to GHCR (best effort; fork PRs fall back to a local build)","number":16,"startedAt":"2026-10-30T09:54:07Z","status":"completed"},{"completedAt":"2026-10-30T09:54:07Z","conclusion":"skipped","name":"Post Cache the container cargo home","number":17,"startedAt":"2026-10-30T09:54:07Z","status":"completed"},{"completedAt":"2026-10-30T09:54:07Z","conclusion":"success","name":"Post Check out","number":18,"startedAt":"2026-10-30T09:54:07Z","status":"completed"},{"completedAt":"2026-10-30T09:54:07Z","conclusion":"success","name":"Complete job","number":19,"startedAt":"2026-10-30T09:54:07Z","status":"completed"}],"url":"https://github.com/HaroldZ32/VEdit/actions/runs/41036153917/job/123997364683"}],"status":"completed","updatedAt":"2026-10-30T09:54:10Z","workflowName":"ci"}
+
+=== gh run view --log (final) ===
+failed to get run log: creating cache directory: mkdir /home/haroldzhao/.cache/gh: read-only file system
+log_exit=1
+POLL-DONE 2026-10-30T17:54:23+08:00

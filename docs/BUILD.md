@@ -173,5 +173,7 @@ VEDIT_SKIP_IMAGE_BUILD=1 \
 - 镜像构建走 BuildKit，不再需要 `DOCKER_BUILDKIT=0`；`scripts/docker/Dockerfile.build` 用
   `COPY vault.repo.in` + `sed` 渲染 yum 源，两种 builder 语法都合法；
 - GHCR 包默认私有：同仓库的 `GITHUB_TOKEN` 可以拉取，fork PR 拉不到时工作流退回本地构建；
-- `--selftest all` 需要 `VEDIT_SLANG` 与 `VEDIT_VERIBLE_LS` 同时存在，因此 **CI 只跑
-  `smoke highlight config fim` 四个套件**；发版流程先构建 slang，打包的干净容器里跑完整套件。
+- `scripts/build.sh` 在镜像内跑两处 `--selftest`：先 `--selftest smoke --probe-hold-ms 2500`
+  做 Xvfb 窗口冒烟，再跑套件集合——`VEDIT_SLANG` 与 `VEDIT_VERIBLE_LS` 同时可用时是一次 `all`
+  （6 个套件），否则**逐个**跑 `smoke highlight config fim`（CI 只构建 slang、没有 verible，走这条）；
+  任一套件非 0 即 `FATAL` 退出。

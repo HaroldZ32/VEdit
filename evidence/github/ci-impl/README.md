@@ -72,3 +72,123 @@ evidence; this task verified the script seam locally only.
   Docker config (and its registry credentials) is kept.
 - Tracked `build/evidence/*.log` files rewritten by the test runs were restored
   with `git checkout --` so the working tree only carries the T3 changes.
+
+---
+
+# T7 — GHA layer cache for the pinned-image build (buildx + cache-from/to)
+
+Review A1 (PR #6 request changes): the image workflow needs a GitHub Actions
+layer cache; `docker build` cannot export one.
+
+## Change (`scripts/lib.sh`)
+
+- `build_build_image()` now assembles the 10 `--build-arg`s, `-f`, `-t` and the
+   context **once** (`local args=(...)`) and dispatches:
+  - **neither cache variable set** → `docker build "${args[@]}"` — identical
+    command/output to before (the normal local/gates/release path);
+  - **`VEDIT_BUILD_CACHE_FROM` and/or `VEDIT_BUILD_CACHE_TO` set** →
+    `require_buildx`, then
+    `docker buildx build --load [--cache-from <value>] [--cache-to <value>] "${args[@]}"`;
+    the cache flag is only passed when its variable is non-empty.
+- New `require_buildx()`: FATAL + exit 1 when `docker buildx version` fails
+  ("need the buildx plugin … or unset both variables") or when
+  `docker buildx inspect` finds no usable builder (suggests
+  `docker buildx create --driver docker-container --name vedit-builder --use`).
+- New `build_build_image_with_cache()`: prints
+  `[image] build cache: from=… to=… (docker buildx --load)`, pipes through the
+  same `tee "$log"`, and on a failed build prints a FATAL hint (builder driver /
+  `type=gha` / `docker/setup-buildx-action`) and exits with the build's status —
+  no silent fallback to `docker build`.
+- `scripts/build-image.sh` and the workflows were not modified; the captain's
+  `image.yml` already exports `VEDIT_BUILD_CACHE_FROM: type=gha`,
+  `VEDIT_BUILD_CACHE_TO: type=gha,mode=max` and runs
+  `docker/setup-buildx-action@v3` (container-driver builder) before the build.
+
+## Verification (all actually run)
+
+| # | Command | Exit | Observed | File |
+|---|---|---|---|---|
+| 1 | `bash scripts/build-image.sh` (no cache vars) | 0 | `[image] building vedit-build:local from the pinned inputs`, plain `docker build` path (no `[image] build cache:` line), `[image] ref=…` + `image_id=…` | `10-buildx-cache-no-vars.txt` |
+| 2 | `VEDIT_BUILD_CACHE_FROM=type=local,src=/tmp/vedit-bx-cache VEDIT_BUILD_CACHE_TO=type=local,dest=/tmp/vedit-bx-cache VEDIT_BUILD_IMAGE_REF=vedit-build:bxcheck bash scripts/build-image.sh` (run 1, cold cache) | 0 | `[image] build cache: from=… to=… (docker buildx --load)`; `WARNING: local cache import … skipped` (dir absent, expected); cache exported: `/tmp/vedit-bx-cache` = 547 MB with `index.json`/`blobs`/`oci-layout`; 1.381 s (daemon cache warm) | `10-buildx-cache.txt` |
+| 3 | same command again (run 2) | 0 | cache imported — no `local cache import … skipped` warning in the build output; 8 build steps `CACHED`; 0.703 s | `10-buildx-cache.txt` |
+| 4 | cache wanted but buildx unavailable (fake `docker` failing `buildx version` on PATH) | 1 | `FATAL: VEDIT_BUILD_CACHE_FROM/VEDIT_BUILD_CACHE_TO need the buildx plugin, but 'docker buildx version' failed.` | `11-buildx-unavailable.txt` |
+| 5 | `VEDIT_BUILD_CACHE_TO=type=does-not-exist bash scripts/build-image.sh` | 1 | buildx: `unknown cache exporter: "does-not-exist"` + the FATAL hint (container-driver builder / setup-buildx-action / unset) | `12-buildx-cache-error-hint.txt` |
+| 6 | `bash scripts/gates.sh` (no cache vars) | 0 | `GATES PASS (local)` + `GATES PASS (host: … in the pinned image)`; 225 tests | `13-gates-regression.txt` |
+
+Environment: `github.com/docker/buildx v0.38.1 0dbe87f3…`; the only builder is
+`default*` (driver `docker`, BuildKit v0.33.1). **No `docker buildx create --use`
+was needed locally**: on this Docker 29.8.2 (containerd image store) the default
+`docker` driver already supports `type=local` cache export/import (probe:
+`writing cache image manifest … done`, and run 2 above). For `type=gha` the CI
+workflow uses `docker/setup-buildx-action`, which creates the container-driver
+builder that supports the GitHub cache.
+
+## Not verified / caveats
+
+- `type=gha` was exercised locally **without** the GitHub cache environment:
+  buildx v0.38.1 accepted the flag and silently did not write a cache (exit 0,
+  no cache-export step). The real GHA cache path is only exercised in GitHub
+  Actions (`image.yml`), not on this host.
+- The daemon's own BuildKit cache was warm, so run 2's wall time alone does not
+  isolate the imported cache; the evidence that the import path worked is
+  (a) the `local cache import … skipped` warning present in run 1 and absent in
+  run 2, and (b) run 1 writing a valid OCI cache layout. A fully isolated
+  cold-cache proof would need a fresh builder (moby/buildkit image / network).
+- No GitHub Actions run was made from here (AC-A7).
+
+---
+
+# T8 — build-in-container: illegal four-suite argv (clean-environment build.sh)
+
+## Root cause
+
+`scripts/build-in-container.sh` passed four suite names as **one argv**:
+`"$BIN" --selftest "smoke highlight config fim"`, but
+`crates/vd-app/src/cli.rs` accepts exactly one suite name (or `all`/`list`).
+The old binary rejects it:
+
+```
+$ target/release/vd-app --selftest "smoke highlight config fim"
+Error: unknown selftest suite 'smoke highlight config fim' (smoke, highlight, config, lsp, slang, fim, all, list)
+exit=1
+```
+
+(`11-selftest-suites-bug.txt`). The four-suite path had never succeeded — the
+committed `build/evidence/12-selftest-suites.txt` only ever held `suite=all`.
+
+## Change (`scripts/build-in-container.sh`, only this file)
+
+- `SELFTEST_SUITE` (string) → `SELFTEST_SUITES` (array):
+  `(all)` when both `VEDIT_VERIBLE_LS` and `VEDIT_SLANG` are present, otherwise
+  `(smoke highlight config fim)`.
+- The summary file is initialised once with the timestamp and the
+  `VEDIT_SLANG` / `VEDIT_VERIBLE_LS` / `VEDIT_GSV_DATADIR` fields, then the loop
+  appends `suite=`, `exit=`, `report=`, `stderr=` per suite.
+- Per-suite reports: `all` keeps the historical
+  `12-selftest-suites.json`/`.err`; an individual suite writes
+  `12-selftest-<suite>.json`/`.err`.
+- Failure semantics preserved: the first non-zero suite prints
+  `FATAL: --selftest <suite> exited <rc> (the JSON report is in …)` + the
+  stderr tail and exits 1.
+- No suite check was touched (the diff touches only the invocation).
+
+## Verification (actually run; the two builds ran in a throwaway copy
+## `target/t8-clean` so the shared `target/verible-pin` was not disturbed)
+
+| # | Condition | Command | Exit | Observed | File |
+|---|---|---|---|---|---|
+| 0 | root cause | `vd-app --selftest "smoke highlight config fim"` | 1 | `unknown selftest suite '…'` | `11-selftest-suites-bug.txt` |
+| A | slang present, **no** `target/verible-pin` | `cd target/t8-clean && SOURCE_DATE_EPOCH=… bash scripts/build.sh` | **0** | 49.539 s; `VEDIT_VERIBLE_LS=<unset>`; `suite=smoke exit=0`, `suite=highlight exit=0`, `suite=config exit=0`, `suite=fim exit=0`; per-suite JSON `ok=True` 30/8/6/6 checks | `11-selftest-suites-A.txt`, `-A-console.txt` |
+| B | both binaries present | same copy + `target/verible-pin` | **0** | 8.012 s; single `suite=all exit=0`; `12-selftest-suites.json` `ok=True`, 62 checks (smoke 30/highlight 8/config 6/lsp 6/slang 6/fim 6) | `11-selftest-suites-B.txt`, `-B-console.txt` |
+| C | failure semantics (fault injection in the throwaway copy: loop pointed at a non-existent suite) | `bash scripts/build.sh` | **1** | `FATAL: --selftest bogus-suite exited 1 (the JSON report is in …)`, CLI error printed, build exits 1 | `11-selftest-suites-failure.txt` |
+
+## Not verified / notes
+
+- No GitHub Actions run from here (AC-A7); the fix was exercised through the
+  real `scripts/build.sh` in the pinned image, which is the same path CI runs.
+- `target/t8-clean` (≈630 MB, gitignored) is the disposable clean environment
+  used for conditions A/B; the reviewable record is under
+  `evidence/github/ci-impl/`.
+- The main tree's `build/evidence/` was not touched by these runs (the builds
+  wrote into the copy).
+- `--selftest all` (both binaries) is unchanged and still reports 62 checks.

@@ -181,26 +181,44 @@ if [ -z "${VEDIT_VERIBLE_LS:-}" ]; then
     export VEDIT_VERIBLE_LINT="$VERIBLE_DIR/verible-verilog-lint"
   fi
 fi
-SELFTEST_SUITE="smoke highlight config fim"
+# The CLI accepts exactly ONE suite name (or `all`/`list`), never a list, so a
+# clean environment runs the suites one argv at a time. With both external
+# binaries present a single `all` run covers everything and keeps the historical
+# 12-selftest-suites.json evidence name.
 if [ -n "${VEDIT_VERIBLE_LS:-}" ] && [ -n "${VEDIT_SLANG:-}" ]; then
-  SELFTEST_SUITE="all"
+  SELFTEST_SUITES=(all)
+else
+  SELFTEST_SUITES=(smoke highlight config fim)
 fi
-set +e
-"$BIN" --selftest "$SELFTEST_SUITE" > "$EVID/12-selftest-suites.json" 2> "$EVID/12-selftest-suites.err"
-SUITES_RC=$?
-set -e
 {
   echo "# Xvfb selftest suites ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
-  echo "suite=${SELFTEST_SUITE}"
-  echo "selftest_exit=$SUITES_RC"
   echo "VEDIT_SLANG=${VEDIT_SLANG:-<unset>}"
   echo "VEDIT_VERIBLE_LS=${VEDIT_VERIBLE_LS:-<unset>}"
   echo "VEDIT_GSV_DATADIR=${VEDIT_GSV_DATADIR:-<unset>}"
-} | tee "$EVID/12-selftest-suites.txt"
-if [ "$SUITES_RC" -ne 0 ]; then
-  echo "FATAL: --selftest $SELFTEST_SUITE exited $SUITES_RC (the JSON report is in $EVID/12-selftest-suites.json)" >&2
-  sed -n '1,60p' "$EVID/12-selftest-suites.err" >&2
-  exit 1
-fi
+} > "$EVID/12-selftest-suites.txt"
+for suite in "${SELFTEST_SUITES[@]}"; do
+  SUITE_REPORT="$EVID/12-selftest-suites.json"
+  SUITE_STDERR="$EVID/12-selftest-suites.err"
+  if [ "$suite" != "all" ]; then
+    SUITE_REPORT="$EVID/12-selftest-$suite.json"
+    SUITE_STDERR="$EVID/12-selftest-$suite.err"
+  fi
+  set +e
+  "$BIN" --selftest "$suite" > "$SUITE_REPORT" 2> "$SUITE_STDERR"
+  SUITE_RC=$?
+  set -e
+  {
+    echo "suite=$suite"
+    echo "exit=$SUITE_RC"
+    echo "report=$SUITE_REPORT"
+    echo "stderr=$SUITE_STDERR"
+  } >> "$EVID/12-selftest-suites.txt"
+  if [ "$SUITE_RC" -ne 0 ]; then
+    echo "FATAL: --selftest $suite exited $SUITE_RC (the JSON report is in $SUITE_REPORT)" >&2
+    sed -n '1,60p' "$SUITE_STDERR" >&2
+    exit 1
+  fi
+done
+cat "$EVID/12-selftest-suites.txt"
 
 echo "BUILD + XVFB SMOKE OK"

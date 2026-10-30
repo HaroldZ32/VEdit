@@ -90,19 +90,73 @@ build_build_image() {
   fi
   ensure_base_image
   echo "[image] building $BUILD_IMAGE_TAG from the pinned inputs"
-  docker build \
-    --build-arg CENTOS_VAULT_BASE="$CENTOS_VAULT_BASE" \
-    --build-arg RUSTUP_URL="$RUSTUP_URL" \
-    --build-arg RUSTUP_SHA256="$RUSTUP_SHA256" \
-    --build-arg RUST_TOOLCHAIN="$RUST_TOOLCHAIN" \
-    --build-arg GSV_URL="$GSV_URL" \
-    --build-arg GSV_SHA256="$GSV_SHA256" \
-    --build-arg MESON_WHEEL_URL="$MESON_WHEEL_URL" \
-    --build-arg MESON_WHEEL_SHA256="$MESON_WHEEL_SHA256" \
-    --build-arg NINJA_WHEEL_URL="$NINJA_WHEEL_URL" \
-    --build-arg NINJA_WHEEL_SHA256="$NINJA_WHEEL_SHA256" \
-    -f "$ROOT/scripts/docker/Dockerfile.build" \
-    -t "$BUILD_IMAGE_TAG" "$ROOT/scripts/docker" 2>&1 | tee "$log"
+  local args=(
+    --build-arg CENTOS_VAULT_BASE="$CENTOS_VAULT_BASE"
+    --build-arg RUSTUP_URL="$RUSTUP_URL"
+    --build-arg RUSTUP_SHA256="$RUSTUP_SHA256"
+    --build-arg RUST_TOOLCHAIN="$RUST_TOOLCHAIN"
+    --build-arg GSV_URL="$GSV_URL"
+    --build-arg GSV_SHA256="$GSV_SHA256"
+    --build-arg MESON_WHEEL_URL="$MESON_WHEEL_URL"
+    --build-arg MESON_WHEEL_SHA256="$MESON_WHEEL_SHA256"
+    --build-arg NINJA_WHEEL_URL="$NINJA_WHEEL_URL"
+    --build-arg NINJA_WHEEL_SHA256="$NINJA_WHEEL_SHA256"
+    -f "$ROOT/scripts/docker/Dockerfile.build"
+    -t "$BUILD_IMAGE_TAG"
+    "$ROOT/scripts/docker"
+  )
+  # The plain `docker build` path has no cache import/export; only use buildx
+  # when a CI layer cache is requested, so the local command stays unchanged.
+  if [ -n "${VEDIT_BUILD_CACHE_FROM:-}" ] || [ -n "${VEDIT_BUILD_CACHE_TO:-}" ]; then
+    build_build_image_with_cache "$log" "${args[@]}"
+  else
+    docker build "${args[@]}" 2>&1 | tee "$log"
+  fi
+}
+
+# Fail loudly when a cache was requested but buildx/builder is missing: the
+# caller asked for a cache, and silently falling back to `docker build` would
+# hide that the cache was never used.
+require_buildx() {
+  if ! docker buildx version >/dev/null 2>&1; then
+    echo "FATAL: VEDIT_BUILD_CACHE_FROM/VEDIT_BUILD_CACHE_TO need the buildx plugin," >&2
+    echo "       but 'docker buildx version' failed. Install docker buildx, or unset both variables." >&2
+    exit 1
+  fi
+  if ! docker buildx inspect >/dev/null 2>&1; then
+    echo "FATAL: VEDIT_BUILD_CACHE_FROM/VEDIT_BUILD_CACHE_TO need a usable buildx builder." >&2
+    echo "       Create one: docker buildx create --driver docker-container --name vedit-builder --use" >&2
+    exit 1
+  fi
+}
+
+# Build through buildx so the CI layer cache can be imported and exported.
+# `docker buildx build --load` keeps the image in the local docker image store,
+# exactly like `docker build`, so run_in_build_container() is unaffected.
+build_build_image_with_cache() {
+  local log="$1"
+  shift
+  require_buildx
+  local cache_args=()
+  if [ -n "${VEDIT_BUILD_CACHE_FROM:-}" ]; then
+    cache_args+=(--cache-from "$VEDIT_BUILD_CACHE_FROM")
+  fi
+  if [ -n "${VEDIT_BUILD_CACHE_TO:-}" ]; then
+    cache_args+=(--cache-to "$VEDIT_BUILD_CACHE_TO")
+  fi
+  echo "[image] build cache: from=${VEDIT_BUILD_CACHE_FROM:-<none>} to=${VEDIT_BUILD_CACHE_TO:-<none>} (docker buildx --load)"
+  local status=0
+  docker buildx build --load "${cache_args[@]}" "$@" 2>&1 | tee "$log" || status=${PIPESTATUS[0]}
+  if [ "$status" -ne 0 ]; then
+    echo "FATAL: the buildx build failed (exit $status); the requested cache was not usable." >&2
+    echo "       Cache import/export depends on the buildx builder and the cache type" >&2
+    echo "       (type=gha needs the GitHub Actions cache environment). If the error above" >&2
+    echo "       is about cache support, create a container-driver builder:" >&2
+    echo "         docker buildx create --driver docker-container --name vedit-builder --use" >&2
+    echo "       (GitHub Actions does this with docker/setup-buildx-action.)" >&2
+    echo "       Or unset VEDIT_BUILD_CACHE_FROM/VEDIT_BUILD_CACHE_TO." >&2
+    exit 1
+  fi
 }
 
 # Run a command in the build image with the workspace mounted at /vedit-build.

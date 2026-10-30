@@ -64,6 +64,21 @@ jobs:
             echo "ref=vedit-build:local" >> "$GITHUB_OUTPUT"
           fi
 
+      # vd-deeplint's real_slang integration tests look for build/slang/out/slang and
+      # panic when it is absent, so the gate needs the deep-lint binary. It is built in
+      # its own pinned container and cached by the pinned inputs.
+      - name: Cache the slang deep-lint binary
+        uses: actions/cache@v4
+        with:
+          path: build/slang/out
+          key: slang-${{ runner.os }}-${{ hashFiles('build/slang/versions.env') }}
+          restore-keys: |
+            slang-${{ runner.os }}-
+
+      - name: Build the slang deep-lint binary
+        shell: bash
+        run: bash build/slang/build.sh
+
       - name: Gates (lock policy, fmt, clippy, test)
         shell: bash
         env:
