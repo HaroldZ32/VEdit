@@ -9,8 +9,8 @@ Two relocatable products, built from the same payload, that run on a clean, offl
 
 | product | bytes | sha256 |
 |---|---|---|
-| `out/vedit-0.1.0-linux-x86_64.tar.gz` | 40,493,353 | `ddf389733b3bc82d68c4f22d6bc2a09ab87b76aaf2eaa3bfbd10655ded9e6e81` |
-| `out/VEdit-0.1.0-x86_64.run` | 40,496,151 | `0ef44b3576905c2ae09547eeaa74a9d5d7f2426e92bce7a999633938fee788ea` |
+| `out/vedit-0.1.1-linux-x86_64.tar.gz` | 40,499,955 | `98f2a548d9e725b55439498b79476ed5ecc514383a6e95a127004f52023586f2` |
+| `out/VEdit-0.1.1-x86_64.run` | 40,502,753 | `3ce106d13a4cf43d8e7f07113afb82c2289fa7ffdcfefba61f80a490acd9d601` |
 
 The `.run` is the tarball plus a POSIX-sh stub: the payload is stored **once**, so the
 overhead is 2,798 bytes.
