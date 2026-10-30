@@ -1,0 +1,82 @@
+# T19 scope gates — pinned centos:7 build image, run at 2026-10-30T04:02:46Z
+# working tree (uncommitted at run time); repo-wide gates are not this lane's judgement
+
+$ cargo fmt -p vd-fim -- --check
+EXIT=0
+
+$ cargo clippy -p vd-fim --all-targets -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.07s
+EXIT=0
+
+$ cargo test -p vd-fim
+   Compiling vd-fim v0.1.0 (/vedit-build/crates/vd-fim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.14s
+     Running unittests src/lib.rs (target/debug/deps/vd_fim-99ab30b57b8bfb56)
+
+running 40 tests
+test backends::tests::a_failing_transport_propagates_the_sanitised_error ... ok
+test backends::tests::an_empty_key_never_produces_an_authorization_header ... ok
+test backends::tests::llama_cpp_request_sends_input_prefix_and_suffix_without_model ... ok
+test backends::tests::llama_cpp_does_not_require_a_model ... ok
+test error::tests::configuration_failures_are_classified_as_such ... ok
+test error::tests::every_reason_is_short_and_not_empty ... ok
+test error::tests::reasons_never_contain_a_secret_or_a_url ... ok
+test error::tests::status_and_timeout_reasons_carry_the_number ... ok
+test backends::tests::openai_request_sends_prompt_suffix_model_and_bearer ... ok
+test backends::tests::unusable_settings_do_not_produce_a_backend ... ok
+test protocol::tests::llama_cpp_body_has_exactly_the_contract_fields ... ok
+test protocol::tests::llama_cpp_response_parses_content ... ok
+test protocol::tests::malformed_bodies_are_invalid_response_not_a_panic ... ok
+test protocol::tests::openai_body_has_exactly_the_contract_fields ... ok
+test protocol::tests::openai_response_parses_choices_zero_text ... ok
+test protocol::tests::response_cap_is_a_documented_constant ... ok
+test protocol::tests::trailing_line_breaks_are_removed_but_leading_spaces_kept ... ok
+test secret::tests::debug_is_redacted ... ok
+test secret::tests::deserialization_round_trips_the_plaintext ... ok
+test secret::tests::expose_secret_is_the_only_way_to_read_plaintext ... ok
+test secret::tests::serialization_inside_a_struct_is_redacted ... ok
+test secret::tests::serialization_is_redacted ... ok
+test service::tests::unavailable_reason_never_contains_configuration_detail ... ok
+test settings::tests::half_configured_settings_are_reported_not_guessed ... ok
+test settings::tests::default_settings_are_disabled_and_unconfigured ... ok
+test settings::tests::timeout_and_token_budget_are_clamped ... ok
+test settings::tests::url_join_uses_the_protocol_path_without_doubling_it ... ok
+test transport::tests::a_bad_uri_never_echoes_the_url ... ok
+test transport::tests::host_lookup_failure_is_sanitised ... ok
+test transport::tests::http_status_maps_to_the_status_code_only ... ok
+test transport::tests::io_errors_are_classified_without_their_message ... ok
+test transport::tests::the_response_cap_is_enforced_at_the_byte ... ok
+test transport::tests::timeout_maps_to_the_configured_milliseconds ... ok
+test service::tests::a_completion_round_trips_through_one_worker ... ok
+test service::tests::a_failed_request_reaches_the_ui_as_a_short_reason ... ok
+test service::tests::disabled_service_is_inert_and_never_touches_a_transport ... ok
+test service::tests::half_configured_service_reports_without_requesting ... ok
+test service::tests::cancelling_drops_any_late_result ... ok
+test service::tests::from_settings_does_not_spawn_anything_while_disabled ... ok
+test service::tests::rapid_typing_does_not_spawn_more_workers_or_queue_requests ... ok
+
+test result: ok. 40 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+     Running unittests src/bin/fim-probe.rs (target/debug/deps/fim_probe-743e91d6d0ac6917)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/default_off.rs (target/debug/deps/default_off-319469f511a31b00)
+
+running 4 tests
+test default_settings_send_nothing_and_start_no_worker ... ok
+test the_real_transport_is_not_constructed_while_disabled ... ok
+test openai_without_a_model_is_reported_without_a_request ... ok
+test llama_cpp_needs_no_model_but_sends_nothing_until_started ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+   Doc-tests vd_fim
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+EXIT=0

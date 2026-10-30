@@ -1,0 +1,32 @@
+DEFAULTS enabled=false endpoint="" model="" timeout_ms=5000 api_key=none
+DISABLED enabled=false reason=Some("FIM 未启用") worker=false start=None poll=None
+CHECK default_off PASS
+CHECK default_reason PASS
+CHECK default_no_worker PASS
+CHECK default_no_request PASS
+CHECK default_zero_transport_calls PASS
+HALF_CONFIGURED enabled=false reason=Some("FIM 未配置端点") start=None
+CHECK half_configured_unavailable PASS
+CHECK half_configured_reason PASS
+CHECK half_configured_zero_calls PASS
+OPENAI_BODY {"max_tokens":64,"model":"qwen2.5-coder","prompt":"assign x","suffix":";\nendmodule"}
+CHECK openai_body_fields PASS
+LLAMA_CPP_BODY {"input_prefix":"always_ff @(","input_suffix":") begin","n_predict":32}
+CHECK llama_cpp_body_fields PASS
+OPENAI_RESPONSE {"choices":[{"text":" <= 1;"}]} -> Ok(" <= 1;")
+LLAMA_CPP_RESPONSE {"content":" <= '0;"} -> Ok(" <= '0;")
+CHECK openai_response_parse PASS
+CHECK llama_cpp_response_parse PASS
+ROUNDTRIP generation=Some(1) completion=Some(Ok(" <= 1;")) url=Some("http://127.0.0.1:8080/v1/completions") body=Some(Object {"max_tokens": Number(64), "model": String("qwen2.5-coder"), "prompt": String("assign x"), "suffix": String(";\n")})
+CHECK roundtrip_completion PASS
+CHECK roundtrip_one_call PASS
+FAILURE result=Some(Err(HttpStatus { status: 401 })) reason="FIM HTTP 401"
+CHECK failure_reason_is_status_bar_ready PASS
+CHECK failure_reason_has_no_secret PASS
+CANCELLED poll=None
+CHECK cancel_drops_result PASS
+BURST threads before=5 after=5 transport_calls=1
+CHECK burst_thread_count_bounded PASS
+CHECK burst_requests_coalesced PASS
+CHECK completion_request_keeps_both_halves PASS
+PROBE PASS
