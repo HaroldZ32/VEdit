@@ -1,3 +1,5 @@
 vd-app selftest: fixture_root=/vedit-build/crates/vd-app/tests/fixtures (VEDIT_SELFTEST_FIXTURES=None)
+
+(vd-app:413): GLib-GIO-CRITICAL **: 05:44:53.664: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: Verible LS not found (9 resolution attempt(s)); LSP features are unavailable
 vd-app: configuration warnings: 1
