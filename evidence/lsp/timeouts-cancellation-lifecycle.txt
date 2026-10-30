@@ -1,0 +1,33 @@
+$ cargo test -p vd-lsp --test verible_ls request_timeout_and_cancellation_are_enforced -- --exact --nocapture
+   Compiling vd-lsp v0.1.0 (/vedit-build/crates/vd-lsp)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.45s
+     Running tests/verible_ls.rs (target/debug/deps/verible_ls-34ae68e02196cc79)
+
+running 1 test
+test request_timeout_and_cancellation_are_enforced ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.16s
+
+EXIT=0
+
+$ cargo test -p vd-lsp --test verible_ls initialize_timeout_is_enforced_and_the_child_is_reaped -- --exact --nocapture
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s
+     Running tests/verible_ls.rs (target/debug/deps/verible_ls-34ae68e02196cc79)
+
+running 1 test
+test initialize_timeout_is_enforced_and_the_child_is_reaped ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 1.31s
+
+EXIT=0
+
+$ cargo test -p vd-lsp --test verible_ls lazy_start_crash_restart_and_shutdown_leave_no_zombie -- --exact --nocapture
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.03s
+     Running tests/verible_ls.rs (target/debug/deps/verible_ls-34ae68e02196cc79)
+
+running 1 test
+test lazy_start_crash_restart_and_shutdown_leave_no_zombie ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.06s
+
+EXIT=0

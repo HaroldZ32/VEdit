@@ -1,0 +1,4 @@
+// line-length violation fixture
+module bad_line_length;
+  wire this_signal_name_is_intentionally_long_so_that_the_line_length_rule_fires_without_any_doubt_about_it;
+endmodule

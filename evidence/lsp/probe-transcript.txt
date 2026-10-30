@@ -1,0 +1,202 @@
+# lsp-probe — workspace WITHOUT a rules file
+$ cargo run -q -p vd-lsp --example lsp-probe -- crates/vd-lsp/fixtures/project
+workspace_root=/vedit-build/crates/vd-lsp/fixtures/project
+ls_path=/vedit-build/crates/vd-lsp/../../.mpd/recon/verible/bin/verible-verilog-ls
+server_argv(no rules)=[]
+lazy_start_running=false
+
+## initialize request
+{
+  "capabilities": {
+    "textDocument": {
+      "codeAction": {
+        "dynamicRegistration": false
+      },
+      "definition": {
+        "dynamicRegistration": false,
+        "linkSupport": false
+      },
+      "documentHighlight": {
+        "dynamicRegistration": false
+      },
+      "documentSymbol": {
+        "dynamicRegistration": false,
+        "hierarchicalDocumentSymbolSupport": true
+      },
+      "formatting": {
+        "dynamicRegistration": false
+      },
+      "publishDiagnostics": {
+        "codeDescriptionSupport": false,
+        "dataSupport": false,
+        "relatedInformation": false,
+        "versionSupport": false
+      },
+      "rangeFormatting": {
+        "dynamicRegistration": false
+      },
+      "references": {
+        "dynamicRegistration": false
+      },
+      "rename": {
+        "dynamicRegistration": false,
+        "prepareSupport": false
+      },
+      "synchronization": {
+        "didSave": true,
+        "dynamicRegistration": false,
+        "willSave": false,
+        "willSaveWaitUntil": false
+      }
+    }
+  },
+  "clientInfo": {
+    "name": "vedit",
+    "version": "0.1.0"
+  },
+  "processId": 7,
+  "rootUri": "file:///vedit-build/crates/vd-lsp/fixtures/project/",
+  "workspaceFolders": [
+    {
+      "name": "workspace",
+      "uri": "file:///vedit-build/crates/vd-lsp/fixtures/project/"
+    }
+  ]
+}
+
+## initialize result (capabilities)
+{
+  "capabilities": {
+    "codeActionProvider": true,
+    "definitionProvider": true,
+    "diagnosticProvider": {
+      "interFileDependencies": false,
+      "workspaceDiagnostics": false
+    },
+    "documentFormattingProvider": true,
+    "documentHighlightProvider": true,
+    "documentRangeFormattingProvider": true,
+    "documentSymbolProvider": true,
+    "hoverProvider": false,
+    "referencesProvider": true,
+    "renameProvider": true,
+    "textDocumentSync": {
+      "change": 2,
+      "openClose": true
+    }
+  },
+  "serverInfo": {
+    "name": "Verible Verilog language server.",
+    "version": "v0.0-4298-g085eef05"
+  }
+}
+
+## diagnostics: 1 item(s) after 1ms
+  3:101 severity=Some(Warning) rule=None message=Line length exceeds max: 100; is: 108 [Style: line-length][line-length]
+
+## definition of b_top in a.sv -> 1 location(s)
+  /vedit-build/crates/vd-lsp/fixtures/project/b.sv:1:8
+
+## formatting: 1 edit(s), byte_equal_to_bundled_formatter=true
+
+## shutdown: running=false pid=Some(448) process_still_present=false
+EXIT=0
+
+# lsp-probe — workspace WITH .rules.verible_lint (explicit --rules_config)
+$ cargo run -q -p vd-lsp --example lsp-probe -- crates/vd-lsp/fixtures/project_with_rules
+workspace_root=/vedit-build/crates/vd-lsp/fixtures/project_with_rules
+ls_path=/vedit-build/crates/vd-lsp/../../.mpd/recon/verible/bin/verible-verilog-ls
+server_argv(no rules)=[]
+server_argv(with rules)=["--rules_config=/vedit-build/crates/vd-lsp/fixtures/project_with_rules/.rules.verible_lint"]
+lazy_start_running=false
+
+## initialize request
+{
+  "capabilities": {
+    "textDocument": {
+      "codeAction": {
+        "dynamicRegistration": false
+      },
+      "definition": {
+        "dynamicRegistration": false,
+        "linkSupport": false
+      },
+      "documentHighlight": {
+        "dynamicRegistration": false
+      },
+      "documentSymbol": {
+        "dynamicRegistration": false,
+        "hierarchicalDocumentSymbolSupport": true
+      },
+      "formatting": {
+        "dynamicRegistration": false
+      },
+      "publishDiagnostics": {
+        "codeDescriptionSupport": false,
+        "dataSupport": false,
+        "relatedInformation": false,
+        "versionSupport": false
+      },
+      "rangeFormatting": {
+        "dynamicRegistration": false
+      },
+      "references": {
+        "dynamicRegistration": false
+      },
+      "rename": {
+        "dynamicRegistration": false,
+        "prepareSupport": false
+      },
+      "synchronization": {
+        "didSave": true,
+        "dynamicRegistration": false,
+        "willSave": false,
+        "willSaveWaitUntil": false
+      }
+    }
+  },
+  "clientInfo": {
+    "name": "vedit",
+    "version": "0.1.0"
+  },
+  "processId": 450,
+  "rootUri": "file:///vedit-build/crates/vd-lsp/fixtures/project_with_rules/",
+  "workspaceFolders": [
+    {
+      "name": "workspace",
+      "uri": "file:///vedit-build/crates/vd-lsp/fixtures/project_with_rules/"
+    }
+  ]
+}
+
+## initialize result (capabilities)
+{
+  "capabilities": {
+    "codeActionProvider": true,
+    "definitionProvider": true,
+    "diagnosticProvider": {
+      "interFileDependencies": false,
+      "workspaceDiagnostics": false
+    },
+    "documentFormattingProvider": true,
+    "documentHighlightProvider": true,
+    "documentRangeFormattingProvider": true,
+    "documentSymbolProvider": true,
+    "hoverProvider": false,
+    "referencesProvider": true,
+    "renameProvider": true,
+    "textDocumentSync": {
+      "change": 2,
+      "openClose": true
+    }
+  },
+  "serverInfo": {
+    "name": "Verible Verilog language server.",
+    "version": "v0.0-4298-g085eef05"
+  }
+}
+
+## diagnostics: 1 item(s) after 1ms
+  3:101 severity=Some(Warning) rule=None message=Line length exceeds max: 100; is: 108 [Style: line-length][line-length]
+Error: No such file or directory (os error 2)
+EXIT=1

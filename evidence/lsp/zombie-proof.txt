@@ -1,0 +1,6 @@
+# after every probe run above the LSP process must be gone
+$ ps -eo pid,ppid,stat,comm | grep -i verible || echo none
+none
+
+$ ps -eo stat,comm | awk '$1 ~ /^Z/ {print}' | grep -i verible || echo 'no verible zombie'
+no verible zombie
