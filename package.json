@@ -1,0 +1,18 @@
+{
+  "name": "vedit-verification",
+  "private": true,
+  "version": "0.0.0",
+  "description": "VERIFICATION ORCHESTRATION ONLY - maps the MPD gate ids to build/gates/*.sh. This file is never a product runtime or build dependency: the product is Rust + cargo (see AGENT.md section 4), and no product artifact reads package.json.",
+  "scripts": {
+    "verify:gates": "bash build/gates/gates.sh",
+    "verify:tests": "bash build/gates/tests.sh",
+    "verify:typecheck": "bash build/gates/typecheck.sh",
+    "verify:docs": "bash build/gates/docs.sh",
+    "verify:manifest": "bash build/gates/manifest.sh",
+    "verify:comments": "bash build/gates/comments.sh",
+    "verify:rows": "bash build/gates/rows.sh",
+    "verify:vendor": "bash build/gates/vendor.sh",
+    "verify:dist": "bash build/gates/dist.sh",
+    "verify:pack": "bash build/gates/pack.sh"
+  }
+}
