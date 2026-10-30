@@ -41,6 +41,11 @@ say "version=$VERSION verible=$VERIBLE_VERSION"
 
 # --- 0. build the application -----------------------------------------------
 say "building vd-app (release)"
+# Every product must ship the SAME vd-app binary: the release remap (source roots
+# and cargo homes) is defined once in scripts/versions.env and applied here too.
+: "${RELEASE_RUSTFLAGS:?RELEASE_RUSTFLAGS is defined in scripts/versions.env}"
+export RUSTFLAGS="${RUSTFLAGS:-} ${RELEASE_RUSTFLAGS}"
+echo "RUSTFLAGS=$RUSTFLAGS" | tee "$EVID/01a-rustflags.txt"
 cargo build --release -p vd-app 2>&1 | tee "$EVID/01-cargo-build.log" | tail -2
 APP="$ROOT/target/release/vd-app"
 [ -x "$APP" ] || { say "FAIL: $APP missing"; exit 1; }
@@ -248,10 +253,15 @@ tail -6 "$EVID/11-glibc-rpath.txt"
     readelf -d "$f" | grep -E 'RPATH|RUNPATH' || echo none
   done
   echo
-  echo "## 4) embedded build-tree strings in the app binary (panic locations only)"
-  echo "count(/vedit-build): $(strings "$PKG/bin/vd-app" | grep -c '/vedit-build' || true)"
-  echo "These are Rust source paths inside panic messages; they are not resolved at"
-  echo "runtime. They are recorded as a known, non-functional bound (see README)."
+  echo "## 4) embedded build-tree strings in the app binary (panic locations)"
+  build_strings=$(strings "$PKG/bin/vd-app" | grep -c '/vedit-build' || true)
+  echo "count(/vedit-build): $build_strings"
+  if [ "$build_strings" -eq 0 ]; then
+    echo "PASS: the release remap (RELEASE_RUSTFLAGS) removed the build-tree prefix"
+  else
+    echo "WARN: $build_strings build-tree strings remain (release remap not applied?)"
+  fi
+  echo "count(/vedit ) remapped prefix: $(strings "$PKG/bin/vd-app" | grep -c '/vedit/' || true)"
 } > "$EVID/13-host-path-audit.txt"
 cat "$EVID/13-host-path-audit.txt"
 

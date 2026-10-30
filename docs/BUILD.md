@@ -114,8 +114,10 @@ bash packaging/tarball/build.sh           # tar.gz + 自解压 .run（含离线�
 
 - CentOS 7 的 `tar 1.26` **没有 `--sort=name`**：tarball 已归一 owner/group 且 `gzip -n`，
   但目录项顺序随文件系统，**不声称字节级可复现**；
-- 应用二进制里含 `/vedit-build/...` 的 panic 位置字符串（Rust 编译产物，非运行期路径）；
-  要消除需要在 workspace 构建里加 `--remap-path-prefix`（属骨架 owner 的范围）；
+- Rust 会把 panic 位置编译进 ELF。发布构建统一注入 `RELEASE_RUSTFLAGS`（`scripts/versions.env`，
+  一组 `--remap-path-prefix`：构建树 → `/vedit`、cargo home → `/cargo`），**所有产物必须消费同一份**，
+  否则不同产物里的 vd-app 不是同一个二进制。打包脚本会 assert 产物中 `count(/vedit-build) == 0`；
+  这不是运行期解析路径，但会被审计；
 - "冷重建结果一致"的自动断言属于端到端验收 lane（`tests/e2e/`，T27）的范围；
   **该套件落地前，本文不声称这一项已验证**。落地后以它的退出码与证据为准。
 

@@ -172,10 +172,12 @@ and once with `--network none --tmpfs /tmp:noexec`.)
    sensitivity, not an unconditional bug). Recorded in `38-known-limitations.txt`; the visual
    evidence in this lane therefore comes from an **X-server capture** (`import -window root`),
    which is the stronger proof anyway because it is what a user sees.
-2. **Build-tree strings in the app binary.** `strings bin/vd-app | grep -c /vedit-build` = 506:
-   these are Rust panic locations (`file:line`), not paths resolved at run time. Removing them
-   needs `--remap-path-prefix` in the workspace build (skeleton owner), which this lane cannot
-   set; the launch-time templates and RPATHs — the paths that actually get opened — are clean.
+2. **Build-tree strings in the app binary.** The release build injects
+   `RELEASE_RUSTFLAGS` (a shared `--remap-path-prefix` set from `scripts/versions.env`) so the
+   panic locations become `/vedit/...` and no `/vedit-build` prefix survives; the packaging audit
+   prints the count and flags a regression (`13-host-path-audit.txt` §4). All products must use
+   that same flag set, otherwise their `vd-app` binaries differ; this lane consumes it in
+   `stage.sh` and fails loudly when the variable is missing.
 3. **Determinism.** `tar` on CentOS 7 is 1.26 and has no `--sort=name`; entries are normalized by
    owner/group (0/0) and `gzip -n` drops the timestamp, but directory order follows the
    filesystem. Byte-identical rebuilds are therefore not claimed here.
