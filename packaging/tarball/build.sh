@@ -23,10 +23,11 @@ echo "== 2/3 stage the payload (inside the pinned image) =="
 run_in_build_container bash packaging/tarball/stage.sh 2>&1 | tee "$LANE/evidence/00-stage.log"
 
 echo "== 3/3 clean-room acceptance image =="
-# The Docker CLI wants a writable config dir; the sandboxed HOME is read-only, so
-# keep it inside the workspace. The classic builder needs no buildx state.
+# BuildKit keeps its buildx state in the Docker CLI config dir; the sandboxed
+# HOME is read-only, so keep that state inside the workspace. (scripts/lib.sh
+# applies the same fallback for every docker build it runs.)
 mkdir -p "$ROOT/target/docker-config"
-DOCKER_BUILDKIT=0 DOCKER_CONFIG="$ROOT/target/docker-config" \
+DOCKER_CONFIG="$ROOT/target/docker-config" \
   docker build -t "$TEST_IMAGE" -f "$LANE/docker/Dockerfile.test" "$LANE/docker" \
   > "$LANE/evidence/01-cleanroom-image.log" 2>&1
 tail -1 "$LANE/evidence/01-cleanroom-image.log"

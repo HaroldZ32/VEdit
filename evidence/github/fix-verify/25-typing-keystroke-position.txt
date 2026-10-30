@@ -1,0 +1,16 @@
+# where the typed character lands after opening a file (reviewer observation)
+# date: 2026-10-30T16:47:08+08:00  binary: sha256 82477a6aa65de1b1061b0df8a0e85c1ca87c0d75e4fc7497bdf89a864a4f9e52
+# uses the captain's probe unchanged, then diffs the file the probe saved
+probe_exit=0
+xtype_exit=0
+RESULT: TYPING_WORKS (keystroke reached the buffer)
+--- diff original vs saved ---
+--- /tmp/vedit-typing/original.sv	2026-10-30 08:47:09.031918151 +0000
++++ /tmp/vedit-typing/target.sv	2026-10-30 08:47:14.913701285 +0000
+@@ -1,3 +1,4 @@
+ module a_top;
+   b_top u_b ();
+ endmodule
++a
+\ No newline at end of file
+diff_exit=1

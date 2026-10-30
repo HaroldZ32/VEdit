@@ -1,0 +1,23 @@
+### F2 mutation check: remove `place_cursor(&start_iter())` from Document::open
+# Expectation: the two new tests FAIL at the end of the document, proving they
+# catch the pre-fix defect (they were added before the fix and observed RED).
+### command: cargo test -p vd-editor --offline opening_
+
+thread 'document::tests::opening_a_crlf_file_puts_the_cursor_at_the_start' (168) panicked at crates/vd-editor/src/document.rs:1195:9:
+crlf: insert mark is at offset 34 instead of the document start
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- document::tests::opening_an_lf_file_puts_the_cursor_at_the_start stdout ----
+
+thread 'document::tests::opening_an_lf_file_puts_the_cursor_at_the_start' (169) panicked at crates/vd-editor/src/document.rs:1195:9:
+lf: insert mark is at offset 32 instead of the document start
+
+
+failures:
+    document::tests::opening_a_crlf_file_puts_the_cursor_at_the_start
+    document::tests::opening_an_lf_file_puts_the_cursor_at_the_start
+
+test result: FAILED. 0 passed; 2 failed; 0 ignored; 0 measured; 42 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p vd-editor --lib`
+mutation_test_exit=101

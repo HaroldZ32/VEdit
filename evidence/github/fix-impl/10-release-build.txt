@@ -1,0 +1,7 @@
+   Compiling gdk v0.18.2
+   Compiling sourceview4 v0.5.0
+   Compiling vd-syntax v0.1.0 (/vedit-build/crates/vd-syntax)
+   Compiling vd-editor v0.1.0 (/vedit-build/crates/vd-editor)
+   Compiling vd-app v0.1.0 (/vedit-build/crates/vd-app)
+    Finished `release` profile [optimized] target(s) in 43.02s
+build_exit=0

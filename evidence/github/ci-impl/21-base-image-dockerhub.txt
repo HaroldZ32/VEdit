@@ -1,0 +1,23 @@
+### Path 3b — primary unreachable and the REAL default fallback (Docker Hub) unavailable
+# command: VEDIT_BASE_IMAGE=localhost:9/library/centos VEDIT_BUILD_IMAGE_REF=vedit-build:t10-hub bash scripts/build-image.sh
+# (VEDIT_BASE_IMAGE_FALLBACK unset -> docker.io)
+[image] pulling localhost:9/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4 (attempt 1/3)
+Error response from daemon: failed to resolve reference "localhost:9/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4": failed to do request: Head "https://localhost:9/v2/library/centos/manifests/sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4": dial tcp [::1]:9: connect: connection refused
+[image] pull attempt 1/3 failed; retrying in 2s
+[image] pulling localhost:9/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4 (attempt 2/3)
+Error response from daemon: failed to resolve reference "localhost:9/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4": failed to do request: Head "https://localhost:9/v2/library/centos/manifests/sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4": dial tcp [::1]:9: connect: connection refused
+[image] pull attempt 2/3 failed; retrying in 4s
+[image] pulling localhost:9/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4 (attempt 3/3)
+Error response from daemon: failed to resolve reference "localhost:9/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4": failed to do request: Head "https://localhost:9/v2/library/centos/manifests/sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4": dial tcp [::1]:9: connect: connection refused
+[image] primary registry failed after 3 attempts; falling back to docker.io: docker.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+[image] pulling docker.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4 (attempt 1/3)
+Error response from daemon: failed to resolve reference "docker.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4": failed to do request: Head "https://registry-1.docker.io/v2/library/centos/manifests/sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4": read tcp [2408:820c:8f1a:28f1:bed1:4557:2d4a:8c3e]:56000->[2600:1f18:2148:bc02:d90:7659:1a87:95a9]:443: read: connection reset by peer
+[image] pull attempt 1/3 failed; retrying in 2s
+[image] pulling docker.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4 (attempt 2/3)
+Error response from daemon: failed to resolve reference "docker.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4": failed to do request: Head "https://registry-1.docker.io/v2/library/centos/manifests/sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4": read tcp [2408:820c:8f1a:28f1:bed1:4557:2d4a:8c3e]:56008->[2600:1f18:2148:bc02:d90:7659:1a87:95a9]:443: read: connection reset by peer
+[image] pull attempt 2/3 failed; retrying in 4s
+[image] pulling docker.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4 (attempt 3/3)
+Error response from daemon: failed to resolve reference "docker.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4": failed to do request: Head "https://registry-1.docker.io/v2/library/centos/manifests/sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4": read tcp [2408:820c:8f1a:28f1:bed1:4557:2d4a:8c3e]:37832->[2600:1f18:2148:bc02:d90:7659:1a87:95a9]:443: read: connection reset by peer
+FATAL: cannot obtain the pinned base image localhost:9/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4 (primary registry and the docker.io fallback both failed)
+hub_fallback_elapsed=13.988 s
+hub_fallback_exit=1

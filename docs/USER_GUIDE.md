@@ -11,22 +11,22 @@
 ### 1.1 AppImage（最省事，需要 FUSE）
 
 ```sh
-chmod +x VEdit-0.1.0-x86_64.AppImage
-./VEdit-0.1.0-x86_64.AppImage
+chmod +x VEdit-0.1.1-x86_64.AppImage
+./VEdit-0.1.1-x86_64.AppImage
 ```
 
 CentOS 7 常常没有 `fusermount3`，直接运行会以 `No suitable fusermount binary found` 退出 127。
 两种兜底方式：
 
 ```sh
-./VEdit-0.1.0-x86_64.AppImage --appimage-extract-and-run
-APPIMAGE_EXTRACT_AND_RUN=1 ./VEdit-0.1.0-x86_64.AppImage
+./VEdit-0.1.1-x86_64.AppImage --appimage-extract-and-run
+APPIMAGE_EXTRACT_AND_RUN=1 ./VEdit-0.1.1-x86_64.AppImage
 ```
 
 ### 1.2 目录包 tar.gz（不需要 FUSE，最稳）
 
 ```sh
-tar xzf vedit-0.1.0-linux-x86_64.tar.gz
+tar xzf vedit-0.1.1-linux-x86_64.tar.gz
 ./VEdit/vedit.sh                 # 空编辑器
 ./VEdit/vedit.sh path/to/top.sv  # 直接打开文件
 ```
@@ -36,9 +36,9 @@ tar xzf vedit-0.1.0-linux-x86_64.tar.gz
 ### 1.3 单文件自解压 `.run`（不需要 FUSE，单文件）
 
 ```sh
-sh VEdit-0.1.0-x86_64.run path/to/top.sv
+sh VEdit-0.1.1-x86_64.run path/to/top.sv
 # 或
-chmod +x VEdit-0.1.0-x86_64.run && ./VEdit-0.1.0-x86_64.run
+chmod +x VEdit-0.1.1-x86_64.run && ./VEdit-0.1.1-x86_64.run
 ```
 
 行为说明：
@@ -166,7 +166,7 @@ accept-fim = "Tab"
 | 输入法无候选框 | 系统未装/未运行 ibus/fcitx；VEdit 只提供 GTK 侧模块 |
 | 启动日志 `Locale not supported by C library` | 目标机缺 `en_US.UTF-8` locale；不影响显示，可 `localedef` 生成 |
 | 无头容器里 `--screenshot` 得到空白图 | 已知问题（无窗口管理器时 GTK 绘制时机）；用 X server 捕获代替 |
-| 想确认安装完整性 | `sh VEdit-0.1.0-x86_64.run --selftest all`（退出码 0 即 6 套件 51 项全过） |
+| 想确认安装完整性 | `sh VEdit-0.1.1-x86_64.run --selftest all`（退出码 0 即 6 套件 62 项全过） |
 
 ## 9. 文件与位置
 

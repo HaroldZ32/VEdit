@@ -1,0 +1,10 @@
+### Path 1 — normal (image already present: no pull, no extra time)
+# command: bash build/slang/fetch-image.sh
+== image docker.m.daocloud.io/library/centos:7 is already present; no pull needed ==
+normal_elapsed=0.026 s
+normal_exit=0
+
+--- build.sh stage 0 call site ---
+35:echo "== stage 0: make the build image available (bounded retry + Docker Hub fallback) =="
+36-bash "$HERE/fetch-image.sh"
+37-

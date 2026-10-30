@@ -1,0 +1,64 @@
+### build.sh flow, normal path (image present -> stage 0 pulls nothing)
+# Verification note: `docker run` is stubbed via a PATH wrapper so the multi-minute
+# slang rebuild is skipped; stage 0 (image acquisition) and the host-side ELF
+# checks run for real, and the previously verified out/slang artifact is used.
+# command: PATH=target/t13bin:$PATH bash build/slang/build.sh
+== stage 0: make the build image available (bounded retry + Docker Hub fallback) ==
+== image docker.m.daocloud.io/library/centos:7 is already present; no pull needed ==
+== stage 1: build inside a fresh docker.m.daocloud.io/library/centos:7 container ==
+[verification stub] docker run skipped (a real slang rebuild is multi-minute); the existing verified artifact is used
+== stage 2: ELF checks on the host ==
+# generated 2026-10-30T12:03:25Z by build.sh stage 2
+
+/home/haroldzhao/MyProj/DshProj/VEdit/build/slang/out/slang:     file format elf64-x86-64
+
+Program Header:
+    PHDR off    0x0000000000000040 vaddr 0x0000000000400040 paddr 0x0000000000400040 align 2**3
+         filesz 0x00000000000002a0 memsz 0x00000000000002a0 flags r--
+  INTERP off    0x00000000000002e0 vaddr 0x00000000004002e0 paddr 0x00000000004002e0 align 2**0
+         filesz 0x000000000000001c memsz 0x000000000000001c flags r--
+    LOAD off    0x0000000000000000 vaddr 0x0000000000400000 paddr 0x0000000000400000 align 2**12
+         filesz 0x0000000000003588 memsz 0x0000000000003588 flags r--
+    LOAD off    0x0000000000004000 vaddr 0x0000000000404000 paddr 0x0000000000404000 align 2**12
+         filesz 0x0000000000766f85 memsz 0x0000000000766f85 flags r-x
+    LOAD off    0x000000000076b000 vaddr 0x0000000000b6b000 paddr 0x0000000000b6b000 align 2**12
+         filesz 0x000000000019d9dd memsz 0x000000000019d9dd flags r--
+    LOAD off    0x0000000000908e70 vaddr 0x0000000000d09e70 paddr 0x0000000000d09e70 align 2**12
+         filesz 0x000000000000c4d0 memsz 0x000000000001ddf0 flags rw-
+ DYNAMIC off    0x0000000000912da8 vaddr 0x0000000000d13da8 paddr 0x0000000000d13da8 align 2**3
+         filesz 0x0000000000000200 memsz 0x0000000000000200 flags rw-
+    NOTE off    0x00000000000002fc vaddr 0x00000000004002fc paddr 0x00000000004002fc align 2**2
+         filesz 0x0000000000000044 memsz 0x0000000000000044 flags r--
+## highest versioned GLIBC symbol required:
+GLIBC_2.17
+## all GLIBC versions referenced:
+GLIBC_2.2.5 GLIBC_2.3 GLIBC_2.3.2 GLIBC_2.4 GLIBC_2.6 GLIBC_2.14 GLIBC_2.17 
+## non-GLIBC versioned symbols (expected: none):
+(none)
+## NEEDED entries:
+  NEEDED               libpthread.so.0
+  NEEDED               libm.so.6
+  NEEDED               libc.so.6
+  NEEDED               ld-linux-x86-64.so.2
+## sha256 / size:
+63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  /home/haroldzhao/MyProj/DshProj/VEdit/build/slang/out/slang
+size_bytes=9526400
+OK: highest GLIBC symbol is GLIBC_2.17 (<= 2.17); no libstdc++/libgcc_s dependency
+== stage 3: offline smoke test in a second fresh docker.m.daocloud.io/library/centos:7 container ==
+[verification stub] docker run skipped (a real slang rebuild is multi-minute); the existing verified artifact is used
+
+BUILD OK: 63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  /home/haroldzhao/MyProj/DshProj/VEdit/build/slang/out/slang
+artifact: /home/haroldzhao/MyProj/DshProj/VEdit/build/slang/out/slang
+evidence: /home/haroldzhao/MyProj/DshProj/VEdit/build/slang/evidence/
+build_flow_elapsed=0.102 s
+build_flow_exit=0
+
+--- pull calls logged (expect none) ---
+(no docker pull)
+--- stage 0 output ---
+
+### note on the "stage 0 output" block above
+That grep was pointed at the docker argv log instead of the run output; the
+stage-0 lines are lines 6–7 of this file ("already present; no pull needed").
+The argv log contains no `argv: pull …` line — that empty result is the proof
+that the happy path triggers no pull.

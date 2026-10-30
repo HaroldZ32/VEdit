@@ -6,6 +6,8 @@
 #     ./build.sh
 #
 # What it does:
+#   0. makes the build image available through build/slang/fetch-image.sh
+#      (bounded retry, then the same tag from the Docker Hub fallback);
 #   1. runs scripts/build-in-container.sh inside a FRESH
 #      docker.m.daocloud.io/library/centos:7 container (no host toolchain used);
 #   2. asserts the produced ELF needs no symbol newer than GLIBC_2.17 and does
@@ -26,16 +28,14 @@ set -a
 source "$HERE/versions.env"
 set +a
 
-IMAGE=${SLANG_BUILD_IMAGE:-docker.m.daocloud.io/library/centos:7}
+# Defaults live in versions.env (SLANG_BUILD_IMAGE / SLANG_BUILD_IMAGE_FALLBACK).
+IMAGE="$SLANG_BUILD_IMAGE"
 OBJDUMP=${OBJDUMP:-objdump}
 
 mkdir -p "$HERE/out" "$HERE/evidence" "$HERE/cache"
 
-image_present() { docker image inspect "$IMAGE" >/dev/null 2>&1; }
-if ! image_present; then
-  echo "== pulling $IMAGE =="
-  docker pull "$IMAGE"
-fi
+echo "== stage 0: make the build image available (bounded retry + Docker Hub fallback) =="
+bash "$HERE/fetch-image.sh"
 
 echo "== stage 1: build inside a fresh $IMAGE container =="
 set +e

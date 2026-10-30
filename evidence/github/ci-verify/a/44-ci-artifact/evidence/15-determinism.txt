@@ -1,0 +1,10 @@
+# Two consecutive builds of the same sources (2026-10-30T03:32:21Z)
+$ bash scripts/build.sh
+exit=0
+7082ab7a4e83cbbadbad05f9fe8862942c870190c625b882833a6097cdf2c666  target/release/vd-app
+$ bash scripts/build.sh   # second run, no source change
+exit=0
+7082ab7a4e83cbbadbad05f9fe8862942c870190c625b882833a6097cdf2c666  target/release/vd-app
+result=IDENTICAL (byte-identical binary across two builds)
+note=both runs reused the cached image and cargo target directory; a fully
+note=cold rebuild comparison is the T27 acceptance action.

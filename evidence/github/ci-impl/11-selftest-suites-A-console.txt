@@ -1,0 +1,451 @@
+== pinned inputs ==
+  VEDIT_BASE_IMAGE="docker.m.daocloud.io/library/centos"
+  VEDIT_BASE_IMAGE_DIGEST="sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4"
+  CENTOS_VAULT_BASE="https://mirrors.tuna.tsinghua.edu.cn/centos-vault/7.9.2009"
+  RUST_TOOLCHAIN="1.99.0"
+  RUSTUP_VERSION="1.29.2"
+  RUSTUP_URL="https://static.rust-lang.org/rustup/archive/1.29.2/x86_64-unknown-linux-gnu/rustup-init"
+  RUSTUP_SHA256="5be191e8c70a5007074254cb74d78dbfdd25cd5a61c27de7b8e5410122ec24f4"
+  GSV_VERSION="4.6.1"
+  GSV_URL="https://download.gnome.org/sources/gtksourceview/4.6/gtksourceview-4.6.1.tar.xz"
+  GSV_SHA256="63f487a7ab59612ffa9e7be1883dbd274ab1016afcede3239b93b0fc384df874"
+  MESON_VERSION="0.59.4"
+  MESON_WHEEL_URL="https://files.pythonhosted.org/packages/01/48/b4ba2490ed26c73618736dece01a68a609713f1a7923563d4c41ac966b3b/meson-0.59.4-py3-none-any.whl"
+  MESON_WHEEL_SHA256="9db5bb89d3bd1c8e9c15974be5fa656f50491c48d53c43b6eb5cfe406dff3fd6"
+  NINJA_VERSION="1.11.1"
+  NINJA_WHEEL_URL="https://files.pythonhosted.org/packages/0f/58/854ce5aab0ff5c33d66e1341b0be42f0330797335011880f7fbd88449996/ninja-1.11.1-py2.py3-none-manylinux_2_12_x86_64.manylinux2010_x86_64.whl"
+  NINJA_WHEEL_SHA256="817e2aee2a4d28a708a67bcfba1817ae502c32c6d8ef80e50d63b0f23adf3a08"
+  APPIMAGETOOL_URL="https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
+  APPIMAGETOOL_SHA256="793fca0ce4bcc309dc65d3f66669f58e3755643e4dadbe03932e7b436128494f"
+  SLANG_BIN_SHA256="63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252"
+  VERIBLE_VERSION="v0.0-4298-g085eef05"
+  VERIBLE_URL="https://github.com/chipsalliance/verible/releases/download/v0.0-4298-g085eef05/verible-v0.0-4298-g085eef05-linux-static-x86_64.tar.gz"
+  VERIBLE_TARBALL_SHA256="ca83778c7c2b73272277bd670d1851c8caf973fd3283688aeb0d36d4b3598a90"
+  VERIBLE_LS_SHA256="07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845"
+  VERIBLE_LINT_SHA256="b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29"
+  VERIBLE_FORMAT_SHA256="b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473"
+  RELEASE_RUSTFLAGS="--remap-path-prefix=/vedit-build/target/cargo-home=/cargo --remap-path-prefix=/root/.cargo=/cargo --remap-path-prefix=/opt/cargo=/cargo --remap-path-prefix=/opt/rust=/rust --remap-path-prefix=/vedit-build=/vedit"
+== stage 1/4: pinned build image ==
+[image] building vedit-build:local from the pinned inputs
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.build
+#1 transferring dockerfile: 5.86kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/9] FROM docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+#4 resolve docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 310B done
+#5 DONE 0.0s
+
+#6 [2/9] COPY vault.repo.in /tmp/vault.repo.in
+#6 CACHED
+
+#7 [8/9] RUN set -eux;     curl -fsSL -o /tmp/gtksourceview.tar.xz "https://download.gnome.org/sources/gtksourceview/4.6/gtksourceview-4.6.1.tar.xz";     echo "63f487a7ab59612ffa9e7be1883dbd274ab1016afcede3239b93b0fc384df874  /tmp/gtksourceview.tar.xz" | sha256sum -c -;     mkdir -p /opt/src/gtksourceview;     tar -xJf /tmp/gtksourceview.tar.xz -C /opt/src/gtksourceview --strip-components=1;     cd /opt/src/gtksourceview;     meson setup build --prefix=/opt/gsv4 --libdir=lib64       -Dgtk_doc=false -Dgir=false -Dvapi=false -Dinstall_tests=false -Dglade_catalog=false;     ninja -C build;     ninja -C build install;     rm -rf /opt/src/gtksourceview /tmp/gtksourceview.tar.xz
+#7 CACHED
+
+#8 [3/9] RUN rm -f /etc/yum.repos.d/CentOS-*.repo  && sed "s|@CENTOS_VAULT_BASE@|https://mirrors.tuna.tsinghua.edu.cn/centos-vault/7.9.2009|g" /tmp/vault.repo.in > /etc/yum.repos.d/vault.repo  && rm -f /tmp/vault.repo.in  && cat /etc/yum.repos.d/vault.repo
+#8 CACHED
+
+#9 [6/9] RUN set -eux;     curl -fsSL -o /tmp/meson.whl "https://files.pythonhosted.org/packages/01/48/b4ba2490ed26c73618736dece01a68a609713f1a7923563d4c41ac966b3b/meson-0.59.4-py3-none-any.whl";     echo "9db5bb89d3bd1c8e9c15974be5fa656f50491c48d53c43b6eb5cfe406dff3fd6  /tmp/meson.whl" | sha256sum -c -;     curl -fsSL -o /tmp/ninja.whl "https://files.pythonhosted.org/packages/0f/58/854ce5aab0ff5c33d66e1341b0be42f0330797335011880f7fbd88449996/ninja-1.11.1-py2.py3-none-manylinux_2_12_x86_64.manylinux2010_x86_64.whl";     echo "817e2aee2a4d28a708a67bcfba1817ae502c32c6d8ef80e50d63b0f23adf3a08  /tmp/ninja.whl" | sha256sum -c -;     mkdir -p /opt/wheels/meson /opt/wheels/ninja;     python3 -m zipfile -e /tmp/meson.whl /opt/wheels/meson;     pysite=$(python3 -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])');     mkdir -p "$pysite";     cp -a /opt/wheels/meson/mesonbuild "$pysite/";     { echo '#!/usr/bin/python3';       echo 'import sys';       echo 'from mesonbuild.mesonmain import main';       echo 'if __name__ == "__main__":';       echo '    sys.exit(main())';     } > /usr/local/bin/meson;     chmod 755 /usr/local/bin/meson;     python3 -m zipfile -e /tmp/ninja.whl /opt/wheels/ninja;     cp /opt/wheels/ninja/ninja/data/bin/ninja /usr/local/bin/ninja;     chmod 755 /usr/local/bin/ninja;     meson --version; ninja --version
+#9 CACHED
+
+#10 [5/9] RUN mkdir -p /opt/vedit  && { echo "## gtk3 immodule packages in the CentOS 7.9.2009 vault:";       for pkg in gtk3-immodule-xim gtk3-immodule-ibus ibus-gtk3; do         if yum -y install "$pkg" >/dev/null 2>&1; then echo "installed $pkg";         else echo "not available: $pkg"; fi;       done;       echo "## immodule files:";       ls -l /usr/lib64/gtk-3.0/3.0.0/immodules/ 2>&1 || true;     } | tee /opt/vedit/immodules.txt
+#10 CACHED
+
+#11 [7/9] RUN set -eux;     curl -fsSL -o /tmp/rustup-init "https://static.rust-lang.org/rustup/archive/1.29.2/x86_64-unknown-linux-gnu/rustup-init";     echo "5be191e8c70a5007074254cb74d78dbfdd25cd5a61c27de7b8e5410122ec24f4  /tmp/rustup-init" | sha256sum -c -;     chmod 755 /tmp/rustup-init;     RUSTUP_HOME=/opt/rust CARGO_HOME=/opt/cargo /tmp/rustup-init       -y --no-modify-path --profile minimal --default-toolchain "1.99.0";     RUSTUP_HOME=/opt/rust CARGO_HOME=/opt/cargo /opt/cargo/bin/rustup component add       --toolchain "1.99.0" rustfmt clippy;     chmod -R a+rX /opt/rust /opt/cargo;     RUSTUP_HOME=/opt/rust CARGO_HOME=/opt/cargo /opt/cargo/bin/rustc --version
+#11 CACHED
+
+#12 [4/9] RUN yum -y install       gcc gcc-c++ make pkgconfig git curl tar xz bzip2 which findutils file       glib2-devel gtk3-devel libxml2-devel gettext       gdk-pixbuf2 gdk-pixbuf2-devel       python3       dejavu-sans-fonts dejavu-sans-mono-fonts fontconfig       xorg-x11-server-Xvfb xorg-x11-utils mesa-demos mesa-libGL  && yum clean all
+#12 CACHED
+
+#13 [9/9] RUN { echo "## image facts"; cat /etc/centos-release;       echo "glibc: $(rpm -q glibc)";       echo "gtk3: $(rpm -q gtk3)";       echo "rust: $(/opt/cargo/bin/rustc --version)";       echo "gsv4: $(PKG_CONFIG_PATH=/opt/gsv4/lib64/pkgconfig pkg-config --modversion gtksourceview-4)";     } > /opt/vedit/build-image.txt  && rpm -qa --qf '%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n' | sort > /opt/vedit/rpm-snapshot.txt
+#13 CACHED
+
+#14 exporting to image
+#14 exporting layers done
+#14 exporting manifest sha256:4d17ef5bbb9295727ee7c79195c74e86365718947424e6c85bed4449f0e0b574 0.0s done
+#14 exporting config sha256:5ecfe56748c331b367243feb27bb3f93a5f9fe22d21e223a403ab594ee65f180 0.0s done
+#14 exporting attestation manifest sha256:13adbbbd2a94606a4b3835c7f8bbd98e26b54a70058d674ace7f53809325099c
+#14 exporting attestation manifest sha256:13adbbbd2a94606a4b3835c7f8bbd98e26b54a70058d674ace7f53809325099c 0.0s done
+#14 exporting manifest list sha256:1e4539885533fe7289254b36622549578cd2ccbf572dd5fd90a48d662526f79e 0.0s done
+#14 naming to docker.io/library/vedit-build:local done
+#14 unpacking to docker.io/library/vedit-build:local done
+#14 DONE 0.1s
+image_tag=vedit-build:local
+image_id=sha256:1e4539885533fe7289254b36622549578cd2ccbf572dd5fd90a48d662526f79e
+base_ref=docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+source_date_epoch=1793353705
+source_date_epoch_source=host:git show -s --format=%ct HEAD
+cargo_incremental=0 (set inside the container)
+remap_flags=RELEASE_RUSTFLAGS="--remap-path-prefix=/vedit-build/target/cargo-home=/cargo --remap-path-prefix=/root/.cargo=/cargo --remap-path-prefix=/opt/cargo=/cargo --remap-path-prefix=/opt/rust=/rust --remap-path-prefix=/vedit-build=/vedit"
+== stage 2/4: release build + Xvfb smoke in the image ==
+== container environment ==
+date_utc=2026-10-30T10:07:57Z
+container=CentOS Linux release 7.9.2009 (Core)
+glibc=glibc-2.17-326.el7_9.3.x86_64
+gtk3=gtk3-3.22.30-8.el7_9.x86_64
+gtk3_pkg=3.22.30
+glib_pkg=2.56.1
+gsv4_pkg=4.6.1
+rustc=rustc 1.99.0 (b940084d7 2026-09-28)
+cargo=cargo 1.99.0 (5f94df478 2026-08-27)
+python3=Python 3.6.8
+meson=0.59.4
+ninja=1.11.1.git.kitware.jobserver-1
+cargo_home=/vedit-build/target/cargo-home
+home=/vedit-build/target/home
+== installed RPM set vs scripts/docker/rpm-baseline.txt ==
+rpm set matches the baseline (382 packages)
+== cargo build --release --workspace ==
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling serde_core v1.0.229
+   Compiling serde v1.0.229
+   Compiling hashbrown v0.17.1
+   Compiling equivalent v1.0.3
+   Compiling winnow v0.5.40
+   Compiling target-lexicon v0.12.16
+   Compiling pkg-config v0.3.34
+   Compiling smallvec v1.16.4
+   Compiling heck v0.5.0
+   Compiling version-compare v0.2.1
+   Compiling libc v0.2.191
+   Compiling memchr v2.8.3
+   Compiling once_cell v1.21.4
+   Compiling version_check v0.9.5
+   Compiling pin-project-lite v0.2.17
+   Compiling futures-sink v0.3.34
+   Compiling futures-core v0.3.34
+   Compiling futures-io v0.3.34
+   Compiling bitflags v2.13.2
+   Compiling syn v1.0.109
+   Compiling futures-task v0.3.34
+   Compiling slab v0.4.12
+   Compiling proc-macro-error-attr v1.0.4
+   Compiling futures-channel v0.3.34
+   Compiling proc-macro-error v1.0.4
+   Compiling stable_deref_trait v1.2.1
+   Compiling thiserror v1.0.69
+   Compiling heck v0.4.1
+   Compiling itoa v1.0.18
+   Compiling zmij v1.0.23
+   Compiling cfg-expr v0.15.8
+   Compiling indexmap v2.14.2
+   Compiling writeable v0.6.4
+   Compiling gio v0.18.4
+   Compiling find-msvc-tools v0.1.15
+   Compiling litemap v0.8.3
+   Compiling cfg-if v1.0.5
+   Compiling serde_json v1.0.154
+   Compiling utf_types v1.0.0
+   Compiling shlex v2.0.1
+   Compiling autocfg v1.5.1
+   Compiling cc v1.10.0
+   Compiling icu_normalizer_data v2.4.0
+   Compiling semver v1.0.28
+   Compiling utf8_iter v1.1.0
+   Compiling syn v3.0.9
+   Compiling syn v2.0.119
+   Compiling icu_properties_data v2.4.0
+   Compiling bytes v1.12.1
+   Compiling memoffset v0.9.1
+   Compiling rustc_version v0.4.1
+   Compiling percent-encoding v2.3.2
+   Compiling zeroize v1.9.1
+   Compiling anyhow v1.0.104
+   Compiling rustix v1.1.6
+   Compiling field-offset v0.3.6
+   Compiling rustls-pki-types v1.15.1
+   Compiling gtk v0.18.2
+   Compiling httparse v1.10.1
+   Compiling linux-raw-sys v0.12.1
+   Compiling getrandom v0.2.17
+   Compiling untrusted v0.9.0
+   Compiling log v0.4.34
+   Compiling rustls v0.23.46
+   Compiling http v1.5.0
+   Compiling errno v0.3.14
+   Compiling form_urlencoded v1.2.2
+   Compiling thiserror v2.0.21
+   Compiling base64 v0.23.1
+   Compiling getrandom v0.4.3
+   Compiling subtle v2.6.1
+   Compiling webpki-roots v1.0.11
+   Compiling signal-hook-registry v1.4.8
+   Compiling mio v1.2.4
+   Compiling tracing-core v0.1.36
+   Compiling winnow v1.0.4
+   Compiling utf8-zero v0.8.1
+   Compiling bitflags v1.3.2
+   Compiling tower-service v0.3.3
+   Compiling toml_writer v1.1.3+spec-1.1.0
+   Compiling fastrand v2.5.0
+   Compiling tower-layer v0.3.3
+   Compiling toml_parser v1.1.5+spec-1.1.0
+   Compiling ring v0.17.14
+   Compiling ureq-proto v0.6.5
+   Compiling toml_datetime v0.6.3
+   Compiling serde_spanned v0.6.9
+   Compiling toml_edit v0.20.2
+   Compiling toml_edit v0.19.15
+   Compiling toml_datetime v1.1.2+spec-1.1.0
+   Compiling serde_spanned v1.1.2
+   Compiling toml v1.1.8+spec-1.1.0
+   Compiling synstructure v0.14.0
+   Compiling proc-macro-crate v1.3.1
+   Compiling thiserror-impl v1.0.69
+   Compiling toml v0.8.2
+   Compiling proc-macro-crate v2.0.2
+   Compiling tracing-attributes v0.1.31
+   Compiling waitpid-any v0.3.0
+   Compiling tempfile v3.27.0
+   Compiling gtk3-macros v0.18.2
+   Compiling system-deps v6.2.2
+   Compiling zerofrom-derive v0.1.8
+   Compiling futures-macro v0.3.34
+   Compiling yoke-derive v0.8.4
+   Compiling zerovec-derive v0.11.7
+   Compiling displaydoc v0.2.7
+   Compiling serde_derive v1.0.229
+   Compiling tokio-macros v2.7.2
+   Compiling glib-macros v0.18.5
+   Compiling serde_repr v0.1.21
+   Compiling thiserror-impl v2.0.21
+   Compiling glib-sys v0.18.1
+   Compiling gobject-sys v0.18.0
+   Compiling gio-sys v0.18.1
+   Compiling atk-sys v0.18.2
+   Compiling gdk-sys v0.18.2
+   Compiling futures-util v0.3.34
+   Compiling gdk-pixbuf-sys v0.18.0
+   Compiling pango-sys v0.18.0
+   Compiling cairo-sys-rs v0.18.2
+   Compiling gtk-sys v0.18.2
+   Compiling sourceview4-sys v0.5.0
+   Compiling tracing v0.1.44
+   Compiling tokio v1.54.1
+   Compiling zerofrom v0.1.8
+   Compiling yoke v0.8.4
+   Compiling zerovec v0.11.9
+   Compiling zerotrie v0.2.5
+   Compiling tinystr v0.8.5
+   Compiling potential_utf v0.1.6
+   Compiling icu_collections v2.4.0
+   Compiling icu_locale_core v2.4.0
+   Compiling vd-deeplint v0.1.0 (/vedit-build/crates/vd-deeplint)
+   Compiling vd-config v0.1.0 (/vedit-build/crates/vd-config)
+   Compiling icu_provider v2.4.0
+   Compiling icu_properties v2.4.0
+   Compiling icu_normalizer v2.4.0
+   Compiling futures-executor v0.3.34
+   Compiling futures v0.3.34
+   Compiling glib v0.18.5
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling tokio-util v0.7.20
+   Compiling lsp-types v0.95.1
+   Compiling rustls-webpki v0.103.16
+   Compiling cairo-rs v0.18.5
+   Compiling atk v0.18.2
+   Compiling ureq v3.5.0
+   Compiling vd-fim v0.1.0 (/vedit-build/crates/vd-fim)
+   Compiling async-lsp v0.2.4
+   Compiling vd-lsp v0.1.0 (/vedit-build/crates/vd-lsp)
+   Compiling gdk-pixbuf v0.18.5
+   Compiling pango v0.18.3
+   Compiling gdk v0.18.2
+   Compiling sourceview4 v0.5.0
+   Compiling vd-syntax v0.1.0 (/vedit-build/crates/vd-syntax)
+   Compiling vd-editor v0.1.0 (/vedit-build/crates/vd-editor)
+   Compiling vd-app v0.1.0 (/vedit-build/crates/vd-app)
+    Finished `release` profile [optimized] target(s) in 40.70s
+artifact=build/artifacts/vd-app
+b1d81ec632858ceec4c115cabc40cbcec27c7db69eaa46ce89d7675dafd6fc34  /vedit-build/target/release/vd-app
+size_bytes=6018496
+/vedit-build/target/release/vd-app: ELF 64-bit LSB shared object, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.6.32, BuildID[sha1]=9b99ee8705b4211fc57910b956281ea782a3846d, stripped
+## ldd:
+	linux-vdso.so.1 =>  (0x00007c6afa0a9000)
+	libgtksourceview-4.so.0 => /opt/gsv4/lib64/libgtksourceview-4.so.0 (0x00007c6af9359000)
+	libgtk-3.so.0 => /lib64/libgtk-3.so.0 (0x00007c6af8a51000)
+	libgdk-3.so.0 => /lib64/libgdk-3.so.0 (0x00007c6af8767000)
+	libgio-2.0.so.0 => /lib64/libgio-2.0.so.0 (0x00007c6af83c7000)
+	libgdk_pixbuf-2.0.so.0 => /lib64/libgdk_pixbuf-2.0.so.0 (0x00007c6af819f000)
+	libcairo-gobject.so.2 => /lib64/libcairo-gobject.so.2 (0x00007c6af7f96000)
+	libpango-1.0.so.0 => /lib64/libpango-1.0.so.0 (0x00007c6af7d50000)
+	libcairo.so.2 => /lib64/libcairo.so.2 (0x00007c6af7a19000)
+	libgobject-2.0.so.0 => /lib64/libgobject-2.0.so.0 (0x00007c6af77c8000)
+	libglib-2.0.so.0 => /lib64/libglib-2.0.so.0 (0x00007c6af74b2000)
+	libgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x00007c6af729c000)
+	librt.so.1 => /lib64/librt.so.1 (0x00007c6af7094000)
+	libpthread.so.0 => /lib64/libpthread.so.0 (0x00007c6af6e78000)
+	libm.so.6 => /lib64/libm.so.6 (0x00007c6af6b76000)
+	libdl.so.2 => /lib64/libdl.so.2 (0x00007c6af6972000)
+	libc.so.6 => /lib64/libc.so.6 (0x00007c6af65a4000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007c6af9e00000)
+	libfribidi.so.0 => /lib64/libfribidi.so.0 (0x00007c6af6388000)
+	libatk-1.0.so.0 => /lib64/libatk-1.0.so.0 (0x00007c6af6162000)
+	libpangocairo-1.0.so.0 => /lib64/libpangocairo-1.0.so.0 (0x00007c6af5f54000)
+	libxml2.so.2 => /lib64/libxml2.so.2 (0x00007c6af5bea000)
+	libgmodule-2.0.so.0 => /lib64/libgmodule-2.0.so.0 (0x00007c6af59e6000)
+	libX11.so.6 => /lib64/libX11.so.6 (0x00007c6af56a8000)
+	libXi.so.6 => /lib64/libXi.so.6 (0x00007c6af5498000)
+	libXfixes.so.3 => /lib64/libXfixes.so.3 (0x00007c6af5292000)
+	libatk-bridge-2.0.so.0 => /lib64/libatk-bridge-2.0.so.0 (0x00007c6af5063000)
+	libwayland-client.so.0 => /lib64/libwayland-client.so.0 (0x00007c6af4e54000)
+	libepoxy.so.0 => /lib64/libepoxy.so.0 (0x00007c6af4b28000)
+	libpangoft2-1.0.so.0 => /lib64/libpangoft2-1.0.so.0 (0x00007c6af4912000)
+	libfontconfig.so.1 => /lib64/libfontconfig.so.1 (0x00007c6af46d0000)
+	libXinerama.so.1 => /lib64/libXinerama.so.1 (0x00007c6af44cd000)
+	libXrandr.so.2 => /lib64/libXrandr.so.2 (0x00007c6af42c2000)
+	libXcursor.so.1 => /lib64/libXcursor.so.1 (0x00007c6af40b7000)
+	libXcomposite.so.1 => /lib64/libXcomposite.so.1 (0x00007c6af3eb4000)
+	libXdamage.so.1 => /lib64/libXdamage.so.1 (0x00007c6af3cb1000)
+	libxkbcommon.so.0 => /lib64/libxkbcommon.so.0 (0x00007c6af3a71000)
+	libwayland-cursor.so.0 => /lib64/libwayland-cursor.so.0 (0x00007c6af3869000)
+	libwayland-egl.so.1 => /lib64/libwayland-egl.so.1 (0x00007c6af3667000)
+	libXext.so.6 => /lib64/libXext.so.6 (0x00007c6af3455000)
+	libffi.so.6 => /lib64/libffi.so.6 (0x00007c6af324d000)
+	libpcre.so.1 => /lib64/libpcre.so.1 (0x00007c6af2feb000)
+	libz.so.1 => /lib64/libz.so.1 (0x00007c6af2dd5000)
+	libselinux.so.1 => /lib64/libselinux.so.1 (0x00007c6af2bae000)
+	libresolv.so.2 => /lib64/libresolv.so.2 (0x00007c6af2994000)
+	libmount.so.1 => /lib64/libmount.so.1 (0x00007c6af2751000)
+	libpng15.so.15 => /lib64/libpng15.so.15 (0x00007c6af2526000)
+	libpixman-1.so.0 => /lib64/libpixman-1.so.0 (0x00007c6af227d000)
+	libfreetype.so.6 => /lib64/libfreetype.so.6 (0x00007c6af1fbe000)
+	libEGL.so.1 => /lib64/libEGL.so.1 (0x00007c6af1daa000)
+	libxcb-shm.so.0 => /lib64/libxcb-shm.so.0 (0x00007c6af1ba6000)
+	libxcb.so.1 => /lib64/libxcb.so.1 (0x00007c6af197e000)
+	libxcb-render.so.0 => /lib64/libxcb-render.so.0 (0x00007c6af1770000)
+	libXrender.so.1 => /lib64/libXrender.so.1 (0x00007c6af1565000)
+	libGL.so.1 => /lib64/libGL.so.1 (0x00007c6af12d9000)
+	libthai.so.0 => /lib64/libthai.so.0 (0x00007c6af10cd000)
+	liblzma.so.5 => /lib64/liblzma.so.5 (0x00007c6af0ea7000)
+	libatspi.so.0 => /lib64/libatspi.so.0 (0x00007c6af0c76000)
+	libdbus-1.so.3 => /lib64/libdbus-1.so.3 (0x00007c6af0a26000)
+	libharfbuzz.so.0 => /lib64/libharfbuzz.so.0 (0x00007c6af0789000)
+	libexpat.so.1 => /lib64/libexpat.so.1 (0x00007c6af055e000)
+	libuuid.so.1 => /lib64/libuuid.so.1 (0x00007c6af0359000)
+	libblkid.so.1 => /lib64/libblkid.so.1 (0x00007c6af0119000)
+	libbz2.so.1 => /lib64/libbz2.so.1 (0x00007c6aeff09000)
+	libGLdispatch.so.0 => /lib64/libGLdispatch.so.0 (0x00007c6aefc53000)
+	libXau.so.6 => /lib64/libXau.so.6 (0x00007c6aefa4f000)
+	libGLX.so.0 => /lib64/libGLX.so.0 (0x00007c6aef81d000)
+	libsystemd.so.0 => /lib64/libsystemd.so.0 (0x00007c6aef5ec000)
+	libgraphite2.so.3 => /lib64/libgraphite2.so.3 (0x00007c6aef3be000)
+	libcap.so.2 => /lib64/libcap.so.2 (0x00007c6aef1b9000)
+	liblz4.so.1 => /lib64/liblz4.so.1 (0x00007c6aeefaa000)
+	libgcrypt.so.11 => /lib64/libgcrypt.so.11 (0x00007c6aeed29000)
+	libgpg-error.so.0 => /lib64/libgpg-error.so.0 (0x00007c6aeeb24000)
+	libdw.so.1 => /lib64/libdw.so.1 (0x00007c6aee8d3000)
+	libattr.so.1 => /lib64/libattr.so.1 (0x00007c6aee6ce000)
+	libelf.so.1 => /lib64/libelf.so.1 (0x00007c6aee4b6000)
+== Xvfb main-window smoke test ==
+# Xvfb main-window smoke (2026-10-30T10:08:42Z)
+selftest_exit=0
+## window entry from the X server (xwininfo -root -tree):
+     0x200002 "VEdit": ("vd-app" "Vd-app")  1120x780+0+0  +0+0
+selftest JSON valid: suite=smoke ok=True checks=29
+== Xvfb selftest suites (smoke/highlight/config/fim, plus lsp/slang when the binaries are provided) ==
+# Xvfb selftest suites (2026-10-30T10:08:42Z)
+VEDIT_SLANG=/vedit-build/build/slang/out/slang
+VEDIT_VERIBLE_LS=<unset>
+VEDIT_GSV_DATADIR=/opt/gsv4/share/gtksourceview-4
+suite=smoke
+exit=0
+report=/vedit-build/build/evidence/12-selftest-smoke.json
+stderr=/vedit-build/build/evidence/12-selftest-smoke.err
+suite=highlight
+exit=0
+report=/vedit-build/build/evidence/12-selftest-highlight.json
+stderr=/vedit-build/build/evidence/12-selftest-highlight.err
+suite=config
+exit=0
+report=/vedit-build/build/evidence/12-selftest-config.json
+stderr=/vedit-build/build/evidence/12-selftest-config.err
+suite=fim
+exit=0
+report=/vedit-build/build/evidence/12-selftest-fim.json
+stderr=/vedit-build/build/evidence/12-selftest-fim.err
+BUILD + XVFB SMOKE OK
+== stage 3/4: ELF assertions (host tools) ==
+# generated 2026-10-30T10:08:45Z by scripts/build.sh
+$ file target/release/vd-app
+/home/haroldzhao/MyProj/DshProj/VEdit/target/t8-clean/target/release/vd-app: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, for GNU/Linux 2.6.32, BuildID[sha1]=9b99ee8705b4211fc57910b956281ea782a3846d, stripped
+exit=0
+
+$ readelf -h | Class/Machine/Type
+  Class:                             ELF64
+  Type:                              DYN (Position-Independent Executable file)
+  Machine:                           Advanced Micro Devices X86-64
+
+$ readelf -d | NEEDED
+ 0x0000000000000001 (NEEDED)             Shared library: [libgtksourceview-4.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgtk-3.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgdk-3.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgio-2.0.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgdk_pixbuf-2.0.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcairo-gobject.so.2]
+ 0x0000000000000001 (NEEDED)             Shared library: [libpango-1.0.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libcairo.so.2]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgobject-2.0.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libglib-2.0.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [librt.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libpthread.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libdl.so.2]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]
+
+$ readelf -V | grep -o GLIBC_[0-9.]* | sort -V -u
+GLIBC_2.2.5
+GLIBC_2.3
+GLIBC_2.3.2
+GLIBC_2.3.4
+GLIBC_2.4
+GLIBC_2.7
+GLIBC_2.9
+GLIBC_2.12
+GLIBC_2.14
+GLIBC_2.15
+GLIBC_2.16
+
+$ readelf -V | grep -o GLIBC_[0-9.]* | sort -V -u | tail -1
+GLIBC_2.16
+
+$ objdump -T | grep -o GLIBC_[0-9.]* | sort -V -u | tail -1
+GLIBC_2.16
+
+$ sha256sum target/release/vd-app
+b1d81ec632858ceec4c115cabc40cbcec27c7db69eaa46ce89d7675dafd6fc34  /home/haroldzhao/MyProj/DshProj/VEdit/target/t8-clean/target/release/vd-app
+size_bytes=6018496
+OK: highest GLIBC symbol is GLIBC_2.16 (<= 2.17); no libstdc++ dependency
+artifact=build/artifacts/vd-app
+b1d81ec632858ceec4c115cabc40cbcec27c7db69eaa46ce89d7675dafd6fc34  /home/haroldzhao/MyProj/DshProj/VEdit/target/t8-clean/build/artifacts/vd-app
+size_bytes=6018496
+== stage 4/4: external inputs (not rebuilt here) ==
+# External artifacts consumed by this project
+slang_expected_sha256=63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252
+slang_path=build/slang/out/slang
+63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  /home/haroldzhao/MyProj/DshProj/VEdit/target/t8-clean/build/slang/out/slang
+slang version 12.1.0+0
+
+BUILD OK: b1d81ec632858ceec4c115cabc40cbcec27c7db69eaa46ce89d7675dafd6fc34
+binary:   /home/haroldzhao/MyProj/DshProj/VEdit/target/t8-clean/target/release/vd-app (copy: /home/haroldzhao/MyProj/DshProj/VEdit/target/t8-clean/build/artifacts/vd-app)
+evidence: /home/haroldzhao/MyProj/DshProj/VEdit/target/t8-clean/build/evidence/
+condA_build_elapsed=49.539 s
+condA_build_exit=0

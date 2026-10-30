@@ -18,7 +18,7 @@ IDE 能力全部复用上游组件（Verible、SLANG、GtkSourceView），自研
 
 ## 三种产物，怎么选
 
-| 产物 | 大小（0.1.0） | 适用场景 |
+| 产物 | 大小（0.1.1） | 适用场景 |
 |---|---|---|
 | `VEdit-<ver>-x86_64.AppImage` | ≈ 48 MB | 最省事。`chmod +x` 后直接运行；**需要 FUSE**。没有 FUSE 时用 `--appimage-extract-and-run`（或 `APPIMAGE_EXTRACT_AND_RUN=1`） |
 | `vedit-<ver>-linux-x86_64.tar.gz` | ≈ 40 MB | **不需要 FUSE**。解压后跑 `VEdit/vedit.sh`；适合内网、无 FUSE、无 `/tmp` 可执行位的老机器 |
@@ -35,15 +35,15 @@ DejaVu + 文泉驿字体。**包内所有 ELF 的最高 GLIBC 符号版本 ≤ 2
 
 ```sh
 # 1) AppImage（有 FUSE 时）
-chmod +x VEdit-0.1.0-x86_64.AppImage
-./VEdit-0.1.0-x86_64.AppImage                      # 或：./VEdit-0.1.0-x86_64.AppImage --appimage-extract-and-run
+chmod +x VEdit-0.1.1-x86_64.AppImage
+./VEdit-0.1.1-x86_64.AppImage                      # 或：./VEdit-0.1.1-x86_64.AppImage --appimage-extract-and-run
 
 # 2) 单文件自解压（推荐给 CentOS 7）
-sh VEdit-0.1.0-x86_64.run                          # 打开一个空编辑器
-sh VEdit-0.1.0-x86_64.run path/to/top.sv           # 直接打开文件
+sh VEdit-0.1.1-x86_64.run                          # 打开一个空编辑器
+sh VEdit-0.1.1-x86_64.run path/to/top.sv           # 直接打开文件
 
 # 3) 目录包
-tar xzf vedit-0.1.0-linux-x86_64.tar.gz
+tar xzf vedit-0.1.1-linux-x86_64.tar.gz
 ./VEdit/vedit.sh path/to/top.sv
 ```
 
@@ -53,7 +53,7 @@ tar xzf vedit-0.1.0-linux-x86_64.tar.gz
 运行自检（不需要任何额外环境，也不需要网络）：
 
 ```sh
-sh VEdit-0.1.0-x86_64.run --selftest all      # 6 个套件 / 51 项检查；成功 exit 0
+sh VEdit-0.1.1-x86_64.run --selftest all      # 6 个套件 / 62 项检查；成功 exit 0
 ```
 
 ## 配置

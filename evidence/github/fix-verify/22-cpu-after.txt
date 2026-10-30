@@ -1,0 +1,35 @@
+# AC-7 independent after-run for 7acd487 (Reviewer)
+# date: 2026-10-30T16:42:45+08:00  host_nproc=16  host_loadavg=0.70 0.64 0.99 2/1715 5
+# binary: sha256 82477a6aa65de1b1061b0df8a0e85c1ca87c0d75e4fc7497bdf89a864a4f9e52
+# cmd: APP_BIN=/vedit-build/target/release/vd-app bash evidence/github/repro/probe-cpu.sh
+
+binary=/vedit-build/target/release/vd-app
+file=/vedit-build/crates/vd-app/tests/fixtures/definition/a.sv
+host_nproc=16 host_loadavg=0.70 0.64 0.99
+alive=yes pid=20
+--- toplevel windows ---
+
+xwininfo: Window id: 0x43 (the root window) (has no name)
+
+  Root window id: 0x43 (the root window) (has no name)
+  Parent window id: 0x0 (none)
+     4 children:
+     0x60000f (has no name): ()  1x1+-1+-1  +-1+-1
+     0x600002 "VEdit": ("vd-app" "Vd-app")  1120x780+0+0  +0+0
+        1 child:
+        0x600003 (has no name): ()  1x1+-1+-1  +-1+-1
+     0x600001 "vd-app": ("vd-app" "Vd-app")  10x10+10+10  +10+10
+     0x200001 (has no name): ()  10x10+-20+-20  +-20+-20
+baseline ticks=11 (app age ~3s + 2s)
+sampling window 3s: ticks=12 delta=1 -> 0.3% of one core
+sampling window 5s: ticks=13 delta=1 -> 0.2% of one core
+sampling window 10s: ticks=15 delta=2 -> 0.2% of one core
+sampling window 20s: ticks=21 delta=6 -> 0.3% of one core
+sampling window 20s: ticks=25 delta=4 -> 0.2% of one core
+--- app log (last 8) ---
+vd-app: configuration warnings: 1
+evidence/github/repro/probe-cpu.sh: line 88:    20 Terminated              "$APP_BIN" "$TARGET_FILE" > /tmp/app.log 2>&1
+SUMMARY: app_age=63s first_window_pct=0.3 last_window_20s_pct=0.2 growth_pp=-0.1
+RESULT: SAMPLED
+probe_exit=0
+container_loadavg_end=1.29 0.82 1.02 2/1742 85

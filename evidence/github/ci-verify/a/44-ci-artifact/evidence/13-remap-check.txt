@@ -1,0 +1,4 @@
+# Embedded build-machine paths (panic locations must not leak /vedit-build)
+$ strings vd-app | grep -c /vedit-build
+leaks=0
+remap_flags= --remap-path-prefix=/vedit-build/target/cargo-home=/cargo --remap-path-prefix=/root/.cargo=/cargo --remap-path-prefix=/opt/cargo=/cargo --remap-path-prefix=/opt/rust=/rust --remap-path-prefix=/vedit-build=/vedit

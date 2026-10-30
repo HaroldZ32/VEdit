@@ -1,0 +1,4 @@
+vd-app selftest: fixture_root=/vedit-build/crates/vd-app/tests/fixtures (VEDIT_SELFTEST_FIXTURES=None)
+
+(vd-app:3107): GLib-GIO-CRITICAL **: 11:34:51.239: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+vd-app: configuration warnings: 1

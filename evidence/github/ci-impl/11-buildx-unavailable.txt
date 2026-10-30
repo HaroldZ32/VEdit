@@ -1,0 +1,5 @@
+### error path 1 — cache requested but buildx is unavailable (fake docker, no buildx version)
+[image] building vedit-build:local from the pinned inputs
+FATAL: VEDIT_BUILD_CACHE_FROM/VEDIT_BUILD_CACHE_TO need the buildx plugin,
+       but 'docker buildx version' failed. Install docker buildx, or unset both variables.
+exit=1

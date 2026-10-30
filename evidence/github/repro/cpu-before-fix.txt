@@ -1,0 +1,18 @@
+# issue #1/#2 CPU baseline (BEFORE fix)
+# command: docker run --rm -e HOME=/vedit-build/target/home -e CARGO_HOME=/vedit-build/target/cargo-home -v $PWD:/vedit-build -w /vedit-build vedit-build:local bash evidence/github/repro/probe-cpu.sh
+# binary: build/artifacts/vd-app sha256=41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611
+# git HEAD: c5216c1
+# date: 2026-10-30T16:04:11+08:00
+binary=/vedit-build/build/artifacts/vd-app
+file=/vedit-build/crates/vd-app/tests/fixtures/definition/a.sv
+alive=yes pid=11
+--- toplevel windows ---
+
+
+baseline ticks=112 (after 2s wait)
+after 3s window: ticks=221 delta=109  -> 36.3% of one core
+after 5s window: ticks=472 delta=251  -> 50.2% of one core
+after 10s window: ticks=1248 delta=776  -> 77.6% of one core
+--- app log (last 8) ---
+vd-app: configuration warnings: 1
+evidence/github/repro/probe-cpu.sh: line 71:    11 Terminated              "$APP_BIN" "$TARGET_FILE" > /tmp/app.log 2>&1

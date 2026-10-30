@@ -1,0 +1,19 @@
+### packaging entry build commands under BuildKit (exact commands the entries issue, distinct tags)
+--- tarball clean-room image ---
+#9 unpacking to docker.io/library/vedit-tarball-cleanroom:buildkit-check
+#9 unpacking to docker.io/library/vedit-tarball-cleanroom:buildkit-check 0.7s done
+#9 DONE 4.5s
+tarball_cleanroom_build_elapsed=45.288 s
+tarball_cleanroom_exit=0
+--- appimage clean-room image ---
+#7 unpacking to docker.io/library/vedit-appimage-test:buildkit-check
+#7 unpacking to docker.io/library/vedit-appimage-test:buildkit-check 1.0s done
+#7 DONE 5.4s
+appimage_test_build_elapsed=59.880 s
+appimage_test_exit=0
+--- appimage package image (FROM the pinned image) ---
+#7 unpacking to docker.io/library/vedit-appimage-package:buildkit-check
+#7 unpacking to docker.io/library/vedit-appimage-package:buildkit-check 0.2s done
+#7 DONE 1.4s
+appimage_package_build_elapsed=5.313 s
+appimage_package_exit=0

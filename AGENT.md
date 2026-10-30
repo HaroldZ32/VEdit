@@ -61,11 +61,12 @@ dependency or edit those files; ask the captain if one is genuinely missing.
 
 ## 6. Git discipline
 
-- All commits land directly on the default branch as linear history. A
-  branch-per-task flow is deliberately NOT used: the task board plus a different
-  reviewer per task already carries the pull-request duties, and disjoint write
-  scopes (never two writers in one path set) carry "one writer per tree". The
-  history is never rewritten (no amend/rebase of published commits).
+- Work lands through pull requests; never commit directly to `main` or `dev`.
+  `fix/<slug>`, `feat/<slug>`, `chore/<slug>` and `docs/<slug>` branch off `dev`,
+  the PR merges into `dev` (a merge commit is allowed), and a release promotes
+  `dev` through `release/<ver>` into `main`. `dev` is the integration line and
+  `main` is the release line: `main` only moves when a release merges into it.
+  Published history is never rewritten (no amend/rebase/force-push).
 - Stage only your own task's declared write scope, with explicit paths; never
   `git add -A` and never `git commit -a`. If `index.lock` contends, retry instead
   of deleting the lock.

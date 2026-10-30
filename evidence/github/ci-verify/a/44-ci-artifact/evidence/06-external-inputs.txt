@@ -1,0 +1,5 @@
+# External artifacts consumed by this project
+slang_expected_sha256=63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252
+slang_path=build/slang/out/slang
+63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  /home/runner/work/VEdit/VEdit/build/slang/out/slang
+slang version 12.1.0+0

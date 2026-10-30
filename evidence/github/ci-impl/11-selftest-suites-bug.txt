@@ -1,0 +1,26 @@
+### Root cause: the old script passed the four suite names as ONE argv
+# command: target/release/vd-app --selftest "smoke highlight config fim"
+Error: unknown selftest suite 'smoke highlight config fim' (smoke, highlight, config, lsp, slang, fim, all, list)
+exit=1
+--- cli.rs: the accepted forms ---
+        let mut args = args.into_iter();
+        while let Some(arg) = args.next() {
+            let text = arg
+                .to_str()
+                .ok_or_else(|| anyhow!("argument is not valid UTF-8: {arg:?}"))?;
+            match text {
+                "--selftest" => {
+                    let raw = args
+                        .next()
+                        .ok_or_else(|| anyhow!("--selftest needs a suite name ({})", suites()))?;
+                    let suite = raw
+                        .to_str()
+                        .ok_or_else(|| anyhow!("--selftest suite name is not valid UTF-8"))?;
+                    if suite != "all" && suite != "list" && !SELFTEST_SUITES.contains(&suite) {
+                        bail!("unknown selftest suite '{suite}' ({})", suites());
+                    }
+                    opts.mode = Mode::Selftest(suite.to_string());
+                }
+                "--file" => {
+                    let path = args.next().ok_or_else(|| anyhow!("--file needs a path"))?;
+                    opts.file = Some(PathBuf::from(path));

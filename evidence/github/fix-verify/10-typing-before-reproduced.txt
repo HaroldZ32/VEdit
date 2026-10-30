@@ -1,0 +1,17 @@
+=== CONTROL ===
+xtype: window=0x200002
+xtype_exit=0
+RESULT: CONTROL_WORKS (injected keystroke reached a focused GtkTextView)
+control buffer: a
+evidence/github/repro/probe-typing-control.sh: line 51:    30 Terminated              "$WORK/xtype-control" > /tmp/control.log 2>&1
+control_exit=0
+=== VEDIT PRE-FIX ===
+binary=/vedit-build/target/probe-prefix/vd-app
+xtype: window=0x600002
+xtype_exit=0
+RESULT: TYPING_BROKEN (keystroke did not reach the buffer)
+--- saved file (first 2 lines) ---
+module a_top;
+  b_top u_b ();
+evidence/github/repro/probe-typing.sh: line 78:    74 Terminated              "$APP_BIN" "$WORK/target.sv" > /tmp/app-typing.log 2>&1
+vedit_exit=0

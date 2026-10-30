@@ -1,0 +1,47 @@
+# frozen3 equivalence proof (corrected) (2026-10-30T05:46:23Z)
+frozen2 = f1f96223025ecb51124557e5efabd6bee2af6210 (product source)
+frozen3 product-source baseline = f1f9622; evidence commits up to 77d333551fb800c4cac4597ffa451e9ed2cc5eb3
+
+## canonical rebuilt from the current tree
+41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611  build/artifacts/vd-app
+bytes=6002112 mtime=2026-10-30 13:44:59.006154356 +0800
+expected = 41d02dcac944c7bff614ab6c44a51f243cece7692afc4d9dda1fc644adef1611 / 6002112 B -> IDENTICAL
+
+## build inputs vs frozen2 (must be empty)
+$ git diff --stat f1f9622..HEAD -- 'scripts/**' 'packaging/**/*.sh' 'crates/**/src/**' Cargo.toml Cargo.lock rust-toolchain.toml
+(empty = no script, product source or manifest changed)
+
+## what did change (tests/docs/evidence only)
+ packaging/tarball/evidence/36-cold-start.txt       |   6 +-
+ packaging/tarball/evidence/37-sizes.txt            |  12 +-
+ packaging/tarball/evidence/41-cjk-screenshot.log   |   4 +-
+ packaging/tarball/evidence/43-x11-capture.log      |   4 +-
+ .../tarball/evidence/45-runtime-fallback-targz.log |  10 +-
+ .../tarball/evidence/46-runtime-fallback-run.log   |  18 +-
+ .../tarball/evidence/48-runtime-fatal-matrix.txt   |  95 ++++++
+ tests/e2e/ACCEPTANCE.md                            | 172 +++++++++++
+ tests/e2e/frozen-run.log                           |  38 +++
+ tests/e2e/gates-frozen-run.txt                     |  35 +++
+ tests/e2e/out/appimage/results.tsv                 |  13 +
+ tests/e2e/out/appimage/screenshot.log              |  70 +++++
+ tests/e2e/out/appimage/screenshot.png              | Bin 0 -> 33484 bytes
+ tests/e2e/out/appimage/selftest-all.log            | 309 ++++++++++++++++++++
+ tests/e2e/out/appimage/window.log                  |   6 +
+ tests/e2e/out/run/results.tsv                      |   2 +
+ tests/e2e/out/run/selftest-all.log                 | 307 +++++++++++++++++++
+ tests/e2e/out/tarball/results.tsv                  |  13 +
+ tests/e2e/out/tarball/screenshot.log               |  67 +++++
+ tests/e2e/out/tarball/screenshot.png               | Bin 0 -> 33780 bytes
+ tests/e2e/out/tarball/selftest-all.log             | 306 +++++++++++++++++++
+ tests/e2e/out/tarball/window.log                   |   3 +
+ tests/e2e/run.sh                                   | 164 ++++++-----
+ tests/e2e/runtime-repro.txt                        |  76 +++++
+ 76 files changed, 2168 insertions(+), 757 deletions(-)
+
+## determinism inputs of the rebuild
+remap_flags=RELEASE_RUSTFLAGS="--remap-path-prefix=/vedit-build/target/cargo-home=/cargo --remap-path-prefix=/root/.cargo=/cargo --remap-path-prefix=/opt/cargo=/cargo --remap-path-prefix=/opt/rust=/rust --remap-path-prefix=/vedit-build=/vedit"
+source_date_epoch=1793339049
+cargo_incremental=0
+remap_flags=--remap-path-prefix=/vedit-build/target/cargo-home=/cargo --remap-path-prefix=/root/.cargo=/cargo --remap-path-prefix=/opt/cargo=/cargo --remap-path-prefix=/opt/rust=/rust --remap-path-prefix=/vedit-build=/vedit
+leaks=0
+remap_flags= --remap-path-prefix=/vedit-build/target/cargo-home=/cargo --remap-path-prefix=/root/.cargo=/cargo --remap-path-prefix=/opt/cargo=/cargo --remap-path-prefix=/opt/rust=/rust --remap-path-prefix=/vedit-build=/vedit
