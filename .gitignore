@@ -1,0 +1,24 @@
+# --- MPD harness state -------------------------------------------------------
+# Tool state (cellwork/team/verify/memory). The memory store is its own VCS repo,
+# so keeping it out of the product repo avoids a nested repository.
+.mpd/
+
+# --- Rust build output -------------------------------------------------------
+target/
+
+# --- Build / packaging artifacts --------------------------------------------
+build/artifacts/
+*.AppImage
+*.AppImage.zsync
+
+# --- slang build spike: fetched inputs and built output ----------------------
+build/slang/cache/
+build/slang/out/
+build/slang/tmp/
+build/slang/slang-12.1/
+
+# --- editor / OS noise -------------------------------------------------------
+*.swp
+*.swo
+*~
+.DS_Store
