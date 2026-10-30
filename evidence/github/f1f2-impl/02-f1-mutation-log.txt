@@ -1,0 +1,2 @@
+mut_build_exit=0
+mut_selftest_exit=1

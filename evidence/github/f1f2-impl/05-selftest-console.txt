@@ -1,0 +1,4 @@
+release_build_exit=0
+    Finished `release` profile [optimized] target(s) in 4.80s
+selftest_exit=0
+selftest_run2_exit=0

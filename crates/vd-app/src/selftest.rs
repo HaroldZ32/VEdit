@@ -252,6 +252,24 @@ fn smoke(ui: &std::rc::Rc<Ui>, fixtures: &Fixtures) -> SuiteReport {
         pass_through,
         format!("overlay_pass_through={pass_through}"),
     );
+    // AC-B1 (startup path): the FIM column is the only producer of the reason,
+    // so it appears exactly once and without the "FIM: FIM …" label doubling.
+    match ui.state.ghost.reason() {
+        Some(reason) => {
+            let text = ui.status_text();
+            let occurrences = text.matches(reason.as_str()).count();
+            report.check(
+                "AC-B1 the FIM reason appears exactly once at startup",
+                occurrences == 1 && !text.contains("FIM: FIM"),
+                format!("reason={reason:?}, occurrences={occurrences}, text={text:?}"),
+            );
+        }
+        None => report.check(
+            "AC-B1 the FIM reason appears exactly once at startup",
+            false,
+            "no persistent FIM reason (the check expects the default disabled FIM)",
+        ),
+    }
 
     let clean = ui.open_path(&fixtures.clean);
     match clean {
@@ -263,6 +281,18 @@ fn smoke(ui: &std::rc::Rc<Ui>, fixtures: &Fixtures) -> SuiteReport {
                     .as_deref()
                     .is_some_and(|language| language.contains("systemverilog")),
                 format!("language={:?}", tab.language.borrow()),
+            );
+            // AC-B2: opening a file leaves the cursor at the document start.
+            let cursor = tab.cursor();
+            report.check(
+                "AC-B2 opening a file puts the cursor at 1:1",
+                cursor == Position::new(0, 0),
+                format!("cursor={cursor:?}"),
+            );
+            report.check(
+                "AC-B2 the status bar reports 1:1 after opening a file",
+                ui.status_text().starts_with("1:1"),
+                ui.status_text(),
             );
         }
         Err(error) => report.check("open clean fixture", false, format!("{error:#}")),
@@ -1054,6 +1084,19 @@ fn fim(ui: &std::rc::Rc<Ui>) -> SuiteReport {
         "the status bar explains why FIM is unavailable",
         ui.status_text().to_lowercase().contains("fim"),
         ui.status_text(),
+    );
+    // AC-B1 (rejection path): a rejected request must not write the reason into
+    // the message again — the FIM column is the only producer. Read the text
+    // synchronously: the next poll can overwrite a transient message, which
+    // would hide a duplicate instead of proving its absence.
+    let reason = ghost.reason().unwrap_or_default();
+    ui.request_fim();
+    let text = ui.status_text();
+    let occurrences = text.matches(reason.as_str()).count();
+    report.check(
+        "AC-B1 the FIM reason appears exactly once after a rejected request",
+        !reason.is_empty() && occurrences == 1 && !text.contains("FIM: FIM"),
+        format!("reason={reason:?}, occurrences={occurrences}, text={text:?}"),
     );
     report
 }
