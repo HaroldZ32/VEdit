@@ -78,6 +78,7 @@ pub fn range_from_lsp(document: &Document, range: lsp_types::Range) -> Range {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::test_support::gtk_lock;
 
     fn document() -> Document {
         Document::from_text("module m;\n  // 你好😀\nendmodule\n")
@@ -85,6 +86,7 @@ mod tests {
 
     #[test]
     fn lsp_positions_are_utf16_and_round_trip() {
+        let _gtk = gtk_lock();
         let document = document();
         // Line 1 is "  // 你好😀": UTF-16 positions 0..9.
         for character in [0u32, 5, 6, 7, 9] {
@@ -103,6 +105,7 @@ mod tests {
 
     #[test]
     fn clamping_handles_out_of_range_positions() {
+        let _gtk = gtk_lock();
         let document = document();
         assert_eq!(
             clamp_to_document(&document, Position::new(999, 999)),
@@ -116,6 +119,7 @@ mod tests {
 
     #[test]
     fn lsp_ranges_are_clamped_into_document_ranges() {
+        let _gtk = gtk_lock();
         let document = document();
         let range = range_from_lsp(
             &document,

@@ -1,5 +1,6 @@
 {
   "app": "VEdit",
+  "fixture_root": "/vedit-build/crates/vd-app/tests/fixtures",
   "ok": true,
   "reports": [
     {
@@ -30,12 +31,12 @@
           "ok": true
         },
         {
-          "detail": "restored=true, dispatch=undo, action_fallback=true, can_undo_before=true, status=\"1:1  |  /tmp/vd-app-selftest-75/format_me.sv  |  systemverilog  |  verible 0  |  slang 0  |  configuration warnings: 1\"",
+          "detail": "restored=true, dispatch=undo, action_fallback=true, can_undo_before=true, status=\"1:1  |  /tmp/vd-app-selftest-3091/format_me.sv  |  systemverilog  |  verible 0  |  slang 0  |  FIM: FIM 未启用  |  configuration warnings: 1\"",
           "name": "undo shortcut restores the text through Document",
           "ok": true
         },
         {
-          "detail": "path=/tmp/vd-app-selftest-75/smoke-saved.sv",
+          "detail": "path=/tmp/vd-app-selftest-3091/smoke-saved.sv",
           "name": "save-as writes the document",
           "ok": true
         },
@@ -70,12 +71,32 @@
           "ok": true
         },
         {
-          "detail": "anchor=Some(Position { line: 0, character: 6 }), contains=true, cursor=Position { line: 0, character: 0 }, direct=Some(Range { start: Position { line: 0, character: 0 }, end: Position { line: 0, character: 6 } }), entry=\"module\", titles=[\"Untitled\", \"clean.sv\", \"smoke-saved.sv\"], current_page=Some(2)",
+          "detail": "jumped=true, at_first=true, clamped=true, at_last=true, cursor=Position { line: 1, character: 0 }, last_line=1",
+          "name": "goto-line moves the cursor and clamps to the last line",
+          "ok": true
+        },
+        {
+          "detail": "shows_line_numbers=true",
+          "name": "line numbers are visible in the view",
+          "ok": true
+        },
+        {
+          "detail": "changed=true, restored=true, original_len=62, replaced_len=62",
+          "name": "replace-next changes the text and undo restores it",
+          "ok": true
+        },
+        {
+          "detail": "tabs_before=3, tabs_after=3, recorded=Some(\"smoke-saved.sv\"), window_visible=true",
+          "name": "unsaved close is refused and the confirmation was requested",
+          "ok": true
+        },
+        {
+          "detail": "anchor=Some(Position { line: 1, character: 6 }), contains=true, cursor=Position { line: 1, character: 0 }, direct=Some(Range { start: Position { line: 1, character: 0 }, end: Position { line: 1, character: 6 } }), entry=\"module\", titles=[\"Untitled\", \"clean.sv\", \"smoke-saved.sv\"], current_page=Some(2)",
           "name": "find-next finds the needle through Document",
           "ok": true
         },
         {
-          "detail": "1:1  |  /tmp/vd-app-selftest-75/smoke-saved.sv  |  systemverilog  |  verible 0  |  slang 1  |  match at line 1",
+          "detail": "2:1  |  /tmp/vd-app-selftest-3091/smoke-saved.sv  |  systemverilog  |  verible 0  |  slang 1  |  FIM: FIM 未启用  |  match at line 2",
           "name": "status bar reports the cursor",
           "ok": true
         }

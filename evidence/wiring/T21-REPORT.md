@@ -9,7 +9,14 @@ The deliverable exists and the success criterion holds in the pinned CentOS 7
 image under Xvfb: **`vd-app --selftest all` exits 0**, with every suite
 (`smoke`, `highlight`, `config`, `lsp`, `slang`, `fim`) passing against the real
 lanes (real GtkSourceView data, real Verible LSP process, real SLANG binary, real
-FIM service in its default-off state). Workspace gates are green. Evidence:
+FIM service in its default-off state): **51 checks**. The suites assert user
+behaviour, not configuration presence: goto-line moves the cursor, line numbers
+are visible, replace-next + one undo round-trips through the replace bar, an
+unsaved close is refused and the confirmation request is recorded, **F12 jumps
+to the cross-file definition in b.sv**, formatting is one undo step, SLANG
+diagnostics reach the panel and gutter. The packaged layout is supported by the
+runtime fixture-root override (proven out-of-source), and `--screenshot` renders
+the real widget tree into PNG. Workspace gates are green. Evidence:
 `evidence/wiring/` (`README.md` maps every check and command to its AC).
 
 No lane logic is re-implemented in the app: text changes go through
@@ -90,16 +97,23 @@ binaries are present, and it now validates the current JSON report shape.
 - **Documented deviation from the literal contract text**: none in behaviour;
   the selftest menu grew a `config` suite (useful evidence for tool resolution)
   and `all`; this is additive.
-- **Screenshots**: the Xvfb frame capture returned a blank image (no compositor
-  in the image), so the PNGs were removed rather than shipped blank; the window is
-  proven realized by the selftest and by the `xwininfo` step of the build script.
-- **Navigation UI (definition/references/outline/rename)** is implemented and
-  wired, but the selftest only proves the client lifecycle, diagnostics and
-  formatting; Verible's support for these requests varies and the dialogs are
-  modal. Rename is a **preview only** (nothing is applied), as the contract asks.
+- **Screenshots**: `--screenshot` now renders the realized widget tree with its
+  own draw handler into a Cairo surface (the T11 highlight-probe path) and writes
+  a PNG through gdk-pixbuf; four real renders are in this directory with bytes +
+  sha256 in `README.md`. Reading pixels back from the X window is what returns
+  blank frames under Xvfb, so it is not used.
+- **Navigation UI**: definition is asserted end-to-end (F12 → b.sv line 1,
+  character 8). references/outline are wired but not asserted (the dialogs are
+  modal and Verible's support varies); rename is a **preview only** (nothing is
+  applied), as the contract asks.
+- **Selftest fixture root** is runtime-overridable (`VEDIT_SELFTEST_FIXTURES`,
+  fallback to the source tree) and prints the root it uses; `fixture-root-override.txt`
+  proves the packaged layout by renaming the source fixture dir away and running
+  the lsp suite with the override (exit 0). The packaging contract with T25 is
+  `share/vedit/testdata/{definition/a.sv,definition/b.sv}`.
 - **FIM accept/cancel with a live endpoint** and **IME input (AC-16)** are manual
   checks (no endpoint in the image; FIM must remain off by default). The manual
-  steps are listed in `README.md`/this report's AC section? see below:
+  steps:
   1. configure `[fim]` with an OpenAI-compatible endpoint and restart;
   2. press Alt+\, wait for ghost text, press Tab (inserts through Document) and
      Esc (cancels); typing cancels an in-flight request;

@@ -31,6 +31,9 @@ use crate::slang_worker;
 /// Message shown when a feature needs a saved file.
 const NEEDS_FILE: &str = "save the file first";
 
+/// Test seam for the modal close confirmation (`None` restores the dialog).
+pub type CloseConfirmation = Box<dyn Fn(&str) -> bool>;
+
 /// Shared, mutable app state (widgets live in [`Ui`]).
 pub struct State {
     pub startup: Startup,
@@ -59,6 +62,8 @@ pub struct Ui {
     pub state: Rc<State>,
     ghost_fixed: gtk::Fixed,
     gutter_refresh: Cell<bool>,
+    close_confirm: RefCell<Option<CloseConfirmation>>,
+    close_request: RefCell<Option<String>>,
 }
 
 impl Ui {
@@ -259,35 +264,80 @@ impl Ui {
     }
 
     /// Close a tab, asking about unsaved changes when requested.
+    /// Replace the modal close confirmation for tests: `Some(false)` keeps the
+    /// tab, `Some(true)` closes without saving. `None` restores the dialog.
+    pub fn set_close_confirmation(&self, confirm: Option<CloseConfirmation>) {
+        *self.close_confirm.borrow_mut() = confirm;
+    }
+
+    /// The tab title of the most recent close confirmation request, if any.
+    #[must_use]
+    pub fn last_close_request(&self) -> Option<String> {
+        self.close_request.borrow().clone()
+    }
+
+    /// Jump to a 1-based line (the same path the Ctrl+G dialog uses).
+    pub fn goto_line_now(&self, line: u32) -> bool {
+        let Some(tab) = self.current_tab() else {
+            return false;
+        };
+        let line = line
+            .saturating_sub(1)
+            .min(tab.document.line_count().saturating_sub(1));
+        tab.set_cursor(Position::new(line, 0))
+    }
+
+    fn confirm_close_dialog(self: &Rc<Self>, tab: &Tab) -> bool {
+        let dialog = gtk::MessageDialog::new(
+            Some(&self.window),
+            gtk::DialogFlags::MODAL,
+            gtk::MessageType::Question,
+            gtk::ButtonsType::None,
+            &format!("Save changes to {}?", tab.title()),
+        );
+        dialog.add_button("Cancel", gtk::ResponseType::Cancel);
+        dialog.add_button("Discard", gtk::ResponseType::Reject);
+        dialog.add_button("Save", gtk::ResponseType::Accept);
+        let response = dialog.run();
+        dialog.close();
+        match response {
+            gtk::ResponseType::Accept => {
+                if tab.path.borrow().is_none() {
+                    self.save_as_dialog();
+                    false
+                } else if let Err(error) = tab.save() {
+                    self.set_info(format!("save failed: {error:#}"));
+                    false
+                } else {
+                    true
+                }
+            }
+            gtk::ResponseType::Reject => true,
+            _ => false,
+        }
+    }
+
+    /// Close a tab, asking about unsaved changes when requested.
     pub fn close_tab_at(self: &Rc<Self>, index: usize, ask: bool) {
         let tab = self.state.tabs.borrow().get(index).cloned();
         let Some(tab) = tab else {
             return;
         };
         if ask && tab.document.needs_close_confirmation() {
-            let dialog = gtk::MessageDialog::new(
-                Some(&self.window),
-                gtk::DialogFlags::MODAL,
-                gtk::MessageType::Question,
-                gtk::ButtonsType::None,
-                &format!("Save changes to {}?", tab.title()),
-            );
-            dialog.add_button("Cancel", gtk::ResponseType::Cancel);
-            dialog.add_button("Discard", gtk::ResponseType::Reject);
-            dialog.add_button("Save", gtk::ResponseType::Accept);
-            let response = dialog.run();
-            dialog.close();
-            match response {
-                gtk::ResponseType::Accept => {
-                    if tab.path.borrow().is_none() {
-                        self.save_as_dialog();
-                    } else if let Err(error) = tab.save() {
-                        self.set_info(format!("save failed: {error:#}"));
+            *self.close_request.borrow_mut() = Some(tab.title());
+            let injected = self
+                .close_confirm
+                .borrow()
+                .as_ref()
+                .map(|confirm| confirm(&tab.title()));
+            match injected {
+                Some(false) => return,
+                Some(true) => {}
+                None => {
+                    if !self.confirm_close_dialog(&tab) {
                         return;
                     }
                 }
-                gtk::ResponseType::Reject => {}
-                _ => return,
             }
         }
         self.state.tabs.borrow_mut().remove(index);
@@ -350,7 +400,7 @@ impl Ui {
         }
     }
 
-    fn replace_next_now(self: &Rc<Self>) {
+    pub fn replace_next_now(self: &Rc<Self>) {
         let needle = self.find_entry.text().to_string();
         let replacement = self.replace_entry.text().to_string();
         if needle.is_empty() {
@@ -392,9 +442,9 @@ impl Ui {
     }
 
     fn goto_dialog(self: &Rc<Self>) {
-        let Some(tab) = self.current_tab() else {
+        if self.current_tab().is_none() {
             return;
-        };
+        }
         let dialog = gtk::Dialog::with_buttons(
             Some("Go to Line"),
             Some(&self.window),
@@ -416,10 +466,7 @@ impl Ui {
             self.set_info(format!("not a line number: {text}"));
             return;
         };
-        let line = line
-            .saturating_sub(1)
-            .min(tab.document.line_count().saturating_sub(1));
-        tab.set_cursor(Position::new(line, 0));
+        self.goto_line_now(line);
     }
 
     /// Request formatting from the LSP; the reply is applied as one undo step.
@@ -738,6 +785,9 @@ impl Ui {
             let (verible, slang) = tab.store.borrow().counts();
             parts.push(format!("verible {verible}"));
             parts.push(format!("slang {slang}"));
+        }
+        if let Some(reason) = self.state.ghost.reason() {
+            parts.push(format!("FIM: {reason}"));
         }
         let info = self.state.info.borrow().clone();
         if !info.is_empty() {
@@ -1093,15 +1143,53 @@ impl Ui {
     /// # Errors
     /// Returns an error when Cairo cannot create the surface or write the PNG.
     pub fn capture_screenshot(&self, path: &Path) -> Result<()> {
-        let window = self
-            .window
-            .window()
-            .ok_or_else(|| anyhow!("the window is not realized yet"))?;
-        let width = window.width();
-        let height = window.height();
-        let pixbuf = window
-            .pixbuf(0, 0, width, height)
-            .ok_or_else(|| anyhow!("reading the X window into a pixbuf failed"))?;
+        // Render the REAL widget tree with its own draw handler (the T11
+        // highlight-probe path): reading pixels back from the X window is blank
+        // under Xvfb because the image has no compositor.
+        self.window.queue_draw();
+        let main_context = gtk::glib::MainContext::default();
+        for _ in 0..80 {
+            while main_context.iteration(false) {}
+            std::thread::sleep(Duration::from_millis(2));
+        }
+        let allocation = self.window.allocation();
+        let width = allocation.width().max(1);
+        let height = allocation.height().max(1);
+        let mut surface =
+            gtk::cairo::ImageSurface::create(gtk::cairo::Format::Rgb24, width, height)
+                .context("creating the screenshot surface")?;
+        {
+            let context = gtk::cairo::Context::new(&surface).context("creating a Cairo context")?;
+            self.window.draw(&context);
+        }
+        surface.flush();
+        let stride = usize::try_from(surface.stride()).context("negative surface stride")?;
+        let data = surface.data().context("reading the screenshot pixels")?;
+        let width_usize = usize::try_from(width).context("negative width")?;
+        let height_usize = usize::try_from(height).context("negative height")?;
+        // cairo RGB24 is BGRx in memory; gdk-pixbuf wants RGBA for a PNG with alpha.
+        let mut rgba = Vec::with_capacity(width_usize * height_usize * 4);
+        for row in 0..height_usize {
+            let start = row * stride;
+            for pixel in 0..width_usize {
+                let offset = start + pixel * 4;
+                rgba.push(data[offset + 2]);
+                rgba.push(data[offset + 1]);
+                rgba.push(data[offset]);
+                rgba.push(0xff);
+            }
+        }
+        drop(data);
+        let bytes = glib::Bytes::from(&rgba);
+        let pixbuf = gtk::gdk_pixbuf::Pixbuf::from_bytes(
+            &bytes,
+            gtk::gdk_pixbuf::Colorspace::Rgb,
+            true,
+            8,
+            width,
+            height,
+            width * 4,
+        );
         pixbuf
             .savev(path, "png", &[])
             .with_context(|| format!("writing {}", path.display()))?;
@@ -1372,6 +1460,8 @@ fn build_ui(application: &gtk::Application, opts: &Options) -> Result<Rc<Ui>> {
         state,
         ghost_fixed,
         gutter_refresh: Cell::new(false),
+        close_confirm: RefCell::new(None),
+        close_request: RefCell::new(None),
     });
 
     // Signal wiring that needs the Rc<Ui>.
@@ -1380,6 +1470,19 @@ fn build_ui(application: &gtk::Application, opts: &Options) -> Result<Rc<Ui>> {
         ui.panel_list.connect_row_activated(move |_, row| {
             if let Some(ui) = weak.upgrade() {
                 ui.jump_to_diagnostic(row.index() as usize);
+            }
+        });
+    }
+    {
+        // Switching tabs must re-render that tab's problems and gutter marks.
+        let weak = Rc::downgrade(&ui);
+        ui.notebook.connect_switch_page(move |_, _, _| {
+            if let Some(ui) = weak.upgrade() {
+                ui.refresh_panel();
+                ui.refresh_status();
+                if ui.state.ghost.has_pending() {
+                    ui.position_ghost();
+                }
             }
         });
     }

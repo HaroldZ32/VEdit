@@ -53,6 +53,19 @@ impl SuiteReport {
     }
 }
 
+/// Root of the selftest fixtures.
+///
+/// Runtime-overridable so a packaged build can point at its payload
+/// (`VEDIT_SELFTEST_FIXTURES=<share>/vedit/testdata`): the compile-time path is
+/// only the source-tree fallback and MUST NOT be the only source, otherwise
+/// `--selftest` can only ever pass inside the build directory.
+fn fixture_root() -> PathBuf {
+    std::env::var_os("VEDIT_SELFTEST_FIXTURES")
+        .filter(|value| !value.is_empty())
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures"))
+}
+
 /// Run a suite (or every suite with `all`).
 ///
 /// # Errors
@@ -64,6 +77,12 @@ pub fn run(suite: &str, opts: &Options) -> Result<()> {
         println!("{}", names.join("\n"));
         return Ok(());
     }
+    let root = fixture_root();
+    eprintln!(
+        "vd-app selftest: fixture_root={} (VEDIT_SELFTEST_FIXTURES={:?})",
+        root.display(),
+        std::env::var_os("VEDIT_SELFTEST_FIXTURES")
+    );
     let fixtures = Fixtures::create()?;
     let app = App::new(opts);
     app.register_and_activate()?;
@@ -97,6 +116,7 @@ pub fn run(suite: &str, opts: &Options) -> Result<()> {
         "version": env!("CARGO_PKG_VERSION"),
         "suite": suite,
         "ok": ok,
+        "fixture_root": root.display().to_string(),
         "shortcuts": commands::SHORTCUTS.len(),
         "shortcut_table": commands::table_text(),
         "reports": reports.iter().map(|report| serde_json::json!({
@@ -361,7 +381,86 @@ fn smoke(ui: &std::rc::Rc<Ui>, fixtures: &Fixtures) -> SuiteReport {
         );
     }
 
+    // AC-04: goto-line moves the cursor (the Ctrl+G dialog calls the same path).
+    if let Some(tab) = ui.current_tab() {
+        let last_line = tab.document.line_count().saturating_sub(1);
+        let jumped = ui.goto_line_now(1);
+        pump(20);
+        let at_first = tab.cursor() == Position::new(0, 0);
+        let clamped = ui.goto_line_now(999);
+        pump(20);
+        let at_last = tab.cursor() == Position::new(last_line, 0);
+        report.check(
+            "goto-line moves the cursor and clamps to the last line",
+            jumped && at_first && clamped && at_last,
+            format!(
+                "jumped={jumped}, at_first={at_first}, clamped={clamped}, at_last={at_last}, cursor={:?}, last_line={last_line}",
+                tab.cursor()
+            ),
+        );
+        report.check(
+            "line numbers are visible in the view",
+            tab.view.shows_line_numbers(),
+            format!("shows_line_numbers={}", tab.view.shows_line_numbers()),
+        );
+    }
+
+    // AC-04: the replace bar changes the text and one undo restores it.
+    if let Some(tab) = ui.current_tab() {
+        let original = tab.text();
+        tab.set_cursor(Position::new(0, 0));
+        pump(10);
+        *ui.state.find_anchor.borrow_mut() = None;
+        ui.find_entry.set_text("module");
+        ui.replace_entry.set_text("MODULE");
+        ui.replace_next_now();
+        pump(30);
+        let replaced = tab.text();
+        let changed = replaced != original && replaced.contains("MODULE");
+        ui.window.activate_action("undo", None);
+        pump(50);
+        report.check(
+            "replace-next changes the text and undo restores it",
+            changed && tab.text() == original,
+            format!(
+                "changed={changed}, restored={}, original_len={}, replaced_len={}",
+                tab.text() == original,
+                original.len(),
+                replaced.len()
+            ),
+        );
+    }
+
+    // AC-04: an unsaved close asks first and the request is recorded.
+    if let Some(index) = ui.notebook.current_page().map(|page| page as usize) {
+        let before = ui.state.tabs.borrow().len();
+        if let Some(tab) = ui.current_tab() {
+            tab.document
+                .insert(Position::new(0, 0), "-- dirty\n")
+                .unwrap_or_else(|error| panic!("dirty edit failed: {error}"));
+        }
+        ui.set_close_confirmation(Some(Box::new(|_| false)));
+        ui.close_tab_at(index, true);
+        pump(20);
+        let after = ui.state.tabs.borrow().len();
+        let recorded = ui.last_close_request();
+        ui.set_close_confirmation(None);
+        report.check(
+            "unsaved close is refused and the confirmation was requested",
+            after == before && recorded.is_some() && ui.window.is_visible(),
+            format!(
+                "tabs_before={before}, tabs_after={after}, recorded={recorded:?}, window_visible={}",
+                ui.window.is_visible()
+            ),
+        );
+    }
+
+    if let Some(tab) = ui.current_tab() {
+        tab.set_cursor(Position::new(0, 0));
+        pump(10);
+    }
     ui.find_entry.set_text("module");
+    *ui.state.find_anchor.borrow_mut() = None;
     ui.find_next_now();
     pump(20);
     let find_detail = if let Some(tab) = ui.current_tab() {
@@ -425,6 +524,25 @@ fn highlight(ui: &std::rc::Rc<Ui>, fixtures: &Fixtures) -> SuiteReport {
         missing.is_empty(),
         format!("missing={missing:?}"),
     );
+    match ui.open_path(&fixtures.unicode) {
+        Ok(tab) => {
+            report.check(
+                "opened .sv with CJK/emoji content has a language",
+                tab.buffer.language().is_some(),
+                format!("language={:?}", tab.buffer.language()),
+            );
+            report.check(
+                "CJK/emoji content is in the buffer",
+                tab.text().contains("你好") && tab.text().contains("😀"),
+                "buffer contains 你好 and 😀",
+            );
+        }
+        Err(error) => report.check(
+            "open unicode highlight fixture",
+            false,
+            format!("{error:#}"),
+        ),
+    }
     match ui.open_path(&fixtures.clean) {
         Ok(tab) => {
             report.check(
@@ -439,6 +557,19 @@ fn highlight(ui: &std::rc::Rc<Ui>, fixtures: &Fixtures) -> SuiteReport {
             );
         }
         Err(error) => report.check("open highlight fixture", false, format!("{error:#}")),
+    }
+    // Leave the CJK/emoji tab current so a --screenshot of this suite shows the
+    // real highlighted unicode content (AC-05 UI + AC-16 rendering evidence).
+    if let Some(page) = ui
+        .state
+        .tabs
+        .borrow()
+        .iter()
+        .find(|tab| tab.title() == "unicode_highlight.sv")
+        .and_then(|tab| ui.notebook.page_num(&tab.widget))
+    {
+        ui.notebook.set_current_page(Some(page));
+        pump(80);
     }
     report.check(
         "startup language warning is absent in this image",
@@ -571,6 +702,44 @@ fn lsp(ui: &std::rc::Rc<Ui>, fixtures: &Fixtures) -> SuiteReport {
             "no LspEvent::Formatted within 20s",
         ),
     }
+    // AC-08: F12 on b_top in a.sv must land on the definition in b.sv.
+    let definition_a = fixtures.definition_a.as_path();
+    let definition_b = fixtures.definition_b.as_path();
+    let b_canonical =
+        std::fs::canonicalize(definition_b).unwrap_or_else(|_| definition_b.to_path_buf());
+    let open_result = ui
+        .open_path(definition_b)
+        .and_then(|_| ui.open_path(definition_a));
+    match open_result {
+        Ok(a_tab) => {
+            a_tab.set_cursor(Position::new(1, 3));
+            pump(40);
+            ui.window.activate_action("definition", None);
+            let jumped = wait_until(Duration::from_secs(15), || {
+                let current = ui.current_tab()?;
+                let path = current.path.borrow().clone()?;
+                if path == b_canonical && current.cursor() == Position::new(0, 7) {
+                    Some(true)
+                } else {
+                    None
+                }
+            });
+            let detail = ui.current_tab().map_or_else(
+                || "no current tab".to_string(),
+                |tab| format!("path={:?}, cursor={:?}", tab.path.borrow(), tab.cursor()),
+            );
+            report.check(
+                "F12 definition jumps to the target file/line/column",
+                jumped.is_some(),
+                detail,
+            );
+        }
+        Err(error) => report.check(
+            "F12 definition jumps to the target file/line/column",
+            false,
+            format!("opening the definition fixtures failed: {error:#}"),
+        ),
+    }
     report
 }
 
@@ -697,6 +866,9 @@ struct Fixtures {
     clean: PathBuf,
     format_me: PathBuf,
     undeclared: PathBuf,
+    unicode: PathBuf,
+    definition_a: PathBuf,
+    definition_b: PathBuf,
 }
 
 impl Fixtures {
@@ -706,6 +878,7 @@ impl Fixtures {
         let clean = dir.join("clean.sv");
         let format_me = dir.join("format_me.sv");
         let undeclared = dir.join("undeclared.sv");
+        let unicode = dir.join("unicode_highlight.sv");
         std::fs::write(&clean, "module clean;\n  logic a;\nendmodule\n")
             .with_context(|| format!("writing {}", clean.display()))?;
         std::fs::write(
@@ -718,11 +891,20 @@ impl Fixtures {
             "module undeclared_probe;\n  initial begin\n    undefined_count = 1;\n  end\nendmodule\n",
         )
         .with_context(|| format!("writing {}", undeclared.display()))?;
+        std::fs::write(
+            &unicode,
+            "module unicode_highlight;\n  // 中文注释：你好，世界 😀\n  logic 信号;\nendmodule\n",
+        )
+        .with_context(|| format!("writing {}", unicode.display()))?;
+        let fixtures_root = fixture_root().join("definition");
         Ok(Self {
             dir,
             clean,
             format_me,
             undeclared,
+            unicode,
+            definition_a: fixtures_root.join("a.sv"),
+            definition_b: fixtures_root.join("b.sv"),
         })
     }
 

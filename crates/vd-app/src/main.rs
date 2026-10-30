@@ -36,3 +36,19 @@ fn main() -> Result<()> {
         }
     }
 }
+
+#[cfg(test)]
+pub(crate) mod test_support {
+    use std::sync::{Mutex, MutexGuard};
+
+    /// GLib/GTK object construction is not thread-safe; unit tests that build a
+    /// `GtkSourceBuffer` (through `vd_editor::Document`) serialise on this lock.
+    static GTK_TEST_LOCK: Mutex<()> = Mutex::new(());
+
+    pub(crate) fn gtk_lock() -> MutexGuard<'static, ()> {
+        match GTK_TEST_LOCK.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => poisoned.into_inner(),
+        }
+    }
+}

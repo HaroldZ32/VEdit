@@ -1,0 +1,60 @@
+vd-app selftest: fixture_root=/vedit-build/crates/vd-app/tests/fixtures (VEDIT_SELFTEST_FIXTURES=None)
+vd-app: configuration warnings: 1
+vd-app: screenshot written to evidence/wiring/highlight-window.png
+{
+  "app": "VEdit",
+  "fixture_root": "/vedit-build/crates/vd-app/tests/fixtures",
+  "ok": true,
+  "reports": [
+    {
+      "checks": [
+        {
+          "detail": "is_language_available(systemverilog)",
+          "name": "systemverilog language definition is available",
+          "ok": true
+        },
+        {
+          "detail": "is_language_available(verilog)",
+          "name": "verilog language definition is available",
+          "ok": true
+        },
+        {
+          "detail": "missing=[]",
+          "name": "no language definitions are missing",
+          "ok": true
+        },
+        {
+          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x56a076162100, type: GtkSourceLanguage } })",
+          "name": "opened .sv with CJK/emoji content has a language",
+          "ok": true
+        },
+        {
+          "detail": "buffer contains 你好 and 😀",
+          "name": "CJK/emoji content is in the buffer",
+          "ok": true
+        },
+        {
+          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x56a07613b900, type: GtkSourceLanguage } })",
+          "name": "opened .sv buffer has a language",
+          "ok": true
+        },
+        {
+          "detail": "scheme=Some(\"cobalt\")",
+          "name": "style scheme applies (cobalt)",
+          "ok": true
+        },
+        {
+          "detail": "warning=None",
+          "name": "startup language warning is absent in this image",
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "suite": "highlight"
+    }
+  ],
+  "shortcut_table": "| action | shortcut | description |\n|---|---|---|\n| `open` | <Ctrl>o | open a file in a new tab |\n| `new` | <Ctrl>n | new untitled tab |\n| `save` | <Ctrl>s | save the current tab |\n| `save-as` | <Ctrl><Shift>s | save the current tab under a new path |\n| `close-tab` | <Ctrl>w | close the tab (confirms unsaved changes) |\n| `quit` | <Ctrl>q | quit the editor |\n| `undo` | <Ctrl>z | undo the last edit (native GtkSource undo) |\n| `redo` | <Ctrl><Shift>z | redo |\n| `find` | <Ctrl>f | show the find bar |\n| `replace` | <Ctrl>h | show the replace bar |\n| `find-next` | F3 | jump to the next match |\n| `goto-line` | <Ctrl>g | jump to a line |\n| `format` | <Ctrl><Shift>f | one-key format through the LSP, one undo step |\n| `slang` | <Ctrl><Shift>l | run SLANG deep lint into the problem panel |\n| `definition` | F12 | jump to the definition (LSP) |\n| `references` | <Shift>F12 | list references (LSP) |\n| `outline` | <Ctrl><Shift>o | document symbols of the current file |\n| `rename` | F2 | preview the LSP rename edits (nothing is applied) |\n| `fim` | <Alt>backslash | request an FIM completion as ghost text |\n| `toggle-panel` | <Ctrl><Shift>p | show/hide the problem panel |\n| `accept-fim` | Tab | insert the pending FIM completion through Document |\n| `cancel-fim` | Esc | discard the pending completion / cancel the request |\n",
+  "shortcuts": 22,
+  "suite": "highlight",
+  "version": "0.1.0"
+}

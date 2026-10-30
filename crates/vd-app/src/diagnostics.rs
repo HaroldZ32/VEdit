@@ -202,6 +202,7 @@ pub fn from_slang(report: &vd_deeplint::LintReport, document: &Document) -> Vec<
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::test_support::gtk_lock;
     use vd_editor::Position;
 
     fn document() -> Document {
@@ -210,6 +211,7 @@ mod tests {
 
     #[test]
     fn lsp_diagnostics_are_clamped_and_keep_the_derived_rule() {
+        let _gtk = gtk_lock();
         let document = document();
         let diagnostics = vec![lsp_types::Diagnostic {
             range: lsp_types::Range::new(
@@ -237,6 +239,7 @@ mod tests {
 
     #[test]
     fn slang_diagnostics_keep_a_positionless_entry() {
+        let _gtk = gtk_lock();
         let document = document();
         let report = vd_deeplint::LintReport {
             diagnostics: vec![vd_deeplint::Diagnostic {
@@ -276,6 +279,7 @@ mod tests {
 
     #[test]
     fn worst_severity_per_line_prefers_errors() {
+        let _gtk = gtk_lock();
         let mut store = DiagnosticsStore::new();
         store.set_verible(vec![ViewDiagnostic {
             source: DiagnosticSource::Verible,

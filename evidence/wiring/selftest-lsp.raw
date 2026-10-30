@@ -1,7 +1,9 @@
+vd-app selftest: fixture_root=/vedit-build/crates/vd-app/tests/fixtures (VEDIT_SELFTEST_FIXTURES=None)
 vd-app: configuration warnings: 1
-vd-app: screenshot written to evidence/wiring/lsp-formatted.png
+vd-app: screenshot written to evidence/wiring/lsp-window.png
 {
   "app": "VEdit",
+  "fixture_root": "/vedit-build/crates/vd-app/tests/fixtures",
   "ok": true,
   "reports": [
     {
@@ -29,6 +31,11 @@ vd-app: screenshot written to evidence/wiring/lsp-formatted.png
         {
           "detail": "restored=true",
           "name": "one undo restores the pre-format content (apply_edits_one_step)",
+          "ok": true
+        },
+        {
+          "detail": "path=Some(\"/vedit-build/crates/vd-app/tests/fixtures/definition/b.sv\"), cursor=Position { line: 0, character: 7 }",
+          "name": "F12 definition jumps to the target file/line/column",
           "ok": true
         }
       ],

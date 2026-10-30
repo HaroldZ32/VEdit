@@ -1,5 +1,6 @@
 {
   "app": "VEdit",
+  "fixture_root": "/vedit-build/crates/vd-app/tests/fixtures",
   "ok": true,
   "reports": [
     {

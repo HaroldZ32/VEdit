@@ -1,1 +1,2 @@
+vd-app selftest: fixture_root=/vedit-build/crates/vd-app/tests/fixtures (VEDIT_SELFTEST_FIXTURES=None)
 vd-app: configuration warnings: 1

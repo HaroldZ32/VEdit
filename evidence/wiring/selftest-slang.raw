@@ -1,7 +1,9 @@
+vd-app selftest: fixture_root=/vedit-build/crates/vd-app/tests/fixtures (VEDIT_SELFTEST_FIXTURES=None)
 vd-app: configuration warnings: 1
-vd-app: screenshot written to evidence/wiring/slang-panel.png
+vd-app: screenshot written to evidence/wiring/slang-window.png
 {
   "app": "VEdit",
+  "fixture_root": "/vedit-build/crates/vd-app/tests/fixtures",
   "ok": true,
   "reports": [
     {
