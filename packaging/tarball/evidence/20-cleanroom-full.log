@@ -1,0 +1,82 @@
+[clean-room:full] os: CentOS Linux release 7.9.2009 (Core)
+[clean-room:full] glibc: 2.17-317.el7
+[clean-room:full] PASS negative assertion: no gtk3 / gtksourceview3 / gtksourceview4 rpm
+[clean-room:full] Xvfb :99 up
+[clean-room:full] tarball=/art/vedit-0.1.0-linux-x86_64.tar.gz run=/art/VEdit-0.1.0-x86_64.run
+[clean-room:full] == tar.gz: extract and run the selftest suites ==
+[clean-room:full] PASS targz_selftest_smoke (exit=0  (log 30-targz-smoke.log))
+[clean-room:full] PASS targz_selftest_highlight (exit=0  (log 30-targz-highlight.log))
+[clean-room:full] PASS targz_selftest_config (exit=0  (log 30-targz-config.log))
+[clean-room:full] PASS targz_selftest_slang (exit=0  (log 30-targz-slang.log))
+[clean-room:full] PASS targz_selftest_fim (exit=0  (log 30-targz-fim.log))
+[clean-room:full] PASS targz_selftest_all (exit=0)
+[clean-room:full] == CJK: the target machine has no Chinese font (negative assertion) ==
+[clean-room:full] PASS no system CJK font (fc-list :lang=zh returned 0 fonts)
+[clean-room:full] == CJK: the packaged font must cover Chinese text ==
+[clean-room:full] launcher FONTCONFIG_FILE=/tmp/xdg/vedit-runtime-0/fonts.conf
+/tmp/tarroot/VEdit/share/fonts/wqy-zenhei/wqy-zenhei.ttc: WenQuanYi Zen Hei Mono:style=Regular
+/tmp/tarroot/VEdit/share/fonts/wqy-zenhei/wqy-zenhei.ttc: WenQuanYi Zen Hei:style=Regular
+/tmp/tarroot/VEdit/share/fonts/wqy-zenhei/wqy-zenhei.ttc: WenQuanYi Zen Hei Sharp,文泉驛點陣正黑:style=Regular
+[clean-room:full] PASS fontconfig lists the bundled WenQuanYi font for :lang=zh
+[clean-room:full] == CJK: a real screenshot with Chinese comments (product path) ==
+[clean-room:full] PASS cjk_screenshot (exit=0  (path /evid/shots/targz-cjk.png))
+# CJK screenshot evidence
+5270 bytes  /evid/shots/targz-cjk.png
+b7bb79ab7208ca74ba80636714b5ae857165bbb33ff28ade6f4be55e1f5f502d  /evid/shots/targz-cjk.png
+identify mean/stddev (stddev>0.02 means real content, not a blank surface):
+mean=0 stddev=0 size=1120x780
+[clean-room:full] KNOWN-LIMITATION --screenshot is blank in a WM-less container (stddev=0):
+[clean-room:full]   gtk_widget_draw: assertion '!widget->priv->alloc_needed' failed (T21 capture path)
+[clean-room:full] == CJK: X-server capture of the real window (authoritative) ==
+[clean-room:full] PASS cjk_x11_capture (import -window root exit=0)
+# X-server capture of the packaged editor showing Chinese text
+50807 bytes  /evid/shots/targz-cjk-x11.png
+fafcd3f59b6d8a3cc8ac462330752aae40b4644a4aa2968ffe69fa6e9d69675c  /evid/shots/targz-cjk-x11.png
+identify mean/stddev: mean=0.30408 stddev=0.392207 size=1280x900
+[clean-room:full] PASS the X-server capture shows the rendered editor (stddev=0.392207)
+[clean-room:full] == tar.gz: window presence + screenshot ==
+[clean-room:full] PASS targz_screenshot_smoke (exit=0  (/evid/shots/targz-window-smoke.png 5270 bytes))
+[clean-room:full] PASS targz_screenshot_highlight (exit=0  (/evid/shots/targz-window-highlight.png 5270 bytes))
+[clean-room:full] PASS targz_window_visible (first xwininfo hit at 62ms)
+[clean-room:full] == tar.gz: launcher environment (GTK_IM_MODULE_FILE etc.) ==
+LAUNCHER_DIR=/tmp/tarroot/VEdit
+LD_LIBRARY_PATH=/tmp/tarroot/VEdit/lib
+GDK_PIXBUF_MODULE_FILE=/tmp/xdg/vedit-runtime-0/loaders.cache
+GTK_IM_MODULE_FILE=/tmp/xdg/vedit-runtime-0/immodules.cache
+GSETTINGS_SCHEMA_DIR=/tmp/tarroot/VEdit/share/glib-2.0/schemas
+XDG_DATA_DIRS=/tmp/tarroot/VEdit/share:/usr/share
+VEDIT_GSV_DATADIR=/tmp/tarroot/VEdit/share/gtksourceview-4
+FONTCONFIG_FILE=/tmp/xdg/vedit-runtime-0/fonts.conf
+VEDIT_VERIBLE_DIR=/tmp/tarroot/VEdit/bin
+VEDIT_SLANG=/tmp/tarroot/VEdit/bin/slang
+VEDIT_SELFTEST_FIXTURES=/tmp/tarroot/VEdit/share/vedit/testdata
+[clean-room:full] PASS GTK_IM_MODULE_FILE points at the rewritten cache
+[clean-room:full] PASS VEDIT_SELFTEST_FIXTURES points at the packaged fixtures
+[clean-room:full] == tar.gz: input-method modules really load ==
+[clean-room:full] PASS immodules cache contains im-xim.so
+[clean-room:full] PASS immodules cache contains im-ibus.so
+[clean-room:full] PASS immodule_xim_run (GTK_IM_MODULE=xim exit=0)
+[clean-room:full] PASS no 'Failed to load module' with GTK_IM_MODULE=xim
+[clean-room:full] == self-extracting .run: selftest + keep-tmp ==
+[clean-room:full] PASS run_selftest_smoke (exit=0  (log 31a-run-smoke.log))
+[clean-room:full] PASS run_selftest_all (exit=0)
+[clean-room:full] PASS run_keeptmp (exit=0)
+[clean-room:full] PASS VEDIT_KEEP_TMP kept the tree at /tmp/vedit.ODBLnQ
+[clean-room:full] PASS self-extracting run cleaned up its temporary tree
+[clean-room:full] == relocation: unpack to a second, unrelated path and run again ==
+[clean-room:full] PASS relocated_selftest (exit=0  (root /opt/relocated-1793336286))
+[clean-room:full] == leftovers: no verible/slang process, no zombie ==
+[clean-room:full] PASS no zombie process
+[clean-room:full] PASS no verible/slang process left behind
+[clean-room:full] == cold start: three window-visible timings ==
+run1_ms=109
+run2_ms=64
+run3_ms=66
+[clean-room:full] == sizes and checksums ==
+# sizes (2026-10-30T04:58:08Z)
+40884328  /art/vedit-0.1.0-linux-x86_64.tar.gz
+40887126  /art/VEdit-0.1.0-x86_64.run
+5d7e1e9624b651079d510733b7ed5dacfb94c4c1002a049bf3c8d90e00a586a0  /art/vedit-0.1.0-linux-x86_64.tar.gz
+7faf6fa60ec37bc5b0a31cbf75b518eaf18793b4b1d211d5fc17eefaa9a1e025  /art/VEdit-0.1.0-x86_64.run
+cold_start=run1_ms=109 run2_ms=64 run3_ms=66 
+[clean-room:full] CLEAN-ROOM FULL RESULT: PASS failures=0

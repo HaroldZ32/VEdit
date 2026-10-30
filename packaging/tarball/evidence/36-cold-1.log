@@ -1,0 +1,6 @@
+vd-app selftest: fixture_root=/tmp/tarroot/VEdit/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/tarroot/VEdit/share/vedit/testdata"))
+
+(process:801): Gtk-WARNING **: 04:58:08.391: Locale not supported by C library.
+	Using the fallback 'C' locale.
+
+(vd-app:801): GLib-GIO-CRITICAL **: 04:58:08.410: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed

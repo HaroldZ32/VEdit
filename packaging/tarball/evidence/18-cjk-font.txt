@@ -1,0 +1,6 @@
+# CJK font bundled for Chinese comments/identifiers
+package: wqy-zenhei-fonts-0.9.46-11.el7
+licence: GPLv2 with exceptions  (GPLv2 with font-embedding exception)
+38ed4249f9a655c15cb0f4574336e23db46b569f867fb35d0ac7f7b8d83ad623  /vedit-build/packaging/tarball/stage/VEdit/share/fonts/wqy-zenhei/wqy-zenhei.ttc
+dejavu files: 13
+cjk files: 1

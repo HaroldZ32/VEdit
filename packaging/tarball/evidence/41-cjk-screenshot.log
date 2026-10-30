@@ -1,0 +1,57 @@
+vd-app selftest: fixture_root=/tmp/tarroot/VEdit/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/tarroot/VEdit/share/vedit/testdata"))
+
+(process:289): Gtk-WARNING **: 04:57:53.898: Locale not supported by C library.
+	Using the fallback 'C' locale.
+
+(vd-app:289): GLib-GIO-CRITICAL **: 04:57:53.913: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+vd-app: configuration warnings: 1
+
+(vd-app:289): Gtk-CRITICAL **: 04:57:54.411: gtk_widget_draw: assertion '!widget->priv->alloc_needed' failed
+vd-app: screenshot written to /evid/shots/targz-cjk.png
+{
+  "app": "VEdit",
+  "fixture_root": "/tmp/tarroot/VEdit/share/vedit/testdata",
+  "ok": true,
+  "reports": [
+    {
+      "checks": [
+        {
+          "detail": "error=None",
+          "name": "configuration loads",
+          "ok": true
+        },
+        {
+          "detail": "tab_width=4",
+          "name": "editor settings are present",
+          "ok": true
+        },
+        {
+          "detail": "attempts=[\"env: /tmp/tarroot/VEdit/bin/verible-verilog-ls [found]\", \"env: /tmp/tarroot/VEdit/bin/verible-verilog-format [found]\", \"env: /tmp/tarroot/VEdit/bin/verible-verilog-lint [found]\"]",
+          "name": "Verible tool resolution records every attempt",
+          "ok": true
+        },
+        {
+          "detail": "no PATH attempt recorded",
+          "name": "tool resolution never uses PATH",
+          "ok": true
+        },
+        {
+          "detail": "format=Some(\"/tmp/tarroot/VEdit/bin/verible-verilog-format\"), lint=Some(\"/tmp/tarroot/VEdit/bin/verible-verilog-lint\")",
+          "name": "formatter and linter tool paths were resolved (or explicitly recorded as missing)",
+          "ok": true
+        },
+        {
+          "detail": "enabled=false",
+          "name": "FIM defaults to off",
+          "ok": true
+        }
+      ],
+      "ok": true,
+      "suite": "config"
+    }
+  ],
+  "shortcut_table": "| action | shortcut | description |\n|---|---|---|\n| `open` | <Ctrl>o | open a file in a new tab |\n| `new` | <Ctrl>n | new untitled tab |\n| `save` | <Ctrl>s | save the current tab |\n| `save-as` | <Ctrl><Shift>s | save the current tab under a new path |\n| `close-tab` | <Ctrl>w | close the tab (confirms unsaved changes) |\n| `quit` | <Ctrl>q | quit the editor |\n| `undo` | <Ctrl>z | undo the last edit (native GtkSource undo) |\n| `redo` | <Ctrl><Shift>z | redo |\n| `find` | <Ctrl>f | show the find bar |\n| `replace` | <Ctrl>h | show the replace bar |\n| `find-next` | F3 | jump to the next match |\n| `goto-line` | <Ctrl>g | jump to a line |\n| `format` | <Ctrl><Shift>f | one-key format through the LSP, one undo step |\n| `slang` | <Ctrl><Shift>l | run SLANG deep lint into the problem panel |\n| `definition` | F12 | jump to the definition (LSP) |\n| `references` | <Shift>F12 | list references (LSP) |\n| `outline` | <Ctrl><Shift>o | document symbols of the current file |\n| `rename` | F2 | preview the LSP rename edits (nothing is applied) |\n| `fim` | <Alt>backslash | request an FIM completion as ghost text |\n| `toggle-panel` | <Ctrl><Shift>p | show/hide the problem panel |\n| `accept-fim` | Tab | insert the pending FIM completion through Document |\n| `cancel-fim` | Esc | discard the pending completion / cancel the request |\n",
+  "shortcuts": 22,
+  "suite": "config",
+  "version": "0.1.0"
+}

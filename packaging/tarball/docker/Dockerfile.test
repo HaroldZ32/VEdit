@@ -1,0 +1,16 @@
+# Clean-room acceptance image for T25.
+#
+# Contains ONLY: CentOS 7.9.2009 base (glibc 2.17) + the test harness itself
+# (Xvfb, xwininfo, a font). It deliberately has NO gtk3 / GtkSourceView / verible /
+# slang / rust / python: the packaged payload must supply all of that, and the
+# smoke script asserts the negative with rpm.
+FROM docker.m.daocloud.io/library/centos:7
+
+COPY tuna.repo /etc/yum.repos.d/tuna.repo
+RUN rm -f /etc/yum.repos.d/CentOS-*.repo \
+ && yum -y install xorg-x11-server-Xvfb xorg-x11-utils procps-ng \
+     fontconfig ImageMagick \
+ && yum clean all
+
+# Negative assertion baked into the image: the GUI stack must NOT be installed.
+RUN ! rpm -q gtk3 gtksourceview3 gtksourceview4 && echo "clean-room: no gtk/gsv packages present"

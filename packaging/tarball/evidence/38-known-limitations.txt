@@ -1,0 +1,1 @@
+SCREENSHOT_BLANK_IN_CLEANROOM=gtk_widget_draw_alloc_needed

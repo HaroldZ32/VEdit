@@ -1,0 +1,12 @@
+[clean-room:noexec] os: CentOS Linux release 7.9.2009 (Core)
+[clean-room:noexec] glibc: 2.17-317.el7
+[clean-room:noexec] PASS negative assertion: no gtk3 / gtksourceview3 / gtksourceview4 rpm
+[clean-room:noexec] Xvfb :99 up
+[clean-room:noexec] tarball=/art/vedit-0.1.0-linux-x86_64.tar.gz run=/art/VEdit-0.1.0-x86_64.run
+[clean-room:noexec] verifying that /tmp really is noexec
+[clean-room:noexec] PASS /tmp is noexec (a file there cannot be executed)
+[clean-room:noexec] running the self-extracting package under noexec /tmp
+[clean-room:noexec] PASS run_noexec_selftest (exit=0  (log 22-run-noexec.log))
+[clean-room:noexec] PASS fallback to the cache directory (extracting to /root/.cache/vedit/run.8Wv5N6)
+[clean-room:noexec] PASS extracted tree cleaned up on exit
+[clean-room:noexec] CLEAN-ROOM NOEXEC RESULT: PASS failures=0

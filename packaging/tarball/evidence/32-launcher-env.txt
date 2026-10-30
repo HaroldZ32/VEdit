@@ -1,0 +1,11 @@
+LAUNCHER_DIR=/tmp/tarroot/VEdit
+LD_LIBRARY_PATH=/tmp/tarroot/VEdit/lib
+GDK_PIXBUF_MODULE_FILE=/tmp/xdg/vedit-runtime-0/loaders.cache
+GTK_IM_MODULE_FILE=/tmp/xdg/vedit-runtime-0/immodules.cache
+GSETTINGS_SCHEMA_DIR=/tmp/tarroot/VEdit/share/glib-2.0/schemas
+XDG_DATA_DIRS=/tmp/tarroot/VEdit/share:/usr/share
+VEDIT_GSV_DATADIR=/tmp/tarroot/VEdit/share/gtksourceview-4
+FONTCONFIG_FILE=/tmp/xdg/vedit-runtime-0/fonts.conf
+VEDIT_VERIBLE_DIR=/tmp/tarroot/VEdit/bin
+VEDIT_SLANG=/tmp/tarroot/VEdit/bin/slang
+VEDIT_SELFTEST_FIXTURES=/tmp/tarroot/VEdit/share/vedit/testdata

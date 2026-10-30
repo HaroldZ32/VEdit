@@ -1,0 +1,3 @@
+# Finished products and in-tree staging stay out of git (T25 evidence is kept).
+out/
+stage/

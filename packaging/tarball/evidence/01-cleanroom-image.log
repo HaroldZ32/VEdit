@@ -1,0 +1,18 @@
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            BuildKit is currently disabled; enable it by removing the DOCKER_BUILDKIT=0
+            environment-variable.
+
+Sending build context to Docker daemon  3.584kB
+Step 1/4 : FROM docker.m.daocloud.io/library/centos:7
+ ---> be65f488b776
+Step 2/4 : COPY tuna.repo /etc/yum.repos.d/tuna.repo
+ ---> Using cache
+ ---> 5f1064d6fc94
+Step 3/4 : RUN rm -f /etc/yum.repos.d/CentOS-*.repo  && yum -y install xorg-x11-server-Xvfb xorg-x11-utils procps-ng      fontconfig ImageMagick  && yum clean all
+ ---> Using cache
+ ---> 29c32c756946
+Step 4/4 : RUN ! rpm -q gtk3 gtksourceview3 gtksourceview4 && echo "clean-room: no gtk/gsv packages present"
+ ---> Using cache
+ ---> 12541df77a5e
+Successfully built 12541df77a5e
+Successfully tagged vedit-tarball-cleanroom:local

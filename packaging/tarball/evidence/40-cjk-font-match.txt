@@ -1,0 +1,3 @@
+/tmp/tarroot/VEdit/share/fonts/wqy-zenhei/wqy-zenhei.ttc: WenQuanYi Zen Hei Mono:style=Regular
+/tmp/tarroot/VEdit/share/fonts/wqy-zenhei/wqy-zenhei.ttc: WenQuanYi Zen Hei:style=Regular
+/tmp/tarroot/VEdit/share/fonts/wqy-zenhei/wqy-zenhei.ttc: WenQuanYi Zen Hei Sharp,文泉驛點陣正黑:style=Regular

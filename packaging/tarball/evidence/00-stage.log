@@ -1,0 +1,66 @@
+[stage] version=0.1.0 verible=v0.0-4298-g085eef05
+[stage] building vd-app (release)
+    Finished `release` profile [optimized] target(s) in 0.10s
+[stage] fetching verible from the pinned URL
+/tmp/verible.tar.gz: OK
+verible-verilog-ls: OK
+verible-verilog-lint: OK
+verible-verilog-format: OK
+[stage] installing slang from the T3 artifact (sha256 pinned)
+/vedit-build/build/slang/out/slang: OK
+[stage] collecting the GTK3 runtime closure
+[stage] gdk-pixbuf loaders
+[stage] GTK input-method modules (xim + ibus)
+[stage] GtkSourceView 4.6.1 data
+[stage] GSettings schemas
+[stage] fonts / icons / themes
+# CJK font bundled for Chinese comments/identifiers
+package: wqy-zenhei-fonts-0.9.46-11.el7
+licence: GPLv2 with exceptions  (GPLv2 with font-embedding exception)
+38ed4249f9a655c15cb0f4574336e23db46b569f867fb35d0ac7f7b8d83ad623  /vedit-build/packaging/tarball/stage/VEdit/share/fonts/wqy-zenhei/wqy-zenhei.ttc
+dejavu files: 13
+cjk files: 1
+[stage] selftest fixtures
+share/vedit/testdata/definition/a.sv
+share/vedit/testdata/definition/b.sv
+[stage] audits
+
+ELF_SCANNED=95
+ELF_WITH_RUNPATH=1
+ALLOWLIST_HITS=1
+UNKNOWN=0
+GLIBC_GATE=PASS
+# host-path audit for the payload
+
+## 1) launch-time templates must contain only @APPDIR@ placeholders
+none (PASS)
+
+## 2) @APPDIR@ placeholder counts
+fonts.conf.in: 1
+immodules.cache.in: 2
+loaders.cache.in: 14
+
+## 3) RPATH/RUNPATH on the shipped ELF binaries
+slang: none
+vd-app: none
+verible-verilog-format: none
+verible-verilog-lint: none
+verible-verilog-ls: none
+
+## 4) embedded build-tree strings in the app binary (panic locations only)
+count(/vedit-build): 507
+These are Rust source paths inside panic messages; they are not resolved at
+runtime. They are recorded as a known, non-functional bound (see README).
+[stage] creating the tar.gz
+[stage] creating the self-extracting .run
+# products (2026-10-30T04:57:35Z)
+40884328  /vedit-build/packaging/tarball/out/vedit-0.1.0-linux-x86_64.tar.gz
+40887126  /vedit-build/packaging/tarball/out/VEdit-0.1.0-x86_64.run
+
+payload tree: 105M
+files in payload: 4106
+ELF files in payload: 95
+
+5d7e1e9624b651079d510733b7ed5dacfb94c4c1002a049bf3c8d90e00a586a0  /vedit-build/packaging/tarball/out/vedit-0.1.0-linux-x86_64.tar.gz
+7faf6fa60ec37bc5b0a31cbf75b518eaf18793b4b1d211d5fc17eefaa9a1e025  /vedit-build/packaging/tarball/out/VEdit-0.1.0-x86_64.run
+[stage] STAGE OK

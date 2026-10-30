@@ -1,0 +1,63 @@
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            BuildKit is currently disabled; enable it by removing the DOCKER_BUILDKIT=0
+            environment-variable.
+
+Sending build context to Docker daemon  20.48kB
+Step 1/19 : FROM docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+ ---> be65f488b776
+Step 2/19 : ARG CENTOS_VAULT_BASE
+ ---> Using cache
+ ---> 51ee0c56e8d9
+Step 3/19 : ARG RUSTUP_URL
+ ---> Using cache
+ ---> 4168d43aa67e
+Step 4/19 : ARG RUSTUP_SHA256
+ ---> Using cache
+ ---> 6b1b913da1ef
+Step 5/19 : ARG RUST_TOOLCHAIN
+ ---> Using cache
+ ---> 21189fec5a13
+Step 6/19 : ARG GSV_URL
+ ---> Using cache
+ ---> 4c5f8ed47ad4
+Step 7/19 : ARG GSV_SHA256
+ ---> Using cache
+ ---> 915410097e66
+Step 8/19 : ARG MESON_WHEEL_URL
+ ---> Using cache
+ ---> 61de7030ddb4
+Step 9/19 : ARG MESON_WHEEL_SHA256
+ ---> Using cache
+ ---> bc2f3c624277
+Step 10/19 : ARG NINJA_WHEEL_URL
+ ---> Using cache
+ ---> bfaa1a08115a
+Step 11/19 : ARG NINJA_WHEEL_SHA256
+ ---> Using cache
+ ---> ea11938304bb
+Step 12/19 : RUN rm -f /etc/yum.repos.d/CentOS-*.repo  && printf '%s\n'       '[base]'       'name=CentOS-7.9.2009-Base'       "baseurl=${CENTOS_VAULT_BASE}/os/x86_64/"       'gpgcheck=0'       '[updates]'       'name=CentOS-7.9.2009-Updates'       "baseurl=${CENTOS_VAULT_BASE}/updates/x86_64/"       'gpgcheck=0'       '[extras]'       'name=CentOS-7.9.2009-Extras'       "baseurl=${CENTOS_VAULT_BASE}/extras/x86_64/"       'gpgcheck=0'     > /etc/yum.repos.d/vault.repo  && cat /etc/yum.repos.d/vault.repo
+ ---> Using cache
+ ---> 4aa42f20e0c2
+Step 13/19 : RUN yum -y install       gcc gcc-c++ make pkgconfig git curl tar xz bzip2 which findutils file       glib2-devel gtk3-devel libxml2-devel gettext       gdk-pixbuf2 gdk-pixbuf2-devel       python3       dejavu-sans-fonts dejavu-sans-mono-fonts fontconfig       xorg-x11-server-Xvfb xorg-x11-utils mesa-demos mesa-libGL  && yum clean all
+ ---> Using cache
+ ---> f473611881a5
+Step 14/19 : RUN mkdir -p /opt/vedit  && { echo "## gtk3 immodule packages in the CentOS 7.9.2009 vault:";       for pkg in gtk3-immodule-xim gtk3-immodule-ibus ibus-gtk3; do         if yum -y install "$pkg" >/dev/null 2>&1; then echo "installed $pkg";         else echo "not available: $pkg"; fi;       done;       echo "## immodule files:";       ls -l /usr/lib64/gtk-3.0/3.0.0/immodules/ 2>&1 || true;     } | tee /opt/vedit/immodules.txt
+ ---> Using cache
+ ---> c9476de1ba25
+Step 15/19 : RUN set -eux;     curl -fsSL -o /tmp/meson.whl "$MESON_WHEEL_URL";     echo "$MESON_WHEEL_SHA256  /tmp/meson.whl" | sha256sum -c -;     curl -fsSL -o /tmp/ninja.whl "$NINJA_WHEEL_URL";     echo "$NINJA_WHEEL_SHA256  /tmp/ninja.whl" | sha256sum -c -;     mkdir -p /opt/wheels/meson /opt/wheels/ninja;     python3 -m zipfile -e /tmp/meson.whl /opt/wheels/meson;     pysite=$(python3 -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])');     mkdir -p "$pysite";     cp -a /opt/wheels/meson/mesonbuild "$pysite/";     { echo '#!/usr/bin/python3';       echo 'import sys';       echo 'from mesonbuild.mesonmain import main';       echo 'if __name__ == "__main__":';       echo '    sys.exit(main())';     } > /usr/local/bin/meson;     chmod 755 /usr/local/bin/meson;     python3 -m zipfile -e /tmp/ninja.whl /opt/wheels/ninja;     cp /opt/wheels/ninja/ninja/data/bin/ninja /usr/local/bin/ninja;     chmod 755 /usr/local/bin/ninja;     meson --version; ninja --version
+ ---> Using cache
+ ---> b236312d8dcb
+Step 16/19 : RUN set -eux;     curl -fsSL -o /tmp/rustup-init "$RUSTUP_URL";     echo "$RUSTUP_SHA256  /tmp/rustup-init" | sha256sum -c -;     chmod 755 /tmp/rustup-init;     RUSTUP_HOME=/opt/rust CARGO_HOME=/opt/cargo /tmp/rustup-init       -y --no-modify-path --profile minimal --default-toolchain "$RUST_TOOLCHAIN";     RUSTUP_HOME=/opt/rust CARGO_HOME=/opt/cargo /opt/cargo/bin/rustup component add       --toolchain "$RUST_TOOLCHAIN" rustfmt clippy;     chmod -R a+rX /opt/rust /opt/cargo;     RUSTUP_HOME=/opt/rust CARGO_HOME=/opt/cargo /opt/cargo/bin/rustc --version
+ ---> Using cache
+ ---> 02e9fe350bd5
+Step 17/19 : RUN set -eux;     curl -fsSL -o /tmp/gtksourceview.tar.xz "$GSV_URL";     echo "$GSV_SHA256  /tmp/gtksourceview.tar.xz" | sha256sum -c -;     mkdir -p /opt/src/gtksourceview;     tar -xJf /tmp/gtksourceview.tar.xz -C /opt/src/gtksourceview --strip-components=1;     cd /opt/src/gtksourceview;     meson setup build --prefix=/opt/gsv4 --libdir=lib64       -Dgtk_doc=false -Dgir=false -Dvapi=false -Dinstall_tests=false -Dglade_catalog=false;     ninja -C build;     ninja -C build install;     rm -rf /opt/src/gtksourceview /tmp/gtksourceview.tar.xz
+ ---> Using cache
+ ---> 6b855016dc18
+Step 18/19 : ENV PKG_CONFIG_PATH=/opt/gsv4/lib64/pkgconfig:/opt/gsv4/lib/pkgconfig     LD_LIBRARY_PATH=/opt/gsv4/lib64:/opt/gsv4/lib     RUSTUP_HOME=/opt/rust     RUSTUP_TOOLCHAIN=${RUST_TOOLCHAIN}     PATH=/opt/cargo/bin:/usr/local/bin:/usr/bin:/bin
+ ---> Using cache
+ ---> f576155db40b
+Step 19/19 : RUN { echo "## image facts"; cat /etc/centos-release;       echo "glibc: $(rpm -q glibc)";       echo "gtk3: $(rpm -q gtk3)";       echo "rust: $(/opt/cargo/bin/rustc --version)";       echo "gsv4: $(PKG_CONFIG_PATH=/opt/gsv4/lib64/pkgconfig pkg-config --modversion gtksourceview-4)";     } > /opt/vedit/build-image.txt  && rpm -qa --qf '%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n' | sort > /opt/vedit/rpm-snapshot.txt
+ ---> Using cache
+ ---> 21bc713ccbf0
+Successfully built 21bc713ccbf0
+Successfully tagged vedit-build:local

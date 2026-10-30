@@ -1,0 +1,30 @@
+VEdit — bundled third-party components (payload notice)
+=======================================================
+
+This file lists the components a VEdit package (tar.gz / AppImage) actually ships.
+It is a payload-side pointer; the authoritative, complete notice set with licence
+texts and source-availability instructions is THIRD_PARTY_NOTICES in the source
+repository (T29).
+
+GTK 3.22.30, GDK-Pixbuf, GLib, Pango, ATK, cairo, gdk-pixbuf loaders
+    LGPL-2.1-or-later; source: https://download.gnome.org/sources/ (matching
+    version tarballs) and the CentOS 7 SRPMs from the centos-vault mirror.
+GtkSourceView 4.6.1 (libgtksourceview-4.so.0 + language-specs/ + styles/)
+    LGPL-2.1-or-later; source tarball, version and sha256 pinned in
+    scripts/versions.env (GSV_URL / GSV_SHA256).
+Verible v0.0-4298-g085eef05 (verible-verilog-ls, -lint, -format)
+    Apache-2.0; static binaries from the pinned release URL in scripts/versions.env.
+slang 12.1 (deep lint binary)
+    MIT; built from source by this project for glibc 2.17 (build/slang/).
+WenQuanYi Zen Hei (wqy-zenhei.ttc)
+    GPLv2 with a font-embedding exception (the upstream licence permits embedding
+    in documents and bundling); bundled so Chinese comments render out of the box.
+DejaVu fonts, Adwaita/HighContrast icon+theme data
+    DejaVu: Bitstream Vera / public-domain-ish permissive licence; themes: LGPL.
+Rust crates
+    Per-crate licences in Cargo.lock; the project's crates are MIT/Apache-2.0
+    dual-licensed.
+
+No component here is modified except slang (rebuilt, unmodified sources) and
+GtkSourceView (built from the unmodified upstream tarball). VEdit's own code is
+separate; see the repository LICENSE.

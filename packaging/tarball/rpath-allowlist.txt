@@ -1,0 +1,14 @@
+# RPATH/RUNPATH allowlist for the bundled payload (T25).
+#
+# One absolute prefix per line; '#' starts a comment. The GLIBC/RPATH gate scans
+# every ELF in the payload, splits its RUNPATH/RPATH on ':', and fails on any
+# entry that is not covered here. The four totals it prints are
+# ELF_SCANNED / ELF_WITH_RUNPATH / ALLOWLIST_HITS / UNKNOWN, and UNKNOWN must be 0.
+#
+# Why this entry is allowed:
+#   CentOS 7's upstream elfutils packages libdw.so.1 with this RUNPATH; it is not
+#   injected by VEdit. LD_LIBRARY_PATH is searched before RUNPATH, and libdw/libelf
+#   are bundled, so the path is never used. The clean-room run (no
+#   /usr/lib64/elfutils there) starts the app and passes --selftest, which is the
+#   assertion that the missing path is harmless.
+/usr/lib64/elfutils

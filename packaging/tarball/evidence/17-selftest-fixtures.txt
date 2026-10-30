@@ -1,0 +1,2 @@
+share/vedit/testdata/definition/a.sv
+share/vedit/testdata/definition/b.sv

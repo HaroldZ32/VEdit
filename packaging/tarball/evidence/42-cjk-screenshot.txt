@@ -1,0 +1,5 @@
+# CJK screenshot evidence
+5270 bytes  /evid/shots/targz-cjk.png
+b7bb79ab7208ca74ba80636714b5ae857165bbb33ff28ade6f4be55e1f5f502d  /evid/shots/targz-cjk.png
+identify mean/stddev (stddev>0.02 means real content, not a blank surface):
+mean=0 stddev=0 size=1120x780

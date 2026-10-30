@@ -1,0 +1,21 @@
+# host-path audit for the payload
+
+## 1) launch-time templates must contain only @APPDIR@ placeholders
+none (PASS)
+
+## 2) @APPDIR@ placeholder counts
+fonts.conf.in: 1
+immodules.cache.in: 2
+loaders.cache.in: 14
+
+## 3) RPATH/RUNPATH on the shipped ELF binaries
+slang: none
+vd-app: none
+verible-verilog-format: none
+verible-verilog-lint: none
+verible-verilog-ls: none
+
+## 4) embedded build-tree strings in the app binary (panic locations only)
+count(/vedit-build): 507
+These are Rust source paths inside panic messages; they are not resolved at
+runtime. They are recorded as a known, non-functional bound (see README).

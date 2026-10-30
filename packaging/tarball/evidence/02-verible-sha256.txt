@@ -1,0 +1,4 @@
+/tmp/verible.tar.gz: OK
+verible-verilog-ls: OK
+verible-verilog-lint: OK
+verible-verilog-format: OK

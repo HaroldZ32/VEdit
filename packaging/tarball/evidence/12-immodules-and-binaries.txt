@@ -1,0 +1,24 @@
+# bundled binary identities
+9f80c05d0c1d0130ec85590a407e11e98c96e1d1cb33d7773d4a932ca21cfeb9  /vedit-build/packaging/tarball/stage/VEdit/bin/vd-app
+63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  /vedit-build/packaging/tarball/stage/VEdit/bin/slang
+07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845  /vedit-build/packaging/tarball/stage/VEdit/bin/verible-verilog-ls
+b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29  /vedit-build/packaging/tarball/stage/VEdit/bin/verible-verilog-lint
+b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473  /vedit-build/packaging/tarball/stage/VEdit/bin/verible-verilog-format
+
+# immodules actually bundled
+total 72
+-rwxr-xr-x 1 root root 33416 Sep 12  2023 im-ibus.so
+-rwxr-xr-x 1 root root 33000 Apr  5  2022 im-xim.so
+
+# immodule cache (both entries must be present)
+# GTK+ Input Method Modules file
+# Automatically generated file, do not edit
+# Created by gtk-query-immodules-3.0-64 from gtk+-3.22.30
+#
+"@APPDIR@/lib/gtk-3.0/3.0.0/immodules/im-ibus.so" 
+"ibus" "IBus (Intelligent Input Bus)" "ibus" "" "ja:ko:zh:*" 
+
+"@APPDIR@/lib/gtk-3.0/3.0.0/immodules/im-xim.so" 
+"xim" "X Input Method" "gtk30" "/usr/share/locale" "ko:ja:th:zh" 
+
+
