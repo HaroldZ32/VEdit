@@ -5,7 +5,22 @@
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 export ROOT
 VERSIONS_FILE="$ROOT/scripts/versions.env"
-BUILD_IMAGE_TAG="vedit-build:local"
+# The pinned build image. CI sets VEDIT_BUILD_IMAGE_REF to the registry ref it
+# pulled or pushed (e.g. ghcr.io/<owner>/vedit-build:latest); with the variable
+# unset the historical local tag is used, so local behaviour is unchanged.
+BUILD_IMAGE_TAG="${VEDIT_BUILD_IMAGE_REF:-vedit-build:local}"
+
+# BuildKit keeps its state in the Docker CLI config directory. Keep the normal
+# config (it may hold registry credentials) when it is writable; a sandboxed or
+# read-only HOME would otherwise make every `docker build` fail, so fall back to
+# a workspace directory in that case.
+if [ -z "${DOCKER_CONFIG:-}" ]; then
+  home_dir="${HOME:-/nonexistent}"
+  if ! { mkdir -p "$home_dir/.docker" 2>/dev/null && [ -w "$home_dir/.docker" ]; }; then
+    export DOCKER_CONFIG="$ROOT/target/docker-config"
+    mkdir -p "$DOCKER_CONFIG"
+  fi
+fi
 
 # Export every pinned input, then refuse to continue with a missing one.
 load_versions() {
@@ -43,12 +58,39 @@ ensure_base_image() {
   }
 }
 
+# Fetch the build image when a CI run points VEDIT_BUILD_IMAGE_PULL=1 at a
+# registry ref. Local runs never pull.
+ensure_build_image_pulled() {
+  [ "${VEDIT_BUILD_IMAGE_PULL:-0}" = "1" ] || return 0
+  echo "[image] pulling $BUILD_IMAGE_TAG (VEDIT_BUILD_IMAGE_PULL=1)"
+  docker pull "$BUILD_IMAGE_TAG" || {
+    echo "FATAL: cannot pull the build image $BUILD_IMAGE_TAG" >&2
+    exit 1
+  }
+}
+
 # Build the pinned CentOS 7 build image. Argument 1 is a log file to mirror to.
+#
+# Environment (all optional; unset behaviour is the local default):
+#   VEDIT_BUILD_IMAGE_REF   image ref/tag to build or reuse
+#                           (default: vedit-build:local)
+#   VEDIT_BUILD_IMAGE_PULL  =1: docker pull that ref before anything else
+#   VEDIT_SKIP_IMAGE_BUILD  =1: never build; the ref must already exist locally
 build_build_image() {
   local log="${1:-/dev/null}"
+  ensure_build_image_pulled
+  if [ "${VEDIT_SKIP_IMAGE_BUILD:-0}" = "1" ]; then
+    if docker image inspect "$BUILD_IMAGE_TAG" >/dev/null 2>&1; then
+      echo "[image] VEDIT_SKIP_IMAGE_BUILD=1: reusing the existing image $BUILD_IMAGE_TAG"
+      return 0
+    fi
+    echo "FATAL: VEDIT_SKIP_IMAGE_BUILD=1, but the build image '$BUILD_IMAGE_TAG' does not exist locally." >&2
+    echo "       Pull it first (docker pull $BUILD_IMAGE_TAG, or VEDIT_BUILD_IMAGE_PULL=1), or unset VEDIT_SKIP_IMAGE_BUILD to build it." >&2
+    exit 1
+  fi
   ensure_base_image
   echo "[image] building $BUILD_IMAGE_TAG from the pinned inputs"
-  DOCKER_BUILDKIT=0 docker build \
+  docker build \
     --build-arg CENTOS_VAULT_BASE="$CENTOS_VAULT_BASE" \
     --build-arg RUSTUP_URL="$RUSTUP_URL" \
     --build-arg RUSTUP_SHA256="$RUSTUP_SHA256" \

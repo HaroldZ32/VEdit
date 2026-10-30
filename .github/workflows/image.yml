@@ -1,0 +1,52 @@
+name: image
+
+# Builds the pinned CentOS 7 build image and publishes it to GHCR so that every
+# other job can reuse it instead of paying a ~20 minute cold build. The image is
+# what makes this repository's gates trustworthy: CentOS 7.9.2009, Rust 1.99.0,
+# GTK 3.22.30 and a GtkSourceView 4.6.1 built from source.
+
+on:
+  push:
+    branches: [dev, main]
+    paths:
+      - 'scripts/docker/**'
+      - 'scripts/versions.env'
+      - 'scripts/lib.sh'
+      - 'scripts/build-image.sh'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: image-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    name: build and push the pinned image
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build the pinned image and push it
+        shell: bash
+        run: |
+          set -euo pipefail
+          owner="$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
+          repo="ghcr.io/${owner}/vedit-build"
+          VEDIT_BUILD_IMAGE_REF="${repo}:${GITHUB_SHA}" bash scripts/build-image.sh
+          docker tag "${repo}:${GITHUB_SHA}" "${repo}:latest"
+          docker push "${repo}:${GITHUB_SHA}"
+          docker push "${repo}:latest"
+          echo "published ${repo}:${GITHUB_SHA} and ${repo}:latest"

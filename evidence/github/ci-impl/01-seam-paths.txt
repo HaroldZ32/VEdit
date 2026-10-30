@@ -1,0 +1,98 @@
+### 1) default ref, skip build (image present)
+[image] VEDIT_SKIP_IMAGE_BUILD=1: reusing the existing image vedit-build:local
+[image] ref=vedit-build:local
+image_id=sha256:21bc713ccbf020cdc76f566f12c15e46e84cb40529e48263e6f09a04d6b4048f
+exit=0
+
+### 2) skip build, ref missing
+FATAL: VEDIT_SKIP_IMAGE_BUILD=1, but the build image 'vedit-build:definitely-missing' does not exist locally.
+       Pull it first (docker pull vedit-build:definitely-missing, or VEDIT_BUILD_IMAGE_PULL=1), or unset VEDIT_SKIP_IMAGE_BUILD to build it.
+exit=1
+
+### 3) pull=1 + skip=1 (public ref already local)
+[image] pulling alpine:latest (VEDIT_BUILD_IMAGE_PULL=1)
+Error response from daemon: failed to resolve reference "docker.io/library/alpine:latest": failed to do request: Head "https://registry-1.docker.io/v2/library/alpine/manifests/latest": read tcp [2408:820c:8f1a:28f1:bed1:4557:2d4a:8c3e]:55408->[2600:1f18:2148:bc02:d114:7bf3:7ba3:744a]:443: read: connection reset by peer
+FATAL: cannot pull the build image alpine:latest
+exit=1
+
+### 4) ref seam only (skip, existing ref)
+[image] VEDIT_SKIP_IMAGE_BUILD=1: reusing the existing image alpine:latest
+[image] ref=alpine:latest
+image_id=sha256:294b683cb724975bec92580e1e685676bd4b50bda910ddb8c51d4cabeaec77e6
+exit=0
+### 3b) pull=1 success path (reachable mirror ref)
+[image] pulling docker.m.daocloud.io/library/centos:7 (VEDIT_BUILD_IMAGE_PULL=1)
+7: Pulling from library/centos
+Digest: sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+Status: Image is up to date for docker.m.daocloud.io/library/centos:7
+docker.m.daocloud.io/library/centos:7
+[image] VEDIT_SKIP_IMAGE_BUILD=1: reusing the existing image docker.m.daocloud.io/library/centos:7
+[image] ref=docker.m.daocloud.io/library/centos:7
+image_id=sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+exit=0
+### 5) scripts/build-image.sh, no environment variables (local default)
+[image] building vedit-build:local from the pinned inputs
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.build
+#1 transferring dockerfile: 5.87kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/9] FROM docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+#4 resolve docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 310B done
+#5 DONE 0.0s
+
+#6 [2/9] COPY vault.repo.in /tmp/vault.repo.in
+#6 CACHED
+
+#7 [5/9] RUN mkdir -p /opt/vedit  && { echo "## gtk3 immodule packages in the CentOS 7.9.2009 vault:";       for pkg in gtk3-immodule-xim gtk3-immodule-ibus ibus-gtk3; do         if yum -y install "$pkg" >/dev/null 2>&1; then echo "installed $pkg";         else echo "not available: $pkg"; fi;       done;       echo "## immodule files:";       ls -l /usr/lib64/gtk-3.0/3.0.0/immodules/ 2>&1 || true;     } | tee /opt/vedit/immodules.txt
+#7 CACHED
+
+#8 [4/9] RUN yum -y install       gcc gcc-c++ make pkgconfig git curl tar xz bzip2 which findutils file       glib2-devel gtk3-devel libxml2-devel gettext       gdk-pixbuf2 gdk-pixbuf2-devel       python3       dejavu-sans-fonts dejavu-sans-mono-fonts fontconfig       xorg-x11-server-Xvfb xorg-x11-utils mesa-demos mesa-libGL  && yum clean all
+#8 CACHED
+
+#9 [6/9] RUN set -eux;     curl -fsSL -o /tmp/meson.whl "https://files.pythonhosted.org/packages/01/48/b4ba2490ed26c73618736dece01a68a609713f1a7923563d4c41ac966b3b/meson-0.59.4-py3-none-any.whl";     echo "9db5bb89d3bd1c8e9c15974be5fa656f50491c48d53c43b6eb5cfe406dff3fd6  /tmp/meson.whl" | sha256sum -c -;     curl -fsSL -o /tmp/ninja.whl "https://files.pythonhosted.org/packages/0f/58/854ce5aab0ff5c33d66e1341b0be42f0330797335011880f7fbd88449996/ninja-1.11.1-py2.py3-none-manylinux_2_12_x86_64.manylinux2010_x86_64.whl";     echo "817e2aee2a4d28a708a67bcfba1817ae502c32c6d8ef80e50d63b0f23adf3a08  /tmp/ninja.whl" | sha256sum -c -;     mkdir -p /opt/wheels/meson /opt/wheels/ninja;     python3 -m zipfile -e /tmp/meson.whl /opt/wheels/meson;     pysite=$(python3 -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])');     mkdir -p "$pysite";     cp -a /opt/wheels/meson/mesonbuild "$pysite/";     { echo '#!/usr/bin/python3';       echo 'import sys';       echo 'from mesonbuild.mesonmain import main';       echo 'if __name__ == "__main__":';       echo '    sys.exit(main())';     } > /usr/local/bin/meson;     chmod 755 /usr/local/bin/meson;     python3 -m zipfile -e /tmp/ninja.whl /opt/wheels/ninja;     cp /opt/wheels/ninja/ninja/data/bin/ninja /usr/local/bin/ninja;     chmod 755 /usr/local/bin/ninja;     meson --version; ninja --version
+#9 CACHED
+
+#10 [7/9] RUN set -eux;     curl -fsSL -o /tmp/rustup-init "https://static.rust-lang.org/rustup/archive/1.29.2/x86_64-unknown-linux-gnu/rustup-init";     echo "5be191e8c70a5007074254cb74d78dbfdd25cd5a61c27de7b8e5410122ec24f4  /tmp/rustup-init" | sha256sum -c -;     chmod 755 /tmp/rustup-init;     RUSTUP_HOME=/opt/rust CARGO_HOME=/opt/cargo /tmp/rustup-init       -y --no-modify-path --profile minimal --default-toolchain "1.99.0";     RUSTUP_HOME=/opt/rust CARGO_HOME=/opt/cargo /opt/cargo/bin/rustup component add       --toolchain "1.99.0" rustfmt clippy;     chmod -R a+rX /opt/rust /opt/cargo;     RUSTUP_HOME=/opt/rust CARGO_HOME=/opt/cargo /opt/cargo/bin/rustc --version
+#10 CACHED
+
+#11 [8/9] RUN set -eux;     curl -fsSL -o /tmp/gtksourceview.tar.xz "https://download.gnome.org/sources/gtksourceview/4.6/gtksourceview-4.6.1.tar.xz";     echo "63f487a7ab59612ffa9e7be1883dbd274ab1016afcede3239b93b0fc384df874  /tmp/gtksourceview.tar.xz" | sha256sum -c -;     mkdir -p /opt/src/gtksourceview;     tar -xJf /tmp/gtksourceview.tar.xz -C /opt/src/gtksourceview --strip-components=1;     cd /opt/src/gtksourceview;     meson setup build --prefix=/opt/gsv4 --libdir=lib64       -Dgtk_doc=false -Dgir=false -Dvapi=false -Dinstall_tests=false -Dglade_catalog=false;     ninja -C build;     ninja -C build install;     rm -rf /opt/src/gtksourceview /tmp/gtksourceview.tar.xz
+#11 CACHED
+
+#12 [3/9] RUN rm -f /etc/yum.repos.d/CentOS-*.repo  && sed "s|@CENTOS_VAULT_BASE@|https://mirrors.tuna.tsinghua.edu.cn/centos-vault/7.9.2009|g" /tmp/vault.repo.in > /etc/yum.repos.d/vault.repo  && rm -f /tmp/vault.repo.in  && cat /etc/yum.repos.d/vault.repo
+#12 CACHED
+
+#13 [9/9] RUN { echo "## image facts"; cat /etc/centos-release;       echo "glibc: $(rpm -q glibc)";       echo "gtk3: $(rpm -q gtk3)";       echo "rust: $(/opt/cargo/bin/rustc --version)";       echo "gsv4: $(PKG_CONFIG_PATH=/opt/gsv4/lib64/pkgconfig pkg-config --modversion gtksourceview-4)";     } > /opt/vedit/build-image.txt  && rpm -qa --qf '%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n' | sort > /opt/vedit/rpm-snapshot.txt
+#13 CACHED
+
+#14 exporting to image
+#14 exporting layers done
+#14 exporting manifest sha256:3f63e96581c0489cd258bda69ba8142170b1814da9ba88ce86a2f18f4dac60c9 done
+#14 exporting config sha256:d8278c2560b8bc6e9a63af0c91c157a73950a17fd9d4b22133e12d90ea6515e0 done
+#14 exporting attestation manifest sha256:d8022d8601cddea5da56b1e539eb720fbd77e560a564c552efb6c61072b6958e 0.0s done
+#14 exporting manifest list sha256:7ca31de0b650b2f9f35bbc2c73c16672ffa8b5dca205631c481b5165d6e28436 0.0s done
+#14 naming to docker.io/library/vedit-build:local done
+#14 unpacking to docker.io/library/vedit-build:local done
+#14 DONE 0.1s
+[image] ref=vedit-build:local
+image_id=sha256:7ca31de0b650b2f9f35bbc2c73c16672ffa8b5dca205631c481b5165d6e28436
+elapsed=0.481 s
+exit=0
+
+### note on §3
+The alpine:latest pull failed with a Docker Hub IPv6 connection reset from this
+host (registry-1.docker.io). That exercises the pull-failure branch of
+`ensure_build_image_pulled` (`FATAL: cannot pull the build image …`, exit 1);
+the successful pull branch is §3b (daocloud mirror, reachable).

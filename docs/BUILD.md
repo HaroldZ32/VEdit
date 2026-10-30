@@ -100,7 +100,8 @@ bash packaging/tarball/build.sh           # tar.gz + 自解压 .run（含离线�
   （唯一允许项是 CentOS 7 上游 elfutils 自带的 `/usr/lib64/elfutils`，理由见
   `packaging/tarball/rpath-allowlist.txt`）；
 - 干净容器验收镜像**不含** gtk3/GtkSourceView，负断言写在镜像定义里，
-  验收脚本在 `--network none` 下跑 `--selftest all`（6 套件 / 51 检查）。
+  验收脚本在 `--network none` 下跑 `--selftest all`（6 个套件；检查总数随版本增长，
+  以实际输出为准，不要在文档里写死）。
 
 ## 8. 可复现性：已控制到什么程度
 
@@ -142,3 +143,35 @@ cargo metadata --format-version 1 --all-features > meta.json
 | `RUNPATH` gate 报 `UNKNOWN` | 新增了绝对路径依赖；若确属上游自带，把理由写进 `rpath-allowlist.txt` 再放行 |
 | `verible-verilog-ls` 找不到 | 运行期只按"配置 → 环境变量 → 包内路径"解析，**不查 PATH**；用 `VEDIT_VERIBLE_DIR` 指向目录 |
 | `--selftest all` 失败在 `lsp` 的 definition 检查 | 运行目录里没有 fixtures：设置 `VEDIT_SELFTEST_FIXTURES=<share>/vedit/testdata` |
+
+## 11. GitHub Actions（CI / 镜像 / 发版）
+
+仓库有三条工作流（`.github/workflows/`），全部复用同一个 pinned CentOS 7 镜像：
+
+| 工作流 | 触发 | 做什么 |
+|---|---|---|
+| `ci.yml` | PR → `dev`/`main`；push → `dev` | `scripts/gates.sh` + `scripts/build.sh`（release build、Xvfb smoke、GLIBC ≤ 2.17 断言），上传 `build/evidence/` 与 `build/artifacts/vd-app` |
+| `image.yml` | `scripts/docker/**`、`scripts/versions.env`、`scripts/lib.sh`、`scripts/build-image.sh` 变更；手动 | 构建 pinned 镜像并推送 `ghcr.io/<owner>/vedit-build:<sha>` 与 `:latest` |
+| `release.yml` | tag `v*`；手动 | slang → `scripts/build.sh` → AppImage → tar.gz/.run → `SHA256SUMS` → GitHub Release |
+
+工作流复用已发布的镜像、不重建时用三个脚本开关（`scripts/lib.sh`）：
+
+```sh
+VEDIT_BUILD_IMAGE_REF=ghcr.io/<owner>/vedit-build:latest \
+VEDIT_SKIP_IMAGE_BUILD=1 \
+  bash scripts/gates.sh
+```
+
+- `VEDIT_BUILD_IMAGE_REF`：镜像 ref，默认 `vedit-build:local`；
+- `VEDIT_BUILD_IMAGE_PULL=1`：先 `docker pull` 该 ref；
+- `VEDIT_SKIP_IMAGE_BUILD=1`：只复用现有镜像，缺失时打印 `FATAL:` 并 exit 1；
+- 只建镜像（不编译工作区）：`bash scripts/build-image.sh`；
+- **不设这些变量时本地行为与以前完全一致**。
+
+注意：
+
+- 镜像构建走 BuildKit，不再需要 `DOCKER_BUILDKIT=0`；`scripts/docker/Dockerfile.build` 用
+  `COPY vault.repo.in` + `sed` 渲染 yum 源，两种 builder 语法都合法；
+- GHCR 包默认私有：同仓库的 `GITHUB_TOKEN` 可以拉取，fork PR 拉不到时工作流退回本地构建；
+- `--selftest all` 需要 `VEDIT_SLANG` 与 `VEDIT_VERIBLE_LS` 同时存在，因此 **CI 只跑
+  `smoke highlight config fim` 四个套件**；发版流程先构建 slang，打包的干净容器里跑完整套件。

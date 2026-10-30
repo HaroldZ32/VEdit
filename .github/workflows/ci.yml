@@ -1,0 +1,94 @@
+name: ci
+
+# The repository's own gates, run inside the pinned CentOS 7 image:
+#   * scripts/gates.sh  -> Cargo.lock policy, cargo fmt --check, clippy -D warnings, cargo test
+#   * scripts/build.sh  -> release build, path-leak check, Xvfb --selftest smoke,
+#                          and the GLIBC <= 2.17 assertion for the shipped binary
+# A published image is reused when available; otherwise this job builds it.
+
+on:
+  pull_request:
+    branches: [dev, main]
+  push:
+    branches: [dev]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gates:
+    name: gates and release build (pinned image)
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Cache the container cargo home
+        uses: actions/cache@v4
+        with:
+          path: |
+            target/cargo-home
+            target/home
+          key: cargo-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
+          restore-keys: |
+            cargo-${{ runner.os }}-
+
+      - name: Log in to GHCR (best effort; fork PRs fall back to a local build)
+        continue-on-error: true
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resolve the pinned build image
+        id: image
+        shell: bash
+        run: |
+          set -euo pipefail
+          owner="$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
+          ref="ghcr.io/${owner}/vedit-build:latest"
+          if docker pull "$ref"; then
+            echo "using the published image ${ref}"
+            echo "ref=${ref}" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::published image unavailable; building it in this job"
+            VEDIT_BUILD_IMAGE_REF=vedit-build:local bash scripts/build-image.sh
+            echo "ref=vedit-build:local" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Gates (lock policy, fmt, clippy, test)
+        shell: bash
+        env:
+          VEDIT_SKIP_IMAGE_BUILD: '1'
+          VEDIT_BUILD_IMAGE_REF: ${{ steps.image.outputs.ref }}
+        run: bash scripts/gates.sh
+
+      - name: Release build, Xvfb selftest and GLIBC assertion
+        shell: bash
+        env:
+          VEDIT_SKIP_IMAGE_BUILD: '1'
+          VEDIT_BUILD_IMAGE_REF: ${{ steps.image.outputs.ref }}
+        run: bash scripts/build.sh
+
+      - name: Hand the workspace back to the runner user
+        if: always()
+        shell: bash
+        run: sudo chown -R "$(id -u):$(id -g)" target build || true
+
+      - name: Upload build evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence
+          path: |
+            build/evidence/
+            build/artifacts/vd-app
+          if-no-files-found: warn
