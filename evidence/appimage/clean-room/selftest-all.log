@@ -1,17 +1,17 @@
-vd-app selftest: fixture_root=/tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/share/vedit/testdata"))
+vd-app selftest: fixture_root=/tmp/appimage_extracted_9bdf8af8116bf664cb2a7230cfa71a57/usr/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/appimage_extracted_9bdf8af8116bf664cb2a7230cfa71a57/usr/share/vedit/testdata"))
 
-(process:32): Gtk-WARNING **: 05:20:36.784: Locale not supported by C library.
+(process:32): Gtk-WARNING **: 05:22:29.769: Locale not supported by C library.
 	Using the fallback 'C' locale.
 
-(vd-app:32): GLib-GIO-CRITICAL **: 05:20:36.807: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:32): GLib-GIO-CRITICAL **: 05:22:29.791: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: configuration warnings: 1
 
-(vd-app:32): Gtk-WARNING **: 05:20:37.448: Could not load a pixbuf from icon theme.
+(vd-app:32): Gtk-WARNING **: 05:22:30.445: Could not load a pixbuf from icon theme.
 This may indicate that pixbuf loaders or the mime database could not be found.
 vd-app: screenshot written to /evid/screenshots/selftest-all.png (38621 bytes, 1120x780, 21 sampled colours)
 {
   "app": "VEdit",
-  "fixture_root": "/tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/share/vedit/testdata",
+  "fixture_root": "/tmp/appimage_extracted_9bdf8af8116bf664cb2a7230cfa71a57/usr/share/vedit/testdata",
   "ok": true,
   "reports": [
     {
@@ -107,12 +107,12 @@ vd-app: screenshot written to /evid/screenshots/selftest-all.png (38621 bytes, 1
           "ok": true
         },
         {
-          "detail": "2:1  |  /tmp/vd-app-selftest-32/smoke-saved.sv  |  systemverilog  |  verible 1  |  slang 1  |  FIM: FIM 未启用  |  match at line 2  Verible LSP: generation 2",
+          "detail": "2:1  |  /tmp/vd-app-selftest-32/smoke-saved.sv  |  systemverilog  |  verible 1  |  slang 1  |  FIM: FIM 未启用  |  match at line 2",
           "name": "status bar reports the cursor",
           "ok": true
         },
         {
-          "detail": "path=/tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/lib/vedit/bin/slang",
+          "detail": "path=/tmp/appimage_extracted_9bdf8af8116bf664cb2a7230cfa71a57/usr/lib/vedit/bin/slang",
           "name": "VEDIT_SLANG is configured for the SLANG suite",
           "ok": true
         },
@@ -143,7 +143,7 @@ vd-app: screenshot written to /evid/screenshots/selftest-all.png (38621 bytes, 1
           "ok": true
         },
         {
-          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5c335f620c80, type: GtkSourceLanguage } })",
+          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5ada615dcc80, type: GtkSourceLanguage } })",
           "name": "opened .sv with CJK/emoji content has a language",
           "ok": true
         },
@@ -153,7 +153,7 @@ vd-app: screenshot written to /evid/screenshots/selftest-all.png (38621 bytes, 1
           "ok": true
         },
         {
-          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5c335f4848f0, type: GtkSourceLanguage } })",
+          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5ada6144d8f0, type: GtkSourceLanguage } })",
           "name": "opened .sv buffer has a language",
           "ok": true
         },
@@ -184,7 +184,7 @@ vd-app: screenshot written to /evid/screenshots/selftest-all.png (38621 bytes, 1
           "ok": true
         },
         {
-          "detail": "attempts=[\"bundled: /tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/lib/vedit/bin/verible-verilog-ls [found]\", \"bundled: /tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/lib/vedit/bin/verible-verilog-format [found]\", \"bundled: /tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/lib/vedit/bin/verible-verilog-lint [found]\"]",
+          "detail": "attempts=[\"bundled: /tmp/appimage_extracted_9bdf8af8116bf664cb2a7230cfa71a57/usr/lib/vedit/bin/verible-verilog-ls [found]\", \"bundled: /tmp/appimage_extracted_9bdf8af8116bf664cb2a7230cfa71a57/usr/lib/vedit/bin/verible-verilog-format [found]\", \"bundled: /tmp/appimage_extracted_9bdf8af8116bf664cb2a7230cfa71a57/usr/lib/vedit/bin/verible-verilog-lint [found]\"]",
           "name": "Verible tool resolution records every attempt",
           "ok": true
         },
@@ -194,7 +194,7 @@ vd-app: screenshot written to /evid/screenshots/selftest-all.png (38621 bytes, 1
           "ok": true
         },
         {
-          "detail": "format=Some(\"/tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/lib/vedit/bin/verible-verilog-format\"), lint=Some(\"/tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/lib/vedit/bin/verible-verilog-lint\")",
+          "detail": "format=Some(\"/tmp/appimage_extracted_9bdf8af8116bf664cb2a7230cfa71a57/usr/lib/vedit/bin/verible-verilog-format\"), lint=Some(\"/tmp/appimage_extracted_9bdf8af8116bf664cb2a7230cfa71a57/usr/lib/vedit/bin/verible-verilog-lint\")",
           "name": "formatter and linter tool paths were resolved (or explicitly recorded as missing)",
           "ok": true
         },
@@ -210,7 +210,7 @@ vd-app: screenshot written to /evid/screenshots/selftest-all.png (38621 bytes, 1
     {
       "checks": [
         {
-          "detail": "path=/tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/lib/vedit/bin/verible-verilog-ls",
+          "detail": "path=/tmp/appimage_extracted_9bdf8af8116bf664cb2a7230cfa71a57/usr/lib/vedit/bin/verible-verilog-ls",
           "name": "Verible language server binary exists",
           "ok": true
         },
@@ -235,7 +235,7 @@ vd-app: screenshot written to /evid/screenshots/selftest-all.png (38621 bytes, 1
           "ok": true
         },
         {
-          "detail": "path=Some(\"/tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/share/vedit/testdata/definition/b.sv\"), cursor=Position { line: 0, character: 7 }",
+          "detail": "path=Some(\"/tmp/appimage_extracted_9bdf8af8116bf664cb2a7230cfa71a57/usr/share/vedit/testdata/definition/b.sv\"), cursor=Position { line: 0, character: 7 }",
           "name": "F12 definition jumps to the target file/line/column",
           "ok": true
         }
@@ -246,7 +246,7 @@ vd-app: screenshot written to /evid/screenshots/selftest-all.png (38621 bytes, 1
     {
       "checks": [
         {
-          "detail": "path=/tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/lib/vedit/bin/slang",
+          "detail": "path=/tmp/appimage_extracted_9bdf8af8116bf664cb2a7230cfa71a57/usr/lib/vedit/bin/slang",
           "name": "SLANG binary exists",
           "ok": true
         },

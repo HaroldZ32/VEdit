@@ -1,9 +1,9 @@
 
-(process:146): Gtk-WARNING **: 05:20:39.196: Locale not supported by C library.
+(process:146): Gtk-WARNING **: 05:22:32.186: Locale not supported by C library.
 	Using the fallback 'C' locale.
 
-(vd-app:146): GLib-GIO-CRITICAL **: 05:20:39.214: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:146): GLib-GIO-CRITICAL **: 05:22:32.204: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: configuration warnings: 1
 
-(vd-app:146): Gtk-WARNING **: 05:20:39.330: Could not load a pixbuf from icon theme.
+(vd-app:146): Gtk-WARNING **: 05:22:32.319: Could not load a pixbuf from icon theme.
 This may indicate that pixbuf loaders or the mime database could not be found.

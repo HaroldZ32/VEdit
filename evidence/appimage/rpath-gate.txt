@@ -1,4 +1,4 @@
-# RUNPATH/RPATH gate — 2026-10-30T05:20:22Z
+# RUNPATH/RPATH gate — 2026-10-30T05:22:11Z
 # appdir: /vedit-build/packaging/appimage/AppDir
 # allowlist: /vedit-build/packaging/appimage/rpath-allowlist.txt
 ALLOWED	/usr/lib64/elfutils	usr/lib/libdw.so.1

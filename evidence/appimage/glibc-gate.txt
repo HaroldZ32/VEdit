@@ -232,3 +232,29 @@ RESULT=PASS
 ELFS_SCANNED=95
 MAX_REQUIRED_GLIBC=2.17
 RESULT=PASS
+# GLIBC gate — 2026-10-30T05:22:18Z
+# target: /vedit-build/packaging/appimage/AppDir
+# rule: max required GLIBC symbol version <= 2.17
+2.14	usr/lib/libtiff.so.5
+2.14	usr/lib/libwayland-client.so.0
+2.14	usr/lib/libwayland-cursor.so.0
+2.14	usr/lib/libxcb-render.so.0
+2.14	usr/lib/libxcb.so.1
+2.14	usr/lib/libz.so.1
+2.15	usr/lib/libX11.so.6
+2.15	usr/lib/libdw.so.1
+2.15	usr/lib/libxml2.so.2
+2.16	usr/bin/vd-app
+2.16	usr/lib/libelf.so.1
+2.16	usr/lib/libsystemd.so.0
+2.17	usr/lib/libblkid.so.1
+2.17	usr/lib/libdbus-1.so.3
+2.17	usr/lib/libgcrypt.so.11
+2.17	usr/lib/libglib-2.0.so.0
+2.17	usr/lib/liblzma.so.5
+2.17	usr/lib/libmount.so.1
+2.17	usr/lib/libxkbcommon.so.0
+2.17	usr/lib/vedit/bin/slang
+ELFS_SCANNED=95
+MAX_REQUIRED_GLIBC=2.17
+RESULT=PASS

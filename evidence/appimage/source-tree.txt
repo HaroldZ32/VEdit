@@ -1,41 +1,8 @@
 source_mode=shared-release-artifact
-git_head=dfca5208a59044c87065a3ddff5ca2c53c890ad0
+git_head=e1e09d69033707adbb6f3cd7d7de4058c985613f
 git_status_porcelain:
- M evidence/appimage/AppRun.txt
- M evidence/appimage/appimagetool.log
- M evidence/appimage/cargo-build.log
- M evidence/appimage/clean-room/app-screenshot.log
- M evidence/appimage/clean-room/cjk-interactive.log
- M evidence/appimage/clean-room/cjk-windows.txt
- M evidence/appimage/clean-room/cold-start-wall.txt
- M evidence/appimage/clean-room/cold-start.log
- M evidence/appimage/clean-room/fonts.txt
- M evidence/appimage/clean-room/immodule-xim.log
- M evidence/appimage/clean-room/immodules-cache.txt
- M evidence/appimage/clean-room/immodules-files.txt
- M evidence/appimage/clean-room/ldd-extracted.txt
- M evidence/appimage/clean-room/selftest-all-summary.txt
- M evidence/appimage/clean-room/selftest-all.log
- M evidence/appimage/clean-room/selftest-env-extract.log
- M evidence/appimage/glibc-gate.txt
- M evidence/appimage/host-path-audit.txt
- M evidence/appimage/payload-binaries.txt
- M evidence/appimage/rpath-gate.txt
- M evidence/appimage/screenshots/app-selftest-highlight.png
- M evidence/appimage/screenshots/cjk-window-0x200002.png
- M evidence/appimage/screenshots/cjk-window-0x200009.png
- M evidence/appimage/screenshots/cjk-window.png
- M evidence/appimage/screenshots/selftest-all.png
- M evidence/appimage/sizes.txt
- M evidence/appimage/source-tree.txt
- M packaging/appimage/build-appimage.sh
- M packaging/appimage/clean-room-accept.sh
-?? evidence/appimage/clean-room/runtime-default.log
-?? evidence/appimage/clean-room/runtime-fallback.log
-?? evidence/appimage/clean-room/runtime-fatal.log
-?? evidence/appimage/payload-vd-app.txt
 ?? evidence/github/
 shared_vd_app=/vedit-build/build/artifacts/vd-app
 shared_vd_app_sha256=809cf95326172fc58975b38cea390dcffd8d78d1261b4f1d75059a8950c6d77d
-archive_revision=dfca5208a59044c87065a3ddff5ca2c53c890ad0
+archive_revision=e1e09d69033707adbb6f3cd7d7de4058c985613f
 archive_dir=/vedit-build/packaging/appimage/.cache/src-head (git archive HEAD, fixtures + provenance)

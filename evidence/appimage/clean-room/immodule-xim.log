@@ -1,16 +1,16 @@
-vd-app selftest: fixture_root=/tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/share/vedit/testdata"))
+vd-app selftest: fixture_root=/tmp/appimage_extracted_9bdf8af8116bf664cb2a7230cfa71a57/usr/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/appimage_extracted_9bdf8af8116bf664cb2a7230cfa71a57/usr/share/vedit/testdata"))
 
-(process:590): Gtk-WARNING **: 05:20:48.139: Locale not supported by C library.
+(process:590): Gtk-WARNING **: 05:22:41.056: Locale not supported by C library.
 	Using the fallback 'C' locale.
 
-(vd-app:590): GLib-GIO-CRITICAL **: 05:20:48.155: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:590): GLib-GIO-CRITICAL **: 05:22:41.072: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: configuration warnings: 1
 
-(vd-app:590): Gtk-WARNING **: 05:20:48.797: Could not load a pixbuf from icon theme.
+(vd-app:590): Gtk-WARNING **: 05:22:41.712: Could not load a pixbuf from icon theme.
 This may indicate that pixbuf loaders or the mime database could not be found.
 {
   "app": "VEdit",
-  "fixture_root": "/tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/share/vedit/testdata",
+  "fixture_root": "/tmp/appimage_extracted_9bdf8af8116bf664cb2a7230cfa71a57/usr/share/vedit/testdata",
   "ok": true,
   "reports": [
     {
@@ -106,12 +106,12 @@ This may indicate that pixbuf loaders or the mime database could not be found.
           "ok": true
         },
         {
-          "detail": "2:1  |  /tmp/vd-app-selftest-590/smoke-saved.sv  |  systemverilog  |  verible 1  |  slang 1  |  FIM: FIM 未启用  |  match at line 2",
+          "detail": "2:1  |  /tmp/vd-app-selftest-590/smoke-saved.sv  |  systemverilog  |  verible 1  |  slang 1  |  FIM: FIM 未启用  |  match at line 2  Verible LSP: generation 2",
           "name": "status bar reports the cursor",
           "ok": true
         },
         {
-          "detail": "path=/tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/lib/vedit/bin/slang",
+          "detail": "path=/tmp/appimage_extracted_9bdf8af8116bf664cb2a7230cfa71a57/usr/lib/vedit/bin/slang",
           "name": "VEDIT_SLANG is configured for the SLANG suite",
           "ok": true
         }

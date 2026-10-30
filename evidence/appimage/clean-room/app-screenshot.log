@@ -1,17 +1,17 @@
-vd-app selftest: fixture_root=/tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/share/vedit/testdata"))
+vd-app selftest: fixture_root=/tmp/appimage_extracted_9bdf8af8116bf664cb2a7230cfa71a57/usr/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/appimage_extracted_9bdf8af8116bf664cb2a7230cfa71a57/usr/share/vedit/testdata"))
 
-(process:103): Gtk-WARNING **: 05:20:38.521: Locale not supported by C library.
+(process:103): Gtk-WARNING **: 05:22:31.518: Locale not supported by C library.
 	Using the fallback 'C' locale.
 
-(vd-app:103): GLib-GIO-CRITICAL **: 05:20:38.538: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:103): GLib-GIO-CRITICAL **: 05:22:31.534: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: configuration warnings: 1
 
-(vd-app:103): Gtk-WARNING **: 05:20:38.838: Could not load a pixbuf from icon theme.
+(vd-app:103): Gtk-WARNING **: 05:22:31.836: Could not load a pixbuf from icon theme.
 This may indicate that pixbuf loaders or the mime database could not be found.
 vd-app: screenshot written to /evid/screenshots/app-selftest-highlight.png (33223 bytes, 1120x780, 16 sampled colours)
 {
   "app": "VEdit",
-  "fixture_root": "/tmp/appimage_extracted_1da379edbc4ca402b6ffa8eedc8a0d3d/usr/share/vedit/testdata",
+  "fixture_root": "/tmp/appimage_extracted_9bdf8af8116bf664cb2a7230cfa71a57/usr/share/vedit/testdata",
   "ok": true,
   "reports": [
     {
@@ -32,7 +32,7 @@ vd-app: screenshot written to /evid/screenshots/app-selftest-highlight.png (3322
           "ok": true
         },
         {
-          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5b4ea40fcf80, type: GtkSourceLanguage } })",
+          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5f850f5a4780, type: GtkSourceLanguage } })",
           "name": "opened .sv with CJK/emoji content has a language",
           "ok": true
         },
@@ -42,7 +42,7 @@ vd-app: screenshot written to /evid/screenshots/app-selftest-highlight.png (3322
           "ok": true
         },
         {
-          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5b4ea4101ef0, type: GtkSourceLanguage } })",
+          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5f850f5a8ef0, type: GtkSourceLanguage } })",
           "name": "opened .sv buffer has a language",
           "ok": true
         },

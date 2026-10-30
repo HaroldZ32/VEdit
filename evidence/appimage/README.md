@@ -6,7 +6,9 @@ Owner: Deep Worker · board **T23** (split key **T11**) · scope
 ## Deliverable (current build)
 
 `packaging/appimage/out/VEdit-0.1.0-x86_64.AppImage`
-— **47,745,528 B**, sha256 **`b24d0bfb5f1945d86be108d9e4cf27ee942e7469af1e7574df4b69d108863119`**.
+— **47,745,528 B**, sha256 **`60b111899444e9743a33750ebfdbbd6a5359fe690e6417120d9101bcede6b7ad`**
+(frozen build; the container hash changes on a rebuild because squashfs stores
+file timestamps — the payload `vd-app` sha256 does not).
 
 The payload installs **the same `vd-app` binary as the tar.gz and `.run`**:
 `sha256 809cf95326172fc58975b338cea390dcffd8d78d1261b4f1d75059a8950c6d77d`
@@ -34,11 +36,10 @@ verible/slang/zombie process behind.
    build moment, and `archive_revision` (= `git_head`), which is what the freeze
    protocol asks for.
 
-At the moment of the current build the HEAD was
-`dfca5208a59044c87065a3ddff5ca2c53c890ad0` (T27 harness skeleton); the evidence
-tree itself was still being regenerated, which is why the recorded status lists
-`evidence/appimage/*` as modified. The frozen-revision rebuild records a clean
-status after those files are committed.
+The frozen revision is
+`e1e09d69033707adbb6f3cd7d7de4058c985613f`; `source-tree.txt` records
+`git status --porcelain` = only the untracked readiness report, and
+`archive_revision` = the frozen SHA. No script was changed after the freeze.
 
 ## Pinned inputs (all verified, nothing copied from `.mpd/recon/`)
 
@@ -135,7 +136,7 @@ only; it asserts it has no gtk3/gsv packages. Harness sets a 32-hex
 | app `--screenshot` | **33,223 B real image** (`screenshots/app-selftest-highlight.png`); the T24-era black capture was fixed by T21's single-window/layout-safe capture |
 | dynamic dependencies of `vd-app` | 67 from payload, 8 from the host glibc family only; no `not found` |
 | residual processes | no verible/slang process, no zombie |
-| cold start (exec → window) | 196 / 196 / 196 ms (`sizes.txt`) |
+| cold start (exec → window) | 191 / 193 / 191 ms (`sizes.txt`) |
 
 ## Payload size: how it is measured
 
@@ -164,8 +165,8 @@ canonical number is the one that corresponds to what an installed tree occupies;
 |---|---|---|---|
 | T24 acceptance | `b589416e9492c6a2df333d861163d71ba3674305788a77e5b1f9c541e72412a4` | 48,105,976 | first clean-room-accepted AppImage |
 | intermediate | `a102aaf69338832204040dfdec361e49fc8b6694a17e1540ea292f5dcacc667e` | 48,110,072 | AppRun runtime-dir alignment with T25 + `/vedit` sandbox remap |
-| current | `b24d0bfb5f1945d86be108d9e4cf27ee942e7469af1e7574df4b69d108863119` | 47,745,528 | consumes shared `vd-app` 809cf953… + T21 single-window/runtime-fixture fixes + T25 shared remap |
-| frozen | TBD (rebuild from the frozen `git rev-parse HEAD`) | TBD | rebuild after freeze; same `vd-app` sha256 must appear in `payload-vd-app.txt` |
+| pre-freeze | `b24d0bfb5f1945d86be108d9e4cf27ee942e7469af1e7574df4b69d108863119` | 47,745,528 | consumes shared `vd-app` 809cf953… + T21 single-window/runtime-fixture fixes + T25 shared remap |
+| **frozen `e1e09d69`** | **`60b111899444e9743a33750ebfdbbd6a5359fe690e6417120d9101bcede6b7ad`** | **47,745,528** | rebuild from the frozen commit; same `vd-app` sha256 (`payload-vd-app.txt`) |
 
 The **container** hash is not byte-reproducible across builds (squashfs stores
 file timestamps); the **payload binary** is (`809cf953…` every time). T27/T28
