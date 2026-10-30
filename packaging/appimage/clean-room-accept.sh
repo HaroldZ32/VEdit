@@ -238,6 +238,7 @@ fi
 # 8) Sizes (record item for AC-18).
 {
   echo "AppImage_bytes=$(stat -c%s "$APPIMAGE")"
+  sha256sum "$APPIMAGE"
   echo "extracted_payload_bytes=$(du -sb "$EXTRACTED" | cut -f1)"
   grep -E 'run=' "$LOGS/cold-start-wall.txt"
 } | tee "$EVID/sizes.txt"

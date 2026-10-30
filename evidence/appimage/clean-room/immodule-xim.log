@@ -1,12 +1,12 @@
 vd-app selftest: fixture_root=/tmp/appimage_extracted_2661ca0ea704059c3dc41aad25e202a6/usr/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/appimage_extracted_2661ca0ea704059c3dc41aad25e202a6/usr/share/vedit/testdata"))
 
-(process:525): Gtk-WARNING **: 04:57:04.518: Locale not supported by C library.
+(process:526): Gtk-WARNING **: 04:58:07.745: Locale not supported by C library.
 	Using the fallback 'C' locale.
 
-(vd-app:525): GLib-GIO-CRITICAL **: 04:57:04.534: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:526): GLib-GIO-CRITICAL **: 04:58:07.762: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: configuration warnings: 1
 
-(vd-app:525): Gtk-WARNING **: 04:57:05.174: Could not load a pixbuf from icon theme.
+(vd-app:526): Gtk-WARNING **: 04:58:08.407: Could not load a pixbuf from icon theme.
 This may indicate that pixbuf loaders or the mime database could not be found.
 {
   "app": "VEdit",
@@ -41,12 +41,12 @@ This may indicate that pixbuf loaders or the mime database could not be found.
           "ok": true
         },
         {
-          "detail": "restored=true, dispatch=undo, action_fallback=true, can_undo_before=true, status=\"1:1  |  /tmp/vd-app-selftest-525/format_me.sv  |  systemverilog  |  verible 1  |  slang 0  |  FIM: FIM 未启用  |  LSP running (pid 555), restarts 0 (running: true, restarts: 0)  Verible LSP: generation 2\"",
+          "detail": "restored=true, dispatch=undo, action_fallback=true, can_undo_before=true, status=\"1:1  |  /tmp/vd-app-selftest-526/format_me.sv  |  systemverilog  |  verible 1  |  slang 0  |  FIM: FIM 未启用  |  LSP running (pid 556), restarts 0 (running: true, restarts: 0)  Verible LSP: generation 1  Verible LSP: generation 2\"",
           "name": "undo shortcut restores the text through Document",
           "ok": true
         },
         {
-          "detail": "path=/tmp/vd-app-selftest-525/smoke-saved.sv",
+          "detail": "path=/tmp/vd-app-selftest-526/smoke-saved.sv",
           "name": "save-as writes the document",
           "ok": true
         },
@@ -106,7 +106,7 @@ This may indicate that pixbuf loaders or the mime database could not be found.
           "ok": true
         },
         {
-          "detail": "2:1  |  /tmp/vd-app-selftest-525/smoke-saved.sv  |  systemverilog  |  verible 1  |  slang 1  |  FIM: FIM 未启用  |  match at line 2",
+          "detail": "2:1  |  /tmp/vd-app-selftest-526/smoke-saved.sv  |  systemverilog  |  verible 1  |  slang 1  |  FIM: FIM 未启用  |  match at line 2",
           "name": "status bar reports the cursor",
           "ok": true
         },

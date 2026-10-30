@@ -1,15 +1,15 @@
 vd-app selftest: fixture_root=/tmp/appimage_extracted_2661ca0ea704059c3dc41aad25e202a6/usr/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/appimage_extracted_2661ca0ea704059c3dc41aad25e202a6/usr/share/vedit/testdata"))
 
-(process:100): Gtk-WARNING **: 04:56:55.280: Locale not supported by C library.
+(process:100): Gtk-WARNING **: 04:57:58.485: Locale not supported by C library.
 	Using the fallback 'C' locale.
 
-(vd-app:100): GLib-GIO-CRITICAL **: 04:56:55.298: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:100): GLib-GIO-CRITICAL **: 04:57:58.504: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: configuration warnings: 1
 
-(vd-app:100): Gtk-WARNING **: 04:56:55.601: Could not load a pixbuf from icon theme.
+(vd-app:100): Gtk-WARNING **: 04:57:58.807: Could not load a pixbuf from icon theme.
 This may indicate that pixbuf loaders or the mime database could not be found.
 
-(vd-app:100): Gtk-CRITICAL **: 04:56:55.914: gtk_widget_draw: assertion '!widget->priv->alloc_needed' failed
+(vd-app:100): Gtk-CRITICAL **: 04:57:59.130: gtk_widget_draw: assertion '!widget->priv->alloc_needed' failed
 vd-app: screenshot written to /evid/screenshots/app-selftest-highlight.png
 {
   "app": "VEdit",
@@ -34,7 +34,7 @@ vd-app: screenshot written to /evid/screenshots/app-selftest-highlight.png
           "ok": true
         },
         {
-          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5c9a9a3def80, type: GtkSourceLanguage } })",
+          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5d173c01af80, type: GtkSourceLanguage } })",
           "name": "opened .sv with CJK/emoji content has a language",
           "ok": true
         },
@@ -44,7 +44,7 @@ vd-app: screenshot written to /evid/screenshots/app-selftest-highlight.png
           "ok": true
         },
         {
-          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5c9a9a3e2ef0, type: GtkSourceLanguage } })",
+          "detail": "language=Some(Language { inner: TypedObjectRef { inner: 0x5d173c01e6f0, type: GtkSourceLanguage } })",
           "name": "opened .sv buffer has a language",
           "ok": true
         },

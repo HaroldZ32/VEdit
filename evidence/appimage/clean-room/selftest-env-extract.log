@@ -1,12 +1,12 @@
 vd-app selftest: fixture_root=/tmp/appimage_extracted_2661ca0ea704059c3dc41aad25e202a6/usr/share/vedit/testdata (VEDIT_SELFTEST_FIXTURES=Some("/tmp/appimage_extracted_2661ca0ea704059c3dc41aad25e202a6/usr/share/vedit/testdata"))
 
-(process:210): Gtk-WARNING **: 04:57:02.287: Locale not supported by C library.
+(process:210): Gtk-WARNING **: 04:58:05.494: Locale not supported by C library.
 	Using the fallback 'C' locale.
 
-(vd-app:210): GLib-GIO-CRITICAL **: 04:57:02.303: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+(vd-app:210): GLib-GIO-CRITICAL **: 04:58:05.510: g_dbus_proxy_new_sync: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
 vd-app: configuration warnings: 1
 
-(vd-app:210): Gtk-WARNING **: 04:57:02.945: Could not load a pixbuf from icon theme.
+(vd-app:210): Gtk-WARNING **: 04:58:06.152: Could not load a pixbuf from icon theme.
 This may indicate that pixbuf loaders or the mime database could not be found.
 {
   "app": "VEdit",
