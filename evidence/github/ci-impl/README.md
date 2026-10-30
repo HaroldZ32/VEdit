@@ -192,3 +192,76 @@ committed `build/evidence/12-selftest-suites.txt` only ever held `suite=all`.
 - The main tree's `build/evidence/` was not touched by these runs (the builds
   wrote into the copy).
 - `--selftest all` (both binaries) is unchanged and still reports 62 checks.
+
+---
+
+# T9 — fetch-verible.sh: pinned Verible for a clean checkout
+
+## Why
+
+CI run 41039437922: slang built, `real_slang` passed, but **vd-lsp's
+integration tests failed** on a clean checkout with
+
+```
+missing Verible binary at /vedit-build/crates/vd-lsp/../../.mpd/recon/verible/bin/verible-verilog-ls — set VEDIT_VERIBLE_BIN_DIR
+```
+
+`.mpd/` is not in git (harness state), so a fresh checkout has no Verible.
+`VEDIT_VERIBLE_BIN_DIR` cannot be forwarded from the host: `run_in_build_container`
+does not pass it, and a host path is invalid inside the container. The app's
+selftest is affected too: without `VEDIT_VERIBLE_LS*` it can only run the four
+binary-free suites instead of `all`.
+
+## Script (`scripts/fetch-verible.sh`, mode 755, idempotent)
+
+1. Downloads `VERIBLE_URL` to `target/verible-pin/verible.tar.gz`
+   (`.part` + rename) and verifies `VERIBLE_TARBALL_SHA256`.
+2. Extracts it to `target/verible-pin/extract/`, keeping the
+   `verible-<version>/bin` layout that `scripts/build-in-container.sh` probes —
+   that probe is what upgrades `--selftest` from four suites to `all`.
+3. Verifies `verible-verilog-{ls,lint,format}` against the pinned
+   `VERIBLE_{LS,LINT,FORMAT}_SHA256` (visible `…: OK` lines on every run).
+4. Exposes the bin dir as `<repo>/.mpd/recon/verible/bin`:
+   - absent → creates a **relative symlink**
+     (`../../../target/verible-pin/extract/verible-<v>/bin`), so the same link
+     resolves on the host and inside the pinned image (/vedit-build);
+   - existing symlink → relinked;
+   - existing directory → kept only when it already holds the pinned binaries,
+     otherwise `FATAL` (the script never deletes harness state).
+5. Reuses a verified tarball/extract (a re-run is a no-op); any
+   download/checksum/extract/verification failure prints `FATAL:` and exits 1.
+
+## Verification (actually run)
+
+| # | Command | Exit | Observed | File |
+|---|---|---|---|---|
+| 1 | clean condition: `rm -rf target/verible-pin` + harness recon dir moved aside, then `bash scripts/fetch-verible.sh` | **0** | 5.197 s; downloaded the pinned tarball (17,582,801 bytes); `verible.tar.gz: OK`; `verible-verilog-{ls,lint,format}: OK`; linked `.mpd/recon/verible/bin -> ../../../target/verible-pin/extract/verible-v0.0-4298-g085eef05/bin` | `14-fetch-verible-clean.txt` |
+| 2 | same command again | **0** | 0.083 s; `reusing the verified tarball`, `reusing the verified binaries`, relinked (idempotent) | `14-fetch-verible-clean.txt` |
+| 3 | `bash scripts/gates.sh` | **0** | `GATES PASS (local)` + `GATES PASS (host: … in the pinned image)`; `tests/verible_ls.rs`: 8 passed; `tests/real_slang.rs`: 6 passed | `15-gates-after-fetch.txt` |
+| 4 | `bash scripts/build.sh` | **0** | 7.749 s; `build/evidence/12-selftest-suites.txt`: `suite=all`, `exit=0`; `12-selftest-suites.json`: `ok=True`, 6 suites, 62 checks (smoke 30/highlight 8/config 6/lsp 6/slang 6/fim 6) | `16-build-after-fetch.txt` |
+
+The two paths after the clean run:
+
+```
+$ ls -ld target/verible-pin/extract/verible-*/bin
+drwx------ 2 … target/verible-pin/extract/verible-v0.0-4298-g085eef05/bin
+$ ls -l .mpd/recon/verible/bin
+lrwxrwxrwx 1 … .mpd/recon/verible/bin -> ../../../target/verible-pin/extract/verible-v0.0-4298-g085eef05/bin
+```
+
+## Not verified / notes
+
+- No GitHub Actions run from here (AC-A7). The workflow step
+  `bash scripts/fetch-verible.sh` already exists in the captain's
+  `.github/workflows/ci.yml` (uncommitted working-tree change at the time);
+  `.github/` was not touched by this task.
+- The harness directory `.mpd/recon/verible/bin` that this dev machine already
+  had was moved aside for the clean-condition test and **restored** afterwards;
+  a developer machine with it present exercises the "keep the existing verified
+  directory" branch instead.
+- Host requirements: `curl`, `tar`, `sha256sum` (all present on GitHub's
+  `ubuntu-latest`); no third-party dependency, no test/gate change. The symlink
+  target is a fixed `../../../` prefix + the repo-relative path, so no
+  `realpath`/platform-specific tool is needed.
+- The 17.5 MB tarball is re-downloaded on every clean CI run (a GHA cache for
+  `target/verible-pin` would be an optional follow-up).

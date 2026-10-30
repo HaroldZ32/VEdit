@@ -79,6 +79,20 @@ jobs:
         shell: bash
         run: bash build/slang/build.sh
 
+      # vd-lsp's integration tests and the lsp/slang selftest suites need the pinned
+      # Verible binaries, which a clean checkout does not have.
+      - name: Cache the pinned Verible binaries
+        uses: actions/cache@v4
+        with:
+          path: target/verible-pin
+          key: verible-${{ runner.os }}-${{ hashFiles('scripts/versions.env') }}
+          restore-keys: |
+            verible-${{ runner.os }}-
+
+      - name: Fetch the pinned Verible binaries
+        shell: bash
+        run: bash scripts/fetch-verible.sh
+
       - name: Gates (lock policy, fmt, clippy, test)
         shell: bash
         env:

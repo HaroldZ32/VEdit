@@ -68,6 +68,10 @@ jobs:
         shell: bash
         run: bash build/slang/build.sh
 
+      - name: Fetch the pinned Verible binaries
+        shell: bash
+        run: bash scripts/fetch-verible.sh
+
       - name: Release build, Xvfb selftest and GLIBC assertion
         shell: bash
         env:
