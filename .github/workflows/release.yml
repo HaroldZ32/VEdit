@@ -24,6 +24,10 @@ jobs:
     name: build and publish the release artefacts
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    # The runner's docker daemon is root; run the containers as the invoking user so
+    # the workspace files they write stay writable by the host-side steps.
+    env:
+      VEDIT_CONTAINER_USER: '1'
     steps:
       - name: "Check out (full history: SOURCE_DATE_EPOCH and git archive)"
         uses: actions/checkout@v4

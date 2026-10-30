@@ -26,6 +26,10 @@ jobs:
     name: gates and release build (pinned image)
     runs-on: ubuntu-latest
     timeout-minutes: 150
+    # The runner's docker daemon is root; run the containers as the invoking user so
+    # the workspace files they write stay writable by the host-side steps.
+    env:
+      VEDIT_CONTAINER_USER: '1'
     steps:
       - name: Check out
         uses: actions/checkout@v4

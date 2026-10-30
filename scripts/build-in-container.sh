@@ -161,10 +161,15 @@ if [ "$APP_RC" -ne 0 ]; then
   exit 1
 fi
 
-# GApplication registration needs a machine id; the minimal CentOS 7 image
-# leaves /etc/machine-id empty, which makes GLib abort in a bare container.
+# A machine id helps GApplication in a bare container; the minimal CentOS 7
+# image ships it empty (0 bytes). Writing it is best effort: with
+# VEDIT_CONTAINER_USER=1 the container runs as the invoking non-root user and
+# this path is not writable — the app starts fine with the empty file (verified
+# with --selftest smoke as uid 1000), so a failed write must not abort the build.
 if [ ! -s /etc/machine-id ]; then
-  printf "0123456789abcdef0123456789abcdef\n" > /etc/machine-id
+  if ! printf "0123456789abcdef0123456789abcdef\n" > /etc/machine-id 2>/dev/null; then
+    echo "[build] /etc/machine-id is not writable as uid $(id -u 2>/dev/null || echo '?'); continuing with the empty file"
+  fi
 fi
 
 echo "== Xvfb selftest suites (smoke/highlight/config/fim, plus lsp/slang when the binaries are provided) =="

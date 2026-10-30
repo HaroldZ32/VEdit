@@ -359,3 +359,66 @@ Alternatives if a runner also cannot reach Docker Hub:
   reference / `docker.io`; unset behaviour is the previous one (no extra pulls).
 - The 3-attempt retry costs ~6 s of backoff only when the primary registry is
   down; nothing changes on the happy path.
+
+---
+
+# T11 — `VEDIT_CONTAINER_USER=1`: run the containers as the invoking uid
+
+## Why
+
+CI run 41043881104 passed the gates but failed at the end with
+
+```
+cp: cannot create regular file '/home/runner/work/VEdit/VEdit/build/artifacts/vd-app': Permission denied
+```
+
+The GitHub runner's docker daemon is **rootful**: the container runs as root and
+writes root-owned files into `target/` and `build/`, so `scripts/build.sh`'s
+host-side `cp` (as the runner) gets EACCES. Local runs never exposed this because
+the local daemon is rootless (container root maps to the calling user).
+
+## Change
+
+`scripts/lib.sh :: run_in_build_container`:
+
+- `VEDIT_CONTAINER_USER=1` → appends `--user "$(id -u):$(id -g)"` to the
+  `docker run` (env vars, mounts, workdir unchanged); it also logs
+  `[image] container user: <uid>:<gid> (VEDIT_CONTAINER_USER=1)`.
+- Unset / `0` → the argv is **exactly** the previous one (no `--user`); the
+  rootless-local path is untouched.
+- `id -u` / `id -g` unavailable → `FATAL: VEDIT_CONTAINER_USER=1, but 'id -u' is
+  unavailable; …` and no container is started (exit status 1).
+
+`scripts/build-in-container.sh` (**necessary deviation from the listed
+scope**): the `/etc/machine-id` preparation is now best effort. The image ships
+`/etc/machine-id` as `-r--r--r-- root root` with 0 bytes; as a non-root container
+user the write fails and `set -e` aborted the whole build. The app starts fine
+with the empty file, so a failed write now logs
+`[build] /etc/machine-id is not writable as uid …; continuing …`.
+
+The captain's workflows already set `VEDIT_CONTAINER_USER: '1'` at job level
+(`ci.yml`, `release.yml`); `.github/` was not touched here.
+
+## Verification (actually run)
+
+| # | Check | Command | Exit | Observed | File |
+|---|---|---|---|---|---|
+| 1 | default argv | fake `docker` wrapper on `PATH` logs the argv, `run_in_build_container true` | 0 | `docker run --rm -e HOME=… -e CARGO_HOME=… … vedit-build:local true` — **no `--user`** | `22-container-user-argv.txt` |
+| 2 | new argv | same with `VEDIT_CONTAINER_USER=1` | 0 | `docker run --rm --user 1000:1000 -e …` — only `--user` added; the container `true` ran as uid 1000 | `22-container-user-argv.txt` |
+| 3 | id unavailable | fake `id` returning 1, `VEDIT_CONTAINER_USER=1` | 1 | `FATAL: … 'id -u' is unavailable …`, docker never called | `22-container-user-argv.txt` |
+| 4 | default gates | `bash scripts/gates.sh` (argv logged) | **0** | 3.944 s; logged argv has no `--user` | `23-container-user-gates-default.txt` |
+| 5 | new path on this rootless daemon | `VEDIT_CONTAINER_USER=1 bash scripts/gates.sh` | **1** (expected) | argv shows `--user 1000:1000`; the container then fails at `scripts/lib.sh: line 43: /vedit-build/scripts/versions.env: Permission denied` — the subuid mapping makes the mounted workspace unreadable to uid 1000 (this is exactly why the default path has no `--user`) | `24-container-user-gates-rootless.txt` |
+| 6 | machine-id write | `docker run --user 1000:1000 … printf … > /etc/machine-id` | 1 | `bash: /etc/machine-id: Permission denied` — the failure the tolerance removes | probe C |
+| 7 | tolerance + app | same with the tolerance pattern; then `--selftest smoke` as uid 1000 with the empty machine-id | 0 / 0 | write skipped with a log line; the app's smoke selftest runs fine (`smoke_exit=0`, only the known harmless `GLib-GIO-CRITICAL … G_IS_DBUS_CONNECTION`) | probes D/B |
+| 8 | syntax | `bash -n scripts/lib.sh scripts/build-in-container.sh` | 0 | — | — |
+
+## Not verified / notes
+
+- **The real effect — workspace files actually owned by the caller — can only be
+  observed on a ROOTFUL daemon (GitHub runners).** This machine's daemon is
+  rootless, so `--user 1000` maps to a subuid and the mounted workspace becomes
+  unreadable (path 5); paths 1–3 prove the argv is assembled exactly as required.
+- The machine-id tolerance is the one change outside the "`scripts/lib.sh`"
+  scope; without it, `VEDIT_CONTAINER_USER=1` (already enabled in the captain's
+  workflows) would abort `scripts/build.sh` in the container (probe 6).
+- No GitHub Actions run from here (AC-A7).

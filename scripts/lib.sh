@@ -245,10 +245,28 @@ build_build_image_with_cache() {
 # Runs as the calling user so build outputs are not root-owned on the host.
 run_in_build_container() {
   mkdir -p "$ROOT/target/home" "$ROOT/target/cargo-home" "$ROOT/build/evidence"
-  # NOTE: no --user. This daemon runs rootless, so container root maps to the
-  # calling host user; passing --user 1000 would map to a subuid and make the
-  # mounted workspace read-only. Root here produces host-owned files.
+  # Default: NO --user. A rootless docker daemon maps container root to the
+  # calling host user, which is what keeps the mounted workspace host-owned;
+  # --user 1000 there would map to a subuid and make the workspace read-only.
+  # A rootful daemon (GitHub runners) would write root-owned files instead, so
+  # CI sets VEDIT_CONTAINER_USER=1 to run the container as the invoking uid.
+  local user_args=""
+  if [ "${VEDIT_CONTAINER_USER:-0}" = "1" ]; then
+    local uid gid
+    if ! uid=$(id -u 2>/dev/null) || [ -z "$uid" ]; then
+      echo "FATAL: VEDIT_CONTAINER_USER=1, but 'id -u' is unavailable; cannot pick the container user" >&2
+      return 1
+    fi
+    if ! gid=$(id -g 2>/dev/null) || [ -z "$gid" ]; then
+      echo "FATAL: VEDIT_CONTAINER_USER=1, but 'id -g' is unavailable; cannot pick the container group" >&2
+      return 1
+    fi
+    user_args="--user ${uid}:${gid}"
+    echo "[image] container user: ${uid}:${gid} (VEDIT_CONTAINER_USER=1)"
+  fi
+  # shellcheck disable=SC2086 # $user_args is either empty or two numeric words
   docker run --rm \
+    $user_args \
     -e HOME=/vedit-build/target/home \
     -e CARGO_HOME=/vedit-build/target/cargo-home \
     -e RUSTUP_HOME=/opt/rust \
