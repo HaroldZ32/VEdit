@@ -38,7 +38,7 @@ Equality is judged by `vd-app` sha256 + size (and that is what AC-19 uses here).
 ## 3. Launch paths / extraction
 
 - AppImage: `--appimage-extract` + `AppRun` executed — PASS (selftest/window).
-- AppImage FUSE direct run / `--appimage-extract-and-run` / `APPIMAGE_EXTRACT_AND_RUN=1`: **NOT TESTED in this harness run** (clean room has no `/dev/fuse`; the extract-and-run variants are packaging-lane evidence, not re-run here).
+- AppImage direct FUSE execution is not used in the clean room (no `/dev/fuse`); the `--appimage-extract-and-run` and `APPIMAGE_EXTRACT_AND_RUN=1` variants were executed and both exit 0 (§4/§runtime-repro.txt).
 - tar.gz: `VEdit/bin/vedit` (official launcher, sets payload env) — PASS.
 - `.run`: `sh VEdit-0.1.0-x86_64.run --selftest all` exit 0, JSON `ok: true`,
   and the extraction directory is cleaned up (before=0, after=0) — PASS.
@@ -89,7 +89,7 @@ not rebuilt and their hashes are unchanged.
 
 The first `run.sh both` invocation failed 6 checks because the harness used
 `file(1)` (absent in the clean image) and guessed launcher paths, so the app was
-not started for several checks. Log: `tests/e2e/first-run-harness-defect.log`.
+not started for several checks. The first-run transcript was a transient `/tmp` capture and was not committed; this report records the defect, its two root causes and the fix in the harness, and `tests/e2e/runtime-repro.txt` holds the reproducible second finding.
 Fix: ELF magic bytes instead of `file`, `readelf`/`objdump` with `tool=` in the
 report and explicit FAIL when neither exists, explicit per-product launcher
 selection, `.run` launcher + cleanup checks, and the runtime test now uses
@@ -125,9 +125,12 @@ channel_range=255**.
 
 ## 8. `--selftest` counts
 
-`--selftest all` = **51 checks**. Adding `--screenshot` appends one conditional
-check (`--screenshot produces a non-blank PNG`), so the same run reports **52**
-checks. Both numbers describe the same suite; neither is contradictory.
+`--selftest all` = **51 check objects** (the harness counts `"name":` entries and
+asserts the expected 51; `"ok": false` must be 0). The JSON contains **58**
+occurrences of `"ok": true`: the 51 checks plus 6 suite-level `ok` fields plus the
+top-level `ok` field. Adding `--screenshot` appends one conditional check
+(`--screenshot produces a non-blank PNG`), making the expected check count 52 for
+such a run. The harness asserts the count, not a hard-coded sentence.
 
 ## 9. Gates — re-run for this report
 

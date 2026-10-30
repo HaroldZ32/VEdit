@@ -36,7 +36,15 @@ is_elf() { [ "$(head -c4 -- "$1" 2>/dev/null | od -An -tx1 | tr -d " \n")" = "7f
 selftest() {
   "$APP" --selftest all > "$OUT/$artifact/selftest-all.log" 2>&1; local rc=$?
   [ $rc -eq 0 ] && record AC-02 "selftest all" PASS "exit=0" || record AC-02 "selftest all" FAIL "exit=$rc"
-  if grep -q '"ok": false' "$OUT/$artifact/selftest-all.log"; then record AC-02 "selftest checks" FAIL "failed checks present"; else record AC-02 "selftest checks" PASS "51 checks (52 with --screenshot)"; fi
+  local checks failed oktrue
+  checks=$(grep -c '"name":' "$OUT/$artifact/selftest-all.log")
+  failed=$(grep -c '"ok": false' "$OUT/$artifact/selftest-all.log")
+  oktrue=$(grep -c '"ok": true' "$OUT/$artifact/selftest-all.log")
+  if [ "$failed" -eq 0 ] && [ "$checks" -eq 51 ]; then
+    record AC-02 "selftest checks" PASS "checks=$checks expected=51 failed=$failed; ok_true=$oktrue (= $checks checks + 6 suites + 1 top level)"
+  else
+    record AC-02 "selftest checks" FAIL "checks=$checks expected=51 failed=$failed"
+  fi
   "$APP" --selftest highlight --screenshot "$OUT/$artifact/screenshot.png" > "$OUT/$artifact/screenshot.log" 2>&1; rc=$?
   if [ $rc -eq 0 ] && [ -s "$OUT/$artifact/screenshot.png" ] && [ "$(head -c8 "$OUT/$artifact/screenshot.png" | od -An -tx1 | tr -d ' \n')" = 89504e470d0a1a0a ]; then
     record AC-02 "screenshot non-blank" PASS "bytes=$(stat -c%s "$OUT/$artifact/screenshot.png") sha256=$(sha256sum "$OUT/$artifact/screenshot.png" | awk '{print $1}')"

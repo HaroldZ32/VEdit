@@ -15,6 +15,17 @@ use vd_deeplint::{
 
 static DIRS: AtomicU64 = AtomicU64::new(0);
 
+// The tests write executable fake binaries and spawn them; running them in
+// parallel can hit ETXTBSY (another thread still holds a write descriptor when
+// a child execs the file). Serialise the test bodies.
+static SERIAL: std::sync::Mutex<()> = std::sync::Mutex::new(());
+fn serial() -> std::sync::MutexGuard<'static, ()> {
+    match SERIAL.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => poisoned.into_inner(),
+    }
+}
+
 struct TestDir {
     path: PathBuf,
 }
@@ -150,6 +161,7 @@ fn fake_three_diagnostics_json() -> String {
 
 #[test]
 fn clean_file_is_a_success_with_no_diagnostics() {
+    let _serial = serial();
     let dir = TestDir::new("clean");
     let binary = json_script(&dir, "slang", "[]", 0);
     let report = vd_deeplint::lint(&fixture("undeclared.sv"), &base_options(binary));
@@ -161,6 +173,7 @@ fn clean_file_is_a_success_with_no_diagnostics() {
 
 #[test]
 fn diagnostics_are_parsed_and_converted_to_utf16_positions() {
+    let _serial = serial();
     let dir = TestDir::new("diag");
     let json = fake_diagnostic_json();
     let binary = json_script(&dir, "slang", &json, 1);
@@ -196,6 +209,7 @@ fn diagnostics_are_parsed_and_converted_to_utf16_positions() {
 
 #[test]
 fn diagnostics_are_capped_and_the_total_is_reported() {
+    let _serial = serial();
     let dir = TestDir::new("cap");
     let json = fake_three_diagnostics_json();
     let binary = json_script(&dir, "slang", &json, 1);
@@ -211,6 +225,7 @@ fn diagnostics_are_capped_and_the_total_is_reported() {
 
 #[test]
 fn malformed_json_is_a_typed_failure() {
+    let _serial = serial();
     let dir = TestDir::new("bad-json");
     let binary = json_script(&dir, "slang", "{ this is not json", 1);
     let report = vd_deeplint::lint(&fixture("undeclared.sv"), &base_options(binary));
@@ -224,6 +239,7 @@ fn malformed_json_is_a_typed_failure() {
 
 #[test]
 fn nonzero_exit_without_json_reports_stderr() {
+    let _serial = serial();
     let dir = TestDir::new("no-json");
     let binary = dir.script(
         "slang",
@@ -245,6 +261,7 @@ fn nonzero_exit_without_json_reports_stderr() {
 
 #[test]
 fn oversized_json_is_rejected_before_parsing() {
+    let _serial = serial();
     let dir = TestDir::new("huge");
     let binary = dir.script(
         "slang",
@@ -262,6 +279,7 @@ fn oversized_json_is_rejected_before_parsing() {
 
 #[test]
 fn timeout_kills_and_reaps_the_child() {
+    let _serial = serial();
     let dir = TestDir::new("timeout");
     let pid_file = dir.file("pid");
     let binary = slumber_script(&dir, "slang", &pid_file);
@@ -290,6 +308,7 @@ fn timeout_kills_and_reaps_the_child() {
 
 #[test]
 fn cancel_kills_and_reaps_the_child() {
+    let _serial = serial();
     let dir = TestDir::new("cancel");
     let pid_file = dir.file("pid");
     let binary = slumber_script(&dir, "slang", &pid_file);
@@ -325,6 +344,7 @@ fn cancel_kills_and_reaps_the_child() {
 
 #[test]
 fn a_new_run_cancels_the_previous_one() {
+    let _serial = serial();
     let dir = TestDir::new("replace");
     let pid_file = dir.file("pid");
     let slow = slumber_script(&dir, "slow-slang", &pid_file);
@@ -359,6 +379,7 @@ fn a_new_run_cancels_the_previous_one() {
 
 #[test]
 fn missing_binary_lists_every_attempt() {
+    let _serial = serial();
     let dir = TestDir::new("missing-bin");
     let mut options = base_options(dir.file("does-not-exist"));
     options.timeout = Duration::from_millis(100);
@@ -377,6 +398,7 @@ fn missing_binary_lists_every_attempt() {
 
 #[test]
 fn non_executable_binary_is_not_found() {
+    let _serial = serial();
     let dir = TestDir::new("noexec");
     let binary = dir.file("slang");
     fs::write(&binary, "not a program").unwrap_or_else(|error| panic!("write failed: {error}"));
@@ -403,6 +425,7 @@ fn non_executable_binary_is_not_found() {
 
 #[test]
 fn executable_with_a_missing_interpreter_is_a_spawn_failure() {
+    let _serial = serial();
     let dir = TestDir::new("bad-interpreter");
     // Executable bit set (so resolution picks it) but the shebang points at a
     // non-existent interpreter: exec fails and must surface as Spawn, not as a
@@ -418,6 +441,7 @@ fn executable_with_a_missing_interpreter_is_a_spawn_failure() {
 
 #[test]
 fn report_captures_stderr_of_a_successful_run() {
+    let _serial = serial();
     let dir = TestDir::new("stderr");
     let binary = dir.script(
         "slang",
