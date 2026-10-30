@@ -13,6 +13,10 @@ target/
 build/artifacts/
 *.AppImage
 *.AppImage.zsync
+# global product patterns: archives and the self-extracting single file
+*.tar.gz
+*.tgz
+*.run
 
 # --- slang build spike: fetched inputs and built output ----------------------
 build/slang/cache/
