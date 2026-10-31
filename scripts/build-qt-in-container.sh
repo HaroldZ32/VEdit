@@ -87,7 +87,13 @@ echo "[qt6] Rust C ABI symbols in vedit-app"
   echo "## sha256"
   sha256sum "$APP"
 } 2>&1 | tee "$EVID/37-qt6-rust-abi.txt"
-if ! nm -C "$APP" | grep -qE ' T vd_abi_version$'; then
+# The check must not die of SIGPIPE: this script runs under `set -o pipefail`, and
+# `grep -q` exits at the first match, which kills a still-writing `nm` with
+# SIGPIPE(141) — the pipeline then reads as failure and the gate reports a false
+# "does not export vd_abi_version" while the symbol is right there. `grep` without
+# `-q` reads the whole stream, so `nm` exits normally and the status is the grep
+# result only. The check itself is unchanged: match => 0, missing => 1 => FATAL.
+if ! nm -C "$APP" | grep -E ' T vd_abi_version$' > /dev/null; then
   echo "FATAL: vedit-app does not export vd_abi_version; the Rust service layer is not linked" >&2
   exit 1
 fi

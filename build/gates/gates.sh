@@ -9,12 +9,23 @@ source "$(dirname "${BASH_SOURCE[0]}")/_common.sh"
 
 BIN="$ROOT/build/slang/out/slang"
 if [ ! -x "$BIN" ] || [ "${GATES_REBUILD:-0}" = "1" ]; then
-  echo "[gates] artifact missing or GATES_REBUILD=1 -> one-command build: build/slang/build.sh"
-  bash "$ROOT/build/slang/build.sh"
+  echo "[gates] slang artifact is missing: $BIN"
+  echo "[gates] building it now with the documented one-command path: bash build/slang/build.sh"
+  echo "[gates]   (from-source build inside a fresh centos:7 container; several minutes; network required)"
+  echo "[gates]   (its own raw output lands in build/slang/evidence/)"
+  if ! bash "$ROOT/build/slang/build.sh"; then
+    no_gate "[gates] FAIL: the slang artifact could not be built, so the artifact checks cannot run.
+       Missing  : build/slang/out/slang  (the CentOS 7 slang binary this gate verifies)
+       Fix      : bash build/slang/build.sh        # the documented one-command build
+       Logs     : build/slang/evidence/            # raw output of the failed build
+       This gate does NOT skip and does NOT pass: without the artifact there is nothing to verify."
+  fi
 else
   echo "[gates] artifact present, re-checking it (GATES_REBUILD=1 rebuilds): $BIN"
 fi
-[ -x "$BIN" ] || no_gate "[gates] FAIL: $BIN missing or not executable"
+[ -x "$BIN" ] || no_gate "[gates] FAIL: the slang build reported success but $BIN is missing or not executable.
+       Fix: bash build/slang/build.sh   (logs: build/slang/evidence/)
+       This gate does NOT skip and does NOT pass without the artifact."
 
 command -v readelf >/dev/null 2>&1 || no_gate "[gates] FAIL: readelf is not available on this host"
 

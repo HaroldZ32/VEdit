@@ -153,7 +153,10 @@ comm -23 "$EXPECTED" "$OUR_SYMS" > "$MISSING"
   echo "-- in distro, not in ours:"
   comm -23 "$DISTRO_SYMS" "$OUR_SYMS"
   echo "-- in ours, not in distro (first 20):"
-  comm -13 "$DISTRO_SYMS" "$OUR_SYMS" | head -20
+  # `sed -n '1,20p'` consumes the whole stream; `head -20` exits early and would
+  # SIGPIPE `comm` under `set -o pipefail`, failing the script on a merely
+  # informational listing.
+  comm -13 "$DISTRO_SYMS" "$OUR_SYMS" | sed -n '1,20p'
 } | tee "$EVID/31-symbol-diff.txt"
 if [ -s "$MISSING" ]; then
   echo "FATAL ABI: the self-built library is missing symbols KTextEditor/katepart require" >&2

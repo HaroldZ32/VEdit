@@ -71,7 +71,7 @@ HEAD is now at 3017243... v3.4.0
 -- Performing Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY - Success
 -- Performing Test COMPILER_HAS_DEPRECATED_ATTR
 -- Performing Test COMPILER_HAS_DEPRECATED_ATTR - Success
--- Configuring done (15.6s)
+-- Configuring done (21.1s)
 -- Generating done (0.0s)
 CMake Warning:
   Manually-specified variables were not used by the project:

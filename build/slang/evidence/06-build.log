@@ -1,27 +1,27 @@
-[  0%] Building CXX object _deps/fmt-build/CMakeFiles/fmt.dir/src/format.cc.o
 [  0%] Building CXX object _deps/mimalloc-build/CMakeFiles/mimalloc-obj.dir/src/static.c.o
+[  0%] Building CXX object _deps/fmt-build/CMakeFiles/fmt.dir/src/format.cc.o
 [  0%] Building CXX object _deps/fmt-build/CMakeFiles/fmt.dir/src/os.cc.o
 [  1%] Linking CXX static library ../../lib64/libfmt.a
 [  1%] Built target fmt
 [  1%] Built target mimalloc-obj
-[  1%] Generating syntax
 [  3%] Generating diagnostics
+[  3%] Generating syntax
+[  3%] Building CXX object source/CMakeFiles/slang_slang.dir/AllSyntax.cpp.o
+[  3%] Building CXX object source/CMakeFiles/slang_slang.dir/SyntaxClone.cpp.o
 [  4%] Building CXX object source/CMakeFiles/slang_slang.dir/TokenKind.cpp.o
-[  4%] Building CXX object source/CMakeFiles/slang_slang.dir/AllSyntax.cpp.o
 [  4%] Building CXX object source/CMakeFiles/slang_slang.dir/DiagCode.cpp.o
-[  4%] Building CXX object source/CMakeFiles/slang_slang.dir/SyntaxClone.cpp.o
-[  6%] Building CXX object source/CMakeFiles/slang_slang.dir/KnownSystemName.cpp.o
-[  7%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/AbstractFlowAnalysis.cpp.o
-[  7%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/AnalysisManager.cpp.o
-[  9%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/AnalyzedAssertion.cpp.o
-[  9%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/AnalyzedProcedure.cpp.o
-[  9%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/CaseDecisionDag.cpp.o
-[  9%] Building CXX object source/CMakeFiles/slang_slang.dir/VersionInfo.cpp.o
-[  9%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/DataFlowAnalysis.cpp.o
+[  4%] Building CXX object source/CMakeFiles/slang_slang.dir/VersionInfo.cpp.o
+[  4%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/AnalysisManager.cpp.o
+[  6%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/AnalyzedAssertion.cpp.o
+[  6%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/AnalyzedProcedure.cpp.o
+[  6%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/CaseDecisionDag.cpp.o
+[  7%] Building CXX object source/CMakeFiles/slang_slang.dir/KnownSystemName.cpp.o
+[  9%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/AbstractFlowAnalysis.cpp.o
 [ 10%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/ClockInference.cpp.o
+[ 10%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/DataFlowAnalysis.cpp.o
 [ 12%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/DFAResults.cpp.o
+[ 12%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/DriverTracker.cpp.o
 [ 14%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/ValueDriver.cpp.o
-[ 14%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/DriverTracker.cpp.o
 [ 14%] Building CXX object source/CMakeFiles/slang_slang.dir/diagnostics/DiagnosticClient.cpp.o
 [ 15%] Building CXX object source/CMakeFiles/slang_slang.dir/diagnostics/DiagnosticEngine.cpp.o
 [ 15%] Building CXX object source/CMakeFiles/slang_slang.dir/diagnostics/Diagnostics.cpp.o
