@@ -1,0 +1,55 @@
+# T-build-registration: real build (green)
+# captured: 2026-10-31T16:22:33+08:00
+# branch: feat/qt6-ktexteditor-migration  HEAD: 4775bee test(cleanup): record the tree collapse and the post-cleanup deliverable check
+# modified files:
+ M CMakeLists.txt
+ M evidence/m0-build/build-logs/20-qt6-image-build.log
+ M evidence/m0-build/build-logs/21-qt6-image-id.txt
+ M evidence/m0-build/build-logs/31-qt6-configure.log
+ M evidence/m0-build/build-logs/32-qt6-build.log
+ M evidence/m0-build/build-logs/33-qt6-ctest.log
+ M evidence/m0-build/build-logs/34-qt6-elf.txt
+ M src/app/CMakeLists.txt
+ M src/app/main.cpp
+
+## scripts/build-qt.sh console (exit 0) — configure lane lines
+-- VEdit: building lane directory src/syntax/provider
+-- VEdit: building lane directory src/syntax/kde
+-- VEdit: building lane directory src/syntax/grammars
+-- VEdit: building lane directory src/terminal
+-- VEdit: lane directory src/syntax/overlay not present yet; skipped
+
+## build progress — lane objects/libs
+[7/96] Building CXX object src/syntax/grammars/CMakeFiles/vedit_syntax_grammars.dir/bindings.cpp.o
+[21/96] Building C object src/syntax/grammars/CMakeFiles/vedit_tree_sitter_verilog.dir/__/__/__/third_party/tree-sitter/verilog/src/parser.c.o
+[22/96] Linking C static library src/syntax/grammars/libvedit_tree_sitter_verilog.a
+[26/96] Building CXX object src/terminal/CMakeFiles/vedit_terminal.dir/vedit_terminal_autogen/mocs_compilation.cpp.o
+[30/96] Building CXX object src/terminal/CMakeFiles/vedit_terminal.dir/terminal_panel.cpp.o
+[33/96] Linking CXX static library src/syntax/grammars/libvedit_syntax_grammars.a
+[36/96] Building CXX object src/terminal/CMakeFiles/vedit_terminal.dir/vt_screen.cpp.o
+[37/96] Building CXX object src/terminal/CMakeFiles/vedit_terminal.dir/pty_session.cpp.o
+[39/96] Building CXX object src/syntax/grammars/CMakeFiles/vedit_syn_grammars_tests.dir/tests/test_syn_grammars.cpp.o
+[40/96] Linking CXX executable src/syntax/grammars/vedit_syn_grammars_tests
+[47/96] Building CXX object src/terminal/CMakeFiles/vedit_terminal.dir/terminal_widget.cpp.o
+[50/96] Linking CXX static library src/terminal/libvedit_terminal.a
+[51/96] Automatic MOC for target vedit-terminal-selftest
+[53/96] Building CXX object src/terminal/CMakeFiles/vedit-terminal-selftest.dir/vedit-terminal-selftest_autogen/mocs_compilation.cpp.o
+[81/96] Building CXX object src/terminal/CMakeFiles/vedit-terminal-selftest.dir/terminal_selftest.cpp.o
+[82/96] Linking CXX executable src/terminal/vedit-terminal-selftest
+    Start 5: vedit-terminal-selftest
+5/9 Test #5: vedit-terminal-selftest ........................   Passed    1.07 sec
+
+## ctest
+1/9 Test #1: vedit-m0-smoke .................................   Passed    0.06 sec
+2/9 Test #2: vedit-syntax-provider-tests ....................   Passed    0.00 sec
+3/9 Test #3: vedit-syntax-kde-data ..........................   Passed    0.03 sec
+4/9 Test #4: vedit-syn-grammars-tests .......................   Passed    0.17 sec
+5/9 Test #5: vedit-terminal-selftest ........................   Passed    1.07 sec
+6/9 Test #6: vedit-app-shell-selftest .......................   Passed    0.12 sec
+7/9 Test #7: vedit-workspace-palette-selftest ...............   Passed    0.09 sec
+8/9 Test #8: vedit-workspace-palette-integration-selftest ...   Passed    0.07 sec
+9/9 Test #9: vedit-workspace-search-selftest ................   Passed    0.31 sec
+100% tests passed, 0 tests failed out of 9
+
+## final
+[qt6] evidence: evidence/m0-build/build-logs/2x-qt6-* and 3x-qt6-*

@@ -1,0 +1,31 @@
+# T-build-registration: target list (collected 2026-10-31T16:23:24+08:00)
+
+## real build targets declared by the three lanes + app (ninja -t targets all)
+src/syntax/grammars/libvedit_tree_sitter_verilog.a: C_STATIC_LIBRARY_LINKER__vedit_tree_sitter_verilog_RelWithDebInfo
+src/syntax/grammars/libvedit_syntax_grammars.a: CXX_STATIC_LIBRARY_LINKER__vedit_syntax_grammars_RelWithDebInfo
+src/syntax/grammars/vedit_syn_grammars_tests: CXX_EXECUTABLE_LINKER__vedit_syn_grammars_tests_RelWithDebInfo
+src/terminal/libvedit_terminal.a: CXX_STATIC_LIBRARY_LINKER__vedit_terminal_RelWithDebInfo
+src/terminal/vedit-terminal-selftest: CXX_EXECUTABLE_LINKER__vedit-terminal-selftest_RelWithDebInfo
+src/app/vedit-app: CXX_EXECUTABLE_LINKER__vedit-app_RelWithDebInfo
+
+## artifacts on disk
+-rwxr-xr-x 1 haroldzhao haroldzhao 18906984 Oct 31 16:22 target/qt6-build/src/app/vedit-app
+-rw-r--r-- 1 haroldzhao haroldzhao   461916 Oct 31 16:21 target/qt6-build/src/syntax/grammars/libvedit_syntax_grammars.a
+-rw-r--r-- 1 haroldzhao haroldzhao 18356932 Oct 31 16:21 target/qt6-build/src/syntax/grammars/libvedit_tree_sitter_verilog.a
+-rwxr-xr-x 1 haroldzhao haroldzhao 21454768 Oct 31 16:21 target/qt6-build/src/syntax/grammars/vedit_syn_grammars_tests
+-rw-r--r-- 1 haroldzhao haroldzhao  7824886 Oct 31 16:22 target/qt6-build/src/terminal/libvedit_terminal.a
+-rwxr-xr-x 1 haroldzhao haroldzhao  4301656 Oct 31 16:22 target/qt6-build/src/terminal/vedit-terminal-selftest
+
+## ctest -N (all registered tests)
+Test project /vedit-build/target/qt6-build
+  Test #1: vedit-m0-smoke
+  Test #2: vedit-syntax-provider-tests
+  Test #3: vedit-syntax-kde-data
+  Test #4: vedit-syn-grammars-tests
+  Test #5: vedit-terminal-selftest
+  Test #6: vedit-app-shell-selftest
+  Test #7: vedit-workspace-palette-selftest
+  Test #8: vedit-workspace-palette-integration-selftest
+  Test #9: vedit-workspace-search-selftest
+
+Total Tests: 9

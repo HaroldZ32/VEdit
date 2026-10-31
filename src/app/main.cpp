@@ -14,6 +14,7 @@
 #include "editor_area.h"
 #include "integration.h"
 #include "panel_registry.h"
+#include "terminal_panel.h"
 #include "theme_manager.h"
 
 #include <QAction>
@@ -390,6 +391,10 @@ int main(int argc, char **argv)
 
     ApplicationShell shell(options);
     vedit::workspace::installPanels(shell, {options.projectRoot, options.stateDir});
+    // Terminal panel lane (T35): the shell created the "terminal" panel spec with
+    // an empty factory; the widget lives in the terminal lane.
+    shell.panels()->setFactory(QStringLiteral("terminal"),
+                               vedit::terminal::terminalPanelFactory());
     shell.show();
 
     const int holdMs = parser.value(QStringLiteral("hold")).toInt();

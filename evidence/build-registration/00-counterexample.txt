@@ -1,0 +1,57 @@
+# T-build-registration: counter-example — a lane that exists but fails to build turns the gate RED
+# collected: 2026-10-31T16:23:35+08:00
+# method: isolated copy target/counterexample-registration (same scripts, same pinned image), so the
+# live tree and the lane implementations are untouched. A #error line was appended to one existing
+# source of each PRESENT lane (terminal, grammars) and a fake overlay lane dir+CMakeLists was added
+# to prove the src/syntax/overlay entry activates once T18 lands.
+
+## injected failures
+src/terminal/terminal_panel.cpp:        #error "counter-example: terminal lane ..."
+src/syntax/grammars/bindings.cpp:       #error "counter-example: grammars lane ..."
+src/syntax/overlay/overlay_probe.cpp:   #error "counter-example: overlay lane ..."  (new dir in the copy)
+
+## 1) bash scripts/build-qt.sh (copy) — exit code 1
+-- VEdit: building lane directory src/syntax/provider
+-- VEdit: building lane directory src/syntax/kde
+-- VEdit: building lane directory src/syntax/grammars
+-- VEdit: building lane directory src/terminal
+-- VEdit: building lane directory src/syntax/overlay
+FAILED: [code=1] src/syntax/grammars/CMakeFiles/vedit_syntax_grammars.dir/bindings.cpp.o 
+/vedit-build/src/syntax/grammars/bindings.cpp:74:2: error: #error "counter-example: grammars lane must be compiled by the root build"
+   74 | #error "counter-example: grammars lane must be compiled by the root build"
+ninja: build stopped: subcommand failed.
+counterexample_build_qt_exit=1
+
+## 2) same copy, build continued with -k 0 so ALL lanes report
+FAILED: [code=1] src/syntax/overlay/CMakeFiles/vedit_syntax_overlay_probe.dir/overlay_probe.cpp.o 
+/vedit-build/src/syntax/overlay/overlay_probe.cpp:1:2: error: #error "counter-example: overlay lane must be compiled by the root build"
+    1 | #error "counter-example: overlay lane must be compiled by the root build"
+FAILED: [code=1] src/syntax/grammars/CMakeFiles/vedit_syntax_grammars.dir/bindings.cpp.o 
+/vedit-build/src/syntax/grammars/bindings.cpp:74:2: error: #error "counter-example: grammars lane must be compiled by the root build"
+   74 | #error "counter-example: grammars lane must be compiled by the root build"
+FAILED: [code=1] src/terminal/CMakeFiles/vedit_terminal.dir/terminal_panel.cpp.o 
+/vedit-build/src/terminal/terminal_panel.cpp:258:2: error: #error "counter-example: terminal lane must be compiled by the root build"
+  258 | #error "counter-example: terminal lane must be compiled by the root build"
+ninja: build stopped: cannot make progress due to previous errors.
+
+## reproduce (isolated copy; live tree untouched)
+CE=target/counterexample-registration
+rm -rf "$CE"; mkdir -p "$CE"
+cp -a CMakeLists.txt cmake scripts src third_party resources "$CE"/
+printf '\n#error "counter-example: terminal lane must be compiled by the root build"\n' >> "$CE/src/terminal/terminal_panel.cpp"
+printf '\n#error "counter-example: grammars lane must be compiled by the root build"\n' >> "$CE/src/syntax/grammars/bindings.cpp"
+mkdir -p "$CE/src/syntax/overlay"
+printf 'add_library(vedit_syntax_overlay_probe STATIC overlay_probe.cpp)\n' > "$CE/src/syntax/overlay/CMakeLists.txt"
+printf '#error "counter-example: overlay lane must be compiled by the root build"\n' > "$CE/src/syntax/overlay/overlay_probe.cpp"
+bash "$CE/scripts/build-qt.sh"; echo "exit=$?"     # -> 1 (first lane failure)
+docker run --rm -v "$PWD/$CE":/vedit-build -w /vedit-build vedit-qt6-build:local \
+  bash -lc 'cmake --build target/qt6-build -- -k 0'  # -> all three #errors
+# note: the copy needs third_party/ (vendored tree-sitter grammar) and resources/
+# (queries) because the grammars lane checks them at configure time; omitting them
+# fails at configure with "missing vendored grammar file" (also observed, see log).
+
+## raw logs (uncurated)
+- 00b-counterexample-full-first-run.log : full console of `bash scripts/build-qt.sh` in the copy (exit 1; first lane failure).
+- 00c-counterexample-k0-full.log        : full `cmake --build target/qt6-build -- -k 0` output showing all three lane #errors.
+- The isolated copy (`target/counterexample-registration`, ~255 MB) was removed after capturing these logs;
+  the "reproduce" section above regenerates it. The live tree was never modified by the counter-example.

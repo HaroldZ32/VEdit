@@ -41,6 +41,12 @@ endif()
 
 add_executable(vedit-app main.cpp)
 target_link_libraries(vedit-app PRIVATE vedit_app_shell)
+# Terminal panel lane (T35): the shell registers the "terminal" panel id but the
+# factory and the widget live in this lane. Guarded so a tree without the lane
+# still configures (same "missing lane => skip" promise as the root lane list).
+if(TARGET vedit_terminal)
+  target_link_libraries(vedit-app PRIVATE vedit_terminal)
+endif()
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(vedit-app PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()

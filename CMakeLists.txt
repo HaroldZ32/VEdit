@@ -61,6 +61,9 @@ endif()
 set(VEDIT_LANE_DIRECTORIES
   src/syntax/provider   # syn-provider lane (T15)
   src/syntax/kde        # syn-kde-data lane (T16), added once it lands
+  src/syntax/grammars   # syn-grammars lane (T17)
+  src/terminal          # term-panel lane (T35)
+  src/syntax/overlay    # syn-overlay lane (T18), added once it lands
 )
 foreach(lane_dir IN LISTS VEDIT_LANE_DIRECTORIES)
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${lane_dir}/CMakeLists.txt")
