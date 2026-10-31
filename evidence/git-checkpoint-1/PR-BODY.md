@@ -7,7 +7,7 @@
 **不合并不打 tag，不发 Release。** 后续提交追加到本 PR，不重建。真正可验收的状态要等人工停点 1（六份独立评审 PASS）才更新，并由用户在有屏机器上 pull 验收。
 
 - base: `dev` @ `eebbfd14a2311cd4bca533fe98d457a01e46e2e6`
-- head: `feat/qt6-ktexteditor-migration` @ `8219324`
+- head: `feat/qt6-ktexteditor-migration`（最新提交见本 PR 提交列表；冻结记录见 `evidence/git-checkpoint-1/`）
 - 本轮 `9957f5f..8219324` 共 **18 个提交**
 - 采集证据：`evidence/git-checkpoint-1/`
 
