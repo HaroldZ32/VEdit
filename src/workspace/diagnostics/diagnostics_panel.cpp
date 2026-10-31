@@ -53,9 +53,16 @@ void DiagnosticsPanel::refreshFromController()
         model_->setSymbols(controller_->outline());
     }
     if (status_ != nullptr) {
-        status_->setText(QStringLiteral("%1 — %2 diagnostic(s)")
-                             .arg(controller_->session().message)
-                             .arg(controller_->diagnostics().size()));
+        const QString toolchain = controller_->toolchainReport().missing().isEmpty()
+            ? QString()
+            : controller_->toolchainReport().userMessage();
+        if (!toolchain.isEmpty()) {
+            status_->setText(toolchain);
+        } else {
+            status_->setText(QStringLiteral("%1 — %2 diagnostic(s)")
+                                 .arg(controller_->session().message)
+                                 .arg(controller_->diagnostics().size()));
+        }
     }
 }
 

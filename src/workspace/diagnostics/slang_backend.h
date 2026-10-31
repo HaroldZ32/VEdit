@@ -38,6 +38,12 @@ public:
 bool ffiSlangBackendAvailable();
 
 /// The real backend, or nullptr when the Rust service layer is not linked.
-std::unique_ptr<SlangBackend> createFfiSlangBackend();
+///
+/// `slangPath` is the path the toolchain resolver chose (bundled > PATH > env);
+/// the backend passes it to the Rust service as an explicit override, so the
+/// observable choice and the executed binary cannot diverge. An empty or
+/// non-executable path makes the backend report itself unavailable, which the
+/// controller surfaces as a diagnosable missing-tool state.
+std::unique_ptr<SlangBackend> createFfiSlangBackend(const QString &slangPath = QString());
 
 } // namespace vedit::workspace::diagnostics

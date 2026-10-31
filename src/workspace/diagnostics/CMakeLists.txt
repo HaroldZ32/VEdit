@@ -65,6 +65,7 @@ set(VEDIT_DIAGNOSTICS_SOURCES
   diagnostics_controller.cpp
   diagnostics_outline_model.cpp
   ffi_backends.cpp
+  toolchain.cpp
 )
 if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL)
   list(APPEND VEDIT_DIAGNOSTICS_SOURCES
@@ -109,6 +110,26 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 endif()
 add_test(NAME vedit-workspace-diagnostics-selftest
          COMMAND vedit-workspace-diagnostics-selftest --selfcheck)
+
+# --- Toolchain observability self-test (T82) --------------------------------
+# The "missing" case is deterministic (an empty staged AppDir), so it belongs in
+# ctest. The "bundled" case needs the assembled AppDir and is run by
+# evidence/toolchain-bundling/ on the delivery payload.
+add_executable(vedit-toolchain-selftest toolchain_selftest.cpp)
+target_link_libraries(vedit-toolchain-selftest PRIVATE vedit_workspace_diagnostics)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(vedit-toolchain-selftest PRIVATE
+    -Wall -Wextra -Wpedantic -Werror)
+endif()
+file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/toolchain-missing-appdir")
+add_test(NAME vedit-toolchain-missing-selftest
+         COMMAND vedit-toolchain-selftest
+                 --appdir "${CMAKE_CURRENT_BINARY_DIR}/toolchain-missing-appdir"
+                 --expect missing)
+set_tests_properties(vedit-toolchain-missing-selftest PROPERTIES
+  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-diagnostics"
+  TIMEOUT 60
+)
 set_tests_properties(vedit-workspace-diagnostics-selftest PROPERTIES
   ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-diagnostics"
   TIMEOUT 120

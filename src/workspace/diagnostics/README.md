@@ -67,3 +67,28 @@ passing interaction.
 5. exposes the controller as the shell property `vedit.diagnosticsController`
    (`QObject *` holder) so the editor lane can call definition/references/rename/
    format with the caret position.
+
+## Toolchain discovery and missing-tool visibility (T82)
+
+The external tools are resolved with the delivery order **bundled > PATH > env**:
+
+- `bundled`: next to the product binary (`bin/` beside `vd-app`, plus the legacy
+  `lib/vedit/bin/` layout). The delivered AppDir installs
+  `bin/verible-verilog-{ls,lint,format}` and `bin/slang` (sha256 pinned).
+- `PATH`: the user's shell PATH.
+- `env`: `VEDIT_VERIBLE_LS` / `VEDIT_SLANG` (explicit override, last).
+
+The chosen source (`bundled` / `PATH` / `env:<name>`) and a `missing: [...]` list are
+printed by `vedit-app --selfcheck` (`TOOLCHAIN ...`), appended to the shell diagnostic
+list (status bar) and shown in the outline/diagnostics panel when a tool is absent —
+including what is missing, what it disables and how to fix it.
+
+```sh
+# bundled / missing proofs on an assembled payload
+vedit-toolchain-selftest --appdir <AppDir> --expect bundled \
+                         --lint-file crates/vd-lsp/fixtures/project/bad_line_length.sv
+vedit-toolchain-selftest --appdir <AppDir-with-tools-moved> --expect missing
+```
+
+The `missing` case is also a ctest entry (`vedit-toolchain-missing-selftest`) so a clean
+build always asserts the explicit-failure path.

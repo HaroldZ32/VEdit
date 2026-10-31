@@ -16,6 +16,7 @@
 #include "diagnostics_types.h"
 #include "lsp_backend.h"
 #include "slang_backend.h"
+#include "toolchain.h"
 
 #include <QString>
 #include <QStringList>
@@ -39,6 +40,10 @@ public:
     void setConfiguration(const QString &lsPath,
                           const QString &workspaceRoot,
                           const QString &rulesPath = QString());
+
+    /// Record the resolved toolchain (observable source/missing).
+    void setToolchainReport(const ToolchainReport &report);
+    const ToolchainReport &toolchainReport() const { return toolchain_; }
 
     const QString &lsPath() const { return lsPath_; }
     const QString &workspaceRoot() const { return workspaceRoot_; }
@@ -114,6 +119,7 @@ private:
     QVector<LintTicket> lints_;
     QVector<DiagnosticTicket> lspDiagnostics_;
 
+    ToolchainReport toolchain_;
     QString lastError_;
     quint64 generation_ = 0;
     quint64 navigation_ = 0;

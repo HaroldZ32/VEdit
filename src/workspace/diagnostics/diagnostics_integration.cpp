@@ -6,6 +6,7 @@
 #include "diagnostics_panel.h"
 #include "lsp_backend.h"
 #include "slang_backend.h"
+#include "toolchain.h"
 
 #include "app_shell.h"
 #include "command_registry.h"
@@ -20,6 +21,7 @@
 #include <QTimer>
 #include <QVariant>
 #include <QDebug>
+#include <cstdio>
 #include <QDockWidget>
 #include <QWidget>
 
@@ -47,31 +49,6 @@ public:
 private:
     std::unique_ptr<diagnostics::DiagnosticsController> controller_;
 };
-
-/// Resolve the Verible language server without a PATH search: the packaging
-/// contract passes it explicitly, the environment can override it for tests,
-/// and the AppDir keeps it next to the binary.
-QString resolveVeribleLs(const QString &projectRoot)
-{
-    const QByteArray override = qgetenv("VEDIT_VERIBLE_LS");
-    if (!override.isEmpty()) {
-        return QString::fromLocal8Bit(override);
-    }
-    QStringList candidates;
-    if (!projectRoot.isEmpty()) {
-        candidates.append(QDir(projectRoot).filePath(QStringLiteral(".vedit/bin/verible-verilog-ls")));
-    }
-    candidates.append(
-        QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("bin/verible-verilog-ls")));
-    candidates.append(QStringLiteral("/usr/bin/verible-verilog-ls"));
-    for (const QString &candidate : candidates) {
-        const QFileInfo info(candidate);
-        if (info.isFile() && info.isExecutable()) {
-            return info.absoluteFilePath();
-        }
-    }
-    return QString();
-}
 
 #if defined(VEDIT_DIAGNOSTICS_HAVE_FFI)
 /// Ask the project model for the effective file set and hand it to the
@@ -172,19 +149,26 @@ void installDiagnostics(vedit::app::ApplicationShell &shell, const IntegrationOp
         return;
     }
 
+    // Discovery order is bundled > PATH > env; the chosen source and the missing
+    // list are printed and shown, so "no diagnostics" is never silent.
+    const diagnostics::ToolchainReport toolchain =
+        diagnostics::resolveToolchain(diagnostics::applicationToolchainContext());
+    std::printf("TOOLCHAIN %s\n", qPrintable(toolchain.statusLine()));
+
     auto lsp = diagnostics::createFfiLspSessionBackend();
-    auto slang = diagnostics::createFfiSlangBackend();
+    auto slang = diagnostics::createFfiSlangBackend(toolchain.slang.path);
     auto *holder = new ControllerHolder(
         std::make_unique<diagnostics::DiagnosticsController>(std::move(lsp), std::move(slang)),
         &shell);
     auto *controller = holder->controller();
+    controller->setToolchainReport(toolchain);
     shell.setProperty("vedit.diagnosticsController", QVariant::fromValue<QObject *>(holder));
 
     const QString projectRoot = options.projectRoot;
-    const QString lsPath = resolveVeribleLs(projectRoot);
-    controller->setConfiguration(lsPath, projectRoot);
-    if (lsPath.isEmpty()) {
-        qWarning("diagnostics: no verible-verilog-ls found; diagnostics degrade diagnostically");
+    controller->setConfiguration(toolchain.verible.path, projectRoot);
+    shell.addShellDiagnostic(toolchain.userMessage());
+    if (!toolchain.missing().isEmpty()) {
+        qWarning("diagnostics: %s", qPrintable(toolchain.userMessage()));
     }
 
     const auto factory = [controller]() {

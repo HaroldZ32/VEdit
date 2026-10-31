@@ -15,8 +15,12 @@
 
 #include "diagnostics_controller.h"
 #include "diagnostics_outline_model.h"
+#include "toolchain.h"
 
 #include <QCoreApplication>
+#include <QDir>
+#include <QFile>
+#include <QTemporaryDir>
 #include <QString>
 #include <QStringList>
 #include <QVector>
@@ -254,6 +258,18 @@ public:
     }
 };
 
+QString makeExecutable(const QString &path)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        return QString();
+    }
+    file.write("#!/bin/sh\nexit 0\n");
+    file.close();
+    file.setPermissions(QFileDevice::ReadOwner | QFileDevice::WriteOwner | QFileDevice::ExeOwner);
+    return path;
+}
+
 /// Refresh until the controller reaches a terminal state or the budget ends.
 BackendState refreshUntilTerminal(DiagnosticsController &controller, int maxIterations = 200)
 {
@@ -392,6 +408,69 @@ int main(int argc, char **argv)
         refreshUntilTerminal(controller);
         check("degrade.no-backend-is-diagnosable",
               controller.state() == BackendState::Failed && !controller.lastError().isEmpty());
+    }
+
+    // ---- 7. Toolchain observability: bundled > PATH > env (T82) ------------
+    {
+        QTemporaryDir tools;
+        const QString bundled = tools.path() + QStringLiteral("/bundled");
+        const QString pathDir = tools.path() + QStringLiteral("/path");
+        QDir().mkpath(bundled);
+        QDir().mkpath(pathDir);
+        const QString bundledLs = makeExecutable(bundled + QStringLiteral("/verible-verilog-ls"));
+        const QString bundledSlang = makeExecutable(bundled + QStringLiteral("/slang"));
+        const QString pathLs = makeExecutable(pathDir + QStringLiteral("/verible-verilog-ls"));
+        const QString pathSlang = makeExecutable(pathDir + QStringLiteral("/slang"));
+
+        ToolchainSearchContext context;
+        context.bundledDirs = QStringList() << bundled;
+        context.pathDirs = QStringList() << pathDir;
+        context.env.insert(QStringLiteral("VEDIT_VERIBLE_LS"),
+                           pathLs + QStringLiteral(".env"));
+        context.env.insert(QStringLiteral("VEDIT_SLANG"), pathSlang + QStringLiteral(".env"));
+
+        const ToolchainReport bundledReport = resolveToolchain(context);
+        check("toolchain.bundled-wins",
+              bundledReport.verible.path == bundledLs
+                  && bundledReport.verible.sourceLabel() == QStringLiteral("bundled")
+                  && bundledReport.slang.path == bundledSlang
+                  && bundledReport.slang.sourceLabel() == QStringLiteral("bundled"),
+              bundledReport.statusLine());
+
+        ToolchainSearchContext pathContext = context;
+        pathContext.bundledDirs = QStringList() << (tools.path() + QStringLiteral("/absent"));
+        const ToolchainReport pathReport = resolveToolchain(pathContext);
+        check("toolchain.path-before-env",
+              pathReport.verible.path == pathLs
+                  && pathReport.verible.sourceLabel() == QStringLiteral("PATH")
+                  && pathReport.slang.path == pathSlang
+                  && pathReport.slang.sourceLabel() == QStringLiteral("PATH"),
+              pathReport.statusLine());
+
+        ToolchainSearchContext envContext = pathContext;
+        envContext.pathDirs = QStringList() << (tools.path() + QStringLiteral("/absent-path"));
+        envContext.env.insert(QStringLiteral("VEDIT_VERIBLE_LS"), bundledLs);
+        envContext.env.insert(QStringLiteral("VEDIT_SLANG"), bundledSlang);
+        const ToolchainReport envReport = resolveToolchain(envContext);
+        check("toolchain.env-is-last",
+              envReport.verible.path == bundledLs
+                  && envReport.verible.sourceLabel() == QStringLiteral("env:VEDIT_VERIBLE_LS")
+                  && envReport.slang.sourceLabel() == QStringLiteral("env:VEDIT_SLANG"),
+              envReport.statusLine());
+
+        ToolchainSearchContext empty;
+        empty.bundledDirs = QStringList() << (tools.path() + QStringLiteral("/absent"));
+        const ToolchainReport missingReport = resolveToolchain(empty);
+        check("toolchain.missing-list",
+              missingReport.missing().contains(QStringLiteral("verible"))
+                  && missingReport.missing().contains(QStringLiteral("slang"))
+                  && missingReport.statusLine().contains(
+                         QStringLiteral("missing=[verible, slang]")),
+              missingReport.statusLine());
+        check("toolchain.missing-message-visible",
+              missingReport.userMessage().contains(QStringLiteral("Diagnostics unavailable"))
+                  && missingReport.userMessage().contains(QStringLiteral("Fix:")),
+              missingReport.userMessage());
     }
 
     std::printf("VE-DIAGNOSTICS-SELFTEST checks=%d failures=%d\n", g_checks, g_failures);

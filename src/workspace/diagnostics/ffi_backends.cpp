@@ -9,8 +9,9 @@
 #include "slang_backend.h"
 
 #include <QByteArray>
-#include <cstdint>
+#include <QFileInfo>
 #include <QStringList>
+#include <cstdint>
 #include <QVector>
 
 #if defined(VEDIT_DIAGNOSTICS_HAVE_FFI)
@@ -323,8 +324,22 @@ private:
 
 class FfiSlangBackend final : public SlangBackend {
 public:
-    bool available() const override { return service_.get() != nullptr; }
-    QString description() const override { return QStringLiteral("slang (FFI)"); }
+    explicit FfiSlangBackend(QString slangPath)
+        : slangPath_(std::move(slangPath))
+    {
+    }
+
+    bool available() const override
+    {
+        // No explicit path => the Rust service performs its own resolution
+        // (pre-existing behaviour); an explicit path is pinned by the caller.
+        return service_.get() != nullptr;
+    }
+    QString description() const override
+    {
+        return slangPath_.isEmpty() ? QStringLiteral("slang (FFI)")
+                                    : QStringLiteral("slang (FFI): %1").arg(slangPath_);
+    }
 
     int startLint(const QString &file, QString *error) override
     {
@@ -335,7 +350,10 @@ public:
             return 0;
         }
         const QByteArray path = file.toUtf8();
-        const quint64 job = vd_deeplint_lint(service_.get(), path.constData(), nullptr);
+        const QByteArray slang = slangPath_.toUtf8();
+        const quint64 job =
+            vd_deeplint_lint(service_.get(), path.constData(), slang.isEmpty() ? nullptr
+                                                                              : slang.constData());
         if (job == 0) {
             if (error != nullptr) {
                 *error = service_.lastError();
@@ -388,6 +406,7 @@ public:
 
 private:
     ServiceHandle service_;
+    QString slangPath_;
 };
 
 } // namespace
@@ -407,9 +426,9 @@ bool ffiSlangBackendAvailable()
     return true;
 }
 
-std::unique_ptr<SlangBackend> createFfiSlangBackend()
+std::unique_ptr<SlangBackend> createFfiSlangBackend(const QString &slangPath)
 {
-    return std::make_unique<FfiSlangBackend>();
+    return std::make_unique<FfiSlangBackend>(slangPath);
 }
 
 } // namespace vedit::workspace::diagnostics
@@ -433,7 +452,7 @@ bool ffiSlangBackendAvailable()
     return false;
 }
 
-std::unique_ptr<SlangBackend> createFfiSlangBackend()
+std::unique_ptr<SlangBackend> createFfiSlangBackend(const QString &)
 {
     return nullptr;
 }

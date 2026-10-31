@@ -60,6 +60,14 @@ void DiagnosticsController::setFileSet(const QStringList &files)
     reparse();
 }
 
+void DiagnosticsController::setToolchainReport(const ToolchainReport &report)
+{
+    toolchain_ = report;
+    if (!toolchain_.missing().isEmpty() && lastError_.isEmpty()) {
+        lastError_ = toolchain_.userMessage();
+    }
+}
+
 void DiagnosticsController::reparse()
 {
     ++generation_;
@@ -101,9 +109,14 @@ void DiagnosticsController::startLsp()
         return;
     }
     if (lsPath_.isEmpty() || workspaceRoot_.isEmpty()) {
-        report_.lspMessage =
-            QStringLiteral("LSP backend is not configured (no server path or workspace root)");
-        lastError_ = report_.lspMessage;
+        if (!toolchain_.verible.found()) {
+            report_.lspMessage = toolchain_.missingMessage(ToolKind::Verible);
+            lastError_ = toolchain_.userMessage();
+        } else {
+            report_.lspMessage =
+                QStringLiteral("LSP backend is not configured (no workspace root)");
+            lastError_ = report_.lspMessage;
+        }
         return;
     }
     QString error;
@@ -120,8 +133,15 @@ void DiagnosticsController::startLints()
 {
     report_.slangRequested = 0;
     if (!slang_ || !report_.slangAvailable) {
-        report_.slangMessage = slang_ ? slang_->description() + QStringLiteral(" is unavailable")
-                                      : QStringLiteral("no SLANG backend in this build");
+        if (!toolchain_.slang.found()) {
+            report_.slangMessage = toolchain_.missingMessage(ToolKind::Slang);
+            if (lastError_.isEmpty()) {
+                lastError_ = toolchain_.userMessage();
+            }
+        } else {
+            report_.slangMessage = slang_ ? slang_->description() + QStringLiteral(" is unavailable")
+                                          : QStringLiteral("no SLANG backend in this build");
+        }
         return;
     }
     for (const QString &file : files_) {
@@ -250,6 +270,9 @@ void DiagnosticsController::finaliseState()
         state_ = BackendState::Degraded;
     } else {
         state_ = BackendState::Ready;
+    }
+    if (!toolchain_.missing().isEmpty() && lastError_.isEmpty()) {
+        lastError_ = toolchain_.userMessage();
     }
     if (state_ == BackendState::Failed && lastError_.isEmpty()) {
         lastError_ = report_.lspMessage;
