@@ -51,6 +51,23 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(vedit-app PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 
+# --- Rust service layer (C ABI, Slice 0 / task T4) ---------------------------
+# The product binary links the Rust services (AC-0.1/AC-S0.1) and the ABI smoke
+# runs against a real project fixture (AC-S0.2). The fixture path is passed on
+# the command line so the test reads the SOURCE tree, not a copied build tree.
+if(TARGET vd_ffi)
+  target_link_libraries(vedit-app PRIVATE vd_ffi)
+  target_compile_definitions(vedit-app PRIVATE VEDIT_HAVE_RUST_FFI=1)
+  add_test(NAME vedit-app-ffi-abi-selftest
+           COMMAND vedit-app --selfcheck-ffi
+                   "${CMAKE_CURRENT_SOURCE_DIR}/../../crates/vd-ffi/tests/fixtures/project")
+  set_tests_properties(vedit-app-ffi-abi-selftest PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime"
+    TIMEOUT 120
+  )
+  message(STATUS "VEdit: vedit-app links the Rust service layer (vd-ffi); ABI selftest registered")
+endif()
+
 add_test(NAME vedit-app-shell-selftest
          COMMAND vedit-app --selfcheck --state-dir "${CMAKE_CURRENT_BINARY_DIR}/selftest-state")
 set_tests_properties(vedit-app-shell-selftest PROPERTIES
