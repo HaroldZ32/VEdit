@@ -1,0 +1,4 @@
+STEPS3 mergeFlag indexOfMethod=-1 invokable=0
+kf.sonnet.core: Sonnet: No speller backends available!
+STEPS3 keyevents chars=0 steps_to_stable=0 verdict=FAIL
+STEPS3 keyevents redo_all restored_ok=1

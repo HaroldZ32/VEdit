@@ -1,0 +1,9 @@
+QMetaObject::invokeMethod: No such method KTextEditor::DocumentPrivate::undoCount()
+STEPS mode=same_pos len_before=0 undoCount=-1 steps_to_empty=1 verdict=FAIL
+QMetaObject::invokeMethod: No such method KTextEditor::DocumentPrivate::undoCount()
+STEPS mode=different_pos len_before=0 undoCount=-1 steps_to_empty=1 verdict=FAIL
+QMetaObject::invokeMethod: No such method KTextEditor::DocumentPrivate::undoCount()
+STEPS mode=different_pos_events len_before=0 undoCount=-1 steps_to_empty=1 verdict=FAIL
+QMetaObject::invokeMethod: No such method KTextEditor::DocumentPrivate::undoCount()
+STEPS mode=insert_lines len_before=0 undoCount=-1 steps_to_empty=1 verdict=FAIL
+STEPS meta undo()=70 redo()=71 undoCount()=-1
