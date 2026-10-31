@@ -39,25 +39,87 @@ EditorPane::EditorPane(QString paneId, EditorProvider *provider, QWidget *parent
     setObjectName(QStringLiteral("editor-pane"));
     setFocusPolicy(Qt::StrongFocus);
 
-    auto *layout = new QVBoxLayout(this);
-    layout->setContentsMargins(0, 0, 0, 0);
-    layout->setSpacing(0);
+    layout_ = new QVBoxLayout(this);
+    layout_->setContentsMargins(0, 0, 0, 0);
+    layout_->setSpacing(0);
 
     header_ = new QLabel(this);
     header_->setObjectName(QStringLiteral("editor-pane-header"));
     header_->setContentsMargins(6, 2, 6, 2);
-    layout->addWidget(header_);
+    layout_->addWidget(header_);
 
-    editor_ = provider_ != nullptr ? provider_->createEditor(this) : nullptr;
-    if (editor_ == nullptr) {
+    QWidget *initial = provider_ != nullptr ? provider_->createEditor(this) : nullptr;
+    if (initial == nullptr) {
         auto *fallback = new QPlainTextEdit(this);
         fallback->setPlainText(QStringLiteral("No editor provider connected."));
         fallback->setReadOnly(true);
-        editor_ = fallback;
+        initial = fallback;
     }
-    layout->addWidget(editor_, 1);
-    editor_->installEventFilter(this);
+    replaceEditorWidget(initial);
     updateHeader();
+}
+
+void EditorPane::replaceEditorWidget(QWidget *editor)
+{
+    if (editor_ == editor) {
+        return;
+    }
+    if (editor_ != nullptr) {
+        editor_->removeEventFilter(this);
+        editor_->setParent(nullptr);
+        delete editor_;
+    }
+    editor_ = editor;
+    if (editor_ != nullptr) {
+        layout_->insertWidget(1, editor_, 1);
+        editor_->installEventFilter(this);
+    }
+}
+
+void EditorPane::setProvider(EditorProvider *provider)
+{
+    provider_ = provider;
+    QWidget *fresh = provider_ != nullptr ? provider_->createEditor(this) : nullptr;
+    if (fresh == nullptr) {
+        auto *fallback = new QPlainTextEdit(this);
+        fallback->setPlainText(QStringLiteral("No editor provider connected."));
+        fallback->setReadOnly(true);
+        fresh = fallback;
+    }
+    replaceEditorWidget(fresh);
+    updateHeader();
+}
+
+EditorProvider *EditorPane::provider() const
+{
+    return provider_;
+}
+
+bool EditorPane::openFile(const QString &absolutePath, QString *error)
+{
+    if (provider_ == nullptr) {
+        if (error != nullptr) {
+            *error = QStringLiteral("open: the pane has no editor provider");
+        }
+        return false;
+    }
+    return provider_->openFile(editor_, absolutePath, error);
+}
+
+QString EditorPane::currentFilePath() const
+{
+    return provider_ != nullptr ? provider_->currentFilePath(editor_) : QString();
+}
+
+bool EditorPane::saveFile(QString *error)
+{
+    if (provider_ == nullptr) {
+        if (error != nullptr) {
+            *error = QStringLiteral("save: the pane has no editor provider");
+        }
+        return false;
+    }
+    return provider_->saveFile(editor_, error);
 }
 
 QString EditorPane::paneId() const
@@ -142,9 +204,17 @@ EditorArea::~EditorArea()
 
 void EditorArea::setProvider(EditorProvider *provider)
 {
+    if (provider_ == provider) {
+        return;
+    }
     provider_ = provider;
-    // Existing panes keep the provider they were built with; new panes use the
-    // new provider. The editor lane registers its provider before the first pane.
+    // The shell builds its first pane before main() installs the real provider,
+    // so every existing pane gets a fresh editor widget; the layout tree
+    // (splits, ratios, active pane) is untouched.
+    const QList<EditorPane *> current = panes();
+    for (EditorPane *pane : current) {
+        pane->setProvider(provider_);
+    }
 }
 
 EditorProvider *EditorArea::provider() const

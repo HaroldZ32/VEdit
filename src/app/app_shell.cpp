@@ -68,6 +68,18 @@ ApplicationShell::ApplicationShell(ShellOptions options, QWidget *parent)
     registerCommands();
     buildMenuBar();
 
+    if (!options_.deferSessionRestore) {
+        startSession();
+    }
+}
+
+void ApplicationShell::startSession()
+{
+    if (sessionStarted_) {
+        return;
+    }
+    sessionStarted_ = true;
+
     bool restored = false;
     if (options_.restoreSession) {
         QString restoreError;
@@ -202,6 +214,12 @@ void ApplicationShell::registerCommands()
     // File
     addCommand(QStringLiteral("file.new-layout"), QStringLiteral("&New Empty Layout"),
                QStringLiteral("file"), QKeySequence(QStringLiteral("Ctrl+Alt+N")), 10);
+    // Save (T71): the entry the editor is actually used through. It goes to the
+    // active pane's provider seam, so the real KTextEditor document is saved
+    // atomically by the edit-core lane; the demo provider keeps working through
+    // its own default implementation of the same seam.
+    addCommand(QStringLiteral("file.save"), QStringLiteral("&Save"), QStringLiteral("file"),
+               QKeySequence(QStringLiteral("Ctrl+S")), 15);
     addCommand(QStringLiteral("file.save-session"), QStringLiteral("&Save Session Now"),
                QStringLiteral("file"), QKeySequence(), 20);
     addCommand(QStringLiteral("file.close-pane"), QStringLiteral("&Close Pane"),
@@ -261,6 +279,7 @@ void ApplicationShell::registerCommands()
         editorArea_->resetLayout();
         updateStatusBar();
     });
+    commands_->setHandler(QStringLiteral("file.save"), [this]() { saveActiveDocument(); });
     commands_->setHandler(QStringLiteral("file.save-session"), [this]() {
         QString error;
         if (!saveSession(&error)) {
@@ -449,6 +468,33 @@ bool ApplicationShell::saveSession(QString *error)
         addDiagnostic(shortcutError);
     }
     return ok;
+}
+
+bool ApplicationShell::saveActiveDocument()
+{
+    EditorPane *pane = editorArea_ != nullptr ? editorArea_->activePane() : nullptr;
+    const auto reportFailure = [this](const QString &detail) {
+        const QString message = QStringLiteral("Save failed: %1").arg(detail);
+        statusBar()->showMessage(message, 8000);
+        addDiagnostic(message);
+        qWarning().noquote() << "[app-shell]" << message;
+    };
+
+    if (pane == nullptr) {
+        reportFailure(QStringLiteral("no active editor pane"));
+        return false;
+    }
+    const QString path = pane->currentFilePath();
+    QString error;
+    if (!pane->saveFile(&error)) {
+        reportFailure(error.isEmpty() ? QStringLiteral("the editor provider refused the save")
+                                     : error);
+        return false;
+    }
+    statusBar()->showMessage(path.isEmpty() ? QStringLiteral("Saved")
+                                            : QStringLiteral("Saved %1").arg(path),
+                             4000);
+    return true;
 }
 
 void ApplicationShell::applyHorizontalSplitPreset(int paneCount)

@@ -36,6 +36,13 @@ struct ShellOptions {
     QString themeName;      // empty => saved theme, else the default theme
     bool restoreSession = true;
     bool showDefaultPanels = true;
+    // Defer the session restore (and the no-session defaults) until the caller
+    // calls startSession(). A lane registers its panel factory through
+    // PanelRegistry::setFactory(), which only affects FUTURE inserts, so a
+    // restore that runs before the factories exist leaves every restored dock a
+    // shell placeholder (review M1: the terminal and search docks). The product
+    // entry point therefore defers, registers the factories, then starts.
+    bool deferSessionRestore = false;
 };
 
 class ApplicationShell final : public QMainWindow {
@@ -56,6 +63,19 @@ public:
 
     bool saveSession(QString *error = nullptr);
     bool restoreSession(QString *error = nullptr);
+
+    // Saves the document of the ACTIVE pane through the EditorProvider seam
+    // (the same call File > Save / Ctrl+S make). Returns false and reports the
+    // reason in the status bar, in diagnostics() and through qWarning() when no
+    // pane is active or the provider refuses; a failed save never looks like a
+    // successful one.
+    bool saveActiveDocument();
+
+    // Restores the saved session, or applies the first-start defaults when there
+    // is none. The constructor calls it unless ShellOptions::deferSessionRestore
+    // asked for it to wait until every panel factory is registered. Idempotent:
+    // a second call is a no-op, so a deferred shell can never restore twice.
+    void startSession();
 
     QStringList diagnostics() const;
     QString projectLabel() const;
@@ -93,6 +113,7 @@ private:
     QLabel *statusTheme_ = nullptr;
     QLabel *statusLayout_ = nullptr;
     QStringList diagnostics_;
+    bool sessionStarted_ = false;
 };
 
 } // namespace vedit::app

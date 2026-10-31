@@ -51,6 +51,21 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(vedit-app PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 
+# --- Edit-core lane (Slice 1 / task T10) ------------------------------------
+# The editing kernel lives in src/editor and ships its own CMakeLists.txt; the
+# root CMakeLists.txt is owned by the build-base lane, so the shell wires the
+# lane here (the shell is its consumer). A tree without the lane still
+# configures. The lane registers its own ctest entry.
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../editor/CMakeLists.txt")
+  add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../editor"
+                   "${CMAKE_CURRENT_BINARY_DIR}/editor-lane")
+  if(TARGET vedit_editor_core)
+    target_link_libraries(vedit-app PRIVATE vedit_editor_core)
+    target_compile_definitions(vedit-app PRIVATE VEDIT_HAVE_EDIT_CORE=1)
+    message(STATUS "VEdit: edit-core lane wired (vedit_editor_core); KTextEditor is the product editor")
+  endif()
+endif()
+
 # --- Rust service layer (C ABI, Slice 0 / task T4) ---------------------------
 # The product binary links the Rust services (AC-0.1/AC-S0.1) and the ABI smoke
 # runs against a real project fixture (AC-S0.2). The fixture path is passed on
@@ -81,7 +96,7 @@ set_tests_properties(vedit-app-shell-selftest PROPERTIES
 # install<Lane>() functions it can see and silently skips the missing ones.
 # src/app therefore never learns which lanes are present, and landing a new
 # workspace lane does not edit this file. Convention: evidence/ws-palette/SEAM.md.
-set(VEDIT_WORKSPACE_LANES filetree palette search)
+set(VEDIT_WORKSPACE_LANES filetree palette search project diagnostics)
 foreach(lane IN LISTS VEDIT_WORKSPACE_LANES)
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../workspace/${lane}/CMakeLists.txt")
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../workspace/${lane}"

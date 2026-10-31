@@ -1,7 +1,10 @@
 #include "editor_provider.h"
 
+#include <QFile>
+#include <QFileInfo>
 #include <QFontDatabase>
 #include <QPlainTextEdit>
+#include <QSaveFile>
 #include <QStringLiteral>
 
 namespace vedit::app {
@@ -43,5 +46,4 @@ QWidget *DemoEditorProvider::createEditor(QWidget *parent)
                              .arg(index));
     return editor;
 }
-
 } // namespace vedit::app

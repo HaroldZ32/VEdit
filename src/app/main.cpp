@@ -16,6 +16,12 @@
 #include "panel_registry.h"
 #include "terminal_panel.h"
 #include "theme_manager.h"
+#if defined(VEDIT_HAVE_EDIT_CORE)
+#include "kernel/cross_boundary.h"
+#include "kernel/edit_core_selftest.h"
+#include "kernel/ktexteditor_provider.h"
+#include <KTextEditor/Document>
+#endif
 #ifdef VEDIT_HAVE_RUST_FFI
 #include "vd_ffi.h"
 #endif
@@ -25,19 +31,27 @@
 #include <QCommandLineParser>
 #include <QCoreApplication>
 #include <QDir>
+#include <QDockWidget>
 #include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QKeyEvent>
 #include <QKeySequence>
+#include <QLabel>
+#include <QMenu>
+#include <QMenuBar>
+#include <QPlainTextEdit>
 #include <QString>
+#include <QStatusBar>
 #include <QStringList>
 #include <QTemporaryDir>
 #include <QTextStream>
 #include <QThread>
 #include <QTimer>
 #include <QWidget>
+#include <QWindow>
 
 #include <cstdio>
 #include <memory>
@@ -56,13 +70,14 @@ namespace {
 int g_checks = 0;
 int g_failures = 0;
 
-void check(const char *name, bool ok)
+void check(const char *name, bool ok, const QString &detail = QString())
 {
     ++g_checks;
     if (!ok) {
         ++g_failures;
     }
-    std::printf("CHECK %s %s\n", name, ok ? "PASS" : "FAIL");
+    std::printf("CHECK %s %s%s%s\n", name, ok ? "PASS" : "FAIL",
+                detail.isEmpty() ? "" : " ", qPrintable(detail));
     std::fflush(stdout);
 }
 
@@ -85,6 +100,17 @@ void pump()
 {
     QCoreApplication::processEvents();
     QCoreApplication::processEvents();
+}
+
+// Cross-boundary counter (AC-S1.1 / C1): the Rust service layer is the only C
+// ABI; the edit kernel links no `vd_*` symbol, and every ABI call site in this
+// file is instrumented with this helper. The edit-core selfcheck asserts the
+// counter does not move while editing, and that the counter is live.
+void noteAbiCall()
+{
+#if defined(VEDIT_HAVE_EDIT_CORE)
+    vedit::editor::noteCrossBoundaryCall();
+#endif
 }
 
 // ---------------------------------------------------------------------------
@@ -251,6 +277,64 @@ int runSelfCheck()
           restored->commands()->action(QStringLiteral("view.split.horizontal"))->shortcut() ==
               QKeySequence(QStringLiteral("Ctrl+Shift+J")));
 
+    // --- a restored dock gets its lane content (review M1) ------------------
+    // A session that lists the terminal and search panels is restored AFTER the
+    // lanes registered their factories (the product sequence: deferSessionRestore
+    // + startSession). Before that fix the restore ran during construction, when
+    // both factories were still empty, and the docks kept the shell placeholder
+    // forever: this check fails there and passes here.
+    {
+        const QString seamStateDir = temp.path() + QStringLiteral("/panel-seam");
+        ShellOptions seamOptions;
+        seamOptions.stateDir = seamStateDir;
+        seamOptions.showDefaultPanels = false;
+        seamOptions.restoreSession = false;
+        auto seed = std::make_unique<ApplicationShell>(seamOptions);
+        seed->panels()->showPanel(QStringLiteral("terminal"), seed.get());
+        seed->panels()->showPanel(QStringLiteral("search"), seed.get());
+        // A non-default editor layout as well: the deferred start must restore it
+        // exactly like the constructor-time restore did.
+        seed->editorArea()->splitActive(Qt::Horizontal);
+        pump();
+        QString seamSaveError;
+        check("panel-seam.seed-session", seed->saveSession(&seamSaveError), seamSaveError);
+        seed.reset();
+
+        ShellOptions seamRestored = seamOptions;
+        seamRestored.restoreSession = true;
+        seamRestored.deferSessionRestore = true;
+        auto seamShell = std::make_unique<ApplicationShell>(seamRestored);
+        seamShell->show();
+        pump();
+        check("panel-seam.deferred-nothing-inserted", seamShell->panels()->insertedIds().isEmpty());
+        // The factories are registered here, exactly as main() does, and only then
+        // the session starts.
+        seamShell->panels()->setFactory(QStringLiteral("terminal"),
+                                        vedit::terminal::terminalPanelFactory());
+        seamShell->panels()->setFactory(QStringLiteral("search"), []() -> QWidget * {
+            auto *probe = new QLabel(QStringLiteral("search panel from a registered factory"));
+            probe->setObjectName(QStringLiteral("search-panel-probe"));
+            return probe;
+        });
+        seamShell->startSession();
+        pump();
+        QDockWidget *terminalDock = seamShell->panels()->dock(QStringLiteral("terminal"));
+        QDockWidget *searchDock = seamShell->panels()->dock(QStringLiteral("search"));
+        check("panel-seam.dock-restored", terminalDock != nullptr && searchDock != nullptr);
+        check("panel-seam.terminal-content",
+              terminalDock != nullptr &&
+                  qobject_cast<vedit::terminal::TerminalPanel *>(terminalDock->widget()) != nullptr);
+        check("panel-seam.search-content",
+              searchDock != nullptr && searchDock->widget() != nullptr &&
+                  searchDock->widget()->objectName() == QStringLiteral("search-panel-probe"));
+        check("panel-seam.no-placeholder",
+              terminalDock != nullptr && terminalDock->widget() != nullptr &&
+                  !terminalDock->widget()->objectName().startsWith(
+                      QStringLiteral("panel-placeholder-")));
+        check("panel-seam.editor-layout-restored", seamShell->editorArea()->paneCount() == 2,
+              QStringLiteral("panes=%1").arg(seamShell->editorArea()->paneCount()));
+    }
+
     // Bad configuration must never prevent startup.
     const QString brokenStateDir = temp.path() + QStringLiteral("/broken");
     writeFile(brokenStateDir + QStringLiteral("/session.json"), QByteArray("{not json at all"));
@@ -282,6 +366,170 @@ int runSelfCheck()
     pump();
     check("stress.pane-invariant", empty->editorArea()->paneCount() >= 1);
     check("stress.non-null-active", empty->editorArea()->activePane() != nullptr);
+
+    // --- save entry: File > Save / Ctrl+S (task T71) ------------------------
+    // Stop 1's acceptance edits a file and saves it. The entry must exist both in
+    // the File menu and on Ctrl+S, and both paths must go through the ACTIVE
+    // pane's EditorProvider seam (never a QPlainTextEdit cast in the shell), so
+    // the installed provider decides how the document is written. The
+    // KTextEditor provider is exercised further down; the demo provider first.
+    QAction *saveAction = shell->commands()->action(QStringLiteral("file.save"));
+    check("save.command.registered", saveAction != nullptr);
+    check("save.shortcut.ctrl-s",
+          saveAction != nullptr
+              && saveAction->shortcut() == QKeySequence(QStringLiteral("Ctrl+S")));
+    bool saveInFileMenu = false;
+    for (QAction *topLevelAction : shell->menuBar()->actions()) {
+        QMenu *menu = topLevelAction != nullptr ? topLevelAction->menu() : nullptr;
+        if (menu != nullptr && menu->actions().contains(saveAction)) {
+            saveInFileMenu = true;
+        }
+    }
+    check("save.menu.file-item", saveInFileMenu);
+
+    const auto readFileBytes = [](const QString &path) {
+        QFile file(path);
+        if (!file.open(QIODevice::ReadOnly)) {
+            return QByteArray();
+        }
+        return file.readAll();
+    };
+    const auto leftoverSaveTemps = [](const QString &directory) {
+        return QDir(directory).entryList(QStringList{QStringLiteral("*.vedit-tmp-*")},
+                                         QDir::Files);
+    };
+
+#if defined(VEDIT_HAVE_EDIT_CORE)
+    // The shell still runs the demo provider here: the same entry must save a
+    // demo document too (the entry is provider-agnostic by construction).
+    EditorPane *saveDemoPane = shell->editorArea()->activePane();
+    if (saveDemoPane != nullptr && saveAction != nullptr) {
+        const QString demoPath = temp.path() + QStringLiteral("/save-entry-demo.v");
+        writeFile(demoPath, QByteArrayLiteral("module demo_before;\nendmodule\n"));
+        QString demoError;
+        check("save.demo.open", saveDemoPane->openFile(demoPath, &demoError));
+        if (auto *demoEditor = qobject_cast<QPlainTextEdit *>(saveDemoPane->editorWidget())) {
+            demoEditor->setPlainText(QStringLiteral("module demo_after;\nendmodule\n"));
+        }
+        saveAction->trigger();
+        pump();
+        check("save.demo.action.disk-bytes",
+              readFileBytes(demoPath) == QByteArrayLiteral("module demo_after;\nendmodule\n"));
+        check("save.demo.action.path-unchanged",
+              saveDemoPane->currentFilePath() == QFileInfo(demoPath).absoluteFilePath());
+        check("save.demo.action.no-temp-file",
+              leftoverSaveTemps(QFileInfo(demoPath).absolutePath()).isEmpty());
+    }
+
+    // --- edit-core kernel in the product (Slice 1, AC-S1.1) ----------------
+    // The provider is swapped on a live shell: every pane must get the real
+    // KTextEditor widget, and the pane's document seam must open/save a file.
+    shell->setEditorProvider(vedit::editor::makeEditCoreProvider());
+    pump();
+    check("editor.provider.id",
+          shell->editorProvider() != nullptr
+              && shell->editorProvider()->id() == QStringLiteral("ktexteditor"));
+    EditorPane *editPane = shell->editorArea()->activePane();
+    check("editor.pane.ktexteditor-widget",
+          editPane != nullptr && vedit::editor::isEditCoreWidget(editPane->editorWidget()));
+    if (editPane != nullptr) {
+        const QString paneFixture = temp.path() + QStringLiteral("/pane-open.v");
+        writeFile(paneFixture, QByteArrayLiteral("module pane_open;\nendmodule\n"));
+        QString paneError;
+        const bool paneOpened = editPane->openFile(paneFixture, &paneError);
+        check("editor.pane.open", paneOpened);
+        if (!paneError.isEmpty()) {
+            std::printf("EDITOR-PANE-ERROR %s\n", qPrintable(paneError));
+        }
+        check("editor.pane.open-path",
+              editPane->currentFilePath() == QFileInfo(paneFixture).absoluteFilePath(),
+              editPane->currentFilePath());
+        check("editor.pane.save", editPane->saveFile(&paneError));
+
+        // --- T71: Ctrl+S and File > Save on the KTextEditor provider -------
+        // Both paths run end-to-end: the document text is changed, the entry is
+        // invoked, and the bytes on disk must change while the pane keeps its
+        // path and the edit-core lane's atomic save leaves no temporary file.
+        KTextEditor::Document *document = vedit::editor::documentFor(editPane->editorWidget());
+        check("save.ktexteditor.document", document != nullptr);
+        const QString savePath = editPane->currentFilePath();
+        if (document != nullptr && saveAction != nullptr) {
+            // 1) Keyboard path: a real Ctrl+S key event sent to the shell's
+            //    window goes through Qt's shortcut map to the QAction.
+            document->setText(QStringLiteral("module saved_by_ctrl_s;\nendmodule\n"));
+            document->setModified(true);
+            shell->activateWindow();
+            pump();
+            QWindow *shellWindow = shell->windowHandle();
+            check("save.shortcut.window", shellWindow != nullptr);
+            if (shellWindow != nullptr) {
+                QKeyEvent press(QEvent::KeyPress, Qt::Key_S, Qt::ControlModifier);
+                QKeyEvent release(QEvent::KeyRelease, Qt::Key_S, Qt::ControlModifier);
+                QApplication::sendEvent(shellWindow, &press);
+                QApplication::sendEvent(shellWindow, &release);
+            }
+            pump();
+            check("save.shortcut.disk-bytes",
+                  readFileBytes(savePath)
+                      == QByteArrayLiteral("module saved_by_ctrl_s;\nendmodule\n"));
+            check("save.shortcut.modified-cleared", !document->isModified());
+            check("save.shortcut.path-unchanged", editPane->currentFilePath() == savePath);
+
+            // 2) Menu path: the very QAction the File menu holds, triggered.
+            document->setText(QStringLiteral("module saved_from_menu;\nendmodule\n"));
+            document->setModified(true);
+            saveAction->trigger();
+            pump();
+            check("save.menu.disk-bytes",
+                  readFileBytes(savePath)
+                      == QByteArrayLiteral("module saved_from_menu;\nendmodule\n"));
+            check("save.menu.path-unchanged", editPane->currentFilePath() == savePath);
+            check("save.no-temp-file",
+                  leftoverSaveTemps(QFileInfo(savePath).absolutePath()).isEmpty());
+
+            // 3) A failing save must be visible and diagnosable, never silent.
+            //    atomic_save's documented test fault injection is used so the
+            //    failure runs through the real KTextEditor/atomic path.
+            document->setText(QStringLiteral("module must_not_reach_disk;\nendmodule\n"));
+            document->setModified(true);
+            const QByteArray beforeFailure = readFileBytes(savePath);
+            qputenv("VEDIT_ATOMIC_FAULT", QByteArrayLiteral("write"));
+            saveAction->trigger();
+            qunsetenv("VEDIT_ATOMIC_FAULT");
+            pump();
+            check("save.failure.disk-unchanged", readFileBytes(savePath) == beforeFailure);
+            check("save.failure.status-bar",
+                  shell->statusBar()->currentMessage().contains(QStringLiteral("Save failed")));
+            bool failureDiagnostic = false;
+            for (const QString &diagnostic : shell->diagnostics()) {
+                if (diagnostic.contains(QStringLiteral("Save failed"))) {
+                    failureDiagnostic = true;
+                }
+            }
+            check("save.failure.diagnostic", failureDiagnostic);
+            check("save.failure.still-modified", document->isModified());
+            // 4) ... and the same entry saves again once the fault is gone.
+            saveAction->trigger();
+            pump();
+            check("save.recovery.disk-bytes",
+                  readFileBytes(savePath)
+                      == QByteArrayLiteral("module must_not_reach_disk;\nendmodule\n"));
+            check("save.recovery.not-modified", !document->isModified());
+        }
+    }
+
+    vedit::editor::BoundaryHooks hooks;
+    hooks.calls = []() { return vedit::editor::crossBoundaryCallCount(); };
+#if defined(VEDIT_HAVE_RUST_FFI)
+    hooks.positiveControl = []() {
+        noteAbiCall();
+        (void)vd_abi_version();
+    };
+#endif
+    const vedit::editor::SelfCheckResult editCore = vedit::editor::runSelfChecks(hooks);
+    g_checks += editCore.checks;
+    g_failures += editCore.failures;
+#endif
 
     std::printf("APP-SHELL-SELFTEST ok=%d checks=%d failures=%d state=%s\n",
                 g_failures == 0 ? 1 : 0, g_checks, g_failures, qPrintable(stateDir));
@@ -323,17 +571,20 @@ int runSelfCheck(const QString &fixtureDir)
     std::printf("FFI-ABI fixture=%s\n", qPrintable(fixtureDir));
     const QByteArray fixturePath = QFile::encodeName(fixtureDir);
 
+    noteAbiCall();
     VdService *service = vd_service_create();
     check("ffi.service.create", service != nullptr);
     if (service == nullptr) {
         std::printf("FFI-ABI-SELFTEST ok=0 checks=%d failures=%d\n", g_checks, g_failures);
         return 1;
     }
+    noteAbiCall();
     check("ffi.abi-version", vd_abi_version() == VD_ABI_VERSION);
 
     // 1/7 project model + .f. The start call must return immediately (C2).
     QElapsedTimer startTimer;
     startTimer.start();
+    noteAbiCall();
     const quint64 projectJob = vd_project_parse(service, fixturePath.constData());
     const qint64 startMs = startTimer.elapsed();
     check("ffi.project.start.returns-job", projectJob != 0);
@@ -369,13 +620,16 @@ int runSelfCheck(const QString &fixtureDir)
     const QStringList defines = stringList(project.defines);
     check("ffi.project.defines",
           defines.contains(QStringLiteral("WIDTH=8")) && defines.contains(QStringLiteral("SIM")));
+    noteAbiCall();
     vd_project_info_free(&project);
 
     // Unknown job ids are rejected instead of silently accepted.
     VdProjectInfo rejected{};
+    noteAbiCall();
     check("ffi.project.unknown-job-rejected", vd_project_poll(service, 424242, &rejected) == -1);
 
     // 4/7 FIM: the product default is off, and the call makes no request.
+    noteAbiCall();
     const quint64 fimJob = vd_fim_complete(service, "module m;", "");
     check("ffi.fim.start", fimJob != 0);
     VdFimResult fim{};
@@ -387,9 +641,11 @@ int runSelfCheck(const QString &fixtureDir)
         QThread::msleep(1);
     }
     check("ffi.fim.disabled-by-default", fimStatus == VD_STATUS_READY && fim.state == 0);
+    noteAbiCall();
     vd_fim_result_free(&fim);
 
     // 6/7 VCS: the fixture lives inside this repository, so Git is detected.
+    noteAbiCall();
     const quint64 vcsJob = vd_vcs_status(service, fixturePath.constData());
     check("ffi.vcs.start", vcsJob != 0);
     VdVcsStatus vcs{};
@@ -401,6 +657,7 @@ int runSelfCheck(const QString &fixtureDir)
         QThread::msleep(1);
     }
     check("ffi.vcs.backend-detected", vcsStatus == VD_STATUS_READY && vcs.backend == 1);
+    noteAbiCall();
     vd_vcs_status_free(&vcs);
 
     // 7/7 settings: write and read back through the ABI.
@@ -411,6 +668,7 @@ int runSelfCheck(const QString &fixtureDir)
     const QByteArray settingKey = QByteArrayLiteral("theme");
     const QByteArray settingValue = QByteArrayLiteral("Breeze Dark");
     const VdSettingInput setting{settingKey.constData(), settingValue.constData()};
+    noteAbiCall();
     const quint64 saveJob = vd_settings_save(service, settingsPath.constData(), &setting, 1);
     check("ffi.settings.save.start", saveJob != 0);
     VdSettings saved{};
@@ -422,8 +680,10 @@ int runSelfCheck(const QString &fixtureDir)
         QThread::msleep(1);
     }
     check("ffi.settings.save.ready", saveStatus == VD_STATUS_READY);
+    noteAbiCall();
     vd_settings_free(&saved);
 
+    noteAbiCall();
     const quint64 loadJob = vd_settings_load(service, settingsPath.constData());
     check("ffi.settings.load.start", loadJob != 0);
     VdSettings loaded{};
@@ -441,8 +701,10 @@ int runSelfCheck(const QString &fixtureDir)
     } else {
         check("ffi.settings.round-trip", false);
     }
+    noteAbiCall();
     vd_settings_free(&loaded);
 
+    noteAbiCall();
     vd_service_destroy(service);
     std::printf("FFI-ABI-SELFTEST ok=%d checks=%d failures=%d\n", g_failures == 0 ? 1 : 0,
                 g_checks, g_failures);
@@ -573,12 +835,24 @@ int main(int argc, char **argv)
         return captureScreenshots(parser.value(QStringLiteral("screenshots")));
     }
 
+    // Session restore is deferred until the lanes registered their panel
+    // factories: setFactory() only affects FUTURE inserts, so restoring during
+    // construction left every restored dock a shell placeholder (review M1 --
+    // terminal and search). startSession() runs once the factories are ready.
+    options.deferSessionRestore = true;
     ApplicationShell shell(options);
+#if defined(VEDIT_HAVE_EDIT_CORE)
+    // Slice 1 (AC-S1.1): the product editor is the KTextEditor editing kernel.
+    // A deferred start makes the restored panes use it directly (no re-creation
+    // of the demo pane).
+    shell.setEditorProvider(vedit::editor::makeEditCoreProvider());
+#endif
     vedit::workspace::installPanels(shell, {options.projectRoot, options.stateDir});
     // Terminal panel lane (T35): the shell created the "terminal" panel spec with
     // an empty factory; the widget lives in the terminal lane.
     shell.panels()->setFactory(QStringLiteral("terminal"),
                                vedit::terminal::terminalPanelFactory());
+    shell.startSession();
     shell.show();
 
     const int holdMs = parser.value(QStringLiteral("hold")).toInt();

@@ -38,17 +38,28 @@ public:
     bool isActive() const;
     void setOnFocusRequested(std::function<void(EditorPane *)> callback);
 
+    // Replaces the pane's editor widget with one created by `provider`, keeping
+    // the pane and the split layout. Needed because the shell builds its first
+    // pane before main() installs the real editor provider (edit-core).
+    void setProvider(EditorProvider *provider);
+    EditorProvider *provider() const;
+    bool openFile(const QString &absolutePath, QString *error = nullptr);
+    QString currentFilePath() const;
+    bool saveFile(QString *error = nullptr);
+
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
     void updateHeader();
+    void replaceEditorWidget(QWidget *editor);
 
     QString paneId_;
     EditorProvider *provider_ = nullptr;
     QLabel *header_ = nullptr;
     QWidget *editor_ = nullptr;
+    QVBoxLayout *layout_ = nullptr;
     std::function<void(EditorPane *)> onFocusRequested_;
     bool active_ = false;
 };
