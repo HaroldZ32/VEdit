@@ -54,8 +54,13 @@ chmod +x VEdit-0.1.1-x86_64.run && ./VEdit-0.1.1-x86_64.run
 1. 启动后 `Ctrl+O` 打开一个 `.sv`/`.v` 文件，或直接把文件路径作为参数；
 2. 底部状态栏依次显示：光标位置、文件路径、语言（`systemverilog`/`verilog`）、
    verible 诊断数、slang 诊断数、FIM 状态、LSP 进程状态；
-3. 打开工程：从工程目录里的任意文件打开即可。工程根是**最近的包含 `vedit.toml` 或 `.git`
-   的祖先目录**；在此之上的 `.rules.verible_lint` 与 `*.f` filelist 会被自动发现；
+3. 打开工程：从工程目录里的任意文件打开即可。工程根**从打开位置向上逐级查找**：在每一级
+   依次看 `vedit.toml`（优先）→ `.git` → 该目录是否**直接包含 `*.f`**，命中的第一级即工程根
+   （来源依次报告为 `vedit_toml` / `git_dir` / `filelist`，都没命中的退化为起始目录 `fallback`）。
+   所以一个只带 `project.f` 的目录本身也算工程根，即使它位于更大的 git 仓库内部：从该目录打开
+   时根就是它自己（`filelist`），而从外层仓库打开时根仍是外层（`git_dir`），嵌套的 `.f` 不会把根
+   改到子目录；同一目录同时有 `.git` 与 `*.f` 时根不变，来源按更强的 `.git` 报 `git_dir`。
+   在此之上的 `.rules.verible_lint` 与 `*.f` filelist 会被自动发现；
 4. 语法高亮是自动的（按扩展名），主题默认 `cobalt`，可在 `[ui] theme` 改。
 
 编辑能力：多标签（`Ctrl+N` 新建、`Ctrl+W` 关闭、未保存会确认）、原生撤销/重做、
@@ -173,7 +178,7 @@ accept-fim = "Tab"
 | 内容 | 位置 |
 |---|---|
 | 用户配置 | `$XDG_CONFIG_HOME/vedit/vedit.toml`（默认 `~/.config/vedit/vedit.toml`） |
-| 工程配置 | `<工程根>/vedit.toml`（工程根 = 最近的含 `vedit.toml` 或 `.git` 的祖先目录） |
+| 工程配置 | `<工程根>/vedit.toml`（工程根 = 从打开位置向上第一个命中 `vedit.toml` / `.git` / 直接含 `*.f` 的目录；同一级优先 `vedit.toml` > `.git` > `*.f`） |
 | Verible lint 规则 | `<工程根>/.rules.verible_lint`（无则用 Verible 默认） |
 | filelist | `<工程根>/*.f`，以及 `[project] filelists` 里列出的 |
 | GtkSourceView 数据 | 包内 `share/gtksourceview-4/`（启动脚本导出 `VEDIT_GSV_DATADIR`） |
