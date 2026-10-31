@@ -19,6 +19,7 @@
 #include <QDir>
 #include <QDockWidget>
 #include <QElapsedTimer>
+#include <QFile>
 #include <QImage>
 #include <QKeyEvent>
 #include <QLabel>
@@ -42,13 +43,14 @@ namespace {
 int g_checks = 0;
 int g_failures = 0;
 
-void check(const char *name, bool ok)
+void check(const char *name, bool ok, const QString &detail = QString())
 {
     ++g_checks;
     if (!ok) {
         ++g_failures;
     }
-    std::printf("CHECK %s %s\n", name, ok ? "PASS" : "FAIL");
+    std::printf("CHECK %s %s%s%s\n", name, ok ? "PASS" : "FAIL",
+                detail.isEmpty() ? "" : " ", qPrintable(detail));
     std::fflush(stdout);
 }
 
@@ -334,6 +336,103 @@ void checkPtyBadShell()
     check("pty.bad-shell.not-running", !session.isRunning());
 }
 
+// Review M2: the child must not inherit the master side of its own pty. The
+// fork()ed child gets a copy of every open fd, and only the slave belongs there;
+// a master left open survives execve() into the shell and every process it starts
+// (/proc/<pid>/fd shows `/dev/pts/ptmx`).
+void checkPtyMasterFdNotInherited()
+{
+    PtySession session;
+    QString error;
+    const bool started = session.start(QStringLiteral("/bin/sh"), QString(), QStringList(), 80, 24, &error);
+    check("pty.master-fd.start", started, error);
+    if (!started) {
+        return;
+    }
+    pump(100);
+    const QDir fdDirectory(QStringLiteral("/proc/%1/fd").arg(session.pid()));
+    check("pty.master-fd.readable", fdDirectory.exists(), fdDirectory.path());
+    QStringList inherited;
+    QStringList links;
+    if (fdDirectory.exists()) {
+        const QStringList entries = fdDirectory.entryList(QDir::NoDotAndDotDot | QDir::AllEntries);
+        for (const QString &entry : entries) {
+            const QString target = QFile::symLinkTarget(fdDirectory.filePath(entry));
+            links.append(QStringLiteral("%1->%2").arg(entry, target));
+            if (target.contains(QStringLiteral("ptmx"))) {
+                inherited.append(QStringLiteral("%1->%2").arg(entry, target));
+            }
+        }
+    }
+    check("pty.master-fd.not-inherited", inherited.isEmpty(),
+          inherited.isEmpty() ? links.join(QStringLiteral(", ")) : inherited.join(QStringLiteral(", ")));
+    session.write("exit 0\r");
+    waitFor([&session]() { return !session.isRunning(); });
+}
+
+// Review M2, descendant half: the shell's children inherit the shell's fd table,
+// so this session makes the shell spawn one and list ITS /proc/<pid>/fd. A master
+// left open by the forked child ends up here too (`/dev/pts/ptmx`).
+void checkPtyMasterFdDescendants()
+{
+    PtySession session;
+    QByteArray output;
+    QObject::connect(&session, &PtySession::outputReady, &session,
+                     [&output](const QByteArray &data) { output += data; });
+    QString error;
+    const bool started =
+        session.start(QStringLiteral("/bin/sh"), QString(),
+                      QStringList{QStringLiteral("-c"),
+                                  QStringLiteral("sleep 20 & ls -l /proc/$!/fd; kill $!")},
+                      80, 24, &error);
+    check("pty.master-fd.descendant-start", started, error);
+    if (!started) {
+        return;
+    }
+    waitFor([&session]() { return !session.isRunning(); }, 20000);
+    QString text = QString::fromLocal8Bit(output);
+    text.replace(QChar('\r'), QChar(' '));
+    text.replace(QChar('\n'), QChar(' '));
+    check("pty.master-fd.descendant-listed", text.contains(QStringLiteral("/dev/pts/")),
+          text.left(300));
+    check("pty.master-fd.descendant-not-inherited", !text.contains(QStringLiteral("ptmx")),
+          text.left(300));
+}
+
+// Review M3: a producer that never stops (`yes`, `cat /dev/zero`) must not keep
+// readAvailable() inside its read loop. Each activation is bounded by
+// PtySession::readChunkLimit(); the residue is rescheduled and still delivered.
+void checkPtyReadLimit()
+{
+    PtySession session;
+    qint64 delivered = 0;
+    QObject::connect(&session, &PtySession::outputReady, &session,
+                     [&delivered](const QByteArray &data) { delivered += data.size(); });
+    const qint64 produced = 4 * 1024 * 1024;
+    QString error;
+    const bool started =
+        session.start(QStringLiteral("/bin/sh"), QString(),
+                      QStringList{QStringLiteral("-c"),
+                                  QStringLiteral("head -c %1 /dev/zero | tr '\\0' x").arg(produced)},
+                      200, 50, &error);
+    check("pty.read-limit.start", started, error);
+    if (!started) {
+        return;
+    }
+    const bool finished = waitFor([&session]() { return !session.isRunning(); }, 30000);
+    pump(200);
+    check("pty.read-limit.finished", finished);
+    check("pty.read-limit.delivered", delivered >= produced,
+          QStringLiteral("delivered=%1 produced=%2").arg(delivered).arg(produced));
+    check("pty.read-limit.max-per-activation",
+          session.maxBytesPerActivation() <= PtySession::readChunkLimit(),
+          QStringLiteral("max=%1 limit=%2")
+              .arg(session.maxBytesPerActivation())
+              .arg(PtySession::readChunkLimit()));
+    check("pty.read-limit.cap-engaged", session.cappedActivations() > 0,
+          QStringLiteral("capped=%1").arg(session.cappedActivations()));
+}
+
 // --- the panel --------------------------------------------------------------
 
 void checkPanelRuns()
@@ -571,6 +670,9 @@ int runSelfCheck()
     checkPtyInteractive();
     checkPtyResize();
     checkPtyBadShell();
+    checkPtyMasterFdNotInherited();
+    checkPtyMasterFdDescendants();
+    checkPtyReadLimit();
     checkPanelRuns();
     checkPanelExitStatusVisible();
     checkPanelRestart();

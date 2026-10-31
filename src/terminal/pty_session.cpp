@@ -139,7 +139,10 @@ bool PtySession::start(const QString &shell,
     plan.envp.push_back(nullptr);
 
     errno = 0;
-    const int master = ::posix_openpt(O_RDWR | O_NOCTTY);
+    // O_CLOEXEC: the master must not survive an execve() into the shell or any
+    // process the shell starts (review M2). The child below also closes it
+    // explicitly, so a child that fails before execve() does not keep it either.
+    const int master = ::posix_openpt(O_RDWR | O_NOCTTY | O_CLOEXEC);
     if (master < 0) {
         return fail(QStringLiteral("posix_openpt failed: %1").arg(QString::fromLocal8Bit(::strerror(errno))));
     }
@@ -181,6 +184,9 @@ bool PtySession::start(const QString &shell,
         if (slave > STDERR_FILENO) {
             ::close(slave);
         }
+        // The master is the parent's side of the pair: the child must not carry it
+        // into the shell (review M2). Only the slave's 0/1/2 remain.
+        ::close(master);
         if (!plan.workingDirectory.empty()) {
             if (::chdir(plan.workingDirectory.c_str()) != 0) {
                 // Keep the shell at the inherited directory; the prompt shows it.
@@ -278,10 +284,30 @@ void PtySession::terminate()
 
 void PtySession::readAvailable()
 {
+    if (master_ < 0) {
+        return;
+    }
+    // Review M3: one activation reads at most readChunkLimit() bytes, then hands
+    // control back to the event loop. A fast producer (`yes`, `cat /dev/zero`)
+    // keeps the kernel pty buffer full, so without this bound the read loop never
+    // reaches EAGAIN and the UI stops responding; the residue is picked up by the
+    // rescheduled pass below (backpressure, nothing is dropped).
+    qint64 activationBytes = 0;
+    bool capped = false;
     char buffer[8192];
     for (;;) {
-        const ssize_t count = ::read(master_, buffer, sizeof buffer);
+        const qint64 remaining = readChunkLimit() - activationBytes;
+        if (remaining <= 0) {
+            capped = true;
+            break;
+        }
+        // Never ask for more than the remaining budget, so an activation cannot
+        // overshoot the limit by a read.
+        const size_t want =
+            static_cast<size_t>(std::min<qint64>(static_cast<qint64>(sizeof buffer), remaining));
+        const ssize_t count = ::read(master_, buffer, want);
         if (count > 0) {
+            activationBytes += count;
             emit outputReady(QByteArray(buffer, static_cast<int>(count)));
             continue;
         }
@@ -289,18 +315,34 @@ void PtySession::readAvailable()
             // EOF: the slave side is gone; the child is being reaped by the timer.
             stopNotifier();
             pollChild();
-            return;
+            break;
         }
         if (errno == EINTR) {
             continue;
         }
         if (errno == EAGAIN || errno == EWOULDBLOCK) {
-            return;
+            break;
         }
         // EIO is the normal "all writers closed" result on Linux ptys.
         stopNotifier();
         pollChild();
-        return;
+        break;
+    }
+    noteActivation(activationBytes, capped);
+    if (capped) {
+        // Requeue instead of looping: the event loop (input, timers, painting)
+        // runs between the passes, and the next pass drains the next chunk.
+        QTimer::singleShot(0, this, [this]() { readAvailable(); });
+    }
+}
+
+void PtySession::noteActivation(qint64 bytes, bool capped)
+{
+    if (bytes > maxBytesPerActivation_) {
+        maxBytesPerActivation_ = bytes;
+    }
+    if (capped) {
+        ++cappedActivations_;
     }
 }
 
@@ -335,6 +377,10 @@ void PtySession::finalize(int status)
     if (pollTimer_ != nullptr) {
         pollTimer_->stop();
     }
+    // A child can exit while output is still buffered in the pty (a big `printf`
+    // followed by `exit`). Drain that tail before the master is closed; the read
+    // is bounded by readChunkLimit() like every other activation.
+    readAvailable();
     stopNotifier();
     closeMaster();
     emit finished(exitCode_, terminationSignal_, exitDescription());

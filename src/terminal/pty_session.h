@@ -46,6 +46,16 @@ public:
     qint64 pid() const { return pid_; }
     QString shellPath() const { return shellPath_; }
 
+    // Output-read budget for ONE notifier activation (review M3). A shell that
+    // floods the terminal (`yes`, `cat /dev/zero`) must not keep readAvailable()
+    // inside its read loop: after this many bytes control returns to the event
+    // loop, the residue stays in the pty buffer (kernel backpressure) and the
+    // next pass reads it. Observability for the selftest: the largest activation
+    // seen and how often the budget was reached.
+    static constexpr qint64 readChunkLimit() { return 64 * 1024; }
+    qint64 maxBytesPerActivation() const { return maxBytesPerActivation_; }
+    qint64 cappedActivations() const { return cappedActivations_; }
+
     // Exit status as the shell reports it: the child's own code when it exited
     // normally, 128 + signal when it was killed, -1 while unknown.
     int exitCode() const { return exitCode_; }
@@ -67,6 +77,7 @@ private:
     void stopNotifier();
     void closeMaster();
     void finalize(int status);
+    void noteActivation(qint64 bytes, bool capped);
     static QString signalName(int signal);
 
     int master_ = -1;
@@ -75,6 +86,8 @@ private:
     bool exitKnown_ = false;
     int exitCode_ = -1;
     int terminationSignal_ = 0;
+    qint64 maxBytesPerActivation_ = 0;
+    qint64 cappedActivations_ = 0;
     QString shellPath_;
     QSocketNotifier *notifier_ = nullptr;
     QSocketNotifier *writeNotifier_ = nullptr;
