@@ -149,8 +149,32 @@ cargo metadata --format-version 1 --all-features > meta.json
 | `pkg-config ... gtksourceview-4 not found` | 在宿主直接 `cargo build` 了；GTK 栈只在 pinned 镜像里存在，用 `bash scripts/build.sh` |
 | `glibc gate` 失败 | 某个 ELF 的符号需求 > 2.17：通常是误用了宿主预编译库，检查捆绑来源 |
 | `RUNPATH` gate 报 `UNKNOWN` | 新增了绝对路径依赖；若确属上游自带，把理由写进 `rpath-allowlist.txt` 再放行 |
-| `verible-verilog-ls` 找不到 | 运行期只按"配置 → 环境变量 → 包内路径"解析，**不查 PATH**；用 `VEDIT_VERIBLE_DIR` 指向目录 |
+| `verible-verilog-ls` / `slang` 找不到 | 运行期按 **随包 → 本地取 → PATH → env** 解析（见 §10.1）；裸构建里先跑 `bash scripts/fetch-verible.sh` 与 `bash build/slang/build.sh`，或用 `VEDIT_VERIBLE_LS` / `VEDIT_SLANG` 指定 |
 | `--selftest all` 失败在 `lsp` 的 definition 检查 | 运行目录里没有 fixtures：设置 `VEDIT_SELFTEST_FIXTURES=<share>/vedit/testdata` |
+
+### 10.1 运行期工具链发现（诊断 / 大纲：随包 / 本地取 / env）
+
+`vedit-app` 的诊断/大纲面板需要 `verible-verilog-ls`（LSP）与 `slang`（deep lint）。
+解析顺序固定为 **bundled → local checkout → PATH → env**，并把结果打印出来
+（`--selfcheck` 的 `TOOLCHAIN source=verible:<source> slang:<source> missing=[...] local=[...]`）：
+
+1. **随包（bundled）**：把两个二进制放进 `vd-app` 同目录的 `bin/`（AppDir/AppImage
+   形态；打包后不需要任何额外配置）。
+2. **本地取（local checkout，裸构建用这条）**：在源码树里执行
+   ```sh
+   bash scripts/fetch-verible.sh     # -> target/verible-pin/extract/verible-*/bin/
+                                     #    以及 .mpd/recon/verible/bin/ 链接
+   bash build/slang/build.sh         # -> build/slang/out/slang
+   ```
+   解析器从 `target/qt6-build/src/app/vedit-app` 向上找到 checkout 根（标记
+   `scripts/fetch-verible.sh`）后自动探测上述产物，**不需要设置任何环境变量**。
+3. **env 指定**：`VEDIT_VERIBLE_LS=/path/verible-verilog-ls`、
+   `VEDIT_SLANG=/path/slang`（也支持 `VEDIT_VERIBLE_LS_DIR` / `VEDIT_SLANG_DIR`
+   指向目录）。
+
+缺工具时，diagnostics/outline 面板只显示**一条**面板级状态（缺什么、影响什么、
+三条修复路径），outline 保持空表 + 一行原因；不会按文件/请求重复报错，也不把
+“环境未满足”当作文件级 Error。
 
 ## 11. GitHub Actions（CI / 镜像 / 发版）
 

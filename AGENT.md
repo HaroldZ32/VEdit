@@ -57,6 +57,32 @@ CentOS 7 image, because the deliverable must run on CentOS 7 (glibc 2.17).
 The slang deep-lint binary has its own one-command build:
 `bash build/slang/build.sh`.
 
+### Runtime toolchain discovery (diagnostics / outline)
+
+The diagnostics and outline panels need `verible-verilog-ls` (LSP) and `slang`
+(deep lint). Resolution order is **bundled > local checkout > PATH > env**, and
+the chosen source is reported (`TOOLCHAIN source=verible:... slang:... missing=[...]`
+from `--selfcheck`; the same line names the local candidates as `local=[...]`).
+Three ways to satisfy it, in delivery order:
+
+1. **bundled** — put `verible-verilog-ls` / `slang` in the product's `bin/` next
+   to `vd-app` (the AppDir/AppImage form; nothing else is needed);
+2. **local checkout** — in a source tree, `bash scripts/fetch-verible.sh`
+   (produces `target/verible-pin/extract/verible-*/bin/`, also linked as
+   `.mpd/recon/verible/bin/`) and `bash build/slang/build.sh` (produces
+   `build/slang/out/slang`). A **bare build**
+   (`target/qt6-build/src/app/vedit-app`) picks both up automatically: the
+   resolver walks up from the binary to the checkout root (marker
+   `scripts/fetch-verible.sh`) and probes those artifacts;
+3. **env** — `VEDIT_VERIBLE_LS=/path/to/verible-verilog-ls`,
+   `VEDIT_SLANG=/path/to/slang` (or the `_DIR` forms `VEDIT_VERIBLE_LS_DIR`,
+   `VEDIT_SLANG_DIR` naming the directory).
+
+When a tool is missing, the panels show **one** concise status line (what is
+missing, what it disables, the three fixes); the outline stays an empty table
+with a one-line reason — a missing environment is never rendered as per-file
+errors.
+
 Dependency ownership: the root `Cargo.toml`, `Cargo.lock` and
 `rust-toolchain.toml` are workspace-level and owned by the skeleton task. The
 lane crates ship with their dependencies pre-installed, so a lane must not add a
