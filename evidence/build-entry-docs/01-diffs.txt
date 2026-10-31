@@ -1,0 +1,94 @@
+generated: 2026-10-31T14:19:09Z
+git_head: c71fe31478887e3dc7c460f875ccfb93e61c0ec4
+git_status_porcelain:
+ M AGENT.md
+ M build/evidence/typecheck/00-run.txt
+ M build/evidence/typecheck/10-typecheck-image-build.log
+ M build/evidence/typecheck/11-typecheck-image-id.txt
+ M docs/BUILD.md
+ M docs/USER_GUIDE.md
+ M evidence/ffi-abi/logs/10-rust-image.txt
+ M evidence/ffi-abi/logs/19-rust-stage-console.log
+ M evidence/ffi-abi/logs/20-cargo-build-release.log
+ M evidence/ffi-abi/logs/21-staticlib.txt
+ M evidence/ffi-abi/logs/23-cargo-test.log
+ M evidence/m0-build/build-logs/20-qt6-image-build.log
+ M evidence/m0-build/build-logs/21-qt6-image-id.txt
+ M evidence/m0-build/build-logs/31-qt6-configure.log
+ M evidence/m0-build/build-logs/32-qt6-build.log
+ M evidence/m0-build/build-logs/34-qt6-elf.txt
+?? evidence/glibc217-feasibility/
+?? evidence/user-guide-split/
+?? evidence/verdicts/fix-shell-terminal/
+?? evidence/verdicts/search-jump-kte/
+?? evidence/verdicts/user-guide/
+---
+== unified diffs (pre-edit snapshot -> current) ==
+
+### AGENT.md
+--- target/be/AGENT.before.md	2026-10-31 22:18:30.454886051 +0800
++++ AGENT.md	2026-10-31 22:18:42.179676663 +0800
+@@ -35,9 +35,17 @@
+ - Install dependencies: none on the host. The pinned image (base digest, Rust
+   1.99.0, GtkSourceView 4.6.1, meson/ninja) is built by `bash scripts/build.sh`;
+   every download's sha256 is pinned in `scripts/versions.env`.
+-- Build: `bash scripts/build.sh` (one command: pinned image ->
+-  `cargo build --release --workspace` -> ELF assertion that the highest GLIBC
+-  symbol is <= 2.17 -> Xvfb `--selftest smoke` window check).
++- Build the **delivered Qt6 product** (v2): `bash scripts/build-qt.sh` ->
++  `target/qt6-build/src/app/vedit-app`. Its runtime needs the KF6/Qt6 shared
++  libraries, `libtree-sitter` 0.25 and the Qt platform plugins; the measured
++  package names are in `evidence/runtime-deps/REPORT.md` §1 and the build matrix
++  in `docs/BUILD.md` §12. **If you are verifying the v2 deliverable, use this
++  command.**
++- Build the **legacy Rust/GTK3 product**: `bash scripts/build.sh` (one command:
++  pinned image -> `cargo build --release --workspace` -> ELF assertion that the
++  highest GLIBC symbol is <= 2.17 -> Xvfb `--selftest smoke` window check). It
++  writes `target/release/vd-app` (copied to `build/artifacts/vd-app`) and
++  **never produces `vedit-app`**.
+   Gate wrapper: `bun run verify:gates`.
+ - Test: `bash scripts/gates.sh` runs `cargo test --workspace` (in the pinned
+   image when the host has no GTK development files).
+
+### docs/USER_GUIDE.md
+--- target/be/USER_GUIDE.before.md	2026-10-31 22:18:30.456153020 +0800
++++ docs/USER_GUIDE.md	2026-10-31 22:18:43.277730496 +0800
+@@ -49,6 +49,22 @@
+ - 退出时清理解包目录；调试时设 `VEDIT_KEEP_TMP=1` 可保留并打印路径；
+ - 参数原样传给编辑器（`--selftest all`、`--version` 等）。
+ 
++### 1.4 从源码得到 Qt6 构建（v2 交付物）
++
++§1.1–1.3 是**旧 GTK3 产物**的安装方式。要拿到 v2 的 Qt6 交付物，从源码构建：
++
++```sh
++bash scripts/build-qt.sh              # 固定镜像 → Rust 服务层 → configure → build → ctest → xcb 冒烟
++bash scripts/build-qt.sh --no-test    # 只 configure + build
++```
++
++产物是 **`target/qt6-build/src/app/vedit-app`**（CMake 构建树在 gitignored 的 `target/qt6-build/`）。
++`bash scripts/build.sh` 是**旧产品**：只产出 `target/release/vd-app`，**不产出 `vedit-app`**。
++
++把 `vedit-app` 放到另一台机器直接跑时，需要 KF6/Qt6 运行库、`libtree-sitter0.25` 和 Qt 平台插件
++（`libqxcb`）；实测包名见 `evidence/runtime-deps/REPORT.md` §1，构建期版本矩阵见 `docs/BUILD.md`
++§12.3。注意构建基线是 glibc 2.43，比它老的系统（含 CentOS 7）要连 glibc 一起打包（同文件 §2）。
++
+ ## 2. 第一次使用
+ 
+ 本文同时标注 **Qt6 产品** 与 **旧 GTK3 产物** 的差异：两者的命令行选项与工程根起点不同，
+
+### docs/BUILD.md
+--- target/be/BUILD.before.md	2026-10-31 22:18:30.457805739 +0800
++++ docs/BUILD.md	2026-10-31 22:18:44.441787567 +0800
+@@ -219,6 +219,11 @@
+ bash scripts/build-qt.sh --no-test    # 只 configure + build（即 C++ 静态检查）
+ ```
+ 
++**产物路径：`target/qt6-build/src/app/vedit-app`**（CMake 构建树 `target/qt6-build/` 已被 gitignore）。
++`bash scripts/build.sh` 是旧 Rust/GTK3 产品，只写 `target/release/vd-app`，不产出 `vedit-app`。
++运行期依赖（KF6/Qt6 运行库、`libtree-sitter0.25`、Qt 平台插件 `libqxcb`）的实测包名见
++`evidence/runtime-deps/REPORT.md` §1，运行期打包边界见本文件 §12.6。
++
+ 每一步的原始输出落在 **`evidence/m0-build/build-logs/`**（T10 的证据目录，随仓库提交）；
+ CMake 构建树在 gitignored 的 **`target/qt6-build/`**，探针目录在 `target/qt6-probe/`：
+ 

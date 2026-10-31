@@ -1,0 +1,43 @@
+generated: 2026-10-31T10:01:35Z
+git_head: 9957f5fe4d63c17c681e8753288262fa2c00955e
+git_status_porcelain:
+ M Cargo.toml
+?? crates/vd-search/
+?? crates/vd-settings/
+?? crates/vd-vcs/
+?? evidence/docs-amendments/
+?? evidence/fixture/
+?? scripts/verify-fixture.sh
+?? tests/fixtures/
+---
+[purpose] the acceptance script exits non-zero when the fixture or its expectations are wrong
+[method] each case runs against a throw-away copy of the fixture, never against the checked-in tree
+
+== case 1: expected/files.txt claims a source the filelist does not list ==
+[command] bash scripts/verify-fixture.sh --fixture <copy>/neg1
+exit=1
+  FAIL entries does not match expected/files.txt
+  20 passed, 1 failed, 1 skipped
+
+== case 2: a resolved source file is deleted ==
+[command] bash scripts/verify-fixture.sh --fixture <copy>/neg2
+exit=1
+  FAIL fixture tree is incomplete
+  FAIL resolved source entries are missing
+  19 passed, 2 failed, 1 skipped
+
+== case 3: a nested -f target is missing ==
+[command] bash scripts/verify-fixture.sh --fixture <copy>/neg3
+exit=1
+  FAIL filelists/tb.f:6 nested -f target 'nested/missing.f' does not exist
+  FAIL entries does not match expected/files.txt
+  FAIL source files are not covered by the filelists
+  19 passed, 3 failed, 1 skipped
+
+== case 4: an +incdir+ directory is deleted ==
+[command] bash scripts/verify-fixture.sh --fixture <copy>/neg4
+exit=1
+  FAIL fixture tree is incomplete
+  FAIL +incdir+ entries do not resolve
+  FAIL an included header is not reachable
+  18 passed, 3 failed, 1 skipped

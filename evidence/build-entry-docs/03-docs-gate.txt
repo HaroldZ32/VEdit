@@ -1,0 +1,30 @@
+generated: 2026-10-31T14:19:09Z
+git_head: c71fe31478887e3dc7c460f875ccfb93e61c0ec4
+git_status_porcelain:
+ M AGENT.md
+ M build/evidence/typecheck/00-run.txt
+ M build/evidence/typecheck/10-typecheck-image-build.log
+ M build/evidence/typecheck/11-typecheck-image-id.txt
+ M docs/BUILD.md
+ M docs/USER_GUIDE.md
+ M evidence/ffi-abi/logs/10-rust-image.txt
+ M evidence/ffi-abi/logs/19-rust-stage-console.log
+ M evidence/ffi-abi/logs/20-cargo-build-release.log
+ M evidence/ffi-abi/logs/21-staticlib.txt
+ M evidence/ffi-abi/logs/23-cargo-test.log
+ M evidence/m0-build/build-logs/20-qt6-image-build.log
+ M evidence/m0-build/build-logs/21-qt6-image-id.txt
+ M evidence/m0-build/build-logs/31-qt6-configure.log
+ M evidence/m0-build/build-logs/32-qt6-build.log
+ M evidence/m0-build/build-logs/34-qt6-elf.txt
+?? evidence/glibc217-feasibility/
+?? evidence/user-guide-split/
+?? evidence/verdicts/fix-shell-terminal/
+?? evidence/verdicts/search-jump-kte/
+?? evidence/verdicts/user-guide/
+---
+== declared gate ==
+
+$ bash build/gates/docs.sh
+[docs] PASS: README.md docs/BUILD.md docs/USER_GUIDE.md THIRD_PARTY_NOTICES.md
+EXIT=0

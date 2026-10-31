@@ -1,7 +1,7 @@
-[2026-10-30T02:42:49Z] build target: slang 12.1 (tag v12.1, commit 42710c788ce76cd08ce2080773e0b8286c428a05)
-[2026-10-30T02:42:49Z] container: CentOS Linux release 7.9.2009 (Core)
-[2026-10-30T02:42:49Z] installing devtoolset-11 + git/make/tar from https://mirrors.tuna.tsinghua.edu.cn/centos-vault/7.9.2009
-# toolchain inside the build container (2026-10-30T02:43:35Z)
+[2026-10-31T10:44:45Z] build target: slang 12.1 (tag v12.1, commit 42710c788ce76cd08ce2080773e0b8286c428a05)
+[2026-10-31T10:44:45Z] container: CentOS Linux release 7.9.2009 (Core)
+[2026-10-31T10:44:45Z] installing devtoolset-11 + git/make/tar from https://mirrors.tuna.tsinghua.edu.cn/centos-vault/7.9.2009
+# toolchain inside the build container (2026-10-31T10:45:29Z)
 ## container
 CentOS Linux release 7.9.2009 (Core)
 ## glibc
@@ -22,16 +22,16 @@ GNU bash, version 4.2.46(2)-release (x86_64-redhat-linux-gnu)
 ## cpus
 16
 /work/cache/Python-3.12.8.tgz: OK
-[2026-10-30T02:43:35Z] building CPython 3.12.8 (build-time code generator only)
-# build-time python (2026-10-30T02:44:15Z)
+[2026-10-31T10:45:29Z] building CPython 3.12.8 (build-time code generator only)
+# build-time python (2026-10-31T10:46:43Z)
 ## system python (CentOS 7 base): Python 2.7.5
 ## build-time python:
 Python 3.12.8
 ## executable: /opt/python3/bin/python3
 ## path: /opt/python3/bin/python3
 /work/cache/cmake-3.31.6-linux-x86_64.tar.gz: OK
-[2026-10-30T02:44:16Z] cmake: cmake version 3.31.6
-[2026-10-30T02:44:16Z] cloning https://github.com/MikePopoloski/slang.git at v12.1 (shallow)
+[2026-10-31T10:46:44Z] cmake: cmake version 3.31.6
+[2026-10-31T10:46:44Z] cloning https://github.com/MikePopoloski/slang.git at v12.1 (shallow)
 Note: checking out '42710c788ce76cd08ce2080773e0b8286c428a05'.
 
 You are in 'detached HEAD' state. You can look around, make experimental
@@ -43,14 +43,14 @@ do so (now or later) by using -b with the checkout command again. Example:
 
   git checkout -b new_branch_name
 
-# slang source provenance (2026-10-30T02:44:20Z)
+# slang source provenance (2026-10-31T10:46:49Z)
 repository=https://github.com/MikePopoloski/slang.git
 tag=v12.1
 pinned_commit=42710c788ce76cd08ce2080773e0b8286c428a05
 checked_out_commit=42710c788ce76cd08ce2080773e0b8286c428a05
 git_describe=v12.1
 working_tree_status_lines=0
-# applied patches (2026-10-30T02:44:20Z)
+# applied patches (2026-10-31T10:46:49Z)
 applied=0001-gcc11-libstdcxx-path-hash.patch sha256=09e985ec43e1a8e62b634e9a2a115d0621ef50d24a6f2e2a5c99b7633c9790d4
 ## resulting diff:
 diff --git a/include/slang/util/Hash.h b/include/slang/util/Hash.h
@@ -85,7 +85,7 @@ index d044c0a..aeb8cf9 100644
  template<typename CharT>
  struct hash<std::basic_string<CharT>> {
      using is_avalanching = void;
-[2026-10-30T02:44:20Z] configuring (Release, static libstdc++/libgcc)
+[2026-10-31T10:46:49Z] configuring (Release, static libstdc++/libgcc)
 -- CMake version: 3.31.6
 -- slang version: 12.1.0+0
 -- The CXX compiler identification is GNU 11.2.1
@@ -159,7 +159,7 @@ HEAD is now at 3017243... v3.4.0
 -- Performing Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY - Success
 -- Performing Test COMPILER_HAS_DEPRECATED_ATTR
 -- Performing Test COMPILER_HAS_DEPRECATED_ATTR - Success
--- Configuring done (15.6s)
+-- Configuring done (21.1s)
 -- Generating done (0.0s)
 CMake Warning:
   Manually-specified variables were not used by the project:
@@ -168,36 +168,36 @@ CMake Warning:
 
 
 -- Build files have been written to: /build/obj
-# FetchContent dependency checkouts (2026-10-30T02:44:36Z)
+# FetchContent dependency checkouts (2026-10-31T10:47:10Z)
 boost_regex-src commit=2b3ac0834f31086c6e3c0e0ceb8516e427d5c39d describe=boost-1.91.0
 fmt-src commit=1be298e1bd68957e4cd352e1f676f00e07dcfb57 describe=12.2.0
 mimalloc-src commit=d4881d338125e1cb7c47ba4cfb398d6f7c0c8d45 describe=v3.5.3
 tomlplusplus-src commit=30172438cee64926dc41fdd9c11fb3ba5b2ba9de describe=v3.4.0
-[2026-10-30T02:44:36Z] building target slang_driver with -j16
-[  0%] Building CXX object _deps/fmt-build/CMakeFiles/fmt.dir/src/format.cc.o
+[2026-10-31T10:47:10Z] building target slang_driver with -j16
 [  0%] Building CXX object _deps/mimalloc-build/CMakeFiles/mimalloc-obj.dir/src/static.c.o
+[  0%] Building CXX object _deps/fmt-build/CMakeFiles/fmt.dir/src/format.cc.o
 [  0%] Building CXX object _deps/fmt-build/CMakeFiles/fmt.dir/src/os.cc.o
 [  1%] Linking CXX static library ../../lib64/libfmt.a
 [  1%] Built target fmt
 [  1%] Built target mimalloc-obj
-[  1%] Generating syntax
 [  3%] Generating diagnostics
+[  3%] Generating syntax
+[  3%] Building CXX object source/CMakeFiles/slang_slang.dir/AllSyntax.cpp.o
+[  3%] Building CXX object source/CMakeFiles/slang_slang.dir/SyntaxClone.cpp.o
 [  4%] Building CXX object source/CMakeFiles/slang_slang.dir/TokenKind.cpp.o
-[  4%] Building CXX object source/CMakeFiles/slang_slang.dir/AllSyntax.cpp.o
 [  4%] Building CXX object source/CMakeFiles/slang_slang.dir/DiagCode.cpp.o
-[  4%] Building CXX object source/CMakeFiles/slang_slang.dir/SyntaxClone.cpp.o
-[  6%] Building CXX object source/CMakeFiles/slang_slang.dir/KnownSystemName.cpp.o
-[  7%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/AbstractFlowAnalysis.cpp.o
-[  7%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/AnalysisManager.cpp.o
-[  9%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/AnalyzedAssertion.cpp.o
-[  9%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/AnalyzedProcedure.cpp.o
-[  9%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/CaseDecisionDag.cpp.o
-[  9%] Building CXX object source/CMakeFiles/slang_slang.dir/VersionInfo.cpp.o
-[  9%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/DataFlowAnalysis.cpp.o
+[  4%] Building CXX object source/CMakeFiles/slang_slang.dir/VersionInfo.cpp.o
+[  4%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/AnalysisManager.cpp.o
+[  6%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/AnalyzedAssertion.cpp.o
+[  6%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/AnalyzedProcedure.cpp.o
+[  6%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/CaseDecisionDag.cpp.o
+[  7%] Building CXX object source/CMakeFiles/slang_slang.dir/KnownSystemName.cpp.o
+[  9%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/AbstractFlowAnalysis.cpp.o
 [ 10%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/ClockInference.cpp.o
+[ 10%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/DataFlowAnalysis.cpp.o
 [ 12%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/DFAResults.cpp.o
+[ 12%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/DriverTracker.cpp.o
 [ 14%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/ValueDriver.cpp.o
-[ 14%] Building CXX object source/CMakeFiles/slang_slang.dir/analysis/DriverTracker.cpp.o
 [ 14%] Building CXX object source/CMakeFiles/slang_slang.dir/diagnostics/DiagnosticClient.cpp.o
 [ 15%] Building CXX object source/CMakeFiles/slang_slang.dir/diagnostics/DiagnosticEngine.cpp.o
 [ 15%] Building CXX object source/CMakeFiles/slang_slang.dir/diagnostics/Diagnostics.cpp.o
@@ -324,24 +324,24 @@ tomlplusplus-src commit=30172438cee64926dc41fdd9c11fb3ba5b2ba9de describe=v3.4.0
 [100%] Building CXX object tools/driver/CMakeFiles/slang_driver.dir/slang_main.cpp.o
 [100%] Linking CXX executable ../../bin/slang
 [100%] Built target slang_driver
-# artifact (2026-10-30T02:46:13Z)
--rwxr-xr-x 1 root root 9526400 Oct 30 02:46 /work/out/slang
+# artifact (2026-10-31T10:48:50Z)
+-rwxr-xr-x 1 root root 9526400 Oct 31 10:48 /work/out/slang
 /work/out/slang: ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), dynamically linked (uses shared libs), BuildID[sha1]=8db83818f200644cede808a232bf79cd535ef68f, for GNU/Linux 2.6.32, stripped
 63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  /work/out/slang
 unstripped_bytes=12244592
 stripped_bytes=9526400
 ## ldd inside the build container:
-	linux-vdso.so.1 =>  (0x00007c1bb8ebc000)
-	libpthread.so.0 => /lib64/libpthread.so.0 (0x00007c1bb89e4000)
-	libm.so.6 => /lib64/libm.so.6 (0x00007c1bb86e2000)
-	libc.so.6 => /lib64/libc.so.6 (0x00007c1bb8314000)
-	/lib64/ld-linux-x86-64.so.2 (0x00007c1bb8c00000)
-# phase durations (2026-10-30T02:46:13Z)
-started_utc=2026-10-30T02:42:49Z
-finished_utc=2026-10-30T02:46:13Z
-yum_install_s=46
-configure_s=16
-compile_link_s=97
-total_s=204
+	linux-vdso.so.1 =>  (0x0000714a10c3a000)
+	libpthread.so.0 => /lib64/libpthread.so.0 (0x0000714a107e4000)
+	libm.so.6 => /lib64/libm.so.6 (0x0000714a104e2000)
+	libc.so.6 => /lib64/libc.so.6 (0x0000714a10114000)
+	/lib64/ld-linux-x86-64.so.2 (0x0000714a10a00000)
+# phase durations (2026-10-31T10:48:50Z)
+started_utc=2026-10-31T10:44:45Z
+finished_utc=2026-10-31T10:48:50Z
+yum_install_s=44
+configure_s=21
+compile_link_s=100
+total_s=245
 cpus=16
-[2026-10-30T02:46:13Z] BUILD DONE: 63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  /work/out/slang
+[2026-10-31T10:48:50Z] BUILD DONE: 63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  /work/out/slang

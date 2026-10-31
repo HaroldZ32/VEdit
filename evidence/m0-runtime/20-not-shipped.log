@@ -1,0 +1,28 @@
+== verify-not-shipped ==
+appdir: /home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/AppDir
+CHECK PASS  no KDE systemverilog.xml / verilog.xml by sha256
+CHECK PASS  no file named systemverilog.xml / verilog.xml
+CHECK PASS  no syntax-bundled/ directory (F2 C5)
+CHECK PASS  active definitions == whitelist [SystemVerilog,Verilog]
+-- shipped library: /home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/AppDir/lib/libKF6SyntaxHighlighting.so.6
+   sha256: aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
+   detector: zstd scanner (evidence/r2-ksh-embedded/scan-embedded-defs.py)
+CHECK PASS  library embeds no strict-GPL syntax definition
+   == embedded-definition scan ==
+   library   : /home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/AppDir/lib/libKF6SyntaxHighlighting.so.6
+   size      : 696480 B
+   sha256    : aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
+   resource names (utf-16le): xml=0 theme=30
+   zstd frames parsed as definitions: 0
+   license classes: {}
+   strict-GPL definitions embedded: 0
+     INFO SystemVerilog: not found among parsed definitions
+     INFO Verilog: not found among parsed definitions
+   RESULT: PASS - no strict-GPL definition embedded
+CHECK PASS  no probe stamp
+CHECK PASS  packaged loader present
+CHECK PASS  packaged libc present
+
+== summary: pass=8 fail=0 expected_red=0 ==
+DELIVERY_BLOCKED=no
+not-shipped exit=0

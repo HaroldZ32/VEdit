@@ -1,0 +1,5 @@
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+STEPS4 keys chars=0 steps_to_stable=0 verdict=FAIL
+STEPS4 prog_with_events chars=10 steps=1 verdict=FAIL

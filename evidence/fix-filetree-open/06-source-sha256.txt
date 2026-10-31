@@ -1,0 +1,8 @@
+# T39 source revision under test (sha256)
+date: 2026-10-31T18:31:06+08:00
+head: 9957f5fe4d63c17c681e8753288262fa2c00955e
+43da23c2d60907bb50c2286dd9089186f1294777f9a7145bb321d2ed38be39bd  src/workspace/filetree/filetree_integration.cpp
+2230cfab05649f77281e3b3be7bc96b86f426da003856d847fc27d25ce66cabb  src/workspace/filetree/filetree_integration.h
+02de30fab36e0bbe1887f15ceefdcd22d0bfb5e69f11d241c8f35555816137dc  src/workspace/filetree/tools/rootcheck/seamcheck.cpp
+8e7d6f5202b95cbadf9aab8503cdc0647e13229df4854509e70800d2a80d33e3  src/workspace/filetree/tools/rootcheck/CMakeLists.txt
+ba9f3993c517e3fa9d72becbc033c9f97f4ead12e532229986fc2cac1729df1a  src/workspace/filetree/tests/filetree_tests.cpp

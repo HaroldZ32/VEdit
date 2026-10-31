@@ -1,0 +1,4 @@
+inc
+inc/generated
+rtl/include
+tb/include

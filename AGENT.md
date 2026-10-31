@@ -35,9 +35,17 @@ CentOS 7 image, because the deliverable must run on CentOS 7 (glibc 2.17).
 - Install dependencies: none on the host. The pinned image (base digest, Rust
   1.99.0, GtkSourceView 4.6.1, meson/ninja) is built by `bash scripts/build.sh`;
   every download's sha256 is pinned in `scripts/versions.env`.
-- Build: `bash scripts/build.sh` (one command: pinned image ->
-  `cargo build --release --workspace` -> ELF assertion that the highest GLIBC
-  symbol is <= 2.17 -> Xvfb `--selftest smoke` window check).
+- Build the **delivered Qt6 product** (v2): `bash scripts/build-qt.sh` ->
+  `target/qt6-build/src/app/vedit-app`. Its runtime needs the KF6/Qt6 shared
+  libraries, `libtree-sitter` 0.25 and the Qt platform plugins; the measured
+  package names are in `evidence/runtime-deps/REPORT.md` §1 and the build matrix
+  in `docs/BUILD.md` §12. **If you are verifying the v2 deliverable, use this
+  command.**
+- Build the **legacy Rust/GTK3 product**: `bash scripts/build.sh` (one command:
+  pinned image -> `cargo build --release --workspace` -> ELF assertion that the
+  highest GLIBC symbol is <= 2.17 -> Xvfb `--selftest smoke` window check). It
+  writes `target/release/vd-app` (copied to `build/artifacts/vd-app`) and
+  **never produces `vedit-app`**.
   Gate wrapper: `bun run verify:gates`.
 - Test: `bash scripts/gates.sh` runs `cargo test --workspace` (in the pinned
   image when the host has no GTK development files).
@@ -48,6 +56,32 @@ CentOS 7 image, because the deliverable must run on CentOS 7 (glibc 2.17).
 
 The slang deep-lint binary has its own one-command build:
 `bash build/slang/build.sh`.
+
+### Runtime toolchain discovery (diagnostics / outline)
+
+The diagnostics and outline panels need `verible-verilog-ls` (LSP) and `slang`
+(deep lint). Resolution order is **bundled > local checkout > PATH > env**, and
+the chosen source is reported (`TOOLCHAIN source=verible:... slang:... missing=[...]`
+from `--selfcheck`; the same line names the local candidates as `local=[...]`).
+Three ways to satisfy it, in delivery order:
+
+1. **bundled** — put `verible-verilog-ls` / `slang` in the product's `bin/` next
+   to `vd-app` (the AppDir/AppImage form; nothing else is needed);
+2. **local checkout** — in a source tree, `bash scripts/fetch-verible.sh`
+   (produces `target/verible-pin/extract/verible-*/bin/`, also linked as
+   `.mpd/recon/verible/bin/`) and `bash build/slang/build.sh` (produces
+   `build/slang/out/slang`). A **bare build**
+   (`target/qt6-build/src/app/vedit-app`) picks both up automatically: the
+   resolver walks up from the binary to the checkout root (marker
+   `scripts/fetch-verible.sh`) and probes those artifacts;
+3. **env** — `VEDIT_VERIBLE_LS=/path/to/verible-verilog-ls`,
+   `VEDIT_SLANG=/path/to/slang` (or the `_DIR` forms `VEDIT_VERIBLE_LS_DIR`,
+   `VEDIT_SLANG_DIR` naming the directory).
+
+When a tool is missing, the panels show **one** concise status line (what is
+missing, what it disables, the three fixes); the outline stays an empty table
+with a one-line reason — a missing environment is never rendered as per-file
+errors.
 
 Dependency ownership: the root `Cargo.toml`, `Cargo.lock` and
 `rust-toolchain.toml` are workspace-level and owned by the skeleton task. The

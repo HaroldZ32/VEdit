@@ -1,0 +1,72 @@
+# AC-0.4: only the FFI crate opens unsafe; every other crate's lint is unchanged.
+# collection: 2026-10-31T10:20:48Z rev=9957f5fe4d63c17c681e8753288262fa2c00955e
+
+$ git show HEAD:Cargo.toml | sed -n "/\[workspace.lints/,/^$/p"
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+
+$ sed -n "/\[workspace.lints/,/^$/p" Cargo.toml     # current tree: identical
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+
+$ git diff Cargo.toml        # the only change is the four new workspace members
+diff --git a/Cargo.toml b/Cargo.toml
+index a1ede26..9203869 100644
+--- a/Cargo.toml
++++ b/Cargo.toml
+@@ -13,6 +13,12 @@ members = [
+     "crates/vd-fim",
+     "crates/vd-lsp",
+     "crates/vd-syntax",
++    # Slice 0 service layer (T4): the C ABI seam plus the search/VCS/settings
++    # backends it exposes. None of these may depend on GTK (AC-0.3).
++    "crates/vd-ffi",
++    "crates/vd-search",
++    "crates/vd-settings",
++    "crates/vd-vcs",
+ ]
+ 
+ [workspace.package]
+
+$ sed -n "/^\[lints.rust\]/,\$p" crates/vd-ffi/Cargo.toml    # the one opt-out (unsafe_code)
+[lints.rust]
+unsafe_code = "allow"
+
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+
+[dependencies]
+# The Rust service layer this crate exports. None of them may pull in GTK
+# (AC-0.3): vd-editor and vd-syntax are deliberately absent.
+vd-config = { path = "../vd-config" }
+vd-deeplint = { path = "../vd-deeplint" }
+vd-fim = { path = "../vd-fim" }
+vd-lsp = { path = "../vd-lsp" }
+vd-search = { path = "../vd-search" }
+vd-settings = { path = "../vd-settings" }
+vd-vcs = { path = "../vd-vcs" }
+serde_json.workspace = true
+
+[build-dependencies]
+# cbindgen generates include/vd_ffi.h from the `extern "C"` surface (C2).
+cbindgen = "0.29.3"
+
+[dev-dependencies]
+tempfile.workspace = true
+
+# No crate other than vd-ffi USES unsafe (forbid attributes are excluded from the scan):
+$ grep -rnE "\bunsafe\b" crates --include=*.rs | grep -v "^crates/vd-ffi/" | grep -v "forbid(unsafe_code)" || echo "(no unsafe usage outside crates/vd-ffi)"
+(no unsafe usage outside crates/vd-ffi)
+
+# The other crates keep their own forbidding attribute (unchanged by this task):
+$ git status --porcelain -- crates | grep -v "crates/vd-ffi/" | grep -v "crates/vd-search/" | grep -v "crates/vd-settings/" | grep -v "crates/vd-vcs/" || echo "(no other crate changed)"
+(no other crate changed)

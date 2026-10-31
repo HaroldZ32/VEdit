@@ -1,0 +1,38 @@
+== evidence: 03-lane-standalone.log (lane configured on its own: no app shell, no jump target, core lane regression)
+time=2026-10-31T18:55:10+08:00
+HEAD=1f47e56421bbeaab64f8082df3cfc104a6a2c2ef
+
+$ cmake -S src/workspace/search -B target/search-standalone -G Ninja && cmake --build && ctest
+/vedit-build/src/workspace/search/search_selftest.cpp:221:6: error: ‘bool {anonymous}::clickHitRow(vedit::workspace::search::SearchPanel&, const vedit::workspace::search::SearchHit&)’ defined but not used [-Werror=unused-function]
+  221 | bool clickHitRow(SearchPanel &panel, const SearchHit &hit)
+      |      ^~~~~~~~~~~
+cc1plus: all warnings being treated as errors
+ninja: build stopped: subcommand failed.
+vedit-build/target/search-standalone/Development/vedit-workspace-search-selftest
+vedit-build/target/search-standalone/Development/vedit-workspace-search-selftest
+Unable to find executable: /vedit-build/target/search-standalone/vedit-workspace-search-selftest
+1/1 Test #1: vedit-workspace-search-selftest ...***Not Run   0.00 sec
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   0.00 sec
+
+The following tests FAILED:
+	  1 - vedit-workspace-search-selftest (Not Run)
+Errors while running CTest
+CTEST-EXIT=8
+
+== RERUN after -Werror fix (unused clickHitRow in the no-shell lane build: helper is now shell-only) ==
+time=2026-10-31T18:55:37+08:00
+[1/4] Automatic MOC for target vedit-workspace-search-selftest
+[2/3] Building CXX object CMakeFiles/vedit-workspace-search-selftest.dir/search_selftest.cpp.o
+[3/3] Linking CXX executable vedit-workspace-search-selftest
+BUILD-EXIT=0
+Test project /vedit-build/target/search-standalone
+    Start 1: vedit-workspace-search-selftest
+1/1 Test #1: vedit-workspace-search-selftest ...   Passed    0.33 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.33 sec
+CTEST-EXIT=0

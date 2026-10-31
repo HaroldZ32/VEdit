@@ -1,0 +1,224 @@
+#include "diagnostics_integration.h"
+
+#if defined(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL)
+
+#include "diagnostics_controller.h"
+#include "diagnostics_panel.h"
+#include "lsp_backend.h"
+#include "slang_backend.h"
+#include "toolchain.h"
+
+#include "app_shell.h"
+#include "command_registry.h"
+#include "panel_registry.h"
+
+#include <QCoreApplication>
+#include <QDir>
+#include <QFileInfo>
+#include <QKeySequence>
+#include <QObject>
+#include <QStringList>
+#include <QTimer>
+#include <QVariant>
+#include <QDebug>
+#include <cstdio>
+#include <QDockWidget>
+#include <QWidget>
+
+#include <memory>
+
+#if defined(VEDIT_DIAGNOSTICS_HAVE_FFI)
+#include <vd_ffi.h>
+#endif
+
+namespace vedit::workspace {
+namespace {
+
+/// Owns the controller for the shell's lifetime (the controller is not a
+/// QObject on purpose: its headless core has no signal surface).
+class ControllerHolder final : public QObject {
+public:
+    explicit ControllerHolder(std::unique_ptr<diagnostics::DiagnosticsController> controller,
+                              QObject *parent)
+        : QObject(parent)
+        , controller_(std::move(controller))
+    {
+    }
+    diagnostics::DiagnosticsController *controller() const { return controller_.get(); }
+
+private:
+    std::unique_ptr<diagnostics::DiagnosticsController> controller_;
+};
+
+#if defined(VEDIT_DIAGNOSTICS_HAVE_FFI)
+/// Ask the project model for the effective file set and hand it to the
+/// controller. The poll is timer-driven, so `installPanels()` never blocks.
+class ProjectFileSetPoller final : public QObject {
+public:
+    ProjectFileSetPoller(QObject *parent,
+                         diagnostics::DiagnosticsController *controller,
+                         const QString &projectRoot)
+        : QObject(parent)
+        , controller_(controller)
+        , projectRoot_(projectRoot)
+        , timer_(new QTimer(this))
+    {
+        service_ = vd_service_create();
+        if (service_ == nullptr) {
+            qWarning("diagnostics: cannot create the Rust service handle for the project model");
+            return;
+        }
+        const QByteArray root = projectRoot_.toUtf8();
+        job_ = vd_project_parse(service_, root.constData());
+        if (job_ == 0) {
+            qWarning("diagnostics: project parse was rejected: %s",
+                     qPrintable(serviceError()));
+            return;
+        }
+        connect(timer_, &QTimer::timeout, this, [this]() { poll(); });
+        timer_->start(50);
+    }
+
+    ~ProjectFileSetPoller() override
+    {
+        if (service_ != nullptr) {
+            // Running jobs finish into memory nobody reads (vd-ffi contract).
+            vd_service_destroy(service_);
+        }
+    }
+
+private:
+    QString serviceError() const
+    {
+        VdError error{};
+        if (service_ != nullptr) {
+            vd_service_error(service_, &error);
+        }
+        return QString::fromUtf8(error.message);
+    }
+
+    void poll()
+    {
+        if (job_ == 0 || service_ == nullptr) {
+            timer_->stop();
+            return;
+        }
+        if (++ticks_ > 200) { // 10 s: a broken project job must not poll forever
+            timer_->stop();
+            qWarning("diagnostics: the project job did not finish within 10 s");
+            job_ = 0;
+            return;
+        }
+        VdProjectInfo info{};
+        const int status = vd_project_poll(service_, job_, &info);
+        if (status == VD_STATUS_PENDING) {
+            return;
+        }
+        timer_->stop();
+        job_ = 0;
+        if (status != VD_STATUS_READY) {
+            qWarning("diagnostics: the project job failed: %s", qPrintable(serviceError()));
+            return;
+        }
+        QStringList files;
+        for (size_t index = 0; index < info.files.count; ++index) {
+            if (info.files.items[index] != nullptr) {
+                files.append(QString::fromUtf8(info.files.items[index]));
+            }
+        }
+        vd_project_info_free(&info);
+        qInfo("diagnostics: effective file set from the project model: %lld file(s)",
+              static_cast<long long>(files.size()));
+        controller_->setFileSet(files);
+    }
+
+    diagnostics::DiagnosticsController *controller_ = nullptr;
+    QString projectRoot_;
+    QTimer *timer_ = nullptr;
+    VdService *service_ = nullptr;
+    quint64 job_ = 0;
+    int ticks_ = 0;
+};
+#endif // VEDIT_DIAGNOSTICS_HAVE_FFI
+
+} // namespace
+
+void installDiagnostics(vedit::app::ApplicationShell &shell, const IntegrationOptions &options)
+{
+    if (shell.panels() == nullptr) {
+        return;
+    }
+
+    // Discovery order is bundled > local checkout > PATH > env; the chosen source,
+    // the local candidates and the missing list are printed and shown, so "no
+    // diagnostics" is never silent — and never a wall of text in the UI.
+    const diagnostics::ToolchainSearchContext toolchainContext =
+        diagnostics::applicationToolchainContext();
+    const diagnostics::ToolchainReport toolchain =
+        diagnostics::resolveToolchain(toolchainContext);
+    std::printf("TOOLCHAIN %s local=[%s]\n", qPrintable(toolchain.statusLine()),
+                qPrintable(toolchainContext.localDirs.join(QLatin1Char(','))));
+
+    auto lsp = diagnostics::createFfiLspSessionBackend();
+    auto slang = diagnostics::createFfiSlangBackend(toolchain.slang.path);
+    auto *holder = new ControllerHolder(
+        std::make_unique<diagnostics::DiagnosticsController>(std::move(lsp), std::move(slang)),
+        &shell);
+    auto *controller = holder->controller();
+    controller->setToolchainReport(toolchain);
+    shell.setProperty("vedit.diagnosticsController", QVariant::fromValue<QObject *>(holder));
+
+    const QString projectRoot = options.projectRoot;
+    controller->setConfiguration(toolchain.verible.path, projectRoot);
+    // Exactly ONE user-facing status line for a missing toolchain: the shell
+    // diagnostic (deduplicated by the shell) and the panel status read the same
+    // concise message. The probed candidate list is a log detail, not UI text,
+    // and is only emitted at debug level.
+    shell.addShellDiagnostic(toolchain.userMessage());
+    if (!toolchain.missing().isEmpty() && qEnvironmentVariableIsSet("VEDIT_TOOLCHAIN_TRACE")) {
+        // Opt-in diagnosis only: the probed-candidate list must never be part of
+        // the panel status or of a default console run.
+        qDebug("diagnostics: %s", qPrintable(toolchain.probeDetail()));
+    }
+
+    const auto factory = [controller]() {
+        auto *panel = new diagnostics::DiagnosticsPanel(controller);
+        controller->refresh();
+        return panel;
+    };
+    shell.panels()->setFactory(QStringLiteral("outline"), factory);
+
+    // The shell inserts panels on demand; replace an existing placeholder now.
+    if (QDockWidget *dock = shell.panels()->dock(QStringLiteral("outline"))) {
+        QWidget *placeholder = dock->widget();
+        if (placeholder != nullptr
+            && placeholder->objectName().startsWith(QStringLiteral("panel-placeholder-"))) {
+            dock->setWidget(factory());
+            delete placeholder;
+        }
+    }
+
+    if (shell.commands() != nullptr) {
+        vedit::app::CommandSpec spec;
+        spec.id = QStringLiteral("project.reparse");
+        spec.text = QStringLiteral("Re&parse Project (Verible + SLANG)");
+        spec.menu = QStringLiteral("project");
+        spec.order = 50;
+        if (shell.commands()->add(spec) == nullptr) {
+            shell.commands()->action(spec.id);
+        }
+        shell.commands()->setHandler(spec.id, [controller]() { controller->reparse(); });
+    }
+
+#if defined(VEDIT_DIAGNOSTICS_HAVE_FFI)
+    if (!projectRoot.isEmpty()) {
+        new ProjectFileSetPoller(&shell, controller, projectRoot);
+    }
+#else
+    (void)projectRoot;
+#endif
+}
+
+} // namespace vedit::workspace
+
+#endif // VEDIT_DIAGNOSTICS_HAVE_APP_SHELL

@@ -1,0 +1,7 @@
+artifact: /home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage
+artifact_sha256: 74bd6aae2af9aefc8a2200d5ff66b1868c3e8281fb77de21f7859c5cafb33faa
+artifact_note: PROBE build (T11); delivery blocked pending T60 — mechanism verification only
+tested_image: docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+tested_glibc: ldd (GNU libc) 2.17
+offscreen_exit=0
+artifact_note_corrected: DELIVERY build (T64/F2): self-built KSyntaxHighlighting with 0 embedded definitions + whitelist SystemVerilog,Verilog; licence gate pass=8 fail=0. The 'PROBE build' line above is the T12 script's hardcoded string and is STALE for this run (T67).

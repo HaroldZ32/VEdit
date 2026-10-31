@@ -1,0 +1,21 @@
+tag: vedit-qt6-build:local
+resolved id for THIS run (used by every docker run step below): sha256:ba08930b122dcd900cd20c0c6cfe67e9b4b0c015060e417a92079423f9146ab7
+
+NOTE: the id only says WHICH local image was used. It is NOT the
+      reproducibility criterion. T10's own persisted evidence file
+      evidence/m0-build/build-logs/21-qt6-image-id.txt records
+      de2b7f70... for this very tag (written 11:39); this run resolved
+      a DIFFERENT id at 11:52 -- same tag, same created=..., different id.
+      (Two further transient ids were seen in the terminal: cf2ca614,
+      2548f11d; not persisted separately.) Content identity is asserted
+      against the lock file in 12-image-pin-assertions.txt, and by the
+      layer fingerprint below.
+
+== content fingerprint = sha256(json RootFS.Layers) ==
+   (layer diff_ids are content-addressed: equal fingerprint = identical filesystem)
+fcd4b23165c5d01ad04f7feabfd09117e7d41f8ed1058b4865a6db650129198b  -
+== same fingerprint for vedit-qt6-build:t10-evidence (T10's own evidence tag) ==
+fcd4b23165c5d01ad04f7feabfd09117e7d41f8ed1058b4865a6db650129198b  -
+
+== created ==
+created=2026-10-31T11:14:08.850571299+08:00

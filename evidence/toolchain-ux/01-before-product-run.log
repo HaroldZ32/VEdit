@@ -1,0 +1,15 @@
+# C9 evidence header
+collected_at: 2026-10-31T23:26:38+08:00
+git_head: c682694e125ff7f59c590b83b6d2895239a3d143
+binary: target/qt6-build/src/app/vedit-app (built BEFORE the T85 source changes)
+binary_sha256: 318289c29994513c0129f1e2b753dd917eca00c0fe57bff664bae3e7ce9746d3
+
+## user scenario: bare build, project with 7 files, no verible/slang on PATH
+
+PATH-TOOLS: none
+APP-EXIT=0
+total output lines: 9
+occurrences of the user-facing message: 2
+occurrences of the raw probe list marker: 2
+longest line length (bytes): 1289
+[app-shell] Diagnostics unavailable: verible-verilog-ls not found (bundled, PATH, env — all empty; probed /vedit-build/target/qt6-build/src/app/verible-verilog-ls, /vedit-build/target/qt6-build/src/app/bin/verible-verilo

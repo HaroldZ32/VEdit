@@ -1,0 +1,44 @@
+== AppDir toolchain payload and licences ==
+collected_at: 2026-10-31T14:43:08Z
+git_head: c71fe31478887e3dc7c460f875ccfb93e61c0ec4
+
+## usr/share/vedit/toolchain.txt
+# VEdit bundled toolchain (T82)
+# discovery order in the product: bundled > PATH > env (source is reported)
+# expected-bundled-dir: bin/ (next to vd-app)
+verible-verilog-ls sha256=07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845 bytes=6300864 source=/vedit-build/.mpd/recon/verible/bin/verible-verilog-ls
+verible-verilog-lint sha256=b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29 bytes=4759200 source=/vedit-build/.mpd/recon/verible/bin/verible-verilog-lint
+verible-verilog-format sha256=b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473 bytes=4231008 source=/vedit-build/.mpd/recon/verible/bin/verible-verilog-format
+license Apache-2.0=usr/share/doc/vedit/licenses/Apache-2.0.txt
+slang sha256=63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252 bytes=9526400 source=/vedit-build/build/slang/out/slang
+license MIT=usr/share/doc/vedit/licenses/slang-LICENSE.txt
+missing=[]
+
+## bundled binaries (sha256 / bytes)
+07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845  target/toolchain-evidence/AppDir/bin/verible-verilog-ls
+b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29  target/toolchain-evidence/AppDir/bin/verible-verilog-lint
+b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473  target/toolchain-evidence/AppDir/bin/verible-verilog-format
+63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  target/toolchain-evidence/AppDir/bin/slang
+-rwxr-xr-x 1 haroldzhao haroldzhao 9526400 Oct 31 22:43 target/toolchain-evidence/AppDir/bin/slang
+-rwxr-xr-x 1 haroldzhao haroldzhao 4231008 Oct 31 22:43 target/toolchain-evidence/AppDir/bin/verible-verilog-format
+-rwxr-xr-x 1 haroldzhao haroldzhao 4759200 Oct 31 22:43 target/toolchain-evidence/AppDir/bin/verible-verilog-lint
+-rwxr-xr-x 1 haroldzhao haroldzhao 6300864 Oct 31 22:43 target/toolchain-evidence/AppDir/bin/verible-verilog-ls
+
+## licence texts in the AppDir
+cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30  target/toolchain-evidence/AppDir/usr/share/doc/vedit/licenses/Apache-2.0.txt
+0aaa5e55c23baad51bdab241e36220d2fa8df1147ce289a81a58ae4d1c1502fe  target/toolchain-evidence/AppDir/usr/share/doc/vedit/licenses/slang-LICENSE.txt
+
+## runtime-manifest entries for the toolchain
+63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  9526400  bin/slang
+b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473  4231008  bin/verible-verilog-format
+b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29  4759200  bin/verible-verilog-lint
+07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845  6300864  bin/verible-verilog-ls
+cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30  11358  usr/share/doc/vedit/licenses/Apache-2.0.txt
+0aaa5e55c23baad51bdab241e36220d2fa8df1147ce289a81a58ae4d1c1502fe  1066  usr/share/doc/vedit/licenses/slang-LICENSE.txt
+4e0bc04bb50061b5313dde5f055857df77793864d16e20f430991f42a70ccfd5  934  usr/share/vedit/toolchain.txt
+
+## RUNTIME-NOTICES toolchain lines
+Verible (bundled)    v0.0-4298-g085eef05  Apache-2.0  bin/verible-verilog-{ls,lint,format}
+slang (bundled)      12.1  MIT  bin/slang
+  licence text: usr/share/doc/vedit/licenses/slang-LICENSE.txt
+Toolchain discovery  bundled > PATH > env; the chosen source and the missing list are

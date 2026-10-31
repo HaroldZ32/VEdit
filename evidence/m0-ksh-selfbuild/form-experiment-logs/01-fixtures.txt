@@ -1,0 +1,6 @@
+host KDE syntax dir : /usr/share/org.kde.syntax-highlighting/syntax (402 xml files, incl. systemverilog.xml)
+user data syntax dir: /tmp/ksh-probe/home/.local/share/org.kde.syntax-highlighting/syntax (user-leak-probe.xml)
+AppDir whitelist    : /tmp/ksh-probe/appdir/usr/share/org.kde.syntax-highlighting/syntax (verilog.xml only, 1 file)
+402
+host-leak-probe.xml
+systemverilog.xml

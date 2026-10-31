@@ -1,0 +1,7 @@
+kf.texteditor: line  1  is not within interval [0.. 1 ) ... returning invalid range
+REPLACE2 case=adjacent found=4 replaced=4 expect=4 text_sha=fb398cc690e15ddba43ee811b6c0d3ec190901ad3df377fec9a1f9004b919a06 expect_sha=fb398cc690e15ddba43ee811b6c0d3ec190901ad3df377fec9a1f9004b919a06 text_ok=1 count_ok=1 one_undo_ok=1 verdict=PASS
+REPLACE2 case=zero_length_anchor found=3 replaced=3 expect=3 text_sha=55287d9b421b0cfff4eaf37ee2e253d172e7a3d6e04dff1a0c32de26a87b5655 expect_sha=55287d9b421b0cfff4eaf37ee2e253d172e7a3d6e04dff1a0c32de26a87b5655 text_ok=1 count_ok=1 one_undo_ok=1 verdict=PASS
+kf.texteditor: line  1  is not within interval [0.. 1 ) ... returning invalid range
+REPLACE2 case=longer found=2 replaced=2 expect=2 text_sha=156647d41949ff377733e6763b816a8cf80244d3570f77c0a981c6ab64744ea2 expect_sha=156647d41949ff377733e6763b816a8cf80244d3570f77c0a981c6ab64744ea2 text_ok=1 count_ok=1 one_undo_ok=1 verdict=PASS
+kf.texteditor: line  1  is not within interval [0.. 1 ) ... returning invalid range
+REPLACE2 case=shorter found=2 replaced=2 expect=2 text_sha=74d905075316e72a046332bb41e2ba78b9377d33750f92b696bbe49f4158f5a9 expect_sha=74d905075316e72a046332bb41e2ba78b9377d33750f92b696bbe49f4158f5a9 text_ok=1 count_ok=1 one_undo_ok=1 verdict=PASS

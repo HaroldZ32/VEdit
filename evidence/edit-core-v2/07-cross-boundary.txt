@@ -1,0 +1,33 @@
+# 编辑事务与 Rust C ABI 的边界证明（AC-S1.1：编辑事务不得过 C ABI）
+# date: 2026-10-31T19:11:46+08:00
+
+## 1) 运行期：编辑事务期间跨边界计数器零增量，且计数器有正控制（product --selfcheck）
+CHECK editcore.boundary.zero-calls PASS before=0 after=0
+CHECK editcore.boundary.counter-live PASS before=0 after=1
+
+## 2) 静态：编辑内核静态库没有引用任何 C ABI 符号（链接层不可能跨边界）
+$ nm -u target/qt6-build/src/app/editor-lane/libvedit_editor_core.a | grep -cE 'vd_[a-z_]+'
+0
+$ nm --defined-only target/qt6-build/src/app/editor-lane/libvedit_editor_core.a | grep -cE 'vd_'
+0
+$ nm -u target/edit-core-build/libvedit_editor_core.a | grep -cE 'vd_[a-z_]+'
+0
+$ nm --defined-only target/edit-core-build/libvedit_editor_core.a | grep -cE 'vd_'
+0
+
+## 3) 源码：内核源码里没有 vd_ffi 头 / 没有 vd_ 调用记号
+$ grep -rl vd_ffi src/editor/kernel/ | wc -l
+0
+$ grep -rhoE '\bvd_[a-z_]+' src/editor/kernel/ | wc -l
+0
+
+## 4) 计数器在何处递增（唯一 C ABI 调用点，全部在 src/app/main.cpp 的 ffi 命名空间）
+$ grep -c 'noteAbiCall();' src/app/main.cpp
+15
+$ grep -n 'noteAbiCall();' src/app/main.cpp | head -3
+334:        noteAbiCall();
+383:    noteAbiCall();
+390:    noteAbiCall();
+
+结论：编辑内核（open/save/find-replace/goto/undo/redo/multi-cursor）在库层面没有任何 vd_* 未定义符号，
+运行期做完整组编辑事务前后计数器都是 0；正控制（一次真实 vd_abi_version() 调用）使计数器 +1，证明计数器不是死代码。

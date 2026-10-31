@@ -1,0 +1,22 @@
+# cbindgen configuration for the VEdit C ABI (Slice 0, task T4).
+#
+# The header is GENERATED from the crate's `extern "C"` surface by build.rs;
+# include/vd_ffi.h is committed so a C/C++ reader can see the contract without
+# running cargo, and scripts/build-qt.sh regenerates it on every build.
+#
+# `language = "C"` keeps the header valid C; `cpp_compat = true` wraps the
+# declarations in `extern "C"` for C++ consumers, so the product's C++ caller
+# links the C symbols instead of C++-mangled names (found the hard way: without
+# it the link fails with `undefined reference to vd_service_create()`).
+language = "C"
+cpp_compat = true
+include_guard = "VDIT_VD_FFI_H"
+pragma_once = true
+documentation = true
+documentation_style = "c"
+tab_width = 2
+line_length = 100
+# size_t, not uintptr_t, for every length: the header is C.
+usize_is_size_t = true
+# An empty enum is how an opaque handle is declared (VdService).
+style = "both"

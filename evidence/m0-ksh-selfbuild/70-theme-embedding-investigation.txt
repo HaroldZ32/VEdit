@@ -1,0 +1,89 @@
+## theme embedding: upstream switches
+data/CMakeLists.txt:107:target_sources(SyntaxHighlightingData PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/themes/theme-data.qrc)
+
+## any THEME option in CMake?
+CMakeLists.txt:72:option(NO_STANDARD_PATHS "Skip lookup of syntax and theme definitions in QStandardPaths locations" OFF)
+
+## theme files
+30
+
+## license attributes inside theme files
+
+## first lines of two theme files
+{
+    "metadata" : {
+        "copyright": [
+            "SPDX-FileCopyrightText: 2016 Volker Krause <vkrause@kde.org>",
+            "SPDX-FileCopyrightText: 2016 Dominik Haumann <dhaumann@kde.org>"
+        ],
+        "license": "SPDX-License-Identifier: MIT",
+        "revision" : 10,
+---
+{
+    "custom-styles": {
+        "Diff": {
+            "Added line": {
+                "selected-text-color": "#98c379",
+                "text-color": "#98c379"
+            },
+            "Changed line (new)": {
+
+## LICENSES/
+CC0-1.0.txt
+GPL-2.0-only.txt
+LGPL-2.0-or-later.txt
+LGPL-2.1-or-later.txt
+MIT.txt
+
+## metainfo.yaml
+description: Syntax Highlighting
+tier: 1
+type: functional
+platforms:
+    - name: Linux
+    - name: FreeBSD
+    - name: Windows
+    - name: macOS
+    - name: Android
+portingAid: false
+deprecated: false
+release: true
+libraries:
+    - cmake: "KF6::SyntaxHighlighting"
+cmakename: KF6SyntaxHighlighting
+
+public_lib: true
+group: Frameworks
+subgroup: Tier 1
+
+## theme license metadata ("license" key inside each .theme)
+atom-one-dark.theme                                     MIT"
+atom-one-light.theme                                    MIT"
+ayu-dark.theme                                          MIT"
+ayu-light.theme                                         MIT"
+ayu-mirage.theme                                        MIT"
+breeze-dark.theme                                       MIT"
+breeze-light.theme                                      MIT"
+catppuccin-frappe.theme                                 MIT"
+catppuccin-latte.theme                                  MIT"
+catppuccin-macchiato.theme                              MIT"
+catppuccin-mocha.theme                                  MIT"
+dracula.theme                                           MIT"
+falcon.theme                                            MIT"
+github-dark.theme                                       MIT"
+github-light.theme                                      MIT"
+gruvbox-dark.theme                                      MIT"
+gruvbox-light.theme                                     MIT"
+homunculus.theme                                        MIT"
+monokai.theme                                           MIT"
+nord.theme                                              MIT"
+oblivion.theme                                          MIT"
+printing.theme                                          MIT"
+radical.theme                                           MIT"
+solarized-dark.theme                                    MIT"
+solarized-light.theme                                   MIT"
+tokyo-night-light.theme                                 MIT"
+tokyo-night-storm.theme                                 MIT"
+tokyo-night.theme                                       MIT"
+vim-dark.theme                                          MIT"
+vscodium-dark.theme                                     MIT"

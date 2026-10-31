@@ -1,0 +1,35 @@
+# C9 evidence header
+collected_at: 2026-10-31T18:51:47+08:00
+git_head: 1f47e56421bbeaab64f8082df3cfc104a6a2c2ef
+
+## Targeted root-build: only vedit-app + the project lane selftest
+[1/23] Linking CXX static library src/syntax/grammars/syntax-product/libvedit_syntax_product.a
+[2/23] Automatic MOC for target vedit_app_shell
+[3/22] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/editor_provider.cpp.o
+[4/22] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/editor_area.cpp.o
+[5/22] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/app_shell.cpp.o
+[6/22] Linking CXX static library src/app/libvedit_app_shell.a
+[7/22] Automatic MOC for target vedit_workspace_project
+[8/21] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_integration.cpp.o
+[9/21] Linking CXX static library src/app/workspace-lane-project/libvedit_workspace_project.a
+[10/21] Automatic MOC for target vedit_workspace_integration
+[11/21] Automatic MOC for target vedit-workspace-project-selftest
+[12/21] Building CXX object src/app/CMakeFiles/vedit_workspace_integration.dir/vedit_workspace_integration_autogen/mocs_compilation.cpp.o
+[13/21] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit-workspace-project-selftest.dir/vedit-workspace-project-selftest_autogen/mocs_compilation.cpp.o
+[14/21] Building CXX object src/app/CMakeFiles/vedit_workspace_integration.dir/__/workspace/integration.cpp.o
+[15/21] Linking CXX static library src/app/libvedit_workspace_integration.a
+[16/21] Automatic MOC for target vedit-app
+[17/21] Building CXX object src/app/CMakeFiles/vedit-app.dir/vedit-app_autogen/mocs_compilation.cpp.o
+[18/21] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit-workspace-project-selftest.dir/project_selftest.cpp.o
+[19/21] Linking CXX executable src/app/workspace-lane-project/vedit-workspace-project-selftest
+[20/21] Building CXX object src/app/CMakeFiles/vedit-app.dir/main.cpp.o
+[21/21] Linking CXX executable src/app/vedit-app
+FAILED: [code=1] src/app/vedit-app 
+: && /usr/bin/c++ -Wall -Wextra -O2 -g -DNDEBUG -Wl,--dependency-file=src/app/CMakeFiles/vedit-app.dir/link.d src/app/CMakeFiles/vedit-app.dir/vedit-app_autogen/mocs_compilation.cpp.o src/app/CMakeFiles/vedit-app.dir/main.cpp.o -o src/app/vedit-app  src/app/libvedit_app_shell.a  src/terminal/libvedit_terminal.a  /vedit-build/target/release/libvd_ffi.a  src/app/libvedit_workspace_integration.a  -Wl,--push-state,--whole-archive  src/syntax/grammars/syntax-product/libvedit_syntax_product.a  -Wl,--pop-state  /usr/lib/x86_64-linux-gnu/libKF6TextEditor.so.6.24.0  src/app/workspace-lane-filetree/libvedit_file_tree.a  src/app/workspace-lane-palette/libvedit_workspace_palette.a  src/app/workspace-lane-search/libvedit_workspace_search.a  src/app/workspace-lane-project/libvedit_workspace_project.a  src/app/libvedit_app_shell.a  /vedit-build/target/release/libvd_ffi.a  -ldl  -lm  /usr/lib/x86_64-linux-gnu/libKF6Parts.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6XmlGui.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ConfigWidgets.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6Completion.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ColorScheme.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6GuiAddons.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ConfigGui.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6WidgetsAddons.so.6.24.0  /usr/lib/x86_64-linux-gnu/libQt6Widgets.so.6.10.2  /usr/lib/x86_64-linux-gnu/libKF6KIOCore.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6CoreAddons.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ConfigCore.so.6.24.0  /usr/lib/x86_64-linux-gnu/libQt6Xml.so.6.10.2  src/syntax/grammars/libvedit_syntax_grammars.a  src/syntax/provider/libvedit_syntax_provider.a  /usr/lib/x86_64-linux-gnu/libtree-sitter.so  src/syntax/grammars/libvedit_tree_sitter_verilog.a  src/syntax/kde/libvedit_syntax_kde.a  /usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0  /usr/lib/x86_64-linux-gnu/libQt6Gui.so.6.10.2  /usr/lib/x86_64-linux-gnu/libGLX.so  /usr/lib/x86_64-linux-gnu/libOpenGL.so  /usr/lib/x86_64-linux-gnu/libQt6DBus.so.6.10.2  /usr/lib/x86_64-linux-gnu/libQt6Network.so.6.10.2  /usr/lib/x86_64-linux-gnu/libQt6Core.so.6.10.2 && :
+/usr/bin/x86_64-linux-gnu-ld.bfd: src/app/libvedit_app_shell.a(editor_provider.cpp.o):(.data.rel.ro._ZTIN5vedit3app18DemoEditorProviderE[_ZTIN5vedit3app18DemoEditorProviderE]+0x10): undefined reference to `typeinfo for vedit::app::EditorProvider'
+/usr/bin/x86_64-linux-gnu-ld.bfd: src/app/libvedit_app_shell.a(editor_provider.cpp.o):(.data.rel.ro._ZTVN5vedit3app18DemoEditorProviderE[_ZTVN5vedit3app18DemoEditorProviderE]+0x38): undefined reference to `vedit::app::EditorProvider::openFile(QWidget*, QString const&, QString*)'
+/usr/bin/x86_64-linux-gnu-ld.bfd: src/app/libvedit_app_shell.a(editor_provider.cpp.o):(.data.rel.ro._ZTVN5vedit3app18DemoEditorProviderE[_ZTVN5vedit3app18DemoEditorProviderE]+0x40): undefined reference to `vedit::app::EditorProvider::currentFilePath(QWidget*) const'
+/usr/bin/x86_64-linux-gnu-ld.bfd: src/app/libvedit_app_shell.a(editor_provider.cpp.o):(.data.rel.ro._ZTVN5vedit3app18DemoEditorProviderE[_ZTVN5vedit3app18DemoEditorProviderE]+0x48): undefined reference to `vedit::app::EditorProvider::saveFile(QWidget*, QString*)'
+collect2: error: ld returned 1 exit status
+ninja: build stopped: subcommand failed.
+TARGET-BUILD-EXIT=1

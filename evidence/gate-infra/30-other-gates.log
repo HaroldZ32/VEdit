@@ -1,0 +1,41 @@
+# Other ledger gate ids, run after the typecheck/gates changes: unaffected.
+collected_at_utc=2026-10-31T10:51:00Z
+git_rev_parse_HEAD=1f47e56421bbeaab64f8082df3cfc104a6a2c2ef
+
+$ bash build/gates/docs.sh
+[docs] PASS: README.md docs/BUILD.md docs/USER_GUIDE.md THIRD_PARTY_NOTICES.md
+DOCS-EXIT=0
+
+$ bash build/gates/manifest.sh
+[manifest] OK: vd-app inherits version="0.1.1" from [workspace.package]
+[manifest] OK: vd-app inherits edition="2021" from [workspace.package]
+[manifest] OK: vd-config inherits version="0.1.1" from [workspace.package]
+[manifest] OK: vd-config inherits edition="2021" from [workspace.package]
+[manifest] OK: vd-deeplint inherits version="0.1.1" from [workspace.package]
+[manifest] OK: vd-deeplint inherits edition="2021" from [workspace.package]
+[manifest] OK: vd-editor inherits version="0.1.1" from [workspace.package]
+[manifest] OK: vd-editor inherits edition="2021" from [workspace.package]
+[manifest] OK: vd-ffi inherits version="0.1.1" from [workspace.package]
+[manifest] OK: vd-ffi inherits edition="2021" from [workspace.package]
+[manifest] OK: vd-fim inherits version="0.1.1" from [workspace.package]
+[manifest] OK: vd-fim inherits edition="2021" from [workspace.package]
+[manifest] OK: vd-lsp inherits version="0.1.1" from [workspace.package]
+[manifest] OK: vd-lsp inherits edition="2021" from [workspace.package]
+[manifest] OK: vd-search inherits version="0.1.1" from [workspace.package]
+[manifest] OK: vd-search inherits edition="2021" from [workspace.package]
+[manifest] OK: vd-settings inherits version="0.1.1" from [workspace.package]
+[manifest] OK: vd-settings inherits edition="2021" from [workspace.package]
+[manifest] OK: vd-syntax inherits version="0.1.1" from [workspace.package]
+[manifest] OK: vd-syntax inherits edition="2021" from [workspace.package]
+[manifest] OK: vd-vcs inherits version="0.1.1" from [workspace.package]
+[manifest] OK: vd-vcs inherits edition="2021" from [workspace.package]
+[manifest] PASS
+MANIFEST-EXIT=0
+
+$ bash build/gates/rows.sh
+[rows] 本项目无此门禁：rows 是 MPD bundle 的 ledger 门禁，本产品没有对应实体；此门禁不伪装通过。
+ROWS-EXIT=1
+
+$ bash build/gates/comments.sh
+[comments] 本项目无此门禁：本产品未接入 comment-checker（该检查属于 MPD bundle 自身）；此门禁不伪装通过。
+COMMENTS-EXIT=1

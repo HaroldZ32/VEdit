@@ -1,0 +1,47 @@
+INFO resources_dir=/vedit-build/src/syntax/kde/../../../resources
+LOAD strategy=Repository::addCustomSearchPath(private_dir) at startup; XDG_DATA_DIRS is not mutated; NO_STANDARD_PATHS is not required (see src/syntax/kde/README.md)
+LOAD private_dir=/vedit-build/src/syntax/kde/../../../resources
+LOAD search_paths=/vedit-build/src/syntax/kde/../../../resources/syntax
+LOAD definitions=451 themes=30
+LOAD definition_names=None, G-Code, GLSL, Klipper Config, Klipper G-Code, OpenSCAD, PLY, POV-Ray, RenderMan RIB, STL, VRML, Wavefront OBJ … (+439)
+LOAD theme_count=30
+LOAD probe_v=V probe_sv=SystemVerilog
+DIAG .v resolves to definition 'V' by file name (the built-in 'V'/vlang definition also claims *.v); use resolveLanguageForFile()/explicit language names instead
+LOAD private_definition_files=vedit-systemverilog.xml, vedit-verilog.xml
+CHECK load.ok PASS
+CHECK load.verilog-available PASS
+CHECK load.systemverilog-available PASS
+CHECK load.private-dir-used PASS
+CHECK load.private-shipped-verilog PASS
+CHECK load.private-shipped-systemverilog PASS
+CHECK load.forbidden-none PASS
+CHECK load.v-resolved-by-name-not-filename PASS  filename probe -> V (expected the known V/vlang trap); explicit name mapping is used instead
+CHECK load.extension-map-v PASS
+CHECK load.extension-map-sv PASS
+CHECK load.resolve-sv-when-present PASS
+LOAD degraded.definitions=451 sv_available=0
+DIAG degraded: SystemVerilog definition exists only inside the syntax library (KDE build) and is not shipped by VEdit (C7): it is deliberately not used
+DIAG degraded: SystemVerilog definition not shipped (C7 pending): .sv files degrade to the Verilog definition (SystemVerilog-only constructs lose highlighting/folding); this is a diagnosable degradation, not a crash
+DIAG degraded: .v resolves to definition 'V' by file name (the built-in 'V'/vlang definition also claims *.v); use resolveLanguageForFile()/explicit language names instead
+CHECK degrade.verilog-still-available PASS
+CHECK degrade.sv-not-available PASS
+CHECK degrade.sv-missing-diagnostic PASS
+CHECK degrade.sv-falls-back-to-verilog PASS
+CHECK degrade.fallback-diagnostic PASS
+CHECK degrade.no-crash PASS
+CHECK data.no-forbidden-kde-definitions PASS
+CHECK data.no-kde-file-names PASS  vedit-systemverilog.xml, vedit-verilog.xml
+DATA files=vedit-systemverilog.xml, vedit-verilog.xml
+CHECK def.verilog-valid PASS
+CHECK def.systemverilog-valid PASS
+CHECK def.verilog-section PASS  Hardware
+CHECK def.systemverilog-extensions-contain-sv PASS  *.sv, *.svh
+FOLD verilog formats=50 begins=7 ends=7
+CHECK fold.verilog-highlighting PASS
+CHECK fold.verilog-regions-begin PASS  7
+CHECK fold.verilog-regions-balanced PASS  7
+FOLD systemverilog formats=51 begins=9 ends=9
+CHECK fold.sv-highlighting PASS
+CHECK fold.sv-a4-constructs-begin PASS  9
+CHECK fold.sv-a4-constructs-balanced PASS  9
+SYN-KDE-DATA-SELFTEST ok=1 checks=29 failures=0

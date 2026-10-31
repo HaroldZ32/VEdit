@@ -1,0 +1,46 @@
+================================================================
+VEdit — CentOS 7 on-machine verification report
+generated: 2026-10-31T15:16:19+0000
+host: f11d9b6bd484
+uname: Linux f11d9b6bd484 7.0.0-38-generic #38-Ubuntu SMP PREEMPT_DYNAMIC Fri Sep  4 09:10:14 UTC 2026 x86_64 x86_64 x86_64 GNU/Linux
+kernel: 7.0.0-38-generic
+script: /tmp/x/vedit-centos7-verify-c682694/verify-centos7.sh
+report: /out/02-before-report.txt
+================================================================
+
+RESULT FAIL kernel.is-3.10 | expected=3.10.x (real CentOS 7) | actual=7.0.0-38-generic | note=NOT a CentOS 7 kernel: container/VM shares a newer host kernel, results do not prove CentOS 7
+RESULT PASS glibc.system | expected=any (the package ships its own) | actual=ldd (GNU libc) 2.17 | note=the app must use the bundled glibc, see loader.used
+
+RESULT PASS package.files | expected=all 8 key files present | actual=present | note=vedit-app + bundled glibc + loader + Qt6 + toolchain
+RESULT PASS package.manifest | expected=sha256 of every shipped file matches MANIFEST.sha256 | actual=all match | note=
+
+RESULT PASS toolchain.verible | expected=verible-verilog-lint runs | actual=Version	v0.0-4298-g085eef05 | note=bundled Apache-2.0 binary
+RESULT PASS toolchain.slang | expected=slang runs | actual=slang version 12.1.0+0 | note=bundled MIT binary
+
+RESULT PASS app.selfcheck | expected=exit 0 | actual=exit 0 | EDIT-CORE-SELFTEST ok=1 checks=67 failures=0 APP-SHELL-SELFTEST ok=1 checks=176 failures=0 state=/tmp/vedit-app-FQKFKr/state  | note=offscreen; log: /tmp/vedit-selfcheck.DWga9j
+
+RESULT PASS startup.toolchain | expected=TOOLCHAIN source=verible:bundled | actual=TOOLCHAIN source=verible:bundled slang:bundled missing=[] | note=the app found the bundled toolchain inside the package
+RESULT PASS startup.project | expected=project opened: installFileTree projectRoot='/tmp/x/vedit-centos7-verify-c682694/samples/verilog-demo' | actual=found | note=the sample project (with .f) was opened
+RESULT PASS startup.exit | expected=0 (window closed after --hold) | actual=exit 0 | note=log: /tmp/vedit-startup.DNdN40
+
+RESULT PASS highlight.stack | expected=grammar=verilog backend=1 startup-hook=1 private-dir inside AppDir | actual=grammar=verilog backend=1 startup-hook=1 private-dir-in-AppDir=yes | note=definitions=3 own-xml=[]
+RESULT FAIL highlight.verilog-definition | expected=verilog=1 and own-xml lists the shipped definition | actual=verilog=0 own-xml=[] definitions=3 | note=the product itself says the Verilog definition is NOT available -> .v files would fall back to plain text; see the full syntax-product line and STEPS.md 6
+RESULT SKIP highlight.mode | expected=highlightingMode='Verilog' (windowed KTextEditor) | actual=not observable headless | note=the AppDir ships no windowed session here; the stack-level check (grammar + definitions + own XML) is above
+
+RESULT PASS lint.bundled | expected=at least 1 diagnostic on the planted violations | actual=3 diagnostic(s), lint exit 1 | note=log: /tmp/vedit-lint.lE6LFW
+RESULT SKIP lint.product | expected=product diagnostics path | actual=exit 1 | VER-DIAGNOSTICS-FFI-SELFTEST checks=1 failures=1 | note=this build's diagnostics selftest needs its FFI fixture directory; not a package failure (see log)
+
+INFO symbols: vedit-app max GLIBC=GLIBC_2.39 | bundled libQt6Core max GLIBC=GLIBC_2.35 | bundled libc provides up to GLIBC=GLIBC_2.43
+RESULT PASS symbols.app | expected=supplied by the bundled glibc | actual=vedit-app needs GLIBC_2.39; bundled libc provides GLIBC_2.43 | note=this AppDir was built on glibc 2.43 and therefore CANNOT run against a 2.17 system libc — that is exactly why glibc+loader are bundled
+
+RESULT PASS loader.used | expected=process maps contain /tmp/x/vedit-centos7-verify-c682694/AppDir/ld-linux-x86-64.so.2 | actual=found in /proc/278/maps | note=proves the app runs on the BUNDLED glibc, not the system one
+RESULT PASS loader.system-not-used | expected=no /lib64/ld-linux-x86-64.so.2 mapping | actual=absent | note=
+INFO loader: first maps entry: 555586f45000-55558743b000 rw-p 00000000 00:00 0                          [heap]
+
+================================================================
+SUMMARY: PASS=14 FAIL=2 SKIP=2
+================================================================
+FAILED checks:
+SKIPPED checks (with reason):
+
+report saved to: /out/02-before-report.txt

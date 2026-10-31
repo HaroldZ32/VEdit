@@ -1,0 +1,1 @@
+acc58ee03206526342ef59edc1b4b23470c068bb6dbdd1aec634629ce85d9a0e  build/centos7-verify/dist/vedit-centos7-verify-c682694.tar.gz

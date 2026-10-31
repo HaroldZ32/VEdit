@@ -1,0 +1,114 @@
+collected_at: unknown (header added retroactively at 2026-10-31T10:19:00Z)
+git_head: 9957f5fe4d63c17c681e8753288262fa2c00955e
+git_status_porcelain:
+ M CMakeLists.txt
+ M Cargo.lock
+ M Cargo.toml
+ M THIRD_PARTY_NOTICES.md
+ M docs/decisions/r2-license.md
+ M docs/handover/README.md
+ M evidence/m0-build/build-logs/21-qt6-image-id.txt
+ M evidence/m0-build/build-logs/31-qt6-configure.log
+ M evidence/m0-build/build-logs/32-qt6-build.log
+ M evidence/m0-build/build-logs/33-qt6-ctest.log
+ M evidence/m0-build/build-logs/34-qt6-elf.txt
+ M evidence/syn-grammars/00-pins.txt
+ M evidence/syn-grammars/01-build.log
+ M evidence/syn-grammars/02-tests.log
+ M evidence/syn-grammars/03-manifest.txt
+ M evidence/syn-grammars/04-manifest-none.txt
+ M evidence/syn-grammars/04-manifest-static.txt
+ M evidence/syn-grammars/04-manifest-systemverilog.txt
+ M evidence/syn-grammars/04-manifest-verilog.txt
+ M evidence/syn-grammars/04-swap-proof.txt
+ M evidence/syn-grammars/05-layering.txt
+ M evidence/syn-grammars/06-licensing.txt
+ M evidence/syn-grammars/07-conclusion.md
+ M evidence/syn-grammars/09-result.txt
+ M evidence/term-panel/00-pins.txt
+ M evidence/term-panel/01-configure.log
+ M evidence/term-panel/02-build.log
+ M evidence/term-panel/03-ctest.log
+ M evidence/term-panel/03b-checks.log
+ M evidence/term-panel/04-elf-needed.txt
+ M evidence/term-panel/05-no-network.txt
+ M evidence/term-panel/06-xcb-and-screenshots.log
+ M evidence/term-panel/07-conclusion.md
+ M evidence/term-panel/08-structure.txt
+ M evidence/term-panel/09-root-build-with-lane.log
+ M evidence/ws-filetree/00-pins.txt
+ M evidence/ws-filetree/00-steps.txt
+ M evidence/ws-filetree/01-configure.log
+ M evidence/ws-filetree/02-build.log
+ M evidence/ws-filetree/03-ctest.log
+ M evidence/ws-filetree/03a-tests-full.log
+ M evidence/ws-filetree/04-fixture.log
+ M evidence/ws-filetree/05-screenshots.log
+ M evidence/ws-filetree/06-permissions-nonroot.log
+ M evidence/ws-filetree/07a-gate-qt6-cxx-pre-seam.log
+ M evidence/ws-filetree/08-real-shell-seamcheck.log
+ M evidence/ws-filetree/09-real-app-install.log
+ M evidence/ws-filetree/10-rootcheck-configure.log
+ M evidence/ws-filetree/11-rootcheck-build.log
+ M evidence/ws-filetree/12-gate-build-qt-final.log
+ M evidence/ws-filetree/12a-gate-build-qt-first.log
+ M evidence/ws-filetree/13-gate-qt6-cxx-final.log
+ M evidence/ws-filetree/14-real-shell-check-run.log
+ M evidence/ws-filetree/REPORT.md
+ M evidence/ws-palette/00-pins.txt
+ M evidence/ws-palette/30-build-qt.log
+ M evidence/ws-palette/31-bench.log
+ M evidence/ws-palette/32-ctest-palette.log
+ M evidence/ws-palette/33-elf.txt
+ M evidence/ws-palette/34-artifacts.txt
+ M evidence/ws-palette/36-app-seam-diff.md
+ M evidence/ws-palette/37-gate-qt6-cxx.log
+ M evidence/ws-palette/REPORT.md
+ M evidence/ws-palette/SEAM.md
+ M evidence/ws-search/04-selfcheck-root.log
+ M evidence/ws-search/05-selfcheck-nonroot.log
+ M evidence/ws-search/06-screenshots.log
+ M evidence/ws-search/07-screenshots-nonroot.log
+ M evidence/ws-search/08-build-qt.log
+ M evidence/ws-search/09-structure.txt
+ M evidence/ws-search/10-ctest-root-search.log
+ M evidence/ws-search/13-integration-proof.log
+ M evidence/ws-search/14-standalone.log
+ M evidence/ws-search/REPORT.md
+ M scripts/build-qt-in-container.sh
+ M scripts/build-qt.sh
+ M src/app/CMakeLists.txt
+ M src/app/main.cpp
+?? cmake/VEditRustFfi.cmake
+?? crates/vd-ffi/
+?? crates/vd-search/
+?? crates/vd-settings/
+?? crates/vd-vcs/
+?? docs/handover/appendix/amendments-rev2.md
+?? evidence/docs-amendments/
+?? evidence/ffi-abi/
+?? evidence/fixture/
+?? evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+?? evidence/verdicts/
+?? scripts/verify-fixture.sh
+?? tests/fixtures/
+backfill: 补记 —— C9 头为事后补齐；git_head / git_status_porcelain 为补记时刻快照，非原始采集时刻；原始采集时刻不可回溯，文件 mtime 2026-10-31T04:14:43Z 仅供参考
+---
+# ws-palette evidence artifacts — sha256 (2026-10-31T04:14:43Z)
+670dd3b7f54db8bcdb113ac8aa91bc31b3f6175de6aca9ff17f963d36ce69cb2  evidence/ws-palette/00-pins.txt
+7c71b04ec4ef7b6214ae3b033d5321e122dc2e213e73fa4c7e8cc50e18a13561  evidence/ws-palette/30-build-qt.log
+016da8c93e35ad5bbd8c06ef2659fc44cbabc213a8a2292a208a5aad52765b19  evidence/ws-palette/31-bench.log
+e0e653a99ff0372a47502496bc13b08290cf5d7750627a5adbfb664c3f4adce6  evidence/ws-palette/32-ctest-palette.log
+ed6e15a69e6cb4c699d4c136503fdcf7e4380677ad7cfb86136a0c858017952e  evidence/ws-palette/33-elf.txt
+a89113adf25c6d02383d88048df1f9d72c1ebac5d05a4c38af8f050d63132b5d  evidence/ws-palette/36-app-seam-diff.md
+92565be203878d660aa8d4c57d16883bb150ce037706ddd89fbaa6148315fa68  evidence/ws-palette/37-gate-qt6-cxx.log
+4485f41e7d62dafd4feaf28cd926f164eb93046b4811c6d253969b95c059bfa8  evidence/ws-palette/bench.json
+e4dccc8474d87f27c7c7dc4163cd0af46cf4cefaebdf368f5bd3f79efe193e02  evidence/ws-palette/REPORT.md
+0e6df95264266bf284b9ad71cef8d7befb11aab779812e7e3dad08ab7550a0d7  evidence/ws-palette/screenshots/10-palette-filter.png
+6ce93f2c6b7b43d955a9f6478201f53627341ad3a9e56e46288cd8aa311cd5ac  evidence/ws-palette/screenshots/11-palette-empty-state.png
+49c0dc95c51a275bb6136ccbf34a57ddae2d802d4f0d916aa43a7903727110c1  evidence/ws-palette/screenshots/12-palette-no-project.png
+a3ad3f6b3ed71ab674be9eb35e2a2cfc2699dc983f75f45662cde87220389864  evidence/ws-palette/screenshots/13-palette-project.png
+0e4f5dc3a3449a7c8f6ae982b5053125e162a1492d4de4046ad8cea08c42655a  evidence/ws-palette/screenshots/20-integration-empty.png
+556dd96470472c24fb4c31f819d4953f99462d02f7978af0d1afd58bc59dff6c  evidence/ws-palette/screenshots/21-integration-palette.png
+6ebd22f07f570b77f3fd414a41499678fdba3467bdea8f3847bca586f9fb195e  evidence/ws-palette/screenshots/22-integration-shell.png
+959c34f8a67a397b3022ff3acf11d1a4622d1515241e92612df8f4fdab12ff2c  evidence/ws-palette/SEAM.md

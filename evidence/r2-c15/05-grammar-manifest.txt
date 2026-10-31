@@ -1,0 +1,5 @@
+== nm: grammar symbols linked into each binary ==
+-- build/verilog --
+tree_sitter_verilog_placeholder
+-- build/json --
+tree_sitter_json

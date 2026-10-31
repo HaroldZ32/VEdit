@@ -1,0 +1,538 @@
+## collection: 2026-10-31T14:11:12+0000
+## target: Core (QtCore only; no Gui/Widgets)
+[1/376] Generating mkspecs/qmodule.pri
+[2/376] Generating pc file for target Qt6::Platform
+[3/376] Generating ../../mkspecs/modules/qt_lib_core_private.pri
+[4/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_chartables.c.o
+[5/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_chkdint.c.o
+[6/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_error.c.o
+[7/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_config.c.o
+[8/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_find_bracket.c.o
+[9/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_extuni.c.o
+[10/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_maketables.c.o
+[11/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_ord2utf.c.o
+[12/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_context.c.o
+[13/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_newline.c.o
+[14/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_match_data.c.o
+[15/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_compile_cgroup.c.o
+[16/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_pattern_info.c.o
+[17/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_script_run.c.o
+[18/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_string_utils.c.o
+[19/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_serialize.c.o
+[20/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_valid_utf.c.o
+[21/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_tables.c.o
+[22/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_auto_possess.c.o
+[23/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_substring.c.o
+[24/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_xclass.c.o
+[25/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_ucd.c.o
+[26/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_compile_class.c.o
+[27/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_study.c.o
+[28/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_substitute.c.o
+[29/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_dfa_match.c.o
+[30/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_compile.c.o
+[31/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_jit_compile.c.o
+[32/376] Building C object src/3rdparty/pcre2/CMakeFiles/BundledPcre2.dir/src/pcre2_match.c.o
+[33/376] Linking C static library lib/libQt6BundledPcre2.a
+[34/376] Building CXX object src/tools/syncqt/CMakeFiles/syncqt.dir/main.cpp.o
+[35/376] Linking CXX executable libexec/syncqt
+[36/376] Running syncqt.cpp for module: QtCore
+[37/376] Generating version linker script for target Core
+[38/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/global/qassert.cpp.o
+[39/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/global/qalloc.cpp.o
+[40/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfilesystementry.cpp.o
+[41/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/kernel/qsystemerror.cpp.o
+[42/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qcborcommon.cpp.o
+[43/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfsfileengine_iterator.cpp.o
+[44/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfiledevice.cpp.o
+[45/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/global/qtenvironmentvariables.cpp.o
+[46/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfilesystemengine.cpp.o
+[47/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qabstractfileengine.cpp.o
+[48/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfileinfo.cpp.o
+[49/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfsfileengine.cpp.o
+[50/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qiodevice.cpp.o
+[51/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qdir.cpp.o
+[52/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfile.cpp.o
+[53/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/kernel/qmetatype.cpp.o
+[54/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/kernel/qcoreapplication.cpp.o
+[55/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qcborstreamwriter.cpp.o
+[56/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qbytearraylist.cpp.o
+[57/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qbytearraymatcher.cpp.o
+[58/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qjsondocument.cpp.o
+[59/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qlatin1stringmatcher.cpp.o
+[60/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qjsonarray.cpp.o
+[61/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qjsoncbor.cpp.o
+[62/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qjsonwriter.cpp.o
+[63/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qjsonobject.cpp.o
+[64/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qjsonvalue.cpp.o
+[65/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qstringbuilder.cpp.o
+[66/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qjsonparser.cpp.o
+[67/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qbytearray.cpp.o
+[68/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qtextstream.cpp.o
+[69/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/serialization/qcborvalue.cpp.o
+[70/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qlocale_tools.cpp.o
+[71/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qregularexpression.cpp.o
+[72/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qstringlist.cpp.o
+[73/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qstringconverter.cpp.o
+[74/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/time/qgregoriancalendar.cpp.o
+[75/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/time/qtimezone.cpp.o
+[76/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/tools/qcommandlineoption.cpp.o
+[77/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/time/qromancalendar.cpp.o
+[78/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_chartables.c.o
+[79/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/time/qlocaltime.cpp.o
+[80/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_chkdint.c.o
+[81/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_compile_cgroup.c.o
+[82/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/time/qcalendar.cpp.o
+[83/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_auto_possess.c.o
+[84/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/tools/qarraydata.cpp.o
+[85/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_config.c.o
+[86/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_error.c.o
+[87/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_context.c.o
+[88/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_extuni.c.o
+[89/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_find_bracket.c.o
+[90/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_jit_compile.c.o
+[91/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_maketables.c.o
+[92/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_compile_class.c.o
+[93/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_newline.c.o
+[94/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_match_data.c.o
+[95/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_ord2utf.c.o
+[96/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/tools/qringbuffer.cpp.o
+[97/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_pattern_info.c.o
+[98/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_serialize.c.o
+[99/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_script_run.c.o
+[100/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_string_utils.c.o
+[101/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_substring.c.o
+[102/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_tables.c.o
+[103/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_ucd.c.o
+[104/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_valid_utf.c.o
+[105/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_study.c.o
+[106/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_substitute.c.o
+[107/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_xclass.c.o
+[108/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/tools/qhash.cpp.o
+[109/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/time/qdatetime.cpp.o
+[110/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/kernel/qcore_unix.cpp.o
+[111/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfilesystemiterator_unix.cpp.o
+[112/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfilesystemengine_unix.cpp.o
+[113/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qlocale.cpp.o
+[114/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/tools/qcommandlineparser.cpp.o
+[115/376] Building CXX object src/tools/moc/CMakeFiles/moc.dir/token.cpp.o
+[116/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/io/qfsfileengine_unix.cpp.o
+[117/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_dfa_match.c.o
+[118/376] Building CXX object src/tools/moc/CMakeFiles/moc.dir/parser.cpp.o
+[119/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_compile.c.o
+[120/376] Building CXX object src/tools/moc/CMakeFiles/moc.dir/collectjson.cpp.o
+[121/376] Building CXX object src/tools/cmake_automoc_parser/CMakeFiles/cmake_automoc_parser.dir/main.cpp.o
+[122/376] Building CXX object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/corelib/text/qstring.cpp.o
+[123/376] Building CXX object src/tools/moc/CMakeFiles/moc.dir/preprocessor.cpp.o
+[124/376] Building CXX object src/tools/moc/CMakeFiles/moc.dir/main.cpp.o
+[125/376] Building CXX object src/tools/moc/CMakeFiles/moc.dir/generator.cpp.o
+[126/376] Building C object src/tools/bootstrap/CMakeFiles/Bootstrap.dir/__/__/3rdparty/pcre2/src/pcre2_match.c.o
+[127/376] Linking CXX static library src/tools/bootstrap/libBootstrap.a
+[128/376] Linking CXX executable libexec/cmake_automoc_parser
+[129/376] Building CXX object src/tools/moc/CMakeFiles/moc.dir/moc.cpp.o
+[130/376] Linking CXX executable libexec/moc
+[131/376] Generating .rcc/qmimeprovider_database.cpp
+[132/376] Automatic MOC for target Core
+[133/376] Generating pc file for target Qt6::Core
+[134/376] Generating kernel/moc_qobject.cpp, kernel/moc_qobject.cpp.json
+[135/376] Generating prl file for target Core
+[136/376] Running AUTOMOC file extraction for target Core
+[137/376] Running moc --collect-json for target Core
+[138/376] Building CXX object src/corelib/CMakeFiles/Core.dir/global/archdetect.cpp.o
+[139/376] Building CXX object src/corelib/CMakeFiles/Core.dir/Core_autogen/mocs_compilation.cpp.o
+[140/376] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qassert.cpp.o
+[141/376] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qcompare.cpp.o
+[142/376] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qalloc.cpp.o
+[143/376] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qmalloc.cpp.o
+[144/376] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qtypes.cpp.o
+[145/376] Building CXX object src/corelib/CMakeFiles/Core.dir/global/q23utility.cpp.o
+[146/376] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qhooks.cpp.o
+[147/376] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qoperatingsystemversion.cpp.o
+[148/376] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qendian.cpp.o
+[149/376] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qsysinfo.cpp.o
+[150/376] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qnumeric.cpp.o
+[151/376] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qsimd.cpp.o
+[152/376] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qfloat16.cpp.o
+[153/376] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qrandom.cpp.o
+[154/376] Building CXX object src/corelib/CMakeFiles/Core.dir/ipc/qsystemsemaphore.cpp.o
+[155/376] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qlibraryinfo.cpp.o
+[156/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qhash.cpp.o
+[157/376] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qtenvironmentvariables.cpp.o
+[158/376] Building CXX object src/corelib/CMakeFiles/Core.dir/ipc/qsharedmemory.cpp.o
+[159/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qbuffer.cpp.o
+[160/376] Building CXX object src/corelib/CMakeFiles/Core.dir/ipc/qtipccommon.cpp.o
+[161/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qdataurl.cpp.o
+[162/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qdebug.cpp.o
+[163/376] Building CXX object src/corelib/CMakeFiles/Core.dir/compat/removed_api.cpp.o
+[164/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qabstractfileengine.cpp.o
+[165/376] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qlogging.cpp.o
+[166/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qdiriterator.cpp.o
+[167/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qdirlisting.cpp.o
+[168/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfiledevice.cpp.o
+[169/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfileinfo.cpp.o
+[170/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfileselector.cpp.o
+[171/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfile.cpp.o
+[172/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfsfileengine_iterator.cpp.o
+[173/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfilesystementry.cpp.o
+[174/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfilesystemengine.cpp.o
+[175/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qloggingcategory.cpp.o
+[176/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qdir.cpp.o
+[177/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfsfileengine.cpp.o
+[178/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qipaddress.cpp.o
+[179/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qlockfile.cpp.o
+[180/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qiodevice.cpp.o
+[181/376] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qglobal.cpp.o
+[182/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qnoncontiguousbytedevice.cpp.o
+[183/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qsavefile.cpp.o
+[184/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qstorageinfo.cpp.o
+[185/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qloggingregistry.cpp.o
+[186/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qtemporarydir.cpp.o
+[187/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qurlidna.cpp.o
+[188/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qstandardpaths.cpp.o
+[189/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qurlquery.cpp.o
+[190/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qurlrecode.cpp.o
+[191/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qresource_iterator.cpp.o
+[192/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qabstractnativeeventfilter.cpp.o
+[193/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qiterable.cpp.o
+[194/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qelapsedtimer.cpp.o
+[195/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qtemporaryfile.cpp.o
+[196/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmath.cpp.o
+[197/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qassociativeiterable.cpp.o
+[198/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qabstracteventdispatcher.cpp.o
+[199/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qresource.cpp.o
+[200/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qbasictimer.cpp.o
+[201/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qzip.cpp.o
+[202/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qcoreevent.cpp.o
+[203/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmetacontainer.cpp.o
+[204/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qdeadlinetimer.cpp.o
+[205/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmetasequence.cpp.o
+[206/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmetaassociation.cpp.o
+[207/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qchronotimer.cpp.o
+[208/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qurl.cpp.o
+[209/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qeventloop.cpp.o
+[210/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qobjectcleanuphandler.cpp.o
+[211/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qsequentialiterable.cpp.o
+[212/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qsystemerror.cpp.o
+[213/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qtestsupport_core.cpp.o
+[214/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qsocketnotifier.cpp.o
+[215/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmetaobject.cpp.o
+[216/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qproperty.cpp.o
+[217/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmimedata.cpp.o
+[218/376] Building CXX object src/corelib/CMakeFiles/Core.dir/plugin/qfactoryinterface.cpp.o
+[219/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qsingleshottimer.cpp.o
+[220/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmetaobjectbuilder.cpp.o
+[221/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qsignalmapper.cpp.o
+[222/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qtimer.cpp.o
+[223/376] Building CXX object src/corelib/CMakeFiles/Core.dir/plugin/quuid.cpp.o
+[224/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qtranslator.cpp.o
+[225/376] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qcborcommon.cpp.o
+[226/376] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qdatastream.cpp.o
+[227/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qobject.cpp.o
+[228/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qcoreapplication.cpp.o
+[229/376] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qjsonarray.cpp.o
+[230/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qvariant.cpp.o
+[231/376] Building CXX object src/corelib/CMakeFiles/Core.dir/plugin/qpluginloader.cpp.o
+[232/376] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qcbordiagnostic.cpp.o
+[233/376] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qjsondocument.cpp.o
+[234/376] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qbytearraymatcher.cpp.o
+[235/376] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qanystringview.cpp.o
+[236/376] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qxmlutils.cpp.o
+[237/376] Building CXX object src/corelib/CMakeFiles/Core.dir/plugin/qfactoryloader.cpp.o
+[238/376] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qbytearraylist.cpp.o
+[239/376] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qjsonobject.cpp.o
+[240/376] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qjsonwriter.cpp.o
+[241/376] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qjsoncbor.cpp.o
+[242/376] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qjsonparser.cpp.o
+[243/376] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qlatin1stringmatcher.cpp.o
+[244/376] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qjsonvalue.cpp.o
+[245/376] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qcborvalue.cpp.o
+[246/376] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qrunnable.cpp.o
+[247/376] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qstringbuilder.cpp.o
+[248/376] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qstringtokenizer.cpp.o
+[249/376] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qcollator.cpp.o
+[250/376] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qstringview.cpp.o
+[251/376] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qvsnprintf.cpp.o
+[252/376] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qtextboundaryfinder.cpp.o
+[253/376] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qbytearray.cpp.o
+[254/376] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qtextstream.cpp.o
+[255/376] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qlocale_tools.cpp.o
+[256/376] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qstringlist.cpp.o
+[257/376] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qsemaphore.cpp.o
+[258/376] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qstringconverter.cpp.o
+[259/376] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qunicodetools.cpp.o
+[260/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qcontiguouscache.cpp.o
+[261/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qmetatype.cpp.o
+[262/376] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qthread.cpp.o
+[263/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qfunctionaltools_impl.cpp.o
+[264/376] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qthreadpool.cpp.o
+[265/376] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qcalendar.cpp.o
+[266/376] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qromancalendar.cpp.o
+[267/376] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qlocaltime.cpp.o
+[268/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qrefcount.cpp.o
+[269/376] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qgregoriancalendar.cpp.o
+[270/376] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qjuliancalendar.cpp.o
+[271/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qarraydata.cpp.o
+[272/376] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qmilankoviccalendar.cpp.o
+[273/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qbitarray.cpp.o
+[274/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qfreelist.cpp.o
+[275/376] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qtimezone.cpp.o
+[276/376] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qdatetime.cpp.o
+[277/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qmargins.cpp.o
+[278/376] Building CXX object src/corelib/CMakeFiles/Core.dir/global/qversiontagging.cpp.o
+[279/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qshareddata.cpp.o
+[280/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qpoint.cpp.o
+[281/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qline.cpp.o
+[282/376] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qxmlstreamgrammar.cpp.o
+[283/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qrect.cpp.o
+[284/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qringbuffer.cpp.o
+[285/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/quniquehandle_types.cpp.o
+[286/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qsize.cpp.o
+[287/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qtyperevision.cpp.o
+[288/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qsharedpointer.cpp.o
+[289/376] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qlocale.cpp.o
+[290/376] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qstring.cpp.o
+[291/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qversionnumber.cpp.o
+[292/376] Building CXX object src/corelib/CMakeFiles/Core.dir/animation/qpauseanimation.cpp.o
+[293/376] Building CXX object src/corelib/CMakeFiles/Core.dir/animation/qanimationgroup.cpp.o
+[294/376] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qatomic.cpp.o
+[295/376] Building CXX object src/corelib/CMakeFiles/Core.dir/animation/qparallelanimationgroup.cpp.o
+[296/376] Building CXX object src/corelib/CMakeFiles/Core.dir/animation/qsequentialanimationgroup.cpp.o
+[297/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qcore_unix.cpp.o
+[298/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfilesystemiterator_unix.cpp.o
+[299/376] Building CXX object src/corelib/CMakeFiles/Core.dir/animation/qpropertyanimation.cpp.o
+[300/376] Building CXX object src/corelib/CMakeFiles/Core.dir/animation/qabstractanimation.cpp.o
+[301/376] Building CXX object src/corelib/CMakeFiles/Core.dir/animation/qvariantanimation.cpp.o
+[302/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfsfileengine_unix.cpp.o
+[303/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfilesystemengine_unix.cpp.o
+[304/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qtimerinfo_unix.cpp.o
+[305/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qlockfile_unix.cpp.o
+[306/376] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/bignum-dtoa.cc.o
+[307/376] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qexception.cpp.o
+[308/376] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qmutex.cpp.o
+[309/376] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/cached-powers.cc.o
+[310/376] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/fast-dtoa.cc.o
+[311/376] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/bignum.cc.o
+[312/376] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qthread_unix.cpp.o
+[313/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qcryptographichash.cpp.o
+[314/376] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qwaitcondition_unix.cpp.o
+[315/376] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/fixed-dtoa.cc.o
+[316/376] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/strtod.cc.o
+[317/376] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/double-to-string.cc.o
+[318/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qcommandlineoption.cpp.o
+[319/376] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qreadwritelock.cpp.o
+[320/376] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qthreadstorage.cpp.o
+[321/376] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qresultstore.cpp.o
+[322/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qeventdispatcher_unix.cpp.o
+[323/376] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qfuturewatcher.cpp.o
+[324/376] Building CXX object src/corelib/CMakeFiles/Core.dir/__/3rdparty/double-conversion/double-conversion/string-to-double.cc.o
+[325/376] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qcollator_posix.cpp.o
+[326/376] Building CXX object src/corelib/CMakeFiles/Core.dir/thread/qfutureinterface.cpp.o
+[327/376] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qhijricalendar.cpp.o
+[328/376] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qxmlstream.cpp.o
+[329/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qcommandlineparser.cpp.o
+[330/376] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qlocale_unix.cpp.o
+[331/376] Building CXX object src/corelib/CMakeFiles/Core.dir/text/qregularexpression.cpp.o
+[332/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qtimeline.cpp.o
+[333/376] Building CXX object src/corelib/CMakeFiles/Core.dir/tools/qeasingcurve.cpp.o
+[334/376] Building C object src/corelib/CMakeFiles/Core.dir/io/forkfd_qt.c.o
+[335/376] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qjalalicalendar.cpp.o
+[336/376] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qislamiccivilcalendar.cpp.o
+[337/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfilesystemwatcher.cpp.o
+[338/376] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qtimezoneprivate.cpp.o
+[339/376] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qdatetimeparser.cpp.o
+[340/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfilesystemwatcher_polling.cpp.o
+[341/376] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qabstractproxymodel.cpp.o
+[342/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qstandardpaths_unix.cpp.o
+[343/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qprocess_unix.cpp.o
+[344/376] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qtimezoneprivate_tz.cpp.o
+[345/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qfilesystemwatcher_inotify.cpp.o
+[346/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qstorageinfo_linux.cpp.o
+[347/376] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qrangemodel.cpp.o
+[348/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qprocess.cpp.o
+[349/376] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qidentityproxymodel.cpp.o
+[350/376] Building CXX object src/corelib/CMakeFiles/Core.dir/plugin/qelfparser_p.cpp.o
+[351/376] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qconcatenatetablesproxymodel.cpp.o
+[352/376] Building CXX object src/corelib/CMakeFiles/Core.dir/time/qtimezonelocale.cpp.o
+[353/376] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qstringlistmodel.cpp.o
+[354/376] Building CXX object src/corelib/CMakeFiles/Core.dir/ipc/qsharedmemory_posix.cpp.o
+[355/376] Building CXX object src/corelib/CMakeFiles/Core.dir/ipc/qsystemsemaphore_posix.cpp.o
+[356/376] Building CXX object src/corelib/CMakeFiles/Core.dir/ipc/qsharedmemory_systemv.cpp.o
+[357/376] Building CXX object src/corelib/CMakeFiles/Core.dir/ipc/qsystemsemaphore_systemv.cpp.o
+[358/376] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qitemselectionmodel.cpp.o
+[359/376] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qtransposeproxymodel.cpp.o
+[360/376] Building CXX object src/corelib/CMakeFiles/Core.dir/plugin/qlibrary.cpp.o
+[361/376] Building CXX object src/corelib/CMakeFiles/Core.dir/plugin/qlibrary_unix.cpp.o
+[362/376] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qabstractitemmodel.cpp.o
+[363/376] Building CXX object src/corelib/CMakeFiles/Core.dir/mimetypes/qmimemagicrulematcher.cpp.o
+[364/376] Building CXX object src/corelib/CMakeFiles/Core.dir/io/qsettings.cpp.o
+[365/376] Building CXX object src/corelib/CMakeFiles/Core.dir/mimetypes/qmimemagicrule.cpp.o
+In file included from /spike/qt6-build/include/QtCore/qbytearrayview.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qbytearray.h:16,
+                 from /spike/qt6-build/include/QtCore/qbytearray.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qstringview.h:11,
+                 from /spike/qt6-build/include/QtCore/qstringview.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qchar.h:723,
+                 from /spike/qt6-build/include/QtCore/qchar.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qstring.h:15,
+                 from /spike/qt6-build/include/QtCore/qstring.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/tools/qhashfunctions.h:9,
+                 from /spike/qt6-build/include/QtCore/qhashfunctions.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/tools/qlist.h:11,
+                 from /spike/qt6-build/include/QtCore/qlist.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/tools/qversionnumber.h:11,
+                 from /spike/qt6-build/include/QtCore/qversionnumber.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/global/qoperatingsystemversion.h:6,
+                 from /spike/qt6-build/include/QtCore/qoperatingsystemversion.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/global/qglobal_p.h:62,
+                 from /spike/qt6-build/include/QtCore/6.10.2/QtCore/private/qglobal_p.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule_p.h:19,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule.cpp:7:
+In function 'bool comparesEqual(const QByteArrayView&, const QByteArrayView&)',
+    inlined from 'bool operator==(const QByteArrayView&, const QByteArrayView&)' at /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qbytearrayview.h:368:5,
+    inlined from 'static QMimeMagicRule::Type QMimeMagicRule::type(const QByteArray&)' at /spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule.cpp:38:25:
+/spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qbytearrayview.h:360:42: warning: 'int __builtin_memcmp_eq(const void*, const void*, long unsigned int)' specified bound 6 exceeds the size 1 of unterminated array [-Wstringop-overread]
+  360 |                 && (!lhs.size() || memcmp(lhs.data(), rhs.data(), lhs.size()) == 0);
+      |                                    ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule.cpp: In static member function 'static QMimeMagicRule::Type QMimeMagicRule::type(const QByteArray&)':
+/spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule.cpp:23:23: note: referenced argument declared here
+   23 | static constexpr auto magicRuleTypes = qOffsetStringArray(
+      |                       ^~~~~~~~~~~~~~
+In file included from /spike/qt6-build/include/QtCore/qbytearrayview.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qbytearray.h:16,
+                 from /spike/qt6-build/include/QtCore/qbytearray.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qstringview.h:11,
+                 from /spike/qt6-build/include/QtCore/qstringview.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qchar.h:723,
+                 from /spike/qt6-build/include/QtCore/qchar.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qstring.h:15,
+                 from /spike/qt6-build/include/QtCore/qstring.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/tools/qhashfunctions.h:9,
+                 from /spike/qt6-build/include/QtCore/qhashfunctions.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/tools/qlist.h:11,
+                 from /spike/qt6-build/include/QtCore/qlist.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/tools/qversionnumber.h:11,
+                 from /spike/qt6-build/include/QtCore/qversionnumber.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/global/qoperatingsystemversion.h:6,
+                 from /spike/qt6-build/include/QtCore/qoperatingsystemversion.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/global/qglobal_p.h:62,
+                 from /spike/qt6-build/include/QtCore/6.10.2/QtCore/private/qglobal_p.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule_p.h:19,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule.cpp:7:
+In function 'bool comparesEqual(const QByteArrayView&, const QByteArrayView&)',
+    inlined from 'bool operator==(const QByteArrayView&, const QByteArrayView&)' at /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qbytearrayview.h:368:5,
+    inlined from 'static QMimeMagicRule::Type QMimeMagicRule::type(const QByteArray&)' at /spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule.cpp:38:25:
+/spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qbytearrayview.h:360:42: warning: 'int __builtin_memcmp_eq(const void*, const void*, long unsigned int)' specified bound 5 exceeds the size 1 of unterminated array [-Wstringop-overread]
+  360 |                 && (!lhs.size() || memcmp(lhs.data(), rhs.data(), lhs.size()) == 0);
+      |                                    ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule.cpp: In static member function 'static QMimeMagicRule::Type QMimeMagicRule::type(const QByteArray&)':
+/spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule.cpp:23:23: note: referenced argument declared here
+   23 | static constexpr auto magicRuleTypes = qOffsetStringArray(
+      |                       ^~~~~~~~~~~~~~
+In file included from /spike/qt6-build/include/QtCore/qbytearrayview.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qbytearray.h:16,
+                 from /spike/qt6-build/include/QtCore/qbytearray.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qstringview.h:11,
+                 from /spike/qt6-build/include/QtCore/qstringview.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qchar.h:723,
+                 from /spike/qt6-build/include/QtCore/qchar.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qstring.h:15,
+                 from /spike/qt6-build/include/QtCore/qstring.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/tools/qhashfunctions.h:9,
+                 from /spike/qt6-build/include/QtCore/qhashfunctions.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/tools/qlist.h:11,
+                 from /spike/qt6-build/include/QtCore/qlist.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/tools/qversionnumber.h:11,
+                 from /spike/qt6-build/include/QtCore/qversionnumber.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/global/qoperatingsystemversion.h:6,
+                 from /spike/qt6-build/include/QtCore/qoperatingsystemversion.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/global/qglobal_p.h:62,
+                 from /spike/qt6-build/include/QtCore/6.10.2/QtCore/private/qglobal_p.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule_p.h:19,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule.cpp:7:
+In function 'bool comparesEqual(const QByteArrayView&, const QByteArrayView&)',
+    inlined from 'bool operator==(const QByteArrayView&, const QByteArrayView&)' at /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qbytearrayview.h:368:5,
+    inlined from 'static QMimeMagicRule::Type QMimeMagicRule::type(const QByteArray&)' at /spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule.cpp:38:25:
+/spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qbytearrayview.h:360:42: warning: 'int __builtin_memcmp_eq(const void*, const void*, long unsigned int)' specified bound 5 exceeds the size 1 of unterminated array [-Wstringop-overread]
+  360 |                 && (!lhs.size() || memcmp(lhs.data(), rhs.data(), lhs.size()) == 0);
+      |                                    ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule.cpp: In static member function 'static QMimeMagicRule::Type QMimeMagicRule::type(const QByteArray&)':
+/spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule.cpp:23:23: note: referenced argument declared here
+   23 | static constexpr auto magicRuleTypes = qOffsetStringArray(
+      |                       ^~~~~~~~~~~~~~
+In file included from /spike/qt6-build/include/QtCore/qbytearrayview.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qbytearray.h:16,
+                 from /spike/qt6-build/include/QtCore/qbytearray.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qstringview.h:11,
+                 from /spike/qt6-build/include/QtCore/qstringview.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qchar.h:723,
+                 from /spike/qt6-build/include/QtCore/qchar.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qstring.h:15,
+                 from /spike/qt6-build/include/QtCore/qstring.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/tools/qhashfunctions.h:9,
+                 from /spike/qt6-build/include/QtCore/qhashfunctions.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/tools/qlist.h:11,
+                 from /spike/qt6-build/include/QtCore/qlist.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/tools/qversionnumber.h:11,
+                 from /spike/qt6-build/include/QtCore/qversionnumber.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/global/qoperatingsystemversion.h:6,
+                 from /spike/qt6-build/include/QtCore/qoperatingsystemversion.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/global/qglobal_p.h:62,
+                 from /spike/qt6-build/include/QtCore/6.10.2/QtCore/private/qglobal_p.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule_p.h:19,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule.cpp:7:
+In function 'bool comparesEqual(const QByteArrayView&, const QByteArrayView&)',
+    inlined from 'bool operator==(const QByteArrayView&, const QByteArrayView&)' at /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qbytearrayview.h:368:5,
+    inlined from 'static QMimeMagicRule::Type QMimeMagicRule::type(const QByteArray&)' at /spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule.cpp:38:25:
+/spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qbytearrayview.h:360:42: warning: 'int __builtin_memcmp_eq(const void*, const void*, long unsigned int)' specified bound 6 exceeds the size 1 of unterminated array [-Wstringop-overread]
+  360 |                 && (!lhs.size() || memcmp(lhs.data(), rhs.data(), lhs.size()) == 0);
+      |                                    ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule.cpp: In static member function 'static QMimeMagicRule::Type QMimeMagicRule::type(const QByteArray&)':
+/spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule.cpp:23:23: note: referenced argument declared here
+   23 | static constexpr auto magicRuleTypes = qOffsetStringArray(
+      |                       ^~~~~~~~~~~~~~
+In file included from /spike/qt6-build/include/QtCore/qbytearrayview.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qbytearray.h:16,
+                 from /spike/qt6-build/include/QtCore/qbytearray.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qstringview.h:11,
+                 from /spike/qt6-build/include/QtCore/qstringview.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qchar.h:723,
+                 from /spike/qt6-build/include/QtCore/qchar.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qstring.h:15,
+                 from /spike/qt6-build/include/QtCore/qstring.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/tools/qhashfunctions.h:9,
+                 from /spike/qt6-build/include/QtCore/qhashfunctions.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/tools/qlist.h:11,
+                 from /spike/qt6-build/include/QtCore/qlist.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/tools/qversionnumber.h:11,
+                 from /spike/qt6-build/include/QtCore/qversionnumber.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/global/qoperatingsystemversion.h:6,
+                 from /spike/qt6-build/include/QtCore/qoperatingsystemversion.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/global/qglobal_p.h:62,
+                 from /spike/qt6-build/include/QtCore/6.10.2/QtCore/private/qglobal_p.h:1,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule_p.h:19,
+                 from /spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule.cpp:7:
+In function 'bool comparesEqual(const QByteArrayView&, const QByteArrayView&)',
+    inlined from 'bool operator==(const QByteArrayView&, const QByteArrayView&)' at /spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qbytearrayview.h:368:5,
+    inlined from 'static QMimeMagicRule::Type QMimeMagicRule::type(const QByteArray&)' at /spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule.cpp:38:25:
+/spike/qtbase-everywhere-src-6.10.2/src/corelib/text/qbytearrayview.h:360:42: warning: 'int __builtin_memcmp_eq(const void*, const void*, long unsigned int)' specified bound 6 exceeds the size 1 of unterminated array [-Wstringop-overread]
+  360 |                 && (!lhs.size() || memcmp(lhs.data(), rhs.data(), lhs.size()) == 0);
+      |                                    ~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule.cpp: In static member function 'static QMimeMagicRule::Type QMimeMagicRule::type(const QByteArray&)':
+/spike/qtbase-everywhere-src-6.10.2/src/corelib/mimetypes/qmimemagicrule.cpp:23:23: note: referenced argument declared here
+   23 | static constexpr auto magicRuleTypes = qOffsetStringArray(
+      |                       ^~~~~~~~~~~~~~
+[366/376] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qcborstreamwriter.cpp.o
+[367/376] Building CXX object src/corelib/CMakeFiles/Core.dir/serialization/qcborstreamreader.cpp.o
+[368/376] Building CXX object src/corelib/CMakeFiles/Core.dir/mimetypes/qmimetype.cpp.o
+[369/376] Building CXX object src/corelib/CMakeFiles/Core.dir/mimetypes/qmimeglobpattern.cpp.o
+[370/376] Building CXX object src/corelib/CMakeFiles/Core.dir/kernel/qpermissions.cpp.o
+[371/376] Building CXX object src/corelib/CMakeFiles/Core.dir/mimetypes/qmimedatabase.cpp.o
+[372/376] Building CXX object src/corelib/CMakeFiles/Core.dir/mimetypes/qmimetypeparser.cpp.o
+[373/376] Building CXX object src/corelib/CMakeFiles/Core.dir/itemmodels/qsortfilterproxymodel.cpp.o
+[374/376] Building CXX object src/corelib/CMakeFiles/Core.dir/mimetypes/qmimeprovider.cpp.o
+[375/376] Linking CXX shared library lib/libQt6Core.so.6.10.2
+[376/376] Creating library symlink lib/libQt6Core.so.6 lib/libQt6Core.so
+
+real	0m59.581s
+user	10m37.661s
+sys	1m9.745s
+BUILD_EXIT=0

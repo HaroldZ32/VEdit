@@ -1,0 +1,24 @@
+== evidence/toolchain-bundling/00-context.txt ==
+collected_at: 2026-10-31T14:43:02Z
+git_head: c71fe31478887e3dc7c460f875ccfb93e61c0ec4
+branch: feat/qt6-ktexteditor-migration
+git_status_porcelain (this task's paths):
+   M THIRD_PARTY_NOTICES.md
+   M packaging/runtime/assemble-appdir.sh
+   M src/app/app_shell.cpp
+   M src/app/app_shell.h
+   M src/app/main.cpp
+   M src/workspace/diagnostics/CMakeLists.txt
+   M src/workspace/diagnostics/diagnostics_controller.cpp
+   M src/workspace/diagnostics/diagnostics_controller.h
+   M src/workspace/diagnostics/diagnostics_integration.cpp
+   M src/workspace/diagnostics/diagnostics_panel.cpp
+   M src/workspace/diagnostics/diagnostics_selftest.cpp
+   M src/workspace/diagnostics/ffi_backends.cpp
+   M src/workspace/diagnostics/slang_backend.h
+  ?? evidence/toolchain-bundling/
+  ?? src/workspace/diagnostics/toolchain.cpp
+  ?? src/workspace/diagnostics/toolchain.h
+  ?? src/workspace/diagnostics/toolchain_selftest.cpp
+
+qt image: vedit-qt6-build:local (no verible/slang on PATH)

@@ -1,0 +1,122 @@
+== configure + build + in-lane ctest inside vedit-qt6-build:local ==
+-- The CXX compiler identification is GNU 15.2.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Performing Test HAVE_STDATOMIC
+-- Performing Test HAVE_STDATOMIC - Success
+-- Found WrapAtomic: TRUE
+-- Found OpenGL: /usr/lib/x86_64-linux-gnu/libOpenGL.so
+-- Found WrapOpenGL: TRUE
+-- Found WrapVulkanHeaders: /usr/include
+-- VEdit: Rust service layer vd-ffi -> /vedit-build/src/workspace/project/../../../target/release/libvd_ffi.a
+-- VEdit: Rust C header           -> /vedit-build/src/workspace/project/../../../crates/vd-ffi/include/vd_ffi.h
+-- VEdit project panel: Qt 6.10.2 (standalone=ON)
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /vedit-build/target/project-t6/build
+[1/11] Automatic MOC for target vedit_workspace_project
+[2/11] Building CXX object CMakeFiles/vedit_workspace_project.dir/project_service.cpp.o
+[3/11] Building CXX object CMakeFiles/vedit_workspace_project.dir/project_state.cpp.o
+[4/11] Building CXX object CMakeFiles/vedit_workspace_project.dir/vedit_workspace_project_autogen/mocs_compilation.cpp.o
+[5/11] Building CXX object CMakeFiles/vedit_workspace_project.dir/project_model.cpp.o
+[6/11] Building CXX object CMakeFiles/vedit_workspace_project.dir/project_panel.cpp.o
+[7/11] Linking CXX static library libvedit_workspace_project.a
+[8/11] Automatic MOC for target vedit-workspace-project-selftest
+[9/11] Building CXX object CMakeFiles/vedit-workspace-project-selftest.dir/vedit-workspace-project-selftest_autogen/mocs_compilation.cpp.o
+[10/11] Building CXX object CMakeFiles/vedit-workspace-project-selftest.dir/project_selftest.cpp.o
+[11/11] Linking CXX executable vedit-workspace-project-selftest
+Test project /vedit-build/target/project-t6/build
+    Start 1: vedit-workspace-project-selftest
+1/1 Test #1: vedit-workspace-project-selftest ...   Passed    0.05 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.05 sec
+== in-process self-check (every CHECK line) ==
+CHECK state.temp-dir PASS
+CHECK service.start.non-blocking PASS
+CHECK service.start.pending PASS
+CHECK service.finishes PASS
+CHECK files.count PASS
+CHECK files.match-fixture-expectations PASS
+CHECK incdirs.count PASS
+CHECK defines.count PASS
+CHECK diagnostics.duplicate-entry PASS
+CHECK diagnostics.unknown-token PASS
+CHECK diagnostics.name-the-filelist PASS
+CHECK summary.states-the-count PASS
+CHECK state.file-written PASS
+This plugin does not support propagateSizeHints()
+CHECK panel.summary PASS
+CHECK panel.file-count PASS
+CHECK panel.files-match-model PASS
+CHECK panel.diagnostics-match PASS
+CHECK restart.restore PASS
+CHECK restart.restore-no-error PASS
+CHECK restart.files PASS
+CHECK restart.root PASS
+CHECK restart.panel.file-count PASS
+CHECK restart.summary.restored PASS
+CHECK bad.temp-dir PASS
+CHECK bad.finishes PASS
+CHECK bad.files PASS
+CHECK bad.define-invalid PASS
+CHECK bad.unknown-token PASS
+CHECK bad.missing-filelist PASS
+CHECK bad.names-file-and-line PASS
+CHECK empty.no-restore PASS
+CHECK empty.no-project PASS
+CHECK empty.panel.file-count PASS
+CHECK empty.summary PASS
+CHECK corrupt.restore-refused PASS
+CHECK corrupt.reported PASS
+PROJECT-MODEL-SELFTEST ok=1 checks=36 failures=0
+== restart persistence: TWO processes sharing /home/haroldzhao/MyProj/DshProj/VEdit/target/project-t6/state ==
+SEED phase=seed ok=1 files=7 root=/vedit-build/tests/fixtures/verilog-project state=/vedit-build/target/project-t6/state/project-model.json
+{
+    "capturedAtUtc": "2026-10-31T11:07:09Z",
+    "defines": [
+        "WIDTH=8",
+        "DEPTH=16",
+        "DEBUG",
+        "SIMULATION"
+    ],
+    "diagnostics": [
+        "filelist.unknown_token: /vedit-build/tests/fixtures/verilog-project/project.f:21: unsupported filelist token `+libext+.v+.sv`; skipped",
+        "filelist.unknown_token: /vedit-build/tests/fixtures/verilog-project/project.f:22: unsupported filelist token `-y`; skipped",
+        "filelist.duplicate_entry: /vedit-build/tests/fixtures/verilog-project/filelists/extra.f:3: duplicate source path in filelist; kept the first occurrence",
+        "rules.search_stopped: /: no .rules.verible_lint found from the project root upward; search stopped at /"
+    ],
+    "files": [
+        "/vedit-build/tests/fixtures/verilog-project/rtl/alu_pkg.sv",
+        "/vedit-build/tests/fixtures/verilog-project/rtl/alu.sv",
+        "/vedit-build/tests/fixtures/verilog-project/rtl/counter.v",
+        "/vedit-build/tests/fixtures/verilog-project/rtl/top.sv",
+        "/vedit-build/tests/fixtures/verilog-project/tb/tb_top.sv",
+        "/vedit-build/tests/fixtures/verilog-project/tb/tb_aux.sv",
+        "/vedit-build/tests/fixtures/verilog-project/rtl/mem.sv"
+    ],
+    "includeDirs": [
+        "/vedit-build/tests/fixtures/verilog-project/inc",
+        "/vedit-build/tests/fixtures/verilog-project/inc/generated",
+        "/vedit-build/tests/fixtures/verilog-project/rtl/include",
+        "/vedit-build/tests/fixtures/verilog-project/tb/include"
+    ],
+    "projectRoot": "/vedit-build/tests/fixtures/verilog-project",
+    "version": 1
+}
+RESTORE phase=restore ok=1 files=7 root=/vedit-build/tests/fixtures/verilog-project error=
+== fixture expectations (the values the service is compared against) ==
+== bad-entry diagnostics (file:line the UI shows) ==
+
+all logs written under /home/haroldzhao/MyProj/DshProj/VEdit/evidence/verdicts/project-model/verify-run
+100% tests passed, 0 tests failed out of 1
+PROJECT-MODEL-SELFTEST ok=1 checks=36 failures=0
+SEED phase=seed ok=1 files=7 root=/vedit-build/tests/fixtures/verilog-project state=/vedit-build/target/project-t6/state/project-model.json
+RESTORE phase=restore ok=1 files=7 root=/vedit-build/tests/fixtures/verilog-project error=

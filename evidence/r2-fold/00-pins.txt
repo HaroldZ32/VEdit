@@ -1,0 +1,40 @@
+== 00 environment + installed-header inventory ==
+date: 2026-10-31T02:54:48Z
+image tag: vprobe-qt6kf6:1 (image id captured host-side, see 00-image-id.txt)
+qt: 6.10.2
+kf6 packages:
+  libkf6syntaxhighlighting-data 6.24.0-0ubuntu1
+  libkf6syntaxhighlighting-dev:amd64 6.24.0-0ubuntu1
+  libkf6syntaxhighlighting6:amd64 6.24.0-0ubuntu1
+  libkf6texteditor-bin 6.24.0-0ubuntu1
+  libkf6texteditor-data 6.24.0-0ubuntu1
+  libkf6texteditor-dev 6.24.0-0ubuntu1
+  libkf6texteditor-katepart 6.24.0-0ubuntu1
+  libkf6texteditor6:amd64 6.24.0-0ubuntu1
+public KTextEditor headers mentioning folding:
+  /usr/include/KF6/KTextEditor/ktexteditor/view.h
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h
+  (matches, all of them config-key documentation:)
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h:354:     * \li Folding Hover == -100.0
+  /usr/include/KF6/KTextEditor/ktexteditor/view.h:160: *       \li folding-bar
+  /usr/include/KF6/KTextEditor/ktexteditor/view.h:162: *       \li show/hide the folding bar
+  /usr/include/KF6/KTextEditor/ktexteditor/view.h:164: *       \li folding-preview
+  /usr/include/KF6/KTextEditor/ktexteditor/view.h:166: *       \li enable/disable folding preview when mouse hovers on folded region
+  /usr/include/KF6/KTextEditor/ktexteditor/view.h:202: *       \li folding-marker-color
+  /usr/include/KF6/KTextEditor/ktexteditor/view.h:204: *       \li read/set folding marker colors (in the icon border)
+  /usr/include/KF6/KTextEditor/ktexteditor/view.h:260: *       \li disable bracket match and code folding highlight if the view has no focus (\since 6.23)
+  /usr/include/KF6/KTextEditor/ktexteditor/view.h:427:       A visible line.  Line that is not folded.
+  /usr/include/KF6/KTextEditor/ktexteditor/view.h:1088:     * \note If code is folded, many hundred lines can be
+  /usr/include/KF6/KTextEditor/ktexteditor/view.h:1092:     * accounting for folded regions. In that case it walks over all folded
+  /usr/include/KF6/KTextEditor/ktexteditor/view.h:1094:     * O(n) for n == number of folded ranges
+  /usr/include/KF6/KTextEditor/ktexteditor/view.h:1106:     * \note If code is folded, many hundred lines can be
+  /usr/include/KF6/KTextEditor/ktexteditor/view.h:1110:     * accounting for folded regions. In that case it walks over all folded
+  /usr/include/KF6/KTextEditor/ktexteditor/view.h:1112:     * O(n) for n == number of folded ranges
+public KTextEditor headers declaring a folding class/interface:
+  NONE
+internal implementation (not installed) referenced for the report:
+  src/buffer/katetextfolding.h:32  class TextFolding (KatePart internal)
+  src/view/kateview.h:827         KateView::textFolding() (internal accessor)
+  src/utils/katecmds.cpp:258      command 'fold' -> newFoldingRange(range, Persistent|Folded)
+  src/utils/katecmds.cpp:261      command 'tfold' -> newFoldingRange(range, Folded)
+  src/utils/katecmds.cpp:264      command 'unfold' -> unfoldRange at cursor line

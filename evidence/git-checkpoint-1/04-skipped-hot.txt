@@ -1,0 +1,32 @@
+generated: 2026-10-31T10:34:44Z
+rule: 提交冷却线 = 提交时刻该路径最新 mtime 距今 > 300s；本文件列出采集时刻仍为脏（未提交）的路径，age 为采集时刻的秒数，可能与提交时刻略有出入
+cutoff_at_commit: now-300s = 2026-10-31T10:29:44Z
+age=61s  files=1  path=crates/vd-lsp/src/session.rs
+age=44s  files=1  path=crates/vd-config/src/filelist.rs
+age=390s  files=1  path=src/workspace/filetree/tools/rootcheck/seamcheck.cpp
+age=365s  files=13  path=evidence/verdicts/
+age=364s  files=1  path=src/workspace/filetree/filetree_integration.h
+age=364s  files=1  path=src/workspace/filetree/filetree_integration.cpp
+age=324s  files=1  path=src/syntax/provider/CMakeLists.txt
+age=313s  files=1  path=src/syntax/grammars/CMakeLists.txt
+age=308s  files=1  path=evidence/m0-build/build-logs/20-qt6-image-build.log
+age=294s  files=1  path=docs/handover/appendix/amendments-rev2.md
+age=287s  files=1  path=evidence/m0-build/build-logs/21-qt6-image-id.txt
+age=286s  files=1  path=evidence/m0-build/build-logs/31-qt6-configure.log
+age=285s  files=1  path=evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+age=285s  files=1  path=evidence/m0-build/build-logs/32-qt6-build.log
+age=284s  files=1  path=evidence/m0-build/build-logs/34-qt6-elf.txt
+age=282s  files=1  path=evidence/m0-build/build-logs/33-qt6-ctest.log
+age=243s  files=12  path=evidence/docs-amendments/
+age=235s  files=1  path=src/workspace/filetree/tests/filetree_tests.cpp
+age=203s  files=10007  path=filetree-testdata/
+age=18s  files=1  path=crates/vd-lsp/tests/session_file_set.rs
+age=17s  files=1  path=crates/vd-lsp/tests/session_degradation.rs
+age=171s  files=1  path=crates/vd-lsp/src/lib.rs
+age=168s  files=21  path=evidence/ffi-abi/
+age=150s  files=1  path=crates/vd-config/src/lib.rs
+age=149s  files=1  path=crates/vd-config/src/render.rs
+age=13s  files=1  path=crates/vd-config/tests/project_model_fixture.rs
+age=116s  files=4  path=src/syntax/product/
+age=115s  files=16  path=evidence/fix-filetree-open/
+age=113s  files=1  path=crates/vd-config/src/project.rs

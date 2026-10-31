@@ -1,0 +1,16 @@
+--- vprobe-qt6kf6:1
+libgl1-mesa-dri                  26.0.8-1ubuntu0.3
+mesa-libgallium                  26.0.8-1ubuntu0.3
+libglx-mesa0                     26.0.8-1ubuntu0.3
+libc6                            2.43-2ubuntu2.4
+qt6-base-dev                     6.10.2+dfsg-7
+libkf6texteditor6                6.24.0-0ubuntu1
+libkf6syntaxhighlighting6        6.24.0-0ubuntu1
+--- vedit-qt6-build:local
+libgl1-mesa-dri                  26.0.8-1ubuntu0.3
+mesa-libgallium                  26.0.8-1ubuntu0.3
+libglx-mesa0                     26.0.8-1ubuntu0.3
+libc6                            2.43-2ubuntu2.4
+qt6-base-dev                     6.10.2+dfsg-7
+libkf6texteditor6                6.24.0-0ubuntu1
+libkf6syntaxhighlighting6        6.24.0-0ubuntu1

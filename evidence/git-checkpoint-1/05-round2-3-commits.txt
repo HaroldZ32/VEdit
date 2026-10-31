@@ -1,0 +1,54 @@
+generated: 2026-10-31T10:40:58Z
+range: 3d7e1f8..HEAD
+count: 10
+
+commit: 6e6283e396e0f9ab8b407da913e000422bc10a20
+subject: feat(filetree): checkpoint filetree double-click open fix (T39 complete)
+files: evidence/fix-filetree-open/00-pins.txt  evidence/fix-filetree-open/01-before-red.log  evidence/fix-filetree-open/02-after-green.log  evidence/fix-filetree-open/03-two-paths.txt  evidence/fix-filetree-open/04-lane-tests-full.log  evidence/fix-filetree-open/04b-lane-tests-after-comment.log  evidence/fix-filetree-open/05-gate-qt6.log  evidence/fix-filetree-open/06-source-sha256.txt  evidence/fix-fil
+
+---
+commit: a179b6ca3a86545f0418d9c2fb772f0fb24c9776
+subject: docs(amendments): checkpoint AMENDMENTS rev2 and its evidence
+files: docs/handover/appendix/amendments-rev2.md  evidence/docs-amendments/00-context.txt  evidence/docs-amendments/01-file-list.txt  evidence/docs-amendments/02-sha256-check.txt  evidence/docs-amendments/03-ksh-validator-rerun.log  evidence/docs-amendments/04-folding-form-probe.log  evidence/docs-amendments/05-builtin-kde-folding.txt  evidence/docs-amendments/06-gates.txt  evidence/docs-amendments/07-e
+
+---
+commit: 0dd3a4a33d451cdf71ffe3117b43dac466fdbf32
+subject: test(evidence): checkpoint C9 verdict header batch
+files: evidence/verdicts/docs/01-independent-checks.txt  evidence/verdicts/docs/02-fold-probe-rerun.log  evidence/verdicts/docs/03-kde-selftest-rerun.log  evidence/verdicts/docs/04-gates.txt  evidence/verdicts/docs/run-checks.sh  evidence/verdicts/docs/verdict.md  evidence/verdicts/fix-evidence-c9/verdict.md  evidence/verdicts/fixture/verdict.md  evidence/verdicts/syn-grammars/verdict.md  evidence/verdi
+
+---
+commit: 0904a1dbda5b8dc45c1c244e8fd65e46579c491d
+subject: chore(ffi): checkpoint slice 0 ffi abi evidence and qt6 build logs
+files: evidence/ffi-abi/00-collect.txt  evidence/ffi-abi/50-unsafe-lint-diff.txt  evidence/ffi-abi/51-glibc-floor.txt  evidence/ffi-abi/52-reuse-boundary.txt  evidence/ffi-abi/53-verification-split.txt  evidence/ffi-abi/54-gates.txt  evidence/ffi-abi/README.md  evidence/ffi-abi/logs/10-rust-image.txt  evidence/ffi-abi/logs/19-rust-stage-console.log  evidence/ffi-abi/logs/20-cargo-build-release.log  evid
+
+---
+commit: 280828044f9ed49e406fbba2736ac01b96d76581
+subject: build(syntax): checkpoint grammar lane cmake wiring
+files: src/syntax/grammars/CMakeLists.txt 
+
+---
+commit: 8b940f2508c69fc82fce46fe2dbbb516ea79575c
+subject: feat(project-model): checkpoint slice 1 project model lane (in flight)
+files: crates/vd-config/src/filelist.rs  crates/vd-config/src/lib.rs  crates/vd-config/src/project.rs  crates/vd-config/src/render.rs  crates/vd-config/tests/project_model_fixture.rs 
+
+---
+commit: 13462f30dc2fbddf45eef3611b6eb2cab8d81ffc
+subject: feat(lsp): checkpoint slice 1 verible lsp lane (in flight)
+files: crates/vd-lsp/src/lib.rs  crates/vd-lsp/src/session.rs  crates/vd-lsp/tests/session_degradation.rs  crates/vd-lsp/tests/session_file_set.rs 
+
+---
+commit: 5668c43742beb91fd79e57e8bd8df5b09b6c5831
+subject: feat(syntax): checkpoint syntax product seam (in flight)
+files: src/syntax/product/CMakeLists.txt  src/syntax/product/syntax_product.cpp  src/syntax/product/syntax_product.h  src/syntax/product/tests/test_syntax_product.cpp  src/syntax/provider/CMakeLists.txt 
+
+---
+commit: 8fedbdd8d2d62da5d5c91555ddfec624afcd143e
+subject: fix(ffi): checkpoint vd-ffi project mirror (in flight)
+files: crates/vd-ffi/src/project.rs 
+
+---
+commit: 8219324042826491e1bca7d5379cbd253225c0fa
+subject: docs(evidence): record T5 independent review verdict for slice 0 ffi (PASS with findings)
+files: evidence/verdicts/ffi/verdict.md 
+
+---

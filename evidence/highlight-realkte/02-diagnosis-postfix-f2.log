@@ -1,0 +1,44 @@
+# C9 evidence header
+collected_at: 2026-10-31T22:38:41+08:00
+git_head: c71fe31478887e3dc7c460f875ccfb93e61c0ec4
+state: POST-FIX, delivered-runtime simulation: self-built F2 KSyntaxHighlighting library on
+       LD_LIBRARY_PATH (no embedded KDE definitions) + XDG data paths narrowed to a
+       private share holding exactly resources/syntax/vedit-*.xml (what AppRun does).
+
+F2 library: /vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
+aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6  /vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
+embedded DOCTYPE language markers in F2 lib: 0
+HIGHLIGHT share='/tmp/qt_temp-DLhbSV'
+HIGHLIGHT xdg_data_dirs='/tmp/qt_temp-DLhbSV'
+HIGHLIGHT xdg_data_home='/tmp/qt_temp-DLhbSV'
+HIGHLIGHT vedit_syntax_dir=''
+HIGHLIGHT generic_data_locations='/tmp/qt_temp-DLhbSV:/tmp/qt_temp-DLhbSV'
+CHECK highlight.editor-instance PASS
+HIGHLIGHT editor_repository_definitions=3 custom_paths=0
+HIGHLIGHT repository-definition name='None' author='' section='' version=0 valid=0
+HIGHLIGHT repository-definition name='SystemVerilog' author='VEdit' section='Hardware' version=1 valid=1
+HIGHLIGHT repository-definition name='Verilog' author='VEdit' section='Hardware' version=1 valid=1
+HIGHLIGHT definitionForName(Verilog): name='Verilog' author='VEdit' section='Hardware' version=1 valid=1
+HIGHLIGHT definitionForName(SystemVerilog): name='SystemVerilog' author='VEdit' section='Hardware' version=1 valid=1
+HIGHLIGHT definitionForFileName(top.v): name='Verilog' author='VEdit' section='Hardware' version=1 valid=1
+HIGHLIGHT definitionForFileName(top.sv): name='SystemVerilog' author='VEdit' section='Hardware' version=1 valid=1
+CHECK highlight.repository-has-verilog PASS  name='Verilog' author='VEdit' section='Hardware' version=1 valid=1
+CHECK highlight.repository-verilog-is-vedit PASS  name='Verilog' author='VEdit' section='Hardware' version=1 valid=1
+CHECK highlight.repository-has-systemverilog PASS  name='SystemVerilog' author='VEdit' section='Hardware' version=1 valid=1
+CHECK highlight.scratch-dir PASS
+CHECK highlight.open-file PASS  diagnose.v 
+HIGHLIGHT diagnose.v: url='' mode='Normal' highlightingMode='Verilog' availableModes=3
+CHECK highlight.document-mode-is-expected PASS  diagnose.v: got 'Verilog', expected 'Verilog'
+HIGHLIGHT diagnose.v: resolved name='Verilog' author='VEdit' section='Hardware' version=1 valid=1 -> formats=30 begins=2 ends=2
+CHECK highlight.definition-authored-by-vedit PASS  name='Verilog' author='VEdit' section='Hardware' version=1 valid=1
+CHECK highlight.format-ranges-positive PASS  diagnose.v: formats=30
+CHECK highlight.folding-regions-positive PASS  diagnose.v: begins=2 ends=2
+CHECK highlight.open-file PASS  diagnose.sv 
+HIGHLIGHT diagnose.sv: url='' mode='Normal' highlightingMode='SystemVerilog' availableModes=3
+CHECK highlight.document-mode-is-expected PASS  diagnose.sv: got 'SystemVerilog', expected 'SystemVerilog'
+HIGHLIGHT diagnose.sv: resolved name='SystemVerilog' author='VEdit' section='Hardware' version=1 valid=1 -> formats=29 begins=1 ends=1
+CHECK highlight.definition-authored-by-vedit PASS  name='SystemVerilog' author='VEdit' section='Hardware' version=1 valid=1
+CHECK highlight.format-ranges-positive PASS  diagnose.sv: formats=29
+CHECK highlight.folding-regions-positive PASS  diagnose.sv: begins=1 ends=1
+HIGHLIGHT-DIAGNOSIS checks=15 failures=0
+DIAG-EXIT=0

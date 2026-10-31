@@ -1,0 +1,56 @@
+# T-build-registration: link evidence — vedit-app really links vedit_terminal (collected 2026-10-31T16:22:43+08:00)
+
+## ninja link command for src/app/vedit-app (the actual linker invocation)
+-Wl,--dependency-file=src/app/CMakeFiles/vedit-app.dir/link.d
+src/app/CMakeFiles/vedit-app.dir/vedit-app_autogen/mocs_compilation.cpp.o
+src/app/CMakeFiles/vedit-app.dir/main.cpp.o
+src/app/vedit-app
+src/app/libvedit_app_shell.a
+src/terminal/libvedit_terminal.a
+src/app/libvedit_workspace_integration.a
+src/app/workspace-lane-filetree/libvedit_file_tree.a
+src/app/workspace-lane-palette/libvedit_workspace_palette.a
+src/app/workspace-lane-search/libvedit_workspace_search.a
+src/app/libvedit_app_shell.a
+
+## ninja dependency inputs of src/app/vedit-app
+src/app/vedit-app:
+  input: CXX_EXECUTABLE_LINKER__vedit-app_RelWithDebInfo
+    src/app/CMakeFiles/vedit-app.dir/vedit-app_autogen/mocs_compilation.cpp.o
+    src/app/CMakeFiles/vedit-app.dir/main.cpp.o
+    | src/app/libvedit_app_shell.a
+    | src/terminal/libvedit_terminal.a
+    | src/app/libvedit_workspace_integration.a
+    | src/app/workspace-lane-filetree/libvedit_file_tree.a
+    | src/app/workspace-lane-palette/libvedit_workspace_palette.a
+    | src/app/workspace-lane-search/libvedit_workspace_search.a
+    | src/app/libvedit_app_shell.a
+    | /usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
+    | /usr/lib/x86_64-linux-gnu/libQt6Widgets.so.6.10.2
+    | /usr/lib/x86_64-linux-gnu/libQt6Gui.so.6.10.2
+    | /usr/lib/x86_64-linux-gnu/libGLX.so
+    | /usr/lib/x86_64-linux-gnu/libOpenGL.so
+    | /usr/lib/x86_64-linux-gnu/libQt6Core.so.6.10.2
+    || src/app/libvedit_app_shell.a
+    || src/app/libvedit_workspace_integration.a
+    || src/app/vedit-app_autogen
+    || src/app/vedit-app_autogen_timestamp_deps
+    || src/app/workspace-lane-filetree/libvedit_file_tree.a
+    || src/app/workspace-lane-palette/libvedit_workspace_palette.a
+    || src/app/workspace-lane-search/libvedit_workspace_search.a
+    || src/terminal/libvedit_terminal.a
+
+## symbols in the executable that come from the terminal lane
+00000000000b7700 b guard variable for vedit::terminal::Screen::rowCells(int) const::empty
+0000000000068060 T vedit::terminal::PtySession::signalName(int)
+00000000000200ee t vedit::terminal::PtySession::signalName(int) [clone .cold]
+0000000000068010 T vedit::terminal::PtySession::closeMaster()
+0000000000067ad0 T vedit::terminal::PtySession::flushWrites()
+00000000000200c4 t vedit::terminal::PtySession::flushWrites() [clone .cold]
+0000000000066f40 T vedit::terminal::PtySession::outputReady(QByteArray const&)
+0000000000067580 T vedit::terminal::PtySession::qt_metacall(QMetaObject::Call, int, void**)
+0000000000067520 T vedit::terminal::PtySession::qt_metacast(char const*)
+0000000000067e20 T vedit::terminal::PtySession::stopNotifier()
+terminal symbol count: 267
+factory symbol:
+6

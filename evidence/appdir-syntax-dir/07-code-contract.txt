@@ -1,0 +1,145 @@
+== product contract vs packaging value (T84) ==
+collected_at: 2026-10-31T15:17:16Z
+git_head: c682694e125ff7f59c590b83b6d2895239a3d143
+
+## product-side contract (BEFORE the fix, unchanged semantics documented in the header)
+src/syntax/kde/ksyntax_data.h:
+//   * the AppDir ships our definitions in
+//       <VEDIT_SYNTAX_DIR>/syntax/*.xml        (VEDIT_SYNTAX_DIR = AppDir/share/ksyntaxhighlighting)
+//   * the app calls KSyntaxHighlighting::Repository::addCustomSearchPath(<VEDIT_SYNTAX_DIR>)
+//     at startup — a runtime, per-repository, revertible hook;
+//   * XDG_DATA_DIRS is NOT mutated (it would leak into unrelated processes) and
+
+## product code: root + '/syntax' is required; addCustomSearchPath(root)
+        "mutated; NO_STANDARD_PATHS is not required (see src/syntax/kde/README.md)");
+
+    repository_ = std::make_unique<KSyntaxHighlighting::Repository>();
+
+    // T84: the contract value is the DATA ROOT (the directory holding `syntax/`),
+    // but packaging has pointed at the `syntax` subdirectory before. Accept both:
+    // a path whose own `syntax/` is missing but whose basename is `syntax` is
+    // normalised to its parent, and the report records the effective root.
+    const auto addSearchPath = [this](const QString &path, bool required) -> QString {
+        if (path.isEmpty()) {
+            return QString();
+        }
+        QString dataRoot = path;
+        if (!QDir(dataRoot + QStringLiteral("/syntax")).exists()) {
+            const QFileInfo info(path);
+            if (info.fileName() == QLatin1String("syntax") && info.dir().exists()) {
+                dataRoot = info.dir().absolutePath();
+            }
+        }
+        if (!QDir(dataRoot + QStringLiteral("/syntax")).exists()) {
+            if (required) {
+                report_.diagnostics.append(
+                    QStringLiteral("private syntax directory missing: %1/syntax (set VEDIT_SYNTAX_DIR)")
+                        .arg(path));
+            }
+            return QString();
+        }
+        repository_->addCustomSearchPath(dataRoot);
+        report_.search_paths.append(dataRoot + QStringLiteral("/syntax"));
+        return dataRoot;
+    };
+
+    if (!config_.private_dir.isEmpty()) {
+        const QString privateRoot = addSearchPath(config_.private_dir, true);
+        if (!privateRoot.isEmpty()) {
+            // The effective root (normalised when packaging passed the `syntax` subdir).
+
+## packaging values BEFORE -> AFTER
+AppRun:    -export VEDIT_SYNTAX_DIR="$APPDIR/usr/share/org.kde.syntax-highlighting/syntax" +export VEDIT_SYNTAX_DIR="$APPDIR/usr/share/org.kde.syntax-highlighting" 
+verify:    0 changed lines (value only; check logic untouched)
+STEPS.md:  
+
+## git diff (packaging + product tolerance)
+diff --git a/packaging/runtime/AppRun b/packaging/runtime/AppRun
+index e6d7201..a7db51e 100755
+--- a/packaging/runtime/AppRun
++++ b/packaging/runtime/AppRun
+@@ -30,7 +30,7 @@ export QML2_IMPORT_PATH="$APPDIR/qml"
+ # -> 402 defs). Setting only one of the two variables is NOT enough.
+ export XDG_DATA_DIRS="$APPDIR/usr/share"
+ export XDG_DATA_HOME="$APPDIR/usr/share"
+-export VEDIT_SYNTAX_DIR="$APPDIR/usr/share/org.kde.syntax-highlighting/syntax"
++export VEDIT_SYNTAX_DIR="$APPDIR/usr/share/org.kde.syntax-highlighting"
+ 
+ # --- fonts (no host fontconfig data) ----------------------------------------
+ export FONTCONFIG_FILE="$APPDIR/etc/fonts/fonts.conf"
+diff --git a/src/syntax/kde/ksyntax_data.cpp b/src/syntax/kde/ksyntax_data.cpp
+index f0bc66b..89f36e4 100644
+--- a/src/syntax/kde/ksyntax_data.cpp
++++ b/src/syntax/kde/ksyntax_data.cpp
+@@ -91,27 +91,42 @@ const LoadReport &KsyntaxData::load()
+ 
+     repository_ = std::make_unique<KSyntaxHighlighting::Repository>();
+ 
+-    const auto addSearchPath = [this](const QString &path, bool required) {
++    // T84: the contract value is the DATA ROOT (the directory holding `syntax/`),
++    // but packaging has pointed at the `syntax` subdirectory before. Accept both:
++    // a path whose own `syntax/` is missing but whose basename is `syntax` is
++    // normalised to its parent, and the report records the effective root.
++    const auto addSearchPath = [this](const QString &path, bool required) -> QString {
+         if (path.isEmpty()) {
+-            return;
++            return QString();
+         }
+-        const bool hasSyntaxDir = QDir(path + QStringLiteral("/syntax")).exists();
+-        if (!hasSyntaxDir) {
++        QString dataRoot = path;
++        if (!QDir(dataRoot + QStringLiteral("/syntax")).exists()) {
++            const QFileInfo info(path);
++            if (info.fileName() == QLatin1String("syntax") && info.dir().exists()) {
++                dataRoot = info.dir().absolutePath();
++            }
++        }
++        if (!QDir(dataRoot + QStringLiteral("/syntax")).exists()) {
+             if (required) {
+                 report_.diagnostics.append(
+                     QStringLiteral("private syntax directory missing: %1/syntax (set VEDIT_SYNTAX_DIR)")
+                         .arg(path));
+             }
+-            return;
++            return QString();
+         }
+-        repository_->addCustomSearchPath(path);
+-        report_.search_paths.append(path + QStringLiteral("/syntax"));
++        repository_->addCustomSearchPath(dataRoot);
++        report_.search_paths.append(dataRoot + QStringLiteral("/syntax"));
++        return dataRoot;
+     };
+ 
+     if (!config_.private_dir.isEmpty()) {
+-        addSearchPath(config_.private_dir, true);
++        const QString privateRoot = addSearchPath(config_.private_dir, true);
++        if (!privateRoot.isEmpty()) {
++            // The effective root (normalised when packaging passed the `syntax` subdir).
++            report_.private_dir = privateRoot;
++        }
+         // Refuse to load forbidden KDE definitions even if they were copied in.
+-        QDirIterator it(config_.private_dir + QStringLiteral("/syntax"),
++        QDirIterator it(report_.private_dir + QStringLiteral("/syntax"),
+                         QStringList{QStringLiteral("*.xml")}, QDir::Files);
+         while (it.hasNext()) {
+             const QString path = it.next();
+diff --git a/src/syntax/kde/ksyntax_data.h b/src/syntax/kde/ksyntax_data.h
+index f121b2e..1525231 100644
+--- a/src/syntax/kde/ksyntax_data.h
++++ b/src/syntax/kde/ksyntax_data.h
+@@ -26,7 +26,9 @@ namespace vedit::kde {
+ 
+ struct DataConfig {
+     // Directory that contains a "syntax/" subdirectory; packaging sets it from
+-    // VEDIT_SYNTAX_DIR. Empty = standard paths only (development).
++    // VEDIT_SYNTAX_DIR. T84 tolerance: passing the `syntax` subdirectory itself is
++    // normalised to its parent (the effective root is recorded in LoadReport).
++    // Empty = standard paths only (development).
+     QString private_dir;
+     // Extra search paths, development only (recorded in the report).
+     QStringList fallback_dirs;
+
+## tarball content proves the packaged AppRun is the corrected one
+export VEDIT_SYNTAX_DIR="$APPDIR/usr/share/org.kde.syntax-highlighting"
+    VEDIT_SYNTAX_DIR="$APPDIR/usr/share/org.kde.syntax-highlighting" \
+        VEDIT_SYNTAX_DIR="$APPDIR/usr/share/org.kde.syntax-highlighting" \

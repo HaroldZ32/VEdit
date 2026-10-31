@@ -1,0 +1,116 @@
+Loaded plugins: fastestmirror, ovl
+Loading mirror speeds from cached hostfile
+Package libxcb-devel-1.13-1.el7.x86_64 already installed and latest version
+Package libX11-devel-1.6.7-5.el7_9.x86_64 already installed and latest version
+Package libXrender-devel-0.9.10-1.el7.x86_64 already installed and latest version
+Package libXi-devel-1.7.9-1.el7.x86_64 already installed and latest version
+Package libxkbcommon-devel-0.7.1-3.el7.x86_64 already installed and latest version
+Package fontconfig-devel-2.13.0-4.3.el7.x86_64 already installed and latest version
+Package freetype-devel-2.8-14.el7_9.1.x86_64 already installed and latest version
+Package 2:libpng-devel-1.5.13-8.el7.x86_64 already installed and latest version
+Resolving Dependencies
+--> Running transaction check
+---> Package libxkbcommon-x11-devel.x86_64 0:0.7.1-3.el7 will be installed
+--> Processing Dependency: libxkbcommon-x11(x86-64) = 0.7.1-3.el7 for package: libxkbcommon-x11-devel-0.7.1-3.el7.x86_64
+--> Processing Dependency: libxkbcommon-x11.so.0()(64bit) for package: libxkbcommon-x11-devel-0.7.1-3.el7.x86_64
+---> Package xcb-util-devel.x86_64 0:0.4.0-2.el7 will be installed
+--> Processing Dependency: xcb-util = 0.4.0-2.el7 for package: xcb-util-devel-0.4.0-2.el7.x86_64
+--> Processing Dependency: libxcb-util.so.1()(64bit) for package: xcb-util-devel-0.4.0-2.el7.x86_64
+---> Package xcb-util-image-devel.x86_64 0:0.4.0-2.el7 will be installed
+--> Processing Dependency: xcb-util-image(x86-64) = 0.4.0-2.el7 for package: xcb-util-image-devel-0.4.0-2.el7.x86_64
+--> Processing Dependency: libxcb-image.so.0()(64bit) for package: xcb-util-image-devel-0.4.0-2.el7.x86_64
+---> Package xcb-util-keysyms-devel.x86_64 0:0.4.0-1.el7 will be installed
+--> Processing Dependency: xcb-util-keysyms(x86-64) = 0.4.0-1.el7 for package: xcb-util-keysyms-devel-0.4.0-1.el7.x86_64
+--> Processing Dependency: libxcb-keysyms.so.1()(64bit) for package: xcb-util-keysyms-devel-0.4.0-1.el7.x86_64
+---> Package xcb-util-renderutil-devel.x86_64 0:0.3.9-3.el7 will be installed
+--> Processing Dependency: xcb-util-renderutil(x86-64) = 0.3.9-3.el7 for package: xcb-util-renderutil-devel-0.3.9-3.el7.x86_64
+--> Processing Dependency: libxcb-render-util.so.0()(64bit) for package: xcb-util-renderutil-devel-0.3.9-3.el7.x86_64
+---> Package xcb-util-wm-devel.x86_64 0:0.4.1-5.el7 will be installed
+--> Processing Dependency: xcb-util-wm(x86-64) = 0.4.1-5.el7 for package: xcb-util-wm-devel-0.4.1-5.el7.x86_64
+--> Processing Dependency: libxcb-icccm.so.4()(64bit) for package: xcb-util-wm-devel-0.4.1-5.el7.x86_64
+--> Processing Dependency: libxcb-ewmh.so.2()(64bit) for package: xcb-util-wm-devel-0.4.1-5.el7.x86_64
+--> Running transaction check
+---> Package libxkbcommon-x11.x86_64 0:0.7.1-3.el7 will be installed
+---> Package xcb-util.x86_64 0:0.4.0-2.el7 will be installed
+---> Package xcb-util-image.x86_64 0:0.4.0-2.el7 will be installed
+---> Package xcb-util-keysyms.x86_64 0:0.4.0-1.el7 will be installed
+---> Package xcb-util-renderutil.x86_64 0:0.3.9-3.el7 will be installed
+---> Package xcb-util-wm.x86_64 0:0.4.1-5.el7 will be installed
+--> Finished Dependency Resolution
+
+Dependencies Resolved
+
+================================================================================
+ Package                        Arch        Version             Repository
+                                                                           Size
+================================================================================
+Installing:
+ libxkbcommon-x11-devel         x86_64      0.7.1-3.el7         base       11 k
+ xcb-util-devel                 x86_64      0.4.0-2.el7         base       11 k
+ xcb-util-image-devel           x86_64      0.4.0-2.el7         base       14 k
+ xcb-util-keysyms-devel         x86_64      0.4.0-1.el7         base      6.4 k
+ xcb-util-renderutil-devel      x86_64      0.3.9-3.el7         base      7.1 k
+ xcb-util-wm-devel              x86_64      0.4.1-5.el7         base       21 k
+Installing for dependencies:
+ libxkbcommon-x11               x86_64      0.7.1-3.el7         base       19 k
+ xcb-util                       x86_64      0.4.0-2.el7         base       16 k
+ xcb-util-image                 x86_64      0.4.0-2.el7         base       15 k
+ xcb-util-keysyms               x86_64      0.4.0-1.el7         base       10 k
+ xcb-util-renderutil            x86_64      0.3.9-3.el7         base       12 k
+ xcb-util-wm                    x86_64      0.4.1-5.el7         base       25 k
+
+Transaction Summary
+================================================================================
+Install  6 Packages (+6 Dependent packages)
+
+Total download size: 169 k
+Installed size: 390 k
+Downloading packages:
+--------------------------------------------------------------------------------
+Total                                              282 kB/s | 169 kB  00:00     
+Running transaction check
+Running transaction test
+Transaction test succeeded
+Running transaction
+  Installing : xcb-util-0.4.0-2.el7.x86_64                                 1/12 
+  Installing : xcb-util-image-0.4.0-2.el7.x86_64                           2/12 
+  Installing : xcb-util-wm-0.4.1-5.el7.x86_64                              3/12 
+  Installing : xcb-util-keysyms-0.4.0-1.el7.x86_64                         4/12 
+  Installing : libxkbcommon-x11-0.7.1-3.el7.x86_64                         5/12 
+  Installing : xcb-util-renderutil-0.3.9-3.el7.x86_64                      6/12 
+  Installing : xcb-util-renderutil-devel-0.3.9-3.el7.x86_64                7/12 
+  Installing : libxkbcommon-x11-devel-0.7.1-3.el7.x86_64                   8/12 
+  Installing : xcb-util-keysyms-devel-0.4.0-1.el7.x86_64                   9/12 
+  Installing : xcb-util-wm-devel-0.4.1-5.el7.x86_64                       10/12 
+  Installing : xcb-util-image-devel-0.4.0-2.el7.x86_64                    11/12 
+  Installing : xcb-util-devel-0.4.0-2.el7.x86_64                          12/12 
+  Verifying  : xcb-util-keysyms-devel-0.4.0-1.el7.x86_64                   1/12 
+  Verifying  : xcb-util-renderutil-0.3.9-3.el7.x86_64                      2/12 
+  Verifying  : libxkbcommon-x11-0.7.1-3.el7.x86_64                         3/12 
+  Verifying  : xcb-util-image-0.4.0-2.el7.x86_64                           4/12 
+  Verifying  : xcb-util-image-devel-0.4.0-2.el7.x86_64                     5/12 
+  Verifying  : xcb-util-0.4.0-2.el7.x86_64                                 6/12 
+  Verifying  : xcb-util-devel-0.4.0-2.el7.x86_64                           7/12 
+  Verifying  : xcb-util-wm-devel-0.4.1-5.el7.x86_64                        8/12 
+  Verifying  : libxkbcommon-x11-devel-0.7.1-3.el7.x86_64                   9/12 
+  Verifying  : xcb-util-keysyms-0.4.0-1.el7.x86_64                        10/12 
+  Verifying  : xcb-util-wm-0.4.1-5.el7.x86_64                             11/12 
+  Verifying  : xcb-util-renderutil-devel-0.3.9-3.el7.x86_64               12/12 
+
+Installed:
+  libxkbcommon-x11-devel.x86_64 0:0.7.1-3.el7                                   
+  xcb-util-devel.x86_64 0:0.4.0-2.el7                                           
+  xcb-util-image-devel.x86_64 0:0.4.0-2.el7                                     
+  xcb-util-keysyms-devel.x86_64 0:0.4.0-1.el7                                   
+  xcb-util-renderutil-devel.x86_64 0:0.3.9-3.el7                                
+  xcb-util-wm-devel.x86_64 0:0.4.1-5.el7                                        
+
+Dependency Installed:
+  libxkbcommon-x11.x86_64 0:0.7.1-3.el7                                         
+  xcb-util.x86_64 0:0.4.0-2.el7                                                 
+  xcb-util-image.x86_64 0:0.4.0-2.el7                                           
+  xcb-util-keysyms.x86_64 0:0.4.0-1.el7                                         
+  xcb-util-renderutil.x86_64 0:0.3.9-3.el7                                      
+  xcb-util-wm.x86_64 0:0.4.1-5.el7                                              
+
+Complete!

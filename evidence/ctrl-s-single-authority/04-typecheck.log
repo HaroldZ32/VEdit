@@ -1,0 +1,6 @@
+# T80 typecheck gate
+# command: bash build/gates/typecheck.sh
+# date: 2026-10-31T22:41:41+08:00
+[qt6] PASS: Rust service layer + configure + build (warnings-as-errors) inside vedit-qt6-build:local; tests skipped (--no-test)
+[typecheck] PASS (pinned image vedit-build:local)
+TYPECHECK-EXIT=0

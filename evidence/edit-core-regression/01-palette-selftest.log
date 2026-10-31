@@ -1,0 +1,53 @@
+# palette integration selftest under the REAL KTextEditor provider (regression T60)
+# command (offscreen, pinned image): vedit-workspace-palette-integration-selftest --screenshots <dir>
+# date: 2026-10-31T19:25:05+08:00
+
+CHECK fixture.temp-dir PASS
+This plugin does not support propagateSizeHints()
+CHECK integration.installed PASS
+CHECK integration.command-registered PASS
+CHECK integration.command-in-registry PASS
+CHECK integration.action PASS
+CHECK integration.shortcut-ctrl-p PASS
+CHECK integration.in-file-menu PASS
+CHECK integration.idempotent PASS
+palette: indexed 4 files under /tmp/vedit-palette-integration-selftest-WcdgRB/project in 0 ms
+This plugin does not support raise()
+This plugin does not support grabbing the keyboard
+This plugin does not support raise()
+CHECK integration.ctrl-p-opens PASS
+CHECK integration.index-count PASS
+CHECK integration.hidden-skipped PASS
+CHECK integration.filters PASS
+CHECK integration.enter-closes PASS
+CHECK integration.enter-opened PASS
+CHECK integration.demo-editor PASS
+CHECK integration.demo-content PASS
+CHECK integration.demo-property PASS
+This plugin does not support raise()
+This plugin does not support grabbing the keyboard
+This plugin does not support raise()
+CHECK integration.second-open PASS
+CHECK integration.single-scan PASS
+This plugin does not support raise()
+This plugin does not support grabbing the keyboard
+This plugin does not support raise()
+CHECK integration.empty-state PASS
+SCREENSHOT OK target/t60-palette-shots/20-integration-empty.png
+SCREENSHOT OK target/t60-palette-shots/21-integration-palette.png
+SCREENSHOT OK target/t60-palette-shots/22-integration-shell.png
+CHECK integration.shortcut-store PASS
+CHECK integration.rebinding PASS
+CHECK integration.rebinding-restored PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+CHECK integration.ktexteditor-widget PASS
+This plugin does not support raise()
+This plugin does not support grabbing the keyboard
+This plugin does not support raise()
+CHECK integration.ktexteditor-opened-path PASS
+CHECK integration.ktexteditor-document PASS
+CHECK integration.ktexteditor-content PASS
+KTEXTEDITOR-OPEN path=/tmp/vedit-palette-integration-selftest-WcdgRB/project/src/util/helper.cpp bytes=10
+CHECK integration.ktexteditor-opened-path-recorded PASS
+INTEGRATION-SELFTEST ok=1 checks=28 failures=0

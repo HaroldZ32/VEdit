@@ -22,6 +22,13 @@ pub enum RootSource {
     VeditToml,
     /// A `.git` directory marked the root.
     GitDir,
+    /// A `.f` filelist held directly by the directory marked the root.
+    ///
+    /// A folder that ships its own filelist is a project even when it lives
+    /// inside a larger checkout: `tests/fixtures/verilog-project` (the
+    /// repository-owned acceptance fixture) documents itself as the project
+    /// root, and every service resolving that project must agree on it.
+    Filelist,
     /// Nothing marked a root; the discovery start directory was used.
     Fallback,
 }
@@ -127,7 +134,12 @@ pub(crate) fn discover_in_root(
     }
 }
 
-/// Walk up from `start_dir` until a `vedit.toml` or `.git` marker is found.
+/// Walk up from `start_dir` until a `vedit.toml`, `.git` or direct `.f` marker is found.
+///
+/// A directory that holds a `.f` filelist directly is a root of its own, so a
+/// project opened from its own folder inside a larger git checkout expands that
+/// folder's filelists instead of the enclosing repository's (see
+/// [`RootSource::Filelist`]).
 pub(crate) fn discover_root(start_dir: &Path) -> (PathBuf, RootSource, PathBuf) {
     let start = std::path::absolute(start_dir).unwrap_or_else(|_| start_dir.to_path_buf());
     let mut dir = start.clone();
@@ -138,11 +150,24 @@ pub(crate) fn discover_root(start_dir: &Path) -> (PathBuf, RootSource, PathBuf) 
         if dir.join(".git").exists() {
             return (dir.clone(), RootSource::GitDir, dir);
         }
+        if has_direct_filelist(&dir) {
+            return (dir.clone(), RootSource::Filelist, dir);
+        }
         match dir.parent() {
             Some(parent) => dir = parent.to_path_buf(),
             None => return (start.clone(), RootSource::Fallback, dir),
         }
     }
+}
+
+/// Does `dir` itself (not a descendant) hold a `.f` filelist?
+fn has_direct_filelist(dir: &Path) -> bool {
+    let Ok(read_dir) = std::fs::read_dir(dir) else {
+        return false;
+    };
+    read_dir
+        .filter_map(Result::ok)
+        .any(|entry| entry.path().is_file() && has_f_extension(&entry.path()))
 }
 
 /// Find the nearest `.rules.verible_lint` at or above `root`.
@@ -347,6 +372,47 @@ mod tests {
         assert_eq!(source, RootSource::Fallback);
         assert_eq!(found, absolute);
         assert!(stop.starts_with("/"));
+        Ok(())
+    }
+
+    /// The counter-example for the `.f` marker: a project folder nested inside a
+    /// git checkout must resolve to itself when opened directly, while the outer
+    /// checkout must keep resolving to the outer root (a `.f` deeper in the tree
+    /// never re-roots the walk).
+    #[test]
+    fn a_direct_filelist_roots_its_own_directory_but_never_the_outer_checkout(
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let temp = tempfile::tempdir()?;
+        let outer = temp.path();
+        std::fs::create_dir_all(outer.join(".git"))?;
+        let inner = outer.join("nested-project");
+        std::fs::create_dir_all(&inner)?;
+        write(&inner.join("project.f"), "rtl/a.sv\n")?;
+        let inner_absolute = std::path::absolute(&inner)?;
+
+        // From the outer checkout root: the .f lives one level down, so it is
+        // not a marker on the way up — the outer root wins.
+        let (found, source, _stop) = discover_root(outer);
+        assert_eq!(
+            found,
+            std::path::absolute(outer)?,
+            "a nested .f must not move the root when starting at the outer checkout"
+        );
+        assert_eq!(source, RootSource::GitDir);
+
+        // From the nested folder itself: its own filelist marks the root.
+        let (found, source, _stop) = discover_root(&inner);
+        assert_eq!(found, inner_absolute);
+        assert_eq!(source, RootSource::Filelist);
+
+        // A directory holding BOTH markers keeps the same root; git stays the
+        // reported source because it is the stronger marker.
+        let both = outer.join("repo-with-filelist");
+        std::fs::create_dir_all(both.join(".git"))?;
+        write(&both.join("top.f"), "rtl/b.sv\n")?;
+        let (found, source, _stop) = discover_root(&both);
+        assert_eq!(found, std::path::absolute(&both)?);
+        assert_eq!(source, RootSource::GitDir);
         Ok(())
     }
 }

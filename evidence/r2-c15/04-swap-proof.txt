@@ -1,0 +1,31 @@
+== diff of source manifests between the two grammar builds ==
+IDENTICAL: every source file hashed the same before/after the grammar switch
+[diff exit=0]
+
+== files that differ between the two build trees (build outputs only) ==
+Files A/.ninja_deps and B/.ninja_deps differ
+Files A/.ninja_log and B/.ninja_log differ
+Files A/CMakeCache.txt and B/CMakeCache.txt differ
+Files A/CMakeFiles/CMakeConfigureLog.yaml and B/CMakeFiles/CMakeConfigureLog.yaml differ
+Files A/CMakeFiles/InstallScripts.json and B/CMakeFiles/InstallScripts.json differ
+Files A/CMakeFiles/TargetDirectories.txt and B/CMakeFiles/TargetDirectories.txt differ
+Files A/CMakeFiles/c15-seam.dir/src/grammar_registry.cpp.o and B/CMakeFiles/c15-seam.dir/src/grammar_registry.cpp.o differ
+Only in B/CMakeFiles: grammar_json.dir
+Only in A/CMakeFiles: grammar_verilog_placeholder.dir
+Files A/CMakeFiles/rules.ninja and B/CMakeFiles/rules.ninja differ
+Files A/build.ninja and B/build.ninja differ
+Files A/c15-seam and B/c15-seam differ
+Files A/cmake_install.cmake and B/cmake_install.cmake differ
+Files A/compile_commands.json and B/compile_commands.json differ
+Files A/generated/grammar_config_generated.hpp and B/generated/grammar_config_generated.hpp differ
+Only in B: libgrammar_json.a
+Only in A: libgrammar_verilog_placeholder.a
+
+== CMake cache: the only configured difference ==
+--- /dev/fd/63	2026-10-31 02:54:48.307087131 +0000
++++ /dev/fd/62	2026-10-31 02:54:48.307087131 +0000
+@@ -1,3 +1,3 @@
+-SEAM_GRAMMAR:STRING=verilog_placeholder
++SEAM_GRAMMAR:STRING=json
+ SEAM_TREESITTER:BOOL=ON
+ SEAM_TS_LINK:STRING=shared

@@ -1,0 +1,12 @@
+== T84 context ==
+collected_at: 2026-10-31T15:17:16Z
+git_head: c682694e125ff7f59c590b83b6d2895239a3d143
+branch: feat/qt6-ktexteditor-migration
+image: docker.m.daocloud.io/library/centos:7 (stock; no KDE data, kernel 3.10 check cannot pass in a container)
+
+== scope: changed paths attributable to T84 ==
+ M packaging/runtime/AppRun
+ M src/syntax/kde/ksyntax_data.cpp
+ M src/syntax/kde/ksyntax_data.h
+?? build/centos7-verify/
+?? evidence/appdir-syntax-dir/

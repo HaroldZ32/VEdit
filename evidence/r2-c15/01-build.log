@@ -1,0 +1,103 @@
+== configure+build verilog ==
+-- The C compiler identification is GNU 15.2.0
+-- The CXX compiler identification is GNU 15.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found PkgConfig: /usr/bin/pkg-config (found version "2.5.1")
+-- Checking for module 'tree-sitter'
+--   Found tree-sitter, version 0.25.9
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /work/probes/c15-seam/build/verilog
+[1/7] Building CXX object CMakeFiles/c15-seam.dir/src/grammar_registry.cpp.o
+[2/7] Building C object CMakeFiles/grammar_verilog_placeholder.dir/grammars/verilog_placeholder/src/parser.c.o
+[3/7] Linking C static library libgrammar_verilog_placeholder.a
+[4/7] Building CXX object CMakeFiles/c15-seam.dir/src/disabled_provider.cpp.o
+[5/7] Building CXX object CMakeFiles/c15-seam.dir/src/main.cpp.o
+[6/7] Building CXX object CMakeFiles/c15-seam.dir/src/tree_sitter_provider.cpp.o
+[7/7] Linking CXX executable c15-seam
+[build verilog exit=0]
+== configure+build json ==
+-- The C compiler identification is GNU 15.2.0
+-- The CXX compiler identification is GNU 15.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found PkgConfig: /usr/bin/pkg-config (found version "2.5.1")
+-- Checking for module 'tree-sitter'
+--   Found tree-sitter, version 0.25.9
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /work/probes/c15-seam/build/json
+[1/7] Building CXX object CMakeFiles/c15-seam.dir/src/grammar_registry.cpp.o
+[2/7] Building C object CMakeFiles/grammar_json.dir/third_party/tree-sitter-json/src/parser.c.o
+[3/7] Linking C static library libgrammar_json.a
+[4/7] Building CXX object CMakeFiles/c15-seam.dir/src/disabled_provider.cpp.o
+[5/7] Building CXX object CMakeFiles/c15-seam.dir/src/main.cpp.o
+[6/7] Building CXX object CMakeFiles/c15-seam.dir/src/tree_sitter_provider.cpp.o
+[7/7] Linking CXX executable c15-seam
+[build json exit=0]
+== configure+build nots ==
+-- The C compiler identification is GNU 15.2.0
+-- The CXX compiler identification is GNU 15.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: /work/probes/c15-seam/build/nots
+[1/4] Building CXX object CMakeFiles/c15-seam.dir/src/builtin_fallback.cpp.o
+[2/4] Building CXX object CMakeFiles/c15-seam.dir/src/disabled_provider.cpp.o
+[3/4] Building CXX object CMakeFiles/c15-seam.dir/src/main.cpp.o
+[4/4] Linking CXX executable c15-seam
+[build nots exit=0]
+== configure+build static ==
+-- The C compiler identification is GNU 15.2.0
+-- The CXX compiler identification is GNU 15.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found PkgConfig: /usr/bin/pkg-config (found version "2.5.1")
+-- Checking for module 'tree-sitter'
+--   Found tree-sitter, version 0.25.9
+-- linking /usr/lib/x86_64-linux-gnu/libtree-sitter.a statically
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /work/probes/c15-seam/build/static
+[1/7] Building CXX object CMakeFiles/c15-seam.dir/src/grammar_registry.cpp.o
+[2/7] Building C object CMakeFiles/grammar_json.dir/third_party/tree-sitter-json/src/parser.c.o
+[3/7] Linking C static library libgrammar_json.a
+[4/7] Building CXX object CMakeFiles/c15-seam.dir/src/disabled_provider.cpp.o
+[5/7] Building CXX object CMakeFiles/c15-seam.dir/src/main.cpp.o
+[6/7] Building CXX object CMakeFiles/c15-seam.dir/src/tree_sitter_provider.cpp.o
+[7/7] Linking CXX executable c15-seam
+[build static exit=0]

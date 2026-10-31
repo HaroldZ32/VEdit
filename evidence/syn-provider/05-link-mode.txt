@@ -1,0 +1,13 @@
+== 05 link mode (C18) ==
+-- shared variant (VEDIT_SYNTAX_TS_LINK=shared): test binary NEEDED
+ 0x0000000000000001 (NEEDED)             Shared library: [libtree-sitter.so.0.25]
+ 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+-- static variant (VEDIT_SYNTAX_TS_LINK=static): test binary NEEDED
+ 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+-- static variant must NOT depend on libtree-sitter.so:
+OK: no libtree-sitter NEEDED entry (libtree-sitter.a linked in)
+-- tree-sitter backend OFF variant (no tree-sitter link at all):

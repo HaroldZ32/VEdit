@@ -1,0 +1,24 @@
+FFI-ABI fixture=crates/vd-ffi/tests/fixtures/project
+CHECK ffi.service.create PASS
+CHECK ffi.abi-version PASS
+CHECK ffi.project.start.returns-job PASS
+CHECK ffi.project.start.non-blocking PASS
+FFI-TIMING project-start-ms=0
+CHECK ffi.project.ready PASS
+CHECK ffi.project.file-count PASS
+CHECK ffi.project.file-order PASS
+CHECK ffi.project.include-dir PASS
+CHECK ffi.project.defines PASS
+CHECK ffi.project.unknown-job-rejected PASS
+CHECK ffi.fim.start PASS
+CHECK ffi.fim.disabled-by-default PASS
+CHECK ffi.vcs.start PASS
+CHECK ffi.vcs.backend-detected PASS
+CHECK ffi.settings.temp-dir PASS
+CHECK ffi.settings.save.start PASS
+CHECK ffi.settings.save.ready PASS
+CHECK ffi.settings.load.start PASS
+CHECK ffi.settings.load.ready PASS
+CHECK ffi.settings.round-trip PASS
+FFI-ABI-SELFTEST ok=1 checks=20 failures=0
+SELFTEST-EXIT=0

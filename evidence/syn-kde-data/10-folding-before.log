@@ -1,0 +1,21 @@
+# INVALID (T66): this log measured the DISTRO library (F2_DIR path bug) and the SV
+# sample branch never ran; superseded by 10-folding-before-F2.log (real F2 + ldd guard + 26-line SV sample).
+# folding probe — definition files: /home/haroldzhao/MyProj/DshProj/VEdit/resources/syntax/vedit-{verilog,systemverilog}.xml
+# library=F2 (/home/haroldzhao/MyProj/DshProj/VEdit/target/ksh-selfbuild/F2/install/lib)
+kf.syntaxhighlighting: Rule: Unknown keyword list "module" in context "Normal" of definition "VEditProbeVerilog"
+kf.syntaxhighlighting: Rule: Unknown keyword list "endmodule" in context "Normal" of definition "VEditProbeVerilog"
+kf.syntaxhighlighting: Rule: Unknown keyword list "begin" in context "Normal" of definition "VEditProbeVerilog"
+kf.syntaxhighlighting: Rule: Unknown keyword list "end" in context "Normal" of definition "VEditProbeVerilog"
+kf.syntaxhighlighting: Rule: Unknown keyword list "case" in context "Normal" of definition "VEditProbeVerilog"
+kf.syntaxhighlighting: Rule: Unknown keyword list "casex" in context "Normal" of definition "VEditProbeVerilog"
+kf.syntaxhighlighting: Rule: Unknown keyword list "casez" in context "Normal" of definition "VEditProbeVerilog"
+kf.syntaxhighlighting: Rule: Unknown keyword list "endcase" in context "Normal" of definition "VEditProbeVerilog"
+kf.syntaxhighlighting: Rule: Unknown keyword list "function" in context "Normal" of definition "VEditProbeVerilog"
+kf.syntaxhighlighting: Rule: Unknown keyword list "endfunction" in context "Normal" of definition "VEditProbeVerilog"
+kf.syntaxhighlighting: Rule: Unknown keyword list "task" in context "Normal" of definition "VEditProbeVerilog"
+kf.syntaxhighlighting: Rule: Unknown keyword list "endtask" in context "Normal" of definition "VEditProbeVerilog"
+kf.syntaxhighlighting: Rule: Unknown keyword list "generate" in context "Normal" of definition "VEditProbeVerilog"
+kf.syntaxhighlighting: Rule: Unknown keyword list "endgenerate" in context "Normal" of definition "VEditProbeVerilog"
+DEFINITION library=F2 name=VEditProbeVerilog author=VEdit section=Hardware license=LGPL-2.1-or-later version=1
+SAMPLE text-lines=18 formats=82 begins=0 ends=0
+RESULT library=F2 definition=VEditProbeVerilog ours=1 valid=1 formats=82 begins=0 ends=0

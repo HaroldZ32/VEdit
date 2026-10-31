@@ -1,0 +1,176 @@
+# C9 header — backfill: this header block was ADDED AFTER THE FACT by T67
+# (the original collected_at/git_head values in the body are unchanged, one cell untouched).
+# collected_at_utc=2026-10-31T11:28:59Z
+# git_rev_parse_HEAD=95c496e682e3841add1a081edd78d29c34957aac
+# backfill: original collection window 2026-10-31T10:57:00Z..2026-10-31T11:11:00Z
+# backfill: observed body range 2026-10-31T10:56:38Z..2026-10-31T11:11:06Z (the bodies keep their original values; ticket summarised ~10:57-11:11Z)
+# backfill: original git_head=1f47e56421bbeaab64f8082df3cfc104a6a2c2ef
+# backfill: header written at 2026-10-31T11:28:59Z on HEAD=95c496e682e3841add1a081edd78d29c34957aac
+# git_status_porcelain (at collection time, verbatim; the worktree is shared
+# with other in-flight lanes, so their paths are listed too):
+#  M .gitignore
+#  M THIRD_PARTY_NOTICES.md
+#  M build/evidence/12-gates-image-build.log
+#  M build/gates/gates.sh
+#  M build/gates/pack.sh
+#  M build/gates/typecheck.sh
+#  M build/slang/evidence/00-build-console.log
+#  M build/slang/evidence/01-yum-install.log
+#  M build/slang/evidence/02-toolchain.txt
+#  M build/slang/evidence/02b-python-build.log
+#  M build/slang/evidence/02c-python.txt
+#  M build/slang/evidence/03-source.txt
+#  M build/slang/evidence/03b-patches.txt
+#  M build/slang/evidence/04-configure.log
+#  M build/slang/evidence/05-deps.txt
+#  M build/slang/evidence/05-elf-check.txt
+#  M build/slang/evidence/06-build.log
+#  M build/slang/evidence/06-offline-console.log
+#  M build/slang/evidence/07-artifact.txt
+#  M build/slang/evidence/08-timings.txt
+#  M build/slang/evidence/09-offline-smoke.txt
+#  M crates/vd-config/tests/project_model_fixture.rs
+#  M crates/vd-ffi/include/vd_ffi.h
+#  M crates/vd-ffi/src/lsp.rs
+#  M crates/vd-lsp/src/session.rs
+#  M crates/vd-lsp/tests/session_degradation.rs
+#  M crates/vd-lsp/tests/session_file_set.rs
+#  M docs/USER_GUIDE.md
+#  M docs/handover/appendix/amendments-rev2.md
+#  M evidence/docs-amendments/00-context.txt
+#  M evidence/docs-amendments/02-sha256-check.txt
+#  M evidence/docs-amendments/verify.sh
+#  M evidence/ffi-abi/logs/10-rust-image.txt
+#  M evidence/ffi-abi/logs/19-rust-stage-console.log
+#  M evidence/ffi-abi/logs/20-cargo-build-release.log
+#  M evidence/ffi-abi/logs/21-staticlib.txt
+#  M evidence/ffi-abi/logs/23-cargo-test.log
+#  M evidence/ffi-abi/logs/26-vd_ffi.h
+#  M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+#  M evidence/m0-build/build-logs/20-qt6-image-build.log
+#  M evidence/m0-build/build-logs/21-qt6-image-id.txt
+#  M evidence/m0-build/build-logs/31-qt6-configure.log
+#  M evidence/m0-build/build-logs/32-qt6-build.log
+#  M evidence/m0-build/build-logs/33-qt6-ctest.log
+#  M evidence/m0-build/build-logs/34-qt6-elf.txt
+#  M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+#  M evidence/m0-ksh-selfbuild/build-logs/10-configure.log
+#  M evidence/m0-ksh-selfbuild/build-logs/11-build.log
+#  M evidence/m0-ksh-selfbuild/build-logs/12-install.log
+#  M evidence/m0-ksh-selfbuild/build-logs/21-library-identity.txt
+#  M evidence/m0-ksh-selfbuild/build-logs/32-abi-loading.txt
+#  M evidence/m0-ksh-selfbuild/build-logs/40-smoke-configure.log
+#  M evidence/m0-ksh-selfbuild/build-logs/41-smoke-build.log
+#  M evidence/m0-runtime/runtime-manifest.txt
+#  M evidence/syn-kde-data/03-folding.log
+#  M evidence/syn-kde-data/04-licensing.txt
+#  M evidence/syn-kde-data/06-conclusion.md
+#  M packaging/appimage/clean-room-accept.sh
+#  M packaging/runtime/assemble-appdir.sh
+#  M packaging/runtime/build.sh
+#  M packaging/runtime/verify-not-shipped.sh
+#  M packaging/tarball/stage.sh
+#  M resources/syntax/vedit-systemverilog.xml
+#  M resources/syntax/vedit-verilog.xml
+#  M scripts/build-ksh-selfbuild-in-container.sh
+#  M scripts/build-qt-in-container.sh
+#  M src/app/CMakeLists.txt
+#  M src/app/editor_area.cpp
+#  M src/app/editor_area.h
+#  M src/app/editor_provider.cpp
+#  M src/app/editor_provider.h
+#  M src/app/main.cpp
+#  M src/terminal/pty_session.cpp
+#  M src/terminal/pty_session.h
+#  M src/terminal/terminal_selftest.cpp
+#  M src/workspace/filetree/filetree_integration.cpp
+#  M src/workspace/filetree/tools/rootcheck/CMakeLists.txt
+#  M src/workspace/filetree/tools/rootcheck/seamcheck.cpp
+#  M src/workspace/integration.cpp
+#  M src/workspace/palette/CMakeLists.txt
+#  M src/workspace/palette/palette_integration.cpp
+#  M src/workspace/palette/palette_integration_selftest.cpp
+#  M src/workspace/search/CMakeLists.txt
+#  M src/workspace/search/README.md
+#  M src/workspace/search/search_integration.cpp
+#  M src/workspace/search/search_panel.h
+#  M src/workspace/search/search_selftest.cpp
+#  M src/workspace/search/search_types.h
+# ?? build/evidence/typecheck/
+# ?? evidence/build-infra/
+# ?? evidence/edit-core-regression/
+# ?? evidence/edit-core-v2/
+# ?? evidence/evidence/
+# ?? evidence/fix-search-jump/
+# ?? evidence/fix-shell-terminal/
+# ?? evidence/gate-infra/
+# ?? evidence/highlight-v2/00-collect.txt
+# ?? evidence/highlight-v2/01-after-link.txt
+# ?? evidence/highlight-v2/03-build-qt-gate.log
+# ?? evidence/highlight-v2/04-syntax-product-tests.log
+# ?? evidence/highlight-v2/06-standalone-lanes.log
+# ?? evidence/highlight-v2/07-negative-control.log
+# ?? evidence/highlight-v2/08-ctest.log
+# ?? evidence/highlight-v2/09-screenshot-L2.log
+# ?? evidence/highlight-v2/10-licensing-and-embargo.txt
+# ?? evidence/highlight-v2/README.md
+# ?? evidence/highlight-v2/screenshots/
+# ?? evidence/licensing-hash-sync/
+# ?? evidence/lsp-v2/
+# ?? evidence/project-model/
+# ?? evidence/repo-hygiene/
+# ?? evidence/syn-kde-data/10-folding-before.log
+# ?? evidence/syn-kde-data/11-folding-after.log
+# ?? evidence/syn-kde-data/12-regression-after-xml.log
+# ?? evidence/syn-kde-data/FOLDING-fix-T45.md
+# ?? evidence/syn-kde-data/f2-build.log
+# ?? evidence/syn-kde-data/folding-probe/
+# ?? evidence/verdicts/edit-core/
+# ?? evidence/verdicts/evidence/
+# ?? evidence/verdicts/fix-filetree-open/
+# ?? evidence/verdicts/fix-search-jump/
+# ?? evidence/verdicts/fix-xml-folding/
+# ?? evidence/verdicts/lsp/
+# ?? evidence/verdicts/project-model/
+# ?? evidence/verdicts/syntax/
+# ?? src/editor/CMakeLists.txt
+# ?? src/editor/kernel/
+# ?? src/workspace/diagnostics/
+# ?? src/workspace/filetree/tools/generate-testdata.sh
+# ?? src/workspace/project/
+# ?? src/workspace/search/search_jump_target.cpp
+# ?? src/workspace/search/search_jump_target.h
+# --- end of C9 header ---
+== vedit-diagnostics-ffi-selftest (REAL verible-verilog-ls through the Rust C ABI) ==
+collected_at: 2026-10-31T11:01:22Z
+git_head: 1f47e56421bbeaab64f8082df3cfc104a6a2c2ef
+image: vedit-qt6-build:local
+cmd: docker run --rm -v $PWD:/vedit-build -w /vedit-build -e QT_QPA_PLATFORM=offscreen vedit-qt6-build:local target/diagnostics-build/vedit-diagnostics-ffi-selftest tests/fixtures/verilog-project .mpd/recon/verible/bin/verible-verilog-ls
+--- output ---
+CHECK PASS a3c.fixture-file-count  expected/files.txt -> 7 file(s)
+CHECK PASS ffi.lsp-backend-available
+CHECK PASS ffi.slang-backend-available
+CHECK PASS a3d.reparsing-observable  reparsing
+CHECK PASS a3d.terminal-state-within-60s  degraded (degraded: lsp 7/7 file(s), diagnostics 3)
+CHECK PASS a3c.lsp-opened-whole-set  opened=7/7
+CHECK PASS a3c.report-carries-the-set
+CHECK PASS a3c.slang-got-every-file  requested=7 completed=7 failures=7
+OBSERVED diagnostics=3 lsp_message='ready: 7/7 file(s) open, 3 diagnostic(s), 0 skipped' slang_message='slang: slang binary not found (tried 4 location(s); set VEDIT_SLANG)'
+SKIP-NOTE: SLANG leg failed on 7 file(s) (no slang binary on this host); the failure is typed and observable, not a crash
+CHECK PASS entry.symbols-queued
+CHECK PASS entry.symbols-answered
+CHECK PASS entry.symbols-contains-top  5 outline entries
+CHECK PASS fixture.alu-instantiation-present
+CHECK PASS entry.definition-queued
+CHECK PASS entry.definition-answered
+OBSERVED definition_locations=1
+CHECK PASS entry.references-queued
+CHECK PASS entry.references-answered
+CHECK PASS entry.rename-queued
+CHECK PASS entry.rename-answered
+CHECK PASS entry.format-queued
+CHECK PASS entry.format-answered
+CHECK PASS degrade.missing-verible-failed  failed
+CHECK PASS degrade.missing-verible-message  cannot open /vedit-build/tests/fixtures/verilog-project/rtl/top.sv on the server: spawning verible-verilog-ls at /nonexistent/verible-verilog-ls
+VER-DIAGNOSTICS-FFI-SELFTEST checks=22 failures=0
+EXIT=0

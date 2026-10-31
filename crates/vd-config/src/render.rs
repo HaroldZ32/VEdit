@@ -169,6 +169,7 @@ fn root_source_str(source: crate::project::RootSource) -> &'static str {
     match source {
         crate::project::RootSource::VeditToml => "vedit_toml",
         crate::project::RootSource::GitDir => "git_dir",
+        crate::project::RootSource::Filelist => "filelist",
         crate::project::RootSource::Fallback => "fallback",
     }
 }

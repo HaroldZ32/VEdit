@@ -9,12 +9,23 @@ source "$(dirname "${BASH_SOURCE[0]}")/_common.sh"
 
 BIN="$ROOT/build/slang/out/slang"
 if [ ! -x "$BIN" ] || [ "${GATES_REBUILD:-0}" = "1" ]; then
-  echo "[gates] artifact missing or GATES_REBUILD=1 -> one-command build: build/slang/build.sh"
-  bash "$ROOT/build/slang/build.sh"
+  echo "[gates] slang artifact is missing: $BIN"
+  echo "[gates] building it now with the documented one-command path: bash build/slang/build.sh"
+  echo "[gates]   (from-source build inside a fresh centos:7 container; several minutes; network required)"
+  echo "[gates]   (its own raw output lands in build/slang/evidence/)"
+  if ! bash "$ROOT/build/slang/build.sh"; then
+    no_gate "[gates] FAIL: the slang artifact could not be built, so the artifact checks cannot run.
+       Missing  : build/slang/out/slang  (the CentOS 7 slang binary this gate verifies)
+       Fix      : bash build/slang/build.sh        # the documented one-command build
+       Logs     : build/slang/evidence/            # raw output of the failed build
+       This gate does NOT skip and does NOT pass: without the artifact there is nothing to verify."
+  fi
 else
   echo "[gates] artifact present, re-checking it (GATES_REBUILD=1 rebuilds): $BIN"
 fi
-[ -x "$BIN" ] || no_gate "[gates] FAIL: $BIN missing or not executable"
+[ -x "$BIN" ] || no_gate "[gates] FAIL: the slang build reported success but $BIN is missing or not executable.
+       Fix: bash build/slang/build.sh   (logs: build/slang/evidence/)
+       This gate does NOT skip and does NOT pass without the artifact."
 
 command -v readelf >/dev/null 2>&1 || no_gate "[gates] FAIL: readelf is not available on this host"
 
@@ -46,5 +57,18 @@ if [ -f "$ROOT/Cargo.toml" ]; then
 else
   echo "[gates] N/A: no Cargo workspace yet (the skeleton task owns it); the test step has nothing to run."
   echo "[gates] this N/A is only valid before the skeleton lands: once Cargo.toml exists, a test failure fails this gate."
+fi
+
+# The C++/Qt6 lane (M0 build base, T10). While the Rust product still exists
+# (Open Q7 is a user/plan decision) BOTH lanes must stay green: this gate covers
+# cmake configure + build + ctest + the xcb/software-rendering window smoke in
+# the lane's own pinned image, so a defect in the new toolchain cannot hide.
+if [ -f "$ROOT/CMakeLists.txt" ] && [ -f "$ROOT/scripts/versions-qt.env" ]; then
+  echo "[gates] C++/Qt6 lane present -> build/gates/qt6-cxx.sh is a HARD requirement"
+  bash "$ROOT/build/gates/qt6-cxx.sh" \
+    || no_gate "[gates] FAIL: the C++/Qt6 lane failed (configure/build/ctest/xcb smoke)"
+else
+  echo "[gates] N/A: no Qt6 build base yet (T10); the C++ lane has nothing to run."
+  echo "[gates] this N/A is only valid before T10 lands: once CMakeLists.txt exists, a C++ lane failure fails this gate."
 fi
 echo "[gates] PASS"

@@ -1,0 +1,24 @@
+# C9 evidence header
+collected_at: 2026-10-31T19:40:35+08:00
+git_head: 95c496e682e3841add1a081edd78d29c34957aac
+binary_sha256: e604b8b8745521ac61492023541586f2af6c43e3bc28607ea19b16b240518ccf
+
+## the T71 target: vedit-app-shell-selftest (contains the 21 save assertions)
+Test project /vedit-build/target/qt6-build
+    Start 9: vedit-app-shell-selftest
+1/1 Test #9: vedit-app-shell-selftest .........   Passed    0.31 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.31 sec
+TARGET-CTEST-EXIT=0
+
+## whole suite (other lanes in flight; see REPORT.md for attribution)
+
+Total Test time (real) =  18.50 sec
+
+The following tests FAILED:
+	 13 - vedit-workspace-search-selftest (Failed)
+Errors while running CTest
+Output from these tests are in: /vedit-build/target/qt6-build/Testing/Temporary/LastTest.log
+Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.

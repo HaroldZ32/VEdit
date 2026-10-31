@@ -1,0 +1,23 @@
+== T73 acceptance checks ==
+collected_at: 2026-10-31T11:48:25Z
+git_head: 95c496e682e3841add1a081edd78d29c34957aac
+
+CHECK PASS  no 'NOT proven' or mangled 'SLANG success is SLANG' in evidence/lsp-v2/
+CHECK PASS  09-report documents the default typed-degradation path
+CHECK PASS  09-report documents the VEDIT_SLANG success path
+CHECK PASS  09-report cites the 16-f1 success numbers
+CHECK PASS  backfill headers present in 15 files
+CHECK PASS  original collection window (10:57–11:11Z) recorded
+CHECK PASS  original git_head 1f47e56 recorded
+CHECK PASS  observed original body range recorded (10:56:38–11:11:06Z)
+CHECK PASS  backfill time/HEAD (11:28:59Z / 95c496e) recorded
+CHECK PASS  USER_GUIDE does not claim file-open decides the project root
+CHECK PASS  USER_GUIDE documents --project <dir>
+CHECK PASS  USER_GUIDE states 'not derived from the opened file'
+CHECK PASS  USER_GUIDE keeps the .F case-insensitivity fact
+
+cmd: bash build/gates/docs.sh
+[docs] PASS: README.md docs/BUILD.md docs/USER_GUIDE.md THIRD_PARTY_NOTICES.md
+
+== summary: pass=13 fail=0 ==
+VERIFY-EXIT=0

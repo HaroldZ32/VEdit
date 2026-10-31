@@ -1,0 +1,20 @@
+generated: 2026-10-31T10:01:35Z
+git_head: 9957f5fe4d63c17c681e8753288262fa2c00955e
+git_status_porcelain:
+ M Cargo.toml
+?? crates/vd-search/
+?? crates/vd-settings/
+?? crates/vd-vcs/
+?? evidence/docs-amendments/
+?? evidence/fixture/
+?? scripts/verify-fixture.sh
+?? tests/fixtures/
+---
+[purpose] two consecutive runs of the acceptance script produce identical output
+[command] bash scripts/verify-fixture.sh
+run1 exit=0 sha256=2f625093730042f12d1863505c25d9252418b79b5fde95ed9a02bb450aa3493e
+run2 exit=0 sha256=2f625093730042f12d1863505c25d9252418b79b5fde95ed9a02bb450aa3493e
+diff run1 run2: no differences
+[command] sha256sum of the two captured reports
+2f625093730042f12d1863505c25d9252418b79b5fde95ed9a02bb450aa3493e  run1
+2f625093730042f12d1863505c25d9252418b79b5fde95ed9a02bb450aa3493e  run2

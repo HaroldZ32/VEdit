@@ -1,0 +1,29 @@
+# root ctest suite under the built product (regression T60)
+# command (offscreen, pinned image): ctest --test-dir target/qt6-build --output-on-failure
+# date: 2026-10-31T19:25:05+08:00
+# exit code: 0
+
+      Start  1: vedit-app-syntax-startup
+      Start  2: vedit-m0-smoke
+      Start  3: vedit-syntax-provider-tests
+      Start  4: vedit-syntax-kde-data
+      Start  5: vedit-syn-grammars-tests
+      Start  6: vedit-syntax-product-tests
+      Start  7: vedit-terminal-selftest
+      Start  8: vedit-app-ffi-abi-selftest
+      Start  9: vedit-app-shell-selftest
+      Start 10: vedit-edit-core-selftest
+10/16 Test #10: vedit-edit-core-selftest .......................   Passed    0.08 sec
+      Start 11: vedit-workspace-palette-selftest
+11/16 Test #11: vedit-workspace-palette-selftest ...............   Passed    0.09 sec
+      Start 12: vedit-workspace-palette-integration-selftest
+12/16 Test #12: vedit-workspace-palette-integration-selftest ...   Passed    0.10 sec
+      Start 13: vedit-workspace-search-selftest
+13/16 Test #13: vedit-workspace-search-selftest ................   Passed    0.33 sec
+      Start 14: vedit-workspace-project-selftest
+14/16 Test #14: vedit-workspace-project-selftest ...............   Passed    0.05 sec
+      Start 15: vedit-workspace-diagnostics-selftest
+15/16 Test #15: vedit-workspace-diagnostics-selftest ...........   Passed    0.00 sec
+      Start 16: vedit-diagnostics-ffi-selftest
+16/16 Test #16: vedit-diagnostics-ffi-selftest .................   Passed    3.11 sec
+100% tests passed, 0 tests failed out of 16

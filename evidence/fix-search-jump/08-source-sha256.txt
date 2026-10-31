@@ -1,0 +1,26 @@
+== evidence: 08-source-sha256.txt — the exact source this evidence certifies
+time=2026-10-31T19:01:22+08:00
+HEAD=1f47e56421bbeaab64f8082df3cfc104a6a2c2ef
+
+f6b18d3e83676402277a2e4784fd73649c494e42e99815a6c8f87fe9639a1471  src/workspace/search/search_jump_target.h
+bfe161f9fd0fc9a41010820f96e8db09a51c6cb44221b55820acdbf7775364b6  src/workspace/search/search_jump_target.cpp
+2ffc295581cbc424d346cb9a6f918ad2778ea3004f958cb2c19d860c2f4a73d5  src/workspace/search/search_integration.cpp
+6eb11c0f87a1a92a7a70e610c9ac2af676f0e5d6963b2748e573066bdbfb557a  src/workspace/search/search_selftest.cpp
+3a16c6b6f251f72dab3c2fa97d8a02bb9aec5395dd7da8f1b17a10ebea3f432a  src/workspace/search/search_panel.h
+6e5f245a6473cfee9eb0eccfbbe5053247b23a3bd03ea3615fa3fdb1a60991c1  src/workspace/search/search_types.h
+c9ed3620c1c9621531daa2a72348bdc72a8fcdd944774ca50fa252bcaa02f7b2  src/workspace/search/CMakeLists.txt
+
+-- appended: README.md (docs-only) --
+6060b38cc8961011817b54887c7c6c3e59ab96c6dcf8ae0d3dcc472330557a30  src/workspace/search/README.md
+
+== final scope status ==
+time=2026-10-31T19:03:11+08:00
+ M src/workspace/search/CMakeLists.txt
+ M src/workspace/search/README.md
+ M src/workspace/search/search_integration.cpp
+ M src/workspace/search/search_panel.h
+ M src/workspace/search/search_selftest.cpp
+ M src/workspace/search/search_types.h
+?? evidence/fix-search-jump/
+?? src/workspace/search/search_jump_target.cpp
+?? src/workspace/search/search_jump_target.h

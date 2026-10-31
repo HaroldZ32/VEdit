@@ -1,0 +1,32 @@
+generated: 2026-10-31T10:40:51Z
+rule: 采集时刻仍为脏、且经 sha256 探针判定仍在被并发改写的路径 —— 本轮不提交
+volatile_build_logs: evidence/ffi-abi/logs/19-23,26,27 与 evidence/m0-build/build-logs/31-34,37 会被并发构建反复重写；已在 0904a1d 整体提交一次，之后的重写为噪声，按船长指示不再逐条补交
+age=8s files=3 path=src/workspace/diagnostics/
+age=8s files=1 path=evidence/verdicts/fix-filetree-open/
+age=82s files=1 path=evidence/ffi-abi/logs/22-rust-targets.txt
+age=82s files=1 path=evidence/ffi-abi/logs/21-staticlib.txt
+age=82s files=1 path=evidence/ffi-abi/logs/20-cargo-build-release.log
+age=75s files=1 path=evidence/highlight-v2/10-licensing-and-embargo.txt
+age=73s files=1 path=evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+age=73s files=1 path=evidence/ffi-abi/logs/26-vd_ffi.h
+age=73s files=1 path=evidence/ffi-abi/logs/23-cargo-test.log
+age=73s files=1 path=evidence/ffi-abi/logs/19-rust-stage-console.log
+age=72s files=1 path=evidence/m0-build/build-logs/31-qt6-configure.log
+age=65s files=1 path=evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+age=65s files=1 path=evidence/m0-build/build-logs/34-qt6-elf.txt
+age=65s files=1 path=evidence/m0-build/build-logs/32-qt6-build.log
+age=62s files=1 path=evidence/m0-build/build-logs/33-qt6-ctest.log
+age=570s files=10007 path=filetree-testdata/
+age=52s files=1 path=evidence/highlight-v2/README.md
+age=37s files=1 path=evidence/highlight-v2/03-build-qt-gate.log
+age=37s files=1 path=evidence/highlight-v2/00-collect.txt
+age=22s files=6 path=src/workspace/project/
+age=170s files=1 path=evidence/highlight-v2/01-after-link.txt
+age=154s files=1 path=crates/vd-ffi/src/lsp.rs
+age=148s files=1 path=crates/vd-ffi/include/vd_ffi.h
+age=122s files=1 path=evidence/highlight-v2/08-ctest.log
+age=121s files=1 path=evidence/highlight-v2/04-syntax-product-tests.log
+age=120s files=1 path=evidence/highlight-v2/06-standalone-lanes.log
+age=119s files=1 path=evidence/highlight-v2/07-negative-control.log
+age=102s files=4 path=evidence/highlight-v2/screenshots/
+age=102s files=1 path=evidence/highlight-v2/09-screenshot-L2.log

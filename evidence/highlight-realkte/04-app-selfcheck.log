@@ -1,0 +1,25 @@
+# C9 evidence header
+collected_at: 2026-10-31T22:39:43+08:00
+git_head: c71fe31478887e3dc7c460f875ccfb93e61c0ec4
+binary_sha256: 46000176016f4c90220e97f99a39063ef34b0decb019490a2870d2372484b872
+
+APP-EXIT=0
+[edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+CHECK editcore.highlight.verilog.fixture PASS
+[edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+CHECK editcore.highlight.verilog.open PASS
+CHECK editcore.highlight.verilog.mode PASS mode='Verilog' expected='Verilog'
+CHECK editcore.highlight.verilog.definition PASS Verilog
+CHECK editcore.highlight.verilog.format-ranges PASS 25
+CHECK editcore.highlight.verilog.folding-regions PASS begins=2 ends=2
+CHECK editcore.highlight.systemverilog.fixture PASS
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+CHECK editcore.highlight.systemverilog.open PASS
+CHECK editcore.highlight.systemverilog.mode PASS mode='SystemVerilog' expected='SystemVerilog'
+CHECK editcore.highlight.systemverilog.definition PASS SystemVerilog
+CHECK editcore.highlight.systemverilog.format-ranges PASS 26
+CHECK editcore.highlight.systemverilog.folding-regions PASS begins=1 ends=1
+[edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+EDIT-CORE-SELFTEST ok=1 checks=67 failures=0
+APP-SHELL-SELFTEST ok=1 checks=176 failures=0 state=/tmp/vedit-app-xZTpLS/state

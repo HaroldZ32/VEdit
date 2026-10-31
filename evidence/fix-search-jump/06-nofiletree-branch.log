@@ -1,0 +1,11 @@
+== evidence: 06-nofiletree-branch.log — the #if !defined(VEDIT_SEARCH_HAVE_FILETREE_OPEN) branch must compile too (app shell without the file tree lane)
+time=2026-10-31T18:58:52+08:00
+original: /usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DVEDIT_SEARCH_HAVE_FILETREE_OPEN=1 -I/vedit-build/target/qt6-build/src/app/workspace-lane-search/vedit_workspace_search_autogen/include -I/vedit-build/src/workspace/search -I/vedit-build/src/app -I/vedit-build/src/workspace/filetree -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtWidgets -isystem /usr/include/KF6/KSyntaxHighlighting -Wall -Wextra -O2 -g -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -o src/app/workspace-lane-search/CMakeFiles/vedit_workspace_search.dir/search_jump_target.cpp.o -c /vedit-build/src/workspace/search/search_jump_target.cpp
+Assembler messages:
+Fatal error: can't create src/app/workspace-lane-search/CMakeFiles/vedit_workspace_search.dir/search_jump_target.cpp.o: No such file or directory
+SYNTAX-EXIT=1
+
+== RERUN (run from the build dir, -o replaced by -fsyntax-only) ==
+built WITHOUT -DVEDIT_SEARCH_HAVE_FILETREE_OPEN (file tree lane absent):
+/usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB  -I/vedit-build/target/qt6-build/src/app/workspace-lane-search/vedit_workspace_search_aut
+SYNTAX-EXIT=0

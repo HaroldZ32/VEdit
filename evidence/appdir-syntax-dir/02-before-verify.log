@@ -1,0 +1,13 @@
+== BEFORE (T83 tarball c682694, unchanged verify script/AppRun) ==
+collected_at: 2026-10-31T15:14:20Z
+git_head: c682694e125ff7f59c590b83b6d2895239a3d143
+tarball: build/centos7-verify/dist/vedit-centos7-verify-c682694.tar.gz
+container: docker.m.daocloud.io/library/centos:7
+cmd: ./verify-centos7.sh /out/before-report.txt
+
+VERIFY-EXIT=1
+RESULT FAIL kernel.is-3.10 | expected=3.10.x (real CentOS 7) | actual=7.0.0-38-generic | note=NOT a CentOS 7 kernel: container/VM shares a newer host kernel, results do not prove CentOS 7
+RESULT FAIL highlight.verilog-definition | expected=verilog=1 and own-xml lists the shipped definition | actual=verilog=0 own-xml=[] definitions=3 | note=the product itself says the Verilog definition is NOT available -> .v files would fall back to plain text; see the full syntax-product line and STEPS.md 6
+RESULT SKIP highlight.mode | expected=highlightingMode='Verilog' (windowed KTextEditor) | actual=not observable headless | note=the AppDir ships no windowed session here; the stack-level check (grammar + definitions + own XML) is above
+RESULT SKIP lint.product | expected=product diagnostics path | actual=exit 1 | VER-DIAGNOSTICS-FFI-SELFTEST checks=1 failures=1 | note=this build's diagnostics selftest needs its FFI fixture directory; not a package failure (see log)
+SUMMARY: PASS=14 FAIL=2 SKIP=2

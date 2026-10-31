@@ -1,0 +1,35 @@
+== app-shell evidence pins ==
+date: 2026-10-31T03:40:06Z
+branch: dev  head: eebbfd1
+build image: vedit-qt6-build:local  id: image_id=sha256:de2b7f708fe58e98f4ec791494d48614ec25ffe33efc2974d86bdb5d60063c14
+toolchain (from evidence/m0-build/build-logs/30-qt6-container-facts.txt):
+  PRETTY_NAME="Ubuntu 26.04.1 LTS"
+  NAME="Ubuntu"
+  VERSION_ID="26.04"
+  glibc: ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43
+  qt6-base-dev: 6.10.2+dfsg-7
+  kf6-texteditor: 6.24.0-0ubuntu1
+  kf6-syntaxhighlighting: 6.24.0-0ubuntu1
+  tree-sitter (pkg-config): 0.25.9
+  cmake: cmake version 4.2.3
+  g++: g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+
+== commands that produced this evidence ==
+1) repo-declared C++ lane build+test+smoke:  bash scripts/build-qt.sh
+   -> exit 0; full console copy: evidence/app-shell/01-build-qt.log
+   -> the command itself writes its canonical logs to evidence/m0-build/build-logs/ (T10 lane)
+2) ctest verbose (app-shell selftest):        ctest --test-dir target/qt6-build -R vedit-app-shell-selftest -V
+   -> exit 0; evidence/app-shell/02-ctest-selftest.log
+3) shell selfcheck under xcb + llvmpipe:      vedit-app --selfcheck --state-dir <tmp>
+   -> exit 0; 73/73 checks; evidence/app-shell/03-selfcheck-xcb.log
+4) screenshots under xcb + llvmpipe:           vedit-app --screenshots evidence/app-shell
+   -> exit 0; evidence/app-shell/04-screenshots.log + 05-artifacts.txt
+5) ELF facts of the shell binary:             readelf/ldd/file/sha256
+   -> evidence/app-shell/03-elf.txt
+
+== binary ==
+GLIBC_2.34
+## libraries resolved
+--
+## sha256
+99019afd47a960cb24209a31655c3669161156c0f0238da8abd9271d51c3791e  /vedit-build/target/qt6-build/src/app/vedit-app

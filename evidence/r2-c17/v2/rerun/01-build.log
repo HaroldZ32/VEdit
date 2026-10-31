@@ -1,0 +1,9 @@
+== 01 build ==
+-- KTextEditor include dirs: 
+-- KTextEditor version:      6.24.0
+-- KSyntaxHighlighting:      6.24.0
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: /work/probes/c17-overlay/build
+ninja: no work to do.
+[build exit=0]

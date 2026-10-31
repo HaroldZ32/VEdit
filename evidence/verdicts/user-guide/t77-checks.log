@@ -1,0 +1,91 @@
+collected_at: 2026-10-31T14:13:41Z
+git_head: 19303ae3a58491767d97815d2fe1e0947816e5b6
+branch: feat/qt6-ktexteditor-migration
+git_status_porcelain:
+ M build/evidence/typecheck/00-run.txt
+ M build/evidence/typecheck/10-typecheck-image-build.log
+ M build/evidence/typecheck/11-typecheck-image-id.txt
+ M docs/USER_GUIDE.md
+ M evidence/ffi-abi/logs/19-rust-stage-console.log
+ M evidence/ffi-abi/logs/20-cargo-build-release.log
+ M evidence/ffi-abi/logs/21-staticlib.txt
+ M evidence/ffi-abi/logs/22-rust-targets.txt
+ M evidence/ffi-abi/logs/23-cargo-test.log
+ M evidence/m0-build/build-logs/20-qt6-image-build.log
+ M evidence/m0-build/build-logs/21-qt6-image-id.txt
+ M evidence/m0-build/build-logs/32-qt6-build.log
+ M evidence/m0-build/build-logs/34-qt6-elf.txt
+?? evidence/glibc217-feasibility/
+?? evidence/user-guide-split/
+?? evidence/verdicts/fix-shell-terminal/
+?? evidence/verdicts/search-jump-kte/
+?? evidence/verdicts/user-guide/
+verifier: Reviewer (cell-20261031T085543161Z, T77; manually created task, no frozen contract - criteria from the captain dispatch)
+
+== 1. F-1 sweep: no '打开位置' / no line implying the opened file decides the root ==
+  (no '打开位置' anywhere)
+
+31:./VEdit/vedit.sh path/to/top.sv  # 直接打开文件
+54:本文同时标注 **Qt6 产品** 与 **旧 GTK3 产物** 的差异：两者的命令行选项与工程根起点不同，
+60:3. 打开工程：先确认手上是哪一版——**Qt6 构建** → 启动时用 `--project <dir>` 指定工程目录
+61:   （或恢复上次会话）；**旧 GTK3 产物** → 该版本不认识 `--project`，会以
+62:   `unknown option '--project'` 在 GUI 启动前直接退出（`crates/vd-app/src/cli.rs:101`；
+64:   工程根**从起点目录向上逐级查找**：在每一级依次看 `vedit.toml`（优先）→ `.git` → 该目录是否
+65:   **直接包含 `*.f`**，命中的第一级即工程根（来源依次报告为 `vedit_toml` / `git_dir` /
+67:   （Qt6 = `--project` 目录，旧 GTK3 = 进程启动目录）。
+68:   所以一个只带 `project.f` 的目录本身也算工程根，即使它位于更大的 git 仓库内部：以该目录为
+76:工程根的**起点**在两个前端不同：旧 GTK3 前端（`crates/vd-app`）以**进程启动目录**
+77:（`std::env::current_dir()`）为起点；Qt6 产品的工程根由 **`--project <dir>`**
+79:**不是由打开文件推导**：`--project` 写入 `ShellOptions.projectRoot`
+82:`crates/vd-config` 的 `Loader::new(start_dir)` 接口约定**调用方应传被打开文件所在目录**
+84:Qt6 当前 shell 传的是 `--project` 的值；GTK3 前端传的是进程启动目录
+85:（`crates/vd-app/src/config_glue.rs:63`）。所以实际起点永远是上面的 `--project` 目录 /
+87:因此 Qt6 里用 `--project` 指定工程目录（根发现从该目录向上）；旧 GTK3 前端要先 `cd` 到期望的
+191:| 打开文件但**没有语法高亮** | GtkSourceView 数据目录不在搜索路径。用包内启动方式运行；tar.gz / `.run` 可用 `VEDIT_PRINT_ENV=1 ./VEdit/vedit.sh` 打印启动环境自查（AppImage 的 AppRun 无此开关） |
+205:| 工程配置 | `<工程根>/vedit.toml`（工程根 = 从起点目录向上第一个命中 `vedit.toml` / `.git` / 直接含 `*.f` 的目录；起点目录：Qt6 = `--project <dir>` 指定的目录，旧 GTK3 = 进程启动目录；同一级优先 `vedit.toml` > `.git` > `*.f`） |
+206:| Verible lint 规则 | `<工程根>/.rules.verible_lint`（无则用 Verible 默认） |
+207:| filelist | `<工程根>/*.f`，以及 `[project] filelists` 里列出的 |
+
+== 2. F-2 fork verified against the code (not the writer's paraphrase) ==
+cli.rs:101 ->                 other if other.starts_with('-') => bail!("unknown option '{other}'\n\n{}", usage()),
+main.rs:25 ->     let opts = cli::Options::parse(std::env::args_os().skip(1))?;
+
+== 3. the GTK3 instruction the reader gets ==
+1. 启动后 `Ctrl+O` 打开一个 `.sv`/`.v` 文件，或直接把文件路径作为参数；
+2. 底部状态栏依次显示：光标位置、文件路径、语言（`systemverilog`/`verilog`）、
+   verible 诊断数、slang 诊断数、FIM 状态、LSP 进程状态；
+3. 打开工程：先确认手上是哪一版——**Qt6 构建** → 启动时用 `--project <dir>` 指定工程目录
+   （或恢复上次会话）；**旧 GTK3 产物** → 该版本不认识 `--project`，会以
+   `unknown option '--project'` 在 GUI 启动前直接退出（`crates/vd-app/src/cli.rs:101`；
+   解析发生在 GUI 之前，`crates/vd-app/src/main.rs:25`），请先 `cd` 到工程目录再启动。
+   工程根**从起点目录向上逐级查找**：在每一级依次看 `vedit.toml`（优先）→ `.git` → 该目录是否
+   **直接包含 `*.f`**，命中的第一级即工程根（来源依次报告为 `vedit_toml` / `git_dir` /
+   `filelist`，都没命中的退化为起始目录 `fallback`）；起点目录的定义见本节末
+   （Qt6 = `--project` 目录，旧 GTK3 = 进程启动目录）。
+   所以一个只带 `project.f` 的目录本身也算工程根，即使它位于更大的 git 仓库内部：以该目录为
+   起点时根就是它自己（`filelist`），而以它所在的外层仓库为起点时根仍是外层（`git_dir`），
+   嵌套的 `.f` 不会把根改到子目录；同一目录同时有 `.git` 与 `*.f` 时根不变，来源按更强的
+
+== 4. write scope ==
+ M docs/USER_GUIDE.md
+?? evidence/user-guide-split/
+  (T75 change set must be docs/USER_GUIDE.md + evidence/user-guide-split/ only)
+
+== 5. regression: docs gate ==
+[docs] PASS: README.md docs/BUILD.md docs/USER_GUIDE.md THIRD_PARTY_NOTICES.md
+DOCS-EXIT=0
+
+== 6. EXTRA: can the user find the Qt6 deliverable build? ==
+USER_GUIDE mentions build-qt/build.sh/vedit-app/target/qt6-build: 0
+BUILD.md mentions build-qt: 4
+BUILD.md mentions the vedit-app binary path: 0
+--- AGENT.md build line (what the user actually followed) ---
+36:  1.99.0, GtkSourceView 4.6.1, meson/ninja) is built by `bash scripts/build.sh`;
+38:- Build: `bash scripts/build.sh` (one command: pinned image ->
+--- what scripts/build.sh builds ---
+9:#   2. cargo build --release --workspace inside that image, then run the Xvfb
+63:BIN="$ROOT/target/release/vd-app"
+73:  echo '$ file target/release/vd-app'
+91:  echo '$ sha256sum target/release/vd-app'
+112:cp "$BIN" "$ARTIFACTS/vd-app"
+113:chmod 755 "$ARTIFACTS/vd-app"
