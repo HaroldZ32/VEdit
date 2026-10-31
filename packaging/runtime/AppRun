@@ -30,7 +30,7 @@ export QML2_IMPORT_PATH="$APPDIR/qml"
 # -> 402 defs). Setting only one of the two variables is NOT enough.
 export XDG_DATA_DIRS="$APPDIR/usr/share"
 export XDG_DATA_HOME="$APPDIR/usr/share"
-export VEDIT_SYNTAX_DIR="$APPDIR/usr/share/org.kde.syntax-highlighting/syntax"
+export VEDIT_SYNTAX_DIR="$APPDIR/usr/share/org.kde.syntax-highlighting"
 
 # --- fonts (no host fontconfig data) ----------------------------------------
 export FONTCONFIG_FILE="$APPDIR/etc/fonts/fonts.conf"
