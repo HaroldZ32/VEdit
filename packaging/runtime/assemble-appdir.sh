@@ -29,12 +29,18 @@ PROBE_TOOL="$ROOT/target/qt6-build/cmake/smoke/vedit-ksh-env-probe"
 KSH_F2=""
 OUT="$ROOT/packaging/runtime/out/AppDir"
 WHITELIST="$ROOT/resources/syntax"
+TOOLCHAIN_VERIBLE=""
+TOOLCHAIN_SLANG=""
+REQUIRE_TOOLCHAIN=0
 
 while [ $# -gt 0 ]; do
   case "$1" in
     --ksh-f2) KSH_F2=${2:?}; shift 2 ;;
     --out) OUT=${2:?}; shift 2 ;;
     --whitelist) WHITELIST=${2:?}; shift 2 ;;
+    --toolchain-verible) TOOLCHAIN_VERIBLE=${2:?}; shift 2 ;;
+    --toolchain-slang) TOOLCHAIN_SLANG=${2:?}; shift 2 ;;
+    --require-toolchain) REQUIRE_TOOLCHAIN=1; shift ;;
     -h|--help) sed -n '2,28p' "$0"; exit 0 ;;
     *) echo "unknown argument: $1" >&2; exit 2 ;;
   esac
@@ -44,6 +50,30 @@ done
 [ -f "$SMOKE" ] || { echo "ERROR: smoke binary missing: $SMOKE" >&2; exit 1; }
 [ -x "$PROBE_TOOL" ] || { echo "ERROR: env probe missing: $PROBE_TOOL" >&2; exit 1; }
 [ -d "$WHITELIST" ] || { echo "ERROR: whitelist dir missing: $WHITELIST" >&2; exit 1; }
+
+# Pins for the bundled external toolchain (T82). Sourced, never guessed.
+# shellcheck source=../../scripts/versions.env
+set -a; . "$ROOT/scripts/versions.env"; set +a
+: "${VERIBLE_LS_SHA256:?missing VERIBLE_LS_SHA256 pin}"
+: "${VERIBLE_LINT_SHA256:?missing VERIBLE_LINT_SHA256 pin}"
+: "${VERIBLE_FORMAT_SHA256:?missing VERIBLE_FORMAT_SHA256 pin}"
+: "${SLANG_BIN_SHA256:?missing SLANG_BIN_SHA256 pin}"
+
+if [ -z "$TOOLCHAIN_VERIBLE" ]; then
+  for candidate in "$ROOT/.mpd/recon/verible/bin" "$ROOT"/target/verible-pin/extract/*/bin; do
+    [ -d "$candidate" ] || continue
+    [ -x "$candidate/verible-verilog-ls" ] || continue
+    TOOLCHAIN_VERIBLE=$candidate
+    break
+  done
+fi
+if [ -z "$TOOLCHAIN_SLANG" ]; then
+  for candidate in "$ROOT/build/slang/out/slang" "$ROOT/target/slang/out/slang"; do
+    [ -f "$candidate" ] || continue
+    TOOLCHAIN_SLANG=$candidate
+    break
+  done
+fi
 
 LIBDIRS=(/usr/lib/x86_64-linux-gnu /lib/x86_64-linux-gnu /usr/lib /lib)
 PLUGROOT=/usr/lib/x86_64-linux-gnu/qt6/plugins
@@ -121,6 +151,71 @@ print(",".join(sorted(names)))
 PY
 log "whitelist: $(cat "$OUT/usr/share/vedit/ksh-whitelist.txt")"
 
+# --- 5b. external toolchain binaries (T82) ----------------------------------
+# CentOS 7 has neither verible nor slang in its repositories, so the delivered
+# product carries them. Every binary is pinned by sha256 and the discovery order
+# (bundled > PATH > env) plus the chosen source is reported by the product; this
+# file records what was actually installed.
+mkdir -p "$OUT/bin" "$OUT/usr/share/doc/vedit/licenses"
+TOOLCHAIN_FILE="$OUT/usr/share/vedit/toolchain.txt"
+{
+  echo "# VEdit bundled toolchain (T82)"
+  echo "# discovery order in the product: bundled > PATH > env (source is reported)"
+  echo "# expected-bundled-dir: bin/ (next to vd-app)"
+} > "$TOOLCHAIN_FILE"
+BUNDLED_VERIBLE=0
+BUNDLED_SLANG=0
+MISSING_TOOLS=""
+bundle_binary() {
+  local name=$1 pin=$2 src=$3
+  [ -f "$src" ] || { echo "ERROR: $name missing at $src" >&2; return 1; }
+  local actual
+  actual=$(sha256sum "$src" | cut -d' ' -f1)
+  if [ "$actual" != "$pin" ]; then
+    echo "ERROR: $name sha256 mismatch: got $actual want $pin ($src)" >&2
+    return 1
+  fi
+  install -m 0755 "$src" "$OUT/bin/$name"
+  echo "binary $name sha256=$actual"
+  echo "$name sha256=$actual bytes=$(stat -c%s "$src") source=$src" >> "$TOOLCHAIN_FILE"
+}
+if [ -n "$TOOLCHAIN_VERIBLE" ] && [ -d "$TOOLCHAIN_VERIBLE" ]; then
+  if bundle_binary verible-verilog-ls "$VERIBLE_LS_SHA256" "$TOOLCHAIN_VERIBLE/verible-verilog-ls" \
+     && bundle_binary verible-verilog-lint "$VERIBLE_LINT_SHA256" "$TOOLCHAIN_VERIBLE/verible-verilog-lint" \
+     && bundle_binary verible-verilog-format "$VERIBLE_FORMAT_SHA256" "$TOOLCHAIN_VERIBLE/verible-verilog-format"; then
+    BUNDLED_VERIBLE=1
+    install -m 0644 "$ROOT/docs/licenses/Apache-2.0.txt" "$OUT/usr/share/doc/vedit/licenses/Apache-2.0.txt"
+    echo "license Apache-2.0=usr/share/doc/vedit/licenses/Apache-2.0.txt" >> "$TOOLCHAIN_FILE"
+    log "toolchain: verible bundled (3 binaries, sha256 pinned)"
+  else
+    MISSING_TOOLS="${MISSING_TOOLS}verible,"
+  fi
+else
+  MISSING_TOOLS="${MISSING_TOOLS}verible,"
+fi
+if [ -n "$TOOLCHAIN_SLANG" ] && [ -f "$TOOLCHAIN_SLANG" ]; then
+  if bundle_binary slang "$SLANG_BIN_SHA256" "$TOOLCHAIN_SLANG"; then
+    BUNDLED_SLANG=1
+    install -m 0644 "$ROOT/docs/licenses/slang-LICENSE.txt" "$OUT/usr/share/doc/vedit/licenses/slang-LICENSE.txt"
+    echo "license MIT=usr/share/doc/vedit/licenses/slang-LICENSE.txt" >> "$TOOLCHAIN_FILE"
+    log "toolchain: slang bundled (sha256 pinned)"
+  else
+    MISSING_TOOLS="${MISSING_TOOLS}slang,"
+  fi
+else
+  MISSING_TOOLS="${MISSING_TOOLS}slang,"
+fi
+MISSING_TOOLS=${MISSING_TOOLS%,}
+if [ -n "$MISSING_TOOLS" ]; then
+  echo "missing=[$MISSING_TOOLS]" >> "$TOOLCHAIN_FILE"
+  echo "fix=put the binary in bin/ next to vd-app, install it on PATH, or set VEDIT_VERIBLE_LS / VEDIT_SLANG" >> "$TOOLCHAIN_FILE"
+  log "toolchain: NOT bundled for [$MISSING_TOOLS] (the product will report this explicitly)"
+  [ "$REQUIRE_TOOLCHAIN" -eq 0 ] || { echo "ERROR: --require-toolchain but missing [$MISSING_TOOLS]" >&2; exit 1; }
+else
+  echo "missing=[]" >> "$TOOLCHAIN_FILE"
+  log "toolchain: complete (verible + slang), missing=[]"
+fi
+
 # --- 6. data: fonts, testdata, desktop/icon ---------------------------------
 for f in DejaVuSans.ttf DejaVuSansMono.ttf; do
   [ -f "/usr/share/fonts/truetype/dejavu/$f" ] && install -m 0644 "/usr/share/fonts/truetype/dejavu/$f" "$OUT/share/fonts/$f"
@@ -184,6 +279,21 @@ log "active whitelist files: $active (no syntax-bundled/)"
   echo "tree-sitter          $(dpkg-query -W -f='${Version}' libtree-sitter-dev 2>/dev/null)  MIT"
   echo "glibc                $(dpkg-query -W -f='${Version}' libc6 2>/dev/null)  LGPL-2.1-or-later"
   echo "DejaVu fonts         $(dpkg-query -W -f='${Version}' fonts-dejavu-core 2>/dev/null)  Bitstream Vera + public domain"
+  echo
+  if [ "$BUNDLED_VERIBLE" -eq 1 ]; then
+    echo "Verible (bundled)    ${VERIBLE_VERSION:-pinned by versions.env}  Apache-2.0  bin/verible-verilog-{ls,lint,format}"
+    echo "  licence text: usr/share/doc/vedit/licenses/Apache-2.0.txt"
+  else
+    echo "Verible              NOT bundled (user/PATH/env must provide it)"
+  fi
+  if [ "$BUNDLED_SLANG" -eq 1 ]; then
+    echo "slang (bundled)      12.1  MIT  bin/slang"
+    echo "  licence text: usr/share/doc/vedit/licenses/slang-LICENSE.txt"
+  else
+    echo "slang                NOT bundled (user/PATH/env must provide it)"
+  fi
+  echo "Toolchain discovery  bundled > PATH > env; the chosen source and the missing list are"
+  echo "                     reported in the status bar, the outline/diagnostics panel and --selfcheck."
   echo
   echo "NOT shipped: KDE systemverilog.xml (GPL-3.0-or-later), KDE verilog.xml (undeclared),"
   echo "             syntax-bundled/, distro libKF6SyntaxHighlighting (embeds 36 strict-GPL definitions)."
