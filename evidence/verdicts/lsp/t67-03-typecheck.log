@@ -1,0 +1,78 @@
+collected_at: 2026-10-31T11:37:17Z
+git_head: 95c496e682e3841add1a081edd78d29c34957aac
+branch: feat/qt6-ktexteditor-migration
+git_status_porcelain:
+ M .gitignore
+ M THIRD_PARTY_NOTICES.md
+ M build/evidence/12-gates-image-build.log
+ M build/gates/gates.sh
+ M build/gates/pack.sh
+ M build/gates/typecheck.sh
+ M build/slang/evidence/00-build-console.log
+ M build/slang/evidence/01-yum-install.log
+ M build/slang/evidence/02-toolchain.txt
+ M build/slang/evidence/02b-python-build.log
+ M build/slang/evidence/02c-python.txt
+ M build/slang/evidence/03-source.txt
+ M build/slang/evidence/03b-patches.txt
+ M build/slang/evidence/04-configure.log
+ M build/slang/evidence/05-deps.txt
+ M build/slang/evidence/05-elf-check.txt
+ M build/slang/evidence/06-build.log
+ M build/slang/evidence/06-offline-console.log
+ M build/slang/evidence/07-artifact.txt
+ M build/slang/evidence/08-timings.txt
+ M build/slang/evidence/09-offline-smoke.txt
+ M crates/vd-config/tests/project_model_fixture.rs
+ M crates/vd-ffi/include/vd_ffi.h
+ M crates/vd-ffi/src/lsp.rs
+ M crates/vd-lsp/src/session.rs
+ M crates/vd-lsp/tests/session_degradation.rs
+ M crates/vd-lsp/tests/session_file_set.rs
+ M docs/USER_GUIDE.md
+ M docs/decisions/r2-license.md
+ M docs/handover/appendix/amendments-rev2.md
+ M evidence/docs-amendments/00-context.txt
+ M evidence/docs-amendments/02-sha256-check.txt
+ M evidence/docs-amendments/verify.sh
+ M evidence/ffi-abi/logs/10-rust-image.txt
+ M evidence/ffi-abi/logs/19-rust-stage-console.log
+ M evidence/ffi-abi/logs/20-cargo-build-release.log
+ M evidence/ffi-abi/logs/21-staticlib.txt
+ M evidence/ffi-abi/logs/23-cargo-test.log
+ M evidence/ffi-abi/logs/26-vd_ffi.h
+ M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+verifier: Reviewer (cell-20261031T085543161Z, T68; no loop exists for T67/T68)
+
+cmd: bash build/gates/typecheck.sh
+
+#9 [rust-build 2/9] COPY vault.repo.in /tmp/vault.repo.in
+#9 CACHED
+
+#10 [rust-build 3/9] RUN rm -f /etc/yum.repos.d/CentOS-*.repo  && sed "s|@CENTOS_VAULT_BASE@|https://mirrors.tuna.tsinghua.edu.cn/centos-vault/7.9.2009|g" /tmp/vault.repo.in > /etc/yum.repos.d/vault.repo  && rm -f /tmp/vault.repo.in  && cat /etc/yum.repos.d/vault.repo
+#10 CACHED
+
+#11 [rust-build 4/9] RUN yum -y install       gcc gcc-c++ make pkgconfig git curl tar xz bzip2 which findutils file       glib2-devel gtk3-devel libxml2-devel gettext       gdk-pixbuf2 gdk-pixbuf2-devel       python3       dejavu-sans-fonts dejavu-sans-mono-fonts fontconfig       xorg-x11-server-Xvfb xorg-x11-utils mesa-demos mesa-libGL  && yum clean all
+#11 CACHED
+
+#12 [rust-build 6/9] RUN set -eux;     curl -fsSL -o /tmp/meson.whl "https://files.pythonhosted.org/packages/01/48/b4ba2490ed26c73618736dece01a68a609713f1a7923563d4c41ac966b3b/meson-0.59.4-py3-none-any.whl";     echo "9db5bb89d3bd1c8e9c15974be5fa656f50491c48d53c43b6eb5cfe406dff3fd6  /tmp/meson.whl" | sha256sum -c -;     curl -fsSL -o /tmp/ninja.whl "https://files.pythonhosted.org/packages/0f/58/854ce5aab0ff5c33d66e1341b0be42f0330797335011880f7fbd88449996/ninja-1.11.1-py2.py3-none-manylinux_2_12_x86_64.manylinux2010_x86_64.whl";     echo "817e2aee2a4d28a708a67bcfba1817ae502c32c6d8ef80e50d63b0f23adf3a08  /tmp/ninja.whl" | sha256sum -c -;     mkdir -p /opt/wheels/meson /opt/wheels/ninja;     python3 -m zipfile -e /tmp/meson.whl /opt/wheels/meson;     pysite=$(python3 -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])');     mkdir -p "$pysite";     cp -a /opt/wheels/meson/mesonbuild "$pysite/";     { echo '#!/usr/bin/python3';       echo 'import sys';       echo 'from mesonbuild.mesonmain import main';       echo 'if __name__ == "__main__":';       echo '    sys.exit(main())';     } > /usr/local/bin/meson;     chmod 755 /usr/local/bin/meson;     python3 -m zipfile -e /tmp/ninja.whl /opt/wheels/ninja;     cp /opt/wheels/ninja/ninja/data/bin/ninja /usr/local/bin/ninja;     chmod 755 /usr/local/bin/ninja;     meson --version; ninja --version
+#12 CACHED
+
+#13 [rust-build 9/9] RUN { echo "## image facts"; cat /etc/centos-release;       echo "glibc: $(rpm -q glibc)";       echo "gtk3: $(rpm -q gtk3)";       echo "rust: $(/opt/cargo/bin/rustc --version)";       echo "gsv4: $(PKG_CONFIG_PATH=/opt/gsv4/lib64/pkgconfig pkg-config --modversion gtksourceview-4)";     } > /opt/vedit/build-image.txt  && rpm -qa --qf '%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n' | sort > /opt/vedit/rpm-snapshot.txt
+#13 CACHED
+
+#14 exporting to image
+#14 exporting layers done
+#14 exporting manifest sha256:2a74a4f0f304d5686f221712db6ed0aad747cfb0fc33e5a3007ffceb1a481385 done
+#14 exporting config sha256:4703b958028529283a1d1e92c132542b5189e8cd19206c2a1f8454fcc961cdaa done
+#14 exporting attestation manifest sha256:9ab3e86275121854d2f8c4e4eac017f6697128726fb30ed76dea5f1e9f198f84 0.0s done
+#14 exporting manifest list sha256:c5c9a5579e6e298a53bc07da8cae9cd8f6a730cec10ca69b2309a05ed3287827 0.0s done
+#14 naming to docker.io/library/vedit-build:local done
+#14 unpacking to docker.io/library/vedit-build:local done
+#14 DONE 0.1s
+image_id=sha256:c5c9a5579e6e298a53bc07da8cae9cd8f6a730cec10ca69b2309a05ed3287827
+[typecheck] container facts: CentOS Linux release 7.9.2009 (Core) | rustc 1.99.0 (b940084d7 2026-09-28) | cargo 1.99.0 (5f94df478 2026-08-27)
+[typecheck] cargo clippy --workspace --all-targets -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.17s
+[typecheck] PASS (pinned image vedit-build:local)
+TYPECHECK-EXIT=0
