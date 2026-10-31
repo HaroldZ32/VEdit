@@ -26,7 +26,9 @@ namespace vedit::kde {
 
 struct DataConfig {
     // Directory that contains a "syntax/" subdirectory; packaging sets it from
-    // VEDIT_SYNTAX_DIR. Empty = standard paths only (development).
+    // VEDIT_SYNTAX_DIR. T84 tolerance: passing the `syntax` subdirectory itself is
+    // normalised to its parent (the effective root is recorded in LoadReport).
+    // Empty = standard paths only (development).
     QString private_dir;
     // Extra search paths, development only (recorded in the report).
     QStringList fallback_dirs;

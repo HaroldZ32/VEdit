@@ -91,27 +91,42 @@ const LoadReport &KsyntaxData::load()
 
     repository_ = std::make_unique<KSyntaxHighlighting::Repository>();
 
-    const auto addSearchPath = [this](const QString &path, bool required) {
+    // T84: the contract value is the DATA ROOT (the directory holding `syntax/`),
+    // but packaging has pointed at the `syntax` subdirectory before. Accept both:
+    // a path whose own `syntax/` is missing but whose basename is `syntax` is
+    // normalised to its parent, and the report records the effective root.
+    const auto addSearchPath = [this](const QString &path, bool required) -> QString {
         if (path.isEmpty()) {
-            return;
+            return QString();
         }
-        const bool hasSyntaxDir = QDir(path + QStringLiteral("/syntax")).exists();
-        if (!hasSyntaxDir) {
+        QString dataRoot = path;
+        if (!QDir(dataRoot + QStringLiteral("/syntax")).exists()) {
+            const QFileInfo info(path);
+            if (info.fileName() == QLatin1String("syntax") && info.dir().exists()) {
+                dataRoot = info.dir().absolutePath();
+            }
+        }
+        if (!QDir(dataRoot + QStringLiteral("/syntax")).exists()) {
             if (required) {
                 report_.diagnostics.append(
                     QStringLiteral("private syntax directory missing: %1/syntax (set VEDIT_SYNTAX_DIR)")
                         .arg(path));
             }
-            return;
+            return QString();
         }
-        repository_->addCustomSearchPath(path);
-        report_.search_paths.append(path + QStringLiteral("/syntax"));
+        repository_->addCustomSearchPath(dataRoot);
+        report_.search_paths.append(dataRoot + QStringLiteral("/syntax"));
+        return dataRoot;
     };
 
     if (!config_.private_dir.isEmpty()) {
-        addSearchPath(config_.private_dir, true);
+        const QString privateRoot = addSearchPath(config_.private_dir, true);
+        if (!privateRoot.isEmpty()) {
+            // The effective root (normalised when packaging passed the `syntax` subdir).
+            report_.private_dir = privateRoot;
+        }
         // Refuse to load forbidden KDE definitions even if they were copied in.
-        QDirIterator it(config_.private_dir + QStringLiteral("/syntax"),
+        QDirIterator it(report_.private_dir + QStringLiteral("/syntax"),
                         QStringList{QStringLiteral("*.xml")}, QDir::Files);
         while (it.hasNext()) {
             const QString path = it.next();
