@@ -1,0 +1,7 @@
+rtl/alu_pkg.sv
+rtl/alu.sv
+rtl/counter.v
+rtl/top.sv
+tb/tb_top.sv
+tb/tb_aux.sv
+rtl/mem.sv
