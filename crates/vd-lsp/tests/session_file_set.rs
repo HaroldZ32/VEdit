@@ -13,9 +13,7 @@ use std::path::{Path, PathBuf};
 use std::time::{Duration, Instant};
 
 use anyhow::{bail, Result};
-use vd_lsp::{
-    LspConfig, PollOutcome, SessionRequest, SessionResponse, SessionStatus,
-};
+use vd_lsp::{LspConfig, PollOutcome, SessionRequest, SessionResponse, SessionStatus};
 
 const DIAGNOSTICS_BUDGET: Duration = Duration::from_secs(5);
 const START_BUDGET: Duration = Duration::from_secs(45);
@@ -90,12 +88,9 @@ fn poll_response(
 
 /// Zero-based line and UTF-16 character of the first occurrence of `needle`.
 fn position_of(text: &str, needle: &str) -> Result<(u32, u32)> {
-    let offset = text
-        .find(needle)
-        .unwrap_or_else(|| 0);
-    if offset == 0 {
+    let Some(offset) = text.find(needle) else {
         bail!("{needle:?} is not in the fixture text");
-    }
+    };
     let before = &text[..offset];
     let line = before.matches('\n').count() as u32;
     let line_prefix = before.rsplit('\n').next().unwrap_or("");
@@ -106,12 +101,12 @@ fn position_of(text: &str, needle: &str) -> Result<(u32, u32)> {
 fn open_session(ls: &Path, files: &[PathBuf]) -> Result<vd_lsp::SessionHandle> {
     let root = fixture_root();
     let config = LspConfig::new(ls, &root);
-    Ok(vd_lsp::SessionHandle::with_budgets(
+    vd_lsp::SessionHandle::with_budgets(
         config,
         files.to_vec(),
         DIAGNOSTICS_BUDGET,
         Duration::from_secs(5),
-    )?)
+    )
 }
 
 #[test]
@@ -123,7 +118,11 @@ fn effective_file_set_is_opened_and_navigation_outline_format_answer() -> Result
         return Ok(());
     };
     let files = effective_files()?;
-    assert_eq!(files.len(), 7, "the fixture expectation is seven source files");
+    assert_eq!(
+        files.len(),
+        7,
+        "the fixture expectation is seven source files"
+    );
     let session = open_session(&ls, &files)?;
     let status = wait_ready(&session, START_BUDGET)?;
     assert_eq!(
@@ -142,7 +141,10 @@ fn effective_file_set_is_opened_and_navigation_outline_format_answer() -> Result
         "no file may be skipped: {:?}",
         status.skipped
     );
-    assert!(status.server_pid.is_some(), "a server process must be running");
+    assert!(
+        status.server_pid.is_some(),
+        "a server process must be running"
+    );
 
     let top = fixture_root().join("rtl/top.sv");
     let text = std::fs::read_to_string(&top)?;
@@ -157,7 +159,7 @@ fn effective_file_set_is_opened_and_navigation_outline_format_answer() -> Result
     };
     let names: Vec<&str> = symbols.iter().map(|symbol| symbol.name.as_str()).collect();
     assert!(
-        names.iter().any(|name| *name == "top"),
+        names.contains(&"top"),
         "the outline must contain the top module, got {names:?}"
     );
 
@@ -251,10 +253,7 @@ fn replacing_the_file_set_changes_the_observable_opened_count() -> Result<()> {
         return Ok(());
     };
     let files = effective_files()?;
-    for (label, subset) in [
-        ("full", files.clone()),
-        ("reduced", files[..3].to_vec()),
-    ] {
+    for (label, subset) in [("full", files.clone()), ("reduced", files[..3].to_vec())] {
         let session = open_session(&ls, &subset)?;
         let status = wait_ready(&session, START_BUDGET)?;
         println!(
@@ -263,7 +262,10 @@ fn replacing_the_file_set_changes_the_observable_opened_count() -> Result<()> {
         );
         assert_eq!(status.files_expected, subset.len(), "{label}: set size");
         assert_eq!(status.files_opened, subset.len(), "{label}: opened count");
-        assert!(session.wait_for_stop(), "{label}: session must stop cleanly");
+        assert!(
+            session.wait_for_stop(),
+            "{label}: session must stop cleanly"
+        );
     }
     Ok(())
 }

@@ -36,8 +36,8 @@ use std::time::{Duration, Instant};
 
 use anyhow::{anyhow, Result};
 use lsp_types::{
-    Diagnostic, DocumentSymbol, DocumentSymbolResponse, Location, Position,
-    Range, TextEdit, Url, WorkspaceEdit,
+    Diagnostic, DocumentSymbol, DocumentSymbolResponse, Location, Position, Range, TextEdit, Url,
+    WorkspaceEdit,
 };
 use tokio::sync::mpsc;
 
@@ -244,10 +244,7 @@ enum RequestState {
 }
 
 enum Command {
-    Request {
-        id: u64,
-        request: SessionRequest,
-    },
+    Request { id: u64, request: SessionRequest },
     Stop,
 }
 
@@ -272,7 +269,15 @@ impl Inner {
             .unwrap_or_else(|poisoned| poisoned.into_inner())
     }
 
-    fn set_ready(&self, opened: usize, skipped: Vec<SkippedFile>, diagnostics: usize, generation: u64, pid: Option<u32>, restarts: u32) {
+    fn set_ready(
+        &self,
+        opened: usize,
+        skipped: Vec<SkippedFile>,
+        diagnostics: usize,
+        generation: u64,
+        pid: Option<u32>,
+        restarts: u32,
+    ) {
         let mut status = self.lock_status();
         status.phase = SessionPhase::Ready;
         status.files_opened = opened;
@@ -349,7 +354,12 @@ impl SessionHandle {
     /// Only when the worker thread cannot be spawned; everything else (missing
     /// binary, unreadable file, server crash) is reported through the status.
     pub fn start(config: LspConfig, files: Vec<PathBuf>) -> Result<Self> {
-        Self::with_budgets(config, files, DEFAULT_DIAGNOSTICS_BUDGET, DEFAULT_STOP_BUDGET)
+        Self::with_budgets(
+            config,
+            files,
+            DEFAULT_DIAGNOSTICS_BUDGET,
+            DEFAULT_STOP_BUDGET,
+        )
     }
 
     /// Start a session with explicit diagnostic and shutdown budgets.
@@ -374,23 +384,25 @@ impl SessionHandle {
         let worker_inner = Arc::clone(&inner);
         let worker = std::thread::Builder::new()
             .name("vd-lsp-session".to_string())
-            .spawn(move || match tokio::runtime::Builder::new_multi_thread()
-                .enable_all()
-                .build()
-            {
-                Ok(runtime) => {
-                    runtime.block_on(session_loop(
-                        worker_inner,
-                        config,
-                        files,
-                        diagnostics_budget,
-                        receiver,
-                    ));
-                }
-                Err(error) => {
-                    worker_inner.fail(format!(
-                        "cannot start the LSP runtime for the session: {error}"
-                    ));
+            .spawn(move || {
+                match tokio::runtime::Builder::new_multi_thread()
+                    .enable_all()
+                    .build()
+                {
+                    Ok(runtime) => {
+                        runtime.block_on(session_loop(
+                            worker_inner,
+                            config,
+                            files,
+                            diagnostics_budget,
+                            receiver,
+                        ));
+                    }
+                    Err(error) => {
+                        worker_inner.fail(format!(
+                            "cannot start the LSP runtime for the session: {error}"
+                        ));
+                    }
                 }
             })
             .map_err(|error| anyhow!("cannot spawn the LSP session worker: {error}"))?;
@@ -429,9 +441,7 @@ impl SessionHandle {
                 .insert(id, RequestState::Failed(message));
             return Ok(id);
         }
-        self.inner
-            .lock_requests()
-            .insert(id, RequestState::Pending);
+        self.inner.lock_requests().insert(id, RequestState::Pending);
         if self
             .inner
             .commands
@@ -544,7 +554,10 @@ async fn session_loop(
             .open_document(uri.clone(), language_id(path), text)
             .await
         {
-            inner.fail(format!("cannot open {} on the server: {error}", path.display()));
+            inner.fail(format!(
+                "cannot open {} on the server: {error}",
+                path.display()
+            ));
             return;
         }
         opened.push((uri, path.clone()));
@@ -605,9 +618,7 @@ async fn session_loop(
     }
 
     if let Err(error) = client.shutdown().await {
-        inner
-            .lock_status()
-            .message = format!("shutdown reported: {error}");
+        inner.lock_status().message = format!("shutdown reported: {error}");
     }
     inner.stopped();
 }
@@ -624,9 +635,9 @@ async fn serve(client: &mut LspClient, request: SessionRequest) -> Result<Sessio
             line,
             character,
         } => (file.clone(), *line, *character, None),
-        SessionRequest::DocumentSymbols { file } | SessionRequest::Formatting { file } | SessionRequest::Diagnostics { file } => {
-            (file.clone(), 0, 0, None)
-        }
+        SessionRequest::DocumentSymbols { file }
+        | SessionRequest::Formatting { file }
+        | SessionRequest::Diagnostics { file } => (file.clone(), 0, 0, None),
         SessionRequest::Rename {
             file,
             line,
@@ -637,9 +648,9 @@ async fn serve(client: &mut LspClient, request: SessionRequest) -> Result<Sessio
     let uri = ensure_open(client, &file).await?;
     let position = Position { line, character };
     match request {
-        SessionRequest::Definition { .. } => {
-            Ok(SessionResponse::Locations(client.definition(&uri, position).await?))
-        }
+        SessionRequest::Definition { .. } => Ok(SessionResponse::Locations(
+            client.definition(&uri, position).await?,
+        )),
         SessionRequest::References { .. } => Ok(SessionResponse::Locations(
             client.references(&uri, position, true).await?,
         )),
@@ -676,13 +687,16 @@ async fn serve(client: &mut LspClient, request: SessionRequest) -> Result<Sessio
 }
 
 async fn ensure_open(client: &mut LspClient, file: &Path) -> Result<Url> {
-    let uri = Url::from_file_path(file).map_err(|()| anyhow!("not a file path: {}", file.display()))?;
+    let uri =
+        Url::from_file_path(file).map_err(|()| anyhow!("not a file path: {}", file.display()))?;
     if client.document(&uri)?.is_some() {
         return Ok(uri);
     }
     let text = std::fs::read_to_string(file)
         .map_err(|error| anyhow!("cannot read {}: {error}", file.display()))?;
-    client.open_document(uri.clone(), language_id(file), text).await?;
+    client
+        .open_document(uri.clone(), language_id(file), text)
+        .await?;
     Ok(uri)
 }
 
@@ -761,7 +775,6 @@ fn flatten_workspace_edit(edit: Option<WorkspaceEdit>) -> Vec<WorkspaceTextEdit>
     }
     edits
 }
-
 
 /// Numeric code of a reported severity (1 error … 4 hint, `0` unknown).
 fn severity_code_of(severity: lsp_types::DiagnosticSeverity) -> i32 {
@@ -875,7 +888,10 @@ mod tests {
             children: Some(vec![child]),
         };
         let flattened = flatten_symbols(Some(DocumentSymbolResponse::Nested(vec![parent])));
-        let names: Vec<&str> = flattened.iter().map(|symbol| symbol.name.as_str()).collect();
+        let names: Vec<&str> = flattened
+            .iter()
+            .map(|symbol| symbol.name.as_str())
+            .collect();
         assert_eq!(names, vec!["outer", "inner"]);
     }
 

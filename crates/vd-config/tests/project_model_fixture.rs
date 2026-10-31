@@ -70,10 +70,7 @@ fn load(root: &Path) -> Result<vd_config::Loaded> {
             home.join(".config").display().to_string(),
         ),
     ]);
-    Ok(Loader::new(root)
-        .with_env(env)
-        .with_exe_dir(exe_dir)
-        .load()?)
+    Loader::new(root).with_env(env).with_exe_dir(exe_dir).load()
 }
 
 #[test]

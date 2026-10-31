@@ -19,7 +19,10 @@ fn missing_server_binary_fails_diagnosably_and_never_hangs() -> Result<()> {
     let root = fixture_root();
     let top = root.join("top.sv");
     let missing = root.join("this-verible-binary-does-not-exist");
-    assert!(!missing.exists(), "the fixture must not contain a fake binary");
+    assert!(
+        !missing.exists(),
+        "the fixture must not contain a fake binary"
+    );
 
     let session = SessionHandle::with_budgets(
         LspConfig::new(&missing, &root),
@@ -34,7 +37,10 @@ fn missing_server_binary_fails_diagnosably_and_never_hangs() -> Result<()> {
         match status.phase {
             SessionPhase::Failed => break status,
             SessionPhase::Starting => {}
-            other => bail!("expected a Failed session, got {other:?} ({})", status.message),
+            other => bail!(
+                "expected a Failed session, got {other:?} ({})",
+                status.message
+            ),
         }
         if Instant::now() >= deadline {
             bail!("the session did not reach Failed within 20 s: {status:?}");
@@ -47,7 +53,9 @@ fn missing_server_binary_fails_diagnosably_and_never_hangs() -> Result<()> {
         status.message
     );
     assert!(
-        status.message.contains("this-verible-binary-does-not-exist")
+        status
+            .message
+            .contains("this-verible-binary-does-not-exist")
             || status.message.to_lowercase().contains("no such file"),
         "the failure message must name the missing binary or the OS error: {}",
         status.message
@@ -77,6 +85,9 @@ fn missing_server_binary_fails_diagnosably_and_never_hangs() -> Result<()> {
         std::thread::sleep(Duration::from_millis(20));
     }
 
-    assert!(session.wait_for_stop(), "the failed session must stop cleanly");
+    assert!(
+        session.wait_for_stop(),
+        "the failed session must stop cleanly"
+    );
     Ok(())
 }
