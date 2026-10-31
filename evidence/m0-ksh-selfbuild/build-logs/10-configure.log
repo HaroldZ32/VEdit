@@ -61,6 +61,6 @@ Installing in /vedit-build/target/ksh-selfbuild/F2/install. Run /vedit-build/tar
  * XercesC
    Compile-time validation of syntax definition files.
 
--- Configuring done (3.0s)
+-- Configuring done (3.5s)
 -- Generating done (0.1s)
 -- Build files have been written to: /vedit-build/target/ksh-selfbuild/F2/build

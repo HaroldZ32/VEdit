@@ -1,6 +1,102 @@
-[1/6] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider_tests.dir/tests/fixture/fixture_binding.cpp.o
-[2/6] Building CXX object src/syntax/grammars/CMakeFiles/vedit_syntax_grammars.dir/bindings.cpp.o
-[3/6] Linking CXX static library src/syntax/grammars/libvedit_syntax_grammars.a
-[4/6] Linking CXX executable src/syntax/provider/vedit_syntax_provider_tests
-[5/6] Building CXX object src/syntax/grammars/CMakeFiles/vedit_syn_grammars_tests.dir/tests/test_syn_grammars.cpp.o
-[6/6] Linking CXX executable src/syntax/grammars/vedit_syn_grammars_tests
+ninja: warning: premature end of file; recovering
+[1/107] Automatic MOC for target vedit_app_shell
+[2/106] Automatic MOC for target vedit_search_slowio
+[3/106] Automatic MOC for target vedit_editor_core
+[4/106] Automatic MOC for target vedit_terminal
+[5/106] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit_search_slowio.dir/vedit_search_slowio_autogen/mocs_compilation.cpp.o
+[6/106] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/vedit_editor_core_autogen/mocs_compilation.cpp.o
+[7/106] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit_search_slowio.dir/tools/slowio/slowio.cpp.o
+[8/106] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/cross_boundary.cpp.o
+[9/106] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider_tests.dir/tests/fixture/fixture_binding.cpp.o
+[10/106] Building CXX object src/syntax/grammars/CMakeFiles/vedit_syntax_grammars.dir/bindings.cpp.o
+[11/106] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/grammar_binding.cpp.o
+[12/106] Linking CXX static library src/syntax/provider/libvedit_syntax_provider.a
+[13/106] Linking CXX static library src/syntax/grammars/libvedit_syntax_grammars.a
+[14/106] Building CXX object src/syntax/grammars/CMakeFiles/vedit_syn_grammars_tests.dir/tests/test_syn_grammars.cpp.o
+[15/106] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/undo_ops.cpp.o
+[16/106] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/atomic_save.cpp.o
+[17/106] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/goto_line.cpp.o
+[18/106] Linking CXX shared library src/app/workspace-lane-search/libvedit_search_slowio.so
+[19/106] Building CXX object src/syntax/grammars/syntax-product/CMakeFiles/vedit_syntax_product.dir/syntax_product.cpp.o
+[20/106] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/find_replace.cpp.o
+[21/106] Linking CXX static library src/syntax/grammars/syntax-product/libvedit_syntax_product.a
+[22/106] Linking CXX executable src/syntax/provider/vedit_syntax_provider_tests
+[23/106] Linking CXX executable src/syntax/grammars/vedit_syn_grammars_tests
+[24/106] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/editor_provider.cpp.o
+[25/106] Building CXX object src/terminal/CMakeFiles/vedit_terminal.dir/vedit_terminal_autogen/mocs_compilation.cpp.o
+[26/106] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/document_io.cpp.o
+[27/106] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/multi_cursor.cpp.o
+[28/106] Linking CXX executable src/syntax/grammars/syntax-product/vedit_syntax_product_tests
+[29/106] Building CXX object src/terminal/CMakeFiles/vedit_terminal.dir/pty_session.cpp.o
+[30/106] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/ktexteditor_provider.cpp.o
+[31/106] Building CXX object src/terminal/CMakeFiles/vedit_terminal.dir/terminal_panel.cpp.o
+[32/106] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/edit_core_selftest.cpp.o
+[33/106] Linking CXX static library src/app/editor-lane/libvedit_editor_core.a
+[34/106] Automatic MOC for target vedit-edit-core-selftest
+[35/106] Building CXX object src/app/editor-lane/CMakeFiles/vedit-edit-core-selftest.dir/vedit-edit-core-selftest_autogen/mocs_compilation.cpp.o
+[36/106] Building CXX object src/terminal/CMakeFiles/vedit_terminal.dir/terminal_widget.cpp.o
+[37/106] Linking CXX static library src/terminal/libvedit_terminal.a
+[38/106] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/editor_area.cpp.o
+[39/106] Automatic MOC for target vedit-terminal-selftest
+[40/105] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/app_shell.cpp.o
+[41/105] Linking CXX static library src/app/libvedit_app_shell.a
+[42/105] Automatic MOC for target vedit_file_tree
+[43/104] Automatic MOC for target vedit_workspace_search
+[44/104] Automatic MOC for target vedit_workspace_palette
+[45/103] Automatic MOC for target vedit_workspace_diagnostics
+[46/103] Building CXX object src/app/editor-lane/CMakeFiles/vedit-edit-core-selftest.dir/kernel/edit_core_selftest_main.cpp.o
+[47/103] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/diagnostics_outline_model.cpp.o
+[48/103] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit_workspace_search.dir/search_types.cpp.o
+[49/103] Building CXX object src/app/workspace-lane-filetree/CMakeFiles/vedit_file_tree.dir/filetree_integration.cpp.o
+[50/103] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/diagnostics_controller.cpp.o
+[51/103] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit_workspace_search.dir/search_integration.cpp.o
+[52/103] Linking CXX static library src/app/workspace-lane-filetree/libvedit_file_tree.a
+[53/103] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit_workspace_search.dir/vedit_workspace_search_autogen/mocs_compilation.cpp.o
+[54/103] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_integration.cpp.o
+[55/103] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/vedit_workspace_diagnostics_autogen/mocs_compilation.cpp.o
+[56/103] Linking CXX static library src/app/workspace-lane-project/libvedit_workspace_project.a
+[57/103] Automatic MOC for target vedit-workspace-project-selftest
+[58/103] Building CXX object src/app/workspace-lane-palette/CMakeFiles/vedit_workspace_palette.dir/palette_integration.cpp.o
+[59/103] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit-workspace-project-selftest.dir/vedit-workspace-project-selftest_autogen/mocs_compilation.cpp.o
+[60/103] Linking CXX static library src/app/workspace-lane-palette/libvedit_workspace_palette.a
+[61/103] Automatic MOC for target vedit-workspace-palette-selftest
+[62/102] Automatic MOC for target vedit-workspace-palette-bench
+[63/101] Automatic MOC for target vedit-workspace-palette-integration-selftest
+[64/101] Building CXX object src/app/workspace-lane-palette/CMakeFiles/vedit-workspace-palette-integration-selftest.dir/vedit-workspace-palette-integration-selftest_autogen/mocs_compilation.cpp.o
+[65/101] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/diagnostics_panel.cpp.o
+[66/101] Linking CXX executable src/app/editor-lane/vedit-edit-core-selftest
+[67/101] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/ffi_backends.cpp.o
+[68/101] Linking CXX executable src/app/workspace-lane-palette/vedit-workspace-palette-selftest
+[69/101] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit_workspace_search.dir/search_jump_target.cpp.o
+[70/101] Linking CXX executable src/app/workspace-lane-palette/vedit-workspace-palette-bench
+[71/101] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit_workspace_search.dir/global_search.cpp.o
+[72/101] Building CXX object src/terminal/CMakeFiles/vedit-terminal-selftest.dir/terminal_selftest.cpp.o
+[73/101] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/diagnostics_integration.cpp.o
+[74/101] Linking CXX static library src/app/workspace-lane-diagnostics/libvedit_workspace_diagnostics.a
+[75/101] Automatic MOC for target vedit-diagnostics-ffi-selftest
+[76/101] Automatic MOC for target vedit-workspace-diagnostics-selftest
+[77/101] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-workspace-diagnostics-selftest.dir/vedit-workspace-diagnostics-selftest_autogen/mocs_compilation.cpp.o
+[78/101] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-diagnostics-ffi-selftest.dir/vedit-diagnostics-ffi-selftest_autogen/mocs_compilation.cpp.o
+[79/101] Linking CXX executable src/terminal/vedit-terminal-selftest
+[80/101] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit_workspace_search.dir/search_panel.cpp.o
+[81/101] Linking CXX static library src/app/workspace-lane-search/libvedit_workspace_search.a
+[82/101] Automatic MOC for target vedit-workspace-search-selftest
+[83/101] Automatic MOC for target vedit_workspace_integration
+[84/101] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit-workspace-search-selftest.dir/vedit-workspace-search-selftest_autogen/mocs_compilation.cpp.o
+[85/101] Building CXX object src/app/CMakeFiles/vedit_workspace_integration.dir/vedit_workspace_integration_autogen/mocs_compilation.cpp.o
+[86/101] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit-workspace-project-selftest.dir/project_selftest.cpp.o
+[87/101] Building CXX object src/app/workspace-lane-palette/CMakeFiles/vedit-workspace-palette-integration-selftest.dir/palette_integration_selftest.cpp.o
+[88/101] Linking CXX executable src/app/workspace-lane-project/vedit-workspace-project-selftest
+[89/101] Linking CXX executable src/app/workspace-lane-palette/vedit-workspace-palette-integration-selftest
+[90/101] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-diagnostics-ffi-selftest.dir/diagnostics_ffi_selftest.cpp.o
+[91/101] Building CXX object src/app/CMakeFiles/vedit_workspace_integration.dir/__/workspace/integration.cpp.o
+[92/101] Linking CXX static library src/app/libvedit_workspace_integration.a
+[93/101] Automatic MOC for target vedit-app
+[94/101] Building CXX object src/app/CMakeFiles/vedit-app.dir/vedit-app_autogen/mocs_compilation.cpp.o
+[95/101] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-diagnostics-ffi-selftest
+[96/101] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-workspace-diagnostics-selftest.dir/diagnostics_selftest.cpp.o
+[97/101] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-workspace-diagnostics-selftest
+[98/101] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit-workspace-search-selftest.dir/search_selftest.cpp.o
+[99/101] Linking CXX executable src/app/workspace-lane-search/vedit-workspace-search-selftest
+[100/101] Building CXX object src/app/CMakeFiles/vedit-app.dir/main.cpp.o
+[101/101] Linking CXX executable src/app/vedit-app

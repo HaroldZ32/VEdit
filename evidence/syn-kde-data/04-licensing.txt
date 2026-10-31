@@ -27,3 +27,8 @@ LGPL text present: yes
 repo:    resources/syntax/*.xml
 shipped: AppDir/share/ksyntaxhighlighting/syntax/*.xml
 loader:  Repository::addCustomSearchPath(VEDIT_SYNTAX_DIR)   (VEDIT_SYNTAX_DIR=AppDir/share/ksyntaxhighlighting)
+
+NOTE (T62, 2026-10-31): the sha256 values above are the pre-T45 capture (T33);
+historical values, left unchanged. Current source values: THIRD_PARTY_NOTICES.md
+§9.1 (verilog c6adc763… 85/5,111; systemverilog 2abba334… 90/5,492);
+recomputation in evidence/licensing-hash-sync/.

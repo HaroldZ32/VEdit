@@ -24,3 +24,8 @@ a15f78b82068daeb62f3b54c8ad0101aa936a2c921a57806fe8f37dcbf0bfff2  third_party/tr
 ab104936984904469572a4e868149f7a22fb2929347f837ae6a1f9b790f1b173  third_party/tree-sitter/verilog/src/tree_sitter/parser.h
 e99b42baf4279d3be6dec59129dda0789f196b4e5c99144a781ea6cdf255425c  third_party/tree-sitter/verilog/src/node-types.json
 6db8f416f22d205d5d208e4d64ddcbde6beb19df404e26003812e5537db2f0de  src/syntax/kde/tests/validate_syntax_data.cpp
+
+# NOTE (T62, 2026-10-31): the XML hashes above are the pre-T45 baseline captured
+# for T33; historical values, left unchanged. Current source values:
+# THIRD_PARTY_NOTICES.md §9.1 (verilog c6adc763… 85/5,111; systemverilog
+# 2abba334… 90/5,492); recomputation in evidence/licensing-hash-sync/.

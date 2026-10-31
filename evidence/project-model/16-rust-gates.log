@@ -1,0 +1,63 @@
+# C9 evidence header
+collected_at: 2026-10-31T18:53:43+08:00
+git_head: 1f47e56421bbeaab64f8082df3cfc104a6a2c2ef
+
+== rustc/cargo ==
+rustc 1.99.0 (b940084d7 2026-09-28)
+cargo 1.99.0 (5f94df478 2026-08-27)
+== cargo fmt --all -- --check ==
+FMT-EXIT=0
+== cargo clippy --workspace --all-targets -- -D warnings ==
+107 | |         files.to_vec(),
+108 | |         DIAGNOSTICS_BUDGET,
+109 | |         Duration::from_secs(5),
+110 | |     )?)
+    | |_______^
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#needless_question_mark
+    = note: `-D clippy::needless-question-mark` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::needless_question_mark)]`
+help: remove the enclosing `Ok` and `?` operator
+    |
+105 ~     vd_lsp::SessionHandle::with_budgets(
+106 |         config,
+...
+109 |         Duration::from_secs(5),
+110 ~     )
+    |
+
+error: using `contains()` instead of `iter().any()` is more efficient
+   --> crates/vd-lsp/tests/session_file_set.rs:163:9
+    |
+163 |         names.iter().any(|name| *name == "top"),
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ help: try: `names.contains(&"top")`
+    |
+    = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.99.0/index.html#manual_contains
+    = note: `-D clippy::manual-contains` implied by `-D warnings`
+    = help: to override `-D warnings` add `#[allow(clippy::manual_contains)]`
+
+error: could not compile `vd-lsp` (test "session_file_set") due to 3 previous errors
+warning: build failed, waiting for other jobs to finish...
+CLIPPY-EXIT=101
+== clippy scoped to this task ==
+   Compiling vd-ffi v0.1.1 (/vedit-build/crates/vd-ffi)
+    Checking vd-lsp v0.1.1 (/vedit-build/crates/vd-lsp)
+    Checking rustls-webpki v0.103.16
+    Checking ureq v3.5.0
+    Checking vd-fim v0.1.1 (/vedit-build/crates/vd-fim)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.50s
+SCOPED-CLIPPY-EXIT=0
+== tests scoped to this task ==
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/project_model_fixture.rs (target/debug/deps/project_model_fixture-042bfe59e03a3130)
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/secret_discipline.rs (target/debug/deps/secret_discipline-b944de1d0935dc0f)
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs (target/debug/deps/vd_ffi-c218ace1bbb0a2eb)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/abi.rs (target/debug/deps/abi-73d3a52e89bce543)
+test null_and_unknown_arguments_are_rejected_with_a_typed_error ... ok
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+SCOPED-TEST-EXIT=0

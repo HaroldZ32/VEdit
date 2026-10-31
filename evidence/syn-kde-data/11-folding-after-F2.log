@@ -1,0 +1,28 @@
+== T66: folding probe on the real F2 library (after T45 fix) ==
+# collected_at: 2026-10-31T11:29:26Z
+# git_head: 95c496e682e3841add1a081edd78d29c34957aac
+# git_status_porcelain (this task's paths):
+#    M resources/syntax/vedit-systemverilog.xml
+#    M resources/syntax/vedit-verilog.xml
+#   ?? evidence/syn-kde-data/folding-probe/
+# mode=after source=/home/haroldzhao/MyProj/DshProj/VEdit/resources/syntax
+# source sha256 c6adc763c7b280d7493f48d06e5779d0b1e2068ac82f75fe7f31a07b0788a6c2  /home/haroldzhao/MyProj/DshProj/VEdit/resources/syntax/vedit-verilog.xml
+# source sha256 2abba3342d0878e71b99d358d96e510f857cd7f232786951be8602f513e0b992  /home/haroldzhao/MyProj/DshProj/VEdit/resources/syntax/vedit-systemverilog.xml
+# F2 install prefix: /vedit-build/target/ksh-selfbuild/F2/install
+# F2 library: /vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
+## compile: g++ ... -I/vedit-build/target/ksh-selfbuild/F2/install/include/KF6/KSyntaxHighlighting -L/vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu -Wl,-rpath,/vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu -lKF6SyntaxHighlighting
+# ldd guard: libKF6SyntaxHighlighting resolves inside the F2 tree: /vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6
+# ---- probe language=verilog definition=VEditProbeVerilog ----
+LDD library=F2 resolves=/vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6
+DEFINITION library=F2 name=VEditProbeVerilog author=VEdit section=Hardware license=LGPL-2.1-or-later version=1
+SAMPLE language=verilog text-lines=18 formats=82 begins=7 ends=7
+RESULT library=F2 definition=VEditProbeVerilog ours=1 valid=1 formats=82 begins=7 ends=7
+PROBE-EXIT=0
+# ---- probe language=systemverilog definition=VEditProbeSystemVerilog ----
+LDD library=F2 resolves=/vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6
+DEFINITION library=F2 name=VEditProbeSystemVerilog author=VEdit section=Hardware license=LGPL-2.1-or-later version=1
+SAMPLE language=systemverilog text-lines=26 formats=100 begins=11 ends=11
+RESULT library=F2 definition=VEditProbeSystemVerilog ours=1 valid=1 formats=100 begins=11 ends=11
+PROBE-EXIT=0
+PROBE-SUMMARY mode=after expected=fold all-checks=PASS
+RUNNER-EXIT=0

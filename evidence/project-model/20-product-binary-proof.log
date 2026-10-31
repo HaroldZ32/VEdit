@@ -1,0 +1,102 @@
+# C9 evidence header
+collected_at: 2026-10-31T18:57:21+08:00
+git_head: 1f47e56421bbeaab64f8082df3cfc104a6a2c2ef
+note: BEFORE binary = the tree before this lane was integrated (from the previous build); AFTER = target/qt6-build/src/app/vedit-app built by build/gates/typecheck.sh after the integration edits.
+
+## AFTER binary facts
+-rwxr-xr-x 1 root root 64819872 Oct 31 10:54 /vedit-build/target/qt6-build/src/app/vedit-app
+4513e96db70409dfcc0ee6be59de700feda82a06de61d673a373fb77aec88616  /vedit-build/target/qt6-build/src/app/vedit-app
+/vedit-build/target/qt6-build/src/app/vedit-app: ELF 64-bit LSB pie executable, x86-64, version 1 (GNU/Linux), dynamically linked, interpreter /lib64/ld-linux-x
+## AFTER: installProject / ProjectModel / ProjectPanel symbols (nm -C)
+D vedit::workspace::project::ProjectModel::staticMetaObject
+D vedit::workspace::project::ProjectPanel::staticMetaObject
+T vedit::workspace::installProject(vedit::app::ApplicationShell&, vedit::workspace::IntegrationOptions const&)
+T vedit::workspace::project::ProjectModel::ProjectModel(QString, QObject*)
+T vedit::workspace::project::ProjectModel::adopt(vedit::workspace::project::ExpansionPayload const&)
+T vedit::workspace::project::ProjectModel::defines() const
+T vedit::workspace::project::ProjectModel::diagnostics() const
+T vedit::workspace::project::ProjectModel::displayFiles() const
+T vedit::workspace::project::ProjectModel::files() const
+T vedit::workspace::project::ProjectModel::hasProject() const
+T vedit::workspace::project::ProjectModel::includeDirs() const
+T vedit::workspace::project::ProjectModel::isPending() const
+T vedit::workspace::project::ProjectModel::lastError() const
+T vedit::workspace::project::ProjectModel::metaObject() const
+T vedit::workspace::project::ProjectModel::open(QString const&)
+T vedit::workspace::project::ProjectModel::pollOnce()
+T vedit::workspace::project::ProjectModel::projectRoot() const
+T vedit::workspace::project::ProjectModel::qt_metacall(QMetaObject::Call, int, void**)
+T vedit::workspace::project::ProjectModel::qt_metacast(char const*)
+T vedit::workspace::project::ProjectModel::recordFailure(QString const&)
+T vedit::workspace::project::ProjectModel::refresh()
+T vedit::workspace::project::ProjectModel::refreshFinished(bool, QString const&)
+T vedit::workspace::project::ProjectModel::restoreFromDisk(QString*)
+T vedit::workspace::project::ProjectModel::restoredFromDisk() const
+T vedit::workspace::project::ProjectModel::startExpansion()
+T vedit::workspace::project::ProjectModel::stateChanged()
+T vedit::workspace::project::ProjectModel::statePath() const
+T vedit::workspace::project::ProjectModel::summary() const
+T vedit::workspace::project::ProjectModel::~ProjectModel()
+T vedit::workspace::project::ProjectPanel::ProjectPanel(vedit::workspace::project::ProjectModel*, QWidget*)
+T vedit::workspace::project::ProjectPanel::displayedDiagnostics() const
+T vedit::workspace::project::ProjectPanel::displayedFiles() const
+T vedit::workspace::project::ProjectPanel::fileCount() const
+T vedit::workspace::project::ProjectPanel::metaObject() const
+T vedit::workspace::project::ProjectPanel::model() const
+T vedit::workspace::project::ProjectPanel::qt_metacall(QMetaObject::Call, int, void**)
+T vedit::workspace::project::ProjectPanel::qt_metacast(char const*)
+T vedit::workspace::project::ProjectPanel::qt_static_metacall(QObject*, QMetaObject::Call, int, void**)
+T vedit::workspace::project::ProjectPanel::refresh()
+T vedit::workspace::project::ProjectPanel::summaryText() const
+T vedit::workspace::project::ProjectPanel::updateUi()
+V typeinfo for vedit::workspace::project::ProjectModel
+V typeinfo for vedit::workspace::project::ProjectPanel
+V typeinfo name for vedit::workspace::project::ProjectModel
+V typeinfo name for vedit::workspace::project::ProjectPanel
+V vtable for vedit::workspace::project::ProjectModel
+V vtable for vedit::workspace::project::ProjectPanel
+W QtPrivate::MetaObjectForType<vedit::workspace::project::ProjectModel, void>::metaObjectFunction(QtPrivate::QMetaTypeInterface const*)
+W QtPrivate::MetaObjectForType<vedit::workspace::project::ProjectPanel, void>::metaObjectFunction(QtPrivate::QMetaTypeInterface const*)
+W QtPrivate::QCallableObject<void (vedit::workspace::project::ProjectModel::*)(), QtPrivate::List<>, void>::impl(int, QtPrivate::QSlotObjectBase*, QObject*, void**, bool*)
+W QtPrivate::QCallableObject<void (vedit::workspace::project::ProjectPanel::*)(), QtPrivate::List<>, void>::impl(int, QtPrivate::QSlotObjectBase*, QObject*, void**, bool*)
+W QtPrivate::QMetaTypeForType<vedit::workspace::project::ProjectModel>::getDtor()::{lambda(QtPrivate::QMetaTypeInterface const*, void*)#1}::_FUN(QtPrivate::QMetaTypeInterface const*, void*)
+W QtPrivate::QMetaTypeForType<vedit::workspace::project::ProjectPanel>::getDtor()::{lambda(QtPrivate::QMetaTypeInterface const*, void*)#1}::_FUN(QtPrivate::QMetaTypeInterface const*, void*)
+W non-virtual thunk to vedit::workspace::project::ProjectPanel::~ProjectPanel()
+W vedit::workspace::project::ProjectPanel::~ProjectPanel()
+d vedit::workspace::project::ProjectModel::qt_staticMetaObjectRelocatingContent<(anonymous namespace)::qt_meta_tag_ZN5vedit9workspace7project12ProjectModelE_t>
+d vedit::workspace::project::ProjectPanel::qt_staticMetaObjectRelocatingContent<(anonymous namespace)::qt_meta_tag_ZN5vedit9workspace7project12ProjectPanelE_t>
+r vedit::workspace::project::ProjectModel::qt_staticMetaObjectStaticContent<(anonymous namespace)::qt_meta_tag_ZN5vedit9workspace7project12ProjectModelE_t>
+r vedit::workspace::project::ProjectPanel::qt_staticMetaObjectStaticContent<(anonymous namespace)::qt_meta_tag_ZN5vedit9workspace7project12ProjectPanelE_t>
+t QtPrivate::QCallableObject<vedit::workspace::project::ProjectPanel::ProjectPanel(vedit::workspace::project::ProjectModel*, QWidget*)::{lambda(bool, QString const&)#1}, QtPrivate::List<bool, QString const&>, void>::impl(int, QtPrivate::QSlotObjectBase*, QObject*, void**, bool*)
+t vedit::workspace::installProject(vedit::app::ApplicationShell&, vedit::workspace::IntegrationOptions const&) [clone .cold]
+t vedit::workspace::project::ProjectModel::ProjectModel(QString, QObject*) [clone .cold]
+t vedit::workspace::project::ProjectModel::adopt(vedit::workspace::project::ExpansionPayload const&) [clone .cold]
+t vedit::workspace::project::ProjectModel::diagnostics() const [clone .cold]
+t vedit::workspace::project::ProjectModel::displayFiles() const [clone .cold]
+t vedit::workspace::project::ProjectModel::open(QString const&) [clone .cold]
+t vedit::workspace::project::ProjectModel::pollOnce() [clone .cold]
+t vedit::workspace::project::ProjectModel::qt_static_metacall(QObject*, QMetaObject::Call, int, void**)
+t vedit::workspace::project::ProjectModel::refresh() [clone .cold]
+t vedit::workspace::project::ProjectModel::restoreFromDisk(QString*) [clone .cold]
+t vedit::workspace::project::ProjectModel::startExpansion() [clone .cold]
+t vedit::workspace::project::ProjectModel::summary() const [clone .cold]
+t vedit::workspace::project::ProjectPanel::ProjectPanel(vedit::workspace::project::ProjectModel*, QWidget*) [clone .cold]
+t vedit::workspace::project::ProjectPanel::displayedDiagnostics() const [clone .cold]
+t vedit::workspace::project::ProjectPanel::displayedFiles() const [clone .cold]
+t vedit::workspace::project::ProjectPanel::updateUi() [clone .cold]
+u QtPrivate::QMetaTypeForType<vedit::workspace::project::ProjectModel>::name
+u QtPrivate::QMetaTypeForType<vedit::workspace::project::ProjectPanel>::name
+u QtPrivate::QMetaTypeInterfaceWrapper<vedit::workspace::project::ProjectModel>::metaType
+u QtPrivate::QMetaTypeInterfaceWrapper<vedit::workspace::project::ProjectPanel>::metaType
+## AFTER: UTF-16 dock object name (QStringLiteral storage)
+189:dock-project
+## AFTER: project panel ctest entry
+Test project /vedit-build/target/qt6-build
+  Test #14: vedit-workspace-project-selftest
+## AFTER: the panel ctest runs and passes
+    Start 14: vedit-workspace-project-selftest
+1/1 Test #14: vedit-workspace-project-selftest ...   Passed    0.05 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.05 sec

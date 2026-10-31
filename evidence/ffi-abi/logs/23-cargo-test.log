@@ -1,22 +1,25 @@
-    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s
      Running unittests src/lib.rs (target/debug/deps/vd_ffi-d7d088bbe0f89edb)
 
-running 0 tests
+running 3 tests
+test project::tests::fixture_expansion_matches_the_service_contract ... ok
+test project::tests::bad_entries_render_actionable_diagnostics ... ok
+test project::tests::expansion_is_deterministic ... ok
 
-test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
      Running tests/abi.rs (target/debug/deps/abi-c804d6a23d6a8517)
 
 running 12 tests
 test abi_version_is_one ... ok
-test cancelling_a_job_discards_its_result ... ok
 test null_and_unknown_arguments_are_rejected_with_a_typed_error ... ok
+test cancelling_a_job_discards_its_result ... ok
 test projected_fixture_serves_all_seven_services ... ok
-test fim_is_disabled_by_default_and_starts_no_worker ... ok
-test lsp_configures_lazily_without_starting_the_server ... ok
-test project_parse_expands_the_fixture_filelist ... ok
-test deeplint_reports_a_missing_binary_as_a_typed_failure ... ok
 test lsp_rejects_a_missing_server_binary ... ok
+test lsp_configures_lazily_without_starting_the_server ... ok
+test deeplint_reports_a_missing_binary_as_a_typed_failure ... ok
+test fim_is_disabled_by_default_and_starts_no_worker ... ok
+test project_parse_expands_the_fixture_filelist ... ok
 test search_returns_hits_over_the_project_file_list ... ok
 test vcs_reports_the_empty_state_for_a_plain_directory ... ok
 test settings_round_trip_through_the_abi ... ok
@@ -29,9 +32,9 @@ running 6 tests
 test tests::missing_root_is_reported ... ok
 test tests::preview_is_trimmed_and_capped ... ok
 test tests::empty_needle_and_zero_limit_return_nothing ... ok
-test tests::non_utf8_and_missing_files_are_skipped ... ok
 test tests::limit_truncates_from_the_tail ... ok
 test tests::query_finds_every_line_in_file_order ... ok
+test tests::non_utf8_and_missing_files_are_skipped ... ok
 
 test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 
@@ -42,20 +45,20 @@ test tests::missing_file_is_the_default_state ... ok
 test tests::broken_toml_degrades_to_a_warning ... ok
 test tests::non_string_values_are_reported_and_skipped ... ok
 test tests::round_trip_preserves_every_pair ... ok
-test tests::save_replaces_atomically_and_leaves_no_temporary_file ... ok
 test tests::failed_rename_leaves_the_original_file_intact ... ok
+test tests::save_replaces_atomically_and_leaves_no_temporary_file ... ok
 
 test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
 
      Running unittests src/lib.rs (target/debug/deps/vd_vcs-172bba4941aeb03b)
 
 running 6 tests
-test tests::git_porcelain_maps_statuses_and_branch ... ok
 test tests::git_detached_head_has_no_branch ... ok
+test tests::git_porcelain_maps_statuses_and_branch ... ok
 test tests::svn_status_maps_codes ... ok
 test tests::plain_directory_is_the_empty_state_not_an_error ... ok
-test tests::nested_directory_finds_the_repository_above_it ... ok
 test tests::markers_select_the_backend ... ok
+test tests::nested_directory_finds_the_repository_above_it ... ok
 
 test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
 

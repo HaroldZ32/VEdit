@@ -70,6 +70,56 @@
 #define VD_ERROR_MESSAGE_CAPACITY 256
 
 /*
+ Request kind: `textDocument/definition`.
+ */
+#define VD_LSP_REQ_DEFINITION 1
+
+/*
+ Request kind: `textDocument/references`.
+ */
+#define VD_LSP_REQ_REFERENCES 2
+
+/*
+ Request kind: `textDocument/documentSymbol` (the outline).
+ */
+#define VD_LSP_REQ_SYMBOLS 3
+
+/*
+ Request kind: `textDocument/rename`.
+ */
+#define VD_LSP_REQ_RENAME 4
+
+/*
+ Request kind: `textDocument/formatting`.
+ */
+#define VD_LSP_REQ_FORMAT 5
+
+/*
+ Request kind: diagnostics currently recorded for one file.
+ */
+#define VD_LSP_REQ_DIAGNOSTICS 6
+
+/*
+ Response kind: locations (definition / references).
+ */
+#define VD_LSP_RES_LOCATIONS 1
+
+/*
+ Response kind: outline symbols.
+ */
+#define VD_LSP_RES_SYMBOLS 2
+
+/*
+ Response kind: text edits (formatting / rename).
+ */
+#define VD_LSP_RES_EDITS 3
+
+/*
+ Response kind: diagnostics.
+ */
+#define VD_LSP_RES_DIAGNOSTICS 4
+
+/*
  The C-side opaque handle.
 
  This type has no variants and no fields on purpose: it exists only as a
@@ -171,6 +221,236 @@ typedef struct VdStringList {
    */
   char **items;
 } VdStringList;
+
+/*
+ Observable state of one session (A3d).
+ */
+typedef struct VdLspStatus {
+  /*
+   0 starting, 1 ready, 2 failed, 3 stopped.
+   */
+  int32_t phase;
+  /*
+   Files the caller handed in (the project model's effective set).
+   */
+  size_t files_expected;
+  /*
+   Files actually opened on the server.
+   */
+  size_t files_opened;
+  /*
+   Diagnostics currently recorded across the open documents.
+   */
+  size_t diagnostics;
+  /*
+   Diagnostics generation counter.
+   */
+  uint64_t generation;
+  /*
+   Server PID, or 0 when no process is running.
+   */
+  uint32_t server_pid;
+  /*
+   How many times a crashed server was restarted.
+   */
+  uint32_t restarts;
+  /*
+   Human-readable state line.
+   */
+  char *message;
+  /*
+   `path: reason` for files that could not be opened.
+   */
+  struct VdStringList skipped;
+} VdLspStatus;
+
+/*
+ Zero-based start/end position of a location, symbol or edit.
+ */
+typedef struct VdLspPositionRange {
+  /*
+   Start line (zero-based).
+   */
+  uint32_t start_line;
+  /*
+   Start UTF-16 character (zero-based).
+   */
+  uint32_t start_character;
+  /*
+   End line (zero-based).
+   */
+  uint32_t end_line;
+  /*
+   End UTF-16 character (zero-based).
+   */
+  uint32_t end_character;
+} VdLspPositionRange;
+
+/*
+ One location returned by definition/references.
+ */
+typedef struct VdLspLocation {
+  /*
+   Target document URI (`file://…`).
+   */
+  char *uri;
+  /*
+   Range inside the target document.
+   */
+  struct VdLspPositionRange range;
+} VdLspLocation;
+
+/*
+ Array of locations.
+ */
+typedef struct VdLspLocationList {
+  /*
+   Number of entries.
+   */
+  size_t count;
+  /*
+   Owned array of locations; null when `count` is zero.
+   */
+  struct VdLspLocation *items;
+} VdLspLocationList;
+
+/*
+ One outline entry.
+ */
+typedef struct VdLspSymbol {
+  /*
+   Symbol name.
+   */
+  char *name;
+  /*
+   Detail text, or null.
+   */
+  char *detail;
+  /*
+   LSP `SymbolKind` number.
+   */
+  int32_t kind;
+  /*
+   Selection range.
+   */
+  struct VdLspPositionRange range;
+} VdLspSymbol;
+
+/*
+ Array of outline entries.
+ */
+typedef struct VdLspSymbolList {
+  /*
+   Number of entries.
+   */
+  size_t count;
+  /*
+   Owned array of symbols; null when `count` is zero.
+   */
+  struct VdLspSymbol *items;
+} VdLspSymbolList;
+
+/*
+ One text edit to apply.
+ */
+typedef struct VdLspTextEdit {
+  /*
+   Target document URI.
+   */
+  char *uri;
+  /*
+   Range replaced by `new_text`.
+   */
+  struct VdLspPositionRange range;
+  /*
+   Replacement text.
+   */
+  char *new_text;
+} VdLspTextEdit;
+
+/*
+ Array of text edits.
+ */
+typedef struct VdLspTextEditList {
+  /*
+   Number of entries.
+   */
+  size_t count;
+  /*
+   Owned array of edits; null when `count` is zero.
+   */
+  struct VdLspTextEdit *items;
+} VdLspTextEditList;
+
+/*
+ One diagnostic.
+ */
+typedef struct VdLspDiagnostic {
+  /*
+   1 error, 2 warning, 3 information, 4 hint, 0 unknown.
+   */
+  int32_t severity;
+  /*
+   Diagnostic range.
+   */
+  struct VdLspPositionRange range;
+  /*
+   Rule/code, or null.
+   */
+  char *code;
+  /*
+   Producing tool, or null.
+   */
+  char *source;
+  /*
+   Message text.
+   */
+  char *message;
+} VdLspDiagnostic;
+
+/*
+ Array of diagnostics.
+ */
+typedef struct VdLspDiagnosticList {
+  /*
+   Number of entries.
+   */
+  size_t count;
+  /*
+   Owned array of diagnostics; null when `count` is zero.
+   */
+  struct VdLspDiagnostic *items;
+} VdLspDiagnosticList;
+
+/*
+ One polled response. Only the list matching `kind` is filled.
+ */
+typedef struct VdLspResponse {
+  /*
+   1 locations, 2 symbols, 3 edits, 4 diagnostics.
+   */
+  int32_t kind;
+  /*
+   Human-readable note (may be null).
+   */
+  char *message;
+  /*
+   Locations, when `kind` is 1.
+   */
+  struct VdLspLocationList locations;
+  /*
+   Symbols, when `kind` is 2.
+   */
+  struct VdLspSymbolList symbols;
+  /*
+   Edits, when `kind` is 3.
+   */
+  struct VdLspTextEditList edits;
+  /*
+   Diagnostics, when `kind` is 4.
+   */
+  struct VdLspDiagnosticList diagnostics;
+} VdLspResponse;
 
 /*
  One project member list: files, include dirs, defines and warnings.
@@ -434,6 +714,124 @@ int32_t vd_lsp_poll(struct VdService *service, uint64_t job, struct VdLspInfo *o
  freed yet.
  */
 void vd_lsp_info_free(struct VdLspInfo *info);
+
+/*
+ Start an LSP session over the effective file set.
+
+ `ls_path` must be the Verible language-server binary, `workspace_root` the
+ project root; `rules_path` may be null; `files` must point to the file list
+ the project model produced (the same list the caller passes to SLANG).
+
+ Returns a session id, or `0` when the arguments were rejected; the reason is
+ then readable with `vd_service_error`. No process is started here: the
+ worker starts the server on its first `didOpen`, so this call cannot block
+ the UI thread (C2).
+
+ # Safety
+
+ `service` must be null or live; the `*const c_char` arguments must be null or
+ valid NUL-terminated strings; `files` must satisfy [`read_file_list`]'s
+ contract.
+ */
+uint64_t vd_lsp_session_start(struct VdService *service,
+                              const char *ls_path,
+                              const char *workspace_root,
+                              const char *rules_path,
+                              const struct VdStringList *files);
+
+/*
+ Read the observable state of one session (A3d).
+
+ Returns `VD_STATUS_READY` with `out` filled, or `POLL_MISUSE` when the id is
+ unknown or `out` is null. The status is a snapshot: it never waits for the
+ server.
+
+ # Safety
+
+ `service` must be null or live; `out` must be null or writable for one
+ [`VdLspStatus`].
+ */
+int32_t vd_lsp_session_status(struct VdService *service, uint64_t session, struct VdLspStatus *out);
+
+/*
+ Release a filled [`VdLspStatus`]; null-safe and idempotent.
+
+ # Safety
+
+ `status` must be null or point to a struct filled by
+ [`vd_lsp_session_status`] and not freed yet.
+ */
+void vd_lsp_status_free(struct VdLspStatus *status);
+
+/*
+ Queue one request on a session.
+
+ `kind` is one of the `VD_LSP_REQ_*` constants. `file` is required for every
+ kind; `line`/`character` are zero-based and used by definition, references
+ and rename; `new_name` is used only by rename.
+
+ Returns a request id, or `0` when the arguments were rejected.
+
+ # Safety
+
+ `service` must be null or live; `file` and `new_name` must be null or valid
+ NUL-terminated strings.
+ */
+uint64_t vd_lsp_session_request(struct VdService *service,
+                                uint64_t session,
+                                int32_t kind,
+                                const char *file,
+                                uint32_t line,
+                                uint32_t character,
+                                const char *new_name);
+
+/*
+ Poll one request.
+
+ `VD_STATUS_PENDING` while the worker is busy, `VD_STATUS_READY` with `out`
+ filled, `VD_STATUS_FAILED` with the reason in `vd_service_error`, or
+ `POLL_MISUSE` for an unknown/consumed id or a null `out`.
+
+ # Safety
+
+ `service` must be null or live; `out` must be null or writable for one
+ [`VdLspResponse`].
+ */
+int32_t vd_lsp_request_poll(struct VdService *service,
+                            uint64_t session,
+                            uint64_t request,
+                            struct VdLspResponse *out);
+
+/*
+ Release a filled [`VdLspResponse`]; null-safe and idempotent.
+
+ # Safety
+
+ `response` must be null or point to a struct filled by
+ [`vd_lsp_request_poll`] and not freed yet.
+ */
+void vd_lsp_response_free(struct VdLspResponse *response);
+
+/*
+ Ask a session to shut its server down. Non-blocking and idempotent.
+
+ Returns `0` when the request was delivered, `POLL_MISUSE` for an unknown id.
+
+ # Safety
+
+ `service` must be null or live.
+ */
+int32_t vd_lsp_session_stop(struct VdService *service, uint64_t session);
+
+/*
+ Stop and forget a session (the worker is asked to shut down before the slot
+ is dropped). Null-safe for an unknown id.
+
+ # Safety
+
+ `service` must be null or live.
+ */
+void vd_lsp_session_free(struct VdService *service, uint64_t session);
 
 /*
  Start a project/.f expansion job.

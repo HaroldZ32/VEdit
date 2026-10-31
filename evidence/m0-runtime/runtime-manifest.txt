@@ -196,3 +196,8 @@ dc6e0a4714762764b9386471bb09e2550c1a9cbcf2b8f67f1a1200f677726f9d  6276  usr/shar
 3d1ec41f0871c001f560ca58b3178bdfd7508ff5f25d095c15820d2feda43e49  5172  usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml
 34105eeefa1276e9cbd5ee009b0a36ac3bcb787429b2d8d0cd546c42230651a5  22  usr/share/vedit/ksh-whitelist.txt
 c7ab82f8896b3276e7a5d7a7a38c8503ca9e715d36e70b786db00209c6fb46bf  307  vedit.desktop
+# NOTE (T62, 2026-10-31): lines 195-196 record the M0 packaged snapshot, built
+# BEFORE T45 rewrote the source XMLs. Those sha256/size values are historical
+# packaged values and are intentionally left unchanged. Current source values:
+# THIRD_PARTY_NOTICES.md §9.1 (verilog c6adc763… 85/5,111; systemverilog
+# 2abba334… 90/5,492); recomputation in evidence/licensing-hash-sync/.

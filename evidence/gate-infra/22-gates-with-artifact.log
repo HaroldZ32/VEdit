@@ -1,0 +1,40 @@
+# gates id with the slang artifact present (built by the documented one-command path).
+collected_at_utc=2026-10-31T10:50:53Z
+git_rev_parse_HEAD=1f47e56421bbeaab64f8082df3cfc104a6a2c2ef
+
+## the artifact the gate verifies
+-rwxr-xr-x 1 haroldzhao haroldzhao 9526400 Oct 31 18:48 build/slang/out/slang
+slang version 12.1.0+0
+
+$ VEDIT_SKIP_IMAGE_BUILD=1 bash build/gates/gates.sh
++        "a server process must be running"
++    );
+ 
+     let top = fixture_root().join("rtl/top.sv");
+     let text = std::fs::read_to_string(&top)?;
+Diff in /vedit-build/crates/vd-lsp/tests/session_file_set.rs:251:
+         return Ok(());
+     };
+     let files = effective_files()?;
+-    for (label, subset) in [
+-        ("full", files.clone()),
+-        ("reduced", files[..3].to_vec()),
+-    ] {
++    for (label, subset) in [("full", files.clone()), ("reduced", files[..3].to_vec())] {
+         let session = open_session(&ls, &subset)?;
+         let status = wait_ready(&session, START_BUDGET)?;
+         println!(
+Diff in /vedit-build/crates/vd-lsp/tests/session_file_set.rs:263:
+         );
+         assert_eq!(status.files_expected, subset.len(), "{label}: set size");
+         assert_eq!(status.files_opened, subset.len(), "{label}: opened count");
+-        assert!(session.wait_for_stop(), "{label}: session must stop cleanly");
++        assert!(
++            session.wait_for_stop(),
++            "{label}: session must stop cleanly"
++        );
+     }
+     Ok(())
+ }
+[gates] FAIL: scripts/gates.sh failed
+GATES-EXIT=1

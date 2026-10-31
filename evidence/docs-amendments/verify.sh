@@ -38,10 +38,13 @@ echo "git_head: $(git rev-parse HEAD)"
 echo
 
 # --- 1. C14: the two own LGPL-2.1-or-later definitions -----------------------
-check_sha 3d1ec41f0871c001f560ca58b3178bdfd7508ff5f25d095c15820d2feda43e49 resources/syntax/vedit-verilog.xml
-check_sha dc6e0a4714762764b9386471bb09e2550c1a9cbcf2b8f67f1a1200f677726f9d resources/syntax/vedit-systemverilog.xml
-check_size resources/syntax/vedit-verilog.xml 78 5172
-check_size resources/syntax/vedit-systemverilog.xml 89 6276
+# Current values after T45 rewrote the folding rules (2026-10-31). The pre-rewrite
+# values (78/5172 3d1ec41f…, 89/6276 dc6e0a47…) survive only in the old evidence
+# snapshots; the recomputation is in evidence/licensing-hash-sync/01-hash-recompute.txt.
+check_sha c6adc763c7b280d7493f48d06e5779d0b1e2068ac82f75fe7f31a07b0788a6c2 resources/syntax/vedit-verilog.xml
+check_sha 2abba3342d0878e71b99d358d96e510f857cd7f232786951be8602f513e0b992 resources/syntax/vedit-systemverilog.xml
+check_size resources/syntax/vedit-verilog.xml 85 5111
+check_size resources/syntax/vedit-systemverilog.xml 90 5492
 
 for f in resources/syntax/vedit-verilog.xml resources/syntax/vedit-systemverilog.xml; do
     grep -q 'license="LGPL-2.1-or-later"' "$f" && ok "$f declares license=LGPL-2.1-or-later" ||
@@ -68,6 +71,10 @@ grep -q 'MIT' third_party/tree-sitter/verilog/LICENSE &&
     ok "grammar LICENSE is the MIT text" || bad "grammar LICENSE is not MIT"
 
 # --- 3. AppDir install-path consistency (evidence/m0-runtime manifest) ------
+# NOTE: the manifest and the shipped AppDir are the M0 packaged snapshot, built
+# BEFORE T45 rewrote the source XMLs, so they still carry the old sha256/size
+# values. Those are historical records: these checks verify the packaged snapshot
+# as it exists, not the current source files.
 for pair in \
     "dc6e0a4714762764b9386471bb09e2550c1a9cbcf2b8f67f1a1200f677726f9d usr/share/org.kde.syntax-highlighting/syntax/vedit-systemverilog.xml" \
     "3d1ec41f0871c001f560ca58b3178bdfd7508ff5f25d095c15820d2feda43e49 usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml"; do
@@ -81,8 +88,8 @@ done
 
 # --- 4. Registration in THIRD_PARTY_NOTICES.md ------------------------------
 for token in \
-    3d1ec41f0871c001f560ca58b3178bdfd7508ff5f25d095c15820d2feda43e49 \
-    dc6e0a4714762764b9386471bb09e2550c1a9cbcf2b8f67f1a1200f677726f9d \
+    c6adc763c7b280d7493f48d06e5779d0b1e2068ac82f75fe7f31a07b0788a6c2 \
+    2abba3342d0878e71b99d358d96e510f857cd7f232786951be8602f513e0b992 \
     92dbb929e5518c6790db68d32d71c257c0c6cbb3974fcd4d930bf28cf1b1bb46 \
     4457145e795b363f072463e697dfe2f6973c9a52; do
     grep -q "$token" THIRD_PARTY_NOTICES.md && ok "THIRD_PARTY_NOTICES.md registers $token" ||

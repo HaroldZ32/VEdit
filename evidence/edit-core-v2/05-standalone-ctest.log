@@ -1,0 +1,74 @@
+# standalone lane: cmake -S src/editor -B target/edit-core-build && ctest
+# date: 2026-10-31T19:11:32+08:00
+
+## ctest
+Test project /vedit-build/target/edit-core-build
+    Start 1: vedit-edit-core-selftest
+1/1 Test #1: vedit-edit-core-selftest .........   Passed    0.12 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.13 sec
+
+## the same selftest binary, full CHECK list (53 checks)
+CHECK editcore.scratch PASS
+CHECK editcore.ktexteditor.instance PASS
+CHECK editcore.document.create PASS
+CHECK editcore.undo.metaobject-slot PASS
+CHECK editcore.document.setText PASS
+CHECK editcore.open.fixture-written PASS
+CHECK editcore.open.file PASS
+CHECK editcore.open.records-path PASS /tmp/vedit-edit-core-selftest-gUjnEq/open.v
+CHECK editcore.atomic.fresh-file PASS
+CHECK editcore.atomic.fresh-content PASS
+CHECK editcore.atomic.no-temp-left PASS
+CHECK editcore.atomic.replace PASS
+CHECK editcore.atomic.replace-no-temp PASS
+CHECK editcore.atomic.fault.write-fails PASS
+CHECK editcore.atomic.fault.write-keeps-target PASS
+CHECK editcore.atomic.fault.write-cleans-temp PASS
+CHECK editcore.atomic.fault.rename-fails PASS
+CHECK editcore.atomic.fault.rename-keeps-target PASS
+CHECK editcore.atomic.fault.rename-cleans-temp PASS
+CHECK editcore.atomic.fault.dir-fsync-nonfatal PASS atomic save: injected directory fsync failure;directory fsync skipped by fault injection
+CHECK editcore.atomic.fault.dir-fsync-content PASS
+CHECK editcore.save.kernel PASS
+CHECK editcore.save.bytes PASS
+CHECK editcore.save.clears-modified PASS
+CHECK editcore.find.count PASS 3
+CHECK editcore.find.adjacent PASS
+CHECK editcore.replace.count PASS found=3 replaced=3
+CHECK editcore.replace.text PASS zz bbb zz ccc zz
+
+CHECK editcore.replace.one-undo PASS
+CHECK editcore.replace.redo PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+CHECK editcore.goto.line PASS
+CHECK editcore.goto.clamp-low PASS
+CHECK editcore.goto.clamp-high PASS line=3
+CHECK editcore.goto.column-zero PASS
+CHECK editcore.undo.100-operations PASS 100
+CHECK editcore.undo.100-back-to-original PASS mismatches=0 error=
+CHECK editcore.redo.100-forwards PASS mismatches=0
+EDITCORE-UNDO sha-before=c2a908d98f5df987ade41b5fce213067efbcc21ef2240212a41e54b5e7c28ae5 sha-after=991ab4d4e3f17a75c77ed6a7000fe568ae995f0dd92fe827129ee74ae2214f98
+CHECK editcore.multicursor.native-api PASS
+CHECK editcore.multicursor.native-read-back PASS
+CHECK editcore.multicursor.native-insert-call PASS
+EDITCORE-MULTICURSOR native-cursors=3 native-inserted-x=1 text="Xaaa
+"
+CHECK editcore.multicursor.native-insert-primary PASS 1
+CHECK editcore.multicursor.batch-insert PASS
+CHECK editcore.multicursor.batch-text PASS XaXaXa
+
+CHECK editcore.multicursor.batch-one-undo PASS
+CHECK editcore.multicursor.batch-redo PASS
+CHECK editcore.provider.id PASS ktexteditor
+CHECK editcore.provider.creates-view PASS
+CHECK editcore.provider.fixture PASS
+CHECK editcore.provider.open PASS
+CHECK editcore.provider.open-records-path PASS /tmp/vedit-edit-core-selftest-IfgBUt/provider.v
+CHECK editcore.provider.document PASS
+CHECK editcore.provider.save PASS
+CHECK editcore.provider.save-bytes PASS
+SKIP editcore.boundary.zero-calls no C ABI hooks in this build
+EDIT-CORE-SELFTEST ok=1 checks=53 failures=0

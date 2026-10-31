@@ -1,0 +1,98 @@
+== evidence: 01-before-red-standalone.log — PRE-FIX code + the new lifecycle reproduction (lane standalone build, no shell)
+time=2026-10-31T19:31:26+08:00
+HEAD=95c496e682e3841add1a081edd78d29c34957aac
+global_search sha256: 9cd0d9d35139bf925bc34f437af5f760d4048410191d866ff45005ba06e84f81  src/workspace/search/global_search.cpp
+
+BUILD-EXIT=1
+  840 |     constexpr int kHoldMs = 10300; // just past the old 10 s destructor bound
+      |                   ^~~~~~~
+ninja: build stopped: subcommand failed.
+CHECK large.skipped.state PASS
+CHECK large.skipped.fast PASS
+CHECK large.start.accepted-raised PASS
+CHECK large.start.non-blocking PASS
+CHECK large.cancel.returns-fast PASS
+CHECK large.cancel.finishes PASS
+CHECK large.cancel.state PASS
+CHECK large.cancel.bounded PASS
+CHECK large.worker-thread PASS
+CHECK many.start.non-blocking PASS
+CHECK many.finishes PASS
+CHECK many.hits PASS
+CHECK many.files-scanned PASS
+CHECK many.elapsed-bounded PASS
+CHECK large.timeout.accepted PASS
+CHECK large.timeout.finishes PASS
+CHECK large.timeout.flag PASS
+CHECK large.timeout.state PASS
+CHECK large.timeout.bounded PASS
+WORKSPACE-SEARCH-SELFTEST ok=1 checks=77 failures=0 skipped=2
+SELFTEST-EXIT=0
+
+== RERUN after adding kHoldMs to the releaser capture list ==
+time=2026-10-31T19:32:10+08:00
+[1/4] Automatic MOC for target vedit-workspace-search-selftest
+[2/3] Building CXX object CMakeFiles/vedit-workspace-search-selftest.dir/search_selftest.cpp.o
+[3/3] Linking CXX executable vedit-workspace-search-selftest
+BUILD-EXIT=0
+CHECK large.timeout.bounded PASS
+CHECK lifecycle.temp-dir PASS
+CHECK lifecycle.fifo-created PASS
+CHECK lifecycle.writer-open PASS
+CHECK lifecycle.scan-started PASS
+CHECK lifecycle.batch-before-block PASS
+CHECK lifecycle.worker-blocked FAIL
+LIFECYCLE delete-returned elapsedMs=0 fifo-released=0 holdMs=10300
+CHECK lifecycle.destructor-waits-for-worker FAIL
+CHECK lifecycle.destructor-wait-measured FAIL
+CHECK lifecycle.worker-released PASS
+WORKSPACE-SEARCH-SELFTEST ok=0 checks=86 failures=3 skipped=2
+SELFTEST-EXIT=1
+
+== RERUN (design v2: slow-storage stall shim instead of FIFO; the scanner skips FIFOs so FIFO cannot stall it) ==
+time=2026-10-31T19:38:23+08:00
+sha256(global_search.cpp)=9cd0d9d35139bf925bc34f437af5f760d4048410191d866ff45005ba06e84f81
+[2/6] Automatic MOC for target vedit-workspace-search-selftest
+[3/6] Building CXX object CMakeFiles/vedit-workspace-search-selftest.dir/vedit-workspace-search-selftest_autogen/mocs_compilation.cpp.o
+[4/6] Building CXX object CMakeFiles/vedit-workspace-search-selftest.dir/search_selftest.cpp.o
+[5/6] Linking CXX executable vedit-workspace-search-selftest
+BUILD-EXIT=0
+CHECK lifecycle.temp-dir PASS
+CHECK lifecycle.no-worker-before PASS
+CHECK lifecycle.scan-started PASS
+CHECK lifecycle.worker-running FAIL
+CHECK lifecycle.destructor-joins-worker PASS
+SLOWLIFECYCLE-CHILD finished=1 exit=1
+CHECK slowlifecycle.temp-dir PASS
+CHECK slowlifecycle.scan-started PASS
+CHECK slowlifecycle.batch-before-block PASS
+SLOWLIFECYCLE delete-returned elapsedMs=0 released-marker=0 stallMs=11500
+CHECK slowlifecycle.destructor-waits-for-stalled-read FAIL
+WORKSPACE-SEARCH-SLOWLIFECYCLE ok=0 checks=4 failures=1
+CHECK lifecycle.stall-child-finished PASS
+CHECK lifecycle.stall-child-pass FAIL
+WORKSPACE-SEARCH-SELFTEST ok=0 checks=84 failures=2 skipped=2
+SELFTEST-EXIT=1
+
+== RERUN 2 (shim target now built via add_dependencies; fast check uses isRunning) ==
+time=2026-10-31T19:39:25+08:00
+[6/9] Automatic MOC for target vedit-workspace-search-selftest
+[7/8] Building CXX object CMakeFiles/vedit-workspace-search-selftest.dir/search_selftest.cpp.o
+[8/8] Linking CXX executable vedit-workspace-search-selftest
+BUILD-EXIT=0
+-rwxr-xr-x 1 root root 26952 Oct 31 11:39 target/search-standalone/libvedit_search_slowio.so
+CHECK lifecycle.temp-dir PASS
+CHECK lifecycle.no-worker-before PASS
+CHECK lifecycle.scan-started PASS
+CHECK lifecycle.worker-running PASS
+CHECK lifecycle.destructor-joins-worker PASS
+SLOWLIFECYCLE-CHILD finished=1 exit=11
+CHECK slowlifecycle.temp-dir PASS
+CHECK slowlifecycle.scan-started PASS
+CHECK slowlifecycle.batch-before-block PASS
+SLOWLIFECYCLE delete-returned elapsedMs=10001 released-marker=0 stallMs=11500
+CHECK slowlifecycle.destructor-waits-for-stalled-read FAIL
+CHECK lifecycle.stall-child-finished PASS
+CHECK lifecycle.stall-child-pass FAIL
+WORKSPACE-SEARCH-SELFTEST ok=0 checks=84 failures=1 skipped=2
+SELFTEST-EXIT=1

@@ -144,3 +144,10 @@ CHECK PASS  r2-license.md errata names the actual artifact
 
 == summary: pass=33 fail=0 ==
 EXIT=0
+
+NOTE (T62, 2026-10-31): this log records the T33 capture. Its 3d1ec41f…/dc6e0a47…
+hashes and 78/89-line sizes are pre-T45 historical values and are left unchanged.
+Current source values: THIRD_PARTY_NOTICES.md §9.1 (verilog c6adc763… 85/5,111;
+systemverilog 2abba334… 90/5,492); recomputation in evidence/licensing-hash-sync/.
+The reproduced script evidence/docs-amendments/verify.sh now pins the current values
+for the source files while keeping the packaged-snapshot checks historical.

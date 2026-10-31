@@ -33,6 +33,26 @@
 
 #define VD_ERROR_MESSAGE_CAPACITY 256
 
+#define VD_LSP_REQ_DEFINITION 1
+
+#define VD_LSP_REQ_REFERENCES 2
+
+#define VD_LSP_REQ_SYMBOLS 3
+
+#define VD_LSP_REQ_RENAME 4
+
+#define VD_LSP_REQ_FORMAT 5
+
+#define VD_LSP_REQ_DIAGNOSTICS 6
+
+#define VD_LSP_RES_LOCATIONS 1
+
+#define VD_LSP_RES_SYMBOLS 2
+
+#define VD_LSP_RES_EDITS 3
+
+#define VD_LSP_RES_DIAGNOSTICS 4
+
 typedef struct VdService VdService;
 
 typedef struct VdDiagnostic {
@@ -65,6 +85,80 @@ typedef struct VdStringList {
   size_t count;
   char **items;
 } VdStringList;
+
+typedef struct VdLspStatus {
+  int32_t phase;
+  size_t files_expected;
+  size_t files_opened;
+  size_t diagnostics;
+  uint64_t generation;
+  uint32_t server_pid;
+  uint32_t restarts;
+  char *message;
+  struct VdStringList skipped;
+} VdLspStatus;
+
+typedef struct VdLspPositionRange {
+  uint32_t start_line;
+  uint32_t start_character;
+  uint32_t end_line;
+  uint32_t end_character;
+} VdLspPositionRange;
+
+typedef struct VdLspLocation {
+  char *uri;
+  struct VdLspPositionRange range;
+} VdLspLocation;
+
+typedef struct VdLspLocationList {
+  size_t count;
+  struct VdLspLocation *items;
+} VdLspLocationList;
+
+typedef struct VdLspSymbol {
+  char *name;
+  char *detail;
+  int32_t kind;
+  struct VdLspPositionRange range;
+} VdLspSymbol;
+
+typedef struct VdLspSymbolList {
+  size_t count;
+  struct VdLspSymbol *items;
+} VdLspSymbolList;
+
+typedef struct VdLspTextEdit {
+  char *uri;
+  struct VdLspPositionRange range;
+  char *new_text;
+} VdLspTextEdit;
+
+typedef struct VdLspTextEditList {
+  size_t count;
+  struct VdLspTextEdit *items;
+} VdLspTextEditList;
+
+typedef struct VdLspDiagnostic {
+  int32_t severity;
+  struct VdLspPositionRange range;
+  char *code;
+  char *source;
+  char *message;
+} VdLspDiagnostic;
+
+typedef struct VdLspDiagnosticList {
+  size_t count;
+  struct VdLspDiagnostic *items;
+} VdLspDiagnosticList;
+
+typedef struct VdLspResponse {
+  int32_t kind;
+  char *message;
+  struct VdLspLocationList locations;
+  struct VdLspSymbolList symbols;
+  struct VdLspTextEditList edits;
+  struct VdLspDiagnosticList diagnostics;
+} VdLspResponse;
 
 typedef struct VdProjectInfo {
   struct VdStringList files;
@@ -143,6 +237,35 @@ uint64_t vd_lsp_start(struct VdService *service,
 int32_t vd_lsp_poll(struct VdService *service, uint64_t job, struct VdLspInfo *out);
 
 void vd_lsp_info_free(struct VdLspInfo *info);
+
+uint64_t vd_lsp_session_start(struct VdService *service,
+                              const char *ls_path,
+                              const char *workspace_root,
+                              const char *rules_path,
+                              const struct VdStringList *files);
+
+int32_t vd_lsp_session_status(struct VdService *service, uint64_t session, struct VdLspStatus *out);
+
+void vd_lsp_status_free(struct VdLspStatus *status);
+
+uint64_t vd_lsp_session_request(struct VdService *service,
+                                uint64_t session,
+                                int32_t kind,
+                                const char *file,
+                                uint32_t line,
+                                uint32_t character,
+                                const char *new_name);
+
+int32_t vd_lsp_request_poll(struct VdService *service,
+                            uint64_t session,
+                            uint64_t request,
+                            struct VdLspResponse *out);
+
+void vd_lsp_response_free(struct VdLspResponse *response);
+
+int32_t vd_lsp_session_stop(struct VdService *service, uint64_t session);
+
+void vd_lsp_session_free(struct VdService *service, uint64_t session);
 
 uint64_t vd_project_parse(struct VdService *service, const char *start_dir);
 

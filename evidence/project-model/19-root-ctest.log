@@ -1,0 +1,75 @@
+# C9 evidence header
+collected_at: 2026-10-31T18:57:03+08:00
+git_head: 1f47e56421bbeaab64f8082df3cfc104a6a2c2ef
+build_dir: target/qt6-build (configured by build/gates/typecheck.sh this run)
+binary_sha256: 4513e96db70409dfcc0ee6be59de700feda82a06de61d673a373fb77aec88616
+
+Test project /vedit-build/target/qt6-build
+      Start  1: vedit-app-syntax-startup
+ 1/14 Test  #1: vedit-app-syntax-startup .......................   Passed    0.17 sec
+      Start  2: vedit-m0-smoke
+ 2/14 Test  #2: vedit-m0-smoke .................................   Passed    0.06 sec
+      Start  3: vedit-syntax-provider-tests
+ 3/14 Test  #3: vedit-syntax-provider-tests ....................   Passed    0.00 sec
+      Start  4: vedit-syntax-kde-data
+ 4/14 Test  #4: vedit-syntax-kde-data ..........................   Passed    0.03 sec
+      Start  5: vedit-syn-grammars-tests
+ 5/14 Test  #5: vedit-syn-grammars-tests .......................   Passed    0.17 sec
+      Start  6: vedit-syntax-product-tests
+ 6/14 Test  #6: vedit-syntax-product-tests .....................   Passed    0.05 sec
+      Start  7: vedit-terminal-selftest
+ 7/14 Test  #7: vedit-terminal-selftest ........................   Passed    1.08 sec
+      Start  8: vedit-app-ffi-abi-selftest
+ 8/14 Test  #8: vedit-app-ffi-abi-selftest .....................   Passed    0.20 sec
+      Start  9: vedit-app-shell-selftest
+ 9/14 Test  #9: vedit-app-shell-selftest .......................   Passed    0.17 sec
+      Start 10: vedit-edit-core-selftest
+Could not find executable /vedit-build/target/qt6-build/src/app/editor-lane/vedit-edit-core-selftest
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/editor-lane/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Release/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Release/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Debug/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Debug/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/MinSizeRel/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/MinSizeRel/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/RelWithDebInfo/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/RelWithDebInfo/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Deployment/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Deployment/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Development/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Development/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Release/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Release/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Debug/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Debug/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/MinSizeRel/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/MinSizeRel/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/RelWithDebInfo/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/RelWithDebInfo/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Deployment/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Deployment/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Development/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Development/vedit-edit-core-selftest
+Unable to find executable: /vedit-build/target/qt6-build/src/app/editor-lane/vedit-edit-core-selftest
+10/14 Test #10: vedit-edit-core-selftest .......................***Not Run   0.00 sec
+      Start 11: vedit-workspace-palette-selftest
+11/14 Test #11: vedit-workspace-palette-selftest ...............   Passed    0.09 sec
+      Start 12: vedit-workspace-palette-integration-selftest
+12/14 Test #12: vedit-workspace-palette-integration-selftest ...   Passed    0.08 sec
+      Start 13: vedit-workspace-search-selftest
+13/14 Test #13: vedit-workspace-search-selftest ................   Passed    0.34 sec
+      Start 14: vedit-workspace-project-selftest
+14/14 Test #14: vedit-workspace-project-selftest ...............   Passed    0.05 sec
+
+93% tests passed, 1 tests failed out of 14
+
+Total Test time (real) =   2.50 sec
+
+The following tests FAILED:
+	 10 - vedit-edit-core-selftest (Not Run)
+Errors while running CTest
+CTEST-EXIT=8

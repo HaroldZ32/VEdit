@@ -1,0 +1,299 @@
+== evidence: 02-after-green.log (H1 fixed: installSearch installs EditorJumpTarget; real click -> open + cursor line)
+time=2026-10-31T18:54:55+08:00
+HEAD=1f47e56421bbeaab64f8082df3cfc104a6a2c2ef
+branch=feat/qt6-ktexteditor-migration
+image=sha256:5e99b44cb5908a3445f7df65ea69b888173aff885d2e5164db70c1a0863fd2f6
+
+$ vedit-workspace-search-selftest --selfcheck   (QT_QPA_PLATFORM=offscreen, inside vedit-qt6-build:local)
+CHECK fixture.created PASS
+This plugin does not support propagateSizeHints()
+CHECK panel.root.normalized PASS
+CHECK panel.empty.enter-query PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panel.search.terminates PASS
+CHECK panel.hits.count PASS
+CHECK panel.summary.state PASS
+CHECK panel.summary.files PASS
+CHECK panel.summary.files-scanned PASS
+CHECK panel.summary.skipped-binary PASS
+CHECK panel.summary.skipped-too-large PASS
+CHECK panel.summary.text.observable PASS
+CHECK panel.tree.files PASS
+CHECK panel.tree.one-row-per-hit PASS
+CHECK panel.tree.no-git PASS
+CHECK panel.tree.no-build PASS
+CHECK panel.tree.no-binary PASS
+CHECK panel.hits.one-per-line PASS
+CHECK panel.hit.line-number PASS
+CHECK panel.hit.column PASS
+CHECK panel.hit.snippet PASS
+CHECK panel.hit.unicode-file PASS
+CHECK panel.hit.unicode-column PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panel.case-sensitive.count PASS
+CHECK panel.case-sensitive.excludes-uppercase PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panel.verilog-only.count PASS
+CHECK panel.verilog-only.excludes-markdown PASS
+CHECK panel.verilog-only.excludes-large-file PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panel.unicode.query PASS
+This plugin does not support propagateSizeHints()
+CHECK empty.no-project.visible PASS
+CHECK empty.no-project.text PASS
+CHECK empty.no-project.no-search PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK empty.query.text PASS
+CHECK empty.query.no-search PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK empty.no-results.state PASS
+CHECK empty.no-results.visible PASS
+CHECK empty.no-results.text PASS
+CHECK empty.no-results.tree-hidden PASS
+CHECK empty.unreadable-root SKIP (running as root: chmod 000 does not deny access)
+CHECK entries.unreadable SKIP (running as root: chmod 000 does not deny access)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK limit.results PASS
+CHECK limit.truncated-flag PASS
+CHECK limit.summary-text PASS
+CHECK extension.v PASS
+CHECK extension.vh PASS
+CHECK extension.sv PASS
+CHECK extension.svh PASS
+CHECK extension.not-verilog PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK jump.hit-row-exists PASS
+CHECK jump.row-visible PASS
+CHECK jump.click.recorded PASS
+CHECK jump.click.file PASS
+CHECK jump.click.line PASS
+CHECK jump.click.column PASS
+CHECK jump.file-row.no-jump PASS
+CHECK jump.activate PASS
+CHECK jump.demo.opened PASS
+CHECK jump.demo.line PASS
+search: installSearch projectRoot='/tmp/vedit-workspace-search-selftest-SiCTSc' jumpTarget=editor
+CHECK seam.dock-created PASS
+CHECK seam.not-placeholder PASS
+CHECK seam.factory-installed PASS
+CHECK seam.root-applied PASS
+CHECK seam.search-in-shell PASS
+search: installSearch projectRoot='/tmp/vedit-workspace-search-selftest-SiCTSc' jumpTarget=editor
+This plugin does not support propagateSizeHints()
+CHECK jump.product.shell-ready PASS
+CHECK jump.product.target-installed PASS
+CHECK jump.product.initially-no-file PASS
+This plugin does not support propagateSizeHints()
+CHECK jump.product.two-hits PASS
+search: jump opened '/tmp/vedit-workspace-search-selftest-SiCTSc/a.v' line=2 column=3 (cursor line=2)
+CHECK jump.product.click-first PASS
+SEARCH-JUMP first requested='a.v':2 current='/tmp/vedit-workspace-search-selftest-SiCTSc/a.v' cursorLine=2
+CHECK jump.product.first-current-file PASS
+CHECK jump.product.first-loads-bytes PASS
+CHECK jump.product.first-cursor-line PASS
+CHECK jump.product.first-cursor-column PASS
+CHECK jump.product.first-status PASS
+search: jump opened '/tmp/vedit-workspace-search-selftest-SiCTSc/b.sv' line=4 column=1 (cursor line=4)
+CHECK jump.product.click-second PASS
+SEARCH-JUMP second requested='b.sv':4 current='/tmp/vedit-workspace-search-selftest-SiCTSc/b.sv' cursorLine=4
+CHECK jump.product.second-current-file PASS
+CHECK jump.product.second-cursor-line PASS
+CHECK large.fixture-created PASS
+CHECK large.start.accepted PASS
+CHECK large.skipped-by-default PASS
+CHECK large.skipped.state PASS
+CHECK large.skipped.fast PASS
+CHECK large.start.accepted-raised PASS
+CHECK large.start.non-blocking PASS
+CHECK large.cancel.returns-fast PASS
+CHECK large.cancel.finishes PASS
+CHECK large.cancel.state PASS
+CHECK large.cancel.bounded PASS
+CHECK large.worker-thread PASS
+CHECK many.start.non-blocking PASS
+CHECK many.finishes PASS
+CHECK many.hits PASS
+CHECK many.files-scanned PASS
+CHECK many.elapsed-bounded PASS
+CHECK large.timeout.accepted PASS
+CHECK large.timeout.finishes PASS
+CHECK large.timeout.flag PASS
+CHECK large.timeout.state PASS
+CHECK large.timeout.bounded PASS
+WORKSPACE-SEARCH-SELFTEST ok=1 checks=95 failures=0 skipped=2
+SELFTEST-EXIT=0
+
+== RERUN (same assertions; only clickHitRow was wrapped in #ifdef for the no-shell lane build) ==
+time=2026-10-31T18:57:30+08:00
+$ vedit-workspace-search-selftest --selfcheck
+CHECK fixture.created PASS
+This plugin does not support propagateSizeHints()
+CHECK panel.root.normalized PASS
+CHECK panel.empty.enter-query PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panel.search.terminates PASS
+CHECK panel.hits.count PASS
+CHECK panel.summary.state PASS
+CHECK panel.summary.files PASS
+CHECK panel.summary.files-scanned PASS
+CHECK panel.summary.skipped-binary PASS
+CHECK panel.summary.skipped-too-large PASS
+CHECK panel.summary.text.observable PASS
+CHECK panel.tree.files PASS
+CHECK panel.tree.one-row-per-hit PASS
+CHECK panel.tree.no-git PASS
+CHECK panel.tree.no-build PASS
+CHECK panel.tree.no-binary PASS
+CHECK panel.hits.one-per-line PASS
+CHECK panel.hit.line-number PASS
+CHECK panel.hit.column PASS
+CHECK panel.hit.snippet PASS
+CHECK panel.hit.unicode-file PASS
+CHECK panel.hit.unicode-column PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panel.case-sensitive.count PASS
+CHECK panel.case-sensitive.excludes-uppercase PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panel.verilog-only.count PASS
+CHECK panel.verilog-only.excludes-markdown PASS
+CHECK panel.verilog-only.excludes-large-file PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panel.unicode.query PASS
+This plugin does not support propagateSizeHints()
+CHECK empty.no-project.visible PASS
+CHECK empty.no-project.text PASS
+CHECK empty.no-project.no-search PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK empty.query.text PASS
+CHECK empty.query.no-search PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK empty.no-results.state PASS
+CHECK empty.no-results.visible PASS
+CHECK empty.no-results.text PASS
+CHECK empty.no-results.tree-hidden PASS
+CHECK empty.unreadable-root SKIP (running as root: chmod 000 does not deny access)
+CHECK entries.unreadable SKIP (running as root: chmod 000 does not deny access)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK limit.results PASS
+CHECK limit.truncated-flag PASS
+CHECK limit.summary-text PASS
+CHECK extension.v PASS
+CHECK extension.vh PASS
+CHECK extension.sv PASS
+CHECK extension.svh PASS
+CHECK extension.not-verilog PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK jump.hit-row-exists PASS
+CHECK jump.row-visible PASS
+CHECK jump.click.recorded PASS
+CHECK jump.click.file PASS
+CHECK jump.click.line PASS
+CHECK jump.click.column PASS
+CHECK jump.file-row.no-jump PASS
+CHECK jump.activate PASS
+CHECK jump.demo.opened PASS
+CHECK jump.demo.line PASS
+search: installSearch projectRoot='/tmp/vedit-workspace-search-selftest-BWvPpN' jumpTarget=editor
+CHECK seam.dock-created PASS
+CHECK seam.not-placeholder PASS
+CHECK seam.factory-installed PASS
+CHECK seam.root-applied PASS
+CHECK seam.search-in-shell PASS
+search: installSearch projectRoot='/tmp/vedit-workspace-search-selftest-BWvPpN' jumpTarget=editor
+This plugin does not support propagateSizeHints()
+CHECK jump.product.shell-ready PASS
+CHECK jump.product.target-installed PASS
+CHECK jump.product.initially-no-file PASS
+This plugin does not support propagateSizeHints()
+CHECK jump.product.two-hits PASS
+search: jump opened '/tmp/vedit-workspace-search-selftest-BWvPpN/a.v' line=2 column=3 (cursor line=2)
+CHECK jump.product.click-first PASS
+SEARCH-JUMP first requested='a.v':2 current='/tmp/vedit-workspace-search-selftest-BWvPpN/a.v' cursorLine=2
+CHECK jump.product.first-current-file PASS
+CHECK jump.product.first-loads-bytes PASS
+CHECK jump.product.first-cursor-line PASS
+CHECK jump.product.first-cursor-column PASS
+CHECK jump.product.first-status PASS
+search: jump opened '/tmp/vedit-workspace-search-selftest-BWvPpN/b.sv' line=4 column=1 (cursor line=4)
+CHECK jump.product.click-second PASS
+SEARCH-JUMP second requested='b.sv':4 current='/tmp/vedit-workspace-search-selftest-BWvPpN/b.sv' cursorLine=4
+CHECK jump.product.second-current-file PASS
+CHECK jump.product.second-cursor-line PASS
+CHECK large.fixture-created PASS
+CHECK large.start.accepted PASS
+CHECK large.skipped-by-default PASS
+CHECK large.skipped.state PASS
+CHECK large.skipped.fast PASS
+CHECK large.start.accepted-raised PASS
+CHECK large.start.non-blocking PASS
+CHECK large.cancel.returns-fast PASS
+CHECK large.cancel.finishes PASS
+CHECK large.cancel.state PASS
+CHECK large.cancel.bounded PASS
+CHECK large.worker-thread PASS
+CHECK many.start.non-blocking PASS
+CHECK many.finishes PASS
+CHECK many.hits PASS
+CHECK many.files-scanned PASS
+CHECK many.elapsed-bounded PASS
+CHECK large.timeout.accepted PASS
+CHECK large.timeout.finishes PASS
+CHECK large.timeout.flag PASS
+CHECK large.timeout.state PASS
+CHECK large.timeout.bounded PASS
+WORKSPACE-SEARCH-SELFTEST ok=1 checks=95 failures=0 skipped=2
+SELFTEST-EXIT=0
+
+== FINAL RERUN (current sources; README is docs-only and not part of the binary) ==
+time=2026-10-31T19:02:45+08:00
+HEAD=95c496e682e3841add1a081edd78d29c34957aac
+BUILD-EXIT=0
+[18/19] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit-workspace-search-selftest.dir/search_selftest.cpp.o
+[19/19] Linking CXX executable src/app/workspace-lane-search/vedit-workspace-search-selftest
+CHECK jump.product.shell-ready PASS
+CHECK jump.product.target-installed PASS
+CHECK jump.product.initially-no-file PASS
+CHECK jump.product.two-hits PASS
+CHECK jump.product.click-first PASS
+CHECK jump.product.first-current-file PASS
+CHECK jump.product.first-loads-bytes PASS
+CHECK jump.product.first-cursor-line PASS
+CHECK jump.product.first-cursor-column PASS
+CHECK jump.product.first-status PASS
+CHECK jump.product.click-second PASS
+CHECK jump.product.second-current-file PASS
+CHECK jump.product.second-cursor-line PASS
+WORKSPACE-SEARCH-SELFTEST ok=1 checks=95 failures=0 skipped=2
+SELFTEST-EXIT=0

@@ -1,0 +1,40 @@
+# Evidence collection — T12 / Slice 1 (G2 link + G3 grammar=verilog)
+# C9 header: collection time, git revision, worktree state.
+collected_at_utc=2026-10-31T10:40:14Z
+collected_at_local=2026-10-31T18:40:14+0800
+git_rev_parse_HEAD=8fedbdd8d2d62da5d5c91555ddfec624afcd143e
+git_branch=feat/qt6-ktexteditor-migration
+final_gate=bash scripts/build-qt.sh (VEDIT_SKIP_IMAGE_BUILD=1) -> exit 0; ctest 12/12; see 03-build-qt-gate.log
+note=The cell runs several members in parallel on one worktree; the porcelain list
+note=contains their files too. This task wrote only: src/syntax/** (provider/grammars
+note=CMakeLists + the new product lane) and evidence/highlight-v2/**.
+git_status_porcelain:
+ M crates/vd-ffi/include/vd_ffi.h
+ M crates/vd-ffi/src/lsp.rs
+ M evidence/ffi-abi/logs/19-rust-stage-console.log
+ M evidence/ffi-abi/logs/20-cargo-build-release.log
+ M evidence/ffi-abi/logs/21-staticlib.txt
+ M evidence/ffi-abi/logs/22-rust-targets.txt
+ M evidence/ffi-abi/logs/23-cargo-test.log
+ M evidence/ffi-abi/logs/26-vd_ffi.h
+ M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+ M evidence/m0-build/build-logs/31-qt6-configure.log
+ M evidence/m0-build/build-logs/32-qt6-build.log
+ M evidence/m0-build/build-logs/33-qt6-ctest.log
+ M evidence/m0-build/build-logs/34-qt6-elf.txt
+ M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+?? evidence/highlight-v2/00-collect.txt
+?? evidence/highlight-v2/01-after-link.txt
+?? evidence/highlight-v2/03-build-qt-gate.log
+?? evidence/highlight-v2/04-syntax-product-tests.log
+?? evidence/highlight-v2/06-standalone-lanes.log
+?? evidence/highlight-v2/07-negative-control.log
+?? evidence/highlight-v2/08-ctest.log
+?? evidence/highlight-v2/09-screenshot-L2.log
+?? evidence/highlight-v2/10-licensing-and-embargo.txt
+?? evidence/highlight-v2/README.md
+?? evidence/highlight-v2/screenshots/
+?? evidence/verdicts/ffi/
+?? evidence/verdicts/fix-filetree-open/
+?? filetree-testdata/
+?? src/workspace/project/

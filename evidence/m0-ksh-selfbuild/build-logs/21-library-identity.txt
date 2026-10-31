@@ -763,10 +763,10 @@
 /vedit-build/target/ksh-selfbuild/F2/install/share/qlogging-categories6/ksyntaxhighlighting.renamecategories
 
 ## library
-lrwxrwxrwx 1 root root     29 Oct 31 03:51 /vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so -> libKF6SyntaxHighlighting.so.6
-lrwxrwxrwx 1 root root     34 Oct 31 03:51 /vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6 -> libKF6SyntaxHighlighting.so.6.24.0
--rw-r--r-- 1 root root 696480 Oct 31 03:51 /vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
--rw-r--r-- 1 root root 696480 Oct 31 03:51 /vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
+lrwxrwxrwx 1 root root     29 Oct 31 10:54 /vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so -> libKF6SyntaxHighlighting.so.6
+lrwxrwxrwx 1 root root     34 Oct 31 10:54 /vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6 -> libKF6SyntaxHighlighting.so.6.24.0
+-rw-r--r-- 1 root root 696480 Oct 31 10:53 /vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
+-rw-r--r-- 1 root root 696480 Oct 31 10:53 /vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
 aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6  /vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
 size=696480
 ## SONAME

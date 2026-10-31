@@ -1,0 +1,37 @@
+# C9 evidence header
+collected_at: 2026-10-31T19:41:22+08:00
+git_head: 95c496e682e3841add1a081edd78d29c34957aac
+
+## git status --porcelain (paths of this task)
+ M src/app/app_shell.cpp
+ M src/app/app_shell.h
+ M src/app/main.cpp
+?? evidence/save-binding/
+
+## git diff --stat
+ src/app/app_shell.cpp |  46 +++++++++
+ src/app/app_shell.h   |  21 ++++
+ src/app/main.cpp      | 273 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 338 insertions(+), 2 deletions(-)
+
+## the command declaration in app_shell.cpp
+221:    addCommand(QStringLiteral("file.save"), QStringLiteral("&Save"), QStringLiteral("file"),
+222-               QKeySequence(QStringLiteral("Ctrl+S")), 15);
+223-    addCommand(QStringLiteral("file.save-session"), QStringLiteral("&Save Session Now"),
+224-               QStringLiteral("file"), QKeySequence(), 20);
+--
+282:    commands_->setHandler(QStringLiteral("file.save"), [this]() { saveActiveDocument(); });
+283-    commands_->setHandler(QStringLiteral("file.save-session"), [this]() {
+284-        QString error;
+285-        if (!saveSession(&error)) {
+
+## no KTextEditor include in the shell library: main.cpp is the only file that adds one
+$ grep -n '#include <KTextEditor' src/app/app_shell.h src/app/app_shell.cpp src/app/main.cpp
+/vedit-build/src/app/main.cpp:23:#include <KTextEditor/Document>
+(only main.cpp; app_shell.h/.cpp contain the word KTextEditor only in comments and in the
+"KTextEditor/version mismatch?" diagnostic string, never as an include)
+
+## Ctrl+S is bound exactly once (no conflicting action in this tree)
+$ grep -rn 'Ctrl+S' src/app/*.cpp src/app/*.h
+src/app/app_shell.cpp:222:               QKeySequence(QStringLiteral("Ctrl+S")), 15);
+

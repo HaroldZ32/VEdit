@@ -1,0 +1,15 @@
+== T66 negative control: the old flags fall back to the DISTRO library, and the ldd guard rejects that ==
+collected_at: 2026-10-31T11:32:14Z
+git_head: 95c496e682e3841add1a081edd78d29c34957aac
+git_status_porcelain (this task's paths):
+   M resources/syntax/vedit-systemverilog.xml
+   M resources/syntax/vedit-verilog.xml
+  ?? evidence/syn-kde-data/folding-probe/
+
+## (a) OLD flags: -I/vedit-build/target/ksh-selfbuild/F2/install/lib/include -L/vedit-build/target/ksh-selfbuild/F2/install/lib/lib
+old_flags_ldd_resolves=/usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6
+
+## (b) corrected guard against the OLD binary
+expected F2 libdir: /vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu
+GUARD-ON-OLD-BINARY=REJECTED exit=1 (as required: a distro-linked binary is never labelled F2)
+NEGATIVE-CONTROL-EXIT=1

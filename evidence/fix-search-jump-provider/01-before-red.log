@@ -1,0 +1,28 @@
+# BEFORE (pre-fix: search_jump_target.cpp still casts editorWidget to QPlainTextEdit)
+# command (offscreen, pinned image): vedit-workspace-search-selftest --selfcheck
+# note: the test harness itself was ALREADY the T69 version (installs the KTextEditor provider
+#       and asserts cursor line/column), so this run is the reproduction of the defect.
+# date: 2026-10-31T19:58:30+08:00
+# exit code: 1
+
+CHECK jump.product.shell-ready PASS
+CHECK jump.product.ktexteditor-provider PASS
+CHECK jump.product.target-installed PASS
+CHECK jump.product.initially-no-file PASS
+CHECK jump.product.two-hits PASS
+search: jump failed: the active editor pane has no text editor
+CHECK jump.product.click-first PASS
+SEARCH-JUMP first requested='a.v':2 current='/tmp/vedit-workspace-search-selftest-uPtIuC/a.v' cursor=5:1
+CHECK jump.product.first-current-file PASS
+CHECK jump.product.first-loads-bytes PASS
+CHECK jump.product.first-cursor-line FAIL
+CHECK jump.product.first-cursor-column FAIL
+CHECK jump.product.first-status PASS
+search: jump failed: the active editor pane has no text editor
+CHECK jump.product.click-second PASS
+SEARCH-JUMP second requested='b.sv':4 current='/tmp/vedit-workspace-search-selftest-uPtIuC/b.sv' cursor=6:1
+CHECK jump.product.second-current-file PASS
+CHECK jump.product.second-loads-bytes PASS
+CHECK jump.product.second-cursor-line FAIL
+CHECK jump.product.second-cursor-column PASS
+WORKSPACE-SEARCH-SELFTEST ok=0 checks=105 failures=3 skipped=2

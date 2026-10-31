@@ -1,0 +1,44 @@
+# filetree seam check under the REAL KTextEditor provider (regression T60)
+# command (offscreen, pinned image): vedit-filetree-seamcheck --project <fixture>/project --state <dir> --screenshot <png>
+# harness: src/workspace/filetree/tools/rootcheck (adds src/app + workspace lanes, then setEditorProvider(makeEditCoreProvider()))
+# date: 2026-10-31T19:25:05+08:00
+
+filetree: installFileTree projectRoot='/vedit-build/target/ws-filetree-tmp/project' dockInserted=1 placeholderReplaced=1
+search: installSearch projectRoot='/vedit-build/target/ws-filetree-tmp/project' jumpTarget=editor
+diagnostics: no verible-verilog-ls found; diagnostics degrade diagnostically
+filetree: installFileTree projectRoot='/vedit-build/target/ws-filetree-tmp/project' dockInserted=1 placeholderReplaced=0
+search: installSearch projectRoot='/vedit-build/target/ws-filetree-tmp/project' jumpTarget=editor
+diagnostics: no verible-verilog-ls found; diagnostics degrade diagnostically
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+diagnostics: effective file set from the project model: 2 file(s)
+diagnostics: effective file set from the project model: 2 file(s)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+SEAM dock-inserted=1 content-before-install=panel-placeholder-file-tree
+SEAM panel-installed=1 dock-content-is-panel=1 find-child=1 root=/vedit-build/target/ws-filetree-tmp/project
+SEAM CHECK panel-installed ok=1
+SEAM CHECK root-path ok=1 detail=/vedit-build/target/ws-filetree-tmp/project
+SEAM CHECK editor.provider ok=1 detail=ktexteditor
+SEAM CHECK editor.active-pane-widget ok=1
+SEAM CHECK editor.ktexteditor-widget ok=1
+SEAM editor-initial-bytes=0
+SEAM CHECK editor.initially-no-file ok=1
+SEAM file-index-valid=1
+SEAM CHECK dblclick.file-row-visible ok=1
+SEAM status-after-file-dblclick="Opened /vedit-build/target/ws-filetree-tmp/project/rtl/top.v"
+SEAM CHECK dblclick.file-loads-bytes ok=1 detail=37 bytes on disk
+SEAM CHECK dblclick.file-records-path ok=1 detail=/vedit-build/target/ws-filetree-tmp/project/rtl/top.v
+SEAM CHECK dblclick.file-status-message ok=1 detail=Opened /vedit-build/target/ws-filetree-tmp/project/rtl/top.v
+SEAM CHECK dblclick.second-file-row-visible ok=1
+SEAM CHECK dblclick.second-file-loads ok=1
+SEAM CHECK dblclick.second-file-records-path ok=1 detail=/vedit-build/target/ws-filetree-tmp/project/rtl/alu.sv
+SEAM CHECK dblclick.folder-row-visible ok=1
+SEAM CHECK dblclick.folder-expands ok=1
+SEAM CHECK dblclick.folder-emits-no-open ok=1 detail=0
+SEAM CHECK dblclick.folder-keeps-editor ok=1
+SEAM rows=5 scanned-dirs=3
+SCREENSHOT ok=1 evidence/edit-core-regression/screenshots/filetree-ktexteditor-shell.png
+FILETREE-SEAMCHECK ok=1 checks=17 failures=0

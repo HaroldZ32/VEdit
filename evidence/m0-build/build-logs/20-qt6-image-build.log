@@ -16,7 +16,7 @@
 #4 DONE 0.0s
 
 #5 [internal] load build context
-#5 transferring context: 45B done
+#5 transferring context: 3.59kB done
 #5 DONE 0.0s
 
 #6 [qt6-build 3/4] RUN set -eux;     apt-get update;     mkdir -p /tmp/qt6-debs; cd /tmp/qt6-debs;     while read -r spec sha rest; do       case "$spec" in ''|'#'*) continue;; esac;       apt-get download "$spec";       deb=$(ls "${spec%%=*}"_*.deb);       printf '%s  %s\n' "$sha" "$deb" | sha256sum -c -;     done < /opt/vedit/qt6-locked-packages.txt;     cd /; rm -rf /tmp/qt6-debs;     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends       build-essential pkg-config git curl ca-certificates binutils file       xvfb xauth fonts-dejavu-core libgl1-mesa-dri mesa-utils       libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0       libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0       libxcb-xkb1 libxkbcommon0       $(awk '!/^#/ && NF {print $1}' /opt/vedit/qt6-locked-packages.txt);     rm -rf /var/lib/apt/lists/*
@@ -29,12 +29,12 @@
 #8 CACHED
 
 #9 exporting to image
-#9 exporting layers
 #9 exporting layers done
-#9 exporting manifest sha256:a622008d8a30a8bab4ad22783e3983b09601c393c9dea3643afcb2da3d5c0306 done
-#9 exporting config sha256:f90c9ac5cfccc4cefc7d4337ab6aa7c80aadfd703a811ffc1527b097820e490a done
-#9 exporting attestation manifest sha256:667033817aeafa8a0c102d405235885fee487dfbc0a710cb7cd24f3d306daca2 0.0s done
-#9 exporting manifest list sha256:df99447300658f9d0ee4df78cda475367ace27d535b6bbb5836f5ce6ee7477fb 0.0s done
+#9 exporting manifest sha256:803b653ced4a28478962b3717ac81a4c636646cf50ef48d055753175537bbd6f
+#9 exporting manifest sha256:803b653ced4a28478962b3717ac81a4c636646cf50ef48d055753175537bbd6f done
+#9 exporting config sha256:a0457878a242488a77527710c76e67a5f6451e0a657726bc440d3115d7a7cf80 done
+#9 exporting attestation manifest sha256:87c5779c50c5cf66785028caf4c6c39d2cd93677688bbad696b4119fa79b33f2 0.0s done
+#9 exporting manifest list sha256:3414606fae295dc2aa29a707d43c0bb633145070c9fe9be6c493e0909189b356 0.0s done
 #9 naming to docker.io/library/vedit-qt6-build:local done
 #9 unpacking to docker.io/library/vedit-qt6-build:local done
 #9 DONE 0.1s

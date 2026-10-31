@@ -1,3 +1,14 @@
+# ⚠ ANNOTATION (T45, 2026-10-31): the definitions measured by this log are NOT
+# ours. The resolved definition's author was "Yevgen Voronenko (ysv22@drexel.edu),
+# Ryan Dalzell (ryan@tullyroan.com)", version=8 -> KDE's built-in Verilog
+# definition; the SystemVerilog numbers came from KDE's GPLv3+ definition.
+# The log therefore does NOT prove anything about resources/syntax/vedit-*.xml.
+# Correct measurement (REAL F2 library, ldd-verified; author=VEdit assertion):
+#   evidence/syn-kde-data/10-folding-before-F2.log   (before 0/0)
+#   evidence/syn-kde-data/11-folding-after-F2.log    (after Verilog 7/7, SV 11/11, 26-line SV)
+# The first recording (10-folding-before.log / 11-folding-after.log) was itself measured
+# on the DISTRO library and is kept only with an # INVALID (T66) banner.
+# ------------------------------------------------------------------------------
 FOLD verilog formats=50 begins=7 ends=7
 CHECK fold.verilog-highlighting PASS
 CHECK fold.verilog-regions-begin PASS  7

@@ -34,7 +34,19 @@
   `<keyword beginRegion/endRegion>` 区，覆盖 module/interface/program/class/function/
   task/generate/case/begin-end（另有 package）。
 - 实测（`03-folding.log`）：Verilog 样例 **7 begin / 7 end**，SystemVerilog 样例
-  **9 begin / 9 end**（A4 构造全覆盖）；`FOLD ... formats>0` 证明着色也生效。
+  **9 begin / 9 end**；`FOLD ... formats>0` 证明着色也生效。
+
+  > **更正（T45，2026-10-31）**：`03-folding.log` 量到的 **不是**我们自己的 XML。
+  > 那一轮解析到的定义 author 是 `Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell
+  > (ryan@tullyroan.com)`、version=8，即 **KDE 内嵌的 Verilog 定义**（SystemVerilog 那份
+  > 是 KDE 的 **GPLv3+** 定义）。当时没有断言 author/section，所以 7/7、9/9 只能证明
+  > “KDE 的定义能折叠”，**不能作为自有 XML 的证据**。自有 XML 当时的真实测量是
+  > **begins=0 ends=0**，且伴随 `Unknown keyword list "module"` 等 loader 警告。
+  > T45 修复后的正确测量见 `10-folding-before-F2.log` / `11-folding-after-F2.log`
+  > （**真 F2 库，ldd 证明**、author=VEdit 断言；before 0/0 → after
+  > **Verilog 7/7、SystemVerilog 11/11**，SV 用 26 行真样例）。
+  > 首版 `10`/`11` 日志已被 T66 证明测的是 DISTRO 库且 SV 分支未生效，文件保留并加
+  > `# INVALID (T66)` 横幅，以 `-F2` 版为准。
 - 缺失场景（`02-degradation.log`，validator 在临时目录复制一份不含 systemverilog 的数据）：
   `LOAD degraded.definitions=451 sv_available=0`，`DIAG ... SystemVerilog definition not shipped
   (C7 pending) ... degradable ... not a crash`，`resolveLanguageForFile("a.sv") == "Verilog"`，
@@ -76,7 +88,7 @@ loader:  addCustomSearchPath(VEDIT_SYNTAX_DIR)   # loads <dir>/syntax
 | `00-pins.txt` | 镜像/版本、命令、退出码、文件清单 |
 | `01-load.log` | 私有路径加载 + 451 定义/30 主题 + 我们的两文件 + CHECK |
 | `02-degradation.log` | 缺失 SystemVerilog 的降级诊断与回退（无崩溃） |
-| `03-folding.log` | A4 折叠证据（7/7 与 9/9 begin/end） |
+| `03-folding.log` | 旧日志：7/7、9/9 来自 KDE 内嵌定义（非自有 XML），已加更正横幅；自有 XML 见 `-F2` 日志（Verilog 7/7、SV 11/11） |
 | `04-licensing.txt` | 文件名/语言名/sha256/许可头、禁止 KDE 定义 0 命中、数据目录约定 |
 | `07-validator-full.log` | validator 全量输出（29/29 CHECK，exit 0） |
 | `09-result.txt` | `failures=0` |

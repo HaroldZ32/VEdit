@@ -1,0 +1,38 @@
+== evidence: 04-neighbour-lanes.log (search change must not regress the other workspace lanes; root ctest subset, app binary excluded because the edit-core lane is mid-landing in this shared tree)
+time=2026-10-31T18:56:54+08:00
+HEAD=1f47e56421bbeaab64f8082df3cfc104a6a2c2ef
+
+BUILD-EXIT=1
+ninja: warning: premature end of file; recovering
+ninja: error: unknown target 'vedit-filetree-tests'
+Test project /vedit-build/target/qt6-build
+    Start 11: vedit-workspace-palette-selftest
+1/3 Test #11: vedit-workspace-palette-selftest ...............   Passed    0.09 sec
+    Start 12: vedit-workspace-palette-integration-selftest
+2/3 Test #12: vedit-workspace-palette-integration-selftest ...   Passed    0.08 sec
+    Start 13: vedit-workspace-search-selftest
+3/3 Test #13: vedit-workspace-search-selftest ................   Passed    0.34 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   0.51 sec
+CTEST-EXIT=0
+
+== RERUN (the filetree ctest target is not part of the root build; rebuilt the search + palette test targets only) ==
+time=2026-10-31T18:57:05+08:00
+BUILD-EXIT=0
+[21/24] Automatic MOC for target vedit-workspace-search-selftest
+[22/24] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit-workspace-search-selftest.dir/vedit-workspace-search-selftest_autogen/mocs_compilation.cpp.o
+[23/24] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit-workspace-search-selftest.dir/search_selftest.cpp.o
+[24/24] Linking CXX executable src/app/workspace-lane-search/vedit-workspace-search-selftest
+    Start 11: vedit-workspace-palette-selftest
+1/3 Test #11: vedit-workspace-palette-selftest ...............   Passed    0.09 sec
+    Start 12: vedit-workspace-palette-integration-selftest
+2/3 Test #12: vedit-workspace-palette-integration-selftest ...   Passed    0.08 sec
+    Start 13: vedit-workspace-search-selftest
+3/3 Test #13: vedit-workspace-search-selftest ................   Passed    0.37 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   0.54 sec
+CTEST-EXIT=0
