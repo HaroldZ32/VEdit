@@ -1,6 +1,9 @@
 #0 building with "default" instance using docker driver
 
 #1 [internal] load build definition from Dockerfile.build
+#1 DONE 0.0s
+
+#1 [internal] load build definition from Dockerfile.build
 #1 transferring dockerfile: 11.56kB done
 #1 DONE 0.0s
 
@@ -19,10 +22,10 @@
 #5 transferring context: 3.59kB done
 #5 DONE 0.0s
 
-#6 [qt6-build 3/4] RUN set -eux;     apt-get update;     mkdir -p /tmp/qt6-debs; cd /tmp/qt6-debs;     while read -r spec sha rest; do       case "$spec" in ''|'#'*) continue;; esac;       apt-get download "$spec";       deb=$(ls "${spec%%=*}"_*.deb);       printf '%s  %s\n' "$sha" "$deb" | sha256sum -c -;     done < /opt/vedit/qt6-locked-packages.txt;     cd /; rm -rf /tmp/qt6-debs;     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends       build-essential pkg-config git curl ca-certificates binutils file       xvfb xauth fonts-dejavu-core libgl1-mesa-dri mesa-utils       libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0       libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0       libxcb-xkb1 libxkbcommon0       $(awk '!/^#/ && NF {print $1}' /opt/vedit/qt6-locked-packages.txt);     rm -rf /var/lib/apt/lists/*
+#6 [qt6-build 2/4] COPY qt6-locked-packages.txt /opt/vedit/qt6-locked-packages.txt
 #6 CACHED
 
-#7 [qt6-build 2/4] COPY qt6-locked-packages.txt /opt/vedit/qt6-locked-packages.txt
+#7 [qt6-build 3/4] RUN set -eux;     apt-get update;     mkdir -p /tmp/qt6-debs; cd /tmp/qt6-debs;     while read -r spec sha rest; do       case "$spec" in ''|'#'*) continue;; esac;       apt-get download "$spec";       deb=$(ls "${spec%%=*}"_*.deb);       printf '%s  %s\n' "$sha" "$deb" | sha256sum -c -;     done < /opt/vedit/qt6-locked-packages.txt;     cd /; rm -rf /tmp/qt6-debs;     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends       build-essential pkg-config git curl ca-certificates binutils file       xvfb xauth fonts-dejavu-core libgl1-mesa-dri mesa-utils       libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0       libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0       libxcb-xkb1 libxkbcommon0       $(awk '!/^#/ && NF {print $1}' /opt/vedit/qt6-locked-packages.txt);     rm -rf /var/lib/apt/lists/*
 #7 CACHED
 
 #8 [qt6-build 4/4] RUN set -eux;     while read -r spec sha rest; do       case "$spec" in ''|'#'*) continue;; esac;       pkg="${spec%%=*}"; ver="${spec#*=}";       got=$(dpkg-query -W -f='${Version}' "$pkg");       [ "$got" = "$ver" ] || { echo "FATAL: $pkg installed=$got locked=$ver" >&2; exit 1; };     done < /opt/vedit/qt6-locked-packages.txt;     { echo "## image facts"; head -3 /etc/os-release;       echo "glibc: $(dpkg-query -W -f='${Version}' libc6)";       strings /lib/x86_64-linux-gnu/libc.so.6 | grep -m1 'Minimum supported kernel';       echo "qt6-base-dev: $(dpkg-query -W -f='${Version}' qt6-base-dev)";       echo "kf6-texteditor: $(dpkg-query -W -f='${Version}' libkf6texteditor-dev)";       echo "kf6-syntaxhighlighting: $(dpkg-query -W -f='${Version}' libkf6syntaxhighlighting-dev)";       echo "tree-sitter: $(pkg-config --modversion tree-sitter)";       echo "cmake: $(cmake --version | head -1)";       echo "g++: $(g++ --version | head -1)";     } | tee /opt/vedit/build-image.txt;     dpkg-query -W -f='${Package} ${Version} ${Architecture}\n' | sort > /opt/vedit/package-snapshot.txt
@@ -30,11 +33,10 @@
 
 #9 exporting to image
 #9 exporting layers done
-#9 exporting manifest sha256:803b653ced4a28478962b3717ac81a4c636646cf50ef48d055753175537bbd6f
-#9 exporting manifest sha256:803b653ced4a28478962b3717ac81a4c636646cf50ef48d055753175537bbd6f done
-#9 exporting config sha256:a0457878a242488a77527710c76e67a5f6451e0a657726bc440d3115d7a7cf80 done
-#9 exporting attestation manifest sha256:87c5779c50c5cf66785028caf4c6c39d2cd93677688bbad696b4119fa79b33f2 0.0s done
-#9 exporting manifest list sha256:3414606fae295dc2aa29a707d43c0bb633145070c9fe9be6c493e0909189b356 0.0s done
+#9 exporting manifest sha256:6023055ddac6f574d35c1d3ab9f1a2b544fc11e64b2d51277d3397e00e7f3a60 done
+#9 exporting config sha256:d147f7dfdb1aea34ffb9e89d5639c27b59fae584d78f070dd89b97087baed093 done
+#9 exporting attestation manifest sha256:ede48cf72b3c3025bd1d9a0ca341ce0283a87cff6ce28fc7f41bf97aaab23050 0.0s done
+#9 exporting manifest list sha256:ffe57f7f2504b0f85a604ccdf0330f37d7721c5874e4eb3a6535c4ba85dc1e33 0.0s done
 #9 naming to docker.io/library/vedit-qt6-build:local done
 #9 unpacking to docker.io/library/vedit-qt6-build:local done
 #9 DONE 0.1s

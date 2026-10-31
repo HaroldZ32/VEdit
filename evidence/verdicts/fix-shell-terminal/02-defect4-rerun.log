@@ -1,0 +1,22 @@
+=== defect 4: VEDIT_SYNTAX_GRAMMAR provider->cache priority (configure only)
+--- none (-DVEDIT_SYNTAX_GRAMMAR=none)
+CONFIGURE_EXIT=0
+-- syn-grammars: compiled grammar id='none' verilog=1 systemverilog=1
+-- syn-provider: baked grammar id='none' for /vedit-build/src/syntax/provider (owner: src/syntax/grammars)
+cache: VEDIT_SYNTAX_GRAMMAR:STRING=none
+header: inline constexpr const char *kCompiledGrammar = "none";
+manifest: VEDIT_SYNTAX_GRAMMAR=none
+--- default ()
+CONFIGURE_EXIT=0
+-- syn-grammars: compiled grammar id='verilog' verilog=1 systemverilog=1
+-- syn-provider: baked grammar id='verilog' for /vedit-build/src/syntax/provider (owner: src/syntax/grammars)
+cache: VEDIT_SYNTAX_GRAMMAR:STRING=verilog
+header: inline constexpr const char *kCompiledGrammar = "verilog";
+manifest: VEDIT_SYNTAX_GRAMMAR=verilog
+--- verilog (-DVEDIT_SYNTAX_GRAMMAR=verilog)
+CONFIGURE_EXIT=0
+-- syn-grammars: compiled grammar id='verilog' verilog=1 systemverilog=1
+-- syn-provider: baked grammar id='verilog' for /vedit-build/src/syntax/provider (owner: src/syntax/grammars)
+cache: VEDIT_SYNTAX_GRAMMAR:STRING=verilog
+header: inline constexpr const char *kCompiledGrammar = "verilog";
+manifest: VEDIT_SYNTAX_GRAMMAR=verilog

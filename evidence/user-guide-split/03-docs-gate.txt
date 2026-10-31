@@ -1,0 +1,11 @@
+generated: 2026-10-31T14:07:58Z
+git_head: 19303ae3a58491767d97815d2fe1e0947816e5b6
+git_status_porcelain:
+ M docs/USER_GUIDE.md
+?? evidence/verdicts/search-jump-kte/
+---
+== declared gate ==
+
+$ bash build/gates/docs.sh
+[docs] PASS: README.md docs/BUILD.md docs/USER_GUIDE.md THIRD_PARTY_NOTICES.md
+EXIT=0

@@ -1,0 +1,35 @@
+# C9 evidence header
+collected_at: 2026-10-31T22:39:52+08:00
+git_head: c71fe31478887e3dc7c460f875ccfb93e61c0ec4
+binary_sha256: 46000176016f4c90220e97f99a39063ef34b0decb019490a2870d2372484b872
+
+## whole suite
+      Start 11: vedit-workspace-palette-selftest
+11/17 Test #11: vedit-workspace-palette-selftest ...............   Passed    0.09 sec
+      Start 12: vedit-workspace-palette-integration-selftest
+12/17 Test #12: vedit-workspace-palette-integration-selftest ...   Passed    0.10 sec
+      Start 13: vedit-workspace-search-selftest
+13/17 Test #13: vedit-workspace-search-selftest ................   Passed   11.90 sec
+      Start 14: vedit-workspace-project-selftest
+14/17 Test #14: vedit-workspace-project-selftest ...............   Passed    0.05 sec
+      Start 15: vedit-workspace-diagnostics-selftest
+15/17 Test #15: vedit-workspace-diagnostics-selftest ...........   Passed    0.01 sec
+      Start 16: vedit-toolchain-missing-selftest
+16/17 Test #16: vedit-toolchain-missing-selftest ...............   Passed    0.00 sec
+      Start 17: vedit-diagnostics-ffi-selftest
+17/17 Test #17: vedit-diagnostics-ffi-selftest .................   Passed    3.13 sec
+
+100% tests passed, 0 tests failed out of 17
+
+Total Test time (real) =  18.46 sec
+
+## T12 invariants: syntax product + KDE data validators (unchanged by T81)
+Test project /vedit-build/target/qt6-build
+    Start 4: vedit-syntax-kde-data
+1/2 Test #4: vedit-syntax-kde-data ............   Passed    0.05 sec
+    Start 6: vedit-syntax-product-tests
+2/2 Test #6: vedit-syntax-product-tests .......   Passed    0.10 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.15 sec

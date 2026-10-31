@@ -1,0 +1,82 @@
+collected_at: 2026-10-31T14:25:53Z
+git_head: c71fe31478887e3dc7c460f875ccfb93e61c0ec4
+branch: feat/qt6-ktexteditor-migration
+git_status_porcelain:
+ M AGENT.md
+ M build/evidence/typecheck/00-run.txt
+ M build/evidence/typecheck/10-typecheck-image-build.log
+ M build/evidence/typecheck/11-typecheck-image-id.txt
+ M docs/BUILD.md
+ M docs/USER_GUIDE.md
+ M evidence/ffi-abi/logs/10-rust-image.txt
+ M evidence/ffi-abi/logs/19-rust-stage-console.log
+ M evidence/ffi-abi/logs/20-cargo-build-release.log
+ M evidence/ffi-abi/logs/21-staticlib.txt
+ M evidence/ffi-abi/logs/23-cargo-test.log
+ M evidence/m0-build/build-logs/20-qt6-image-build.log
+ M evidence/m0-build/build-logs/21-qt6-image-id.txt
+ M evidence/m0-build/build-logs/32-qt6-build.log
+ M evidence/m0-build/build-logs/34-qt6-elf.txt
+ M src/app/main.cpp
+?? evidence/build-entry-docs/
+?? evidence/glibc217-feasibility/
+?? evidence/user-guide-split/
+?? evidence/verdicts/fix-shell-terminal/
+?? evidence/verdicts/search-jump-kte/
+?? evidence/verdicts/user-guide/
+verifier: Reviewer (cell-20261031T085543161Z, T79; manually created task, no frozen contract - criteria from the captain dispatch)
+
+== 1. NEWCOMER Q1/Q2: which command -> which artifact (scripts, not prose) ==
+build-qt-in-container.sh BUILD_DIR: 11:BUILD_DIR="$WORK/target/qt6-build"
+build-qt-in-container.sh APP: 72:APP="$BUILD_DIR/src/app/vedit-app"
+build.sh BIN/copy: 63:BIN="$ROOT/target/release/vd-app"
+112:cp "$BIN" "$ARTIFACTS/vd-app"
+artifact exists: 71618608 bytes
+49c45d1b8fafd86cb6468218667a50cc8b9499e5d6a5fc4b640a1db71ec91662  target/qt6-build/src/app/vedit-app
+
+== 2. the three docs state the same command/path ==
+AGENT.md:38:- Build the **delivered Qt6 product** (v2): `bash scripts/build-qt.sh` ->
+docs/USER_GUIDE.md:57:bash scripts/build-qt.sh              # 固定镜像 → Rust 服务层 → configure → build → ctest → xcb 冒烟
+docs/USER_GUIDE.md:58:bash scripts/build-qt.sh --no-test    # 只 configure + build
+docs/BUILD.md:7:> §12 是重写后的 **C++/Qt6 构建底座**（M0，T10：`bash scripts/build-qt.sh`，
+docs/BUILD.md:218:bash scripts/build-qt.sh              # 镜像 → configure → build → ctest → xcb/软件渲染冒烟
+docs/BUILD.md:219:bash scripts/build-qt.sh --no-test    # 只 configure + build（即 C++ 静态检查）
+docs/BUILD.md:323:| 想复用已发布镜像 | `VEDIT_QT6_BUILD_IMAGE_REF=… VEDIT_QT6_BUILD_IMAGE_PULL=1 bash scripts/build-qt.sh` |
+AGENT.md:39:  `target/qt6-build/src/app/vedit-app`. Its runtime needs the KF6/Qt6 shared
+docs/USER_GUIDE.md:61:产物是 **`target/qt6-build/src/app/vedit-app`**（CMake 构建树在 gitignored 的 `target/qt6-build/`）。
+docs/BUILD.md:222:**产物路径：`target/qt6-build/src/app/vedit-app`**（CMake 构建树 `target/qt6-build/` 已被 gitignore）。
+
+== 3. legacy statements == build.sh behavior ==
+47:  writes `target/release/vd-app` (copied to `build/artifacts/vd-app`) and
+48:  **never produces `vedit-app`**.
+  (build.sh never mentions vedit-app)
+
+== 4. package names are real (dpkg -S in the pinned image) ==
+libtree-sitter.so.0.25         libtree-sitter0.25:amd64: /usr/lib/x86_64-linux-gnu/libtree-sitter.so.0.25
+libKF6TextEditor.so.6          libkf6texteditor6:amd64: /usr/lib/x86_64-linux-gnu/libKF6TextEditor.so.6
+libKF6Parts.so.6               libkf6parts6:amd64: /usr/lib/x86_64-linux-gnu/libKF6Parts.so.6
+libKF6SyntaxHighlighting.so.6  libkf6syntaxhighlighting6:amd64: /usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6
+libQt6Widgets.so.6             libqt6widgets6:amd64: /usr/lib/x86_64-linux-gnu/libQt6Widgets.so.6
+libQt6Gui.so.6                 libqt6gui6:amd64: /usr/lib/x86_64-linux-gnu/libQt6Gui.so.6
+libQt6Core.so.6                libqt6core6t64:amd64: /usr/lib/x86_64-linux-gnu/libQt6Core.so.6
+-rw-r--r-- 1 root root 19128 Apr 11  2026 /usr/lib/x86_64-linux-gnu/qt6/plugins/platforms/libqxcb.so
+
+== 4b. host apt-cache for the one package name written inline in the docs ==
+libtree-sitter0.25:
+  已安装：(无)
+  候选： 0.25.9-7
+  版本列表：
+
+== 5. regression: docs gate ==
+[docs] PASS: README.md docs/BUILD.md docs/USER_GUIDE.md THIRD_PARTY_NOTICES.md
+DOCS-EXIT=0
+
+== 6. pointer audit for the findings ==
+USER_GUIDE 1.4 glibc pointer: 66:§12.3。注意构建基线是 glibc 2.43，比它老的系统（含 CentOS 7）要连 glibc 一起打包（同文件 §2）。
+docs/BUILD.md §2 heading: ## 2. 一条命令
+runtime-deps REPORT §2 heading: ## 2. 自包含实测（三档干净环境）
+BUILD.md 12.6 first bullet: - **T10 不含运行时打包**：把 loader/glibc/Qt6/KF6/plugins/syntax data 打进 AppImage 是
+  T11（m0-runtime）；本节的产物是可执行的冒烟程序，不是交付物。
+- **双宿主闸门是 T12**：本机构建容器与宿主**共享内核**，"CentOS 7.9 + glibc 2.17
+T78 "delivered product" wording: AGENT.md:38:- Build the **delivered Qt6 product** (v2): `bash scripts/build-qt.sh` ->
+docs/USER_GUIDE.md:52:### 1.4 从源码得到 Qt6 构建（v2 交付物）

@@ -1,0 +1,18 @@
+## libQt6Core.so.6.10.2
+size: 13M
+max GLIBC: GLIBC_2.16
+GLIBC refs >2.17: 238
+max GLIBCXX: GLIBCXX_3.4.19
+## link minimal Qt6 console program
+LINK_EXIT=0
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, but has failed to switch to one.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+qt6=6.10.2 list=verilog,systemverilog hostname-readable=1
+RUN_EXIT=0
+## qt6_hello
+max GLIBC: GLIBC_2.2.5
+GLIBC refs >2.17: 3
+max GLIBCXX: ## GLIBC symbol versions used
+      3 GLIBC_2.2.5

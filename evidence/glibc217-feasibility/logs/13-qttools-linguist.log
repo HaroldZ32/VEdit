@@ -1,0 +1,47 @@
+## collection: 2026-10-31T14:28:18+0000
+
+real	0m9.286s
+user	0m0.061s
+sys	0m0.169s
+## configure (qttools: only what LinguistTools needs)
+
+real	0m2.667s
+user	0m1.464s
+sys	0m1.155s
+QTT_CONFIGURE_EXIT=0
+
+real	0m13.282s
+user	1m9.342s
+sys	0m5.983s
+QTT_BUILD_EXIT=0
+[46/47] Linking CXX shared library lib/libQt6UiTools.so.6.10.2
+[47/47] Creating library symlink lib/libQt6UiTools.so.6 lib/libQt6UiTools.so
+## install qttools into /opt/qt6-gui
+QTT_INSTALL_EXIT=0
+## retry: LinguistTools were disabled by -no-feature-linguist
+
+real	0m2.736s
+user	0m1.612s
+sys	0m1.140s
+QTT_CONFIGURE_EXIT=0
+
+real	0m0.017s
+user	0m0.010s
+sys	0m0.007s
+QTT_BUILD_EXIT=1
+ninja: error: unknown target 'LinguistTools'
+QTT_INSTALL_EXIT=1
+## full qttools build (default features)
+
+real	1m43.516s
+user	19m54.934s
+sys	2m18.832s
+QTT_BUILD_EXIT=0
+[584/585] Building CXX object src/designer/src/designer/CMakeFiles/designer.dir/__/__/__/shared/qttoolbardialog/qttoolbardialog.cpp.o
+[585/585] Linking CXX executable bin/designer
+QTT_INSTALL_EXIT=0
+Qt6CoreTools
+Qt6GuiTools
+Qt6Linguist
+Qt6LinguistTools
+Qt6Tools

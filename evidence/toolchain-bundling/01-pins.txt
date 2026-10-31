@@ -1,0 +1,19 @@
+== pins and source identities ==
+collected_at: 2026-10-31T14:43:02Z
+git_head: c71fe31478887e3dc7c460f875ccfb93e61c0ec4
+
+## scripts/versions.env pins
+SLANG_BIN_SHA256="63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252"
+VERIBLE_VERSION="v0.0-4298-g085eef05"
+VERIBLE_LS_SHA256="07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845"
+VERIBLE_LINT_SHA256="b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29"
+VERIBLE_FORMAT_SHA256="b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473"
+
+## sha256 of the sources the assembler used
+07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845  .mpd/recon/verible/bin/verible-verilog-ls
+b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29  .mpd/recon/verible/bin/verible-verilog-lint
+b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473  .mpd/recon/verible/bin/verible-verilog-format
+63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  build/slang/out/slang
+
+## Qt image: no verible/slang on PATH (clean-container premise)
+NONE-ON-PATH

@@ -1,0 +1,59 @@
+## collection: 2026-10-31T14:26:51+0000
+## ECM (extra-cmake-modules 6.24.0)
+ECM_CONFIGURE_EXIT=0
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /spike/ecm-build
+
+real	0m0.022s
+user	0m0.005s
+sys	0m0.017s
+ECM_BUILD_EXIT=0
+## KCoreAddons 6.24.0
+
+real	0m0.812s
+user	0m0.422s
+sys	0m0.399s
+KCA_CONFIGURE_EXIT=1
+CMake Error at CMakeLists.txt:37 (find_package):
+  package was not found.
+
+real	0m0.002s
+user	0m0.001s
+sys	0m0.001s
+KCA_BUILD_EXIT=1
+ninja: error: loading 'build.ninja': No such file or directory
+## syntax-highlighting 6.24.0 (the KSyntaxHighlighting KTextEditor needs)
+syntax-highlighting-6.24.0
+## KCoreAddons retry (Qml off; qtbase only, no qtdeclarative)
+KCA_CONFIGURE_EXIT=1
+CMake Error at /spike/cmake-3.31.0-linux-x86_64/share/cmake-3.31/Modules/FindPackageHandleStandardArgs.cmake:233 (message):
+
+real	0m0.002s
+user	0m0.000s
+sys	0m0.001s
+KCA_BUILD_EXIT=1
+ninja: error: loading 'build.ninja': No such file or directory
+KCA_INSTALL_EXIT=1
+## syntax-highlighting configure+build
+
+real	0m1.186s
+user	0m0.692s
+sys	0m0.494s
+SHL_CONFIGURE_EXIT=1
+  Could not find a package configuration file provided by "Qt6Core" with any
+CMake Error at /opt/kf6/share/ECM/modules/ECMPoQmTools.cmake:155 (find_package):
+
+real	0m0.002s
+user	0m0.000s
+sys	0m0.002s
+SHL_BUILD_EXIT=1
+ninja: error: loading 'build.ninja': No such file or directory
+Could NOT find Python3 (missing: Python3_EXECUTABLE Python3_INCLUDE_DIRS
+  Python3_LIBRARIES Interpreter Development Development.Module
+  Development.Embed) (Required is at least version "3.9")
+
+      Reason given by package: 
+---
+Python 3.6.8
+g++ (GCC) 11.2.1 20220127 (Red Hat 11.2.1-9)

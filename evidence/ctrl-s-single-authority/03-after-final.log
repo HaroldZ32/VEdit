@@ -1,0 +1,41 @@
+# T80 最终状态证据（修复后）
+# date: 2026-10-31T22:41:09+08:00
+# head: c71fe31478887e3dc7c460f875ccfb93e61c0ec4
+
+## 1) 产品 --selfcheck（exit 0）：Ctrl+S 只剩一条绑定
+CHECK save.shortcut.ctrl-s PASS
+CHECK save.menu.file-item PASS
+CHECK save.demo.open PASS
+CHECK save.demo.action.disk-bytes PASS
+CHECK save.demo.action.path-unchanged PASS
+CHECK save.demo.action.no-temp-file PASS
+CTRL-S-BINDING after-provider-install objectName=action-file.save class=QAction shortcut=Ctrl+S context=1 associated=[QMenu() ] holders=[QMenu() ] chain=QMainWindow<
+CHECK save.shortcut.unique PASS bindings=1
+CHECK save.shortcut.authority PASS
+CHECK save.ktexteditor.document PASS
+CHECK save.shortcut.window PASS
+CHECK save.shortcut.disk-bytes PASS
+CHECK save.shortcut.modified-cleared PASS
+CHECK save.shortcut.path-unchanged PASS
+CHECK save.menu.disk-bytes PASS
+CHECK save.menu.path-unchanged PASS
+CHECK save.failure.disk-unchanged PASS
+CHECK save.failure.status-bar PASS
+CHECK save.failure.diagnostic PASS
+CHECK save.failure.still-modified PASS
+CHECK save.recovery.disk-bytes PASS
+CHECK save.recovery.not-modified PASS
+CTRL-S-BINDING after-split objectName=action-file.save class=QAction shortcut=Ctrl+S context=1 associated=[QMenu() ] holders=[QMenu() ] chain=QMainWindow<
+CHECK save.shortcut.unique.multi-pane PASS bindings=1
+APP-SHELL-SELFTEST ok=1 checks=176 failures=0 state=/tmp/vedit-app-RIIYqQ/state
+
+## 2) 根 ctest（exit 0）
+10/17 Test #10: vedit-edit-core-selftest .......................   Passed    0.10 sec
+11/17 Test #11: vedit-workspace-palette-selftest ...............   Passed    0.09 sec
+12/17 Test #12: vedit-workspace-palette-integration-selftest ...   Passed    0.12 sec
+13/17 Test #13: vedit-workspace-search-selftest ................   Passed   11.93 sec
+14/17 Test #14: vedit-workspace-project-selftest ...............   Passed    0.05 sec
+15/17 Test #15: vedit-workspace-diagnostics-selftest ...........   Passed    0.00 sec
+16/17 Test #16: vedit-toolchain-missing-selftest ...............   Passed    0.00 sec
+17/17 Test #17: vedit-diagnostics-ffi-selftest .................   Passed    3.11 sec
+100% tests passed, 0 tests failed out of 17

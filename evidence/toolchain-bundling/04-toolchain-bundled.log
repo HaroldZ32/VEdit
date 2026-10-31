@@ -1,0 +1,27 @@
+== (a) bundled toolchain in a clean container ==
+collected_at: 2026-10-31T14:43:24Z
+git_head: c71fe31478887e3dc7c460f875ccfb93e61c0ec4
+clean env: env -i PATH=/usr/bin:/bin QT_QPA_PLATFORM=offscreen (no VEDIT_/verible/slang variables)
+
+cmd1: vedit-toolchain-selftest --appdir <AppDir> --expect bundled --lint-file crates/vd-lsp/fixtures/project/bad_line_length.sv
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+RESOLVED source=verible:bundled slang:bundled missing=[]
+MESSAGE Toolchain: verible=bundled, slang=bundled; missing=[]
+CHECK PASS bundled.verible-source  verible-verilog-ls: /vedit-build/target/toolchain-evidence/AppDir/bin/verible-verilog-ls [bundled]
+CHECK PASS bundled.slang-source  slang: /vedit-build/target/toolchain-evidence/AppDir/bin/slang [bundled]
+CHECK PASS bundled.no-missing
+CHECK PASS bundled.lint-fixture-written  /vedit-build/crates/vd-lsp/fixtures/project/bad_line_length.sv
+CHECK PASS bundled.lint-binary-present  /vedit-build/target/toolchain-evidence/AppDir/bin/verible-verilog-lint
+LINT exit=1 output-lines=2 first=/vedit-build/crates/vd-lsp/fixtures/project/bad_line_length.sv:3:101-108: Line length exceeds max: 100; is: 108 [Style: line-length] [line-length]
+CHECK PASS bundled.lint-reports-violation  exit=1
+VER-TOOLCHAIN-SELFTEST expect=bundled checks=6 failures=0
+SELFTEST-EXIT=0
+
+cmd2: <AppDir>/bin/vedit-app --selfcheck  (applicationDirPath = AppDir/bin, bundled tools next to it)
+--- output (TOOLCHAIN + selfcheck summary) ---
+TOOLCHAIN source=verible:bundled slang:bundled missing=[]
+APP-SHELL-SELFTEST ok=1 checks=176 failures=0 state=/tmp/vedit-app-nHuWgb/state
+SELFCHECK-EXIT=0

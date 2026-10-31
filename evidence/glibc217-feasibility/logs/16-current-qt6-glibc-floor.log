@@ -1,0 +1,12 @@
+## collection: 2026-10-31T22:35:52+08:00  HEAD=c71fe31478887e3dc7c460f875ccfb93e61c0ec4  host_kernel=7.0.0-38-generic
+## current shipped Qt6 binaries (Ubuntu 26.04 build image, glibc 2.43)
+--- target/qt6-build/src/app/vedit-app
+  max GLIBC: GLIBC_2.39
+  refs needing >2.17: 30
+--- target/qt6-build/cmake/smoke/vedit-m0-smoke
+  max GLIBC: GLIBC_2.34
+  refs needing >2.17: 1
+--- /usr/lib/x86_64-linux-gnu/libQt6Core.so.6 (Ubuntu build image)
+  max GLIBC: GLIBC_2.35
+  refs needing >2.17: 35
+ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43

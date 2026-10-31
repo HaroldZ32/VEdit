@@ -1,0 +1,23 @@
+== assemble AppDir with the bundled toolchain (T82) ==
+collected_at: 2026-10-31T14:43:03Z
+git_head: c71fe31478887e3dc7c460f875ccfb93e61c0ec4
+cmd: bash packaging/runtime/assemble-appdir.sh --out /vedit-build/target/toolchain-evidence/AppDir --toolchain-verible /vedit-build/.mpd/recon/verible/bin --toolchain-slang /vedit-build/build/slang/out/slang --require-toolchain
+--- output ---
+[assemble] binary: cc9f67782ed61cde765e39dca17d2e170b32de56cb5400096504d4b72b3ebe97  probe: b709d6924ec9a6f6da6ec80aaf915aa27d9b9ddb3e18de73ced44316353fc242
+[assemble] whitelist: SystemVerilog,Verilog
+binary verible-verilog-ls sha256=07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845
+binary verible-verilog-lint sha256=b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29
+binary verible-verilog-format sha256=b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473
+[assemble] toolchain: verible bundled (3 binaries, sha256 pinned)
+binary slang sha256=63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252
+[assemble] toolchain: slang bundled (sha256 pinned)
+[assemble] toolchain: complete (verible + slang), missing=[]
+[assemble] active whitelist files: 2 (no syntax-bundled/)
+[assemble] AppDir: /vedit-build/target/toolchain-evidence/AppDir files=203 bytes=202807255
+[assemble] f2lib sha256: aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
+APPDIR=/vedit-build/target/toolchain-evidence/AppDir
+APPDIR_FORM=F2
+APPDIR_FILES=203
+APPDIR_BYTES=202807255
+APPDIR_WHITELIST=SystemVerilog,Verilog
+ASSEMBLE-EXIT=0

@@ -15,13 +15,13 @@ test abi_version_is_one ... ok
 test null_and_unknown_arguments_are_rejected_with_a_typed_error ... ok
 test cancelling_a_job_discards_its_result ... ok
 test projected_fixture_serves_all_seven_services ... ok
-test lsp_rejects_a_missing_server_binary ... ok
-test lsp_configures_lazily_without_starting_the_server ... ok
 test deeplint_reports_a_missing_binary_as_a_typed_failure ... ok
 test fim_is_disabled_by_default_and_starts_no_worker ... ok
+test lsp_configures_lazily_without_starting_the_server ... ok
+test lsp_rejects_a_missing_server_binary ... ok
 test project_parse_expands_the_fixture_filelist ... ok
-test search_returns_hits_over_the_project_file_list ... ok
 test vcs_reports_the_empty_state_for_a_plain_directory ... ok
+test search_returns_hits_over_the_project_file_list ... ok
 test settings_round_trip_through_the_abi ... ok
 
 test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
@@ -31,9 +31,9 @@ test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fin
 running 6 tests
 test tests::missing_root_is_reported ... ok
 test tests::preview_is_trimmed_and_capped ... ok
+test tests::query_finds_every_line_in_file_order ... ok
 test tests::empty_needle_and_zero_limit_return_nothing ... ok
 test tests::limit_truncates_from_the_tail ... ok
-test tests::query_finds_every_line_in_file_order ... ok
 test tests::non_utf8_and_missing_files_are_skipped ... ok
 
 test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
@@ -41,8 +41,8 @@ test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; fini
      Running unittests src/lib.rs (target/debug/deps/vd_settings-6db6bb138f178aed)
 
 running 6 tests
-test tests::missing_file_is_the_default_state ... ok
 test tests::broken_toml_degrades_to_a_warning ... ok
+test tests::missing_file_is_the_default_state ... ok
 test tests::non_string_values_are_reported_and_skipped ... ok
 test tests::round_trip_preserves_every_pair ... ok
 test tests::failed_rename_leaves_the_original_file_intact ... ok
