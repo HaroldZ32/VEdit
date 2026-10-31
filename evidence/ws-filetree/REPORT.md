@@ -1,3 +1,99 @@
+collected_at: unknown (header added retroactively at 2026-10-31T10:19:00Z)
+git_head: 9957f5fe4d63c17c681e8753288262fa2c00955e
+git_status_porcelain:
+ M CMakeLists.txt
+ M Cargo.lock
+ M Cargo.toml
+ M THIRD_PARTY_NOTICES.md
+ M docs/decisions/r2-license.md
+ M docs/handover/README.md
+ M evidence/m0-build/build-logs/21-qt6-image-id.txt
+ M evidence/m0-build/build-logs/31-qt6-configure.log
+ M evidence/m0-build/build-logs/32-qt6-build.log
+ M evidence/m0-build/build-logs/33-qt6-ctest.log
+ M evidence/m0-build/build-logs/34-qt6-elf.txt
+ M evidence/syn-grammars/00-pins.txt
+ M evidence/syn-grammars/01-build.log
+ M evidence/syn-grammars/02-tests.log
+ M evidence/syn-grammars/03-manifest.txt
+ M evidence/syn-grammars/04-manifest-none.txt
+ M evidence/syn-grammars/04-manifest-static.txt
+ M evidence/syn-grammars/04-manifest-systemverilog.txt
+ M evidence/syn-grammars/04-manifest-verilog.txt
+ M evidence/syn-grammars/04-swap-proof.txt
+ M evidence/syn-grammars/05-layering.txt
+ M evidence/syn-grammars/06-licensing.txt
+ M evidence/syn-grammars/07-conclusion.md
+ M evidence/syn-grammars/09-result.txt
+ M evidence/term-panel/00-pins.txt
+ M evidence/term-panel/01-configure.log
+ M evidence/term-panel/02-build.log
+ M evidence/term-panel/03-ctest.log
+ M evidence/term-panel/03b-checks.log
+ M evidence/term-panel/04-elf-needed.txt
+ M evidence/term-panel/05-no-network.txt
+ M evidence/term-panel/06-xcb-and-screenshots.log
+ M evidence/term-panel/07-conclusion.md
+ M evidence/term-panel/08-structure.txt
+ M evidence/term-panel/09-root-build-with-lane.log
+ M evidence/ws-filetree/00-pins.txt
+ M evidence/ws-filetree/00-steps.txt
+ M evidence/ws-filetree/01-configure.log
+ M evidence/ws-filetree/02-build.log
+ M evidence/ws-filetree/03-ctest.log
+ M evidence/ws-filetree/03a-tests-full.log
+ M evidence/ws-filetree/04-fixture.log
+ M evidence/ws-filetree/05-screenshots.log
+ M evidence/ws-filetree/06-permissions-nonroot.log
+ M evidence/ws-filetree/07a-gate-qt6-cxx-pre-seam.log
+ M evidence/ws-filetree/08-real-shell-seamcheck.log
+ M evidence/ws-filetree/09-real-app-install.log
+ M evidence/ws-filetree/10-rootcheck-configure.log
+ M evidence/ws-filetree/11-rootcheck-build.log
+ M evidence/ws-filetree/12-gate-build-qt-final.log
+ M evidence/ws-filetree/12a-gate-build-qt-first.log
+ M evidence/ws-filetree/13-gate-qt6-cxx-final.log
+ M evidence/ws-filetree/14-real-shell-check-run.log
+ M evidence/ws-filetree/REPORT.md
+ M evidence/ws-palette/00-pins.txt
+ M evidence/ws-palette/30-build-qt.log
+ M evidence/ws-palette/31-bench.log
+ M evidence/ws-palette/32-ctest-palette.log
+ M evidence/ws-palette/33-elf.txt
+ M evidence/ws-palette/34-artifacts.txt
+ M evidence/ws-palette/36-app-seam-diff.md
+ M evidence/ws-palette/37-gate-qt6-cxx.log
+ M evidence/ws-palette/REPORT.md
+ M evidence/ws-palette/SEAM.md
+ M evidence/ws-search/04-selfcheck-root.log
+ M evidence/ws-search/05-selfcheck-nonroot.log
+ M evidence/ws-search/06-screenshots.log
+ M evidence/ws-search/07-screenshots-nonroot.log
+ M evidence/ws-search/08-build-qt.log
+ M evidence/ws-search/09-structure.txt
+ M evidence/ws-search/10-ctest-root-search.log
+ M evidence/ws-search/13-integration-proof.log
+ M evidence/ws-search/14-standalone.log
+ M evidence/ws-search/REPORT.md
+ M scripts/build-qt-in-container.sh
+ M scripts/build-qt.sh
+ M src/app/CMakeLists.txt
+ M src/app/main.cpp
+?? cmake/VEditRustFfi.cmake
+?? crates/vd-ffi/
+?? crates/vd-search/
+?? crates/vd-settings/
+?? crates/vd-vcs/
+?? docs/handover/appendix/amendments-rev2.md
+?? evidence/docs-amendments/
+?? evidence/ffi-abi/
+?? evidence/fixture/
+?? evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+?? evidence/verdicts/
+?? scripts/verify-fixture.sh
+?? tests/fixtures/
+backfill: 补记 —— C9 头为事后补齐；git_head / git_status_porcelain 为补记时刻快照，非原始采集时刻；原始采集时刻不可回溯，文件 mtime 2026-10-31T04:18:29Z 仅供参考
+---
 # T21 文件树面板 — 交付与证据报告
 
 契约：`contracts/ws-filetree.md`（split revision 2，冻结 2026-10-31T02:25:28Z）

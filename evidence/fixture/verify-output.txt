@@ -1,0 +1,94 @@
+generated: 2026-10-31T10:01:37Z
+git_head: 9957f5fe4d63c17c681e8753288262fa2c00955e
+command: bash scripts/verify-fixture.sh --evidence evidence/fixture
+git_status_porcelain:
+ M Cargo.toml
+?? crates/vd-search/
+?? crates/vd-settings/
+?? crates/vd-vcs/
+?? evidence/docs-amendments/
+?? evidence/fixture/
+?? scripts/verify-fixture.sh
+?? tests/fixtures/
+---
+
+VEdit acceptance fixture check (C13 / AC-S1.5)
+fixture: tests/fixtures/verilog-project
+top filelist: project.f
+
+[computed from project.f]
+entries (7):
+  rtl/alu_pkg.sv
+  rtl/alu.sv
+  rtl/counter.v
+  rtl/top.sv
+  tb/tb_top.sv
+  tb/tb_aux.sv
+  rtl/mem.sv
+include dirs (4):
+  inc
+  inc/generated
+  rtl/include
+  tb/include
+defines (4):
+  WIDTH=8
+  DEPTH=16
+  DEBUG
+  SIMULATION
+skipped tokens (2):
+  +libext+.v+.sv
+  -y
+duplicate entries (1):
+  rtl/mem.sv
+
+[expectations — tests/fixtures/verilog-project/expected]
+entries (expected/files.txt):
+  rtl/alu_pkg.sv
+  rtl/alu.sv
+  rtl/counter.v
+  rtl/top.sv
+  tb/tb_top.sv
+  tb/tb_aux.sv
+  rtl/mem.sv
+include dirs (expected/incdirs.txt):
+  inc
+  inc/generated
+  rtl/include
+  tb/include
+defines (expected/defines.txt):
+  WIDTH=8
+  DEPTH=16
+  DEBUG
+  SIMULATION
+skipped tokens (expected/skipped-tokens.txt):
+  +libext+.v+.sv
+  -y
+duplicate entries (expected/duplicates.txt):
+  rtl/mem.sv
+
+[checks]
+PASS fixture tree contains the 21 required files
+PASS project.f is the only filelist at the fixture root (auto-discovery is unambiguous)
+PASS every +incdir+ resolves to a directory
+PASS entries matches expected/files.txt (7 items)
+PASS include dirs matches expected/incdirs.txt (4 items)
+PASS defines matches expected/defines.txt (4 items)
+PASS skipped tokens matches expected/skipped-tokens.txt (2 items)
+PASS duplicate entries matches expected/duplicates.txt (1 items)
+PASS every resolved source entry exists on disk
+PASS every .v/.sv under rtl/ and tb/ is reachable from project.f
+PASS every `include resolves through the resolved +incdir+ list
+PASS every +define+ name is referenced by the sources
+PASS module top is declared
+PASS top instantiates alu as u_alu
+PASS top instantiates counter as u_counter
+PASS top instantiates mem as u_mem
+PASS module tb_top is declared
+PASS tb_top instantiates top as u_top
+PASS alu imports the shared package
+PASS top uses the package type
+PASS tb_top uses a package enumeration value
+SKIP verible-verilog-syntax not installed: Verilog syntax parse not checked
+
+[summary]
+21 passed, 0 failed, 1 skipped

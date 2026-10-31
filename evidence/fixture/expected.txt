@@ -1,0 +1,41 @@
+generated: 2026-10-31T10:01:37Z
+git_head: 9957f5fe4d63c17c681e8753288262fa2c00955e
+command: bash scripts/verify-fixture.sh --evidence evidence/fixture
+git_status_porcelain:
+ M Cargo.toml
+?? crates/vd-search/
+?? crates/vd-settings/
+?? crates/vd-vcs/
+?? evidence/docs-amendments/
+?? evidence/fixture/
+?? scripts/verify-fixture.sh
+?? tests/fixtures/
+---
+== expected/files.txt ==
+rtl/alu_pkg.sv
+rtl/alu.sv
+rtl/counter.v
+rtl/top.sv
+tb/tb_top.sv
+tb/tb_aux.sv
+rtl/mem.sv
+
+== expected/incdirs.txt ==
+inc
+inc/generated
+rtl/include
+tb/include
+
+== expected/defines.txt ==
+WIDTH=8
+DEPTH=16
+DEBUG
+SIMULATION
+
+== expected/skipped-tokens.txt ==
++libext+.v+.sv
+-y
+
+== expected/duplicates.txt ==
+rtl/mem.sv
+

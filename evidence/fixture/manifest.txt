@@ -1,0 +1,59 @@
+generated: 2026-10-31T10:01:37Z
+git_head: 9957f5fe4d63c17c681e8753288262fa2c00955e
+command: bash scripts/verify-fixture.sh --evidence evidence/fixture
+git_status_porcelain:
+ M Cargo.toml
+?? crates/vd-search/
+?? crates/vd-settings/
+?? crates/vd-vcs/
+?? evidence/docs-amendments/
+?? evidence/fixture/
+?? scripts/verify-fixture.sh
+?? tests/fixtures/
+---
+fixture: tests/fixtures/verilog-project
+
+[files — sha256, bytes, fixture-relative path]
+8d979953078a66c53921f8b51a4dd4aa0cbb9a6eca6ced0f2c96ccb5853e7150       132  filelists/extra.f
+e0d1fd7d71c625d749bd8ceee6cd6583658fe3d9f6c63543bf54603dea6de177       149  filelists/nested/tb_aux.f
+c81b4f62af4063c2641be416a7420b8bccc3650f8e18e5476ac9940348b0f33e       222  filelists/tb.f
+eb0563baf3bb6bafbc0bc8e4e3fb56b6c04a057da4584b5028662224287cc104       111  inc/defs.vh
+58b18c4a3af0a7e20292f9d10e1c9b312f005605f95f2016bb9c11eee15d44f0       109  inc/generated/width.vh
+a04b563c1112a01f9945807f92618906e4575d6f478ac2194b1b63f5ed3c694c       810  project.f
+87c10fdf5fdec216525a2b440c8d78de71003c8237957b90c2c4a0944d5b5cb5       295  rtl/alu_pkg.sv
+69d4f30880c6723f7d3d862901b9577cbffe1414a2b8b83468d60ae742371d1a       603  rtl/alu.sv
+853aa74271f29357bb20966ce7911a46989963ad55e4598ff7124de68e3b9cfc       428  rtl/counter.v
+b4210fca58b61ab1bb1cf9fd8392799ba8a5915f001197e84904adad1be034dd       235  rtl/include/rtl_defs.vh
+84c6f5da0429a8a265064a2b418e1b2b57f2c04dcab1d3e0ee5c050478df36a8       631  rtl/mem.sv
+5c89c4ff128af8c6f782669dfd9a422786e12620333c10a2fada2b795a72ad98      1098  rtl/top.sv
+3fd0440418d48e978ea0a851c530ecbed40e8eb6551b97ffd253e4d56dc9ff5e       149  tb/include/tb_defs.vh
+a92e6cfd05c3e83be9a0ff6158221d0a06772c17567c04c8a7991bff7ec4b644       168  tb/tb_aux.sv
+f8380172407fd675d4471a0c2a657f0575c73b6c2768c6fe5d06c754b588fbbd       984  tb/tb_top.sv
+
+[resolved entries — in filelist order]
+  rtl/alu_pkg.sv
+  rtl/alu.sv
+  rtl/counter.v
+  rtl/top.sv
+  tb/tb_top.sv
+  tb/tb_aux.sv
+  rtl/mem.sv
+
+[include dirs]
+  inc
+  inc/generated
+  rtl/include
+  tb/include
+
+[defines]
+  WIDTH=8
+  DEPTH=16
+  DEBUG
+  SIMULATION
+
+[skipped tokens]
+  +libext+.v+.sv
+  -y
+
+[duplicate entries]
+  rtl/mem.sv
