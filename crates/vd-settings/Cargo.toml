@@ -1,0 +1,16 @@
+[package]
+name = "vd-settings"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# Settings storage (Slice 3, T25): one flat TOML table of string values.
+toml.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true

@@ -41,6 +41,11 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules(TREE_SITTER REQUIRED IMPORTED_TARGET "tree-sitter=${VEDIT_TREE_SITTER_VERSION}")
 message(STATUS "  tree-sitter:       ${TREE_SITTER_VERSION} at ${TREE_SITTER_LIBDIR}")
 
+# --- Rust service layer (vd-ffi, Slice 0 / task T4) -------------------------
+# Imported target + the hard requirement that the product binary carries the
+# C ABI. The library is built by scripts/build-qt.sh before configure.
+include(VEditRustFfi)
+
 # --- M0 build-base smoke target ---------------------------------------------
 option(VEDIT_BUILD_M0_SMOKE
   "Build the M0 Qt6/KTextEditor/KSyntaxHighlighting/tree-sitter smoke target (T10)" ON)

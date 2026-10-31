@@ -13,6 +13,12 @@ members = [
     "crates/vd-fim",
     "crates/vd-lsp",
     "crates/vd-syntax",
+    # Slice 0 service layer (T4): the C ABI seam plus the search/VCS/settings
+    # backends it exposes. None of these may depend on GTK (AC-0.3).
+    "crates/vd-ffi",
+    "crates/vd-search",
+    "crates/vd-settings",
+    "crates/vd-vcs",
 ]
 
 [workspace.package]
