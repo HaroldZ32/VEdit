@@ -149,11 +149,15 @@ void installDiagnostics(vedit::app::ApplicationShell &shell, const IntegrationOp
         return;
     }
 
-    // Discovery order is bundled > PATH > env; the chosen source and the missing
-    // list are printed and shown, so "no diagnostics" is never silent.
+    // Discovery order is bundled > local checkout > PATH > env; the chosen source,
+    // the local candidates and the missing list are printed and shown, so "no
+    // diagnostics" is never silent — and never a wall of text in the UI.
+    const diagnostics::ToolchainSearchContext toolchainContext =
+        diagnostics::applicationToolchainContext();
     const diagnostics::ToolchainReport toolchain =
-        diagnostics::resolveToolchain(diagnostics::applicationToolchainContext());
-    std::printf("TOOLCHAIN %s\n", qPrintable(toolchain.statusLine()));
+        diagnostics::resolveToolchain(toolchainContext);
+    std::printf("TOOLCHAIN %s local=[%s]\n", qPrintable(toolchain.statusLine()),
+                qPrintable(toolchainContext.localDirs.join(QLatin1Char(','))));
 
     auto lsp = diagnostics::createFfiLspSessionBackend();
     auto slang = diagnostics::createFfiSlangBackend(toolchain.slang.path);
@@ -166,9 +170,15 @@ void installDiagnostics(vedit::app::ApplicationShell &shell, const IntegrationOp
 
     const QString projectRoot = options.projectRoot;
     controller->setConfiguration(toolchain.verible.path, projectRoot);
+    // Exactly ONE user-facing status line for a missing toolchain: the shell
+    // diagnostic (deduplicated by the shell) and the panel status read the same
+    // concise message. The probed candidate list is a log detail, not UI text,
+    // and is only emitted at debug level.
     shell.addShellDiagnostic(toolchain.userMessage());
-    if (!toolchain.missing().isEmpty()) {
-        qWarning("diagnostics: %s", qPrintable(toolchain.userMessage()));
+    if (!toolchain.missing().isEmpty() && qEnvironmentVariableIsSet("VEDIT_TOOLCHAIN_TRACE")) {
+        // Opt-in diagnosis only: the probed-candidate list must never be part of
+        // the panel status or of a default console run.
+        qDebug("diagnostics: %s", qPrintable(toolchain.probeDetail()));
     }
 
     const auto factory = [controller]() {

@@ -20,6 +20,13 @@ public:
 
     OutlineModel *model() const { return model_; }
     QString statusText() const;
+    /// Number of rows in the outline table (0 when there is nothing to show).
+    int outlineRowCount() const;
+    /// The one-line empty-state reason shown below the outline (empty when hidden).
+    QString emptyStateText() const;
+    bool emptyStateVisible() const;
+    /// The controller this panel renders (the self-test reads its entry counts).
+    DiagnosticsController *controller() const;
 
     /// Copy the controller's outline + state into the widgets.
     void refreshFromController();
@@ -29,6 +36,7 @@ private:
     OutlineModel *model_ = nullptr;
     QTreeView *view_ = nullptr;
     QLabel *status_ = nullptr;
+    QLabel *emptyState_ = nullptr;
 };
 
 /// Factory used by `installDiagnostics` for the shell's "outline" panel id.

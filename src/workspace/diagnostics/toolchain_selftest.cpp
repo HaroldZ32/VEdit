@@ -21,6 +21,7 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QHash>
 #include <QProcess>
 #include <QString>
 #include <QStringList>
@@ -153,6 +154,85 @@ int main(int argc, char **argv)
               report.userMessage());
         check("missing.no-fabricated-diagnostics", report.verible.path.isEmpty()
                                                        && report.slang.path.isEmpty());
+
+        // T85: the user-facing message is ONE concise line; the probed candidate
+        // list is a separate log detail and must never be part of it.
+        const QString message = report.userMessage();
+        check("missing.user-message-single-line", !message.contains(QLatin1Char('\n')), message);
+        check("missing.user-message-concise", message.size() <= 500,
+              QString::number(message.size()));
+        check("missing.user-message-no-probe-wall",
+              !message.contains(QStringLiteral("probed"))
+                  && !message.contains(QStringLiteral("/usr/local/sbin")),
+              message);
+        check("missing.user-message-names-three-paths",
+              message.contains(QStringLiteral("bin/")) && message.contains(QStringLiteral("PATH"))
+                  && message.contains(QStringLiteral("VEDIT_VERIBLE_LS"))
+                  && message.contains(QStringLiteral("VEDIT_SLANG"))
+                  && message.contains(QStringLiteral("scripts/fetch-verible.sh"))
+                  && message.contains(QStringLiteral("build/slang/build.sh")),
+              message);
+        check("missing.probe-detail-is-separate",
+              report.probeDetail().contains(QStringLiteral("probed"))
+                  && !message.contains(report.probeDetail()));
+
+        // Discovery order: bundled > local checkout > PATH > env. Build one
+        // candidate directory per tier with a fake executable and check which
+        // tier wins as the earlier ones are removed.
+        QTemporaryDir tiers;
+        check("local.order.temp-dir", tiers.isValid());
+        const QString bundledDir = tiers.path() + QStringLiteral("/bundled");
+        const QString localDir = tiers.path() + QStringLiteral("/local");
+        const QString pathDir = tiers.path() + QStringLiteral("/path");
+        const QString envDir = tiers.path() + QStringLiteral("/env");
+        for (const QString &dir : {bundledDir, localDir, pathDir, envDir}) {
+            QDir().mkpath(dir);
+        }
+        const auto writeFake = [](const QString &path) {
+            QFile file(path);
+            if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+                return false;
+            }
+            file.write("#!/bin/sh\nexit 0\n");
+            file.close();
+            return QFile::setPermissions(path, QFileDevice::ReadOwner | QFileDevice::WriteOwner
+                                                   | QFileDevice::ExeOwner);
+        };
+        const QString veribleName = QStringLiteral("verible-verilog-ls");
+        QHash<QString, QString> orderEnv;
+        orderEnv.insert(QStringLiteral("VEDIT_VERIBLE_LS"), envDir + QLatin1Char('/') + veribleName);
+        const auto resolveOrder = [&](bool withBundled, bool withLocal, bool withPath) {
+            ToolchainSearchContext orderContext;
+            if (withBundled) {
+                orderContext.bundledDirs = QStringList{bundledDir};
+            }
+            if (withLocal) {
+                orderContext.localDirs = QStringList{localDir};
+            }
+            if (withPath) {
+                orderContext.pathDirs = QStringList{pathDir};
+            }
+            orderContext.env = orderEnv;
+            return resolveToolchain(orderContext);
+        };
+        check("local.order.fake-env-written", writeFake(envDir + QLatin1Char('/') + veribleName));
+        check("local.order.env-fallback",
+              resolveOrder(false, false, false).verible.sourceLabel().startsWith(
+                  QStringLiteral("env:")),
+              resolveOrder(false, false, false).verible.describe());
+        check("local.order.fake-path-written", writeFake(pathDir + QLatin1Char('/') + veribleName));
+        check("local.order.path-over-env",
+              resolveOrder(false, false, true).verible.sourceLabel() == QStringLiteral("PATH"),
+              resolveOrder(false, false, true).verible.describe());
+        check("local.order.fake-local-written", writeFake(localDir + QLatin1Char('/') + veribleName));
+        check("local.order.local-over-path",
+              resolveOrder(false, true, true).verible.sourceLabel() == QStringLiteral("local"),
+              resolveOrder(false, true, true).verible.describe());
+        check("local.order.fake-bundled-written",
+              writeFake(bundledDir + QLatin1Char('/') + veribleName));
+        check("local.order.bundled-over-all",
+              resolveOrder(true, true, true).verible.sourceLabel() == QStringLiteral("bundled"),
+              resolveOrder(true, true, true).verible.describe());
     }
 
     std::printf("VER-TOOLCHAIN-SELFTEST expect=%s checks=%d failures=%d\n",

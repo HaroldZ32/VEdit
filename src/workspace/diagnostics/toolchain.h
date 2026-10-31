@@ -2,9 +2,14 @@
 
 // Toolchain discovery + observability for the diagnostics lane.
 //
-// Discovery order (the delivery contract): **bundled > PATH > env**.
+// Discovery order (the delivery contract): **bundled > local checkout > PATH > env**.
 //   * bundled — a binary next to the product binary (`bin/` next to `vd-app`,
 //     or the legacy `lib/vedit/bin/`);
+//   * local   — a SOURCE CHECKOUT's own toolchain outputs, so a bare build works
+//     after one documented command: `<repo>/build/slang/out/slang`,
+//     `<repo>/target/verible-pin/extract/verible-*/bin/`, and
+//     `<repo>/.mpd/recon/verible/bin/` (the repo root is found by walking up
+//     from the product binary until `scripts/fetch-verible.sh` is seen);
 //   * PATH    — the user's shell PATH;
 //   * env     — `VEDIT_VERIBLE_LS` / `VEDIT_SLANG` (explicit override, last).
 //
@@ -28,6 +33,7 @@ enum class ToolKind {
 /// Where the resolved binary came from.
 enum class ToolSource {
     Bundled,
+    Local, ///< the source checkout's own artifact (`build/slang/out`, verible extract)
     Path,
     Env,
     Missing,
@@ -69,12 +75,16 @@ struct ToolchainReport {
     /// A human sentence for the status bar / diagnostics panel.
     QString userMessage() const;
     /// The per-tool explanation, e.g. `verible-verilog-ls not found (...)`.
+    /// Deliberately short: the probed candidate list lives in probeDetail().
     QString missingMessage(ToolKind kind) const;
+    /// Every candidate probed, per tool — for logs/selfcheck, never for the UI.
+    QString probeDetail() const;
 };
 
 /// Inputs of one resolution (injectable so the self-test is deterministic).
 struct ToolchainSearchContext {
     QStringList bundledDirs;            ///< directories probed as "bundled"
+    QStringList localDirs;              ///< the source checkout's own toolchain dirs
     QStringList pathDirs;               ///< PATH entries
     QHash<QString, QString> env;        ///< override variables
     QString veribleName = QStringLiteral("verible-verilog-ls");

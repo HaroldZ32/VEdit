@@ -155,3 +155,28 @@ if(VEDIT_DIAGNOSTICS_FFI)
     TIMEOUT 240
   )
 endif()
+
+# --- Toolchain UX self-test (T85): ONE panel-level status, not a wall --------
+# Needs the panel widget (built with the app-shell seam) and, for the real
+# outline-symbol leg, the Rust service layer. It is offscreen and fast.
+if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL)
+  add_executable(vedit-toolchain-ux-selftest toolchain_ux_selftest.cpp)
+  target_link_libraries(vedit-toolchain-ux-selftest PRIVATE
+    vedit_workspace_diagnostics
+  )
+  if(VEDIT_DIAGNOSTICS_FFI)
+    target_compile_definitions(vedit-toolchain-ux-selftest PRIVATE
+      VEDIT_DIAGNOSTICS_HAVE_FFI=1)
+  endif()
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-toolchain-ux-selftest PRIVATE
+      -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  add_test(NAME vedit-toolchain-ux-selftest
+           COMMAND vedit-toolchain-ux-selftest
+                   --fixture "${CMAKE_CURRENT_SOURCE_DIR}/../../../tests/fixtures/verilog-project")
+  set_tests_properties(vedit-toolchain-ux-selftest PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-diagnostics"
+    TIMEOUT 240
+  )
+endif()

@@ -1,6 +1,7 @@
 #include "toolchain.h"
 
 #include <QCoreApplication>
+#include <QDir>
 #include <QFileInfo>
 
 namespace vedit::workspace::diagnostics {
@@ -20,6 +21,7 @@ ToolResolution resolveOne(ToolKind kind,
                           const QString &name,
                           const QString &envName,
                           const QStringList &bundledDirs,
+                          const QStringList &localDirs,
                           const QStringList &pathDirs,
                           const QHash<QString, QString> &env)
 {
@@ -50,7 +52,20 @@ ToolResolution resolveOne(ToolKind kind,
         }
     }
 
-    // 2) PATH.
+    // 2) local checkout: the source tree's own toolchain artifacts (bare build).
+    for (const QString &dir : localDirs) {
+        if (dir.isEmpty()) {
+            continue;
+        }
+        const QString candidate = dir + QLatin1Char('/') + name;
+        if (probe(candidate)) {
+            resolution.path = QFileInfo(candidate).absoluteFilePath();
+            resolution.source = ToolSource::Local;
+            return resolution;
+        }
+    }
+
+    // 3) PATH.
     for (const QString &dir : pathDirs) {
         if (dir.isEmpty()) {
             continue;
@@ -63,7 +78,7 @@ ToolResolution resolveOne(ToolKind kind,
         }
     }
 
-    // 3) env: explicit override, last (never silently preferred over bundled/PATH).
+    // 4) env: explicit override, last (never silently preferred over bundled/local/PATH).
     const QString override = env.value(envName).trimmed();
     if (!override.isEmpty()) {
         if (probe(override)) {
@@ -87,6 +102,46 @@ ToolResolution resolveOne(ToolKind kind,
     return resolution;
 }
 
+/// The SOURCE CHECKOUT root: walk up from the product binary until the repo's
+/// own marker file is seen. A packaged AppDir has no such marker, so the shipped
+/// runtime never probes a development tree.
+QString findSourceCheckoutRoot(const QString &startDir)
+{
+    QDir dir(startDir);
+    for (int depth = 0; depth < 10; ++depth) {
+        if (QFileInfo(dir.filePath(QStringLiteral("scripts/fetch-verible.sh"))).isFile()) {
+            return dir.absolutePath();
+        }
+        if (!dir.cdUp()) {
+            break;
+        }
+    }
+    return {};
+}
+
+/// The toolchain artifacts a bare build can produce with one command each:
+/// `bash build/slang/build.sh` and `bash scripts/fetch-verible.sh`.
+QStringList sourceCheckoutToolchainDirs(const QString &applicationDir)
+{
+    QStringList dirs;
+    const QString root = findSourceCheckoutRoot(applicationDir);
+    if (root.isEmpty()) {
+        return dirs;
+    }
+    dirs.append(root + QStringLiteral("/build/slang/out"));
+    dirs.append(root + QStringLiteral("/.mpd/recon/verible/bin"));
+    const QDir extract(root + QStringLiteral("/target/verible-pin/extract"));
+    if (extract.exists()) {
+        const QStringList versions = extract.entryList(QStringList{QStringLiteral("verible-*")},
+                                                       QDir::Dirs | QDir::NoDotAndDotDot,
+                                                       QDir::Name);
+        for (const QString &version : versions) {
+            dirs.append(extract.filePath(version) + QStringLiteral("/bin"));
+        }
+    }
+    return dirs;
+}
+
 ToolchainSearchContext contextFor(const QStringList &bundledDirs,
                                   const QStringList &pathDirs,
                                   const QHash<QString, QString> &env)
@@ -105,6 +160,8 @@ QString toolSourceLabel(ToolSource source, const QString &envName)
     switch (source) {
     case ToolSource::Bundled:
         return QStringLiteral("bundled");
+    case ToolSource::Local:
+        return QStringLiteral("local");
     case ToolSource::Path:
         return QStringLiteral("PATH");
     case ToolSource::Env:
@@ -150,8 +207,8 @@ QString ToolchainReport::impact() const
     }
     QStringList parts;
     if (!verible.found()) {
-        parts.append(QStringLiteral("Verible diagnostics, go-to-definition, references, "
-                                    "rename, formatting and the outline are unavailable"));
+        parts.append(QStringLiteral("Verible diagnostics, navigation and the outline "
+                                    "are unavailable"));
     }
     if (!slang.found()) {
         parts.append(QStringLiteral("SLANG deep lint is unavailable"));
@@ -164,16 +221,10 @@ QString ToolchainReport::fixHint() const
     if (missing().isEmpty()) {
         return QString();
     }
-    QStringList fixes;
-    if (!verible.found()) {
-        fixes.append(QStringLiteral("put `verible-verilog-ls` in the product's bin/ next to "
-                                    "vd-app, install it on PATH, or set VEDIT_VERIBLE_LS"));
-    }
-    if (!slang.found()) {
-        fixes.append(QStringLiteral("put `slang` in the product's bin/ next to vd-app, "
-                                    "install it on PATH, or set VEDIT_SLANG"));
-    }
-    return QStringLiteral("Fix: ") + fixes.join(QStringLiteral("; ")) + QLatin1Char('.');
+    return QStringLiteral("Fix: bundle `verible-verilog-ls`/`slang` in the product's bin/ "
+                          "next to vd-app, run `bash scripts/fetch-verible.sh` and "
+                          "`bash build/slang/build.sh` in a source checkout, install them on "
+                          "PATH, or set VEDIT_VERIBLE_LS / VEDIT_SLANG.");
 }
 
 QString ToolchainReport::missingMessage(ToolKind kind) const
@@ -186,25 +237,37 @@ QString ToolchainReport::missingMessage(ToolKind kind) const
         ? (kind == ToolKind::Verible ? QStringLiteral("verible-verilog-ls")
                                      : QStringLiteral("slang"))
         : tool.name;
-    return QStringLiteral("%1 not found (bundled, PATH, env — all empty; probed %2)")
-        .arg(name, readableCandidates(tool.searched));
+    return QStringLiteral("%1 not found (bundled, local checkout, PATH and env all empty)")
+        .arg(name);
+}
+
+QString ToolchainReport::probeDetail() const
+{
+    QStringList parts;
+    parts.append(QStringLiteral("verible-verilog-ls probed: %1")
+                     .arg(readableCandidates(verible.searched)));
+    parts.append(QStringLiteral("slang probed: %1").arg(readableCandidates(slang.searched)));
+    return parts.join(QStringLiteral(" | "));
 }
 
 QString ToolchainReport::userMessage() const
 {
     if (missing().isEmpty()) {
-        return QStringLiteral("Toolchain: verible=%1, slang=%2; missing=[]")
-            .arg(verible.sourceLabel(), slang.sourceLabel());
+        // Nothing to tell the user: healthy is silent (the status line still
+        // carries the chosen sources for logs and the selfcheck).
+        return {};
     }
-    QStringList details;
+    QStringList absent;
     if (!verible.found()) {
-        details.append(missingMessage(ToolKind::Verible));
+        absent.append(verible.name.isEmpty() ? QStringLiteral("verible-verilog-ls")
+                                             : verible.name);
     }
     if (!slang.found()) {
-        details.append(missingMessage(ToolKind::Slang));
+        absent.append(slang.name.isEmpty() ? QStringLiteral("slang") : slang.name);
     }
-    return QStringLiteral("Diagnostics unavailable: %1 Impact: %2 %3")
-        .arg(details.join(QStringLiteral("; ")), impact(), fixHint())
+    return QStringLiteral("Diagnostics unavailable: %1 not found (bundled, local checkout, "
+                          "PATH and env all empty). Impact: %2 %3")
+        .arg(absent.join(QStringLiteral(", ")), impact(), fixHint())
         .simplified();
 }
 
@@ -215,12 +278,14 @@ ToolchainReport resolveToolchain(const ToolchainSearchContext &context)
                                 context.veribleName,
                                 QStringLiteral("VEDIT_VERIBLE_LS"),
                                 context.bundledDirs,
+                                context.localDirs,
                                 context.pathDirs,
                                 context.env);
     report.slang = resolveOne(ToolKind::Slang,
                               context.slangName,
                               QStringLiteral("VEDIT_SLANG"),
                               context.bundledDirs,
+                              context.localDirs,
                               context.pathDirs,
                               context.env);
     return report;
@@ -236,6 +301,8 @@ ToolchainSearchContext applicationToolchainContext()
         bundledDirs.append(applicationDir + QStringLiteral("/../lib/vedit/bin")); // legacy layout
         bundledDirs.append(applicationDir + QStringLiteral("/../share/vedit/bin"));
     }
+
+    QStringList localDirs = sourceCheckoutToolchainDirs(applicationDir);
 
     QStringList pathDirs;
     const QString path = qEnvironmentVariable("PATH");
@@ -255,13 +322,17 @@ ToolchainSearchContext applicationToolchainContext()
     remember("VEDIT_SLANG");
     remember("VEDIT_SLANG_DIR");
 
-    return contextFor(bundledDirs, pathDirs, env);
+    ToolchainSearchContext context = contextFor(bundledDirs, pathDirs, env);
+    context.localDirs = localDirs;
+    return context;
 }
 
 QString toolchainStatusLine()
 {
-    const ToolchainReport report = resolveToolchain(applicationToolchainContext());
-    return QStringLiteral("TOOLCHAIN %1").arg(report.statusLine());
+    const ToolchainSearchContext context = applicationToolchainContext();
+    const ToolchainReport report = resolveToolchain(context);
+    return QStringLiteral("TOOLCHAIN %1 local=[%2]")
+        .arg(report.statusLine(), context.localDirs.join(QLatin1Char(',')));
 }
 
 } // namespace vedit::workspace::diagnostics

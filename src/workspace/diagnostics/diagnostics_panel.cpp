@@ -5,6 +5,7 @@
 
 #include <QLabel>
 #include <QTreeView>
+#include <QStringLiteral>
 #include <QVBoxLayout>
 
 namespace vedit::workspace::diagnostics {
@@ -30,6 +31,13 @@ DiagnosticsPanel::DiagnosticsPanel(DiagnosticsController *controller, QWidget *p
     view_->setAlternatingRowColors(true);
     layout->addWidget(view_, 1);
 
+    // One-line empty state. A missing toolchain is an environment state, not a
+    // list of per-file errors: the outline stays empty and says why once.
+    emptyState_ = new QLabel(this);
+    emptyState_->setObjectName(QStringLiteral("diagnosticsEmptyState"));
+    emptyState_->setWordWrap(true);
+    layout->addWidget(emptyState_);
+
     refreshFromController();
 }
 
@@ -39,6 +47,26 @@ QString DiagnosticsPanel::statusText() const
         return QString();
     }
     return status_->text();
+}
+
+int DiagnosticsPanel::outlineRowCount() const
+{
+    return model_ != nullptr ? model_->rowCount() : 0;
+}
+
+QString DiagnosticsPanel::emptyStateText() const
+{
+    return emptyState_ != nullptr ? emptyState_->text() : QString();
+}
+
+bool DiagnosticsPanel::emptyStateVisible() const
+{
+    return emptyState_ != nullptr && emptyState_->isVisibleTo(this);
+}
+
+DiagnosticsController *DiagnosticsPanel::controller() const
+{
+    return controller_;
 }
 
 void DiagnosticsPanel::refreshFromController()
@@ -62,6 +90,22 @@ void DiagnosticsPanel::refreshFromController()
             status_->setText(QStringLiteral("%1 — %2 diagnostic(s)")
                                  .arg(controller_->session().message)
                                  .arg(controller_->diagnostics().size()));
+        }
+    }
+    if (emptyState_ != nullptr) {
+        const QStringList missing = controller_->toolchainReport().missing();
+        if (model_ != nullptr && model_->rowCount() > 0) {
+            emptyState_->clear();
+            emptyState_->setVisible(false);
+        } else if (!missing.isEmpty()) {
+            emptyState_->setText(QStringLiteral("No symbols — the outline backend is missing (%1). "
+                                                "See the status line above for the one-line fix.")
+                                     .arg(missing.join(QStringLiteral(", "))));
+            emptyState_->setVisible(true);
+        } else {
+            emptyState_->setText(QStringLiteral("No symbols yet — open a file and run "
+                                                "Reparse Project."));
+            emptyState_->setVisible(true);
         }
     }
 }
