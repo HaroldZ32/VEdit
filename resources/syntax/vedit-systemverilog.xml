@@ -31,32 +31,33 @@
       <item>trireg</item><item>unsigned</item><item>wait</item><item>wand</item>
       <item>while</item><item>wire</item><item>wor</item><item>xnor</item><item>xor</item>
     </list>
+    <list name="veditFoldBegin">
+      <item>module</item><item>interface</item><item>program</item><item>class</item>
+      <item>package</item><item>generate</item><item>function</item><item>task</item>
+      <item>case</item><item>casex</item><item>casez</item><item>randcase</item><item>begin</item>
+    </list>
+    <list name="veditFoldEnd">
+      <item>endmodule</item><item>endinterface</item><item>endprogram</item>
+      <item>endclass</item><item>endpackage</item><item>endgenerate</item>
+      <item>endfunction</item><item>endtask</item><item>endcase</item><item>end</item>
+    </list>
     <contexts>
       <context name="Normal" attribute="Normal Text" lineEndContext="#stay">
-        <!-- folding openers/closers first: they must win over the keyword list -->
-        <keyword attribute="Keyword" context="#stay" String="module" beginRegion="moduleEndmodule"/>
-        <keyword attribute="Keyword" context="#stay" String="endmodule" endRegion="moduleEndmodule"/>
-        <keyword attribute="Keyword" context="#stay" String="begin" beginRegion="beginEnd"/>
-        <keyword attribute="Keyword" context="#stay" String="end" endRegion="beginEnd"/>
-        <keyword attribute="Keyword" context="#stay" String="case" beginRegion="caseEndcase"/>
-        <keyword attribute="Keyword" context="#stay" String="casex" beginRegion="caseEndcase"/>
-        <keyword attribute="Keyword" context="#stay" String="casez" beginRegion="caseEndcase"/>
-        <keyword attribute="Keyword" context="#stay" String="endcase" endRegion="caseEndcase"/>
-        <keyword attribute="Keyword" context="#stay" String="function" beginRegion="functionEndfunction"/>
-        <keyword attribute="Keyword" context="#stay" String="endfunction" endRegion="functionEndfunction"/>
-        <keyword attribute="Keyword" context="#stay" String="task" beginRegion="taskEndtask"/>
-        <keyword attribute="Keyword" context="#stay" String="endtask" endRegion="taskEndtask"/>
-        <keyword attribute="Keyword" context="#stay" String="generate" beginRegion="generateEndgenerate"/>
-        <keyword attribute="Keyword" context="#stay" String="endgenerate" endRegion="generateEndgenerate"/>
-        <keyword attribute="Keyword" context="#stay" String="interface" beginRegion="interfaceEndinterface"/>
-        <keyword attribute="Keyword" context="#stay" String="endinterface" endRegion="interfaceEndinterface"/>
-        <keyword attribute="Keyword" context="#stay" String="program" beginRegion="programEndprogram"/>
-        <keyword attribute="Keyword" context="#stay" String="endprogram" endRegion="programEndprogram"/>
-        <keyword attribute="Keyword" context="#stay" String="class" beginRegion="classEndclass"/>
-        <keyword attribute="Keyword" context="#stay" String="endclass" endRegion="classEndclass"/>
-        <keyword attribute="Keyword" context="#stay" String="package" beginRegion="packageEndpackage"/>
-        <keyword attribute="Keyword" context="#stay" String="endpackage" endRegion="packageEndpackage"/>
-        <keyword attribute="Keyword" context="#stay" String="randcase" beginRegion="caseEndcase"/>
+        <!--
+          Folding, in the KDE keyword-list idiom that KSyntaxHighlighting 6.24
+          actually understands (task T45): the previous `<keyword String="module"/>`
+          form was resolved as a keyword-LIST name, failed with
+          "Unknown keyword list", and produced ZERO folding regions. The fold words
+          now live in two lists referenced by name:
+            veditFoldBegin: module, interface, program, class, package, generate,
+                            function, task, case, casex, casez, randcase, begin
+            veditFoldEnd:   endmodule, endinterface, endprogram, endclass,
+                            endpackage, endgenerate, endfunction, endtask,
+                            endcase, end
+          One region name; the begin/end events are counted, so nesting balances.
+        -->
+        <keyword attribute="Keyword" context="#stay" String="veditFoldBegin" beginRegion="veditFold"/>
+        <keyword attribute="Keyword" context="#stay" String="veditFoldEnd" endRegion="veditFold"/>
 
         <keyword attribute="Keyword" context="#stay" String="keywords"/>
 
