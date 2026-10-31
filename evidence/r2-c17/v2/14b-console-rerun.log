@@ -1,0 +1,164 @@
+== 00 environment ==
+date: 2026-10-31T03:52:35Z
+image: vprobe-qt6kf6:1
+cmake: cmake version 4.2.3
+compiler: c++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+qt: 6.10.2
+image tag: vprobe-qt6kf6:1 (image id captured host-side, see 00-image-id.txt)
+KF6TextEditor version: set(PACKAGE_VERSION "6.24.0")
+kf6 packages:
+  libkf6syntaxhighlighting-data 6.24.0-0ubuntu1
+  libkf6syntaxhighlighting-dev:amd64 6.24.0-0ubuntu1
+  libkf6syntaxhighlighting6:amd64 6.24.0-0ubuntu1
+  libkf6texteditor-bin 6.24.0-0ubuntu1
+  libkf6texteditor-data 6.24.0-0ubuntu1
+  libkf6texteditor-dev 6.24.0-0ubuntu1
+  libkf6texteditor-katepart 6.24.0-0ubuntu1
+  libkf6texteditor6:amd64 6.24.0-0ubuntu1
+katepart plugin: /usr/lib/x86_64-linux-gnu/qt6/plugins/kf6/parts/katepart.so
+installed KTextEditor public headers: 25 files
+installed folding-related public API symbols (grep -c fold):
+  /usr/include/KF6/KTextEditor/ktexteditor/view.h
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h
+  total header files mentioning folding: 2
+host-side range/attribute API (installed header evidence):
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h:46: * auto* movingRange = aDocument->newMovingRange(range);
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h:124: * auto range = doc->newMovingRange(KTextEditor::Range(3, 5, 3, 14));
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h:299:    virtual const Attribute::Ptr &attribute() const = 0;
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h:309:    virtual void setAttribute(Attribute::Ptr attribute) = 0;
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h:324:    virtual void setAttributeOnlyForViews(bool onlyForViews) = 0;
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h:359:    virtual qreal zDepth() const = 0;
+  /usr/include/KF6/KTextEditor/ktexteditor/document.h:202: * Use newMovingCursor() to create a new moving cursor and newMovingRange() to create
+  /usr/include/KF6/KTextEditor/ktexteditor/document.h:1489:    virtual MovingRange *newMovingRange(Range range,
+definition/theme embedding statement (installed Repository header):
+  65: * All highlighting Definition and Theme files are compiled into the shared
+external verilog.xml definitions in /usr/share: 0
+== 01 build ==
+-- KTextEditor include dirs: 
+-- KTextEditor version:      6.24.0
+-- KSyntaxHighlighting:      6.24.0
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: /work/probes/c17-overlay/build
+ninja: no work to do.
+[build exit=0]
+== 02 run under Xvfb ==
+HOME=/tmp/c17-home (empty: no custom syntax definitions installed)
+INFO qt=6.10.2
+INFO platform=xcb
+CHECK editor.instance.available PASS
+
+== phase A: overlay rendering + attribute query ==
+kf.sonnet.core: Sonnet: No speller backends available!
+INFO highlightingModes=None,G-Code,GLSL,Klipper Config,Klipper G-Code,OpenSCAD,PLY,POV-Ray,RenderMan RIB,STL,VRML,Wavefront OBJ,ARM Assembler,Asm6502,AVR Assembler,Common Intermediate Language (CIL),GNU Assembler,Intel x86 (FASM),Intel x86 (NASM),MIPS Assembler,Motorola 68k (VASM/Devpac),Motorola DSP56k,PicAsm,.desktop,Adblock Plus,Apache Configuration,Cabal,Cisco,Doxyfile,fstab,Git Ignore,Gitolite,Hjson,INI Files,Jsonnet,Kate Config,Kconfig,kdesrc-buildrc,mergetag text,Nagios,NFTables,nginx Configuration,QDoc Configuration,systemd unit,TOML,Varnish Configuration Language,Varnish Test Case language,WINE Config,x.org Configuration,XKeyboardConfig,4GL,4GL-PER,LDIF,progress,SPARQL,SQL,SQL (MySQL),SQL (Oracle),SQL (PostgreSQL),AHDL,Spice,SystemC,SystemVerilog,Vera,Verilog,VHDL,AppArmor Security Profile,AsciiDoc,ASN.1,ASP,BibTeX,CartoCSS MML,CartoCSS MSS,CleanCSS,ColdFusion,ConTeXt,CSS,Cucumber Gherkin feature,D2,Django HTML Template,Doxygen,DoxygenLua,DTD,Fluent,FTL,Gemtext,GlossTex,GNU Gettext,GTK Blueprint,Haml,Hamlet,HTML,Javadoc,Jira,JSON,JSON5,JSONC,JSP,LaTeX,LaTeX Log File,LESSCSS,MAB-DB,Mako,MapCSS,Markdown,MediaWiki,Metapost/Metafont,Mustache/Handlebars (HTML),Org Mode,Pango,PostScript,PostScript Printer Description,Pug,Quarto,R documentation,R Markdown,RELAX NG,RelaxNG-Compact,reStructuredText,Rich Text Format,Roff,Ruby/Rails/RHTML,SASS,SCSS,SGML,SiSU,Texinfo,Textile,Troff Mandoc,TT2,Twig/Twig,txt2tags,Typst,vCard, vCalendar, iCalendar,Vue,Wesnoth Markup Language,XHTML,XML,XML (Debug),xslt,XUL,YAML,YANG,ABC,Alerts,ChangeLog,CMake,Comments,CSS/PHP,CSS/Twig,CSV,CSV (pipe),CSV (semicolon),CSV (whitespace),CUE Sheet,Debian Changelog,Debian Control,Devicetree Source (DTS),Diff,Dockerfile,Earthfile,Email,GDB,GDB Backtrace,GDB Init,Git Rebase,GraphQL,Hunspell Affix File,Hunspell Dictionary File,Hunspell Thesaurus File,Hunspell Thesaurus Index File,InnoSetup,Intel HEX,Jam,Java Properties,JavaScript React (JSX)/PHP,JavaScript React (JSX)/Twig,JavaScript/PHP,JavaScript/Twig,Jinja,Jinja/Alerts,Jinja/Bash,Jinja/C++,Jinja/CMake,Jinja/Comments,Jinja/CSS,Jinja/Dockerfile,Jinja/Doxygen,Jinja/GCCExtensions,Jinja/Groovy,Jinja/HTML,Jinja/INI Files,Jinja/ISO C++,Jinja/Java,Jinja/Javadoc,Jinja/JavaScript,Jinja/JavaScript React (JSX),Jinja/JSON,Jinja/Modelines,Jinja/Mustache/Handlebars (HTML),Jinja/Python,Jinja/QMake,Jinja/QML,Jinja/reStructuredText,Jinja/Ruby,Jinja/Rust,Jinja/SPDX-Comments,Jinja/SQL,Jinja/systemd unit,Jinja/Terraform,Jinja/TOML,Jinja/TypeScript,Jinja/XML,Jinja/YAML,Jinja/Zsh,LilyPond,Log File (advanced),Log File (advanced) Selector,Log File (simplified),Log File (simplified) Selector,Logcat,M3U,Makefile,Meson,MIB,Modelines,Music Publisher,Mustache/Handlebars (HTML)/PHP,Ninja,Overpass QL,PGN,QMake,RPM Spec,SELinux File Contexts,Snort/Suricata,SPDX-Comments,Starlark,SubRip Subtitles,TextProto,Tiger,Todo.txt,TSV,TypeScript/PHP,TypeScript/Twig,Valgrind Suppression,Wayland Trace,Web Video Text Tracks,YARA,Ansys,B-Method,dot,FASTQ,GAP,GDL,Gnuplot,Magma,Mathematica,Matlab,Maxima,Mermaid,Metamath,Octave,R Script,Replicode,scilab,Stan,Stata,TI Basic,yacas,4DOS BatchToMemory,AMPLE,AutoHotKey,AWK,Bash,BrightScript,CLIST,CoffeeScript,CubeScript,Elixir/EEx,Elixir/HEEx,Elvish,Erlang,Euphoria,Expect,ferite,Fish,GNU Linker Script,Godot,J,JavaScript,JavaScript React (JSX),JCL,k,LSL,Lua,Mason,MEL,MS-DOS Batch,Nix,NSIS,opsi-script,Perl,PHP (HTML),PHP/PHP,Pig,Pike,PowerShell,Praat,Puppet,Python,q,QFace,QML,Quake Script,Racket,Raku,REXX,Robot,Ruby,Scheme,sed,Sieve,Snakemake,TaskJuggler,Tcl/Tk,Tcsh,Twig (HTML),TypeScript,TypeScript React (TSX),UnrealScript,Velocity,Xonotic Script,Zsh,ABAP,ACPI DSL,ACPI Source Language,ActionScript 2.0,Ada,Agda,ANS-Forth94,ANSI C89,ANTLR,ATS,Bitbake,Boo,C,C#,C++,Cap'n Proto,CashScript,Cg,CGiS,Clipper,Clojure,COBOL,Common Lisp,Component-Pascal,Crack,Crystal,Curry,D,Dart,E Language,Eiffel,Elixir,Elm,FlatBuffers,Fortran (Fixed Format),Fortran (Free Format),FreeBASIC,FreeFEM,FSharp,GCCExtensions,Gleam,GNU M4,Go,GPRBuild,Groovy,Hare,Haskell,Haxe,IDL,Idris,ILERPG,Inform,ISO C++,Java,Java Module,Julia,KBasic,KDev-PG[-Qt] Grammar,Kotlin,Lex/Flex,Literate Curry,Literate Haskell,LLVM,Logtalk,LPC,Modelica,Modula-2,Modula-2 (ISO only),Modula-2 (PIM only),Modula-2 (R10 only),Modula-3,MonoBasic,Nemerle,nesC,Nim,noweb,Objective Caml,Objective Caml Ocamllex,Objective Caml Ocamlyacc,Objective-C,Objective-C++,Odin,OORS,OPAL,OpenCL,Pascal,PL/I,Pony,Prolog,Protobuf,Pure,PureBasic,PureScript,RapidQ,RenPy,RETRO,RSI IDL,Rust,Sather,Scala,SELinux CIL Policy,SELinux Policy,Smali,SML,Solidity,Swift,TADS 3,Terraform,TLA+,toit,V,Vala,Varnish module spec file,Viper,xHarbour,Yacc/Bison,Zig,Zonnon
+INFO highlightingMode=Verilog
+INFO editor.commands=85 commands=reload-scripts,emmetExpand,emmetWrap,emmetSelectTagPairInwards,emmetSelectTagPairOutwards,emmetMatchingPair,emmetToggleComment,emmetNext,emmetPrev,emmetSelectNext,emmetSelectPrev,emmetDelete,emmetSplitJoinTab,emmetEvaluateMathExpression,emmetDecrementNumberBy1,emmetDecrementNumberBy10,emmetDecrementNumberBy01,emmetIncrementNumberBy1,emmetIncrementNumberBy10,emmetIncrementNumberBy01,jumpIndentUp,ju
+INFO base_keyword_color=#3090d0 baseline_colored_px=1238
+INFO overlay_band=(1,14px)
+MEASURE overlay_foreground_px=71
+MEASURE overlay_background_px=325
+MEASURE baseline_band_colored_px=183
+MEASURE baseline_band_near_base_color_px=30
+MEASURE overlay_band_base_keyword_px=12
+MEASURE overlay_band_overlay_foreground_px=71
+CHECK overlay.foreground.rendered PASS
+CHECK overlay.background.rendered PASS
+CHECK overlay.foreground.inside.band PASS
+CHECK overlay.replaces.base.foreground PASS
+CHECK query.range.attribute.identity PASS
+CHECK query.range.start PASS
+CHECK query.range.end.column PASS
+CHECK query.range.zdepth PASS
+CHECK query.range.attribute.name PASS
+MEASURE restored_band_base_keyword_px=30
+MEASURE restored_band_overlay_foreground_px=0
+INFO restored_band_dominant_color=#3070b0 saturated_px=183
+CHECK overlay.removal.restores.base.foreground PASS
+CHECK overlay.removal.leaves.no.overlay.colour PASS
+CHECK query.range.moves.with.document PASS
+CHECK query.range.attribute.survives.edit PASS
+CHECK query.range.text.after.edit PASS
+
+== phase A2: semantic attributes (theme-resolved vs Theme::TextStyle hint) ==
+INFO embedded_definitions=451 embedded_themes=30 verilog_loaded=yes
+INFO theme_style_distance style=1 color=#1f1c1b distance=0
+INFO theme_style_distance style=21 color=#898887 distance=322
+INFO theme_style_distance style=2 color=#644a9b distance=243
+INFO theme_style_distance style=17 color=#b08000 distance=272
+INFO theme_style_distance style=12 color=#bf0303 distance=209
+INFO chosen_text_style=21 distance_from_normal=322
+MEASURE semantic_text_band_colored_px_baseline=347
+MEASURE semantic_text_band_colored_px_defaultstyle_hint=347
+MEASURE semantic_text_band_colored_px_theme_resolved=212
+INFO theme_keyword_color=#898887
+MEASURE semantic_theme_resolved_exact_color_px=87
+INFO defaultstyle_hint_alone_effective=no
+CHECK semantic.defaultstyle_hint.queryable PASS
+CHECK semantic.theme_resolved_colors.range PASS
+
+== phase A3: attribute range cap per line ==
+MEASURE cap_test_1000_ranges_marker_px=103568
+MEASURE cap_test_1100_ranges_marker_px=0
+CHECK cap.ranges.render.below.limit PASS
+CHECK cap.ranges.silently.drop.above.limit PASS
+
+== phase B: per-frame injection cost, doc lines=120000 mode=None steps=200 step_lines=3 ==
+MEASURE document_load_ms=60 lines=120001
+CHECK bigdoc.at.least.100k.lines PASS
+MEASURE grab_baseline_no_overlay n=200 p50_us=1616.26 p95_us=2167.8 mean_us=1671.38 min_us=1218.74 max_us=4527.09
+INFO strategy=full_recreate_per_line visible_lines_avg=62 scroll_moved_steps=200/200
+MEASURE full_recreate_per_line.inject n=200 p50_us=18.31 p95_us=28.85 mean_us=19.7359 min_us=11.803 max_us=36.5
+MEASURE full_recreate_per_line.inject_plus_grab n=200 p50_us=1904.97 p95_us=2332.55 mean_us=1972.13 min_us=1754.41 max_us=3090.14
+MEASURE full_recreate_per_line.grab_with_overlay n=200 p50_us=1883.55 p95_us=2314.91 mean_us=1952.4 min_us=1737.52 max_us=3068.51
+MEASURE full_recreate_per_token.inject n=200 p50_us=69.659 p95_us=122.853 mean_us=76.6049 min_us=47.03 max_us=143.495
+MEASURE full_recreate_per_token.grab_with_overlay n=200 p50_us=2135.63 p95_us=2530.57 mean_us=2188.43 min_us=1881.28 max_us=2720.42
+INFO strategy=incremental_pool pool_size=62
+MEASURE incremental_pool.inject n=200 p50_us=8.922 p95_us=19.7475 mean_us=10.9955 min_us=5.4 max_us=26.461
+MEASURE incremental_pool.grab_with_overlay n=200 p50_us=1817.21 p95_us=2301.98 mean_us=1857.16 min_us=1458.7 max_us=3155.81
+
+RESULT=PASS failures=0
+[run exit=0]
+== 02b run again with Verilog base highlighting active (paint cost with both layers) ==
+INFO qt=6.10.2
+INFO platform=xcb
+CHECK editor.instance.available PASS
+
+== phase B: per-frame injection cost, doc lines=120000 mode=Verilog steps=120 step_lines=3 ==
+kf.sonnet.core: Sonnet: No speller backends available!
+MEASURE document_load_ms=79 lines=120001
+CHECK bigdoc.at.least.100k.lines PASS
+MEASURE grab_baseline_no_overlay n=120 p50_us=1771.83 p95_us=2183.2 mean_us=1891.77 min_us=1597.69 max_us=9566.98
+INFO strategy=full_recreate_per_line visible_lines_avg=62 scroll_moved_steps=120/120
+MEASURE full_recreate_per_line.inject n=120 p50_us=18.455 p95_us=25.4122 mean_us=19.5284 min_us=9.869 max_us=35.659
+MEASURE full_recreate_per_line.inject_plus_grab n=120 p50_us=2557.35 p95_us=2967.58 mean_us=2605.53 min_us=2342.1 max_us=3189.8
+MEASURE full_recreate_per_line.grab_with_overlay n=120 p50_us=2534.44 p95_us=2947.56 mean_us=2586 min_us=2328.06 max_us=3167.32
+MEASURE full_recreate_per_token.inject n=120 p50_us=77.178 p95_us=111.91 mean_us=81.0881 min_us=57.521 max_us=149.647
+MEASURE full_recreate_per_token.grab_with_overlay n=120 p50_us=2816.31 p95_us=3276.6 mean_us=2867.98 min_us=2617.2 max_us=3500.79
+INFO strategy=incremental_pool pool_size=62
+MEASURE incremental_pool.inject n=120 p50_us=6.8935 p95_us=16.3551 mean_us=8.96469 min_us=4.068 max_us=30.228
+MEASURE incremental_pool.grab_with_overlay n=120 p50_us=2507.09 p95_us=2980.27 mean_us=2536.03 min_us=2182.88 max_us=3810.57
+
+RESULT=PASS failures=0
+[run perf-mode Verilog exit=0]
+== 03 screenshots ==
+-rw-r--r-- 1 root root   7895 Oct 31 03:52 /work/evidence/r2-c17/v2/rerun/10-baseline-verilog.png
+-rw-r--r-- 1 root root   7940 Oct 31 03:52 /work/evidence/r2-c17/v2/rerun/11-overlay-rendered.png
+-rw-r--r-- 1 root root   9100 Oct 31 03:52 /work/evidence/r2-c17/v2/rerun/12-overlay-after-edit.png
+-rw-r--r-- 1 root root   7895 Oct 31 03:52 /work/evidence/r2-c17/v2/rerun/12b-overlay-removed.png
+-rw-r--r-- 1 root root   6252 Oct 31 03:52 /work/evidence/r2-c17/v2/rerun/13a-semantic-defaultstyle-hint.png
+-rw-r--r-- 1 root root   6226 Oct 31 03:52 /work/evidence/r2-c17/v2/rerun/13b-semantic-theme-resolved.png
+-rw-r--r-- 1 root root  62355 Oct 31 03:52 /work/evidence/r2-c17/v2/rerun/14-1000-ranges-per-line.png
+-rw-r--r-- 1 root root  64102 Oct 31 03:52 /work/evidence/r2-c17/v2/rerun/15-1100-ranges-per-line.png
+-rw-r--r-- 1 root root 260105 Oct 31 03:52 /work/evidence/r2-c17/v2/rerun/20-bigdoc-overlay-Verilog.png
+-rw-r--r-- 1 root root 261492 Oct 31 03:52 /work/evidence/r2-c17/v2/rerun/20-bigdoc-overlay-plain.png
+b3f5465b633c6b0789a514633c10dc08851a07ba872f77cf1017cf7472b9e1be  /work/evidence/r2-c17/v2/rerun/10-baseline-verilog.png
+c868e7bb9064eccb9a88cd7574da267f1fc6498f9a76c57bc42d00c588d7db39  /work/evidence/r2-c17/v2/rerun/11-overlay-rendered.png
+80a7da8ce67e43ab4d8183d31855e6e14744e48858fe4f6fceebb03ccf7678b5  /work/evidence/r2-c17/v2/rerun/12-overlay-after-edit.png
+b3f5465b633c6b0789a514633c10dc08851a07ba872f77cf1017cf7472b9e1be  /work/evidence/r2-c17/v2/rerun/12b-overlay-removed.png
+8cb02769a15785fd2343d3f086f13a75bcfdc363ee36ecf49b89a2324c6c2d9c  /work/evidence/r2-c17/v2/rerun/13a-semantic-defaultstyle-hint.png
+8718c910463f3555a83c88345025db4f3cdeb639c0e57b263de91eb37abcf115  /work/evidence/r2-c17/v2/rerun/13b-semantic-theme-resolved.png
+199ec7303039a2a1ccb923e666d21c1e9ca14ad91a86ee9d38c59a718b71c644  /work/evidence/r2-c17/v2/rerun/14-1000-ranges-per-line.png
+e63e12c5e8632dafd3a49e1c4b4c5646876a2a3d808d27689be8189f77368853  /work/evidence/r2-c17/v2/rerun/15-1100-ranges-per-line.png
+b1d46c196ca0de82e3d6c652fafead10e76ca40023dbd647a7c63bd2d40c1e83  /work/evidence/r2-c17/v2/rerun/20-bigdoc-overlay-Verilog.png
+43596a3af02458a8e14eff162a0b3cb3bed0d4ca5a31ca39a4f65e48eea24bad  /work/evidence/r2-c17/v2/rerun/20-bigdoc-overlay-plain.png
+== RESULT: failures=0 ==

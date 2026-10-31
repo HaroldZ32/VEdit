@@ -1,0 +1,3 @@
+## whitelist fixture (plain XML, loaded through addCustomSearchPath)
+7199e3677b0a942e65b40f95cb2481be062b1ca48eb048519e7d4efc098f5970  /vedit-build/target/ksh-selfbuild/F1/whitelist/syntax/verilog.xml
+<language name="Verilog" version="8" kateversion="5.0" section="Hardware" extensions="*.v;*.V;*.vl" mimetype="text/x-verilog-src" author="Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)" license="">

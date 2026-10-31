@@ -1,0 +1,155 @@
+UpdateCTestConfiguration  from :/vedit-build/target/qt6-build/DartConfiguration.tcl
+Test project /vedit-build/target/qt6-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 5
+    Start 5: vedit-workspace-palette-selftest
+
+5: Test command: /vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-selftest "--screenshots" "/vedit-build/target/qt6-build/src/app/workspace-lane-palette/screenshots"
+5: Working Directory: /vedit-build/target/qt6-build/src/app/workspace-lane-palette
+5: Environment variables: 
+5:  QT_QPA_PLATFORM=offscreen
+5:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime
+5: Test timeout computed to be: 120
+5: CHECK fixture.temp-dir PASS
+5: CHECK fuzzy.main-ranks-basename-first PASS
+5: CHECK fuzzy.basename-beats-directory PASS
+5: CHECK fuzzy.subsequence PASS
+5: CHECK fuzzy.positions PASS
+5: CHECK fuzzy.case-insensitive PASS
+5: CHECK fuzzy.no-match PASS
+5: CHECK fuzzy.empty-query-keeps-order PASS
+5: CHECK fuzzy.limit PASS
+5: CHECK index.scan PASS
+5: CHECK index.scan-four-files PASS
+5: CHECK index.display-sorted PASS
+5: CHECK index.hidden-skipped PASS
+5: CHECK index.ignored-dir-skipped PASS
+5: CHECK index.basenames PASS
+5: CHECK index.cached-scan PASS
+5: CHECK index.no-rescan PASS
+5: CHECK index.no-change-on-cached-scan PASS
+5: CHECK index.add-file PASS
+5: CHECK index.remove-file PASS
+5: CHECK index.incremental-no-scan PASS
+5: CHECK index.publish-no-scan PASS
+5: CHECK index.publish-sorted PASS
+5: CHECK index.max-files PASS
+5: CHECK palette-fixture.scan PASS
+5: This plugin does not support raise()
+5: This plugin does not support grabbing the keyboard
+5: This plugin does not support raise()
+5: CHECK palette.opens PASS
+5: CHECK palette.lists-all PASS
+5: CHECK palette.status-shows-total PASS
+5: CHECK palette.filters PASS
+5: CHECK palette.filter-under-200ms PASS
+5: CHECK palette.empty-state PASS
+5: CHECK palette.enter-opens PASS
+5: CHECK palette.enter-closes PASS
+5: This plugin does not support raise()
+5: This plugin does not support grabbing the keyboard
+5: This plugin does not support raise()
+5: CHECK palette.typing-filters PASS
+5: CHECK palette.escape-closes PASS
+5: This plugin does not support raise()
+5: This plugin does not support grabbing the keyboard
+5: This plugin does not support raise()
+5: CHECK palette.arrow-selects PASS
+5: CHECK palette.arrow-enter-opens PASS
+5: This plugin does not support raise()
+5: This plugin does not support grabbing the keyboard
+5: This plugin does not support raise()
+5: CHECK palette.no-project-empty-state PASS
+5: CHECK index.synthetic-10000 PASS
+5: This plugin does not support raise()
+5: This plugin does not support grabbing the keyboard
+5: This plugin does not support raise()
+5: CHECK palette.10k-opens PASS
+5: MEASURE palette.query=m micros=1004 results=100
+5: MEASURE palette.query=ma micros=994 results=100
+5: MEASURE palette.query=mai micros=818 results=100
+5: MEASURE palette.query=main micros=909 results=100
+5: MEASURE palette.query=cmd micros=1075 results=100
+5: MEASURE palette.query=pal micros=965 results=100
+5: MEASURE palette.query=src micros=1608 results=100
+5: MEASURE palette.query=zzzz micros=834 results=0
+5: CHECK palette.10k-keystroke-under-200ms PASS
+5: MEASURE palette.10k-worst-micros=1608
+5: CHECK palette.10k-results-nonempty PASS
+5: CHECK palette.10k-empty-state PASS
+5: CHECK palette.10k-never-scans-disk PASS
+5: This plugin does not support raise()
+5: This plugin does not support grabbing the keyboard
+5: This plugin does not support raise()
+5: SCREENSHOT OK /vedit-build/target/qt6-build/src/app/workspace-lane-palette/screenshots/10-palette-filter.png
+5: SCREENSHOT OK /vedit-build/target/qt6-build/src/app/workspace-lane-palette/screenshots/11-palette-empty-state.png
+5: This plugin does not support raise()
+5: This plugin does not support raise()
+5: SCREENSHOT OK /vedit-build/target/qt6-build/src/app/workspace-lane-palette/screenshots/12-palette-no-project.png
+5: This plugin does not support raise()
+5: This plugin does not support raise()
+5: SCREENSHOT OK /vedit-build/target/qt6-build/src/app/workspace-lane-palette/screenshots/13-palette-project.png
+5: This plugin does not support grabbing the keyboard
+5: PALETTE-SELFTEST ok=1 checks=44 failures=0
+1/2 Test #5: vedit-workspace-palette-selftest ...............   Passed    0.09 sec
+test 6
+    Start 6: vedit-workspace-palette-integration-selftest
+
+6: Test command: /vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-integration-selftest "--screenshots" "/vedit-build/target/qt6-build/src/app/workspace-lane-palette/integration-screenshots"
+6: Working Directory: /vedit-build/target/qt6-build/src/app/workspace-lane-palette
+6: Environment variables: 
+6:  QT_QPA_PLATFORM=offscreen
+6:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime
+6: Test timeout computed to be: 120
+6: CHECK fixture.temp-dir PASS
+6: This plugin does not support propagateSizeHints()
+6: CHECK integration.installed PASS
+6: CHECK integration.command-registered PASS
+6: CHECK integration.command-in-registry PASS
+6: CHECK integration.action PASS
+6: CHECK integration.shortcut-ctrl-p PASS
+6: CHECK integration.in-file-menu PASS
+6: CHECK integration.idempotent PASS
+6: palette: indexed 4 files under /tmp/vedit-palette-integration-selftest-ooskVH/project in 0 ms
+6: This plugin does not support raise()
+6: This plugin does not support grabbing the keyboard
+6: This plugin does not support raise()
+6: CHECK integration.ctrl-p-opens PASS
+6: CHECK integration.index-count PASS
+6: CHECK integration.hidden-skipped PASS
+6: CHECK integration.filters PASS
+6: CHECK integration.enter-closes PASS
+6: CHECK integration.enter-opened PASS
+6: CHECK integration.demo-editor PASS
+6: CHECK integration.demo-content PASS
+6: CHECK integration.demo-property PASS
+6: This plugin does not support raise()
+6: This plugin does not support grabbing the keyboard
+6: This plugin does not support raise()
+6: CHECK integration.second-open PASS
+6: CHECK integration.single-scan PASS
+6: This plugin does not support raise()
+6: This plugin does not support grabbing the keyboard
+6: This plugin does not support raise()
+6: CHECK integration.empty-state PASS
+6: SCREENSHOT OK /vedit-build/target/qt6-build/src/app/workspace-lane-palette/integration-screenshots/20-integration-empty.png
+6: SCREENSHOT OK /vedit-build/target/qt6-build/src/app/workspace-lane-palette/integration-screenshots/21-integration-palette.png
+6: SCREENSHOT OK /vedit-build/target/qt6-build/src/app/workspace-lane-palette/integration-screenshots/22-integration-shell.png
+6: CHECK integration.shortcut-store PASS
+6: CHECK integration.rebinding PASS
+6: CHECK integration.rebinding-restored PASS
+6: INTEGRATION-SELFTEST ok=1 checks=23 failures=0
+2/2 Test #6: vedit-workspace-palette-integration-selftest ...   Passed    0.08 sec
+
+The following tests passed:
+	vedit-workspace-palette-selftest
+	vedit-workspace-palette-integration-selftest
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.17 sec

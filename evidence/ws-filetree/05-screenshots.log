@@ -1,0 +1,39 @@
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+filetree: The folder '/vedit-build/target/ws-filetree-tmp/denied' cannot be read (permission denied).
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+filetree: The folder '/vedit-build/target/ws-filetree-tmp/does-not-exist' does not exist.
+This plugin does not support propagateSizeHints()
+SCREENSHOT ok=1 /vedit-build/evidence/ws-filetree/screenshots/10-file-tree-open.png size=560x720
+SCENARIO open root=/vedit-build/target/ws-filetree-tmp/project rows=5 status="top.v - Verilog"
+KIND top.v=verilog(Verilog) alu.sv=systemverilog(SystemVerilog) filelist.f=filelist(File list)
+OPEN-REQUEST path=/vedit-build/target/ws-filetree-tmp/project/rtl/alu.sv
+SCREENSHOT ok=1 /vedit-build/evidence/ws-filetree/screenshots/11-created-file.png size=560x720
+DISK-CREATE path=/vedit-build/target/ws-filetree-tmp/project/rtl entries=5 [alu.sv,defs.vh,new_module.v,sub,top.v]
+TREE-CREATE path=/vedit-build/target/ws-filetree-tmp/project/rtl entries=5 [alu.sv,defs.vh,new_module.v,sub,top.v]
+OP create ok=1 status="Created file 'new_module.v' (Verilog)"
+SCREENSHOT ok=1 /vedit-build/evidence/ws-filetree/screenshots/12-renamed-file.png size=560x720
+DISK-RENAME path=/vedit-build/target/ws-filetree-tmp/project/rtl entries=5 [alu.sv,defs.vh,renamed_module.v,sub,top.v]
+TREE-RENAME path=/vedit-build/target/ws-filetree-tmp/project/rtl entries=5 [alu.sv,defs.vh,renamed_module.v,sub,top.v]
+OP rename old_gone=1 new_present=1 status="Renamed 'new_module.v' to 'renamed_module.v'"
+SCREENSHOT ok=1 /vedit-build/evidence/ws-filetree/screenshots/13-deleted-file.png size=560x720
+DISK-DELETE path=/vedit-build/target/ws-filetree-tmp/project/rtl entries=4 [alu.sv,defs.vh,sub,top.v]
+TREE-DELETE path=/vedit-build/target/ws-filetree-tmp/project/rtl entries=4 [alu.sv,defs.vh,sub,top.v]
+OP delete gone_from_disk=1 status="Deleted 'renamed_module.v'"
+SCREENSHOT ok=1 /vedit-build/evidence/ws-filetree/screenshots/14-empty-folder.png size=560x720
+EMPTY-STATE kind=empty text="This folder is empty." visible=1
+SCREENSHOT ok=1 /vedit-build/evidence/ws-filetree/screenshots/15-permission-denied.png size=560x720
+EMPTY-STATE kind=denied text="Cannot read folder 'denied': permission denied." visible=1
+SCREENSHOT ok=1 /vedit-build/evidence/ws-filetree/screenshots/16-large-folder-lazy.png size=560x720
+LAZY open_ms=67 rows_loaded=1250 can_fetch_more=1 scanned_dirs=1
+LAZY fully_loaded rows=10000 total_ms=196 scanned_dirs=1
+SCREENSHOT ok=1 /vedit-build/evidence/ws-filetree/screenshots/17-missing-folder.png size=560x720
+EMPTY-STATE kind=missing text="The folder does not exist: 'does-not-exist'" visible=1
+FILETREE-DEMO ok=1 dir=/vedit-build/evidence/ws-filetree/screenshots

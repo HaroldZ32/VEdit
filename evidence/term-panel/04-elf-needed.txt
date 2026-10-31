@@ -1,0 +1,26 @@
+## file
+target/term-build/vedit-terminal-selftest: ELF 64-bit LSB pie executable, x86-64, version 1 (GNU/Linux), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=70d1f426905cc2bbbd130df757dad11c6dba90ba, for GNU/Linux 3.2.0, with debug_info, not stripped
+
+## NEEDED
+ 0x0000000000000001 (NEEDED)             Shared library: [libQt6Widgets.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libQt6Gui.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libQt6Core.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+
+## no Qt network library may appear here (contract (c): local only)
+OK: libQt6Network is not linked
+
+## libraries resolved at build time
+	libQt6Widgets.so.6 => /usr/lib/x86_64-linux-gnu/libQt6Widgets.so.6 (0x00007b7b782ab000)
+	libQt6Gui.so.6 => /usr/lib/x86_64-linux-gnu/libQt6Gui.so.6 (0x00007b7b77a61000)
+	libQt6Core.so.6 => /usr/lib/x86_64-linux-gnu/libQt6Core.so.6 (0x00007b7b7747c000)
+	libstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007b7b771dc000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007b7b76f8b000)
+	libQt6DBus.so.6 => /usr/lib/x86_64-linux-gnu/libQt6DBus.so.6 (0x00007b7b76a9c000)
+
+## sha256
+15cedef77dde9012d9918c4e92378ef4976395a8080113db64da5c4b17e6b5d3  target/term-build/vedit-terminal-selftest
+d1905ed6ff1a847135132ec079a4ebbd4657062e77b29725d8f97067d433aa28  target/term-build/libvedit_terminal.a
+elf-check exit: 0 (the FAIL branch above would have printed FAIL)

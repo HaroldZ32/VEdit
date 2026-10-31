@@ -1,0 +1,33 @@
+[bench] container: PRETTY_NAME="Ubuntu 26.04.1 LTS", cmake 4.2.3, g++ 15
+[bench] configure palette lane standalone (target/, git-ignored)
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /vedit-build/target/ws-palette-bench-build
+ninja: no work to do.
+[bench] fixture: /vedit-build/target/ws-palette-bench-fixture
+[bench] run: files=10000 iterations=200 limit=100 budget=200ms
+BENCH SCAN files=10000 cold_ms=22 cached_ms=0 scan_count=1
+BENCH CORE q=m median_ms=0.820 p95_ms=0.978 max_ms=1.122
+BENCH GUI  q=m median_ms=0.903 p95_ms=1.031 max_ms=1.224
+BENCH CORE q=ma median_ms=0.791 p95_ms=0.948 max_ms=1.464
+BENCH GUI  q=ma median_ms=0.890 p95_ms=0.978 max_ms=1.183
+BENCH CORE q=mai median_ms=0.634 p95_ms=0.756 max_ms=1.197
+BENCH GUI  q=mai median_ms=0.736 p95_ms=0.822 max_ms=1.007
+BENCH CORE q=main median_ms=0.635 p95_ms=0.734 max_ms=0.942
+BENCH GUI  q=main median_ms=0.740 p95_ms=0.799 max_ms=1.071
+BENCH CORE q=cmd median_ms=0.856 p95_ms=0.984 max_ms=1.240
+BENCH GUI  q=cmd median_ms=0.958 p95_ms=1.067 max_ms=1.346
+BENCH CORE q=pal median_ms=0.744 p95_ms=0.916 max_ms=1.091
+BENCH GUI  q=pal median_ms=0.845 p95_ms=0.908 max_ms=1.200
+BENCH CORE q=src median_ms=1.305 p95_ms=1.453 max_ms=2.291
+BENCH GUI  q=src median_ms=1.404 p95_ms=1.497 max_ms=1.705
+BENCH CORE q=widget median_ms=0.652 p95_ms=0.790 max_ms=0.969
+BENCH GUI  q=widget median_ms=0.759 p95_ms=0.880 max_ms=1.073
+BENCH CORE q=file_index median_ms=0.662 p95_ms=0.830 max_ms=0.974
+BENCH GUI  q=file_index median_ms=0.777 p95_ms=0.953 max_ms=1.045
+BENCH CORE q=zzzz median_ms=0.599 p95_ms=0.724 max_ms=0.949
+BENCH GUI  q=zzzz median_ms=0.623 p95_ms=0.687 max_ms=0.887
+BENCH CORE overall median_ms=0.739 p95_ms=1.305 max_ms=2.291
+BENCH GUI  overall median_ms=0.838 p95_ms=1.404 max_ms=1.705
+BENCH VERDICT PASS p95_ms=1.404 budget_ms=200.000 files=10000 source=disk
+BENCH JSON /vedit-build/evidence/ws-palette/bench.json

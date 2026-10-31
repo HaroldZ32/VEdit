@@ -1,0 +1,8 @@
+## command: readelf -d target/qt6-build/src/app/vedit-app | grep -E 'KTextEditor|tree-sitter' | wc -l   (SEAM §5.3: must be 0)
+0
+## exit: 0
+
+## command: strings vedit-app | grep -F 'No project root' (panel really linked into the app)
+No project root.
+No project root. Open a project to search its files.
+## exit: 0

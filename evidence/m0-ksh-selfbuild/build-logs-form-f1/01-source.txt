@@ -1,0 +1,4 @@
+/vedit-build/target/ksh-selfbuild/F1/syntax-highlighting-6.24.0.tar.xz: OK
+url=https://download.kde.org/stable/frameworks/6.24/syntax-highlighting-6.24.0.tar.xz
+tag=v6.24.0 commit=bbea2326fbd4fc720518efc43f1b018f8a7d0670 version=6.24.0
+061c5946dc6170ecfa91b9c7d4faa5ec81eb53bb5f86eda861c2ce748a65486d  /vedit-build/target/ksh-selfbuild/F1/syntax-highlighting-6.24.0.tar.xz

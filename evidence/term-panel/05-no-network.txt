@@ -1,0 +1,21 @@
+## source: no socket / network API anywhere in src/terminal
+OK: no socket or network API in src/terminal (exit 1 from grep means no match)
+
+## binary: our code imports no network syscall (undefined symbols)
+OK: none of socket/bind/listen/connect/accept/getaddrinfo/gethostbyname is imported
+
+## binary: the pty calls it does import (positive control for the check above)
+                 U execve@GLIBC_2.2.5
+                 U fork@GLIBC_2.2.5
+                 U grantpt@GLIBC_2.2.5
+                 U ioctl@GLIBC_2.2.5
+                 U posix_openpt@GLIBC_2.2.5
+                 U ptsname@GLIBC_2.2.5
+                 U setsid@GLIBC_2.2.5
+                 U unlockpt@GLIBC_2.2.5
+                 U waitpid@GLIBC_2.2.5
+
+## network namespace run (self-check must pass with no interfaces at all)
+unshare -n / -Urn not permitted in this container (no CAP_SYS_ADMIN and no user-namespace creation);
+the source grep, the ELF NEEDED list and the undefined-symbol check above stand on their own
+no-network-check exit: 0 (the FAIL branch above would have printed FAIL)

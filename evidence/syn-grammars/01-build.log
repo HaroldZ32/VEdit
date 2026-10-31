@@ -1,0 +1,149 @@
+== configure+build none ==
+-- The C compiler identification is GNU 15.2.0
+-- The CXX compiler identification is GNU 15.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found PkgConfig: /usr/bin/pkg-config (found version "2.5.1")
+-- Checking for module 'tree-sitter=0.25.9'
+--   Found tree-sitter, version 0.25.9
+-- syn-grammars: compiled grammar id='none' verilog=0 systemverilog=0
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /vedit-build/target/syn-grammars/none
+[1/13] Building C object provider/CMakeFiles/vedit_syntax_test_fixture_grammar.dir/tests/fixture/parser.c.o
+[2/13] Linking C static library provider/libvedit_syntax_test_fixture_grammar.a
+[3/13] Building CXX object CMakeFiles/vedit_syntax_grammars.dir/bindings.cpp.o
+[4/13] Building CXX object provider/CMakeFiles/vedit_syntax_provider.dir/disabled_provider.cpp.o
+[5/13] Building CXX object provider/CMakeFiles/vedit_syntax_provider_tests.dir/tests/fixture/fixture_binding.cpp.o
+[6/13] Building CXX object provider/CMakeFiles/vedit_syntax_provider.dir/syntax_service.cpp.o
+[7/13] Building CXX object provider/CMakeFiles/vedit_syntax_provider.dir/grammar_binding.cpp.o
+[8/13] Building CXX object provider/CMakeFiles/vedit_syntax_provider_tests.dir/tests/test_syntax_provider.cpp.o
+[9/13] Building CXX object provider/CMakeFiles/vedit_syntax_provider.dir/owner_arbiter.cpp.o
+[10/13] Building CXX object provider/CMakeFiles/vedit_syntax_provider.dir/tree_sitter_provider.cpp.o
+[11/13] Linking CXX static library provider/libvedit_syntax_provider.a
+[12/13] Linking CXX static library libvedit_syntax_grammars.a
+[13/13] Linking CXX executable provider/vedit_syntax_provider_tests
+[build none exit=0]
+== configure+build verilog ==
+-- The C compiler identification is GNU 15.2.0
+-- The CXX compiler identification is GNU 15.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found PkgConfig: /usr/bin/pkg-config (found version "2.5.1")
+-- Checking for module 'tree-sitter=0.25.9'
+--   Found tree-sitter, version 0.25.9
+-- syn-grammars: compiled grammar id='verilog' verilog=1 systemverilog=1
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /vedit-build/target/syn-grammars/verilog
+[1/17] Building C object provider/CMakeFiles/vedit_syntax_test_fixture_grammar.dir/tests/fixture/parser.c.o
+[2/17] Linking C static library provider/libvedit_syntax_test_fixture_grammar.a
+[3/17] Building CXX object provider/CMakeFiles/vedit_syntax_provider.dir/disabled_provider.cpp.o
+[4/17] Building CXX object CMakeFiles/vedit_syntax_grammars.dir/bindings.cpp.o
+[5/17] Building CXX object provider/CMakeFiles/vedit_syntax_provider_tests.dir/tests/fixture/fixture_binding.cpp.o
+[6/17] Building CXX object provider/CMakeFiles/vedit_syntax_provider.dir/syntax_service.cpp.o
+[7/17] Building CXX object provider/CMakeFiles/vedit_syntax_provider.dir/grammar_binding.cpp.o
+[8/17] Building CXX object provider/CMakeFiles/vedit_syntax_provider_tests.dir/tests/test_syntax_provider.cpp.o
+[9/17] Building CXX object CMakeFiles/vedit_syn_grammars_tests.dir/tests/test_syn_grammars.cpp.o
+[10/17] Building CXX object provider/CMakeFiles/vedit_syntax_provider.dir/owner_arbiter.cpp.o
+[11/17] Building C object CMakeFiles/vedit_tree_sitter_verilog.dir/vedit-build/third_party/tree-sitter/verilog/src/parser.c.o
+[12/17] Linking C static library libvedit_tree_sitter_verilog.a
+[13/17] Building CXX object provider/CMakeFiles/vedit_syntax_provider.dir/tree_sitter_provider.cpp.o
+[14/17] Linking CXX static library provider/libvedit_syntax_provider.a
+[15/17] Linking CXX static library libvedit_syntax_grammars.a
+[16/17] Linking CXX executable provider/vedit_syntax_provider_tests
+[17/17] Linking CXX executable vedit_syn_grammars_tests
+[build verilog exit=0]
+== configure+build systemverilog ==
+-- The C compiler identification is GNU 15.2.0
+-- The CXX compiler identification is GNU 15.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found PkgConfig: /usr/bin/pkg-config (found version "2.5.1")
+-- Checking for module 'tree-sitter=0.25.9'
+--   Found tree-sitter, version 0.25.9
+-- syn-grammars: compiled grammar id='systemverilog' verilog=1 systemverilog=1
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /vedit-build/target/syn-grammars/systemverilog
+[1/17] Building C object provider/CMakeFiles/vedit_syntax_test_fixture_grammar.dir/tests/fixture/parser.c.o
+[2/17] Linking C static library provider/libvedit_syntax_test_fixture_grammar.a
+[3/17] Building CXX object CMakeFiles/vedit_syntax_grammars.dir/bindings.cpp.o
+[4/17] Building CXX object provider/CMakeFiles/vedit_syntax_provider.dir/disabled_provider.cpp.o
+[5/17] Building CXX object provider/CMakeFiles/vedit_syntax_provider_tests.dir/tests/fixture/fixture_binding.cpp.o
+[6/17] Building CXX object provider/CMakeFiles/vedit_syntax_provider.dir/syntax_service.cpp.o
+[7/17] Building CXX object provider/CMakeFiles/vedit_syntax_provider.dir/grammar_binding.cpp.o
+[8/17] Building CXX object provider/CMakeFiles/vedit_syntax_provider_tests.dir/tests/test_syntax_provider.cpp.o
+[9/17] Building CXX object CMakeFiles/vedit_syn_grammars_tests.dir/tests/test_syn_grammars.cpp.o
+[10/17] Building CXX object provider/CMakeFiles/vedit_syntax_provider.dir/owner_arbiter.cpp.o
+[11/17] Building C object CMakeFiles/vedit_tree_sitter_verilog.dir/vedit-build/third_party/tree-sitter/verilog/src/parser.c.o
+[12/17] Linking C static library libvedit_tree_sitter_verilog.a
+[13/17] Building CXX object provider/CMakeFiles/vedit_syntax_provider.dir/tree_sitter_provider.cpp.o
+[14/17] Linking CXX static library provider/libvedit_syntax_provider.a
+[15/17] Linking CXX static library libvedit_syntax_grammars.a
+[16/17] Linking CXX executable provider/vedit_syntax_provider_tests
+[17/17] Linking CXX executable vedit_syn_grammars_tests
+[build systemverilog exit=0]
+== configure+build verilog-static ==
+-- The C compiler identification is GNU 15.2.0
+-- The CXX compiler identification is GNU 15.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Found PkgConfig: /usr/bin/pkg-config (found version "2.5.1")
+-- Checking for module 'tree-sitter=0.25.9'
+--   Found tree-sitter, version 0.25.9
+-- syn-provider: linking /usr/lib/x86_64-linux-gnu/libtree-sitter.a statically (C18)
+-- syn-grammars: compiled grammar id='verilog' verilog=1 systemverilog=1
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /vedit-build/target/syn-grammars/verilog-static
+[1/17] Building C object provider/CMakeFiles/vedit_syntax_test_fixture_grammar.dir/tests/fixture/parser.c.o
+[2/17] Linking C static library provider/libvedit_syntax_test_fixture_grammar.a
+[3/17] Building CXX object provider/CMakeFiles/vedit_syntax_provider_tests.dir/tests/fixture/fixture_binding.cpp.o
+[4/17] Building CXX object provider/CMakeFiles/vedit_syntax_provider.dir/disabled_provider.cpp.o
+[5/17] Building CXX object CMakeFiles/vedit_syntax_grammars.dir/bindings.cpp.o
+[6/17] Building CXX object provider/CMakeFiles/vedit_syntax_provider.dir/syntax_service.cpp.o
+[7/17] Building CXX object provider/CMakeFiles/vedit_syntax_provider.dir/grammar_binding.cpp.o
+[8/17] Building CXX object provider/CMakeFiles/vedit_syntax_provider_tests.dir/tests/test_syntax_provider.cpp.o
+[9/17] Building CXX object CMakeFiles/vedit_syn_grammars_tests.dir/tests/test_syn_grammars.cpp.o
+[10/17] Building CXX object provider/CMakeFiles/vedit_syntax_provider.dir/owner_arbiter.cpp.o
+[11/17] Building C object CMakeFiles/vedit_tree_sitter_verilog.dir/vedit-build/third_party/tree-sitter/verilog/src/parser.c.o
+[12/17] Linking C static library libvedit_tree_sitter_verilog.a
+[13/17] Building CXX object provider/CMakeFiles/vedit_syntax_provider.dir/tree_sitter_provider.cpp.o
+[14/17] Linking CXX static library provider/libvedit_syntax_provider.a
+[15/17] Linking CXX static library libvedit_syntax_grammars.a
+[16/17] Linking CXX executable provider/vedit_syntax_provider_tests
+[17/17] Linking CXX executable vedit_syn_grammars_tests
+[build verilog-static exit=0]

@@ -1,0 +1,31 @@
+[filetree] image: vedit-qt6-build:local
+NEEDED-KTEXTEDITOR-OR-TREESITTER count=0 (expected 0)
+filetree: installFileTree projectRoot='/vedit-build/target/ws-filetree-tmp/project' dockInserted=1 placeholderReplaced=1
+STEP 09-real-app exit=0 cmd=readelf NEEDED + vedit-app --project ...
+-- VEdit file tree: Qt 6.10.2 (standalone=OFF)
+-- VEdit file tree: vedit_app_shell present -> installFileTree() is active
+-- VEdit: workspace lane 'filetree' included
+-- VEdit: workspace lane 'palette' included
+-- VEdit: workspace lane 'search' included
+-- VEdit: workspace lane 'filetree' wired (vedit_file_tree)
+-- VEdit: workspace lane 'palette' wired (vedit_workspace_palette)
+-- VEdit: workspace lane 'search' wired (vedit_workspace_search)
+-- VEdit file tree rootcheck: Qt 6.10.2, shell=/vedit-build/src/app
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+STEP 10-rootcheck-configure exit=0
+[3/5] Linking CXX static library app/workspace-lane-filetree/libvedit_file_tree.a
+[4/5] Linking CXX executable vedit-filetree-seamcheck
+[5/5] Linking CXX executable app/vedit-app
+STEP 11-rootcheck-build exit=0 cmd=cmake --build target/filetree-rootcheck
+filetree: installFileTree projectRoot='/vedit-build/target/ws-filetree-tmp/project' dockInserted=1 placeholderReplaced=1
+filetree: installFileTree projectRoot='/vedit-build/target/ws-filetree-tmp/project' dockInserted=1 placeholderReplaced=0
+SEAM dock-inserted=1 content-before-install=panel-placeholder-file-tree
+SEAM panel-installed=1 dock-content-is-panel=1 find-child=1 root=/vedit-build/target/ws-filetree-tmp/project
+SEAM file-index-valid=1
+SEAM status-after-activate="Open /vedit-build/target/ws-filetree-tmp/project/rtl/top.v"
+SEAM rows=5 scanned-dirs=2
+SCREENSHOT ok=1 /vedit-build/evidence/ws-filetree/screenshots/20-real-shell-file-tree.png
+FILETREE-SEAMCHECK ok=1
+STEP 12-real-shell-seamcheck exit=0
+REAL-SHELL-EXIT=0

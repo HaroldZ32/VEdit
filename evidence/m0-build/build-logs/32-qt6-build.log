@@ -1,0 +1,4 @@
+[1/4] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider_tests.dir/tests/fixture/fixture_binding.cpp.o
+[2/4] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/grammar_binding.cpp.o
+[3/4] Linking CXX static library src/syntax/provider/libvedit_syntax_provider.a
+[4/4] Linking CXX executable src/syntax/provider/vedit_syntax_provider_tests

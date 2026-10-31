@@ -1,0 +1,31 @@
+This plugin does not support propagateSizeHints()
+filetree: The folder '/vedit-build/target/ws-filetree-perm/perm-locked' cannot be read (permission denied).
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+filetree: permission denied: /vedit-build/target/ws-filetree-perm/perm-parent/secret
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+SCRATCH /vedit-build/target/ws-filetree-perm
+PERMISSIONS euid=1000
+CHECK perm.fixture-locked ok=1
+CHECK perm.root-state ok=1
+CHECK perm.root-text ok=1 detail="Cannot read folder 'perm-locked': permission denied."
+CHECK perm.root-visible ok=1
+CHECK perm.root-no-rows ok=1
+CHECK perm.child-index ok=1
+CHECK perm.child-populated ok=1
+CHECK perm.child-no-rows ok=1
+CHECK perm.child-signalled ok=1 detail="1"
+CHECK perm.child-tooltip ok=1 detail="/vedit-build/target/ws-filetree-perm/perm-parent/secret
+Folder
+permission denied: /vedit-build/target/ws-filetree-perm/perm-parent/secret"
+CHECK perm.fixture-readonly ok=1
+CHECK perm.delete-refused ok=1
+CHECK perm.delete-error ok=1 detail="Could not delete 'keep.v'"
+CHECK perm.delete-status ok=1 detail="Could not delete 'keep.v' (Permission denied (the folder '/vedit-build/target/ws-filetree-perm/perm-readonly' is not writable))"
+CHECK perm.delete-still-on-disk ok=1
+CHECK perm.delete-no-phantom ok=1
+CHECK perm.delete-tree-unchanged ok=1
+FILETREE-TESTS checks=17 failures=0

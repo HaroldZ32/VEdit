@@ -1,0 +1,47 @@
+== 04 swap proof (compiled grammar is configuration only, C15) ==
+-- generated configuration header differs (build artifact, not source):
+--- /vedit-build/target/syn-grammars/none/generated/grammars_config_generated.h	2026-10-31 04:22:01.846830977 +0000
++++ /vedit-build/target/syn-grammars/verilog/generated/grammars_config_generated.h	2026-10-31 04:22:05.314836992 +0000
+@@ -3,8 +3,8 @@
+ // rewrites it; no tracked source file changes (C15).
+ #pragma once
+ 
+-#define VEDIT_GRAMMAR_VERILOG_ENABLED 0
+-#define VEDIT_GRAMMAR_SYSTEMVERILOG_ENABLED 0
++#define VEDIT_GRAMMAR_VERILOG_ENABLED 1
++#define VEDIT_GRAMMAR_SYSTEMVERILOG_ENABLED 1
+ 
+ namespace vedit::syntax::generated {
+ 
+@@ -17,10 +17,10 @@
+ };
+ 
+ inline constexpr GrammarInfo kVerilog = {"verilog", "Verilog (tree-sitter-verilog)",
+-    "4457145e795b363f072463e697dfe2f6973c9a52", "MIT", false};
++    "4457145e795b363f072463e697dfe2f6973c9a52", "MIT", true};
+ inline constexpr GrammarInfo kSystemVerilog = {"systemverilog",
+     "SystemVerilog (tree-sitter-verilog)", "4457145e795b363f072463e697dfe2f6973c9a52",
+-    "MIT", false};
++    "MIT", true};
+ 
+ inline constexpr const char *kVerilogHighlights = R"VEDITQ(; Verilog (.v/.vh) highlights for the vendored tree-sitter-verilog grammar
+ ; (identity/provenance: third_party/tree-sitter/PROVENANCE.md).
+
+-- CMake cache: the only configured difference:
+--- /dev/fd/63	2026-10-31 04:22:17.086540745 +0000
++++ /dev/fd/62	2026-10-31 04:22:17.086540745 +0000
+@@ -1,7 +1,7 @@
+-VEDIT_GRAMMAR_BUILD_TESTS:BOOL=OFF
+-VEDIT_GRAMMAR_SYSTEMVERILOG:BOOL=OFF
+-VEDIT_GRAMMAR_VERILOG:BOOL=OFF
++VEDIT_GRAMMAR_BUILD_TESTS:BOOL=ON
++VEDIT_GRAMMAR_SYSTEMVERILOG:BOOL=ON
++VEDIT_GRAMMAR_VERILOG:BOOL=ON
+ VEDIT_SYNTAX_BUILD_TESTS:BOOL=ON
+-VEDIT_SYNTAX_GRAMMAR:STRING=none
++VEDIT_SYNTAX_GRAMMAR:STRING=verilog
+ VEDIT_SYNTAX_TREESITTER:BOOL=ON
+ VEDIT_SYNTAX_TS_LINK:STRING=shared
+
+-- source manifest identical across all four configurations:
+IDENTICAL: no source file changed when the compiled grammar changed (diff exit=0)

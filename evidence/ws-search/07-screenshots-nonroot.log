@@ -1,0 +1,8 @@
+## command: Xvfb :84 -ac + setpriv --reuid=1000 ... --screenshots /tmp/shots (non-root: unreadable-root state)
+SHOT /tmp/shots/01-search-results.png written 1280x860
+SHOT /tmp/shots/03-search-jump.png written 1280x860
+SHOT /tmp/shots/02-search-empty-state.png written 1280x860
+SHOT /tmp/shots/04-search-no-project.png written 1280x860
+SHOT /tmp/shots/05-search-unreadable-root.png written 1280x860
+SCREENSHOTS ok=1 failures=0
+## exit: 0

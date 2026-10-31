@@ -1,0 +1,80 @@
+#!/bin/sh
+# AppRun for the VEdit Qt6/KF6 private runtime — F2 form (T64 / T61).
+#
+# Two jobs:
+#   1. start the binary through the loader that ships inside the package, with
+#      the package's lib/ as the only library path (C2);
+#   2. isolate syntax-definition lookup: XDG_DATA_DIRS *and* XDG_DATA_HOME point
+#      into the AppDir, so a host with KDE installed cannot leak its definitions
+#      into the product (F2 conditions C3/C4). A runtime guard (C7) then checks
+#      that every loaded definition is on the whitelist and fails closed.
+#
+# Usage: AppRun [--selfcheck] [--] [args]
+set -u
+
+HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+APPDIR="$HERE"
+export APPDIR
+
+# --- private plugin search paths (package only) ------------------------------
+# NB: LD_LIBRARY_PATH is exported only right before exec (see below). Exporting it
+# here would make host utilities (cat/sed/grep/id/mkdir) load OUR glibc through the
+# HOST loader and fail on a CentOS 7 host, silently breaking the guard below.
+export QT_PLUGIN_PATH="$APPDIR/plugins"
+export QT_QPA_PLATFORM_PLUGIN_PATH="$APPDIR/plugins/platforms"
+export QML2_IMPORT_PATH="$APPDIR/qml"
+
+# --- F2: XDG narrowed to the AppDir ONLY (C3 + C4) ---------------------------
+# Never append /usr/share or keep $HOME/.local/share: both were measured to leak
+# host/user definitions (FORM-DECISION §1: f2-xdgdirs-only -> 2 defs, f2-override
+# -> 402 defs). Setting only one of the two variables is NOT enough.
+export XDG_DATA_DIRS="$APPDIR/usr/share"
+export XDG_DATA_HOME="$APPDIR/usr/share"
+export VEDIT_SYNTAX_DIR="$APPDIR/usr/share/org.kde.syntax-highlighting/syntax"
+
+# --- fonts (no host fontconfig data) ----------------------------------------
+export FONTCONFIG_FILE="$APPDIR/etc/fonts/fonts.conf"
+export FONTCONFIG_PATH="$APPDIR/etc/fonts"
+: "${XDG_CACHE_HOME:=/tmp/vedit-cache-$(id -u)}"
+export XDG_CACHE_HOME
+mkdir -p "$XDG_CACHE_HOME" 2>/dev/null || true
+
+# --- locale: Qt needs a UTF-8 locale ----------------------------------------
+: "${LANG:=C.UTF-8}"
+export LANG
+
+# --- C7 runtime guard: fail closed if the whitelist is not the visible set ---
+ksh_guard() {
+    [ -x "$APPDIR/bin/vedit-ksh-env-probe" ] || return 0
+    [ -s "$APPDIR/usr/share/vedit/ksh-whitelist.txt" ] || return 0
+    wl=$(cat "$APPDIR/usr/share/vedit/ksh-whitelist.txt")
+    out=$(QT_QPA_PLATFORM=offscreen "$APPDIR/ld-linux-x86-64.so.2" --library-path "$APPDIR/lib" \
+            "$APPDIR/bin/vedit-ksh-env-probe" --list --editor-repo 2>&1)
+    rc=$?
+    seen=$(printf '%s\n' "$out" | sed -n 's/^KSH-ENV def name="\(.*\)"$/\1/p' | sort | paste -sd, -)
+    printf '%s\n' "$out" | grep '^KSH-ENV defs=' >&2
+    if [ "$rc" -ne 0 ] || [ "$seen" != "$wl" ]; then
+        echo "KSH-GUARD FAIL: visible definitions [$seen] != whitelist [$wl]" >&2
+        exit 2
+    fi
+    echo "KSH-GUARD PASS whitelist=$wl" >&2
+}
+ksh_guard
+
+# now that no host utility will run any more, hand the loader search path to the app
+export LD_LIBRARY_PATH="$APPDIR/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+
+BIN="$APPDIR/bin/vd-app"
+[ -x "$BIN" ] || BIN="$APPDIR/bin/vedit-m0-smoke"
+
+case "${1:-}" in
+  --selfcheck)
+    shift
+    exec "$APPDIR/ld-linux-x86-64.so.2" --library-path "$APPDIR/lib" "$BIN" \
+      --selfcheck --testdata "$APPDIR/share/ksyntaxhighlighting/testdata" \
+      --ksh-selfbuild --expect-kshlib-prefix "$APPDIR/lib" --expect-libc-prefix "$APPDIR/lib" "$@"
+    ;;
+  *)
+    exec "$APPDIR/ld-linux-x86-64.so.2" --library-path "$APPDIR/lib" "$BIN" "$@"
+    ;;
+esac

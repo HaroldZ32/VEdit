@@ -1,0 +1,11 @@
+image: vedit-qt6-build:local
+image_id=sha256:224211577924d6accfdd8272922f902377deb68b4a0fa1dd0308d15697d8ffa7 size=2183732414
+smoke: /home/haroldzhao/MyProj/DshProj/VEdit/target/qt6-build/cmake/smoke/vedit-m0-smoke
+  sha256=cc9f67782ed61cde765e39dca17d2e170b32de56cb5400096504d4b72b3ebe97
+probe: /home/haroldzhao/MyProj/DshProj/VEdit/target/qt6-build/cmake/smoke/vedit-ksh-env-probe
+  sha256=b709d6924ec9a6f6da6ec80aaf915aa27d9b9ddb3e18de73ced44316353fc242
+f2 install: /home/haroldzhao/MyProj/DshProj/VEdit/target/ksh-selfbuild/F2/install
+aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6  /home/haroldzhao/MyProj/DshProj/VEdit/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
+whitelist: 2 xml in resources/syntax/
+appimagetool: /home/haroldzhao/MyProj/DshProj/VEdit/packaging/appimage/.cache/appimagetool.AppImage
+	libfuse3.so.4 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libfuse3.so.4

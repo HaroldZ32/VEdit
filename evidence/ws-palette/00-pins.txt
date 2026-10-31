@@ -1,0 +1,35 @@
+# ws-palette (T22) evidence pins — generated 2026-10-31T04:12:49Z
+## host
+Linux 7.0.0-38-generic x86_64
+## docker
+Docker version 29.9.2, build a82e528
+## build image recorded by the final scripts/build-qt.sh run (30-build-qt.log)
+image_id=sha256:460933d3c25212b2de3528884c6cb4482d0274a5de5a2dbf9799d5afdfa9fdef
+## pinned versions (container facts)
+PRETTY_NAME="Ubuntu 26.04.1 LTS"
+ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43
+qt6-base-dev=6.10.2+dfsg-7
+libkf6texteditor-dev=6.24.0-0ubuntu1
+libkf6syntaxhighlighting-dev=6.24.0-0ubuntu1
+tree-sitter=0.25.9
+cmake version 4.2.3
+g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+## lane source sha256 (final)
+1f4ef0d886473e9abcbb7f7edd8222754e252c733b553a75f4ec722075b7aaf6  src/workspace/palette/synthetic_paths.h
+22f42155f34f10e045523bc96c988f60ab186bd21e489069f0b52568e782c155  src/workspace/palette/command_palette.cpp
+25afdec28a06337119cb0010ba682fc541d81f2705736e8b2b7ef3e798d7c665  src/workspace/palette/palette_integration.h
+293942fdfcc8be2074be9f7a4f500862f3ece8cab56b9647060be46d3113b910  src/workspace/palette/palette_integration_selftest.cpp
+41a6ef68a6736c889ab72aa37f7c2e0a4e85bceb6b7e5760d3a12e63392d28e9  src/workspace/palette/tools/bench.sh
+427dda490079da750600b999f1734870a8a793aa157cdeb1f239bceafd46e52b  src/workspace/palette/fuzzy_matcher.cpp
+444c29770724c61024846d6e8411c2485be812d14ac951dcd965a81877439b9c  src/workspace/palette/palette_selftest.cpp
+4faf90115e72e56cf7970a5dd59b8dd5caf3397ca9c9b2c2a9ea51d948be75b7  src/workspace/palette/palette_integration.cpp
+74acad373cae40cb9b14f83b7cc99b0ec13755051fbb5aaf27bac6013fc2fa88  src/workspace/palette/command_palette.h
+9cadbc3b62c055fce968b16da67956e4b08f9b56fdc16e2fc820f865155edbab  src/workspace/palette/file_index.h
+b09c8d9ab2a7560190aed811fbcac5967ecc379c178ce34065321ff754725b2b  src/workspace/palette/tools/bench-in-container.sh
+b2371ddf48d3db690c754958278f84474338bda38d9587dd3171e5e412985386  src/workspace/palette/fuzzy_matcher.h
+b7036b844dd9a67c28fa4677a112e6d3322e02ff351226a4fb66dd7381a855ac  src/workspace/palette/file_index.cpp
+e211e32f97338e7a538f03e42a54777b02868daa0aa18b0504bae569b12c749a  src/workspace/palette/palette_bench.cpp
+08ca4930b3e5dd43a806138c5c07ae9880c68c796d6a4faa6ea898a07cb1f3ff  src/workspace/integration.h
+6e5365a32b9ec742ed551b838d074f8a89c3271a6bf66824ebf6343388722b16  src/workspace/integration.cpp
+c125ddc9e7dfe5910cbe46237b401860413ac7f537c2ca9d1b47c6e03df84c09  src/app/main.cpp
+c9d320493a90d9fbcbdb5e55c52abd26f82ce1d31bd3c936b489a4b0344da7b4  src/app/CMakeLists.txt

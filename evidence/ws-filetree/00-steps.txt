@@ -1,0 +1,11 @@
+STEP 01-configure exit=0 cmd=cmake -S /vedit-build/src/workspace/filetree -B /vedit-build/target/filetree-build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+STEP 02-build exit=0 cmd=cmake --build /vedit-build/target/filetree-build --parallel 16
+STEP 03-ctest exit=0 cmd=ctest --test-dir /vedit-build/target/filetree-build --output-on-failure
+STEP 03a-tests-full exit=0 cmd=/vedit-build/target/filetree-build/vedit-filetree-tests
+STEP 06-permissions-nonroot exit=0 cmd=setpriv --reuid=1000 VEDIT_FILETREE_SUITE=permissions vedit-filetree-tests
+STEP 04-fixture exit=0 cmd=/vedit-build/target/filetree-build/vedit-filetree-demo --prepare /vedit-build/target/ws-filetree-tmp --big-count 10000
+STEP 05-screenshots exit=0 cmd=setpriv --reuid=1000 vedit-filetree-demo --screenshots ...
+STEP 09-real-app exit=0 cmd=readelf NEEDED + vedit-app --project ...
+STEP 10-rootcheck-configure exit=0
+STEP 11-rootcheck-build exit=0 cmd=cmake --build target/filetree-rootcheck
+STEP 12-real-shell-seamcheck exit=0

@@ -1,0 +1,13 @@
+## renderer
+OpenGL renderer string: llvmpipe (LLVM 21.1.8, 256 bits)
+OpenGL version string: 4.5 (Compatibility Profile) Mesa 26.0.8-1ubuntu0.3
+
+## selfcheck (QT_QPA_PLATFORM=xcb, software rendering)
+TERMINAL-SELFTEST ok=1 checks=101 failures=0
+
+## screenshots
+INFO terminal widget=1100x337 screen=139x21 cell=7x15
+SCREENSHOT OK /vedit-build/evidence/term-panel/10-terminal-running.png
+SCREENSHOT OK /vedit-build/evidence/term-panel/11-terminal-exited-code42.png
+TERMINAL-SCREENSHOTS ok=1 dir=/vedit-build/evidence/term-panel
+xcb-and-screenshots exit: 0

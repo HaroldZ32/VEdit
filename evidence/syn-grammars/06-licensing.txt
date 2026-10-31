@@ -1,0 +1,23 @@
+== 06 licensing / provenance ==
+-- MIT licence header (vendored):
+MIT License
+
+Copyright (c) 2018-2021 Aliaksei Chapyzhenka
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+
+-- sha256 of the vendored files (cross-checked against third_party/tree-sitter/PROVENANCE.md):
+92dbb929e5518c6790db68d32d71c257c0c6cbb3974fcd4d930bf28cf1b1bb46  LICENSE
+323c121a3e550df0f970d46c544b3f02485e5e6d754acb730d6be7b8dea7dc4b  grammar.js
+a15f78b82068daeb62f3b54c8ad0101aa936a2c921a57806fe8f37dcbf0bfff2  src/parser.c
+ab104936984904469572a4e868149f7a22fb2929347f837ae6a1f9b790f1b173  src/tree_sitter/parser.h
+e99b42baf4279d3be6dec59129dda0789f196b4e5c99144a781ea6cdf255425c  src/node-types.json
+
+-- no copyleft marker in the vendored grammar:
+OK: no GPL/LGPL marker in LICENSE or grammar.js
+
+-- provenance document: 69 lines
+-- THIRD_PARTY_NOTICES.md is owned by pack-final (deliberately untouched by this lane)

@@ -1,0 +1,16 @@
+== 05 layering purity (node types only in queries; interface grammar-free) ==
+$ grep -nE 'TS[A-Z][A-Za-z]*|tree_sitter|TSTree|TSNode|TSQuery|node_type' <provider public headers>
+[grep exit=1]  (exit 1 = no match = the provider interface stays grammar-free)
+
+translation units that include the tree-sitter C API (must be the provider backend only):
+src/syntax/provider/tree_sitter_provider.cpp
+
+$ grep -rn 'module_declaration|interface_declaration|class_declaration' src/syntax/grammars
+[grep exit=1]  (exit 1 = node types do not appear in the binding layer)
+
+node types appear only in the query files (and the vendored grammar's own node-types.json):
+resources/queries/verilog/structure.scm
+resources/queries/verilog/folds.scm
+resources/queries/systemverilog/structure.scm
+resources/queries/systemverilog/folds.scm
+third_party/tree-sitter/verilog/src/node-types.json

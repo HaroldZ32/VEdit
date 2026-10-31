@@ -1,0 +1,7 @@
+scenario=f1-default               lib=/vedit-build/target/ksh-selfbuild/F1/install/lib/x86_64-linux-gnu exit=0 defs=0 hash=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+scenario=f1-editor-inject         lib=/vedit-build/target/ksh-selfbuild/F1/install/lib/x86_64-linux-gnu exit=0 defs=0 hash=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+scenario=f2-default               lib=/vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu exit=0 defs=403 hash=60d98554034d2c914a9899071d47dccfb60308a46a858197fd7493c0af037ef1
+scenario=f2-xdgdirs-only          lib=/vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu exit=0 defs=2 hash=0b2d28f9801551caf68db0a4ac1c2ff8719d5fbe71ec40b5dec3c736aaace198
+scenario=f2-isolated              lib=/vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu exit=0 defs=1 hash=25d9678d5751122ddd45aa87a465cab682e00ffa6a6ddf821fbd7a43fe8d200c
+scenario=f2-editor-isolated       lib=/vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu exit=0 defs=1 hash=25d9678d5751122ddd45aa87a465cab682e00ffa6a6ddf821fbd7a43fe8d200c
+scenario=f2-override              lib=/vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu exit=0 defs=402 hash=ce9b16c94af9dc0651cd73cae0cf8abdf9b7d0e787010fd4fd174e1dbc377332

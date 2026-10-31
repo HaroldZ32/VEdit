@@ -1,0 +1,26 @@
+== 03 swap proof (compile-time grammar is configuration only) ==
+-- generated configuration header differs (build artifact, not source):
+--- /vedit-build/target/syn-provider/none/generated/grammar_config_generated.h	2026-10-31 03:51:16.353231646 +0000
++++ /vedit-build/target/syn-provider/external/generated/grammar_config_generated.h	2026-10-31 03:51:21.666747767 +0000
+@@ -2,7 +2,7 @@
+ // This file is a BUILD ARTIFACT: switching grammar rewrites it, no tracked source changes.
+ #pragma once
+ namespace vedit::syntax::generated {
+-inline constexpr const char *kCompiledGrammar = "none";
++inline constexpr const char *kCompiledGrammar = "external";
+ inline constexpr bool kBackendCompiled = true;
+ inline constexpr bool kStaticBackend = false;
+ }  // namespace vedit::syntax::generated
+
+-- CMake cache: the only configured difference:
+--- /dev/fd/63	2026-10-31 03:51:33.068641630 +0000
++++ /dev/fd/62	2026-10-31 03:51:33.068641630 +0000
+@@ -1,4 +1,4 @@
+ VEDIT_SYNTAX_BUILD_TESTS:BOOL=ON
+-VEDIT_SYNTAX_GRAMMAR:STRING=none
++VEDIT_SYNTAX_GRAMMAR:STRING=external
+ VEDIT_SYNTAX_TREESITTER:BOOL=ON
+ VEDIT_SYNTAX_TS_LINK:STRING=shared
+
+-- source manifest identical across the two builds (hash the SRC tree twice):
+IDENTICAL: no source file changed when the compiled grammar changed (diff exit=0)

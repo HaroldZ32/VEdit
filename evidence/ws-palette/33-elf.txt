@@ -1,0 +1,20 @@
+# vedit-app ELF facts — T13 guarantee: KTextEditor/tree-sitter stay UNLINKED
+## file
+target/qt6-build/src/app/vedit-app: ELF 64-bit LSB pie executable, x86-64, version 1 (GNU/Linux), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=495046d36e9cdaceb5b2bf5ce0866bf1ab938091, for GNU/Linux 3.2.0, with debug_info, not stripped
+## NEEDED
+  libKF6SyntaxHighlighting.so.6
+  libQt6Widgets.so.6
+  libQt6Gui.so.6
+  libQt6Core.so.6
+  libstdc++.so.6
+  libgcc_s.so.1
+  libc.so.6
+## forbidden NEEDED count (KTextEditor|tree-sitter) = 0
+## highest GLIBC symbol
+GLIBC_2.34
+## sha256
+519ddcfbd158a35bde9f3f0f57e8c4c73e4b19c4049c56593da8e1aea7e8b193  target/qt6-build/src/app/vedit-app
+## palette lane test binaries
+vedit-workspace-palette-selftest 10172920 bytes
+vedit-workspace-palette-bench 10275624 bytes
+vedit-workspace-palette-integration-selftest 10015672 bytes

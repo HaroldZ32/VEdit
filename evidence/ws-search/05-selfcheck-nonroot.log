@@ -1,0 +1,126 @@
+## command: setpriv --reuid=1000 ... root-build selftest --selfcheck (non-root permission checks)
+CHECK fixture.created PASS
+This plugin does not support propagateSizeHints()
+CHECK panel.root.normalized PASS
+CHECK panel.empty.enter-query PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panel.search.terminates PASS
+CHECK panel.hits.count PASS
+CHECK panel.summary.state PASS
+CHECK panel.summary.files PASS
+CHECK panel.summary.files-scanned PASS
+CHECK panel.summary.skipped-binary PASS
+CHECK panel.summary.skipped-too-large PASS
+CHECK panel.summary.text.observable PASS
+CHECK panel.tree.files PASS
+CHECK panel.tree.one-row-per-hit PASS
+CHECK panel.tree.no-git PASS
+CHECK panel.tree.no-build PASS
+CHECK panel.tree.no-binary PASS
+CHECK panel.hits.one-per-line PASS
+CHECK panel.hit.line-number PASS
+CHECK panel.hit.column PASS
+CHECK panel.hit.snippet PASS
+CHECK panel.hit.unicode-file PASS
+CHECK panel.hit.unicode-column PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panel.case-sensitive.count PASS
+CHECK panel.case-sensitive.excludes-uppercase PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panel.verilog-only.count PASS
+CHECK panel.verilog-only.excludes-markdown PASS
+CHECK panel.verilog-only.excludes-large-file PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panel.unicode.query PASS
+This plugin does not support propagateSizeHints()
+CHECK empty.no-project.visible PASS
+CHECK empty.no-project.text PASS
+CHECK empty.no-project.no-search PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK empty.query.text PASS
+CHECK empty.query.no-search PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK empty.no-results.state PASS
+CHECK empty.no-results.visible PASS
+CHECK empty.no-results.text PASS
+CHECK empty.no-results.tree-hidden PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK empty.unreadable-root.state PASS
+CHECK empty.unreadable-root.text PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK entries.unreadable.state PASS
+CHECK entries.unreadable.counted PASS
+CHECK entries.unreadable.text PASS
+CHECK entries.unreadable.results-intact PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK limit.results PASS
+CHECK limit.truncated-flag PASS
+CHECK limit.summary-text PASS
+CHECK extension.v PASS
+CHECK extension.vh PASS
+CHECK extension.sv PASS
+CHECK extension.svh PASS
+CHECK extension.not-verilog PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK jump.hit-row-exists PASS
+CHECK jump.row-visible PASS
+CHECK jump.click.recorded PASS
+CHECK jump.click.file PASS
+CHECK jump.click.line PASS
+CHECK jump.click.column PASS
+CHECK jump.file-row.no-jump PASS
+CHECK jump.activate PASS
+CHECK jump.demo.opened PASS
+CHECK jump.demo.line PASS
+CHECK seam.dock-created PASS
+CHECK seam.not-placeholder PASS
+CHECK seam.factory-installed PASS
+CHECK seam.root-applied PASS
+CHECK seam.search-in-shell PASS
+CHECK large.fixture-created PASS
+CHECK large.start.accepted PASS
+CHECK large.skipped-by-default PASS
+CHECK large.skipped.state PASS
+CHECK large.skipped.fast PASS
+CHECK large.start.accepted-raised PASS
+CHECK large.start.non-blocking PASS
+CHECK large.cancel.returns-fast PASS
+CHECK large.cancel.finishes PASS
+CHECK large.cancel.state PASS
+CHECK large.cancel.bounded PASS
+CHECK large.worker-thread PASS
+CHECK many.start.non-blocking PASS
+CHECK many.finishes PASS
+CHECK many.hits PASS
+CHECK many.files-scanned PASS
+CHECK many.elapsed-bounded PASS
+CHECK large.timeout.accepted PASS
+CHECK large.timeout.finishes PASS
+CHECK large.timeout.flag PASS
+CHECK large.timeout.state PASS
+CHECK large.timeout.bounded PASS
+WORKSPACE-SEARCH-SELFTEST ok=1 checks=88 failures=0 skipped=0
+## exit: 0

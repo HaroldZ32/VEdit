@@ -1,0 +1,17 @@
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+KSH-ENV defs=2 hash=0b2d28f9801551caf68db0a4ac1c2ff8719d5fbe71ec40b5dec3c736aaace198
+KSH-ENV def name="UserLeakProbe"
+KSH-ENV def name="Verilog"
+KSH-ENV custom_paths=
+KSH-ENV std_paths=/tmp/ksh-probe/home/.local/share:/tmp/ksh-probe/appdir/usr/share
+KSH-ENV loc dir="/tmp/ksh-probe/home/.local/share" syntax_dir=1 xml_files=1 bundled_dir=0 bundled_files=0
+KSH-ENV source name="UserLeakProbe" path="/tmp/ksh-probe/home/.local/share/org.kde.syntax-highlighting/syntax/user-leak-probe.xml"
+KSH-ENV loc dir="/tmp/ksh-probe/appdir/usr/share" syntax_dir=1 xml_files=1 bundled_dir=0 bundled_files=0
+KSH-ENV source name="Verilog" path="/tmp/ksh-probe/appdir/usr/share/org.kde.syntax-highlighting/syntax/verilog.xml"
+KSH-ENV repo expect name="UserLeakProbe" present=1
+KSH-ENV repo forbid name="HostLeakProbe" present=0
+KSH-ENV repo forbid name="SystemVerilog" present=0
+KSH-ENV result=pass

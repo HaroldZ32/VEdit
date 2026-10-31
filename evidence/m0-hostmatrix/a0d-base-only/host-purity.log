@@ -1,0 +1,6 @@
+host_libQt6_or_libKF6=0
+host_qmake_or_qtpaths=0
+host_ksyntax_data=0
+host_katepart=0
+host_libX11=0
+host_libfuse2=0

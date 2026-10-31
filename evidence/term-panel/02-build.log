@@ -1,0 +1,15 @@
+[1/14] Automatic MOC for target vedit_terminal_seam_check
+[2/14] Building CXX object CMakeFiles/vedit_terminal_seam_check.dir/vedit_terminal_seam_check_autogen/mocs_compilation.cpp.o
+[3/14] Automatic MOC for target vedit_terminal
+[4/14] Building CXX object CMakeFiles/vedit_terminal_seam_check.dir/seam_check.cpp.o
+[5/14] Building CXX object CMakeFiles/vedit_terminal.dir/vt_screen.cpp.o
+[6/14] Building CXX object CMakeFiles/vedit_terminal.dir/vedit_terminal_autogen/mocs_compilation.cpp.o
+[7/14] Building CXX object CMakeFiles/vedit_terminal.dir/terminal_panel.cpp.o
+[8/14] Building CXX object CMakeFiles/vedit_terminal.dir/pty_session.cpp.o
+[9/14] Building CXX object CMakeFiles/vedit_terminal.dir/terminal_widget.cpp.o
+[10/14] Linking CXX static library libvedit_terminal.a
+[11/14] Automatic MOC for target vedit-terminal-selftest
+[12/14] Building CXX object CMakeFiles/vedit-terminal-selftest.dir/vedit-terminal-selftest_autogen/mocs_compilation.cpp.o
+[13/14] Building CXX object CMakeFiles/vedit-terminal-selftest.dir/terminal_selftest.cpp.o
+[14/14] Linking CXX executable vedit-terminal-selftest
+build exit: 0

@@ -1,0 +1,129 @@
+UpdateCTestConfiguration  from :/vedit-build/target/qt6-build/DartConfiguration.tcl
+Test project /vedit-build/target/qt6-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 2
+    Start 2: vedit-app-shell-selftest
+
+2: Test command: /vedit-build/target/qt6-build/src/app/vedit-app "--selfcheck" "--state-dir" "/vedit-build/target/qt6-build/src/app/selftest-state"
+2: Working Directory: /vedit-build/target/qt6-build/src/app
+2: Environment variables: 
+2:  QT_QPA_PLATFORM=offscreen
+2:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime
+2: Test timeout computed to be: 120
+2: This plugin does not support propagateSizeHints()
+2: CHECK empty.no-project-label PASS
+2: CHECK empty.one-pane PASS
+2: CHECK empty.window-title PASS
+2: CHECK panels.registry.six PASS
+2: CHECK panels.registered.file-tree PASS
+2: CHECK panels.registered.search PASS
+2: CHECK panels.registered.terminal PASS
+2: CHECK panels.registered.vcs PASS
+2: CHECK panels.registered.settings PASS
+2: CHECK panels.registered.outline PASS
+2: CHECK panels.none-inserted-by-default PASS
+2: This plugin does not support propagateSizeHints()
+2: CHECK panels.show.file-tree PASS
+2: This plugin does not support propagateSizeHints()
+2: CHECK panels.toggle-hide.file-tree PASS
+2: This plugin does not support propagateSizeHints()
+2: CHECK panels.toggle-show.file-tree PASS
+2: This plugin does not support propagateSizeHints()
+2: CHECK panels.show.search PASS
+2: This plugin does not support propagateSizeHints()
+2: CHECK panels.toggle-hide.search PASS
+2: This plugin does not support propagateSizeHints()
+2: CHECK panels.toggle-show.search PASS
+2: CHECK panels.show.terminal PASS
+2: CHECK panels.toggle-hide.terminal PASS
+2: CHECK panels.toggle-show.terminal PASS
+2: This plugin does not support propagateSizeHints()
+2: CHECK panels.show.vcs PASS
+2: This plugin does not support propagateSizeHints()
+2: CHECK panels.toggle-hide.vcs PASS
+2: This plugin does not support propagateSizeHints()
+2: CHECK panels.toggle-show.vcs PASS
+2: This plugin does not support propagateSizeHints()
+2: CHECK panels.show.settings PASS
+2: This plugin does not support propagateSizeHints()
+2: CHECK panels.toggle-hide.settings PASS
+2: This plugin does not support propagateSizeHints()
+2: CHECK panels.toggle-show.settings PASS
+2: CHECK panels.show.outline PASS
+2: CHECK panels.toggle-hide.outline PASS
+2: CHECK panels.toggle-show.outline PASS
+2: CHECK panels.six-docks PASS
+2: CHECK menus.file PASS
+2: CHECK menus.view PASS
+2: CHECK menus.help PASS
+2: CHECK commands.action.file.new-layout PASS
+2: CHECK commands.action.file.close-pane PASS
+2: CHECK commands.action.file.quit PASS
+2: CHECK commands.action.view.split.horizontal PASS
+2: CHECK commands.action.view.split.vertical PASS
+2: CHECK commands.action.view.focus.next PASS
+2: CHECK commands.action.view.layout.reset PASS
+2: CHECK commands.action.help.about PASS
+2: CHECK commands.action.view.panel.file-tree PASS
+2: CHECK commands.action.view.panel.outline PASS
+2: CHECK commands.file-menu-actions PASS
+2: CHECK commands.view-panel-actions-checkable PASS
+2: This plugin does not support propagateSizeHints()
+2: CHECK split.horizontal.pane-count PASS
+2: CHECK split.horizontal.root-orientation PASS
+2: This plugin does not support propagateSizeHints()
+2: This plugin does not support propagateSizeHints()
+2: CHECK split.vertical.pane-count PASS
+2: CHECK split.vertical.root-orientation PASS
+2: CHECK panes.three PASS
+2: CHECK focus.set-second PASS
+2: CHECK focus.next-wraps PASS
+2: This plugin does not support propagateSizeHints()
+2: This plugin does not support propagateSizeHints()
+2: CHECK close.pane-count PASS
+2: This plugin does not support propagateSizeHints()
+2: This plugin does not support propagateSizeHints()
+2: CHECK reset.one-pane PASS
+2: CHECK close.last-pane.keeps-one PASS
+2: CHECK close.last-pane.active PASS
+2: This plugin does not support propagateSizeHints()
+2: CHECK theme.catalogue PASS
+2: CHECK theme.apply PASS
+2: CHECK theme.invalid.rejected PASS
+2: CHECK theme.invalid.keeps-palette PASS
+2: CHECK shortcut.override.applied PASS
+2: CHECK session.save PASS
+2: This plugin does not support propagateSizeHints()
+2: CHECK restore.pane-count PASS
+2: CHECK restore.layout-tree PASS
+2: CHECK restore.active-pane PASS
+2: CHECK restore.theme PASS
+2: CHECK restore.panel-visible PASS
+2: CHECK restore.shortcut PASS
+2: [app-shell] invalid shortcut store /tmp/vedit-app-BARUlh/broken/shortcuts.json: illegal number
+2: [app-shell] invalid session /tmp/vedit-app-BARUlh/broken/session.json: unterminated object
+2: This plugin does not support propagateSizeHints()
+2: CHECK broken.config.survives PASS
+2: CHECK broken.config.diagnostics PASS
+2: This plugin does not support propagateSizeHints()
+2: CHECK stress.one-pane-initial PASS
+2: This plugin does not support propagateSizeHints()
+2: This plugin does not support propagateSizeHints()
+2: This plugin does not support propagateSizeHints()
+2: This plugin does not support propagateSizeHints()
+2: CHECK stress.pane-invariant PASS
+2: CHECK stress.non-null-active PASS
+2: APP-SHELL-SELFTEST ok=1 checks=73 failures=0 state=/tmp/vedit-app-BARUlh/state
+1/1 Test #2: vedit-app-shell-selftest .........   Passed    0.12 sec
+
+The following tests passed:
+	vedit-app-shell-selftest
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.12 sec

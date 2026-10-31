@@ -1,0 +1,66 @@
+-- The C compiler identification is GNU 15.2.0
+-- The CXX compiler identification is GNU 15.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+Installing in /vedit-build/target/ksh-selfbuild/F2/install. Run /vedit-build/target/ksh-selfbuild/F2/build/prefix.sh to set the environment for KSyntaxHighlighting.
+-- Performing Test HAVE_STDATOMIC
+-- Performing Test HAVE_STDATOMIC - Success
+-- Found WrapAtomic: TRUE
+-- Looking for __GLIBC__
+-- Looking for __GLIBC__ - found
+-- Performing Test _OFFT_IS_64BIT
+-- Performing Test _OFFT_IS_64BIT - Success
+-- Performing Test HAVE_DATE_TIME
+-- Performing Test HAVE_DATE_TIME - Success
+-- Found OpenGL: /usr/lib/x86_64-linux-gnu/libOpenGL.so
+-- Found WrapOpenGL: TRUE
+-- Found WrapVulkanHeaders: /usr/include
+-- Failed to find XercesC (missing: XercesC_LIBRARY XercesC_INCLUDE_DIR XercesC_VERSION) 
+-- Found Perl: /usr/bin/perl (found version "5.40.1")
+-- Found Python: /usr/bin/python3 (found version "3.14.4") found components: Interpreter
+-- Performing Test COMPILER_HAS_HIDDEN_VISIBILITY
+-- Performing Test COMPILER_HAS_HIDDEN_VISIBILITY - Success
+-- Performing Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY
+-- Performing Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY - Success
+-- Performing Test COMPILER_HAS_DEPRECATED_ATTR
+-- Performing Test COMPILER_HAS_DEPRECATED_ATTR - Success
+-- The following OPTIONAL packages have been found:
+
+ * Qt6Core
+ * Qt6Qml
+ * Qt6Test (required version >= 6.8.0)
+ * OpenGL
+ * Qt6DBusTools (required version >= 6.10.2)
+ * Qt6Gui (required version >= 6.8.0)
+ * Python
+   Auto-generate Jinja syntax definition files.
+ * Qt6LinguistTools
+
+-- The following REQUIRED packages have been found:
+
+ * ECM (required version >= 6.24.0)
+ * Perl
+   Auto-generate PHP syntax definition files.
+ * Qt6, <http://qt-project.org/>
+
+-- The following features have been disabled:
+
+ * SYNTAX_RESOURCE, Bundle the syntax definition files inside the library as resources
+ * FEATURE_NO_STANDARD_PATHS, Skip lookup of syntax and theme definitions in QStandardPaths locations
+
+-- The following OPTIONAL packages have not been found:
+
+ * XercesC
+   Compile-time validation of syntax definition files.
+
+-- Configuring done (3.0s)
+-- Generating done (0.1s)
+-- Build files have been written to: /vedit-build/target/ksh-selfbuild/F2/build

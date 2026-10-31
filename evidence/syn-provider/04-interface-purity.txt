@@ -1,0 +1,7 @@
+== 04 interface purity (no grammar type in the public headers) ==
+$ grep -nE 'TS[A-Z][A-Za-z]*|tree_sitter|TSTree|TSNode|TSQuery|node_type' <4 public headers>
+[grep exit=1]  (exit 1 = no match = the interface is grammar-type free)
+
+translation units that actually include the tree-sitter API:
+scripts/run-evidence.sh
+tree_sitter_provider.cpp

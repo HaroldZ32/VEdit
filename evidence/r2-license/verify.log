@@ -1,0 +1,64 @@
+== E1 tag peel: v0.4.6 -> commit ==
+PASS  git ls-remote v0.4.6^{} = b012cef466741528f338879fa708355217fc40bd
+== E3/E4/E5 Lapce v0.4.6 static reading ==
+PASS  sha256 Cargo.lock
+PASS  count=1 exactly one tree-sitter package in Cargo.lock
+PASS  absent no tree-sitter-verilog grammar crate in Cargo.lock
+PASS  absent no tree-sitter-systemverilog crate in Cargo.lock
+PASS  sha256 language.rs
+PASS  sha256 grammars.rs
+PASS  has language.rs TreeSitterProperties::DEFAULT grammar: None
+PASS  has language.rs Verilog uses DEFAULT
+PASS  has grammars.rs release endpoint
+PASS  has grammars.rs exact-version match
+PASS  has grammars.rs prebuilt asset name
+PASS  matches workspace version 0.4.6
+== E6 no 0.4.6 grammar release ==
+PASS  absent tree-sitter-grammars tag v0.4.6 (as of 2026-10-31)
+PASS  absent tree-sitter-grammars release v0.4.6 (as of 2026-10-31)
+== E7/E8 grammar build pipeline ==
+PASS  sha256 tree-sitter-grammars main.rs
+PASS  has main.rs helix pin
+PASS  has main.rs reads helix languages.toml
+PASS  sha256 helix languages.toml
+PASS  has helix verilog file-types
+PASS  has helix verilog grammar rev
+PASS  absent (ci) no systemverilog string anywhere in helix languages.toml
+== E9 grammar identity + license ==
+PASS  sha256 ts-verilog LICENSE
+PASS  has LICENSE is MIT
+PASS  has LICENSE copyright line
+PASS  has MIT notice obligation
+PASS  sha256 ts-verilog Cargo.toml
+PASS  has Cargo.toml license = MIT
+PASS  sha256 ts-verilog package.json
+PASS  has package.json license MIT
+PASS  sha256 ts-verilog grammar.js
+== E11 MIT alternatives ==
+PASS  sha256 gmlarumbe LICENSE
+PASS  has gmlarumbe copyright line
+PASS  sha256 gmlarumbe Cargo.toml
+PASS  has gmlarumbe license = MIT
+PASS  sha256 gmlarumbe grammar.js
+== E13 KDE definitions ==
+PASS  sha256 KDE systemverilog.xml
+PASS  has systemverilog.xml license=GPLv3+
+PASS  has systemverilog.xml GPLv3-or-later boilerplate
+PASS  sha256 KDE verilog.xml
+PASS  has verilog.xml license is EMPTY (undeclared)
+PASS  sha256 KDE LICENSES/MIT.txt
+PASS  has KDE contribution policy (MIT)
+== E15 helix query license ==
+PASS  sha256 helix LICENSE
+PASS  has helix LICENSE is MPL-2.0
+== E12 local LGPL asset pins (no network) ==
+PASS  assets/language-specs holds only README.md
+PASS  GtkSourceView 4.6.1 tarball sha256 pinned in scripts/versions.env
+PASS  systemverilog.lang sha256 recorded in evidence/highlight/03-langspec-provenance.txt
+== negative controls (prove the new assertions can actually fail) ==
+PASS  negative control: count detector returns 2 on a 2-grammar fixture (so want=1 is a real constraint)
+PASS  negative control: absence detector fires when the grammar crate IS present
+PASS  negative control: absence detector stays quiet on a clean fixture
+
+== summary: 51 passed, 0 failed ==
+ALL ASSERTIONS PASSED

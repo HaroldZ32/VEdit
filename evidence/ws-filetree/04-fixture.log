@@ -1,0 +1,1 @@
+PREPARE ok=1 root=/vedit-build/target/ws-filetree-tmp project_files=7 big_files=10000

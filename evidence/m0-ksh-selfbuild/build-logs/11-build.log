@@ -1,0 +1,184 @@
+[1/168] Generating generated/syntax/xslt.xml
+[2/168] Generating generated/syntax/javascript-react-twig.xml
+[3/168] Generating generated/syntax/html-php.xml
+[4/168] Generating generated/syntax/css-twig.xml
+[5/168] Generating generated/syntax/javascript-twig.xml
+[6/168] Generating generated/syntax/javascript-php.xml
+[7/168] Generating generated/syntax/html-twig.xml
+[8/168] Generating generated/syntax/typescript-twig.xml
+[9/168] Generating generated/syntax/typescript-php.xml
+[10/168] Generating generated/syntax/javascript-react-php.xml
+[11/168] Generating generated/syntax/mustache-php.xml
+[12/168] Generating generated/syntax/doxygenlua.xml
+[13/168] Generating generated/syntax/css-php.xml
+[14/168] Copying kquicksyntaxhighlightingplugin qml sources into build dir
+[15/168] Copying kquicksyntaxhighlightingplugin qml resources into build dir
+[16/168] Generating generated/syntax/jsonc.xml
+[17/168] Generating ECMPoQm/ast/syntaxhighlighting6_qt.qm
+[18/168] Generating ECMPoQm/az/syntaxhighlighting6_qt.qm
+[19/168] Generating ECMPoQm/bg/syntaxhighlighting6_qt.qm
+[20/168] Generating ECMPoQm/cs/syntaxhighlighting6_qt.qm
+[21/168] Generating ECMPoQm/ca@valencia/syntaxhighlighting6_qt.qm
+[22/168] Automatic MOC for target katehighlightingindexer
+[23/168] Generating ECMPoQm/ca/syntaxhighlighting6_qt.qm
+[24/168] Populating .qmlls.ini file at /vedit-build/target/ksh-selfbuild/F2/build/.qt/.qmlls.build.ini
+[25/168] Building CXX object src/indexer/CMakeFiles/katehighlightingindexer.dir/katehighlightingindexer_autogen/mocs_compilation.cpp.o
+[26/168] Generating ECMPoQm/bn/syntaxhighlighting6_qt.qm
+[27/168] Generating ECMPoQm/ar/syntaxhighlighting6_qt.qm
+[28/168] Generating ECMPoQm/cy/syntaxhighlighting6_qt.qm
+[29/168] Generating ECMPoQm/af/syntaxhighlighting6_qt.qm
+[30/168] Generating ECMPoQm/eo/syntaxhighlighting6_qt.qm
+[31/168] Generating ECMPoQm/es/syntaxhighlighting6_qt.qm
+[32/168] Generating ECMPoQm/be/syntaxhighlighting6_qt.qm
+[33/168] Generating ECMPoQm/bs/syntaxhighlighting6_qt.qm
+[34/168] Generating ECMPoQm/da/syntaxhighlighting6_qt.qm
+[35/168] Generating ECMPoQm/br/syntaxhighlighting6_qt.qm
+[36/168] Generating ECMPoQm/et/syntaxhighlighting6_qt.qm
+[37/168] Generating ECMPoQm/de/syntaxhighlighting6_qt.qm
+[38/168] Generating ECMPoQm/fa/syntaxhighlighting6_qt.qm
+[39/168] Generating ECMPoQm/el/syntaxhighlighting6_qt.qm
+[40/168] Generating ECMPoQm/en_GB/syntaxhighlighting6_qt.qm
+[41/168] Generating ECMPoQm/eu/syntaxhighlighting6_qt.qm
+[42/168] Generating ECMPoQm/he/syntaxhighlighting6_qt.qm
+[43/168] Generating ECMPoQm/fr/syntaxhighlighting6_qt.qm
+[44/168] Generating ECMPoQm/gu/syntaxhighlighting6_qt.qm
+[45/168] Generating ECMPoQm/id/syntaxhighlighting6_qt.qm
+[46/168] Generating ECMPoQm/fi/syntaxhighlighting6_qt.qm
+[47/168] Generating ECMPoQm/ga/syntaxhighlighting6_qt.qm
+Removed plural forms as the target language has less forms.
+If this sounds wrong, possibly the target language is not set or recognized.
+[48/168] Generating ECMPoQm/gl/syntaxhighlighting6_qt.qm
+[49/168] Generating ECMPoQm/fy/syntaxhighlighting6_qt.qm
+[50/168] Generating ECMPoQm/hi/syntaxhighlighting6_qt.qm
+[51/168] Generating ECMPoQm/ja/syntaxhighlighting6_qt.qm
+[52/168] Generating ECMPoQm/hsb/syntaxhighlighting6_qt.qm
+Removed plural forms as the target language has less forms.
+If this sounds wrong, possibly the target language is not set or recognized.
+[53/168] Generating ECMPoQm/ka/syntaxhighlighting6_qt.qm
+[54/168] Generating ECMPoQm/hr/syntaxhighlighting6_qt.qm
+[55/168] Generating ECMPoQm/is/syntaxhighlighting6_qt.qm
+[56/168] Generating ECMPoQm/ia/syntaxhighlighting6_qt.qm
+[57/168] Generating ECMPoQm/it/syntaxhighlighting6_qt.qm
+[58/168] Generating ECMPoQm/hu/syntaxhighlighting6_qt.qm
+Removed plural forms as the target language has less forms.
+If this sounds wrong, possibly the target language is not set or recognized.
+[59/168] Generating ECMPoQm/km/syntaxhighlighting6_qt.qm
+[60/168] Generating ECMPoQm/ku/syntaxhighlighting6_qt.qm
+[61/168] Generating ECMPoQm/lt/syntaxhighlighting6_qt.qm
+Removed plural forms as the target language has less forms.
+If this sounds wrong, possibly the target language is not set or recognized.
+[62/168] Generating ECMPoQm/lb/syntaxhighlighting6_qt.qm
+[63/168] Generating ECMPoQm/nb/syntaxhighlighting6_qt.qm
+[64/168] Generating ECMPoQm/ml/syntaxhighlighting6_qt.qm
+[65/168] Generating ECMPoQm/ko/syntaxhighlighting6_qt.qm
+[66/168] Generating ECMPoQm/mr/syntaxhighlighting6_qt.qm
+[67/168] Generating ECMPoQm/mai/syntaxhighlighting6_qt.qm
+Removed plural forms as the target language has less forms.
+If this sounds wrong, possibly the target language is not set or recognized.
+[68/168] Generating ECMPoQm/nn/syntaxhighlighting6_qt.qm
+[69/168] Generating ECMPoQm/kk/syntaxhighlighting6_qt.qm
+[70/168] Generating ECMPoQm/nl/syntaxhighlighting6_qt.qm
+[71/168] Generating ECMPoQm/lv/syntaxhighlighting6_qt.qm
+[72/168] Generating ECMPoQm/ms/syntaxhighlighting6_qt.qm
+Removed plural forms as the target language has less forms.
+If this sounds wrong, possibly the target language is not set or recognized.
+[73/168] Generating ECMPoQm/pl/syntaxhighlighting6_qt.qm
+[74/168] Generating ECMPoQm/mk/syntaxhighlighting6_qt.qm
+[75/168] Generating ECMPoQm/pt/syntaxhighlighting6_qt.qm
+[76/168] Generating ECMPoQm/pt_BR/syntaxhighlighting6_qt.qm
+[77/168] Generating ECMPoQm/oc/syntaxhighlighting6_qt.qm
+[78/168] Generating ECMPoQm/sa/syntaxhighlighting6_qt.qm
+[79/168] Generating ECMPoQm/sl/syntaxhighlighting6_qt.qm
+[80/168] Generating ECMPoQm/se/syntaxhighlighting6_qt.qm
+[81/168] Generating ECMPoQm/sk/syntaxhighlighting6_qt.qm
+[82/168] Generating ECMPoQm/ne/syntaxhighlighting6_qt.qm
+[83/168] Generating ECMPoQm/sr/syntaxhighlighting6_qt.qm
+[84/168] Generating ECMPoQm/ro/syntaxhighlighting6_qt.qm
+[85/168] Generating ECMPoQm/sr@ijekavian/syntaxhighlighting6_qt.qm
+[86/168] Generating ECMPoQm/sr@ijekavianlatin/syntaxhighlighting6_qt.qm
+[87/168] Generating ECMPoQm/pa/syntaxhighlighting6_qt.qm
+[88/168] Generating ECMPoQm/sq/syntaxhighlighting6_qt.qm
+[89/168] Generating ECMPoQm/sr@latin/syntaxhighlighting6_qt.qm
+[90/168] Generating ECMPoQm/sv/syntaxhighlighting6_qt.qm
+[91/168] Generating ECMPoQm/ru/syntaxhighlighting6_qt.qm
+Removed plural forms as the target language has less forms.
+If this sounds wrong, possibly the target language is not set or recognized.
+[92/168] Generating ECMPoQm/nds/syntaxhighlighting6_qt.qm
+Removed plural forms as the target language has less forms.
+If this sounds wrong, possibly the target language is not set or recognized.
+[93/168] Automatic MOC for target KF6SyntaxHighlighting
+[94/168] Generating ECMPoQm/tr/syntaxhighlighting6_qt.qm
+[95/168] Generating ECMPoQm/uk/syntaxhighlighting6_qt.qm
+[96/168] Generating ECMPoQm/si/syntaxhighlighting6_qt.qm
+[97/168] Generating ECMPoQm/vi/syntaxhighlighting6_qt.qm
+[98/168] Generating ECMPoQm/uz/syntaxhighlighting6_qt.qm
+[99/168] Generating ECMPoQm/tg/syntaxhighlighting6_qt.qm
+[100/168] Generating ECMPoQm/uz@cyrillic/syntaxhighlighting6_qt.qm
+[101/168] Generating ECMPoQm/zh_CN/syntaxhighlighting6_qt.qm
+[102/168] Generating ECMPoQm/zh_TW/syntaxhighlighting6_qt.qm
+[103/168] Generating generated/syntax/jinja-systemd-unit.xml, generated/syntax/jinja-cmake.xml, generated/syntax/jinja-zsh.xml, generated/syntax/jinja-sql.xml, generated/syntax/jinja-javascript.xml, generated/syntax/jinja-java.xml, generated/syntax/jinja-bash.xml, generated/syntax/jinja-typescript.xml, generated/syntax/jinja-html.xml, generated/syntax/jinja-rust.xml, generated/syntax/jinja-dockerfile.xml, generated/syntax/jinja-mustache.xml, generated/syntax/jinja-javascript-react.xml, generated/syntax/jinja-rest.xml, generated/syntax/jinja-comments.xml, generated/syntax/jinja-python.xml, generated/syntax/jinja-groovy.xml, generated/syntax/jinja-alert.xml, generated/syntax/jinja-xml.xml, generated/syntax/jinja-yaml.xml, generated/syntax/jinja-terraform.xml, generated/syntax/jinja-javadoc.xml, generated/syntax/jinja-cpp.xml, generated/syntax/jinja-modelines.xml, generated/syntax/jinja-ini.xml, generated/syntax/jinja-spdx-comments.xml, generated/syntax/jinja-json.xml, generated/syntax/jinja-ruby.xml, generated/syntax/jinja-qmake.xml, generated/syntax/jinja-qml.xml, generated/syntax/jinja-toml.xml, generated/syntax/jinja-css.xml, generated/syntax/jinja-doxygen.xml, generated/syntax/jinja-isocpp.xml, generated/syntax/jinja-gcc.xml
+[104/168] Generating ECMPoQm/th/syntaxhighlighting6_qt.qm
+[105/168] Generating ECMPoQm/ug/syntaxhighlighting6_qt.qm
+[106/168] Generating ECMPoQm/ta/syntaxhighlighting6_qt.qm
+[107/168] Generating ECMPoQm/xh/syntaxhighlighting6_qt.qm
+[108/168] Generating ECMPoQm/wa/syntaxhighlighting6_qt.qm
+[109/168] Building CXX object src/indexer/CMakeFiles/katehighlightingindexer.dir/__/lib/worddelimiters.cpp.o
+[110/168] Building CXX object src/indexer/CMakeFiles/katehighlightingindexer.dir/katehighlightingindexer.cpp.o
+[111/168] Linking CXX executable bin/katehighlightingindexer
+[112/168] Generating index.katesyntax
+[113/168] Automatic MOC for target SyntaxHighlightingData
+[114/168] Automatic RCC for themes/theme-data.qrc
+[115/168] Building CXX object data/CMakeFiles/SyntaxHighlightingData.dir/SyntaxHighlightingData_autogen/mocs_compilation.cpp.o
+[116/168] Building CXX object data/CMakeFiles/SyntaxHighlightingData.dir/SyntaxHighlightingData_autogen/PS4R4P76QL/qrc_theme-data.cpp.o
+[117/168] Running AUTOMOC file extraction for target KF6SyntaxHighlighting
+[118/168] Running moc --collect-json for target KF6SyntaxHighlighting
+[119/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/KF6SyntaxHighlighting_autogen/mocs_compilation.cpp.o
+[120/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/foldingregion.cpp.o
+[121/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/wildcardmatcher.cpp.o
+[122/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/theme.cpp.o
+[123/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/contextswitch.cpp.o
+[124/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/format.cpp.o
+[125/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/state.cpp.o
+[126/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/context.cpp.o
+[127/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/highlightingdata.cpp.o
+[128/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/keywordlist.cpp.o
+[129/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/htmlhighlighter.cpp.o
+[130/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/abstracthighlighter.cpp.o
+[131/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/worddelimiters.cpp.o
+[132/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/syntaxhighlighter.cpp.o
+[133/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/definitiondownloader.cpp.o
+[134/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/themedata.cpp.o
+[135/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/rule.cpp.o
+[136/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/ansihighlighter.cpp.o
+[137/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/ksyntaxhighlighting_logging.cpp.o
+[138/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/ECMQmLoader-syntaxhighlighting6_qt.cpp.o
+[139/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/definition.cpp.o
+[140/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/repository.cpp.o
+[141/168] Linking CXX shared library bin/libKF6SyntaxHighlighting.so.6.24.0
+[142/168] Creating library symlink bin/libKF6SyntaxHighlighting.so.6 bin/libKF6SyntaxHighlighting.so
+[143/168] Automatic MOC for target ksyntaxhighlighter6
+[144/168] Automatic MOC for target codepdfprinter
+[145/168] Building CXX object src/cli/CMakeFiles/ksyntaxhighlighter6.dir/ksyntaxhighlighter6_autogen/mocs_compilation.cpp.o
+[146/168] Building CXX object examples/codepdfprinter/CMakeFiles/codepdfprinter.dir/codepdfprinter_autogen/mocs_compilation.cpp.o
+[147/168] Automatic MOC for target codeeditor
+[148/168] Building CXX object examples/codeeditor/CMakeFiles/codeeditor.dir/codeeditor_autogen/mocs_compilation.cpp.o
+[149/168] Automatic MOC for target kquicksyntaxhighlightingplugin
+[150/168] Running AUTOMOC file extraction for target kquicksyntaxhighlightingplugin
+[151/168] Running rcc for resource qmake_org_kde_syntaxhighlighting
+[152/168] Running moc --collect-json for target kquicksyntaxhighlightingplugin
+[153/168] Automatic QML type registration for target kquicksyntaxhighlightingplugin
+[154/168] Building CXX object src/quick/CMakeFiles/kquicksyntaxhighlightingplugin.dir/kquicksyntaxhighlightingplugin_autogen/mocs_compilation.cpp.o
+[155/168] Building CXX object src/quick/CMakeFiles/kquicksyntaxhighlightingplugin.dir/.qt/rcc/qrc_qmake_org_kde_syntaxhighlighting.cpp.o
+[156/168] Building CXX object src/quick/CMakeFiles/kquicksyntaxhighlightingplugin.dir/kquicksyntaxhighlightingplugin_org_kde_syntaxhighlightingPlugin.cpp.o
+[157/168] Building CXX object examples/codepdfprinter/CMakeFiles/codepdfprinter.dir/main.cpp.o
+[158/168] Building CXX object src/cli/CMakeFiles/ksyntaxhighlighter6.dir/ksyntaxhighlighter.cpp.o
+[159/168] Building CXX object examples/codepdfprinter/CMakeFiles/codepdfprinter.dir/codepdfprinter.cpp.o
+[160/168] Building CXX object examples/codeeditor/CMakeFiles/codeeditor.dir/main.cpp.o
+[161/168] Linking CXX executable bin/ksyntaxhighlighter6
+[162/168] Building CXX object src/quick/CMakeFiles/kquicksyntaxhighlightingplugin.dir/types.cpp.o
+[163/168] Linking CXX executable bin/codepdfprinter
+[164/168] Building CXX object examples/codeeditor/CMakeFiles/codeeditor.dir/codeeditor.cpp.o
+[165/168] Building CXX object src/quick/CMakeFiles/kquicksyntaxhighlightingplugin.dir/kquicksyntaxhighlightingplugin_qmltyperegistrations.cpp.o
+[166/168] Building CXX object src/quick/CMakeFiles/kquicksyntaxhighlightingplugin.dir/kquicksyntaxhighlighter.cpp.o
+[167/168] Linking CXX executable bin/codeeditor
+[168/168] Linking CXX shared module bin/org/kde/syntaxhighlighting/libkquicksyntaxhighlightingplugin.so

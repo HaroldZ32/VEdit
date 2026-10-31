@@ -1,0 +1,13 @@
+actual image for this run: vedit-qt6-build:local
+resolved id (LOCATOR only, never the criterion): sha256:ba08930b122dcd900cd20c0c6cfe67e9b4b0c015060e417a92079423f9146ab7
+
+runner: probes/c17-overlay/scripts/run-probe.sh (UNMODIFIED)
+4485c4c20f5d170b35760c70e53a033ffe425cb24d638bb9e6dcc8ec9e8d6dc6  /home/haroldzhao/MyProj/DshProj/VEdit/probes/c17-overlay/scripts/run-probe.sh
+
+why 00-pins.txt contains 'image: vprobe-qt6kf6:1':
+  7:#       vprobe-qt6kf6:1 bash scripts/run-probe.sh /work/evidence/r2-c17
+  23:  echo "image: vprobe-qt6kf6:1"
+  27:  echo "image tag: vprobe-qt6kf6:1 (image id captured host-side, see 00-image-id.txt)"
+  -> hardcoded echo lines in the runner, left untouched by design;
+     authoritative identity is THIS file + 12-image-pin-assertions.txt
+     (22 locked packages asserted against the lock file inside the image).

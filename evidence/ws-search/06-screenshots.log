@@ -1,0 +1,7 @@
+## command: Xvfb :83 + root-build selftest --screenshots evidence/ws-search (xcb + llvmpipe)
+SHOT evidence/ws-search/01-search-results.png written 1280x860
+SHOT evidence/ws-search/03-search-jump.png written 1280x860
+SHOT evidence/ws-search/02-search-empty-state.png written 1280x860
+SHOT evidence/ws-search/04-search-no-project.png written 1280x860
+SCREENSHOTS ok=1 failures=0
+## exit: 0

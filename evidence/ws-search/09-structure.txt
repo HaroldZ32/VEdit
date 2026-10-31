@@ -1,0 +1,30 @@
+## files
+src/workspace/search/CMakeLists.txt
+src/workspace/search/global_search.cpp
+src/workspace/search/global_search.h
+src/workspace/search/README.md
+src/workspace/search/search_integration.cpp
+src/workspace/search/search_integration.h
+src/workspace/search/search_panel.cpp
+src/workspace/search/search_panel.h
+src/workspace/search/search_selftest.cpp
+src/workspace/search/search_types.cpp
+src/workspace/search/search_types.h
+
+## line counts
+   97 src/workspace/search/CMakeLists.txt
+  345 src/workspace/search/global_search.cpp
+   62 src/workspace/search/global_search.h
+  139 src/workspace/search/README.md
+   21 src/workspace/search/search_integration.cpp
+   22 src/workspace/search/search_integration.h
+  451 src/workspace/search/search_panel.cpp
+  127 src/workspace/search/search_panel.h
+  860 src/workspace/search/search_selftest.cpp
+   43 src/workspace/search/search_types.cpp
+   93 src/workspace/search/search_types.h
+ 2260 total
+
+## no KSyntaxHighlighting call sites in the lane (the .v->V trap cannot apply)
+src/workspace/search/search_types.h:25:    // KSyntaxHighlighting: in this image definitionForFileName("x.v") resolves
+## (only the documentation comment in search_types.h mentions the trap)

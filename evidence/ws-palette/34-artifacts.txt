@@ -1,0 +1,18 @@
+# ws-palette evidence artifacts — sha256 (2026-10-31T04:14:43Z)
+670dd3b7f54db8bcdb113ac8aa91bc31b3f6175de6aca9ff17f963d36ce69cb2  evidence/ws-palette/00-pins.txt
+7c71b04ec4ef7b6214ae3b033d5321e122dc2e213e73fa4c7e8cc50e18a13561  evidence/ws-palette/30-build-qt.log
+016da8c93e35ad5bbd8c06ef2659fc44cbabc213a8a2292a208a5aad52765b19  evidence/ws-palette/31-bench.log
+e0e653a99ff0372a47502496bc13b08290cf5d7750627a5adbfb664c3f4adce6  evidence/ws-palette/32-ctest-palette.log
+ed6e15a69e6cb4c699d4c136503fdcf7e4380677ad7cfb86136a0c858017952e  evidence/ws-palette/33-elf.txt
+a89113adf25c6d02383d88048df1f9d72c1ebac5d05a4c38af8f050d63132b5d  evidence/ws-palette/36-app-seam-diff.md
+92565be203878d660aa8d4c57d16883bb150ce037706ddd89fbaa6148315fa68  evidence/ws-palette/37-gate-qt6-cxx.log
+4485f41e7d62dafd4feaf28cd926f164eb93046b4811c6d253969b95c059bfa8  evidence/ws-palette/bench.json
+e4dccc8474d87f27c7c7dc4163cd0af46cf4cefaebdf368f5bd3f79efe193e02  evidence/ws-palette/REPORT.md
+0e6df95264266bf284b9ad71cef8d7befb11aab779812e7e3dad08ab7550a0d7  evidence/ws-palette/screenshots/10-palette-filter.png
+6ce93f2c6b7b43d955a9f6478201f53627341ad3a9e56e46288cd8aa311cd5ac  evidence/ws-palette/screenshots/11-palette-empty-state.png
+49c0dc95c51a275bb6136ccbf34a57ddae2d802d4f0d916aa43a7903727110c1  evidence/ws-palette/screenshots/12-palette-no-project.png
+a3ad3f6b3ed71ab674be9eb35e2a2cfc2699dc983f75f45662cde87220389864  evidence/ws-palette/screenshots/13-palette-project.png
+0e4f5dc3a3449a7c8f6ae982b5053125e162a1492d4de4046ad8cea08c42655a  evidence/ws-palette/screenshots/20-integration-empty.png
+556dd96470472c24fb4c31f819d4953f99462d02f7978af0d1afd58bc59dff6c  evidence/ws-palette/screenshots/21-integration-palette.png
+6ebd22f07f570b77f3fd414a41499678fdba3467bdea8f3847bca586f9fb195e  evidence/ws-palette/screenshots/22-integration-shell.png
+959c34f8a67a397b3022ff3acf11d1a4622d1515241e92612df8f4fdab12ff2c  evidence/ws-palette/SEAM.md

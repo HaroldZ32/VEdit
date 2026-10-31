@@ -1,0 +1,1759 @@
+[ksh] self-build KSyntaxHighlighting 6.24.0 (tag v6.24.0, commit bbea2326fbd4)
+[ksh] options: QRC_SYNTAX=OFF NO_STANDARD_PATHS=ON BUILD_TESTING=OFF
+[ksh] toolchain: the M0 Qt6 image vedit-qt6-build:local (Qt 6.10.2, ECM 6.24)
+[qt6-image] building vedit-qt6-build:local (stage qt6-build, base docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c)
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.build
+#1 transferring dockerfile: 11.56kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [qt6-build 1/4] FROM docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c
+#4 resolve docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 45B done
+#5 DONE 0.0s
+
+#6 [qt6-build 2/4] COPY qt6-locked-packages.txt /opt/vedit/qt6-locked-packages.txt
+#6 CACHED
+
+#7 [qt6-build 3/4] RUN set -eux;     apt-get update;     mkdir -p /tmp/qt6-debs; cd /tmp/qt6-debs;     while read -r spec sha rest; do       case "$spec" in ''|'#'*) continue;; esac;       apt-get download "$spec";       deb=$(ls "${spec%%=*}"_*.deb);       printf '%s  %s\n' "$sha" "$deb" | sha256sum -c -;     done < /opt/vedit/qt6-locked-packages.txt;     cd /; rm -rf /tmp/qt6-debs;     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends       build-essential pkg-config git curl ca-certificates binutils file       xvfb xauth fonts-dejavu-core libgl1-mesa-dri mesa-utils       libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0       libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0       libxcb-xkb1 libxkbcommon0       $(awk '!/^#/ && NF {print $1}' /opt/vedit/qt6-locked-packages.txt);     rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [qt6-build 4/4] RUN set -eux;     while read -r spec sha rest; do       case "$spec" in ''|'#'*) continue;; esac;       pkg="${spec%%=*}"; ver="${spec#*=}";       got=$(dpkg-query -W -f='${Version}' "$pkg");       [ "$got" = "$ver" ] || { echo "FATAL: $pkg installed=$got locked=$ver" >&2; exit 1; };     done < /opt/vedit/qt6-locked-packages.txt;     { echo "## image facts"; head -3 /etc/os-release;       echo "glibc: $(dpkg-query -W -f='${Version}' libc6)";       strings /lib/x86_64-linux-gnu/libc.so.6 | grep -m1 'Minimum supported kernel';       echo "qt6-base-dev: $(dpkg-query -W -f='${Version}' qt6-base-dev)";       echo "kf6-texteditor: $(dpkg-query -W -f='${Version}' libkf6texteditor-dev)";       echo "kf6-syntaxhighlighting: $(dpkg-query -W -f='${Version}' libkf6syntaxhighlighting-dev)";       echo "tree-sitter: $(pkg-config --modversion tree-sitter)";       echo "cmake: $(cmake --version | head -1)";       echo "g++: $(g++ --version | head -1)";     } | tee /opt/vedit/build-image.txt;     dpkg-query -W -f='${Package} ${Version} ${Architecture}\n' | sort > /opt/vedit/package-snapshot.txt
+#8 CACHED
+
+#9 exporting to image
+#9 exporting layers
+#9 exporting layers done
+#9 exporting manifest sha256:a7872d6d7763700875d864c27b4503fc4987508c956152b2970818bab8c367a1 done
+#9 exporting config sha256:b258b23c4868f9f168aa51b961a9c4f941db28d886284e59d35e021f9c33788e done
+#9 exporting attestation manifest sha256:0778d6055c492c6378ca3774c6a3de2029942a2f8e9d1e3a4232255fe1956aa0 0.0s done
+#9 exporting manifest list sha256:237edd8db44a87bc179e17a5fda53e29fd4ec674fcdf3add5c80599002a36e5b 0.0s done
+#9 naming to docker.io/library/vedit-qt6-build:local done
+#9 unpacking to docker.io/library/vedit-qt6-build:local done
+#9 DONE 0.1s
+== [1/7] pinned source tarball ==
+/vedit-build/target/ksh-selfbuild/syntax-highlighting-6.24.0.tar.xz: OK
+url=https://download.kde.org/stable/frameworks/6.24/syntax-highlighting-6.24.0.tar.xz
+tag=v6.24.0 commit=bbea2326fbd4fc720518efc43f1b018f8a7d0670 version=6.24.0
+061c5946dc6170ecfa91b9c7d4faa5ec81eb53bb5f86eda861c2ce748a65486d  /vedit-build/target/ksh-selfbuild/syntax-highlighting-6.24.0.tar.xz
+== [2/7] configure with the B' options ==
+-- The C compiler identification is GNU 15.2.0
+-- The CXX compiler identification is GNU 15.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+Installing in /vedit-build/target/ksh-selfbuild/install. Run /vedit-build/target/ksh-selfbuild/build/prefix.sh to set the environment for KSyntaxHighlighting.
+-- Performing Test HAVE_STDATOMIC
+-- Performing Test HAVE_STDATOMIC - Success
+-- Found WrapAtomic: TRUE
+-- Looking for __GLIBC__
+-- Looking for __GLIBC__ - found
+-- Performing Test _OFFT_IS_64BIT
+-- Performing Test _OFFT_IS_64BIT - Success
+-- Performing Test HAVE_DATE_TIME
+-- Performing Test HAVE_DATE_TIME - Success
+-- Found OpenGL: /usr/lib/x86_64-linux-gnu/libOpenGL.so
+-- Found WrapOpenGL: TRUE
+-- Found WrapVulkanHeaders: /usr/include
+-- Failed to find XercesC (missing: XercesC_LIBRARY XercesC_INCLUDE_DIR XercesC_VERSION) 
+-- Found Perl: /usr/bin/perl (found version "5.40.1")
+-- Found Python: /usr/bin/python3 (found version "3.14.4") found components: Interpreter
+-- Performing Test COMPILER_HAS_HIDDEN_VISIBILITY
+-- Performing Test COMPILER_HAS_HIDDEN_VISIBILITY - Success
+-- Performing Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY
+-- Performing Test COMPILER_HAS_HIDDEN_INLINE_VISIBILITY - Success
+-- Performing Test COMPILER_HAS_DEPRECATED_ATTR
+-- Performing Test COMPILER_HAS_DEPRECATED_ATTR - Success
+-- The following features have been enabled:
+
+ * FEATURE_NO_STANDARD_PATHS, Skip lookup of syntax and theme definitions in QStandardPaths locations
+
+-- The following OPTIONAL packages have been found:
+
+ * Qt6Core
+ * Qt6Qml
+ * Qt6Test (required version >= 6.8.0)
+ * OpenGL
+ * Qt6DBusTools (required version >= 6.10.2)
+ * Qt6Gui (required version >= 6.8.0)
+ * Python
+   Auto-generate Jinja syntax definition files.
+ * Qt6LinguistTools
+
+-- The following REQUIRED packages have been found:
+
+ * ECM (required version >= 6.24.0)
+ * Perl
+   Auto-generate PHP syntax definition files.
+ * Qt6, <http://qt-project.org/>
+
+-- The following features have been disabled:
+
+ * SYNTAX_RESOURCE, Bundle the syntax definition files inside the library as resources
+
+-- The following OPTIONAL packages have not been found:
+
+ * XercesC
+   Compile-time validation of syntax definition files.
+
+-- Configuring done (3.0s)
+-- Generating done (0.1s)
+-- Build files have been written to: /vedit-build/target/ksh-selfbuild/build
+== [3/7] build + install ==
+[1/168] Generating generated/syntax/html-php.xml
+[2/168] Generating generated/syntax/javascript-php.xml
+[3/168] Generating generated/syntax/html-twig.xml
+[4/168] Generating generated/syntax/css-php.xml
+[5/168] Generating generated/syntax/css-twig.xml
+[6/168] Generating generated/syntax/doxygenlua.xml
+[7/168] Generating generated/syntax/mustache-php.xml
+[8/168] Generating generated/syntax/javascript-react-twig.xml
+[9/168] Generating generated/syntax/xslt.xml
+[10/168] Generating generated/syntax/javascript-react-php.xml
+[11/168] Generating generated/syntax/typescript-twig.xml
+[12/168] Generating generated/syntax/typescript-php.xml
+[13/168] Generating generated/syntax/javascript-twig.xml
+[14/168] Generating generated/syntax/jsonc.xml
+[15/168] Copying kquicksyntaxhighlightingplugin qml sources into build dir
+[16/168] Copying kquicksyntaxhighlightingplugin qml resources into build dir
+[17/168] Generating ECMPoQm/az/syntaxhighlighting6_qt.qm
+[18/168] Automatic MOC for target katehighlightingindexer
+[19/168] Generating ECMPoQm/bg/syntaxhighlighting6_qt.qm
+[20/168] Generating ECMPoQm/ast/syntaxhighlighting6_qt.qm
+[21/168] Generating ECMPoQm/ca/syntaxhighlighting6_qt.qm
+[22/168] Generating ECMPoQm/ca@valencia/syntaxhighlighting6_qt.qm
+[23/168] Populating .qmlls.ini file at /vedit-build/target/ksh-selfbuild/build/.qt/.qmlls.build.ini
+[24/168] Generating ECMPoQm/cs/syntaxhighlighting6_qt.qm
+[25/168] Generating ECMPoQm/bn/syntaxhighlighting6_qt.qm
+[26/168] Generating ECMPoQm/br/syntaxhighlighting6_qt.qm
+[27/168] Generating ECMPoQm/cy/syntaxhighlighting6_qt.qm
+[28/168] Generating ECMPoQm/ar/syntaxhighlighting6_qt.qm
+[29/168] Building CXX object src/indexer/CMakeFiles/katehighlightingindexer.dir/katehighlightingindexer_autogen/mocs_compilation.cpp.o
+[30/168] Generating ECMPoQm/af/syntaxhighlighting6_qt.qm
+[31/168] Generating ECMPoQm/be/syntaxhighlighting6_qt.qm
+[32/168] Generating ECMPoQm/eo/syntaxhighlighting6_qt.qm
+[33/168] Generating ECMPoQm/et/syntaxhighlighting6_qt.qm
+[34/168] Generating ECMPoQm/de/syntaxhighlighting6_qt.qm
+[35/168] Generating ECMPoQm/da/syntaxhighlighting6_qt.qm
+[36/168] Generating ECMPoQm/es/syntaxhighlighting6_qt.qm
+[37/168] Generating ECMPoQm/el/syntaxhighlighting6_qt.qm
+[38/168] Generating ECMPoQm/bs/syntaxhighlighting6_qt.qm
+[39/168] Generating ECMPoQm/he/syntaxhighlighting6_qt.qm
+[40/168] Generating ECMPoQm/eu/syntaxhighlighting6_qt.qm
+[41/168] Generating ECMPoQm/en_GB/syntaxhighlighting6_qt.qm
+[42/168] Generating ECMPoQm/fi/syntaxhighlighting6_qt.qm
+[43/168] Generating ECMPoQm/fy/syntaxhighlighting6_qt.qm
+[44/168] Generating ECMPoQm/fa/syntaxhighlighting6_qt.qm
+[45/168] Generating ECMPoQm/gu/syntaxhighlighting6_qt.qm
+[46/168] Generating ECMPoQm/hsb/syntaxhighlighting6_qt.qm
+Removed plural forms as the target language has less forms.
+If this sounds wrong, possibly the target language is not set or recognized.
+[47/168] Generating ECMPoQm/ka/syntaxhighlighting6_qt.qm
+[48/168] Generating ECMPoQm/hu/syntaxhighlighting6_qt.qm
+Removed plural forms as the target language has less forms.
+If this sounds wrong, possibly the target language is not set or recognized.
+[49/168] Generating ECMPoQm/gl/syntaxhighlighting6_qt.qm
+[50/168] Generating ECMPoQm/hr/syntaxhighlighting6_qt.qm
+[51/168] Generating ECMPoQm/ga/syntaxhighlighting6_qt.qm
+Removed plural forms as the target language has less forms.
+If this sounds wrong, possibly the target language is not set or recognized.
+[52/168] Generating ECMPoQm/fr/syntaxhighlighting6_qt.qm
+[53/168] Generating ECMPoQm/hi/syntaxhighlighting6_qt.qm
+[54/168] Generating ECMPoQm/id/syntaxhighlighting6_qt.qm
+[55/168] Generating ECMPoQm/ja/syntaxhighlighting6_qt.qm
+[56/168] Generating ECMPoQm/is/syntaxhighlighting6_qt.qm
+[57/168] Generating ECMPoQm/ia/syntaxhighlighting6_qt.qm
+[58/168] Generating ECMPoQm/lv/syntaxhighlighting6_qt.qm
+[59/168] Generating ECMPoQm/it/syntaxhighlighting6_qt.qm
+[60/168] Generating ECMPoQm/ko/syntaxhighlighting6_qt.qm
+[61/168] Generating ECMPoQm/km/syntaxhighlighting6_qt.qm
+[62/168] Generating ECMPoQm/ku/syntaxhighlighting6_qt.qm
+[63/168] Generating ECMPoQm/mai/syntaxhighlighting6_qt.qm
+Removed plural forms as the target language has less forms.
+If this sounds wrong, possibly the target language is not set or recognized.
+[64/168] Generating ECMPoQm/lb/syntaxhighlighting6_qt.qm
+[65/168] Generating ECMPoQm/kk/syntaxhighlighting6_qt.qm
+[66/168] Generating ECMPoQm/lt/syntaxhighlighting6_qt.qm
+Removed plural forms as the target language has less forms.
+If this sounds wrong, possibly the target language is not set or recognized.
+[67/168] Generating ECMPoQm/mk/syntaxhighlighting6_qt.qm
+[68/168] Generating ECMPoQm/nb/syntaxhighlighting6_qt.qm
+[69/168] Generating ECMPoQm/nn/syntaxhighlighting6_qt.qm
+[70/168] Generating ECMPoQm/mr/syntaxhighlighting6_qt.qm
+[71/168] Generating ECMPoQm/ml/syntaxhighlighting6_qt.qm
+[72/168] Generating ECMPoQm/nds/syntaxhighlighting6_qt.qm
+Removed plural forms as the target language has less forms.
+If this sounds wrong, possibly the target language is not set or recognized.
+[73/168] Generating ECMPoQm/oc/syntaxhighlighting6_qt.qm
+[74/168] Generating ECMPoQm/ms/syntaxhighlighting6_qt.qm
+Removed plural forms as the target language has less forms.
+If this sounds wrong, possibly the target language is not set or recognized.
+[75/168] Generating ECMPoQm/pl/syntaxhighlighting6_qt.qm
+[76/168] Generating ECMPoQm/pa/syntaxhighlighting6_qt.qm
+[77/168] Generating ECMPoQm/sa/syntaxhighlighting6_qt.qm
+[78/168] Generating ECMPoQm/pt/syntaxhighlighting6_qt.qm
+[79/168] Generating ECMPoQm/ne/syntaxhighlighting6_qt.qm
+[80/168] Generating ECMPoQm/se/syntaxhighlighting6_qt.qm
+[81/168] Generating ECMPoQm/nl/syntaxhighlighting6_qt.qm
+[82/168] Generating ECMPoQm/pt_BR/syntaxhighlighting6_qt.qm
+[83/168] Generating ECMPoQm/sk/syntaxhighlighting6_qt.qm
+[84/168] Generating ECMPoQm/sr@ijekavian/syntaxhighlighting6_qt.qm
+[85/168] Generating ECMPoQm/sr@ijekavianlatin/syntaxhighlighting6_qt.qm
+[86/168] Generating ECMPoQm/sr/syntaxhighlighting6_qt.qm
+[87/168] Generating ECMPoQm/sl/syntaxhighlighting6_qt.qm
+[88/168] Generating ECMPoQm/sq/syntaxhighlighting6_qt.qm
+[89/168] Automatic MOC for target KF6SyntaxHighlighting
+[90/168] Generating ECMPoQm/ro/syntaxhighlighting6_qt.qm
+[91/168] Generating ECMPoQm/ru/syntaxhighlighting6_qt.qm
+Removed plural forms as the target language has less forms.
+If this sounds wrong, possibly the target language is not set or recognized.
+[92/168] Generating ECMPoQm/sv/syntaxhighlighting6_qt.qm
+[93/168] Generating ECMPoQm/sr@latin/syntaxhighlighting6_qt.qm
+[94/168] Generating ECMPoQm/tr/syntaxhighlighting6_qt.qm
+[95/168] Generating ECMPoQm/uk/syntaxhighlighting6_qt.qm
+[96/168] Generating ECMPoQm/si/syntaxhighlighting6_qt.qm
+[97/168] Generating ECMPoQm/zh_CN/syntaxhighlighting6_qt.qm
+[98/168] Generating ECMPoQm/vi/syntaxhighlighting6_qt.qm
+[99/168] Generating ECMPoQm/uz/syntaxhighlighting6_qt.qm
+[100/168] Generating ECMPoQm/th/syntaxhighlighting6_qt.qm
+[101/168] Generating ECMPoQm/zh_TW/syntaxhighlighting6_qt.qm
+[102/168] Generating ECMPoQm/ta/syntaxhighlighting6_qt.qm
+[103/168] Generating ECMPoQm/xh/syntaxhighlighting6_qt.qm
+[104/168] Generating ECMPoQm/wa/syntaxhighlighting6_qt.qm
+[105/168] Generating ECMPoQm/tg/syntaxhighlighting6_qt.qm
+[106/168] Generating ECMPoQm/uz@cyrillic/syntaxhighlighting6_qt.qm
+[107/168] Generating ECMPoQm/ug/syntaxhighlighting6_qt.qm
+[108/168] Generating generated/syntax/jinja-dockerfile.xml, generated/syntax/jinja-zsh.xml, generated/syntax/jinja-javascript.xml, generated/syntax/jinja-java.xml, generated/syntax/jinja-ini.xml, generated/syntax/jinja-rust.xml, generated/syntax/jinja-sql.xml, generated/syntax/jinja-ruby.xml, generated/syntax/jinja-html.xml, generated/syntax/jinja-yaml.xml, generated/syntax/jinja-css.xml, generated/syntax/jinja-mustache.xml, generated/syntax/jinja-terraform.xml, generated/syntax/jinja-javascript-react.xml, generated/syntax/jinja-qmake.xml, generated/syntax/jinja-toml.xml, generated/syntax/jinja-systemd-unit.xml, generated/syntax/jinja-comments.xml, generated/syntax/jinja-bash.xml, generated/syntax/jinja-cmake.xml, generated/syntax/jinja-typescript.xml, generated/syntax/jinja-javadoc.xml, generated/syntax/jinja-cpp.xml, generated/syntax/jinja-json.xml, generated/syntax/jinja-qml.xml, generated/syntax/jinja-rest.xml, generated/syntax/jinja-xml.xml, generated/syntax/jinja-groovy.xml, generated/syntax/jinja-python.xml, generated/syntax/jinja-doxygen.xml, generated/syntax/jinja-spdx-comments.xml, generated/syntax/jinja-modelines.xml, generated/syntax/jinja-alert.xml, generated/syntax/jinja-isocpp.xml, generated/syntax/jinja-gcc.xml
+[109/168] Building CXX object src/indexer/CMakeFiles/katehighlightingindexer.dir/__/lib/worddelimiters.cpp.o
+[110/168] Building CXX object src/indexer/CMakeFiles/katehighlightingindexer.dir/katehighlightingindexer.cpp.o
+[111/168] Linking CXX executable bin/katehighlightingindexer
+[112/168] Generating index.katesyntax
+[113/168] Automatic MOC for target SyntaxHighlightingData
+[114/168] Automatic RCC for themes/theme-data.qrc
+[115/168] Building CXX object data/CMakeFiles/SyntaxHighlightingData.dir/SyntaxHighlightingData_autogen/mocs_compilation.cpp.o
+[116/168] Building CXX object data/CMakeFiles/SyntaxHighlightingData.dir/SyntaxHighlightingData_autogen/PS4R4P76QL/qrc_theme-data.cpp.o
+[117/168] Running AUTOMOC file extraction for target KF6SyntaxHighlighting
+[118/168] Running moc --collect-json for target KF6SyntaxHighlighting
+[119/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/KF6SyntaxHighlighting_autogen/mocs_compilation.cpp.o
+[120/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/foldingregion.cpp.o
+[121/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/wildcardmatcher.cpp.o
+[122/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/contextswitch.cpp.o
+[123/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/theme.cpp.o
+[124/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/state.cpp.o
+[125/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/format.cpp.o
+[126/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/keywordlist.cpp.o
+[127/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/definitiondownloader.cpp.o
+[128/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/worddelimiters.cpp.o
+[129/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/htmlhighlighter.cpp.o
+[130/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/abstracthighlighter.cpp.o
+[131/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/context.cpp.o
+[132/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/syntaxhighlighter.cpp.o
+[133/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/highlightingdata.cpp.o
+[134/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/rule.cpp.o
+[135/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/ansihighlighter.cpp.o
+[136/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/ksyntaxhighlighting_logging.cpp.o
+[137/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/ECMQmLoader-syntaxhighlighting6_qt.cpp.o
+[138/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/themedata.cpp.o
+[139/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/definition.cpp.o
+[140/168] Building CXX object src/lib/CMakeFiles/KF6SyntaxHighlighting.dir/repository.cpp.o
+[141/168] Linking CXX shared library bin/libKF6SyntaxHighlighting.so.6.24.0
+[142/168] Creating library symlink bin/libKF6SyntaxHighlighting.so.6 bin/libKF6SyntaxHighlighting.so
+[143/168] Automatic MOC for target ksyntaxhighlighter6
+[144/168] Automatic MOC for target codepdfprinter
+[145/168] Building CXX object examples/codepdfprinter/CMakeFiles/codepdfprinter.dir/codepdfprinter_autogen/mocs_compilation.cpp.o
+[146/168] Building CXX object src/cli/CMakeFiles/ksyntaxhighlighter6.dir/ksyntaxhighlighter6_autogen/mocs_compilation.cpp.o
+[147/168] Automatic MOC for target codeeditor
+[148/168] Building CXX object examples/codeeditor/CMakeFiles/codeeditor.dir/codeeditor_autogen/mocs_compilation.cpp.o
+[149/168] Automatic MOC for target kquicksyntaxhighlightingplugin
+[150/168] Running AUTOMOC file extraction for target kquicksyntaxhighlightingplugin
+[151/168] Running rcc for resource qmake_org_kde_syntaxhighlighting
+[152/168] Running moc --collect-json for target kquicksyntaxhighlightingplugin
+[153/168] Automatic QML type registration for target kquicksyntaxhighlightingplugin
+[154/168] Building CXX object src/quick/CMakeFiles/kquicksyntaxhighlightingplugin.dir/kquicksyntaxhighlightingplugin_autogen/mocs_compilation.cpp.o
+[155/168] Building CXX object src/quick/CMakeFiles/kquicksyntaxhighlightingplugin.dir/.qt/rcc/qrc_qmake_org_kde_syntaxhighlighting.cpp.o
+[156/168] Building CXX object examples/codepdfprinter/CMakeFiles/codepdfprinter.dir/main.cpp.o
+[157/168] Building CXX object src/cli/CMakeFiles/ksyntaxhighlighter6.dir/ksyntaxhighlighter.cpp.o
+[158/168] Building CXX object src/quick/CMakeFiles/kquicksyntaxhighlightingplugin.dir/types.cpp.o
+[159/168] Building CXX object examples/codeeditor/CMakeFiles/codeeditor.dir/main.cpp.o
+[160/168] Linking CXX executable bin/ksyntaxhighlighter6
+[161/168] Building CXX object examples/codepdfprinter/CMakeFiles/codepdfprinter.dir/codepdfprinter.cpp.o
+[162/168] Building CXX object src/quick/CMakeFiles/kquicksyntaxhighlightingplugin.dir/kquicksyntaxhighlightingplugin_org_kde_syntaxhighlightingPlugin.cpp.o
+[163/168] Building CXX object src/quick/CMakeFiles/kquicksyntaxhighlightingplugin.dir/kquicksyntaxhighlighter.cpp.o
+[164/168] Linking CXX executable bin/codepdfprinter
+[165/168] Building CXX object src/quick/CMakeFiles/kquicksyntaxhighlightingplugin.dir/kquicksyntaxhighlightingplugin_qmltyperegistrations.cpp.o
+[166/168] Building CXX object examples/codeeditor/CMakeFiles/codeeditor.dir/codeeditor.cpp.o
+[167/168] Linking CXX shared module bin/org/kde/syntaxhighlighting/libkquicksyntaxhighlightingplugin.so
+[168/168] Linking CXX executable bin/codeeditor
+-- Install configuration: "Release"
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/af/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/ar/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/ast/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/az/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/be/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/bg/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/bn/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/br/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/bs/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/ca/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/ca@valencia/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/cs/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/cy/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/da/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/de/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/el/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/en_GB/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/eo/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/es/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/et/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/eu/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/fa/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/fi/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/fr/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/fy/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/ga/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/gl/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/gu/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/he/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/hi/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/hr/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/hsb/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/hu/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/ia/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/id/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/is/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/it/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/ja/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/ka/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/kk/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/km/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/ko/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/ku/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/lb/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/lt/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/lv/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/mai/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/mk/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/ml/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/mr/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/ms/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/nb/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/nds/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/ne/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/nl/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/nn/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/oc/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/pa/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/pl/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/pt/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/pt_BR/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/ro/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/ru/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/sa/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/se/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/si/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/sk/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/sl/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/sq/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/sr/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/sr@ijekavian/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/sr@ijekavianlatin/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/sr@latin/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/sv/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/ta/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/tg/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/th/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/tr/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/ug/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/uk/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/uz/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/uz@cyrillic/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/vi/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/wa/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/xh/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/zh_CN/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/locale/zh_TW/LC_MESSAGES/syntaxhighlighting6_qt.qm
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/index.katesyntax
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/4dos.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/abap.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/abc.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/acpi-asl.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/acpi-dsl.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/actionscript.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ada.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/adblock.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/agda.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ahdl.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ahk.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/alert.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ample.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ansforth94.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ansic89.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ansys.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/antlr.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/apache.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/apparmor.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/asciidoc.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/asm-arm.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/asm-avr.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/asm-dsp56k.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/asm-m68k.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/asm6502.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/asn1.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/asp.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ats.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/awk.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/bash.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/bibtex.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/bitbake.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/bmethod.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/boo.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/brightscript.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/c.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cabal.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/capnproto.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/carto-css-mml.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/carto-css.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cashscript.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ccss.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cg.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cgis.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/changelog.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cil.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cisco.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/clipper.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/clist.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/clojure.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cmake.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cobol.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/coffee.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/coldfusion.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/comments.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/commonlisp.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/component-pascal.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/context.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cpp.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/crk.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/crystal.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cs.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/css.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/csv-pipe.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/csv-semicolon.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/csv-whitespace.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/csv.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cubescript.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cue.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/curry.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/d.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/d2.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/dart.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/debianchangelog.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/debiancontrol.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/desktop.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/diff.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/djangotemplate.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/dockerfile.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/dosbat.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/dot.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/doxyfile.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/doxygen.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/dtd.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/dts.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/e.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/earthfile.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/edp.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/eiffel.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/elixir-eex.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/elixir-heex.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/elixir.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/elm.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/elvish.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/email.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/erlang.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/euphoria.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/expect.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/fasm.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/fastq.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ferite.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/fgl-4gl.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/fgl-per.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/fish.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/flatbuffers.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/fluent.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/fortran-fixed.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/fortran-free.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/freebasic.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/fsharp.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/fstab.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ftl.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gap.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gcc.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gcode.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gd-script.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gdb-bt.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gdb.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gdbinit.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gdl.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gemtext.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gettext.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gherkin.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/git-ignore.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/git-rebase.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gitolite.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gleam.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/glosstex.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/glsl.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gnuassembler.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gnuplot.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/go.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gpr.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/grammar.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/graphql.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/groovy.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gtk-blueprint.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/haml.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/hamlet.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/hare.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/haskell.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/haxe.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/hjson.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/html.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/hunspell-aff.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/hunspell-dat.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/hunspell-dic.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/hunspell-idx.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/idconsole.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/idl.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/idris.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ilerpg.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/inform.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ini.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/innosetup.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/intelhex.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/isocpp.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/j.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jam.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/java-module.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/java-properties.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/java.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/javadoc.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/javascript-react.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/javascript.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jcl.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jira.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/json.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/json5.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jsonnet.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jsp.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/julia.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/k.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/kateconfig.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/kbasic.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/kconfig.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/kdesrc-buildrc.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/klipper-config.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/klipper-gcode.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/kotlin.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/latex-logfile.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/latex.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ld.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ldif.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/less.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/lex.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/lilypond.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/literate-curry.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/literate-haskell.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/llvm.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/logcat.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/logfile-advanced-selector.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/logfile-advanced.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/logfile-selector.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/logfile.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/logtalk.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/lpc.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/lsl.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/lua.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/m3u.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/m4.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mab.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/magma.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/makefile.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mako.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mandoc.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mapcss.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/markdown.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mason.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mathematica.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/matlab.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/maxima.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mediawiki.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mel.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mergetagtext.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mermaid.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/meson.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/metafont.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/metamath.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mib.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mips.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/modelica.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/modelines.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/modula-2-iso-only.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/modula-2-pim-only.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/modula-2-r10-only.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/modula-2.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/modula-3.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/monobasic.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mup.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mustache.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/nagios.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/nasm.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/nemerle.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/nesc.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/nftables.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/nginx.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/nim.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ninja.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/nix.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/noweb.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/nsis.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/objectivec.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/objectivecpp.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ocaml.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ocamllex.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ocamlyacc.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/octave.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/odin.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/oors.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/opal.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/opencl.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/openscad.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/opsiscript.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/orgmode.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/overpassql.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/pango.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/pascal.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/perl.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/pgn.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/php.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/picsrc.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/pig.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/pike.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/pli.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ply.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/pony.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/postscript.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/povray.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/powershell.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ppd.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/praat.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/progress.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/prolog.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/protobuf.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/pug.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/puppet.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/pure.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/purebasic.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/purescript.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/python.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/q.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/qdocconf.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/qface.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/qmake.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/qml.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/quarto.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/r.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/racket.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/raku.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rapidq.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rdoc.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/relaxng.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/relaxngcompact.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/renpy.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/replicode.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rest.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/retro.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rexx.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rhtml.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rib.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rmarkdown.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/robot.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/roff.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rpmspec.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rsiidl.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rtf.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ruby.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rust.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sass.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sather.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/scala.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/scheme.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sci.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/scss.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sed.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/selinux-cil.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/selinux-fc.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/selinux.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sgml.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sieve.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sisu.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/smali.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sml.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/snakemake.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/snort_suricata.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/solidity.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sparql.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/spdx-comments.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/spice.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sql-mysql.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sql-oracle.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sql-postgresql.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sql.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/stan.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/starlark.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/stata.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/stl.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/subrip-subtitles.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/swift.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/systemc.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/systemd-unit.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/systemverilog.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/tads3.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/taskjuggler.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/tcl.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/tcsh.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/template-toolkit.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/terraform.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/texinfo.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/textile.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/textproto.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/tibasic.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/tiger.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/tlaplus.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/todo.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/toit.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/toml.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/tsv.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/twig.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/txt2tags.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/typescript-react.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/typescript.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/typst.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/uscript.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/v.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/vala.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/valgrind-suppression.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/varnish.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/varnishcc.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/varnishtest.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/vcard.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/velocity.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/vera.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/verilog.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/vhdl.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/viper.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/vrml.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/vue.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/wavefront-obj.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/wayland-trace.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/webvtt.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/winehq.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/wml.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/xharbour.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/xhtml.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/xkb.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/xml.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/xmldebug.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/xonotic-console.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/xorg.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/xul.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/yacas.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/yacc.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/yaml.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/yang.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/yara.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/zig.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/zonnon.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/zsh.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/html-php.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/css-php.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/javascript-php.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/javascript-react-php.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/typescript-php.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mustache-php.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/html-twig.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/css-twig.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/javascript-twig.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/javascript-react-twig.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/typescript-twig.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/doxygenlua.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/xslt.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jsonc.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-dockerfile.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-zsh.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-javascript.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-java.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-ini.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-rust.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-sql.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-ruby.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-html.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-yaml.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-css.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-mustache.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-terraform.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-javascript-react.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-qmake.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-toml.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-systemd-unit.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-comments.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-bash.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-cmake.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-typescript.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-javadoc.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-cpp.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-json.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-qml.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-rest.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-xml.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-groovy.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-python.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-doxygen.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-spdx-comments.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-modelines.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-alert.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-isocpp.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-gcc.xml
+-- Installing: /vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
+-- Installing: /vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6
+-- Installing: /vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/AbstractHighlighter
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/Definition
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/DefinitionDownloader
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/FoldingRegion
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/Format
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/Repository
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/State
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/SyntaxHighlighter
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/Theme
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/WildcardMatcher
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/abstracthighlighter.h
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/definition.h
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/definitiondownloader.h
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/foldingregion.h
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/format.h
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/repository.h
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/state.h
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/syntaxhighlighter.h
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/theme.h
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/wildcardmatcher.h
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/ksyntaxhighlighting_export.h
+-- Installing: /vedit-build/target/ksh-selfbuild/install/bin/ksyntaxhighlighter6
+-- Set non-toolchain portion of runtime path of "/vedit-build/target/ksh-selfbuild/install/bin/ksyntaxhighlighter6" to ""
+-- Installing: /vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/qml/org/kde/syntaxhighlighting/libkquicksyntaxhighlightingplugin.so
+-- Set non-toolchain portion of runtime path of "/vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/qml/org/kde/syntaxhighlighting/libkquicksyntaxhighlightingplugin.so" to ""
+-- Installing: /vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/qml/org/kde/syntaxhighlighting/qmldir
+-- Installing: /vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/qml/org/kde/syntaxhighlighting/kquicksyntaxhighlightingplugin.qmltypes
+-- Installing: /vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/qml/org/kde/syntaxhighlighting/kde-qmlmodule.version
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/qlogging-categories6/ksyntaxhighlighting.categories
+-- Installing: /vedit-build/target/ksh-selfbuild/install/share/qlogging-categories6/ksyntaxhighlighting.renamecategories
+-- Installing: /vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/cmake/KF6SyntaxHighlighting/KF6SyntaxHighlightingConfig.cmake
+-- Installing: /vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/cmake/KF6SyntaxHighlighting/KF6SyntaxHighlightingConfigVersion.cmake
+-- Installing: /vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/cmake/KF6SyntaxHighlighting/KF6SyntaxHighlightingTargets.cmake
+-- Installing: /vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/cmake/KF6SyntaxHighlighting/KF6SyntaxHighlightingTargets-release.cmake
+-- Installing: /vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/ksyntaxhighlighting_version.h
+== [4/7] G3: build configuration is the cause of the clean library ==
+## CMakeCache keys (G3)
+BUILD_TESTING:BOOL=OFF
+CMAKE_BUILD_TYPE:STRING=Release
+CMAKE_INSTALL_PREFIX:PATH=/vedit-build/target/ksh-selfbuild/install
+NO_STANDARD_PATHS:BOOL=ON
+QRC_SYNTAX:BOOL=OFF
+G3 PASS
+== [5/7] installed library identity + G2 (no syntax definition embedded) ==
+## installed tree (depth 5)
+/vedit-build/target/ksh-selfbuild/install
+/vedit-build/target/ksh-selfbuild/install/bin
+/vedit-build/target/ksh-selfbuild/install/bin/ksyntaxhighlighter6
+/vedit-build/target/ksh-selfbuild/install/include
+/vedit-build/target/ksh-selfbuild/install/include/KF6
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/AbstractHighlighter
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/Definition
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/DefinitionDownloader
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/FoldingRegion
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/Format
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/Repository
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/State
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/SyntaxHighlighter
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/Theme
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/WildcardMatcher
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/abstracthighlighter.h
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/definition.h
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/definitiondownloader.h
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/foldingregion.h
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/format.h
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/ksyntaxhighlighting_export.h
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/repository.h
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/state.h
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/syntaxhighlighter.h
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/theme.h
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/wildcardmatcher.h
+/vedit-build/target/ksh-selfbuild/install/include/KF6/KSyntaxHighlighting/ksyntaxhighlighting_version.h
+/vedit-build/target/ksh-selfbuild/install/lib
+/vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu
+/vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/cmake
+/vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/cmake/KF6SyntaxHighlighting
+/vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/cmake/KF6SyntaxHighlighting/KF6SyntaxHighlightingConfig.cmake
+/vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/cmake/KF6SyntaxHighlighting/KF6SyntaxHighlightingConfigVersion.cmake
+/vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/cmake/KF6SyntaxHighlighting/KF6SyntaxHighlightingTargets-release.cmake
+/vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/cmake/KF6SyntaxHighlighting/KF6SyntaxHighlightingTargets.cmake
+/vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so
+/vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6
+/vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
+/vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/qml
+/vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/qml/org
+/vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/qml/org/kde
+/vedit-build/target/ksh-selfbuild/install/share
+/vedit-build/target/ksh-selfbuild/install/share/locale
+/vedit-build/target/ksh-selfbuild/install/share/locale/af
+/vedit-build/target/ksh-selfbuild/install/share/locale/af/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/af/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/ar
+/vedit-build/target/ksh-selfbuild/install/share/locale/ar/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/ar/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/ast
+/vedit-build/target/ksh-selfbuild/install/share/locale/ast/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/ast/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/az
+/vedit-build/target/ksh-selfbuild/install/share/locale/az/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/az/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/be
+/vedit-build/target/ksh-selfbuild/install/share/locale/be/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/be/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/bg
+/vedit-build/target/ksh-selfbuild/install/share/locale/bg/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/bg/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/bn
+/vedit-build/target/ksh-selfbuild/install/share/locale/bn/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/bn/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/br
+/vedit-build/target/ksh-selfbuild/install/share/locale/br/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/br/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/bs
+/vedit-build/target/ksh-selfbuild/install/share/locale/bs/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/bs/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/ca
+/vedit-build/target/ksh-selfbuild/install/share/locale/ca/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/ca/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/ca@valencia
+/vedit-build/target/ksh-selfbuild/install/share/locale/ca@valencia/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/ca@valencia/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/cs
+/vedit-build/target/ksh-selfbuild/install/share/locale/cs/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/cs/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/cy
+/vedit-build/target/ksh-selfbuild/install/share/locale/cy/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/cy/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/da
+/vedit-build/target/ksh-selfbuild/install/share/locale/da/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/da/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/de
+/vedit-build/target/ksh-selfbuild/install/share/locale/de/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/de/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/el
+/vedit-build/target/ksh-selfbuild/install/share/locale/el/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/el/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/en_GB
+/vedit-build/target/ksh-selfbuild/install/share/locale/en_GB/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/en_GB/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/eo
+/vedit-build/target/ksh-selfbuild/install/share/locale/eo/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/eo/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/es
+/vedit-build/target/ksh-selfbuild/install/share/locale/es/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/es/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/et
+/vedit-build/target/ksh-selfbuild/install/share/locale/et/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/et/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/eu
+/vedit-build/target/ksh-selfbuild/install/share/locale/eu/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/eu/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/fa
+/vedit-build/target/ksh-selfbuild/install/share/locale/fa/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/fa/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/fi
+/vedit-build/target/ksh-selfbuild/install/share/locale/fi/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/fi/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/fr
+/vedit-build/target/ksh-selfbuild/install/share/locale/fr/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/fr/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/fy
+/vedit-build/target/ksh-selfbuild/install/share/locale/fy/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/fy/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/ga
+/vedit-build/target/ksh-selfbuild/install/share/locale/ga/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/ga/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/gl
+/vedit-build/target/ksh-selfbuild/install/share/locale/gl/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/gl/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/gu
+/vedit-build/target/ksh-selfbuild/install/share/locale/gu/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/gu/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/he
+/vedit-build/target/ksh-selfbuild/install/share/locale/he/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/he/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/hi
+/vedit-build/target/ksh-selfbuild/install/share/locale/hi/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/hi/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/hr
+/vedit-build/target/ksh-selfbuild/install/share/locale/hr/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/hr/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/hsb
+/vedit-build/target/ksh-selfbuild/install/share/locale/hsb/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/hsb/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/hu
+/vedit-build/target/ksh-selfbuild/install/share/locale/hu/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/hu/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/ia
+/vedit-build/target/ksh-selfbuild/install/share/locale/ia/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/ia/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/id
+/vedit-build/target/ksh-selfbuild/install/share/locale/id/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/id/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/is
+/vedit-build/target/ksh-selfbuild/install/share/locale/is/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/is/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/it
+/vedit-build/target/ksh-selfbuild/install/share/locale/it/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/it/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/ja
+/vedit-build/target/ksh-selfbuild/install/share/locale/ja/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/ja/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/ka
+/vedit-build/target/ksh-selfbuild/install/share/locale/ka/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/ka/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/kk
+/vedit-build/target/ksh-selfbuild/install/share/locale/kk/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/kk/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/km
+/vedit-build/target/ksh-selfbuild/install/share/locale/km/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/km/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/ko
+/vedit-build/target/ksh-selfbuild/install/share/locale/ko/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/ko/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/ku
+/vedit-build/target/ksh-selfbuild/install/share/locale/ku/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/ku/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/lb
+/vedit-build/target/ksh-selfbuild/install/share/locale/lb/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/lb/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/lt
+/vedit-build/target/ksh-selfbuild/install/share/locale/lt/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/lt/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/lv
+/vedit-build/target/ksh-selfbuild/install/share/locale/lv/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/lv/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/mai
+/vedit-build/target/ksh-selfbuild/install/share/locale/mai/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/mai/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/mk
+/vedit-build/target/ksh-selfbuild/install/share/locale/mk/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/mk/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/ml
+/vedit-build/target/ksh-selfbuild/install/share/locale/ml/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/ml/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/mr
+/vedit-build/target/ksh-selfbuild/install/share/locale/mr/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/mr/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/ms
+/vedit-build/target/ksh-selfbuild/install/share/locale/ms/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/ms/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/nb
+/vedit-build/target/ksh-selfbuild/install/share/locale/nb/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/nb/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/nds
+/vedit-build/target/ksh-selfbuild/install/share/locale/nds/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/nds/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/ne
+/vedit-build/target/ksh-selfbuild/install/share/locale/ne/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/ne/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/nl
+/vedit-build/target/ksh-selfbuild/install/share/locale/nl/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/nl/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/nn
+/vedit-build/target/ksh-selfbuild/install/share/locale/nn/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/nn/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/oc
+/vedit-build/target/ksh-selfbuild/install/share/locale/oc/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/oc/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/pa
+/vedit-build/target/ksh-selfbuild/install/share/locale/pa/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/pa/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/pl
+/vedit-build/target/ksh-selfbuild/install/share/locale/pl/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/pl/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/pt
+/vedit-build/target/ksh-selfbuild/install/share/locale/pt/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/pt/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/pt_BR
+/vedit-build/target/ksh-selfbuild/install/share/locale/pt_BR/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/pt_BR/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/ro
+/vedit-build/target/ksh-selfbuild/install/share/locale/ro/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/ro/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/ru
+/vedit-build/target/ksh-selfbuild/install/share/locale/ru/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/ru/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/sa
+/vedit-build/target/ksh-selfbuild/install/share/locale/sa/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/sa/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/se
+/vedit-build/target/ksh-selfbuild/install/share/locale/se/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/se/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/si
+/vedit-build/target/ksh-selfbuild/install/share/locale/si/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/si/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/sk
+/vedit-build/target/ksh-selfbuild/install/share/locale/sk/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/sk/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/sl
+/vedit-build/target/ksh-selfbuild/install/share/locale/sl/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/sl/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/sq
+/vedit-build/target/ksh-selfbuild/install/share/locale/sq/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/sq/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/sr
+/vedit-build/target/ksh-selfbuild/install/share/locale/sr/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/sr/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/sr@ijekavian
+/vedit-build/target/ksh-selfbuild/install/share/locale/sr@ijekavian/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/sr@ijekavian/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/sr@ijekavianlatin
+/vedit-build/target/ksh-selfbuild/install/share/locale/sr@ijekavianlatin/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/sr@ijekavianlatin/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/sr@latin
+/vedit-build/target/ksh-selfbuild/install/share/locale/sr@latin/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/sr@latin/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/sv
+/vedit-build/target/ksh-selfbuild/install/share/locale/sv/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/sv/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/ta
+/vedit-build/target/ksh-selfbuild/install/share/locale/ta/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/ta/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/tg
+/vedit-build/target/ksh-selfbuild/install/share/locale/tg/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/tg/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/th
+/vedit-build/target/ksh-selfbuild/install/share/locale/th/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/th/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/tr
+/vedit-build/target/ksh-selfbuild/install/share/locale/tr/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/tr/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/ug
+/vedit-build/target/ksh-selfbuild/install/share/locale/ug/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/ug/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/uk
+/vedit-build/target/ksh-selfbuild/install/share/locale/uk/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/uk/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/uz
+/vedit-build/target/ksh-selfbuild/install/share/locale/uz/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/uz/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/uz@cyrillic
+/vedit-build/target/ksh-selfbuild/install/share/locale/uz@cyrillic/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/uz@cyrillic/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/vi
+/vedit-build/target/ksh-selfbuild/install/share/locale/vi/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/vi/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/wa
+/vedit-build/target/ksh-selfbuild/install/share/locale/wa/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/wa/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/xh
+/vedit-build/target/ksh-selfbuild/install/share/locale/xh/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/xh/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/zh_CN
+/vedit-build/target/ksh-selfbuild/install/share/locale/zh_CN/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/zh_CN/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/locale/zh_TW
+/vedit-build/target/ksh-selfbuild/install/share/locale/zh_TW/LC_MESSAGES
+/vedit-build/target/ksh-selfbuild/install/share/locale/zh_TW/LC_MESSAGES/syntaxhighlighting6_qt.qm
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/4dos.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/abap.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/abc.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/acpi-asl.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/acpi-dsl.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/actionscript.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ada.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/adblock.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/agda.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ahdl.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ahk.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/alert.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ample.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ansforth94.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ansic89.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ansys.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/antlr.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/apache.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/apparmor.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/asciidoc.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/asm-arm.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/asm-avr.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/asm-dsp56k.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/asm-m68k.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/asm6502.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/asn1.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/asp.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ats.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/awk.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/bash.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/bibtex.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/bitbake.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/bmethod.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/boo.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/brightscript.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/c.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cabal.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/capnproto.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/carto-css-mml.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/carto-css.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cashscript.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ccss.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cg.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cgis.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/changelog.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cil.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cisco.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/clipper.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/clist.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/clojure.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cmake.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cobol.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/coffee.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/coldfusion.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/comments.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/commonlisp.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/component-pascal.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/context.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cpp.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/crk.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/crystal.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cs.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/css-php.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/css-twig.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/css.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/csv-pipe.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/csv-semicolon.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/csv-whitespace.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/csv.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cubescript.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/cue.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/curry.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/d.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/d2.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/dart.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/debianchangelog.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/debiancontrol.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/desktop.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/diff.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/djangotemplate.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/dockerfile.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/dosbat.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/dot.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/doxyfile.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/doxygen.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/doxygenlua.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/dtd.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/dts.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/e.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/earthfile.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/edp.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/eiffel.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/elixir-eex.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/elixir-heex.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/elixir.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/elm.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/elvish.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/email.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/erlang.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/euphoria.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/expect.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/fasm.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/fastq.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ferite.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/fgl-4gl.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/fgl-per.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/fish.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/flatbuffers.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/fluent.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/fortran-fixed.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/fortran-free.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/freebasic.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/fsharp.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/fstab.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ftl.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gap.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gcc.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gcode.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gd-script.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gdb-bt.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gdb.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gdbinit.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gdl.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gemtext.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gettext.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gherkin.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/git-ignore.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/git-rebase.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gitolite.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gleam.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/glosstex.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/glsl.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gnuassembler.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gnuplot.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/go.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gpr.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/grammar.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/graphql.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/groovy.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/gtk-blueprint.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/haml.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/hamlet.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/hare.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/haskell.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/haxe.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/hjson.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/html-php.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/html-twig.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/html.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/hunspell-aff.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/hunspell-dat.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/hunspell-dic.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/hunspell-idx.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/idconsole.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/idl.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/idris.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ilerpg.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/index.katesyntax
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/inform.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ini.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/innosetup.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/intelhex.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/isocpp.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/j.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jam.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/java-module.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/java-properties.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/java.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/javadoc.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/javascript-php.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/javascript-react-php.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/javascript-react-twig.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/javascript-react.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/javascript-twig.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/javascript.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jcl.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-alert.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-bash.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-cmake.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-comments.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-cpp.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-css.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-dockerfile.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-doxygen.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-gcc.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-groovy.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-html.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-ini.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-isocpp.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-java.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-javadoc.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-javascript-react.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-javascript.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-json.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-modelines.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-mustache.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-python.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-qmake.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-qml.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-rest.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-ruby.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-rust.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-spdx-comments.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-sql.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-systemd-unit.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-terraform.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-toml.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-typescript.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-xml.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-yaml.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja-zsh.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jinja.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jira.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/json.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/json5.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jsonc.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jsonnet.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/jsp.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/julia.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/k.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/kateconfig.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/kbasic.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/kconfig.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/kdesrc-buildrc.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/klipper-config.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/klipper-gcode.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/kotlin.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/latex-logfile.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/latex.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ld.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ldif.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/less.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/lex.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/lilypond.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/literate-curry.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/literate-haskell.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/llvm.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/logcat.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/logfile-advanced-selector.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/logfile-advanced.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/logfile-selector.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/logfile.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/logtalk.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/lpc.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/lsl.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/lua.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/m3u.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/m4.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mab.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/magma.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/makefile.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mako.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mandoc.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mapcss.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/markdown.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mason.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mathematica.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/matlab.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/maxima.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mediawiki.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mel.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mergetagtext.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mermaid.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/meson.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/metafont.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/metamath.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mib.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mips.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/modelica.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/modelines.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/modula-2-iso-only.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/modula-2-pim-only.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/modula-2-r10-only.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/modula-2.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/modula-3.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/monobasic.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mup.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mustache-php.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/mustache.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/nagios.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/nasm.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/nemerle.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/nesc.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/nftables.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/nginx.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/nim.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ninja.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/nix.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/noweb.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/nsis.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/objectivec.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/objectivecpp.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ocaml.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ocamllex.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ocamlyacc.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/octave.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/odin.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/oors.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/opal.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/opencl.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/openscad.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/opsiscript.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/orgmode.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/overpassql.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/pango.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/pascal.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/perl.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/pgn.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/php.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/picsrc.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/pig.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/pike.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/pli.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ply.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/pony.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/postscript.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/povray.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/powershell.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ppd.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/praat.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/progress.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/prolog.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/protobuf.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/pug.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/puppet.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/pure.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/purebasic.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/purescript.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/python.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/q.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/qdocconf.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/qface.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/qmake.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/qml.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/quarto.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/r.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/racket.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/raku.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rapidq.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rdoc.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/relaxng.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/relaxngcompact.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/renpy.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/replicode.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rest.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/retro.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rexx.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rhtml.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rib.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rmarkdown.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/robot.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/roff.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rpmspec.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rsiidl.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rtf.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/ruby.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/rust.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sass.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sather.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/scala.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/scheme.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sci.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/scss.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sed.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/selinux-cil.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/selinux-fc.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/selinux.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sgml.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sieve.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sisu.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/smali.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sml.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/snakemake.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/snort_suricata.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/solidity.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sparql.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/spdx-comments.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/spice.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sql-mysql.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sql-oracle.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sql-postgresql.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/sql.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/stan.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/starlark.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/stata.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/stl.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/subrip-subtitles.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/swift.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/systemc.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/systemd-unit.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/systemverilog.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/tads3.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/taskjuggler.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/tcl.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/tcsh.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/template-toolkit.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/terraform.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/texinfo.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/textile.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/textproto.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/tibasic.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/tiger.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/tlaplus.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/todo.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/toit.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/toml.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/tsv.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/twig.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/txt2tags.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/typescript-php.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/typescript-react.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/typescript-twig.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/typescript.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/typst.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/uscript.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/v.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/vala.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/valgrind-suppression.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/varnish.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/varnishcc.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/varnishtest.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/vcard.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/velocity.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/vera.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/verilog.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/vhdl.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/viper.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/vrml.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/vue.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/wavefront-obj.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/wayland-trace.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/webvtt.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/winehq.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/wml.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/xharbour.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/xhtml.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/xkb.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/xml.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/xmldebug.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/xonotic-console.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/xorg.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/xslt.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/xul.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/yacas.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/yacc.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/yaml.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/yang.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/yara.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/zig.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/zonnon.xml
+/vedit-build/target/ksh-selfbuild/install/share/org.kde.syntax-highlighting/syntax-bundled/zsh.xml
+/vedit-build/target/ksh-selfbuild/install/share/qlogging-categories6
+/vedit-build/target/ksh-selfbuild/install/share/qlogging-categories6/ksyntaxhighlighting.categories
+/vedit-build/target/ksh-selfbuild/install/share/qlogging-categories6/ksyntaxhighlighting.renamecategories
+
+## library
+lrwxrwxrwx 1 root root     29 Oct 31 03:36 /vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so -> libKF6SyntaxHighlighting.so.6
+lrwxrwxrwx 1 root root     34 Oct 31 03:36 /vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6 -> libKF6SyntaxHighlighting.so.6.24.0
+-rw-r--r-- 1 root root 696328 Oct 31 03:36 /vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
+-rw-r--r-- 1 root root 696328 Oct 31 03:36 /vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
+2d19bd15849fa4f98601bb55f9ea3eca8a1c35d10058d37ae2ca71312ef750ce  /vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
+size=696328
+## SONAME
+ 0x000000000000000e (SONAME)             Library soname: [libKF6SyntaxHighlighting.so.6]
+## RPATH/RUNPATH
+(none)
+## NEEDED
+ 0x0000000000000001 (NEEDED)             Shared library: [libQt6Gui.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libQt6Network.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libQt6Core.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+xml resource names: 0 -> []
+theme resource names: 30 -> ['5github-light.theme', '5nord.theme', '5radical.theme', '5solarized-dark.theme', 'Ucatppuccin-mocha.theme']
+systemverilog.xml present: False []
+RESULT: PASS - no syntax definition is embedded (themes stay: upstream has no switch)
+G2 exit=0 (expect 0)
+== [6/7] ABI with the distro KTextEditor 6.24.0 / katepart ==
+## defined dynamic symbols
+distro:     254
+self-built: 255
+
+## symbols KTextEditor + katepart need that the distro library provides: 101
+## of those, missing from the self-built library (must be empty):
+
+## export-set differences (informational; C++ ABI plumbing varies with build flags)
+-- in distro, not in ours:
+_ZTISt19_Sp_make_shared_tag
+-- in ours, not in distro (first 20):
+_ZNSt8_Rb_treeI7QStringSt4pairIKS0_N19KSyntaxHighlighting10DefinitionEESt10_Select1stIS5_ESt4lessIS0_ESaIS5_EE24_M_get_insert_unique_posERS2_
+_ZNSt8_Rb_treeI7QStringSt4pairIKS0_N19KSyntaxHighlighting10DefinitionEESt10_Select1stIS5_ESt4lessIS0_ESaIS5_EE29_M_get_insert_hint_unique_posESt23_Rb_tree_const_iteratorIS5_ERS2_
+== [6/7] build the M0 smoke target ==
+-- VEdit version matrix (scripts/versions-qt.env):
+--   distro:            Ubuntu 26.04.1 LTS build image, glibc 2.43-2ubuntu2.4 (min kernel 3.2.0)
+--   Qt6:               6.10.2 (floor 6.5)
+--   KF6:               6.24.0 (floor 6.5, upstream needs Qt >= 6.8.0)
+--   KTextEditor:       6.24.0
+--   KSyntaxHighlighting: 6.24.0
+--   tree-sitter:       0.25.9
+-- Could NOT find Cups (missing: CUPS_LIBRARIES CUPS_INCLUDE_DIR) 
+--   tree-sitter:       0.25.9 at /usr/lib/x86_64-linux-gnu
+-- VEdit: building src/app (application shell)
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: /vedit-build/target/qt6-build
+ninja: warning: premature end of file; recovering
+[1/2] Building CXX object cmake/smoke/CMakeFiles/vedit-m0-smoke.dir/qt6_window_smoke.cpp.o
+[2/2] Linking CXX executable cmake/smoke/vedit-m0-smoke
+## which libKF6SyntaxHighlighting resolves with the override (ldd)
+	libKF6TextEditor.so.6 => /usr/lib/x86_64-linux-gnu/libKF6TextEditor.so.6 (0x0000797748a00000)
+	libKF6SyntaxHighlighting.so.6 => /vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6 (0x000079774897a000)
+
+## unresolved relocations in KTextEditor when linked against our library
+(none)
+
+## unresolved relocations in katepart when linked against our library
+(none)
+== [7/7] behaviour: empty library, then whitelist + Verilog highlighting ==
+## whitelist fixture (plain XML, loaded through addCustomSearchPath)
+7199e3677b0a942e65b40f95cb2481be062b1ca48eb048519e7d4efc098f5970  /vedit-build/target/ksh-selfbuild/whitelist/syntax/verilog.xml
+<language name="Verilog" version="8" kateversion="5.0" section="Hardware" extensions="*.v;*.V;*.vl" mimetype="text/x-verilog-src" author="Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)" license="">
+-- [7a] no definitions provided: must not crash, zero valid built-in definitions
+M0-SMOKE ok=1 platform=offscreen qt=6.10.2 kf6=6.24.0 ktexteditor=1 ksynhl=6.24.0 tree_sitter=0.25.9 window=1 editor=1 document=1 definitions=1 themes=30 verilog=0 systemverilog=absent custom_path=1 tree_sitter_parser=1 builtin_valid_defs=0 whitelist_verilog=0 highlight_formats=-1 kshlib=/vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0 libc=/usr/lib/x86_64-linux-gnu/libc.so.6
+M0-SMOKE theme=Atom One Dark
+M0-SMOKE ksh-selfbuild ktexteditor_repo_valid_defs_before=0 ktexteditor_repo_whitelist_visible=0 (const_cast probe only)
+exit=0
+-- [7b] whitelisted Verilog definition: by name, then real highlighting
+kf.syntaxhighlighting: Unable to resolve external include rule for definition "Comments" in "Verilog"
+kf.syntaxhighlighting: Unable to resolve include rule for definition "##Comments" in "Verilog"
+kf.syntaxhighlighting: Unable to resolve external include rule for definition "Comments" in "Verilog"
+kf.syntaxhighlighting: Unable to resolve include rule for definition "##Comments" in "Verilog"
+kf.syntaxhighlighting: Unable to resolve external include rule for definition "Comments" in "Verilog"
+kf.syntaxhighlighting: Unable to resolve include rule for definition "##Comments" in "Verilog"
+M0-SMOKE ok=1 platform=offscreen qt=6.10.2 kf6=6.24.0 ktexteditor=1 ksynhl=6.24.0 tree_sitter=0.25.9 window=1 editor=1 document=1 definitions=2 themes=30 verilog=0 systemverilog=absent custom_path=1 tree_sitter_parser=1 builtin_valid_defs=0 whitelist_verilog=1 highlight_formats=21 kshlib=/vedit-build/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0 libc=/usr/lib/x86_64-linux-gnu/libc.so.6
+M0-SMOKE theme=Atom One Dark
+M0-SMOKE ksh-selfbuild ktexteditor_repo_valid_defs_before=0 ktexteditor_repo_whitelist_visible=1 (const_cast probe only)
+exit=0
+[ksh] ALL CHECKS PASS
+[ksh] installed library: target/ksh-selfbuild/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
+[ksh] G1: scan-embedded-defs --expect-clean (self-built library)
+== embedded-definition scan ==
+library   : /home/haroldzhao/MyProj/DshProj/VEdit/target/ksh-selfbuild/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
+size      : 696328 B
+sha256    : 2d19bd15849fa4f98601bb55f9ea3eca8a1c35d10058d37ae2ca71312ef750ce
+resource names (utf-16le): xml=0 theme=30
+zstd frames parsed as definitions: 0
+license classes: {}
+strict-GPL definitions embedded: 0
+  INFO SystemVerilog: not found among parsed definitions
+  INFO Verilog: not found among parsed definitions
+RESULT: PASS - no strict-GPL definition embedded
+[ksh] G1 self-built exit=0 (expect 0)
+[ksh] G1 negative control: the SAME scan on the distro library must exit 1
+  INFO SystemVerilog: license='GPLv3+' bytes=25672 sha256=3f1ecc7316a4212efba2ea0a38852299f2b4744cd7c02a64fddd907a672b0f09
+  INFO Verilog: license='' bytes=6759 sha256=67f7aaf11c277b20bd0dc075849e47feac3dabbe5e0111c71cf177496b99006b
+RESULT: FAIL - strict-GPL syntax definitions are embedded in the library
+[ksh] G1 negative control exit=1 (expect 1)
+[ksh] PASS: build + G3 + ABI + behaviour checks inside vedit-qt6-build:local
+[ksh] evidence: evidence/m0-ksh-selfbuild/build-logs/

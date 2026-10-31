@@ -1,0 +1,5 @@
+ninja: warning: premature end of file; recovering
+[1/4] Building CXX object cmake/smoke/CMakeFiles/vedit-ksh-env-probe.dir/ksh_env_probe.cpp.o
+[2/4] Building CXX object cmake/smoke/CMakeFiles/vedit-m0-smoke.dir/qt6_window_smoke.cpp.o
+[3/4] Linking CXX executable cmake/smoke/vedit-ksh-env-probe
+[4/4] Linking CXX executable cmake/smoke/vedit-m0-smoke

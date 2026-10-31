@@ -1,0 +1,13 @@
+## defined dynamic symbols
+distro:     254
+self-built: 255
+
+## symbols KTextEditor + katepart need that the distro library provides: 101
+## of those, missing from the self-built library (must be empty):
+
+## export-set differences (informational; C++ ABI plumbing varies with build flags)
+-- in distro, not in ours:
+_ZTISt19_Sp_make_shared_tag
+-- in ours, not in distro (first 20):
+_ZNSt8_Rb_treeI7QStringSt4pairIKS0_N19KSyntaxHighlighting10DefinitionEESt10_Select1stIS5_ESt4lessIS0_ESaIS5_EE24_M_get_insert_unique_posERS2_
+_ZNSt8_Rb_treeI7QStringSt4pairIKS0_N19KSyntaxHighlighting10DefinitionEESt10_Select1stIS5_ESt4lessIS0_ESaIS5_EE29_M_get_insert_hint_unique_posESt23_Rb_tree_const_iteratorIS5_ERS2_

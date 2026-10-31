@@ -1,0 +1,4 @@
+appimage: /home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage
+sha256: 74bd6aae2af9aefc8a2200d5ff66b1868c3e8281fb77de21f7859c5cafb33faa
+bytes: 65673720
+file: ELF 64-bit LSB pie executable, x86-64, version 1 (SYSV), static-pie linked, BuildID[sha1]=ef655b05ac26feebfd3bc24ec7ccb30389cefc33, stripped

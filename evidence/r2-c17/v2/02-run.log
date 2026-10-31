@@ -1,0 +1,76 @@
+== 02 run under Xvfb ==
+HOME=/tmp/c17-home (empty: no custom syntax definitions installed)
+INFO qt=6.10.2
+INFO platform=xcb
+CHECK editor.instance.available PASS
+
+== phase A: overlay rendering + attribute query ==
+kf.sonnet.core: Sonnet: No speller backends available!
+INFO highlightingModes=None,G-Code,GLSL,Klipper Config,Klipper G-Code,OpenSCAD,PLY,POV-Ray,RenderMan RIB,STL,VRML,Wavefront OBJ,ARM Assembler,Asm6502,AVR Assembler,Common Intermediate Language (CIL),GNU Assembler,Intel x86 (FASM),Intel x86 (NASM),MIPS Assembler,Motorola 68k (VASM/Devpac),Motorola DSP56k,PicAsm,.desktop,Adblock Plus,Apache Configuration,Cabal,Cisco,Doxyfile,fstab,Git Ignore,Gitolite,Hjson,INI Files,Jsonnet,Kate Config,Kconfig,kdesrc-buildrc,mergetag text,Nagios,NFTables,nginx Configuration,QDoc Configuration,systemd unit,TOML,Varnish Configuration Language,Varnish Test Case language,WINE Config,x.org Configuration,XKeyboardConfig,4GL,4GL-PER,LDIF,progress,SPARQL,SQL,SQL (MySQL),SQL (Oracle),SQL (PostgreSQL),AHDL,Spice,SystemC,SystemVerilog,Vera,Verilog,VHDL,AppArmor Security Profile,AsciiDoc,ASN.1,ASP,BibTeX,CartoCSS MML,CartoCSS MSS,CleanCSS,ColdFusion,ConTeXt,CSS,Cucumber Gherkin feature,D2,Django HTML Template,Doxygen,DoxygenLua,DTD,Fluent,FTL,Gemtext,GlossTex,GNU Gettext,GTK Blueprint,Haml,Hamlet,HTML,Javadoc,Jira,JSON,JSON5,JSONC,JSP,LaTeX,LaTeX Log File,LESSCSS,MAB-DB,Mako,MapCSS,Markdown,MediaWiki,Metapost/Metafont,Mustache/Handlebars (HTML),Org Mode,Pango,PostScript,PostScript Printer Description,Pug,Quarto,R documentation,R Markdown,RELAX NG,RelaxNG-Compact,reStructuredText,Rich Text Format,Roff,Ruby/Rails/RHTML,SASS,SCSS,SGML,SiSU,Texinfo,Textile,Troff Mandoc,TT2,Twig/Twig,txt2tags,Typst,vCard, vCalendar, iCalendar,Vue,Wesnoth Markup Language,XHTML,XML,XML (Debug),xslt,XUL,YAML,YANG,ABC,Alerts,ChangeLog,CMake,Comments,CSS/PHP,CSS/Twig,CSV,CSV (pipe),CSV (semicolon),CSV (whitespace),CUE Sheet,Debian Changelog,Debian Control,Devicetree Source (DTS),Diff,Dockerfile,Earthfile,Email,GDB,GDB Backtrace,GDB Init,Git Rebase,GraphQL,Hunspell Affix File,Hunspell Dictionary File,Hunspell Thesaurus File,Hunspell Thesaurus Index File,InnoSetup,Intel HEX,Jam,Java Properties,JavaScript React (JSX)/PHP,JavaScript React (JSX)/Twig,JavaScript/PHP,JavaScript/Twig,Jinja,Jinja/Alerts,Jinja/Bash,Jinja/C++,Jinja/CMake,Jinja/Comments,Jinja/CSS,Jinja/Dockerfile,Jinja/Doxygen,Jinja/GCCExtensions,Jinja/Groovy,Jinja/HTML,Jinja/INI Files,Jinja/ISO C++,Jinja/Java,Jinja/Javadoc,Jinja/JavaScript,Jinja/JavaScript React (JSX),Jinja/JSON,Jinja/Modelines,Jinja/Mustache/Handlebars (HTML),Jinja/Python,Jinja/QMake,Jinja/QML,Jinja/reStructuredText,Jinja/Ruby,Jinja/Rust,Jinja/SPDX-Comments,Jinja/SQL,Jinja/systemd unit,Jinja/Terraform,Jinja/TOML,Jinja/TypeScript,Jinja/XML,Jinja/YAML,Jinja/Zsh,LilyPond,Log File (advanced),Log File (advanced) Selector,Log File (simplified),Log File (simplified) Selector,Logcat,M3U,Makefile,Meson,MIB,Modelines,Music Publisher,Mustache/Handlebars (HTML)/PHP,Ninja,Overpass QL,PGN,QMake,RPM Spec,SELinux File Contexts,Snort/Suricata,SPDX-Comments,Starlark,SubRip Subtitles,TextProto,Tiger,Todo.txt,TSV,TypeScript/PHP,TypeScript/Twig,Valgrind Suppression,Wayland Trace,Web Video Text Tracks,YARA,Ansys,B-Method,dot,FASTQ,GAP,GDL,Gnuplot,Magma,Mathematica,Matlab,Maxima,Mermaid,Metamath,Octave,R Script,Replicode,scilab,Stan,Stata,TI Basic,yacas,4DOS BatchToMemory,AMPLE,AutoHotKey,AWK,Bash,BrightScript,CLIST,CoffeeScript,CubeScript,Elixir/EEx,Elixir/HEEx,Elvish,Erlang,Euphoria,Expect,ferite,Fish,GNU Linker Script,Godot,J,JavaScript,JavaScript React (JSX),JCL,k,LSL,Lua,Mason,MEL,MS-DOS Batch,Nix,NSIS,opsi-script,Perl,PHP (HTML),PHP/PHP,Pig,Pike,PowerShell,Praat,Puppet,Python,q,QFace,QML,Quake Script,Racket,Raku,REXX,Robot,Ruby,Scheme,sed,Sieve,Snakemake,TaskJuggler,Tcl/Tk,Tcsh,Twig (HTML),TypeScript,TypeScript React (TSX),UnrealScript,Velocity,Xonotic Script,Zsh,ABAP,ACPI DSL,ACPI Source Language,ActionScript 2.0,Ada,Agda,ANS-Forth94,ANSI C89,ANTLR,ATS,Bitbake,Boo,C,C#,C++,Cap'n Proto,CashScript,Cg,CGiS,Clipper,Clojure,COBOL,Common Lisp,Component-Pascal,Crack,Crystal,Curry,D,Dart,E Language,Eiffel,Elixir,Elm,FlatBuffers,Fortran (Fixed Format),Fortran (Free Format),FreeBASIC,FreeFEM,FSharp,GCCExtensions,Gleam,GNU M4,Go,GPRBuild,Groovy,Hare,Haskell,Haxe,IDL,Idris,ILERPG,Inform,ISO C++,Java,Java Module,Julia,KBasic,KDev-PG[-Qt] Grammar,Kotlin,Lex/Flex,Literate Curry,Literate Haskell,LLVM,Logtalk,LPC,Modelica,Modula-2,Modula-2 (ISO only),Modula-2 (PIM only),Modula-2 (R10 only),Modula-3,MonoBasic,Nemerle,nesC,Nim,noweb,Objective Caml,Objective Caml Ocamllex,Objective Caml Ocamlyacc,Objective-C,Objective-C++,Odin,OORS,OPAL,OpenCL,Pascal,PL/I,Pony,Prolog,Protobuf,Pure,PureBasic,PureScript,RapidQ,RenPy,RETRO,RSI IDL,Rust,Sather,Scala,SELinux CIL Policy,SELinux Policy,Smali,SML,Solidity,Swift,TADS 3,Terraform,TLA+,toit,V,Vala,Varnish module spec file,Viper,xHarbour,Yacc/Bison,Zig,Zonnon
+INFO highlightingMode=Verilog
+INFO editor.commands=85 commands=reload-scripts,emmetExpand,emmetWrap,emmetSelectTagPairInwards,emmetSelectTagPairOutwards,emmetMatchingPair,emmetToggleComment,emmetNext,emmetPrev,emmetSelectNext,emmetSelectPrev,emmetDelete,emmetSplitJoinTab,emmetEvaluateMathExpression,emmetDecrementNumberBy1,emmetDecrementNumberBy10,emmetDecrementNumberBy01,emmetIncrementNumberBy1,emmetIncrementNumberBy10,emmetIncrementNumberBy01,jumpIndentUp,ju
+INFO base_keyword_color=#3090d0 baseline_colored_px=1238
+INFO overlay_band=(1,14px)
+MEASURE overlay_foreground_px=71
+MEASURE overlay_background_px=325
+MEASURE baseline_band_colored_px=183
+MEASURE baseline_band_near_base_color_px=30
+MEASURE overlay_band_base_keyword_px=12
+MEASURE overlay_band_overlay_foreground_px=71
+CHECK overlay.foreground.rendered PASS
+CHECK overlay.background.rendered PASS
+CHECK overlay.foreground.inside.band PASS
+CHECK overlay.replaces.base.foreground PASS
+CHECK query.range.attribute.identity PASS
+CHECK query.range.start PASS
+CHECK query.range.end.column PASS
+CHECK query.range.zdepth PASS
+CHECK query.range.attribute.name PASS
+MEASURE restored_band_base_keyword_px=30
+MEASURE restored_band_overlay_foreground_px=0
+INFO restored_band_dominant_color=#3070b0 saturated_px=183
+CHECK overlay.removal.restores.base.foreground PASS
+CHECK overlay.removal.leaves.no.overlay.colour PASS
+CHECK query.range.moves.with.document PASS
+CHECK query.range.attribute.survives.edit PASS
+CHECK query.range.text.after.edit PASS
+
+== phase A2: semantic attributes (theme-resolved vs Theme::TextStyle hint) ==
+INFO embedded_definitions=451 embedded_themes=30 verilog_loaded=yes
+INFO theme_style_distance style=1 color=#1f1c1b distance=0
+INFO theme_style_distance style=21 color=#898887 distance=322
+INFO theme_style_distance style=2 color=#644a9b distance=243
+INFO theme_style_distance style=17 color=#b08000 distance=272
+INFO theme_style_distance style=12 color=#bf0303 distance=209
+INFO chosen_text_style=21 distance_from_normal=322
+MEASURE semantic_text_band_colored_px_baseline=347
+MEASURE semantic_text_band_colored_px_defaultstyle_hint=347
+MEASURE semantic_text_band_colored_px_theme_resolved=212
+INFO theme_keyword_color=#898887
+MEASURE semantic_theme_resolved_exact_color_px=87
+INFO defaultstyle_hint_alone_effective=no
+CHECK semantic.defaultstyle_hint.queryable PASS
+CHECK semantic.theme_resolved_colors.range PASS
+
+== phase A3: attribute range cap per line ==
+MEASURE cap_test_1000_ranges_marker_px=103568
+MEASURE cap_test_1100_ranges_marker_px=0
+CHECK cap.ranges.render.below.limit PASS
+CHECK cap.ranges.silently.drop.above.limit PASS
+
+== phase B: per-frame injection cost, doc lines=120000 mode=None steps=200 step_lines=3 ==
+MEASURE document_load_ms=59 lines=120001
+CHECK bigdoc.at.least.100k.lines PASS
+MEASURE grab_baseline_no_overlay n=200 p50_us=1506.53 p95_us=1924 mean_us=1577.77 min_us=1309.39 max_us=3960.04
+INFO strategy=full_recreate_per_line visible_lines_avg=62 scroll_moved_steps=200/200
+MEASURE full_recreate_per_line.inject n=200 p50_us=18.621 p95_us=29.016 mean_us=19.7382 min_us=9.008 max_us=34.016
+MEASURE full_recreate_per_line.inject_plus_grab n=200 p50_us=1919.26 p95_us=2298.87 mean_us=1985.84 min_us=1757.24 max_us=3025.68
+MEASURE full_recreate_per_line.grab_with_overlay n=200 p50_us=1900.35 p95_us=2270.15 mean_us=1966.1 min_us=1734.24 max_us=2994.03
+MEASURE full_recreate_per_token.inject n=200 p50_us=68.111 p95_us=102.131 mean_us=73.6753 min_us=54.575 max_us=136.312
+MEASURE full_recreate_per_token.grab_with_overlay n=200 p50_us=2135.7 p95_us=2415 mean_us=2171.88 min_us=1983.58 max_us=2794.17
+INFO strategy=incremental_pool pool_size=62
+MEASURE incremental_pool.inject n=200 p50_us=9.2875 p95_us=19.053 mean_us=11.2053 min_us=5.25 max_us=29.206
+MEASURE incremental_pool.grab_with_overlay n=200 p50_us=1832.13 p95_us=2142.49 mean_us=1849.71 min_us=1546.87 max_us=2800.11
+
+RESULT=PASS failures=0
+[run exit=0]

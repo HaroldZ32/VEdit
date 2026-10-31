@@ -1,0 +1,17 @@
+## container
+PRETTY_NAME="Ubuntu 26.04.1 LTS"
+NAME="Ubuntu"
+VERSION_ID="26.04"
+glibc: ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43
+qt6-base-dev: 6.10.2+dfsg-7
+cmake: cmake version 4.2.3
+g++: g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+
+## QTermWidget / libvterm availability in the pinned image
+installed: none
+
+## the pty API the panel uses (in libc, no extra dependency)
+0000000000190bc0 T grantpt@@GLIBC_2.2.5
+0000000000190700 W posix_openpt@@GLIBC_2.2.5
+00000000001914a0 T ptsname@@GLIBC_2.2.5
+00000000001916e0 T unlockpt@@GLIBC_2.2.5

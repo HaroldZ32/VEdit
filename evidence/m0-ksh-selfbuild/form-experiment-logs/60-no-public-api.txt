@@ -1,0 +1,45 @@
+## Q2: is there ANY public API to inject definitions into KTextEditor 6.24? (negative evidence)
+
+## 1) grep for an injection/setter API in the installed KTextEditor headers
+$ grep -rn "addCustomSearchPath|setRepository|setSyntaxRepository|setHighlightingRepository" /usr/include/KF6/KTextEditor/
+(no matches -> empty)
+
+## 2) every repository mention in editor.h (the only editor-level access)
+$ grep -n repository /usr/include/KF6/KTextEditor/ktexteditor/editor.h
+273:     * Get read-only access to the syntax highlighting repository the editor uses.
+274:     * Might be reloaded during runtime, repositoryReloaded() will be emitted in that cases.
+276:     * Returns syntax repository used by the editor
+280:    const KSyntaxHighlighting::Repository &repository() const;
+284:     * This signal is emitted whenever the editor syntax repository is reloaded.
+286:     * the repository reload.
+288:     * \a editor is the editor whose repository was reloaded
+292:    void repositoryReloaded(KTextEditor::Editor *editor);
+
+## 3) is any private editor header installed that could expose a non-const accessor?
+(no private headers installed)
+
+## 4) does KSyntaxHighlighting::Repository have a static/default instance?
+
+## 5) compile-time proof: the public getter is const-only (three attempts fail, one succeeds)
+$ g++ -std=c++20 -fsyntax-only ... (a) editor->repository().addCustomSearchPath(...)
+/tmp/api_probe.cpp: In function ‘int main()’:
+/tmp/api_probe.cpp:6:45: error: passing ‘const KSyntaxHighlighting::Repository’ as ‘this’ argument discards qualifiers [-fpermissive]
+    6 |     editor->repository().addCustomSearchPath(QStringLiteral("/tmp/x"));
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/KF6/KSyntaxHighlighting/KSyntaxHighlighting/Repository:2,
+                 from /tmp/api_probe.cpp:2:
+
+$ g++ ... (b)(c) setRepository / assignment
+/tmp/api_probe2.cpp: In function ‘int main()’:
+/tmp/api_probe2.cpp:4:13: error: ‘class KTextEditor::Editor’ has no member named ‘setRepository’; did you mean ‘repository’?
+    4 |     editor->setRepository(nullptr);   // (b) a setter does not exist
+      |             ^~~~~~~~~~~~~
+      |             repository
+/tmp/api_probe2.cpp:6:19: error: invalid use of incomplete type ‘const class KSyntaxHighlighting::Repository’
+    6 |     e2->repository() = nullptr;       // (c) the getter is not assignable either
+      |     ~~~~~~~~~~~~~~^~
+In file included from /usr/include/KF6/KTextEditor/KTextEditor/Editor:1,
+                 from /tmp/api_probe2.cpp:1:
+
+$ g++ ... (d) standalone Repository::addCustomSearchPath (positive control)
+positive_control_exit=0

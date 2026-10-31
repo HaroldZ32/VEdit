@@ -1,0 +1,11 @@
+filetree: installFileTree projectRoot='/vedit-build/target/ws-filetree-tmp/project' dockInserted=1 placeholderReplaced=1
+filetree: installFileTree projectRoot='/vedit-build/target/ws-filetree-tmp/project' dockInserted=1 placeholderReplaced=0
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+SEAM dock-inserted=1 content-before-install=panel-placeholder-file-tree
+SEAM panel-installed=1 dock-content-is-panel=1 find-child=1 root=/vedit-build/target/ws-filetree-tmp/project
+SEAM file-index-valid=1
+SEAM status-after-activate="Open /vedit-build/target/ws-filetree-tmp/project/rtl/top.v"
+SEAM rows=5 scanned-dirs=2
+SCREENSHOT ok=1 /vedit-build/evidence/ws-filetree/screenshots/20-real-shell-file-tree.png
+FILETREE-SEAMCHECK ok=1

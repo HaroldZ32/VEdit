@@ -1,0 +1,19 @@
+== 00 environment ==
+date: 2026-10-31T02:54:44Z
+image tag: vprobe-qt6kf6:1 (image id captured host-side, see 00-image-id.txt)
+cmake: cmake version 4.2.3
+compiler: c++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+tree-sitter (pkg-config): 0.25.9
+libtree-sitter dynamic: /usr/lib/x86_64-linux-gnu/libtree-sitter.so /usr/lib/x86_64-linux-gnu/libtree-sitter.so.0 /usr/lib/x86_64-linux-gnu/libtree-sitter.so.0.25 
+libtree-sitter static: /usr/lib/x86_64-linux-gnu/libtree-sitter.a
+pinned grammar parser.c sha256:
+afcef39bb867396dc550e82adb33e3a4bce239208a6960900f03ec5532263386  grammars/verilog_placeholder/src/parser.c
+9a266ae4a0305b8a2769bee90a14ac06914bdc83a509f16428311eac2845637e  third_party/tree-sitter-json/src/parser.c
+upstream commit tree-sitter-json: 254c42a6476413b776221e03982ac8ae159eeb72
+tree-sitter CLI used to generate verilog_placeholder: 0.27.1
+interface grammar-type leak check (must be empty):
+  no grammar type appears in the interface or the caller
+interface/consumer file list:
+04c7970475869795dfa63a26f485405fc38752842a2ac6c1a1a48857601574ee  src/syntax_provider.hpp
+c96b88820e5f4fbf1f12a625257f059b3d39e3cf12f95c2f92983be1de316f07  src/main.cpp
+160f114c8dbda72302b802b48c7beae7955673004a7004636cfe6a9a87661e0f  src/grammar_registry.cpp

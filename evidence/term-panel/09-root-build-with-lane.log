@@ -1,0 +1,46 @@
+## Rehearsal of the root-build wire-up (this lane edits no repository file)
+## A copy of the tree under target/term-rehearsal/ adds ONE line to CMakeLists.txt:
+##     VEDIT_LANE_DIRECTORIES += src/terminal          # T63 mechanism
+
+### configure
+-- VEdit: building lane directory src/syntax/provider
+-- VEdit: building lane directory src/syntax/kde
+-- VEdit: building lane directory src/terminal
+-- VEdit: building src/app (application shell)
+-- Configuring done (1.0s)
+-- Generating done (0.0s)
+configure exit: 0
+
+### build (every lane + src/app + src/terminal, warnings are errors)
+[85/90] Linking CXX executable src/app/workspace-lane-palette/vedit-workspace-palette-selftest
+[86/90] Linking CXX executable src/app/workspace-lane-palette/vedit-workspace-palette-bench
+[87/90] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit-workspace-search-selftest.dir/search_selftest.cpp.o
+[88/90] Linking CXX executable src/app/workspace-lane-search/vedit-workspace-search-selftest
+[89/90] Building CXX object src/app/CMakeFiles/vedit-app.dir/main.cpp.o
+[90/90] Linking CXX executable src/app/vedit-app
+build exit: 0
+
+### ctest of the whole root project
+    Start 2: vedit-syntax-provider-tests
+2/8 Test #2: vedit-syntax-provider-tests ....................   Passed    0.00 sec
+    Start 3: vedit-syntax-kde-data
+3/8 Test #3: vedit-syntax-kde-data ..........................   Passed    0.02 sec
+    Start 4: vedit-terminal-selftest
+4/8 Test #4: vedit-terminal-selftest ........................   Passed    1.07 sec
+    Start 5: vedit-app-shell-selftest
+5/8 Test #5: vedit-app-shell-selftest .......................   Passed    0.11 sec
+    Start 6: vedit-workspace-palette-selftest
+6/8 Test #6: vedit-workspace-palette-selftest ...............   Passed    0.08 sec
+    Start 7: vedit-workspace-palette-integration-selftest
+7/8 Test #7: vedit-workspace-palette-integration-selftest ...   Passed    0.07 sec
+    Start 8: vedit-workspace-search-selftest
+8/8 Test #8: vedit-workspace-search-selftest ................   Passed    0.31 sec
+
+100% tests passed, 0 tests failed out of 8
+
+Total Test time (real) =   1.75 sec
+ctest exit: 0
+
+### binaries produced by the root build
+-rwxr-xr-x 1 root root 16144608 Oct 31 04:18 target/term-rehearsal-build/src/app/vedit-app
+-rwxr-xr-x 1 root root  4301880 Oct 31 04:17 target/term-rehearsal-build/src/terminal/vedit-terminal-selftest

@@ -1,0 +1,9 @@
+## which libKF6SyntaxHighlighting resolves with the override (ldd)
+	libKF6TextEditor.so.6 => /usr/lib/x86_64-linux-gnu/libKF6TextEditor.so.6 (0x00007690a5ac2000)
+	libKF6SyntaxHighlighting.so.6 => /vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6 (0x00007690a5a3c000)
+
+## unresolved relocations in KTextEditor when linked against our library
+(none)
+
+## unresolved relocations in katepart when linked against our library
+(none)

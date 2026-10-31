@@ -1,0 +1,37 @@
+## command: standalone configure/build/ctest (core lane, no shell) inside vedit-qt6-build:local
+-- The CXX compiler identification is GNU 15.2.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Performing Test HAVE_STDATOMIC
+-- Performing Test HAVE_STDATOMIC - Success
+-- Found WrapAtomic: TRUE
+-- Found OpenGL: /usr/lib/x86_64-linux-gnu/libOpenGL.so
+-- Found WrapOpenGL: TRUE
+-- Found WrapVulkanHeaders: /usr/include
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/standalone-search
+[1/10] Automatic MOC for target vedit_workspace_search
+[2/10] Building CXX object CMakeFiles/vedit_workspace_search.dir/search_types.cpp.o
+[3/10] Building CXX object CMakeFiles/vedit_workspace_search.dir/vedit_workspace_search_autogen/mocs_compilation.cpp.o
+[4/10] Building CXX object CMakeFiles/vedit_workspace_search.dir/global_search.cpp.o
+[5/10] Building CXX object CMakeFiles/vedit_workspace_search.dir/search_panel.cpp.o
+[6/10] Linking CXX static library libvedit_workspace_search.a
+[7/10] Automatic MOC for target vedit-workspace-search-selftest
+[8/10] Building CXX object CMakeFiles/vedit-workspace-search-selftest.dir/vedit-workspace-search-selftest_autogen/mocs_compilation.cpp.o
+[9/10] Building CXX object CMakeFiles/vedit-workspace-search-selftest.dir/search_selftest.cpp.o
+[10/10] Linking CXX executable vedit-workspace-search-selftest
+Test project /tmp/standalone-search
+    Start 1: vedit-workspace-search-selftest
+1/1 Test #1: vedit-workspace-search-selftest ...   Passed    0.16 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.16 sec
+## exit: 0

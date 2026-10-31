@@ -1,0 +1,138 @@
+## command: ctest --test-dir target/qt6-build -R vedit-workspace-search-selftest -V  (FINAL)
+UpdateCTestConfiguration  from :/vedit-build/target/qt6-build/DartConfiguration.tcl
+Test project /vedit-build/target/qt6-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 7
+    Start 7: vedit-workspace-search-selftest
+
+7: Test command: /vedit-build/target/qt6-build/src/app/workspace-lane-search/vedit-workspace-search-selftest "--selfcheck"
+7: Working Directory: /vedit-build/target/qt6-build/src/app/workspace-lane-search
+7: Environment variables: 
+7:  QT_QPA_PLATFORM=offscreen
+7:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime-search
+7: Test timeout computed to be: 180
+7: CHECK fixture.created PASS
+7: This plugin does not support propagateSizeHints()
+7: CHECK panel.root.normalized PASS
+7: CHECK panel.empty.enter-query PASS
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: CHECK panel.search.terminates PASS
+7: CHECK panel.hits.count PASS
+7: CHECK panel.summary.state PASS
+7: CHECK panel.summary.files PASS
+7: CHECK panel.summary.files-scanned PASS
+7: CHECK panel.summary.skipped-binary PASS
+7: CHECK panel.summary.skipped-too-large PASS
+7: CHECK panel.summary.text.observable PASS
+7: CHECK panel.tree.files PASS
+7: CHECK panel.tree.one-row-per-hit PASS
+7: CHECK panel.tree.no-git PASS
+7: CHECK panel.tree.no-build PASS
+7: CHECK panel.tree.no-binary PASS
+7: CHECK panel.hits.one-per-line PASS
+7: CHECK panel.hit.line-number PASS
+7: CHECK panel.hit.column PASS
+7: CHECK panel.hit.snippet PASS
+7: CHECK panel.hit.unicode-file PASS
+7: CHECK panel.hit.unicode-column PASS
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: CHECK panel.case-sensitive.count PASS
+7: CHECK panel.case-sensitive.excludes-uppercase PASS
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: CHECK panel.verilog-only.count PASS
+7: CHECK panel.verilog-only.excludes-markdown PASS
+7: CHECK panel.verilog-only.excludes-large-file PASS
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: CHECK panel.unicode.query PASS
+7: This plugin does not support propagateSizeHints()
+7: CHECK empty.no-project.visible PASS
+7: CHECK empty.no-project.text PASS
+7: CHECK empty.no-project.no-search PASS
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: CHECK empty.query.text PASS
+7: CHECK empty.query.no-search PASS
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: CHECK empty.no-results.state PASS
+7: CHECK empty.no-results.visible PASS
+7: CHECK empty.no-results.text PASS
+7: CHECK empty.no-results.tree-hidden PASS
+7: CHECK empty.unreadable-root SKIP (running as root: chmod 000 does not deny access)
+7: CHECK entries.unreadable SKIP (running as root: chmod 000 does not deny access)
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: CHECK limit.results PASS
+7: CHECK limit.truncated-flag PASS
+7: CHECK limit.summary-text PASS
+7: CHECK extension.v PASS
+7: CHECK extension.vh PASS
+7: CHECK extension.sv PASS
+7: CHECK extension.svh PASS
+7: CHECK extension.not-verilog PASS
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: CHECK jump.hit-row-exists PASS
+7: CHECK jump.row-visible PASS
+7: CHECK jump.click.recorded PASS
+7: CHECK jump.click.file PASS
+7: CHECK jump.click.line PASS
+7: CHECK jump.click.column PASS
+7: CHECK jump.file-row.no-jump PASS
+7: CHECK jump.activate PASS
+7: CHECK jump.demo.opened PASS
+7: CHECK jump.demo.line PASS
+7: CHECK seam.dock-created PASS
+7: CHECK seam.not-placeholder PASS
+7: CHECK seam.factory-installed PASS
+7: CHECK seam.root-applied PASS
+7: CHECK seam.search-in-shell PASS
+7: CHECK large.fixture-created PASS
+7: CHECK large.start.accepted PASS
+7: CHECK large.skipped-by-default PASS
+7: CHECK large.skipped.state PASS
+7: CHECK large.skipped.fast PASS
+7: CHECK large.start.accepted-raised PASS
+7: CHECK large.start.non-blocking PASS
+7: CHECK large.cancel.returns-fast PASS
+7: CHECK large.cancel.finishes PASS
+7: CHECK large.cancel.state PASS
+7: CHECK large.cancel.bounded PASS
+7: CHECK large.worker-thread PASS
+7: CHECK many.start.non-blocking PASS
+7: CHECK many.finishes PASS
+7: CHECK many.hits PASS
+7: CHECK many.files-scanned PASS
+7: CHECK many.elapsed-bounded PASS
+7: CHECK large.timeout.accepted PASS
+7: CHECK large.timeout.finishes PASS
+7: CHECK large.timeout.flag PASS
+7: CHECK large.timeout.state PASS
+7: CHECK large.timeout.bounded PASS
+7: WORKSPACE-SEARCH-SELFTEST ok=1 checks=82 failures=0 skipped=2
+1/1 Test #7: vedit-workspace-search-selftest ...   Passed    0.32 sec
+
+The following tests passed:
+	vedit-workspace-search-selftest
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.32 sec
+## exit: 0

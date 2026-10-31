@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=VEdit
+GenericName=Text Editor
+Comment=Verilog/SystemVerilog editor built on Qt6 + KTextEditor
+Exec=AppRun %F
+Icon=io.github.vedit.VEdit
+Terminal=false
+Categories=Development;IDE;TextEditor;
+MimeType=text/x-verilog-src;text/x-systemverilog-src;
+X-AppImage-Version=@VERSION@

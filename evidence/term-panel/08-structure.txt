@@ -1,0 +1,31 @@
+## files
+src/terminal/CMakeLists.txt                   66 lines
+src/terminal/README.md                        96 lines
+src/terminal/pty_session.cpp                 390 lines
+src/terminal/pty_session.h                    85 lines
+src/terminal/seam_check.cpp                   37 lines
+src/terminal/terminal_panel.cpp              256 lines
+src/terminal/terminal_panel.h                 82 lines
+src/terminal/terminal_selftest.cpp           715 lines
+src/terminal/terminal_widget.cpp             660 lines
+src/terminal/terminal_widget.h               113 lines
+src/terminal/vt_screen.cpp                   958 lines
+src/terminal/vt_screen.h                     186 lines
+
+## sha256
+61bf5f7ecda32203cdf33d68988ee801d9d6aa7c466193099aaffff869fb01ef  src/terminal/CMakeLists.txt
+4346da15aa43a3457c8f9cac7229c2d3745ea5ad298ed97b5e828bdb755ecf51  src/terminal/README.md
+2a70003e404ffe6410c88a5da7cb7cd9e7ee6cf15ba03580862f39c1db12c6a4  src/terminal/pty_session.cpp
+3823f84680fabe09781bd440066ac0e9100a8fcb90aa75453e4d7b6087e6271b  src/terminal/pty_session.h
+5f8933474463b7efea53fc32e51cbaf7ec472b8d6f64f26c86228bafe2358576  src/terminal/seam_check.cpp
+625592c20e109cada9de512df2d9b22c03bb21de52317ef407f48bd602f706e6  src/terminal/terminal_panel.cpp
+e7771ed88776432577755e1854432f8d9cd2f8a4ce0fc44af643a13f035ba3c4  src/terminal/terminal_panel.h
+f9ce430b801de73bf46bc13ea8d9190101634772fe773f0585aa80f3af929cbd  src/terminal/terminal_selftest.cpp
+b5247bf9d7277388d23b7bfe9966eb16c27ccf5d31fa1aa08928b7c33bc3afdc  src/terminal/terminal_widget.cpp
+cf21eba72dca1ed68240e989330fe776b5b436cd3e4ff098ae4c03cc46214063  src/terminal/terminal_widget.h
+87ba8e9e115b523651b75dc02a40239beb5d5d3fa383065e0263a01513330ba6  src/terminal/vt_screen.cpp
+3bcc583c882a731d9d70f2cfbb8eef73521076d2087daa15d379e3f530c741f5  src/terminal/vt_screen.h
+
+## screenshots
+5cf0b83ea0c697362d83c20c2224bd6b7bff458b85093a39b66e1a5d50bd918c  /vedit-build/evidence/term-panel/10-terminal-running.png
+c63d6571017eeb5a299ee2e9ddc27cb5642f626f4d05e22f41f2bbb9da5e615c  /vedit-build/evidence/term-panel/11-terminal-exited-code42.png

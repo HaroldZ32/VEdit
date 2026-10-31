@@ -1,0 +1,25 @@
+## file
+/vedit-build/target/qt6-build/src/app/vedit-app: ELF 64-bit LSB pie executable, x86-64, version 1 (GNU/Linux), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=c3bb1102b6f10cc26d6ce4be8160c562640bd3f0, for GNU/Linux 3.2.0, with debug_info, not stripped
+## NEEDED
+ 0x0000000000000001 (NEEDED)             Shared library: [libQt6Widgets.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libKF6SyntaxHighlighting.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libQt6Gui.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libQt6Core.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+## highest GLIBC symbol the binary requires
+GLIBC_2.34
+## libraries resolved
+	libQt6Widgets.so.6 => /usr/lib/x86_64-linux-gnu/libQt6Widgets.so.6 (0x0000709d0f94b000)
+	libKF6SyntaxHighlighting.so.6 => /usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6 (0x0000709d0f75f000)
+	libQt6Gui.so.6 => /usr/lib/x86_64-linux-gnu/libQt6Gui.so.6 (0x0000709d0ef15000)
+	libQt6Core.so.6 => /usr/lib/x86_64-linux-gnu/libQt6Core.so.6 (0x0000709d0e930000)
+	libstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x0000709d0e690000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x0000709d0e43f000)
+	libQt6Network.so.6 => /usr/lib/x86_64-linux-gnu/libQt6Network.so.6 (0x0000709d0e129000)
+	libQt6DBus.so.6 => /usr/lib/x86_64-linux-gnu/libQt6DBus.so.6 (0x0000709d0dd60000)
+## linked KTextEditor?
+0
+## sha256
+99019afd47a960cb24209a31655c3669161156c0f0238da8abd9271d51c3791e  /vedit-build/target/qt6-build/src/app/vedit-app

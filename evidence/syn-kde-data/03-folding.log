@@ -1,0 +1,8 @@
+FOLD verilog formats=50 begins=7 ends=7
+CHECK fold.verilog-highlighting PASS
+CHECK fold.verilog-regions-begin PASS  7
+CHECK fold.verilog-regions-balanced PASS  7
+FOLD systemverilog formats=51 begins=9 ends=9
+CHECK fold.sv-highlighting PASS
+CHECK fold.sv-a4-constructs-begin PASS  9
+CHECK fold.sv-a4-constructs-balanced PASS  9
