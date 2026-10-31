@@ -54,14 +54,29 @@ chmod +x VEdit-0.1.1-x86_64.run && ./VEdit-0.1.1-x86_64.run
 1. 启动后 `Ctrl+O` 打开一个 `.sv`/`.v` 文件，或直接把文件路径作为参数；
 2. 底部状态栏依次显示：光标位置、文件路径、语言（`systemverilog`/`verilog`）、
    verible 诊断数、slang 诊断数、FIM 状态、LSP 进程状态；
-3. 打开工程：从工程目录里的任意文件打开即可。工程根**从打开位置向上逐级查找**：在每一级
-   依次看 `vedit.toml`（优先）→ `.git` → 该目录是否**直接包含 `*.f`**，命中的第一级即工程根
-   （来源依次报告为 `vedit_toml` / `git_dir` / `filelist`，都没命中的退化为起始目录 `fallback`）。
-   所以一个只带 `project.f` 的目录本身也算工程根，即使它位于更大的 git 仓库内部：从该目录打开
-   时根就是它自己（`filelist`），而从外层仓库打开时根仍是外层（`git_dir`），嵌套的 `.f` 不会把根
-   改到子目录；同一目录同时有 `.git` 与 `*.f` 时根不变，来源按更强的 `.git` 报 `git_dir`。
-   在此之上的 `.rules.verible_lint` 与 `*.f` filelist 会被自动发现；
+3. 打开工程（Qt6）：启动时用 `--project <dir>` 指定工程目录（或恢复上次会话）。工程根
+   **从该目录向上逐级查找**：在每一级依次看 `vedit.toml`（优先）→ `.git` → 该目录是否
+   **直接包含 `*.f`**，命中的第一级即工程根（来源依次报告为 `vedit_toml` / `git_dir` /
+   `filelist`，都没命中的退化为起始目录 `fallback`）。
+   所以一个只带 `project.f` 的目录本身也算工程根，即使它位于更大的 git 仓库内部：以该目录为
+   起点时根就是它自己（`filelist`），而以它所在的外层仓库为起点时根仍是外层（`git_dir`），
+   嵌套的 `.f` 不会把根改到子目录；同一目录同时有 `.git` 与 `*.f` 时根不变，来源按更强的
+   `.git` 报 `git_dir`。扩展名大小写不敏感：`.F` 与 `.f` 同样算根
+   （`has_f_extension` 用 `eq_ignore_ascii_case("f")`）。在此之上的 `.rules.verible_lint` 与
+   `*.f` filelist 会被自动发现；
 4. 语法高亮是自动的（按扩展名），主题默认 `cobalt`，可在 `[ui] theme` 改。
+
+工程根的**起点**在两个前端不同：旧 GTK3 前端（`crates/vd-app`）以**进程启动目录**
+（`std::env::current_dir()`）为起点；Qt6 产品的工程根由 **`--project <dir>`**
+（`src/app/main.cpp:804/824`）或**恢复的会话**（`src/app/app_shell.cpp:390`）指定，
+**不是由打开文件推导**：`--project` 写入 `ShellOptions.projectRoot`
+（`src/workspace/integration.h:26`），`src/workspace/project/project_integration.cpp:56,69`
+直接 `model->open(root)`，全仓没有 file-open → project-root 的连线。
+`crates/vd-config` 的 `Loader::new(start_dir)` 契约规定**调用方应传被打开文件所在目录**
+（`crates/vd-config/src/lib.rs:93-103`），而 Qt6 当前 shell 传的是 `--project` 的值；
+GTK3 前端当前传的是进程启动目录（`crates/vd-app/src/config_glue.rs:63`，与契约不一致）。
+因此 Qt6 里用 `--project` 指定工程目录（根发现从该目录向上）；旧 GTK3 前端要先 `cd` 到期望的
+工程目录再启动。
 
 编辑能力：多标签（`Ctrl+N` 新建、`Ctrl+W` 关闭、未保存会确认）、原生撤销/重做、
 查找/替换/下一个（`Ctrl+F`/`Ctrl+H`/`F3`）、跳行（`Ctrl+G`）、CRLF 保留、原子保存

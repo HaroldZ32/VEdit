@@ -44,3 +44,10 @@ build/gui-spike/
 **/CMakeFiles/
 **/CMakeCache.txt
 **/cmake_install.cmake
+
+# --- generated test data ------------------------------------------------------
+# The file-tree lane's 10,000-file laziness fixture (10,006 zero-byte files). It
+# is generated data: reproduce it with
+#   bash src/workspace/filetree/tools/generate-testdata.sh
+# (the lane's own entries regenerate it too). Never commit it.
+filetree-testdata/

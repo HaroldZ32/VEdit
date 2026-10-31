@@ -39,10 +39,13 @@
 
 1. **用户已定案 (a)**：需求书 `requirements.md:99` 的决策记录写明"`.sv` 关闭态折叠不再作为
    用户决策"，依据是 ① A4.1 已定案采用 (a)；② 自有 LGPL XML 已交付；③ 其余只是证据/登记/文档。
-2. **数据已交付，路径与哈希可核对**（C14）：`resources/syntax/vedit-systemverilog.xml`
-   89 行 / 6,276 B / sha256 `dc6e0a4714762764b9386471bb09e2550c1a9cbcf2b8f67f1a1200f677726f9d`
-   （Verilog 版 78 行 / 5,172 B / `3d1ec41f0871c001f560ca58b3178bdfd7508ff5f25d095c15820d2feda43e49`）。
-   核对输出见 `evidence/docs-amendments/02-sha256-check.txt`。
+2. **数据已交付，路径与哈希可核对**（C14；哈希为 T45 重写折叠规则后的当前值）：
+   `resources/syntax/vedit-systemverilog.xml` 90 行 / 5,492 B / sha256
+   `2abba3342d0878e71b99d358d96e510f857cd7f232786951be8602f513e0b992`
+   （Verilog 版 85 行 / 5,111 B / `c6adc763c7b280d7493f48d06e5779d0b1e2068ac82f75fe7f31a07b0788a6c2`）。
+   变更记录（2026-10-31）：T45 重写折叠规则后哈希变更；旧值 89 / 6,276 B `dc6e0a47…`、
+   78 / 5,172 B `3d1ec41f…` 为重写前的历史值（旧证据与旧打包快照仍保留该值，不改写）。
+   实算/核对输出见 `evidence/licensing-hash-sync/01-hash-recompute.txt`。
 3. **许可干净**：两份 XML 为自有构建产物（XML 头 `author="VEdit"`、
    `license="LGPL-2.1-or-later"`），不随包 KDE 的 `verilog.xml`（许可未声明）与
    `systemverilog.xml`（GPL-3.0-or-later）；禁运由 sha256 + 文件名 + 内嵌扫描三重执行
@@ -51,16 +54,21 @@
 4. **回退 (b) 的代价与收益都不再成立**：(b) 会让 `.sv` 关闭态无折叠、并改写 A1f 期望；
    现在数据与验收路径都已存在，(b) 只会制造倒退。因此 A4.4 的 (b) 条件永不触发。
 
-**执行状态（必须与"决定"分开看）**：决定成立，但**当前交付的折叠规则尚未生效**——
-`resources/syntax/` 两份 XML 的折叠规则写法不被 KSyntaxHighlighting 6.24.0 接受，实测产出
-**0 条折叠区**（§4 事实 B）。因此 **A4.5 仍未满足**；这是实现缺陷（修复属 `resources/syntax/`
-的 lane，**不在本 task 写域**），**不是**对 A4(a) 决定的变更，也**不**重开用户决策。
-**返修已入队：已并入 split revision 3（重写两份 XML 为 KDE 关键字列表惯用法、在 F2 交付库验证、
-探针断言 author/section、重采 A4.5 视图级证据）；T29（A4 残项）将依赖该修复。**
+**执行状态（必须与"决定"分开看）**：决定成立。**折叠规则已由 T45 重写，并由 T66 在真 F2
+交付库上重录**：两份 XML 改为 KDE 关键字列表惯用法后，在自建 `QRC_SYNTAX=OFF` 的 F2 库上，
+探针断言 `author=VEdit / section=Hardware`，且 **`ldd` 证明 `libKF6SyntaxHighlighting` 解析到
+F2 安装树**（不再出现 "F2 标签 + DISTRO 库"）。实测：**Verilog 7/7、SystemVerilog 11/11**
+（SV 用 26 行真样例；每行 `library=F2` 前都有 `LDD library=F2 resolves=<F2 path>`）。
+证据：`evidence/syn-kde-data/10-folding-before-F2.log`、`11-folding-after-F2.log`。
+首版 `10`/`11` 日志已被证明测的是 DISTRO 库、且 SV 采样分支从未生效，文件保留并加
+`# INVALID (T66)` 横幅，以 `-F2` 版为准。
+**A4.5 仍未满足**：它的判据是视图级观测（§4.8 门槛 3），单元级 `applyFolding` 计数只能当前置正控，
+视图级证据仍需按 §4.7/§4.8 重采（U-2）；这**不是**对 A4(a) 决定的变更，也**不**重开用户决策。
 
-> **交付风险声明（必须随任何"折叠已可用"的结论一起出现）**：F2 交付构建
-> （自建 `QRC_SYNTAX=OFF` 库、无内嵌定义）下，现有自有 XML 会给出 **0 折叠区**——
-> 开发镜像里看到的折叠来自 KDE 内嵌定义（§4.4），交付库没有它们。
+> **交付风险声明（T66 更正）**：T45 之前的 XML 在 F2 交付构建（自建 `QRC_SYNTAX=OFF` 库、
+> 无内嵌定义）下确实给出 **0 折叠区**；T45 修复后，T66 在**真 F2 库**上重测为
+> **Verilog 7/7、SystemVerilog 11/11**（SV 26 行样例；`ldd` 证明库指向 F2）。开发镜像里
+> 的旧数字若来自 KDE 内嵌定义（§4.4），一律不作自有 XML 的证据。
 
 ---
 
@@ -76,13 +84,19 @@
 | 语言名 | `Verilog` | `SystemVerilog` |
 | 许可 | **LGPL-2.1-or-later** | **LGPL-2.1-or-later** |
 | 仓库路径 | `resources/syntax/vedit-verilog.xml` | `resources/syntax/vedit-systemverilog.xml` |
-| 行数 / 字节 | 78 / 5,172 B | 89 / 6,276 B |
-| **sha256（C14）** | `3d1ec41f0871c001f560ca58b3178bdfd7508ff5f25d095c15820d2feda43e49` | `dc6e0a4714762764b9386471bb09e2550c1a9cbcf2b8f67f1a1200f677726f9d` |
+| 行数 / 字节 | 85 / 5,111 B | 90 / 5,492 B |
+| **sha256（C14；T45 重写后）** | `c6adc763c7b280d7493f48d06e5779d0b1e2068ac82f75fe7f31a07b0788a6c2` | `2abba3342d0878e71b99d358d96e510f857cd7f232786951be8602f513e0b992` |
 | 安装落点（AppDir） | `usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml` | `usr/share/org.kde.syntax-highlighting/syntax/vedit-systemverilog.xml` |
 | 安装后 sha256 | 与仓库一致（`runtime-manifest:196`） | 与仓库一致（`runtime-manifest:195`） |
 | 许可全文 | `docs/licenses/LGPL-2.1.txt`、`resources/syntax/LICENSE-LGPL-2.1`（26,419 B） | 同左 |
 | 上游功能参照（非复制） | GtkSourceView 4.6.1 `verilog.lang`，475 行，sha256 `7670ddfd7b443f5f99c202bfa79de31834c1bd8968ed74c39474dca4f439d464` | GtkSourceView 4.6.1 `systemverilog.lang`，262 行，sha256 `9d1f67411f2674d93f035620ce004da4beca5bbf469eb9955a83c332edb79b04` |
 | 上游 tarball pin | `GSV_URL` / `GSV_SHA256=63f487a7ab59612ffa9e7be1883dbd274ab1016afcede3239b93b0fc384df874`（`scripts/versions.env:24-26`） | 同左 |
+
+> **哈希变更记录（2026-10-31，T45）**：T45 把两份 XML 的折叠规则改写为 KDE 关键字列表惯用法后，
+> 行数 / 字节 / sha256 变为上表值；旧的 78 / 5,172 B `3d1ec41f…`、89 / 6,276 B `dc6e0a47…` 是
+> **T45 重写前的历史值**，只保留在旧证据与旧打包快照里（`evidence/highlight-v2/10-licensing-and-embargo.txt`、
+> `evidence/m0-runtime/runtime-manifest.txt`、`evidence/docs-amendments/02-sha256-check.txt`），不改写。
+> 许可结论不变：两份均为自有 LGPL-2.1-or-later 构建产物。
 
 **归属更正（三句话，防止再次误归属）**：
 
@@ -92,9 +106,10 @@
 2. 它们**不得**登记在"第三方 GTK/GtkSourceView 运行期组件"条目下，**不得**归因给 KDE；
    KDE 的 `verilog.xml`（许可未声明，sha256 `7199e367…`）与 `systemverilog.xml`
    （GPL-3.0-or-later，sha256 `3361d8b4…`）**永不随包**。
-3. **C14 的身份核对已做**：路径/行数/字节数/sha256 与 `02-sha256-check.txt` 一致；
-   安装点与 `packaging/runtime/assemble-appdir.sh:109-112`、`packaging/runtime/AppRun:33`、
-   `evidence/m0-runtime/runtime-manifest.txt:195-196` 一致。
+3. **C14 的身份核对（T45 重写后重算）**：当前两份源文件的路径/行数/字节数/sha256 与 §2 表一致
+   （实算见 `evidence/licensing-hash-sync/01-hash-recompute.txt`）；`02-sha256-check.txt` 与
+   `evidence/m0-runtime/runtime-manifest.txt:195-196` 记录的是重写前/旧打包快照的**历史值**，
+   不改写；安装点本身仍与 `packaging/runtime/assemble-appdir.sh:109-112`、`packaging/runtime/AppRun:33` 一致。
 
 ### 2.2 MIT `tree-sitter-verilog`（随包静态编入）
 
@@ -198,8 +213,9 @@ rev 2 记录。下面把"事实"与"判据等价性"分开写。
 - 我们的 SystemVerilog 定义：`CONTROL shipped-SV-attribute-form: … begins=0 ends=0`；
 - 全文共 **37 条** `Unknown keyword list` 警告（`04-folding-form-probe.log`）。
 
-**结论 B**：**当前交付的两份 XML 产出的折叠区为 0 条**。这不是"属性形态不成立"，而是
-规则写法错误（见事实 D 的修正对照）。
+**结论 B（T45 修复前的历史事实）**：当时交付的两份 XML 产出的折叠区为 0 条。这不是
+"属性形态不成立"，而是规则写法错误（见事实 D 的修正对照）。**T45 已按事实 D 修复，
+T66 在真 F2 库上重测为 Verilog 7/7、SystemVerilog 11/11（26 行 SV 样例）**。
 
 ### 4.4 事实 C — 既有 FoldingProbe 的 7/7、9/9 证据来自 KDE 内嵌定义，不是我们的 XML
 
@@ -220,8 +236,9 @@ rev 2 记录。下面把"事实"与"判据等价性"分开写。
 - **`03-folding.log` 也不得用于任何许可/合规叙事**：它证明不了自有 LGPL 定义被加载，
   反而证明 `.sv` 折叠数字来自内嵌的 GPLv3+ KDE 定义；许可证据必须来自自有文件
   （sha256/归属/加载来源），不能引用该日志。
-- 在交付形态（F2 自建库、`QRC_SYNTAX=OFF`、无内置定义）下，内置定义不存在，
-  我们的 XML 会按事实 B 产出 **0 折叠**。
+- 在交付形态（F2 自建库、`QRC_SYNTAX=OFF`、无内置定义）下，内置定义不存在；
+  T45 修复前我们的 XML 会按事实 B 产出 **0 折叠**，T45 修复后 T66 在真 F2 上实测
+  Verilog 7/7、SystemVerilog 11/11（见 §1 执行状态与 `-F2` 日志）。
 
 ### 4.5 事实 D — 修正后的属性形态可用（正控）
 
@@ -308,8 +325,8 @@ rev 2 记录。下面把"事实"与"判据等价性"分开写。
 
 | # | 项 | 归属 |
 |---|---|---|
-| **U-1** | 两份自有 XML 的折叠规则不生效（0 折叠区），需改为关键字列表引用并重测 | `resources/syntax/` lane（不在 T33 写域）；返修已入 split revision 3 |
-| **U-2** | A4.5（1k 行 `.sv`、tree-sitter 关闭、A3.1 观测）未采；不得引用旧 03 日志。**T29（A4 残项）的期望值来自一个当前产出 0 折叠的 XML，故 T29 必须依赖 U-1 的修复** | 返修 lane + `acc-editor`；T29 依赖该修复 |
+| **U-1** | ~~折叠规则不生效（0 折叠区），需改为关键字列表引用并重测~~ **已修复（T45），T66 重录成立**：规则改为关键字列表引用；T66 修复 runner 的 F2 路径与 SV 采样，`ldd` 证明库指向 F2 安装树，两份 XML 实测 **Verilog 7/7、SystemVerilog 11/11**（SV 26 行样例；`author=VEdit / section=Hardware`）。证据：`10-folding-before-F2.log`、`11-folding-after-F2.log`；首版日志已被标注 INVALID | `resources/syntax/` lane（T45）；证据重录 T66 |
+| **U-2** | A4.5（1k 行 `.sv`、tree-sitter 关闭、A3.1 观测）未采；不得引用旧 03 日志。U-1 的规则层修复已完成，T29 的期望值可取自修复后自有 XML 的 `beginRegion` 规则，但视图级观测仍须重采 | 返修 lane + `acc-editor`；T29 依赖 U-1 修复（已就绪） |
 | **U-3** | `evidence/syn-kde-data/06-conclusion.md` (c) 与 C14 的"FoldingProbe 已证"表述需按 §4.4/§4.7 更正 | 原 lane / 文档维护者 |
 | **U-4** | ADR §5 A/C 的正式断言脚本落地（按 §3.3 等价改写），并在产物侧复核两份 XML 与 grammar | `pack-final` |
 | **U-5** | `THIRD_PARTY_NOTICES.md` 的最终产物一致性（AppDir 内每份文件 sha256 可查） | `pack-final` |
@@ -324,4 +341,6 @@ rev 2 记录。下面把"事实"与"判据等价性"分开写。
    KSyntaxHighlighting 当"未知关键字列表"丢弃；必须写成 `<list name="…">` +
    `<keyword String="列表名" beginRegion/endRegion>`（KDE 同款 idiom）。
 3. **证据归属**：旧 `03-folding.log` 的 7/7、9/9 来自 KDE 内嵌定义（`.sv` 为 GPLv3+），
-   **不是**我们的 XML；A4.5 需修复后在 F2（无内置定义）上重采。
+   **不是**我们的 XML；折叠规则已由 T45 重写并在 F2（无内置定义）上重测，但 A4.5 的**视图级**
+   证据仍需在修复后的 F2 上按 §4.7/§4.8 重采（具体计数与 `ldd` 库指向见 `evidence/syn-kde-data/`
+   的重录版；原 `10`/`11` 日志已被证明测的是 DISTRO 库）。

@@ -243,9 +243,12 @@ bash evidence/r2-license/verify.sh   # 44 条断言；本文件所有 sha256 与
    与 **G1 内嵌扫描主闸门**保持原样，本次修正只动文件级检查的路径字面。
 4. **与 D2 执行口径不冲突**：D2 口径 2 的落点由 `syn-kde-data` 契约定为 `resources/syntax/`；
    本勘误只修 §5 的旧路径/旧文件名字面，不改变"自有 LGPL 定义随包、KDE 定义永不随包"的决策。
-5. **交叉引用（A4 相关，非本 ADR 的决策）**：交付件折叠规则当前不生效（0 折叠区，A4.5 未满足），
-   旧 `03-folding.log` 的 7/7、9/9 测到的是 KDE 内嵌定义（`.sv` 为 GPLv3+），不得引用。
-   详见 amendments rev2 §4；本 ADR 的 D2/许可结论不受影响。
+5. **交叉引用（A4 相关，非本 ADR 的决策）**：T45 之前交付件的折叠规则不生效（0 折叠区）；
+   T45 改为关键字列表引用后，T66 在**真 F2 库**上（`ldd` 证明库指向 F2 安装树、SV 26 行样例）
+   实测 **Verilog 7/7、SystemVerilog 11/11**，见 `evidence/syn-kde-data/10-folding-before-F2.log`
+   / `11-folding-after-F2.log`。旧 `03-folding.log` 的 7/7、9/9 测到的是 KDE 内嵌定义
+   （`.sv` 为 GPLv3+），不得引用；A4.5 的视图级观测仍需单独重采（amendments rev2 U-2）。
+   本 ADR 的 D2/许可结论不受影响。
 
 **更正后的可执行断言（可抄给 `pack-final`）**：
 
