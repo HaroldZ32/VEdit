@@ -1,0 +1,50 @@
+# Locked Ubuntu 26.04 packages for the Qt6/KF6 C++ lane (task T10).
+#
+# Format: <package>=<exact version> <sha256 of the .deb>
+#
+# scripts/docker/Dockerfile.build (stage `qt6-build`) downloads exactly these
+# versions with `apt-get download`, verifies each sha256, installs them, then
+# asserts the installed version again with dpkg-query -- so a rebuilt image can
+# never silently drift to a different Qt6/KF6/tree-sitter.
+#
+# The sha256 values were measured from the Ubuntu 26.04 archive on 2026-10-31
+# (evidence/m0-build/09-locked-deb-sha256.txt). If the archive stops serving one
+# of these exact versions, the image build FAILS LOUDLY instead of picking up a
+# newer one; that is the intended behaviour (the pinned image ref is the way to
+# reuse a verified build).
+#
+# --- Qt 6.10.2 (qt6-base + the modules KTextEditor links: Qml, TextToSpeech) --
+qt6-base-dev=6.10.2+dfsg-7 37a09d02275eedbefec63c7d71dd6c310077d7feb6609fa938a4a8e0572762a7
+qt6-base-dev-tools=6.10.2+dfsg-7 f75b03bc0f4c294d8b54d44a7fc4eeeb3a75b92b9fe13656cbb426f22f98a6f0
+qt6-declarative-dev=6.10.2+dfsg-3 4d3b87befda13385b65a82f526bc7fcf8c3a5bfd7708a76bfd2a6f06c6faaa9d
+qt6-speech-dev=6.10.2-1 d4e5b63f45f30806b039aefb9dc5ff8c7460254ae7326434bdece9c5b116a42f
+
+# --- KDE Frameworks 6.24.0 (KTextEditor 6.24.0 + KSyntaxHighlighting 6.24.0) --
+extra-cmake-modules=6.24.0-0ubuntu1 3ea14a8e6fd9a0a2ba1f9e188fa210a2ba3d1c56591dcdc839f17110e4093b81
+libkf6config-dev=6.24.0-0ubuntu1 4371d2cdd08cef200735e7952d37ad59c816fa5e80ce602930c790149a06ec57
+libkf6coreaddons-dev=6.24.0-0ubuntu1.1 069f87aa129a3e6e4aa6e9d9cf0edf77cb4eff48d8f7e2297752b43cf887f565
+libkf6parts-dev=6.24.0-0ubuntu1 c3b2f937f77829bd7e7a91299b3b5dd355aa872679babf5ddbfab7e25427a2c7
+libkf6syntaxhighlighting-dev=6.24.0-0ubuntu1 eedea799fd683fb36302f1301e27eba2c073575291b7977db1d61c68b86eac29
+libkf6syntaxhighlighting-data=6.24.0-0ubuntu1 6203fc3438918ab75489b8caf920b45ba8b11b649c5f54f73f1b0a3cfdfd4da7
+libkf6texteditor-dev=6.24.0-0ubuntu1 a5c1024671fac9f9be34cb6cbcb52fcc4b2b1bca37ff72d09d6710b0f98c0cf4
+libkf6texteditor-data=6.24.0-0ubuntu1 5b74fd21c8ad656eb3d60c37c763b8cbf328d2681b76b8054c5f2463d6766522
+# katepart is the real KTextEditor implementation plugin behind
+# KTextEditor::Editor::instance(); without it the editor core cannot be created.
+libkf6texteditor-katepart=6.24.0-0ubuntu1 64ae8f538ac3a160ec0b403cedb3f8a97b8b077ae677df5e8edd4e1516ad9d9c
+libkf6xmlgui-dev=6.24.0-0ubuntu1 cfe0de53aae298ed0b696ebb460c7a3428cfc8cecf2521680e282c3466d9d17b
+
+# --- tree-sitter runtime (C18) ----------------------------------------------
+libtree-sitter-dev=0.25.9-7 62cbe7b5891517d8bada5713bd4e34da8bf30176aff83598f94a549d5de8d5b9
+
+# --- the glibc that the private runtime bundles (T11) + its C++ runtime ------
+libc6=2.43-2ubuntu2.4 a613b457f3ff9c84ebd28af8a05afdec22605ad9aed87c71e3a6ae5170aeb9ca
+libstdc++6=16-20260322-1ubuntu1 a32b9ad585e39bdc7bd15d1eae6293461e6d466859a1dd2f7862d1e40f89b9d8
+libgcc-s1=16-20260322-1ubuntu1 2fb4d81c14fdf34251639ae82f5181f9f98480ea16125d535571ac1be9db3065
+
+# --- host runtime prerequisite for AppImage type-2 (C3/A7) -------------------
+libfuse2t64=2.9.9-9build1 d89b6b9513f4b8c28377005e4cab53b8395cde6c9d7563b4832a6794401a6441
+
+# --- build toolchain (recorded so the compiler is part of the pin) ----------
+cmake=4.2.3-2ubuntu2 87c496f1e37b64bc0b4ad9c5fe0e75c09655f5399ed39695b876afba55becc61
+ninja-build=1.13.2-1 533239a464183f041f7c979f899fd8419e31ac82366540e57902a255de78f156
+g++-15=15.2.0-16ubuntu1 cb7771861d821e48d38253f2397217920d5cf8020ed9de8372a625d080dcc6be

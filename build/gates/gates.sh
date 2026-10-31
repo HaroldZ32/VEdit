@@ -47,4 +47,17 @@ else
   echo "[gates] N/A: no Cargo workspace yet (the skeleton task owns it); the test step has nothing to run."
   echo "[gates] this N/A is only valid before the skeleton lands: once Cargo.toml exists, a test failure fails this gate."
 fi
+
+# The C++/Qt6 lane (M0 build base, T10). While the Rust product still exists
+# (Open Q7 is a user/plan decision) BOTH lanes must stay green: this gate covers
+# cmake configure + build + ctest + the xcb/software-rendering window smoke in
+# the lane's own pinned image, so a defect in the new toolchain cannot hide.
+if [ -f "$ROOT/CMakeLists.txt" ] && [ -f "$ROOT/scripts/versions-qt.env" ]; then
+  echo "[gates] C++/Qt6 lane present -> build/gates/qt6-cxx.sh is a HARD requirement"
+  bash "$ROOT/build/gates/qt6-cxx.sh" \
+    || no_gate "[gates] FAIL: the C++/Qt6 lane failed (configure/build/ctest/xcb smoke)"
+else
+  echo "[gates] N/A: no Qt6 build base yet (T10); the C++ lane has nothing to run."
+  echo "[gates] this N/A is only valid before T10 lands: once CMakeLists.txt exists, a C++ lane failure fails this gate."
+fi
 echo "[gates] PASS"

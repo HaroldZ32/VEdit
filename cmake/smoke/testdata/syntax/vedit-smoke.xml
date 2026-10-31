@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Project-owned minimal KSyntaxHighlighting definition used by the M0 smoke
+  check (task T10) to prove that the C6 mechanism, loading syntax definitions
+  from a private path via Repository::addCustomSearchPath(), really works.
+
+  It is authored for this repository under the project licence (MIT, see
+  LICENSE); it is NOT a copy of any KDE syntax definition, and it deliberately
+  defines a language no real file uses. Do not ship it in the runtime bundle as
+  a feature; it exists so the build base never has to guess whether custom data
+  paths work.
+-->
+<language name="VEditSmoke" version="1" kateversion="5.0" section="Other"
+          extensions="*.vedit-smoke" author="VEdit M0" license="MIT">
+  <highlighting>
+    <contexts>
+      <context name="Normal" attribute="Normal Text" lineEndContext="#stay">
+        <keyword attribute="Keyword" context="#stay" String="module"/>
+      </context>
+    </contexts>
+    <itemDatas>
+      <itemData name="Normal Text" defStyleNum="dsNormal"/>
+      <itemData name="Keyword" defStyleNum="dsKeyword"/>
+    </itemDatas>
+  </highlighting>
+</language>
