@@ -1,0 +1,29 @@
+== T84 experiment: VEDIT_SYNTAX_DIR = data root vs syntax subdirectory ==
+collected_at: 2026-10-31T15:14:19Z
+git_head: c682694e125ff7f59c590b83b6d2895239a3d143
+host image: docker.m.daocloud.io/library/centos:7 (stock, no KDE data)
+AppDir: build/centos7-verify/AppDir (T83 staged tree, unchanged at this point)
+cmd pattern: env -i ... VEDIT_SYNTAX_DIR=<value> ld-linux --library-path AppDir/lib AppDir/bin/vedit-app --selfcheck
+
+===== VEDIT_SYNTAX_DIR=/app/usr/share/org.kde.syntax-highlighting =====
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='/app/usr/share/org.kde.syntax-highlighting' definitions=3 own-xml=[vedit-systemverilog.xml,vedit-verilog.xml] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+CHECK editcore.highlight.verilog.mode PASS mode='Verilog' expected='Verilog'
+CHECK editcore.highlight.verilog.definition PASS Verilog
+CHECK editcore.highlight.verilog.format-ranges PASS 30
+CHECK editcore.highlight.verilog.folding-regions PASS begins=2 ends=2
+CHECK editcore.highlight.systemverilog.mode PASS mode='SystemVerilog' expected='SystemVerilog'
+CHECK editcore.highlight.systemverilog.definition PASS SystemVerilog
+CHECK editcore.highlight.systemverilog.format-ranges PASS 29
+CHECK editcore.highlight.systemverilog.folding-regions PASS begins=1 ends=1
+
+===== VEDIT_SYNTAX_DIR=/app/usr/share/org.kde.syntax-highlighting/syntax =====
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='/app/usr/share/org.kde.syntax-highlighting/syntax' definitions=3 own-xml=[] themes=30 verilog=0 systemverilog=0 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+CHECK editcore.highlight.verilog.mode PASS mode='Verilog' expected='Verilog'
+CHECK editcore.highlight.verilog.definition PASS Verilog
+CHECK editcore.highlight.verilog.format-ranges PASS 30
+CHECK editcore.highlight.verilog.folding-regions PASS begins=2 ends=2
+CHECK editcore.highlight.systemverilog.mode PASS mode='SystemVerilog' expected='SystemVerilog'
+CHECK editcore.highlight.systemverilog.definition PASS SystemVerilog
+CHECK editcore.highlight.systemverilog.format-ranges PASS 29
+CHECK editcore.highlight.systemverilog.folding-regions PASS begins=1 ends=1
+
