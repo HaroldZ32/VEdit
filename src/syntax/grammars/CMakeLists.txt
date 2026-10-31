@@ -198,3 +198,21 @@ if(VEDIT_GRAMMAR_BUILD_TESTS AND VEDIT_SYNTAX_TREESITTER)
 elseif(VEDIT_GRAMMAR_BUILD_TESTS)
   message(STATUS "syn-grammars: tests skipped (tree-sitter backend not compiled)")
 endif()
+
+# ---- product wiring: link the syntax stack into vedit-app (T12, G2) --------
+# The root build's VEDIT_LANE_DIRECTORIES list does not contain src/syntax/product,
+# so the lane that owns the grammar registry pulls the product-wiring lane in.
+# Guards:
+#   * standalone build (CMAKE_SOURCE_DIR == this lane): no product binary exists,
+#     so the wiring module is not needed;
+#   * the product lane itself includes this directory, so `NOT TARGET` prevents a
+#     second definition of vedit_syntax_product.
+# The product lane's CMakeLists defers the actual vedit-app link to the end of
+# the top-level configure (src/app is added after the lane directories) and
+# fails configure when a required library is missing - it never links a partial
+# syntax stack silently.
+if(NOT CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR
+   AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../product/CMakeLists.txt"
+   AND NOT TARGET vedit_syntax_product)
+  add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../product" "${CMAKE_CURRENT_BINARY_DIR}/syntax-product")
+endif()
