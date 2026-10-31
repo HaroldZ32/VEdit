@@ -269,7 +269,12 @@ void testTreeAndInteraction(const QString &scratch)
     check("tree.dblclick.folder-expands", widget.view()->isExpanded(alphaIndex));
     check("tree.dblclick.folder-does-not-open", fileSpy.count() == 0);
 
-    // Double click on a file raises openFileRequested with its path.
+    // Double click on a file raises openFileRequested with its path. This suite
+    // runs on the standalone panel, which has no shell and no editor, so the
+    // panel-level contract is "report the path"; what the PRODUCT does with it
+    // (load the bytes into the active editor pane and record the path there) is
+    // asserted against the real ApplicationShell in
+    // tools/rootcheck/seamcheck.cpp (verdict §8.1, repair task T39).
     const QModelIndex fileIndex = model->indexForPath(root + QStringLiteral("/top.v"), true);
     check("tree.file-index", fileIndex.isValid());
     const QRect fileRect = widget.view()->visualRect(fileIndex);

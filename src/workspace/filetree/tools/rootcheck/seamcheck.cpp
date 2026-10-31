@@ -1,8 +1,16 @@
 // Root-context seam check (task T21): proves the file tree panel really becomes
 // the shell's `file-tree` dock content through installFileTree(), without the
 // repository's src/app files being modified by this lane.
+//
+// The double-click contract is checked on the PRODUCT side of the seam
+// (verdict §8.1, repair task T39): a double click on a *file* row must load the
+// file into the shell's active editor pane and record the path there; a double
+// click on a *folder* row must only expand it and leave the editor untouched.
+// The checks below therefore assert editor content and the `vedit.openFilePath`
+// property, not just that a signal was emitted or that the status bar changed.
 
 #include "app_shell.h"
+#include "editor_area.h"
 #include "panel_registry.h"
 
 #include "file_tree_model.h"
@@ -14,9 +22,13 @@
 #include <QDir>
 #include <QDockWidget>
 #include <QElapsedTimer>
+#include <QFile>
 #include <QFileInfo>
+#include <QPlainTextEdit>
+#include <QSignalSpy>
 #include <QStatusBar>
 #include <QTreeView>
+#include <QtTest/QTest>
 
 #include <cstdio>
 
@@ -34,6 +46,15 @@ void pump(int milliseconds)
     while (timer.elapsed() < milliseconds) {
         QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
     }
+}
+
+QByteArray readFile(const QString &path)
+{
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly)) {
+        return QByteArray();
+    }
+    return file.readAll();
 }
 
 } // namespace
@@ -95,25 +116,118 @@ int main(int argc, char **argv)
                 panel != nullptr ? 1 : 0, panel != nullptr ? 1 : 0, found != nullptr ? 1 : 0,
                 panel != nullptr ? qPrintable(panel->rootPath()) : "none");
 
+    int checks = 0;
+    int failures = 0;
+    const auto check = [&checks, &failures](const char *name, bool condition,
+                                            const QString &detail = QString()) {
+        ++checks;
+        if (!condition) {
+            ++failures;
+        }
+        std::printf("SEAM CHECK %s ok=%d%s%s\n", name, condition ? 1 : 0,
+                    detail.isEmpty() ? "" : " detail=", qPrintable(detail));
+    };
+
+    check("panel-installed", panel != nullptr && found != nullptr);
+    check("root-path", panel != nullptr && panel->rootPath() == QDir(project).absolutePath(),
+          panel != nullptr ? panel->rootPath() : QString());
+
     shell.show();
     pump(250);
     if (panel != nullptr) {
         shell.panels()->hidePanel(QStringLiteral("outline"));
-        pump(120);
+        shell.panels()->showPanel(QStringLiteral("file-tree"), &shell);
+        pump(150);
     }
 
-    // The double-click bridge: the panel reports a path, the shell shows it.
-    bool bridge = false;
+    // --- the real product behaviour of a double click (verdict §8.1 H1) ------
+    QPlainTextEdit *editor = nullptr;
+    if (vedit::app::EditorPane *pane = shell.editorArea()->activePane()) {
+        editor = qobject_cast<QPlainTextEdit *>(pane->editorWidget());
+    }
+    check("editor.active-pane-widget", editor != nullptr);
+
+    const auto editorPath = [editor]() {
+        return editor != nullptr ? editor->property("vedit.openFilePath").toString() : QString();
+    };
+    const auto editorText = [editor]() {
+        return editor != nullptr ? editor->toPlainText() : QString();
+    };
+    // The demo editor starts with its own welcome text, so "no file is open" is
+    // the empty path property, not an empty document.
+    const QString initialText = editorText();
+    std::printf("SEAM editor-initial-bytes=%d\n", static_cast<int>(initialText.size()));
+    check("editor.initially-no-file", editor != nullptr && editorPath().isEmpty());
+
     if (panel != nullptr) {
-        const QModelIndex fileIndex = panel->model()->indexForPath(
-            QDir(project).filePath(QStringLiteral("rtl/top.v")), true);
+        // A real mouse double click on the row, not a direct call to activateIndex:
+        // the point is the whole path from the view event to the editor content.
+        const QString topPath = QDir(project).filePath(QStringLiteral("rtl/top.v"));
+        const QByteArray topOnDisk = readFile(topPath);
+        const QModelIndex fileIndex = panel->model()->indexForPath(topPath, true);
         std::printf("SEAM file-index-valid=%d\n", fileIndex.isValid() ? 1 : 0);
-        panel->activateIndex(fileIndex);
+        panel->selectPath(topPath);
         pump(80);
+        const QRect fileRect = panel->view()->visualRect(fileIndex);
+        check("dblclick.file-row-visible", fileRect.isValid() && !fileRect.isEmpty());
+        QTest::mouseClick(panel->view()->viewport(), Qt::LeftButton, Qt::NoModifier,
+                          fileRect.center());
+        QTest::mouseDClick(panel->view()->viewport(), Qt::LeftButton, Qt::NoModifier,
+                           fileRect.center());
+        pump(150);
         const QString message = shell.statusBar()->currentMessage();
-        bridge = message.contains(QStringLiteral("Open "))
-            && message.contains(QStringLiteral("top.v"));
-        std::printf("SEAM status-after-activate=\"%s\"\n", qPrintable(message));
+        std::printf("SEAM status-after-file-dblclick=\"%s\"\n", qPrintable(message));
+        check("dblclick.file-loads-bytes",
+              !topOnDisk.isEmpty() && editorText() == QString::fromUtf8(topOnDisk)
+                  && editorText() != initialText,
+              QString::number(topOnDisk.size()) + QStringLiteral(" bytes on disk"));
+        check("dblclick.file-records-path", editorPath() == topPath, editorPath());
+        // The pre-repair evidence asserted this status-bar text; it is kept
+        // unchanged next to the editor-state assertions above.
+        check("dblclick.file-status-message",
+              message.contains(QStringLiteral("Opened"))
+                  && message.contains(QStringLiteral("top.v")),
+              message);
+
+        // A second file must replace the content: this proves the bytes are read
+        // per open, not a property written once.
+        const QString aluPath = QDir(project).filePath(QStringLiteral("rtl/alu.sv"));
+        const QByteArray aluOnDisk = readFile(aluPath);
+        const QModelIndex aluIndex = panel->model()->indexForPath(aluPath, true);
+        panel->selectPath(aluPath);
+        pump(80);
+        const QRect aluRect = panel->view()->visualRect(aluIndex);
+        check("dblclick.second-file-row-visible", aluRect.isValid() && !aluRect.isEmpty());
+        QTest::mouseClick(panel->view()->viewport(), Qt::LeftButton, Qt::NoModifier,
+                          aluRect.center());
+        QTest::mouseDClick(panel->view()->viewport(), Qt::LeftButton, Qt::NoModifier,
+                           aluRect.center());
+        pump(150);
+        check("dblclick.second-file-loads",
+              !aluOnDisk.isEmpty() && aluOnDisk != topOnDisk
+                  && editorText() == QString::fromUtf8(aluOnDisk));
+        check("dblclick.second-file-records-path", editorPath() == aluPath, editorPath());
+
+        // A folder double click expands the row and must not open anything: the
+        // editor keeps the last file and the panel emits no open request.
+        const QString tbPath = QDir(project).filePath(QStringLiteral("tb"));
+        const QModelIndex tbIndex = panel->model()->indexForPath(tbPath, true);
+        QSignalSpy openSpy(panel, &FileTreeWidget::openFileRequested);
+        panel->view()->setExpanded(tbIndex, false);
+        panel->selectPath(tbPath);
+        pump(80);
+        const QRect tbRect = panel->view()->visualRect(tbIndex);
+        check("dblclick.folder-row-visible", tbRect.isValid() && !tbRect.isEmpty());
+        QTest::mouseClick(panel->view()->viewport(), Qt::LeftButton, Qt::NoModifier,
+                          tbRect.center());
+        QTest::mouseDClick(panel->view()->viewport(), Qt::LeftButton, Qt::NoModifier,
+                           tbRect.center());
+        pump(150);
+        check("dblclick.folder-expands", panel->view()->isExpanded(tbIndex));
+        check("dblclick.folder-emits-no-open", openSpy.isEmpty(),
+              QString::number(openSpy.count()));
+        check("dblclick.folder-keeps-editor",
+              editorPath() == aluPath && editorText() == QString::fromUtf8(aluOnDisk));
 
         // Laziness is observable from the real shell too.
         const QModelIndex rootIndex = panel->model()->index(0, 0, QModelIndex());
@@ -121,8 +235,7 @@ int main(int argc, char **argv)
                     panel->model()->rowCount(rootIndex), panel->model()->scannedDirectories());
     }
 
-    bool ok = panel != nullptr && found != nullptr
-        && panel->rootPath() == QDir(project).absolutePath() && bridge;
+    bool ok = failures == 0;
 
     shell.panels()->showPanel(QStringLiteral("file-tree"), &shell);
     pump(150);
@@ -132,6 +245,6 @@ int main(int argc, char **argv)
         ok = saved && ok;
     }
 
-    std::printf("FILETREE-SEAMCHECK ok=%d\n", ok ? 1 : 0);
+    std::printf("FILETREE-SEAMCHECK ok=%d checks=%d failures=%d\n", ok ? 1 : 0, checks, failures);
     return ok ? 0 : 1;
 }
