@@ -148,7 +148,13 @@ install -m 0644 "$ROOT/packaging/runtime/assets/io.github.vedit.VEdit.png" "$OUT
 install -m 0755 "$ROOT/packaging/runtime/AppRun" "$OUT/AppRun"
 
 # --- 7. hard conditions that must hold BEFORE we leave ----------------------
-! find "$OUT" -type d -name 'syntax-bundled' | grep -q . || { echo "ERROR: syntax-bundled/ present (C5 violated)" >&2; exit 1; }
+# `find -print -quit` stops find itself: a `find ... | grep -q .` pipeline would
+# let grep exit on the first hit and SIGPIPE find (this script sets pipefail),
+# which reads as "not found" and would wave a forbidden syntax-bundled/ through.
+if [ -n "$(find "$OUT" -type d -name 'syntax-bundled' -print -quit)" ]; then
+  echo "ERROR: syntax-bundled/ present (C5 violated)" >&2
+  exit 1
+fi
 active=$(python3 - "$OUT/usr/share/org.kde.syntax-highlighting/syntax" <<'PY'
 import glob, os, sys
 print(len(glob.glob(os.path.join(sys.argv[1], "*.xml"))))

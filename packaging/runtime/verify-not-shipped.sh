@@ -51,14 +51,17 @@ done < <(find "$APPDIR" -type f -name '*.xml')
 [ "$kde_hits" -eq 0 ] && ok "no KDE systemverilog.xml / verilog.xml by sha256"
 
 for n in systemverilog.xml verilog.xml; do
-  if find "$APPDIR" -type f -name "$n" | grep -q .; then
+  # `find -print -quit` avoids the `find | grep -q` SIGPIPE trap: under this
+  # script's pipefail a match used to make the pipeline read as failure, so a
+  # forbidden file could be reported clean. The check itself is unchanged.
+  if [ -n "$(find "$APPDIR" -type f -name "$n" -print -quit)" ]; then
     bad "a file named $n is present (must not ship; use our own LGPL definitions)"
   fi
 done
 ok "no file named systemverilog.xml / verilog.xml"
 
 # --- F2 (T64): whitelist only, no syntax-bundled/, visible set == whitelist ---
-if find "$APPDIR" -type d -name 'syntax-bundled' | grep -q .; then
+if [ -n "$(find "$APPDIR" -type d -name 'syntax-bundled' -print -quit)" ]; then
   bad "syntax-bundled/ present (F2 C5: compressed definitions would be auto-loaded)"
 else
   ok "no syntax-bundled/ directory (F2 C5)"
@@ -106,7 +109,10 @@ else
     sed -n '1,12p' /tmp/verify-embedded.txt | sed 's/^/   /'
   else
     echo "   detector: binutils fallback (python3-zstandard unavailable)"
-    if strings -a -el "$LIB" | grep -qx 'systemverilog.xml'; then
+    # `strings` on the KSH library prints a large stream; `grep -qx` exits at the
+    # match and SIGPIPEs it under pipefail, which used to read as "not embedded".
+    # A plain grep reads the whole stream and keeps the exact-line match.
+    if strings -a -el "$LIB" | grep -x 'systemverilog.xml' > /dev/null; then
       line="library embeds systemverilog.xml as a Qt resource"
       if [ "$EXPECT_PROBE" = 1 ]; then red "$line"; else bad "$line"; fi
     else

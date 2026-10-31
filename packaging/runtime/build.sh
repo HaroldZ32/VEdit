@@ -37,7 +37,11 @@ step "preflight"
   echo "f2 install: $KSH_F2"; [ -d "$KSH_F2" ] && sha256sum "$KSH_F2"/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0 2>/dev/null || echo "FAIL: F2 tree missing"
   echo "whitelist: $(ls "$ROOT/resources/syntax"/*.xml 2>/dev/null | wc -l) xml in resources/syntax/"
   echo "appimagetool: $ROOT/packaging/appimage/.cache/appimagetool.AppImage"
-  (ldconfig -p 2>/dev/null | grep -m1 libfuse) || echo "  libfuse not visible in ldconfig"
+  # `ldconfig -p` prints the whole cache (tens of KiB), so `grep -m1` would exit at
+  # the first match and SIGPIPE it under this script's `set -uo pipefail`: the
+  # `|| echo` would then claim libfuse is missing while it is installed. A plain
+  # grep reads everything; `sed -n '1p'` keeps the one-line output.
+  (ldconfig -p 2>/dev/null | grep libfuse | sed -n '1p') || echo "  libfuse not visible in ldconfig"
 } 2>&1 | tee "$EVID/00-preflight.log"
 grep -q 'FAIL' "$EVID/00-preflight.log" && fail=1
 [ "$fail" -eq 0 ] || { echo "preflight failed"; exit 1; }
