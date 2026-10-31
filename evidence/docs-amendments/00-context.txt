@@ -1,0 +1,26 @@
+== docs-amendments evidence: context ==
+collected_at: 2026-10-31T09:59:28Z (UTC) / 2026-10-31T17:59:28+0800
+git_head: 9957f5fe4d63c17c681e8753288262fa2c00955e
+branch: feat/qt6-ktexteditor-migration
+git_status_porcelain:
+?? crates/vd-search/
+?? crates/vd-vcs/
+?? evidence/docs-amendments/
+?? scripts/verify-fixture.sh
+?? tests/fixtures/
+
+== baseline hashes (before this task's docs edits) ==
+4a01064cdfeaac8b47c84957bc70d53b85ced0d23c854f390b0ea76ce19675a5  .mpd/cellwork/cell-20261031T085543161Z/requirements.md
+ca5fbf108fd9f42cbdaa8cce183942db1e100db3a2b05dd6bb89c616b0738954  docs/handover/appendix/amendments-a1-a5.md
+425da67f1c6a6d647eae7b04a680734b59b54d213e164de039c3f9f0992ad141  docs/decisions/r2-license.md
+879bc5451929cc7c67665185f5c586103fd27224dd633836fd790e9279a15cfb  docs/handover/README.md
+aa8fba8d73c9507155bc937c6648a12a9296c9fe7a1671a003abd220c32da5e9  THIRD_PARTY_NOTICES.md
+3d1ec41f0871c001f560ca58b3178bdfd7508ff5f25d095c15820d2feda43e49  resources/syntax/vedit-verilog.xml
+dc6e0a4714762764b9386471bb09e2550c1a9cbcf2b8f67f1a1200f677726f9d  resources/syntax/vedit-systemverilog.xml
+11a24275a46a1e4eebf1e1e9e31899968fd6a3be46f1487ac1b17d2f4af51dc3  resources/syntax/README.md
+92dbb929e5518c6790db68d32d71c257c0c6cbb3974fcd4d930bf28cf1b1bb46  third_party/tree-sitter/verilog/LICENSE
+323c121a3e550df0f970d46c544b3f02485e5e6d754acb730d6be7b8dea7dc4b  third_party/tree-sitter/verilog/grammar.js
+a15f78b82068daeb62f3b54c8ad0101aa936a2c921a57806fe8f37dcbf0bfff2  third_party/tree-sitter/verilog/src/parser.c
+ab104936984904469572a4e868149f7a22fb2929347f837ae6a1f9b790f1b173  third_party/tree-sitter/verilog/src/tree_sitter/parser.h
+e99b42baf4279d3be6dec59129dda0789f196b4e5c99144a781ea6cdf255425c  third_party/tree-sitter/verilog/src/node-types.json
+6db8f416f22d205d5d208e4d64ddcbde6beb19df404e26003812e5537db2f0de  src/syntax/kde/tests/validate_syntax_data.cpp
