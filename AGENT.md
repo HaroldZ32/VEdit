@@ -35,9 +35,17 @@ CentOS 7 image, because the deliverable must run on CentOS 7 (glibc 2.17).
 - Install dependencies: none on the host. The pinned image (base digest, Rust
   1.99.0, GtkSourceView 4.6.1, meson/ninja) is built by `bash scripts/build.sh`;
   every download's sha256 is pinned in `scripts/versions.env`.
-- Build: `bash scripts/build.sh` (one command: pinned image ->
-  `cargo build --release --workspace` -> ELF assertion that the highest GLIBC
-  symbol is <= 2.17 -> Xvfb `--selftest smoke` window check).
+- Build the **delivered Qt6 product** (v2): `bash scripts/build-qt.sh` ->
+  `target/qt6-build/src/app/vedit-app`. Its runtime needs the KF6/Qt6 shared
+  libraries, `libtree-sitter` 0.25 and the Qt platform plugins; the measured
+  package names are in `evidence/runtime-deps/REPORT.md` §1 and the build matrix
+  in `docs/BUILD.md` §12. **If you are verifying the v2 deliverable, use this
+  command.**
+- Build the **legacy Rust/GTK3 product**: `bash scripts/build.sh` (one command:
+  pinned image -> `cargo build --release --workspace` -> ELF assertion that the
+  highest GLIBC symbol is <= 2.17 -> Xvfb `--selftest smoke` window check). It
+  writes `target/release/vd-app` (copied to `build/artifacts/vd-app`) and
+  **never produces `vedit-app`**.
   Gate wrapper: `bun run verify:gates`.
 - Test: `bash scripts/gates.sh` runs `cargo test --workspace` (in the pinned
   image when the host has no GTK development files).
