@@ -30,6 +30,7 @@
 | [`08-evidence-index.md`](08-evidence-index.md) | `evidence/` 每个目录证明什么、属于新产品还是旧产品 | 要找证据时 |
 | [`appendix/requirements-rev2.md`](appendix/requirements-rev2.md) | 需求权威文本（rev 2，逐条 C1–C18 / A1–A7 / G1–G4） | 有争议时的唯一裁判 |
 | [`appendix/amendments-a1-a5.md`](appendix/amendments-a1-a5.md) | 五条硬约束修正（与需求同权） | 做折叠/编辑器时 |
+| [`appendix/amendments-rev2.md`](appendix/amendments-rev2.md) | AMENDMENTS rev 2：`.sv` 折叠定案、许可归属更正、ADR 命名冲突、折叠语法等价性（**含 A4.5 未交付的事实与证据归属更正**） | 做折叠/`.sv`/许可证据时**必读** |
 | [`appendix/board-snapshot.md`](appendix/board-snapshot.md) | 上一轮 69 张票的原样快照 | 想知道"某张票当时说了什么" |
 | [`appendix/q-vs-lapce-route-compare.md`](appendix/q-vs-lapce-route-compare.md) | Qt 路线 vs fork Lapce 的量化对比（结论：留在 Qt） | 有人想改路线时 |
 

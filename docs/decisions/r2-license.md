@@ -218,3 +218,44 @@ grep -q 'QRC_SYNTAX:BOOL=OFF' "$BUILD_DIR/CMakeCache.txt"
 ```bash
 bash evidence/r2-license/verify.sh   # 44 条断言；本文件所有 sha256 与关键原文均被断言
 ```
+
+---
+
+## 9. 勘误（AMENDMENTS rev 2 / C15-3，2026-10-31）
+
+本节**只记录修正与判读口径，不改写 §5 正文**（ADR 是决策记录，修正以勘误追加）。
+权威副本：[`docs/handover/appendix/amendments-rev2.md`](../handover/appendix/amendments-rev2.md) §3。
+
+1. **命名冲突（事实）**：§5 **C** 要求 `$PAYLOAD/share/ksyntaxhighlighting/syntax/systemverilog.xml`
+   存在，而 §5 **A** 与 `packaging/runtime/verify-not-shipped.sh:53-57` 的黑名单**禁止任何**
+   basename 为 `systemverilog.xml` / `verilog.xml` 的文件 —— 按 §5 C 的字面命名，门禁必然 FAIL。
+   实际交付名是 **`vedit-systemverilog.xml` / `vedit-verilog.xml`**（C14）。
+2. **路径更正（事实）**：实际安装点是
+   `$PAYLOAD/usr/share/org.kde.syntax-highlighting/syntax/`
+   （`packaging/runtime/assemble-appdir.sh:109-112`、`packaging/runtime/AppRun:33`、
+   `evidence/m0-runtime/runtime-manifest.txt:195-196`），**不是** §5 A/C 写的
+   `share/ksyntaxhighlighting/syntax/`。§5 A 的"路径不存在"检查因此是**空检查**；
+   真正执行禁运的是 `verify-not-shipped.sh`（文件名 + sha256 双黑名单），它**不得被删除或放宽**。
+3. **判据等价改写（语义不变）**：§5 C 的检查对象读作
+   `.../usr/share/org.kde.syntax-highlighting/syntax/vedit-systemverilog.xml`，
+   检查项（存在 + `LGPL-2.1` 声明 + `GtkSourceView` 归属）原样保留；两份自有 XML 均满足
+   （grep 实测见 `evidence/docs-amendments/02-sha256-check.txt`）。§5 A/B 的"必要不充分"提示
+   与 **G1 内嵌扫描主闸门**保持原样，本次修正只动文件级检查的路径字面。
+4. **与 D2 执行口径不冲突**：D2 口径 2 的落点由 `syn-kde-data` 契约定为 `resources/syntax/`；
+   本勘误只修 §5 的旧路径/旧文件名字面，不改变"自有 LGPL 定义随包、KDE 定义永不随包"的决策。
+5. **交叉引用（A4 相关，非本 ADR 的决策）**：交付件折叠规则当前不生效（0 折叠区，A4.5 未满足），
+   旧 `03-folding.log` 的 7/7、9/9 测到的是 KDE 内嵌定义（`.sv` 为 GPLv3+），不得引用。
+   详见 amendments rev2 §4；本 ADR 的 D2/许可结论不受影响。
+
+**更正后的可执行断言（可抄给 `pack-final`）**：
+
+```sh
+sv="$PAYLOAD/usr/share/org.kde.syntax-highlighting/syntax/vedit-systemverilog.xml"
+[ -e "$sv" ] || { echo "FAIL: own systemverilog.xml missing (D2=B requires it)"; exit 1; }
+grep -q 'LGPL-2.1' "$sv"        || { echo "FAIL: $sv lacks the LGPL-2.1 declaration"; exit 1; }
+grep -qi 'GtkSourceView' "$sv"  || { echo "FAIL: $sv lacks upstream attribution"; exit 1; }
+# 文件名黑名单保持（与 verify-not-shipped.sh 一致）：
+if find "$PAYLOAD" -type f \( -name 'systemverilog.xml' -o -name 'verilog.xml' \) | grep -q .; then
+  echo "FAIL: a file named systemverilog.xml / verilog.xml is present"; exit 1
+fi
+```

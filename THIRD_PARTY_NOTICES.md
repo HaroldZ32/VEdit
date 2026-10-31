@@ -6,6 +6,12 @@ MIT 只覆盖本项目自己的代码，不改变任何第三方组件的许可�
 本文件是**分发用的许可声明**：每个组件的版本、许可、来源与验证方式。
 许可全文见 [`docs/licenses/`](docs/licenses/)，Rust crate 清单见 [`docs/rust-crates.txt`](docs/rust-crates.txt)（生成物）。
 
+> **两条产品线的范围说明（归属更正，2026-10-31 · AMENDMENTS rev 2 / C15）**：
+> **§1–§8 描述旧 Rust/GTK3 产物（legacy）**；**§9 描述当前 Qt6 产品线**的自有基础语法数据
+> （两份 LGPL-2.1-or-later XML）与 MIT `tree-sitter-verilog` grammar。§9 与 §1–§8 的组件
+> **不可互相替代**，也不得把 §9 的两份 XML 归到 GtkSourceView 或 KDE 名下。
+> 权威副本与登记口径见 [`docs/handover/appendix/amendments-rev2.md`](docs/handover/appendix/amendments-rev2.md) §2。
+
 ## 1. 组件清单
 
 | 组件 | 版本 | 许可 | 来源（固定方式） | 分发形态 |
@@ -110,3 +116,52 @@ sha256sum <payload>/bin/verible-verilog-ls <payload>/bin/verible-verilog-lint \
 
 证据位置：`packaging/tarball/evidence/`（载荷清单、二进制身份、字体、许可相关日志）与
 `evidence/appimage/`（AppImage 侧的同类证据）。
+
+## 9. Qt6 产品线：自有语法定义与 tree-sitter grammar（归属更正）
+
+本节按需求 C11/C14 登记**当前 Qt6 产品线**随包的三项组件。**身份核对**（路径 / 行数 / 字节 /
+sha256）的原始输出见 [`evidence/docs-amendments/02-sha256-check.txt`](evidence/docs-amendments/02-sha256-check.txt)；
+更详细的登记口径见 [`docs/handover/appendix/amendments-rev2.md`](docs/handover/appendix/amendments-rev2.md) §2。
+
+### 9.1 自有基础语法定义（两份，LGPL-2.1-or-later）
+
+| 项 | `vedit-verilog.xml` | `vedit-systemverilog.xml` |
+|---|---|---|
+| 语言名 | `Verilog` | `SystemVerilog` |
+| 许可 | **LGPL-2.1-or-later** | **LGPL-2.1-or-later** |
+| 仓库路径 | `resources/syntax/vedit-verilog.xml` | `resources/syntax/vedit-systemverilog.xml` |
+| 行数 / 字节 | 78 / 5,172 B | 89 / 6,276 B |
+| **sha256** | `3d1ec41f0871c001f560ca58b3178bdfd7508ff5f25d095c15820d2feda43e49` | `dc6e0a4714762764b9386471bb09e2550c1a9cbcf2b8f67f1a1200f677726f9d` |
+| 安装落点（AppDir） | `usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml` | `usr/share/org.kde.syntax-highlighting/syntax/vedit-systemverilog.xml` |
+| 许可全文 | `docs/licenses/LGPL-2.1.txt`（亦随包 `resources/syntax/LICENSE-LGPL-2.1`，26,419 B） | 同左 |
+| 上游功能参照（非复制） | GtkSourceView 4.6.1 `verilog.lang`（475 行，sha256 `7670ddfd7b443f5f99c202bfa79de31834c1bd8968ed74c39474dca4f439d464`） | GtkSourceView 4.6.1 `systemverilog.lang`（262 行，sha256 `9d1f67411f2674d93f035620ce004da4beca5bbf469eb9955a83c332edb79b04`） |
+| 上游 tarball pin | `GSV_SHA256=63f487a7ab59612ffa9e7be1883dbd274ab1016afcede3239b93b0fc384df874`（`scripts/versions.env:24-26`） | 同左 |
+
+**归属更正**：
+
+- 这两份 XML 是**本仓库自有的构建产物**（XML 头 `author="VEdit"`、
+  `license="LGPL-2.1-or-later"`），**不是** GtkSourceView 的运行期文件，**也不是** KDE 定义；
+  GtkSourceView 的 `.lang` 只作功能参照与交叉核对（见 `resources/syntax/README.md`）。
+- **不得**把它们登记在"第三方 GTK/GtkSourceView 运行期组件"条目下，**不得**归因给 KDE；
+  KDE 的 `verilog.xml`（许可未声明，sha256 `7199e367…`）与 `systemverilog.xml`
+  （GPL-3.0-or-later，sha256 `3361d8b4…`）**永不随包**（sha256 + 文件名 + 内嵌扫描三重禁运）。
+- LGPL 义务（许可声明 + 源码可得）：**XML 本身即源码**，随包安装于上述落点；仓库内文件可修改。
+
+### 9.2 MIT `tree-sitter-verilog`（静态编入）
+
+| 项 | 值 |
+|---|---|
+| 上游仓库 / commit | `https://github.com/tree-sitter/tree-sitter-verilog` / **`4457145e795b363f072463e697dfe2f6973c9a52`**（2022-09-07） |
+| 许可 | **MIT**，© 2018-2021 Aliaksei Chapyzhenka；`LICENSE` 全文随包（`third_party/tree-sitter/verilog/LICENSE`，1,082 B，sha256 `92dbb929e5518c6790db68d32d71c257c0c6cbb3974fcd4d930bf28cf1b1bb46`） |
+| 仓库路径 / provenance | `third_party/tree-sitter/verilog/`；`third_party/tree-sitter/PROVENANCE.md` |
+| 随包文件与 sha256 | `grammar.js`（133,684 B）`323c121a3e550df0f970d46c544b3f02485e5e6d754acb730d6be7b8dea7dc4b`；`src/parser.c`（46,042,888 B）`a15f78b82068daeb62f3b54c8ad0101aa936a2c921a57806fe8f37dcbf0bfff2`；`src/tree_sitter/parser.h`（5,378 B）`ab104936984904469572a4e868149f7a22fb2929347f837ae6a1f9b790f1b173`；`src/node-types.json`（271,904 B）`e99b42baf4279d3be6dec59129dda0789f196b4e5c99144a781ea6cdf255425c` |
+| 分发形态 | 静态编入 `libvedit_syntax_grammars`（`verilog/src/parser.c`）；无运行期下载 / `.so` 加载 / 动态链接；`-DVEDIT_GRAMMAR_*` 可整体关闭 |
+| MIT 义务 | 保留版权行 + 许可全文 + 锁定 commit（已满足）；上游无 NOTICE 段落需转发 |
+
+### 9.3 范围与复核
+
+- 本节只登记 C11/C14 要求的三项。Qt6/KF6 运行期组件（Qt6、KTextEditor、KSyntaxHighlighting、
+  Verible、slang、Rust 服务层 crate）的完整清单由打包收口（`pack-final`）补齐；在补齐前，
+  §1–§8 的 legacy 条目**不覆盖** Qt6 产物。
+- 最终产物一致性（AppDir 内每份文件可按 sha256 找到）由 `pack-final` 的产物侧清单复核；
+  本节只固定仓库内身份。
