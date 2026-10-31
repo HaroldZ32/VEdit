@@ -23,7 +23,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(VEDIT_REPO_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/../../../../..")
 get_filename_component(VEDIT_REPO_ROOT "${VEDIT_REPO_ROOT}" ABSOLUTE)
 
-find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Test)
 # The application shell links KSyntaxHighlighting (theme catalogue).
 find_package(KF6SyntaxHighlighting REQUIRED)
 
@@ -43,6 +43,7 @@ target_link_libraries(vedit-filetree-seamcheck PRIVATE
   vedit_workspace_integration
   vedit_app_shell
   vedit_file_tree
+  Qt6::Test
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(vedit-filetree-seamcheck PRIVATE -Wall -Wextra -Wpedantic -Werror)
