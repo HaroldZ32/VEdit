@@ -3,6 +3,7 @@
 #include "atomic_save.h"
 #include "document_io.h"
 #include "find_replace.h"
+#include "highlight_mode.h"
 #include "goto_line.h"
 #include "multi_cursor.h"
 #include "undo_ops.h"
@@ -15,6 +16,7 @@
 #include <KTextEditor/Document>
 #include <KTextEditor/Editor>
 #include <KTextEditor/View>
+#include <KSyntaxHighlighting/Definition>
 
 #include <QCryptographicHash>
 #include <QDir>
@@ -416,6 +418,69 @@ void checkBoundary(const BoundaryHooks &hooks)
     }
 }
 
+// The user-visible acceptance of T81: after the product open path, the document
+// must carry a syntax-highlighting mode from the editor's own repository, and the
+// engine must really apply format ranges and folding regions to its text. This is
+// the closest observable proxy to "the view renders colors"; it works both on a
+// developer host (host definitions visible) and in the delivered runtime (only
+// VEdit's definitions visible).
+void checkHighlighting(const QString &scratch)
+{
+    struct Case {
+        const char *label;
+        const char *fileName;
+        const char *expectedMode;
+        const char *text;
+    };
+    const Case cases[] = {
+        {"verilog", "highlight.v", "Verilog",
+         "module top;\n  // comment\n  assign out = 1;\n  initial begin\n"
+         "    out <= 1'b0;\n  end\nendmodule\n"},
+        {"systemverilog", "highlight.sv", "SystemVerilog",
+         "module top;\n  logic [7:0] q;\n  always_ff @(posedge clk)\n"
+         "    q <= d;\nendmodule\n"},
+    };
+    for (const Case &testCase : cases) {
+        const QString prefix =
+            QStringLiteral("editcore.highlight.") + QLatin1String(testCase.label);
+        const QByteArray fixtureName = (prefix + QStringLiteral(".fixture")).toUtf8();
+        const QString path = scratch + QLatin1Char('/') + QLatin1String(testCase.fileName);
+        check(fixtureName.constData(), writeFixture(path, QByteArray(testCase.text)));
+
+        QString error;
+        std::unique_ptr<EditorDocument> document = EditorDocument::create(&error);
+        if (document == nullptr) {
+            const QByteArray documentName = (prefix + QStringLiteral(".document")).toUtf8();
+            check(documentName.constData(), false, error);
+            continue;
+        }
+        const QByteArray openName = (prefix + QStringLiteral(".open")).toUtf8();
+        check(openName.constData(), document->openFile(path, &error), error);
+
+        KTextEditor::Document *editorDocument = document->document();
+        const QString mode = editorDocument->highlightingMode();
+        const QByteArray modeName = (prefix + QStringLiteral(".mode")).toUtf8();
+        check(modeName.constData(), mode == QLatin1String(testCase.expectedMode),
+              QStringLiteral("mode='%1' expected='%2'")
+                  .arg(mode, QLatin1String(testCase.expectedMode)));
+
+        const KSyntaxHighlighting::Definition definition = editorDefinitionForMode(mode);
+        const QByteArray definitionName = (prefix + QStringLiteral(".definition")).toUtf8();
+        check(definitionName.constData(), definition.isValid(), definition.name());
+
+        const HighlightStats stats = measureHighlighting(definition, editorDocument->text());
+        const QByteArray rangesName = (prefix + QStringLiteral(".format-ranges")).toUtf8();
+        check(rangesName.constData(), definition.isValid() && stats.formats > 0,
+              QString::number(stats.formats));
+        const QByteArray foldingName = (prefix + QStringLiteral(".folding-regions")).toUtf8();
+        check(foldingName.constData(),
+              definition.isValid() && stats.foldingBegins > 0 && stats.foldingEnds > 0,
+              QStringLiteral("begins=%1 ends=%2")
+                  .arg(stats.foldingBegins)
+                  .arg(stats.foldingEnds));
+    }
+}
+
 } // namespace
 
 SelfCheckResult runSelfChecks(const BoundaryHooks &hooks)
@@ -434,6 +499,7 @@ SelfCheckResult runSelfChecks(const BoundaryHooks &hooks)
     check("editcore.ktexteditor.instance", editor != nullptr);
 
     checkDocumentRoundTrip(scratch.path());
+    checkHighlighting(scratch.path());
     checkAtomicSave(scratch.path());
     checkFindReplace();
     checkGotoLine();

@@ -1,12 +1,14 @@
 #include "document_io.h"
 
 #include "atomic_save.h"
+#include "highlight_mode.h"
 
 #include <KTextEditor/Document>
 #include <KTextEditor/Editor>
 
-#include <QFileInfo>
+#include <QDebug>
 #include <QFile>
+#include <QFileInfo>
 #include <QUrl>
 
 namespace vedit::editor {
@@ -47,6 +49,16 @@ bool loadFileIntoDocument(KTextEditor::Document *document, const QString &absolu
                          .arg(absolutePath);
         }
         return false;
+    }
+    // T81: selecting the syntax definition is part of opening a document.
+    // KTextEditor only auto-detects a mode from the document URL, and this open
+    // path deliberately does not use KParts::openUrl(); without this call the
+    // document stays in the "None" mode and the view renders no colors.
+    QString highlightDiagnostic;
+    if (!applyHighlightingMode(document, info.absoluteFilePath(), &highlightDiagnostic)) {
+        qWarning().noquote() << "[edit-core] syntax highlighting:" << highlightDiagnostic;
+    } else if (!highlightDiagnostic.isEmpty()) {
+        qInfo().noquote() << "[edit-core] syntax highlighting:" << highlightDiagnostic;
     }
     return true;
 }

@@ -24,4 +24,13 @@ struct SelfCheckResult {
 
 SelfCheckResult runSelfChecks(const BoundaryHooks &hooks = BoundaryHooks());
 
+// Diagnosis of the REAL KTextEditor highlighting path (task T81): which
+// definitions the editor's own KSyntaxHighlighting repository holds, which
+// document mode the product open path selects, and how many format/folding
+// ranges the resolved definition produces. The caller is expected to set
+// delivery-like XDG data paths BEFORE constructing QApplication (the delivered
+// AppRun narrows them to the AppDir); see `vedit-edit-core-selftest
+// --diagnose-highlight`.
+SelfCheckResult runHighlightDiagnosis();
+
 } // namespace vedit::editor

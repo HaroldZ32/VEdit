@@ -15,6 +15,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   enable_testing()
   find_package(Qt6 6.5 REQUIRED COMPONENTS Core Gui Widgets)
   find_package(KF6TextEditor REQUIRED)
+  find_package(KF6SyntaxHighlighting REQUIRED)
 else()
   set(VEDIT_EDIT_CORE_STANDALONE OFF)
 endif()
@@ -30,6 +31,8 @@ set(VEDIT_EDIT_CORE_SOURCES
   kernel/edit_core_selftest.cpp
   kernel/find_replace.cpp
   kernel/goto_line.cpp
+  kernel/highlight_diagnosis.cpp
+  kernel/highlight_mode.cpp
   kernel/multi_cursor.cpp
   kernel/undo_ops.cpp
 )
@@ -50,6 +53,10 @@ target_link_libraries(vedit_editor_core PUBLIC
   Qt6::Gui
   Qt6::Widgets
   KF6::TextEditor
+  # The highlighting diagnosis (T81) counts format ranges with the same engine
+  # KTextEditor::View uses; the editor target already depends on it transitively,
+  # but the dependency is real and stated here.
+  KF6::SyntaxHighlighting
 )
 if(VEDIT_EDIT_CORE_HAVE_APP_SEAM)
   target_include_directories(vedit_editor_core PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../app")
@@ -65,6 +72,10 @@ endif()
 
 add_executable(vedit-edit-core-selftest kernel/edit_core_selftest_main.cpp)
 target_link_libraries(vedit-edit-core-selftest PRIVATE vedit_editor_core)
+# The delivery-like highlighting diagnosis needs the shipped XML files to build
+# its private XDG share directory (the same two files packaging installs).
+target_compile_definitions(vedit-edit-core-selftest PRIVATE
+  VEDIT_SYNTAX_RESOURCES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../../resources")
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(vedit-edit-core-selftest PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
