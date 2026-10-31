@@ -78,6 +78,10 @@ public:
     void startSession();
 
     QStringList diagnostics() const;
+    /// Append a diagnostic line that is also visible to the user (status bar)
+    /// and in `--selfcheck` output. Used by lanes to surface startup problems
+    /// such as a missing external toolchain (T82).
+    void addShellDiagnostic(const QString &message);
     QString projectLabel() const;
 
     // Layout presets shared by the View menu, the self-check and the

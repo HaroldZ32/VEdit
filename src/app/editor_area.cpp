@@ -2,14 +2,18 @@
 
 #include "editor_provider.h"
 
+#include <QAction>
 #include <QEvent>
 #include <QFont>
 #include <QJsonValue>
+#include <QKeySequence>
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPlainTextEdit>
+#include <QPointer>
 #include <QSplitter>
 #include <QString>
+#include <QTimer>
 #include <QVBoxLayout>
 
 #include <algorithm>
@@ -26,6 +30,63 @@ struct EditorArea::Node {
     std::unique_ptr<Node> first;
     std::unique_ptr<Node> second;
 };
+
+namespace {
+
+// Task T80: an editor widget may bring its own standard shortcuts. The
+// KTextEditor view owns a KStandardAction::save action bound to Ctrl+S; together
+// with the shell's file.save command Qt reports "Ambiguous shortcut overload"
+// and runs NEITHER of them, which is exactly what the user hit at stop 1.
+//
+// The shell's command is the single authority, so the editor widget's own Ctrl+S
+// bindings are cleared here, when the widget enters the pane. The KTextEditor
+// action is not in the view's own action list: it lives in a parentless
+// KActionCollection and is registered on the internal KateViewInternal child
+// widget, so the whole editor subtree is walked. The actions stay alive and
+// triggerable from the editor's own menus; only the duplicate key binding goes
+// away. This runs for every pane - first pane, provider swap and every split -
+// because that is the same code path a pane is created through.
+void clearEditorSaveShortcut(QWidget *editor)
+{
+    if (editor == nullptr) {
+        return;
+    }
+    const QKeySequence save(QStringLiteral("Ctrl+S"));
+    int removed = 0;
+    const auto clear = [&save, &removed](QAction *action) {
+        if (action == nullptr) {
+            return;
+        }
+        QList<QKeySequence> kept;
+        bool changed = false;
+        for (const QKeySequence &sequence : action->shortcuts()) {
+            if (sequence == save) {
+                changed = true;
+            } else {
+                kept.append(sequence);
+            }
+        }
+        if (changed) {
+            action->setShortcuts(kept);
+            ++removed;
+        }
+    };
+    for (QAction *action : editor->actions()) {
+        clear(action);
+    }
+    const QList<QWidget *> subtree = editor->findChildren<QWidget *>();
+    for (QWidget *widget : subtree) {
+        for (QAction *action : widget->actions()) {
+            clear(action);
+        }
+    }
+    const QList<QAction *> nested = editor->findChildren<QAction *>();
+    for (QAction *action : nested) {
+        clear(action);
+    }
+}
+
+} // namespace
 
 // ---------------------------------------------------------------------------
 // EditorPane
@@ -73,6 +134,18 @@ void EditorPane::replaceEditorWidget(QWidget *editor)
     if (editor_ != nullptr) {
         layout_->insertWidget(1, editor_, 1);
         editor_->installEventFilter(this);
+        // T80: the shell's file.save command is the only Ctrl+S authority.
+        clearEditorSaveShortcut(editor_);
+        // KTextEditor populates its standard actions lazily (its
+        // KActionCollection has no QObject parent, so it cannot be found from
+        // the widget tree afterwards), so re-apply once the current event-loop
+        // turn is over: the actions are on the widget by then.
+        QPointer<QWidget> guarded(editor_);
+        QTimer::singleShot(0, this, [guarded]() {
+            if (guarded != nullptr) {
+                clearEditorSaveShortcut(guarded.data());
+            }
+        });
     }
 }
 
@@ -161,7 +234,13 @@ void EditorPane::mousePressEvent(QMouseEvent *event)
 
 bool EditorPane::eventFilter(QObject *watched, QEvent *event)
 {
-    Q_UNUSED(watched);
+    if (watched == editor_ &&
+        (event->type() == QEvent::Show || event->type() == QEvent::FocusIn)) {
+        // T80: providers may populate their standard actions lazily, after
+        // createEditor() returned. Re-applying the invariant when the widget is
+        // shown or focused guarantees it holds before a user can press Ctrl+S.
+        clearEditorSaveShortcut(editor_);
+    }
     if ((event->type() == QEvent::FocusIn || event->type() == QEvent::MouseButtonPress) &&
         onFocusRequested_ != nullptr) {
         onFocusRequested_(this);

@@ -13,6 +13,7 @@
 #include "command_registry.h"
 #include "editor_area.h"
 #include "integration.h"
+#include "../workspace/diagnostics/toolchain.h"
 #include "panel_registry.h"
 #include "terminal_panel.h"
 #include "theme_manager.h"
@@ -102,6 +103,100 @@ void pump()
     QCoreApplication::processEvents();
 }
 
+// --- Ctrl+S duplicate-binding detection (task T80) -------------------------
+// Qt reports "Ambiguous shortcut overload" and triggers NEITHER action when two
+// enabled actions carry the same shortcut in the same window context. The
+// product had exactly that: the shell's file.save action (Ctrl+S) plus the
+// KTextEditor view's own standard save action (KStandardAction::save). The
+// helpers below enumerate what Qt can see, so the selfcheck can assert the
+// invariant "exactly ONE Ctrl+S binding" instead of trusting one simulated key
+// press (the simulated press missed the ambiguity in T71).
+QList<QAction *> collectShortcutActions(QWidget *root)
+{
+    QList<QAction *> actions;
+    if (root == nullptr) {
+        return actions;
+    }
+    const auto add = [&actions](const QList<QAction *> &list) {
+        for (QAction *action : list) {
+            if (action != nullptr && !actions.contains(action)) {
+                actions.append(action);
+            }
+        }
+    };
+    add(root->actions());
+    const QList<QWidget *> widgets = root->findChildren<QWidget *>();
+    for (QWidget *widget : widgets) {
+        add(widget->actions());
+    }
+    add(root->findChildren<QAction *>());
+    return actions;
+}
+
+bool hasCtrlSShortcut(const QAction *action)
+{
+    if (action == nullptr) {
+        return false;
+    }
+    const QKeySequence ctrlS(QStringLiteral("Ctrl+S"));
+    for (const QKeySequence &sequence : action->shortcuts()) {
+        if (sequence == ctrlS) {
+            return true;
+        }
+    }
+    return false;
+}
+
+QList<QAction *> ctrlSActions(QWidget *root)
+{
+    QList<QAction *> found;
+    for (QAction *action : collectShortcutActions(root)) {
+        if (hasCtrlSShortcut(action)) {
+            found.append(action);
+        }
+    }
+    return found;
+}
+
+void printCtrlSBindings(QWidget *root, const char *tag)
+{
+    for (QAction *action : ctrlSActions(root)) {
+        QStringList shortcuts;
+        for (const QKeySequence &sequence : action->shortcuts()) {
+            shortcuts.append(sequence.toString(QKeySequence::PortableText));
+        }
+        QString chain;
+        for (QObject *object = action->parent(); object != nullptr; object = object->parent()) {
+            chain.append(QString::fromLatin1(object->metaObject()->className()));
+            chain.append(QLatin1Char('<'));
+        }
+        QString associated;
+        for (QObject *object : action->associatedObjects()) {
+            associated.append(QString::fromLatin1(object->metaObject()->className()));
+            if (auto *widget = qobject_cast<QWidget *>(object)) {
+                associated.append(QLatin1Char('(') + widget->objectName() + QLatin1Char(')'));
+            }
+            associated.append(QLatin1Char(' '));
+        }
+        QString holders;
+        if (root != nullptr) {
+            for (QWidget *widget : root->findChildren<QWidget *>()) {
+                if (widget->actions().contains(action)) {
+                    holders.append(QString::fromLatin1(widget->metaObject()->className()));
+                    holders.append(QLatin1Char('(') + widget->objectName() + QLatin1Char(')'));
+                    holders.append(QLatin1Char(' '));
+                }
+            }
+        }
+        std::printf("CTRL-S-BINDING %s objectName=%s class=%s shortcut=%s context=%d "
+                    "associated=[%s] holders=[%s] chain=%s\n",
+                    tag, qPrintable(action->objectName()), action->metaObject()->className(),
+                    qPrintable(shortcuts.join(QLatin1Char(','))),
+                    static_cast<int>(action->shortcutContext()), qPrintable(associated),
+                    qPrintable(holders), qPrintable(chain));
+    }
+}
+
 // Cross-boundary counter (AC-S1.1 / C1): the Rust service layer is the only C
 // ABI; the edit kernel links no `vd_*` symbol, and every ABI call site in this
 // file is instrumented with this helper. The edit-core selfcheck asserts the
@@ -119,6 +214,9 @@ void noteAbiCall()
 
 int runSelfCheck()
 {
+    // T82: toolchain observability is part of the self-check output. The line
+    // names each tool's source (bundled > PATH > env) and the missing list.
+    std::printf("%s\n", qPrintable(vedit::workspace::diagnostics::toolchainStatusLine()));
     QTemporaryDir temp;
     if (!temp.isValid()) {
         std::printf("APP-SHELL-SELFTEST ok=0 reason=temporary-directory\n");
@@ -432,6 +530,19 @@ int runSelfCheck()
     EditorPane *editPane = shell->editorArea()->activePane();
     check("editor.pane.ktexteditor-widget",
           editPane != nullptr && vedit::editor::isEditCoreWidget(editPane->editorWidget()));
+
+    // --- T80: exactly ONE authority for Ctrl+S ------------------------------
+    // The user hit "Ambiguous shortcut overload" on the real machine: the shell
+    // registered Ctrl+S for file.save while the KTextEditor view brought its own
+    // standard save action. Two enabled Ctrl+S actions in one window make Qt
+    // trigger neither, so the invariant is asserted directly.
+    printCtrlSBindings(shell.get(), "after-provider-install");
+    {
+        const QList<QAction *> ctrlS = ctrlSActions(shell.get());
+        check("save.shortcut.unique", ctrlS.size() == 1,
+              QStringLiteral("bindings=%1").arg(ctrlS.size()));
+        check("save.shortcut.authority", ctrlS.size() == 1 && ctrlS.first() == saveAction);
+    }
     if (editPane != nullptr) {
         const QString paneFixture = temp.path() + QStringLiteral("/pane-open.v");
         writeFile(paneFixture, QByteArrayLiteral("module pane_open;\nendmodule\n"));
@@ -455,10 +566,14 @@ int runSelfCheck()
         const QString savePath = editPane->currentFilePath();
         if (document != nullptr && saveAction != nullptr) {
             // 1) Keyboard path: a real Ctrl+S key event sent to the shell's
-            //    window goes through Qt's shortcut map to the QAction.
+            //    window goes through Qt's shortcut map to the QAction. T80: the
+            //    editor view is FOCUSED first - that is the real user path, and
+            //    it is exactly what exposes a duplicate binding (Qt then sees
+            //    both the shell action and the editor view's own save action).
             document->setText(QStringLiteral("module saved_by_ctrl_s;\nendmodule\n"));
             document->setModified(true);
             shell->activateWindow();
+            editPane->editorWidget()->setFocus(Qt::OtherFocusReason);
             pump();
             QWindow *shellWindow = shell->windowHandle();
             check("save.shortcut.window", shellWindow != nullptr);
@@ -515,6 +630,22 @@ int runSelfCheck()
                   readFileBytes(savePath)
                       == QByteArrayLiteral("module must_not_reach_disk;\nendmodule\n"));
             check("save.recovery.not-modified", !document->isModified());
+        }
+    }
+
+    // T80: a split creates ANOTHER editor view, so the "exactly one Ctrl+S"
+    // invariant must cover every pane, not only the first one. This is what the
+    // per-widget cleanup in EditorPane::replaceEditorWidget guarantees.
+    {
+        EditorPane *extraPane = shell->editorArea()->splitActive(Qt::Horizontal);
+        pump();
+        const QList<QAction *> ctrlS = ctrlSActions(shell.get());
+        printCtrlSBindings(shell.get(), "after-split");
+        check("save.shortcut.unique.multi-pane", ctrlS.size() == 1,
+              QStringLiteral("bindings=%1").arg(ctrlS.size()));
+        if (extraPane != nullptr) {
+            shell->editorArea()->closeActivePane();
+            pump();
         }
     }
 

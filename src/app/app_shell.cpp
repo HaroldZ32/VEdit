@@ -594,6 +594,11 @@ QStringList ApplicationShell::diagnostics() const
     return diagnostics_;
 }
 
+void ApplicationShell::addShellDiagnostic(const QString &message)
+{
+    addDiagnostic(message);
+}
+
 void ApplicationShell::addDiagnostic(const QString &message)
 {
     if (message.isEmpty() || diagnostics_.contains(message)) {
