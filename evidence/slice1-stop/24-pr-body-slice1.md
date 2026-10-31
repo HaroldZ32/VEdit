@@ -107,3 +107,50 @@ a6d5a04 test(editor): extend the edit-core selftest for the highlighting asserti
 ### 未验证项（如实）
 - **GUI 一律未验收**：高亮观感、Ctrl+S 的实际效果、lint 诊断在界面上的呈现，只能由用户真机确认。门禁只覆盖无头可证部分（构建 / ctest / xcb 软件渲染冒烟）。
 - `build/glibc217-spike/run-spike.sh` 是 T76 探针产物（untracked），本轮未纳入提交。
+
+---
+
+## 🔁 GO-4 更新 —— T84（打包形态语法定义丢失）与 T85（工具链缺失刷屏）已修
+
+| 缺陷 | 根因 | 修法 | 红→绿对照 |
+|---|---|---|---|
+| **T84：打包形态下语法定义丢失** | `VEDIT_SYNTAX_DIR` 指向 `…/syntax` **子目录**，而产品契约要求的是**数据根** | `packaging/runtime/AppRun` 与 centos7 验证脚本改为数据根；`src/syntax/kde/ksyntax_data.cpp` **容忍两种取值**（子目录归一化到父目录），防下一个打包者再踩 | tarball 在干净 centos:7 上 `highlight.verilog-definition` **FAIL → PASS**；`SUMMARY PASS=15 FAIL=1 SKIP=2`（唯一 FAIL 是预期的 `kernel.is-3.10`） |
+| **T85：缺工具时刷屏** | 一条 **1289 字符**的超长消息（20 条候选探测路径塞一行），且 `qWarning` + `addShellDiagnostic` **各输出一次** | 改为**一条 446 字符单行**（缺什么 / 影响什么 / 三条修复路径）；候选清单移入 `probeDetail()`，仅 `VEDIT_TOOLCHAIN_TRACE=1` 时输出；面板 1 条状态、outline 0 行 + 一行空状态 | 新增 `vedit-toolchain-ux-selftest`（42 checks / 0 failures）；新增发现链 **bundled → local → PATH → env**（local 从二进制向上找 checkout 根，探测 `build/slang/out`、`.mpd/recon/verible/bin`、`target/verible-pin/extract/verible-*/bin`），裸构建现在直接 `source=verible:local slang:local missing=[]`，真 Verible 会话产出 **5 个 outline 符号** |
+
+### 门禁（GO-4 冻结树，真实输出）
+```
+TYPECHECK-EXIT=0        [typecheck] PASS (pinned image vedit-build:local)
+BUILD-QT-EXIT=0         ctest: 100% tests passed, 0 tests failed out of 18
+```
+原始日志 `evidence/slice1-stop/{41-typecheck-go4.log,42-build-qt-go4.log}`。
+
+### 本轮提交
+```
+0ed4915 fix(syntax): accept both the syntax dir and its parent for KDE data
+2e12136 fix(packaging): point AppRun at the KDE data root, not the syntax subdir
+2ce8bbb build(centos7): land the clean-room verify scripts
+fd78844 fix(diagnostics): one concise status line and a local-checkout discovery source
+1bda664 docs: document the runtime toolchain discovery order
+c755d9c docs(evidence): point the T83 snapshot at its T84 successor
+73f6c8c docs(evidence): land the T84/T85 evidence and the GO-4 gate logs
+1c03f80 docs(evidence): refresh the operational build logs
+8856ed8 docs(evidence): land the T83 clean-room console, container report and tarball checksums
+```
+
+### 不入库的构建产物（显式跳过）
+| 路径 | 大小 | 原因 |
+|---|---|---|
+| `build/centos7-verify/dist/*.tar.gz` | 108 MB | `.gitignore` 的 `*.tar.gz` 已覆盖；**只提交其 `.sha256`** |
+| `build/centos7-verify/AppDir/` | 287 MB | 打包产物（staged AppDir） |
+| `build/centos7-verify/stage/` | 287 MB | 打包暂存目录 |
+| `build/centos7-verify/samples/` | 几 KB | 由 `build-tarball.sh` 生成 |
+| `build/glibc217-spike/` | 12 KB | T76 探针产物 |
+
+> ⚠️ 仓库卫生建议（供后续任务）：`build/centos7-verify/{AppDir,stage,samples}/` **没有被 `.gitignore` 覆盖**，只有 `*.tar.gz` 被忽略。本 PR 用显式路径避开了它们，但 `git add -A` 的使用者会一次性提交约 574 MB 二进制。建议补一条 `build/centos7-verify/{AppDir,stage,samples}/` 忽略规则。
+
+### 历史证据的处理（不改成假绿）
+`evidence/centos7-verify-package/README.md` 是 T83 当时的历史快照，其「`highlight.verilog-definition` FAIL」的结论**保持原文不改**；顶部新增一段「更新：已被 T84 取代，见 `evidence/appdir-syntax-dir/`」的指引。
+
+### 未验证项（如实）
+- **GUI 一律未验收**：高亮是否在界面上正确呈现、工具链状态行在面板里的实际观感，只能由用户真机确认。
+- T84 的红→绿是在**干净 centos:7 容器**里跑的，容器共用宿主内核（7.0.0），`kernel.is-3.10` 仍是预期 FAIL —— 真机内核未验。
