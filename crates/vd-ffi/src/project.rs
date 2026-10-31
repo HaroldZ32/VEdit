@@ -199,3 +199,196 @@ pub unsafe extern "C" fn vd_project_info_free(info: *mut VdProjectInfo) {
         warnings: VdStringList::empty(),
     };
 }
+
+#[cfg(test)]
+mod tests {
+    use super::parse;
+    use std::path::{Path, PathBuf};
+
+    fn fixture_root() -> PathBuf {
+        let path =
+            Path::new(env!("CARGO_MANIFEST_DIR")).join("../../tests/fixtures/verilog-project");
+        match std::fs::canonicalize(&path) {
+            Ok(path) => path,
+            Err(error) => panic!("cannot canonicalize {}: {error}", path.display()),
+        }
+    }
+
+    fn write(path: &Path, text: &str) {
+        if let Some(parent) = path.parent() {
+            if let Err(error) = std::fs::create_dir_all(parent) {
+                panic!("cannot create {}: {error}", parent.display());
+            }
+        }
+        if let Err(error) = std::fs::write(path, text) {
+            panic!("cannot write {}: {error}", path.display());
+        }
+    }
+
+    fn require<T>(value: Option<T>, what: &str) -> T {
+        match value {
+            Some(value) => value,
+            None => panic!("missing {what}"),
+        }
+    }
+
+    fn relative(path: &str, root: &Path) -> String {
+        Path::new(path)
+            .strip_prefix(root)
+            .unwrap_or_else(|_| Path::new(path))
+            .to_string_lossy()
+            .replace('\\', "/")
+    }
+
+    fn expected_lines(root: &Path, name: &str) -> Vec<String> {
+        let path = root.join("expected").join(name);
+        let text = match std::fs::read_to_string(&path) {
+            Ok(text) => text,
+            Err(error) => panic!("cannot read {}: {error}", path.display()),
+        };
+        text.lines()
+            .map(str::trim)
+            .filter(|line| !line.is_empty())
+            .map(str::to_string)
+            .collect()
+    }
+
+    /// AC-S1.3 through the exported service: the fixture expands to the checked-in
+    /// expectations, and the diagnostics the UI receives are phrased strings that
+    /// name the offending filelist and line.
+    #[test]
+    fn fixture_expansion_matches_the_service_contract() {
+        let root = fixture_root();
+        let data = match parse(&root) {
+            Ok(data) => data,
+            Err(error) => panic!("project parse failed with code {}", error.code),
+        };
+
+        let files: Vec<String> = data
+            .files
+            .iter()
+            .map(|file| relative(file, &root))
+            .collect();
+        assert_eq!(files, expected_lines(&root, "files.txt"), "expanded files");
+        assert_eq!(data.files.len(), 7, "fixture file count");
+
+        let incdirs: Vec<String> = data
+            .include_dirs
+            .iter()
+            .map(|dir| relative(dir, &root))
+            .collect();
+        assert_eq!(
+            incdirs,
+            expected_lines(&root, "incdirs.txt"),
+            "include dirs"
+        );
+
+        assert_eq!(
+            data.defines,
+            expected_lines(&root, "defines.txt"),
+            "defines"
+        );
+
+        for file in &data.files {
+            assert!(
+                Path::new(file).is_absolute(),
+                "the C side receives absolute paths, got {file}"
+            );
+        }
+
+        let unknown = data
+            .warnings
+            .iter()
+            .find(|warning| warning.starts_with("filelist.unknown_token: "))
+            .unwrap_or_else(|| panic!("no unknown-token diagnostic in {:#?}", data.warnings));
+        assert!(
+            unknown.contains("project.f:"),
+            "the diagnostic must name project.f: {unknown}"
+        );
+        let line = unknown
+            .split("project.f:")
+            .nth(1)
+            .and_then(|rest| rest.split(':').next());
+        match line {
+            Some(digits) if !digits.is_empty() && digits.chars().all(|c| c.is_ascii_digit()) => {}
+            _ => panic!("the diagnostic must carry the 1-based line: {unknown}"),
+        }
+
+        let duplicate = data
+            .warnings
+            .iter()
+            .find(|warning| warning.starts_with("filelist.duplicate_entry: "))
+            .unwrap_or_else(|| panic!("no duplicate diagnostic in {:#?}", data.warnings));
+        assert!(
+            duplicate.contains("extra.f:"),
+            "the duplicate diagnostic must name the nested filelist: {duplicate}"
+        );
+    }
+
+    /// A project whose filelist contains broken entries still expands (the editor
+    /// must open it) and every broken entry produces one diagnostic string with
+    /// the file and line the user has to fix.
+    #[test]
+    fn bad_entries_render_actionable_diagnostics() {
+        let temp = match tempfile::tempdir() {
+            Ok(temp) => temp,
+            Err(error) => panic!("temporary directory: {error}"),
+        };
+        let root = temp.path().join("bad-project");
+        let filelist = root.join("project.f");
+        write(
+            &filelist,
+            "+define+1BAD=1\n+libext+.v\n-f missing.f\nrtl/a.sv\n",
+        );
+        write(&root.join("rtl/a.sv"), "module a; endmodule\n");
+
+        let data = match parse(&root) {
+            Ok(data) => data,
+            Err(error) => panic!("broken entries must not fail the expansion: {}", error.code),
+        };
+        let absolute = require(std::path::absolute(&root).ok(), "absolute project root");
+        assert_eq!(
+            data.files,
+            vec![absolute.join("rtl/a.sv").display().to_string()]
+        );
+        assert_eq!(data.include_dirs.len(), 0);
+        assert_eq!(data.defines.len(), 0);
+
+        let prefix = |code: &str, line: u32| format!("{code}: {}:{line}:", filelist.display());
+        for (code, line, needle) in [
+            ("filelist.define_invalid", 1, "malformed"),
+            ("filelist.unknown_token", 2, "+libext+.v"),
+            ("filelist.missing", 3, "missing.f"),
+        ] {
+            let expected = prefix(code, line);
+            let found = data
+                .warnings
+                .iter()
+                .find(|warning| warning.starts_with(&expected));
+            let found = require(found, "diagnostic");
+            assert!(
+                found.contains(needle),
+                "diagnostic {code} must explain the bad entry, got {found}"
+            );
+        }
+    }
+
+    /// Two loads of the same project produce byte-identical payloads; the Qt panel
+    /// re-expands on every start and the list must not reshuffle.
+    #[test]
+    fn expansion_is_deterministic() {
+        let root = fixture_root();
+        let first = match parse(&root) {
+            Ok(data) => data,
+            Err(error) => panic!("first parse failed with code {}", error.code),
+        };
+        let second = match parse(&root) {
+            Ok(data) => data,
+            Err(error) => panic!("second parse failed with code {}", error.code),
+        };
+        assert_eq!(first.files, second.files);
+        assert_eq!(first.include_dirs, second.include_dirs);
+        assert_eq!(first.defines, second.defines);
+        assert_eq!(first.warnings, second.warnings);
+    }
+}
