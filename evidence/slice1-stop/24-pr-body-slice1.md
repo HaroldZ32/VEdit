@@ -66,3 +66,44 @@ cfe708b docs(evidence): record captain exemptions and the two reconstructed PASS
 e8c67a2 docs(evidence): land the remaining lane evidence
 09907ae docs(evidence): backfill C9 headers on the frozen tree and record the gate results
 ```
+
+---
+
+## 🔁 GO-3 更新 —— 用户报的三条真机缺陷已修完（待用户复验）
+
+| 缺陷 | 根因 | 修法 | 红→绿对照 |
+|---|---|---|---|
+| **T80 Ctrl+S 无反应 / 歧义** | `action-file.save`（QMainWindow, context=1）与 KTextEditor 视图自带的 `file_save`（parentless KActionCollection, context=3）同绑 Ctrl+S | 装 editor widget 时清掉编辑器自身（含子树）的 Ctrl+S，`action-file.save` 保留为唯一权威；保存链路不变 | 修前 `--selfcheck` 真跑出 `QAction::event: Ambiguous shortcut overload: Ctrl+S`、聚焦后 Ctrl+S 磁盘不变；修后 **bindings 4→1**，新增 `save.shortcut.{unique,authority,unique.multi-pane}` 三条断言 |
+| **T81 真 KTextEditor 下无高亮** | 文档从不选择语法模式（打开只 `setText()`，不设 URL、不调 `setHighlightingMode`） | 新增 `src/editor/kernel/highlight_mode.{h,cpp}`，打开时选择模式 | 修后 `highlightingMode=Verilog/SystemVerilog`、author=`VEdit`、**formats=30/29**、folding begins=2/1；`resources/syntax/*.xml` 未动（sha256 不变，T45/T66 无需更新） |
+| **T82 工具链不随包 / 缺工具不可见** | assemble-appdir 只装 vd-app，不装 verible/slang | `--toolchain-verible/--toolchain-slang/--require-toolchain`，装 `bin/verible-verilog-{ls,lint,format}` + `bin/slang`，逐个 sha256 对 pin 校验，写 `usr/share/vedit/toolchain.txt`；发现顺序 bundled > PATH > env 且可观测 | 干净容器两路验收：bundled 时真出 `line-length` 诊断；移走后 `Diagnostics unavailable … Impact … Fix …`，不崩溃不伪造 |
+
+### 门禁（GO-3 冻结树，真实输出）
+```
+TYPECHECK-EXIT=0        [typecheck] PASS (pinned image vedit-build:local)
+BUILD-QT-EXIT=0         ctest: 100% tests passed, 0 tests failed out of 17
+```
+一次通过，未出现 relink 竞态；原始日志 `evidence/slice1-stop/{31,32}-*.log`、汇总 `33-go3-gates.txt`。
+
+### 多 lane 共写的文件（判读提示）
+| 路径 | 承载 |
+|---|---|
+| `src/app/main.cpp` | **T80**（绑定枚举 helper + 3 条新断言）+ **T82**（runSelfCheck 打印 TOOLCHAIN） |
+| `src/app/app_shell.{h,cpp}` | **T71**（保存绑定/菜单）+ **T82**（`addShellDiagnostic`） |
+
+### 本轮提交
+```
+2193f7e fix(editor): select the syntax mode so KTextEditor actually highlights
+2454362 feat(diagnostics): discover bundled toolchain and surface a missing one explicitly
+169fb74 fix(app): make Ctrl+S single-authority and print the toolchain in the selfcheck
+c42d745 feat(packaging): bundle verible and slang into the appdir with pinned sha256
+144fa55 docs(legal): register Verible (Apache-2.0) and slang (MIT) in the notices
+ad05938 docs: name the v2 deliverable build entry in AGENT.md
+a6d5a04 test(editor): extend the edit-core selftest for the highlighting assertions
+9a11c91 docs: sync the build and usage documentation
+07f3b63 docs(evidence): land the T80/T81/T82 lane evidence
+5709520 docs(evidence): record the GO-3 frozen gate results
+```
+
+### 未验证项（如实）
+- **GUI 一律未验收**：高亮观感、Ctrl+S 的实际效果、lint 诊断在界面上的呈现，只能由用户真机确认。门禁只覆盖无头可证部分（构建 / ctest / xcb 软件渲染冒烟）。
+- `build/glibc217-spike/run-spike.sh` 是 T76 探针产物（untracked），本轮未纳入提交。
