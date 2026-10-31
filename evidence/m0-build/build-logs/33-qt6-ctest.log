@@ -1,23 +1,25 @@
 Test project /vedit-build/target/qt6-build
-    Start 1: vedit-m0-smoke
-1/9 Test #1: vedit-m0-smoke .................................   Passed    0.06 sec
-    Start 2: vedit-syntax-provider-tests
-2/9 Test #2: vedit-syntax-provider-tests ....................   Passed    0.00 sec
-    Start 3: vedit-syntax-kde-data
-3/9 Test #3: vedit-syntax-kde-data ..........................   Passed    0.03 sec
-    Start 4: vedit-syn-grammars-tests
-4/9 Test #4: vedit-syn-grammars-tests .......................   Passed    0.17 sec
-    Start 5: vedit-terminal-selftest
-5/9 Test #5: vedit-terminal-selftest ........................   Passed    1.07 sec
-    Start 6: vedit-app-shell-selftest
-6/9 Test #6: vedit-app-shell-selftest .......................   Passed    0.12 sec
-    Start 7: vedit-workspace-palette-selftest
-7/9 Test #7: vedit-workspace-palette-selftest ...............   Passed    0.09 sec
-    Start 8: vedit-workspace-palette-integration-selftest
-8/9 Test #8: vedit-workspace-palette-integration-selftest ...   Passed    0.07 sec
-    Start 9: vedit-workspace-search-selftest
-9/9 Test #9: vedit-workspace-search-selftest ................   Passed    0.31 sec
+      Start  1: vedit-m0-smoke
+ 1/10 Test  #1: vedit-m0-smoke .................................   Passed    0.06 sec
+      Start  2: vedit-syntax-provider-tests
+ 2/10 Test  #2: vedit-syntax-provider-tests ....................   Passed    0.00 sec
+      Start  3: vedit-syntax-kde-data
+ 3/10 Test  #3: vedit-syntax-kde-data ..........................   Passed    0.03 sec
+      Start  4: vedit-syn-grammars-tests
+ 4/10 Test  #4: vedit-syn-grammars-tests .......................   Passed    0.20 sec
+      Start  5: vedit-terminal-selftest
+ 5/10 Test  #5: vedit-terminal-selftest ........................   Passed    1.07 sec
+      Start  6: vedit-app-ffi-abi-selftest
+ 6/10 Test  #6: vedit-app-ffi-abi-selftest .....................   Passed    0.03 sec
+      Start  7: vedit-app-shell-selftest
+ 7/10 Test  #7: vedit-app-shell-selftest .......................   Passed    0.12 sec
+      Start  8: vedit-workspace-palette-selftest
+ 8/10 Test  #8: vedit-workspace-palette-selftest ...............   Passed    0.09 sec
+      Start  9: vedit-workspace-palette-integration-selftest
+ 9/10 Test  #9: vedit-workspace-palette-integration-selftest ...   Passed    0.08 sec
+      Start 10: vedit-workspace-search-selftest
+10/10 Test #10: vedit-workspace-search-selftest ................   Passed    0.33 sec
 
-100% tests passed, 0 tests failed out of 9
+100% tests passed, 0 tests failed out of 10
 
-Total Test time (real) =   1.92 sec
+Total Test time (real) =   2.01 sec

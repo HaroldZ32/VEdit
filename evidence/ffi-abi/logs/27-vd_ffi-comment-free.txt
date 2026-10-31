@@ -1,0 +1,196 @@
+#ifndef VDIT_VD_FFI_H
+#define VDIT_VD_FFI_H
+
+#pragma once
+
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdlib.h>
+
+#define VD_ABI_VERSION 1
+
+#define VD_STATUS_PENDING 0
+
+#define VD_STATUS_READY 1
+
+#define VD_STATUS_FAILED 2
+
+#define VD_ERR_INVALID_ARGUMENT 1
+
+#define VD_ERR_NOT_FOUND 2
+
+#define VD_ERR_SERVICE 3
+
+#define VD_ERR_CANCELLED 4
+
+#define VD_ERR_WRONG_JOB_KIND 5
+
+#define VD_ERR_INTERNAL 6
+
+#define VD_ERR_JOB_UNKNOWN 7
+
+#define VD_ERROR_MESSAGE_CAPACITY 256
+
+typedef struct VdService VdService;
+
+typedef struct VdDiagnostic {
+  int32_t severity;
+  uint32_t line;
+  uint32_t column;
+  uint32_t end_line;
+  uint32_t end_column;
+  char *code;
+  char *message;
+} VdDiagnostic;
+
+typedef struct VdDiagnostics {
+  size_t count;
+  struct VdDiagnostic *items;
+} VdDiagnostics;
+
+typedef struct VdFimResult {
+  int32_t state;
+  char *text;
+} VdFimResult;
+
+typedef struct VdLspInfo {
+  int32_t state;
+  char *server;
+  char *message;
+} VdLspInfo;
+
+typedef struct VdStringList {
+  size_t count;
+  char **items;
+} VdStringList;
+
+typedef struct VdProjectInfo {
+  struct VdStringList files;
+  struct VdStringList include_dirs;
+  struct VdStringList defines;
+  struct VdStringList warnings;
+} VdProjectInfo;
+
+typedef struct VdSearchHit {
+  char *path;
+  uint32_t line;
+  uint32_t column;
+  char *preview;
+} VdSearchHit;
+
+typedef struct VdSearchResults {
+  size_t count;
+  struct VdSearchHit *items;
+} VdSearchResults;
+
+typedef struct VdError {
+  int32_t code;
+  char message[VD_ERROR_MESSAGE_CAPACITY];
+} VdError;
+
+typedef struct VdSettingInput {
+  const char *key;
+  const char *value;
+} VdSettingInput;
+
+typedef struct VdSetting {
+  char *key;
+  char *value;
+} VdSetting;
+
+typedef struct VdSettings {
+  size_t count;
+  struct VdSetting *items;
+  struct VdStringList warnings;
+} VdSettings;
+
+typedef struct VdVcsChange {
+  char *path;
+  int32_t kind;
+} VdVcsChange;
+
+typedef struct VdVcsStatus {
+  int32_t backend;
+  char *branch;
+  size_t count;
+  struct VdVcsChange *changes;
+  char *note;
+} VdVcsStatus;
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
+uint64_t vd_deeplint_lint(struct VdService *service, const char *file, const char *binary_override);
+
+int32_t vd_deeplint_poll(struct VdService *service, uint64_t job, struct VdDiagnostics *out);
+
+void vd_diagnostics_free(struct VdDiagnostics *diagnostics);
+
+uint64_t vd_fim_complete(struct VdService *service, const char *prefix, const char *suffix);
+
+int32_t vd_fim_poll(struct VdService *service, uint64_t job, struct VdFimResult *out);
+
+void vd_fim_result_free(struct VdFimResult *result);
+
+uint64_t vd_lsp_start(struct VdService *service,
+                      const char *ls_path,
+                      const char *workspace_root,
+                      const char *rules_path);
+
+int32_t vd_lsp_poll(struct VdService *service, uint64_t job, struct VdLspInfo *out);
+
+void vd_lsp_info_free(struct VdLspInfo *info);
+
+uint64_t vd_project_parse(struct VdService *service, const char *start_dir);
+
+int32_t vd_project_poll(struct VdService *service, uint64_t job, struct VdProjectInfo *out);
+
+void vd_project_info_free(struct VdProjectInfo *info);
+
+uint64_t vd_search_query(struct VdService *service,
+                         const char *root,
+                         const char *const *files,
+                         size_t file_count,
+                         const char *needle,
+                         size_t limit);
+
+int32_t vd_search_poll(struct VdService *service, uint64_t job, struct VdSearchResults *out);
+
+void vd_search_results_free(struct VdSearchResults *results);
+
+int32_t vd_service_error(struct VdService *service, struct VdError *out);
+
+uint32_t vd_abi_version(void);
+
+struct VdService *vd_service_create(void);
+
+void vd_service_destroy(struct VdService *service);
+
+int32_t vd_job_cancel(struct VdService *service, uint64_t job);
+
+int32_t vd_job_release(struct VdService *service, uint64_t job);
+
+uint64_t vd_settings_load(struct VdService *service, const char *path);
+
+uint64_t vd_settings_save(struct VdService *service,
+                          const char *path,
+                          const struct VdSettingInput *entries,
+                          size_t count);
+
+int32_t vd_settings_poll(struct VdService *service, uint64_t job, struct VdSettings *out);
+
+void vd_settings_free(struct VdSettings *settings);
+
+uint64_t vd_vcs_status(struct VdService *service, const char *root);
+
+int32_t vd_vcs_poll(struct VdService *service, uint64_t job, struct VdVcsStatus *out);
+
+void vd_vcs_status_free(struct VdVcsStatus *status);
+
+#ifdef __cplusplus
+}  // extern "C"
+#endif  // __cplusplus
+

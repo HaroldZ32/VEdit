@@ -12,11 +12,11 @@
 ## highest GLIBC symbol the binary itself requires (informational; the private runtime supplies it)
 GLIBC_2.34
 ## libraries resolved at build time
-	libKF6TextEditor.so.6 => /usr/lib/x86_64-linux-gnu/libKF6TextEditor.so.6 (0x000072ad40f8a000)
-	libKF6SyntaxHighlighting.so.6 => /usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6 (0x000072ad40d9e000)
-	libQt6Core.so.6 => /usr/lib/x86_64-linux-gnu/libQt6Core.so.6 (0x000072ad3fff9000)
-	libtree-sitter.so.0.25 => /usr/lib/x86_64-linux-gnu/libtree-sitter.so.0.25 (0x000072ad3ffca000)
-	libstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x000072ad3fd28000)
-	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x000072ad3fad9000)
+	libKF6TextEditor.so.6 => /usr/lib/x86_64-linux-gnu/libKF6TextEditor.so.6 (0x0000730f8cb49000)
+	libKF6SyntaxHighlighting.so.6 => /usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6 (0x0000730f8c95d000)
+	libQt6Core.so.6 => /usr/lib/x86_64-linux-gnu/libQt6Core.so.6 (0x0000730f8bbb8000)
+	libtree-sitter.so.0.25 => /usr/lib/x86_64-linux-gnu/libtree-sitter.so.0.25 (0x0000730f8bb89000)
+	libstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x0000730f8b8e7000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x0000730f8b698000)
 ## sha256
 cc9f67782ed61cde765e39dca17d2e170b32de56cb5400096504d4b72b3ebe97  /vedit-build/target/qt6-build/cmake/smoke/vedit-m0-smoke
