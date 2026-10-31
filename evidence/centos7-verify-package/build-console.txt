@@ -1,0 +1,29 @@
+## build console (build/centos7-verify/build-tarball.sh)
+## HEAD=c682694e125ff7f59c590b83b6d2895239a3d143  2026-10-31T23:10:52+08:00
+== 1/5: assemble the AppDir (private runtime + bundled toolchain) ==
+[assemble] binary: cc9f67782ed61cde765e39dca17d2e170b32de56cb5400096504d4b72b3ebe97  probe: b709d6924ec9a6f6da6ec80aaf915aa27d9b9ddb3e18de73ced44316353fc242
+[assemble] whitelist: SystemVerilog,Verilog
+binary verible-verilog-ls sha256=07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845
+binary verible-verilog-lint sha256=b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29
+binary verible-verilog-format sha256=b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473
+[assemble] toolchain: verible bundled (3 binaries, sha256 pinned)
+binary slang sha256=63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252
+[assemble] toolchain: slang bundled (sha256 pinned)
+[assemble] toolchain: complete (verible + slang), missing=[]
+[assemble] active whitelist files: 2 (no syntax-bundled/)
+[assemble] AppDir: /vedit-build/build/centos7-verify/AppDir files=203 bytes=202807255
+[assemble] f2lib sha256: aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
+APPDIR=/vedit-build/build/centos7-verify/AppDir
+APPDIR_FORM=F2
+APPDIR_FILES=203
+APPDIR_BYTES=202807255
+APPDIR_WHITELIST=SystemVerilog,Verilog
+   AppDir: 287M
+== 2/5: stage the tarball tree ==
+== 3/5: checksums (MANIFEST.sha256, relative paths) ==
+   211 files
+== 4/5: tarball ==
+== 5/5: done ==
+   /home/haroldzhao/MyProj/DshProj/VEdit/build/centos7-verify/dist/vedit-centos7-verify-c682694.tar.gz
+   size: 104M
+   sha256: 6ecf90a258c2e8b2d1b82b114bd65d54dd0c3d38b883e155592555bd83803b51
