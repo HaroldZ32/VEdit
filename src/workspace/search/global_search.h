@@ -18,6 +18,7 @@
 #include <QThread>
 
 #include <atomic>
+#include <memory>
 
 namespace vedit::workspace::search {
 
@@ -49,11 +50,16 @@ signals:
     void finished(const vedit::workspace::search::SearchSummary &summary);
 
 private:
-    void runScan(const SearchOptions &options, quint64 generation);
+    void runScan(const SearchOptions &options, quint64 generation,
+                 const std::shared_ptr<std::atomic_bool> &cancelTag);
 
     QPointer<QThread> thread_;
     std::atomic_bool running_{false};
-    std::atomic_bool cancelRequested_{false};
+    // Per-scan cancellation token. The worker thread holds its own shared_ptr
+    // copy, so it never touches memory owned by this QObject; the destructor
+    // additionally joins the worker before any member is destroyed (verdict
+    // ws-search M2, evidence/search-uaf/).
+    std::shared_ptr<std::atomic_bool> cancelRequested_;
     std::atomic_bool ranOnWorkerThread_{false};
     quint64 generation_ = 0;
     SearchSummary lastSummary_;

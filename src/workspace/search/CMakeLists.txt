@@ -58,7 +58,9 @@ set(VEDIT_WORKSPACE_SEARCH_SOURCES
 )
 if(VEDIT_WORKSPACE_SEARCH_HAVE_SHELL)
   # The lane entry point needs src/app headers; only the root build has them.
-  list(APPEND VEDIT_WORKSPACE_SEARCH_SOURCES search_integration.cpp)
+  # search_jump_target.cpp is the product consumer of jumpRequested (verdict H1)
+  # and lives on the same terms: it opens through the shell's editor pane.
+  list(APPEND VEDIT_WORKSPACE_SEARCH_SOURCES search_integration.cpp search_jump_target.cpp)
 endif()
 
 add_library(vedit_workspace_search STATIC ${VEDIT_WORKSPACE_SEARCH_SOURCES})
@@ -70,6 +72,15 @@ target_link_libraries(vedit_workspace_search PUBLIC
 )
 if(VEDIT_WORKSPACE_SEARCH_HAVE_SHELL)
   target_link_libraries(vedit_workspace_search PUBLIC vedit_app_shell)
+  # The jump target opens through the ONE shell-level seam
+  # (EditorPane::openFile(), src/app/editor_area.h) and then positions the
+  # cursor in the product's editing kernel. Regression T69: it must NOT cast the
+  # pane widget to the demo QPlainTextEdit - the product installs KTextEditor.
+  if(TARGET vedit_editor_core)
+    target_link_libraries(vedit_workspace_search PUBLIC vedit_editor_core)
+    target_compile_definitions(vedit_workspace_search PRIVATE
+      VEDIT_SEARCH_HAVE_EDITOR_CORE=1)
+  endif()
 endif()
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(vedit_workspace_search PRIVATE -Wall -Wextra -Wpedantic -Werror)
@@ -84,10 +95,33 @@ if(VEDIT_WORKSPACE_SEARCH_HAVE_SHELL)
   target_link_libraries(vedit-workspace-search-selftest PRIVATE vedit_app_shell)
   target_compile_definitions(vedit-workspace-search-selftest PRIVATE
     VEDIT_WORKSPACE_SEARCH_HAVE_SHELL=1)
+  # Regression T69: the product-jump checks run against the real KTextEditor
+  # provider, so the harness needs the kernel's document/view accessors.
+  if(TARGET vedit_editor_core)
+    target_link_libraries(vedit-workspace-search-selftest PRIVATE vedit_editor_core)
+    target_compile_definitions(vedit-workspace-search-selftest PRIVATE
+      VEDIT_SEARCH_HAVE_EDITOR_CORE=1)
+  endif()
 endif()
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(vedit-workspace-search-selftest PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
+
+# Test-only stall shim (tools/slowio): simulates slow storage for files whose
+# name ends with .slowio, so the GlobalSearch destructor lifetime test (T64) can
+# make the scanner block inside read() on purpose. It is lane test tooling: it is
+# never linked into vedit-app nor into vedit_workspace_search - the self-check
+# re-executes itself with this library in LD_PRELOAD.
+add_library(vedit_search_slowio SHARED tools/slowio/slowio.cpp)
+target_link_libraries(vedit_search_slowio PRIVATE ${CMAKE_DL_LIBS})
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(vedit_search_slowio PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+target_compile_definitions(vedit-workspace-search-selftest PRIVATE
+  VEDIT_SEARCH_SLOWIO_LIB="$<TARGET_FILE:vedit_search_slowio>")
+# The definition above only creates a file-level dependency; building just the
+# self-check must still produce the shim it re-executes with LD_PRELOAD.
+add_dependencies(vedit-workspace-search-selftest vedit_search_slowio)
 
 add_test(NAME vedit-workspace-search-selftest
          COMMAND vedit-workspace-search-selftest --selfcheck)

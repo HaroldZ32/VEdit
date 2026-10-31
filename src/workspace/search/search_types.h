@@ -77,9 +77,12 @@ struct JumpRequest {
     int column = 1;
 };
 
-// Editor seam: src/editor (edit-core) supplies the real target once it lands.
-// Until then the lane's self-check harness supplies a demo implementation, so
-// the click -> open file -> position cursor path is exercised end to end.
+// Editor seam: the product target is installed by installSearch()
+// (search_jump_target.h, EditorJumpTarget), so the click -> open file ->
+// position cursor path runs inside vedit-app; the edit-core lane replaces that
+// implementation once its real document exists, without changing this contract.
+// A panel built without a shell (the lane's standalone build) keeps the
+// signal-only behaviour and is driven by a harness-supplied target.
 class IJumpTarget {
 public:
     virtual ~IJumpTarget() = default;

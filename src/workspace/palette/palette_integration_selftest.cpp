@@ -19,6 +19,12 @@
 #include "command_registry.h"
 #include "editor_area.h"
 
+#if defined(VEDIT_PALETTE_HAVE_EDIT_CORE)
+#include "kernel/ktexteditor_provider.h"
+
+#include <KTextEditor/Document>
+#endif
+
 #include <QAction>
 #include <QApplication>
 #include <QCommandLineParser>
@@ -228,6 +234,45 @@ int main(int argc, char **argv)
         check(QStringLiteral("integration.rebinding-restored"),
               action->shortcut() == QKeySequence(QStringLiteral("Ctrl+P")));
     }
+
+#if defined(VEDIT_PALETTE_HAVE_EDIT_CORE)
+    // --- the PRODUCT editor provider (regression T60) ----------------------
+    // The demo QPlainTextEdit checks above are not enough: the product installs
+    // the KTextEditor kernel, so the palette's open path must be verified
+    // against that provider too (recorded path + document content).
+    palette->closePalette();
+    pump();
+    shell.setEditorProvider(vedit::editor::makeEditCoreProvider());
+    pump();
+    vedit::app::EditorPane *productPane = shell.editorArea()->activePane();
+    check(QStringLiteral("integration.ktexteditor-widget"),
+          productPane != nullptr && vedit::editor::isEditCoreWidget(productPane->editorWidget()));
+    action->trigger();
+    pump();
+    palette->setQueryText(QStringLiteral("helper"));
+    pump();
+    QApplication::sendEvent(palette->queryEdit(), &returnKey);
+    pump();
+    const QString helperPath = projectRoot + QStringLiteral("/src/util/helper.cpp");
+    check(QStringLiteral("integration.ktexteditor-opened-path"),
+          productPane != nullptr && productPane->currentFilePath() == helperPath);
+    KTextEditor::Document *productDocument =
+        productPane != nullptr ? vedit::editor::documentFor(productPane->editorWidget()) : nullptr;
+    check(QStringLiteral("integration.ktexteditor-document"), productDocument != nullptr);
+    if (productDocument != nullptr) {
+        QFile helperFile(helperPath);
+        const bool helperRead = helperFile.open(QIODevice::ReadOnly);
+        const QByteArray helperOnDisk = helperRead ? helperFile.readAll() : QByteArray();
+        check(QStringLiteral("integration.ktexteditor-content"),
+              !helperOnDisk.isEmpty()
+                  && productDocument->text() == QString::fromUtf8(helperOnDisk));
+        std::printf("KTEXTEDITOR-OPEN path=%s bytes=%d\n",
+                    qPrintable(productPane->currentFilePath()),
+                    static_cast<int>(productDocument->text().toUtf8().size()));
+    }
+    check(QStringLiteral("integration.ktexteditor-opened-path-recorded"),
+          integration->openedPath() == helperPath);
+#endif
 
     std::printf("INTEGRATION-SELFTEST ok=%d checks=%d failures=%d\n",
                 g_failures == 0 ? 1 : 0, g_checks, g_failures);

@@ -18,13 +18,18 @@
 #include "filetree_integration.h"
 #include "integration.h"
 
+#if defined(VEDIT_ROOTCHECK_HAVE_EDIT_CORE)
+#include "kernel/ktexteditor_provider.h"
+
+#include <KTextEditor/Document>
+#endif
+
 #include <QApplication>
 #include <QDir>
 #include <QDockWidget>
 #include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
-#include <QPlainTextEdit>
 #include <QSignalSpy>
 #include <QStatusBar>
 #include <QTreeView>
@@ -87,6 +92,10 @@ int main(int argc, char **argv)
                     " [--screenshot <png>]\n");
         return 2;
     }
+    // Compare absolute paths everywhere: the recorded file path is absolute, so
+    // a relative --project argument must not turn a real open into a failure.
+    project = QFileInfo(project).absoluteFilePath();
+    stateDir = QFileInfo(stateDir).absoluteFilePath();
     QDir().mkpath(stateDir);
 
     ShellOptions options;
@@ -132,6 +141,17 @@ int main(int argc, char **argv)
     check("root-path", panel != nullptr && panel->rootPath() == QDir(project).absolutePath(),
           panel != nullptr ? panel->rootPath() : QString());
 
+#if defined(VEDIT_ROOTCHECK_HAVE_EDIT_CORE)
+    // Regression T60: the PRODUCT installs the KTextEditor editor provider. The
+    // double-click assertions below must therefore run against that provider,
+    // not against the demo QPlainTextEdit (which is what made T39's evidence
+    // green while the real product stopped opening files).
+    shell.setEditorProvider(vedit::editor::makeEditCoreProvider());
+    check("editor.provider", shell.editorProvider() != nullptr
+                                 && shell.editorProvider()->id() == QStringLiteral("ktexteditor"),
+          shell.editorProvider() != nullptr ? shell.editorProvider()->id() : QString());
+#endif
+
     shell.show();
     pump(250);
     if (panel != nullptr) {
@@ -141,23 +161,32 @@ int main(int argc, char **argv)
     }
 
     // --- the real product behaviour of a double click (verdict §8.1 H1) ------
-    QPlainTextEdit *editor = nullptr;
-    if (vedit::app::EditorPane *pane = shell.editorArea()->activePane()) {
-        editor = qobject_cast<QPlainTextEdit *>(pane->editorWidget());
-    }
-    check("editor.active-pane-widget", editor != nullptr);
+    // The editor is whatever provider the product installs: the widget is read
+    // through the pane's provider seam, never through a QPlainTextEdit cast.
+    vedit::app::EditorPane *activePane = shell.editorArea()->activePane();
+    check("editor.active-pane-widget", activePane != nullptr);
+#if defined(VEDIT_ROOTCHECK_HAVE_EDIT_CORE)
+    check("editor.ktexteditor-widget",
+          activePane != nullptr && vedit::editor::isEditCoreWidget(activePane->editorWidget()));
+#endif
 
-    const auto editorPath = [editor]() {
-        return editor != nullptr ? editor->property("vedit.openFilePath").toString() : QString();
+    const auto editorPath = [activePane]() {
+        return activePane != nullptr ? activePane->currentFilePath() : QString();
     };
-    const auto editorText = [editor]() {
-        return editor != nullptr ? editor->toPlainText() : QString();
+    const auto editorText = [activePane]() {
+#if defined(VEDIT_ROOTCHECK_HAVE_EDIT_CORE)
+        KTextEditor::Document *document =
+            activePane != nullptr ? vedit::editor::documentFor(activePane->editorWidget())
+                                  : nullptr;
+        if (document != nullptr) {
+            return document->text();
+        }
+#endif
+        return QString();
     };
-    // The demo editor starts with its own welcome text, so "no file is open" is
-    // the empty path property, not an empty document.
     const QString initialText = editorText();
     std::printf("SEAM editor-initial-bytes=%d\n", static_cast<int>(initialText.size()));
-    check("editor.initially-no-file", editor != nullptr && editorPath().isEmpty());
+    check("editor.initially-no-file", activePane != nullptr && editorPath().isEmpty());
 
     if (panel != nullptr) {
         // A real mouse double click on the row, not a direct call to activateIndex:

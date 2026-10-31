@@ -3,8 +3,11 @@
 //
 //   vedit-workspace-search-selftest --selfcheck
 //       Runs the result-correctness, empty-state, jump, limit, permission,
-//       large-file and cancellation checks; prints CHECK lines and one
-//       machine-readable summary line. Exit code 0 iff no check failed.
+//       large-file, cancellation and worker-lifetime checks; prints CHECK lines
+//       and one machine-readable summary line. Exit code 0 iff no check failed.
+//       The lifetime check re-executes this binary as --lifecycle-slow with the
+//       lane's stall shim (tools/slowio) in LD_PRELOAD, so the destructor really
+//       races a blocking read (evidence/search-uaf/).
 //
 //   vedit-workspace-search-selftest --screenshots <dir>
 //       Installs the panel into the real ApplicationShell through the
@@ -24,6 +27,13 @@
 #include "search_integration.h"
 #endif
 
+#if defined(VEDIT_SEARCH_HAVE_EDITOR_CORE)
+#include "kernel/ktexteditor_provider.h"
+
+#include <KTextEditor/Document>
+#include <KTextEditor/View>
+#endif
+
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QDir>
@@ -33,6 +43,8 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPlainTextEdit>
+#include <QProcess>
+#include <QProcessEnvironment>
 #include <QPixmap>
 #include <QTextBlock>
 #include <QTextCursor>
@@ -44,6 +56,7 @@
 
 #ifdef VEDIT_WORKSPACE_SEARCH_HAVE_SHELL
 #include <QDockWidget>
+#include <QStatusBar>
 #endif
 
 #include <cstdio>
@@ -213,6 +226,35 @@ const SearchHit *findHitData(const SearchPanel &panel, const QString &relativePa
     }
     return nullptr;
 }
+
+// Clicks the tree row of `hit` with a real mouse event (the user's action, the
+// same path T23's jump.click.* checks exercise) so the product consumer of
+// jumpRequested - not a target injected by this harness - performs the jump.
+// Shell-only: the standalone lane build has no product target to click into.
+#ifdef VEDIT_WORKSPACE_SEARCH_HAVE_SHELL
+bool clickHitRow(SearchPanel &panel, const SearchHit &hit)
+{
+    QTreeWidgetItem *item = findHitItem(panel, hit.relativePath, hit.line);
+    if (item == nullptr) {
+        return false;
+    }
+    panel.resultsView()->scrollToItem(item);
+    QCoreApplication::processEvents();
+    const auto rowRect = [&panel, item]() {
+        return panel.resultsView()->visualItemRect(item);
+    };
+    if (!waitUntil([&rowRect]() {
+            const QRect rect = rowRect();
+            return rect.isValid() && !rect.isEmpty();
+        }, 5000)) {
+        return false;
+    }
+    QTest::mouseClick(panel.resultsView()->viewport(), Qt::LeftButton, Qt::NoModifier,
+                      rowRect().center());
+    QCoreApplication::processEvents();
+    return true;
+}
+#endif
 
 class RecordingJumpTarget final : public IJumpTarget
 {
@@ -544,6 +586,128 @@ void testShellSeam(const Fixture &fixture)
     }
 }
 
+// The PRODUCTION jump path (verdict H1): installSearch() installs the consumer of
+// jumpRequested, so a real click on a hit row has to open the hit file in the
+// shell's editor and put the cursor on the hit line. Everything asserted below is
+// the shell's own editor state (document text, cursor, open-file property, status
+// bar) - no demo target is injected by this harness here.
+void testProductJump(const Fixture &fixture)
+{
+    QTemporaryDir stateDir;
+    vedit::app::ShellOptions options;
+    options.stateDir = stateDir.path();
+    options.projectRoot = fixture.root();
+    options.restoreSession = false;
+    options.showDefaultPanels = false;
+
+    std::unique_ptr<vedit::app::ApplicationShell> shell(new vedit::app::ApplicationShell(options));
+#if defined(VEDIT_SEARCH_HAVE_EDITOR_CORE)
+    // Regression T69: the PRODUCT editor provider is KTextEditor (src/app/main.cpp
+    // installs makeEditCoreProvider()). The jump must be verified on that
+    // provider; running only against the demo QPlainTextEdit is what hid the
+    // regression (the demo and the product have different widget types).
+    shell->setEditorProvider(vedit::editor::makeEditCoreProvider());
+#endif
+    vedit::workspace::IntegrationOptions integrationOptions;
+    integrationOptions.projectRoot = fixture.root();
+    integrationOptions.stateDir = stateDir.path();
+    vedit::workspace::installSearch(*shell, integrationOptions);
+    shell->panels()->showPanel(QStringLiteral("search"), shell.get());
+    if (QDockWidget *dock = shell->panels()->dock(QStringLiteral("search"))) {
+        shell->resizeDocks({dock}, {420}, Qt::Vertical);
+    }
+    shell->resize(1280, 860);
+    shell->show();
+    QCoreApplication::processEvents();
+
+    SearchPanel *panel = shell->findChild<SearchPanel *>();
+    vedit::app::EditorPane *pane = shell->editorArea()->activePane();
+    check("jump.product.shell-ready", panel != nullptr && pane != nullptr);
+    if (panel == nullptr || pane == nullptr) {
+        return;
+    }
+
+#if defined(VEDIT_SEARCH_HAVE_EDITOR_CORE)
+    KTextEditor::View *view = vedit::editor::viewFor(pane->editorWidget());
+    KTextEditor::Document *document = vedit::editor::documentFor(pane->editorWidget());
+    check("jump.product.ktexteditor-provider", view != nullptr && document != nullptr);
+    if (view == nullptr || document == nullptr) {
+        return;
+    }
+    const auto documentText = [document]() { return document->text(); };
+    const auto cursorLine = [view]() { return view->cursorPosition().line() + 1; };
+    const auto cursorColumn = [view]() { return view->cursorPosition().column() + 1; };
+#else
+    check("jump.product.ktexteditor-provider", false);
+    return;
+#endif
+
+    check("jump.product.target-installed", panel->jumpTarget() != nullptr);
+    check("jump.product.initially-no-file", pane->currentFilePath().isEmpty());
+
+    panel->setQuery(QStringLiteral("always_ff"));
+    panel->startSearch();
+    waitForSearch(*panel);
+    QCoreApplication::processEvents();
+
+    // Two hits in two different files, both below line 1, so the assertions can
+    // only pass when the open really positions the cursor (a file opening at the
+    // default position would land on line 1 and the same document twice would
+    // hide a stale-cursor bug).
+    const QList<SearchHit> &hits = panel->hits();
+    int firstIndex = -1;
+    int secondIndex = -1;
+    for (int i = 0; i < hits.size(); ++i) {
+        if (hits.at(i).line < 2) {
+            continue;
+        }
+        if (firstIndex < 0) {
+            firstIndex = i;
+            continue;
+        }
+        if (hits.at(i).filePath != hits.at(firstIndex).filePath
+            && hits.at(i).line != hits.at(firstIndex).line) {
+            secondIndex = i;
+            break;
+        }
+    }
+    check("jump.product.two-hits", firstIndex >= 0 && secondIndex >= 0);
+    if (firstIndex < 0 || secondIndex < 0) {
+        return;
+    }
+
+    const auto readAll = [](const QString &path) {
+        QFile file(path);
+        return file.open(QIODevice::ReadOnly) ? QString::fromUtf8(file.readAll()) : QString();
+    };
+    const SearchHit hitA = hits.at(firstIndex);
+    const SearchHit hitB = hits.at(secondIndex);
+    const QString expectedA = readAll(hitA.filePath);
+    const QString expectedB = readAll(hitB.filePath);
+
+    check("jump.product.click-first", clickHitRow(*panel, hitA));
+    std::printf("SEARCH-JUMP first requested='%s':%d current='%s' cursor=%d:%d\n",
+                qPrintable(hitA.relativePath), hitA.line,
+                qPrintable(pane->currentFilePath()), cursorLine(), cursorColumn());
+    check("jump.product.first-current-file", pane->currentFilePath() == hitA.filePath);
+    check("jump.product.first-loads-bytes",
+          !expectedA.isEmpty() && documentText() == expectedA);
+    check("jump.product.first-cursor-line", cursorLine() == hitA.line);
+    check("jump.product.first-cursor-column", cursorColumn() == hitA.column);
+    check("jump.product.first-status",
+          shell->statusBar()->currentMessage().contains(hitA.filePath));
+
+    check("jump.product.click-second", clickHitRow(*panel, hitB));
+    std::printf("SEARCH-JUMP second requested='%s':%d current='%s' cursor=%d:%d\n",
+                qPrintable(hitB.relativePath), hitB.line,
+                qPrintable(pane->currentFilePath()), cursorLine(), cursorColumn());
+    check("jump.product.second-current-file", pane->currentFilePath() == hitB.filePath);
+    check("jump.product.second-loads-bytes",
+          !expectedB.isEmpty() && documentText() == expectedB);
+    check("jump.product.second-cursor-line", cursorLine() == hitB.line);
+    check("jump.product.second-cursor-column", cursorColumn() == hitB.column);
+}
+
 #endif // VEDIT_WORKSPACE_SEARCH_HAVE_SHELL
 
 void testLargeFileAndCancel()
@@ -677,6 +841,151 @@ void testLargeFileAndCancel()
         check("large.timeout.state", summary.state == SearchState::Done);
         check("large.timeout.bounded", summary.elapsedMs < 5000);
     }
+}
+
+// T64 / verdict M2 (GlobalSearch destructor use-after-free), part 1: a normal
+// in-flight scan must be joined before the object dies, so no thread of the scan
+// can outlive it. Fast guard; the timeout window itself is reproduced by
+// runSlowLifecycleProbe() below through the *.slowio stall shim.
+#if defined(Q_OS_UNIX)
+bool workerThreadPresent()
+{
+    const QDir tasks(QStringLiteral("/proc/self/task"));
+    const QStringList ids = tasks.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    for (const QString &id : ids) {
+        QFile comm(QStringLiteral("/proc/self/task/%1/comm").arg(id));
+        if (comm.open(QIODevice::ReadOnly)
+            && QString::fromUtf8(comm.readAll()).trimmed()
+                   == QStringLiteral("vedit-global-search")) {
+            return true;
+        }
+    }
+    return false;
+}
+#endif
+
+void testDestructionJoinsWorker()
+{
+#if defined(Q_OS_UNIX)
+    QTemporaryDir temp;
+    check("lifecycle.temp-dir", temp.isValid());
+    if (!temp.isValid()) {
+        return;
+    }
+    const QString root = temp.path();
+    QByteArray lines;
+    for (int i = 0; i < 200; ++i) {
+        lines.append("always_ff lifecycle line\n");
+    }
+    writeFile(root + QStringLiteral("/a.txt"), lines);
+    writeFile(root + QStringLiteral("/b.txt"), lines);
+
+    check("lifecycle.no-worker-before", !workerThreadPresent());
+    auto *search = new GlobalSearch;
+    QObject::connect(search, &GlobalSearch::hitsReady, [](const QList<SearchHit> &) {});
+    SearchOptions options;
+    options.rootPath = root;
+    options.query = QStringLiteral("always_ff");
+    check("lifecycle.scan-started", search->start(options));
+    check("lifecycle.worker-running", search->isRunning());
+    delete search;
+    check("lifecycle.destructor-joins-worker", !workerThreadPresent());
+    QCoreApplication::processEvents();
+#else
+    skipCheck("lifecycle.destructor-joins-worker", "POSIX /proc check is Unix-only");
+#endif
+}
+
+// T64 / verdict M2 (GlobalSearch destructor use-after-free), part 2: the real
+// timeout window. The scanner's only long, cancel-blind section is a blocking
+// read; this machine has no slow storage, so the child process is started with
+// the lane's stall shim (tools/slowio), which makes read() on a *.slowio file
+// take 11.5 s - exactly the "scan budget (15 s) > destructor bound (10 s)"
+// condition that freed the QObject under the worker.
+//
+// The child asserts the destructor returned only AFTER the stalled read
+// finished (marker file written by the shim): a destructor that joins the
+// worker can only return after the worker exited, a bounded one returns first.
+// Run under ASan, the pre-fix child also aborts with heap-use-after-free.
+int runSlowLifecycleProbe()
+{
+#if defined(Q_OS_UNIX)
+    constexpr int kStallMs = 11500; // > the old 10 s destructor bound
+    QTemporaryDir temp;
+    check("slowlifecycle.temp-dir", temp.isValid());
+    if (!temp.isValid()) {
+        return 1;
+    }
+    const QString root = temp.path();
+    QByteArray lines;
+    for (int i = 0; i < 70; ++i) {
+        lines.append("always_ff line\n");
+    }
+    writeFile(root + QStringLiteral("/a.txt"), lines);
+    const QString slowPath = root + QStringLiteral("/zz_slow.slowio");
+    writeFile(slowPath, QByteArray("always_ff on the slow disk\n"));
+    const int before = g_failures;
+
+    auto *search = new GlobalSearch;
+    QList<SearchHit> delivered;
+    QObject::connect(search, &GlobalSearch::hitsReady,
+                     [&delivered](const QList<SearchHit> &batch) { delivered += batch; });
+    SearchOptions options;
+    options.rootPath = root;
+    options.query = QStringLiteral("always_ff");
+    options.maxDurationMs = 60000;
+    check("slowlifecycle.scan-started", search->start(options));
+    check("slowlifecycle.batch-before-block",
+          waitUntil([&delivered]() { return delivered.size() >= 64; }, 30000));
+    // a.txt is scanned and its batch is out, so the scan is in the stalled read.
+    QTest::qWait(200);
+
+    QElapsedTimer timer;
+    timer.start();
+    delete search;
+    const qint64 destroyMs = timer.elapsed();
+    const bool released = QFileInfo(slowPath + QStringLiteral(".released")).exists();
+    std::printf("SLOWLIFECYCLE delete-returned elapsedMs=%lld released-marker=%d stallMs=%d\n",
+                static_cast<long long>(destroyMs), released ? 1 : 0, kStallMs);
+    check("slowlifecycle.destructor-waits-for-stalled-read", released);
+    if (!released) {
+        // Pre-fix: the worker is still inside read(); let it resume (and, under
+        // ASan, report the use-after-free) before reporting.
+        waitUntil([&slowPath]() { return QFileInfo(slowPath + QStringLiteral(".released")).exists(); },
+                  10000);
+        QCoreApplication::processEvents();
+    }
+    std::printf("WORKSPACE-SEARCH-SLOWLIFECYCLE ok=%d checks=%d failures=%d\n",
+                g_failures == before ? 1 : 0, g_checks, g_failures);
+    return g_failures == before ? 0 : 1;
+#else
+    skipCheck("slowlifecycle.destructor-waits-for-stalled-read", "POSIX stall shim is Unix-only");
+    return 0;
+#endif
+}
+
+// Parent side of part 2: re-execute this binary with the lane's stall shim in
+// LD_PRELOAD and require a clean child run.
+void testDestructorAgainstStalledRead()
+{
+#if defined(Q_OS_UNIX) && defined(VEDIT_SEARCH_SLOWIO_LIB)
+    QProcess child;
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    env.insert(QStringLiteral("LD_PRELOAD"), QStringLiteral(VEDIT_SEARCH_SLOWIO_LIB));
+    child.setProcessEnvironment(env);
+    child.setProcessChannelMode(QProcess::MergedChannels);
+    child.start(QCoreApplication::applicationFilePath(),
+                QStringList{QStringLiteral("--lifecycle-slow")});
+    const bool finished = child.waitForFinished(90000);
+    const int exitCode = finished ? child.exitCode() : -1;
+    const QString output = QString::fromUtf8(child.readAll());
+    std::printf("SLOWLIFECYCLE-CHILD finished=%d exit=%d\n%s",
+                finished ? 1 : 0, exitCode, qPrintable(output));
+    check("lifecycle.stall-child-finished", finished);
+    check("lifecycle.stall-child-pass", exitCode == 0);
+#else
+    skipCheck("lifecycle.stall-child-pass", "no POSIX stall shim in this build");
+#endif
 }
 
 #ifdef VEDIT_WORKSPACE_SEARCH_HAVE_SHELL
@@ -827,7 +1136,14 @@ int main(int argc, char **argv)
     parser.addOption({QStringLiteral("screenshots"),
                       QStringLiteral("Capture screenshots into this directory and exit."),
                       QStringLiteral("dir")});
+    parser.addOption({QStringLiteral("lifecycle-slow"),
+                      QStringLiteral("Internal: slow-storage lifecycle probe (child of "
+                                     "--selfcheck, requires the *.slowio stall shim).")});
     parser.process(app);
+
+    if (parser.isSet(QStringLiteral("lifecycle-slow"))) {
+        return runSlowLifecycleProbe();
+    }
 
     if (parser.isSet(QStringLiteral("screenshots"))) {
 #ifdef VEDIT_WORKSPACE_SEARCH_HAVE_SHELL
@@ -849,9 +1165,12 @@ int main(int argc, char **argv)
         testJump(fixture);
 #ifdef VEDIT_WORKSPACE_SEARCH_HAVE_SHELL
         testShellSeam(fixture);
+        testProductJump(fixture);
 #endif
     }
     testLargeFileAndCancel();
+    testDestructionJoinsWorker();
+    testDestructorAgainstStalledRead();
 
     std::printf("WORKSPACE-SEARCH-SELFTEST ok=%d checks=%d failures=%d skipped=%d\n",
                 g_failures == 0 ? 1 : 0, g_checks, g_failures, g_skips);

@@ -9,19 +9,11 @@
 
 #include <QDebug>
 #include <QElapsedTimer>
-#include <QFile>
-#include <QFileInfo>
 #include <QMenu>
 #include <QMenuBar>
-#include <QPlainTextEdit>
 #include <QStatusBar>
 
 namespace vedit::workspace {
-namespace {
-
-constexpr qint64 kMaxDemoEditorBytes = 4 * 1024 * 1024;
-
-} // namespace
 
 PaletteIntegration::PaletteIntegration(vedit::app::ApplicationShell *shell)
     : QObject(shell)
@@ -176,35 +168,24 @@ void PaletteIntegration::openInEditor(const QString &absolutePath)
         return;
     }
 
-    QPlainTextEdit *editor = nullptr;
-    if (vedit::app::EditorPane *pane = shell_->editorArea()->activePane()) {
-        editor = qobject_cast<QPlainTextEdit *>(pane->editorWidget());
-    }
+    // The editor pane owns the open seam: it dispatches to the installed
+    // EditorProvider (the KTextEditor kernel in the product, the demo
+    // QPlainTextEdit in a provider-less build). Casting the pane widget to
+    // QPlainTextEdit here is what made palette opening fail once the product
+    // editor became KTextEditor (regression T60).
+    vedit::app::EditorPane *pane =
+        shell_->editorArea() != nullptr ? shell_->editorArea()->activePane() : nullptr;
 
     QString message;
-    const QFileInfo info(absolutePath);
-    if (!info.exists() || !info.isFile()) {
-        message = QStringLiteral("Cannot open %1: not a file").arg(absolutePath);
-    } else if (info.size() > kMaxDemoEditorBytes) {
-        message = QStringLiteral("%1 is too large for the demo editor (%2 bytes)")
-                      .arg(absolutePath)
-                      .arg(info.size());
-    } else if (editor == nullptr) {
-        message = QStringLiteral("Open %1 (no editor seam connected yet)").arg(absolutePath);
+    if (pane == nullptr) {
+        message = QStringLiteral("Cannot open %1: no active editor pane").arg(absolutePath);
     } else {
-        QFile file(absolutePath);
-        if (!file.open(QIODevice::ReadOnly)) {
-            message = QStringLiteral("Cannot read %1: %2").arg(absolutePath, file.errorString());
+        QString paneError;
+        if (pane->openFile(absolutePath, &paneError)) {
+            message = QStringLiteral("Opened %1").arg(absolutePath);
         } else {
-            const QByteArray data = file.readAll();
-            if (data.contains('\0')) {
-                message = QStringLiteral("%1 looks binary; not opened in the demo editor")
-                              .arg(absolutePath);
-            } else {
-                editor->setPlainText(QString::fromUtf8(data));
-                editor->setProperty("vedit.openFilePath", absolutePath);
-                message = QStringLiteral("Opened %1").arg(absolutePath);
-            }
+            message = paneError.isEmpty() ? QStringLiteral("Cannot open %1").arg(absolutePath)
+                                          : paneError;
         }
     }
     shell_->statusBar()->showMessage(message, 5000);

@@ -249,41 +249,63 @@ private:
 
 GlobalSearch::GlobalSearch(QObject *parent)
     : QObject(parent)
+    , cancelRequested_(std::make_shared<std::atomic_bool>(false))
 {
 }
 
 GlobalSearch::~GlobalSearch()
 {
+    // Lifetime (verdict ws-search M2): the worker never reads this object's
+    // memory - it holds the per-scan shared cancellation token by value - and
+    // this destructor waits until the worker has really returned before any
+    // member is destroyed. The old bound was 10 s while the default scan budget
+    // is 15 s, so a scan blocked in a slow read() outlived the destructor and
+    // then read the destroyed cancel flag (heap-use-after-free, reproduced in
+    // evidence/search-uaf/): there is no timeout here on purpose.
     cancel();
     if (thread_ != nullptr) {
-        thread_->wait(10000);
+        thread_->wait();
+        QObject::disconnect(thread_, &QThread::finished, thread_, &QObject::deleteLater);
+        QCoreApplication::removePostedEvents(thread_);
+        delete thread_;
+        thread_ = nullptr;
     }
-    // The worker posts its last results through invokeMethod(); once the thread
-    // is gone those events would otherwise touch a half-destroyed object.
+    // Every queued hitsReady/finished event was posted by the joined worker, so
+    // this removes all of them and no later post can follow.
     QCoreApplication::removePostedEvents(this);
 }
 
 bool GlobalSearch::start(const SearchOptions &options)
 {
-    cancelRequested_.store(true);
     if (thread_ != nullptr) {
+        cancel();
         if (!thread_->wait(5000)) {
             // Refuse to run two scans on the same object; the caller can retry.
+            // The previous worker keeps using its own shared state, so this
+            // answer is a scheduling decision, never a lifetime risk.
             return false;
         }
+        QObject::disconnect(thread_, &QThread::finished, thread_, &QObject::deleteLater);
+        QCoreApplication::removePostedEvents(thread_);
         delete thread_;
         thread_ = nullptr;
     }
 
+    // One token per scan, captured by value by the worker: the worker can never
+    // observe this object's members, even if the object dies first.
+    auto cancelTag = std::make_shared<std::atomic_bool>(false);
+    cancelRequested_ = cancelTag;
+
     running_.store(true);
-    cancelRequested_.store(false);
     ranOnWorkerThread_.store(false);
     const quint64 generation = ++generation_;
 
-    QThread *thread = QThread::create([this, options, generation]() { runScan(options, generation); });
+    QThread *thread = QThread::create(
+        [this, options, generation, cancelTag]() { runScan(options, generation, cancelTag); });
     thread->setObjectName(QStringLiteral("vedit-global-search"));
     thread_ = thread;
-    // The QThread object lives in this (GUI) thread; deleteLater runs here.
+    // The QThread object lives in this (GUI) thread; deleteLater runs here, and
+    // the destructor reaps it deterministically when it is still alive.
     QObject::connect(thread, &QThread::finished, thread, &QObject::deleteLater);
     thread->start();
     return true;
@@ -291,7 +313,9 @@ bool GlobalSearch::start(const SearchOptions &options)
 
 void GlobalSearch::cancel()
 {
-    cancelRequested_.store(true);
+    if (cancelRequested_ != nullptr) {
+        cancelRequested_->store(true);
+    }
 }
 
 bool GlobalSearch::isRunning() const
@@ -309,13 +333,14 @@ bool GlobalSearch::ranOnWorkerThread() const
     return ranOnWorkerThread_.load();
 }
 
-void GlobalSearch::runScan(const SearchOptions &options, quint64 generation)
+void GlobalSearch::runScan(const SearchOptions &options, quint64 generation,
+                           const std::shared_ptr<std::atomic_bool> &cancelTag)
 {
     if (QThread::currentThread() != QCoreApplication::instance()->thread()) {
         ranOnWorkerThread_.store(true);
     }
 
-    Scanner scanner(options, cancelRequested_, [this, generation](QList<SearchHit> batch) {
+    Scanner scanner(options, *cancelTag, [this, generation](QList<SearchHit> batch) {
         QMetaObject::invokeMethod(
             this,
             [this, generation, batch = std::move(batch)]() {

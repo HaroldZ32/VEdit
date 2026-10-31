@@ -13,9 +13,11 @@
 //   * unreadable root / failure  -> "Search failed: search root is not readable: ..."
 //   * cancelled before any hit   -> "Search cancelled before any hit."
 //
-// Jumping is a seam: clicking a result emits jumpRequested() and forwards to an
-// optional IJumpTarget (src/editor supplies the real one; the lane's self-check
-// supplies a demo one until then).
+// Jumping: clicking a result emits jumpRequested() and forwards the request to
+// the IJumpTarget installed on the panel. In the product installSearch() installs
+// EditorJumpTarget (search_jump_target.h), which opens the hit through the
+// workspace open seam and puts the cursor on the hit line; the edit-core lane
+// replaces that implementation, not this call site.
 #include "global_search.h"
 #include "search_types.h"
 

@@ -11,25 +11,12 @@
 
 #include <QDebug>
 #include <QDockWidget>
-#include <QFile>
-#include <QFileInfo>
-#include <QPlainTextEdit>
 #include <QStatusBar>
 #include <QString>
 
 #endif
 
 namespace vedit::workspace {
-
-#if defined(VEDIT_FILETREE_HAVE_APP_SHELL)
-namespace {
-
-// The demo editor cannot hold an unbounded document; the same limit as the
-// command palette's open path keeps the two entry points consistent.
-constexpr qint64 kMaxDemoEditorBytes = 4LL * 1024 * 1024;
-
-} // namespace
-#endif
 
 bool openFileInEditor(vedit::app::ApplicationShell &shell, const QString &path, QString *error)
 {
@@ -42,34 +29,20 @@ bool openFileInEditor(vedit::app::ApplicationShell &shell, const QString &path, 
         return false;
     };
 
-    QPlainTextEdit *editor = nullptr;
-    if (vedit::app::EditorPane *pane = shell.editorArea()->activePane()) {
-        editor = qobject_cast<QPlainTextEdit *>(pane->editorWidget());
+    // The editor pane owns the open seam now: it dispatches to whatever
+    // EditorProvider is installed (the KTextEditor kernel in the product, the
+    // demo QPlainTextEdit in a provider-less build). The lane must not cast the
+    // widget itself - that is what broke double click when the product editor
+    // moved from the demo widget to KTextEditor (regression T60).
+    vedit::app::EditorPane *pane =
+        shell.editorArea() != nullptr ? shell.editorArea()->activePane() : nullptr;
+    if (pane == nullptr) {
+        return fail(QStringLiteral("Cannot open %1: no active editor pane").arg(path));
     }
-
-    const QFileInfo info(path);
-    if (!info.exists() || !info.isFile()) {
-        return fail(QStringLiteral("Cannot open %1: not a file").arg(path));
+    QString paneError;
+    if (!pane->openFile(path, &paneError)) {
+        return fail(paneError.isEmpty() ? QStringLiteral("Cannot open %1").arg(path) : paneError);
     }
-    if (info.size() > kMaxDemoEditorBytes) {
-        return fail(QStringLiteral("%1 is too large for the demo editor (%2 bytes)")
-                        .arg(path)
-                        .arg(info.size()));
-    }
-    if (editor == nullptr) {
-        return fail(QStringLiteral("Open %1 (no editor seam connected yet)").arg(path));
-    }
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly)) {
-        return fail(QStringLiteral("Cannot read %1: %2").arg(path, file.errorString()));
-    }
-    const QByteArray data = file.readAll();
-    if (data.contains('\0')) {
-        return fail(QStringLiteral("%1 looks binary; not opened in the demo editor").arg(path));
-    }
-
-    editor->setPlainText(QString::fromUtf8(data));
-    editor->setProperty("vedit.openFilePath", path);
     shell.statusBar()->showMessage(QStringLiteral("Opened %1").arg(path), 5000);
     return true;
 #else

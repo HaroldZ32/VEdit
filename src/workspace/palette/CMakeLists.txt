@@ -64,6 +64,18 @@ if(TARGET vedit_app_shell)
   target_compile_options(vedit-workspace-palette-integration-selftest
                          PRIVATE ${VEDIT_PALETTE_WARNING_FLAGS})
 
+  # Regression T60: the product installs the KTextEditor editor provider, so the
+  # palette's open path must also be verified against that provider (content +
+  # recorded path), not only against the demo QPlainTextEdit. Enabled only when
+  # the edit-core lane is part of this build.
+  if(TARGET vedit_editor_core)
+    target_link_libraries(vedit-workspace-palette-integration-selftest
+                          PRIVATE vedit_editor_core)
+    target_compile_definitions(vedit-workspace-palette-integration-selftest
+                               PRIVATE VEDIT_PALETTE_HAVE_EDIT_CORE=1)
+    message(STATUS "VEdit palette: edit-core provider assertions enabled in the integration selftest")
+  endif()
+
   add_test(NAME vedit-workspace-palette-integration-selftest
            COMMAND vedit-workspace-palette-integration-selftest
                    --screenshots "${CMAKE_CURRENT_BINARY_DIR}/integration-screenshots")
