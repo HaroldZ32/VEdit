@@ -1,0 +1,29 @@
+generated: 2026-10-31T14:13:44Z
+git_head: 19303ae3a58491767d97815d2fe1e0947816e5b6
+git_branch: feat/qt6-ktexteditor-migration
+git_status_porcelain:
+   M build/evidence/typecheck/00-run.txt
+   M build/evidence/typecheck/10-typecheck-image-build.log
+   M build/evidence/typecheck/11-typecheck-image-id.txt
+   M docs/USER_GUIDE.md
+   M evidence/ffi-abi/logs/19-rust-stage-console.log
+   M evidence/ffi-abi/logs/20-cargo-build-release.log
+   M evidence/ffi-abi/logs/21-staticlib.txt
+   M evidence/ffi-abi/logs/22-rust-targets.txt
+   M evidence/ffi-abi/logs/23-cargo-test.log
+   M evidence/m0-build/build-logs/20-qt6-image-build.log
+   M evidence/m0-build/build-logs/21-qt6-image-id.txt
+   M evidence/m0-build/build-logs/32-qt6-build.log
+   M evidence/m0-build/build-logs/34-qt6-elf.txt
+  ?? evidence/glibc217-feasibility/
+  ?? evidence/runtime-deps/
+  ?? evidence/user-guide-split/
+  ?? evidence/verdicts/fix-shell-terminal/
+  ?? evidence/verdicts/search-jump-kte/
+  ?? evidence/verdicts/user-guide/
+artifact: target/qt6-build/src/app/vedit-app
+artifact_sha256: 49c45d1b8fafd86cb6468218667a50cc8b9499e5d6a5fc4b640a1db71ec91662
+artifact_size: 71618608 bytes
+artifact_built: 2026-10-31 22:13:39.312828044 +0800
+build_image: vedit-qt6-build:local (sha256:7579a0551ee3...)
+build_image_glibc: ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43
