@@ -1,6 +1,6 @@
 # VEdit 交接文档
 
-> 交接时间：**2026-10-31 16:35 (+08:00)** · 分支 `feat/qt6-ktexteditor-migration` · HEAD `4775bee`
+> 交接时间：**2026-10-31 16:40 (+08:00)** · 分支 `feat/qt6-ktexteditor-migration` · HEAD 见 `git log -1`
 > 上一轮编排（cellwork）已强制归档，原因与故障模式见 [`07-cellwork-postmortem.md`](07-cellwork-postmortem.md)。
 > **这套文档是给人看的，不是给流程看的**：它优先写清「什么真的是真的」，其次才写「还差什么」。
 
@@ -35,18 +35,23 @@
 
 ## 树的现状（交接那一刻）
 
-- `git status` 有**未提交改动**：`CMakeLists.txt`、`src/app/{CMakeLists.txt,main.cpp}`（根构建登记与终端接线）、
-  `evidence/m0-build/build-logs/*`（被 `build-qt.sh` 重写的构建日志）。
-- 未跟踪：`docs/handover/**`、`evidence/build-registration/**`、`evidence/edit-core/**`、`src/editor/probes/**`、`target/`（已忽略）。
-- 体积 **392 M**（收口前 16 G），明细见 `evidence/tree-cleanup/REPORT.md`。
+- `git status` **干净**。本轮所有工作都已提交（`dev` 之后 10 个提交，HEAD 见 `git log -1`）。
+- `target/` 是 `.gitignore` 掉的构建树（266 M），里面是最近一次绿构建的产物，可直接复用，不需要就当垃圾删。
+- 分支 `feat/qt6-ktexteditor-migration` **只存在于本地**，没有 push（用户明确说"push个啥"）。
+- 体积 **392 M** 源码 + 266 M 构建树（收口前合计 16 G），明细见 `evidence/tree-cleanup/REPORT.md`。
 - **唯一交付物**：`packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage`，65,673,720 B，
   sha256 `74bd6aae2af9aefc8a2200d5ff66b1868c3e8281fb77de21f7859c5cafb33faa`。收口后重跑自检仍 PASS。
 
 ## 接手的第一步该做什么
 
-1. **把未提交的接线提交掉**（G9）。它在工作树里能通过构建，一次干净 checkout 就会退回"假绿"。
-2. **重跑一次 `bash scripts/build-qt.sh`**，把 target 清单和 ctest 结果写进 `evidence/build-registration/`，并带上采集时间与树状态。
-3. 然后按 [`03-architecture.md`](03-architecture.md) §6「收口顺序」往下走。
+1. **先确认根构建登记还在**（G9 已修并提交）：`grep -A8 VEDIT_LANE_DIRECTORIES CMakeLists.txt` 应当看到
+   provider / kde / grammars / terminal / overlay(if EXISTS) 五条；`readelf -d target/qt6-build/src/app/vedit-app | grep terminal` 应当有输出。
+   一次干净 checkout 退回旧状态的话，`src/terminal` 与 `src/syntax/grammars` 又会变成"在树里但不编译"。
+2. **修 G2/G3**：把 syntax 三个库链进 `vedit-app` 并把 `VEDIT_SYNTAX_GRAMMAR` 从 `none` 改成 `verilog`。
+   这一步做完，产品才第一次真正有语法高亮。
+3. **重跑 `bash scripts/build-qt.sh`**，按 [`05-build-and-verify.md`](05-build-and-verify.md) §2 的规则重采证据
+   （采集时间 + HEAD + target 清单 + 一次证伪）。
+4. 然后按 [`03-architecture.md`](03-architecture.md) §6「收口顺序」往下走。
 
 **不要**先做新功能。当前最贵的问题不是缺功能，是**构建链和产品之间断着**：
 `syntax` 三个库编译了但没链进 `vedit-app`，`vedit-app` 里用的还是 `QPlainTextEdit` 的 `DemoEditorProvider`，
