@@ -49,15 +49,38 @@ chmod +x VEdit-0.1.1-x86_64.run && ./VEdit-0.1.1-x86_64.run
 - 退出时清理解包目录；调试时设 `VEDIT_KEEP_TMP=1` 可保留并打印路径；
 - 参数原样传给编辑器（`--selftest all`、`--version` 等）。
 
+### 1.4 从源码得到 Qt6 构建（v2 交付物）
+
+§1.1–1.3 是**旧 GTK3 产物**的安装方式。要拿到 v2 的 Qt6 交付物，从源码构建：
+
+```sh
+bash scripts/build-qt.sh              # 固定镜像 → Rust 服务层 → configure → build → ctest → xcb 冒烟
+bash scripts/build-qt.sh --no-test    # 只 configure + build
+```
+
+产物是 **`target/qt6-build/src/app/vedit-app`**（CMake 构建树在 gitignored 的 `target/qt6-build/`）。
+`bash scripts/build.sh` 是**旧产品**：只产出 `target/release/vd-app`，**不产出 `vedit-app`**。
+
+把 `vedit-app` 放到另一台机器直接跑时，需要 KF6/Qt6 运行库、`libtree-sitter0.25` 和 Qt 平台插件
+（`libqxcb`）；实测包名见 `evidence/runtime-deps/REPORT.md` §1，构建期版本矩阵见 `docs/BUILD.md`
+§12.3。注意构建基线是 glibc 2.43，比它老的系统（含 CentOS 7）要连 glibc 一起打包（同文件 §2）。
+
 ## 2. 第一次使用
+
+本文同时标注 **Qt6 产品** 与 **旧 GTK3 产物** 的差异：两者的命令行选项与工程根起点不同，
+请先确认手上的产物版本，再照下面的步骤操作。
 
 1. 启动后 `Ctrl+O` 打开一个 `.sv`/`.v` 文件，或直接把文件路径作为参数；
 2. 底部状态栏依次显示：光标位置、文件路径、语言（`systemverilog`/`verilog`）、
    verible 诊断数、slang 诊断数、FIM 状态、LSP 进程状态；
-3. 打开工程（Qt6）：启动时用 `--project <dir>` 指定工程目录（或恢复上次会话）。工程根
-   **从该目录向上逐级查找**：在每一级依次看 `vedit.toml`（优先）→ `.git` → 该目录是否
+3. 打开工程：先确认手上是哪一版——**Qt6 构建** → 启动时用 `--project <dir>` 指定工程目录
+   （或恢复上次会话）；**旧 GTK3 产物** → 该版本不认识 `--project`，会以
+   `unknown option '--project'` 在 GUI 启动前直接退出（`crates/vd-app/src/cli.rs:101`；
+   解析发生在 GUI 之前，`crates/vd-app/src/main.rs:25`），请先 `cd` 到工程目录再启动。
+   工程根**从起点目录向上逐级查找**：在每一级依次看 `vedit.toml`（优先）→ `.git` → 该目录是否
    **直接包含 `*.f`**，命中的第一级即工程根（来源依次报告为 `vedit_toml` / `git_dir` /
-   `filelist`，都没命中的退化为起始目录 `fallback`）。
+   `filelist`，都没命中的退化为起始目录 `fallback`）；起点目录的定义见本节末
+   （Qt6 = `--project` 目录，旧 GTK3 = 进程启动目录）。
    所以一个只带 `project.f` 的目录本身也算工程根，即使它位于更大的 git 仓库内部：以该目录为
    起点时根就是它自己（`filelist`），而以它所在的外层仓库为起点时根仍是外层（`git_dir`），
    嵌套的 `.f` 不会把根改到子目录；同一目录同时有 `.git` 与 `*.f` 时根不变，来源按更强的
@@ -72,9 +95,11 @@ chmod +x VEdit-0.1.1-x86_64.run && ./VEdit-0.1.1-x86_64.run
 **不是由打开文件推导**：`--project` 写入 `ShellOptions.projectRoot`
 （`src/workspace/integration.h:26`），`src/workspace/project/project_integration.cpp:56,69`
 直接 `model->open(root)`，全仓没有 file-open → project-root 的连线。
-`crates/vd-config` 的 `Loader::new(start_dir)` 契约规定**调用方应传被打开文件所在目录**
-（`crates/vd-config/src/lib.rs:93-103`），而 Qt6 当前 shell 传的是 `--project` 的值；
-GTK3 前端当前传的是进程启动目录（`crates/vd-app/src/config_glue.rs:63`，与契约不一致）。
+`crates/vd-config` 的 `Loader::new(start_dir)` 接口约定**调用方应传被打开文件所在目录**
+（`crates/vd-config/src/lib.rs:93-103`），但这只是该接口的契约，**当前两个前端都没有按它传**：
+Qt6 当前 shell 传的是 `--project` 的值；GTK3 前端传的是进程启动目录
+（`crates/vd-app/src/config_glue.rs:63`）。所以实际起点永远是上面的 `--project` 目录 /
+进程启动目录，**不是打开的文件**。
 因此 Qt6 里用 `--project` 指定工程目录（根发现从该目录向上）；旧 GTK3 前端要先 `cd` 到期望的
 工程目录再启动。
 
@@ -193,7 +218,7 @@ accept-fim = "Tab"
 | 内容 | 位置 |
 |---|---|
 | 用户配置 | `$XDG_CONFIG_HOME/vedit/vedit.toml`（默认 `~/.config/vedit/vedit.toml`） |
-| 工程配置 | `<工程根>/vedit.toml`（工程根 = 从打开位置向上第一个命中 `vedit.toml` / `.git` / 直接含 `*.f` 的目录；同一级优先 `vedit.toml` > `.git` > `*.f`） |
+| 工程配置 | `<工程根>/vedit.toml`（工程根 = 从起点目录向上第一个命中 `vedit.toml` / `.git` / 直接含 `*.f` 的目录；起点目录：Qt6 = `--project <dir>` 指定的目录，旧 GTK3 = 进程启动目录；同一级优先 `vedit.toml` > `.git` > `*.f`） |
 | Verible lint 规则 | `<工程根>/.rules.verible_lint`（无则用 Verible 默认） |
 | filelist | `<工程根>/*.f`，以及 `[project] filelists` 里列出的 |
 | GtkSourceView 数据 | 包内 `share/gtksourceview-4/`（启动脚本导出 `VEDIT_GSV_DATADIR`） |

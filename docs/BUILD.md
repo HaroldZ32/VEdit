@@ -219,6 +219,11 @@ bash scripts/build-qt.sh              # 镜像 → configure → build → ctest
 bash scripts/build-qt.sh --no-test    # 只 configure + build（即 C++ 静态检查）
 ```
 
+**产物路径：`target/qt6-build/src/app/vedit-app`**（CMake 构建树 `target/qt6-build/` 已被 gitignore）。
+`bash scripts/build.sh` 是旧 Rust/GTK3 产品，只写 `target/release/vd-app`，不产出 `vedit-app`。
+运行期依赖（KF6/Qt6 运行库、`libtree-sitter0.25`、Qt 平台插件 `libqxcb`）的实测包名见
+`evidence/runtime-deps/REPORT.md` §1，运行期打包边界见本文件 §12.6。
+
 每一步的原始输出落在 **`evidence/m0-build/build-logs/`**（T10 的证据目录，随仓库提交）；
 CMake 构建树在 gitignored 的 **`target/qt6-build/`**，探针目录在 `target/qt6-probe/`：
 
