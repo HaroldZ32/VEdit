@@ -32,16 +32,24 @@
   tree-sitter grammar 绑定（三配置各 **79/79**）、文件树、命令面板、全局搜索、终端
   （自写 pty + VT，零新依赖，因为 QTermWidget 是 GPL-2.0 而本仓是 MIT）。
 
-### 1.2 假绿（代码在树里，从没被编译过）——最高优先级
+### 1.2 假绿与装配缺口 —— 最高优先级
 
-`CMakeLists.txt` 的 `VEDIT_LANE_DIRECTORIES` 只登记了 `src/syntax/provider` 和 `src/syntax/kde`。
-以下三条 lane **存在但不在构建里**：
+> **更正（2026-10-31 交接核查）**：本条原文把 `src/syntax/overlay` 写成"已存在但未入构建的 lane"，
+> **这是错的** —— 该目录**根本不存在**，overlay 只到 C17 探针为止。
+> 逐条带 file:line 的缺口清单以 [`../handover/03-architecture.md`](../handover/03-architecture.md) §6（G1–G10）为准。
 
-- `src/terminal`（终端整条 lane）
-- `src/syntax/grammars`（tree-sitter grammar，T17 的 79/79 是它自己的 CMake 跑的，不是根构建）
-- `src/syntax/overlay`（tree-sitter 着色叠加）
+`CMakeLists.txt` 的 `VEDIT_LANE_DIRECTORIES` 原先只登记 `src/syntax/provider` 和 `src/syntax/kde`。
+本轮已补上 `src/syntax/grammars`、`src/terminal`、`src/syntax/overlay`（最后一条用 `if(EXISTS)` 守着，
+目录不存在时配置期打印 skipped），并用"放 `#error` 必须变红"的反例证明过
+（`evidence/build-registration/00-counterexample.txt`）。**这批改动当时未提交。**
 
-外加 `src/app` 还差终端面板的 `setFactory("terminal", …)` 与 `vedit_terminal` 链接。
+但真正决定"产品有没有编辑器"的不是上面三条，而是这四条：
+
+- `vedit-app` 里用的是 `DemoEditorProvider`（`QPlainTextEdit`），**KTextEditor 没有进产品**（G1）
+- syntax 三个库编译了却**没链进 `vedit-app`**（`readelf -d` 无 `KF6TextEditor` / `libtree-sitter`）（G2）
+- 根 configure 的 `VEDIT_SYNTAX_GRAMMAR=none`，`SyntaxService` 默认 inactive（G3）
+- 打包链装的是 M0 冒烟程序，**`vedit-app` 从来没被装进去过**（G7）
+
 **这正是项目已经栽过一次的同一类事故**（T63 之前 `src/syntax/provider` 编译 0 个文件而闸门全绿）。
 不修这一条，后面每一条“通过”都不可信。
 
