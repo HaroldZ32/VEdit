@@ -13,17 +13,36 @@ set -uo pipefail
 
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 ROOT=$(cd "$HERE/../.." && pwd)
-EVID="$ROOT/evidence/m0-runtime"
+# Every step below uses `packaging/runtime/...` or `scripts/...` relative to the
+# tree being packaged; pin the working directory to that tree so invoking this
+# script from another checkout cannot run the wrong build-appimage.sh (caught in
+# T31 phase 2: a relative call hashed the caller's appimagetool cache).
+cd "$ROOT"
+EVID=${VEDIT_PACK_EVIDENCE:-"$ROOT/evidence/slice3-pack"}
 OUT="$ROOT/packaging/runtime/out"
 IMAGE=${VEDIT_QT6_BUILD_IMAGE:-vedit-qt6-build:local}
-SMOKE="$ROOT/target/qt6-build/cmake/smoke/vedit-m0-smoke"
+APP="$ROOT/target/qt6-build/src/app/vedit-app"
 PROBE="$ROOT/target/qt6-build/cmake/smoke/vedit-ksh-env-probe"
 KSH_F2="$ROOT/target/ksh-selfbuild/F2/install"
 CENTOS_PROBE=1
 [ "${1:-}" = "--no-centos-probe" ] && CENTOS_PROBE=0
 CENTOS_IMAGE="docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4"
 
-mkdir -p "$EVID"
+mkdir -p "$EVID" "$ROOT/packaging/appimage/.cache"
+# The AppImage tool is pinned by URL + sha256; fetch it once into the cache.
+# shellcheck source=/dev/null
+set -a; . "$ROOT/scripts/versions.env"; set +a
+VENDORED="$ROOT/packaging/appimage/vendor/appimagetool-x86_64"
+TOOL="$ROOT/packaging/appimage/.cache/appimagetool.AppImage"
+if [ -x "$VENDORED" ]; then TOOL="$VENDORED"; fi
+if [ ! -x "$TOOL" ]; then
+  echo "fetching pinned appimagetool -> $TOOL"
+  curl -fsSL "${APPIMAGETOOL_URL:?APPIMAGETOOL_URL missing}" -o "$TOOL"
+  chmod +x "$TOOL"
+  got=$(sha256sum "$TOOL" | cut -d' ' -f1)
+  [ "$got" = "${APPIMAGETOOL_SHA256:?APPIMAGETOOL_SHA256 missing}" ] || {
+    echo "FAIL: appimagetool sha256 mismatch: want=$APPIMAGETOOL_SHA256 got=$got" >&2; exit 1; }
+fi
 fail=0
 step() { printf '\n===== %s =====\n' "$*"; }
 
@@ -32,11 +51,16 @@ echo "VEdit M0 private runtime — F2 build ($(date -u +%Y-%m-%dT%H:%M:%SZ))"
 step "preflight"
 {
   echo "image: $IMAGE"; docker image inspect "$IMAGE" --format 'image_id={{.Id}} size={{.Size}}' 2>/dev/null || { echo "FAIL: image missing"; exit 1; }
-  echo "smoke: $SMOKE"; [ -f "$SMOKE" ] && echo "  sha256=$(sha256sum "$SMOKE" | cut -d' ' -f1)" || echo "FAIL: smoke missing"
+  echo "vd-app: $APP"; [ -x "$APP" ] && echo "  sha256=$(sha256sum "$APP" | cut -d' ' -f1)" || echo "FAIL: vd-app missing (run bash scripts/build-qt.sh)"
   echo "probe: $PROBE"; [ -x "$PROBE" ] && echo "  sha256=$(sha256sum "$PROBE" | cut -d' ' -f1)" || echo "FAIL: probe missing"
   echo "f2 install: $KSH_F2"; [ -d "$KSH_F2" ] && sha256sum "$KSH_F2"/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0 2>/dev/null || echo "FAIL: F2 tree missing"
   echo "whitelist: $(ls "$ROOT/resources/syntax"/*.xml 2>/dev/null | wc -l) xml in resources/syntax/"
-  echo "appimagetool: $ROOT/packaging/appimage/.cache/appimagetool.AppImage"
+  echo "toolchain: verible=$ROOT/.mpd/recon/verible/bin slang=$ROOT/build/slang/out/slang"
+  for t in "$ROOT/.mpd/recon/verible/bin/verible-verilog-ls" "$ROOT/build/slang/out/slang"; do
+    [ -x "$t" ] && echo "  $(sha256sum "$t" | cut -d' ' -f1)  $t" || echo "FAIL: toolchain artifact missing: $t"
+  done
+  echo "appimagetool: vendored=$ROOT/packaging/appimage/vendor/appimagetool-x86_64 cache=$ROOT/packaging/appimage/.cache/appimagetool.AppImage"
+  [ -x "$TOOL" ] || echo "FAIL: appimagetool missing (vendor and cache)"
   # `ldconfig -p` prints the whole cache (tens of KiB), so `grep -m1` would exit at
   # the first match and SIGPIPE it under this script's `set -uo pipefail`: the
   # `|| echo` would then claim libfuse is missing while it is installed. A plain
@@ -48,9 +72,29 @@ grep -q 'FAIL' "$EVID/00-preflight.log" && fail=1
 
 step "1/7 assemble AppDir (F2: self-built library + whitelist)"
 docker run --rm -e HOME=/tmp -v "$ROOT:/vedit-build" -w /vedit-build "$IMAGE" \
-  bash packaging/runtime/assemble-appdir.sh > "$EVID/10-assemble.log" 2>&1
+  bash packaging/runtime/assemble-appdir.sh --require-toolchain > "$EVID/10-assemble.log" 2>&1
 rc=$?; echo "assemble exit=$rc" | tee -a "$EVID/10-assemble.log"; tail -5 "$EVID/10-assemble.log"
 [ "$rc" -eq 0 ] || { echo "assemble FAILED"; exit 1; }
+
+step "1b/7 delivery invariants (T31: vd-app, Qt plugins, static FFI, toolchain)"
+{
+  echo "== AppDir delivery invariants =="
+  for f in bin/vd-app plugins/platforms/libqxcb.so plugins/platforms/libqoffscreen.so \
+           plugins/kf6/parts/katepart.so bin/verible-verilog-ls bin/slang \
+           usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml; do
+    if [ -e "$OUT/AppDir/$f" ]; then echo "OK   $f"; else echo "MISS $f"; fail=1; fi
+  done
+  echo "== FFI linkage (static into vd-app) =="
+  readelf -d "$OUT/AppDir/bin/vd-app" | grep -E 'NEEDED' | sed 's/^/  /'
+  echo "  libvd_ffi.so NEEDED entries: $(readelf -d "$OUT/AppDir/bin/vd-app" | grep -c 'libvd_ffi' || true)"
+  echo "  vd_* symbols in vd-app: $(nm "$OUT/AppDir/bin/vd-app" 2>/dev/null | grep -c ' T vd_' || true)"
+  echo "== toolchain sha256 =="
+  sha256sum "$OUT/AppDir/bin/verible-verilog-ls" "$OUT/AppDir/bin/slang" | sed 's/^/  /'
+  echo "== AppRun VEDIT_SYNTAX_DIR =="
+  grep -n 'VEDIT_SYNTAX_DIR' "$OUT/AppDir/AppRun" || true
+} > "$EVID/15-delivery-invariants.log" 2>&1
+grep -E 'MISS|NEEDED|vd_\*|sha256|VEDIT_SYNTAX_DIR' "$EVID/15-delivery-invariants.log" | head -12
+grep -q '^MISS ' "$EVID/15-delivery-invariants.log" && fail=1
 
 step "2/7 licence / not-shipped gate (delivery mode: must be all green)"
 bash packaging/runtime/verify-not-shipped.sh "$OUT/AppDir" > "$EVID/20-not-shipped.log" 2>&1
@@ -61,7 +105,7 @@ grep -E 'CHECK (PASS|FAIL)|summary' "$EVID/20-not-shipped.log" | tail -12
 step "3/7 runtime self-check (AppDir, clean env)"
 bash packaging/runtime/selfcheck.sh --appdir "$OUT/AppDir" > "$EVID/30-selfcheck-appdir.log" 2>&1
 rc=$?; echo "selfcheck(appdir) exit=$rc" | tee -a "$EVID/30-selfcheck-appdir.log"
-grep -E 'KSH-ENV defs=|KSH-GUARD|M0-SMOKE ok=|CHECK |SELFCHECK' "$EVID/30-selfcheck-appdir.log"
+grep -E 'KSH-ENV defs=|KSH-GUARD|APP-SHELL-SELFTEST|TOOLCHAIN|CHECK |SELFCHECK' "$EVID/30-selfcheck-appdir.log"
 [ "$rc" -eq 0 ] || fail=1
 
 step "4/7 F2 isolation with a simulated KDE host + user definitions"
@@ -76,6 +120,11 @@ rc=$?; echo "appimagetool exit=$rc" | tee -a "$EVID/50-appimage.log"
 grep -E 'APPIMAGE|sha256|SOURCE_DATE' "$EVID/50-appimage.log"
 [ "$rc" -eq 0 ] || { echo "AppImage build failed"; exit 1; }
 APPIMAGE=$(grep -m1 '^APPIMAGE=' "$EVID/50-appimage.log" | cut -d= -f2-)
+if [ -n "$APPIMAGE" ] && [ -f "$APPIMAGE" ]; then
+  ( cd "$(dirname "$APPIMAGE")" && sha256sum "$(basename "$APPIMAGE")" > SHA256SUMS )
+  cp "$(dirname "$APPIMAGE")/SHA256SUMS" "$EVID/SHA256SUMS"
+  echo "SHA256SUMS:"; cat "$EVID/SHA256SUMS"
+fi
 
 step "6/7 self-check + F2 isolation on the AppImage"
 bash packaging/runtime/selfcheck.sh --appimage "$APPIMAGE" > "$EVID/60-selfcheck-appimage.log" 2>&1
@@ -95,11 +144,11 @@ if [ "$CENTOS_PROBE" -eq 1 ]; then
     echo "host: $(docker run --rm "$CENTOS_IMAGE" cat /etc/centos-release 2>&1 | head -1)"
     echo "glibc: $(docker run --rm "$CENTOS_IMAGE" ldd --version 2>&1 | head -1)"
     docker run --rm -e HOME=/tmp -e QT_QPA_PLATFORM=offscreen -v "$OUT/centos7-appdir:/app:ro" \
-      "$CENTOS_IMAGE" /app/AppRun --selfcheck --expect-libc-prefix /app 2>&1
+      "$CENTOS_IMAGE" /app/AppRun --selfcheck 2>&1
     echo "centos7_smoke_exit=$?"
   } > "$EVID/70-centos7-probe.log" 2>&1
-  grep -E 'M0-SMOKE|KSH-GUARD|centos7_smoke_exit' "$EVID/70-centos7-probe.log"
-  grep -q 'M0-SMOKE ok=1' "$EVID/70-centos7-probe.log" && grep -q 'centos7_smoke_exit=0' "$EVID/70-centos7-probe.log" \
+  grep -E 'APP-SHELL-SELFTEST|TOOLCHAIN|KSH-GUARD|centos7_smoke_exit' "$EVID/70-centos7-probe.log"
+  grep -q 'APP-SHELL-SELFTEST ok=1' "$EVID/70-centos7-probe.log" && grep -q 'centos7_smoke_exit=0' "$EVID/70-centos7-probe.log" \
     && echo "CHECK PASS  CentOS 7 mechanism probe" || { echo "CHECK FAIL  CentOS 7 mechanism probe"; fail=1; }
 fi
 

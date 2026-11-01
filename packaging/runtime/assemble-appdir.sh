@@ -24,7 +24,7 @@ set -euo pipefail
 
 ROOT=${ROOT:-/vedit-build}
 VERSION=$(awk -F'"' '/^version = / {print $2; exit}' "$ROOT/Cargo.toml" 2>/dev/null || echo "0.0.0")
-SMOKE="$ROOT/target/qt6-build/cmake/smoke/vedit-m0-smoke"
+APP="$ROOT/target/qt6-build/src/app/vedit-app"
 PROBE_TOOL="$ROOT/target/qt6-build/cmake/smoke/vedit-ksh-env-probe"
 KSH_F2=""
 OUT="$ROOT/packaging/runtime/out/AppDir"
@@ -47,7 +47,7 @@ while [ $# -gt 0 ]; do
 done
 [ -n "$KSH_F2" ] || KSH_F2="$ROOT/target/ksh-selfbuild/F2/install"
 [ -d "$KSH_F2" ] || { echo "ERROR: F2 install tree missing: $KSH_F2 (run scripts/build-ksh-selfbuild.sh with KSH_FORM=F2)" >&2; exit 1; }
-[ -f "$SMOKE" ] || { echo "ERROR: smoke binary missing: $SMOKE" >&2; exit 1; }
+[ -x "$APP" ] || { echo "ERROR: product binary missing: $APP (run bash scripts/build-qt.sh)" >&2; exit 1; }
 [ -x "$PROBE_TOOL" ] || { echo "ERROR: env probe missing: $PROBE_TOOL" >&2; exit 1; }
 [ -d "$WHITELIST" ] || { echo "ERROR: whitelist dir missing: $WHITELIST" >&2; exit 1; }
 
@@ -85,16 +85,25 @@ F2LIB=$(ls -1 "$KSH_F2"/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.* 2>/
 
 rm -rf "$OUT"
 mkdir -p "$OUT"/{bin,lib,plugins/platforms,plugins/xcbglintegrations,plugins/kf6/parts} \
-         "$OUT"/{share/fonts,share/ksyntaxhighlighting/testdata/syntax,etc/fonts} \
+         "$OUT"/{share/fonts,etc/fonts} \
          "$OUT"/usr/share/org.kde.syntax-highlighting/syntax "$OUT"/usr/share/vedit
 
 # --- 1. programs -------------------------------------------------------------
-install -m 0755 "$SMOKE" "$OUT/bin/vedit-m0-smoke"
+# T31: the delivered product binary is the Qt/KTextEditor `vedit-app`, installed as
+# `bin/vd-app` (the M0 smoke binary is no longer part of the AppDir).
+install -m 0755 "$APP" "$OUT/bin/vd-app"
 install -m 0755 "$PROBE_TOOL" "$OUT/bin/vedit-ksh-env-probe"
-log "binary: $(sha256sum "$SMOKE" | cut -d' ' -f1)  probe: $(sha256sum "$PROBE_TOOL" | cut -d' ' -f1)"
+log "vd-app: $(sha256sum "$APP" | cut -d' ' -f1)  probe: $(sha256sum "$PROBE_TOOL" | cut -d' ' -f1)"
 
 # --- 2. plugins (dlopen-only) ------------------------------------------------
-for p in libqoffscreen.so libqminimal.so libqxcb.so libqwayland.so; do
+# ldd cannot see Qt platform plugins (they are dlopen'ed), so they are copied
+# explicitly. xcb and offscreen are REQUIRED (the delivery and headless evidence
+# both need them); minimal/wayland stay optional.
+for p in libqxcb.so libqoffscreen.so; do
+  [ -f "$PLUGROOT/platforms/$p" ] || { echo "ERROR: required Qt platform plugin missing: $PLUGROOT/platforms/$p" >&2; exit 1; }
+  install -m 0755 "$PLUGROOT/platforms/$p" "$OUT/plugins/platforms/$p"
+done
+for p in libqminimal.so libqwayland.so; do
   [ -f "$PLUGROOT/platforms/$p" ] && install -m 0755 "$PLUGROOT/platforms/$p" "$OUT/plugins/platforms/$p"
 done
 for p in "$PLUGROOT"/xcbglintegrations/*.so; do
@@ -119,7 +128,7 @@ install -m 0644 "$(readlink -f "$F2LIB")" "$OUT/lib/libKF6SyntaxHighlighting.so.
 # the DISTRO library (the build image has it installed), and an unmarked copy_dep
 # would silently overwrite the self-built library with the distro one.
 COPIED[libKF6SyntaxHighlighting.so.6]=1
-for root in "$OUT/bin/vedit-m0-smoke" "$OUT/bin/vedit-ksh-env-probe" "$OUT/lib/libKF6SyntaxHighlighting.so.6" \
+for root in "$OUT/bin/vd-app" "$OUT/bin/vedit-ksh-env-probe" "$OUT/lib/libKF6SyntaxHighlighting.so.6" \
             "$OUT/plugins/kf6/parts/katepart.so" "$OUT"/plugins/platforms/*.so "$OUT"/plugins/xcbglintegrations/*.so; do
   [ -e "$root" ] || continue
   while read -r dep; do copy_dep "$dep"; done < <(closure "$root")
@@ -136,10 +145,16 @@ for g in libc.so.6 libm.so.6 libpthread.so.0 libdl.so.2 librt.so.1 libresolv.so.
 done
 
 # --- 5. whitelist syntax definitions (C5) ------------------------------------
+DATA_ROOT="$OUT/usr/share/org.kde.syntax-highlighting"
 for x in "$WHITELIST"/*.xml; do
   [ -e "$x" ] || continue
-  install -m 0644 "$x" "$OUT/usr/share/org.kde.syntax-highlighting/syntax/$(basename "$x")"
+  install -m 0644 "$x" "$DATA_ROOT/syntax/$(basename "$x")"
 done
+# T84/T110: AppRun exports VEDIT_SYNTAX_DIR as the DATA ROOT and the product's
+# shared syntax-directory helper probes <root>/syntax, so ONE copy under
+# <root>/syntax/ is the complete layout. No root-level XML copy is shipped (it
+# would only drift and make the THIRD_PARTY_NOTICES hash ambiguous).
+log "syntax data root: $(ls -1 "$DATA_ROOT/syntax"/*.xml 2>/dev/null | wc -l) xml under <root>/syntax/"
 python3 - "$OUT/usr/share/org.kde.syntax-highlighting/syntax" > "$OUT/usr/share/vedit/ksh-whitelist.txt" <<'PY'
 import glob, os, re, sys
 names = []
@@ -229,7 +244,6 @@ cat > "$OUT/etc/fonts/fonts.conf" <<'EOF'
   <config></config>
 </fontconfig>
 EOF
-install -m 0644 "$ROOT/cmake/smoke/testdata/syntax/vedit-smoke.xml" "$OUT/share/ksyntaxhighlighting/testdata/syntax/vedit-smoke.xml"
 # the whitelist definitions are LGPL-2.1-or-later derivatives: ship the licence text
 if [ -f "$ROOT/resources/syntax/LICENSE-LGPL-2.1" ]; then
   mkdir -p "$OUT/usr/share/doc/vedit/syntax"
@@ -256,6 +270,17 @@ print(len(glob.glob(os.path.join(sys.argv[1], "*.xml"))))
 PY
 )
 log "active whitelist files: $active (no syntax-bundled/)"
+
+# --- 7b. delivery invariants (T31) ------------------------------------------
+for required in bin/vd-app bin/verible-verilog-ls bin/slang \
+                plugins/platforms/libqxcb.so plugins/platforms/libqoffscreen.so \
+                plugins/kf6/parts/katepart.so usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml; do
+  [ -e "$OUT/$required" ] || { echo "ERROR: delivery artifact missing: $required" >&2; exit 1; }
+done
+[ -z "$(find "$OUT/bin" -maxdepth 1 -name 'vedit-m0-smoke' -print -quit)" ] || {
+  echo "ERROR: M0 smoke binary must not be part of the delivery AppDir" >&2; exit 1;
+}
+log "delivery invariants: vd-app + Qt platform plugins + toolchain + whitelist present"
 
 # --- 8. manifest + notices ---------------------------------------------------
 {

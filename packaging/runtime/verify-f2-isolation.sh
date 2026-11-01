@@ -28,6 +28,8 @@ while [ $# -gt 0 ]; do
   esac
 done
 [ -d "$APPDIR" ] || { echo "ERROR: no AppDir $APPDIR" >&2; exit 1; }
+APPDIR=$(cd "$APPDIR" && pwd -P)
+if [ -n "$APPIMAGE" ]; then APPIMAGE=$(cd "$(dirname "$APPIMAGE")" && pwd -P)/$(basename "$APPIMAGE"); fi
 WORK="$EVID/.f2-work"; rm -rf "$WORK"; mkdir -p "$WORK"
 LOG="$WORK/f2-isolation.log"
 ok=0; bad=0

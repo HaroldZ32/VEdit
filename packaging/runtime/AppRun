@@ -65,14 +65,12 @@ ksh_guard
 export LD_LIBRARY_PATH="$APPDIR/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 
 BIN="$APPDIR/bin/vd-app"
-[ -x "$BIN" ] || BIN="$APPDIR/bin/vedit-m0-smoke"
+[ -x "$BIN" ] || { echo "AppRun: product binary missing: $BIN" >&2; exit 1; }
 
 case "${1:-}" in
   --selfcheck)
     shift
-    exec "$APPDIR/ld-linux-x86-64.so.2" --library-path "$APPDIR/lib" "$BIN" \
-      --selfcheck --testdata "$APPDIR/share/ksyntaxhighlighting/testdata" \
-      --ksh-selfbuild --expect-kshlib-prefix "$APPDIR/lib" --expect-libc-prefix "$APPDIR/lib" "$@"
+    exec "$APPDIR/ld-linux-x86-64.so.2" --library-path "$APPDIR/lib" "$BIN" --selfcheck "$@"
     ;;
   *)
     exec "$APPDIR/ld-linux-x86-64.so.2" --library-path "$APPDIR/lib" "$BIN" "$@"

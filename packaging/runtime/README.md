@@ -62,3 +62,46 @@ bash packaging/runtime/build.sh          # 组装 → 许可闸门 → 自检 �
 2. 宿主直接 FUSE 挂载需 `libfuse2`（A7 前提）；无 libfuse2 时用 `APPIMAGE_EXTRACT_AND_RUN=1` 验证内容。
 3. 30 个主题仍内嵌在库（上游无开关，全部 MIT），本包不另发主题文件。
 4. 图标只随包应用图标；若 UI 需要系统图标主题，需补 hicolor 子集。
+
+
+## Delivery form (T31)
+
+- The AppDir installs the Qt/KTextEditor product as **`bin/vd-app`** (the M0
+  smoke binary is gone); `AppRun` only starts that binary.
+- Qt platform plugins **`libqxcb.so` and `libqoffscreen.so` are required** and are
+  copied explicitly (they are `dlopen`-ed and invisible to `ldd`).
+- The external toolchain (`bin/verible-verilog-*`, `bin/slang`) is installed with
+  `--require-toolchain` and sha256-checked; `selfcheck.sh` asserts
+  `TOOLCHAIN source=verible:bundled slang:bundled missing=[]`.
+- `VEDIT_SYNTAX_DIR` stays the **data root** (T84); the product's shared
+  syntax-directory helper normalises both spellings (T109/T110), so the assembly
+  ships **only** `<root>/syntax/vedit-*.xml` — the root-level duplicate used in
+  the skeleton phase is gone (a duplicate would drift and make the
+  THIRD_PARTY_NOTICES hash ambiguous).
+- `selfcheck.sh` reads `/proc/<pid>/maps` of a real product process and proves
+  the packaged loader + libc are used and the system loader is absent.
+- `build.sh` writes `out/SHA256SUMS` for the single-file AppImage and copies the
+  evidence into `evidence/slice3-pack/`.
+
+**Phase note:** the current delivery baseline is the pre-T106 commit
+(`9017685`). The final AppImage/SHA256SUMS/matrix are produced only after the
+T106 async-FIM change lands and the Lead freezes the final baseline.
+
+
+## appimagetool is vendored (reproducibility, T31)
+
+`appimagetool` is **not** downloaded from the upstream `continuous` asset at build
+time: that asset drifts. On 2026-11-01 two independent downloads hashed
+`ac7fd56feade6002c2f57db39587113275d351fce911a5fbb29ea84cd0666cab`
+(15,137,272 B), while `scripts/versions.env` pins
+`793fca0ce4bcc309dc65d3f66669f58e3755643e4dadbe03932e7b436128494f`.
+
+The pinned binary is committed as
+`packaging/appimage/vendor/appimagetool-x86_64` (15,104,504 B, sha256
+`793fca0ce4bcc309dc65d3f66669f58e3755643e4dadbe03932e7b436128494f`) and the
+builders prefer it; the cache/network fallback remains only for a deliberate
+refresh. The sha256 check is **fail-closed** in both paths (`build-appimage.sh`,
+`build.sh`) — a mismatched tool aborts the build instead of warning.
+Rationale: a reproducible build needs a reproducible tool; pinning a `continuous`
+URL means "works until upstream publishes again, then fails closed", which is
+what this workspace measured.

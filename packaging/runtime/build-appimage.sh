@@ -35,8 +35,14 @@ if [ -f "$APPDIR/PROBE-NOT-FOR-DELIVERY.txt" ] && [ "$PROBE" -ne 1 ]; then
   exit 1
 fi
 
+# Reproducibility: the tool is VENDORED with the pinned sha256, not downloaded
+# from the drifting `continuous` asset (two 2026-11-01 downloads hashed
+# ac7fd56f..., not the 793fca0c... pin). The cache fallback is kept for a
+# deliberate refresh, and the sha check below is never skipped.
+VENDORED="$ROOT/packaging/appimage/vendor/appimagetool-x86_64"
 TOOL="$ROOT/packaging/appimage/.cache/appimagetool.AppImage"
-[ -x "$TOOL" ] || { echo "ERROR: appimagetool not cached at $TOOL" >&2; exit 1; }
+if [ -x "$VENDORED" ]; then TOOL="$VENDORED"; fi
+[ -x "$TOOL" ] || { echo "ERROR: appimagetool missing (vendor and cache): $TOOL" >&2; exit 1; }
 # shellcheck source=/dev/null
 set -a; . "$ROOT/scripts/versions.env"; set +a
 want=${APPIMAGETOOL_SHA256:?APPIMAGETOOL_SHA256 missing from scripts/versions.env}

@@ -17,7 +17,9 @@
 #                   exits 0, but it prints DELIVERY_BLOCKED=yes. A probe AppDir
 #                   can never make this script report a deliverable runtime.
 #
-# Usage: verify-not-shipped.sh [--expect-probe] <AppDir>
+# Usage: verify-not-shipped.sh [--expect-probe|--expect-clean] <AppDir>
+#        (--expect-clean is the delivery spelling used by requirements C10; it is
+#         the default mode, the flag is accepted for compatibility.)
 set -uo pipefail
 
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
@@ -29,6 +31,7 @@ KDE_V=7199e3677b0a942e65b40f95cb2481be062b1ca48eb048519e7d4efc098f5970
 
 EXPECT_PROBE=0
 if [ "${1:-}" = "--expect-probe" ]; then EXPECT_PROBE=1; shift; fi
+if [ "${1:-}" = "--expect-clean" ]; then EXPECT_PROBE=0; shift; fi
 APPDIR=${1:?usage: verify-not-shipped.sh [--expect-probe] <AppDir>}
 [ -d "$APPDIR" ] || { echo "FAIL: no AppDir at $APPDIR" >&2; exit 2; }
 
