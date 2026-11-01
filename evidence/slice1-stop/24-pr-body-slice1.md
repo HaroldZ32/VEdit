@@ -194,3 +194,45 @@ cc6a594 test(fixtures): track the verilog demo samples the centos7 tarball ships
 42ea3e6 build(spike): track the glibc 2.17 feasibility probe script
 7169074 docs(evidence): record the gitignore hygiene review and its known trap
 ```
+
+---
+
+## ✅ 停点 1 已由用户放行 —— 最终交付状态（T90 / T91 已并入）
+
+### 门禁（最终冻结树，真实输出）
+```
+TYPECHECK-EXIT=0        [typecheck] PASS (pinned image vedit-build:local)
+BUILD-QT-EXIT=0         ctest: 100% tests passed, 0 tests failed out of 18
+```
+原始日志 `evidence/slice1-stop/{50-pre-run-final.txt,51-typecheck-final.log,52-build-qt-final.log}`。
+
+### 本轮并入的两个任务
+| 任务 | 内容 |
+|---|---|
+| **T90** | ① F-1 更正：`01-diagnosis-prefix.log` 改标为「开发机发行版库、库无关的机制证据」，**补采 `01b-diagnosis-prefix-f2.log`** 构成同口径红→绿（修前 `mode=None`、formats/folding=0 vs 修后 30/29、2/1），旧日志 sha256 `2041cab4…` 未改。② F-2 方案 A：`EditorArea` 新增**运行期** Ctrl+S 权威守卫（`ApplicationActivate`/`WindowActivate` + 2s 低频 QTimer，objectName `ctrlSAuthorityGuard`），`--selfcheck` 新增 6 条断言，**APP-SHELL-SELFTEST 182 checks / 0 failures**。边界：事件驱动即时，<2s 重灌窗口仍可能有一次歧义。 |
+| **T91** | 四条软 PASS 全部硬起来 + **5 例负向验证真的 FAIL**；`THIRD_PARTY_NOTICES §9.3` 补上游 URL；发现链统一四级；`evidence/centos7-real-machine/` 归档用户真机 **PASS=16 FAIL=0 SKIP=2**（逐项 Actual 留空并写明「待回贴补入」）。 |
+
+### 用户真机结果
+```
+PASS=16  FAIL=0  SKIP=2
+```
+Slice 1 四项功能人工确认：打开 / 高亮 / Ctrl+S / lint。
+
+### ⚠️ 版本提示（避免下一次复跑误会）
+| 包 | 说明 |
+|---|---|
+| `vedit-centos7-verify-acc58ee0.tar.gz` | **用户真机跑的旧构建** |
+| `vedit-centos7-verify-23514fb.tar.gz`（sha256 `e95f9817fec6106dc5259b8c1c9c12ccda9d4826834a5eb05ae0b7c62f43a17c`，104 MB） | T91 把脚本硬度修好后的**新包**；下一次真机复跑预期 **17 PASS / 1 SKIP**（`kernel.is-3.10` 转绿、`lint.product` 不再是 SKIP）。**两个包都是同一代产品，差别只在脚本硬度。** |
+
+> 两个 tarball 都**不入库**（`.gitignore` 的 `build/centos7-verify/dist/` 覆盖），只入库其 sha256。
+
+### 本轮提交
+```
+b62ff31 fix(app): keep Ctrl+S single-authority at runtime, not only at construction
+ecb6f12 docs(evidence): correct the highlight diagnosis baseline and add the F2 red-green pair
+a6aafd1 test(centos7): harden the on-machine verification and add negative checks
+8d0d110 feat(packaging): unify toolchain discovery and add upstream URLs to the notices
+d39fcd0 docs(evidence): archive the real-machine run and the T91 verification package
+0ce8395 docs(evidence): record the final gate run before the stop-point handover
+a5da47d docs(evidence): refresh the operational build logs
+```
