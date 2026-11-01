@@ -41,6 +41,16 @@ CentOS 7 image, because the deliverable must run on CentOS 7 (glibc 2.17).
   package names are in `evidence/runtime-deps/REPORT.md` §1 and the build matrix
   in `docs/BUILD.md` §12. **If you are verifying the v2 deliverable, use this
   command.**
+- Rust C ABI selfcheck of the product binary (T97): `target/qt6-build/src/app/vedit-app
+  --selfcheck-ffi crates/vd-ffi/tests/fixtures/project` (offscreen:
+  `QT_QPA_PLATFORM=offscreen`). `--selfcheck-ffi` asserts the **C ABI smoke
+  fixture's** file set (3 rtl files, `+incdir+inc`, `WIDTH=8`/`SIM`), so it must
+  be given `crates/vd-ffi/tests/fixtures/project`. It is **not** the
+  project-model fixture: `tests/fixtures/verilog-project` (T14) has 7 files and
+  its own expectations under `expected/`, validated by
+  `cargo test -p vd-ffi -p vd-config` (and by `scripts/verify-fixture.sh`).
+  Passing the T14 folder to `--selfcheck-ffi` is refused with a hint instead of
+  four misleading `ffi.project.*` failures.
 - Build the **legacy Rust/GTK3 product**: `bash scripts/build.sh` (one command:
   pinned image -> `cargo build --release --workspace` -> ELF assertion that the
   highest GLIBC symbol is <= 2.17 -> Xvfb `--selftest smoke` window check). It
@@ -56,6 +66,23 @@ CentOS 7 image, because the deliverable must run on CentOS 7 (glibc 2.17).
 
 The slang deep-lint binary has its own one-command build:
 `bash build/slang/build.sh`.
+
+### VCS panel: read-only, asynchronous, Git verified / SVN stub-only (T99)
+
+The VCS panel is a read-only view (backend, branch/revision, changed files, one
+file's diff). All three reads are **asynchronous jobs** in the C ABI
+(`vd_vcs_status` / `vd_vcs_info_job` / `vd_vcs_diff_job` + poll); the panel
+polls them from a QTimer, so no `git`/`svn` subprocess ever runs on the GUI
+thread. There is no write entry point in the seam or the C ABI, and the runner
+rejects write subcommands before spawning.
+
+Real-subprocess evidence: Git is covered end to end (the lane selftest starts a
+job against a repository and proves the event loop keeps ticking while a slow
+`git` wrapper sleeps; `vedit-app --selfcheck-ffi` also exercises the VCS status
+job). **SVN is stub-only**: neither the host nor the pinned image ships
+`svn`/`svnadmin`, so the real SVN subprocess path has no end-to-end test — the
+lane tests drive `StubVcsSource`/canned runners. Do not describe SVN support as
+verified until a real `svn` working-copy smoke exists.
 
 ### Runtime toolchain discovery (diagnostics / outline)
 
