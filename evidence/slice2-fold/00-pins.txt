@@ -1,0 +1,43 @@
+== evidence: 00-pins.txt — the tree this evidence belongs to
+time=2026-11-01T13:49:35+08:00
+branch=feat/qt6-ktexteditor-migration
+HEAD=31a7c2d10111a9ab6078a433b1aa8289b31197a6
+image=vedit-qt6-build:local sha256:28a15c623ce74454cb951a6fe4b66a3bea206c3509e5a104c373f73b310f1f77
+host=Linux 7.0.0-38-generic x86_64 GNU/Linux
+
+--- this task write scope ---
+?? evidence/slice2-fold/
+?? src/syntax/folding/
+?? src/workspace/breadcrumb/
+
+--- the rest of the shared worktree (other lanes; not this task) ---
+ M build/evidence/typecheck/00-run.txt
+ M build/evidence/typecheck/10-typecheck-image-build.log
+ M build/evidence/typecheck/11-typecheck-image-id.txt
+ M crates/vd-ffi/include/vd_ffi.h
+ M crates/vd-ffi/src/search.rs
+ M crates/vd-ffi/src/vcs.rs
+ M crates/vd-search/src/lib.rs
+ M crates/vd-vcs/src/lib.rs
+ M evidence/ffi-abi/logs/10-rust-image.txt
+ M evidence/ffi-abi/logs/19-rust-stage-console.log
+ M evidence/ffi-abi/logs/20-cargo-build-release.log
+ M evidence/ffi-abi/logs/21-staticlib.txt
+ M evidence/ffi-abi/logs/23-cargo-test.log
+ M evidence/ffi-abi/logs/26-vd_ffi.h
+ M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+ M evidence/m0-build/build-logs/20-qt6-image-build.log
+ M evidence/m0-build/build-logs/21-qt6-image-id.txt
+ M evidence/m0-build/build-logs/31-qt6-configure.log
+ M evidence/m0-build/build-logs/32-qt6-build.log
+ M evidence/m0-build/build-logs/34-qt6-elf.txt
+ M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+ M src/workspace/palette/README.md
+ M src/workspace/search/CMakeLists.txt
+ M src/workspace/search/README.md
+ M src/workspace/search/global_search.cpp
+ M src/workspace/search/global_search.h
+?? crates/vd-vcs/src/runner.rs
+?? crates/vd-vcs/src/service.rs
+?? crates/vd-vcs/tests/
+?? evidence/slice2-find/

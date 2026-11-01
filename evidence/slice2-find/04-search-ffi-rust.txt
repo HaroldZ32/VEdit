@@ -1,0 +1,35 @@
+== search index ownership: Rust service, no Qt second implementation (T21) ==
+collected_at: 2026-11-01T05:45:27Z
+git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+
+## the backend only calls the Rust C ABI
+146:            const quint64 job = vd_search_tree_query(
+160:                    const qint32 status = vd_search_tree_poll(service, job, &results, &ffiSummary);
+182:                        vd_search_results_free(&results);
+
+## no directory walk / file reading in the Qt backend (expected: no hits)
+NO-HITS (backend is a pure FFI consumer)
+
+## the Rust service owns walk + match
+424:pub fn search_tree(
+425-    root: &Path,
+426-    needle: &str,
+427-    options: &TreeOptions,
+
+## C ABI surface (cbindgen header)
+920: with [`vd_search_tree_poll`], which also returns the observable summary.
+927:uint64_t vd_search_tree_query(struct VdService *service,
+976:int32_t vd_search_tree_poll(struct VdService *service,
+
+## symbols in the product binary and the selftest
+-- target/qt6-build/src/app/vedit-app
+25
+-- target/qt6-build/src/app/workspace-lane-search/vedit-workspace-search-selftest
+25
+
+## Rust service unit tests
+cmd: cargo test -p vd-search (pinned Rust image)
+running 10 tests
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+running 0 tests
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

@@ -1,0 +1,46 @@
+== FFI ownership: Qt consumes the Rust VCS backend, no second implementation ==
+collected_at: 2026-11-01T05:58:23Z
+git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+
+## Qt source calls only vd_vcs_* (C ABI)
+77:    VdVcsInfo raw = vd_vcs_info(root.c_str());
+82:    vd_vcs_info_free(&raw);
+97:    const unsigned long long job = vd_vcs_status(service, root.c_str());
+102:        state = vd_vcs_poll(service, job, &raw);
+117:        vd_vcs_status_free(&raw);
+129:    VdVcsDiff raw = vd_vcs_diff(root.c_str(), path.c_str());
+134:    vd_vcs_diff_free(&raw);
+
+## no Qt-side process spawn / git / svn invocation
+NO-HITS (Qt does not spawn git/svn)
+
+## read-only C ABI surface (no write entry point)
+102:pub unsafe extern "C" fn vd_vcs_status(service: *mut VdService, root: *const c_char) -> u64 {
+124:pub unsafe extern "C" fn vd_vcs_poll(
+160:pub unsafe extern "C" fn vd_vcs_status_free(status: *mut VdVcsStatus) {
+240:pub unsafe extern "C" fn vd_vcs_info(root: *const c_char) -> VdVcsInfo {
+265:pub unsafe extern "C" fn vd_vcs_info_free(info: *mut VdVcsInfo) {
+288:pub unsafe extern "C" fn vd_vcs_diff(root: *const c_char, path: *const c_char) -> VdVcsDiff {
+313:pub unsafe extern "C" fn vd_vcs_diff_free(diff: *mut VdVcsDiff) {
+
+## cbindgen header
+1144:uint64_t vd_vcs_status(struct VdService *service, const char *root);
+1154:int32_t vd_vcs_poll(struct VdService *service, uint64_t job, struct VdVcsStatus *out);
+1161: `status` must be null or point to a struct filled by [`vd_vcs_poll`] and not
+1164:void vd_vcs_status_free(struct VdVcsStatus *status);
+1172: released with `vd_vcs_info_free`.
+1174:struct VdVcsInfo vd_vcs_info(const char *root);
+1181: `info` must be null or a struct returned by `vd_vcs_info` that was not freed.
+1183:void vd_vcs_info_free(struct VdVcsInfo *info);
+1191: result must be released with `vd_vcs_diff_free`.
+1193:struct VdVcsDiff vd_vcs_diff(const char *root, const char *path);
+
+## product symbols in the lane selftest
+15
+
+## backend abstraction: production (subprocess, read-only gate) vs stub
+crates/vd-vcs/src/runner.rs:216:pub trait CommandRunner {
+crates/vd-vcs/src/runner.rs:228:pub struct SystemRunner;
+crates/vd-vcs/src/runner.rs:253:pub struct RecordingRunner {
+crates/vd-vcs/src/service.rs:78:pub struct ProcessVcsService<R: CommandRunner> {
+crates/vd-vcs/src/service.rs:283:pub struct StubVcsService {

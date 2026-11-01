@@ -1,0 +1,38 @@
+== VCS lane selftest (panel + stub + FFI) ==
+collected_at: 2026-11-01T05:58:22Z
+git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+cmd: target/vcs-build/vedit-workspace-vcs-selftest --selfcheck
+--- output ---
+WORKSPACE-VCS-SELFTEST start
+CHECK vcs.panel.empty-state.backend-none PASS No repository
+CHECK vcs.panel.empty-state.header PASS No repository
+CHECK vcs.panel.empty-state.note-visible PASS not a Git or Subversion working tree
+
+Open a directory that is a Git or Subversi
+CHECK vcs.panel.empty-state.no-files PASS
+CHECK vcs.panel.empty-state.stub-queried PASS calls=1
+CHECK vcs.panel.empty-state.no-write-attempt PASS
+CHECK vcs.panel.git.backend PASS Git feature/vcs-panel @ abc1234 · 2 changed file(s)
+CHECK vcs.panel.git.branch-and-revision PASS Git feature/vcs-panel @ abc1234 · 2 changed file(s)
+CHECK vcs.panel.git.changed-file-count PASS rows=2
+CHECK vcs.panel.git.file-row PASS rtl/top.sv  modified
+CHECK vcs.panel.git.added-row PASS rtl/added.sv  added
+CHECK vcs.panel.git.empty-state-hidden PASS
+CHECK vcs.panel.diff.shown PASS diff --git a/rtl/top.sv b/rtl/top.sv
+--- a/rtl/top.sv
++++ b/rtl/top.sv
+@@ -1 +1 @@
+-module
+CHECK vcs.panel.diff.read-only PASS
+CHECK vcs.panel.diff.missing-is-a-note PASS rtl/missing.sv: stub has no diff for this path
+CHECK vcs.panel.diff.no-write-attempt PASS calls=4
+CHECK vcs.panel.svn.backend-and-revision PASS Subversion trunk @ 42 · 1 changed file(s)
+CHECK vcs.panel.svn.file-count PASS Subversion trunk @ 42 · 1 changed file(s)
+CHECK vcs.panel.no-source.empty-state PASS No repository
+CHECK vcs.panel.refresh.empty-stays-empty PASS
+CHECK vcs.panel.refresh.populates PASS
+CHECK vcs.ffi.info-empty-state PASS not a Git or Subversion working tree
+CHECK vcs.ffi.diff-empty-state PASS not a repository
+CHECK vcs.ffi.read-only-surface PASS vd_vcs_info / vd_vcs_diff only; no write entry point
+WORKSPACE-VCS-SELFTEST ok=1 checks=24 failures=0
+SELFTEST-EXIT=0

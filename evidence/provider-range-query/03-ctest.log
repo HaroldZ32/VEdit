@@ -1,0 +1,11 @@
+# overlay ctest entry (root build)
+# command (pinned image): ctest --test-dir target/qt6-build -R vedit-syntax-overlay-selftest --output-on-failure
+# date: 2026-11-01T14:13:32+08:00
+
+Test project /vedit-build/target/qt6-build
+    Start 8: vedit-syntax-overlay-selftest
+1/1 Test #8: vedit-syntax-overlay-selftest ....   Passed    3.95 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   3.96 sec

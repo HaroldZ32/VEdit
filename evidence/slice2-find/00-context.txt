@@ -1,0 +1,19 @@
+== T21 context ==
+collected_at: 2026-11-01T05:50:03Z
+git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+branch: feat/qt6-ktexteditor-migration
+host: Linux 7.0.0-38-generic x86_64
+cpu: AMD Ryzen 7 7840H w/ Radeon 780M Graphics
+mem: 29Gi
+qt image: vedit-qt6-build:local (sha256:28a15c623ce7)
+rust image: vedit-build:local
+--- T21 scope ---
+   M crates/vd-ffi/include/vd_ffi.h
+   M crates/vd-ffi/src/search.rs
+   M crates/vd-search/src/lib.rs
+   M src/workspace/palette/README.md
+   M src/workspace/search/CMakeLists.txt
+   M src/workspace/search/README.md
+   M src/workspace/search/global_search.cpp
+   M src/workspace/search/global_search.h
+  ?? evidence/slice2-find/

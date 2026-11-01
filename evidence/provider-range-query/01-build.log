@@ -1,0 +1,9 @@
+# overlay target build (final sources)
+# command (pinned image): cmake --build target/qt6-build --target vedit-syntax-overlay-selftest --parallel N
+# date: 2026-11-01T14:13:32+08:00
+# exit code: 0
+
+[10/13] Linking CXX static library src/syntax/provider/libvedit_syntax_provider.a
+[11/13] Linking CXX static library src/syntax/grammars/libvedit_syntax_grammars.a
+[12/13] Linking CXX static library src/syntax/overlay/libvedit_syntax_overlay.a
+[13/13] Linking CXX executable src/syntax/overlay/vedit-syntax-overlay-selftest

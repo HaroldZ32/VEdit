@@ -1,0 +1,135 @@
+{
+    "budget_ms": 200,
+    "core_filter": {
+        "overall": {
+            "max_ms": 1.702152,
+            "median_ms": 0.762873,
+            "p95_ms": 1.345919
+        },
+        "per_query": {
+            "cmd": {
+                "max_ms": 1.254244,
+                "median_ms": 0.889104,
+                "p95_ms": 1.054241
+            },
+            "file_index": {
+                "max_ms": 1.088797,
+                "median_ms": 0.673661,
+                "p95_ms": 0.817827
+            },
+            "m": {
+                "max_ms": 1.224928,
+                "median_ms": 0.867022,
+                "p95_ms": 1.057096
+            },
+            "ma": {
+                "max_ms": 1.206673,
+                "median_ms": 0.807387,
+                "p95_ms": 0.994135
+            },
+            "mai": {
+                "max_ms": 1.531806,
+                "median_ms": 0.648413,
+                "p95_ms": 0.776528
+            },
+            "main": {
+                "max_ms": 1.179451,
+                "median_ms": 0.649986,
+                "p95_ms": 0.742454
+            },
+            "pal": {
+                "max_ms": 1.440432,
+                "median_ms": 0.771429,
+                "p95_ms": 0.935052
+            },
+            "src": {
+                "max_ms": 1.702152,
+                "median_ms": 1.345279,
+                "p95_ms": 1.503782
+            },
+            "widget": {
+                "max_ms": 1.045123,
+                "median_ms": 0.674312,
+                "p95_ms": 0.857023
+            },
+            "zzzz": {
+                "max_ms": 1.285725,
+                "median_ms": 0.614768,
+                "p95_ms": 0.755217
+            }
+        }
+    },
+    "disk_scan": {
+        "cached_ms": 0,
+        "cold_ms": 18,
+        "files": 10000,
+        "root": "/vedit-build/target/ws-palette-bench-fixture",
+        "scan_count": 1
+    },
+    "files": 10000,
+    "iterations": 200,
+    "limit": 100,
+    "overall_p95_ms": 1.471,
+    "palette_gui": {
+        "overall": {
+            "max_ms": 1.953,
+            "median_ms": 0.88,
+            "p95_ms": 1.471
+        },
+        "per_query": {
+            "cmd": {
+                "max_ms": 1.363,
+                "median_ms": 1.021,
+                "p95_ms": 1.155
+            },
+            "file_index": {
+                "max_ms": 1.149,
+                "median_ms": 0.809,
+                "p95_ms": 1.005
+            },
+            "m": {
+                "max_ms": 1.362,
+                "median_ms": 0.976,
+                "p95_ms": 1.124
+            },
+            "ma": {
+                "max_ms": 1.273,
+                "median_ms": 0.929,
+                "p95_ms": 1.043
+            },
+            "mai": {
+                "max_ms": 0.956,
+                "median_ms": 0.763,
+                "p95_ms": 0.825
+            },
+            "main": {
+                "max_ms": 1.194,
+                "median_ms": 0.766,
+                "p95_ms": 0.825
+            },
+            "pal": {
+                "max_ms": 1.203,
+                "median_ms": 0.891,
+                "p95_ms": 1.074
+            },
+            "src": {
+                "max_ms": 1.953,
+                "median_ms": 1.471,
+                "p95_ms": 1.644
+            },
+            "widget": {
+                "max_ms": 1.283,
+                "median_ms": 0.8,
+                "p95_ms": 0.991
+            },
+            "zzzz": {
+                "max_ms": 0.908,
+                "median_ms": 0.648,
+                "p95_ms": 0.79
+            }
+        }
+    },
+    "schema": 1,
+    "source": "disk",
+    "verdict": "PASS"
+}

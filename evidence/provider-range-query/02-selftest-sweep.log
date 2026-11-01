@@ -1,0 +1,104 @@
+# T92 — overlay selftest + 1k/2k/5k/10k sweep (T17 方法: 'x' 插入, 3 次独立运行)
+# command: target/qt6-build/src/syntax/overlay/vedit-syntax-overlay-selftest --selfcheck
+# date: 2026-11-01T14:13:32+08:00
+# 注: 本机为多人共享，run2/run3 期间其他 lane 在构建（CPU 争用），故同时给出三次原始值
+
+## run1
+  SYN-OVERLAY-SELFTEST start
+  CHECK overlay.single-owner PASS single owner across 494 span(s)
+  CHECK overlay.single-owner.overlay-present PASS overlay spans=247
+  CHECK overlay.single-owner.known-ranges PASS lines 0,5,12,60
+  CHECK overlay.fallback.state PASS Disabled | disabled at runtime (A1h): the base highlighter owns every range
+  CHECK overlay.fallback.claims-released PASS before=181 after=0
+  CHECK overlay.fallback.base-owns-everything PASS no overlay owner left
+  CHECK overlay.fallback.inject-is-noop PASS claims=0
+  CHECK overlay.fallback.toggle-stress PASS 100 enable/disable cycles
+  CHECK overlay.fallback.reenabled PASS Active
+  CHECK overlay.incremental.equivalence PASS incremental=812 full=812 text-bytes=10360
+  CHECK overlay.perf.rebuild-50 PASS 50 rebuilds median=27.810000 ms of 3 batches (best 24.562000, worst 27.857000), budget 150 ms, bytes=25388
+  PERF doc_bytes=25388 doc_lines=1051 rebuild50_ms=27.810 injection_p50_ms=0.143 injection_p95_ms=0.185 injection_max_ms=0.229 text_us=0.0 sync_us=390.0 query_us=76.0
+  CHECK overlay.perf.injection-p95 PASS p50=0.143000 p95=0.185000 max=0.229000 ms (budget 2 ms)
+  PERF-SWEEP lines=1051 bytes=25388 full_query_ms=1.714 range_query_ms=0.0670 rebuild50_ms=24.48 injection_p95_ms=0.152 sync_us=394.0 query_us=84.0 spans_full=2251 spans_window=86 span_cache_kb=105 rss_kb=43628
+  CHECK overlay.perf-sweep.1051.rebuild-50 PASS 50 rebuilds median=24.478000 ms (budget 150)
+  CHECK overlay.perf-sweep.1051.injection-p95 PASS p95=0.152000 ms (budget 2)
+  CHECK overlay.perf-sweep.1051.range-query-bounded PASS range_query_median=0.067000 ms
+  PERF-SWEEP lines=2017 bytes=48710 full_query_ms=3.818 range_query_ms=0.0680 rebuild50_ms=25.91 injection_p95_ms=0.160 sync_us=430.0 query_us=77.0 spans_full=4321 spans_window=86 span_cache_kb=202 rss_kb=43692
+  CHECK overlay.perf-sweep.2017.rebuild-50 PASS 50 rebuilds median=25.912000 ms (budget 150)
+  CHECK overlay.perf-sweep.2017.injection-p95 PASS p95=0.160000 ms (budget 2)
+  CHECK overlay.perf-sweep.2017.range-query-bounded PASS range_query_median=0.068000 ms
+  PERF-SWEEP lines=5041 bytes=121858 full_query_ms=9.836 range_query_ms=0.0670 rebuild50_ms=27.60 injection_p95_ms=0.156 sync_us=472.0 query_us=79.0 spans_full=10801 spans_window=86 span_cache_kb=506 rss_kb=46548
+  CHECK overlay.perf-sweep.5041.rebuild-50 PASS 50 rebuilds median=27.602000 ms (budget 150)
+  CHECK overlay.perf-sweep.5041.injection-p95 PASS p95=0.156000 ms (budget 2)
+  CHECK overlay.perf-sweep.5041.range-query-bounded PASS range_query_median=0.067000 ms
+  PERF-SWEEP lines=10081 bytes=243778 full_query_ms=20.298 range_query_ms=0.0690 rebuild50_ms=29.83 injection_p95_ms=0.147 sync_us=516.0 query_us=80.0 spans_full=21601 spans_window=86 span_cache_kb=1012 rss_kb=60004
+  CHECK overlay.perf-sweep.10081.rebuild-50 PASS 50 rebuilds median=29.829000 ms (budget 150)
+  CHECK overlay.perf-sweep.10081.injection-p95 PASS p95=0.147000 ms (budget 2)
+  CHECK overlay.perf-sweep.10081.range-query-bounded PASS range_query_median=0.069000 ms
+  SYN-OVERLAY-SELFTEST ok=1 checks=40 failures=0 skipped=0
+
+## run2
+  SYN-OVERLAY-SELFTEST start
+  CHECK overlay.single-owner PASS single owner across 494 span(s)
+  CHECK overlay.single-owner.overlay-present PASS overlay spans=247
+  CHECK overlay.single-owner.known-ranges PASS lines 0,5,12,60
+  CHECK overlay.fallback.state PASS Disabled | disabled at runtime (A1h): the base highlighter owns every range
+  CHECK overlay.fallback.claims-released PASS before=181 after=0
+  CHECK overlay.fallback.base-owns-everything PASS no overlay owner left
+  CHECK overlay.fallback.inject-is-noop PASS claims=0
+  CHECK overlay.fallback.toggle-stress PASS 100 enable/disable cycles
+  CHECK overlay.fallback.reenabled PASS Active
+  CHECK overlay.incremental.equivalence PASS incremental=812 full=812 text-bytes=10360
+  CHECK overlay.perf.rebuild-50 PASS 50 rebuilds median=46.406000 ms of 3 batches (best 43.141000, worst 47.954000), budget 150 ms, bytes=25388
+  PERF doc_bytes=25388 doc_lines=1051 rebuild50_ms=46.406 injection_p50_ms=0.248 injection_p95_ms=0.262 injection_max_ms=0.290 text_us=1.0 sync_us=772.0 query_us=155.0
+  CHECK overlay.perf.injection-p95 PASS p50=0.248000 p95=0.262000 max=0.290000 ms (budget 2 ms)
+  PERF-SWEEP lines=1051 bytes=25388 full_query_ms=3.403 range_query_ms=0.1180 rebuild50_ms=49.87 injection_p95_ms=0.273 sync_us=793.0 query_us=166.0 spans_full=2251 spans_window=86 span_cache_kb=105 rss_kb=43556
+  CHECK overlay.perf-sweep.1051.rebuild-50 PASS 50 rebuilds median=49.872000 ms (budget 150)
+  CHECK overlay.perf-sweep.1051.injection-p95 PASS p95=0.273000 ms (budget 2)
+  CHECK overlay.perf-sweep.1051.range-query-bounded PASS range_query_median=0.118000 ms
+  PERF-SWEEP lines=2017 bytes=48710 full_query_ms=6.767 range_query_ms=0.1170 rebuild50_ms=48.61 injection_p95_ms=0.282 sync_us=869.0 query_us=177.0 spans_full=4321 spans_window=86 span_cache_kb=202 rss_kb=43556
+  CHECK overlay.perf-sweep.2017.rebuild-50 PASS 50 rebuilds median=48.613000 ms (budget 150)
+  CHECK overlay.perf-sweep.2017.injection-p95 PASS p95=0.282000 ms (budget 2)
+  CHECK overlay.perf-sweep.2017.range-query-bounded PASS range_query_median=0.117000 ms
+  PERF-SWEEP lines=5041 bytes=121858 full_query_ms=16.959 range_query_ms=0.1230 rebuild50_ms=57.80 injection_p95_ms=0.287 sync_us=993.0 query_us=173.0 spans_full=10801 spans_window=86 span_cache_kb=506 rss_kb=46412
+  CHECK overlay.perf-sweep.5041.rebuild-50 PASS 50 rebuilds median=57.802000 ms (budget 150)
+  CHECK overlay.perf-sweep.5041.injection-p95 PASS p95=0.287000 ms (budget 2)
+  CHECK overlay.perf-sweep.5041.range-query-bounded PASS range_query_median=0.123000 ms
+  PERF-SWEEP lines=10081 bytes=243778 full_query_ms=31.083 range_query_ms=0.1030 rebuild50_ms=65.19 injection_p95_ms=0.274 sync_us=1113.0 query_us=167.0 spans_full=21601 spans_window=86 span_cache_kb=1012 rss_kb=59856
+  CHECK overlay.perf-sweep.10081.rebuild-50 PASS 50 rebuilds median=65.194000 ms (budget 150)
+  CHECK overlay.perf-sweep.10081.injection-p95 PASS p95=0.274000 ms (budget 2)
+  CHECK overlay.perf-sweep.10081.range-query-bounded PASS range_query_median=0.103000 ms
+  SYN-OVERLAY-SELFTEST ok=1 checks=40 failures=0 skipped=0
+
+## run3
+  SYN-OVERLAY-SELFTEST start
+  CHECK overlay.single-owner PASS single owner across 494 span(s)
+  CHECK overlay.single-owner.overlay-present PASS overlay spans=247
+  CHECK overlay.single-owner.known-ranges PASS lines 0,5,12,60
+  CHECK overlay.fallback.state PASS Disabled | disabled at runtime (A1h): the base highlighter owns every range
+  CHECK overlay.fallback.claims-released PASS before=181 after=0
+  CHECK overlay.fallback.base-owns-everything PASS no overlay owner left
+  CHECK overlay.fallback.inject-is-noop PASS claims=0
+  CHECK overlay.fallback.toggle-stress PASS 100 enable/disable cycles
+  CHECK overlay.fallback.reenabled PASS Active
+  CHECK overlay.incremental.equivalence PASS incremental=812 full=812 text-bytes=10360
+  CHECK overlay.perf.rebuild-50 PASS 50 rebuilds median=47.385000 ms of 3 batches (best 46.982000, worst 47.594000), budget 150 ms, bytes=25388
+  PERF doc_bytes=25388 doc_lines=1051 rebuild50_ms=47.385 injection_p50_ms=0.247 injection_p95_ms=0.268 injection_max_ms=0.274 text_us=1.0 sync_us=705.0 query_us=147.0
+  CHECK overlay.perf.injection-p95 PASS p50=0.247000 p95=0.268000 max=0.274000 ms (budget 2 ms)
+  PERF-SWEEP lines=1051 bytes=25388 full_query_ms=3.482 range_query_ms=0.1190 rebuild50_ms=47.41 injection_p95_ms=0.247 sync_us=804.0 query_us=149.0 spans_full=2251 spans_window=86 span_cache_kb=105 rss_kb=43644
+  CHECK overlay.perf-sweep.1051.rebuild-50 PASS 50 rebuilds median=47.411000 ms (budget 150)
+  CHECK overlay.perf-sweep.1051.injection-p95 PASS p95=0.247000 ms (budget 2)
+  CHECK overlay.perf-sweep.1051.range-query-bounded PASS range_query_median=0.119000 ms
+  PERF-SWEEP lines=2017 bytes=48710 full_query_ms=6.752 range_query_ms=0.1170 rebuild50_ms=51.27 injection_p95_ms=0.285 sync_us=866.0 query_us=174.0 spans_full=4321 spans_window=86 span_cache_kb=202 rss_kb=43644
+  CHECK overlay.perf-sweep.2017.rebuild-50 PASS 50 rebuilds median=51.269000 ms (budget 150)
+  CHECK overlay.perf-sweep.2017.injection-p95 PASS p95=0.285000 ms (budget 2)
+  CHECK overlay.perf-sweep.2017.range-query-bounded PASS range_query_median=0.117000 ms
+  PERF-SWEEP lines=5041 bytes=121858 full_query_ms=16.634 range_query_ms=0.1140 rebuild50_ms=53.11 injection_p95_ms=0.264 sync_us=901.0 query_us=161.0 spans_full=10801 spans_window=86 span_cache_kb=506 rss_kb=46500
+  CHECK overlay.perf-sweep.5041.rebuild-50 PASS 50 rebuilds median=53.112000 ms (budget 150)
+  CHECK overlay.perf-sweep.5041.injection-p95 PASS p95=0.264000 ms (budget 2)
+  CHECK overlay.perf-sweep.5041.range-query-bounded PASS range_query_median=0.114000 ms
+  PERF-SWEEP lines=10081 bytes=243778 full_query_ms=32.839 range_query_ms=0.1050 rebuild50_ms=65.82 injection_p95_ms=0.166 sync_us=614.0 query_us=99.0 spans_full=21601 spans_window=86 span_cache_kb=1012 rss_kb=59956
+  CHECK overlay.perf-sweep.10081.rebuild-50 PASS 50 rebuilds median=65.817000 ms (budget 150)
+  CHECK overlay.perf-sweep.10081.injection-p95 PASS p95=0.166000 ms (budget 2)
+  CHECK overlay.perf-sweep.10081.range-query-bounded PASS range_query_median=0.105000 ms
+  SYN-OVERLAY-SELFTEST ok=1 checks=40 failures=0 skipped=0
+

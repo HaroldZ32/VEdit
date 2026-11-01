@@ -1,0 +1,69 @@
+== AFTER wiring: vcs lane in vedit-app ==
+collected_at: 2026-11-01T06:04:14Z
+git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+cmd: cmake --build target/qt6-build --target vedit-app ; ctest -N ; nm -C vedit-app | grep vedit::workspace::vcs ; strings -el vedit-app | grep vcs-panel
+--- output ---
+BUILD-EXIT=0
+## lane wiring messages
+-- VEdit: workspace lane 'vcs' included
+-- VEdit: workspace lane 'vcs' wired (vedit_workspace_vcs)
+## ctest -N (after)
+vedit-build/target/qt6-build/src/app/workspace-lane-vcs/RelWithDebInfo/vedit-workspace-vcs-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-vcs/Deployment/vedit-workspace-vcs-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-vcs/Deployment/vedit-workspace-vcs-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-vcs/Development/vedit-workspace-vcs-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-vcs/Development/vedit-workspace-vcs-selftest
+  Test #20: vedit-workspace-vcs-selftest
+
+Total Tests: 20
+## vcs symbols (after, count)
+73
+## vcs symbols (after, sample)
+00000000007cb050 T vedit::workspace::vcs::backendName(vedit::workspace::vcs::Backend)
+00000000007ca940 T vedit::workspace::vcs::FfiVcsSource::diff(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+00000000000a7d98 t vedit::workspace::vcs::FfiVcsSource::diff(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [clone .cold]
+00000000007cacc0 T vedit::workspace::vcs::FfiVcsSource::info(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+00000000000a7dfa t vedit::workspace::vcs::FfiVcsSource::info(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [clone .cold]
+00000000007cbd70 T vedit::workspace::vcs::FfiVcsSource::status(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+00000000000a7f40 t vedit::workspace::vcs::FfiVcsSource::status(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [clone .cold]
+00000000007ccfc0 W vedit::workspace::vcs::FfiVcsSource::~FfiVcsSource()
+## vcs-panel UTF-16 strings (after)
+vcs-diff
+vcs-empty-state
+vcs-files
+vcs-header
+vcs-panel
+## root ctest
+
+Total Test time (real) =  24.06 sec
+
+The following tests FAILED:
+	 20 - vedit-workspace-vcs-selftest (Not Run)
+Errors while running CTest
+ROOT-CTEST-EXIT=8
+VCS-TEST-BUILD-EXIT=0
+      Start 20: vedit-workspace-vcs-selftest
+20/20 Test #20: vedit-workspace-vcs-selftest ...................   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 20
+
+Total Test time (real) =  24.19 sec
+ROOT-CTEST-EXIT=0
+
+## panel / integration symbols (after)
+00000000007ca460 T vedit::workspace::installVcs(vedit::app::ApplicationShell&, vedit::workspace::IntegrationOptions const&)
+00000000000a7ced t vedit::workspace::installVcs(vedit::app::ApplicationShell&, vedit::workspace::IntegrationOptions const&) [clone .cold]
+00000000007ce370 T vedit::workspace::vcs::VcsPanel::selectFile(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+00000000000a8278 t vedit::workspace::vcs::VcsPanel::selectFile(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&) [clone .cold]
+00000000007cf650 T vedit::workspace::vcs::VcsPanel::qt_metacall(QMetaObject::Call, int, void**)
+00000000007cf5f0 T vedit::workspace::vcs::VcsPanel::qt_metacast(char const*)
+00000000007cd880 T vedit::workspace::vcs::VcsPanel::showEmptyState(vedit::workspace::vcs::Status const&)
+00000000000a808e t vedit::workspace::vcs::VcsPanel::showEmptyState(vedit::workspace::vcs::Status const&) [clone .cold]
+0000000001c01c60 D vedit::workspace::vcs::VcsPanel::staticMetaObject
+00000000007cf5c0 T vedit::workspace::vcs::VcsPanel::qt_static_metacall(QObject*, QMetaObject::Call, int, void**)
+0000000000906c20 r vedit::workspace::vcs::VcsPanel::qt_staticMetaObjectStaticContent<(anonymous namespace)::qt_meta_tag_ZN5vedit9workspace3vcs8VcsPanelE_t>
+0000000001bc8fb8 d vedit::workspace::vcs::VcsPanel::qt_staticMetaObjectRelocatingContent<(anonymous namespace)::qt_meta_tag_ZN5vedit9workspace3vcs8VcsPanelE_t>
+
+## note: the first `ctest` above ran before the new lane test executable existed
+## (configured test -> "Not Run", exit 8). `VCS-TEST-BUILD-EXIT=0` built
+## vedit-workspace-vcs-selftest and the second `ctest` run is 20/20 with exit 0.

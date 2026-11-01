@@ -1,0 +1,13 @@
+== root build: vedit-app with the Rust search service ==
+collected_at: 2026-11-01T05:46:25Z
+git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+cmd: cmake --build target/qt6-build --target vedit-app --parallel 2
+--- output tail ---
+APP-BUILD-EXIT=0
+      Start 19: vedit-toolchain-ux-selftest
+19/19 Test #19: vedit-toolchain-ux-selftest ....................   Passed    3.10 sec
+
+100% tests passed, 0 tests failed out of 19
+
+Total Test time (real) =  22.53 sec
+CTEST-EXIT=0

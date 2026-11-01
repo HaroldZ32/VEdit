@@ -1,45 +1,51 @@
 ## file
-/vedit-build/target/qt6-build/src/app/vedit-app: ELF 64-bit LSB pie executable, x86-64, version 1 (GNU/Linux), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=85d24db55b2930c6929142f89b668b8590481386, for GNU/Linux 3.2.0, with debug_info, not stripped
+/vedit-build/target/qt6-build/src/app/vedit-app: ELF 64-bit LSB pie executable, x86-64, version 1 (GNU/Linux), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=1424ab2274205058ba5882bdd2801e6577f69910, for GNU/Linux 3.2.0, with debug_info, not stripped
 ## exported vd_* C ABI symbols (nm)
-0000000000107100 T vd_abi_version
-0000000000107110 T vd_job_cancel
-0000000000107360 T vd_job_release
-0000000000107480 T vd_service_create
-0000000000107620 T vd_service_destroy
-0000000000107670 T vd_service_error
-000000000010ad90 T vd_deeplint_lint
-000000000010af90 T vd_deeplint_poll
-000000000010b1d0 T vd_diagnostics_free
-000000000010b2c0 T vd_fim_complete
-000000000010b4a0 T vd_fim_poll
-000000000010b610 T vd_fim_result_free
-000000000010ebb0 T vd_project_info_free
-000000000010edf0 T vd_project_parse
-000000000010ef00 T vd_project_poll
-000000000010fd30 T vd_vcs_poll
-00000000001100a0 T vd_vcs_status
-00000000001101b0 T vd_vcs_status_free
-0000000000111af0 T vd_settings_free
-0000000000111c50 T vd_settings_load
-0000000000111d60 T vd_settings_poll
-00000000001120c0 T vd_settings_save
-0000000000113bd0 T vd_search_poll
-0000000000113e10 T vd_search_query
-0000000000114120 T vd_search_results_free
-0000000000594380 T vd_lsp_info_free
-0000000000594400 T vd_lsp_poll
-00000000005945b0 T vd_lsp_request_poll
-0000000000594a20 T vd_lsp_response_free
-0000000000594dd0 T vd_lsp_session_free
-0000000000594f20 T vd_lsp_session_request
-0000000000595470 T vd_lsp_session_start
-0000000000595ee0 T vd_lsp_session_status
-00000000005961d0 T vd_lsp_session_stop
-0000000000596280 T vd_lsp_start
-0000000000596580 T vd_lsp_status_free
+0000000000108510 T vd_vcs_diff
+0000000000108930 T vd_vcs_diff_free
+00000000001089e0 T vd_vcs_info
+0000000000108c30 T vd_vcs_info_free
+0000000000108ce0 T vd_vcs_poll
+0000000000109050 T vd_vcs_status
+0000000000109160 T vd_vcs_status_free
+000000000010b5b0 T vd_fim_complete
+000000000010b7a0 T vd_fim_poll
+000000000010b910 T vd_fim_result_free
+000000000010b960 T vd_project_info_free
+000000000010bba0 T vd_project_parse
+000000000010bcb0 T vd_project_poll
+00000000001101e0 T vd_abi_version
+00000000001101f0 T vd_job_cancel
+0000000000110440 T vd_job_release
+0000000000110560 T vd_service_create
+0000000000110700 T vd_service_destroy
+0000000000110750 T vd_service_error
+00000000001139a0 T vd_deeplint_lint
+0000000000113ba0 T vd_deeplint_poll
+0000000000113de0 T vd_diagnostics_free
+0000000000113ed0 T vd_search_poll
+0000000000114000 T vd_search_query
+0000000000114310 T vd_search_results_free
+0000000000114400 T vd_search_tree_poll
+0000000000114690 T vd_search_tree_query
+0000000000116930 T vd_settings_free
+0000000000116a90 T vd_settings_load
+0000000000116ba0 T vd_settings_poll
+0000000000116f00 T vd_settings_save
+0000000000612650 T vd_lsp_info_free
+00000000006126d0 T vd_lsp_poll
+0000000000612880 T vd_lsp_request_poll
+0000000000612cf0 T vd_lsp_response_free
+00000000006130a0 T vd_lsp_session_free
+00000000006131f0 T vd_lsp_session_request
+0000000000613740 T vd_lsp_session_start
+00000000006141b0 T vd_lsp_session_status
+00000000006144a0 T vd_lsp_session_stop
+0000000000614550 T vd_lsp_start
+0000000000614850 T vd_lsp_status_free
 ## count
-36
+42
 ## highest GLIBC symbol the product binary requires (the private runtime supplies 2.43)
 GLIBC_2.39
 ## sha256
-e286e6e4d7d6cbd9cead3392d7593818138e3f5d0c5601faba63f3f5b04cf74e  /vedit-build/target/qt6-build/src/app/vedit-app
+e80610c4e709bb4cd11ac3ece4e3fb2596acc290d34e2d75d930405c3cbfb574  /vedit-build/target/qt6-build/src/app/vedit-app

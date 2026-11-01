@@ -1,0 +1,67 @@
+# C9 evidence header
+collected_at: 2026-11-01T14:05:11+08:00
+git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+test_binary: target/a4-fold-build/vedit-folding-tests (standalone lane build)
+sample: generated 25 modules x 40 lines = 1000 lines of SystemVerilog inside the test
+expected_source: resources/syntax/vedit-systemverilog.xml beginRegion/endRegion keyword lists (region veditFold)
+
+## run A: host KSyntaxHighlighting library (dev host)
+
+TEST-EXIT=0
+A4 source=ksyntax:SystemVerilog path=/vedit-build/src/syntax/folding/../../../resources/syntax/vedit-systemverilog.xml diag=loaded vedit-systemverilog.xml (SystemVerilog) region=veditFold begin=13 end=10
+CHECK a4.source.loaded PASS
+CHECK a4.source.identity-is-ours PASS
+CHECK a4.source.region-veditfold PASS
+CHECK a4.source.begin-list-from-xml PASS
+CHECK a4.source.end-list-from-xml PASS
+CHECK a4.source.tree-sitter-off PASS
+CHECK a4.tree-sitter-switch-off PASS
+CHECK a4.sample.newlines PASS actual=1000 expected=1000
+A4 expected_source=/vedit-build/src/syntax/folding/../../../resources/syntax/vedit-systemverilog.xml region=veditFold ranges=200 unbalanced=0
+CHECK a4.ranges.from-xml PASS actual=200 expected=200
+CHECK a4.ranges.unbalanced PASS actual=0 expected=0
+A4 ranges total=200 first-module: (6,8) (10,12) (12,14) (9,15) (16,18) (20,22) (19,23) (0,39)
+CHECK a4.ranges.match-construction PASS
+CHECK a4.ranges.all-valid PASS
+A4 closed_state tree_sitter_active=0 trigger=first-open injected=200 rejected=0 expected_hidden=975 observed_hidden=975 scroll_drop=939 expected_scroll_drop=939
+CHECK a4.rebuild.trigger-first-open PASS actual=0 expected=0
+CHECK a4.inject.from-xml PASS actual=200 expected=200
+CHECK a4.inject.rejected PASS actual=0 expected=0
+CHECK a4.observed.folds-yes PASS
+CHECK a4.observed.hidden-equals-expected PASS actual=975 expected=975
+CHECK a4.observed.scroll-drop-equals-expected PASS actual=939 expected=939
+CHECK a4.full-count-one PASS actual=1 expected=1
+CHECK a4.invalid.still-rejected PASS actual=0 expected=0
+CHECK a4.invalid.rejected-counted PASS
+FOLDING-TESTS ok=1 checks=75 failures=0 skipped=0
+
+## run B: DELIVERY library F2 (QRC_SYNTAX=OFF, no embedded KDE definitions)
+f2_library_sha256: aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
+
+F2 embedded DOCTYPE-language markers: 0
+TEST-EXIT=0
+A4 source=ksyntax:SystemVerilog path=/vedit-build/src/syntax/folding/../../../resources/syntax/vedit-systemverilog.xml diag=loaded vedit-systemverilog.xml (SystemVerilog) region=veditFold begin=13 end=10
+CHECK a4.source.loaded PASS
+CHECK a4.source.identity-is-ours PASS
+CHECK a4.source.region-veditfold PASS
+CHECK a4.source.begin-list-from-xml PASS
+CHECK a4.source.end-list-from-xml PASS
+CHECK a4.source.tree-sitter-off PASS
+CHECK a4.tree-sitter-switch-off PASS
+CHECK a4.sample.newlines PASS actual=1000 expected=1000
+CHECK a4.ranges.from-xml PASS actual=200 expected=200
+CHECK a4.ranges.unbalanced PASS actual=0 expected=0
+A4 ranges total=200 first-module: (6,8) (10,12) (12,14) (9,15) (16,18) (20,22) (19,23) (0,39)
+CHECK a4.ranges.match-construction PASS
+CHECK a4.ranges.all-valid PASS
+A4 closed_state tree_sitter_active=0 trigger=first-open injected=200 rejected=0 expected_hidden=975 observed_hidden=975 scroll_drop=939 expected_scroll_drop=939
+CHECK a4.rebuild.trigger-first-open PASS actual=0 expected=0
+CHECK a4.inject.from-xml PASS actual=200 expected=200
+CHECK a4.inject.rejected PASS actual=0 expected=0
+CHECK a4.observed.folds-yes PASS
+CHECK a4.observed.hidden-equals-expected PASS actual=975 expected=975
+CHECK a4.observed.scroll-drop-equals-expected PASS actual=939 expected=939
+CHECK a4.full-count-one PASS actual=1 expected=1
+CHECK a4.invalid.still-rejected PASS actual=0 expected=0
+CHECK a4.invalid.rejected-counted PASS
+FOLDING-TESTS ok=1 checks=75 failures=0 skipped=0
