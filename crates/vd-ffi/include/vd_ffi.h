@@ -874,6 +874,27 @@ uint64_t vd_lsp_session_request(struct VdService *service,
                                 const char *new_name);
 
 /*
+ Replace the tracked text of one document with the caller's EDITOR BUFFER
+ (a full-document `didChange`). Nothing is read from disk here, so diagnostics
+ can follow unsaved edits; the document is opened first when the session does
+ not have it. The updated diagnostics arrive through the normal
+ `VD_LSP_REQ_DIAGNOSTICS` request (the server publishes them).
+
+ Returns `VD_STATUS_READY` on success; `POLL_MISUSE` when the session id is
+ unknown or the arguments are not valid UTF-8 strings (see
+ `vd_service_error` for the reason).
+
+ # Safety
+
+ `service` must be null or live; `path` and `text` must be valid
+ NUL-terminated strings.
+ */
+int32_t vd_lsp_session_change(struct VdService *service,
+                              uint64_t session,
+                              const char *path,
+                              const char *text);
+
+/*
  Poll one request.
 
  `VD_STATUS_PENDING` while the worker is busy, `VD_STATUS_READY` with `out`
@@ -1164,40 +1185,66 @@ int32_t vd_vcs_poll(struct VdService *service, uint64_t job, struct VdVcsStatus 
 void vd_vcs_status_free(struct VdVcsStatus *status);
 
 /*
- Branch + revision of the working tree containing `root`.
+ Starts a branch + revision job for `root`.
+
+ Returns the job id, or `0` when the arguments were rejected. The panel polls
+ with [`vd_vcs_info_poll`], so the GUI thread never waits for `git`/`svn`.
 
  # Safety
 
- `root` must be null or a valid NUL-terminated UTF-8 string; the result must be
- released with `vd_vcs_info_free`.
+ `service` must be null or live; `root` must be null or a valid NUL-terminated
+ string.
  */
-struct VdVcsInfo vd_vcs_info(const char *root);
+uint64_t vd_vcs_info_job(struct VdService *service, const char *root);
+
+/*
+ Polls a branch + revision job started by [`vd_vcs_info_job`].
+
+ # Safety
+
+ `service` must be null or live and `out` must be null or writable for one
+ [`VdVcsInfo`].
+ */
+int32_t vd_vcs_info_poll(struct VdService *service, uint64_t job, struct VdVcsInfo *out);
 
 /*
  Releases the strings of a [`VdVcsInfo`] (the struct itself is by value).
 
  # Safety
 
- `info` must be null or a struct returned by `vd_vcs_info` that was not freed.
+ `info` must be null or a struct returned by `vd_vcs_info_poll` that was not freed.
  */
 void vd_vcs_info_free(struct VdVcsInfo *info);
 
 /*
- Unified diff of one file of the working tree containing `root`.
+ Starts a unified-diff job for one file of the working tree containing `root`.
+
+ Returns the job id, or `0` when the arguments were rejected. The panel polls
+ with [`vd_vcs_diff_poll`], so the GUI thread never waits for `git diff`.
 
  # Safety
 
- `root` and `path` must be null or valid NUL-terminated UTF-8 strings; the
- result must be released with `vd_vcs_diff_free`.
+ `service` must be null or live; `root` and `path` must be null or valid
+ NUL-terminated UTF-8 strings.
  */
-struct VdVcsDiff vd_vcs_diff(const char *root, const char *path);
+uint64_t vd_vcs_diff_job(struct VdService *service, const char *root, const char *path);
+
+/*
+ Polls a diff job started by [`vd_vcs_diff_job`].
+
+ # Safety
+
+ `service` must be null or live and `out` must be null or writable for one
+ [`VdVcsDiff`].
+ */
+int32_t vd_vcs_diff_poll(struct VdService *service, uint64_t job, struct VdVcsDiff *out);
 
 /*
  Releases the strings of a [`VdVcsDiff`].
 
  # Safety
 
- `diff` must be null or a struct returned by `vd_vcs_diff` that was not freed.
+ `diff` must be null or a struct returned by `vd_vcs_diff_poll` that was not freed.
  */
 void vd_vcs_diff_free(struct VdVcsDiff *diff);
 
