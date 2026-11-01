@@ -21,8 +21,10 @@
 //! vcs-panel task, which owns the richer queries.
 #![forbid(unsafe_code)]
 
+pub mod runner;
+pub mod service;
+
 use std::path::{Path, PathBuf};
-use std::process::Command;
 
 /// Deepest ancestor walk performed while looking for a repository marker.
 const MAX_ANCESTORS: usize = 64;
@@ -150,9 +152,20 @@ pub fn detect(start: &Path) -> (Backend, Option<PathBuf>) {
     (Backend::None, None)
 }
 
-/// Status of the working tree containing `root`.
+/// Status of the working tree containing `root` (production runner).
 #[must_use]
 pub fn status(root: &Path) -> RepoStatus {
+    status_with(root, &runner::SystemRunner)
+}
+
+/// Status through an explicit runner.
+///
+/// Tests inject a stub ([`runner::RecordingRunner`]) to prove a whole session
+/// issues only read-only subcommands; production uses [`runner::SystemRunner`].
+/// The runner applies the read-only gate, so even a status query cannot execute
+/// a write subcommand.
+#[must_use]
+pub fn status_with<R: runner::CommandRunner>(root: &Path, command_runner: &R) -> RepoStatus {
     let (backend, found) = detect(root);
     let Some(working_tree) = found else {
         return RepoStatus {
@@ -164,15 +177,16 @@ pub fn status(root: &Path) -> RepoStatus {
     };
     match backend {
         Backend::Git => {
-            let output = Command::new("git")
-                .arg("-C")
-                .arg(&working_tree)
-                .args(["status", "--porcelain=v1", "--branch"])
-                .output();
-            match output {
-                Ok(output) if output.status.success() => {
-                    let text = String::from_utf8_lossy(&output.stdout);
-                    let (branch, changes) = parse_git_status(&text);
+            let args = vec![
+                "-C".to_string(),
+                working_tree.display().to_string(),
+                "status".to_string(),
+                "--porcelain=v1".to_string(),
+                "--branch".to_string(),
+            ];
+            match command_runner.run("git", &args) {
+                Ok(output) if output.success => {
+                    let (branch, changes) = parse_git_status(&output.stdout);
                     RepoStatus {
                         backend,
                         branch,
@@ -184,10 +198,7 @@ pub fn status(root: &Path) -> RepoStatus {
                     backend,
                     branch: None,
                     changes: Vec::new(),
-                    note: Some(first_line(
-                        &String::from_utf8_lossy(&output.stderr),
-                        "git status failed",
-                    )),
+                    note: Some(first_line(&output.stderr, "git status failed")),
                 },
                 Err(error) => RepoStatus {
                     backend,
@@ -198,25 +209,19 @@ pub fn status(root: &Path) -> RepoStatus {
             }
         }
         Backend::Svn => {
-            let output = Command::new("svn")
-                .arg("status")
-                .arg(&working_tree)
-                .output();
-            match output {
-                Ok(output) if output.status.success() => RepoStatus {
+            let args = vec!["status".to_string(), working_tree.display().to_string()];
+            match command_runner.run("svn", &args) {
+                Ok(output) if output.success => RepoStatus {
                     backend,
                     branch: None,
-                    changes: parse_svn_status(&String::from_utf8_lossy(&output.stdout)),
+                    changes: parse_svn_status(&output.stdout),
                     note: None,
                 },
                 Ok(output) => RepoStatus {
                     backend,
                     branch: None,
                     changes: Vec::new(),
-                    note: Some(first_line(
-                        &String::from_utf8_lossy(&output.stderr),
-                        "svn status failed",
-                    )),
+                    note: Some(first_line(&output.stderr, "svn status failed")),
                 },
                 Err(error) => RepoStatus {
                     backend,
@@ -290,7 +295,7 @@ pub fn parse_svn_status(text: &str) -> Vec<Change> {
     changes
 }
 
-fn first_line(text: &str, fallback: &str) -> String {
+pub(crate) fn first_line(text: &str, fallback: &str) -> String {
     let line = text.lines().next().unwrap_or("").trim();
     if line.is_empty() {
         fallback.to_string()

@@ -181,3 +181,147 @@ pub unsafe extern "C" fn vd_vcs_status_free(status: *mut VdVcsStatus) {
     status.changes = std::ptr::null_mut();
     status.note = std::ptr::null_mut();
 }
+
+// --- synchronous read-only queries for the VCS panel (T23) ------------------
+//
+// The job-based `vd_vcs_status`/`vd_vcs_poll` pair is the service-layer API; the
+// panel needs the identity (branch + revision) and one file's diff, which are
+// small read-only queries. These entry points are synchronous on purpose and
+// stay inside the same read-only allow-list (they go through `ProcessVcsService`
+// -> `SystemRunner`, which refuses any write subcommand before spawning).
+
+use std::ffi::CStr;
+
+/// Branch + revision of the working tree containing `root` (owned strings).
+#[repr(C)]
+pub struct VdVcsInfo {
+    /// Backend: 0 none, 1 git, 2 svn.
+    pub backend: i32,
+    /// Branch name, or NULL.
+    pub branch: *mut c_char,
+    /// Short revision, or NULL.
+    pub revision: *mut c_char,
+    /// Why the identity is unavailable, or NULL.
+    pub note: *mut c_char,
+}
+
+/// One file's unified diff (owned strings).
+#[repr(C)]
+pub struct VdVcsDiff {
+    /// Path asked for, or NULL.
+    pub path: *mut c_char,
+    /// Unified diff text, or NULL.
+    pub text: *mut c_char,
+    /// 1 when the tool reported binary content.
+    pub binary: i32,
+    /// Why the diff is empty, or NULL.
+    pub note: *mut c_char,
+}
+
+fn root_from(ptr: *const c_char) -> Option<PathBuf> {
+    if ptr.is_null() {
+        return None;
+    }
+    let bytes = unsafe { CStr::from_ptr(ptr) }.to_bytes();
+    std::str::from_utf8(bytes).ok().map(PathBuf::from)
+}
+
+fn owned(text: Option<&str>) -> *mut c_char {
+    text.map_or(std::ptr::null_mut(), c_string)
+}
+
+/// Branch + revision of the working tree containing `root`.
+///
+/// # Safety
+///
+/// `root` must be null or a valid NUL-terminated UTF-8 string; the result must be
+/// released with `vd_vcs_info_free`.
+#[no_mangle]
+pub unsafe extern "C" fn vd_vcs_info(root: *const c_char) -> VdVcsInfo {
+    let Some(root) = root_from(root) else {
+        return VdVcsInfo {
+            backend: 0,
+            branch: std::ptr::null_mut(),
+            revision: std::ptr::null_mut(),
+            note: owned(Some("root must be a valid UTF-8 path")),
+        };
+    };
+    let service = vd_vcs::service::ProcessVcsService::production();
+    let info = vd_vcs::service::VcsService::info(&service, &root);
+    VdVcsInfo {
+        backend: info.backend.as_i32(),
+        branch: owned(info.branch.as_deref()),
+        revision: owned(info.revision.as_deref()),
+        note: owned(info.note.as_deref()),
+    }
+}
+
+/// Releases the strings of a [`VdVcsInfo`] (the struct itself is by value).
+///
+/// # Safety
+///
+/// `info` must be null or a struct returned by `vd_vcs_info` that was not freed.
+#[no_mangle]
+pub unsafe extern "C" fn vd_vcs_info_free(info: *mut VdVcsInfo) {
+    let Some(info) = (if info.is_null() {
+        None
+    } else {
+        Some(&mut *info)
+    }) else {
+        return;
+    };
+    for field in [&mut info.branch, &mut info.revision, &mut info.note] {
+        if !field.is_null() {
+            free_string(*field);
+            *field = std::ptr::null_mut();
+        }
+    }
+}
+
+/// Unified diff of one file of the working tree containing `root`.
+///
+/// # Safety
+///
+/// `root` and `path` must be null or valid NUL-terminated UTF-8 strings; the
+/// result must be released with `vd_vcs_diff_free`.
+#[no_mangle]
+pub unsafe extern "C" fn vd_vcs_diff(root: *const c_char, path: *const c_char) -> VdVcsDiff {
+    let (Some(root), Some(path)) = (root_from(root), root_from(path)) else {
+        return VdVcsDiff {
+            path: std::ptr::null_mut(),
+            text: std::ptr::null_mut(),
+            binary: 0,
+            note: owned(Some("root and path must be valid UTF-8 paths")),
+        };
+    };
+    let service = vd_vcs::service::ProcessVcsService::production();
+    let diff = vd_vcs::service::VcsService::file_diff(&service, &root, &path.display().to_string());
+    VdVcsDiff {
+        path: owned(Some(&diff.path)),
+        text: owned(Some(&diff.text)),
+        binary: i32::from(diff.binary),
+        note: owned(diff.note.as_deref()),
+    }
+}
+
+/// Releases the strings of a [`VdVcsDiff`].
+///
+/// # Safety
+///
+/// `diff` must be null or a struct returned by `vd_vcs_diff` that was not freed.
+#[no_mangle]
+pub unsafe extern "C" fn vd_vcs_diff_free(diff: *mut VdVcsDiff) {
+    let Some(diff) = (if diff.is_null() {
+        None
+    } else {
+        Some(&mut *diff)
+    }) else {
+        return;
+    };
+    for field in [&mut diff.path, &mut diff.text, &mut diff.note] {
+        if !field.is_null() {
+            free_string(*field);
+            *field = std::ptr::null_mut();
+        }
+    }
+}
