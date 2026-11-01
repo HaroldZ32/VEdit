@@ -154,3 +154,43 @@ c755d9c docs(evidence): point the T83 snapshot at its T84 successor
 ### 未验证项（如实）
 - **GUI 一律未验收**：高亮是否在界面上正确呈现、工具链状态行在面板里的实际观感，只能由用户真机确认。
 - T84 的红→绿是在**干净 centos:7 容器**里跑的，容器共用宿主内核（7.0.0），`kernel.is-3.10` 仍是预期 FAIL —— 真机内核未验。
+
+---
+
+## 🧹 T86 —— `.gitignore` 卫生（构建产物不静默入库，源不被静默隐藏）
+
+### 新增的三条规则（`.gitignore:47-49`）
+```
+build/centos7-verify/AppDir/
+build/centos7-verify/stage/
+build/centos7-verify/dist/
+```
+这三者由 `build/centos7-verify/build-tarball.sh` 每次重写（AppDir 287 MB + stage 287 MB + dist 108 MB）。
+
+### 两处**被判为源、因此入库**（不是产物）
+| 路径 | 事实 |
+|---|---|
+| `build/centos7-verify/samples/verilog-demo/`（4 文件 / 1,406 B） | 手写 fixture：`build-tarball.sh:56` 拷进 tarball、`verify-centos7.sh:22` 当输入、`STEPS.md:103` 有文档，**全仓无生成器** |
+| `build/glibc217-spike/run-spike.sh`（8,052 B） | 探针**源脚本**：日志写 `evidence/`、tarball 写 `target/`（已忽略），本目录不产产物 |
+
+### 零误伤证明
+```
+$ git ls-files -z | git check-ignore --stdin -z | grep -c .
+0                       # 没有任何已跟踪文件被这轮规则命中。
+$ git ls-files | grep -c "^build/centos7-verify/\{AppDir,stage,dist\}"
+0                       # 新规则名下本来就 0 个跟踪文件。
+```
+（`--no-index` 下的 69 个命中全部来自**既有**规则 `.gitignore:42`，与本轮无关。）
+
+### ⚠️ 已知陷阱（记录在案，本轮**不修**，由 captain 裁定）
+> **`build/gui-spike/` 存在 tracked-but-ignored 状态（既有规则 `.gitignore:42`），新增文件到该目录会静默不被跟踪；如需修正应单独立项。**
+
+细节：该目录被既有规则忽略，但其中 **69 个文件仍在 index 里**。移除它们是破坏性操作（会从仓库删内容），去掉规则又可能让产物重新可提交，且**无实际损失**（现有 69 文件仍在版本控制内）。已写入 `evidence/gitignore-hygiene/REPORT.md` §8。
+
+### 本轮提交
+```
+4ab30b0 chore(gitignore): ignore the centos7 verification build outputs
+cc6a594 test(fixtures): track the verilog demo samples the centos7 tarball ships
+42ea3e6 build(spike): track the glibc 2.17 feasibility probe script
+7169074 docs(evidence): record the gitignore hygiene review and its known trap
+```
