@@ -9,6 +9,14 @@ git_head: 95c496e682e3841add1a081edd78d29c34957aac
 folding regions 数**。KTextEditor 没有公开 API 枚举 view 内部的渲染 range，因此这是可达的
 最强代理；真实观感仍需用户在停点 1 用眼睛确认。
 
+> **更正（T90/F-1，标签修正）**：本文件原先把 `01-diagnosis-prefix.log` 标成“交付口径（F2 库）”，
+> 但该次运行的日志本体是 `editor_repository_definitions=451`、解析到 KDE 作者 —— 实际用的是
+> **开发机发行版库（内嵌 451 份 KDE 定义）**，不是 F2。原日志**内容未改动**（sha256 仍为
+> `2041cab48ea46bbb5c028e5c4117fce662a580b7c670a62d430b7905606c3107`）；本文件已把它改标为
+> “库无关的机制证据”，并**补采了真正的 F2 口径修前证据** `01b-diagnosis-prefix-f2.log`
+> （用 `git show a6d5a04^:src/editor/kernel/document_io.cpp` 的修前代码，在 `target/t90-prefix-src/`
+> 的临时副本中构建，未改共享工作树；F2 库 + AppRun 同款 XDG 收窄）。
+
 ---
 
 ## 1. 结论（机制级）
@@ -31,7 +39,7 @@ folding regions 数**。KTextEditor 没有公开 API 枚举 view 内部的渲染
   （`strings … | grep -c 'DOCTYPE language'` = 63），所以在这台开发机上仅靠 `XDG_DATA_DIRS`
   收窄并不能让编辑器只看到我们的定义；必须用交付用的 **自建 F2 库**（无内嵌定义）才复现真机。
 
-### 修复前（交付口径，F2 库 + 私有 XDG share）— `01-diagnosis-prefix.log`
+### 修复前（开发机发行版库，内嵌 451 份定义；库无关的机制证据）— `01-diagnosis-prefix.log`
 
 ```
 HIGHLIGHT editor_repository_definitions=3
@@ -43,6 +51,27 @@ CHECK highlight.document-mode-is-expected FAIL  diagnose.v: got 'None', expected
 诊断第一版里我有一条 `!mode.isEmpty()` 的弱断言（`'None'` 也非空，且 invalid definition 也会
 产生默认 format）——它当时错误地显示 PASS；这正是任务提醒的“又一个看起来对的证据”。现在这两条
 已被收紧为 `mode == expected` 与 **definition 必须 valid 且 formats>0**。
+
+### 修复前（交付口径：F2 库 + 私有 XDG share）— `01b-diagnosis-prefix-f2.log`
+
+用 git 里的修前代码（`a6d5a04^` 的 `document_io.cpp`，含 0 处 `applyHighlightingMode`）在
+`target/t90-prefix-src/` 临时副本中重建，配 **F2 库**（`target/ksh-selfbuild/F2/...`，
+`strings | grep -c 'DOCTYPE language'` = 0）与 selftest main 的私有 XDG share（仅两份自有 XML）：
+
+```
+HIGHLIGHT editor_repository_definitions=3   # None + 我们自己的 Verilog/SystemVerilog（author=VEdit）
+HIGHLIGHT definitionForName(Verilog): name='Verilog' author='VEdit' … valid=1
+HIGHLIGHT definitionForFileName(top.v): name='Verilog' author='VEdit' valid=1
+HIGHLIGHT diagnose.v: url='' mode='Normal' highlightingMode='None' availableModes=3
+CHECK highlight.document-mode-is-expected FAIL  diagnose.v: got 'None', expected 'Verilog'
+CHECK highlight.format-ranges-positive FAIL  diagnose.v: formats=0
+CHECK highlight.folding-regions-positive FAIL  diagnose.v: begins=0 ends=0
+HIGHLIGHT-DIAGNOSIS checks=15 failures=8
+```
+
+即：在真正的交付口径下，仓库里**有**我们的定义、`definitionForFileName(top.v)` 也解析到它，但
+文档 mode 仍是 `None`、format/folding 为 0 —— 与修后的 `02-diagnosis-postfix-f2.log`（mode 选中、
+formats=30/29、folding 2/1）构成同一口径下的红→绿对照。
 
 ### 修复后（同一交付口径）— `02-diagnosis-postfix-f2.log`
 
@@ -125,7 +154,8 @@ LD_LIBRARY_PATH=$F2 QT_QPA_PLATFORM=offscreen \
 
 | 文件 | 内容 |
 |---|---|
-| `01-diagnosis-prefix.log` | 修复前、交付口径：仓库有我们的定义（author=VEdit），但文档 `highlightingMode='None'`、无 ranges/folding（并记录第一版弱断言的教训） |
+| `01-diagnosis-prefix.log` | 修复前、**开发机发行版库（451 内嵌定义）**：库无关的机制证据——文档 `highlightingMode='None'`、无 ranges/folding（原日志内容未改动，sha256 `2041cab4…`；标签更正见文首） |
+| `01b-diagnosis-prefix-f2.log` | 修复前、**交付口径 F2 库**（git 修前代码的临时副本 + 私有 XDG share）：仓库有 author=VEdit 的 Verilog/SystemVerilog 且 `top.v` 解析到它，但文档 mode=`None`、formats/folding=0，`checks=15 failures=8` |
 | `02-diagnosis-postfix-f2.log` | 修复后、交付口径：mode 选中、author=VEdit、formats=30/29、folding 2/1、checks=15 failures=0；附 F2 库路径/sha256 与“无内嵌定义”证明 |
 | `03-editor-selftest.log` | 独立 kernel selftest（宿主库）65 checks / 0 failures |
 | `04-app-selfcheck.log` | 产品 `--selfcheck`（EDIT-CORE 67/0、APP-SHELL 176/0） |
