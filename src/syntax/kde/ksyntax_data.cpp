@@ -1,5 +1,7 @@
 #include "ksyntax_data.h"
 
+#include "syntax_directory.h"
+
 #include <QCryptographicHash>
 #include <QRegularExpression>
 #include <QDir>
@@ -99,14 +101,11 @@ const LoadReport &KsyntaxData::load()
         if (path.isEmpty()) {
             return QString();
         }
-        QString dataRoot = path;
-        if (!QDir(dataRoot + QStringLiteral("/syntax")).exists()) {
-            const QFileInfo info(path);
-            if (info.fileName() == QLatin1String("syntax") && info.dir().exists()) {
-                dataRoot = info.dir().absolutePath();
-            }
-        }
-        if (!QDir(dataRoot + QStringLiteral("/syntax")).exists()) {
+        // T110: the ONE normalisation shared with the folding lane and the live
+        // editor binding (src/syntax/common/syntax_directory.h). It accepts the
+        // T84 data root and the legacy `syntax/` subdirectory spelling.
+        const QString definitions = vedit::syntax::resolveSyntaxDefinitionDirectory(path);
+        if (definitions.isEmpty()) {
             if (required) {
                 report_.diagnostics.append(
                     QStringLiteral("private syntax directory missing: %1/syntax (set VEDIT_SYNTAX_DIR)")
@@ -114,8 +113,9 @@ const LoadReport &KsyntaxData::load()
             }
             return QString();
         }
+        const QString dataRoot = QFileInfo(definitions).absolutePath();
         repository_->addCustomSearchPath(dataRoot);
-        report_.search_paths.append(dataRoot + QStringLiteral("/syntax"));
+        report_.search_paths.append(definitions);
         return dataRoot;
     };
 
