@@ -123,6 +123,15 @@ struct TreeSitterSyntaxProvider::Impl {
 
     std::vector<Match> run(const TSQuery *query, const ParseTreePtr &handle)
     {
+        return runInByteRange(query, handle, 0, 0, /*limited=*/false);
+    }
+
+    // T92: restrict the query cursor to a byte range. tree-sitter prunes the
+    // traversal, so the cost tracks the range instead of the whole document.
+    std::vector<Match> runInByteRange(const TSQuery *query, const ParseTreePtr &handle,
+                                      std::uint32_t byte_start, std::uint32_t byte_end,
+                                      bool limited = true)
+    {
         std::vector<Match> matches;
         if (query == nullptr || !handle || handle->tree == nullptr) {
             return matches;
@@ -130,6 +139,9 @@ struct TreeSitterSyntaxProvider::Impl {
         TSQueryCursor *cursor = ts_query_cursor_new();
         if (cursor == nullptr) {
             return matches;
+        }
+        if (limited) {
+            ts_query_cursor_set_byte_range(cursor, byte_start, byte_end);
         }
         ts_query_cursor_exec(cursor, query, ts_tree_root_node(handle->tree));
         TSQueryMatch raw{};
@@ -290,6 +302,54 @@ std::vector<HighlightSpan> TreeSitterSyntaxProvider::highlightSpans(const ParseT
                 Range{ts_node_start_byte(capture.node), ts_node_end_byte(capture.node), start.row,
                       end.row},
                 capture.name});
+        }
+    }
+    std::sort(spans.begin(), spans.end(), [](const HighlightSpan &a, const HighlightSpan &b) {
+        if (a.range.start_byte != b.range.start_byte) {
+            return a.range.start_byte < b.range.start_byte;
+        }
+        return a.capture < b.capture;
+    });
+    return spans;
+}
+
+std::vector<HighlightSpan>
+TreeSitterSyntaxProvider::highlightSpans(const ParseTreePtr &tree, const Range &range)
+{
+    std::vector<HighlightSpan> spans;
+    const TSQuery *query = impl_->queryFor("highlights");
+    if (query == nullptr || !tree || tree->tree == nullptr) {
+        return spans;
+    }
+    // Widen the scan to whole lines plus one guard line on each side: a capture
+    // node may start before the window (multi-line highlight) while still
+    // overlapping it, and tree-sitter prunes by where the match begins.
+    std::uint32_t scan_start = std::min<std::uint32_t>(range.start_byte,
+                                                       static_cast<std::uint32_t>(impl_->source.size()));
+    std::uint32_t scan_end = std::min<std::uint32_t>(range.end_byte,
+                                                     static_cast<std::uint32_t>(impl_->source.size()));
+    for (int newlines = 0; scan_start > 0 && newlines < 2; --scan_start) {
+        if (impl_->source[scan_start - 1] == '\n') {
+            ++newlines;
+        }
+    }
+    for (int newlines = 0; scan_end < impl_->source.size() && newlines < 2; ++scan_end) {
+        if (impl_->source[scan_end] == '\n') {
+            ++newlines;
+        }
+    }
+    for (const auto &match : impl_->runInByteRange(query, tree, scan_start, scan_end)) {
+        for (const auto &capture : match) {
+            const std::uint32_t start_byte = ts_node_start_byte(capture.node);
+            const std::uint32_t end_byte = ts_node_end_byte(capture.node);
+            // The scan is widened for correctness; the CONTRACT is intersection.
+            if (end_byte <= range.start_byte || range.end_byte <= start_byte) {
+                continue;
+            }
+            const TSPoint start = ts_node_start_point(capture.node);
+            const TSPoint end = ts_node_end_point(capture.node);
+            spans.push_back(
+                HighlightSpan{Range{start_byte, end_byte, start.row, end.row}, capture.name});
         }
     }
     std::sort(spans.begin(), spans.end(), [](const HighlightSpan &a, const HighlightSpan &b) {

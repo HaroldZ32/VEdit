@@ -34,6 +34,12 @@ public:
     std::vector<std::string> queryIds() const override;
     std::vector<QueryRange> queryRanges(const ParseTreePtr &tree, std::string_view query_id) override;
     std::vector<HighlightSpan> highlightSpans(const ParseTreePtr &tree) override;
+    // T92: the overlay only owns a visible window, so the per-edit rebuild must
+    // not pay for a whole-tree query. This override restricts tree-sitter's
+    // query cursor to the byte range (widened by a line on each side, because a
+    // highlight node can start just outside the window and still overlap it).
+    std::vector<HighlightSpan> highlightSpans(const ParseTreePtr &tree,
+                                              const Range &range) override;
     std::vector<FoldRange> foldRanges(const ParseTreePtr &tree) override;
     std::vector<Breadcrumb> breadcrumbs(const ParseTreePtr &tree, std::uint32_t byte_offset) override;
     bool applyEdit(const Edit &edit) override;

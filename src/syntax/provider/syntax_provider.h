@@ -103,6 +103,15 @@ public:
     virtual std::vector<QueryRange> queryRanges(const ParseTreePtr &tree,
                                                 std::string_view query_id) = 0;
     virtual std::vector<HighlightSpan> highlightSpans(const ParseTreePtr &tree) = 0;
+
+    // Highlight spans intersecting `range` (byte range). This is the query the
+    // overlay actually needs: it owns one visible window, so asking for the
+    // whole tree makes a per-edit rebuild grow with the document instead of with
+    // the window (T92 performance boundary). Providers that cannot restrict
+    // their query keep working unchanged: this default filters the full result.
+    // The tree-sitter provider overrides it with a byte-range-limited query.
+    virtual std::vector<HighlightSpan> highlightSpans(const ParseTreePtr &tree,
+                                                      const Range &range);
     virtual std::vector<FoldRange> foldRanges(const ParseTreePtr &tree) = 0;
 
     // Structure path (outer -> inner) for the node containing `byte_offset`.

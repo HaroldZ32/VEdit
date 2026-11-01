@@ -129,6 +129,7 @@ set(VEDIT_SYNTAX_PROVIDER_SOURCES
   disabled_provider.cpp
   grammar_binding.cpp
   owner_arbiter.cpp
+  syntax_provider.cpp
   syntax_service.cpp
 )
 if(VEDIT_SYNTAX_TREESITTER)
