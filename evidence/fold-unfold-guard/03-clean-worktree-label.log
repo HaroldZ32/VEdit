@@ -1,0 +1,24 @@
+# C9 evidence header
+collected_at: 2026-11-01T19:36:12+08:00
+collected_at_utc: 2026-11-01T11:36:12+00:00
+git_head: 60c7ae9c95fe769e2bd6c86dd4c56e1514603e44
+NOTE: target/t122-clean = HEAD + T122 changes + crates/vd-ffi/include/vd_ffi.h copied from the working tree
+      (HEAD alone cannot build: see 02-head-not-self-consistent.log). This is NOT a pure HEAD tree.
+---
+## full build + ctest + the two folding tests (T122/T120)
+
+CFG-EXIT=0
+BUILD-EXIT=0
+Total Test time (real) =  21.22 sec
+
+The following tests FAILED:
+	  8 - vedit-terminal-selftest (Subprocess aborted)
+	 16 - vedit-fold-toggle-tests (Failed)
+	 17 - vedit-folding-tests (Failed)
+	 22 - vedit-workspace-search-selftest (SEGFAULT)
+Errors while running CTest
+=== T122 folding tests ===
+CHECK t122.reverse.legacy-targets-hidden-line PASS  175
+FOLD-UNFOLD-GUARD ok=1 checks=19 failures=0
+CHECK t120.after-rebuild.unfold-really-unfolded FAIL  954 -> 954
+FOLD-TOGGLE ok=0 checks=9 failures=1

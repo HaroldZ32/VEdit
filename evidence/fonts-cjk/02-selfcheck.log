@@ -1,0 +1,9 @@
+# C9 (T119): collected_at=2026-11-01T10:52:34Z; git_head=60c7ae9c95fe769e2bd6c86dd4c56e1514603e44; git_status_porcelain_sha256=29b3dde0b45cdcacccc86852294fbc0129b0c730cb73dfe4dcaf1227cd8f2606; anchor=00-C9.txt
+== selfcheck on the T119 test AppDir (font + OFL assertions) ==
+collected_at: 2026-11-01T10:52:29Z
+git_head: 60c7ae9c95fe769e2bd6c86dd4c56e1514603e44
+--- output (font/licence lines + final) ---
+CHECK PASS  packaged CJK font present (19484784 bytes)
+CHECK PASS  packaged OFL text present and carries the copyright
+SELFCHECK PASS
+SELFCHECK-EXIT=0

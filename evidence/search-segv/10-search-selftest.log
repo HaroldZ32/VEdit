@@ -1,0 +1,239 @@
+collected_at: 2026-11-01T19:32:45+08:00
+git_head: 60c7ae9c95fe769e2bd6c86dd4c56e1514603e44
+git_branch: feat/qt6-ktexteditor-migration
+git_status:
+   M AGENT.md
+   M THIRD_PARTY_NOTICES.md
+   M build/evidence/typecheck/00-run.txt
+   M build/evidence/typecheck/10-typecheck-image-build.log
+   M build/evidence/typecheck/11-typecheck-image-id.txt
+   M crates/vd-config/src/project.rs
+   M crates/vd-config/src/warnings.rs
+   M crates/vd-ffi/include/vd_ffi.h
+   M crates/vd-ffi/src/lsp.rs
+   M crates/vd-ffi/src/project.rs
+   M crates/vd-lsp/src/client.rs
+   M crates/vd-lsp/src/documents.rs
+   M crates/vd-lsp/src/session.rs
+   M evidence/ffi-abi/logs/10-rust-image.txt
+   M evidence/ffi-abi/logs/19-rust-stage-console.log
+   M evidence/ffi-abi/logs/20-cargo-build-release.log
+   M evidence/ffi-abi/logs/21-staticlib.txt
+   M evidence/ffi-abi/logs/23-cargo-test.log
+   M evidence/ffi-abi/logs/26-vd_ffi.h
+   M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+   M evidence/m0-build/build-logs/20-qt6-image-build.log
+   M evidence/m0-build/build-logs/21-qt6-image-id.txt
+   M evidence/m0-build/build-logs/31-qt6-configure.log
+   M evidence/m0-build/build-logs/32-qt6-build.log
+   M evidence/m0-build/build-logs/33-qt6-ctest.log
+   M evidence/m0-build/build-logs/34-qt6-elf.txt
+   M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+   M packaging/runtime/AppRun
+   M packaging/runtime/README.md
+   M packaging/runtime/assemble-appdir.sh
+   M packaging/runtime/selfcheck.sh
+   M scripts/versions.env
+   M src/app/CMakeLists.txt
+   M src/app/app_shell.cpp
+   M src/app/editor_area.cpp
+   M src/app/main.cpp
+   M src/editor/kernel/fold_breadcrumb.cpp
+   M src/syntax/folding/CMakeLists.txt
+   M src/syntax/folding/fold_injector.cpp
+   M src/syntax/folding/fold_injector.h
+   M src/syntax/product/syntax_product.cpp
+   M src/workspace/diagnostics/CMakeLists.txt
+   M src/workspace/diagnostics/diagnostics_controller.cpp
+   M src/workspace/diagnostics/diagnostics_controller.h
+   M src/workspace/diagnostics/diagnostics_ffi_selftest.cpp
+   M src/workspace/diagnostics/diagnostics_integration.cpp
+   M src/workspace/diagnostics/diagnostics_panel.cpp
+   M src/workspace/diagnostics/diagnostics_panel.h
+   M src/workspace/diagnostics/diagnostics_selftest.cpp
+   M src/workspace/diagnostics/ffi_backends.cpp
+   M src/workspace/diagnostics/lsp_backend.h
+   M src/workspace/filetree/filetree_integration.cpp
+   M src/workspace/palette/README.md
+   M src/workspace/palette/palette_integration.cpp
+   M src/workspace/search/CMakeLists.txt
+   M src/workspace/search/README.md
+   M src/workspace/search/global_search.cpp
+   M src/workspace/search/global_search.h
+   M src/workspace/search/search_integration.cpp
+   M src/workspace/search/search_selftest.cpp
+   M src/workspace/settings/settings_integration.cpp
+   M src/workspace/vcs/vcs_integration.cpp
+  ?? crates/vd-lsp/tests/buffer_change.rs
+  ?? evidence/crash-segv/
+  ?? evidence/fold-toggle/
+  ?? evidence/fonts-cjk/
+  ?? evidence/large-file/
+  ?? evidence/lint-trigger/
+  ?? evidence/locale-and-noise/
+  ?? evidence/rules-search-ux/
+  ?? evidence/search-segv/
+  ?? packaging/runtime/assets/fonts/
+  ?? packaging/runtime/assets/licenses/
+  ?? src/app/crash_report_check.sh
+  ?? src/app/crash_reporter.cpp
+  ?? src/app/crash_reporter.h
+  ?? src/app/crash_reporter_selftest.cpp
+  ?? src/syntax/folding/tests/fold_toggle_tests.cpp
+  ?? src/workspace/diagnostics/selftests/
+
+CHECK fixture.created PASS
+This plugin does not support propagateSizeHints()
+CHECK panel.root.normalized PASS
+CHECK panel.empty.enter-query PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panel.search.terminates PASS
+CHECK panel.hits.count PASS
+CHECK panel.summary.state PASS
+CHECK panel.summary.files PASS
+CHECK panel.summary.files-scanned PASS
+CHECK panel.summary.skipped-binary PASS
+CHECK panel.summary.skipped-too-large PASS
+CHECK panel.summary.text.observable PASS
+CHECK panel.tree.files PASS
+CHECK panel.tree.one-row-per-hit PASS
+CHECK panel.tree.no-git PASS
+CHECK panel.tree.no-build PASS
+CHECK panel.tree.no-binary PASS
+CHECK panel.hits.one-per-line PASS
+CHECK panel.hit.line-number PASS
+CHECK panel.hit.column PASS
+CHECK panel.hit.snippet PASS
+CHECK panel.hit.unicode-file PASS
+CHECK panel.hit.unicode-column PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panel.case-sensitive.count PASS
+CHECK panel.case-sensitive.excludes-uppercase PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panel.verilog-only.count PASS
+CHECK panel.verilog-only.excludes-markdown PASS
+CHECK panel.verilog-only.excludes-large-file PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panel.unicode.query PASS
+This plugin does not support propagateSizeHints()
+CHECK empty.no-project.visible PASS
+CHECK empty.no-project.text PASS
+CHECK empty.no-project.no-search PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK empty.query.text PASS
+CHECK empty.query.no-search PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK empty.no-results.state PASS
+CHECK empty.no-results.visible PASS
+CHECK empty.no-results.text PASS
+CHECK empty.no-results.tree-hidden PASS
+CHECK empty.unreadable-root SKIP (running as root: chmod 000 does not deny access)
+CHECK entries.unreadable SKIP (running as root: chmod 000 does not deny access)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK limit.results PASS
+CHECK limit.truncated-flag PASS
+CHECK limit.summary-text PASS
+CHECK extension.v PASS
+CHECK extension.vh PASS
+CHECK extension.sv PASS
+CHECK extension.svh PASS
+CHECK extension.not-verilog PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK jump.hit-row-exists PASS
+CHECK jump.row-visible PASS
+CHECK jump.click.recorded PASS
+CHECK jump.click.file PASS
+CHECK jump.click.line PASS
+CHECK jump.click.column PASS
+CHECK jump.file-row.no-jump PASS
+CHECK jump.activate PASS
+CHECK jump.demo.opened PASS
+CHECK jump.demo.line PASS
+CHECK seam.dock-created PASS
+CHECK seam.not-placeholder PASS
+CHECK seam.factory-installed PASS
+CHECK seam.root-applied PASS
+CHECK seam.search-in-shell PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+CHECK jump.product.shell-ready PASS
+CHECK jump.product.ktexteditor-provider PASS
+CHECK jump.product.target-installed PASS
+CHECK jump.product.initially-no-file PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK jump.product.two-hits PASS
+[edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+This plugin does not support propagateSizeHints()
+search: jump opened '/tmp/vedit-workspace-search-selftest-qrHPBs/a.v' line=2 column=3 (cursor=2:3)
+CHECK jump.product.click-first PASS
+SEARCH-JUMP first requested='a.v':2 current='/tmp/vedit-workspace-search-selftest-qrHPBs/a.v' cursor=2:3
+CHECK jump.product.first-current-file PASS
+CHECK jump.product.first-loads-bytes PASS
+CHECK jump.product.first-cursor-line PASS
+CHECK jump.product.first-cursor-column PASS
+CHECK jump.product.first-status PASS
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+search: jump opened '/tmp/vedit-workspace-search-selftest-qrHPBs/b.sv' line=4 column=1 (cursor=4:1)
+CHECK jump.product.click-second PASS
+SEARCH-JUMP second requested='b.sv':4 current='/tmp/vedit-workspace-search-selftest-qrHPBs/b.sv' cursor=4:1
+CHECK jump.product.second-current-file PASS
+CHECK jump.product.second-loads-bytes PASS
+CHECK jump.product.second-cursor-line PASS
+CHECK jump.product.second-cursor-column PASS
+This plugin does not support propagateSizeHints()
+CHECK jump.product.second-open-paint-stable PASS
+CHECK large.fixture-created PASS
+CHECK large.start.accepted PASS
+CHECK large.skipped-by-default PASS
+CHECK large.skipped.state PASS
+CHECK large.skipped.fast PASS
+CHECK large.start.accepted-raised PASS
+CHECK large.start.non-blocking PASS
+CHECK large.cancel.returns-fast PASS
+CHECK large.cancel.finishes PASS
+CHECK large.cancel.state PASS
+CHECK large.cancel.bounded PASS
+CHECK large.worker-thread PASS
+CHECK many.start.non-blocking PASS
+CHECK many.finishes PASS
+CHECK many.hits PASS
+CHECK many.files-scanned PASS
+CHECK many.elapsed-bounded PASS
+CHECK large.timeout.accepted PASS
+CHECK large.timeout.finishes PASS
+CHECK large.timeout.flag PASS
+CHECK large.timeout.state PASS
+CHECK large.timeout.bounded PASS
+CHECK lifecycle.temp-dir PASS
+CHECK lifecycle.no-worker-before PASS
+CHECK lifecycle.scan-started PASS
+CHECK lifecycle.worker-running PASS
+CHECK lifecycle.destructor-joins-worker PASS
+SLOWLIFECYCLE-CHILD finished=1 exit=0
+CHECK slowlifecycle.temp-dir PASS
+CHECK slowlifecycle.scan-started PASS
+CHECK slowlifecycle.batch-before-block PASS
+SLOWLIFECYCLE delete-returned elapsedMs=0 released-marker=1 stallMs=11500
+CHECK slowlifecycle.destructor-waits-for-stalled-read PASS
+WORKSPACE-SEARCH-SLOWLIFECYCLE ok=1 checks=4 failures=0
+CHECK lifecycle.stall-child-finished PASS
+CHECK lifecycle.stall-child-pass PASS
+WORKSPACE-SEARCH-SELFTEST ok=1 checks=106 failures=0 skipped=2

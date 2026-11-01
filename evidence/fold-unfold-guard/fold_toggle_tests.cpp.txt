@@ -1,0 +1,228 @@
+// T120 — REAL interaction test: can a USER fold a region back after unfolding it?
+//
+// Every earlier folding test asserted "we injected N ranges" (injected=200,
+// hidden=975, rejected=0). None of them performed the user's action: unfold a
+// module through KTextEditor's own command, then FOLD IT BACK, and check that
+// the view really changed each time. That gap is what let "unfold works, fold
+// back does not" ship. This test walks:
+//
+//   product injection -> user unfold -> user fold back -> unfold again
+//   -> user fold of a nested range -> release/rebuild -> toggle sequence again
+//
+// and asserts hidden-line counts / scroll_max really move at every step.
+#include "fold_injector.h"
+#include "syntax_fold_source.h"
+#include "syntax_service.h"
+
+#include <KTextEditor/Command>
+#include <KTextEditor/Cursor>
+#include <KTextEditor/Document>
+#include <KTextEditor/Editor>
+#include <KTextEditor/Range>
+#include <KTextEditor/View>
+
+#include <QApplication>
+#include <QCoreApplication>
+#include <QScrollBar>
+
+#include <cstdio>
+#include <vector>
+
+using vedit::folding::FoldInjector;
+using vedit::folding::RebuildTrigger;
+using vedit::folding::SyntaxFoldSource;
+
+namespace {
+
+int g_checks = 0;
+int g_failures = 0;
+
+void check(const char *name, bool ok, const QString &detail = QString())
+{
+    ++g_checks;
+    if (!ok) {
+        ++g_failures;
+    }
+    std::printf("CHECK %s %s%s%s\n", name, ok ? "PASS" : "FAIL",
+                detail.isEmpty() ? "" : "  ", detail.toUtf8().constData());
+    std::fflush(stdout);
+}
+
+void pump()
+{
+    for (int i = 0; i < 3; ++i) {
+        QCoreApplication::processEvents();
+    }
+}
+
+// Same 25 x 40-line sample used by the folding acceptance test (module fold hides
+// 39 lines; function/begin folds nest inside).
+QString sampleText()
+{
+    QString text;
+    for (int index = 0; index < 25; ++index) {
+        const QString n = QString::number(index);
+        text += QStringLiteral("module m%1 #(parameter W = 8) (\n").arg(n);
+        text += QStringLiteral("  input  logic clk,\n");
+        text += QStringLiteral("  input  logic rst_n,\n");
+        text += QStringLiteral("  output logic [W-1:0] q\n");
+        text += QStringLiteral(");\n");
+        text += QStringLiteral("  logic [W-1:0] state, nxt;\n");
+        text += QStringLiteral("  function automatic logic [W-1:0] inc(input logic [W-1:0] v);\n");
+        text += QStringLiteral("    inc = v + 1'b1;\n");
+        text += QStringLiteral("  endfunction\n");
+        text += QStringLiteral("  always_ff @(posedge clk or negedge rst_n) begin\n");
+        text += QStringLiteral("    if (!rst_n) begin\n");
+        text += QStringLiteral("      state <= '0;\n");
+        text += QStringLiteral("    end else begin\n");
+        text += QStringLiteral("      state <= inc(nxt);\n");
+        text += QStringLiteral("    end\n");
+        text += QStringLiteral("  end\n");
+        text += QStringLiteral("  always_comb begin\n");
+        text += QStringLiteral("    nxt = state + 1'b1;\n");
+        text += QStringLiteral("  end\n");
+        text += QStringLiteral("  generate\n");
+        text += QStringLiteral("    for (genvar i = 0; i < W; i = i + 1) begin : g_lane\n");
+        text += QStringLiteral("      assign q[i] = state[i];\n");
+        text += QStringLiteral("    end\n");
+        text += QStringLiteral("  endgenerate\n");
+        for (int line = 24; line < 39; ++line) {
+            text += QStringLiteral("  // filler %1 %2\n").arg(line).arg(n);
+        }
+        text += QStringLiteral("endmodule\n");
+    }
+    return text;
+}
+
+struct Metrics {
+    int hidden = 0;
+    int scrollMax = 0;
+};
+
+Metrics metrics(KTextEditor::View *view)
+{
+    Metrics result;
+    const int firstReal = view->firstDisplayedLine(KTextEditor::View::RealLine);
+    const int lastReal = view->lastDisplayedLine(KTextEditor::View::RealLine);
+    const int firstVisible = view->firstDisplayedLine(KTextEditor::View::VisibleLine);
+    const int lastVisible = view->lastDisplayedLine(KTextEditor::View::VisibleLine);
+    result.hidden = (lastReal - firstReal) - (lastVisible - firstVisible);
+    if (QScrollBar *bar = view->verticalScrollBar()) {
+        result.scrollMax = bar->maximum();
+    }
+    return result;
+}
+
+bool runCommand(KTextEditor::Editor *editor, KTextEditor::View *view, const QString &name,
+                const KTextEditor::Range &range, const char *label)
+{
+    KTextEditor::Command *command = editor->queryCommand(name);
+    if (command == nullptr) {
+        std::printf("COMMAND-MISSING %s\n", label);
+        return false;
+    }
+    QString message;
+    const bool ok = command->exec(view, name, message, range);
+    std::printf("STEP %s returned=%d message=%s\n", label, ok ? 1 : 0, qPrintable(message));
+    std::fflush(stdout);
+    pump();
+    return ok;
+}
+
+void runToggleSequence(KTextEditor::Editor *editor, const char *label)
+{
+    KTextEditor::Document *document = editor->createDocument(nullptr);
+    document->setText(sampleText());
+    KTextEditor::View *view = document->createView(nullptr);
+    view->resize(1200, 900);
+    view->show();
+    pump();
+
+    vedit::syntax::SyntaxService::instance().setTreeSitterEnabled(true);
+    SyntaxFoldSource source(QStringLiteral("systemverilog"));
+    FoldInjector injector(view);
+    runCommand(editor, view, QStringLiteral("fold"), KTextEditor::Range(-1, 0, -1, 0), "noop");
+    const auto opened = injector.rebuildFrom(source, RebuildTrigger::FirstOpen);
+    const Metrics injected = metrics(view);
+    std::printf("OBS %s injected_ranges=%d hidden=%d scroll_max=%d\n", label, opened.injected,
+                injected.hidden, injected.scrollMax);
+    check("t120.injected.hidden-positive", injected.hidden > 0,
+          QString::number(injected.hidden));
+
+    // 1) USER unfolds module 0 with KTextEditor's own command.
+    view->setCursorPosition(KTextEditor::Cursor(0, 0));
+    runCommand(editor, view, QStringLiteral("unfold"), KTextEditor::Range::invalid(),
+               "user-unfold-module-0");
+    const Metrics unfolded = metrics(view);
+    std::printf("OBS %s after_unfold hidden=%d scroll_max=%d\n", label, unfolded.hidden,
+                unfolded.scrollMax);
+    check("t120.unfold.really-unfolded", unfolded.hidden < injected.hidden,
+          QStringLiteral("%1 -> %2").arg(injected.hidden).arg(unfolded.hidden));
+
+    // 2) USER folds it back with KTextEditor's own command (the reported defect).
+    view->setCursorPosition(KTextEditor::Cursor(0, 0));
+    runCommand(editor, view, QStringLiteral("fold"), KTextEditor::Range(0, 0, 39, 0),
+               "user-fold-back-module-0");
+    const Metrics refolded = metrics(view);
+    std::printf("OBS %s after_fold_back hidden=%d scroll_max=%d\n", label, refolded.hidden,
+                refolded.scrollMax);
+    check("t120.fold-back.really-folded", refolded.hidden > unfolded.hidden,
+          QStringLiteral("%1 -> %2").arg(unfolded.hidden).arg(refolded.hidden));
+
+    // 3) Unfold again, then fold a NESTED range through the same user command.
+    view->setCursorPosition(KTextEditor::Cursor(0, 0));
+    runCommand(editor, view, QStringLiteral("unfold"), KTextEditor::Range::invalid(),
+               "user-unfold-again");
+    const Metrics twice = metrics(view);
+    check("t120.unfold-again.really-unfolded", twice.hidden < refolded.hidden,
+          QStringLiteral("%1 -> %2").arg(refolded.hidden).arg(twice.hidden));
+    // A USER-created fold on a currently VISIBLE range (lines 1..5 of module 0
+    // are visible after the outer unfold) must really collapse it.
+    view->setCursorPosition(KTextEditor::Cursor(1, 0));
+    runCommand(editor, view, QStringLiteral("fold"), KTextEditor::Range(1, 0, 5, 0),
+               "user-fold-visible-range");
+    const Metrics nested = metrics(view);
+    check("t120.user-created-fold.really-folded", nested.hidden > twice.hidden,
+          QStringLiteral("%1 -> %2").arg(twice.hidden).arg(nested.hidden));
+
+    // Folding a range that is ALREADY folded (the inner function fold survived
+    // the outer unfold) is a no-op - that is KTextEditor semantics, not our bug.
+    view->setCursorPosition(KTextEditor::Cursor(6, 0));
+    runCommand(editor, view, QStringLiteral("fold"), KTextEditor::Range(6, 0, 8, 0),
+               "user-fold-already-folded");
+    const Metrics already = metrics(view);
+    check("t120.already-folded.no-op", already.hidden == nested.hidden,
+          QStringLiteral("%1 -> %2").arg(nested.hidden).arg(already.hidden));
+
+    // 4) A rebuild (allowed trigger) after user actions must not crash and must
+    //    leave a working toggle path.
+    const auto rebuilt = injector.rebuildFrom(source, RebuildTrigger::Reparsed);
+    const Metrics afterRebuild = metrics(view);
+    std::printf("OBS %s after_rebuild injected=%d hidden=%d\n", label, rebuilt.injected,
+                afterRebuild.hidden);
+    check("t120.rebuild.after-user-actions-no-crash", true);
+    check("t120.rebuild.hidden-positive", afterRebuild.hidden > 0);
+    view->setCursorPosition(KTextEditor::Cursor(0, 0));
+    runCommand(editor, view, QStringLiteral("unfold"), KTextEditor::Range::invalid(),
+               "user-unfold-after-rebuild");
+    const Metrics finalUnfold = metrics(view);
+    check("t120.after-rebuild.unfold-really-unfolded", finalUnfold.hidden < afterRebuild.hidden,
+          QStringLiteral("%1 -> %2").arg(afterRebuild.hidden).arg(finalUnfold.hidden));
+}
+
+} // namespace
+
+int main(int argc, char **argv)
+{
+    std::setvbuf(stdout, nullptr, _IOLBF, 0);
+    QApplication app(argc, argv);
+    KTextEditor::Editor *editor = KTextEditor::Editor::instance();
+    if (editor == nullptr) {
+        std::printf("FOLD-TOGGLE ok=0 reason=no-editor\n");
+        return 1;
+    }
+    runToggleSequence(editor, "full");
+    std::printf("FOLD-TOGGLE ok=%d checks=%d failures=%d\n", g_failures == 0 ? 1 : 0, g_checks,
+                g_failures);
+    return g_failures == 0 ? 0 : 1;
+}

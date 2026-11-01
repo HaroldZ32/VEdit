@@ -1,0 +1,91 @@
+collected_at: 2026-11-01T19:21:45+08:00
+git_head: 60c7ae9c95fe769e2bd6c86dd4c56e1514603e44
+git_branch: feat/qt6-ktexteditor-migration
+git_status:
+   M AGENT.md
+   M THIRD_PARTY_NOTICES.md
+   M build/evidence/typecheck/00-run.txt
+   M build/evidence/typecheck/10-typecheck-image-build.log
+   M build/evidence/typecheck/11-typecheck-image-id.txt
+   M crates/vd-config/src/project.rs
+   M crates/vd-config/src/warnings.rs
+   M crates/vd-ffi/include/vd_ffi.h
+   M crates/vd-ffi/src/lsp.rs
+   M crates/vd-ffi/src/project.rs
+   M crates/vd-lsp/src/client.rs
+   M crates/vd-lsp/src/documents.rs
+   M crates/vd-lsp/src/session.rs
+   M evidence/ffi-abi/logs/10-rust-image.txt
+   M evidence/ffi-abi/logs/19-rust-stage-console.log
+   M evidence/ffi-abi/logs/20-cargo-build-release.log
+   M evidence/ffi-abi/logs/21-staticlib.txt
+   M evidence/ffi-abi/logs/23-cargo-test.log
+   M evidence/ffi-abi/logs/26-vd_ffi.h
+   M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+   M evidence/m0-build/build-logs/20-qt6-image-build.log
+   M evidence/m0-build/build-logs/21-qt6-image-id.txt
+   M evidence/m0-build/build-logs/31-qt6-configure.log
+   M evidence/m0-build/build-logs/32-qt6-build.log
+   M evidence/m0-build/build-logs/33-qt6-ctest.log
+   M evidence/m0-build/build-logs/34-qt6-elf.txt
+   M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+   M packaging/runtime/AppRun
+   M packaging/runtime/README.md
+   M packaging/runtime/assemble-appdir.sh
+   M packaging/runtime/selfcheck.sh
+   M scripts/versions.env
+   M src/app/CMakeLists.txt
+   M src/app/app_shell.cpp
+   M src/app/editor_area.cpp
+   M src/app/main.cpp
+   M src/syntax/product/syntax_product.cpp
+   M src/workspace/diagnostics/CMakeLists.txt
+   M src/workspace/diagnostics/diagnostics_controller.cpp
+   M src/workspace/diagnostics/diagnostics_controller.h
+   M src/workspace/diagnostics/diagnostics_ffi_selftest.cpp
+   M src/workspace/diagnostics/diagnostics_integration.cpp
+   M src/workspace/diagnostics/diagnostics_panel.cpp
+   M src/workspace/diagnostics/diagnostics_panel.h
+   M src/workspace/diagnostics/diagnostics_selftest.cpp
+   M src/workspace/diagnostics/ffi_backends.cpp
+   M src/workspace/diagnostics/lsp_backend.h
+   M src/workspace/filetree/filetree_integration.cpp
+   M src/workspace/palette/README.md
+   M src/workspace/palette/palette_integration.cpp
+   M src/workspace/search/CMakeLists.txt
+   M src/workspace/search/README.md
+   M src/workspace/search/global_search.cpp
+   M src/workspace/search/global_search.h
+   M src/workspace/search/search_integration.cpp
+   M src/workspace/settings/settings_integration.cpp
+   M src/workspace/vcs/vcs_integration.cpp
+  ?? crates/vd-lsp/tests/buffer_change.rs
+  ?? evidence/crash-segv/
+  ?? evidence/fonts-cjk/
+  ?? evidence/large-file/
+  ?? evidence/lint-trigger/
+  ?? evidence/locale-and-noise/
+  ?? evidence/rules-search-ux/
+  ?? evidence/search-segv/
+  ?? packaging/runtime/assets/fonts/
+  ?? packaging/runtime/assets/licenses/
+  ?? src/app/crash_report_check.sh
+  ?? src/app/crash_reporter.cpp
+  ?? src/app/crash_reporter.h
+  ?? src/app/crash_reporter_selftest.cpp
+  ?? src/workspace/diagnostics/selftests/
+
+                #0  0x000079aad9fcca00 n/a (libKF6TextEditor.so.6 + 0xc5a00)
+                #1  0x000079aad9fccb09 n/a (libKF6TextEditor.so.6 + 0xc5b09)
+                #2  0x000079aad9fccbc8 _ZNK4Kate11TextFolding27foldingRangesStartingOnLineEi (libKF6TextEditor.so.6 + 0xc5bc8)
+                #3  0x000079aada146729 n/a (libKF6TextEditor.so.6 + 0x23f729)
+                #4  0x000079aad96dd56b _ZN7QWidget5eventEP6QEvent (libQt6Widgets.so.6 + 0x1f756b)
+                #5  0x000079aad9686b7f _ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent (libQt6Widgets.so.6 + 0x1a0b7f)
+                #6  0x000079aad8847098 _ZN16QCoreApplication15notifyInternal2EP7QObjectP6QEvent (libQt6Core.so.6 + 0x190098)
+                #7  0x000079aad96cf85c _ZN14QWidgetPrivate14sendPaintEventERK7QRegion (libQt6Widgets.so.6 + 0x1e985c)
+                #8  0x000079aad96d0856 _ZN14QWidgetPrivate10drawWidgetEP12QPaintDeviceRK7QRegionRK6QPoint6QFlagsINS_14DrawWidgetFlagEEP8QPainterP21QWidgetRepaintManager (libQt6Widgets.so.6 + 0x1ea856)
+                #9  0x000079aad96f6b9c _ZN21QWidgetRepaintManager13paintAndFlushEv (libQt6Widgets.so.6 + 0x210b9c)
+                #10 0x000079aad96dcef4 _ZN7QWidget5eventEP6QEvent (libQt6Widgets.so.6 + 0x1f6ef4)
+                #11 0x000079aad9686b7f _ZN19QApplicationPrivate13notify_helperEP7QObjectP6QEvent (libQt6Widgets.so.6 + 0x1a0b7f)
+                #12 0x000079aad8847098 _ZN16QCoreApplication15notifyInternal2EP7QObjectP6QEvent (libQt6Core.so.6 + 0x190098)
+                #13 0x000079aad8847321 _ZN23QCoreApplicationPrivate16sendPostedEventsEP7QObjectiP11QThreadData (libQt6Core.so.6 + 0x190321)

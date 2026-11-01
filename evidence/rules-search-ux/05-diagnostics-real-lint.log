@@ -1,0 +1,67 @@
+collected_at: 2026-11-01T18:22:29+08:00
+git_head: 60c7ae9c95fe769e2bd6c86dd4c56e1514603e44
+git_branch: feat/qt6-ktexteditor-migration
+git_status:
+   M AGENT.md
+   M build/evidence/typecheck/00-run.txt
+   M build/evidence/typecheck/10-typecheck-image-build.log
+   M build/evidence/typecheck/11-typecheck-image-id.txt
+   M crates/vd-config/src/project.rs
+   M crates/vd-config/src/warnings.rs
+   M crates/vd-ffi/include/vd_ffi.h
+   M crates/vd-ffi/src/project.rs
+   M evidence/ffi-abi/logs/10-rust-image.txt
+   M evidence/ffi-abi/logs/19-rust-stage-console.log
+   M evidence/ffi-abi/logs/20-cargo-build-release.log
+   M evidence/ffi-abi/logs/21-staticlib.txt
+   M evidence/ffi-abi/logs/22-rust-targets.txt
+   M evidence/ffi-abi/logs/23-cargo-test.log
+   M evidence/ffi-abi/logs/26-vd_ffi.h
+   M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+   M evidence/m0-build/build-logs/20-qt6-image-build.log
+   M evidence/m0-build/build-logs/21-qt6-image-id.txt
+   M evidence/m0-build/build-logs/31-qt6-configure.log
+   M evidence/m0-build/build-logs/32-qt6-build.log
+   M evidence/m0-build/build-logs/33-qt6-ctest.log
+   M evidence/m0-build/build-logs/34-qt6-elf.txt
+   M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+   M packaging/runtime/AppRun
+   M src/workspace/palette/README.md
+   M src/workspace/search/CMakeLists.txt
+   M src/workspace/search/README.md
+   M src/workspace/search/global_search.cpp
+   M src/workspace/search/global_search.h
+  ?? evidence/rules-search-ux/
+
+command (pinned Qt image): mkdir -p /tmp/xdg-runtime; QT_QPA_PLATFORM=offscreen XDG_RUNTIME_DIR=/tmp/xdg-runtime target/qt6-build/src/app/workspace-lane-diagnostics/vedit-diagnostics-ffi-selftest /vedit-build/tests/fixtures/verilog-project /vedit-build/.mpd/recon/verible/bin/verible-verilog-ls
+
+CHECK PASS a3c.fixture-file-count  expected/files.txt -> 7 file(s)
+CHECK PASS ffi.lsp-backend-available
+CHECK PASS ffi.slang-backend-available
+CHECK PASS a3d.reparsing-observable  reparsing
+CHECK PASS a3d.terminal-state-within-60s  degraded (degraded: lsp 7/7 file(s), diagnostics 3)
+CHECK PASS a3c.lsp-opened-whole-set  opened=7/7
+CHECK PASS a3c.report-carries-the-set
+CHECK PASS a3c.slang-got-every-file  requested=7 completed=7 failures=7
+OBSERVED diagnostics=3 lsp_message='ready: 7/7 file(s) open, 3 diagnostic(s), 0 skipped' slang_message='slang: slang binary not found (tried 4 location(s); set VEDIT_SLANG)'
+SKIP-NOTE: SLANG leg failed on 7 file(s) (no slang binary on this host); the failure is typed and observable, not a crash
+CHECK PASS entry.symbols-queued
+CHECK PASS entry.symbols-answered
+CHECK PASS entry.symbols-contains-top  5 outline entries
+CHECK PASS fixture.alu-instantiation-present
+CHECK PASS entry.definition-queued
+CHECK PASS entry.definition-answered
+OBSERVED definition_locations=1
+CHECK PASS entry.references-queued
+CHECK PASS entry.references-answered
+CHECK PASS entry.rename-queued
+CHECK PASS entry.rename-answered
+CHECK PASS entry.format-queued
+CHECK PASS entry.format-answered
+CHECK PASS degrade.missing-verible-state  failed
+CHECK PASS degrade.missing-verible-not-ready  failed
+OBSERVED missing-verible-state=failed
+CHECK PASS degrade.missing-verible-message  Diagnostics unavailable: verible-verilog-ls, slang not found (bundled, local checkout, PATH and env all empty). Impact: Verible diagnostics, navigation and the outline are unavailable; SLANG deep lint is unavailable. Fix: bundle `verible-verilog-ls`/`slang` in the product's bin/ next to vd-app, run `bash scripts/fetch-verible.sh` and `bash build/slang/build.sh` in a source checkout, install them on PATH, or set VEDIT_VERIBLE_LS / VEDIT_SLANG.
+VER-DIAGNOSTICS-FFI-SELFTEST checks=23 failures=0
+
+exit_code: 0

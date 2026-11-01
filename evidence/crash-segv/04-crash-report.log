@@ -1,0 +1,23 @@
+vedit crash report
+signal=11 (SIGSEGV)
+si_code=1
+fault_address=0x0
+pid=10
+build=fold-crash-probe
+current_file=<none>
+last_events:
+  [1] probe start
+  [2] probe fixture
+  [3] probe view+binding
+  [4] probe opened
+  [5] probe folds-injected
+backtrace:
+target/qt6-build/src/app/vedit-fold-crash-probe(vedit_crash_handler+0x8fb) [0x5b78ddc0184b]
+/usr/lib/x86_64-linux-gnu/libc.so.6(+0x45cb0) [0x7f0383ca3cb0]
+/usr/lib/x86_64-linux-gnu/libKF6TextEditor.so.6(+0x27c00c) [0x7f0385d3f00c]
+target/qt6-build/src/app/vedit-fold-crash-probe(+0x17fd86) [0x5b78ddbffd86]
+target/qt6-build/src/app/vedit-fold-crash-probe(main+0x652) [0x5b78ddbff622]
+/usr/lib/x86_64-linux-gnu/libc.so.6(+0x2a601) [0x7f0383c88601]
+/usr/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x88) [0x7f0383c88718]
+target/qt6-build/src/app/vedit-fold-crash-probe(_start+0x25) [0x5b78ddbffb35]
+end

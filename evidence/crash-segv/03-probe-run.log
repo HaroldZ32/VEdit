@@ -1,0 +1,8 @@
+PROBE start
+PROBE fixture
+kf.sonnet.core: Sonnet: No speller backends available!
+PROBE view+binding
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+PROBE opened
+PROBE injected=120
+PROBE folds-injected

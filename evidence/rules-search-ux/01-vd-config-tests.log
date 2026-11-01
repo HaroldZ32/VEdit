@@ -1,0 +1,143 @@
+collected_at: 2026-11-01T18:22:10+08:00
+git_head: 60c7ae9c95fe769e2bd6c86dd4c56e1514603e44
+git_branch: feat/qt6-ktexteditor-migration
+git_status:
+   M AGENT.md
+   M build/evidence/typecheck/00-run.txt
+   M build/evidence/typecheck/10-typecheck-image-build.log
+   M build/evidence/typecheck/11-typecheck-image-id.txt
+   M crates/vd-config/src/project.rs
+   M crates/vd-config/src/warnings.rs
+   M crates/vd-ffi/include/vd_ffi.h
+   M crates/vd-ffi/src/project.rs
+   M evidence/ffi-abi/logs/10-rust-image.txt
+   M evidence/ffi-abi/logs/19-rust-stage-console.log
+   M evidence/ffi-abi/logs/20-cargo-build-release.log
+   M evidence/ffi-abi/logs/21-staticlib.txt
+   M evidence/ffi-abi/logs/22-rust-targets.txt
+   M evidence/ffi-abi/logs/23-cargo-test.log
+   M evidence/ffi-abi/logs/26-vd_ffi.h
+   M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+   M evidence/m0-build/build-logs/20-qt6-image-build.log
+   M evidence/m0-build/build-logs/21-qt6-image-id.txt
+   M evidence/m0-build/build-logs/31-qt6-configure.log
+   M evidence/m0-build/build-logs/32-qt6-build.log
+   M evidence/m0-build/build-logs/33-qt6-ctest.log
+   M evidence/m0-build/build-logs/34-qt6-elf.txt
+   M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+   M packaging/runtime/AppRun
+   M src/workspace/palette/README.md
+   M src/workspace/search/CMakeLists.txt
+   M src/workspace/search/README.md
+   M src/workspace/search/global_search.cpp
+   M src/workspace/search/global_search.h
+  ?? evidence/rules-search-ux/
+
+command (pinned Rust image): cd /vedit-build && cargo test -p vd-config -- --nocapture
+
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling libc v0.2.191
+   Compiling memchr v2.8.3
+   Compiling rustix v1.1.6
+   Compiling once_cell v1.21.4
+   Compiling serde_json v1.0.154
+   Compiling syn v3.0.9
+   Compiling getrandom v0.4.3
+   Compiling tempfile v3.27.0
+   Compiling serde_derive v1.0.229
+   Compiling serde v1.0.229
+   Compiling vd-config v0.1.1 (/vedit-build/crates/vd-config)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.89s
+     Running unittests src/lib.rs (target/debug/deps/vd_config-7c1f0461b4b1abe7)
+
+running 38 tests
+test env::tests::no_home_means_no_default_directories ... ok
+test env::tests::xdg_defaults_come_from_home ... ok
+test env::tests::relative_xdg_value_falls_back_and_is_reported ... ok
+test env::tests::xdg_explicit_absolute_values_win ... ok
+test model::tests::default_binding_ids_are_unique_and_have_no_legacy_alias ... ok
+test model::tests::every_default_binding_names_a_known_action ... ok
+test model::tests::defaults_match_the_requirements ... ok
+test model::tests::known_actions_are_unique ... ok
+test model::tests::a_partial_document_keeps_the_defaults_for_absent_keys ... ok
+chmod-000 readable_by_this_process=true found=true warnings=[]
+test project::tests::define_parsing ... ok
+test filelist::tests::missing_nested_filelist_is_reported_not_fatal ... ok
+test project::tests::a_present_rules_file_is_found_without_warnings ... ok
+test filelist::tests::detects_cycles_and_duplicates ... ok
+test project::tests::missing_optional_rules_file_is_silent ... ok
+test project::tests::a_direct_filelist_roots_its_own_directory_but_never_the_outer_checkout ... ok
+test filelist::tests::parent_components_are_normalized ... ok
+test project::tests::chmod_000_rules_file_hits_one_of_the_two_expectations ... ok
+test provenance::tests::secret_leaf_is_redacted_even_when_the_layer_carries_the_raw_value ... ok
+test filelist::tests::parses_entries_comments_incdirs_defines_and_nested_filelists ... ok
+test project::tests::rules_search_stops_at_the_home_boundary ... ok
+test secret::tests::debug_is_redacted ... ok
+test provenance::tests::precedence_chain_is_recorded_nearest_first_in_overridden_by ... ok
+test provenance::tests::empty_secret_is_reported_as_unset ... ok
+test render::tests::json_carries_the_schema_version_and_tool_attempts_even_on_success ... ok
+test render::tests::table_renders_redacted_secret_and_overridden_by ... ok
+test project::tests::unreadable_rules_file_is_reported_without_an_absolute_path ... ok
+test provenance::tests::lists_reduce_to_their_length ... ok
+test tests::parse_layer_reports_a_line_without_quoting_the_source ... ok
+test project::tests::root_discovery_prefers_vedit_toml_then_git ... ok
+test tools::tests::failure_lists_every_attempt_and_never_mentions_path_lookup ... ok
+test tools::tests::missing_config_falls_through_to_env_and_records_both_attempts ... ok
+test project::tests::root_discovery_falls_back_to_the_start_directory ... ok
+test secret::tests::serialization_is_redacted ... ok
+test tests::deep_merge_keeps_unrelated_keys_and_replaces_lists ... ok
+test secret::tests::expose_secret_is_the_only_way_out ... ok
+test tools::tests::configured_path_wins ... ok
+test tools::tests::bundled_payload_is_found_next_to_the_executable ... ok
+test filelist::tests::depth_limit_is_enforced ... ok
+
+test result: ok. 38 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/config_behaviour.rs (target/debug/deps/config_behaviour-056e71597237f342)
+
+running 14 tests
+test a_known_action_rebinds_and_an_unknown_action_is_reported ... ok
+test a_relative_configured_tool_path_is_resolved_against_the_project_root ... ok
+test a_legacy_key_name_is_reported_with_its_replacement ... ok
+test an_unknown_key_is_ignored_while_the_rest_of_the_file_applies ... ok
+test defaults_apply_when_nothing_is_configured ... ok
+test an_invalid_configuration_file_degrades_to_the_lower_layer ... ok
+test a_relative_xdg_variable_is_reported_and_the_default_is_used ... ok
+test environment_variables_override_fim_settings_and_record_their_source ... ok
+test configured_filelists_and_project_settings_are_merged_with_discovered_ones ... ok
+test the_two_renderings_agree_and_stay_safe ... ok
+test the_project_layer_overrides_the_user_layer_per_key_and_inherits_the_rest ... ok
+test project_discovery_finds_filelists_rules_includes_defines_and_upward_rules ... ok
+test the_user_layer_applies_from_the_xdg_config_home ... ok
+test tool_resolution_records_every_attempt_even_on_success ... ok
+
+test result: ok. 14 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/project_model_fixture.rs (target/debug/deps/project_model_fixture-d4ef01cf1077fcb6)
+
+running 2 tests
+test the_repository_fixture_expands_to_the_checked_in_expectations ... ok
+test bad_entries_name_the_filelist_file_and_line ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/secret_discipline.rs (target/debug/deps/secret_discipline-2fa8596384c3c12a)
+
+running 4 tests
+test the_secret_is_only_reachable_through_the_explicit_accessor ... ok
+test a_rejected_configuration_file_never_quotes_its_secret_in_the_warning ... ok
+test the_default_configuration_carries_no_endpoint_or_key ... ok
+test a_configured_and_an_environment_secret_never_leave_the_config_layer ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_config
+
+running 1 test
+test crates/vd-config/src/lib.rs - (line 27) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+
+
+exit_code: 0

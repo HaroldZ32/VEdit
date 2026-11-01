@@ -1,0 +1,28 @@
+# C9 evidence header
+collected_at: 2026-11-01T19:35:29+08:00
+collected_at_utc: 2026-11-01T11:35:29+00:00
+git_head: 60c7ae9c95fe769e2bd6c86dd4c56e1514603e44
+clean_worktree: target/t122-clean (HEAD 60c7ae9) + T122 uncommitted changes copied in
+rust_ffi_lib: reused target/release/libvd_ffi.a from the main tree (build artifact only; source tree is clean worktree)
+---
+CFG-EXIT=0
+FAILED: [code=1] src/app/workspace-lane-vcs/CMakeFiles/vedit_workspace_vcs.dir/vcs_source.cpp.o 
+/vedit-clean/src/workspace/vcs/vcs_source.cpp:189:36: error: ‘vd_vcs_info_job’ was not declared in this scope; did you mean ‘vd_vcs_info_free’?
+/vedit-clean/src/workspace/vcs/vcs_source.cpp:243:36: error: ‘vd_vcs_diff_job’ was not declared in this scope; did you mean ‘vd_vcs_diff_free’?
+/vedit-clean/src/workspace/vcs/vcs_source.cpp:273:27: error: ‘vd_vcs_info_poll’ was not declared in this scope; did you mean ‘vd_vcs_info_free’?
+/vedit-clean/src/workspace/vcs/vcs_source.cpp:327:27: error: ‘vd_vcs_diff_poll’ was not declared in this scope; did you mean ‘vd_vcs_diff_free’?
+/vedit-clean/src/workspace/vcs/vcs_source.cpp:369:36: error: ‘vd_vcs_info_job’ was not declared in this scope; did you mean ‘vd_vcs_info_free’?
+/vedit-clean/src/workspace/vcs/vcs_source.cpp:374:17: error: ‘vd_vcs_info_poll’ was not declared in this scope; did you mean ‘vd_vcs_info_free’?
+/vedit-clean/src/workspace/vcs/vcs_source.cpp:430:36: error: ‘vd_vcs_diff_job’ was not declared in this scope; did you mean ‘vd_vcs_diff_free’?
+/vedit-clean/src/workspace/vcs/vcs_source.cpp:435:17: error: ‘vd_vcs_diff_poll’ was not declared in this scope; did you mean ‘vd_vcs_diff_free’?
+BUILD-EXIT=1
+	 21 - vedit-workspace-palette-integration-selftest (Not Run)
+	 22 - vedit-workspace-search-selftest (Not Run)
+	 23 - vedit-workspace-project-selftest (Not Run)
+	 24 - vedit-workspace-diagnostics-selftest (Not Run)
+	 25 - vedit-toolchain-missing-selftest (Not Run)
+	 26 - vedit-diagnostics-ffi-selftest (Not Run)
+	 27 - vedit-toolchain-ux-selftest (Not Run)
+	 28 - vedit-workspace-vcs-selftest (Not Run)
+	 29 - vedit-workspace-settings-selftest (Not Run)
+Errors while running CTest

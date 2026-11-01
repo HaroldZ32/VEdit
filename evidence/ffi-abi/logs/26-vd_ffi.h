@@ -511,6 +511,50 @@ typedef struct VdSearchResults {
 } VdSearchResults;
 
 /*
+ Observable summary of one tree search (T21): counters, limits and time.
+
+ `truncated`/`timed_out` are `u8` so the C layout is explicit (0/1).
+ */
+typedef struct VdSearchSummary {
+  /*
+   Files whose content was read.
+   */
+  uint32_t files_scanned;
+  /*
+   Files that produced at least one hit.
+   */
+  uint32_t files_matched;
+  /*
+   Recorded hits.
+   */
+  uint32_t hit_count;
+  /*
+   Files skipped as binary (NUL byte).
+   */
+  uint32_t skipped_binary;
+  /*
+   Files skipped as too large.
+   */
+  uint32_t skipped_too_large;
+  /*
+   Files/directories skipped as unreadable.
+   */
+  uint32_t skipped_unreadable;
+  /*
+   1 when `max_results` was reached, else 0.
+   */
+  uint8_t truncated;
+  /*
+   1 when `max_duration_ms` was reached, else 0.
+   */
+  uint8_t timed_out;
+  /*
+   Wall-clock duration of the scan.
+   */
+  uint64_t elapsed_ms;
+} VdSearchSummary;
+
+/*
  Error details of the most recent rejected call or failed job.
  */
 typedef struct VdError {
@@ -609,6 +653,50 @@ typedef struct VdVcsStatus {
    */
   char *note;
 } VdVcsStatus;
+
+/*
+ Branch + revision of the working tree containing `root` (owned strings).
+ */
+typedef struct VdVcsInfo {
+  /*
+   Backend: 0 none, 1 git, 2 svn.
+   */
+  int32_t backend;
+  /*
+   Branch name, or NULL.
+   */
+  char *branch;
+  /*
+   Short revision, or NULL.
+   */
+  char *revision;
+  /*
+   Why the identity is unavailable, or NULL.
+   */
+  char *note;
+} VdVcsInfo;
+
+/*
+ One file's unified diff (owned strings).
+ */
+typedef struct VdVcsDiff {
+  /*
+   Path asked for, or NULL.
+   */
+  char *path;
+  /*
+   Unified diff text, or NULL.
+   */
+  char *text;
+  /*
+   1 when the tool reported binary content.
+   */
+  int32_t binary;
+  /*
+   Why the diff is empty, or NULL.
+   */
+  char *note;
+} VdVcsDiff;
 
 #ifdef __cplusplus
 extern "C" {
@@ -786,6 +874,27 @@ uint64_t vd_lsp_session_request(struct VdService *service,
                                 const char *new_name);
 
 /*
+ Replace the tracked text of one document with the caller's EDITOR BUFFER
+ (a full-document `didChange`). Nothing is read from disk here, so diagnostics
+ can follow unsaved edits; the document is opened first when the session does
+ not have it. The updated diagnostics arrive through the normal
+ `VD_LSP_REQ_DIAGNOSTICS` request (the server publishes them).
+
+ Returns `VD_STATUS_READY` on success; `POLL_MISUSE` when the session id is
+ unknown or the arguments are not valid UTF-8 strings (see
+ `vd_service_error` for the reason).
+
+ # Safety
+
+ `service` must be null or live; `path` and `text` must be valid
+ NUL-terminated strings.
+ */
+int32_t vd_lsp_session_change(struct VdService *service,
+                              uint64_t session,
+                              const char *path,
+                              const char *text);
+
+/*
  Poll one request.
 
  `VD_STATUS_PENDING` while the worker is busy, `VD_STATUS_READY` with `out`
@@ -870,6 +979,26 @@ int32_t vd_project_poll(struct VdService *service, uint64_t job, struct VdProjec
 void vd_project_info_free(struct VdProjectInfo *info);
 
 /*
+ Start a tree-search job (walk + match, T21).
+
+ `case_sensitive`/`verilog_only` are `u8` booleans (0/1). The result is read
+ with [`vd_search_tree_poll`], which also returns the observable summary.
+
+ # Safety
+
+ `service` must be null or live; `root`/`needle` must be null or valid
+ NUL-terminated strings.
+ */
+uint64_t vd_search_tree_query(struct VdService *service,
+                              const char *root,
+                              const char *needle,
+                              size_t limit,
+                              uint64_t max_file_bytes,
+                              uint64_t max_duration_ms,
+                              uint8_t case_sensitive,
+                              uint8_t verilog_only);
+
+/*
  Start a search job.
 
  `files` is a C array of `file_count` borrowed strings. Returns the job id, or
@@ -897,6 +1026,22 @@ uint64_t vd_search_query(struct VdService *service,
  [`VdSearchResults`].
  */
 int32_t vd_search_poll(struct VdService *service, uint64_t job, struct VdSearchResults *out);
+
+/*
+ Poll a tree-search job and fill both the hits and the summary.
+
+ `out_summary` may be null; when present it is zero-filled for a job that was
+ started by [`vd_search_query`] (no tree summary exists).
+
+ # Safety
+
+ `service` must be null or live; `out_results`/`out_summary` must be null or
+ writable for one [`VdSearchResults`] / [`VdSearchSummary`].
+ */
+int32_t vd_search_tree_poll(struct VdService *service,
+                            uint64_t job,
+                            struct VdSearchResults *out_results,
+                            struct VdSearchSummary *out_summary);
 
 /*
  Release a filled [`VdSearchResults`]; null-safe.
@@ -1038,6 +1183,70 @@ int32_t vd_vcs_poll(struct VdService *service, uint64_t job, struct VdVcsStatus 
  freed yet.
  */
 void vd_vcs_status_free(struct VdVcsStatus *status);
+
+/*
+ Starts a branch + revision job for `root`.
+
+ Returns the job id, or `0` when the arguments were rejected. The panel polls
+ with [`vd_vcs_info_poll`], so the GUI thread never waits for `git`/`svn`.
+
+ # Safety
+
+ `service` must be null or live; `root` must be null or a valid NUL-terminated
+ string.
+ */
+uint64_t vd_vcs_info_job(struct VdService *service, const char *root);
+
+/*
+ Polls a branch + revision job started by [`vd_vcs_info_job`].
+
+ # Safety
+
+ `service` must be null or live and `out` must be null or writable for one
+ [`VdVcsInfo`].
+ */
+int32_t vd_vcs_info_poll(struct VdService *service, uint64_t job, struct VdVcsInfo *out);
+
+/*
+ Releases the strings of a [`VdVcsInfo`] (the struct itself is by value).
+
+ # Safety
+
+ `info` must be null or a struct returned by `vd_vcs_info_poll` that was not freed.
+ */
+void vd_vcs_info_free(struct VdVcsInfo *info);
+
+/*
+ Starts a unified-diff job for one file of the working tree containing `root`.
+
+ Returns the job id, or `0` when the arguments were rejected. The panel polls
+ with [`vd_vcs_diff_poll`], so the GUI thread never waits for `git diff`.
+
+ # Safety
+
+ `service` must be null or live; `root` and `path` must be null or valid
+ NUL-terminated UTF-8 strings.
+ */
+uint64_t vd_vcs_diff_job(struct VdService *service, const char *root, const char *path);
+
+/*
+ Polls a diff job started by [`vd_vcs_diff_job`].
+
+ # Safety
+
+ `service` must be null or live and `out` must be null or writable for one
+ [`VdVcsDiff`].
+ */
+int32_t vd_vcs_diff_poll(struct VdService *service, uint64_t job, struct VdVcsDiff *out);
+
+/*
+ Releases the strings of a [`VdVcsDiff`].
+
+ # Safety
+
+ `diff` must be null or a struct returned by `vd_vcs_diff_poll` that was not freed.
+ */
+void vd_vcs_diff_free(struct VdVcsDiff *diff);
 
 #ifdef __cplusplus
 }  // extern "C"

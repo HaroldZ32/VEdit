@@ -179,6 +179,18 @@ typedef struct VdSearchResults {
   struct VdSearchHit *items;
 } VdSearchResults;
 
+typedef struct VdSearchSummary {
+  uint32_t files_scanned;
+  uint32_t files_matched;
+  uint32_t hit_count;
+  uint32_t skipped_binary;
+  uint32_t skipped_too_large;
+  uint32_t skipped_unreadable;
+  uint8_t truncated;
+  uint8_t timed_out;
+  uint64_t elapsed_ms;
+} VdSearchSummary;
+
 typedef struct VdError {
   int32_t code;
   char message[VD_ERROR_MESSAGE_CAPACITY];
@@ -212,6 +224,20 @@ typedef struct VdVcsStatus {
   struct VdVcsChange *changes;
   char *note;
 } VdVcsStatus;
+
+typedef struct VdVcsInfo {
+  int32_t backend;
+  char *branch;
+  char *revision;
+  char *note;
+} VdVcsInfo;
+
+typedef struct VdVcsDiff {
+  char *path;
+  char *text;
+  int32_t binary;
+  char *note;
+} VdVcsDiff;
 
 #ifdef __cplusplus
 extern "C" {
@@ -256,6 +282,11 @@ uint64_t vd_lsp_session_request(struct VdService *service,
                                 uint32_t character,
                                 const char *new_name);
 
+int32_t vd_lsp_session_change(struct VdService *service,
+                              uint64_t session,
+                              const char *path,
+                              const char *text);
+
 int32_t vd_lsp_request_poll(struct VdService *service,
                             uint64_t session,
                             uint64_t request,
@@ -273,6 +304,15 @@ int32_t vd_project_poll(struct VdService *service, uint64_t job, struct VdProjec
 
 void vd_project_info_free(struct VdProjectInfo *info);
 
+uint64_t vd_search_tree_query(struct VdService *service,
+                              const char *root,
+                              const char *needle,
+                              size_t limit,
+                              uint64_t max_file_bytes,
+                              uint64_t max_duration_ms,
+                              uint8_t case_sensitive,
+                              uint8_t verilog_only);
+
 uint64_t vd_search_query(struct VdService *service,
                          const char *root,
                          const char *const *files,
@@ -281,6 +321,11 @@ uint64_t vd_search_query(struct VdService *service,
                          size_t limit);
 
 int32_t vd_search_poll(struct VdService *service, uint64_t job, struct VdSearchResults *out);
+
+int32_t vd_search_tree_poll(struct VdService *service,
+                            uint64_t job,
+                            struct VdSearchResults *out_results,
+                            struct VdSearchSummary *out_summary);
 
 void vd_search_results_free(struct VdSearchResults *results);
 
@@ -312,6 +357,18 @@ uint64_t vd_vcs_status(struct VdService *service, const char *root);
 int32_t vd_vcs_poll(struct VdService *service, uint64_t job, struct VdVcsStatus *out);
 
 void vd_vcs_status_free(struct VdVcsStatus *status);
+
+uint64_t vd_vcs_info_job(struct VdService *service, const char *root);
+
+int32_t vd_vcs_info_poll(struct VdService *service, uint64_t job, struct VdVcsInfo *out);
+
+void vd_vcs_info_free(struct VdVcsInfo *info);
+
+uint64_t vd_vcs_diff_job(struct VdService *service, const char *root, const char *path);
+
+int32_t vd_vcs_diff_poll(struct VdService *service, uint64_t job, struct VdVcsDiff *out);
+
+void vd_vcs_diff_free(struct VdVcsDiff *diff);
 
 #ifdef __cplusplus
 }  // extern "C"

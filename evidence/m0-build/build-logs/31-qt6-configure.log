@@ -14,7 +14,10 @@
 -- syn-grammars: compiled grammar id='verilog' verilog=1 systemverilog=1
 -- VEdit: building lane directory src/syntax/grammars
 -- VEdit: building lane directory src/terminal
--- VEdit: lane directory src/syntax/overlay not present yet; skipped
+-- VEdit: building lane directory src/syntax/overlay
+-- VEdit edit-core: folding + breadcrumb lanes wired into the live editor (T94)
+-- VEdit FIM: Rust service layer linked (the Qt side never sends HTTP)
+-- VEdit edit-core: FIM inline-completion lane wired into the live editor (T104)
 -- VEdit edit-core: src/app EditorProvider seam found -> provider adapter built
 -- VEdit: edit-core lane wired (vedit_editor_core); KTextEditor is the product editor
 -- VEdit: vedit-app links the Rust service layer (vd-ffi); ABI selftest registered
@@ -28,15 +31,21 @@
 -- VEdit: workspace lane 'project' included
 -- VEdit: diagnostics lane links the Rust service layer (vd-ffi)
 -- VEdit: workspace lane 'diagnostics' included
+-- workspace-vcs: linking the vd-ffi VCS ABI (/vedit-build/target/release/libvd_ffi.a)
+-- VEdit: workspace lane 'vcs' included
+-- workspace-settings: linking the vd-ffi settings ABI (/vedit-build/target/release/libvd_ffi.a)
+-- VEdit: workspace lane 'settings' included
 -- VEdit: workspace lane 'filetree' wired (vedit_file_tree)
 -- VEdit: workspace lane 'palette' wired (vedit_workspace_palette)
 -- VEdit: workspace lane 'search' wired (vedit_workspace_search)
 -- VEdit: workspace lane 'project' wired (vedit_workspace_project)
 -- VEdit: workspace lane 'diagnostics' wired (vedit_workspace_diagnostics)
+-- VEdit: workspace lane 'vcs' wired (vedit_workspace_vcs)
+-- VEdit: workspace lane 'settings' wired (vedit_workspace_settings)
 -- VEdit: workspace integration enabled (src/workspace/integration.cpp)
 -- VEdit: building src/app (application shell)
 -- syn-provider: baked grammar id='verilog' for /vedit-build/src/syntax/provider (owner: src/syntax/grammars)
 -- syn-product: vedit-app links the syntax stack (provider+kde+grammars, tree-sitter, KTextEditor, KSyntaxHighlighting) and its startup hook is asserted by ctest
--- Configuring done (0.3s)
+-- Configuring done (0.4s)
 -- Generating done (0.1s)
 -- Build files have been written to: /vedit-build/target/qt6-build
