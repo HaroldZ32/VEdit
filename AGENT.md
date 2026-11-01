@@ -84,6 +84,20 @@ job). **SVN is stub-only**: neither the host nor the pinned image ships
 lane tests drive `StubVcsSource`/canned runners. Do not describe SVN support as
 verified until a real `svn` working-copy smoke exists.
 
+### Project discovery: optional files are not errors (T114)
+
+`.rules.verible_lint` is **optional**: when no file is found the built-in Verible
+rule set applies, so nothing is reported (a missing optional file is the normal
+case, not a defect — the same rule T85 applied to a missing toolchain). Only a
+rules file that **exists but cannot be read** is reported (`rules.unreadable`);
+that message stays path-free (no `file` field, the text names the file relative
+to the project root) and says the built-in rules keep working meanwhile.
+
+The upward search **intentionally stops at `$HOME`** (or at the filesystem root
+when the project lives outside the home tree), so it can never walk out of the
+user's tree. `filelist.missing` and the other `filelist.*` / `config.*` codes
+stay: they describe things the user explicitly configured or wrote wrong.
+
 ### Runtime toolchain discovery (diagnostics / outline)
 
 The diagnostics and outline panels need `verible-verilog-ls` (LSP) and `slang`
@@ -114,6 +128,20 @@ Dependency ownership: the root `Cargo.toml`, `Cargo.lock` and
 `rust-toolchain.toml` are workspace-level and owned by the skeleton task. The
 lane crates ship with their dependencies pre-installed, so a lane must not add a
 dependency or edit those files; ask the captain if one is genuinely missing.
+
+### CJK font fallback in the editor (T119)
+
+The editor keeps DejaVu Sans Mono for Latin (so ASCII metrics are unchanged) and
+falls back to Noto Sans Mono CJK for CJK glyphs. Because the two fonts have
+different em advances, a CJK glyph is **1.60×** a Latin advance rather than the
+typographic 2.0×; mixed Chinese/Latin comment alignment is therefore approximate,
+while CJK runs are internally monospaced. This is a **deliberate trade-off**: ASCII
+width stability (the bulk of code) was chosen over a 2.0 mixed ratio.
+
+Back door, if strict 2.00 is ever required: set the editor's primary font family
+to `Noto Sans Mono CJK SC` (one configuration line). The cost is that the Latin
+advance changes from **10px to 8px** (DejaVu Sans Mono → Noto Sans Mono CJK SC),
+so all pure-ASCII metrics change.
 
 ## 5. Verification
 

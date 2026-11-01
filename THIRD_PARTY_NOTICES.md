@@ -201,3 +201,20 @@ CentOS 7 的软件仓库里没有这两个工具，所以交付物**随包分发
   §1–§8 的 legacy 条目**不覆盖** Qt6 产物。
 - 最终产物一致性（AppDir 内每份文件可按 sha256 找到）由 `pack-final` 的产物侧清单复核；
   本节只固定仓库内身份。
+
+### 9.5 随包 CJK 字体：Noto Sans CJK（OFL-1.1）
+
+CentOS 7 最小安装没有任何字体，而 AppDir 的 fontconfig 只指向包内字体；不随包
+CJK 字体时，中文正文/中文文件名会渲染成方块（T115 的 `inFont_CJK=0` 实测）。
+
+| 字体 | 版本 / 来源 | 随包文件（sha256） | 许可 | 许可全文 |
+|---|---|---|---|---|
+| **Noto Sans CJK**（TTC 合集：SC/TC/JP/KR/HK + Mono CJK） | Ubuntu 包 `fonts-noto-cjk 1:20240730+repack1-1build1`；上游 <https://github.com/notofonts/noto-cjk> | `packaging/runtime/assets/fonts/NotoSansCJK-Regular.ttc`（**19,484,784 B**，sha256 **`b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a`**） | **OFL-1.1**，Copyright **2010-2012, Google Corporation** | 包内 `usr/share/doc/vedit/licenses/Noto-CJK-OFL-1.1.txt`；仓内 `packaging/runtime/assets/licenses/Noto-CJK-OFL-1.1.txt` |
+
+- fontconfig 别名（随包 `etc/fonts/fonts.conf`）：UI 的 `DejaVu Sans` 优先回退
+  `Noto Sans CJK SC`；编辑器等宽的 `DejaVu Sans Mono` 优先回退
+  **`Noto Sans Mono CJK SC`**（中文全角按 2× 拉丁字宽对齐）；拉丁字符仍由 DejaVu 匹配。
+- `assemble-appdir.sh` 按 `scripts/versions.env` 的 `NOTO_CJK_FONT_SHA256` 校验后安装；
+  sha 不符即失败。`selfcheck.sh` 断言包内字体存在、OFL 文本存在且含
+  `SIL OPEN FONT LICENSE` 与版权行。
+- 许可文本随包分发（OFL 的再分发条件）；包内文件与仓内文件内容相同。
