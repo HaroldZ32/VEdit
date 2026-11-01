@@ -1,107 +1,96 @@
-# T83 — 真机验证包（自包含 tarball + 一条命令的 verify-centos7.sh）
+# 真机验证包（T91 加固后）— 证据
 
-- cell: `cell-20261031T085543161Z` · board task **T83**
-- 采集时间：2026-10-31 23:05 – 2026-11-01 00:12 (Asia/Shanghai)
-- `git rev-parse HEAD`（构建 tarball 时）：`c682694`（`git rev-parse --short HEAD`；完整值见 `build-console.txt` 头）
-- 构建镜像：`vedit-qt6-build:local`（Ubuntu 26.04 / glibc **2.43** / Qt 6.10.2 / KF6 6.24.0）
-
-> **更新（2026-10-31T15:33Z，Lead 在 GO-4 提交时补记）**
-> 本文件是 **T83 当时的历史快照**。其中「clean-room 上 `highlight.verilog-definition` FAIL」的结论**已被 T84 取代**：根因是 `VEDIT_SYNTAX_DIR` 指向了 `…/syntax` 子目录（产品契约要求的是**数据根**），修法与红→绿对照见 **`evidence/appdir-syntax-dir/`**（修复后该检查 FAIL → PASS）。
-> **历史结论保持原样不改**（不把历史快照改成假绿）；判读时请以 `evidence/appdir-syntax-dir/` 为准。
-
-- 构建方式：`bash build/centos7-verify/build-tarball.sh`（可复跑，日志见 `build-console.txt`）
+- cell: `cell-20261031T085543161Z` · board task **T91**（承接 T83 的验证包）
+- 采集时间：2026-11-01 10:37–11:57 (Asia/Shanghai)
+- `git rev-parse HEAD`：见 `build-console.txt` 与 `report-container/verify-report-container.txt`
+- 构建镜像：`vedit-qt6-build:local`；验证环境：**干净 stock `docker.m.daocloud.io/library/centos:7`**（glibc 2.17，无 Qt6/KF6，无网络）
 
 ## 交付物
 
 | 文件 | 说明 |
 |---|---|
-| `build/centos7-verify/dist/vedit-centos7-verify-c682694.tar.gz` | **要拷到真机的 tarball**（104 MB，自包含） |
-| `build/centos7-verify/dist/…tar.gz.sha256` / `tarball-sha256.txt` | sha256 = `6ecf90a258c2e8b2d1b82b114bd65d54dd0c3d38b883e155592555bd83803b51` |
-| `build/centos7-verify/verify-centos7.sh` | 一条命令跑完的验证脚本（打进 tarball） |
-| `build/centos7-verify/STEPS.md` | 给用户的中文步骤（打进 tarball） |
-| `build/centos7-verify/build-tarball.sh` | 可复跑的构建脚本（AppDir + 样例 + 脚本 + MANIFEST → tarball） |
-| `build/centos7-verify/samples/verilog-demo/` | 样例工程：`demo.f` + `top.v` + `counter.v` + 故意违规的 `bad.v` |
-| `report-container/verify-report-container.txt` | **在干净 stock `centos:7` 容器里对本 tarball 跑出的完整报告**（原文，未编辑） |
+| `build/centos7-verify/dist/vedit-centos7-verify-23514fb.tar.gz` | **要拷到真机的 tarball**（104 MB）；sha256 = `e95f9817fec6106dc5259b8c1c9c12ccda9d4826834a5eb05ae0b7c62f43a17c`（见 `tarball-sha256.txt`） |
+| `build/centos7-verify/verify-centos7.sh` | 一条命令的验证脚本（18 项，T91 加固后） |
+| `build/centos7-verify/STEPS.md` | 中文步骤 + **硬证据/代理指标**分栏 + 四级工具链发现顺序 |
+| `build/centos7-verify/build-tarball.sh` | 可复跑构建（AppDir + 样例 + **诊断 fixture** + 脚本 + MANIFEST） |
+| `build/centos7-verify/negative-checks.sh` | **负向验证**：5 个破坏用例，证明修复后的检查真能 FAIL |
+| `build/centos7-verify/samples/verilog-demo/` | 样例（`.f` + `bad.v` 预置 3 条违规） |
+| 包内 `samples/diagnostics-fixture` | 产品诊断 selftest 的 7 文件 `.f` fixture（来自 `tests/fixtures/verilog-project`） |
+| `report-container/verify-report-container.txt` | **本 tarball 在干净 centos:7 容器里的完整 18 项报告** |
+| `negative-checks.txt` | 5 个负向用例的原样输出 + "仓库未被改动"证明 |
 
-tarball 结构：
+## 1. T89 F-1/F-2/F-3 的修复（逐条）
 
-```
-vedit-centos7-verify-c682694/
-  AppDir/  bin/vedit-app  bin/verible-verilog-{ls,lint,format}  bin/slang
-           bin/vedit-ksh-env-probe  bin/vedit-diagnostics-ffi-selftest
-           lib/（Qt6/KF6/KSyntaxHighlighting/tree-sitter + glibc 2.43 全家）
-           ld-linux-x86-64.so.2（自带 loader） plugins/platforms/ usr/share/
-  samples/verilog-demo/   verify-centos7.sh   STEPS.md   MANIFEST.sha256
-```
-
-## 自测结果（这就是验证脚本的原样输出）
-
-在**干净的 `docker.m.daocloud.io/library/centos:7`**（glibc 2.17、无 Qt6/KF6、无网络）里解压并执行
-`bash verify-centos7.sh`：
-
-```
-SUMMARY: PASS=14 FAIL=2 SKIP=2
-```
-
-| 检查 | 结果 | 实际值 |
+| 发现 | 修复前（软 PASS） | 修复后（硬证据） |
 |---|---|---|
-| `kernel.is-3.10` | **FAIL** | `actual=7.0.0-38-generic` —— 容器共享宿主内核，**这条 FAIL 正是设计意图**：容器里不能冒充 CentOS 7 内核 |
-| `glibc.system` | PASS | `ldd (GNU libc) 2.17` |
-| `package.files` / `package.manifest` | PASS | 8 个关键文件齐全；MANIFEST 211 个文件全部 sha256 一致 |
-| `toolchain.verible` / `toolchain.slang` | PASS | `Version v0.0-4298-g085eef05` / `slang version 12.1.0+0` |
-| `app.selfcheck` | PASS | exit 0；`EDIT-CORE-SELFTEST ok=1 checks=67` + `APP-SHELL-SELFTEST ok=1 checks=176` |
-| `startup.toolchain` | PASS | `TOOLCHAIN source=verible:bundled slang:bundled missing=[]` |
-| `startup.project` | PASS | `installFileTree projectRoot='<解压路径>/samples/verilog-demo'`（`.f` 工程被打开） |
-| `startup.exit` | PASS | exit 0（`--hold 1500` 后正常退出） |
-| `highlight.stack` | PASS | `grammar=verilog backend=1 startup-hook=1 private-dir-in-AppDir=yes` |
-| `highlight.verilog-definition` | **FAIL** | `verilog=0 own-xml=[] definitions=3` —— 产品自己报告 Verilog 定义不可用（详见 §发现2） |
-| `highlight.mode` | SKIP | 需要带窗会话，offscreen 观测不到 `highlightingMode`（已在报告里写明原因） |
-| `lint.bundled` | PASS | 随包 verible lint 在 `bad.v` 上报 **3** 条诊断（`explicit-parameter-storage-type` / `line-length` / `always-comb`） |
-| `lint.product` | SKIP | 随包的 `vedit-diagnostics-ffi-selftest` 需要自己的 FFI fixture 目录，本次返回 1；已如实标 SKIP 并给日志 |
-| `symbols.app` | PASS | `vedit-app` 需 `GLIBC_2.39`；随包 libc 提供到 `GLIBC_2.43` → 包自洽 |
-| `loader.used` | PASS | `/proc/<pid>/maps` 含 `<AppDir>/ld-linux-x86-64.so.2` |
-| `loader.system-not-used` | PASS | maps 里没有 `/lib64/ld-linux-x86-64.so.2` |
+| **F-1a** `toolchain.verible` | `$?` 取到的是 `head` 的退出码；`-x` 存在就 PASS | 真执行 `--version`，取**进程退出码**，且输出必须含 `vX.Y-<release>-g<sha>` 版本标识 |
+| **F-1b** `toolchain.slang` | 无条件 PASS（只判 `-x`） | 真执行 `--version`，退出码 0 **且**输出含 `slang version <n>` |
+| **F-2** `startup.exit` | 永远 `PASS`，退出码只写进文本 | 判定来自**真实进程退出码**：非 0 → FAIL（崩溃/参数错误都会红） |
+| **F-3** `lint.product` | 永远 SKIP（包里没有 fixture） | **选项 (a)**：把 7 文件诊断 fixture 打进包，真跑产品诊断 selftest（随包 `verible-verilog-ls` LSP + FFI slang），断言 `exit 0` **且** `failures=0` |
 
-`SCRIPT_EXIT=1` 是**预期**的：脚本按设计“有 FAIL 就返回 1”。真机上 `kernel.is-3.10` 应为 PASS，
-`highlight.verilog-definition` 是否转 PASS 取决于 §发现2 的修复。
+同时把 `lint.bundled` 从"至少 1 条"收紧为**确定条数**：恰好 **3** 条诊断且 lint `exit 1`。
 
-## 发现（两条，都属于"验证脚本应当暴露"的东西）
-
-### 发现 1（已证）：容器里跑不等于 CentOS 7 跑，脚本会自己把这件事暴露出来
-本报告的一切都是**容器内**实测（glibc 2.17 用户态 + 宿主 7.0.0 内核）。`kernel.is-3.10` 因此 FAIL。
-**真机上这条才会 PASS** —— 这正是把包交给用户、让用户在真 VM 上跑的原因。脚本的其它 14 条 PASS
-不依赖内核版本（用户态证据），但 `loader.used` 之后的"能不能在 3.10 上真跑起来"只能由真机回答。
-
-### 发现 2（已证，包形态问题，不是脚本问题）：F2 AppDir 形态下产品报告"Verilog 定义不可用"
-真机报告里 `syntax-product:` 行原文（容器内）：
+## 2. 修后完整验证（18 项，本 tarball 实跑）
 
 ```
-syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog'
-backend-available=1 private-dir='<AppDir>/usr/share/org.kde.syntax-highlighting/syntax'
-definitions=3 own-xml=[] themes=30 verilog=0 systemverilog=0 kernel='KTextEditor 6.24.0'
-embargoed=[] startup-hook=1
+SUMMARY: PASS=16 FAIL=1 SKIP=1
 ```
 
-- `own-xml=[]`：产品在 private-dir 下没列出任何自带 XML（该目录里确实有 2 个文件，
-  `package.files` 与 `vedit-ksh-env-probe` 的 whitelist 都能看到 `Verilog,SystemVerilog`）。
-- `verilog=0`：按 `src/syntax/kde/ksyntax_data.cpp:161-165`，这要求
-  `repository_->definitionForName("Verilog").isValid() && private_verilog_shipped`；
-  产品自己给出的诊断是 “.v files fall back to plain text”。
-- **推断（未证，需 highlight/packaging lane 确认）**：`AppRun` 把 `VEDIT_SYNTAX_DIR` 指向
-  `<AppDir>/usr/share/org.kde.syntax-highlighting/syntax`（syntax 子目录），而仓库里跑通时该变量是
-  数据根（`/vedit-build/resources`，其下有 `syntax/` 子目录）。两者相差一层，很可能就是
-  `own-xml=[]` 的直接原因。**本任务写域不包含 `packaging/**` 之外的运行期代码与 `AppRun` 语义**，
-  故只报告、不修改；这也解释了为什么 `highlight.stack` PASS 而 `highlight.verilog-definition` FAIL：
-  栈起来了，但 `.v` 的定义解析没起来。
+| # | 检查 | 结果 | 备注 |
+|---|---|---|---|
+| 1 | `kernel.is-3.10` | **FAIL** | `actual=7.0.0-38-generic` —— 容器共享宿主内核，**设计如此**；真机应 PASS |
+| 2 | `glibc.system` | PASS | `ldd (GNU libc) 2.17` |
+| 3 | `package.files` | PASS | 8 个关键文件齐全 |
+| 4 | `package.manifest` | PASS | 全部 sha256 一致 |
+| 5 | `toolchain.verible` | PASS | `exit 0 | Version v0.0-4298-g085eef05` |
+| 6 | `toolchain.slang` | PASS | `exit 0 | slang version 12.1.0+0` |
+| 7 | `app.selfcheck` | PASS | `exit 0`（EDIT-CORE 67 / APP-SHELL 176 checks） |
+| 8 | `startup.toolchain` | PASS | `TOOLCHAIN source=verible:bundled slang:bundled missing=[]` |
+| 9 | `startup.project` | PASS | `installFileTree projectRoot='<解压路径>/samples/verilog-demo'` |
+| 10 | `startup.exit` | PASS | 真实退出码 `0` |
+| 11 | `highlight.stack` | PASS | `grammar=verilog backend=1 startup-hook=1 private-dir-in-AppDir=yes` |
+| 12 | `highlight.verilog-definition` | PASS | `verilog=1 own-xml=[…]`（T83 时的 FAIL 已在当前树修复） |
+| 13 | `highlight.mode` | SKIP | 需带窗会话；已写明原因 |
+| 14 | `lint.bundled` | PASS | 恰好 **3** 条诊断 + `exit 1` |
+| 15 | `lint.product` | PASS | `exit 0 | VER-DIAGNOSTICS-FFI-SELFTEST checks=23 failures=0`（随包 fixture） |
+| 16 | `symbols.app` | PASS | `vedit-app needs GLIBC_2.39 / bundled libc provides 2.43` |
+| 17 | `loader.used` | PASS | `/proc/<pid>/maps` 含包内 `ld-linux-x86-64.so.2` |
+| 18 | `loader.system-not-used` | PASS | 无 `/lib64/ld-linux-x86-64.so.2` |
 
-→ 建议下一步（给 captain 的交办）：由 highlight/packaging lane 用 `VEDIT_SYNTAX_DIR=<数据根>` 与
-`<数据根>/syntax` 各跑一次 `vedit-app --selfcheck`，比对 `own-xml`/`verilog` 两字段，确认后修正 AppRun；
-修好后重跑 `build-tarball.sh` 与真机验证，`highlight.verilog-definition` 应转 PASS。
+## 3. 负向验证（每条修过的检查都证明能 FAIL）
 
-## 边界（照实说）
+方法：**在容器内**解压**出厂 tarball**，只破坏一个条件，跑完整脚本，引用该检查自己的 `RESULT` 行；
+仓库文件与 tarball 从不被修改。原样输出见 `negative-checks.txt`。
 
-- 没有真 CentOS 7（内核 3.10）机器：tarball 与脚本的自测都在容器里完成，**内核 3.10 未验**（脚本会把这条 FAIL 出来）。
-- 未开真窗口：`highlight.mode` SKIP；xcb 插件虽随包，但容器无 DISPLAY，未验证窗口路径。
-- `lint.product` SKIP：诊断 selftest 需要 fixture 目录，未在包里带（它验证的是 LSP 链路，不是本包主判据）。
-- 脚本自测覆盖了 **FAIL / SKIP / PASS 三种分支**（本报告里三种都出现了），说明"失败继续跑完并如实报告"是有效的。
-- tarball 未入库（104 MB，`build/centos7-verify/dist/` 由脚本重建）；证据里只放 sha256 与报告原文。
+| 用例 | 破坏方式 | 观察到的结果 |
+|---|---|---|
+| `verible-wrong-binary` | 用 `/bin/true` 冒充 `bin/verible-verilog-lint` | **FAIL**：`exit 0 | true (GNU coreutils) 8.22` —— 正是"退出 0 但不是 verible"的软 PASS 场景，被版本标识拦住 |
+| `slang-not-a-binary` | 写一个文本文件当 `bin/slang` | **FAIL**：`exit 127`（无法执行） |
+| `startup-exit-nonzero` | 给启动命令加一个不存在的参数 | **FAIL**：`exit 1`（真实退出码） |
+| `lint-count-wrong` | 把期望诊断数 3 改成 4 | **FAIL**：`actual=3 diagnostic(s)` ≠ 期望 4 |
+| `lint-product-wrong-fixture` | 把 fixture 指到非 fixture 目录 | **FAIL**：`exit 1 | VER-DIAGNOSTICS-FFI-SELFTEST checks=1 failures=1` |
+
+负向用例全部在容器内的临时副本上执行并以 `rm -rf /work` 丢弃；**仓库侧证明**见 `negative-checks.txt` 末尾：
+`sha256sum build/centos7-verify/verify-centos7.sh` 与用例前一致，`git status` 里没有负向用例产生的文件。
+
+## 4. T89 另两条 Low（已修）
+
+- **`THIRD_PARTY_NOTICES.md` §9.3**：新增"显式上游来源（URL）"表 —— Verible
+  `https://github.com/chipsalliance/verible`（release `v0.0-4298-g085eef05`，下载 URL 见
+  `scripts/versions.env:VERIBLE_URL`）；slang `https://github.com/MikePopoloski/slang`（本仓库从源码构建）。
+- **发现链措辞统一为四级**：`bundled > local checkout > PATH > env`。改了
+  `packaging/runtime/assemble-appdir.sh` 生成的三处文案（`RUNTIME-NOTICES.txt`、
+  `usr/share/vedit/toolchain.txt` 及其注释），`THIRD_PARTY_NOTICES.md` §9.3 同步，`STEPS.md` 写明四级含义。
+  产物内新文案已随本次 tarball 重新生成。
+
+## 5. F-4 真机结果归档
+
+见 `evidence/centos7-real-machine/`：已归档用户回贴的 `SUMMARY: PASS=16 FAIL=0 SKIP=2`、
+tarball sha256 前缀 `acc58ee0…`，以及"完整 `verify-report-*.txt` 待用户回贴后补入"的说明与补充步骤。
+**没有**伪造任何逐项真机数据。
+
+## 6. 边界
+
+- 依然是容器自测：`kernel.is-3.10` 在容器里必然 FAIL（共享宿主内核），真机数据只能由用户回贴（F-4）。
+- `highlight.mode` 仍是 SKIP（需要带窗会话），已被 `STEPS.md` 归入"需要窗口才能看全"的代理指标。
+- 本目录不含 104 MB 的 tarball 本体（由 `build-tarball.sh` 复跑重建）；证据只放 sha256 与报告原文。

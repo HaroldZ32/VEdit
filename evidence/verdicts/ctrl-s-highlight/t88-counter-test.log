@@ -1,0 +1,27 @@
+collected_at: 2026-11-01T02:31:33Z
+git_head: 23514fb351f34ab23de177c375dd240175662d5e
+verifier: Reviewer (cell-20261031T085543161Z, T88) — counter-test: HEAD sources in an isolated /tmp copy with ONLY clearEditorSaveShortcut disabled (the rest of the fix, the enumerator and the assertions are the committed ones)
+
+== build the counter-test copy in the pinned image (same configure flags as scripts/build-qt-in-container.sh) ==
+patched: fix disabled in the counter-test copy
+CONFIGURE-EXIT=0
+BUILD-EXIT=0
+== selfcheck with the fix disabled (the committed assertions must go RED) ==
+CTRL-S-BINDING after-provider-install objectName=file_save class=QAction shortcut=Ctrl+S context=3 associated=[KateViewInternal() ] holders=[KateViewInternal() ] chain=KActionCollection<
+CTRL-S-BINDING after-provider-install objectName=file_save class=QAction shortcut=Ctrl+S context=3 associated=[KateViewInternal() ] holders=[KateViewInternal() ] chain=KActionCollection<
+CTRL-S-BINDING after-provider-install objectName=file_save class=QAction shortcut=Ctrl+S context=3 associated=[KateViewInternal() ] holders=[KateViewInternal() ] chain=KActionCollection<
+CTRL-S-BINDING after-provider-install objectName=action-file.save class=QAction shortcut=Ctrl+S context=1 associated=[QMenu() ] holders=[QMenu() ] chain=QMainWindow<
+CHECK save.shortcut.unique FAIL bindings=4
+CHECK save.shortcut.authority FAIL
+QAction::event: Ambiguous shortcut overload: Ctrl+S
+CHECK save.shortcut.disk-bytes FAIL
+CHECK save.shortcut.modified-cleared FAIL
+CTRL-S-BINDING after-split objectName=file_save class=QAction shortcut=Ctrl+S context=3 associated=[KateViewInternal() ] holders=[KateViewInternal() ] chain=KActionCollection<
+CTRL-S-BINDING after-split objectName=file_save class=QAction shortcut=Ctrl+S context=3 associated=[KateViewInternal() ] holders=[KateViewInternal() ] chain=KActionCollection<
+CTRL-S-BINDING after-split objectName=file_save class=QAction shortcut=Ctrl+S context=3 associated=[KateViewInternal() ] holders=[KateViewInternal() ] chain=KActionCollection<
+CTRL-S-BINDING after-split objectName=file_save class=QAction shortcut=Ctrl+S context=3 associated=[KateViewInternal() ] holders=[KateViewInternal() ] chain=KActionCollection<
+CTRL-S-BINDING after-split objectName=action-file.save class=QAction shortcut=Ctrl+S context=1 associated=[QMenu() ] holders=[QMenu() ] chain=QMainWindow<
+CHECK save.shortcut.unique.multi-pane FAIL bindings=5
+APP-SHELL-SELFTEST ok=0 checks=176 failures=5 state=/tmp/vedit-app-MbcyKr/state
+COUNTER-EXIT=1
+capture exit=0

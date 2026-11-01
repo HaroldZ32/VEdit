@@ -1,0 +1,57 @@
+collected_at: 2026-11-01T02:30:59Z
+git_head: 23514fb351f34ab23de177c375dd240175662d5e
+branch: feat/qt6-ktexteditor-migration
+git_status_porcelain:
+?? evidence/verdicts/ctrl-s-highlight/
+verifier: Reviewer (cell-20261031T085543161Z, T88; manually created task, no frozen contract - criteria from the captain dispatch)
+
+== [1] vedit-app --selfcheck (shared build tree from HEAD 9a6b828, built 23:33) ==
+CHECK save.shortcut.ctrl-s PASS
+CTRL-S-BINDING after-provider-install objectName=action-file.save class=QAction shortcut=Ctrl+S context=1 associated=[QMenu() ] holders=[QMenu() ] chain=QMainWindow<
+CHECK save.shortcut.unique PASS bindings=1
+CHECK save.shortcut.authority PASS
+CHECK save.shortcut.window PASS
+CHECK save.shortcut.disk-bytes PASS
+CHECK save.shortcut.modified-cleared PASS
+CHECK save.shortcut.path-unchanged PASS
+CHECK save.no-temp-file PASS
+CTRL-S-BINDING after-split objectName=action-file.save class=QAction shortcut=Ctrl+S context=1 associated=[QMenu() ] holders=[QMenu() ] chain=QMainWindow<
+CHECK save.shortcut.unique.multi-pane PASS bindings=1
+EDIT-CORE-SELFTEST ok=1 checks=67 failures=0
+APP-SHELL-SELFTEST ok=1 checks=176 failures=0 state=/tmp/vedit-app-VFCSAY/state
+APP-EXIT=0
+
+== [2] root ctest ==
+
+100% tests passed, 0 tests failed out of 18
+
+Total Test time (real) =  21.67 sec
+CTEST-EXIT=0
+
+== [3] T81 --diagnose-highlight on the F2 library (no embedded definitions) ==
+	libKF6SyntaxHighlighting.so.6 => /vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6 (0x000071b43a81c000)
+HIGHLIGHT diagnose.v: url='' mode='Normal' highlightingMode='Verilog' availableModes=3
+HIGHLIGHT diagnose.v: resolved name='Verilog' author='VEdit' section='Hardware' version=1 valid=1 -> formats=30 begins=2 ends=2
+CHECK highlight.format-ranges-positive PASS  diagnose.v: formats=30
+CHECK highlight.folding-regions-positive PASS  diagnose.v: begins=2 ends=2
+HIGHLIGHT diagnose.sv: url='' mode='Normal' highlightingMode='SystemVerilog' availableModes=3
+HIGHLIGHT diagnose.sv: resolved name='SystemVerilog' author='VEdit' section='Hardware' version=1 valid=1 -> formats=29 begins=1 ends=1
+CHECK highlight.format-ranges-positive PASS  diagnose.sv: formats=29
+CHECK highlight.folding-regions-positive PASS  diagnose.sv: begins=1 ends=1
+HIGHLIGHT-DIAGNOSIS checks=15 failures=0
+DIAG-EXIT=0
+
+== [4] F2 library has no embedded definitions ==
+aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6  target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
+F2 DOCTYPE markers: 0
+distro lib DOCTYPE markers: 63
+
+== [5] XML hashes (folding data) unchanged ==
+c6adc763c7b280d7493f48d06e5779d0b1e2068ac82f75fe7f31a07b0788a6c2  resources/syntax/vedit-verilog.xml
+2abba3342d0878e71b99d358d96e510f857cd7f232786951be8602f513e0b992  resources/syntax/vedit-systemverilog.xml
+
+== [6] typecheck equivalents ==
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.07s
+CLIPPY-EXIT=0
+FMT-EXIT=0
+note: the full gate script was NOT run on purpose - it writes evidence/gate-infra + evidence/m0-build logs into the shared tree (forbidden by the task discipline); the C++ -Werror half is covered by the isolated /tmp build in [7] with -Wall -Wextra -Wpedantic -Werror (src/app/CMakeLists.txt:39,51,122)
