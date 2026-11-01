@@ -1,0 +1,43 @@
+generated: 2026-11-01T02:26:25Z
+git_head: 9a6b828f468d85a13a035fe839aa59c4b2a77f44
+git_status_porcelain:
+ M .gitignore
+?? build/centos7-verify/samples/
+?? build/glibc217-spike/
+---
+== zero false positives ==
+
+A. The sources in the same tree are NOT ignored (checked one by one):
+
+build/centos7-verify/samples                       not ignored (correct)
+build/centos7-verify/samples/verilog-demo/top.v    not ignored (correct)
+build/centos7-verify/build-tarball.sh              not ignored (correct)
+build/centos7-verify/verify-centos7.sh             not ignored (correct)
+build/centos7-verify/STEPS.md                      not ignored (correct)
+build/glibc217-spike                               not ignored (correct)
+build/glibc217-spike/run-spike.sh                  not ignored (correct)
+
+B. No tracked file is caught by the rules.
+
+$ git ls-files -z | git check-ignore --stdin -z     # tracked files vs ignore rules
+hits=0 (empty output = no tracked file is ignored)
+
+$ git ls-files -z | git check-ignore --no-index --stdin -z    # test the PATTERNS against tracked paths
+hits=69
+Every one of those hits is the PRE-EXISTING `build/gui-spike/` rule
+(`.gitignore:42`, "Abandoned GTK spike build tree, kept on disk, never
+versioned"), not a rule added here:
+
+build/gui-spike hits: 69
+hits outside build/gui-spike: 0
+
+The three rules added here name only `build/centos7-verify/{AppDir,stage,dist}/`
+and cannot match any tracked path:
+
+$ git ls-files build/centos7-verify/AppDir build/centos7-verify/stage build/centos7-verify/dist | wc -l
+0
+
+C. `git status --porcelain build/` after the change:
+
+?? build/centos7-verify/samples/
+?? build/glibc217-spike/

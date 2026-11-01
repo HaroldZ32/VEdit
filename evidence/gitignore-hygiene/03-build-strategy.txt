@@ -1,0 +1,36 @@
+generated: 2026-11-01T02:26:25Z
+git_head: 9a6b828f468d85a13a035fe839aa59c4b2a77f44
+git_status_porcelain:
+ M .gitignore
+?? build/centos7-verify/samples/
+?? build/glibc217-spike/
+---
+== build/ strategy: sources vs products (report only; no files touched) ==
+
+Tracked files per top-level `build/` directory:
+
+      3 centos7-verify
+     39 evidence
+     13 gates
+     69 gui-spike
+     32 slang
+
+| path | role | handling |
+| --- | --- | --- |
+| `build/gates/` | gate scripts (source) | tracked, not ignored |
+| `build/slang/` | `build.sh` + REPORT/REPRODUCIBILITY docs + captured evidence logs (source + committed evidence) | tracked, not ignored; only `cache/ out/ tmp/ slang-12.1/` ignored (existing rules) |
+| `build/evidence/` | committed build evidence logs (products by nature, but the repo commits them deliberately) | tracked, not ignored |
+| `build/centos7-verify/*.sh`, `STEPS.md` | verification scripts + runbook (source) | tracked, not ignored |
+| `build/centos7-verify/samples/verilog-demo/` | authored sample project (4 files: `top.v`, `counter.v`, `bad.v`, `demo.f`) copied INTO the tarball by `build-tarball.sh:56`, used by `verify-centos7.sh:22` | **source**, currently untracked; should be committed by the Lead — it is NOT generated (no generator exists) |
+| `build/centos7-verify/{AppDir,stage,dist}/` | assembled AppDir, staging tree, tarball output | generated; now ignored (this task) |
+| `build/glibc217-spike/run-spike.sh` | the T76 spike script (source); it writes its logs to `evidence/glibc217-feasibility/logs/` and a tarball to `target/`, i.e. NOT into this directory | source, currently untracked; should be committed by the Lead |
+| `build/artifacts/` | build output | ignored (existing) |
+| `build/gui-spike/` | 69 tracked files from the abandoned GTK spike | ignored by rule `.gitignore:42` BUT STILL TRACKED — a pre-existing inconsistency: new files under it would be silently ignored while the old ones stay in the index. Reported here, not changed (outside this task's decision). |
+| `build/slang/{cache,out,tmp,slang-12.1}/` | fetched inputs / built output | ignored (existing) |
+
+Recommendations (report only, require a decision):
+1. Commit `build/centos7-verify/samples/verilog-demo/` and
+   `build/glibc217-spike/run-spike.sh` as sources (they are inputs, not products).
+2. Decide what to do with `build/gui-spike/`: either remove the 69 files from the
+   index (it is declared abandoned) or drop the ignore rule. Leaving both is the
+   one silent trap left in `build/`.
