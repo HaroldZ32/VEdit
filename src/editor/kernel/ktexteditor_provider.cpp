@@ -5,6 +5,9 @@
 #if defined(VEDIT_EDIT_CORE_HAVE_FOLDING)
 #include "fold_breadcrumb.h"
 #endif
+#if defined(VEDIT_EDIT_CORE_HAVE_FIM)
+#include "fim_wiring.h"
+#endif
 
 #include <KTextEditor/Document>
 #include <KTextEditor/Editor>
@@ -88,6 +91,13 @@ QWidget *EditCoreProvider::createEditor(QWidget *parent)
     // changes to the pane through the EditorProvider seam.
     auto *binding = new FoldBreadcrumbBinding(view, view);
     binding->setStatusListener([this, view]() { notifyStatus(view); });
+#endif
+#if defined(VEDIT_EDIT_CORE_HAVE_FIM)
+    // T104: one FIM binding per view, a child of the view so it dies with the
+    // pane. Alt+\\ requests, Tab accepts, Esc cancels; with FIM disabled (the
+    // product default) the state machine reports it and no socket is opened.
+    auto *fimBinding = new FimBinding(view, view);
+    Q_UNUSED(fimBinding);
 #endif
     return view;
 }
