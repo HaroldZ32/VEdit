@@ -54,6 +54,9 @@ rm -rf "$STAGE"
 mkdir -p "$STAGE/$NAME"
 cp -a "$APPDIR" "$STAGE/$NAME/AppDir"
 cp -a "$OUT/samples" "$STAGE/$NAME/samples"
+# the product-side diagnostics selftest needs this fixture (a .f project with 7 files);
+# shipping it turns lint.product from a permanent SKIP into a real product check (T89 F-3a)
+cp -a "$ROOT/tests/fixtures/verilog-project" "$STAGE/$NAME/samples/diagnostics-fixture"
 install -m 0755 "$OUT/verify-centos7.sh" "$STAGE/$NAME/verify-centos7.sh"
 install -m 0644 "$OUT/STEPS.md" "$STAGE/$NAME/STEPS.md"
 
@@ -67,7 +70,8 @@ echo "== 3/5: checksums (MANIFEST.sha256, relative paths) =="
 echo "== 4/5: tarball =="
 mkdir -p "$OUT/dist"
 TARBALL="$OUT/dist/$NAME.tar.gz"
-rm -f "$TARBALL"
+# one tarball at a time: an older one would make globs (and the user) pick the wrong file
+rm -f "$OUT/dist"/vedit-centos7-verify-*.tar.gz "$OUT/dist"/vedit-centos7-verify-*.tar.gz.sha256
 tar -C "$STAGE" -czf "$TARBALL" "$NAME"
 ( cd "$OUT/dist" && sha256sum "$NAME.tar.gz" > "$NAME.tar.gz.sha256" )
 

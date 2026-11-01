@@ -42,15 +42,29 @@ bash verify-centos7.sh
 | `kernel.is-3.10` | **PASS，actual 是 `3.10.*`** | **最关键**：证明真的是 CentOS 7 内核。若是别的内核（容器/共享宿主内核），这条会 FAIL，说明这次结果不能代表 CentOS 7 |
 | `glibc.system` | 任意（只是记录） | 记下系统 glibc（CentOS 7 应为 2.17） |
 | `package.files` / `package.manifest` | PASS | 包是否完整、sha256 是否一致（防传输损坏） |
-| `app.selfcheck` | PASS（exit 0） | 应用能启动并自检通过 |
+| `app.selfcheck` | PASS（exit 0） | 应用能启动并自检通过（**硬证据**：真实进程退出码） |
 | `startup.toolchain` | PASS，含 `source=verible:bundled` | 应用**找到并用上了包里的工具链**（不是系统 PATH 的） |
 | `highlight.stack` | PASS，`grammar=verilog backend=1 startup-hook=1` | 高亮栈真的启动了 |
 | `highlight.verilog-definition` | PASS，`verilog=1` 且 `own-xml` 非空 | **.v 是否真的会高亮**。若这条 FAIL（当前构建在这台容器里就是 FAIL，`verilog=0`），说明产品自己判定“Verilog 定义不可用 → .v 退化为纯文本”；这是**包形态的问题**，报告里会原样给出 `syntax-product:` 行 |
-| `lint.bundled` | PASS，诊断数 > 0 | 随包 verible lint 在样例预置违规上真的报出诊断 |
+| `lint.bundled` | PASS，**恰好 3 条**诊断且 lint exit 1 | 随包 verible lint 在样例预置违规上真的报出诊断（**硬证据**：确定条数 + 进程退出码；样例改了要同步改期望值） |
+| `lint.product` | PASS，`exit 0` 且 `failures=0` | **产品自己的诊断链路**：随包 `vedit-diagnostics-ffi-selftest` 用**随包 fixture**（`samples/diagnostics-fixture`，7 文件 `.f` 工程）+ **随包 verible-verilog-ls**（LSP）+ FFI slang，跑完必须 0 失败（**硬证据**） |
 | `symbols.app` | PASS + 打印实际最高 GLIBC | `vedit-app` 需要 2.39（Linux 构建基线），由**包内 glibc 2.43** 提供；这条通过说明包能自洽 |
 | `loader.used` | PASS，`/proc/<pid>/maps` 里有包内 loader | **机制级证据**：进程真的用包里的 loader + glibc 跑，而不是系统那个 |
 
 `SKIP` 不是失败：脚本会写明原因（例如本包没带某个可选探针）。
+
+### 3.1 哪些是硬证据，哪些是代理指标（重要）
+
+| 类别 | 检查项 | 为什么 |
+|---|---|---|
+| **硬证据（进程/内核真实行为）** | `kernel.is-3.10`、`app.selfcheck`、`startup.exit`、`startup.toolchain`、`startup.project`、`toolchain.verible`、`toolchain.slang`、`lint.bundled`、`lint.product`、`loader.used`、`loader.system-not-used`、`package.manifest` | 全部基于**真实进程退出码**、`/proc/<pid>/maps`、内核版本或逐字节 sha256 |
+| **代理指标（测量正确，但不等价于"用户看见的效果"）** | `symbols.app` | 只是符号层测量：证明包内 glibc 能覆盖 `vedit-app` 的需求；能不能跑由 `app.selfcheck`/`startup.exit` + `loader.used` 共同证明 |
+| **代理指标（需要窗口才能看全）** | `highlight.stack`、`highlight.verilog-definition` | 证明高亮栈启动、产品判定 Verilog 定义可用；**肉眼高亮效果**仍需带窗会话（`highlight.mode` 因此是 SKIP） |
+| **仅记录（不判定）** | `glibc.system` | 只记录系统 glibc，判定在 `loader.used` |
+
+**工具链发现顺序**：产品内是 **四级** —— `bundled`（AppDir `bin/`）> `local checkout`（源码树里
+`scripts/fetch-verible.sh` / `build/slang/build.sh` 的产物）> `PATH` > `env`
+（`VEDIT_VERIBLE_LS(_DIR)` / `VEDIT_SLANG(_DIR)`）。本包只依赖第一级 `bundled`。
 
 ## 4. 失败了怎么办
 

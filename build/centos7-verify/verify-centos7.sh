@@ -150,19 +150,32 @@ say ""
 
 # --- 2. the bundled toolchain actually runs here --------------------------
 if [ -x "$APPDIR/bin/verible-verilog-lint" ]; then
-    VER=$("$APPDIR/bin/verible-verilog-lint" --version 2>&1 | head -1)
-    if [ $? -eq 0 ]; then
-        result PASS toolchain.verible "verible-verilog-lint runs" "$VER" "bundled Apache-2.0 binary"
+    # F-1: the exit code must be the PROCESS exit code (never a pipe's), and a binary
+    # that exits 0 without printing its version must NOT pass (e.g. /bin/true).
+    VER_OUT=$("$APPDIR/bin/verible-verilog-lint" --version 2>&1); VER_RC=$?
+    VER_HEAD=$(printf '%s\n' "$VER_OUT" | head -1)
+    if [ "$VER_RC" -eq 0 ] && printf '%s' "$VER_HEAD" | grep -qE 'v[0-9]+\.[0-9]+-[0-9]+-g[0-9a-f]+'; then
+        result PASS toolchain.verible "process exit 0 AND a vX.Y-<release>-g<sha> version marker in its output" \
+            "exit $VER_RC | $VER_HEAD" "bundled Apache-2.0 binary"
     else
-        result FAIL toolchain.verible "verible-verilog-lint runs" "$VER" "bundled binary cannot run on this machine"
+        result FAIL toolchain.verible "process exit 0 AND a vX.Y-<release>-g<sha> version marker in its output" \
+            "exit $VER_RC | ${VER_HEAD:-<empty output>}" "the bundled verible-verilog-lint is broken/wrong: it did not run and identify itself"
     fi
 else
     result SKIP toolchain.verible "bundled verible-verilog-lint" "missing" "package.files already reported it"
 fi
 
 if [ -x "$APPDIR/bin/slang" ]; then
-    SLANG=$("$APPDIR/bin/slang" --version 2>&1 | head -1)
-    result PASS toolchain.slang "slang runs" "${SLANG:-<no --version output>}" "bundled MIT binary"
+    # F-1: same rule as verible — execute it, keep the real exit code, require identity.
+    SLANG_OUT=$("$APPDIR/bin/slang" --version 2>&1); SLANG_RC=$?
+    SLANG_HEAD=$(printf '%s\n' "$SLANG_OUT" | head -1)
+    if [ "$SLANG_RC" -eq 0 ] && printf '%s' "$SLANG_HEAD" | grep -qE 'slang version [0-9]'; then
+        result PASS toolchain.slang "process exit 0 AND 'slang version <n>' in its output" \
+            "exit $SLANG_RC | $SLANG_HEAD" "bundled MIT binary"
+    else
+        result FAIL toolchain.slang "process exit 0 AND 'slang version <n>' in its output" \
+            "exit $SLANG_RC | ${SLANG_HEAD:-<empty output>}" "the bundled slang is broken/wrong: it did not run and identify itself"
+    fi
 else
     result SKIP toolchain.slang "bundled slang" "missing" "package.files already reported it"
 fi
@@ -199,7 +212,13 @@ if [ -x "$APPDIR/bin/vedit-app" ] && [ -d "$SAMPLE" ]; then
     else
         result FAIL startup.project "project opened: installFileTree projectRoot='$SAMPLE'" "$(grep -a 'installFileTree' "$START_LOG" | tail -1 || echo '<no filetree line>')" ""
     fi
-    result PASS startup.exit "0 (window closed after --hold)" "exit $START_RC" "log: $START_LOG"
+    # F-2: the verdict MUST come from the process exit code, not from the fact that a
+    # line was printed. A crash (exit 134/139) or a rejected argument (exit 1) fails here.
+    if [ "$START_RC" -eq 0 ]; then
+        result PASS startup.exit "the app exits 0 after --hold (clean shutdown)" "exit $START_RC" "log: $START_LOG"
+    else
+        result FAIL startup.exit "the app exits 0 after --hold (clean shutdown)" "exit $START_RC" "the app did not shut down cleanly: log $START_LOG"
+    fi
 else
     result SKIP startup.exit "AppDir/bin/vedit-app + samples/" "missing" "package incomplete"
 fi
@@ -249,28 +268,41 @@ if [ -x "$APPDIR/bin/verible-verilog-lint" ] && [ -f "$SAMPLE/bad.v" ]; then
     "$APPDIR/bin/verible-verilog-lint" "$SAMPLE/bad.v" >"$LINT_LOG" 2>&1
     LINT_RC=$?
     DIAGS=$(grep -c '\[.*\]$' "$LINT_LOG" || true)
-    if [ "${DIAGS:-0}" -gt 0 ]; then
-        result PASS lint.bundled "at least 1 diagnostic on the planted violations" "$DIAGS diagnostic(s), lint exit $LINT_RC" "log: $LINT_LOG"
+    # Deterministic expectation: samples/verilog-demo/bad.v carries exactly 3 planted
+    # violations (explicit-parameter-storage-type, line-length, always-comb) and verible
+    # exits 1 when it reports any. A sample change must update this number on purpose.
+    EXPECTED_DIAGS=3
+    if [ "${DIAGS:-0}" -eq "$EXPECTED_DIAGS" ] && [ "$LINT_RC" -eq 1 ]; then
+        result PASS lint.bundled "exactly $EXPECTED_DIAGS diagnostics on the planted violations and lint exit 1" \
+            "$DIAGS diagnostic(s), lint exit $LINT_RC" "log: $LINT_LOG"
     else
-        result FAIL lint.bundled "at least 1 diagnostic on the planted violations" "$DIAGS diagnostic(s)" "log: $LINT_LOG"
+        result FAIL lint.bundled "exactly $EXPECTED_DIAGS diagnostics on the planted violations and lint exit 1" \
+            "$DIAGS diagnostic(s), lint exit $LINT_RC" "log: $LINT_LOG"
     fi
 else
     result SKIP lint.bundled "bundled verible-verilog-lint + samples/verilog-demo/bad.v" "missing" "package incomplete"
 fi
 
-if [ -x "$APPDIR/bin/vedit-diagnostics-ffi-selftest" ] && [ -x "$APPDIR/bin/verible-verilog-ls" ]; then
+FIXTURE="$HERE/samples/diagnostics-fixture"
+if [ -x "$APPDIR/bin/vedit-diagnostics-ffi-selftest" ] && [ -x "$APPDIR/bin/verible-verilog-ls" ] && [ -d "$FIXTURE" ]; then
+    # F-3(a): the fixture travels in the package, so this is a REAL product check:
+    # the product's diagnostics controller opens the whole file set through the
+    # bundled verible-verilog-ls (LSP) and the FFI slang backend, and must pass.
     DIAG_LOG=$(mktemp /tmp/vedit-diag.XXXXXX)
     QT_QPA_PLATFORM=offscreen "$APPDIR/ld-linux-x86-64.so.2" --library-path "$APPDIR/lib" \
-        "$APPDIR/bin/vedit-diagnostics-ffi-selftest" "$SAMPLE" "$APPDIR/bin/verible-verilog-ls" >"$DIAG_LOG" 2>&1
+        "$APPDIR/bin/vedit-diagnostics-ffi-selftest" "$FIXTURE" "$APPDIR/bin/verible-verilog-ls" >"$DIAG_LOG" 2>&1
     DIAG_RC=$?
-    DIAG_SUM=$(grep -a -E 'DIAG|diagnostics=|SELFTEST' "$DIAG_LOG" | tail -1)
-    if [ "$DIAG_RC" -eq 0 ]; then
-        result PASS lint.product "product diagnostics path (verible-verilog-ls from the package)" "exit 0 | $DIAG_SUM" "log: $DIAG_LOG"
+    DIAG_SUM=$(grep -a 'VER-DIAGNOSTICS-FFI-SELFTEST' "$DIAG_LOG" | tail -1)
+    if [ "$DIAG_RC" -eq 0 ] && printf '%s' "$DIAG_SUM" | grep -q 'failures=0'; then
+        result PASS lint.product "exit 0 AND failures=0 from the product diagnostics selftest (bundled LSP + FFI slang)" \
+            "exit $DIAG_RC | $DIAG_SUM" "fixture: samples/diagnostics-fixture; log: $DIAG_LOG"
     else
-        result SKIP lint.product "product diagnostics path" "exit $DIAG_RC | $DIAG_SUM" "this build's diagnostics selftest needs its FFI fixture directory; not a package failure (see log)"
+        result FAIL lint.product "exit 0 AND failures=0 from the product diagnostics selftest (bundled LSP + FFI slang)" \
+            "exit $DIAG_RC | ${DIAG_SUM:-<no summary line>}" "the product-side diagnostics path failed; log: $DIAG_LOG"
     fi
 else
-    result SKIP lint.product "bundled diagnostics selftest" "not shipped" "the product-side LSP path is exercised by startup.project + toolchain check; the CLI lint check is above"
+    result SKIP lint.product "shipped diagnostics selftest + fixture + bundled verible-verilog-ls" "one of them is missing" \
+        "the tarball ships all three; a missing one means the package is incomplete (package.files reports it)"
 fi
 say ""
 
