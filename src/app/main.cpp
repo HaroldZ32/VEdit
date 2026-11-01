@@ -544,6 +544,56 @@ int runSelfCheck()
         check("save.shortcut.authority", ctrlS.size() == 1 && ctrlS.first() == saveAction);
     }
     if (editPane != nullptr) {
+        // --- T90/F-2: runtime re-application of an editor Ctrl+S binding ----
+        // T80 clears the editor-side save shortcut when a pane is created, shown
+        // or focused. A runtime re-apply (KDE system settings re-applying
+        // KStandardShortcut, a provider repopulating its action collection) can
+        // put a second Ctrl+S back afterwards. The EditorArea guard re-enforces
+        // on activation/window-activation and on a slow timer; this simulates the
+        // re-application by injecting the binding at runtime.
+        QWidget *editorWidget = editPane->editorWidget();
+        auto *injected = new QAction(QStringLiteral("injected-ctrl-s"), editorWidget);
+        injected->setShortcut(QKeySequence(QStringLiteral("Ctrl+S")));
+        injected->setShortcutContext(Qt::WindowShortcut);
+        editorWidget->addAction(injected);
+        check("save.shortcut.runtime-duplicate-enumerated",
+              ctrlSActions(shell.get()).size() == 2,
+              QStringLiteral("bindings=%1").arg(ctrlSActions(shell.get()).size()));
+        // One event-loop turn without an activation is the pre-T90 exposure: no
+        // T80 trigger runs, so the duplicate stays and a Ctrl+S press would be
+        // ambiguous again.
+        pump();
+        check("save.shortcut.runtime-unguarded-turn-keeps-duplicate",
+              ctrlSActions(shell.get()).size() == 2,
+              QStringLiteral("bindings=%1").arg(ctrlSActions(shell.get()).size()));
+        QEvent activation(QEvent::ApplicationActivate);
+        QCoreApplication::sendEvent(QCoreApplication::instance(), &activation);
+        pump();
+        check("save.shortcut.runtime-guard-clears",
+              ctrlSActions(shell.get()).size() == 1 && hasCtrlSShortcut(saveAction)
+                  && !hasCtrlSShortcut(injected),
+              QStringLiteral("bindings=%1").arg(ctrlSActions(shell.get()).size()));
+        check("save.shortcut.runtime-guard-authority",
+              ctrlSActions(shell.get()).size() == 1
+                  && ctrlSActions(shell.get()).first() == saveAction);
+        // The slow timer calls the same entry point; assert the entry point and
+        // that the timer is actually armed.
+        auto *injectedAgain = new QAction(QStringLiteral("injected-ctrl-s-2"), editorWidget);
+        injectedAgain->setShortcut(QKeySequence(QStringLiteral("Ctrl+S")));
+        editorWidget->addAction(injectedAgain);
+        const int removed = shell->editorArea()->enforceSingleCtrlSAuthority();
+        check("save.shortcut.runtime-guard-entry-point",
+              removed >= 1 && ctrlSActions(shell.get()).size() == 1,
+              QStringLiteral("removed=%1 bindings=%2")
+                  .arg(removed)
+                  .arg(ctrlSActions(shell.get()).size()));
+        QTimer *shortcutGuard =
+            shell->editorArea()->findChild<QTimer *>(QStringLiteral("ctrlSAuthorityGuard"));
+        check("save.shortcut.runtime-guard-timer",
+              shortcutGuard != nullptr && shortcutGuard->isActive());
+        delete injected;
+        delete injectedAgain;
+
         const QString paneFixture = temp.path() + QStringLiteral("/pane-open.v");
         writeFile(paneFixture, QByteArrayLiteral("module pane_open;\nendmodule\n"));
         QString paneError;

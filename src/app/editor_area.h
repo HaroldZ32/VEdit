@@ -17,6 +17,7 @@
 #include <memory>
 
 class QEvent;
+class QTimer;
 class QLabel;
 class QMouseEvent;
 class QVBoxLayout;
@@ -46,6 +47,11 @@ public:
     bool openFile(const QString &absolutePath, QString *error = nullptr);
     QString currentFilePath() const;
     bool saveFile(QString *error = nullptr);
+
+    // T90/F-2: re-apply the single-authority invariant for Ctrl+S on this pane's
+    // editor widget (an editor may re-inject its own standard save shortcut at
+    // runtime). Returns the number of duplicate bindings removed.
+    int enforceSingleCtrlSAuthority();
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -98,6 +104,16 @@ public:
     void setOnLayoutChanged(std::function<void()> callback);
     void setOnActivePaneChanged(std::function<void(EditorPane *)> callback);
 
+    // T90/F-2: runtime guard for the T80 invariant. Editor/standard-action
+    // re-application (KStandardShortcut re-apply, KDE system settings, a
+    // provider that repopulates its action collection) can put a second Ctrl+S
+    // binding back after the pane was created; this re-runs the enforcement on
+    // every pane. Returns the number of duplicate bindings removed.
+    int enforceSingleCtrlSAuthority();
+
+protected:
+    bool eventFilter(QObject *watched, QEvent *event) override;
+
 private:
     struct Node;
 
@@ -124,6 +140,7 @@ private:
     std::function<void(EditorPane *)> onActivePaneChanged_;
     QStringList diagnostics_;
     bool rebuilding_ = false;
+    QTimer *shortcutGuard_ = nullptr;
 };
 
 } // namespace vedit::app

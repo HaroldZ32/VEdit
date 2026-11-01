@@ -3,6 +3,7 @@
 #include "editor_provider.h"
 
 #include <QAction>
+#include <QCoreApplication>
 #include <QEvent>
 #include <QFont>
 #include <QJsonValue>
@@ -46,10 +47,10 @@ namespace {
 // triggerable from the editor's own menus; only the duplicate key binding goes
 // away. This runs for every pane - first pane, provider swap and every split -
 // because that is the same code path a pane is created through.
-void clearEditorSaveShortcut(QWidget *editor)
+int clearEditorSaveShortcut(QWidget *editor)
 {
     if (editor == nullptr) {
-        return;
+        return 0;
     }
     const QKeySequence save(QStringLiteral("Ctrl+S"));
     int removed = 0;
@@ -84,6 +85,7 @@ void clearEditorSaveShortcut(QWidget *editor)
     for (QAction *action : nested) {
         clear(action);
     }
+    return removed;
 }
 
 } // namespace
@@ -166,6 +168,11 @@ void EditorPane::setProvider(EditorProvider *provider)
 EditorProvider *EditorPane::provider() const
 {
     return provider_;
+}
+
+int EditorPane::enforceSingleCtrlSAuthority()
+{
+    return clearEditorSaveShortcut(editor_);
 }
 
 bool EditorPane::openFile(const QString &absolutePath, QString *error)
@@ -272,13 +279,60 @@ EditorArea::EditorArea(QWidget *parent)
     layout_ = new QVBoxLayout(this);
     layout_->setContentsMargins(0, 0, 0, 0);
     layout_->setSpacing(0);
+
+    // T90/F-2: the T80 invariant is re-applied at pane creation, show, focus and
+    // the next event-loop turn. A runtime re-application of editor/standard
+    // shortcuts (KDE system settings applying KStandardShortcut, a provider
+    // repopulating its action collection) can still put a second Ctrl+S back.
+    // Two triggers cover that without polling the shortcut map: a window/application
+    // activation (the typical moment a settings-driven re-apply becomes visible)
+    // and a low-frequency timer as the safety net. Both call the SAME enforcement
+    // entry point, and the selfcheck asserts "enumerate >1 -> cleared".
+    shortcutGuard_ = new QTimer(this);
+    shortcutGuard_->setObjectName(QStringLiteral("ctrlSAuthorityGuard"));
+    shortcutGuard_->setInterval(2000);
+    connect(shortcutGuard_, &QTimer::timeout, this,
+            [this]() { enforceSingleCtrlSAuthority(); });
+    shortcutGuard_->start();
+    if (QCoreApplication::instance() != nullptr) {
+        QCoreApplication::instance()->installEventFilter(this);
+    }
 }
 
 EditorArea::~EditorArea()
 {
+    if (shortcutGuard_ != nullptr) {
+        shortcutGuard_->stop();
+    }
+    if (QCoreApplication::instance() != nullptr) {
+        QCoreApplication::instance()->removeEventFilter(this);
+    }
     delete content_;
     content_ = nullptr;
     root_.reset();
+}
+
+bool EditorArea::eventFilter(QObject *watched, QEvent *event)
+{
+    Q_UNUSED(watched);
+    if (event != nullptr
+        && (event->type() == QEvent::ApplicationActivate
+            || event->type() == QEvent::WindowActivate)) {
+        enforceSingleCtrlSAuthority();
+    }
+    return false;
+}
+
+int EditorArea::enforceSingleCtrlSAuthority()
+{
+    int removed = 0;
+    const QList<EditorPane *> current = panes();
+    for (EditorPane *pane : current) {
+        if (pane != nullptr) {
+            removed += pane->enforceSingleCtrlSAuthority();
+        }
+    }
+    return removed;
 }
 
 void EditorArea::setProvider(EditorProvider *provider)
