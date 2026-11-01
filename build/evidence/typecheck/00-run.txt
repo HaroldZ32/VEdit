@@ -1,37 +1,40 @@
 # gate log: typecheck (operational; rewritten by every run)
-collected_at: 2026-10-31T23:33:25+08:00
-git_head: c682694e125ff7f59c590b83b6d2895239a3d143
+collected_at: 2026-11-01T13:27:40+08:00
+git_head: 23514fb351f34ab23de177c375dd240175662d5e
 git_status_porcelain:
-   M AGENT.md
+   M THIRD_PARTY_NOTICES.md
+   M build/centos7-verify/STEPS.md
+   M build/centos7-verify/build-tarball.sh
+   M build/centos7-verify/verify-centos7.sh
    M build/evidence/typecheck/00-run.txt
    M build/evidence/typecheck/10-typecheck-image-build.log
    M build/evidence/typecheck/11-typecheck-image-id.txt
-   M docs/BUILD.md
+   M evidence/centos7-verify-package/README.md
+   M evidence/centos7-verify-package/build-console.txt
+   M evidence/centos7-verify-package/report-container/verify-report-container.txt
+   M evidence/centos7-verify-package/tarball-sha256.txt
    M evidence/ffi-abi/logs/10-rust-image.txt
    M evidence/ffi-abi/logs/19-rust-stage-console.log
    M evidence/ffi-abi/logs/20-cargo-build-release.log
    M evidence/ffi-abi/logs/21-staticlib.txt
    M evidence/ffi-abi/logs/23-cargo-test.log
+   M evidence/highlight-realkte/REPORT.md
    M evidence/m0-build/build-logs/20-qt6-image-build.log
    M evidence/m0-build/build-logs/21-qt6-image-id.txt
    M evidence/m0-build/build-logs/32-qt6-build.log
    M evidence/m0-build/build-logs/34-qt6-elf.txt
    M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
-   M packaging/runtime/AppRun
-   M src/syntax/kde/ksyntax_data.cpp
-   M src/syntax/kde/ksyntax_data.h
-   M src/workspace/diagnostics/CMakeLists.txt
-   M src/workspace/diagnostics/diagnostics_integration.cpp
-   M src/workspace/diagnostics/diagnostics_panel.cpp
-   M src/workspace/diagnostics/diagnostics_panel.h
-   M src/workspace/diagnostics/toolchain.cpp
-   M src/workspace/diagnostics/toolchain.h
-   M src/workspace/diagnostics/toolchain_selftest.cpp
-  ?? build/centos7-verify/
-  ?? build/glibc217-spike/
-  ?? evidence/appdir-syntax-dir/
-  ?? evidence/centos7-verify-package/
-  ?? evidence/slice1-stop/40-pre-run-go4.txt
-  ?? evidence/toolchain-ux/
-  ?? src/workspace/diagnostics/toolchain_ux_selftest.cpp
+   M packaging/runtime/assemble-appdir.sh
+   M src/app/editor_area.cpp
+   M src/app/editor_area.h
+   M src/app/main.cpp
+  ?? build/centos7-verify/negative-checks.sh
+  ?? evidence/centos7-real-machine/
+  ?? evidence/centos7-verify-package/negative-checks.txt
+  ?? evidence/highlight-realkte/01b-diagnosis-prefix-f2.log
+  ?? evidence/slice1-stop/50-pre-run-final.txt
+  ?? evidence/t88-followups/
+  ?? evidence/verdicts/appdir-toolchain/
+  ?? evidence/verdicts/ctrl-s-highlight/
+  ?? evidence/verdicts/supporting-deliverables/
 
