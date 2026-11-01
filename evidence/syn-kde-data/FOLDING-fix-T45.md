@@ -20,7 +20,7 @@ git_status_porcelain (this task's paths only):
 `<keyword String="module" beginRegion="moduleEndmodule"/>`. KSyntaxHighlighting 6.24
 resolves the `String` value **as a keyword-list name**; with no `<list name="module">`
 the loader logs `Unknown keyword list "module"` and drops the rule, so the shipped
-definitions produced **begins=0 ends=0** (`10-folding-before.log`).
+definitions produced **begins=0 ends=0** (`10-folding-before-F2.log`, re-recorded by T66 on the real F2 library; the first `10-folding-before.log` measured DISTRO and is superseded).
 
 ## The fix
 

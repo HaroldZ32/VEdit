@@ -1,0 +1,49 @@
+== evidence: 07-binding.txt — which source the T18 numbers actually certify (T93 evidence repair) ==
+time=2026-11-01T14:13:12+08:00
+
+## 1. the tested binary (and why its hash is no longer recoverable)
+NOTE: the lane owner rebuilt the SAME path at 14:12:49, so the file on disk now is NOT the binary the T93 logs
+ran. The T93 logs ran the binary produced by the 01-build step at 14:08:12-14:08:16; that file has been
+overwritten, so its sha256 cannot be reported. The CURRENT file on that path is shown only to make the
+overwrite visible:
+-rwxr-xr-x 1 haroldzhao haroldzhao 23521224 2026-11-01 14:12:49.117600168 +0800 target/qt6-build/src/syntax/overlay/vedit-syntax-overlay-selftest
+d252422c8d5362eeb6d145f651299848d33e87714a2ed61bba043e28a9131906  target/qt6-build/src/syntax/overlay/vedit-syntax-overlay-selftest
+
+## 2. the source state the binary was built from (recorded in 01-build.log / 02-selftest.log headers)
+9594bd916073f1d17764800626eb9edcf1f7581386ee98f94aa48c477f1d45e3  src/syntax/overlay/CMakeLists.txt
+5d78c565b13aca87d2174100c0b73ad3e96f71a6d85dec6d1b4826b725ccfe9e  src/syntax/overlay/overlay.cpp
+c01585d71cb98bdec5bc26980cdb9add12909baad7cdbf7cce85bda6c1d8e8a8  src/syntax/overlay/overlay.h
+8cb45b65d8d6ae2676538ecad53fb82ce15570feb9a934681027b3b196e7e125  src/syntax/overlay/overlay_selftest.cpp
+f89da4da9b4c3ef7229e9f9f4bade9314f8a0dafca6b54e449357fbbd43f0946  src/syntax/overlay/paint.cpp
+7f449eb1df45997d89aa93a60d4512542e8c747cd1351b01e4349faf1130cc7f  src/syntax/overlay/paint.h
+e252aa29468c5ed6cae88d4a9618314f01b6a8b0e73f759e61aff02d9b7fa3e7  src/syntax/overlay/README.md
+
+## 3. lane source edits observed DURING T93 (the lane is untracked in git, so mtime+hash are the record)
+   14:01:37  overlay_selftest.cpp  sha256=32f5fc20…  (before the T93 re-collections)
+   14:04:36  overlay_selftest.cpp  sha256=8cb45b65…  (this is what the 01/02 collection built and ran)
+   14:09:21  overlay_selftest.cpp  sha256=388b4809…  (AFTER 01/02; the 03/04 headers captured a drifted snapshot)
+   14:10:04, 14:11:15  overlay_selftest.cpp edited again (mtime; edits continued while this file was written)
+   overlay.cpp/overlay.h/paint.*/CMakeLists.txt were NOT edited after 13:59:30.
+
+## 4. what this means for the numbers
+   * 02-selftest.log (40 checks, 0 failures) and the three perf runs in 03-perf-runs.log, and the two ctest
+     runs in 04-ctest.log, all executed the ONE binary built at 14:08:12-14:08:16 from 8cb45b65…;
+   * the 'lane_sources' blocks in 03/04 were written minutes later and show a newer file (7b0752e4…); that
+     is a snapshot of the working tree, not of the binary - the binary hash in section 1 is authoritative;
+   * because the lane owner kept editing overlay_selftest.cpp after the collection, a reviewer must re-run
+     README section 4 after the lane settles; the fix under review is evidence-only and does not touch src/.
+
+## 5. recommendation to the reviewer/continuity
+   Re-run (after the T18 lane stops changing):
+     cmake --build target/qt6-build --target vedit-syntax-overlay-selftest
+     QT_QPA_PLATFORM=offscreen target/qt6-build/src/syntax/overlay/vedit-syntax-overlay-selftest --selfcheck
+     ctest --test-dir target/qt6-build --output-on-failure
+   and compare the source sha256 with 02-selftest.log's lane_sources block. If they differ, the numbers in
+   README section 2/3 describe the 8cb45b65… state, not the newer one.
+
+## 6. additional, clearly-dated observation of the CURRENT working tree (not part of 01-04)
+time=2026-11-01T14:13:29+08:00
+binary sha256: d252422c8d5362eeb6d145f651299848d33e87714a2ed61bba043e28a9131906
+source overlay_selftest.cpp sha256: eeccaa26368344072aca9216f78571479efd984eaaf6bef86dca64008ef8b777
+SYN-OVERLAY-SELFTEST ok=1 checks=40 failures=0 skipped=0
+CURRENT_RUN_EXIT=0

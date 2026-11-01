@@ -1,0 +1,6 @@
+# typecheck gate on the final T99 tree
+# command: bash build/gates/typecheck.sh
+# date: 2026-11-01T14:45:23+08:00
+[qt6] PASS: Rust service layer + configure + build (warnings-as-errors) inside vedit-qt6-build:local; tests skipped (--no-test)
+[typecheck] PASS (pinned image vedit-build:local)
+TYPECHECK-EXIT=0

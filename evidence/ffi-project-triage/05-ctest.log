@@ -1,0 +1,10 @@
+# ctest entry (registered command)
+# command: ctest --test-dir target/qt6-build -R vedit-app-ffi-abi-selftest --output-on-failure
+
+Test project /vedit-build/target/qt6-build
+    Start 9: vedit-app-ffi-abi-selftest
+1/1 Test #9: vedit-app-ffi-abi-selftest .......   Passed    0.07 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.07 sec

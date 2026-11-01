@@ -1,0 +1,7 @@
+date: 2026-11-01T14:25:02+08:00
+head: 48569602d0c86fb402dc88155593d1dc06445c90 (feat/qt6-ktexteditor-migration)
+image: vedit-qt6-build:local sha256:4b918bf6d2a738905a25198a0937f324b15d74bfcb450b019c7849469f1fe4a5
+changed paths (T97):
+   M AGENT.md
+   M src/app/main.cpp
+  ?? evidence/ffi-project-triage/

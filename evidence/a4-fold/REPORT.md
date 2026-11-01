@@ -118,3 +118,14 @@ LD_LIBRARY_PATH=$F2 QT_QPA_PLATFORM=offscreen target/a4-fold-build/vedit-folding
 3. 期望区间是**写死的构造值**：若 `vedit-systemverilog.xml` 的折叠关键字表变化，测试会红——
    这是刻意的“规则锚点”，不是脆弱测试。
 4. 无显示服务器：`offscreen` 下的视图观测是 A3.1 的代理指标，真实屏幕观感仍属停点验收。
+
+
+## F-1 addendum (T100)
+
+`01-lane-tests.log` run B proves the F2 artifact's sha256 and that it embeds zero
+definitions; it does **not** prove that the test process resolved that library.
+`01b-lane-tests-f2-ldd.log` adds the missing fact: with the same
+`LD_LIBRARY_PATH`, `ldd` maps `libKF6SyntaxHighlighting.so.6` to
+`target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/...` (and the test then
+runs green there). A sha/marker pair can stay true while the binary loads a
+different library through another search path, so the link fact was missing.

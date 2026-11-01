@@ -1,0 +1,19 @@
+# root ctest after wiring (final run)
+# command: ctest --test-dir target/qt6-build --output-on-failure
+# exit code: 0 (23/23 passed)
+
+10/23 Test #10: vedit-app-shell-selftest .......................   Passed    8.23 sec
+11/23 Test #11: vedit-edit-core-selftest .......................   Passed    0.14 sec
+12/23 Test #12: vedit-folding-tests ............................   Passed    0.79 sec
+13/23 Test #13: vedit-breadcrumb-tests .........................   Passed    0.04 sec
+14/23 Test #14: vedit-workspace-palette-selftest ...............   Passed    0.09 sec
+15/23 Test #15: vedit-workspace-palette-integration-selftest ...   Passed    0.17 sec
+16/23 Test #16: vedit-workspace-search-selftest ................   Passed   12.28 sec
+17/23 Test #17: vedit-workspace-project-selftest ...............   Passed    0.05 sec
+18/23 Test #18: vedit-workspace-diagnostics-selftest ...........   Passed    0.01 sec
+19/23 Test #19: vedit-toolchain-missing-selftest ...............   Passed    0.00 sec
+20/23 Test #20: vedit-diagnostics-ffi-selftest .................   Passed    3.12 sec
+21/23 Test #21: vedit-toolchain-ux-selftest ....................   Passed    3.11 sec
+22/23 Test #22: vedit-workspace-vcs-selftest ...................   Passed    1.14 sec
+23/23 Test #23: vedit-workspace-settings-selftest ..............   Passed    0.32 sec
+100% tests passed, 0 tests failed out of 23

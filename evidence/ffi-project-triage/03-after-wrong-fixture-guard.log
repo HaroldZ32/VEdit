@@ -1,0 +1,10 @@
+# AFTER (T97 guard): `vedit-app --selfcheck-ffi tests/fixtures/verilog-project`
+# exit code: 2 (usage error with the correct command, no misleading ffi.project.* FAILs)
+
+FFI-ABI fixture=tests/fixtures/verilog-project
+FFI-ABI-SELFTEST ok=0 reason=wrong-fixture
+FFI-ABI hint: --selfcheck-ffi expects the Rust C ABI smoke fixture:
+FFI-ABI hint:   crates/vd-ffi/tests/fixtures/project  (vedit.toml + 3 rtl files)
+FFI-ABI hint: tests/fixtures/verilog-project is the PROJECT-MODEL fixture (T14,
+FFI-ABI hint:   7 files); its expectations live in expected/ and are validated by:
+FFI-ABI hint:   cargo test -p vd-ffi -p vd-config

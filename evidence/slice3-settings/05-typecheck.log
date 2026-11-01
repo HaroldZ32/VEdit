@@ -1,0 +1,9 @@
+# typecheck gate (final run on the T25 tree)
+# command: bash build/gates/typecheck.sh
+# observed: TYPECHECK-EXIT=0 (PASS, pinned image vedit-build:local)
+# history on the way here: the gate was RED for a while in crates/vd-ffi/src/fim.rs:412
+# (clippy field_reassign_with_default) — a T27 FIM file outside T25's scope, fixed by its owner;
+# a T25 re-run then passed (this log). T25 itself changed no Rust file.
+
+[typecheck] PASS (pinned image vedit-build:local)
+TYPECHECK-EXIT=0

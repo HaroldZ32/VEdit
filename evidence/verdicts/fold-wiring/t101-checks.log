@@ -1,0 +1,56 @@
+collected_at: 2026-11-01T06:50:39Z
+git_head: 48569602d0c86fb402dc88155593d1dc06445c90
+git_head_note: T94 changes are UNCOMMITTED on top of 4856960 (src/editor/kernel/{fold_breadcrumb.*,ktexteditor_provider.*}, src/editor/CMakeLists.txt, src/app/{editor_area.*,editor_provider.h,main.cpp})
+branch: feat/qt6-ktexteditor-migration
+verifier: Reviewer (cell-20261031T085543161Z, T101; manually created task, no frozen contract)
+
+== [1] project selfcheck (fresh build tree from the T94 sources, binaries 14:45 after sources 14:37/14:41) ==
+CHECK save.shortcut.unique PASS bindings=1
+CHECK save.shortcut.unique.multi-pane PASS bindings=1
+CHECK fold.wiring.pane PASS
+CHECK fold.wiring.open PASS
+CHECK fold.wiring.view PASS
+CHECK fold.wiring.highlight-mode PASS SystemVerilog
+CHECK fold.wiring.binding PASS
+CHECK fold.wiring.firstopen-full-count PASS full_count=1
+FOLD-WIRING before_state first_real=0 last_real=1000 first_visible=0 last_visible=25 hidden=975 scroll_max=0
+FOLD-WIRING closed_state first_real=0 last_real=1000 first_visible=0 last_visible=25 full_count=2 injected_ranges=200 hidden_in_viewport=975 scroll_max=0 tree_sitter=0
+CHECK fold.wiring.closed.observed PASS
+CHECK fold.wiring.closed.hidden-975 PASS hidden=975
+CHECK fold.wiring.closed.registry-200 PASS registry=200
+CHECK fold.wiring.closed.no-rejects PASS
+CHECK fold.wiring.a1-invalid-rejected PASS injected=0 rejected=1
+FOLD-WIRING key_path full_count=2 key_events=50
+CHECK fold.wiring.no-rebuild-on-keys PASS
+CHECK fold.wiring.toggle-on-rebuild PASS full_count=3
+FOLD-WIRING breadcrumb describe='module:m0 > function:inc' bar='m0 > inc'
+CHECK fold.wiring.breadcrumb.describe PASS module:m0 > function:inc
+CHECK fold.wiring.breadcrumb.pane-bar PASS m0 > inc
+CHECK fold.wiring.breadcrumb.no-invention PASS describe='' bar=''
+CHECK fold.wiring.no-rebuild-on-edit PASS full_count=5
+CHECK fold.wiring.reparsed-trigger PASS full_count=6
+EDIT-CORE-SELFTEST ok=1 checks=67 failures=0
+APP-SHELL-SELFTEST ok=1 checks=200 failures=0 state=/tmp/vedit-app-YtXDnY/state
+APP-EXIT=0
+
+== [2] root ctest ==
+
+Total Test time (real) =  37.26 sec
+CTEST-EXIT=0
+
+== [3] declared gate typecheck (host) ==
+TYPECHECK-EXIT=0
+[qt6] PASS: Rust service layer + configure + build (warnings-as-errors) inside vedit-qt6-build:local; tests skipped (--no-test)
+[typecheck] PASS (pinned image vedit-build:local)
+
+== [4] bypass audit ==
+non-test calls to fold exec: 2
+wiring direct KTextEditor command calls: 0
+fold_breadcrumb.cpp rebuild triggers used: RebuildTrigger::FirstOpen RebuildTrigger::Reparsed RebuildTrigger::TreeSitterToggled 
+== [5] the releaseFolds fix + the reverse test ==
+src/editor/kernel/ktexteditor_provider.cpp:115:        binding->releaseFolds();
+src/editor/kernel/fold_breadcrumb.cpp:148:void FoldBreadcrumbBinding::releaseFolds()
+REVERSE TEST (my run, isolated /tmp copy, ONLY the releaseFolds() call reverted):
+  CONFIGURE-EXIT=0 BUILD-EXIT=0
+  SEARCH-SELFTEST-EXIT=139  (Segmentation fault, core dumped)
+  control: the shared/fixed tree's workspace-search-selftest passes inside root ctest 22/22

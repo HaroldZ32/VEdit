@@ -1,5 +1,20 @@
 # 独立评审 verdict — T46 rev-fix-xml-folding：自有 XML 折叠规则重写（Blocker）
 
+> **升级记录（2026-11-01 15:16 Asia/Shanghai，评审者 Reviewer（本 cell Reviewer 3），依据 T100 审计执行）**：
+> 本 verdict 由「**PASS（有条件，等 T66 重录）**」升级为「**PASS（无保留）**」。
+> 升级依据（我逐条核验属实，核验记录：`evidence/fold-evidence-final/06-T103-verdict-update.md`）：
+> - `evidence/syn-kde-data/10-folding-before-F2.log` — 真 F2（`# ldd guard` + **每个结果块前**都有
+>   `LDD library=F2 resolves=…/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6`）：
+>   before Verilog 18 行 `begins=0 ends=0`、SystemVerilog **26 行** `begins=0 ends=0`；
+>   `PROBE-SUMMARY mode=before expected=zero all-checks=PASS`、`RUNNER-EXIT=0`；
+> - `evidence/syn-kde-data/11-folding-after-F2.log` — 真 F2（同样每块前 ldd）：after Verilog 18 行 **7/7**、
+>   SystemVerilog **26 行 11/11**；`PROBE-SUMMARY mode=after expected=fold all-checks=PASS`、`RUNNER-EXIT=0`；
+> - `evidence/syn-kde-data/14-ldd-guard-negative-control.log` — 旧 flags 的 `ldd` 解析到 `/usr/lib/…`（DISTRO），
+>   `GUARD-ON-OLD-BINARY=REJECTED exit=1`、`NEGATIVE-CONTROL-EXIT=1`；
+> - 旧 `10-folding-before.log` / `11-folding-after.log` 均带 `# INVALID (T66)` 横幅；`FOLDING-fix-T45.md` 的过时引用
+>   已改指 `-F2` 日志（旧日志标注 superseded）。
+> **原「PASS（有条件）」结论、以及最初「无 ldd 依据」的自我更正记录，原样保留在下方，未被删除或改写**（只在相关位置加了升级标注）。
+
 > **依据更正（2026-10-31 19:25，captain 指出后由本评审独立复核）**：本 verdict 的第一版把
 > `evidence/syn-kde-data/10/11-folding-*.log` 的 `library=F2` 标签当成了链接事实，**这是错的**。
 > 我用 `ldd` 复现了缺陷并**在真 F2 上重测**；本文件是更正后的版本。原 verdict 记录
@@ -13,7 +28,7 @@
 - 评审时刻: 2026-10-31 19:04–19:25（Asia/Shanghai）
 - 环境: `vedit-qt6-build:local`；真 F2 交付库 `target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0`
 - 风险等级: **High**（证据链曾建立在假标签上；XML 修复本身正确）
-- 结论: **PASS（有条件）** — XML 修复经我独立在**真 F2** 上重测成立（Verilog 7/7、SV **11/11**、before 0/0）；但**证据之记录的 10/11 日志不是 F2 测量**、SV 采样分支从未生效；在 **T66** 修好 `run.sh`、加 `ldd` 防呆并重录 10/11 之前，本票只能读作“有条件 PASS / 依据待重录确认”。
+- 结论: **PASS（有条件）** — XML 修复经我独立在**真 F2** 上重测成立（Verilog 7/7、SV **11/11**、before 0/0）；但**证据之记录的 10/11 日志不是 F2 测量**、SV 采样分支从未生效；在 **T66** 修好 `run.sh`、加 `ldd` 防呆并重录 10/11 之前，本票只能读作“有条件 PASS / 依据待重录确认”。（**已于 2026-11-01 升级为无保留 PASS，见文首「升级记录」；原措辞保留**）
 
 ---
 
@@ -84,6 +99,11 @@ Blocker 的根因与 XML 修复本身是**对的**：旧写法 `<keyword String=
 
 ## 6. 结论与一句话理由
 
-**Verdict: PASS（有条件）** — 风险 High。
+**Verdict: PASS（有条件）**（**已于 2026-11-01 升级为无保留 PASS，见文首「升级记录」；原措辞保留**） — 风险 High。
 
 理由：XML 修复本身正确，且经我**在真 F2 上**独立重测成立（Verilog 7/7、SV 11/11、before 0/0）；但该 lane 的**证据之记录**（`10/11-folding-*.log`）实际测的是 DISTRO 库、且 SV 样例从未生效（`ldd` 与 flawed 复现已证明），因此本 PASS 的正式依据必须由 **T66** 修好 `run.sh`、加 `ldd` 防呆并重录 10/11 后才能归档；在那之前请把本票读作“有条件 PASS / 依据待重录确认”，并保留本文件作为真 F2 数字的来源。
+
+**更新（2026-11-01，Reviewer 3，依据 T100 审计）**：上述条件已由 **T66 交付**满足——`10-folding-before-F2.log` /
+`11-folding-after-F2.log` 在真 F2 上重录（每块前 `LDD library=F2 resolves=…F2…`；before 0/0、after Verilog 7/7、SV 26 行 11/11；
+`RUNNER-EXIT=0`），并用 `14-ldd-guard-negative-control.log` 证明 guard 可证伪（旧 flags→DISTRO，`exit=1`）。
+我已逐条核验（`evidence/fold-evidence-final/06-T103-verdict-update.md`）→ 本 verdict 升级为**无保留 PASS**；原结论与自我更正记录保留在下方。

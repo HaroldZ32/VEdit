@@ -1,0 +1,20 @@
+# T96 regression commands and observed results
+binding: HEAD 4856960 (clean worktree target/t96-clean); src/syntax clean at HEAD; T92 commit 3b1bb1e
+worktree add: git worktree add --detach target/t96-clean 4856960
+build:       cd target/t96-clean && bash scripts/build-qt.sh --no-test   -> BUILD-EXIT=0
+lane:        QT_QPA_PLATFORM=offscreen target/qt6-build/src/syntax/overlay/vedit-syntax-overlay-selftest --selfcheck
+             -> SYN-OVERLAY-SELFTEST ok=1 checks=40 failures=0 skipped=0; A1g 494/247; A1h before=181 after=0;
+                incremental=812 full=812; 50-rebuild median=24.607000 ms (budget 150); injection p95=0.153000 ms (budget 2);
+                10k sweep rebuild=31.016000 ms, p95=0.154000 ms
+ctest:       ctest --test-dir target/qt6-build --output-on-failure
+             -> 100% tests passed, 0 tests failed out of 20 ; CTEST_EXIT=0
+typecheck:   cd target/t96-clean && bash build/gates/typecheck.sh -> TYPECHECK_EXIT=0
+             [qt6] PASS (warnings-as-errors); [typecheck] PASS (pinned image vedit-build:local)
+cargo test:  docker run vedit-build:local, worktree mounted, env VEDIT_* UNSET, with the repo-relative external
+             artifacts provisioned at the paths the tests document:
+               build/slang/out/slang              (copied from the built artifact; the tests' documented prerequisite)
+               .mpd/recon/verible/bin/            (copied from the built artifact; tests' documented prerequisite)
+             cargo test --workspace -> CARGO_TEST_EXIT=0 (all test binaries ok, including real_slang 6/6 and verible_ls 8/8)
+             NOTE: without those artifacts the tests fail loudly by design ("slang artifact not found ... run bash
+             build/slang/build.sh"); that is an environment prerequisite, not a T92 regression.
+no test/gate modified: T92 commit 3b1bb1e = 1944 insertions, 0 deletions; overlay commit 1977c50 = 0 deleted assertions.

@@ -1,0 +1,17 @@
+== A(a) RED: block comments are counted as structure (pre-fix) ==
+collected_at: 2026-11-01T06:48:23Z
+git_head: 48569602d0c86fb402dc88155593d1dc06445c90
+cmd: vedit-folding-tests (target/a4-fold-build, LD_LIBRARY_PATH=F2)
+--- output ---
+CHECK blockcomment.source.loaded PASS
+A4 BLOCKCOMMENT ranges=2 unbalanced=0 (2,3) (0,5)
+CHECK blockcomment.multiline.no-extra-range FAIL actual=2 expected=1
+CHECK blockcomment.multiline.unbalanced PASS actual=0 expected=0
+CHECK blockcomment.inline.no-extra-range PASS actual=1 expected=1
+CHECK blockcomment.inline.unbalanced FAIL actual=1 expected=0
+FOLDING-TESTS ok=0 checks=80 failures=2 skipped=0
+TEST-EXIT=0
+
+## note: the `TEST-EXIT=0` line above is the exit of the `grep` filter, not of the
+## test binary. The run itself ended with `FOLDING-TESTS ok=0 checks=80 failures=2`
+## (the two block-comment checks failed); that is the pre-fix red result.

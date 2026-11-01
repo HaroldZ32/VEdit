@@ -1,0 +1,10 @@
+# C9 evidence header
+collected_at: 2026-11-01T14:44:31+08:00
+git_head: 48569602d0c86fb402dc88155593d1dc06445c90
+
+## regression: a pane re-opening a second file after folds were injected (crash before releaseFolds)
+
+WORKSPACE-SEARCH-SLOWLIFECYCLE ok=1 checks=4 failures=0
+CHECK lifecycle.stall-child-finished PASS
+CHECK lifecycle.stall-child-pass PASS
+WORKSPACE-SEARCH-SELFTEST ok=1 checks=105 failures=0 skipped=2
