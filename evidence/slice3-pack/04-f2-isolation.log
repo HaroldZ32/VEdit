@@ -1,0 +1,18 @@
+== F2 isolation with simulated KDE host + user definitions (absolute paths) ==
+collected_at: 2026-11-01T07:49:54Z
+git_head: 90176858e5f8d5123c573826df8c0ccc7375c015
+cmd: bash packaging/runtime/verify-f2-isolation.sh --appdir packaging/runtime/out/AppDir --keep
+--- output ---
+402
+whitelist: SystemVerilog,Verilog
+fixtures: host_xml=402 user_xml=1
+== positive (AppDir) ==
+CHECK PASS  appdir: defs=2
+CHECK PASS  appdir: names == whitelist [SystemVerilog,Verilog]
+CHECK PASS  appdir: HostLeakProbe invisible
+CHECK PASS  appdir: UserLeakProbe invisible
+== reverse control (AppDir) ==
+CHECK PASS  appdir-reverse: reverse control reproduces the leak (defs=403)
+== summary: pass=5 fail=0 ==
+F2-ISOLATION PASS
+F2-ISOLATION-EXIT=0

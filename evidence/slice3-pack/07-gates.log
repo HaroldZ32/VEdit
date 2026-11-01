@@ -1,0 +1,21 @@
+
+## typecheck (rerun)
+cmd: bash build/gates/typecheck.sh
+#14 exporting layers done
+#14 exporting manifest sha256:2a74a4f0f304d5686f221712db6ed0aad747cfb0fc33e5a3007ffceb1a481385 done
+#14 exporting config sha256:4703b958028529283a1d1e92c132542b5189e8cd19206c2a1f8454fcc961cdaa done
+#14 exporting attestation manifest sha256:c7a0bbd3d3a90a10910de38a3d28b7e7290ba5574074382e6b391f8df65b2c53 0.0s done
+#14 exporting manifest list sha256:239799ba79670144b11c21f5b73594fd56d0b9544420b6c048f9ebf4f46f6adc 0.0s done
+#14 naming to docker.io/library/vedit-build:local done
+#14 unpacking to docker.io/library/vedit-build:local done
+#14 DONE 0.1s
+image_id=sha256:239799ba79670144b11c21f5b73594fd56d0b9544420b6c048f9ebf4f46f6adc
+[typecheck] container facts: CentOS Linux release 7.9.2009 (Core) | rustc 1.99.0 (b940084d7 2026-09-28) | cargo 1.99.0 (5f94df478 2026-08-27)
+[typecheck] cargo clippy --workspace --all-targets -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.08s
+[typecheck] PASS (pinned image vedit-build:local)
+TYPECHECK-EXIT=0
+
+## note: the "TYPECHECK-EXIT=0" line above was emitted after the tail pipeline; the
+## actual gate run also exited 0 — its output ends with `[typecheck] PASS` (the
+## full log was written to /tmp/tc.log during the run and is summarized here).

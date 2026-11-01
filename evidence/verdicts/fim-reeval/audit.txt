@@ -1,0 +1,59 @@
+# T107 independent audit — T27 evidence after T105 repair
+
+bound HEAD: 90176858e5f8d5123c573826df8c0ccc7375c015 (shared tree during review)
+T105 evidence captured while HEAD was d36bff9 (lead commit); T27 code version hash:
+  crates/vd-ffi/src/fim.rs = 1ca08772b0079458affbb9a39d16eabe5b0aca6839106f4b5f160f3c0f09b4f8
+  src/editor/fim/{fim_backend.h, fim_backend.cpp, fim_inline_completion.h, fim_inline_completion.cpp, fim_selftest.cpp, CMakeLists.txt}
+  = ee0224a1…, d3cbd1de…, 9ebcf91b…, 396f1c68…, 7693de25…, 1c208e28…  (identical to the T28 review binding)
+
+== 1. T105 write scope: code untouched at review start ==
+At T107 start (15:43) all the above shas equal the T28 binding exactly; `git status` shows no M for
+crates/vd-ffi/src/fim.rs or src/editor/fim. Later the shared tree moved by ANOTHER lane (files modified
+15:44:42–15:47:58, `src/editor/fim/**` + `src/editor/kernel/fim_wiring.*`, +526/−54) — see verdict N3.
+
+== 2. F1 audit (my own parser, not verify-headers.sh) ==
+AUDIT logs= 21  bad= 0
+- every log has collected_at (real value or `unknown`), git_head (real value or `unknown`),
+  git_status_porcelain block, `backfill: 补记（T105）` note, and a matching
+  git_status_porcelain_sha256 (recomputed by me for all 21: 0 mismatches).
+- 10 original-header logs: collected_at/git_head identical to the values I recorded in the T28 review:
+  01 15:12:51/4856960; 02 15:13:21/4856960; 03 15:23:14/d36bff9; 04b 15:23:13/d36bff9;
+  04 15:21:50/4856960; 05 15:21:51/4856960; 06b 15:21:34/4856960; 06-lane 15:15:26/4856960;
+  06-root 15:15:26/4856960; 06-typecheck 15:21:34/4856960.
+- headerless files: 00-run-evidence.log `unknown` + mtime ref 15:19:50 (matches the mtime I recorded
+  at T28); repro/* 15:17:16–15:19:50 (matches "ran 15:16–15:19" context). No fabricated values.
+- body preservation: original logs grew by exactly +2552 bytes each (= the prepended header block);
+  00 grew +2525. REPORT grew +7529 (documented additions: backfill header + binding section).
+
+== 3. Root fix (run-evidence.sh writes C9 headers) ==
+The updated script defines c9_header() (collected_at, collected_at_utc, git_head, porcelain) and calls
+it before every log. I executed it with VEDIT_FIM_EVIDENCE_DIR=target/t107-repro (scratch, did not
+touch the writer's evidence): all 10 generated logs have REAL auto-written headers
+(collected_at 15:43:47–15:45:00, git_head 9017685, porcelain present), bodies show the same results
+(FFI 20/0, FIM 28/0 default-off, 40/0 configured, FIM-RUST-REQUEST, SOCKETS=0/0 default, CONNECTS=1
+configured). RUN_EVIDENCE_EXIT=8 at the time because test #12 `vedit-fim-wiring-selftest` was
+transiently red from the concurrent lane; a later rerun of the full ctest passed 25/25.
+
+== 4. F2 checks ==
+- per-log HEAD attribution: REPORT's table A/B matches my per-log audit exactly
+  (A 4856960: 01,02,06-lane,06-root,06b,06-typecheck,04,05; B d36bff9: 03,04b; unknown: 00,repro).
+- REPORT collected_at 2026-11-01T15:41:23+0800 == mtime 15:41:23 (≤), old 15:22:00 declared void.
+- artifact sha256 table: current lane binary c2d73e64…, product 61e19acd…, libvd_ffi 2ad5b187…,
+  fim.rs 1ca08772…, src/editor/fim files match, socket_probe.c 48bed864…, d36bff9's fim.rs 070c849c…
+  — all reproduced; recorded `lane_sha256: adef16c7…` present in 04/05 and `product_sha256: 63a27a53…`
+  in 04b (lines 51), matching the table.
+- errata: (N1) table row evidence/slice3-fim/run-evidence.sh lists 86eec25a… (facts.txt snapshot at
+  15:37) but the final file is 78477e77… (edited 15:40; REPORT not refreshed). (N2) the note explains the
+  d36bff9 fim.rs hash difference as "clippy 修复的格式差异"; in fact d36bff9's committed file is the
+  pre-T27 stub (0 × settings_from_config, 1 × `pub(crate) fn complete`) and the difference is the T27
+  landing (+365/−14). Both values themselves are correct.
+
+== 5. F3/F4 boundaries ==
+§5 "未接线" and §8 "边界声明（F3/F4）" are present and stronger: F3 states the product UI is unwired and
+that other lanes' wiring files are not validated by this evidence; F4 bounds LD_PRELOAD (no raw syscall /
+static link / pcap). Not weakened.
+
+== 6. Regression ==
+typecheck: TYPECHECK_EXIT=0 ([qt6] PASS -Werror; [typecheck] PASS pinned image vedit-build:local).
+root ctest: 25/25 passed (CTEST_EXIT=0) at 15:48; lane ctest 1/1 passed. (At 15:45 test #12 was red
+during the concurrent lane's in-flight edits; not the known folding flake; it passed after their build.)
