@@ -15,9 +15,9 @@ bash packaging/runtime/build.sh          # 组装 → 许可闸门 → 自检 �
 
 | 路径 | 说明 |
 |---|---|
-| `packaging/runtime/out/AppDir/` | 196 个文件，约 178 MB |
-| `packaging/runtime/out/VEdit-<ver>-x86_64.AppImage` | 单文件交付物（F2 后许可闸门全绿） |
-| `evidence/m0-runtime/` | 每一步日志 + manifest + `F2.md`（T64 报告） |
+| `packaging/runtime/out/AppDir/` | **中间产物**（不是交付物）：202 个文件，约 283 MB；`bin/vd-app` 的 sha256 与交付 AppImage 内的同一份（当前 `b93f8cf4…`）。目录内容来自最终基线，仅用于检查/调试。 |
+| `packaging/runtime/out/VEdit-<ver>-x86_64.AppImage` | **唯一交付物**：单文件 AppImage（当前基线 `55a874d` 的产物 sha256 `e7ae067f…`）；`out/SHA256SUMS` 与之配套。 |
+| `evidence/slice3-pack/` | 最终打包证据（`final-55a874d/`：C9、构建、干净容器 selfcheck、四容器矩阵）。 |
 
 ## F2 形态（T61 定案；缺一条就会泄漏宿主定义）
 
@@ -58,7 +58,7 @@ bash packaging/runtime/build.sh          # 组装 → 许可闸门 → 自检 �
 
 ## 已知限制
 
-1. **delivery 双宿主矩阵未重跑**：用 `tests/packaging/hostmatrix.sh --appimage packaging/runtime/out/VEdit-<ver>-x86_64.AppImage` 跑 A0a/A0b/A0d/A0e；这是 M0 的结案动作（T12 脚本可直接复用）。
+1. **四宿主矩阵是容器矩阵**：`packaging/runtime/hostmatrix.sh` 已在 centos:7 / ubuntu:24.04 / rockylinux:9 / ubuntu:26.04 上跑通（启动、bundled lint、高亮均 PASS），**但全部共享宿主内核 `7.0.0-38-generic`，真 CentOS 7（内核 3.10）未测**。
 2. 宿主直接 FUSE 挂载需 `libfuse2`（A7 前提）；无 libfuse2 时用 `APPIMAGE_EXTRACT_AND_RUN=1` 验证内容。
 3. 30 个主题仍内嵌在库（上游无开关，全部 MIT），本包不另发主题文件。
 4. 图标只随包应用图标；若 UI 需要系统图标主题，需补 hicolor 子集。
@@ -83,9 +83,12 @@ bash packaging/runtime/build.sh          # 组装 → 许可闸门 → 自检 �
 - `build.sh` writes `out/SHA256SUMS` for the single-file AppImage and copies the
   evidence into `evidence/slice3-pack/`.
 
-**Phase note:** the current delivery baseline is the pre-T106 commit
-(`9017685`). The final AppImage/SHA256SUMS/matrix are produced only after the
-T106 async-FIM change lands and the Lead freezes the final baseline.
+**Delivery baseline:** `55a874da076d605c6b620e0bb20f9ac5932d5f46`. The delivery
+AppImage is `out/VEdit-0.1.1-x86_64.AppImage` with sha256
+`e7ae067fe66c8e271ba72da974795a7ee3db0efa59bda45079b5a048b4a09558`; any source or
+packaging-script change invalidates it and requires a rebuild. `out/AppDir/` is
+an intermediate inspection tree (its `bin/vd-app` sha matches the AppImage), not
+a deliverable.
 
 
 ## appimagetool is vendored (reproducibility, T31)

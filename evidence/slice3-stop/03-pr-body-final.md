@@ -35,6 +35,19 @@ chmod +x /tmp/VEdit-0.1.1-x86_64.AppImage
 /tmp/VEdit-0.1.1-x86_64.AppImage --appimage-extract-and-run
 ```
 
+**真机验证要拷两个文件（放同一目录）**：
+
+```bash
+packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage     # 95,349,240 B, sha256 e7ae067f…
+packaging/runtime/verify/verify-appimage-centos7.sh   # 16 项检查的单文件脚本
+
+chmod +x VEdit-0.1.1-x86_64.AppImage verify-appimage-centos7.sh
+bash verify-appimage-centos7.sh
+```
+
+预期：同目录**带 `SHA256SUMS`** 时 `PASS=16 FAIL=0 SKIP=0`；**不带**时 `PASS=15 FAIL=0 SKIP=1`。
+把脚本产出的 `verify-report-*.txt` 发回来即可。
+
 ## 3. 已验（无头 / 容器内，可复跑）
 
 | 项 | 结果 |
@@ -70,6 +83,7 @@ chmod +x /tmp/VEdit-0.1.1-x86_64.AppImage
 - **设置**：以 Rust settings store 为权威；UI 冲突有提示、坏配置回退。
 - **FIM**：**默认关闭**；未配置时零网络（syscall 级证明 `SOCKETS=0 CONNECTS=0 GETADDRINFO=0`）。
 - **工具链发现**：`bundled > local > PATH > env`，缺工具时只显示**一条**状态句，不刷屏。
+- **⚠️ AppRun 在带桌面的环境里会等待**：AppRun 的 C7 白名单守卫会**继承桌面环境**而一直等待（无输出、看起来卡死）；纯容器里不出现。因此**所有自动化运行都改用干净环境**：`env -i PATH=… HOME=… TMPDIR=… QT_QPA_PLATFORM=offscreen LANG=C.UTF-8` + stdin `/dev/null`（与 `packaging/runtime/selfcheck.sh` 一致）。验证脚本已按此实现 —— **但如果你在带桌面的 VM 上手工直接双击/运行 AppImage 而它"卡住不说话"，这就是这个行为边界，不是产物损坏。**
 
 ## 6. 构建方式（从源码复现）
 
@@ -103,10 +117,42 @@ bash packaging/runtime/build.sh     # -> packaging/runtime/out/VEdit-0.1.1-x86_6
 
 > ⚠️ **真 CentOS 7（内核 3.10）未经验证** —— 本次就是请你在真机上验这一步。
 
-## 9. 待补（本 PR 定稿前）
+## 9. 真机验证方法（T113 已就绪）
 
-- **T112**：修 T32 提出的三条证据问题（N1 `--no-test` 日志被当 ctest 证据 / N2 52 份证据缺 C9 头 / N3 `out/AppDir` 旧 sha）。
-- **T113**：真机验证包（`verify-appimage-centos7.sh` + 中文 STEPS），落地后路径与用法补进本节。
+**T112**（证据收口：N1 补 ctest 证据 / N2 补 C9 头 / N3 `out/AppDir` 口径）与 **T113**（真机验证包）均已落地并入库。
+
+### 两个文件
+```
+packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage        (95,349,240 B, e7ae067f…)
+packaging/runtime/verify/verify-appimage-centos7.sh      (16 项检查)
+```
+
+### 一条命令
+```bash
+# 两个文件放同一目录，然后
+chmod +x VEdit-0.1.1-x86_64.AppImage verify-appimage-centos7.sh
+bash verify-appimage-centos7.sh
+```
+
+### 预期结果
+| 情况 | 结果 |
+|---|---|
+| 同目录**有** `SHA256SUMS` | `PASS=16 FAIL=0 SKIP=0` |
+| 同目录**无** `SHA256SUMS` | `PASS=15 FAIL=0 SKIP=1`（该条 SKIP 并写明原因） |
+
+### 脚本检查什么（16 项，全部真取证）
+glibc 2.17 · AppImage sha256 · **FUSE 失败后回落 extract-and-run 并写明用了哪条** · `APP-SHELL-SELFTEST 200/0` · own-xml 两份 + `verilog=1` · `hidden-975` · bundled toolchain · **三条 loader `/proc/maps` 证明** · **真 lint 报 `line-length`（134 字符行）** · `--project` 真启动 exit 0。
+
+### 负向对照（证明不是假 PASS）
+| 场景 | 结果 |
+|---|---|
+| AppImage 截断成 1 MiB | `PASS=1 FAIL=4 SKIP=10`，exit 1 |
+| 目录里没有 AppImage | `PASS=0 FAIL=1 SKIP=0`，exit 1 |
+| 没有 `SHA256SUMS` | 该条 SKIP 并写原因 |
+
+中文说明见 `packaging/runtime/verify/STEPS.md`；自测证据见 `evidence/centos7-final-verify/`。
+
+**把 `verify-report-*.txt` 发回来，我据此关闭停点。**
 
 ## 10. 红线
 
