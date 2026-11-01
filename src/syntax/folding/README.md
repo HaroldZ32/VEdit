@@ -60,3 +60,14 @@ ctest --test-dir target/syn-folding -R vedit-folding-tests --output-on-failure
   975 条隐藏行（期望值来自样本文本构造，不来自 registry）；证据在 `evidence/a4-fold/`。
 - 本 lane 仍**未链入 `vedit-app`**：实时视图接线（打开时首建、tree-sitter 开关重灌、光标路径 no-op）
   与面包屑接线是 `T94` 的集成工作，不在 T29 的写域内。
+
+
+## Block comments (T100/F-4)
+
+`KsyntaxFoldSource::ranges()` skips `//` comments, `"..."` strings **and**
+`/* ... */` block comments (the block state spans lines). Keywords inside a block
+comment therefore never form a fold range and never unbalance the stack.
+Regression: `folding_tests.cpp::testBlockCommentsDoNotCreateFolds` — on the
+pre-fix code it produced an extra `(2,3)` range and `unbalanced=1` for the inline
+case; both are zero now. Evidence: `evidence/fold-evidence-final/01-blockcomment-red.log`
+(red) and `02-blockcomment-green.log` (green, F2).

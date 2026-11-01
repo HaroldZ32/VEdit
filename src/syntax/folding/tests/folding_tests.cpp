@@ -656,6 +656,50 @@ void testA4ClosedStateFolds(KTextEditor::Editor *editor)
 #endif
 }
 
+// F-4 (T30): block comments must not contribute structure. The scanner already
+// skips `//` and strings; this test pins the same rule for `/* ... */`, first on
+// the pre-fix implementation (it produces an extra range), then after the fix.
+void testBlockCommentsDoNotCreateFolds()
+{
+#if !defined(VEDIT_A4_SYSTEMVERILOG_XML)
+    skip("blockcomment.source.loaded", "VEDIT_A4_SYSTEMVERILOG_XML is not defined");
+#else
+    vedit::folding::KsyntaxFoldSource source(QStringLiteral(VEDIT_A4_SYSTEMVERILOG_XML));
+    check("blockcomment.source.loaded", source.isLoaded());
+
+    const QString sample = QStringLiteral(
+        "module top;\n"
+        "/*\n"
+        "module fake;\n"
+        "endmodule\n"
+        "*/\n"
+        "endmodule\n");
+    const std::vector<FoldRange> ranges = source.ranges(sample);
+    std::printf("A4 BLOCKCOMMENT ranges=%d unbalanced=%d", static_cast<int>(ranges.size()),
+                source.lastUnbalancedCount());
+    for (const FoldRange &range : ranges) {
+        std::printf(" (%d,%d)", range.startLine, range.endLine);
+    }
+    std::printf("\n");
+    checkInt("blockcomment.multiline.no-extra-range", static_cast<long long>(ranges.size()), 1);
+    checkInt("blockcomment.multiline.unbalanced", source.lastUnbalancedCount(), 0);
+    if (ranges.size() == 1) {
+        checkInt("blockcomment.multiline.range.start", ranges.front().startLine, 0);
+        checkInt("blockcomment.multiline.range.end", ranges.front().endLine, 5);
+    }
+
+    // A begin keyword inside a one-line block comment must not leave the stack
+    // unbalanced either (pre-fix: unbalanced=1).
+    const QString inlineSample = QStringLiteral(
+        "module q;\n"
+        "/* module x; */\n"
+        "endmodule\n");
+    const std::vector<FoldRange> inlineRanges = source.ranges(inlineSample);
+    checkInt("blockcomment.inline.no-extra-range", static_cast<long long>(inlineRanges.size()), 1);
+    checkInt("blockcomment.inline.unbalanced", source.lastUnbalancedCount(), 0);
+#endif
+}
+
 } // namespace
 
 int main(int argc, char **argv)
@@ -674,6 +718,7 @@ int main(int argc, char **argv)
     testRebuildPolicyAndCounters(editor);
     testTreeSitterToggleObservable(editor);
     testA4ClosedStateFolds(editor);
+    testBlockCommentsDoNotCreateFolds();
 
     std::printf("FOLDING-TESTS ok=%d checks=%d failures=%d skipped=%d\n", g_failures == 0 ? 1 : 0,
                 g_checks, g_failures, g_skips);

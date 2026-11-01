@@ -126,15 +126,34 @@ std::vector<FoldRange> KsyntaxFoldSource::ranges(QStringView text)
     }
 
     std::vector<int> stack;
+    // F-4 (T30): `/* ... */` is a comment context too; keywords inside it are
+    // not structure. The state spans lines, so it lives outside the line loop.
+    bool inBlockComment = false;
     const QStringList lines = text.toString().split(QLatin1Char('\n'));
     for (int lineIndex = 0; lineIndex < lines.size(); ++lineIndex) {
         const QString &line = lines.at(lineIndex);
         int index = 0;
         while (index < line.size()) {
+            if (inBlockComment) {
+                const qsizetype close = line.indexOf(QStringLiteral("*/"), index);
+                if (close < 0) {
+                    index = line.size();
+                    break;
+                }
+                inBlockComment = false;
+                index = static_cast<int>(close) + 2;
+                continue;
+            }
             const QChar ch = line.at(index);
             if (ch == QLatin1Char('/') && index + 1 < line.size()
                 && line.at(index + 1) == QLatin1Char('/')) {
                 break; // the XML's Normal context treats // to end of line as comment
+            }
+            if (ch == QLatin1Char('/') && index + 1 < line.size()
+                && line.at(index + 1) == QLatin1Char('*')) {
+                inBlockComment = true;
+                index += 2;
+                continue;
             }
             if (ch == QLatin1Char('"')) {
                 ++index;
