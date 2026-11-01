@@ -154,13 +154,13 @@ log "whitelist: $(cat "$OUT/usr/share/vedit/ksh-whitelist.txt")"
 # --- 5b. external toolchain binaries (T82) ----------------------------------
 # CentOS 7 has neither verible nor slang in its repositories, so the delivered
 # product carries them. Every binary is pinned by sha256 and the discovery order
-# (bundled > PATH > env) plus the chosen source is reported by the product; this
+# (bundled > local checkout > PATH > env) plus the chosen source is reported by the product; this
 # file records what was actually installed.
 mkdir -p "$OUT/bin" "$OUT/usr/share/doc/vedit/licenses"
 TOOLCHAIN_FILE="$OUT/usr/share/vedit/toolchain.txt"
 {
   echo "# VEdit bundled toolchain (T82)"
-  echo "# discovery order in the product: bundled > PATH > env (source is reported)"
+  echo "# discovery order in the product: bundled > local checkout > PATH > env (source is reported)"
   echo "# expected-bundled-dir: bin/ (next to vd-app)"
 } > "$TOOLCHAIN_FILE"
 BUNDLED_VERIBLE=0
@@ -292,7 +292,7 @@ log "active whitelist files: $active (no syntax-bundled/)"
   else
     echo "slang                NOT bundled (user/PATH/env must provide it)"
   fi
-  echo "Toolchain discovery  bundled > PATH > env; the chosen source and the missing list are"
+  echo "Toolchain discovery  bundled > local checkout > PATH > env; the chosen source and the missing list are"
   echo "                     reported in the status bar, the outline/diagnostics panel and --selfcheck."
   echo
   echo "NOT shipped: KDE systemverilog.xml (GPL-3.0-or-later), KDE verilog.xml (undeclared),"

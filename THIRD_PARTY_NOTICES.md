@@ -176,10 +176,19 @@ CentOS 7 的软件仓库里没有这两个工具，所以交付物**随包分发
 | **Verible**（`verible-verilog-ls`、`-lint`、`-format`） | `v0.0-4298-g085eef05`，三个二进制的 sha256 由 `scripts/versions.env` 的 `VERIBLE_{LS,LINT,FORMAT}_SHA256` 钉死 | **Apache-2.0** | `bin/verible-verilog-ls`、`bin/verible-verilog-lint`、`bin/verible-verilog-format` | `usr/share/doc/vedit/licenses/Apache-2.0.txt` |
 | **slang**（深度 lint） | 12.1，sha256 由 `SLANG_BIN_SHA256` 钉死（本仓库从源码构建） | **MIT** | `bin/slang` | `usr/share/doc/vedit/licenses/slang-LICENSE.txt` |
 
+**显式上游来源（URL）**：
+
+| 组件 | 上游仓库 | 具体来源 / 版本 |
+|---|---|---|
+| **Verible** | `https://github.com/chipsalliance/verible` | release `v0.0-4298-g085eef05`；下载 URL 与 sha256 钉在 `scripts/versions.env` 的 `VERIBLE_URL`、`VERIBLE_TARBALL_SHA256`、`VERIBLE_{LS,LINT,FORMAT}_SHA256` |
+| **slang** | `https://github.com/MikePopoloski/slang` | 本仓库从该上游源码构建（`build/slang/build.sh`，源码身份见 `build/slang/evidence/03-source.txt` 的 `repository=` 行与 commit），产物 sha256 由 `scripts/versions.env:SLANG_BIN_SHA256` 钉死 |
+
 - **sha256 校验**：安装器逐个比对 pin，任何不一致立即失败；实际安装身份写入
   `usr/share/vedit/toolchain.txt`，并进入 `runtime-manifest.txt`。
-- **发现顺序**：产品内固定为 **bundled > PATH > env**；选中的来源
-  （`bundled` / `PATH` / `env:<name>`）与 `missing: [...]` 会出现在状态栏、诊断/大纲面板状态和
+- **发现顺序**：产品内固定为 **bundled > local checkout > PATH > env**（四级：AppDir 内 `bin/`
+  随包副本 > 源码树里由 `scripts/fetch-verible.sh` / `build/slang/build.sh` 产出的本地 artifact >
+  `PATH` > `VEDIT_VERIBLE_LS(_DIR)` / `VEDIT_SLANG(_DIR)` 环境变量）；选中的来源
+  （`bundled` / `local` / `PATH` / `env:<name>`）与 `missing: [...]`、`local=[...]` 会出现在状态栏、诊断/大纲面板状态和
   `--selfcheck` 输出里——缺工具时显式说明「缺哪个、影响什么、怎么解决」，不静默等同于无功能。
 - Verible 上游 tarball 不含 `LICENSE`/`NOTICE` 文件（与本文 §3 的 legacy 说明一致），因此随包提供
   Apache-2.0 正文；slang 的 MIT 全文随包提供。
