@@ -1,3 +1,11 @@
+# C9 backfill (T112/N2): header added after the fact; the body below is unchanged.
+# original_collected_at_utc: 2026-11-01T08:32:53Z   (from the archived file mtime)
+# original_git_head: 55a874da076d605c6b620e0bb20f9ac5932d5f46
+# original_git_status_porcelain_sha256: 00b8d8a0956773d9246d1650a785ddf13c1b167806b44d77d7c9cb9003652e9b (hash of the porcelain block archived in final-55a874d/00-C9.txt)
+# session_anchor: final-55a874d/00-C9.txt
+# backfill_collected_at_utc: 2026-11-01T09:23:35Z
+# backfill_git_head: 0c8ea9fe4ae18c386a59a55b8868f837f4f80a84
+# backfill_git_status_porcelain_sha256: a7feab0230532310375511329de129cad97d49e690c7a9c7336394a1cce151fa (current tree at backfill time)
 image: vedit-qt6-build:local
 image_id=sha256:5aa9f14ef77b97ddd8ef42147d2c2ebb6e8718d83f17184406efa62fe1c269c4 size=2183723690
 vd-app: /home/haroldzhao/MyProj/DshProj/VEdit/target/wt-55a874d/target/qt6-build/src/app/vedit-app

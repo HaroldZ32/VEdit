@@ -1,3 +1,11 @@
+# C9 backfill (T112/N2): header added after the fact; the body below is unchanged.
+# original_collected_at_utc: 2026-11-01T09:22:44Z   (from the archived file mtime)
+# original_git_head: 55a874da076d605c6b620e0bb20f9ac5932d5f46
+# original_git_status_porcelain_sha256: 00b8d8a0956773d9246d1650a785ddf13c1b167806b44d77d7c9cb9003652e9b (hash of the porcelain block archived in final-55a874d/00-C9.txt)
+# session_anchor: final-55a874d/00-C9.txt
+# backfill_collected_at_utc: 2026-11-01T09:23:35Z
+# backfill_git_head: 0c8ea9fe4ae18c386a59a55b8868f837f4f80a84
+# backfill_git_status_porcelain_sha256: a7feab0230532310375511329de129cad97d49e690c7a9c7336394a1cce151fa (current tree at backfill time)
 # T31 FINAL — AppImage built from baseline `55a874d`
 
 C9 header: `00-C9.txt` (collected_at + HEAD + porcelain + the clean worktree).
@@ -71,8 +79,10 @@ this as four-real-host verification.
 ## 4. Build/gate evidence
 
 - clean worktree `target/wt-55a874d` = `55a874d` + T31 packaging scripts (listed
-  in C9). Build: `BUILD-QT-EXIT=0`; ctest in that tree: **27/27 passed**
-  (`CTEST-EXIT=0`).
+  in C9). Build: `BUILD-QT-EXIT=0` — the build log (`01-build-qt.log`) is a
+  `--no-test` build and does **not** contain a ctest run. The ctest gate is the
+  separate, real run `09-clean-ctest-55a874d.log` on the same clean tree:
+  **27/27 passed** (`CTEST-EXIT=0`).
 - `build.sh` run: `PACK-EXIT=0`, `steps_failed=0`, `BUILD: F2 runtime OK`;
   AppImage step, not-shipped (`pass=8 fail=0 DELIVERY_BLOCKED=no`), F2 isolation
   (`pass=5 fail=0`, reverse control `defs=403`), AppDir selfcheck and AppImage
@@ -98,7 +108,8 @@ this as four-real-host verification.
 | file | content |
 |---|---|
 | `00-C9.txt` | C9 header, baseline + final sha |
-| `01-build-qt.log` | clean build + ctest 27/27 |
+| `01-build-qt.log` | clean build **`--no-test`** (no ctest evidence inside) |
+| `09-clean-ctest-55a874d.log` | separate real ctest on the same clean tree: **27/27 passed**, `CTEST-EXIT=0` |
 | `02-build-final.log` | full packaging run (steps_failed=0) |
 | `03-clean-container.log` | stock centos:7 selfcheck on the AppImage |
 | `04-report.md` | this report |

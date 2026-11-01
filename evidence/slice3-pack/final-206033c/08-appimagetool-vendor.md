@@ -1,3 +1,11 @@
+# C9 backfill (T112/N2): header added after the fact; the body below is unchanged.
+# original_collected_at_utc: 2026-11-01T08:17:27Z   (from the archived file mtime)
+# original_git_head: 206033c1faa91ac6b89cca0d575d36283ab69d7f
+# original_git_status_porcelain_sha256: 50471d2bac6fbfce420c003a8f921497e7b3eabb201e9ad852d0b8e9c5319c2a (hash of the porcelain block archived in final-206033c/00-C9.txt)
+# session_anchor: final-206033c/00-C9.txt
+# backfill_collected_at_utc: 2026-11-01T09:23:35Z
+# backfill_git_head: 0c8ea9fe4ae18c386a59a55b8868f837f4f80a84
+# backfill_git_status_porcelain_sha256: a7feab0230532310375511329de129cad97d49e690c7a9c7336394a1cce151fa (current tree at backfill time)
 == appimagetool: vendored, hash-pinned, reproducible (T31 decision) ==
 collected_at: 2026-11-01T08:16:30Z
 git_head_at_collection: a4b8efd0890860ac5134e739c72965f9744d13d0

@@ -1,3 +1,11 @@
+# C9 backfill (T112/N2): header added after the fact; the body below is unchanged.
+# original_collected_at_utc: 2026-11-01T07:53:37Z   (from the archived file mtime)
+# original_git_head: 9017685 (phase-1 skeleton baseline)
+# original_git_status_porcelain_sha256: not captured at collection time
+# session_anchor: none: phase-1 logs recorded time+HEAD, not a full porcelain block
+# backfill_collected_at_utc: 2026-11-01T09:23:35Z
+# backfill_git_head: 0c8ea9fe4ae18c386a59a55b8868f837f4f80a84
+# backfill_git_status_porcelain_sha256: a7feab0230532310375511329de129cad97d49e690c7a9c7336394a1cce151fa (current tree at backfill time)
 # T31 — phase 1 (pipeline only): skeleton baseline `9017685`
 
 C9 header: every log in this directory carries its own `collected_at`,

@@ -1,3 +1,11 @@
+# C9 backfill (T112/N2): header added after the fact; the body below is unchanged.
+# original_collected_at_utc: 2026-11-01T08:09:35Z   (from the archived file mtime)
+# original_git_head: 206033c1faa91ac6b89cca0d575d36283ab69d7f
+# original_git_status_porcelain_sha256: 50471d2bac6fbfce420c003a8f921497e7b3eabb201e9ad852d0b8e9c5319c2a (hash of the porcelain block archived in final-206033c/00-C9.txt)
+# session_anchor: final-206033c/00-C9.txt
+# backfill_collected_at_utc: 2026-11-01T09:23:35Z
+# backfill_git_head: 0c8ea9fe4ae18c386a59a55b8868f837f4f80a84
+# backfill_git_status_porcelain_sha256: a7feab0230532310375511329de129cad97d49e690c7a9c7336394a1cce151fa (current tree at backfill time)
 appimagetool sha256 OK (793fca0ce4bcc309dc65d3f66669f58e3755643e4dadbe03932e7b436128494f)
 SOURCE_DATE_EPOCH=1793519834
 $ appimagetool --no-appstream /home/haroldzhao/MyProj/DshProj/VEdit/target/wt-206033c/packaging/runtime/out/AppDir /home/haroldzhao/MyProj/DshProj/VEdit/target/wt-206033c/packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage
@@ -10,7 +18,8 @@ Downloading runtime file from https://github.com/AppImage/type2-runtime/releases
 Downloaded runtime binary of size 944632
 Parallel mksquashfs: Using 16 processors
 Creating 4.0 filesystem on /home/haroldzhao/MyProj/DshProj/VEdit/target/wt-206033c/packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage, block size 131072.
-[=============================================================|] 2287/2287 100%
+
+[=============================================================|] 2287/2287 100%
 
 Exportable Squashfs 4.0 filesystem, zstd compressed, data block size 131072
 	compressed data, compressed metadata, compressed fragments,

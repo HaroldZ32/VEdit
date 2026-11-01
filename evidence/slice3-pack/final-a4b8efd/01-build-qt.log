@@ -1,3 +1,11 @@
+# C9 backfill (T112/N2): header added after the fact; the body below is unchanged.
+# original_collected_at_utc: 2026-11-01T08:19:09Z   (from the archived file mtime)
+# original_git_head: a4b8efd0890860ac5134e739c72965f9744d13d0
+# original_git_status_porcelain_sha256: not captured
+# session_anchor: final-a4b8efd/00-C9.txt
+# backfill_collected_at_utc: 2026-11-01T09:23:35Z
+# backfill_git_head: 0c8ea9fe4ae18c386a59a55b8868f837f4f80a84
+# backfill_git_status_porcelain_sha256: a7feab0230532310375511329de129cad97d49e690c7a9c7336394a1cce151fa (current tree at backfill time)
 == T31 final candidate: baseline a4b8efd (service.rs fix + T110) ==
 collected_at: 2026-11-01T08:17:59Z
 git_head: a4b8efd0890860ac5134e739c72965f9744d13d0
