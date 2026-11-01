@@ -210,6 +210,46 @@ private:
     vedit::editor::fim::Reply reply_;
 };
 
+// T106: a backend with the asynchronous seam. `pendingPolls` controls how many
+// polls report Pending before the suggestion is delivered.
+class AsyncFakeBackend final : public vedit::editor::fim::Backend {
+public:
+    vedit::editor::fim::Reply complete(const QString &, const QString &) override
+    {
+        return vedit::editor::fim::Reply{vedit::editor::fim::Reply::State::Text, text};
+    }
+    bool supportsAsync() const override { return true; }
+    quint64 start(const QString &, const QString &, QString *) override
+    {
+        ++starts;
+        return token_++;
+    }
+    vedit::editor::fim::AsyncReply poll(quint64 request) override
+    {
+        ++polls;
+        if (request != lastToken) {
+            lastToken = request;
+        }
+        if (pendingPolls > 0) {
+            --pendingPolls;
+            return vedit::editor::fim::AsyncReply{vedit::editor::fim::AsyncReply::State::Pending,
+                                                  QString()};
+        }
+        return vedit::editor::fim::AsyncReply{vedit::editor::fim::AsyncReply::State::Text, text};
+    }
+    void cancel(quint64) override { ++cancels; }
+
+    QString text = QStringLiteral(" async-suggestion");
+    int pendingPolls = 1;
+    int starts = 0;
+    int polls = 0;
+    int cancels = 0;
+
+private:
+    quint64 token_ = 1;
+    quint64 lastToken = 0;
+};
+
 #if defined(VEDIT_FIM_SELFTEST_HAVE_FFI)
 void clearFimEnvironment()
 {
@@ -323,6 +363,41 @@ QString redact(const QString &raw)
     QString copy = raw;
     copy.replace(QStringLiteral("SECRET-SELFTEST-KEY"), QStringLiteral("<redacted>"));
     return copy;
+}
+
+void testAsyncStateMachine()
+{
+    AsyncFakeBackend backend;
+    vedit::editor::fim::InlineCompletion client(&backend);
+
+    const quint64 job = client.requestJob(QStringLiteral("module m;\n  "), 1, 2);
+    check("fim.async.start-token", job != 0 && client.inFlight(), QString::number(job));
+    check("fim.async.start-called-once", backend.starts == 1);
+    check("fim.async.poll-pending", !client.pollRequest(job) && client.inFlight());
+    check("fim.async.poll-ready",
+          client.pollRequest(job) && !client.inFlight() && client.hasSuggestion());
+    check("fim.async.suggestion", client.suggestion() == backend.text, client.suggestion());
+    check("fim.async.accept-once",
+          client.accept() == backend.text && client.accept().isEmpty());
+
+    // Typing cancels an in-flight job (not only a pending suggestion).
+    client.requestJob(QStringLiteral("a"), 0, 1);
+    const int cancelsBeforeTyping = backend.cancels;
+    client.onTextEdited();
+    check("fim.async.typing-cancels-inflight",
+          !client.inFlight() && backend.cancels == cancelsBeforeTyping + 1);
+    check("fim.async.stale-poll-after-cancel", client.pollRequest(job));
+
+    // A new request cancels the previous job: at most one is ever in flight.
+    const quint64 first = client.requestJob(QStringLiteral("a"), 0, 1);
+    const quint64 second = client.requestJob(QStringLiteral("b"), 0, 1);
+    check("fim.async.single-inflight", client.inFlight() && client.activeJob() == second,
+          QString::number(client.activeJob()));
+    check("fim.async.new-cancels-old", first != second && backend.cancels >= 2);
+
+    // Esc while the job is in flight releases it; a later poll is stale.
+    client.cancelRequest(second);
+    check("fim.async.cancel-releases", !client.inFlight());
 }
 
 void testRustDefaultOff(const QTemporaryDir &home, bool withEndpoint)
@@ -443,6 +518,7 @@ int main(int argc, char **argv)
     std::printf("FIM-BACKEND %s\n", qPrintable(vedit::editor::fim::backendDescription()));
     testContextSplit();
     testStateMachine();
+    testAsyncStateMachine();
 
 #if defined(VEDIT_FIM_SELFTEST_HAVE_FFI)
     QTemporaryDir home;

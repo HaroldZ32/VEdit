@@ -27,6 +27,7 @@
 // calls it exactly as the lane's README prescribes; making the trigger
 // asynchronous would require changing the lane's request() contract, which is
 // outside this task's write scope.
+#include <QElapsedTimer>
 #include <QKeySequence>
 #include <QObject>
 #include <QString>
@@ -35,6 +36,7 @@
 
 class QLabel;
 class QShortcut;
+class QTimer;
 
 namespace KTextEditor {
 class View;
@@ -60,7 +62,9 @@ public:
     // The binding installed on this editor widget, or nullptr.
     static FimBinding *instanceFor(QWidget *editorWidget);
 
-    // The `Alt+\` action (also what the shortcut calls).
+    // The `Alt+\` action (also what the shortcut calls). T106: it starts an
+    // asynchronous request and returns immediately; the suggestion arrives via a
+    // QTimer poll (`pollJob`) and is rendered when it does.
     bool requestCompletion();
     // The `Tab` action: inserts the pending suggestion, returns true iff text
     // was inserted. A second call inserts nothing (the suggestion is gone).
@@ -78,6 +82,13 @@ public:
     QString ghostText() const;
     QLabel *ghostWidget() const { return ghost_; }
 
+    // T106 async state: exactly one job is in flight while a request runs.
+    int inFlightJobs() const;
+    int pollRounds() const { return pollRounds_; }
+    // The poll budget (default 15 s). Tests shrink it to prove the timeout is a
+    // cancel + diagnostic, not a frozen window.
+    void setPollBudgetMs(int milliseconds);
+
     // Shortcut wiring, exposed for the lane selftest.
     QShortcut *triggerShortcut() const { return trigger_; }
     QShortcut *acceptShortcut() const { return accept_; }
@@ -94,6 +105,7 @@ protected:
 private:
     void onDocumentEdited();
     void onCursorMoved();
+    void pollJob();
     void showGhost();
     void hideGhost();
     void installAcceptShortcuts();
@@ -108,6 +120,12 @@ private:
     QShortcut *trigger_ = nullptr;
     QShortcut *accept_ = nullptr;
     QShortcut *cancel_ = nullptr;
+    QTimer *pollTimer_ = nullptr;
+    quint64 activeJob_ = 0;
+    QElapsedTimer jobTimer_;
+    int pollBudgetMs_ = 15'000;
+    int pollRounds_ = 0;
+    QString timeoutStatus_;
     QString shownText_;
 };
 

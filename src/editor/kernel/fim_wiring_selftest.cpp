@@ -25,6 +25,7 @@
 #include <QLabel>
 #include <QShortcut>
 #include <QString>
+#include <QTimer>
 #include <QtGlobal>
 #include <QWidget>
 
@@ -69,8 +70,10 @@ void skip(const char *name, const char *reason)
 // answering while the GUI thread waits for the synchronous FIM request.
 class RawEndpoint {
 public:
-    explicit RawEndpoint(QByteArray body)
+    explicit RawEndpoint(QByteArray body, int delayMs = 0, bool respond = true)
         : response_(std::move(body))
+        , delayMs_(delayMs)
+        , respond_(respond)
     {
         listenFd_ = ::socket(AF_INET, SOCK_STREAM, 0);
         if (listenFd_ < 0) {
@@ -150,6 +153,18 @@ private:
                 std::lock_guard<std::mutex> lock(mutex_);
                 ++requests_;
             }
+            if (!respond_) {
+                // Black hole: hold the connection open and never answer, so the
+                // caller's own budget has to fire.
+                while (!stop_.load()) {
+                    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+                }
+                ::close(client);
+                continue;
+            }
+            if (delayMs_ > 0) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(delayMs_));
+            }
             QByteArray response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n";
             response += "Content-Length: " + QByteArray::number(response_.size()) + "\r\n";
             response += "Connection: close\r\n\r\n";
@@ -178,6 +193,8 @@ private:
     }
 
     QByteArray response_;
+    int delayMs_ = 0;
+    bool respond_ = true;
     int listenFd_ = -1;
     quint16 port_ = 0;
     std::thread thread_;
@@ -205,6 +222,31 @@ void configureFimEnvironment(const QString &endpoint)
 // The shortcut signal is what Qt delivers to a key press that matches the
 // binding; invoking it exercises the same wiring without depending on
 // offscreen focus handling. The key sequence itself is asserted separately.
+void pumpFor(int milliseconds)
+{
+    QElapsedTimer timer;
+    timer.start();
+    while (timer.elapsed() < milliseconds) {
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 5);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+}
+
+template <typename Predicate>
+bool pumpUntil(Predicate predicate, int timeoutMs)
+{
+    QElapsedTimer timer;
+    timer.start();
+    while (timer.elapsed() < timeoutMs) {
+        if (predicate()) {
+            return true;
+        }
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 5);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    return predicate();
+}
+
 void activate(QShortcut *shortcut)
 {
     if (shortcut != nullptr) {
@@ -277,24 +319,28 @@ int main(int argc, char **argv)
           !binding->acceptShortcutActive() && !binding->cancelShortcutActive());
     const quint64 requestsBefore = binding->requestCount();
     activate(binding->triggerShortcut());
+    pumpUntil([binding]() { return binding->inFlightJobs() == 0; }, 3000);
     check("fim.wiring.default-off.state-machine-asked",
           binding->requestCount() == requestsBefore + 1, QString::number(binding->requestCount()));
     check("fim.wiring.default-off.no-suggestion", !binding->hasSuggestion());
     check("fim.wiring.default-off.no-ghost", !binding->ghostVisible());
     check("fim.wiring.default-off.document-untouched", document->text() == kDocument);
-    std::this_thread::sleep_for(std::chrono::milliseconds(150));
+    pumpFor(150);
     check("fim.wiring.default-off.zero-connections", endpoint.requests() == 0,
           QStringLiteral("connections=%1").arg(endpoint.requests()));
     check("fim.wiring.default-off.status-disabled",
           binding->statusText().contains(QStringLiteral("未启用")), binding->statusText());
 
-    // --- configured: the suggestion arrives, ghost does not edit ------------
+    // --- configured: the job starts, the suggestion arrives asynchronously ---
     configureFimEnvironment(endpoint.endpoint());
     activate(binding->triggerShortcut());
+    check("fim.wiring.configured.async-started",
+          binding->inFlightJobs() == 1 || binding->hasSuggestion(),
+          QStringLiteral("in_flight=%1").arg(binding->inFlightJobs()));
+    const bool arrived = pumpUntil([binding]() { return binding->hasSuggestion(); }, 5000);
     check("fim.wiring.configured.request", endpoint.requests() >= 1,
           QStringLiteral("connections=%1").arg(endpoint.requests()));
-    check("fim.wiring.configured.suggestion",
-          binding->hasSuggestion() && binding->suggestion() == kSuggestion,
+    check("fim.wiring.configured.suggestion", arrived && binding->suggestion() == kSuggestion,
           binding->suggestion());
     check("fim.wiring.configured.ghost-visible", binding->ghostVisible());
     check("fim.wiring.configured.ghost-text",
@@ -303,6 +349,7 @@ int main(int argc, char **argv)
           document->text() == kDocument, document->text().left(60));
     check("fim.wiring.configured.tab-esc-armed",
           binding->acceptShortcutActive() && binding->cancelShortcutActive());
+    check("fim.wiring.configured.no-job-left", binding->inFlightJobs() == 0);
 
     // --- Tab accepts: the text changes here and exactly once ----------------
     activate(binding->acceptShortcut());
@@ -319,7 +366,8 @@ int main(int argc, char **argv)
     view->setCursorPosition(KTextEditor::Cursor(1, 6));
     const QString beforeCancel = document->text();
     activate(binding->triggerShortcut());
-    check("fim.wiring.cancel.suggestion", binding->hasSuggestion());
+    check("fim.wiring.cancel.suggestion",
+          pumpUntil([binding]() { return binding->hasSuggestion(); }, 5000));
     activate(binding->cancelShortcut());
     check("fim.wiring.cancel.dropped", !binding->hasSuggestion() && !binding->ghostVisible());
     check("fim.wiring.cancel.document-unchanged", document->text() == beforeCancel);
@@ -327,7 +375,8 @@ int main(int argc, char **argv)
     // --- typing invalidates a pending suggestion (lane state machine) -------
     view->setCursorPosition(KTextEditor::Cursor(1, 6));
     activate(binding->triggerShortcut());
-    check("fim.wiring.invalidate.suggestion", binding->hasSuggestion());
+    check("fim.wiring.invalidate.suggestion",
+          pumpUntil([binding]() { return binding->hasSuggestion(); }, 5000));
     document->insertText(view->cursorPosition(), QStringLiteral("z"));
     const QString afterTyping = document->text();
     check("fim.wiring.invalidate.typing-drops-it",
@@ -336,6 +385,78 @@ int main(int argc, char **argv)
     check("fim.wiring.invalidate.accept-inserts-nothing",
           !binding->acceptSuggestion() && document->text() == afterTyping,
           document->text().left(80));
+
+    // --- T106: a SLOW endpoint must not block the GUI thread -----------------
+    RawEndpoint slow(kFakeResponse, 400);
+    check("fim.async.slow-endpoint", slow.listening(), slow.endpoint());
+    configureFimEnvironment(slow.endpoint());
+    pumpFor(20);
+    QElapsedTimer startTimer;
+    startTimer.start();
+    activate(binding->triggerShortcut());
+    const qint64 startMs = startTimer.elapsed();
+    check("fim.async.start-returns-fast", startMs < 50,
+          QStringLiteral("start took %1 ms (the endpoint sleeps 400 ms)").arg(startMs));
+    check("fim.async.in-flight", binding->inFlightJobs() == 1);
+    int ticks = 0;
+    QTimer ticker;
+    ticker.setInterval(20);
+    QObject::connect(&ticker, &QTimer::timeout, [&ticks]() { ++ticks; });
+    ticker.start();
+    const int pollsBefore = binding->pollRounds();
+    pumpFor(250);
+    ticker.stop();
+    check("fim.async.event-loop-ticks", ticks >= 3, QStringLiteral("ticks=%1").arg(ticks));
+    check("fim.async.still-pending",
+          binding->inFlightJobs() == 1 && !binding->hasSuggestion(),
+          QStringLiteral("in_flight=%1").arg(binding->inFlightJobs()));
+    check("fim.async.polls-ran", binding->pollRounds() > pollsBefore,
+          QStringLiteral("polls=%1").arg(binding->pollRounds() - pollsBefore));
+    check("fim.async.suggestion-arrives-late",
+          pumpUntil([binding]() { return binding->hasSuggestion(); }, 5000));
+    check("fim.async.ghost-after-arrival", binding->ghostVisible());
+    check("fim.async.job-finished", binding->inFlightJobs() == 0);
+    binding->cancelSuggestion();
+
+    // --- typing also cancels an IN-FLIGHT request ----------------------------
+    activate(binding->triggerShortcut());
+    check("fim.async.inflight-before-typing", binding->inFlightJobs() == 1);
+    document->insertText(view->cursorPosition(), QStringLiteral("q"));
+    check("fim.async.typing-cancels-inflight",
+          binding->inFlightJobs() == 0 && !binding->hasSuggestion());
+    pumpFor(600);
+    check("fim.async.cancelled-never-arrives",
+          !binding->hasSuggestion() && !binding->ghostVisible());
+
+    // --- sensitivity: the same metric detects a blocked thread ---------------
+    qint64 firedAtMs = -1;
+    QElapsedTimer probe;
+    probe.start();
+    QTimer::singleShot(20, [&firedAtMs, &probe]() { firedAtMs = probe.elapsed(); });
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+    check("fim.async.metric-detects-block", firedAtMs >= 250,
+          QStringLiteral("20 ms timer fired at %1 ms after scheduling").arg(firedAtMs));
+
+    // --- timeout: a black hole becomes a diagnostic, not a frozen window -----
+    RawEndpoint blackHole(kFakeResponse, 0, false);
+    check("fim.async.black-hole", blackHole.listening(), blackHole.endpoint());
+    configureFimEnvironment(blackHole.endpoint());
+    binding->setPollBudgetMs(300);
+    const QString beforeTimeout = document->text();
+    QElapsedTimer timeoutTimer;
+    timeoutTimer.start();
+    activate(binding->triggerShortcut());
+    const bool timedOut = pumpUntil([binding]() { return binding->inFlightJobs() == 0; }, 3000);
+    const qint64 timeoutElapsed = timeoutTimer.elapsed();
+    binding->setPollBudgetMs(15000);
+    check("fim.async.timeout-fires", timedOut,
+          QStringLiteral("after %1 ms with a 300 ms budget").arg(timeoutElapsed));
+    check("fim.async.timeout-status",
+          binding->statusText().contains(QStringLiteral("超时")), binding->statusText());
+    check("fim.async.timeout-no-suggestion",
+          !binding->hasSuggestion() && !binding->ghostVisible());
+    check("fim.async.timeout-document-unchanged", document->text() == beforeTimeout);
 
     clearFimEnvironment();
     std::printf("FIM-WIRING-SELFTEST ok=%d checks=%d failures=%d\n", g_failures == 0 ? 1 : 0,

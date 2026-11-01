@@ -28,3 +28,20 @@ FIM（fill-in-the-middle）的**编辑器侧 inline completion 客户端**。本
 `fim::InlineCompletion`，把视图的 `cursorPositionChanged`/`textChanged` 映射到
 `onTextEdited`，把触发命令（`Alt+\`）映射到 `request(document->text(), cursor.line(), cursor.column())`，
 并把 `accept()` 的结果写入文档。该接线与 FIM 面板/命令注册属于后续任务。
+
+## Asynchronous requests (T106)
+
+`Backend` has two shapes: `complete()` (blocking, 15 s budget, lane selftest /
+explicit callers only) and `start()` / `poll()` / `cancel()` (job-based). The
+editor binding (`src/editor/kernel/fim_wiring.*`) uses only the job-based shape:
+`Alt+\` starts the Rust job and returns immediately, a 15 ms QTimer polls it, and
+the 15 s budget becomes a cancel + a short status sentence (`FIM 超时…`) instead
+of a frozen window. Typing cancels an in-flight request the same way it
+invalidates a pending suggestion; at most one job exists per view at a time.
+
+## Ghost-text limitation
+
+The overlay previews only the **first line** of a suggestion (a multi-line one
+shows `↵`); `Tab` inserts the complete text. KTextEditor 6.24 has no public
+ghost-text API, so the preview is a translucent `QLabel` positioned with
+`View::cursorToCoordinate()`; it never edits the document.

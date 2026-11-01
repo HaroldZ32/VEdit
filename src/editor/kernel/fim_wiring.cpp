@@ -10,6 +10,7 @@
 #include <QEvent>
 #include <QLabel>
 #include <QShortcut>
+#include <QTimer>
 
 #include <utility>
 
@@ -51,6 +52,12 @@ FimBinding::FimBinding(KTextEditor::View *view, QObject *parent)
     ghostFont.setItalic(true);
     ghost_->setFont(ghostFont);
     ghost_->hide();
+    ghost_->setToolTip(QStringLiteral(
+        "FIM ghost text: previews the first line only; Tab inserts the full suggestion."));
+
+    pollTimer_ = new QTimer(this);
+    pollTimer_->setInterval(15);
+    connect(pollTimer_, &QTimer::timeout, this, [this]() { pollJob(); });
 
     trigger_ = new QShortcut(QKeySequence(Qt::ALT | Qt::Key_Backslash), view_);
     trigger_->setContext(Qt::WidgetWithChildrenShortcut);
@@ -67,6 +74,13 @@ FimBinding::FimBinding(KTextEditor::View *view, QObject *parent)
 
 FimBinding::~FimBinding()
 {
+    if (pollTimer_ != nullptr) {
+        pollTimer_->stop();
+    }
+    if (completion_ != nullptr && activeJob_ != 0) {
+        completion_->cancelRequest(activeJob_);
+        activeJob_ = 0;
+    }
     removeAcceptShortcuts();
     if (view_ != nullptr) {
         view_->removeEventFilter(this);
@@ -92,27 +106,37 @@ bool FimBinding::requestCompletion()
         return false;
     }
     const KTextEditor::Cursor cursor = view_->cursorPosition();
-    // The lane's state machine: it splits the text, calls the backend (Rust C
-    // ABI; with FIM disabled the Rust side makes no request at all) and keeps
-    // the suggestion until it is accepted, cancelled or invalidated by typing.
+    // T106: start the job and return. The lane's state machine splits the text,
+    // starts the Rust job (with FIM disabled the Rust side makes no request at
+    // all) and keeps ONE job in flight; the QTimer poll below applies the
+    // suggestion when it arrives. Nothing here waits on the network.
     cancelSuggestion();
-    const bool has = completion_->request(document->text(), cursor.line(), cursor.column());
-    if (has && !completion_->suggestion().isEmpty()) {
-        showGhost();
-        installAcceptShortcuts();
-        emit suggestionChanged(true);
-        return true;
+    timeoutStatus_.clear();
+    const quint64 job = completion_->requestJob(document->text(), cursor.line(), cursor.column());
+    if (job == 0) {
+        hideGhost();
+        removeAcceptShortcuts();
+        emit suggestionChanged(false);
+        return false;
     }
-    hideGhost();
-    removeAcceptShortcuts();
-    emit suggestionChanged(false);
-    return false;
+    activeJob_ = job;
+    jobTimer_.start();
+    // The QTimer is what makes the request asynchronous: start it BEFORE the
+    // first poll so a pending job keeps being polled without any blocking wait.
+    pollTimer_->start();
+    pollJob(); // a backend without an async seam is already done
+    return completion_->hasSuggestion();
 }
 
 bool FimBinding::acceptSuggestion()
 {
     if (view_ == nullptr || completion_ == nullptr || !completion_->hasSuggestion()) {
         return false;
+    }
+    if (activeJob_ != 0) {
+        completion_->cancelRequest(activeJob_);
+        activeJob_ = 0;
+        pollTimer_->stop();
     }
     QString text = completion_->accept();
     removeAcceptShortcuts();
@@ -134,7 +158,14 @@ bool FimBinding::acceptSuggestion()
 void FimBinding::cancelSuggestion()
 {
     if (completion_ != nullptr) {
+        if (activeJob_ != 0) {
+            completion_->cancelRequest(activeJob_);
+            activeJob_ = 0;
+        }
         completion_->cancel();
+    }
+    if (pollTimer_ != nullptr) {
+        pollTimer_->stop();
     }
     removeAcceptShortcuts();
     hideGhost();
@@ -152,7 +183,20 @@ QString FimBinding::suggestion() const
 
 QString FimBinding::statusText() const
 {
+    if (!timeoutStatus_.isEmpty()) {
+        return timeoutStatus_;
+    }
     return completion_ != nullptr ? completion_->statusText() : QString();
+}
+
+int FimBinding::inFlightJobs() const
+{
+    return activeJob_ != 0 ? 1 : 0;
+}
+
+void FimBinding::setPollBudgetMs(int milliseconds)
+{
+    pollBudgetMs_ = qMax(1, milliseconds);
 }
 
 quint64 FimBinding::requestCount() const
@@ -185,10 +229,20 @@ bool FimBinding::cancelShortcutActive() const
 
 void FimBinding::onDocumentEdited()
 {
-    if (completion_ == nullptr || !completion_->hasSuggestion()) {
+    if (completion_ == nullptr) {
         return;
     }
-    // T27's invalidation: typing makes the pending suggestion stale.
+    const bool hadJob = activeJob_ != 0;
+    if (hadJob) {
+        completion_->cancelRequest(activeJob_);
+        activeJob_ = 0;
+        pollTimer_->stop();
+    }
+    if (!completion_->hasSuggestion() && !hadJob) {
+        return;
+    }
+    // T27's invalidation: typing makes the pending suggestion (and an in-flight
+    // request) stale.
     completion_->onTextEdited();
     removeAcceptShortcuts();
     hideGhost();
@@ -197,12 +251,49 @@ void FimBinding::onDocumentEdited()
 
 void FimBinding::onCursorMoved()
 {
-    if (completion_ == nullptr || !completion_->hasSuggestion()) {
+    if (completion_ == nullptr) {
         return;
     }
-    // A suggestion belongs to the cursor position it was requested at.
+    if (!completion_->hasSuggestion() && activeJob_ == 0) {
+        return;
+    }
+    // A suggestion (and a request) belongs to the cursor position it was made at.
     cancelSuggestion();
     emit suggestionChanged(false);
+}
+
+void FimBinding::pollJob()
+{
+    if (activeJob_ == 0 || completion_ == nullptr) {
+        if (pollTimer_ != nullptr) {
+            pollTimer_->stop();
+        }
+        return;
+    }
+    ++pollRounds_;
+    if (!completion_->pollRequest(activeJob_)) {
+        if (jobTimer_.elapsed() >= pollBudgetMs_) {
+            completion_->cancelRequest(activeJob_);
+            activeJob_ = 0;
+            pollTimer_->stop();
+            hideGhost();
+            removeAcceptShortcuts();
+            timeoutStatus_ = QStringLiteral("FIM 超时（%1 ms 无结果，已取消）").arg(pollBudgetMs_);
+            emit suggestionChanged(false);
+        }
+        return;
+    }
+    activeJob_ = 0;
+    pollTimer_->stop();
+    if (completion_->hasSuggestion()) {
+        showGhost();
+        installAcceptShortcuts();
+        emit suggestionChanged(true);
+    } else {
+        hideGhost();
+        removeAcceptShortcuts();
+        emit suggestionChanged(false);
+    }
 }
 
 void FimBinding::showGhost()
