@@ -13,8 +13,21 @@
 #endif
 
 #include <QApplication>
+#include <QCoreApplication>
+#include <QDir>
+#include <QElapsedTimer>
+#include <QFile>
+#include <QFileInfo>
+#include <QStandardPaths>
 #include <QString>
+#include <QTemporaryDir>
+#include <QTimer>
 #include <QWidget>
+
+#if defined(VEDIT_VCS_HAVE_FFI)
+#include <chrono>
+#include <thread>
+#endif
 
 #include <cstdio>
 #include <cstring>
@@ -27,8 +40,12 @@ using vedit::workspace::vcs::Change;
 using vedit::workspace::vcs::Diff;
 using vedit::workspace::vcs::Info;
 using vedit::workspace::vcs::Status;
+#if defined(VEDIT_VCS_HAVE_FFI)
+using vedit::workspace::vcs::FfiVcsSource;
+#endif
 using vedit::workspace::vcs::StubVcsSource;
 using vedit::workspace::vcs::VcsPanel;
+using vedit::workspace::vcs::VcsSource;
 
 namespace {
 
@@ -184,26 +201,163 @@ void checkTransitions()
 void checkFfi()
 {
 #if defined(VEDIT_VCS_HAVE_FFI)
-    // Real C ABI call on a plain (non-repository) directory: the empty state
-    // must come back as backend 0 + a note, with every owned string freed.
-    VdVcsInfo info = vd_vcs_info("/tmp");
-    const bool info_ok = info.backend == 0 && info.note != nullptr && std::strlen(info.note) > 0;
-    QString info_note = info.note != nullptr ? QString::fromUtf8(info.note) : QString();
+    // T99: info/diff are job-based like status. The ABI contract is start ->
+    // job id, poll -> PENDING until READY (or a typed failure); no call spawns a
+    // subprocess on the caller's thread.
+    VdService *service = vd_service_create();
+    check("vcs.ffi.service", service != nullptr);
+    if (service == nullptr) {
+        return;
+    }
+
+    const unsigned long long infoJob = vd_vcs_info_job(service, "/tmp");
+    check("vcs.ffi.info.start", infoJob != 0);
+    VdVcsInfo info{};
+    int infoState = VD_STATUS_PENDING;
+    for (int attempt = 0; attempt < 2000 && infoState == VD_STATUS_PENDING; ++attempt) {
+        infoState = vd_vcs_info_poll(service, infoJob, &info);
+        if (infoState == VD_STATUS_PENDING) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+    }
+    const bool info_ok = infoState == VD_STATUS_READY && info.backend == 0
+        && info.note != nullptr && std::strlen(info.note) > 0;
+    const QString info_note = info.note != nullptr ? QString::fromUtf8(info.note) : QString();
     vd_vcs_info_free(&info);
     check("vcs.ffi.info-empty-state", info_ok, info_note.left(70));
 
-    VdVcsDiff diff = vd_vcs_diff("/tmp", "a.sv");
-    const bool diff_ok = diff.text == nullptr || std::strlen(diff.text) == 0;
-    QString diff_note = diff.note != nullptr ? QString::fromUtf8(diff.note) : QString();
+    const unsigned long long diffJob = vd_vcs_diff_job(service, "/tmp", "a.sv");
+    check("vcs.ffi.diff.start", diffJob != 0);
+    VdVcsDiff diff{};
+    int diffState = VD_STATUS_PENDING;
+    for (int attempt = 0; attempt < 2000 && diffState == VD_STATUS_PENDING; ++attempt) {
+        diffState = vd_vcs_diff_poll(service, diffJob, &diff);
+        if (diffState == VD_STATUS_PENDING) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+    }
+    const bool diff_ok =
+        diffState == VD_STATUS_READY && (diff.text == nullptr || std::strlen(diff.text) == 0);
     const int diff_binary = diff.binary;
+    const QString diff_note = diff.note != nullptr ? QString::fromUtf8(diff.note) : QString();
     vd_vcs_diff_free(&diff);
     check("vcs.ffi.diff-empty-state", diff_ok && diff_binary == 0, diff_note.left(70));
-    // A write-shaped call cannot be expressed through this ABI at all.
-    check("vcs.ffi.read-only-surface", true, "vd_vcs_info / vd_vcs_diff only; no write entry point");
+
+    // A null root is rejected before a job is started.
+    check("vcs.ffi.invalid-root-rejected", vd_vcs_info_job(service, nullptr) == 0);
+    // The C ABI has no write entry point at all (only status/info/diff jobs).
+    check("vcs.ffi.read-only-surface", true,
+          "vd_vcs_status / vd_vcs_info_job / vd_vcs_diff_job only; no write entry point");
+    vd_service_destroy(service);
 #else
+    skip("vcs.ffi.service", "lane built without vd-ffi (stub-only build)");
+    skip("vcs.ffi.info.start", "lane built without vd-ffi (stub-only build)");
     skip("vcs.ffi.info-empty-state", "lane built without vd-ffi (stub-only build)");
+    skip("vcs.ffi.diff.start", "lane built without vd-ffi (stub-only build)");
     skip("vcs.ffi.diff-empty-state", "lane built without vd-ffi (stub-only build)");
+    skip("vcs.ffi.invalid-root-rejected", "lane built without vd-ffi (stub-only build)");
     skip("vcs.ffi.read-only-surface", "lane built without vd-ffi (stub-only build)");
+#endif
+}
+
+// T99 N-1 regression: the GUI thread must not wait for git. A fake `git` in
+// front of PATH sleeps before exec-ing the real one, so the job stays PENDING
+// while an event-loop timer has to keep ticking. The last check proves the
+// metric itself is sensitive: a deliberate blocking sleep makes the timer fire
+// late, so a synchronous implementation would be caught.
+void checkNonBlocking()
+{
+#if defined(VEDIT_VCS_HAVE_FFI)
+    const QString git = QStandardPaths::findExecutable(QStringLiteral("git"));
+    if (git.isEmpty()) {
+        skip("vcs.nonblocking.start-returns-fast", "git is not on PATH");
+        return;
+    }
+    QTemporaryDir temp;
+    check("vcs.nonblocking.temp-dir", temp.isValid());
+    if (!temp.isValid()) {
+        return;
+    }
+    const QString fakeDir = temp.path() + QStringLiteral("/bin");
+    QDir().mkpath(fakeDir);
+    const QString fakeGit = fakeDir + QStringLiteral("/git");
+    {
+        QFile script(fakeGit);
+        if (!script.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+            check("vcs.nonblocking.fake-git", false);
+            return;
+        }
+        script.write(QStringLiteral("#!/bin/sh\nsleep 0.4\nexec \"%1\" \"$@\"\n").arg(git).toUtf8());
+    }
+    QFile::setPermissions(fakeGit, QFileDevice::ReadOwner | QFileDevice::WriteOwner
+                                        | QFileDevice::ExeOwner | QFileDevice::ReadUser
+                                        | QFileDevice::ExeUser | QFileDevice::ReadGroup
+                                        | QFileDevice::ExeGroup | QFileDevice::ReadOther
+                                        | QFileDevice::ExeOther);
+    check("vcs.nonblocking.fake-git", QFileInfo(fakeGit).isExecutable());
+    const QByteArray savedPath = qgetenv("PATH");
+    qputenv("PATH", (fakeDir + QLatin1Char(':') + QString::fromLocal8Bit(savedPath)).toLocal8Bit());
+    // A repository marker makes the backend Git, so the info job really spawns
+    // `git rev-parse` twice (each through the sleeping wrapper). Without the
+    // marker vd-vcs answers "no repository" from the marker walk alone and no
+    // subprocess is started.
+    QDir().mkpath(temp.path() + QStringLiteral("/.git"));
+
+    {
+        FfiVcsSource source;
+        bool delivered = false;
+        QString note;
+        QElapsedTimer startTimer;
+        startTimer.start();
+        source.requestInfo(temp.path().toStdString(), [&delivered, &note](Info info) {
+            delivered = true;
+            note = QString::fromStdString(info.note);
+        });
+        const qint64 startMs = startTimer.elapsed();
+        check("vcs.nonblocking.start-returns-fast", startMs < 150,
+              QStringLiteral("start took %1 ms while the fake git sleeps 400 ms").arg(startMs));
+
+        int ticks = 0;
+        QTimer ticker;
+        ticker.setInterval(20);
+        QObject::connect(&ticker, &QTimer::timeout, [&ticks]() { ++ticks; });
+        ticker.start();
+        QElapsedTimer window;
+        window.start();
+        while (window.elapsed() < 250) {
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+        ticker.stop();
+        check("vcs.nonblocking.event-loop-ticks", ticks >= 3,
+              QStringLiteral("ticks=%1").arg(ticks));
+        check("vcs.nonblocking.job-still-pending", !delivered,
+              QStringLiteral("polls=%1").arg(static_cast<unsigned long long>(source.pollRounds())));
+
+        QElapsedTimer wait;
+        wait.start();
+        while (!delivered && wait.elapsed() < 8000) {
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+        check("vcs.nonblocking.result-delivered", delivered, note.left(60));
+    }
+
+    // Sensitivity: schedule the same 20 ms timer, then block the thread. A
+    // synchronous implementation looks exactly like this, so the timing metric
+    // must report the late fire.
+    qint64 firedAtMs = -1;
+    QElapsedTimer probe;
+    probe.start();
+    QTimer::singleShot(20, [&firedAtMs, &probe]() { firedAtMs = probe.elapsed(); });
+    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+    QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+    check("vcs.nonblocking.metric-detects-block", firedAtMs >= 250,
+          QStringLiteral("timer fired at %1 ms after scheduling (expected late)").arg(firedAtMs));
+
+    qputenv("PATH", savedPath);
+#else
+    skip("vcs.nonblocking.start-returns-fast", "lane built without vd-ffi (stub-only build)");
 #endif
 }
 
@@ -230,6 +384,7 @@ int main(int argc, char **argv)
     checkSvnPanel();
     checkTransitions();
     checkFfi();
+    checkNonBlocking();
 
     std::printf("WORKSPACE-VCS-SELFTEST ok=%d checks=%d failures=%d\n",
                 g_failures == 0 ? 1 : 0, g_checks, g_failures);

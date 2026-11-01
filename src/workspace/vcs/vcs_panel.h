@@ -44,6 +44,11 @@ public:
     bool emptyStateVisible() const;
 
 private:
+    // T99: the panel drives the asynchronous VcsSource seam and renders in the
+    // completion callbacks, so no git/svn subprocess runs on the GUI thread.
+    void applyStatus(Status status);
+    void applyInfo(Info info);
+    void applyDiff(const std::string &path, Diff diff);
     void showEmptyState(const Status &status);
     std::unique_ptr<VcsSource> source_;
     std::string root_;

@@ -69,7 +69,13 @@ void VcsPanel::refresh()
         showEmptyState(Status{});
         return;
     }
-    const Status status = source_->status(root_);
+    // T99: returns immediately; the result arrives in applyStatus() (the stub
+    // source calls it synchronously, the FFI source from its QTimer poll).
+    source_->requestStatus(root_, [this](Status status) { applyStatus(std::move(status)); });
+}
+
+void VcsPanel::applyStatus(Status status)
+{
     backend_ = status.backend;
     if (status.backend == Backend::None) {
         showEmptyState(status);
@@ -85,17 +91,22 @@ void VcsPanel::refresh()
                             .arg(QString::fromStdString(change.path),
                                  QString::fromLatin1(changeKindName(change.kind))));
     }
+    if (source_) {
+        source_->requestInfo(root_, [this](Info info) { applyInfo(std::move(info)); });
+    }
+}
 
-    const Info info = source_->info(root_);
+void VcsPanel::applyInfo(Info info)
+{
     QStringList parts;
-    parts << QString::fromLatin1(backendName(status.backend));
+    parts << QString::fromLatin1(backendName(backend_));
     if (!info.branch.empty()) {
         parts << QString::fromStdString(info.branch);
     }
     if (!info.revision.empty()) {
         parts << QStringLiteral("@ ") + QString::fromStdString(info.revision);
     }
-    parts << QStringLiteral("· %1 changed file(s)").arg(status.changes.size());
+    parts << QStringLiteral("· %1 changed file(s)").arg(files_->count());
     header_->setText(parts.join(QStringLiteral(" ")));
 }
 
@@ -122,7 +133,12 @@ void VcsPanel::selectFile(const std::string &path)
         diff_->setPlainText(QStringLiteral("No VCS backend available."));
         return;
     }
-    const Diff diff = source_->diff(root_, path);
+    source_->requestDiff(root_, path,
+                         [this, path](Diff diff) { applyDiff(path, std::move(diff)); });
+}
+
+void VcsPanel::applyDiff(const std::string &path, Diff diff)
+{
     if (!diff.text.empty()) {
         diff_->setPlainText(QString::fromStdString(diff.text));
         return;
