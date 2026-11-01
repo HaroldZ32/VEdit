@@ -55,6 +55,10 @@ pub(crate) enum JobValue {
     Search(crate::search::SearchData),
     /// VCS status.
     Vcs(crate::vcs::VcsData),
+    /// VCS branch + revision identity (T99: job-based, GUI thread never blocks).
+    VcsInfo(crate::vcs::VcsInfoData),
+    /// One file's VCS diff (T99: job-based, GUI thread never blocks).
+    VcsDiff(crate::vcs::VcsDiffData),
     /// Settings read from the store.
     Settings(crate::settings::SettingsData),
     /// Settings written successfully (no payload).
