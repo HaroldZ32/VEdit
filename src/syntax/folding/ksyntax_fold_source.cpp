@@ -1,5 +1,7 @@
 #include "ksyntax_fold_source.h"
 
+#include "syntax_directory.h"
+
 #include <QChar>
 #include <QFile>
 #include <QFileInfo>
@@ -28,6 +30,18 @@ KsyntaxFoldSource::KsyntaxFoldSource(QString definitionPath)
     : path_(std::move(definitionPath))
 {
     load();
+}
+
+QString KsyntaxFoldSource::definitionDirectoryFromEnvironment()
+{
+    return vedit::syntax::applicationSyntaxDefinitionDirectory();
+}
+
+QString KsyntaxFoldSource::definitionPathForMode(const QString &mode)
+{
+    const QString directory = vedit::syntax::applicationSyntaxDefinitionDirectory();
+    return directory.isEmpty() ? QString()
+                               : directory + QLatin1Char('/') + vedit::syntax::syntaxDefinitionFileName(mode);
 }
 
 void KsyntaxFoldSource::load()

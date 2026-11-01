@@ -29,6 +29,11 @@ find_package(KF6TextEditor REQUIRED)
 
 # The syntax stack owns the fold ranges (provider + vendored grammar + queries).
 # Standalone builds pull the grammar lane in; the root build already has it.
+if(NOT TARGET vedit_syntax_common)
+  add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../common"
+                   "${CMAKE_CURRENT_BINARY_DIR}/syn-common")
+endif()
+
 if(NOT TARGET vedit_syntax_grammars)
   set(VEDIT_GRAMMAR_BUILD_TESTS OFF CACHE BOOL "grammar lane tests (off in this lane build)" FORCE)
   add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../grammars"
@@ -48,11 +53,23 @@ target_link_libraries(vedit_syntax_folding PUBLIC
   Qt6::Gui
   Qt6::Widgets
   KF6::TextEditor
+  vedit_syntax_common
   vedit_syntax_grammars
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(vedit_syntax_folding PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
+
+add_executable(vedit-syntax-directory-tests tests/syntax_directory_tests.cpp)
+target_link_libraries(vedit-syntax-directory-tests PRIVATE vedit_syntax_folding Qt6::Core)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(vedit-syntax-directory-tests PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+add_test(NAME vedit-syntax-directory-tests COMMAND vedit-syntax-directory-tests)
+set_tests_properties(vedit-syntax-directory-tests PROPERTIES
+  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-fold"
+  TIMEOUT 60
+)
 
 add_executable(vedit-folding-tests tests/folding_tests.cpp)
 target_link_libraries(vedit-folding-tests PRIVATE vedit_syntax_folding Qt6::Gui)

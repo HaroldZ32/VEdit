@@ -58,6 +58,12 @@ public:
 
     QString lastDiagnostic() const { return lastDiagnostic_; }
     int lastRangeCount() const { return lastRangeCount_; }
+
+    // The ONE path resolution (T109): `VEDIT_SYNTAX_DIR` is a data root, not the
+    // `syntax` subdirectory; the shared helper also accepts the subdirectory
+    // spelling and the bare-build checkout fallback.
+    static QString definitionDirectoryFromEnvironment();
+    static QString definitionPathForMode(const QString &mode);
     int lastUnbalancedCount() const { return lastUnbalancedCount_; }
 
 private:
