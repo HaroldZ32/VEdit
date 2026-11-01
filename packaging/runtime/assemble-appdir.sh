@@ -58,6 +58,7 @@ set -a; . "$ROOT/scripts/versions.env"; set +a
 : "${VERIBLE_LINT_SHA256:?missing VERIBLE_LINT_SHA256 pin}"
 : "${VERIBLE_FORMAT_SHA256:?missing VERIBLE_FORMAT_SHA256 pin}"
 : "${SLANG_BIN_SHA256:?missing SLANG_BIN_SHA256 pin}"
+: "${NOTO_CJK_FONT_SHA256:?missing NOTO_CJK_FONT_SHA256 pin}"
 
 if [ -z "$TOOLCHAIN_VERIBLE" ]; then
   for candidate in "$ROOT/.mpd/recon/verible/bin" "$ROOT"/target/verible-pin/extract/*/bin; do
@@ -133,6 +134,20 @@ for root in "$OUT/bin/vd-app" "$OUT/bin/vedit-ksh-env-probe" "$OUT/lib/libKF6Syn
   [ -e "$root" ] || continue
   while read -r dep; do copy_dep "$dep"; done < <(closure "$root")
 done
+
+# --- 3b. locale data for the bundled glibc (T115) ---------------------------
+# The host CentOS 7 locale archive is glibc-2.17 data and the bundled glibc
+# cannot use it (setlocale returns NULL). Ship the build image's tiny C.utf8
+# locale (compatible with the bundled glibc) and let AppRun set LOCPATH.
+LOCALE_SRC=/usr/lib/locale/C.utf8
+if [ -d "$LOCALE_SRC" ]; then
+  mkdir -p "$OUT/usr/lib/locale"
+  cp -a "$LOCALE_SRC" "$OUT/usr/lib/locale/C.utf8"
+  log "locale: C.utf8 $(du -sh "$OUT/usr/lib/locale/C.utf8" | cut -f1) (bundled glibc)"
+else
+  echo "ERROR: the build image has no /usr/lib/locale/C.utf8; cannot ship a UTF-8 locale" >&2
+  exit 1
+fi
 
 # --- 4. loader + glibc -------------------------------------------------------
 install -m 0755 "$(readlink -f /lib64/ld-linux-x86-64.so.2)" "$OUT/ld-linux-x86-64.so.2"
@@ -241,6 +256,11 @@ cat > "$OUT/etc/fonts/fonts.conf" <<'EOF'
 <fontconfig>
   <dir prefix="relative">../../share/fonts</dir>
   <cachedir>/tmp/vedit-fontconfig-cache</cachedir>
+  <!-- T119: Latin keeps DejaVu first; CJK falls back to the packaged Noto.
+       The editor (monospace) gets the Mono CJK face so full-width comments
+       align in columns. -->
+  <alias binding="same"><family>DejaVu Sans</family><prefer><family>Noto Sans CJK SC</family></prefer></alias>
+  <alias binding="same"><family>DejaVu Sans Mono</family><prefer><family>Noto Sans Mono CJK SC</family></prefer></alias>
   <config></config>
 </fontconfig>
 EOF
@@ -250,6 +270,20 @@ if [ -f "$ROOT/resources/syntax/LICENSE-LGPL-2.1" ]; then
   install -m 0644 "$ROOT/resources/syntax/LICENSE-LGPL-2.1" "$OUT/usr/share/doc/vedit/syntax/LICENSE-LGPL-2.1"
   install -m 0644 "$ROOT/resources/syntax/README.md" "$OUT/usr/share/doc/vedit/syntax/README.md"
 fi
+# T119: packaged CJK font (OFL-1.1) + the licence text. The fontconfig aliases
+# above make the UI fall back to Noto Sans CJK SC and the editor to
+# Noto Sans Mono CJK SC (Latin stays DejaVu).
+FONT_SRC="$ROOT/packaging/runtime/assets/fonts/NotoSansCJK-Regular.ttc"
+FONT_LICENSE_SRC="$ROOT/packaging/runtime/assets/licenses/Noto-CJK-OFL-1.1.txt"
+[ -f "$FONT_SRC" ] || { echo "ERROR: packaged CJK font missing: $FONT_SRC" >&2; exit 1; }
+font_sha=$(sha256sum "$FONT_SRC" | cut -d' ' -f1)
+[ "$font_sha" = "$NOTO_CJK_FONT_SHA256" ] || {
+  echo "ERROR: Noto CJK font sha256 mismatch: want=$NOTO_CJK_FONT_SHA256 got=$font_sha" >&2; exit 1; }
+install -m 0644 "$FONT_SRC" "$OUT/share/fonts/NotoSansCJK-Regular.ttc"
+mkdir -p "$OUT/usr/share/doc/vedit/licenses"
+install -m 0644 "$FONT_LICENSE_SRC" "$OUT/usr/share/doc/vedit/licenses/Noto-CJK-OFL-1.1.txt"
+log "cjk font: $(stat -c%s "$OUT/share/fonts/NotoSansCJK-Regular.ttc") bytes sha256=$font_sha; licence: usr/share/doc/vedit/licenses/Noto-CJK-OFL-1.1.txt"
+
 install -m 0644 "$ROOT/packaging/runtime/assets/vedit.desktop" "$OUT/vedit.desktop"
 sed -i "s/@VERSION@/$VERSION/g" "$OUT/vedit.desktop"
 install -m 0644 "$ROOT/packaging/runtime/assets/io.github.vedit.VEdit.png" "$OUT/io.github.vedit.VEdit.png"
@@ -274,7 +308,10 @@ log "active whitelist files: $active (no syntax-bundled/)"
 # --- 7b. delivery invariants (T31) ------------------------------------------
 for required in bin/vd-app bin/verible-verilog-ls bin/slang \
                 plugins/platforms/libqxcb.so plugins/platforms/libqoffscreen.so \
-                plugins/kf6/parts/katepart.so usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml; do
+                plugins/kf6/parts/katepart.so usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml \
+                usr/lib/locale/C.utf8/LC_CTYPE \
+                share/fonts/NotoSansCJK-Regular.ttc \
+                usr/share/doc/vedit/licenses/Noto-CJK-OFL-1.1.txt; do
   [ -e "$OUT/$required" ] || { echo "ERROR: delivery artifact missing: $required" >&2; exit 1; }
 done
 [ -z "$(find "$OUT/bin" -maxdepth 1 -name 'vedit-m0-smoke' -print -quit)" ] || {

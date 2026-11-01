@@ -47,7 +47,7 @@ echo "prefix: $PREFIX"
 echo "\$ env -i PATH=... HOME=$TMP/home QT_QPA_PLATFORM=offscreen $PREFIX/AppRun --selfcheck"
 OUT=$(
   env -i PATH=/usr/bin:/bin HOME="$TMP/home" TMPDIR="$TMP/tmp" \
-      QT_QPA_PLATFORM=offscreen LANG=C.UTF-8 \
+      QT_QPA_PLATFORM=offscreen LANG=C.UTF-8 VEDIT_DEBUG=1 \
       "$PREFIX/AppRun" --selfcheck 2>&1
 )
 RC=$?
@@ -71,6 +71,21 @@ printf '%s' "$OUT" | grep -q 'EDIT-CORE-SELFTEST ok=1' && echo "CHECK PASS  KTex
 printf '%s' "$OUT" | grep -q 'CHECK fold.wiring.closed.hidden-975 PASS' \
   && echo "CHECK PASS  folded 1k .sv with packaged XML" \
   || { echo "CHECK FAIL  folding in the package"; fail=1; }
+
+# --- packaged CJK font + its OFL text (T119) --------------------------------
+FONT="$PREFIX/share/fonts/NotoSansCJK-Regular.ttc"
+FONT_LICENSE="$PREFIX/usr/share/doc/vedit/licenses/Noto-CJK-OFL-1.1.txt"
+if [ -f "$FONT" ]; then
+    echo "CHECK PASS  packaged CJK font present ($(stat -c%s "$FONT") bytes)"
+else
+    echo "CHECK FAIL  packaged CJK font missing: $FONT"; fail=1
+fi
+if [ -f "$FONT_LICENSE" ] && grep -q 'SIL OPEN FONT LICENSE' "$FONT_LICENSE" \
+   && grep -q 'Google Corporation' "$FONT_LICENSE"; then
+    echo "CHECK PASS  packaged OFL text present and carries the copyright"
+else
+    echo "CHECK FAIL  packaged OFL text missing/incomplete: $FONT_LICENSE"; fail=1
+fi
 
 # --- loader / glibc link fact (build a real process, read /proc/<pid>/maps) ---
 echo "-- loader proof: run the product through AppRun and read /proc/<pid>/maps --"

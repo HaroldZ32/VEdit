@@ -91,6 +91,24 @@ an intermediate inspection tree (its `bin/vd-app` sha matches the AppImage), not
 a deliverable.
 
 
+## CJK font fallback (T119)
+
+The AppDir ships `usr/share/fonts/NotoSansCJK-Regular.ttc` (19,484,784 B,
+sha256 `b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a`,
+OFL-1.1) and its licence at `usr/share/doc/vedit/licenses/Noto-CJK-OFL-1.1.txt`.
+`etc/fonts/fonts.conf` aliases UI `DejaVu Sans` → `Noto Sans CJK SC` and editor
+`DejaVu Sans Mono` → `Noto Sans Mono CJK SC`; Latin still matches DejaVu first.
+
+The editor keeps DejaVu Sans Mono for Latin (so ASCII metrics are unchanged) and
+falls back to Noto Sans Mono CJK for CJK glyphs. Because the two fonts have
+different em advances, a CJK glyph is **1.60×** a Latin advance rather than the
+typographic 2.0×; mixed Chinese/Latin comment alignment is therefore approximate,
+while CJK runs are internally monospaced. This is a deliberate trade-off: ASCII
+width stability was chosen over a 2.0 mixed ratio.
+
+Back door: set the editor's primary font family to `Noto Sans Mono CJK SC` (one
+configuration line) for strict 2.00; the cost is Latin advance 10px → 8px.
+
 ## appimagetool is vendored (reproducibility, T31)
 
 `appimagetool` is **not** downloaded from the upstream `continuous` asset at build
