@@ -1,0 +1,41 @@
+== diagnostic: baseline + the uncommitted 4-line service.rs fix ==
+collected_at: 2026-11-01T08:04:35Z
+baseline: 206033c1faa91ac6b89cca0d575d36283ab69d7f
+worktree: /home/haroldzhao/MyProj/DshProj/VEdit/target/wt-206033c
+worktree status:
+   M crates/vd-ffi/include/vd_ffi.h
+   M crates/vd-ffi/src/service.rs
+   M evidence/ffi-abi/logs/10-rust-image.txt
+   M evidence/ffi-abi/logs/19-rust-stage-console.log
+   M evidence/ffi-abi/logs/20-cargo-build-release.log
+   M packaging/appimage/README.md
+   M packaging/runtime/AppRun
+   M packaging/runtime/README.md
+   M packaging/runtime/assemble-appdir.sh
+   M packaging/runtime/build.sh
+   M packaging/runtime/selfcheck.sh
+   M packaging/runtime/verify-f2-isolation.sh
+   M packaging/runtime/verify-not-shipped.sh
+applied diff (main worktree):
+  diff --git a/crates/vd-ffi/src/service.rs b/crates/vd-ffi/src/service.rs
+  index 2883996..a33ac33 100644
+  --- a/crates/vd-ffi/src/service.rs
+  +++ b/crates/vd-ffi/src/service.rs
+  @@ -55,6 +55,10 @@ pub(crate) enum JobValue {
+       Search(crate::search::SearchData),
+       /// VCS status.
+       Vcs(crate::vcs::VcsData),
+  +    /// VCS branch + revision identity (T99: job-based, GUI thread never blocks).
+  +    VcsInfo(crate::vcs::VcsInfoData),
+  +    /// One file's VCS diff (T99: job-based, GUI thread never blocks).
+  +    VcsDiff(crate::vcs::VcsDiffData),
+       /// Settings read from the store.
+       Settings(crate::settings::SettingsData),
+       /// Settings written successfully (no payload).
+cmd: cargo check -p vd-ffi (vedit-build:local)
+--- output ---
+  Downloaded tokio v1.54.1
+  Downloaded ring v0.17.14
+  Downloaded linux-raw-sys v0.12.1
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 13.16s
+CARGO-CHECK-EXIT=0
