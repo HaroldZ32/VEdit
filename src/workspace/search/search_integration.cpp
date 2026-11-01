@@ -36,7 +36,9 @@ void installSearch(vedit::app::ApplicationShell &shell, const IntegrationOptions
         return panel;
     };
     shell.panels()->setFactory(QStringLiteral("search"), factory);
-    qInfo("search: installSearch projectRoot='%s' jumpTarget=editor", qPrintable(projectRoot));
+    if (qEnvironmentVariableIsSet("VEDIT_DEBUG")) {
+        qInfo("search: installSearch projectRoot='%s' jumpTarget=editor", qPrintable(projectRoot));
+    }
 }
 
 } // namespace vedit::workspace

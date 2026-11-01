@@ -253,6 +253,27 @@ public:
         return request(VD_LSP_REQ_DIAGNOSTICS, file, 0, 0, QString());
     }
 
+    bool changeBuffer(const QString &file, const QString &text, QString *error) override
+    {
+        if (session_ == 0 || service_.get() == nullptr) {
+            if (error != nullptr) {
+                *error = QStringLiteral("no LSP session");
+            }
+            return false;
+        }
+        const QByteArray path = file.toUtf8();
+        const QByteArray body = text.toUtf8();
+        const int status = vd_lsp_session_change(service_.get(), session_, path.constData(),
+                                                 body.constData());
+        if (status != VD_STATUS_READY) {
+            if (error != nullptr) {
+                *error = service_.lastError();
+            }
+            return false;
+        }
+        return true;
+    }
+
     LspPolled poll(quint64 requestId) override
     {
         if (session_ == 0 || requestId == 0) {

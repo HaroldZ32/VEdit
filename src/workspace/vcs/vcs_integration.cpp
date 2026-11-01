@@ -26,7 +26,9 @@ void installVcs(vedit::app::ApplicationShell &shell, const IntegrationOptions &o
         return panel;
     };
     shell.panels()->setFactory(QStringLiteral("vcs"), factory);
-    qInfo("vcs: installVcs projectRoot='%s'", qPrintable(projectRoot));
+    if (qEnvironmentVariableIsSet("VEDIT_DEBUG")) {
+        qInfo("vcs: installVcs projectRoot='%s'", qPrintable(projectRoot));
+    }
 }
 
 } // namespace vedit::workspace

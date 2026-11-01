@@ -14,9 +14,11 @@
 // diagnostics_ffi_selftest.cpp; it SKIPs explicitly when the binary is absent.
 
 #include "diagnostics_controller.h"
+#include "diagnostics_panel.h"
 #include "diagnostics_outline_model.h"
 #include "toolchain.h"
 
+#include <QApplication>
 #include <QCoreApplication>
 #include <QDir>
 #include <QFile>
@@ -24,6 +26,8 @@
 #include <QString>
 #include <QStringList>
 #include <QVector>
+
+#include <QtTest/QTest>
 
 #include <cstdio>
 #include <memory>
@@ -149,6 +153,27 @@ public:
     {
         return request(ResponseKind::Diagnostics, file, 0, 0, QString());
     }
+
+    // T118: the editor buffer path. The fake records what the controller pushed,
+    // and bumps the diagnostics generation like a server that just republished.
+    bool changeBuffer(const QString &file, const QString &text, QString *error) override
+    {
+        if (failChange) {
+            if (error != nullptr) {
+                *error = QStringLiteral("fake LSP cannot follow buffers");
+            }
+            return false;
+        }
+        ++changeCount;
+        changedFile = file;
+        changedText = text;
+        ++snapshot.generation;
+        return true;
+    }
+    int changeCount = 0;
+    QString changedFile;
+    QString changedText;
+    bool failChange = false;
 
     LspPolled poll(quint64 requestId) override
     {
@@ -287,7 +312,7 @@ BackendState refreshUntilTerminal(DiagnosticsController &controller, int maxIter
 
 int main(int argc, char **argv)
 {
-    QCoreApplication app(argc, argv);
+    QApplication app(argc, argv); // the panel test needs a QApplication
 
     // ---- 1. A3c: one effective file set reaches both backends --------------
     auto lsp = std::make_unique<FakeLsp>();
@@ -471,6 +496,68 @@ int main(int argc, char **argv)
               missingReport.userMessage().contains(QStringLiteral("Diagnostics unavailable"))
                   && missingReport.userMessage().contains(QStringLiteral("Fix:")),
               missingReport.userMessage());
+    }
+
+    // ---- T118: the editor-buffer path and the panel's own polling ----------
+    // Reported defect: deleting a comma in the GUI produced no diagnostic and an
+    // empty Outline. The controller must (a) analyze the ACTIVE file without a
+    // project, (b) push the BUFFER text into the session, and (c) the panel must
+    // show the result without the user touching anything.
+    {
+        auto raw = std::make_unique<FakeLsp>();
+        FakeLsp *fakeLsp = raw.get();
+        auto slangRaw = std::make_unique<FakeSlang>();
+        DiagnosticsController controller(std::move(raw), std::move(slangRaw));
+        controller.setConfiguration(QStringLiteral("verible"), QStringLiteral("/fixture"));
+        ToolchainReport found;
+        found.verible.kind = ToolKind::Verible;
+        found.verible.name = QStringLiteral("verible-verilog-ls");
+        found.verible.path = QStringLiteral("/fixture/verible-verilog-ls");
+        found.verible.source = ToolSource::Bundled;
+        found.slang.kind = ToolKind::Slang;
+        found.slang.name = QStringLiteral("slang");
+        found.slang.path = QStringLiteral("/fixture/slang");
+        found.slang.source = ToolSource::Bundled;
+        controller.setToolchainReport(found);
+        DiagnosticsPanel panel(&controller);
+        const QString staleText = panel.statusText();
+
+        const QString file = QStringLiteral("/fixture/rtl/top.sv");
+        const QString brokenBuffer =
+            QStringLiteral("module top;\n  logic a b;\nendmodule\n");
+        const bool started = controller.analyzeFile(file, brokenBuffer, true);
+        check("t118.analyze-starts", started,
+              QStringLiteral("analysis count=%1").arg(controller.analysisCount()));
+        check("t118.analyze-is-file-scope", fakeLsp->startedFiles == QStringList{file},
+              fakeLsp->startedFiles.join(QLatin1Char(',')));
+        check("t118.analyze-counted", controller.analysisCount() == 1,
+              QString::number(controller.analysisCount()));
+
+        // The panel's own 300 ms timer drives refresh(): no manual call here.
+        QTest::qWait(1200);
+        check("t118.buffer-pushed", fakeLsp->changeCount >= 1 && fakeLsp->changedFile == file
+                                       && fakeLsp->changedText == brokenBuffer,
+              QStringLiteral("changes=%1").arg(fakeLsp->changeCount));
+        check("t118.panel-refreshed-before",
+              !staleText.contains(QStringLiteral("analyzed")), staleText);
+        check("t118.panel-analyzed", panel.statusText().contains(QStringLiteral("analyzed")),
+              panel.statusText());
+        check("t118.panel-source-is-buffer",
+              panel.statusText().contains(QStringLiteral("not saved")), panel.statusText());
+        check("t118.panel-counts-diagnostics",
+              panel.statusText().contains(QStringLiteral("diagnostic(s)")), panel.statusText());
+        check("t118.panel-outline-filled", panel.outlineRowCount() > 0,
+              QString::number(panel.outlineRowCount()));
+
+        // A backend that cannot follow a buffer must be reported, never silently
+        // pretended: the analysis stays alive and the message is observable.
+        fakeLsp->failChange = true;
+        controller.analyzeFile(file, QStringLiteral("module top;\nendmodule\n"), false);
+        QTest::qWait(600);
+        check("t118.buffer-refusal-observable",
+              controller.analyzeWasDirty() == false
+                  && controller.state() != BackendState::Idle,
+              QString::number(static_cast<int>(controller.state())));
     }
 
     std::printf("VE-DIAGNOSTICS-SELFTEST checks=%d failures=%d\n", g_checks, g_failures);

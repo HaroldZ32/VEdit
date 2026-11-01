@@ -6,6 +6,7 @@
 #include <QWidget>
 
 class QLabel;
+class QTimer;
 class QTreeView;
 
 namespace vedit::workspace::diagnostics {
@@ -32,7 +33,12 @@ public:
     void refreshFromController();
 
 private:
+    /// T118: the panel owns the polling loop, so an asynchronous analysis result
+    /// always reaches the widgets without the user touching anything.
+    void poll();
+
     DiagnosticsController *controller_ = nullptr;
+    QTimer *pollTimer_ = nullptr;
     OutlineModel *model_ = nullptr;
     QTreeView *view_ = nullptr;
     QLabel *status_ = nullptr;

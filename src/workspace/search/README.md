@@ -13,7 +13,7 @@ Lapce 对齐的全局搜索：**命中文件 + 行号 + 片段**、**点击跳�
 | 文件 | 职责 |
 |---|---|
 | `search_types.h/.cpp` | 选项、命中、摘要、`JumpRequest`、`IJumpTarget`、Verilog 扩展名表 |
-| `global_search.h/.cpp` | 后端：工作线程目录遍历 + 逐行字面匹配 + 批量回传 + 取消/限额/时间预算 |
+| `global_search.h/.cpp` | 后端（T21）：**只消费 Rust 搜索服务** `vd_search_tree_query`/`vd_search_tree_poll`；无 Qt 目录遍历、无 Qt 行匹配。工作线程负责轮询与取消，命中按 200 条分批回主线程 |
 | `search_panel.h/.cpp` | 面板：查询框、结果树（文件分组：文件 / 行号 / 片段）、空状态、点击跳转 |
 | `search_integration.h/.cpp` | lane 入口 `installSearch(shell, options)`：注册 `PanelRegistry` 工厂，并安装产品跳转目标 `EditorJumpTarget` |
 | `search_jump_target.h/.cpp` | **产品跳转消费者**：复用 filetree lane 的 open seam `openFileInEditor()` 打开命中文件，再把光标定位到命中行/列（edit-core 落地后替换其实现） |
@@ -25,19 +25,25 @@ Lapce 对齐的全局搜索：**命中文件 + 行号 + 片段**、**点击跳�
 ```
 SearchPanel::startSearch()
   → GlobalSearch::start(options)            立即返回（QThread::create）
-      worker: 递归遍历 → 跳过/计数 → 逐行匹配 → 每 64 条或 40 ms 批量 invokeMethod 回主线程
+      worker: vd_search_tree_query(root, query, options) → 轮询 vd_search_tree_poll
+              Rust 侧完成 递归遍历 + 跳过/计数 + 逐行匹配 + 限额/时间预算
+      worker: 结果按 200 条/批 invokeMethod 回主线程；取消 = 停止轮询（服务 job 自行结束）
   ← 主线程: hitsReady(batch)                逐批追加结果树
   ← 主线程: finished(summary)               文案 + 空状态 + searchFinished
 ```
 
-- **不冻结 UI**：扫描在 `QThread` 上；`start()` 在 96 MiB 文件样本上实测 < 100 ms 返回
-  （`CHECK large.start.non-blocking`），工作线程身份由 `ranOnWorkerThread()` 断言。
-- **生命周期（verdict M2，T64 修复）**：每次扫描一个 `std::shared_ptr<std::atomic_bool>`
-  取消令牌，worker **按值**持有它、从不读 `GlobalSearch` 的成员；析构时 `cancel()` 后
-  **无上限等待** worker 真正退出（旧实现只等 10 s，而扫描预算是 15 s，慢盘 `read()` 仍在跑时
-  对象就被释放 → heap-use-after-free，证据 `evidence/search-uaf/`），然后确定性地回收
-  `QThread`（断连 `finished→deleteLater` + `removePostedEvents` + `delete`）。
-  代价：卡死的文件系统会拖慢销毁；这是“宁可不释放，也不在 worker 脚下释放”的取舍。
+`vd-search` 拥有遍历与匹配（`crates/vd-search/src/lib.rs::search_tree`），`vd-ffi`
+只做 C 投影；Qt lane 没有第二套实现。构建未链接 Rust 层时 `GlobalSearch` 返回
+类型化 Failed（`the Rust search service is not linked in this build`），不会退化成
+Qt 自带搜索。
+
+- **不冻结 UI**：job 启动与轮询都在 `QThread` 上；`start()` 在 96 MiB 文件样本上实测
+  < 100 ms 返回（`CHECK large.start.non-blocking`），工作线程身份由 `ranOnWorkerThread()` 断言。
+- **生命周期（verdict M2 + T21）**：取消令牌按值传给 worker；析构时 `cancel()` 后等待
+  worker 退出，再确定性地回收 `QThread`。Rust job 由服务内部的 `Arc` 持有，服务句柄
+  可以在 job 未结束时销毁（`vd-ffi` service.rs 的生命周期契约），因此 worker 不会读到
+  已释放的对象；慢盘读只会拖慢服务 job，不会造成 Qt 侧 use-after-free
+  （回归证据 `evidence/search-uaf/`，当前实现仍由 `slowlifecycle` 自检覆盖）。
 - **可取消**：`cancel()` 只置原子标志；扫描每 256 行 / 每个目录条目检查一次；
   旧搜索的结果由 generation 过滤，不会串到新搜索里。
 - **限额可观测**：`SearchSummary` 带 `skippedBinary / skippedTooLarge /

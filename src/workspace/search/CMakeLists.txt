@@ -51,6 +51,28 @@ find_package(Qt6 REQUIRED COMPONENTS Test)
 
 set(CMAKE_AUTOMOC ON)
 
+# The Rust search service (T21): the index and the matcher are `vd-search`; this
+# lane only consumes the C ABI. Standalone builds may point at the archive like
+# the diagnostics lane does; a build without the Rust layer still compiles but
+# GlobalSearch reports a typed failure instead of growing a Qt implementation.
+set(VEDIT_RUST_FFI_LIB "" CACHE FILEPATH "libvd_ffi.a (standalone builds)")
+set(VEDIT_RUST_FFI_INCLUDE "" CACHE PATH "directory containing vd_ffi.h")
+if(TARGET vd_ffi)
+  set(VEDIT_WORKSPACE_SEARCH_HAVE_FFI ON)
+elseif(VEDIT_RUST_FFI_LIB AND EXISTS "${VEDIT_RUST_FFI_LIB}"
+       AND VEDIT_RUST_FFI_INCLUDE AND EXISTS "${VEDIT_RUST_FFI_INCLUDE}/vd_ffi.h")
+  add_library(vd_ffi STATIC IMPORTED)
+  set_target_properties(vd_ffi PROPERTIES
+    IMPORTED_LOCATION "${VEDIT_RUST_FFI_LIB}"
+    INTERFACE_INCLUDE_DIRECTORIES "${VEDIT_RUST_FFI_INCLUDE}")
+  include(CMakeFindDependencyMacro)
+  find_dependency(Threads)
+  target_link_libraries(vd_ffi INTERFACE Threads::Threads ${CMAKE_DL_LIBS} m)
+  set(VEDIT_WORKSPACE_SEARCH_HAVE_FFI ON)
+else()
+  set(VEDIT_WORKSPACE_SEARCH_HAVE_FFI OFF)
+endif()
+
 set(VEDIT_WORKSPACE_SEARCH_SOURCES
   global_search.cpp
   search_panel.cpp
@@ -70,6 +92,10 @@ target_link_libraries(vedit_workspace_search PUBLIC
   Qt6::Gui
   Qt6::Widgets
 )
+if(VEDIT_WORKSPACE_SEARCH_HAVE_FFI)
+  target_link_libraries(vedit_workspace_search PUBLIC vd_ffi)
+  target_compile_definitions(vedit_workspace_search PRIVATE VEDIT_SEARCH_HAVE_FFI=1)
+endif()
 if(VEDIT_WORKSPACE_SEARCH_HAVE_SHELL)
   target_link_libraries(vedit_workspace_search PUBLIC vedit_app_shell)
   # The jump target opens through the ONE shell-level seam

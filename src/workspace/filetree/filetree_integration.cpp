@@ -90,9 +90,12 @@ void installFileTree(vedit::app::ApplicationShell &shell, const IntegrationOptio
             placeholderReplaced = true;
         }
     }
-    qInfo("filetree: installFileTree projectRoot='%s' dockInserted=%d placeholderReplaced=%d",
-          qPrintable(projectRoot), shell.panels()->dock(QStringLiteral("file-tree")) != nullptr ? 1 : 0,
-          placeholderReplaced ? 1 : 0);
+    if (qEnvironmentVariableIsSet("VEDIT_DEBUG")) {
+        qInfo("filetree: installFileTree projectRoot='%s' dockInserted=%d placeholderReplaced=%d",
+              qPrintable(projectRoot),
+              shell.panels()->dock(QStringLiteral("file-tree")) != nullptr ? 1 : 0,
+              placeholderReplaced ? 1 : 0);
+    }
 #else
     (void)shell;
     (void)options;

@@ -85,6 +85,12 @@ if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL)
   target_link_libraries(vedit_workspace_diagnostics PUBLIC vedit_app_shell)
   target_compile_definitions(vedit_workspace_diagnostics PRIVATE
     VEDIT_DIAGNOSTICS_HAVE_APP_SHELL=1)
+  # T118: the active-file watcher reads the editor buffer. The product editor is
+  # a KTextEditor::View; the demo fallback is a QPlainTextEdit.
+  find_package(KF6TextEditor REQUIRED)
+  target_link_libraries(vedit_workspace_diagnostics PUBLIC KF6::TextEditor)
+  target_compile_definitions(vedit_workspace_diagnostics PRIVATE
+    VEDIT_DIAGNOSTICS_HAVE_KTEXTEDITOR=1)
 endif()
 if(VEDIT_DIAGNOSTICS_FFI)
   target_link_libraries(vedit_workspace_diagnostics PUBLIC vd_ffi)
@@ -153,6 +159,32 @@ if(VEDIT_DIAGNOSTICS_FFI)
   set_tests_properties(vedit-diagnostics-ffi-selftest PROPERTIES
     ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-diagnostics"
     TIMEOUT 240
+  )
+endif()
+
+# --- Product-seam self-test (T118): open a file, edit the BUFFER, see it ----
+# Builds the real ApplicationShell, calls installDiagnostics() exactly like
+# vedit-app (no --project), opens a file through the document seam and edits the
+# buffer only. SKIPs when the real verible-verilog-ls is not resolvable.
+if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL AND VEDIT_DIAGNOSTICS_FFI)
+  add_executable(vedit-diagnostics-product-seam selftests/diagnostics_product_seam.cpp)
+  target_link_libraries(vedit-diagnostics-product-seam PRIVATE
+    vedit_workspace_diagnostics
+    vedit_app_shell
+  )
+  target_include_directories(vedit-diagnostics-product-seam PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../app"
+  )
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-diagnostics-product-seam PRIVATE
+      -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  add_test(NAME vedit-diagnostics-product-seam
+           COMMAND vedit-diagnostics-product-seam)
+  set_tests_properties(vedit-diagnostics-product-seam PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-diagnostics;VEDIT_QUIET=1"
+    TIMEOUT 180
   )
 endif()
 

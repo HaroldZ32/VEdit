@@ -1,5 +1,8 @@
 #include "diagnostics_controller.h"
 
+#include <QDateTime>
+#include <QFileInfo>
+
 #include <utility>
 
 namespace vedit::workspace::diagnostics {
@@ -101,6 +104,66 @@ void DiagnosticsController::reparse()
     refresh();
 }
 
+bool DiagnosticsController::analyzeFile(const QString &file, const QString &bufferText,
+                                        bool bufferDirty)
+{
+    if (file.isEmpty()) {
+        return false;
+    }
+    // Record the analysis request FIRST: the session start below already runs a
+    // refresh(), and that refresh must see the buffer it is supposed to push.
+    analysisFile_ = file;
+    analysisText_ = bufferText;
+    analysisDirty_ = bufferDirty;
+    lspDiagnosticsRequested_ = false;
+    bufferApplied_ = false;
+    bufferAppliedMs_ = 0;
+    bufferGenerationAtApply_ = 0;
+    symbolsRequested_ = false;
+    ++analysisCount_;
+    lastAnalysisAt_ = QDateTime::currentDateTime();
+
+    const bool sameFile = files_.size() == 1 && files_.first() == file;
+    if (!sameFile || !lspStarted_) {
+        // A file-scope analysis uses a session over exactly this file: the
+        // project-scope session (if any) is replaced, and `project.reparse`
+        // restores the project file set.
+        if (lsp_ && lspStarted_) {
+            lsp_->stop();
+        }
+        files_ = QStringList{file};
+        lspStarted_ = false;
+        lspDiagnosticsRequested_ = false;
+        lints_.clear();
+        lspDiagnostics_.clear();
+        diagnostics_.clear();
+        outline_.clear();
+        lastError_.clear();
+        session_ = SessionSnapshot{};
+        report_ = FileSetReport{};
+        report_.files = files_;
+        report_.slangAvailable = false; // file scope: the LSP is the fast path
+        // T118: a file opened WITHOUT a project still needs a workspace root for
+        // the language server. Use the file's own directory (the project root is
+        // kept when the product was started with --project).
+        if (workspaceRoot_.isEmpty()) {
+            workspaceRoot_ = QFileInfo(file).absolutePath();
+        }
+        ++generation_;
+        state_ = BackendState::Reparsing;
+        session_.state = BackendState::Reparsing;
+        session_.message = QStringLiteral("analyzing %1").arg(QFileInfo(file).fileName());
+        startLsp();
+        refresh();
+    } else {
+        // Same file, running session: re-run the analysis on the new buffer.
+        state_ = BackendState::Reparsing;
+        session_.state = BackendState::Reparsing;
+        refresh();
+    }
+    return lspStarted_;
+}
+
 void DiagnosticsController::startLsp()
 {
     if (!lsp_) {
@@ -171,13 +234,48 @@ void DiagnosticsController::refresh()
         if (!session_.message.isEmpty()) {
             report_.lspMessage = session_.message;
         }
-        if (session_.state == BackendState::Ready && !lspDiagnosticsRequested_) {
-            lspDiagnosticsRequested_ = true;
-            for (const QString &file : files_) {
-                const quint64 id = lsp_->requestDiagnostics(file);
-                if (id != 0) {
-                    lspDiagnostics_.append(DiagnosticTicket{id, file});
+        if (session_.state == BackendState::Ready) {
+            const qint64 now = QDateTime::currentMSecsSinceEpoch();
+            // T118: push the EDITOR BUFFER into the session before asking for
+            // diagnostics, so what gets linted is the text the user sees.
+            if (!analysisFile_.isEmpty() && !bufferApplied_ && files_.contains(analysisFile_)) {
+                QString bufferError;
+                if (lsp_->changeBuffer(analysisFile_, analysisText_, &bufferError)) {
+                    bufferApplied_ = true;
+                    bufferAppliedMs_ = now;
+                    bufferGenerationAtApply_ = session_.generation;
+                    bufferDiagnosticsSeen_ = false;
+                    // Re-ask on the next tick: the server publishes the new
+                    // diagnostics asynchronously and the request returns the
+                    // CURRENT snapshot immediately.
+                    lspDiagnosticsRequested_ = false;
+                } else if (report_.lspMessage.isEmpty()) {
+                    report_.lspMessage = bufferError;
                 }
+            }
+
+            // verible publishes asynchronously: keep re-asking for the snapshot
+            // after a buffer change until it arrives (bounded window), because a
+            // request returns the CURRENT snapshot immediately.
+            const bool bufferSettling =
+                bufferApplied_ && !bufferDiagnosticsSeen_ && !analysisFile_.isEmpty()
+                && now - bufferAppliedMs_ < 2500;
+            if (bufferSettling) {
+                lspDiagnosticsRequested_ = false;
+            }
+            if (!lspDiagnosticsRequested_) {
+                lspDiagnosticsRequested_ = true;
+                for (const QString &file : files_) {
+                    const quint64 id = lsp_->requestDiagnostics(file);
+                    if (id != 0) {
+                        lspDiagnostics_.append(DiagnosticTicket{id, file});
+                    }
+                }
+            }
+
+            if (!analysisFile_.isEmpty() && !symbolsRequested_) {
+                navigation_ = lsp_->requestSymbols(analysisFile_);
+                symbolsRequested_ = navigation_ != 0;
             }
         }
     }
@@ -185,6 +283,9 @@ void DiagnosticsController::refresh()
         report_.lspMessage = QStringLiteral("the LSP session did not start");
     }
 
+    if (navigation_ != 0) {
+        pollNavigation();
+    }
     collectLints();
     collectLspDiagnostics();
     finaliseState();
@@ -240,6 +341,17 @@ void DiagnosticsController::collectLspDiagnostics()
             }
             continue;
         }
+        if (bufferApplied_ && ticket.file == analysisFile_) {
+            bufferDiagnosticsSeen_ = true;
+        }
+        // One analysis = one truth per file: replace the previous entries of
+        // this file instead of appending, so re-requesting diagnostics after a
+        // buffer edit cannot duplicate rows.
+        for (int index = diagnostics_.size() - 1; index >= 0; --index) {
+            if (diagnostics_.at(index).file == ticket.file) {
+                diagnostics_.removeAt(index);
+            }
+        }
         for (DiagnosticEntry entry : polled.diagnostics) {
             entry.file = ticket.file;
             if (entry.source.isEmpty()) {
@@ -255,7 +367,13 @@ void DiagnosticsController::finaliseState()
 {
     const bool lspPending = lspStarted_ && session_.state == BackendState::Reparsing;
     const bool lspFailed = lspStarted_ && session_.state == BackendState::Failed;
-    if (lspPending || !lints_.isEmpty() || !lspDiagnostics_.isEmpty()) {
+    // T118: a buffer edit is not "done" until the server published the new
+    // diagnostics (bounded by the 1.5 s grace) - otherwise the state turns Ready
+    // and the panel stops polling before the edit's diagnostics exist.
+    const bool bufferPublishing =
+        bufferApplied_ && !bufferDiagnosticsSeen_ && !analysisFile_.isEmpty()
+        && QDateTime::currentMSecsSinceEpoch() - bufferAppliedMs_ <= 2500;
+    if (lspPending || bufferPublishing || !lints_.isEmpty() || !lspDiagnostics_.isEmpty()) {
         return;
     }
 

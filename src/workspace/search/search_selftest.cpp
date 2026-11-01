@@ -706,6 +706,20 @@ void testProductJump(const Fixture &fixture)
           !expectedB.isEmpty() && documentText() == expectedB);
     check("jump.product.second-cursor-line", cursorLine() == hitB.line);
     check("jump.product.second-cursor-column", cursorColumn() == hitB.column);
+
+    // T121: the second open replaces the document in the SAME view while the
+    // folds registered for the first document are released. A stale folding tree
+    // used to crash katepart inside the next paint
+    // (Kate::TextFolding::foldingRangesStartingOnLine -> SIGSEGV). Pump real
+    // paint events and assert the view/document are still coherent: the crash is
+    // then a red test, not a user's lost session.
+    for (int pump = 0; pump < 5; ++pump) {
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 20);
+        QCoreApplication::sendPostedEvents(nullptr, static_cast<int>(QEvent::Paint));
+    }
+    check("jump.product.second-open-paint-stable",
+          documentText() == expectedB && cursorLine() == hitB.line
+              && pane->currentFilePath() == hitB.filePath);
 }
 
 #endif // VEDIT_WORKSPACE_SEARCH_HAVE_SHELL

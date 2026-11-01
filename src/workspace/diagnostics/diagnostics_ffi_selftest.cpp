@@ -18,6 +18,7 @@
 
 #include <QCoreApplication>
 #include <QFile>
+#include <QTemporaryDir>
 #include <QFileInfo>
 #include <QString>
 #include <QStringList>
@@ -222,6 +223,75 @@ int main(int argc, char **argv)
     const LspPolled formatting = waitForPolled(controller);
     check("entry.format-answered", formatting.ready && formatting.kind == ResponseKind::Edits,
           formatting.failed ? formatting.error : QString());
+
+    // ---- T118: the user's exact action - delete one comma in the editor ----
+    {
+        // A generated file keeps the scenario exact: the deleted comma is in
+        // CODE, not in a comment (the fixture's first comma happens to sit in a
+        // comment, which is not a syntax error at all).
+        QTemporaryDir bufferDir;
+        check("t118.temp-dir", bufferDir.isValid());
+        const QString file = bufferDir.path() + QStringLiteral("/buffer_edit.sv");
+        const QString goodText =
+            QStringLiteral("module m;\n  logic a, b;\n  always_comb begin\n    a = b;\n"
+                           "  end\nendmodule\n");
+        const QString brokenText =
+            QStringLiteral("module m;\n  logic a b;\n  always_comb begin\n    a = b;\n"
+                           "  end\nendmodule\n");
+        {
+            QFile fileOnDisk(file);
+            check("t118.good-file-written",
+                  fileOnDisk.open(QIODevice::WriteOnly)
+                      && fileOnDisk.write(goodText.toUtf8()) == goodText.toUtf8().size());
+        }
+
+        const bool started = controller.analyzeFile(file, brokenText, true);
+        check("t118.buffer-analysis-starts", started);
+        const BackendState bufferState = waitForTerminal(controller, 30);
+        std::printf("OBSERVED t118 buffer_analysis_state=%s diagnostics=%lld dirty=%d\n",
+                    qPrintable(stateName(bufferState)),
+                    static_cast<long long>(controller.diagnostics().size()),
+                    controller.analyzeWasDirty() ? 1 : 0);
+        bool sawError = false;
+        QStringList messages;
+        for (const DiagnosticEntry &entry : controller.diagnostics()) {
+            if (entry.file == file && !entry.message.isEmpty()) {
+                messages.append(entry.message);
+            }
+            if (entry.file == file && entry.severity == 1) {
+                sawError = true;
+            }
+        }
+        std::printf("OBSERVED t118 buffer_messages=%s\n",
+                    qPrintable(messages.join(QStringLiteral(" | "))));
+        check("t118.buffer-syntax-error-reported", sawError,
+              messages.join(QStringLiteral(" | ")));
+
+        // Proof the lint ran on the BUFFER: the file on disk still has its comma.
+        QFile diskFile(file);
+        QString diskText;
+        if (diskFile.open(QIODevice::ReadOnly)) {
+            diskText = QString::fromUtf8(diskFile.readAll());
+        }
+        check("t118.disk-file-unchanged", diskText == goodText,
+              QStringLiteral("disk=%1 bytes, buffer=%2 bytes")
+                  .arg(diskText.size())
+                  .arg(brokenText.size()));
+
+        // Putting the comma back in the buffer clears the error.
+        check("t118.buffer-restore-starts", controller.analyzeFile(file, goodText, false));
+        waitForTerminal(controller, 30);
+        int topErrors = 0;
+        for (const DiagnosticEntry &entry : controller.diagnostics()) {
+            if (entry.file == file && entry.severity == 1) {
+                ++topErrors;
+            }
+        }
+        std::printf("OBSERVED t118 after_restore errors=%d diagnostics=%lld\n", topErrors,
+                    static_cast<long long>(controller.diagnostics().size()));
+        check("t118.restore-clears-error", topErrors == 0,
+              QStringLiteral("remaining errors=%1").arg(topErrors));
+    }
 
     // ---- degradation: a missing server is diagnosable, never a crash -------
     {

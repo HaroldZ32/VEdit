@@ -18,6 +18,7 @@
 #include "slang_backend.h"
 #include "toolchain.h"
 
+#include <QDateTime>
 #include <QString>
 #include <QStringList>
 #include <QVector>
@@ -55,6 +56,18 @@ public:
 
     /// Restart the reparse for the current set.
     void reparse();
+
+    /// File-scope analysis that follows the EDITOR BUFFER (T118): start (or
+    /// reuse) a session over exactly `file`, replace the tracked document text
+    /// with `bufferText` (a didChange; nothing is read from disk) and collect
+    /// diagnostics + the outline for that file. `bufferDirty` only labels the
+    /// source in the UI/status. Returns false when no session could be started.
+    bool analyzeFile(const QString &file, const QString &bufferText, bool bufferDirty);
+    /// How many file-scope analyses ran (observable in the status line/tests).
+    quint64 analysisCount() const { return analysisCount_; }
+    QString analyzeFileName() const { return analysisFile_; }
+    bool analyzeWasDirty() const { return analysisDirty_; }
+    QDateTime lastAnalysisAt() const { return lastAnalysisAt_; }
 
     /// Advance the asynchronous state; cheap, non-blocking, idempotent.
     void refresh();
@@ -118,6 +131,20 @@ private:
     QVector<OutlineSymbol> outline_;
     QVector<LintTicket> lints_;
     QVector<DiagnosticTicket> lspDiagnostics_;
+
+    // File-scope analysis state (T118): one file, the buffer text it was asked
+    // to analyze, and the bookkeeping that lets refresh() apply the buffer
+    // before it collects the diagnostics.
+    QString analysisFile_;
+    QString analysisText_;
+    bool analysisDirty_ = false;
+    bool bufferApplied_ = false;
+    qint64 bufferAppliedMs_ = 0;
+    quint64 bufferGenerationAtApply_ = 0;
+    bool bufferDiagnosticsSeen_ = false;
+    bool symbolsRequested_ = false;
+    quint64 analysisCount_ = 0;
+    QDateTime lastAnalysisAt_;
 
     ToolchainReport toolchain_;
     QString lastError_;

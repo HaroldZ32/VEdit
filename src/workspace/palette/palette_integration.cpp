@@ -151,10 +151,12 @@ void PaletteIntegration::ensureIndexReady()
         qWarning().noquote() << QStringLiteral("palette: cannot index workspace: %1").arg(error);
         return;
     }
-    qInfo().noquote() << QStringLiteral("palette: indexed %1 files under %2 in %3 ms")
-                             .arg(index_->size())
-                             .arg(index_->root())
-                             .arg(timer.elapsed());
+    if (qEnvironmentVariableIsSet("VEDIT_DEBUG")) {
+        qInfo().noquote() << QStringLiteral("palette: indexed %1 files under %2 in %3 ms")
+                                 .arg(index_->size())
+                                 .arg(index_->root())
+                                 .arg(timer.elapsed());
+    }
 }
 
 void PaletteIntegration::openInEditor(const QString &absolutePath)

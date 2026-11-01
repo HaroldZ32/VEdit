@@ -10,11 +10,14 @@
 
 #include "app_shell.h"
 #include "command_registry.h"
+#include "editor_area.h"
 #include "panel_registry.h"
 
 #include <QCoreApplication>
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
+#include <QPlainTextEdit>
 #include <QKeySequence>
 #include <QObject>
 #include <QStringList>
@@ -29,6 +32,11 @@
 
 #if defined(VEDIT_DIAGNOSTICS_HAVE_FFI)
 #include <vd_ffi.h>
+#endif
+
+#if defined(VEDIT_DIAGNOSTICS_HAVE_KTEXTEDITOR)
+#include <KTextEditor/Document>
+#include <KTextEditor/View>
 #endif
 
 namespace vedit::workspace {
@@ -48,6 +56,115 @@ public:
 
 private:
     std::unique_ptr<diagnostics::DiagnosticsController> controller_;
+};
+
+/// T118: follow the ACTIVE editor (open + edit), not only the project file set.
+///
+/// The project poller above only runs when the product was started with
+/// `--project`; a user who double-clicks the AppImage and opens a file never got
+/// any analysis (no LSP session, an empty outline). This watcher reads the active
+/// pane's file and its EDITOR BUFFER every 400 ms:
+///   * a new file  -> analyze immediately (file scope, no project needed);
+///   * edited text -> analyze after a 700 ms quiet period (debounced);
+/// and it tells the controller whether the buffer differs from the file on disk,
+/// so the panel can say which text was linted.
+class ActiveFileWatcher final : public QObject {
+public:
+    ActiveFileWatcher(QObject *parent, vedit::app::ApplicationShell *shell,
+                      diagnostics::DiagnosticsController *controller)
+        : QObject(parent)
+        , shell_(shell)
+        , controller_(controller)
+        , tick_(new QTimer(this))
+        , debounce_(new QTimer(this))
+    {
+        debounce_->setSingleShot(true);
+        debounce_->setInterval(700);
+        connect(debounce_, &QTimer::timeout, this, [this]() { analyze(); });
+        connect(tick_, &QTimer::timeout, this, [this]() { poll(); });
+        tick_->start(400);
+    }
+
+private:
+    static QString bufferText(QWidget *widget)
+    {
+        if (widget == nullptr) {
+            return QString();
+        }
+#if defined(VEDIT_DIAGNOSTICS_HAVE_KTEXTEDITOR)
+        if (auto *view = qobject_cast<KTextEditor::View *>(widget)) {
+            return view->document() != nullptr ? view->document()->text() : QString();
+        }
+#endif
+        if (auto *text = qobject_cast<QPlainTextEdit *>(widget)) {
+            return text->toPlainText();
+        }
+        return QString();
+    }
+
+    void poll()
+    {
+        vedit::app::EditorPane *pane = shell_->editorArea() != nullptr
+                                           ? shell_->editorArea()->activePane()
+                                           : nullptr;
+        if (pane == nullptr) {
+            return;
+        }
+        const QString path = pane->currentFilePath();
+        QWidget *widget = pane->editorWidget();
+        if (path.isEmpty() || widget == nullptr) {
+            lastPath_.clear();
+            lastText_.clear();
+            return;
+        }
+        const QString text = bufferText(widget);
+        if (text.isEmpty() && lastPath_ == path) {
+            return; // the widget is not readable (yet); wait for the next tick
+        }
+        if (path != lastPath_) {
+            lastPath_ = path;
+            lastText_ = text;
+            analyze(); // opening a file is an analysis trigger, not a manual step
+            return;
+        }
+        if (text != lastText_) {
+            lastText_ = text;
+            debounce_->start(); // typing: analyze once the user pauses
+        }
+    }
+
+    void analyze()
+    {
+        vedit::app::EditorPane *pane = shell_->editorArea() != nullptr
+                                           ? shell_->editorArea()->activePane()
+                                           : nullptr;
+        if (pane == nullptr) {
+            return;
+        }
+        const QString path = pane->currentFilePath();
+        const QString text = bufferText(pane->editorWidget());
+        if (path.isEmpty() || text.isEmpty()) {
+            return;
+        }
+        QFile file(path);
+        QString disk;
+        if (file.open(QIODevice::ReadOnly)) {
+            disk = QString::fromUtf8(file.readAll());
+        }
+        const bool dirty = disk != text;
+        controller_->analyzeFile(path, text, dirty);
+        if (qEnvironmentVariableIsSet("VEDIT_DEBUG")) {
+            qInfo("diagnostics: analyze %s (%s)",
+                  qPrintable(path), dirty ? "editor buffer, not saved" : "saved file");
+        }
+    }
+
+    vedit::app::ApplicationShell *shell_ = nullptr;
+    diagnostics::DiagnosticsController *controller_ = nullptr;
+    QTimer *tick_ = nullptr;
+    QTimer *debounce_ = nullptr;
+    QString lastPath_;
+    QString lastText_;
 };
 
 #if defined(VEDIT_DIAGNOSTICS_HAVE_FFI)
@@ -127,8 +244,10 @@ private:
             }
         }
         vd_project_info_free(&info);
-        qInfo("diagnostics: effective file set from the project model: %lld file(s)",
-              static_cast<long long>(files.size()));
+        if (qEnvironmentVariableIsSet("VEDIT_DEBUG")) {
+            qInfo("diagnostics: effective file set from the project model: %lld file(s)",
+                  static_cast<long long>(files.size()));
+        }
         controller_->setFileSet(files);
     }
 
@@ -156,8 +275,10 @@ void installDiagnostics(vedit::app::ApplicationShell &shell, const IntegrationOp
         diagnostics::applicationToolchainContext();
     const diagnostics::ToolchainReport toolchain =
         diagnostics::resolveToolchain(toolchainContext);
-    std::printf("TOOLCHAIN %s local=[%s]\n", qPrintable(toolchain.statusLine()),
-                qPrintable(toolchainContext.localDirs.join(QLatin1Char(','))));
+    if (!qEnvironmentVariableIsSet("VEDIT_QUIET")) {
+        std::printf("TOOLCHAIN %s local=[%s]\n", qPrintable(toolchain.statusLine()),
+                    qPrintable(toolchainContext.localDirs.join(QLatin1Char(','))));
+    }
 
     auto lsp = diagnostics::createFfiLspSessionBackend();
     auto slang = diagnostics::createFfiSlangBackend(toolchain.slang.path);
@@ -209,6 +330,10 @@ void installDiagnostics(vedit::app::ApplicationShell &shell, const IntegrationOp
         }
         shell.commands()->setHandler(spec.id, [controller]() { controller->reparse(); });
     }
+
+    // T118: the active editor is followed whether or not a project was given.
+    // (Before this, a plain "open a file" session had no analysis at all.)
+    new ActiveFileWatcher(&shell, &shell, controller);
 
 #if defined(VEDIT_DIAGNOSTICS_HAVE_FFI)
     if (!projectRoot.isEmpty()) {

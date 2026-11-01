@@ -29,7 +29,9 @@ void installSettings(vedit::app::ApplicationShell &shell, const IntegrationOptio
         return new settings::SettingsPanel(shellPtr->themes(), shellPtr->commands(), path);
     };
     shell.panels()->setFactory(QStringLiteral("settings"), factory);
-    qInfo("settings: installSettings file='%s'", qPrintable(path));
+    if (qEnvironmentVariableIsSet("VEDIT_DEBUG")) {
+        qInfo("settings: installSettings file='%s'", qPrintable(path));
+    }
 }
 
 } // namespace vedit::workspace

@@ -3,247 +3,33 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QElapsedTimer>
-#include <QFile>
 #include <QFileInfo>
 #include <QMetaObject>
 #include <QThread>
 
 #include <atomic>
-#include <functional>
 #include <utility>
+
+#if defined(VEDIT_SEARCH_HAVE_FFI)
+#include "vd_ffi.h"
+#endif
 
 namespace vedit::workspace::search {
 
 namespace {
 
-constexpr int kBatchSize = 64;
-constexpr int kMaxDepth = 64;
-constexpr int kMaxSnippetChars = 400;
-constexpr int kStopCheckMask = 0xFF; // check cancel/budget every 256 lines
-constexpr qint64 kFlushIntervalMs = 40;
+constexpr int kBatchSize = 200;
 
-// One scan. Lives entirely on the worker thread; all state it exposes goes out
-// through the batch sink and the returned SearchSummary.
-class Scanner final
+#if defined(VEDIT_SEARCH_HAVE_FFI)
+QString serviceError(VdService *service)
 {
-public:
-    using BatchSink = std::function<void(QList<SearchHit>)>;
-
-    Scanner(const SearchOptions &options, const std::atomic_bool &cancel, BatchSink sink)
-        : options_(options)
-        , cancel_(cancel)
-        , sink_(std::move(sink))
-    {
-        if (options_.excludedDirNames.isEmpty()) {
-            options_.excludedDirNames = defaultExcludedDirNames();
-        }
-        if (options_.maxResults <= 0) {
-            options_.maxResults = 2000;
-        }
-        if (options_.maxFileBytes <= 0) {
-            options_.maxFileBytes = 8LL * 1024 * 1024;
-        }
-        if (options_.maxDurationMs <= 0) {
-            options_.maxDurationMs = 15000;
-        }
+    VdError error{};
+    if (service == nullptr || vd_service_error(service, &error) != VD_STATUS_READY) {
+        return QStringLiteral("the Rust search service did not report a reason");
     }
-
-    SearchSummary run()
-    {
-        clock_.start();
-        const QFileInfo root(options_.rootPath);
-        if (!root.exists() || !root.isDir()) {
-            return failed(QStringLiteral("search root does not exist or is not a directory: %1")
-                              .arg(options_.rootPath));
-        }
-        if (!root.isReadable()) {
-            return failed(QStringLiteral("search root is not readable: %1").arg(root.absoluteFilePath()));
-        }
-        if (options_.query.isEmpty()) {
-            return failed(QStringLiteral("empty query"));
-        }
-        rootPath_ = root.absoluteFilePath();
-        walk(rootPath_, 0);
-        flush(true);
-        summary_.state = cancelled() ? SearchState::Cancelled : SearchState::Done;
-        summary_.elapsedMs = clock_.elapsed();
-        return summary_;
-    }
-
-private:
-    SearchSummary failed(const QString &error)
-    {
-        summary_.state = SearchState::Failed;
-        summary_.error = error;
-        summary_.elapsedMs = clock_.elapsed();
-        return summary_;
-    }
-
-    bool cancelled() const { return cancel_.load(std::memory_order_relaxed); }
-
-    // Cancellation, result limit and time budget share one decision point so a
-    // stopped scan can always explain why it stopped.
-    bool stopRequested()
-    {
-        if (cancelled()) {
-            return true;
-        }
-        if (summary_.truncated) {
-            return true;
-        }
-        if (clock_.elapsed() >= options_.maxDurationMs) {
-            summary_.timedOut = true;
-            return true;
-        }
-        return false;
-    }
-
-    void walk(const QString &absoluteDirectory, int depth)
-    {
-        if (depth > kMaxDepth || stopRequested()) {
-            return;
-        }
-        const QDir dir(absoluteDirectory);
-        // Readability is NOT a listing filter: an unreadable entry must be
-        // counted (observable), not silently disappear from the results.
-        const QFileInfoList entries = dir.entryInfoList(
-            QDir::Filters(QDir::AllEntries | QDir::NoDotAndDotDot | QDir::DirsFirst),
-            QDir::SortFlags(QDir::Name | QDir::IgnoreCase));
-        for (const QFileInfo &entry : entries) {
-            if (stopRequested()) {
-                return;
-            }
-            if (entry.isSymLink()) {
-                continue; // never follow links: cycles and escaping the root
-            }
-            if (entry.isDir()) {
-                if (options_.excludedDirNames.contains(entry.fileName())) {
-                    continue; // .git / build / target / node_modules ...
-                }
-                if (!entry.isReadable()) {
-                    ++summary_.skippedUnreadable;
-                    continue;
-                }
-                walk(entry.absoluteFilePath(), depth + 1);
-                continue;
-            }
-            if (!entry.isFile()) {
-                continue;
-            }
-            scanFile(entry);
-        }
-    }
-
-    void scanFile(const QFileInfo &info)
-    {
-        if (stopRequested()) {
-            return;
-        }
-        if (options_.verilogOnly && !isVerilogFileName(info.fileName())) {
-            return;
-        }
-        if (info.size() > options_.maxFileBytes) {
-            ++summary_.skippedTooLarge;
-            return;
-        }
-        QFile file(info.absoluteFilePath());
-        if (!file.open(QIODevice::ReadOnly)) {
-            ++summary_.skippedUnreadable;
-            return;
-        }
-        const QByteArray bytes = file.readAll();
-        file.close();
-        if (bytes.contains('\0')) {
-            ++summary_.skippedBinary;
-            return;
-        }
-        ++summary_.filesScanned;
-
-        const QString relative = QDir(rootPath_).relativeFilePath(info.absoluteFilePath());
-        const Qt::CaseSensitivity sensitivity =
-            options_.caseSensitive ? Qt::CaseSensitive : Qt::CaseInsensitive;
-        const int total = bytes.size();
-        int lineNumber = 1;
-        int start = 0;
-        while (start <= total) {
-            if ((lineNumber & kStopCheckMask) == 0 && stopRequested()) {
-                break;
-            }
-            if (summary_.truncated) {
-                break;
-            }
-            int end = bytes.indexOf('\n', start);
-            if (end < 0) {
-                end = total;
-            }
-            QByteArray raw = bytes.mid(start, end - start);
-            if (raw.endsWith('\r')) {
-                raw.chop(1);
-            }
-            if (!raw.isEmpty()) {
-                const QString text = QString::fromUtf8(raw);
-                const int column = text.indexOf(options_.query, 0, sensitivity);
-                if (column >= 0) {
-                    recordHit(info.absoluteFilePath(), relative, lineNumber, column + 1, text);
-                }
-            }
-            if (end >= total) {
-                break;
-            }
-            start = end + 1;
-            ++lineNumber;
-        }
-        flush(false);
-    }
-
-    void recordHit(const QString &filePath, const QString &relativePath, int line, int column,
-                   const QString &text)
-    {
-        if (summary_.hitCount >= options_.maxResults) {
-            summary_.truncated = true;
-            return;
-        }
-        SearchHit hit;
-        hit.filePath = filePath;
-        hit.relativePath = relativePath;
-        hit.line = line;
-        hit.column = column;
-        hit.text = text.size() > kMaxSnippetChars
-                       ? text.left(kMaxSnippetChars) + QChar(0x2026)
-                       : text;
-        pending_.append(hit);
-        ++summary_.hitCount;
-        // Hits are produced file by file, so a change of path is a new file.
-        if (lastMatchedFile_ != filePath) {
-            lastMatchedFile_ = filePath;
-            ++summary_.filesMatched;
-        }
-    }
-
-    void flush(bool force)
-    {
-        if (pending_.isEmpty()) {
-            return;
-        }
-        const qint64 now = clock_.elapsed();
-        if (!force && pending_.size() < kBatchSize && now - lastFlushMs_ < kFlushIntervalMs) {
-            return;
-        }
-        sink_(std::move(pending_));
-        pending_.clear();
-        lastFlushMs_ = now;
-    }
-
-    SearchOptions options_;
-    const std::atomic_bool &cancel_;
-    BatchSink sink_;
-    QElapsedTimer clock_;
-    SearchSummary summary_;
-    QList<SearchHit> pending_;
-    QString rootPath_;
-    QString lastMatchedFile_;
-    qint64 lastFlushMs_ = 0;
-};
+    return QString::fromUtf8(error.message);
+}
+#endif
 
 } // namespace
 
@@ -255,13 +41,11 @@ GlobalSearch::GlobalSearch(QObject *parent)
 
 GlobalSearch::~GlobalSearch()
 {
-    // Lifetime (verdict ws-search M2): the worker never reads this object's
-    // memory - it holds the per-scan shared cancellation token by value - and
-    // this destructor waits until the worker has really returned before any
-    // member is destroyed. The old bound was 10 s while the default scan budget
-    // is 15 s, so a scan blocked in a slow read() outlived the destructor and
-    // then read the destroyed cancel flag (heap-use-after-free, reproduced in
-    // evidence/search-uaf/): there is no timeout here on purpose.
+    // Lifetime (verdict ws-search M2): the worker only reads the per-scan shared
+    // cancellation token; the destructor waits until the worker has returned
+    // before any member is destroyed. The Rust job itself is owned by its
+    // service (Arc), so destroying that service after the worker returns cannot
+    // free memory the worker still reads (vd-ffi service.rs lifetime note).
     cancel();
     if (thread_ != nullptr) {
         thread_->wait();
@@ -270,8 +54,6 @@ GlobalSearch::~GlobalSearch()
         delete thread_;
         thread_ = nullptr;
     }
-    // Every queued hitsReady/finished event was posted by the joined worker, so
-    // this removes all of them and no later post can follow.
     QCoreApplication::removePostedEvents(this);
 }
 
@@ -281,8 +63,6 @@ bool GlobalSearch::start(const SearchOptions &options)
         cancel();
         if (!thread_->wait(5000)) {
             // Refuse to run two scans on the same object; the caller can retry.
-            // The previous worker keeps using its own shared state, so this
-            // answer is a scheduling decision, never a lifetime risk.
             return false;
         }
         QObject::disconnect(thread_, &QThread::finished, thread_, &QObject::deleteLater);
@@ -291,8 +71,6 @@ bool GlobalSearch::start(const SearchOptions &options)
         thread_ = nullptr;
     }
 
-    // One token per scan, captured by value by the worker: the worker can never
-    // observe this object's members, even if the object dies first.
     auto cancelTag = std::make_shared<std::atomic_bool>(false);
     cancelRequested_ = cancelTag;
 
@@ -302,10 +80,8 @@ bool GlobalSearch::start(const SearchOptions &options)
 
     QThread *thread = QThread::create(
         [this, options, generation, cancelTag]() { runScan(options, generation, cancelTag); });
-    thread->setObjectName(QStringLiteral("vedit-global-search"));
+    thread->setObjectName(QStringLiteral("vedit-global-search-ffi"));
     thread_ = thread;
-    // The QThread object lives in this (GUI) thread; deleteLater runs here, and
-    // the destructor reaps it deterministically when it is still alive.
     QObject::connect(thread, &QThread::finished, thread, &QObject::deleteLater);
     thread->start();
     return true;
@@ -340,19 +116,118 @@ void GlobalSearch::runScan(const SearchOptions &options, quint64 generation,
         ranOnWorkerThread_.store(true);
     }
 
-    Scanner scanner(options, *cancelTag, [this, generation](QList<SearchHit> batch) {
-        QMetaObject::invokeMethod(
-            this,
-            [this, generation, batch = std::move(batch)]() {
-                if (generation != generation_) {
-                    return; // superseded by a newer search
-                }
-                emit hitsReady(batch);
-            },
-            Qt::QueuedConnection);
-    });
+    QElapsedTimer clock;
+    clock.start();
+    SearchSummary summary;
 
-    const SearchSummary summary = scanner.run();
+    const QFileInfo rootInfo(options.rootPath);
+    if (!rootInfo.exists() || !rootInfo.isDir()) {
+        summary.state = SearchState::Failed;
+        summary.error = QStringLiteral("search root does not exist or is not a directory: %1")
+                            .arg(options.rootPath);
+        summary.elapsedMs = clock.elapsed();
+    } else if (!rootInfo.isReadable()) {
+        summary.state = SearchState::Failed;
+        summary.error = QStringLiteral("search root is not readable: %1").arg(options.rootPath);
+        summary.elapsedMs = clock.elapsed();
+    } else if (options.query.isEmpty()) {
+        summary.state = SearchState::Failed;
+        summary.error = QStringLiteral("empty query");
+        summary.elapsedMs = clock.elapsed();
+    } else {
+#if defined(VEDIT_SEARCH_HAVE_FFI)
+        VdService *service = vd_service_create();
+        if (service == nullptr) {
+            summary.state = SearchState::Failed;
+            summary.error = QStringLiteral("cannot create the Rust search service");
+        } else {
+            const QByteArray rootPath = options.rootPath.toUtf8();
+            const QByteArray query = options.query.toUtf8();
+            const quint64 job = vd_search_tree_query(
+                service, rootPath.constData(), query.constData(),
+                static_cast<size_t>(options.maxResults),
+                static_cast<quint64>(options.maxFileBytes),
+                static_cast<quint64>(options.maxDurationMs), options.caseSensitive ? 1 : 0,
+                options.verilogOnly ? 1 : 0);
+            if (job == 0) {
+                summary.state = SearchState::Failed;
+                summary.error = serviceError(service);
+            } else {
+                bool cancelled = false;
+                for (;;) {
+                    VdSearchResults results{};
+                    VdSearchSummary ffiSummary{};
+                    const qint32 status = vd_search_tree_poll(service, job, &results, &ffiSummary);
+                    if (status == VD_STATUS_PENDING) {
+                        if (cancelTag->load(std::memory_order_relaxed)) {
+                            cancelled = true;
+                            break;
+                        }
+                        QThread::msleep(5);
+                        continue;
+                    }
+                    if (status == VD_STATUS_READY) {
+                        QList<SearchHit> hits;
+                        hits.reserve(static_cast<int>(results.count));
+                        for (size_t index = 0; index < results.count; ++index) {
+                            const VdSearchHit &item = results.items[index];
+                            SearchHit hit;
+                            hit.relativePath = QString::fromUtf8(item.path);
+                            hit.filePath = QDir(options.rootPath).absoluteFilePath(hit.relativePath);
+                            hit.line = static_cast<int>(item.line);
+                            hit.column = static_cast<int>(item.column);
+                            hit.text = QString::fromUtf8(item.preview);
+                            hits.append(hit);
+                        }
+                        vd_search_results_free(&results);
+                        summary.state = SearchState::Done;
+                        summary.filesScanned = static_cast<int>(ffiSummary.files_scanned);
+                        summary.filesMatched = static_cast<int>(ffiSummary.files_matched);
+                        summary.hitCount = static_cast<int>(ffiSummary.hit_count);
+                        summary.skippedBinary = static_cast<int>(ffiSummary.skipped_binary);
+                        summary.skippedTooLarge = static_cast<int>(ffiSummary.skipped_too_large);
+                        summary.skippedUnreadable = static_cast<int>(ffiSummary.skipped_unreadable);
+                        summary.truncated = ffiSummary.truncated != 0;
+                        summary.timedOut = ffiSummary.timed_out != 0;
+                        summary.elapsedMs = static_cast<qint64>(ffiSummary.elapsed_ms);
+                        // The Rust service returns one complete result; the
+                        // panel still receives it in bounded batches.
+                        for (int offset = 0; offset < hits.size(); offset += kBatchSize) {
+                            QList<SearchHit> batch = hits.mid(offset, kBatchSize);
+                            QMetaObject::invokeMethod(
+                                this,
+                                [this, generation, batch = std::move(batch)]() {
+                                    if (generation != generation_) {
+                                        return;
+                                    }
+                                    emit hitsReady(batch);
+                                },
+                                Qt::QueuedConnection);
+                        }
+                    } else {
+                        summary.state = SearchState::Failed;
+                        summary.error = serviceError(service);
+                    }
+                    break;
+                }
+                if (cancelled) {
+                    summary.state = SearchState::Cancelled;
+                    summary.elapsedMs = clock.elapsed();
+                }
+            }
+            vd_service_destroy(service);
+        }
+#else
+        summary.state = SearchState::Failed;
+        summary.error = QStringLiteral(
+            "the Rust search service is not linked in this build; the Qt side does not "
+            "implement a second search backend");
+#endif
+    }
+
+    if (summary.elapsedMs == 0 && summary.state != SearchState::Done) {
+        summary.elapsedMs = clock.elapsed();
+    }
 
     QMetaObject::invokeMethod(
         this,

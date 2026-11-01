@@ -46,9 +46,26 @@ public:
     /// Diagnostics currently recorded for one file (`VD_LSP_REQ_DIAGNOSTICS`).
     virtual quint64 requestDiagnostics(const QString &file) = 0;
 
+    /// Replace the tracked text of `file` with the EDITOR BUFFER (a
+    /// full-document didChange). Nothing is read from disk, so diagnostics can
+    /// follow unsaved edits. Returns false with `error` filled when this backend
+    /// cannot follow a buffer (the caller reports it instead of pretending).
+    virtual bool changeBuffer(const QString &file, const QString &text, QString *error);
+
     /// Poll one request id; `pending` means "poll again later".
     virtual LspPolled poll(quint64 requestId) = 0;
 };
+
+inline bool LspSessionBackend::changeBuffer(const QString &file, const QString &text,
+                                            QString *error)
+{
+    (void)file;
+    (void)text;
+    if (error != nullptr) {
+        *error = QStringLiteral("this LSP backend cannot follow editor buffers");
+    }
+    return false;
+}
 
 /// True when this build links the Rust service layer (the real backend exists).
 bool ffiLspSessionBackendAvailable();

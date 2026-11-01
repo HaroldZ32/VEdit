@@ -2,15 +2,17 @@
 
 // Global search backend (workspace lane, task T23 / acceptance A2c).
 //
-// One scan walks the root directory on a worker thread, matches the query
-// literally line by line, and streams hits back in batches. start() returns
-// immediately; cancel() is safe to call from the UI thread at any time.
+// The scan itself belongs to the Rust search service (T21): this class starts
+// `vd_search_tree_query`, polls it from a worker thread, and converts the hits
+// and summary into Qt types. Qt performs no directory walk and no line matching
+// — there is exactly one implementation, in `crates/vd-search`.
 //
 // Observable limits are part of the contract, not hidden behaviour:
 //   * files above SearchOptions::maxFileBytes are skipped and counted,
 //   * binary files (NUL byte in the content) are skipped and counted,
 //   * unreadable files/directories are skipped and counted,
 //   * a scan stops at maxResults (truncated) or maxDurationMs (timedOut).
+// The counters come back in the same poll as the hits (VdSearchSummary).
 #include "search_types.h"
 
 #include <QObject>

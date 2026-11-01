@@ -55,8 +55,8 @@ vedit::workspace::installPanels(shell, {options.projectRoot, options.stateDir});
 
 | 指标 | median | p95 | max |
 |---|---|---|---|
-| 核心过滤（`FuzzyMatcher::filter`，10k 候选） | 0.772 ms | **1.338 ms** | 3.070 ms |
-| 面板打字路径（过滤 + 100 行列表重建） | 0.829 ms | **1.403 ms** | 1.827 ms |
+| 核心过滤（`FuzzyMatcher::filter`，10k 候选） | 0.763 ms | **1.346 ms** | 1.702 ms |
+| 面板打字路径（过滤 + 100 行列表重建） | 0.880 ms | **1.471 ms** | 1.953 ms |
 | 索引冷扫描（一次，10k 文件） | — | — | 18 ms |
 | 缓存扫描（二次调用） | — | — | 0 ms（`scan_count=1`） |
 
