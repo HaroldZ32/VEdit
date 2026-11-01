@@ -17,6 +17,9 @@
 #if defined(VEDIT_WORKSPACE_HAVE_DIAGNOSTICS)
 #include "diagnostics/diagnostics_integration.h"
 #endif
+#if defined(VEDIT_WORKSPACE_HAVE_VCS)
+#include "vcs/vcs_integration.h"
+#endif
 
 namespace vedit::workspace {
 
@@ -39,6 +42,9 @@ void installPanels(vedit::app::ApplicationShell &shell, const IntegrationOptions
 #endif
 #if defined(VEDIT_WORKSPACE_HAVE_DIAGNOSTICS)
     installDiagnostics(shell, options);
+#endif
+#if defined(VEDIT_WORKSPACE_HAVE_VCS)
+    installVcs(shell, options);
 #endif
 }
 

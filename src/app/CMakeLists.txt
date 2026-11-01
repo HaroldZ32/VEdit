@@ -96,7 +96,7 @@ set_tests_properties(vedit-app-shell-selftest PROPERTIES
 # install<Lane>() functions it can see and silently skips the missing ones.
 # src/app therefore never learns which lanes are present, and landing a new
 # workspace lane does not edit this file. Convention: evidence/ws-palette/SEAM.md.
-set(VEDIT_WORKSPACE_LANES filetree palette search project diagnostics)
+set(VEDIT_WORKSPACE_LANES filetree palette search project diagnostics vcs)
 foreach(lane IN LISTS VEDIT_WORKSPACE_LANES)
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../workspace/${lane}/CMakeLists.txt")
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../workspace/${lane}"
