@@ -1,0 +1,52 @@
+# T32 independent audit — T31 final packaging (AppImage)
+
+bound: shared-tree HEAD eb7bee9 + T31 packaging workspace changes (packaging/runtime/*, hostmatrix.sh)
+deliverable baseline: 55a874da076d605c6b620e0bb20f9ac5932d5f46 (source-equivalent to HEAD: the only
+diff 55a874d..eb7bee9 is evidence/slice1-stop docs)
+
+== artifact ==
+packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage = 95,349,240 B
+sha256 = e7ae067fe66c8e271ba72da974795a7ee3db0efa59bda45079b5a048b4a09558  (matches REPORT/SHA256SUMS/00-C9)
+target/wt-55a874d/.../VEdit-0.1.1-x86_64.AppImage same sha256 (the report's build path)
+
+== payload identity (AC-S3.3 bin/vd-app) ==
+extracted AppImage squashfs-root/bin/vd-app sha256 = b93f8cf4c43dada6f041905bcee264fd4349966af5d4248028f17093c5e4520d
+  == target/wt-55a874d/target/qt6-build/src/app/vedit-app (the clean-tree product)
+  readelf -d: NEEDED libKF6TextEditor/libKF6Parts/libQt6Widgets/libtree-sitter/KF6SyntaxHighlighting/Qt6
+  → the Qt deliverable is installed as bin/vd-app; no legacy GTK binary.
+NOTE (finding N2): the MAIN workspace out/AppDir is a stale phase-1 AppDir:
+  packaging/runtime/out/AppDir/bin/vd-app sha256 = 61e19acda47fe2c9e2e34841cd292d93b3dbc90281c23fce93f89ba4f6f8d402
+  mtime 15:48; the AppImage (16:33) and wt AppDir (16:32) carry b93f8cf4. out/AppDir is not the delivered payload.
+
+== AC-S0.4 FFI inside the package ==
+readelf -d squashfs-root/bin/vd-app | grep -c libvd_ffi = 0   (no external FFI shared lib)
+nm squashfs-root/bin/vd-app | grep -c ' T vd_' = 44           (vd_* C-ABI symbols compiled in)
+→ Rust FFI is statically linked into the delivered binary, as required.
+
+== selfcheck / not-shipped / F2 isolation (independent reruns) ==
+clean container centos:7, APPIMAGE_EXTRACT_AND_RUN=1, AppRun --selfcheck:
+  APP-SHELL-SELFTEST ok=1 checks=200 failures=0; syntax-product definitions=3 own-xml=[both]; verilog=1;
+  TOOLCHAIN source=verible:bundled slang:bundled missing=[]; fold.wiring.closed.hidden-975 PASS
+not-shipped (extracted AppDir, --expect-clean): pass=8 fail=0 expected_red=0, DELIVERY_BLOCKED=no, exit 0
+F2 isolation (extracted AppDir): pass=5 fail=0; positive defs=2 whitelist-only; reverse control defs=403
+AppDir file count = 202 == evidence build/appdir-files.txt
+
+== four-container matrix (rerun by me, target/t32-matrix) ==
+centos:7      glibc 2.17  selfcheck PASS startup PASS lint PASS
+ubuntu:24.04  glibc 2.39  PASS PASS PASS
+rockylinux:9  glibc 2.34  PASS PASS PASS
+ubuntu:26.04  glibc 2.43  PASS PASS PASS
+MATRIX pass=4 fail=0; all rows share host kernel 7.0.0-38-generic (real CentOS 7/3.10 UNTESTED, as declared).
+Per row: selfcheck 200/0, startup_exit=0, bundled lint exits 1 with "Line length exceeds max: 100; is: 108 [line-length]".
+
+== clean-worktree ctest (report claims 27/27) ==
+target/wt-55a874d (HEAD 55a874d) ctest --test-dir target/qt6-build: 100% tests passed, 0 failed out of 27,
+CTEST_EXIT=0. (Finding N1: 01-build-qt.log actually ran `build-qt.sh --no-test` and says ctest was not run;
+no ctest log exists in final-55a874d — the number is true only because I reran it here.)
+
+== declared gate ==
+mpd_verify_evidence{gate:"typecheck", loop:"loop-20261031T095153-bf8202"} -> exit 0 (id below)
+
+== appimagetool pin ==
+packaging/appimage/vendor/appimagetool-x86_64 sha256 = 793fca0ce4bcc309dc65d3f66669f58e3755643e4dadbe03932e7b436128494f ==
+scripts/versions.env APPIMAGETOOL_SHA256; build log: "appimagetool sha256 OK".
