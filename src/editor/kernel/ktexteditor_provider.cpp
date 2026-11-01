@@ -2,6 +2,9 @@
 
 #include "atomic_save.h"
 #include "document_io.h"
+#if defined(VEDIT_EDIT_CORE_HAVE_FOLDING)
+#include "fold_breadcrumb.h"
+#endif
 
 #include <KTextEditor/Document>
 #include <KTextEditor/Editor>
@@ -79,6 +82,13 @@ QWidget *EditCoreProvider::createEditor(QWidget *parent)
     // the widget (EditorPane deletes it when the provider changes).
     document->setParent(view);
     view->setObjectName(QStringLiteral("ktexteditor-view"));
+#if defined(VEDIT_EDIT_CORE_HAVE_FOLDING)
+    // T94: the live wiring of the folding/breadcrumb lanes. The binding is a
+    // child of the view, so it dies with it; the provider only forwards status
+    // changes to the pane through the EditorProvider seam.
+    auto *binding = new FoldBreadcrumbBinding(view, view);
+    binding->setStatusListener([this, view]() { notifyStatus(view); });
+#endif
     return view;
 }
 
@@ -97,12 +107,62 @@ bool EditCoreProvider::openFile(QWidget *editor, const QString &absolutePath, QS
         }
         return false;
     }
+#if defined(VEDIT_EDIT_CORE_HAVE_FOLDING)
+    // Releases the previous document's folds before setText() replaces the text:
+    // a document carrying fold ranges into a text replacement is what crashed
+    // the search-jump selftest on the second open.
+    if (auto *binding = FoldBreadcrumbBinding::instanceFor(view)) {
+        binding->releaseFolds();
+    }
+#endif
     if (!loadFileIntoDocument(view->document(), info.absoluteFilePath(), error)) {
         return false;
     }
     view->document()->setModified(false);
     view->setProperty(kOpenFilePathProperty, info.absoluteFilePath());
+#if defined(VEDIT_EDIT_CORE_HAVE_FOLDING)
+    // T94: FirstOpen is one of the three allowed fold-rebuild triggers; the
+    // breadcrumb is refreshed for the initial cursor position too.
+    if (auto *binding = FoldBreadcrumbBinding::instanceFor(view)) {
+        binding->onDocumentOpened();
+    }
+#endif
     return true;
+}
+
+QString EditCoreProvider::statusText(QWidget *editor) const
+{
+#if defined(VEDIT_EDIT_CORE_HAVE_FOLDING)
+    auto *binding = FoldBreadcrumbBinding::instanceFor(editor);
+    return binding != nullptr ? binding->breadcrumbDisplay() : QString();
+#else
+    return EditorProvider::statusText(editor);
+#endif
+}
+
+void EditCoreProvider::setStatusListener(QWidget *editor, std::function<void()> listener)
+{
+    if (editor == nullptr) {
+        return;
+    }
+    if (!listener) {
+        statusListeners_.remove(editor);
+        return;
+    }
+    statusListeners_.insert(editor, std::move(listener));
+#if defined(VEDIT_EDIT_CORE_HAVE_FOLDING)
+    if (auto *binding = FoldBreadcrumbBinding::instanceFor(editor)) {
+        binding->setStatusListener([this, editor]() { notifyStatus(editor); });
+    }
+#endif
+}
+
+void EditCoreProvider::notifyStatus(QWidget *editor)
+{
+    const auto it = statusListeners_.constFind(editor);
+    if (it != statusListeners_.constEnd() && it.value()) {
+        it.value()();
+    }
 }
 
 QString EditCoreProvider::currentFilePath(QWidget *editor) const

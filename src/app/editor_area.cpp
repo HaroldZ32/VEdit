@@ -111,6 +111,14 @@ EditorPane::EditorPane(QString paneId, EditorProvider *provider, QWidget *parent
     header_->setContentsMargins(6, 2, 6, 2);
     layout_->addWidget(header_);
 
+    // T94: the semantic breadcrumb bar under the pane header. Empty (and hidden)
+    // when the provider has no positional context.
+    breadcrumb_ = new QLabel(this);
+    breadcrumb_->setObjectName(QStringLiteral("editor-pane-breadcrumb"));
+    breadcrumb_->setContentsMargins(6, 0, 6, 2);
+    breadcrumb_->setVisible(false);
+    layout_->addWidget(breadcrumb_);
+
     QWidget *initial = provider_ != nullptr ? provider_->createEditor(this) : nullptr;
     if (initial == nullptr) {
         auto *fallback = new QPlainTextEdit(this);
@@ -129,12 +137,17 @@ void EditorPane::replaceEditorWidget(QWidget *editor)
     }
     if (editor_ != nullptr) {
         editor_->removeEventFilter(this);
+        if (provider_ != nullptr) {
+            // The provider drops its listener for the widget that is going away.
+            provider_->setStatusListener(editor_, nullptr);
+        }
         editor_->setParent(nullptr);
         delete editor_;
     }
     editor_ = editor;
     if (editor_ != nullptr) {
-        layout_->insertWidget(1, editor_, 1);
+        // Index 2: after the pane header (0) and the breadcrumb bar (1).
+        layout_->insertWidget(2, editor_, 1);
         editor_->installEventFilter(this);
         // T80: the shell's file.save command is the only Ctrl+S authority.
         clearEditorSaveShortcut(editor_);
@@ -148,7 +161,28 @@ void EditorPane::replaceEditorWidget(QWidget *editor)
                 clearEditorSaveShortcut(guarded.data());
             }
         });
+        // T94: the provider pushes breadcrumb changes into the pane; the pane
+        // repaints the bar (and it is empty while the provider has no path).
+        if (provider_ != nullptr) {
+            provider_->setStatusListener(editor_, [this]() { updateBreadcrumb(); });
+        }
     }
+    updateBreadcrumb();
+}
+
+QString EditorPane::breadcrumbText() const
+{
+    return breadcrumb_ != nullptr ? breadcrumb_->text() : QString();
+}
+
+void EditorPane::updateBreadcrumb()
+{
+    if (breadcrumb_ == nullptr) {
+        return;
+    }
+    const QString text = provider_ != nullptr ? provider_->statusText(editor_) : QString();
+    breadcrumb_->setText(text);
+    breadcrumb_->setVisible(!text.isEmpty());
 }
 
 void EditorPane::setProvider(EditorProvider *provider)

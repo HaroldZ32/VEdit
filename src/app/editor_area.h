@@ -48,6 +48,9 @@ public:
     QString currentFilePath() const;
     bool saveFile(QString *error = nullptr);
 
+    // T94: the breadcrumb bar's current text (empty while hidden).
+    QString breadcrumbText() const;
+
     // T90/F-2: re-apply the single-authority invariant for Ctrl+S on this pane's
     // editor widget (an editor may re-inject its own standard save shortcut at
     // runtime). Returns the number of duplicate bindings removed.
@@ -59,11 +62,13 @@ protected:
 
 private:
     void updateHeader();
+    void updateBreadcrumb();
     void replaceEditorWidget(QWidget *editor);
 
     QString paneId_;
     EditorProvider *provider_ = nullptr;
     QLabel *header_ = nullptr;
+    QLabel *breadcrumb_ = nullptr;
     QWidget *editor_ = nullptr;
     QVBoxLayout *layout_ = nullptr;
     std::function<void(EditorPane *)> onFocusRequested_;

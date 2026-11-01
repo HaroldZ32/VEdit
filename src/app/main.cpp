@@ -21,7 +21,11 @@
 #include "kernel/cross_boundary.h"
 #include "kernel/edit_core_selftest.h"
 #include "kernel/ktexteditor_provider.h"
+#include "../editor/kernel/fold_breadcrumb.h"
+#include "../syntax/folding/fold_injector.h"
+#include "../syntax/provider/syntax_service.h"
 #include <KTextEditor/Document>
+#include <KTextEditor/View>
 #endif
 #ifdef VEDIT_HAVE_RUST_FFI
 #include "vd_ffi.h"
@@ -102,6 +106,48 @@ void pump()
     QCoreApplication::processEvents();
     QCoreApplication::processEvents();
 }
+
+#if defined(VEDIT_HAVE_EDIT_CORE)
+// T94: the same 25 modules x 40 lines SystemVerilog sample the folding lane's
+// acceptance uses (1000 lines): each module keeps its first line and folds the
+// other 39, and the body carries function/always/generate/begin regions.
+QByteArray largeSystemVerilogSample()
+{
+    QString text;
+    for (int index = 0; index < 25; ++index) {
+        const QString n = QString::number(index);
+        text += QStringLiteral("module m%1 #(parameter W = 8) (\n").arg(n);
+        text += QStringLiteral("  input  logic clk,\n");
+        text += QStringLiteral("  input  logic rst_n,\n");
+        text += QStringLiteral("  output logic [W-1:0] q\n");
+        text += QStringLiteral(");\n");
+        text += QStringLiteral("  logic [W-1:0] state, nxt;\n");
+        text += QStringLiteral("  function automatic logic [W-1:0] inc(input logic [W-1:0] v);\n");
+        text += QStringLiteral("    inc = v + 1'b1;\n");
+        text += QStringLiteral("  endfunction\n");
+        text += QStringLiteral("  always_ff @(posedge clk or negedge rst_n) begin\n");
+        text += QStringLiteral("    if (!rst_n) begin\n");
+        text += QStringLiteral("      state <= '0;\n");
+        text += QStringLiteral("    end else begin\n");
+        text += QStringLiteral("      state <= inc(nxt);\n");
+        text += QStringLiteral("    end\n");
+        text += QStringLiteral("  end\n");
+        text += QStringLiteral("  always_comb begin\n");
+        text += QStringLiteral("    nxt = state + 1'b1;\n");
+        text += QStringLiteral("  end\n");
+        text += QStringLiteral("  generate\n");
+        text += QStringLiteral("    for (genvar i = 0; i < W; i = i + 1) begin : g_lane\n");
+        text += QStringLiteral("      assign q[i] = state[i];\n");
+        text += QStringLiteral("    end\n");
+        text += QStringLiteral("  endgenerate\n");
+        for (int line = 24; line < 39; ++line) {
+            text += QStringLiteral("  // filler line %1 of module %2\n").arg(line).arg(n);
+        }
+        text += QStringLiteral("endmodule\n");
+    }
+    return text.toUtf8();
+}
+#endif
 
 // --- Ctrl+S duplicate-binding detection (task T80) -------------------------
 // Qt reports "Ambiguous shortcut overload" and triggers NEITHER action when two
@@ -699,6 +745,166 @@ int runSelfCheck()
         }
     }
 
+    // --- T94: folding + breadcrumb wired into the live editor ----------------
+    // A real ApplicationShell + the real KTextEditor provider, a 1000-line .sv,
+    // and the two acceptance assertions: the folds really appear (975 hidden
+    // lines, T29's closed-state expectation) and an invalid range is still
+    // refused (A1 is not bypassed by the wiring).
+    {
+        // Give the pane enough vertical room to display every collapsed module
+        // line, so the viewport-relative observation covers the whole document
+        // (the lane's acceptance used a 1200x900 standalone view).
+        shell->resize(1500, 1200);
+        pump();
+        EditorPane *foldPane = shell->editorArea()->splitActive(Qt::Horizontal);
+        pump();
+        check("fold.wiring.pane", foldPane != nullptr);
+        if (foldPane != nullptr) {
+            const QString foldPath = temp.path() + QStringLiteral("/fold-1000.sv");
+            writeFile(foldPath, largeSystemVerilogSample());
+            QString foldError;
+            check("fold.wiring.open", foldPane->openFile(foldPath, &foldError));
+            pump();
+            KTextEditor::View *foldView = vedit::editor::viewFor(foldPane->editorWidget());
+            KTextEditor::Document *foldDocument =
+                vedit::editor::documentFor(foldPane->editorWidget());
+            check("fold.wiring.view", foldView != nullptr && foldDocument != nullptr);
+            check("fold.wiring.highlight-mode",
+                  foldDocument != nullptr
+                      && foldDocument->highlightingMode() == QStringLiteral("SystemVerilog"),
+                  foldDocument != nullptr ? foldDocument->highlightingMode() : QString());
+            auto *binding =
+                vedit::editor::FoldBreadcrumbBinding::instanceFor(foldPane->editorWidget());
+            check("fold.wiring.binding", binding != nullptr);
+            if (binding != nullptr && foldView != nullptr) {
+                check("fold.wiring.firstopen-full-count",
+                      binding->injector()->fullCount() == 1,
+                      QStringLiteral("full_count=%1")
+                          .arg(static_cast<unsigned long long>(
+                              binding->injector()->fullCount())));
+
+                // Closed state (tree-sitter OFF): the XML-derived ranges fold the
+                // file; 975 = 25 modules * 39 hidden lines (T29's expectation).
+                const vedit::folding::ViewObservation before =
+                    vedit::folding::observeView(foldView);
+                binding->setTreeSitterEnabled(false);
+                foldView->setCursorPosition(KTextEditor::Cursor(0, 0));
+                pump();
+                const vedit::folding::ViewObservation closed =
+                    vedit::folding::observeView(foldView);
+                std::printf("FOLD-WIRING before_state first_real=%d last_real=%d "
+                            "first_visible=%d last_visible=%d hidden=%d scroll_max=%d\n",
+                            before.firstDisplayedRealLine, before.lastDisplayedRealLine,
+                            before.firstDisplayedVisibleLine, before.lastDisplayedVisibleLine,
+                            before.hiddenInViewport, before.scrollMax);
+                std::printf("FOLD-WIRING closed_state first_real=%d last_real=%d "
+                            "first_visible=%d last_visible=%d full_count=%llu injected_ranges=%d "
+                            "hidden_in_viewport=%d scroll_max=%d tree_sitter=%d\n",
+                            closed.firstDisplayedRealLine, closed.lastDisplayedRealLine,
+                            closed.firstDisplayedVisibleLine, closed.lastDisplayedVisibleLine,
+                            static_cast<unsigned long long>(binding->injector()->fullCount()),
+                            static_cast<int>(binding->injector()->registry().size()),
+                            closed.hiddenInViewport, closed.scrollMax,
+                            binding->treeSitterEnabled() ? 1 : 0);
+                check("fold.wiring.closed.observed", closed.hiddenInViewport > 0);
+                check("fold.wiring.closed.hidden-975", closed.hiddenInViewport == 975,
+                      QStringLiteral("hidden=%1").arg(closed.hiddenInViewport));
+                check("fold.wiring.closed.registry-200",
+                      binding->injector()->registry().size() == 200,
+                      QStringLiteral("registry=%1")
+                          .arg(static_cast<int>(binding->injector()->registry().size())));
+                check("fold.wiring.closed.no-rejects",
+                      binding->injector()->rejectedCount() == 0);
+
+                // A1 is not bypassed: an invalid range never folds (T19 proves
+                // the exec fallback would fold the user's selection instead).
+                const quint64 rejectsBefore = binding->injector()->rejectedCount();
+                const int injectedInvalid =
+                    binding->injector()->inject({vedit::folding::FoldRange{5, 5}});
+                check("fold.wiring.a1-invalid-rejected",
+                      injectedInvalid == 0
+                          && binding->injector()->rejectedCount() == rejectsBefore + 1,
+                      QStringLiteral("injected=%1 rejected=%2")
+                          .arg(injectedInvalid)
+                          .arg(static_cast<unsigned long long>(
+                              binding->injector()->rejectedCount())));
+
+                // Typing must never rebuild folds (A2.1). Key events reach the
+                // view, the binding counts them, full_count stays flat.
+                const quint64 fullBeforeKeys = binding->injector()->fullCount();
+                const quint64 keysBefore = binding->injector()->keyEventCount();
+                for (int i = 0; i < 50; ++i) {
+                    QKeyEvent key(QEvent::KeyPress, Qt::Key_Left, Qt::NoModifier);
+                    QCoreApplication::sendEvent(foldView, &key);
+                }
+                pump();
+                std::printf("FOLD-WIRING key_path full_count=%llu key_events=%llu\n",
+                            static_cast<unsigned long long>(
+                                binding->injector()->fullCount()),
+                            static_cast<unsigned long long>(
+                                binding->injector()->keyEventCount()));
+                check("fold.wiring.no-rebuild-on-keys",
+                      binding->injector()->fullCount() == fullBeforeKeys
+                          && binding->injector()->keyEventCount() >= keysBefore + 50);
+
+                // Tree-sitter back ON: folds from the parse; the breadcrumb
+                // follows the cursor into the function body of module m0.
+                binding->setTreeSitterEnabled(true);
+                pump();
+                check("fold.wiring.toggle-on-rebuild",
+                      binding->injector()->fullCount() == fullBeforeKeys + 1,
+                      QStringLiteral("full_count=%1")
+                          .arg(static_cast<unsigned long long>(
+                              binding->injector()->fullCount())));
+                foldView->setCursorPosition(KTextEditor::Cursor(7, 4));
+                pump();
+                std::printf("FOLD-WIRING breadcrumb describe='%s' bar='%s'\n",
+                            qPrintable(binding->breadcrumbDescribe()),
+                            qPrintable(foldPane->breadcrumbText()));
+                check("fold.wiring.breadcrumb.describe",
+                      binding->breadcrumbDescribe()
+                          == QStringLiteral("module:m0 > function:inc"),
+                      binding->breadcrumbDescribe());
+                check("fold.wiring.breadcrumb.pane-bar",
+                      foldPane->breadcrumbText().contains(QStringLiteral("m0 > inc")),
+                      foldPane->breadcrumbText());
+
+                // Tree-sitter OFF again: no semantic source -> EMPTY path, the
+                // bar hides; no invented text heuristic (T19's contract).
+                binding->setTreeSitterEnabled(false);
+                pump();
+                check("fold.wiring.breadcrumb.no-invention",
+                      binding->breadcrumbDescribe().isEmpty()
+                          && foldPane->breadcrumbText().isEmpty(),
+                      QStringLiteral("describe='%1' bar='%2'")
+                          .arg(binding->breadcrumbDescribe(), foldPane->breadcrumbText()));
+                binding->setTreeSitterEnabled(true);
+                pump();
+
+                // Ordinary text edits do NOT rebuild folds (A2.1); the third
+                // allowed trigger (Reparsed) is explicit and counts exactly once.
+                const quint64 fullBeforeEdit = binding->injector()->fullCount();
+                foldDocument->insertText(KTextEditor::Cursor(0, 0),
+                                        QStringLiteral("// edited by the selfcheck\n"));
+                pump();
+                check("fold.wiring.no-rebuild-on-edit",
+                      binding->injector()->fullCount() == fullBeforeEdit,
+                      QStringLiteral("full_count=%1")
+                          .arg(static_cast<unsigned long long>(
+                              binding->injector()->fullCount())));
+                binding->notifyReparsed();
+                pump();
+                check("fold.wiring.reparsed-trigger",
+                      binding->injector()->fullCount() == fullBeforeEdit + 1,
+                      QStringLiteral("full_count=%1")
+                          .arg(static_cast<unsigned long long>(
+                              binding->injector()->fullCount())));
+            }
+            shell->editorArea()->closeActivePane();
+            pump();
+        }
+    }
+
     vedit::editor::BoundaryHooks hooks;
     hooks.calls = []() { return vedit::editor::crossBoundaryCallCount(); };
 #if defined(VEDIT_HAVE_RUST_FFI)
@@ -750,6 +956,26 @@ QStringList stringList(const VdStringList &list)
 int runSelfCheck(const QString &fixtureDir)
 {
     std::printf("FFI-ABI fixture=%s\n", qPrintable(fixtureDir));
+
+    // T97: this selfcheck asserts the exact file set of the Rust C ABI smoke
+    // fixture (crates/vd-ffi/tests/fixtures/project: vedit.toml + 3 rtl files,
+    // +incdir+inc, WIDTH=8/SIM). The T24 review passed the repository's
+    // project-model fixture (tests/fixtures/verilog-project: 7 files and its own
+    // filelist semantics) and got four ffi.project.* failures that looked like a
+    // project-model regression. Refuse the wrong fixture explicitly, with the
+    // correct command; on the right fixture a real regression still fails those
+    // same four checks (nothing here filters their result).
+    const QFileInfo fixtureInfo(fixtureDir);
+    const QString manifest = fixtureInfo.absoluteFilePath() + QStringLiteral("/vedit.toml");
+    if (!fixtureInfo.exists() || !fixtureInfo.isDir() || !QFileInfo(manifest).isFile()) {
+        std::printf("FFI-ABI-SELFTEST ok=0 reason=wrong-fixture\n");
+        std::printf("FFI-ABI hint: --selfcheck-ffi expects the Rust C ABI smoke fixture:\n"
+                    "FFI-ABI hint:   crates/vd-ffi/tests/fixtures/project  (vedit.toml + 3 rtl files)\n"
+                    "FFI-ABI hint: tests/fixtures/verilog-project is the PROJECT-MODEL fixture (T14,\n"
+                    "FFI-ABI hint:   7 files); its expectations live in expected/ and are validated by:\n"
+                    "FFI-ABI hint:   cargo test -p vd-ffi -p vd-config\n");
+        return 2;
+    }
     const QByteArray fixturePath = QFile::encodeName(fixtureDir);
 
     noteAbiCall();
@@ -787,20 +1013,26 @@ int runSelfCheck(const QString &fixtureDir)
         std::printf("FFI-ERROR project: %s\n", qPrintable(errorText(service)));
     }
     const QStringList files = stringList(project.files);
-    check("ffi.project.file-count", files.size() == 3);
+    check("ffi.project.file-count", files.size() == 3,
+          QStringLiteral("actual=%1 files=[%2] (C ABI fixture expects 3)")
+              .arg(files.size())
+              .arg(files.join(QLatin1Char(','))));
     QStringList basenames;
     for (const QString &path : files) {
         basenames.append(QFileInfo(path).fileName());
     }
     check("ffi.project.file-order",
           basenames == QStringList{QStringLiteral("rtl_a.sv"), QStringLiteral("rtl_b.sv"),
-                                   QStringLiteral("rtl_c.sv")});
+                                   QStringLiteral("rtl_c.sv")},
+          QStringLiteral("actual=[%1]").arg(basenames.join(QLatin1Char(','))));
     const QStringList includeDirs = stringList(project.include_dirs);
     check("ffi.project.include-dir",
-          includeDirs.size() == 1 && includeDirs.first().endsWith(QStringLiteral("inc")));
+          includeDirs.size() == 1 && includeDirs.first().endsWith(QStringLiteral("inc")),
+          QStringLiteral("actual=[%1]").arg(includeDirs.join(QLatin1Char(','))));
     const QStringList defines = stringList(project.defines);
     check("ffi.project.defines",
-          defines.contains(QStringLiteral("WIDTH=8")) && defines.contains(QStringLiteral("SIM")));
+          defines.contains(QStringLiteral("WIDTH=8")) && defines.contains(QStringLiteral("SIM")),
+          QStringLiteral("actual=[%1]").arg(defines.join(QLatin1Char(','))));
     noteAbiCall();
     vd_project_info_free(&project);
 
@@ -989,7 +1221,8 @@ int main(int argc, char **argv)
     parser.addOption({QStringLiteral("selfcheck"),
                       QStringLiteral("Run non-interactive layout/theme/persistence checks and exit.")});
     parser.addOption({QStringLiteral("selfcheck-ffi"),
-                      QStringLiteral("Run the Rust C ABI checks against this project fixture and exit."),
+                      QStringLiteral("Run the Rust C ABI checks against the vd-ffi smoke fixture "
+                                     "(crates/vd-ffi/tests/fixtures/project) and exit."),
                       QStringLiteral("dir")});
     parser.addOption({QStringLiteral("screenshots"),
                       QStringLiteral("Capture split-state screenshots into this directory and exit."),
@@ -1027,6 +1260,41 @@ int main(int argc, char **argv)
     // A deferred start makes the restored panes use it directly (no re-creation
     // of the demo pane).
     shell.setEditorProvider(vedit::editor::makeEditCoreProvider());
+
+    // T94: the runtime tree-sitter switch is a product command, not a test hook:
+    // turning it off releases the fold registry (the injector unfolds it first)
+    // and clears the breadcrumb (no text-heuristic path is invented).
+    if (shell.commands() != nullptr) {
+        vedit::app::CommandSpec spec;
+        spec.id = QStringLiteral("view.treesitter");
+        spec.text = QStringLiteral("Use &tree-sitter parsing");
+        spec.menu = QStringLiteral("view");
+        spec.order = 90;
+        spec.checkable = true;
+        if (shell.commands()->add(spec) == nullptr) {
+            shell.commands()->action(spec.id);
+        }
+        QAction *treeSitterAction = shell.commands()->action(spec.id);
+        const auto applyTreeSitter = [&shell, treeSitterAction](bool enabled) {
+            for (EditorPane *pane : shell.editorArea()->panes()) {
+                if (auto *binding = vedit::editor::FoldBreadcrumbBinding::instanceFor(
+                        pane->editorWidget())) {
+                    binding->setTreeSitterEnabled(enabled);
+                }
+            }
+            vedit::syntax::SyntaxService::instance().setTreeSitterEnabled(enabled);
+            if (treeSitterAction != nullptr) {
+                treeSitterAction->setChecked(enabled);
+            }
+        };
+        if (treeSitterAction != nullptr) {
+            treeSitterAction->setChecked(
+                vedit::syntax::SyntaxService::instance().treeSitterEnabled());
+        }
+        shell.commands()->setHandler(spec.id, [applyTreeSitter]() {
+            applyTreeSitter(!vedit::syntax::SyntaxService::instance().treeSitterEnabled());
+        });
+    }
 #endif
     vedit::workspace::installPanels(shell, {options.projectRoot, options.stateDir});
     // Terminal panel lane (T35): the shell created the "terminal" panel spec with

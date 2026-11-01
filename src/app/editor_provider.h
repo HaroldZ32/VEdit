@@ -18,6 +18,8 @@
 #include <QStringLiteral>
 #include <QWidget>
 
+#include <functional>
+
 namespace vedit::app {
 
 class EditorProvider {
@@ -44,6 +46,14 @@ public:
                           QString *error = nullptr);
     virtual QString currentFilePath(QWidget *editor) const;
     virtual bool saveFile(QWidget *editor, QString *error = nullptr);
+
+    // --- breadcrumb/status seam (T94) --------------------------------------
+    // One line of positional context for a pane (the semantic breadcrumb path).
+    // The pane renders it under the header and hides it while empty. A provider
+    // with nothing positional keeps the defaults; the shell never sees a
+    // KTextEditor header.
+    virtual QString statusText(QWidget *editor) const;
+    virtual void setStatusListener(QWidget *editor, std::function<void()> listener);
 };
 
 // Placeholder provider: one read/write QPlainTextEdit per pane, labelled
@@ -105,6 +115,18 @@ inline QString EditorProvider::currentFilePath(QWidget *editor) const
         return QString();
     }
     return editor->property("vedit.openFilePath").toString();
+}
+
+inline QString EditorProvider::statusText(QWidget *editor) const
+{
+    Q_UNUSED(editor);
+    return {};
+}
+
+inline void EditorProvider::setStatusListener(QWidget *editor, std::function<void()> listener)
+{
+    Q_UNUSED(editor);
+    Q_UNUSED(listener);
 }
 
 inline bool EditorProvider::saveFile(QWidget *editor, QString *error)

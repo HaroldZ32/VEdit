@@ -9,8 +9,10 @@
 // provider is installed.
 #include "editor_provider.h"
 
+#include <QHash>
 #include <QString>
 
+#include <functional>
 #include <memory>
 
 namespace KTextEditor {
@@ -41,6 +43,16 @@ public:
     bool openFile(QWidget *editor, const QString &absolutePath, QString *error) override;
     QString currentFilePath(QWidget *editor) const override;
     bool saveFile(QWidget *editor, QString *error) override;
+
+    // Breadcrumb seam (T94): the pane renders the semantic path of the cursor
+    // for this editor widget; an empty string hides the bar.
+    QString statusText(QWidget *editor) const override;
+    void setStatusListener(QWidget *editor, std::function<void()> listener) override;
+
+private:
+    void notifyStatus(QWidget *editor);
+
+    QHash<QWidget *, std::function<void()>> statusListeners_;
 };
 
 std::unique_ptr<vedit::app::EditorProvider> makeEditCoreProvider();
