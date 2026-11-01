@@ -9,6 +9,7 @@
 // the seams in src/app (EditorProvider / PanelRegistry / IShortcutStore). See
 // evidence/app-shell/ for the acceptance evidence of this task.
 #include "app_shell.h"
+#include "crash_reporter.h"
 
 #include "command_registry.h"
 #include "editor_area.h"
@@ -34,6 +35,8 @@
 #include <QAction>
 #include <QApplication>
 #include <QCommandLineParser>
+
+#include <csignal>
 #include <QCoreApplication>
 #include <QDir>
 #include <QDockWidget>
@@ -1231,7 +1234,42 @@ int main(int argc, char **argv)
                       QStringLiteral("Ignore an existing session file at startup.")});
     parser.addOption({QStringLiteral("hold"), QStringLiteral("Keep the window for this many ms."),
                       QStringLiteral("ms"), QStringLiteral("0")});
+    // T117: proves the crash reporter works on the SHIPPED binary (the ctest
+    // `vedit-app-crash-report-shipped` runs exactly this). It raises before any
+    // window or display is needed.
+    parser.addOption({QStringLiteral("crash-test"),
+                      QStringLiteral("Raise a signal after installing the crash reporter "
+                                     "(segv|abort|bus|fpe|ill) and exit. Test-only."),
+                      QStringLiteral("signal")});
     parser.process(app);
+
+    // Crash self-reporting is installed as early as possible: from here on a
+    // SIGSEGV/SIGBUS/SIGFPE/SIGILL/SIGABRT writes $XDG_STATE_HOME/vedit/crash-*.log
+    // (signal, fault address, symbolized backtrace, open file, recent events,
+    // build identity) before the process dies.
+    {
+        const QString buildInfo = QStringLiteral(VEDIT_BUILD_HEAD) + QStringLiteral(" built ")
+            + QStringLiteral(__DATE__) + QStringLiteral(" ") + QStringLiteral(__TIME__);
+        vedit::app::crash::install(buildInfo);
+        vedit::app::crash::event("start argv0=%s", argv[0]);
+    }
+    if (parser.isSet(QStringLiteral("crash-test"))) {
+        const QString which = parser.value(QStringLiteral("crash-test")).trimmed().toLower();
+        int signal = SIGSEGV;
+        if (which == QStringLiteral("abort")) {
+            signal = SIGABRT;
+        } else if (which == QStringLiteral("bus")) {
+            signal = SIGBUS;
+        } else if (which == QStringLiteral("fpe")) {
+            signal = SIGFPE;
+        } else if (which == QStringLiteral("ill")) {
+            signal = SIGILL;
+        }
+        vedit::app::crash::event("crash-test %s", qPrintable(which));
+        vedit::app::crash::setCurrentFile(QStringLiteral("/tmp/vedit-crash-test/input.sv"));
+        std::raise(signal);
+        return 3; // unreachable unless the handler failed
+    }
 
     ShellOptions options;
     options.stateDir = parser.value(QStringLiteral("state-dir"));

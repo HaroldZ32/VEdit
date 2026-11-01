@@ -18,6 +18,7 @@ set(CMAKE_AUTOMOC ON)
 set(VEDIT_APP_SHELL_SOURCES
   app_shell.cpp
   command_registry.cpp
+  crash_reporter.cpp
   editor_area.cpp
   editor_provider.cpp
   panel_registry.cpp
@@ -25,7 +26,21 @@ set(VEDIT_APP_SHELL_SOURCES
   theme_manager.cpp
 )
 
+# T117: the build identity a crash report carries (HEAD + build time).
+set(VEDIT_BUILD_HEAD "unknown")
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../.git")
+  execute_process(
+    COMMAND git -C "${CMAKE_CURRENT_SOURCE_DIR}/../.." rev-parse HEAD
+    OUTPUT_VARIABLE VEDIT_BUILD_HEAD_VALUE
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET)
+  if(VEDIT_BUILD_HEAD_VALUE)
+    set(VEDIT_BUILD_HEAD "${VEDIT_BUILD_HEAD_VALUE}")
+  endif()
+endif()
+
 add_library(vedit_app_shell STATIC ${VEDIT_APP_SHELL_SOURCES})
+target_compile_definitions(vedit_app_shell PUBLIC VEDIT_BUILD_HEAD="${VEDIT_BUILD_HEAD}")
 target_include_directories(vedit_app_shell PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(vedit_app_shell PUBLIC
   Qt6::Core
@@ -41,6 +56,11 @@ endif()
 
 add_executable(vedit-app main.cpp)
 target_link_libraries(vedit-app PRIVATE vedit_app_shell)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  # `-rdynamic` lets backtrace_symbols_fd() print function names in a crash
+  # report instead of bare addresses (T117).
+  target_link_options(vedit-app PRIVATE -rdynamic)
+endif()
 # Terminal panel lane (T35): the shell registers the "terminal" panel id but the
 # factory and the widget live in this lane. Guarded so a tree without the lane
 # still configures (same "missing lane => skip" promise as the root lane list).
@@ -140,3 +160,24 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../workspace/integration.cpp")
   target_link_libraries(vedit-app PRIVATE vedit_workspace_integration)
   message(STATUS "VEdit: workspace integration enabled (src/workspace/integration.cpp)")
 endif()
+
+# --- T117: crash self-reporting --------------------------------------------
+# The fork/raise selftest proves the handler writes a readable report; the shell
+# check runs the SHIPPED binary with --crash-test=segv, which is what a user's
+# next crash will exercise.
+add_executable(vedit-app-crash-reporter-selftest crash_reporter_selftest.cpp)
+target_link_libraries(vedit-app-crash-reporter-selftest PRIVATE vedit_app_shell)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(vedit-app-crash-reporter-selftest PRIVATE -Wall -Wextra -Wpedantic -Werror)
+  target_link_options(vedit-app-crash-reporter-selftest PRIVATE -rdynamic)
+endif()
+add_test(NAME vedit-app-crash-reporter-selftest
+         COMMAND vedit-app-crash-reporter-selftest "${CMAKE_CURRENT_BINARY_DIR}")
+set_tests_properties(vedit-app-crash-reporter-selftest PROPERTIES
+  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_CURRENT_BINARY_DIR}/xdg-runtime-crash"
+  TIMEOUT 120
+)
+add_test(NAME vedit-app-crash-report-shipped
+         COMMAND bash "${CMAKE_CURRENT_SOURCE_DIR}/crash_report_check.sh"
+                 $<TARGET_FILE:vedit-app> "${CMAKE_CURRENT_BINARY_DIR}")
+set_tests_properties(vedit-app-crash-report-shipped PROPERTIES TIMEOUT 120)

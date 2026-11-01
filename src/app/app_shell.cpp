@@ -1,5 +1,7 @@
 #include "app_shell.h"
 
+#include "crash_reporter.h"
+
 #include "command_registry.h"
 #include "editor_area.h"
 #include "editor_provider.h"
@@ -366,6 +368,7 @@ QString ApplicationShell::projectLabel() const
 
 void ApplicationShell::applyThemeForStartup()
 {
+    vedit::app::crash::event("theme startup name=%s", qPrintable(options_.themeName));
     QString error;
     if (!themes_->applyTheme(options_.themeName, &error)) {
         addDiagnostic(QStringLiteral("theme: %1").arg(error));
@@ -446,6 +449,7 @@ bool ApplicationShell::restoreSession(QString *error)
 
 bool ApplicationShell::saveSession(QString *error)
 {
+    vedit::app::crash::event("session save");
     QJsonObject session;
     session.insert(QStringLiteral("version"), 1);
     session.insert(QStringLiteral("project"), options_.projectRoot);

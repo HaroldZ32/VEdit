@@ -1,5 +1,7 @@
 #include "editor_area.h"
 
+#include "crash_reporter.h"
+
 #include "editor_provider.h"
 
 #include <QAction>
@@ -217,7 +219,13 @@ bool EditorPane::openFile(const QString &absolutePath, QString *error)
         }
         return false;
     }
-    return provider_->openFile(editor_, absolutePath, error);
+    if (!provider_->openFile(editor_, absolutePath, error)) {
+        return false;
+    }
+    // T117 crash report context: the file a crash happened on.
+    vedit::app::crash::setCurrentFile(absolutePath);
+    vedit::app::crash::event("open %s", qPrintable(absolutePath));
+    return true;
 }
 
 QString EditorPane::currentFilePath() const
