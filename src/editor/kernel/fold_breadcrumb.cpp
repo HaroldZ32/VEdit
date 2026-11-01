@@ -1,6 +1,7 @@
 #include "fold_breadcrumb.h"
 
 #include "ksyntax_fold_source.h"
+#include "syntax_directory.h"
 #include "syntax_breadcrumb_source.h"
 #include "syntax_fold_source.h"
 #include "syntax_service.h"
@@ -18,24 +19,6 @@
 
 namespace vedit::editor {
 namespace {
-
-// Same walk-up the toolchain resolver uses for a bare build: find the checkout's
-// resources/syntax next to the source tree. The delivered AppRun narrows the
-// search path and exports VEDIT_SYNTAX_DIR, which wins.
-QString findSyntaxDirectory(const QString &startDir)
-{
-    QDir dir(startDir);
-    for (int depth = 0; depth < 8; ++depth) {
-        const QString candidate = dir.filePath(QStringLiteral("resources/syntax"));
-        if (QFileInfo(candidate + QStringLiteral("/vedit-systemverilog.xml")).isFile()) {
-            return candidate;
-        }
-        if (!dir.cdUp()) {
-            break;
-        }
-    }
-    return {};
-}
 
 } // namespace
 
@@ -94,11 +77,11 @@ FoldBreadcrumbBinding *FoldBreadcrumbBinding::instanceFor(QWidget *editorWidget)
 
 QString FoldBreadcrumbBinding::definitionDirectory() const
 {
-    const QString fromEnvironment = qEnvironmentVariable("VEDIT_SYNTAX_DIR");
-    if (!fromEnvironment.isEmpty() && QFileInfo(fromEnvironment).isDir()) {
-        return fromEnvironment;
-    }
-    return findSyntaxDirectory(QCoreApplication::applicationDirPath());
+    // T109: the ONE shared resolution. `VEDIT_SYNTAX_DIR` is T84's data root (its
+    // `syntax/` child holds the XML files); the helper also accepts the legacy
+    // `syntax` subdirectory spelling, so packaging no longer needs a second copy
+    // of the XMLs at the data root.
+    return vedit::syntax::applicationSyntaxDefinitionDirectory();
 }
 
 QString FoldBreadcrumbBinding::definitionFileName() const
@@ -106,8 +89,7 @@ QString FoldBreadcrumbBinding::definitionFileName() const
     const QString mode = view_ != nullptr && view_->document() != nullptr
         ? view_->document()->highlightingMode()
         : QString();
-    return mode == QStringLiteral("Verilog") ? QStringLiteral("vedit-verilog.xml")
-                                             : QStringLiteral("vedit-systemverilog.xml");
+    return vedit::syntax::syntaxDefinitionFileName(mode);
 }
 
 QString FoldBreadcrumbBinding::grammarId() const
