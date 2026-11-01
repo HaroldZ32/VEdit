@@ -172,8 +172,20 @@ fn has_direct_filelist(dir: &Path) -> bool {
 
 /// Find the nearest `.rules.verible_lint` at or above `root`.
 ///
+/// A MISSING rules file is normal: verible falls back to its built-in rule set,
+/// so it produces **no diagnostic at all** (T114 — "environment not configured"
+/// is not an error, the same rule T85 applied to a missing toolchain).
+///
+/// Only a rules file that EXISTS but cannot be used (permissions, I/O error, or
+/// the name is not a regular file) is reported, as
+/// [`WarningCode::RulesUnreadable`]. That message never contains the user's
+/// absolute path: it names the file relative to the project root, or just the
+/// file name when it lives above the root, and the [`Warning::file`] field is
+/// left empty for the same reason.
+///
 /// The search stops at `$HOME` when `root` lives under it, otherwise at the
-/// filesystem root, so it can never walk out of the user's tree.
+/// filesystem root, so it can never walk out of the user's tree. That boundary
+/// is a deliberate safety limit, not a bug.
 pub(crate) fn discover_rules(
     root: &Path,
     home: Option<&Path>,
@@ -186,8 +198,17 @@ pub(crate) fn discover_rules(
     let mut dir = root.to_path_buf();
     loop {
         let candidate = dir.join(VERIBLE_RULES_FILE_NAME);
-        if candidate.is_file() {
-            return (Some(candidate), dir);
+        if candidate.exists() {
+            // Exists: usable only when it is a regular file we can open. Anything
+            // else is an actionable problem the user has to fix.
+            if candidate.is_file() && std::fs::File::open(&candidate).is_ok() {
+                return (Some(candidate), dir);
+            }
+            warnings.push(Warning::new(
+                WarningCode::RulesUnreadable,
+                unreadable_rules_message(root, &candidate),
+            ));
+            return (None, dir);
         }
         if dir == boundary {
             break;
@@ -198,17 +219,23 @@ pub(crate) fn discover_rules(
         }
     }
     let stop = dir;
-    warnings.push(
-        Warning::new(
-            WarningCode::RulesSearchStopped,
-            format!(
-                "no {VERIBLE_RULES_FILE_NAME} found from the project root upward; search stopped at {}",
-                stop.display()
-            ),
-        )
-        .with_file(stop.clone()),
-    );
+    // No warning: the optional file is simply absent (built-in rules apply).
     (None, stop)
+}
+
+/// The short, path-free sentence for an unusable rules file.
+fn unreadable_rules_message(root: &Path, candidate: &Path) -> String {
+    let shown = candidate
+        .strip_prefix(root)
+        .map(|relative| relative.display().to_string())
+        .unwrap_or_else(|_| VERIBLE_RULES_FILE_NAME.to_string());
+    // Say what it means for the user: the feature is still working with the
+    // built-in rules, only their project-specific rules are not applied (T85's
+    // lesson: explain the impact, not just the error).
+    format!(
+        "the Verilog lint rules file {shown} could not be read; falling back to \
+         built-in rules"
+    )
 }
 
 fn discover_filelists(
@@ -323,8 +350,11 @@ fn is_identifier(text: &str) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::{discover_root, parse_define, Define, RootSource};
+    use super::{
+        discover_root, discover_rules, parse_define, Define, RootSource, VERIBLE_RULES_FILE_NAME,
+    };
     use crate::test_support::write;
+    use crate::warnings::WarningCode;
 
     #[test]
     fn define_parsing() {
@@ -413,6 +443,141 @@ mod tests {
         let (found, source, _stop) = discover_root(&both);
         assert_eq!(found, std::path::absolute(&both)?);
         assert_eq!(source, RootSource::GitDir);
+        Ok(())
+    }
+
+    // --- T114: a missing optional rules file is not a diagnostic ------------
+
+    /// The regression the real-machine GUI reported: no `.rules.verible_lint`
+    /// anywhere produced an Error-looking line with the user's home directory.
+    /// A missing optional file is now completely silent (built-in rules apply).
+    #[test]
+    fn missing_optional_rules_file_is_silent() -> Result<(), Box<dyn std::error::Error>> {
+        let temp = tempfile::tempdir()?;
+        let mut warnings = Vec::new();
+        let (found, stop) = discover_rules(temp.path(), None, &mut warnings);
+        assert_eq!(found, None, "nothing to find");
+        assert!(
+            warnings.is_empty(),
+            "a missing optional rules file must not produce a warning: {warnings:?}"
+        );
+        assert!(stop.starts_with("/"), "the walk ended at a filesystem path");
+        Ok(())
+    }
+
+    /// Exists-but-unusable is a REAL problem and still reported, but the message
+    /// must stay actionable and path-free (no `/home/<user>`), and it must say
+    /// that the feature keeps working with the built-in rules.
+    #[test]
+    fn unreadable_rules_file_is_reported_without_an_absolute_path(
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let temp = tempfile::tempdir()?;
+        let root = temp.path();
+        let rules = root.join(VERIBLE_RULES_FILE_NAME);
+        // A directory with that name is "exists but not a readable regular file".
+        // It is deterministic even in a root container, where chmod 000 would
+        // still be readable.
+        std::fs::create_dir_all(&rules)?;
+
+        let mut warnings = Vec::new();
+        let (found, _stop) = discover_rules(root, None, &mut warnings);
+        assert_eq!(found, None);
+        assert_eq!(warnings.len(), 1, "one actionable warning: {warnings:?}");
+        let warning = &warnings[0];
+        assert_eq!(warning.code, WarningCode::RulesUnreadable);
+        assert!(
+            warning.file.is_none(),
+            "the file field must not carry an absolute path"
+        );
+        assert!(
+            warning.message.contains("could not be read"),
+            "the reason must be visible: {}",
+            warning.message
+        );
+        assert!(
+            warning.message.contains("falling back to built-in rules"),
+            "the message must say the feature still works: {}",
+            warning.message
+        );
+        let absolute = root.display().to_string();
+        assert!(
+            !warning.message.contains(&absolute),
+            "the message leaks the project path: {}",
+            warning.message
+        );
+        assert!(
+            !warning.message.contains("/home/"),
+            "the message leaks a home directory: {}",
+            warning.message
+        );
+        Ok(())
+    }
+
+    /// The positive control: a real rules file is adopted and produces no noise
+    /// (no "found" message either).
+    #[test]
+    fn a_present_rules_file_is_found_without_warnings() -> Result<(), Box<dyn std::error::Error>> {
+        let temp = tempfile::tempdir()?;
+        let root = temp.path();
+        write(&root.join(VERIBLE_RULES_FILE_NAME), "line-length: 120\n")?;
+        let mut warnings = Vec::new();
+        let (found, stop) = discover_rules(root, None, &mut warnings);
+        assert_eq!(found, Some(root.join(VERIBLE_RULES_FILE_NAME)));
+        assert_eq!(stop, root);
+        assert!(
+            warnings.is_empty(),
+            "no noise for a found file: {warnings:?}"
+        );
+        Ok(())
+    }
+
+    /// `chmod 000` coverage. In the pinned root container the file stays
+    /// readable, so the test asserts the readable branch; on a normal account it
+    /// asserts the unreadable branch. Either way something is asserted, never
+    /// silently skipped.
+    #[test]
+    fn chmod_000_rules_file_hits_one_of_the_two_expectations(
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        use std::os::unix::fs::PermissionsExt;
+        let temp = tempfile::tempdir()?;
+        let root = temp.path();
+        let rules = root.join(VERIBLE_RULES_FILE_NAME);
+        write(&rules, "line-length: 120\n")?;
+        std::fs::set_permissions(&rules, std::fs::Permissions::from_mode(0o000))?;
+        let readable_by_us = std::fs::File::open(&rules).is_ok();
+
+        let mut warnings = Vec::new();
+        let (found, _stop) = discover_rules(root, None, &mut warnings);
+        std::fs::set_permissions(&rules, std::fs::Permissions::from_mode(0o644))?;
+        println!(
+            "chmod-000 readable_by_this_process={readable_by_us} found={:?} warnings={:?}",
+            found.is_some(),
+            warnings.iter().map(|w| w.code.as_str()).collect::<Vec<_>>()
+        );
+        if readable_by_us {
+            assert_eq!(found, Some(rules), "readable => adopted");
+            assert!(warnings.is_empty());
+        } else {
+            assert_eq!(found, None);
+            assert_eq!(warnings.len(), 1);
+            assert_eq!(warnings[0].code, WarningCode::RulesUnreadable);
+        }
+        Ok(())
+    }
+
+    /// The `$HOME` boundary is a deliberate safety limit: the walk stops there
+    /// and never reaches `/`, and a miss is silent.
+    #[test]
+    fn rules_search_stops_at_the_home_boundary() -> Result<(), Box<dyn std::error::Error>> {
+        let temp = tempfile::tempdir()?;
+        let home = temp.path().join("home");
+        let project = home.join("work/project");
+        std::fs::create_dir_all(&project)?;
+        let mut warnings = Vec::new();
+        let (found, stop) = discover_rules(&project, Some(home.as_path()), &mut warnings);
+        assert_eq!(found, None);
+        assert_eq!(stop, home, "the search must stop at $HOME, not at /");
+        assert!(warnings.is_empty());
         Ok(())
     }
 }

@@ -83,9 +83,16 @@ pub(crate) fn parse(start_dir: &Path) -> Result<ProjectData, VdError> {
             None => define.name.clone(),
         })
         .collect();
+    // T114 defence in depth: the user-facing diagnostic list carries only
+    // actionable problems. `rules.search_stopped` was the note "no optional
+    // `.rules.verible_lint` anywhere" (which also named the absolute stop path,
+    // i.e. the user's home directory). vd-config no longer emits it, and this
+    // projection drops it if an older/pinned service ever does. The machine
+    // contract in vd-config (`--print-config`) is untouched.
     let warnings = loaded
         .warnings
         .iter()
+        .filter(|warning| warning.code.as_str() != "rules.search_stopped")
         .map(|warning| match (&warning.file, warning.line) {
             (Some(file), Some(line)) => format!(
                 "{}: {}:{}: {}",
@@ -390,5 +397,131 @@ mod tests {
         assert_eq!(first.include_dirs, second.include_dirs);
         assert_eq!(first.defines, second.defines);
         assert_eq!(first.warnings, second.warnings);
+    }
+
+    // --- T114: optional resources are not GUI diagnostics --------------------
+
+    /// NEGATIVE CONTROL: a project without `.rules.verible_lint` (the normal
+    /// case) produces NO `rules.*` diagnostic, so the panel's "Diagnostics (N)"
+    /// list stays empty and no home-directory path is shown.
+    #[test]
+    fn missing_optional_rules_file_is_not_a_panel_diagnostic(
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let temp = tempfile::tempdir()?;
+        let root = temp.path();
+        std::fs::write(root.join("top.f"), "rtl/a.sv\n")?;
+        let data = match parse(root) {
+            Ok(data) => data,
+            Err(error) => panic!("parse failed with code {}", error.code),
+        };
+        println!(
+            "NEGATIVE-CONTROL project_without_rules warnings={:?}",
+            data.warnings
+        );
+        let rules: Vec<&String> = data
+            .warnings
+            .iter()
+            .filter(|warning| warning.starts_with("rules."))
+            .collect();
+        assert!(
+            rules.is_empty(),
+            "a missing optional rules file must not reach the panel: {rules:?}"
+        );
+        assert!(
+            !data
+                .warnings
+                .iter()
+                .any(|warning| warning.contains("/home/")),
+            "no diagnostic may leak a home directory: {:#?}",
+            data.warnings
+        );
+        Ok(())
+    }
+
+    /// POSITIVE CONTROL: a real rules file is adopted and produces no noise
+    /// (not even a "found it" note).
+    #[test]
+    fn a_present_rules_file_produces_no_panel_noise() -> Result<(), Box<dyn std::error::Error>> {
+        let temp = tempfile::tempdir()?;
+        let root = temp.path();
+        std::fs::write(root.join(".rules.verible_lint"), "line-length: 120\n")?;
+        std::fs::write(root.join("top.f"), "rtl/a.sv\n")?;
+        let data = match parse(root) {
+            Ok(data) => data,
+            Err(error) => panic!("parse failed with code {}", error.code),
+        };
+        println!(
+            "POSITIVE-CONTROL project_with_rules warnings={:?}",
+            data.warnings
+        );
+        assert!(
+            data.warnings.is_empty(),
+            "a found rules file must be silent: {:#?}",
+            data.warnings
+        );
+        Ok(())
+    }
+
+    /// REGRESSION CONTROL: genuinely actionable filelist problems still reach
+    /// the panel (the filter above must not become a blanket mute).
+    #[test]
+    fn actionable_filelist_warnings_still_reach_the_panel() -> Result<(), Box<dyn std::error::Error>>
+    {
+        let temp = tempfile::tempdir()?;
+        let root = temp.path();
+        std::fs::write(root.join("top.f"), "+broken+token\nrtl/a.sv\n")?;
+        let data = match parse(root) {
+            Ok(data) => data,
+            Err(error) => panic!("parse failed with code {}", error.code),
+        };
+        println!("REGRESSION-CONTROL warnings={:?}", data.warnings);
+        assert!(
+            data.warnings
+                .iter()
+                .any(|warning| warning.starts_with("filelist.unknown_token: ")),
+            "a malformed filelist entry must still be reported: {:#?}",
+            data.warnings
+        );
+        Ok(())
+    }
+
+    /// The "exists but unusable" branch still warns, and the message stays
+    /// path-free (a directory with the rules file name is deterministic even in
+    /// a root container).
+    #[test]
+    fn unreadable_rules_file_still_warns_without_an_absolute_path() {
+        let temp = match tempfile::tempdir() {
+            Ok(temp) => temp,
+            Err(error) => panic!("cannot create a temp dir: {error}"),
+        };
+        let root = temp.path();
+        if let Err(error) = std::fs::create_dir_all(root.join(".rules.verible_lint")) {
+            panic!("cannot create the rules directory: {error}");
+        }
+        let data = match parse(root) {
+            Ok(data) => data,
+            Err(error) => panic!("parse failed with code {}", error.code),
+        };
+        println!("UNREADABLE-CONTROL warnings={:?}", data.warnings);
+        let unreadable: Vec<&String> = data
+            .warnings
+            .iter()
+            .filter(|warning| warning.starts_with("rules.unreadable: "))
+            .collect();
+        assert_eq!(
+            unreadable.len(),
+            1,
+            "an unusable rules file must still warn: {:#?}",
+            data.warnings
+        );
+        let message = unreadable[0];
+        assert!(
+            message.contains("falling back to built-in rules"),
+            "the message must say the feature still works: {message}"
+        );
+        assert!(
+            !message.contains(&root.display().to_string()) && !message.contains("/home/"),
+            "the warning must not leak an absolute path: {message}"
+        );
     }
 }

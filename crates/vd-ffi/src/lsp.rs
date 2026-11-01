@@ -864,6 +864,54 @@ pub unsafe extern "C" fn vd_lsp_session_request(
     }
 }
 
+/// Replace the tracked text of one document with the caller's EDITOR BUFFER
+/// (a full-document `didChange`). Nothing is read from disk here, so diagnostics
+/// can follow unsaved edits; the document is opened first when the session does
+/// not have it. The updated diagnostics arrive through the normal
+/// `VD_LSP_REQ_DIAGNOSTICS` request (the server publishes them).
+///
+/// Returns `VD_STATUS_READY` on success; `POLL_MISUSE` when the session id is
+/// unknown or the arguments are not valid UTF-8 strings (see
+/// `vd_service_error` for the reason).
+///
+/// # Safety
+///
+/// `service` must be null or live; `path` and `text` must be valid
+/// NUL-terminated strings.
+#[no_mangle]
+pub unsafe extern "C" fn vd_lsp_session_change(
+    service: *mut VdService,
+    session: u64,
+    path: *const c_char,
+    text: *const c_char,
+) -> i32 {
+    let Some(state) = service_state(service) else {
+        return POLL_MISUSE;
+    };
+    let Some(slot) = session_for(session) else {
+        state.record_error(VdError::new(VD_ERR_NOT_FOUND, "unknown LSP session id"));
+        return POLL_MISUSE;
+    };
+    // SAFETY: the caller supplies valid NUL-terminated strings or null.
+    let (Some(path), Some(text)) = ((unsafe { c_str(path) }), (unsafe { c_str(text) })) else {
+        state.record_error(VdError::new(
+            VD_ERR_INVALID_ARGUMENT,
+            "path and text must be valid UTF-8 strings",
+        ));
+        return POLL_MISUSE;
+    };
+    match slot.handle.change_document(Path::new(path), text.to_string()) {
+        Ok(()) => VD_STATUS_READY,
+        Err(error) => {
+            state.record_error(VdError::new(
+                VD_ERR_SERVICE,
+                &format!("cannot change the document: {error}"),
+            ));
+            POLL_MISUSE
+        }
+    }
+}
+
 /// Poll one request.
 ///
 /// `VD_STATUS_PENDING` while the worker is busy, `VD_STATUS_READY` with `out`

@@ -36,8 +36,8 @@ use std::time::{Duration, Instant};
 
 use anyhow::{anyhow, Result};
 use lsp_types::{
-    Diagnostic, DocumentSymbol, DocumentSymbolResponse, Location, Position, Range, TextEdit, Url,
-    WorkspaceEdit,
+    Diagnostic, DocumentSymbol, DocumentSymbolResponse, Location, Position, Range, TextEdit,
+    TextDocumentContentChangeEvent, Url, WorkspaceEdit,
 };
 use tokio::sync::mpsc;
 
@@ -245,6 +245,10 @@ enum RequestState {
 
 enum Command {
     Request { id: u64, request: SessionRequest },
+    /// Replace one tracked document's text with the caller's buffer (a
+    /// full-document `didChange`); this is how diagnostics follow the EDITOR
+    /// BUFFER instead of the bytes on disk.
+    Change { path: PathBuf, text: String },
     Stop,
 }
 
@@ -456,6 +460,23 @@ impl SessionHandle {
         Ok(id)
     }
 
+    /// Replace one document's tracked text with `text` (a full-document
+    /// `didChange`; the document is opened first when the session does not have
+    /// it). Nothing is read from disk: this is the editor-buffer path.
+    ///
+    /// # Errors
+    ///
+    /// When the session worker has already ended.
+    pub fn change_document(&self, path: &Path, text: String) -> Result<()> {
+        self.inner
+            .commands
+            .send(Command::Change {
+                path: path.to_path_buf(),
+                text,
+            })
+            .map_err(|_| anyhow!("the LSP session worker is not running"))
+    }
+
     /// Consume one finished request; `Unknown` once the id was polled.
     pub fn poll(&self, id: u64) -> PollOutcome {
         let mut requests = self.inner.lock_requests();
@@ -614,6 +635,19 @@ async fn session_loop(
                 let count = client.diagnostics().borrow().diagnostic_count();
                 inner.refresh_from(snapshot_generation, count);
             }
+            Command::Change { path, text } => {
+                let outcome = apply_buffer_change(&mut client, &path, text).await;
+                {
+                    let mut status = inner.lock_status();
+                    status.message = match &outcome {
+                        Ok(bytes) => format!("buffer changed ({} bytes): {}", bytes, path.display()),
+                        Err(error) => format!("buffer change failed: {error}"),
+                    };
+                }
+                let snapshot_generation = client.diagnostics_generation();
+                let count = client.diagnostics().borrow().diagnostic_count();
+                inner.refresh_from(snapshot_generation, count);
+            }
         }
     }
 
@@ -621,6 +655,32 @@ async fn session_loop(
         inner.lock_status().message = format!("shutdown reported: {error}");
     }
     inner.stopped();
+}
+
+/// Apply the editor buffer's text to one document: open it when the session does
+/// not have it, otherwise send a full-document `didChange`. Returns the byte
+/// length applied. Never touches the file on disk.
+async fn apply_buffer_change(client: &mut LspClient, path: &Path, text: String) -> Result<usize> {
+    let uri =
+        Url::from_file_path(path).map_err(|()| anyhow!("{} is not a file path", path.display()))?;
+    let bytes = text.len();
+    if client.is_open(&uri) {
+        client
+            .change_document(
+                &uri,
+                vec![TextDocumentContentChangeEvent {
+                    range: None,
+                    range_length: None,
+                    text,
+                }],
+            )
+            .await?;
+    } else {
+        client
+            .open_document(uri, language_id(path), text)
+            .await?;
+    }
+    Ok(bytes)
 }
 
 async fn serve(client: &mut LspClient, request: SessionRequest) -> Result<SessionResponse> {

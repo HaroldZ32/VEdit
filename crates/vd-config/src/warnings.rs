@@ -33,6 +33,11 @@ pub enum WarningCode {
     #[serde(rename = "filelist.duplicate_entry")]
     FilelistDuplicateEntry,
     /// The upward `.rules.verible_lint` search ended without a hit.
+    ///
+    /// Retained for the `--print-config` machine contract (external scripts may
+    /// still name it). The normal path no longer emits it: a missing optional
+    /// rules file is not a defect, verible falls back to its built-in rule set
+    /// (T114).
     #[serde(rename = "rules.search_stopped")]
     RulesSearchStopped,
     /// A `vedit.toml` was rejected (syntax or schema); lower layers were kept.
@@ -47,6 +52,12 @@ pub enum WarningCode {
     /// An XDG variable was present but unusable (relative path, missing HOME).
     #[serde(rename = "xdg.invalid")]
     XdgInvalid,
+    /// A `.rules.verible_lint` exists but cannot be read (permissions, I/O, or
+    /// the name is not a regular file). Unlike a *missing* rules file this is a
+    /// real, actionable problem; the message never contains an absolute user
+    /// path and the built-in rule set is used meanwhile (T114).
+    #[serde(rename = "rules.unreadable")]
+    RulesUnreadable,
 }
 
 impl WarningCode {
@@ -65,6 +76,7 @@ impl WarningCode {
             Self::ConfigUnknownKey => "config.unknown_key",
             Self::ConfigInvalidValue => "config.invalid_value",
             Self::XdgInvalid => "xdg.invalid",
+            Self::RulesUnreadable => "rules.unreadable",
         }
     }
 }

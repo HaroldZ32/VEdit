@@ -248,6 +248,11 @@ impl LspClient {
         self.send_did_open(&server, &document)
     }
 
+    /// True when this client already opened `uri` (a later change can reuse it).
+    pub fn is_open(&self, uri: &Url) -> bool {
+        self.documents.contains(uri)
+    }
+
     /// Apply incremental changes to a tracked document.
     pub async fn change_document(
         &mut self,
