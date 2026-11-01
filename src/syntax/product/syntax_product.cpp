@@ -164,6 +164,8 @@ static void veditSyntaxProductStartup()
 {
     vedit::syntax::product::initialize();
     vedit::syntax::product::noteStartupHook();
-    qInfo().noquote() << "syntax-product:" << vedit::syntax::product::describe();
+    if (!qEnvironmentVariableIsSet("VEDIT_QUIET")) {
+        qInfo().noquote() << "syntax-product:" << vedit::syntax::product::describe();
+    }
 }
 Q_COREAPP_STARTUP_FUNCTION(veditSyntaxProductStartup)
