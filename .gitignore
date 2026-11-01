@@ -40,6 +40,13 @@ evidence/fim/real-endpoint/harness/target/
 probes/*/build/
 # Abandoned GTK spike build tree (1.4G, kept on disk, never versioned).
 build/gui-spike/
+# CentOS 7 on-machine verification (T83): build/centos7-verify/build-tarball.sh
+# assembles these on every run. The scripts (build-tarball.sh,
+# verify-centos7.sh), STEPS.md and the samples/verilog-demo fixture are inputs
+# and stay tracked.
+build/centos7-verify/AppDir/
+build/centos7-verify/stage/
+build/centos7-verify/dist/
 # CMake/Ninja output directories that appear inside lane sources.
 **/CMakeFiles/
 **/CMakeCache.txt
