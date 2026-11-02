@@ -1,0 +1,43 @@
+generated: 2026-11-02T03:46:07Z
+git_head: 8d568b36028701df7a8db77508952c67ee99a9d9
+
+## 交付产物
+path: packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage
+size_bytes: 110443000
+sha256: f9e5c47d8de9aa226622c77cc61d700a6062a1a1b3bfafcbfcb56ad8e4caa250
+built_from_head: 8d568b36028701df7a8db77508952c67ee99a9d9
+PACKAGING-EXIT=0   steps_failed=0
+
+## 四容器矩阵
+HOSTMATRIX-EXIT=0
+ROW docker.m.daocloud.io/library/centos:7 uname=7.0.0-38-generic glibc=ldd (GNU libc) 2.17 selfcheck=PASS startup=PASS lint=PASS
+ROW docker.m.daocloud.io/library/ubuntu:24.04 uname=7.0.0-38-generic glibc=ldd (Ubuntu GLIBC 2.39-0ubuntu8.9) 2.39 selfcheck=PASS startup=PASS lint=PASS
+ROW docker.m.daocloud.io/library/rockylinux:9 uname=7.0.0-38-generic glibc=ldd (GNU libc) 2.34 selfcheck=PASS startup=PASS lint=PASS
+ROW docker.m.daocloud.io/library/ubuntu:26.04 uname=7.0.0-38-generic glibc=ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43 selfcheck=PASS startup=PASS lint=PASS
+
+## 包内复验（captain 指定两条）
+① fold.native.*：24 条全部 PASS
+② close.*：18 条全部 PASS
+CHECK close.button.present PASS
+CHECK close.button.single-view PASS
+CHECK close.button.split PASS
+CHECK close.command.exists PASS
+CHECK close.command.in-view PASS
+CHECK close.command.shortcut-ctrl-w PASS
+CHECK close.last-pane.active PASS
+CHECK close.last-pane.keeps-one PASS
+CHECK close.last-single-view PASS
+CHECK close.pane-count PASS
+CHECK close.remaining-editable PASS
+CHECK close.reverse-control PASS
+CHECK close.shortcuts.binding-count PASS
+CHECK close.shortcuts.no-conflicts PASS
+CHECK close.split.editor-editable PASS
+CHECK close.split.pane-count PASS
+CHECK close.unsaved.blocked PASS
+CHECK close.unsaved-saved-close PASS
+
+③ 内联标注（删逗号 → stderr 'diagnostics: 1 inline annotation(s)'）：**未完成**
+   原因：该包仍没有 File→Open / 位置参数入口（T137 才补），无 --project 时应用不打开任何文件，也就不会触发诊断分析。
+   实测：AppImage 在 stock centos:7 里 --hold 6000 正常启动并 exit 0，stderr 只有 locale 兜底与 Qt 提示（14-inline-annotation-check.log）。
+   因此本条**不能声称通过**；需等 T137 的打开入口，或由用户在 GUI 里点文件树验证。
