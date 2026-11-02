@@ -23,7 +23,6 @@
 #include "kernel/edit_core_selftest.h"
 #include "kernel/ktexteditor_provider.h"
 #include "../editor/kernel/fold_breadcrumb.h"
-#include "../syntax/folding/fold_injector.h"
 #include "../syntax/provider/syntax_service.h"
 #include <KTextEditor/Document>
 #include <KTextEditor/View>
@@ -748,135 +747,64 @@ int runSelfCheck()
         }
     }
 
-    // --- T94: folding + breadcrumb wired into the live editor ----------------
-    // A real ApplicationShell + the real KTextEditor provider, a 1000-line .sv,
-    // and the two acceptance assertions: the folds really appear (975 hidden
-    // lines, T29's closed-state expectation) and an invalid range is still
-    // refused (A1 is not bypassed by the wiring).
+    // --- T94/T128: breadcrumb wired; folding is KDE-NATIVE (no injection) ----
+    // T127's xcb experiment proved the gutter marker folds/unfolds in both
+    // directions with our build; VEdit therefore injects nothing, and a file
+    // opens with no auto-folds. These checks lock the new contract: no automatic
+    // folding, breadcrumb intact, and the same-pane second open + cursor moves
+    // (the T117/T121 crash triggers) are safe.
     {
-        // Give the pane enough vertical room to display every collapsed module
-        // line, so the viewport-relative observation covers the whole document
-        // (the lane's acceptance used a 1200x900 standalone view).
         shell->resize(1500, 1200);
         pump();
         EditorPane *foldPane = shell->editorArea()->splitActive(Qt::Horizontal);
         pump();
-        check("fold.wiring.pane", foldPane != nullptr);
+        check("fold.native.pane", foldPane != nullptr);
         if (foldPane != nullptr) {
             const QString foldPath = temp.path() + QStringLiteral("/fold-1000.sv");
             writeFile(foldPath, largeSystemVerilogSample());
             QString foldError;
-            check("fold.wiring.open", foldPane->openFile(foldPath, &foldError));
+            check("fold.native.open", foldPane->openFile(foldPath, &foldError));
             pump();
             KTextEditor::View *foldView = vedit::editor::viewFor(foldPane->editorWidget());
             KTextEditor::Document *foldDocument =
                 vedit::editor::documentFor(foldPane->editorWidget());
-            check("fold.wiring.view", foldView != nullptr && foldDocument != nullptr);
-            check("fold.wiring.highlight-mode",
+            check("fold.native.view", foldView != nullptr && foldDocument != nullptr);
+            check("fold.native.highlight-mode",
                   foldDocument != nullptr
                       && foldDocument->highlightingMode() == QStringLiteral("SystemVerilog"),
                   foldDocument != nullptr ? foldDocument->highlightingMode() : QString());
             auto *binding =
                 vedit::editor::FoldBreadcrumbBinding::instanceFor(foldPane->editorWidget());
-            check("fold.wiring.binding", binding != nullptr);
+            check("fold.native.binding", binding != nullptr);
             if (binding != nullptr && foldView != nullptr) {
-                check("fold.wiring.firstopen-full-count",
-                      binding->injector()->fullCount() == 1,
-                      QStringLiteral("full_count=%1")
-                          .arg(static_cast<unsigned long long>(
-                              binding->injector()->fullCount())));
+                // No VEdit-side folding: the view must not hide anything on open.
+                const int firstReal = foldView->firstDisplayedLine(KTextEditor::View::RealLine);
+                const int lastReal = foldView->lastDisplayedLine(KTextEditor::View::RealLine);
+                const int firstVisible =
+                    foldView->firstDisplayedLine(KTextEditor::View::VisibleLine);
+                const int lastVisible =
+                    foldView->lastDisplayedLine(KTextEditor::View::VisibleLine);
+                const int hidden = (lastReal - firstReal) - (lastVisible - firstVisible);
+                check("fold.native.no-auto-folds", hidden == 0,
+                      QStringLiteral("hidden=%1").arg(hidden));
 
-                // Closed state (tree-sitter OFF): the XML-derived ranges fold the
-                // file; 975 = 25 modules * 39 hidden lines (T29's expectation).
-                const vedit::folding::ViewObservation before =
-                    vedit::folding::observeView(foldView);
-                binding->setTreeSitterEnabled(false);
-                foldView->setCursorPosition(KTextEditor::Cursor(0, 0));
-                pump();
-                const vedit::folding::ViewObservation closed =
-                    vedit::folding::observeView(foldView);
-                std::printf("FOLD-WIRING before_state first_real=%d last_real=%d "
-                            "first_visible=%d last_visible=%d hidden=%d scroll_max=%d\n",
-                            before.firstDisplayedRealLine, before.lastDisplayedRealLine,
-                            before.firstDisplayedVisibleLine, before.lastDisplayedVisibleLine,
-                            before.hiddenInViewport, before.scrollMax);
-                std::printf("FOLD-WIRING closed_state first_real=%d last_real=%d "
-                            "first_visible=%d last_visible=%d full_count=%llu injected_ranges=%d "
-                            "hidden_in_viewport=%d scroll_max=%d tree_sitter=%d\n",
-                            closed.firstDisplayedRealLine, closed.lastDisplayedRealLine,
-                            closed.firstDisplayedVisibleLine, closed.lastDisplayedVisibleLine,
-                            static_cast<unsigned long long>(binding->injector()->fullCount()),
-                            static_cast<int>(binding->injector()->registry().size()),
-                            closed.hiddenInViewport, closed.scrollMax,
-                            binding->treeSitterEnabled() ? 1 : 0);
-                check("fold.wiring.closed.observed", closed.hiddenInViewport > 0);
-                check("fold.wiring.closed.hidden-975", closed.hiddenInViewport == 975,
-                      QStringLiteral("hidden=%1").arg(closed.hiddenInViewport));
-                check("fold.wiring.closed.registry-200",
-                      binding->injector()->registry().size() == 200,
-                      QStringLiteral("registry=%1")
-                          .arg(static_cast<int>(binding->injector()->registry().size())));
-                check("fold.wiring.closed.no-rejects",
-                      binding->injector()->rejectedCount() == 0);
-
-                // A1 is not bypassed: an invalid range never folds (T19 proves
-                // the exec fallback would fold the user's selection instead).
-                const quint64 rejectsBefore = binding->injector()->rejectedCount();
-                const int injectedInvalid =
-                    binding->injector()->inject({vedit::folding::FoldRange{5, 5}});
-                check("fold.wiring.a1-invalid-rejected",
-                      injectedInvalid == 0
-                          && binding->injector()->rejectedCount() == rejectsBefore + 1,
-                      QStringLiteral("injected=%1 rejected=%2")
-                          .arg(injectedInvalid)
-                          .arg(static_cast<unsigned long long>(
-                              binding->injector()->rejectedCount())));
-
-                // Typing must never rebuild folds (A2.1). Key events reach the
-                // view, the binding counts them, full_count stays flat.
-                const quint64 fullBeforeKeys = binding->injector()->fullCount();
-                const quint64 keysBefore = binding->injector()->keyEventCount();
-                for (int i = 0; i < 50; ++i) {
-                    QKeyEvent key(QEvent::KeyPress, Qt::Key_Left, Qt::NoModifier);
-                    QCoreApplication::sendEvent(foldView, &key);
-                }
-                pump();
-                std::printf("FOLD-WIRING key_path full_count=%llu key_events=%llu\n",
-                            static_cast<unsigned long long>(
-                                binding->injector()->fullCount()),
-                            static_cast<unsigned long long>(
-                                binding->injector()->keyEventCount()));
-                check("fold.wiring.no-rebuild-on-keys",
-                      binding->injector()->fullCount() == fullBeforeKeys
-                          && binding->injector()->keyEventCount() >= keysBefore + 50);
-
-                // Tree-sitter back ON: folds from the parse; the breadcrumb
-                // follows the cursor into the function body of module m0.
-                binding->setTreeSitterEnabled(true);
-                pump();
-                check("fold.wiring.toggle-on-rebuild",
-                      binding->injector()->fullCount() == fullBeforeKeys + 1,
-                      QStringLiteral("full_count=%1")
-                          .arg(static_cast<unsigned long long>(
-                              binding->injector()->fullCount())));
+                // Breadcrumb still follows the cursor into the function body.
                 foldView->setCursorPosition(KTextEditor::Cursor(7, 4));
                 pump();
-                std::printf("FOLD-WIRING breadcrumb describe='%s' bar='%s'\n",
+                std::printf("FOLD-NATIVE breadcrumb describe='%s' bar='%s'\n",
                             qPrintable(binding->breadcrumbDescribe()),
                             qPrintable(foldPane->breadcrumbText()));
-                check("fold.wiring.breadcrumb.describe",
+                check("fold.native.breadcrumb.describe",
                       binding->breadcrumbDescribe()
                           == QStringLiteral("module:m0 > function:inc"),
                       binding->breadcrumbDescribe());
-                check("fold.wiring.breadcrumb.pane-bar",
+                check("fold.native.breadcrumb.pane-bar",
                       foldPane->breadcrumbText().contains(QStringLiteral("m0 > inc")),
                       foldPane->breadcrumbText());
 
-                // Tree-sitter OFF again: no semantic source -> EMPTY path, the
-                // bar hides; no invented text heuristic (T19's contract).
                 binding->setTreeSitterEnabled(false);
                 pump();
-                check("fold.wiring.breadcrumb.no-invention",
+                check("fold.native.breadcrumb.no-invention",
                       binding->breadcrumbDescribe().isEmpty()
                           && foldPane->breadcrumbText().isEmpty(),
                       QStringLiteral("describe='%1' bar='%2'")
@@ -884,24 +812,27 @@ int runSelfCheck()
                 binding->setTreeSitterEnabled(true);
                 pump();
 
-                // Ordinary text edits do NOT rebuild folds (A2.1); the third
-                // allowed trigger (Reparsed) is explicit and counts exactly once.
-                const quint64 fullBeforeEdit = binding->injector()->fullCount();
-                foldDocument->insertText(KTextEditor::Cursor(0, 0),
-                                        QStringLiteral("// edited by the selfcheck\n"));
+                // T117/T121 triggers: move the cursor across the document, then
+                // open a SECOND file in the same pane. With no injected folds
+                // there is no hidden-line cursor move and no fold state to carry
+                // across setText().
+                for (int line = 0; line < foldDocument->lines(); line += 137) {
+                    foldView->setCursorPosition(KTextEditor::Cursor(line, 0));
+                    pump();
+                }
+                const QString secondPath = temp.path() + QStringLiteral("/fold-second.sv");
+                writeFile(secondPath, largeSystemVerilogSample());
+                check("fold.native.second-open", foldPane->openFile(secondPath, &foldError),
+                      foldError);
                 pump();
-                check("fold.wiring.no-rebuild-on-edit",
-                      binding->injector()->fullCount() == fullBeforeEdit,
-                      QStringLiteral("full_count=%1")
-                          .arg(static_cast<unsigned long long>(
-                              binding->injector()->fullCount())));
-                binding->notifyReparsed();
-                pump();
-                check("fold.wiring.reparsed-trigger",
-                      binding->injector()->fullCount() == fullBeforeEdit + 1,
-                      QStringLiteral("full_count=%1")
-                          .arg(static_cast<unsigned long long>(
-                              binding->injector()->fullCount())));
+                KTextEditor::View *secondView = vedit::editor::viewFor(foldPane->editorWidget());
+                check("fold.native.second-view", secondView != nullptr);
+                if (secondView != nullptr) {
+                    secondView->setCursorPosition(
+                        KTextEditor::Cursor(secondView->document()->lines() - 1, 0));
+                    pump();
+                    check("fold.native.second-cursor", secondView->cursorPosition().line() >= 0);
+                }
             }
             shell->editorArea()->closeActivePane();
             pump();
