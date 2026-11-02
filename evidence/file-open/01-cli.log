@@ -1,0 +1,17 @@
+== T137 positional CLI on the built product binary ==
+collected_at: 2026-11-02T03:42:20Z
+git_head: a0adfb99ab880c2d5c33399e2caa1548d1586eff
+--- valid single file (offscreen, --hold) ---
+open.paths: opened 1 file(s): /vedit-build/evidence/file-open/fixtures/hello.sv
+VALID-EXIT=0
+--- missing path (must be readable + nonzero) ---
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+vedit-app: cannot open /tmp/definitely-missing-t137.sv: no such file or directory
+MISSING-EXIT=2
+--- directory path (must be readable + nonzero) ---
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+vedit-app: cannot open /tmp: not a regular file
+DIR-EXIT=2
+--- two files (each additional split) ---
+open.paths: opened 2 file(s): /vedit-build/evidence/file-open/fixtures/hello.sv, /vedit-build/evidence/file-open/fixtures/second.v
+MULTI-EXIT=0

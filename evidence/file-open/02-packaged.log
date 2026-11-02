@@ -1,0 +1,22 @@
+== T137 packaged test (rebuilt test AppImage; NOT delivery) ==
+collected_at: 2026-11-02T03:45:16Z
+git_head: 8d568b36028701df7a8db77508952c67ee99a9d9
+bytes: 110447096
+sha256: 4016d70f12b75cf7117cc25e9d39a6a15166fa9b9b5cf1406fa991a130e9ef1e
+--- file argument ---
+AppRun: locale 'unset' (ANSI_X3.4-1968) -> 'C.UTF-8' (bundled UTF-8 fallback)
+open.paths: opened 1 file(s): /fixtures/hello.sv
+PACKAGED-VALID-EXIT=0
+--- --project + file ---
+open.paths: opened 1 file(s): /fixtures/second.v
+PACKAGED-PROJECT-EXIT=0
+--- missing path ---
+vedit-app: cannot open /no-such-t137.sv: no such file or directory
+PACKAGED-MISSING-EXIT=2
+--- selfcheck ---
+APP-SHELL-SELFTEST ok=1 checks=245 failures=0 state=/tmp/vedit-app-xFzzzp/state
+PACKAGED-SELFCHECK-EXIT=0
+--- desktop MIME ---
+Exec=AppRun %F
+MimeType=text/x-svsrc;text/x-verilog;text/x-systemverilog;text/x-verilog-src;text/x-systemverilog-src;text/verilog;
+DESKTOP-EXIT=0

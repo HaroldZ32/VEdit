@@ -1,0 +1,8 @@
+== T137 root gates ==
+collected_at: 2026-11-02T03:45:26Z
+--- ctest ---
+100% tests passed, 0 tests failed out of 31
+
+Total Test time (real) =  37.82 sec
+CTEST-EXIT=0
+--- typecheck ---

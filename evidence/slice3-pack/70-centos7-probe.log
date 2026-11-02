@@ -7,17 +7,17 @@ TOOLCHAIN source=verible:bundled slang:bundled missing=[] local=[]
 CHECK empty.no-project-label PASS
 CHECK empty.one-pane PASS
 CHECK empty.window-title PASS
-CHECK panels.registry.six PASS
+CHECK panels.no-settings-dock PASS
+CHECK panels.registry.five PASS
 CHECK panels.registered.file-tree PASS
 CHECK panels.registered.search PASS
 CHECK panels.registered.terminal PASS
 CHECK panels.registered.vcs PASS
-CHECK panels.registered.settings PASS
 CHECK panels.registered.outline PASS
 CHECK panels.none-inserted-by-default PASS
 This plugin does not support propagateSizeHints()
-This plugin does not support propagateSizeHints()
 CHECK panels.show.file-tree PASS
+This plugin does not support propagateSizeHints()
 CHECK panels.toggle-hide.file-tree PASS
 This plugin does not support propagateSizeHints()
 CHECK panels.toggle-show.file-tree PASS
@@ -37,18 +37,20 @@ This plugin does not support propagateSizeHints()
 CHECK panels.toggle-hide.vcs PASS
 CHECK panels.toggle-show.vcs PASS
 This plugin does not support propagateSizeHints()
-CHECK panels.show.settings PASS
-This plugin does not support propagateSizeHints()
-CHECK panels.toggle-hide.settings PASS
-This plugin does not support propagateSizeHints()
-CHECK panels.toggle-show.settings PASS
 CHECK panels.show.outline PASS
+This plugin does not support propagateSizeHints()
 CHECK panels.toggle-hide.outline PASS
+This plugin does not support propagateSizeHints()
 CHECK panels.toggle-show.outline PASS
-CHECK panels.six-docks PASS
+CHECK panels.five-docks PASS
 CHECK menus.file PASS
 CHECK menus.view PASS
+CHECK menus.settings PASS
 CHECK menus.help PASS
+CHECK settings.preferences.exists PASS
+CHECK settings.preferences.menu PASS
+CHECK settings.preferences.shortcut PASS Ctrl+,
+CHECK settings.preferences.unique-shortcut PASS bindings=1
 CHECK commands.action.file.new-layout PASS
 CHECK commands.action.file.close-pane PASS
 CHECK commands.action.file.quit PASS
@@ -61,6 +63,51 @@ CHECK commands.action.view.panel.file-tree PASS
 CHECK commands.action.view.panel.outline PASS
 CHECK commands.file-menu-actions PASS
 CHECK commands.view-panel-actions-checkable PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panels.sync.closed.file-tree PASS
+This plugin does not support propagateSizeHints()
+CHECK panels.sync.action-show.file-tree PASS
+CHECK panels.sync.close-clears-check.file-tree PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panels.sync.one-click-reopen.file-tree PASS
+CHECK panels.sync.closed.search PASS
+CHECK panels.sync.action-show.search PASS
+CHECK panels.sync.close-clears-check.search PASS
+CHECK panels.sync.one-click-reopen.search PASS
+This plugin does not support propagateSizeHints()
+CHECK panels.sync.closed.terminal PASS
+This plugin does not support propagateSizeHints()
+CHECK panels.sync.action-show.terminal PASS
+This plugin does not support propagateSizeHints()
+CHECK panels.sync.close-clears-check.terminal PASS
+This plugin does not support propagateSizeHints()
+CHECK panels.sync.one-click-reopen.terminal PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panels.sync.closed.vcs PASS
+This plugin does not support propagateSizeHints()
+CHECK panels.sync.action-show.vcs PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panels.sync.close-clears-check.vcs PASS
+CHECK panels.sync.one-click-reopen.vcs PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panels.sync.closed.outline PASS
+CHECK panels.sync.action-show.outline PASS
+This plugin does not support propagateSizeHints()
+CHECK panels.sync.close-clears-check.outline PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panels.sync.one-click-reopen.outline PASS
+This plugin does not support propagateSizeHints()
+CHECK panels.sync.reverse-precondition PASS
+This plugin does not support propagateSizeHints()
+CHECK panels.sync.reverse-control PASS
+This plugin does not support propagateSizeHints()
 This plugin does not support propagateSizeHints()
 CHECK split.horizontal.pane-count PASS
 CHECK split.horizontal.root-orientation PASS
@@ -79,6 +126,42 @@ This plugin does not support propagateSizeHints()
 CHECK reset.one-pane PASS
 CHECK close.last-pane.keeps-one PASS
 CHECK close.last-pane.active PASS
+CHECK close.command.exists PASS
+CHECK close.command.in-view PASS
+CHECK close.command.shortcut-ctrl-w PASS
+CHECK close.shortcuts.no-conflicts PASS
+CHECK close.shortcuts.binding-count PASS
+This plugin does not support propagateSizeHints()
+[app-shell] Close Pane blocked: this pane has unsaved changes. Save it first (Ctrl+S).
+This plugin does not support propagateSizeHints()
+CHECK close.split.pane-count PASS
+CHECK close.split.editor-editable PASS
+CHECK close.unsaved.blocked PASS
+CHECK close.reverse-control PASS
+This plugin does not support propagateSizeHints()
+CHECK close.unsaved-saved-close PASS
+CHECK close.remaining-editable PASS
+CHECK close.last-single-view PASS
+This plugin does not support propagateSizeHints()
+CHECK close.button.split PASS
+CHECK close.button.present PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK close.button.single-view PASS
+CHECK open.command.exists PASS
+CHECK open.command.in-file-menu PASS
+CHECK open.command.shortcut-ctrl-o PASS
+CHECK open.fixture-a PASS
+CHECK open.fixture-b PASS
+CHECK open.missing.rejected PASS
+CHECK open.missing.nonzero-readable PASS
+CHECK open.multiple.ok PASS
+CHECK open.multiple.pane-count PASS
+CHECK open.multiple.paths PASS
+CHECK open.multiple.active-second PASS
+This plugin does not support propagateSizeHints()
+CHECK open.dialog.action-opens PASS
+This plugin does not support propagateSizeHints()
 This plugin does not support propagateSizeHints()
 CHECK theme.catalogue PASS
 CHECK theme.apply PASS
@@ -105,14 +188,13 @@ CHECK panel-seam.terminal-content PASS
 CHECK panel-seam.search-content PASS
 CHECK panel-seam.no-placeholder PASS
 CHECK panel-seam.editor-layout-restored PASS panes=2
-[app-shell] invalid shortcut store /tmp/vedit-app-TIFRFN/broken/shortcuts.json: illegal number
-[app-shell] invalid session /tmp/vedit-app-TIFRFN/broken/session.json: unterminated object
+[app-shell] invalid shortcut store /tmp/vedit-app-HHmTeR/broken/shortcuts.json: illegal number
+[app-shell] invalid session /tmp/vedit-app-HHmTeR/broken/session.json: unterminated object
 This plugin does not support propagateSizeHints()
 CHECK broken.config.survives PASS
 CHECK broken.config.diagnostics PASS
 This plugin does not support propagateSizeHints()
 CHECK stress.one-pane-initial PASS
-This plugin does not support propagateSizeHints()
 This plugin does not support propagateSizeHints()
 This plugin does not support propagateSizeHints()
 This plugin does not support propagateSizeHints()
@@ -138,7 +220,7 @@ CHECK save.shortcut.runtime-guard-authority PASS
 CHECK save.shortcut.runtime-guard-entry-point PASS removed=1 bindings=1
 CHECK save.shortcut.runtime-guard-timer PASS
 CHECK editor.pane.open PASS
-CHECK editor.pane.open-path PASS /tmp/vedit-app-TIFRFN/pane-open.v
+CHECK editor.pane.open-path PASS /tmp/vedit-app-HHmTeR/pane-open.v
 CHECK editor.pane.save PASS
 CHECK save.ktexteditor.document PASS
 CHECK save.shortcut.window PASS
@@ -163,8 +245,10 @@ This plugin does not support propagateSizeHints()
 This plugin does not support propagateSizeHints()
 This plugin does not support propagateSizeHints()
 This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
 CHECK fold.native.pane PASS
 CHECK fold.native.open PASS
+This plugin does not support propagateSizeHints()
 CHECK fold.native.view PASS
 CHECK fold.native.highlight-mode PASS SystemVerilog
 CHECK fold.native.binding PASS
@@ -184,7 +268,7 @@ CHECK editcore.undo.metaobject-slot PASS
 CHECK editcore.document.setText PASS
 CHECK editcore.open.fixture-written PASS
 CHECK editcore.open.file PASS
-CHECK editcore.open.records-path PASS /tmp/vedit-app-jJArtc/open.v
+CHECK editcore.open.records-path PASS /tmp/vedit-app-JkhBfM/open.v
 CHECK editcore.highlight.verilog.fixture PASS
 CHECK editcore.highlight.verilog.open PASS
 CHECK editcore.highlight.verilog.mode PASS mode='Verilog' expected='Verilog'
@@ -243,12 +327,12 @@ CHECK editcore.provider.id PASS ktexteditor
 CHECK editcore.provider.creates-view PASS
 CHECK editcore.provider.fixture PASS
 CHECK editcore.provider.open PASS
-CHECK editcore.provider.open-records-path PASS /tmp/vedit-app-KFXqbI/provider.v
+CHECK editcore.provider.open-records-path PASS /tmp/vedit-app-BgjUKH/provider.v
 CHECK editcore.provider.document PASS
 CHECK editcore.provider.save PASS
 CHECK editcore.provider.save-bytes PASS
 CHECK editcore.boundary.zero-calls PASS before=0 after=0
 CHECK editcore.boundary.counter-live PASS before=0 after=1
 EDIT-CORE-SELFTEST ok=1 checks=67 failures=0
-APP-SHELL-SELFTEST ok=1 checks=194 failures=0 state=/tmp/vedit-app-TIFRFN/state
+APP-SHELL-SELFTEST ok=1 checks=245 failures=0 state=/tmp/vedit-app-HHmTeR/state
 centos7_smoke_exit=0

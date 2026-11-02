@@ -1,5 +1,5 @@
 appimagetool sha256 OK (793fca0ce4bcc309dc65d3f66669f58e3755643e4dadbe03932e7b436128494f)
-SOURCE_DATE_EPOCH=1793587545
+SOURCE_DATE_EPOCH=1793591051
 $ appimagetool --no-appstream /home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/AppDir /home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage
 appimagetool, continuous build (git version b082d2e), build 333 built on 2026-10-29 19:15:25 UTC
 /home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/AppDir/vedit.desktop: hint: value item "TextEditor" in key "Categories" in group "Desktop Entry" can be extended with another category among the following categories: Utility
@@ -10,18 +10,18 @@ Downloading runtime file from https://github.com/AppImage/type2-runtime/releases
 Downloaded runtime binary of size 944632
 Parallel mksquashfs: Using 16 processors
 Creating 4.0 filesystem on /home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage, block size 131072.
-[=============================================================|] 2448/2448 100%
+[=============================================================\] 2460/2460 100%
 
 Exportable Squashfs 4.0 filesystem, zstd compressed, data block size 131072
 	compressed data, compressed metadata, compressed fragments,
 	compressed xattrs, compressed ids
 	duplicates are removed
-Filesystem size 106404.24 Kbytes (103.91 Mbytes)
-	35.87% of uncompressed filesystem size (296640.00 Kbytes)
-Inode table size 8623 bytes (8.42 Kbytes)
-	50.41% of uncompressed inode table size (17106 bytes)
-Directory table size 2866 bytes (2.80 Kbytes)
-	49.06% of uncompressed directory table size (5842 bytes)
+Filesystem size 106931.94 Kbytes (104.43 Mbytes)
+	35.86% of uncompressed filesystem size (298157.10 Kbytes)
+Inode table size 8641 bytes (8.44 Kbytes)
+	50.37% of uncompressed inode table size (17154 bytes)
+Directory table size 2875 bytes (2.81 Kbytes)
+	49.21% of uncompressed directory table size (5842 bytes)
 Number of duplicate files found 1
 Number of inodes 241
 Number of files 216
@@ -47,6 +47,6 @@ central directory of available AppImages, by opening a pull request
 at https://github.com/AppImage/appimage.github.io
 EXIT=0
 APPIMAGE=/home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage
-APPIMAGE_BYTES=109906424
-APPIMAGE_SHA256=2918210695d9aaaebccd0e687481f665fdc852b749f9347c465c35ee9a797795
+APPIMAGE_BYTES=110443000
+APPIMAGE_SHA256=f9e5c47d8de9aa226622c77cc61d700a6062a1a1b3bfafcbfcb56ad8e4caa250
 appimagetool exit=0
