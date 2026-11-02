@@ -1,0 +1,28 @@
+== 01-package-run.log — the FINAL AppImage on a syntax-error .sv, stock centos:7, extract-and-run ==
+collected_at=2026-11-02T11:57:21+08:00
+git_head=4e07e27463f3ee6c5a7f277162d102da1db61f26
+appimage=packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage
+appimage_sha256=de19746c62a9e633de85e40b34f41f7e70350ca14ba4be284a9adca9d544501d
+container=docker.m.daocloud.io/library/centos:7 (stock)
+fixture:
+  module bad;
+    logic a b;
+    always_comb begin
+      a = b;
+    end
+  endmodule
+
+--- command ---
+VEDIT_DEBUG=1 APPIMAGE_EXTRACT_AND_RUN=1 /test.AppImage /tmp/bad.sv --hold 8000
+
+AppRun: locale 'unset' (ANSI_X3.4-1968) -> 'C.UTF-8' (bundled UTF-8 fallback)
+KSH-ENV defs=2 hash=b31aa2cc1f717e2d5a03bbdad983f7487f8982803fe71fe243745a85454b2d37
+KSH-GUARD PASS whitelist=SystemVerilog,Verilog
+qt.qpa.xcb: could not connect to display 
+qt.qpa.plugin: From 6.5.0, xcb-cursor0 or libxcb-cursor0 is needed to load the Qt xcb platform plugin.
+qt.qpa.plugin: Could not load the Qt platform plugin "xcb" in "/tmp/appimage_extracted_7f68749426864131be92c0d04ac11068/plugins/platforms" even though it was found.
+This application failed to start because no Qt platform plugin could be initialized. Reinstalling the application may fix this problem.
+
+Available platform plugins are: wayland-brcm, wayland-egl, wayland, xcb, minimal, offscreen.
+
+APP_EXIT=127
