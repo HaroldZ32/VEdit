@@ -1,3 +1,5 @@
+# C9 (T137): collected_at=2026-11-02T03:48:09Z; git_head=fe2460da770a08be506d85afaeb3d81d40c08ee1; git_status_porcelain_sha256=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855; anchor=00-C9.txt
+
 # T137 — real file-open entry points (positional, File → Open, desktop MIME)
 
 ## What was missing
