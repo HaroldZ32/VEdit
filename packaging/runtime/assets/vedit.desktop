@@ -7,5 +7,5 @@ Exec=AppRun %F
 Icon=io.github.vedit.VEdit
 Terminal=false
 Categories=Development;IDE;TextEditor;
-MimeType=text/x-verilog-src;text/x-systemverilog-src;
+MimeType=text/x-verilog;text/x-systemverilog;text/x-verilog-src;text/x-systemverilog-src;text/verilog;
 X-AppImage-Version=@VERSION@
