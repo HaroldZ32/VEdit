@@ -10,6 +10,7 @@
 // `keymap.<command id>` entries. Nothing here opens a settings file directly.
 #include "settings_client.h"
 
+#include <QHash>
 #include <QKeySequence>
 #include <QString>
 #include <QStringList>
@@ -43,6 +44,18 @@ public:
 
     SettingsPanel(const SettingsPanel &) = delete;
     SettingsPanel &operator=(const SettingsPanel &) = delete;
+
+    // T132: when deferred (the modal dialog's mode), edits are applied live as a
+    // PREVIEW but nothing is written to the store; commitPending() persists and
+    // revertPending() restores the snapshot taken when deferred mode started.
+    // The default (false) keeps the old immediate-persist behaviour.
+    void setDeferredPersistence(bool deferred);
+    bool deferredPersistence() const { return deferred_; }
+    bool hasPendingChanges() const { return dirty_; }
+    // Persists the preview (Rust store + shortcut mirror) and re-snapshots.
+    void commitPending();
+    // Discards the preview: restores the theme and the shortcuts of the snapshot.
+    void revertPending();
 
     // Re-reads the Rust store and re-applies its values. Safe to call again after
     // the file was edited by hand (that is the bad-config recovery path).
@@ -89,6 +102,8 @@ private:
     void persist();
     void applyThemeFromEntries();
     void applyKeymapFromEntries();
+    void snapshotOriginal();
+    void restoreOriginalShortcuts();
     QString selectedCommand() const;
 
     vedit::app::ThemeManager *themes_ = nullptr;
@@ -96,6 +111,12 @@ private:
     std::unique_ptr<SettingsClient> client_;
     QVector<Entry> entries_;
     QStringList diagnostics_;
+    // T132 deferred-mode state.
+    bool deferred_ = false;
+    bool dirty_ = false;
+    QVector<Entry> committedEntries_;
+    QString originalTheme_;
+    QHash<QString, QKeySequence> originalShortcuts_;
 
     QComboBox *themeCombo_ = nullptr;
     QTableWidget *keyTable_ = nullptr;

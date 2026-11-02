@@ -22,6 +22,7 @@ set(CMAKE_AUTOMOC ON)
 
 set(VEDIT_WORKSPACE_SETTINGS_SOURCES
   settings_client.cpp
+  settings_dialog.cpp
   settings_panel.cpp
 )
 if(TARGET vedit_app_shell)

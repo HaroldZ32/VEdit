@@ -288,6 +288,14 @@ void SettingsPanel::persist()
     if (client_ == nullptr) {
         return;
     }
+    if (deferred_) {
+        // Preview only: the dialog decides when this becomes persistent.
+        dirty_ = true;
+        statusLabel_->setText(QStringLiteral("Preview — press Apply or OK to store it, "
+                                             "Cancel to discard."));
+        refreshWidgets();
+        return;
+    }
     // Mirror into the shortcut store the shell loads at startup (the existing Qt
     // persistence path); failure is a diagnostic, never fatal.
     if (commands_ != nullptr) {
@@ -310,6 +318,87 @@ void SettingsPanel::persist()
                                   .arg(client_->path()));
         refreshWidgets();
     });
+}
+
+void SettingsPanel::setDeferredPersistence(bool deferred)
+{
+    deferred_ = deferred;
+    if (deferred) {
+        snapshotOriginal();
+        committedEntries_ = entries_;
+        dirty_ = false;
+    }
+}
+
+void SettingsPanel::snapshotOriginal()
+{
+    originalTheme_ = themes_ != nullptr ? themes_->currentTheme() : QString();
+    originalShortcuts_.clear();
+    if (commands_ == nullptr) {
+        return;
+    }
+    for (const QString &command : commands_->ids()) {
+        const QAction *action = commands_->action(command);
+        if (action != nullptr) {
+            originalShortcuts_.insert(command, action->shortcut());
+        }
+    }
+}
+
+void SettingsPanel::restoreOriginalShortcuts()
+{
+    if (commands_ == nullptr) {
+        return;
+    }
+    if (commands_->store() != nullptr) {
+        for (auto it = originalShortcuts_.constBegin(); it != originalShortcuts_.constEnd(); ++it) {
+            if (it.value().isEmpty()) {
+                commands_->store()->clearShortcut(it.key());
+            } else {
+                commands_->store()->setShortcut(it.key(), it.value());
+            }
+        }
+        commands_->refreshShortcuts();
+    }
+}
+
+void SettingsPanel::commitPending()
+{
+    if (!deferred_) {
+        return;
+    }
+    // Write the preview through the Rust store (and the shortcut mirror), then
+    // the committed state becomes the new snapshot.
+    const QVector<Entry> entries = entries_;
+    entries_ = entries;
+    const bool wasDeferred = deferred_;
+    deferred_ = false;
+    persist();
+    deferred_ = wasDeferred;
+    dirty_ = false;
+    committedEntries_ = entries_;
+    snapshotOriginal();
+    statusLabel_->setText(QStringLiteral("Stored by the Rust service in %1").arg(client_->path()));
+    refreshWidgets();
+}
+
+void SettingsPanel::revertPending()
+{
+    if (!deferred_) {
+        return;
+    }
+    if (themes_ != nullptr && !originalTheme_.isEmpty()
+        && themes_->currentTheme() != originalTheme_) {
+        QString error;
+        if (!themes_->applyTheme(originalTheme_, &error)) {
+            addDiagnostic(error);
+        }
+    }
+    restoreOriginalShortcuts();
+    entries_ = committedEntries_;
+    dirty_ = false;
+    statusLabel_->setText(QStringLiteral("Changes discarded; nothing was stored."));
+    refreshWidgets();
 }
 
 void SettingsPanel::refreshWidgets()

@@ -1,8 +1,7 @@
 #include "settings_integration.h"
 
 #include "app_shell.h"
-#include "panel_registry.h"
-#include "settings_panel.h"
+#include "settings_dialog.h"
 
 #include <QDebug>
 #include <QDir>
@@ -24,11 +23,14 @@ void installSettings(vedit::app::ApplicationShell &shell, const IntegrationOptio
         directory = QDir::homePath() + QStringLiteral("/.config/vedit");
     }
     const QString path = directory + QStringLiteral("/settings.toml");
+    // T132: settings are a MODAL Preferences dialog (Settings -> Preferences...,
+    // Ctrl+,), not a dock panel. The shell owns the menu command and calls the
+    // opener installed here; this lane owns the dialog + the Rust store.
     vedit::app::ApplicationShell *shellPtr = &shell;
-    const auto factory = [shellPtr, path]() {
-        return new settings::SettingsPanel(shellPtr->themes(), shellPtr->commands(), path);
-    };
-    shell.panels()->setFactory(QStringLiteral("settings"), factory);
+    shell.setPreferencesOpener([shellPtr, path]() {
+        settings::SettingsDialog dialog(shellPtr->themes(), shellPtr->commands(), path, shellPtr);
+        dialog.exec();
+    });
     if (qEnvironmentVariableIsSet("VEDIT_DEBUG")) {
         qInfo("settings: installSettings file='%s'", qPrintable(path));
     }
