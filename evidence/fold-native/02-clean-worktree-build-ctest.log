@@ -1,0 +1,19 @@
+# C9 evidence header
+collected_at: 2026-11-02T10:38:34+08:00
+collected_at_utc: 2026-11-02T02:38:34+00:00
+git_head: 9a9bb43d3c0035f0618d89b9e28082d9bd1e0a01
+clean_worktree: target/t128-clean (HEAD + T128 changes copied in)
+---
+## clean worktree: full build + ctest + typecheck
+
+CFG-EXIT=0
+FAILED: [code=1] src/app/workspace-lane-diagnostics/vedit-workspace-diagnostics-selftest 
+collect2: error: ld returned 1 exit status
+BUILD-EXIT=1
+	  9 - vedit-syntax-overlay-selftest (Failed)
+	 10 - vedit-app-ffi-abi-selftest (Not Run)
+	 11 - vedit-app-shell-selftest (Not Run)
+	 13 - vedit-app-crash-report-shipped (Failed)
+	 23 - vedit-workspace-search-selftest (Not Run)
+	 25 - vedit-workspace-diagnostics-selftest (Not Run)
+Errors while running CTest
