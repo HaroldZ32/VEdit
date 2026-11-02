@@ -73,6 +73,10 @@ chmod +x /tmp/VEdit-0.1.1-x86_64.AppImage
 - **VCS 面板**：三个读全部异步 job，GUI 线程永不跑 `git`/`svn` 子进程；无写入口。
 - **FIM**：默认关闭；未配置时零网络（syscall 级证明）。
 - **CI**：该分支未配置 workflow，`gh pr checks` 为 `no checks reported`。
+- **诊断入口的发现性仍有改进空间**（用户实机确认后的记录，属下一版工作）：
+  - 诊断内容目前显示在 **Outline 面板**内，`View` 菜单里**没有**独立的 `Diagnostics` 项；
+  - 建议下一版增加 `View → Diagnostics`（Ctrl+Alt+D），或把 Outline 改名为 **「Outline / Diagnostics」**；
+  - **不影响本版交付** —— 用户明确表示「这玩意儿在 outline 里，也不能算有问题」。
 
 ## 6. 构建方式
 
@@ -104,7 +108,7 @@ bash packaging/runtime/build.sh     # -> packaging/runtime/out/VEdit-0.1.1-x86_6
 
 1. **`.f` ↔ `.v` 来回切 20 次不崩**
 2. **删一个逗号（不保存）** → 编辑器行首 **✖** + 面板明细 + 状态行计数
-3. **`View → Diagnostics`（Ctrl+Alt+D）** 入口存在
+3. **诊断在哪里**：`View` 菜单中**没有**独立的 `Diagnostics` 项（T131 曾计划 `View → Diagnostics` + `Ctrl+Alt+D`，用户在最终 AppImage 上**未观察到该项**）；诊断明细与计数**显示在 Outline 面板内**（T131 的明细列表 + 状态行计数），编辑器内的行级标注（✖/⚠/ℹ + 悬停 `message [rule]`）**正常工作**。**用户已确认这不算问题。**
 4. **gutter 折叠标记双向可用、不崩**
 5. **中文注释 / 文件名不方块**
 6. **`vd-app <file>` 与双击 `.sv` 能打开**
