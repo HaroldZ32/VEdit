@@ -19,10 +19,15 @@
 #include "app_shell.h"
 #include "editor_area.h"
 #include "editor_provider.h"
+#include "diagnostics_annotations.h"
+#include "ktexteditor_provider.h"
 #include "panel_registry.h"
 
 #include <KTextEditor/Document>
 #include <KTextEditor/View>
+
+#include <QImage>
+#include <QPixmap>
 
 #include <QApplication>
 #include <QCoreApplication>
@@ -75,17 +80,6 @@ bool waitUntil(const std::function<bool()> &done, int timeoutMs)
     return true;
 }
 
-QString bufferText(QWidget *editor)
-{
-    if (auto *view = qobject_cast<KTextEditor::View *>(editor)) {
-        return view->document() != nullptr ? view->document()->text() : QString();
-    }
-    if (auto *plain = qobject_cast<QPlainTextEdit *>(editor)) {
-        return plain->toPlainText();
-    }
-    return QString();
-}
-
 void setBufferText(QWidget *editor, const QString &text)
 {
     if (auto *view = qobject_cast<KTextEditor::View *>(editor)) {
@@ -128,10 +122,14 @@ int main(int argc, char **argv)
     options.stateDir = dir.path() + QStringLiteral("/state");
     options.restoreSession = false;
     options.showDefaultPanels = false;
-    // The provider outlives the shell (declared first, destroyed last).
-    vedit::app::DemoEditorProvider provider;
+    // The PRODUCT editor (KTextEditor): inline annotations only exist on a real
+    // KTextEditor::View. The provider outlives the shell (declared first).
+    std::unique_ptr<vedit::app::EditorProvider> provider = vedit::editor::makeEditCoreProvider();
+    check("seam.edit-core-provider", provider != nullptr);
     std::unique_ptr<vedit::app::ApplicationShell> shell(new vedit::app::ApplicationShell(options));
-    shell->editorArea()->setProvider(&provider);
+    if (provider != nullptr) {
+        shell->editorArea()->setProvider(provider.get());
+    }
     shell->editorArea()->ensurePane();
     vedit::workspace::IntegrationOptions integration;
     integration.projectRoot = QString(); // the double-click case: no project at all
@@ -200,7 +198,76 @@ int main(int argc, char **argv)
         }
         check("seam.disk-untouched", disk == goodText,
               QStringLiteral("disk=%1 bytes").arg(disk.size()));
-        Q_UNUSED(bufferText(editor));
+        check("seam.panel-lists-the-issue", panel->issueRowCount() > 0,
+              QString::number(panel->issueRowCount()));
+
+        // T131: the same diagnostics must be INLINE in the editor (annotation border).
+        auto *view = qobject_cast<KTextEditor::View *>(editor);
+        check("seam.ktexteditor-view", view != nullptr);
+        if (view != nullptr) {
+            auto *annotations = vedit::editor::DiagnosticsAnnotations::forView(view);
+            check("seam.annotations-installed", annotations != nullptr);
+            if (annotations != nullptr) {
+                // The bridge pushes on its own 300 ms tick: give it a moment.
+                waitUntil([annotations]() { return annotations->annotatedLineCount() > 0; }, 5000);
+            }
+            if (annotations != nullptr) {
+                const int lines = annotations->annotatedLineCount();
+                const QString tooltip = annotations->tooltipForLine(1); // "logic a b;" is line 1
+                std::printf("OBSERVED seam.annotation_lines=%d tooltip='%s'\n", lines,
+                            tooltip.toUtf8().constData());
+                check("seam.annotation-on-error-line", lines >= 1 && !tooltip.isEmpty(), tooltip);
+                check("seam.annotation-tooltip-has-syntax",
+                      tooltip.contains(QStringLiteral("syntax"), Qt::CaseInsensitive), tooltip);
+            }
+        }
+
+        // Pixel evidence: the window with the inline marker AND the diagnostics
+        // panel visible in one frame.
+        const QString shotPath = qEnvironmentVariable("VEDIT_SEAM_SCREENSHOT");
+        if (!shotPath.isEmpty()) {
+            const QPixmap shot = shell->grab();
+            check("seam.screenshot-saved", !shot.isNull() && shot.save(shotPath),
+                  QStringLiteral("%1 (%2x%3)").arg(shotPath).arg(shot.width()).arg(shot.height()));
+        }
+    }
+
+    // ---- reverse control: without ActiveFileWatcher the same open does NOT
+    // analyse anything (so step 1 of the acceptance is not vacuous).
+    {
+        qputenv("VEDIT_NO_ACTIVE_FILE_WATCHER", "1");
+        vedit::app::ShellOptions options2;
+        options2.stateDir = dir.path() + QStringLiteral("/state2");
+        options2.restoreSession = false;
+        options2.showDefaultPanels = false;
+        vedit::app::DemoEditorProvider provider2;
+        std::unique_ptr<vedit::app::ApplicationShell> shell2(
+            new vedit::app::ApplicationShell(options2));
+        shell2->editorArea()->setProvider(&provider2);
+        shell2->editorArea()->ensurePane();
+        vedit::workspace::IntegrationOptions integration2;
+        integration2.stateDir = dir.path() + QStringLiteral("/state2");
+        vedit::workspace::installDiagnostics(*shell2, integration2);
+        shell2->panels()->showPanel(QStringLiteral("outline"), shell2.get());
+        shell2->show();
+        QCoreApplication::processEvents();
+        auto *panel2 = shell2->findChild<vedit::workspace::diagnostics::DiagnosticsPanel *>();
+        auto *pane2 = shell2->editorArea()->activePane();
+        if (panel2 != nullptr && pane2 != nullptr) {
+            pane2->openFile(file);
+            QElapsedTimer timer;
+            timer.start();
+            while (timer.elapsed() < 4000) {
+                QCoreApplication::processEvents(QEventLoop::AllEvents, 20);
+                QThread::msleep(10);
+            }
+            std::printf("OBSERVED seam.reverse-control status='%s'\n",
+                        panel2->statusText().toUtf8().constData());
+            check("seam.reverse-control-no-analysis",
+                  !panel2->statusText().contains(QStringLiteral("analyzed")),
+                  panel2->statusText());
+        }
+        qunsetenv("VEDIT_NO_ACTIVE_FILE_WATCHER");
     }
 
     std::printf("VE-DIAGNOSTICS-PRODUCT-SEAM checks=%d failures=%d skipped=%d\n", g_checks,

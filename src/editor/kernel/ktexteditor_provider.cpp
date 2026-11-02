@@ -1,6 +1,7 @@
 #include "ktexteditor_provider.h"
 
 #include "atomic_save.h"
+#include "diagnostics_annotations.h"
 #include "document_io.h"
 #if defined(VEDIT_EDIT_CORE_HAVE_FOLDING)
 #include "fold_breadcrumb.h"
@@ -102,6 +103,9 @@ QWidget *EditCoreProvider::createEditor(QWidget *parent)
     auto *fimBinding = new FimBinding(view, view);
     Q_UNUSED(fimBinding);
 #endif
+    // T131: inline diagnostics (annotation border) on every new view, same
+    // lifetime as the fold/breadcrumb binding above.
+    vedit::editor::DiagnosticsAnnotations::install(view);
     return view;
 }
 
@@ -175,6 +179,12 @@ void EditCoreProvider::notifyStatus(QWidget *editor)
     if (it != statusListeners_.constEnd() && it.value()) {
         it.value()();
     }
+}
+
+bool EditCoreProvider::isModified(QWidget *editor) const
+{
+    KTextEditor::Document *document = documentFor(editor);
+    return document != nullptr ? document->isModified() : EditorProvider::isModified(editor);
 }
 
 QString EditCoreProvider::currentFilePath(QWidget *editor) const

@@ -6,6 +6,7 @@
 #include <QWidget>
 
 class QLabel;
+class QListWidget;
 class QTimer;
 class QTreeView;
 
@@ -23,6 +24,9 @@ public:
     QString statusText() const;
     /// Number of rows in the outline table (0 when there is nothing to show).
     int outlineRowCount() const;
+    /// Rows in the diagnostics list (T131: the panel must LIST the details, not
+    /// only count them).
+    int issueRowCount() const;
     /// The one-line empty-state reason shown below the outline (empty when hidden).
     QString emptyStateText() const;
     bool emptyStateVisible() const;
@@ -39,6 +43,7 @@ private:
 
     DiagnosticsController *controller_ = nullptr;
     QTimer *pollTimer_ = nullptr;
+    QListWidget *issues_ = nullptr;
     OutlineModel *model_ = nullptr;
     QTreeView *view_ = nullptr;
     QLabel *status_ = nullptr;

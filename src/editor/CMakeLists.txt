@@ -27,6 +27,7 @@ set(CMAKE_AUTOMOC ON)
 set(VEDIT_EDIT_CORE_SOURCES
   kernel/atomic_save.cpp
   kernel/cross_boundary.cpp
+  kernel/diagnostics_annotations.cpp
   kernel/document_io.cpp
   kernel/edit_core_selftest.cpp
   kernel/find_replace.cpp

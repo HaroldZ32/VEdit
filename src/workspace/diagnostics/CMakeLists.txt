@@ -89,6 +89,15 @@ if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL)
   # a KTextEditor::View; the demo fallback is a QPlainTextEdit.
   find_package(KF6TextEditor REQUIRED)
   target_link_libraries(vedit_workspace_diagnostics PUBLIC KF6::TextEditor)
+  # T131: the inline annotation model lives in the editor kernel (it installs
+  # itself per view); the diagnostics lane only pushes entries into it.
+  if(TARGET vedit_editor_core)
+    target_link_libraries(vedit_workspace_diagnostics PUBLIC vedit_editor_core)
+    target_include_directories(vedit_workspace_diagnostics PRIVATE
+      "${CMAKE_CURRENT_SOURCE_DIR}/../../editor/kernel")
+    target_compile_definitions(vedit_workspace_diagnostics PRIVATE
+      VEDIT_DIAGNOSTICS_HAVE_ANNOTATIONS=1)
+  endif()
   target_compile_definitions(vedit_workspace_diagnostics PRIVATE
     VEDIT_DIAGNOSTICS_HAVE_KTEXTEDITOR=1)
 endif()
@@ -175,6 +184,7 @@ if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL AND VEDIT_DIAGNOSTICS_FFI)
   target_include_directories(vedit-diagnostics-product-seam PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}"
     "${CMAKE_CURRENT_SOURCE_DIR}/../../app"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../editor/kernel"
   )
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(vedit-diagnostics-product-seam PRIVATE

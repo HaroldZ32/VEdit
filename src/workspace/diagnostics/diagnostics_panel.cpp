@@ -6,6 +6,7 @@
 #include <QDateTime>
 #include <QFileInfo>
 #include <QLabel>
+#include <QListWidget>
 #include <QStringLiteral>
 #include <QTimer>
 #include <QTreeView>
@@ -17,6 +18,9 @@ DiagnosticsPanel::DiagnosticsPanel(DiagnosticsController *controller, QWidget *p
     : QWidget(parent)
     , controller_(controller)
 {
+    // T131: the dock's title is what the user searches for. The panel is
+    // diagnostics (with an outline section), not "Outline".
+    setWindowTitle(QStringLiteral("Diagnostics"));
     auto *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
@@ -33,6 +37,15 @@ DiagnosticsPanel::DiagnosticsPanel(DiagnosticsController *controller, QWidget *p
     view_->setRootIsDecorated(false);
     view_->setAlternatingRowColors(true);
     layout->addWidget(view_, 1);
+
+    // T131: the detail list. The status line carries the summary; this list
+    // carries "file:line — severity — message [rule]" so the panel is usable
+    // without hovering the editor.
+    issues_ = new QListWidget(this);
+    issues_->setObjectName(QStringLiteral("diagnosticsIssues"));
+    issues_->setVisible(false);
+    issues_->setMaximumHeight(180);
+    layout->addWidget(issues_);
 
     // One-line empty state. A missing toolchain is an environment state, not a
     // list of per-file errors: the outline stays empty and says why once.
@@ -74,6 +87,11 @@ int DiagnosticsPanel::outlineRowCount() const
     return model_ != nullptr ? model_->rowCount() : 0;
 }
 
+int DiagnosticsPanel::issueRowCount() const
+{
+    return issues_ != nullptr ? issues_->count() : 0;
+}
+
 QString DiagnosticsPanel::emptyStateText() const
 {
     return emptyState_ != nullptr ? emptyState_->text() : QString();
@@ -92,13 +110,45 @@ DiagnosticsController *DiagnosticsPanel::controller() const
 void DiagnosticsPanel::refreshFromController()
 {
     if (controller_ == nullptr) {
-        if (status_ != nullptr) {
+        if (issues_ != nullptr && controller_ != nullptr) {
+        issues_->clear();
+        for (const DiagnosticEntry &entry : controller_->diagnostics()) {
+            QString text = QStringLiteral("%1:%2 — %3")
+                               .arg(QFileInfo(entry.file).fileName())
+                               .arg(entry.line + 1)
+                               .arg(entry.message);
+            if (!entry.code.isEmpty()) {
+                text += QStringLiteral(" [%1]").arg(entry.code);
+            } else if (!entry.source.isEmpty()) {
+                text += QStringLiteral(" [%1]").arg(entry.source);
+            }
+            issues_->addItem(text);
+        }
+        issues_->setVisible(issues_->count() > 0);
+    }
+    if (status_ != nullptr) {
             status_->setText(QStringLiteral("no diagnostics controller"));
         }
         return;
     }
     if (model_ != nullptr) {
         model_->setSymbols(controller_->outline());
+    }
+    if (issues_ != nullptr && controller_ != nullptr) {
+        issues_->clear();
+        for (const DiagnosticEntry &entry : controller_->diagnostics()) {
+            QString text = QStringLiteral("%1:%2 — %3")
+                               .arg(QFileInfo(entry.file).fileName())
+                               .arg(entry.line + 1)
+                               .arg(entry.message);
+            if (!entry.code.isEmpty()) {
+                text += QStringLiteral(" [%1]").arg(entry.code);
+            } else if (!entry.source.isEmpty()) {
+                text += QStringLiteral(" [%1]").arg(entry.source);
+            }
+            issues_->addItem(text);
+        }
+        issues_->setVisible(issues_->count() > 0);
     }
     if (status_ != nullptr) {
         const QString toolchain = controller_->toolchainReport().missing().isEmpty()

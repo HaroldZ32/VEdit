@@ -10,6 +10,9 @@
 
 #include "app_shell.h"
 #include "command_registry.h"
+#if defined(VEDIT_DIAGNOSTICS_HAVE_ANNOTATIONS)
+#include "diagnostics_annotations.h"
+#endif
 #include "editor_area.h"
 #include "panel_registry.h"
 
@@ -68,6 +71,87 @@ private:
 ///   * edited text -> analyze after a 700 ms quiet period (debounced);
 /// and it tells the controller whether the buffer differs from the file on disk,
 /// so the panel can say which text was linted.
+#if defined(VEDIT_DIAGNOSTICS_HAVE_ANNOTATIONS)
+/// T131: push the analysed file's diagnostics into the ACTIVE editor view as
+/// inline annotations (KTextEditor::AnnotationModel), so the error is visible on
+/// the line itself - not only in a panel the user must find.
+class AnnotationBridge final : public QObject {
+public:
+    AnnotationBridge(QObject *parent, vedit::app::ApplicationShell *shell,
+                     diagnostics::DiagnosticsController *controller)
+        : QObject(parent)
+        , shell_(shell)
+        , controller_(controller)
+        , timer_(new QTimer(this))
+    {
+        connect(timer_, &QTimer::timeout, this, [this]() { push(); });
+        timer_->start(300);
+    }
+
+private:
+    void push()
+    {
+        vedit::app::EditorPane *pane = shell_->editorArea() != nullptr
+                                           ? shell_->editorArea()->activePane()
+                                           : nullptr;
+        if (pane == nullptr) {
+            return;
+        }
+        // Only a KTextEditor view can show annotations; the demo provider cannot.
+        auto *view = dynamic_cast<KTextEditor::View *>(pane->editorWidget());
+        if (view == nullptr) {
+            return;
+        }
+        const QString path = pane->currentFilePath();
+        if (path.isEmpty()) {
+            return;
+        }
+        QList<vedit::editor::DiagnosticAnnotation> entries;
+        for (const diagnostics::DiagnosticEntry &entry : controller_->diagnostics()) {
+            if (entry.file != path) {
+                continue;
+            }
+            vedit::editor::DiagnosticAnnotation annotation;
+            annotation.line = entry.line;
+            annotation.severity = entry.severity;
+            annotation.message = entry.message;
+            annotation.rule = entry.code.isEmpty() ? entry.source : entry.code;
+            entries.append(annotation);
+        }
+        if (entries.isEmpty()) {
+            return;
+        }
+        const QString signature = signatureOf(entries);
+        if (signature == lastSignature_ && path == lastPath_) {
+            return;
+        }
+        lastSignature_ = signature;
+        lastPath_ = path;
+        vedit::editor::DiagnosticsAnnotations::install(view);
+        vedit::editor::DiagnosticsAnnotations::setForView(view, entries);
+        if (qEnvironmentVariableIsSet("VEDIT_DEBUG")) {
+            qInfo("diagnostics: %lld inline annotation(s) on %s", static_cast<long long>(entries.size()),
+                  qPrintable(path));
+        }
+    }
+
+    static QString signatureOf(const QList<vedit::editor::DiagnosticAnnotation> &entries)
+    {
+        QStringList parts;
+        for (const vedit::editor::DiagnosticAnnotation &entry : entries) {
+            parts.append(QStringLiteral("%1/%2/%3").arg(entry.line).arg(entry.severity).arg(entry.message));
+        }
+        return parts.join(QLatin1Char('\n'));
+    }
+
+    vedit::app::ApplicationShell *shell_ = nullptr;
+    diagnostics::DiagnosticsController *controller_ = nullptr;
+    QTimer *timer_ = nullptr;
+    QString lastSignature_;
+    QString lastPath_;
+};
+#endif
+
 class ActiveFileWatcher final : public QObject {
 public:
     ActiveFileWatcher(QObject *parent, vedit::app::ApplicationShell *shell,
@@ -78,6 +162,11 @@ public:
         , tick_(new QTimer(this))
         , debounce_(new QTimer(this))
     {
+        // Reverse control (T131): VEDIT_NO_ACTIVE_FILE_WATCHER=1 proves that the
+        // automatic analysis is what makes a plain "open a file" work at all.
+        if (qEnvironmentVariableIsSet("VEDIT_NO_ACTIVE_FILE_WATCHER")) {
+            return;
+        }
         debounce_->setSingleShot(true);
         debounce_->setInterval(700);
         connect(debounce_, &QTimer::timeout, this, [this]() { analyze(); });
@@ -334,6 +423,25 @@ void installDiagnostics(vedit::app::ApplicationShell &shell, const IntegrationOp
     // T118: the active editor is followed whether or not a project was given.
     // (Before this, a plain "open a file" session had no analysis at all.)
     new ActiveFileWatcher(&shell, &shell, controller);
+#if defined(VEDIT_DIAGNOSTICS_HAVE_ANNOTATIONS)
+    new AnnotationBridge(&shell, &shell, controller);
+#endif
+
+    // T131: the user must FIND the diagnostics view. There was no "Diagnostics"
+    // entry anywhere (the dock was only "Outline"), so add an explicit View-menu
+    // command that shows the same dock, titled "Diagnostics".
+    if (shell.commands() != nullptr) {
+        vedit::app::CommandSpec spec;
+        spec.id = QStringLiteral("view.panel.diagnostics");
+        spec.text = QStringLiteral("&Diagnostics");
+        spec.menu = QStringLiteral("view");
+        spec.defaultShortcut = QKeySequence(QStringLiteral("Ctrl+Alt+D"));
+        spec.order = 160;
+        shell.commands()->add(spec);
+        shell.commands()->setHandler(spec.id, [&shell]() {
+            shell.panels()->showPanel(QStringLiteral("outline"), &shell);
+        });
+    }
 
 #if defined(VEDIT_DIAGNOSTICS_HAVE_FFI)
     if (!projectRoot.isEmpty()) {
