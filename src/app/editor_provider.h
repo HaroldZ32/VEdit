@@ -46,6 +46,8 @@ public:
                           QString *error = nullptr);
     virtual QString currentFilePath(QWidget *editor) const;
     virtual bool saveFile(QWidget *editor, QString *error = nullptr);
+    // T130: closing a pane must not silently discard an unsaved document.
+    virtual bool isModified(QWidget *editor) const;
 
     // --- breadcrumb/status seam (T94) --------------------------------------
     // One line of positional context for a pane (the semantic breadcrumb path).
@@ -127,6 +129,12 @@ inline void EditorProvider::setStatusListener(QWidget *editor, std::function<voi
 {
     Q_UNUSED(editor);
     Q_UNUSED(listener);
+}
+
+inline bool EditorProvider::isModified(QWidget *editor) const
+{
+    auto *text = qobject_cast<QPlainTextEdit *>(editor);
+    return text != nullptr && text->document()->isModified();
 }
 
 inline bool EditorProvider::saveFile(QWidget *editor, QString *error)

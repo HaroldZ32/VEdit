@@ -20,6 +20,7 @@ class QEvent;
 class QTimer;
 class QLabel;
 class QMouseEvent;
+class QToolButton;
 class QVBoxLayout;
 
 namespace vedit::app {
@@ -38,6 +39,9 @@ public:
     void setActive(bool active);
     bool isActive() const;
     void setOnFocusRequested(std::function<void(EditorPane *)> callback);
+    void setOnCloseRequested(std::function<void(EditorPane *)> callback);
+    // T130: the pane's own close button must not discard an unsaved document.
+    bool isModified() const;
 
     // Replaces the pane's editor widget with one created by `provider`, keeping
     // the pane and the split layout. Needed because the shell builds its first
@@ -72,6 +76,8 @@ private:
     QWidget *editor_ = nullptr;
     QVBoxLayout *layout_ = nullptr;
     std::function<void(EditorPane *)> onFocusRequested_;
+    std::function<void(EditorPane *)> onCloseRequested_;
+    QToolButton *closeButton_ = nullptr;
     bool active_ = false;
 };
 
@@ -97,6 +103,9 @@ public:
     // Qt::Vertical puts it below; the new pane becomes active (returned).
     EditorPane *splitActive(Qt::Orientation orientation);
     bool closeActivePane();
+    // T130: close a specific pane (the per-pane X button); returns false when
+    // the close was blocked (unsaved modifications).
+    bool closePane(EditorPane *pane);
     void focusNextPane();
     void resetLayout();
 
@@ -108,6 +117,9 @@ public:
 
     void setOnLayoutChanged(std::function<void()> callback);
     void setOnActivePaneChanged(std::function<void(EditorPane *)> callback);
+    // T130: returning false blocks the close (unsaved changes). The shell
+    // installs this; no callback means "allow" for direct/unit use.
+    void setOnClosePaneRequested(std::function<bool(EditorPane *)> callback);
 
     // T90/F-2: runtime guard for the T80 invariant. Editor/standard-action
     // re-application (KStandardShortcut re-apply, KDE system settings, a
@@ -143,6 +155,7 @@ private:
     int nextPaneNumber_ = 1;
     std::function<void()> onLayoutChanged_;
     std::function<void(EditorPane *)> onActivePaneChanged_;
+    std::function<bool(EditorPane *)> onClosePaneRequested_;
     QStringList diagnostics_;
     bool rebuilding_ = false;
     QTimer *shortcutGuard_ = nullptr;

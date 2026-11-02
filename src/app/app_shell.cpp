@@ -16,6 +16,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QDockWidget>
+#include <QFileDialog>
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonObject>
@@ -64,10 +65,31 @@ ApplicationShell::ApplicationShell(ShellOptions options, QWidget *parent)
         updateStatusBar();
         syncPanelToggleStates();
     });
+    editorArea_->setOnClosePaneRequested([this](EditorPane *pane) {
+        if (pane == nullptr || !pane->isModified()) {
+            return true;
+        }
+        const QString message = QStringLiteral(
+            "Close Pane blocked: this pane has unsaved changes. Save it first (Ctrl+S).");
+        addDiagnostic(message);
+        statusBar()->showMessage(message, 8000);
+        if (QApplication::platformName() != QStringLiteral("offscreen")) {
+            QMessageBox::warning(this, QStringLiteral("Unsaved changes"), message);
+        }
+        return false;
+    });
 
     buildUi();
     registerPanels();
     registerCommands();
+    panels_->setVisibilityListener([this](const QString &id, bool visible) {
+        if (commands_ == nullptr) {
+            return;
+        }
+        if (QAction *action = commands_->action(QStringLiteral("view.panel.") + id)) {
+            action->setChecked(visible);
+        }
+    });
     buildMenuBar();
 
     if (!options_.deferSessionRestore) {
@@ -105,7 +127,12 @@ void ApplicationShell::startSession()
     updateStatusBar();
 }
 
-ApplicationShell::~ApplicationShell() = default;
+ApplicationShell::~ApplicationShell()
+{
+    if (panels_ != nullptr) {
+        panels_->setVisibilityListener(nullptr);
+    }
+}
 
 EditorArea *ApplicationShell::editorArea() const
 {
@@ -120,6 +147,80 @@ PanelRegistry *ApplicationShell::panels() const
 CommandRegistry *ApplicationShell::commands() const
 {
     return commands_.get();
+}
+
+bool ApplicationShell::openPaths(const QStringList &paths, QString *error)
+{
+    if (paths.isEmpty()) {
+        return true;
+    }
+    if (editorArea_ == nullptr) {
+        if (error != nullptr) {
+            *error = QStringLiteral("cannot open a file: the editor area is not available");
+        }
+        return false;
+    }
+    QStringList absolutePaths;
+    absolutePaths.reserve(paths.size());
+    for (const QString &raw : paths) {
+        const QFileInfo info(raw);
+        if (!info.exists()) {
+            if (error != nullptr) {
+                *error = QStringLiteral("cannot open %1: no such file or directory").arg(raw);
+            }
+            return false;
+        }
+        if (!info.isFile()) {
+            if (error != nullptr) {
+                *error = QStringLiteral("cannot open %1: not a regular file").arg(raw);
+            }
+            return false;
+        }
+        absolutePaths.append(info.absoluteFilePath());
+    }
+    EditorPane *pane = editorArea_->activePane();
+    if (pane == nullptr) {
+        pane = editorArea_->ensurePane();
+    }
+    for (int i = 0; i < absolutePaths.size(); ++i) {
+        if (i > 0) {
+            pane = editorArea_->splitActive(Qt::Horizontal);
+        }
+        if (pane == nullptr) {
+            if (error != nullptr) {
+                *error = QStringLiteral("cannot open %1: no editor pane is available")
+                             .arg(absolutePaths.at(i));
+            }
+            return false;
+        }
+        QString paneError;
+        if (!pane->openFile(absolutePaths.at(i), &paneError)) {
+            if (error != nullptr) {
+                *error = paneError.isEmpty()
+                             ? QStringLiteral("cannot open %1").arg(absolutePaths.at(i))
+                             : paneError;
+            }
+            return false;
+        }
+        editorArea_->setActivePane(pane);
+    }
+    if (qEnvironmentVariableIsSet("VEDIT_DEBUG")) {
+        qInfo("open.paths: opened %lld file(s): %s", static_cast<long long>(absolutePaths.size()),
+              qPrintable(absolutePaths.join(QStringLiteral(", "))));
+    }
+    statusBar()->showMessage(QStringLiteral("Opened %1 file(s)").arg(absolutePaths.size()), 5000);
+    updateStatusBar();
+    return true;
+}
+
+void ApplicationShell::setOpenFileDialogProvider(std::function<QString()> provider)
+{
+    openFileDialogProvider_ = std::move(provider);
+}
+
+void ApplicationShell::setPreferencesOpener(std::function<void()> opener)
+{
+    preferencesOpener_ = std::move(opener);
 }
 
 ThemeManager *ApplicationShell::themes() const
@@ -189,7 +290,9 @@ void ApplicationShell::registerPanels()
     addPanel(QStringLiteral("search"), QStringLiteral("Search"), QStringLiteral("workspace"), Qt::BottomDockWidgetArea);
     addPanel(QStringLiteral("terminal"), QStringLiteral("Terminal"), QStringLiteral("tools"), Qt::BottomDockWidgetArea);
     addPanel(QStringLiteral("vcs"), QStringLiteral("Source Control"), QStringLiteral("vcs"), Qt::LeftDockWidgetArea);
-    addPanel(QStringLiteral("settings"), QStringLiteral("Settings"), QStringLiteral("settings"), Qt::RightDockWidgetArea);
+    // T132: settings are a modal Preferences dialog (Settings menu / Ctrl+,), not
+    // a dock panel — a dock competed with the editor and read like an ordinary
+    // panel. The settings lane installs the dialog through setPreferencesOpener().
     addPanel(QStringLiteral("outline"), QStringLiteral("Outline"), QStringLiteral("editor/syntax"), Qt::RightDockWidgetArea);
 }
 
@@ -211,9 +314,17 @@ void ApplicationShell::registerCommands()
 
     commands_->setMenuLabel(QStringLiteral("file"), QStringLiteral("&File"));
     commands_->setMenuLabel(QStringLiteral("view"), QStringLiteral("&View"));
+    commands_->setMenuLabel(QStringLiteral("settings"), QStringLiteral("&Settings"));
     commands_->setMenuLabel(QStringLiteral("help"), QStringLiteral("&Help"));
 
+    // Settings menu (T132): the modal Preferences dialog. Ctrl+, is checked
+    // against the other bindings (no other command uses it).
+    addCommand(QStringLiteral("settings.preferences"), QStringLiteral("&Preferences…"),
+               QStringLiteral("settings"), QKeySequence(QStringLiteral("Ctrl+,")), 10);
+
     // File
+    addCommand(QStringLiteral("file.open"), QStringLiteral("&Open…"), QStringLiteral("file"),
+               QKeySequence(QStringLiteral("Ctrl+O")), 5);
     addCommand(QStringLiteral("file.new-layout"), QStringLiteral("&New Empty Layout"),
                QStringLiteral("file"), QKeySequence(QStringLiteral("Ctrl+Alt+N")), 10);
     // Save (T71): the entry the editor is actually used through. It goes to the
@@ -224,8 +335,10 @@ void ApplicationShell::registerCommands()
                QKeySequence(QStringLiteral("Ctrl+S")), 15);
     addCommand(QStringLiteral("file.save-session"), QStringLiteral("&Save Session Now"),
                QStringLiteral("file"), QKeySequence(), 20);
+    // T130: the user-facing entry lives in View. The id stays stable so an
+    // existing shortcut-store key is not invalidated.
     addCommand(QStringLiteral("file.close-pane"), QStringLiteral("&Close Pane"),
-               QStringLiteral("file"), QKeySequence(QStringLiteral("Ctrl+W")), 30);
+               QStringLiteral("view"), QKeySequence(QStringLiteral("Ctrl+W")), 60);
     addCommand(QStringLiteral("file.quit"), QStringLiteral("&Quit"), QStringLiteral("file"),
                QKeySequence(QStringLiteral("Ctrl+Q")), 90, false, true);
 
@@ -250,7 +363,6 @@ void ApplicationShell::registerCommands()
         {"search", "To&ggle Search Panel", "Ctrl+Alt+S"},
         {"terminal", "To&ggle Terminal Panel", "Ctrl+Alt+J"},
         {"vcs", "To&ggle Source Control Panel", "Ctrl+Alt+V"},
-        {"settings", "To&ggle Settings Panel", "Ctrl+Alt+P"},
         {"outline", "To&ggle Outline Panel", "Ctrl+Alt+O"},
     };
     int order = 100;
@@ -272,11 +384,35 @@ void ApplicationShell::registerCommands()
         });
     }
 
+    commands_->setHandler(QStringLiteral("settings.preferences"), [this]() {
+        if (preferencesOpener_) {
+            preferencesOpener_();
+        }
+    });
+
     // Help
     addCommand(QStringLiteral("help.about"), QStringLiteral("&About VEdit"), QStringLiteral("help"),
                QKeySequence(), 10, false, true);
 
     // Handlers that are not panel toggles.
+    commands_->setHandler(QStringLiteral("file.open"), [this]() {
+        const QString start = options_.projectRoot.isEmpty() ? QDir::homePath()
+                                                             : options_.projectRoot;
+        const QString path = openFileDialogProvider_
+                                 ? openFileDialogProvider_()
+                                 : QFileDialog::getOpenFileName(
+                                       this, QStringLiteral("Open File"), start,
+                                       QStringLiteral("Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;"
+                                                      "All Files (*)"));
+        if (path.isEmpty()) {
+            return;
+        }
+        QString error;
+        if (!openPaths({path}, &error)) {
+            addDiagnostic(error);
+            statusBar()->showMessage(error, 8000);
+        }
+    });
     commands_->setHandler(QStringLiteral("file.new-layout"), [this]() {
         editorArea_->resetLayout();
         updateStatusBar();
@@ -290,7 +426,12 @@ void ApplicationShell::registerCommands()
         statusBar()->showMessage(QStringLiteral("Session saved (%1)").arg(session_->path()), 4000);
     });
     commands_->setHandler(QStringLiteral("file.close-pane"), [this]() {
-        editorArea_->closeActivePane();
+        if (!editorArea_->closeActivePane()) {
+            // The guard already surfaced the unsaved-changes message; a blocked
+            // close must not look like a successful action.
+            updateStatusBar();
+            return;
+        }
         updateStatusBar();
     });
     commands_->setHandler(QStringLiteral("file.quit"), []() { QApplication::quit(); });

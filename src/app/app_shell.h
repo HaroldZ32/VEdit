@@ -14,6 +14,7 @@
 #include <QString>
 #include <QStringList>
 
+#include <functional>
 #include <memory>
 
 class QCloseEvent;
@@ -53,7 +54,21 @@ public:
     EditorArea *editorArea() const;
     PanelRegistry *panels() const;
     CommandRegistry *commands() const;
+    // T137: the one open path used by positional arguments, File -> Open and
+    // (future) recent files. Validates every path before mutating the layout;
+    // first file opens in the active pane, each additional file gets a new
+    // horizontal split. Returns false with a human-readable *error.
+    bool openPaths(const QStringList &paths, QString *error = nullptr);
+    // T137 test seam: the default opens QFileDialog; the headless shell
+    // selfcheck injects a provider so the File -> Open action itself is
+    // exercised without a modal dialog. Clearing it restores QFileDialog.
+    void setOpenFileDialogProvider(std::function<QString()> provider);
     ThemeManager *themes() const;
+
+    // T132: the settings lane installs the modal Preferences dialog behind the
+    // `Settings -> Preferences...` menu command (Ctrl+,). The shell knows no
+    // settings type; it only invokes the opener.
+    void setPreferencesOpener(std::function<void()> opener);
     IShortcutStore *shortcutStore() const;
     SessionStore *sessionStore() const;
 
@@ -110,6 +125,7 @@ private:
     EditorArea *editorArea_ = nullptr; // owned by QMainWindow (central widget)
     std::unique_ptr<PanelRegistry> panels_;
     std::unique_ptr<CommandRegistry> commands_;
+    std::function<QString()> openFileDialogProvider_;
     std::unique_ptr<ThemeManager> themes_;
     std::unique_ptr<IShortcutStore> shortcutStore_;
     std::unique_ptr<SessionStore> session_;
@@ -117,6 +133,7 @@ private:
     QLabel *statusTheme_ = nullptr;
     QLabel *statusLayout_ = nullptr;
     QStringList diagnostics_;
+    std::function<void()> preferencesOpener_;
     bool sessionStarted_ = false;
 };
 

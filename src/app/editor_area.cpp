@@ -10,7 +10,9 @@
 #include <QFont>
 #include <QJsonValue>
 #include <QKeySequence>
+#include <QHBoxLayout>
 #include <QLabel>
+#include <QToolButton>
 #include <QMouseEvent>
 #include <QPlainTextEdit>
 #include <QPointer>
@@ -108,10 +110,29 @@ EditorPane::EditorPane(QString paneId, EditorProvider *provider, QWidget *parent
     layout_->setContentsMargins(0, 0, 0, 0);
     layout_->setSpacing(0);
 
-    header_ = new QLabel(this);
+    auto *headerRow = new QWidget(this);
+    headerRow->setObjectName(QStringLiteral("editor-pane-header-row"));
+    auto *headerLayout = new QHBoxLayout(headerRow);
+    headerLayout->setContentsMargins(0, 0, 0, 0);
+    headerLayout->setSpacing(0);
+    header_ = new QLabel(headerRow);
     header_->setObjectName(QStringLiteral("editor-pane-header"));
     header_->setContentsMargins(6, 2, 6, 2);
-    layout_->addWidget(header_);
+    headerLayout->addWidget(header_, 1);
+    closeButton_ = new QToolButton(headerRow);
+    closeButton_->setObjectName(QStringLiteral("pane-close-button"));
+    closeButton_->setText(QStringLiteral("×"));
+    closeButton_->setToolTip(QStringLiteral("Close Pane"));
+    closeButton_->setAutoRaise(true);
+    closeButton_->setFixedSize(22, 20);
+    closeButton_->setCursor(Qt::PointingHandCursor);
+    headerLayout->addWidget(closeButton_, 0);
+    QObject::connect(closeButton_, &QToolButton::clicked, this, [this]() {
+        if (onCloseRequested_ != nullptr) {
+            onCloseRequested_(this);
+        }
+    });
+    layout_->addWidget(headerRow);
 
     // T94: the semantic breadcrumb bar under the pane header. Empty (and hidden)
     // when the provider has no positional context.
@@ -273,6 +294,16 @@ void EditorPane::setOnFocusRequested(std::function<void(EditorPane *)> callback)
     onFocusRequested_ = std::move(callback);
 }
 
+void EditorPane::setOnCloseRequested(std::function<void(EditorPane *)> callback)
+{
+    onCloseRequested_ = std::move(callback);
+}
+
+bool EditorPane::isModified() const
+{
+    return provider_ != nullptr && editor_ != nullptr && provider_->isModified(editor_);
+}
+
 void EditorPane::mousePressEvent(QMouseEvent *event)
 {
     if (onFocusRequested_ != nullptr) {
@@ -410,6 +441,10 @@ EditorPane *EditorArea::createPane(const QString &paneId)
     }
     auto *pane = new EditorPane(id, provider_, nullptr);
     pane->setOnFocusRequested([this](EditorPane *requested) { setActivePane(requested); });
+    pane->setOnCloseRequested([this](EditorPane *requested) {
+        setActivePane(requested);
+        closeActivePane();
+    });
     return pane;
 }
 
@@ -629,14 +664,21 @@ EditorPane *EditorArea::splitActive(Qt::Orientation orientation)
 
 bool EditorArea::closeActivePane()
 {
-    if (active_ == nullptr) {
+    return closePane(active_);
+}
+
+bool EditorArea::closePane(EditorPane *closing)
+{
+    if (closing == nullptr || !panes().contains(closing)) {
         return false;
     }
-    Node *leaf = findLeaf(root_.get(), active_);
+    if (onClosePaneRequested_ != nullptr && !onClosePaneRequested_(closing)) {
+        return false;
+    }
+    Node *leaf = findLeaf(root_.get(), closing);
     if (leaf == nullptr) {
         return false;
     }
-    EditorPane *closing = active_;
     if (root_.get() == leaf) {
         // Last pane: replace its content with a fresh pane, never leave the
         // area without one (the shell must stay usable, empty state included).
@@ -645,6 +687,9 @@ bool EditorArea::closeActivePane()
         active_ = nullptr;
         leaf->pane = replacement;
         setActivePane(replacement);
+        if (replacement->editorWidget() != nullptr) {
+            replacement->editorWidget()->setFocus(Qt::OtherFocusReason);
+        }
         rebuild();
         return true;
     }
@@ -664,6 +709,9 @@ bool EditorArea::closeActivePane()
     const auto remaining = panes();
     if (!remaining.isEmpty()) {
         setActivePane(remaining.first());
+        if (remaining.first()->editorWidget() != nullptr) {
+            remaining.first()->editorWidget()->setFocus(Qt::OtherFocusReason);
+        }
     }
     rebuild();
     return true;
@@ -863,6 +911,11 @@ void EditorArea::setOnLayoutChanged(std::function<void()> callback)
 void EditorArea::setOnActivePaneChanged(std::function<void(EditorPane *)> callback)
 {
     onActivePaneChanged_ = std::move(callback);
+}
+
+void EditorArea::setOnClosePaneRequested(std::function<bool(EditorPane *)> callback)
+{
+    onClosePaneRequested_ = std::move(callback);
 }
 
 } // namespace vedit::app

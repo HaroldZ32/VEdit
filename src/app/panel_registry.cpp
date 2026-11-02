@@ -10,6 +10,18 @@
 
 namespace vedit::app {
 
+PanelRegistry::PanelRegistry() = default;
+
+PanelRegistry::~PanelRegistry()
+{
+    // T129: the docks outlive this registry (they are QMainWindow children).
+    // Drop the visibility connections before the listener/std::function is
+    // destroyed, otherwise dock destruction calls into a dead registry.
+    for (const QMetaObject::Connection &connection : visibilityConnections_) {
+        QObject::disconnect(connection);
+    }
+}
+
 namespace {
 
 QWidget *makePlaceholder(const PanelSpec &spec, const QString &hint)
@@ -94,6 +106,12 @@ void PanelRegistry::setPlaceholderHint(const QString &id, const QString &hint)
     hints_.insert(id, hint);
 }
 
+void PanelRegistry::setVisibilityListener(
+    std::function<void(const QString &id, bool visible)> listener)
+{
+    visibilityListener_ = std::move(listener);
+}
+
 QWidget *PanelRegistry::createContent(const PanelSpec &spec) const
 {
     if (spec.factory) {
@@ -123,6 +141,15 @@ QDockWidget *PanelRegistry::insert(const QString &id, QMainWindow *window)
     dock->setWidget(createContent(spec));
     window_->addDockWidget(spec.area, dock);
     docks_.insert(spec.id, dock);
+    // T129: a dock's own X button hides it without touching the menu action;
+    // mirror every visibility change back to the shell's action.
+    visibilityConnections_.append(
+        QObject::connect(dock, &QDockWidget::visibilityChanged, dock,
+                         [this, id](bool visible) {
+                             if (visibilityListener_) {
+                                 visibilityListener_(id, visible);
+                             }
+                         }));
     return dock;
 }
 

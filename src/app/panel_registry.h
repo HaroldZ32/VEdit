@@ -10,6 +10,7 @@
 // never a crash). src/workspace, src/tools, src/vcs and src/settings replace
 // the factories through ApplicationShell/PanelRegistry::setFactory().
 #include <QHash>
+#include <QMetaObject>
 #include <QList>
 #include <QString>
 #include <QStringList>
@@ -33,12 +34,19 @@ struct PanelSpec {
 
 class PanelRegistry {
 public:
+    PanelRegistry();
+    ~PanelRegistry();
+
     void addPanel(PanelSpec spec);
     bool contains(const QString &id) const;
     QStringList ids() const;                 // registration order
     QStringList insertedIds() const;         // docks that currently exist
     void setFactory(const QString &id, std::function<QWidget *()> factory);
     void setPlaceholderHint(const QString &id, const QString &hint);
+    // T129: the shell installs this once; every dock reports visibility changes
+    // (X button / menu / programmatic hide/show) so the View-menu check state
+    // can follow the dock in both directions.
+    void setVisibilityListener(std::function<void(const QString &id, bool visible)> listener);
 
     // Creates and inserts the dock on first request; later calls return the
     // existing dock. `window` is remembered for show/toggle operations.
@@ -59,6 +67,8 @@ private:
     QHash<QString, PanelSpec> specs_;
     QHash<QString, QString> hints_;
     QHash<QString, QDockWidget *> docks_;
+    std::function<void(const QString &id, bool visible)> visibilityListener_;
+    QList<QMetaObject::Connection> visibilityConnections_;
     QStringList order_;
     QMainWindow *window_ = nullptr;
 };
