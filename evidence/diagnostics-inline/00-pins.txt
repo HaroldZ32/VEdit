@@ -1,0 +1,26 @@
+== 00-pins.txt — T131 evidence pins (C9) ==
+collected_at=2026-11-02T11:28:04+08:00
+git_head=af852255acf8979cd25ffc0bd882c1dcbbec6220
+git_status_porcelain:
+ M AGENT.md
+ M build/evidence/typecheck/00-run.txt
+ M build/evidence/typecheck/10-typecheck-image-build.log
+ M build/evidence/typecheck/11-typecheck-image-id.txt
+ M evidence/ffi-abi/logs/10-rust-image.txt
+ M evidence/ffi-abi/logs/19-rust-stage-console.log
+ M evidence/ffi-abi/logs/20-cargo-build-release.log
+ M evidence/ffi-abi/logs/21-staticlib.txt
+ M evidence/ffi-abi/logs/22-rust-targets.txt
+ M evidence/ffi-abi/logs/23-cargo-test.log
+ M evidence/m0-build/build-logs/20-qt6-image-build.log
+ M evidence/m0-build/build-logs/21-qt6-image-id.txt
+ M evidence/m0-build/build-logs/31-qt6-configure.log
+ M evidence/m0-build/build-logs/32-qt6-build.log
+ M evidence/m0-build/build-logs/34-qt6-elf.txt
+ M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+ M src/app/app_shell.cpp
+ M src/app/app_shell.h
+ M src/app/editor_area.cpp
+ M src/app/editor_area.h
+package=2918210695d9aaae… (2026-11-02 10:47:37.967650359 +0800)
+image=vedit-qt6-build:local sha256:483662b1689a1

@@ -1,1 +1,1 @@
--rw-r--r-- 2 root root 61262434 Nov  2 02:38 target/release/libvd_ffi.a
+-rw-r--r-- 2 root root 61262434 Nov  2 03:35 target/release/libvd_ffi.a

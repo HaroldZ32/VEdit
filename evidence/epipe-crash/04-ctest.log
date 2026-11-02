@@ -1,0 +1,120 @@
+collected_at: 2026-11-02T11:37:13+08:00
+git_head: af852255acf8979cd25ffc0bd882c1dcbbec6220
+git_branch: feat/qt6-ktexteditor-migration
+git_status:
+   M AGENT.md
+   M build/evidence/typecheck/00-run.txt
+   M build/evidence/typecheck/10-typecheck-image-build.log
+   M build/evidence/typecheck/11-typecheck-image-id.txt
+   M evidence/ffi-abi/logs/10-rust-image.txt
+   M evidence/ffi-abi/logs/19-rust-stage-console.log
+   M evidence/ffi-abi/logs/20-cargo-build-release.log
+   M evidence/ffi-abi/logs/21-staticlib.txt
+   M evidence/ffi-abi/logs/22-rust-targets.txt
+   M evidence/ffi-abi/logs/23-cargo-test.log
+   M evidence/m0-build/build-logs/20-qt6-image-build.log
+   M evidence/m0-build/build-logs/21-qt6-image-id.txt
+   M evidence/m0-build/build-logs/31-qt6-configure.log
+   M evidence/m0-build/build-logs/32-qt6-build.log
+   M evidence/m0-build/build-logs/34-qt6-elf.txt
+   M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+   M src/app/app_shell.cpp
+   M src/app/app_shell.h
+   M src/app/editor_area.cpp
+   M src/app/editor_area.h
+   M src/app/editor_provider.h
+   M src/app/main.cpp
+   M src/app/panel_registry.cpp
+   M src/app/panel_registry.h
+   M src/editor/CMakeLists.txt
+   M src/editor/kernel/ktexteditor_provider.cpp
+   M src/editor/kernel/ktexteditor_provider.h
+   M src/workspace/diagnostics/CMakeLists.txt
+   M src/workspace/diagnostics/diagnostics_integration.cpp
+   M src/workspace/diagnostics/diagnostics_panel.cpp
+   M src/workspace/diagnostics/diagnostics_panel.h
+   M src/workspace/diagnostics/selftests/diagnostics_product_seam.cpp
+   M src/workspace/settings/CMakeLists.txt
+   M src/workspace/settings/settings_integration.cpp
+   M src/workspace/settings/settings_panel.cpp
+   M src/workspace/settings/settings_panel.h
+  ?? crates/vd-lsp/tests/pipe_lifecycle.rs
+  ?? evidence/diagnostics-inline/
+  ?? evidence/epipe-crash/
+  ?? evidence/i18n/
+  ?? evidence/split-close/
+  ?? evidence/view-menu-sync/
+  ?? src/editor/kernel/diagnostics_annotations.cpp
+  ?? src/editor/kernel/diagnostics_annotations.h
+  ?? src/workspace/settings/settings_dialog.cpp
+  ?? src/workspace/settings/settings_dialog.h
+
+# root ctest after the T134 fix (and the T132 compile fixes): 31/31
+
+Test project /vedit-build/target/qt6-build
+      Start  1: vedit-app-syntax-startup
+ 1/31 Test  #1: vedit-app-syntax-startup .......................   Passed    0.57 sec
+      Start  2: vedit-m0-smoke
+ 2/31 Test  #2: vedit-m0-smoke .................................   Passed    0.06 sec
+      Start  3: vedit-syntax-provider-tests
+ 3/31 Test  #3: vedit-syntax-provider-tests ....................   Passed    0.00 sec
+      Start  4: vedit-syntax-kde-data
+ 4/31 Test  #4: vedit-syntax-kde-data ..........................   Passed    0.03 sec
+      Start  5: vedit-syntax-directory-equivalence
+ 5/31 Test  #5: vedit-syntax-directory-equivalence .............   Passed    0.02 sec
+      Start  6: vedit-syn-grammars-tests
+ 6/31 Test  #6: vedit-syn-grammars-tests .......................   Passed    0.18 sec
+      Start  7: vedit-syntax-product-tests
+ 7/31 Test  #7: vedit-syntax-product-tests .....................   Passed    0.06 sec
+      Start  8: vedit-terminal-selftest
+ 8/31 Test  #8: vedit-terminal-selftest ........................   Passed    2.01 sec
+      Start  9: vedit-syntax-overlay-selftest
+ 9/31 Test  #9: vedit-syntax-overlay-selftest ..................   Passed    2.37 sec
+      Start 10: vedit-app-ffi-abi-selftest
+10/31 Test #10: vedit-app-ffi-abi-selftest .....................   Passed    0.29 sec
+      Start 11: vedit-app-shell-selftest
+11/31 Test #11: vedit-app-shell-selftest .......................   Passed    0.60 sec
+      Start 12: vedit-app-crash-reporter-selftest
+12/31 Test #12: vedit-app-crash-reporter-selftest ..............   Passed    0.14 sec
+      Start 13: vedit-app-crash-report-shipped
+13/31 Test #13: vedit-app-crash-report-shipped .................   Passed    0.15 sec
+      Start 14: vedit-native-fold-tests
+14/31 Test #14: vedit-native-fold-tests ........................   Passed    0.44 sec
+      Start 15: vedit-edit-core-selftest
+15/31 Test #15: vedit-edit-core-selftest .......................   Passed    0.12 sec
+      Start 16: vedit-fim-wiring-selftest
+16/31 Test #16: vedit-fim-wiring-selftest ......................   Passed    1.91 sec
+      Start 17: vedit-syntax-directory-tests
+17/31 Test #17: vedit-syntax-directory-tests ...................   Passed    0.01 sec
+      Start 18: vedit-fold-gutter-click
+18/31 Test #18: vedit-fold-gutter-click ........................   Passed    0.26 sec
+      Start 19: vedit-breadcrumb-tests
+19/31 Test #19: vedit-breadcrumb-tests .........................   Passed    0.04 sec
+      Start 20: vedit-fim-selftest
+20/31 Test #20: vedit-fim-selftest .............................   Passed    0.11 sec
+      Start 21: vedit-workspace-palette-selftest
+21/31 Test #21: vedit-workspace-palette-selftest ...............   Passed    0.10 sec
+      Start 22: vedit-workspace-palette-integration-selftest
+22/31 Test #22: vedit-workspace-palette-integration-selftest ...   Passed    0.16 sec
+      Start 23: vedit-workspace-search-selftest
+23/31 Test #23: vedit-workspace-search-selftest ................   Passed   12.23 sec
+      Start 24: vedit-workspace-project-selftest
+24/31 Test #24: vedit-workspace-project-selftest ...............   Passed    0.05 sec
+      Start 25: vedit-workspace-diagnostics-selftest
+25/31 Test #25: vedit-workspace-diagnostics-selftest ...........   Passed    1.81 sec
+      Start 26: vedit-toolchain-missing-selftest
+26/31 Test #26: vedit-toolchain-missing-selftest ...............   Passed    0.01 sec
+      Start 27: vedit-diagnostics-ffi-selftest
+27/31 Test #27: vedit-diagnostics-ffi-selftest .................   Passed    3.25 sec
+      Start 28: vedit-diagnostics-product-seam
+28/31 Test #28: vedit-diagnostics-product-seam .................   Passed    6.48 sec
+      Start 29: vedit-toolchain-ux-selftest
+29/31 Test #29: vedit-toolchain-ux-selftest ....................   Passed    3.12 sec
+      Start 30: vedit-workspace-vcs-selftest
+30/31 Test #30: vedit-workspace-vcs-selftest ...................   Passed    1.14 sec
+      Start 31: vedit-workspace-settings-selftest
+31/31 Test #31: vedit-workspace-settings-selftest ..............   Passed    0.32 sec
+
+100% tests passed, 0 tests failed out of 31
+
+Total Test time (real) =  38.07 sec

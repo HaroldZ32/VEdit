@@ -63,6 +63,7 @@ ring
 rustix
 rustls
 rustls-pki-types
+rustls-webpki
 serde
 serde_core
 serde_derive
@@ -105,14 +106,13 @@ utf8parse
 utf_types
 vd-config
 vd-deeplint
+vd-fim
 vd-lsp
 vd-search
 vd-settings
 vd-vcs
 vd_ffi
-vd_fim
 waitpid-any
-webpki
 webpki-roots
 winnow
 writeable

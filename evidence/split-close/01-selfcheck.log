@@ -1,0 +1,25 @@
+# C9 (T130): collected_at=2026-11-02T03:22:38Z; git_head=af852255acf8979cd25ffc0bd882c1dcbbec6220; git_status_porcelain_sha256=045309e62e8b304f88ca5c3515c7d82d08bfaf73e03166df75bbb110e13c3662; anchor=00-C9.txt
+== T130 selfcheck on clean worktree (baseline 55a874d + T130 code) ==
+collected_at: 2026-11-02T03:22:32Z
+git_head: af852255acf8979cd25ffc0bd882c1dcbbec6220
+--- output ---
+SELFCHECK-EXIT=0
+CHECK close.pane-count PASS
+CHECK close.last-pane.keeps-one PASS
+CHECK close.last-pane.active PASS
+CHECK close.command.exists PASS
+CHECK close.command.in-view PASS
+CHECK close.command.shortcut-ctrl-w PASS
+CHECK close.shortcuts.no-conflicts PASS
+CHECK close.shortcuts.binding-count PASS
+CHECK close.split.pane-count PASS
+CHECK close.split.editor-editable PASS
+CHECK close.unsaved.blocked PASS
+CHECK close.reverse-control PASS
+CHECK close.unsaved-saved-close PASS
+CHECK close.remaining-editable PASS
+CHECK close.last-single-view PASS
+CHECK close.button.split PASS
+CHECK close.button.present PASS
+CHECK close.button.single-view PASS
+APP-SHELL-SELFTEST ok=1 checks=215 failures=0 state=/tmp/vedit-app-wbYmAJ/state
