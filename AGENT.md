@@ -98,6 +98,26 @@ when the project lives outside the home tree), so it can never walk out of the
 user's tree. `filelist.missing` and the other `filelist.*` / `config.*` codes
 stay: they describe things the user explicitly configured or wrote wrong.
 
+### Rust is statically linked into a C++ host (T134)
+
+`vedit-app` links the Rust service layer (`crates/vd-ffi` → `vd-lsp`, `vd-config`,
+…) **into the C++ process**. Rust's runtime startup — the part of a Rust binary
+that installs process-wide defaults — does **not** run in that host. Known
+consequences, and the rule they imply:
+
+- **`SIGPIPE`**: a Rust binary ignores it at startup; in this host it would stay
+  at its default (terminate) and a write to a dead child (e.g. the verible LSP
+  pipe while switching files) killed the GUI with `Broken pipe`, with **no crash
+  report** (SIGPIPE is not in the reporter's signal set). `src/app/main.cpp` sets
+  `std::signal(SIGPIPE, SIG_IGN)` before anything else; the write then returns
+  `EPIPE`, which the Rust side must record as a state (never panic/abort).
+- Other process-level Rust defaults (e.g. stack-overflow handling) are **not**
+  installed either. Any new behaviour that relies on Rust's runtime init must be
+  set up explicitly by the C++ host and documented here.
+- Lane selftests that spawn real LSP children and link Rust have the same latent
+  issue; a death there is a visible test crash, not a user crash, but a shared
+  `vedit_runtime_init()` should be used when those entry points grow one.
+
 ### Runtime toolchain discovery (diagnostics / outline)
 
 The diagnostics and outline panels need `verible-verilog-ls` (LSP) and `slang`
