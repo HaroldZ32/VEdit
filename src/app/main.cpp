@@ -33,6 +33,8 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QSet>
+#include <QSignalBlocker>
 #include <QCommandLineParser>
 
 #include <csignal>
@@ -50,6 +52,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QPlainTextEdit>
+#include <QToolButton>
 #include <QString>
 #include <QStatusBar>
 #include <QStringList>
@@ -284,10 +287,13 @@ int runSelfCheck()
     check("empty.one-pane", shell->editorArea()->paneCount() == 1);
     check("empty.window-title", shell->windowTitle().contains(QStringLiteral("no project")));
 
+    // T132: settings are a modal Preferences dialog, not a dock panel, so five
+    // panels remain (the Settings menu entry replaces the old dock + toggle).
     const QStringList expectedPanels{QStringLiteral("file-tree"), QStringLiteral("search"),
                                      QStringLiteral("terminal"), QStringLiteral("vcs"),
-                                     QStringLiteral("settings"), QStringLiteral("outline")};
-    check("panels.registry.six", shell->panels()->ids().size() == expectedPanels.size());
+                                     QStringLiteral("outline")};
+    check("panels.no-settings-dock", !shell->panels()->contains(QStringLiteral("settings")));
+    check("panels.registry.five", shell->panels()->ids().size() == expectedPanels.size());
     for (const QString &id : expectedPanels) {
         check(("panels.registered." + id.toStdString()).c_str(), shell->panels()->contains(id));
     }
@@ -305,12 +311,32 @@ int runSelfCheck()
         pump();
         check(("panels.toggle-show." + id.toStdString()).c_str(), shown && shell->panels()->isVisible(id));
     }
-    check("panels.six-docks", shell->panels()->docks().size() == expectedPanels.size());
+    check("panels.five-docks", shell->panels()->docks().size() == expectedPanels.size());
 
     // Menu / shortcut framework.
     check("menus.file", shell->commands()->menus().contains(QStringLiteral("file")));
     check("menus.view", shell->commands()->menus().contains(QStringLiteral("view")));
+    check("menus.settings", shell->commands()->menus().contains(QStringLiteral("settings")));
     check("menus.help", shell->commands()->menus().contains(QStringLiteral("help")));
+    // T132: Settings -> Preferences... (Ctrl+,) replaces the old panel toggle.
+    QAction *preferences = shell->commands()->action(QStringLiteral("settings.preferences"));
+    check("settings.preferences.exists", preferences != nullptr);
+    check("settings.preferences.menu",
+          preferences != nullptr && shell->commands()->menuLabel(QStringLiteral("settings"))
+              == QStringLiteral("&Settings"));
+    check("settings.preferences.shortcut",
+          preferences != nullptr
+              && preferences->shortcut() == QKeySequence(QStringLiteral("Ctrl+,")),
+          preferences != nullptr ? preferences->shortcut().toString() : QStringLiteral("<missing>"));
+    int ctrlCommaBindings = 0;
+    for (const QString &command : shell->commands()->ids()) {
+        if (QAction *action = shell->commands()->action(command);
+            action != nullptr && action->shortcut() == QKeySequence(QStringLiteral("Ctrl+,"))) {
+            ++ctrlCommaBindings;
+        }
+    }
+    check("settings.preferences.unique-shortcut", ctrlCommaBindings == 1,
+          QStringLiteral("bindings=%1").arg(ctrlCommaBindings));
     const char *commandIds[] = {"file.new-layout", "file.close-pane", "file.quit",
                                 "view.split.horizontal", "view.split.vertical",
                                 "view.focus.next", "view.layout.reset", "help.about",
@@ -323,6 +349,62 @@ int runSelfCheck()
           shell->commands()->actionsInMenu(QStringLiteral("file")).size() >= 4);
     check("commands.view-panel-actions-checkable",
           shell->commands()->action(QStringLiteral("view.panel.file-tree"))->isCheckable());
+
+    // T129: the View-menu check mark and the dock visibility are one state.
+    // Step 2 (the dock's own X) is the bug: without the visibility listener the
+    // action stays checked and the next menu click appears to do nothing.
+    for (const QString &id : expectedPanels) {
+        const QString commandId = QStringLiteral("view.panel.") + id;
+        QAction *action = shell->commands()->action(commandId);
+        QDockWidget *dock = shell->panels()->dock(id);
+        if (action == nullptr || dock == nullptr) {
+            check(("panels.sync.available." + id.toStdString()).c_str(), false);
+            continue;
+        }
+        // Normalise: closed => action unchecked.
+        dock->close();
+        pump();
+        check(("panels.sync.closed." + id.toStdString()).c_str(),
+              !dock->isVisible() && !action->isChecked());
+        // 1) menu action shows it, check mark follows.
+        action->trigger();
+        pump();
+        check(("panels.sync.action-show." + id.toStdString()).c_str(),
+              dock->isVisible() && action->isChecked());
+        // 2) the panel's own X hides it; the check mark must clear.
+        dock->close();
+        pump();
+        check(("panels.sync.close-clears-check." + id.toStdString()).c_str(),
+              !dock->isVisible() && !action->isChecked());
+        // 3) one menu click reopens it (no stale checked state).
+        action->trigger();
+        pump();
+        check(("panels.sync.one-click-reopen." + id.toStdString()).c_str(),
+              dock->isVisible() && action->isChecked());
+        dock->close();
+        pump();
+    }
+
+    // Reverse control: block the dock's visibility signal and close it. The
+    // action MUST stay checked, proving the positive step above really depends
+    // on the listener (it would be red if the sync were removed).
+    {
+        QDockWidget *dock = shell->panels()->dock(QStringLiteral("file-tree"));
+        QAction *action = shell->commands()->action(QStringLiteral("view.panel.file-tree"));
+        dock->show();
+        pump();
+        check("panels.sync.reverse-precondition",
+              dock->isVisible() && action != nullptr && action->isChecked());
+        {
+            QSignalBlocker blocker(dock);
+            dock->close();
+            pump();
+            check("panels.sync.reverse-control",
+                  !dock->isVisible() && action != nullptr && action->isChecked());
+        }
+        dock->show();
+        pump();
+    }
 
     // Horizontal split.
     shell->applyHorizontalSplitPreset(3);
@@ -365,6 +447,146 @@ int runSelfCheck()
     pump();
     check("close.last-pane.keeps-one", shell->editorArea()->paneCount() == 1);
     check("close.last-pane.active", shell->editorArea()->activePane() != nullptr);
+
+    // T130: the split panes have a visible close path, and unsaved changes are
+    // never discarded silently.
+    QAction *closePaneAction = shell->commands()->action(QStringLiteral("file.close-pane"));
+    check("close.command.exists", closePaneAction != nullptr);
+    check("close.command.in-view", closePaneAction != nullptr
+          && shell->commands()->actionsInMenu(QStringLiteral("view")).contains(closePaneAction));
+    check("close.command.shortcut-ctrl-w",
+          closePaneAction != nullptr
+          && closePaneAction->shortcut() == QKeySequence(QStringLiteral("Ctrl+W")));
+    {
+        QSet<QString> seen;
+        bool duplicate = false;
+        int bindings = 0;
+        for (const QString &id : shell->commands()->ids()) {
+            QAction *action = shell->commands()->action(id);
+            if (action == nullptr || action->shortcut().isEmpty()) {
+                continue;
+            }
+            const QString key = action->shortcut().toString();
+            if (seen.contains(key)) {
+                duplicate = true;
+            }
+            seen.insert(key);
+            ++bindings;
+        }
+        check("close.shortcuts.no-conflicts", !duplicate);
+        check("close.shortcuts.binding-count", bindings >= 10);
+    }
+
+    EditorPane *splitPane = shell->editorArea()->splitActive(Qt::Horizontal);
+    pump();
+    check("close.split.pane-count", splitPane != nullptr && shell->editorArea()->paneCount() == 2);
+    auto *dirtyEditor = qobject_cast<QPlainTextEdit *>(
+        shell->editorArea()->activePane() != nullptr
+            ? shell->editorArea()->activePane()->editorWidget()
+            : nullptr);
+    check("close.split.editor-editable", dirtyEditor != nullptr && !dirtyEditor->isReadOnly());
+    const int beforeDirtyClose = shell->editorArea()->paneCount();
+    if (dirtyEditor != nullptr) {
+        dirtyEditor->document()->setModified(true);
+    }
+    closePaneAction->trigger();
+    pump();
+    check("close.unsaved.blocked",
+          shell->editorArea()->paneCount() == beforeDirtyClose
+              && shell->statusBar()->currentMessage().contains(QStringLiteral("unsaved"),
+                                                               Qt::CaseInsensitive));
+    if (dirtyEditor != nullptr) {
+        dirtyEditor->document()->setModified(false);
+    }
+
+    // Reverse control: with the entry disabled the same trigger cannot close;
+    // re-enabling it must close, so step 1 is not a no-op assertion.
+    closePaneAction->setEnabled(false);
+    const int beforeDisabled = shell->editorArea()->paneCount();
+    closePaneAction->trigger();
+    pump();
+    check("close.reverse-control", shell->editorArea()->paneCount() == beforeDisabled);
+    closePaneAction->setEnabled(true);
+
+    closePaneAction->trigger();
+    pump();
+    check("close.unsaved-saved-close", shell->editorArea()->paneCount() == beforeDirtyClose - 1);
+    check("close.remaining-editable",
+          shell->editorArea()->activePane() != nullptr
+              && shell->editorArea()->activePane()->editorWidget() != nullptr);
+
+    while (shell->editorArea()->paneCount() > 1) {
+        closePaneAction->trigger();
+        pump();
+    }
+    check("close.last-single-view",
+          shell->editorArea()->paneCount() == 1 && shell->isVisible());
+
+    // Per-pane X button: splitting once more gives the new pane a button; one
+    // click removes exactly that split and the window stays open.
+    EditorPane *buttonPane = shell->editorArea()->splitActive(Qt::Horizontal);
+    pump();
+    check("close.button.split", buttonPane != nullptr && shell->editorArea()->paneCount() == 2);
+    auto *button = buttonPane != nullptr
+                       ? buttonPane->findChild<QToolButton *>(QStringLiteral("pane-close-button"))
+                       : nullptr;
+    check("close.button.present", button != nullptr);
+    if (button != nullptr) {
+        button->click();
+    }
+    pump();
+    check("close.button.single-view",
+          shell->editorArea()->paneCount() == 1 && shell->isVisible());
+
+    // T137: File -> Open is a real command, and the shared openPaths() used by
+    // positional arguments and the dialog validates before mutating anything.
+    QAction *openAction = shell->commands()->action(QStringLiteral("file.open"));
+    check("open.command.exists", openAction != nullptr);
+    check("open.command.in-file-menu",
+          openAction != nullptr
+              && shell->commands()->actionsInMenu(QStringLiteral("file")).contains(openAction));
+    check("open.command.shortcut-ctrl-o",
+          openAction != nullptr
+          && openAction->shortcut() == QKeySequence(QStringLiteral("Ctrl+O")));
+
+    const QString openA = temp.path() + QStringLiteral("/open-a.sv");
+    const QString openB = temp.path() + QStringLiteral("/open-b.sv");
+    const auto writeFixture = [](const QString &path) {
+        QFile file(path);
+        return file.open(QIODevice::WriteOnly) && file.write("module m;\n// 中文注释\nendmodule\n") > 0;
+    };
+    check("open.fixture-a", writeFixture(openA));
+    check("open.fixture-b", writeFixture(openB));
+    QString missingError;
+    check("open.missing.rejected",
+          !shell->openPaths({temp.path() + QStringLiteral("/does-not-exist.sv")}, &missingError)
+              && missingError.contains(QStringLiteral("no such file")));
+    check("open.missing.nonzero-readable", !missingError.isEmpty());
+
+    shell->editorArea()->resetLayout();
+    QString openError;
+    check("open.multiple.ok", shell->openPaths({openA, openB}, &openError));
+    check("open.multiple.pane-count", shell->editorArea()->paneCount() == 2);
+    const auto openedPanes = shell->editorArea()->panes();
+    check("open.multiple.paths",
+          openedPanes.size() == 2
+              && openedPanes.at(0)->currentFilePath() == QFileInfo(openA).absoluteFilePath()
+              && openedPanes.at(1)->currentFilePath() == QFileInfo(openB).absoluteFilePath());
+    check("open.multiple.active-second",
+          shell->editorArea()->activePane() == openedPanes.at(1));
+    shell->editorArea()->resetLayout();
+
+    // File -> Open: exercise the real action/handler wiring; the headless seam
+    // supplies the path instead of a modal QFileDialog.
+    shell->setOpenFileDialogProvider([openA]() { return openA; });
+    openAction->trigger();
+    pump();
+    check("open.dialog.action-opens",
+          shell->editorArea()->activePane() != nullptr
+              && shell->editorArea()->activePane()->currentFilePath()
+                     == QFileInfo(openA).absoluteFilePath());
+    shell->setOpenFileDialogProvider(nullptr);
+    shell->editorArea()->resetLayout();
 
     // Persistence round-trip.
     shell->applyMixedSplitPreset();
@@ -1136,6 +1358,18 @@ int captureScreenshots(const QString &directory)
 
 int main(int argc, char **argv)
 {
+    // T134: Rust is STATICALLY LINKED into this C++ host (crates/vd-lsp drives
+    // the verible/verible-verilog-ls child through tokio). The Rust runtime's
+    // startup — the code that calls `signal(SIGPIPE, SIG_IGN)` in a Rust binary
+    // — never runs here, so a write to a dead child's stdin (e.g. while the
+    // user switches files and the LSP session is being torn down) would raise
+    // SIGPIPE and kill the whole GUI with "Broken pipe" before any error path
+    // runs (and before the crash reporter: SIGPIPE is not one of the signals it
+    // handles). Ignore it FIRST, before Qt / Rust / any child process starts;
+    // the write then fails with EPIPE, which the Rust side records as a state.
+    // Do not add SA_RESETHAND: the ignore must stay for the whole process.
+    std::signal(SIGPIPE, SIG_IGN);
+
     QApplication app(argc, argv);
     QCoreApplication::setApplicationName(QStringLiteral("vedit-app"));
     QCoreApplication::setApplicationVersion(QStringLiteral("0.2.0"));
@@ -1145,6 +1379,9 @@ int main(int argc, char **argv)
     parser.setApplicationDescription(QStringLiteral("VEdit application shell (Qt6/KTextEditor rewrite)."));
     parser.addHelpOption();
     parser.addVersionOption();
+    parser.addPositionalArgument(QStringLiteral("file"),
+                                 QStringLiteral("File(s) to open (each additional file gets a split)."),
+                                 QStringLiteral("[file...]"));
     parser.addOption({QStringLiteral("state-dir"),
                       QStringLiteral("Directory for session.json and shortcuts.json."),
                       QStringLiteral("dir")});
@@ -1218,6 +1455,20 @@ int main(int argc, char **argv)
         return captureScreenshots(parser.value(QStringLiteral("screenshots")));
     }
 
+    // T137: validate positional files before creating the shell, so a typo
+    // prints one readable line and exits non-zero instead of opening an empty
+    // window. The same validation lives in ApplicationShell::openPaths for
+    // File -> Open; this early pass only exists to avoid constructing the GUI.
+    const QStringList requestedFiles = parser.positionalArguments();
+    for (const QString &raw : requestedFiles) {
+        const QFileInfo info(raw);
+        if (!info.exists() || !info.isFile()) {
+            std::fprintf(stderr, "vedit-app: cannot open %s: %s\n", qPrintable(raw),
+                         info.exists() ? "not a regular file" : "no such file or directory");
+            return 2;
+        }
+    }
+
     // Session restore is deferred until the lanes registered their panel
     // factories: setFactory() only affects FUTURE inserts, so restoring during
     // construction left every restored dock a shell placeholder (review M1 --
@@ -1271,6 +1522,13 @@ int main(int argc, char **argv)
     shell.panels()->setFactory(QStringLiteral("terminal"),
                                vedit::terminal::terminalPanelFactory());
     shell.startSession();
+    if (!requestedFiles.isEmpty()) {
+        QString openError;
+        if (!shell.openPaths(requestedFiles, &openError)) {
+            std::fprintf(stderr, "vedit-app: %s\n", qPrintable(openError));
+            return 1;
+        }
+    }
     shell.show();
 
     const int holdMs = parser.value(QStringLiteral("hold")).toInt();
