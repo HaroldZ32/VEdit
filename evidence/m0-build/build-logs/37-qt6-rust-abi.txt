@@ -1,54 +1,54 @@
 ## file
-/vedit-build/target/qt6-build/src/app/vedit-app: ELF 64-bit LSB pie executable, x86-64, version 1 (GNU/Linux), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=56e0166b3c531e43d0e7da9b53a8183f4794af55, for GNU/Linux 3.2.0, with debug_info, not stripped
+/vedit-build/target/qt6-build/src/app/vedit-app: ELF 64-bit LSB pie executable, x86-64, version 1 (GNU/Linux), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=3a8480970975a92502bbd9dd8a9f2c0082eb4d5d, for GNU/Linux 3.2.0, with debug_info, not stripped
 ## exported vd_* C ABI symbols (nm)
-000000000023fe00 T vd_search_poll
-000000000023ff30 T vd_search_query
-0000000000240240 T vd_search_results_free
-0000000000240330 T vd_search_tree_poll
-00000000002405c0 T vd_search_tree_query
-0000000000240840 T vd_settings_free
-00000000002409a0 T vd_settings_load
-0000000000240ab0 T vd_settings_poll
-0000000000240e10 T vd_settings_save
-0000000000246ff0 T vd_abi_version
-0000000000247000 T vd_job_cancel
-0000000000247250 T vd_job_release
-0000000000247370 T vd_service_create
-0000000000247510 T vd_service_destroy
-0000000000247560 T vd_service_error
-000000000024a490 T vd_fim_complete
-000000000024a670 T vd_fim_poll
-000000000024a7e0 T vd_fim_result_free
-000000000024f310 T vd_vcs_diff_free
-000000000024f3c0 T vd_vcs_diff_job
-000000000024f5a0 T vd_vcs_diff_poll
-000000000024f7d0 T vd_vcs_info_free
-000000000024f880 T vd_vcs_info_job
-000000000024f990 T vd_vcs_info_poll
-000000000024fc10 T vd_vcs_poll
-000000000024ff80 T vd_vcs_status
-0000000000250090 T vd_vcs_status_free
-0000000000252ed0 T vd_deeplint_lint
-00000000002530d0 T vd_deeplint_poll
-0000000000253310 T vd_diagnostics_free
-0000000000253400 T vd_project_info_free
-0000000000253640 T vd_project_parse
-0000000000253750 T vd_project_poll
-00000000006b6ff0 T vd_lsp_info_free
-00000000006b7070 T vd_lsp_poll
-00000000006b7220 T vd_lsp_request_poll
-00000000006b7690 T vd_lsp_response_free
-00000000006b7a40 T vd_lsp_session_change
-00000000006b7d10 T vd_lsp_session_free
-00000000006b7e60 T vd_lsp_session_request
-00000000006b83b0 T vd_lsp_session_start
-00000000006b8e20 T vd_lsp_session_status
-00000000006b9110 T vd_lsp_session_stop
-00000000006b91c0 T vd_lsp_start
-00000000006b94c0 T vd_lsp_status_free
+0000000000242e40 T vd_search_poll
+0000000000242f70 T vd_search_query
+0000000000243280 T vd_search_results_free
+0000000000243370 T vd_search_tree_poll
+0000000000243600 T vd_search_tree_query
+0000000000243880 T vd_settings_free
+00000000002439e0 T vd_settings_load
+0000000000243af0 T vd_settings_poll
+0000000000243e50 T vd_settings_save
+000000000024a030 T vd_abi_version
+000000000024a040 T vd_job_cancel
+000000000024a290 T vd_job_release
+000000000024a3b0 T vd_service_create
+000000000024a550 T vd_service_destroy
+000000000024a5a0 T vd_service_error
+000000000024d4d0 T vd_fim_complete
+000000000024d6b0 T vd_fim_poll
+000000000024d820 T vd_fim_result_free
+0000000000252350 T vd_vcs_diff_free
+0000000000252400 T vd_vcs_diff_job
+00000000002525e0 T vd_vcs_diff_poll
+0000000000252810 T vd_vcs_info_free
+00000000002528c0 T vd_vcs_info_job
+00000000002529d0 T vd_vcs_info_poll
+0000000000252c50 T vd_vcs_poll
+0000000000252fc0 T vd_vcs_status
+00000000002530d0 T vd_vcs_status_free
+0000000000255f10 T vd_deeplint_lint
+0000000000256110 T vd_deeplint_poll
+0000000000256350 T vd_diagnostics_free
+0000000000256440 T vd_project_info_free
+0000000000256680 T vd_project_parse
+0000000000256790 T vd_project_poll
+00000000006ba030 T vd_lsp_info_free
+00000000006ba0b0 T vd_lsp_poll
+00000000006ba260 T vd_lsp_request_poll
+00000000006ba6d0 T vd_lsp_response_free
+00000000006baa80 T vd_lsp_session_change
+00000000006bad50 T vd_lsp_session_free
+00000000006baea0 T vd_lsp_session_request
+00000000006bb3f0 T vd_lsp_session_start
+00000000006bbe60 T vd_lsp_session_status
+00000000006bc150 T vd_lsp_session_stop
+00000000006bc200 T vd_lsp_start
+00000000006bc500 T vd_lsp_status_free
 ## count
 45
 ## highest GLIBC symbol the product binary requires (the private runtime supplies 2.43)
 GLIBC_2.39
 ## sha256
-853712ae37f699448ea9f6ff66488b29d20dd1ea920f72745ff476ad2e9d53eb  /vedit-build/target/qt6-build/src/app/vedit-app
+26ff19e3bd28b23dd77186217658fcf0a3930926cf1e134d514977602dea1538  /vedit-build/target/qt6-build/src/app/vedit-app

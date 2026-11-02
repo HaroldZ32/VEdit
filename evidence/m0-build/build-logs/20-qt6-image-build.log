@@ -31,10 +31,10 @@
 #9 exporting to image
 #9 exporting layers
 #9 exporting layers done
-#9 exporting manifest sha256:d47119c0023d0f333b04affc90012c9965c7a7df7ec21769dc142ad75b98feb3 done
-#9 exporting config sha256:31f4a9ce36bb0f218db8d9bc2d3e3b29b13ba7aaabe944f33915a2d8bcbb2259 done
-#9 exporting attestation manifest sha256:827d72bea818d81e5091806940c275b488d2419323af15326c95557a5244f260 0.0s done
-#9 exporting manifest list sha256:aacdaae97aae103587abce846b33ba278476e6278952158cd73b400de438d927 0.0s done
+#9 exporting manifest sha256:24022d16c2aa3d10eeada52b148d3ffe274ab6cbd8780e122263a8ab56ebe949 0.0s done
+#9 exporting config sha256:9b3e9f0ac23c4aee095efee26667dcf659fb78cf36ec069ca865a323afd0e26d 0.0s done
+#9 exporting attestation manifest sha256:327ccaea39f1c3d8795b1f5ee4a3b9c02d3e6c8d0a09e85d6de4adc00252e590 0.0s done
+#9 exporting manifest list sha256:b4a9fb80cda0d85947550233d49461ca9a61485b011ea643f32cc8dbaa8d36fd 0.0s done
 #9 naming to docker.io/library/vedit-qt6-build:local done
 #9 unpacking to docker.io/library/vedit-qt6-build:local done
 #9 DONE 0.1s
