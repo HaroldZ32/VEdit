@@ -1,0 +1,25 @@
+generated: 2026-11-02T03:48:11Z
+git_head: 1ab6dedc21dfefbc5cd386a4e99ba12a3d38c0a2
+git_branch: feat/qt6-ktexteditor-migration
+
+## 最终交付产物（重打包，含 svsrc mime 的 .desktop）
+path: packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage
+size_bytes: 110443000
+sha256: 8fe9b704b951ad26d0deee8e795eda5c9420c0ebd17c2b7c78c2a34ecf340112
+built_from_head: 1ab6dedc21dfefbc5cd386a4e99ba12a3d38c0a2
+PACKAGING-EXIT=0  steps_failed=0
+
+## 四容器矩阵（本产物）
+HOSTMATRIX-EXIT=0
+ROW docker.m.daocloud.io/library/centos:7 uname=7.0.0-38-generic glibc=ldd (GNU libc) 2.17 selfcheck=PASS startup=PASS lint=PASS
+ROW docker.m.daocloud.io/library/ubuntu:24.04 uname=7.0.0-38-generic glibc=ldd (Ubuntu GLIBC 2.39-0ubuntu8.9) 2.39 selfcheck=PASS startup=PASS lint=PASS
+ROW docker.m.daocloud.io/library/rockylinux:9 uname=7.0.0-38-generic glibc=ldd (GNU libc) 2.34 selfcheck=PASS startup=PASS lint=PASS
+ROW docker.m.daocloud.io/library/ubuntu:26.04 uname=7.0.0-38-generic glibc=ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43 selfcheck=PASS startup=PASS lint=PASS
+
+## 包内复验
+fold.native.* : 24 条全 PASS
+close.*       : 18 条全 PASS
+内联标注      : **未验证** —— 包内仍无 File→Open/位置参数（T137 进行中），无 --project 时不打开文件、不触发诊断分析。
+
+## 与上一版产物的差异
+上一版 f9e5c47d… 构建于 11:44:27；packaging/runtime/assets/vedit.desktop 在 11:44:42 追加了 text/x-svsrc MIME，晚 15 秒。为保证『产物与 commit 一致』，已重打包，本版为最终产物。
