@@ -1,51 +1,9 @@
 # gate log: typecheck (operational; rewritten by every run)
-collected_at: 2026-11-02T11:36:23+08:00
-git_head: af852255acf8979cd25ffc0bd882c1dcbbec6220
+collected_at: 2026-11-02T11:47:17+08:00
+git_head: 1ab6dedc21dfefbc5cd386a4e99ba12a3d38c0a2
 git_status_porcelain:
-   M AGENT.md
    M build/evidence/typecheck/00-run.txt
-   M build/evidence/typecheck/10-typecheck-image-build.log
-   M build/evidence/typecheck/11-typecheck-image-id.txt
-   M evidence/ffi-abi/logs/10-rust-image.txt
-   M evidence/ffi-abi/logs/19-rust-stage-console.log
-   M evidence/ffi-abi/logs/20-cargo-build-release.log
-   M evidence/ffi-abi/logs/21-staticlib.txt
-   M evidence/ffi-abi/logs/22-rust-targets.txt
-   M evidence/ffi-abi/logs/23-cargo-test.log
-   M evidence/m0-build/build-logs/20-qt6-image-build.log
-   M evidence/m0-build/build-logs/21-qt6-image-id.txt
-   M evidence/m0-build/build-logs/31-qt6-configure.log
-   M evidence/m0-build/build-logs/32-qt6-build.log
-   M evidence/m0-build/build-logs/34-qt6-elf.txt
-   M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
-   M src/app/app_shell.cpp
-   M src/app/app_shell.h
-   M src/app/editor_area.cpp
-   M src/app/editor_area.h
-   M src/app/editor_provider.h
-   M src/app/main.cpp
-   M src/app/panel_registry.cpp
-   M src/app/panel_registry.h
-   M src/editor/CMakeLists.txt
-   M src/editor/kernel/ktexteditor_provider.cpp
-   M src/editor/kernel/ktexteditor_provider.h
-   M src/workspace/diagnostics/CMakeLists.txt
-   M src/workspace/diagnostics/diagnostics_integration.cpp
-   M src/workspace/diagnostics/diagnostics_panel.cpp
-   M src/workspace/diagnostics/diagnostics_panel.h
-   M src/workspace/diagnostics/selftests/diagnostics_product_seam.cpp
-   M src/workspace/settings/CMakeLists.txt
-   M src/workspace/settings/settings_integration.cpp
-   M src/workspace/settings/settings_panel.cpp
-   M src/workspace/settings/settings_panel.h
-  ?? crates/vd-lsp/tests/pipe_lifecycle.rs
-  ?? evidence/diagnostics-inline/
-  ?? evidence/epipe-crash/
-  ?? evidence/i18n/
-  ?? evidence/split-close/
-  ?? evidence/view-menu-sync/
-  ?? src/editor/kernel/diagnostics_annotations.cpp
-  ?? src/editor/kernel/diagnostics_annotations.h
-  ?? src/workspace/settings/settings_dialog.cpp
-  ?? src/workspace/settings/settings_dialog.h
+   M evidence/slice3-pack/00-preflight.log
+   M evidence/slice3-pack/10-assemble.log
+  ?? evidence/epipe-crash/16-packaging-final.log
 

@@ -1,7 +1,7 @@
 image: vedit-qt6-build:local
-image_id=sha256:d0f2659c2034f00526d95e1aceb00c5b5860ede326a07ca79747f3f55b1e8a6b size=2183735978
+image_id=sha256:b4a9fb80cda0d85947550233d49461ca9a61485b011ea643f32cc8dbaa8d36fd size=2183732339
 vd-app: /home/haroldzhao/MyProj/DshProj/VEdit/target/qt6-build/src/app/vedit-app
-  sha256=132ecc6ffae27f24457bd23ea73479231f865e306937ad4818d2cbc6148b5e8d
+  sha256=26ff19e3bd28b23dd77186217658fcf0a3930926cf1e134d514977602dea1538
 probe: /home/haroldzhao/MyProj/DshProj/VEdit/target/qt6-build/cmake/smoke/vedit-ksh-env-probe
   sha256=b709d6924ec9a6f6da6ec80aaf915aa27d9b9ddb3e18de73ced44316353fc242
 f2 install: /home/haroldzhao/MyProj/DshProj/VEdit/target/ksh-selfbuild/F2/install
