@@ -1,0 +1,58 @@
+# C9 evidence header
+collected_at: 2026-11-01T15:58:09+08:00
+collected_at_utc: 2026-11-01T07:58:09+00:00
+git_head: 206033c1faa91ac6b89cca0d575d36283ab69d7f
+git_status_porcelain:
+  M build/evidence/typecheck/00-run.txt
+  M build/evidence/typecheck/10-typecheck-image-build.log
+  M build/evidence/typecheck/11-typecheck-image-id.txt
+  M crates/vd-ffi/include/vd_ffi.h
+  M crates/vd-ffi/src/service.rs
+  M evidence/ffi-abi/logs/10-rust-image.txt
+  M evidence/ffi-abi/logs/19-rust-stage-console.log
+  M evidence/ffi-abi/logs/20-cargo-build-release.log
+  M evidence/ffi-abi/logs/21-staticlib.txt
+  M evidence/ffi-abi/logs/23-cargo-test.log
+  M evidence/ffi-abi/logs/26-vd_ffi.h
+  M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+  M evidence/m0-build/build-logs/20-qt6-image-build.log
+  M evidence/m0-build/build-logs/21-qt6-image-id.txt
+  M evidence/m0-build/build-logs/31-qt6-configure.log
+  M evidence/m0-build/build-logs/32-qt6-build.log
+  M evidence/m0-build/build-logs/33-qt6-ctest.log
+  M evidence/m0-build/build-logs/34-qt6-elf.txt
+  M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+  M packaging/appimage/README.md
+  M packaging/runtime/AppRun
+  M packaging/runtime/README.md
+  M packaging/runtime/assemble-appdir.sh
+  M packaging/runtime/build.sh
+  M packaging/runtime/selfcheck.sh
+  M packaging/runtime/verify-f2-isolation.sh
+  M packaging/runtime/verify-not-shipped.sh
+  M src/editor/kernel/fold_breadcrumb.cpp
+  M src/syntax/folding/CMakeLists.txt
+  M src/syntax/folding/ksyntax_fold_source.cpp
+  M src/syntax/folding/ksyntax_fold_source.h
+  M src/workspace/palette/README.md
+  M src/workspace/search/CMakeLists.txt
+  M src/workspace/search/README.md
+  M src/workspace/search/global_search.cpp
+  M src/workspace/search/global_search.h
+ ?? evidence/fold-syntax-dir/
+ ?? evidence/slice1-stop/81-typecheck-t106.log
+ ?? evidence/slice1-stop/82-build-qt-t106.log
+ ?? src/syntax/folding/syntax_directory.cpp
+ ?? src/syntax/folding/syntax_directory.h
+ ?? src/syntax/folding/tests/syntax_directory_tests.cpp
+---
+## PRE-FIX reproduction: T84 data-root layout (T31 packaging without the
+## duplicate XML copies): the old binding looked for <root>/vedit-*.xml directly,
+## so the closed-state fold source loaded nothing (injected_ranges=0).
+
+FOLD-WIRING closed_state first_real=0 last_real=42 first_visible=0 last_visible=42 full_count=2 injected_ranges=0 hidden_in_viewport=0 scroll_max=958 tree_sitter=0
+CHECK fold.wiring.closed.observed FAIL
+CHECK fold.wiring.closed.hidden-975 FAIL hidden=0
+CHECK fold.wiring.closed.registry-200 FAIL registry=0
+CHECK fold.wiring.closed.no-rejects PASS
+APP-SHELL-SELFTEST ok=0 checks=200 failures=3 state=/tmp/vedit-app-nkUPWS/state

@@ -1,0 +1,4 @@
+== tree-sitter CLI pin ==
+version: 0.27.1
+actual:  tree-sitter 0.27.1
+PASS: tree-sitter CLI 0.27.1 (npm package + linux-x64 binary sha256 verified)

@@ -1,0 +1,16 @@
+date: 2026-11-01T14:45:08+08:00
+head: 48569602d0c86fb402dc88155593d1dc06445c90 (feat/qt6-ktexteditor-migration)
+image: vedit-qt6-build:local sha256:c9024fc91daa4bdf1a34536c7dcb74e4e662130618b80af7a4173b7e6ad4f1c9
+changed paths (T99):
+   M AGENT.md
+   M crates/vd-ffi/include/vd_ffi.h
+   M crates/vd-ffi/src/service.rs
+   M crates/vd-ffi/src/vcs.rs
+   M src/workspace/vcs/vcs_panel.cpp
+   M src/workspace/vcs/vcs_panel.h
+   M src/workspace/vcs/vcs_selftest.cpp
+   M src/workspace/vcs/vcs_source.cpp
+   M src/workspace/vcs/vcs_source.h
+read-only gate untouched (crates/vd-vcs): clean (no changes)
+write-shaped symbols in the generated header:
+0

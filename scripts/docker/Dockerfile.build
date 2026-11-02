@@ -1,5 +1,97 @@
-# Build environment for VEdit on CentOS 7.9.2009 (glibc 2.17) — the deployment
-# target itself, so the produced ELF never needs a newer glibc.
+# Build environments for VEdit — two STAGES in one file, every input pinned.
+#
+#   stage `qt6-build`  (declared FIRST): the modern build distro of the Qt6/KF6
+#        C++ lane (M0 build base, task T10). Selected explicitly with
+#        `docker build --target qt6-build -f scripts/docker/Dockerfile.build`.
+#   stage `rust-build` (declared LAST): the historical CentOS 7.9.2009
+#        (glibc 2.17) image that compiles the Rust/GTK product and is that
+#        product's deployment target. A plain
+#        `docker build -f scripts/docker/Dockerfile.build` builds THIS stage
+#        (Docker builds the last stage by default), so scripts/build.sh,
+#        scripts/gates.sh and CI keep their exact previous behaviour.
+#
+# Reproducibility: both stages pin their base image by digest; every download is
+# pinned by sha256 (scripts/versions.env for the Rust/GTK lane;
+# scripts/versions-qt.env + scripts/docker/qt6-locked-packages.txt for the Qt6
+# lane) and verified before use; the installed package set is snapshotted.
+#
+# =============================================================================
+# Stage: qt6-build
+#
+# Qt 6.10.2 / KF6 6.24.0 / KTextEditor 6.24.0 / KSyntaxHighlighting 6.24.0 /
+# tree-sitter 0.25.9 on Ubuntu 26.04.1 LTS, pinned by digest + exact package
+# versions + .deb sha256. This is deliberately a BUILD distro, not the
+# deployment target: the deliverable carries its own loader + glibc + Qt6/KF6
+# runtime (C2, task T11), so the binary may need symbols newer than CentOS 7's
+# glibc 2.17. KF6 6.24 requires Qt >= 6.8 upstream, and the CentOS 7 vault has
+# no Qt >= 6.5 at all -- building this lane on CentOS 7 is impossible, while the
+# bundled runner makes the modern build distro irrelevant to the user's machine.
+# The CentOS 7 kernel (3.10) is still satisfied: this glibc 2.43 is built with
+# "Minimum supported kernel: 3.2.0" (see scripts/versions-qt.env).
+#
+# Both base-image ARGs must be declared BEFORE the first FROM: a FROM can only
+# read global-scope build arguments, and the rust-build stage's base image is a
+# build argument too (scripts/lib.sh passes it after a mirror fallback).
+# =============================================================================
+ARG VEDIT_QT6_BASE_IMAGE=docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c
+ARG BASE_IMAGE=docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+FROM ${VEDIT_QT6_BASE_IMAGE} AS qt6-build
+
+# The lock file is the build context's copy of scripts/docker/qt6-locked-packages.txt
+# (the build context of this Dockerfile is scripts/docker/).
+COPY qt6-locked-packages.txt /opt/vedit/qt6-locked-packages.txt
+
+# Download the exact locked versions, verify every .deb sha256, then install
+# them. A missing/renamed version fails here instead of drifting silently.
+RUN set -eux; \
+    apt-get update; \
+    mkdir -p /tmp/qt6-debs; cd /tmp/qt6-debs; \
+    while read -r spec sha rest; do \
+      case "$spec" in ''|'#'*) continue;; esac; \
+      apt-get download "$spec"; \
+      deb=$(ls "${spec%%=*}"_*.deb); \
+      printf '%s  %s\n' "$sha" "$deb" | sha256sum -c -; \
+    done < /opt/vedit/qt6-locked-packages.txt; \
+    cd /; rm -rf /tmp/qt6-debs; \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      build-essential pkg-config git curl ca-certificates binutils file \
+      xvfb xauth fonts-dejavu-core libgl1-mesa-dri mesa-utils \
+      libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 \
+      libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0 \
+      libxcb-xkb1 libxkbcommon0 \
+      $(awk '!/^#/ && NF {print $1}' /opt/vedit/qt6-locked-packages.txt); \
+    rm -rf /var/lib/apt/lists/*
+
+# Assert the installed versions equal the lock again (defence in depth: the
+# download check proves the archive, this proves the image), then record the
+# facts the lane's evidence and the CMake guards rely on.
+RUN set -eux; \
+    while read -r spec sha rest; do \
+      case "$spec" in ''|'#'*) continue;; esac; \
+      pkg="${spec%%=*}"; ver="${spec#*=}"; \
+      got=$(dpkg-query -W -f='${Version}' "$pkg"); \
+      [ "$got" = "$ver" ] || { echo "FATAL: $pkg installed=$got locked=$ver" >&2; exit 1; }; \
+    done < /opt/vedit/qt6-locked-packages.txt; \
+    { echo "## image facts"; head -3 /etc/os-release; \
+      echo "glibc: $(dpkg-query -W -f='${Version}' libc6)"; \
+      strings /lib/x86_64-linux-gnu/libc.so.6 | grep -m1 'Minimum supported kernel'; \
+      echo "qt6-base-dev: $(dpkg-query -W -f='${Version}' qt6-base-dev)"; \
+      echo "kf6-texteditor: $(dpkg-query -W -f='${Version}' libkf6texteditor-dev)"; \
+      echo "kf6-syntaxhighlighting: $(dpkg-query -W -f='${Version}' libkf6syntaxhighlighting-dev)"; \
+      echo "tree-sitter: $(pkg-config --modversion tree-sitter)"; \
+      echo "cmake: $(cmake --version | head -1)"; \
+      echo "g++: $(g++ --version | head -1)"; \
+    } | tee /opt/vedit/build-image.txt; \
+    dpkg-query -W -f='${Package} ${Version} ${Architecture}\n' | sort > /opt/vedit/package-snapshot.txt
+
+# UTF-8 locale + a writable runtime dir for the offscreen/xcb smoke runs; the
+# compile step itself never depends on the host environment.
+ENV LANG=C.UTF-8 \
+    XDG_RUNTIME_DIR=/tmp/xdg-runtime
+
+# =============================================================================
+# Stage: rust-build — CentOS 7.9.2009 (glibc 2.17), the Rust/GTK deployment
+# target itself, so that product's ELF never needs a newer glibc.
 #
 # Reproducibility (AC-19): the base image is pinned by digest, every download is
 # pinned by sha256 in scripts/versions.env and verified before use, and the
@@ -7,10 +99,10 @@
 # compared on every build by scripts/build-in-container.sh.
 # The CentOS base is a build argument so a transient mirror outage can be served
 # by the Docker Hub fallback with the SAME digest (scripts/lib.sh resolves it);
-# with no fallback the pinned reference below is used, so a normal build is
-# identical to before.
-ARG BASE_IMAGE=docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
-FROM ${BASE_IMAGE}
+# its ARG is declared once, in the global scope at the top of this file (a FROM
+# can only read global-scope ARGs), so a normal build is identical to before.
+# =============================================================================
+FROM ${BASE_IMAGE} AS rust-build
 
 ARG CENTOS_VAULT_BASE
 ARG RUSTUP_URL

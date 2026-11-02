@@ -1,0 +1,32 @@
+# C9 evidence header
+collected_at: 2026-11-02T10:27:08+08:00
+collected_at_utc: 2026-11-02T02:27:08+00:00
+git_head: 9a9bb43d3c0035f0618d89b9e28082d9bd1e0a01
+---
+## Xvfb+xcb, NO FoldInjector: real mouse clicks on the KTextEditor gutter marker
+
+NATIVE-GUI mode='SystemVerilog' set=1 view_visible=1
+NATIVE-GUI baseline first=0 last=61 hidden=0 scroll_max=939
+NATIVE-GUI geometry view=1000x900 text_x=60 global_text_x=60 global_y=1
+NATIVE-GUI screenshot=/vedit-build/evidence/fold-gutter-click/gutter.png size=1000x900
+NATIVE-GUI border_scan line0_px=32 line1_px=33
+NATIVE-GUI marker_found x=44 (gutter_x=44)
+NATIVE-GUI after_first_click first=0 hidden=38 scroll_max=901 changed=1
+NATIVE-GUI after_second_click first=0 hidden=0 scroll_max=939
+NATIVE-GUI verdict marker_created_by_kde=1 fold_direction=1 unfold_direction=1
+NATIVE-GUI negative_control changed=1
+NATIVE-GUI done
+GUI-PROBE-EXIT=0
+NATIVE-GUI mode='SystemVerilog' set=1 view_visible=1
+NATIVE-GUI baseline first=0 last=61 hidden=0 scroll_max=939
+NATIVE-GUI geometry view=1000x900 text_x=60 global_text_x=60 global_y=1
+NATIVE-GUI line_height=14
+NATIVE-GUI screenshot=/vedit-build/evidence/fold-gutter-click/gutter.png size=1000x900
+NATIVE-GUI border_scan line0_px=32 line1_px=33
+NATIVE-GUI marker_found x=44 (gutter_x=44)
+NATIVE-GUI after_first_click first=0 hidden=38 scroll_max=901 changed=1
+NATIVE-GUI after_second_click first=0 hidden=0 scroll_max=939
+NATIVE-GUI verdict marker_created_by_kde=1 fold_direction=1 unfold_direction=1
+NATIVE-GUI negative_control changed=0
+NATIVE-GUI done
+GUI-PROBE-EXIT=0

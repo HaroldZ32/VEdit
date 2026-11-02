@@ -1,0 +1,45 @@
+== AC-S2.3 palette benchmark: 10,000 files, 200 samples/query, budget 200 ms ==
+collected_at: 2026-11-01T05:43:01Z
+git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+host: Linux 7.0.0-38-generic x86_64
+cpu: AMD Ryzen 7 7840H w/ Radeon 780M Graphics
+mem: 29Gi
+image: vedit-qt6-build:local (sha256:c1fa0168a4e6)
+cmd: cmake -S src/workspace/palette -B target/ws-palette-bench-build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+     cmake --build target/ws-palette-bench-build --target vedit-workspace-palette-bench
+     vedit-workspace-palette-bench --files 10000 --iterations 200 --limit 100 --fixture target/ws-palette-bench-fixture --json evidence/slice2-find/palette-bench.json --assert-p95-ms 200
+--- output ---
+CONFIGURE-EXIT=0
+-- Generating done (0.0s)
+-- Build files have been written to: /vedit-build/target/ws-palette-bench-build
+BUILD-EXIT=0
+This plugin does not support raise()
+This plugin does not support grabbing the keyboard
+This plugin does not support raise()
+BENCH FIXTURE created files=10000 ms=257
+BENCH SCAN files=10000 cold_ms=18 cached_ms=0 scan_count=1
+BENCH CORE q=m median_ms=0.867 p95_ms=1.057 max_ms=1.225
+BENCH GUI  q=m median_ms=0.976 p95_ms=1.124 max_ms=1.362
+BENCH CORE q=ma median_ms=0.807 p95_ms=0.994 max_ms=1.207
+BENCH GUI  q=ma median_ms=0.929 p95_ms=1.043 max_ms=1.273
+BENCH CORE q=mai median_ms=0.648 p95_ms=0.777 max_ms=1.532
+BENCH GUI  q=mai median_ms=0.763 p95_ms=0.825 max_ms=0.956
+BENCH CORE q=main median_ms=0.650 p95_ms=0.742 max_ms=1.179
+BENCH GUI  q=main median_ms=0.766 p95_ms=0.825 max_ms=1.194
+BENCH CORE q=cmd median_ms=0.889 p95_ms=1.054 max_ms=1.254
+BENCH GUI  q=cmd median_ms=1.021 p95_ms=1.155 max_ms=1.363
+BENCH CORE q=pal median_ms=0.771 p95_ms=0.935 max_ms=1.440
+BENCH GUI  q=pal median_ms=0.891 p95_ms=1.074 max_ms=1.203
+BENCH CORE q=src median_ms=1.345 p95_ms=1.504 max_ms=1.702
+BENCH GUI  q=src median_ms=1.471 p95_ms=1.644 max_ms=1.953
+BENCH CORE q=widget median_ms=0.674 p95_ms=0.857 max_ms=1.045
+BENCH GUI  q=widget median_ms=0.800 p95_ms=0.991 max_ms=1.283
+BENCH CORE q=file_index median_ms=0.674 p95_ms=0.818 max_ms=1.089
+BENCH GUI  q=file_index median_ms=0.809 p95_ms=1.005 max_ms=1.149
+BENCH CORE q=zzzz median_ms=0.615 p95_ms=0.755 max_ms=1.286
+BENCH GUI  q=zzzz median_ms=0.648 p95_ms=0.790 max_ms=0.908
+BENCH CORE overall median_ms=0.763 p95_ms=1.346 max_ms=1.702
+BENCH GUI  overall median_ms=0.880 p95_ms=1.471 max_ms=1.953
+BENCH VERDICT PASS p95_ms=1.471 budget_ms=200.000 files=10000 source=disk
+BENCH JSON /vedit-build/evidence/slice2-find/palette-bench.json
+BENCH-EXIT=0

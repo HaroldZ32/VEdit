@@ -54,6 +54,7 @@ mod diagnostics;
 mod documents;
 mod edits;
 mod position;
+mod session;
 
 pub use client::{CancelHandle, CancelToken, LspClient, MAX_RESTARTS};
 pub use config::LspConfig;
@@ -61,6 +62,16 @@ pub use diagnostics::{diagnostic_rule, DiagnosticsSnapshot, PublishedDiagnostics
 pub use documents::OpenDocument;
 pub use edits::{apply_content_changes, apply_text_edits};
 pub use position::{byte_to_position, line_start_byte, position_to_byte};
+// The C ABI layer (vd-ffi) converts these types without depending on
+// lsp-types directly; the aliases keep that dependency at one crate.
+pub use lsp_types::Location as SessionLocation;
+pub use lsp_types::Range as SessionRange;
+
+pub use session::{
+    range_parts, severity_code, PollOutcome, SessionDiagnostic, SessionHandle, SessionPhase,
+    SessionRequest, SessionResponse, SessionStatus, SkippedFile, SymbolNode, WorkspaceTextEdit,
+    DEFAULT_DIAGNOSTICS_BUDGET, DEFAULT_STOP_BUDGET, DEFAULT_TAB_SIZE,
+};
 
 /// Version of this crate, from its manifest.
 pub const CRATE_VERSION: &str = env!("CARGO_PKG_VERSION");

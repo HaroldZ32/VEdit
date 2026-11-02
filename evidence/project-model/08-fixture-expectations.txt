@@ -1,0 +1,102 @@
+# C9 evidence header
+collected_at: 2026-10-31T18:49:40+08:00
+git_head: 1f47e56421bbeaab64f8082df3cfc104a6a2c2ef
+git_status_porcelain:
+   M build/evidence/12-gates-image-build.log
+   M build/gates/gates.sh
+   M build/gates/typecheck.sh
+   M build/slang/evidence/00-build-console.log
+   M build/slang/evidence/01-yum-install.log
+   M build/slang/evidence/02-toolchain.txt
+   M build/slang/evidence/02b-python-build.log
+   M build/slang/evidence/02c-python.txt
+   M build/slang/evidence/03-source.txt
+   M build/slang/evidence/03b-patches.txt
+   M build/slang/evidence/04-configure.log
+   M build/slang/evidence/05-deps.txt
+   M build/slang/evidence/05-elf-check.txt
+   M build/slang/evidence/06-build.log
+   M build/slang/evidence/06-offline-console.log
+   M build/slang/evidence/07-artifact.txt
+   M build/slang/evidence/08-timings.txt
+   M build/slang/evidence/09-offline-smoke.txt
+   M crates/vd-ffi/include/vd_ffi.h
+   M crates/vd-ffi/src/lsp.rs
+   M evidence/ffi-abi/logs/10-rust-image.txt
+   M evidence/ffi-abi/logs/19-rust-stage-console.log
+   M evidence/ffi-abi/logs/20-cargo-build-release.log
+   M evidence/ffi-abi/logs/21-staticlib.txt
+   M evidence/ffi-abi/logs/23-cargo-test.log
+   M evidence/ffi-abi/logs/26-vd_ffi.h
+   M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+   M evidence/m0-build/build-logs/20-qt6-image-build.log
+   M evidence/m0-build/build-logs/21-qt6-image-id.txt
+   M evidence/m0-build/build-logs/31-qt6-configure.log
+   M evidence/m0-build/build-logs/32-qt6-build.log
+   M evidence/m0-build/build-logs/33-qt6-ctest.log
+   M evidence/m0-build/build-logs/34-qt6-elf.txt
+   M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+  ?? evidence/gate-infra/
+  ?? evidence/highlight-v2/00-collect.txt
+  ?? evidence/highlight-v2/01-after-link.txt
+  ?? evidence/highlight-v2/03-build-qt-gate.log
+  ?? evidence/highlight-v2/04-syntax-product-tests.log
+  ?? evidence/highlight-v2/06-standalone-lanes.log
+  ?? evidence/highlight-v2/07-negative-control.log
+  ?? evidence/highlight-v2/08-ctest.log
+  ?? evidence/highlight-v2/09-screenshot-L2.log
+  ?? evidence/highlight-v2/10-licensing-and-embargo.txt
+  ?? evidence/highlight-v2/README.md
+  ?? evidence/highlight-v2/screenshots/
+  ?? evidence/project-model/
+  ?? evidence/verdicts/fix-filetree-open/
+  ?? filetree-testdata/
+  ?? src/editor/CMakeLists.txt
+  ?? src/editor/kernel/
+  ?? src/workspace/diagnostics/
+  ?? src/workspace/project/
+host: Linux 7.0.0-38-generic x86_64 (docker image vedit-qt6-build:local; no display server)
+fixture: /home/haroldzhao/MyProj/DshProj/VEdit/tests/fixtures/verilog-project
+build_dir: /home/haroldzhao/MyProj/DshProj/VEdit/target/project-t6/build
+state_dir: /home/haroldzhao/MyProj/DshProj/VEdit/target/project-t6/state
+
+fixture files:
+  ./expected/defines.txt
+  ./expected/duplicates.txt
+  ./expected/files.txt
+  ./expected/incdirs.txt
+  ./expected/skipped-tokens.txt
+  ./filelists/extra.f
+  ./filelists/nested/tb_aux.f
+  ./filelists/tb.f
+  ./inc/defs.vh
+  ./inc/generated/width.vh
+  ./project.f
+  ./README.md
+  ./rtl/alu_pkg.sv
+  ./rtl/alu.sv
+  ./rtl/counter.v
+  ./rtl/include/rtl_defs.vh
+  ./rtl/mem.sv
+  ./rtl/top.sv
+  ./tb/include/tb_defs.vh
+  ./tb/tb_aux.sv
+  ./tb/tb_top.sv
+expected/files.txt:
+  rtl/alu_pkg.sv
+  rtl/alu.sv
+  rtl/counter.v
+  rtl/top.sv
+  tb/tb_top.sv
+  tb/tb_aux.sv
+  rtl/mem.sv
+expected/incdirs.txt:
+  inc
+  inc/generated
+  rtl/include
+  tb/include
+expected/defines.txt:
+  WIDTH=8
+  DEPTH=16
+  DEBUG
+  SIMULATION

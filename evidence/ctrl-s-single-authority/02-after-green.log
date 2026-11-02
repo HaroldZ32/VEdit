@@ -1,0 +1,32 @@
+# T80 — Ctrl+S 单一权威修复后（真实 KTextEditor view 聚焦时的 Ctrl+S 与 File>Save 均生效）
+# command: vedit-app --selfcheck (offscreen, pinned image)
+# date: 2026-10-31T22:39:00+08:00
+# exit code: 0
+
+CHECK save.command.registered PASS
+CHECK save.shortcut.ctrl-s PASS
+CHECK save.menu.file-item PASS
+CHECK save.demo.open PASS
+CHECK save.demo.action.disk-bytes PASS
+CHECK save.demo.action.path-unchanged PASS
+CHECK save.demo.action.no-temp-file PASS
+CTRL-S-BINDING after-provider-install objectName=action-file.save class=QAction shortcut=Ctrl+S context=1 associated=[QMenu() ] holders=[QMenu() ] chain=QMainWindow<
+CHECK save.shortcut.unique PASS bindings=1
+CHECK save.shortcut.authority PASS
+CHECK save.ktexteditor.document PASS
+CHECK save.shortcut.window PASS
+CHECK save.shortcut.disk-bytes PASS
+CHECK save.shortcut.modified-cleared PASS
+CHECK save.shortcut.path-unchanged PASS
+CHECK save.menu.disk-bytes PASS
+CHECK save.menu.path-unchanged PASS
+CHECK save.no-temp-file PASS
+CHECK save.failure.disk-unchanged PASS
+CHECK save.failure.status-bar PASS
+CHECK save.failure.diagnostic PASS
+CHECK save.failure.still-modified PASS
+CHECK save.recovery.disk-bytes PASS
+CHECK save.recovery.not-modified PASS
+CTRL-S-BINDING after-split objectName=action-file.save class=QAction shortcut=Ctrl+S context=1 associated=[QMenu() ] holders=[QMenu() ] chain=QMainWindow<
+CHECK save.shortcut.unique.multi-pane PASS bindings=1
+APP-SHELL-SELFTEST ok=1 checks=176 failures=0 state=/tmp/vedit-app-hhKjfL/state

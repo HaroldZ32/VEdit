@@ -1,0 +1,14 @@
+# C9 (T115): collected_at=2026-11-01T10:32:02Z; git_head=60c7ae9c95fe769e2bd6c86dd4c56e1514603e44; git_status_porcelain_sha256=4592cf97b951ef89d479131892e008788c3f773d68a44978fb2ed5787417320d; anchor=00-C9.txt
+== CJK probe with the packaged locale (C.utf8 + LOCPATH) ==
+collected_at: 2026-11-01T10:32:02Z
+git_head: 60c7ae9c95fe769e2bd6c86dd4c56e1514603e44
+--- output ---
+LOCALE system=C
+FROM_UTF8 len=7 hex=e6b58be8af95e6a8a1e59d972e7376
+FROM_LOCAL len=7 eq_utf8=1 hex=e6b58be8af95e6a8a1e59d972e7376
+FILE_CREATE open=1 exists=1 fileinfo_exists=1
+DIR_ENTRY hex=e6b58be8af95e6a8a1e59d972e7376 eq_utf8=1
+FONT default_family=DejaVu Sans pixel_size=14 families=5
+FONT inFont_CJK=0 inFontUcs4_CJK=0 inFont_A=1
+FONT family_sample=DejaVu Sans,DejaVu Sans Mono,Monospace,Sans Serif,Serif,
+PROBE-EXIT=0

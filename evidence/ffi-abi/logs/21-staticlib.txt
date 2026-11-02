@@ -1,0 +1,1 @@
+-rw-r--r-- 2 root root 61262434 Nov  2 03:46 target/release/libvd_ffi.a

@@ -1,0 +1,52 @@
+== evidence: 01-build-folding.log ==
+time=2026-11-01T13:40:50+08:00
+HEAD=31a7c2d10111a9ab6078a433b1aa8289b31197a6
+
+$ cmake -S src/syntax/folding -B target/syn-folding -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo && cmake --build
+-- Found X11: /usr/include
+-- Looking for XOpenDisplay in /usr/lib/x86_64-linux-gnu/libX11.so
+-- Looking for XOpenDisplay in /usr/lib/x86_64-linux-gnu/libX11.so - found
+-- Looking for gethostbyname
+-- Looking for gethostbyname - found
+-- Looking for connect
+-- Looking for connect - found
+-- Looking for remove
+-- Looking for remove - found
+-- Looking for shmat
+-- Looking for shmat - found
+-- Found PkgConfig: /usr/bin/pkg-config (found version "2.5.1")
+-- Checking for module 'tree-sitter=0.25.9'
+--   Found tree-sitter, version 0.25.9
+-- syn-grammars: compiled grammar id='verilog' verilog=1 systemverilog=1
+-- syn-provider: baked grammar id='verilog' for /vedit-build/src/syntax/provider (owner: src/syntax/grammars)
+-- syn-product: this build has no vedit-app target (lane-only build); the product link is skipped, the stack itself is still built and tested
+-- Configuring done (1.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /vedit-build/target/syn-folding
+CONFIGURE-EXIT=0
+  382 |     vedit::syntax::SyntaxService::instance().setTreeSitterEnabled(false);
+      |            ^~~~~~
+/vedit-build/src/syntax/folding/tests/folding_tests.cpp:399:12: error: ‘vedit::syntax’ has not been declared
+  399 |     vedit::syntax::SyntaxService::instance().setTreeSitterEnabled(true);
+      |            ^~~~~~
+/vedit-build/src/syntax/folding/tests/folding_tests.cpp: In function ‘void {anonymous}::testTreeSitterToggleObservable(KTextEditor::Editor*)’:
+/vedit-build/src/syntax/folding/tests/folding_tests.cpp:442:38: error: ‘observeView’ was not declared in this scope; did you mean ‘vedit::folding::observeView’?
+  442 |     const ViewObservation baseline = observeView(view);
+      |                                      ^~~~~~~~~~~
+      |                                      vedit::folding::observeView
+/vedit-build/src/syntax/folding/fold_injector.h:65:17: note: ‘vedit::folding::observeView’ declared here
+   65 | ViewObservation observeView(KTextEditor::View *view);
+      |                 ^~~~~~~~~~~
+/vedit-build/src/syntax/folding/tests/folding_tests.cpp:447:12: error: ‘vedit::syntax’ has not been declared
+  447 |     vedit::syntax::SyntaxService::instance().setTreeSitterEnabled(true);
+      |            ^~~~~~
+/vedit-build/src/syntax/folding/tests/folding_tests.cpp:462:12: error: ‘vedit::syntax’ has not been declared
+  462 |     vedit::syntax::SyntaxService::instance().setTreeSitterEnabled(false);
+      |            ^~~~~~
+[16/30] Building CXX object syn-grammars/syntax-product/kde/CMakeFiles/vedit_syntax_kde.dir/ksyntax_data.cpp.o
+[17/30] Building CXX object syn-grammars/syntax-product/CMakeFiles/vedit_syntax_product_tests.dir/tests/test_syntax_product.cpp.o
+[18/30] Building C object syn-grammars/CMakeFiles/vedit_tree_sitter_verilog.dir/vedit-build/third_party/tree-sitter/verilog/src/parser.c.o
+[19/30] Building CXX object syn-grammars/syntax-product/kde/CMakeFiles/vedit_syntax_kde_selftest.dir/tests/validate_syntax_data.cpp.o
+[20/30] Building CXX object syn-grammars/provider/CMakeFiles/vedit_syntax_provider.dir/tree_sitter_provider.cpp.o
+ninja: build stopped: subcommand failed.
+BUILD-EXIT=1

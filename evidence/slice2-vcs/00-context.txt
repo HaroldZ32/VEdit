@@ -1,0 +1,14 @@
+== T23 context ==
+collected_at: 2026-11-01T05:57:48Z
+git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+host: Linux 7.0.0-38-generic x86_64; cpu: AMD Ryzen 7 7840H w/ Radeon 780M Graphics
+qt image: vedit-qt6-build:local; rust image: vedit-build:local
+--- changed paths (this task) ---
+   M crates/vd-ffi/include/vd_ffi.h
+   M crates/vd-ffi/src/vcs.rs
+   M crates/vd-vcs/src/lib.rs
+  ?? crates/vd-vcs/src/runner.rs
+  ?? crates/vd-vcs/src/service.rs
+  ?? crates/vd-vcs/tests/
+  ?? evidence/slice2-vcs/
+  ?? src/workspace/vcs/

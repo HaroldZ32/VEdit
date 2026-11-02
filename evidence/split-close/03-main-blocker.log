@@ -1,0 +1,6 @@
+# C9 (T130): collected_at=2026-11-02T03:26:13Z; git_head=af852255acf8979cd25ffc0bd882c1dcbbec6220; git_status_porcelain_sha256=045309e62e8b304f88ca5c3515c7d82d08bfaf73e03166df75bbb110e13c3662; anchor=00-C9.txt
+BUILD=0
+[42/126] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/diagnostics_annotations.cpp.o
+[124/126] Building CXX object src/app/CMakeFiles/vedit-app.dir/vedit-app_autogen/mocs_compilation.cpp.o
+[125/126] Building CXX object src/app/CMakeFiles/vedit-app.dir/main.cpp.o
+[126/126] Linking CXX executable src/app/vedit-app

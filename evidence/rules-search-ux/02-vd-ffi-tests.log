@@ -1,0 +1,91 @@
+collected_at: 2026-11-01T18:22:15+08:00
+git_head: 60c7ae9c95fe769e2bd6c86dd4c56e1514603e44
+git_branch: feat/qt6-ktexteditor-migration
+git_status:
+   M AGENT.md
+   M build/evidence/typecheck/00-run.txt
+   M build/evidence/typecheck/10-typecheck-image-build.log
+   M build/evidence/typecheck/11-typecheck-image-id.txt
+   M crates/vd-config/src/project.rs
+   M crates/vd-config/src/warnings.rs
+   M crates/vd-ffi/include/vd_ffi.h
+   M crates/vd-ffi/src/project.rs
+   M evidence/ffi-abi/logs/10-rust-image.txt
+   M evidence/ffi-abi/logs/19-rust-stage-console.log
+   M evidence/ffi-abi/logs/20-cargo-build-release.log
+   M evidence/ffi-abi/logs/21-staticlib.txt
+   M evidence/ffi-abi/logs/22-rust-targets.txt
+   M evidence/ffi-abi/logs/23-cargo-test.log
+   M evidence/ffi-abi/logs/26-vd_ffi.h
+   M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+   M evidence/m0-build/build-logs/20-qt6-image-build.log
+   M evidence/m0-build/build-logs/21-qt6-image-id.txt
+   M evidence/m0-build/build-logs/31-qt6-configure.log
+   M evidence/m0-build/build-logs/32-qt6-build.log
+   M evidence/m0-build/build-logs/33-qt6-ctest.log
+   M evidence/m0-build/build-logs/34-qt6-elf.txt
+   M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+   M packaging/runtime/AppRun
+   M src/workspace/palette/README.md
+   M src/workspace/search/CMakeLists.txt
+   M src/workspace/search/README.md
+   M src/workspace/search/global_search.cpp
+   M src/workspace/search/global_search.h
+  ?? evidence/rules-search-ux/
+
+command (pinned Rust image): cd /vedit-build && cargo test -p vd-ffi -- --nocapture
+
+   Compiling vd-ffi v0.1.1 (/vedit-build/crates/vd-ffi)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.18s
+     Running unittests src/lib.rs (target/debug/deps/vd_ffi-c218ace1bbb0a2eb)
+
+running 16 tests
+test fim::tests::mapping_carries_every_configured_value_without_leaking_the_key ... ok
+test vcs::tests::invalid_arguments_return_no_job ... ok
+REGRESSION-CONTROL warnings=["filelist.unknown_token: /tmp/.tmplvCpmB/top.f:1: unsupported filelist token `+broken+token`; skipped"]
+NEGATIVE-CONTROL project_without_rules warnings=[]
+POSITIVE-CONTROL project_with_rules warnings=[]
+test fim::tests::loaded_project_and_environment_configure_the_service ... ok
+test project::tests::fixture_expansion_matches_the_service_contract ... ok
+test project::tests::actionable_filelist_warnings_still_reach_the_panel ... ok
+test project::tests::missing_optional_rules_file_is_not_a_panel_diagnostic ... ok
+test project::tests::bad_entries_render_actionable_diagnostics ... ok
+test project::tests::expansion_is_deterministic ... ok
+UNREADABLE-CONTROL warnings=["rules.unreadable: the Verilog lint rules file .rules.verible_lint could not be read; falling back to built-in rules"]
+test project::tests::a_present_rules_file_produces_no_panel_noise ... ok
+test project::tests::unreadable_rules_file_still_warns_without_an_absolute_path ... ok
+test vcs::tests::info_job_reaches_ready_for_a_plain_directory ... ok
+test vcs::tests::diff_job_reaches_ready_for_a_plain_directory ... ok
+test fim::tests::unreachable_endpoint_is_an_explicit_error_without_the_key ... ok
+test vcs::tests::polling_a_job_with_the_wrong_kind_is_misuse ... ok
+test fim::tests::configured_loopback_request_reaches_the_rust_transport ... ok
+test fim::tests::default_config_is_disabled_and_sends_nothing ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/abi.rs (target/debug/deps/abi-73d3a52e89bce543)
+
+running 12 tests
+test abi_version_is_one ... ok
+test cancelling_a_job_discards_its_result ... ok
+test null_and_unknown_arguments_are_rejected_with_a_typed_error ... ok
+test projected_fixture_serves_all_seven_services ... ok
+test deeplint_reports_a_missing_binary_as_a_typed_failure ... ok
+test lsp_configures_lazily_without_starting_the_server ... ok
+test lsp_rejects_a_missing_server_binary ... ok
+test fim_is_disabled_by_default_and_starts_no_worker ... ok
+test project_parse_expands_the_fixture_filelist ... ok
+test search_returns_hits_over_the_project_file_list ... ok
+test vcs_reports_the_empty_state_for_a_plain_directory ... ok
+test settings_round_trip_through_the_abi ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+   Doc-tests vd_ffi
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+exit_code: 0

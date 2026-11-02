@@ -1,0 +1,30 @@
+# AC-0.5 — every piece of evidence is labelled with who can produce it.
+# collection: 2026-10-31T10:19:00Z rev=9957f5fe4d63c17c681e8753288262fa2c00955e
+#
+# "agent" = reproducible by any agent in this workspace with the pinned images.
+# "user"  = needs a machine/display the agents here do not have; it is NOT claimed.
+#
+# result | kind | who | what proves it
+# -------+------+-----+--------------------------------------------------------------
+# PASS   | L1   | agent | logs/20-cargo-build-release.log, logs/21-staticlib.txt, logs/22-rust-targets.txt
+#        |      |       |   the Rust static library is built and its compiled target list is recorded
+# PASS   | L1   | agent | logs/23-cargo-test.log — 30 unit/ABI tests across the four crates
+# PASS   | L1   | agent | logs/24-cargo-tree-vd-ffi.txt + 52-reuse-boundary.txt — no GTK, no editor crates
+# PASS   | L1   | agent | logs/26-vd_ffi.h (+ 27-…) — the cbindgen header has no Rust type outside comments
+# PASS   | L1   | agent | logs/40-falsification-red.log (exit 1) and logs/41-falsification-restored.log (exit 0)
+# PASS   | L1   | agent | logs/30-ffi-selftest.log — the C++ caller drives the C ABI: 20 checks, exit 0
+# PASS   | L1   | agent | evidence/m0-build/build-logs/33-qt6-ctest.log — 10/10 ctest, the ABI selftest among them
+# PASS   | L1   | agent | evidence/m0-build/build-logs/37-qt6-rust-abi.txt — 28 vd_* symbols in vedit-app
+# PASS   | L1   | agent | 51-glibc-floor.txt — the Rust binaries stay at GLIBC_2.16 <= 2.17
+# PASS   | L1   | agent | 50-unsafe-lint-diff.txt — only vd-ffi opts out of `unsafe_code = "forbid"`
+# PASS   | L1   | agent | 54-gates.txt — fmt/clippy green; targeted tests green; workspace-test caveat stated
+#
+# Levels: L1 = a command with its exit code and raw log; L2 = a rendered screenshot
+# (Xvfb or a real display). Nothing in this directory is L2, and no claim here
+# depends on a screenshot.
+#
+# ONLY THE USER can do (NOT claimed by this task):
+#   * look at a real window on a real display and judge the interaction feel;
+#   * run the single-file AppImage on a CentOS 7.9 host and an Ubuntu host (packaging lane);
+#   * decide whether the seven service semantics are the ones the product should ship
+#     (the seam fixes the shape; each service's product behaviour lands in its own slice).

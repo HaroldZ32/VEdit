@@ -1,0 +1,14 @@
+# Rust service tests: vd-vcs (6 unit + 9 readonly) and vd-ffi (7 unit + 12 abi)
+# command (pinned Rust image): cargo test -p vd-vcs -p vd-ffi
+# date: 2026-11-01T14:45:23+08:00
+
+     Running unittests src/lib.rs (target/debug/deps/vd_ffi-c218ace1bbb0a2eb)
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running tests/abi.rs (target/debug/deps/abi-73d3a52e89bce543)
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running unittests src/lib.rs (target/debug/deps/vd_vcs-bd3772dd48fd098f)
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/readonly.rs (target/debug/deps/readonly-a4facb6dc3724ba8)
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

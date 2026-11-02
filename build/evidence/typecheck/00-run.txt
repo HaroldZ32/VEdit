@@ -1,0 +1,9 @@
+# gate log: typecheck (operational; rewritten by every run)
+collected_at: 2026-11-02T11:47:17+08:00
+git_head: 1ab6dedc21dfefbc5cd386a4e99ba12a3d38c0a2
+git_status_porcelain:
+   M build/evidence/typecheck/00-run.txt
+   M evidence/slice3-pack/00-preflight.log
+   M evidence/slice3-pack/10-assemble.log
+  ?? evidence/epipe-crash/16-packaging-final.log
+

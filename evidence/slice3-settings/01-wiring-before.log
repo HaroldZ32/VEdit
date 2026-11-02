@@ -1,0 +1,4 @@
+# wiring BEFORE (measured on the pre-wiring binary, same commands)
+ctest -N:                22 tests (last: vedit-workspace-vcs-selftest)
+nm settings symbols:     0
+utf16 settings-panel:    0

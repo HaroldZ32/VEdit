@@ -1,0 +1,8 @@
+# What the user reported from the REAL CentOS 7 machine (kernel 3.10).
+# This file carries ONLY what was relayed to us; the full verify-report-*.txt is
+# NOT in the repository yet (see README.md "how to complete this archive").
+#
+# relayed: 2026-11-01 (Asia/Shanghai), via the cell captain
+# tarball the user ran: sha256 acc58ee0… (prefix only, full value not relayed)
+# result line the user pasted:
+SUMMARY: PASS=16 FAIL=0 SKIP=2

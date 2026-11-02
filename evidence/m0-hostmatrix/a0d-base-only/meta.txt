@@ -1,0 +1,6 @@
+artifact: /home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/VEdit-0.1.1-x86_64.probe.AppImage
+artifact_sha256: 524f7b0780ff4ee093095e6ebae34b816b18c3aec94310dd8abe281c1e04bd28
+artifact_note: PROBE build (T11); delivery blocked pending T60 — mechanism verification only
+tested_image: docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+tested_glibc: ldd (GNU libc) 2.17
+offscreen_exit=0

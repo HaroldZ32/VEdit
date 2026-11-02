@@ -1,0 +1,33 @@
+## collection: 2026-10-31T14:25:00+0000
+--- libQt6Core.so.6.10.2
+  max GLIBC: GLIBC_2.16
+  mismatches needing >2.17 (dynamic refs AND version defs): 0
+  max GLIBCXX: GLIBCXX_3.4.19
+  version NAMES defined/used: GLIBC_2.12 GLIBC_2.14 GLIBC_2.16 
+--- libQt6Gui.so.6.10.2
+  max GLIBC: GLIBC_2.14
+  mismatches needing >2.17 (dynamic refs AND version defs): 0
+  max GLIBCXX: GLIBCXX_3.4.18
+  version NAMES defined/used: GLIBC_2.4 GLIBC_2.11 GLIBC_2.14 
+--- libQt6Widgets.so.6.10.2
+  max GLIBC: GLIBC_2.14
+  mismatches needing >2.17 (dynamic refs AND version defs): 0
+  max GLIBCXX: GLIBCXX_3.4.18
+  version NAMES defined/used: GLIBC_2.2.5 GLIBC_2.4 GLIBC_2.14 
+--- libqoffscreen.so
+  max GLIBC: GLIBC_2.14
+  mismatches needing >2.17 (dynamic refs AND version defs): 0
+  max GLIBCXX: GLIBCXX_3.4
+  version NAMES defined/used: GLIBC_2.2.5 GLIBC_2.4 GLIBC_2.14 
+## link minimal Widgets program
+LINK_EXIT=0
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, but has failed to switch to one.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+qt6=6.10.2 platform=offscreen widgets=200
+RUN_EXIT=0
+## /spike/qt6_widgets
+max GLIBC: GLIBC_2.2.5
+mismatches needing >2.17: 0
+max GLIBCXX: GLIBCXX_3.4

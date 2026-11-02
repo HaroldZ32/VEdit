@@ -1,0 +1,45 @@
+# C9 backfill (T112/N2): header added after the fact; the body below is unchanged.
+# original_collected_at_utc: 2026-11-01T08:19:47Z   (from the archived file mtime)
+# original_git_head: a4b8efd0890860ac5134e739c72965f9744d13d0
+# original_git_status_porcelain_sha256: not captured
+# session_anchor: final-a4b8efd/00-C9.txt
+# backfill_collected_at_utc: 2026-11-01T09:23:35Z
+# backfill_git_head: 0c8ea9fe4ae18c386a59a55b8868f837f4f80a84
+# backfill_git_status_porcelain_sha256: a7feab0230532310375511329de129cad97d49e690c7a9c7336394a1cce151fa (current tree at backfill time)
+== a4b8efd final-candidate attempt ==
+collected_at: 2026-11-01T08:19:46Z
+git_head: a4b8efd0890860ac5134e739c72965f9744d13d0
+remote_head: a4b8efd0890860ac5134e739c72965f9744d13d0
+clean_worktree: target/wt-a4b8efd
+clean_worktree_status:
+   M crates/vd-ffi/include/vd_ffi.h
+   M evidence/ffi-abi/logs/10-rust-image.txt
+   M evidence/ffi-abi/logs/19-rust-stage-console.log
+   M evidence/ffi-abi/logs/20-cargo-build-release.log
+   M evidence/ffi-abi/logs/21-staticlib.txt
+   M evidence/ffi-abi/logs/22-rust-targets.txt
+   M evidence/ffi-abi/logs/23-cargo-test.log
+   M evidence/ffi-abi/logs/26-vd_ffi.h
+   M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+   M evidence/m0-build/build-logs/20-qt6-image-build.log
+   M evidence/m0-build/build-logs/21-qt6-image-id.txt
+   M evidence/m0-build/build-logs/31-qt6-configure.log
+   M evidence/m0-build/build-logs/32-qt6-build.log
+   M packaging/appimage/README.md
+   M packaging/runtime/AppRun
+   M packaging/runtime/README.md
+   M packaging/runtime/assemble-appdir.sh
+   M packaging/runtime/build.sh
+   M packaging/runtime/selfcheck.sh
+   M packaging/runtime/verify-f2-isolation.sh
+   M packaging/runtime/verify-not-shipped.sh
+  ?? packaging/appimage/vendor/
+
+## build failure (T110 CMake wiring gap)
+src/syntax/kde/ksyntax_data.cpp:3: fatal error: syntax_directory.h: No such file or directory
+src/syntax/kde/CMakeLists.txt (HEAD): vedit_syntax_kde links only Qt6::Core + KF6::SyntaxHighlighting; it does not link/include vedit_syntax_common
+src/syntax/common/CMakeLists.txt exists at HEAD and exports the header on its PUBLIC include path, but nothing links it to vedit_syntax_kde.
+=> a4b8efd is NOT buildable; cannot be the final packaging baseline.
+
+The T31 packaging changes (including removal of the root XML duplicate per T109/T110) are ready in the clean worktree; only the product-side CMake fix is missing.
+See 01-build-qt.log for the full build log.

@@ -1,0 +1,28 @@
+== Rust backend tests: vd-vcs ==
+collected_at: 2026-11-01T05:57:48Z
+git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+cmd: cargo test -p vd-vcs ; cargo clippy -p vd-vcs -p vd-ffi --all-targets -- -D warnings ; cargo fmt -p vd-vcs -p vd-ffi -- --check
+--- output ---
+test tests::git_detached_head_has_no_branch ... ok
+test tests::git_porcelain_maps_statuses_and_branch ... ok
+test tests::svn_status_maps_codes ... ok
+test tests::plain_directory_is_the_empty_state_not_an_error ... ok
+test tests::markers_select_the_backend ... ok
+test tests::nested_directory_finds_the_repository_above_it ... ok
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test allow_lists_are_disjoint_from_write_lists ... ok
+test every_svn_write_subcommand_is_refused_before_spawn ... ok
+test every_git_write_subcommand_is_refused_before_spawn ... ok
+test production_runner_gate_refuses_writes_without_spawning ... ok
+test stub_service_drives_the_panel_without_processes ... ok
+test git_session_uses_only_read_only_subcommands ... ok
+test unknown_tool_and_empty_subcommand_are_refused ... ok
+test plain_directory_is_the_empty_state_in_every_query ... ok
+test svn_session_reads_status_info_and_diff ... ok
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+TEST-EXIT=0
+FMT-EXIT=0
+  Downloaded ring v0.17.14
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.54s
+CLIPPY-EXIT=0

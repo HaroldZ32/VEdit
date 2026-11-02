@@ -307,7 +307,10 @@ tail -6 "$EVID/11-glibc-rpath.txt"
     echo "PASS: the release remap (RELEASE_RUSTFLAGS) removed the build-tree prefix"
   else
     echo "WARN: $build_strings build-tree strings remain; distinct values:"
-    strings "$PKG/bin/vd-app" | grep '/vedit-build' | sort -u | head -5
+    # `sed -n '1,5p'` reads the whole stream (unlike `head -5`, which exits early
+    # and SIGPIPEs `sort` under this script's `set -o pipefail`); the visible
+    # output is identical.
+    strings "$PKG/bin/vd-app" | grep '/vedit-build' | sort -u | sed -n '1,5p'
     echo "classify each: a rustc-emitted source path means the remap was not applied;"
     echo "a compile-time literal default (env!) is inert unless opened at run time."
   fi

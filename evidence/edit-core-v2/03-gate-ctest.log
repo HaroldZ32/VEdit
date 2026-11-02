@@ -1,0 +1,47 @@
+# ctest section of the repo gate (16 tests; vedit-edit-core-selftest is #10)
+# source: 02-gate-build.log
+
+[qt6] ctest (offscreen: QMainWindow + KTextEditor document + KSyntaxHighlighting + tree-sitter)
+Test project /vedit-build/target/qt6-build
+      Start  1: vedit-app-syntax-startup
+ 1/16 Test  #1: vedit-app-syntax-startup .......................   Passed    0.23 sec
+      Start  2: vedit-m0-smoke
+ 2/16 Test  #2: vedit-m0-smoke .................................   Passed    0.06 sec
+      Start  3: vedit-syntax-provider-tests
+ 3/16 Test  #3: vedit-syntax-provider-tests ....................   Passed    0.00 sec
+      Start  4: vedit-syntax-kde-data
+ 4/16 Test  #4: vedit-syntax-kde-data ..........................   Passed    0.03 sec
+      Start  5: vedit-syn-grammars-tests
+ 5/16 Test  #5: vedit-syn-grammars-tests .......................   Passed    0.17 sec
+      Start  6: vedit-syntax-product-tests
+ 6/16 Test  #6: vedit-syntax-product-tests .....................   Passed    0.05 sec
+      Start  7: vedit-terminal-selftest
+ 7/16 Test  #7: vedit-terminal-selftest ........................   Passed    1.07 sec
+      Start  8: vedit-app-ffi-abi-selftest
+ 8/16 Test  #8: vedit-app-ffi-abi-selftest .....................   Passed    0.07 sec
+      Start  9: vedit-app-shell-selftest
+ 9/16 Test  #9: vedit-app-shell-selftest .......................   Passed    0.22 sec
+      Start 10: vedit-edit-core-selftest
+10/16 Test #10: vedit-edit-core-selftest .......................   Passed    0.08 sec
+      Start 11: vedit-workspace-palette-selftest
+11/16 Test #11: vedit-workspace-palette-selftest ...............   Passed    0.09 sec
+      Start 12: vedit-workspace-palette-integration-selftest
+12/16 Test #12: vedit-workspace-palette-integration-selftest ...   Passed    0.08 sec
+      Start 13: vedit-workspace-search-selftest
+13/16 Test #13: vedit-workspace-search-selftest ................   Passed    0.34 sec
+      Start 14: vedit-workspace-project-selftest
+14/16 Test #14: vedit-workspace-project-selftest ...............   Passed    0.05 sec
+      Start 15: vedit-workspace-diagnostics-selftest
+15/16 Test #15: vedit-workspace-diagnostics-selftest ...........   Passed    0.00 sec
+      Start 16: vedit-diagnostics-ffi-selftest
+16/16 Test #16: vedit-diagnostics-ffi-selftest .................   Passed    3.11 sec
+
+100% tests passed, 0 tests failed out of 16
+
+[qt6] xcb + software-rendering window smoke under Xvfb
+## renderer
+OpenGL renderer string: llvmpipe (LLVM 21.1.8, 256 bits)
+OpenGL version string: 4.5 (Compatibility Profile) Mesa 26.0.8-1ubuntu0.3
+## smoke (QT_QPA_PLATFORM=xcb, QT_OPENGL=software, LIBGL_ALWAYS_SOFTWARE=1)
+M0-SMOKE ok=1 platform=xcb qt=6.10.2 kf6=6.24.0 ktexteditor=1 ksynhl=6.24.0 tree_sitter=0.25.9 window=1 editor=1 document=1 definitions=451 themes=30 verilog=1 systemverilog=loadable(not-asserted,C7-pending) custom_path=1 tree_sitter_parser=1 builtin_valid_defs=450 whitelist_verilog=0 highlight_formats=-1 kshlib=/usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0 libc=/usr/lib/x86_64-linux-gnu/libc.so.6
+M0-SMOKE theme=Atom One Dark

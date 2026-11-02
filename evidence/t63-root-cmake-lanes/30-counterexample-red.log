@@ -1,0 +1,137 @@
+[qt6] pinned matrix: Qt 6.10.2 / KF6 6.24.0 / KTextEditor 6.24.0 / KSyntaxHighlighting 6.24.0 / tree-sitter 0.25.9
+[qt6] build image: vedit-qt6-build:local (stage qt6-build of scripts/docker/Dockerfile.build, base docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c)
+[qt6-image] building vedit-qt6-build:local (stage qt6-build, base docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c)
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.build
+#1 transferring dockerfile: 11.56kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context:
+#3 transferring context: 2B done
+#3 DONE 0.1s
+
+#4 [qt6-build 1/4] FROM docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c
+#4 resolve docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 3.59kB done
+#5 DONE 0.0s
+
+#6 [qt6-build 3/4] RUN set -eux;     apt-get update;     mkdir -p /tmp/qt6-debs; cd /tmp/qt6-debs;     while read -r spec sha rest; do       case "$spec" in ''|'#'*) continue;; esac;       apt-get download "$spec";       deb=$(ls "${spec%%=*}"_*.deb);       printf '%s  %s\n' "$sha" "$deb" | sha256sum -c -;     done < /opt/vedit/qt6-locked-packages.txt;     cd /; rm -rf /tmp/qt6-debs;     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends       build-essential pkg-config git curl ca-certificates binutils file       xvfb xauth fonts-dejavu-core libgl1-mesa-dri mesa-utils       libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0       libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0       libxcb-xkb1 libxkbcommon0       $(awk '!/^#/ && NF {print $1}' /opt/vedit/qt6-locked-packages.txt);     rm -rf /var/lib/apt/lists/*
+#6 CACHED
+
+#7 [qt6-build 2/4] COPY qt6-locked-packages.txt /opt/vedit/qt6-locked-packages.txt
+#7 CACHED
+
+#8 [qt6-build 4/4] RUN set -eux;     while read -r spec sha rest; do       case "$spec" in ''|'#'*) continue;; esac;       pkg="${spec%%=*}"; ver="${spec#*=}";       got=$(dpkg-query -W -f='${Version}' "$pkg");       [ "$got" = "$ver" ] || { echo "FATAL: $pkg installed=$got locked=$ver" >&2; exit 1; };     done < /opt/vedit/qt6-locked-packages.txt;     { echo "## image facts"; head -3 /etc/os-release;       echo "glibc: $(dpkg-query -W -f='${Version}' libc6)";       strings /lib/x86_64-linux-gnu/libc.so.6 | grep -m1 'Minimum supported kernel';       echo "qt6-base-dev: $(dpkg-query -W -f='${Version}' qt6-base-dev)";       echo "kf6-texteditor: $(dpkg-query -W -f='${Version}' libkf6texteditor-dev)";       echo "kf6-syntaxhighlighting: $(dpkg-query -W -f='${Version}' libkf6syntaxhighlighting-dev)";       echo "tree-sitter: $(pkg-config --modversion tree-sitter)";       echo "cmake: $(cmake --version | head -1)";       echo "g++: $(g++ --version | head -1)";     } | tee /opt/vedit/build-image.txt;     dpkg-query -W -f='${Package} ${Version} ${Architecture}\n' | sort > /opt/vedit/package-snapshot.txt
+#8 CACHED
+
+#9 exporting to image
+#9 exporting layers done
+#9 exporting manifest sha256:a7872d6d7763700875d864c27b4503fc4987508c956152b2970818bab8c367a1 done
+#9 exporting config sha256:b258b23c4868f9f168aa51b961a9c4f941db28d886284e59d35e021f9c33788e done
+#9 exporting attestation manifest sha256:04d5d41a8b2016e56ea0e0b4866fee4269e7877b177e94ba911190f737da0370 0.0s done
+#9 exporting manifest list sha256:c129e8116a632810a53653ec76be201be11be6d69fb28d2764c3fee06788c189 0.0s done
+#9 naming to docker.io/library/vedit-qt6-build:local done
+#9 unpacking to docker.io/library/vedit-qt6-build:local done
+#9 DONE 0.1s
+image_id=sha256:c129e8116a632810a53653ec76be201be11be6d69fb28d2764c3fee06788c189
+[qt6] container facts
+PRETTY_NAME="Ubuntu 26.04.1 LTS"
+NAME="Ubuntu"
+VERSION_ID="26.04"
+glibc: ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43
+qt6-base-dev: 6.10.2+dfsg-7
+kf6-texteditor: 6.24.0-0ubuntu1
+kf6-syntaxhighlighting: 6.24.0-0ubuntu1
+tree-sitter (pkg-config): 0.25.9
+cmake: cmake version 4.2.3
+g++: g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+## image facts
+PRETTY_NAME="Ubuntu 26.04.1 LTS"
+NAME="Ubuntu"
+VERSION_ID="26.04"
+glibc: 2.43-2ubuntu2.4
+Minimum supported kernel: 3.2.0
+qt6-base-dev: 6.10.2+dfsg-7
+kf6-texteditor: 6.24.0-0ubuntu1
+kf6-syntaxhighlighting: 6.24.0-0ubuntu1
+tree-sitter: 0.25.9
+cmake: cmake version 4.2.3
+g++: g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+[qt6] cmake configure (versions are requested EXACT from scripts/versions-qt.env)
+-- The C compiler identification is GNU 15.2.0
+-- The CXX compiler identification is GNU 15.2.0
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- VEdit version matrix (scripts/versions-qt.env):
+--   distro:            Ubuntu 26.04.1 LTS build image, glibc 2.43-2ubuntu2.4 (min kernel 3.2.0)
+--   Qt6:               6.10.2 (floor 6.5)
+--   KF6:               6.24.0 (floor 6.5, upstream needs Qt >= 6.8.0)
+--   KTextEditor:       6.24.0
+--   KSyntaxHighlighting: 6.24.0
+--   tree-sitter:       0.25.9
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Performing Test HAVE_STDATOMIC
+-- Performing Test HAVE_STDATOMIC - Success
+-- Found WrapAtomic: TRUE
+-- Found OpenGL: /usr/lib/x86_64-linux-gnu/libOpenGL.so
+-- Found WrapOpenGL: TRUE
+-- Found WrapVulkanHeaders: /usr/include
+-- Could NOT find Cups (missing: CUPS_LIBRARIES CUPS_INCLUDE_DIR) 
+-- Found X11: /usr/include
+-- Looking for XOpenDisplay in /usr/lib/x86_64-linux-gnu/libX11.so
+-- Looking for XOpenDisplay in /usr/lib/x86_64-linux-gnu/libX11.so - found
+-- Looking for gethostbyname
+-- Looking for gethostbyname - found
+-- Looking for connect
+-- Looking for connect - found
+-- Looking for remove
+-- Looking for remove - found
+-- Looking for shmat
+-- Looking for shmat - found
+-- Found PkgConfig: /usr/bin/pkg-config (found version "2.5.1")
+-- Checking for module 'tree-sitter=0.25.9'
+--   Found tree-sitter, version 0.25.9
+--   tree-sitter:       0.25.9 at /usr/lib/x86_64-linux-gnu
+-- VEdit: building lane directory src/syntax/provider
+-- VEdit: lane directory src/syntax/kde not present yet; skipped
+-- VEdit: building src/app (application shell)
+-- Configuring done (1.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /vedit-build/target/qt6-build
+[qt6] cmake build
+[1/31] Building CXX object src/syntax/provider/CMakeFiles/t63_counterexample_fail.dir/t63_counterexample_fail.cpp.o
+FAILED: [code=1] src/syntax/provider/CMakeFiles/t63_counterexample_fail.dir/t63_counterexample_fail.cpp.o 
+/usr/bin/c++   -Wall -Wextra -O2 -g -DNDEBUG -std=c++20 -MD -MT src/syntax/provider/CMakeFiles/t63_counterexample_fail.dir/t63_counterexample_fail.cpp.o -MF src/syntax/provider/CMakeFiles/t63_counterexample_fail.dir/t63_counterexample_fail.cpp.o.d -o src/syntax/provider/CMakeFiles/t63_counterexample_fail.dir/t63_counterexample_fail.cpp.o -c /vedit-build/src/syntax/provider/t63_counterexample_fail.cpp
+/vedit-build/src/syntax/provider/t63_counterexample_fail.cpp:1:2: error: #error "T63 counter-example: this lane deliberately fails to build"
+    1 | #error "T63 counter-example: this lane deliberately fails to build"
+      |  ^~~~~
+[2/31] Automatic MOC for target vedit_app_shell
+[3/31] Building C object src/syntax/provider/CMakeFiles/vedit_syntax_test_fixture_grammar.dir/tests/fixture/parser.c.o
+[4/31] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/disabled_provider.cpp.o
+[5/31] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider_tests.dir/tests/fixture/fixture_binding.cpp.o
+[6/31] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/syntax_service.cpp.o
+[7/31] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/grammar_binding.cpp.o
+[8/31] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider_tests.dir/tests/test_syntax_provider.cpp.o
+[9/31] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/owner_arbiter.cpp.o
+[10/31] Building CXX object cmake/smoke/CMakeFiles/vedit-m0-smoke.dir/qt6_window_smoke.cpp.o
+[11/31] Building CXX object cmake/smoke/CMakeFiles/vedit-ksh-env-probe.dir/ksh_env_probe.cpp.o
+[12/31] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/tree_sitter_provider.cpp.o
+ninja: build stopped: subcommand failed.

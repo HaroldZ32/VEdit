@@ -1,0 +1,19 @@
+generated: 2026-10-31T14:13:44Z
+## 备用方案：不装系统包，从构建镜像里取 .so
+
+### 一条命令（在仓库根执行）
+docker run --rm vedit-qt6-build:local bash -lc 'ldd /vedit-build/target/qt6-build/src/app/vedit-app | awk "/=> \//{print \$3}"' \
+  | sed "s|^|/|" >/dev/null   # 见下面更稳的两步法
+
+### 两步法（推荐，已验证）
+# 1) 在镜像里把闭包打成一个 tar（含 Qt 平台插件）
+docker run --rm -v "$PWD":/vedit-build -w /vedit-build vedit-qt6-build:local bash -lc \
+  'mkdir -p /tmp/s/usr/lib /tmp/s/usr/lib/qt6/plugins/platforms; \
+   ldd target/qt6-build/src/app/vedit-app | awk "/=> \//{print \$3}" | sort -u | while read -r l; do cp -L \"\$l\" /tmp/s/usr/lib/; done; \
+   cp -L /usr/lib/x86_64-linux-gnu/qt6/plugins/platforms/libqoffscreen.so /tmp/s/usr/lib/qt6/plugins/platforms/; \
+   cp -L /usr/lib/x86_64-linux-gnu/qt6/plugins/platforms/libqxcb.so /tmp/s/usr/lib/qt6/plugins/platforms/; \
+   tar -C /tmp/s -czf /vedit-build/build/runtime-libs.tgz .'
+# 2) 解到某处并指定搜索路径
+mkdir -p /tmp/vedit-libs && tar xzf build/runtime-libs.tgz -C /tmp/vedit-libs
+LD_LIBRARY_PATH=/tmp/vedit-libs/usr/lib QT_PLUGIN_PATH=/tmp/vedit-libs/usr/lib/qt6/plugins \
+  ./target/qt6-build/src/app/vedit-app --project <dir>

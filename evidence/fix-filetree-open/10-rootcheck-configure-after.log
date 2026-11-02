@@ -1,0 +1,13 @@
+-- VEdit file tree: Qt 6.10.2 (standalone=OFF)
+-- VEdit file tree: vedit_app_shell present -> installFileTree() is active
+-- VEdit: workspace lane 'filetree' included
+-- VEdit: workspace lane 'palette' included
+-- VEdit: workspace lane 'search' included
+-- VEdit: workspace lane 'filetree' wired (vedit_file_tree)
+-- VEdit: workspace lane 'palette' wired (vedit_workspace_palette)
+-- VEdit: workspace lane 'search' wired (vedit_workspace_search)
+-- VEdit: workspace integration enabled (src/workspace/integration.cpp)
+-- VEdit file tree rootcheck: Qt 6.10.2, shell=/vedit-build/src/app
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /vedit-build/target/filetree-rootcheck

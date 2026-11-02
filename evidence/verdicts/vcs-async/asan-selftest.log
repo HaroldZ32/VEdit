@@ -1,0 +1,43 @@
+WORKSPACE-VCS-SELFTEST start
+CHECK vcs.panel.empty-state.backend-none PASS No repository
+CHECK vcs.panel.empty-state.header PASS No repository
+CHECK vcs.panel.empty-state.note-visible PASS not a Git or Subversion working tree
+
+Open a directory that is a Git or Subversi
+CHECK vcs.panel.empty-state.no-files PASS
+CHECK vcs.panel.empty-state.stub-queried PASS calls=1
+CHECK vcs.panel.empty-state.no-write-attempt PASS
+CHECK vcs.panel.git.backend PASS Git feature/vcs-panel @ abc1234 · 2 changed file(s)
+CHECK vcs.panel.git.branch-and-revision PASS Git feature/vcs-panel @ abc1234 · 2 changed file(s)
+CHECK vcs.panel.git.changed-file-count PASS rows=2
+CHECK vcs.panel.git.file-row PASS rtl/top.sv  modified
+CHECK vcs.panel.git.added-row PASS rtl/added.sv  added
+CHECK vcs.panel.git.empty-state-hidden PASS
+CHECK vcs.panel.diff.shown PASS diff --git a/rtl/top.sv b/rtl/top.sv
+--- a/rtl/top.sv
++++ b/rtl/top.sv
+@@ -1 +1 @@
+-module
+CHECK vcs.panel.diff.read-only PASS
+CHECK vcs.panel.diff.missing-is-a-note PASS rtl/missing.sv: stub has no diff for this path
+CHECK vcs.panel.diff.no-write-attempt PASS calls=4
+CHECK vcs.panel.svn.backend-and-revision PASS Subversion trunk @ 42 · 1 changed file(s)
+CHECK vcs.panel.svn.file-count PASS Subversion trunk @ 42 · 1 changed file(s)
+CHECK vcs.panel.no-source.empty-state PASS No repository
+CHECK vcs.panel.refresh.empty-stays-empty PASS
+CHECK vcs.panel.refresh.populates PASS
+CHECK vcs.ffi.service PASS
+CHECK vcs.ffi.info.start PASS
+CHECK vcs.ffi.info-empty-state PASS not a Git or Subversion working tree
+CHECK vcs.ffi.diff.start PASS
+CHECK vcs.ffi.diff-empty-state PASS not a repository
+CHECK vcs.ffi.invalid-root-rejected PASS
+CHECK vcs.ffi.read-only-surface PASS vd_vcs_status / vd_vcs_info_job / vd_vcs_diff_job only; no write entry point
+CHECK vcs.nonblocking.temp-dir PASS
+CHECK vcs.nonblocking.fake-git PASS
+CHECK vcs.nonblocking.start-returns-fast PASS start took 0 ms while the fake git sleeps 400 ms
+CHECK vcs.nonblocking.event-loop-ticks PASS ticks=12
+CHECK vcs.nonblocking.job-still-pending PASS polls=24
+CHECK vcs.nonblocking.result-delivered PASS git repository has no commit yet
+CHECK vcs.nonblocking.metric-detects-block PASS timer fired at 300 ms after scheduling (expected late)
+WORKSPACE-VCS-SELFTEST ok=1 checks=35 failures=0

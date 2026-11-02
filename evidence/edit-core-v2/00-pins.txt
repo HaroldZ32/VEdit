@@ -1,0 +1,14 @@
+date: 2026-10-31T19:10:16+08:00
+host: Linux 7.0.0-38-generic x86_64
+head: 95c496e682e3841add1a081edd78d29c34957aac (feat/qt6-ktexteditor-migration)
+image: vedit-qt6-build:local sha256:26287a352e136a5ade5484e8a073f8062a2a9ab46526fd564f54718b91c12af6
+ktexteditor: VEDIT_KTEXTEDITOR_VERSION="6.24.0" / qt: VEDIT_QT6_VERSION="6.10.2"
+changed-paths (this task):
+   M src/app/CMakeLists.txt
+   M src/app/editor_area.cpp
+   M src/app/editor_area.h
+   M src/app/editor_provider.cpp
+   M src/app/editor_provider.h
+   M src/app/main.cpp
+  ?? src/editor/CMakeLists.txt
+  ?? src/editor/kernel/

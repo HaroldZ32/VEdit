@@ -1,0 +1,40 @@
+== evidence: 00-pins.txt — the tree this evidence belongs to ==
+time=2026-11-01T19:11:32+08:00
+branch=feat/qt6-ktexteditor-migration
+HEAD=60c7ae9c95fe769e2bd6c86dd4c56e1514603e44
+host=Linux 7.0.0-38-generic x86_64 GNU/Linux
+image=vedit-qt6-build:local sha256:bf0725194354a0c9184623fe4ab975b6271e3641653bebd26f2453d88425eb69
+verible=07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845
+
+--- write scope (this task) ---
+ M crates/vd-ffi/src/lsp.rs
+ M crates/vd-lsp/src/client.rs
+ M crates/vd-lsp/src/documents.rs
+ M crates/vd-lsp/src/session.rs
+ M src/workspace/diagnostics/CMakeLists.txt
+ M src/workspace/diagnostics/diagnostics_controller.cpp
+ M src/workspace/diagnostics/diagnostics_controller.h
+ M src/workspace/diagnostics/diagnostics_ffi_selftest.cpp
+ M src/workspace/diagnostics/diagnostics_integration.cpp
+ M src/workspace/diagnostics/diagnostics_panel.cpp
+ M src/workspace/diagnostics/diagnostics_panel.h
+ M src/workspace/diagnostics/diagnostics_selftest.cpp
+ M src/workspace/diagnostics/ffi_backends.cpp
+ M src/workspace/diagnostics/lsp_backend.h
+?? crates/vd-lsp/tests/buffer_change.rs
+?? evidence/lint-trigger/
+?? src/workspace/diagnostics/selftests/
+
+--- rest of the shared worktree (other lanes) ---
+ M AGENT.md
+ M THIRD_PARTY_NOTICES.md
+ M build/evidence/typecheck/00-run.txt
+ M build/evidence/typecheck/10-typecheck-image-build.log
+ M build/evidence/typecheck/11-typecheck-image-id.txt
+ M crates/vd-config/src/project.rs
+ M crates/vd-config/src/warnings.rs
+ M crates/vd-ffi/include/vd_ffi.h
+ M crates/vd-ffi/src/project.rs
+ M evidence/ffi-abi/logs/10-rust-image.txt
+ M evidence/ffi-abi/logs/19-rust-stage-console.log
+ M evidence/ffi-abi/logs/20-cargo-build-release.log

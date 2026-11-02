@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language>
+<!--
+  VEdit SystemVerilog syntax definition (own LGPL port; NOT a copy of KDE's systemverilog.xml).
+  Semantic source: the product's Verilog feature set (GtkSourceView 4.6.1
+  verilog.lang was used as the feature reference only). Authored for VEdit.
+  SPDX-License-Identifier: LGPL-2.1-or-later
+  Folding (A4): module/interface/program/class/function/task/generate/case/begin-end
+  regions, so .sv keeps folds when tree-sitter is switched off.
+  File name deliberately differs from the prohibited KDE file name.
+-->
+<language name="SystemVerilog" version="1" kateversion="5.0" section="Hardware"
+          extensions="*.sv;*.svh" mimetype="text/x-systemverilog"
+          author="VEdit" license="LGPL-2.1-or-later">
+  <highlighting>
+    <list name="keywords">
+      <item>always_comb</item><item>always_ff</item><item>always_latch</item>
+      <item>always</item><item>and</item><item>assign</item><item>automatic</item>
+      <item>buf</item><item>casex</item><item>casez</item><item>deassign</item>
+      <item>default</item><item>defparam</item><item>disable</item><item>edge</item>
+      <item>else</item><item>endcase</item><item>endfunction</item><item>endgenerate</item>
+      <item>endmodule</item><item>endtask</item><item>for</item><item>force</item>
+      <item>forever</item><item>fork</item><item>function</item><item>generate</item>
+      <item>if</item><item>ifnone</item><item>initial</item><item>inout</item>
+      <item>input</item><item>integer</item><item>join</item><item>localparam</item>
+      <item>module</item><item>nand</item><item>negedge</item><item>nor</item>
+      <item>not</item><item>or</item><item>output</item><item>parameter</item>
+      <item>posedge</item><item>reg</item><item>release</item><item>repeat</item>
+      <item>signed</item><item>supply0</item><item>supply1</item><item>task</item>
+      <item>time</item><item>tri</item><item>triand</item><item>trior</item>
+      <item>trireg</item><item>unsigned</item><item>wait</item><item>wand</item>
+      <item>while</item><item>wire</item><item>wor</item><item>xnor</item><item>xor</item>
+    </list>
+    <contexts>
+      <context name="Normal" attribute="Normal Text" lineEndContext="#stay">
+        <!-- folding openers/closers first: they must win over the keyword list -->
+        <keyword attribute="Keyword" context="#stay" String="module" beginRegion="moduleEndmodule"/>
+        <keyword attribute="Keyword" context="#stay" String="endmodule" endRegion="moduleEndmodule"/>
+        <keyword attribute="Keyword" context="#stay" String="begin" beginRegion="beginEnd"/>
+        <keyword attribute="Keyword" context="#stay" String="end" endRegion="beginEnd"/>
+        <keyword attribute="Keyword" context="#stay" String="case" beginRegion="caseEndcase"/>
+        <keyword attribute="Keyword" context="#stay" String="casex" beginRegion="caseEndcase"/>
+        <keyword attribute="Keyword" context="#stay" String="casez" beginRegion="caseEndcase"/>
+        <keyword attribute="Keyword" context="#stay" String="endcase" endRegion="caseEndcase"/>
+        <keyword attribute="Keyword" context="#stay" String="function" beginRegion="functionEndfunction"/>
+        <keyword attribute="Keyword" context="#stay" String="endfunction" endRegion="functionEndfunction"/>
+        <keyword attribute="Keyword" context="#stay" String="task" beginRegion="taskEndtask"/>
+        <keyword attribute="Keyword" context="#stay" String="endtask" endRegion="taskEndtask"/>
+        <keyword attribute="Keyword" context="#stay" String="generate" beginRegion="generateEndgenerate"/>
+        <keyword attribute="Keyword" context="#stay" String="endgenerate" endRegion="generateEndgenerate"/>
+        <keyword attribute="Keyword" context="#stay" String="interface" beginRegion="interfaceEndinterface"/>
+        <keyword attribute="Keyword" context="#stay" String="endinterface" endRegion="interfaceEndinterface"/>
+        <keyword attribute="Keyword" context="#stay" String="program" beginRegion="programEndprogram"/>
+        <keyword attribute="Keyword" context="#stay" String="endprogram" endRegion="programEndprogram"/>
+        <keyword attribute="Keyword" context="#stay" String="class" beginRegion="classEndclass"/>
+        <keyword attribute="Keyword" context="#stay" String="endclass" endRegion="classEndclass"/>
+        <keyword attribute="Keyword" context="#stay" String="package" beginRegion="packageEndpackage"/>
+        <keyword attribute="Keyword" context="#stay" String="endpackage" endRegion="packageEndpackage"/>
+        <keyword attribute="Keyword" context="#stay" String="randcase" beginRegion="caseEndcase"/>
+
+        <keyword attribute="Keyword" context="#stay" String="keywords"/>
+
+        <RegExpr attribute="Comment" context="#stay" String="//.*$"/>
+        <Detect2Chars attribute="Comment" context="BlockComment" char="/" char1="*" beginRegion="Comment"/>
+        <DetectChar attribute="String" context="String" char="&quot;"/>
+        <RegExpr attribute="Number" context="#stay" String="\b\d+'[bBoOdDhH][0-9a-fA-FxXzZ_?]+\b"/>
+        <RegExpr attribute="Number" context="#stay" String="\b\d+(\.\d+)?\b"/>
+        <RegExpr attribute="Operator" context="#stay" String="[&amp;|^~!+\-*/%&lt;&gt;=?:]+"/>
+        <RegExpr attribute="Data Type" context="#stay" String="[A-Za-z_][A-Za-z0-9_$]*"/>
+      </context>
+      <context name="BlockComment" attribute="Comment" lineEndContext="#stay">
+        <Detect2Chars attribute="Comment" context="#pop" char="*" char1="/" endRegion="Comment"/>
+      </context>
+      <context name="String" attribute="String" lineEndContext="#pop">
+        <Detect2Chars attribute="String" context="#stay" char="\" char1="&quot;"/>
+        <DetectChar attribute="String" context="#pop" char="&quot;"/>
+      </context>
+    </contexts>
+    <itemDatas>
+      <itemData name="Normal Text" defStyleNum="dsNormal"/>
+      <itemData name="Keyword" defStyleNum="dsKeyword"/>
+      <itemData name="Comment" defStyleNum="dsComment"/>
+      <itemData name="String" defStyleNum="dsString"/>
+      <itemData name="Number" defStyleNum="dsDecVal"/>
+      <itemData name="Operator" defStyleNum="dsOperator"/>
+      <itemData name="Data Type" defStyleNum="dsNormal"/>
+    </itemDatas>
+  </highlighting>
+</language>

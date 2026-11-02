@@ -1,0 +1,18 @@
+# Root ctest after T99 (final tree)
+# command: ctest --test-dir target/qt6-build --output-on-failure
+# date: 2026-11-01T14:45:23+08:00
+
+10/22 Test #10: vedit-app-shell-selftest .......................   Passed    8.32 sec
+11/22 Test #11: vedit-edit-core-selftest .......................   Passed    0.17 sec
+12/22 Test #12: vedit-folding-tests ............................   Passed    1.08 sec
+13/22 Test #13: vedit-breadcrumb-tests .........................   Passed    0.04 sec
+14/22 Test #14: vedit-workspace-palette-selftest ...............   Passed    0.10 sec
+15/22 Test #15: vedit-workspace-palette-integration-selftest ...   Passed    0.22 sec
+16/22 Test #16: vedit-workspace-search-selftest ................   Passed   12.41 sec
+17/22 Test #17: vedit-workspace-project-selftest ...............   Passed    0.05 sec
+18/22 Test #18: vedit-workspace-diagnostics-selftest ...........   Passed    0.00 sec
+19/22 Test #19: vedit-toolchain-missing-selftest ...............   Passed    0.00 sec
+20/22 Test #20: vedit-diagnostics-ffi-selftest .................   Passed    3.13 sec
+21/22 Test #21: vedit-toolchain-ux-selftest ....................   Passed    3.10 sec
+22/22 Test #22: vedit-workspace-vcs-selftest ...................   Passed    1.14 sec
+100% tests passed, 0 tests failed out of 22

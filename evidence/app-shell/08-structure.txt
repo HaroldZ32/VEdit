@@ -1,0 +1,19 @@
+== src/app file inventory (this task's deliverable) ==
+    53  src/app/CMakeLists.txt
+   560  src/app/app_shell.cpp
+    98  src/app/app_shell.h
+   260  src/app/command_registry.cpp
+   103  src/app/command_registry.h
+   623  src/app/editor_area.cpp
+   118  src/app/editor_area.h
+    47  src/app/editor_provider.cpp
+    42  src/app/editor_provider.h
+   398  src/app/main.cpp
+   192  src/app/panel_registry.cpp
+    66  src/app/panel_registry.h
+    80  src/app/session_store.cpp
+    34  src/app/session_store.h
+   133  src/app/theme_manager.cpp
+    50  src/app/theme_manager.h
+
+total lines: 2857

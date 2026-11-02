@@ -1,0 +1,7 @@
+generated: 2026-10-31T10:34:14Z
+command: gh pr create --base dev --head feat/qt6-ktexteditor-migration --title 'feat(qt6): v2 迁移 - WIP checkpoint 1' --body-file evidence/git-checkpoint-1/PR-BODY.md
+exit_code: 0
+pr_url: https://github.com/HaroldZ32/VEdit/pull/11
+
+gh pr view:
+{"baseRefName":"dev","createdAt":"2026-10-31T10:34:00Z","headRefName":"feat/qt6-ktexteditor-migration","mergeable":"MERGEABLE","number":11,"state":"OPEN","title":"feat(qt6): v2 迁移 - WIP checkpoint 1","url":"https://github.com/HaroldZ32/VEdit/pull/11"}

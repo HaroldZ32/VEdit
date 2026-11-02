@@ -1,0 +1,67 @@
+== evidence: 03-run-breadcrumb.log ==
+time=2026-11-01T13:45:14+08:00
+
+$ vedit-breadcrumb-tests (QCoreApplication, no display needed)
+CHECK model.initial-empty PASS
+MODEL display='m0 > inc' describe='module:m0 > function:inc'
+CHECK model.display-names PASS
+CHECK model.describe-kinds PASS
+CHECK model.updates PASS actual=1 expected=1
+CHECK model.changes PASS actual=1 expected=1
+CHECK model.same-path.changes PASS actual=1 expected=1
+CHECK model.same-path.updates PASS actual=2 expected=2
+CHECK model.changed-shortens PASS
+CHECK model.changed.changes PASS actual=2 expected=2
+CHECK model.unnamed-uses-kind PASS
+CHECK model.empty-path-hides PASS
+CHECK source.semantic-active FAIL
+PATH line=0 depth=1 display='m0' describe='module:m0'
+CHECK path.module-header.depth PASS actual=1 expected=1
+CHECK path.module-header.kind PASS
+CHECK path.module-header.name PASS
+CHECK path.function-body.depth PASS actual=2 expected=2
+CHECK path.function-body.kinds PASS
+CHECK path.function-body.names PASS
+CHECK path.function-body.start-line PASS actual=3 expected=3
+CHECK path.always-body.depth PASS actual=1 expected=1
+CHECK path.always-body.name PASS
+CHECK path.second-module.depth PASS actual=1 expected=1
+CHECK path.second-module.name PASS
+CHECK path.outside.depth PASS actual=0 expected=0
+CHECK source.parse-count-after-moves PASS actual=1 expected=1
+CHECK source.query-count PASS
+CHECK source.parse-count-after-reparse PASS actual=2 expected=2
+CHECK path.third-module.depth PASS actual=1 expected=1
+CHECK path.third-module.name PASS
+FOLLOW header='m0' function='m0 > inc' changes=3 updates=4
+CHECK follow.header PASS
+CHECK follow.function PASS
+CHECK follow.updates PASS actual=4 expected=4
+CHECK follow.changes PASS actual=3 expected=3
+CHECK source.disabled.semantic-inactive PASS
+CHECK path.disabled.depth PASS actual=0 expected=0
+CHECK path.disabled.parse-count PASS actual=0 expected=0
+BREADCRUMB-TESTS ok=0 checks=36 failures=1
+TEST-EXIT=1
+
+== RERUN after semanticActive() no longer requires a prior parse ==
+time=2026-11-01T13:45:24+08:00
+BUILD-EXIT=0
+    Start 4: vedit-syntax-kde-data
+4/4 Test #4: vedit-syntax-kde-data ............   Passed    0.03 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   0.13 sec
+CTEST-EXIT=0
+
+== FINAL RERUN (direct) ==
+time=2026-11-01T13:45:33+08:00
+PATH line=0 depth=1 display='m0' describe='module:m0'
+FOLLOW header='m0' function='m0 > inc' changes=3 updates=4
+BREADCRUMB-TESTS ok=1 checks=36 failures=0
+TEST-EXIT=0
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.04 sec

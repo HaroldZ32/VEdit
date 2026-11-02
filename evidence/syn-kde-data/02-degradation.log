@@ -1,0 +1,10 @@
+LOAD degraded.definitions=451 sv_available=0
+DIAG degraded: SystemVerilog definition exists only inside the syntax library (KDE build) and is not shipped by VEdit (C7): it is deliberately not used
+DIAG degraded: SystemVerilog definition not shipped (C7 pending): .sv files degrade to the Verilog definition (SystemVerilog-only constructs lose highlighting/folding); this is a diagnosable degradation, not a crash
+DIAG degraded: .v resolves to definition 'V' by file name (the built-in 'V'/vlang definition also claims *.v); use resolveLanguageForFile()/explicit language names instead
+CHECK degrade.verilog-still-available PASS
+CHECK degrade.sv-not-available PASS
+CHECK degrade.sv-missing-diagnostic PASS
+CHECK degrade.sv-falls-back-to-verilog PASS
+CHECK degrade.fallback-diagnostic PASS
+CHECK degrade.no-crash PASS

@@ -1,0 +1,32 @@
+# C9 evidence header
+collected_at: 2026-11-01T14:01:27+08:00
+git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+
+## root ctest baseline (19 tests at T29 claim time)
+
+Total Test time (real) =  22.06 sec
+
+The following tests FAILED:
+	  3 - vedit-syntax-provider-tests (Not Run)
+	  6 - vedit-syntax-product-tests (Not Run)
+Errors while running CTest
+
+## root ctest after a full root rebuild (the earlier "Not Run" was a stale build dir, not a failure)
+
+89% tests passed, 2 tests failed out of 19
+
+Total Test time (real) =  23.89 sec
+
+The following tests FAILED:
+	  9 - vedit-app-ffi-abi-selftest (BAD_COMMAND)
+	 10 - vedit-app-shell-selftest (BAD_COMMAND)
+Errors while running CTest
+
+## root ctest re-run alone (the previous BAD_COMMAND pair was a race: typecheck rebuilt the same build dir concurrently)
+
+      Start 19: vedit-toolchain-ux-selftest
+19/19 Test #19: vedit-toolchain-ux-selftest ....................   Passed    3.10 sec
+
+100% tests passed, 0 tests failed out of 19
+
+Total Test time (real) =  24.15 sec

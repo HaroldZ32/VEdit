@@ -1,0 +1,48 @@
+## collection: 2026-10-31T14:10:55+0000
+## gcc: g++ (GCC) 11.2.1 20220127 (Red Hat 11.2.1-9)   cmake: cmake version 3.31.0   ninja: 1.11.1.git.kitware.jobserver-1
+'/spike/cmake-3.31.0-linux-x86_64/bin/cmake' '-DQT_INTERNAL_CALLED_FROM_CONFIGURE:BOOL=TRUE' '-DCMAKE_INSTALL_PREFIX=/opt/qt6-spike' '-DBUILD_WITH_PCH=OFF' '-DQT_BUILD_EXAMPLES=FALSE' '-DQT_BUILD_TESTS=FALSE' '-DCMAKE_BUILD_TYPE=Release' '-DFEATURE_gui=OFF' '-DFEATURE_dbus=OFF' '-DFEATURE_icu=OFF' '-DFEATURE_glib=OFF' '-DINPUT_openssl=no' '-DINPUT_opengl=no' '-G' 'Ninja' '/spike/qtbase-everywhere-src-6.10.2'
+-- The CXX compiler identification is GNU 11.2.1
+-- The C compiler identification is GNU 11.2.1
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /opt/rh/devtoolset-11/root/usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /opt/rh/devtoolset-11/root/usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- The ASM compiler identification is GNU
+-- Found assembler: /opt/rh/devtoolset-11/root/usr/bin/cc
+-- CMAKE_BUILD_TYPE was already explicitly set to: 'Release'
+
+-- Configuration summary has been written to /spike/qt6-build/config.summary
+
+-- 
+
+Qt is now configured for building. Just run 'cmake --build . --parallel'
+
+Once everything is built, you must run 'cmake --install .'
+Qt will be installed into '/opt/qt6-spike'
+
+To configure and build other Qt modules, you can use the following convenience script:
+        /opt/qt6-spike/bin/qt-configure-module
+
+If reconfiguration fails for some reason, try removing 'CMakeCache.txt' from the build directory
+Alternatively, you can add the --fresh flag to your CMake flags.
+
+-- Configuring done (9.6s)
+-- Generating done (0.3s)
+CMake Warning:
+  Manually-specified variables were not used by the project:
+
+    INPUT_opengl
+
+
+-- Build files have been written to: /spike/qt6-build
+
+real	0m9.954s
+user	0m5.462s
+sys	0m4.563s
+CONFIGURE_EXIT=0

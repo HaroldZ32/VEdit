@@ -1,0 +1,16 @@
+# C9 (T115): collected_at=2026-11-01T10:32:08Z; git_head=60c7ae9c95fe769e2bd6c86dd4c56e1514603e44; git_status_porcelain_sha256=4592cf97b951ef89d479131892e008788c3f773d68a44978fb2ed5787417320d; anchor=00-C9.txt
+== VEDIT_DEBUG=1 keeps the full diagnostics ==
+collected_at: 2026-11-01T10:32:07Z
+git_head: 60c7ae9c95fe769e2bd6c86dd4c56e1514603e44
+--- output ---
+AppRun: locale 'C' (ANSI_X3.4-1968) -> 'C.UTF-8' (bundled UTF-8 fallback)
+KSH-ENV defs=2 hash=b31aa2cc1f717e2d5a03bbdad983f7487f8982803fe71fe243745a85454b2d37
+KSH-GUARD PASS whitelist=SystemVerilog,Verilog
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='/app/usr/share/org.kde.syntax-highlighting' definitions=3 own-xml=[vedit-systemverilog.xml,vedit-verilog.xml] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+filetree: installFileTree projectRoot='' dockInserted=0 placeholderReplaced=0
+search: installSearch projectRoot='' jumpTarget=editor
+vcs: installVcs projectRoot=''
+settings: installSettings file='/tmp/.config/VEdit/vedit-app/settings.toml'
+This plugin does not support propagateSizeHints()
+TOOLCHAIN source=verible:bundled slang:bundled missing=[] local=[]
+APP-EXIT=0

@@ -1,0 +1,28 @@
+## collection: 2026-10-31T14:31:10+0000
+
+real	0m3.583s
+user	0m2.645s
+sys	0m0.949s
+SHL_CONFIGURE_EXIT=0
+
+real	0m4.120s
+user	0m7.377s
+sys	0m3.525s
+SHL_BUILD_EXIT=1
+[108/155] Building CXX object src/indexer/CMakeFiles/katehighlightingindexer.dir/katehighlightingindexer.cpp.o
+ninja: build stopped: subcommand failed.
+LIB=
+## retry with a UTF-8 locale (the data generator failed on the ASCII locale: UnicodeEncodeError U+03BC)
+
+real	0m12.478s
+user	0m57.061s
+sys	0m6.359s
+SHL_BUILD_EXIT=0
+[46/48] Linking CXX executable bin/codepdfprinter
+[47/48] Building CXX object examples/codeeditor/CMakeFiles/codeeditor.dir/codeeditor.cpp.o
+[48/48] Linking CXX executable bin/codeeditor
+LIB=bin/libKF6SyntaxHighlighting.so.6.24.0
+max GLIBC: GLIBC_2.14
+refs needing >2.17: 0
+max GLIBCXX: GLIBCXX_3.4
+NEEDED: libQt6Gui.so.6 libQt6Network.so.6 libQt6Core.so.6 libstdc++.so.6 libm.so.6 libgcc_s.so.1 libpthread.so.0 libc.so.6 

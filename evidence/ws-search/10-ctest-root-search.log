@@ -1,0 +1,234 @@
+collected_at: unknown (header added retroactively at 2026-10-31T10:19:00Z)
+git_head: 9957f5fe4d63c17c681e8753288262fa2c00955e
+git_status_porcelain:
+ M CMakeLists.txt
+ M Cargo.lock
+ M Cargo.toml
+ M THIRD_PARTY_NOTICES.md
+ M docs/decisions/r2-license.md
+ M docs/handover/README.md
+ M evidence/m0-build/build-logs/21-qt6-image-id.txt
+ M evidence/m0-build/build-logs/31-qt6-configure.log
+ M evidence/m0-build/build-logs/32-qt6-build.log
+ M evidence/m0-build/build-logs/33-qt6-ctest.log
+ M evidence/m0-build/build-logs/34-qt6-elf.txt
+ M evidence/syn-grammars/00-pins.txt
+ M evidence/syn-grammars/01-build.log
+ M evidence/syn-grammars/02-tests.log
+ M evidence/syn-grammars/03-manifest.txt
+ M evidence/syn-grammars/04-manifest-none.txt
+ M evidence/syn-grammars/04-manifest-static.txt
+ M evidence/syn-grammars/04-manifest-systemverilog.txt
+ M evidence/syn-grammars/04-manifest-verilog.txt
+ M evidence/syn-grammars/04-swap-proof.txt
+ M evidence/syn-grammars/05-layering.txt
+ M evidence/syn-grammars/06-licensing.txt
+ M evidence/syn-grammars/07-conclusion.md
+ M evidence/syn-grammars/09-result.txt
+ M evidence/term-panel/00-pins.txt
+ M evidence/term-panel/01-configure.log
+ M evidence/term-panel/02-build.log
+ M evidence/term-panel/03-ctest.log
+ M evidence/term-panel/03b-checks.log
+ M evidence/term-panel/04-elf-needed.txt
+ M evidence/term-panel/05-no-network.txt
+ M evidence/term-panel/06-xcb-and-screenshots.log
+ M evidence/term-panel/07-conclusion.md
+ M evidence/term-panel/08-structure.txt
+ M evidence/term-panel/09-root-build-with-lane.log
+ M evidence/ws-filetree/00-pins.txt
+ M evidence/ws-filetree/00-steps.txt
+ M evidence/ws-filetree/01-configure.log
+ M evidence/ws-filetree/02-build.log
+ M evidence/ws-filetree/03-ctest.log
+ M evidence/ws-filetree/03a-tests-full.log
+ M evidence/ws-filetree/04-fixture.log
+ M evidence/ws-filetree/05-screenshots.log
+ M evidence/ws-filetree/06-permissions-nonroot.log
+ M evidence/ws-filetree/07a-gate-qt6-cxx-pre-seam.log
+ M evidence/ws-filetree/08-real-shell-seamcheck.log
+ M evidence/ws-filetree/09-real-app-install.log
+ M evidence/ws-filetree/10-rootcheck-configure.log
+ M evidence/ws-filetree/11-rootcheck-build.log
+ M evidence/ws-filetree/12-gate-build-qt-final.log
+ M evidence/ws-filetree/12a-gate-build-qt-first.log
+ M evidence/ws-filetree/13-gate-qt6-cxx-final.log
+ M evidence/ws-filetree/14-real-shell-check-run.log
+ M evidence/ws-filetree/REPORT.md
+ M evidence/ws-palette/00-pins.txt
+ M evidence/ws-palette/30-build-qt.log
+ M evidence/ws-palette/31-bench.log
+ M evidence/ws-palette/32-ctest-palette.log
+ M evidence/ws-palette/33-elf.txt
+ M evidence/ws-palette/34-artifacts.txt
+ M evidence/ws-palette/36-app-seam-diff.md
+ M evidence/ws-palette/37-gate-qt6-cxx.log
+ M evidence/ws-palette/REPORT.md
+ M evidence/ws-palette/SEAM.md
+ M evidence/ws-search/04-selfcheck-root.log
+ M evidence/ws-search/05-selfcheck-nonroot.log
+ M evidence/ws-search/06-screenshots.log
+ M evidence/ws-search/07-screenshots-nonroot.log
+ M evidence/ws-search/08-build-qt.log
+ M evidence/ws-search/09-structure.txt
+ M evidence/ws-search/10-ctest-root-search.log
+ M evidence/ws-search/13-integration-proof.log
+ M evidence/ws-search/14-standalone.log
+ M evidence/ws-search/REPORT.md
+ M scripts/build-qt-in-container.sh
+ M scripts/build-qt.sh
+ M src/app/CMakeLists.txt
+ M src/app/main.cpp
+?? cmake/VEditRustFfi.cmake
+?? crates/vd-ffi/
+?? crates/vd-search/
+?? crates/vd-settings/
+?? crates/vd-vcs/
+?? docs/handover/appendix/amendments-rev2.md
+?? evidence/docs-amendments/
+?? evidence/ffi-abi/
+?? evidence/fixture/
+?? evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+?? evidence/verdicts/
+?? scripts/verify-fixture.sh
+?? tests/fixtures/
+backfill: 补记 —— C9 头为事后补齐；git_head / git_status_porcelain 为补记时刻快照，非原始采集时刻；原始采集时刻不可回溯，文件 mtime 2026-10-31T04:12:07Z 仅供参考
+---
+## command: ctest --test-dir target/qt6-build -R vedit-workspace-search-selftest -V  (FINAL)
+UpdateCTestConfiguration  from :/vedit-build/target/qt6-build/DartConfiguration.tcl
+Test project /vedit-build/target/qt6-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 7
+    Start 7: vedit-workspace-search-selftest
+
+7: Test command: /vedit-build/target/qt6-build/src/app/workspace-lane-search/vedit-workspace-search-selftest "--selfcheck"
+7: Working Directory: /vedit-build/target/qt6-build/src/app/workspace-lane-search
+7: Environment variables: 
+7:  QT_QPA_PLATFORM=offscreen
+7:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime-search
+7: Test timeout computed to be: 180
+7: CHECK fixture.created PASS
+7: This plugin does not support propagateSizeHints()
+7: CHECK panel.root.normalized PASS
+7: CHECK panel.empty.enter-query PASS
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: CHECK panel.search.terminates PASS
+7: CHECK panel.hits.count PASS
+7: CHECK panel.summary.state PASS
+7: CHECK panel.summary.files PASS
+7: CHECK panel.summary.files-scanned PASS
+7: CHECK panel.summary.skipped-binary PASS
+7: CHECK panel.summary.skipped-too-large PASS
+7: CHECK panel.summary.text.observable PASS
+7: CHECK panel.tree.files PASS
+7: CHECK panel.tree.one-row-per-hit PASS
+7: CHECK panel.tree.no-git PASS
+7: CHECK panel.tree.no-build PASS
+7: CHECK panel.tree.no-binary PASS
+7: CHECK panel.hits.one-per-line PASS
+7: CHECK panel.hit.line-number PASS
+7: CHECK panel.hit.column PASS
+7: CHECK panel.hit.snippet PASS
+7: CHECK panel.hit.unicode-file PASS
+7: CHECK panel.hit.unicode-column PASS
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: CHECK panel.case-sensitive.count PASS
+7: CHECK panel.case-sensitive.excludes-uppercase PASS
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: CHECK panel.verilog-only.count PASS
+7: CHECK panel.verilog-only.excludes-markdown PASS
+7: CHECK panel.verilog-only.excludes-large-file PASS
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: CHECK panel.unicode.query PASS
+7: This plugin does not support propagateSizeHints()
+7: CHECK empty.no-project.visible PASS
+7: CHECK empty.no-project.text PASS
+7: CHECK empty.no-project.no-search PASS
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: CHECK empty.query.text PASS
+7: CHECK empty.query.no-search PASS
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: CHECK empty.no-results.state PASS
+7: CHECK empty.no-results.visible PASS
+7: CHECK empty.no-results.text PASS
+7: CHECK empty.no-results.tree-hidden PASS
+7: CHECK empty.unreadable-root SKIP (running as root: chmod 000 does not deny access)
+7: CHECK entries.unreadable SKIP (running as root: chmod 000 does not deny access)
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: CHECK limit.results PASS
+7: CHECK limit.truncated-flag PASS
+7: CHECK limit.summary-text PASS
+7: CHECK extension.v PASS
+7: CHECK extension.vh PASS
+7: CHECK extension.sv PASS
+7: CHECK extension.svh PASS
+7: CHECK extension.not-verilog PASS
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: This plugin does not support propagateSizeHints()
+7: CHECK jump.hit-row-exists PASS
+7: CHECK jump.row-visible PASS
+7: CHECK jump.click.recorded PASS
+7: CHECK jump.click.file PASS
+7: CHECK jump.click.line PASS
+7: CHECK jump.click.column PASS
+7: CHECK jump.file-row.no-jump PASS
+7: CHECK jump.activate PASS
+7: CHECK jump.demo.opened PASS
+7: CHECK jump.demo.line PASS
+7: CHECK seam.dock-created PASS
+7: CHECK seam.not-placeholder PASS
+7: CHECK seam.factory-installed PASS
+7: CHECK seam.root-applied PASS
+7: CHECK seam.search-in-shell PASS
+7: CHECK large.fixture-created PASS
+7: CHECK large.start.accepted PASS
+7: CHECK large.skipped-by-default PASS
+7: CHECK large.skipped.state PASS
+7: CHECK large.skipped.fast PASS
+7: CHECK large.start.accepted-raised PASS
+7: CHECK large.start.non-blocking PASS
+7: CHECK large.cancel.returns-fast PASS
+7: CHECK large.cancel.finishes PASS
+7: CHECK large.cancel.state PASS
+7: CHECK large.cancel.bounded PASS
+7: CHECK large.worker-thread PASS
+7: CHECK many.start.non-blocking PASS
+7: CHECK many.finishes PASS
+7: CHECK many.hits PASS
+7: CHECK many.files-scanned PASS
+7: CHECK many.elapsed-bounded PASS
+7: CHECK large.timeout.accepted PASS
+7: CHECK large.timeout.finishes PASS
+7: CHECK large.timeout.flag PASS
+7: CHECK large.timeout.state PASS
+7: CHECK large.timeout.bounded PASS
+7: WORKSPACE-SEARCH-SELFTEST ok=1 checks=82 failures=0 skipped=2
+1/1 Test #7: vedit-workspace-search-selftest ...   Passed    0.32 sec
+
+The following tests passed:
+	vedit-workspace-search-selftest
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.32 sec
+## exit: 0

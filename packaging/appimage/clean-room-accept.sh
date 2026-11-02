@@ -251,7 +251,10 @@ grep -iE 'Failed to load module|im-xim.*(error|cannot)' "$LOGS/immodule-xim.log"
   FONTCONFIG_FILE="/tmp/vedit-runtime-$(id -u)/fonts.conf" fc-list :lang=zh | head -5
   echo "payload_cjk_count=$(FONTCONFIG_FILE="/tmp/vedit-runtime-$(id -u)/fonts.conf" fc-list :lang=zh | wc -l)"
 } > "$LOGS/fonts.txt" 2>&1
-if FONTCONFIG_FILE="/tmp/vedit-runtime-$(id -u)/fonts.conf" fc-list :lang=zh | grep -q 'wqy-zenhei'; then
+# The font list can be long; `grep -q` would exit at the first match and SIGPIPE
+# `fc-list` under this script's `set -uo pipefail`, turning a present font into a
+# "not visible" verdict. `grep` without `-q` reads the whole list.
+if FONTCONFIG_FILE="/tmp/vedit-runtime-$(id -u)/fonts.conf" fc-list :lang=zh | grep 'wqy-zenhei' > /dev/null; then
   say "PASS: fontconfig resolves the bundled wqy-zenhei CJK font"
 else
   say "FAIL: bundled CJK font is not visible to fontconfig"; FAIL=1

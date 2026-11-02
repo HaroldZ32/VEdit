@@ -1,0 +1,3 @@
+M0-SMOKE ok=1 platform=offscreen qt=6.10.2 kf6=6.24.0 ktexteditor=1 ksynhl=6.24.0 tree_sitter=0.25.9 window=1 editor=1 document=1 definitions=1 themes=30 verilog=0 systemverilog=absent custom_path=1 tree_sitter_parser=1 builtin_valid_defs=0 whitelist_verilog=0 highlight_formats=-1 kshlib=/vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0 libc=/usr/lib/x86_64-linux-gnu/libc.so.6
+M0-SMOKE theme=Atom One Dark
+M0-SMOKE ksh-selfbuild ktexteditor_repo_valid_defs_before=0 ktexteditor_repo_whitelist_visible=0 (const_cast probe only)

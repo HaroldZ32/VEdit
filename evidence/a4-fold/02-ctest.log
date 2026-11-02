@@ -1,0 +1,12 @@
+# C9 evidence header
+collected_at: 2026-11-01T14:06:15+08:00
+git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+
+## lane ctest (standalone lane build, final code incl. the printed range list)
+
+1/1 Test #1: vedit-folding-tests ..............   Passed    0.75 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.75 sec
+LANE-CTEST-EXIT=0

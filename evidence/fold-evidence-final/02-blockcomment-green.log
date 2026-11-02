@@ -1,0 +1,15 @@
+== A(a) GREEN: block comments skipped, no extra range ==
+collected_at: 2026-11-01T06:49:22Z
+git_head: 48569602d0c86fb402dc88155593d1dc06445c90
+cmd: LD_LIBRARY_PATH=<F2>/lib/x86_64-linux-gnu vedit-folding-tests
+--- output ---
+CHECK blockcomment.source.loaded PASS
+A4 BLOCKCOMMENT ranges=1 unbalanced=0 (0,5)
+CHECK blockcomment.multiline.no-extra-range PASS actual=1 expected=1
+CHECK blockcomment.multiline.unbalanced PASS actual=0 expected=0
+CHECK blockcomment.multiline.range.start PASS actual=0 expected=0
+CHECK blockcomment.multiline.range.end PASS actual=5 expected=5
+CHECK blockcomment.inline.no-extra-range PASS actual=1 expected=1
+CHECK blockcomment.inline.unbalanced PASS actual=0 expected=0
+FOLDING-TESTS ok=1 checks=82 failures=0 skipped=0
+TEST-EXIT=0

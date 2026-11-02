@@ -1,0 +1,12 @@
+## determinism probe
+hash = sha256 over the sorted visible definition names
+
+host install PRESENT:
+f1-host-present            exit=0 defs=0 hash=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+f2-isolated-host-present   exit=0 defs=1 hash=25d9678d5751122ddd45aa87a465cab682e00ffa6a6ddf821fbd7a43fe8d200c
+f2-default-host-present    exit=0 defs=403 hash=60d98554034d2c914a9899071d47dccfb60308a46a858197fd7493c0af037ef1
+
+host install ABSENT:
+f1-host-absent             exit=0 defs=0 hash=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+f2-isolated-host-absent    exit=0 defs=1 hash=25d9678d5751122ddd45aa87a465cab682e00ffa6a6ddf821fbd7a43fe8d200c
+f2-default-host-absent     exit=0 defs=1 hash=883311921dd556846ae7b8b98a935641fcf62600f442a474453fda8e72f2416a

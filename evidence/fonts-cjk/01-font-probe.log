@@ -1,0 +1,41 @@
+# C9 (T119): collected_at=2026-11-01T10:52:29Z; git_head=60c7ae9c95fe769e2bd6c86dd4c56e1514603e44; git_status_porcelain_sha256=29b3dde0b45cdcacccc86852294fbc0129b0c730cb73dfe4dcaf1227cd8f2606; anchor=00-C9.txt
+== T119 font probe (after; fallback family + metrics) ==
+collected_at: 2026-11-01T10:52:28Z
+git_head: 60c7ae9c95fe769e2bd6c86dd4c56e1514603e44
+git_status_porcelain_sha256: 31b31f31b3975ba5631b9a5196cc7f2ab9ba24196bfb36aa6e42330a2203d013
+AppDir: target/t119-appdir; locale C.UTF-8 + LOCPATH; fontconfig aliases; stock centos:7
+--- after output ---
+LOCALE system=C
+FROM_UTF8 len=7 hex=e6b58be8af95e6a8a1e59d972e7376
+FROM_LOCAL len=7 eq_utf8=1 hex=e6b58be8af95e6a8a1e59d972e7376
+FILE_CREATE open=1 exists=1 fileinfo_exists=1
+DIR_ENTRY hex=e6b58be8af95e6a8a1e59d972e7376 eq_utf8=1
+FONT default_family=DejaVu Sans pixel_size=14 families=15
+FONT inFont_CJK=1 inFontUcs4_CJK=1 inFont_A=1
+RUNS[UI-DejaVuSans] family=Noto Sans CJK SC glyphs=2 family=DejaVu Sans glyphs=1
+RUNS[EDITOR-DejaVuSansMono] family=Noto Sans Mono CJK SC glyphs=2 family=DejaVu Sans Mono glyphs=1
+FONT[UI-DejaVuSans] family=DejaVu Sans inFont_CJK=1 inFontUcs4_CJK=1 adv_A=11 adv_CJK=16 ratio_CJK_over_A=1.45 ascii_adv=159
+FONT[EDITOR-DejaVuSansMono] family=DejaVu Sans Mono inFont_CJK=1 inFontUcs4_CJK=1 adv_A=10 adv_CJK=16 ratio_CJK_over_A=1.60 ascii_adv=190
+FONT[EXPLICIT-NotoSansCJKSC] family=Noto Sans CJK SC inFont_CJK=1 inFontUcs4_CJK=1 adv_A=10 adv_CJK=16 ratio_CJK_over_A=1.60 ascii_adv=149
+FONT[EXPLICIT-NotoSansMonoCJKSC] family=Noto Sans Mono CJK SC inFont_CJK=1 inFontUcs4_CJK=1 adv_A=8 adv_CJK=16 ratio_CJK_over_A=2.00 ascii_adv=152
+FONT[DEFAULT] family=DejaVu Sans inFont_CJK=1 inFontUcs4_CJK=1 adv_A=8 adv_CJK=12 ratio_CJK_over_A=1.50 ascii_adv=120
+FONT family_sample=DejaVu Sans,DejaVu Sans Mono,Monospace,Noto Sans CJK HK,Noto Sans CJK JP,Noto Sans CJK KR,
+PROBE-EXIT=0
+## before (T115 delivered AppDir, DejaVu only)
+FONT inFont_CJK=0 inFontUcs4_CJK=0 inFont_A=1
+FONT family_sample=DejaVu Sans,DejaVu Sans Mono,Monospace,Sans Serif,Serif,
+FONT inFont_CJK=0 inFontUcs4_CJK=0 inFont_A=1
+FONT family_sample=DejaVu Sans,DejaVu Sans Mono,Monospace,Sans Serif,Serif,
+## after (T119)
+FONT inFont_CJK=1 inFontUcs4_CJK=1 inFont_A=1
+RUNS[UI-DejaVuSans] family=Noto Sans CJK SC glyphs=2 family=DejaVu Sans glyphs=1
+RUNS[EDITOR-DejaVuSansMono] family=Noto Sans Mono CJK SC glyphs=2 family=DejaVu Sans Mono glyphs=1
+FONT[UI-DejaVuSans] family=DejaVu Sans inFont_CJK=1 inFontUcs4_CJK=1 adv_A=11 adv_CJK=16 ratio_CJK_over_A=1.45 ascii_adv=159
+FONT[EDITOR-DejaVuSansMono] family=DejaVu Sans Mono inFont_CJK=1 inFontUcs4_CJK=1 adv_A=10 adv_CJK=16 ratio_CJK_over_A=1.60 ascii_adv=190
+FONT[EXPLICIT-NotoSansCJKSC] family=Noto Sans CJK SC inFont_CJK=1 inFontUcs4_CJK=1 adv_A=10 adv_CJK=16 ratio_CJK_over_A=1.60 ascii_adv=149
+FONT[EXPLICIT-NotoSansMonoCJKSC] family=Noto Sans Mono CJK SC inFont_CJK=1 inFontUcs4_CJK=1 adv_A=8 adv_CJK=16 ratio_CJK_over_A=2.00 ascii_adv=152
+FONT[DEFAULT] family=DejaVu Sans inFont_CJK=1 inFontUcs4_CJK=1 adv_A=8 adv_CJK=12 ratio_CJK_over_A=1.50 ascii_adv=120
+FONT family_sample=DejaVu Sans,DejaVu Sans Mono,Monospace,Noto Sans CJK HK,Noto Sans CJK JP,Noto Sans CJK KR,
+FONT inFont_CJK=0 inFontUcs4_CJK=0 inFont_A=1
+FONT family_sample=DejaVu Sans,DejaVu Sans Mono,Monospace,Sans Serif,Serif,
+FONT inFont_CJK=0 inFontUcs4_CJK=0 inFont_A=1

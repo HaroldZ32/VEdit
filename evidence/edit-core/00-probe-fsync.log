@@ -1,0 +1,8 @@
+FSYNC step=open_tmp rc=0 errno=0 (ok)
+FSYNC step=write rc=0 errno=0 (ok)
+FSYNC step=fsync_file rc=0 errno=0 (ok)
+FSYNC step=rename rc=0 errno=0 (ok)
+FSYNC step=open_dir rc=0 errno=0 (ok)
+FSYNC step=fsync_dir rc=0 errno=0 (ok)
+FSYNC stat rc=0 size=14
+FSYNC verdict=PASS

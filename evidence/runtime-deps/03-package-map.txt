@@ -1,0 +1,24 @@
+generated: 2026-10-31T14:13:44Z
+宿主: Ubuntu 26.04.1 LTS (resolute) — 本机恰好装有 KF6 开发/运行包，因此只能看到 tree-sitter 缺失
+
+## 直接 NEEDED 的 soname → Debian/Ubuntu 包名（dpkg -S 实测）
+libKF6TextEditor.so.6          libkf6texteditor6
+libKF6Parts.so.6               libkf6parts6
+libKF6SyntaxHighlighting.so.6  libkf6syntaxhighlighting6
+libQt6Widgets.so.6             libqt6widgets6
+libQt6Gui.so.6                 libqt6gui6
+libQt6Core.so.6                libqt6core6t64
+libtree-sitter.so.0.25         libtree-sitter0.25   (候选 0.25.9-7)
+
+## 镜像内绝对路径（vedit-qt6-build:local）
+/usr/lib/x86_64-linux-gnu/<soname>    （即上述全部 soname 的实文件位置）
+Qt 平台插件：/usr/lib/x86_64-linux-gnu/qt6/plugins/platforms/{libqoffscreen.so,libqxcb.so}
+
+## 一条装齐的 apt 命令（Debian/Ubuntu）
+sudo apt install -y libkf6texteditor6 libtree-sitter0.25
+# libkf6texteditor6 会经依赖链自动拉入 libkf6parts6 / libkf6syntaxhighlighting6 / KIO / KConfig 等（32 个 KF6 库）
+# 若要显式写全：
+sudo apt install -y libkf6texteditor6 libkf6parts6 libkf6syntaxhighlighting6 libqt6widgets6 libqt6gui6 libqt6core6t64 libtree-sitter0.25
+
+## apt 干跑结果
+Inst libtree-sitter0.25 (0.25.9-7 Ubuntu:26.04/resolute [amd64])

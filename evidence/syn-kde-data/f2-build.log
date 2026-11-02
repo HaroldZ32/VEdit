@@ -1,0 +1,6 @@
+[ksh] self-build KSyntaxHighlighting 6.24.0 (tag v6.24.0, commit bbea2326fbd4)
+[ksh] form F2: QRC_SYNTAX=OFF NO_STANDARD_PATHS=OFF BUILD_TESTING=OFF
+[ksh] build tree: target/ksh-selfbuild/F2 · evidence: evidence/m0-ksh-selfbuild/build-logs
+[ksh] toolchain: the M0 Qt6 image vedit-qt6-build:local (Qt 6.10.2, ECM 6.24)
+[qt6-image] VEDIT_SKIP_IMAGE_BUILD=1: reusing the existing image vedit-qt6-build:local
+== [1/7] pinned source tarball ==

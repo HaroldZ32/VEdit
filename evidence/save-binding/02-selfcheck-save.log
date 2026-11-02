@@ -1,0 +1,36 @@
+# C9 evidence header
+collected_at: 2026-10-31T19:40:07+08:00
+git_head: 95c496e682e3841add1a081edd78d29c34957aac
+binary: target/qt6-build/src/app/vedit-app
+binary_sha256: e604b8b8745521ac61492023541586f2af6c43e3bc28607ea19b16b240518ccf
+
+## all save.* checks + the selfcheck summary (QT_QPA_PLATFORM=offscreen, pinned Qt image)
+APP-EXIT=0
+CHECK save.command.registered PASS
+CHECK save.shortcut.ctrl-s PASS
+CHECK save.menu.file-item PASS
+CHECK save.demo.open PASS
+CHECK save.demo.action.disk-bytes PASS
+CHECK save.demo.action.path-unchanged PASS
+CHECK save.demo.action.no-temp-file PASS
+CHECK editor.pane.ktexteditor-widget PASS
+CHECK editor.pane.open PASS
+CHECK editor.pane.open-path PASS /tmp/vedit-app-YRKEcH/pane-open.v
+CHECK editor.pane.save PASS
+CHECK save.ktexteditor.document PASS
+CHECK save.shortcut.window PASS
+CHECK save.shortcut.disk-bytes PASS
+CHECK save.shortcut.modified-cleared PASS
+CHECK save.shortcut.path-unchanged PASS
+CHECK save.menu.disk-bytes PASS
+CHECK save.menu.path-unchanged PASS
+CHECK save.no-temp-file PASS
+[app-shell] Save failed: atomic save: injected write failure
+[app-shell] Save failed: atomic save: injected write failure
+CHECK save.failure.disk-unchanged PASS
+CHECK save.failure.status-bar PASS
+CHECK save.failure.diagnostic PASS
+CHECK save.failure.still-modified PASS
+CHECK save.recovery.disk-bytes PASS
+CHECK save.recovery.not-modified PASS
+APP-SHELL-SELFTEST ok=1 checks=160 failures=0 state=/tmp/vedit-app-YRKEcH/state

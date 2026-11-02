@@ -1,0 +1,36 @@
+== evidence/lsp-v2/09-report.md repair (before -> after) ==
+collected_at: 2026-10-31T11:47:37Z
+git_head: 95c496e682e3841add1a081edd78d29c34957aac
+
+## BEFORE §4.1 (self-contradicting):
+1. **SLANG success is NOT proven.** `slang` is absent on this host ... A host with slang runs the same test with a healthy leg; the test does not fake success.
+
+## BEFORE tail (mangled split sentence):
+Unchanged honest SKIPs: SLANG success is SLANG success IS now proven (见 16-f1... (no binary; the typed degradation is proven), ...
+
+## AFTER §4.1:
+## 4. Not verified / explicit SKIPs (no pretending)
+
+1. **SLANG has two proven paths, selected by `VEDIT_SLANG`.**
+   * **Default environment (no `VEDIT_SLANG`):** the leg degrades diagnostically — the
+     session reports `slangFailures=7` with the typed message
+     `slang: slang binary not found (tried 4 location(s); set VEDIT_SLANG)` while the LSP
+     side stays usable (`lsp 7/7`); nothing crashes and nothing is faked.
+   * **With `VEDIT_SLANG=build/slang/out/slang`:** the success path is proven in
+     `16-f1-slang-success-path.log` — `a3c.slang-got-every-file requested=7 completed=7
+     failures=0`, `a3d.terminal-state-within-60s ready (lsp 7/7 file(s), diagnostics 21)`,
+     `VER-DIAGNOSTICS-FFI-SELFTEST checks=23 failures=0`.
+2. **`verible-verilog-syntax`** is absent, but this lane does not use it: only
+
+## AFTER tail:
+Unchanged honest limits: SLANG **success is proven** with
+`VEDIT_SLANG=build/slang/out/slang` (`16-f1-slang-success-path.log`:
+`requested=7 completed=7 failures=0`, `lsp 7/7`, `checks=23 failures=0`), while the default
+environment (no `VEDIT_SLANG`) exercises the typed degradation without a crash. GUI-visible
+behaviour is not claimed (no display), and `verible-verilog-syntax` is absent but unused by
+this lane.
+
+## 16-f1 evidence cited by the report:
+CHECK PASS a3d.terminal-state-within-60s  ready (ready: lsp 7/7 file(s), diagnostics 21)
+CHECK PASS a3c.slang-got-every-file  requested=7 completed=7 failures=0
+VER-DIAGNOSTICS-FFI-SELFTEST checks=23 failures=0

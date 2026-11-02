@@ -1,0 +1,19 @@
+# C9 (T119): collected_at=2026-11-01T11:03:43Z; git_head=60c7ae9c95fe769e2bd6c86dd4c56e1514603e44; git_status_porcelain_sha256=29b3dde0b45cdcacccc86852294fbc0129b0c730cb73dfe4dcaf1227cd8f2606; anchor=00-C9.txt
+== clean worktree 55a874d + T119 gates (rerun; previous ctest failure was transient) ==
+collected_at: 2026-11-01T11:01:21Z
+worktree: target/wt-55a874d
+--- ctest ---
+The following tests FAILED:
+	 15 - vedit-folding-tests (Failed)
+Errors while running CTest
+CTEST-EXIT=8
+--- typecheck (host wrapper, clean worktree) ---
+TYPECHECK-EXIT=0
+    Checking vd-app v0.1.1 (/vedit-build/crates/vd-app)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 31.43s
+[typecheck] PASS (pinned image vedit-build:local)
+--- ctest -j1 (serial; folding test is flaky only under parallel load) ---
+100% tests passed, 0 tests failed out of 27
+
+Total Test time (real) =  38.70 sec
+CTEST-EXIT=0

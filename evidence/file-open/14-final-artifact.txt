@@ -1,0 +1,42 @@
+generated: 2026-11-02T03:54:52Z
+git_head: 157e5fbf259df3e608b33386148b8757beb16e03
+git_branch: feat/qt6-ktexteditor-migration
+
+## 最终交付产物（含 T137 File→Open）
+path: packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage
+size_bytes: 110443000
+sha256: de19746c62a9e633de85e40b34f41f7e70350ca14ba4be284a9adca9d544501d
+built_from_head: 157e5fbf259df3e608b33386148b8757beb16e03
+PACKAGING-EXIT=0  steps_failed=0
+
+## 包内 selfcheck
+APP-SHELL-SELFTEST ok=1 checks=245 failures=0
+
+## 包内断言组
+open.*        : 12 条全 PASS
+CHECK open.command.exists PASS
+CHECK open.command.in-file-menu PASS
+CHECK open.command.shortcut-ctrl-o PASS
+CHECK open.dialog.action-opens PASS
+CHECK open.fixture-a PASS
+CHECK open.fixture-b PASS
+CHECK open.missing.nonzero-readable PASS
+CHECK open.missing.rejected PASS
+CHECK open.multiple.active-second PASS
+CHECK open.multiple.ok PASS
+CHECK open.multiple.pane-count PASS
+CHECK open.multiple.paths PASS
+fold.native.* : 24 条
+close.*       : 18 条
+
+## 四容器矩阵
+HOSTMATRIX-EXIT=0
+ROW docker.m.daocloud.io/library/centos:7 uname=7.0.0-38-generic glibc=ldd (GNU libc) 2.17 selfcheck=PASS startup=PASS lint=PASS
+ROW docker.m.daocloud.io/library/ubuntu:24.04 uname=7.0.0-38-generic glibc=ldd (Ubuntu GLIBC 2.39-0ubuntu8.9) 2.39 selfcheck=PASS startup=PASS lint=PASS
+ROW docker.m.daocloud.io/library/rockylinux:9 uname=7.0.0-38-generic glibc=ldd (GNU libc) 2.34 selfcheck=PASS startup=PASS lint=PASS
+ROW docker.m.daocloud.io/library/ubuntu:26.04 uname=7.0.0-38-generic glibc=ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43 selfcheck=PASS startup=PASS lint=PASS
+
+## 未验证（如实）
+- 真 CentOS 7 / 内核 3.10：容器共用宿主内核，未验
+- GUI 双击 .sv 用文件管理器打开：.desktop 的 MIME 关联已具备，但无头环境未真点文件管理器
+- 内联标注的包级验证：需 --project 或 GUI 内操作；T137 后已有 <file> 参数，可用真实文件重试（本轮未做）

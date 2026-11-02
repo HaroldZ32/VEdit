@@ -1,0 +1,22 @@
+-- extracting /home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage (FUSE not required) --
+== self-check ==
+prefix: /tmp/tmp.wjTVwGdZQD/squashfs-root
+$ env -i PATH=... HOME=/tmp/tmp.wjTVwGdZQD/home QT_QPA_PLATFORM=offscreen /tmp/tmp.wjTVwGdZQD/squashfs-root/AppRun --selfcheck --expect-libc-prefix /tmp/tmp.wjTVwGdZQD/squashfs-root
+KSH-ENV defs=2 hash=b31aa2cc1f717e2d5a03bbdad983f7487f8982803fe71fe243745a85454b2d37
+KSH-GUARD PASS whitelist=SystemVerilog,Verilog
+M0-SMOKE ok=1 platform=offscreen qt=6.10.2 kf6=6.24.0 ktexteditor=1 ksynhl=6.24.0 tree_sitter=0.25.9 window=1 editor=1 document=1 definitions=3 themes=30 verilog=1 systemverilog=loadable(not-asserted,C7-pending) custom_path=1 tree_sitter_parser=1 builtin_valid_defs=2 whitelist_verilog=0 highlight_formats=-1 kshlib=/tmp/tmp.wjTVwGdZQD/squashfs-root/lib/libKF6SyntaxHighlighting.so.6 libc=/tmp/tmp.wjTVwGdZQD/squashfs-root/lib/libc.so.6
+M0-SMOKE theme=Atom One Dark
+M0-SMOKE ksh-selfbuild ktexteditor_repo_valid_defs_before=2 ktexteditor_repo_whitelist_visible=0 (const_cast probe only)
+smoke_exit=0
+CHECK PASS  M0-SMOKE ok=1
+CHECK PASS  libc resolved under package
+CHECK PASS  KTextEditor loaded
+CHECK PASS  tree-sitter parser
+-- shipped syntax definitions in /tmp/tmp.wjTVwGdZQD/squashfs-root/share/ksyntaxhighlighting/syntax --
+-- embedded in the library (names/licenses) --
+   resource names (utf-16le): xml=0 theme=30
+   zstd frames parsed as definitions: 0
+   license classes: {}
+   strict-GPL definitions embedded: 0
+
+SELFCHECK PASS

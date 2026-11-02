@@ -1,0 +1,15 @@
+== public KTextEditor headers + key .so: v1 probe image vs v2 official image ==
+--- vprobe-qt6kf6:1
+7f80f37b706e349a5daf6a3daaf1b41008684c40dcc163970d31c9df40261d2e  -
+08a2eced8f9ffe5f93c8a18b228108bfd8354b442504b8d66a5cb787344859f8  -
+85d3cd4a2a19e308ac67b6e12360fd78db0f490c54bb0d13374a25495d6d0ddc  /usr/lib/x86_64-linux-gnu/libKF6TextEditor.so.6.24.0
+da9d5f1c1640059b2809ddbb5c22e855479f9214005821abb3aa25c38a62f5e5  /usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
+libkf6texteditor6=6.24.0-0ubuntu1
+libkf6syntaxhighlighting6=6.24.0-0ubuntu1
+--- vedit-qt6-build:local
+7f80f37b706e349a5daf6a3daaf1b41008684c40dcc163970d31c9df40261d2e  -
+08a2eced8f9ffe5f93c8a18b228108bfd8354b442504b8d66a5cb787344859f8  -
+85d3cd4a2a19e308ac67b6e12360fd78db0f490c54bb0d13374a25495d6d0ddc  /usr/lib/x86_64-linux-gnu/libKF6TextEditor.so.6.24.0
+da9d5f1c1640059b2809ddbb5c22e855479f9214005821abb3aa25c38a62f5e5  /usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
+libkf6texteditor6=6.24.0-0ubuntu1
+libkf6syntaxhighlighting6=6.24.0-0ubuntu1

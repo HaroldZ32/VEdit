@@ -1,0 +1,140 @@
+# lane acceptance suite re-run after the repair (panel behaviour must not change)
+# host command: bash -lc 'source scripts/lib-qt.sh; load_qt_versions; run_in_qt6_container bash -lc "QT_QPA_PLATFORM=offscreen XDG_RUNTIME_DIR=/tmp/xdg-runtime target/filetree-build/vedit-filetree-tests"'
+# date: 2026-10-31T18:30:04+08:00
+This plugin does not support propagateSizeHints()
+filetree: The folder '/vedit-build/filetree-testdata/does-not-exist' does not exist.
+This plugin does not support propagateSizeHints()
+filetree: '/vedit-build/filetree-testdata/plain.txt' is not a folder.
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+SCRATCH /vedit-build/filetree-testdata
+CHECK kind.v-is-verilog ok=1
+CHECK kind.v-label ok=1
+CHECK kind.v-id-not-vlang ok=1
+CHECK kind.vh-is-verilog ok=1
+CHECK kind.sv-is-systemverilog ok=1
+CHECK kind.svh-is-systemverilog ok=1
+CHECK kind.uppercase-suffix ok=1
+CHECK kind.f-is-filelist ok=1
+CHECK kind.txt-is-other ok=1
+CHECK kind.extensionless-other ok=1
+CHECK kind.directory ok=1
+CHECK state.no-root ok=1
+CHECK state.no-root.text ok=1 detail="No folder open.
+Use "Open..." to browse a project."
+CHECK state.no-root.visible ok=1
+CHECK state.no-root.rows ok=1
+CHECK state.missing ok=1
+CHECK state.missing.text ok=1 detail="The folder does not exist: 'does-not-exist'"
+CHECK state.fixture-file ok=1
+CHECK state.not-a-folder ok=1
+CHECK state.not-a-folder.text ok=1 detail="'plain.txt' is not a folder."
+CHECK state.empty-folder ok=1
+CHECK state.empty-folder.text ok=1 detail="This folder is empty."
+CHECK state.empty-folder.visible ok=1
+CHECK state.empty-folder.no-rows ok=1
+CHECK state.permission-denied SKIPPED running-as-root
+CHECK tree.root-open ok=1
+CHECK tree.root-expanded ok=1
+CHECK tree.root.rows ok=1 detail="4"
+CHECK tree.folders-first ok=1 detail="alpha,beta,zeta,top.v"
+CHECK tree.lazy.nested-not-read ok=1
+CHECK tree.lazy.nested-no-rows ok=1
+CHECK tree.lazy.one-dir-scanned ok=1 detail="1"
+CHECK tree.alpha.populated ok=1
+CHECK tree.alpha.rows ok=1 detail="2"
+CHECK tree.alpha.folders-first ok=1
+CHECK tree.collapse ok=1
+CHECK tree.expand ok=1
+CHECK tree.dblclick.rect-visible ok=1
+CHECK tree.dblclick.view-signal ok=1 detail="1"
+CHECK tree.dblclick.folder-expands ok=1
+CHECK tree.dblclick.folder-does-not-open ok=1
+CHECK tree.file-index ok=1
+CHECK tree.dblclick.file-rect ok=1
+CHECK tree.dblclick.file-opens ok=1 detail="1"
+CHECK tree.dblclick.file-path ok=1 detail="/vedit-build/filetree-testdata/tree/top.v"
+CHECK tree.activate.file-opens ok=1
+CHECK tree.status.kind ok=1 detail="top.v - Verilog"
+CHECK tree.disk-and-tree-agree ok=1
+CHECK tree.disk-and-tree-agree.alpha ok=1
+MEASURE lazy.open 64ms
+MEASURE lazy.rows-after-open 1250
+CHECK lazy.open-fast ok=1 detail="64 ms"
+CHECK lazy.not-all-rows-materialised ok=1 detail="1250"
+CHECK lazy.can-fetch-more ok=1
+CHECK lazy.only-root-scanned ok=1 detail="1"
+CHECK lazy.child-index ok=1
+CHECK lazy.child-not-read ok=1
+MEASURE lazy.one-batch 0ms
+CHECK lazy.batch-fast ok=1 detail="0 ms"
+MEASURE lazy.full-drain 2ms
+CHECK lazy.total-rows ok=1 detail="10002"
+CHECK lazy.disk-and-tree-agree ok=1
+CHECK lazy.ui-not-blocked ok=1
+CHECK ops.create-file ok=1
+CHECK ops.create-file.on-disk ok=1
+CHECK ops.create-file.in-tree ok=1
+CHECK ops.create-file.consistent ok=1
+CHECK ops.create-file.status ok=1 detail="Created file 'alpha.v' (Verilog)"
+CHECK ops.create-dup-refused ok=1
+CHECK ops.create-dup-error ok=1 detail="A file or folder named 'alpha.v' already exists"
+CHECK ops.create-dup.no-disk-change ok=1
+CHECK ops.create-dup.tree-count ok=1
+CHECK ops.invalid.empty-name ok=1
+CHECK ops.invalid.empty-name.error ok=1 detail="Name must not be empty"
+CHECK ops.invalid.separator ok=1
+CHECK ops.invalid.separator.error ok=1 detail="Name must not contain a path separator"
+CHECK ops.invalid.dotdot ok=1
+CHECK ops.invalid.no-disk-change ok=1
+CHECK ops.create-folder ok=1
+CHECK ops.create-folder.on-disk ok=1
+CHECK ops.create-folder.in-tree ok=1
+CHECK ops.create-folder.consistent ok=1
+CHECK ops.rename ok=1
+CHECK ops.rename.old-gone ok=1
+CHECK ops.rename.new-present ok=1
+CHECK ops.rename.tree-old-gone ok=1
+CHECK ops.rename.tree-new ok=1
+CHECK ops.rename.consistent ok=1
+CHECK ops.rename-dup-refused ok=1
+CHECK ops.rename-dup.error ok=1 detail="A file or folder named 'rtl' already exists"
+CHECK ops.rename-dup.no-change ok=1
+CHECK ops.rename-dup.consistent ok=1
+CHECK ops.delete-file ok=1
+CHECK ops.delete-file.gone ok=1
+CHECK ops.delete-file.tree-gone ok=1
+CHECK ops.delete-file.consistent ok=1
+CHECK ops.create-nested ok=1
+CHECK ops.create-nested-file ok=1
+CHECK ops.sub-index ok=1
+CHECK ops.delete-folder ok=1
+CHECK ops.delete-folder.gone ok=1
+CHECK ops.delete-folder.consistent ok=1
+CHECK ops.delete-folder.rows-shrunk ok=1 detail="3 -> 1"
+CHECThis plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+K ops.delete-root-refused ok=1
+CHECK ops.delete-root.error ok=1 detail="Cannot delete the folder that is open. Close it first."
+CHECK ops.locked-folder ok=1
+CHECK ops.locked-file ok=1
+CHECK ops.delete-denied SKIPPED running-as-root
+CHECK refresh.fixture ok=1
+CHECK refresh.hidden-until-refresh ok=1
+CHECK refresh.appears ok=1
+CHECK refresh.consistent ok=1
+CHECK widget.close.no-root ok=1
+CHECK seam.factory.returns-widget ok=1
+CHECK seam.factory.root ok=1 detail="/vedit-build/filetree-testdata/tree"
+CHECK seam.factory.rows ok=1 detail="4"
+CHECK seam.factory.empty-root ok=1
+FILETREE-TESTS checks=111 failures=0
+HOST-EXIT=0

@@ -1,0 +1,47 @@
+== evidence: 03-after-green-standalone.log — FIXED code (shared per-scan cancellation token + destructor joins the worker, no timeout) ==
+time=2026-10-31T19:41:48+08:00
+HEAD=95c496e682e3841add1a081edd78d29c34957aac
+sha256(global_search.cpp)=8febfb2c1d88ad228c92b57bf833c06015d426d267ea201cec6c96a947c89e98
+
+[5/7] Linking CXX static library libvedit_workspace_search.a
+[6/7] Building CXX object CMakeFiles/vedit-workspace-search-selftest.dir/search_selftest.cpp.o
+[7/7] Linking CXX executable vedit-workspace-search-selftest
+BUILD-EXIT=0
+CHECK lifecycle.temp-dir PASS
+CHECK lifecycle.no-worker-before PASS
+CHECK lifecycle.scan-started PASS
+CHECK lifecycle.worker-running PASS
+CHECK lifecycle.destructor-joins-worker PASS
+SLOWLIFECYCLE-CHILD finished=1 exit=0
+CHECK slowlifecycle.temp-dir PASS
+CHECK slowlifecycle.scan-started PASS
+CHECK slowlifecycle.batch-before-block PASS
+SLOWLIFECYCLE delete-returned elapsedMs=11297 released-marker=1 stallMs=11500
+CHECK slowlifecycle.destructor-waits-for-stalled-read PASS
+WORKSPACE-SEARCH-SLOWLIFECYCLE ok=1 checks=4 failures=0
+CHECK lifecycle.stall-child-finished PASS
+CHECK lifecycle.stall-child-pass PASS
+WORKSPACE-SEARCH-SELFTEST ok=1 checks=84 failures=0 skipped=2
+SELFTEST-EXIT=0
+
+== RERUN after tidying includes ==
+time=2026-10-31T19:47:25+08:00
+[2/3] Building CXX object CMakeFiles/vedit-workspace-search-selftest.dir/search_selftest.cpp.o
+[3/3] Linking CXX executable vedit-workspace-search-selftest
+BUILD-EXIT=0
+CHECK lifecycle.temp-dir PASS
+CHECK lifecycle.no-worker-before PASS
+CHECK lifecycle.scan-started PASS
+CHECK lifecycle.worker-running PASS
+CHECK lifecycle.destructor-joins-worker PASS
+SLOWLIFECYCLE-CHILD finished=1 exit=0
+CHECK slowlifecycle.temp-dir PASS
+CHECK slowlifecycle.scan-started PASS
+CHECK slowlifecycle.batch-before-block PASS
+SLOWLIFECYCLE delete-returned elapsedMs=11297 released-marker=1 stallMs=11500
+CHECK slowlifecycle.destructor-waits-for-stalled-read PASS
+WORKSPACE-SEARCH-SLOWLIFECYCLE ok=1 checks=4 failures=0
+CHECK lifecycle.stall-child-finished PASS
+CHECK lifecycle.stall-child-pass PASS
+WORKSPACE-SEARCH-SELFTEST ok=1 checks=84 failures=0 skipped=2
+SELFTEST-EXIT=0

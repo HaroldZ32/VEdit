@@ -1,0 +1,28 @@
+# C9 backfill (T112/N2): header added after the fact; the body below is unchanged.
+# original_collected_at_utc: 2026-11-01T08:32:58Z   (from the archived file mtime)
+# original_git_head: 55a874da076d605c6b620e0bb20f9ac5932d5f46
+# original_git_status_porcelain_sha256: 00b8d8a0956773d9246d1650a785ddf13c1b167806b44d77d7c9cb9003652e9b (hash of the porcelain block archived in final-55a874d/00-C9.txt)
+# session_anchor: final-55a874d/00-C9.txt
+# backfill_collected_at_utc: 2026-11-01T09:23:35Z
+# backfill_git_head: 0c8ea9fe4ae18c386a59a55b8868f837f4f80a84
+# backfill_git_status_porcelain_sha256: a7feab0230532310375511329de129cad97d49e690c7a9c7336394a1cce151fa (current tree at backfill time)
+[assemble] vd-app: b93f8cf4c43dada6f041905bcee264fd4349966af5d4248028f17093c5e4520d  probe: b709d6924ec9a6f6da6ec80aaf915aa27d9b9ddb3e18de73ced44316353fc242
+[assemble] syntax data root: 2 xml under <root>/syntax/
+[assemble] whitelist: SystemVerilog,Verilog
+binary verible-verilog-ls sha256=07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845
+binary verible-verilog-lint sha256=b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29
+binary verible-verilog-format sha256=b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473
+[assemble] toolchain: verible bundled (3 binaries, sha256 pinned)
+binary slang sha256=63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252
+[assemble] toolchain: slang bundled (sha256 pinned)
+[assemble] toolchain: complete (verible + slang), missing=[]
+[assemble] active whitelist files: 2 (no syntax-bundled/)
+[assemble] delivery invariants: vd-app + Qt platform plugins + toolchain + whitelist present
+[assemble] AppDir: /vedit-build/packaging/runtime/out/AppDir files=202 bytes=284187264
+[assemble] f2lib sha256: aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
+APPDIR=/vedit-build/packaging/runtime/out/AppDir
+APPDIR_FORM=F2
+APPDIR_FILES=202
+APPDIR_BYTES=284187264
+APPDIR_WHITELIST=SystemVerilog,Verilog
+assemble exit=0

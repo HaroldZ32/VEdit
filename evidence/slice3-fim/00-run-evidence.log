@@ -1,0 +1,489 @@
+# C9 evidence header (T105 backfill — evidence repair; the body below is unchanged)
+collected_at: unknown (no original header; the local collection time was not recorded)
+collected_at_utc: unknown
+collected_at_mtime_reference: 2026-11-01T15:19:50+0800   # reference only, NOT the collection time
+git_head: unknown (not recorded at collection time)
+git_head_at_backfill: d36bff9470dca6bb94ee6c5529c7fb5328f344c9
+backfill: 补记（T105）—— `git_status_porcelain`、`git_head_at_backfill` 与推导的 `collected_at_utc` 是补记时刻的快照/推导值，不是原始采集时刻；`git_status_porcelain` 描述补记时刻的工作树；原始采集时刻不可回溯，mtime 仅作参考。原始 `collected_at`/`git_head`（若存在）保留原值，未编造。
+backfill_snapshot: local=2026-11-01T15:38:25+0800 utc=2026-11-01T07:38:25Z
+git_status_porcelain_sha256: 8fac5b80afb6c312f8c729f6e07fc0410476bb743f515b195057f726876bc5e3   # snapshot at backfill time
+git_status_porcelain:
+  M build/evidence/typecheck/00-run.txt
+  M build/evidence/typecheck/10-typecheck-image-build.log
+  M build/evidence/typecheck/11-typecheck-image-id.txt
+  M crates/vd-ffi/include/vd_ffi.h
+  M crates/vd-ffi/src/fim.rs
+  M crates/vd-ffi/src/service.rs
+  M evidence/ffi-abi/logs/10-rust-image.txt
+  M evidence/ffi-abi/logs/19-rust-stage-console.log
+  M evidence/ffi-abi/logs/20-cargo-build-release.log
+  M evidence/ffi-abi/logs/21-staticlib.txt
+  M evidence/ffi-abi/logs/23-cargo-test.log
+  M evidence/ffi-abi/logs/26-vd_ffi.h
+  M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+  M evidence/m0-build/build-logs/20-qt6-image-build.log
+  M evidence/m0-build/build-logs/21-qt6-image-id.txt
+  M evidence/m0-build/build-logs/31-qt6-configure.log
+  M evidence/m0-build/build-logs/32-qt6-build.log
+  M evidence/m0-build/build-logs/33-qt6-ctest.log
+  M evidence/m0-build/build-logs/34-qt6-elf.txt
+  M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+  M src/editor/CMakeLists.txt
+  M src/editor/kernel/ktexteditor_provider.cpp
+  M src/workspace/palette/README.md
+  M src/workspace/search/CMakeLists.txt
+  M src/workspace/search/README.md
+  M src/workspace/search/global_search.cpp
+  M src/workspace/search/global_search.h
+ ?? evidence/fim-wiring/
+ ?? evidence/slice1-stop/61-typecheck-slice3.log
+ ?? evidence/slice1-stop/62-build-qt-slice3.log
+ ?? evidence/slice3-fim/
+ ?? evidence/verdicts/fim/
+ ?? src/editor/fim/
+ ?? src/editor/kernel/fim_wiring.cpp
+ ?? src/editor/kernel/fim_wiring.h
+ ?? src/editor/kernel/fim_wiring_selftest.cpp
+---
+== [1/6] Rust: cargo test (FIM) ==
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded anyhow v1.0.104
+  Downloaded anstyle-parse v1.0.0
+  Downloaded anstyle v1.0.14
+  Downloaded anstyle-query v1.1.5
+  Downloaded anstream v1.0.0
+  Downloaded async-lsp v0.2.4
+  Downloaded utf8-zero v0.8.1
+  Downloaded serde_derive v1.0.229
+  Downloaded tower-service v0.3.3
+  Downloaded time-macros v0.2.32
+  Downloaded clap_lex v1.1.1
+  Downloaded clap_builder v4.6.7
+  Downloaded bitflags v1.3.2
+  Downloaded itoa v1.0.18
+  Downloaded bitflags v2.13.2
+  Downloaded fastrand v2.5.0
+  Downloaded equivalent v1.0.3
+  Downloaded idna_adapter v1.2.2
+  Downloaded serde_spanned v1.1.2
+  Downloaded potential_utf v0.1.6
+  Downloaded futures-task v0.3.34
+  Downloaded tower-layer v0.3.3
+  Downloaded document-features v0.2.12
+  Downloaded futures-sink v0.3.34
+  Downloaded colorchoice v1.0.5
+  Downloaded percent-encoding v2.3.2
+  Downloaded futures-io v0.3.34
+  Downloaded heck v0.5.0
+  Downloaded is_terminal_polyfill v1.70.2
+  Downloaded cfg-if v1.0.5
+  Downloaded num-conv v0.2.2
+  Downloaded errno v0.3.14
+  Downloaded displaydoc v0.2.7
+  Downloaded deranged v0.5.9
+  Downloaded signal-hook-registry v1.4.8
+  Downloaded strsim v0.11.1
+  Downloaded form_urlencoded v1.2.2
+  Downloaded powerfmt v0.2.1
+  Downloaded tokio-macros v2.7.2
+  Downloaded subtle v2.6.1
+  Downloaded futures-macro v0.3.34
+  Downloaded serde_repr v0.1.21
+  Downloaded stable_deref_trait v1.2.1
+  Downloaded futures-core v0.3.34
+  Downloaded time-core v0.1.9
+  Downloaded find-msvc-tools v0.1.15
+  Downloaded tracing-attributes v0.1.31
+  Downloaded tinystr v0.8.5
+  Downloaded getrandom v0.2.17
+  Downloaded httparse v1.10.1
+  Downloaded shlex v2.0.1
+  Downloaded slab v0.4.12
+  Downloaded quote v1.0.47
+  Downloaded pin-project-lite v0.2.17
+  Downloaded thiserror v2.0.21
+  Downloaded utf8parse v0.2.2
+  Downloaded synstructure v0.14.0
+  Downloaded futures-channel v0.3.34
+  Downloaded cookie_store v0.22.1
+  Downloaded litemap v0.8.3
+  Downloaded litrs v1.0.1
+  Downloaded once_cell v1.21.4
+  Downloaded thiserror-impl v2.0.21
+  Downloaded icu_provider v2.4.0
+  Downloaded proc-macro2 v1.0.107
+  Downloaded smallvec v1.16.4
+  Downloaded rustls-pki-types v1.15.1
+  Downloaded utf8_iter v1.1.0
+  Downloaded untrusted v0.9.0
+  Downloaded log v0.4.34
+  Downloaded socket2 v0.6.5
+  Downloaded futures v0.3.34
+  Downloaded tempfile v3.27.0
+  Downloaded utf_types v1.0.0
+  Downloaded serde_core v1.0.229
+  Downloaded cookie v0.18.2
+  Downloaded getrandom v0.4.3
+  Downloaded icu_locale_core v2.4.0
+  Downloaded icu_normalizer_data v2.4.0
+  Downloaded serde v1.0.229
+  Downloaded cbindgen v0.29.4
+  Downloaded lsp-types v0.95.1
+  Downloaded clap v4.6.7
+  Downloaded base64 v0.23.1
+  Downloaded bytes v1.12.1
+  Downloaded icu_collections v2.4.0
+  Downloaded rustls-webpki v0.103.16
+  Downloaded toml v0.9.12+spec-1.1.0
+  Downloaded memchr v2.8.3
+  Downloaded indexmap v2.14.2
+  Downloaded toml_writer v1.1.3+spec-1.1.0
+  Downloaded toml_parser v1.1.5+spec-1.1.0
+  Downloaded http v1.5.0
+  Downloaded mio v1.2.4
+  Downloaded idna v1.1.0
+  Downloaded unicode-ident v1.0.27
+  Downloaded tracing-core v0.1.36
+  Downloaded url v2.5.8
+  Downloaded ureq-proto v0.6.5
+  Downloaded tokio-util v0.7.20
+  Downloaded icu_properties v2.4.0
+  Downloaded cc v1.10.0
+  Downloaded serde_json v1.0.154
+  Downloaded futures-util v0.3.34
+  Downloaded hashbrown v0.17.1
+  Downloaded icu_properties_data v2.4.0
+  Downloaded ureq v3.5.0
+  Downloaded tracing v0.1.44
+  Downloaded zerofrom-derive v0.1.8
+  Downloaded yoke-derive v0.8.4
+  Downloaded zerotrie v0.2.5
+  Downloaded zmij v1.0.23
+  Downloaded toml_datetime v0.7.5+spec-1.1.0
+  Downloaded version_check v0.9.5
+  Downloaded writeable v0.6.4
+  Downloaded zerovec-derive v0.11.7
+  Downloaded waitpid-any v0.3.0
+  Downloaded zerofrom v0.1.8
+  Downloaded zeroize v1.9.1
+  Downloaded time v0.3.55
+  Downloaded syn v2.0.119
+  Downloaded syn v3.0.9
+  Downloaded rustls v0.23.46
+  Downloaded rustix v1.1.6
+  Downloaded toml v1.1.8+spec-1.1.0
+  Downloaded yoke v0.8.4
+  Downloaded icu_normalizer v2.4.0
+  Downloaded toml_datetime v1.1.2+spec-1.1.0
+  Downloaded winnow v0.7.15
+  Downloaded winnow v1.0.4
+  Downloaded zerovec v0.11.9
+  Downloaded webpki-roots v1.0.11
+  Downloaded libc v0.2.191
+  Downloaded tokio v1.54.1
+  Downloaded ring v0.17.14
+  Downloaded linux-raw-sys v0.12.1
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling serde_core v1.0.229
+   Compiling libc v0.2.191
+   Compiling zmij v1.0.23
+   Compiling serde_json v1.0.154
+   Compiling bitflags v2.13.2
+   Compiling serde v1.0.229
+   Compiling icu_normalizer_data v2.4.0
+   Compiling getrandom v0.4.3
+   Compiling icu_properties_data v2.4.0
+   Compiling shlex v2.0.1
+   Compiling find-msvc-tools v0.1.15
+   Compiling winnow v1.0.4
+   Compiling rustix v1.1.6
+   Compiling utf8parse v0.2.2
+   Compiling anstyle-parse v1.0.0
+   Compiling cc v1.10.0
+   Compiling anstyle v1.0.14
+   Compiling anstyle-query v1.1.5
+   Compiling fastrand v2.5.0
+   Compiling is_terminal_polyfill v1.70.2
+   Compiling anyhow v1.0.104
+   Compiling toml_parser v1.1.5+spec-1.1.0
+   Compiling colorchoice v1.0.5
+   Compiling clap_lex v1.1.1
+   Compiling linux-raw-sys v0.12.1
+   Compiling httparse v1.10.1
+   Compiling anstream v1.0.0
+   Compiling strsim v0.11.1
+   Compiling winnow v0.7.15
+   Compiling equivalent v1.0.3
+   Compiling clap_builder v4.6.7
+   Compiling memchr v2.8.3
+   Compiling thiserror v2.0.21
+   Compiling cbindgen v0.29.4
+   Compiling hashbrown v0.17.1
+   Compiling rustls v0.23.46
+   Compiling toml_writer v1.1.3+spec-1.1.0
+   Compiling heck v0.5.0
+   Compiling syn v3.0.9
+   Compiling syn v2.0.119
+   Compiling ureq-proto v0.6.5
+   Compiling indexmap v2.14.2
+   Compiling getrandom v0.2.17
+   Compiling errno v0.3.14
+   Compiling mio v1.2.4
+   Compiling ring v0.17.14
+   Compiling signal-hook-registry v1.4.8
+   Compiling serde_spanned v1.1.2
+   Compiling toml_datetime v0.7.5+spec-1.1.0
+   Compiling toml_datetime v1.1.2+spec-1.1.0
+   Compiling tempfile v3.27.0
+   Compiling toml v1.1.8+spec-1.1.0
+   Compiling clap v4.6.7
+   Compiling toml v0.9.12+spec-1.1.0
+   Compiling waitpid-any v0.3.0
+   Compiling vd-settings v0.1.1 (/vedit-build/crates/vd-settings)
+   Compiling synstructure v0.14.0
+   Compiling tracing-attributes v0.1.31
+   Compiling zerofrom-derive v0.1.8
+   Compiling yoke-derive v0.8.4
+   Compiling zerovec-derive v0.11.7
+   Compiling serde_derive v1.0.229
+   Compiling displaydoc v0.2.7
+   Compiling futures-macro v0.3.34
+   Compiling thiserror-impl v2.0.21
+   Compiling tokio-macros v2.7.2
+   Compiling serde_repr v0.1.21
+   Compiling tokio v1.54.1
+   Compiling tracing v0.1.44
+   Compiling futures-util v0.3.34
+   Compiling zerofrom v0.1.8
+   Compiling yoke v0.8.4
+   Compiling zerovec v0.11.9
+   Compiling zerotrie v0.2.5
+   Compiling rustls-webpki v0.103.16
+   Compiling tinystr v0.8.5
+   Compiling potential_utf v0.1.6
+   Compiling icu_collections v2.4.0
+   Compiling icu_locale_core v2.4.0
+   Compiling icu_provider v2.4.0
+   Compiling icu_normalizer v2.4.0
+   Compiling icu_properties v2.4.0
+   Compiling vd-config v0.1.1 (/vedit-build/crates/vd-config)
+   Compiling vd-deeplint v0.1.1 (/vedit-build/crates/vd-deeplint)
+   Compiling futures v0.3.34
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling tokio-util v0.7.20
+   Compiling url v2.5.8
+   Compiling lsp-types v0.95.1
+   Compiling ureq v3.5.0
+   Compiling vd-ffi v0.1.1 (/vedit-build/crates/vd-ffi)
+   Compiling vd-fim v0.1.1 (/vedit-build/crates/vd-fim)
+   Compiling async-lsp v0.2.4
+   Compiling vd-lsp v0.1.1 (/vedit-build/crates/vd-lsp)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 31.03s
+     Running unittests src/lib.rs (target/debug/deps/vd_ffi-c218ace1bbb0a2eb)
+
+running 5 tests
+test fim::tests::mapping_carries_every_configured_value_without_leaking_the_key ... ok
+test fim::tests::loaded_project_and_environment_configure_the_service ... ok
+test fim::tests::unreachable_endpoint_is_an_explicit_error_without_the_key ... ok
+test fim::tests::configured_loopback_request_reaches_the_rust_transport ... ok
+test fim::tests::default_config_is_disabled_and_sends_nothing ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 0.05s
+
+     Running tests/abi.rs (target/debug/deps/abi-73d3a52e89bce543)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.00s
+
+== [2/6] Rust: cargo test (vd-fim default-off) ==
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded form_urlencoded v1.2.2
+  Downloaded deranged v0.5.9
+  Downloaded displaydoc v0.2.7
+  Downloaded anyhow v1.0.104
+  Downloaded cfg-if v1.0.5
+  Downloaded document-features v0.2.12
+  Downloaded equivalent v1.0.3
+  Downloaded cookie v0.18.2
+  Downloaded cookie_store v0.22.1
+  Downloaded find-msvc-tools v0.1.15
+  Downloaded base64 v0.23.1
+  Downloaded bytes v1.12.1
+  Downloaded cc v1.10.0
+  Downloaded icu_locale_core v2.4.0
+  Downloaded webpki-roots v1.0.11
+  Downloaded unicode-ident v1.0.27
+  Downloaded stable_deref_trait v1.2.1
+  Downloaded num-conv v0.2.2
+  Downloaded utf8_iter v1.1.0
+  Downloaded powerfmt v0.2.1
+  Downloaded zerofrom v0.1.8
+  Downloaded zerofrom-derive v0.1.8
+  Downloaded idna_adapter v1.2.2
+  Downloaded untrusted v0.9.0
+  Downloaded potential_utf v0.1.6
+  Downloaded percent-encoding v2.3.2
+  Downloaded utf8-zero v0.8.1
+  Downloaded version_check v0.9.5
+  Downloaded time-core v0.1.9
+  Downloaded subtle v2.6.1
+  Downloaded yoke-derive v0.8.4
+  Downloaded itoa v1.0.18
+  Downloaded tinystr v0.8.5
+  Downloaded zerovec-derive v0.11.7
+  Downloaded quote v1.0.47
+  Downloaded shlex v2.0.1
+  Downloaded synstructure v0.14.0
+  Downloaded zmij v1.0.23
+  Downloaded writeable v0.6.4
+  Downloaded smallvec v1.16.4
+  Downloaded utf_types v1.0.0
+  Downloaded yoke v0.8.4
+  Downloaded zeroize v1.9.1
+  Downloaded getrandom v0.2.17
+  Downloaded rustls-pki-types v1.15.1
+  Downloaded once_cell v1.21.4
+  Downloaded time-macros v0.2.32
+  Downloaded litemap v0.8.3
+  Downloaded litrs v1.0.1
+  Downloaded serde_core v1.0.229
+  Downloaded log v0.4.34
+  Downloaded httparse v1.10.1
+  Downloaded icu_provider v2.4.0
+  Downloaded proc-macro2 v1.0.107
+  Downloaded ureq-proto v0.6.5
+  Downloaded serde_derive v1.0.229
+  Downloaded serde v1.0.229
+  Downloaded icu_normalizer_data v2.4.0
+  Downloaded rustls-webpki v0.103.16
+  Downloaded url v2.5.8
+  Downloaded zerotrie v0.2.5
+  Downloaded memchr v2.8.3
+  Downloaded http v1.5.0
+  Downloaded icu_collections v2.4.0
+  Downloaded indexmap v2.14.2
+  Downloaded zerovec v0.11.9
+  Downloaded icu_properties v2.4.0
+  Downloaded idna v1.1.0
+  Downloaded hashbrown v0.17.1
+  Downloaded serde_json v1.0.154
+  Downloaded icu_properties_data v2.4.0
+  Downloaded ureq v3.5.0
+  Downloaded syn v3.0.9
+  Downloaded time v0.3.55
+  Downloaded rustls v0.23.46
+  Downloaded icu_normalizer v2.4.0
+  Downloaded libc v0.2.191
+  Downloaded ring v0.17.14
+   Compiling libc v0.2.191
+   Compiling proc-macro2 v1.0.107
+   Compiling serde_json v1.0.154
+   Compiling quote v1.0.47
+   Compiling syn v3.0.9
+   Compiling getrandom v0.2.17
+   Compiling ring v0.17.14
+   Compiling serde_derive v1.0.229
+   Compiling rustls-webpki v0.103.16
+   Compiling rustls v0.23.46
+   Compiling serde v1.0.229
+   Compiling ureq v3.5.0
+   Compiling vd-fim v0.1.1 (/vedit-build/crates/vd-fim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 16.55s
+     Running tests/default_off.rs (target/debug/deps/default_off-ea87a2772ce5343f)
+
+running 4 tests
+test default_settings_send_nothing_and_start_no_worker ... ok
+test llama_cpp_needs_no_model_but_sends_nothing_until_started ... ok
+test openai_without_a_model_is_reported_without_a_request ... ok
+test the_real_transport_is_not_constructed_while_disabled ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+== [3/6] build the editor-side lane + staticlib ==
+== [4/6] zero-network proof: LD_PRELOAD syscall counter, default off ==
+FIM-BACKEND Rust service (vd_fim_complete -> vd-fim)
+CHECK fim.context.split-prefix PASS  module m;
+  assi
+CHECK fim.context.split-suffix PASS  gn x = 1;
+endmodule
+
+CHECK fim.context.clamps-past-the-end PASS
+CHECK fim.context.starts-at-zero PASS
+CHECK fim.state.no-backend.request PASS
+CHECK fim.state.no-backend.status PASS  FIM 不可用（未链接 Rust 服务；未发出请求）
+CHECK fim.state.no-backend.no-suggestion PASS
+CHECK fim.state.disabled.request PASS
+CHECK fim.state.disabled.backend-called PASS
+CHECK fim.state.disabled.status PASS  FIM 未启用
+CHECK fim.state.disabled.no-suggestion PASS
+CHECK fim.state.text.request PASS
+CHECK fim.state.text.suggestion PASS
+CHECK fim.state.text.status PASS  FIM 建议就绪
+CHECK fim.state.text.invalidated PASS
+CHECK fim.state.text.accept-after-invalidate PASS
+CHECK fim.state.text.request-again PASS
+CHECK fim.state.text.accept PASS
+CHECK fim.state.text.accept-clears PASS
+CHECK fim.state.text.accept-once PASS
+CHECK fim.state.text.request-for-cancel PASS
+CHECK fim.state.text.cancel PASS
+CHECK fim.state.text.request-count PASS  3
+CHECK fim.state.error.request PASS
+CHECK fim.state.error.status PASS  FIM 超时（3000ms）
+SKIP fim.rust.default-off.endpoint-listening (--default-off-only: no listener so the syscall counter sees a socket-free process)
+CHECK fim.rust.backend.available PASS  Rust service (vd_fim_complete -> vd-fim)
+FIM-DEFAULT-OFF status="FIM 未启用" endpoint_requests=0 suggestion=0
+CHECK fim.rust.default-off.no-suggestion PASS
+CHECK fim.rust.default-off.disabled-status PASS  FIM 未启用
+SKIP fim.rust.configured (--default-off-only)
+FIM-SELFTEST ok=1 checks=28 failures=0
+SELFTEST-EXIT=0
+--- syscall counters (no listener in this mode) ---
+SOCKETS=0
+CONNECTS=0
+GETADDRINFO=0
+== [4b/6] zero-network proof: PRODUCT binary --selfcheck-ffi, default off ==
+PRODUCT-SELFCHECK-FFI-EXIT=0
+CHECK ffi.fim.start PASS
+CHECK ffi.fim.disabled-by-default PASS
+FFI-ABI-SELFTEST ok=1 checks=20 failures=0
+--- syscall counters (product process) ---
+SOCKETS=0
+CONNECTS=0
+GETADDRINFO=0
+SOCKETS=0
+CONNECTS=0
+GETADDRINFO=0
+== [5/6] configured: request goes through Rust to the local fake endpoint ==
+SELFTEST-EXIT=0
+FIM-DEFAULT-OFF status="FIM 未启用" endpoint_requests=0 suggestion=0
+FIM-RUST-REQUEST first_line="POST /v1/completions HTTP/1.1" user-agent: ureq/3.5.0 body_has_prompt=1 body_has_suffix=1 authorization_bearer_redacted=1
+FIM-HALF-CONFIGURED status="FIM 未配置模型" endpoint_requests=1
+FIM-SELFTEST ok=1 checks=40 failures=0
+--- syscall counters (listener + client) ---
+SOCKET domain=2 type=1
+SOCKET domain=2 type=1
+SOCKET domain=2 type=524289
+CONNECT fd_placeholder=6 len=16
+SOCKETS=3
+CONNECTS=1
+GETADDRINFO=0
+== [6/6] gate: lane ctest + repo ctest + typecheck ==
+Test project /vedit-build/target/fim-lane
+    Start 1: vedit-fim-selftest
+1/1 Test #1: vedit-fim-selftest ...............   Passed    0.11 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.11 sec
+
+100% tests passed, 0 tests failed out of 23
+
+Total Test time (real) =  36.63 sec
+TYPECHECK-EXIT=0

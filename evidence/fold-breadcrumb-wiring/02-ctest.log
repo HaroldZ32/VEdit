@@ -1,0 +1,19 @@
+# C9 evidence header
+collected_at: 2026-11-01T14:42:34+08:00
+git_head: 48569602d0c86fb402dc88155593d1dc06445c90
+binary_sha256: 502503dc5867a6190218e075fa0861a2ef5e49019289841158c1572d2bb7e93a
+
+
+Total Test time (real) =  37.10 sec
+
+The following tests FAILED:
+	  7 - vedit-terminal-selftest (Failed)
+Errors while running CTest
+
+## re-run (the single failed terminal test passes alone: timing flake, not T94)
+
+22/22 Test #22: vedit-workspace-vcs-selftest ...................   Passed    1.16 sec
+
+100% tests passed, 0 tests failed out of 22
+
+Total Test time (real) =  39.09 sec

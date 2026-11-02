@@ -1,0 +1,10 @@
+# C9 evidence header
+collected_at: 2026-10-31T18:51:30+08:00
+git_head: 1f47e56421bbeaab64f8082df3cfc104a6a2c2ef
+
+## BEFORE (binary from the previous tree, integration not applied yet)
+binary: target/qt6-build/src/app/vedit-app
+sha256: df7f3d74bec2f5a831ffe2640aa584039d5dc8160b965a6822bd7548565ff2bf
+mtime: 2026-10-31T18:49:35+08:00
+nm -C ... | grep -c installProject = 0
+strings ... | grep -c dock-project  = 0

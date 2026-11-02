@@ -1,4 +1,4 @@
-# applied patches (2026-10-30T02:44:20Z)
+# applied patches (2026-10-31T10:46:49Z)
 applied=0001-gcc11-libstdcxx-path-hash.patch sha256=09e985ec43e1a8e62b634e9a2a115d0621ef50d24a6f2e2a5c99b7633c9790d4
 ## resulting diff:
 diff --git a/include/slang/util/Hash.h b/include/slang/util/Hash.h

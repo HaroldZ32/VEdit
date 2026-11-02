@@ -1,0 +1,20 @@
+generated: 2026-10-31T12:02:53Z
+git_head: 09907ae5e69fcff6a646823619ce80b506d7549b
+
+## PR
+url: https://github.com/HaroldZ32/VEdit/pull/11
+title: feat(qt6): v2 Slice 1 迁移 — 人工停点 1（冻结树全绿，待用户在有屏机器验收）
+state: OPEN   base: dev   mergeable: MERGEABLE   draft: false
+commits: 45
+
+## CI
+$ gh pr checks 11
+build the pinned image	pending	0	https://github.com/HaroldZ32/VEdit/actions/runs/41199333895/job/124531825742	
+gates and release build (pinned image)	pending	0	https://github.com/HaroldZ32/VEdit/actions/runs/41199333901/job/124531826026	
+(exit 0)
+
+## 红线自检
+- 未合并：OPEN = OPEN
+- 未 push dev/main：dev=eebbfd14a2311cd4bca533fe98d457a01e46e2e6  main=fa3e8b13e976c25cfddf46b195d3cf21619d1ba4
+- 未打 tag：0 个 tag 指向 HEAD
+- 未发 Release：gh release list → v0.1.1	Latest	v0.1.1	2026-10-30T16:01:12Z VEdit v0.1.0		v0.1.0	2026-10-30T06:01:21Z 

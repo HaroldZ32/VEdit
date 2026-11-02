@@ -1,0 +1,90 @@
+# C9 backfill (T112/N2): header added after the fact; the body below is unchanged.
+# original_collected_at_utc: 2026-11-01T07:50:42Z   (from the archived file mtime)
+# original_git_head: 90176858e5f8d5123c573826df8c0ccc7375c015
+# original_git_status_porcelain_sha256: not captured at collection time
+# session_anchor: none: phase-1 logs recorded time+HEAD, not a full porcelain block
+# backfill_collected_at_utc: 2026-11-01T09:23:35Z
+# backfill_git_head: 0c8ea9fe4ae18c386a59a55b8868f837f4f80a84
+# backfill_git_status_porcelain_sha256: a7feab0230532310375511329de129cad97d49e690c7a9c7336394a1cce151fa (current tree at backfill time)
+== T31 phase-1 delivery invariants ==
+collected_at: 2026-11-01T07:50:20Z
+git_head: 90176858e5f8d5123c573826df8c0ccc7375c015
+git_status_porcelain (this task):
+   M packaging/appimage/README.md
+   M packaging/runtime/AppRun
+   M packaging/runtime/README.md
+   M packaging/runtime/assemble-appdir.sh
+   M packaging/runtime/build.sh
+   M packaging/runtime/selfcheck.sh
+   M packaging/runtime/verify-f2-isolation.sh
+   M packaging/runtime/verify-not-shipped.sh
+  ?? evidence/slice3-pack/
+
+## product binary
+-rwxr-xr-x 1 haroldzhao haroldzhao 81810464 Nov  1 15:48 packaging/runtime/out/AppDir/bin/vd-app
+61e19acda47fe2c9e2e34841cd292d93b3dbc90281c23fce93f89ba4f6f8d402  packaging/runtime/out/AppDir/bin/vd-app
+07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845  packaging/runtime/out/AppDir/bin/verible-verilog-ls
+63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  packaging/runtime/out/AppDir/bin/slang
+
+## M0 smoke must be absent
+0
+
+## Qt platform plugins (explicit; ldd-invisible)
+total 196
+-rwxr-xr-x 1 haroldzhao haroldzhao  39608 Nov  1 15:48 libqminimal.so
+-rwxr-xr-x 1 haroldzhao haroldzhao 117432 Nov  1 15:48 libqoffscreen.so
+-rwxr-xr-x 1 haroldzhao haroldzhao  19136 Nov  1 15:48 libqwayland.so
+-rwxr-xr-x 1 haroldzhao haroldzhao  19128 Nov  1 15:48 libqxcb.so
+
+## katepart + probe
+-rwxr-xr-x 1 haroldzhao haroldzhao 951344 Nov  1 15:48 packaging/runtime/out/AppDir/bin/vedit-ksh-env-probe
+-rwxr-xr-x 1 haroldzhao haroldzhao  22984 Nov  1 15:48 packaging/runtime/out/AppDir/plugins/kf6/parts/katepart.so
+
+## FFI is statically linked into vd-app
+vd_* symbols: 44
+NEEDED entries mentioning vd_ffi: 0
+first NEEDED:
+ 0x0000000000000001 (NEEDED)             Shared library: [libKF6TextEditor.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libKF6Parts.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libQt6Widgets.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libtree-sitter.so.0.25]
+ 0x0000000000000001 (NEEDED)             Shared library: [libKF6SyntaxHighlighting.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libQt6Gui.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libQt6Core.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+
+## highest GLIBC version referenced by vd-app (host-independent: bundled loader/glibc are shipped)
+GLIBC_2.39
+bundled libc: /home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/AppDir/lib/libc.so.6
+
+## AppRun syntax dir (data root, T84)
+33:export VEDIT_SYNTAX_DIR="$APPDIR/usr/share/org.kde.syntax-highlighting"
+
+## XMLs at data root and syntax/ (T84 + fold compatibility)
+packaging/runtime/out/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-systemverilog.xml
+packaging/runtime/out/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml
+packaging/runtime/out/AppDir/usr/share/org.kde.syntax-highlighting/vedit-systemverilog.xml
+packaging/runtime/out/AppDir/usr/share/org.kde.syntax-highlighting/vedit-verilog.xml
+
+## toolchain pins
+SLANG_BIN_SHA256="63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252"
+VERIBLE_LS_SHA256="07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845"
+VERIBLE_LINT_SHA256="b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29"
+VERIBLE_FORMAT_SHA256="b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473"
+
+## sha256 of installed toolchain
+07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845  packaging/runtime/out/AppDir/bin/verible-verilog-ls
+b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29  packaging/runtime/out/AppDir/bin/verible-verilog-lint
+b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473  packaging/runtime/out/AppDir/bin/verible-verilog-format
+63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  packaging/runtime/out/AppDir/bin/slang
+
+## GLIBC versions requested by vd-app (version-info)
+GLIBC_2.33
+GLIBC_2.34
+GLIBC_2.39
+## bundled libc
+-rw-r--r-- 1 haroldzhao haroldzhao 2190608 Nov  1 15:48 packaging/runtime/out/AppDir/lib/libc.so.6
+85e64f97e348786a8fb4d9f3d52fec289e2fb86bba20f0731dfe61990525e0f7  packaging/runtime/out/AppDir/lib/libc.so.6
+## loader
+-rwxr-xr-x 1 haroldzhao haroldzhao 254864 Nov  1 15:48 packaging/runtime/out/AppDir/ld-linux-x86-64.so.2
+bda779ea9e9ad234f60315477d7cfd0bdde861cd8ddd9df8cdaf62f18c4cec14  packaging/runtime/out/AppDir/ld-linux-x86-64.so.2

@@ -1,0 +1,15 @@
+artifact: /home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/VEdit-0.1.1-x86_64.probe.AppImage
+artifact_sha256: 524f7b0780ff4ee093095e6ebae34b816b18c3aec94310dd8abe281c1e04bd28
+artifact_note: PROBE build (T11); delivery blocked pending T60 — mechanism verification only
+tested_image: docker.m.daocloud.io/library/ubuntu@sha256:fe81560990fae86dc4743202b2cb4d3df98d0bcf949173cecef15ce1127ef852
+tested_os: Ubuntu 24.04.5 LTS
+tested_glibc: ldd (Ubuntu GLIBC 2.39-0ubuntu8.9) 2.39
+display: Xvfb :99 in sidecar xside-a0b (TCP), tested container has DISPLAY=xside-a0b:99
+extra_env: none
+host_qt_kf6_count: 0
+window_id=2097159
+window_geometry=Window 2097159   Position: 0,0 (screen: 0)   Geometry: 640x480 
+input=sent
+alive_after_input=1
+smoke_exit=0
+screenshot_pixel_diff_empty_vs_window=307200

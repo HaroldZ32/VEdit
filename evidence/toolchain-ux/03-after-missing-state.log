@@ -1,0 +1,18 @@
+# C9 evidence header
+collected_at: 2026-10-31T23:28:16+08:00
+git_head: c682694e125ff7f59c590b83b6d2895239a3d143
+binary_sha256: 229c2876be45c4fb3bb22d1447e9b6ca317a7f0f43dedd446487e63912220986
+
+## the missing-toolchain state, reproduced with the same binary outside the checkout
+## (no local artifacts above it), PATH without verible/slang — the user scenario
+
+APP-EXIT=0
+TOOLCHAIN line: TOOLCHAIN source=verible:missing slang:missing missing=[verible, slang] local=[]
+user-facing message occurrences: 1
+probe-wall occurrences (default run): 0
+message line bytes: 459
+longest line bytes: 458
+--- the one message, verbatim ---
+[app-shell] Diagnostics unavailable: verible-verilog-ls, slang not found (bundled, local checkout, PATH and env all empty). Impact: Verible diagnostics, navigation and the outline are unavailable; SLANG deep lint is unavailable. Fix: bundle `verible-verilog-ls`/`slang` in the product's bin/ next to vd-app, run `bash scripts/fetch-verible.sh` and `bash build/slang/build.sh` in a source checkout, install them on PATH, or set VEDIT_VERIBLE_LS / VEDIT_SLANG.
+--- opt-in trace (VEDIT_TOOLCHAIN_TRACE=1) keeps the candidate detail available ---
+diagnostics: verible-verilog-ls probed: /tmp/t85-bare/verible-verilog-ls, /tmp/t85-bare/bin/verible-verilog-ls, /tmp/t85-bare/../lib/vedit/bin/verible-verilog-l

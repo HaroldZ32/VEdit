@@ -1,0 +1,5 @@
+image	uname_r	glibc	selfcheck	startup	lint	highlight
+docker.m.daocloud.io/library/centos:7	7.0.0-38-generic	ldd (GNU libc) 2.17	PASS	PASS	PASS	PASS
+docker.m.daocloud.io/library/ubuntu:24.04	7.0.0-38-generic	ldd (Ubuntu GLIBC 2.39-0ubuntu8.9) 2.39	PASS	PASS	PASS	PASS
+docker.m.daocloud.io/library/rockylinux:9	7.0.0-38-generic	ldd (GNU libc) 2.34	PASS	PASS	PASS	PASS
+docker.m.daocloud.io/library/ubuntu:26.04	7.0.0-38-generic	ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43	PASS	PASS	PASS	PASS

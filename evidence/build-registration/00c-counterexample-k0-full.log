@@ -1,0 +1,19 @@
+[1/15] Building CXX object src/syntax/overlay/CMakeFiles/vedit_syntax_overlay_probe.dir/overlay_probe.cpp.o
+FAILED: [code=1] src/syntax/overlay/CMakeFiles/vedit_syntax_overlay_probe.dir/overlay_probe.cpp.o 
+/usr/bin/c++   -Wall -Wextra -O2 -g -DNDEBUG -std=c++20 -MD -MT src/syntax/overlay/CMakeFiles/vedit_syntax_overlay_probe.dir/overlay_probe.cpp.o -MF src/syntax/overlay/CMakeFiles/vedit_syntax_overlay_probe.dir/overlay_probe.cpp.o.d -o src/syntax/overlay/CMakeFiles/vedit_syntax_overlay_probe.dir/overlay_probe.cpp.o -c /vedit-build/src/syntax/overlay/overlay_probe.cpp
+/vedit-build/src/syntax/overlay/overlay_probe.cpp:1:2: error: #error "counter-example: overlay lane must be compiled by the root build"
+    1 | #error "counter-example: overlay lane must be compiled by the root build"
+      |  ^~~~~
+[2/15] Building CXX object src/syntax/grammars/CMakeFiles/vedit_syntax_grammars.dir/bindings.cpp.o
+FAILED: [code=1] src/syntax/grammars/CMakeFiles/vedit_syntax_grammars.dir/bindings.cpp.o 
+/usr/bin/c++  -I/vedit-build/src/syntax/grammars -I/vedit-build/target/qt6-build/src/syntax/grammars/generated -I/vedit-build/src/syntax/provider -I/vedit-build/target/qt6-build/src/syntax/provider/generated -I/vedit-build/src/syntax/grammars/../../../third_party/tree-sitter/verilog/src -Wall -Wextra -O2 -g -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -MD -MT src/syntax/grammars/CMakeFiles/vedit_syntax_grammars.dir/bindings.cpp.o -MF src/syntax/grammars/CMakeFiles/vedit_syntax_grammars.dir/bindings.cpp.o.d -o src/syntax/grammars/CMakeFiles/vedit_syntax_grammars.dir/bindings.cpp.o -c /vedit-build/src/syntax/grammars/bindings.cpp
+/vedit-build/src/syntax/grammars/bindings.cpp:74:2: error: #error "counter-example: grammars lane must be compiled by the root build"
+   74 | #error "counter-example: grammars lane must be compiled by the root build"
+      |  ^~~~~
+[3/15] Building CXX object src/terminal/CMakeFiles/vedit_terminal.dir/terminal_panel.cpp.o
+FAILED: [code=1] src/terminal/CMakeFiles/vedit_terminal.dir/terminal_panel.cpp.o 
+/usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/vedit-build/target/qt6-build/src/terminal/vedit_terminal_autogen/include -I/vedit-build/src/terminal -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtWidgets -Wall -Wextra -O2 -g -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -MD -MT src/terminal/CMakeFiles/vedit_terminal.dir/terminal_panel.cpp.o -MF src/terminal/CMakeFiles/vedit_terminal.dir/terminal_panel.cpp.o.d -o src/terminal/CMakeFiles/vedit_terminal.dir/terminal_panel.cpp.o -c /vedit-build/src/terminal/terminal_panel.cpp
+/vedit-build/src/terminal/terminal_panel.cpp:258:2: error: #error "counter-example: terminal lane must be compiled by the root build"
+  258 | #error "counter-example: terminal lane must be compiled by the root build"
+      |  ^~~~~
+ninja: build stopped: cannot make progress due to previous errors.

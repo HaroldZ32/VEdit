@@ -1,0 +1,42 @@
+== evidence: 09-callers.txt — who consumes jumpRequested in the PRODUCT now (the exact claim verdict H1 denied)
+time=2026-10-31T19:02:03+08:00
+HEAD=1f47e56421bbeaab64f8082df3cfc104a6a2c2ef
+
+$ grep -rn "setJumpTarget\|EditorJumpTarget" src/ --include=*.cpp --include=*.h
+src/workspace/search/search_jump_target.cpp:19:EditorJumpTarget::EditorJumpTarget(vedit::app::ApplicationShell *shell)
+src/workspace/search/search_jump_target.cpp:25:EditorJumpTarget::~EditorJumpTarget() = default;
+src/workspace/search/search_jump_target.cpp:27:void EditorJumpTarget::jumpTo(const JumpRequest &request)
+src/workspace/search/search_jump_target.cpp:83:vedit::app::ApplicationShell *EditorJumpTarget::shell() const
+src/workspace/search/search_jump_target.cpp:88:JumpRequest EditorJumpTarget::lastRequest() const
+src/workspace/search/search_jump_target.cpp:93:bool EditorJumpTarget::lastJumpSucceeded() const
+src/workspace/search/search_jump_target.cpp:98:QString EditorJumpTarget::lastError() const
+src/workspace/search/search_types.h:81:// (search_jump_target.h, EditorJumpTarget), so the click -> open file ->
+src/workspace/search/search_selftest.cpp:493:    panel.setJumpTarget(&target);
+src/workspace/search/search_selftest.cpp:536:    panel.setJumpTarget(&demo);
+src/workspace/search/search_selftest.cpp:886:                panel->setJumpTarget(&target);
+src/workspace/search/search_panel.h:18:// EditorJumpTarget (search_jump_target.h), which opens the hit through the
+src/workspace/search/search_panel.h:49:    void setJumpTarget(IJumpTarget *target);
+src/workspace/search/search_panel.cpp:147:void SearchPanel::setJumpTarget(IJumpTarget *target)
+src/workspace/search/search_integration.cpp:26:    auto *jumpTarget = shell.findChild<search::EditorJumpTarget *>();
+src/workspace/search/search_integration.cpp:28:        jumpTarget = new search::EditorJumpTarget(&shell);
+src/workspace/search/search_integration.cpp:34:            searchPanel->setJumpTarget(jumpTarget);
+src/workspace/search/search_jump_target.h:8:// now installs exactly one EditorJumpTarget per shell, and the panel factory
+src/workspace/search/search_jump_target.h:36:class EditorJumpTarget final : public QObject, public IJumpTarget {
+src/workspace/search/search_jump_target.h:42:    explicit EditorJumpTarget(vedit::app::ApplicationShell *shell);
+src/workspace/search/search_jump_target.h:43:    ~EditorJumpTarget() override;
+src/workspace/search/search_jump_target.h:45:    EditorJumpTarget(const EditorJumpTarget &) = delete;
+src/workspace/search/search_jump_target.h:46:    EditorJumpTarget &operator=(const EditorJumpTarget &) = delete;
+
+$ grep -n "installSearch" src/workspace/integration.cpp src/workspace/search/search_integration.cpp
+src/workspace/integration.cpp:32:    installSearch(shell, options);
+src/workspace/search/search_integration.cpp:13:void installSearch(vedit::app::ApplicationShell &shell, const IntegrationOptions &options)
+src/workspace/search/search_integration.cpp:25:    // them (installSearch may be called again when the dock is re-created).
+src/workspace/search/search_integration.cpp:39:    qInfo("search: installSearch projectRoot='%s' jumpTarget=editor", qPrintable(projectRoot));
+
+$ grep -n "jumpTarget_->jumpTo" src/workspace/search/search_panel.cpp
+284:        jumpTarget_->jumpTo(request);
+
+$ nm -C target/qt6-build/.../libvedit_workspace_search.a | grep -c EditorJumpTarget
+37
+0000000000000310 T vedit::workspace::search::EditorJumpTarget::jumpTo(vedit::workspace::search::JumpRequest const&)
+0000000000000920 T non-virtual thunk to vedit::workspace::search::EditorJumpTarget::jumpTo(vedit::workspace::search::JumpRequest const&)

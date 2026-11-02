@@ -1,0 +1,24 @@
+== F-1 companion: A4 lane test with ldd (link fact, not a label) ==
+collected_at: 2026-11-01T06:48:53Z
+git_head: 48569602d0c86fb402dc88155593d1dc06445c90
+cmd: LD_LIBRARY_PATH=<F2>/lib/x86_64-linux-gnu ldd target/a4-fold-build/vedit-folding-tests
+why a sha256 + '0 embedded definitions' is NOT sufficient: both describe the library file, not what the test process's loader actually resolves; a stale LD_LIBRARY_PATH, an rpath, or a different search order can make the binary load another lib while the sha of the F2 artifact still matches.
+--- ldd ---
+## F2 library sha256
+aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6  /vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
+## ldd resolution
+	libKF6SyntaxHighlighting.so.6 => /vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6 (0x00007dd82a3bb000)
+## test run under the same environment
+CHECK a4.ranges.from-xml PASS actual=200 expected=200
+CHECK a4.observed.hidden-equals-expected PASS actual=975 expected=975
+FOLDING-TESTS ok=0 checks=82 failures=1 skipped=0
+TEST-EXIT=1
+
+== F-1 rerun with the same F2 environment (stable) ==
+collected_at: 2026-11-01T06:49:23Z
+git_head: 48569602d0c86fb402dc88155593d1dc06445c90
+	libKF6SyntaxHighlighting.so.6 => /vedit-build/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6 (0x00007c99c5d24000)
+CHECK a4.ranges.from-xml PASS actual=200 expected=200
+CHECK a4.observed.hidden-equals-expected PASS actual=975 expected=975
+FOLDING-TESTS ok=1 checks=82 failures=0 skipped=0
+TEST-EXIT=0

@@ -1,0 +1,23 @@
+== 00-pins.txt — T138 evidence (C9 headers) ==
+collected_at=2026-11-02T11:59:34+08:00
+git_head=4e07e27463f3ee6c5a7f277162d102da1db61f26
+appimage=packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage
+appimage_sha256=de19746c62a9e633de85e40b34f41f7e70350ca14ba4be284a9adca9d544501d
+expected_sha256=de19746c62a9e633de85e40b34f41f7e70350ca14ba4be284a9adca9d544501d
+container=docker.m.daocloud.io/library/centos:7 (stock, glibc 2.17)
+host=Linux 7.0.0-38-generic x86_64 GNU/Linux
+fixture=/tmp/bad.sv (missing comma: 'logic a b;')
+
+-- normal run assertions --
+open.paths: opened 1 file(s): /tmp/bad.sv
+diagnostics: analyze /tmp/bad.sv (saved file)
+diagnostics: 1 inline annotation(s) on /tmp/bad.sv
+TOOLCHAIN source=verible:bundled slang:bundled missing=[] local=[]
+APP_EXIT=0
+
+-- reverse control assertions (VEDIT_NO_ACTIVE_FILE_WATCHER=1) --
+open.paths: opened 1 file(s): /tmp/bad.sv
+APP_EXIT=0
+
+-- what the package does NOT log --
+the panel status label text (e.g. '(saved file): 1 diagnostic(s)') is a QLabel, never written to stderr; grep 'diagnostic(s)' in 02-package-run-offscreen.log = 0

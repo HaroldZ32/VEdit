@@ -1,0 +1,16 @@
+== evidence: 01-h2-trigger-probe.log — is ANY analysis started when the user just opens the product? ==
+time=2026-11-01T19:11:33+08:00
+method: run the real product in the pinned image for 6 s and look for a verible-verilog-ls child
+(pgrep pattern 'verible-verilog[-]ls' avoids matching its own command line)
+
+### no-project (double-click case)
+language-server children: 0
+app-exit=0
+TOOLCHAIN source=verible:local slang:local missing=[] local=[/vedit-build/build/slang/out,/vedit-build/.mpd/recon/verible/bin]
+
+### with-project
+language-server children: 1
+43 /vedit-build/.mpd/recon/verible/bin/verible-verilog-ls
+app-exit=141
+diagnostics: effective file set from the project model: 1 file(s)
+

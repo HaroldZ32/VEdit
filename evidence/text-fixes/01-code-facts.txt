@@ -1,0 +1,92 @@
+== T73 code facts (read from the tree, not from the ticket) ==
+collected_at: 2026-10-31T11:47:13Z
+git_head: 95c496e682e3841add1a081edd78d29c34957aac
+
+## Qt6 project root option + assignment (src/app/main.cpp)
+804:    parser.addOption({QStringLiteral("project"), QStringLiteral("Project root to display (optional)."),
+824:    options.projectRoot = parser.value(QStringLiteral("project"));
+
+## Session restore of the project root (src/app/app_shell.cpp)
+
+    if (options_.projectRoot.isEmpty()) {
+        options_.projectRoot = session.value(QStringLiteral("project")).toString();
+    }
+
+## IntegrationOptions (src/workspace/integration.h)
+
+struct IntegrationOptions {
+    QString projectRoot; // empty => the shell starts without a project
+    QString stateDir;    // effective session/shortcut directory (may be empty)
+};
+
+## project_integration open path (src/workspace/project/project_integration.cpp)
+    const bool restored = model->restoreFromDisk();
+
+    QString root = options.projectRoot;
+    if (root.isEmpty() && restored) {
+        root = model->projectRoot();
+    }
+    if (root.isEmpty()) {
+        root = sessionProjectRoot(shell);
+    }
+    if (root.isEmpty()) {
+        // Empty state: no project was opened, so the shell keeps its usual
+        // layout instead of carrying an empty panel forever.
+        delete model;
+        return;
+    }
+    model->open(root);
+
+
+## project service -> vd_project_parse (src/workspace/project/project_service.cpp)
+        return Start::Rejected;
+    }
+    const QByteArray path = projectRoot.toUtf8();
+    const quint64 id = static_cast<quint64>(vd_project_parse(service_, path.constData()));
+    if (id == 0) {
+        return Start::Rejected;
+
+## project panel empty-state hint (src/workspace/project/project_panel.cpp)
+
+    emptyHint_ = new QLabel(
+        QStringLiteral("Open a project with --project <dir>; the expanded file list appears here."),
+        this);
+    emptyHint_->setObjectName(QStringLiteral("project-empty-hint"));
+
+## vd-config Loader contract (crates/vd-config/src/lib.rs)
+/// `Loader::new(start_dir)`: **`start_dir` is the origin of the upward project
+/// discovery** — the directory that holds the file the editor just opened, as
+/// passed by the application layer (`vd-app`). It is *not* the process working
+/// directory. The root is the nearest ancestor containing `vedit.toml`, `.git`,
+/// or a `.f` filelist directly (a folder that ships its own filelists is a
+/// project even inside a larger checkout); when nothing marks a root,
+/// `start_dir` itself is used and [`ProjectContext::root_source`] says
+/// `fallback`.
+#[derive(Debug, Clone)]
+pub struct Loader {
+    start_dir: PathBuf,
+
+## GTK3 frontend passes the process cwd (crates/vd-app/src/config_glue.rs, app.rs)
+    pub fn load(cwd: &Path, exe_dir: &Path) -> Self {
+        let loader = Loader::new(cwd)
+            .with_env(Env::from_process())
+            .with_exe_dir(exe_dir);
+        match loader.load() {
+1475:    let cwd = std::env::current_dir().context("reading the current directory")?;
+
+## no file-open -> project-root wiring (grep; no hits)
+grep_exit=0
+
+## GTK3 Loader::new(cwd) exact line
+63:        let loader = Loader::new(cwd)
+
+## GTK3 cwd exact lines
+1475:    let cwd = std::env::current_dir().context("reading the current directory")?;
+
+## no file-open -> project-root wiring (grep; no hits expected)
+grep_exit=0
+
+## project panel hint
+38:        QStringLiteral("Open a project with --project <dir>; the expanded file list appears here."),
+
+## note: no output above means no file-open -> project-root wiring was found; the grep_exit line is `head`'s exit, not grep's.

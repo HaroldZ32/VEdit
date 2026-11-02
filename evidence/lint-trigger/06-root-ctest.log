@@ -1,0 +1,53 @@
+== evidence: 06-root-ctest.log — the repository's own test suite (baseline 27/27 + the new product-seam test) ==
+time=2026-11-01T19:12:26+08:00
+HEAD=60c7ae9c95fe769e2bd6c86dd4c56e1514603e44
+
+      Start 27: vedit-diagnostics-ffi-selftest
+27/31 Test #27: vedit-diagnostics-ffi-selftest .................   Passed    3.24 sec
+      Start 28: vedit-diagnostics-product-seam
+28/31 Test #28: vedit-diagnostics-product-seam .................   Passed    2.16 sec
+      Start 29: vedit-toolchain-ux-selftest
+29/31 Test #29: vedit-toolchain-ux-selftest ....................   Passed    3.11 sec
+      Start 30: vedit-workspace-vcs-selftest
+30/31 Test #30: vedit-workspace-vcs-selftest ...................   Passed    1.14 sec
+      Start 31: vedit-workspace-settings-selftest
+31/31 Test #31: vedit-workspace-settings-selftest ..............   Passed    0.32 sec
+
+97% tests passed, 1 tests failed out of 31
+
+Total Test time (real) =  42.46 sec
+
+The following tests FAILED:
+	 23 - vedit-workspace-search-selftest (Failed)
+Errors while running CTest
+CTEST_EXIT=0
+
+== RE-RUN with the REAL exit code (the previous tail hid it) ==
+time=2026-11-01T19:16:11+08:00
+CTEST_REAL_EXIT=8
+94% tests passed, 2 tests failed out of 31
+
+Total Test time (real) =  34.56 sec
+
+The following tests FAILED:
+	 18 - vedit-folding-tests (Failed)
+	 23 - vedit-workspace-search-selftest (SEGFAULT)
+Errors while running CTest
+
+== the two failing tests are OTHER lanes' in-flight work (file mtimes) ==
+time=2026-11-01T19:17:00+08:00
+-rw------- 1 haroldzhao haroldzhao 11434 19:15:01 src/syntax/folding/fold_injector.cpp
+-rw------- 1 haroldzhao haroldzhao 37543 14:47:58 src/syntax/folding/tests/folding_tests.cpp
+-rw------- 1 haroldzhao haroldzhao 47773 19:52:24 src/workspace/search/search_selftest.cpp
+-rw------- 1 haroldzhao haroldzhao  2440 19:37:50 src/workspace/search/tools/slowio/slowio.cpp
+
+== search selftest: where it dies (direct run) ==
+SEARCH_EXIT=139
+bash: line 1:     9 Segmentation fault         (core dumped) QT_QPA_PLATFORM=offscreen ./target/qt6-build/src/app/workspace-lane-search/vedit-workspace-search-selftest --selfcheck > /tmp/search.log 2>&1
+CHECK jump.product.first-cursor-column PASS
+CHECK jump.product.first-status PASS
+open: read done bytes=52 in 0 ms
+[edit-core] open: read done bytes=52 in 0 ms
+open: setText done lines=6 in 0 ms
+[edit-core] open: setText done lines=6 in 0 ms
+73

@@ -4,6 +4,11 @@
 //! `+define+NAME[=VALUE]` and nested `-f FILE`. Unknown `+…`/`-…` tokens are
 //! reported as warnings and skipped — a filelist written for a commercial
 //! simulator must not stop the editor from opening the project.
+//!
+//! Every line-scoped diagnostic names the `.f` file the line came from and its
+//! 1-based line number, so a bad entry is actionable in the UI (a warning that
+//! pointed at the containing directory could not be told apart from its
+//! siblings).
 
 use std::collections::BTreeSet;
 use std::path::{Path, PathBuf};
@@ -101,13 +106,16 @@ impl<'a> Parser<'a> {
 
         let base = path.parent().unwrap_or_else(|| Path::new("."));
         self.visiting.push(canonical);
+        let file = path.to_path_buf();
         for (index, raw_line) in text.lines().enumerate() {
-            self.consume_line(base, raw_line, index as u32 + 1, depth);
+            self.consume_line(&file, base, raw_line, index as u32 + 1, depth);
         }
         self.visiting.pop();
     }
 
-    fn consume_line(&mut self, base: &Path, raw_line: &str, line: u32, depth: u32) {
+    /// `file` is the filelist the line came from (the file a diagnostic points
+    /// at); `base` is its directory, which relative paths resolve against.
+    fn consume_line(&mut self, file: &Path, base: &Path, raw_line: &str, line: u32, depth: u32) {
         let line_text = strip_comment(raw_line).trim();
         if line_text.is_empty() {
             return;
@@ -117,11 +125,11 @@ impl<'a> Parser<'a> {
             return;
         }
         if let Some(rest) = line_text.strip_prefix("+define+") {
-            self.consume_defines(rest, base, line);
+            self.consume_defines(rest, file, line);
             return;
         }
         if let Some(nested) = filelist_argument(line_text) {
-            self.consume_nested(base, nested, line, depth);
+            self.consume_nested(base, file, nested, line, depth);
             return;
         }
         if line_text.starts_with('+') || line_text.starts_with('-') {
@@ -131,7 +139,7 @@ impl<'a> Parser<'a> {
                     WarningCode::FilelistUnknownToken,
                     format!("unsupported filelist token `{token}`; skipped"),
                 )
-                .with_file(base)
+                .with_file(file)
                 .with_line(line),
             );
             return;
@@ -145,7 +153,7 @@ impl<'a> Parser<'a> {
                     WarningCode::FilelistDuplicateEntry,
                     "duplicate source path in filelist; kept the first occurrence",
                 )
-                .with_file(base)
+                .with_file(file)
                 .with_line(line),
             );
         }
@@ -160,7 +168,7 @@ impl<'a> Parser<'a> {
         }
     }
 
-    fn consume_defines(&mut self, rest: &str, base: &Path, line: u32) {
+    fn consume_defines(&mut self, rest: &str, file: &Path, line: u32) {
         for token in rest.split('+').filter(|part| !part.trim().is_empty()) {
             match parse_define(token) {
                 Some(define) => {
@@ -173,14 +181,14 @@ impl<'a> Parser<'a> {
                         WarningCode::FilelistDefineInvalid,
                         "malformed +define+ token; skipped",
                     )
-                    .with_file(base)
+                    .with_file(file)
                     .with_line(line),
                 ),
             }
         }
     }
 
-    fn consume_nested(&mut self, base: &Path, nested: &str, line: u32, depth: u32) {
+    fn consume_nested(&mut self, base: &Path, file: &Path, nested: &str, line: u32, depth: u32) {
         let nested_path = resolve(base, nested);
         if !nested_path.is_file() {
             self.warnings.push(
@@ -188,7 +196,7 @@ impl<'a> Parser<'a> {
                     WarningCode::FilelistMissing,
                     format!("nested -f target `{nested}` does not exist; skipped"),
                 )
-                .with_file(base)
+                .with_file(file)
                 .with_line(line),
             );
             return;
@@ -232,11 +240,41 @@ fn strip_comment(line: &str) -> &str {
 
 fn resolve(base: &Path, path: &str) -> PathBuf {
     let candidate = Path::new(path);
-    if candidate.is_absolute() {
+    let joined = if candidate.is_absolute() {
         candidate.to_path_buf()
     } else {
         base.join(candidate)
+    };
+    normalize(&joined)
+}
+
+/// Lexically normalize `.` and `..` components.
+///
+/// The parser resolves paths relative to the containing filelist, so a nested
+/// filelist naturally produces `filelists/../tb/x.sv`. Left unnormalized, two
+/// spellings of the same file would defeat duplicate detection and the UI would
+/// show paths with `..`. Nothing touches the filesystem here: the file may not
+/// exist yet, and symlinks must not be resolved.
+fn normalize(path: &Path) -> PathBuf {
+    use std::path::Component;
+
+    let mut out = PathBuf::new();
+    for component in path.components() {
+        match component {
+            Component::CurDir => {}
+            Component::ParentDir => {
+                let last_is_name =
+                    matches!(out.components().next_back(), Some(Component::Normal(_)));
+                if last_is_name {
+                    out.pop();
+                } else if !out.has_root() {
+                    out.push("..");
+                }
+            }
+            other => out.push(other.as_os_str()),
+        }
     }
+    out
 }
 
 #[cfg(test)]
@@ -277,6 +315,19 @@ mod tests {
         assert!(warnings
             .iter()
             .any(|warning| warning.code == WarningCode::FilelistUnknownToken));
+        Ok(())
+    }
+
+    #[test]
+    fn parent_components_are_normalized() -> Result<(), Box<dyn std::error::Error>> {
+        let temp = tempfile::tempdir()?;
+        let root = temp.path();
+        write(&root.join("sub/top.f"), "../rtl/a.sv\n+incdir+../inc\n")?;
+        let mut warnings = Vec::new();
+        let filelist = require(parse(&root.join("sub/top.f"), &mut warnings))?;
+        assert_eq!(filelist.entries, vec![root.join("rtl/a.sv")]);
+        assert_eq!(filelist.include_dirs, vec![root.join("inc")]);
+        assert!(warnings.is_empty(), "normalization must not add warnings");
         Ok(())
     }
 

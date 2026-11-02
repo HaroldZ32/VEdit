@@ -1,0 +1,6 @@
+# typecheck gate (self-run on the T104 tree)
+# command: bash build/gates/typecheck.sh
+# observed: TYPECHECK-EXIT=0 (PASS, pinned image vedit-build:local)
+
+[typecheck] PASS (pinned image vedit-build:local)
+TYPECHECK-EXIT=0

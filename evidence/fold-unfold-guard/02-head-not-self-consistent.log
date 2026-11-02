@@ -1,0 +1,11 @@
+# C9 evidence header
+collected_at: 2026-11-01T19:36:12+08:00
+collected_at_utc: 2026-11-01T11:36:12+00:00
+git_head: 60c7ae9c95fe769e2bd6c86dd4c56e1514603e44
+---
+## HEAD 60c7ae9 is not self-consistent: vcs_source.cpp calls vd_vcs_info_job/diff_poll
+## but the committed crates/vd-ffi/include/vd_ffi.h does not declare them (working tree does).
+
+HEAD header matches: 0
+working-tree header matches: 2
+HEAD vcs_source uses: 2

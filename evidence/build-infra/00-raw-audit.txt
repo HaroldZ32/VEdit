@@ -1,0 +1,73 @@
+# C9 evidence header
+collected_at: 2026-10-31T19:22:32+08:00
+git_head: 95c496e682e3841add1a081edd78d29c34957aac
+note: this is the CURRENT-TREE search (after the fixes of this task).
+      The as-found list (before the edits) is the table in AUDIT.md, captured with the same patterns.
+
+=== raw audit: pipe->early-exit consumers ===
+## pipe -> grep -q / -m (only sites that still use an early-exit grep)
+scripts/build.sh:106:if readelf -d "$BIN" | sed -n '/NEEDED/p' | grep -qE 'libstdc\+\+'; then
+scripts/lib-qt.sh:118:  if ! docker info --format '{{json .SecurityOptions}}' 2>/dev/null | grep -q '"name=rootless"'; then
+build/gates/dist.sh:25:  if ! file "$appimage" | grep -q 'ELF'; then
+build/gates/gates.sh:34:if readelf -d "$BIN" | sed -n '/NEEDED/p' | grep -qE 'libstdc\+\+|libgcc_s'; then
+build/slang/scripts/verify-offline.sh:73:if ldd /out/slang 2>/dev/null | grep -qE 'libstdc\+\+|libgcc_s'; then
+build/slang/build.sh:90:if "$OBJDUMP" -p "$BIN" | sed -n '/NEEDED/p' | grep -qE 'libstdc\+\+|libgcc_s'; then
+packaging/tarball/clean-room.sh:59:    if xwininfo -root -tree 2>/dev/null | grep -q 'VEdit'; then
+packaging/tarball/clean-room.sh:196:  xwininfo -root -tree 2>/dev/null | grep -q 'VEdit' && break
+packaging/tarball/clean-room.sh:319:if awk 'NR>1 && $2 ~ /Z/' "$EVID/35-processes.txt" | grep -q .; then
+packaging/tarball/clean-room.sh:324:if awk 'NR>1 && $3 ~ /verible|slang/' "$EVID/35-processes.txt" | grep -q .; then
+packaging/tarball/stage.sh:74:    if readelf -S "$APP" 2>/dev/null | grep -q '\.symtab'; then
+packaging/tarball/stage.sh:88:  if readelf -S "$APP" 2>/dev/null | grep -q '\.symtab'; then
+packaging/appimage/clean-room-accept.sh:187:    if ! xwininfo -root -tree 2>/dev/null | grep -qi 'vedit'; then break; fi
+packaging/appimage/clean-room-accept.sh:196:    if xwininfo -root -tree 2>/dev/null | grep -qi 'vedit'; then
+packaging/appimage/clean-room-accept.sh:282:if grep -Eiv '^(#|\$)' "$LOGS/processes.txt" | grep -qiE 'verible|slang'; then
+packaging/appimage/check-rpaths.sh:27:  if ! head -c 4 "$file" | grep -q $'\x7fELF'; then continue; fi
+packaging/appimage/glibc-gate.sh:17:  if ! head -c 4 "$file" | grep -q $'\x7fELF'; then continue; fi
+packaging/runtime/verify-f2-isolation.sh:81:    printf '%s' "$names" | grep -q "$marker" && fail "$label: $marker leaked" || pass "$label: $marker invisible"
+packaging/runtime/selfcheck.sh:55:printf '%s' "$OUT" | grep -q 'M0-SMOKE ok=1'      && echo "CHECK PASS  M0-SMOKE ok=1"           || { echo "CHECK FAIL  M0-SMOKE ok=1"; fail=1; }
+packaging/runtime/selfcheck.sh:56:printf '%s' "$OUT" | grep -q "libc=$PREFIX/"       && echo "CHECK PASS  libc resolved under package" || { echo "CHECK FAIL  libc not under $PREFIX"; fail=1; }
+packaging/runtime/selfcheck.sh:57:printf '%s' "$OUT" | grep -q 'ktexteditor=1'       && echo "CHECK PASS  KTextEditor loaded"       || { echo "CHECK FAIL  KTextEditor"; fail=1; }
+packaging/runtime/selfcheck.sh:58:printf '%s' "$OUT" | grep -q 'tree_sitter_parser=1' && echo "CHECK PASS  tree-sitter parser"      || { echo "CHECK FAIL  tree-sitter"; fail=1; }
+packaging/runtime/assemble-appdir.sh:151:# `find -print -quit` stops find itself: a `find ... | grep -q .` pipeline would
+packaging/runtime/verify-not-shipped.sh:54:  # `find -print -quit` avoids the `find | grep -q` SIGPIPE trap: under this
+
+## pipe -> head (early exit)
+scripts/fetch-verible.sh:63:  candidate=$(compgen -G "$EXTRACT/verible-*/bin" | head -1 || true)
+scripts/run-ksh-form-experiment-in-container.sh:88:grep -E "^KSH-ENV (defs|loc|result)" "$EVID/10-distro-baseline.log" | head -5
+scripts/run-ksh-form-experiment-in-container.sh:96:    "$(grep -o 'defs=[0-9]*' "$log" | head -1 | cut -d= -f2)" \
+scripts/run-ksh-form-experiment-in-container.sh:97:    "$(grep -o 'hash=[0-9a-f]*' "$log" | head -1 | cut -d= -f2)" >> "$EVID/02-summary.txt"
+scripts/run-ksh-form-experiment-in-container.sh:123:grep -E "^KSH-ENV (defs|editor_repo|editor_def|result|editor (expect|forbid))" "$EVID/21-f1-editor-inject.log" | head -8
+scripts/run-ksh-form-experiment-in-container.sh:175:grep -E "^KSH-ENV (defs|editor_repo|editor_def|result|editor (expect|forbid))" "$EVID/33-f2-editor-isolated.log" | head -8
+scripts/run-ksh-form-experiment-in-container.sh:207:      "$(grep -o 'defs=[0-9]*' "/tmp/${name}.log" | head -1 | cut -d= -f2)" \
+scripts/run-ksh-form-experiment-in-container.sh:208:      "$(grep -o 'hash=[0-9a-f]*' "/tmp/${name}.log" | head -1 | cut -d= -f2)"
+scripts/build-qt-in-container.sh:29:  echo "glibc: $(ldd --version | head -1)"
+scripts/build-qt-in-container.sh:34:  echo "cmake: $(cmake --version | head -1)"
+scripts/build-qt-in-container.sh:35:  echo "g++: $(g++ --version | head -1)"
+scripts/check-tree-sitter-cli.sh:67:actual_version=$("$CLI" --version 2>&1 | head -1)
+scripts/build-ksh-selfbuild.sh:83:LIB=$(find "$ROOT/$build_root/install" -name 'libKF6SyntaxHighlighting.so.6.*' -type f | head -1)
+scripts/build-ksh-selfbuild-in-container.sh:80:LIB=$(find "$PREFIX" -name 'libKF6SyntaxHighlighting.so.6.*' -type f | head -1)
+scripts/build-ksh-selfbuild-in-container.sh:207:  grep -o '<language[^>]*>' "$WHITELIST/syntax/verilog.xml" | head -1
+scripts/build-in-container.sh:182:  VERIBLE_DIR=$(compgen -G "$ROOT/target/verible-pin/extract/verible-*/bin" | head -1 || true)
+packaging/tarball/clean-room.sh:46:TARBALL=$(ls "$ART"/*.tar.gz | head -1)
+packaging/tarball/clean-room.sh:47:RUNFILE=$(ls "$ART"/*.run | head -1)
+packaging/tarball/clean-room.sh:88:    && say "PASS fallback to the cache directory ($(grep -o 'extracting to [^ ]*' "$EVID/22-run-noexec.log" | head -1))" \
+packaging/tarball/clean-room.sh:141:FONTCONF=$(sed -n 's/^FONTCONFIG_FILE=//p' "$EVID/32-launcher-env.txt" | head -1)
+packaging/tarball/clean-room.sh:296:kept=$(sed -n 's/.*keeping the extracted tree at //p' "$EVID/31b-run-keeptmp.log" | head -1)
+packaging/tarball/stage.sh:114:VERIBLE_DIR=$(find /tmp -maxdepth 2 -type d -name 'verible-*' | head -1)
+packaging/tarball/stage.sh:118:  src=$(find "$VERIBLE_DIR" -name "verible-verilog-${kind}" -type f | head -1)
+packaging/appimage/clean-room-accept.sh:66:APPIMAGE=$(ls "$ART"/*.AppImage | head -1)
+packaging/appimage/clean-room-accept.sh:205:  xwininfo -root -tree 2>/dev/null | grep -i vedit | head -1 >> "$LOGS/cold-start-windows.txt"
+packaging/appimage/clean-room-accept.sh:220:  sh -x "$EXTRACTED/AppRun" --version 2>&1 | grep -E 'GTK_IM_MODULE_FILE=' | head -2
+packaging/appimage/clean-room-accept.sh:222:IMFILE=$(sh -x "$EXTRACTED/AppRun" --version 2>&1 | sed -n 's/.*GTK_IM_MODULE_FILE=\([^ ]*\).*/\1/p' | head -1)
+packaging/appimage/clean-room-accept.sh:251:  FONTCONFIG_FILE="/tmp/vedit-runtime-$(id -u)/fonts.conf" fc-list :lang=zh | head -5
+packaging/appimage/build-appimage.sh:87:VBIN=$(find "$CACHE/verible-extract" -type d -name bin | head -1)
+packaging/appimage/build-appimage.sh:147:    static=$(ldd "$path" 2>&1 | head -1 || true)
+packaging/appimage/build-appimage.sh:329:  if [ -n "$host_hits" ]; then printf '%s\n' "$host_hits" | head -5; else echo "none"; fi
+packaging/runtime/verify-f2-isolation.sh:75:  defs=$(printf '%s\n' "$out" | sed -n 's/^KSH-ENV defs=\([0-9]*\).*/\1/p' | head -1)
+packaging/runtime/verify-f2-isolation.sh:90:  defs=$(printf '%s\n' "$out" | sed -n 's/^KSH-ENV defs=\([0-9]*\).*/\1/p' | head -1)
+packaging/runtime/build.sh:95:    echo "host: $(docker run --rm "$CENTOS_IMAGE" cat /etc/centos-release 2>&1 | head -1)"
+packaging/runtime/build.sh:96:    echo "glibc: $(docker run --rm "$CENTOS_IMAGE" ldd --version 2>&1 | head -1)"
+packaging/runtime/selfcheck.sh:61:LIB=$(ls -1 "$PREFIX"/lib/libKF6SyntaxHighlighting.so.6* 2>/dev/null | head -1)
+packaging/runtime/assemble-appdir.sh:52:F2LIB=$(ls -1 "$KSH_F2"/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.* 2>/dev/null | head -1)
+packaging/runtime/assemble-appdir.sh:53:[ -n "$F2LIB" ] || F2LIB=$(ls -1 "$KSH_F2"/lib/libKF6SyntaxHighlighting.so.6.* 2>/dev/null | head -1)
+packaging/runtime/verify-not-shipped.sh:93:LIB=$(ls -1 "$APPDIR"/lib/libKF6SyntaxHighlighting.so.6* 2>/dev/null | head -1)

@@ -1,0 +1,17 @@
+# repository typecheck gate (regression T60 must not break the static check)
+# command: bash build/gates/typecheck.sh
+# date: 2026-10-31T19:25:34+08:00
+# exit code: 0
+
+[typecheck] C++/Qt6 lane: configure + build with warnings-as-errors (pinned image)
+    Finished `release` profile [optimized] target(s) in 0.07s
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s
+[qt6] PASS: Rust service layer + configure + build (warnings-as-errors) inside vedit-qt6-build:local; tests skipped (--no-test)
+[typecheck] host clippy unusable (pinned 1.99.0 toolchain has no cargo binary)
+[typecheck] delegating to the pinned image, same command (scripts/gates.sh pattern)
+[typecheck]   cargo clippy --workspace --all-targets -- -D warnings
+[typecheck] container facts: CentOS Linux release 7.9.2009 (Core) | rustc 1.99.0 (b940084d7 2026-09-28) | cargo 1.99.0 (5f94df478 2026-08-27)
+[typecheck] cargo clippy --workspace --all-targets -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.11s
+[typecheck] PASS (pinned image vedit-build:local)
+TYPECHECK-EXIT=0

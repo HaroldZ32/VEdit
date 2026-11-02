@@ -1,0 +1,18 @@
+== read-only proof (AC-S2.5) ==
+collected_at: 2026-11-01T05:58:03Z
+git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+
+## every write subcommand is enumerated and refused before spawning
+
+## the production runner and the recording stub both call ensure_read_only()
+crates/vd-vcs/src/runner.rs:187:pub fn ensure_read_only(program: &str, args: &[String]) -> Result<(), String> {
+crates/vd-vcs/src/runner.rs:232:        ensure_read_only(program, args)?;
+crates/vd-vcs/src/runner.rs:309:        ensure_read_only(program, args)?;
+
+## tests that prove it (observed)
+test every_svn_write_subcommand_is_refused_before_spawn ... ok
+test every_git_write_subcommand_is_refused_before_spawn ... ok
+test production_runner_gate_refuses_writes_without_spawning ... ok
+test stub_service_drives_the_panel_without_processes ... ok
+test git_session_uses_only_read_only_subcommands ... ok
+test svn_session_reads_status_info_and_diff ... ok

@@ -1,0 +1,55 @@
+backfill_local: 2026-11-01T15:37:11+08:00
+backfill_utc: 2026-11-01T07:37:11+00:00
+head: d36bff9470dca6bb94ee6c5529c7fb5328f344c9
+porcelain_sha256: 8fac5b80afb6c312f8c729f6e07fc0410476bb743f515b195057f726876bc5e3
+porcelain_lines: 36
+
+## recorded collection headers (per log, verbatim values from T27)
+--- evidence/slice3-fim/00-run-evidence.log
+(no header)
+--- evidence/slice3-fim/01-ffi-rust-tests.log
+collected_at: 2026-11-01T15:12:51+08:00
+git_head: 48569602d0c86fb402dc88155593d1dc06445c90
+--- evidence/slice3-fim/02-vdfim-default-off-tests.log
+collected_at: 2026-11-01T15:13:21+08:00
+git_head: 48569602d0c86fb402dc88155593d1dc06445c90
+--- evidence/slice3-fim/03-lane-build.log
+collected_at: 2026-11-01T15:23:14+08:00
+git_head: d36bff9470dca6bb94ee6c5529c7fb5328f344c9
+--- evidence/slice3-fim/04b-product-default-off-sockets.log
+collected_at: 2026-11-01T15:23:13+08:00
+git_head: d36bff9470dca6bb94ee6c5529c7fb5328f344c9
+product_sha256: 63a27a532b376cab0ae285a0797c6cacd55cf3e6cd014ed1e69571c54a16bb42
+--- evidence/slice3-fim/04-default-off-sockets.log
+collected_at: 2026-11-01T15:21:50+08:00
+git_head: 48569602d0c86fb402dc88155593d1dc06445c90
+lane_sha256: adef16c710ce9bfaedde04e45240b3409b84341fff7f9880b7049896c3a35e0a
+--- evidence/slice3-fim/05-configured-chain.log
+collected_at: 2026-11-01T15:21:51+08:00
+git_head: 48569602d0c86fb402dc88155593d1dc06445c90
+lane_sha256: adef16c710ce9bfaedde04e45240b3409b84341fff7f9880b7049896c3a35e0a
+--- evidence/slice3-fim/06b-lane-noffi.log
+collected_at: 2026-11-01T15:21:34+08:00
+git_head: 48569602d0c86fb402dc88155593d1dc06445c90
+--- evidence/slice3-fim/06-lane-ctest.log
+collected_at: 2026-11-01T15:15:26+08:00
+git_head: 48569602d0c86fb402dc88155593d1dc06445c90
+--- evidence/slice3-fim/06-root-ctest.log
+collected_at: 2026-11-01T15:15:26+08:00
+git_head: 48569602d0c86fb402dc88155593d1dc06445c90
+--- evidence/slice3-fim/06-typecheck.log
+collected_at: 2026-11-01T15:21:34+08:00
+git_head: 48569602d0c86fb402dc88155593d1dc06445c90
+
+## current artifacts sha256
+c2d73e642f8e5c345953ed5f67d3cf3223aeb7aa3af1e95960c2e87331b01264  target/fim-lane/vedit-fim-selftest
+61e19acda47fe2c9e2e34841cd292d93b3dbc90281c23fce93f89ba4f6f8d402  target/qt6-build/src/app/vedit-app
+2ad5b187ae3064b31f4b5c95d96f7fa6233db7c6779c30b51c9eb996d1bf47ee  target/release/libvd_ffi.a
+1ca08772b0079458affbb9a39d16eabe5b0aca6839106f4b5f160f3c0f09b4f8  crates/vd-ffi/src/fim.rs
+d3cbd1def0c679c70f355ed37ee6460deee932c82df32cf0e1c23ade16137988  src/editor/fim/fim_backend.cpp
+396f1c68be59101c74e69c54dab75e06e79839d09f07539419c9b6056b368285  src/editor/fim/fim_inline_completion.cpp
+7693de25c1af39e70718fb471f9bee38b85519a8f98e4b4878a60c0e94276108  src/editor/fim/fim_selftest.cpp
+1c208e28bd16f8de2ac3d8d3dee9b745b4a9fb5d7bd2a7158c558689855668da  src/editor/fim/CMakeLists.txt
+3903d666bd047ef5047f8672d61ec2788d9e0f40ea0dcb5e61d161dc395fdbda  src/editor/fim/README.md
+48bed864e14054d4ad3e9c90e1f0bc865253c4a5bd3bcdaa9721af63aef28c58  evidence/slice3-fim/socket_probe.c
+86eec25af45122a8942d45a50a754a2a34fdee0a5e9dab92c5281c19dc8b6c62  evidence/slice3-fim/run-evidence.sh

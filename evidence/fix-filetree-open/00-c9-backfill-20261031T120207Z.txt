@@ -1,0 +1,23 @@
+# C9 补记（backfill）—— 补记时刻快照，**非原始采集时刻**
+generated: 2026-10-31T12:02:07Z
+frozen_tree_commit: e8c67a250ede4345d8a64a833ed4f91a47f594b5
+git_head: e8c67a250ede4345d8a64a833ed4f91a47f594b5
+git_branch: feat/qt6-ktexteditor-migration
+git_status_porcelain: (empty at freeze — the working tree was clean when this snapshot was taken)
+
+## 被补记的原始证据（原始值一字未改，仅照抄于此）
+target: evidence/fix-filetree-open/01-before-red.log … 05-gate-qt6.log
+original_collected_at: (原 01-05 五份文件均无 C9 头)
+original_git_rev_parse_HEAD: (原 01-05 五份文件均无 C9 头)
+
+## 为什么有这份补记
+T40 finding F-1：evidence/fix-filetree-open/01–05 缺少 git_rev_parse_HEAD 与 git_status_porcelain。按规则不篡改原始文件，故新开本文件提供冻结树上的 C9 对照。
+
+## 补记时刻冻结树上的门禁结果
+TYPECHECK-EXIT=0            (bash build/gates/typecheck.sh, pinned image vedit-build:local)
+BUILD-QT-EXIT=0             (bash scripts/build-qt.sh)
+ctest: 100% tests passed, 0 tests failed out of 16
+
+## 规则声明
+原始文件的 collected_at / git_rev_parse_HEAD 行**保持原样**，未做任何修改。
+本补记只提供「同一份证据在冻结树上的对照」，不覆盖、不替换原始采集值。

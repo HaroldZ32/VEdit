@@ -1,0 +1,114 @@
+collected_at: 2026-11-01T15:50:12+08:00
+git_head: 90176858e5f8d5123c573826df8c0ccc7375c015
+git_branch: feat/qt6-ktexteditor-migration
+git_status:
+   M build/evidence/typecheck/00-run.txt
+   M build/evidence/typecheck/10-typecheck-image-build.log
+   M build/evidence/typecheck/11-typecheck-image-id.txt
+   M crates/vd-ffi/include/vd_ffi.h
+   M crates/vd-ffi/src/service.rs
+   M evidence/ffi-abi/logs/10-rust-image.txt
+   M evidence/ffi-abi/logs/19-rust-stage-console.log
+   M evidence/ffi-abi/logs/20-cargo-build-release.log
+   M evidence/ffi-abi/logs/21-staticlib.txt
+   M evidence/ffi-abi/logs/23-cargo-test.log
+   M evidence/ffi-abi/logs/26-vd_ffi.h
+   M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+   M evidence/m0-build/build-logs/20-qt6-image-build.log
+   M evidence/m0-build/build-logs/21-qt6-image-id.txt
+   M evidence/m0-build/build-logs/31-qt6-configure.log
+   M evidence/m0-build/build-logs/32-qt6-build.log
+   M evidence/m0-build/build-logs/33-qt6-ctest.log
+   M evidence/m0-build/build-logs/34-qt6-elf.txt
+   M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+   M packaging/appimage/README.md
+   M packaging/runtime/AppRun
+   M packaging/runtime/README.md
+   M packaging/runtime/assemble-appdir.sh
+   M packaging/runtime/build.sh
+   M packaging/runtime/selfcheck.sh
+   M packaging/runtime/verify-f2-isolation.sh
+   M packaging/runtime/verify-not-shipped.sh
+   M src/editor/fim/README.md
+   M src/editor/fim/fim_backend.cpp
+   M src/editor/fim/fim_backend.h
+   M src/editor/fim/fim_inline_completion.cpp
+   M src/editor/fim/fim_inline_completion.h
+   M src/editor/fim/fim_selftest.cpp
+   M src/editor/kernel/fim_wiring.cpp
+   M src/editor/kernel/fim_wiring.h
+   M src/editor/kernel/fim_wiring_selftest.cpp
+   M src/workspace/palette/README.md
+   M src/workspace/search/CMakeLists.txt
+   M src/workspace/search/README.md
+   M src/workspace/search/global_search.cpp
+   M src/workspace/search/global_search.h
+  ?? evidence/fim-async/
+  ?? evidence/slice1-stop/71-typecheck-fim.log
+  ?? evidence/slice1-stop/72-build-qt-fim.log
+  ?? evidence/slice3-fim/
+  ?? evidence/slice3-pack/
+
+command: mkdir -p /tmp/xdg-runtime; QT_QPA_PLATFORM=offscreen XDG_RUNTIME_DIR=/tmp/xdg-runtime target/qt6-build/src/app/editor-lane/fim-lane/vedit-fim-selftest
+
+FIM-BACKEND Rust service (vd_fim_complete -> vd-fim)
+CHECK fim.context.split-prefix PASS  module m;
+  assi
+CHECK fim.context.split-suffix PASS  gn x = 1;
+endmodule
+
+CHECK fim.context.clamps-past-the-end PASS
+CHECK fim.context.starts-at-zero PASS
+CHECK fim.state.no-backend.request PASS
+CHECK fim.state.no-backend.status PASS  FIM 不可用（未链接 Rust 服务；未发出请求）
+CHECK fim.state.no-backend.no-suggestion PASS
+CHECK fim.state.disabled.request PASS
+CHECK fim.state.disabled.backend-called PASS
+CHECK fim.state.disabled.status PASS  FIM 未启用
+CHECK fim.state.disabled.no-suggestion PASS
+CHECK fim.state.text.request PASS
+CHECK fim.state.text.suggestion PASS
+CHECK fim.state.text.status PASS  FIM 建议就绪
+CHECK fim.state.text.invalidated PASS
+CHECK fim.state.text.accept-after-invalidate PASS
+CHECK fim.state.text.request-again PASS
+CHECK fim.state.text.accept PASS
+CHECK fim.state.text.accept-clears PASS
+CHECK fim.state.text.accept-once PASS
+CHECK fim.state.text.request-for-cancel PASS
+CHECK fim.state.text.cancel PASS
+CHECK fim.state.text.request-count PASS  3
+CHECK fim.state.error.request PASS
+CHECK fim.state.error.status PASS  FIM 超时（3000ms）
+CHECK fim.async.start-token PASS  1
+CHECK fim.async.start-called-once PASS
+CHECK fim.async.poll-pending PASS
+CHECK fim.async.poll-ready PASS
+CHECK fim.async.suggestion PASS   async-suggestion
+CHECK fim.async.accept-once PASS
+CHECK fim.async.typing-cancels-inflight PASS
+CHECK fim.async.stale-poll-after-cancel PASS
+CHECK fim.async.single-inflight PASS  4
+CHECK fim.async.new-cancels-old PASS
+CHECK fim.async.cancel-releases PASS
+CHECK fim.rust.default-off.endpoint-listening PASS
+CHECK fim.rust.backend.available PASS  Rust service (vd_fim_complete -> vd-fim)
+FIM-DEFAULT-OFF status="FIM 未启用" endpoint_requests=0 suggestion=0
+CHECK fim.rust.default-off.no-suggestion PASS
+CHECK fim.rust.default-off.disabled-status PASS  FIM 未启用
+CHECK fim.rust.default-off.zero-endpoint-connections PASS  connections=0
+CHECK fim.rust.configured.endpoint-listening PASS
+CHECK fim.rust.configured.suggestion PASS  FIM 建议就绪
+CHECK fim.rust.configured.suggestion-text PASS   assign x = 1;
+CHECK fim.rust.configured.request-count PASS  requests=1
+FIM-RUST-REQUEST first_line="POST /v1/completions HTTP/1.1" user-agent: ureq/3.5.0 body_has_prompt=1 body_has_suffix=1 authorization_bearer_redacted=1
+CHECK fim.rust.configured.request-is-rust-http PASS  POST /v1/completions HTTP/1.1
+CHECK fim.rust.configured.body-has-prompt-and-suffix PASS
+CHECK fim.rust.configured.key-as-bearer-only PASS
+CHECK fim.rust.configured.no-key-in-status PASS
+FIM-HALF-CONFIGURED status="FIM 未配置模型" endpoint_requests=1
+CHECK fim.rust.half-configured.no-suggestion PASS
+CHECK fim.rust.half-configured.no-new-connection PASS  requests=1
+FIM-SELFTEST ok=1 checks=51 failures=0
+
+exit_code: 0

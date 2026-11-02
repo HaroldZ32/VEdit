@@ -1,0 +1,11 @@
+== embedded-definition scan ==
+library   : /home/haroldzhao/MyProj/DshProj/VEdit/target/ksh-selfbuild/F1/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
+size      : 696328 B
+sha256    : 2d19bd15849fa4f98601bb55f9ea3eca8a1c35d10058d37ae2ca71312ef750ce
+resource names (utf-16le): xml=0 theme=30
+zstd frames parsed as definitions: 0
+license classes: {}
+strict-GPL definitions embedded: 0
+  INFO SystemVerilog: not found among parsed definitions
+  INFO Verilog: not found among parsed definitions
+RESULT: PASS - no strict-GPL definition embedded

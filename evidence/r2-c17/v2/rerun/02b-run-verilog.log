@@ -1,0 +1,22 @@
+== 02b run again with Verilog base highlighting active (paint cost with both layers) ==
+INFO qt=6.10.2
+INFO platform=xcb
+CHECK editor.instance.available PASS
+
+== phase B: per-frame injection cost, doc lines=120000 mode=Verilog steps=120 step_lines=3 ==
+kf.sonnet.core: Sonnet: No speller backends available!
+MEASURE document_load_ms=79 lines=120001
+CHECK bigdoc.at.least.100k.lines PASS
+MEASURE grab_baseline_no_overlay n=120 p50_us=1771.83 p95_us=2183.2 mean_us=1891.77 min_us=1597.69 max_us=9566.98
+INFO strategy=full_recreate_per_line visible_lines_avg=62 scroll_moved_steps=120/120
+MEASURE full_recreate_per_line.inject n=120 p50_us=18.455 p95_us=25.4122 mean_us=19.5284 min_us=9.869 max_us=35.659
+MEASURE full_recreate_per_line.inject_plus_grab n=120 p50_us=2557.35 p95_us=2967.58 mean_us=2605.53 min_us=2342.1 max_us=3189.8
+MEASURE full_recreate_per_line.grab_with_overlay n=120 p50_us=2534.44 p95_us=2947.56 mean_us=2586 min_us=2328.06 max_us=3167.32
+MEASURE full_recreate_per_token.inject n=120 p50_us=77.178 p95_us=111.91 mean_us=81.0881 min_us=57.521 max_us=149.647
+MEASURE full_recreate_per_token.grab_with_overlay n=120 p50_us=2816.31 p95_us=3276.6 mean_us=2867.98 min_us=2617.2 max_us=3500.79
+INFO strategy=incremental_pool pool_size=62
+MEASURE incremental_pool.inject n=120 p50_us=6.8935 p95_us=16.3551 mean_us=8.96469 min_us=4.068 max_us=30.228
+MEASURE incremental_pool.grab_with_overlay n=120 p50_us=2507.09 p95_us=2980.27 mean_us=2536.03 min_us=2182.88 max_us=3810.57
+
+RESULT=PASS failures=0
+[run perf-mode Verilog exit=0]

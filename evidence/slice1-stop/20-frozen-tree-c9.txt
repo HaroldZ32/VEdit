@@ -1,0 +1,7 @@
+generated: 2026-10-31T12:02:07Z
+git_head: e8c67a250ede4345d8a64a833ed4f91a47f594b5
+git_branch: feat/qt6-ktexteditor-migration
+git_status_porcelain:
+  (empty)
+
+note: 这是停点 1 的**冻结树**。工作树在本次记录时刻为空（clean），即提交树 == 工作树 == 门禁树。

@@ -1,0 +1,1033 @@
+Test project /home/haroldzhao/MyProj/DshProj/VEdit/target/verify-f6ee6c184d8ea690cdf47a9015c3fa24ff374e87/target/qt6-build
+      Start  1: vedit-app-syntax-startup
+Could not find executable /vedit-build/target/qt6-build/src/app/vedit-app
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/vedit-app
+/vedit-build/target/qt6-build/src/app/vedit-app
+/vedit-build/target/qt6-build/src/app/Release/vedit-app
+/vedit-build/target/qt6-build/src/app/Release/vedit-app
+/vedit-build/target/qt6-build/src/app/Debug/vedit-app
+/vedit-build/target/qt6-build/src/app/Debug/vedit-app
+/vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app
+/vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app
+/vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app
+/vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app
+/vedit-build/target/qt6-build/src/app/Deployment/vedit-app
+/vedit-build/target/qt6-build/src/app/Deployment/vedit-app
+/vedit-build/target/qt6-build/src/app/Development/vedit-app
+/vedit-build/target/qt6-build/src/app/Development/vedit-app
+vedit-build/target/qt6-build/src/app/vedit-app
+vedit-build/target/qt6-build/src/app/vedit-app
+vedit-build/target/qt6-build/src/app/Release/vedit-app
+vedit-build/target/qt6-build/src/app/Release/vedit-app
+vedit-build/target/qt6-build/src/app/Debug/vedit-app
+vedit-build/target/qt6-build/src/app/Debug/vedit-app
+vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app
+vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app
+vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app
+vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app
+vedit-build/target/qt6-build/src/app/Deployment/vedit-app
+vedit-build/target/qt6-build/src/app/Deployment/vedit-app
+vedit-build/target/qt6-build/src/app/Development/vedit-app
+vedit-build/target/qt6-build/src/app/Development/vedit-app
+Unable to find executable: /vedit-build/target/qt6-build/src/app/vedit-app
+ 1/31 Test  #1: vedit-app-syntax-startup .......................***Not Run   0.00 sec
+      Start  2: vedit-m0-smoke
+Could not find executable /vedit-build/target/qt6-build/cmake/smoke/vedit-m0-smoke
+Looked in the following places:
+/vedit-build/target/qt6-build/cmake/smoke/vedit-m0-smoke
+/vedit-build/target/qt6-build/cmake/smoke/vedit-m0-smoke
+/vedit-build/target/qt6-build/cmake/smoke/Release/vedit-m0-smoke
+/vedit-build/target/qt6-build/cmake/smoke/Release/vedit-m0-smoke
+/vedit-build/target/qt6-build/cmake/smoke/Debug/vedit-m0-smoke
+/vedit-build/target/qt6-build/cmake/smoke/Debug/vedit-m0-smoke
+/vedit-build/target/qt6-build/cmake/smoke/MinSizeRel/vedit-m0-smoke
+/vedit-build/target/qt6-build/cmake/smoke/MinSizeRel/vedit-m0-smoke
+/vedit-build/target/qt6-build/cmake/smoke/RelWithDebInfo/vedit-m0-smoke
+/vedit-build/target/qt6-build/cmake/smoke/RelWithDebInfo/vedit-m0-smoke
+/vedit-build/target/qt6-build/cmake/smoke/Deployment/vedit-m0-smoke
+/vedit-build/target/qt6-build/cmake/smoke/Deployment/vedit-m0-smoke
+/vedit-build/target/qt6-build/cmake/smoke/Development/vedit-m0-smoke
+/vedit-build/target/qt6-build/cmake/smoke/Development/vedit-m0-smoke
+vedit-build/target/qt6-build/cmake/smoke/vedit-m0-smoke
+vedit-build/target/qt6-build/cmake/smoke/vedit-m0-smoke
+vedit-build/target/qt6-build/cmake/smoke/Release/vedit-m0-smoke
+vedit-build/target/qt6-build/cmake/smoke/Release/vedit-m0-smoke
+vedit-build/target/qt6-build/cmake/smoke/Debug/vedit-m0-smoke
+vedit-build/target/qt6-build/cmake/smoke/Debug/vedit-m0-smoke
+vedit-build/target/qt6-build/cmake/smoke/MinSizeRel/vedit-m0-smoke
+vedit-build/target/qt6-build/cmake/smoke/MinSizeRel/vedit-m0-smoke
+vedit-build/target/qt6-build/cmake/smoke/RelWithDebInfo/vedit-m0-smoke
+vedit-build/target/qt6-build/cmake/smoke/RelWithDebInfo/vedit-m0-smoke
+vedit-build/target/qt6-build/cmake/smoke/Deployment/vedit-m0-smoke
+vedit-build/target/qt6-build/cmake/smoke/Deployment/vedit-m0-smoke
+vedit-build/target/qt6-build/cmake/smoke/Development/vedit-m0-smoke
+vedit-build/target/qt6-build/cmake/smoke/Development/vedit-m0-smoke
+Unable to find executable: /vedit-build/target/qt6-build/cmake/smoke/vedit-m0-smoke
+ 2/31 Test  #2: vedit-m0-smoke .................................***Not Run   0.00 sec
+      Start  3: vedit-syntax-provider-tests
+Could not find executable /vedit-build/target/qt6-build/src/syntax/provider/vedit_syntax_provider_tests
+Looked in the following places:
+/vedit-build/target/qt6-build/src/syntax/provider/vedit_syntax_provider_tests
+/vedit-build/target/qt6-build/src/syntax/provider/vedit_syntax_provider_tests
+/vedit-build/target/qt6-build/src/syntax/provider/Release/vedit_syntax_provider_tests
+/vedit-build/target/qt6-build/src/syntax/provider/Release/vedit_syntax_provider_tests
+/vedit-build/target/qt6-build/src/syntax/provider/Debug/vedit_syntax_provider_tests
+/vedit-build/target/qt6-build/src/syntax/provider/Debug/vedit_syntax_provider_tests
+/vedit-build/target/qt6-build/src/syntax/provider/MinSizeRel/vedit_syntax_provider_tests
+/vedit-build/target/qt6-build/src/syntax/provider/MinSizeRel/vedit_syntax_provider_tests
+/vedit-build/target/qt6-build/src/syntax/provider/RelWithDebInfo/vedit_syntax_provider_tests
+/vedit-build/target/qt6-build/src/syntax/provider/RelWithDebInfo/vedit_syntax_provider_tests
+/vedit-build/target/qt6-build/src/syntax/provider/Deployment/vedit_syntax_provider_tests
+/vedit-build/target/qt6-build/src/syntax/provider/Deployment/vedit_syntax_provider_tests
+/vedit-build/target/qt6-build/src/syntax/provider/Development/vedit_syntax_provider_tests
+/vedit-build/target/qt6-build/src/syntax/provider/Development/vedit_syntax_provider_tests
+vedit-build/target/qt6-build/src/syntax/provider/vedit_syntax_provider_tests
+vedit-build/target/qt6-build/src/syntax/provider/vedit_syntax_provider_tests
+vedit-build/target/qt6-build/src/syntax/provider/Release/vedit_syntax_provider_tests
+vedit-build/target/qt6-build/src/syntax/provider/Release/vedit_syntax_provider_tests
+vedit-build/target/qt6-build/src/syntax/provider/Debug/vedit_syntax_provider_tests
+vedit-build/target/qt6-build/src/syntax/provider/Debug/vedit_syntax_provider_tests
+vedit-build/target/qt6-build/src/syntax/provider/MinSizeRel/vedit_syntax_provider_tests
+vedit-build/target/qt6-build/src/syntax/provider/MinSizeRel/vedit_syntax_provider_tests
+vedit-build/target/qt6-build/src/syntax/provider/RelWithDebInfo/vedit_syntax_provider_tests
+vedit-build/target/qt6-build/src/syntax/provider/RelWithDebInfo/vedit_syntax_provider_tests
+vedit-build/target/qt6-build/src/syntax/provider/Deployment/vedit_syntax_provider_tests
+vedit-build/target/qt6-build/src/syntax/provider/Deployment/vedit_syntax_provider_tests
+vedit-build/target/qt6-build/src/syntax/provider/Development/vedit_syntax_provider_tests
+vedit-build/target/qt6-build/src/syntax/provider/Development/vedit_syntax_provider_tests
+Unable to find executable: /vedit-build/target/qt6-build/src/syntax/provider/vedit_syntax_provider_tests
+ 3/31 Test  #3: vedit-syntax-provider-tests ....................***Not Run   0.00 sec
+      Start  4: vedit-syntax-kde-data
+Could not find executable /vedit-build/target/qt6-build/src/syntax/kde/vedit_syntax_kde_selftest
+Looked in the following places:
+/vedit-build/target/qt6-build/src/syntax/kde/vedit_syntax_kde_selftest
+/vedit-build/target/qt6-build/src/syntax/kde/vedit_syntax_kde_selftest
+/vedit-build/target/qt6-build/src/syntax/kde/Release/vedit_syntax_kde_selftest
+/vedit-build/target/qt6-build/src/syntax/kde/Release/vedit_syntax_kde_selftest
+/vedit-build/target/qt6-build/src/syntax/kde/Debug/vedit_syntax_kde_selftest
+/vedit-build/target/qt6-build/src/syntax/kde/Debug/vedit_syntax_kde_selftest
+/vedit-build/target/qt6-build/src/syntax/kde/MinSizeRel/vedit_syntax_kde_selftest
+/vedit-build/target/qt6-build/src/syntax/kde/MinSizeRel/vedit_syntax_kde_selftest
+/vedit-build/target/qt6-build/src/syntax/kde/RelWithDebInfo/vedit_syntax_kde_selftest
+/vedit-build/target/qt6-build/src/syntax/kde/RelWithDebInfo/vedit_syntax_kde_selftest
+/vedit-build/target/qt6-build/src/syntax/kde/Deployment/vedit_syntax_kde_selftest
+/vedit-build/target/qt6-build/src/syntax/kde/Deployment/vedit_syntax_kde_selftest
+/vedit-build/target/qt6-build/src/syntax/kde/Development/vedit_syntax_kde_selftest
+/vedit-build/target/qt6-build/src/syntax/kde/Development/vedit_syntax_kde_selftest
+vedit-build/target/qt6-build/src/syntax/kde/vedit_syntax_kde_selftest
+vedit-build/target/qt6-build/src/syntax/kde/vedit_syntax_kde_selftest
+vedit-build/target/qt6-build/src/syntax/kde/Release/vedit_syntax_kde_selftest
+vedit-build/target/qt6-build/src/syntax/kde/Release/vedit_syntax_kde_selftest
+vedit-build/target/qt6-build/src/syntax/kde/Debug/vedit_syntax_kde_selftest
+vedit-build/target/qt6-build/src/syntax/kde/Debug/vedit_syntax_kde_selftest
+vedit-build/target/qt6-build/src/syntax/kde/MinSizeRel/vedit_syntax_kde_selftest
+vedit-build/target/qt6-build/src/syntax/kde/MinSizeRel/vedit_syntax_kde_selftest
+vedit-build/target/qt6-build/src/syntax/kde/RelWithDebInfo/vedit_syntax_kde_selftest
+vedit-build/target/qt6-build/src/syntax/kde/RelWithDebInfo/vedit_syntax_kde_selftest
+vedit-build/target/qt6-build/src/syntax/kde/Deployment/vedit_syntax_kde_selftest
+vedit-build/target/qt6-build/src/syntax/kde/Deployment/vedit_syntax_kde_selftest
+vedit-build/target/qt6-build/src/syntax/kde/Development/vedit_syntax_kde_selftest
+vedit-build/target/qt6-build/src/syntax/kde/Development/vedit_syntax_kde_selftest
+Unable to find executable: /vedit-build/target/qt6-build/src/syntax/kde/vedit_syntax_kde_selftest
+ 4/31 Test  #4: vedit-syntax-kde-data ..........................***Not Run   0.00 sec
+      Start  5: vedit-syntax-directory-equivalence
+Could not find executable /vedit-build/target/qt6-build/src/syntax/kde/vedit-syntax-directory-equivalence
+Looked in the following places:
+/vedit-build/target/qt6-build/src/syntax/kde/vedit-syntax-directory-equivalence
+/vedit-build/target/qt6-build/src/syntax/kde/vedit-syntax-directory-equivalence
+/vedit-build/target/qt6-build/src/syntax/kde/Release/vedit-syntax-directory-equivalence
+/vedit-build/target/qt6-build/src/syntax/kde/Release/vedit-syntax-directory-equivalence
+/vedit-build/target/qt6-build/src/syntax/kde/Debug/vedit-syntax-directory-equivalence
+/vedit-build/target/qt6-build/src/syntax/kde/Debug/vedit-syntax-directory-equivalence
+/vedit-build/target/qt6-build/src/syntax/kde/MinSizeRel/vedit-syntax-directory-equivalence
+/vedit-build/target/qt6-build/src/syntax/kde/MinSizeRel/vedit-syntax-directory-equivalence
+/vedit-build/target/qt6-build/src/syntax/kde/RelWithDebInfo/vedit-syntax-directory-equivalence
+/vedit-build/target/qt6-build/src/syntax/kde/RelWithDebInfo/vedit-syntax-directory-equivalence
+/vedit-build/target/qt6-build/src/syntax/kde/Deployment/vedit-syntax-directory-equivalence
+/vedit-build/target/qt6-build/src/syntax/kde/Deployment/vedit-syntax-directory-equivalence
+/vedit-build/target/qt6-build/src/syntax/kde/Development/vedit-syntax-directory-equivalence
+/vedit-build/target/qt6-build/src/syntax/kde/Development/vedit-syntax-directory-equivalence
+vedit-build/target/qt6-build/src/syntax/kde/vedit-syntax-directory-equivalence
+vedit-build/target/qt6-build/src/syntax/kde/vedit-syntax-directory-equivalence
+vedit-build/target/qt6-build/src/syntax/kde/Release/vedit-syntax-directory-equivalence
+vedit-build/target/qt6-build/src/syntax/kde/Release/vedit-syntax-directory-equivalence
+vedit-build/target/qt6-build/src/syntax/kde/Debug/vedit-syntax-directory-equivalence
+vedit-build/target/qt6-build/src/syntax/kde/Debug/vedit-syntax-directory-equivalence
+vedit-build/target/qt6-build/src/syntax/kde/MinSizeRel/vedit-syntax-directory-equivalence
+vedit-build/target/qt6-build/src/syntax/kde/MinSizeRel/vedit-syntax-directory-equivalence
+vedit-build/target/qt6-build/src/syntax/kde/RelWithDebInfo/vedit-syntax-directory-equivalence
+vedit-build/target/qt6-build/src/syntax/kde/RelWithDebInfo/vedit-syntax-directory-equivalence
+vedit-build/target/qt6-build/src/syntax/kde/Deployment/vedit-syntax-directory-equivalence
+vedit-build/target/qt6-build/src/syntax/kde/Deployment/vedit-syntax-directory-equivalence
+vedit-build/target/qt6-build/src/syntax/kde/Development/vedit-syntax-directory-equivalence
+vedit-build/target/qt6-build/src/syntax/kde/Development/vedit-syntax-directory-equivalence
+Unable to find executable: /vedit-build/target/qt6-build/src/syntax/kde/vedit-syntax-directory-equivalence
+ 5/31 Test  #5: vedit-syntax-directory-equivalence .............***Not Run   0.00 sec
+      Start  6: vedit-syn-grammars-tests
+Could not find executable /vedit-build/target/qt6-build/src/syntax/grammars/vedit_syn_grammars_tests
+Looked in the following places:
+/vedit-build/target/qt6-build/src/syntax/grammars/vedit_syn_grammars_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/vedit_syn_grammars_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/Release/vedit_syn_grammars_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/Release/vedit_syn_grammars_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/Debug/vedit_syn_grammars_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/Debug/vedit_syn_grammars_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/MinSizeRel/vedit_syn_grammars_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/MinSizeRel/vedit_syn_grammars_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/RelWithDebInfo/vedit_syn_grammars_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/RelWithDebInfo/vedit_syn_grammars_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/Deployment/vedit_syn_grammars_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/Deployment/vedit_syn_grammars_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/Development/vedit_syn_grammars_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/Development/vedit_syn_grammars_tests
+vedit-build/target/qt6-build/src/syntax/grammars/vedit_syn_grammars_tests
+vedit-build/target/qt6-build/src/syntax/grammars/vedit_syn_grammars_tests
+vedit-build/target/qt6-build/src/syntax/grammars/Release/vedit_syn_grammars_tests
+vedit-build/target/qt6-build/src/syntax/grammars/Release/vedit_syn_grammars_tests
+vedit-build/target/qt6-build/src/syntax/grammars/Debug/vedit_syn_grammars_tests
+vedit-build/target/qt6-build/src/syntax/grammars/Debug/vedit_syn_grammars_tests
+vedit-build/target/qt6-build/src/syntax/grammars/MinSizeRel/vedit_syn_grammars_tests
+vedit-build/target/qt6-build/src/syntax/grammars/MinSizeRel/vedit_syn_grammars_tests
+vedit-build/target/qt6-build/src/syntax/grammars/RelWithDebInfo/vedit_syn_grammars_tests
+vedit-build/target/qt6-build/src/syntax/grammars/RelWithDebInfo/vedit_syn_grammars_tests
+vedit-build/target/qt6-build/src/syntax/grammars/Deployment/vedit_syn_grammars_tests
+vedit-build/target/qt6-build/src/syntax/grammars/Deployment/vedit_syn_grammars_tests
+vedit-build/target/qt6-build/src/syntax/grammars/Development/vedit_syn_grammars_tests
+vedit-build/target/qt6-build/src/syntax/grammars/Development/vedit_syn_grammars_tests
+Unable to find executable: /vedit-build/target/qt6-build/src/syntax/grammars/vedit_syn_grammars_tests
+ 6/31 Test  #6: vedit-syn-grammars-tests .......................***Not Run   0.00 sec
+      Start  7: vedit-syntax-product-tests
+Could not find executable /vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/vedit_syntax_product_tests
+Looked in the following places:
+/vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/vedit_syntax_product_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/vedit_syntax_product_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/Release/vedit_syntax_product_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/Release/vedit_syntax_product_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/Debug/vedit_syntax_product_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/Debug/vedit_syntax_product_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/MinSizeRel/vedit_syntax_product_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/MinSizeRel/vedit_syntax_product_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/RelWithDebInfo/vedit_syntax_product_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/RelWithDebInfo/vedit_syntax_product_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/Deployment/vedit_syntax_product_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/Deployment/vedit_syntax_product_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/Development/vedit_syntax_product_tests
+/vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/Development/vedit_syntax_product_tests
+vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/vedit_syntax_product_tests
+vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/vedit_syntax_product_tests
+vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/Release/vedit_syntax_product_tests
+vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/Release/vedit_syntax_product_tests
+vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/Debug/vedit_syntax_product_tests
+vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/Debug/vedit_syntax_product_tests
+vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/MinSizeRel/vedit_syntax_product_tests
+vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/MinSizeRel/vedit_syntax_product_tests
+vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/RelWithDebInfo/vedit_syntax_product_tests
+vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/RelWithDebInfo/vedit_syntax_product_tests
+vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/Deployment/vedit_syntax_product_tests
+vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/Deployment/vedit_syntax_product_tests
+vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/Development/vedit_syntax_product_tests
+vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/Development/vedit_syntax_product_tests
+Unable to find executable: /vedit-build/target/qt6-build/src/syntax/grammars/syntax-product/vedit_syntax_product_tests
+ 7/31 Test  #7: vedit-syntax-product-tests .....................***Not Run   0.00 sec
+      Start  8: vedit-terminal-selftest
+Could not find executable /vedit-build/target/qt6-build/src/terminal/vedit-terminal-selftest
+Looked in the following places:
+/vedit-build/target/qt6-build/src/terminal/vedit-terminal-selftest
+/vedit-build/target/qt6-build/src/terminal/vedit-terminal-selftest
+/vedit-build/target/qt6-build/src/terminal/Release/vedit-terminal-selftest
+/vedit-build/target/qt6-build/src/terminal/Release/vedit-terminal-selftest
+/vedit-build/target/qt6-build/src/terminal/Debug/vedit-terminal-selftest
+/vedit-build/target/qt6-build/src/terminal/Debug/vedit-terminal-selftest
+/vedit-build/target/qt6-build/src/terminal/MinSizeRel/vedit-terminal-selftest
+/vedit-build/target/qt6-build/src/terminal/MinSizeRel/vedit-terminal-selftest
+/vedit-build/target/qt6-build/src/terminal/RelWithDebInfo/vedit-terminal-selftest
+/vedit-build/target/qt6-build/src/terminal/RelWithDebInfo/vedit-terminal-selftest
+/vedit-build/target/qt6-build/src/terminal/Deployment/vedit-terminal-selftest
+/vedit-build/target/qt6-build/src/terminal/Deployment/vedit-terminal-selftest
+/vedit-build/target/qt6-build/src/terminal/Development/vedit-terminal-selftest
+/vedit-build/target/qt6-build/src/terminal/Development/vedit-terminal-selftest
+vedit-build/target/qt6-build/src/terminal/vedit-terminal-selftest
+vedit-build/target/qt6-build/src/terminal/vedit-terminal-selftest
+vedit-build/target/qt6-build/src/terminal/Release/vedit-terminal-selftest
+vedit-build/target/qt6-build/src/terminal/Release/vedit-terminal-selftest
+vedit-build/target/qt6-build/src/terminal/Debug/vedit-terminal-selftest
+vedit-build/target/qt6-build/src/terminal/Debug/vedit-terminal-selftest
+vedit-build/target/qt6-build/src/terminal/MinSizeRel/vedit-terminal-selftest
+vedit-build/target/qt6-build/src/terminal/MinSizeRel/vedit-terminal-selftest
+vedit-build/target/qt6-build/src/terminal/RelWithDebInfo/vedit-terminal-selftest
+vedit-build/target/qt6-build/src/terminal/RelWithDebInfo/vedit-terminal-selftest
+vedit-build/target/qt6-build/src/terminal/Deployment/vedit-terminal-selftest
+vedit-build/target/qt6-build/src/terminal/Deployment/vedit-terminal-selftest
+vedit-build/target/qt6-build/src/terminal/Development/vedit-terminal-selftest
+vedit-build/target/qt6-build/src/terminal/Development/vedit-terminal-selftest
+Unable to find executable: /vedit-build/target/qt6-build/src/terminal/vedit-terminal-selftest
+ 8/31 Test  #8: vedit-terminal-selftest ........................***Not Run   0.00 sec
+      Start  9: vedit-syntax-overlay-selftest
+Could not find executable /vedit-build/target/qt6-build/src/syntax/overlay/vedit-syntax-overlay-selftest
+Looked in the following places:
+/vedit-build/target/qt6-build/src/syntax/overlay/vedit-syntax-overlay-selftest
+/vedit-build/target/qt6-build/src/syntax/overlay/vedit-syntax-overlay-selftest
+/vedit-build/target/qt6-build/src/syntax/overlay/Release/vedit-syntax-overlay-selftest
+/vedit-build/target/qt6-build/src/syntax/overlay/Release/vedit-syntax-overlay-selftest
+/vedit-build/target/qt6-build/src/syntax/overlay/Debug/vedit-syntax-overlay-selftest
+/vedit-build/target/qt6-build/src/syntax/overlay/Debug/vedit-syntax-overlay-selftest
+/vedit-build/target/qt6-build/src/syntax/overlay/MinSizeRel/vedit-syntax-overlay-selftest
+/vedit-build/target/qt6-build/src/syntax/overlay/MinSizeRel/vedit-syntax-overlay-selftest
+/vedit-build/target/qt6-build/src/syntax/overlay/RelWithDebInfo/vedit-syntax-overlay-selftest
+/vedit-build/target/qt6-build/src/syntax/overlay/RelWithDebInfo/vedit-syntax-overlay-selftest
+/vedit-build/target/qt6-build/src/syntax/overlay/Deployment/vedit-syntax-overlay-selftest
+/vedit-build/target/qt6-build/src/syntax/overlay/Deployment/vedit-syntax-overlay-selftest
+/vedit-build/target/qt6-build/src/syntax/overlay/Development/vedit-syntax-overlay-selftest
+/vedit-build/target/qt6-build/src/syntax/overlay/Development/vedit-syntax-overlay-selftest
+vedit-build/target/qt6-build/src/syntax/overlay/vedit-syntax-overlay-selftest
+vedit-build/target/qt6-build/src/syntax/overlay/vedit-syntax-overlay-selftest
+vedit-build/target/qt6-build/src/syntax/overlay/Release/vedit-syntax-overlay-selftest
+vedit-build/target/qt6-build/src/syntax/overlay/Release/vedit-syntax-overlay-selftest
+vedit-build/target/qt6-build/src/syntax/overlay/Debug/vedit-syntax-overlay-selftest
+vedit-build/target/qt6-build/src/syntax/overlay/Debug/vedit-syntax-overlay-selftest
+vedit-build/target/qt6-build/src/syntax/overlay/MinSizeRel/vedit-syntax-overlay-selftest
+vedit-build/target/qt6-build/src/syntax/overlay/MinSizeRel/vedit-syntax-overlay-selftest
+vedit-build/target/qt6-build/src/syntax/overlay/RelWithDebInfo/vedit-syntax-overlay-selftest
+vedit-build/target/qt6-build/src/syntax/overlay/RelWithDebInfo/vedit-syntax-overlay-selftest
+vedit-build/target/qt6-build/src/syntax/overlay/Deployment/vedit-syntax-overlay-selftest
+vedit-build/target/qt6-build/src/syntax/overlay/Deployment/vedit-syntax-overlay-selftest
+vedit-build/target/qt6-build/src/syntax/overlay/Development/vedit-syntax-overlay-selftest
+vedit-build/target/qt6-build/src/syntax/overlay/Development/vedit-syntax-overlay-selftest
+Unable to find executable: /vedit-build/target/qt6-build/src/syntax/overlay/vedit-syntax-overlay-selftest
+ 9/31 Test  #9: vedit-syntax-overlay-selftest ..................***Not Run   0.00 sec
+      Start 10: vedit-app-ffi-abi-selftest
+Could not find executable /vedit-build/target/qt6-build/src/app/vedit-app
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/vedit-app
+/vedit-build/target/qt6-build/src/app/vedit-app
+/vedit-build/target/qt6-build/src/app/Release/vedit-app
+/vedit-build/target/qt6-build/src/app/Release/vedit-app
+/vedit-build/target/qt6-build/src/app/Debug/vedit-app
+/vedit-build/target/qt6-build/src/app/Debug/vedit-app
+/vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app
+/vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app
+/vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app
+/vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app
+/vedit-build/target/qt6-build/src/app/Deployment/vedit-app
+/vedit-build/target/qt6-build/src/app/Deployment/vedit-app
+/vedit-build/target/qt6-build/src/app/Development/vedit-app
+/vedit-build/target/qt6-build/src/app/Development/vedit-app
+vedit-build/target/qt6-build/src/app/vedit-app
+vedit-build/target/qt6-build/src/app/vedit-app
+vedit-build/target/qt6-build/src/app/Release/vedit-app
+vedit-build/target/qt6-build/src/app/Release/vedit-app
+vedit-build/target/qt6-build/src/app/Debug/vedit-app
+vedit-build/target/qt6-build/src/app/Debug/vedit-app
+vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app
+vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app
+vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app
+vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app
+vedit-build/target/qt6-build/src/app/Deployment/vedit-app
+vedit-build/target/qt6-build/src/app/Deployment/vedit-app
+vedit-build/target/qt6-build/src/app/Development/vedit-app
+vedit-build/target/qt6-build/src/app/Development/vedit-app
+Unable to find executable: /vedit-build/target/qt6-build/src/app/vedit-app
+10/31 Test #10: vedit-app-ffi-abi-selftest .....................***Not Run   0.00 sec
+      Start 11: vedit-app-shell-selftest
+Could not find executable /vedit-build/target/qt6-build/src/app/vedit-app
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/vedit-app
+/vedit-build/target/qt6-build/src/app/vedit-app
+/vedit-build/target/qt6-build/src/app/Release/vedit-app
+/vedit-build/target/qt6-build/src/app/Release/vedit-app
+/vedit-build/target/qt6-build/src/app/Debug/vedit-app
+/vedit-build/target/qt6-build/src/app/Debug/vedit-app
+/vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app
+/vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app
+/vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app
+/vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app
+/vedit-build/target/qt6-build/src/app/Deployment/vedit-app
+/vedit-build/target/qt6-build/src/app/Deployment/vedit-app
+/vedit-build/target/qt6-build/src/app/Development/vedit-app
+/vedit-build/target/qt6-build/src/app/Development/vedit-app
+vedit-build/target/qt6-build/src/app/vedit-app
+vedit-build/target/qt6-build/src/app/vedit-app
+vedit-build/target/qt6-build/src/app/Release/vedit-app
+vedit-build/target/qt6-build/src/app/Release/vedit-app
+vedit-build/target/qt6-build/src/app/Debug/vedit-app
+vedit-build/target/qt6-build/src/app/Debug/vedit-app
+vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app
+vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app
+vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app
+vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app
+vedit-build/target/qt6-build/src/app/Deployment/vedit-app
+vedit-build/target/qt6-build/src/app/Deployment/vedit-app
+vedit-build/target/qt6-build/src/app/Development/vedit-app
+vedit-build/target/qt6-build/src/app/Development/vedit-app
+Unable to find executable: /vedit-build/target/qt6-build/src/app/vedit-app
+11/31 Test #11: vedit-app-shell-selftest .......................***Not Run   0.00 sec
+      Start 12: vedit-app-crash-reporter-selftest
+Could not find executable /vedit-build/target/qt6-build/src/app/vedit-app-crash-reporter-selftest
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/vedit-app-crash-reporter-selftest
+/vedit-build/target/qt6-build/src/app/vedit-app-crash-reporter-selftest
+/vedit-build/target/qt6-build/src/app/Release/vedit-app-crash-reporter-selftest
+/vedit-build/target/qt6-build/src/app/Release/vedit-app-crash-reporter-selftest
+/vedit-build/target/qt6-build/src/app/Debug/vedit-app-crash-reporter-selftest
+/vedit-build/target/qt6-build/src/app/Debug/vedit-app-crash-reporter-selftest
+/vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app-crash-reporter-selftest
+/vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app-crash-reporter-selftest
+/vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app-crash-reporter-selftest
+/vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app-crash-reporter-selftest
+/vedit-build/target/qt6-build/src/app/Deployment/vedit-app-crash-reporter-selftest
+/vedit-build/target/qt6-build/src/app/Deployment/vedit-app-crash-reporter-selftest
+/vedit-build/target/qt6-build/src/app/Development/vedit-app-crash-reporter-selftest
+/vedit-build/target/qt6-build/src/app/Development/vedit-app-crash-reporter-selftest
+vedit-build/target/qt6-build/src/app/vedit-app-crash-reporter-selftest
+vedit-build/target/qt6-build/src/app/vedit-app-crash-reporter-selftest
+vedit-build/target/qt6-build/src/app/Release/vedit-app-crash-reporter-selftest
+vedit-build/target/qt6-build/src/app/Release/vedit-app-crash-reporter-selftest
+vedit-build/target/qt6-build/src/app/Debug/vedit-app-crash-reporter-selftest
+vedit-build/target/qt6-build/src/app/Debug/vedit-app-crash-reporter-selftest
+vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app-crash-reporter-selftest
+vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app-crash-reporter-selftest
+vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app-crash-reporter-selftest
+vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app-crash-reporter-selftest
+vedit-build/target/qt6-build/src/app/Deployment/vedit-app-crash-reporter-selftest
+vedit-build/target/qt6-build/src/app/Deployment/vedit-app-crash-reporter-selftest
+vedit-build/target/qt6-build/src/app/Development/vedit-app-crash-reporter-selftest
+vedit-build/target/qt6-build/src/app/Development/vedit-app-crash-reporter-selftest
+Unable to find executable: /vedit-build/target/qt6-build/src/app/vedit-app-crash-reporter-selftest
+12/31 Test #12: vedit-app-crash-reporter-selftest ..............***Not Run   0.00 sec
+      Start 13: vedit-app-crash-report-shipped
+13/31 Test #13: vedit-app-crash-report-shipped .................***Failed    0.00 sec
+/usr/bin/bash: /vedit-build/src/app/crash_report_check.sh: No such file or directory
+
+      Start 14: vedit-native-fold-tests
+Could not find executable /vedit-build/target/qt6-build/src/app/editor-lane/vedit-native-fold-tests
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/editor-lane/vedit-native-fold-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/vedit-native-fold-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/Release/vedit-native-fold-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/Release/vedit-native-fold-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/Debug/vedit-native-fold-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/Debug/vedit-native-fold-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/MinSizeRel/vedit-native-fold-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/MinSizeRel/vedit-native-fold-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/RelWithDebInfo/vedit-native-fold-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/RelWithDebInfo/vedit-native-fold-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/Deployment/vedit-native-fold-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/Deployment/vedit-native-fold-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/Development/vedit-native-fold-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/Development/vedit-native-fold-tests
+vedit-build/target/qt6-build/src/app/editor-lane/vedit-native-fold-tests
+vedit-build/target/qt6-build/src/app/editor-lane/vedit-native-fold-tests
+vedit-build/target/qt6-build/src/app/editor-lane/Release/vedit-native-fold-tests
+vedit-build/target/qt6-build/src/app/editor-lane/Release/vedit-native-fold-tests
+vedit-build/target/qt6-build/src/app/editor-lane/Debug/vedit-native-fold-tests
+vedit-build/target/qt6-build/src/app/editor-lane/Debug/vedit-native-fold-tests
+vedit-build/target/qt6-build/src/app/editor-lane/MinSizeRel/vedit-native-fold-tests
+vedit-build/target/qt6-build/src/app/editor-lane/MinSizeRel/vedit-native-fold-tests
+vedit-build/target/qt6-build/src/app/editor-lane/RelWithDebInfo/vedit-native-fold-tests
+vedit-build/target/qt6-build/src/app/editor-lane/RelWithDebInfo/vedit-native-fold-tests
+vedit-build/target/qt6-build/src/app/editor-lane/Deployment/vedit-native-fold-tests
+vedit-build/target/qt6-build/src/app/editor-lane/Deployment/vedit-native-fold-tests
+vedit-build/target/qt6-build/src/app/editor-lane/Development/vedit-native-fold-tests
+vedit-build/target/qt6-build/src/app/editor-lane/Development/vedit-native-fold-tests
+Unable to find executable: /vedit-build/target/qt6-build/src/app/editor-lane/vedit-native-fold-tests
+14/31 Test #14: vedit-native-fold-tests ........................***Not Run   0.00 sec
+      Start 15: vedit-edit-core-selftest
+Could not find executable /vedit-build/target/qt6-build/src/app/editor-lane/vedit-edit-core-selftest
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/editor-lane/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Release/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Release/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Debug/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Debug/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/MinSizeRel/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/MinSizeRel/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/RelWithDebInfo/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/RelWithDebInfo/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Deployment/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Deployment/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Development/vedit-edit-core-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Development/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Release/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Release/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Debug/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Debug/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/MinSizeRel/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/MinSizeRel/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/RelWithDebInfo/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/RelWithDebInfo/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Deployment/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Deployment/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Development/vedit-edit-core-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Development/vedit-edit-core-selftest
+Unable to find executable: /vedit-build/target/qt6-build/src/app/editor-lane/vedit-edit-core-selftest
+15/31 Test #15: vedit-edit-core-selftest .......................***Not Run   0.00 sec
+      Start 16: vedit-fim-wiring-selftest
+Could not find executable /vedit-build/target/qt6-build/src/app/editor-lane/vedit-fim-wiring-selftest
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/editor-lane/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Release/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Release/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Debug/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Debug/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/MinSizeRel/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/MinSizeRel/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/RelWithDebInfo/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/RelWithDebInfo/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Deployment/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Deployment/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Development/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Development/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Release/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Release/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Debug/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Debug/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/MinSizeRel/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/MinSizeRel/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/RelWithDebInfo/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/RelWithDebInfo/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Deployment/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Deployment/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Development/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Development/vedit-fim-wiring-selftest
+Unable to find executable: /vedit-build/target/qt6-build/src/app/editor-lane/vedit-fim-wiring-selftest
+16/31 Test #16: vedit-fim-wiring-selftest ......................***Not Run   0.00 sec
+      Start 17: vedit-syntax-directory-tests
+Could not find executable /vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/vedit-syntax-directory-tests
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/vedit-syntax-directory-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/vedit-syntax-directory-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/Release/vedit-syntax-directory-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/Release/vedit-syntax-directory-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/Debug/vedit-syntax-directory-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/Debug/vedit-syntax-directory-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/MinSizeRel/vedit-syntax-directory-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/MinSizeRel/vedit-syntax-directory-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/RelWithDebInfo/vedit-syntax-directory-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/RelWithDebInfo/vedit-syntax-directory-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/Deployment/vedit-syntax-directory-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/Deployment/vedit-syntax-directory-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/Development/vedit-syntax-directory-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/Development/vedit-syntax-directory-tests
+vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/vedit-syntax-directory-tests
+vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/vedit-syntax-directory-tests
+vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/Release/vedit-syntax-directory-tests
+vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/Release/vedit-syntax-directory-tests
+vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/Debug/vedit-syntax-directory-tests
+vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/Debug/vedit-syntax-directory-tests
+vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/MinSizeRel/vedit-syntax-directory-tests
+vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/MinSizeRel/vedit-syntax-directory-tests
+vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/RelWithDebInfo/vedit-syntax-directory-tests
+vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/RelWithDebInfo/vedit-syntax-directory-tests
+vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/Deployment/vedit-syntax-directory-tests
+vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/Deployment/vedit-syntax-directory-tests
+vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/Development/vedit-syntax-directory-tests
+vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/Development/vedit-syntax-directory-tests
+Unable to find executable: /vedit-build/target/qt6-build/src/app/editor-lane/folding-lane/vedit-syntax-directory-tests
+17/31 Test #17: vedit-syntax-directory-tests ...................***Not Run   0.00 sec
+      Start 18: vedit-fold-gutter-click
+Could not find executable /usr/bin/xvfb-run
+Looked in the following places:
+/usr/bin/xvfb-run
+/usr/bin/xvfb-run
+/usr/bin/Release/xvfb-run
+/usr/bin/Release/xvfb-run
+/usr/bin/Debug/xvfb-run
+/usr/bin/Debug/xvfb-run
+/usr/bin/MinSizeRel/xvfb-run
+/usr/bin/MinSizeRel/xvfb-run
+/usr/bin/RelWithDebInfo/xvfb-run
+/usr/bin/RelWithDebInfo/xvfb-run
+/usr/bin/Deployment/xvfb-run
+/usr/bin/Deployment/xvfb-run
+/usr/bin/Development/xvfb-run
+/usr/bin/Development/xvfb-run
+usr/bin/xvfb-run
+usr/bin/xvfb-run
+usr/bin/Release/xvfb-run
+usr/bin/Release/xvfb-run
+usr/bin/Debug/xvfb-run
+usr/bin/Debug/xvfb-run
+usr/bin/MinSizeRel/xvfb-run
+usr/bin/MinSizeRel/xvfb-run
+usr/bin/RelWithDebInfo/xvfb-run
+usr/bin/RelWithDebInfo/xvfb-run
+usr/bin/Deployment/xvfb-run
+usr/bin/Deployment/xvfb-run
+usr/bin/Development/xvfb-run
+usr/bin/Development/xvfb-run
+Unable to find executable: /usr/bin/xvfb-run
+18/31 Test #18: vedit-fold-gutter-click ........................***Not Run   0.00 sec
+      Start 19: vedit-breadcrumb-tests
+Could not find executable /vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/vedit-breadcrumb-tests
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/vedit-breadcrumb-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/vedit-breadcrumb-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/Release/vedit-breadcrumb-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/Release/vedit-breadcrumb-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/Debug/vedit-breadcrumb-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/Debug/vedit-breadcrumb-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/MinSizeRel/vedit-breadcrumb-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/MinSizeRel/vedit-breadcrumb-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/RelWithDebInfo/vedit-breadcrumb-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/RelWithDebInfo/vedit-breadcrumb-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/Deployment/vedit-breadcrumb-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/Deployment/vedit-breadcrumb-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/Development/vedit-breadcrumb-tests
+/vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/Development/vedit-breadcrumb-tests
+vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/vedit-breadcrumb-tests
+vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/vedit-breadcrumb-tests
+vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/Release/vedit-breadcrumb-tests
+vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/Release/vedit-breadcrumb-tests
+vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/Debug/vedit-breadcrumb-tests
+vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/Debug/vedit-breadcrumb-tests
+vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/MinSizeRel/vedit-breadcrumb-tests
+vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/MinSizeRel/vedit-breadcrumb-tests
+vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/RelWithDebInfo/vedit-breadcrumb-tests
+vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/RelWithDebInfo/vedit-breadcrumb-tests
+vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/Deployment/vedit-breadcrumb-tests
+vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/Deployment/vedit-breadcrumb-tests
+vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/Development/vedit-breadcrumb-tests
+vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/Development/vedit-breadcrumb-tests
+Unable to find executable: /vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/vedit-breadcrumb-tests
+19/31 Test #19: vedit-breadcrumb-tests .........................***Not Run   0.00 sec
+      Start 20: vedit-fim-selftest
+Could not find executable /vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/vedit-fim-selftest
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/vedit-fim-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/vedit-fim-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/Release/vedit-fim-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/Release/vedit-fim-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/Debug/vedit-fim-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/Debug/vedit-fim-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/MinSizeRel/vedit-fim-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/MinSizeRel/vedit-fim-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/RelWithDebInfo/vedit-fim-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/RelWithDebInfo/vedit-fim-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/Deployment/vedit-fim-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/Deployment/vedit-fim-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/Development/vedit-fim-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/Development/vedit-fim-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/vedit-fim-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/vedit-fim-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/Release/vedit-fim-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/Release/vedit-fim-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/Debug/vedit-fim-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/Debug/vedit-fim-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/MinSizeRel/vedit-fim-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/MinSizeRel/vedit-fim-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/RelWithDebInfo/vedit-fim-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/RelWithDebInfo/vedit-fim-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/Deployment/vedit-fim-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/Deployment/vedit-fim-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/Development/vedit-fim-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/Development/vedit-fim-selftest
+Unable to find executable: /vedit-build/target/qt6-build/src/app/editor-lane/fim-lane/vedit-fim-selftest
+20/31 Test #20: vedit-fim-selftest .............................***Not Run   0.00 sec
+      Start 21: vedit-workspace-palette-selftest
+Could not find executable /vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-selftest
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Release/vedit-workspace-palette-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Release/vedit-workspace-palette-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Debug/vedit-workspace-palette-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Debug/vedit-workspace-palette-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/MinSizeRel/vedit-workspace-palette-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/MinSizeRel/vedit-workspace-palette-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/RelWithDebInfo/vedit-workspace-palette-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/RelWithDebInfo/vedit-workspace-palette-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Deployment/vedit-workspace-palette-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Deployment/vedit-workspace-palette-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Development/vedit-workspace-palette-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Development/vedit-workspace-palette-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Release/vedit-workspace-palette-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Release/vedit-workspace-palette-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Debug/vedit-workspace-palette-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Debug/vedit-workspace-palette-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/MinSizeRel/vedit-workspace-palette-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/MinSizeRel/vedit-workspace-palette-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/RelWithDebInfo/vedit-workspace-palette-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/RelWithDebInfo/vedit-workspace-palette-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Deployment/vedit-workspace-palette-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Deployment/vedit-workspace-palette-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Development/vedit-workspace-palette-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Development/vedit-workspace-palette-selftest
+Unable to find executable: /vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-selftest
+21/31 Test #21: vedit-workspace-palette-selftest ...............***Not Run   0.00 sec
+      Start 22: vedit-workspace-palette-integration-selftest
+Could not find executable /vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-integration-selftest
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Release/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Release/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Debug/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Debug/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/MinSizeRel/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/MinSizeRel/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/RelWithDebInfo/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/RelWithDebInfo/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Deployment/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Deployment/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Development/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Development/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Release/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Release/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Debug/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Debug/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/MinSizeRel/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/MinSizeRel/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/RelWithDebInfo/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/RelWithDebInfo/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Deployment/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Deployment/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Development/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Development/vedit-workspace-palette-integration-selftest
+Unable to find executable: /vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-integration-selftest
+22/31 Test #22: vedit-workspace-palette-integration-selftest ...***Not Run   0.00 sec
+      Start 23: vedit-workspace-search-selftest
+Could not find executable /vedit-build/target/qt6-build/src/app/workspace-lane-search/vedit-workspace-search-selftest
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/workspace-lane-search/vedit-workspace-search-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-search/vedit-workspace-search-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-search/Release/vedit-workspace-search-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-search/Release/vedit-workspace-search-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-search/Debug/vedit-workspace-search-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-search/Debug/vedit-workspace-search-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-search/MinSizeRel/vedit-workspace-search-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-search/MinSizeRel/vedit-workspace-search-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-search/RelWithDebInfo/vedit-workspace-search-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-search/RelWithDebInfo/vedit-workspace-search-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-search/Deployment/vedit-workspace-search-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-search/Deployment/vedit-workspace-search-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-search/Development/vedit-workspace-search-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-search/Development/vedit-workspace-search-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-search/vedit-workspace-search-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-search/vedit-workspace-search-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-search/Release/vedit-workspace-search-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-search/Release/vedit-workspace-search-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-search/Debug/vedit-workspace-search-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-search/Debug/vedit-workspace-search-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-search/MinSizeRel/vedit-workspace-search-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-search/MinSizeRel/vedit-workspace-search-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-search/RelWithDebInfo/vedit-workspace-search-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-search/RelWithDebInfo/vedit-workspace-search-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-search/Deployment/vedit-workspace-search-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-search/Deployment/vedit-workspace-search-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-search/Development/vedit-workspace-search-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-search/Development/vedit-workspace-search-selftest
+Unable to find executable: /vedit-build/target/qt6-build/src/app/workspace-lane-search/vedit-workspace-search-selftest
+23/31 Test #23: vedit-workspace-search-selftest ................***Not Run   0.00 sec
+      Start 24: vedit-workspace-project-selftest
+Could not find executable /vedit-build/target/qt6-build/src/app/workspace-lane-project/vedit-workspace-project-selftest
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/workspace-lane-project/vedit-workspace-project-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-project/vedit-workspace-project-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-project/Release/vedit-workspace-project-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-project/Release/vedit-workspace-project-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-project/Debug/vedit-workspace-project-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-project/Debug/vedit-workspace-project-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-project/MinSizeRel/vedit-workspace-project-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-project/MinSizeRel/vedit-workspace-project-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-project/RelWithDebInfo/vedit-workspace-project-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-project/RelWithDebInfo/vedit-workspace-project-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-project/Deployment/vedit-workspace-project-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-project/Deployment/vedit-workspace-project-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-project/Development/vedit-workspace-project-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-project/Development/vedit-workspace-project-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-project/vedit-workspace-project-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-project/vedit-workspace-project-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-project/Release/vedit-workspace-project-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-project/Release/vedit-workspace-project-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-project/Debug/vedit-workspace-project-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-project/Debug/vedit-workspace-project-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-project/MinSizeRel/vedit-workspace-project-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-project/MinSizeRel/vedit-workspace-project-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-project/RelWithDebInfo/vedit-workspace-project-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-project/RelWithDebInfo/vedit-workspace-project-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-project/Deployment/vedit-workspace-project-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-project/Deployment/vedit-workspace-project-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-project/Development/vedit-workspace-project-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-project/Development/vedit-workspace-project-selftest
+Unable to find executable: /vedit-build/target/qt6-build/src/app/workspace-lane-project/vedit-workspace-project-selftest
+24/31 Test #24: vedit-workspace-project-selftest ...............***Not Run   0.00 sec
+      Start 25: vedit-workspace-diagnostics-selftest
+Could not find executable /vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-workspace-diagnostics-selftest
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-workspace-diagnostics-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-workspace-diagnostics-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Release/vedit-workspace-diagnostics-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Release/vedit-workspace-diagnostics-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Debug/vedit-workspace-diagnostics-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Debug/vedit-workspace-diagnostics-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/MinSizeRel/vedit-workspace-diagnostics-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/MinSizeRel/vedit-workspace-diagnostics-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/RelWithDebInfo/vedit-workspace-diagnostics-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/RelWithDebInfo/vedit-workspace-diagnostics-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Deployment/vedit-workspace-diagnostics-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Deployment/vedit-workspace-diagnostics-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Development/vedit-workspace-diagnostics-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Development/vedit-workspace-diagnostics-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-workspace-diagnostics-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-workspace-diagnostics-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Release/vedit-workspace-diagnostics-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Release/vedit-workspace-diagnostics-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Debug/vedit-workspace-diagnostics-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Debug/vedit-workspace-diagnostics-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/MinSizeRel/vedit-workspace-diagnostics-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/MinSizeRel/vedit-workspace-diagnostics-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/RelWithDebInfo/vedit-workspace-diagnostics-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/RelWithDebInfo/vedit-workspace-diagnostics-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Deployment/vedit-workspace-diagnostics-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Deployment/vedit-workspace-diagnostics-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Development/vedit-workspace-diagnostics-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Development/vedit-workspace-diagnostics-selftest
+Unable to find executable: /vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-workspace-diagnostics-selftest
+25/31 Test #25: vedit-workspace-diagnostics-selftest ...........***Not Run   0.00 sec
+      Start 26: vedit-toolchain-missing-selftest
+Could not find executable /vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-toolchain-selftest
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-toolchain-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-toolchain-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Release/vedit-toolchain-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Release/vedit-toolchain-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Debug/vedit-toolchain-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Debug/vedit-toolchain-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/MinSizeRel/vedit-toolchain-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/MinSizeRel/vedit-toolchain-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/RelWithDebInfo/vedit-toolchain-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/RelWithDebInfo/vedit-toolchain-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Deployment/vedit-toolchain-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Deployment/vedit-toolchain-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Development/vedit-toolchain-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Development/vedit-toolchain-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-toolchain-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-toolchain-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Release/vedit-toolchain-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Release/vedit-toolchain-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Debug/vedit-toolchain-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Debug/vedit-toolchain-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/MinSizeRel/vedit-toolchain-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/MinSizeRel/vedit-toolchain-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/RelWithDebInfo/vedit-toolchain-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/RelWithDebInfo/vedit-toolchain-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Deployment/vedit-toolchain-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Deployment/vedit-toolchain-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Development/vedit-toolchain-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Development/vedit-toolchain-selftest
+Unable to find executable: /vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-toolchain-selftest
+26/31 Test #26: vedit-toolchain-missing-selftest ...............***Not Run   0.00 sec
+      Start 27: vedit-diagnostics-ffi-selftest
+Could not find executable /vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-diagnostics-ffi-selftest
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-diagnostics-ffi-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-diagnostics-ffi-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Release/vedit-diagnostics-ffi-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Release/vedit-diagnostics-ffi-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Debug/vedit-diagnostics-ffi-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Debug/vedit-diagnostics-ffi-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/MinSizeRel/vedit-diagnostics-ffi-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/MinSizeRel/vedit-diagnostics-ffi-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/RelWithDebInfo/vedit-diagnostics-ffi-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/RelWithDebInfo/vedit-diagnostics-ffi-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Deployment/vedit-diagnostics-ffi-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Deployment/vedit-diagnostics-ffi-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Development/vedit-diagnostics-ffi-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Development/vedit-diagnostics-ffi-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-diagnostics-ffi-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-diagnostics-ffi-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Release/vedit-diagnostics-ffi-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Release/vedit-diagnostics-ffi-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Debug/vedit-diagnostics-ffi-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Debug/vedit-diagnostics-ffi-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/MinSizeRel/vedit-diagnostics-ffi-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/MinSizeRel/vedit-diagnostics-ffi-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/RelWithDebInfo/vedit-diagnostics-ffi-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/RelWithDebInfo/vedit-diagnostics-ffi-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Deployment/vedit-diagnostics-ffi-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Deployment/vedit-diagnostics-ffi-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Development/vedit-diagnostics-ffi-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Development/vedit-diagnostics-ffi-selftest
+Unable to find executable: /vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-diagnostics-ffi-selftest
+27/31 Test #27: vedit-diagnostics-ffi-selftest .................***Not Run   0.00 sec
+      Start 28: vedit-diagnostics-product-seam
+Could not find executable /vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-diagnostics-product-seam
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-diagnostics-product-seam
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-diagnostics-product-seam
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Release/vedit-diagnostics-product-seam
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Release/vedit-diagnostics-product-seam
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Debug/vedit-diagnostics-product-seam
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Debug/vedit-diagnostics-product-seam
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/MinSizeRel/vedit-diagnostics-product-seam
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/MinSizeRel/vedit-diagnostics-product-seam
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/RelWithDebInfo/vedit-diagnostics-product-seam
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/RelWithDebInfo/vedit-diagnostics-product-seam
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Deployment/vedit-diagnostics-product-seam
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Deployment/vedit-diagnostics-product-seam
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Development/vedit-diagnostics-product-seam
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Development/vedit-diagnostics-product-seam
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-diagnostics-product-seam
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-diagnostics-product-seam
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Release/vedit-diagnostics-product-seam
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Release/vedit-diagnostics-product-seam
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Debug/vedit-diagnostics-product-seam
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Debug/vedit-diagnostics-product-seam
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/MinSizeRel/vedit-diagnostics-product-seam
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/MinSizeRel/vedit-diagnostics-product-seam
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/RelWithDebInfo/vedit-diagnostics-product-seam
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/RelWithDebInfo/vedit-diagnostics-product-seam
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Deployment/vedit-diagnostics-product-seam
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Deployment/vedit-diagnostics-product-seam
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Development/vedit-diagnostics-product-seam
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Development/vedit-diagnostics-product-seam
+Unable to find executable: /vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-diagnostics-product-seam
+28/31 Test #28: vedit-diagnostics-product-seam .................***Not Run   0.00 sec
+      Start 29: vedit-toolchain-ux-selftest
+Could not find executable /vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-toolchain-ux-selftest
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-toolchain-ux-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-toolchain-ux-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Release/vedit-toolchain-ux-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Release/vedit-toolchain-ux-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Debug/vedit-toolchain-ux-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Debug/vedit-toolchain-ux-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/MinSizeRel/vedit-toolchain-ux-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/MinSizeRel/vedit-toolchain-ux-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/RelWithDebInfo/vedit-toolchain-ux-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/RelWithDebInfo/vedit-toolchain-ux-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Deployment/vedit-toolchain-ux-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Deployment/vedit-toolchain-ux-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Development/vedit-toolchain-ux-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Development/vedit-toolchain-ux-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-toolchain-ux-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-toolchain-ux-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Release/vedit-toolchain-ux-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Release/vedit-toolchain-ux-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Debug/vedit-toolchain-ux-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Debug/vedit-toolchain-ux-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/MinSizeRel/vedit-toolchain-ux-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/MinSizeRel/vedit-toolchain-ux-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/RelWithDebInfo/vedit-toolchain-ux-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/RelWithDebInfo/vedit-toolchain-ux-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Deployment/vedit-toolchain-ux-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Deployment/vedit-toolchain-ux-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Development/vedit-toolchain-ux-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/Development/vedit-toolchain-ux-selftest
+Unable to find executable: /vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-toolchain-ux-selftest
+29/31 Test #29: vedit-toolchain-ux-selftest ....................***Not Run   0.00 sec
+      Start 30: vedit-workspace-vcs-selftest
+Could not find executable /vedit-build/target/qt6-build/src/app/workspace-lane-vcs/vedit-workspace-vcs-selftest
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/workspace-lane-vcs/vedit-workspace-vcs-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-vcs/vedit-workspace-vcs-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-vcs/Release/vedit-workspace-vcs-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-vcs/Release/vedit-workspace-vcs-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-vcs/Debug/vedit-workspace-vcs-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-vcs/Debug/vedit-workspace-vcs-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-vcs/MinSizeRel/vedit-workspace-vcs-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-vcs/MinSizeRel/vedit-workspace-vcs-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-vcs/RelWithDebInfo/vedit-workspace-vcs-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-vcs/RelWithDebInfo/vedit-workspace-vcs-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-vcs/Deployment/vedit-workspace-vcs-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-vcs/Deployment/vedit-workspace-vcs-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-vcs/Development/vedit-workspace-vcs-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-vcs/Development/vedit-workspace-vcs-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-vcs/vedit-workspace-vcs-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-vcs/vedit-workspace-vcs-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-vcs/Release/vedit-workspace-vcs-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-vcs/Release/vedit-workspace-vcs-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-vcs/Debug/vedit-workspace-vcs-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-vcs/Debug/vedit-workspace-vcs-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-vcs/MinSizeRel/vedit-workspace-vcs-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-vcs/MinSizeRel/vedit-workspace-vcs-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-vcs/RelWithDebInfo/vedit-workspace-vcs-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-vcs/RelWithDebInfo/vedit-workspace-vcs-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-vcs/Deployment/vedit-workspace-vcs-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-vcs/Deployment/vedit-workspace-vcs-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-vcs/Development/vedit-workspace-vcs-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-vcs/Development/vedit-workspace-vcs-selftest
+Unable to find executable: /vedit-build/target/qt6-build/src/app/workspace-lane-vcs/vedit-workspace-vcs-selftest
+30/31 Test #30: vedit-workspace-vcs-selftest ...................***Not Run   0.00 sec
+      Start 31: vedit-workspace-settings-selftest
+Could not find executable /vedit-build/target/qt6-build/src/app/workspace-lane-settings/vedit-workspace-settings-selftest
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/workspace-lane-settings/vedit-workspace-settings-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-settings/vedit-workspace-settings-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-settings/Release/vedit-workspace-settings-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-settings/Release/vedit-workspace-settings-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-settings/Debug/vedit-workspace-settings-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-settings/Debug/vedit-workspace-settings-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-settings/MinSizeRel/vedit-workspace-settings-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-settings/MinSizeRel/vedit-workspace-settings-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-settings/RelWithDebInfo/vedit-workspace-settings-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-settings/RelWithDebInfo/vedit-workspace-settings-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-settings/Deployment/vedit-workspace-settings-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-settings/Deployment/vedit-workspace-settings-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-settings/Development/vedit-workspace-settings-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-settings/Development/vedit-workspace-settings-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-settings/vedit-workspace-settings-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-settings/vedit-workspace-settings-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-settings/Release/vedit-workspace-settings-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-settings/Release/vedit-workspace-settings-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-settings/Debug/vedit-workspace-settings-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-settings/Debug/vedit-workspace-settings-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-settings/MinSizeRel/vedit-workspace-settings-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-settings/MinSizeRel/vedit-workspace-settings-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-settings/RelWithDebInfo/vedit-workspace-settings-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-settings/RelWithDebInfo/vedit-workspace-settings-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-settings/Deployment/vedit-workspace-settings-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-settings/Deployment/vedit-workspace-settings-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-settings/Development/vedit-workspace-settings-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-settings/Development/vedit-workspace-settings-selftest
+Unable to find executable: /vedit-build/target/qt6-build/src/app/workspace-lane-settings/vedit-workspace-settings-selftest
+31/31 Test #31: vedit-workspace-settings-selftest ..............***Not Run   0.00 sec
+
+0% tests passed, 31 tests failed out of 31
+
+Total Test time (real) =   0.01 sec
+
+The following tests FAILED:
+	  1 - vedit-app-syntax-startup (Not Run)
+	  2 - vedit-m0-smoke (Not Run)
+	  3 - vedit-syntax-provider-tests (Not Run)
+	  4 - vedit-syntax-kde-data (Not Run)
+	  5 - vedit-syntax-directory-equivalence (Not Run)
+	  6 - vedit-syn-grammars-tests (Not Run)
+	  7 - vedit-syntax-product-tests (Not Run)
+	  8 - vedit-terminal-selftest (Not Run)
+	  9 - vedit-syntax-overlay-selftest (Not Run)
+	 10 - vedit-app-ffi-abi-selftest (Not Run)
+	 11 - vedit-app-shell-selftest (Not Run)
+	 12 - vedit-app-crash-reporter-selftest (Not Run)
+	 13 - vedit-app-crash-report-shipped (Failed)
+	 14 - vedit-native-fold-tests (Not Run)
+	 15 - vedit-edit-core-selftest (Not Run)
+	 16 - vedit-fim-wiring-selftest (Not Run)
+	 17 - vedit-syntax-directory-tests (Not Run)
+	 18 - vedit-fold-gutter-click (Not Run)
+	 19 - vedit-breadcrumb-tests (Not Run)
+	 20 - vedit-fim-selftest (Not Run)
+	 21 - vedit-workspace-palette-selftest (Not Run)
+	 22 - vedit-workspace-palette-integration-selftest (Not Run)
+	 23 - vedit-workspace-search-selftest (Not Run)
+	 24 - vedit-workspace-project-selftest (Not Run)
+	 25 - vedit-workspace-diagnostics-selftest (Not Run)
+	 26 - vedit-toolchain-missing-selftest (Not Run)
+	 27 - vedit-diagnostics-ffi-selftest (Not Run)
+	 28 - vedit-diagnostics-product-seam (Not Run)
+	 29 - vedit-toolchain-ux-selftest (Not Run)
+	 30 - vedit-workspace-vcs-selftest (Not Run)
+	 31 - vedit-workspace-settings-selftest (Not Run)
+Errors while running CTest

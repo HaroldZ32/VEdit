@@ -1,0 +1,13 @@
+## screenshots (sha256 + dimensions)
+10-horizontal-split.png abb916e3b73be162357e60b41e8d2042da5c017e10f700befffbd7415c5c7743 1440 x 900
+11-vertical-split.png b19081c13616d76ce66abeb0ff3413f72943ea1a9918e02a2bcd2ee090702210 1440 x 900
+12-panels-and-docks.png 5c1093bdbe916a174d7a0c753cdd165f385bce52ac281e8c2e5335e2c4d23d44 1440 x 900
+13-empty-state-no-project.png 7e3a5ad303a7cc45f6e4a6b6d80e386929b0b1a932d00692d18e7ebd0a5ce710 1440 x 900
+
+## xcb selfcheck summary
+APP-SHELL-SELFTEST ok=1 checks=73 failures=0 state=/tmp/vedit-app-ivwRpb/state
+
+## ctest summary
+1/1 Test #2: vedit-app-shell-selftest .........   Passed    0.12 sec
+The following tests passed:
+100% tests passed, 0 tests failed out of 1

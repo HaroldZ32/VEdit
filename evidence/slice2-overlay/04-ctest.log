@@ -1,0 +1,112 @@
+## C9 collection header — T18 overlay ctest: FULL root ctest, then the lane's own entry (FINAL re-collection; F5 fix)
+## collected_at: 2026-11-01T14:09:11+08:00
+## collected_at_utc: 2026-11-01T06:09:11Z
+## git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+## git_head_subject: docs(evidence): record the stop-point release, the T90/T91 landing and the tarball version warning
+## git_status_porcelain (collection-time snapshot; SHARED worktree, so other lanes' in-flight files appear too):
+##    M build/evidence/typecheck/00-run.txt
+##    M build/evidence/typecheck/10-typecheck-image-build.log
+##    M build/evidence/typecheck/11-typecheck-image-id.txt
+##    M crates/vd-ffi/include/vd_ffi.h
+##    M crates/vd-ffi/src/search.rs
+##    M crates/vd-ffi/src/vcs.rs
+##    M crates/vd-search/src/lib.rs
+##    M crates/vd-vcs/src/lib.rs
+##    M evidence/ffi-abi/logs/10-rust-image.txt
+##    M evidence/ffi-abi/logs/19-rust-stage-console.log
+##    M evidence/ffi-abi/logs/20-cargo-build-release.log
+##    M evidence/ffi-abi/logs/21-staticlib.txt
+##    M evidence/ffi-abi/logs/23-cargo-test.log
+##    M evidence/ffi-abi/logs/26-vd_ffi.h
+##    M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+##    M evidence/m0-build/build-logs/20-qt6-image-build.log
+##    M evidence/m0-build/build-logs/21-qt6-image-id.txt
+##    M evidence/m0-build/build-logs/31-qt6-configure.log
+##    M evidence/m0-build/build-logs/32-qt6-build.log
+##    M evidence/m0-build/build-logs/34-qt6-elf.txt
+##    M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+##    M src/app/CMakeLists.txt
+##    M src/syntax/provider/CMakeLists.txt
+##    M src/syntax/provider/syntax_provider.h
+##    M src/syntax/provider/tree_sitter_provider.cpp
+##    M src/syntax/provider/tree_sitter_provider.h
+##    M src/workspace/integration.cpp
+##    M src/workspace/palette/README.md
+##    M src/workspace/search/CMakeLists.txt
+##    M src/workspace/search/README.md
+##    M src/workspace/search/global_search.cpp
+##    M src/workspace/search/global_search.h
+##   ?? crates/vd-vcs/src/runner.rs
+##   ?? crates/vd-vcs/src/service.rs
+##   ?? crates/vd-vcs/tests/
+##   ?? evidence/a4-fold/
+##   ?? evidence/provider-range-query/
+##   ?? evidence/slice2-find/
+##   ?? evidence/slice2-fold/
+##   ?? evidence/slice2-overlay/
+##   ?? evidence/slice2-vcs/
+##   ?? evidence/verdicts/overlay/
+##   ?? src/syntax/folding/
+##   ?? src/syntax/overlay/
+##   ?? src/syntax/provider/syntax_provider.cpp
+##   ?? src/workspace/breadcrumb/
+##   ?? src/workspace/vcs/
+## machine: AMD Ryzen 7 7840H w/ Radeon 780M Graphics | nproc=16 | kernel=7.0.0-38-generic | mem=30496356 kB
+## loadavg_at_collection: 5.27 5.44 4.77 2/1980 21
+## image: vedit-qt6-build:local sha256:06699ee6db616de7704c46bb5edb3db1be6efe440cfb52e3783175badd647b1e
+## host: Linux 7.0.0-38-generic x86_64 GNU/Linux
+## lane_sources (src/syntax/overlay is UNTRACKED in git, so these hashes are what binds this evidence to the code it measured):
+##   9594bd916073f1d17764800626eb9edcf1f7581386ee98f94aa48c477f1d45e3  src/syntax/overlay/CMakeLists.txt
+##   5d78c565b13aca87d2174100c0b73ad3e96f71a6d85dec6d1b4826b725ccfe9e  src/syntax/overlay/overlay.cpp
+##   c01585d71cb98bdec5bc26980cdb9add12909baad7cdbf7cce85bda6c1d8e8a8  src/syntax/overlay/overlay.h
+##   7b0752e49f6d1d2fa37e8c60e8aca53216de66e862763bd8746f37c5e5ef7ee6  src/syntax/overlay/overlay_selftest.cpp
+##   f89da4da9b4c3ef7229e9f9f4bade9314f8a0dafca6b54e449357fbbd43f0946  src/syntax/overlay/paint.cpp
+##   7f449eb1df45997d89aa93a60d4512542e8c747cd1351b01e4349faf1130cc7f  src/syntax/overlay/paint.h
+##   e252aa29468c5ed6cae88d4a9618314f01b6a8b0e73f759e61aff02d9b7fa3e7  src/syntax/overlay/README.md
+## command: ctest --test-dir target/qt6-build --output-on-failure ; ctest --test-dir target/qt6-build -R vedit-syntax-overlay-selftest --output-on-failure
+
+## [1/2] FULL root ctest at 2026-11-01T14:09:11+08:00
+      Start 10: vedit-app-shell-selftest
+10/20 Test #10: vedit-app-shell-selftest .......................   Passed    0.32 sec
+      Start 11: vedit-edit-core-selftest
+11/20 Test #11: vedit-edit-core-selftest .......................   Passed    0.09 sec
+      Start 12: vedit-workspace-palette-selftest
+12/20 Test #12: vedit-workspace-palette-selftest ...............   Passed    0.10 sec
+      Start 13: vedit-workspace-palette-integration-selftest
+13/20 Test #13: vedit-workspace-palette-integration-selftest ...   Passed    0.11 sec
+      Start 14: vedit-workspace-search-selftest
+14/20 Test #14: vedit-workspace-search-selftest ................   Passed   12.16 sec
+      Start 15: vedit-workspace-project-selftest
+15/20 Test #15: vedit-workspace-project-selftest ...............   Passed    0.05 sec
+      Start 16: vedit-workspace-diagnostics-selftest
+16/20 Test #16: vedit-workspace-diagnostics-selftest ...........   Passed    0.01 sec
+      Start 17: vedit-toolchain-missing-selftest
+17/20 Test #17: vedit-toolchain-missing-selftest ...............   Passed    0.00 sec
+      Start 18: vedit-diagnostics-ffi-selftest
+18/20 Test #18: vedit-diagnostics-ffi-selftest .................   Passed    3.11 sec
+      Start 19: vedit-toolchain-ux-selftest
+19/20 Test #19: vedit-toolchain-ux-selftest ....................   Passed    3.13 sec
+      Start 20: vedit-workspace-vcs-selftest
+20/20 Test #20: vedit-workspace-vcs-selftest ...................   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 20
+
+Total Test time (real) =  24.31 sec
+FULL_CTEST_EXIT=0
+
+## [2/2] lane ctest at 2026-11-01T14:09:36+08:00
+Test project /vedit-build/target/qt6-build
+    Start 8: vedit-syntax-overlay-selftest
+1/1 Test #8: vedit-syntax-overlay-selftest ....   Passed    2.10 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   2.10 sec
+LANE_CTEST_EXIT=0
+
+## backfill: 2026-11-01T14:12:28+08:00 — binding reconciliation (post-hoc note, NOT the original collection time)
+##   The binary these runs actually executed was built in the 01-build step (14:08:16-14:08:20) from
+##   src/syntax/overlay/overlay_selftest.cpp sha256=8cb45b65d8d6ae2676538ecad53fb82ce15570feb9a934681027b3b196e7e125
+##   (recorded in the 01/02 headers). The lane_sources block ABOVE is a snapshot taken when this log's
+##   header was written and had already drifted (the lane owner edited the untracked file during T93: see
+##   evidence/slice2-overlay/07-binding.txt). For number/check interpretation the binary + 01/02 hash win.

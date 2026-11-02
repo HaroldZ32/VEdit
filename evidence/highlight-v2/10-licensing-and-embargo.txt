@@ -1,0 +1,40 @@
+# C11 / licensing: what the syntax stack ships, and what it refuses.
+# collection: 2026-10-31T10:39:36Z rev=8fedbdd8d2d62da5d5c91555ddfec624afcd143e
+
+## resources/syntax — the ONLY definitions the product ships
+total 48
+-rw-r--r-- 1 haroldzhao haroldzhao 26419 Oct 31 11:56 LICENSE-LGPL-2.1
+-rw-r--r-- 1 haroldzhao haroldzhao  1426 Oct 31 11:59 README.md
+-rw-r--r-- 1 haroldzhao haroldzhao  6276 Oct 31 11:56 vedit-systemverilog.xml
+-rw-r--r-- 1 haroldzhao haroldzhao  5172 Oct 31 11:56 vedit-verilog.xml
+
+dc6e0a4714762764b9386471bb09e2550c1a9cbcf2b8f67f1a1200f677726f9d  resources/syntax/vedit-systemverilog.xml
+3d1ec41f0871c001f560ca58b3178bdfd7508ff5f25d095c15820d2feda43e49  resources/syntax/vedit-verilog.xml
+
+## the product's loader reports (real startup line, from 09-screenshot-L2.log)
+embargoed=[]
+
+## KDE GPLv3+ definitions: not present in our data dir (the loader refuses them by sha256)
+KDE definition files in resources/syntax: 0
+0
+loader embargo list at startup: embargoed=[] (see 01-after-link.txt)
+
+## tree-sitter-verilog: MIT, vendored with provenance
+MIT License
+
+Copyright (c) 2018-2021 Aliaksei Chapyzhenka
+8:### 1.1 `verilog/` — tree-sitter-verilog（上游 MIT，已内置）
+15:| 许可 | **MIT**，`LICENSE` 全文随包（© 2018-2021 Aliaksei Chapyzhenka） |
+17:| 为何选它 | `evidence/r2-license/report.md` §0.3 认定它是 Lapce 机制解析到的**唯一身份**；MIT 与静态编入单一二进制兼容，只需保留通知（本文件 §3） |
+
+## packaging guard (pre-existing, unchanged by this task)
+5:#   (1) FILE level  — are KDE's systemverilog.xml / verilog.xml copied into the
+51:[ "$kde_hits" -eq 0 ] && ok "no KDE systemverilog.xml / verilog.xml by sha256"
+53:for n in systemverilog.xml verilog.xml; do
+58:ok "no file named systemverilog.xml / verilog.xml"
+
+# NOTE (T62, 2026-10-31): the sha256/size values above were captured before T45
+# rewrote the two XMLs; they are historical snapshot values and are left
+# unchanged. Current values: THIRD_PARTY_NOTICES.md §9.1 (verilog c6adc763…
+# 85/5,111; systemverilog 2abba334… 90/5,492); recomputation in
+# evidence/licensing-hash-sync/.

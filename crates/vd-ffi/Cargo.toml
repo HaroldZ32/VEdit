@@ -1,0 +1,44 @@
+[package]
+name = "vd-ffi"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+description = "C ABI surface of the VEdit Rust service layer; the only crate allowed to contain unsafe (C3, AC-0.4)."
+
+[lib]
+name = "vd_ffi"
+# staticlib: linked into vedit-app (AC-S0.1/AC-S0.4). rlib: the ABI tests link
+# the same code as a Rust library, so the C surface is exercised by `cargo test`.
+crate-type = ["staticlib", "rlib"]
+
+# AC-0.4: the workspace forbids unsafe everywhere (Cargo.toml, workspace.lints).
+# This crate deliberately does NOT inherit that table — the boundary needs
+# `extern "C"` ownership transitions, and it is the single documented exception.
+# Every other lint the workspace declares is repeated here with the same level,
+# so the only difference between this crate and its neighbours is `unsafe_code`.
+[lints.rust]
+unsafe_code = "allow"
+
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+
+[dependencies]
+# The Rust service layer this crate exports. None of them may pull in GTK
+# (AC-0.3): vd-editor and vd-syntax are deliberately absent.
+vd-config = { path = "../vd-config" }
+vd-deeplint = { path = "../vd-deeplint" }
+vd-fim = { path = "../vd-fim" }
+vd-lsp = { path = "../vd-lsp" }
+vd-search = { path = "../vd-search" }
+vd-settings = { path = "../vd-settings" }
+vd-vcs = { path = "../vd-vcs" }
+serde_json.workspace = true
+
+[build-dependencies]
+# cbindgen generates include/vd_ffi.h from the `extern "C"` surface (C2).
+cbindgen = "0.29.3"
+
+[dev-dependencies]
+tempfile.workspace = true

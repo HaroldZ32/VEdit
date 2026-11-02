@@ -1,0 +1,40 @@
+== Qt lane build (standalone, with the Rust C ABI) ==
+collected_at: 2026-11-01T05:58:03Z
+git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+cmd: cmake -S src/workspace/vcs -B target/vcs-build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo ; cmake --build target/vcs-build
+--- output ---
+CONFIGURE-EXIT=0
+-- workspace-vcs: linking the vd-ffi VCS ABI (/vedit-build/src/workspace/vcs/../../../target/release/libvd_ffi.a)
+BUILD-EXIT=0
+WORKSPACE-VCS-SELFTEST start
+CHECK vcs.panel.empty-state.backend-none PASS No repository
+CHECK vcs.panel.empty-state.header PASS No repository
+CHECK vcs.panel.empty-state.note-visible PASS not a Git or Subversion working tree
+CHECK vcs.panel.empty-state.no-files PASS
+CHECK vcs.panel.empty-state.stub-queried PASS calls=1
+CHECK vcs.panel.empty-state.no-write-attempt PASS
+CHECK vcs.panel.git.backend PASS Git feature/vcs-panel @ abc1234 · 2 changed file(s)
+CHECK vcs.panel.git.branch-and-revision PASS Git feature/vcs-panel @ abc1234 · 2 changed file(s)
+CHECK vcs.panel.git.changed-file-count PASS rows=2
+CHECK vcs.panel.git.file-row PASS rtl/top.sv  modified
+CHECK vcs.panel.git.added-row PASS rtl/added.sv  added
+CHECK vcs.panel.git.empty-state-hidden PASS
+CHECK vcs.panel.diff.shown PASS diff --git a/rtl/top.sv b/rtl/top.sv
+CHECK vcs.panel.diff.read-only PASS
+CHECK vcs.panel.diff.missing-is-a-note PASS rtl/missing.sv: stub has no diff for this path
+CHECK vcs.panel.diff.no-write-attempt PASS calls=4
+CHECK vcs.panel.svn.backend-and-revision PASS Subversion trunk @ 42 · 1 changed file(s)
+CHECK vcs.panel.svn.file-count PASS Subversion trunk @ 42 · 1 changed file(s)
+CHECK vcs.panel.no-source.empty-state PASS No repository
+CHECK vcs.panel.refresh.empty-stays-empty PASS
+CHECK vcs.panel.refresh.populates PASS
+CHECK vcs.ffi.info-empty-state PASS not a Git or Subversion working tree
+CHECK vcs.ffi.diff-empty-state PASS not a repository
+CHECK vcs.ffi.read-only-surface PASS vd_vcs_info / vd_vcs_diff only; no write entry point
+WORKSPACE-VCS-SELFTEST ok=1 checks=24 failures=0
+SELFTEST-EXIT=0
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.02 sec
+CTEST-EXIT=0

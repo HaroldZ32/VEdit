@@ -1,0 +1,48 @@
+== run build/verilog --tree-sitter=off ==
+TREE_SITTER_REQUESTED=off
+PROVIDER=disabled
+PROVIDER_VERSION=n/a
+PROVIDER_LICENSE=n/a
+CAPABILITIES parse=0 query=0 highlight=0 fold=0 structure=0
+CHECK input.read(tests/sample.json) PASS
+PARSED_NONEMPTY=0
+CHECK fallback.parse.null PASS
+CHECK fallback.no.spans PASS
+CHECK fallback.no.folds PASS
+CHECK fallback.no.structure PASS
+CHECK fallback.no.queries PASS
+FALLBACK_PATH=ksyntaxhighlighting-only (tree-sitter unavailable)
+RESULT=PASS failures=0
+[run verilog off exit=0]
+== run build/json --tree-sitter=off ==
+TREE_SITTER_REQUESTED=off
+PROVIDER=disabled
+PROVIDER_VERSION=n/a
+PROVIDER_LICENSE=n/a
+CAPABILITIES parse=0 query=0 highlight=0 fold=0 structure=0
+CHECK input.read(tests/sample.json) PASS
+PARSED_NONEMPTY=0
+CHECK fallback.parse.null PASS
+CHECK fallback.no.spans PASS
+CHECK fallback.no.folds PASS
+CHECK fallback.no.structure PASS
+CHECK fallback.no.queries PASS
+FALLBACK_PATH=ksyntaxhighlighting-only (tree-sitter unavailable)
+RESULT=PASS failures=0
+[run json off exit=0]
+== run build/nots (tree-sitter not compiled in) ==
+TREE_SITTER_REQUESTED=on
+PROVIDER=disabled
+PROVIDER_VERSION=n/a
+PROVIDER_LICENSE=n/a
+CAPABILITIES parse=0 query=0 highlight=0 fold=0 structure=0
+CHECK input.read(tests/sample.json) PASS
+PARSED_NONEMPTY=0
+CHECK fallback.parse.null PASS
+CHECK fallback.no.spans PASS
+CHECK fallback.no.folds PASS
+CHECK fallback.no.structure PASS
+CHECK fallback.no.queries PASS
+FALLBACK_PATH=ksyntaxhighlighting-only (tree-sitter unavailable)
+RESULT=PASS failures=0
+[run nots exit=0]

@@ -1,0 +1,21 @@
+== evidence: 03-h3-panel-refresh.log — did a finished analysis ever reach the panel? ==
+time=2026-11-01T19:12:11+08:00
+
+### BEFORE (git HEAD): DiagnosticsPanel refreshed only in its constructor
+$ git show HEAD:src/workspace/diagnostics/diagnostics_panel.cpp | grep -n "refreshFromController|QTimer"
+41:    refreshFromController();
+72:void DiagnosticsPanel::refreshFromController()
+(no QTimer, one refreshFromController() at the end of the constructor)
+
+### BEFORE (git HEAD): nothing polled controller.refresh() after startup
+$ git show HEAD:src/workspace/diagnostics/diagnostics_integration.cpp | grep -n "refresh()"
+186:        controller->refresh();
+(the panel factory calls it once when the dock is created)
+
+### AFTER: the panel owns a 300 ms poll timer (the selftest drives it for real: no manual refresh)
+$ grep -n "pollTimer_|void DiagnosticsPanel::poll" src/workspace/diagnostics/diagnostics_panel.cpp
+50:    pollTimer_ = new QTimer(this);
+51:    pollTimer_->setInterval(300);
+52:    connect(pollTimer_, &QTimer::timeout, this, [this]() { poll(); });
+53:    pollTimer_->start();
+56:void DiagnosticsPanel::poll()

@@ -1,0 +1,19 @@
+== search panel screenshots (current Rust-backed build) ==
+collected_at: 2026-11-01T05:45:27Z
+git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+cmd: <selftest> --screenshots evidence/slice2-find/screenshots   (root; see note)
+note: unreadable-root screenshot exists in the non-root selftest log instead; as root chmod 000 does not deny access.
+--- output ---
+search: installSearch projectRoot='/tmp/vedit-workspace-search-selftest-RkJKtR' jumpTarget=editor
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: installSearch projectRoot='' jumpTarget=editor
+This plugin does not support propagateSizeHints()
+SHOT /vedit-build/evidence/slice2-find/screenshots/01-search-results.png written 1280x860
+SHOT /vedit-build/evidence/slice2-find/screenshots/03-search-jump.png written 1280x860
+SHOT /vedit-build/evidence/slice2-find/screenshots/02-search-empty-state.png written 1280x860
+SHOT /vedit-build/evidence/slice2-find/screenshots/04-search-no-project.png written 1280x860
+SCREENSHOTS ok=1 failures=0
+SCREENSHOTS-EXIT=0

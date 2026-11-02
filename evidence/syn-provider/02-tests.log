@@ -1,0 +1,165 @@
+== 02 unit tests (ctest, external + static variants) ==
+== external: ctest ==
+Test project /vedit-build/target/syn-provider/external
+    Start 1: vedit-syntax-provider-tests
+1/1 Test #1: vedit-syntax-provider-tests ......   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.00 sec
+[ctest external exit=0]
+== external: test binary (full CHECK output) ==
+CHECK compiletime.grammar-matches-build-option PASS  external
+CHECK compiletime.tree-sitter-flag PASS  true
+CHECK compiletime.runtime-switch-wired PASS
+CHECK arbiter.base-default PASS
+CHECK arbiter.base-owner-id PASS
+CHECK arbiter.single-owner-default PASS  single owner across 1 span(s)
+CHECK arbiter.claim-granted PASS  granted
+CHECK arbiter.overlay-owns-range PASS
+CHECK arbiter.segments-partition PASS  [0,10:1][10,30:2][30,100:1] single owner across 1 span(s)
+CHECK arbiter.segments-count PASS  [0,10:1][10,30:2][30,100:1]
+CHECK arbiter.no-double-color PASS
+CHECK arbiter.overlap-conflict PASS  range already owned by overlay 'tree-sitter'
+CHECK arbiter.conflict-reports-owner PASS  tree-sitter
+CHECK arbiter.adjacent-claim-granted PASS  granted
+CHECK arbiter.overlap-free-single-owner PASS  single owner across 4 span(s)
+CHECK arbiter.release-splits PASS
+CHECK arbiter.release-falls-back-to-base PASS
+CHECK arbiter.release-keeps-single-owner PASS  single owner across 6 span(s)
+CHECK arbiter.release-unowned-returns-false PASS
+CHECK arbiter.base-disabled-none PASS
+CHECK arbiter.base-disabled-still-partitions PASS  single owner across 6 span(s)
+CHECK arbiter.release-all PASS
+CHECK arbiter.release-all-leaves-other-overlay PASS  [0,10:1][10,15:2][15,20:1][20,30:2][30,100:1]
+CHECK arbiter.release-all-keeps-single-owner PASS  single owner across 5 span(s)
+CHECK arbiter.release-second-overlay PASS
+CHECK arbiter.release-all-base-only PASS  [0,100:1]
+CHECK arbiter.other-language-independent PASS
+CHECK arbiter.invalid-range PASS
+CHECK registry.register PASS
+CHECK registry.duplicate-rejected PASS
+CHECK registry.missing-binding-invalid PASS
+CHECK registry.ids-contain-fixture PASS
+CHECK service.activate-fixture PASS
+CHECK service.active-id PASS
+CHECK service.available PASS
+CHECK service.provider-created PASS
+CHECK provider.id PASS
+CHECK provider.license PASS
+CHECK provider.caps.parse PASS
+CHECK provider.caps.query-ranges PASS
+CHECK provider.caps.highlight-spans PASS
+CHECK provider.caps.fold-ranges PASS
+CHECK provider.caps.breadcrumbs PASS
+CHECK provider.caps.incremental-edit-sync PASS
+CHECK provider.parse-non-null PASS
+CHECK provider.no-syntax-errors PASS
+CHECK provider.text-roundtrip PASS
+CHECK provider.query-ids PASS
+CHECK provider.highlight-spans-nonempty PASS
+CHECK provider.query-ranges-nonempty PASS
+CHECK provider.breadcrumbs-nonempty PASS  "b" "c" 
+CHECK provider.breadcrumbs-nested-path PASS  "b" "c" 
+CHECK provider.fold-ranges-nonempty PASS
+CHECK provider.incremental.parse PASS
+CHECK provider.incremental.apply-edit PASS
+CHECK provider.incremental.text-updated PASS
+CHECK provider.incremental.tree-updated PASS  2 -> 4
+CHECK provider.incremental.invalid-edit-rejected PASS
+CHECK provider.bad-input-does-not-crash PASS
+CHECK provider.bad-input-reports-error PASS
+CHECK switch.disabled.available-false PASS
+CHECK switch.disabled.no-provider PASS
+CHECK switch.enabled.available-true PASS
+CHECK switch.enabled.provider PASS
+CHECK switch.deactivated.available-false PASS
+CHECK switch.unknown-grammar-rejected PASS
+CHECK switch.reactivate PASS
+CHECK fallback.disabled-provider-caps PASS
+CHECK fallback.disabled-provider-parse-null PASS
+CHECK fallback.disabled-provider-spans-empty PASS
+SYN-PROVIDER-TESTS ok=1 checks=70 failures=0
+[tests external exit=0]
+== static: ctest ==
+Test project /vedit-build/target/syn-provider/static
+    Start 1: vedit-syntax-provider-tests
+1/1 Test #1: vedit-syntax-provider-tests ......   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.00 sec
+[ctest static exit=0]
+== static: test binary (full CHECK output) ==
+CHECK compiletime.grammar-matches-build-option PASS  external
+CHECK compiletime.tree-sitter-flag PASS  true
+CHECK compiletime.runtime-switch-wired PASS
+CHECK arbiter.base-default PASS
+CHECK arbiter.base-owner-id PASS
+CHECK arbiter.single-owner-default PASS  single owner across 1 span(s)
+CHECK arbiter.claim-granted PASS  granted
+CHECK arbiter.overlay-owns-range PASS
+CHECK arbiter.segments-partition PASS  [0,10:1][10,30:2][30,100:1] single owner across 1 span(s)
+CHECK arbiter.segments-count PASS  [0,10:1][10,30:2][30,100:1]
+CHECK arbiter.no-double-color PASS
+CHECK arbiter.overlap-conflict PASS  range already owned by overlay 'tree-sitter'
+CHECK arbiter.conflict-reports-owner PASS  tree-sitter
+CHECK arbiter.adjacent-claim-granted PASS  granted
+CHECK arbiter.overlap-free-single-owner PASS  single owner across 4 span(s)
+CHECK arbiter.release-splits PASS
+CHECK arbiter.release-falls-back-to-base PASS
+CHECK arbiter.release-keeps-single-owner PASS  single owner across 6 span(s)
+CHECK arbiter.release-unowned-returns-false PASS
+CHECK arbiter.base-disabled-none PASS
+CHECK arbiter.base-disabled-still-partitions PASS  single owner across 6 span(s)
+CHECK arbiter.release-all PASS
+CHECK arbiter.release-all-leaves-other-overlay PASS  [0,10:1][10,15:2][15,20:1][20,30:2][30,100:1]
+CHECK arbiter.release-all-keeps-single-owner PASS  single owner across 5 span(s)
+CHECK arbiter.release-second-overlay PASS
+CHECK arbiter.release-all-base-only PASS  [0,100:1]
+CHECK arbiter.other-language-independent PASS
+CHECK arbiter.invalid-range PASS
+CHECK registry.register PASS
+CHECK registry.duplicate-rejected PASS
+CHECK registry.missing-binding-invalid PASS
+CHECK registry.ids-contain-fixture PASS
+CHECK service.activate-fixture PASS
+CHECK service.active-id PASS
+CHECK service.available PASS
+CHECK service.provider-created PASS
+CHECK provider.id PASS
+CHECK provider.license PASS
+CHECK provider.caps.parse PASS
+CHECK provider.caps.query-ranges PASS
+CHECK provider.caps.highlight-spans PASS
+CHECK provider.caps.fold-ranges PASS
+CHECK provider.caps.breadcrumbs PASS
+CHECK provider.caps.incremental-edit-sync PASS
+CHECK provider.parse-non-null PASS
+CHECK provider.no-syntax-errors PASS
+CHECK provider.text-roundtrip PASS
+CHECK provider.query-ids PASS
+CHECK provider.highlight-spans-nonempty PASS
+CHECK provider.query-ranges-nonempty PASS
+CHECK provider.breadcrumbs-nonempty PASS  "b" "c" 
+CHECK provider.breadcrumbs-nested-path PASS  "b" "c" 
+CHECK provider.fold-ranges-nonempty PASS
+CHECK provider.incremental.parse PASS
+CHECK provider.incremental.apply-edit PASS
+CHECK provider.incremental.text-updated PASS
+CHECK provider.incremental.tree-updated PASS  2 -> 4
+CHECK provider.incremental.invalid-edit-rejected PASS
+CHECK provider.bad-input-does-not-crash PASS
+CHECK provider.bad-input-reports-error PASS
+CHECK switch.disabled.available-false PASS
+CHECK switch.disabled.no-provider PASS
+CHECK switch.enabled.available-true PASS
+CHECK switch.enabled.provider PASS
+CHECK switch.deactivated.available-false PASS
+CHECK switch.unknown-grammar-rejected PASS
+CHECK switch.reactivate PASS
+CHECK fallback.disabled-provider-caps PASS
+CHECK fallback.disabled-provider-parse-null PASS
+CHECK fallback.disabled-provider-spans-empty PASS
+SYN-PROVIDER-TESTS ok=1 checks=70 failures=0
+[tests static exit=0]

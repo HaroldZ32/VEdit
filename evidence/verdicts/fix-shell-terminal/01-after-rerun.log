@@ -1,0 +1,25 @@
+=== AFTER (defect 2 + 3): current src/terminal
+BUILD_EXIT=0
+CHECK pty.master-fd.start PASS
+CHECK pty.master-fd.readable PASS /proc/16/fd
+CHECK pty.master-fd.not-inherited PASS 0->/dev/pts/0, 1->/dev/pts/0, 10->/dev/tty, 2->/dev/pts/0
+CHECK pty.master-fd.descendant-start PASS
+CHECK pty.master-fd.descendant-listed PASS total 0  lr-x------ 1 root root 64 Oct 31 14:13 0 -> /dev/null  lrwx------ 1 root root 64 Oct 31 14:13 1 -> /dev/pts/0  lrwx------ 1 root root 64 Oct 31 14:13 2 -> /dev/pts/0  
+CHECK pty.master-fd.descendant-not-inherited PASS total 0  lr-x------ 1 root root 64 Oct 31 14:13 0 -> /dev/null  lrwx------ 1 root root 64 Oct 31 14:13 1 -> /dev/pts/0  lrwx------ 1 root root 64 Oct 31 14:13 2 -> /dev/pts/0  
+CHECK pty.read-limit.start PASS
+CHECK pty.read-limit.finished PASS
+CHECK pty.read-limit.delivered PASS delivered=4194304 produced=4194304
+CHECK pty.read-limit.max-per-activation PASS max=65536 limit=65536
+CHECK pty.read-limit.cap-engaged PASS capped=11
+TERMINAL-SELFTEST ok=1 checks=112 failures=0
+=== AFTER (defect 1): deferred session restore (product order)
+BUILD_EXIT=0
+CHECK panel-seam.seed-session PASS
+CHECK panel-seam.deferred-nothing-inserted PASS
+CHECK panel-seam.dock-restored PASS
+CHECK panel-seam.terminal-content PASS
+CHECK panel-seam.search-content PASS
+CHECK panel-seam.no-placeholder PASS
+CHECK panel-seam.editor-layout-restored PASS panes=2
+EDIT-CORE-SELFTEST ok=1 checks=55 failures=0
+APP-SHELL-SELFTEST ok=1 checks=161 failures=0 state=/tmp/vedit-app-eTIHcd/state

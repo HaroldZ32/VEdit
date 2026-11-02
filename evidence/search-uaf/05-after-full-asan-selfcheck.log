@@ -1,0 +1,8 @@
+== evidence: 05-after-full-asan-selfcheck.log — the WHOLE search self-check under AddressSanitizer (fixed code) ==
+time=2026-10-31T19:42:49+08:00
+
+$ ASAN_OPTIONS=detect_leaks=0:verify_asan_link_order=0 vedit-workspace-search-selftest --selfcheck
+SLOWLIFECYCLE-CHILD finished=1 exit=0
+SLOWLIFECYCLE delete-returned elapsedMs=11299 released-marker=1 stallMs=11500
+WORKSPACE-SEARCH-SELFTEST ok=1 checks=84 failures=0 skipped=2
+SELFTEST-EXIT=0

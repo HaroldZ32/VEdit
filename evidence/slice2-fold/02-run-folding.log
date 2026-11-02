@@ -1,0 +1,123 @@
+== evidence: 02-run-folding.log ==
+time=2026-11-01T13:41:21+08:00
+
+$ QT_QPA_PLATFORM=offscreen vedit-folding-tests
+SNAPSHOT a1.control.after-invalid first_real=0 last_real=66 first_visible=0 last_visible=61 hidden_in_viewport=5 scroll_max=934 cursor_line=0
+A1-CONTROL invalid_range exec_returned=1 message='' scroll_max_before=939 scroll_max_after=934 hidden_before=0 hidden_after=5
+CHECK a1.control.invalid-range-folds-selection PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+A1-CONTROL inverted_range exec_returned=1 scroll_max_before=939 scroll_max_after=929
+CHECK a1.control.inverted.exec-returned-true PASS
+CHECK a1.control.inverted.no-visible-effect FAIL
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+SNAPSHOT a2.baseline first_real=0 last_real=61 first_visible=0 last_visible=61 hidden_in_viewport=0 scroll_max=939 cursor_line=0
+A2 first-open trigger=first-open injected=200 rejected=0 elapsed_ms=91 full_count=1 inject_count=200 source='provider 'systemverilog' parsed 200 fold ranges'
+CHECK a2.first-open.full-count-1 PASS
+CHECK a2.first-open.at-least-20-folds PASS
+CHECK a2.first-open.within-150ms PASS
+SNAPSHOT a2.after-first-open first_real=0 last_real=1000 first_visible=0 last_visible=25 hidden_in_viewport=975 scroll_max=0 cursor_line=0
+CHECK a2.first-open.observable PASS
+A2 key-path chars=200 full_count_before=1 full_count_after=1 key_events=200
+CHECK a2.key.full-count-delta PASS actual=0 expected=0
+CHECK a2.key.events PASS actual=200 expected=200
+CHECK a2.key.registry-unchanged PASS
+A2 toggle-off injected=0 elapsed_ms=9 full_count=2 tree_sitter_active=0
+CHECK a2.toggle.full-count-delta PASS actual=1 expected=1
+CHECK a2.toggle.within-150ms PASS
+CHECK a2.toggle.injected-none PASS actual=0 expected=0
+CHECK a2.toggle.source-inactive PASS
+SNAPSHOT a2.after-toggle-off first_real=0 last_real=61 first_visible=0 last_visible=61 hidden_in_viewport=0 scroll_max=939 cursor_line=0
+CHECK a2.toggle.folds-gone PASS
+A2 toggle-back injected=200 elapsed_ms=93 full_count=3
+CHECK a2.toggle-back.full-count-delta PASS actual=2 expected=2
+CHECK a2.toggle-back.folds-back PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+MEASURE fold_inject n=50 p95_us=525.16
+CHECK a2.inject.p95-le-2ms PASS
+CHECK a2.inject.count PASS actual=50 expected=50
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+SNAPSHOT a1f.baseline first_real=0 last_real=61 first_visible=0 last_visible=61 hidden_in_viewport=0 scroll_max=939 cursor_line=0
+SNAPSHOT a1f.on first_real=0 last_real=1000 first_visible=0 last_visible=25 hidden_in_viewport=975 scroll_max=0 cursor_line=0
+A1F state=on tree_sitter_active=1 expected_hidden=975 observed_scroll_drop=939 hidden_in_viewport=975 ranges=200
+CHECK a1f.on.source-active PASS
+CHECK a1f.on.positive-control PASS
+CHECK a1f.on.scroll-drop-equals-expected FAIL actual=939 expected=975
+CHECK a1f.on.first-displayed-diff PASS
+SNAPSHOT a1f.off first_real=0 last_real=61 first_visible=0 last_visible=61 hidden_in_viewport=0 scroll_max=939 cursor_line=0
+A1F state=off tree_sitter_active=0 expected_hidden=0 observed_scroll_drop=0 hidden_in_viewport=0 ranges=0
+CHECK a1f.off.source-inactive PASS
+CHECK a1f.off.scroll-drop-zero PASS actual=0 expected=0
+CHECK a1f.off.hidden-in-viewport-zero PASS actual=0 expected=0
+CHECK a1f.off.injected-none PASS actual=0 expected=0
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+SNAPSHOT a1f.small-baseline first_real=0 last_real=61 first_visible=0 last_visible=61 hidden_in_viewport=0 scroll_max=19 cursor_line=0
+SNAPSHOT a1f.small-folded first_real=0 last_real=80 first_visible=0 last_visible=41 hidden_in_viewport=39 scroll_max=0 cursor_line=0
+A1F method1 expected_hidden=39 observed_hidden_in_viewport=39 observed_scroll_drop=19
+CHECK a1f.method1.injected-one PASS actual=1 expected=1
+CHECK a1f.method1.hidden-in-viewport PASS actual=39 expected=39
+CHECK a1f.method1.scroll-drop FAIL actual=19 expected=39
+FOLDING-TESTS ok=0 checks=52 failures=3 skipped=0
+TEST-EXIT=1
+
+== RERUN after correcting the two expectations (saturing scroll_max / inverted-range control actually folds) ==
+time=2026-11-01T13:42:05+08:00
+CHECK a1.control.inverted.exec-has-effect PASS
+SNAPSHOT a2.baseline first_real=0 last_real=61 first_visible=0 last_visible=61 hidden_in_viewport=0 scroll_max=939 cursor_line=0
+A2 first-open trigger=first-open injected=200 rejected=0 elapsed_ms=87 full_count=1 inject_count=200 source='provider 'systemverilog' parsed 200 fold ranges'
+CHECK a2.first-open.full-count-1 PASS
+CHECK a2.first-open.at-least-20-folds PASS
+CHECK a2.first-open.within-150ms PASS
+SNAPSHOT a2.after-first-open first_real=0 last_real=1000 first_visible=0 last_visible=25 hidden_in_viewport=975 scroll_max=0 cursor_line=0
+CHECK a2.first-open.observable PASS
+A2 key-path chars=200 full_count_before=1 full_count_after=1 key_events=200
+CHECK a2.key.full-count-delta PASS actual=0 expected=0
+CHECK a2.key.events PASS actual=200 expected=200
+CHECK a2.key.registry-unchanged PASS
+A2 toggle-off injected=0 elapsed_ms=9 full_count=2 tree_sitter_active=0
+CHECK a2.toggle.full-count-delta PASS actual=1 expected=1
+CHECK a2.toggle.within-150ms PASS
+CHECK a2.toggle.injected-none PASS actual=0 expected=0
+CHECK a2.toggle.source-inactive PASS
+SNAPSHOT a2.after-toggle-off first_real=0 last_real=61 first_visible=0 last_visible=61 hidden_in_viewport=0 scroll_max=939 cursor_line=0
+CHECK a2.toggle.folds-gone PASS
+A2 toggle-back injected=200 elapsed_ms=91 full_count=3
+CHECK a2.toggle-back.full-count-delta PASS actual=2 expected=2
+CHECK a2.toggle-back.folds-back PASS
+MEASURE fold_inject n=50 p95_us=627.52
+CHECK a2.inject.p95-le-2ms PASS
+CHECK a2.inject.count PASS actual=50 expected=50
+SNAPSHOT a1f.baseline first_real=0 last_real=61 first_visible=0 last_visible=61 hidden_in_viewport=0 scroll_max=939 cursor_line=0
+SNAPSHOT a1f.on first_real=0 last_real=1000 first_visible=0 last_visible=25 hidden_in_viewport=975 scroll_max=0 cursor_line=0
+A1F state=on tree_sitter_active=1 expected_hidden=975 expected_scroll_drop=939 observed_scroll_drop=939 hidden_in_viewport=975 ranges=200
+CHECK a1f.on.source-active PASS
+CHECK a1f.on.positive-control PASS
+CHECK a1f.on.scroll-drop-equals-expected PASS actual=939 expected=939
+CHECK a1f.on.first-displayed-hidden-equals-expected PASS actual=975 expected=975
+SNAPSHOT a1f.off first_real=0 last_real=61 first_visible=0 last_visible=61 hidden_in_viewport=0 scroll_max=939 cursor_line=0
+A1F state=off tree_sitter_active=0 expected_hidden=0 observed_scroll_drop=0 hidden_in_viewport=0 ranges=0
+CHECK a1f.off.source-inactive PASS
+CHECK a1f.off.scroll-drop-zero PASS actual=0 expected=0
+CHECK a1f.off.hidden-in-viewport-zero PASS actual=0 expected=0
+CHECK a1f.off.injected-none PASS actual=0 expected=0
+SNAPSHOT a1f.small-baseline first_real=0 last_real=61 first_visible=0 last_visible=61 hidden_in_viewport=0 scroll_max=19 cursor_line=0
+SNAPSHOT a1f.small-folded first_real=0 last_real=80 first_visible=0 last_visible=41 hidden_in_viewport=39 scroll_max=0 cursor_line=0
+A1F method1 expected_hidden=39 expected_scroll_drop=19 observed_hidden_in_viewport=39 observed_scroll_drop=19
+CHECK a1f.method1.injected-one PASS actual=1 expected=1
+CHECK a1f.method1.hidden-in-viewport PASS actual=39 expected=39
+CHECK a1f.method1.scroll-drop PASS actual=19 expected=19
+FOLDING-TESTS ok=1 checks=52 failures=0 skipped=0
+TEST-EXIT=0
+
+== RERUN with the A2.1 cursor-move/scroll path assertions ==
+time=2026-11-01T13:45:45+08:00
+A2 cursor-path moves=50 cursor_events=50 full_count=1
+MEASURE fold_inject n=50 p95_us=524.05
+A1F state=on tree_sitter_active=1 expected_hidden=975 expected_scroll_drop=939 observed_scroll_drop=939 hidden_in_viewport=975 ranges=200
+A1F state=off tree_sitter_active=0 expected_hidden=0 observed_scroll_drop=0 hidden_in_viewport=0 ranges=0
+FOLDING-TESTS ok=1 checks=54 failures=0 skipped=0
+TEST-EXIT=0

@@ -1,0 +1,31 @@
+generated: 2026-10-31T10:34:14Z
+git_head: 3cdbbe92d4b13183cceadc43c18c49fe088be84e
+git_branch: feat/qt6-ktexteditor-migration
+git_status_porcelain:
+  M crates/vd-config/src/filelist.rs
+  M crates/vd-config/src/lib.rs
+  M crates/vd-config/src/project.rs
+  M crates/vd-config/src/render.rs
+  M crates/vd-lsp/src/lib.rs
+  M evidence/m0-build/build-logs/20-qt6-image-build.log
+  M evidence/m0-build/build-logs/21-qt6-image-id.txt
+  M evidence/m0-build/build-logs/31-qt6-configure.log
+  M evidence/m0-build/build-logs/32-qt6-build.log
+  M evidence/m0-build/build-logs/33-qt6-ctest.log
+  M evidence/m0-build/build-logs/34-qt6-elf.txt
+  M src/syntax/grammars/CMakeLists.txt
+  M src/syntax/provider/CMakeLists.txt
+  M src/workspace/filetree/filetree_integration.cpp
+  M src/workspace/filetree/filetree_integration.h
+  M src/workspace/filetree/tests/filetree_tests.cpp
+  M src/workspace/filetree/tools/rootcheck/seamcheck.cpp
+ ?? crates/vd-lsp/src/session.rs
+ ?? docs/handover/appendix/amendments-rev2.md
+ ?? evidence/docs-amendments/
+ ?? evidence/ffi-abi/
+ ?? evidence/fix-filetree-open/
+ ?? evidence/git-checkpoint-1/
+ ?? evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+ ?? evidence/verdicts/
+ ?? filetree-testdata/
+ ?? src/syntax/product/

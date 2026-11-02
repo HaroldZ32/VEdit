@@ -1,0 +1,114 @@
+collected_at: 2026-10-31T10:41:22Z
+git_head: 8219324042826491e1bca7d5379cbd253225c0fa
+branch: feat/qt6-ktexteditor-migration
+git_status_porcelain:
+ M crates/vd-ffi/include/vd_ffi.h
+ M crates/vd-ffi/src/lsp.rs
+ M evidence/ffi-abi/logs/19-rust-stage-console.log
+ M evidence/ffi-abi/logs/20-cargo-build-release.log
+ M evidence/ffi-abi/logs/21-staticlib.txt
+ M evidence/ffi-abi/logs/22-rust-targets.txt
+ M evidence/ffi-abi/logs/23-cargo-test.log
+ M evidence/ffi-abi/logs/26-vd_ffi.h
+ M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+ M evidence/m0-build/build-logs/31-qt6-configure.log
+ M evidence/m0-build/build-logs/32-qt6-build.log
+ M evidence/m0-build/build-logs/33-qt6-ctest.log
+ M evidence/m0-build/build-logs/34-qt6-elf.txt
+ M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+?? evidence/gate-infra/
+?? evidence/git-checkpoint-1/05-round2-3-commits.txt
+?? evidence/git-checkpoint-1/06-skipped-final.txt
+?? evidence/highlight-v2/00-collect.txt
+?? evidence/highlight-v2/01-after-link.txt
+?? evidence/highlight-v2/03-build-qt-gate.log
+?? evidence/highlight-v2/04-syntax-product-tests.log
+?? evidence/highlight-v2/06-standalone-lanes.log
+?? evidence/highlight-v2/07-negative-control.log
+?? evidence/highlight-v2/08-ctest.log
+?? evidence/highlight-v2/09-screenshot-L2.log
+?? evidence/highlight-v2/10-licensing-and-embargo.txt
+?? evidence/highlight-v2/README.md
+?? evidence/highlight-v2/screenshots/
+?? evidence/verdicts/fix-filetree-open/
+?? filetree-testdata/
+?? src/workspace/diagnostics/
+?? src/workspace/project/
+verifier: Reviewer (cell-20261031T085543161Z, T40; loop loop-20261031T101645-f4b9e5)
+
+cmd: bash evidence/verdicts/fix-filetree-open/run-review-seamcheck.sh green
+== toolchain ==
+qt6-base-dev: qt6-base-dev:amd64	6.10.2+dfsg-7
+cmake: cmake version 4.2.3
+g++: g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+src root: /src
+
+== 1/4 lane standalone build ==
+-- VEdit file tree: Qt 6.10.2 (standalone=ON)
+-- VEdit file tree: independent build (no vedit_app_shell) -> filetree_integration.cpp not compiled
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/lane
+[12/16] Building CXX object CMakeFiles/vedit-filetree-demo.dir/vedit-filetree-demo_autogen/mocs_compilation.cpp.o
+[13/16] Building CXX object CMakeFiles/vedit-filetree-demo.dir/demo/filetree_demo.cpp.o
+[14/16] Linking CXX executable vedit-filetree-demo
+[15/16] Building CXX object CMakeFiles/vedit-filetree-tests.dir/tests/filetree_tests.cpp.o
+[16/16] Linking CXX executable vedit-filetree-tests
+
+== 2/4 lane ctest (the 111-check acceptance suite) ==
+Test project /tmp/lane
+    Start 1: vedit-filetree-tests
+1/1 Test #1: vedit-filetree-tests .............   Passed    1.37 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   1.37 sec
+
+== 3/4 fixture (the lane own --prepare) ==
+PREPARE ok=1 root=/tmp/fx project_files=7 big_files=200
+
+== 4/4 root-context seamcheck (REAL ApplicationShell) ==
+-- VEdit: workspace lane 'search' wired (vedit_workspace_search)
+-- VEdit: workspace integration enabled (src/workspace/integration.cpp)
+-- VEdit file tree rootcheck: Qt 6.10.2, shell=/src/src/app
+-- Configuring done (0.5s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/rc
+[34/39] Automatic MOC for target vedit_workspace_integration
+[35/39] Building CXX object app/CMakeFiles/vedit_workspace_integration.dir/vedit_workspace_integration_autogen/mocs_compilation.cpp.o
+[36/39] Building CXX object app/CMakeFiles/vedit_workspace_integration.dir/src/src/workspace/integration.cpp.o
+[37/39] Linking CXX static library app/libvedit_workspace_integration.a
+[38/39] Building CXX object CMakeFiles/vedit-filetree-seamcheck.dir/seamcheck.cpp.o
+[39/39] Linking CXX executable vedit-filetree-seamcheck
+filetree: installFileTree projectRoot='/tmp/fx/project' dockInserted=1 placeholderReplaced=1
+filetree: installFileTree projectRoot='/tmp/fx/project' dockInserted=1 placeholderReplaced=0
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+SEAM dock-inserted=1 content-before-install=panel-placeholder-file-tree
+SEAM panel-installed=1 dock-content-is-panel=1 find-child=1 root=/tmp/fx/project
+SEAM CHECK panel-installed ok=1
+SEAM CHECK root-path ok=1 detail=/tmp/fx/project
+SEAM CHECK editor.active-pane-widget ok=1
+SEAM editor-initial-bytes=503
+SEAM CHECK editor.initially-no-file ok=1
+SEAM file-index-valid=1
+SEAM CHECK dblclick.file-row-visible ok=1
+SEAM status-after-file-dblclick="Opened /tmp/fx/project/rtl/top.v"
+SEAM CHECK dblclick.file-loads-bytes ok=1 detail=37 bytes on disk
+SEAM CHECK dblclick.file-records-path ok=1 detail=/tmp/fx/project/rtl/top.v
+SEAM CHECK dblclick.file-status-message ok=1 detail=Opened /tmp/fx/project/rtl/top.v
+SEAM CHECK dblclick.second-file-row-visible ok=1
+SEAM CHECK dblclick.second-file-loads ok=1
+SEAM CHECK dblclick.second-file-records-path ok=1 detail=/tmp/fx/project/rtl/alu.sv
+SEAM CHECK dblclick.folder-row-visible ok=1
+SEAM CHECK dblclick.folder-expands ok=1
+SEAM CHECK dblclick.folder-emits-no-open ok=1 detail=0
+SEAM CHECK dblclick.folder-keeps-editor ok=1
+SEAM rows=5 scanned-dirs=3
+SCREENSHOT ok=1 /tmp/shot.png
+FILETREE-SEAMCHECK ok=1 checks=15 failures=0
+SEAMCHECK green exit=0
+EXIT=0

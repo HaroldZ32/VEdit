@@ -3,6 +3,11 @@
 本文覆盖：从零构建（干净 CentOS 7 容器内）、固定（pinned）输入、镜像源替换、
 GtkSourceView 与 slang 的源码构建、三种产物的打包命令，以及可复现性的边界。
 
+> **两条构建 lane 并存**：§1–§11 是仍在树里的 Rust/GTK 产品（旧产品，Open Q7 未决）；
+> §12 是重写后的 **C++/Qt6 构建底座**（M0，T10：`bash scripts/build-qt.sh`，
+> 固定 Ubuntu 26.04 镜像 + Qt6/KF6/KTextEditor/KSyntaxHighlighting/tree-sitter）。
+> 两者互不替代，门禁同时覆盖。
+
 ## 1. 前提
 
 - **Docker**（daemon 可用即可；rootless 也可，`scripts/lib.sh` 有说明）。
@@ -144,8 +149,32 @@ cargo metadata --format-version 1 --all-features > meta.json
 | `pkg-config ... gtksourceview-4 not found` | 在宿主直接 `cargo build` 了；GTK 栈只在 pinned 镜像里存在，用 `bash scripts/build.sh` |
 | `glibc gate` 失败 | 某个 ELF 的符号需求 > 2.17：通常是误用了宿主预编译库，检查捆绑来源 |
 | `RUNPATH` gate 报 `UNKNOWN` | 新增了绝对路径依赖；若确属上游自带，把理由写进 `rpath-allowlist.txt` 再放行 |
-| `verible-verilog-ls` 找不到 | 运行期只按"配置 → 环境变量 → 包内路径"解析，**不查 PATH**；用 `VEDIT_VERIBLE_DIR` 指向目录 |
+| `verible-verilog-ls` / `slang` 找不到 | 运行期按 **随包 → 本地取 → PATH → env** 解析（见 §10.1）；裸构建里先跑 `bash scripts/fetch-verible.sh` 与 `bash build/slang/build.sh`，或用 `VEDIT_VERIBLE_LS` / `VEDIT_SLANG` 指定 |
 | `--selftest all` 失败在 `lsp` 的 definition 检查 | 运行目录里没有 fixtures：设置 `VEDIT_SELFTEST_FIXTURES=<share>/vedit/testdata` |
+
+### 10.1 运行期工具链发现（诊断 / 大纲：随包 / 本地取 / env）
+
+`vedit-app` 的诊断/大纲面板需要 `verible-verilog-ls`（LSP）与 `slang`（deep lint）。
+解析顺序固定为 **bundled → local checkout → PATH → env**，并把结果打印出来
+（`--selfcheck` 的 `TOOLCHAIN source=verible:<source> slang:<source> missing=[...] local=[...]`）：
+
+1. **随包（bundled）**：把两个二进制放进 `vd-app` 同目录的 `bin/`（AppDir/AppImage
+   形态；打包后不需要任何额外配置）。
+2. **本地取（local checkout，裸构建用这条）**：在源码树里执行
+   ```sh
+   bash scripts/fetch-verible.sh     # -> target/verible-pin/extract/verible-*/bin/
+                                     #    以及 .mpd/recon/verible/bin/ 链接
+   bash build/slang/build.sh         # -> build/slang/out/slang
+   ```
+   解析器从 `target/qt6-build/src/app/vedit-app` 向上找到 checkout 根（标记
+   `scripts/fetch-verible.sh`）后自动探测上述产物，**不需要设置任何环境变量**。
+3. **env 指定**：`VEDIT_VERIBLE_LS=/path/verible-verilog-ls`、
+   `VEDIT_SLANG=/path/slang`（也支持 `VEDIT_VERIBLE_LS_DIR` / `VEDIT_SLANG_DIR`
+   指向目录）。
+
+缺工具时，diagnostics/outline 面板只显示**一条**面板级状态（缺什么、影响什么、
+三条修复路径），outline 保持空表 + 一行原因；不会按文件/请求重复报错，也不把
+“环境未满足”当作文件级 Error。
 
 ## 11. GitHub Actions（CI / 镜像 / 发版）
 
@@ -180,3 +209,139 @@ VEDIT_SKIP_IMAGE_BUILD=1 \
   做 Xvfb 窗口冒烟，再跑套件集合——`VEDIT_SLANG` 与 `VEDIT_VERIBLE_LS` 同时可用时是一次 `all`
   （6 个套件），否则**逐个**跑 `smoke highlight config fim`；任一套件非 0 即 `FATAL` 退出。
   CI 会先 `bash build/slang/build.sh` 与 `bash scripts/fetch-verible.sh`，因此走 `all` 六套件。
+
+## 12. Qt6 / KF6 C++ 构建底座（M0，T10）
+
+> 本节描述**重写后的 C++/Qt6 产品**的构建底座；§1–§11 描述仍在树里的 Rust/GTK 产品
+> （Open Q7 未决，两条 lane 并存，彼此不替代）。
+
+### 12.1 为什么用现代发行版做构建镜像
+
+交付物把 **loader + 新版 glibc + Qt6/KF6 运行时**打进 AppImage（C2，T11），所以 C++
+二进制可以合法地要求比 CentOS 7 的 glibc 2.17 更新的符号——由包内 loader 提供。
+在 CentOS 7 上构建这条 lane 反而**不可能**：
+
+- KF6 6.24.0 上游要求 Qt ≥ 6.8（`set(REQUIRED_QT_VERSION 6.8.0)`，见
+  `KDE/ktexteditor` v6.24.0 与 `KDE/syntax-highlighting` v6.24.0 的 CMakeLists，
+  证据：`evidence/m0-build/upstream/`）；
+- CentOS 7 的 vault 里根本没有 Qt ≥ 6.5 的包（C5 的起步线都够不到）。
+
+构建镜像因此是固定 digest 的 **Ubuntu 26.04.1 LTS**；它在
+`scripts/docker/Dockerfile.build` 里是一个 stage（`qt6-build`），**最后一个 stage 仍是
+原来的 CentOS 7 镜像**，所以不带 `--target` 的
+`docker build -f scripts/docker/Dockerfile.build` 行为与以前完全一致。
+
+CentOS 7（kernel 3.10）仍然成立：镜像里的 glibc 2.43 编译下限是 kernel **3.2.0**
+（`/lib/x86_64-linux-gnu/libc.so.6` 内嵌 `Minimum supported kernel: 3.2.0`，其
+`.note.ABI-tag` 也是 `ABI: 3.2.0`）；ELF 基线是普通 x86-64
+（`x86 ISA needed: x86-64-baseline`），不是 x86-64-v3。
+
+### 12.2 一条命令
+
+```sh
+bash scripts/build-qt.sh              # 镜像 → configure → build → ctest → xcb/软件渲染冒烟
+bash scripts/build-qt.sh --no-test    # 只 configure + build（即 C++ 静态检查）
+```
+
+**产物路径：`target/qt6-build/src/app/vedit-app`**（CMake 构建树 `target/qt6-build/` 已被 gitignore）。
+`bash scripts/build.sh` 是旧 Rust/GTK3 产品，只写 `target/release/vd-app`，不产出 `vedit-app`。
+运行期依赖（KF6/Qt6 运行库、`libtree-sitter0.25`、Qt 平台插件 `libqxcb`）的实测包名见
+`evidence/runtime-deps/REPORT.md` §1，运行期打包边界见本文件 §12.6。
+
+每一步的原始输出落在 **`evidence/m0-build/build-logs/`**（T10 的证据目录，随仓库提交）；
+CMake 构建树在 gitignored 的 **`target/qt6-build/`**，探针目录在 `target/qt6-probe/`：
+
+| 文件 | 内容 |
+|---|---|
+| `build-logs/20-qt6-image-build.log` | 固定镜像构建（digest、.deb sha256 校验、安装后版本断言） |
+| `build-logs/21-qt6-image-id.txt` | 镜像 id |
+| `build-logs/30-qt6-image-facts.txt` / `30-qt6-package-snapshot.txt` | 镜像事实与完整 dpkg 快照 |
+| `build-logs/31-qt6-configure.log` | cmake configure（版本矩阵打印） |
+| `build-logs/32-qt6-build.log` | 编译 |
+| `build-logs/33-qt6-ctest.log` | `ctest` |
+| `build-logs/34-qt6-elf.txt` | 产物 ELF：NEEDED、最高 GLIBC 符号、构建期解析到的库、sha256 |
+| `build-logs/35-qt6-xvfb.log` / `36-qt6-xcb-smoke.log` | Xvfb + xcb + llvmpipe 的窗口冒烟 |
+
+### 12.3 版本矩阵与锁定方式
+
+| 组件 | 锁定值 | 来源 |
+|---|---|---|
+| 构建镜像 | `docker.m.daocloud.io/library/ubuntu@sha256:6a06111c…4d3c` | Ubuntu 26.04.1 LTS |
+| Qt6 | 6.10.2（`qt6-base-dev 6.10.2+dfsg-7`） | Ubuntu 26.04 |
+| KF6 | 6.24.0（`libkf6*-dev 6.24.0-0ubuntu1`） | Ubuntu 26.04 |
+| KTextEditor | 6.24.0 | 同上 |
+| KSyntaxHighlighting | 6.24.0 | 同上 |
+| tree-sitter | 0.25.9（`libtree-sitter-dev 0.25.9-7`，`pkg-config tree-sitter`） | Ubuntu 26.04 |
+| glibc（随包） | 2.43-2ubuntu2.4，min kernel 3.2.0 | `libc6` |
+| 工具链 | cmake 4.2.3 / ninja 1.13.2 / g++ 15.2.0 | 同上 |
+
+锁定有三层，任一层不符都**硬失败**：
+
+1. `scripts/versions-qt.env`：版本矩阵与最低版本（C5 的 Qt 6.5 起步线、KF6 6.24 的
+   Qt 6.8 要求、glibc 的 kernel 下限）；
+2. `scripts/docker/qt6-locked-packages.txt`：每行 `<包>=<精确版本> <*.deb sha256>`，
+   镜像构建时逐个 `apt-get download` 校验 sha256 再安装，安装后再用 `dpkg-query` 断言；
+3. `cmake/VEditVersions.cmake`：把同一份 env 读进 CMake，所有依赖用 `EXACT` 请求
+   （Qt6 / KF6 / KTextEditor / KSyntaxHighlighting / tree-sitter），版本漂移在
+   configure 阶段就报错。
+
+### 12.4 CMake 骨架
+
+- 根 `CMakeLists.txt`：C++20；Qt6 Core/Gui/Widgets/Network/PrintSupport/Qml/TextToSpeech
+  （后两个是 KTextEditor 的链接依赖）；KF6 CoreAddons/Config/TextEditor/
+  SyntaxHighlighting；tree-sitter 经 pkg-config 精确锁定；
+- `cmake/VEditVersions.cmake`：从 `scripts/versions-qt.env` 读 pin，并校验 floor；
+- `cmake/smoke/`：**M0 冒烟 target**——Qt6 窗口、KTextEditor 文档、
+  KSyntaxHighlighting 定义/主题、tree-sitter 运行时各验证一次，编译参数
+  `-Wall -Wextra -Wpedantic -Werror`，`ctest` 在 offscreen 下跑它；
+- `src/app/` 是 app-shell lane（T13）的交付物：根 CMakeLists 在它出现后**自动**纳入，
+  本文件无需二次编辑。T10 不写 `src/app/`。
+
+冒烟程序打印一行机器可读结论，并报告进程实际解析到的 `libc.so.6` 路径
+（A0c 自检钩子，T11 复用）：
+
+```
+M0-SMOKE ok=1 platform=offscreen qt=6.10.2 kf6=6.24.0 ... definitions=452 themes=30 verilog=1 ... libc=/usr/lib/x86_64-linux-gnu/libc.so.6
+```
+
+### 12.5 门禁
+
+C++ lane 没有独立的 MPD gate id（ledger 的 id 表是固定的），因此它折进三个脚本
+（公共实现在 `build/gates/qt6-cxx.sh`）：
+
+- `gates`（唯一可跑重活的 ledger gate）：完整 configure + build + ctest + xcb 冒烟；
+- `typecheck`：`--no-test`，即 `-Werror` 编译（C++ 静态检查）；
+- `tests`（仅人工）：同样的 ctest。
+
+`CMakeLists.txt` 存在即视为**硬要求**：C++ lane 失败则 gate 红，不允许打印 N/A 通过。
+
+### 12.6 已知边界（如实记录）
+
+- **T10 不含运行时打包**：把 loader/glibc/Qt6/KF6/plugins/syntax data 打进 AppImage 是
+  T11（m0-runtime）；本节的产物是可执行的冒烟程序，不是交付物。
+- **双宿主闸门是 T12**：本机构建容器与宿主**共享内核**，"CentOS 7.9 + glibc 2.17
+  userland 能跑"已在 `centos:7` 容器里验证（`evidence/m0-build/14-*`：包内 loader 与
+  包内 glibc 解析成功），但 kernel 3.10 本身没有在这里被跑到；真实 3.10 主机由 T12 验。
+- 冒烟窗口是 offscreen 或 Xvfb+xcb，没有真实窗口管理器；旧 Mesa 的软件渲染回退需 T12
+  在真机按 A0e 验（镜像内已用 llvmpipe + `QT_OPENGL=software` +
+  `LIBGL_ALWAYS_SOFTWARE=1` 跑通一遍）。
+- **`.v` 按文件名会解析成 "V" 语言**：本镜像的 KSyntaxHighlighting 内嵌 451 个定义，
+  `definitionForName("Verilog")` 有效，但 `definitionForFileName("test.v")` 返回 `V`
+  （vlang 也占用 `*.v`）。T16/T20 必须按名字或自定义映射处理，不能只依赖扩展名。
+  证据：`evidence/m0-build/12-ksyntax-definitions-probe.txt`。
+- **SystemVerilog 定义**：镜像里 `definitionForName("SystemVerilog")` 可加载，但冒烟
+  **只报告不断言**，因为 C7 的许可处置未定（Open Q1），"构建镜像能加载"不等于
+  "交付物随包"。
+- 镜像重建需要联网拉取固定版本 .deb；归档一旦停供某个精确版本，镜像构建会**硬失败**
+  （预期行为：复用已发布镜像 ref，而不是悄悄换版本）。
+
+### 12.7 排障
+
+| 现象 | 原因与处理 |
+|---|---|
+| `mkdir ~/.docker/... read-only file system` | 沙箱/只读 HOME；`scripts/lib-qt.sh` 自动退到 `target/docker-config` |
+| `base name (${BASE_IMAGE}) should not be blank` | 两个 base image ARG 必须声明在**第一个 FROM 之前** |
+| `find_package(KF6 …)` 找不到 | KF6 没有总包 config；按框架 `find_package(KF6TextEditor …)`（本仓库已如此） |
+| `Could not find Qt6Qml/TextToSpeech` | KTextEditor 的链接依赖；镜像装 `qt6-declarative-dev` / `qt6-speech-dev`（已锁定） |
+| `KTextEditor::Editor::instance()` 为 null | 缺 katepart 插件（`libkf6texteditor-katepart`，已锁定） |
+| 想复用已发布镜像 | `VEDIT_QT6_BUILD_IMAGE_REF=… VEDIT_QT6_BUILD_IMAGE_PULL=1 bash scripts/build-qt.sh` |

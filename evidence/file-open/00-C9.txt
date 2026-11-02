@@ -1,0 +1,27 @@
+# C9 (T137)
+collected_at: 2026-11-02T03:48:09Z
+git_head: 1ab6dedc21dfefbc5cd386a4e99ba12a3d38c0a2
+git_status_porcelain:
+   M build/evidence/typecheck/00-run.txt
+   M build/evidence/typecheck/10-typecheck-image-build.log
+   M build/evidence/typecheck/11-typecheck-image-id.txt
+   M evidence/epipe-crash/matrix/README.txt
+   M evidence/epipe-crash/matrix/docker.m.daocloud.io_library_centos_7.log
+   M evidence/epipe-crash/matrix/docker.m.daocloud.io_library_rockylinux_9.log
+   M evidence/epipe-crash/matrix/docker.m.daocloud.io_library_ubuntu_24.04.log
+   M evidence/epipe-crash/matrix/docker.m.daocloud.io_library_ubuntu_26.04.log
+   M evidence/file-open/01-cli.log
+   M evidence/file-open/02-packaged.log
+   M evidence/file-open/03-gates.log
+   M evidence/slice3-pack/00-preflight.log
+   M evidence/slice3-pack/10-assemble.log
+   M evidence/slice3-pack/30-selfcheck-appdir.log
+   M evidence/slice3-pack/50-appimage.log
+   M evidence/slice3-pack/60-selfcheck-appimage.log
+   M evidence/slice3-pack/70-centos7-probe.log
+   M evidence/slice3-pack/99-summary.txt
+   M evidence/slice3-pack/SHA256SUMS
+   M evidence/slice3-pack/runtime-manifest.txt
+  ?? evidence/epipe-crash/16-packaging-final.log
+  ?? evidence/epipe-crash/17-hostmatrix-final.log
+  ?? evidence/file-open/00-C9.txt

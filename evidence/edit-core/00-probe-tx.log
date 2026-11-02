@@ -1,0 +1,14 @@
+TX editor=ok class=KTextEditor
+TX noview metaClass=KTextEditor::DocumentPrivate undoIndex=70 redoIndex=71
+TX noview case=plain3_insert text3=cd2eb0837c9b4c962c22d2ff8b5441b7b45805887f051d39bf133b583baf6860 after_undo=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 verdict=FAIL
+TX noview case=tx3_insert text=cd2eb0837c9b4c962c22d2ff8b5441b7b45805887f051d39bf133b583baf6860 after_undo=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 empty=1 verdict=PASS
+TX noview case=tx100_insert len=100 after_undo_len=0 empty=1 verdict=PASS
+TX noview case=plain100_insert len=100 after_undo_len=0 one_step=0 verdict=FAIL
+TX noview case=redo_after_plain_undo len=100 verdict=PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+TX view metaClass=KTextEditor::DocumentPrivate undoIndex=70 redoIndex=71
+TX view case=plain3_insert text3=cd2eb0837c9b4c962c22d2ff8b5441b7b45805887f051d39bf133b583baf6860 after_undo=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 verdict=FAIL
+TX view case=tx3_insert text=cd2eb0837c9b4c962c22d2ff8b5441b7b45805887f051d39bf133b583baf6860 after_undo=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 empty=1 verdict=PASS
+TX view case=tx100_insert len=100 after_undo_len=0 empty=1 verdict=PASS
+TX view case=plain100_insert len=100 after_undo_len=0 one_step=0 verdict=FAIL
+TX view case=redo_after_plain_undo len=100 verdict=PASS
