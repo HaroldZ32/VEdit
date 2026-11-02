@@ -1,0 +1,28 @@
+generated: 2026-11-02T02:48:38Z
+git_head: 73bc039e6b773172a5a15898a87a5c6449c4e819
+git_branch: feat/qt6-ktexteditor-migration
+
+## 交付产物
+path: packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage
+size_bytes: 109906424
+sha256: 2918210695d9aaaebccd0e687481f665fdc852b749f9347c465c35ee9a797795
+built_from_head: 73bc039e6b773172a5a15898a87a5c6449c4e819
+note: 产物由『产品 HEAD 265f9a3 + 已提交的 packaging/runtime/selfcheck.sh 修复(73bc039)』所对应的树产出；73bc039 与产出时的树在源码上等价。
+
+## 打包结果
+PACKAGING-EXIT=0   BUILD: F2 runtime OK   steps_failed=0   SELFCHECK PASS
+## 四容器矩阵
+HOSTMATRIX-EXIT=0
+ROW docker.m.daocloud.io/library/centos:7 uname=7.0.0-38-generic glibc=ldd (GNU libc) 2.17 selfcheck=PASS startup=PASS lint=PASS
+ROW docker.m.daocloud.io/library/ubuntu:24.04 uname=7.0.0-38-generic glibc=ldd (Ubuntu GLIBC 2.39-0ubuntu8.9) 2.39 selfcheck=PASS startup=PASS lint=PASS
+ROW docker.m.daocloud.io/library/rockylinux:9 uname=7.0.0-38-generic glibc=ldd (GNU libc) 2.34 selfcheck=PASS startup=PASS lint=PASS
+ROW docker.m.daocloud.io/library/ubuntu:26.04 uname=7.0.0-38-generic glibc=ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43 selfcheck=PASS startup=PASS lint=PASS
+
+## 与预期的差异（如实）
+captain 预期 ~114.8 MB，实测 109906424 B（约 104.8 MiB）。差异为压缩率不同，不是缺件：
+  - CJK 字体在位：share/fonts/NotoSansCJK-Regular.ttc = 19484784 B
+  - locale 在位：packaging/runtime/out/AppDir/usr/lib/locale
+  - AppDir 共 216 个文件 / 291M
+
+## 打包前必须修的一处（已在 73bc039 修）
+packaging/runtime/selfcheck.sh 仍断言 T128 已废弃的 fold.wiring.closed.hidden-975 → 流水线 FAIL。改为断言 fold.native.view + fold.native.no-auto-folds hidden=0。
