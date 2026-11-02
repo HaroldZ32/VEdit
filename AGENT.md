@@ -175,3 +175,37 @@ so all pure-ASCII metrics change.
 
 - Never commit or echo secrets, tokens or credentials.
 - Keep generated logs and evidence free of secret material.
+
+## 9. KTextEditor 语法定义仓库事实（T127，重要）
+
+KTextEditor 的 `KSyntaxHighlighting::Repository` **不认**我们随包的两份 XML
+（`resources/syntax/vedit-*.xml`）：解析 `SystemVerilog` / `Verilog` 时它指向 **KDE 自带的定义**
+（例如 SystemVerilog 的 author 是 `Sean O'Boyle (seanoboyle@intelligentdv.com)`）。
+`Repository::addCustomSearchPath()` 与私有 XDG 目录都改变不了这一点，
+因为 `KTextEditor::Editor::repository()` 返回 const，没有公共注入路径。
+
+**后果**：编辑器里实际生效的高亮/原生折叠来自 KDE 自带定义；我们的 XML 只被我们自己的
+`vedit::folding::KsyntaxFoldSource`（以及面包屑的语法扫描）使用。
+所以“高亮是好的”与“我们的 XML”没有关系；要改我们的定义，必须走我们自己的扫描路径，
+不能指望 KTextEditor 加载它。
+
+**xcb 实测（T127）**：不加载任何 `FoldInjector`，在 Xvfb+xcb 下真实鼠标点 gutter 折叠标记，
+模块行可以**双向**折叠/展开（`hidden 0→38→0`、`scroll_max 939→901→939`），非 region 行同列负控制无变化。
+→ KDE 原生折叠可用；VEdit 自建的 `exec("fold")` 注入层是与它打架的根源，应删除。
+
+## 10. 折叠策略：KDE 原生（T128）
+
+VEdit **不再注入折叠**（T128 删掉了 `FoldInjector` 的 `exec("fold")` 循环、registry、
+`unfoldRegistered()` 和所有绕光标的 unfold 逻辑）。文件打开时**不自动折叠**（VS Code/Kate/CLion 同款行为），
+折叠由 KTextEditor 从 KSyntaxHighlighting 定义计算，用户点 gutter 标记按需折叠/展开。
+
+- 依据：T127 的 xcb 真点击实验（`evidence/fold-gutter-click/`）在**零注入**下证明标记存在且双向可用
+  （`hidden 0→38→0`、`scroll_max 939→901→939`，非 region 行负控制无变化）。
+- 旧判据 `hidden-975` / `registry-200` / `firstopen-full-count` **已废弃**，替换为真交互判据：
+  `vedit-fold-gutter-click`（xcb+Xvfb，实际点 marker 两个方向；无 xvfb 时显式 SKIP）与
+  `vedit-native-fold-tests`（10k 行 open ≤2 s、二次打开不崩、折叠时移动光标不崩、打开无自动折叠）。
+- 删除清单：`src/syntax/folding/fold_injector.{h,cpp}`、`tests/folding_tests.cpp`、
+  以及 `FoldBreadcrumbBinding` 里的折叠字段/方法；面包屑保留不变。
+- 仍保留但**已无产品消费方**：`fold_range.*`、`fold_source.*`、`syntax_fold_source.*`、
+  `ksyntax_fold_source.*`（折叠扫描能力/旧的 tree-sitter fold 查询）。它们只服务于测试/探针；
+  下一步可整体删除（删 `vedit_syntax_folding` 及其 CMake 接线）。

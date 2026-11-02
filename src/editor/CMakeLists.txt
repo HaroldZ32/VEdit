@@ -135,6 +135,21 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(vedit-edit-core-selftest PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 
+add_executable(vedit-native-fold-tests kernel/native_fold_tests.cpp)
+target_link_libraries(vedit-native-fold-tests PRIVATE vedit_editor_core)
+if(VEDIT_EDIT_CORE_HAVE_APP_SEAM)
+  target_include_directories(vedit-native-fold-tests PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/../app")
+endif()
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(vedit-native-fold-tests PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+add_test(NAME vedit-native-fold-tests COMMAND vedit-native-fold-tests)
+set_tests_properties(vedit-native-fold-tests PROPERTIES
+  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime"
+  TIMEOUT 120
+)
+
 add_test(NAME vedit-edit-core-selftest COMMAND vedit-edit-core-selftest)
 set_tests_properties(vedit-edit-core-selftest PROPERTIES
   ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime"

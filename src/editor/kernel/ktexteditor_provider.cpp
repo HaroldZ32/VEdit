@@ -89,6 +89,9 @@ QWidget *EditCoreProvider::createEditor(QWidget *parent)
     // T94: the live wiring of the folding/breadcrumb lanes. The binding is a
     // child of the view, so it dies with it; the provider only forwards status
     // changes to the pane through the EditorProvider seam.
+    // T128: the gutter fold markers come from KDE/KTextEditor itself; make sure
+    // the folding bar is enabled instead of relying on a user config default.
+    view->setConfigValue(QStringLiteral("folding-bar"), true);
     auto *binding = new FoldBreadcrumbBinding(view, view);
     binding->setStatusListener([this, view]() { notifyStatus(view); });
 #endif
@@ -121,9 +124,8 @@ bool EditCoreProvider::openFile(QWidget *editor, const QString &absolutePath, QS
     // Releases the previous document's folds before setText() replaces the text:
     // a document carrying fold ranges into a text replacement is what crashed
     // the search-jump selftest on the second open.
-    if (auto *binding = FoldBreadcrumbBinding::instanceFor(view)) {
-        binding->releaseFolds();
-    }
+    // T128: no fold injection, so there is no registry to release before the
+    // text replacement; KDE-native folding is user-driven only.
 #endif
     if (!loadFileIntoDocument(view->document(), info.absoluteFilePath(), error)) {
         return false;

@@ -1,48 +1,32 @@
 #pragma once
 
-// Product wiring of the folding and breadcrumb lanes (task T94).
+// Breadcrumb wiring of the live editor (originally T94; folding changed to
+// KDE-native in T128).
 //
-// T19 delivered two lanes and said honestly that neither was wired into
-// vedit-app; T29 added the closed-state (tree-sitter OFF) fold source from OUR
-// own resources/syntax/vedit-systemverilog.xml. This class is the integration
-// point the live editor needs:
+// FOLDING (T128): VEdit no longer injects folds. KTextEditor computes folding
+// regions from the KSyntaxHighlighting definition and the user folds/unfolds
+// through the gutter. The T127 xcb experiment proved that path works in both
+// directions with our build, and every VEdit-side command injection / registry /
+// cursor-moving unfold was removed because it fought that native state and
+// caused the T117/T121 crashes. A file therefore opens with NO auto-folds, which
+// matches VS Code/Kate/CLion.
 //
-//   * FOLDING: one FoldInjector per KTextEditor::View. A full rebuild runs only
-//     for the three triggers the lane allows (FirstOpen when the file opens,
-//     TreeSitterToggled when the runtime switch changes, Reparsed when a caller
-//     reports a completed reparse). The key / cursor / scroll paths call the
-//     injector's explicit no-ops, so typing never rebuilds folds (A2.1).
-//   * NO BYPASS: the injector validates every range through fold_range.h before
-//     `exec("fold")` (A1). Nothing here calls KTextEditor commands directly.
-//   * BREADCRUMB: a Model fed by the syntax stack's structure query on cursor
-//     moves (debounced after text edits, so typing does not reparse per key).
-//     With the runtime switch OFF the source reports "no semantics" and the path
-//     is EMPTY - no text-heuristic path is invented (T19's contract).
-//
-// The view owns this QObject (parent), so the binding dies with the pane's
-// editor; the provider swaps the status listener through the EditorProvider seam
-// and the pane renders breadcrumbDisplay().
+// BREADCRUMB: a Model fed by the syntax stack's structure query on cursor moves
+// (debounced after text edits). With the runtime switch OFF the source reports
+// "no semantics" and the path is EMPTY - no text-heuristic path is invented.
 #include "breadcrumb_model.h"
-#include "fold_injector.h"
 
 #include <QObject>
 #include <QString>
 
 #include <functional>
 #include <memory>
-#include <vector>
 
 class QTimer;
 
 namespace KTextEditor {
 class Document;
 class View;
-}
-
-namespace vedit::folding {
-class FoldSource;
-class KsyntaxFoldSource;
-class SyntaxFoldSource;
 }
 
 namespace vedit::breadcrumb {
@@ -63,27 +47,15 @@ public:
     // The binding the provider installed on this editor widget, or nullptr.
     static FoldBreadcrumbBinding *instanceFor(QWidget *editorWidget);
 
-    // FirstOpen: the file was just loaded into this view (one full rebuild).
+    // The file was just loaded into this view: seed the breadcrumb.
     void onDocumentOpened();
 
-    // Release the registered folds BEFORE the document text is replaced. A
-    // KTextEditor document that still carries fold ranges from the previous text
-    // can crash on the next setText()/setCursorPosition() (observed as a
-    // segfault in the search-jump selftest when a pane re-opened a second file),
-    // so the open path unfolds first. Safe to call when nothing is registered.
-    void releaseFolds();
-
-    // TreeSitterToggled: flip the runtime switch and rebuild with the source the
-    // new state selects (the injector unfolds its registry first, so closing the
-    // switch really releases the folds).
+    // Runtime tree-sitter switch: affects the breadcrumb's semantic source only.
     void setTreeSitterEnabled(bool enabled);
     bool treeSitterEnabled() const;
 
-    // Reparsed: the caller (a reparse pipeline) reports the semantic update.
+    // A caller reports a completed reparse: refresh the breadcrumb.
     void notifyReparsed();
-
-    vedit::folding::FoldInjector *injector() { return &injector_; }
-    const vedit::folding::FoldInjector *injector() const { return &injector_; }
 
     // The breadcrumb the pane bar renders ("m0 > inc") and the diagnostic form
     // the evidence prints ("module:m0 > function:inc"). Empty when no semantics.
@@ -99,21 +71,12 @@ public:
 signals:
     void breadcrumbChanged(const QString &display);
 
-protected:
-    bool eventFilter(QObject *watched, QEvent *event) override;
-
 private:
     void ensureSources();
-    void rebuildFor(vedit::folding::RebuildTrigger trigger);
     void refreshBreadcrumb();
-    QString definitionDirectory() const;
-    QString definitionFileName() const;
     QString grammarId() const;
 
     KTextEditor::View *view_ = nullptr;
-    vedit::folding::FoldInjector injector_;
-    std::unique_ptr<vedit::folding::KsyntaxFoldSource> closedSource_;
-    std::unique_ptr<vedit::folding::SyntaxFoldSource> treeSitterSource_;
     std::unique_ptr<vedit::breadcrumb::SyntaxBreadcrumbSource> breadcrumbSource_;
     vedit::breadcrumb::Model breadcrumbModel_;
     QTimer *breadcrumbDebounce_ = nullptr;

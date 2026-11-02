@@ -42,7 +42,6 @@ endif()
 
 add_library(vedit_syntax_folding STATIC
   fold_range.cpp
-  fold_injector.cpp
   fold_source.cpp
   syntax_fold_source.cpp
   ksyntax_fold_source.cpp
@@ -71,17 +70,34 @@ set_tests_properties(vedit-syntax-directory-tests PROPERTIES
   TIMEOUT 60
 )
 
-add_executable(vedit-folding-tests tests/folding_tests.cpp)
-target_link_libraries(vedit-folding-tests PRIVATE vedit_syntax_folding Qt6::Gui)
-# T29: the closed-state source reads OUR definition file, never the repository.
-target_compile_definitions(vedit-folding-tests PRIVATE
-  VEDIT_A4_SYSTEMVERILOG_XML="${CMAKE_CURRENT_SOURCE_DIR}/../../../resources/syntax/vedit-systemverilog.xml")
+add_executable(vedit-fold-native-gui-probe tests/fold_native_gui_probe.cpp)
+target_link_libraries(vedit-fold-native-gui-probe PRIVATE vedit_syntax_folding Qt6::Gui)
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-  target_compile_options(vedit-folding-tests PRIVATE -Wall -Wextra -Wpedantic -Werror)
+  target_compile_options(vedit-fold-native-gui-probe PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 
-add_test(NAME vedit-folding-tests COMMAND vedit-folding-tests)
-set_tests_properties(vedit-folding-tests PROPERTIES
-  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-fold"
-  TIMEOUT 300
-)
+# T128: the real interaction regression (T127 experiment). Needs xcb + Xvfb; when
+# xvfb-run is unavailable the test is registered as explicitly SKIPPED (77).
+find_program(VEDIT_XVFB_RUN xvfb-run)
+if(VEDIT_XVFB_RUN)
+  add_test(NAME vedit-fold-gutter-click
+           COMMAND ${VEDIT_XVFB_RUN} -a -s "-screen 0 1280x1024x24"
+                   $<TARGET_FILE:vedit-fold-native-gui-probe>
+                   "${CMAKE_CURRENT_SOURCE_DIR}/../../../resources/syntax"
+                   "${CMAKE_CURRENT_BINARY_DIR}/fold-gutter.png")
+  set_tests_properties(vedit-fold-gutter-click PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=xcb;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-fold"
+    SKIP_RETURN_CODE 77
+    TIMEOUT 120
+  )
+else()
+  add_test(NAME vedit-fold-gutter-click
+           COMMAND bash -c "echo 'SKIP: xvfb-run not available'; exit 77")
+  set_tests_properties(vedit-fold-gutter-click PROPERTIES SKIP_RETURN_CODE 77)
+endif()
+
+add_executable(vedit-fold-native-probe tests/fold_native_probe.cpp)
+target_link_libraries(vedit-fold-native-probe PRIVATE vedit_syntax_folding Qt6::Gui)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(vedit-fold-native-probe PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
