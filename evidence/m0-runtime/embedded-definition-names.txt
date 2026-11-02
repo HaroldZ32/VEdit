@@ -1,0 +1,36 @@
+ABAP
+AVR Assembler
+Bitbake
+Clipper
+ConTeXt
+FreeBASIC
+GAP
+GNU Assembler
+Go
+ILERPG
+Inform
+Intel x86 (FASM)
+Intel x86 (NASM)
+JSON
+JSONC
+Kconfig
+Markdown
+MEL
+MonoBasic
+Nagios
+nesC
+Octave
+PGN
+Pig
+progress
+Quarto
+Replicode
+R Markdown
+Roff
+R Script
+sed
+SystemVerilog
+TaskJuggler
+Vera
+Wesnoth Markup Language
+xHarbour

@@ -1,0 +1,46 @@
+== evidence: 04-after-fix.log — the user's scenario, end to end (headless) ==
+time=2026-11-01T19:12:18+08:00
+
+### (a) product seam: real ApplicationShell, NO --project, open a file, delete a comma in the buffer
+CHECK seam.file-written PASS
+CHECK seam.panel-installed PASS
+CHECK seam.active-pane PASS
+CHECK seam.file-opened PASS
+CHECK seam.analysis-after-open PASS  edited.sv — analyzed 11:12:19 (saved file): 0 diagnostic(s)
+OBSERVED seam.after-open status='edited.sv — analyzed 11:12:19 (saved file): 0 diagnostic(s)'
+CHECK seam.editor-widget PASS
+OBSERVED seam.after-edit status='edited.sv — analyzed 11:12:20 (editor buffer, not saved yet): 1 diagnostic(s)'
+OBSERVED seam.controller state=1 session='buffer changed (75 bytes): /tmp/vedit-diagnostics-product-seam-jbkxfz/edited.sv' diagnostics=1 analyses=2
+CHECK seam.panel-shows-buffer-source PASS  edited.sv — analyzed 11:12:20 (editor buffer, not saved yet): 1 diagnostic(s)
+CHECK seam.buffer-edit-diagnosed PASS  edited.sv — analyzed 11:12:20 (editor buffer, not saved yet): 1 diagnostic(s)
+CHECK seam.disk-untouched PASS  disk=76 bytes
+VE-DIAGNOSTICS-PRODUCT-SEAM checks=9 failures=0 skipped=0
+SEAM_EXIT=0
+
+### (b) real verible through the C ABI + controller (deleted comma in the buffer)
+CHECK PASS t118.temp-dir
+CHECK PASS t118.good-file-written
+CHECK PASS t118.buffer-analysis-starts
+OBSERVED t118 buffer_analysis_state=degraded diagnostics=2 dirty=1
+OBSERVED t118 buffer_messages=syntax error at "b" | Declared module does not match the first dot-delimited component of file name: "buffer_edit" [Style: file-names][module-filename] (fix available)
+CHECK PASS t118.buffer-syntax-error-reported  syntax error at "b" | Declared module does not match the first dot-delimited component of file name: "buffer_edit" [Style: file-names][module-filename] (fix available)
+CHECK PASS t118.disk-file-unchanged  disk=71 bytes, buffer=70 bytes
+CHECK PASS t118.buffer-restore-starts
+OBSERVED t118 after_restore errors=0 diagnostics=1
+CHECK PASS t118.restore-clears-error  remaining errors=0
+VER-DIAGNOSTICS-FFI-SELFTEST checks=30 failures=0
+FFI_EXIT=0
+
+### (c) lane selftest with fakes: panel auto-refresh + buffer push
+CHECK PASS t118.analyze-starts  analysis count=1
+CHECK PASS t118.analyze-is-file-scope  /fixture/rtl/top.sv
+CHECK PASS t118.analyze-counted  1
+CHECK PASS t118.buffer-pushed  changes=1
+CHECK PASS t118.panel-refreshed-before   — 0 diagnostic(s)
+CHECK PASS t118.panel-analyzed  top.sv — analyzed 11:12:20 (editor buffer, not saved yet): 1 diagnostic(s)
+CHECK PASS t118.panel-source-is-buffer  top.sv — analyzed 11:12:20 (editor buffer, not saved yet): 1 diagnostic(s)
+CHECK PASS t118.panel-counts-diagnostics  top.sv — analyzed 11:12:20 (editor buffer, not saved yet): 1 diagnostic(s)
+CHECK PASS t118.panel-outline-filled  2
+CHECK PASS t118.buffer-refusal-observable  3
+VE-DIAGNOSTICS-SELFTEST checks=39 failures=0
+LANE_EXIT=0

@@ -1,0 +1,29 @@
+== 00 environment ==
+date: 2026-10-31T03:51:16Z
+cmake: cmake version 4.2.3
+compiler: c++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+tree-sitter (pkg-config): 0.25.9
+libtree-sitter dynamic: /usr/lib/x86_64-linux-gnu/libtree-sitter.so /usr/lib/x86_64-linux-gnu/libtree-sitter.so.0 /usr/lib/x86_64-linux-gnu/libtree-sitter.so.0.25 
+libtree-sitter static: /usr/lib/x86_64-linux-gnu/libtree-sitter.a
+source manifest (interface + implementation + tests):
+879304588684a7f399ec5c07a90dbb858bd4a31f6ae0000f59b736a89c26cca2  ./CMakeLists.txt
+76e1110d0b5b709db443f28b1377f8a6abff0d90894e1a1e50df2f89b77abecf  ./disabled_provider.cpp
+554067496b8e57522caf8419df67a1a7c8aef6e6a611718b28f2cdf713507b7e  ./grammar_binding.cpp
+779fdc0963b1c3f0e03856f97b9bc577581e6eb217ce730f13ab6d662f0e516f  ./grammar_binding.h
+9cc67505392bedc5339ba14aa54ee01d15535fb2e06a0676d650d9519de09b50  ./owner_arbiter.cpp
+861b3120202ee48c49162fb34c58566c133ef9dc334e643bee71956c5b1209a9  ./owner_arbiter.h
+2176bcb2002a311b6fac922b30b798eb0a3cb2ef3da9af51c90d5e336e5dff07  ./syntax_provider.h
+050ea35b5da854b324f54c5e3d6a4773b2b7be2c650f53320a6ee6743c377e1f  ./syntax_service.cpp
+23eaba2adbd2bc7ab7d9ef771588d2ed4c89b41452820dc1c9b587def402a61f  ./syntax_service.h
+db3755a1a09d4d66528d23347a377e8db911e390b8fd7d58a8cad8c0a45a129c  ./tests/fixture/fixture_binding.cpp
+a4c3835ec64319989823061beb617a6058f0b1dbc98f8046a9e915fa86a3bfe5  ./tests/fixture/fixture_binding.h
+9a266ae4a0305b8a2769bee90a14ac06914bdc83a509f16428311eac2845637e  ./tests/fixture/parser.c
+b42505f21532adb2e86cc070d186fa63e73d5dfb068aae18aa1f226f8e285eab  ./tests/fixture/queries/folds.scm
+0511524465b56aed122580792254e68b6abbbfde7119f1d02b135acbe278233f  ./tests/fixture/queries/highlights.scm
+a2cdbf9e5ff565761cc0ff726c1b0504c63d4860b04829b4e50ff981c5bf9b60  ./tests/fixture/queries/structure.scm
+a1f6ef161fbaf48a0e10fca90ef5290a062462b307b3898aa562993853b9f80a  ./tests/fixture/tree_sitter/parser.h
+f5aa683765efe62e5730ef26333768c5d365b5fa22ca10a113eaa472dc4c6606  ./tests/test_syntax_provider.cpp
+81cd375276f3c23349f96f0565dbce4d242a50c720a57d49e6276118fa785b70  ./tree_sitter_provider.cpp
+ee4feb4325c6e08849daddb1edeeec902ef14ed3dd719de5a437f7026f1c1a99  ./tree_sitter_provider.h
+f4993961e809376c01bcb745a602b4b831a8e3444e6754b3e7401ce63da7c72d  ./tree_sitter_unavailable.cpp
+fixture grammar parser.c sha256: 9a266ae4a0305b8a2769bee90a14ac06914bdc83a509f16428311eac2845637e

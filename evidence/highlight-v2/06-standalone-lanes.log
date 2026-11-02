@@ -1,0 +1,18 @@
+# The documented STANDALONE lane builds still work after the grammar-id fix.
+
+## src/syntax/provider standalone (no grammar lane -> honest default none)
+-- syn-provider: baked grammar id='none' for /vedit-build/src/syntax/provider (owner: src/syntax/grammars)
+-- Configuring done (0.0s)
+-- Build files have been written to: /vedit-build/target/syn-provider-alone
+[3/4] Linking CXX static library libvedit_syntax_provider.a
+[4/4] Linking CXX executable vedit_syntax_provider_tests
+100% tests passed, 0 tests failed out of 1
+
+## src/syntax/grammars standalone (-DVEDIT_SYNTAX_GRAMMAR=verilog)
+-- syn-grammars: compiled grammar id='verilog' verilog=1 systemverilog=1
+-- syn-provider: baked grammar id='verilog' for /vedit-build/src/syntax/provider (owner: src/syntax/grammars)
+-- Configuring done (0.0s)
+-- Build files have been written to: /vedit-build/target/syn-grammars-alone
+[7/8] Building CXX object CMakeFiles/vedit_syn_grammars_tests.dir/tests/test_syn_grammars.cpp.o
+[8/8] Linking CXX executable vedit_syn_grammars_tests
+100% tests passed, 0 tests failed out of 2

@@ -1,0 +1,19 @@
+== evidence: 00-pins.txt — the tree and artefacts this verification package belongs to ==
+time=2026-11-01T17:43:00+08:00
+branch=feat/qt6-ktexteditor-migration
+HEAD=0c8ea9fe4ae18c386a59a55b8868f837f4f80a84
+host=Linux 7.0.0-38-generic x86_64 GNU/Linux glibc=ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43
+centos7-image=docker.m.daocloud.io/library/centos:7 sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+
+== deliverable under test ==
+-rwxr-xr-x 1 haroldzhao haroldzhao 95349240 Nov  1 16:33 packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage
+e7ae067fe66c8e271ba72da974795a7ee3db0efa59bda45079b5a048b4a09558  packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage
+e7ae067fe66c8e271ba72da974795a7ee3db0efa59bda45079b5a048b4a09558  VEdit-0.1.1-x86_64.AppImage
+
+== this task's files ==
+24b8bd5f7d756a067c439230f2d6f0288815b6acf9351f1f068bfb4cd48855b1  packaging/runtime/verify/verify-appimage-centos7.sh
+0c2c69a07f710716991e1f51e156bba8c344383c28725cbea3686f66f4c7f004  packaging/runtime/verify/STEPS.md
+
+== write scope status ==
+?? evidence/centos7-final-verify/
+?? packaging/runtime/verify/

@@ -1,0 +1,23 @@
+== 06 runtime switch evidence (from ctest output) ==
+CHECK switch.disabled.available-false PASS
+CHECK switch.disabled.no-provider PASS
+CHECK switch.enabled.available-true PASS
+CHECK switch.enabled.provider PASS
+CHECK switch.deactivated.available-false PASS
+CHECK switch.unknown-grammar-rejected PASS
+CHECK switch.reactivate PASS
+CHECK fallback.disabled-provider-caps PASS
+CHECK fallback.disabled-provider-parse-null PASS
+CHECK fallback.disabled-provider-spans-empty PASS
+SYN-PROVIDER-TESTS ok=1 checks=70 failures=0
+CHECK switch.disabled.available-false PASS
+CHECK switch.disabled.no-provider PASS
+CHECK switch.enabled.available-true PASS
+CHECK switch.enabled.provider PASS
+CHECK switch.deactivated.available-false PASS
+CHECK switch.unknown-grammar-rejected PASS
+CHECK switch.reactivate PASS
+CHECK fallback.disabled-provider-caps PASS
+CHECK fallback.disabled-provider-parse-null PASS
+CHECK fallback.disabled-provider-spans-empty PASS
+SYN-PROVIDER-TESTS ok=1 checks=70 failures=0

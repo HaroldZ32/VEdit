@@ -1,0 +1,16 @@
+# C9 evidence header
+collected_at: 2026-10-31T22:40:38+08:00
+git_head: c71fe31478887e3dc7c460f875ccfb93e61c0ec4
+
+## T12 invariants must not regress: grammar id, registered grammars, three syntax libs
+
+## syntax-product startup line (from a real product run):
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+
+## vedit-app NEEDED entries for the three syntax libraries:
+ 0x0000000000000001 (NEEDED)             Shared library: [libKF6TextEditor.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libtree-sitter.so.0.25]
+ 0x0000000000000001 (NEEDED)             Shared library: [libKF6SyntaxHighlighting.so.6]
+
+## the grammar registry symbols are linked into the product binary:
+36

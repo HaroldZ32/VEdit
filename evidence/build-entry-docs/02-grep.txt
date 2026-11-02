@@ -1,0 +1,53 @@
+generated: 2026-10-31T14:19:09Z
+git_head: c71fe31478887e3dc7c460f875ccfb93e61c0ec4
+git_status_porcelain:
+ M AGENT.md
+ M build/evidence/typecheck/00-run.txt
+ M build/evidence/typecheck/10-typecheck-image-build.log
+ M build/evidence/typecheck/11-typecheck-image-id.txt
+ M docs/BUILD.md
+ M docs/USER_GUIDE.md
+ M evidence/ffi-abi/logs/10-rust-image.txt
+ M evidence/ffi-abi/logs/19-rust-stage-console.log
+ M evidence/ffi-abi/logs/20-cargo-build-release.log
+ M evidence/ffi-abi/logs/21-staticlib.txt
+ M evidence/ffi-abi/logs/23-cargo-test.log
+ M evidence/m0-build/build-logs/20-qt6-image-build.log
+ M evidence/m0-build/build-logs/21-qt6-image-id.txt
+ M evidence/m0-build/build-logs/31-qt6-configure.log
+ M evidence/m0-build/build-logs/32-qt6-build.log
+ M evidence/m0-build/build-logs/34-qt6-elf.txt
+?? evidence/glibc217-feasibility/
+?? evidence/user-guide-split/
+?? evidence/verdicts/fix-shell-terminal/
+?? evidence/verdicts/search-jump-kte/
+?? evidence/verdicts/user-guide/
+---
+== grep per the acceptance criterion ==
+
+$ grep -n 'build-qt\|vedit-app\|build\.sh' AGENT.md docs/USER_GUIDE.md docs/BUILD.md
+AGENT.md:36:  1.99.0, GtkSourceView 4.6.1, meson/ninja) is built by `bash scripts/build.sh`;
+AGENT.md:38:- Build the **delivered Qt6 product** (v2): `bash scripts/build-qt.sh` ->
+AGENT.md:39:  `target/qt6-build/src/app/vedit-app`. Its runtime needs the KF6/Qt6 shared
+AGENT.md:44:- Build the **legacy Rust/GTK3 product**: `bash scripts/build.sh` (one command:
+AGENT.md:48:  **never produces `vedit-app`**.
+AGENT.md:58:`bash build/slang/build.sh`.
+docs/USER_GUIDE.md:57:bash scripts/build-qt.sh              # 固定镜像 → Rust 服务层 → configure → build → ctest → xcb 冒烟
+docs/USER_GUIDE.md:58:bash scripts/build-qt.sh --no-test    # 只 configure + build
+docs/USER_GUIDE.md:61:产物是 **`target/qt6-build/src/app/vedit-app`**（CMake 构建树在 gitignored 的 `target/qt6-build/`）。
+docs/USER_GUIDE.md:62:`bash scripts/build.sh` 是**旧产品**：只产出 `target/release/vd-app`，**不产出 `vedit-app`**。
+docs/USER_GUIDE.md:64:把 `vedit-app` 放到另一台机器直接跑时，需要 KF6/Qt6 运行库、`libtree-sitter0.25` 和 Qt 平台插件
+docs/BUILD.md:7:> §12 是重写后的 **C++/Qt6 构建底座**（M0，T10：`bash scripts/build-qt.sh`，
+docs/BUILD.md:23:bash scripts/build.sh
+docs/BUILD.md:86:bash build/slang/build.sh
+docs/BUILD.md:102:bash packaging/tarball/build.sh           # tar.gz + 自解压 .run（含离线干净容器验收）
+docs/BUILD.md:149:| `pkg-config ... gtksourceview-4 not found` | 在宿主直接 `cargo build` 了；GTK 栈只在 pinned 镜像里存在，用 `bash scripts/build.sh` |
+docs/BUILD.md:161:| `ci.yml` | PR → `dev`/`main`；push → `dev` | `scripts/gates.sh` + `scripts/build.sh`（release build、Xvfb smoke、GLIBC ≤ 2.17 断言），上传 `build/evidence/` 与 `build/artifacts/vd-app` |
+docs/BUILD.md:163:| `release.yml` | tag `v*`；手动 | slang → `scripts/build.sh` → AppImage → tar.gz/.run → `SHA256SUMS` → GitHub Release |
+docs/BUILD.md:184:- `scripts/build.sh` 在镜像内跑两处 `--selftest`：先 `--selftest smoke --probe-hold-ms 2500`
+docs/BUILD.md:187:  CI 会先 `bash build/slang/build.sh` 与 `bash scripts/fetch-verible.sh`，因此走 `all` 六套件。
+docs/BUILD.md:218:bash scripts/build-qt.sh              # 镜像 → configure → build → ctest → xcb/软件渲染冒烟
+docs/BUILD.md:219:bash scripts/build-qt.sh --no-test    # 只 configure + build（即 C++ 静态检查）
+docs/BUILD.md:222:**产物路径：`target/qt6-build/src/app/vedit-app`**（CMake 构建树 `target/qt6-build/` 已被 gitignore）。
+docs/BUILD.md:223:`bash scripts/build.sh` 是旧 Rust/GTK3 产品，只写 `target/release/vd-app`，不产出 `vedit-app`。
+docs/BUILD.md:323:| 想复用已发布镜像 | `VEDIT_QT6_BUILD_IMAGE_REF=… VEDIT_QT6_BUILD_IMAGE_PULL=1 bash scripts/build-qt.sh` |

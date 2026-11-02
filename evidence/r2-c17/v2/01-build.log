@@ -1,0 +1,36 @@
+== 01 build ==
+-- The CXX compiler identification is GNU 15.2.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Performing Test HAVE_STDATOMIC
+-- Performing Test HAVE_STDATOMIC - Success
+-- Found WrapAtomic: TRUE
+-- Found OpenGL: /usr/lib/x86_64-linux-gnu/libOpenGL.so
+-- Found WrapOpenGL: TRUE
+-- Found WrapVulkanHeaders: /usr/include
+-- Found X11: /usr/include
+-- Looking for XOpenDisplay in /usr/lib/x86_64-linux-gnu/libX11.so
+-- Looking for XOpenDisplay in /usr/lib/x86_64-linux-gnu/libX11.so - found
+-- Looking for gethostbyname
+-- Looking for gethostbyname - found
+-- Looking for connect
+-- Looking for connect - found
+-- Looking for remove
+-- Looking for remove - found
+-- Looking for shmat
+-- Looking for shmat - found
+-- KTextEditor include dirs: 
+-- KTextEditor version:      6.24.0
+-- KSyntaxHighlighting:      6.24.0
+-- Configuring done (0.8s)
+-- Generating done (0.0s)
+-- Build files have been written to: /work/probes/c17-overlay/build
+[1/2] Building CXX object CMakeFiles/c17-overlay.dir/src/main.cpp.o
+[2/2] Linking CXX executable c17-overlay
+[build exit=0]

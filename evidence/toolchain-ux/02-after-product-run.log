@@ -1,0 +1,23 @@
+# C9 evidence header
+collected_at: 2026-10-31T23:27:37+08:00
+git_head: c682694e125ff7f59c590b83b6d2895239a3d143
+binary_sha256: 7e2034d890a8a6a1625f561b72e7a7f1424b479be00b023993fce446ae53644b
+
+## A) BARE BUILD IN THE REPO (local checkout artifacts present)
+
+APP-EXIT=0
+TOOLCHAIN line:
+TOOLCHAIN source=verible:local slang:local missing=[] local=[/vedit-build/build/slang/out,/vedit-build/.mpd/recon/verible/bin]
+unavailable-message occurrences: 0
+probe-wall occurrences: 0
+longest line bytes: 247
+
+## B) BINARY OUTSIDE THE CHECKOUT (no local artifacts -> the missing state)
+APP-EXIT=0
+TOOLCHAIN line:
+TOOLCHAIN source=verible:missing slang:missing missing=[verible, slang] local=[]
+user-facing message occurrences: 1
+probe-wall occurrences: 1
+message line bytes: 459
+longest line bytes: 637
+[app-shell] Diagnostics unavailable: verible-verilog-ls, slang not found (bundled, local checkout, PATH and env all empty). Impact: Verible diagnostics, navigation and the outline are unavailable; SLA

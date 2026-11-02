@@ -1,0 +1,79 @@
+--- /tmp/head-header.h	2026-11-01 19:54:34.370262387 +0800
++++ target/verify-abifix/crates/vd-ffi/include/vd_ffi.h	2026-11-01 19:53:10.733054807 +0800
+@@ -1164,40 +1164,66 @@
+ void vd_vcs_status_free(struct VdVcsStatus *status);
+ 
+ /*
+- Branch + revision of the working tree containing `root`.
++ Starts a branch + revision job for `root`.
++
++ Returns the job id, or `0` when the arguments were rejected. The panel polls
++ with [`vd_vcs_info_poll`], so the GUI thread never waits for `git`/`svn`.
++
++ # Safety
++
++ `service` must be null or live; `root` must be null or a valid NUL-terminated
++ string.
++ */
++uint64_t vd_vcs_info_job(struct VdService *service, const char *root);
++
++/*
++ Polls a branch + revision job started by [`vd_vcs_info_job`].
+ 
+  # Safety
+ 
+- `root` must be null or a valid NUL-terminated UTF-8 string; the result must be
+- released with `vd_vcs_info_free`.
++ `service` must be null or live and `out` must be null or writable for one
++ [`VdVcsInfo`].
+  */
+-struct VdVcsInfo vd_vcs_info(const char *root);
++int32_t vd_vcs_info_poll(struct VdService *service, uint64_t job, struct VdVcsInfo *out);
+ 
+ /*
+  Releases the strings of a [`VdVcsInfo`] (the struct itself is by value).
+ 
+  # Safety
+ 
+- `info` must be null or a struct returned by `vd_vcs_info` that was not freed.
++ `info` must be null or a struct returned by `vd_vcs_info_poll` that was not freed.
+  */
+ void vd_vcs_info_free(struct VdVcsInfo *info);
+ 
+ /*
+- Unified diff of one file of the working tree containing `root`.
++ Starts a unified-diff job for one file of the working tree containing `root`.
++
++ Returns the job id, or `0` when the arguments were rejected. The panel polls
++ with [`vd_vcs_diff_poll`], so the GUI thread never waits for `git diff`.
++
++ # Safety
++
++ `service` must be null or live; `root` and `path` must be null or valid
++ NUL-terminated UTF-8 strings.
++ */
++uint64_t vd_vcs_diff_job(struct VdService *service, const char *root, const char *path);
++
++/*
++ Polls a diff job started by [`vd_vcs_diff_job`].
+ 
+  # Safety
+ 
+- `root` and `path` must be null or valid NUL-terminated UTF-8 strings; the
+- result must be released with `vd_vcs_diff_free`.
++ `service` must be null or live and `out` must be null or writable for one
++ [`VdVcsDiff`].
+  */
+-struct VdVcsDiff vd_vcs_diff(const char *root, const char *path);
++int32_t vd_vcs_diff_poll(struct VdService *service, uint64_t job, struct VdVcsDiff *out);
+ 
+ /*
+  Releases the strings of a [`VdVcsDiff`].
+ 
+  # Safety
+ 
+- `diff` must be null or a struct returned by `vd_vcs_diff` that was not freed.
++ `diff` must be null or a struct returned by `vd_vcs_diff_poll` that was not freed.
+  */
+ void vd_vcs_diff_free(struct VdVcsDiff *diff);
+ 

@@ -1,0 +1,27 @@
+# Product acceptance test (headless): task T12, AC-S1.2
+
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='/vedit-build/resources' definitions=451 own-xml=[vedit-systemverilog.xml,vedit-verilog.xml] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+CHECK g3.compiled-grammar-is-verilog PASS
+CHECK g3.tree-sitter-backend-compiled PASS
+CHECK g3.verilog-registered PASS
+CHECK g3.systemverilog-registered PASS
+CHECK g3.startup-hook-ran PASS
+CHECK g3.grammar-activated PASS
+CHECK g3.active-grammar-is-verilog PASS
+CHECK g3.tree-sitter-backend-available PASS
+CHECK g3.tree-sitter-provider-created PASS
+CHECK g2.editing-kernel-linked PASS
+CHECK data.loaded PASS
+CHECK data.own-verilog-xml PASS
+CHECK data.own-systemverilog-xml PASS
+CHECK data.verilog-definition PASS
+CHECK data.systemverilog-definition PASS
+CHECK data.no-embargoed-definition PASS
+CHECK data.themes-available PASS
+HIGHLIGHT verilog format-ranges=3
+CHECK highlight.verilog-attributes PASS
+HIGHLIGHT systemverilog format-ranges=4
+CHECK highlight.systemverilog-attributes PASS
+DIAGNOSTICS .v resolves to definition 'V' by file name (the built-in 'V'/vlang definition also claims *.v); use resolveLanguageForFile()/explicit language names instead
+SYNTAX-PRODUCT-TESTS ok=1 checks=19 failures=0
+EXIT=0

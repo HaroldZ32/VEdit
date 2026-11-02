@@ -1,0 +1,11 @@
+KSH-ENV defs=2 hash=b31aa2cc1f717e2d5a03bbdad983f7487f8982803fe71fe243745a85454b2d37
+KSH-GUARD PASS whitelist=SystemVerilog,Verilog
+qt.multimedia.symbolsresolver: Couldn't load pipewire-0.3 library
+qt.multimedia.symbolsresolver: Couldn't resolve pipewire-0.3 symbols
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, but has failed to switch to one.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+M0-SMOKE ok=1 platform=offscreen qt=6.10.2 kf6=6.24.0 ktexteditor=1 ksynhl=6.24.0 tree_sitter=0.25.9 window=1 editor=1 document=1 definitions=3 themes=30 verilog=1 systemverilog=loadable(not-asserted,C7-pending) custom_path=1 tree_sitter_parser=1 builtin_valid_defs=2 whitelist_verilog=0 highlight_formats=-1 kshlib=/app/lib/libKF6SyntaxHighlighting.so.6 libc=/app/lib/libc.so.6
+M0-SMOKE theme=Atom One Dark
+M0-SMOKE ksh-selfbuild ktexteditor_repo_valid_defs_before=2 ktexteditor_repo_whitelist_visible=0 (const_cast probe only)

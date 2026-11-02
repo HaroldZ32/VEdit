@@ -93,9 +93,11 @@ const ENV_FIM_ENABLED: &str = "VEDIT_FIM_ENABLED";
 /// `Loader::new(start_dir)`: **`start_dir` is the origin of the upward project
 /// discovery** — the directory that holds the file the editor just opened, as
 /// passed by the application layer (`vd-app`). It is *not* the process working
-/// directory. The root is the nearest ancestor containing `vedit.toml` or
-/// `.git`; when nothing marks a root, `start_dir` itself is used and
-/// [`ProjectContext::root_source`] says `fallback`.
+/// directory. The root is the nearest ancestor containing `vedit.toml`, `.git`,
+/// or a `.f` filelist directly (a folder that ships its own filelists is a
+/// project even inside a larger checkout); when nothing marks a root,
+/// `start_dir` itself is used and [`ProjectContext::root_source`] says
+/// `fallback`.
 #[derive(Debug, Clone)]
 pub struct Loader {
     start_dir: PathBuf,

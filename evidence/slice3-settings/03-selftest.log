@@ -1,0 +1,48 @@
+# settings lane selftest (offscreen, real Rust store through the C ABI)
+# command: vedit-workspace-settings-selftest --selfcheck
+# exit code: 0
+
+SETTINGS-SELFTEST start
+CHECK settings.ffi.available PASS
+CHECK settings.panel.loaded PASS
+CHECK settings.panel.object-name PASS
+CHECK settings.theme.list PASS 30 theme(s)
+CHECK settings.theme.initial PASS Breeze Light
+CHECK settings.keys.rows PASS rows=3
+CHECK settings.theme.applied PASS Atom One Dark
+CHECK settings.theme.status PASS Stored by the Rust service in /tmp/vedit-workspace-settings-selftest-MmXLpI/settings.toml
+CHECK settings.theme.persisted PASS theme = "Atom One Dark"
+
+CHECK settings.restart.loaded PASS
+CHECK settings.theme.restart PASS Atom One Dark
+CHECK settings.keys.flush PASS
+CHECK settings.keys.applied PASS Ctrl+Alt+J
+CHECK settings.keys.persisted PASS "keymap.view.split.horizontal" = "Ctrl+Alt+J"
+theme = "Atom One Dark"
+
+CHECK settings.keys.mirror PASS
+CHECK settings.keys.mirror-restart PASS
+CHECK settings.restart.keys-loaded PASS
+CHECK settings.keys.restart PASS Ctrl+Alt+J
+CHECK settings.conflict.flush PASS
+CHECK settings.conflict.detected PASS Ctrl+S: file.save, view.toggle-settings
+CHECK settings.conflict.names PASS Ctrl+S: file.save, view.toggle-settings
+CHECK settings.conflict.visible PASS Conflicting shortcuts: Ctrl+S: file.save, view.toggle-settings
+CHECK settings.badconfig.write PASS
+CHECK settings.badconfig.flush PASS
+CHECK settings.badconfig.warning PASS invalid TOML in /tmp/vedit-workspace-settings-selftest-MmXLpI/settings.toml: TOML parse error at line 2, column 10
+  |
+2 | [unclosed
+  |    
+CHECK settings.badconfig.visible PASS
+CHECK settings.badconfig.theme-valid PASS Atom One Dark
+CHECK settings.badconfig.recover-flush PASS
+CHECK settings.badconfig.recovered PASS
+CHECK settings.badconfig.file-valid PASS
+CHECK settings.nonblocking.temp-dir PASS
+CHECK settings.nonblocking.write-fixture PASS
+CHECK settings.nonblocking.start-returns-fast PASS start took 0 ms for a 1532 KB store
+CHECK settings.nonblocking.event-loop-ticks PASS ticks=7 poles=10
+CHECK settings.nonblocking.flush PASS
+CHECK settings.nonblocking.result PASS entries=120000 delivered=1
+SETTINGS-SELFTEST ok=1 checks=36 failures=0

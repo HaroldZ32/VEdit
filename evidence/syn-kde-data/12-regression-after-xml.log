@@ -1,0 +1,28 @@
+# Regression check after the XML rewrite: the same definitions still load in the product paths.
+
+## product acceptance test (headless) — own HTML/files + highlight attributes
+CHECK data.loaded PASS
+CHECK data.own-verilog-xml PASS
+CHECK data.own-systemverilog-xml PASS
+CHECK data.verilog-definition PASS
+CHECK data.systemverilog-definition PASS
+CHECK data.no-embargoed-definition PASS
+CHECK data.themes-available PASS
+HIGHLIGHT verilog format-ranges=3
+CHECK highlight.verilog-attributes PASS
+HIGHLIGHT systemverilog format-ranges=4
+CHECK highlight.systemverilog-attributes PASS
+SYNTAX-PRODUCT-TESTS ok=1 checks=19 failures=0
+PRODUCT-TEST-EXIT=0
+
+## syntax-data validator (KDE data lane ctest)
+CHECK fold.verilog-regions-balanced PASS  7
+FOLD systemverilog formats=51 begins=9 ends=9
+CHECK fold.sv-highlighting PASS
+CHECK fold.sv-a4-constructs-begin PASS  9
+CHECK fold.sv-a4-constructs-balanced PASS  9
+SYN-KDE-DATA-SELFTEST ok=1 checks=29 failures=0
+KDE-VALIDATOR-EXIT=0
+
+## product binary startup line
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='/vedit-build/resources' definitions=451 own-xml=[vedit-systemverilog.xml,vedit-verilog.xml] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1

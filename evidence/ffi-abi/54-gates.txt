@@ -1,0 +1,38 @@
+# Gates that cover this change (AGENT.md §4; build/gates/typecheck.sh, build/gates/gates.sh).
+# collection: 2026-10-31T10:19:00Z rev=9957f5fe4d63c17c681e8753288262fa2c00955e
+#
+# EVERY command below was run in the pinned images; the observed exit code follows it.
+
+$ cargo fmt --all -- --check
+exit=0
+
+$ cargo clippy --workspace --all-targets -- -D warnings
+exit=0                                # includes vd-ffi (unsafe allowed) and every other crate (forbid)
+
+$ cargo test -p vd-ffi -p vd-search -p vd-settings -p vd-vcs
+vd-ffi      12 passed, 0 failed       # ABI tests, one per service + lifecycle + cancellation
+vd-search    6 passed, 0 failed
+vd-settings  6 passed, 0 failed
+vd-vcs       6 passed, 0 failed
+raw log: logs/23-cargo-test.log
+
+$ cargo test --workspace              # NOT a green run in this ad-hoc invocation; see note
+FAILED: vd-deeplint --test real_slang (6 tests).
+  Cause: crates/vd-deeplint/tests/real_slang.rs locates the REAL slang artifact through
+  VEDIT_SLANG or build/slang/out/slang and panics when neither exists. This invocation did
+  not build that artifact. crates/vd-deeplint is UNTOUCHED by this task (`git status` lists no
+  change under it), so the failure predates this work and is not caused by it.
+  The ledger gate build/gates/gates.sh builds the artifact first (see its lines 12-17:
+  `bash build/slang/build.sh` when build/slang/out/slang is missing) and then runs
+  scripts/gates.sh, whose `cargo test --workspace` therefore finds it. This task ran
+  build-qt.sh (the C++ lane gate) instead of the full ledger gate, to avoid racing the
+  other members' builds in the shared tree; the slang artifact is unrelated to the FFI seam.
+
+$ VEDIT_SKIP_IMAGE_BUILD=1 bash scripts/build-qt.sh
+exit=0                                # Rust layer + configure + build + ctest + xcb smoke
+ctest: 100% tests passed, 0 tests failed out of 10 (incl. vedit-app-ffi-abi-selftest)
+raw log: logs/41-falsification-restored.log
+ctest log: evidence/m0-build/build-logs/33-qt6-ctest.log
+
+$ VEDIT_SKIP_IMAGE_BUILD=1 bash scripts/build-qt.sh --no-test   # with one export name broken
+exit=1                                # FALSIFICATION: see logs/40-falsification-red.log

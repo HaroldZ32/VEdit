@@ -1,0 +1,9 @@
+kf.syntaxhighlighting: Unable to resolve external include rule for definition "Comments" in "Verilog"
+kf.syntaxhighlighting: Unable to resolve include rule for definition "##Comments" in "Verilog"
+kf.syntaxhighlighting: Unable to resolve external include rule for definition "Comments" in "Verilog"
+kf.syntaxhighlighting: Unable to resolve include rule for definition "##Comments" in "Verilog"
+kf.syntaxhighlighting: Unable to resolve external include rule for definition "Comments" in "Verilog"
+kf.syntaxhighlighting: Unable to resolve include rule for definition "##Comments" in "Verilog"
+M0-SMOKE ok=1 platform=offscreen qt=6.10.2 kf6=6.24.0 ktexteditor=1 ksynhl=6.24.0 tree_sitter=0.25.9 window=1 editor=1 document=1 definitions=2 themes=30 verilog=0 systemverilog=absent custom_path=1 tree_sitter_parser=1 builtin_valid_defs=0 whitelist_verilog=1 highlight_formats=21 kshlib=/vedit-build/target/ksh-selfbuild/F1/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0 libc=/usr/lib/x86_64-linux-gnu/libc.so.6
+M0-SMOKE theme=Atom One Dark
+M0-SMOKE ksh-selfbuild ktexteditor_repo_valid_defs_before=0 ktexteditor_repo_whitelist_visible=1 (const_cast probe only)

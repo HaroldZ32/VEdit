@@ -1,0 +1,79 @@
+collected_at: 2026-11-01T06:19:52Z
+git_head: 48569602d0c86fb402dc88155593d1dc06445c90
+branch: feat/qt6-ktexteditor-migration
+git_status_porcelain:
+ M build/evidence/typecheck/00-run.txt
+ M build/evidence/typecheck/10-typecheck-image-build.log
+ M build/evidence/typecheck/11-typecheck-image-id.txt
+ M evidence/ffi-abi/logs/10-rust-image.txt
+ M evidence/ffi-abi/logs/19-rust-stage-console.log
+ M evidence/ffi-abi/logs/20-cargo-build-release.log
+ M evidence/ffi-abi/logs/21-staticlib.txt
+ M evidence/ffi-abi/logs/23-cargo-test.log
+ M evidence/ffi-abi/logs/26-vd_ffi.h
+ M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+ M evidence/m0-build/build-logs/20-qt6-image-build.log
+ M evidence/m0-build/build-logs/21-qt6-image-id.txt
+ M evidence/m0-build/build-logs/31-qt6-configure.log
+ M evidence/m0-build/build-logs/32-qt6-build.log
+ M src/app/editor_area.cpp
+ M src/app/editor_area.h
+ M src/app/editor_provider.h
+ M src/app/main.cpp
+ M src/editor/CMakeLists.txt
+ M src/editor/kernel/ktexteditor_provider.cpp
+ M src/editor/kernel/ktexteditor_provider.h
+ M src/workspace/palette/README.md
+ M src/workspace/search/CMakeLists.txt
+ M src/workspace/search/README.md
+ M src/workspace/search/global_search.cpp
+ M src/workspace/search/global_search.h
+?? evidence/slice2-overlay/
+?? evidence/verdicts/fold/
+?? evidence/verdicts/vcs/
+?? src/editor/kernel/fold_breadcrumb.cpp
+verifier: Reviewer (cell-20261031T085543161Z, T20; loop loop-20261031T095153-fc5d81)
+
+== [1] folding lane: fresh /tmp build + tests (current tree) ==
+FOLD-CONFIGURE-EXIT=0
+FOLD-BUILD-EXIT=0
+A1-CONTROL invalid_range exec_returned=1 message='' scroll_max_before=939 scroll_max_after=934 hidden_before=0 hidden_after=5
+A1-CONTROL inverted_range exec_returned=1 scroll_max_before=939 scroll_max_after=929
+A2 first-open trigger=first-open injected=200 rejected=0 elapsed_ms=94 full_count=1 inject_count=200 source='provider 'systemverilog' parsed 200 fold ranges'
+A2 key-path chars=200 full_count_before=1 full_count_after=1 key_events=200
+A2 cursor-path moves=50 cursor_events=50 full_count=1
+A2 toggle-off injected=0 elapsed_ms=9 full_count=2 tree_sitter_active=0
+A2 toggle-back injected=200 elapsed_ms=92 full_count=3
+MEASURE fold_inject n=50 p95_us=835.19
+A1F state=on tree_sitter_active=1 expected_hidden=975 expected_scroll_drop=939 observed_scroll_drop=939 hidden_in_viewport=975 ranges=200
+A1F state=off tree_sitter_active=0 expected_hidden=0 observed_scroll_drop=0 hidden_in_viewport=0 ranges=0
+A1F method1 expected_hidden=39 expected_scroll_drop=19 observed_hidden_in_viewport=39 observed_scroll_drop=19
+FOLDING-TESTS ok=1 checks=75 failures=0 skipped=0
+FOLD-TEST-EXIT=0
+FOLD-CTEST-EXIT=0
+
+== [2] breadcrumb lane: fresh /tmp build + tests (current tree) ==
+BC-CONFIGURE-EXIT=0
+BC-BUILD-EXIT=0
+BREADCRUMB-TESTS ok=1 checks=36 failures=0
+BC-TEST-EXIT=0
+BC-CTEST-EXIT=0
+
+== [3] root ctest (current tree) ==
+	 12 - vedit-folding-tests (Not Run)
+Errors while running CTest
+CTEST-EXIT=8
+
+== [4] evidence source pins vs current tree (C9 drift check) ==
+DRIFT src/syntax/folding/CMakeLists.txt pinned c798d8077b7eface now 5d817655a47d6967
+DRIFT src/syntax/folding/README.md pinned 898afbff577d18cc now 29e75eb16911498a
+DRIFT src/syntax/folding/tests/folding_tests.cpp pinned 5143e8608d65dedd now f4041cd14e4fb48c
+pins 19 drifted 3
+
+== [5] declared gate: typecheck (loop-bound) ==
+mpd_verify_evidence {gate:typecheck, loop:loop-20261031T095153-fc5d81} -> exit 1
+log: .mpd/verify/evidence/ev-20261101T061831-28ddbd.log
+FAILED: [code=1] src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/ktexteditor_provider.cpp.o 
+/vedit-build/src/editor/kernel/ktexteditor_provider.cpp:91:5: error: ‘connect’ was not declared in this scope; did you mean ‘const’?
+[typecheck] FAIL: the C++/Qt6 lane failed to configure/build with -Werror
+error: script "typecheck" exited with code 1

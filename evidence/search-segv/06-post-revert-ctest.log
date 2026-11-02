@@ -1,0 +1,151 @@
+collected_at: 2026-11-01T19:32:07+08:00
+git_head: 60c7ae9c95fe769e2bd6c86dd4c56e1514603e44
+git_branch: feat/qt6-ktexteditor-migration
+git_status:
+   M AGENT.md
+   M THIRD_PARTY_NOTICES.md
+   M build/evidence/typecheck/00-run.txt
+   M build/evidence/typecheck/10-typecheck-image-build.log
+   M build/evidence/typecheck/11-typecheck-image-id.txt
+   M crates/vd-config/src/project.rs
+   M crates/vd-config/src/warnings.rs
+   M crates/vd-ffi/include/vd_ffi.h
+   M crates/vd-ffi/src/lsp.rs
+   M crates/vd-ffi/src/project.rs
+   M crates/vd-lsp/src/client.rs
+   M crates/vd-lsp/src/documents.rs
+   M crates/vd-lsp/src/session.rs
+   M evidence/ffi-abi/logs/10-rust-image.txt
+   M evidence/ffi-abi/logs/19-rust-stage-console.log
+   M evidence/ffi-abi/logs/20-cargo-build-release.log
+   M evidence/ffi-abi/logs/21-staticlib.txt
+   M evidence/ffi-abi/logs/23-cargo-test.log
+   M evidence/ffi-abi/logs/26-vd_ffi.h
+   M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+   M evidence/m0-build/build-logs/20-qt6-image-build.log
+   M evidence/m0-build/build-logs/21-qt6-image-id.txt
+   M evidence/m0-build/build-logs/31-qt6-configure.log
+   M evidence/m0-build/build-logs/32-qt6-build.log
+   M evidence/m0-build/build-logs/33-qt6-ctest.log
+   M evidence/m0-build/build-logs/34-qt6-elf.txt
+   M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+   M packaging/runtime/AppRun
+   M packaging/runtime/README.md
+   M packaging/runtime/assemble-appdir.sh
+   M packaging/runtime/selfcheck.sh
+   M scripts/versions.env
+   M src/app/CMakeLists.txt
+   M src/app/app_shell.cpp
+   M src/app/editor_area.cpp
+   M src/app/main.cpp
+   M src/editor/kernel/fold_breadcrumb.cpp
+   M src/syntax/folding/CMakeLists.txt
+   M src/syntax/product/syntax_product.cpp
+   M src/workspace/diagnostics/CMakeLists.txt
+   M src/workspace/diagnostics/diagnostics_controller.cpp
+   M src/workspace/diagnostics/diagnostics_controller.h
+   M src/workspace/diagnostics/diagnostics_ffi_selftest.cpp
+   M src/workspace/diagnostics/diagnostics_integration.cpp
+   M src/workspace/diagnostics/diagnostics_panel.cpp
+   M src/workspace/diagnostics/diagnostics_panel.h
+   M src/workspace/diagnostics/diagnostics_selftest.cpp
+   M src/workspace/diagnostics/ffi_backends.cpp
+   M src/workspace/diagnostics/lsp_backend.h
+   M src/workspace/filetree/filetree_integration.cpp
+   M src/workspace/palette/README.md
+   M src/workspace/palette/palette_integration.cpp
+   M src/workspace/search/CMakeLists.txt
+   M src/workspace/search/README.md
+   M src/workspace/search/global_search.cpp
+   M src/workspace/search/global_search.h
+   M src/workspace/search/search_integration.cpp
+   M src/workspace/search/search_selftest.cpp
+   M src/workspace/settings/settings_integration.cpp
+   M src/workspace/vcs/vcs_integration.cpp
+  ?? crates/vd-lsp/tests/buffer_change.rs
+  ?? evidence/crash-segv/
+  ?? evidence/fold-toggle/
+  ?? evidence/fonts-cjk/
+  ?? evidence/large-file/
+  ?? evidence/lint-trigger/
+  ?? evidence/locale-and-noise/
+  ?? evidence/rules-search-ux/
+  ?? evidence/search-segv/
+  ?? packaging/runtime/assets/fonts/
+  ?? packaging/runtime/assets/licenses/
+  ?? src/app/crash_report_check.sh
+  ?? src/app/crash_reporter.cpp
+  ?? src/app/crash_reporter.h
+  ?? src/app/crash_reporter_selftest.cpp
+  ?? src/syntax/folding/tests/fold_toggle_tests.cpp
+  ?? src/workspace/diagnostics/selftests/
+
+# post-revert confirmation: the search selftest no longer crashes
+
+Test project /vedit-build/target/qt6-build
+      Start  1: vedit-app-syntax-startup
+ 1/31 Test  #1: vedit-app-syntax-startup .......................   Passed    5.02 sec
+      Start  2: vedit-m0-smoke
+ 2/31 Test  #2: vedit-m0-smoke .................................   Passed    0.05 sec
+      Start  3: vedit-syntax-provider-tests
+ 3/31 Test  #3: vedit-syntax-provider-tests ....................   Passed    0.00 sec
+      Start  4: vedit-syntax-kde-data
+ 4/31 Test  #4: vedit-syntax-kde-data ..........................   Passed    0.03 sec
+      Start  5: vedit-syntax-directory-equivalence
+ 5/31 Test  #5: vedit-syntax-directory-equivalence .............   Passed    0.02 sec
+      Start  6: vedit-syn-grammars-tests
+ 6/31 Test  #6: vedit-syn-grammars-tests .......................   Passed    0.17 sec
+      Start  7: vedit-syntax-product-tests
+ 7/31 Test  #7: vedit-syntax-product-tests .....................   Passed    0.05 sec
+      Start  8: vedit-terminal-selftest
+ 8/31 Test  #8: vedit-terminal-selftest ........................   Passed    2.13 sec
+      Start  9: vedit-syntax-overlay-selftest
+ 9/31 Test  #9: vedit-syntax-overlay-selftest ..................   Passed    2.18 sec
+      Start 10: vedit-app-ffi-abi-selftest
+10/31 Test #10: vedit-app-ffi-abi-selftest .....................   Passed    0.24 sec
+      Start 11: vedit-app-shell-selftest
+11/31 Test #11: vedit-app-shell-selftest .......................   Passed    5.00 sec
+      Start 12: vedit-app-crash-reporter-selftest
+12/31 Test #12: vedit-app-crash-reporter-selftest ..............   Passed    0.13 sec
+      Start 13: vedit-app-crash-report-shipped
+13/31 Test #13: vedit-app-crash-report-shipped .................   Passed    0.14 sec
+      Start 14: vedit-edit-core-selftest
+14/31 Test #14: vedit-edit-core-selftest .......................   Passed    0.13 sec
+      Start 15: vedit-fim-wiring-selftest
+15/31 Test #15: vedit-fim-wiring-selftest ......................   Passed    1.92 sec
+      Start 16: vedit-syntax-directory-tests
+16/31 Test #16: vedit-syntax-directory-tests ...................   Passed    0.00 sec
+      Start 17: vedit-fold-toggle-tests
+17/31 Test #17: vedit-fold-toggle-tests ........................   Passed    0.37 sec
+      Start 18: vedit-folding-tests
+18/31 Test #18: vedit-folding-tests ............................   Passed    0.73 sec
+      Start 19: vedit-breadcrumb-tests
+19/31 Test #19: vedit-breadcrumb-tests .........................   Passed    0.04 sec
+      Start 20: vedit-fim-selftest
+20/31 Test #20: vedit-fim-selftest .............................   Passed    0.11 sec
+      Start 21: vedit-workspace-palette-selftest
+21/31 Test #21: vedit-workspace-palette-selftest ...............   Passed    0.08 sec
+      Start 22: vedit-workspace-palette-integration-selftest
+22/31 Test #22: vedit-workspace-palette-integration-selftest ...   Passed    0.16 sec
+      Start 23: vedit-workspace-search-selftest
+23/31 Test #23: vedit-workspace-search-selftest ................   Passed   12.21 sec
+      Start 24: vedit-workspace-project-selftest
+24/31 Test #24: vedit-workspace-project-selftest ...............   Passed    0.05 sec
+      Start 25: vedit-workspace-diagnostics-selftest
+25/31 Test #25: vedit-workspace-diagnostics-selftest ...........   Passed    1.81 sec
+      Start 26: vedit-toolchain-missing-selftest
+26/31 Test #26: vedit-toolchain-missing-selftest ...............   Passed    0.00 sec
+      Start 27: vedit-diagnostics-ffi-selftest
+27/31 Test #27: vedit-diagnostics-ffi-selftest .................   Passed    3.24 sec
+      Start 28: vedit-diagnostics-product-seam
+28/31 Test #28: vedit-diagnostics-product-seam .................   Passed    1.85 sec
+      Start 29: vedit-toolchain-ux-selftest
+29/31 Test #29: vedit-toolchain-ux-selftest ....................   Passed    3.10 sec
+      Start 30: vedit-workspace-vcs-selftest
+30/31 Test #30: vedit-workspace-vcs-selftest ...................   Passed    1.13 sec
+      Start 31: vedit-workspace-settings-selftest
+31/31 Test #31: vedit-workspace-settings-selftest ..............   Passed    0.32 sec
+
+100% tests passed, 0 tests failed out of 31
+
+Total Test time (real) =  42.45 sec

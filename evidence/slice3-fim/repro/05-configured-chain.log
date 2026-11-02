@@ -1,0 +1,60 @@
+# C9 evidence header (T105 backfill — evidence repair; the body below is unchanged)
+collected_at: unknown (no original header; the local collection time was not recorded)
+collected_at_utc: unknown
+collected_at_mtime_reference: 2026-11-01T15:17:53+0800   # reference only, NOT the collection time
+git_head: unknown (not recorded at collection time)
+git_head_at_backfill: d36bff9470dca6bb94ee6c5529c7fb5328f344c9
+backfill: 补记（T105）—— `git_status_porcelain`、`git_head_at_backfill` 与推导的 `collected_at_utc` 是补记时刻的快照/推导值，不是原始采集时刻；`git_status_porcelain` 描述补记时刻的工作树；原始采集时刻不可回溯，mtime 仅作参考。原始 `collected_at`/`git_head`（若存在）保留原值，未编造。
+backfill_snapshot: local=2026-11-01T15:38:25+0800 utc=2026-11-01T07:38:25Z
+git_status_porcelain_sha256: 8fac5b80afb6c312f8c729f6e07fc0410476bb743f515b195057f726876bc5e3   # snapshot at backfill time
+git_status_porcelain:
+  M build/evidence/typecheck/00-run.txt
+  M build/evidence/typecheck/10-typecheck-image-build.log
+  M build/evidence/typecheck/11-typecheck-image-id.txt
+  M crates/vd-ffi/include/vd_ffi.h
+  M crates/vd-ffi/src/fim.rs
+  M crates/vd-ffi/src/service.rs
+  M evidence/ffi-abi/logs/10-rust-image.txt
+  M evidence/ffi-abi/logs/19-rust-stage-console.log
+  M evidence/ffi-abi/logs/20-cargo-build-release.log
+  M evidence/ffi-abi/logs/21-staticlib.txt
+  M evidence/ffi-abi/logs/23-cargo-test.log
+  M evidence/ffi-abi/logs/26-vd_ffi.h
+  M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+  M evidence/m0-build/build-logs/20-qt6-image-build.log
+  M evidence/m0-build/build-logs/21-qt6-image-id.txt
+  M evidence/m0-build/build-logs/31-qt6-configure.log
+  M evidence/m0-build/build-logs/32-qt6-build.log
+  M evidence/m0-build/build-logs/33-qt6-ctest.log
+  M evidence/m0-build/build-logs/34-qt6-elf.txt
+  M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+  M src/editor/CMakeLists.txt
+  M src/editor/kernel/ktexteditor_provider.cpp
+  M src/workspace/palette/README.md
+  M src/workspace/search/CMakeLists.txt
+  M src/workspace/search/README.md
+  M src/workspace/search/global_search.cpp
+  M src/workspace/search/global_search.h
+ ?? evidence/fim-wiring/
+ ?? evidence/slice1-stop/61-typecheck-slice3.log
+ ?? evidence/slice1-stop/62-build-qt-slice3.log
+ ?? evidence/slice3-fim/
+ ?? evidence/verdicts/fim/
+ ?? src/editor/fim/
+ ?? src/editor/kernel/fim_wiring.cpp
+ ?? src/editor/kernel/fim_wiring.h
+ ?? src/editor/kernel/fim_wiring_selftest.cpp
+---
+SELFTEST-EXIT=0
+FIM-DEFAULT-OFF status="FIM 未启用" endpoint_requests=0 suggestion=0
+FIM-RUST-REQUEST first_line="POST /v1/completions HTTP/1.1" user-agent: ureq/3.5.0 body_has_prompt=1 body_has_suffix=1 authorization_bearer_redacted=1
+FIM-HALF-CONFIGURED status="FIM 未配置模型" endpoint_requests=1
+FIM-SELFTEST ok=1 checks=40 failures=0
+--- syscall counters (listener + client) ---
+SOCKET domain=2 type=1
+SOCKET domain=2 type=1
+SOCKET domain=2 type=524289
+CONNECT fd_placeholder=6 len=16
+SOCKETS=3
+CONNECTS=1
+GETADDRINFO=0

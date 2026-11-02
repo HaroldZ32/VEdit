@@ -1,0 +1,5 @@
+ROW docker.m.daocloud.io/library/centos:7 uname=7.0.0-38-generic glibc=ldd (GNU libc) 2.17 selfcheck=PASS startup=PASS lint=PASS
+ROW docker.m.daocloud.io/library/ubuntu:24.04 uname=7.0.0-38-generic glibc=ldd (Ubuntu GLIBC 2.39-0ubuntu8.9) 2.39 selfcheck=PASS startup=PASS lint=PASS
+ROW docker.m.daocloud.io/library/rockylinux:9 uname=7.0.0-38-generic glibc=ldd (GNU libc) 2.34 selfcheck=PASS startup=PASS lint=PASS
+ROW docker.m.daocloud.io/library/ubuntu:26.04 uname=7.0.0-38-generic glibc=ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43 selfcheck=PASS startup=PASS lint=PASS
+MATRIX pass=4 fail=0 (containers; host kernel 7.0.0-38-generic; real CentOS 7/3.10 UNTESTED)

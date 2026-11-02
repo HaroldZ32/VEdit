@@ -1,0 +1,38 @@
+# C9 evidence header
+collected_at: 2026-10-31T22:34:10+08:00
+git_head: c71fe31478887e3dc7c460f875ccfb93e61c0ec4
+state: PRE-FIX (no mode selection in the open path)
+
+HIGHLIGHT share='/tmp/qt_temp-pbalZn'
+HIGHLIGHT xdg_data_dirs='/tmp/qt_temp-pbalZn'
+HIGHLIGHT xdg_data_home='/tmp/qt_temp-pbalZn'
+HIGHLIGHT vedit_syntax_dir=''
+HIGHLIGHT generic_data_locations='/tmp/qt_temp-pbalZn:/tmp/qt_temp-pbalZn'
+CHECK highlight.editor-instance PASS
+HIGHLIGHT editor_repository_definitions=451
+HIGHLIGHT definitionForName(Verilog): name='Verilog' author='Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' section='Hardware' version=8 valid=1
+HIGHLIGHT definitionForName(SystemVerilog): name='SystemVerilog' author='Sean O'Boyle (seanoboyle@intelligentdv.com)' section='Hardware' version=11 valid=1
+HIGHLIGHT definitionForFileName(top.v): name='V' author='Lars Pontoppidan (dev.larpon@gmail.com)' section='Sources' version=1 valid=1
+HIGHLIGHT definitionForFileName(top.sv): name='SystemVerilog' author='Sean O'Boyle (seanoboyle@intelligentdv.com)' section='Hardware' version=11 valid=1
+CHECK highlight.repository-has-verilog PASS  name='Verilog' author='Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' section='Hardware' version=8 valid=1
+CHECK highlight.repository-verilog-is-vedit FAIL  name='Verilog' author='Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' section='Hardware' version=8 valid=1
+CHECK highlight.repository-has-systemverilog PASS  name='SystemVerilog' author='Sean O'Boyle (seanoboyle@intelligentdv.com)' section='Hardware' version=11 valid=1
+CHECK highlight.scratch-dir PASS
+CHECK highlight.open-file PASS  diagnose.v 
+HIGHLIGHT diagnose.v: url='' mode='Normal' highlightingMode='None' availableModes=451
+CHECK highlight.document-mode-selected PASS  diagnose.v: highlightingMode='None' (expected 'Verilog')
+CHECK highlight.document-mode-is-expected FAIL  diagnose.v: got 'None', expected 'Verilog'
+HIGHLIGHT diagnose.v: resolved name='None' author='' section='' version=0 valid=0 -> formats=8 begins=0 ends=0
+CHECK highlight.format-ranges-positive PASS  diagnose.v: formats=8
+CHECK highlight.folding-regions-positive FAIL  diagnose.v: begins=0 ends=0
+CHECK highlight.definition-authored-by-vedit FAIL  name='None' author='' section='' version=0 valid=0
+CHECK highlight.open-file PASS  diagnose.sv 
+HIGHLIGHT diagnose.sv: url='' mode='Normal' highlightingMode='None' availableModes=451
+CHECK highlight.document-mode-selected PASS  diagnose.sv: highlightingMode='None' (expected 'SystemVerilog')
+CHECK highlight.document-mode-is-expected FAIL  diagnose.sv: got 'None', expected 'SystemVerilog'
+HIGHLIGHT diagnose.sv: resolved name='None' author='' section='' version=0 valid=0 -> formats=6 begins=0 ends=0
+CHECK highlight.format-ranges-positive PASS  diagnose.sv: formats=6
+CHECK highlight.folding-regions-positive FAIL  diagnose.sv: begins=0 ends=0
+CHECK highlight.definition-authored-by-vedit FAIL  name='None' author='' section='' version=0 valid=0
+HIGHLIGHT-DIAGNOSIS checks=17 failures=7
+DIAG-EXIT=1

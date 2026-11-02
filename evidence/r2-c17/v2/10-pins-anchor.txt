@@ -1,0 +1,14 @@
+date: 2026-10-31T03:52:19Z
+git HEAD: eebbfd14a2311cd4bca533fe98d457a01e46e2e6
+host: Linux 7.0.0-38-generic x86_64 / nproc=16
+host load at start:  11:52:19 up 21 days, 11:28,  4 users,  load average: 4.83, 5.21, 4.16
+== sha256 of the pinned inputs ==
+bb510b3526a3041a1e824e9869b44e36cb133f11c7beccb79f36a8263521584a  /home/haroldzhao/MyProj/DshProj/VEdit/scripts/versions-qt.env
+cbfa9b427157ed2eed248668ca61681a64b1ee6a670d2387fd42c67f4916d3e6  /home/haroldzhao/MyProj/DshProj/VEdit/scripts/docker/qt6-locked-packages.txt
+987492fd80d42e6c359435d2f595239a86f9d2f97b978f28f2923c62e25247bd  /home/haroldzhao/MyProj/DshProj/VEdit/scripts/docker/Dockerfile.build
+
+== combined lock fingerprint = sha256(versions-qt.env + qt6-locked-packages.txt + Dockerfile.build) ==
+c97a25661f10434eb4c592be3e701d2847d0ad8d1995249c571cdc1d720c6fa4  -
+
+== locked .deb entries (expect 22) ==
+22

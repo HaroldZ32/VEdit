@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  TEST FIXTURE — NOT A PRODUCT DEFINITION.
+
+  F2 packaging test whitelist (task T64). It exists so the runtime can prove:
+    * the whitelist reaches KTextEditor through XDG_DATA_DIRS/XDG_DATA_HOME,
+    * a definition named "Verilog" is visible while host/user definitions are not.
+
+  It is a minimal, deliberately dumb highlighter (keywords + comments) written
+  for this repository (MIT, same licence as the product). It is NOT the product
+  Verilog/SystemVerilog definition: that is the LGPL-2.1-or-later port from the
+  GtkSourceView 4.6.1 assets (decision D2=B, task T16), which replaces this file
+  in packaging/runtime/syntax-whitelist/ when it lands.
+-->
+<language name="Verilog" version="1" kateversion="5.0" section="Hardware"
+          extensions="*.v;*.V;*.vh;*.sv;*.svh" mimetype="text/x-verilog-src"
+          author="VEdit test fixture" license="MIT">
+  <highlighting>
+    <list name="keywords">
+      <item>module</item> <item>endmodule</item> <item>input</item> <item>output</item>
+      <item>inout</item> <item>wire</item> <item>reg</item> <item>logic</item>
+      <item>always</item> <item>assign</item> <item>initial</item> <item>begin</item>
+      <item>end</item> <item>if</item> <item>else</item> <item>case</item> <item>endcase</item>
+      <item>parameter</item> <item>localparam</item> <item>posedge</item> <item>negedge</item>
+    </list>
+    <contexts>
+      <context name="Normal" attribute="Normal Text" lineEndContext="#stay">
+        <keyword attribute="Keyword" context="#stay" String="keywords"/>
+        <DetectChar attribute="Comment" context="LineComment" char="/"/>
+      </context>
+      <context name="LineComment" attribute="Comment" lineEndContext="#pop">
+        <DetectChar attribute="Comment" context="LineComment" char="/"/>
+      </context>
+    </contexts>
+    <itemDatas>
+      <itemData name="Normal Text" defStyleNum="dsNormal"/>
+      <itemData name="Keyword" defStyleNum="dsKeyword"/>
+      <itemData name="Comment" defStyleNum="dsComment"/>
+    </itemDatas>
+  </highlighting>
+</language>

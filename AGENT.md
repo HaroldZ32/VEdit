@@ -35,9 +35,27 @@ CentOS 7 image, because the deliverable must run on CentOS 7 (glibc 2.17).
 - Install dependencies: none on the host. The pinned image (base digest, Rust
   1.99.0, GtkSourceView 4.6.1, meson/ninja) is built by `bash scripts/build.sh`;
   every download's sha256 is pinned in `scripts/versions.env`.
-- Build: `bash scripts/build.sh` (one command: pinned image ->
-  `cargo build --release --workspace` -> ELF assertion that the highest GLIBC
-  symbol is <= 2.17 -> Xvfb `--selftest smoke` window check).
+- Build the **delivered Qt6 product** (v2): `bash scripts/build-qt.sh` ->
+  `target/qt6-build/src/app/vedit-app`. Its runtime needs the KF6/Qt6 shared
+  libraries, `libtree-sitter` 0.25 and the Qt platform plugins; the measured
+  package names are in `evidence/runtime-deps/REPORT.md` §1 and the build matrix
+  in `docs/BUILD.md` §12. **If you are verifying the v2 deliverable, use this
+  command.**
+- Rust C ABI selfcheck of the product binary (T97): `target/qt6-build/src/app/vedit-app
+  --selfcheck-ffi crates/vd-ffi/tests/fixtures/project` (offscreen:
+  `QT_QPA_PLATFORM=offscreen`). `--selfcheck-ffi` asserts the **C ABI smoke
+  fixture's** file set (3 rtl files, `+incdir+inc`, `WIDTH=8`/`SIM`), so it must
+  be given `crates/vd-ffi/tests/fixtures/project`. It is **not** the
+  project-model fixture: `tests/fixtures/verilog-project` (T14) has 7 files and
+  its own expectations under `expected/`, validated by
+  `cargo test -p vd-ffi -p vd-config` (and by `scripts/verify-fixture.sh`).
+  Passing the T14 folder to `--selfcheck-ffi` is refused with a hint instead of
+  four misleading `ffi.project.*` failures.
+- Build the **legacy Rust/GTK3 product**: `bash scripts/build.sh` (one command:
+  pinned image -> `cargo build --release --workspace` -> ELF assertion that the
+  highest GLIBC symbol is <= 2.17 -> Xvfb `--selftest smoke` window check). It
+  writes `target/release/vd-app` (copied to `build/artifacts/vd-app`) and
+  **never produces `vedit-app`**.
   Gate wrapper: `bun run verify:gates`.
 - Test: `bash scripts/gates.sh` runs `cargo test --workspace` (in the pinned
   image when the host has no GTK development files).
@@ -49,10 +67,101 @@ CentOS 7 image, because the deliverable must run on CentOS 7 (glibc 2.17).
 The slang deep-lint binary has its own one-command build:
 `bash build/slang/build.sh`.
 
+### VCS panel: read-only, asynchronous, Git verified / SVN stub-only (T99)
+
+The VCS panel is a read-only view (backend, branch/revision, changed files, one
+file's diff). All three reads are **asynchronous jobs** in the C ABI
+(`vd_vcs_status` / `vd_vcs_info_job` / `vd_vcs_diff_job` + poll); the panel
+polls them from a QTimer, so no `git`/`svn` subprocess ever runs on the GUI
+thread. There is no write entry point in the seam or the C ABI, and the runner
+rejects write subcommands before spawning.
+
+Real-subprocess evidence: Git is covered end to end (the lane selftest starts a
+job against a repository and proves the event loop keeps ticking while a slow
+`git` wrapper sleeps; `vedit-app --selfcheck-ffi` also exercises the VCS status
+job). **SVN is stub-only**: neither the host nor the pinned image ships
+`svn`/`svnadmin`, so the real SVN subprocess path has no end-to-end test — the
+lane tests drive `StubVcsSource`/canned runners. Do not describe SVN support as
+verified until a real `svn` working-copy smoke exists.
+
+### Project discovery: optional files are not errors (T114)
+
+`.rules.verible_lint` is **optional**: when no file is found the built-in Verible
+rule set applies, so nothing is reported (a missing optional file is the normal
+case, not a defect — the same rule T85 applied to a missing toolchain). Only a
+rules file that **exists but cannot be read** is reported (`rules.unreadable`);
+that message stays path-free (no `file` field, the text names the file relative
+to the project root) and says the built-in rules keep working meanwhile.
+
+The upward search **intentionally stops at `$HOME`** (or at the filesystem root
+when the project lives outside the home tree), so it can never walk out of the
+user's tree. `filelist.missing` and the other `filelist.*` / `config.*` codes
+stay: they describe things the user explicitly configured or wrote wrong.
+
+### Rust is statically linked into a C++ host (T134)
+
+`vedit-app` links the Rust service layer (`crates/vd-ffi` → `vd-lsp`, `vd-config`,
+…) **into the C++ process**. Rust's runtime startup — the part of a Rust binary
+that installs process-wide defaults — does **not** run in that host. Known
+consequences, and the rule they imply:
+
+- **`SIGPIPE`**: a Rust binary ignores it at startup; in this host it would stay
+  at its default (terminate) and a write to a dead child (e.g. the verible LSP
+  pipe while switching files) killed the GUI with `Broken pipe`, with **no crash
+  report** (SIGPIPE is not in the reporter's signal set). `src/app/main.cpp` sets
+  `std::signal(SIGPIPE, SIG_IGN)` before anything else; the write then returns
+  `EPIPE`, which the Rust side must record as a state (never panic/abort).
+- Other process-level Rust defaults (e.g. stack-overflow handling) are **not**
+  installed either. Any new behaviour that relies on Rust's runtime init must be
+  set up explicitly by the C++ host and documented here.
+- Lane selftests that spawn real LSP children and link Rust have the same latent
+  issue; a death there is a visible test crash, not a user crash, but a shared
+  `vedit_runtime_init()` should be used when those entry points grow one.
+
+### Runtime toolchain discovery (diagnostics / outline)
+
+The diagnostics and outline panels need `verible-verilog-ls` (LSP) and `slang`
+(deep lint). Resolution order is **bundled > local checkout > PATH > env**, and
+the chosen source is reported (`TOOLCHAIN source=verible:... slang:... missing=[...]`
+from `--selfcheck`; the same line names the local candidates as `local=[...]`).
+Three ways to satisfy it, in delivery order:
+
+1. **bundled** — put `verible-verilog-ls` / `slang` in the product's `bin/` next
+   to `vd-app` (the AppDir/AppImage form; nothing else is needed);
+2. **local checkout** — in a source tree, `bash scripts/fetch-verible.sh`
+   (produces `target/verible-pin/extract/verible-*/bin/`, also linked as
+   `.mpd/recon/verible/bin/`) and `bash build/slang/build.sh` (produces
+   `build/slang/out/slang`). A **bare build**
+   (`target/qt6-build/src/app/vedit-app`) picks both up automatically: the
+   resolver walks up from the binary to the checkout root (marker
+   `scripts/fetch-verible.sh`) and probes those artifacts;
+3. **env** — `VEDIT_VERIBLE_LS=/path/to/verible-verilog-ls`,
+   `VEDIT_SLANG=/path/to/slang` (or the `_DIR` forms `VEDIT_VERIBLE_LS_DIR`,
+   `VEDIT_SLANG_DIR` naming the directory).
+
+When a tool is missing, the panels show **one** concise status line (what is
+missing, what it disables, the three fixes); the outline stays an empty table
+with a one-line reason — a missing environment is never rendered as per-file
+errors.
+
 Dependency ownership: the root `Cargo.toml`, `Cargo.lock` and
 `rust-toolchain.toml` are workspace-level and owned by the skeleton task. The
 lane crates ship with their dependencies pre-installed, so a lane must not add a
 dependency or edit those files; ask the captain if one is genuinely missing.
+
+### CJK font fallback in the editor (T119)
+
+The editor keeps DejaVu Sans Mono for Latin (so ASCII metrics are unchanged) and
+falls back to Noto Sans Mono CJK for CJK glyphs. Because the two fonts have
+different em advances, a CJK glyph is **1.60×** a Latin advance rather than the
+typographic 2.0×; mixed Chinese/Latin comment alignment is therefore approximate,
+while CJK runs are internally monospaced. This is a **deliberate trade-off**: ASCII
+width stability (the bulk of code) was chosen over a 2.0 mixed ratio.
+
+Back door, if strict 2.00 is ever required: set the editor's primary font family
+to `Noto Sans Mono CJK SC` (one configuration line). The cost is that the Latin
+advance changes from **10px to 8px** (DejaVu Sans Mono → Noto Sans Mono CJK SC),
+so all pure-ASCII metrics change.
 
 ## 5. Verification
 
@@ -86,3 +195,37 @@ dependency or edit those files; ask the captain if one is genuinely missing.
 
 - Never commit or echo secrets, tokens or credentials.
 - Keep generated logs and evidence free of secret material.
+
+## 9. KTextEditor 语法定义仓库事实（T127，重要）
+
+KTextEditor 的 `KSyntaxHighlighting::Repository` **不认**我们随包的两份 XML
+（`resources/syntax/vedit-*.xml`）：解析 `SystemVerilog` / `Verilog` 时它指向 **KDE 自带的定义**
+（例如 SystemVerilog 的 author 是 `Sean O'Boyle (seanoboyle@intelligentdv.com)`）。
+`Repository::addCustomSearchPath()` 与私有 XDG 目录都改变不了这一点，
+因为 `KTextEditor::Editor::repository()` 返回 const，没有公共注入路径。
+
+**后果**：编辑器里实际生效的高亮/原生折叠来自 KDE 自带定义；我们的 XML 只被我们自己的
+`vedit::folding::KsyntaxFoldSource`（以及面包屑的语法扫描）使用。
+所以“高亮是好的”与“我们的 XML”没有关系；要改我们的定义，必须走我们自己的扫描路径，
+不能指望 KTextEditor 加载它。
+
+**xcb 实测（T127）**：不加载任何 `FoldInjector`，在 Xvfb+xcb 下真实鼠标点 gutter 折叠标记，
+模块行可以**双向**折叠/展开（`hidden 0→38→0`、`scroll_max 939→901→939`），非 region 行同列负控制无变化。
+→ KDE 原生折叠可用；VEdit 自建的 `exec("fold")` 注入层是与它打架的根源，应删除。
+
+## 10. 折叠策略：KDE 原生（T128）
+
+VEdit **不再注入折叠**（T128 删掉了 `FoldInjector` 的 `exec("fold")` 循环、registry、
+`unfoldRegistered()` 和所有绕光标的 unfold 逻辑）。文件打开时**不自动折叠**（VS Code/Kate/CLion 同款行为），
+折叠由 KTextEditor 从 KSyntaxHighlighting 定义计算，用户点 gutter 标记按需折叠/展开。
+
+- 依据：T127 的 xcb 真点击实验（`evidence/fold-gutter-click/`）在**零注入**下证明标记存在且双向可用
+  （`hidden 0→38→0`、`scroll_max 939→901→939`，非 region 行负控制无变化）。
+- 旧判据 `hidden-975` / `registry-200` / `firstopen-full-count` **已废弃**，替换为真交互判据：
+  `vedit-fold-gutter-click`（xcb+Xvfb，实际点 marker 两个方向；无 xvfb 时显式 SKIP）与
+  `vedit-native-fold-tests`（10k 行 open ≤2 s、二次打开不崩、折叠时移动光标不崩、打开无自动折叠）。
+- 删除清单：`src/syntax/folding/fold_injector.{h,cpp}`、`tests/folding_tests.cpp`、
+  以及 `FoldBreadcrumbBinding` 里的折叠字段/方法；面包屑保留不变。
+- 仍保留但**已无产品消费方**：`fold_range.*`、`fold_source.*`、`syntax_fold_source.*`、
+  `ksyntax_fold_source.*`（折叠扫描能力/旧的 tree-sitter fold 查询）。它们只服务于测试/探针；
+  下一步可整体删除（删 `vedit_syntax_folding` 及其 CMake 接线）。

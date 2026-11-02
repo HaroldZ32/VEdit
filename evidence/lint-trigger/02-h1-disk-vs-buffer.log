@@ -1,0 +1,22 @@
+== evidence: 02-h1-disk-vs-buffer.log — what text did the lint see before the fix? (code path + the new Rust proof) ==
+time=2026-11-01T19:12:04+08:00
+
+### BEFORE (git HEAD): didOpen read the file from DISK
+533:        let text = match std::fs::read_to_string(path) {
+695:    let text = std::fs::read_to_string(file)
+
+### BEFORE (git HEAD): the FFI had no way to send the editor buffer (didChange)
+vd_lsp_session_change occurrences in HEAD: 0
+change_document (client API existed, unused by the session/FFI): 1
+
+### AFTER: the new Rust integration test against the REAL verible-verilog-ls
+(deleted comma in the buffer, nothing written to disk)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s
+     Running tests/buffer_change.rs (target/debug/deps/buffer_change-45af0f44cd87bc71)
+
+running 2 tests
+test change_opens_a_document_the_session_did_not_have ... ok
+test buffer_edit_without_saving_is_diagnosed ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s
+

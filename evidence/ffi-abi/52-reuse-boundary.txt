@@ -1,0 +1,15 @@
+# AC-0.3 / AC-S0.5: reuse boundary of the C ABI crate.
+# collection: 2026-10-31T10:17:53Z rev=9957f5fe4d63c17c681e8753288262fa2c00955e
+# Source data: logs/24-cargo-tree-vd-ffi.txt (cargo tree -p vd-ffi, pinned Rust image).
+
+$ grep -E "vd-config |vd-lsp |vd-deeplint |vd-fim |vd-search |vd-vcs |vd-settings " logs/24-cargo-tree-vd-ffi.txt
+└── vd-vcs v0.1.1 (/vedit-build/crates/vd-vcs)
+├── vd-config v0.1.1 (/vedit-build/crates/vd-config)
+├── vd-deeplint v0.1.1 (/vedit-build/crates/vd-deeplint)
+├── vd-fim v0.1.1 (/vedit-build/crates/vd-fim)
+├── vd-lsp v0.1.1 (/vedit-build/crates/vd-lsp)
+├── vd-search v0.1.1 (/vedit-build/crates/vd-search)
+├── vd-settings v0.1.1 (/vedit-build/crates/vd-settings)
+
+$ grep -E "gtk|sourceview4|vd-editor|vd-syntax" logs/24-cargo-tree-vd-ffi.txt || echo "(absent, as required)"
+(absent, as required)

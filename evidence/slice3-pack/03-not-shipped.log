@@ -1,0 +1,41 @@
+# C9 backfill (T112/N2): header added after the fact; the body below is unchanged.
+# original_collected_at_utc: 2026-11-01T07:48:43Z   (from the archived file mtime)
+# original_git_head: 90176858e5f8d5123c573826df8c0ccc7375c015
+# original_git_status_porcelain_sha256: not captured at collection time
+# session_anchor: none: phase-1 logs recorded time+HEAD, not a full porcelain block
+# backfill_collected_at_utc: 2026-11-01T09:23:35Z
+# backfill_git_head: 0c8ea9fe4ae18c386a59a55b8868f837f4f80a84
+# backfill_git_status_porcelain_sha256: a7feab0230532310375511329de129cad97d49e690c7a9c7336394a1cce151fa (current tree at backfill time)
+== not-shipped gate (delivery spelling --expect-clean) ==
+collected_at: 2026-11-01T07:48:43Z
+git_head: 90176858e5f8d5123c573826df8c0ccc7375c015
+cmd: bash packaging/runtime/verify-not-shipped.sh --expect-clean packaging/runtime/out/AppDir
+--- output ---
+== verify-not-shipped ==
+appdir: packaging/runtime/out/AppDir
+CHECK PASS  no KDE systemverilog.xml / verilog.xml by sha256
+CHECK PASS  no file named systemverilog.xml / verilog.xml
+CHECK PASS  no syntax-bundled/ directory (F2 C5)
+CHECK PASS  active definitions == whitelist [SystemVerilog,Verilog]
+-- shipped library: packaging/runtime/out/AppDir/lib/libKF6SyntaxHighlighting.so.6
+   sha256: aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
+   detector: zstd scanner (evidence/r2-ksh-embedded/scan-embedded-defs.py)
+CHECK PASS  library embeds no strict-GPL syntax definition
+   == embedded-definition scan ==
+   library   : packaging/runtime/out/AppDir/lib/libKF6SyntaxHighlighting.so.6
+   size      : 696480 B
+   sha256    : aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
+   resource names (utf-16le): xml=0 theme=30
+   zstd frames parsed as definitions: 0
+   license classes: {}
+   strict-GPL definitions embedded: 0
+     INFO SystemVerilog: not found among parsed definitions
+     INFO Verilog: not found among parsed definitions
+   RESULT: PASS - no strict-GPL definition embedded
+CHECK PASS  no probe stamp
+CHECK PASS  packaged loader present
+CHECK PASS  packaged libc present
+
+== summary: pass=8 fail=0 expected_red=0 ==
+DELIVERY_BLOCKED=no
+NOT-SHIPPED-EXIT=0

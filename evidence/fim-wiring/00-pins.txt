@@ -1,0 +1,11 @@
+date: 2026-11-01T15:34:27+08:00
+head: d36bff9470dca6bb94ee6c5529c7fb5328f344c9 (feat/qt6-ktexteditor-migration)
+changed paths (T104):
+   M src/editor/CMakeLists.txt
+   M src/editor/kernel/ktexteditor_provider.cpp
+  ?? evidence/fim-wiring/
+  ?? src/editor/kernel/fim_wiring.cpp
+  ?? src/editor/kernel/fim_wiring.h
+  ?? src/editor/kernel/fim_wiring_selftest.cpp
+FIM lane / Rust side (must stay untouched by T104):
+  ?? src/editor/fim/

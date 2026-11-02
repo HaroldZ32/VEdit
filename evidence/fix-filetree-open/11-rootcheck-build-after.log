@@ -1,0 +1,7 @@
+[1/8] Automatic MOC for target vedit_file_tree
+[2/7] Building CXX object app/workspace-lane-filetree/CMakeFiles/vedit_file_tree.dir/filetree_integration.cpp.o
+[3/7] Linking CXX static library app/workspace-lane-filetree/libvedit_file_tree.a
+[4/7] Building CXX object app/CMakeFiles/vedit_workspace_integration.dir/vedit-build/src/workspace/integration.cpp.o
+[5/7] Linking CXX static library app/libvedit_workspace_integration.a
+[6/7] Building CXX object CMakeFiles/vedit-filetree-seamcheck.dir/seamcheck.cpp.o
+[7/7] Linking CXX executable vedit-filetree-seamcheck

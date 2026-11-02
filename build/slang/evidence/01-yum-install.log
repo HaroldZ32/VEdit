@@ -307,7 +307,7 @@ Total download size: 110 M
 Downloading packages:
 Delta RPMs disabled because /usr/bin/applydeltarpm not installed.
 --------------------------------------------------------------------------------
-Total                                              5.6 MB/s | 110 MB  00:19     
+Total                                              7.6 MB/s | 110 MB  00:14     
 Running transaction check
 Running transaction test
 Transaction test succeeded

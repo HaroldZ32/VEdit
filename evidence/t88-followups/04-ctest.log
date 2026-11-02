@@ -1,0 +1,11 @@
+# C9 evidence header
+collected_at: 2026-11-01T10:38:58+08:00
+git_head: 23514fb351f34ab23de177c375dd240175662d5e
+binary_sha256: e286e6e4d7d6cbd9cead3392d7593818138e3f5d0c5601faba63f3f5b04cf74e
+
+      Start 18: vedit-toolchain-ux-selftest
+18/18 Test #18: vedit-toolchain-ux-selftest ....................   Passed    3.13 sec
+
+100% tests passed, 0 tests failed out of 18
+
+Total Test time (real) =  21.69 sec

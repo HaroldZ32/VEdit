@@ -1,0 +1,176 @@
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+This plugin does not support propagateSizeHints()
+CHECK empty.no-project-label PASS
+CHECK empty.one-pane PASS
+CHECK empty.window-title PASS
+CHECK panels.registry.six PASS
+CHECK panels.registered.file-tree PASS
+CHECK panels.registered.search PASS
+CHECK panels.registered.terminal PASS
+CHECK panels.registered.vcs PASS
+CHECK panels.registered.settings PASS
+CHECK panels.registered.outline PASS
+CHECK panels.none-inserted-by-default PASS
+This plugin does not support propagateSizeHints()
+CHECK panels.show.file-tree PASS
+This plugin does not support propagateSizeHints()
+CHECK panels.toggle-hide.file-tree PASS
+This plugin does not support propagateSizeHints()
+CHECK panels.toggle-show.file-tree PASS
+This plugin does not support propagateSizeHints()
+CHECK panels.show.search PASS
+This plugin does not support propagateSizeHints()
+CHECK panels.toggle-hide.search PASS
+This plugin does not support propagateSizeHints()
+CHECK panels.toggle-show.search PASS
+CHECK panels.show.terminal PASS
+CHECK panels.toggle-hide.terminal PASS
+CHECK panels.toggle-show.terminal PASS
+This plugin does not support propagateSizeHints()
+CHECK panels.show.vcs PASS
+This plugin does not support propagateSizeHints()
+CHECK panels.toggle-hide.vcs PASS
+This plugin does not support propagateSizeHints()
+CHECK panels.toggle-show.vcs PASS
+This plugin does not support propagateSizeHints()
+CHECK panels.show.settings PASS
+This plugin does not support propagateSizeHints()
+CHECK panels.toggle-hide.settings PASS
+This plugin does not support propagateSizeHints()
+CHECK panels.toggle-show.settings PASS
+CHECK panels.show.outline PASS
+CHECK panels.toggle-hide.outline PASS
+CHECK panels.toggle-show.outline PASS
+CHECK panels.six-docks PASS
+CHECK menus.file PASS
+CHECK menus.view PASS
+CHECK menus.help PASS
+CHECK commands.action.file.new-layout PASS
+CHECK commands.action.file.close-pane PASS
+CHECK commands.action.file.quit PASS
+CHECK commands.action.view.split.horizontal PASS
+CHECK commands.action.view.split.vertical PASS
+CHECK commands.action.view.focus.next PASS
+CHECK commands.action.view.layout.reset PASS
+CHECK commands.action.help.about PASS
+CHECK commands.action.view.panel.file-tree PASS
+CHECK commands.action.view.panel.outline PASS
+CHECK commands.file-menu-actions PASS
+CHECK commands.view-panel-actions-checkable PASS
+This plugin does not support propagateSizeHints()
+CHECK split.horizontal.pane-count PASS
+CHECK split.horizontal.root-orientation PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK split.vertical.pane-count PASS
+CHECK split.vertical.root-orientation PASS
+CHECK panes.three PASS
+CHECK focus.set-second PASS
+CHECK focus.next-wraps PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK close.pane-count PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK reset.one-pane PASS
+CHECK close.last-pane.keeps-one PASS
+CHECK close.last-pane.active PASS
+This plugin does not support propagateSizeHints()
+CHECK theme.catalogue PASS
+CHECK theme.apply PASS
+CHECK theme.invalid.rejected PASS
+CHECK theme.invalid.keeps-palette PASS
+CHECK shortcut.override.applied PASS
+CHECK session.save PASS
+This plugin does not support propagateSizeHints()
+CHECK restore.pane-count PASS
+CHECK restore.layout-tree PASS
+CHECK restore.active-pane PASS
+CHECK restore.theme PASS
+CHECK restore.panel-visible PASS
+CHECK restore.shortcut PASS
+CHECK panel-seam.seed-session PASS
+This plugin does not support propagateSizeHints()
+CHECK panel-seam.dock-restored PASS
+CHECK panel-seam.terminal-content FAIL
+[app-shell] invalid shortcut store /tmp/vedit-app-WBvXRw/broken/shortcuts.json: illegal number
+[app-shell] invalid session /tmp/vedit-app-WBvXRw/broken/session.json: unterminated object
+This plugin does not support propagateSizeHints()
+CHECK broken.config.survives PASS
+CHECK broken.config.diagnostics PASS
+This plugin does not support propagateSizeHints()
+CHECK stress.one-pane-initial PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK stress.pane-invariant PASS
+CHECK stress.non-null-active PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+CHECK editor.provider.id PASS
+CHECK editor.pane.ktexteditor-widget PASS
+CHECK editor.pane.open PASS
+CHECK editor.pane.open-path PASS /tmp/vedit-app-WBvXRw/pane-open.v
+CHECK editor.pane.save PASS
+CHECK editcore.scratch PASS
+CHECK editcore.ktexteditor.instance PASS
+CHECK editcore.document.create PASS
+CHECK editcore.undo.metaobject-slot PASS
+CHECK editcore.document.setText PASS
+CHECK editcore.open.fixture-written PASS
+CHECK editcore.open.file PASS
+CHECK editcore.open.records-path PASS /tmp/vedit-app-HwFRjM/open.v
+CHECK editcore.atomic.fresh-file PASS
+CHECK editcore.atomic.fresh-content PASS
+CHECK editcore.atomic.no-temp-left PASS
+CHECK editcore.atomic.replace PASS
+CHECK editcore.atomic.replace-no-temp PASS
+CHECK editcore.atomic.fault.write-fails PASS
+CHECK editcore.atomic.fault.write-keeps-target PASS
+CHECK editcore.atomic.fault.write-cleans-temp PASS
+CHECK editcore.atomic.fault.rename-fails PASS
+CHECK editcore.atomic.fault.rename-keeps-target PASS
+CHECK editcore.atomic.fault.rename-cleans-temp PASS
+CHECK editcore.atomic.fault.dir-fsync-nonfatal PASS atomic save: injected directory fsync failure;directory fsync skipped by fault injection
+CHECK editcore.atomic.fault.dir-fsync-content PASS
+CHECK editcore.save.kernel PASS
+CHECK editcore.save.bytes PASS
+CHECK editcore.save.clears-modified PASS
+CHECK editcore.find.count PASS 3
+CHECK editcore.find.adjacent PASS
+CHECK editcore.replace.count PASS found=3 replaced=3
+CHECK editcore.replace.text PASS zz bbb zz ccc zz
+
+CHECK editcore.replace.one-undo PASS
+CHECK editcore.replace.redo PASS
+CHECK editcore.goto.line PASS
+CHECK editcore.goto.clamp-low PASS
+CHECK editcore.goto.clamp-high PASS line=3
+CHECK editcore.goto.column-zero PASS
+CHECK editcore.undo.100-operations PASS 100
+CHECK editcore.undo.100-back-to-original PASS mismatches=0 error=
+CHECK editcore.redo.100-forwards PASS mismatches=0
+EDITCORE-UNDO sha-before=c2a908d98f5df987ade41b5fce213067efbcc21ef2240212a41e54b5e7c28ae5 sha-after=991ab4d4e3f17a75c77ed6a7000fe568ae995f0dd92fe827129ee74ae2214f98
+CHECK editcore.multicursor.native-api PASS
+CHECK editcore.multicursor.native-read-back PASS
+CHECK editcore.multicursor.native-insert-call PASS
+EDITCORE-MULTICURSOR native-cursors=3 native-inserted-x=1 text="Xaaa
+"
+CHECK editcore.multicursor.native-insert-primary PASS 1
+CHECK editcore.multicursor.batch-insert PASS
+CHECK editcore.multicursor.batch-text PASS XaXaXa
+
+CHECK editcore.multicursor.batch-one-undo PASS
+CHECK editcore.multicursor.batch-redo PASS
+CHECK editcore.provider.id PASS ktexteditor
+CHECK editcore.provider.creates-view PASS
+CHECK editcore.provider.fixture PASS
+CHECK editcore.provider.open PASS
+CHECK editcore.provider.open-records-path PASS /tmp/vedit-app-aRkHvn/provider.v
+CHECK editcore.provider.document PASS
+CHECK editcore.provider.save PASS
+CHECK editcore.provider.save-bytes PASS
+CHECK editcore.boundary.zero-calls PASS before=0 after=0
+CHECK editcore.boundary.counter-live PASS before=0 after=1
+EDIT-CORE-SELFTEST ok=1 checks=55 failures=0
+APP-SHELL-SELFTEST ok=0 checks=136 failures=1 state=/tmp/vedit-app-WBvXRw/state

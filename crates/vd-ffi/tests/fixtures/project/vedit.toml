@@ -1,0 +1,7 @@
+# Project fixture for the C ABI smoke test (Slice 0, task T4).
+#
+# The filelist lives under rtl/ on purpose: the project root is auto-scanned for
+# `*.f` files, so a list in the root would be discovered twice and the expected
+# file order would stop being the thing the test asserts.
+[project]
+filelists = ["rtl/files.f"]

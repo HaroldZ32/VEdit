@@ -1,0 +1,4 @@
+xml resource names: 0 -> []
+theme resource names: 30 -> ['5github-light.theme', '5nord.theme', '5radical.theme', '5solarized-dark.theme', 'Ucatppuccin-mocha.theme']
+systemverilog.xml present: False []
+RESULT: PASS - no syntax definition is embedded (themes stay: upstream has no switch)

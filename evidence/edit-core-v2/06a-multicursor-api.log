@@ -1,0 +1,19 @@
+# date: 2026-10-31T11:10:50+00:00
+# image: vedit-qt6-build:local
+
+## 1) header: the native multiple-cursor API exists in KTextEditor 6.24
+680:     * \sa cursorPositions()
+684:    void setCursorPositions(const QList<KTextEditor::Cursor> &positions);
+706:    QList<KTextEditor::Cursor> cursorPositions() const;
+
+## 2) runtime library exports the multi-cursor entry points
+00000000002a2ee0 T _ZN11KTextEditor4View18setCursorPositionsERK5QListINS_6CursorEE
+000000000016bb90 T _ZN14KateScriptView15cursorPositionsEv
+000000000016bc70 T _ZN14KateScriptView18setCursorPositionsERK8QJSValue
+00000000002a2ef0 T _ZNK11KTextEditor4View15cursorPositionsEv
+
+## 3) no addCursor/multiCursor-style API in the headers (there is no separate cursor object API)
+0
+
+## 4) the convenience View::insertText edits only the primary cursor (observed, see 04)
+EDITCORE-MULTICURSOR native-cursors=3 native-inserted-x=1 text="Xaaa

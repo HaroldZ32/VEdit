@@ -1,0 +1,29 @@
+Test project /vedit-build/target/qt6-build
+      Start  1: vedit-app-syntax-startup
+ 1/12 Test  #1: vedit-app-syntax-startup .......................   Passed    0.18 sec
+      Start  2: vedit-m0-smoke
+ 2/12 Test  #2: vedit-m0-smoke .................................   Passed    0.06 sec
+      Start  3: vedit-syntax-provider-tests
+ 3/12 Test  #3: vedit-syntax-provider-tests ....................   Passed    0.00 sec
+      Start  4: vedit-syntax-kde-data
+ 4/12 Test  #4: vedit-syntax-kde-data ..........................   Passed    0.03 sec
+      Start  5: vedit-syn-grammars-tests
+ 5/12 Test  #5: vedit-syn-grammars-tests .......................   Passed    0.17 sec
+      Start  6: vedit-syntax-product-tests
+ 6/12 Test  #6: vedit-syntax-product-tests .....................   Passed    0.05 sec
+      Start  7: vedit-terminal-selftest
+ 7/12 Test  #7: vedit-terminal-selftest ........................   Passed    1.06 sec
+      Start  8: vedit-app-ffi-abi-selftest
+ 8/12 Test  #8: vedit-app-ffi-abi-selftest .....................   Passed    0.20 sec
+      Start  9: vedit-app-shell-selftest
+ 9/12 Test  #9: vedit-app-shell-selftest .......................   Passed    0.19 sec
+      Start 10: vedit-workspace-palette-selftest
+10/12 Test #10: vedit-workspace-palette-selftest ...............   Passed    0.09 sec
+      Start 11: vedit-workspace-palette-integration-selftest
+11/12 Test #11: vedit-workspace-palette-integration-selftest ...   Passed    0.07 sec
+      Start 12: vedit-workspace-search-selftest
+12/12 Test #12: vedit-workspace-search-selftest ................   Passed    0.32 sec
+
+100% tests passed, 0 tests failed out of 12
+
+Total Test time (real) =   2.45 sec

@@ -1,0 +1,17 @@
+== BEFORE wiring: vcs lane absent from vedit-app ==
+collected_at: 2026-11-01T06:02:26Z
+git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+cmd: ctest -N ; nm -C vedit-app | grep -c 'vedit::workspace::vcs' ; strings -el vedit-app | grep -c vcs-panel
+--- output ---
+BUILD-EXIT=0
+## ctest -N (before)
+  Test #16: vedit-workspace-diagnostics-selftest
+  Test #17: vedit-toolchain-missing-selftest
+  Test #18: vedit-diagnostics-ffi-selftest
+  Test #19: vedit-toolchain-ux-selftest
+
+Total Tests: 19
+## vcs symbols (before)
+0
+## vcs-panel UTF-16 string (before)
+0

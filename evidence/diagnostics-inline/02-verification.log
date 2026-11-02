@@ -1,0 +1,35 @@
+== 02-verification.log — the user's three acceptance steps, on the PRODUCT build (real shell, real verible, real KTextEditor) ==
+collected_at=2026-11-02T11:30:46+08:00
+git_head=af852255acf8979cd25ffc0bd882c1dcbbec6220
+NOTE: this run uses the product build tree, NOT the packaged binary (the package was built at 10:47 from HEAD af85225, which does not contain this task's code; a repackage is required by the Lead — see REPORT §5)
+
+CHECK seam.file-written PASS
+CHECK seam.edit-core-provider PASS
+CHECK seam.panel-installed PASS
+CHECK seam.active-pane PASS
+CHECK seam.file-opened PASS
+CHECK seam.analysis-after-open PASS  edited.sv — analyzed 03:30:47 (saved file): 0 diagnostic(s)
+OBSERVED seam.after-open status='edited.sv — analyzed 03:30:47 (saved file): 0 diagnostic(s)'
+CHECK seam.editor-widget PASS
+OBSERVED seam.after-edit status='edited.sv — analyzed 03:30:48 (editor buffer, not saved yet): 1 diagnostic(s)'
+OBSERVED seam.controller state=1 session='buffer changed (75 bytes): /tmp/vedit-diagnostics-product-seam-CqQnfv/edited.sv' diagnostics=1 analyses=2
+CHECK seam.panel-shows-buffer-source PASS  edited.sv — analyzed 03:30:48 (editor buffer, not saved yet): 1 diagnostic(s)
+CHECK seam.buffer-edit-diagnosed PASS  edited.sv — analyzed 03:30:48 (editor buffer, not saved yet): 1 diagnostic(s)
+CHECK seam.disk-untouched PASS  disk=76 bytes
+CHECK seam.panel-lists-the-issue PASS  1
+CHECK seam.ktexteditor-view PASS
+CHECK seam.annotations-installed PASS
+diagnostics: 1 inline annotation(s) on /tmp/vedit-diagnostics-product-seam-CqQnfv/edited.sv
+OBSERVED seam.annotation_lines=1 tooltip='syntax error at "b" [verible]'
+CHECK seam.annotation-on-error-line PASS  syntax error at "b" [verible]
+CHECK seam.annotation-tooltip-has-syntax PASS  syntax error at "b" [verible]
+CHECK seam.screenshot-saved PASS  /vedit-build/evidence/diagnostics-inline/shot-seam.png (1280x860)
+OBSERVED seam.reverse-control status=' — 0 diagnostic(s)'
+CHECK seam.reverse-control-no-analysis PASS   — 0 diagnostic(s)
+VE-DIAGNOSTICS-PRODUCT-SEAM checks=17 failures=0 skipped=0
+SEAM_EXIT=0
+
+== 03-gates.log ==
+collected_at=2026-11-02T11:30:53+08:00
+ctest: 30/31 passed; the ONE failure is vedit-app-shell-selftest, whose failing checks are all 'settings' panel registry checks (src/app/panel_registry.* + app_shell.cpp are modified in the shared worktree by the T129/T130 owner) — not touched by this task
+typecheck: TYPECHECK_EXIT=0 (see /tmp/tc131.log, quoted: '[typecheck] PASS (pinned image vedit-build:local)')

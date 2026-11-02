@@ -1,0 +1,18 @@
+# C9 backfill (T112/N2): header added after the fact; the body below is unchanged.
+# original_collected_at_utc: 2026-11-01T08:09:48Z   (from the archived file mtime)
+# original_git_head: 206033c1faa91ac6b89cca0d575d36283ab69d7f
+# original_git_status_porcelain_sha256: 50471d2bac6fbfce420c003a8f921497e7b3eabb201e9ad852d0b8e9c5319c2a (hash of the porcelain block archived in final-206033c/00-C9.txt)
+# session_anchor: final-206033c/00-C9.txt
+# backfill_collected_at_utc: 2026-11-01T09:23:35Z
+# backfill_git_head: 0c8ea9fe4ae18c386a59a55b8868f837f4f80a84
+# backfill_git_status_porcelain_sha256: a7feab0230532310375511329de129cad97d49e690c7a9c7336394a1cce151fa (current tree at backfill time)
+== embedded-definition scan ==
+library   : /home/haroldzhao/MyProj/DshProj/VEdit/target/wt-206033c/packaging/runtime/out/AppDir/lib/libKF6SyntaxHighlighting.so.6
+size      : 696480 B
+sha256    : aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
+resource names (utf-16le): xml=0 theme=30
+zstd frames parsed as definitions: 0
+license classes: {}
+strict-GPL definitions embedded: 0
+  INFO SystemVerilog: not found among parsed definitions
+  INFO Verilog: not found among parsed definitions

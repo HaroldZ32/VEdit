@@ -1,0 +1,2 @@
+STEPS5 insert_lines=100 steps=1 verdict=FAIL
+STEPS5 replace_text=100 steps=101 verdict=PASS

@@ -1,0 +1,50 @@
+== dynamic build (SEAM_TS_LINK=shared) ==
+	libtree-sitter.so.0.25 => /usr/lib/x86_64-linux-gnu/libtree-sitter.so.0.25 (0x0000797bb1255000)
+[ldd exit=0]
+
+== static build (SEAM_TS_LINK=static) ==
+(no libtree-sitter line: statically linked)
+[ldd exit=0]
+
+== ELF dynamic dependency listing ==
+-- build/json --
+0x0000000000000001 (NEEDED)             Shared library: [libtree-sitter.so.0.25]
+0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+-- build/static --
+0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+== run build/static (libtree-sitter.a linked in) ==
+TREE_SITTER_REQUESTED=on
+PROVIDER=tree-sitter-json
+PROVIDER_VERSION=254c42a6476413b776221e03982ac8ae159eeb72
+PROVIDER_LICENSE=MIT
+CAPABILITIES parse=1 query=1 highlight=1 fold=1 structure=1
+CHECK input.read(tests/sample.json) PASS
+PARSED_NONEMPTY=1
+CHECK parse.returns.tree PASS
+HIGHLIGHT_SPANS=21
+FOLD_REGIONS=1
+STRUCTURE_ITEMS=7
+CHECK highlight.nonempty PASS
+CHECK highlight.keyword.capture.seen PASS
+CHECK query.ids.count PASS
+CHECK query.count.highlights.gt0 PASS
+CHECK folds.nonempty PASS
+CHECK structure.nonempty PASS
+CHECK all.five.capabilities PASS
+SPAN[0] line=1 bytes=4-10 capture=string
+SPAN[1] line=1 bytes=4-10 capture=string.special.key
+SPAN[2] line=1 bytes=12-19 capture=string
+SPAN[3] line=2 bytes=23-32 capture=string
+SPAN[4] line=2 bytes=23-32 capture=string.special.key
+FOLD[0] lines=0-6 kind=fold
+STRUCT[0] line=1 kind=item name="name"
+STRUCT[1] line=2 kind=item name="version"
+STRUCT[2] line=3 kind=item name="features"
+STRUCT[3] line=4 kind=item name="nested"
+STRUCT[4] line=4 kind=item name="deep"
+RESULT=PASS failures=0
+[run static exit=0]

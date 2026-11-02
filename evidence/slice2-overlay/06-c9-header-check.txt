@@ -1,0 +1,68 @@
+== evidence: 06-c9-header-check.txt — T93/F2 proof: every log carries collected_at + git_head + git_status_porcelain (+ lane_sources) ==
+time=2026-11-01T14:14:15+08:00
+
+-- evidence/slice2-overlay/01-build.log
+   collected_at:          ## collected_at: 2026-11-01T14:08:16+08:00
+   git_head:              ## git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+   git_status_porcelain   ## git_status_porcelain (collection-time snapshot; SHARED worktree, so other lanes' in-flight files appear too):
+   lane_sources           ## lane_sources (src/syntax/overlay is UNTRACKED in git, so these hashes are what binds this evidence to the code it measured):
+   porcelain lines        47
+   lane source hashes     7
+   ## machine: AMD Ryzen 7 7840H w/ Radeon 780M Graphics | nproc=16 | kernel=7.0.0-38-generic | mem=30496356 kB
+
+-- evidence/slice2-overlay/02-selftest.log
+   collected_at:          ## collected_at: 2026-11-01T14:08:20+08:00
+   git_head:              ## git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+   git_status_porcelain   ## git_status_porcelain (collection-time snapshot; SHARED worktree, so other lanes' in-flight files appear too):
+   lane_sources           ## lane_sources (src/syntax/overlay is UNTRACKED in git, so these hashes are what binds this evidence to the code it measured):
+   porcelain lines        47
+   lane source hashes     7
+   ## machine: AMD Ryzen 7 7840H w/ Radeon 780M Graphics | nproc=16 | kernel=7.0.0-38-generic | mem=30496356 kB
+
+-- evidence/slice2-overlay/03-perf-runs.log
+   collected_at:          ## collected_at: 2026-11-01T14:08:56+08:00
+   git_head:              ## git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+   git_status_porcelain   ## git_status_porcelain (collection-time snapshot; SHARED worktree, so other lanes' in-flight files appear too):
+   lane_sources           ## lane_sources (src/syntax/overlay is UNTRACKED in git, so these hashes are what binds this evidence to the code it measured):
+   porcelain lines        47
+   lane source hashes     7
+   ## machine: AMD Ryzen 7 7840H w/ Radeon 780M Graphics | nproc=16 | kernel=7.0.0-38-generic | mem=30496356 kB
+
+-- evidence/slice2-overlay/04-ctest.log
+   collected_at:          ## collected_at: 2026-11-01T14:09:11+08:00
+   git_head:              ## git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+   git_status_porcelain   ## git_status_porcelain (collection-time snapshot; SHARED worktree, so other lanes' in-flight files appear too):
+   lane_sources           ## lane_sources (src/syntax/overlay is UNTRACKED in git, so these hashes are what binds this evidence to the code it measured):
+   porcelain lines        47
+   lane source hashes     7
+   ## machine: AMD Ryzen 7 7840H w/ Radeon 780M Graphics | nproc=16 | kernel=7.0.0-38-generic | mem=30496356 kB
+
+== binding: overlay_selftest.cpp hash recorded in each log ==
+   01-build.log       8cb45b65d8d6ae2676538ecad53fb82ce15570feb9a934681027b3b196e7e125  (header written 2026-11-01T14:08:16+08:00)
+   02-selftest.log    8cb45b65d8d6ae2676538ecad53fb82ce15570feb9a934681027b3b196e7e125  (header written 2026-11-01T14:08:20+08:00)
+   03-perf-runs.log   7b0752e49f6d1d2fa37e8c60e8aca53216de66e862763bd8746f37c5e5ef7ee6  (header written 2026-11-01T14:08:56+08:00)
+   04-ctest.log       7b0752e49f6d1d2fa37e8c60e8aca53216de66e862763bd8746f37c5e5ef7ee6  (header written 2026-11-01T14:09:11+08:00)
+   CURRENT on disk     eeccaa26368344072aca9216f78571479efd984eaaf6bef86dca64008ef8b777
+
+The 01/02 headers bind the source of the binary the four logs executed (overlay_selftest.cpp = 8cb45b65…);
+the 03/04 headers were written minutes later, while the lane owner was still editing the untracked file,
+so they captured a newer snapshot. The 03/04 tails carry a '## backfill:' note saying exactly that, and
+07-binding.txt records the edit sequence and what the numbers certify. This is a disclosure, not a masked
+mismatch: the authoritative binding is the 01/02 lane_sources block plus the build time in 01-build.log.
+
+== 04-ctest.log: both scopes ==
+   100% tests passed, 0 tests failed out of 20
+   FULL_CTEST_EXIT=0
+   100% tests passed, 0 tests failed out of 1
+   LANE_CTEST_EXIT=0
+
+== 02-selftest.log: result ==
+   SYN-OVERLAY-SELFTEST ok=1 checks=40 failures=0 skipped=0
+
+== README: F4 declaration present ==
+   20: | **F4（LOW）未声明的合成 base 替身** | §6 第 6 条**明确声明** A1g 的 paint-plan 证据用的是合成 base 替身 `baseLineSpans()`，并改写结论措辞（见下）。 |
+   30: | A1g 无双重着色 | `OwnerArbiter::assertSingleOwner` 全文档 + 4 个已知区间全 PASS；喷涂计划是单引擎分区；`raw-overlap=663 B` 证明“底座与 overlay 本来重叠、被裁掉”这条路径真的被走到。**注意：这里的 base 是测试内的合成替身（§6.
+   117: | A1g 逐 range 单一 owner（arbiter + 喷涂计划交叉校验） | **agent 可做** | ✅ 已做（`overlay.single-owner*`、`overlay.paint.*`；base 为合成替身，见 §6.6） |
+   136: 6. **A1g 的 base 是合成替身（T93/F4 明确声明）**：`overlay_selftest.cpp` 的 `baseLineSpans()`
+   138:    **不是** KSyntaxHighlighting 真引擎产出的 span。因此：
+   143:    - 结论措辞以上述为限，不把合成替身的结果说成真 base 的证明。

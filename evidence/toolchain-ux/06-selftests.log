@@ -1,0 +1,47 @@
+# C9 evidence header
+collected_at: 2026-10-31T23:31:41+08:00
+git_head: c682694e125ff7f59c590b83b6d2895239a3d143
+
+## toolchain observability selftest (missing scenario, order, concise message)
+
+MESSAGE Diagnostics unavailable: verible-verilog-ls, slang not found (bundled, local checkout, PATH and env all empty). Impact: Verible diagnostics, navigation 
+VER-TOOLCHAIN-SELFTEST expect=missing checks=20 failures=0
+
+## toolchain UX selftest (panel + shell counts, repeat reparse, local discovery, real symbols)
+UX-MISSING-STATUS Diagnostics unavailable: verible-verilog-ls, slang not found (bundled, local checkout, PATH and env all empty). Impact: Verible diagnostics, n
+UX-PANEL-STATUS Diagnostics unavailable: verible-verilog-ls, slang not found (bundled, local checkout, PATH and env all empty). Impact: Verible diagnostics, nav
+UX-PANEL-OUTLINE rows=0 empty-state="No symbols — the outline backend is missing (verible, slang). See the status line above for the one-line fix."
+CHECK panel.status-single-line PASS  Diagnostics unavailable: verible-verilog-ls, slang not found (bundled, local checkout, PATH and env all empty). Impact: Ver
+CHECK panel.status-concise PASS  446
+CHECK panel.status-mentions-both-tools PASS
+CHECK panel.status-no-probe-wall PASS
+CHECK panel.outline-zero-rows PASS  0
+CHECK panel.empty-state-visible PASS
+CHECK panel.empty-state-single-line PASS  No symbols — the outline backend is missing (verible, slang). See the status line above for the one-line fix.
+CHECK panel.empty-state-mentions-missing PASS  No symbols — the outline backend is missing (verible, slang). See the status line above for the one-line fix.
+CHECK panel.no-fabricated-diagnostics PASS  0
+CHECK panel.no-error-entries PASS
+CHECK panel.degraded-not-crash PASS
+CHECK repeat.status-unchanged PASS  Diagnostics unavailable: verible-verilog-ls, slang not found (bundled, local checkout, PATH and env all empty). Impact: Veri
+CHECK repeat.still-single-line PASS
+CHECK repeat.no-extra-entries PASS  0
+CHECK repeat.outline-still-empty PASS
+CHECK shell.diagnostics-single-entry PASS  1
+CHECK shell.diagnostics-concise PASS  446
+CHECK shell.diagnostics-no-probe-wall PASS  Diagnostics unavailable: verible-verilog-ls, slang not found (bundled, local checkout, PATH and env all empty). Impa
+CHECK shell.diagnostics-single-line PASS  Diagnostics unavailable: verible-verilog-ls, slang not found (bundled, local checkout, PATH and env all empty). Impact
+CHECK available.local-candidates-known PASS  /vedit-build/build/slang/out,/vedit-build/.mpd/recon/verible/bin
+UX-AVAILABLE-STATUS source=verible:local slang:local missing=[]
+CHECK available.slang-from-local PASS  slang: /vedit-build/build/slang/out/slang [local]
+CHECK available.verible-from-local PASS  verible-verilog-ls: /vedit-build/.mpd/recon/verible/bin/verible-verilog-ls [local]
+CHECK available.no-missing PASS
+CHECK available.no-user-message PASS
+CHECK available.panel-no-unavailable-text PASS   — 0 diagnostic(s)
+CHECK available.real-session-terminal PASS  3
+CHECK available.real-session-ready-not-failed PASS  slang: slang binary not found (tried 4 location(s); set VEDIT_SLANG)
+CHECK available.real-symbols-queued PASS
+CHECK available.real-symbols-answered PASS
+CHECK available.real-symbols-non-empty PASS  5
+CHECK available.real-panel-has-symbols PASS  5
+CHECK available.real-panel-no-unavailable-text PASS  degraded: lsp 1/1 file(s), diagnostics 0 — 0 diagnostic(s)
+TOOLCHAIN-UX-SELFTEST ok=1 checks=42 failures=0 skipped=0

@@ -1,0 +1,29 @@
+# C9 evidence header
+collected_at: 2026-11-01T10:38:25+08:00
+git_head: 23514fb351f34ab23de177c375dd240175662d5e
+
+## F-1: the mislabelled evidence log was NOT edited; a genuine F2 pre-fix log was added.
+
+## old log sha256 (must equal the value recorded before this task)
+2041cab48ea46bbb5c028e5c4117fce662a580b7c670a62d430b7905606c3107  evidence/highlight-realkte/01-diagnosis-prefix.log
+   recorded before T90: 2041cab48ea46bbb5c028e5c4117fce662a580b7c670a62d430b7905606c3107
+
+## git diff/status for the old log (must be empty: content untouched)
+(no output above = unchanged)
+
+## the new, genuinely-F2 pre-fix evidence
+-rw-rw-r-- 1 haroldzhao haroldzhao 3799 Nov  1 10:36 evidence/highlight-realkte/01b-diagnosis-prefix-f2.log
+f2_sha256: aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
+HIGHLIGHT editor_repository_definitions=3 custom_paths=0
+HIGHLIGHT diagnose.v: url='' mode='Normal' highlightingMode='None' availableModes=3
+HIGHLIGHT diagnose.sv: url='' mode='Normal' highlightingMode='None' availableModes=3
+HIGHLIGHT-DIAGNOSIS checks=15 failures=8
+
+## corrected label / correction note in REPORT.md
+12:> **更正（T90/F-1，标签修正）**：本文件原先把 `01-diagnosis-prefix.log` 标成“交付口径（F2 库）”，
+14:> **开发机发行版库（内嵌 451 份 KDE 定义）**，不是 F2。原日志**内容未改动**（sha256 仍为
+16:> “库无关的机制证据”，并**补采了真正的 F2 口径修前证据** `01b-diagnosis-prefix-f2.log`
+42:### 修复前（开发机发行版库，内嵌 451 份定义；库无关的机制证据）— `01-diagnosis-prefix.log`
+55:### 修复前（交付口径：F2 库 + 私有 XDG share）— `01b-diagnosis-prefix-f2.log`
+157:| `01-diagnosis-prefix.log` | 修复前、**开发机发行版库（451 内嵌定义）**：库无关的机制证据——文档 `highlightingMode='None'`、无 ranges/folding（原日志内容未改动，sha256 `2041cab4…`；标签更正见文首） |
+158:| `01b-diagnosis-prefix-f2.log` | 修复前、**交付口径 F2 库**（git 修前代码的临时副本 + 私有 XDG share）：仓库有 author=VEdit 的 Verilog/SystemVerilog 且 `top.v` 解析到它，但文档 mode=`None`、formats/folding=0，`checks=15 failures=8` |

@@ -1,0 +1,24 @@
+generated: 2026-10-31T14:13:44Z
+command: readelf -d target/qt6-build/src/app/vedit-app | grep NEEDED
+
+ 0x0000000000000001 (NEEDED)             Shared library: [libKF6TextEditor.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libKF6Parts.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libQt6Widgets.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libtree-sitter.so.0.25]
+ 0x0000000000000001 (NEEDED)             Shared library: [libKF6SyntaxHighlighting.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libQt6Gui.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libQt6Core.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]
+
+## 其中非常规（非 libc/libstdc++/libm/libgcc/ld-linux）的条目：
+libKF6TextEditor.so.6
+libKF6Parts.so.6
+libQt6Widgets.so.6
+libtree-sitter.so.0.25
+libKF6SyntaxHighlighting.so.6
+libQt6Gui.so.6
+libQt6Core.so.6

@@ -1,0 +1,19 @@
+== normal-mode visibility (status bar / shell diagnostic) ==
+collected_at: 2026-10-31T14:44:15Z
+git_head: c71fe31478887e3dc7c460f875ccfb93e61c0ec4
+clean env: env -i PATH=/usr/bin:/bin QT_QPA_PLATFORM=offscreen
+cmd: vedit-app --hold 200  (installPanels runs; --selfcheck would return before it)
+--- output (stdout TOOLCHAIN + stderr [app-shell] diagnostic) ---
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+filetree: installFileTree projectRoot='' dockInserted=0 placeholderReplaced=0
+search: installSearch projectRoot='' jumpTarget=editor
+[app-shell] Diagnostics unavailable: verible-verilog-ls not found (bundled, PATH, env — all empty; probed /vedit-build/target/qt6-build/src/app/verible-verilog-ls, /vedit-build/target/qt6-build/src/app/bin/verible-verilog-ls, /vedit-build/target/qt6-build/src/app/../lib/vedit/bin/verible-verilog-ls, /vedit-build/target/qt6-build/src/app/../share/vedit/bin/verible-verilog-ls, /usr/bin/verible-verilog-ls, /bin/verible-verilog-ls); slang not found (bundled, PATH, env — all empty; probed /vedit-build/target/qt6-build/src/app/slang, /vedit-build/target/qt6-build/src/app/bin/slang, /vedit-build/target/qt6-build/src/app/../lib/vedit/bin/slang, /vedit-build/target/qt6-build/src/app/../share/vedit/bin/slang, /usr/bin/slang, /bin/slang) Impact: Verible diagnostics, go-to-definition, references, rename, formatting and the outline are unavailable; SLANG deep lint is unavailable. Fix: put `verible-verilog-ls` in the product's bin/ next to vd-app, install it on PATH, or set VEDIT_VERIBLE_LS; put `slang` in the product's bin/ next to vd-app, install it on PATH, or set VEDIT_SLANG.
+diagnostics: Diagnostics unavailable: verible-verilog-ls not found (bundled, PATH, env — all empty; probed /vedit-build/target/qt6-build/src/app/verible-verilog-ls, /vedit-build/target/qt6-build/src/app/bin/verible-verilog-ls, /vedit-build/target/qt6-build/src/app/../lib/vedit/bin/verible-verilog-ls, /vedit-build/target/qt6-build/src/app/../share/vedit/bin/verible-verilog-ls, /usr/bin/verible-verilog-ls, /bin/verible-verilog-ls); slang not found (bundled, PATH, env — all empty; probed /vedit-build/target/qt6-build/src/app/slang, /vedit-build/target/qt6-build/src/app/bin/slang, /vedit-build/target/qt6-build/src/app/../lib/vedit/bin/slang, /vedit-build/target/qt6-build/src/app/../share/vedit/bin/slang, /usr/bin/slang, /bin/slang) Impact: Verible diagnostics, go-to-definition, references, rename, formatting and the outline are unavailable; SLANG deep lint is unavailable. Fix: put `verible-verilog-ls` in the product's bin/ next to vd-app, install it on PATH, or set VEDIT_VERIBLE_LS; put `slang` in the product's bin/ next to vd-app, install it on PATH, or set VEDIT_SLANG.
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+TOOLCHAIN source=verible:missing slang:missing missing=[verible, slang]
+APP-EXIT=0

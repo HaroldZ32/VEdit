@@ -1,0 +1,10 @@
+== evidence: 09-source-sha256.txt — exact source this evidence certifies
+time=2026-10-31T19:45:11+08:00
+HEAD=95c496e682e3841add1a081edd78d29c34957aac
+
+2027595c6eba7c99825f0d09bca67b21036ae1dfba462186ca7d3f4ce5754540  src/workspace/search/global_search.h
+8febfb2c1d88ad228c92b57bf833c06015d426d267ea201cec6c96a947c89e98  src/workspace/search/global_search.cpp
+7d075ddaf8b16a99d3788ba4f5ece7e457b3e1d0fb4000371a7da89cd4a7f302  src/workspace/search/search_selftest.cpp
+e66a572ad0bad89ba2b155bb3f46a348ba89bfa3d8854e9d6ed8943cb6d8e003  src/workspace/search/tools/slowio/slowio.cpp
+8bb6a804f4b0e26fabf46c9a7275801ca50c56b987f0b891c7f036e34fbffdf6  src/workspace/search/CMakeLists.txt
+df23a3051c83e2edbd5238296bf711e255d3f0fdabc8de5aced6e9dbd0a73126  src/workspace/search/README.md

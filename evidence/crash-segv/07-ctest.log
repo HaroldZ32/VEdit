@@ -1,0 +1,267 @@
+collected_at: 2026-11-01T18:58:47+08:00
+git_head: 60c7ae9c95fe769e2bd6c86dd4c56e1514603e44
+git_branch: feat/qt6-ktexteditor-migration
+git_status:
+   M AGENT.md
+   M THIRD_PARTY_NOTICES.md
+   M build/evidence/typecheck/00-run.txt
+   M build/evidence/typecheck/10-typecheck-image-build.log
+   M build/evidence/typecheck/11-typecheck-image-id.txt
+   M crates/vd-config/src/project.rs
+   M crates/vd-config/src/warnings.rs
+   M crates/vd-ffi/include/vd_ffi.h
+   M crates/vd-ffi/src/lsp.rs
+   M crates/vd-ffi/src/project.rs
+   M crates/vd-lsp/src/client.rs
+   M crates/vd-lsp/src/documents.rs
+   M crates/vd-lsp/src/session.rs
+   M evidence/ffi-abi/logs/10-rust-image.txt
+   M evidence/ffi-abi/logs/19-rust-stage-console.log
+   M evidence/ffi-abi/logs/20-cargo-build-release.log
+   M evidence/ffi-abi/logs/21-staticlib.txt
+   M evidence/ffi-abi/logs/22-rust-targets.txt
+   M evidence/ffi-abi/logs/23-cargo-test.log
+   M evidence/ffi-abi/logs/26-vd_ffi.h
+   M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+   M evidence/m0-build/build-logs/20-qt6-image-build.log
+   M evidence/m0-build/build-logs/21-qt6-image-id.txt
+   M evidence/m0-build/build-logs/31-qt6-configure.log
+   M evidence/m0-build/build-logs/32-qt6-build.log
+   M evidence/m0-build/build-logs/33-qt6-ctest.log
+   M evidence/m0-build/build-logs/34-qt6-elf.txt
+   M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+   M packaging/runtime/AppRun
+   M packaging/runtime/assemble-appdir.sh
+   M packaging/runtime/selfcheck.sh
+   M scripts/versions.env
+   M src/app/CMakeLists.txt
+   M src/app/app_shell.cpp
+   M src/app/editor_area.cpp
+   M src/app/main.cpp
+   M src/editor/CMakeLists.txt
+   M src/editor/kernel/document_io.cpp
+   M src/editor/kernel/document_io.h
+   M src/editor/kernel/edit_core_selftest_main.cpp
+   M src/editor/kernel/fold_breadcrumb.cpp
+   M src/editor/kernel/fold_breadcrumb.h
+   M src/editor/kernel/ktexteditor_provider.cpp
+   M src/syntax/folding/CMakeLists.txt
+   M src/syntax/product/syntax_product.cpp
+   M src/workspace/diagnostics/CMakeLists.txt
+   M src/workspace/diagnostics/diagnostics_controller.cpp
+   M src/workspace/diagnostics/diagnostics_controller.h
+   M src/workspace/diagnostics/diagnostics_integration.cpp
+   M src/workspace/diagnostics/diagnostics_panel.cpp
+   M src/workspace/diagnostics/diagnostics_panel.h
+   M src/workspace/diagnostics/diagnostics_selftest.cpp
+   M src/workspace/diagnostics/ffi_backends.cpp
+   M src/workspace/diagnostics/lsp_backend.h
+   M src/workspace/filetree/filetree_integration.cpp
+   M src/workspace/palette/README.md
+   M src/workspace/palette/palette_integration.cpp
+   M src/workspace/search/CMakeLists.txt
+   M src/workspace/search/README.md
+   M src/workspace/search/global_search.cpp
+   M src/workspace/search/global_search.h
+   M src/workspace/search/search_integration.cpp
+   M src/workspace/settings/settings_integration.cpp
+   M src/workspace/vcs/vcs_integration.cpp
+  ?? crates/vd-lsp/tests/buffer_change.rs
+  ?? evidence/crash-segv/
+  ?? evidence/fonts-cjk/
+  ?? evidence/large-file/
+  ?? evidence/locale-and-noise/
+  ?? evidence/rules-search-ux/
+  ?? packaging/runtime/assets/fonts/
+  ?? packaging/runtime/assets/licenses/
+  ?? src/app/crash_report_check.sh
+  ?? src/app/crash_reporter.cpp
+  ?? src/app/crash_reporter.h
+  ?? src/app/crash_reporter_selftest.cpp
+  ?? src/editor/kernel/large_file.cpp
+  ?? src/editor/kernel/large_file.h
+  ?? src/editor/kernel/large_file_bench.cpp
+  ?? src/editor/kernel/large_file_bench.h
+  ?? src/syntax/folding/tests/fold_interaction_tests.cpp
+
+command (pinned Qt image): ctest --test-dir target/qt6-build --output-on-failure
+
+Test project /vedit-build/target/qt6-build
+      Start  1: vedit-app-syntax-startup
+Could not find executable /vedit-build/target/qt6-build/src/app/vedit-app
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/vedit-app
+/vedit-build/target/qt6-build/src/app/vedit-app
+/vedit-build/target/qt6-build/src/app/Release/vedit-app
+/vedit-build/target/qt6-build/src/app/Release/vedit-app
+/vedit-build/target/qt6-build/src/app/Debug/vedit-app
+/vedit-build/target/qt6-build/src/app/Debug/vedit-app
+/vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app
+/vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app
+/vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app
+/vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app
+/vedit-build/target/qt6-build/src/app/Deployment/vedit-app
+/vedit-build/target/qt6-build/src/app/Deployment/vedit-app
+/vedit-build/target/qt6-build/src/app/Development/vedit-app
+/vedit-build/target/qt6-build/src/app/Development/vedit-app
+vedit-build/target/qt6-build/src/app/vedit-app
+vedit-build/target/qt6-build/src/app/vedit-app
+vedit-build/target/qt6-build/src/app/Release/vedit-app
+vedit-build/target/qt6-build/src/app/Release/vedit-app
+vedit-build/target/qt6-build/src/app/Debug/vedit-app
+vedit-build/target/qt6-build/src/app/Debug/vedit-app
+vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app
+vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app
+vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app
+vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app
+vedit-build/target/qt6-build/src/app/Deployment/vedit-app
+vedit-build/target/qt6-build/src/app/Deployment/vedit-app
+vedit-build/target/qt6-build/src/app/Development/vedit-app
+vedit-build/target/qt6-build/src/app/Development/vedit-app
+ 1/30 Test  #1: vedit-app-syntax-startup .......................***Not Run   0.00 sec
+Unable to find executable: /vedit-build/target/qt6-build/src/app/vedit-app
+      Start  2: vedit-m0-smoke
+ 2/30 Test  #2: vedit-m0-smoke .................................   Passed    0.07 sec
+      Start  3: vedit-syntax-provider-tests
+ 3/30 Test  #3: vedit-syntax-provider-tests ....................   Passed    0.00 sec
+      Start  4: vedit-syntax-kde-data
+ 4/30 Test  #4: vedit-syntax-kde-data ..........................   Passed    0.03 sec
+      Start  5: vedit-syntax-directory-equivalence
+ 5/30 Test  #5: vedit-syntax-directory-equivalence .............   Passed    0.03 sec
+      Start  6: vedit-syn-grammars-tests
+ 6/30 Test  #6: vedit-syn-grammars-tests .......................   Passed    0.20 sec
+      Start  7: vedit-syntax-product-tests
+ 7/30 Test  #7: vedit-syntax-product-tests .....................   Passed    0.06 sec
+      Start  8: vedit-terminal-selftest
+ 8/30 Test  #8: vedit-terminal-selftest ........................   Passed    2.06 sec
+      Start  9: vedit-syntax-overlay-selftest
+ 9/30 Test  #9: vedit-syntax-overlay-selftest ..................   Passed    2.92 sec
+      Start 10: vedit-app-ffi-abi-selftest
+Process not started
+ /vedit-build/target/qt6-build/src/app/vedit-app
+[permission denied]
+10/30 Test #10: vedit-app-ffi-abi-selftest .....................***Not Run   0.00 sec
+      Start 11: vedit-app-shell-selftest
+Process not started
+ /vedit-build/target/qt6-build/src/app/vedit-app
+[permission denied]
+11/30 Test #11: vedit-app-shell-selftest .......................***Not Run   0.00 sec
+      Start 12: vedit-app-crash-reporter-selftest
+12/30 Test #12: vedit-app-crash-reporter-selftest ..............   Passed    0.15 sec
+      Start 13: vedit-app-crash-report-shipped
+13/30 Test #13: vedit-app-crash-report-shipped .................***Failed    0.02 sec
+FAIL: no crash report under /vedit-build/target/qt6-build/src/app/crash-report-check/state/vedit (exit=126)
+--- process output ---
+/vedit-build/src/app/crash_report_check.sh: line 17: /vedit-build/target/qt6-build/src/app/vedit-app: Permission denied
+
+      Start 14: vedit-edit-core-selftest
+14/30 Test #14: vedit-edit-core-selftest .......................   Passed    0.16 sec
+      Start 15: vedit-fim-wiring-selftest
+Could not find executable /vedit-build/target/qt6-build/src/app/editor-lane/vedit-fim-wiring-selftest
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/editor-lane/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Release/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Release/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Debug/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Debug/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/MinSizeRel/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/MinSizeRel/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/RelWithDebInfo/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/RelWithDebInfo/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Deployment/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Deployment/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Development/vedit-fim-wiring-selftest
+/vedit-build/target/qt6-build/src/app/editor-lane/Development/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Release/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Release/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Debug/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Debug/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/MinSizeRel/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/MinSizeRel/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/RelWithDebInfo/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/RelWithDebInfo/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Deployment/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Deployment/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Development/vedit-fim-wiring-selftest
+vedit-build/target/qt6-build/src/app/editor-lane/Development/vedit-fim-wiring-selftest
+15/30 Test #15: vedit-fim-wiring-selftest ......................***Not Run   0.00 sec
+Unable to find executable: /vedit-build/target/qt6-build/src/app/editor-lane/vedit-fim-wiring-selftest
+      Start 16: vedit-syntax-directory-tests
+16/30 Test #16: vedit-syntax-directory-tests ...................   Passed    0.00 sec
+      Start 17: vedit-fold-interaction-tests
+17/30 Test #17: vedit-fold-interaction-tests ...................   Passed    1.50 sec
+      Start 18: vedit-folding-tests
+18/30 Test #18: vedit-folding-tests ............................   Passed    0.78 sec
+      Start 19: vedit-breadcrumb-tests
+19/30 Test #19: vedit-breadcrumb-tests .........................   Passed    0.04 sec
+      Start 20: vedit-fim-selftest
+20/30 Test #20: vedit-fim-selftest .............................   Passed    0.11 sec
+      Start 21: vedit-workspace-palette-selftest
+21/30 Test #21: vedit-workspace-palette-selftest ...............   Passed    0.09 sec
+      Start 22: vedit-workspace-palette-integration-selftest
+Could not find executable /vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-integration-selftest
+Looked in the following places:
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Release/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Release/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Debug/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Debug/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/MinSizeRel/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/MinSizeRel/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/RelWithDebInfo/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/RelWithDebInfo/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Deployment/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Deployment/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Development/vedit-workspace-palette-integration-selftest
+/vedit-build/target/qt6-build/src/app/workspace-lane-palette/Development/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Release/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Release/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Debug/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Debug/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/MinSizeRel/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/MinSizeRel/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/RelWithDebInfo/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/RelWithDebInfo/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Deployment/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Deployment/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Development/vedit-workspace-palette-integration-selftest
+vedit-build/target/qt6-build/src/app/workspace-lane-palette/Development/vedit-workspace-palette-integration-selftest
+Unable to find executable: /vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-integration-selftest
+22/30 Test #22: vedit-workspace-palette-integration-selftest ...***Not Run   0.00 sec
+      Start 23: vedit-workspace-search-selftest
+23/30 Test #23: vedit-workspace-search-selftest ................   Passed   12.28 sec
+      Start 24: vedit-workspace-project-selftest
+24/30 Test #24: vedit-workspace-project-selftest ...............   Passed    0.05 sec
+      Start 25: vedit-workspace-diagnostics-selftest
+25/30 Test #25: vedit-workspace-diagnostics-selftest ...........   Passed    0.01 sec
+      Start 26: vedit-toolchain-missing-selftest
+26/30 Test #26: vedit-toolchain-missing-selftest ...............   Passed    0.01 sec
+      Start 27: vedit-diagnostics-ffi-selftest
+27/30 Test #27: vedit-diagnostics-ffi-selftest .................   Passed    3.16 sec
+      Start 28: vedit-toolchain-ux-selftest
+28/30 Test #28: vedit-toolchain-ux-selftest ....................   Passed    3.11 sec
+      Start 29: vedit-workspace-vcs-selftest
+29/30 Test #29: vedit-workspace-vcs-selftest ...................   Passed    1.15 sec
+      Start 30: vedit-workspace-settings-selftest
+30/30 Test #30: vedit-workspace-settings-selftest ..............   Passed    0.37 sec
+
+80% tests passed, 6 tests failed out of 30
+
+Total Test time (real) =  28.35 sec
+
+The following tests FAILED:
+	  1 - vedit-app-syntax-startup (Not Run)
+	 10 - vedit-app-ffi-abi-selftest (BAD_COMMAND)
+	 11 - vedit-app-shell-selftest (BAD_COMMAND)
+	 13 - vedit-app-crash-report-shipped (Failed)
+	 15 - vedit-fim-wiring-selftest (Not Run)
+	 22 - vedit-workspace-palette-integration-selftest (Not Run)
+Errors while running CTest
+
+exit_code: 8

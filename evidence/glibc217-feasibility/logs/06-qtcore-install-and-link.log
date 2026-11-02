@@ -1,0 +1,29 @@
+## collection: 2026-10-31T14:12:33+0000
+
+real	0m0.063s
+user	0m0.007s
+sys	0m0.055s
+INSTALL_EXIT=1
+install size: 5.6M
+## libQt6Core.so.6.10.2 GLIBC floor
+max GLIBC: readelf: /opt/qt6-spike/lib/libQt6Core.so.6.10.2: Error: No such file
+GLIBC symbols needing >2.17: readelf: /opt/qt6-spike/lib/libQt6Core.so.6.10.2: Error: No such file
+0
+GLIBC symbols needing >2.17 (names): readelf: /opt/qt6-spike/lib/libQt6Core.so.6.10.2: Error: No such file
+max GLIBCXX: readelf: /opt/qt6-spike/lib/libQt6Core.so.6.10.2: Error: No such file
+NEEDED: readelf: /opt/qt6-spike/lib/libQt6Core.so.6.10.2: Error: No such file
+
+/tmp/qt6_hello.cpp:1:10: fatal error: QCoreApplication: No such file or directory
+    1 | #include <QCoreApplication>
+      |          ^~~~~~~~~~~~~~~~~~
+compilation terminated.
+LINK_EXIT=0
+bash: line 36: /tmp/qt6_hello: No such file or directory
+RUN_EXIT=127
+## qt6_hello GLIBC floor
+max GLIBC: readelf: /tmp/qt6_hello: Error: No such file
+GLIBC symbols needing >2.17: readelf: /tmp/qt6_hello: Error: No such file
+0
+max GLIBCXX: readelf: /tmp/qt6_hello: Error: No such file
+## NEEDED
+readelf: /tmp/qt6_hello: Error: No such file

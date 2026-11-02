@@ -24,7 +24,9 @@ for archive in "${candidates[@]}"; do
     fail=1
     continue
   fi
-  if printf '%s\n' "$entries" | grep -qE '(^|/)(AppRun|start[^/]*\.(sh|bash)|vedit)$'; then
+  # `grep` without `-q` reads the whole list; `-q` would exit at the first match
+  # and SIGPIPE `printf` (this gate runs under `set -o pipefail`).
+  if printf '%s\n' "$entries" | grep -E '(^|/)(AppRun|start[^/]*\.(sh|bash)|vedit)$' > /dev/null; then
     echo "[pack] OK: launcher present"
   else
     echo "[pack] FAIL: no launcher entry (AppRun/start*.sh/vedit) in the archive"

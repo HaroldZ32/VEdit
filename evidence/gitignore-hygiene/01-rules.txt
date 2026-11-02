@@ -1,0 +1,44 @@
+generated: 2026-11-01T02:26:25Z
+git_head: 9a6b828f468d85a13a035fe839aa59c4b2a77f44
+git_status_porcelain:
+ M .gitignore
+?? build/centos7-verify/samples/
+?? build/glibc217-spike/
+---
+== what was untracked and unignored at the start of this task (Lead's report) ==
+
+build/centos7-verify/AppDir            287M  files=205
+build/centos7-verify/stage             287M  files=212
+build/centos7-verify/dist              104M  files=2
+build/centos7-verify/samples           24K  files=4
+build/glibc217-spike                   12K  files=1
+
+These were listed by `git status --porcelain` as five untracked entries
+(`AppDir/`, `stage/`, `dist/`, `samples/`, `glibc217-spike/`). After the rules
+below, only the two *source* entries remain (see 03), and this is what is now
+ignored:
+
+$ git check-ignore -v build/centos7-verify/AppDir build/centos7-verify/stage build/centos7-verify/dist
+.gitignore:47:build/centos7-verify/AppDir/	build/centos7-verify/AppDir
+.gitignore:48:build/centos7-verify/stage/	build/centos7-verify/stage
+.gitignore:49:build/centos7-verify/dist/	build/centos7-verify/dist
+
+$ git diff -- .gitignore
+diff --git a/.gitignore b/.gitignore
+index 87bf86a..b900988 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -40,6 +40,13 @@ evidence/fim/real-endpoint/harness/target/
+ probes/*/build/
+ # Abandoned GTK spike build tree (1.4G, kept on disk, never versioned).
+ build/gui-spike/
++# CentOS 7 on-machine verification (T83): build/centos7-verify/build-tarball.sh
++# assembles these on every run. The scripts (build-tarball.sh,
++# verify-centos7.sh), STEPS.md and the samples/verilog-demo fixture are inputs
++# and stay tracked.
++build/centos7-verify/AppDir/
++build/centos7-verify/stage/
++build/centos7-verify/dist/
+ # CMake/Ninja output directories that appear inside lane sources.
+ **/CMakeFiles/
+ **/CMakeCache.txt

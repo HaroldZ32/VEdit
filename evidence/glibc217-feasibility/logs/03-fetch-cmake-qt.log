@@ -1,0 +1,15 @@
+## collection: 2026-10-31T14:09:41+0000
+## cmake 3.31.0 official linux-x86_64
+
+real	0m12.651s
+user	0m0.165s
+sys	0m0.381s
+cmake version 3.31.0
+cmake max GLIBC: GLIBC_2.17
+## qtbase 6.10.2 source
+
+real	0m15.047s
+user	0m0.145s
+sys	0m0.479s
+-rw-r--r-- 1 root root 50374380 Oct 31 14:10 qtbase-everywhere-src-6.10.2.tar.xz
+qtbase-everywhere-src-6.10.2

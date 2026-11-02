@@ -1,0 +1,35 @@
+# C9 evidence header
+collected_at: 2026-10-31T11:23:46+00:00
+git_head: 95c496e682e3841add1a081edd78d29c34957aac
+app: /vedit-build/target/qt6-build/src/app/vedit-app
+app_sha256: d5c7e20a84d7e189c709d00a51a16c763d3fc8231a3ace147dc7038e2dbea123
+
+## the check as it stands in scripts/build-qt-in-container.sh
+# The check must not die of SIGPIPE: this script runs under `set -o pipefail`, and
+# `grep -q` exits at the first match, which kills a still-writing `nm` with
+# SIGPIPE(141) — the pipeline then reads as failure and the gate reports a false
+# "does not export vd_abi_version" while the symbol is right there. `grep` without
+# `-q` reads the whole stream, so `nm` exits normally and the status is the grep
+# result only. The check itself is unchanged: match => 0, missing => 1 => FATAL.
+if ! nm -C "$APP" | grep -E ' T vd_abi_version$' > /dev/null; then
+  echo "FATAL: vedit-app does not export vd_abi_version; the Rust service layer is not linked" >&2
+  exit 1
+fi
+
+## 1. deterministic repro of the mechanism (synthetic nm-sized stream)
+match + OLD (grep -q), unbounded producer     -> status=141   FALSE-FAIL (producer dies on the broken pipe; the real gate logged 141)
+match + OLD (grep -q), bounded producer       -> status=141   FALSE-FAIL (producer write error; any non-zero reads as a missing symbol)
+match + NEW (grep ... >/dev/null), bounded    -> status=0   PASS
+no match + NEW (grep ... >/dev/null), bounded -> status=1   FAIL (correct)
+
+## 2. the exact fixed predicate against real and symbol-less binaries
+real vedit-app                 predicate=0  vd_* count=36
+shim without vd_abi_version    predicate=1  vd_* count=5
+/bin/true (no vd_* at all)     predicate=1  vd_* count=0
+
+expected: real=0 (pass); shim and /bin/true non-zero (FATAL, check keeps its power)
+
+## 3. script-level verdict (0 = passes to the next step, 1 = FATAL + exit)
+real vedit-app                 verdict=0
+shim without vd_abi_version    verdict=1
+/bin/true (no vd_* at all)     verdict=1

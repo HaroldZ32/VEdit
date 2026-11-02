@@ -1,0 +1,7 @@
+{
+  "name": "vedit",
+  "version": 1,
+  "features": ["syntax", "folds"],
+  "nested": { "deep": true, "count": 42 },
+  "none": null
+}

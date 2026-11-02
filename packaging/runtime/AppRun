@@ -1,0 +1,143 @@
+#!/bin/sh
+# AppRun for the VEdit Qt6/KF6 private runtime — F2 form (T64 / T61).
+#
+# Two jobs:
+#   1. start the binary through the loader that ships inside the package, with
+#      the package's lib/ as the only library path (C2);
+#   2. isolate syntax-definition lookup: XDG_DATA_DIRS *and* XDG_DATA_HOME point
+#      into the AppDir, so a host with KDE installed cannot leak its definitions
+#      into the product (F2 conditions C3/C4). A runtime guard (C7) then checks
+#      that every loaded definition is on the whitelist and fails closed.
+#
+# Usage: AppRun [--selfcheck] [--] [args]
+set -u
+
+HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+APPDIR="$HERE"
+export APPDIR
+
+# --- private plugin search paths (package only) ------------------------------
+# NB: LD_LIBRARY_PATH is exported only right before exec (see below). Exporting it
+# here would make host utilities (cat/sed/grep/id/mkdir) load OUR glibc through the
+# HOST loader and fail on a CentOS 7 host, silently breaking the guard below.
+export QT_PLUGIN_PATH="$APPDIR/plugins"
+export QT_QPA_PLATFORM_PLUGIN_PATH="$APPDIR/plugins/platforms"
+export QML2_IMPORT_PATH="$APPDIR/qml"
+
+# --- F2: XDG narrowed to the AppDir ONLY (C3 + C4) ---------------------------
+# Never append /usr/share or keep $HOME/.local/share: both were measured to leak
+# host/user definitions (FORM-DECISION §1: f2-xdgdirs-only -> 2 defs, f2-override
+# -> 402 defs). Setting only one of the two variables is NOT enough.
+export XDG_DATA_DIRS="$APPDIR/usr/share"
+export XDG_DATA_HOME="$APPDIR/usr/share"
+export VEDIT_SYNTAX_DIR="$APPDIR/usr/share/org.kde.syntax-highlighting"
+
+# --- fonts (no host fontconfig data) ----------------------------------------
+export FONTCONFIG_FILE="$APPDIR/etc/fonts/fonts.conf"
+export FONTCONFIG_PATH="$APPDIR/etc/fonts"
+: "${XDG_CACHE_HOME:=/tmp/vedit-cache-$(id -u)}"
+export XDG_CACHE_HOME
+mkdir -p "$XDG_CACHE_HOME" 2>/dev/null || true
+
+# --- locale: Qt needs a UTF-8 locale ----------------------------------------
+# CentOS 7's default is C / ANSI_X3.4-1968. The host locale archive is glibc
+# 2.17 data; the PACKAGED glibc cannot load it (setlocale NULL), so the package
+# ships /usr/lib/locale/C.utf8 and LOCPATH is set for the product. The fallback
+# is only announced when it is used; if it cannot be used, the original locale
+# is kept and that is announced once (never silent).
+CURRENT_LOCALE_DESC="${LC_ALL:-${LC_CTYPE:-${LANG:-unset}}}"
+CURRENT_CHARMAP=$(locale charmap 2>/dev/null || true)
+BUNDLED_UTF8_LOCALE="$APPDIR/usr/lib/locale/C.utf8"
+CHOSEN_LOCALE=""
+use_bundled_utf8_locale() {
+    [ -d "$BUNDLED_UTF8_LOCALE" ] || return 1
+    CHOSEN_LOCALE=C.UTF-8
+    return 0
+}
+bundled_charmap_ok() {
+    [ -x "$APPDIR/ld-linux-x86-64.so.2" ] || return 1
+    [ -x /usr/bin/locale ] || return 1
+    LC_ALL="$1" LANG="$1" LOCPATH="$APPDIR/usr/lib/locale" \
+        "$APPDIR/ld-linux-x86-64.so.2" --library-path "$APPDIR/lib" \
+        /usr/bin/locale charmap 2>/dev/null | grep -qi '^utf-8$'
+}
+NEED_LOCALE_FALLBACK=0
+if ! printf '%s' "${CURRENT_CHARMAP:-unknown}" | grep -qi '^utf-8$'; then
+    NEED_LOCALE_FALLBACK=1
+elif ! bundled_charmap_ok "${LC_ALL:-${LC_CTYPE:-${LANG:-C}}}"; then
+    # e.g. LC_ALL=en_US.utf8 is UTF-8 for the host glibc but not for the packaged
+    # one (only C.utf8 is shipped); fall back to the packaged locale.
+    NEED_LOCALE_FALLBACK=1
+fi
+if [ "$NEED_LOCALE_FALLBACK" -eq 1 ]; then
+    if use_bundled_utf8_locale; then
+        printf '%s\n' "AppRun: locale '${CURRENT_LOCALE_DESC}' (${CURRENT_CHARMAP:-unknown}) -> '${CHOSEN_LOCALE}' (bundled UTF-8 fallback)" >&2
+    else
+        printf '%s\n' "AppRun: locale '${CURRENT_LOCALE_DESC}' is not UTF-8 and no packaged UTF-8 locale is available; keeping it" >&2
+    fi
+fi
+
+# --- known noise only: never mute qt.qpa.* (real display/DBus errors) -------
+VEDIT_NOISE_RULES="qt.multimedia.symbolsresolver=false;kf.sonnet.core=false"
+if [ -n "${QT_LOGGING_RULES:-}" ]; then
+    export QT_LOGGING_RULES="${QT_LOGGING_RULES};${VEDIT_NOISE_RULES}"
+else
+    export QT_LOGGING_RULES="$VEDIT_NOISE_RULES"
+fi
+
+# --- C7 runtime guard: fail closed if the whitelist is not the visible set ---
+ksh_guard() {
+    [ -x "$APPDIR/bin/vedit-ksh-env-probe" ] || return 0
+    [ -s "$APPDIR/usr/share/vedit/ksh-whitelist.txt" ] || return 0
+    wl=$(cat "$APPDIR/usr/share/vedit/ksh-whitelist.txt")
+    out=$(QT_QPA_PLATFORM=offscreen LOCPATH="$APPDIR/usr/lib/locale" \
+            "$APPDIR/ld-linux-x86-64.so.2" --library-path "$APPDIR/lib" \
+            "$APPDIR/bin/vedit-ksh-env-probe" --list --editor-repo 2>&1)
+    rc=$?
+    seen=$(printf '%s\n' "$out" | sed -n 's/^KSH-ENV def name="\(.*\)"$/\1/p' | sort | paste -sd, -)
+    if [ "${VEDIT_DEBUG:-0}" = "1" ]; then
+        printf '%s\n' "$out" | grep '^KSH-ENV defs=' >&2
+    fi
+    if [ "$rc" -ne 0 ] || [ "$seen" != "$wl" ]; then
+        echo "KSH-GUARD FAIL: visible definitions [$seen] != whitelist [$wl]" >&2
+        exit 2
+    fi
+    if [ "${VEDIT_DEBUG:-0}" = "1" ]; then
+        echo "KSH-GUARD PASS whitelist=$wl" >&2
+    fi
+}
+ksh_guard
+
+# now that no host utility will run any more, hand the loader search path to the app
+# (the fallback locale, LOCPATH and LD_LIBRARY_PATH are passed to the PRODUCT via
+# `env`, never exported into the host shell: glibc 2.17 has no C.UTF-8 and bash
+# would warn on every command; exporting LD_LIBRARY_PATH would also make the
+# host /usr/bin/env load the package libc.  KEEP the line below as a comment
+# marker for the old approach.)
+
+BIN="$APPDIR/bin/vd-app"
+[ -x "$BIN" ] || { echo "AppRun: product binary missing: $BIN" >&2; exit 1; }
+
+run_app() {
+    LIBPATH="$APPDIR/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+    if [ -n "$CHOSEN_LOCALE" ]; then
+        exec /usr/bin/env LANG="$CHOSEN_LOCALE" LC_ALL="$CHOSEN_LOCALE" \
+            LOCPATH="$APPDIR/usr/lib/locale" LD_LIBRARY_PATH="$LIBPATH" \
+            "$APPDIR/ld-linux-x86-64.so.2" --library-path "$APPDIR/lib" "$BIN" "$@"
+    fi
+    exec /usr/bin/env LOCPATH="$APPDIR/usr/lib/locale" LD_LIBRARY_PATH="$LIBPATH" \
+        "$APPDIR/ld-linux-x86-64.so.2" --library-path "$APPDIR/lib" "$BIN" "$@"
+}
+
+case "${1:-}" in
+  --selfcheck)
+    shift
+    run_app --selfcheck "$@"
+    ;;
+  *)
+    if [ "${VEDIT_DEBUG:-0}" != "1" ]; then
+        export VEDIT_QUIET=1
+    fi
+    run_app "$@"
+    ;;
+esac

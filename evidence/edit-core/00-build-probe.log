@@ -1,0 +1,42 @@
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: /vedit-build/evidence/edit-core/.work/probe-build
+[  0%] Built target tx_steps_probe3_autogen_timestamp_deps
+[  0%] Built target tx_steps_probe_autogen_timestamp_deps
+[  0%] Built target tx_steps_probe2_autogen_timestamp_deps
+[  0%] Built target tx_probe_autogen_timestamp_deps
+[  0%] Built target replace_probe2_autogen_timestamp_deps
+[  0%] Built target tx_steps_probe5_autogen_timestamp_deps
+[  0%] Built target replace_probe_autogen_timestamp_deps
+[  0%] Built target tx_steps_probe4_autogen_timestamp_deps
+[  0%] Built target fsync_probe_autogen_timestamp_deps
+[  5%] Automatic MOC for target tx_probe
+[  5%] Automatic MOC for target tx_steps_probe2
+[  8%] Automatic MOC for target tx_steps_probe
+[ 11%] Automatic MOC for target tx_steps_probe3
+[ 11%] Built target tx_steps_probe2_autogen
+[ 11%] Built target tx_steps_probe_autogen
+[ 11%] Built target tx_probe_autogen
+[ 13%] Automatic MOC for target tx_steps_probe5
+[ 19%] Automatic MOC for target replace_probe
+[ 19%] Automatic MOC for target tx_steps_probe4
+[ 19%] Built target tx_steps_probe3_autogen
+[ 19%] Built target tx_steps_probe4_autogen
+[ 19%] Built target replace_probe_autogen
+[ 22%] Automatic MOC for target replace_probe2
+[ 22%] Built target tx_steps_probe5_autogen
+[ 25%] Automatic MOC for target fsync_probe
+[ 33%] Built target tx_probe
+[ 33%] Built target replace_probe2_autogen
+[ 41%] Built target tx_steps_probe
+[ 41%] Built target fsync_probe_autogen
+[ 50%] Built target tx_steps_probe2
+[ 58%] Built target tx_steps_probe3
+[ 61%] Building CXX object CMakeFiles/tx_steps_probe5.dir/tx_steps_probe5_autogen/mocs_compilation.cpp.o
+[ 69%] Built target tx_steps_probe4
+[ 72%] Building CXX object CMakeFiles/tx_steps_probe5.dir/tx_steps_probe5.cpp.o
+[ 80%] Built target replace_probe
+[ 88%] Built target replace_probe2
+[ 97%] Built target fsync_probe
+[100%] Linking CXX executable tx_steps_probe5
+[100%] Built target tx_steps_probe5

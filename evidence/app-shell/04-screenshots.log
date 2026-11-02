@@ -1,0 +1,5 @@
+SCREENSHOT OK /vedit-build/evidence/app-shell/10-horizontal-split.png
+SCREENSHOT OK /vedit-build/evidence/app-shell/11-vertical-split.png
+SCREENSHOT OK /vedit-build/evidence/app-shell/12-panels-and-docks.png
+SCREENSHOT OK /vedit-build/evidence/app-shell/13-empty-state-no-project.png
+APP-SHELL-SCREENSHOTS ok=1 dir=/vedit-build/evidence/app-shell

@@ -1,0 +1,194 @@
+== evidence: 01-before-red.log (H1 RED baseline: new product assertions, installSearch still only registers the factory)
+time=2026-10-31T18:51:28+08:00
+HEAD=1f47e56421bbeaab64f8082df3cfc104a6a2c2ef
+branch=feat/qt6-ktexteditor-migration
+porcelain:
+   M build/evidence/12-gates-image-build.log
+   M build/gates/gates.sh
+   M build/gates/typecheck.sh
+   M build/slang/evidence/00-build-console.log
+   M build/slang/evidence/01-yum-install.log
+   M build/slang/evidence/02-toolchain.txt
+   M build/slang/evidence/02b-python-build.log
+   M build/slang/evidence/02c-python.txt
+   M build/slang/evidence/03-source.txt
+   M build/slang/evidence/03b-patches.txt
+   M build/slang/evidence/04-configure.log
+   M build/slang/evidence/05-deps.txt
+   M build/slang/evidence/05-elf-check.txt
+   M build/slang/evidence/06-build.log
+   M build/slang/evidence/06-offline-console.log
+   M build/slang/evidence/07-artifact.txt
+   M build/slang/evidence/08-timings.txt
+   M build/slang/evidence/09-offline-smoke.txt
+   M crates/vd-ffi/include/vd_ffi.h
+   M crates/vd-ffi/src/lsp.rs
+   M evidence/ffi-abi/logs/10-rust-image.txt
+   M evidence/ffi-abi/logs/19-rust-stage-console.log
+   M evidence/ffi-abi/logs/20-cargo-build-release.log
+   M evidence/ffi-abi/logs/21-staticlib.txt
+   M evidence/ffi-abi/logs/23-cargo-test.log
+   M evidence/ffi-abi/logs/26-vd_ffi.h
+   M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+   M evidence/m0-build/build-logs/20-qt6-image-build.log
+   M evidence/m0-build/build-logs/21-qt6-image-id.txt
+   M evidence/m0-build/build-logs/31-qt6-configure.log
+   M evidence/m0-build/build-logs/32-qt6-build.log
+   M evidence/m0-build/build-logs/33-qt6-ctest.log
+   M evidence/m0-build/build-logs/34-qt6-elf.txt
+   M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+   M src/app/CMakeLists.txt
+   M src/workspace/integration.cpp
+   M src/workspace/search/search_selftest.cpp
+  ?? evidence/fix-search-jump/
+  ?? evidence/gate-infra/
+  ?? evidence/highlight-v2/00-collect.txt
+  ?? evidence/highlight-v2/01-after-link.txt
+  ?? evidence/highlight-v2/03-build-qt-gate.log
+  ?? evidence/highlight-v2/04-syntax-product-tests.log
+  ?? evidence/highlight-v2/06-standalone-lanes.log
+  ?? evidence/highlight-v2/07-negative-control.log
+  ?? evidence/highlight-v2/08-ctest.log
+  ?? evidence/highlight-v2/09-screenshot-L2.log
+  ?? evidence/highlight-v2/10-licensing-and-embargo.txt
+  ?? evidence/highlight-v2/README.md
+  ?? evidence/highlight-v2/screenshots/
+  ?? evidence/project-model/
+  ?? evidence/verdicts/fix-filetree-open/
+  ?? filetree-testdata/
+  ?? src/editor/CMakeLists.txt
+  ?? src/editor/kernel/
+  ?? src/workspace/diagnostics/
+  ?? src/workspace/project/
+image=sha256:c859d7311b83f0fdf3f0c80365503693ea50ed79161c75297f84e896d6311d25
+
+$ vedit-workspace-search-selftest --selfcheck   (QT_QPA_PLATFORM=offscreen, inside vedit-qt6-build:local)
+CHECK fixture.created PASS
+This plugin does not support propagateSizeHints()
+CHECK panel.root.normalized PASS
+CHECK panel.empty.enter-query PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panel.search.terminates PASS
+CHECK panel.hits.count PASS
+CHECK panel.summary.state PASS
+CHECK panel.summary.files PASS
+CHECK panel.summary.files-scanned PASS
+CHECK panel.summary.skipped-binary PASS
+CHECK panel.summary.skipped-too-large PASS
+CHECK panel.summary.text.observable PASS
+CHECK panel.tree.files PASS
+CHECK panel.tree.one-row-per-hit PASS
+CHECK panel.tree.no-git PASS
+CHECK panel.tree.no-build PASS
+CHECK panel.tree.no-binary PASS
+CHECK panel.hits.one-per-line PASS
+CHECK panel.hit.line-number PASS
+CHECK panel.hit.column PASS
+CHECK panel.hit.snippet PASS
+CHECK panel.hit.unicode-file PASS
+CHECK panel.hit.unicode-column PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panel.case-sensitive.count PASS
+CHECK panel.case-sensitive.excludes-uppercase PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panel.verilog-only.count PASS
+CHECK panel.verilog-only.excludes-markdown PASS
+CHECK panel.verilog-only.excludes-large-file PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panel.unicode.query PASS
+This plugin does not support propagateSizeHints()
+CHECK empty.no-project.visible PASS
+CHECK empty.no-project.text PASS
+CHECK empty.no-project.no-search PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK empty.query.text PASS
+CHECK empty.query.no-search PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK empty.no-results.state PASS
+CHECK empty.no-results.visible PASS
+CHECK empty.no-results.text PASS
+CHECK empty.no-results.tree-hidden PASS
+CHECK empty.unreadable-root SKIP (running as root: chmod 000 does not deny access)
+CHECK entries.unreadable SKIP (running as root: chmod 000 does not deny access)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK limit.results PASS
+CHECK limit.truncated-flag PASS
+CHECK limit.summary-text PASS
+CHECK extension.v PASS
+CHECK extension.vh PASS
+CHECK extension.sv PASS
+CHECK extension.svh PASS
+CHECK extension.not-verilog PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK jump.hit-row-exists PASS
+CHECK jump.row-visible PASS
+CHECK jump.click.recorded PASS
+CHECK jump.click.file PASS
+CHECK jump.click.line PASS
+CHECK jump.click.column PASS
+CHECK jump.file-row.no-jump PASS
+CHECK jump.activate PASS
+CHECK jump.demo.opened PASS
+CHECK jump.demo.line PASS
+CHECK seam.dock-created PASS
+CHECK seam.not-placeholder PASS
+CHECK seam.factory-installed PASS
+CHECK seam.root-applied PASS
+CHECK seam.search-in-shell PASS
+This plugin does not support propagateSizeHints()
+CHECK jump.product.shell-ready PASS
+CHECK jump.product.target-installed FAIL
+CHECK jump.product.initially-no-file PASS
+This plugin does not support propagateSizeHints()
+CHECK jump.product.two-hits PASS
+CHECK jump.product.click-first PASS
+SEARCH-JUMP first requested='a.v':2 current='' cursorLine=1
+CHECK jump.product.first-current-file FAIL
+CHECK jump.product.first-loads-bytes FAIL
+CHECK jump.product.first-cursor-line FAIL
+CHECK jump.product.first-cursor-column FAIL
+CHECK jump.product.first-status FAIL
+CHECK jump.product.click-second PASS
+SEARCH-JUMP second requested='b.sv':4 current='' cursorLine=1
+CHECK jump.product.second-current-file FAIL
+CHECK jump.product.second-cursor-line FAIL
+CHECK large.fixture-created PASS
+CHECK large.start.accepted PASS
+CHECK large.skipped-by-default PASS
+CHECK large.skipped.state PASS
+CHECK large.skipped.fast PASS
+CHECK large.start.accepted-raised PASS
+CHECK large.start.non-blocking PASS
+CHECK large.cancel.returns-fast PASS
+CHECK large.cancel.finishes PASS
+CHECK large.cancel.state PASS
+CHECK large.cancel.bounded PASS
+CHECK large.worker-thread PASS
+CHECK many.start.non-blocking PASS
+CHECK many.finishes PASS
+CHECK many.hits PASS
+CHECK many.files-scanned PASS
+CHECK many.elapsed-bounded PASS
+CHECK large.timeout.accepted PASS
+CHECK large.timeout.finishes PASS
+CHECK large.timeout.flag PASS
+CHECK large.timeout.state PASS
+CHECK large.timeout.bounded PASS
+WORKSPACE-SEARCH-SELFTEST ok=0 checks=95 failures=8 skipped=2
+SELFTEST-EXIT=1

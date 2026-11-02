@@ -1,0 +1,16 @@
+# probe pins (T14)
+image: vedit-qt6-build:local
+date_utc: 2026-10-31T08:22:09Z
+os: Ubuntu 26.04.1 LTS
+glibc: ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43
+kf6_texteditor: 6.24.0-0ubuntu1
+kf6_syntaxhighlighting: 6.24.0-0ubuntu1
+qt6_base: 6.10.2+dfsg-7
+cmake: cmake version 4.2.3
+g++: g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+--- header sha256 ---
+950f0c56d9d6e605911b72fcab7fe844f657938b60ea70e44199cd4c7e0924b0  ktexteditor/document.h
+28bac9da4bef1546296a30b39c6b78c1e76882dd60bdf1de9bbe47a9e2b9fbe3  ktexteditor/editor.h
+1f19d7e980f7a7d437e31504c5b4a49b6727fed3ad4d2c5c7e3b3a221ab8d2f9  ktexteditor/movingcursor.h
+6ff9e1750d7f06ac094f7b3e6242be39342f101662db1523c2825e3b41d446d5  ktexteditor/movingrange.h
+c4cc97e471d94af94407c257a674854f4712261f2777468bcf35b19da8229158  ktexteditor/view.h

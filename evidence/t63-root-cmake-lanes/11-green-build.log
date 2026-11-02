@@ -1,0 +1,29 @@
+[1/29] Automatic MOC for target vedit_app_shell
+[2/29] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/vedit_app_shell_autogen/mocs_compilation.cpp.o
+[3/29] Building C object src/syntax/provider/CMakeFiles/vedit_syntax_test_fixture_grammar.dir/tests/fixture/parser.c.o
+[4/29] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/disabled_provider.cpp.o
+[5/29] Linking C static library src/syntax/provider/libvedit_syntax_test_fixture_grammar.a
+[6/29] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider_tests.dir/tests/fixture/fixture_binding.cpp.o
+[7/29] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/syntax_service.cpp.o
+[8/29] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/grammar_binding.cpp.o
+[9/29] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider_tests.dir/tests/test_syntax_provider.cpp.o
+[10/29] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/owner_arbiter.cpp.o
+[11/29] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/editor_provider.cpp.o
+[12/29] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/session_store.cpp.o
+[13/29] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/theme_manager.cpp.o
+[14/29] Building CXX object cmake/smoke/CMakeFiles/vedit-m0-smoke.dir/qt6_window_smoke.cpp.o
+[15/29] Building CXX object cmake/smoke/CMakeFiles/vedit-ksh-env-probe.dir/ksh_env_probe.cpp.o
+[16/29] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/panel_registry.cpp.o
+[17/29] Linking CXX executable cmake/smoke/vedit-m0-smoke
+[18/29] Linking CXX executable cmake/smoke/vedit-ksh-env-probe
+[19/29] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/tree_sitter_provider.cpp.o
+[20/29] Linking CXX static library src/syntax/provider/libvedit_syntax_provider.a
+[21/29] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/command_registry.cpp.o
+[22/29] Linking CXX executable src/syntax/provider/vedit_syntax_provider_tests
+[23/29] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/editor_area.cpp.o
+[24/29] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/app_shell.cpp.o
+[25/29] Linking CXX static library src/app/libvedit_app_shell.a
+[26/29] Automatic MOC for target vedit-app
+[27/29] Building CXX object src/app/CMakeFiles/vedit-app.dir/vedit-app_autogen/mocs_compilation.cpp.o
+[28/29] Building CXX object src/app/CMakeFiles/vedit-app.dir/main.cpp.o
+[29/29] Linking CXX executable src/app/vedit-app

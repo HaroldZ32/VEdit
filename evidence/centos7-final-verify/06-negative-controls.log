@@ -1,0 +1,32 @@
+== evidence: 06-negative-controls.log — the verify script must FAIL honestly on bad input (final script) ==
+time=2026-11-01T17:42:41+08:00
+HEAD=0c8ea9fe4ae18c386a59a55b8868f837f4f80a84
+
+### (a) truncated AppImage (1 MiB of 95 MB)
+EXIT_A=1
+RESULT FAIL kernel.is-3.10 | expected=3.10.x (CentOS 7 target kernel) actual=7.0.0-38-generic note=containers share the host kernel; a container run is not the real-machine answer
+RESULT PASS glibc.system | expected=glibc 2.17 (CentOS 7) actual=ldd (GNU libc) 2.17 note=target baseline; the product requires 2.34, so the packaged runtime must be used
+RESULT FAIL appimage.sha256 | expected=e7ae067fe66c8e271ba72da974795a7ee3db0efa59bda45079b5a048b4a09558 actual=8e9bf68da0698a081c88dbac327f72e6b163b16322b06072d41d77ac22df450c note=re-copy the file; a truncated transfer cannot be verified any further
+RESULT SKIP appimage.sha256sums | expected=optional SHA256SUMS next to the AppImage actual=absent note=not needed: the expected hash is built into this script
+RESULT FAIL run.selfcheck | expected=--selfcheck completes with APP-SHELL-SELFTEST ok=1 actual=direct exit=127; extract-and-run also failed note=install libfuse2 only if you want the direct FUSE mode; extract-and-run needs no fuse
+RESULT SKIP selfcheck.app-shell | expected=selfcheck output actual=none note=no selfcheck run succeeded; see run.selfcheck
+RESULT SKIP selfcheck.own-xml | expected=selfcheck output actual=none note=no selfcheck run succeeded
+RESULT SKIP selfcheck.fold-975 | expected=selfcheck output actual=none note=no selfcheck run succeeded
+RESULT SKIP selfcheck.toolchain | expected=selfcheck output actual=none note=no selfcheck run succeeded
+RESULT FAIL extract | expected=squashfs-root/AppRun + bin/vd-app actual=missing (exit=1) note=the internal checks (loader/lint/launch) cannot run without the tree
+RESULT SKIP loader.packaged | expected=extracted tree actual=none note=extract failed; cannot observe the process
+RESULT SKIP loader.no-system-loader | expected=extracted tree actual=none note=extract failed
+RESULT SKIP loader.packaged-libc | expected=extracted tree actual=none note=extract failed
+RESULT SKIP lint.real | expected=bin/verible-verilog-lint in the package actual=absent note=cannot lint without the packaged linter
+RESULT SKIP launch.project | expected=extracted tree actual=none note=extract failed; cannot start the product
+SUMMARY: PASS=1 FAIL=4 SKIP=10
+
+### (b) no AppImage next to the script
+EXIT_B=1
+RESULT FAIL appimage.found | expected=VEdit-0.1.1-x86_64.AppImage next to this script actual=not found in /tmp/b note=copy the AppImage and this script into the same directory
+SUMMARY: PASS=0 FAIL=1 SKIP=0
+
+### (c) full AppImage, no SHA256SUMS (cross-check must SKIP, not fail)
+EXIT_C=1
+RESULT SKIP appimage.sha256sums | expected=optional SHA256SUMS next to the AppImage actual=absent note=not needed: the expected hash is built into this script
+SUMMARY: PASS=14 FAIL=1 SKIP=1

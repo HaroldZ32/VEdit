@@ -1,0 +1,46 @@
+# FIM wiring selftest (real provider + real lane, offscreen)
+# command: vedit-fim-wiring-selftest --selfcheck
+# exit code: 0
+
+kf.sonnet.core: Sonnet: No speller backends available!
+FIM-WIRING-SELFTEST start
+CHECK fim.wiring.view PASS
+CHECK fim.wiring.binding-installed PASS
+CHECK fim.wiring.binding-owned-by-view PASS
+CHECK fim.wiring.default-off.endpoint PASS http://127.0.0.1:40135
+CHECK fim.wiring.default-off.trigger-key PASS Alt+\
+CHECK fim.wiring.default-off.tab-free PASS
+CHECK fim.wiring.default-off.state-machine-asked PASS 1
+CHECK fim.wiring.default-off.no-suggestion PASS
+CHECK fim.wiring.default-off.no-ghost PASS
+CHECK fim.wiring.default-off.document-untouched PASS
+CHECK fim.wiring.default-off.zero-connections PASS connections=0
+CHECK fim.wiring.default-off.status-disabled PASS FIM 未启用
+CHECK fim.wiring.configured.request PASS connections=1
+CHECK fim.wiring.configured.suggestion PASS  assign y = 2;
+CHECK fim.wiring.configured.ghost-visible PASS
+CHECK fim.wiring.configured.ghost-text PASS  assign y = 2;
+CHECK fim.wiring.configured.document-untouched-before-tab PASS module m;
+  assign x = 1;
+endmodule
+
+CHECK fim.wiring.configured.tab-esc-armed PASS
+CHECK fim.wiring.accept.text PASS module m;
+  assi assign y = 2;gn x = 1;
+endmodule
+
+CHECK fim.wiring.accept.exactly-once PASS
+CHECK fim.wiring.accept.shortcuts-removed PASS
+CHECK fim.wiring.accept.ghost-hidden PASS
+CHECK fim.wiring.accept.no-pending PASS
+CHECK fim.wiring.cancel.suggestion PASS
+CHECK fim.wiring.cancel.dropped PASS
+CHECK fim.wiring.cancel.document-unchanged PASS
+CHECK fim.wiring.invalidate.suggestion PASS
+CHECK fim.wiring.invalidate.typing-drops-it PASS
+CHECK fim.wiring.invalidate.tab-disarmed PASS
+CHECK fim.wiring.invalidate.accept-inserts-nothing PASS module m;
+  assiz assign y = 2;gn x = 1;
+endmodule
+
+FIM-WIRING-SELFTEST ok=1 checks=30 failures=0

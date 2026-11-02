@@ -1,0 +1,20 @@
+T96-RANGE-EQUIV start
+activated=1 provider=systemverilog
+DEFAULT-IMPL exact=1 whole_tree_calls=1 got=2 expected=2
+DEFAULT-IMPL empty-range-result=0 (legacy whole_tree_calls=2)
+STRESS bytes=9876 lines=237 full_spans=1108
+STRESS long-spans(>500B)=1 longest=1958 capture=comment bytes=[66,2024)
+CASES total=496 failing=0 missing_total=0 extra_total=0
+EDGE zero-length got=0 expected=0 (observation)
+EDGE inverted got=0 expected=0 (observation)
+UNION step=97 queries=102 full=1108 union=1108 missing=0 extra=0 cross-window-dups=42 equal=1
+UNION step=512 queries=20 full=1108 union=1108 missing=0 extra=0 cross-window-dups=8 equal=1
+UNION step=4096 queries=3 full=1108 union=1108 missing=0 extra=0 cross-window-dups=0 equal=1
+FULL-RANGE equals-whole-tree=1 got=1108 full=1108
+PERF-BEGIN
+PERF lines=1000 bytes=16230 full_ms=1.114 range_2k_ms=0.1440 range_16k_ms=0.5550 range_25pct_ms=0.2830 spans_full=1750 spans_2k=219 spans_16k=867
+PERF lines=1920 bytes=31272 full_ms=2.193 range_2k_ms=0.1480 range_16k_ms=1.1030 range_25pct_ms=0.5440 spans_full=3360 spans_2k=219 spans_16k=1672
+PERF lines=4800 bytes=80040 full_ms=5.701 range_2k_ms=0.1430 range_16k_ms=1.0950 range_25pct_ms=1.3350 spans_full=8400 spans_2k=212 spans_16k=1693
+PERF lines=9600 bytes=161400 full_ms=12.880 range_2k_ms=0.1370 range_16k_ms=1.0870 range_25pct_ms=2.7540 spans_full=16800 spans_2k=212 spans_16k=1693
+EDGE zero-length-inside-span point=566 got=1 expected=1 (default semantics filter)
+T96-RANGE-EQUIV end hard_failures=0

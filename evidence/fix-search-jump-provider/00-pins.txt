@@ -1,0 +1,16 @@
+date: 2026-10-31T19:58:17+08:00
+head: 95c496e682e3841add1a081edd78d29c34957aac (feat/qt6-ktexteditor-migration)
+image: vedit-qt6-build:local sha256:29b2435961aded7fb5bb6368819e6811634f8477cf47786043cc2d24fb1b60f5
+changed paths (T69):
+   M src/workspace/search/CMakeLists.txt
+   M src/workspace/search/README.md
+   M src/workspace/search/global_search.cpp
+   M src/workspace/search/global_search.h
+   M src/workspace/search/search_integration.cpp
+   M src/workspace/search/search_panel.h
+   M src/workspace/search/search_selftest.cpp
+   M src/workspace/search/search_types.h
+  ?? evidence/fix-search-jump-provider/
+  ?? src/workspace/search/search_jump_target.cpp
+  ?? src/workspace/search/search_jump_target.h
+  ?? src/workspace/search/tools/

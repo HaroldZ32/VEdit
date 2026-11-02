@@ -1,0 +1,62 @@
+== container os ==
+PRETTY_NAME="Ubuntu 26.04.1 LTS"
+NAME="Ubuntu"
+VERSION_ID="26.04"
+== glibc ==
+ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43
+== kernel (shared with host) ==
+7.0.0-38-generic
+== 22 locked packages: lock version vs installed ==
+qt6-base-dev                       lock=6.10.2+dfsg-7          installed=6.10.2+dfsg-7          OK
+qt6-base-dev-tools                 lock=6.10.2+dfsg-7          installed=6.10.2+dfsg-7          OK
+qt6-declarative-dev                lock=6.10.2+dfsg-3          installed=6.10.2+dfsg-3          OK
+qt6-speech-dev                     lock=6.10.2-1               installed=6.10.2-1               OK
+extra-cmake-modules                lock=6.24.0-0ubuntu1        installed=6.24.0-0ubuntu1        OK
+libkf6config-dev                   lock=6.24.0-0ubuntu1        installed=6.24.0-0ubuntu1        OK
+libkf6coreaddons-dev               lock=6.24.0-0ubuntu1.1      installed=6.24.0-0ubuntu1.1      OK
+libkf6parts-dev                    lock=6.24.0-0ubuntu1        installed=6.24.0-0ubuntu1        OK
+libkf6syntaxhighlighting-dev       lock=6.24.0-0ubuntu1        installed=6.24.0-0ubuntu1        OK
+libkf6syntaxhighlighting-data      lock=6.24.0-0ubuntu1        installed=6.24.0-0ubuntu1        OK
+libkf6texteditor-dev               lock=6.24.0-0ubuntu1        installed=6.24.0-0ubuntu1        OK
+libkf6texteditor-data              lock=6.24.0-0ubuntu1        installed=6.24.0-0ubuntu1        OK
+libkf6texteditor-katepart          lock=6.24.0-0ubuntu1        installed=6.24.0-0ubuntu1        OK
+libkf6xmlgui-dev                   lock=6.24.0-0ubuntu1        installed=6.24.0-0ubuntu1        OK
+libtree-sitter-dev                 lock=0.25.9-7               installed=0.25.9-7               OK
+libc6                              lock=2.43-2ubuntu2.4        installed=2.43-2ubuntu2.4        OK
+libstdc++6                         lock=16-20260322-1ubuntu1   installed=16-20260322-1ubuntu1   OK
+libgcc-s1                          lock=16-20260322-1ubuntu1   installed=16-20260322-1ubuntu1   OK
+libfuse2t64                        lock=2.9.9-9build1          installed=2.9.9-9build1          OK
+cmake                              lock=4.2.3-2ubuntu2         installed=4.2.3-2ubuntu2         OK
+ninja-build                        lock=1.13.2-1               installed=1.13.2-1               OK
+g++-15                             lock=15.2.0-16ubuntu1       installed=15.2.0-16ubuntu1       OK
+checked=22 mismatches=0
+== /opt/vedit image facts (written by the Dockerfile at image build time) ==
+## image facts
+PRETTY_NAME="Ubuntu 26.04.1 LTS"
+NAME="Ubuntu"
+VERSION_ID="26.04"
+glibc: 2.43-2ubuntu2.4
+Minimum supported kernel: 3.2.0
+qt6-base-dev: 6.10.2+dfsg-7
+kf6-texteditor: 6.24.0-0ubuntu1
+kf6-syntaxhighlighting: 6.24.0-0ubuntu1
+tree-sitter: 0.25.9
+cmake: cmake version 4.2.3
+g++: g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+== image package snapshot vs the T10 evidence copy (provenance w/o image id) ==
+04887dd0af18126ced8dcec10984b5ddf430ef7bd4a9718a08c1d2769c88ff23  /opt/vedit/package-snapshot.txt
+04887dd0af18126ced8dcec10984b5ddf430ef7bd4a9718a08c1d2769c88ff23  /work/evidence/m0-build/build-logs/30-qt6-package-snapshot.txt
+== locked-package list: image copy vs repo copy ==
+cbfa9b427157ed2eed248668ca61681a64b1ee6a670d2387fd42c67f4916d3e6  /opt/vedit/qt6-locked-packages.txt
+cbfa9b427157ed2eed248668ca61681a64b1ee6a670d2387fd42c67f4916d3e6  /work/scripts/docker/qt6-locked-packages.txt
+== probe prerequisites ==
+OK /usr/lib/x86_64-linux-gnu/cmake/KF6TextEditor
+OK /usr/lib/x86_64-linux-gnu/cmake/KF6SyntaxHighlighting
+OK /usr/lib/x86_64-linux-gnu/cmake/Qt6Widgets
+xvfb-run: /usr/bin/xvfb-run
+katepart: /usr/lib/x86_64-linux-gnu/qt6/plugins/kf6/parts/katepart.so
+cmake: cmake version 4.2.3
+c++: c++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+qt: 6.10.2
+tree-sitter (pkg-config): 0.25.9
+KTextEditor cmake version: set(PACKAGE_VERSION "6.24.0")

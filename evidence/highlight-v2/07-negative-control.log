@@ -1,0 +1,5 @@
+# Negative control: the product build must NOT configure with no grammar id.
+CMake Error at src/syntax/grammars/CMakeLists.txt:46 (message):
+  VEDIT_SYNTAX_GRAMMAR must be 'none', 'verilog' or 'systemverilog', got ''
+-- Configuring incomplete, errors occurred!
+CONFIGURE-EXIT=1

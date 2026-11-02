@@ -1,0 +1,7 @@
+== 03 artifacts ==
+-rw-r--r-- 1 root root 111240 Oct 31 02:54 /work/evidence/r2-fold/10-fold-external-range.png
+-rw-r--r-- 1 root root 121749 Oct 31 02:54 /work/evidence/r2-fold/11-bigdoc-fold-series.png
+-rw-r--r-- 1 root root  36255 Oct 31 02:54 /work/evidence/r2-fold/12-folded-view.png
+a72053ef1f8add9c9e5252402bc27d01b17c614384bacb4945d5b29d604ab8ab  /work/evidence/r2-fold/10-fold-external-range.png
+2797380190cb5f8cd8623993fd5e1dd2889b5926e78b67574e69f6ec0e6a26a8  /work/evidence/r2-fold/11-bigdoc-fold-series.png
+bb360db561c29d55e5e4487ca7e3e9fb80fc5dab0791818deab2e4d5e2795887  /work/evidence/r2-fold/12-folded-view.png

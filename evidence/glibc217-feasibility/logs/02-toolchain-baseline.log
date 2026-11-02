@@ -1,0 +1,26 @@
+## collection: 2026-10-31T14:09:18+0000  container: CentOS Linux release 7.9.2009 (Core)  glibc: glibc-2.17-326.el7_9.3.x86_64
+## compiler
+g++ (GCC) 11.2.1 20220127 (Red Hat 11.2.1-9)
+## default link (-pthread)
+LINK_EXIT=0
+hello c++17 b
+RUN_EXIT=0
+max GLIBC: GLIBC_2.14
+max GLIBCXX: GLIBCXX_3.4.11
+system libstdc++ max GLIBCXX: GLIBCXX_3.4.19
+## static libstdc++/libgcc link
+LINK_EXIT=0
+hello c++17 b
+RUN_EXIT=0
+max GLIBC: GLIBC_2.14
+max GLIBCXX (dyn): ## NEEDED
+ 0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libpthread.so.0]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]
+## GLIBC symbols used
+      1 GLIBC_2.14
+    104 GLIBC_2.2.5
+      6 GLIBC_2.3
+      2 GLIBC_2.4
+      1 GLIBC_2.6

@@ -1,0 +1,73 @@
+# BEFORE (pre-repair) — src/workspace/filetree/filetree_integration.{h,cpp} restored to HEAD 9957f5f
+# host command: bash -lc 'source scripts/lib-qt.sh; load_qt_versions; run_in_qt6_container bash evidence/fix-filetree-open/run-seamcheck.sh before'
+# date: 2026-10-31T18:28:26+08:00
+== image/toolchain ==
+container: Ubuntu 26.04.1 LTS
+qt6-base-dev: 6.10.2+dfsg-7
+cmake: cmake version 4.2.3
+g++: g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+glibc: ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43
+uid: 0
+source: 9957f5f (HEAD; working tree carries the T39 repair)
+== 1/4 configure the lane standalone ==
+-- VEdit file tree: Qt 6.10.2 (standalone=ON)
+-- VEdit file tree: independent build (no vedit_app_shell) -> filetree_integration.cpp not compiled
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /vedit-build/target/filetree-build
+== 2/4 build the lane (panel + ctest suite + demo) ==
+ninja: no work to do.
+== 2b/4 lane ctest (before) ==
+Test project /vedit-build/target/filetree-build
+    Start 1: vedit-filetree-tests
+1/1 Test #1: vedit-filetree-tests .............   Passed    1.15 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   1.15 sec
+== 2c/4 fixture via the lane's own --prepare ==
+PREPARE ok=1 root=/vedit-build/target/ws-filetree-tmp project_files=7 big_files=200
+== 3/4 configure+build the root-context harness (real ApplicationShell) ==
+-- VEdit: workspace lane 'filetree' wired (vedit_file_tree)
+-- VEdit: workspace lane 'palette' wired (vedit_workspace_palette)
+-- VEdit: workspace lane 'search' wired (vedit_workspace_search)
+-- VEdit: workspace integration enabled (src/workspace/integration.cpp)
+-- VEdit file tree rootcheck: Qt 6.10.2, shell=/vedit-build/src/app
+-- Configuring done (0.1s)
+-- Generating done (0.0s)
+-- Build files have been written to: /vedit-build/target/filetree-rootcheck
+[1/2] Building CXX object CMakeFiles/vedit-filetree-seamcheck.dir/seamcheck.cpp.o
+[2/2] Linking CXX executable vedit-filetree-seamcheck
+== 4/4 seamcheck (before) ==
+filetree: installFileTree projectRoot='/vedit-build/target/ws-filetree-tmp/project' dockInserted=1 placeholderReplaced=1
+filetree: installFileTree projectRoot='/vedit-build/target/ws-filetree-tmp/project' dockInserted=1 placeholderReplaced=0
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+SEAM dock-inserted=1 content-before-install=panel-placeholder-file-tree
+SEAM panel-installed=1 dock-content-is-panel=1 find-child=1 root=/vedit-build/target/ws-filetree-tmp/project
+SEAM CHECK panel-installed ok=1
+SEAM CHECK root-path ok=1 detail=/vedit-build/target/ws-filetree-tmp/project
+SEAM CHECK editor.active-pane-widget ok=1
+SEAM editor-initial-bytes=503
+SEAM CHECK editor.initially-no-file ok=1
+SEAM file-index-valid=1
+SEAM CHECK dblclick.file-row-visible ok=1
+SEAM status-after-file-dblclick="Open /vedit-build/target/ws-filetree-tmp/project/rtl/top.v"
+SEAM CHECK dblclick.file-loads-bytes ok=0 detail=37 bytes on disk
+SEAM CHECK dblclick.file-records-path ok=0
+SEAM CHECK dblclick.file-status-message ok=0 detail=Open /vedit-build/target/ws-filetree-tmp/project/rtl/top.v
+SEAM CHECK dblclick.second-file-row-visible ok=1
+SEAM CHECK dblclick.second-file-loads ok=0
+SEAM CHECK dblclick.second-file-records-path ok=0
+SEAM CHECK dblclick.folder-row-visible ok=1
+SEAM CHECK dblclick.folder-expands ok=1
+SEAM CHECK dblclick.folder-emits-no-open ok=1 detail=0
+SEAM CHECK dblclick.folder-keeps-editor ok=0
+SEAM rows=5 scanned-dirs=3
+SCREENSHOT ok=1 /vedit-build/evidence/fix-filetree-open/screenshots/before-shell.png
+FILETREE-SEAMCHECK ok=0 checks=15 failures=6
+SEAMCHECK before exit=1
+HOST-EXIT=1

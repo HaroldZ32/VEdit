@@ -1,0 +1,10 @@
+# C9 (T115): collected_at=2026-11-01T10:34:17Z; git_head=60c7ae9c95fe769e2bd6c86dd4c56e1514603e44; git_status_porcelain_sha256=4592cf97b951ef89d479131892e008788c3f773d68a44978fb2ed5787417320d; anchor=00-C9.txt
+== LANG=en_US.utf8 (host UTF-8 but not loadable by the packaged glibc) ==
+collected_at: 2026-11-01T10:34:16Z
+git_head: 60c7ae9c95fe769e2bd6c86dd4c56e1514603e44
+--- output ---
+AppRun: locale 'en_US.utf8' (UTF-8) -> 'C.UTF-8' (bundled UTF-8 fallback)
+vcs: installVcs projectRoot=''
+settings: installSettings file='/tmp/.config/VEdit/vedit-app/settings.toml'
+This plugin does not support propagateSizeHints()
+APP-EXIT=0

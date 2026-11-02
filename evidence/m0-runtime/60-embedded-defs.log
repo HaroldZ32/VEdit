@@ -1,0 +1,46 @@
+== embedded-definition scan ==
+library   : /home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/AppDir/lib/libKF6SyntaxHighlighting.so.6
+size      : 2010872 B
+sha256    : da9d5f1c1640059b2809ddbb5c22e855479f9214005821abb3aa25c38a62f5e5
+resource names (utf-16le): xml=450 theme=30
+zstd frames parsed as definitions: 387
+license classes: {'GPL': 36, 'LGPL': 112, 'none': 64, 'other': 175}
+strict-GPL definitions embedded: 36
+  GPL  ABAP | license='GPL' | 5922 B | sha256=14c509ec3b6d9d0d
+  GPL  AVR Assembler | license='GPLv2+' | 10771 B | sha256=2ba978bc96b9cae0
+  GPL  Bitbake | license='GPL' | 6087 B | sha256=9ff7ab453d175136
+  GPL  Clipper | license='GPL' | 12622 B | sha256=fc074cbfd4e62cbd
+  GPL  ConTeXt | license='GPL' | 7120 B | sha256=73c24601d953e930
+  GPL  FreeBASIC | license='GPL' | 12083 B | sha256=48171dc26cc22ae6
+  GPL  GAP | license='GPL' | 255337 B | sha256=9e02c30dda129ae5
+  GPL  GNU Assembler | license='GPLv2+' | 111162 B | sha256=ebd0ed357e346ff0
+  GPL  Go | license='GPLv2+' | 6948 B | sha256=8a67f614e8bb0b63
+  GPL  ILERPG | license='GPLv2+' | 14142 B | sha256=811c51fcd2bc2008
+  GPL  Inform | license='GPL' | 10235 B | sha256=5ff9724ad7dccaea
+  GPL  Intel x86 (FASM) | license='GPL' | 37531 B | sha256=8899a357dcb08f14
+  GPL  Intel x86 (NASM) | license='GPLv2+' | 62159 B | sha256=659182ede893ea4d
+  GPL  JSON | license='GPL' | 3513 B | sha256=f1a5678810050eb8
+  GPL  JSONC | license='GPL' | 4073 B | sha256=cf9aab3cc4e58181
+  GPL  Kconfig | license='GPLv3' | 66451 B | sha256=d57d32112d3ea399
+  GPL  MEL | license='GPLv2+' | 34870 B | sha256=f4c9b04b23e3d06c
+  GPL  Markdown | license='GPL,BSD' | 40057 B | sha256=eab886e5566c1e7d
+  GPL  MonoBasic | license='GPL' | 6806 B | sha256=b108b45afe6520d4
+  GPL  Nagios | license='GPL' | 3256 B | sha256=17bc8958b6ded030
+  GPL  Octave | license='GPL' | 62428 B | sha256=e1f45170466962c6
+  GPL  PGN | license='GPL' | 3364 B | sha256=fe35eedfd4050806
+  GPL  Pig | license='GPL' | 5452 B | sha256=0b207f598a08f192
+  GPL  Quarto | license='GPL' | 8093 B | sha256=0aafe04bbe93a64c
+  GPL  R Markdown | license='GPL' | 6276 B | sha256=8679f9927989e692
+  GPL  R Script | license='GPLv2' | 6118 B | sha256=2e8049c911b8466e
+  GPL  Replicode | license='GPLv2+' | 6092 B | sha256=0d9d82550862f779
+  GPL  Roff | license='GPL' | 6874 B | sha256=1a445539b976bd95
+  GPL  SystemVerilog | license='GPLv3+' | 25672 B | sha256=3f1ecc7316a4212e
+  GPL  TaskJuggler | license='GPLv2' | 8962 B | sha256=42fcd1a3c12b3d6a
+  GPL  Vera | license='GPLv3+' | 15239 B | sha256=727a1fb18909da7b
+  GPL  Wesnoth Markup Language | license='GPL' | 5933 B | sha256=0a10bc30d30b2b3e
+  GPL  nesC | license='GPLv2' | 5915 B | sha256=db51018c7bfe1ee8
+  GPL  progress | license='GPL' | 41477 B | sha256=4c6f7fc15504b5a6
+  GPL  sed | license='GPL' | 11832 B | sha256=1df8e7478208a717
+  GPL  xHarbour | license='GPL' | 12145 B | sha256=8f9c69899deb9822
+  INFO SystemVerilog: license='GPLv3+' bytes=25672 sha256=3f1ecc7316a4212efba2ea0a38852299f2b4744cd7c02a64fddd907a672b0f09
+  INFO Verilog: license='' bytes=6759 sha256=67f7aaf11c277b20bd0dc075849e47feac3dabbe5e0111c71cf177496b99006b

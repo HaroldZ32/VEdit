@@ -1,0 +1,10 @@
+## collection: 2026-10-31T14:26:39+0000
+
+real	0m0.749s
+user	0m0.196s
+sys	0m0.543s
+INSTALL_EXIT=0
+88M	/opt/qt6-gui
+-- Installing: /opt/qt6-gui/lib/cmake/Qt6WidgetsTools/Qt6WidgetsToolsAdditionalTargetInfo.cmake
+-- Installing: /opt/qt6-gui/lib/cmake/Qt6GuiTools/Qt6GuiToolsAdditionalTargetInfo.cmake
+-- Installing: /opt/qt6-gui/lib/cmake/Qt6WaylandScannerTools/Qt6WaylandScannerToolsAdditionalTargetInfo.cmake

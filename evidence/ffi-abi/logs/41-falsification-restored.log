@@ -1,0 +1,530 @@
+[rust-ffi] pinned Rust image: vedit-build:local (toolchain 1.99.0)
+[rust-ffi] reusing the existing image vedit-build:local
+image_id=sha256:aa99410988b4df4588d4fae69761510129cc052d1b79db9a820ba60af4a44f69
+[rust-ffi] build + unit tests + dependency-tree + header checks in vedit-build:local
+== cargo build -p vd-ffi --release (verbose: the target list is in the log) ==
+       Fresh unicode-ident v1.0.27
+       Fresh stable_deref_trait v1.2.1
+       Fresh litemap v0.8.3
+       Fresh writeable v0.6.4
+       Fresh utf_types v1.0.0
+       Fresh proc-macro2 v1.0.107
+       Fresh utf8_iter v1.1.0
+       Fresh shlex v2.0.1
+       Fresh find-msvc-tools v0.1.15
+       Fresh bytes v1.12.1
+       Fresh quote v1.0.47
+       Fresh serde_core v1.0.229
+       Fresh cc v1.10.0
+       Fresh icu_normalizer_data v2.4.0
+       Fresh smallvec v1.16.4
+       Fresh percent-encoding v2.3.2
+       Fresh pin-project-lite v0.2.17
+       Fresh utf8parse v0.2.2
+       Fresh futures-sink v0.3.34
+       Fresh syn v3.0.9
+       Fresh icu_properties_data v2.4.0
+       Fresh syn v2.0.119
+       Fresh anstyle-parse v1.0.0
+       Fresh anstyle-query v1.1.5
+       Fresh is_terminal_polyfill v1.70.2
+       Fresh futures-core v0.3.34
+       Fresh zeroize v1.9.1
+       Fresh colorchoice v1.0.5
+       Fresh anstyle v1.0.14
+       Fresh synstructure v0.14.0
+       Fresh zerovec-derive v0.11.7
+       Fresh serde_derive v1.0.229
+       Fresh displaydoc v0.2.7
+       Fresh libc v0.2.191
+       Fresh anstream v1.0.0
+       Fresh rustls-pki-types v1.15.1
+       Fresh getrandom v0.2.17
+       Fresh futures-io v0.3.34
+       Fresh zerofrom-derive v0.1.8
+       Fresh yoke-derive v0.8.4
+       Fresh clap_lex v1.1.1
+       Fresh bitflags v2.13.2
+       Fresh linux-raw-sys v0.12.1
+       Fresh strsim v0.11.1
+       Fresh cfg-if v1.0.5
+       Fresh untrusted v0.9.0
+       Fresh anyhow v1.0.104
+       Fresh zmij v1.0.23
+       Fresh futures-macro v0.3.34
+       Fresh zerofrom v0.1.8
+       Fresh rustix v1.1.6
+       Fresh clap_builder v4.6.7
+       Fresh ring v0.17.14
+       Fresh futures-channel v0.3.34
+       Fresh form_urlencoded v1.2.2
+       Fresh toml_datetime v0.7.5+spec-1.1.0
+       Fresh errno v0.3.14
+       Fresh equivalent v1.0.3
+       Fresh memchr v2.8.3
+       Fresh yoke v0.8.4
+       Fresh winnow v0.7.15
+       Fresh itoa v1.0.18
+       Fresh hashbrown v0.17.1
+       Fresh winnow v1.0.4
+       Fresh slab v0.4.12
+       Fresh futures-task v0.3.34
+       Fresh once_cell v1.21.4
+       Fresh rustls-webpki v0.103.16
+       Fresh signal-hook-registry v1.4.8
+       Fresh httparse v1.10.1
+       Fresh serde v1.0.229
+       Fresh zerovec v0.11.9
+       Fresh zerotrie v0.2.5
+       Fresh toml_parser v1.1.5+spec-1.1.0
+       Fresh serde_json v1.0.154
+       Fresh indexmap v2.14.2
+       Fresh futures-util v0.3.34
+       Fresh toml v0.9.12+spec-1.1.0
+       Fresh clap v4.6.7
+       Fresh serde_repr v0.1.21
+       Fresh thiserror-impl v2.0.21
+       Fresh tracing-attributes v0.1.31
+       Fresh tokio-macros v2.7.2
+       Fresh tinystr v0.8.5
+       Fresh potential_utf v0.1.6
+       Fresh mio v1.2.4
+       Fresh toml_datetime v1.1.2+spec-1.1.0
+       Fresh serde_spanned v1.1.2
+       Fresh tracing-core v0.1.36
+       Fresh http v1.5.0
+       Fresh bitflags v1.3.2
+       Fresh subtle v2.6.1
+       Fresh heck v0.5.0
+       Fresh toml_writer v1.1.3+spec-1.1.0
+       Fresh base64 v0.23.1
+       Fresh log v0.4.34
+       Fresh futures v0.3.34
+       Fresh thiserror v2.0.21
+       Fresh icu_locale_core v2.4.0
+       Fresh icu_collections v2.4.0
+       Fresh tokio v1.54.1
+       Fresh getrandom v0.4.3
+       Fresh tracing v0.1.44
+       Fresh toml v1.1.8+spec-1.1.0
+       Fresh cbindgen v0.29.4
+       Fresh ureq-proto v0.6.5
+       Fresh rustls v0.23.46
+       Fresh waitpid-any v0.3.0
+       Fresh webpki-roots v1.0.11
+       Fresh tower-service v0.3.3
+       Fresh tower-layer v0.3.3
+       Fresh utf8-zero v0.8.1
+       Fresh fastrand v2.5.0
+       Fresh vd-vcs v0.1.1 (/vedit-build/crates/vd-vcs)
+       Fresh icu_provider v2.4.0
+       Fresh tempfile v3.27.0
+       Fresh ureq v3.5.0
+       Fresh tokio-util v0.7.20
+       Fresh vd-settings v0.1.1 (/vedit-build/crates/vd-settings)
+       Fresh vd-config v0.1.1 (/vedit-build/crates/vd-config)
+       Fresh vd-search v0.1.1 (/vedit-build/crates/vd-search)
+       Fresh icu_properties v2.4.0
+       Fresh icu_normalizer v2.4.0
+       Fresh vd-fim v0.1.1 (/vedit-build/crates/vd-fim)
+       Dirty vd-ffi v0.1.1 (/vedit-build/crates/vd-ffi): the file `crates/vd-ffi/src` has changed (1793441782.058815035s, 14s after last build at 1793441768.878335751s)
+   Compiling vd-ffi v0.1.1 (/vedit-build/crates/vd-ffi)
+       Fresh vd-deeplint v0.1.1 (/vedit-build/crates/vd-deeplint)
+       Fresh idna_adapter v1.2.2
+       Fresh idna v1.1.0
+       Fresh url v2.5.8
+       Fresh lsp-types v0.95.1
+     Running `/vedit-build/target/release/build/vd-ffi-791172e5cce55e94/build-script-build`
+       Fresh async-lsp v0.2.4
+       Fresh vd-lsp v0.1.1 (/vedit-build/crates/vd-lsp)
+     Running `/opt/rust/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/rustc --crate-name vd_ffi --edition=2021 crates/vd-ffi/src/lib.rs --error-format=json --json=diagnostic-rendered-ansi,artifacts,future-incompat --crate-type staticlib --crate-type rlib --emit=dep-info,link -C opt-level=3 -C embed-bitcode=no '--deny=clippy::unwrap_used' --allow=unsafe_code '--deny=clippy::expect_used' --check-cfg 'cfg(docsrs,test)' --check-cfg 'cfg(feature, values())' -C metadata=97618e0f55dfe23d -C extra-filename=-3734eb76d79aa960 --out-dir /vedit-build/target/release/deps -C strip=debuginfo -L dependency=/vedit-build/target/release/deps --extern serde_json=/vedit-build/target/release/deps/libserde_json-6bf6c0e6b5655d4c.rlib --extern vd_config=/vedit-build/target/release/deps/libvd_config-c1e72019a2db39c5.rlib --extern vd_deeplint=/vedit-build/target/release/deps/libvd_deeplint-e435e2c8de650286.rlib --extern vd_fim=/vedit-build/target/release/deps/libvd_fim-cbdd8cced8c27a45.rlib --extern vd_lsp=/vedit-build/target/release/deps/libvd_lsp-3f932512ba270546.rlib --extern vd_search=/vedit-build/target/release/deps/libvd_search-54347baab052b98d.rlib --extern vd_settings=/vedit-build/target/release/deps/libvd_settings-aa20470d25a50815.rlib --extern vd_vcs=/vedit-build/target/release/deps/libvd_vcs-a56a56bc1abda397.rlib --remap-path-prefix=/vedit-build/target/cargo-home=/cargo --remap-path-prefix=/root/.cargo=/cargo --remap-path-prefix=/opt/cargo=/cargo --remap-path-prefix=/opt/rust=/rust --remap-path-prefix=/vedit-build=/vedit -L native=/vedit-build/target/release/build/ring-3d39bd3b074f0337/out`
+    Finished `release` profile [optimized] target(s) in 0.75s
+-rw-r--r-- 2 root root 56102610 Oct 31 10:16 target/release/libvd_ffi.a
+== compiled Rust targets (rustc --crate-name lines, or Fresh lines when cached) ==
+anstream
+anstyle
+anstyle-parse
+anstyle-query
+anyhow
+async-lsp
+base64
+bitflags
+bytes
+cbindgen
+cc
+cfg-if
+clap
+clap_builder
+clap_lex
+colorchoice
+displaydoc
+equivalent
+errno
+fastrand
+find-msvc-tools
+form_urlencoded
+futures
+futures-channel
+futures-core
+futures-io
+futures-macro
+futures-sink
+futures-task
+futures-util
+getrandom
+hashbrown
+heck
+http
+httparse
+icu_collections
+icu_locale_core
+icu_normalizer
+icu_normalizer_data
+icu_properties
+icu_properties_data
+icu_provider
+idna
+idna_adapter
+indexmap
+is_terminal_polyfill
+itoa
+libc
+linux-raw-sys
+litemap
+log
+lsp-types
+memchr
+mio
+once_cell
+percent-encoding
+pin-project-lite
+potential_utf
+proc-macro2
+quote
+ring
+rustix
+rustls
+rustls-pki-types
+rustls-webpki
+serde
+serde_core
+serde_derive
+serde_json
+serde_repr
+serde_spanned
+shlex
+signal-hook-registry
+slab
+smallvec
+stable_deref_trait
+strsim
+subtle
+syn
+synstructure
+tempfile
+thiserror
+thiserror-impl
+tinystr
+tokio
+tokio-macros
+tokio-util
+toml
+toml_datetime
+toml_parser
+toml_writer
+tower-layer
+tower-service
+tracing
+tracing-attributes
+tracing-core
+unicode-ident
+untrusted
+ureq
+ureq-proto
+url
+utf8-zero
+utf8_iter
+utf8parse
+utf_types
+vd-config
+vd-deeplint
+vd-fim
+vd-lsp
+vd-search
+vd-settings
+vd-vcs
+vd_ffi
+waitpid-any
+webpki-roots
+winnow
+writeable
+yoke
+yoke-derive
+zerofrom
+zerofrom-derive
+zeroize
+zerotrie
+zerovec
+zerovec-derive
+zmij
+== cargo test (the service unit tests, AC-0.2) ==
+   Compiling vd-ffi v0.1.1 (/vedit-build/crates/vd-ffi)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.75s
+     Running unittests src/lib.rs (target/debug/deps/vd_ffi-d7d088bbe0f89edb)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/abi.rs (target/debug/deps/abi-c804d6a23d6a8517)
+
+running 12 tests
+test abi_version_is_one ... ok
+test null_and_unknown_arguments_are_rejected_with_a_typed_error ... ok
+test cancelling_a_job_discards_its_result ... ok
+test projected_fixture_serves_all_seven_services ... ok
+test deeplint_reports_a_missing_binary_as_a_typed_failure ... ok
+test lsp_configures_lazily_without_starting_the_server ... ok
+test fim_is_disabled_by_default_and_starts_no_worker ... ok
+test project_parse_expands_the_fixture_filelist ... ok
+test lsp_rejects_a_missing_server_binary ... ok
+test search_returns_hits_over_the_project_file_list ... ok
+test vcs_reports_the_empty_state_for_a_plain_directory ... ok
+test settings_round_trip_through_the_abi ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_search-ccee45e2854f35f2)
+
+running 6 tests
+test tests::missing_root_is_reported ... ok
+test tests::preview_is_trimmed_and_capped ... ok
+test tests::limit_truncates_from_the_tail ... ok
+test tests::query_finds_every_line_in_file_order ... ok
+test tests::empty_needle_and_zero_limit_return_nothing ... ok
+test tests::non_utf8_and_missing_files_are_skipped ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_settings-6db6bb138f178aed)
+
+running 6 tests
+test tests::broken_toml_degrades_to_a_warning ... ok
+test tests::missing_file_is_the_default_state ... ok
+test tests::non_string_values_are_reported_and_skipped ... ok
+test tests::round_trip_preserves_every_pair ... ok
+test tests::failed_rename_leaves_the_original_file_intact ... ok
+test tests::save_replaces_atomically_and_leaves_no_temporary_file ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_vcs-172bba4941aeb03b)
+
+running 6 tests
+test tests::git_detached_head_has_no_branch ... ok
+test tests::git_porcelain_maps_statuses_and_branch ... ok
+test tests::svn_status_maps_codes ... ok
+test tests::plain_directory_is_the_empty_state_not_an_error ... ok
+test tests::nested_directory_finds_the_repository_above_it ... ok
+test tests::markers_select_the_backend ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_ffi
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_search
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_settings
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_vcs
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+== cargo tree (GTK isolation, AC-0.3 / AC-S0.5) ==
+├── vd-config v0.1.1 (/vedit-build/crates/vd-config)
+├── vd-deeplint v0.1.1 (/vedit-build/crates/vd-deeplint)
+├── vd-fim v0.1.1 (/vedit-build/crates/vd-fim)
+├── vd-lsp v0.1.1 (/vedit-build/crates/vd-lsp)
+== cbindgen header ==
+header check: no Rust type outside comments
+[qt6] pinned matrix: Qt 6.10.2 / KF6 6.24.0 / KTextEditor 6.24.0 / KSyntaxHighlighting 6.24.0 / tree-sitter 0.25.9
+[qt6] build image: vedit-qt6-build:local (stage qt6-build of scripts/docker/Dockerfile.build, base docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c)
+[qt6-image] VEDIT_SKIP_IMAGE_BUILD=1: reusing the existing image vedit-qt6-build:local
+image_id=sha256:2a56f1cb28bbcc638e49d9da0c139a060863c78d70bc43d0f36033039b35c0f2
+[qt6] container facts
+PRETTY_NAME="Ubuntu 26.04.1 LTS"
+NAME="Ubuntu"
+VERSION_ID="26.04"
+glibc: ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43
+qt6-base-dev: 6.10.2+dfsg-7
+kf6-texteditor: 6.24.0-0ubuntu1
+kf6-syntaxhighlighting: 6.24.0-0ubuntu1
+tree-sitter (pkg-config): 0.25.9
+cmake: cmake version 4.2.3
+g++: g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+## image facts
+PRETTY_NAME="Ubuntu 26.04.1 LTS"
+NAME="Ubuntu"
+VERSION_ID="26.04"
+glibc: 2.43-2ubuntu2.4
+Minimum supported kernel: 3.2.0
+qt6-base-dev: 6.10.2+dfsg-7
+kf6-texteditor: 6.24.0-0ubuntu1
+kf6-syntaxhighlighting: 6.24.0-0ubuntu1
+tree-sitter: 0.25.9
+cmake: cmake version 4.2.3
+g++: g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+[qt6] cmake configure (versions are requested EXACT from scripts/versions-qt.env)
+-- VEdit version matrix (scripts/versions-qt.env):
+--   distro:            Ubuntu 26.04.1 LTS build image, glibc 2.43-2ubuntu2.4 (min kernel 3.2.0)
+--   Qt6:               6.10.2 (floor 6.5)
+--   KF6:               6.24.0 (floor 6.5, upstream needs Qt >= 6.8.0)
+--   KTextEditor:       6.24.0
+--   KSyntaxHighlighting: 6.24.0
+--   tree-sitter:       0.25.9
+-- Could NOT find Cups (missing: CUPS_LIBRARIES CUPS_INCLUDE_DIR) 
+--   tree-sitter:       0.25.9 at /usr/lib/x86_64-linux-gnu
+-- VEdit: Rust service layer vd-ffi -> /vedit-build/target/release/libvd_ffi.a
+-- VEdit: Rust C header           -> /vedit-build/crates/vd-ffi/include/vd_ffi.h
+-- VEdit: building lane directory src/syntax/provider
+-- VEdit: building lane directory src/syntax/kde
+-- syn-grammars: compiled grammar id='none' verilog=1 systemverilog=1
+-- VEdit: building lane directory src/syntax/grammars
+-- VEdit: building lane directory src/terminal
+-- VEdit: lane directory src/syntax/overlay not present yet; skipped
+-- VEdit: vedit-app links the Rust service layer (vd-ffi); ABI selftest registered
+-- VEdit file tree: Qt 6.10.2 (standalone=OFF)
+-- VEdit file tree: vedit_app_shell present -> installFileTree() is active
+-- VEdit: workspace lane 'filetree' included
+-- VEdit: workspace lane 'palette' included
+-- VEdit: workspace lane 'search' included
+-- VEdit: workspace lane 'filetree' wired (vedit_file_tree)
+-- VEdit: workspace lane 'palette' wired (vedit_workspace_palette)
+-- VEdit: workspace lane 'search' wired (vedit_workspace_search)
+-- VEdit: workspace integration enabled (src/workspace/integration.cpp)
+-- VEdit: building src/app (application shell)
+-- Configuring done (0.3s)
+-- Generating done (0.0s)
+-- Build files have been written to: /vedit-build/target/qt6-build
+[qt6] cmake build
+[1/10] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider_tests.dir/tests/fixture/fixture_binding.cpp.o
+[2/10] Building CXX object src/syntax/grammars/CMakeFiles/vedit_syntax_grammars.dir/bindings.cpp.o
+[3/10] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/grammar_binding.cpp.o
+[4/10] Linking CXX static library src/syntax/provider/libvedit_syntax_provider.a
+[5/10] Linking CXX static library src/syntax/grammars/libvedit_syntax_grammars.a
+[6/10] Linking CXX executable src/syntax/provider/vedit_syntax_provider_tests
+[7/10] Building CXX object src/syntax/grammars/CMakeFiles/vedit_syn_grammars_tests.dir/tests/test_syn_grammars.cpp.o
+[8/10] Linking CXX executable src/syntax/grammars/vedit_syn_grammars_tests
+[9/10] Building CXX object src/app/CMakeFiles/vedit-app.dir/main.cpp.o
+[10/10] Linking CXX executable src/app/vedit-app
+[qt6] Rust C ABI symbols in vedit-app
+## file
+/vedit-build/target/qt6-build/src/app/vedit-app: ELF 64-bit LSB pie executable, x86-64, version 1 (GNU/Linux), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=8e754d1ff88b831808b36880a19f7d93a0443ece, for GNU/Linux 3.2.0, with debug_info, not stripped
+## exported vd_* C ABI symbols (nm)
+00000000000d3da0 T vd_search_poll
+00000000000d4180 T vd_search_query
+00000000000d4490 T vd_search_results_free
+00000000000d4580 T vd_vcs_poll
+00000000000d4aa0 T vd_vcs_status
+00000000000d4bb0 T vd_vcs_status_free
+00000000000d7150 T vd_settings_free
+00000000000d72b0 T vd_settings_load
+00000000000d73c0 T vd_settings_poll
+00000000000d7720 T vd_settings_save
+00000000000dbb10 T vd_deeplint_lint
+00000000000dbd10 T vd_deeplint_poll
+00000000000dbf50 T vd_diagnostics_free
+00000000000dc040 T vd_fim_complete
+00000000000dc220 T vd_fim_poll
+00000000000dc390 T vd_fim_result_free
+00000000000e5460 T vd_lsp_info_free
+00000000000e54e0 T vd_lsp_poll
+00000000000e5690 T vd_lsp_start
+00000000000e5990 T vd_project_info_free
+00000000000e5bd0 T vd_project_parse
+00000000000e5ce0 T vd_project_poll
+00000000000ec1a0 T vd_abi_version
+00000000000ec1b0 T vd_job_cancel
+00000000000ec400 T vd_job_release
+00000000000ec520 T vd_service_create
+00000000000ec6c0 T vd_service_destroy
+00000000000ec710 T vd_service_error
+## count
+28
+## highest GLIBC symbol the product binary requires (the private runtime supplies 2.43)
+GLIBC_2.39
+## sha256
+aaadaea8e1d22b1085f6c8c9b714c4e8015328fb674c5a2d9ad11e1da466163c  /vedit-build/target/qt6-build/src/app/vedit-app
+[qt6] ELF facts (T11 must bundle a glibc that satisfies this floor)
+## file
+/vedit-build/target/qt6-build/cmake/smoke/vedit-m0-smoke: ELF 64-bit LSB pie executable, x86-64, version 1 (GNU/Linux), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=f3a7ef576116cc7d110b1eec39529be1adfa2053, for GNU/Linux 3.2.0, with debug_info, not stripped
+## NEEDED
+ 0x0000000000000001 (NEEDED)             Shared library: [libKF6TextEditor.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libKF6SyntaxHighlighting.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libQt6Widgets.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libQt6Core.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libtree-sitter.so.0.25]
+ 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+## highest GLIBC symbol the binary itself requires (informational; the private runtime supplies it)
+GLIBC_2.34
+## libraries resolved at build time
+	libKF6TextEditor.so.6 => /usr/lib/x86_64-linux-gnu/libKF6TextEditor.so.6 (0x00007fc193e3a000)
+	libKF6SyntaxHighlighting.so.6 => /usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6 (0x00007fc193c4e000)
+	libQt6Core.so.6 => /usr/lib/x86_64-linux-gnu/libQt6Core.so.6 (0x00007fc192ea9000)
+	libtree-sitter.so.0.25 => /usr/lib/x86_64-linux-gnu/libtree-sitter.so.0.25 (0x00007fc192e7a000)
+	libstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007fc192bd8000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x00007fc192989000)
+## sha256
+cc9f67782ed61cde765e39dca17d2e170b32de56cb5400096504d4b72b3ebe97  /vedit-build/target/qt6-build/cmake/smoke/vedit-m0-smoke
+[qt6] ctest (offscreen: QMainWindow + KTextEditor document + KSyntaxHighlighting + tree-sitter)
+Test project /vedit-build/target/qt6-build
+      Start  1: vedit-m0-smoke
+ 1/10 Test  #1: vedit-m0-smoke .................................   Passed    0.06 sec
+      Start  2: vedit-syntax-provider-tests
+ 2/10 Test  #2: vedit-syntax-provider-tests ....................   Passed    0.00 sec
+      Start  3: vedit-syntax-kde-data
+ 3/10 Test  #3: vedit-syntax-kde-data ..........................   Passed    0.03 sec
+      Start  4: vedit-syn-grammars-tests
+ 4/10 Test  #4: vedit-syn-grammars-tests .......................   Passed    0.18 sec
+      Start  5: vedit-terminal-selftest
+ 5/10 Test  #5: vedit-terminal-selftest ........................   Passed    1.07 sec
+      Start  6: vedit-app-ffi-abi-selftest
+ 6/10 Test  #6: vedit-app-ffi-abi-selftest .....................   Passed    0.17 sec
+      Start  7: vedit-app-shell-selftest
+ 7/10 Test  #7: vedit-app-shell-selftest .......................   Passed    0.12 sec
+      Start  8: vedit-workspace-palette-selftest
+ 8/10 Test  #8: vedit-workspace-palette-selftest ...............   Passed    0.09 sec
+      Start  9: vedit-workspace-palette-integration-selftest
+ 9/10 Test  #9: vedit-workspace-palette-integration-selftest ...   Passed    0.08 sec
+      Start 10: vedit-workspace-search-selftest
+10/10 Test #10: vedit-workspace-search-selftest ................   Passed    0.33 sec
+
+100% tests passed, 0 tests failed out of 10
+
+Total Test time (real) =   2.12 sec
+[qt6] xcb + software-rendering window smoke under Xvfb
+## renderer
+OpenGL renderer string: llvmpipe (LLVM 21.1.8, 256 bits)
+OpenGL version string: 4.5 (Compatibility Profile) Mesa 26.0.8-1ubuntu0.3
+## smoke (QT_QPA_PLATFORM=xcb, QT_OPENGL=software, LIBGL_ALWAYS_SOFTWARE=1)
+M0-SMOKE ok=1 platform=xcb qt=6.10.2 kf6=6.24.0 ktexteditor=1 ksynhl=6.24.0 tree_sitter=0.25.9 window=1 editor=1 document=1 definitions=451 themes=30 verilog=1 systemverilog=loadable(not-asserted,C7-pending) custom_path=1 tree_sitter_parser=1 builtin_valid_defs=450 whitelist_verilog=0 highlight_formats=-1 kshlib=/usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0 libc=/usr/lib/x86_64-linux-gnu/libc.so.6
+M0-SMOKE theme=Atom One Dark
+[qt6] PASS: Rust service layer + configure + build + ctest (incl. the C ABI smoke) + xcb/software-rendering smoke inside vedit-qt6-build:local
+[qt6] evidence: evidence/ffi-abi/logs/ (Rust layer) and evidence/m0-build/build-logs/2x-qt6-*, 3x-qt6-*
+RESTORED-EXIT=0

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language>
+<!--
+  VEdit Verilog syntax definition (own LGPL port; NOT a copy of KDE's verilog.xml).
+  Semantic source: the product's Verilog feature set (GtkSourceView 4.6.1
+  verilog.lang was used as the feature reference only). Authored for VEdit.
+  SPDX-License-Identifier: LGPL-2.1-or-later
+  Folding: module/begin/case/function/task/generate regions (A4 requirement).
+  File name deliberately differs from the prohibited KDE file name.
+-->
+<language name="Verilog" version="1" kateversion="5.0" section="Hardware"
+          extensions="*.v;*.vh;*.vlg" mimetype="text/x-verilog"
+          author="VEdit" license="LGPL-2.1-or-later">
+  <highlighting>
+    <list name="keywords">
+      <item>always</item><item>and</item><item>assign</item><item>automatic</item>
+      <item>buf</item><item>casex</item><item>casez</item><item>deassign</item>
+      <item>default</item><item>defparam</item><item>disable</item><item>edge</item>
+      <item>else</item><item>endcase</item><item>endfunction</item><item>endgenerate</item>
+      <item>endmodule</item><item>endtask</item><item>for</item><item>force</item>
+      <item>forever</item><item>fork</item><item>function</item><item>generate</item>
+      <item>if</item><item>ifnone</item><item>initial</item><item>inout</item>
+      <item>input</item><item>integer</item><item>join</item><item>localparam</item>
+      <item>module</item><item>nand</item><item>negedge</item><item>nor</item>
+      <item>not</item><item>or</item><item>output</item><item>parameter</item>
+      <item>posedge</item><item>reg</item><item>release</item><item>repeat</item>
+      <item>signed</item><item>supply0</item><item>supply1</item><item>task</item>
+      <item>time</item><item>tri</item><item>triand</item><item>trior</item>
+      <item>trireg</item><item>unsigned</item><item>wait</item><item>wand</item>
+      <item>while</item><item>wire</item><item>wor</item><item>xnor</item><item>xor</item>
+    </list>
+    <list name="veditFoldBegin">
+      <item>module</item><item>begin</item><item>case</item><item>casex</item>
+      <item>casez</item><item>function</item><item>task</item><item>generate</item>
+    </list>
+    <list name="veditFoldEnd">
+      <item>endmodule</item><item>end</item><item>endcase</item>
+      <item>endfunction</item><item>endtask</item><item>endgenerate</item>
+    </list>
+    <contexts>
+      <context name="Normal" attribute="Normal Text" lineEndContext="#stay">
+        <!--
+          Folding, in the KDE keyword-list idiom that KSyntaxHighlighting 6.24
+          actually understands (task T45). A <keyword String="X"> whose value is
+          not a list name is resolved AS a list name; with no <list name="X"> it is
+          rejected ("Unknown keyword list") and the rule is dropped, which is why
+          the previous form produced ZERO folding regions. The fold words
+          therefore live in two lists and the rules reference those lists:
+            veditFoldBegin: module, begin, case, casex, casez, function, task, generate
+            veditFoldEnd:   endmodule, end, endcase, endfunction, endtask, endgenerate
+          All openers/closers share one region name; the highlighter counts the
+          begin/end events, so nested constructs stay balanced.
+        -->
+        <keyword attribute="Keyword" context="#stay" String="veditFoldBegin" beginRegion="veditFold"/>
+        <keyword attribute="Keyword" context="#stay" String="veditFoldEnd" endRegion="veditFold"/>
+
+        <keyword attribute="Keyword" context="#stay" String="keywords"/>
+
+        <RegExpr attribute="Comment" context="#stay" String="//.*$"/>
+        <Detect2Chars attribute="Comment" context="BlockComment" char="/" char1="*" beginRegion="Comment"/>
+        <DetectChar attribute="String" context="String" char="&quot;"/>
+        <RegExpr attribute="Number" context="#stay" String="\b\d+'[bBoOdDhH][0-9a-fA-FxXzZ_?]+\b"/>
+        <RegExpr attribute="Number" context="#stay" String="\b\d+(\.\d+)?\b"/>
+        <RegExpr attribute="Operator" context="#stay" String="[&amp;|^~!+\-*/%&lt;&gt;=?:]+"/>
+        <RegExpr attribute="Data Type" context="#stay" String="[A-Za-z_][A-Za-z0-9_$]*"/>
+      </context>
+      <context name="BlockComment" attribute="Comment" lineEndContext="#stay">
+        <Detect2Chars attribute="Comment" context="#pop" char="*" char1="/" endRegion="Comment"/>
+      </context>
+      <context name="String" attribute="String" lineEndContext="#pop">
+        <Detect2Chars attribute="String" context="#stay" char="\" char1="&quot;"/>
+        <DetectChar attribute="String" context="#pop" char="&quot;"/>
+      </context>
+    </contexts>
+    <itemDatas>
+      <itemData name="Normal Text" defStyleNum="dsNormal"/>
+      <itemData name="Keyword" defStyleNum="dsKeyword"/>
+      <itemData name="Comment" defStyleNum="dsComment"/>
+      <itemData name="String" defStyleNum="dsString"/>
+      <itemData name="Number" defStyleNum="dsDecVal"/>
+      <itemData name="Operator" defStyleNum="dsOperator"/>
+      <itemData name="Data Type" defStyleNum="dsNormal"/>
+    </itemDatas>
+  </highlighting>
+</language>

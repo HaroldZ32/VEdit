@@ -1,0 +1,10 @@
+== embedded-definition scan ==
+library   : /home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/AppDir/lib/libKF6SyntaxHighlighting.so.6
+size      : 696480 B
+sha256    : aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
+resource names (utf-16le): xml=0 theme=30
+zstd frames parsed as definitions: 0
+license classes: {}
+strict-GPL definitions embedded: 0
+  INFO SystemVerilog: not found among parsed definitions
+  INFO Verilog: not found among parsed definitions

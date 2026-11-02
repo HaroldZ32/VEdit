@@ -1,0 +1,43 @@
+# C9 backfill (T112/N2): header added after the fact; the body below is unchanged.
+# original_collected_at_utc: 2026-11-01T07:48:26Z   (from the archived file mtime)
+# original_git_head: 90176858e5f8d5123c573826df8c0ccc7375c015
+# original_git_status_porcelain_sha256: not captured at collection time
+# session_anchor: none: phase-1 logs recorded time+HEAD, not a full porcelain block
+# backfill_collected_at_utc: 2026-11-01T09:23:35Z
+# backfill_git_head: 0c8ea9fe4ae18c386a59a55b8868f837f4f80a84
+# backfill_git_status_porcelain_sha256: a7feab0230532310375511329de129cad97d49e690c7a9c7336394a1cce151fa (current tree at backfill time)
+== T31 PHASE 1 skeleton: assemble the delivery AppDir (baseline 9017685) ==
+collected_at: 2026-11-01T07:48:21Z
+git_head: 90176858e5f8d5123c573826df8c0ccc7375c015
+git_status_porcelain (this task's paths):
+   M packaging/appimage/README.md
+   M packaging/runtime/AppRun
+   M packaging/runtime/README.md
+   M packaging/runtime/assemble-appdir.sh
+   M packaging/runtime/build.sh
+   M packaging/runtime/selfcheck.sh
+   M packaging/runtime/verify-not-shipped.sh
+  ?? evidence/slice3-pack/
+IMAGE=vedit-qt6-build:local
+cmd: packaging/runtime/assemble-appdir.sh --require-toolchain
+--- output ---
+[assemble] vd-app: 61e19acda47fe2c9e2e34841cd292d93b3dbc90281c23fce93f89ba4f6f8d402  probe: b709d6924ec9a6f6da6ec80aaf915aa27d9b9ddb3e18de73ced44316353fc242
+[assemble] syntax data root: 2 root xml + 2 syntax/ xml (T84 + fold compatibility)
+[assemble] whitelist: SystemVerilog,Verilog
+binary verible-verilog-ls sha256=07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845
+binary verible-verilog-lint sha256=b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29
+binary verible-verilog-format sha256=b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473
+[assemble] toolchain: verible bundled (3 binaries, sha256 pinned)
+binary slang sha256=63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252
+[assemble] toolchain: slang bundled (sha256 pinned)
+[assemble] toolchain: complete (verible + slang), missing=[]
+[assemble] active whitelist files: 2 (no syntax-bundled/)
+[assemble] delivery invariants: vd-app + Qt platform plugins + toolchain + whitelist present
+[assemble] AppDir: /vedit-build/packaging/runtime/out/AppDir files=204 bytes=283399121
+[assemble] f2lib sha256: aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
+APPDIR=/vedit-build/packaging/runtime/out/AppDir
+APPDIR_FORM=F2
+APPDIR_FILES=204
+APPDIR_BYTES=283399121
+APPDIR_WHITELIST=SystemVerilog,Verilog
+ASSEMBLE-EXIT=0

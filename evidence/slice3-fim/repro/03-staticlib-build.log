@@ -1,0 +1,187 @@
+# C9 evidence header (T105 backfill — evidence repair; the body below is unchanged)
+collected_at: unknown (no original header; the local collection time was not recorded)
+collected_at_utc: unknown
+collected_at_mtime_reference: 2026-11-01T15:17:50+0800   # reference only, NOT the collection time
+git_head: unknown (not recorded at collection time)
+git_head_at_backfill: d36bff9470dca6bb94ee6c5529c7fb5328f344c9
+backfill: 补记（T105）—— `git_status_porcelain`、`git_head_at_backfill` 与推导的 `collected_at_utc` 是补记时刻的快照/推导值，不是原始采集时刻；`git_status_porcelain` 描述补记时刻的工作树；原始采集时刻不可回溯，mtime 仅作参考。原始 `collected_at`/`git_head`（若存在）保留原值，未编造。
+backfill_snapshot: local=2026-11-01T15:38:25+0800 utc=2026-11-01T07:38:25Z
+git_status_porcelain_sha256: 8fac5b80afb6c312f8c729f6e07fc0410476bb743f515b195057f726876bc5e3   # snapshot at backfill time
+git_status_porcelain:
+  M build/evidence/typecheck/00-run.txt
+  M build/evidence/typecheck/10-typecheck-image-build.log
+  M build/evidence/typecheck/11-typecheck-image-id.txt
+  M crates/vd-ffi/include/vd_ffi.h
+  M crates/vd-ffi/src/fim.rs
+  M crates/vd-ffi/src/service.rs
+  M evidence/ffi-abi/logs/10-rust-image.txt
+  M evidence/ffi-abi/logs/19-rust-stage-console.log
+  M evidence/ffi-abi/logs/20-cargo-build-release.log
+  M evidence/ffi-abi/logs/21-staticlib.txt
+  M evidence/ffi-abi/logs/23-cargo-test.log
+  M evidence/ffi-abi/logs/26-vd_ffi.h
+  M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+  M evidence/m0-build/build-logs/20-qt6-image-build.log
+  M evidence/m0-build/build-logs/21-qt6-image-id.txt
+  M evidence/m0-build/build-logs/31-qt6-configure.log
+  M evidence/m0-build/build-logs/32-qt6-build.log
+  M evidence/m0-build/build-logs/33-qt6-ctest.log
+  M evidence/m0-build/build-logs/34-qt6-elf.txt
+  M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+  M src/editor/CMakeLists.txt
+  M src/editor/kernel/ktexteditor_provider.cpp
+  M src/workspace/palette/README.md
+  M src/workspace/search/CMakeLists.txt
+  M src/workspace/search/README.md
+  M src/workspace/search/global_search.cpp
+  M src/workspace/search/global_search.h
+ ?? evidence/fim-wiring/
+ ?? evidence/slice1-stop/61-typecheck-slice3.log
+ ?? evidence/slice1-stop/62-build-qt-slice3.log
+ ?? evidence/slice3-fim/
+ ?? evidence/verdicts/fim/
+ ?? src/editor/fim/
+ ?? src/editor/kernel/fim_wiring.cpp
+ ?? src/editor/kernel/fim_wiring.h
+ ?? src/editor/kernel/fim_wiring_selftest.cpp
+---
+    Updating crates.io index
+ Downloading crates ...
+  Downloaded cfg-if v1.0.5
+  Downloaded anstyle v1.0.14
+  Downloaded anyhow v1.0.104
+  Downloaded cbindgen v0.29.4
+  Downloaded anstyle-query v1.1.5
+  Downloaded base64 v0.23.1
+  Downloaded anstyle-parse v1.0.0
+  Downloaded bitflags v2.13.2
+  Downloaded anstream v1.0.0
+  Downloaded cc v1.10.0
+  Downloaded utf8-zero v0.8.1
+  Downloaded async-lsp v0.2.4
+  Downloaded bitflags v1.3.2
+  Downloaded bytes v1.12.1
+  Downloaded clap v4.6.7
+  Downloaded clap_builder v4.6.7
+  Downloaded colorchoice v1.0.5
+  Downloaded document-features v0.2.12
+  Downloaded errno v0.3.14
+  Downloaded cookie v0.18.2
+  Downloaded cookie_store v0.22.1
+  Downloaded displaydoc v0.2.7
+  Downloaded equivalent v1.0.3
+  Downloaded clap_lex v1.1.1
+  Downloaded idna_adapter v1.2.2
+  Downloaded powerfmt v0.2.1
+  Downloaded deranged v0.5.9
+  Downloaded strsim v0.11.1
+  Downloaded tokio-macros v2.7.2
+  Downloaded percent-encoding v2.3.2
+  Downloaded shlex v2.0.1
+  Downloaded tempfile v3.27.0
+  Downloaded log v0.4.34
+  Downloaded serde v1.0.229
+  Downloaded hashbrown v0.17.1
+  Downloaded serde_json v1.0.154
+  Downloaded utf_types v1.0.0
+  Downloaded futures-util v0.3.34
+  Downloaded futures-macro v0.3.34
+  Downloaded subtle v2.6.1
+  Downloaded serde_spanned v1.1.2
+  Downloaded syn v2.0.119
+  Downloaded futures-task v0.3.34
+  Downloaded num-conv v0.2.2
+  Downloaded quote v1.0.47
+  Downloaded potential_utf v0.1.6
+  Downloaded futures-core v0.3.34
+  Downloaded is_terminal_polyfill v1.70.2
+  Downloaded futures-io v0.3.34
+  Downloaded form_urlencoded v1.2.2
+  Downloaded heck v0.5.0
+  Downloaded itoa v1.0.18
+  Downloaded stable_deref_trait v1.2.1
+  Downloaded serde_repr v0.1.21
+  Downloaded slab v0.4.12
+  Downloaded fastrand v2.5.0
+  Downloaded find-msvc-tools v0.1.15
+  Downloaded thiserror-impl v2.0.21
+  Downloaded getrandom v0.2.17
+  Downloaded time-core v0.1.9
+  Downloaded synstructure v0.14.0
+  Downloaded futures-sink v0.3.34
+  Downloaded pin-project-lite v0.2.17
+  Downloaded tinystr v0.8.5
+  Downloaded httparse v1.10.1
+  Downloaded thiserror v2.0.21
+  Downloaded litrs v1.0.1
+  Downloaded signal-hook-registry v1.4.8
+  Downloaded futures-channel v0.3.34
+  Downloaded litemap v0.8.3
+  Downloaded rustls-pki-types v1.15.1
+  Downloaded time-macros v0.2.32
+  Downloaded once_cell v1.21.4
+  Downloaded proc-macro2 v1.0.107
+  Downloaded getrandom v0.4.3
+  Downloaded smallvec v1.16.4
+  Downloaded serde_core v1.0.229
+  Downloaded futures v0.3.34
+  Downloaded icu_locale_core v2.4.0
+  Downloaded toml v0.9.12+spec-1.1.0
+  Downloaded toml_parser v1.1.5+spec-1.1.0
+  Downloaded icu_provider v2.4.0
+  Downloaded serde_derive v1.0.229
+  Downloaded socket2 v0.6.5
+  Downloaded icu_normalizer_data v2.4.0
+  Downloaded rustls-webpki v0.103.16
+  Downloaded icu_collections v2.4.0
+  Downloaded lsp-types v0.95.1
+  Downloaded utf8_iter v1.1.0
+  Downloaded version_check v0.9.5
+  Downloaded utf8parse v0.2.2
+  Downloaded http v1.5.0
+  Downloaded writeable v0.6.4
+  Downloaded untrusted v0.9.0
+  Downloaded waitpid-any v0.3.0
+  Downloaded memchr v2.8.3
+  Downloaded indexmap v2.14.2
+  Downloaded mio v1.2.4
+  Downloaded icu_properties v2.4.0
+  Downloaded idna v1.1.0
+  Downloaded icu_properties_data v2.4.0
+  Downloaded time v0.3.55
+  Downloaded icu_normalizer v2.4.0
+  Downloaded syn v3.0.9
+  Downloaded rustls v0.23.46
+  Downloaded rustix v1.1.6
+  Downloaded tracing v0.1.44
+  Downloaded ureq v3.5.0
+  Downloaded ureq-proto v0.6.5
+  Downloaded url v2.5.8
+  Downloaded tokio-util v0.7.20
+  Downloaded webpki-roots v1.0.11
+  Downloaded winnow v0.7.15
+  Downloaded winnow v1.0.4
+  Downloaded toml_writer v1.1.3+spec-1.1.0
+  Downloaded zerofrom v0.1.8
+  Downloaded tracing-core v0.1.36
+  Downloaded libc v0.2.191
+  Downloaded yoke-derive v0.8.4
+  Downloaded zerovec v0.11.9
+  Downloaded tracing-attributes v0.1.31
+  Downloaded tokio v1.54.1
+  Downloaded zerotrie v0.2.5
+  Downloaded toml_datetime v1.1.2+spec-1.1.0
+  Downloaded zerovec-derive v0.11.7
+  Downloaded yoke v0.8.4
+  Downloaded zeroize v1.9.1
+  Downloaded ring v0.17.14
+  Downloaded unicode-ident v1.0.27
+  Downloaded toml v1.1.8+spec-1.1.0
+  Downloaded tower-layer v0.3.3
+  Downloaded zmij v1.0.23
+  Downloaded tower-service v0.3.3
+  Downloaded toml_datetime v0.7.5+spec-1.1.0
+  Downloaded zerofrom-derive v0.1.8
+  Downloaded linux-raw-sys v0.12.1
+   Compiling vd-ffi v0.1.1 (/vedit-build/crates/vd-ffi)
+    Finished `release` profile [optimized] target(s) in 15.54s

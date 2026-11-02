@@ -1,3 +1,9 @@
+> **Legacy GTK product packaging.** This directory still packages the legacy
+> Rust/GTK `vd-app` (kept by requirements non-goal 5). The **Qt delivery**
+> (single-file AppImage of `vedit-app`) is produced by
+> `packaging/runtime/build.sh`; do not present this pipeline as the final
+> Qt AppImage.
+
 # AppImage packaging (T23)
 
 One command: `bash packaging/appimage/run-evidence.sh` — builds the package
@@ -16,3 +22,12 @@ export for the same reason: the artefact must correspond to a commit, not to
 whatever the worktree contained at build time.
 
 Evidence, decisions and handoffs: `evidence/appimage/README.md`.
+
+
+## appimagetool (legacy pipeline too)
+
+The legacy GTK builder now also prefers
+`packaging/appimage/vendor/appimagetool-x86_64` (sha256 `793fca0c…`, the
+`versions.env` pin) instead of the drifting upstream `continuous` download; the
+sha check stays fail-closed. See `packaging/runtime/README.md` for the measured
+drift (`ac7fd56f…` on 2026-11-01).

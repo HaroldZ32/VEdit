@@ -1,0 +1,33 @@
+# gates id with the slang artifact missing: the documented build is attempted, and when it
+# cannot run the gate prints an actionable error and FAILS (no skip, no pass).
+# Fault injection: docker is made unreachable via DOCKER_HOST (environment only, no file edits).
+collected_at_utc=2026-10-31T10:50:12Z
+git_rev_parse_HEAD=1f47e56421bbeaab64f8082df3cfc104a6a2c2ef
+
+$ DOCKER_HOST=tcp://127.0.0.1:1 bash build/gates/gates.sh
+[gates] sha256: 63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252
+[gates] Cargo workspace present -> scripts/gates.sh is a HARD requirement
+== gates: host ==
+PASS[lock]: no tree-sitter/openssl/native-tls; gtk-rs 0.18 generation; sourceview4 0.5 line
+HOST-LACKS-GTK: no GTK3/GtkSourceView development files on this host (and no root to install them).
+Running fmt/clippy/test in the pinned CentOS 7 build image, which is the deployment target.
+[image] pulling docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4 (attempt 1/3)
+Cannot connect to the Docker daemon at tcp://127.0.0.1:1. Is the docker daemon running?
+[image] pull attempt 1/3 failed; retrying in 2s
+[image] pulling docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4 (attempt 2/3)
+Cannot connect to the Docker daemon at tcp://127.0.0.1:1. Is the docker daemon running?
+[image] pull attempt 2/3 failed; retrying in 4s
+[image] pulling docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4 (attempt 3/3)
+Cannot connect to the Docker daemon at tcp://127.0.0.1:1. Is the docker daemon running?
+[image] primary registry failed after 3 attempts; falling back to docker.io: docker.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+[image] pulling docker.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4 (attempt 1/3)
+Cannot connect to the Docker daemon at tcp://127.0.0.1:1. Is the docker daemon running?
+[image] pull attempt 1/3 failed; retrying in 2s
+[image] pulling docker.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4 (attempt 2/3)
+Cannot connect to the Docker daemon at tcp://127.0.0.1:1. Is the docker daemon running?
+[image] pull attempt 2/3 failed; retrying in 4s
+[image] pulling docker.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4 (attempt 3/3)
+Cannot connect to the Docker daemon at tcp://127.0.0.1:1. Is the docker daemon running?
+FATAL: cannot obtain the pinned base image docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4 (primary registry and the docker.io fallback both failed)
+[gates] FAIL: scripts/gates.sh failed
+GATES-EXIT=1

@@ -1,0 +1,273 @@
+// T122 — guard against the fold-release crash: never hand KTextEditor a hidden
+// line, and never clear the registry when an unfold was not confirmed.
+//
+// Root cause (T117 stack + T120 traces): FoldInjector::unfoldRegistered() moved
+// the cursor to EVERY registered start line and then issued `unfold`. With
+// nested folds the inner start line is hidden by the outer fold, and
+// KTextEditor's setCursorPosition() dereferences null for a hidden line
+// (SIGSEGV). A second defect cleared the registry unconditionally, so a failed
+// unfold left real folds behind while the code believed the document was clean.
+//
+// This test asserts the INVARIANT (no cursor move onto a hidden line), not just
+// "did not crash" - offscreen does not segfault, the real xcb build does.
+#include "fold_injector.h"
+#include "ksyntax_fold_source.h"
+#include "syntax_directory.h"
+#include "syntax_fold_source.h"
+#include "syntax_service.h"
+
+#include <KTextEditor/Command>
+#include <KTextEditor/Cursor>
+#include <KTextEditor/Document>
+#include <KTextEditor/Editor>
+#include <KTextEditor/Range>
+#include <KTextEditor/View>
+
+#include <QApplication>
+#include <QCoreApplication>
+
+#include <cstdio>
+
+using vedit::folding::FoldInjector;
+using vedit::folding::KsyntaxFoldSource;
+using vedit::folding::RebuildTrigger;
+using vedit::folding::SyntaxFoldSource;
+
+namespace {
+
+int g_checks = 0;
+int g_failures = 0;
+
+void check(const char *name, bool ok, const QString &detail = QString())
+{
+    ++g_checks;
+    if (!ok) {
+        ++g_failures;
+    }
+    std::printf("CHECK %s %s%s%s\n", name, ok ? "PASS" : "FAIL",
+                detail.isEmpty() ? "" : "  ", detail.toUtf8().constData());
+    std::fflush(stdout);
+}
+
+void pump()
+{
+    for (int i = 0; i < 3; ++i) {
+        QCoreApplication::processEvents();
+    }
+}
+
+int hidden(KTextEditor::View *view)
+{
+    const int firstReal = view->firstDisplayedLine(KTextEditor::View::RealLine);
+    const int lastReal = view->lastDisplayedLine(KTextEditor::View::RealLine);
+    const int firstVisible = view->firstDisplayedLine(KTextEditor::View::VisibleLine);
+    const int lastVisible = view->lastDisplayedLine(KTextEditor::View::VisibleLine);
+    return (lastReal - firstReal) - (lastVisible - firstVisible);
+}
+
+QString sampleText()
+{
+    QString text;
+    for (int index = 0; index < 25; ++index) {
+        const QString n = QString::number(index);
+        text += QStringLiteral("module m%1 #(parameter W = 8) (\n").arg(n);
+        text += QStringLiteral("  input  logic clk,\n");
+        text += QStringLiteral("  input  logic rst_n,\n");
+        text += QStringLiteral("  output logic [W-1:0] q\n");
+        text += QStringLiteral(");\n");
+        text += QStringLiteral("  logic [W-1:0] state, nxt;\n");
+        text += QStringLiteral("  function automatic logic [W-1:0] inc(input logic [W-1:0] v);\n");
+        text += QStringLiteral("    inc = v + 1'b1;\n");
+        text += QStringLiteral("  endfunction\n");
+        text += QStringLiteral("  always_ff @(posedge clk or negedge rst_n) begin\n");
+        text += QStringLiteral("    if (!rst_n) begin\n");
+        text += QStringLiteral("      state <= '0;\n");
+        text += QStringLiteral("    end else begin\n");
+        text += QStringLiteral("      state <= inc(nxt);\n");
+        text += QStringLiteral("    end\n");
+        text += QStringLiteral("  end\n");
+        text += QStringLiteral("  always_comb begin\n");
+        text += QStringLiteral("    nxt = state + 1'b1;\n");
+        text += QStringLiteral("  end\n");
+        text += QStringLiteral("  generate\n");
+        text += QStringLiteral("    for (genvar i = 0; i < W; i = i + 1) begin : g_lane\n");
+        text += QStringLiteral("      assign q[i] = state[i];\n");
+        text += QStringLiteral("    end\n");
+        text += QStringLiteral("  endgenerate\n");
+        for (int line = 24; line < 39; ++line) {
+            text += QStringLiteral("  // filler %1 %2\n").arg(line).arg(n);
+        }
+        text += QStringLiteral("endmodule\n");
+    }
+    return text;
+}
+
+struct Fixture {
+    KTextEditor::Document *document = nullptr;
+    KTextEditor::View *view = nullptr;
+};
+
+Fixture makeFixture(KTextEditor::Editor *editor)
+{
+    Fixture fixture;
+    fixture.document = editor->createDocument(nullptr);
+    fixture.document->setText(sampleText());
+    fixture.view = fixture.document->createView(nullptr);
+    fixture.view->resize(1200, 900);
+    fixture.view->show();
+    pump();
+    return fixture;
+}
+
+void userUnfold(KTextEditor::Editor *editor, KTextEditor::View *view, int line)
+{
+    view->setCursorPosition(KTextEditor::Cursor(line, 0));
+    KTextEditor::Command *command = editor->queryCommand(QStringLiteral("unfold"));
+    if (command != nullptr) {
+        QString message;
+        command->exec(view, QStringLiteral("unfold"), message, KTextEditor::Range::invalid());
+    }
+    pump();
+}
+
+void testGuardedRelease(KTextEditor::Editor *editor)
+{
+    // A) Clean release (no prior user fold action): everything must unfold and
+    //    the registry must empty only because every unfold was CONFIRMED.
+    Fixture clean = makeFixture(editor);
+    vedit::syntax::SyntaxService::instance().setTreeSitterEnabled(true);
+    SyntaxFoldSource source(QStringLiteral("systemverilog"));
+    FoldInjector cleanInjector(clean.view);
+    const auto opened = cleanInjector.rebuildFrom(source, RebuildTrigger::FirstOpen);
+    const int injectedHidden = hidden(clean.view);
+    std::printf("OBS guarded injected=%d hidden=%d\n", opened.injected, injectedHidden);
+    check("t122.guard.injected-200", opened.injected == 200, QString::number(opened.injected));
+    check("t122.guard.hidden-positive", injectedHidden > 0, QString::number(injectedHidden));
+    clean.view->setCursorPosition(KTextEditor::Cursor(0, 0));
+    cleanInjector.rebuild(RebuildTrigger::Reparsed, {}); // same call releaseFolds() uses
+    const int afterHidden = hidden(clean.view);
+    std::printf("OBS clean-release hidden=%d cursor=%d moves=%llu hidden_targets=%llu "
+                "failures=%llu skipped=%llu restore_skipped=%llu\n",
+                afterHidden, clean.view->cursorPosition().line(),
+                static_cast<unsigned long long>(cleanInjector.unfoldCursorMoves()),
+                static_cast<unsigned long long>(cleanInjector.unfoldHiddenTargetMoves()),
+                static_cast<unsigned long long>(cleanInjector.unfoldFailures()),
+                static_cast<unsigned long long>(cleanInjector.unfoldSkippedHidden()),
+                static_cast<unsigned long long>(cleanInjector.cursorRestoreSkipped()));
+    check("t122.guard.no-hidden-cursor-moves", cleanInjector.unfoldHiddenTargetMoves() == 0,
+          QString::number(cleanInjector.unfoldHiddenTargetMoves()));
+    check("t122.guard.release-really-unfolds", afterHidden == 0, QString::number(afterHidden));
+    check("t122.guard.registry-cleared-on-confirmed", cleanInjector.registry().empty(),
+          QString::number(cleanInjector.registry().size()));
+    check("t122.guard.cursor-restored", clean.view->cursorPosition().line() == 0,
+          QString::number(clean.view->cursorPosition().line()));
+
+    // Re-inject then release again: fold set returns and the invariant still holds.
+    const auto again = cleanInjector.rebuildFrom(source, RebuildTrigger::Reparsed);
+    check("t122.guard.reinject-200", again.injected == 200, QString::number(again.injected));
+    check("t122.guard.reinject-hidden", hidden(clean.view) > 0);
+    cleanInjector.rebuild(RebuildTrigger::Reparsed, {});
+    check("t122.guard.second-release-unfolds", hidden(clean.view) == 0,
+          QString::number(hidden(clean.view)));
+    check("t122.guard.invariant-after-reinject", cleanInjector.unfoldHiddenTargetMoves() == 0);
+
+    // B) The user unfolds one registered range by hand, THEN the release runs.
+    //    The injector cannot confirm that unfold (the fold is already gone), so
+    //    it must KEEP the entry (T120 defect #2) instead of clearing blindly, and
+    //    it must never move the cursor onto a hidden line.
+    Fixture withUser = makeFixture(editor);
+    FoldInjector userInjector(withUser.view);
+    userInjector.rebuildFrom(source, RebuildTrigger::FirstOpen);
+    userUnfold(editor, withUser.view, 0);
+    const int userHidden = hidden(withUser.view);
+    check("t122.guard.user-unfold-changed", userHidden < injectedHidden,
+          QString::number(userHidden));
+    withUser.view->setCursorPosition(KTextEditor::Cursor(0, 0));
+    userInjector.rebuild(RebuildTrigger::Reparsed, {});
+    std::printf("OBS user-release hidden=%d registry=%zu failures=%llu hidden_targets=%llu\n",
+                hidden(withUser.view), userInjector.registry().size(),
+                static_cast<unsigned long long>(userInjector.unfoldFailures()),
+                static_cast<unsigned long long>(userInjector.unfoldHiddenTargetMoves()));
+    check("t122.guard.user-release-invariant", userInjector.unfoldHiddenTargetMoves() == 0,
+          QString::number(userInjector.unfoldHiddenTargetMoves()));
+    check("t122.guard.user-release-keeps-unconfirmed", !userInjector.registry().empty(),
+          QString::number(userInjector.registry().size()));
+}
+
+void testFailureKeepsRegistry(KTextEditor::Editor *editor)
+{
+    Fixture fixture = makeFixture(editor);
+    vedit::syntax::SyntaxService::instance().setTreeSitterEnabled(true);
+    SyntaxFoldSource source(QStringLiteral("systemverilog"));
+    FoldInjector injector(fixture.view);
+    injector.rebuildFrom(source, RebuildTrigger::FirstOpen);
+    const auto ranges = source.ranges(QStringView(fixture.document->text()));
+    check("t122.failure.have-ranges", !ranges.empty());
+    if (ranges.empty()) {
+        return;
+    }
+    // The user unfolds one registered range by hand; the injector still has it in
+    // its registry. A release then cannot confirm that unfold and MUST keep it.
+    const vedit::folding::FoldRange target = ranges.front();
+    userUnfold(editor, fixture.view, target.startLine);
+    injector.rebuild(RebuildTrigger::Reparsed, {});
+    bool kept = false;
+    for (const auto &range : injector.registry()) {
+        if (range.startLine == target.startLine && range.endLine == target.endLine) {
+            kept = true;
+        }
+    }
+    std::printf("OBS failure registry=%zu failures=%llu kept=%d\n", injector.registry().size(),
+                static_cast<unsigned long long>(injector.unfoldFailures()), kept ? 1 : 0);
+    check("t122.failure.unconfirmed-unfold-kept", kept);
+    check("t122.failure.failure-counted", injector.unfoldFailures() > 0,
+          QString::number(injector.unfoldFailures()));
+    check("t122.failure.invariant", injector.unfoldHiddenTargetMoves() == 0);
+}
+
+void testReverseControl(KTextEditor::Editor *editor)
+{
+    vedit::syntax::SyntaxService::instance().setTreeSitterEnabled(false);
+    KsyntaxFoldSource closedSource(vedit::syntax::applicationSyntaxDefinitionDirectory()
+                                   + QStringLiteral("/vedit-systemverilog.xml"));
+
+    Fixture guardedFixture = makeFixture(editor);
+    FoldInjector guarded(guardedFixture.view);
+    guarded.rebuildFrom(closedSource, RebuildTrigger::FirstOpen);
+    guarded.rebuild(RebuildTrigger::Reparsed, {});
+    std::printf("OBS reverse-control guarded hidden_targets=%llu moves=%llu\n",
+                static_cast<unsigned long long>(guarded.unfoldHiddenTargetMoves()),
+                static_cast<unsigned long long>(guarded.unfoldCursorMoves()));
+    check("t122.reverse.guarded-never-hidden", guarded.unfoldHiddenTargetMoves() == 0);
+
+    Fixture legacyFixture = makeFixture(editor);
+    FoldInjector legacy(legacyFixture.view);
+    legacy.rebuildFrom(closedSource, RebuildTrigger::FirstOpen);
+    legacy.setLegacyUnfoldModeForTest(true);
+    legacy.rebuild(RebuildTrigger::Reparsed, {});
+    std::printf("OBS reverse-control legacy hidden_targets=%llu moves=%llu\n",
+                static_cast<unsigned long long>(legacy.unfoldHiddenTargetMoves()),
+                static_cast<unsigned long long>(legacy.unfoldCursorMoves()));
+    check("t122.reverse.legacy-targets-hidden-line", legacy.unfoldHiddenTargetMoves() > 0,
+          QString::number(legacy.unfoldHiddenTargetMoves()));
+    vedit::syntax::SyntaxService::instance().setTreeSitterEnabled(true);
+}
+
+} // namespace
+
+int main(int argc, char **argv)
+{
+    std::setvbuf(stdout, nullptr, _IOLBF, 0);
+    QApplication app(argc, argv);
+    KTextEditor::Editor *editor = KTextEditor::Editor::instance();
+    if (editor == nullptr) {
+        std::printf("FOLD-UNFOLD-GUARD ok=0 reason=no-editor\n");
+        return 1;
+    }
+    testGuardedRelease(editor);
+    testFailureKeepsRegistry(editor);
+    testReverseControl(editor);
+    std::printf("FOLD-UNFOLD-GUARD ok=%d checks=%d failures=%d\n",
+                g_failures == 0 ? 1 : 0, g_checks, g_failures);
+    return g_failures == 0 ? 0 : 1;
+}

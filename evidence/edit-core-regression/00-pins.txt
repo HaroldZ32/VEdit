@@ -1,0 +1,12 @@
+date: 2026-10-31T19:24:44+08:00
+head: 95c496e682e3841add1a081edd78d29c34957aac (feat/qt6-ktexteditor-migration)
+host: Linux 7.0.0-38-generic x86_64
+image: vedit-qt6-build:local sha256:7cb76f95d3c8142d75df0289f05af35dbb0ff8ae36be4ca90a91d31eae277091
+changed paths (T60):
+   M src/workspace/filetree/filetree_integration.cpp
+   M src/workspace/filetree/tools/rootcheck/CMakeLists.txt
+   M src/workspace/filetree/tools/rootcheck/seamcheck.cpp
+   M src/workspace/palette/CMakeLists.txt
+   M src/workspace/palette/palette_integration.cpp
+   M src/workspace/palette/palette_integration_selftest.cpp
+  ?? src/workspace/filetree/tools/generate-testdata.sh

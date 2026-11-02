@@ -1,0 +1,20 @@
+== 01-package-diagnosis.log — the user's package 29182106, inspected (not rebuilt) ==
+collected_at=2026-11-02T11:28:04+08:00
+git_head=af852255acf8979cd25ffc0bd882c1dcbbec6220
+
+### (a) the package DOES contain T118 (QStringLiteral text is UTF-16, so plain `strings` misses it)
+analyzed                         UTF16LE=1
+analysis starts automatically    UTF16LE=1
+not saved yet                    UTF16LE=1
+No symbols yet                   UTF16LE=2
+
+### (b) the panel is named 'Outline' and the View menu has NO 'Diagnostics' entry (git HEAD code)
+193:    addPanel(QStringLiteral("outline"), QStringLiteral("Outline"), QStringLiteral("editor/syntax"), Qt::RightDockWidgetArea);
+254:        {"outline", "To&ggle Outline Panel", "Ctrl+Alt+O"},
+Diagnostics menu entries in HEAD: 1
+
+### (c) the app has NO File>Open and NO positional-argument handling (a file can only be opened by clicking in the file tree)
+positional-argument API calls in HEAD main.cpp: 0
+QFileDialog calls in HEAD src/app: 0
+
+### (d) so on the real machine: (i) no 'Diagnostics' entry exists at all, (ii) the only file-open path is the file-tree double-click, which no headless test ever exercised end-to-end on the packaged binary

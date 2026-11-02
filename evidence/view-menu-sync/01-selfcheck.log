@@ -1,0 +1,32 @@
+== T129 selfcheck: View menu check <-> dock visibility, all 6 panels ==
+collected_at: 2026-11-02T03:10:05Z
+git_head: af852255acf8979cd25ffc0bd882c1dcbbec6220
+--- output ---
+SELFCHECK-EXIT=0
+CHECK panels.sync.closed.file-tree PASS
+CHECK panels.sync.action-show.file-tree PASS
+CHECK panels.sync.close-clears-check.file-tree PASS
+CHECK panels.sync.one-click-reopen.file-tree PASS
+CHECK panels.sync.closed.search PASS
+CHECK panels.sync.action-show.search PASS
+CHECK panels.sync.close-clears-check.search PASS
+CHECK panels.sync.one-click-reopen.search PASS
+CHECK panels.sync.closed.terminal PASS
+CHECK panels.sync.action-show.terminal PASS
+CHECK panels.sync.close-clears-check.terminal PASS
+CHECK panels.sync.one-click-reopen.terminal PASS
+CHECK panels.sync.closed.vcs PASS
+CHECK panels.sync.action-show.vcs PASS
+CHECK panels.sync.close-clears-check.vcs PASS
+CHECK panels.sync.one-click-reopen.vcs PASS
+CHECK panels.sync.closed.settings PASS
+CHECK panels.sync.action-show.settings PASS
+CHECK panels.sync.close-clears-check.settings PASS
+CHECK panels.sync.one-click-reopen.settings PASS
+CHECK panels.sync.closed.outline PASS
+CHECK panels.sync.action-show.outline PASS
+CHECK panels.sync.close-clears-check.outline PASS
+CHECK panels.sync.one-click-reopen.outline PASS
+CHECK panels.sync.reverse-precondition PASS
+CHECK panels.sync.reverse-control PASS
+APP-SHELL-SELFTEST ok=1 checks=220 failures=0 state=/tmp/vedit-app-KLceTP/state

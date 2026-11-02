@@ -1,0 +1,57 @@
+== 02 run under Xvfb ==
+HOME=/tmp/fold-home (empty; folding must not depend on external syntax data)
+INFO qt=6.10.2 platform=xcb
+CHECK editor.instance.available PASS
+INFO fold_commands=fold,fold,fold,fold,fold,fold,fold,fold,fold,fold,fold,fold,fold,fold,fold,fold,fold,fold,fold,fold,fold,fold,fold,fold,fold,fold,fold,fold,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,set-folding-markers,tfold,tfold,tfold,tfold,tfold,tfold,tfold,tfold,tfold,tfold,tfold,tfold,tfold,tfold,tfold,tfold,tfold,tfold,tfold,tfold,tfold,tfold,tfold,tfold,tfold,tfold,tfold,tfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold,unfold
+CHECK command.fold.registered PASS
+CHECK command.unfold.registered PASS
+CHECK command.fold.supportsRange PASS
+INFO command_unfold_supports_range=0 (unfold is cursor-based by design)
+CHECK command.unfold.is.cursor.based PASS
+INFO fold_command_registrations=28 (one registration per live view: commands are per-view objects)
+
+== B1: explicit external range, syntax definition present ==
+kf.sonnet.core: Sonnet: No speller backends available!
+SNAPSHOT baseline_verilog first_real=0 last_real=53 first_visible=0 last_visible=53 scroll_min=0 scroll_max=397 scroll_value=0 cursor_line=0
+SNAPSHOT after_fold_2_10 first_real=0 last_real=61 first_visible=0 last_visible=53 scroll_min=0 scroll_max=389 scroll_value=0 cursor_line=0
+INFO fold_external_range ok=1 message= us=863.376
+CHECK fold.external.range.returned.true PASS
+CHECK fold.external.range.observable PASS
+SNAPSHOT after_unfold_line_2 first_real=0 last_real=53 first_visible=0 last_visible=53 scroll_min=0 scroll_max=397 scroll_value=0 cursor_line=2
+INFO unfold ok=1 message= us=719.38
+CHECK unfold.returned.true PASS
+CHECK unfold.restores.visibility PASS
+
+== B2: explicit external range, no syntax definition (mode None) ==
+SNAPSHOT baseline_plain first_real=0 last_real=53 first_visible=0 last_visible=53 scroll_min=0 scroll_max=397 scroll_value=0 cursor_line=0
+SNAPSHOT after_fold_4_12_plain first_real=0 last_real=61 first_visible=0 last_visible=53 scroll_min=0 scroll_max=389 scroll_value=0 cursor_line=0
+INFO fold_without_definition ok=1
+CHECK fold.works.without.syntax.definition PASS
+
+== B3: edits vs a folded range ==
+SNAPSHOT after_insert_above first_real=0 last_real=61 first_visible=0 last_visible=53 scroll_min=0 scroll_max=390 scroll_value=0 cursor_line=1
+INFO edit_above_fold hidden_before=8 hidden_after=8
+SNAPSHOT after_insert_inside first_real=0 last_real=53 first_visible=0 last_visible=53 scroll_min=0 scroll_max=399 scroll_value=0 cursor_line=1
+INFO edit_inside_fold hidden_after=0
+CHECK edit.inside.fold.no.crash PASS
+CHECK edit.inside.fold.unfolds.range PASS
+
+== B4: overlapping / invalid / out-of-range input ==
+INFO overlapping_folds a=1 b=1
+CHECK overlapping.folds.no.crash PASS
+INFO empty_range_ok=0 inverted_range_ok=1 beyond_end_ok=0
+
+== B5: injection cost, large document ==
+INFO big_doc_lines=4001
+CHECK big_doc.at.least.3000.lines PASS
+MEASURE fold_command_exec n=60 p50_us=680.5 p95_us=1081.92 mean_us=748.223 max_us=1156
+MEASURE unfold_command_exec n=60 p50_us=719.219 p95_us=1042.2 mean_us=757.958 max_us=1266.41
+SNAPSHOT big_doc_after_series first_real=1156 last_real=1209 first_visible=1156 last_visible=1209 scroll_min=0 scroll_max=3947 scroll_value=1156 cursor_line=1183
+
+== B6: query / removal surface ==
+INFO state_query_api=absent (no public API returns the fold ranges or their folded state; only unfold-at-cursor mutates)
+INFO fold_command_scope=Persistent|Folded (command 'fold'); 'tfold' creates a Folded-only range
+SNAPSHOT demo_folded first_real=0 last_real=60 first_visible=0 last_visible=18 scroll_min=0 scroll_max=0 scroll_value=0 cursor_line=0
+
+RESULT=PASS failures=0
+[run exit=0]

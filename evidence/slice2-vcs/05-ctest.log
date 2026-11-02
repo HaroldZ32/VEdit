@@ -1,0 +1,12 @@
+== lane ctest ==
+collected_at: 2026-11-01T05:58:22Z
+git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+cmd: ctest --test-dir target/vcs-build --output-on-failure
+--- output ---
+    Start 1: vedit-workspace-vcs-selftest
+1/1 Test #1: vedit-workspace-vcs-selftest .....   Passed    0.02 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.02 sec
+CTEST-EXIT=0

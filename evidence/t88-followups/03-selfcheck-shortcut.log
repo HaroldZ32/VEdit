@@ -1,0 +1,23 @@
+# C9 evidence header
+collected_at: 2026-11-01T10:38:48+08:00
+git_head: 23514fb351f34ab23de177c375dd240175662d5e
+binary_sha256: e286e6e4d7d6cbd9cead3392d7593818138e3f5d0c5601faba63f3f5b04cf74e
+
+## product --selfcheck: T80 invariant + T90 runtime guard
+
+APP-EXIT=0
+CHECK save.shortcut.ctrl-s PASS
+CHECK save.shortcut.unique PASS bindings=1
+CHECK save.shortcut.authority PASS
+CHECK save.shortcut.runtime-duplicate-enumerated PASS bindings=2
+CHECK save.shortcut.runtime-unguarded-turn-keeps-duplicate PASS bindings=2
+CHECK save.shortcut.runtime-guard-clears PASS bindings=1
+CHECK save.shortcut.runtime-guard-authority PASS
+CHECK save.shortcut.runtime-guard-entry-point PASS removed=1 bindings=1
+CHECK save.shortcut.runtime-guard-timer PASS
+CHECK save.shortcut.window PASS
+CHECK save.shortcut.disk-bytes PASS
+CHECK save.shortcut.modified-cleared PASS
+CHECK save.shortcut.path-unchanged PASS
+CHECK save.shortcut.unique.multi-pane PASS bindings=1
+APP-SHELL-SELFTEST ok=1 checks=182 failures=0 state=/tmp/vedit-app-NrfXLh/state

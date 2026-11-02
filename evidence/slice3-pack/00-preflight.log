@@ -1,0 +1,14 @@
+image: vedit-qt6-build:local
+image_id=sha256:8aac6c1115d5d340c406a1cddddc2cca927845db36fc5a244f3fdf4b272933d0 size=2183723690
+vd-app: /home/haroldzhao/MyProj/DshProj/VEdit/target/qt6-build/src/app/vedit-app
+  sha256=26ff19e3bd28b23dd77186217658fcf0a3930926cf1e134d514977602dea1538
+probe: /home/haroldzhao/MyProj/DshProj/VEdit/target/qt6-build/cmake/smoke/vedit-ksh-env-probe
+  sha256=b709d6924ec9a6f6da6ec80aaf915aa27d9b9ddb3e18de73ced44316353fc242
+f2 install: /home/haroldzhao/MyProj/DshProj/VEdit/target/ksh-selfbuild/F2/install
+aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6  /home/haroldzhao/MyProj/DshProj/VEdit/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
+whitelist: 2 xml in resources/syntax/
+toolchain: verible=/home/haroldzhao/MyProj/DshProj/VEdit/.mpd/recon/verible/bin slang=/home/haroldzhao/MyProj/DshProj/VEdit/build/slang/out/slang
+  07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845  /home/haroldzhao/MyProj/DshProj/VEdit/.mpd/recon/verible/bin/verible-verilog-ls
+  63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  /home/haroldzhao/MyProj/DshProj/VEdit/build/slang/out/slang
+appimagetool: vendored=/home/haroldzhao/MyProj/DshProj/VEdit/packaging/appimage/vendor/appimagetool-x86_64 cache=/home/haroldzhao/MyProj/DshProj/VEdit/packaging/appimage/.cache/appimagetool.AppImage
+	libfuse3.so.4 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libfuse3.so.4

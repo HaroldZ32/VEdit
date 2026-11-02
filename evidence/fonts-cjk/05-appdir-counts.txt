@@ -1,0 +1,10 @@
+# C9 (T119): collected_at=2026-11-01T11:04:46Z; git_head=60c7ae9c95fe769e2bd6c86dd4c56e1514603e44; git_status_porcelain_sha256=29b3dde0b45cdcacccc86852294fbc0129b0c730cb73dfe4dcaf1227cd8f2606; anchor=00-C9.txt
+## AppDir file counts
+old final AppDir: 202 files
+new T119 test AppDir: 216 files
+locale (T115 C.utf8): 12 files
+delta: 216 - 202 = 14 = 12 locale (T115) + 2 (font + OFL text)
+font: target/t119-appdir/share/fonts/NotoSansCJK-Regular.ttc
+licence: target/t119-appdir/usr/share/doc/vedit/licenses/Noto-CJK-OFL-1.1.txt
+old AppDir bytes: 284187264
+new AppDir bytes: 304057466

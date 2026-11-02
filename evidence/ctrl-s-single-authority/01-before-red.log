@@ -1,0 +1,24 @@
+# T80 — Ctrl+S 歧义复现（修复前，真实 KTextEditor view 已聚焦）
+# command: vedit-app --selfcheck (offscreen, pinned image)
+# date: 2026-10-31T22:37:24+08:00
+# exit code: 1
+
+CHECK save.shortcut.ctrl-s PASS
+CTRL-S-BINDING after-provider-install objectName=file_save class=QAction parent=KActionCollection shortcut=Ctrl+S context=3 widgets=1
+CTRL-S-BINDING after-provider-install objectName=file_save class=QAction parent=KActionCollection shortcut=Ctrl+S context=3 widgets=1
+CTRL-S-BINDING after-provider-install objectName=file_save class=QAction parent=KActionCollection shortcut=Ctrl+S context=3 widgets=1
+CTRL-S-BINDING after-provider-install objectName=action-file.save class=QAction parent=QMainWindow shortcut=Ctrl+S context=1 widgets=1
+CHECK save.shortcut.unique FAIL bindings=4
+CHECK save.shortcut.authority FAIL
+CHECK save.shortcut.window PASS
+QAction::event: Ambiguous shortcut overload: Ctrl+S
+CHECK save.shortcut.disk-bytes FAIL
+CHECK save.shortcut.modified-cleared FAIL
+CHECK save.shortcut.path-unchanged PASS
+CTRL-S-BINDING after-split objectName=file_save class=QAction parent=KActionCollection shortcut=Ctrl+S context=3 widgets=1
+CTRL-S-BINDING after-split objectName=file_save class=QAction parent=KActionCollection shortcut=Ctrl+S context=3 widgets=1
+CTRL-S-BINDING after-split objectName=file_save class=QAction parent=KActionCollection shortcut=Ctrl+S context=3 widgets=1
+CTRL-S-BINDING after-split objectName=file_save class=QAction parent=KActionCollection shortcut=Ctrl+S context=3 widgets=1
+CTRL-S-BINDING after-split objectName=action-file.save class=QAction parent=QMainWindow shortcut=Ctrl+S context=1 widgets=1
+CHECK save.shortcut.unique.multi-pane FAIL bindings=5
+APP-SHELL-SELFTEST ok=0 checks=164 failures=5 state=/tmp/vedit-app-nnhtVk/state

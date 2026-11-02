@@ -1,0 +1,11 @@
+== T129 root ctest ==
+collected_at: 2026-11-02T03:10:06Z
+--- output ---
+
+100% tests passed, 0 tests failed out of 31
+
+Total Test time (real) =  33.53 sec
+CTEST-EXIT=0
+TYPECHECK-EXIT=0
+[typecheck] PASS: crates/vd-ffi/include/vd_ffi.h matches the committed (HEAD) copy — no cbindgen drift
+[typecheck] PASS (pinned image vedit-build:local)

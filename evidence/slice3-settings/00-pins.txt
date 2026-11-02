@@ -1,0 +1,7 @@
+date: 2026-11-01T15:06:37+08:00
+head: 48569602d0c86fb402dc88155593d1dc06445c90 (feat/qt6-ktexteditor-migration)
+changed paths (T25):
+   M src/app/CMakeLists.txt
+   M src/workspace/integration.cpp
+  ?? evidence/slice3-settings/
+  ?? src/workspace/settings/

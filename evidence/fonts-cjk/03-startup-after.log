@@ -1,0 +1,8 @@
+# C9 (T119): collected_at=2026-11-01T10:50:38Z; git_head=60c7ae9c95fe769e2bd6c86dd4c56e1514603e44; git_status_porcelain_sha256=29b3dde0b45cdcacccc86852294fbc0129b0c730cb73dfe4dcaf1227cd8f2606; anchor=00-C9.txt
+== normal startup after font+quiet gates (stock centos:7, LANG=C) ==
+collected_at: 2026-11-01T10:50:38Z
+git_head: 60c7ae9c95fe769e2bd6c86dd4c56e1514603e44
+--- output ---
+AppRun: locale 'C' (ANSI_X3.4-1968) -> 'C.UTF-8' (bundled UTF-8 fallback)
+This plugin does not support propagateSizeHints()
+APP-EXIT=0

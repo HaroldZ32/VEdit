@@ -1,0 +1,11 @@
+== evidence: 05-app-selfcheck-and-hold.log — the app still passes its own suite and exits cleanly (no new crash with the timers) ==
+time=2026-11-01T19:11:04+08:00
+HEAD=60c7ae9c95fe769e2bd6c86dd4c56e1514603e44
+
+EDIT-CORE-SELFTEST ok=1 checks=67 failures=0
+APP-SHELL-SELFTEST ok=1 checks=200 failures=0 state=/tmp/vedit-app-YbgJNl/state
+SELFCHECK_EXIT=0
+TOOLCHAIN source=verible:local slang:local missing=[] local=[/vedit-build/build/slang/out,/vedit-build/.mpd/recon/verible/bin]
+HOLD_NO_PROJECT_EXIT=0
+TOOLCHAIN source=verible:local slang:local missing=[] local=[/vedit-build/build/slang/out,/vedit-build/.mpd/recon/verible/bin]
+HOLD_PROJECT_EXIT=0

@@ -1,0 +1,15 @@
+# wiring AFTER (same commands)
+```
+$ ctest --test-dir target/qt6-build -N
+  Test #23: vedit-workspace-settings-selftest
+  Total Tests: 23
+
+$ nm -C target/qt6-build/src/app/vedit-app | grep -c "vedit::workspace::settings"
+  123
+
+$ strings -el target/qt6-build/src/app/vedit-app | grep settings
+  settings-panel / settings-keys / settings-conflict
+
+app runtime (--state-dir /tmp/t25-state --hold 300):
+  settings: installSettings file='/tmp/t25-state/settings.toml'
+```

@@ -1,0 +1,35 @@
+== 00 environment ==
+date: 2026-10-31T03:52:23Z
+image: vprobe-qt6kf6:1
+cmake: cmake version 4.2.3
+compiler: c++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+qt: 6.10.2
+image tag: vprobe-qt6kf6:1 (image id captured host-side, see 00-image-id.txt)
+KF6TextEditor version: set(PACKAGE_VERSION "6.24.0")
+kf6 packages:
+  libkf6syntaxhighlighting-data 6.24.0-0ubuntu1
+  libkf6syntaxhighlighting-dev:amd64 6.24.0-0ubuntu1
+  libkf6syntaxhighlighting6:amd64 6.24.0-0ubuntu1
+  libkf6texteditor-bin 6.24.0-0ubuntu1
+  libkf6texteditor-data 6.24.0-0ubuntu1
+  libkf6texteditor-dev 6.24.0-0ubuntu1
+  libkf6texteditor-katepart 6.24.0-0ubuntu1
+  libkf6texteditor6:amd64 6.24.0-0ubuntu1
+katepart plugin: /usr/lib/x86_64-linux-gnu/qt6/plugins/kf6/parts/katepart.so
+installed KTextEditor public headers: 25 files
+installed folding-related public API symbols (grep -c fold):
+  /usr/include/KF6/KTextEditor/ktexteditor/view.h
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h
+  total header files mentioning folding: 2
+host-side range/attribute API (installed header evidence):
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h:46: * auto* movingRange = aDocument->newMovingRange(range);
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h:124: * auto range = doc->newMovingRange(KTextEditor::Range(3, 5, 3, 14));
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h:299:    virtual const Attribute::Ptr &attribute() const = 0;
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h:309:    virtual void setAttribute(Attribute::Ptr attribute) = 0;
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h:324:    virtual void setAttributeOnlyForViews(bool onlyForViews) = 0;
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h:359:    virtual qreal zDepth() const = 0;
+  /usr/include/KF6/KTextEditor/ktexteditor/document.h:202: * Use newMovingCursor() to create a new moving cursor and newMovingRange() to create
+  /usr/include/KF6/KTextEditor/ktexteditor/document.h:1489:    virtual MovingRange *newMovingRange(Range range,
+definition/theme embedding statement (installed Repository header):
+  65: * All highlighting Definition and Theme files are compiled into the shared
+external verilog.xml definitions in /usr/share: 0

@@ -1,0 +1,306 @@
+==================================================================
+ VEdit AppImage — CentOS 7 real-machine verification
+ host=haroldzhao-aipc  date=2026-11-01T17:42:13+08:00  cwd=/home/haroldzhao/MyProj/DshProj/VEdit/target/tmp.vqur8M5erx
+==================================================================
+
+-- AppImage: /home/haroldzhao/MyProj/DshProj/VEdit/target/tmp.vqur8M5erx/VEdit-0.1.1-x86_64.AppImage
+RESULT FAIL kernel.is-3.10 | expected=3.10.x (CentOS 7 target kernel) actual=7.0.0-38-generic note=containers share the host kernel; a container run is not the real-machine answer
+RESULT PASS glibc.system | expected=glibc 2.17 (CentOS 7) actual=ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43 note=not the 2.17 baseline; the loader checks below still prove the package uses its own runtime
+RESULT PASS appimage.sha256 | expected=e7ae067fe66c8e271ba72da974795a7ee3db0efa59bda45079b5a048b4a09558 actual=e7ae067fe66c8e271ba72da974795a7ee3db0efa59bda45079b5a048b4a09558 note=size=95349240 (expected 95349240)
+RESULT PASS appimage.sha256sums | expected=SHA256SUMS row matches actual=e7ae067fe66c8e271ba72da974795a7ee3db0efa59bda45079b5a048b4a09558  VEdit-0.1.1-x86_64.AppImage note=cross-check passed
+-- direct FUSE run: exit=127 (first lines of its output)
+   | Error: No suitable fusermount binary found on the $PATH
+   | fuse: device not found, try 'modprobe fuse' first
+   | 
+   | Cannot mount AppImage, please check your FUSE setup.
+RESULT PASS run.selfcheck | expected=--selfcheck completes with APP-SHELL-SELFTEST ok=1 actual=exit=0 via EXTRACT-AND-RUN (--appimage-extract-and-run) note=both modes were tried; the one that worked is named here
+
+---- selfcheck output begin (the full text the app printed) ----
+  KSH-ENV defs=2 hash=b31aa2cc1f717e2d5a03bbdad983f7487f8982803fe71fe243745a85454b2d37
+  KSH-GUARD PASS whitelist=SystemVerilog,Verilog
+  syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='/tmp/vedit-verify.FANLyG/appimage_extracted_7de6e6d0994e75e11f2b81f01f19b016/usr/share/org.kde.syntax-highlighting' definitions=3 own-xml=[vedit-verilog.xml,vedit-systemverilog.xml] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+  This plugin does not support propagateSizeHints()
+  TOOLCHAIN source=verible:bundled slang:bundled missing=[] local=[]
+  CHECK empty.no-project-label PASS
+  CHECK empty.one-pane PASS
+  CHECK empty.window-title PASS
+  CHECK panels.registry.six PASS
+  CHECK panels.registered.file-tree PASS
+  CHECK panels.registered.search PASS
+  CHECK panels.registered.terminal PASS
+  CHECK panels.registered.vcs PASS
+  CHECK panels.registered.settings PASS
+  CHECK panels.registered.outline PASS
+  CHECK panels.none-inserted-by-default PASS
+  This plugin does not support propagateSizeHints()
+  CHECK panels.show.file-tree PASS
+  This plugin does not support propagateSizeHints()
+  CHECK panels.toggle-hide.file-tree PASS
+  This plugin does not support propagateSizeHints()
+  CHECK panels.toggle-show.file-tree PASS
+  This plugin does not support propagateSizeHints()
+  CHECK panels.show.search PASS
+  This plugin does not support propagateSizeHints()
+  CHECK panels.toggle-hide.search PASS
+  This plugin does not support propagateSizeHints()
+  CHECK panels.toggle-show.search PASS
+  CHECK panels.show.terminal PASS
+  CHECK panels.toggle-hide.terminal PASS
+  CHECK panels.toggle-show.terminal PASS
+  This plugin does not support propagateSizeHints()
+  CHECK panels.show.vcs PASS
+  This plugin does not support propagateSizeHints()
+  CHECK panels.toggle-hide.vcs PASS
+  This plugin does not support propagateSizeHints()
+  CHECK panels.toggle-show.vcs PASS
+  This plugin does not support propagateSizeHints()
+  CHECK panels.show.settings PASS
+  This plugin does not support propagateSizeHints()
+  CHECK panels.toggle-hide.settings PASS
+  This plugin does not support propagateSizeHints()
+  CHECK panels.toggle-show.settings PASS
+  CHECK panels.show.outline PASS
+  CHECK panels.toggle-hide.outline PASS
+  CHECK panels.toggle-show.outline PASS
+  CHECK panels.six-docks PASS
+  CHECK menus.file PASS
+  CHECK menus.view PASS
+  CHECK menus.help PASS
+  CHECK commands.action.file.new-layout PASS
+  CHECK commands.action.file.close-pane PASS
+  CHECK commands.action.file.quit PASS
+  CHECK commands.action.view.split.horizontal PASS
+  CHECK commands.action.view.split.vertical PASS
+  CHECK commands.action.view.focus.next PASS
+  CHECK commands.action.view.layout.reset PASS
+  CHECK commands.action.help.about PASS
+  CHECK commands.action.view.panel.file-tree PASS
+  CHECK commands.action.view.panel.outline PASS
+  CHECK commands.file-menu-actions PASS
+  CHECK commands.view-panel-actions-checkable PASS
+  This plugin does not support propagateSizeHints()
+  CHECK split.horizontal.pane-count PASS
+  CHECK split.horizontal.root-orientation PASS
+  This plugin does not support propagateSizeHints()
+  This plugin does not support propagateSizeHints()
+  CHECK split.vertical.pane-count PASS
+  CHECK split.vertical.root-orientation PASS
+  CHECK panes.three PASS
+  CHECK focus.set-second PASS
+  CHECK focus.next-wraps PASS
+  This plugin does not support propagateSizeHints()
+  This plugin does not support propagateSizeHints()
+  CHECK close.pane-count PASS
+  This plugin does not support propagateSizeHints()
+  This plugin does not support propagateSizeHints()
+  CHECK reset.one-pane PASS
+  CHECK close.last-pane.keeps-one PASS
+  CHECK close.last-pane.active PASS
+  This plugin does not support propagateSizeHints()
+  CHECK theme.catalogue PASS
+  CHECK theme.apply PASS
+  CHECK theme.invalid.rejected PASS
+  CHECK theme.invalid.keeps-palette PASS
+  CHECK shortcut.override.applied PASS
+  CHECK session.save PASS
+  This plugin does not support propagateSizeHints()
+  CHECK restore.pane-count PASS
+  CHECK restore.layout-tree PASS
+  CHECK restore.active-pane PASS
+  CHECK restore.theme PASS
+  CHECK restore.panel-visible PASS
+  CHECK restore.shortcut PASS
+  CHECK panel-seam.seed-session PASS
+  This plugin does not support propagateSizeHints()
+  CHECK panel-seam.deferred-nothing-inserted PASS
+  This plugin does not support propagateSizeHints()
+  This plugin does not support propagateSizeHints()
+  This plugin does not support propagateSizeHints()
+  CHECK panel-seam.dock-restored PASS
+  CHECK panel-seam.terminal-content PASS
+  CHECK panel-seam.search-content PASS
+  CHECK panel-seam.no-placeholder PASS
+  CHECK panel-seam.editor-layout-restored PASS panes=2
+  [app-shell] invalid shortcut store /tmp/vedit-verify.FANLyG/vedit-app-nQebiK/broken/shortcuts.json: illegal number
+  [app-shell] invalid session /tmp/vedit-verify.FANLyG/vedit-app-nQebiK/broken/session.json: unterminated object
+  This plugin does not support propagateSizeHints()
+  CHECK broken.config.survives PASS
+  CHECK broken.config.diagnostics PASS
+  This plugin does not support propagateSizeHints()
+  CHECK stress.one-pane-initial PASS
+  This plugin does not support propagateSizeHints()
+  This plugin does not support propagateSizeHints()
+  This plugin does not support propagateSizeHints()
+  This plugin does not support propagateSizeHints()
+  CHECK stress.pane-invariant PASS
+  CHECK stress.non-null-active PASS
+  CHECK save.command.registered PASS
+  CHECK save.shortcut.ctrl-s PASS
+  CHECK save.menu.file-item PASS
+  CHECK save.demo.open PASS
+  CHECK save.demo.action.disk-bytes PASS
+  CHECK save.demo.action.path-unchanged PASS
+  CHECK save.demo.action.no-temp-file PASS
+  CHECK editor.provider.id PASS
+  CHECK editor.pane.ktexteditor-widget PASS
+  CTRL-S-BINDING after-provider-install objectName=action-file.save class=QAction shortcut=Ctrl+S context=1 associated=[QMenu() ] holders=[QMenu() ] chain=QMainWindow<
+  CHECK save.shortcut.unique PASS bindings=1
+  CHECK save.shortcut.authority PASS
+  CHECK save.shortcut.runtime-duplicate-enumerated PASS bindings=2
+  This plugin does not support propagateSizeHints()
+  CHECK save.shortcut.runtime-unguarded-turn-keeps-duplicate PASS bindings=2
+  CHECK save.shortcut.runtime-guard-clears PASS bindings=1
+  CHECK save.shortcut.runtime-guard-authority PASS
+  CHECK save.shortcut.runtime-guard-entry-point PASS removed=1 bindings=1
+  CHECK save.shortcut.runtime-guard-timer PASS
+  CHECK editor.pane.open PASS
+  CHECK editor.pane.open-path PASS /tmp/vedit-verify.FANLyG/vedit-app-nQebiK/pane-open.v
+  CHECK editor.pane.save PASS
+  CHECK save.ktexteditor.document PASS
+  CHECK save.shortcut.window PASS
+  CHECK save.shortcut.disk-bytes PASS
+  CHECK save.shortcut.modified-cleared PASS
+  CHECK save.shortcut.path-unchanged PASS
+  CHECK save.menu.disk-bytes PASS
+  CHECK save.menu.path-unchanged PASS
+  CHECK save.no-temp-file PASS
+  [app-shell] Save failed: atomic save: injected write failure
+  [app-shell] Save failed: atomic save: injected write failure
+  CHECK save.failure.disk-unchanged PASS
+  CHECK save.failure.status-bar PASS
+  CHECK save.failure.diagnostic PASS
+  CHECK save.failure.still-modified PASS
+  CHECK save.recovery.disk-bytes PASS
+  CHECK save.recovery.not-modified PASS
+  This plugin does not support propagateSizeHints()
+  This plugin does not support propagateSizeHints()
+  CTRL-S-BINDING after-split objectName=action-file.save class=QAction shortcut=Ctrl+S context=1 associated=[QMenu() ] holders=[QMenu() ] chain=QMainWindow<
+  CHECK save.shortcut.unique.multi-pane PASS bindings=1
+  This plugin does not support propagateSizeHints()
+  This plugin does not support propagateSizeHints()
+  This plugin does not support propagateSizeHints()
+  This plugin does not support propagateSizeHints()
+  CHECK fold.wiring.pane PASS
+  CHECK fold.wiring.open PASS
+  CHECK fold.wiring.view PASS
+  CHECK fold.wiring.highlight-mode PASS SystemVerilog
+  CHECK fold.wiring.binding PASS
+  CHECK fold.wiring.firstopen-full-count PASS full_count=1
+  FOLD-WIRING before_state first_real=0 last_real=1000 first_visible=0 last_visible=25 hidden=975 scroll_max=0
+  FOLD-WIRING closed_state first_real=0 last_real=1000 first_visible=0 last_visible=25 full_count=2 injected_ranges=200 hidden_in_viewport=975 scroll_max=0 tree_sitter=0
+  CHECK fold.wiring.closed.observed PASS
+  CHECK fold.wiring.closed.hidden-975 PASS hidden=975
+  CHECK fold.wiring.closed.registry-200 PASS registry=200
+  CHECK fold.wiring.closed.no-rejects PASS
+  CHECK fold.wiring.a1-invalid-rejected PASS injected=0 rejected=1
+  FOLD-WIRING key_path full_count=2 key_events=50
+  CHECK fold.wiring.no-rebuild-on-keys PASS
+  CHECK fold.wiring.toggle-on-rebuild PASS full_count=3
+  FOLD-WIRING breadcrumb describe='module:m0 > function:inc' bar='m0 > inc'
+  CHECK fold.wiring.breadcrumb.describe PASS module:m0 > function:inc
+  CHECK fold.wiring.breadcrumb.pane-bar PASS m0 > inc
+  CHECK fold.wiring.breadcrumb.no-invention PASS describe='' bar=''
+  CHECK fold.wiring.no-rebuild-on-edit PASS full_count=5
+  CHECK fold.wiring.reparsed-trigger PASS full_count=6
+  This plugin does not support propagateSizeHints()
+  CHECK editcore.scratch PASS
+  CHECK editcore.ktexteditor.instance PASS
+  CHECK editcore.document.create PASS
+  CHECK editcore.undo.metaobject-slot PASS
+  CHECK editcore.document.setText PASS
+  CHECK editcore.open.fixture-written PASS
+  CHECK editcore.open.file PASS
+  CHECK editcore.open.records-path PASS /tmp/vedit-verify.FANLyG/vedit-app-VuEEGH/open.v
+  CHECK editcore.highlight.verilog.fixture PASS
+  CHECK editcore.highlight.verilog.open PASS
+  CHECK editcore.highlight.verilog.mode PASS mode='Verilog' expected='Verilog'
+  CHECK editcore.highlight.verilog.definition PASS Verilog
+  CHECK editcore.highlight.verilog.format-ranges PASS 30
+  CHECK editcore.highlight.verilog.folding-regions PASS begins=2 ends=2
+  CHECK editcore.highlight.systemverilog.fixture PASS
+  CHECK editcore.highlight.systemverilog.open PASS
+  CHECK editcore.highlight.systemverilog.mode PASS mode='SystemVerilog' expected='SystemVerilog'
+  CHECK editcore.highlight.systemverilog.definition PASS SystemVerilog
+  CHECK editcore.highlight.systemverilog.format-ranges PASS 29
+  CHECK editcore.highlight.systemverilog.folding-regions PASS begins=1 ends=1
+  CHECK editcore.atomic.fresh-file PASS
+  CHECK editcore.atomic.fresh-content PASS
+  CHECK editcore.atomic.no-temp-left PASS
+  CHECK editcore.atomic.replace PASS
+  CHECK editcore.atomic.replace-no-temp PASS
+  CHECK editcore.atomic.fault.write-fails PASS
+  CHECK editcore.atomic.fault.write-keeps-target PASS
+  CHECK editcore.atomic.fault.write-cleans-temp PASS
+  CHECK editcore.atomic.fault.rename-fails PASS
+  CHECK editcore.atomic.fault.rename-keeps-target PASS
+  CHECK editcore.atomic.fault.rename-cleans-temp PASS
+  CHECK editcore.atomic.fault.dir-fsync-nonfatal PASS atomic save: injected directory fsync failure;directory fsync skipped by fault injection
+  CHECK editcore.atomic.fault.dir-fsync-content PASS
+  CHECK editcore.save.kernel PASS
+  CHECK editcore.save.bytes PASS
+  CHECK editcore.save.clears-modified PASS
+  CHECK editcore.find.count PASS 3
+  CHECK editcore.find.adjacent PASS
+  CHECK editcore.replace.count PASS found=3 replaced=3
+  CHECK editcore.replace.text PASS zz bbb zz ccc zz
+  
+  CHECK editcore.replace.one-undo PASS
+  CHECK editcore.replace.redo PASS
+  CHECK editcore.goto.line PASS
+  CHECK editcore.goto.clamp-low PASS
+  CHECK editcore.goto.clamp-high PASS line=3
+  CHECK editcore.goto.column-zero PASS
+  CHECK editcore.undo.100-operations PASS 100
+  CHECK editcore.undo.100-back-to-original PASS mismatches=0 error=
+  CHECK editcore.redo.100-forwards PASS mismatches=0
+  EDITCORE-UNDO sha-before=c2a908d98f5df987ade41b5fce213067efbcc21ef2240212a41e54b5e7c28ae5 sha-after=991ab4d4e3f17a75c77ed6a7000fe568ae995f0dd92fe827129ee74ae2214f98
+  CHECK editcore.multicursor.native-api PASS
+  CHECK editcore.multicursor.native-read-back PASS
+  CHECK editcore.multicursor.native-insert-call PASS
+  EDITCORE-MULTICURSOR native-cursors=3 native-inserted-x=1 text="Xaaa
+  "
+  CHECK editcore.multicursor.native-insert-primary PASS 1
+  CHECK editcore.multicursor.batch-insert PASS
+  CHECK editcore.multicursor.batch-text PASS XaXaXa
+  
+  CHECK editcore.multicursor.batch-one-undo PASS
+  CHECK editcore.multicursor.batch-redo PASS
+  CHECK editcore.provider.id PASS ktexteditor
+  CHECK editcore.provider.creates-view PASS
+  CHECK editcore.provider.fixture PASS
+  CHECK editcore.provider.open PASS
+  CHECK editcore.provider.open-records-path PASS /tmp/vedit-verify.FANLyG/vedit-app-isETXM/provider.v
+  CHECK editcore.provider.document PASS
+  CHECK editcore.provider.save PASS
+  CHECK editcore.provider.save-bytes PASS
+  CHECK editcore.boundary.zero-calls PASS before=0 after=0
+  CHECK editcore.boundary.counter-live PASS before=0 after=1
+  EDIT-CORE-SELFTEST ok=1 checks=67 failures=0
+  APP-SHELL-SELFTEST ok=1 checks=200 failures=0 state=/tmp/vedit-verify.FANLyG/vedit-app-nQebiK/state
+  (261 lines; complete output copied into this report)
+---- selfcheck output end ----
+
+RESULT PASS selfcheck.app-shell | expected=APP-SHELL-SELFTEST ok=1 actual=APP-SHELL-SELFTEST ok=1 checks=200 failures=0 state=/tmp/vedit-verify.FANLyG/vedit-app-nQebiK/state note=the product's own headless suite passed
+RESULT PASS selfcheck.own-xml | expected=both vedit-*.xml definitions + verilog=1 actual=syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='/tmp/vedit-verify.FANLyG/appimage_extracted_7de6e6d0994e75e11f2b81f01f19b016/usr/share/org.kde.syntax-highlighting' definitions=3 own-xml=[vedit-verilog.xml,vedit-systemverilog.xml] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1 note=the package loads ONLY its own LGPL definitions
+RESULT PASS selfcheck.fold-975 | expected=fold.wiring.closed.hidden-975 PASS actual=CHECK fold.wiring.closed.hidden-975 PASS hidden=975 note=the packaged XML really folds a 1k-line .sv
+RESULT PASS selfcheck.toolchain | expected=TOOLCHAIN source=verible:bundled slang:bundled missing=[] actual=TOOLCHAIN source=verible:bundled slang:bundled missing=[] local=[] note=nothing has to be installed on the machine
+RESULT PASS extract | expected=squashfs-root/AppRun + bin/vd-app actual=/tmp/vedit-verify.FANLyG/extract/squashfs-root note=used by the loader/lint/launch checks below
+RESULT PASS loader.packaged | expected=package loader /tmp/vedit-verify.FANLyG/extract/squashfs-root/ld-linux-x86-64.so.2 in /proc/<pid>/maps actual=7ec035187000-7ec035188000 r--p 00000000 00:74 296                        /tmp/vedit-verify.FANLyG/extract/squashfs-root/ld-linux-x86-64.so.2 note=the packaged loader is the one running the product
+RESULT PASS loader.no-system-loader | expected=no loader outside the package in /proc/<pid>/maps actual=only /tmp/vedit-verify.FANLyG/extract/squashfs-root/ld-linux-x86-64.so.2 note=the host loader is not used
+RESULT PASS loader.packaged-libc | expected=package libc /tmp/vedit-verify.FANLyG/extract/squashfs-root/lib/libc.so.6 mapped actual=7ec03143c000-7ec031464000 r--p 00000000 00:74 364                        /tmp/vedit-verify.FANLyG/extract/squashfs-root/lib/libc.so.6 note=the glibc inside the package is in use (the 2.17 route)
+RESULT PASS lint.real | expected=a real line-length diagnostic from the bundled linter actual=/tmp/vedit-verify.FANLyG/lint/line_length_bad.sv:2:101-134: Line length exceeds max: 100; is: 134 [Style: line-length] [line-length] note=linter exit=1 (1 = violations found, expected); no host tool used
+RESULT PASS launch.project | expected=--project <generated .f> --hold 300 exits 0 actual=exit=0 note=the product started, opened the project and shut down cleanly
+RESULT PASS launch.project-files | expected=the project model read the generated .f (>=1 file) actual=diagnostics: effective file set from the project model: 1 file(s) note=the generated filelist was actually expanded
+
+---- manual checks (optional; NOT counted in SUMMARY) --------------
+ If this machine has a desktop session, double-click the AppImage and mark:
+   [ ] the window opens on the real desktop                                    PASS / FAIL
+   [ ] opening a .v/.sv file shows syntax colours                             PASS / FAIL
+   [ ] edit one line and Ctrl+S saves it                                      PASS / FAIL
+   [ ] the diagnostics panel reports a real lint message                      PASS / FAIL
+   note:
+---------------------------------------------------------------------
+
+SUMMARY: PASS=15 FAIL=1 SKIP=0
+Report: /home/haroldzhao/MyProj/DshProj/VEdit/target/tmp.vqur8M5erx/verify-report-haroldzhao-aipc-20261101-174213.txt
+Send this whole report file back; the RESULT lines are the answer.

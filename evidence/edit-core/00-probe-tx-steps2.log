@@ -1,0 +1,7 @@
+STEPS2 noview case=one_tx_per_edit len_before=100 steps_to_stable=1 empty_after=1 verdict=FAIL
+STEPS2 noview case=redo_all restored_ok=1 verdict=PASS
+STEPS2 noview case=one_tx_100_edits steps=3 verdict=FAIL
+kf.sonnet.core: Sonnet: No speller backends available!
+STEPS2 view case=one_tx_per_edit len_before=100 steps_to_stable=1 empty_after=1 verdict=FAIL
+STEPS2 view case=redo_all restored_ok=1 verdict=PASS
+STEPS2 view case=one_tx_100_edits steps=3 verdict=FAIL

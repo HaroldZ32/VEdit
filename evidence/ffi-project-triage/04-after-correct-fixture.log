@@ -1,0 +1,13 @@
+# AFTER: `vedit-app --selfcheck-ffi crates/vd-ffi/tests/fixtures/project`
+# exit code: 0
+
+FFI-ABI fixture=crates/vd-ffi/tests/fixtures/project
+CHECK ffi.project.start.returns-job PASS
+CHECK ffi.project.start.non-blocking PASS
+CHECK ffi.project.ready PASS
+CHECK ffi.project.file-count PASS actual=3 files=[/vedit-build/crates/vd-ffi/tests/fixtures/project/rtl/rtl_a.sv,/vedit-build/crates/vd-ffi/tests/fixtures/project/rtl/rtl_b.sv,/vedit-build/crates/vd-ffi/tests/fixtures/project/rtl/rtl_c.sv] (C ABI fixture expects 3)
+CHECK ffi.project.file-order PASS actual=[rtl_a.sv,rtl_b.sv,rtl_c.sv]
+CHECK ffi.project.include-dir PASS actual=[/vedit-build/crates/vd-ffi/tests/fixtures/project/rtl/inc]
+CHECK ffi.project.defines PASS actual=[WIDTH=8,SIM]
+CHECK ffi.project.unknown-job-rejected PASS
+FFI-ABI-SELFTEST ok=1 checks=20 failures=0

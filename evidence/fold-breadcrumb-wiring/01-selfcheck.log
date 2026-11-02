@@ -1,0 +1,34 @@
+# C9 evidence header
+collected_at: 2026-11-01T14:44:23+08:00
+git_head: 48569602d0c86fb402dc88155593d1dc06445c90
+binary_sha256: 963d7dd95f70a64fc3c9f99486b5950eab6713b1a867a8231f13ee38cf42e657
+
+## real ApplicationShell + real KTextEditor provider: 1000-line .sv folding + breadcrumb
+
+CHECK save.shortcut.unique PASS bindings=1
+CHECK save.shortcut.authority PASS
+CHECK save.shortcut.unique.multi-pane PASS bindings=1
+CHECK fold.wiring.pane PASS
+CHECK fold.wiring.open PASS
+CHECK fold.wiring.view PASS
+CHECK fold.wiring.highlight-mode PASS SystemVerilog
+CHECK fold.wiring.binding PASS
+CHECK fold.wiring.firstopen-full-count PASS full_count=1
+FOLD-WIRING before_state first_real=0 last_real=1000 first_visible=0 last_visible=25 hidden=975 scroll_max=0
+FOLD-WIRING closed_state first_real=0 last_real=1000 first_visible=0 last_visible=25 full_count=2 injected_ranges=200 hidden_in_viewport=975 scroll_max=0 tree_sitter=0
+CHECK fold.wiring.closed.observed PASS
+CHECK fold.wiring.closed.hidden-975 PASS hidden=975
+CHECK fold.wiring.closed.registry-200 PASS registry=200
+CHECK fold.wiring.closed.no-rejects PASS
+CHECK fold.wiring.a1-invalid-rejected PASS injected=0 rejected=1
+FOLD-WIRING key_path full_count=2 key_events=50
+CHECK fold.wiring.no-rebuild-on-keys PASS
+CHECK fold.wiring.toggle-on-rebuild PASS full_count=3
+FOLD-WIRING breadcrumb describe='module:m0 > function:inc' bar='m0 > inc'
+CHECK fold.wiring.breadcrumb.describe PASS module:m0 > function:inc
+CHECK fold.wiring.breadcrumb.pane-bar PASS m0 > inc
+CHECK fold.wiring.breadcrumb.no-invention PASS describe='' bar=''
+CHECK fold.wiring.no-rebuild-on-edit PASS full_count=5
+CHECK fold.wiring.reparsed-trigger PASS full_count=6
+EDIT-CORE-SELFTEST ok=1 checks=67 failures=0
+APP-SHELL-SELFTEST ok=1 checks=200 failures=0 state=/tmp/vedit-app-HtJIJp/state

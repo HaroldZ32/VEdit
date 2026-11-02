@@ -1,0 +1,34 @@
+generated: 2026-10-31T10:34:14Z
+base_dev: eebbfd14a2311cd4bca533fe98d457a01e46e2e6
+
+# 本轮 7 个 checkpoint 提交（新 -> 旧）
+commit: 3cdbbe92d4b13183cceadc43c18c49fe088be84e
+subject: chore(wip): checkpoint app shell entry point and cmake
+files: 2
+---
+commit: a7ce7e914bcea454ef9deeef22593cf702a08425
+subject: chore(wip): checkpoint lane evidence (syn-grammars, term-panel, workspace lanes)
+files: 71
+---
+commit: e065c776923921c803e29265a18a399a3185e042
+subject: chore(wip): checkpoint handover docs and third-party licensing registration
+files: 3
+---
+commit: 4929488e310bcfa40500c6dee3633d52de368910
+subject: chore(wip): checkpoint qt6 build scripts
+files: 2
+---
+commit: 057b6f15acc0f5bcc7f4001a20cbe2ab9f9ffffe
+subject: chore(wip): checkpoint app shell and rootcheck cmake
+files: 1
+---
+commit: 62048652270b350da02d6f744aab302108275e6f
+subject: chore(wip): checkpoint in-repo verilog fixtures and verification script
+files: 22
+---
+commit: f349342226d12f214f867f966ae10e6ec80c522c
+subject: chore(wip): checkpoint rust service crates and ffi build wiring
+files: 32
+---
+ahead_of_dev: 18 commits
+diffstat:  133 files changed, 12841 insertions(+), 12 deletions(-)

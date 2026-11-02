@@ -1,0 +1,9 @@
+# C9 (T129)
+collected_at: 2026-11-02T03:10:05Z
+git_head: af852255acf8979cd25ffc0bd882c1dcbbec6220
+git_status_porcelain:
+   M src/app/app_shell.cpp
+   M src/app/main.cpp
+   M src/app/panel_registry.cpp
+   M src/app/panel_registry.h
+  ?? evidence/view-menu-sync/

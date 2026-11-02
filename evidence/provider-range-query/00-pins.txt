@@ -1,0 +1,13 @@
+date: 2026-11-01T14:06:27+08:00
+head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6 (feat/qt6-ktexteditor-migration)
+image: vedit-qt6-build:local sha256:1f0499590914e4fa309e24c163c09350b6603666480c7db463227cc2f52ce3c0
+tree-sitter: VEDIT_TREE_SITTER_VERSION="0.25.9"
+changed paths (T92):
+   M src/syntax/provider/CMakeLists.txt
+   M src/syntax/provider/syntax_provider.h
+   M src/syntax/provider/tree_sitter_provider.cpp
+   M src/syntax/provider/tree_sitter_provider.h
+  ?? evidence/provider-range-query/
+  ?? src/syntax/folding/
+  ?? src/syntax/overlay/
+  ?? src/syntax/provider/syntax_provider.cpp

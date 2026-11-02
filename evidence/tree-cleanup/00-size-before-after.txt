@@ -1,0 +1,28 @@
+# Working-tree size, before/after the 2026-10-31 cleanup
+# collected with: du -sh .[!.]* * | sort -rh
+
+## BEFORE (16G total)
+13G     target                     (cargo output of the replaced Rust/GTK product)
+1.5G    build                      (1.4G of it build/gui-spike/app/target)
+903M    packaging                  (runtime 467M + appimage 256M + tarball 181M)
+305M    evidence                   (.f2-work 171M + fim harness/target 115M)
+92M     .mpd                       (harness state: memory, team, recon)
+75M     .codegraph                 (tool index)
+45M     third_party                (tree-sitter-verilog, parser.c 44M)
+24M     .git
+15M     probes                     (three CMake build trees)
+1.3M    crates  1.1M src  224K tests  204K docs  164K scripts
+
+## AFTER (392M total)
+128M    packaging                  (scripts + the two AppImages only)
+92M     .mpd
+75M     .codegraph
+45M     third_party
+24M     .git
+21M     evidence                   (text/logs only)
+7.8M    build
+1.3M    crates
+1.1M    src
+736K    probes
+
+## Reclaimed: ~15.6G, 96% of the tree.

@@ -1,0 +1,12 @@
+date: 2026-10-31T11:52:20Z
+== probe binary present at the START of the LAST v2 execution (removed right after) ==
+35c26bda2f233373143bac327521181d2fd133a0ea9ee50b639b76aeefe0b611  /home/haroldzhao/MyProj/DshProj/VEdit/probes/c17-overlay/build/c17-overlay
+== build tree file count ==
+20
+NOTE: this tree is a build artefact (not evidence). It is removed so each run
+      compiles the probe inside the official image; 01-build.log shows
+      "[1/2] Building CXX object ..." + "[2/2] Linking ..." for the final run.
+NOTE (honesty): on the FIRST v2 execution this was v1's vprobe-image binary.
+      Later re-runs regenerated this file, so the hash above is the previous
+      v2 build (official image), NOT v1's. The claim this step supports is
+      "v2 rebuilds the probe", not "v1's binary hash is preserved".

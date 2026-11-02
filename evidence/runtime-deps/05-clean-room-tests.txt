@@ -1,0 +1,27 @@
+generated: 2026-10-31T14:13:44Z
+## 三档干净环境实测（本机 2026-10-31）
+
+### A) ubuntu:26.04 —— 无任何系统 KF6/Qt6（`ldconfig -p | grep -cE 'KF6|Qt6'` = 0）
+包：AppRun + usr/lib（**不含 glibc**），QT_QPA_PLATFORM=offscreen
+结果：**EXIT=0** —— 自包含成立（同基线系统）
+
+### B) ubuntu:24.04 —— glibc 2.39，无 KF6/Qt6
+包：AppRun + usr/lib（不含 glibc）
+结果：**失败**。不是缺 KF6，而是**打包进来的库自身要求 GLIBC_2.43**：
+  /app/usr/lib/libQt6Gui.so.6: /lib/x86_64-linux-gnu/libm.so.6: version `GLIBC_2.43' not found
+  /app/usr/lib/libglib-2.0.so.0: version `GLIBC_2.43' not found
+  → 构建基线是 Ubuntu 26.04 / glibc 2.43（`ldd --version` 实测 2.43），比它老的目标机光打库不够。
+
+### C) CentOS 7.9 clean-room（glibc **2.17**，无 KF6/Qt6）
+包：usr/lib **含 glibc（libc.so.6 + ld-linux-x86-64.so.2）**，用自带 loader 启动：
+  /app/usr/lib/ld-linux-x86-64.so.2 --library-path /app/usr/lib /app/usr/bin/vedit-app ...
+结果：**EXIT=0**，日志证实真跑起来了：
+  syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] ... kernel='KTextEditor 6.24.0'
+  filetree: installFileTree projectRoot='/tmp/proj' dockInserted=0
+  search: installSearch projectRoot='/tmp/proj' jumpTarget=editor
+  → **同一份 Ubuntu 26.04 构建的产物，在 glibc 2.17 的系统上跑起来了**，前提是连 glibc 一起打包并用自带 loader。
+
+### ⚠️ 三档共同的边界（必须写进 T76）
+1. **内核没有被测到**：容器共用宿主内核（7.0.0）。真实 CentOS 7 是 **3.10**，glibc 2.43 对内核有最低要求；这一点**必须在真 3.10 内核上再验**，容器里测不出来。
+2. **无头**：三档都用 QT_QPA_PLATFORM=offscreen，**没有开过真窗口**。真 GUI 需要 libqxcb.so + 可用 DISPLAY。
+3. **打包 glibc 是脆弱手法**：AppImage 惯例是不带 glibc。这里是能跑的证明，不等于该这么发；发布前要给 T76 做取舍。

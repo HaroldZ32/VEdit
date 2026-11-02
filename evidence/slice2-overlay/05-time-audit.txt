@@ -1,0 +1,98 @@
+== evidence: 05-time-audit.txt — T93/F1 acceptance: every time in this directory vs the audit time ==
+audit_time: 2026-11-01T14:16:01+08:00
+date: 2026-11-01T14:16:01+08:00
+timezone: Asia/Shanghai (+08:00); the logs also carry the UTC equivalent in collected_at_utc
+note: the directory was re-collected three times during T93 (13:54 / 14:02 / 14:08), because the
+      untracked lane src/syntax/overlay kept changing (see 07-binding.txt). The FINAL evidence is the
+      14:08:16-14:09:38 collection; its numbers bind to overlay_selftest.cpp sha256=8cb45b65… as recorded
+      in the 01/02 headers. Concurrency during collection is disclosed in 03/04's '## backfill:' notes.
+
+## 1. file mtimes (filesystem record)
+mtime  2026-11-01T14:08:20+08:00  evidence/slice2-overlay/01-build.log  (5108 bytes)
+mtime  2026-11-01T14:08:23+08:00  evidence/slice2-overlay/02-selftest.log  (7940 bytes)
+mtime  2026-11-01T14:12:28+08:00  evidence/slice2-overlay/03-perf-runs.log  (8987 bytes)
+mtime  2026-11-01T14:12:28+08:00  evidence/slice2-overlay/04-ctest.log  (6388 bytes)
+mtime  2026-11-01T14:15:22+08:00  evidence/slice2-overlay/05-time-audit.txt  (5396 bytes)
+mtime  2026-11-01T14:14:15+08:00  evidence/slice2-overlay/06-c9-header-check.txt  (5276 bytes)
+mtime  2026-11-01T14:13:32+08:00  evidence/slice2-overlay/07-binding.txt  (3785 bytes)
+mtime  2026-11-01T14:15:38+08:00  evidence/slice2-overlay/README.md  (14115 bytes)
+mtime  2026-11-01T14:02:48+08:00  evidence/slice2-overlay/collect-header.sh  (1500 bytes)
+
+## 2. every clock-looking token in README.md (regex: HH:MM with optional :SS, boundary-aware)
+lineno  token      resolved_as(+08:00)        verdict
+4       14:08:16   2026-11-01T14:08:16+08:00  past
+4       14:09:38   2026-11-01T14:09:38+08:00  past
+4       14:08:16   2026-11-01T14:08:16+08:00  past
+4       14:09:38   2026-11-01T14:09:38+08:00  past
+5       14:04:36   2026-11-01T14:04:36+08:00  past
+5       14:09:21   2026-11-01T14:09:21+08:00  past
+5       14:10:04   2026-11-01T14:10:04+08:00  past
+5       14:11:15   2026-11-01T14:11:15+08:00  past
+5       14:12:49   2026-11-01T14:12:49+08:00  past
+17      13:38      2026-11-01T13:38:00+08:00  past
+17      14:08:16   2026-11-01T14:08:16+08:00  past
+17      14:09:38   2026-11-01T14:09:38+08:00  past
+17      13:54      2026-11-01T13:54:00+08:00  past
+17      14:02      2026-11-01T14:02:00+08:00  past
+17      13:38:01   2026-11-01T13:38:01+08:00  past
+17      13:38:58   2026-11-01T13:38:58+08:00  past
+58      14:08:56   2026-11-01T14:08:56+08:00  past
+58      14:08:58   2026-11-01T14:08:58+08:00  past
+58      14:09:01   2026-11-01T14:09:01+08:00  past
+
+timestamps_in_README=19 future_in_README=0
+
+## 3. collection markers in the four logs
+-- 01-build.log
+   2026-11-01T14:08:16+08:00  past
+-- 02-selftest.log
+   2026-11-01T14:08:20+08:00  past
+-- 03-perf-runs.log
+   2026-11-01T14:08:56+08:00  past
+   2026-11-01T14:08:58+08:00  past
+   2026-11-01T14:09:01+08:00  past
+   2026-11-01T14:12:28+08:00  past
+-- 04-ctest.log
+   2026-11-01T14:09:11+08:00  past
+   2026-11-01T14:09:36+08:00  past
+   2026-11-01T14:12:28+08:00  past
+
+## 4. whole-directory scan (this audit file excluded from its own scan - see the note)
+The exclusion only prevents the audit from quoting itself; every value it prints is either 'now' or read
+back from a file mtime / log marker, so it cannot introduce a time that sections 2-3 do not cover.
+tokens=4    evidence/slice2-overlay/01-build.log
+tokens=3    evidence/slice2-overlay/02-selftest.log
+tokens=13   evidence/slice2-overlay/03-perf-runs.log
+tokens=11   evidence/slice2-overlay/04-ctest.log
+tokens=18   evidence/slice2-overlay/06-c9-header-check.txt
+tokens=16   evidence/slice2-overlay/07-binding.txt
+tokens=19   evidence/slice2-overlay/README.md
+tokens=0    evidence/slice2-overlay/collect-header.sh
+
+future_tokens_in_scanned_files=0
+
+## 5. how to reproduce
+$ date -Is
+$ python3 - <<'EOF'
+  # every file under evidence/slice2-overlay/ except this audit file: boundary-aware regex
+  # (HH:MM(:SS)?), resolve in +08:00, compare with datetime.now(); print the FUTURE rows.
+EOF
+
+## 6. the superseded original collection (T18 review F1; the invalid literal is deliberately not repeated)
+The pre-repair directory was collected at 13:38:01-13:38:58 local time (README mtime 13:38:58; the review
+also quotes the same instant in UTC). Its README claimed a collection window whose end was LATER than
+the README's own mtime - a time no log could ever reach (the F1 defect). The four logs are now
+re-collected at 14:08:16-14:09:38 (sections 1 and 3), the README window is taken from those headers,
+and sections 2-4 show there is no future time in this directory.
+
+## 7. conclusion
+future tokens: README=0, logs=0, scanned files=0. The README window (14:08:16-14:09:38) equals
+the four logs' headers, precedes the README's own mtime, and precedes this audit's time.
+
+## 8. one literal-grep false positive, explained
+A naive grep for the OLD window's tail can hit unrelated digits in a backfill timestamp: 07-binding.txt
+records the wall-clock time at which that note was written (a PAST time), and its minute:second digits
+happen to contain the same digit pair as the old window's tail. Section 2/4 use boundary lookarounds AND
+resolve every token against 'now', which is why they report 0 future tokens; the naive literal grep in
+this spot is a substring artefact, not a future time. No file in this directory carries a time later
+than audit_time above.

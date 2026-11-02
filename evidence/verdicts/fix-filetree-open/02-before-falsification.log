@@ -1,0 +1,120 @@
+collected_at: 2026-10-31T10:43:05Z
+git_head: 1f47e56421bbeaab64f8082df3cfc104a6a2c2ef
+branch: feat/qt6-ktexteditor-migration
+git_status_porcelain (temp copy excluded from the listing):
+ M build/slang/evidence/00-build-console.log
+ M build/slang/evidence/01-yum-install.log
+ M crates/vd-ffi/include/vd_ffi.h
+ M crates/vd-ffi/src/lsp.rs
+ M evidence/ffi-abi/logs/19-rust-stage-console.log
+ M evidence/ffi-abi/logs/20-cargo-build-release.log
+ M evidence/ffi-abi/logs/21-staticlib.txt
+ M evidence/ffi-abi/logs/22-rust-targets.txt
+ M evidence/ffi-abi/logs/23-cargo-test.log
+ M evidence/ffi-abi/logs/26-vd_ffi.h
+ M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+ M evidence/m0-build/build-logs/31-qt6-configure.log
+ M evidence/m0-build/build-logs/32-qt6-build.log
+ M evidence/m0-build/build-logs/33-qt6-ctest.log
+ M evidence/m0-build/build-logs/34-qt6-elf.txt
+ M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+?? evidence/gate-infra/
+?? evidence/highlight-v2/00-collect.txt
+?? evidence/highlight-v2/01-after-link.txt
+?? evidence/highlight-v2/03-build-qt-gate.log
+?? evidence/highlight-v2/04-syntax-product-tests.log
+?? evidence/highlight-v2/06-standalone-lanes.log
+?? evidence/highlight-v2/07-negative-control.log
+?? evidence/highlight-v2/08-ctest.log
+?? evidence/highlight-v2/09-screenshot-L2.log
+?? evidence/highlight-v2/10-licensing-and-embargo.txt
+?? evidence/highlight-v2/README.md
+?? evidence/highlight-v2/screenshots/
+?? evidence/verdicts/fix-filetree-open/
+?? filetree-testdata/
+?? src/editor/CMakeLists.txt
+?? src/editor/kernel/
+?? src/workspace/diagnostics/
+?? src/workspace/project/
+verifier: Reviewer (cell-20261031T085543161Z, T40; loop loop-20261031T101645-f4b9e5)
+
+falsification: CURRENT seamcheck.cpp (sha256 02de30fa…) + filetree_integration.{h,cpp} restored to pre-fix commit 9957f5f (sha256 below)
+eccde498ae4caf75d837150e374f167a66cd7868d2127915f40a2ce9063c2a09  /home/haroldzhao/MyProj/DshProj/VEdit/evidence/verdicts/fix-filetree-open/.tmp-before-src/src/workspace/filetree/filetree_integration.cpp
+d676c4bf9f65904e018b4f54d9ca4055ac8aa90557e5b01840e0777fe850a535  /home/haroldzhao/MyProj/DshProj/VEdit/evidence/verdicts/fix-filetree-open/.tmp-before-src/src/workspace/filetree/filetree_integration.h
+02de30fab36e0bbe1887f15ceefdcd22d0bfb5e69f11d241c8f35555816137dc  /home/haroldzhao/MyProj/DshProj/VEdit/evidence/verdicts/fix-filetree-open/.tmp-before-src/src/workspace/filetree/tools/rootcheck/seamcheck.cpp
+cmd: bash evidence/verdicts/fix-filetree-open/run-review-seamcheck.sh before /home/haroldzhao/MyProj/DshProj/VEdit/evidence/verdicts/fix-filetree-open/.tmp-before-src
+== toolchain ==
+qt6-base-dev: qt6-base-dev:amd64	6.10.2+dfsg-7
+cmake: cmake version 4.2.3
+g++: g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+src root: /src
+
+== 1/4 lane standalone build ==
+-- VEdit file tree: Qt 6.10.2 (standalone=ON)
+-- VEdit file tree: independent build (no vedit_app_shell) -> filetree_integration.cpp not compiled
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/lane
+[12/16] Building CXX object CMakeFiles/vedit-filetree-demo.dir/vedit-filetree-demo_autogen/mocs_compilation.cpp.o
+[13/16] Building CXX object CMakeFiles/vedit-filetree-demo.dir/demo/filetree_demo.cpp.o
+[14/16] Linking CXX executable vedit-filetree-demo
+[15/16] Building CXX object CMakeFiles/vedit-filetree-tests.dir/tests/filetree_tests.cpp.o
+[16/16] Linking CXX executable vedit-filetree-tests
+
+== 2/4 lane ctest (the 111-check acceptance suite) ==
+Test project /tmp/lane
+    Start 1: vedit-filetree-tests
+1/1 Test #1: vedit-filetree-tests .............   Passed    1.17 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   1.17 sec
+
+== 3/4 fixture (the lane own --prepare) ==
+PREPARE ok=1 root=/tmp/fx project_files=7 big_files=200
+
+== 4/4 root-context seamcheck (REAL ApplicationShell) ==
+-- VEdit: workspace lane 'search' wired (vedit_workspace_search)
+-- VEdit: workspace integration enabled (src/workspace/integration.cpp)
+-- VEdit file tree rootcheck: Qt 6.10.2, shell=/src/src/app
+-- Configuring done (0.5s)
+-- Generating done (0.0s)
+-- Build files have been written to: /tmp/rc
+[34/39] Automatic MOC for target vedit_workspace_integration
+[35/39] Building CXX object app/CMakeFiles/vedit_workspace_integration.dir/vedit_workspace_integration_autogen/mocs_compilation.cpp.o
+[36/39] Building CXX object app/CMakeFiles/vedit_workspace_integration.dir/src/src/workspace/integration.cpp.o
+[37/39] Linking CXX static library app/libvedit_workspace_integration.a
+[38/39] Building CXX object CMakeFiles/vedit-filetree-seamcheck.dir/seamcheck.cpp.o
+[39/39] Linking CXX executable vedit-filetree-seamcheck
+filetree: installFileTree projectRoot='/tmp/fx/project' dockInserted=1 placeholderReplaced=1
+filetree: installFileTree projectRoot='/tmp/fx/project' dockInserted=1 placeholderReplaced=0
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+SEAM dock-inserted=1 content-before-install=panel-placeholder-file-tree
+SEAM panel-installed=1 dock-content-is-panel=1 find-child=1 root=/tmp/fx/project
+SEAM CHECK panel-installed ok=1
+SEAM CHECK root-path ok=1 detail=/tmp/fx/project
+SEAM CHECK editor.active-pane-widget ok=1
+SEAM editor-initial-bytes=503
+SEAM CHECK editor.initially-no-file ok=1
+SEAM file-index-valid=1
+SEAM CHECK dblclick.file-row-visible ok=1
+SEAM status-after-file-dblclick="Open /tmp/fx/project/rtl/top.v"
+SEAM CHECK dblclick.file-loads-bytes ok=0 detail=37 bytes on disk
+SEAM CHECK dblclick.file-records-path ok=0
+SEAM CHECK dblclick.file-status-message ok=0 detail=Open /tmp/fx/project/rtl/top.v
+SEAM CHECK dblclick.second-file-row-visible ok=1
+SEAM CHECK dblclick.second-file-loads ok=0
+SEAM CHECK dblclick.second-file-records-path ok=0
+SEAM CHECK dblclick.folder-row-visible ok=1
+SEAM CHECK dblclick.folder-expands ok=1
+SEAM CHECK dblclick.folder-emits-no-open ok=1 detail=0
+SEAM CHECK dblclick.folder-keeps-editor ok=0
+SEAM rows=5 scanned-dirs=3
+SCREENSHOT ok=1 /tmp/shot.png
+FILETREE-SEAMCHECK ok=0 checks=15 failures=6
+SEAMCHECK before exit=1
+EXIT=1

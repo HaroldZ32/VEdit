@@ -1,0 +1,259 @@
+diff --git a/src/editor/kernel/fold_breadcrumb.cpp b/src/editor/kernel/fold_breadcrumb.cpp
+index 179e91b..7a52e2c 100644
+--- a/src/editor/kernel/fold_breadcrumb.cpp
++++ b/src/editor/kernel/fold_breadcrumb.cpp
+@@ -118,6 +118,9 @@ void FoldBreadcrumbBinding::ensureSources()
+ 
+ void FoldBreadcrumbBinding::onDocumentOpened()
+ {
++    if (qEnvironmentVariableIsSet("VEDIT_FOLD_TRACE")) {
++        qInfo("[fold-trace] document opened; rebuilding folds (one full rebuild)");
++    }
+     if (view_ == nullptr || view_->document() == nullptr) {
+         return;
+     }
+@@ -161,6 +164,10 @@ void FoldBreadcrumbBinding::notifyReparsed()
+ 
+ void FoldBreadcrumbBinding::rebuildFor(vedit::folding::RebuildTrigger trigger)
+ {
++    if (qEnvironmentVariableIsSet("VEDIT_FOLD_TRACE")) {
++        qInfo("[fold-trace] rebuild trigger=%d (1=first-open 2=tree-sitter 3=reparsed)",
++              static_cast<int>(trigger));
++    }
+     if (view_ == nullptr || view_->document() == nullptr) {
+         return;
+     }
+diff --git a/src/syntax/folding/CMakeLists.txt b/src/syntax/folding/CMakeLists.txt
+index a4b5f48..74590c3 100644
+--- a/src/syntax/folding/CMakeLists.txt
++++ b/src/syntax/folding/CMakeLists.txt
+@@ -71,6 +71,28 @@ set_tests_properties(vedit-syntax-directory-tests PROPERTIES
+   TIMEOUT 60
+ )
+ 
++add_executable(vedit-fold-unfold-guard-tests tests/fold_unfold_guard_tests.cpp)
++target_link_libraries(vedit-fold-unfold-guard-tests PRIVATE vedit_syntax_folding Qt6::Gui)
++if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
++  target_compile_options(vedit-fold-unfold-guard-tests PRIVATE -Wall -Wextra -Wpedantic -Werror)
++endif()
++add_test(NAME vedit-fold-unfold-guard-tests COMMAND vedit-fold-unfold-guard-tests)
++set_tests_properties(vedit-fold-unfold-guard-tests PROPERTIES
++  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-fold"
++  TIMEOUT 120
++)
++
++add_executable(vedit-fold-toggle-tests tests/fold_toggle_tests.cpp)
++target_link_libraries(vedit-fold-toggle-tests PRIVATE vedit_syntax_folding Qt6::Gui)
++if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
++  target_compile_options(vedit-fold-toggle-tests PRIVATE -Wall -Wextra -Wpedantic -Werror)
++endif()
++add_test(NAME vedit-fold-toggle-tests COMMAND vedit-fold-toggle-tests)
++set_tests_properties(vedit-fold-toggle-tests PROPERTIES
++  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-fold"
++  TIMEOUT 120
++)
++
+ add_executable(vedit-folding-tests tests/folding_tests.cpp)
+ target_link_libraries(vedit-folding-tests PRIVATE vedit_syntax_folding Qt6::Gui)
+ # T29: the closed-state source reads OUR definition file, never the repository.
+diff --git a/src/syntax/folding/fold_injector.cpp b/src/syntax/folding/fold_injector.cpp
+index 65ad576..25266b3 100644
+--- a/src/syntax/folding/fold_injector.cpp
++++ b/src/syntax/folding/fold_injector.cpp
+@@ -119,8 +119,11 @@ int FoldInjector::injectUnchecked(const std::vector<FoldRange> &ranges)
+ {
+     int injected = 0;
+     for (const FoldRange &range : ranges) {
+-        if (std::find(registry_.begin(), registry_.end(), range) != registry_.end()) {
+-            continue; // already folded by this injector
++        const bool known = std::find(registry_.begin(), registry_.end(), range) != registry_.end();
++        const bool unconfirmed =
++            std::find(unconfirmed_.begin(), unconfirmed_.end(), range) != unconfirmed_.end();
++        if (known && !unconfirmed) {
++            continue; // folded by this injector and the fold was confirmed
+         }
+         QString message;
+         const bool returnValue =
+@@ -132,6 +135,12 @@ int FoldInjector::injectUnchecked(const std::vector<FoldRange> &ranges)
+         // validation + command issued" is the only honest bookkeeping.
+         execResults_.push_back(returnValue);
+         registry_.push_back(range);
++        unconfirmed_.erase(std::remove_if(unconfirmed_.begin(), unconfirmed_.end(),
++                                         [&range](const FoldRange &fold) {
++                                             return fold.startLine == range.startLine
++                                                 && fold.endLine == range.endLine;
++                                         }),
++                           unconfirmed_.end());
+         ++injectCount_;
+         ++injected;
+         if (!returnValue) {
+@@ -147,20 +156,102 @@ int FoldInjector::unfoldRegistered()
+     if (view_ == nullptr || unfoldCommand_ == nullptr || registry_.empty()) {
+         return 0;
+     }
+-    // `unfold` has no range support: it acts on the fold starting at the cursor
+-    // line (evidence/r2-fold/decision.md §2.2). A full rebuild therefore has to
+-    // place the cursor on every registered start line, then restore it.
++    // T122: KTextEditor segfaults inside setCursorPosition() when the target line
++    // is hidden by a fold. The old release walked the registry in injection order
++    // (inner ranges first) and moved the cursor to EVERY start line, so nested
++    // folds (module > always_comb > begin) handed KTextEditor a hidden line.
++    //
++    // Invariants of this implementation:
++    //   * outer-first order (largest span first, start line ascending on ties),
++    //     so the outer fold is unfolded before any inner start line is visited;
++    //   * a start line still covered by an unresolved registered fold is NEVER
++    //     handed to setCursorPosition (counted in unfoldSkippedHidden());
++    //   * the original cursor is restored only when it is not hidden itself;
++    //   * a registry entry leaves the registry ONLY after its `unfold` returned
++    //     true - an incomplete unfold keeps it registered (T120's second defect:
++    //     clearing the registry on failure left folds alive while the code
++    //     believed the document was clean, which crashed the next setText()).
+     const KTextEditor::Cursor original = view_->cursorPosition();
++    const std::vector<FoldRange> initial = registry_;
++    std::vector<FoldRange> ordered = initial;
++    if (!legacyUnfold_) {
++        std::sort(ordered.begin(), ordered.end(),
++                  [](const FoldRange &left, const FoldRange &right) {
++                      const int leftSpan = left.endLine - left.startLine;
++                      const int rightSpan = right.endLine - right.startLine;
++                      if (leftSpan != rightSpan) {
++                          return leftSpan > rightSpan;
++                      }
++                      return left.startLine < right.startLine;
++                  });
++    }
++    // Legazy mode replays the OLD algorithm (registry order, no guard); the fold
++    // set is tracked so the reverse control can count hidden targets.
++    std::vector<FoldRange> stillFolded = initial;
+     int unfolded = 0;
+-    for (auto it = registry_.rbegin(); it != registry_.rend(); ++it) {
+-        view_->setCursorPosition(KTextEditor::Cursor(it->startLine, 0));
++    for (const FoldRange &range : ordered) {
++        bool covered = false;
++        for (const FoldRange &fold : stillFolded) {
++            if (fold.startLine <= range.startLine && fold.endLine >= range.endLine
++                && (fold.startLine != range.startLine || fold.endLine != range.endLine)) {
++                covered = true;
++                break;
++            }
++        }
++        if (!legacyUnfold_ && covered) {
++            ++unfoldSkippedHidden_;
++            log(QStringLiteral("folding.unfold.skip-hidden range=%1").arg(rangeText(range)));
++            continue;
++        }
++        if (covered) {
++            // Only reachable in legacy mode: the old order would have moved onto
++            // a hidden line here. Counted, never hidden by an assertion.
++            ++unfoldHiddenTargetMoves_;
++        }
++        view_->setCursorPosition(KTextEditor::Cursor(range.startLine, 0));
++        ++unfoldCursorMoves_;
++        unfoldCursorTargets_.push_back(range.startLine);
+         QString message;
+         const bool returnValue = unfoldCommand_->exec(
+             view_, QStringLiteral("unfold"), message, KTextEditor::Range::invalid());
+         execResults_.push_back(returnValue);
+-        ++unfolded;
++        if (returnValue) {
++            ++unfolded;
++            unconfirmed_.erase(std::remove_if(unconfirmed_.begin(), unconfirmed_.end(),
++                                             [&range](const FoldRange &fold) {
++                                                 return fold.startLine == range.startLine
++                                                     && fold.endLine == range.endLine;
++                                             }),
++                               unconfirmed_.end());
++            stillFolded.erase(
++                std::remove_if(stillFolded.begin(), stillFolded.end(),
++                               [&range](const FoldRange &fold) {
++                                   return fold.startLine == range.startLine
++                                       && fold.endLine == range.endLine;
++                               }),
++                stillFolded.end());
++        } else {
++            ++unfoldFailures_;
++            if (std::find(unconfirmed_.begin(), unconfirmed_.end(), range) == unconfirmed_.end()) {
++                unconfirmed_.push_back(range);
++            }
++            log(QStringLiteral("folding.unfold.returned-false range=%1").arg(rangeText(range)));
++        }
++    }
++    // Confirmed unfolds leave the registry; failures stay in it.
++    registry_ = stillFolded;
++    bool originalVisible = true;
++    for (const FoldRange &fold : registry_) {
++        if (fold.startLine < original.line() && fold.endLine >= original.line()) {
++            originalVisible = false;
++            break;
++        }
++    }
++    if (originalVisible) {
++        view_->setCursorPosition(original);
++    } else {
++        ++cursorRestoreSkipped_;
+     }
+-    view_->setCursorPosition(original);
+     return unfolded;
+ }
+ 
+@@ -172,7 +263,9 @@ RebuildOutcome FoldInjector::rebuild(RebuildTrigger trigger, const std::vector<F
+     QElapsedTimer timer;
+     timer.start();
+     outcome.unfolded = unfoldRegistered();
+-    registry_.clear();
++    // T122: no unconditional clear - unfoldRegistered() already keeps every range
++    // whose unfold could not be confirmed, so a later rebuild never believes the
++    // document is fold-free when it is not.
+     const quint64 rejectedBefore = rejectedCount_;
+     outcome.injected = inject(ranges);
+     outcome.rejected = static_cast<int>(rejectedCount_ - rejectedBefore);
+diff --git a/src/syntax/folding/fold_injector.h b/src/syntax/folding/fold_injector.h
+index a4359a5..5ef8ae1 100644
+--- a/src/syntax/folding/fold_injector.h
++++ b/src/syntax/folding/fold_injector.h
+@@ -113,6 +113,19 @@ public:
+     // are evidence for A1.2 (the value is not a success signal), not a decision.
+     const std::vector<bool> &execResults() const;
+ 
++    // T122 release invariants. The normal path only moves the cursor to a line
++    // that is NOT covered by a still-folded registered range; every violation
++    // would bump hiddenTargetMoves() (it must stay 0). The reverse control runs
++    // the old order through setLegacyUnfoldModeForTest(true) and shows a non-zero
++    // count, which is why "no crash" alone cannot be the acceptance signal.
++    quint64 unfoldCursorMoves() const { return unfoldCursorMoves_; }
++    quint64 unfoldHiddenTargetMoves() const { return unfoldHiddenTargetMoves_; }
++    quint64 unfoldSkippedHidden() const { return unfoldSkippedHidden_; }
++    quint64 unfoldFailures() const { return unfoldFailures_; }
++    quint64 cursorRestoreSkipped() const { return cursorRestoreSkipped_; }
++    const std::vector<int> &unfoldCursorTargets() const { return unfoldCursorTargets_; }
++    void setLegacyUnfoldModeForTest(bool legacy) { legacyUnfold_ = legacy; }
++
+ private:
+     int injectUnchecked(const std::vector<FoldRange> &ranges);
+     int unfoldRegistered();
+@@ -123,6 +136,10 @@ private:
+     KTextEditor::Command *unfoldCommand_ = nullptr;
+ 
+     std::vector<FoldRange> registry_;
++    // Ranges whose `unfold` was not confirmed: still registered (never cleared
++    // blindly) but allowed to be injected again, because a failed unfold may mean
++    // "the user already unfolded it" - a full rebuild must be able to restore it.
++    std::vector<FoldRange> unconfirmed_;
+     std::vector<bool> execResults_;
+     QStringList diagnostics_;
+     quint64 fullCount_ = 0;
+@@ -130,6 +147,13 @@ private:
+     quint64 rejectedCount_ = 0;
+     quint64 keyEventCount_ = 0;
+     quint64 cursorEventCount_ = 0;
++    quint64 unfoldCursorMoves_ = 0;
++    quint64 unfoldHiddenTargetMoves_ = 0;
++    quint64 unfoldSkippedHidden_ = 0;
++    quint64 unfoldFailures_ = 0;
++    quint64 cursorRestoreSkipped_ = 0;
++    std::vector<int> unfoldCursorTargets_;
++    bool legacyUnfold_ = false;
+ };
+ 
+ } // namespace vedit::folding

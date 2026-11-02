@@ -1,0 +1,36 @@
+# C9 evidence header
+collected_at: 2026-11-02T10:20:17+08:00
+collected_at_utc: 2026-11-02T02:20:17+00:00
+git_head: 9a9bb43d3c0035f0618d89b9e28082d9bd1e0a01
+---
+## Decisive experiment: NO injection. Cursor on module line, run KTextEditor tfold/fold.
+## Definitions are OUR directory XMLs, loaded through a private XDG share (delivery-like).
+
+NATIVE-PROBE share=/tmp/qt_temp-zwBJLA
+NATIVE-PROBE mode=SystemVerilog mode_set=1
+NATIVE-PROBE baseline first=0 last=61 hidden=0 scroll_max=939 at=0.000s
+NATIVE-PROBE run command=tfold line=0 returned=0
+NATIVE-PROBE after-tfold first=0 last=61 hidden=0 scroll_max=939 at=0.000s
+NATIVE-PROBE verdict tfold_changed=0
+NATIVE-PROBE run command=fold line=0 returned=0
+NATIVE-PROBE after-fold first=0 last=61 hidden=0 scroll_max=939 at=0.000s
+NATIVE-PROBE verdict fold_changed=0
+NATIVE-PROBE run command=tfold line=1 returned=0
+NATIVE-PROBE verdict non-region-tfold_changed=0
+NATIVE-PROBE done
+PROBE-EXIT=0
+NATIVE-PROBE share=/tmp/qt_temp-YsTqxS
+NATIVE-PROBE sv-definition name='SystemVerilog' author='Sean O'Boyle (seanoboyle@intelligentdv.com)' valid=1
+NATIVE-PROBE ksh-folding name='SystemVerilog' author='Sean O'Boyle (seanoboyle@intelligentdv.com)' begin=75 end=75
+NATIVE-PROBE mode=SystemVerilog mode_set=1
+NATIVE-PROBE baseline first=0 last=61 hidden=0 scroll_max=939 at=0.000s
+NATIVE-PROBE run command=tfold line=0 returned=0
+NATIVE-PROBE after-tfold first=0 last=61 hidden=0 scroll_max=939 at=0.000s
+NATIVE-PROBE verdict tfold_changed=0
+NATIVE-PROBE run command=fold line=0 returned=0
+NATIVE-PROBE after-fold first=0 last=61 hidden=0 scroll_max=939 at=0.000s
+NATIVE-PROBE verdict fold_changed=0
+NATIVE-PROBE run command=tfold line=1 returned=0
+NATIVE-PROBE verdict non-region-tfold_changed=0
+NATIVE-PROBE cpp-control mode='C++' tfold_returned=0
+NATIVE-PROBE done

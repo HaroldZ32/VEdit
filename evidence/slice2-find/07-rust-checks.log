@@ -1,0 +1,40 @@
+== Rust lane checks ==
+collected_at: 2026-11-01T05:49:11Z
+git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+cmd: cargo test -p vd-search ; cargo clippy -p vd-search -p vd-ffi --all-targets -- -D warnings ; cargo fmt -p vd-search -p vd-ffi -- --check
+--- output ---
+running 10 tests
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+running 0 tests
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+TEST-EXIT=0
+error: could not compile `vd-vcs` (lib) due to 7 previous errors
+warning: build failed, waiting for other jobs to finish...
+CLIPPY-EXIT=101
+Diff in /vedit-build/crates/vd-ffi/src/vcs.rs:263:
+ /// `info` must be null or a struct returned by `vd_vcs_info` that was not freed.
+ #[no_mangle]
+ pub unsafe extern "C" fn vd_vcs_info_free(info: *mut VdVcsInfo) {
+-    let Some(info) = (if info.is_null() { None } else { Some(&mut *info) }) else {
++    let Some(info) = (if info.is_null() {
++        None
++    } else {
++        Some(&mut *info)
++    }) else {
+         return;
+     };
+     for field in [&mut info.branch, &mut info.revision, &mut info.note] {
+Diff in /vedit-build/crates/vd-ffi/src/vcs.rs:307:
+ /// `diff` must be null or a struct returned by `vd_vcs_diff` that was not freed.
+ #[no_mangle]
+ pub unsafe extern "C" fn vd_vcs_diff_free(diff: *mut VdVcsDiff) {
+-    let Some(diff) = (if diff.is_null() { None } else { Some(&mut *diff) }) else {
++    let Some(diff) = (if diff.is_null() {
++        None
++    } else {
++        Some(&mut *diff)
++    }) else {
+         return;
+     };
+     for field in [&mut diff.path, &mut diff.text, &mut diff.note] {
+FMT-EXIT=1

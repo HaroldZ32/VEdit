@@ -1,0 +1,36 @@
+# C9 backfill (T112/N2): header added after the fact; the body below is unchanged.
+# original_collected_at_utc: 2026-11-01T08:32:59Z   (from the archived file mtime)
+# original_git_head: 55a874da076d605c6b620e0bb20f9ac5932d5f46
+# original_git_status_porcelain_sha256: 00b8d8a0956773d9246d1650a785ddf13c1b167806b44d77d7c9cb9003652e9b (hash of the porcelain block archived in final-55a874d/00-C9.txt)
+# session_anchor: final-55a874d/00-C9.txt
+# backfill_collected_at_utc: 2026-11-01T09:23:35Z
+# backfill_git_head: 0c8ea9fe4ae18c386a59a55b8868f837f4f80a84
+# backfill_git_status_porcelain_sha256: a7feab0230532310375511329de129cad97d49e690c7a9c7336394a1cce151fa (current tree at backfill time)
+== AppDir delivery invariants ==
+OK   bin/vd-app
+OK   plugins/platforms/libqxcb.so
+OK   plugins/platforms/libqoffscreen.so
+OK   plugins/kf6/parts/katepart.so
+OK   bin/verible-verilog-ls
+OK   bin/slang
+OK   usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml
+== FFI linkage (static into vd-app) ==
+   0x0000000000000001 (NEEDED)             Shared library: [libKF6TextEditor.so.6]
+   0x0000000000000001 (NEEDED)             Shared library: [libKF6Parts.so.6]
+   0x0000000000000001 (NEEDED)             Shared library: [libQt6Widgets.so.6]
+   0x0000000000000001 (NEEDED)             Shared library: [libtree-sitter.so.0.25]
+   0x0000000000000001 (NEEDED)             Shared library: [libKF6SyntaxHighlighting.so.6]
+   0x0000000000000001 (NEEDED)             Shared library: [libQt6Gui.so.6]
+   0x0000000000000001 (NEEDED)             Shared library: [libQt6Core.so.6]
+   0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+   0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+   0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+   0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+   0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]
+  libvd_ffi.so NEEDED entries: 0
+  vd_* symbols in vd-app: 44
+== toolchain sha256 ==
+  07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845  /home/haroldzhao/MyProj/DshProj/VEdit/target/wt-55a874d/packaging/runtime/out/AppDir/bin/verible-verilog-ls
+  63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  /home/haroldzhao/MyProj/DshProj/VEdit/target/wt-55a874d/packaging/runtime/out/AppDir/bin/slang
+== AppRun VEDIT_SYNTAX_DIR ==
+33:export VEDIT_SYNTAX_DIR="$APPDIR/usr/share/org.kde.syntax-highlighting"

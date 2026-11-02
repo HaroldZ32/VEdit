@@ -1,0 +1,10 @@
+# Xvfb + xcb screenshot of the product binary with the syntax stack linked (L2, declared limitation)
+# The shell still uses the demo QPlainTextEdit (G1/edit-core): this screenshot proves the
+# app RUNS with the stack linked and the startup hook executed; it does NOT show syntax colours.
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='/vedit-build/resources' definitions=451 own-xml=[vedit-systemverilog.xml,vedit-verilog.xml] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+SCREENSHOT OK /vedit-build/evidence/highlight-v2/screenshots/10-horizontal-split.png
+SCREENSHOT OK /vedit-build/evidence/highlight-v2/screenshots/11-vertical-split.png
+SCREENSHOT OK /vedit-build/evidence/highlight-v2/screenshots/12-panels-and-docks.png
+SCREENSHOT OK /vedit-build/evidence/highlight-v2/screenshots/13-empty-state-no-project.png
+APP-SHELL-SCREENSHOTS ok=1 dir=/vedit-build/evidence/highlight-v2/screenshots
+APP-EXIT=0

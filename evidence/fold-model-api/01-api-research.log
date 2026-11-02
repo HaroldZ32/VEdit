@@ -1,0 +1,58 @@
+# C9 evidence header
+collected_at: 2026-11-02T10:17:13+08:00
+collected_at_utc: 2026-11-02T02:17:13+00:00
+git_head: 9a9bb43d3c0035f0618d89b9e28082d9bd1e0a01
+---
+## Q1/Q2/Q3/Q4: is there a public KTextEditor folding MODEL (setFoldingRanges) in pinned KF6 6.24?
+
+=== Q1: Document::foldingModel() / any foldingModel in public headers ===
+GREP-EXIT=1
+
+=== Q2: setFoldingRanges / addFoldingRegion / removeFoldingRegion in public headers ===
+GREP-EXIT=1
+
+=== Q3: FoldingRange struct / foldingregion headers in KTextEditor (installed files) ===
+(none above means no public folding type headers)
+
+=== public header list (no folding model/range header exists) ===
+abstractannotationitemdelegate.h annotationinterface.h application.h attribute.h codecompletionmodel.h codecompletionmodelcontrollerinterface.h command.h configpage.h cursor.h document.h documentcursor.h editor.h inlinenote.h inlinenoteprovider.h linerange.h mainwindow.h message.h movingcursor.h movingrange.h movingrangefeedback.h plugin.h range.h sessionconfiginterface.h texthintinterface.h view.h 
+
+=== Q4: what IS public about folding: View folding-bar config + commands only ===
+160: *       \li folding-bar
+164: *       \li folding-preview
+202: *       \li folding-marker-color
+
+=== KF6TextEditor pinned version ===
+set(PACKAGE_VERSION "6.24.0")
+  if ((PACKAGE_FIND_VERSION_RANGE_MIN STREQUAL "INCLUDE" AND PACKAGE_VERSION VERSION_LESS PACKAGE_FIND_VERSION_MIN)
+libkf6texteditor-bin 6.24.0-0ubuntu1
+libkf6texteditor-data 6.24.0-0ubuntu1
+libkf6texteditor-dev 6.24.0-0ubuntu1
+
+=== KTextEditor public library: folding-related exported symbols (all internal/private namespaces) ===
+0000000000153640 T _ZN10KateBuffer15computeFoldingsEi
+0000000000153db0 T _ZN10KateBuffer23isFoldingStartingOnLineEi
+0000000000153910 T _ZN10KateBuffer25findMatchingFoldingMarkerEN11KTextEditor6CursorEN19KSyntaxHighlighting13FoldingRegionEi
+00000000001540d0 T _ZN10KateBuffer31computeFoldingRangeForStartLineEi
+00000000001f07f0 T _ZN11KTextEditor11ViewPrivate10unfoldLineEi
+00000000001f06f0 T _ZN11KTextEditor11ViewPrivate16foldingMarkersOnEv
+0000000000214950 T _ZN11KTextEditor11ViewPrivate16saveFoldingStateEv
+00000000002149c0 T _ZN11KTextEditor11ViewPrivate17applyFoldingStateEv
+0000000000211970 T _ZN11KTextEditor11ViewPrivate17clearFoldingStateEv
+00000000001f8800 T _ZN11KTextEditor11ViewPrivate17slotToggleFoldingEv
+00000000001f0fe0 T _ZN11KTextEditor11ViewPrivate19setFoldingMarkersOnEb
+00000000001f8880 T _ZN11KTextEditor11ViewPrivate19toggleFoldingOfLineEi
+symbol-count=50
+
+=== FoldingRange in KSyntaxHighlighting (highlighting input, not an editor fold model) ===
+17: * \class KSyntaxHighlighting::FoldingRegion
+18: * \inheaderfile KSyntaxHighlighting/FoldingRegion
+24:class KSYNTAXHIGHLIGHTING_EXPORT FoldingRegion
+28:     * Defines whether a FoldingRegion starts or ends a folding region.
+34:    enum Type {
+41:     * Constructs an invalid folding region, meaning that isValid() returns \c false.
+44:    FoldingRegion();
+46:    /*! Compares two FoldingRegion instances for equality. */
+47:    bool operator==(const FoldingRegion &other) const;
+51:     * A valid FoldingRegion is defined by a type() other than Type::None.
+53:     * \note The FoldingRegion%s passed in AbstractHighlighter::applyFolding()

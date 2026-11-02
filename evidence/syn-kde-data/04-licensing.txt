@@ -1,0 +1,34 @@
+== date / image ==
+date: 2026-10-31T03:59:37Z
+image: vedit-qt6-build:local
+qmake6: 6.10.2
+kf6-syntaxhighlighting: %s.6.24.0-0ubuntu1
+
+== our data files (name, language, sha256, license header) ==
+file: vedit-systemverilog.xml
+  sha256: dc6e0a4714762764b9386471bb09e2550c1a9cbcf2b8f67f1a1200f677726f9d
+  language: <language name="SystemVerilog"
+  license: license="LGPL-2.1-or-later"
+  folds: 14 beginRegion rules
+file: vedit-verilog.xml
+  sha256: 3d1ec41f0871c001f560ca58b3178bdfd7508ff5f25d095c15820d2feda43e49
+  language: <language name="Verilog"
+  license: license="LGPL-2.1-or-later"
+  folds: 9 beginRegion rules
+
+== forbidden KDE definitions (must never appear; sha256 comparison) ==
+forbidden systemverilog.xml sha256: 3361d8b4ef62c4868165ef045c02d8b6e85a1e57f61c304b399661bdc06be015
+forbidden verilog.xml      sha256: 7199e3677b0a942e65b40f95cb2481be062b1ca48eb048519e7d4efc098f5970
+hits in resources/syntax: 0
+filenames named verilog.xml/systemverilog.xml: 0
+LGPL text present: yes
+
+== data contract (matches packaging/runtime/assemble-appdir.sh --syntax) ==
+repo:    resources/syntax/*.xml
+shipped: AppDir/share/ksyntaxhighlighting/syntax/*.xml
+loader:  Repository::addCustomSearchPath(VEDIT_SYNTAX_DIR)   (VEDIT_SYNTAX_DIR=AppDir/share/ksyntaxhighlighting)
+
+NOTE (T62, 2026-10-31): the sha256 values above are the pre-T45 capture (T33);
+historical values, left unchanged. Current source values: THIRD_PARTY_NOTICES.md
+§9.1 (verilog c6adc763… 85/5,111; systemverilog 2abba334… 90/5,492);
+recomputation in evidence/licensing-hash-sync/.

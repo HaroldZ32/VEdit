@@ -1,0 +1,45 @@
+generated: 2026-10-31T11:52:57Z
+git_head: 95c496e682e3841add1a081edd78d29c34957aac
+build_window: 2026-10-31 19:51:37 -> 19:52:17 (+0800)
+
+## GATE RESULTS (real, quoted)
+TYPECHECK-EXIT=0   [typecheck] PASS (pinned image vedit-build:local)
+BUILD-QT-EXIT=8
+
+## ctest
+94% tests passed, 1 tests failed out of 16
+ 1/16 Test  #1: vedit-app-syntax-startup .......................   Passed    0.27 sec
+ 2/16 Test  #2: vedit-m0-smoke .................................   Passed    0.06 sec
+ 3/16 Test  #3: vedit-syntax-provider-tests ....................   Passed    0.00 sec
+ 4/16 Test  #4: vedit-syntax-kde-data ..........................   Passed    0.03 sec
+ 5/16 Test  #5: vedit-syn-grammars-tests .......................   Passed    0.17 sec
+ 6/16 Test  #6: vedit-syntax-product-tests .....................   Passed    0.06 sec
+ 7/16 Test  #7: vedit-terminal-selftest ........................   Passed    2.09 sec
+ 8/16 Test  #8: vedit-app-ffi-abi-selftest .....................   Passed    0.19 sec
+ 9/16 Test  #9: vedit-app-shell-selftest .......................   Passed    0.28 sec
+10/16 Test #10: vedit-edit-core-selftest .......................   Passed    0.08 sec
+11/16 Test #11: vedit-workspace-palette-selftest ...............   Passed    0.09 sec
+12/16 Test #12: vedit-workspace-palette-integration-selftest ...   Passed    0.10 sec
+13/16 Test #13: vedit-workspace-search-selftest ................***Failed   11.85 sec
+14/16 Test #14: vedit-workspace-project-selftest ...............   Passed    0.05 sec
+15/16 Test #15: vedit-workspace-diagnostics-selftest ...........   Passed    0.00 sec
+16/16 Test #16: vedit-diagnostics-ffi-selftest .................   Passed    3.12 sec
+
+## the one failure
+13 - vedit-workspace-search-selftest (Failed)
+WORKSPACE-SEARCH-SELFTEST ok=0 checks=102 failures=7 skipped=2
+CHECK jump.product.first-current-file FAIL
+CHECK jump.product.first-loads-bytes FAIL
+CHECK jump.product.first-cursor-line FAIL
+CHECK jump.product.first-cursor-column FAIL
+CHECK jump.product.first-status FAIL
+CHECK jump.product.second-current-file FAIL
+CHECK jump.product.second-cursor-line FAIL
+
+## root cause: the lane was being written DURING the build
+mtime of src/workspace/search/search_selftest.cpp = 2026-10-31 19:52:24 +0800  -> INSIDE/after the build window (build ended 19:52:17)
+other search-lane writes: global_search.h/cpp 19:41, search_jump_target.* 18:51-18:52, search_types/panel/integration 18:53-18:54
+
+## conclusion (honest)
+RED caused by an IN-FLIGHT lane (T69 search), not by a defect introduced by this checkpoint.
+Per captain's instruction: stop, report, do NOT force a green. NOT pushed, NOT committed.

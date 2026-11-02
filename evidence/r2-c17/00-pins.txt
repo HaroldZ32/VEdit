@@ -1,0 +1,74 @@
+== 00 environment ==
+date: 2026-10-31T02:54:33Z
+image: vprobe-qt6kf6:1
+cmake: cmake version 4.2.3
+compiler: c++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+qt: 6.10.2
+image tag: vprobe-qt6kf6:1 (image id captured host-side, see 00-image-id.txt)
+KF6TextEditor version: set(PACKAGE_VERSION "6.24.0")
+kf6 packages:
+  libkf6syntaxhighlighting-data 6.24.0-0ubuntu1
+  libkf6syntaxhighlighting-dev:amd64 6.24.0-0ubuntu1
+  libkf6syntaxhighlighting6:amd64 6.24.0-0ubuntu1
+  libkf6texteditor-bin 6.24.0-0ubuntu1
+  libkf6texteditor-data 6.24.0-0ubuntu1
+  libkf6texteditor-dev 6.24.0-0ubuntu1
+  libkf6texteditor-katepart 6.24.0-0ubuntu1
+  libkf6texteditor6:amd64 6.24.0-0ubuntu1
+katepart plugin: /usr/lib/x86_64-linux-gnu/qt6/plugins/kf6/parts/katepart.so
+installed KTextEditor public headers: 25 files
+installed folding-related public API symbols (grep -c fold):
+  /usr/include/KF6/KTextEditor/ktexteditor/view.h
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h
+  total header files mentioning folding: 2
+host-side range/attribute API (installed header evidence):
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h:46: * auto* movingRange = aDocument->newMovingRange(range);
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h:124: * auto range = doc->newMovingRange(KTextEditor::Range(3, 5, 3, 14));
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h:299:    virtual const Attribute::Ptr &attribute() const = 0;
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h:309:    virtual void setAttribute(Attribute::Ptr attribute) = 0;
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h:324:    virtual void setAttributeOnlyForViews(bool onlyForViews) = 0;
+  /usr/include/KF6/KTextEditor/ktexteditor/movingrange.h:359:    virtual qreal zDepth() const = 0;
+  /usr/include/KF6/KTextEditor/ktexteditor/document.h:202: * Use newMovingCursor() to create a new moving cursor and newMovingRange() to create
+  /usr/include/KF6/KTextEditor/ktexteditor/document.h:1489:    virtual MovingRange *newMovingRange(Range range,
+definition/theme embedding statement (installed Repository header):
+  65: * All highlighting Definition and Theme files are compiled into the shared
+external verilog.xml definitions in /usr/share: 0
+
+== 00b 阴性 API 查证（append-only，T58/F3 补录；上方原始运行输出未改动） ==
+执行环境:
+  image: vprobe-qt6kf6:1
+  image digest: sha256:93452d6c64f32b2b60e6a99032d74172df506eb209624399a6718c2cd3a01c9a
+    (docker image inspect 原文见 00-image-id.txt)
+  查证时间(UTC): 2026-10-31T03:08:27Z
+  容器: docker run --rm vprobe-qt6kf6:1 bash -lc '...'（默认镜像配置，未挂载工作区）
+  查证目录: /usr/include/KF6/KTextEditor/（ktexteditor/ 下 25 个公共头文件）
+  grep: GNU grep 3.12
+
+命令与输出（空输出 = 无匹配，退出码 1；正对照 exit=0）:
+$ grep -rn 'movingRanges' /usr/include/KF6/KTextEditor/
+[exit=1]（无输出）
+
+$ grep -rn 'attributesAt' /usr/include/KF6/KTextEditor/
+[exit=1]（无输出）
+
+$ grep -rnE 'movingRanges|attributesAt' /usr/include/KF6/KTextEditor/
+[exit=1]（无输出）
+
+$ grep -rni 'semantic' /usr/include/KF6/KTextEditor/
+[exit=1]（无输出：公共头文件没有 semantic highlighting 接口）
+
+$ grep -rnE 'class [A-Za-z_:]*Fold|FoldingModel|CodeFoldingModel' /usr/include/KF6/KTextEditor/
+[exit=1]（无输出：公共头文件没有折叠类/接口；view.h 中只有 folding-bar 等配置键文档）
+
+正对照（证明同一查证方式确实能找到已存在的 API）:
+$ grep -rn 'virtual MovingRange \*newMovingRange' /usr/include/KF6/KTextEditor/ktexteditor/document.h
+1489:    virtual MovingRange *newMovingRange(Range range,
+[exit=0]
+
+结论（对应 结论.md §4 / §2.3 / §5）:
+  1. 公共头文件没有文档级 range 枚举（movingRanges）与逐点属性查询（attributesAt）
+     → C16/A1g 的“单一 owner”仲裁必须在应用侧实现（§4）。
+  2. 公共头文件没有 semantic highlighting 接口（semantic 零命中）
+     → 语义着色必须应用侧实现（§2.3/§5）。
+  3. 公共头文件没有折叠类/接口（Fold 零命中，仅配置键文档）
+     → 外部只能通过 Editor 命令接口注入折叠（见 evidence/r2-fold/decision.md）。

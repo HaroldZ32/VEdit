@@ -1,0 +1,14 @@
+image="Ubuntu 24.04.5 LTS"
+uname_r=7.0.0-38-generic
+glibc=ldd (Ubuntu GLIBC 2.39-0ubuntu8.9) 2.39
+== selfcheck ==
+selfcheck_exit=0
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='/tmp/squashfs-root/usr/share/org.kde.syntax-highlighting' definitions=3 own-xml=[vedit-systemverilog.xml,vedit-verilog.xml] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+TOOLCHAIN source=verible:bundled slang:bundled missing=[] local=[]
+APP-SHELL-SELFTEST ok=1 checks=194 failures=0 state=/tmp/vedit-app-YAvoNj/state
+highlight_lines=3
+== startup ==
+startup_exit=0
+== lint ==
+lint_exit=1
+/fixtures/bad_line_length.sv:3:101-108: Line length exceeds max: 100; is: 108 [Style: line-length] [line-length]

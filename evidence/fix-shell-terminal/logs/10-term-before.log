@@ -1,0 +1,124 @@
+CHECK vt.print PASS
+CHECK vt.cursor.after-print PASS
+CHECK vt.newline PASS
+CHECK vt.carriage-return PASS
+CHECK vt.backspace PASS
+CHECK vt.tab-stops PASS
+CHECK vt.utf8 PASS
+CHECK vt.wrap PASS
+CHECK vt.csi.cup PASS
+CHECK vt.csi.erase-to-end PASS
+CHECK vt.csi.delete-chars PASS
+CHECK vt.csi.insert-chars PASS
+CHECK vt.csi.erase-display PASS
+CHECK vt.csi.insert-lines PASS
+CHECK vt.csi.insert-lines.shift PASS
+CHECK vt.csi.dsr PASS
+CHECK vt.sgr.bold PASS
+CHECK vt.sgr.red PASS
+CHECK vt.sgr.reset PASS
+CHECK vt.sgr.rgb PASS
+CHECK vt.sgr.256 PASS
+CHECK vt.mode.app-cursor-keys PASS
+CHECK vt.mode.app-cursor-keys-off PASS
+CHECK vt.mode.bracketed-paste PASS
+CHECK vt.mode.cursor-hidden PASS
+CHECK vt.alt-screen PASS
+CHECK vt.osc.title PASS
+CHECK vt.scrollback.grew PASS
+CHECK vt.scrollback.last-line PASS
+CHECK vt.scrollback.keeps-row-count PASS
+CHECK vt.scrollback.offset PASS
+CHECK vt.scrollback.back-to-live PASS
+CHECK vt.scrollback.limit PASS
+CHECK vt.reply.cursor-position PASS
+CHECK vt.reply.device-attributes PASS
+CHECK vt.selection.text PASS
+CHECK vt.selection.reversed PASS
+CHECK vt.resize.columns PASS
+CHECK vt.resize.rows PASS
+CHECK vt.resize.keeps-text PASS
+CHECK pty.start PASS
+CHECK pty.start.error-empty PASS
+CHECK pty.pid PASS
+CHECK pty.finished PASS
+CHECK pty.output PASS
+CHECK pty.exit-code PASS
+CHECK pty.exit-known PASS
+CHECK pty.exit-description PASS
+CHECK pty.exit-description-visible PASS
+CHECK pty.signal.start PASS
+CHECK pty.signal.termination-signal PASS
+CHECK pty.signal.exit-code-128 PASS
+CHECK pty.signal.description PASS
+CHECK pty.interactive.start PASS
+CHECK pty.interactive.output PASS
+CHECK pty.interactive.exit PASS
+CHECK pty.resize.start PASS
+CHECK pty.resize.tty-size PASS
+CHECK pty.bad-shell.refused PASS
+CHECK pty.bad-shell.error PASS
+CHECK pty.bad-shell.not-running PASS
+CHECK pty.master-fd.start PASS
+CHECK pty.master-fd.readable PASS /proc/75/fd
+CHECK pty.master-fd.not-inherited FAIL 4->/dev/pts/ptmx
+CHECK pty.master-fd.descendant-start PASS
+CHECK pty.master-fd.descendant-listed PASS total 0  lr-x------ 1 root root 64 Oct 31 11:39 0 -> /dev/null  lrwx------ 1 root root 64 Oct 31 11:39 1 -> /dev/pts/0  lrwx------ 1 root root 64 Oct 31 11:39 2 -> /dev/pts/0  lrwx------ 1 root root 64 Oct 31 11:39 4 -> /dev/pts/ptmx  
+CHECK pty.master-fd.descendant-not-inherited FAIL total 0  lr-x------ 1 root root 64 Oct 31 11:39 0 -> /dev/null  lrwx------ 1 root root 64 Oct 31 11:39 1 -> /dev/pts/0  lrwx------ 1 root root 64 Oct 31 11:39 2 -> /dev/pts/0  lrwx------ 1 root root 64 Oct 31 11:39 4 -> /dev/pts/ptmx  
+CHECK pty.read-limit.start PASS
+CHECK pty.read-limit.finished PASS
+CHECK pty.read-limit.delivered PASS delivered=4194304 produced=4194304
+CHECK pty.read-limit.max-per-activation FAIL max=163840 limit=65536
+CHECK pty.read-limit.cap-engaged FAIL capped=0
+CHECK panel.auto-start PASS
+CHECK panel.pid PASS
+CHECK panel.shell-path PASS
+CHECK panel.state-running PASS
+CHECK panel.state-has-pid PASS
+CHECK panel.banner-hidden PASS
+CHECK panel.output-reaches-screen PASS
+CHECK panel.renders PASS
+CHECK panel.renders.two-colors PASS
+CHECK panel.exit.start PASS
+CHECK panel.exit.finished PASS
+CHECK panel.exit.state-code PASS
+CHECK panel.exit.banner-visible PASS
+CHECK panel.exit.banner-hint PASS
+CHECK panel.exit.output-kept PASS
+CHECK panel.restart.start PASS
+CHECK panel.restart.running PASS
+CHECK panel.restart.new-pid PASS
+CHECK panel.restart.banner-cleared PASS
+CHECK panel.restart.state-running PASS
+CHECK panel.restart.screen-cleared PASS
+CHECK panel.enter-restarts PASS
+This plugin does not support propagateSizeHints()
+CHECK panel.dock.content PASS
+CHECK panel.dock.visible PASS
+CHECK panel.dock.area PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support raise()
+This plugin does not support propagateSizeHints()
+CHECK panel.dock.float PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK panel.dock.closed PASS
+This plugin does not support propagateSizeHints()
+CHECK panel.dock.reopened PASS
+CHECK panel.dock.pty-size-follows-widget PASS
+This plugin does not support propagateSizeHints()
+CHECK panel.close-button.exists PASS
+This plugin does not support propagateSizeHints()
+CHECK panel.close-button.signal PASS
+CHECK panel.close-button.hides-dock PASS
+CHECK panel.restart-button.exists PASS
+CHECK panel.restart-button.new-pid PASS
+CHECK panel.restart-button.running PASS
+CHECK panel.factory.widget PASS
+CHECK panel.factory.type PASS
+CHECK panel.factory.starts-shell PASS
+CHECK panel.factory.function PASS
+This plugin does not support propagateSizeHints()
+CHECK widget.key-events-to-pty PASS
+This plugin does not support propagateSizeHints()
+TERMINAL-SELFTEST ok=0 checks=112 failures=4

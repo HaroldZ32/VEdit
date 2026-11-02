@@ -1,0 +1,737 @@
+collected_at: 2026-11-01T18:59:16+08:00
+git_head: 60c7ae9c95fe769e2bd6c86dd4c56e1514603e44
+git_branch: feat/qt6-ktexteditor-migration
+git_status:
+   M AGENT.md
+   M THIRD_PARTY_NOTICES.md
+   M build/evidence/typecheck/00-run.txt
+   M build/evidence/typecheck/10-typecheck-image-build.log
+   M build/evidence/typecheck/11-typecheck-image-id.txt
+   M crates/vd-config/src/project.rs
+   M crates/vd-config/src/warnings.rs
+   M crates/vd-ffi/include/vd_ffi.h
+   M crates/vd-ffi/src/lsp.rs
+   M crates/vd-ffi/src/project.rs
+   M crates/vd-lsp/src/client.rs
+   M crates/vd-lsp/src/documents.rs
+   M crates/vd-lsp/src/session.rs
+   M evidence/ffi-abi/logs/10-rust-image.txt
+   M evidence/ffi-abi/logs/19-rust-stage-console.log
+   M evidence/ffi-abi/logs/20-cargo-build-release.log
+   M evidence/ffi-abi/logs/21-staticlib.txt
+   M evidence/ffi-abi/logs/22-rust-targets.txt
+   M evidence/ffi-abi/logs/23-cargo-test.log
+   M evidence/ffi-abi/logs/26-vd_ffi.h
+   M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+   M evidence/m0-build/build-logs/20-qt6-image-build.log
+   M evidence/m0-build/build-logs/21-qt6-image-id.txt
+   M evidence/m0-build/build-logs/31-qt6-configure.log
+   M evidence/m0-build/build-logs/32-qt6-build.log
+   M evidence/m0-build/build-logs/33-qt6-ctest.log
+   M evidence/m0-build/build-logs/34-qt6-elf.txt
+   M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+   M packaging/runtime/AppRun
+   M packaging/runtime/assemble-appdir.sh
+   M packaging/runtime/selfcheck.sh
+   M scripts/versions.env
+   M src/app/CMakeLists.txt
+   M src/app/app_shell.cpp
+   M src/app/editor_area.cpp
+   M src/app/main.cpp
+   M src/editor/CMakeLists.txt
+   M src/editor/kernel/document_io.cpp
+   M src/editor/kernel/document_io.h
+   M src/editor/kernel/edit_core_selftest_main.cpp
+   M src/editor/kernel/fold_breadcrumb.cpp
+   M src/editor/kernel/fold_breadcrumb.h
+   M src/editor/kernel/ktexteditor_provider.cpp
+   M src/syntax/folding/CMakeLists.txt
+   M src/syntax/product/syntax_product.cpp
+   M src/workspace/diagnostics/CMakeLists.txt
+   M src/workspace/diagnostics/diagnostics_controller.cpp
+   M src/workspace/diagnostics/diagnostics_controller.h
+   M src/workspace/diagnostics/diagnostics_integration.cpp
+   M src/workspace/diagnostics/diagnostics_panel.cpp
+   M src/workspace/diagnostics/diagnostics_panel.h
+   M src/workspace/diagnostics/diagnostics_selftest.cpp
+   M src/workspace/diagnostics/ffi_backends.cpp
+   M src/workspace/diagnostics/lsp_backend.h
+   M src/workspace/filetree/filetree_integration.cpp
+   M src/workspace/palette/README.md
+   M src/workspace/palette/palette_integration.cpp
+   M src/workspace/search/CMakeLists.txt
+   M src/workspace/search/README.md
+   M src/workspace/search/global_search.cpp
+   M src/workspace/search/global_search.h
+   M src/workspace/search/search_integration.cpp
+   M src/workspace/settings/settings_integration.cpp
+   M src/workspace/vcs/vcs_integration.cpp
+  ?? crates/vd-lsp/tests/buffer_change.rs
+  ?? evidence/crash-segv/
+  ?? evidence/fonts-cjk/
+  ?? evidence/large-file/
+  ?? evidence/locale-and-noise/
+  ?? evidence/rules-search-ux/
+  ?? packaging/runtime/assets/fonts/
+  ?? packaging/runtime/assets/licenses/
+  ?? src/app/crash_report_check.sh
+  ?? src/app/crash_reporter.cpp
+  ?? src/app/crash_reporter.h
+  ?? src/app/crash_reporter_selftest.cpp
+  ?? src/editor/kernel/large_file.cpp
+  ?? src/editor/kernel/large_file.h
+  ?? src/editor/kernel/large_file_bench.cpp
+  ?? src/editor/kernel/large_file_bench.h
+  ?? src/syntax/folding/tests/fold_interaction_tests.cpp
+
+command (host): bash build/gates/typecheck.sh
+
+[typecheck] C++/Qt6 lane: configure + build with warnings-as-errors (pinned image)
+[qt6-cxx] pinned image + cmake configure/build--no-test: bash scripts/build-qt.sh --no-test
+[rust-ffi] pinned Rust image: vedit-build:local (toolchain 1.99.0)
+[rust-ffi] reusing the existing image vedit-build:local
+image_id=sha256:fd7caa1b92ebdb294cbaa73e036fbe5c092cdd879bc983199144531e0a9ebc3e
+[rust-ffi] build + unit tests + dependency-tree + header checks in vedit-build:local
+== cargo build -p vd-ffi --release (verbose: the target list is in the log) ==
+       Fresh unicode-ident v1.0.27
+       Fresh stable_deref_trait v1.2.1
+       Fresh litemap v0.8.3
+       Fresh writeable v0.6.4
+       Fresh utf_types v1.0.0
+       Fresh proc-macro2 v1.0.107
+       Fresh utf8_iter v1.1.0
+       Fresh find-msvc-tools v0.1.15
+       Fresh shlex v2.0.1
+       Fresh pin-project-lite v0.2.17
+       Fresh quote v1.0.47
+       Fresh cc v1.10.0
+       Fresh serde_core v1.0.229
+       Fresh icu_properties_data v2.4.0
+       Fresh utf8parse v0.2.2
+       Fresh bytes v1.12.1
+       Fresh smallvec v1.16.4
+       Fresh percent-encoding v2.3.2
+       Fresh anstyle v1.0.14
+       Fresh syn v3.0.9
+       Fresh icu_normalizer_data v2.4.0
+       Fresh syn v2.0.119
+       Fresh anstyle-parse v1.0.0
+       Fresh futures-sink v0.3.34
+       Fresh anstyle-query v1.1.5
+       Fresh is_terminal_polyfill v1.70.2
+       Fresh futures-core v0.3.34
+       Fresh zeroize v1.9.1
+       Fresh colorchoice v1.0.5
+       Fresh synstructure v0.14.0
+       Fresh zerovec-derive v0.11.7
+       Fresh displaydoc v0.2.7
+       Fresh serde_derive v1.0.229
+       Fresh libc v0.2.191
+       Fresh anstream v1.0.0
+       Fresh rustls-pki-types v1.15.1
+       Fresh getrandom v0.2.17
+       Fresh untrusted v0.9.0
+       Fresh zerofrom-derive v0.1.8
+       Fresh yoke-derive v0.8.4
+       Fresh futures-io v0.3.34
+       Fresh clap_lex v1.1.1
+       Fresh bitflags v2.13.2
+       Fresh linux-raw-sys v0.12.1
+       Fresh strsim v0.11.1
+       Fresh cfg-if v1.0.5
+       Fresh anyhow v1.0.104
+       Fresh zmij v1.0.23
+       Fresh ring v0.17.14
+       Fresh zerofrom v0.1.8
+       Fresh rustix v1.1.6
+       Fresh clap_builder v4.6.7
+       Fresh futures-channel v0.3.34
+       Fresh futures-macro v0.3.34
+       Fresh errno v0.3.14
+       Fresh form_urlencoded v1.2.2
+       Fresh toml_datetime v0.7.5+spec-1.1.0
+       Fresh once_cell v1.21.4
+       Fresh equivalent v1.0.3
+       Fresh yoke v0.8.4
+       Fresh memchr v2.8.3
+       Fresh itoa v1.0.18
+       Fresh winnow v0.7.15
+       Fresh hashbrown v0.17.1
+       Fresh winnow v1.0.4
+       Fresh slab v0.4.12
+       Fresh futures-task v0.3.34
+       Fresh serde v1.0.229
+       Fresh clap v4.6.7
+       Fresh signal-hook-registry v1.4.8
+       Fresh httparse v1.10.1
+       Fresh zerovec v0.11.9
+       Fresh zerotrie v0.2.5
+       Fresh toml_parser v1.1.5+spec-1.1.0
+       Fresh serde_json v1.0.154
+       Fresh indexmap v2.14.2
+       Fresh futures-util v0.3.34
+       Fresh toml v0.9.12+spec-1.1.0
+       Fresh rustls-webpki v0.103.16
+       Fresh serde_repr v0.1.21
+       Fresh thiserror-impl v2.0.21
+       Fresh tracing-attributes v0.1.31
+       Fresh tokio-macros v2.7.2
+       Fresh tinystr v0.8.5
+       Fresh potential_utf v0.1.6
+       Fresh mio v1.2.4
+       Fresh http v1.5.0
+       Fresh toml_datetime v1.1.2+spec-1.1.0
+       Fresh serde_spanned v1.1.2
+       Fresh tracing-core v0.1.36
+       Fresh log v0.4.34
+       Fresh bitflags v1.3.2
+       Fresh subtle v2.6.1
+       Fresh heck v0.5.0
+       Fresh toml_writer v1.1.3+spec-1.1.0
+       Fresh base64 v0.23.1
+       Fresh futures v0.3.34
+       Fresh thiserror v2.0.21
+       Fresh icu_locale_core v2.4.0
+       Fresh icu_collections v2.4.0
+       Fresh rustls v0.23.46
+       Fresh tokio v1.54.1
+       Fresh getrandom v0.4.3
+       Fresh tracing v0.1.44
+       Fresh toml v1.1.8+spec-1.1.0
+       Fresh cbindgen v0.29.4
+       Fresh ureq-proto v0.6.5
+       Fresh waitpid-any v0.3.0
+       Fresh webpki-roots v1.0.11
+       Fresh fastrand v2.5.0
+       Fresh tower-service v0.3.3
+       Fresh tower-layer v0.3.3
+       Fresh utf8-zero v0.8.1
+       Fresh vd-search v0.1.1 (/vedit-build/crates/vd-search)
+       Fresh icu_provider v2.4.0
+       Fresh tokio-util v0.7.20
+       Fresh tempfile v3.27.0
+       Fresh ureq v3.5.0
+       Fresh vd-settings v0.1.1 (/vedit-build/crates/vd-settings)
+       Fresh vd-config v0.1.1 (/vedit-build/crates/vd-config)
+       Fresh vd-vcs v0.1.1 (/vedit-build/crates/vd-vcs)
+       Fresh icu_properties v2.4.0
+       Fresh icu_normalizer v2.4.0
+       Fresh vd-deeplint v0.1.1 (/vedit-build/crates/vd-deeplint)
+       Fresh vd-fim v0.1.1 (/vedit-build/crates/vd-fim)
+       Fresh idna_adapter v1.2.2
+       Fresh idna v1.1.0
+       Fresh url v2.5.8
+       Fresh lsp-types v0.95.1
+       Fresh async-lsp v0.2.4
+       Fresh vd-lsp v0.1.1 (/vedit-build/crates/vd-lsp)
+       Fresh vd-ffi v0.1.1 (/vedit-build/crates/vd-ffi)
+    Finished `release` profile [optimized] target(s) in 0.23s
+-rw-r--r-- 2 root root 61262434 Nov  1 10:56 target/release/libvd_ffi.a
+== compiled Rust targets (rustc --crate-name lines, or Fresh lines when cached) ==
+anstream
+anstyle
+anstyle-parse
+anstyle-query
+anyhow
+async-lsp
+base64
+bitflags
+bytes
+cbindgen
+cc
+cfg-if
+clap
+clap_builder
+clap_lex
+colorchoice
+displaydoc
+equivalent
+errno
+fastrand
+find-msvc-tools
+form_urlencoded
+futures
+futures-channel
+futures-core
+futures-io
+futures-macro
+futures-sink
+futures-task
+futures-util
+getrandom
+hashbrown
+heck
+http
+httparse
+icu_collections
+icu_locale_core
+icu_normalizer
+icu_normalizer_data
+icu_properties
+icu_properties_data
+icu_provider
+idna
+idna_adapter
+indexmap
+is_terminal_polyfill
+itoa
+libc
+linux-raw-sys
+litemap
+log
+lsp-types
+memchr
+mio
+once_cell
+percent-encoding
+pin-project-lite
+potential_utf
+proc-macro2
+quote
+ring
+rustix
+rustls
+rustls-pki-types
+rustls-webpki
+serde
+serde_core
+serde_derive
+serde_json
+serde_repr
+serde_spanned
+shlex
+signal-hook-registry
+slab
+smallvec
+stable_deref_trait
+strsim
+subtle
+syn
+synstructure
+tempfile
+thiserror
+thiserror-impl
+tinystr
+tokio
+tokio-macros
+tokio-util
+toml
+toml_datetime
+toml_parser
+toml_writer
+tower-layer
+tower-service
+tracing
+tracing-attributes
+tracing-core
+unicode-ident
+untrusted
+ureq
+ureq-proto
+url
+utf8-zero
+utf8_iter
+utf8parse
+utf_types
+vd-config
+vd-deeplint
+vd-ffi
+vd-fim
+vd-lsp
+vd-search
+vd-settings
+vd-vcs
+waitpid-any
+webpki-roots
+winnow
+writeable
+yoke
+yoke-derive
+zerofrom
+zerofrom-derive
+zeroize
+zerotrie
+zerovec
+zerovec-derive
+zmij
+== cargo test (the service unit tests, AC-0.2) ==
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.13s
+     Running unittests src/lib.rs (target/debug/deps/vd_ffi-d7d088bbe0f89edb)
+
+running 16 tests
+test vcs::tests::invalid_arguments_return_no_job ... ok
+test fim::tests::mapping_carries_every_configured_value_without_leaking_the_key ... ok
+test project::tests::missing_optional_rules_file_is_not_a_panel_diagnostic ... ok
+test project::tests::a_present_rules_file_produces_no_panel_noise ... ok
+test project::tests::unreadable_rules_file_still_warns_without_an_absolute_path ... ok
+test project::tests::bad_entries_render_actionable_diagnostics ... ok
+test project::tests::expansion_is_deterministic ... ok
+test project::tests::fixture_expansion_matches_the_service_contract ... ok
+test fim::tests::loaded_project_and_environment_configure_the_service ... ok
+test project::tests::actionable_filelist_warnings_still_reach_the_panel ... ok
+test vcs::tests::diff_job_reaches_ready_for_a_plain_directory ... ok
+test vcs::tests::info_job_reaches_ready_for_a_plain_directory ... ok
+test fim::tests::unreachable_endpoint_is_an_explicit_error_without_the_key ... ok
+test vcs::tests::polling_a_job_with_the_wrong_kind_is_misuse ... ok
+test fim::tests::configured_loopback_request_reaches_the_rust_transport ... ok
+test fim::tests::default_config_is_disabled_and_sends_nothing ... ok
+
+test result: ok. 16 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+     Running tests/abi.rs (target/debug/deps/abi-c804d6a23d6a8517)
+
+running 12 tests
+test abi_version_is_one ... ok
+test null_and_unknown_arguments_are_rejected_with_a_typed_error ... ok
+test cancelling_a_job_discards_its_result ... ok
+test projected_fixture_serves_all_seven_services ... ok
+test vcs_reports_the_empty_state_for_a_plain_directory ... ok
+test deeplint_reports_a_missing_binary_as_a_typed_failure ... ok
+test lsp_configures_lazily_without_starting_the_server ... ok
+test lsp_rejects_a_missing_server_binary ... ok
+test search_returns_hits_over_the_project_file_list ... ok
+test project_parse_expands_the_fixture_filelist ... ok
+test fim_is_disabled_by_default_and_starts_no_worker ... ok
+test settings_round_trip_through_the_abi ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_search-ccee45e2854f35f2)
+
+running 10 tests
+test tests::missing_root_is_reported ... ok
+test tests::preview_is_trimmed_and_capped ... ok
+test tests::tree_missing_root_is_reported ... ok
+test tests::empty_needle_and_zero_limit_return_nothing ... ok
+test tests::tree_honours_the_result_limit_and_timeout ... ok
+test tests::non_utf8_and_missing_files_are_skipped ... ok
+test tests::limit_truncates_from_the_tail ... ok
+test tests::query_finds_every_line_in_file_order ... ok
+test tests::tree_matches_case_insensitively_and_reports_summary ... ok
+test tests::tree_skips_binary_oversized_and_excluded_dirs ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_settings-6db6bb138f178aed)
+
+running 6 tests
+test tests::missing_file_is_the_default_state ... ok
+test tests::broken_toml_degrades_to_a_warning ... ok
+test tests::non_string_values_are_reported_and_skipped ... ok
+test tests::round_trip_preserves_every_pair ... ok
+test tests::save_replaces_atomically_and_leaves_no_temporary_file ... ok
+test tests::failed_rename_leaves_the_original_file_intact ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_vcs-172bba4941aeb03b)
+
+running 6 tests
+test tests::git_detached_head_has_no_branch ... ok
+test tests::git_porcelain_maps_statuses_and_branch ... ok
+test tests::svn_status_maps_codes ... ok
+test tests::plain_directory_is_the_empty_state_not_an_error ... ok
+test tests::nested_directory_finds_the_repository_above_it ... ok
+test tests::markers_select_the_backend ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/readonly.rs (target/debug/deps/readonly-dbb1f326a4173505)
+
+running 9 tests
+test allow_lists_are_disjoint_from_write_lists ... ok
+test production_runner_gate_refuses_writes_without_spawning ... ok
+test unknown_tool_and_empty_subcommand_are_refused ... ok
+test every_git_write_subcommand_is_refused_before_spawn ... ok
+test every_svn_write_subcommand_is_refused_before_spawn ... ok
+test stub_service_drives_the_panel_without_processes ... ok
+test git_session_uses_only_read_only_subcommands ... ok
+test svn_session_reads_status_info_and_diff ... ok
+test plain_directory_is_the_empty_state_in_every_query ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_ffi
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_search
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_settings
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_vcs
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+== cargo tree (GTK isolation, AC-0.3 / AC-S0.5) ==
+├── vd-config v0.1.1 (/vedit-build/crates/vd-config)
+├── vd-deeplint v0.1.1 (/vedit-build/crates/vd-deeplint)
+├── vd-fim v0.1.1 (/vedit-build/crates/vd-fim)
+├── vd-lsp v0.1.1 (/vedit-build/crates/vd-lsp)
+== cbindgen header ==
+header check: no Rust type outside comments
+[qt6] pinned matrix: Qt 6.10.2 / KF6 6.24.0 / KTextEditor 6.24.0 / KSyntaxHighlighting 6.24.0 / tree-sitter 0.25.9
+[qt6] build image: vedit-qt6-build:local (stage qt6-build of scripts/docker/Dockerfile.build, base docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c)
+[qt6-image] building vedit-qt6-build:local (stage qt6-build, base docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c)
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.build
+#1 transferring dockerfile: 11.56kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [qt6-build 1/4] FROM docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c
+#4 resolve docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 45B done
+#5 DONE 0.0s
+
+#6 [qt6-build 2/4] COPY qt6-locked-packages.txt /opt/vedit/qt6-locked-packages.txt
+#6 CACHED
+
+#7 [qt6-build 3/4] RUN set -eux;     apt-get update;     mkdir -p /tmp/qt6-debs; cd /tmp/qt6-debs;     while read -r spec sha rest; do       case "$spec" in ''|'#'*) continue;; esac;       apt-get download "$spec";       deb=$(ls "${spec%%=*}"_*.deb);       printf '%s  %s\n' "$sha" "$deb" | sha256sum -c -;     done < /opt/vedit/qt6-locked-packages.txt;     cd /; rm -rf /tmp/qt6-debs;     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends       build-essential pkg-config git curl ca-certificates binutils file       xvfb xauth fonts-dejavu-core libgl1-mesa-dri mesa-utils       libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0       libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0       libxcb-xkb1 libxkbcommon0       $(awk '!/^#/ && NF {print $1}' /opt/vedit/qt6-locked-packages.txt);     rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [qt6-build 4/4] RUN set -eux;     while read -r spec sha rest; do       case "$spec" in ''|'#'*) continue;; esac;       pkg="${spec%%=*}"; ver="${spec#*=}";       got=$(dpkg-query -W -f='${Version}' "$pkg");       [ "$got" = "$ver" ] || { echo "FATAL: $pkg installed=$got locked=$ver" >&2; exit 1; };     done < /opt/vedit/qt6-locked-packages.txt;     { echo "## image facts"; head -3 /etc/os-release;       echo "glibc: $(dpkg-query -W -f='${Version}' libc6)";       strings /lib/x86_64-linux-gnu/libc.so.6 | grep -m1 'Minimum supported kernel';       echo "qt6-base-dev: $(dpkg-query -W -f='${Version}' qt6-base-dev)";       echo "kf6-texteditor: $(dpkg-query -W -f='${Version}' libkf6texteditor-dev)";       echo "kf6-syntaxhighlighting: $(dpkg-query -W -f='${Version}' libkf6syntaxhighlighting-dev)";       echo "tree-sitter: $(pkg-config --modversion tree-sitter)";       echo "cmake: $(cmake --version | head -1)";       echo "g++: $(g++ --version | head -1)";     } | tee /opt/vedit/build-image.txt;     dpkg-query -W -f='${Package} ${Version} ${Architecture}\n' | sort > /opt/vedit/package-snapshot.txt
+#8 CACHED
+
+#9 exporting to image
+#9 exporting layers done
+#9 exporting manifest sha256:34aca0f7ce038d552a03797ac82c40a9e298a606b49bfe9a8320916b67058235 done
+#9 exporting config sha256:7e2e0c4ad588ba3e96cf0e6e39c7e9e59ebaaccb5e5a06f851551e5990c61dd9 done
+#9 exporting attestation manifest sha256:7239236981e2d17de220a64997fd4466945c60088268d16ae75a0ba94b0e6a93 0.0s done
+#9 exporting manifest list sha256:a1efb648f8be3c3995442151daadd44b522e4639e4e1d1a3532d30baf6096171 0.0s done
+#9 naming to docker.io/library/vedit-qt6-build:local done
+#9 unpacking to docker.io/library/vedit-qt6-build:local done
+#9 DONE 0.1s
+image_id=sha256:a1efb648f8be3c3995442151daadd44b522e4639e4e1d1a3532d30baf6096171
+[qt6] container facts
+PRETTY_NAME="Ubuntu 26.04.1 LTS"
+NAME="Ubuntu"
+VERSION_ID="26.04"
+glibc: ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43
+qt6-base-dev: 6.10.2+dfsg-7
+kf6-texteditor: 6.24.0-0ubuntu1
+kf6-syntaxhighlighting: 6.24.0-0ubuntu1
+tree-sitter (pkg-config): 0.25.9
+cmake: cmake version 4.2.3
+g++: g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+## image facts
+PRETTY_NAME="Ubuntu 26.04.1 LTS"
+NAME="Ubuntu"
+VERSION_ID="26.04"
+glibc: 2.43-2ubuntu2.4
+Minimum supported kernel: 3.2.0
+qt6-base-dev: 6.10.2+dfsg-7
+kf6-texteditor: 6.24.0-0ubuntu1
+kf6-syntaxhighlighting: 6.24.0-0ubuntu1
+tree-sitter: 0.25.9
+cmake: cmake version 4.2.3
+g++: g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+[qt6] cmake configure (versions are requested EXACT from scripts/versions-qt.env)
+-- VEdit version matrix (scripts/versions-qt.env):
+--   distro:            Ubuntu 26.04.1 LTS build image, glibc 2.43-2ubuntu2.4 (min kernel 3.2.0)
+--   Qt6:               6.10.2 (floor 6.5)
+--   KF6:               6.24.0 (floor 6.5, upstream needs Qt >= 6.8.0)
+--   KTextEditor:       6.24.0
+--   KSyntaxHighlighting: 6.24.0
+--   tree-sitter:       0.25.9
+-- Could NOT find Cups (missing: CUPS_LIBRARIES CUPS_INCLUDE_DIR) 
+--   tree-sitter:       0.25.9 at /usr/lib/x86_64-linux-gnu
+-- VEdit: Rust service layer vd-ffi -> /vedit-build/target/release/libvd_ffi.a
+-- VEdit: Rust C header           -> /vedit-build/crates/vd-ffi/include/vd_ffi.h
+-- VEdit: building lane directory src/syntax/provider
+-- VEdit: building lane directory src/syntax/kde
+-- syn-grammars: compiled grammar id='verilog' verilog=1 systemverilog=1
+-- VEdit: building lane directory src/syntax/grammars
+-- VEdit: building lane directory src/terminal
+-- VEdit: building lane directory src/syntax/overlay
+-- VEdit edit-core: folding + breadcrumb lanes wired into the live editor (T94)
+-- VEdit FIM: Rust service layer linked (the Qt side never sends HTTP)
+-- VEdit edit-core: FIM inline-completion lane wired into the live editor (T104)
+-- VEdit edit-core: src/app EditorProvider seam found -> provider adapter built
+-- VEdit: edit-core lane wired (vedit_editor_core); KTextEditor is the product editor
+-- VEdit: vedit-app links the Rust service layer (vd-ffi); ABI selftest registered
+-- VEdit file tree: Qt 6.10.2 (standalone=OFF)
+-- VEdit file tree: vedit_app_shell present -> installFileTree() is active
+-- VEdit: workspace lane 'filetree' included
+-- VEdit palette: edit-core provider assertions enabled in the integration selftest
+-- VEdit: workspace lane 'palette' included
+-- VEdit: workspace lane 'search' included
+-- VEdit project panel: Qt 6.10.2 (standalone=OFF)
+-- VEdit: workspace lane 'project' included
+-- VEdit: diagnostics lane links the Rust service layer (vd-ffi)
+-- VEdit: workspace lane 'diagnostics' included
+-- workspace-vcs: linking the vd-ffi VCS ABI (/vedit-build/target/release/libvd_ffi.a)
+-- VEdit: workspace lane 'vcs' included
+-- workspace-settings: linking the vd-ffi settings ABI (/vedit-build/target/release/libvd_ffi.a)
+-- VEdit: workspace lane 'settings' included
+-- VEdit: workspace lane 'filetree' wired (vedit_file_tree)
+-- VEdit: workspace lane 'palette' wired (vedit_workspace_palette)
+-- VEdit: workspace lane 'search' wired (vedit_workspace_search)
+-- VEdit: workspace lane 'project' wired (vedit_workspace_project)
+-- VEdit: workspace lane 'diagnostics' wired (vedit_workspace_diagnostics)
+-- VEdit: workspace lane 'vcs' wired (vedit_workspace_vcs)
+-- VEdit: workspace lane 'settings' wired (vedit_workspace_settings)
+-- VEdit: workspace integration enabled (src/workspace/integration.cpp)
+-- VEdit: building src/app (application shell)
+-- syn-provider: baked grammar id='verilog' for /vedit-build/src/syntax/provider (owner: src/syntax/grammars)
+-- syn-product: vedit-app links the syntax stack (provider+kde+grammars, tree-sitter, KTextEditor, KSyntaxHighlighting) and its startup hook is asserted by ctest
+-- Configuring done (0.4s)
+-- Generating done (0.2s)
+-- Build files have been written to: /vedit-build/target/qt6-build
+[qt6] cmake build
+ninja: warning: premature end of file; recovering
+[1/227] Automatic MOC for target vedit_search_slowio
+[2/227] Automatic MOC for target vedit_terminal
+[3/227] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit_search_slowio.dir/vedit_search_slowio_autogen/mocs_compilation.cpp.o
+[4/227] Automatic MOC for target vedit_editor_fim
+[5/227] Building CXX object src/app/editor-lane/fim-lane/CMakeFiles/vedit_editor_fim.dir/vedit_editor_fim_autogen/mocs_compilation.cpp.o
+[6/227] Automatic MOC for target vedit_app_shell
+[7/227] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/syntax_provider.cpp.o
+[8/227] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/vedit_app_shell_autogen/mocs_compilation.cpp.o
+[9/227] Building CXX object src/syntax/overlay/CMakeFiles/vedit_syntax_overlay.dir/paint.cpp.o
+[10/227] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/disabled_provider.cpp.o
+[11/227] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/syntax_service.cpp.o
+[12/227] Building CXX object src/syntax/grammars/CMakeFiles/vedit_syntax_grammars.dir/bindings.cpp.o
+[13/227] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/crash_reporter.cpp.o
+[14/227] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/grammar_binding.cpp.o
+[15/227] Building CXX object src/app/editor-lane/fim-lane/CMakeFiles/vedit_editor_fim.dir/fim_backend.cpp.o
+[16/227] Building CXX object src/syntax/kde/syn-common/CMakeFiles/vedit_syntax_common.dir/syntax_directory.cpp.o
+[17/227] Linking CXX static library src/syntax/kde/syn-common/libvedit_syntax_common.a
+[18/227] Building CXX object src/syntax/overlay/CMakeFiles/vedit_syntax_overlay.dir/overlay.cpp.o
+[19/227] Building CXX object src/syntax/kde/CMakeFiles/vedit_syntax_kde.dir/ksyntax_data.cpp.o
+[20/227] Linking CXX static library src/syntax/kde/libvedit_syntax_kde.a
+[21/227] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider_tests.dir/tests/test_syntax_provider.cpp.o
+[22/227] Building CXX object src/syntax/grammars/syntax-product/CMakeFiles/vedit_syntax_product.dir/syntax_product.cpp.o
+[23/227] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit_search_slowio.dir/tools/slowio/slowio.cpp.o
+[24/227] Linking CXX shared library src/app/workspace-lane-search/libvedit_search_slowio.so
+[25/227] Building CXX object src/app/editor-lane/fim-lane/CMakeFiles/vedit_editor_fim.dir/fim_inline_completion.cpp.o
+[26/227] Linking CXX static library src/app/editor-lane/fim-lane/libvedit_editor_fim.a
+[27/227] Automatic MOC for target vedit-fim-selftest
+[28/227] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/tree_sitter_provider.cpp.o
+[29/227] Linking CXX static library src/syntax/provider/libvedit_syntax_provider.a
+[30/227] Linking CXX static library src/syntax/grammars/libvedit_syntax_grammars.a
+[31/227] Automatic MOC for target vedit_syntax_folding
+[32/227] Automatic MOC for target vedit_workspace_breadcrumb
+[33/227] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit_syntax_folding.dir/vedit_syntax_folding_autogen/mocs_compilation.cpp.o
+[34/227] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider_tests.dir/tests/fixture/fixture_binding.cpp.o
+[35/227] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/command_registry.cpp.o
+[36/227] Building CXX object src/terminal/CMakeFiles/vedit_terminal.dir/vedit_terminal_autogen/mocs_compilation.cpp.o
+[37/227] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/editor_provider.cpp.o
+[38/227] Building CXX object src/terminal/CMakeFiles/vedit_terminal.dir/pty_session.cpp.o
+[39/227] Building CXX object src/app/editor-lane/breadcrumb-lane/CMakeFiles/vedit_workspace_breadcrumb.dir/vedit_workspace_breadcrumb_autogen/mocs_compilation.cpp.o
+[40/227] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit_syntax_folding.dir/fold_range.cpp.o
+[41/227] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit_syntax_folding.dir/fold_source.cpp.o
+[42/227] Linking CXX static library src/syntax/grammars/syntax-product/libvedit_syntax_product.a
+[43/227] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/session_store.cpp.o
+[44/227] Linking CXX static library src/syntax/overlay/libvedit_syntax_overlay.a
+[45/227] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit_syntax_folding.dir/syntax_fold_source.cpp.o
+[46/227] Building CXX object src/app/editor-lane/fim-lane/CMakeFiles/vedit-fim-selftest.dir/vedit-fim-selftest_autogen/mocs_compilation.cpp.o
+[47/227] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/app_shell.cpp.o
+[48/227] Linking CXX executable src/syntax/provider/vedit_syntax_provider_tests
+[49/227] Building CXX object src/terminal/CMakeFiles/vedit_terminal.dir/terminal_panel.cpp.o
+[50/227] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/theme_manager.cpp.o
+[51/227] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/panel_registry.cpp.o
+[52/227] Building CXX object src/app/editor-lane/breadcrumb-lane/CMakeFiles/vedit_workspace_breadcrumb.dir/breadcrumb_model.cpp.o
+[53/227] Building CXX object src/app/editor-lane/breadcrumb-lane/CMakeFiles/vedit_workspace_breadcrumb.dir/syntax_breadcrumb_source.cpp.o
+[54/227] Building CXX object src/syntax/kde/CMakeFiles/vedit-syntax-directory-equivalence.dir/tests/syntax_directory_equivalence.cpp.o
+[55/227] Linking CXX static library src/app/editor-lane/breadcrumb-lane/libvedit_workspace_breadcrumb.a
+[56/227] Automatic MOC for target vedit-breadcrumb-tests
+[57/227] Building CXX object src/app/editor-lane/breadcrumb-lane/CMakeFiles/vedit-breadcrumb-tests.dir/vedit-breadcrumb-tests_autogen/mocs_compilation.cpp.o
+[58/227] Building CXX object src/syntax/grammars/CMakeFiles/vedit_syn_grammars_tests.dir/tests/test_syn_grammars.cpp.o
+[59/227] Linking CXX executable src/syntax/kde/vedit-syntax-directory-equivalence
+[60/227] Linking CXX executable src/syntax/grammars/vedit_syn_grammars_tests
+[61/227] Building CXX object src/syntax/kde/CMakeFiles/vedit_syntax_kde_selftest.dir/tests/validate_syntax_data.cpp.o
+[62/227] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/editor_area.cpp.o
+[63/227] Linking CXX static library src/app/libvedit_app_shell.a
+[64/227] Automatic MOC for target vedit_workspace_palette
+[65/227] Automatic MOC for target vedit_workspace_vcs
+[66/227] Automatic MOC for target vedit_workspace_diagnostics
+[67/227] Automatic MOC for target vedit_file_tree
+[68/227] Automatic MOC for target vedit_workspace_settings
+[69/227] Linking CXX executable src/syntax/kde/vedit_syntax_kde_selftest
+[70/227] Building CXX object src/terminal/CMakeFiles/vedit_terminal.dir/terminal_widget.cpp.o
+[71/227] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit_syntax_folding.dir/fold_injector.cpp.o
+[72/227] Building CXX object src/app/editor-lane/breadcrumb-lane/CMakeFiles/vedit-breadcrumb-tests.dir/tests/breadcrumb_tests.cpp.o
+[73/227] Building CXX object src/syntax/grammars/syntax-product/CMakeFiles/vedit_syntax_product_tests.dir/tests/test_syntax_product.cpp.o
+[74/227] Building CXX object src/app/workspace-lane-palette/CMakeFiles/vedit_workspace_palette.dir/vedit_workspace_palette_autogen/mocs_compilation.cpp.o
+[75/227] Building CXX object src/app/workspace-lane-filetree/CMakeFiles/vedit_file_tree.dir/file_kind.cpp.o
+[76/227] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit_syntax_folding.dir/ksyntax_fold_source.cpp.o
+[77/227] Linking CXX static library src/app/editor-lane/folding-lane/libvedit_syntax_folding.a
+[78/227] Building CXX object src/syntax/overlay/CMakeFiles/vedit-syntax-overlay-selftest.dir/overlay_selftest.cpp.o
+[79/227] Automatic MOC for target vedit_editor_core
+[80/227] Building CXX object src/app/editor-lane/fim-lane/CMakeFiles/vedit-fim-selftest.dir/fim_selftest.cpp.o
+[81/227] Building CXX object src/app/workspace-lane-filetree/CMakeFiles/vedit_file_tree.dir/vedit_file_tree_autogen/mocs_compilation.cpp.o
+[82/227] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_model.cpp.o
+[83/227] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/vedit_workspace_project_autogen/mocs_compilation.cpp.o
+[84/227] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_panel.cpp.o
+[85/227] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/cross_boundary.cpp.o
+[86/227] Building CXX object src/app/workspace-lane-filetree/CMakeFiles/vedit_file_tree.dir/file_ops.cpp.o
+[87/227] Building CXX object src/app/workspace-lane-filetree/CMakeFiles/vedit_file_tree.dir/file_tree_model.cpp.o
+[88/227] Building CXX object src/app/workspace-lane-palette/CMakeFiles/vedit_workspace_palette.dir/command_palette.cpp.o
+[89/227] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_service.cpp.o
+[90/227] Building CXX object src/app/workspace-lane-palette/CMakeFiles/vedit_workspace_palette.dir/fuzzy_matcher.cpp.o
+[91/227] Building CXX object src/app/workspace-lane-filetree/CMakeFiles/vedit_file_tree.dir/filetree_panel.cpp.o
+[92/227] Building CXX object src/app/workspace-lane-filetree/CMakeFiles/vedit_file_tree.dir/filetree_integration.cpp.o
+[93/227] Building CXX object src/app/workspace-lane-filetree/CMakeFiles/vedit_file_tree.dir/file_tree_widget.cpp.o
+[94/227] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/vedit_editor_core_autogen/mocs_compilation.cpp.o
+[95/227] Building CXX object src/app/workspace-lane-palette/CMakeFiles/vedit_workspace_palette.dir/file_index.cpp.o
+[96/227] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/atomic_save.cpp.o
+[97/227] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/large_file.cpp.o
+[98/227] Building CXX object src/app/workspace-lane-palette/CMakeFiles/vedit_workspace_palette.dir/palette_integration.cpp.o
+[99/227] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/document_io.cpp.o
+[100/227] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/find_replace.cpp.o
+[101/227] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/goto_line.cpp.o
+[102/227] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/large_file_bench.cpp.o
+FAILED: [code=1] src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/large_file_bench.cpp.o 
+/usr/bin/c++ -DKCOREADDONS_LIB -DKGUIADDONS_LIB -DQT_CORE_LIB -DQT_DBUS_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_XML_LIB -DVEDIT_EDIT_CORE_HAVE_APP_SEAM=1 -DVEDIT_EDIT_CORE_HAVE_FIM=1 -DVEDIT_EDIT_CORE_HAVE_FOLDING=1 -DVEDIT_FIM_HAVE_FFI=1 -I/vedit-build/target/qt6-build/src/app/editor-lane/vedit_editor_core_autogen/include -I/vedit-build/src/editor -I/vedit-build/src/editor/../app -I/vedit-build/src/syntax/folding -I/vedit-build/src/syntax/common -I/vedit-build/src/syntax/grammars -I/vedit-build/target/qt6-build/src/syntax/grammars/generated -I/vedit-build/src/syntax/provider -I/vedit-build/target/qt6-build/src/syntax/provider/generated -I/vedit-build/src/syntax/grammars/../../../third_party/tree-sitter/verilog/src -I/vedit-build/src/workspace/breadcrumb -I/vedit-build/src/editor/fim -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtWidgets -isystem /usr/include/KF6/KTextEditor -isystem /usr/include/KF6/KParts -isystem /usr/include/KF6/KIOCore -isystem /usr/include/KF6/KIO -isystem /usr/include/KF6/KCoreAddons -isystem /usr/include/x86_64-linux-gnu/qt6/QtNetwork -isystem /usr/include/x86_64-linux-gnu/qt6/QtDBus -isystem /usr/include/KF6/KXmlGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtXml -isystem /usr/include/KF6/KConfig -isystem /usr/include/KF6/KConfigCore -isystem /usr/include/KF6/KConfigWidgets -isystem /usr/include/KF6/KWidgetsAddons -isystem /usr/include/KF6/KConfigGui -isystem /usr/include/KF6/KColorScheme -isystem /usr/include/KF6/KGuiAddons -isystem /usr/include/KF6/KCompletion -isystem /usr/include/KF6/KSyntaxHighlighting -isystem /vedit-build/crates/vd-ffi/include -Wall -Wextra -O2 -g -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -MD -MT src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/large_file_bench.cpp.o -MF src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/large_file_bench.cpp.o.d -o src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/large_file_bench.cpp.o -c /vedit-build/src/editor/kernel/large_file_bench.cpp
+/vedit-build/src/editor/kernel/large_file_bench.cpp: In function ‘void vedit::editor::{anonymous}::measureSize(int, int*, int*)’:
+/vedit-build/src/editor/kernel/large_file_bench.cpp:157:5: error: ‘FoldBreadcrumbBinding’ was not declared in this scope
+  157 |     FoldBreadcrumbBinding *binding = FoldBreadcrumbBinding::instanceFor(widget);
+      |     ^~~~~~~~~~~~~~~~~~~~~
+/vedit-build/src/editor/kernel/large_file_bench.cpp:157:28: error: ‘binding’ was not declared in this scope
+  157 |     FoldBreadcrumbBinding *binding = FoldBreadcrumbBinding::instanceFor(widget);
+      |                            ^~~~~~~
+/vedit-build/src/editor/kernel/large_file_bench.cpp:157:38: error: ‘FoldBreadcrumbBinding’ is not a class, namespace, or enumeration
+  157 |     FoldBreadcrumbBinding *binding = FoldBreadcrumbBinding::instanceFor(widget);
+      |                                      ^~~~~~~~~~~~~~~~~~~~~
+[103/227] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/undo_ops.cpp.o
+[104/227] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/edit_core_selftest.cpp.o
+[105/227] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/multi_cursor.cpp.o
+[106/227] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/highlight_mode.cpp.o
+[107/227] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_state.cpp.o
+[108/227] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/highlight_diagnosis.cpp.o
+[109/227] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/vedit_workspace_diagnostics_autogen/mocs_compilation.cpp.o
+[110/227] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/diagnostics_outline_model.cpp.o
+[111/227] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/ktexteditor_provider.cpp.o
+[112/227] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/fold_breadcrumb.cpp.o
+[113/227] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_integration.cpp.o
+[114/227] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/fim_wiring.cpp.o
+[115/227] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/diagnostics_controller.cpp.o
+[116/227] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/toolchain.cpp.o
+[117/227] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/ffi_backends.cpp.o
+ninja: build stopped: subcommand failed.
+[typecheck] FAIL: the C++/Qt6 lane failed to configure/build with -Werror
+
+exit_code: 1

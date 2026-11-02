@@ -1,0 +1,3 @@
+# flaky external test observed during T25 verification (not T25's lane)
+# vedit-folding-tests (T94 folding lane) failed in 2 of 4 full ctest runs and PASSED every
+# standalone re-run:  'ctest -R vedit-folding-tests' -> 1/1 Passed. Not touched by T25.

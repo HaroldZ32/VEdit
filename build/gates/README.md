@@ -12,9 +12,17 @@ Rules:
   the slang artifact with one command (`build/slang/build.sh`, a fresh CentOS 7
   container) and asserts the ELF needs no symbol newer than `GLIBC_2.17` and no
   `libstdc++`/`libgcc_s`.
+- **Two lanes are covered.** The Rust/GTK product (T7) and the Qt6/KF6 C++ product
+  being built for the rewrite (T10) both run here while both exist. The C++ lane
+  is `build/gates/qt6-cxx.sh`: it builds the pinned Qt6 image
+  (`scripts/docker/Dockerfile.build`, stage `qt6-build`), then configures,
+  compiles, runs ctest and an xcb + software-rendering window smoke **inside that
+  image** (`scripts/build-qt.sh`). `typecheck` runs its `--no-test` form, which is
+  the C++ static check (the lane's own code is compiled with
+  `-Wall -Wextra -Wpedantic -Werror`).
 - `tests`, `typecheck`, `manifest` need the Rust workspace that T7 creates
-  (`Cargo.toml`, `crates/*`). Until that lands they exit 1 with the reason, so a
-  reviewer sees an honest red rather than a skip.
+  (`Cargo.toml`, `crates/*`). Until that lands the Rust half exits 1 with the
+  reason, so a reviewer sees an honest red rather than a skip.
 - `docs`, `vendor`, `dist`, `pack` check for the artifacts their owning tasks
   (T29, T23, T25) must produce; they turn green on their own once those exist.
 - `comments` and `rows` have no meaning in this product (they are MPD-bundle
@@ -22,6 +30,11 @@ Rules:
 
 `GATES_REBUILD=1 bun run verify:gates` forces a full rebuild instead of
 re-verifying the existing `build/slang/out/slang`.
+
+The Qt6 lane has its own switches (see `scripts/build-qt.sh`):
+`VEDIT_SKIP_IMAGE_BUILD=1` reuses an existing `vedit-qt6-build:local`
+(a missing image is a `FATAL`, never a skip), and
+`VEDIT_QT6_BUILD_IMAGE_PULL=1` pulls a published image instead of building.
 
 ## Exit-0 rule for `gates`
 

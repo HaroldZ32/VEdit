@@ -1,0 +1,33 @@
+== evidence: 07-root-selftest.log — root build search self-check (with app shell): T41 jump checks must still pass, lifecycle checks added ==
+time=2026-10-31T19:43:54+08:00
+
+$ vedit-workspace-search-selftest --selfcheck   (QT_QPA_PLATFORM=offscreen)
+CHECK jump.product.shell-ready PASS
+CHECK jump.product.target-installed PASS
+CHECK jump.product.initially-no-file PASS
+CHECK jump.product.two-hits PASS
+CHECK jump.product.click-first PASS
+CHECK jump.product.first-current-file PASS
+CHECK jump.product.first-loads-bytes PASS
+CHECK jump.product.first-cursor-line PASS
+CHECK jump.product.first-cursor-column PASS
+CHECK jump.product.first-status PASS
+CHECK jump.product.click-second PASS
+CHECK jump.product.second-current-file PASS
+CHECK jump.product.second-cursor-line PASS
+CHECK lifecycle.temp-dir PASS
+CHECK lifecycle.no-worker-before PASS
+CHECK lifecycle.scan-started PASS
+CHECK lifecycle.worker-running PASS
+CHECK lifecycle.destructor-joins-worker PASS
+SLOWLIFECYCLE-CHILD finished=1 exit=0
+CHECK slowlifecycle.temp-dir PASS
+CHECK slowlifecycle.scan-started PASS
+CHECK slowlifecycle.batch-before-block PASS
+SLOWLIFECYCLE delete-returned elapsedMs=11298 released-marker=1 stallMs=11500
+CHECK slowlifecycle.destructor-waits-for-stalled-read PASS
+WORKSPACE-SEARCH-SLOWLIFECYCLE ok=1 checks=4 failures=0
+CHECK lifecycle.stall-child-finished PASS
+CHECK lifecycle.stall-child-pass PASS
+WORKSPACE-SEARCH-SELFTEST ok=1 checks=102 failures=0 skipped=2
+SELFTEST-EXIT=0

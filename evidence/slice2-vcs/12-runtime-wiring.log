@@ -1,0 +1,7 @@
+== runtime wiring message (normal start) ==
+collected_at: 2026-11-01T06:06:35Z
+git_head: 31a7c2d10111a9ab6078a433b1aa8289b31197a6
+cmd: vedit-app --project tests/fixtures/verilog-project --hold 200 (offscreen)
+--- output ---
+vcs: installVcs projectRoot='/vedit-build/tests/fixtures/verilog-project'
+APP-EXIT=0

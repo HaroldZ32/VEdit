@@ -1,0 +1,6 @@
+APP-EXIT=0
+--- stderr tail ---
+AppRun: locale 'unset' (ANSI_X3.4-1968) -> 'C.UTF-8' (bundled UTF-8 fallback)
+This plugin does not support propagateSizeHints()
+--- inline matches ---
+0

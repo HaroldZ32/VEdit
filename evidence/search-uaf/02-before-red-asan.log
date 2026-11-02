@@ -1,0 +1,72 @@
+== evidence: 02-before-red-asan.log — PRE-FIX, AddressSanitizer build of the search lane; the child is run with the *.slowio stall shim (slow storage) ==
+time=2026-10-31T19:40:15+08:00
+HEAD=95c496e682e3841add1a081edd78d29c34957aac
+global_search sha256: 9cd0d9d35139bf925bc34f437af5f760d4048410191d866ff45005ba06e84f81  src/workspace/search/global_search.cpp
+
+$ cmake -S src/workspace/search -B target/search-asan -DCMAKE_CXX_FLAGS="-fsanitize=address -fno-omit-frame-pointer -g"
+[12/14] Building CXX object CMakeFiles/vedit-workspace-search-selftest.dir/vedit-workspace-search-selftest_autogen/mocs_compilation.cpp.o
+[13/14] Building CXX object CMakeFiles/vedit-workspace-search-selftest.dir/search_selftest.cpp.o
+[14/14] Linking CXX executable vedit-workspace-search-selftest
+BUILD-EXIT=0
+ASANLIB=/usr/lib/gcc/x86_64-linux-gnu/15/libasan.so
+CHECK slowlifecycle.temp-dir PASS
+CHECK slowlifecycle.scan-started PASS
+CHECK slowlifecycle.batch-before-block PASS
+SLOWLIFECYCLE delete-returned elapsedMs=10000 released-marker=0 stallMs=11500
+CHECK slowlifecycle.destructor-waits-for-stalled-read FAIL
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==159==ERROR: AddressSanitizer: heap-use-after-free on address 0x7af12d1e9431 at pc 0x56054bc05fe1 bp 0x7a412b3fda00 sp 0x7a412b3fd9f0
+READ of size 1 at 0x7af12d1e9431 thread T1 (vedit-global-se)
+    #0 0x56054bc05fe0 in std::__atomic_base<bool>::load(std::memory_order) const /usr/include/c++/15/bits/atomic_base.h:501
+    #1 0x56054bc05fe0 in std::atomic<bool>::load(std::memory_order) const /usr/include/c++/15/atomic:121
+    #2 0x56054bbfb927 in cancelled /vedit-build/src/workspace/search/global_search.cpp:82
+    #3 0x56054bbfb4ac in run /vedit-build/src/workspace/search/global_search.cpp:68
+    #4 0x56054bbfed03 in vedit::workspace::search::GlobalSearch::runScan(vedit::workspace::search::SearchOptions const&, unsigned long long) /vedit-build/src/workspace/search/global_search.cpp:330
+    #5 0x56054bbfdd1f in operator() /vedit-build/src/workspace/search/global_search.cpp:283
+    #6 0x56054bc05020 in __invoke_impl<void, vedit::workspace::search::GlobalSearch::start(const vedit::workspace::search::SearchOptions&)::<lambda()> > /usr/include/c++/15/bits/invoke.h:63
+    #7 0x56054bc04ffd in __invoke<vedit::workspace::search::GlobalSearch::start(const vedit::workspace::search::SearchOptions&)::<lambda()> > /usr/include/c++/15/bits/invoke.h:98
+    #8 0x56054bc04fda in invoke<vedit::workspace::search::GlobalSearch::start(const vedit::workspace::search::SearchOptions&)::<lambda()> > /usr/include/c++/15/functional:122
+    #9 0x56054bc04fa9 in operator()<> /usr/include/x86_64-linux-gnu/qt6/QtCore/qthread.h:139
+    #10 0x56054bc04f6b in __invoke_impl<void, QThread::create<vedit::workspace::search::GlobalSearch::start(const vedit::workspace::search::SearchOptions&)::<lambda()> >(vedit::workspace::search::GlobalSearch::start(const vedit::workspace::search::SearchOptions&)::<lambda()>&&)::<lambda(auto:56&& ...)> > /usr/include/c++/15/bits/invoke.h:63
+    #11 0x56054bc04f2e in __invoke<QThread::create<vedit::workspace::search::GlobalSearch::start(const vedit::workspace::search::SearchOptions&)::<lambda()> >(vedit::workspace::search::GlobalSearch::start(const vedit::workspace::search::SearchOptions&)::<lambda()>&&)::<lambda(auto:56&& ...)> > /usr/include/c++/15/bits/invoke.h:98
+    #12 0x56054bc04ee9 in _M_invoke<0> /usr/include/c++/15/bits/std_thread.h:303
+    #13 0x56054bc04e53 in operator() /usr/include/c++/15/bits/std_thread.h:310
+    #14 0x56054bc04b3b in operator() /usr/include/c++/15/future:1441
+    #15 0x56054bc049b9 in __invoke_impl<std::unique_ptr<std::__future_base::_Result<void>, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<void>, std::__future_base::_Result_base::_Deleter>, std::thread::_Invoker<std::tuple<QThread::create<vedit::workspace::search::GlobalSearch::start(const vedit::workspace::search::SearchOptions&)::<lambda()> >(vedit::workspace::search::GlobalSearch::start(const vedit::workspace::search::SearchOptions&)::<lambda()>&&)::<lambda(auto:56&& ...)> > >, void>&> /usr/include/c++/15/bits/invoke.h:63
+    #16 0x56054bc04795 in __invoke_r<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter>, std::__future_base::_Task_setter<std::unique_ptr<std::__future_base::_Result<void>, std::__future_base::_Result_base::_Deleter>, std::thread::_Invoker<std::tuple<QThread::create<vedit::workspace::search::GlobalSearch::start(const vedit::workspace::search::SearchOptions&)::<lambda()> >(vedit::workspace::search::GlobalSearch::start(const vedit::workspace::search::SearchOptions&)::<lambda()>&&)::<lambda(auto:56&& ...)> > >, void>&> /usr/include/c++/15/bits/invoke.h:116
+    #17 0x56054bc044a1 in _M_invoke /usr/include/c++/15/bits/std_function.h:293
+    #18 0x56054bc0b295 in std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>::operator()() const /usr/include/c++/15/bits/std_function.h:593
+    #19 0x56054bc09061 in std::__future_base::_State_baseV2::_M_do_set(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*) /usr/include/c++/15/future:598
+    #20 0x56054bc0f078 in void std::__invoke_impl<void, void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*>(std::__invoke_memfun_deref, void (std::__future_base::_State_baseV2::*&&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*&&, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*&&, bool*&&) /usr/include/c++/15/bits/invoke.h:76
+    #21 0x56054bc0d45d in std::__invoke_result<void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*>::type std::__invoke<void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*>(void (std::__future_base::_State_baseV2::*&&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*&&, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*&&, bool*&&) /usr/include/c++/15/bits/invoke.h:98
+    #22 0x56054bc0ad88 in std::call_once<void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*>(std::once_flag&, void (std::__future_base::_State_baseV2::*&&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*&&, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*&&, bool*&&)::{lambda()#1}::operator()() const /usr/include/c++/15/mutex:911
+    #23 0x56054bc0d484 in std::once_flag::_Prepare_execution::_Prepare_execution<std::call_once<void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*>(std::once_flag&, void (std::__future_base::_State_baseV2::*&&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*&&, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*&&, bool*&&)::{lambda()#1}>(void (std::__future_base::_State_baseV2::*&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*))::{lambda()#1}::operator()() const /usr/include/c++/15/mutex:847
+    #24 0x56054bc0d499 in std::once_flag::_Prepare_execution::_Prepare_execution<std::call_once<void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*>(std::once_flag&, void (std::__future_base::_State_baseV2::*&&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*&&, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*&&, bool*&&)::{lambda()#1}>(void (std::__future_base::_State_baseV2::*&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*))::{lambda()#1}::_FUN() /usr/include/c++/15/mutex:847
+    #25 0x7e4131047513  (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9513) (BuildId: 066527e430a32768d82741e00b81eebb1a872294)
+    #26 0x7e4131047588 in __pthread_once (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9588) (BuildId: 066527e430a32768d82741e00b81eebb1a872294)
+    #27 0x56054bc0af5d in __gthread_once(int*, void (*)()) /usr/include/x86_64-linux-gnu/c++/15/bits/gthr-default.h:746
+    #28 0x56054bc0af5d in void std::call_once<void (std::__future_base::_State_baseV2::*)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*>(std::once_flag&, void (std::__future_base::_State_baseV2::*&&)(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*, bool*), std::__future_base::_State_baseV2*&&, std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>*&&, bool*&&) /usr/include/c++/15/mutex:918
+    #29 0x56054bc08afd in std::__future_base::_State_baseV2::_M_set_result(std::function<std::unique_ptr<std::__future_base::_Result_base, std::__future_base::_Result_base::_Deleter> ()>, bool) /usr/include/c++/15/future:437
+    #30 0x56054bc057b4 in _M_complete_async /usr/include/c++/15/future:1721
+    #31 0x7e413182d5cc  (/usr/lib/x86_64-linux-gnu/libQt6Core.so.6+0x2785cc) (BuildId: 965bf46c1adbad5630257b8ac46ad7d7875b7ea6)
+    #32 0x7e41318cd5a5  (/usr/lib/x86_64-linux-gnu/libQt6Core.so.6+0x3185a5) (BuildId: 965bf46c1adbad5630257b8ac46ad7d7875b7ea6)
+    #33 0x7e4132ce9a80 in asan_thread_start ../../../../src/libsanitizer/asan/asan_interceptors.cpp:246
+    #34 0x7e4131041df9  (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa3df9) (BuildId: 066527e430a32768d82741e00b81eebb1a872294)
+    #35 0x7e41310d53d3 in __clone (/usr/lib/x86_64-linux-gnu/libc.so.6+0x1373d3) (BuildId: 066527e430a32768d82741e00b81eebb1a872294)
+
+0x7af12d1e9431 is located 33 bytes inside of 112-byte region [0x7af12d1e9410,0x7af12d1e9480)
+freed by thread T0 here:
+    #0 0x7e4132db389f in operator delete(void*, unsigned long) ../../../../src/libsanitizer/asan/asan_new_delete.cpp:190
+    #1 0x56054bbfdca8 in vedit::workspace::search::GlobalSearch::~GlobalSearch() /vedit-build/src/workspace/search/global_search.cpp:264
+    #2 0x56054bbd6482 in runSlowLifecycleProbe /vedit-build/src/workspace/search/search_selftest.cpp:924
+    #3 0x56054bbd88d4 in main /vedit-build/src/workspace/search/search_selftest.cpp:1124
+    #4 0x7e4130fc8600  (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a600) (BuildId: 066527e430a32768d82741e00b81eebb1a872294)
+    #5 0x7e4130fc8717 in __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a717) (BuildId: 066527e430a32768d82741e00b81eebb1a872294)
+    #6 0x56054bbbc6b4 in _start (/vedit-build/target/search-asan/vedit-workspace-search-selftest+0x1c6b4) (BuildId: e2781383fa803a1688e8f5fa8cbb2e4ec28c3945)
+
+previously allocated by thread T0 here:
+    #0 0x7e4132db273f in operator new(unsigned long) ../../../../src/libsanitizer/asan/asan_new_delete.cpp:109
+    #1 0x56054bbd5ea9 in runSlowLifecycleProbe /vedit-build/src/workspace/search/search_selftest.cpp:908
+    #2 0x56054bbd88d4 in main /vedit-build/src/workspace/search/search_selftest.cpp:1124
+CHILD-EXIT=1

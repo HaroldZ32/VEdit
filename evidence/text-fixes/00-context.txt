@@ -1,0 +1,8 @@
+== evidence/text-fixes/00-context.txt ==
+collected_at: 2026-10-31T11:47:13Z
+git_head: 95c496e682e3841add1a081edd78d29c34957aac
+branch: feat/qt6-ktexteditor-migration
+git_status_porcelain (this task's paths):
+   M docs/USER_GUIDE.md
+  ?? evidence/lsp-v2/
+  ?? evidence/text-fixes/

@@ -1,0 +1,15 @@
+== syn-kde-data evidence pins ==
+date: 2026-10-31T03:59Z
+image: vedit-qt6-build:local (sha256 id in evidence/m0-build/build-logs/21-qt6-image-id.txt)
+Qt: 6.10.2 · KF6/KSyntaxHighlighting: 6.24.0 · Ubuntu 26.04
+deliverable: src/syntax/kde/ (loader + validator), resources/syntax/ (our LGPL definitions)
+build:   cmake -S src/syntax/kde -B target/syn-kde -G Ninja && cmake --build target/syn-kde   -> exit 0
+selfcheck: target/syn-kde/vedit_syntax_kde_selftest -> exit 0, checks=29 failures=0
+         (full output 07-validator-full.log; ctest target vedit-syntax-kde-data registered)
+evidence files:
+  01-load.log            LOAD/DIAG/CHECK: private path loaded, 451 defs + 30 themes, our 2 definitions shipped
+  02-degradation.log     simulated missing SystemVerilog -> diagnosable fallback to Verilog (no crash)
+  03-folding.log         A4 folding evidence: verilog 7 begin/7 end, systemverilog 9 begin/9 end
+  04-licensing.txt       names/sha256/license headers, forbidden KDE hashes = 0 hits, data contract
+  07-validator-full.log  complete validator output
+  09-result.txt          failures=0

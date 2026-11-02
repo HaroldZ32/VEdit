@@ -1,0 +1,21 @@
+== 03 screenshots ==
+-rw-r--r-- 1 root root   7895 Oct 31 03:52 /work/evidence/r2-c17/v2/10-baseline-verilog.png
+-rw-r--r-- 1 root root   7940 Oct 31 03:52 /work/evidence/r2-c17/v2/11-overlay-rendered.png
+-rw-r--r-- 1 root root   9100 Oct 31 03:52 /work/evidence/r2-c17/v2/12-overlay-after-edit.png
+-rw-r--r-- 1 root root   7895 Oct 31 03:52 /work/evidence/r2-c17/v2/12b-overlay-removed.png
+-rw-r--r-- 1 root root   6252 Oct 31 03:52 /work/evidence/r2-c17/v2/13a-semantic-defaultstyle-hint.png
+-rw-r--r-- 1 root root   6226 Oct 31 03:52 /work/evidence/r2-c17/v2/13b-semantic-theme-resolved.png
+-rw-r--r-- 1 root root  62355 Oct 31 03:52 /work/evidence/r2-c17/v2/14-1000-ranges-per-line.png
+-rw-r--r-- 1 root root  64102 Oct 31 03:52 /work/evidence/r2-c17/v2/15-1100-ranges-per-line.png
+-rw-r--r-- 1 root root 260105 Oct 31 03:52 /work/evidence/r2-c17/v2/20-bigdoc-overlay-Verilog.png
+-rw-r--r-- 1 root root 261492 Oct 31 03:52 /work/evidence/r2-c17/v2/20-bigdoc-overlay-plain.png
+b3f5465b633c6b0789a514633c10dc08851a07ba872f77cf1017cf7472b9e1be  /work/evidence/r2-c17/v2/10-baseline-verilog.png
+c868e7bb9064eccb9a88cd7574da267f1fc6498f9a76c57bc42d00c588d7db39  /work/evidence/r2-c17/v2/11-overlay-rendered.png
+80a7da8ce67e43ab4d8183d31855e6e14744e48858fe4f6fceebb03ccf7678b5  /work/evidence/r2-c17/v2/12-overlay-after-edit.png
+b3f5465b633c6b0789a514633c10dc08851a07ba872f77cf1017cf7472b9e1be  /work/evidence/r2-c17/v2/12b-overlay-removed.png
+8cb02769a15785fd2343d3f086f13a75bcfdc363ee36ecf49b89a2324c6c2d9c  /work/evidence/r2-c17/v2/13a-semantic-defaultstyle-hint.png
+8718c910463f3555a83c88345025db4f3cdeb639c0e57b263de91eb37abcf115  /work/evidence/r2-c17/v2/13b-semantic-theme-resolved.png
+199ec7303039a2a1ccb923e666d21c1e9ca14ad91a86ee9d38c59a718b71c644  /work/evidence/r2-c17/v2/14-1000-ranges-per-line.png
+e63e12c5e8632dafd3a49e1c4b4c5646876a2a3d808d27689be8189f77368853  /work/evidence/r2-c17/v2/15-1100-ranges-per-line.png
+b1d46c196ca0de82e3d6c652fafead10e76ca40023dbd647a7c63bd2d40c1e83  /work/evidence/r2-c17/v2/20-bigdoc-overlay-Verilog.png
+43596a3af02458a8e14eff162a0b3cb3bed0d4ca5a31ca39a4f65e48eea24bad  /work/evidence/r2-c17/v2/20-bigdoc-overlay-plain.png

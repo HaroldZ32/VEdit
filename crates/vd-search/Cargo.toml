@@ -1,0 +1,16 @@
+[package]
+name = "vd-search"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
+
+[dependencies]
+# Search index service (Slice 2, T21): the file set is owned by the project
+# model, so this crate has no dependencies of its own yet.
+
+[dev-dependencies]
+tempfile.workspace = true

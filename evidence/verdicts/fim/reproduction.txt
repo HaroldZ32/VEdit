@@ -1,0 +1,61 @@
+# T28 independent reproduction (2026-11-01) — FIM default-off / zero-network / configured chain
+# binding: shared tree HEAD d36bff9 + uncommitted T27 changes
+#   crates/vd-ffi/src/fim.rs mtime 15:21:05 (M)
+#   src/editor/fim/** (untracked, 15:01-15:21)
+#   evidence/slice3-fim/** (untracked, 15:12-15:23)
+# container: vedit-qt6-build:local (Qt/KF6), probe compiled from evidence/slice3-fim/socket_probe.c
+
+== A) lane default-off-only (isolated HOME/XDG, no VEDIT_FIM_*), under LD_PRELOAD probe ==
+FIM-DEFAULT-OFF status="FIM 未启用" endpoint_requests=0 suggestion=0
+FIM-SELFTEST ok=1 checks=28 failures=0
+SELFTEST-EXIT=0
+SOCKETS=0
+CONNECTS=0
+GETADDRINFO=0
+
+== B) product binary --selfcheck-ffi crates/vd-ffi/tests/fixtures/project (default config), probe ==
+PRODUCT-EXIT=0
+CHECK ffi.fim.start PASS
+CHECK ffi.fim.disabled-by-default PASS
+FFI-ABI-SELFTEST ok=1 checks=20 failures=0
+SOCKETS=0
+CONNECTS=0
+GETADDRINFO=0
+
+== C) configured full lane selftest (in-process loopback fake endpoint), probe ==
+LANE-FULL-EXIT=0
+FIM-DEFAULT-OFF status="FIM 未启用" endpoint_requests=0 suggestion=0
+FIM-RUST-REQUEST first_line="POST /v1/completions HTTP/1.1" user-agent: ureq/3.5.0 body_has_prompt=1 body_has_suffix=1 authorization_bearer_redacted=1
+FIM-HALF-CONFIGURED status="FIM 未配置模型" endpoint_requests=1
+FIM-SELFTEST ok=1 checks=40 failures=0
+SOCKETS=3 CONNECTS=1 GETADDRINFO=0   (2 in-process fake listeners + 1 Rust client socket; positive control)
+
+== D) Rust tests ==
+cargo test -p vd-fim --test default_off -> 4 passed; 0 failed (VDFIM_EXIT=0)
+cargo test -p vd-ffi fim:: -> 5 passed; 0 failed (VDFFI_EXIT=0), incl.
+  default_config_is_disabled_and_sends_nothing,
+  configured_loopback_request_reaches_the_rust_transport,
+  unreachable_endpoint_is_an_explicit_error_without_the_key,
+  mapping_carries_every_configured_value_without_leaking_the_key
+
+== E) no-FFI lane build ==
+CFG=0 BUILD=0 RUN=0
+FIM-BACKEND unavailable (no Rust service in this build)
+SKIP fim.rust.* (this build has no Rust service layer; the lane CMake says why)
+FIM-SELFTEST ok=1 checks=25 failures=0   (explicit SKIP, no fake PASS)
+
+== F) ctest ==
+lane: 100% tests passed, 0 tests failed out of 1   (vedit-fim-selftest)
+root: 100% tests passed, 0 tests failed out of 23  (CTEST_EXIT=0)  [before the concurrent editor-wiring
+      CMake change at 15:31 introduced test #12 vedit-fim-wiring-selftest; that is another lane's in-flight
+      change, its executable was not built yet at review time]
+
+== G) declared gate ==
+mpd_verify_evidence {kind:"gate", gate:"typecheck", loop_id:"loop-20261031T095153-d2cacf"} -> exit 0
+evidence id ev-20261101T072855-533392
+
+== H) defaults / endpoints / keys ==
+crates/vd-config/src/model.rs:203-232 FimConfig default: enabled=false, endpoint="", model="", api_key=None
+crates/vd-fim/src/settings.rs:67-79 FimSettings default: disabled; no endpoint/model/key
+grep for http(s) in production FIM code: only scheme parsing in settings.rs + test/error strings
+grep for key-like literals: only test fixtures (sk-secret-value / SECRET-LOOPBACK / TEST-SECRET-KEY)
