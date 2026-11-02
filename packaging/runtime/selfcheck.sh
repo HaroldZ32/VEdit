@@ -7,7 +7,7 @@
 #   * TOOLCHAIN source=…:bundled …   — verible + slang came from the package,
 #   * syntax-product … own-xml=[…]   — OUR definitions loaded from the data root,
 #   * EDIT-CORE-SELFTEST ok=1        — KTextEditor kernel initialised,
-#   * fold.wiring.closed.hidden-975  — the packaged XML actually folds a 1k .sv,
+#   * fold.native.view / no-auto-folds — KDE-native folding (T128); the injected
 #   * /proc/<pid>/maps shows the packaged loader + libc and no system loader.
 #
 # Usage: selfcheck.sh --appdir <dir>   |   --appimage <file>
@@ -68,9 +68,15 @@ else
   echo "CHECK FAIL  own XML definitions"; fail=1
 fi
 printf '%s' "$OUT" | grep -q 'EDIT-CORE-SELFTEST ok=1' && echo "CHECK PASS  KTextEditor kernel" || { echo "CHECK FAIL  edit-core"; fail=1; }
-printf '%s' "$OUT" | grep -q 'CHECK fold.wiring.closed.hidden-975 PASS' \
-  && echo "CHECK PASS  folded 1k .sv with packaged XML" \
-  || { echo "CHECK FAIL  folding in the package"; fail=1; }
+# T128: folding is KDE-native (the FoldInjector layer was deleted), so the old
+# `fold.wiring.closed.hidden-975` criterion is retired (AGENT.md §10). Assert the
+# native facts instead: the folding view exists AND no folds are injected on open.
+if printf '%s' "$OUT" | grep -q 'CHECK fold.native.view PASS' \
+   && printf '%s' "$OUT" | grep -q 'CHECK fold.native.no-auto-folds PASS hidden=0'; then
+  echo "CHECK PASS  native folding available and no auto-folds"
+else
+  echo "CHECK FAIL  folding in the package"; fail=1
+fi
 
 # --- packaged CJK font + its OFL text (T119) --------------------------------
 FONT="$PREFIX/share/fonts/NotoSansCJK-Regular.ttc"
