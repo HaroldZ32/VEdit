@@ -6,6 +6,7 @@ anyhow
 async-lsp
 base64
 bitflags
+build_script_build
 bytes
 cbindgen
 cc

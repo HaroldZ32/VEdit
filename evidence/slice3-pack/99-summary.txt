@@ -1,0 +1,9 @@
+form=F2
+appdir=/home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/AppDir
+appdir_files=216
+whitelist=SystemVerilog,Verilog
+kshlib_sha256=aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
+appimage=/home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage
+appimage_bytes=109906424
+appimage_sha256=2918210695d9aaaebccd0e687481f665fdc852b749f9347c465c35ee9a797795
+steps_failed=0

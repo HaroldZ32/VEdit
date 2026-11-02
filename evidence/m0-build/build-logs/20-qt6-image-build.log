@@ -5,7 +5,7 @@
 #1 DONE 0.0s
 
 #2 [internal] load metadata for docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c
-#2 DONE 0.1s
+#2 DONE 0.2s
 
 #3 [internal] load .dockerignore
 #3 transferring context: 2B done
@@ -30,11 +30,10 @@
 
 #9 exporting to image
 #9 exporting layers done
-#9 exporting manifest sha256:5948c4fd5ee7985ad096559cf3d33361e2c2c302ef39fe01780d9a127f0b2d74 0.0s done
-#9 exporting config sha256:d185a9e8e55e5a93a8d537d1fd9274117e035d0172cd580aebaa78bc85dff49b 0.0s done
-#9 exporting attestation manifest sha256:6422fce901e131e19695aecf12dc0b8b9b815946ec8d8a6f78a70c8d6b36755a
-#9 exporting attestation manifest sha256:6422fce901e131e19695aecf12dc0b8b9b815946ec8d8a6f78a70c8d6b36755a 0.0s done
-#9 exporting manifest list sha256:5207d6357f7a9670af5807625fda082ca3d0ce0bdfe241638f0d029dca8e5cc5 0.0s done
+#9 exporting manifest sha256:ca84c4a8a5c237d7158cf61727c55382bd0b545b729f9f0a6d00c1f86e6f3056 0.0s done
+#9 exporting config sha256:5c577fc4dfc20635e5656c8f3efb3d2bbc2d52b8d7e751d91d5c64d218ec4e2e 0.0s done
+#9 exporting attestation manifest sha256:10cb565a9b63cb30c6a948822356072e536554ee46223e73d05b47f88c073d35 0.0s done
+#9 exporting manifest list sha256:520baedcaaf59e8dddae62dd7a005e21e6b8b1fb0ab0fd000e4b5b7154128bc4 0.0s done
 #9 naming to docker.io/library/vedit-qt6-build:local done
-#9 unpacking to docker.io/library/vedit-qt6-build:local done
+#9 unpacking to docker.io/library/vedit-qt6-build:local 0.0s done
 #9 DONE 0.1s

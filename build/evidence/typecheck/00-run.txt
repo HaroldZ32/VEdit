@@ -1,82 +1,34 @@
 # gate log: typecheck (operational; rewritten by every run)
-collected_at: 2026-11-01T20:32:09+08:00
-git_head: 7b190a040829e8cdcf7020f7f18363cfcf37a934
+collected_at: 2026-11-02T10:39:43+08:00
+git_head: 9a9bb43d3c0035f0618d89b9e28082d9bd1e0a01
 git_status_porcelain:
    M AGENT.md
-   M THIRD_PARTY_NOTICES.md
    M build/evidence/typecheck/00-run.txt
-   M build/evidence/typecheck/10-typecheck-image-build.log
-   M build/evidence/typecheck/11-typecheck-image-id.txt
-   M crates/vd-config/src/project.rs
-   M crates/vd-config/src/warnings.rs
-   M crates/vd-ffi/src/lsp.rs
-   M crates/vd-ffi/src/project.rs
-   M crates/vd-lsp/src/client.rs
-   M crates/vd-lsp/src/documents.rs
-   M crates/vd-lsp/src/session.rs
    M evidence/ffi-abi/logs/10-rust-image.txt
    M evidence/ffi-abi/logs/19-rust-stage-console.log
    M evidence/ffi-abi/logs/20-cargo-build-release.log
    M evidence/ffi-abi/logs/21-staticlib.txt
    M evidence/ffi-abi/logs/22-rust-targets.txt
    M evidence/ffi-abi/logs/23-cargo-test.log
-   M evidence/ffi-abi/logs/26-vd_ffi.h
-   M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
    M evidence/m0-build/build-logs/20-qt6-image-build.log
    M evidence/m0-build/build-logs/21-qt6-image-id.txt
    M evidence/m0-build/build-logs/31-qt6-configure.log
    M evidence/m0-build/build-logs/32-qt6-build.log
-   M evidence/m0-build/build-logs/33-qt6-ctest.log
    M evidence/m0-build/build-logs/34-qt6-elf.txt
    M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
-   M packaging/runtime/AppRun
-   M packaging/runtime/README.md
-   M packaging/runtime/assemble-appdir.sh
-   M packaging/runtime/selfcheck.sh
-   M scripts/versions.env
-   M src/app/CMakeLists.txt
-   M src/app/app_shell.cpp
-   M src/app/editor_area.cpp
    M src/app/main.cpp
-   M src/syntax/product/syntax_product.cpp
-   M src/workspace/diagnostics/CMakeLists.txt
-   M src/workspace/diagnostics/diagnostics_controller.cpp
-   M src/workspace/diagnostics/diagnostics_controller.h
-   M src/workspace/diagnostics/diagnostics_ffi_selftest.cpp
-   M src/workspace/diagnostics/diagnostics_integration.cpp
-   M src/workspace/diagnostics/diagnostics_panel.cpp
-   M src/workspace/diagnostics/diagnostics_panel.h
-   M src/workspace/diagnostics/diagnostics_selftest.cpp
-   M src/workspace/diagnostics/ffi_backends.cpp
-   M src/workspace/diagnostics/lsp_backend.h
-   M src/workspace/filetree/filetree_integration.cpp
-   M src/workspace/palette/README.md
-   M src/workspace/palette/palette_integration.cpp
-   M src/workspace/search/CMakeLists.txt
-   M src/workspace/search/README.md
-   M src/workspace/search/global_search.cpp
-   M src/workspace/search/global_search.h
-   M src/workspace/search/search_integration.cpp
-   M src/workspace/search/search_selftest.cpp
-   M src/workspace/settings/settings_integration.cpp
-   M src/workspace/vcs/vcs_integration.cpp
-  ?? crates/vd-lsp/tests/buffer_change.rs
-  ?? evidence/crash-segv/
-  ?? evidence/ffi-header-drift/
-  ?? evidence/fold-toggle/
-  ?? evidence/fold-unfold-guard/
-  ?? evidence/fonts-cjk/
-  ?? evidence/large-file/
-  ?? evidence/lint-trigger/
-  ?? evidence/locale-and-noise/
-  ?? evidence/rules-search-ux/
-  ?? evidence/search-segv/
-  ?? evidence/slice3-stop/05-typecheck-header-drift.log
-  ?? packaging/runtime/assets/fonts/
-  ?? packaging/runtime/assets/licenses/
-  ?? src/app/crash_report_check.sh
-  ?? src/app/crash_reporter.cpp
-  ?? src/app/crash_reporter.h
-  ?? src/app/crash_reporter_selftest.cpp
-  ?? src/workspace/diagnostics/selftests/
+   M src/editor/CMakeLists.txt
+   M src/editor/kernel/fold_breadcrumb.cpp
+   M src/editor/kernel/fold_breadcrumb.h
+   M src/editor/kernel/ktexteditor_provider.cpp
+   M src/syntax/folding/CMakeLists.txt
+   D src/syntax/folding/fold_injector.cpp
+   D src/syntax/folding/fold_injector.h
+   D src/syntax/folding/tests/folding_tests.cpp
+  ?? evidence/fold-gutter-click/
+  ?? evidence/fold-model-api/
+  ?? evidence/fold-native/
+  ?? src/editor/kernel/native_fold_tests.cpp
+  ?? src/syntax/folding/tests/fold_native_gui_probe.cpp
+  ?? src/syntax/folding/tests/fold_native_probe.cpp
 

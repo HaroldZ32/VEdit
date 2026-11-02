@@ -1,0 +1,20 @@
+VEdit private runtime — components and licences (evidence, not legal advice)
+form: F2 (self-built KSyntaxHighlighting, QRC_SYNTAX=OFF, NO_STANDARD_PATHS=OFF)
+whitelist: SystemVerilog,Verilog
+
+KSyntaxHighlighting  self-built 6.24.0 (KDE tarball, MIT library); definitions: whitelist only (see above)
+Qt6                  6.10.2+dfsg-7  LGPL-3.0 / GPL-3.0 / commercial
+KF6 (KTextEditor)    6.24.0-0ubuntu1  LGPL-2.1-or-later
+tree-sitter          0.25.9-7  MIT
+glibc                2.43-2ubuntu2.4  LGPL-2.1-or-later
+DejaVu fonts         2.37-8build1  Bitstream Vera + public domain
+
+Verible (bundled)    v0.0-4298-g085eef05  Apache-2.0  bin/verible-verilog-{ls,lint,format}
+  licence text: usr/share/doc/vedit/licenses/Apache-2.0.txt
+slang (bundled)      12.1  MIT  bin/slang
+  licence text: usr/share/doc/vedit/licenses/slang-LICENSE.txt
+Toolchain discovery  bundled > local checkout > PATH > env; the chosen source and the missing list are
+                     reported in the status bar, the outline/diagnostics panel and --selfcheck.
+
+NOT shipped: KDE systemverilog.xml (GPL-3.0-or-later), KDE verilog.xml (undeclared),
+             syntax-bundled/, distro libKF6SyntaxHighlighting (embeds 36 strict-GPL definitions).
