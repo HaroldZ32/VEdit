@@ -1,0 +1,3 @@
+merge evidence/i18n-l2/02-a-class-translations.json -> translations/vedit_zh_CN.ts
+  filled=102 already-translated=289 still-unfinished=0
+  note: .ts contexts with no JSON table: VEdit, vedit::app::ApplicationShell

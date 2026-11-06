@@ -17,7 +17,7 @@ pub struct VcsInfo {
     pub backend: Backend,
     /// Current branch (`None` for a detached HEAD or a plain directory).
     pub branch: Option<String>,
-    /// Short revision (`git rev-parse --short HEAD`, `svn info --show-item revision`).
+    /// Short revision (`git rev-parse --short HEAD`, `svn info --xml` entry revision).
     pub revision: Option<String>,
     /// Why the identity could not be read, when it could not.
     pub note: Option<String>,
@@ -85,12 +85,11 @@ impl<R: CommandRunner> ProcessVcsService<R> {
         Self { runner }
     }
 
-    fn git(&self, root: &Path, args: &[&str]) -> Result<String, String> {
-        let mut owned = Vec::with_capacity(args.len() + 2);
-        owned.push("-C".to_string());
-        owned.push(root.display().to_string());
-        owned.extend(args.iter().map(|arg| (*arg).to_string()));
-        let output = self.runner.run("git", &owned)?;
+    /// Runs one git read in the repository root (the tool is NOT given a global
+    /// path option: the delivery baseline cannot parse one).
+    fn git(&self, working_tree: &Path, args: &[&str]) -> Result<String, String> {
+        let owned: Vec<String> = args.iter().map(|arg| (*arg).to_string()).collect();
+        let output = self.runner.run("git", working_tree, &owned)?;
         if output.success {
             Ok(output.stdout)
         } else {
@@ -98,9 +97,10 @@ impl<R: CommandRunner> ProcessVcsService<R> {
         }
     }
 
-    fn svn(&self, args: &[&str]) -> Result<String, String> {
+    /// Runs one Subversion read in the working copy root.
+    fn svn(&self, working_tree: &Path, args: &[&str]) -> Result<String, String> {
         let owned: Vec<String> = args.iter().map(|arg| (*arg).to_string()).collect();
-        let output = self.runner.run("svn", &owned)?;
+        let output = self.runner.run("svn", working_tree, &owned)?;
         if output.success {
             Ok(output.stdout)
         } else {
@@ -152,25 +152,18 @@ impl<R: CommandRunner> VcsService for ProcessVcsService<R> {
                 }
             }
             Backend::Svn => {
-                let revision = self
-                    .svn(&[
-                        "info",
-                        "--show-item",
-                        "revision",
-                        working_tree.to_str().unwrap_or("."),
-                    ])
+                // One `svn info --xml` call: the XML form is available in
+                // Subversion 1.7 (the bundled client) whereas the selector form
+                // (`info` printing a single field) only exists from 1.9.
+                let xml = self
+                    .svn(
+                        &working_tree,
+                        &["info", "--xml", working_tree.to_str().unwrap_or(".")],
+                    )
                     .ok()
-                    .and_then(|text| parse_revision(&text));
-                let url = self
-                    .svn(&[
-                        "info",
-                        "--show-item",
-                        "url",
-                        working_tree.to_str().unwrap_or("."),
-                    ])
-                    .ok()
-                    .map(|text| text.trim().to_string())
-                    .filter(|value| !value.is_empty());
+                    .unwrap_or_default();
+                let revision = parse_svn_info_revision(&xml);
+                let url = parse_svn_info_url(&xml);
                 let branch = url.map(|value| {
                     value
                         .rsplit('/')
@@ -246,12 +239,12 @@ impl<R: CommandRunner> VcsService for ProcessVcsService<R> {
                 }
             }
             Backend::Svn => {
+                // The path is WORKING-COPY RELATIVE (status reports it that way);
+                // svn resolves it against the process cwd (the working-copy root),
+                // so the diff header says `Index: rtl/a.sv` exactly like the Git
+                // panel's `a/rtl/a.sv` instead of an absolute path.
                 let text = self
-                    .svn(&[
-                        "diff",
-                        "--internal-diff",
-                        working_tree.join(path).to_str().unwrap_or("."),
-                    ])
+                    .svn(&working_tree, &["diff", "--internal-diff", path])
                     .unwrap_or_default();
                 if text.trim().is_empty() {
                     return FileDiff::empty(path, "no diff to show (unchanged, added or binary)");
@@ -320,11 +313,68 @@ impl VcsService for StubVcsService {
     }
 }
 
+/// Revision from `svn info --xml` (`<entry ... revision="42">`).
+fn parse_svn_info_revision(xml: &str) -> Option<String> {
+    let entry = xml.split("<entry").nth(1)?;
+    let marker = "revision=\"";
+    let start = entry.find(marker)? + marker.len();
+    let end = entry[start..].find('"')? + start;
+    let value = entry[start..end].trim();
+    (!value.is_empty()).then(|| value.to_string())
+}
+
+/// URL from `svn info --xml` (`<url>...</url>`).
+fn parse_svn_info_url(xml: &str) -> Option<String> {
+    let marker = "<url>";
+    let start = xml.find(marker)? + marker.len();
+    let end = xml[start..].find("</url>")? + start;
+    let value = xml[start..end].trim();
+    (!value.is_empty()).then(|| value.to_string())
+}
+
 /// Convenience: a change with a modified kind (used by the panel tests).
 #[must_use]
 pub fn modified(path: &str) -> Change {
     Change {
         path: path.to_string(),
         kind: ChangeKind::Modified,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    const SVN_INFO_XML: &str = concat!(
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n",
+        "<info>\n",
+        "<entry\n",
+        "   kind=\"dir\"\n",
+        "   path=\".\"\n",
+        "   revision=\"42\">\n",
+        "<url>svn://example.invalid/repo/trunk</url>\n",
+        "<repository>\n",
+        "<root>svn://example.invalid/repo</root>\n",
+        "</repository>\n",
+        "</entry>\n",
+        "</info>\n"
+    );
+
+    #[test]
+    fn svn_info_xml_yields_revision_and_url() {
+        // Subversion 1.7 has no selector form; the XML form carries both values.
+        assert_eq!(parse_svn_info_revision(SVN_INFO_XML).as_deref(), Some("42"));
+        assert_eq!(
+            parse_svn_info_url(SVN_INFO_XML).as_deref(),
+            Some("svn://example.invalid/repo/trunk")
+        );
+    }
+
+    #[test]
+    fn svn_info_xml_without_values_is_the_empty_state_not_a_panic() {
+        assert_eq!(parse_svn_info_revision("<info/>"), None);
+        assert_eq!(parse_svn_info_url("<info/>"), None);
+        assert_eq!(parse_svn_info_revision(""), None);
+        assert_eq!(parse_svn_info_url(""), None);
     }
 }

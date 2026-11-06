@@ -1,0 +1,47 @@
+--- src/workspace/filetree/file_status_delegate.cpp	2026-11-06 17:32:53.313979804 +0800
++++ evidence/ux-batch-2/rm7b-disabled-followups/prefix/file_status_delegate_prefix.cpp	2026-11-06 17:37:50.432089914 +0800
+@@ -11,24 +11,6 @@
+ 
+ namespace vedit::workspace {
+ 
+-namespace {
+-
+-// RM-7b: a disabled row's dot must dim exactly like the rest of the row. The
+-// same rule the theme palette uses for its Disabled group: move the semantic
+-// colour 55% of the way toward the surface it is painted on. Keeping the hue
+-// (red/amber/green/grey) means the status stays readable, only muted.
+-constexpr int kDisabledDotBlendPercent = 55;
+-
+-QColor blendToward(const QColor &color, const QColor &surface, int percent)
+-{
+-    const qreal weight = qBound(0, percent, 100) / 100.0;
+-    return QColor(qRound(color.red() * (1.0 - weight) + surface.red() * weight),
+-                  qRound(color.green() * (1.0 - weight) + surface.green() * weight),
+-                  qRound(color.blue() * (1.0 - weight) + surface.blue() * weight));
+-}
+-
+-} // namespace
+-
+ FileStatusDotDelegate::FileStatusDotDelegate(QObject *parent)
+     : QStyledItemDelegate(parent)
+ {
+@@ -93,18 +75,7 @@
+     const QRect dotRect(centreX - DotDiameter / 2, centreY - DotDiameter / 2, DotDiameter,
+                         DotDiameter);
+     lastDotRect_ = dotRect;
+-    // RM-7b: honour the row's enabled state for the hand-painted dot. Before
+-    // this, a disabled row kept a full-strength dot while its icon and text
+-    // dimmed (the RM-9 states are unchanged: the ring shape below still uses
+-    // this colour, only dimmed when the row is disabled).
+-    QColor paintedDot = dotColor(status);
+-    if ((opt.state & QStyle::State_Enabled) == 0) {
+-        const QColor surface = (opt.state & QStyle::State_Selected)
+-                                   ? opt.palette.color(QPalette::Highlight)
+-                                   : opt.palette.color(QPalette::Base);
+-        paintedDot = blendToward(paintedDot, surface, kDisabledDotBlendPercent);
+-    }
+-    lastDotColor_ = paintedDot;
++    lastDotColor_ = dotColor(status);
+     ++paintedDots_;
+     painter->save();
+     painter->setRenderHint(QPainter::Antialiasing, true);

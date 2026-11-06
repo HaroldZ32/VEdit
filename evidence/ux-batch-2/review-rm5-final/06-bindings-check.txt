@@ -1,0 +1,7 @@
+duplicate sequences in product-bindings.txt:
+(none above = ok)
+
+my selfcheck:
+COMMAND-BINDINGS count=32
+CHECK commands.no-duplicate-shortcuts PASS
+APP-SHELL-SELFTEST ok=1 checks=319 failures=0 state=/tmp/vedit-app-nvCQpA/state

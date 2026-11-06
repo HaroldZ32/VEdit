@@ -15,7 +15,10 @@
 //! original JSON object in [`Diagnostic::raw`] (so unknown keys such as
 //! `optionName` survive), and never drops a diagnostic.
 
-use serde::Deserialize;
+use std::io::Read;
+
+use serde::de::{DeserializeSeed, SeqAccess, Visitor};
+use serde::{Deserialize, Deserializer};
 
 /// Diagnostic severity as reported by slang.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -133,6 +136,15 @@ pub struct Diagnostic {
     /// A problem with the raw fields themselves (e.g. an unparsable location
     /// string); the diagnostic is still usable and [`Self::raw`] has the data.
     pub parse_note: Option<String>,
+    /// How many raw findings this row represents.
+    ///
+    /// `1` for a single-file run and for every row the language server pushes.
+    /// The streaming pass parser de-duplicates findings that repeat verbatim
+    /// (same file, line, column, code and message) — a warning about an
+    /// instantiated module's connection otherwise repeats once per instance —
+    /// and counts them here. Two DIFFERENT findings at the same location are
+    /// never merged.
+    pub repeat: usize,
 }
 
 /// Errors from parsing slang's JSON.
@@ -292,6 +304,10 @@ pub(crate) struct ParsedDiagnostic {
     pub symbol_path: Option<String>,
     pub raw: serde_json::Value,
     pub parse_note: Option<String>,
+    /// How many raw findings this row represents. `1` everywhere except the
+    /// streaming pass parser, which de-duplicates repeated findings and counts
+    /// them here (a warning about an instantiated module repeats per instance).
+    pub repeat: usize,
 }
 
 #[derive(Deserialize)]
@@ -326,6 +342,7 @@ struct WireEnd {
 /// Returns a [`ParseError`] for invalid JSON, a non-array top level, or an
 /// element missing a required field (`severity`, `message`, `code`). Missing
 /// `location`/`ranges` is **not** an error; those diagnostics stay usable.
+#[cfg(test)]
 pub(crate) fn parse_diagnostics(json: &str) -> Result<Vec<ParsedDiagnostic>, ParseError> {
     let value: serde_json::Value =
         serde_json::from_str(json).map_err(|error| ParseError(format!("{error}")))?;
@@ -335,51 +352,179 @@ pub(crate) fn parse_diagnostics(json: &str) -> Result<Vec<ParsedDiagnostic>, Par
     array
         .iter()
         .enumerate()
-        .map(|(index, element)| {
-            let wire: WireDiagnostic = serde_json::from_value(element.clone())
-                .map_err(|error| ParseError(format!("element {index}: {error}")))?;
-            let (location, parse_note) = match wire.location.as_deref() {
-                Some(text) => match parse_location_string(text) {
-                    Some(location) => (Some(location), None),
-                    None => (None, Some(format!("unparsable location string {text:?}"))),
-                },
-                // No location string: fall back to the first range, as some
-                // diagnostics only carry ranges.
-                None => (
-                    wire.ranges.first().map(|range| RawLocation {
-                        file: range.start.file.clone(),
-                        line: range.start.line,
-                        column: range.start.column,
-                    }),
-                    None,
-                ),
-            };
-            Ok(ParsedDiagnostic {
-                severity: Severity::from_wire(&wire.severity),
-                message: wire.message,
-                code: wire.code,
-                location,
-                ranges: wire
-                    .ranges
-                    .into_iter()
-                    .map(|range| RawRange {
-                        file: range.start.file.clone(),
-                        start: RawRangePosition {
-                            line: range.start.line,
-                            column: range.start.column,
-                        },
-                        end: RawRangePosition {
-                            line: range.end.line,
-                            column: range.end.column,
-                        },
-                    })
-                    .collect(),
-                symbol_path: wire.symbol_path,
-                raw: element.clone(),
-                parse_note,
-            })
-        })
+        .map(|(index, element)| parse_wire_element(element.clone(), index))
         .collect()
+}
+
+/// One diagnostics document read from a READER.
+#[derive(Debug, Clone)]
+pub(crate) struct DiagnosticStream {
+    /// The rows RETAINED, one per distinct finding, each with its `repeat`.
+    pub diagnostics: Vec<ParsedDiagnostic>,
+    /// Raw elements present in the document (retained + dropped).
+    pub total: usize,
+    /// Raw elements that are not represented in `diagnostics` because the
+    /// count bound was reached for a new distinct finding.
+    pub dropped: usize,
+}
+
+/// Stream slang's `--diag-json` array from a reader.
+///
+/// The document is NEVER held in memory. Two policies make a real project's
+/// warning flood harmless:
+///
+/// * **de-duplication**: findings with the same (file, line, column, code,
+///   message) are one row with `repeat` counting how many times they occurred.
+///   A warning about an instantiated module's connection otherwise repeats once
+///   per elaborated instance. Two different findings at the same location are
+///   NEVER merged: the code and the message are part of the key.
+/// * **count bound**: at most `max_unique` distinct findings are retained. Past
+///   it, the walk keeps reading and counting so the caller can say how many
+///   findings it did not keep — the pass never fails because of volume.
+///
+/// # Errors
+/// Invalid JSON, a non-array top level, or a retained element missing a
+/// required field. Elements read only for counting are still JSON-validated.
+pub(crate) fn parse_diagnostics_reader<R: Read>(
+    reader: R,
+    max_unique: usize,
+) -> Result<DiagnosticStream, ParseError> {
+    let mut stream = DiagnosticStream {
+        diagnostics: Vec::new(),
+        total: 0,
+        dropped: 0,
+    };
+    let mut deserializer = serde_json::Deserializer::from_reader(reader);
+    StreamSeed {
+        stream: &mut stream,
+        max_unique,
+    }
+    .deserialize(&mut deserializer)
+    .map_err(|error| ParseError(format!("{error}")))?;
+    Ok(stream)
+}
+
+struct StreamSeed<'a> {
+    stream: &'a mut DiagnosticStream,
+    max_unique: usize,
+}
+
+impl<'de> DeserializeSeed<'de> for StreamSeed<'_> {
+    type Value = ();
+
+    fn deserialize<D>(self, deserializer: D) -> Result<(), D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        deserializer.deserialize_seq(StreamVisitor {
+            stream: self.stream,
+            max_unique: self.max_unique,
+        })
+    }
+}
+
+struct StreamVisitor<'a> {
+    stream: &'a mut DiagnosticStream,
+    max_unique: usize,
+}
+
+impl<'de> Visitor<'de> for StreamVisitor<'_> {
+    type Value = ();
+
+    fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter.write_str("an array of slang diagnostics")
+    }
+
+    fn visit_seq<A>(self, mut seq: A) -> Result<(), A::Error>
+    where
+        A: SeqAccess<'de>,
+    {
+        use std::collections::HashMap;
+        // The de-duplication identity of a retained row. The file is part of the
+        // key so a diagnostic in an include does not merge with one in the
+        // linted file at the same line/column; code+message keep two DIFFERENT
+        // findings at one location apart.
+        let mut index: HashMap<String, usize> = HashMap::new();
+        while let Some(element) = seq.next_element::<serde_json::Value>()? {
+            let position = self.stream.total;
+            let parsed = parse_wire_element(element, position)
+                .map_err(|error| <A::Error as serde::de::Error>::custom(error.to_string()))?;
+            self.stream.total += 1;
+            let key = dedupe_key(&parsed);
+            if let Some(&retained) = index.get(&key) {
+                self.stream.diagnostics[retained].repeat += 1;
+            } else if self.stream.diagnostics.len() < self.max_unique {
+                index.insert(key, self.stream.diagnostics.len());
+                self.stream.diagnostics.push(parsed);
+            } else {
+                self.stream.dropped += 1;
+            }
+        }
+        Ok(())
+    }
+}
+
+/// The per-finding identity used by the pass de-duplication.
+fn dedupe_key(parsed: &ParsedDiagnostic) -> String {
+    let (file, line, column) = match &parsed.location {
+        Some(location) => (location.file.clone(), location.line, location.column),
+        None => ("".to_string(), 0, 0),
+    };
+    format!(
+        "{file}\u{1f}{line}\u{1f}{column}\u{1f}{}\u{1f}{}",
+        parsed.code, parsed.message
+    )
+}
+
+/// Parse one wire element. Shared by the whole-string and the streaming path so
+/// both produce exactly the same rows.
+fn parse_wire_element(
+    value: serde_json::Value,
+    index: usize,
+) -> Result<ParsedDiagnostic, ParseError> {
+    let wire: WireDiagnostic = serde_json::from_value(value.clone())
+        .map_err(|error| ParseError(format!("element {index}: {error}")))?;
+    let (location, parse_note) = match wire.location.as_deref() {
+        Some(text) => match parse_location_string(text) {
+            Some(location) => (Some(location), None),
+            None => (None, Some(format!("unparsable location string {text:?}"))),
+        },
+        // No location string: fall back to the first range, as some
+        // diagnostics only carry ranges.
+        None => (
+            wire.ranges.first().map(|range| RawLocation {
+                file: range.start.file.clone(),
+                line: range.start.line,
+                column: range.start.column,
+            }),
+            None,
+        ),
+    };
+    Ok(ParsedDiagnostic {
+        severity: Severity::from_wire(&wire.severity),
+        message: wire.message,
+        code: wire.code,
+        location,
+        ranges: wire
+            .ranges
+            .into_iter()
+            .map(|range| RawRange {
+                file: range.start.file.clone(),
+                start: RawRangePosition {
+                    line: range.start.line,
+                    column: range.start.column,
+                },
+                end: RawRangePosition {
+                    line: range.end.line,
+                    column: range.end.column,
+                },
+            })
+            .collect(),
+        symbol_path: wire.symbol_path,
+        raw: value,
+        parse_note,
+        repeat: 1,
+    })
 }
 
 /// Parse the `"file:line:column"` location string (file names may contain
@@ -393,7 +538,28 @@ fn parse_location_string(text: &str) -> Option<RawLocation> {
 }
 
 /// Convert a parsed diagnostic to the public model using the linted source.
-pub(crate) fn convert_diagnostic(parsed: ParsedDiagnostic, source: &SourceLines) -> Diagnostic {
+/// Convert a parsed diagnostic and make its reported paths absolute.
+///
+/// `tool_dir` is the directory the lint child actually ran in (the lint runner
+/// sets it to the linted file's directory). slang reports `--diag-json` paths
+/// relative to it (verified: an absolute argument comes back as
+/// `../…/warn.sv` from a foreign cwd), so without this the diagnostics' file
+/// identity would never match the editor's absolute paths - verdicts would key
+/// on a path that does not exist. `None` keeps the reported spelling (the
+/// unit-test fixtures, whose paths are already absolute or intentionally raw).
+pub(crate) fn convert_diagnostic(
+    mut parsed: ParsedDiagnostic,
+    source: &SourceLines,
+    tool_dir: Option<&std::path::Path>,
+) -> Diagnostic {
+    if let Some(tool_dir) = tool_dir {
+        if let Some(location) = parsed.location.as_mut() {
+            location.file = crate::tool_paths::absolute_path_str(&location.file, tool_dir);
+        }
+        for range in &mut parsed.ranges {
+            range.file = crate::tool_paths::absolute_path_str(&range.file, tool_dir);
+        }
+    }
     let primary = parsed.ranges.first().cloned().or_else(|| {
         parsed.location.as_ref().map(|location| RawRange {
             file: location.file.clone(),
@@ -428,6 +594,7 @@ pub(crate) fn convert_diagnostic(parsed: ParsedDiagnostic, source: &SourceLines)
         editor_range,
         conversion_note,
         parse_note: parsed.parse_note,
+        repeat: parsed.repeat,
     }
 }
 
@@ -544,6 +711,7 @@ mod tests {
                 .next()
                 .unwrap_or_else(|| panic!("missing")),
             &source,
+            None,
         );
         assert_eq!(diagnostic.code, "TooManyErrors");
         assert!(diagnostic.editor_range.is_none());
@@ -566,6 +734,7 @@ mod tests {
                 .next()
                 .unwrap_or_else(|| panic!("missing")),
             &source,
+            None,
         );
         assert!(diagnostic.ranges.is_empty());
         assert_eq!(
@@ -802,5 +971,90 @@ mod tests {
                 character: 2
             }
         );
+    }
+
+    fn one_finding(message: &str, code: &str) -> String {
+        format!(
+            "{{\"severity\":\"warning\",\"message\":\"{message}\",\"code\":\"{code}\",\"location\":\"top.sv:10:5\"}}"
+        )
+    }
+
+    #[test]
+    fn the_streaming_parser_matches_the_whole_string_parse() {
+        let json = format!(
+            "[{},{}]",
+            one_finding("first", "W1"),
+            one_finding("second", "W2")
+        );
+        let whole = parse_diagnostics(&json).unwrap_or_else(|error| panic!("parse: {error}"));
+        let streamed = parse_diagnostics_reader(json.as_bytes(), 500)
+            .unwrap_or_else(|error| panic!("stream: {error}"));
+        assert_eq!(whole.len(), streamed.diagnostics.len());
+        for (a, b) in whole.iter().zip(streamed.diagnostics.iter()) {
+            assert_eq!(a.message, b.message);
+            assert_eq!(a.code, b.code);
+            assert_eq!(a.location, b.location);
+            assert_eq!(b.repeat, 1);
+        }
+        assert_eq!(streamed.total, 2);
+        assert_eq!(streamed.dropped, 0);
+    }
+
+    #[test]
+    fn repeated_findings_collapse_with_a_repeat_count() {
+        let json = format!(
+            "[{},{},{},{}]",
+            one_finding("repeated", "Wrep"),
+            one_finding("repeated", "Wrep"),
+            one_finding("repeated", "Wrep"),
+            one_finding("different", "Wother")
+        );
+        let streamed = parse_diagnostics_reader(json.as_bytes(), 500)
+            .unwrap_or_else(|error| panic!("stream: {error}"));
+        assert_eq!(streamed.total, 4, "every raw element is counted");
+        assert_eq!(streamed.diagnostics.len(), 2, "two distinct findings");
+        assert_eq!(streamed.diagnostics[0].repeat, 3);
+        assert_eq!(streamed.diagnostics[1].repeat, 1);
+        assert_eq!(streamed.dropped, 0, "collapsing is not dropping");
+    }
+
+    #[test]
+    fn different_findings_at_one_location_stay_separate() {
+        // Same file/line/column, different rule code and message: two findings,
+        // never merged (the code and the message are part of the key).
+        let a = "{\"severity\":\"warning\",\"message\":\"alpha\",\"code\":\"WA\",\"location\":\"top.sv:10:5\"}";
+        let b = "{\"severity\":\"warning\",\"message\":\"beta\",\"code\":\"WB\",\"location\":\"top.sv:10:5\"}";
+        let json = format!("[{a},{b}]");
+        let streamed = parse_diagnostics_reader(json.as_bytes(), 500)
+            .unwrap_or_else(|error| panic!("stream: {error}"));
+        assert_eq!(
+            streamed.diagnostics.len(),
+            2,
+            "same location is not the same finding"
+        );
+        assert!(streamed.diagnostics.iter().all(|row| row.repeat == 1));
+    }
+
+    #[test]
+    fn the_count_bound_keeps_the_head_and_counts_the_tail() {
+        let elements: Vec<String> = (0..5)
+            .map(|index| one_finding(&format!("finding {index}"), &format!("W{index}")))
+            .collect();
+        let json = format!("[{}]", elements.join(","));
+        let streamed = parse_diagnostics_reader(json.as_bytes(), 3)
+            .unwrap_or_else(|error| panic!("stream: {error}"));
+        assert_eq!(
+            streamed.diagnostics.len(),
+            3,
+            "retention is bounded by count"
+        );
+        assert_eq!(streamed.total, 5, "the tail is counted");
+        assert_eq!(streamed.dropped, 2);
+    }
+
+    #[test]
+    fn a_non_array_diagnostics_document_is_a_typed_error() {
+        assert!(parse_diagnostics_reader("{}".as_bytes(), 10).is_err());
+        assert!(parse_diagnostics_reader("{not json".as_bytes(), 10).is_err());
     }
 }

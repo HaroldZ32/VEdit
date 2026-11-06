@@ -1,0 +1,41 @@
+$ grep "^COMMAND-BINDING" evidence/ux-batch-2/rm5c-defaults/product-selfcheck.log
+COMMAND-BINDINGS count=36
+COMMAND-BINDING Alt+Shift+F	diagnostics.format
+COMMAND-BINDING Ctrl+,	settings.preferences
+COMMAND-BINDING Ctrl+Alt+C	view.panel.vcs
+COMMAND-BINDING Ctrl+Alt+F	view.panel.file-tree
+COMMAND-BINDING Ctrl+Alt+H	view.split.horizontal
+COMMAND-BINDING Ctrl+Alt+J	view.panel.terminal
+COMMAND-BINDING Ctrl+Alt+M	view.layout.mixed
+COMMAND-BINDING Ctrl+Alt+N	file.new-layout
+COMMAND-BINDING Ctrl+Alt+O	view.panel.outline
+COMMAND-BINDING Ctrl+Alt+R	view.layout.reset
+COMMAND-BINDING Ctrl+Alt+S	view.panel.search
+COMMAND-BINDING Ctrl+Alt+Shift+D	view.panel.diagnostics
+COMMAND-BINDING Ctrl+Alt+Shift+F	search.focus
+COMMAND-BINDING Ctrl+Alt+Shift+O	file.open-folder
+COMMAND-BINDING Ctrl+Alt+Shift+P	file.switch-project
+COMMAND-BINDING Ctrl+Alt+Shift+S	file.save-all
+COMMAND-BINDING Ctrl+Alt+Shift+T	view.toolbar
+COMMAND-BINDING Ctrl+N	file.new
+COMMAND-BINDING Ctrl+O	file.open
+COMMAND-BINDING Ctrl+P	file.goto-file
+COMMAND-BINDING Ctrl+Q	file.quit
+COMMAND-BINDING Ctrl+S	file.save
+COMMAND-BINDING Ctrl+Shift+F	diagnostics.format
+COMMAND-BINDING Ctrl+Shift+S	file.save-as
+COMMAND-BINDING Ctrl+Shift+Tab	view.tab.previous
+COMMAND-BINDING Ctrl+Shift+V	view.split.vertical
+COMMAND-BINDING Ctrl+Shift+Z	edit.redo
+COMMAND-BINDING Ctrl+Tab	view.tab.next
+COMMAND-BINDING Ctrl+W	file.close-pane
+COMMAND-BINDING Ctrl+Y	edit.redo
+COMMAND-BINDING Ctrl+Z	edit.undo
+COMMAND-BINDING F1	help.user-manual
+COMMAND-BINDING F12	diagnostics.definition
+COMMAND-BINDING F2	diagnostics.rename
+COMMAND-BINDING F6	view.focus.next
+COMMAND-BINDING Shift+F12	diagnostics.references
+
+$ grep -n "commands.no-desktop-global-shortcuts" evidence/ux-batch-2/rm5c-defaults/product-selfcheck.log
+376:CHECK commands.no-desktop-global-shortcuts PASS

@@ -15,6 +15,13 @@
 
 namespace vedit::workspace::diagnostics {
 
+/// Which CLI lint engine a run uses (T138/T11). The numbers match
+/// `vd_deeplint_lint_v2`'s `engine` argument.
+enum class LintEngineKind {
+    Slang = 0,        ///< `slang --lint-only`
+    VeribleLint = 1,  ///< `verible-verilog-lint`
+};
+
 class SlangBackend {
 public:
     virtual ~SlangBackend() = default;
@@ -32,7 +39,34 @@ public:
 
     /// Poll one lint ticket; `pending` means "poll again later".
     virtual LspPolled pollLint(int ticket) = 0;
+
+    // --- T11: engine selection and the project's -I/-D ---------------------
+    /// Select the engine, its binaries, the project's include dirs/defines and
+    /// the verible rules file for runs started AFTER this call.
+    virtual void selectEngine(LintEngineKind engine,
+                              const QString &slangPath,
+                              const QString &veribleLintPath,
+                              const QStringList &includeDirs,
+                              const QStringList &defines,
+                              const QString &rulesPath);
+    virtual LintEngineKind engineKind() const { return LintEngineKind::Slang; }
+    virtual QString engineName() const { return QStringLiteral("slang"); }
 };
+
+inline void SlangBackend::selectEngine(LintEngineKind engine,
+                                       const QString &slangPath,
+                                       const QString &veribleLintPath,
+                                       const QStringList &includeDirs,
+                                       const QStringList &defines,
+                                       const QString &rulesPath)
+{
+    (void)engine;
+    (void)slangPath;
+    (void)veribleLintPath;
+    (void)includeDirs;
+    (void)defines;
+    (void)rulesPath;
+}
 
 /// True when this build links the Rust service layer.
 bool ffiSlangBackendAvailable();

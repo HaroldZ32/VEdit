@@ -1,0 +1,5 @@
+bash: line 6: warning: setlocale: LC_ALL: cannot change locale (C.UTF-8)
+bash: line 6: warning: setlocale: LC_ALL: cannot change locale (C.UTF-8)
+PRODUCT_EXIT=0
+== vedit-app diagnostics ==
+vedit-app: interface language zh_CN needs vedit_zh_CN.qm but no translations directory contains it (searched: /w/evidence/loader-i18n-restart-slang-verification/scratch-notrans/bin/translations, /w/evidence/loader-i18n-restart-slang-verification/scratch-notrans/translations, /w/evidence/loader-i18n-restart-slang-verification/scratch-notrans/../share/vedit/translations)

@@ -100,7 +100,7 @@ int main(int argc, char **argv)
     QApplication app(argc, argv);
     QTemporaryDir dir;
     if (!dir.isValid()) {
-        skip("seam.temp-dir", QStringLiteral("no temporary directory"));
+        skip("seam.temp-dir", QCoreApplication::translate("VEdit", "no temporary directory"));
         std::printf("VE-DIAGNOSTICS-PRODUCT-SEAM checks=%d failures=%d skipped=%d\n", g_checks,
                     g_failures, g_skips);
         return g_failures == 0 ? 0 : 1;
@@ -157,7 +157,7 @@ int main(int argc, char **argv)
     const bool analyzedAfterOpen = waitUntil(
         [&panel]() { return panel->statusText().contains(QStringLiteral("analyzed")); }, 30000);
     if (!analyzedAfterOpen
-        && panel->statusText().contains(QStringLiteral("Diagnostics unavailable"))) {
+        && panel->statusText().contains(QCoreApplication::translate("VEdit", "Diagnostics unavailable"))) {
         skip("seam.analysis-after-open", panel->statusText());
         skip("seam.panel-shows-buffer-source", QStringLiteral("no toolchain"));
         skip("seam.buffer-edit-diagnosed", QStringLiteral("no toolchain"));
@@ -178,7 +178,7 @@ int main(int argc, char **argv)
         const bool diagnosed = waitUntil(
             [&panel]() {
                 return panel->statusText().contains(QStringLiteral("not saved"))
-                       && !panel->statusText().contains(QStringLiteral(": 0 diagnostic(s)"));
+                       && !panel->statusText().contains(QCoreApplication::translate("VEdit", ": 0 diagnostic(s)"));
             },
             30000);
         std::printf("OBSERVED seam.after-edit status='%s'\n",

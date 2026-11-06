@@ -1,0 +1,43 @@
+===== jump lane tests =====
+[8/9] Building CXX object src/app/editor-lane/breadcrumb-lane/jump-lane/CMakeFiles/vedit-jump-tests.dir/tests/jump_tests.cpp.o
+[9/9] Linking CXX executable src/app/editor-lane/breadcrumb-lane/jump-lane/vedit-jump-tests
+DESTROYED-TARGET status=no-target file='rtl/gone.sv' (no crash)
+CHECK guard.after-destroy-no-target PASS
+CHECK guard.target-getter-null PASS
+CHECK status-name.no-target PASS
+CHECK status-name.invalid PASS
+CHECK status-name.delivered PASS
+CHECK status-name.rejected PASS
+SUMMARY checks=40 failures=0
+===== search lane selftest =====
+[79/80] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit-workspace-search-selftest.dir/search_selftest.cpp.o
+[80/80] Linking CXX executable src/app/workspace-lane-search/vedit-workspace-search-selftest
+SLOWLIFECYCLE delete-returned elapsedMs=0 released-marker=1 stallMs=11500
+CHECK slowlifecycle.destructor-waits-for-stalled-read PASS
+WORKSPACE-SEARCH-SLOWLIFECYCLE ok=1 checks=4 failures=0
+CHECK lifecycle.stall-child-finished PASS
+CHECK lifecycle.stall-child-pass PASS
+WORKSPACE-SEARCH-SELFTEST ok=1 checks=106 failures=0 skipped=2
+===== module tree acceptance (real seam) =====
+[95/96] Building CXX object src/app/workspace-lane-module_tree/CMakeFiles/vedit-module-tree-catalog-test.dir/module_tree_catalog_test.cpp.o
+[96/96] Linking CXX executable src/app/workspace-lane-module_tree/vedit-module-tree-catalog-test
+ok   jump.product-target
+FAIL h1.first-appearance.file-set — fileSet=7 modules=6
+FAIL h1.first-appearance.uses-seeded-set — modules=6
+FAIL h1.first-appearance.source-is-model — vd_project_expand_v2(/vedit-build/src/workspace/module_tree/fixtures/ux-batch-2)
+ok   acceptance.iii.cursor-on-declaration — cursor=1:8 expected=1:8
+ok   acceptance.vi.focus-top-a — top_a
+ok   acceptance.vi.port-row-visible
+ok   acceptance.vi.declaration-file — /vedit-build/src/workspace/module_tree/fixtures/ux-batch-2/top_a.sv
+ok   acceptance.vi.declaration-cursor — cursor=1:67 expected=1:67
+ok   acceptance.vi.top-b-instance-found — top_b.u_shared
+ok   acceptance.vi.shared-row
+ok   acceptance.vi.focus-shared — shared
+ok   acceptance.vi.shared-port-visible
+ok   acceptance.vi.chooser-two-parents — candidates=2
+ok   acceptance.vi.chooser-parents — top_a, top_b
+ok   acceptance.vi.instantiation-file — /vedit-build/src/workspace/module_tree/fixtures/ux-batch-2/top_b.sv
+ok   acceptance.vi.instantiation-cursor — cursor=2 expected=2
+ok   acceptance.vi.chooser-count-observable — 2
+SKIP screenshot — no screenshot path was requested
+FAIL: 80 check(s), 3 failure(s)

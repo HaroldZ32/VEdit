@@ -1,0 +1,32 @@
+# Files this lane (B3 + B5) wrote. The workspace already carried other lanes'
+# uncommitted changes, so this list is the lane's own record, not `git status`.
+
+src/workspace/diagnostics/diagnostics_controller.h        R2 layering API, pass serial, view revision, FileStatus
+src/workspace/diagnostics/diagnostics_controller.cpp      merge/coverage/edit-invalidation, severity-scale fix, rename request guard
+src/workspace/diagnostics/diagnostics_integration.cpp     save seam wiring, trigger, ELAB presentation, diagnostic hover + autofix, rename validation, project file set via vd_project_expand
+src/workspace/diagnostics/diagnostics_panel.cpp           renders the merged view
+src/workspace/diagnostics/ffi_backends.cpp                hover gate (no longer greyed by hoverProvider:false)
+src/workspace/diagnostics/project_lint_trigger.h/.cpp     NEW  R3 debounce + single flight
+src/workspace/diagnostics/project_lint_notice.h/.cpp      NEW  item 12 modal-vs-notice policy
+src/workspace/diagnostics/autofix.h/.cpp                  NEW  engine-driven autofix probe/fix (temp copy)
+src/workspace/diagnostics/autofix_document.cpp            NEW  one-undo whole-document replacement
+src/workspace/diagnostics/diagnostic_hover.h/.cpp         NEW  hover content + fix button
+src/workspace/diagnostics/symbol_scan.h/.cpp              NEW  keyword pre-check for Rename
+src/workspace/diagnostics/selftests/lint_experience_selftest.cpp  NEW  acceptance 1-7 (headless)
+src/workspace/diagnostics/selftests/rename_e2e.cpp        NEW  acceptance 8 (real verible)
+src/workspace/diagnostics/selftests/project_lint_e2e.cpp  NEW  item 12 product wiring
+src/workspace/diagnostics/CMakeLists.txt                  sources + 3 test targets
+src/workspace/diagnostics/README.md                       R2/R3/items 9/10/12/B5 documentation
+
+src/workspace/filetree/file_status_delegate.h/.cpp        NEW  dot between icon and name
+src/workspace/filetree/file_tree_model.h/.cpp             FileStatusRole + status source/revision
+src/workspace/filetree/file_tree_widget.h/.cpp            delegate + 500 ms revision poll
+src/workspace/filetree/filetree_integration.cpp           status source from the shell property seam
+src/workspace/filetree/CMakeLists.txt                     new source
+
+src/app/editor_area.h                                     EditorPane/EditorArea setOnDocumentSaved (save seam only)
+src/app/editor_area.cpp                                   fires it after a SUCCESSFUL saveTab/saveAsFile
+
+FORBIDDEN paths left untouched: src/app/app_shell.cpp, src/app/main.cpp,
+src/workspace/search/**, src/workspace/module_tree/**, src/editor/**, crates/**,
+docs/USER_GUIDE.md, translations/**, other lanes' evidence.

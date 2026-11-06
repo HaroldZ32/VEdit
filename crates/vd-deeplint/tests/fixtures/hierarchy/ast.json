@@ -1,0 +1,661 @@
+{
+  "design": {
+    "name": "$root",
+    "kind": "Root",
+    "addr": 5525745508000,
+    "members": [
+      {
+        "name": "",
+        "kind": "CompilationUnit",
+        "addr": 5525748208080
+      },
+      {
+        "name": "",
+        "kind": "CompilationUnit",
+        "addr": 5525748208352
+      },
+      {
+        "name": "top",
+        "kind": "Instance",
+        "source_file": "probes/slang-spike/fixture/top.sv",
+        "source_line": 3,
+        "source_column": 8,
+        "addr": 5525748209328,
+        "body": {
+          "name": "top",
+          "kind": "InstanceBody",
+          "source_file": "probes/slang-spike/fixture/top.sv",
+          "source_line": 3,
+          "source_column": 8,
+          "addr": 5525748208624,
+          "members": [
+            {
+              "name": "clk",
+              "kind": "Port",
+              "source_file": "probes/slang-spike/fixture/top.sv",
+              "source_line": 4,
+              "source_column": 18,
+              "addr": 5525748209464,
+              "type": "logic",
+              "direction": "In",
+              "internalSymbol": "5525748209584 clk"
+            },
+            {
+              "name": "clk",
+              "kind": "Net",
+              "source_file": "probes/slang-spike/fixture/top.sv",
+              "source_line": 4,
+              "source_column": 18,
+              "addr": 5525748209584,
+              "type": "logic",
+              "netType": {
+                "name": "wire",
+                "kind": "NetType",
+                "addr": 5525745507200,
+                "type": "logic"
+              }
+            },
+            {
+              "name": "d",
+              "kind": "Port",
+              "source_file": "probes/slang-spike/fixture/top.sv",
+              "source_line": 5,
+              "source_column": 18,
+              "addr": 5525748209744,
+              "type": "logic",
+              "direction": "In",
+              "internalSymbol": "5525748209864 d"
+            },
+            {
+              "name": "d",
+              "kind": "Net",
+              "source_file": "probes/slang-spike/fixture/top.sv",
+              "source_line": 5,
+              "source_column": 18,
+              "addr": 5525748209864,
+              "type": "logic",
+              "netType": {
+                "name": "wire",
+                "kind": "NetType",
+                "addr": 5525745507200,
+                "type": "logic"
+              }
+            },
+            {
+              "name": "rst",
+              "kind": "Port",
+              "source_file": "probes/slang-spike/fixture/top.sv",
+              "source_line": 6,
+              "source_column": 18,
+              "addr": 5525748210024,
+              "type": "logic",
+              "direction": "In",
+              "internalSymbol": "5525748210144 rst"
+            },
+            {
+              "name": "rst",
+              "kind": "Net",
+              "source_file": "probes/slang-spike/fixture/top.sv",
+              "source_line": 6,
+              "source_column": 18,
+              "addr": 5525748210144,
+              "type": "logic",
+              "netType": {
+                "name": "wire",
+                "kind": "NetType",
+                "addr": 5525745507200,
+                "type": "logic"
+              }
+            },
+            {
+              "name": "q",
+              "kind": "Port",
+              "source_file": "probes/slang-spike/fixture/top.sv",
+              "source_line": 7,
+              "source_column": 18,
+              "addr": 5525748210304,
+              "type": "logic",
+              "direction": "Out",
+              "internalSymbol": "5525748210424 q"
+            },
+            {
+              "name": "q",
+              "kind": "Variable",
+              "source_file": "probes/slang-spike/fixture/top.sv",
+              "source_line": 7,
+              "source_column": 18,
+              "addr": 5525748210424,
+              "type": "logic",
+              "lifetime": "Static"
+            },
+            {
+              "name": "link",
+              "kind": "Variable",
+              "source_file": "probes/slang-spike/fixture/top.sv",
+              "source_line": 9,
+              "source_column": 9,
+              "addr": 5525748208864,
+              "type": "logic",
+              "lifetime": "Static"
+            },
+            {
+              "name": "u0",
+              "kind": "Instance",
+              "source_file": "probes/slang-spike/fixture/top.sv",
+              "source_line": 11,
+              "source_column": 7,
+              "addr": 5525748210592,
+              "body": {
+                "name": "mid",
+                "kind": "InstanceBody",
+                "source_file": "probes/slang-spike/fixture/mid.sv",
+                "source_line": 2,
+                "source_column": 8,
+                "addr": 5525748210720,
+                "members": [
+                  {
+                    "name": "clk",
+                    "kind": "Port",
+                    "source_file": "probes/slang-spike/fixture/mid.sv",
+                    "source_line": 3,
+                    "source_column": 18,
+                    "addr": 5525748216496,
+                    "type": "logic",
+                    "direction": "In",
+                    "internalSymbol": "5525748216616 clk"
+                  },
+                  {
+                    "name": "clk",
+                    "kind": "Net",
+                    "source_file": "probes/slang-spike/fixture/mid.sv",
+                    "source_line": 3,
+                    "source_column": 18,
+                    "addr": 5525748216616,
+                    "type": "logic",
+                    "netType": {
+                      "name": "wire",
+                      "kind": "NetType",
+                      "addr": 5525745507200,
+                      "type": "logic"
+                    }
+                  },
+                  {
+                    "name": "d",
+                    "kind": "Port",
+                    "source_file": "probes/slang-spike/fixture/mid.sv",
+                    "source_line": 4,
+                    "source_column": 18,
+                    "addr": 5525748216776,
+                    "type": "logic",
+                    "direction": "In",
+                    "internalSymbol": "5525748216896 d"
+                  },
+                  {
+                    "name": "d",
+                    "kind": "Net",
+                    "source_file": "probes/slang-spike/fixture/mid.sv",
+                    "source_line": 4,
+                    "source_column": 18,
+                    "addr": 5525748216896,
+                    "type": "logic",
+                    "netType": {
+                      "name": "wire",
+                      "kind": "NetType",
+                      "addr": 5525745507200,
+                      "type": "logic"
+                    }
+                  },
+                  {
+                    "name": "q",
+                    "kind": "Port",
+                    "source_file": "probes/slang-spike/fixture/mid.sv",
+                    "source_line": 5,
+                    "source_column": 18,
+                    "addr": 5525748217056,
+                    "type": "logic",
+                    "direction": "Out",
+                    "internalSymbol": "5525748217176 q"
+                  },
+                  {
+                    "name": "q",
+                    "kind": "Variable",
+                    "source_file": "probes/slang-spike/fixture/mid.sv",
+                    "source_line": 5,
+                    "source_column": 18,
+                    "addr": 5525748217176,
+                    "type": "logic",
+                    "lifetime": "Static"
+                  },
+                  {
+                    "name": "state",
+                    "kind": "Variable",
+                    "source_file": "probes/slang-spike/fixture/mid.sv",
+                    "source_line": 7,
+                    "source_column": 9,
+                    "addr": 5525748210960,
+                    "type": "logic",
+                    "lifetime": "Static"
+                  },
+                  {
+                    "name": "",
+                    "kind": "ProceduralBlock",
+                    "source_file": "probes/slang-spike/fixture/mid.sv",
+                    "source_line": 9,
+                    "source_column": 3,
+                    "addr": 5525748211096,
+                    "procedureKind": "AlwaysFF",
+                    "body": {
+                      "source_file_start": "probes/slang-spike/fixture/mid.sv",
+                      "source_file_end": "probes/slang-spike/fixture/mid.sv",
+                      "source_line_start": 9,
+                      "source_line_end": 11,
+                      "source_column_start": 13,
+                      "source_column_end": 6,
+                      "kind": "Timed",
+                      "timing": {
+                        "source_file_start": "probes/slang-spike/fixture/mid.sv",
+                        "source_file_end": "probes/slang-spike/fixture/mid.sv",
+                        "source_line_start": 9,
+                        "source_line_end": 9,
+                        "source_column_start": 15,
+                        "source_column_end": 26,
+                        "kind": "SignalEvent",
+                        "expr": {
+                          "source_file_start": "probes/slang-spike/fixture/mid.sv",
+                          "source_file_end": "probes/slang-spike/fixture/mid.sv",
+                          "source_line_start": 9,
+                          "source_line_end": 9,
+                          "source_column_start": 23,
+                          "source_column_end": 26,
+                          "kind": "NamedValue",
+                          "type": "logic",
+                          "symbol": "5525748216616 clk"
+                        },
+                        "edge": "PosEdge"
+                      },
+                      "stmt": {
+                        "source_file_start": "probes/slang-spike/fixture/mid.sv",
+                        "source_file_end": "probes/slang-spike/fixture/mid.sv",
+                        "source_line_start": 10,
+                        "source_line_end": 10,
+                        "source_column_start": 5,
+                        "source_column_end": 16,
+                        "kind": "Block",
+                        "blockKind": "Sequential",
+                        "body": {
+                          "source_file_start": "probes/slang-spike/fixture/mid.sv",
+                          "source_file_end": "probes/slang-spike/fixture/mid.sv",
+                          "source_line_start": 10,
+                          "source_line_end": 10,
+                          "source_column_start": 5,
+                          "source_column_end": 16,
+                          "kind": "ExpressionStatement",
+                          "expr": {
+                            "source_file_start": "probes/slang-spike/fixture/mid.sv",
+                            "source_file_end": "probes/slang-spike/fixture/mid.sv",
+                            "source_line_start": 10,
+                            "source_line_end": 10,
+                            "source_column_start": 5,
+                            "source_column_end": 15,
+                            "kind": "Assignment",
+                            "type": "logic",
+                            "left": {
+                              "source_file_start": "probes/slang-spike/fixture/mid.sv",
+                              "source_file_end": "probes/slang-spike/fixture/mid.sv",
+                              "source_line_start": 10,
+                              "source_line_end": 10,
+                              "source_column_start": 5,
+                              "source_column_end": 10,
+                              "kind": "NamedValue",
+                              "type": "logic",
+                              "symbol": "5525748210960 state"
+                            },
+                            "right": {
+                              "source_file_start": "probes/slang-spike/fixture/mid.sv",
+                              "source_file_end": "probes/slang-spike/fixture/mid.sv",
+                              "source_line_start": 10,
+                              "source_line_end": 10,
+                              "source_column_start": 14,
+                              "source_column_end": 15,
+                              "kind": "NamedValue",
+                              "type": "logic",
+                              "symbol": "5525748216896 d"
+                            },
+                            "isNonBlocking": true
+                          }
+                        }
+                      }
+                    }
+                  },
+                  {
+                    "name": "",
+                    "kind": "ContinuousAssign",
+                    "source_file": "probes/slang-spike/fixture/mid.sv",
+                    "source_line": 13,
+                    "source_column": 10,
+                    "addr": 5525748217336,
+                    "assignment": {
+                      "source_file_start": "probes/slang-spike/fixture/mid.sv",
+                      "source_file_end": "probes/slang-spike/fixture/mid.sv",
+                      "source_line_start": 13,
+                      "source_line_end": 13,
+                      "source_column_start": 10,
+                      "source_column_end": 19,
+                      "kind": "Assignment",
+                      "type": "logic",
+                      "left": {
+                        "source_file_start": "probes/slang-spike/fixture/mid.sv",
+                        "source_file_end": "probes/slang-spike/fixture/mid.sv",
+                        "source_line_start": 13,
+                        "source_line_end": 13,
+                        "source_column_start": 10,
+                        "source_column_end": 11,
+                        "kind": "NamedValue",
+                        "type": "logic",
+                        "symbol": "5525748217176 q"
+                      },
+                      "right": {
+                        "source_file_start": "probes/slang-spike/fixture/mid.sv",
+                        "source_file_end": "probes/slang-spike/fixture/mid.sv",
+                        "source_line_start": 13,
+                        "source_line_end": 13,
+                        "source_column_start": 14,
+                        "source_column_end": 19,
+                        "kind": "NamedValue",
+                        "type": "logic",
+                        "symbol": "5525748210960 state"
+                      },
+                      "isNonBlocking": false
+                    }
+                  }
+                ],
+                "definition": "5525744610304 mid"
+              },
+              "connections": [
+                {
+                  "port": {
+                    "name": "clk",
+                    "kind": "Port",
+                    "source_file": "probes/slang-spike/fixture/mid.sv",
+                    "source_line": 3,
+                    "source_column": 18,
+                    "addr": 5525748216496,
+                    "type": "logic",
+                    "direction": "In",
+                    "internalSymbol": "5525748216616 clk"
+                  },
+                  "expr": {
+                    "source_file_start": "probes/slang-spike/fixture/top.sv",
+                    "source_file_end": "probes/slang-spike/fixture/top.sv",
+                    "source_line_start": 11,
+                    "source_line_end": 11,
+                    "source_column_start": 16,
+                    "source_column_end": 19,
+                    "kind": "NamedValue",
+                    "type": "logic",
+                    "symbol": "5525748209584 clk"
+                  }
+                },
+                {
+                  "port": {
+                    "name": "d",
+                    "kind": "Port",
+                    "source_file": "probes/slang-spike/fixture/mid.sv",
+                    "source_line": 4,
+                    "source_column": 18,
+                    "addr": 5525748216776,
+                    "type": "logic",
+                    "direction": "In",
+                    "internalSymbol": "5525748216896 d"
+                  },
+                  "expr": {
+                    "source_file_start": "probes/slang-spike/fixture/top.sv",
+                    "source_file_end": "probes/slang-spike/fixture/top.sv",
+                    "source_line_start": 11,
+                    "source_line_end": 11,
+                    "source_column_start": 25,
+                    "source_column_end": 26,
+                    "kind": "NamedValue",
+                    "type": "logic",
+                    "symbol": "5525748209864 d"
+                  }
+                },
+                {
+                  "port": {
+                    "name": "q",
+                    "kind": "Port",
+                    "source_file": "probes/slang-spike/fixture/mid.sv",
+                    "source_line": 5,
+                    "source_column": 18,
+                    "addr": 5525748217056,
+                    "type": "logic",
+                    "direction": "Out",
+                    "internalSymbol": "5525748217176 q"
+                  },
+                  "expr": {
+                    "source_file_start": "probes/slang-spike/fixture/top.sv",
+                    "source_file_end": "probes/slang-spike/fixture/top.sv",
+                    "source_line_start": 11,
+                    "source_line_end": 11,
+                    "source_column_start": 38,
+                    "source_column_end": 42,
+                    "kind": "Assignment",
+                    "type": "logic",
+                    "left": {
+                      "source_file_start": "probes/slang-spike/fixture/top.sv",
+                      "source_file_end": "probes/slang-spike/fixture/top.sv",
+                      "source_line_start": 11,
+                      "source_line_end": 11,
+                      "source_column_start": 38,
+                      "source_column_end": 42,
+                      "kind": "NamedValue",
+                      "type": "logic",
+                      "symbol": "5525748208864 link"
+                    },
+                    "right": {
+                      "source_file_start": "probes/slang-spike/fixture/top.sv",
+                      "source_file_end": "probes/slang-spike/fixture/top.sv",
+                      "source_line_start": 11,
+                      "source_line_end": 11,
+                      "source_column_start": 38,
+                      "source_column_end": 42,
+                      "kind": "EmptyArgument",
+                      "type": "logic"
+                    },
+                    "isNonBlocking": false
+                  }
+                }
+              ]
+            },
+            {
+              "name": "u1",
+              "kind": "Instance",
+              "source_file": "probes/slang-spike/fixture/top.sv",
+              "source_line": 12,
+              "source_column": 7,
+              "addr": 5525748211264,
+              "body": "5525748210720 mid",
+              "connections": [
+                {
+                  "port": {
+                    "name": "clk",
+                    "kind": "Port",
+                    "source_file": "probes/slang-spike/fixture/mid.sv",
+                    "source_line": 3,
+                    "source_column": 18,
+                    "addr": 5525748218784,
+                    "type": "logic",
+                    "direction": "In",
+                    "internalSymbol": "5525748218904 clk"
+                  },
+                  "expr": {
+                    "source_file_start": "probes/slang-spike/fixture/top.sv",
+                    "source_file_end": "probes/slang-spike/fixture/top.sv",
+                    "source_line_start": 12,
+                    "source_line_end": 12,
+                    "source_column_start": 16,
+                    "source_column_end": 19,
+                    "kind": "NamedValue",
+                    "type": "logic",
+                    "symbol": "5525748209584 clk"
+                  }
+                },
+                {
+                  "port": {
+                    "name": "d",
+                    "kind": "Port",
+                    "source_file": "probes/slang-spike/fixture/mid.sv",
+                    "source_line": 4,
+                    "source_column": 18,
+                    "addr": 5525748219064,
+                    "type": "logic",
+                    "direction": "In",
+                    "internalSymbol": "5525748219184 d"
+                  },
+                  "expr": {
+                    "source_file_start": "probes/slang-spike/fixture/top.sv",
+                    "source_file_end": "probes/slang-spike/fixture/top.sv",
+                    "source_line_start": 12,
+                    "source_line_end": 12,
+                    "source_column_start": 25,
+                    "source_column_end": 29,
+                    "kind": "NamedValue",
+                    "type": "logic",
+                    "symbol": "5525748208864 link"
+                  }
+                },
+                {
+                  "port": {
+                    "name": "q",
+                    "kind": "Port",
+                    "source_file": "probes/slang-spike/fixture/mid.sv",
+                    "source_line": 5,
+                    "source_column": 18,
+                    "addr": 5525748219344,
+                    "type": "logic",
+                    "direction": "Out",
+                    "internalSymbol": "5525748219464 q"
+                  },
+                  "expr": {
+                    "source_file_start": "probes/slang-spike/fixture/top.sv",
+                    "source_file_end": "probes/slang-spike/fixture/top.sv",
+                    "source_line_start": 12,
+                    "source_line_end": 12,
+                    "source_column_start": 38,
+                    "source_column_end": 39,
+                    "kind": "Assignment",
+                    "type": "logic",
+                    "left": {
+                      "source_file_start": "probes/slang-spike/fixture/top.sv",
+                      "source_file_end": "probes/slang-spike/fixture/top.sv",
+                      "source_line_start": 12,
+                      "source_line_end": 12,
+                      "source_column_start": 38,
+                      "source_column_end": 39,
+                      "kind": "NamedValue",
+                      "type": "logic",
+                      "symbol": "5525748210424 q"
+                    },
+                    "right": {
+                      "source_file_start": "probes/slang-spike/fixture/top.sv",
+                      "source_file_end": "probes/slang-spike/fixture/top.sv",
+                      "source_line_start": 12,
+                      "source_line_end": 12,
+                      "source_column_start": 38,
+                      "source_column_end": 39,
+                      "kind": "EmptyArgument",
+                      "type": "logic"
+                    },
+                    "isNonBlocking": false
+                  }
+                }
+              ]
+            },
+            {
+              "name": "observed",
+              "kind": "Variable",
+              "source_file": "probes/slang-spike/fixture/top.sv",
+              "source_line": 15,
+              "source_column": 9,
+              "addr": 5525748209128,
+              "type": "logic",
+              "lifetime": "Static"
+            },
+            {
+              "name": "",
+              "kind": "ContinuousAssign",
+              "source_file": "probes/slang-spike/fixture/top.sv",
+              "source_line": 16,
+              "source_column": 10,
+              "addr": 5525748216128,
+              "assignment": {
+                "source_file_start": "probes/slang-spike/fixture/top.sv",
+                "source_file_end": "probes/slang-spike/fixture/top.sv",
+                "source_line_start": 16,
+                "source_line_end": 16,
+                "source_column_start": 10,
+                "source_column_end": 25,
+                "kind": "Assignment",
+                "type": "logic",
+                "left": {
+                  "source_file_start": "probes/slang-spike/fixture/top.sv",
+                  "source_file_end": "probes/slang-spike/fixture/top.sv",
+                  "source_line_start": 16,
+                  "source_line_end": 16,
+                  "source_column_start": 10,
+                  "source_column_end": 18,
+                  "kind": "NamedValue",
+                  "type": "logic",
+                  "symbol": "5525748209128 observed"
+                },
+                "right": {
+                  "source_file_start": "probes/slang-spike/fixture/top.sv",
+                  "source_file_end": "probes/slang-spike/fixture/top.sv",
+                  "source_line_start": 16,
+                  "source_line_end": 16,
+                  "source_column_start": 21,
+                  "source_column_end": 25,
+                  "kind": "NamedValue",
+                  "type": "logic",
+                  "symbol": "5525748208864 link"
+                },
+                "isNonBlocking": false
+              }
+            }
+          ],
+          "definition": "5525744611072 top"
+        },
+        "connections": [
+        ]
+      }
+    ]
+  },
+  "definitions": [
+    {
+      "name": "mid",
+      "kind": "Definition",
+      "source_file": "probes/slang-spike/fixture/mid.sv",
+      "source_line": 2,
+      "source_column": 8,
+      "addr": 5525744610304,
+      "defaultNetType": "5525745507200 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    },
+    {
+      "name": "top",
+      "kind": "Definition",
+      "source_file": "probes/slang-spike/fixture/top.sv",
+      "source_line": 3,
+      "source_column": 8,
+      "addr": 5525744611072,
+      "defaultNetType": "5525745507200 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    }
+  ]
+}

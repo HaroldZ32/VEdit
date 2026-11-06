@@ -1,0 +1,17 @@
+CHECK a17.finishes PASS
+CHECK a17.files PASS
+CHECK a17.literal-dollar-kept PASS
+CHECK a17.literal-trailing-dollar-kept PASS
+CHECK a17.scanned-entry-kept PASS
+CHECK a17.no-expansion-error PASS
+CHECK a17.escape-finishes PASS
+CHECK a17.escape-one-dollar PASS
+CHECK a17.missing-finishes PASS
+CHECK a17.missing-re-expands PASS
+CHECK a17.missing-files-kept PASS
+CHECK a17.missing-expanded-reported PASS
+CHECK a17.missing-home-reported PASS
+CHECK a17.missing-kept-not-dropped PASS
+CHECK a17.missing-literal-not-reported PASS
+PROJECT-MODEL-SELFTEST ok=1 checks=106 failures=0
+SELFCHECK-EXIT=0

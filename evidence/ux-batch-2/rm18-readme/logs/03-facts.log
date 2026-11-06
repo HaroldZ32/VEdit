@@ -1,0 +1,49 @@
+$ grep -n "setApplicationName|setApplicationVersion" src/app/main.cpp
+1841:    QCoreApplication::setApplicationName(QStringLiteral("vedit-app"));
+1842:    QCoreApplication::setApplicationVersion(QStringLiteral("0.2.0"));
+
+$ sed -n "11,20p" packaging/runtime/README.md
+bash packaging/runtime/build.sh          # 组装 → 许可闸门 → 自检 → F2 隔离(正+反) → AppImage → AppImage 自检/隔离 → CentOS 7 机制探针
+```
+
+产物：
+
+| 路径 | 说明 |
+|---|---|
+| `packaging/runtime/out/AppDir/` | **中间产物**（不是交付物）：202 个文件，约 283 MB；`bin/vd-app` 的 sha256 与交付 AppImage 内的同一份（当前 `b93f8cf4…`）。目录内容来自最终基线，仅用于检查/调试。 |
+| `packaging/runtime/out/VEdit-<ver>-x86_64.AppImage` | **唯一交付物**：单文件 AppImage（当前基线 `55a874d` 的产物 sha256 `e7ae067f…`）；`out/SHA256SUMS` 与之配套。 |
+| `evidence/slice3-pack/` | 最终打包证据（`final-55a874d/`：C9、构建、干净容器 selfcheck、四容器矩阵）。 |
+
+$ ls packaging/runtime/out/AppDir/bin/
+git
+slang
+svn
+translations
+vd-app
+vedit-ksh-env-probe
+verible-verilog-format
+verible-verilog-lint
+verible-verilog-ls
+
+$ ls packaging/runtime/out/AppDir/usr/lib/vcs/bin/
+git
+svn
+
+$ grep TOOLCHAIN / VCS-TOOLCHAIN evidence
+TOOLCHAIN source=verible:bundled slang:bundled missing=[] local=[]
+== 2. ordinary start (NO --project): persisted root -> panels + VCS-TOOLCHAIN ==
+
+$ stat -c "%s %n" packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage packaging/runtime/out/SHA256SUMS
+137079288 packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage
+94 packaging/runtime/out/SHA256SUMS
+
+$ test -f build/gates/qt6-cxx.sh / scripts/gates.sh / build/gates/lrelease.sh / build/gates/docs.sh
+exists: build/gates/qt6-cxx.sh
+exists: scripts/gates.sh
+exists: build/gates/lrelease.sh
+exists: build/gates/docs.sh
+exists: scripts/build-qt.sh
+exists: packaging/runtime/build.sh
+
+$ grep -n "Legacy GTK product packaging" packaging/appimage/README.md
+1:> **Legacy GTK product packaging.** This directory still packages the legacy

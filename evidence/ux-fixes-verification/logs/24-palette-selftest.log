@@ -1,0 +1,83 @@
+CHECK fixture.temp-dir PASS
+CHECK fuzzy.main-ranks-basename-first PASS
+CHECK fuzzy.basename-beats-directory PASS
+CHECK fuzzy.subsequence PASS
+CHECK fuzzy.positions PASS
+CHECK fuzzy.case-insensitive PASS
+CHECK fuzzy.no-match PASS
+CHECK fuzzy.empty-query-keeps-order PASS
+CHECK fuzzy.limit PASS
+CHECK index.scan PASS
+CHECK index.scan-four-files PASS
+CHECK index.display-sorted PASS
+CHECK index.hidden-skipped PASS
+CHECK index.ignored-dir-skipped PASS
+CHECK index.basenames PASS
+CHECK index.cached-scan PASS
+CHECK index.no-rescan PASS
+CHECK index.no-change-on-cached-scan PASS
+CHECK index.add-file PASS
+CHECK index.remove-file PASS
+CHECK index.incremental-no-scan PASS
+CHECK index.publish-no-scan PASS
+CHECK index.publish-sorted PASS
+CHECK index.max-files PASS
+CHECK index.outside-root-absolute PASS
+CHECK index.inside-root-relative PASS
+CHECK palette-fixture.scan PASS
+This plugin does not support raise()
+This plugin does not support grabbing the keyboard
+This plugin does not support raise()
+CHECK palette.opens PASS
+CHECK palette.lists-all PASS
+CHECK palette.status-shows-total PASS
+CHECK palette.filters PASS
+CHECK palette.filter-under-200ms PASS
+CHECK palette.empty-state PASS
+CHECK palette.enter-opens PASS
+CHECK palette.enter-closes PASS
+This plugin does not support raise()
+This plugin does not support grabbing the keyboard
+This plugin does not support raise()
+CHECK palette.typing-filters PASS
+CHECK palette.escape-closes PASS
+This plugin does not support raise()
+This plugin does not support grabbing the keyboard
+This plugin does not support raise()
+CHECK palette.arrow-selects PASS
+CHECK palette.arrow-enter-opens PASS
+This plugin does not support raise()
+This plugin does not support grabbing the keyboard
+This plugin does not support raise()
+CHECK palette.no-project-empty-state PASS
+CHECK index.synthetic-10000 PASS
+This plugin does not support raise()
+This plugin does not support grabbing the keyboard
+This plugin does not support raise()
+CHECK palette.10k-opens PASS
+MEASURE palette.query=m micros=1032 results=100
+MEASURE palette.query=ma micros=1022 results=100
+MEASURE palette.query=mai micros=868 results=100
+MEASURE palette.query=main micros=880 results=100
+MEASURE palette.query=cmd micros=1082 results=100
+MEASURE palette.query=pal micros=944 results=100
+MEASURE palette.query=src micros=1519 results=100
+MEASURE palette.query=zzzz micros=775 results=0
+CHECK palette.10k-keystroke-under-200ms PASS
+MEASURE palette.10k-worst-micros=1519
+CHECK palette.10k-results-nonempty PASS
+CHECK palette.10k-empty-state PASS
+CHECK palette.10k-never-scans-disk PASS
+This plugin does not support raise()
+This plugin does not support grabbing the keyboard
+This plugin does not support raise()
+SCREENSHOT OK /tmp/verify-palette-shots/10-palette-filter.png
+SCREENSHOT OK /tmp/verify-palette-shots/11-palette-empty-state.png
+This plugin does not support raise()
+This plugin does not support raise()
+SCREENSHOT OK /tmp/verify-palette-shots/12-palette-no-project.png
+This plugin does not support raise()
+This plugin does not support raise()
+SCREENSHOT OK /tmp/verify-palette-shots/13-palette-project.png
+This plugin does not support grabbing the keyboard
+PALETTE-SELFTEST ok=1 checks=46 failures=0

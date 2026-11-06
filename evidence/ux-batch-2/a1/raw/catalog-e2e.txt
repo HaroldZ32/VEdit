@@ -1,0 +1,27 @@
+$ CARGO_HOME=$PWD/target/cargo-home cargo run -p vd-deeplint --example catalog_dump -- crates/vd-deeplint/tests/fixtures/catalog/project build/slang/out/slang
+6 module(s) in 24 ms
+module consumer (defined at consumer.sv:1:8)
+  port bus InOut bus_if @1:25
+  port clk In logic @1:42
+  port y Out logic[3:0] @1:66
+module orphan (defined at orphan.sv:1:8) [top]
+  port a In logic @1:28
+  port b Out logic @1:44
+module reflink (defined at reflink.sv:1:8)
+  port x Ref logic @1:27
+module shared (defined at shared.sv:1:8)
+  port a In logic @1:28
+  port y Out logic[3:0] @1:50
+module top_a (defined at top_a.sv:1:8) [top]
+  port clk In logic @1:27
+  port pad InOut logic @1:43
+  port y Out logic[3:0] @1:67
+  child shared path=top_a.u_shared @top_a.sv:4:10
+  child consumer path=top_a.u_consumer @top_a.sv:5:12
+  child reflink path=top_a.u_ref @top_a.sv:6:11
+module top_b (defined at top_b.sv:1:8) [top]
+  port clk In logic @1:27
+  port y Out logic[3:0] @1:51
+  child shared path=top_b.u_shared @top_b.sv:2:10
+  child shared path=top_b.u_shared_2 @top_b.sv:4:10
+EXIT=0

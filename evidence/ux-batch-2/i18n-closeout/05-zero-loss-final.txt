@@ -1,0 +1,22 @@
+old messages: 1238  new messages: 1244
+old finished+translated: 1238
+new finished+translated: 1244
+ADDED: 12  REMOVED: 6  CHANGED: 0  LOST: 0
+  REMOVED ctx='VEdit' src='KTextEditor::Document::setText() failed for %1' kind=finished val='KTextEditor::Document::setText() 对 %1 失败'
+  REMOVED ctx='VEdit' src='No variables are used by this project yet' kind=finished val='此工程尚未使用变量'
+  REMOVED ctx='VEdit' src='Project variables updated; re-expanding' kind=finished val='工程变量已更新；正在重新展开'
+  REMOVED ctx='VEdit' src='the module catalog service did not answer within 30 s' kind=finished val='模块目录服务在 30 秒内没有响应'
+  REMOVED ctx='vedit::workspace::settings::SettingsPanel' src='Clear' kind=finished val='清除'
+  REMOVED ctx='vedit::workspace::settings::SettingsPanel' src='Shortcut' kind=finished val='快捷键'
+  ADDED  ctx='VEdit' src='Analysed: no problems found' kind=finished
+  ADDED  ctx='VEdit' src='Files imported through a .f filelist; they live outside this folder tree' kind=finished
+  ADDED  ctx='VEdit' src='From filelist (%1)' kind=finished
+  ADDED  ctx='VEdit' src='Has errors' kind=finished
+  ADDED  ctx='VEdit' src='Not analysed yet (queued, or excluded because the buffer has unsaved changes)' kind=finished
+  ADDED  ctx='VEdit' src='Warnings only' kind=finished
+  ADDED  ctx='VEdit' src='absolute path opened as given; files outside the workspace are allowed' kind=finished
+  ADDED  ctx='VEdit' src='cannot open %1: the editor could not load the file' kind=finished
+  ADDED  ctx='VEdit' src='relative path and the workspace root is unknown' kind=finished
+  ADDED  ctx='VEdit' src='relative path resolved under the workspace root' kind=finished
+  ADDED  ctx='VEdit' src='relative path, not found under the workspace root' kind=finished
+  ADDED  ctx='VEdit' src='the module catalog service did not answer within 300 s' kind=finished

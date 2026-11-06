@@ -1,0 +1,35 @@
+== fileOpened / open-signal checks (app selfcheck) ==
+CHECK open.signal.opens PASS
+CHECK open.signal.one-per-open PASS /tmp/vedit-app-KELPal/open-a.sv,/tmp/vedit-app-KELPal/open-b.sv
+CHECK open.signal.failed-open-silent PASS
+CHECK open.signal.direct-pane-open PASS
+
+== slang resolver checks (module-tree selftest) ==
+ok   toolchain.appdir-temp
+ok   toolchain.appdir-bin — /tmp/vedit-module-tree-selftest-XrQqKB/bin
+ok   toolchain.appdir-slang — /tmp/vedit-module-tree-selftest-XrQqKB/bin/slang
+ok   toolchain.published-path — /tmp/vedit-module-tree-selftest-XrQqKB/bin/slang
+ok   toolchain.no-source-empty
+ok   toolchain.override-executable — /tmp/vedit-module-tree-selftest-XrQqKB/slang-override
+ok   toolchain.env-override-wins — /tmp/vedit-module-tree-selftest-XrQqKB/slang-override
+ok   packaged.appdir-slang — /vedit-build/target/qt6-build/src/app/workspace-lane-module_tree/bin/slang
+ok   packaged.answered
+ok   packaged.instances — instances=3
+
+== palette display tests ==
+CHECK index.outside-root-absolute PASS
+CHECK index.inside-root-relative PASS
+
+== project display tests ==
+CHECK display.files.open-key-absolute PASS
+CHECK display.panel.files-under-root PASS
+CHECK display.filelist.outside-import PASS
+CHECK display.filelist.outside-finishes PASS
+CHECK display.files.outside-absolute PASS
+CHECK display.filelists.outside-absolute PASS
+CHECK display.panel.filelists-outside-absolute PASS
+CHECK display.filelist.inside-import PASS
+CHECK display.filelist.inside-finishes PASS
+CHECK display.filelist.inside-absolute-in-model PASS
+CHECK display.panel.filelist-inside-relative PASS
+CHECK display.panel.files-inside-relative PASS

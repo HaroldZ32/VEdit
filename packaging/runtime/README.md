@@ -16,8 +16,8 @@ bash packaging/runtime/build.sh          # 组装 → 许可闸门 → 自检 �
 | 路径 | 说明 |
 |---|---|
 | `packaging/runtime/out/AppDir/` | **中间产物**（不是交付物）：202 个文件，约 283 MB；`bin/vd-app` 的 sha256 与交付 AppImage 内的同一份（当前 `b93f8cf4…`）。目录内容来自最终基线，仅用于检查/调试。 |
-| `packaging/runtime/out/VEdit-<ver>-x86_64.AppImage` | **唯一交付物**：单文件 AppImage（当前基线 `55a874d` 的产物 sha256 `e7ae067f…`）；`out/SHA256SUMS` 与之配套。 |
-| `evidence/slice3-pack/` | 最终打包证据（`final-55a874d/`：C9、构建、干净容器 selfcheck、四容器矩阵）。 |
+| `packaging/runtime/out/VEdit-<ver>-x86_64.AppImage` | **唯一交付物**：单文件 AppImage（sha256 见 `out/SHA256SUMS`，不在文档里写死）；`out/SHA256SUMS` 与之配套。 |
+| `evidence/slice3-pack/` | 最终打包证据（`final-<commit>/`：C9、构建、干净容器 selfcheck、四容器矩阵）。 |
 
 ## F2 形态（T61 定案；缺一条就会泄漏宿主定义）
 
@@ -32,8 +32,23 @@ bash packaging/runtime/build.sh          # 组装 → 许可闸门 → 自检 �
 | C7 | 运行时白名单守卫（可见集合 ≠ 白名单 → 失败） | `AppRun` 的 `ksh_guard()`，调用 `bin/vedit-ksh-env-probe` |
 | C8 | 图标/主题/字体自备 | DejaVu + `FONTCONFIG_FILE`；30 个主题内嵌在自建库；应用图标随包 |
 
-**反向控制是验收的一部分**：把 `/usr/share` 加回 `XDG_DATA_DIRS` 重跑，必须复现
-`defs=403`（402 宿主 + 1 用户）。正控是 `defs=2`（`SystemVerilog,Verilog`）。
+**反向控制与负控是验收的一部分**。正控的期望值**不写死**：
+`verify-f2-isolation.sh` 从随包的 `usr/share/vedit/ksh-whitelist.txt` **数条目**得到 `WANT`
+（A3 之后是 5：`Markdown,SystemVerilog,Tcl,VHDL,Verilog`；A3 之前是 2）。
+
+- **正控（AppDir）**：断言 `defs == WANT`、`names == 白名单`，并且**每一条可见定义的获胜文件**
+  （探针输出的 `Definition::filePath()`）都在 AppDir 的
+  `usr/share/org.kde.syntax-highlighting/syntax/` 下。这一条才是“互不遮蔽”的判据：
+  KSyntaxHighlighting 按**名字**去重（`try_emplace`，同名只有更高 `version()` 能替换），
+  所以同名遮蔽**不会**改变名字列表或数量，只会改变**哪个文件赢**。
+- **宿主反向控制**：把 `/usr/share` 加回 `XDG_DATA_DIRS`，必须复现
+  `defs > WANT`（本次 406 = 402 个宿主名字 + 5 个白名单名字 − 1 个双方同名的
+  `SystemVerilog`；**不是**“402 宿主 + 1 用户”）。
+- **用户级反向控制**：把 `XDG_DATA_HOME` 设为 `$HOME/.local/share`（`UserLeakProbe` 夹具所在），
+  必须让它重新可见且 `defs > WANT`——验证 AppRun 对用户目录的收窄，而不只是 `XDG_DATA_DIRS`。
+- **同名遮蔽负控**：`/shadow` 里放一份**同名、更高版本**的 `Tcl.xml`（version 999）。它可见时必须
+  **赢过**随包副本，且上面的“获胜文件”断言必须**报告**它赢了；同时它的名字集合与 `defs` 不变
+  ——这正是“名字/重复项检查永远测不出遮蔽”的证明。
 
 ## 不随包（许可闸门强制）
 
@@ -83,12 +98,12 @@ bash packaging/runtime/build.sh          # 组装 → 许可闸门 → 自检 �
 - `build.sh` writes `out/SHA256SUMS` for the single-file AppImage and copies the
   evidence into `evidence/slice3-pack/`.
 
-**Delivery baseline:** `55a874da076d605c6b620e0bb20f9ac5932d5f46`. The delivery
-AppImage is `out/VEdit-0.1.1-x86_64.AppImage` with sha256
-`e7ae067fe66c8e271ba72da974795a7ee3db0efa59bda45079b5a048b4a09558`; any source or
-packaging-script change invalidates it and requires a rebuild. `out/AppDir/` is
-an intermediate inspection tree (its `bin/vd-app` sha matches the AppImage), not
-a deliverable.
+**Delivery baseline:** the AppImage is `out/VEdit-0.2.1-x86_64.AppImage`, and its
+sha256 is recorded in `out/SHA256SUMS` (written by `build.sh`) rather than restated
+here, so a rebuild cannot leave a stale hash in the docs. Any source or
+packaging-script change invalidates a published AppImage and requires a rebuild.
+`out/AppDir/` is an intermediate inspection tree (its `bin/vd-app` sha matches the
+AppImage), not a deliverable.
 
 
 ## CJK font fallback (T119)

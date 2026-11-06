@@ -1,0 +1,26 @@
+## T19 product-level gates — one block (binary sha belongs to the results)
+date=2026-11-02T09:05:37Z
+image=vedit-qt6-build:local
+qt=6.10.2+dfsg-7 kf6-texteditor=6.24.0-0ubuntu1
+binary=4c2cc2e6128992198c9c7290e9be5609e9081104af1d329fcf58c0cf30ca2b90  target/qt6-build/src/app/vedit-app
+
+## [1] vedit-app --selfcheck (QT_QPA_PLATFORM=offscreen)
+CHECK restore.theme PASS
+CHECK restore.panel-visible PASS
+CHECK restore.shortcut PASS
+CHECK panel-seam.seed-session PASS
+CHECK panel-seam.deferred-nothing-inserted PASS
+CHECK panel-seam.dock-restored PASS
+CHECK panel-seam.terminal-content PASS
+CHECK panel-seam.search-content PASS
+CHECK panel-seam.no-placeholder PASS
+CHECK panel-seam.editor-layout-restored PASS panes=2
+EDIT-CORE-SELFTEST ok=1 checks=67 failures=0
+APP-SHELL-SELFTEST ok=1 checks=245 failures=0 state=/tmp/vedit-app-QCHcMf/state
+SELFCHECK_EXIT=0
+
+## [2] ctest --test-dir target/qt6-build
+27/37 Test #27: vedit-workspace-search-selftest ................***Failed   12.24 sec
+97% tests passed, 1 tests failed out of 37
+	 27 - vedit-workspace-search-selftest (Failed)
+CTEST_EXIT=8

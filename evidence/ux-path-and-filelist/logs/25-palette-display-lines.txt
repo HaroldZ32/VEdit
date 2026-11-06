@@ -1,0 +1,5 @@
+CHECK index.display-sorted PASS
+CHECK index.add-file PASS
+CHECK index.outside-root-absolute PASS
+CHECK index.inside-root-relative PASS
+PALETTE-SELFTEST ok=1 checks=46 failures=0

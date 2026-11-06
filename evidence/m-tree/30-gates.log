@@ -1,0 +1,14 @@
+== configure ==
+configure_exit=0
+-- Generating done (0.2s)
+-- Build files have been written to: /vedit-build/target/qt6-build
+== build vedit-app ==
+build_exit=0
+[147/148] Building CXX object src/app/CMakeFiles/vedit-app.dir/main.cpp.o
+[148/148] Linking CXX executable src/app/vedit-app
+== ctest lane ==
+ctest_exit=0
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.22 sec

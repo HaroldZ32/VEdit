@@ -1,0 +1,30 @@
+before keys: 1209 after keys: 1214
+added: 5
+   + vedit::workspace::search::SearchPanel | Replace refused: the unsaved edits in "%1" cannot be checked against line %2 (th
+   + vedit::workspace::search::SearchPanel | Replace refused: the unsaved edits in "%1" changed where line %2 sits in the buf
+   + vedit::workspace::settings::SettingsPanel | Active engine. --ruleset, --rules, --rules_config and --waiver_files are applied
+   + vedit::workspace::settings::SettingsPanel | Active engine. -W and --error-limit are applied to the lint job.
+   + vedit::workspace::settings::SettingsPanel | Stored but not applied yet (the lint job's C ABI has no field for them): %1. The
+removed: 0
+changed translation text: 0
+translations lost (non-empty -> empty): 0
+newly vanished: 3
+   v vedit::workspace::settings::SettingsPanel | Active engine. --rules_config is applied; the other options are stored but not s
+   v vedit::workspace::settings::SettingsPanel | Active engine. -W and --error-limit are stored but not sent yet (transport pendi
+   v vedit::workspace::settings::SettingsPanel | Stored but not applied yet (the lint job's C ABI does not carry them): %1. They 
+unfinished: 5
+   u vedit::workspace::search::SearchPanel | Replace refused: the unsaved edits in "%1" cannot be checked against line %2 (the editor did not pro
+   u vedit::workspace::search::SearchPanel | Replace refused: the unsaved edits in "%1" changed where line %2 sits in the buffer, and that line i
+   u vedit::workspace::settings::SettingsPanel | Active engine. --ruleset, --rules, --rules_config and --waiver_files are applied to the lint job; --
+   u vedit::workspace::settings::SettingsPanel | Active engine. -W and --error-limit are applied to the lint job.
+   u vedit::workspace::settings::SettingsPanel | Stored but not applied yet (the lint job's C ABI has no field for them): %1. The values stay in sett
+
+=== FINAL comparison against the pre-lupdate backup ===
+before keys: 1209 after keys: 1211
+added: 5 | removed: 3 | translation text changed: 0 | translations lost: 0
+removed keys (the 3 obsolete):
+   - vedit::workspace::settings::SettingsPanel | Active engine. --rules_config is applied; the other options are stored but not sent yet (t
+   - vedit::workspace::settings::SettingsPanel | Active engine. -W and --error-limit are stored but not sent yet (transport pending).
+   - vedit::workspace::settings::SettingsPanel | Stored but not applied yet (the lint job's C ABI does not carry them): %1. They stay in se
+every surviving translated pair identical: True
+unfinished now: 0 | vanished now: 0

@@ -1,0 +1,11 @@
+== verible: the exact argv shapes the new knobs produce ==
+$ /home/haroldzhao/MyProj/DshProj/VEdit/.mpd/recon/verible/bin/verible-verilog-lint --ruleset=all --rules=+always-comb --waiver_files=<evidence>/waiver.txt <evidence>/flagprobe.sv
+evidence/ux-batch-2/a1/raw/flagprobe.sv:1:8: Declared module does not match the first dot-delimited component of file name: "flagprobe" [Style: file-names] [module-filename]
+evidence/ux-batch-2/a1/raw/flagprobe.sv:1:23: input port names must end with _i, _ni or _pi [Style: suffixes-for-signals-and-types] [port-name-suffix]
+EXIT=1
+
+== slang: the exact argv shapes the new knobs produce ==
+$ build/slang/out/slang --lint-only -Weverything -Wno-unused-variable --error-limit=5 --diag-column-unit byte --diag-json <evidence>/probe-diag.json <evidence>/flagprobe.sv
+
+Build succeeded: 0 errors, 0 warnings
+EXIT=0

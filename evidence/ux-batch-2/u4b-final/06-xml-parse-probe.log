@@ -1,0 +1,14 @@
+[1/2] Building CXX object CMakeFiles/xmlprobe.dir/main.cpp.o
+[2/2] Linking CXX executable xmlprobe
+== target/u4b-probe/xmlprobe/b/xmlprobe
+== /vedit-build/resources/syntax/vedit-tcl.xml
+START depth=1 name=language
+ROOT NAME=[Tcl]
+START depth=2 name=highlighting
+START depth=3 name=list
+START depth=3 name=list
+START depth=3 name=contexts
+START depth=3 name=itemDatas
+START depth=3 name=keywords
+hasContexts=1 contextCount=0 hasError=0 errorString=
+rc=1

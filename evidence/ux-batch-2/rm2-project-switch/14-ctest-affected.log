@@ -1,0 +1,19 @@
+Test project /vedit-build/target/qt6-build
+    Start 11: vedit-app-shell-selftest
+1/7 Test #11: vedit-app-shell-selftest ...............   Passed    0.73 sec
+    Start 22: vedit-edit-core-selftest
+2/7 Test #22: vedit-edit-core-selftest ...............   Passed    0.13 sec
+    Start 37: vedit-workspace-project-selftest
+3/7 Test #37: vedit-workspace-project-selftest .......   Passed    0.54 sec
+    Start 39: vedit-module-tree-catalog-test
+4/7 Test #39: vedit-module-tree-catalog-test .........   Passed    3.72 sec
+    Start 41: vedit-workspace-diagnostics-selftest
+5/7 Test #41: vedit-workspace-diagnostics-selftest ...   Passed    1.82 sec
+    Start 48: vedit-b3-wiring-e2e
+6/7 Test #48: vedit-b3-wiring-e2e ....................   Passed    6.27 sec
+    Start 49: vedit-rm2-project-switch-e2e
+7/7 Test #49: vedit-rm2-project-switch-e2e ...........   Passed    1.94 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Total Test time (real) =  15.16 sec

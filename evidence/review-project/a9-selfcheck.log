@@ -1,0 +1,22 @@
+CHECK a9.finishes PASS
+CHECK a9.expands-with-table PASS
+CHECK a9.expands-dollar-var PASS
+CHECK a9.expands-braced-var PASS
+CHECK a9.expands-parenthesized-var PASS
+CHECK a9.expands-tilde PASS
+CHECK a9.two-level-nested-f PASS
+CHECK a9.project-table-wins-over-environment PASS
+CHECK a9.cycle-names-both-files PASS
+CHECK a9.missing-collected PASS
+CHECK a9.skipped-count PASS
+CHECK a9.missing-file-and-line PASS
+CHECK a9.summary-shows-unresolved PASS
+CHECK a9.panel.variables-shown PASS
+CHECK a9.dialog.one-row-per-variable PASS
+CHECK a9.dialog.names PASS
+CHECK a9.dialog.variable-table PASS
+CHECK a9.re-expands-after-dialog PASS
+CHECK a9.dialog-value-used PASS
+CHECK a9.unresolved-cleared PASS
+CHECK a9.variables-persisted-in-state PASS
+PROJECT-MODEL-SELFTEST ok=1 checks=91 failures=0

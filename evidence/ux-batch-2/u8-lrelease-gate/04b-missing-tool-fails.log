@@ -1,0 +1,5 @@
+[lrelease] FAIL: the Qt6 lrelease tool is not available: /nonexistent/lrelease
+       Install  : the Qt6 l10n tools (qt6-l10n-tools), or point LRELEASE at the binary.
+       Host pin : /usr/lib/qt6/bin/lrelease (AGENT.md §4, docs/BUILD.md §4).
+       This gate does NOT skip and does NOT pass: without lrelease the catalogue
+       is not compiled at all, so nothing is verified.

@@ -36,6 +36,7 @@
 #include <QTemporaryDir>
 
 #include <cstdio>
+#include <QCoreApplication>
 
 namespace vedit::editor {
 namespace {
@@ -150,16 +151,16 @@ SelfCheckResult runHighlightDiagnosis()
              .arg(repository.definitions().size())
              .arg(repository.customSearchPaths().size()));
     for (const KSyntaxHighlighting::Definition &definition : repository.definitions()) {
-        fact(QStringLiteral("repository-definition %1").arg(describe(definition)));
+        fact(QCoreApplication::translate("VEdit", "repository-definition %1").arg(describe(definition)));
     }
     const KSyntaxHighlighting::Definition verilog = repository.definitionForName(QStringLiteral("Verilog"));
     const KSyntaxHighlighting::Definition systemverilog =
         repository.definitionForName(QStringLiteral("SystemVerilog"));
-    fact(QStringLiteral("definitionForName(Verilog): %1").arg(describe(verilog)));
-    fact(QStringLiteral("definitionForName(SystemVerilog): %1").arg(describe(systemverilog)));
-    fact(QStringLiteral("definitionForFileName(top.v): %1")
+    fact(QCoreApplication::translate("VEdit", "definitionForName(Verilog): %1").arg(describe(verilog)));
+    fact(QCoreApplication::translate("VEdit", "definitionForName(SystemVerilog): %1").arg(describe(systemverilog)));
+    fact(QCoreApplication::translate("VEdit", "definitionForFileName(top.v): %1")
              .arg(describe(repository.definitionForFileName(QStringLiteral("top.v")))));
-    fact(QStringLiteral("definitionForFileName(top.sv): %1")
+    fact(QCoreApplication::translate("VEdit", "definitionForFileName(top.sv): %1")
              .arg(describe(repository.definitionForFileName(QStringLiteral("top.sv")))));
     check("highlight.repository-has-verilog", verilog.isValid(), describe(verilog));
     check("highlight.repository-verilog-is-vedit",

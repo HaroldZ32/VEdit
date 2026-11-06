@@ -16,6 +16,47 @@ HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
 APPDIR="$HERE"
 export APPDIR
 
+# --- bundled VCS tools (batch 6a) -------------------------------------------
+# The AppDir ships git/svn under bin/ (wrappers around the bundled binaries).
+# The product does not need this line — it resolves bundled tools relative to
+# its own executable — but it keeps `git`/`svn` consistent for hooks and shells
+# started from the package. No host utility is shadowed (bin/ only has ours).
+export PATH="$APPDIR/bin${PATH:+:$PATH}"
+
+# --- bundled toolchain: the launch contract names the tools ------------------
+# AppRun is the launch contract, and it enters the product through the private
+# loader, so the process's executable directory is the AppDir ROOT rather than
+# bin/. Naming the bundled tools here makes the packaged layout unambiguous.
+# This is a stopgap, not the only path: the product-side resolver (Qt and the
+# Rust hierarchy service) also probes `<AppDir>/bin` itself, so the package
+# still works when this script is bypassed. Every tool below is exported only
+# when the caller did not set it (an explicit value always wins) AND the
+# packaged file exists and is executable. This guard is required, not cosmetic:
+# the Qt module-tree lane reads VEDIT_SLANG first (moduleTreeSlangBinary()), so
+# an unconditional or dead value would mask the diagnostics-resolved toolchain
+# and the documented environment override (docs/USER_GUIDE.md troubleshooting).
+if [ -z "${VEDIT_SLANG:-}" ] && [ -x "$APPDIR/bin/slang" ]; then
+    export VEDIT_SLANG="$APPDIR/bin/slang"
+fi
+if [ -z "${VEDIT_VERIBLE_LS:-}" ] && [ -x "$APPDIR/bin/verible-verilog-ls" ]; then
+    export VEDIT_VERIBLE_LS="$APPDIR/bin/verible-verilog-ls"
+fi
+if [ -z "${VEDIT_VERIBLE_LINT:-}" ] && [ -x "$APPDIR/bin/verible-verilog-lint" ]; then
+    export VEDIT_VERIBLE_LINT="$APPDIR/bin/verible-verilog-lint"
+fi
+if [ -z "${VEDIT_VERIBLE_FORMAT:-}" ] && [ -x "$APPDIR/bin/verible-verilog-format" ]; then
+    export VEDIT_VERIBLE_FORMAT="$APPDIR/bin/verible-verilog-format"
+fi
+# Translations: AppRun enters through the bundled loader, so the product's
+# applicationDirPath() is the AppDir root while the .qm are installed under
+# bin/translations. The product probes that layout itself (src/app/i18n.cpp);
+# naming it here makes the packaged source explicit and keeps the diagnostic
+# pointing at the directory that was actually checked. Guarded like the tools:
+# an explicit value wins and a missing directory is never exported.
+if [ -z "${VEDIT_TRANSLATIONS_DIR:-}" ] && [ -d "$APPDIR/bin/translations" ]; then
+    export VEDIT_TRANSLATIONS_DIR="$APPDIR/bin/translations"
+fi
+
 # --- private plugin search paths (package only) ------------------------------
 # NB: LD_LIBRARY_PATH is exported only right before exec (see below). Exporting it
 # here would make host utilities (cat/sed/grep/id/mkdir) load OUR glibc through the
@@ -86,15 +127,30 @@ else
 fi
 
 # --- C7 runtime guard: fail closed if the whitelist is not the visible set ---
+# Canonical form of a comma-separated definition-name list. The whitelist is
+# written by assemble-appdir.sh with Python's sorted() (code-point order), while
+# `sort` uses the CALLER's collation: under zh_CN.UTF-8 / en_US.UTF-8 it orders
+# `Verilog` before `VHDL`, so a CORRECT package failed closed with exit 2 on
+# every non-C locale before the app started (A3 blocker 1). Both sides are
+# normalised under LC_ALL=C — the one collation every host `sort` implements —
+# because the guard compares SETS, not the byte order the producer happened to
+# use. Do not remove this: the packaged launcher must not depend on the desktop
+# locale.
+canonical_names() {
+    printf '%s\n' "$1" | tr ',' '\n' | sed '/^$/d' | LC_ALL=C sort | paste -sd, -
+}
 ksh_guard() {
     [ -x "$APPDIR/bin/vedit-ksh-env-probe" ] || return 0
     [ -s "$APPDIR/usr/share/vedit/ksh-whitelist.txt" ] || return 0
-    wl=$(cat "$APPDIR/usr/share/vedit/ksh-whitelist.txt")
+    wl=$(canonical_names "$(cat "$APPDIR/usr/share/vedit/ksh-whitelist.txt")")
     out=$(QT_QPA_PLATFORM=offscreen LOCPATH="$APPDIR/usr/lib/locale" \
             "$APPDIR/ld-linux-x86-64.so.2" --library-path "$APPDIR/lib" \
             "$APPDIR/bin/vedit-ksh-env-probe" --list --editor-repo 2>&1)
     rc=$?
-    seen=$(printf '%s\n' "$out" | sed -n 's/^KSH-ENV def name="\(.*\)"$/\1/p' | sort | paste -sd, -)
+    # The trailing `file="..."` (R2) is deliberately ignored here: the guard
+    # compares the visible NAME SET; the F2 script asserts the winning paths.
+    seen=$(printf '%s\n' "$out" | sed -n 's/^KSH-ENV def name="\([^"]*\)".*$/\1/p' \
+             | LC_ALL=C sort | paste -sd, -)
     if [ "${VEDIT_DEBUG:-0}" = "1" ]; then
         printf '%s\n' "$out" | grep '^KSH-ENV defs=' >&2
     fi

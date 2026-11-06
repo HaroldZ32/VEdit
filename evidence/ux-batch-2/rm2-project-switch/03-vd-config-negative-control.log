@@ -1,0 +1,49 @@
+   Compiling serde_core v1.0.229
+   Compiling proc-macro2 v1.0.107
+   Compiling quote v1.0.47
+   Compiling unicode-ident v1.0.27
+   Compiling libc v0.2.191
+   Compiling getrandom v0.4.3
+   Compiling rustix v1.1.6
+   Compiling zmij v1.0.23
+   Compiling cfg-if v1.0.5
+   Compiling linux-raw-sys v0.12.1
+   Compiling serde_json v1.0.154
+   Compiling winnow v1.0.4
+   Compiling serde v1.0.229
+   Compiling bitflags v2.13.2
+   Compiling anyhow v1.0.104
+   Compiling memchr v2.8.3
+   Compiling toml_writer v1.1.3+spec-1.1.0
+   Compiling once_cell v1.21.4
+   Compiling itoa v1.0.18
+   Compiling fastrand v2.5.0
+   Compiling toml_parser v1.1.5+spec-1.1.0
+   Compiling syn v3.0.9
+   Compiling tempfile v3.27.0
+   Compiling serde_spanned v1.1.2
+   Compiling toml_datetime v1.1.2+spec-1.1.0
+   Compiling toml v1.1.8+spec-1.1.0
+   Compiling serde_derive v1.0.229
+   Compiling vd-config v0.1.1 (/vedit-build/crates/vd-config)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.27s
+     Running unittests src/lib.rs (target/debug/deps/vd_config-7c1f0461b4b1abe7)
+
+running 1 test
+test project::tests::expand_drops_an_ancestor_projects_membership_but_keeps_its_own ... FAILED
+
+failures:
+
+---- project::tests::expand_drops_an_ancestor_projects_membership_but_keeps_its_own stdout ----
+
+thread 'project::tests::expand_drops_an_ancestor_projects_membership_but_keeps_its_own' (648) panicked at crates/vd-config/src/project.rs:1162:9:
+the outer project's -D must not leak: [Define { name: "OUTER_ONLY", value: Some("1") }]
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+
+failures:
+    project::tests::expand_drops_an_ancestor_projects_membership_but_keeps_its_own
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 56 filtered out; finished in 0.00s
+
+error: test failed, to rerun pass `-p vd-config --lib`

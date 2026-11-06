@@ -1,0 +1,11 @@
+-- Configuring done (0.0s)
+-- Generating done (0.0s)
+-- Build files have been written to: /vedit-build/target/lane-jump
+ninja: no work to do.
+Test project /vedit-build/target/lane-jump
+    Start 1: vedit-jump-tests
+1/1 Test #1: vedit-jump-tests .................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.01 sec

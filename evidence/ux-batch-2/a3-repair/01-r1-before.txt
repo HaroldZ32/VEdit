@@ -1,0 +1,33 @@
+R1 (Blocker 1) — BEFORE: packaged AppRun ksh_guard is host-collation dependent
+captured: 2026-11-05T02:42:10+08:00
+host: Linux 7.0.0-38-generic x86_64  LANG=zh_CN.UTF-8 LC_ALL=unset
+git HEAD: 4e2d0a57ca50db9568db5a5b040cc66f04c9a05f (tree dirty: 385 entries)
+AppDir: target/a3-appdir/AppDir
+whitelist file: Markdown,SystemVerilog,Tcl,VHDL,Verilog
+probe sha256: b709d6924ec9a6f6da6ec80aaf915aa27d9b9ddb3e18de73ced44316353fc242
+
+== sort collation of the whitelist names under each locale ==
+LC_ALL=C            -> Markdown,SystemVerilog,Tcl,VHDL,Verilog
+LC_ALL=zh_CN.UTF-8  -> Markdown,SystemVerilog,Tcl,Verilog,VHDL
+LC_ALL=en_US.UTF-8  -> Markdown,SystemVerilog,Tcl,Verilog,VHDL
+
+== AppRun guard path: env -i ... LC_ALL=<loc> VEDIT_DEBUG=1 AppRun --hold 10 ==
+--- LC_ALL=C ---
+  KSH-ENV defs=5 hash=7a004024007d64ae2f042f288bba900a60601d453b599c6ada6feac3be34d294
+  KSH-GUARD PASS whitelist=Markdown,SystemVerilog,Tcl,VHDL,Verilog
+  exit=0
+--- LC_ALL=zh_CN.UTF-8 ---
+  KSH-ENV defs=5 hash=7a004024007d64ae2f042f288bba900a60601d453b599c6ada6feac3be34d294
+  KSH-GUARD FAIL: visible definitions [Markdown,SystemVerilog,Tcl,Verilog,VHDL] != whitelist [Markdown,SystemVerilog,Tcl,VHDL,Verilog]
+  exit=2
+--- LC_ALL=en_US.UTF-8 ---
+  KSH-ENV defs=5 hash=7a004024007d64ae2f042f288bba900a60601d453b599c6ada6feac3be34d294
+  KSH-GUARD FAIL: visible definitions [Markdown,SystemVerilog,Tcl,Verilog,VHDL] != whitelist [Markdown,SystemVerilog,Tcl,VHDL,Verilog]
+  exit=2
+
+NOTE (honesty): this log was captured BEFORE the fix, against the then-current
+`target/a3-appdir/AppDir` (old probe without `file=`, old AppRun). That scratch AppDir was later
+overwritten with the fixed AppRun during a smoke test, so re-running the same command against it today
+shows the fixed behaviour. The failure itself is deterministic and independent of the binary: the raw
+`sort` lines above show the collation difference, and the guard's comparison `[ "$seen" != "$wl" ]`
+then exits 2. The repaired behaviour is in 02-r1-after.txt (rebuilt AppDir, AppRun sha256 recorded).

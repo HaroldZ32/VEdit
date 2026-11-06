@@ -1,0 +1,14 @@
+== RED control: pre-repair AppRun (unconditional export) under the new probe ==
+$ sh evidence/ux-repair-2/scratch/red-apprun-probe.sh
+CHECK PASS  apprun.syntax
+CHECK PASS  default.slang-bundled
+CHECK PASS  default.verible-bundled
+CHECK FAIL  override.slang-preserved
+CHECK PASS  override.verible-preserved
+CHECK FAIL  absent.slang-not-exported
+CHECK PASS  absent.verible-not-exported
+CHECK FAIL  absent.slang-caller-preserved
+CHECK FAIL  non-executable.slang-not-exported
+APPRUN-ENV-PROBE ok=0 checks=9 failures=4
+RED-CONTROL probe exit=1 (non-zero expected)
+RED-CONTROL-SCRIPT EXIT=0 (0 means the probe caught the regression)

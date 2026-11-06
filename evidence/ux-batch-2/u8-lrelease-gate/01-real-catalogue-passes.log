@@ -1,0 +1,11 @@
+# catalogue under test (read-only for this gate)
+55261d0136028fc0a87b8c766a4ad84ee4027ab72ff0c082571fba02362f9779  translations/vedit_zh_CN.ts
+mtime=2026-11-06 10:25:21.664679715 +0800 size=302280
+
+[lrelease] /usr/lib/qt6/bin/lrelease /home/haroldzhao/MyProj/DshProj/VEdit/translations/vedit_zh_CN.ts -qm /tmp/tmp.Kw6CvwHxV5/vedit_zh_CN.qm
+Updating '/tmp/tmp.Kw6CvwHxV5/vedit_zh_CN.qm'...
+    Generated 1186 translation(s) (1186 finished and 0 unfinished)
+[lrelease] counts: 1186 translation(s) (1186 finished, 0 unfinished, 0 untranslated)
+[lrelease] qm: 125621 bytes sha256=34cdc5bc09d38810c4070eb1b2e19e6c8de99943e3316f30ba388ba13fe23ac9
+[lrelease] PASS: 0 unfinished and 0 untranslated in /home/haroldzhao/MyProj/DshProj/VEdit/translations/vedit_zh_CN.ts
+gate_exit=0

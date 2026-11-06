@@ -1,0 +1,32 @@
+#!/bin/sh
+# Controlled second evidence for AC-3.0 — EVIDENCE ONLY, never shipped.
+#
+# Prepended to PATH, this wrapper:
+#   * appends every invocation (cwd + argv) to $VEDIT_SHIM_LOG;
+#   * REJECTS the two legacy spellings with exit 129 (like git 1.8.3 does);
+#   * forwards everything else to $VEDIT_REAL_GIT (default /usr/bin/git).
+#
+# The product sources and tests contain neither spelling (grep proof in
+# logs/40-grep.log); the shim proves the read path cannot silently rely on them.
+LOG=${VEDIT_SHIM_LOG:-/tmp/vedit-vcs-shim.log}
+REAL_GIT=${VEDIT_REAL_GIT:-/usr/bin/git}
+
+# One single write per invocation: concurrent child processes append atomically
+# (a multi-write line can interleave, which would corrupt the evidence).
+line="cwd=$PWD"
+for argument in "$@"; do
+  line="$line arg=$argument"
+done
+printf '%s\n' "$line" >> "$LOG"
+
+for argument in "$@"; do
+  case "$argument" in
+    -C | -C?* | --porcelain=v1)
+      printf 'REJECTED %s\n' "$argument" >> "$LOG"
+      printf 'compat shim: rejected legacy argument %s\n' "$argument" >&2
+      exit 129
+      ;;
+  esac
+done
+
+exec "$REAL_GIT" "$@"

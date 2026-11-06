@@ -1,0 +1,11 @@
+SELFCHECK_EXIT=0
+EDIT-CORE-SELFTEST ok=1 checks=67 failures=0
+APP-SHELL-SELFTEST ok=1 checks=245 failures=0 state=/tmp/vedit-app-tHdAoT/state
+--- ctest ---
+CTEST_EXIT=0
+      Start 38: vedit-workspace-settings-selftest
+38/38 Test #38: vedit-workspace-settings-selftest ..............   Passed    0.59 sec
+
+100% tests passed, 0 tests failed out of 38
+
+Total Test time (real) =  39.62 sec

@@ -3,6 +3,12 @@
 #include "atomic_save.h"
 #include "diagnostics_annotations.h"
 #include "document_io.h"
+#include "editor_advanced.h"
+#include "editor_context_menu.h"
+#include "find_replace.h"
+#include "lsp_actions.h"
+#include "multi_cursor.h"
+#include "signature_help.h"
 #if defined(VEDIT_EDIT_CORE_HAVE_FOLDING)
 #include "fold_breadcrumb.h"
 #endif
@@ -16,7 +22,12 @@
 
 #include <QFileInfo>
 #include <QPlainTextEdit>
+#include <QPointer>
+#include <QTimer>
 #include <QUrl>
+
+#include <algorithm>
+#include <QCoreApplication>
 
 namespace vedit::editor {
 namespace {
@@ -64,7 +75,7 @@ QString EditCoreProvider::id() const
 
 QString EditCoreProvider::displayName() const
 {
-    return QStringLiteral("KTextEditor (edit-core)");
+    return QCoreApplication::translate("VEdit", "KTextEditor (edit-core)");
 }
 
 QWidget *EditCoreProvider::createEditor(QWidget *parent)
@@ -106,6 +117,28 @@ QWidget *EditCoreProvider::createEditor(QWidget *parent)
     // T131: inline diagnostics (annotation border) on every new view, same
     // lifetime as the fold/breadcrumb binding above.
     vedit::editor::DiagnosticsAnnotations::install(view);
+    // T13: the in-view find/replace bar (Ctrl+F / Ctrl+H / F3 / Shift+F3). One
+    // bar per view, a child of it, so it dies with the pane.
+    vedit::editor::FindReplaceBar::install(view);
+    // T14: block/multi-cursor and the AC-4.4 editing actions. Install order
+    // matters: the filter installed LAST runs FIRST, so MultiCursorController
+    // (installed after EditorEnhancements) sees a keystroke before the
+    // single-cursor enhancements and can swallow it while several cursors are
+    // active; with one cursor it declines and the enhancements handle the key.
+    vedit::editor::EditorEnhancements::install(view);
+    vedit::editor::MultiCursorController::install(view);
+    // T15 (AC-3.1/3.2): the editor's right-click menu (built from the LSP action
+    // channel) and the F8 / Shift+F8 diagnostic navigation. The menu reads the
+    // capability gate the diagnostics lane publishes on the shell, so an action
+    // this backend cannot serve is greyed WITH its reason instead of silently
+    // missing; the navigator is installed last so its key filter runs first.
+    vedit::editor::LspActionChannel::install(view);
+    vedit::editor::EditorContextMenu::install(view);
+    vedit::editor::DiagnosticNavigator::install(view);
+    // T16 (AC-3.3/3.4): the editor-synthesised signatureHelp popup and the
+    // advanced-feature controller (Ctrl+Alt+A menu, honest capability gating).
+    vedit::editor::SignatureHelp::install(view);
+    vedit::editor::EditorAdvanced::install(view);
     return view;
 }
 
@@ -120,7 +153,7 @@ bool EditCoreProvider::openFile(QWidget *editor, const QString &absolutePath, QS
     const QFileInfo info(absolutePath);
     if (!info.exists() || !info.isFile()) {
         if (error != nullptr) {
-            *error = QStringLiteral("cannot open %1: not a regular file").arg(absolutePath);
+            *error = QCoreApplication::translate("VEdit", "cannot open %1: not a regular file").arg(absolutePath);
         }
         return false;
     }
@@ -173,9 +206,37 @@ void EditCoreProvider::setStatusListener(QWidget *editor, std::function<void()> 
 #endif
 }
 
-void EditCoreProvider::notifyStatus(QWidget *editor)
+void EditCoreProvider::setModifiedListener(QWidget *editor, std::function<void(bool)> listener)
 {
-    const auto it = statusListeners_.constFind(editor);
+    if (editor == nullptr) {
+        return;
+    }
+    const auto existing = modifiedConnections_.find(editor);
+    if (existing != modifiedConnections_.end()) {
+        QObject::disconnect(existing.value());
+        modifiedConnections_.erase(existing);
+    }
+    KTextEditor::Document *document = documentFor(editor);
+    if (document == nullptr || !listener) {
+        // Not an edit-core widget (the demo/fallback pane) or an unsubscribe:
+        // the base seam owns the QPlainTextEdit case.
+        EditorProvider::setModifiedListener(editor, std::move(listener));
+        return;
+    }
+    // The view is the connection's context: the document is its child, so both
+    // die together and the subscription can never outlive the tab's editor.
+    const QMetaObject::Connection connection = QObject::connect(
+        document, &KTextEditor::Document::modifiedChanged, editor,
+        [document, listener](KTextEditor::Document *) {
+            if (listener) {
+                listener(document->isModified());
+            }
+        });
+    modifiedConnections_.insert(editor, connection);
+}
+
+void EditCoreProvider::notifyStatus(QWidget *editor)
+{    const auto it = statusListeners_.constFind(editor);
     if (it != statusListeners_.constEnd() && it.value()) {
         it.value()();
     }
@@ -185,6 +246,51 @@ bool EditCoreProvider::isModified(QWidget *editor) const
 {
     KTextEditor::Document *document = documentFor(editor);
     return document != nullptr ? document->isModified() : EditorProvider::isModified(editor);
+}
+
+vedit::app::EditorProvider::ViewState EditCoreProvider::viewState(QWidget *editor) const
+{
+    KTextEditor::View *view = viewFrom(editor);
+    if (view == nullptr) {
+        return EditorProvider::viewState(editor);
+    }
+    ViewState state;
+    const KTextEditor::Cursor cursor = view->cursorPosition();
+    state.caretLine = cursor.line();
+    state.caretColumn = cursor.column();
+    // RealLine (the document line), matched by setViewState's setScrollPosition:
+    // one unit, so the archive value means the same thing on both sides.
+    state.scrollTop = view->firstDisplayedLine(KTextEditor::View::RealLine);
+    return state;
+}
+
+void EditCoreProvider::setViewState(QWidget *editor, const ViewState &state)
+{
+    KTextEditor::View *view = viewFrom(editor);
+    if (view == nullptr) {
+        EditorProvider::setViewState(editor, state);
+        return;
+    }
+    if (state.hasCaret()) {
+        view->setCursorPosition(
+            KTextEditor::Cursor(std::max(0, state.caretLine), std::max(0, state.caretColumn)));
+    }
+    if (state.hasScroll()) {
+        const int line = std::max(0, state.scrollTop);
+        const QPointer<KTextEditor::View> guarded(view);
+        const auto scroll = [guarded, line]() {
+            if (guarded.isNull()) {
+                return;
+            }
+            guarded->setScrollPosition(KTextEditor::Cursor(line, 0));
+        };
+        // setCursorPosition() scrolled to the caret; put the captured top line
+        // back. The first call can be clamped while the page is not laid out yet
+        // (a hidden tab has a zero-height viewport), so apply it now AND once more
+        // on the next event-loop turn, exactly like the plain-text fallback.
+        scroll();
+        QTimer::singleShot(0, view, scroll);
+    }
 }
 
 QString EditCoreProvider::currentFilePath(QWidget *editor) const
@@ -209,7 +315,7 @@ bool EditCoreProvider::saveFile(QWidget *editor, QString *error)
     const QString path = currentFilePath(editor);
     if (path.isEmpty()) {
         if (error != nullptr) {
-            *error = QStringLiteral("save: the document has no file path yet");
+            *error = QCoreApplication::translate("VEdit", "save: the document has no file path yet");
         }
         return false;
     }

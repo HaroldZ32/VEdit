@@ -1,0 +1,10 @@
+=== BEFORE (recorded 18:24) ===
+docs/BUILD.md:101:bash packaging/appimage/run-evidence.sh   # AppImage（含离线干净容器验收）
+docs/handover/03-architecture.md:176:... packaging/appimage/ 与 packaging/tarball/ 是旧 Rust 产品的打包/测试工具（already correct）
+docs/RELEASING.md:105:3. bash packaging/appimage/run-evidence.sh 与 bash packaging/tarball/build.sh 的干净无网验收全绿
+
+=== AFTER ===
+docs/BUILD.md:117:bash packaging/appimage/run-evidence.sh   # 旧 Rust/GTK vd-app 的 AppImage
+docs/BUILD.md:121:这两条是**旧 Rust/GTK 产品**的打包/验收管线，按需求非目标 5 保留；`packaging/appimage/README.md`
+docs/handover/03-architecture.md:176:`packaging/runtime/` 是当前 Qt6 私有运行时的打包实现；`packaging/appimage/` 与 `packaging/tarball/` 是旧 Rust 产品的打包/测试工具，不要混用。下表中前六个脚本均位于 `packaging/runtime/`。
+docs/RELEASING.md:105:3. `bash packaging/appimage/run-evidence.sh` 与 `bash packaging/tarball/build.sh` 的**干净无网**验收全绿

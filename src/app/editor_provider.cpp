@@ -6,6 +6,7 @@
 #include <QPlainTextEdit>
 #include <QSaveFile>
 #include <QStringLiteral>
+#include <QCoreApplication>
 
 namespace vedit::app {
 
@@ -20,7 +21,7 @@ QString DemoEditorProvider::id() const
 
 QString DemoEditorProvider::displayName() const
 {
-    return QStringLiteral("demo editor (shell placeholder)");
+    return QCoreApplication::translate("VEdit", "demo editor (shell placeholder)");
 }
 
 QWidget *DemoEditorProvider::createEditor(QWidget *parent)
@@ -38,7 +39,9 @@ QWidget *DemoEditorProvider::createEditor(QWidget *parent)
                              "EditorProvider seam; nothing in the shell depends on KTextEditor.\n"
                              "\n"
                              "Layout operations worth trying:\n"
-                             "  * Ctrl+Shift+H  split horizontally (side by side)\n"
+                             // RM-5b: the shell default moved off Ctrl+Shift+H
+                             // (KTextEditor's Find Selected Backwards owns it).
+                             "  * Ctrl+Alt+H    split horizontally (side by side)\n"
                              "  * Ctrl+Shift+V  split vertically (stacked)\n"
                              "  * F6            focus the next pane\n"
                              "  * Ctrl+W        close the focused pane\n"

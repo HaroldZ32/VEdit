@@ -1,0 +1,33 @@
+CHECK seam.file-written PASS
+CHECK seam.edit-core-provider PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+TOOLCHAIN source=verible:local slang:local missing=[] local=[/vedit-build/build/slang/out,/vedit-build/.mpd/recon/verible/bin]
+CHECK seam.panel-installed PASS
+CHECK seam.active-pane PASS
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+CHECK seam.file-opened PASS
+CHECK seam.analysis-after-open PASS  edited.sv — analyzed 07:33:03 (saved file): 0 diagnostic(s)
+OBSERVED seam.after-open status='edited.sv — analyzed 07:33:03 (saved file): 0 diagnostic(s)'
+CHECK seam.editor-widget PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+OBSERVED seam.after-edit status='edited.sv — analyzed 07:33:04 (editor buffer, not saved yet): 1 diagnostic(s)'
+OBSERVED seam.controller state=3 session='degraded: lsp 1/1 file(s), diagnostics 1' diagnostics=1 analyses=2
+CHECK seam.panel-shows-buffer-source PASS  edited.sv — analyzed 07:33:04 (editor buffer, not saved yet): 1 diagnostic(s)
+CHECK seam.buffer-edit-diagnosed PASS  edited.sv — analyzed 07:33:04 (editor buffer, not saved yet): 1 diagnostic(s)
+CHECK seam.disk-untouched PASS  disk=76 bytes
+CHECK seam.panel-lists-the-issue PASS  1
+CHECK seam.ktexteditor-view PASS
+CHECK seam.annotations-installed PASS
+OBSERVED seam.annotation_lines=1 tooltip='syntax error at "b" [verible]'
+CHECK seam.annotation-on-error-line PASS  syntax error at "b" [verible]
+CHECK seam.annotation-tooltip-has-syntax PASS  syntax error at "b" [verible]
+CHECK seam.screenshot-saved PASS  /vedit-build/evidence/d-diagnostics/product-seam-inline-diagnostics.png (1280x860)
+This plugin does not support propagateSizeHints()
+TOOLCHAIN source=verible:local slang:local missing=[] local=[/vedit-build/build/slang/out,/vedit-build/.mpd/recon/verible/bin]
+OBSERVED seam.reverse-control status=' — 0 diagnostic(s)'
+CHECK seam.reverse-control-no-analysis PASS   — 0 diagnostic(s)
+VE-DIAGNOSTICS-PRODUCT-SEAM checks=17 failures=0 skipped=0
+[product-seam-exit=0]

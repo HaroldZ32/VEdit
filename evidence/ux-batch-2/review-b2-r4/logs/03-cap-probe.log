@@ -1,0 +1,6 @@
+PROBE P5.search PASS
+PROBE P5.hit PASS (1)
+PROBE P5.idle PASS
+PROBE P5.started=1 saves=1 ok=1 replacements=1 line0-right='XXXXXXTAIL_B' line1-equals-original=1
+PROBE P5.no-wrong-target FAIL (BAR was written into the inserted near-duplicate, the scanned line is untouched)
+PROBE SUMMARY failures=1

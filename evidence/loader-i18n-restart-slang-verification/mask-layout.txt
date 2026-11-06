@@ -1,0 +1,34 @@
+== scratch-mask layout (host) ==
+d evidence/loader-i18n-restart-slang-verification/scratch-mask -> 
+d evidence/loader-i18n-restart-slang-verification/scratch-mask/bin -> 
+d evidence/loader-i18n-restart-slang-verification/scratch-mask/bin/translations -> 
+f evidence/loader-i18n-restart-slang-verification/scratch-mask/ld-linux-x86-64.so.2 -> 
+l evidence/loader-i18n-restart-slang-verification/scratch-mask/AppRun -> ../../../packaging/runtime/out/AppDir/AppRun
+l evidence/loader-i18n-restart-slang-verification/scratch-mask/bin/git -> ../../../../packaging/runtime/out/AppDir/bin/git
+l evidence/loader-i18n-restart-slang-verification/scratch-mask/bin/slang -> ../../../../packaging/runtime/out/AppDir/bin/slang
+l evidence/loader-i18n-restart-slang-verification/scratch-mask/bin/svn -> ../../../../packaging/runtime/out/AppDir/bin/svn
+l evidence/loader-i18n-restart-slang-verification/scratch-mask/bin/vd-app -> ../../../../packaging/runtime/out/AppDir/bin/vd-app
+l evidence/loader-i18n-restart-slang-verification/scratch-mask/bin/vedit-ksh-env-probe -> ../../../../packaging/runtime/out/AppDir/bin/vedit-ksh-env-probe
+l evidence/loader-i18n-restart-slang-verification/scratch-mask/bin/verible-verilog-format -> ../../../../packaging/runtime/out/AppDir/bin/verible-verilog-format
+l evidence/loader-i18n-restart-slang-verification/scratch-mask/bin/verible-verilog-lint -> ../../../../packaging/runtime/out/AppDir/bin/verible-verilog-lint
+l evidence/loader-i18n-restart-slang-verification/scratch-mask/bin/verible-verilog-ls -> ../../../../packaging/runtime/out/AppDir/bin/verible-verilog-ls
+l evidence/loader-i18n-restart-slang-verification/scratch-mask/etc -> ../../../packaging/runtime/out/AppDir/etc
+l evidence/loader-i18n-restart-slang-verification/scratch-mask/io.github.vedit.VEdit.png -> ../../../packaging/runtime/out/AppDir/io.github.vedit.VEdit.png
+l evidence/loader-i18n-restart-slang-verification/scratch-mask/lib -> ../../../packaging/runtime/out/AppDir/lib
+l evidence/loader-i18n-restart-slang-verification/scratch-mask/plugins -> ../../../packaging/runtime/out/AppDir/plugins
+l evidence/loader-i18n-restart-slang-verification/scratch-mask/runtime-manifest.txt -> ../../../packaging/runtime/out/AppDir/runtime-manifest.txt
+l evidence/loader-i18n-restart-slang-verification/scratch-mask/RUNTIME-NOTICES.txt -> ../../../packaging/runtime/out/AppDir/RUNTIME-NOTICES.txt
+l evidence/loader-i18n-restart-slang-verification/scratch-mask/share -> ../../../packaging/runtime/out/AppDir/share
+l evidence/loader-i18n-restart-slang-verification/scratch-mask/translations -> ../../../packaging/runtime/out/AppDir/bin/translations
+l evidence/loader-i18n-restart-slang-verification/scratch-mask/usr -> ../../../packaging/runtime/out/AppDir/usr
+l evidence/loader-i18n-restart-slang-verification/scratch-mask/vedit.desktop -> ../../../packaging/runtime/out/AppDir/vedit.desktop
+== candidate 1 contents (empty dir) ==
+total 8
+drwxrwxr-x 2 haroldzhao haroldzhao 4096 Nov  4 20:11 .
+drwxrwxr-x 3 haroldzhao haroldzhao 4096 Nov  4 20:11 ..
+== candidate 2 contents (symlink to packaged qm) ==
+total 244
+drwxr-xr-x 2 haroldzhao haroldzhao   4096 Nov  4 19:37 .
+drwxr-xr-x 3 haroldzhao haroldzhao   4096 Nov  4 19:42 ..
+-rw-r--r-- 1 haroldzhao haroldzhao 147222 Nov  4 19:37 qtbase_zh_CN.qm
+-rw-r--r-- 1 haroldzhao haroldzhao  90461 Nov  4 19:37 vedit_zh_CN.qm

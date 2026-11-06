@@ -1,0 +1,43 @@
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+OBSERVED platform offscreen
+OBSERVED expect available
+PRECONDITION state-dir='/tmp/g6-diag-probe-atNbFB/state' entries=<empty> settings-toml=absent
+CHECK precondition.state-dir-empty PASS detail='<empty>'
+CHECK precondition.no-settings-toml PASS detail='/tmp/g6-diag-probe-atNbFB/state/settings.toml'
+CHECK precondition.file-exists PASS detail='/tmp/g6-diag-probe-atNbFB/project/format.sv'
+TOOLCHAIN-RESOLVED source=verible:local slang:local missing=[] aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server]
+TOOLCHAIN-FORMAT found=1 source='local' path='/vedit-build/.mpd/recon/verible/bin/verible-verilog-format' env='VEDIT_VERIBLE_FORMAT'
+CHECK toolchain.formatter-executable-when-available PASS detail='/vedit-build/.mpd/recon/verible/bin/verible-verilog-format'
+CHECK probe.edit-core-provider PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server] local=[/vedit-build/build/slang/out,/vedit-build/.mpd/recon/verible/bin]
+GATES-READ sequence=after-install-before-file-open
+GATE action=formatting present=1 enabled=1 known=1 source='always-verible-format' reason='formatting always uses verible-verilog-format, independent of the LSP backend'
+GATE action=definition present=1 enabled=1 known=1 source='backend' reason=''
+GATE action=hover present=1 enabled=0 known=1 source='backend' reason='hoverProvider = false in the initialize result (measured)'
+CHECK gate.formatting-published PASS
+CHECK gate.formatting-matches-toolchain PASS detail='gate=1 toolchain=1'
+CHECK gate.formatting-independent-of-backend PASS detail='always-verible-format'
+CHECK action.formatting-exists PASS
+ACTION action=diagnostics.format enabled=1 reason='formatting always uses verible-verilog-format, independent of the LSP backend'
+CHECK action.formatting-enabled PASS detail='formatting always uses verible-verilog-format, independent of the LSP backend'
+CHECK reason.no-missing-claim-when-present PASS detail='formatting always uses verible-verilog-format, independent of the LSP backend'
+CHECK probe.active-pane PASS
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+CHECK format.file-opened PASS
+CHECK format.ktexteditor-view PASS
+CHECK format.current-file PASS detail='/tmp/g6-diag-probe-atNbFB/project/format.sv'
+OBSERVED format.before bytes=59 sha256=1f434e206212dafb47c58e393eb21657396a176e95311d0ac338c743d484ddce
+FORMAT backend=verible formatter=/vedit-build/.mpd/recon/verible/bin/verible-verilog-format changed=1 enabled-by='always-verible-format' in-bytes=59 out-bytes=73 file='/tmp/g6-diag-probe-atNbFB/project/format.sv'
+OBSERVED format.after bytes=73 sha256=fd85f6a81b7255fe151d1ab74c4f43f4de09a407bed080520e0b9b6e3feb7018 changed=1
+CHECK format.document-changed PASS detail='bytes 59 -> 73'
+OBSERVED format.reference bytes=73 sha256=fd85f6a81b7255fe151d1ab74c4f43f4de09a407bed080520e0b9b6e3feb7018
+CHECK format.matches-the-formatter-cli PASS detail='reference-bytes=73'
+CHECK format.actually-differs PASS
+CHECK evidence.before-written PASS detail='/vedit-build/evidence/g6-diag/format-before.sv'
+CHECK evidence.after-written PASS detail='/vedit-build/evidence/g6-diag/format-after.sv'
+EVIDENCE format-before='/vedit-build/evidence/g6-diag/format-before.sv' format-after='/vedit-build/evidence/g6-diag/format-after.sv'
+POSTCONDITION state-dir='/tmp/g6-diag-probe-atNbFB/state' entries=<empty> settings-toml=absent
+CHECK postcondition.no-settings-toml PASS detail='/tmp/g6-diag-probe-atNbFB/state/settings.toml'
+G6-DIAG-PROBE exit=0 checks=21 failures=0 expect=available

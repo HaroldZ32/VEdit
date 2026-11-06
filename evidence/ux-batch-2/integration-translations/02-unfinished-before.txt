@@ -1,0 +1,364 @@
+  1 editor/kernel/multi_cursor.cpp:775 [VEdit]
+    'Go to Definition is unavailable here: %1 - Ctrl+click now behaves like a plain click'
+  2 workspace/module_tree/module_tree_integration.cpp:296 [VEdit]
+    'No project open — open a folder to build the module catalog.'
+  3 workspace/module_tree/module_tree_integration.cpp:413 [VEdit]
+    'module catalog: retrying after the project model…'
+  4 workspace/module_tree/module_tree_integration.cpp:462 [VEdit]
+    'Empty state: no module catalog yet. Open a project and press Refresh.'
+  5 workspace/module_tree/module_tree_integration.cpp:468 [VEdit]
+    'Interface'
+  6 workspace/module_tree/module_tree_integration.cpp:474 [VEdit]
+    'Empty state: the focused module&apos;s ports appear here once the module catalog is ready.'
+  7 workspace/module_tree/catalog_client.cpp:237 [VEdit]
+    'this build has no Rust service layer (vd-ffi), so the module catalog cannot run'
+  8 workspace/module_tree/catalog_client.cpp:272 [VEdit]
+    'no project root: open a folder or start vedit-app with --project &lt;dir&gt;'
+  9 workspace/module_tree/catalog_client.cpp:290 [VEdit]
+    'project expansion was rejected: %1'
+ 10 workspace/module_tree/catalog_client.cpp:308 [VEdit]
+    'the project has no source files, so there is no module catalog to build'
+ 11 workspace/module_tree/catalog_client.cpp:346 [VEdit]
+    'module catalog was rejected: %1'
+ 12 workspace/module_tree/catalog_client.cpp:351 [VEdit]
+    'cataloguing %1 project file(s)…'
+ 13 workspace/module_tree/catalog_client.cpp:375 [VEdit]
+    'the module catalog service did not answer within 30 s'
+ 14 workspace/module_tree/catalog_client.cpp:388 [VEdit]
+    'project expansion failed: %1'
+ 15 workspace/module_tree/catalog_client.cpp:409 [VEdit]
+    'module catalog failed: %1'
+ 16 workspace/module_tree/catalog_client.cpp:445 [VEdit]
+    'unknown error'
+ 17 workspace/diagnostics/diagnostics_integration.cpp:1207 [VEdit]
+    'Hover · %1'
+ 18 workspace/diagnostics/diagnostics_integration.cpp:1271 [VEdit]
+    'checking whether the engine can fix this…'
+ 19 workspace/diagnostics/diagnostics_integration.cpp:1340 [VEdit]
+    'The fix could not be applied: the document refused the edit (is it read-only?)'
+ 20 workspace/diagnostics/diagnostics_integration.cpp:1353 [VEdit]
+    'Fixed %1 with verible-verilog-lint (one undo reverts it)'
+ 21 workspace/diagnostics/diagnostics_integration.cpp:1376 [VEdit]
+    'Rename is not available: %1'
+ 22 workspace/diagnostics/diagnostics_integration.cpp:1394 [VEdit]
+    'Rename needs the cursor on a symbol (line %1, column %2 has none)'
+ 23 workspace/diagnostics/diagnostics_integration.cpp:1405 [VEdit]
+    'Rename is not possible here: %1'
+ 24 workspace/diagnostics/diagnostics_integration.cpp:1411 [VEdit]
+    'Rename %1'
+ 25 workspace/diagnostics/diagnostics_integration.cpp:1422 [VEdit]
+    '%1 refused the rename request'
+ 26 workspace/diagnostics/diagnostics_integration.cpp:1430 [VEdit]
+    'Rename was refused: %1'
+ 27 workspace/diagnostics/diagnostics_integration.cpp:1509 [VEdit]
+    'The project file set is still loading — try again in a moment'
+ 28 workspace/diagnostics/diagnostics_integration.cpp:1599 [VEdit]
+    'Project lint failed: %1'
+ 29 workspace/diagnostics/diagnostics_integration.cpp:781 [VEdit]
+    'Automatic project lint did not start: %1'
+ 30 workspace/module_tree/interface_panel.cpp:59 [VEdit]
+    'Double-click a port: jump to its declaration. Ctrl+double-click: jump to this module&apos;s instantiation statement. The module catalog has no per-connection position, so Ctrl+double-click targets the instance statement, not the connected port.'
+ 31 workspace/module_tree/interface_panel.cpp:85 [VEdit]
+    'Name'
+ 32 workspace/module_tree/interface_panel.cpp:86 [VEdit]
+    'Direction'
+ 33 workspace/module_tree/interface_panel.cpp:87 [VEdit]
+    'Type'
+ 34 workspace/module_tree/interface_panel.cpp:88 [VEdit]
+    'Width'
+ 35 workspace/module_tree/interface_panel.cpp:115 [VEdit]
+    'Double-click a port for its declaration; Ctrl+double-click for the instantiation statement.'
+ 36 workspace/module_tree/interface_panel.cpp:118 [VEdit]
+    'No module catalog yet: open a project and press Refresh.'
+ 37 workspace/module_tree/interface_panel.cpp:170 [VEdit]
+    'No modules found: slang reported no module definitions for this project.'
+ 38 workspace/module_tree/interface_panel.cpp:182 [VEdit]
+    'No focused module — select a module in the Module Tree, or put the caret inside a module definition.'
+ 39 workspace/module_tree/interface_panel.cpp:191 [VEdit]
+    'Module %1 · %2 port(s)'
+ 40 workspace/module_tree/interface_panel.cpp:236 [VEdit]
+    'Packed width derived from `%1`'
+ 41 workspace/module_tree/interface_panel.cpp:248 [VEdit]
+    '%1 · double-click: jump to the port declaration; Ctrl+double-click: jump to this module&apos;s instantiation statement'
+ 42 workspace/module_tree/interface_panel.cpp:277 [VEdit]
+    'port %1 has no declaration position in the catalog, so nothing was opened'
+ 43 workspace/module_tree/interface_panel.cpp:283 [VEdit]
+    'port %1 declaration'
+ 44 workspace/module_tree/interface_panel.cpp:293 [VEdit]
+    'no instantiation of %1 was catalogued: it is a design top, so there is no instance statement to jump to'
+ 45 workspace/module_tree/interface_panel.cpp:310 [VEdit]
+    '%1 · %2 · %3'
+ 46 workspace/module_tree/interface_panel.cpp:319 [VEdit]
+    'instantiation chooser cancelled'
+ 47 workspace/module_tree/interface_panel.cpp:334 [VEdit]
+    'the instantiation in %1 has no source position in the catalog'
+ 48 workspace/module_tree/interface_panel.cpp:339 [VEdit]
+    'instantiation of %1 in %2'
+ 49 workspace/module_tree/interface_panel.cpp:362 [VEdit]
+    '%1: no jump target is registered (the editor lane is not installed), so nothing was opened'
+ 50 workspace/module_tree/interface_panel.cpp:369 [VEdit]
+    '%1: the editor rejected the jump to %2'
+ 51 workspace/module_tree/interface_panel.cpp:373 [VEdit]
+    '%1: the jump request (%2) was refused'
+ 52 workspace/diagnostics/autofix.cpp:20 [VEdit]
+    'verible-verilog-lint was not found: no autofix is possible'
+ 53 workspace/diagnostics/autofix.cpp:47 [VEdit]
+    'the fixed copy could not be read back'
+ 54 workspace/diagnostics/autofix.cpp:53 [VEdit]
+    'the lint tool crashed during autofix'
+ 55 workspace/diagnostics/autofix.cpp:84 [VEdit]
+    'this diagnostic carries no rule id, so no autofix can be selected'
+ 56 workspace/diagnostics/autofix.cpp:90 [VEdit]
+    'no temporary directory is available'
+ 57 workspace/diagnostics/autofix.cpp:102 [VEdit]
+    'the temporary copy could not be written'
+ 58 workspace/diagnostics/autofix.cpp:118 [VEdit]
+    'the lint tool could not be started: %1'
+ 59 workspace/diagnostics/autofix.cpp:125 [VEdit]
+    'the autofix run timed out'
+ 60 workspace/diagnostics/autofix.cpp:348 [VEdit]
+    'the lint tool could not be started'
+ 61 workspace/diagnostics/diagnostic_hover.cpp:51 [VEdit]
+    'Error'
+ 62 workspace/diagnostics/diagnostic_hover.cpp:53 [VEdit]
+    'Warning'
+ 63 workspace/diagnostics/diagnostic_hover.cpp:55 [VEdit]
+    'Information'
+ 64 workspace/diagnostics/diagnostic_hover.cpp:57 [VEdit]
+    'Hint'
+ 65 workspace/diagnostics/diagnostic_hover.cpp:59 [VEdit]
+    'Diagnostic'
+ 66 workspace/diagnostics/diagnostic_hover.cpp:77 [VEdit]
+    'this backend offers no autofix for this diagnostic'
+ 67 workspace/diagnostics/diagnostic_hover.cpp:87 [VEdit]
+    'Checking for an automatic fix…'
+ 68 workspace/diagnostics/diagnostic_hover.cpp:88 [VEdit]
+    'No automatic fix: %1'
+ 69 workspace/diagnostics/diagnostic_hover.cpp:112 [VEdit]
+    '修复'
+ 70 workspace/diagnostics/project_lint_notice.cpp:94 [VEdit]
+    '&lt;a href=&quot;jump&quot;&gt;⚠ %1 project error(s) — click to jump&lt;/a&gt;'
+ 71 workspace/diagnostics/project_lint_notice.cpp:98 [VEdit]
+    'The automatic project lint found %1 error(s). Each click jumps to the next one.'
+ 72 workspace/diagnostics/project_lint_notice.cpp:144 [VEdit]
+    'Project lint errors'
+ 73 workspace/diagnostics/project_lint_notice.cpp:173 [VEdit]
+    'The project lint reported %1 error(s). Double-click one to jump to it.'
+ 74 workspace/module_tree/module_catalog.cpp:51 [VEdit]
+    'module catalog: %1'
+ 75 workspace/module_tree/module_catalog.cpp:54 [VEdit]
+    'no module catalog yet'
+ 76 workspace/module_tree/module_catalog.cpp:62 [VEdit]
+    '%1 · %2 module(s) · %3 top(s) · %4 ms · %5 KiB peak'
+ 77 workspace/module_tree/module_catalog.cpp:71 [VEdit]
+    ' · ⚠ %1'
+ 78 workspace/module_tree/module_catalog.cpp:117 [VEdit]
+    'the ABI reported no type string for this port'
+ 79 workspace/module_tree/module_catalog.cpp:138 [VEdit]
+    'the type `%1` has an unclosed packed dimension'
+ 80 workspace/module_tree/module_catalog.cpp:146 [VEdit]
+    'the packed range `[%1]` in `%2` is not a literal msb:lsb pair, so the width cannot be derived'
+ 81 workspace/module_tree/module_catalog.cpp:158 [VEdit]
+    'the packed range `[%1]` in `%2` is too large to represent'
+ 82 workspace/module_tree/module_catalog.cpp:166 [VEdit]
+    'the packed dimensions in `%1` exceed the supported width'
+ 83 workspace/module_tree/module_hierarchy.cpp:88 [VEdit]
+    'depth limit %1 reached — this module&apos;s children are not expanded'
+ 84 workspace/module_tree/module_hierarchy.cpp:102 [VEdit]
+    'the module tree was truncated at %1 rows'
+ 85 workspace/module_tree/module_hierarchy.cpp:111 [VEdit]
+    'cycle: %1 is already an ancestor of this row — not expanded'
+ 86 workspace/module_tree/module_hierarchy.cpp:127 [VEdit]
+    'no module definition was catalogued for `%1`'
+ 87 workspace/module_tree/module_tree_panel.cpp:43 [VEdit]
+    'cycle: %1'
+ 88 workspace/module_tree/module_tree_panel.cpp:45 [VEdit]
+    'depth limit (%1) reached'
+ 89 workspace/module_tree/module_tree_panel.cpp:48 [VEdit]
+    'tree truncated (%1 rows)'
+ 90 workspace/module_tree/module_tree_panel.cpp:93 [VEdit]
+    'Re-run the module catalog for the whole project'
+ 91 workspace/module_tree/module_tree_panel.cpp:97 [VEdit]
+    'Filter modules…'
+ 92 workspace/module_tree/module_tree_panel.cpp:105 [VEdit]
+    'Module'
+ 93 workspace/module_tree/module_tree_panel.cpp:106 [VEdit]
+    'Instantiations'
+ 94 workspace/module_tree/module_tree_panel.cpp:107 [VEdit]
+    'Definition'
+ 95 workspace/module_tree/module_tree_panel.cpp:130 [VEdit]
+    'nothing to refresh: no catalog client'
+ 96 workspace/module_tree/module_tree_panel.cpp:172 [VEdit]
+    'No top module: every catalogued module is instantiated by another module, so the hierarchy has no root.'
+ 97 workspace/module_tree/module_tree_panel.cpp:180 [VEdit]
+    '\nroot: %1'
+ 98 workspace/module_tree/module_tree_panel.cpp:184 [VEdit]
+    'Module tree ready — double-click a module to open its declaration.'
+ 99 workspace/module_tree/module_tree_panel.cpp:273 [VEdit]
+    'Double-click: open this module&apos;s declaration'
+100 workspace/module_tree/module_tree_panel.cpp:397 [VEdit]
+    'this marker row has no location'
+101 workspace/module_tree/module_tree_panel.cpp:408 [VEdit]
+    '%1 has no definition position in the module catalog, so nothing was opened'
+102 workspace/module_tree/module_tree_panel.cpp:415 [VEdit]
+    '%1 definition'
+103 workspace/search/project_replace.cpp:356 [VEdit]
+    'replace is unavailable: this build does not link the atomic save path'
+104 workspace/search/project_replace.cpp:361 [VEdit]
+    'replace refused: the operation has no query, so the ranges cannot be verified; nothing was written'
+105 workspace/search/project_replace.cpp:365 [VEdit]
+    'replace refused: the hit list has no frozen scan identity; nothing was written'
+106 workspace/search/project_replace.cpp:373 [VEdit]
+    'replace: %1: line %2 belongs to a different search; nothing was written to that file (run the search again)'
+107 workspace/search/project_replace.cpp:405 [VEdit]
+    'replace: %1: line %2 is not covered by the frozen scan snapshot; nothing was written to that file (run the search again)'
+108 workspace/search/project_replace.cpp:423 [VEdit]
+    'replace: %1: line %2: the document was written while the scan was running, so the hit positions may be stale; nothing was written to that file (run the search again)'
+109 workspace/search/project_replace.cpp:439 [VEdit]
+    'replace: %1: line %2: the document changed after the scan (size or modification time); nothing was written to that file (run the search again)'
+110 workspace/search/project_replace.cpp:461 [VEdit]
+    'replace: %1: line %2: the document changed while it was being read; nothing was written to that file (run the search again)'
+111 editor/kernel/find_replace.cpp:397 [vedit::editor::FindReplaceBar]
+    'Current File'
+112 editor/kernel/find_replace.cpp:399 [vedit::editor::FindReplaceBar]
+    'Whole Project'
+113 editor/kernel/find_replace.cpp:401 [vedit::editor::FindReplaceBar]
+    'Search this document, or hand the query to the Search panel'
+114 editor/kernel/find_replace.cpp:914 [vedit::editor::FindReplaceBar]
+    'Project replace runs from the Search panel'
+115 editor/kernel/find_replace.cpp:999 [vedit::editor::FindReplaceBar]
+    'Whole project → Search panel'
+116 editor/kernel/find_replace.cpp:1137 [vedit::editor::FindReplaceBar]
+    'Type a query to search the project'
+117 editor/kernel/find_replace.cpp:1146 [vedit::editor::FindReplaceBar]
+    'Whole project: searching in the Search panel'
+118 editor/kernel/find_replace.cpp:1147 [vedit::editor::FindReplaceBar]
+    'Whole project: open the Search panel to search the project'
+119 workspace/search/search_panel.cpp:109 [vedit::workspace::search::SearchPanel]
+    'Whole words'
+120 workspace/search/search_panel.cpp:116 [vedit::workspace::search::SearchPanel]
+    'Regular expression (project-wide: RE2 style, no backreferences or lookaround)'
+121 workspace/search/search_panel.cpp:125 [vedit::workspace::search::SearchPanel]
+    'Current File'
+122 workspace/search/search_panel.cpp:127 [vedit::workspace::search::SearchPanel]
+    'Whole Project'
+123 workspace/search/search_panel.cpp:130 [vedit::workspace::search::SearchPanel]
+    'Search the active document or the whole project'
+124 workspace/search/search_panel.cpp:161 [vedit::workspace::search::SearchPanel]
+    'Replace with'
+125 workspace/search/search_panel.cpp:163 [vedit::workspace::search::SearchPanel]
+    'Replace'
+126 workspace/search/search_panel.cpp:165 [vedit::workspace::search::SearchPanel]
+    'Replace the current match and advance to the next one'
+127 workspace/search/search_panel.cpp:167 [vedit::workspace::search::SearchPanel]
+    'Replace All'
+128 workspace/search/search_panel.cpp:169 [vedit::workspace::search::SearchPanel]
+    'Replace every match (asks for confirmation with the file and hit counts first)'
+129 workspace/search/search_panel.cpp:421 [vedit::workspace::search::SearchPanel]
+    'A replace is still running, so the Ctrl+F hand-off was not applied. Wait for it to finish and search again.'
+130 workspace/search/search_panel.cpp:503 [vedit::workspace::search::SearchPanel]
+    'A replace is still running, so the search was not started. Wait for it to finish and run the search again.'
+131 workspace/search/search_panel.cpp:519 [vedit::workspace::search::SearchPanel]
+    'Counting matches…'
+132 workspace/search/search_panel.cpp:571 [vedit::workspace::search::SearchPanel]
+    'No current file. Open a document or choose Whole Project.'
+133 workspace/search/search_panel.cpp:775 [vedit::workspace::search::SearchPanel]
+    'Replace All refused: the query or options changed while the counting scan was running; nothing was replaced. Run the search and Replace All again.'
+134 workspace/search/search_panel.cpp:782 [vedit::workspace::search::SearchPanel]
+    'the counting scan was cancelled'
+135 workspace/search/search_panel.cpp:783 [vedit::workspace::search::SearchPanel]
+    'Replace All refused: %1'
+136 workspace/search/search_panel.cpp:787 [vedit::workspace::search::SearchPanel]
+    'Replace All refused: the result limit (%1) was reached; narrow the query first'
+137 workspace/search/search_panel.cpp:797 [vedit::workspace::search::SearchPanel]
+    'Replace All refused: the counting scan stopped at the %1 ms time budget, so the hit list is incomplete; narrow the query first'
+138 workspace/search/search_panel.cpp:813 [vedit::workspace::search::SearchPanel]
+    'Replace All refused: &quot;%1&quot; was written while the counting scan was running, so the hit positions may be stale; nothing was replaced. Run the search and Replace All again.'
+139 workspace/search/search_panel.cpp:839 [vedit::workspace::search::SearchPanel]
+    'The query or options changed while the search was running; run the search again.'
+140 workspace/search/search_panel.cpp:952 [vedit::workspace::search::SearchPanel]
+    'The query or options changed; run the search again.'
+141 workspace/search/search_panel.cpp:1134 [vedit::workspace::search::SearchPanel]
+    'the result list has no frozen scan identity; run the search again before replacing'
+142 workspace/search/search_panel.cpp:1139 [vedit::workspace::search::SearchPanel]
+    'the operation has no query, so the ranges cannot be verified; refusing to write without verification'
+143 workspace/search/search_panel.cpp:1145 [vedit::workspace::search::SearchPanel]
+    'the query is empty, so the ranges cannot be verified; run the search again before replacing'
+144 workspace/search/search_panel.cpp:1150 [vedit::workspace::search::SearchPanel]
+    'the query or match options changed since the scan; run the search again before replacing'
+145 workspace/search/search_panel.cpp:1162 [vedit::workspace::search::SearchPanel]
+    'the search scope or options changed since the scan; run the search again before replacing'
+146 workspace/search/search_panel.cpp:1172 [vedit::workspace::search::SearchPanel]
+    ' Nothing was replaced.'
+147 workspace/search/search_panel.cpp:1174 [vedit::workspace::search::SearchPanel]
+    ' %1 document(s) were already saved and remain on disk; nothing was replaced.'
+148 workspace/search/search_panel.cpp:1201 [vedit::workspace::search::SearchPanel]
+    'the editor bridge is unavailable, so the unsaved buffer state cannot be checked'
+149 workspace/search/search_panel.cpp:1211 [vedit::workspace::search::SearchPanel]
+    '&quot;%1&quot;: %2'
+150 workspace/search/search_panel.cpp:1273 [vedit::workspace::search::SearchPanel]
+    'Replace All refused: the editor bridge is unavailable, so the unsaved-buffer state cannot be checked.'
+151 workspace/search/search_panel.cpp:1309 [vedit::workspace::search::SearchPanel]
+    'Replace All refused: an unsaved editor document could not be saved: %1'
+152 workspace/search/search_panel.cpp:1313 [vedit::workspace::search::SearchPanel]
+    'The %1 document(s) already saved remain on disk; nothing was replaced.'
+153 workspace/search/search_panel.cpp:1317 [vedit::workspace::search::SearchPanel]
+    'Nothing was replaced.'
+154 workspace/search/search_panel.cpp:1363 [vedit::workspace::search::SearchPanel]
+    'No match to replace; run the search first.'
+155 workspace/search/search_panel.cpp:1372 [vedit::workspace::search::SearchPanel]
+    'Replace refused: %1'
+156 workspace/search/search_panel.cpp:1395 [vedit::workspace::search::SearchPanel]
+    'Replace refused: this row belongs to an older search; run the search again before replacing.'
+157 workspace/search/search_panel.cpp:1400 [vedit::workspace::search::SearchPanel]
+    'The result list is out of date; run the search again.'
+158 workspace/search/search_panel.cpp:1405 [vedit::workspace::search::SearchPanel]
+    'Replace refused: this match reports no replaceable range.'
+159 workspace/search/search_panel.cpp:1423 [vedit::workspace::search::SearchPanel]
+    'Replace refused: &quot;%1&quot; is not covered by the frozen scan snapshot; nothing was written (run the search again).'
+160 workspace/search/search_panel.cpp:1436 [vedit::workspace::search::SearchPanel]
+    'Replace refused: &quot;%1&quot; was written while the search was running, so this match may have moved; nothing was written. Run the search again.'
+161 workspace/search/search_panel.cpp:1458 [vedit::workspace::search::SearchPanel]
+    'Replace refused: &quot;%1&quot; changed after the search; nothing was written. Run the search again.'
+162 workspace/search/search_panel.cpp:1478 [vedit::workspace::search::SearchPanel]
+    'Replace refused: the unsaved edits in &quot;%1&quot; moved line %2, so this match is no longer where the search found it; the document was not saved and nothing was replaced. Save it and run the search again.'
+163 workspace/search/search_panel.cpp:1495 [vedit::workspace::search::SearchPanel]
+    'Replace refused: &quot;%1&quot; has unsaved changes that could not be saved: %2'
+164 workspace/search/search_panel.cpp:1529 [vedit::workspace::search::SearchPanel]
+    'Replace All: no match to replace.'
+165 workspace/search/search_panel.cpp:1552 [vedit::workspace::search::SearchPanel]
+    'Replace All cancelled;'
+166 workspace/search/search_panel.cpp:1554 [vedit::workspace::search::SearchPanel]
+    ' nothing was written.'
+167 workspace/search/search_panel.cpp:1586 [vedit::workspace::search::SearchPanel]
+    'the query or options changed while the confirmation was open'
+168 workspace/search/search_panel.cpp:1589 [vedit::workspace::search::SearchPanel]
+    'Replace All refused: %1; nothing was replaced. Run the search and Replace All again.'
+169 workspace/search/search_panel.cpp:1604 [vedit::workspace::search::SearchPanel]
+    'Replace &quot;%1&quot; with &quot;%2&quot;?\n\n%3 occurrence(s) in %4 file(s) will be replaced.'
+170 workspace/search/search_panel.cpp:1616 [vedit::workspace::search::SearchPanel]
+    '\n\n%1 affected unsaved editor document(s) were saved first: %2'
+171 workspace/search/search_panel.cpp:1635 [vedit::workspace::search::SearchPanel]
+    'Replace refused: the operation has no query, so the ranges cannot be verified; nothing was written.'
+172 workspace/search/search_panel.cpp:1648 [vedit::workspace::search::SearchPanel]
+    'Replace refused: %1; nothing was written. Run the search again.'
+173 workspace/search/search_panel.cpp:1661 [vedit::workspace::search::SearchPanel]
+    'Replace refused: a hit does not belong to the scan being replaced; nothing was written.'
+174 workspace/search/search_panel.cpp:1678 [vedit::workspace::search::SearchPanel]
+    'Replace is unavailable: this build does not link the atomic save path.'
+175 workspace/search/search_panel.cpp:1691 [vedit::workspace::search::SearchPanel]
+    'Replacing…'
+176 workspace/search/search_panel.cpp:1692 [vedit::workspace::search::SearchPanel]
+    'Replacing %1 occurrence(s)…'
+177 workspace/search/search_panel.cpp:1739 [vedit::workspace::search::SearchPanel]
+    'Replaced %1 occurrence(s) in %2 file(s).'
+178 workspace/search/search_panel.cpp:1744 [vedit::workspace::search::SearchPanel]
+    '%1 file(s) skipped (not valid UTF-8 or unreadable).'
+179 workspace/search/search_panel.cpp:1749 [vedit::workspace::search::SearchPanel]
+    'Replace cancelled; %1 occurrence(s) in %2 file(s) were written.'
+180 workspace/search/search_panel.cpp:1755 [vedit::workspace::search::SearchPanel]
+    'Replace failed after writing %1 occurrence(s) in %2 file(s): %3'
+181 workspace/search/search_panel.cpp:1760 [vedit::workspace::search::SearchPanel]
+    'Replace failed: %1'
+182 workspace/search/search_panel.cpp:1770 [vedit::workspace::search::SearchPanel]
+    '%1 file(s) changed during replace — not reloaded: %2'

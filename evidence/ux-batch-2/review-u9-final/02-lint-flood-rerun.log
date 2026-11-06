@@ -1,0 +1,31 @@
+   Compiling proc-macro2 v1.0.107
+   Compiling unicode-ident v1.0.27
+   Compiling quote v1.0.47
+   Compiling libc v0.2.191
+   Compiling serde_core v1.0.229
+   Compiling zmij v1.0.23
+   Compiling getrandom v0.4.3
+   Compiling rustix v1.1.6
+   Compiling linux-raw-sys v0.12.1
+   Compiling bitflags v2.13.2
+   Compiling anyhow v1.0.104
+   Compiling serde_json v1.0.154
+   Compiling cfg-if v1.0.5
+   Compiling serde v1.0.229
+   Compiling fastrand v2.5.0
+   Compiling memchr v2.8.3
+   Compiling itoa v1.0.18
+   Compiling once_cell v1.21.4
+   Compiling syn v3.0.9
+   Compiling tempfile v3.27.0
+   Compiling serde_derive v1.0.229
+   Compiling vd-deeplint v0.1.1 (/home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-deeplint)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.19s
+     Running tests/engine_batch.rs (target/debug/deps/engine_batch-daaa9ed86c06f74f)
+
+running 1 test
+real-flood: phase=Finished files=1/1 total_findings=40000 distinct=500 dropped=39500 collapsed=0 elapsed_ms=2136 failures=0 summary=slang — 1/1 files, 500 distinct diagnostic(s), 39500 dropped
+test a_real_diagnostics_flood_is_streamed_and_reported ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 7 filtered out; finished in 2.15s
+

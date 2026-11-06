@@ -1,0 +1,61 @@
+== label-set comparison (details in 05-label-compare.txt) ==
+predecessor -> this run: no old label disappeared in app(312), project(150), palette(46), search(112), module-tree(61), integration(28)
+this run: project has exactly the 3 new F4 labels; integration has exactly the 3 new F2 labels
+
+== cbindgen header unchanged by our gate ==
+ae78ce608bd1f8d06e01b2cb18ff8bcdbf9ad11689877afc748b5ca149cabca9  crates/vd-ffi/include/vd_ffi.h
+ae78ce608bd1f8d06e01b2cb18ff8bcdbf9ad11689877afc748b5ca149cabca9  evidence/ffi-abi/logs/26-vd_ffi.h
+
+== touched test files: HEAD diff removed-check audit ==
+NOTE: HEAD 4e2d0a5 predates the writers; the diffs below include the pre-repair writer change already verified by the predecessor. The repair boundary is checked by the label sets above.
+-- project_selftest.cpp removed check( lines from HEAD --
+-    check("service.start.non-blocking", startTimer.elapsed() < 250);
+-    check("service.start.pending", model.isPending());
+-    check("service.finishes", waitForCompletion(model, 20000));
+-    check("files.count", model.files().size() == 7);
+-    check("files.match-fixture-expectations",
+-    check("summary.states-the-count", model.summary().contains(QStringLiteral("7 files")));
+-    check("panel.summary", panel.summaryText().contains(QStringLiteral("7 files")));
+-    check("panel.file-count", panel.fileCount() == 7);
+-    check("restart.restore", restored.restoreFromDisk(&restoreError));
+-    check("restart.restore-no-error", restoreError.isEmpty());
+-    check("restart.files", restored.files() == model.files());
+-    check("restart.root", restored.projectRoot() == fixtureAbsolute);
+-    check("restart.panel.file-count", restoredPanel.fileCount() == 7);
+-    check("restart.summary.restored",
+-    check("bad.temp-dir", badTemp.isValid());
+-    check("bad.define-invalid",
+-    check("bad.unknown-token",
+-    check("bad.missing-filelist",
+-    check("bad.names-file-and-line",
+-    check("empty.no-restore", !empty.restoreFromDisk());
+-    check("empty.no-project", !empty.hasProject());
+-    check("empty.panel.file-count", emptyPanel.fileCount() == 0);
+-    check("empty.summary", emptyPanel.summaryText() == QStringLiteral("No project open"));
+-    check("corrupt.restore-refused", !corrupt.restoreFromDisk(&corruptError));
+-    check("corrupt.reported", !corruptError.isEmpty());
+-- palette_integration_selftest.cpp removed check( lines from HEAD --
+
+== old F4/F2 checks still present in current source ==
+468:    check("filelist.import-model", model.filelists() == QStringList{importedPath});
+477:    check("filelist.import-no-duplicate", !model.importFilelists({importedPath})
+480:    check("filelist.import-keeps-union", model.files().size() == 11);
+481:    check("filelist.remove", panel.removeFilelist(importedPath));
+482:    check("filelist.remove-finishes", waitForCompletion(model, 20000));
+483:    check("filelist.remove-model", model.filelists().isEmpty());
+484:    check("filelist.remove-keeps-union", model.files().size() == 11);
+485:    check("filelist.remove-unknown-rejected", !panel.removeFilelist(importedPath));
+198:    check(QStringLiteral("integration.second-open"),
+200:    check(QStringLiteral("integration.single-scan"),
+208:    check(QStringLiteral("integration.empty-state"),
+274:    check(QStringLiteral("integration.ktexteditor-opened-path-recorded"),
+
+== new checks appear exactly once each ==
+3
+3
+
+== no repair-touched test file deleted ==
+  none
+
+== deleted files are the pre-existing T29 folding set ==
+  no non-folding deletions

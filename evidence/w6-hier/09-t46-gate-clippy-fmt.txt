@@ -1,0 +1,9 @@
+# T46 gate: clippy + fmt on vd-deeplint (all targets)
+date: 2026-11-02T17:13:06+08:00
+command: CARGO_HOME=$PWD/target/cargo-home RUSTUP_TOOLCHAIN=stable cargo clippy --offline -p vd-deeplint --all-targets -- -D warnings
+    Checking vd-deeplint v0.1.1 (/home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-deeplint)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.30s
+clippy-exit=0
+
+command: cargo fmt -p vd-deeplint -- --check
+fmt-exit=0

@@ -1,0 +1,35 @@
+# baseline parity — review-b2-r5 (repaired tree)
+# baselines: review-b2-r3/probes/01-229-suite.log (229) and review-b2-r4/logs/01-suite-green.log (275)
+# current: logs/01-suite-green.log
+# date: 2026-11-06T11:07:04+08:00
+
+current_checks=299
+-- baseline 229: missing names:
+-- baseline 229 RESULT: 229/229 present+PASS; not-pass=0
+-- baseline 275: missing names:
+-- baseline 275 RESULT: 275/275 present+PASS; not-pass=0
+-- names added since 275: 24
+preview-cap-ok.below-intact
+preview-cap-ok.hit
+preview-cap-ok.idle
+preview-cap-ok.ok
+preview-cap-ok.replaced-one
+preview-cap-ok.replaced-scanned-line
+preview-cap-ok.save-ran
+preview-cap-ok.search
+preview-cap-ok.started
+preview-cap.detector-at-cap
+preview-cap.detector-empty
+preview-cap.detector-short-ellipsis
+preview-cap.detector-truncated
+preview-cap.disk-unchanged
+preview-cap.error-names-file
+preview-cap.hit
+preview-cap.idle
+preview-cap.no-save
+preview-cap.refused
+preview-cap.search
+preview-cap.tail-disk-unchanged
+preview-cap.tail-idle
+preview-cap.tail-no-save
+preview-cap.tail-refused

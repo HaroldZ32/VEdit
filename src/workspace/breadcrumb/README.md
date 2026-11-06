@@ -24,7 +24,7 @@
 
 ## 与折叠的关系
 
-本 lane **不依赖** `src/syntax/folding`（`CMakeLists.txt` 里没有该链接，也没有任何 include）。
+本 lane **不依赖** 折叠 lane（`CMakeLists.txt` 里没有该链接，也没有任何 include；该 lane 已于 T29 整体删除）。
 光标移动/语义更新只会更新面包屑，不可能触发 AMENDMENTS A2.1 所说的折叠全量重建。
 
 ## 构建与测试（独立 lane）

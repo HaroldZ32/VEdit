@@ -1,0 +1,14 @@
+$ grep -n "^version" Cargo.toml
+25:version = "0.2.1"
+$ grep -n project(VEdit ...
+19:project(VEdit VERSION 0.2.1 LANGUAGES C CXX)
+16:  project(VEditTerminal VERSION 0.2.1 LANGUAGES CXX)
+$ grep -n setApplicationVersion ...
+src/app/main.cpp:1851:    QCoreApplication::setApplicationVersion(QStringLiteral("0.2.1"));
+cmake/smoke/qt6_window_smoke.cpp:133:    QCoreApplication::setApplicationVersion(QStringLiteral("0.2.1"));
+$ ls packaging/runtime/out
+total 134124
+drwxr-xr-x 8 haroldzhao haroldzhao      4096 Nov  6 21:40 AppDir
+-rw-rw-r-- 1 haroldzhao haroldzhao        94 Nov  6 21:40 SHA256SUMS
+-rwxr-xr-x 1 haroldzhao haroldzhao 137325048 Nov  6 21:40 VEdit-0.1.1-x86_64.AppImage
+drwx------ 8 haroldzhao haroldzhao      4096 Nov  6 21:40 centos7-appdir

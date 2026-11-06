@@ -1,0 +1,17 @@
+observed slang argv (one argument per line):
+--lint-only
+-Weverything
+--diag-column-unit
+byte
+--diag-json
+/tmp/vd-deeplint-dGacP8/diagnostics.json
+-I/tmp/vd-argv-Ad4x7x/inc
+-DWIDTH=8
+-DSIMULATION
+/tmp/vd-argv-Ad4x7x/top.sv
+
+settings echo:engine=slang tool=slang program=/tmp/vd-argv-Ad4x7x/slang --lint-only -Weverything --diag-column-unit byte --diag-json <diagnostics.json> -I/tmp/vd-argv-Ad4x7x/inc -DWIDTH=8 -DSIMULATION /tmp/vd-argv-Ad4x7x/top.sv | include dirs and defines are passed as -I<dir> / -D<name>=<value> in the real argv
+test the_verible_engine_parses_findings_and_records_its_tool ... ok
+real slang settings echo:engine=slang tool=slang program=/home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-deeplint/../../build/slang/out/slang --lint-only -Weverything --diag-column-unit byte --diag-json <diagnostics.json> -Iinc -DWIDTH=8 /tmp/vd-real-include-QMhS3w/top.sv | include dirs and defines are passed as -I<dir> / -D<name>=<value> in the real argv
+without settings: 2 diagnostic(s); with settings: 0 diagnostic(s)
+test slang_really_receives_the_include_dirs_and_defines ... ok

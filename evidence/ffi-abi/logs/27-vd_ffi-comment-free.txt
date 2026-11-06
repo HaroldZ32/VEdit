@@ -53,7 +53,187 @@
 
 #define VD_LSP_RES_DIAGNOSTICS 4
 
+#define VD_LSP_REQ_HOVER 7
+
+#define VD_LSP_REQ_SIGNATURE_HELP 8
+
+#define VD_LSP_RES_HOVER 5
+
+#define VD_LSP_RES_SIGNATURE_HELP 6
+
+#define VD_VCS_HISTORY_COMMITS 1
+
+#define VD_VCS_HISTORY_COMMIT 2
+
+#define VD_VCS_HISTORY_FILE 3
+
+#define VD_VCS_HISTORY_BLAME 4
+
+#define VD_VCS_HISTORY_COMPARE 5
+
+#define VD_VCS_WORKSPACE_STASHES 1
+
+#define VD_VCS_WORKSPACE_WORKTREES 2
+
+#define VD_VCS_WRITE_GIT_STAGE 1
+
+#define VD_VCS_WRITE_GIT_UNSTAGE 2
+
+#define VD_VCS_WRITE_GIT_DISCARD 3
+
+#define VD_VCS_WRITE_GIT_COMMIT 4
+
+#define VD_VCS_WRITE_GIT_FETCH 5
+
+#define VD_VCS_WRITE_GIT_PULL 6
+
+#define VD_VCS_WRITE_GIT_PUSH 7
+
+#define VD_VCS_WRITE_GIT_BRANCH_CREATE 8
+
+#define VD_VCS_WRITE_GIT_BRANCH_SWITCH 9
+
+#define VD_VCS_WRITE_GIT_BRANCH_DELETE 10
+
+#define VD_VCS_WRITE_SVN_COMMIT 11
+
+#define VD_VCS_WRITE_SVN_UPDATE 12
+
+#define VD_VCS_WRITE_SVN_REVERT 13
+
+#define VD_VCS_WRITE_SVN_ADD 14
+
+#define VD_VCS_WRITE_SVN_REMOVE 15
+
+#define VD_VCS_WRITE_GIT_BRANCH_RENAME 16
+
+#define VD_VCS_WRITE_GIT_TAG_CREATE 17
+
+#define VD_VCS_WRITE_GIT_TAG_DELETE 18
+
+#define VD_VCS_WRITE_GIT_CHECKOUT 19
+
+#define VD_VCS_WRITE_GIT_REMOTE_ADD 20
+
+#define VD_VCS_WRITE_GIT_REMOTE_REMOVE 21
+
+#define VD_VCS_WRITE_GIT_REMOTE_SET_URL 22
+
+#define VD_VCS_WRITE_GIT_SET_UPSTREAM 23
+
+#define VD_VCS_WRITE_GIT_MERGE 24
+
+#define VD_VCS_WRITE_GIT_REBASE 25
+
+#define VD_VCS_WRITE_GIT_CHERRY_PICK 26
+
+#define VD_VCS_WRITE_GIT_REVERT 27
+
+#define VD_VCS_WRITE_GIT_RESET 28
+
+#define VD_VCS_WRITE_GIT_CLEAN 29
+
+#define VD_VCS_WRITE_GIT_CONTINUE 30
+
+#define VD_VCS_WRITE_GIT_ABORT 31
+
+#define VD_VCS_WRITE_GIT_STASH_SAVE 32
+
+#define VD_VCS_WRITE_GIT_STASH_POP 33
+
+#define VD_VCS_WRITE_GIT_STASH_APPLY 34
+
+#define VD_VCS_WRITE_GIT_STASH_DROP 35
+
+#define VD_VCS_WRITE_GIT_WORKTREE_ADD 36
+
+#define VD_VCS_WRITE_GIT_WORKTREE_REMOVE 37
+
+#define VD_VCS_WRITE_GIT_SUBMODULE_INIT 38
+
+#define VD_VCS_WRITE_GIT_SUBMODULE_UPDATE 39
+
 typedef struct VdService VdService;
+
+typedef struct VdStringList {
+  size_t count;
+  char **items;
+} VdStringList;
+
+typedef struct VdCatalogOptions {
+  const char *slang_binary;
+  struct VdStringList include_dirs;
+  struct VdStringList defines;
+  uint64_t timeout_ms;
+  size_t max_json_bytes;
+  size_t max_files;
+} VdCatalogOptions;
+
+typedef struct VdModulePort {
+  char *name;
+  char *direction;
+  char *type_name;
+  char *file;
+  uint32_t line;
+  uint32_t column;
+} VdModulePort;
+
+typedef struct VdModulePortList {
+  size_t count;
+  struct VdModulePort *items;
+} VdModulePortList;
+
+typedef struct VdModuleInstance {
+  char *module;
+  char *path;
+  char *file;
+  uint32_t line;
+  uint32_t column;
+} VdModuleInstance;
+
+typedef struct VdModuleInstanceList {
+  size_t count;
+  struct VdModuleInstance *items;
+} VdModuleInstanceList;
+
+typedef struct VdModule {
+  char *name;
+  char *file;
+  uint32_t line;
+  uint32_t column;
+  uint8_t is_top;
+  struct VdModulePortList ports;
+  struct VdModuleInstanceList children;
+} VdModule;
+
+typedef struct VdModuleList {
+  size_t count;
+  struct VdModule *items;
+} VdModuleList;
+
+typedef struct VdModuleCatalog {
+  char *tool;
+  uint64_t elapsed_ms;
+  uint64_t peak_rss_kb;
+  char *warning;
+  struct VdModuleList modules;
+} VdModuleCatalog;
+
+typedef struct VdLintBatchOptions {
+  int32_t engine;
+  const char *slang_binary;
+  const char *verible_binary;
+  const char *rules_path;
+  struct VdStringList include_dirs;
+  struct VdStringList defines;
+  uint64_t timeout_ms;
+  size_t max_diagnostics;
+  uint8_t ruleset;
+  const char *rules;
+  const char *waiver_files;
+  const char *slang_suppressions;
+  uint32_t error_limit;
+} VdLintBatchOptions;
 
 typedef struct VdDiagnostic {
   int32_t severity;
@@ -63,12 +243,89 @@ typedef struct VdDiagnostic {
   uint32_t end_column;
   char *code;
   char *message;
+  char *file;
+  char *key;
+  int32_t origin;
 } VdDiagnostic;
 
 typedef struct VdDiagnostics {
   size_t count;
   struct VdDiagnostic *items;
 } VdDiagnostics;
+
+typedef struct VdLintProgress {
+  int32_t phase;
+  size_t done;
+  size_t total;
+  char *current;
+  char *tool;
+  char *stage;
+  char *message;
+} VdLintProgress;
+
+typedef struct VdHierOptions {
+  const char *slang_binary;
+  const char *top;
+  struct VdStringList include_dirs;
+  struct VdStringList defines;
+  uint64_t timeout_ms;
+  size_t max_instances;
+  size_t max_files;
+} VdHierOptions;
+
+typedef struct VdHierInstance {
+  char *path;
+  char *module;
+  char *file;
+  uint32_t line;
+  uint32_t column;
+} VdHierInstance;
+
+typedef struct VdHierInstanceList {
+  size_t count;
+  struct VdHierInstance *items;
+} VdHierInstanceList;
+
+typedef struct VdHierEndpoint {
+  char *path;
+  char *file;
+  uint32_t line;
+  uint32_t column;
+  int32_t kind;
+  char *detail;
+} VdHierEndpoint;
+
+typedef struct VdHierEndpointList {
+  size_t count;
+  struct VdHierEndpoint *items;
+} VdHierEndpointList;
+
+typedef struct VdHierSignal {
+  char *path;
+  char *kind;
+  int32_t has_declaration;
+  char *declaration_file;
+  uint32_t declaration_line;
+  uint32_t declaration_column;
+  struct VdHierEndpointList drivers;
+  struct VdHierEndpointList loads;
+  struct VdHierEndpointList chain;
+} VdHierSignal;
+
+typedef struct VdHierSignalList {
+  size_t count;
+  struct VdHierSignal *items;
+} VdHierSignalList;
+
+typedef struct VdHierarchy {
+  char *tool;
+  char *top;
+  uint64_t elapsed_ms;
+  uint64_t peak_rss_kb;
+  char *warning;
+  struct VdHierInstanceList instances;
+  struct VdHierSignalList signal_list;
+} VdHierarchy;
 
 typedef struct VdFimResult {
   int32_t state;
@@ -81,11 +338,6 @@ typedef struct VdLspInfo {
   char *message;
 } VdLspInfo;
 
-typedef struct VdStringList {
-  size_t count;
-  char **items;
-} VdStringList;
-
 typedef struct VdLspStatus {
   int32_t phase;
   size_t files_expected;
@@ -96,6 +348,8 @@ typedef struct VdLspStatus {
   uint32_t restarts;
   char *message;
   struct VdStringList skipped;
+  int32_t backend;
+  char *backend_name;
 } VdLspStatus;
 
 typedef struct VdLspPositionRange {
@@ -144,12 +398,23 @@ typedef struct VdLspDiagnostic {
   char *code;
   char *source;
   char *message;
+  int32_t origin;
 } VdLspDiagnostic;
 
 typedef struct VdLspDiagnosticList {
   size_t count;
   struct VdLspDiagnostic *items;
 } VdLspDiagnosticList;
+
+typedef struct VdLspSignature {
+  char *label;
+  struct VdStringList parameters;
+} VdLspSignature;
+
+typedef struct VdLspSignatureList {
+  size_t count;
+  struct VdLspSignature *items;
+} VdLspSignatureList;
 
 typedef struct VdLspResponse {
   int32_t kind;
@@ -158,20 +423,58 @@ typedef struct VdLspResponse {
   struct VdLspSymbolList symbols;
   struct VdLspTextEditList edits;
   struct VdLspDiagnosticList diagnostics;
+  char *text;
+  struct VdLspPositionRange range;
+  struct VdLspSignatureList signatures;
+  int32_t active_signature;
+  int32_t active_parameter;
 } VdLspResponse;
+
+typedef struct VdLspCapability {
+  char *action;
+  int32_t supported;
+  char *reason;
+} VdLspCapability;
+
+typedef struct VdLspCapabilities {
+  char *backend;
+  char *basis;
+  char *source;
+  char *note;
+  size_t count;
+  struct VdLspCapability *items;
+} VdLspCapabilities;
 
 typedef struct VdProjectInfo {
   struct VdStringList files;
   struct VdStringList include_dirs;
   struct VdStringList defines;
   struct VdStringList warnings;
+  struct VdStringList relative_files;
+  struct VdStringList missing_variables;
+  uint32_t skipped_lines;
+  char *rules_path;
 } VdProjectInfo;
+
+typedef struct VdSearchOptions {
+  uint8_t case_sensitive;
+  uint8_t whole_word;
+  uint8_t regex;
+  uint8_t all_matches;
+  uint8_t _reserved[4];
+  struct VdStringList extensions;
+  size_t max_results;
+  uint64_t max_file_bytes;
+  uint64_t max_duration_ms;
+} VdSearchOptions;
 
 typedef struct VdSearchHit {
   char *path;
   uint32_t line;
   uint32_t column;
   char *preview;
+  uint32_t end_column;
+  uint32_t match_length;
 } VdSearchHit;
 
 typedef struct VdSearchResults {
@@ -225,11 +528,29 @@ typedef struct VdVcsStatus {
   char *note;
 } VdVcsStatus;
 
+typedef struct VdVcsRef {
+  char *name;
+  int32_t kind;
+  char *target;
+  int32_t current;
+} VdVcsRef;
+
+typedef struct VdVcsRemote {
+  char *name;
+  char *url;
+} VdVcsRemote;
+
 typedef struct VdVcsInfo {
   int32_t backend;
   char *branch;
   char *revision;
   char *note;
+  size_t ref_count;
+  struct VdVcsRef *refs;
+  size_t remote_count;
+  struct VdVcsRemote *remotes;
+  char *upstream;
+  int32_t operation;
 } VdVcsInfo;
 
 typedef struct VdVcsDiff {
@@ -239,15 +560,175 @@ typedef struct VdVcsDiff {
   char *note;
 } VdVcsDiff;
 
+typedef struct VdVcsHistoryEntry {
+  char *hash;
+  char *short_hash;
+  char *author;
+  char *email;
+  int64_t time;
+  char *subject;
+} VdVcsHistoryEntry;
+
+typedef struct VdVcsFileStat {
+  char *path;
+  int64_t additions;
+  int64_t deletions;
+} VdVcsFileStat;
+
+typedef struct VdVcsBlameLine {
+  uint64_t line;
+  char *hash;
+  char *short_hash;
+  char *author;
+  int64_t time;
+  char *text;
+} VdVcsBlameLine;
+
+typedef struct VdVcsHistoryResult {
+  int32_t backend;
+  int32_t kind;
+  size_t commit_count;
+  struct VdVcsHistoryEntry *commits;
+  size_t file_count;
+  struct VdVcsFileStat *files;
+  size_t blame_count;
+  struct VdVcsBlameLine *blame;
+  uint64_t offset;
+  int32_t has_more;
+  int32_t truncated;
+  int32_t error;
+  char *hash;
+  char *author;
+  char *email;
+  char *subject;
+  char *body;
+  char *patch;
+  char *path;
+  char *from;
+  char *to;
+  int64_t time;
+  char *note;
+} VdVcsHistoryResult;
+
+typedef struct VdVcsWorkspaceEntry {
+  char *ref_name;
+  char *hash;
+  char *subject;
+  char *path;
+  char *branch;
+  int32_t main_worktree;
+  int32_t detached;
+  int32_t bare;
+} VdVcsWorkspaceEntry;
+
+typedef struct VdVcsWorkspaceResult {
+  int32_t backend;
+  int32_t kind;
+  size_t count;
+  struct VdVcsWorkspaceEntry *entries;
+  int32_t truncated;
+  int32_t error;
+  char *note;
+} VdVcsWorkspaceResult;
+
+typedef struct VdVcsWriteRequest {
+  int32_t op;
+  const char *root;
+  const char *message;
+  const char *author;
+  int32_t amend;
+  size_t count;
+  const char *const *paths;
+  const char *name;
+  const char *target;
+  const char *url;
+  const char *credential_user;
+  const char *credential_password;
+  int32_t set_upstream;
+  const char *mode;
+} VdVcsWriteRequest;
+
+typedef struct VdVcsWriteResult {
+  int32_t op;
+  int32_t ok;
+  char *stdout_text;
+  char *stderr_text;
+  char *note;
+} VdVcsWriteResult;
+
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
 
+char *vd_diagnostic_key(int32_t origin,
+                        const char *file,
+                        uint32_t line,
+                        int32_t severity,
+                        const char *message);
+
+void vd_string_free(char *text);
+
+uint64_t vd_catalog_start(struct VdService *service,
+                          const struct VdStringList *files,
+                          const struct VdCatalogOptions *options);
+
+int32_t vd_catalog_poll(struct VdService *service, uint64_t job, struct VdModuleCatalog *out);
+
+int32_t vd_catalog_release(struct VdService *service, uint64_t job);
+
+void vd_module_catalog_free(struct VdModuleCatalog *catalog);
+
 uint64_t vd_deeplint_lint(struct VdService *service, const char *file, const char *binary_override);
+
+uint64_t vd_deeplint_lint_v2(struct VdService *service,
+                             const char *file,
+                             int32_t engine,
+                             const char *slang_binary,
+                             const char *verible_binary,
+                             const char *rules_path,
+                             const struct VdStringList *include_dirs,
+                             const struct VdStringList *defines);
+
+char *vd_lint_command_line(int32_t engine,
+                           const char *binary,
+                           const char *file,
+                           const char *rules_path,
+                           const struct VdStringList *include_dirs,
+                           const struct VdStringList *defines);
+
+char *vd_lint_batch_command_line(const struct VdLintBatchOptions *options, const char *file);
+
+char *vd_lint_unsupported_knobs(int32_t engine);
 
 int32_t vd_deeplint_poll(struct VdService *service, uint64_t job, struct VdDiagnostics *out);
 
 void vd_diagnostics_free(struct VdDiagnostics *diagnostics);
+
+uint64_t vd_deeplint_batch_start(struct VdService *service,
+                                 const struct VdStringList *files,
+                                 const struct VdLintBatchOptions *options);
+
+int32_t vd_deeplint_batch_progress(struct VdService *service,
+                                   uint64_t job,
+                                   struct VdLintProgress *out);
+
+int32_t vd_deeplint_batch_poll(struct VdService *service, uint64_t job, struct VdDiagnostics *out);
+
+int32_t vd_deeplint_batch_cancel(struct VdService *service, uint64_t job);
+
+int32_t vd_deeplint_batch_release(struct VdService *service, uint64_t job);
+
+void vd_lint_progress_free(struct VdLintProgress *progress);
+
+uint64_t vd_hier_start(struct VdService *service,
+                       const struct VdStringList *files,
+                       const struct VdHierOptions *options);
+
+int32_t vd_hier_poll(struct VdService *service, uint64_t job, struct VdHierarchy *out);
+
+int32_t vd_hier_release(struct VdService *service, uint64_t job);
+
+void vd_hierarchy_free(struct VdHierarchy *hierarchy);
 
 uint64_t vd_fim_complete(struct VdService *service, const char *prefix, const char *suffix);
 
@@ -269,6 +750,15 @@ uint64_t vd_lsp_session_start(struct VdService *service,
                               const char *workspace_root,
                               const char *rules_path,
                               const struct VdStringList *files);
+
+uint64_t vd_lsp_session_start_v2(struct VdService *service,
+                                 const char *ls_path,
+                                 const char *workspace_root,
+                                 const char *rules_path,
+                                 const struct VdStringList *files,
+                                 int32_t backend,
+                                 const struct VdStringList *include_dirs,
+                                 const struct VdStringList *defines);
 
 int32_t vd_lsp_session_status(struct VdService *service, uint64_t session, struct VdLspStatus *out);
 
@@ -298,7 +788,40 @@ int32_t vd_lsp_session_stop(struct VdService *service, uint64_t session);
 
 void vd_lsp_session_free(struct VdService *service, uint64_t session);
 
+void vd_lsp_capabilities_free(struct VdLspCapabilities *capabilities);
+
+int32_t vd_lsp_backend_capabilities(int32_t backend, struct VdLspCapabilities *out);
+
+int32_t vd_lsp_session_capabilities(struct VdService *service,
+                                    uint64_t session,
+                                    struct VdLspCapabilities *out);
+
+char *vd_lsp_command_line(int32_t backend,
+                          const char *ls_path,
+                          const char *workspace_root,
+                          const char *rules_path,
+                          const char *file_list_path,
+                          const struct VdStringList *include_dirs,
+                          const struct VdStringList *defines);
+
+char *vd_lsp_file_list_preview(const struct VdStringList *files,
+                               const struct VdStringList *include_dirs,
+                               const struct VdStringList *defines);
+
+char *vd_lsp_session_command_line(struct VdService *service, uint64_t session);
+
 uint64_t vd_project_parse(struct VdService *service, const char *start_dir);
+
+uint64_t vd_project_expand(struct VdService *service,
+                           const char *start_dir,
+                           const struct VdStringList *filelists,
+                           const char *settings_path);
+
+uint64_t vd_project_expand_v2(struct VdService *service,
+                              const char *start_dir,
+                              const struct VdStringList *filelists,
+                              const char *settings_path,
+                              const struct VdStringList *variables);
 
 int32_t vd_project_poll(struct VdService *service, uint64_t job, struct VdProjectInfo *out);
 
@@ -312,6 +835,11 @@ uint64_t vd_search_tree_query(struct VdService *service,
                               uint64_t max_duration_ms,
                               uint8_t case_sensitive,
                               uint8_t verilog_only);
+
+uint64_t vd_search_tree_query_ex(struct VdService *service,
+                                 const char *root,
+                                 const char *needle,
+                                 const struct VdSearchOptions *options);
 
 uint64_t vd_search_query(struct VdService *service,
                          const char *root,
@@ -369,6 +897,49 @@ uint64_t vd_vcs_diff_job(struct VdService *service, const char *root, const char
 int32_t vd_vcs_diff_poll(struct VdService *service, uint64_t job, struct VdVcsDiff *out);
 
 void vd_vcs_diff_free(struct VdVcsDiff *diff);
+
+uint64_t vd_vcs_history_commits_job(struct VdService *service,
+                                    const char *root,
+                                    uint64_t offset,
+                                    uint64_t limit,
+                                    const char *query);
+
+uint64_t vd_vcs_history_commit_job(struct VdService *service, const char *root, const char *hash);
+
+uint64_t vd_vcs_history_file_job(struct VdService *service,
+                                 const char *root,
+                                 const char *path,
+                                 uint64_t offset,
+                                 uint64_t limit);
+
+uint64_t vd_vcs_history_blame_job(struct VdService *service, const char *root, const char *path);
+
+uint64_t vd_vcs_history_compare_job(struct VdService *service,
+                                    const char *root,
+                                    const char *from,
+                                    const char *to);
+
+int32_t vd_vcs_history_poll(struct VdService *service,
+                            uint64_t job,
+                            struct VdVcsHistoryResult *out);
+
+void vd_vcs_history_free(struct VdVcsHistoryResult *result);
+
+uint64_t vd_vcs_workspace_stashes_job(struct VdService *service, const char *root);
+
+uint64_t vd_vcs_workspace_worktrees_job(struct VdService *service, const char *root);
+
+int32_t vd_vcs_workspace_poll(struct VdService *service,
+                              uint64_t job,
+                              struct VdVcsWorkspaceResult *out);
+
+void vd_vcs_workspace_free(struct VdVcsWorkspaceResult *result);
+
+uint64_t vd_vcs_write_job(struct VdService *service, const struct VdVcsWriteRequest *request);
+
+int32_t vd_vcs_write_poll(struct VdService *service, uint64_t job, struct VdVcsWriteResult *out);
+
+void vd_vcs_write_free(struct VdVcsWriteResult *result);
 
 #ifdef __cplusplus
 }  // extern "C"

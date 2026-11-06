@@ -1,0 +1,1110 @@
+{
+  "design": {
+    "name": "$root",
+    "kind": "Root",
+    "addr": 6455605927744,
+    "members": [
+      {
+        "name": "",
+        "kind": "CompilationUnit",
+        "addr": 6455622832592
+      },
+      {
+        "name": "",
+        "kind": "CompilationUnit",
+        "addr": 6455622832864
+      },
+      {
+        "name": "",
+        "kind": "CompilationUnit",
+        "addr": 6455622833136
+      },
+      {
+        "name": "",
+        "kind": "CompilationUnit",
+        "addr": 6455622833408
+      },
+      {
+        "name": "",
+        "kind": "CompilationUnit",
+        "addr": 6455622833680
+      },
+      {
+        "name": "",
+        "kind": "CompilationUnit",
+        "addr": 6455622833952
+      },
+      {
+        "name": "",
+        "kind": "CompilationUnit",
+        "addr": 6455622834224
+      },
+      {
+        "name": "orphan",
+        "kind": "Instance",
+        "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+        "source_line": 1,
+        "source_column": 8,
+        "addr": 6455622834800,
+        "body": {
+          "name": "orphan",
+          "kind": "InstanceBody",
+          "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+          "source_line": 1,
+          "source_column": 8,
+          "addr": 6455622834496,
+          "members": [
+            {
+              "name": "a",
+              "kind": "Port",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+              "source_line": 1,
+              "source_column": 28,
+              "addr": 6455622840488,
+              "type": "logic",
+              "direction": "In",
+              "internalSymbol": "6455622840608 a"
+            },
+            {
+              "name": "a",
+              "kind": "Net",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+              "source_line": 1,
+              "source_column": 28,
+              "addr": 6455622840608,
+              "type": "logic",
+              "netType": {
+                "name": "wire",
+                "kind": "NetType",
+                "addr": 6455605919904,
+                "type": "logic"
+              }
+            },
+            {
+              "name": "b",
+              "kind": "Port",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+              "source_line": 1,
+              "source_column": 44,
+              "addr": 6455622840768,
+              "type": "logic",
+              "direction": "Out",
+              "internalSymbol": "6455622840888 b"
+            },
+            {
+              "name": "b",
+              "kind": "Variable",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+              "source_line": 1,
+              "source_column": 44,
+              "addr": 6455622840888,
+              "type": "logic",
+              "lifetime": "Static"
+            },
+            {
+              "name": "",
+              "kind": "ContinuousAssign",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+              "source_line": 2,
+              "source_column": 10,
+              "addr": 6455622841040,
+              "assignment": {
+                "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+                "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+                "source_line_start": 2,
+                "source_line_end": 2,
+                "source_column_start": 10,
+                "source_column_end": 15,
+                "kind": "Assignment",
+                "type": "logic",
+                "left": {
+                  "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+                  "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+                  "source_line_start": 2,
+                  "source_line_end": 2,
+                  "source_column_start": 10,
+                  "source_column_end": 11,
+                  "kind": "NamedValue",
+                  "type": "logic",
+                  "symbol": "6455622840888 b"
+                },
+                "right": {
+                  "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+                  "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+                  "source_line_start": 2,
+                  "source_line_end": 2,
+                  "source_column_start": 14,
+                  "source_column_end": 15,
+                  "kind": "NamedValue",
+                  "type": "logic",
+                  "symbol": "6455622840608 a"
+                },
+                "isNonBlocking": false
+              }
+            }
+          ],
+          "definition": "6455605029888 orphan"
+        },
+        "connections": [
+        ]
+      },
+      {
+        "name": "top_a",
+        "kind": "Instance",
+        "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+        "source_line": 1,
+        "source_column": 8,
+        "addr": 6455622835560,
+        "body": {
+          "name": "top_a",
+          "kind": "InstanceBody",
+          "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+          "source_line": 1,
+          "source_column": 8,
+          "addr": 6455622834928,
+          "members": [
+            {
+              "name": "clk",
+              "kind": "Port",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_line": 1,
+              "source_column": 27,
+              "addr": 6455622841464,
+              "type": "logic",
+              "direction": "In",
+              "internalSymbol": "6455622841584 clk"
+            },
+            {
+              "name": "clk",
+              "kind": "Net",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_line": 1,
+              "source_column": 27,
+              "addr": 6455622841584,
+              "type": "logic",
+              "netType": {
+                "name": "wire",
+                "kind": "NetType",
+                "addr": 6455605919904,
+                "type": "logic"
+              }
+            },
+            {
+              "name": "pad",
+              "kind": "Port",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_line": 1,
+              "source_column": 43,
+              "addr": 6455622841744,
+              "type": "logic",
+              "direction": "InOut",
+              "internalSymbol": "6455622841864 pad"
+            },
+            {
+              "name": "pad",
+              "kind": "Net",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_line": 1,
+              "source_column": 43,
+              "addr": 6455622841864,
+              "type": "logic",
+              "netType": {
+                "name": "wire",
+                "kind": "NetType",
+                "addr": 6455605919904,
+                "type": "logic"
+              }
+            },
+            {
+              "name": "y",
+              "kind": "Port",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_line": 1,
+              "source_column": 67,
+              "addr": 6455622842024,
+              "type": "logic[3:0]",
+              "direction": "Out",
+              "internalSymbol": "6455622842144 y"
+            },
+            {
+              "name": "y",
+              "kind": "Variable",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_line": 1,
+              "source_column": 67,
+              "addr": 6455622842144,
+              "type": "logic[3:0]",
+              "lifetime": "Static"
+            },
+            {
+              "name": "bus",
+              "kind": "Instance",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_line": 2,
+              "source_column": 10,
+              "addr": 6455622842304,
+              "body": {
+                "name": "bus_if",
+                "kind": "InstanceBody",
+                "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/bus.sv",
+                "source_line": 1,
+                "source_column": 11,
+                "addr": 6455622842432,
+                "members": [
+                  {
+                    "name": "req",
+                    "kind": "Variable",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/bus.sv",
+                    "source_line": 2,
+                    "source_column": 9,
+                    "addr": 6455622842608,
+                    "type": "logic",
+                    "lifetime": "Static"
+                  },
+                  {
+                    "name": "ack",
+                    "kind": "Variable",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/bus.sv",
+                    "source_line": 3,
+                    "source_column": 9,
+                    "addr": 6455622842744,
+                    "type": "logic",
+                    "lifetime": "Static"
+                  },
+                  {
+                    "name": "master",
+                    "kind": "Modport",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/bus.sv",
+                    "source_line": 4,
+                    "source_column": 11,
+                    "addr": 6455622848760,
+                    "members": [
+                      {
+                        "name": "req",
+                        "kind": "ModportPort",
+                        "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/bus.sv",
+                        "source_line": 4,
+                        "source_column": 26,
+                        "addr": 6455622848872,
+                        "type": "logic",
+                        "direction": "Out",
+                        "internalSymbol": "6455622842608 req"
+                      },
+                      {
+                        "name": "ack",
+                        "kind": "ModportPort",
+                        "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/bus.sv",
+                        "source_line": 4,
+                        "source_column": 37,
+                        "addr": 6455622849088,
+                        "type": "logic",
+                        "direction": "In",
+                        "internalSymbol": "6455622842744 ack"
+                      }
+                    ]
+                  }
+                ],
+                "definition": "6455605028352 bus_if"
+              },
+              "connections": [
+              ]
+            },
+            {
+              "name": "link",
+              "kind": "Variable",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_line": 3,
+              "source_column": 9,
+              "addr": 6455622835232,
+              "type": "logic",
+              "lifetime": "Static"
+            },
+            {
+              "name": "u_shared",
+              "kind": "Instance",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_line": 4,
+              "source_column": 10,
+              "addr": 6455622842944,
+              "body": {
+                "name": "shared",
+                "kind": "InstanceBody",
+                "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                "source_line": 1,
+                "source_column": 8,
+                "addr": 6455622843072,
+                "members": [
+                  {
+                    "name": "a",
+                    "kind": "Port",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_line": 1,
+                    "source_column": 28,
+                    "addr": 6455622849304,
+                    "type": "logic",
+                    "direction": "In",
+                    "internalSymbol": "6455622849424 a"
+                  },
+                  {
+                    "name": "a",
+                    "kind": "Net",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_line": 1,
+                    "source_column": 28,
+                    "addr": 6455622849424,
+                    "type": "logic",
+                    "netType": {
+                      "name": "wire",
+                      "kind": "NetType",
+                      "addr": 6455605919904,
+                      "type": "logic"
+                    }
+                  },
+                  {
+                    "name": "y",
+                    "kind": "Port",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_line": 1,
+                    "source_column": 50,
+                    "addr": 6455622849584,
+                    "type": "logic[3:0]",
+                    "direction": "Out",
+                    "internalSymbol": "6455622849704 y"
+                  },
+                  {
+                    "name": "y",
+                    "kind": "Variable",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_line": 1,
+                    "source_column": 50,
+                    "addr": 6455622849704,
+                    "type": "logic[3:0]",
+                    "lifetime": "Static"
+                  },
+                  {
+                    "name": "",
+                    "kind": "ContinuousAssign",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_line": 2,
+                    "source_column": 10,
+                    "addr": 6455622849856,
+                    "assignment": {
+                      "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                      "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                      "source_line_start": 2,
+                      "source_line_end": 2,
+                      "source_column_start": 10,
+                      "source_column_end": 20,
+                      "kind": "Assignment",
+                      "type": "logic[3:0]",
+                      "left": {
+                        "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                        "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                        "source_line_start": 2,
+                        "source_line_end": 2,
+                        "source_column_start": 10,
+                        "source_column_end": 11,
+                        "kind": "NamedValue",
+                        "type": "logic[3:0]",
+                        "symbol": "6455622849704 y"
+                      },
+                      "right": {
+                        "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                        "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                        "source_line_start": 2,
+                        "source_line_end": 2,
+                        "source_column_start": 14,
+                        "source_column_end": 20,
+                        "kind": "Replication",
+                        "type": "logic[3:0]",
+                        "count": {
+                          "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                          "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                          "source_line_start": 2,
+                          "source_line_end": 2,
+                          "source_column_start": 15,
+                          "source_column_end": 16,
+                          "kind": "IntegerLiteral",
+                          "type": "int",
+                          "value": "4",
+                          "constant": "4"
+                        },
+                        "concat": {
+                          "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                          "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                          "source_line_start": 2,
+                          "source_line_end": 2,
+                          "source_column_start": 16,
+                          "source_column_end": 19,
+                          "kind": "Concatenation",
+                          "type": "logic[0:0]",
+                          "operands": [
+                            {
+                              "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                              "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                              "source_line_start": 2,
+                              "source_line_end": 2,
+                              "source_column_start": 17,
+                              "source_column_end": 18,
+                              "kind": "NamedValue",
+                              "type": "logic",
+                              "symbol": "6455622849424 a"
+                            }
+                          ]
+                        }
+                      },
+                      "isNonBlocking": false
+                    }
+                  }
+                ],
+                "definition": "6455605031424 shared"
+              },
+              "connections": [
+                {
+                  "port": {
+                    "name": "a",
+                    "kind": "Port",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_line": 1,
+                    "source_column": 28,
+                    "addr": 6455622849304,
+                    "type": "logic",
+                    "direction": "In",
+                    "internalSymbol": "6455622849424 a"
+                  },
+                  "expr": {
+                    "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+                    "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+                    "source_line_start": 4,
+                    "source_line_end": 4,
+                    "source_column_start": 23,
+                    "source_column_end": 26,
+                    "kind": "NamedValue",
+                    "type": "logic",
+                    "symbol": "6455622841584 clk"
+                  }
+                },
+                {
+                  "port": {
+                    "name": "y",
+                    "kind": "Port",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_line": 1,
+                    "source_column": 50,
+                    "addr": 6455622849584,
+                    "type": "logic[3:0]",
+                    "direction": "Out",
+                    "internalSymbol": "6455622849704 y"
+                  },
+                  "expr": {
+                    "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+                    "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+                    "source_line_start": 4,
+                    "source_line_end": 4,
+                    "source_column_start": 32,
+                    "source_column_end": 33,
+                    "kind": "Assignment",
+                    "type": "logic[3:0]",
+                    "left": {
+                      "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+                      "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+                      "source_line_start": 4,
+                      "source_line_end": 4,
+                      "source_column_start": 32,
+                      "source_column_end": 33,
+                      "kind": "NamedValue",
+                      "type": "logic[3:0]",
+                      "symbol": "6455622842144 y"
+                    },
+                    "right": {
+                      "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+                      "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+                      "source_line_start": 4,
+                      "source_line_end": 4,
+                      "source_column_start": 32,
+                      "source_column_end": 33,
+                      "kind": "EmptyArgument",
+                      "type": "logic[3:0]"
+                    },
+                    "isNonBlocking": false
+                  }
+                }
+              ]
+            },
+            {
+              "name": "u_consumer",
+              "kind": "Instance",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_line": 5,
+              "source_column": 12,
+              "addr": 6455622843376,
+              "body": {
+                "name": "consumer",
+                "kind": "InstanceBody",
+                "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                "source_line": 1,
+                "source_column": 8,
+                "addr": 6455622843504,
+                "members": [
+                  {
+                    "name": "bus",
+                    "kind": "InterfacePort",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                    "source_line": 1,
+                    "source_column": 25,
+                    "addr": 6455622851096,
+                    "interfaceDef": "bus_if",
+                    "isGeneric": false
+                  },
+                  {
+                    "name": "clk",
+                    "kind": "Port",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                    "source_line": 1,
+                    "source_column": 42,
+                    "addr": 6455622851208,
+                    "type": "logic",
+                    "direction": "In",
+                    "internalSymbol": "6455622851328 clk"
+                  },
+                  {
+                    "name": "clk",
+                    "kind": "Net",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                    "source_line": 1,
+                    "source_column": 42,
+                    "addr": 6455622851328,
+                    "type": "logic",
+                    "netType": {
+                      "name": "wire",
+                      "kind": "NetType",
+                      "addr": 6455605919904,
+                      "type": "logic"
+                    }
+                  },
+                  {
+                    "name": "y",
+                    "kind": "Port",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                    "source_line": 1,
+                    "source_column": 66,
+                    "addr": 6455622851488,
+                    "type": "logic[3:0]",
+                    "direction": "Out",
+                    "internalSymbol": "6455622851608 y"
+                  },
+                  {
+                    "name": "y",
+                    "kind": "Variable",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                    "source_line": 1,
+                    "source_column": 66,
+                    "addr": 6455622851608,
+                    "type": "logic[3:0]",
+                    "lifetime": "Static"
+                  },
+                  {
+                    "name": "",
+                    "kind": "ContinuousAssign",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                    "source_line": 2,
+                    "source_column": 10,
+                    "addr": 6455622851768,
+                    "assignment": {
+                      "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                      "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                      "source_line_start": 2,
+                      "source_line_end": 2,
+                      "source_column_start": 10,
+                      "source_column_end": 22,
+                      "kind": "Assignment",
+                      "type": "logic[3:0]",
+                      "left": {
+                        "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                        "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                        "source_line_start": 2,
+                        "source_line_end": 2,
+                        "source_column_start": 10,
+                        "source_column_end": 11,
+                        "kind": "NamedValue",
+                        "type": "logic[3:0]",
+                        "symbol": "6455622851608 y"
+                      },
+                      "right": {
+                        "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                        "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                        "source_line_start": 2,
+                        "source_line_end": 2,
+                        "source_column_start": 14,
+                        "source_column_end": 22,
+                        "kind": "Replication",
+                        "type": "logic[3:0]",
+                        "count": {
+                          "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                          "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                          "source_line_start": 2,
+                          "source_line_end": 2,
+                          "source_column_start": 15,
+                          "source_column_end": 16,
+                          "kind": "IntegerLiteral",
+                          "type": "int",
+                          "value": "4",
+                          "constant": "4"
+                        },
+                        "concat": {
+                          "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                          "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                          "source_line_start": 2,
+                          "source_line_end": 2,
+                          "source_column_start": 16,
+                          "source_column_end": 21,
+                          "kind": "Concatenation",
+                          "type": "logic[0:0]",
+                          "operands": [
+                            {
+                              "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                              "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                              "source_line_start": 2,
+                              "source_line_end": 2,
+                              "source_column_start": 17,
+                              "source_column_end": 20,
+                              "kind": "NamedValue",
+                              "type": "logic",
+                              "symbol": "6455622851328 clk"
+                            }
+                          ]
+                        }
+                      },
+                      "isNonBlocking": false
+                    }
+                  }
+                ],
+                "definition": "6455605029120 consumer"
+              },
+              "connections": [
+                {
+                  "port": {
+                    "name": "bus",
+                    "kind": "InterfacePort",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                    "source_line": 1,
+                    "source_column": 25,
+                    "addr": 6455622851096,
+                    "interfaceDef": "bus_if",
+                    "isGeneric": false
+                  },
+                  "ifaceInstance": "6455622842304 bus"
+                },
+                {
+                  "port": {
+                    "name": "clk",
+                    "kind": "Port",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                    "source_line": 1,
+                    "source_column": 42,
+                    "addr": 6455622851208,
+                    "type": "logic",
+                    "direction": "In",
+                    "internalSymbol": "6455622851328 clk"
+                  },
+                  "expr": {
+                    "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+                    "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+                    "source_line_start": 5,
+                    "source_line_end": 5,
+                    "source_column_start": 40,
+                    "source_column_end": 43,
+                    "kind": "NamedValue",
+                    "type": "logic",
+                    "symbol": "6455622841584 clk"
+                  }
+                },
+                {
+                  "port": {
+                    "name": "y",
+                    "kind": "Port",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                    "source_line": 1,
+                    "source_column": 66,
+                    "addr": 6455622851488,
+                    "type": "logic[3:0]",
+                    "direction": "Out",
+                    "internalSymbol": "6455622851608 y"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "u_ref",
+              "kind": "Instance",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_line": 6,
+              "source_column": 11,
+              "addr": 6455622843808,
+              "body": {
+                "name": "reflink",
+                "kind": "InstanceBody",
+                "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/reflink.sv",
+                "source_line": 1,
+                "source_column": 8,
+                "addr": 6455622843936,
+                "members": [
+                  {
+                    "name": "x",
+                    "kind": "Port",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/reflink.sv",
+                    "source_line": 1,
+                    "source_column": 27,
+                    "addr": 6455622853032,
+                    "type": "logic",
+                    "direction": "Ref",
+                    "internalSymbol": "6455622853152 x"
+                  },
+                  {
+                    "name": "x",
+                    "kind": "Variable",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/reflink.sv",
+                    "source_line": 1,
+                    "source_column": 27,
+                    "addr": 6455622853152,
+                    "type": "logic",
+                    "lifetime": "Static"
+                  }
+                ],
+                "definition": "6455605030656 reflink"
+              },
+              "connections": [
+                {
+                  "port": {
+                    "name": "x",
+                    "kind": "Port",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/reflink.sv",
+                    "source_line": 1,
+                    "source_column": 27,
+                    "addr": 6455622853032,
+                    "type": "logic",
+                    "direction": "Ref",
+                    "internalSymbol": "6455622853152 x"
+                  },
+                  "expr": {
+                    "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+                    "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+                    "source_line_start": 6,
+                    "source_line_end": 6,
+                    "source_column_start": 21,
+                    "source_column_end": 25,
+                    "kind": "NamedValue",
+                    "type": "logic",
+                    "symbol": "6455622835232 link"
+                  }
+                }
+              ]
+            }
+          ],
+          "definition": "6455605032192 top_a"
+        },
+        "connections": [
+        ]
+      },
+      {
+        "name": "top_b",
+        "kind": "Instance",
+        "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+        "source_line": 1,
+        "source_column": 8,
+        "addr": 6455622840336,
+        "body": {
+          "name": "top_b",
+          "kind": "InstanceBody",
+          "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+          "source_line": 1,
+          "source_column": 8,
+          "addr": 6455622835688,
+          "members": [
+            {
+              "name": "clk",
+              "kind": "Port",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+              "source_line": 1,
+              "source_column": 27,
+              "addr": 6455622853488,
+              "type": "logic",
+              "direction": "In",
+              "internalSymbol": "6455622853608 clk"
+            },
+            {
+              "name": "clk",
+              "kind": "Net",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+              "source_line": 1,
+              "source_column": 27,
+              "addr": 6455622853608,
+              "type": "logic",
+              "netType": {
+                "name": "wire",
+                "kind": "NetType",
+                "addr": 6455605919904,
+                "type": "logic"
+              }
+            },
+            {
+              "name": "y",
+              "kind": "Port",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+              "source_line": 1,
+              "source_column": 51,
+              "addr": 6455622853768,
+              "type": "logic[3:0]",
+              "direction": "Out",
+              "internalSymbol": "6455622853888 y"
+            },
+            {
+              "name": "y",
+              "kind": "Variable",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+              "source_line": 1,
+              "source_column": 51,
+              "addr": 6455622853888,
+              "type": "logic[3:0]",
+              "lifetime": "Static"
+            },
+            {
+              "name": "u_shared",
+              "kind": "Instance",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+              "source_line": 2,
+              "source_column": 10,
+              "addr": 6455622854040,
+              "body": "6455622843072 shared",
+              "connections": [
+                {
+                  "port": {
+                    "name": "a",
+                    "kind": "Port",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_line": 1,
+                    "source_column": 28,
+                    "addr": 6455622855192,
+                    "type": "logic",
+                    "direction": "In",
+                    "internalSymbol": "6455622855312 a"
+                  },
+                  "expr": {
+                    "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+                    "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+                    "source_line_start": 2,
+                    "source_line_end": 2,
+                    "source_column_start": 23,
+                    "source_column_end": 26,
+                    "kind": "NamedValue",
+                    "type": "logic",
+                    "symbol": "6455622853608 clk"
+                  }
+                },
+                {
+                  "port": {
+                    "name": "y",
+                    "kind": "Port",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_line": 1,
+                    "source_column": 50,
+                    "addr": 6455622855472,
+                    "type": "logic[3:0]",
+                    "direction": "Out",
+                    "internalSymbol": "6455622855592 y"
+                  },
+                  "expr": {
+                    "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+                    "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+                    "source_line_start": 2,
+                    "source_line_end": 2,
+                    "source_column_start": 32,
+                    "source_column_end": 33,
+                    "kind": "Assignment",
+                    "type": "logic[3:0]",
+                    "left": {
+                      "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+                      "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+                      "source_line_start": 2,
+                      "source_line_end": 2,
+                      "source_column_start": 32,
+                      "source_column_end": 33,
+                      "kind": "NamedValue",
+                      "type": "logic[3:0]",
+                      "symbol": "6455622853888 y"
+                    },
+                    "right": {
+                      "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+                      "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+                      "source_line_start": 2,
+                      "source_line_end": 2,
+                      "source_column_start": 32,
+                      "source_column_end": 33,
+                      "kind": "EmptyArgument",
+                      "type": "logic[3:0]"
+                    },
+                    "isNonBlocking": false
+                  }
+                }
+              ]
+            },
+            {
+              "name": "spare",
+              "kind": "Variable",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+              "source_line": 3,
+              "source_column": 9,
+              "addr": 6455622835992,
+              "type": "logic",
+              "lifetime": "Static"
+            },
+            {
+              "name": "u_shared_2",
+              "kind": "Instance",
+              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+              "source_line": 4,
+              "source_column": 10,
+              "addr": 6455622854472,
+              "body": "6455622843072 shared",
+              "connections": [
+                {
+                  "port": {
+                    "name": "a",
+                    "kind": "Port",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_line": 1,
+                    "source_column": 28,
+                    "addr": 6455622856488,
+                    "type": "logic",
+                    "direction": "In",
+                    "internalSymbol": "6455622860816 a"
+                  },
+                  "expr": {
+                    "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+                    "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+                    "source_line_start": 4,
+                    "source_line_end": 4,
+                    "source_column_start": 25,
+                    "source_column_end": 28,
+                    "kind": "NamedValue",
+                    "type": "logic",
+                    "symbol": "6455622853608 clk"
+                  }
+                },
+                {
+                  "port": {
+                    "name": "y",
+                    "kind": "Port",
+                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_line": 1,
+                    "source_column": 50,
+                    "addr": 6455622860976,
+                    "type": "logic[3:0]",
+                    "direction": "Out",
+                    "internalSymbol": "6455622861096 y"
+                  }
+                }
+              ]
+            }
+          ],
+          "definition": "6455605032960 top_b"
+        },
+        "connections": [
+        ]
+      }
+    ]
+  },
+  "definitions": [
+    {
+      "name": "bus_if",
+      "kind": "Definition",
+      "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/bus.sv",
+      "source_line": 1,
+      "source_column": 11,
+      "addr": 6455605028352,
+      "defaultNetType": "6455605919904 wire",
+      "definitionKind": "Interface",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    },
+    {
+      "name": "consumer",
+      "kind": "Definition",
+      "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+      "source_line": 1,
+      "source_column": 8,
+      "addr": 6455605029120,
+      "defaultNetType": "6455605919904 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    },
+    {
+      "name": "orphan",
+      "kind": "Definition",
+      "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+      "source_line": 1,
+      "source_column": 8,
+      "addr": 6455605029888,
+      "defaultNetType": "6455605919904 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    },
+    {
+      "name": "reflink",
+      "kind": "Definition",
+      "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/reflink.sv",
+      "source_line": 1,
+      "source_column": 8,
+      "addr": 6455605030656,
+      "defaultNetType": "6455605919904 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    },
+    {
+      "name": "shared",
+      "kind": "Definition",
+      "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+      "source_line": 1,
+      "source_column": 8,
+      "addr": 6455605031424,
+      "defaultNetType": "6455605919904 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    },
+    {
+      "name": "top_a",
+      "kind": "Definition",
+      "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+      "source_line": 1,
+      "source_column": 8,
+      "addr": 6455605032192,
+      "defaultNetType": "6455605919904 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    },
+    {
+      "name": "top_b",
+      "kind": "Definition",
+      "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+      "source_line": 1,
+      "source_column": 8,
+      "addr": 6455605032960,
+      "defaultNetType": "6455605919904 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+## lrelease (acceptance command, /tmp scratch)
+Updating '/tmp/x.qm'...
+    Generated 1186 translation(s) (1186 finished and 0 unfinished)
+lrelease exit=0
+## compiled catalogue round-trip (lconvert)
+lconvert exit=0
+11:        <source>Fix</source>
+12-        <translation>修复</translation>
+## counts
+unfinished=0 vanished=0 messages=1186
+## xml well-formedness
+xml ok

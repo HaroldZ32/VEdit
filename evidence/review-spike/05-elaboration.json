@@ -1,0 +1,406 @@
+{
+ "tool": {
+  "command": [
+   "/home/haroldzhao/MyProj/DshProj/VEdit/build/slang/out/slang",
+   "--top",
+   "top",
+   "--ast-json",
+   "/home/haroldzhao/MyProj/DshProj/VEdit/evidence/review-spike/05-elaboration.json.ast.json",
+   "--ast-json-source-info",
+   "/home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/mid.sv",
+   "/home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv"
+  ],
+  "exit_code": 0,
+  "stderr": "",
+  "elapsed_ms": 5,
+  "peak_rss_kb": 19352,
+  "peak_rss_mb": 18.9,
+  "rss_note": "resource.getrusage(RUSAGE_CHILDREN).ru_maxrss (KiB on Linux), the maximum over all children of this probe",
+  "limits": {
+   "max_elapsed_s": 30,
+   "max_peak_rss_mb": 1024
+  },
+  "passes_limits": true
+ },
+ "hierarchy": [
+  {
+   "path": "top",
+   "module": "top",
+   "instantiation": {
+    "file": "probes/slang-spike/fixture/top.sv",
+    "line": 3,
+    "column": 8
+   }
+  },
+  {
+   "path": "top.u0",
+   "module": "mid",
+   "instantiation": {
+    "file": "probes/slang-spike/fixture/top.sv",
+    "line": 11,
+    "column": 7
+   }
+  },
+  {
+   "path": "top.u1",
+   "module": "mid",
+   "instantiation": {
+    "file": "probes/slang-spike/fixture/top.sv",
+    "line": 12,
+    "column": 7
+   }
+  }
+ ],
+ "signals": {
+  "top.u0.clk": {
+   "path": "top.u0.clk",
+   "kind": "Net",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/mid.sv",
+    "line": 3,
+    "column": 18
+   },
+   "drivers": [],
+   "loads": []
+  },
+  "top.u0.d": {
+   "path": "top.u0.d",
+   "kind": "Net",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/mid.sv",
+    "line": 4,
+    "column": 18
+   },
+   "drivers": [],
+   "loads": []
+  },
+  "top.u0.q": {
+   "path": "top.u0.q",
+   "kind": "Variable",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/mid.sv",
+    "line": 5,
+    "column": 18
+   },
+   "drivers": [
+    {
+     "via": "top.u0.q (continuous assign)",
+     "kind": "assign",
+     "at": {
+      "file": "probes/slang-spike/fixture/mid.sv",
+      "line": 13,
+      "column": 10
+     }
+    }
+   ],
+   "loads": [],
+   "assign_from": [
+    "top.u0.state"
+   ]
+  },
+  "top.u0.state": {
+   "path": "top.u0.state",
+   "kind": "Variable",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/mid.sv",
+    "line": 7,
+    "column": 9
+   },
+   "drivers": [
+    {
+     "via": "top.u0.state (AlwaysFF)",
+     "kind": "procedural",
+     "at": {
+      "file": "probes/slang-spike/fixture/mid.sv",
+      "line": 10,
+      "column": 5
+     }
+    }
+   ],
+   "loads": [
+    {
+     "via": "top.u0.state (continuous assign source)",
+     "kind": "assign",
+     "at": {
+      "file": "probes/slang-spike/fixture/mid.sv",
+      "line": 13,
+      "column": 10
+     }
+    }
+   ]
+  },
+  "top.u1.clk": {
+   "path": "top.u1.clk",
+   "kind": "Net",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/mid.sv",
+    "line": 3,
+    "column": 18
+   },
+   "drivers": [],
+   "loads": []
+  },
+  "top.u1.d": {
+   "path": "top.u1.d",
+   "kind": "Net",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/mid.sv",
+    "line": 4,
+    "column": 18
+   },
+   "drivers": [],
+   "loads": []
+  },
+  "top.u1.q": {
+   "path": "top.u1.q",
+   "kind": "Variable",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/mid.sv",
+    "line": 5,
+    "column": 18
+   },
+   "drivers": [
+    {
+     "via": "top.u1.q (continuous assign)",
+     "kind": "assign",
+     "at": {
+      "file": "probes/slang-spike/fixture/mid.sv",
+      "line": 13,
+      "column": 10
+     }
+    }
+   ],
+   "loads": [],
+   "assign_from": [
+    "top.u1.state"
+   ]
+  },
+  "top.u1.state": {
+   "path": "top.u1.state",
+   "kind": "Variable",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/mid.sv",
+    "line": 7,
+    "column": 9
+   },
+   "drivers": [
+    {
+     "via": "top.u1.state (AlwaysFF)",
+     "kind": "procedural",
+     "at": {
+      "file": "probes/slang-spike/fixture/mid.sv",
+      "line": 10,
+      "column": 5
+     }
+    }
+   ],
+   "loads": [
+    {
+     "via": "top.u1.state (continuous assign source)",
+     "kind": "assign",
+     "at": {
+      "file": "probes/slang-spike/fixture/mid.sv",
+      "line": 13,
+      "column": 10
+     }
+    }
+   ]
+  },
+  "top.clk": {
+   "path": "top.clk",
+   "kind": "Net",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/top.sv",
+    "line": 4,
+    "column": 18
+   },
+   "drivers": [],
+   "loads": [
+    {
+     "via": "top.u0.clk",
+     "kind": "instance-port",
+     "direction": "in",
+     "at": {
+      "file": "probes/slang-spike/fixture/top.sv",
+      "line": 11,
+      "column": 16
+     }
+    },
+    {
+     "via": "top.u1.clk",
+     "kind": "instance-port",
+     "direction": "in",
+     "at": {
+      "file": "probes/slang-spike/fixture/top.sv",
+      "line": 12,
+      "column": 16
+     }
+    }
+   ]
+  },
+  "top.d": {
+   "path": "top.d",
+   "kind": "Net",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/top.sv",
+    "line": 5,
+    "column": 18
+   },
+   "drivers": [],
+   "loads": [
+    {
+     "via": "top.u0.d",
+     "kind": "instance-port",
+     "direction": "in",
+     "at": {
+      "file": "probes/slang-spike/fixture/top.sv",
+      "line": 11,
+      "column": 25
+     }
+    }
+   ]
+  },
+  "top.rst": {
+   "path": "top.rst",
+   "kind": "Net",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/top.sv",
+    "line": 6,
+    "column": 18
+   },
+   "drivers": [],
+   "loads": []
+  },
+  "top.q": {
+   "path": "top.q",
+   "kind": "Variable",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/top.sv",
+    "line": 7,
+    "column": 18
+   },
+   "drivers": [
+    {
+     "via": "top.u1.q",
+     "kind": "instance-port",
+     "direction": "out",
+     "at": {
+      "file": "probes/slang-spike/fixture/top.sv",
+      "line": 12,
+      "column": 38
+     }
+    }
+   ],
+   "loads": []
+  },
+  "top.link": {
+   "path": "top.link",
+   "kind": "Variable",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/top.sv",
+    "line": 9,
+    "column": 9
+   },
+   "drivers": [
+    {
+     "via": "top.u0.q",
+     "kind": "instance-port",
+     "direction": "out",
+     "at": {
+      "file": "probes/slang-spike/fixture/top.sv",
+      "line": 11,
+      "column": 38
+     }
+    }
+   ],
+   "loads": [
+    {
+     "via": "top.u1.d",
+     "kind": "instance-port",
+     "direction": "in",
+     "at": {
+      "file": "probes/slang-spike/fixture/top.sv",
+      "line": 12,
+      "column": 25
+     }
+    },
+    {
+     "via": "top.link (continuous assign source)",
+     "kind": "assign",
+     "at": {
+      "file": "probes/slang-spike/fixture/top.sv",
+      "line": 16,
+      "column": 10
+     }
+    }
+   ]
+  },
+  "top.observed": {
+   "path": "top.observed",
+   "kind": "Variable",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/top.sv",
+    "line": 15,
+    "column": 9
+   },
+   "drivers": [
+    {
+     "via": "top.observed (continuous assign)",
+     "kind": "assign",
+     "at": {
+      "file": "probes/slang-spike/fixture/top.sv",
+      "line": 16,
+      "column": 10
+     }
+    }
+   ],
+   "loads": [],
+   "assign_from": [
+    "top.link"
+   ]
+  }
+ },
+ "signals_with_drivers_and_loads": [
+  "top.link",
+  "top.u0.state",
+  "top.u1.state"
+ ],
+ "driver_chain_of_interest": {
+  "top.link": [
+   {
+    "from": "top.link",
+    "to": "top.u0.q",
+    "kind": "instance-output-port",
+    "at": {
+     "file": "probes/slang-spike/fixture/top.sv",
+     "line": 11,
+     "column": 38
+    }
+   },
+   {
+    "from": "top.u0.q",
+    "to": "top.u0.state",
+    "kind": "continuous-assign",
+    "at": {
+     "file": "probes/slang-spike/fixture/mid.sv",
+     "line": 13,
+     "column": 10
+    }
+   },
+   {
+    "from": "top.u0.state",
+    "drivers": [
+     {
+      "via": "top.u0.state (AlwaysFF)",
+      "kind": "procedural",
+      "at": {
+       "file": "probes/slang-spike/fixture/mid.sv",
+       "line": 10,
+       "column": 5
+      }
+     }
+    ]
+   }
+  ]
+ }
+}

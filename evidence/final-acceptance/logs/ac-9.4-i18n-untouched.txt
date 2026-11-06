@@ -1,0 +1,37 @@
+# AC-9.4 — evidence/i18n/** 未改写检查（mtime 均早于 G7 开工 ~23:59）
+# collected: 2026-11-03T01:37:05+08:00
+total 1220
+drwxrwxr-x   4 haroldzhao haroldzhao   4096 2026-11-02 23:08:57.087973776 +0800 .
+drwxrwxr-x 138 haroldzhao haroldzhao   4096 2026-11-03 01:30:40.448582565 +0800 ..
+-rw-rw-r--   1 haroldzhao haroldzhao  33855 2026-11-02 12:49:37.618119434 +0800 01-string-inventory.log
+-rw-rw-r--   1 haroldzhao haroldzhao   2345 2026-11-02 12:49:37.618651290 +0800 02-bilingual-table-draft.md
+-rw-rw-r--   1 haroldzhao haroldzhao   3108 2026-11-02 12:49:37.618651290 +0800 03-glossary.md
+-rw-rw-r--   1 haroldzhao haroldzhao  46297 2026-11-02 16:58:26.095292210 +0800 05-extracted-at-af85225.log
+-rw-rw-r--   1 haroldzhao haroldzhao  98408 2026-11-02 16:58:26.855946362 +0800 05-extracted-current-broad.log
+-rw-rw-r--   1 haroldzhao haroldzhao  10056 2026-11-02 22:52:20.875243231 +0800 05-extracted-current.json
+-rw-rw-r--   1 haroldzhao haroldzhao  67645 2026-11-02 16:58:26.461703483 +0800 05-extracted-current.log
+-rw-rw-r--   1 haroldzhao haroldzhao  75098 2026-11-02 16:59:36.131614976 +0800 06-extractor-diff.json
+-rw-rw-r--   1 haroldzhao haroldzhao  55388 2026-11-02 16:59:36.134154068 +0800 06-extractor-diff.md
+-rw-rw-r--   1 haroldzhao haroldzhao 123048 2026-11-02 17:02:30.267353592 +0800 07-triage-466.csv
+-rw-rw-r--   1 haroldzhao haroldzhao 215812 2026-11-02 17:02:30.272353843 +0800 07-triage-466.json
+-rw-rw-r--   1 haroldzhao haroldzhao  33465 2026-11-02 22:56:14.364101055 +0800 09-ui-translations.json
+-rw-rw-r--   1 haroldzhao haroldzhao    831 2026-11-02 23:01:06.071585676 +0800 10-ui-translations-supplementary.json
+-rw-rw-r--   1 haroldzhao haroldzhao 132777 2026-11-02 23:07:53.721827356 +0800 11-reconciliation-466.csv
+-rw-rw-r--   1 haroldzhao haroldzhao 126844 2026-11-02 23:07:53.722827406 +0800 11-reconciliation-466.md
+-rw-rw-r--   1 haroldzhao haroldzhao  37024 2026-11-02 23:08:02.918296507 +0800 12-ui-blocks.md
+-rw-rw-r--   1 haroldzhao haroldzhao   1057 2026-11-02 23:08:02.918646589 +0800 13-coverage.md
+-rw-rw-r--   1 haroldzhao haroldzhao   1935 2026-11-02 23:03:55.741010518 +0800 14-selftest-coverage.md
+-rw-------   1 haroldzhao haroldzhao  12823 2026-11-02 23:09:35.627677243 +0800 15-t21-report.md
+-rw-rw-r--   1 haroldzhao haroldzhao  18426 2026-11-02 22:57:04.077264232 +0800 16-wrap-changes.txt
+-rw-------   1 haroldzhao haroldzhao   6150 2026-11-02 22:56:50.246998578 +0800 apply_tr_wrapping.py
+-rw-------   1 haroldzhao haroldzhao  13595 2026-11-02 23:01:37.590244057 +0800 build_reports.py
+-rw-------   1 haroldzhao haroldzhao  11947 2026-11-02 16:59:35.143804783 +0800 diff_i18n_lists.py
+-rw-------   1 haroldzhao haroldzhao  21171 2026-11-02 17:01:30.432097775 +0800 extract_i18n_candidates.py
+drwxrwxr-x   2 haroldzhao haroldzhao   4096 2026-11-02 23:08:57.085973677 +0800 logs
+-rw-------   1 haroldzhao haroldzhao   3199 2026-11-02 23:01:06.081321857 +0800 merge_ui_translations.py
+drwxrwxr-x   2 haroldzhao haroldzhao   4096 2026-11-02 23:04:17.916111607 +0800 shots
+-rw-------   1 haroldzhao haroldzhao  18042 2026-11-02 17:02:24.522370948 +0800 triage_i18n_candidates.py
+
+# 466 基线条数复核
+07-triage-466.json rows: 466
+11-reconciliation-466.csv data rows: 466

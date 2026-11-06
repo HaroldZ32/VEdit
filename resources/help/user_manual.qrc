@@ -1,0 +1,16 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <!-- UX batch 2 (item 11): the built-in user manual rendered by
+         src/app/help_viewer.cpp (Help -> User Manual, F1). The Markdown source
+         is the SAME file the documentation lane maintains; rcc embeds it into
+         the shell library at build time, so every packaging form (build tree,
+         tarball, AppDir/AppImage) already carries it and no packaging script
+         needs a second install rule.
+
+         Helper objects referenced from the guide live in docs/images/ and are
+         NOT embedded: the manual is a text document, and a missing image is a
+         broken picture, never a failed open. -->
+    <qresource prefix="/help">
+        <file alias="USER_GUIDE.md">../../docs/USER_GUIDE.md</file>
+    </qresource>
+</RCC>

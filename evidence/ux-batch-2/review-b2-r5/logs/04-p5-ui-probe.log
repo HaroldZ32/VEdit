@@ -1,0 +1,210 @@
+search: root='/tmp/review-b2-r3-probe-KruCgo' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r3-probe-KruCgo' query='foo' case=1 whole=1 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+PROBE P1.search PASS
+PROBE P1.hit PASS (1)
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r3-probe-KruCgo' query='foo' case=1 whole=1 regex=0 all=1 filter=''
+PROBE P1.start PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r3-probe-KruCgo' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+PROBE P1.idle PASS
+PROBE P1.after='foo_bar
+' confirmed=1 ok=0 error='Replace All refused: the query or options changed while the confirmation was open; nothing was replaced. Run the search and Replace All again. Nothing was replaced.'
+PROBE P1.refused PASS (Replace All refused: the query or options changed while the confirmation was open; nothing was replaced. Run the search and Replace All again. Nothing was replaced.)
+PROBE P1.no-corruption PASS
+PROBE P1.controls-restored PASS
+search: root='/tmp/review-b2-r3-probe-dnQcBg' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r3-probe-dnQcBg' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+PROBE P2.search PASS
+PROBE P2.hits PASS (1)
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r3-probe-dnQcBg' query='foo' case=1 whole=0 regex=0 all=1 filter=''
+PROBE P2.start PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PROBE P2.idle PASS
+PROBE P2.after='fix fix
+' confirmed=1 ok=0 error='Replace All refused: the query or options changed while the confirmation was open; nothing was replaced. Run the search and Replace All again. Nothing was replaced.'
+PROBE P2.refused PASS (Replace All refused: the query or options changed while the confirmation was open; nothing was replaced. Run the search and Replace All again. Nothing was replaced.)
+PROBE P2.no-corruption PASS
+search: root='/tmp/review-b2-r3-probe-EevjWC' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r3-probe-EevjWC' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+PROBE P3.search PASS
+PROBE P3.hit PASS (1)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PROBE P3.idle PASS
+PROBE P3.after='  assign bar = foo + foo;
+' started=0 saves=0 ok=0 error=''
+PROBE P3.refused PASS
+PROBE P3.no-save PASS
+PROBE P3.no-write PASS
+search: root='/tmp/review-b2-r3-probe-AHNiBL' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r3-probe-AHNiBL' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+PROBE P4.search PASS
+PROBE P4.hit PASS (3)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r3-probe-AHNiBL' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+PROBE P4.idle PASS
+PROBE P4.after='abc foo
+xyz foo
+' started=1 saves=1 ok=0 error='replace: shift.v: line 2 no longer holds the text the search read (the document changed); nothing was written to that file'
+PROBE P4.refused PASS
+PROBE P4.no-wrong-occurrence PASS
+search: root='/tmp/review-b2-r3-probe-kUamFW' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r3-probe-kUamFW' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+PROBE N1.search PASS
+PROBE N1.save-during-scan PASS
+PROBE N1.hit PASS (3)
+This plugin does not support propagateSizeHints()
+PROBE N1.idle PASS
+PROBE N1.after='abc foo
+xyz foo
+' started=1 ok=0 replacements=0 status='Replace refused: "freeze.v" was written while the search was running, so this match may have moved; nothing was written. Run the search again.' error='Replace refused: "freeze.v" was written while the search was running, so this match may have moved; nothing was written. Run the search again.'
+PROBE N1.no-wrong-occurrence PASS (abc foo
+xyz foo
+)
+search: root='/tmp/review-b2-r3-probe-DXXWbR' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r3-probe-DXXWbR' query='foo' case=1 whole=0 regex=0 all=1 filter=''
+PROBE N1b.start PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r3-probe-DXXWbR' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+PROBE N1b.idle PASS
+PROBE N1b.save-during-scan PASS
+PROBE N1b.after='foo c
+foo a
+foo b
+' confirmed=0 ok=0 replacements=0 status='Replace All refused: "freeze-all.v" was written while the counting scan was running, so the hit positions may be stale; nothing was replaced. Run the search and Replace All again. Nothing was replaced.' error='Replace All refused: "freeze-all.v" was written while the counting scan was running, so the hit positions may be stale; nothing was replaced. Run the search and Replace All again. Nothing was replaced.'
+PROBE N1b.no-wrong-occurrence PASS (foo c
+foo a
+foo b
+)
+search: root='/tmp/review-b2-r3-probe-JuJjHN' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r3-probe-JuJjHN' query='foo' case=1 whole=0 regex=0 all=1 filter=''
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r3-probe-JuJjHN' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+PROBE N2.handed=1 idle=1 queryEnabled=1 replaceAllEnabled=1 replaceEditEnabled=1 outcomeOk=0 error='Replace All cancelled; nothing was written.'
+PROBE N2.handoff-delivered PASS
+PROBE N2.no-write PASS
+PROBE N2.controls-recovered PASS
+PROBE N2.replace-all-recovered PASS
+search: root='/tmp/review-b2-r3-probe-jLmuVT' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r3-probe-jLmuVT' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+PROBE N3.search PASS
+PROBE N3.hit PASS (2)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r3-probe-jLmuVT' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+PROBE N3.idle PASS
+PROBE N3.after='BAR
+abc foo edited
+' started=1 saves=1 ok=1 error=''
+PROBE N3.save-first-ran PASS
+PROBE N3.one-of-two-documented-outcomes PASS (BAR
+abc foo edited
+)
+PROBE N4.three-arg-refused PASS (replace: x.v: the operation has no query, so the range cannot be verified; refusing to write without verification)
+PROBE N4.three-arg-names-reason PASS (replace: x.v: the operation has no query, so the range cannot be verified; refusing to write without verification)
+PROBE N4.empty-query-refused PASS (replace: x.v: the operation has no query, so the range cannot be verified; refusing to write without verification)
+PROBE N4.valid-control PASS
+PROBE N4.worker-zero-scan-refused PASS (replace refused: the hit list has no frozen scan identity; nothing was written)
+PROBE N4.worker-zero-scan-names-reason PASS (replace refused: the hit list has no frozen scan identity; nothing was written)
+PROBE N4.worker-zero-scan-no-write PASS
+PROBE N4.worker-empty-query-refused PASS (replace refused: the operation has no query, so the ranges cannot be verified; nothing was written)
+PROBE N4.worker-empty-query-no-write PASS
+search: root='/tmp/review-b2-r3-probe-waBbJk' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r3-probe-waBbJk' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+PROBE N5.search PASS
+PROBE N5.measured PASS
+PROBE N5.query-options-scope-replace-disabled PASS
+search: root='/tmp/review-b2-r3-probe-BjmayW' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r3-probe-BjmayW' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+PROBE P5.search PASS
+PROBE P5.hit PASS (1)
+This plugin does not support propagateSizeHints()
+PROBE P5.idle PASS
+PROBE P5.started=1 saves=0 ok=0 replacements=0 line0-right='XXXXXXTAIL_A' line1-equals-original=0
+PROBE P5.no-wrong-target PASS (not reproduced)
+search: root='/tmp/review-b2-r3-probe-yZOxZp' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r3-probe-yZOxZp' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+PROBE P5U.search PASS
+PROBE P5U.hit PASS (1)
+This plugin does not support propagateSizeHints()
+PROBE P5U.idle PASS
+PROBE P5U.started=1 saves=0 ok=0 replacements=0 byte-identical=1 label-visible=1 label='Replace refused: the unsaved edits in "dup-ui.v" changed where line 1 sits in the buffer, and that line is longer than the 400-character search preview, so the match cannot be re-identified from the preview alone; the document was not saved and nothing was replaced. Save it and run the search again.'
+PROBE P5U.refused PASS (Replace refused: the unsaved edits in "dup-ui.v" changed where line 1 sits in the buffer, and that line is longer than the 400-character search preview, so the match cannot be re-identified from the preview alone; the document was not saved and nothing was replaced. Save it and run the search again.)
+PROBE P5U.zero-replacements PASS
+PROBE P5U.no-save PASS
+PROBE P5U.disk-byte-identical PASS
+PROBE P5U.error-non-empty PASS
+PROBE P5U.error-names-file PASS
+PROBE P5U.status-shows-reason PASS
+PROBE P5U.status-visible PASS
+search: root='/tmp/review-b2-r3-probe-CwpflB' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r3-probe-CwpflB' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+PROBE P5U.ok.search PASS
+PROBE P5U.ok.hit PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r3-probe-CwpflB' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PROBE P5U.ok.idle PASS
+PROBE P5U.ok started=1 saves=1 ok=1 line0-right='XXXXTAIL_A' line1='below edited'
+PROBE P5U.ok.replaced PASS
+PROBE P5U.ok.scanned-line-replaced PASS
+PROBE P5U.ok.edit-preserved PASS
+PROBE SUMMARY failures=0

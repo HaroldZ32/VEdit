@@ -111,6 +111,26 @@ public:
         return copy;
     }
 
+    // B5 repair: the request path now refuses a NULL/unknown capability row (the
+    // captain's ruling), so a fake that expects its requests to reach the server
+    // must advertise the measured table it stands for. Before the repair the
+    // controller passed a no-table backend through.
+    BackendCapabilities staticCapabilities() const override
+    {
+        BackendCapabilities capabilities;
+        capabilities.backend = QStringLiteral("fake-lsp");
+        capabilities.basis = QStringLiteral("measured");
+        capabilities.rows.append(CapabilityRow{QStringLiteral("definition"), 1, QString()});
+        capabilities.rows.append(CapabilityRow{QStringLiteral("references"), 1, QString()});
+        capabilities.rows.append(CapabilityRow{QStringLiteral("documentSymbol"), 1, QString()});
+        capabilities.rows.append(CapabilityRow{QStringLiteral("rename"), 1, QString()});
+        capabilities.rows.append(CapabilityRow{QStringLiteral("formatting"), 1, QString()});
+        capabilities.rows.append(CapabilityRow{QStringLiteral("hover"), 1, QString()});
+        return capabilities;
+    }
+    BackendCapabilities sessionCapabilities() const override { return staticCapabilities(); }
+    QString backendName() const override { return QStringLiteral("fake-lsp"); }
+
     quint64 request(ResponseKind kind, const QString &file, int line, int character,
                     const QString &newName)
     {
@@ -152,6 +172,14 @@ public:
     quint64 requestDiagnostics(const QString &file) override
     {
         return request(ResponseKind::Diagnostics, file, 0, 0, QString());
+    }
+    quint64 requestHover(const QString &file, int line, int character) override
+    {
+        return request(ResponseKind::Hover, file, line, character, QString());
+    }
+    quint64 requestSignatureHelp(const QString &file, int line, int character) override
+    {
+        return request(ResponseKind::SignatureHelp, file, line, character, QString());
     }
 
     // T118: the editor buffer path. The fake records what the controller pushed,
@@ -221,6 +249,21 @@ public:
             entry.code = QStringLiteral("line-length");
             entry.message = QStringLiteral("fake LSP diagnostic");
             polled.diagnostics.append(entry);
+            break;
+        }
+        case ResponseKind::Hover: {
+            // T16: the fake answers a hover so the controller pass-through can be
+            // asserted without a server.
+            polled.hoverText = QStringLiteral("logic [7:0] data");
+            break;
+        }
+        case ResponseKind::SignatureHelp: {
+            LspSignature signature;
+            signature.label = QStringLiteral("foo(int a, int b)");
+            signature.parameters = QStringList{QStringLiteral("int a"), QStringLiteral("int b")};
+            polled.signatures.append(signature);
+            polled.activeSignature = 0;
+            polled.activeParameter = 1;
             break;
         }
         case ResponseKind::None:
@@ -387,6 +430,21 @@ int main(int argc, char **argv)
               rename.ready && rename.kind == ResponseKind::Edits && !rename.edits.isEmpty());
         check("entry.format", controller.requestFormat(QStringLiteral("rtl/top.sv")) != 0);
         check("entry.format-result", controller.pollNavigation().kind == ResponseKind::Edits);
+        // T16: the hover / signatureHelp pass-through (the fake answers both; the
+        // real FFI path is the same one `requestHover` maps to).
+        check("entry.hover", controller.requestHover(QStringLiteral("rtl/top.sv"), 10, 3) != 0);
+        const LspPolled hover = controller.pollNavigation();
+        check("entry.hover-result",
+              hover.ready && hover.kind == ResponseKind::Hover
+                  && hover.hoverText == QStringLiteral("logic [7:0] data"));
+        check("entry.signature",
+              controller.requestSignatureHelp(QStringLiteral("rtl/top.sv"), 10, 3) != 0);
+        const LspPolled signature = controller.pollNavigation();
+        check("entry.signature-result",
+              signature.ready && signature.kind == ResponseKind::SignatureHelp
+                  && signature.signatures.size() == 1
+                  && signature.signatures.first().label == QStringLiteral("foo(int a, int b)")
+                  && signature.activeParameter == 1);
         check("diagnostics.collected", !controller.diagnostics().isEmpty(),
               QString::number(controller.diagnostics().size()));
     }
@@ -493,7 +551,7 @@ int main(int argc, char **argv)
                          QStringLiteral("missing=[verible, slang]")),
               missingReport.statusLine());
         check("toolchain.missing-message-visible",
-              missingReport.userMessage().contains(QStringLiteral("Diagnostics unavailable"))
+              missingReport.userMessage().contains(QCoreApplication::translate("VEdit", "Diagnostics unavailable"))
                   && missingReport.userMessage().contains(QStringLiteral("Fix:")),
               missingReport.userMessage());
     }

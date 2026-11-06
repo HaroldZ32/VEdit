@@ -2,7 +2,7 @@
 #
 # `syntax_directory` is the ONE normalisation of `VEDIT_SYNTAX_DIR` (T84 data root
 # vs. the legacy `syntax/` subdirectory spelling). It lives here, below both the
-# KDE data loader (`src/syntax/kde`) and the folding lane (`src/syntax/folding`),
+# KDE data loader (`src/syntax/kde`) — and, until T29 deleted it, the folding lane,
 # so neither has to depend on the other and the three call sites cannot drift
 # apart again (the T109 root cause).
 cmake_minimum_required(VERSION 3.20)

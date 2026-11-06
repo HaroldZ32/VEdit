@@ -1,0 +1,139 @@
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK edit.controllers.installed PASS
+CHECK edit.provider.editor PASS
+CHECK edit.provider.multi-cursor PASS
+CHECK edit.provider.enhancements PASS
+CHECK edit.real-focus.inner-widget PASS
+CHECK edit.real-focus.multi-cursor-setup PASS
+CHECK edit.real-focus.multi-cursor-typing PASS
+CHECK edit.real-focus.line-setup PASS
+CHECK edit.real-focus.line-op PASS
+CHECK edit.block.inner-widget PASS
+CHECK edit.block.inner-widget-same-for-end PASS
+CHECK edit.block.drag-active PASS
+CHECK edit.block.drag-native-mode PASS
+CHECK edit.block.cursor-count PASS
+CHECK edit.block.left-column PASS
+CHECK edit.block.cursor-lines PASS
+CHECK edit.block.native-mode-off PASS
+CHECK edit.real-focus.block-typing-target PASS
+CHECK edit.block.rectangular-insert PASS
+CHECK edit.block.one-undo PASS
+CHECK edit.alt-click.add PASS
+CHECK edit.alt-click.clicked-position PASS
+CHECK edit.alt-click.toggle-off PASS
+CHECK edit.alt-click.readd PASS
+CHECK edit.alt-click.typing PASS
+CHECK edit.alt-click.one-undo PASS
+CHECK edit.multi.three-cursors PASS
+CHECK edit.multi.type PASS
+CHECK edit.multi.type-one-undo PASS
+CHECK edit.multi.backspace-setup PASS
+CHECK edit.multi.backspace PASS
+CHECK edit.multi.backspace-one-undo PASS
+CHECK edit.multi.delete-setup PASS
+CHECK edit.multi.delete PASS
+CHECK edit.multi.delete-one-undo PASS
+CHECK edit.multi.return-setup PASS
+CHECK edit.multi.return PASS
+CHECK edit.multi.return-one-undo PASS
+CHECK edit.return.auto-indent PASS
+CHECK edit.return.cursor-after-indent PASS
+CHECK edit.return.brace-indent PASS
+CHECK edit.typing.control PASS
+CHECK edit.pair.round PASS
+CHECK edit.pair.inside PASS
+CHECK edit.pair.skip-over PASS
+CHECK edit.pair.backspace-precondition PASS
+CHECK edit.pair.backspace-deletes-both PASS
+CHECK edit.pair.quote-precondition PASS
+CHECK edit.pair.quote PASS
+CHECK edit.comment.on PASS
+CHECK edit.comment.off PASS
+CHECK edit.move.up PASS
+CHECK edit.move.down PASS
+CHECK edit.duplicate.line PASS
+CHECK edit.delete.line PASS
+CHECK edit.case.upper PASS
+CHECK edit.case.lower PASS
+CHECK edit.zoom.in PASS
+CHECK edit.zoom.config-changed PASS
+CHECK edit.zoom.out PASS
+CHECK edit.wrap.flip PASS
+CHECK edit.wrap.config PASS
+CHECK edit.wrap.back PASS
+CHECK-DETAIL bracket config key 'disable-bracket-match-highlight-if-inactive': listed=0 accepted=0
+CHECK edit.bracket.native-highlight PASS
+CHECK edit.keys.single-owner PASS
+CHECK definition.document PASS
+CHECK definition.view PASS
+CHECK definition.seams PASS
+CHECK definition.action-is-the-f12-path PASS
+CHECK definition.click-coordinate PASS
+CHECK definition.ctrl-click.inner-widget PASS
+ACTION action=definition dispatched=1 via='diagnostics.definition'
+CHECK definition.ctrl-click.dispatched PASS
+CHECK definition.ctrl-click.action-triggered PASS
+CHECK definition.ctrl-click.file PASS
+CHECK definition.ctrl-click.line-column PASS
+CHECK definition.ctrl-click.document-unchanged PASS
+CHECK definition.ctrl-click.no-added-cursor PASS
+CHECK definition.collapse.plain-setup PASS
+CHECK definition.collapse.plain-click PASS
+CHECK definition.collapse.ctrl-setup PASS
+ACTION action=definition dispatched=1 via='diagnostics.definition'
+This plugin does not support propagateSizeHints()
+CHECK definition.collapse.ctrl-click PASS
+CHECK definition.collapse.ctrl-click-position PASS
+CHECK definition.collapse.ctrl-click-dispatched PASS
+CHECK definition.plain-click.inner-widget PASS
+CHECK definition.plain-click.caret PASS
+DEFINITION-CLICK unavailable=1 reason='verible-verilog-ls does not advertise definitionProvider'
+This plugin does not support propagateSizeHints()
+CHECK definition.gate-off.no-request PASS
+CHECK definition.gate-off.document-unchanged PASS
+CHECK definition.gate-off.plain-click PASS
+CHECK definition.gate-off.status-reason PASS
+CHECK definition.gate-off.one-time-message PASS
+CHECK definition.gate-off.second-plain-click PASS
+CHECK definition.gate-off.still-no-request PASS
+CHECK definition.gate-only.action-enabled PASS
+CHECK definition.gate-only.availability FAIL (gate-only: verible-verilog-ls does not advertise definitionProvider)
+ACTION action=definition dispatched=1 via='diagnostics.definition'
+CHECK definition.gate-only.no-request FAIL
+CHECK definition.gate-only.plain-click PASS
+CHECK definition.gate-only.status-reason FAIL
+CHECK definition.action-only.gate-row-enabled PASS
+CHECK definition.action-only.availability PASS
+DEFINITION-CLICK unavailable=1 reason='action-only: the definition QAction is disabled'
+CHECK definition.action-only.no-request PASS
+CHECK definition.action-only.plain-click PASS
+CHECK definition.action-only.status-reason PASS
+CHECK definition.rearm.first-message FAIL
+CHECK definition.rearm.one-time PASS
+CHECK definition.rearm.restored PASS
+DEFINITION-CLICK unavailable=1 reason='Go to Definition'
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK definition.rearm.message-after-restore FAIL (Go to Definition is unavailable here: Go to Definition - Ctrl+click now behaves like a plain click)
+CHECK definition.rearm.changed-reason FAIL
+CHECK definition.rearm.changed-reason-one-time PASS
+CHECK definition.two-pane.views PASS
+CHECK definition.two-pane.seams PASS
+CHECK definition.two-pane.inner-widget PASS
+ACTION action=definition dispatched=1 via='diagnostics.definition'
+CHECK definition.two-pane.clicked-channel PASS
+CHECK definition.two-pane.other-channel PASS
+CHECK definition.two-pane.action-triggered PASS
+CHECK definition.two-pane.clicked-caret PASS
+CHECK definition.two-pane.clicked-file PASS
+CHECK definition.two-pane.other-caret-untouched PASS
+CHECK definition.two-pane.clicked-cursor-count PASS
+CHECK definition.two-pane.keyboard-focus PASS
+SUMMARY checks=119 failures=6

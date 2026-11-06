@@ -1,0 +1,46 @@
+# write scope attribution for lane B2
+
+## files edited by THIS lane (mtime after session start 04:13)
+ M src/editor/kernel/find_replace.{h,cpp}
+ M src/workspace/search/{CMakeLists.txt,README.md,global_search.cpp,search_integration.cpp,search_panel.h,search_panel.cpp,search_types.h}
+ ?? src/workspace/search/{document_sync.h,document_sync.cpp,project_replace.h,project_replace.cpp,search_query.h,search_replace_selftest.cpp}
+
+## pre-existing modifications in the same directory (earlier batch work, NOT this lane; mtime predates the session)
+ M src/workspace/search/search_selftest.cpp        (19:38)
+ M src/workspace/search/search_jump_target.{h,cpp} (19:37 / 22:57)
+ M src/workspace/search/global_search.h            (12:49, unchanged by B2)
+
+## git status limited to the declared scope
+ M src/editor/kernel/find_replace.cpp
+ M src/editor/kernel/find_replace.h
+ M src/workspace/search/CMakeLists.txt
+ M src/workspace/search/README.md
+ M src/workspace/search/global_search.cpp
+ M src/workspace/search/search_integration.cpp
+ M src/workspace/search/search_jump_target.cpp
+ M src/workspace/search/search_jump_target.h
+ M src/workspace/search/search_panel.cpp
+ M src/workspace/search/search_panel.h
+ M src/workspace/search/search_selftest.cpp
+ M src/workspace/search/search_types.h
+?? src/workspace/search/document_sync.cpp
+?? src/workspace/search/document_sync.h
+?? src/workspace/search/project_replace.cpp
+?? src/workspace/search/project_replace.h
+?? src/workspace/search/search_query.h
+?? src/workspace/search/search_replace_selftest.cpp
+
+## diff stat
+ src/editor/kernel/find_replace.cpp          | 1242 ++++++++++++++++++++++++++-
+ src/editor/kernel/find_replace.h            |  178 +++-
+ src/workspace/search/CMakeLists.txt         |   65 +-
+ src/workspace/search/README.md              |  104 ++-
+ src/workspace/search/global_search.cpp      |   87 +-
+ src/workspace/search/search_integration.cpp |   71 +-
+ src/workspace/search/search_jump_target.cpp |   96 ++-
+ src/workspace/search/search_jump_target.h   |   38 +-
+ src/workspace/search/search_panel.cpp       |  703 ++++++++++++++-
+ src/workspace/search/search_panel.h         |  124 ++-
+ src/workspace/search/search_selftest.cpp    |   79 +-
+ src/workspace/search/search_types.h         |  106 ++-
+ 12 files changed, 2670 insertions(+), 223 deletions(-)

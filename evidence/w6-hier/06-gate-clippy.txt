@@ -1,0 +1,5 @@
+# T7 gate: clippy on the crates this task changed (all targets)
+command: CARGO_HOME=$PWD/target/cargo-home RUSTUP_TOOLCHAIN=stable cargo clippy --offline -p vd-deeplint -p vd-ffi --all-targets -- -D warnings
+    Checking vd-deeplint v0.1.1 (/home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-deeplint)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.50s
+cargo-clippy-exit=0

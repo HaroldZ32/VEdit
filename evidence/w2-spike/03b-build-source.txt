@@ -1,0 +1,10 @@
+# source (2026-11-02T07:32:00Z)
+repository=https://github.com/hudson-trading/slang-server.git
+tag=v0.3.1
+pinned_commit=2ad996ffb7388e4f231736609e9d91f87d9efedb
+checked_out_commit=2ad996ffb7388e4f231736609e9d91f87d9efedb
+## submodules:
+ 6225211806c48230e5d17a1e555ef69e7325051c external/ctre (v3.9.0-39-g6225211)
+ a26047a4d3bdbd5cf6b65995cbc5e7862e241c57 external/reflect-cpp (v0.24.0-25-ga26047a)
+ 7213cf8135c329c37c7e2778e40774489a0583a8 external/reflect-cpp/vcpkg (2022.02.02-10762-g7213cf8)
+ 151a801ceaf6faf23d79a42d210ff67e50eb4660 external/slang (remotes/origin/slang-patches-0923-1-g151a801)

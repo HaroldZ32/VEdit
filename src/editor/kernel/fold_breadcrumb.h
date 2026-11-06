@@ -14,6 +14,14 @@
 // BREADCRUMB: a Model fed by the syntax stack's structure query on cursor moves
 // (debounced after text edits). With the runtime switch OFF the source reports
 // "no semantics" and the path is EMPTY - no text-heuristic path is invented.
+//
+// PANE BAR (T20/A-3): the pane's clickable breadcrumb bar
+// (vedit::breadcrumb::Bar, src/app/editor_area.cpp) needs the entries, not just
+// the display string, and the app shell deliberately does not link KTextEditor.
+// The binding therefore (a) exposes pathEntries() to editor-core consumers and
+// (b) publishes the same list as the QVariantList property
+// "veditBreadcrumbEntries" ({kind, name, line} per entry, line 0-based) on the
+// view object, which is the KTextEditor-free hand-off the pane reads.
 #include "breadcrumb_model.h"
 
 #include <QObject>
@@ -61,6 +69,10 @@ public:
     // the evidence prints ("module:m0 > function:inc"). Empty when no semantics.
     QString breadcrumbDisplay() const;
     QString breadcrumbDescribe() const;
+    // The semantic path behind breadcrumbDisplay(), outermost first (Entry::line
+    // is the syntax source's 0-based line). T20/A-3: the pane's clickable Bar
+    // renders exactly this list.
+    std::vector<vedit::breadcrumb::Entry> pathEntries() const;
     quint64 breadcrumbUpdates() const;
     quint64 breadcrumbChanges() const;
     bool semanticActive() const;
@@ -74,6 +86,10 @@ signals:
 private:
     void ensureSources();
     void refreshBreadcrumb();
+    // Mirrors breadcrumbModel_'s path to the view's "veditBreadcrumbEntries"
+    // property for the KTextEditor-free pane bar (the shell never includes this
+    // header). Always called with the model state of the current document.
+    void publishEntries();
     QString grammarId() const;
 
     KTextEditor::View *view_ = nullptr;

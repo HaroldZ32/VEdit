@@ -1,0 +1,38 @@
+# U3 review — my own claim checks (manual text vs code/evidence)
+# Format: claim (manual section) -> verdict -> basis
+1. 模块树根=从未被例化的模块；共享模块出现在每个父下；无网络/驱动行 (§11.1)
+   -> PASS -> src/workspace/module_tree/module_hierarchy.h (is_top roots; children per parent; NO net/driver rows)
+2. 模块树列 模块/例化次数/定义位置 (§11.1) -> PASS -> module_tree_panel.cpp setHeaderLabels(Module, Instantiations, Definition)
+3. 双击模块行打开定义并定位 module 声明 (§11.1) -> PASS -> module_tree_panel.cpp activateItem/itemDoubleClicked; b1/README acceptance ③
+4. 过滤：不区分大小写、三列任一、父行保留 (§11.1) -> PASS -> module_tree_panel.cpp applyFilter (recursive show())
+5. 汇总行 "追加一行 ⚠" (§11.1) -> NIT -> module_catalog.cpp summaryLine appends " · ⚠ %1" to the SAME line
+6. 接口列 名称/方向/类型/位宽/位置；位宽 logic[3:0]→4、无维度→1、不可解析→空+tooltip (§11.2)
+   -> PASS -> interface_panel.cpp header labels; module_catalog.cpp portWidthFromType (dimensions==0 -> 1; parser problem -> unknown)
+7. 焦点规则：树选中优先，否则同文件内 定义行<=光标行 的最近模块 (§11.2) -> PASS -> module_catalog.cpp moduleAtCaret; interface_panel.cpp setCaretContext/refreshFocus
+8. 双击端口=声明；Ctrl+双击=例化语句；多父先弹选择列表（父·实例路径·文件:行）(§11.2)
+   -> PASS -> interface_panel.cpp activatePortRow/jumpToInstantiation ("%1 · %2 · %3"); activationTooltip()
+9. 两个搜索入口共享 4 选项；工程级 2000 命中/15s；结果 文件/行/匹配三列；Verilog 过滤器 (§12.1-12.2)
+   -> PASS -> search_query.h; search_panel.cpp (resultLimit_ 2000, timeBudgetMs_ 15000, setHeaderLabels File/Line/Match, verilogOnly)
+10. 替换两个按钮；先保存后替换；写前拒绝条件列表 (§12.3)
+    -> PASS -> search_panel.cpp (finishReplaceRefusal messages, savedBeforeReplace_, "unsaved editor document could not be saved"); project_replace.h (per-hit fingerprint, size+mtime stamp, frozen query)
+11. 工程级 RE2 / Ctrl+F PCRE (§12.4) -> PASS -> search_query.h engine note; search_panel regex tooltip; find_replace uses QRegularExpression
+12. 保存后自动工程 lint：700ms 去抖、单飞、先落盘、静默、无模态 (§13.2)
+    -> PASS -> project_lint_trigger.cpp (700, cancelProjectPass before restart, setNextPassAutomatic); editor_area.cpp saveTab emits after provider save; project_lint_notice.cpp present(Mode::Automatic) never shows the dialog
+13. ELAB 模态只在显式 Lint Project；自动跑只给可点击状态栏 (§13.3)
+    -> PASS -> project_lint_notice.cpp present(): showDialog only for Mode::Explicit; notice link "<a href=jump>⚠ %1 project error(s)"; zh translation exists
+14. 悬浮：严重级+规则 id+消息；修复按钮仅在引擎能修；临时副本 --autofix 后一次可撤销整文替换 (§13.4)
+    -> PASS -> diagnostic_hover.cpp describeDiagnostic (severityLabel + rule, body=message); autofix.cpp --autofix=inplace on temp copy; autofix_document.cpp one transaction; zh "已用 verible-verilog-lint 修复 %1（一次撤销即可还原）"
+15. 普通符号 hover 仍可用，不因 hoverProvider=false 置灰 (§13.4) -> PASS -> ffi_backends.cpp action "hover" carve-out ("Always available ... measured with a real request")
+16. 文件点 红/黄/绿/无 (§13.5) -> PASS -> file_status_delegate.h enum Error/Warning/Clean/Unknown + dotColor; data from merged view
+17. Rename：非符号位置先给原因；能力缺失置灰+请求路径拒绝；未打开文件原子写；不承诺跨文件 (§13.6)
+    -> PASS -> lsp_actions.cpp applyWorkspaceEdit (atomicSaveText, summary), diagnostics_integration capability gate on request; translations "重命名需要光标位于符号上…"; handover §8.2
+18. Ctrl+左键=定义（与 F12 同派发）、Alt+左键=加/减光标、Alt+拖拽=块选、点分屏即激活 (§14)
+    -> PASS -> b4/README acceptance ①②③④; lsp_actions.cpp dispatchDefinitionAt; pane-activation/README
+19. Format 23 旋钮、默认不发 flag、恢复默认、高级折叠 (§15.2) -> PASS -> format_options.h kFormatKnobs (23 entries), formatArguments; settings_panel.cpp formatAdvancedButton_/"Restore defaults"
+20. Lint 单页双配置；不支持置灰+原因；transport-pending 如实标注；当前只 --rules_config 送达；发现路径未接 (§15.3)
+    -> PASS (as of this tree) -> lint_options.cpp lintKnobState; settings_panel.cpp 2175-2219; ffi_backends.cpp discoveredRulesPath stays empty. TIME-SENSITIVE: U6 will change this.
+21. 快捷键：§15.2 "Ctrl+Shift+F 一键格式化" / §14 "符号大纲 Ctrl+Shift+O" (Qt6 sections)
+    -> FALSE -> Qt6: diagnostics.format = Ctrl+Alt+F (diagnostics_integration.cpp addCommand), view.panel.outline = Ctrl+Alt+O (app_shell.cpp panelCommands); Ctrl+Shift+O is the file-tree Open action (file_tree_widget.cpp). GTK3 bindings are Ctrl+Shift+F/Ctrl+Shift+O (crates/vd-config/src/model.rs). ALSO: Ctrl+Alt+F collides with view.panel.file-tree (both defaults); CommandRegistry::add does not dedupe; SettingsPanel::conflicts() would list it.
+22. 语法扩展名表含 .sdc/.xdc→Tcl (§2) -> PASS -> highlight_mode.cpp kExtensionTable; resources/syntax/README.md
+23. 已知限制四条 (§16) -> PASS (in substance) -> §8 items 1-4 all present: no real-machine GUI/Xvfb tofu; cross-file rename not claimed; RE2 vs PCRE; the three search-replace residual bounds
+24. 纠正：04-hard-facts 5 份；kde README five；b1 "Every string is wrapped" gone -> PASS -> greps in 02-corrections-grep.txt

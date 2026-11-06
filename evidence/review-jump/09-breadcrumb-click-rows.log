@@ -1,0 +1,4 @@
+BREADCRUMB-CLICK segment=1 text='inc' line=4 status=delivered target-file='/tmp/vedit-fixture/top.sv' target-line=4 target-column=1 target-calls=1
+BREADCRUMB-CLICK segment=0 text='m0' line=1 status=delivered target-file='/tmp/vedit-fixture/top.sv' target-line=1 target-column=1 target-calls=2
+BREADCRUMB-NO-TARGET segment=1 activated=0 status=no-target target-calls=3
+SUMMARY checks=35 failures=0

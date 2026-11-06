@@ -453,7 +453,7 @@ int main(int argc, char **argv)
     check("fim.async.timeout-fires", timedOut,
           QStringLiteral("after %1 ms with a 300 ms budget").arg(timeoutElapsed));
     check("fim.async.timeout-status",
-          binding->statusText().contains(QStringLiteral("超时")), binding->statusText());
+          binding->statusText().contains(QStringLiteral("FIM timed out")), binding->statusText());
     check("fim.async.timeout-no-suggestion",
           !binding->hasSuggestion() && !binding->ghostVisible());
     check("fim.async.timeout-document-unchanged", document->text() == beforeTimeout);

@@ -1,0 +1,305 @@
+path,line,string,call_site,sink,already_wrapped,decision,reason
+src/app/app_shell.cpp,86,Save failed: %1,tr,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,87,Save failed: %1,tr,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,101,Close blocked: %1 has unsaved changes,tr,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,147,Session could not be restored (%1) — starting clean,other,showMessage,no,不译,transient status-bar feedback; kept English this wave by the documented batch-2 boundary
+src/app/app_shell.cpp,245,open.paths: opened %lld file(s): %s,log,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,248,Opened %1 file(s),tr,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,307,color: #e8a33d; font-weight: 600;,other,new QLabel,no,不译,not user-visible text (style sheet / log / developer message)
+src/app/app_shell.cpp,343,Empty state: no project open. This panel stays usable and empty.,other,addPanel,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,344,Empty state: nothing to show for this project yet.,other,addPanel,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,349,Source Control,other,addPanel,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,461,Open File,other,QFileDialog,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,462,Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;,other,QFileDialog,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,463,All Files (*),other,QFileDialog,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,483,Session saved (%1),tr,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,517,About VEdit,ui_text,QMessageBox,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,520,Diagnostics: %5,other,QMessageBox,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,667,Save failed: %1,other,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,685,Saved %1,other,showMessage,no,不译,transient status-bar feedback; kept English this wave by the documented batch-2 boundary
+src/app/app_shell.cpp,763,● Unsaved changes,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,765,unsaved document,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,768,Project: %1,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,772,Theme: %1,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,776,Panes: %1 · active: %2 · tabs: %3,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,790,no project,other,setWindowTitle,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,793,VEdit — %1[*],ui_text,setWindowTitle,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,804,close refused (headless): %1 has unsaved changes,tr,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,806,Close blocked: %1 has unsaved changes,tr,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,812,Unsaved changes,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,813,%1 has unsaved changes.,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,816,"This document has no file path yet, so it cannot be saved here.",tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,817,Close it and discard the changes?,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,819,"Save the document before closing, or discard the changes?",tr,QMessageBox,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,855,Save failed: %1,tr,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,856,Save failed: %1,tr,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,867,Close blocked: %1 has unsaved changes,other,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,939,Save failed: %1,tr,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,940,Save failed: %1,tr,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,954,Close blocked: %1 documents have unsaved changes,tr,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,965,close refused (headless): %1 documents have unsaved changes,tr,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,968,Close blocked: %1 documents have unsaved changes,tr,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,974,Unsaved changes,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,975,%1 documents have unsaved changes.,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,981,"Save all of them before continuing, or discard the changes?",tr,setInformativeText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,983,Save All,tr,setInformativeText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,984,Discard All,tr,setInformativeText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/app_shell.cpp,1016,Language not switched: restart cancelled,tr,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/editor_area.cpp,215,Close Pane,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/editor_area.cpp,396,Close File,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/editor_area.cpp,559,● %1,other,setTabText,no,不译,"decorative glyph prefix, not a sentence"
+src/app/main.cpp,687,search panel from a registered factory,ui_text,new QLabel,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/app/main.cpp,861,removed=%1 bindings=%2,other,addAction,no,不译,not user-visible text (style sheet / log / developer message)
+src/app/panel_registry.cpp,43,"factory through PanelRegistry::setFactory(""%2"", ...).",ui_text,new QLabel,no,不译,not user-visible text (style sheet / log / developer message)
+src/app/panel_registry.cpp,49,Empty state: no project / no data.,ui_text,new QLabel,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/editor/kernel/document_io.cpp,49,KTextEditor::Document::setText() failed for %1,other,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/editor/kernel/document_io.cpp,104,setText: no document,other,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/editor/kernel/document_io.cpp,110,KTextEditor::Document::setText() failed,other,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/editor/kernel/editor_advanced.cpp,342,%1 — available (%2),other,setToolTip,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/editor/kernel/editor_advanced.cpp,352,Module skeleton,other,setToolTip,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/editor/kernel/editor_advanced.cpp,353,always_ff block,other,setToolTip,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/editor/kernel/editor_advanced.cpp,354,case statement,other,setToolTip,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/editor/kernel/editor_context_menu.cpp,198,Language Server,other,setToolTip,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/editor/kernel/fim_wiring.cpp,49,"color: gray; background-color: rgba(160, 160, 160, 40); border-radius: 2px;",other,setText,no,不译,not user-visible text (style sheet / log / developer message)
+src/editor/kernel/fim_wiring.cpp,50, padding: 0px 2px;,other,setText,no,不译,not user-visible text (style sheet / log / developer message)
+src/editor/kernel/fim_wiring.cpp,56,FIM ghost text: previews the first line only; Tab inserts the full suggestion.,ui_text,setToolTip,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/editor/kernel/find_replace.cpp,365,Previous match (Shift+F3),tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/editor/kernel/find_replace.cpp,369,Next match (F3),tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/editor/kernel/find_replace.cpp,381,Close (Esc),tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/editor/kernel/find_replace.cpp,392,Replace with,tr,setPlaceholderText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/editor/kernel/find_replace.cpp,397,Replace the current match,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/editor/kernel/find_replace.cpp,400,Replace All,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/editor/kernel/find_replace.cpp,401,Replace every match in one undo step,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/editor/kernel/find_replace.cpp,883,Type to search,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/editor/kernel/find_replace.cpp,895, in selection,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/editor/kernel/lsp_actions.cpp,546,No diagnostics in this file,other,showMessage,no,不译,transient status-bar feedback; kept English this wave by the documented batch-2 boundary
+src/editor/kernel/lsp_actions.cpp,548,DIAG-NAV action=%1 count=0 moved=0 file='%2',other,showMessage,no,不译,not user-visible text (style sheet / log / developer message)
+src/editor/kernel/lsp_actions.cpp,573,DIAG-NAV action=%1 count=%2 index=%3 from=%4:%5 to=%6:%7 wrapped=%8 ,other,showMessage,no,不译,not user-visible text (style sheet / log / developer message)
+src/editor/kernel/lsp_actions.cpp,574,severity=%9 message='%10' file='%11',other,showMessage,no,不译,transient status-bar feedback; kept English this wave by the documented batch-2 boundary
+src/terminal/terminal_panel.cpp,190,Shell %1. Press Enter or Restart to start a new session.,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/terminal/terminal_panel.cpp,200,Shell: %1,other,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/terminal/terminal_panel.cpp,203,Not started,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/terminal/terminal_panel.cpp,207,Running · pid %1,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/terminal/terminal_panel.cpp,211,Killed · signal %1 (%2),ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/terminal/terminal_panel.cpp,217,Exited · code %1,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/terminal/terminal_panel.cpp,220,Stopped · %1,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/breadcrumb/breadcrumb_bar.cpp,147,%1: %2 (line %3),ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/diagnostics/diagnostics_integration.cpp,529,Selected LSP backend and CLI lint engine,ui_text,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/diagnostics/diagnostics_integration.cpp,655,Backend switch failed: %1,other,showMessage,no,不译,transient status-bar feedback; kept English this wave by the documented batch-2 boundary
+src/workspace/diagnostics/diagnostics_integration.cpp,721,%1 (%2) — %3 action(s),other,showMessage,no,不译,transient status-bar feedback; kept English this wave by the documented batch-2 boundary
+src/workspace/diagnostics/diagnostics_integration.cpp,722,no table,other,showMessage,no,不译,transient status-bar feedback; kept English this wave by the documented batch-2 boundary
+src/workspace/diagnostics/diagnostics_integration.cpp,724,unknown basis,other,showMessage,no,不译,transient status-bar feedback; kept English this wave by the documented batch-2 boundary
+src/workspace/diagnostics/diagnostics_integration.cpp,751,Hover needs a KTextEditor view,other,showMessage,no,不译,transient status-bar feedback; kept English this wave by the documented batch-2 boundary
+src/workspace/diagnostics/diagnostics_integration.cpp,766,Hover request refused by %1,other,showMessage,no,不译,transient status-bar feedback; kept English this wave by the documented batch-2 boundary
+src/workspace/diagnostics/diagnostics_integration.cpp,835,New name:,other,QInputDialog,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/diagnostics/diagnostics_integration.cpp,864,Formatting failed: %1,other,showMessage,no,不译,transient status-bar feedback; kept English this wave by the documented batch-2 boundary
+src/workspace/diagnostics/diagnostics_integration.cpp,873,FORMAT backend=%s formatter=%s changed=%d enabled-by='%s' ,log,setText,no,不译,not user-visible text (style sheet / log / developer message)
+src/workspace/diagnostics/diagnostics_integration.cpp,881,Formatted with verible-verilog-format,other,showMessage,no,不译,transient status-bar feedback; kept English this wave by the documented batch-2 boundary
+src/workspace/diagnostics/diagnostics_integration.cpp,882,Already formatted (verible-verilog-format),other,showMessage,no,不译,transient status-bar feedback; kept English this wave by the documented batch-2 boundary
+src/workspace/diagnostics/diagnostics_integration.cpp,892,No project file set — open a folder first,other,showMessage,no,不译,transient status-bar feedback; kept English this wave by the documented batch-2 boundary
+src/workspace/diagnostics/diagnostics_integration.cpp,911,Project lint did not start: %1,other,showMessage,no,不译,transient status-bar feedback; kept English this wave by the documented batch-2 boundary
+src/workspace/diagnostics/diagnostics_integration.cpp,923,Linting project with %1…,other,showMessage,no,不译,transient status-bar feedback; kept English this wave by the documented batch-2 boundary
+src/workspace/diagnostics/diagnostics_integration.cpp,974,%1 needs a KTextEditor view,other,showMessage,no,不译,transient status-bar feedback; kept English this wave by the documented batch-2 boundary
+src/workspace/diagnostics/diagnostics_integration.cpp,1016,No hover from %1 here,other,showMessage,no,不译,transient status-bar feedback; kept English this wave by the documented batch-2 boundary
+src/workspace/diagnostics/diagnostics_integration.cpp,1029,Rename preview: %1 edit(s) from %2,other,showMessage,no,不译,transient status-bar feedback; kept English this wave by the documented batch-2 boundary
+src/workspace/diagnostics/diagnostics_integration.cpp,1037,No definition found,other,showMessage,no,不译,transient status-bar feedback; kept English this wave by the documented batch-2 boundary
+src/workspace/diagnostics/diagnostics_integration.cpp,1058,%1 reference(s) from %2,other,showMessage,no,不译,transient status-bar feedback; kept English this wave by the documented batch-2 boundary
+src/workspace/diagnostics/diagnostics_integration.cpp,1070,LSP backend=%1 · lint=%2 · %3,ui_text,setText,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/workspace/diagnostics/diagnostics_panel.cpp,282,no diagnostics controller,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/diagnostics/diagnostics_panel.cpp,297,%1 — analyzed %2 (%3): %4 diagnostic(s),ui_text,setText,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/workspace/diagnostics/diagnostics_panel.cpp,303,saved file,other,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/diagnostics/diagnostics_panel.cpp,306,%1 — %2 diagnostic(s),ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/diagnostics/diagnostics_panel.cpp,317,No symbols — the outline backend is missing (%1). ,ui_text,setText,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/diagnostics/diagnostics_panel.cpp,318,See the status line above for the one-line fix.,ui_text,setText,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/diagnostics/diagnostics_panel.cpp,322,"No symbols yet for %1 — analysis is starting, ",ui_text,setText,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/diagnostics/diagnostics_panel.cpp,323,or this file has no structure.,ui_text,setText,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/diagnostics/diagnostics_panel.cpp,327,No symbols yet — open a file; analysis starts ,ui_text,setText,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/diagnostics/diagnostics_panel.cpp,389,<span style='color:%1'><b>Errors: %2</b></span>,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/diagnostics/diagnostics_panel.cpp,390,&nbsp;&nbsp;<span style='color:%3'><b>Warnings: %4</b></span>,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/diagnostics/diagnostics_panel.cpp,391,&nbsp;&nbsp;<span style='color:%5'>Information: %6</span>,other,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/diagnostics/diagnostics_panel.cpp,420,%1:%2:%3 — %4,ui_text,setToolTip,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/workspace/diagnostics/lint_progress.cpp,111,no request to re-run: the last pass had no files,other,setToolTip,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/workspace/diagnostics/lint_progress.cpp,176,cannot re-run this pass,ui_text,setText,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/workspace/filetree/file_tree_widget.cpp,54,Open a folder,ui_text,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,57,New File,ui_action,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,58,Create a file here (Ctrl+N),ui_text,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,61,New Folder,ui_action,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,62,Create a folder here (Ctrl+Shift+N),ui_text,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,66,Rename the selection (F2),ui_text,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,70,Delete the selection (Del),ui_text,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,74,Re-read the folder from disk (F5),ui_text,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,78,Collapse every expanded folder,ui_text,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,182,Opened '%1',other,setStatus,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/workspace/filetree/file_tree_widget.cpp,235,Created file '%1' (%2),other,setStatus,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,267,Created folder '%1',other,setStatus,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,296,Renamed '%1' to '%2',other,setStatus,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,334,Deleted '%1',other,setStatus,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/workspace/filetree/file_tree_widget.cpp,426,Open Folder,tr,QFileDialog,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,437,Open a folder first.,other,setStatus,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,443,New File,tr,QInputDialog,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,443,File name:,tr,QInputDialog,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,456,Open a folder first.,other,setStatus,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,462,New Folder,tr,QInputDialog,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,462,Folder name:,tr,QInputDialog,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,475,Select a file or folder first.,other,setStatus,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,481,New name:,tr,QInputDialog,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,494,Select a file or folder first.,other,setStatus,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,498,Cannot delete the folder that is open. Close it first.,other,setStatus,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,505,Delete the folder '%1' and everything inside it?,tr,QMessageBox,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,507,Delete the file '%1'?,tr,QMessageBox,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/file_tree_widget.cpp,528,Refreshed '%1',other,setStatus,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/workspace/filetree/file_tree_widget.cpp,654,color: #b3261e;,other,setText,no,不译,not user-visible text (style sheet / log / developer message)
+src/workspace/filetree/filetree_integration.cpp,45,Cannot open %1,selftest_out,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/filetree/filetree_integration.cpp,47,Opened %1,other,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/module_tree/module_tree_integration.cpp,135,hierarchy: retrying after the project ,other,setStatus,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/module_tree/module_tree_integration.cpp,171,No hierarchy yet: open a project and press ,other,setStatus,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/module_tree/module_tree_integration.cpp,244,Module Tree,other,addPanel,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/module_tree/module_tree_integration.cpp,249,Empty state: no elaborated project yet. Open a project and press ,other,addPanel,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/module_tree/module_tree_panel.cpp,45,%1 · no file:line reported,ui_text,setToolTip,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/workspace/module_tree/module_tree_panel.cpp,80,Re-elaborate the whole project,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/module_tree/module_tree_panel.cpp,84,Jump to source,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/module_tree/module_tree_panel.cpp,86,"Put the cursor on a signal in the editor, then jump to the construct that drives it",ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/module_tree/module_tree_panel.cpp,90,Jump to target,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/module_tree/module_tree_panel.cpp,92,"Put the cursor on a signal in the editor, then jump to the construct that reads it",ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/module_tree/module_tree_panel.cpp,96,Filter instance / net / file…,ui_text,setPlaceholderText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/module_tree/module_tree_panel.cpp,104,Instance / Net,other,setHeaderLabels,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/module_tree/module_tree_panel.cpp,138,No hierarchy yet: open a project and press Refresh.,other,setStatus,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/workspace/module_tree/module_tree_panel.cpp,148,No hierarchy yet: open a project and press Refresh.,other,setStatus,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/workspace/module_tree/module_tree_panel.cpp,158,"Hierarchy ready — double-click an instance, a net or a driver/load.",other,setText,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/workspace/palette/command_palette.cpp,148,Go to file…,ui_text,setPlaceholderText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/palette/command_palette.cpp,433,No project,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/palette/command_palette.cpp,438,%1 files · type to filter · Enter to open,ui_text,setText,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/workspace/palette/command_palette.cpp,440,%1 of %2 files,ui_text,setText,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/workspace/project/project_panel.cpp,74,Import Filelist…,ui_text,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,77,Add one or more .f filelists to the project file set,ui_text,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,84,Open a folder from the File Tree (or pass --project <dir>); the expanded ,ui_text,new QLabel,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/project/project_panel.cpp,85,"file list, include dirs and defines appear here.",ui_text,new QLabel,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/project/project_panel.cpp,91,Filelists (0),ui_text,new QLabel,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,98,Imported .f filelists; double-click to open one,ui_text,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,102,Remove Selected Filelist,ui_text,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,108,Files (0),ui_text,new QLabel,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,114,Double-click a file to open it (AC-7.4),ui_text,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,117,Include dirs (-I) (0),ui_text,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,126,Defines (-D) (0),ui_text,new QLabel,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,135,Variables (0),ui_text,new QLabel,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,142,Project variable table; wins over the environment,ui_text,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,146,Edit Variables…,ui_text,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,152,Diagnostics (0),ui_text,new QLabel,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,210,No project model is attached,other,setStatus,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,218,Imported %1 filelist%2,other,setStatus,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/workspace/project/project_panel.cpp,229,No project model is attached,other,setStatus,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,233,%1 is not an imported filelist,other,setStatus,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,236,Removed %1; the file set is being re-expanded,other,setStatus,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,271,%1 unresolved filelist variable(s): %2,other,setStatus,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/workspace/project/project_panel.cpp,280,Import completed with %1 unresolved variable(s); the affected ,other,setStatus,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/project/project_panel.cpp,281,.f lines stay listed below,other,setStatus,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/project/project_panel.cpp,289,Saved %1 variable(s); re-expanding,other,setStatus,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/workspace/project/project_panel.cpp,298,Open a folder before editing variables,other,setStatus,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,312,No variables are used by this project yet,other,setStatus,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/workspace/project/project_panel.cpp,322,Project variables updated; re-expanding,other,setStatus,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/workspace/project/project_panel.cpp,355,Cannot open %1: no editor jump target is registered,other,setStatus,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/workspace/project/project_panel.cpp,361,Cannot open %1: this build has no jump seam,other,setStatus,no,译（本批）,"batch-2: QCoreApplication::translate(""VEdit"", …) + Chinese translation"
+src/workspace/project/project_panel.cpp,410,⚠ %1,ui_text,setText,no,不译,"decorative glyph prefix, not a sentence"
+src/workspace/project/project_panel.cpp,411,color: #c0392b;,other,setText,no,不译,not user-visible text (style sheet / log / developer message)
+src/workspace/project/project_panel.cpp,420,Open a folder before importing a filelist,other,QFileDialog,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,424,Import Filelist,other,QFileDialog,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,425,Verilog filelists (*.f *.F *.flist);;All files (*),other,QFileDialog,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,448,Filelists (%1),ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,457,Files (%1),ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,466,Include dirs (-I) (%1),ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,471,Defines (-D) (%1),ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,476,Variables (%1),ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_panel.cpp,484,Diagnostics (%1),ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_variables_dialog.cpp,21,Filelist variables,ui_text,setWindowTitle,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/project/project_variables_dialog.cpp,28,These variables are used by the imported .f filelists but are not ,ui_text,new QLabel,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/project/project_variables_dialog.cpp,29,resolved by the project table or the environment. Fill them in once.,ui_text,new QLabel,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/project/project_variables_dialog.cpp,40,value for %1,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/search/search_jump_target.cpp,46,search: jump failed: %s,log,showMessage,no,不译,not user-visible text (style sheet / log / developer message)
+src/workspace/search/search_jump_target.cpp,120,Opened %1 line %2,other,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/search/search_jump_target.cpp,122,search: jump opened '%s' line=%d column=%d (cursor=%d:%d),log,showMessage,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/search/search_panel.cpp,54,Search text in the project…,tr,setPlaceholderText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/search/search_panel.cpp,62,Match case,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/search/search_panel.cpp,69,Only .v/.vh/.sv/.svh files (explicit extension table),tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/search/search_panel.cpp,361,Search failed: %1,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/search/search_panel.cpp,403,No project root.,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/search/search_panel.cpp,403,In %1,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,267,empty: use the resolved toolchain,tr,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,270,Choose %1,tr,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,274,Select %1,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,315,Applied immediately and stored as `theme` by the Rust service.,tr,new QLabel,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,324,Command shortcuts; a conflicting binding is shown in red.,tr,addTab,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,325,"LSP backend, lint engine, tool paths and -I/-D.",tr,addTab,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,327,Fill-in completions. The API key is never stored in settings.toml.,tr,addTab,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,342,Reload from disk,tr,new QPushButton,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,401,Type the API key first; the field is write-only.,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,406,API key stored owner-only (0600) in %1,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,433,Assign to selected command,tr,new QPushButton,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,437,New shortcut:,tr,new QPushButton,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,468,Interface language. Auto follows the system locale; a switch needs a restart.,tr,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,469,Restart now to apply,tr,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,476,Interface language:,tr,new QLabel,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,477,The interface language is applied on the next start.,tr,new QLabel,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,492,"Which language server answers diagnostics, outline, ",tr,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,493,"definition, references and rename.",ui_text,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,494,LSP backend:,tr,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,503,Which tool runs the project-wide batch lint (independent of the LSP backend).,tr,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,504,Lint engine:,tr,setToolTip,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,530,"one directory per line, e.g. rtl/include",tr,setPlaceholderText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,532,Include dirs (-I):,tr,setPlaceholderText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,536,"one define per line, e.g. WIDTH=8",tr,setPlaceholderText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,538,Defines (-D):,tr,setPlaceholderText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,541,Stored in settings.toml. The backend and lint-engine choices apply on the next ,tr,new QLabel,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,542,parse; -I/-D are handed to the project-wide lint.,ui_text,new QLabel,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,560,Enable FIM completion,tr,new QCheckBox,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,564,Show the suggestion as ghost text in the editor,tr,new QCheckBox,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,584,model name (required for the OpenAI protocol),tr,setPlaceholderText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,608,write-only — the stored key is never shown,tr,setPlaceholderText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,614,Save key,tr,new QPushButton,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,616,Remove key file,tr,new QPushButton,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,629,The key is never written to settings.toml and never logged. ,tr,new QLabel,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,630,VEDIT_FIM_API_KEY takes priority; otherwise it is read from the owner-only ,ui_text,new QLabel,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,631,(0600) file `fim_api_key` beside settings.toml.,ui_text,new QLabel,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,638,FIM is off by default: with no endpoint configured VEdit never touches the ,tr,new QLabel,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,650,Loading settings from %1 …,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,653,settings could not be loaded,other,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,656,Settings unavailable; showing the built-in defaults.,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,674,Settings loaded from %1,other,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,675,Settings loaded from %1 with %2 warning(s); the built-in ,other,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,676,defaults were kept where the file is invalid.,other,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,702,Theme '%1' is invalid; the default theme is ,ui_text,setText,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/settings/settings_panel.cpp,703,applied instead.,ui_text,setText,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/settings/settings_panel.cpp,742,Theme '%1' could not be applied.,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,749,Theme '%1' applied and stored by the Rust service.,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,770,Shortcut for '%1' set to %2 and stored by the Rust ,ui_text,setText,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/settings/settings_panel.cpp,786,Shortcut for '%1' cleared (default restored).,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,795,Select a command in the table first.,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,810,"Preview — press Apply or OK to store it, ",ui_text,setText,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/settings/settings_panel.cpp,811,Cancel to discard.,ui_text,setText,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/settings/settings_panel.cpp,826,the Rust settings store rejected ,other,setText,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/settings/settings_panel.cpp,827,the write,other,setText,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/settings/settings_panel.cpp,829,The settings change was applied but could not ,ui_text,setText,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/settings/settings_panel.cpp,830,be stored; see the diagnostics.,ui_text,setText,no,译（片段）,fragment of a batch-2 wrapped concatenation (translated as one message)
+src/workspace/settings/settings_panel.cpp,834,Stored by the Rust service in %1,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,898,Stored by the Rust service in %1,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,922,Changes discarded; nothing was stored.,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,934,No configuration problems reported by the Rust store.,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,935,%1 configuration problem(s) — the built-in defaults were kept ,other,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,936,where needed:,other,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,1103,Restart to apply.,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,1105,The interface language is applied on the next start.,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,1155,The interface language is already the stored one.,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,1335,Key source: environment variable %1 — it takes priority and is never written to ,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,1341,Key source: owner-only key file (0600) %1,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,1343,color: #a33; font-weight: bold;,other,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,1345,"Key source: %1 is readable by other users, so it is IGNORED. Run ",tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,1346,"`chmod 600` on it, or use %2.",ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,1351,Key source: none — set %1 or save a key here.,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,1424,The owner-only key file was removed; %1 is still set and ,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,1425,still wins.,other,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,1427,The API key file was removed; FIM has no key.,tr,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,1495,No conflicting shortcuts.,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,1498,color: #a33; font-weight: bold;,other,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/settings/settings_panel.cpp,1499,Conflicting shortcuts: %1,ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/vcs/vcs_panel.cpp,110,· %1 changed file(s),other,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/vcs/vcs_panel.cpp,124,not a Git or Subversion working tree,other,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts
+src/workspace/vcs/vcs_panel.cpp,127,"tree to see its branch, changed files and diffs.",ui_text,setText,yes,译（已完成）,wrapped before this wave; message present and translated in the .ts

@@ -1,0 +1,49 @@
+A3 repair — cross-lane note: the two `vedit-app-syntax-startup` SEGFAULT occurrences (review Medium 5)
+=====================================================================================================
+
+Context
+-------
+The A3 review (evidence/ux-batch-2/review-a3/REPORT.md, Medium 5) recorded that the
+`vedit-app-syntax-startup` test SEGFAULTed and that A3 could not prove the crash was outside its lane.
+Two occurrences were observed while A3 was being delivered:
+
+  1. evidence/ux-batch-2/a3/logs/13-ctest-final-clean.log
+     `1 - vedit-app-syntax-startup (SEGFAULT)` — "83% tests passed, 1 tests failed out of 6".
+  2. evidence/ux-batch-2/a3/logs/14-app-syntax-startup-rerun.log
+     three consecutive single-test reruns, each `***Exception: SegFault`.
+
+Both logs are kept as historical records (marked SUPERSEDED in logs/00-LOG-INDEX.md).
+
+Attribution (reported by the lane that owned the code)
+------------------------------------------------------
+The crash was later found and FIXED by another lane: a dangling `editor_` pointer on editor-provider
+switch in `src/app/editor_area.cpp` (a source file outside A3's write scope). A3 did not chase the crash
+and did not modify that file. The attribution is therefore the other lane's, not an A3 finding.
+
+Reproduction of the GREEN state on the repaired tree (this repair run)
+----------------------------------------------------------------------
+The tree was rebuilt from the final source (including the other lane's fix) and the packaging
+self-check was run on the rebuilt AppDir:
+
+  command : bash packaging/runtime/selfcheck.sh --appdir target/a3-appdir-repair/AppDir
+  log     : evidence/ux-batch-2/a3-repair/10-selfcheck-appdir.log
+  observed: APP-SHELL-SELFTEST ok=1 checks=312 failures=0 state=…
+            CHECK PASS  APP-SHELL-SELFTEST ok=1
+            SELFCHECK PASS
+  exit    : 0
+
+and the same test through ctest:
+
+  command : docker run … ctest --test-dir target/qt6-build -R "…|vedit-app-syntax-startup" --output-on-failure
+  log     : evidence/ux-batch-2/a3/logs/10-final-green.log
+  observed: 1/6 Test #1: vedit-app-syntax-startup … Passed 0.66 sec
+            100% tests passed, 0 tests failed out of 6
+            CTEST_EXIT=0
+
+Conclusion
+----------
+The two SEGFAULT occurrences are attributed to the other lane's dangling-pointer bug, which is fixed;
+the rebuilt tree passes the test both directly (`--selfcheck`, 312 PASS / 0 FAIL, exit 0) and through
+ctest. The reviewer's Medium 5 can be closed on this evidence. What this note does NOT prove: that the
+old crash could never have involved A3 — only that it no longer reproduces on the rebuilt tree and that
+the fix was made outside A3's scope.

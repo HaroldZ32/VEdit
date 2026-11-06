@@ -1,0 +1,13 @@
+# cbindgen header probe
+cwd=/tmp
+header=/vedit-build/crates/vd-ffi/include/vd_ffi.h
+snapshot=/tmp/vedit-vd-ffi-header-9d6tAr.h
+tracked_bytes=54754
+tracked_sha256=53a5398521e1c144a2afa0ed67a6ed0b045743b2022f7dbe00186156a3bc247a
+== force the build script (cbindgen) to run again ==
+   Compiling vd-ffi v0.1.1 (/vedit-build/crates/vd-ffi)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.46s
+regenerated_bytes=54754
+regenerated_sha256=53a5398521e1c144a2afa0ed67a6ed0b045743b2022f7dbe00186156a3bc247a
+header_byte_identical=yes
+build_qt_copy_identical=yes (/vedit-build/evidence/ffi-abi/logs/26-vd_ffi.h)

@@ -1,0 +1,13 @@
+baseline rows=1207  {'finished': 1004, 'unfinished': 182, 'vanished': 21}
+current messages=1186
+
+[1] baseline-finished=1004 present=1004 lost=0 changed=0
+
+[2] baseline-unfinished=182 missing=0 still-empty=0
+
+[3] baseline-vanished=21 still-present=0 unrecorded-in-removed-json=0
+
+[4] current keys outside baseline-active: 0
+[5] baseline-active keys missing from current: 0
+
+VERDICT SET-EQUALITY: OK

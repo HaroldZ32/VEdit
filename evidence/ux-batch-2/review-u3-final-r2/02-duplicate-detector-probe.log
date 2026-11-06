@@ -1,0 +1,5 @@
+BINDINGS=2 Ctrl+Shift+F	probe.first ; Ctrl+Shift+F	probe.second
+DUPLICATES=1 Ctrl+Shift+F: probe.first, probe.second
+WARNINGS=1 CommandRegistry: duplicate shortcut 'Ctrl+Shift+F' for 'probe.first' and 'probe.second'
+DETECTOR FIRES
+PROBE_EXIT=0

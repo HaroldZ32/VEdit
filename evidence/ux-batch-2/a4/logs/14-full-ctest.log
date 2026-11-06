@@ -1,0 +1,181 @@
+Test project /vedit-build/target/qt6-build
+      Start  1: vedit-app-syntax-startup
+ 1/42 Test  #1: vedit-app-syntax-startup .......................   Passed    0.69 sec
+      Start  2: vedit-m0-smoke
+ 2/42 Test  #2: vedit-m0-smoke .................................   Passed    0.05 sec
+      Start  3: vedit-syntax-provider-tests
+ 3/42 Test  #3: vedit-syntax-provider-tests ....................   Passed    0.00 sec
+      Start  4: vedit-syntax-kde-data
+ 4/42 Test  #4: vedit-syntax-kde-data ..........................   Passed    0.03 sec
+      Start  5: vedit-syntax-directory-equivalence
+ 5/42 Test  #5: vedit-syntax-directory-equivalence .............   Passed    0.02 sec
+      Start  6: vedit-syn-grammars-tests
+ 6/42 Test  #6: vedit-syn-grammars-tests .......................   Passed    0.17 sec
+      Start  7: vedit-syntax-product-tests
+ 7/42 Test  #7: vedit-syntax-product-tests .....................   Passed    0.05 sec
+      Start  8: vedit-terminal-selftest
+ 8/42 Test  #8: vedit-terminal-selftest ........................   Passed    2.12 sec
+      Start  9: vedit-syntax-overlay-selftest
+ 9/42 Test  #9: vedit-syntax-overlay-selftest ..................   Passed    2.19 sec
+      Start 10: vedit-app-ffi-abi-selftest
+10/42 Test #10: vedit-app-ffi-abi-selftest .....................   Passed    0.43 sec
+      Start 11: vedit-app-shell-selftest
+11/42 Test #11: vedit-app-shell-selftest .......................   Passed    0.68 sec
+      Start 12: vedit-app-crash-reporter-selftest
+12/42 Test #12: vedit-app-crash-reporter-selftest ..............   Passed    0.13 sec
+      Start 13: vedit-app-crash-report-shipped
+13/42 Test #13: vedit-app-crash-report-shipped .................   Passed    0.15 sec
+      Start 14: vedit-app-i18n-selftest
+14/42 Test #14: vedit-app-i18n-selftest ........................   Passed    0.00 sec
+      Start 15: vedit-app-ux-selftest
+15/42 Test #15: vedit-app-ux-selftest ..........................***Failed    5.15 sec
+CHECK a2.toolbar.undo-disabled-without-view PASS
+This plugin does not support propagateSizeHints()
+CHECK a2.menu.order PASS &File,&Edit,&View,&Project,&Help
+CHECK a2.menu.no-settings PASS
+CHECK a2.menu.preferences-in-edit PASS
+CHECK a2.menu.preferences-last-in-edit PASS
+CHECK a2.toolbar.exists PASS
+CHECK a2.toolbar.movable PASS
+CHECK a2.toolbar.object-name PASS
+CHECK a2.toolbar.action-order PASS action-file.new,action-file.open,action-file.open-folder,action-file.save,action-file.save-all,action-edit.undo,action-edit.redo,---,action-search.focus,action-project.lint,action-diagnostics.format
+CHECK a2.toolbar.shares-registry-actions PASS
+CHECK a2.toolbar.build-runs-command PASS
+CHECK a2.toolbar.format-runs-command PASS
+CHECK a2.toolbar.active-pane PASS
+CHECK a2.toolbar.demo-editor PASS
+CHECK a2.toolbar.new-opens-document PASS tabs 1 -> 2
+CHECK a2.toolbar.undo-enabled-with-view PASS
+CHECK a2.toolbar.undo-changes-document PASS VEdit application shell — demo editor pane #1
+
+This text view is the shell's placeholder editor. The real editor
+widget is injected by src/editor (edit-core) through the
+EditorProvider seam; nothing in the shell depends on KTextEditor.
+
+Layout operations worth trying:
+  * Ctrl+Shift+H  split horizontally (side by side)
+  * Ctrl+Shift+V  split vertically (stacked)
+  * F6            focus the next pane
+  * Ctrl+W        close the focused pane
+  * View menu     insert / hide the panel docks on demand
+
+CHECK a2.toolbar.redo-enabled PASS
+CHECK a2.toolbar.redo-restores-document PASS helloVEdit application shell — demo editor pane #1
+
+This text view is the shell's placeholder editor. The real editor
+widget is injected by src/editor (edit-core) through the
+EditorProvider seam; nothing in the shell depends on KTextEditor.
+
+Layout operations worth trying:
+  * Ctrl+Shift+H  split horizontally (side by side)
+  * Ctrl+Shift+V  split vertically (stacked)
+  * F6            focus the next pane
+  * Ctrl+W        close the focused pane
+  * View menu     insert / hide the panel docks on demand
+
+This plugin does not support propagateSizeHints()
+CHECK a2.toolbar.search-shows-panel PASS
+CHECK a2.toolbar.search-focuses-query PASS
+This plugin does not support propagateSizeHints()
+CHECK a2.help.manual-resource-not-empty PASS 14539 bytes
+CHECK a2.help.manual-has-title PASS VEdit 用户指南
+CHECK a2.help.command-exists PASS
+CHECK a2.help.command-shortcut PASS
+This plugin does not support propagateSizeHints()
+CHECK a2.help.viewer-opens PASS
+CHECK a2.help.viewer-renders-title PASS
+CHECK a2.i18n.qm-loaded PASS
+CHECK a2.i18n.menu-count PASS 文件(&F),编辑(&E),视图(&V),项目(&P),帮助(&H)
+CHECK a2.i18n.menu-0 PASS 文件(&F)
+CHECK a2.i18n.menu-1 PASS 编辑(&E)
+CHECK a2.i18n.menu-2 PASS 视图(&V)
+CHECK a2.i18n.menu-3 PASS 项目(&P)
+CHECK a2.i18n.menu-4 PASS 帮助(&H)
+CHECK a2.i18n.preferences PASS 首选项(&P)…
+CHECK a2.i18n.panel-toggle PASS 切换文件面板(&G)
+CHECK a2.i18n.context-menu-label PASS 跳转到定义(&D)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK a2.f1.terminal-panel PASS
+CHECK a2.f1.terminal-running PASS
+CHECK a2.f1.terminal-widget PASS
+CHECK a2.f1.terminal-focus PASS
+CHECK a2.f1.terminal-claims-shortcut-override PASS
+CHECK a2.f1.terminal-f1-reaches-pty FAIL
+CHECK a2.f1.terminal-does-not-open-manual PASS
+CHECK a2.f1.editor-focus-target PASS
+This plugin does not support propagateSizeHints()
+CHECK a2.f1.manual-opens-outside-terminal PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+CHECK a2.undo.real-ktexteditor-view PASS
+CHECK a2.undo.real-enabled-after-edit PASS
+CHECK a2.undo.real-changes-document PASS
+CHECK a2.redo.real-enabled-after-undo PASS
+CHECK a2.redo.real-restores-document PASS hello
+A2-UX-SELFTEST failures=1
+
+      Start 16: vedit-app-ux-screenshots
+16/42 Test #16: vedit-app-ux-screenshots .......................   Passed    0.34 sec
+      Start 17: vedit-native-fold-tests
+17/42 Test #17: vedit-native-fold-tests ........................   Passed    0.46 sec
+      Start 18: vedit-fold-gutter-click
+18/42 Test #18: vedit-fold-gutter-click ........................   Passed    0.24 sec
+      Start 19: vedit-edit-core-selftest
+19/42 Test #19: vedit-edit-core-selftest .......................   Passed    0.12 sec
+      Start 20: vedit-highlight-mode-selftest
+20/42 Test #20: vedit-highlight-mode-selftest ..................   Passed    0.07 sec
+      Start 21: vedit-editor-find-replace-selftest
+21/42 Test #21: vedit-editor-find-replace-selftest .............   Passed    0.06 sec
+      Start 22: vedit-editor-multi-cursor-selftest
+22/42 Test #22: vedit-editor-multi-cursor-selftest .............   Passed    0.09 sec
+      Start 23: vedit-signature-help-selftest
+23/42 Test #23: vedit-signature-help-selftest ..................   Passed    0.07 sec
+      Start 24: vedit-fim-wiring-selftest
+24/42 Test #24: vedit-fim-wiring-selftest ......................   Passed    1.93 sec
+      Start 25: vedit-breadcrumb-tests
+25/42 Test #25: vedit-breadcrumb-tests .........................   Passed    0.04 sec
+      Start 26: vedit-breadcrumb-click-tests
+26/42 Test #26: vedit-breadcrumb-click-tests ...................   Passed    0.05 sec
+      Start 27: vedit-jump-tests
+27/42 Test #27: vedit-jump-tests ...............................   Passed    0.00 sec
+      Start 28: vedit-fim-selftest
+28/42 Test #28: vedit-fim-selftest .............................   Passed    0.11 sec
+      Start 29: vedit-workspace-palette-selftest
+29/42 Test #29: vedit-workspace-palette-selftest ...............   Passed    0.13 sec
+      Start 30: vedit-workspace-palette-integration-selftest
+30/42 Test #30: vedit-workspace-palette-integration-selftest ...   Passed    0.19 sec
+      Start 31: vedit-workspace-search-selftest
+31/42 Test #31: vedit-workspace-search-selftest ................   Passed   12.24 sec
+      Start 32: vedit-workspace-project-selftest
+32/42 Test #32: vedit-workspace-project-selftest ...............   Passed    0.53 sec
+      Start 33: vedit-module-tree-selftest
+33/42 Test #33: vedit-module-tree-selftest .....................   Passed    0.39 sec
+      Start 34: vedit-lint-orchestration-probe
+34/42 Test #34: vedit-lint-orchestration-probe .................   Passed    0.02 sec
+      Start 35: vedit-workspace-diagnostics-selftest
+35/42 Test #35: vedit-workspace-diagnostics-selftest ...........   Passed    1.82 sec
+      Start 36: vedit-toolchain-missing-selftest
+36/42 Test #36: vedit-toolchain-missing-selftest ...............   Passed    0.00 sec
+      Start 37: vedit-diagnostics-ffi-selftest
+37/42 Test #37: vedit-diagnostics-ffi-selftest .................   Passed    3.22 sec
+      Start 38: vedit-diagnostics-product-seam
+38/42 Test #38: vedit-diagnostics-product-seam .................   Passed    6.16 sec
+      Start 39: vedit-toolchain-ux-selftest
+39/42 Test #39: vedit-toolchain-ux-selftest ....................   Passed    3.13 sec
+      Start 40: vedit-workspace-vcs-selftest
+40/42 Test #40: vedit-workspace-vcs-selftest ...................   Passed   14.94 sec
+      Start 41: vedit-workspace-settings-selftest
+41/42 Test #41: vedit-workspace-settings-selftest ..............   Passed    1.33 sec
+      Start 42: vedit-ui-scale-restart
+42/42 Test #42: vedit-ui-scale-restart .........................   Passed    0.33 sec
+
+98% tests passed, 1 tests failed out of 42
+
+Total Test time (real) =  59.88 sec
+
+The following tests FAILED:
+	 15 - vedit-app-ux-selftest (Failed)
+Errors while running CTest

@@ -1,0 +1,90 @@
+--> {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"processId": null, "clientInfo": {"name": "vedit-spike", "version": "0"}, "rootUri": "file:///fixture", "capabilities": {}, "workspaceFolders": null}}
+<-- notification {"jsonrpc": "2.0", "method": "slang/setConfig", "params": {"flags": "", "incdirs": [], "indexGlobs": [], "index": [], "excludeDirs": [], "indexingThreads": 0, "buildPattern": "**/*.f", "buildRelativePaths": false, "hovers": {"docCommentFormat": "markdown"}, "inlayHints": {"portTypes": false, "assignmentPatternTypes": true, "activeParameterValues": true, "orderedInstanceNames": true, "wildcardNames": true, "funcArgNames": 2, "macroArgNames": 2}, "builds": []}}
+<-- {
+ "jsonrpc": "2.0",
+ "id": 1,
+ "result": {
+  "capabilities": {
+   "textDocumentSync": {
+    "openClose": true,
+    "change": 2,
+    "save": {
+     "includeText": true
+    }
+   },
+   "completionProvider": {
+    "triggerCharacters": [
+     "`",
+     "#",
+     ".",
+     "(",
+     ":",
+     "[",
+     "$",
+     "{"
+    ],
+    "resolveProvider": true,
+    "completionItem": {
+     "labelDetailsSupport": true
+    }
+   },
+   "hoverProvider": true,
+   "definitionProvider": true,
+   "referencesProvider": true,
+   "documentHighlightProvider": true,
+   "documentSymbolProvider": true,
+   "codeActionProvider": true,
+   "codeLensProvider": {
+    "resolveProvider": false
+   },
+   "documentLinkProvider": {
+    "resolveProvider": false,
+    "workDoneProgress": false
+   },
+   "workspaceSymbolProvider": true,
+   "renameProvider": true,
+   "executeCommandProvider": {
+    "commands": [
+     "slang.autoConfigure",
+     "slang.addDefine",
+     "slang.setIncludeContext",
+     "slang.showLocation",
+     "slang.getActiveInstance",
+     "slang.activateInstance",
+     "slang.setActiveInstance",
+     "slang.getScopesByModule",
+     "slang.getInstancesOfModule",
+     "slang.getFilesContainingModule",
+     "slang.setTopLevel",
+     "slang.openModuleDefinition",
+     "slang.setBuildFile",
+     "slang.searchHierarchy",
+     "slang.getInstances",
+     "slang.getDriversWithLocation",
+     "slang.expandMacros",
+     "slang.openWaveform",
+     "slang.getModulesInFile",
+     "slang.addToWaveform",
+     "slang.getScope",
+     "slang.getLoadsWithLocation",
+     "slang.getScopes",
+     "slang.showHierLocation"
+    ]
+   },
+   "callHierarchyProvider": true,
+   "inlayHintProvider": {
+    "resolveProvider": false
+   }
+  },
+  "serverInfo": {
+   "name": "slang-server",
+   "version": "0.3.1+2ad996f\n"
+  }
+ }
+}
+handshake_seconds=0.205
+serverInfo={"name": "slang-server", "version": "0.3.1+2ad996f\n"}
+capabilities=["callHierarchyProvider", "codeActionProvider", "codeLensProvider", "completionProvider", "definitionProvider", "documentHighlightProvider", "documentLinkProvider", "documentSymbolProvider", "executeCommandProvider", "hoverProvider", "inlayHintProvider", "referencesProvider", "renameProvider", "textDocumentSync", "workspaceSymbolProvider"]
+notifications_before_response=["slang/setConfig"]
+<-- {"jsonrpc": "2.0", "method": "slang/setConfig", "params": {"flags": "", "incdirs": [], "indexGlobs": [], "index": [], "excludeDirs": [], "indexingThreads": 0, "buildPattern": "**/*.f", "buildRelativePaths": false, "hovers": {"docCommentFormat": "markdown"}, "inlayHints": {"portTypes": false, "assignmentPatternTypes": true, "activeParameterValues": true, "orderedInstanceNames": true, "wildcardNames": true, "funcArgNames": 2, "macroArgNames": 2}, "builds": []}}
+exit=0

@@ -1,0 +1,1265 @@
+UpdateCTestConfiguration  from :/vedit-build/target/qt6-build/DartConfiguration.tcl
+Test project /vedit-build/target/qt6-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 11
+    Start 11: vedit-app-shell-selftest
+
+11: Test command: /vedit-build/target/qt6-build/src/app/vedit-app "--selfcheck" "--state-dir" "/vedit-build/target/qt6-build/src/app/selftest-state"
+11: Working Directory: /vedit-build/target/qt6-build/src/app
+11: Environment variables: 
+11:  QT_QPA_PLATFORM=offscreen
+11:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime
+11: Test timeout computed to be: 120
+11: syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+11: TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server] local=[/vedit-build/build/slang/out,/vedit-build/.mpd/recon/verible/bin]
+11: CHECK path.display.under-root PASS rtl/top.sv
+11: CHECK path.display.under-root.normalized-root PASS
+11: CHECK path.display.outside-root PASS /tmp/vedit-app-YmbuQy/display-outside/top.sv
+11: CHECK path.display.no-root PASS /tmp/vedit-app-YmbuQy/display-outside/top.sv
+11: CHECK path.display.sibling-prefix-outside PASS
+11: CHECK path.display.root-itself-absolute PASS
+11: CHECK path.display.root-normalized PASS /tmp/vedit-app-YmbuQy/display-root
+11: This plugin does not support propagateSizeHints()
+11: CHECK empty.no-project-label PASS
+11: CHECK empty.one-pane PASS
+11: CHECK empty.window-title PASS
+11: CHECK panels.no-settings-dock PASS
+11: CHECK panels.registry.five PASS
+11: CHECK panels.registered.file-tree PASS
+11: CHECK panels.registered.search PASS
+11: CHECK panels.registered.terminal PASS
+11: CHECK panels.registered.vcs PASS
+11: CHECK panels.registered.outline PASS
+11: CHECK panels.none-inserted-by-default PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.show.file-tree PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.toggle-hide.file-tree PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.toggle-show.file-tree PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.show.search PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.toggle-hide.search PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.toggle-show.search PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.show.terminal PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.toggle-hide.terminal PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.toggle-show.terminal PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.show.vcs PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.toggle-hide.vcs PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.toggle-show.vcs PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.show.outline PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.toggle-hide.outline PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.toggle-show.outline PASS
+11: CHECK panels.five-docks PASS
+11: CHECK menus.file PASS
+11: CHECK menus.view PASS
+11: CHECK menus.settings PASS
+11: CHECK menus.help PASS
+11: CHECK settings.preferences.exists PASS
+11: CHECK settings.preferences.menu PASS
+11: CHECK settings.preferences.shortcut PASS Ctrl+,
+11: CHECK settings.preferences.unique-shortcut PASS bindings=1
+11: CHECK commands.action.file.new-layout PASS
+11: CHECK commands.action.file.close-pane PASS
+11: CHECK commands.action.file.quit PASS
+11: CHECK commands.action.view.split.horizontal PASS
+11: CHECK commands.action.view.split.vertical PASS
+11: CHECK commands.action.view.focus.next PASS
+11: CHECK commands.action.view.layout.reset PASS
+11: CHECK commands.action.help.about PASS
+11: CHECK commands.action.view.panel.file-tree PASS
+11: CHECK commands.action.view.panel.outline PASS
+11: CHECK commands.file-menu-actions PASS
+11: CHECK commands.view-panel-actions-checkable PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.sync.closed.file-tree PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.sync.action-show.file-tree PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.sync.close-clears-check.file-tree PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.sync.one-click-reopen.file-tree PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.sync.closed.search PASS
+11: CHECK panels.sync.action-show.search PASS
+11: CHECK panels.sync.close-clears-check.search PASS
+11: CHECK panels.sync.one-click-reopen.search PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.sync.closed.terminal PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.sync.action-show.terminal PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.sync.close-clears-check.terminal PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.sync.one-click-reopen.terminal PASS
+11: This plugin does not support propagateSizeHints()
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.sync.closed.vcs PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.sync.action-show.vcs PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.sync.close-clears-check.vcs PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.sync.one-click-reopen.vcs PASS
+11: This plugin does not support propagateSizeHints()
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.sync.closed.outline PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.sync.action-show.outline PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.sync.close-clears-check.outline PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.sync.one-click-reopen.outline PASS
+11: This plugin does not support propagateSizeHints()
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.sync.reverse-precondition PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panels.sync.reverse-control PASS
+11: This plugin does not support propagateSizeHints()
+11: This plugin does not support propagateSizeHints()
+11: CHECK split.horizontal.pane-count PASS
+11: CHECK split.horizontal.root-orientation PASS
+11: This plugin does not support propagateSizeHints()
+11: This plugin does not support propagateSizeHints()
+11: CHECK split.vertical.pane-count PASS
+11: CHECK split.vertical.root-orientation PASS
+11: CHECK panes.three PASS
+11: CHECK focus.set-second PASS
+11: CHECK focus.next-wraps PASS
+11: This plugin does not support propagateSizeHints()
+11: This plugin does not support propagateSizeHints()
+11: CHECK close.pane-count PASS
+11: This plugin does not support propagateSizeHints()
+11: This plugin does not support propagateSizeHints()
+11: CHECK reset.one-pane PASS
+11: CHECK close.last-pane.keeps-one PASS
+11: CHECK close.last-pane.active PASS
+11: CHECK close.command.exists PASS
+11: CHECK close.command.in-view PASS
+11: CHECK close.command.shortcut-ctrl-w PASS
+11: CHECK close.shortcuts.no-conflicts PASS
+11: CHECK close.shortcuts.binding-count PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK close.split.pane-count PASS
+11: CHECK close.split.editor-editable PASS
+11: This plugin does not support propagateSizeHints()
+11: [app-shell] close refused (headless): untitled has unsaved changes
+11: CHECK close.unsaved.blocked PASS
+11: CHECK close.reverse-control PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK close.unsaved-saved-close PASS
+11: CHECK close.remaining-editable PASS
+11: CHECK close.last-single-view PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK close.button.split PASS
+11: CHECK close.button.present PASS
+11: This plugin does not support propagateSizeHints()
+11: This plugin does not support propagateSizeHints()
+11: CHECK close.button.single-view PASS
+11: CHECK open.command.exists PASS
+11: CHECK open.command.in-file-menu PASS
+11: CHECK open.command.shortcut-ctrl-o PASS
+11: CHECK open.fixture-a PASS
+11: CHECK open.fixture-b PASS
+11: CHECK open.missing.rejected PASS
+11: CHECK open.missing.nonzero-readable PASS
+11: CHECK open.multiple.ok PASS
+11: CHECK open.multiple.pane-count PASS
+11: CHECK open.multiple.paths PASS
+11: CHECK open.multiple.active-second PASS
+11: This plugin does not support propagateSizeHints()
+11: This plugin does not support propagateSizeHints()
+11: CHECK open.dialog.action-opens PASS
+11: CHECK path.display.title.absolute-no-root PASS VEdit — /tmp/vedit-app-YmbuQy/open-a.sv[*]
+11: CHECK path.display.tab-tooltip.absolute-no-root PASS /tmp/vedit-app-YmbuQy/open-a.sv
+11: CHECK open.filter.filelist PASS Verilog/SystemVerilog/filelist (*.v *.sv *.svh *.vh *.f *.F *.flist);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F *.flist);;All Files (*)
+11: CHECK open.filter.keeps-existing-types PASS Verilog/SystemVerilog/filelist (*.v *.sv *.svh *.vh *.f *.F *.flist);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F *.flist);;All Files (*)
+11: CHECK open.signal.opens PASS
+11: CHECK open.signal.one-per-open PASS /tmp/vedit-app-YmbuQy/open-a.sv,/tmp/vedit-app-YmbuQy/open-b.sv
+11: CHECK open.signal.failed-open-silent PASS
+11: CHECK open.signal.direct-pane-open PASS
+11: This plugin does not support propagateSizeHints()
+11: This plugin does not support propagateSizeHints()
+11: This plugin does not support propagateSizeHints()
+11: CHECK theme.catalogue PASS
+11: CHECK theme.apply PASS
+11: CHECK theme.invalid.rejected PASS
+11: CHECK theme.invalid.keeps-palette PASS
+11: CHECK shortcut.override.applied PASS
+11: CHECK session.save PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK restore.pane-count PASS
+11: CHECK restore.layout-tree PASS
+11: CHECK restore.active-pane PASS
+11: CHECK restore.theme PASS
+11: CHECK restore.panel-visible PASS
+11: CHECK restore.shortcut PASS
+11: CHECK panel-seam.seed-session PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK panel-seam.deferred-nothing-inserted PASS
+11: This plugin does not support propagateSizeHints()
+11: This plugin does not support propagateSizeHints()
+11: This plugin does not support propagateSizeHints()
+11: CHECK panel-seam.dock-restored PASS
+11: CHECK panel-seam.terminal-content PASS
+11: CHECK panel-seam.search-content PASS
+11: CHECK panel-seam.no-placeholder PASS
+11: CHECK panel-seam.editor-layout-restored PASS panes=2
+11: [app-shell] invalid shortcut store /tmp/vedit-app-YmbuQy/broken/shortcuts.json: illegal number
+11: [app-shell] invalid session /tmp/vedit-app-YmbuQy/broken/session.json: unterminated object
+11: This plugin does not support propagateSizeHints()
+11: CHECK broken.config.survives PASS
+11: CHECK broken.config.diagnostics PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK stress.one-pane-initial PASS
+11: This plugin does not support propagateSizeHints()
+11: This plugin does not support propagateSizeHints()
+11: This plugin does not support propagateSizeHints()
+11: This plugin does not support propagateSizeHints()
+11: CHECK stress.pane-invariant PASS
+11: CHECK stress.non-null-active PASS
+11: CHECK save.command.registered PASS
+11: CHECK save.shortcut.ctrl-s PASS
+11: CHECK save.menu.file-item PASS
+11: CHECK save.demo.open PASS
+11: CHECK save.demo.action.disk-bytes PASS
+11: CHECK save.demo.action.path-unchanged PASS
+11: CHECK save.demo.action.no-temp-file PASS
+11: kf.sonnet.core: Sonnet: No speller backends available!
+11: [edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+11: This plugin does not support propagateSizeHints()
+11: CHECK editor.provider.id PASS
+11: CHECK editor.pane.ktexteditor-widget PASS
+11: CTRL-S-BINDING after-provider-install objectName=action-file.save class=QAction shortcut=Ctrl+S context=1 associated=[QMenu() ] holders=[QMenu() ] chain=vedit::app::ApplicationShell<
+11: CHECK save.shortcut.unique PASS bindings=1
+11: CHECK save.shortcut.authority PASS
+11: CHECK save.shortcut.runtime-duplicate-enumerated PASS bindings=2
+11: CHECK save.shortcut.runtime-unguarded-turn-keeps-duplicate PASS bindings=2
+11: CHECK save.shortcut.runtime-guard-clears PASS bindings=1
+11: CHECK save.shortcut.runtime-guard-authority PASS
+11: CHECK save.shortcut.runtime-guard-entry-point PASS removed=1 bindings=1
+11: CHECK save.shortcut.runtime-guard-timer PASS
+11: [edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+11: CHECK editor.pane.open PASS
+11: CHECK editor.pane.open-path PASS /tmp/vedit-app-YmbuQy/pane-open.v
+11: CHECK editor.pane.save PASS
+11: CHECK save.ktexteditor.document PASS
+11: CHECK save.shortcut.window PASS
+11: CHECK save.shortcut.disk-bytes PASS
+11: CHECK save.shortcut.modified-cleared PASS
+11: CHECK save.shortcut.path-unchanged PASS
+11: CHECK save.menu.disk-bytes PASS
+11: CHECK save.menu.path-unchanged PASS
+11: CHECK save.no-temp-file PASS
+11: [app-shell] Save failed: atomic save: injected write failure
+11: [app-shell] Save failed: atomic save: injected write failure
+11: CHECK save.failure.disk-unchanged PASS
+11: CHECK save.failure.status-bar PASS
+11: CHECK save.failure.diagnostic PASS
+11: CHECK save.failure.still-modified PASS
+11: CHECK save.recovery.disk-bytes PASS
+11: CHECK save.recovery.not-modified PASS
+11: This plugin does not support propagateSizeHints()
+11: CTRL-S-BINDING after-split objectName=action-file.save class=QAction shortcut=Ctrl+S context=1 associated=[QMenu() ] holders=[QMenu() ] chain=vedit::app::ApplicationShell<
+11: CHECK save.shortcut.unique.multi-pane PASS bindings=1
+11: This plugin does not support propagateSizeHints()
+11: This plugin does not support propagateSizeHints()
+11: This plugin does not support propagateSizeHints()
+11: CHECK fold.native.pane PASS
+11: This plugin does not support propagateSizeHints()
+11: [edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+11: CHECK fold.native.open PASS
+11: CHECK fold.native.view PASS
+11: CHECK fold.native.highlight-mode PASS SystemVerilog
+11: CHECK fold.native.binding PASS
+11: CHECK fold.native.no-auto-folds PASS hidden=0
+11: FOLD-NATIVE breadcrumb describe='module:m0 > function:inc' bar='m0 > inc'
+11: CHECK fold.native.breadcrumb.describe PASS module:m0 > function:inc
+11: CHECK fold.native.breadcrumb.pane-bar PASS m0 > inc
+11: CHECK fold.native.breadcrumb.no-invention PASS describe='' bar=''
+11: [edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+11: CHECK fold.native.second-open PASS
+11: CHECK fold.native.second-view PASS
+11: CHECK fold.native.second-cursor PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK editcore.scratch PASS
+11: CHECK editcore.ktexteditor.instance PASS
+11: CHECK editcore.document.create PASS
+11: CHECK editcore.undo.metaobject-slot PASS
+11: CHECK editcore.document.setText PASS
+11: CHECK editcore.open.fixture-written PASS
+11: [edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+11: CHECK editcore.open.file PASS
+11: CHECK editcore.open.records-path PASS /tmp/vedit-app-gsrhzS/open.v
+11: CHECK editcore.highlight.verilog.fixture PASS
+11: [edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+11: CHECK editcore.highlight.verilog.open PASS
+11: CHECK editcore.highlight.verilog.mode PASS mode='Verilog' expected='Verilog'
+11: CHECK editcore.highlight.verilog.definition PASS Verilog
+11: CHECK editcore.highlight.verilog.format-ranges PASS 25
+11: CHECK editcore.highlight.verilog.folding-regions PASS begins=2 ends=2
+11: CHECK editcore.highlight.systemverilog.fixture PASS
+11: [edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+11: CHECK editcore.highlight.systemverilog.open PASS
+11: CHECK editcore.highlight.systemverilog.mode PASS mode='SystemVerilog' expected='SystemVerilog'
+11: CHECK editcore.highlight.systemverilog.definition PASS SystemVerilog
+11: CHECK editcore.highlight.systemverilog.format-ranges PASS 26
+11: CHECK editcore.highlight.systemverilog.folding-regions PASS begins=1 ends=1
+11: CHECK editcore.atomic.fresh-file PASS
+11: CHECK editcore.atomic.fresh-content PASS
+11: CHECK editcore.atomic.no-temp-left PASS
+11: CHECK editcore.atomic.replace PASS
+11: CHECK editcore.atomic.replace-no-temp PASS
+11: CHECK editcore.atomic.fault.write-fails PASS
+11: CHECK editcore.atomic.fault.write-keeps-target PASS
+11: CHECK editcore.atomic.fault.write-cleans-temp PASS
+11: CHECK editcore.atomic.fault.rename-fails PASS
+11: CHECK editcore.atomic.fault.rename-keeps-target PASS
+11: CHECK editcore.atomic.fault.rename-cleans-temp PASS
+11: CHECK editcore.atomic.fault.dir-fsync-nonfatal PASS atomic save: injected directory fsync failure;directory fsync skipped by fault injection
+11: CHECK editcore.atomic.fault.dir-fsync-content PASS
+11: CHECK editcore.save.kernel PASS
+11: CHECK editcore.save.bytes PASS
+11: CHECK editcore.save.clears-modified PASS
+11: CHECK editcore.find.count PASS 3
+11: CHECK editcore.find.adjacent PASS
+11: CHECK editcore.replace.count PASS found=3 replaced=3
+11: CHECK editcore.replace.text PASS zz bbb zz ccc zz
+11: 
+11: CHECK editcore.replace.one-undo PASS
+11: CHECK editcore.replace.redo PASS
+11: CHECK editcore.goto.line PASS
+11: CHECK editcore.goto.clamp-low PASS
+11: CHECK editcore.goto.clamp-high PASS line=3
+11: CHECK editcore.goto.column-zero PASS
+11: CHECK editcore.undo.100-operations PASS 100
+11: CHECK editcore.undo.100-back-to-original PASS mismatches=0 error=
+11: CHECK editcore.redo.100-forwards PASS mismatches=0
+11: EDITCORE-UNDO sha-before=c2a908d98f5df987ade41b5fce213067efbcc21ef2240212a41e54b5e7c28ae5 sha-after=991ab4d4e3f17a75c77ed6a7000fe568ae995f0dd92fe827129ee74ae2214f98
+11: CHECK editcore.multicursor.native-api PASS
+11: CHECK editcore.multicursor.native-read-back PASS
+11: CHECK editcore.multicursor.native-insert-call PASS
+11: EDITCORE-MULTICURSOR native-cursors=3 native-inserted-x=1 text="Xaaa
+11: "
+11: CHECK editcore.multicursor.native-insert-primary PASS 1
+11: CHECK editcore.multicursor.batch-insert PASS
+11: CHECK editcore.multicursor.batch-text PASS XaXaXa
+11: 
+11: CHECK editcore.multicursor.batch-one-undo PASS
+11: CHECK editcore.multicursor.batch-redo PASS
+11: CHECK editcore.wsedit.fixture-open PASS
+11: CHECK editcore.wsedit.fixture-disk PASS
+11: CHECK editcore.wsedit.view PASS
+11: CHECK editcore.wsedit.open-visible PASS 3
+11: CHECK editcore.wsedit.applied PASS
+11: CHECK editcore.wsedit.counts PASS edits=3 files=2 editor=1 disk=1
+11: CHECK editcore.wsedit.open-text PASS module top;
+11:   wire new_name;
+11:   new_name = 1;
+11: endmodule
+11: 
+11: CHECK editcore.wsedit.open-dirty PASS
+11: CHECK editcore.wsedit.disk-text PASS // new_name
+11: 
+11: CHECK editcore.wsedit.summary PASS Rename applied: 3 edit(s) in 2 file(s) — 1 document(s) changed in the editor, 1 file(s) written on disk
+11: CHECK editcore.wsedit.one-undo PASS
+11: CHECK editcore.wsedit.one-redo PASS
+11: CHECK editcore.wsedit.out-of-range-refused PASS /tmp/vedit-app-gsrhzS/rename-open.sv: edit line 1000-1000 is outside rename-open.sv (5 line(s))
+11: CHECK editcore.wsedit.refusal-keeps-buffer PASS
+11: CHECK editcore.wsedit.refusal-keeps-file PASS // new_name
+11: 
+11: CHECK editcore.wsedit.missing-file-refused PASS cannot change /tmp/vedit-app-gsrhzS/does-not-exist.sv: No such file or directory
+11: CHECK editcore.wsedit.empty-refused PASS
+11: CHECK editcore.references.empty PASS
+11: CHECK editcore.references.count PASS 2
+11: CHECK editcore.references.ordered PASS
+11: CHECK editcore.references.open-snippet PASS wire new_name;
+11: CHECK editcore.references.location-text PASS /tmp/vedit-app-gsrhzS/rename-open.sv:2:8
+11: CHECK editcore.references.disk-snippet PASS // new_name
+11: CHECK editcore.gates.document PASS
+11: CHECK editcore.gates.view PASS
+11: CHECK editcore.gates.channel PASS
+11: CHECK editcore.gates.rename-disabled PASS verible does not advertise renameProvider for this session
+11: CHECK editcore.gates.rename-real-reason PASS verible does not advertise renameProvider for this session
+11: CHECK editcore.gates.rename-action-greyed PASS
+11: ACTION-REFUSED action=rename enabled=0 known=1 source=backend reason='verible does not advertise renameProvider for this session'
+11: CHECK editcore.gates.rename-refused PASS verible does not advertise renameProvider for this session
+11: CHECK editcore.gates.rename-enabled PASS
+11: CHECK editcore.gates.rename-action-enabled PASS
+11: CHECK editcore.provider.id PASS ktexteditor
+11: CHECK editcore.provider.creates-view PASS
+11: CHECK editcore.provider.fixture PASS
+11: [edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+11: CHECK editcore.provider.open PASS
+11: CHECK editcore.provider.open-records-path PASS /tmp/vedit-app-Aneeve/provider.v
+11: CHECK editcore.provider.document PASS
+11: CHECK editcore.provider.save PASS
+11: CHECK editcore.provider.save-bytes PASS
+11: CHECK editcore.boundary.zero-calls PASS before=0 after=0
+11: CHECK editcore.boundary.counter-live PASS before=0 after=1
+11: EDIT-CORE-SELFTEST ok=1 checks=99 failures=0
+11: CHECK root.restored-before-install PASS /tmp/vedit-app-YmbuQy/project-a
+11: CHECK root.explicit-wins PASS /tmp/vedit-app-YmbuQy/project-b
+11: This plugin does not support propagateSizeHints()
+11: CHECK path.display.under-root.open PASS
+11: This plugin does not support propagateSizeHints()
+11: CHECK path.display.window-title.relative PASS VEdit — rtl/foo.sv[*]
+11: CHECK path.display.tab-tooltip.relative PASS rtl/foo.sv
+11: CHECK path.display.open-key-still-absolute PASS /tmp/vedit-app-YmbuQy/project-a/rtl/foo.sv
+11: CHECK path.display.outside-root.open PASS
+11: CHECK path.display.window-title.outside-absolute PASS VEdit — /tmp/vedit-app-YmbuQy/outside/other.sv[*]
+11: CHECK path.display.tab-tooltip.outside-absolute PASS /tmp/vedit-app-YmbuQy/outside/other.sv
+11: CHECK root.switch-broadcast PASS /tmp/vedit-app-YmbuQy/project-b
+11: CHECK root.switch-value PASS /tmp/vedit-app-YmbuQy/project-b
+11: CHECK root.switch-label PASS project-b
+11: CHECK root.switch-idempotent PASS events=1
+11: CHECK root.open-folder-command PASS
+11: CHECK root.open-folder-menu PASS
+11: CHECK root.open-folder-switches PASS /tmp/vedit-app-YmbuQy/project-a
+11: CHECK root.open-folder-broadcast PASS events=2
+11: CHECK root.open-folder-cancel PASS events=2
+11: CHECK root.switch.persisted PASS
+11: CHECK root.switch.persisted-value PASS
+11: APP-SHELL-SELFTEST ok=1 checks=312 failures=0 state=/tmp/vedit-app-YmbuQy/state
+1/6 Test #11: vedit-app-shell-selftest .......................   Passed    0.68 sec
+test 25
+    Start 25: vedit-workspace-palette-selftest
+
+25: Test command: /vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-selftest "--screenshots" "/vedit-build/target/qt6-build/src/app/workspace-lane-palette/screenshots"
+25: Working Directory: /vedit-build/target/qt6-build/src/app/workspace-lane-palette
+25: Environment variables: 
+25:  QT_QPA_PLATFORM=offscreen
+25:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime
+25: Test timeout computed to be: 120
+25: CHECK fixture.temp-dir PASS
+25: CHECK fuzzy.main-ranks-basename-first PASS
+25: CHECK fuzzy.basename-beats-directory PASS
+25: CHECK fuzzy.subsequence PASS
+25: CHECK fuzzy.positions PASS
+25: CHECK fuzzy.case-insensitive PASS
+25: CHECK fuzzy.no-match PASS
+25: CHECK fuzzy.empty-query-keeps-order PASS
+25: CHECK fuzzy.limit PASS
+25: CHECK index.scan PASS
+25: CHECK index.scan-four-files PASS
+25: CHECK index.display-sorted PASS
+25: CHECK index.hidden-skipped PASS
+25: CHECK index.ignored-dir-skipped PASS
+25: CHECK index.basenames PASS
+25: CHECK index.cached-scan PASS
+25: CHECK index.no-rescan PASS
+25: CHECK index.no-change-on-cached-scan PASS
+25: CHECK index.add-file PASS
+25: CHECK index.remove-file PASS
+25: CHECK index.incremental-no-scan PASS
+25: CHECK index.publish-no-scan PASS
+25: CHECK index.publish-sorted PASS
+25: CHECK index.max-files PASS
+25: CHECK index.outside-root-absolute PASS
+25: CHECK index.inside-root-relative PASS
+25: CHECK palette-fixture.scan PASS
+25: This plugin does not support raise()
+25: This plugin does not support grabbing the keyboard
+25: This plugin does not support raise()
+25: CHECK palette.opens PASS
+25: CHECK palette.lists-all PASS
+25: CHECK palette.status-shows-total PASS
+25: CHECK palette.filters PASS
+25: CHECK palette.filter-under-200ms PASS
+25: CHECK palette.empty-state PASS
+25: CHECK palette.enter-opens PASS
+25: CHECK palette.enter-closes PASS
+25: This plugin does not support raise()
+25: This plugin does not support grabbing the keyboard
+25: This plugin does not support raise()
+25: CHECK palette.typing-filters PASS
+25: CHECK palette.escape-closes PASS
+25: This plugin does not support raise()
+25: This plugin does not support grabbing the keyboard
+25: This plugin does not support raise()
+25: CHECK palette.arrow-selects PASS
+25: CHECK palette.arrow-enter-opens PASS
+25: This plugin does not support raise()
+25: This plugin does not support grabbing the keyboard
+25: This plugin does not support raise()
+25: CHECK palette.no-project-empty-state PASS
+25: CHECK index.synthetic-10000 PASS
+25: This plugin does not support raise()
+25: This plugin does not support grabbing the keyboard
+25: This plugin does not support raise()
+25: CHECK palette.10k-opens PASS
+25: MEASURE palette.query=m micros=1593 results=100
+25: MEASURE palette.query=ma micros=1533 results=100
+25: MEASURE palette.query=mai micros=1398 results=100
+25: MEASURE palette.query=main micros=1401 results=100
+25: MEASURE palette.query=cmd micros=1609 results=100
+25: MEASURE palette.query=pal micros=1946 results=100
+25: MEASURE palette.query=src micros=1845 results=100
+25: MEASURE palette.query=zzzz micros=1277 results=0
+25: CHECK palette.10k-keystroke-under-200ms PASS
+25: MEASURE palette.10k-worst-micros=1946
+25: CHECK palette.10k-results-nonempty PASS
+25: CHECK palette.10k-empty-state PASS
+25: CHECK palette.10k-never-scans-disk PASS
+25: This plugin does not support raise()
+25: This plugin does not support grabbing the keyboard
+25: This plugin does not support raise()
+25: SCREENSHOT OK /vedit-build/target/qt6-build/src/app/workspace-lane-palette/screenshots/10-palette-filter.png
+25: SCREENSHOT OK /vedit-build/target/qt6-build/src/app/workspace-lane-palette/screenshots/11-palette-empty-state.png
+25: This plugin does not support raise()
+25: This plugin does not support raise()
+25: SCREENSHOT OK /vedit-build/target/qt6-build/src/app/workspace-lane-palette/screenshots/12-palette-no-project.png
+25: This plugin does not support raise()
+25: This plugin does not support raise()
+25: SCREENSHOT OK /vedit-build/target/qt6-build/src/app/workspace-lane-palette/screenshots/13-palette-project.png
+25: This plugin does not support grabbing the keyboard
+25: PALETTE-SELFTEST ok=1 checks=46 failures=0
+2/6 Test #25: vedit-workspace-palette-selftest ...............   Passed    0.13 sec
+test 26
+    Start 26: vedit-workspace-palette-integration-selftest
+
+26: Test command: /vedit-build/target/qt6-build/src/app/workspace-lane-palette/vedit-workspace-palette-integration-selftest "--screenshots" "/vedit-build/target/qt6-build/src/app/workspace-lane-palette/integration-screenshots"
+26: Working Directory: /vedit-build/target/qt6-build/src/app/workspace-lane-palette
+26: Environment variables: 
+26:  QT_QPA_PLATFORM=offscreen
+26:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime
+26: Test timeout computed to be: 120
+26: CHECK fixture.temp-dir PASS
+26: This plugin does not support propagateSizeHints()
+26: CHECK integration.installed PASS
+26: CHECK integration.command-registered PASS
+26: CHECK integration.command-in-registry PASS
+26: CHECK integration.action PASS
+26: CHECK integration.shortcut-ctrl-p PASS
+26: CHECK integration.in-file-menu PASS
+26: CHECK integration.idempotent PASS
+26: This plugin does not support raise()
+26: This plugin does not support grabbing the keyboard
+26: This plugin does not support raise()
+26: CHECK integration.ctrl-p-opens PASS
+26: CHECK integration.index-count PASS
+26: CHECK integration.hidden-skipped PASS
+26: CHECK integration.filters PASS
+26: CHECK integration.enter-closes PASS
+26: CHECK integration.enter-opened PASS
+26: CHECK integration.demo-editor PASS
+26: CHECK integration.demo-content PASS
+26: CHECK integration.demo-property PASS
+26: This plugin does not support raise()
+26: This plugin does not support grabbing the keyboard
+26: This plugin does not support raise()
+26: CHECK integration.second-open PASS
+26: CHECK integration.single-scan PASS
+26: This plugin does not support raise()
+26: This plugin does not support grabbing the keyboard
+26: This plugin does not support raise()
+26: CHECK integration.empty-state PASS
+26: SCREENSHOT OK /vedit-build/target/qt6-build/src/app/workspace-lane-palette/integration-screenshots/20-integration-empty.png
+26: SCREENSHOT OK /vedit-build/target/qt6-build/src/app/workspace-lane-palette/integration-screenshots/21-integration-palette.png
+26: SCREENSHOT OK /vedit-build/target/qt6-build/src/app/workspace-lane-palette/integration-screenshots/22-integration-shell.png
+26: CHECK integration.shortcut-store PASS
+26: CHECK integration.rebinding PASS
+26: CHECK integration.rebinding-restored PASS
+26: kf.sonnet.core: Sonnet: No speller backends available!
+26: [edit-core] syntax highlighting: no syntax definition for main.cpp
+26: This plugin does not support propagateSizeHints()
+26: [edit-core] syntax highlighting: no syntax definition for helper.cpp
+26: CHECK integration.ktexteditor-widget PASS
+26: This plugin does not support raise()
+26: This plugin does not support grabbing the keyboard
+26: This plugin does not support raise()
+26: CHECK integration.ktexteditor-opened-path PASS
+26: CHECK integration.ktexteditor-document PASS
+26: CHECK integration.ktexteditor-content PASS
+26: KTEXTEDITOR-OPEN path=/tmp/vedit-palette-integration-selftest-KqmFkR/project/src/util/helper.cpp bytes=10
+26: CHECK integration.ktexteditor-opened-path-recorded PASS
+26: CHECK integration.root-follows-projectRootChanged PASS
+26: This plugin does not support raise()
+26: This plugin does not support grabbing the keyboard
+26: This plugin does not support raise()
+26: CHECK integration.root-rescan-new-root PASS
+26: CHECK integration.root-old-files-gone PASS
+26: INTEGRATION-SELFTEST ok=1 checks=31 failures=0
+3/6 Test #26: vedit-workspace-palette-integration-selftest ...   Passed    0.17 sec
+test 27
+    Start 27: vedit-workspace-search-selftest
+
+27: Test command: /vedit-build/target/qt6-build/src/app/workspace-lane-search/vedit-workspace-search-selftest "--selfcheck"
+27: Working Directory: /vedit-build/target/qt6-build/src/app/workspace-lane-search
+27: Environment variables: 
+27:  QT_QPA_PLATFORM=offscreen
+27:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime-search
+27: Test timeout computed to be: 180
+27: CHECK fixture.created PASS
+27: This plugin does not support propagateSizeHints()
+27: search: root='/tmp/vedit-workspace-search-selftest-IiNFxy' (ready)
+27: CHECK panel.root.normalized PASS
+27: CHECK panel.empty.enter-query PASS
+27: This plugin does not support propagateSizeHints()
+27: This plugin does not support propagateSizeHints()
+27: search: query root='/tmp/vedit-workspace-search-selftest-IiNFxy' query='always_ff'
+27: This plugin does not support propagateSizeHints()
+27: CHECK panel.search.terminates PASS
+27: CHECK panel.hits.count PASS
+27: CHECK panel.summary.state PASS
+27: CHECK panel.summary.files PASS
+27: CHECK panel.summary.files-scanned PASS
+27: CHECK panel.summary.skipped-binary PASS
+27: CHECK panel.summary.skipped-too-large PASS
+27: CHECK panel.summary.text.observable PASS
+27: CHECK panel.tree.files PASS
+27: CHECK panel.tree.one-row-per-hit PASS
+27: CHECK panel.tree.no-git PASS
+27: CHECK panel.tree.no-build PASS
+27: CHECK panel.tree.no-binary PASS
+27: CHECK panel.hits.one-per-line PASS
+27: CHECK panel.hit.line-number PASS
+27: CHECK panel.hit.column PASS
+27: CHECK panel.hit.snippet PASS
+27: CHECK panel.hit.unicode-file PASS
+27: CHECK panel.hit.unicode-column PASS
+27: This plugin does not support propagateSizeHints()
+27: search: query root='/tmp/vedit-workspace-search-selftest-IiNFxy' query='always_ff'
+27: This plugin does not support propagateSizeHints()
+27: CHECK panel.case-sensitive.count PASS
+27: CHECK panel.case-sensitive.excludes-uppercase PASS
+27: This plugin does not support propagateSizeHints()
+27: search: query root='/tmp/vedit-workspace-search-selftest-IiNFxy' query='always_ff'
+27: This plugin does not support propagateSizeHints()
+27: CHECK panel.verilog-only.count PASS
+27: CHECK panel.verilog-only.excludes-markdown PASS
+27: CHECK panel.verilog-only.excludes-large-file PASS
+27: This plugin does not support propagateSizeHints()
+27: search: query root='/tmp/vedit-workspace-search-selftest-IiNFxy' query='中文注释'
+27: This plugin does not support propagateSizeHints()
+27: CHECK panel.unicode.query PASS
+27: This plugin does not support propagateSizeHints()
+27: CHECK empty.no-project.visible PASS
+27: CHECK empty.no-project.text PASS
+27: CHECK empty.no-project.no-search PASS
+27: This plugin does not support propagateSizeHints()
+27: This plugin does not support propagateSizeHints()
+27: search: root='/tmp/vedit-workspace-search-selftest-IiNFxy' (ready)
+27: CHECK empty.query.text PASS
+27: CHECK empty.query.no-search PASS
+27: This plugin does not support propagateSizeHints()
+27: search: root='/tmp/vedit-workspace-search-selftest-IiNFxy' (ready)
+27: This plugin does not support propagateSizeHints()
+27: This plugin does not support propagateSizeHints()
+27: search: query root='/tmp/vedit-workspace-search-selftest-IiNFxy' query='no_such_token_9999'
+27: This plugin does not support propagateSizeHints()
+27: This plugin does not support propagateSizeHints()
+27: CHECK empty.no-results.state PASS
+27: CHECK empty.no-results.visible PASS
+27: CHECK empty.no-results.text PASS
+27: CHECK empty.no-results.tree-hidden PASS
+27: CHECK empty.unreadable-root SKIP (running as root: chmod 000 does not deny access)
+27: CHECK entries.unreadable SKIP (running as root: chmod 000 does not deny access)
+27: This plugin does not support propagateSizeHints()
+27: search: root='/tmp/vedit-workspace-search-selftest-IiNFxy' (ready)
+27: This plugin does not support propagateSizeHints()
+27: This plugin does not support propagateSizeHints()
+27: search: query root='/tmp/vedit-workspace-search-selftest-IiNFxy' query='always_ff'
+27: This plugin does not support propagateSizeHints()
+27: CHECK limit.results PASS
+27: CHECK limit.truncated-flag PASS
+27: CHECK limit.summary-text PASS
+27: CHECK extension.v PASS
+27: CHECK extension.vh PASS
+27: CHECK extension.sv PASS
+27: CHECK extension.svh PASS
+27: CHECK extension.not-verilog PASS
+27: This plugin does not support propagateSizeHints()
+27: search: root='/tmp/vedit-workspace-search-selftest-IiNFxy' (ready)
+27: This plugin does not support propagateSizeHints()
+27: This plugin does not support propagateSizeHints()
+27: search: query root='/tmp/vedit-workspace-search-selftest-IiNFxy' query='always_ff'
+27: This plugin does not support propagateSizeHints()
+27: CHECK jump.hit-row-exists PASS
+27: CHECK jump.row-visible PASS
+27: CHECK jump.click.recorded PASS
+27: CHECK jump.click.file PASS
+27: CHECK jump.click.line PASS
+27: CHECK jump.click.column PASS
+27: CHECK jump.file-row.no-jump PASS
+27: CHECK jump.activate PASS
+27: CHECK jump.demo.opened PASS
+27: CHECK jump.demo.line PASS
+27: search: root='/tmp/vedit-workspace-search-selftest-IiNFxy' (ready)
+27: CHECK seam.dock-created PASS
+27: CHECK seam.not-placeholder PASS
+27: CHECK seam.factory-installed PASS
+27: CHECK seam.root-applied PASS
+27: search: query root='/tmp/vedit-workspace-search-selftest-IiNFxy' query='always_ff'
+27: CHECK seam.search-in-shell PASS
+27: kf.sonnet.core: Sonnet: No speller backends available!
+27: search: root='/tmp/vedit-workspace-search-selftest-IiNFxy' (ready)
+27: This plugin does not support propagateSizeHints()
+27: CHECK jump.product.shell-ready PASS
+27: CHECK jump.product.ktexteditor-provider PASS
+27: CHECK jump.product.target-installed PASS
+27: CHECK jump.product.initially-no-file PASS
+27: This plugin does not support propagateSizeHints()
+27: This plugin does not support propagateSizeHints()
+27: search: query root='/tmp/vedit-workspace-search-selftest-IiNFxy' query='always_ff'
+27: This plugin does not support propagateSizeHints()
+27: CHECK jump.product.two-hits PASS
+27: [edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+27: This plugin does not support propagateSizeHints()
+27: search: jump opened '/tmp/vedit-workspace-search-selftest-IiNFxy/a.v' line=2 column=3 (cursor=2:3)
+27: CHECK jump.product.click-first PASS
+27: SEARCH-JUMP first requested='a.v':2 current='/tmp/vedit-workspace-search-selftest-IiNFxy/a.v' cursor=2:3
+27: CHECK jump.product.first-current-file PASS
+27: CHECK jump.product.first-loads-bytes PASS
+27: CHECK jump.product.first-cursor-line PASS
+27: CHECK jump.product.first-cursor-column PASS
+27: CHECK jump.product.first-status PASS
+27: [edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+27: search: jump opened '/tmp/vedit-workspace-search-selftest-IiNFxy/b.sv' line=4 column=1 (cursor=4:1)
+27: CHECK jump.product.click-second PASS
+27: SEARCH-JUMP second requested='b.sv':4 current='/tmp/vedit-workspace-search-selftest-IiNFxy/b.sv' cursor=4:1
+27: CHECK jump.product.second-current-file PASS
+27: CHECK jump.product.second-loads-bytes PASS
+27: CHECK jump.product.second-cursor-line PASS
+27: CHECK jump.product.second-cursor-column PASS
+27: This plugin does not support propagateSizeHints()
+27: CHECK jump.product.second-open-paint-stable PASS
+27: CHECK large.fixture-created PASS
+27: CHECK large.start.accepted PASS
+27: CHECK large.skipped-by-default PASS
+27: CHECK large.skipped.state PASS
+27: CHECK large.skipped.fast PASS
+27: CHECK large.start.accepted-raised PASS
+27: CHECK large.start.non-blocking PASS
+27: CHECK large.cancel.returns-fast PASS
+27: CHECK large.cancel.finishes PASS
+27: CHECK large.cancel.state PASS
+27: CHECK large.cancel.bounded PASS
+27: CHECK large.worker-thread PASS
+27: search: root='/tmp/vedit-workspace-search-selftest-pKLnji' (ready)
+27: search: query root='/tmp/vedit-workspace-search-selftest-pKLnji' query='always_ff'
+27: CHECK many.start.non-blocking PASS
+27: CHECK many.finishes PASS
+27: CHECK many.hits PASS
+27: CHECK many.files-scanned PASS
+27: CHECK many.elapsed-bounded PASS
+27: CHECK large.timeout.accepted PASS
+27: CHECK large.timeout.finishes PASS
+27: CHECK large.timeout.flag PASS
+27: CHECK large.timeout.state PASS
+27: CHECK large.timeout.bounded PASS
+27: CHECK lifecycle.temp-dir PASS
+27: CHECK lifecycle.no-worker-before PASS
+27: CHECK lifecycle.scan-started PASS
+27: CHECK lifecycle.worker-running PASS
+27: CHECK lifecycle.destructor-joins-worker PASS
+27: SLOWLIFECYCLE-CHILD finished=1 exit=0
+27: CHECK slowlifecycle.temp-dir PASS
+27: CHECK slowlifecycle.scan-started PASS
+27: CHECK slowlifecycle.batch-before-block PASS
+27: SLOWLIFECYCLE delete-returned elapsedMs=0 released-marker=1 stallMs=11500
+27: CHECK slowlifecycle.destructor-waits-for-stalled-read PASS
+27: WORKSPACE-SEARCH-SLOWLIFECYCLE ok=1 checks=4 failures=0
+27: CHECK lifecycle.stall-child-finished PASS
+27: CHECK lifecycle.stall-child-pass PASS
+27: WORKSPACE-SEARCH-SELFTEST ok=1 checks=106 failures=0 skipped=2
+4/6 Test #27: vedit-workspace-search-selftest ................   Passed   12.21 sec
+test 28
+    Start 28: vedit-workspace-project-selftest
+
+28: Test command: /vedit-build/target/qt6-build/src/app/workspace-lane-project/vedit-workspace-project-selftest "--selfcheck" "/vedit-build/src/workspace/project/../../../tests/fixtures/verilog-project"
+28: Working Directory: /vedit-build/target/qt6-build/src/app/workspace-lane-project
+28: Environment variables: 
+28:  QT_QPA_PLATFORM=offscreen
+28:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime-project
+28: Test timeout computed to be: 180
+28: CHECK state.temp-dir PASS
+28: This plugin does not support propagateSizeHints()
+28: CHECK empty.no-project PASS
+28: CHECK empty.summary PASS
+28: CHECK empty.import-disabled PASS
+28: CHECK directoryOpened.subscribed PASS
+28: CHECK directoryOpened.non-blocking PASS
+28: CHECK directoryOpened.pending PASS
+28: This plugin does not support propagateSizeHints()
+28: CHECK directoryOpened.finishes PASS
+28: CHECK directoryOpened.root PASS
+28: CHECK directoryOpened.panel-visible? PASS
+28: CHECK files.count PASS
+28: CHECK files.carry-every-filelist-entry PASS
+28: CHECK files.scan-adds-headers PASS
+28: CHECK files.relative-for-generated-filelist PASS
+28: CHECK files.relative-matches-display PASS
+28: CHECK incdirs.count PASS
+28: CHECK defines.count PASS
+28: CHECK diagnostics.duplicate-entry PASS
+28: CHECK diagnostics.unknown-token PASS
+28: CHECK diagnostics.name-the-filelist PASS
+28: CHECK summary.states-the-count PASS
+28: CHECK state.file-written PASS
+28: CHECK panel.summary PASS
+28: CHECK panel.file-count PASS
+28: CHECK panel.files-match-model PASS
+28: CHECK panel.include-dirs PASS
+28: CHECK panel.defines PASS
+28: CHECK panel.diagnostics-match PASS
+28: CHECK settings.finishes PASS
+28: CHECK settings.include-dir-reaches-model PASS
+28: CHECK settings.define-reaches-model PASS
+28: CHECK settings.backend-arguments PASS
+28: CHECK settings.persisted PASS
+28: SETTINGS-WATCH settings=/tmp/vedit-workspace-project-selftest-OqdZJd/settings.toml exists=1 defines-before=[WIDTH=8,DEPTH=16,DEBUG,SIMULATION,BOARD=7]
+28: SETTINGS-WATCH defines-after=[WIDTH=8,DEPTH=16,DEBUG,SIMULATION,BOARD=9] last-error=[]
+28: CHECK settings.watch-reloads PASS
+28: CHECK settings.watch-second-include PASS
+28: CHECK filelist.import-bad-path PASS
+28: CHECK filelist.import-bad-path-keeps-list PASS
+28: This plugin does not support propagateSizeHints()
+28: This plugin does not support propagateSizeHints()
+28: This plugin does not support propagateSizeHints()
+28: CHECK filelist.import PASS
+28: CHECK filelist.import-finishes PASS
+28: CHECK filelist.import-model PASS
+28: CHECK filelist.import-panel PASS
+28: CHECK filelist.import-status PASS
+28: CHECK filelist.reimport-panel-noop PASS
+28: CHECK filelist.reimport-status-honest PASS
+28: CHECK filelist.import-no-duplicate PASS
+28: CHECK filelist.import-keeps-union PASS
+28: CHECK filelist.remove PASS
+28: This plugin does not support propagateSizeHints()
+28: CHECK filelist.remove-finishes PASS
+28: CHECK filelist.remove-model PASS
+28: CHECK filelist.remove-keeps-union PASS
+28: CHECK filelist.remove-unknown-rejected PASS
+28: CHECK display.files.under-root-finishes PASS
+28: CHECK display.files.under-root PASS
+28: CHECK display.files.open-key-absolute PASS
+28: CHECK display.panel.files-under-root PASS
+28: CHECK display.filelist.outside-import PASS
+28: CHECK display.filelist.outside-finishes PASS
+28: CHECK display.files.outside-absolute PASS
+28: CHECK display.filelists.outside-absolute PASS
+28: CHECK display.panel.filelists-outside-absolute PASS
+28: CHECK display.filelist.inside-import PASS
+28: CHECK display.filelist.inside-finishes PASS
+28: CHECK display.filelist.inside-absolute-in-model PASS
+28: CHECK display.panel.filelist-inside-relative PASS
+28: CHECK display.panel.files-inside-relative PASS
+28: CHECK filelist.plan.lowercase-f PASS
+28: CHECK filelist.plan.uppercase-f PASS
+28: CHECK filelist.plan.flist PASS
+28: CHECK filelist.plan.non-filelist PASS
+28: CHECK filelist.plan.empty PASS
+28: CHECK filelist-open.temp-dir PASS
+28: This plugin does not support propagateSizeHints()
+28: qt.core.qobject.connect: QObject::connect: No such signal vedit::app::ApplicationShell::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-app-shell')
+28: qt.core.qobject.connect: QObject::connect: No such signal QMainWindowLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   '_layout')
+28: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'editor-area')
+28: qt.core.qobject.connect: QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QTimer::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'ctrlSAuthorityGuard')
+28: qt.core.qobject.connect: QObject::connect: No such signal QPropertyAnimation::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QStatusBar::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QSizeGrip::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'status-dirty')
+28: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'status-project')
+28: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'status-theme')
+28: qt.core.qobject.connect: QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'status-layout')
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-settings.preferences')
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-file.open')
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-file.open-folder')
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-file.new-layout')
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-file.save')
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-file.save-as')
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-file.save-session')
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-file.close-pane')
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-file.quit')
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-view.split.horizontal')
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-view.split.vertical')
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-view.focus.next')
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-view.layout.mixed')
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-view.layout.reset')
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-view.panel.file-tree')
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-view.panel.search')
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-view.panel.terminal')
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-view.panel.vcs')
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-view.panel.outline')
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-help.about')
+28: qt.core.qobject.connect: QObject::connect: No such signal QMenuBar::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_menubar_ext_button')
+28: qt.core.qobject.connect: QObject::connect: No such signal QMenu::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QMenu::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QMenu::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QMenu::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QMenu::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal vedit::workspace::project::ProjectModel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QDockWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'dock-project')
+28: qt.core.qobject.connect: QObject::connect: No such signal QDockWidgetLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QDockWidgetTitleButton::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_dockwidget_floatbutton')
+28: qt.core.qobject.connect: QObject::connect: No such signal QDockWidgetTitleButton::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_dockwidget_closebutton')
+28: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal vedit::workspace::project::ProjectPanel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-panel')
+28: qt.core.qobject.connect: QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-summary')
+28: qt.core.qobject.connect: QObject::connect: No such signal QPushButton::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-refresh')
+28: qt.core.qobject.connect: QObject::connect: No such signal QPushButton::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-import-filelist')
+28: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-empty-hint')
+28: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-filelists-header')
+28: qt.core.qobject.connect: QObject::connect: No such signal QListWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-filelist-list')
+28: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+28: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+28: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+28: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QListModel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QPushButton::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-remove-filelist')
+28: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-files-header')
+28: qt.core.qobject.connect: QObject::connect: No such signal QListWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-file-list')
+28: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+28: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+28: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+28: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QListModel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-include-header')
+28: qt.core.qobject.connect: QObject::connect: No such signal QListWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-include-dirs')
+28: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+28: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+28: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+28: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QListModel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-defines-header')
+28: qt.core.qobject.connect: QObject::connect: No such signal QListWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-defines')
+28: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+28: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+28: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+28: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QListModel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-variables-header')
+28: qt.core.qobject.connect: QObject::connect: No such signal QListWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-variables')
+28: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+28: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+28: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+28: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QListModel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QPushButton::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-edit-variables')
+28: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-diagnostics-header')
+28: qt.core.qobject.connect: QObject::connect: No such signal QListWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-diagnostics')
+28: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+28: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+28: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+28: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QListModel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+28: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-status')
+28: This plugin does not support propagateSizeHints()
+28: CHECK filelist-open.model PASS
+28: CHECK filelist-open.panel PASS
+28: CHECK filelist-open.starts-without-project PASS
+28: This plugin does not support propagateSizeHints()
+28: This plugin does not support propagateSizeHints()
+28: This plugin does not support propagateSizeHints()
+28: This plugin does not support propagateSizeHints()
+28: CHECK filelist-open.first-open PASS
+28: CHECK filelist-open.signal PASS
+28: CHECK filelist-open.first-finishes PASS
+28: CHECK filelist-open.root-is-filelist-directory PASS
+28: CHECK filelist-open.filelist-imported PASS
+28: CHECK filelist-open.file-set-imported PASS
+28: CHECK filelist-open.panel-relative PASS
+28: CHECK filelist-open.document-tab PASS
+28: CHECK filelist-open.second-open-same PASS
+28: CHECK filelist-open.same-import-finishes PASS
+28: CHECK filelist-open.idempotent-filelists PASS
+28: CHECK filelist-open.idempotent-files PASS
+28: CHECK filelist-open.second-open PASS
+28: CHECK filelist-open.second-import-finishes PASS
+28: CHECK filelist-open.second-root-unchanged PASS
+28: CHECK filelist-open.second-filelist-kept PASS
+28: CHECK filelist-open.opened-through-pane PASS
+28: CHECK filelist-open.pane-import-finishes PASS
+28: CHECK filelist-open.pane-filelist-kept PASS
+28: CHECK filelist-open.parse-diagnostic PASS
+28: CHECK filelist-open.panel-shows-diagnostics PASS
+28: CHECK jump.delivered PASS
+28: CHECK jump.absolute-path PASS
+28: CHECK jump.position-1-based PASS
+28: CHECK bad.finishes PASS
+28: CHECK bad.files PASS
+28: CHECK bad.incdir-line PASS
+28: CHECK bad.unknown-line PASS
+28: CHECK bad.nested-line PASS
+28: CHECK bad.reasons PASS
+28: CHECK bad.panel-shows PASS
+28: CHECK a9.finishes PASS
+28: CHECK a9.expands-with-table PASS
+28: CHECK a9.expands-dollar-var PASS
+28: CHECK a9.expands-braced-var PASS
+28: CHECK a9.expands-parenthesized-var PASS
+28: CHECK a9.expands-tilde PASS
+28: CHECK a9.two-level-nested-f PASS
+28: CHECK a9.project-table-wins-over-environment PASS
+28: CHECK a9.cycle-names-both-files PASS
+28: CHECK a9.missing-collected PASS
+28: CHECK a9.skipped-count PASS
+28: CHECK a9.missing-file-and-line PASS
+28: CHECK a9.summary-shows-unresolved PASS
+28: This plugin does not support propagateSizeHints()
+28: CHECK a9.panel.variables-shown PASS
+28: CHECK a9.dialog.one-row-per-variable PASS
+28: CHECK a9.dialog.names PASS
+28: CHECK a9.dialog.variable-table PASS
+28: CHECK a9.re-expands-after-dialog PASS
+28: CHECK a9.dialog-value-used PASS
+28: CHECK a9.unresolved-cleared PASS
+28: CHECK a9.variables-persisted-in-state PASS
+28: CHECK a17.finishes PASS
+28: CHECK a17.files PASS
+28: CHECK a17.literal-dollar-kept PASS
+28: CHECK a17.literal-trailing-dollar-kept PASS
+28: CHECK a17.scanned-entry-kept PASS
+28: CHECK a17.no-expansion-error PASS
+28: CHECK a17.escape-finishes PASS
+28: CHECK a17.escape-one-dollar PASS
+28: CHECK a17.missing-finishes PASS
+28: CHECK a17.missing-re-expands PASS
+28: CHECK a17.missing-files-kept PASS
+28: CHECK a17.missing-expanded-reported PASS
+28: CHECK a17.missing-home-reported PASS
+28: CHECK a17.missing-kept-not-dropped PASS
+28: CHECK a17.missing-literal-not-reported PASS
+28: CHECK restore.ok PASS
+28: CHECK restore.root PASS
+28: CHECK restore.files PASS
+28: CHECK restore.include-dirs PASS
+28: CHECK restore.defines PASS
+28: CHECK restore.relative-files PASS
+28: CHECK missing-root.finishes PASS
+28: CHECK missing-root.reports PASS
+28: CHECK missing-root.diagnostics PASS
+28: CHECK missing-root.no-members PASS
+28: CHECK corrupt.reports PASS
+28: CHECK corrupt.error-text PASS
+28: PROJECT-MODEL-SELFTEST ok=1 checks=153 failures=0
+5/6 Test #28: vedit-workspace-project-selftest ...............   Passed    0.53 sec
+test 29
+    Start 29: vedit-module-tree-selftest
+
+29: Test command: /vedit-build/target/qt6-build/src/app/workspace-lane-module_tree/vedit-module-tree-selftest "/vedit-build/src/workspace/module_tree/../../../probes/slang-spike/fixture" "/vedit-build/src/workspace/module_tree/../../../build/slang/out/slang" "" "/vedit-build/src/workspace/module_tree/../../../evidence/m-tree/fixture-generate"
+29: Working Directory: /vedit-build/target/qt6-build/src/app/workspace-lane-module_tree
+29: Environment variables: 
+29:  QT_QPA_PLATFORM=offscreen
+29:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime-module-tree
+29: Test timeout computed to be: 180
+29: ok   tree.single-root — roots=1
+29: ok   tree.root-label — top
+29: ok   tree.root-module — top
+29: ok   tree.root-position-1based — top.sv:3:8
+29: ok   tree.instance-nesting — top.u0, top.u1, link, clk, rst
+29: ok   tree.full-instance-path — top.u0
+29: ok   tree.instance-module — mid
+29: ok   tree.instance-jump — /proj/top.sv:11:7
+29: ok   tree.signal-node
+29: ok   tree.signal-children — children=3
+29: ok   tree.signal-driver-node — driver: top.u0.q
+29: ok   jump.conversion
+29: ok   signal.source — source of top.link: top.u0.q · top.sv:11:38
+29: ok   signal.target — target of top.link: top.u1.d · top.sv:12:25
+29: ok   signal.declaration-falls-back-to-driver — source of top.link: top.u0.q · top.sv:11:38
+29: ok   signal.no-driver-is-honest — top.rst has no driver in the elaborated design
+29: ok   lookup.single — net top.link
+29: ok   lookup.ambiguous-reports-choice — 2 nets named 'q'; chose top.u0.q
+29: ok   lookup.unknown — no net named 'nope' in the elaborated design
+29: This plugin does not support propagateSizeHints()
+29: ok   panel.rows-built — rows=19
+29: ok   panel.summary — slang · 2 file(s) · 3 instance(s) · 6 net(s) · 5 ms · 19592 KiB peak
+29: root: /proj
+29: ok   panel.instance-row
+29: ok   panel.event.row-clickable — rect=40,14 566x14
+29: ok   panel.event.double-click-instance — delivered=1 /proj/top.sv:11:7
+29: ok   panel.signal-row
+29: ok   panel.event.double-click-signal-declaration — delivered=1 /proj/top.sv:11:38
+29: ok   panel.event.button-source — net top.link · source of top.link: top.u0.q · top.sv:11:38 → top.sv:11:38
+29: ok   panel.event.button-target — net top.link · target of top.link: top.u1.d · top.sv:12:25 → top.sv:12:25
+29: ok   panel.event.button-source-cross-file — /proj/mid.sv:10:5
+29: ok   panel.no-location-row
+29: ok   panel.event.no-location-double-click — delivered=1 calls=5->5 status=rst has no file:line in the elaborated design
+29: ok   panel.null-row-safe
+29: ok   panel.no-driver-status — top.rst has no driver in the elaborated design
+29: ok   panel.no-cursor-word — put the cursor on a signal name in the editor first
+29: ok   panel.empty-state — No hierarchy yet: open a project and press Refresh.
+29: ok   panel.failure-visible — no project root: open a folder
+29: ok   panel.empty-snapshot — No hierarchy yet: open a project and press Refresh.
+29: ok   toolchain.appdir-temp
+29: ok   toolchain.appdir-bin — /tmp/vedit-module-tree-selftest-LjoXaR/bin
+29: ok   toolchain.appdir-slang — /tmp/vedit-module-tree-selftest-LjoXaR/bin/slang
+29: ok   toolchain.published-path — /tmp/vedit-module-tree-selftest-LjoXaR/bin/slang
+29: ok   toolchain.no-source-empty
+29: ok   toolchain.override-executable — /tmp/vedit-module-tree-selftest-LjoXaR/slang-override
+29: ok   toolchain.env-override-wins — /tmp/vedit-module-tree-selftest-LjoXaR/slang-override
+29: ok   real.temp-state
+29: ok   real.service-answered
+29: ok   real.source-description — vd_project_expand_v2(/vedit-build/probes/slang-spike/fixture)
+29: ok   real.instances — instances=3
+29: ok   real.instance-paths — top, top.u0, top.u1
+29:      measurement: slang · 2 file(s) · 3 instance(s) · 14 net(s) · 5 ms · 19224 KiB peak
+29: ok   real.tree-built — rows=47
+29: ok   real.double-click-instance — top.sv:11:7
+29: ok   real.signal-source — net top.link · source of top.link: top.u0.q · top.sv:11:38 → top.sv:11:38
+29: ok   real.signal-target — net top.link · target of top.link: top.u1.d · top.sv:12:25 → top.sv:12:25
+29: ok   real.cross-file-source — 2 nets named 'state'; chose top.u0.state · source of top.u0.state: top.u0.state · mid.sv:10:5 → mid.sv:10:5
+29: ok   packaged.appdir-slang — /vedit-build/target/qt6-build/src/app/workspace-lane-module_tree/bin/slang
+29: ok   packaged.temp-state
+29: ok   packaged.answered
+29: ok   packaged.instances — instances=3
+29:      measurement: slang · 2 file(s) · 3 instance(s) · 14 net(s) · 5 ms · 19464 KiB peak
+29: ok   generate.answered
+29:      generate fixture: slang · 2 file(s) · 5 instance(s) · 14 net(s) · 6 ms · 19084 KiB peak
+29:      observed instance paths: gen_top, gen_top.u_bank, gen_top.u_bank.g[0].u_leaf, gen_top.u_bank.g[1].u_leaf, other_top
+29:      observed 5/5 ground-truth instance(s); missing: 
+29: ok   generate.first-root-visible — gen_top, gen_top.u_bank, gen_top.u_bank.g[0].u_leaf, gen_top.u_bank.g[1].u_leaf, other_top
+29: ok   generate.tree-painted — rows=42 instances=5
+29: 
+29: 61 checks, 0 failure(s)
+6/6 Test #29: vedit-module-tree-selftest .....................   Passed    0.37 sec
+
+The following tests passed:
+	vedit-app-shell-selftest
+	vedit-workspace-palette-selftest
+	vedit-workspace-palette-integration-selftest
+	vedit-workspace-search-selftest
+	vedit-workspace-project-selftest
+	vedit-module-tree-selftest
+
+100% tests passed, 0 tests failed out of 6
+
+Total Test time (real) =  14.10 sec
+ctest EXIT=0

@@ -1,0 +1,13 @@
+# T46 recheck: independent AST ground truth on the CURRENT tree
+date: 2026-11-02T18:45:12+08:00
+git_head: 4e2d0a57ca50db9568db5a5b040cc66f04c9a05f
+script: evidence/w4-lint/scale/ast_count.py
+
+slang: slang version 12.1.0+0
+flat slang-exit=0 stderr-bytes=0
+flat AST-GROUND-TRUTH roots=1000 instance_nodes=11000 max_depth=2
+ast.json bytes=44276734
+nested slang-exit=0 stderr-bytes=0
+nested AST-GROUND-TRUTH roots=1000 instance_nodes=11000 max_depth=6
+ast.json bytes=114308834
+docker-exit=0

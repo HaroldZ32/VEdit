@@ -32,8 +32,13 @@
 
 - grammar：`tree-sitter/tree-sitter-verilog@4457145e795b363f072463e697dfe2f6973c9a52`，**MIT**，LICENSE 随包。
 - KDE 的 `systemverilog.xml` 是 **GPL-3.0-or-later**（sha256 `3361d8b4…`），`verilog.xml` 无许可（`7199e367…`）→ **两份都按 sha256 拉黑**。
-- 随包的是自家 **LGPL-2.1+** 移植定义，且带 `<folding>` 区域（A4a）。
-- 送达构建：`builtin_valid_defs=2`、`KSH-GUARD PASS whitelist=SystemVerilog,Verilog`；反向对照 `defs=404`。
+- 随包的是自家 **LGPL-2.1+** 定义：Verilog/SystemVerilog 是移植定义（带 `<folding>` 区域，A4a），
+  A3 新增的 VHDL/Markdown/Tcl 是自研定义（见下条）。
+- 送达构建（UX 批次 2 / A3 之后）：随包 **5 份**定义 `Markdown,SystemVerilog,Tcl,VHDL,Verilog`；
+  `KSH-ENV defs=5`、`KSH-GUARD PASS whitelist=Markdown,SystemVerilog,Tcl,VHDL,Verilog`，且 C / zh_CN.UTF-8 /
+  en_US.UTF-8 三种 locale 都 PASS（故意改坏白名单仍 fail-closed）。见
+  `evidence/ux-batch-2/a3-repair/02-r1-after.txt`、`03-r1-guard-fails-closed.txt`。
+  A3 之前随包只有 Verilog/SystemVerilog 两份；旧的「2 份」口径（`builtin_valid_defs` 探针）已作废，不是当前值。
 - **QTermWidget 是 GPL-2.0+，本仓 MIT** → 链进去等于整包换许可。所以终端是自己写的 pty + VT（D7）。**不要推翻这个决定。**
 
 ## 4. KTextEditor 6.24.0 的硬限制（探针实测，不是听说）

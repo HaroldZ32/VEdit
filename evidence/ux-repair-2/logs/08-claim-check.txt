@@ -1,0 +1,28 @@
+CLAIM PASS  build-qt EXIT=0
+CLAIM PASS  build-qt ctest 37/37
+CLAIM PASS  focused ctest 6/6
+CLAIM PASS  app selfcheck 312/0
+CLAIM PASS  project selftest 153/0
+CLAIM PASS  palette selftest 46/0
+CLAIM PASS  palette integration 31/0
+CLAIM PASS  search selftest 106/0/2
+CLAIM PASS  module-tree 61/0
+CLAIM PASS  AppRun probe 9/0
+CLAIM PASS  AppRun RED control catches 4
+CLAIM PASS  docs gate PASS
+CLAIM PASS  F2 checks present
+CLAIM PASS  F2 rescan check present
+CLAIM PASS  F4 import-status check present
+CLAIM PASS  F4 honest-reimport check present
+CLAIM PASS  path.display tests intact
+CLAIM PASS  open.signal tests intact
+CLAIM PASS  slang resolver tests intact
+CLAIM PASS  AppRun guarded slang export
+CLAIM PASS  AppRun probe wired into selfcheck
+CLAIM PASS  palette subscribes root change
+CLAIM PASS  model reports added filelists
+CLAIM PASS  panel prints honest no-op
+CLAIM PASS  guide names status exception
+CLAIM PASS  guide names Refresh re-parse
+CLAIM PASS  guide quotes honest no-op
+CLAIM-CHECK fail=0

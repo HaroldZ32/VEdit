@@ -1,0 +1,25 @@
+## generated test definition (shared build tree, read-only)
+2026-11-06T11:07:34+08:00
+
+7:add_test([=[vedit-app-syntax-startup]=] "/vedit-build/target/qt6-build/src/app/vedit-app" "--selfcheck")
+8:set_tests_properties([=[vedit-app-syntax-startup]=] PROPERTIES  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime;VEDIT_SYNTAX_DIR=/vedit-build/resources" PASS_REGULAR_EXPRESSION "syntax-product: .*private-dir='[^']+/resources' definitions=[0-9]+ own-xml=\\[vedit-(markdown|systemverilog|tcl|verilog|vhdl)\\.xml,vedit-(markdown|systemverilog|tcl|verilog|vhdl)\\.xml,vedit-(markdown|systemverilog|tcl|verilog|vhdl)\\.xml,vedit-(markdown|systemverilog|tcl|verilog|vhdl)\\.xml,vedit-(markdown|systemverilog|tcl|verilog|vhdl)\\.xml\\] themes=[0-9]+ verilog=1 systemverilog=1 .*startup-hook=1 definitions-ok=\\[Markdown,SystemVerilog,Tcl,VHDL,Verilog\\].*APP-SHELL-SELFTEST ok=1" TIMEOUT "120" _BACKTRACE_TRIPLES "/vedit-build/src/syntax/product/CMakeLists.txt;131;add_test;/vedit-build/src/syntax/product/CMakeLists.txt;177;vedit_syntax_link_product;/vedit-build/CMakeLists.txt;-1;;/vedit-build/CMakeLists.txt;0;")
+
+## hashes
+15e84e7bca5e2909c39d125c79f0598a1b4a691224c83630bce257f9fa3706ba  src/syntax/product/CMakeLists.txt
+4ae24e529f0b84a72e937db0ca5b592df2df630cf386a4e093843f6f9986aff0  target/qt6-build/CTestTestfile.cmake
+
+## derivation check: CMakeLists variables
+153:  set(_u4_definition "vedit-(markdown|systemverilog|tcl|verilog|vhdl)\\.xml")
+154:  set(_u4_own_xml "${_u4_definition}")
+156:    string(APPEND _u4_own_xml ",${_u4_definition}")
+159:  set(_u4_resolved_definitions "Markdown,SystemVerilog,Tcl,VHDL,Verilog")
+166:    # "APP-SHELL-SELFTEST ok=1" (printed only on success, after the syntax line);
+169:      "syntax-product: .*private-dir='[^']+/resources' definitions=[0-9]+ own-xml=\\[${_u4_own_xml}\\] themes=[0-9]+ verilog=1 systemverilog=1 .*startup-hook=1 definitions-ok=\\[${_u4_resolved_definitions}\\].*APP-SHELL-SELFTEST ok=1"
+
+## all syntax tests
+1: syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='/vedit-build/resources' definitions=452 own-xml=[vedit-vhdl.xml,vedit-tcl.xml,vedit-systemverilog.xml,vedit-markdown.xml,vedit-verilog.xml] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1 definitions-ok=[Markdown,SystemVerilog,Tcl,VHDL,Verilog]
+1/2 Test #1: vedit-app-syntax-startup .........   Passed    0.70 sec
+7: syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='/vedit-build/resources' definitions=452 own-xml=[vedit-vhdl.xml,vedit-tcl.xml,vedit-systemverilog.xml,vedit-markdown.xml,vedit-verilog.xml] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1 definitions-ok=[Markdown,SystemVerilog,Tcl,VHDL,Verilog]
+2/2 Test #7: vedit-syntax-product-tests .......   Passed    0.06 sec
+The following tests passed:
+100% tests passed, 0 tests failed out of 2

@@ -1,0 +1,38 @@
+=== cancel at 1k mid-pass (after 500 ms) ===
+START files=1000 phase=1 tool=slang message=«queued: 1000 file(s)»
+RESULT files=1000 ticks=50 wall_ms=504 worst_tick_ms=0 phase=4 done=88 total=1000 percent=8 monotonic=1 progress_samples=50 cli_diagnostics=0 overscale_warn=0 message=«已取消 — 88/1000 文件»
+CHECK ui.tick-under-100ms PASS
+CHECK progress.monotonic PASS
+CANCEL latency_ms=0 phase=4 running=0 message=«已取消 — 88/1000 文件»
+CHECK cancel.phase PASS
+CHECK cancel.flag-cleared PASS
+CHECK cancel.bounded-latency PASS
+AFTER-CANCEL cli_before=0 cli_after=0 running=0
+CHECK cancel.no-late-diagnostics PASS
+CHECK overscale.warning PASS
+LINT-SCALE-HARNESS ok=1 checks=7 failures=0
+MEASURE exit=0 wall_s=0.510 peak_rss_mib=16.4
+=== over-scale 2k: warn + cancel (after 300 ms) ===
+START files=2000 phase=1 tool=slang message=«large pass: 2000 files — cancel is available»
+RESULT files=2000 ticks=30 wall_ms=303 worst_tick_ms=0 phase=4 done=52 total=2000 percent=2 monotonic=1 progress_samples=30 cli_diagnostics=0 overscale_warn=1 message=«已取消 — 52/2000 文件»
+CHECK ui.tick-under-100ms PASS
+CHECK progress.monotonic PASS
+CANCEL latency_ms=0 phase=4 running=0 message=«已取消 — 52/2000 文件»
+CHECK cancel.phase PASS
+CHECK cancel.flag-cleared PASS
+CHECK cancel.bounded-latency PASS
+AFTER-CANCEL cli_before=0 cli_after=0 running=0
+CHECK cancel.no-late-diagnostics PASS
+CHECK overscale.warning PASS
+LINT-SCALE-HARNESS ok=1 checks=7 failures=0
+MEASURE exit=0 wall_s=0.310 peak_rss_mib=16.4
+=== full 2k pass (for comparison) ===
+START files=2000 phase=1 tool=slang message=«large pass: 2000 files — cancel is available»
+RESULT files=2000 ticks=1115 wall_ms=11245 worst_tick_ms=0 phase=3 done=2000 total=2000 percent=100 monotonic=1 progress_samples=1115 cli_diagnostics=0 overscale_warn=1 message=«2000/2000 文件已扫描 — 0 条 CLI 诊断»
+CHECK ui.tick-under-100ms PASS
+CHECK progress.monotonic PASS
+CHECK pass.finished PASS
+CHECK progress.reached-total PASS
+CHECK progress.samples PASS
+LINT-SCALE-HARNESS ok=1 checks=5 failures=0
+MEASURE exit=0 wall_s=11.252 peak_rss_mib=16.4

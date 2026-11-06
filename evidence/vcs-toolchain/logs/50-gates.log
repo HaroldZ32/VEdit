@@ -1,0 +1,22 @@
+# gates (final tree)
+collected_at: 2026-11-04T11:58:36+08:00
+## build-qt + ctest (final tree: target/vcs-bundle/13-build-qt-final.log)
+100% tests passed, 0 tests failed out of 38
+M0-SMOKE ok=1 platform=xcb qt=6.10.2 kf6=6.24.0 ktexteditor=1 ksynhl=6.24.0 tree_sitter=0.25.9 window=1 editor=1 document=1 definitions=451 themes=30 verilog=1 systemverilog=loadable(not-asserted,C7-pending) custom_path=1 tree_sitter_parser=1 builtin_valid_defs=450 whitelist_verilog=0 highlight_formats=-1 kshlib=/usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0 libc=/usr/lib/x86_64-linux-gnu/libc.so.6
+[qt6] PASS: Rust service layer + configure + build + ctest (incl. the C ABI smoke) + xcb/software-rendering smoke inside vedit-qt6-build:local
+## clippy + fmt (vedit-build:local)
+    Checking vd-vcs v0.1.1 (/vedit-build/crates/vd-vcs)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.14s
+clippy_exit=0
+fmt_exit=0
+## docs
+[docs] PASS: README.md docs/BUILD.md docs/USER_GUIDE.md THIRD_PARTY_NOTICES.md
+docs_exit=0
+## host fmt
+fmt_host_exit=0
+## selfcheck + lrelease (qt6 image)
+APP-SHELL-SELFTEST ok=1 checks=290 failures=0 state=/tmp/vedit-app-gZluCK/state
+selfcheck_pipe=0
+Updating '/tmp/v.qm'...
+    Generated 880 translation(s) (880 finished and 0 unfinished)
+lrelease=0

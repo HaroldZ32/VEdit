@@ -1,0 +1,18 @@
+label=current-host-git
+cwd=/tmp/vedit-vcs-matrix-91xbGN
+fixture=/tmp/vedit-vcs-matrix-91xbGN
+git_binary=/usr/bin/git
+git_version=git version 2.53.0
+# read commands the product issues (status / identity / diff)
+status                     exit=0   | ## master| M rtl/a.sv|
+rev-parse-abbrev           exit=0   | master
+rev-parse-short            exit=0   | 49cce04
+diff-worktree              exit=0   | diff --git a/rtl/a.sv b/rtl/a.sv|index 0fb97fc..a0e8734 100644|
+diff-cached                exit=0   | 
+diff-no-index              exit=1   | diff --git a/rtl/b.sv b/rtl/b.sv|new file mode 100644|
+# negative control: the legacy spellings the product used to emit
+legacy-path-option         exit=0   | ## master| M rtl/a.sv|
+legacy-porcelain-v1        exit=0   | ## master| M rtl/a.sv|
+# note: diff-no-index exits 1 when the files differ (expected); the product
+#       reads the output and ignores the exit status for that one query.
+matrix_done=yes

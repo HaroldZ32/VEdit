@@ -1,0 +1,83 @@
+== time/head ==
+2026-11-04T18:10:04,687019319+08:00
+4e2d0a57ca50db9568db5a5b040cc66f04c9a05f
+
+== status counts (porcelain -uall) ==
+1519
+   1321 ??
+     13 D
+    185 M
+
+== frozen-file mtimes (must remain pre-task) ==
+2026-11-02 22:13:58.614396990 +0800 CMakeLists.txt
+2026-11-02 12:49:37.579117445 +0800 Cargo.toml
+2026-11-02 12:49:37.579117445 +0800 Cargo.lock
+2026-10-30 11:13:27.950039273 +0800 rust-toolchain.toml
+2026-10-30 10:35:17.809894610 +0800 package.json
+2026-11-02 12:49:37.798349223 +0800 scripts/build-qt.sh
+2026-10-30 10:32:58.869696447 +0800 build/gates/comments.sh
+2026-10-30 10:32:17.411774076 +0800 build/gates/_common.sh
+2026-10-30 10:33:00.414768090 +0800 build/gates/dist.sh
+2026-10-30 10:32:45.885094361 +0800 build/gates/docs.sh
+2026-11-02 12:49:37.581089395 +0800 build/gates/gates.sh
+2026-11-02 12:49:37.581089395 +0800 build/gates/manifest.sh
+2026-11-02 12:49:37.581089395 +0800 build/gates/pack.sh
+2026-11-02 12:49:37.581089395 +0800 build/gates/qt6-cxx.sh
+2026-10-30 10:32:59.357719076 +0800 build/gates/rows.sh
+2026-11-02 12:49:37.581089395 +0800 build/gates/tests.sh
+2026-11-02 12:49:37.581117547 +0800 build/gates/typecheck.sh
+2026-10-30 10:32:59.902744347 +0800 build/gates/vendor.sh
+
+== files under src/packaging/docs/crates/scripts/tests/resources newer than 17:30 ==
+docs/USER_GUIDE.md
+packaging/runtime/AppRun
+packaging/runtime/probe-apprun-env.sh
+packaging/runtime/selfcheck.sh
+src/common/path_display.h
+src/workspace/palette/palette_integration.cpp
+src/workspace/palette/palette_integration_selftest.cpp
+src/workspace/project/project_model.cpp
+src/workspace/project/project_model.h
+src/workspace/project/project_panel.cpp
+src/workspace/project/project_selftest.cpp
+
+== deleted paths (pre-existing T29 folding set; not repair) ==
+ D src/syntax/folding/CMakeLists.txt
+ D src/syntax/folding/README.md
+ D src/syntax/folding/fold_range.cpp
+ D src/syntax/folding/fold_range.h
+ D src/syntax/folding/fold_source.cpp
+ D src/syntax/folding/fold_source.h
+ D src/syntax/folding/ksyntax_fold_source.cpp
+ D src/syntax/folding/ksyntax_fold_source.h
+ D src/syntax/folding/syntax_fold_source.cpp
+ D src/syntax/folding/syntax_fold_source.h
+ D src/syntax/folding/tests/fold_native_gui_probe.cpp
+ D src/syntax/folding/tests/fold_native_probe.cpp
+ D src/syntax/folding/tests/syntax_directory_tests.cpp
+
+== whole-tree diff --check ==
+THIRD_PARTY_NOTICES.md:287: new blank line at EOF.
+evidence/slice3-pack/10-assemble.log:2: trailing whitespace.
++[assemble] translations: qtbase_zh_CN.qm vedit_zh_CN.qm 
+src/editor/kernel/fim_wiring.cpp:56: trailing whitespace.
++    ghost_->setToolTip(QCoreApplication::translate("VEdit", 
+src/editor/kernel/find_replace.cpp:1056: new blank line at EOF.
+src/editor/kernel/multi_cursor.cpp:1280: new blank line at EOF.
+src/workspace/vcs/vcs_panel.cpp:3322: new blank line at EOF.
+WHOLE_DIFF_CHECK_EXIT=2
+
+== repair-scoped diff --check ==
+SCOPED_DIFF_CHECK_EXIT=0
+
+== new probe tracking/ignore status ==
+?? packaging/runtime/probe-apprun-env.sh
+NOT IGNORED
+error: pathspec 'packaging/runtime/probe-apprun-env.sh' did not match any file(s) known to git
+Did you forget to 'git add'?
+UNTRACKED (expected in this dirty worktree)
+
+== cbindgen header current vs build copy ==
+ae78ce608bd1f8d06e01b2cb18ff8bcdbf9ad11689877afc748b5ca149cabca9  crates/vd-ffi/include/vd_ffi.h
+ae78ce608bd1f8d06e01b2cb18ff8bcdbf9ad11689877afc748b5ca149cabca9  evidence/ffi-abi/logs/26-vd_ffi.h
+IDENTICAL

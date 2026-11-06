@@ -1,0 +1,61 @@
+{
+    "dockState": "AAAA/wAAAAD9AAAAAgAAAAAAAAEBAAADM/wCAAAAAfsAAAAcAGQAbwBjAGsALQBmAGkAbABlAC0AdAByAGUAZQEAAAATAAADMwAAAHYA////AAAAAQAAAQEAAAMz/AIAAAAB+wAAABgAZABvAGMAawAtAG8AdQB0AGwAaQBuAGUBAAAAEwAAAzMAAAB2AP///wAAAqIAAAMzAAAABAAAAAQAAAAIAAAACPwAAAAA",
+    "editorLayout": {
+        "active": "pane-1",
+        "nextPane": 3,
+        "root": {
+            "first": {
+                "activeTab": 1,
+                "documents": [
+                    {
+                        "caret": {
+                            "column": 3,
+                            "line": 12
+                        },
+                        "path": "/tmp/vedit-session-probe-nceEHq/project/alpha.sv",
+                        "scroll": 5
+                    },
+                    {
+                        "caret": {
+                            "column": 5,
+                            "line": 45
+                        },
+                        "path": "/tmp/vedit-session-probe-nceEHq/project/bravo.sv",
+                        "scroll": 25
+                    }
+                ],
+                "pane": "pane-1",
+                "provider": "ktexteditor",
+                "type": "leaf"
+            },
+            "orientation": "horizontal",
+            "ratio": 0.5,
+            "second": {
+                "activeTab": 0,
+                "documents": [
+                    {
+                        "caret": {
+                            "column": 0,
+                            "line": 39
+                        },
+                        "path": "/tmp/vedit-session-probe-nceEHq/project/charlie.sv",
+                        "scroll": 0
+                    }
+                ],
+                "pane": "pane-2",
+                "provider": "ktexteditor",
+                "type": "leaf"
+            },
+            "type": "split"
+        },
+        "version": 2
+    },
+    "geometry": "AdnQywADAAAAAAAAAAAAAAAABK8AAANbAAAAAAAAAAAAAASvAAADWwAAAAAAAAAABdwAAAAAAAAAAAAABK8AAANb",
+    "panels": [
+        "file-tree",
+        "outline"
+    ],
+    "project": "/tmp/vedit-session-probe-nceEHq/project",
+    "theme": "Breeze Light",
+    "version": 2
+}

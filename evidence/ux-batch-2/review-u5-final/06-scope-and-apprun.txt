@@ -1,0 +1,44 @@
+# U5 review independent checks
+2026-11-06T10:22:49+08:00
+
+## covered definitions vs resources vs packaged whitelist
+resources:
+vedit-markdown.xml
+vedit-systemverilog.xml
+vedit-tcl.xml
+vedit-verilog.xml
+vedit-vhdl.xml
+appdir syntax:
+vedit-markdown.xml
+vedit-systemverilog.xml
+vedit-tcl.xml
+vedit-verilog.xml
+vedit-vhdl.xml
+packaged whitelist:
+Markdown,SystemVerilog,Tcl,VHDL,Verilog
+
+## xml hashes (resources vs appdir)
+vedit-verilog SAME c6adc763c7b280d7493f48d06e5779d0b1e2068ac82f75fe7f31a07b0788a6c2
+vedit-systemverilog SAME 2abba3342d0878e71b99d358d96e510f857cd7f232786951be8602f513e0b992
+vedit-vhdl SAME 47a4539e08fc6b6257d0897c6187c25c4d9620fe8ac2b2023729b31d6ef75451
+vedit-markdown SAME 9724927b63ef9824739727f471ea7e98d61d0e9ff23b054c82ae21c73e70fc5a
+vedit-tcl SAME 3e201a1df4ad0afc679635a105965a067d16fe4c3618662def4676680572e126
+
+## AppRun untouched
+-rwxrwxr-x 1 haroldzhao haroldzhao 9788 2026-11-05 02:43:48.864927849 +0800 packaging/runtime/AppRun
+925ab1500e1504412a2cfa8a492d8140453f803dc3081702fa4412edb62406c3  packaging/runtime/AppRun
+ M packaging/runtime/AppRun
+
+## files modified today under packaging/runtime
+10:15 selfcheck.sh
+
+## changed file
+ M packaging/runtime/selfcheck.sh
+392489715d580c328f5bb496b050e3503234c3c889cee0b4f40508d904c95fc6  packaging/runtime/selfcheck.sh
+bash -n OK
+
+## assemble-appdir required list
+REQUIRED_SYNTAX=(vedit-verilog.xml vedit-systemverilog.xml vedit-vhdl.xml
+                 vedit-markdown.xml vedit-tcl.xml)
+for required in "${REQUIRED_SYNTAX[@]}"; do
+  [ -f "$DATA_ROOT/syntax/$required" ] ||

@@ -1,0 +1,104 @@
+# 7c 1500x1000 xcb screenshots (Xvfb :83, screen 1500x1000x24)
+collected_at: 2026-11-04T06:25:08+00:00
+xvfb=11 Xvfb :83 -screen 0 1500x1000x24
+svn=1.14.5
+git=git version 2.53.0
+WORKSPACE-VCS-SELFTEST start
+CHECK vcs.screenshot.platform PASS xcb
+VCS-TOOLCHAIN git=/usr/bin/git version=2.53.0 svn=/vedit-build/packaging/runtime/out/AppDir/bin/svn version=1.14.5 source=mixed git_source=path svn_source=env
+CHECK 10-vcs-three-columns-1500x1000.png.bytes PASS /vedit-build/evidence/xcb-visual-2/shots/vcs/10-vcs-three-columns-1500x1000.png bytes=65243
+CHECK 10-vcs-three-columns-1500x1000.png.dimensions PASS 1500x1000
+CHECK 10-vcs-three-columns-1500x1000.png.pixels PASS distinct sampled colours=386
+CHECK 11-vcs-staged-1500x1000.png.bytes PASS /vedit-build/evidence/xcb-visual-2/shots/vcs/11-vcs-staged-1500x1000.png bytes=67235
+CHECK 11-vcs-staged-1500x1000.png.dimensions PASS 1500x1000
+CHECK 11-vcs-staged-1500x1000.png.pixels PASS distinct sampled colours=396
+CHECK 13-vcs-loading-1500x1000.png.bytes PASS /vedit-build/evidence/xcb-visual-2/shots/vcs/13-vcs-loading-1500x1000.png bytes=18072
+CHECK 13-vcs-loading-1500x1000.png.dimensions PASS 1500x1000
+CHECK 13-vcs-loading-1500x1000.png.pixels PASS distinct sampled colours=100
+CHECK 12-vcs-empty-state-1500x1000.png.bytes PASS /vedit-build/evidence/xcb-visual-2/shots/vcs/12-vcs-empty-state-1500x1000.png bytes=35527
+CHECK 12-vcs-empty-state-1500x1000.png.dimensions PASS 1500x1000
+CHECK 12-vcs-empty-state-1500x1000.png.pixels PASS distinct sampled colours=236
+CHECK 14-vcs-error-state-1500x1000.png.bytes PASS /vedit-build/evidence/xcb-visual-2/shots/vcs/14-vcs-error-state-1500x1000.png bytes=33250
+CHECK 14-vcs-error-state-1500x1000.png.dimensions PASS 1500x1000
+CHECK 14-vcs-error-state-1500x1000.png.pixels PASS distinct sampled colours=222
+CHECK 15-vcs-commit-dialog-1500x1000.png.bytes PASS /vedit-build/evidence/xcb-visual-2/shots/vcs/15-vcs-commit-dialog-1500x1000.png bytes=15952
+CHECK 15-vcs-commit-dialog-1500x1000.png.dimensions PASS 900x360
+CHECK 15-vcs-commit-dialog-1500x1000.png.pixels PASS distinct sampled colours=107
+CHECK vcs.screenshot.refs-fixture PASS /tmp/vedit-workspace-vcs-selftest-VhKlGI/ui-remote/work
+CHECK vcs.screenshot.refs-info PASS refs=5 remotes=1
+CHECK 20-vcs-refs-and-remotes-1500x1000.png.bytes PASS /vedit-build/evidence/xcb-visual-2/shots/vcs/20-vcs-refs-and-remotes-1500x1000.png bytes=50719
+CHECK 20-vcs-refs-and-remotes-1500x1000.png.dimensions PASS 1500x1000
+CHECK 20-vcs-refs-and-remotes-1500x1000.png.pixels PASS distinct sampled colours=301
+CHECK 21-vcs-remote-action-row-1500x1000.png.bytes PASS /vedit-build/evidence/xcb-visual-2/shots/vcs/21-vcs-remote-action-row-1500x1000.png bytes=33824
+CHECK 21-vcs-remote-action-row-1500x1000.png.dimensions PASS 1500x1000
+CHECK 21-vcs-remote-action-row-1500x1000.png.pixels PASS distinct sampled colours=218
+CHECK 22-vcs-credential-dialog-1500x1000.png.bytes PASS /vedit-build/evidence/xcb-visual-2/shots/vcs/22-vcs-credential-dialog-1500x1000.png bytes=33599
+CHECK 22-vcs-credential-dialog-1500x1000.png.dimensions PASS 1500x1000
+CHECK 22-vcs-credential-dialog-1500x1000.png.pixels PASS distinct sampled colours=207
+CHECK 23-vcs-branch-dialog-1500x1000.png.bytes PASS /vedit-build/evidence/xcb-visual-2/shots/vcs/23-vcs-branch-dialog-1500x1000.png bytes=18759
+CHECK 23-vcs-branch-dialog-1500x1000.png.dimensions PASS 1500x1000
+CHECK 23-vcs-branch-dialog-1500x1000.png.pixels PASS distinct sampled colours=89
+CHECK 24-vcs-tag-dialog-1500x1000.png.bytes PASS /vedit-build/evidence/xcb-visual-2/shots/vcs/24-vcs-tag-dialog-1500x1000.png bytes=13631
+CHECK 24-vcs-tag-dialog-1500x1000.png.dimensions PASS 1500x1000
+CHECK 24-vcs-tag-dialog-1500x1000.png.pixels PASS distinct sampled colours=49
+CHECK 25-vcs-remote-dialog-1500x1000.png.bytes PASS /vedit-build/evidence/xcb-visual-2/shots/vcs/25-vcs-remote-dialog-1500x1000.png bytes=15669
+CHECK 25-vcs-remote-dialog-1500x1000.png.dimensions PASS 1500x1000
+CHECK 25-vcs-remote-dialog-1500x1000.png.pixels PASS distinct sampled colours=62
+CHECK vcs.screenshot.history-ready PASS rows=40
+CHECK 30-vcs-history-commits-1500x1000.png.bytes PASS /vedit-build/evidence/xcb-visual-2/shots/vcs/30-vcs-history-commits-1500x1000.png bytes=246782
+CHECK 30-vcs-history-commits-1500x1000.png.dimensions PASS 1500x1000
+CHECK 30-vcs-history-commits-1500x1000.png.pixels PASS distinct sampled colours=666
+CHECK 31-vcs-history-blame-1500x1000.png.bytes PASS /vedit-build/evidence/xcb-visual-2/shots/vcs/31-vcs-history-blame-1500x1000.png bytes=225666
+CHECK 31-vcs-history-blame-1500x1000.png.dimensions PASS 1500x1000
+CHECK 31-vcs-history-blame-1500x1000.png.pixels PASS distinct sampled colours=536
+CHECK 32-vcs-history-empty-1500x1000.png.bytes PASS /vedit-build/evidence/xcb-visual-2/shots/vcs/32-vcs-history-empty-1500x1000.png bytes=24665
+CHECK 32-vcs-history-empty-1500x1000.png.dimensions PASS 1500x1000
+CHECK 32-vcs-history-empty-1500x1000.png.pixels PASS distinct sampled colours=142
+CHECK vcs.screenshot.conflict-fixture PASS /tmp/vedit-workspace-vcs-selftest-VhKlGI/ops-conflict
+CHECK vcs.screenshot.conflict-state PASS Merge in progress: 1 conflicted file(s). Resolve them, stage the result, then Continue (or Abort).
+CHECK 40-vcs-conflict-state-1500x1000.png.bytes PASS /vedit-build/evidence/xcb-visual-2/shots/vcs/40-vcs-conflict-state-1500x1000.png bytes=74850
+CHECK 40-vcs-conflict-state-1500x1000.png.dimensions PASS 1500x1000
+CHECK 40-vcs-conflict-state-1500x1000.png.pixels PASS distinct sampled colours=449
+CHECK vcs.screenshot.workspace-fixture PASS /tmp/vedit-workspace-vcs-selftest-VhKlGI/workspace-ui
+CHECK vcs.screenshot.workspace-listings PASS stashes=1 worktrees=2
+CHECK 50-vcs-workspace-dialog-1500x1000.png.bytes PASS /vedit-build/evidence/xcb-visual-2/shots/vcs/50-vcs-workspace-dialog-1500x1000.png bytes=54573
+CHECK 50-vcs-workspace-dialog-1500x1000.png.dimensions PASS 1500x1000
+CHECK 50-vcs-workspace-dialog-1500x1000.png.pixels PASS distinct sampled colours=354
+CHECK 60-vcs-svn-panel-1500x1000.png.bytes PASS /vedit-build/evidence/xcb-visual-2/shots/vcs/60-vcs-svn-panel-1500x1000.png bytes=60622
+CHECK 60-vcs-svn-panel-1500x1000.png.dimensions PASS 1500x1000
+CHECK 60-vcs-svn-panel-1500x1000.png.pixels PASS distinct sampled colours=396
+CHECK vcs.screenshot.svn-fixture PASS /tmp/vedit-workspace-vcs-selftest-TViAgY/wc
+CHECK vcs.screenshot.svn-real-ready PASS
+CHECK 61-vcs-svn-real-1500x1000.png.bytes PASS /vedit-build/evidence/xcb-visual-2/shots/vcs/61-vcs-svn-real-1500x1000.png bytes=62266
+CHECK 61-vcs-svn-real-1500x1000.png.dimensions PASS 1500x1000
+CHECK 61-vcs-svn-real-1500x1000.png.pixels PASS distinct sampled colours=428
+CHECK 33-vcs-history-error-1500x1000.png.bytes PASS /vedit-build/evidence/xcb-visual-2/shots/vcs/33-vcs-history-error-1500x1000.png bytes=28751
+CHECK 33-vcs-history-error-1500x1000.png.dimensions PASS 1500x1000
+CHECK 33-vcs-history-error-1500x1000.png.pixels PASS distinct sampled colours=174
+WORKSPACE-VCS-SELFTEST screenshots ok=1 checks=70 failures=0
+total 1208
+drwxrwxr-x 2 root root   4096 Nov  4 06:25 .
+drwxrwxr-x 5 root root   4096 Nov  4 06:22 ..
+-rw-r--r-- 1 root root  65243 Nov  4 06:25 10-vcs-three-columns-1500x1000.png
+-rw-r--r-- 1 root root  67235 Nov  4 06:25 11-vcs-staged-1500x1000.png
+-rw-r--r-- 1 root root  35527 Nov  4 06:25 12-vcs-empty-state-1500x1000.png
+-rw-r--r-- 1 root root  18072 Nov  4 06:25 13-vcs-loading-1500x1000.png
+-rw-r--r-- 1 root root  33250 Nov  4 06:25 14-vcs-error-state-1500x1000.png
+-rw-r--r-- 1 root root  15952 Nov  4 06:25 15-vcs-commit-dialog-1500x1000.png
+-rw-r--r-- 1 root root  50719 Nov  4 06:25 20-vcs-refs-and-remotes-1500x1000.png
+-rw-r--r-- 1 root root  33824 Nov  4 06:25 21-vcs-remote-action-row-1500x1000.png
+-rw-r--r-- 1 root root  33599 Nov  4 06:25 22-vcs-credential-dialog-1500x1000.png
+-rw-r--r-- 1 root root  18759 Nov  4 06:25 23-vcs-branch-dialog-1500x1000.png
+-rw-r--r-- 1 root root  13631 Nov  4 06:25 24-vcs-tag-dialog-1500x1000.png
+-rw-r--r-- 1 root root  15669 Nov  4 06:25 25-vcs-remote-dialog-1500x1000.png
+-rw-r--r-- 1 root root 246782 Nov  4 06:25 30-vcs-history-commits-1500x1000.png
+-rw-r--r-- 1 root root 225666 Nov  4 06:25 31-vcs-history-blame-1500x1000.png
+-rw-r--r-- 1 root root  24665 Nov  4 06:25 32-vcs-history-empty-1500x1000.png
+-rw-r--r-- 1 root root  28751 Nov  4 06:25 33-vcs-history-error-1500x1000.png
+-rw-r--r-- 1 root root  74850 Nov  4 06:25 40-vcs-conflict-state-1500x1000.png
+-rw-r--r-- 1 root root  54573 Nov  4 06:25 50-vcs-workspace-dialog-1500x1000.png
+-rw-r--r-- 1 root root  60622 Nov  4 06:25 60-vcs-svn-panel-1500x1000.png
+-rw-r--r-- 1 root root  62266 Nov  4 06:25 61-vcs-svn-real-1500x1000.png
+vcs-screenshots=PASS
+[xcb-visual-2] PASS: 1500x1000 xcb VCS screenshots in evidence/xcb-visual-2/shots/vcs/
+VCS_RUN_EXIT=0

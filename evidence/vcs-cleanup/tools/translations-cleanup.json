@@ -1,0 +1,10 @@
+{
+  "VEdit": {
+    "A rebase target is required; nothing was written.": "需要 rebase 目标；未写入任何内容。",
+    "the current branch": "当前分支",
+    "Rebase %1 onto %2?\n\nRebase rewrites the commits of %1: every commit after %2 is replayed on top of it and gets a new id. A published branch must be force-pushed afterwards. Conflicts stop the rebase until you Continue or Abort.": "将 %1 rebase 到 %2？\n\nrebase 会重写 %1 的提交：%2 之后的每个提交都会在其之上重放并获得新的 id。已发布的分支之后必须强制推送（force-push）。冲突会中止 rebase，直到你选择 Continue 或 Abort。",
+    "Rebase the branch?": "Rebase 分支？",
+    "Rebase cancelled; nothing was written.": "已取消 rebase；未写入任何内容。",
+    "Unknown": "未知"
+  }
+}

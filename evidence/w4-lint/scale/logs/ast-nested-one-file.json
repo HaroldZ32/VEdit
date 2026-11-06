@@ -1,0 +1,1174 @@
+{
+  "design": {
+    "name": "$root",
+    "kind": "Root",
+    "addr": 4114043437216,
+    "members": [
+      {
+        "name": "",
+        "kind": "CompilationUnit",
+        "addr": 4114046210512
+      },
+      {
+        "name": "l0_m_0_0",
+        "kind": "Instance",
+        "addr": 4114046211264,
+        "body": {
+          "name": "l0_m_0_0",
+          "kind": "InstanceBody",
+          "addr": 4114046210784,
+          "members": [
+            {
+              "name": "W",
+              "kind": "Parameter",
+              "addr": 4114046210960,
+              "type": "int",
+              "initializer": {
+                "kind": "IntegerLiteral",
+                "type": "int",
+                "value": "3",
+                "constant": "3"
+              },
+              "value": "3",
+              "isLocal": false,
+              "isPort": true,
+              "isBody": false
+            },
+            {
+              "name": "a",
+              "kind": "Port",
+              "addr": 4114046211400,
+              "type": "logic",
+              "direction": "In",
+              "internalSymbol": "4114046211520 a"
+            },
+            {
+              "name": "a",
+              "kind": "Net",
+              "addr": 4114046211520,
+              "type": "logic",
+              "netType": {
+                "name": "wire",
+                "kind": "NetType",
+                "addr": 4114043444736,
+                "type": "logic"
+              }
+            },
+            {
+              "name": "b",
+              "kind": "Port",
+              "addr": 4114046211680,
+              "type": "logic[5:0]",
+              "direction": "Out",
+              "internalSymbol": "4114046211800 b"
+            },
+            {
+              "name": "b",
+              "kind": "Variable",
+              "addr": 4114046211800,
+              "type": "logic[5:0]",
+              "lifetime": "Static"
+            },
+            {
+              "name": "u1",
+              "kind": "Instance",
+              "addr": 4114046211952,
+              "body": {
+                "name": "l1_m_0_0",
+                "kind": "InstanceBody",
+                "addr": 4114046212080,
+                "members": [
+                  {
+                    "name": "W",
+                    "kind": "Parameter",
+                    "addr": 4114046212256,
+                    "type": "int",
+                    "initializer": {
+                      "kind": "NamedValue",
+                      "type": "int",
+                      "symbol": "4114046210960 W",
+                      "constant": "3"
+                    },
+                    "value": "3",
+                    "isLocal": false,
+                    "isPort": true,
+                    "isBody": false
+                  },
+                  {
+                    "name": "a",
+                    "kind": "Port",
+                    "addr": 4114046213008,
+                    "type": "logic",
+                    "direction": "In",
+                    "internalSymbol": "4114046213128 a"
+                  },
+                  {
+                    "name": "a",
+                    "kind": "Net",
+                    "addr": 4114046213128,
+                    "type": "logic",
+                    "netType": {
+                      "name": "wire",
+                      "kind": "NetType",
+                      "addr": 4114043444736,
+                      "type": "logic"
+                    }
+                  },
+                  {
+                    "name": "b",
+                    "kind": "Port",
+                    "addr": 4114046213288,
+                    "type": "logic[5:0]",
+                    "direction": "Out",
+                    "internalSymbol": "4114046213408 b"
+                  },
+                  {
+                    "name": "b",
+                    "kind": "Variable",
+                    "addr": 4114046213408,
+                    "type": "logic[5:0]",
+                    "lifetime": "Static"
+                  },
+                  {
+                    "name": "u2",
+                    "kind": "Instance",
+                    "addr": 4114046213560,
+                    "body": {
+                      "name": "l2_m_0_0",
+                      "kind": "InstanceBody",
+                      "addr": 4114046213688,
+                      "members": [
+                        {
+                          "name": "W",
+                          "kind": "Parameter",
+                          "addr": 4114046213864,
+                          "type": "int",
+                          "initializer": {
+                            "kind": "NamedValue",
+                            "type": "int",
+                            "symbol": "4114046212256 W",
+                            "constant": "3"
+                          },
+                          "value": "3",
+                          "isLocal": false,
+                          "isPort": true,
+                          "isBody": false
+                        },
+                        {
+                          "name": "a",
+                          "kind": "Port",
+                          "addr": 4114046219048,
+                          "type": "logic",
+                          "direction": "In",
+                          "internalSymbol": "4114046219168 a"
+                        },
+                        {
+                          "name": "a",
+                          "kind": "Net",
+                          "addr": 4114046219168,
+                          "type": "logic",
+                          "netType": {
+                            "name": "wire",
+                            "kind": "NetType",
+                            "addr": 4114043444736,
+                            "type": "logic"
+                          }
+                        },
+                        {
+                          "name": "b",
+                          "kind": "Port",
+                          "addr": 4114046219328,
+                          "type": "logic[5:0]",
+                          "direction": "Out",
+                          "internalSymbol": "4114046219448 b"
+                        },
+                        {
+                          "name": "b",
+                          "kind": "Variable",
+                          "addr": 4114046219448,
+                          "type": "logic[5:0]",
+                          "lifetime": "Static"
+                        },
+                        {
+                          "name": "u3",
+                          "kind": "Instance",
+                          "addr": 4114046219600,
+                          "body": {
+                            "name": "l3_m_0_0",
+                            "kind": "InstanceBody",
+                            "addr": 4114046219728,
+                            "members": [
+                              {
+                                "name": "W",
+                                "kind": "Parameter",
+                                "addr": 4114046219904,
+                                "type": "int",
+                                "initializer": {
+                                  "kind": "NamedValue",
+                                  "type": "int",
+                                  "symbol": "4114046213864 W",
+                                  "constant": "3"
+                                },
+                                "value": "3",
+                                "isLocal": false,
+                                "isPort": true,
+                                "isBody": false
+                              },
+                              {
+                                "name": "a",
+                                "kind": "Port",
+                                "addr": 4114046220928,
+                                "type": "logic",
+                                "direction": "In",
+                                "internalSymbol": "4114046221048 a"
+                              },
+                              {
+                                "name": "a",
+                                "kind": "Net",
+                                "addr": 4114046221048,
+                                "type": "logic",
+                                "netType": {
+                                  "name": "wire",
+                                  "kind": "NetType",
+                                  "addr": 4114043444736,
+                                  "type": "logic"
+                                }
+                              },
+                              {
+                                "name": "b",
+                                "kind": "Port",
+                                "addr": 4114046221208,
+                                "type": "logic[5:0]",
+                                "direction": "Out",
+                                "internalSymbol": "4114046221328 b"
+                              },
+                              {
+                                "name": "b",
+                                "kind": "Variable",
+                                "addr": 4114046221328,
+                                "type": "logic[5:0]",
+                                "lifetime": "Static"
+                              },
+                              {
+                                "name": "u4",
+                                "kind": "Instance",
+                                "addr": 4114046221480,
+                                "body": {
+                                  "name": "l4_m_0_0",
+                                  "kind": "InstanceBody",
+                                  "addr": 4114046221608,
+                                  "members": [
+                                    {
+                                      "name": "W",
+                                      "kind": "Parameter",
+                                      "addr": 4114046221784,
+                                      "type": "int",
+                                      "initializer": {
+                                        "kind": "NamedValue",
+                                        "type": "int",
+                                        "symbol": "4114046219904 W",
+                                        "constant": "3"
+                                      },
+                                      "value": "3",
+                                      "isLocal": false,
+                                      "isPort": true,
+                                      "isBody": false
+                                    },
+                                    {
+                                      "name": "a",
+                                      "kind": "Port",
+                                      "addr": 4114046226952,
+                                      "type": "logic",
+                                      "direction": "In",
+                                      "internalSymbol": "4114046227072 a"
+                                    },
+                                    {
+                                      "name": "a",
+                                      "kind": "Net",
+                                      "addr": 4114046227072,
+                                      "type": "logic",
+                                      "netType": {
+                                        "name": "wire",
+                                        "kind": "NetType",
+                                        "addr": 4114043444736,
+                                        "type": "logic"
+                                      }
+                                    },
+                                    {
+                                      "name": "b",
+                                      "kind": "Port",
+                                      "addr": 4114046227232,
+                                      "type": "logic[5:0]",
+                                      "direction": "Out",
+                                      "internalSymbol": "4114046227352 b"
+                                    },
+                                    {
+                                      "name": "b",
+                                      "kind": "Variable",
+                                      "addr": 4114046227352,
+                                      "type": "logic[5:0]",
+                                      "lifetime": "Static"
+                                    },
+                                    {
+                                      "name": "g_leaf",
+                                      "kind": "GenerateBlockArray",
+                                      "addr": 4114046227504,
+                                      "members": [
+                                        {
+                                          "name": "g",
+                                          "kind": "Genvar",
+                                          "addr": 4114046227704
+                                        },
+                                        {
+                                          "name": "",
+                                          "kind": "GenerateBlock",
+                                          "addr": 4114046228712,
+                                          "members": [
+                                            {
+                                              "name": "g",
+                                              "kind": "Parameter",
+                                              "addr": 4114046228856,
+                                              "type": "integer",
+                                              "value": "0",
+                                              "isLocal": true,
+                                              "isPort": false,
+                                              "isBody": true
+                                            },
+                                            {
+                                              "name": "u",
+                                              "kind": "Instance",
+                                              "addr": 4114046231752,
+                                              "body": {
+                                                "name": "leaf_m_0_0",
+                                                "kind": "InstanceBody",
+                                                "addr": 4114046231880,
+                                                "members": [
+                                                  {
+                                                    "name": "W",
+                                                    "kind": "Parameter",
+                                                    "addr": 4114046232056,
+                                                    "type": "int",
+                                                    "initializer": {
+                                                      "kind": "NamedValue",
+                                                      "type": "int",
+                                                      "symbol": "4114046221784 W",
+                                                      "constant": "3"
+                                                    },
+                                                    "value": "3",
+                                                    "isLocal": false,
+                                                    "isPort": true,
+                                                    "isBody": false
+                                                  },
+                                                  {
+                                                    "name": "a",
+                                                    "kind": "Port",
+                                                    "addr": 4114046232536,
+                                                    "type": "logic",
+                                                    "direction": "In",
+                                                    "internalSymbol": "4114046232656 a"
+                                                  },
+                                                  {
+                                                    "name": "a",
+                                                    "kind": "Net",
+                                                    "addr": 4114046232656,
+                                                    "type": "logic",
+                                                    "netType": {
+                                                      "name": "wire",
+                                                      "kind": "NetType",
+                                                      "addr": 4114043444736,
+                                                      "type": "logic"
+                                                    }
+                                                  },
+                                                  {
+                                                    "name": "b",
+                                                    "kind": "Port",
+                                                    "addr": 4114046232816,
+                                                    "type": "logic",
+                                                    "direction": "Out",
+                                                    "internalSymbol": "4114046232936 b"
+                                                  },
+                                                  {
+                                                    "name": "b",
+                                                    "kind": "Variable",
+                                                    "addr": 4114046232936,
+                                                    "type": "logic",
+                                                    "lifetime": "Static"
+                                                  },
+                                                  {
+                                                    "name": "LW",
+                                                    "kind": "Parameter",
+                                                    "addr": 4114046232288,
+                                                    "type": "int",
+                                                    "initializer": {
+                                                      "kind": "NamedValue",
+                                                      "type": "int",
+                                                      "symbol": "4114046232056 W",
+                                                      "constant": "3"
+                                                    },
+                                                    "value": "3",
+                                                    "isLocal": true,
+                                                    "isPort": false,
+                                                    "isBody": true
+                                                  },
+                                                  {
+                                                    "name": "",
+                                                    "kind": "ContinuousAssign",
+                                                    "addr": 4114046233088,
+                                                    "assignment": {
+                                                      "kind": "Assignment",
+                                                      "type": "logic",
+                                                      "left": {
+                                                        "kind": "NamedValue",
+                                                        "type": "logic",
+                                                        "symbol": "4114046232936 b"
+                                                      },
+                                                      "right": {
+                                                        "kind": "NamedValue",
+                                                        "type": "logic",
+                                                        "symbol": "4114046232656 a"
+                                                      },
+                                                      "isNonBlocking": false
+                                                    }
+                                                  }
+                                                ],
+                                                "definition": "4114042546432 leaf_m_0_0"
+                                              },
+                                              "connections": [
+                                                {
+                                                  "port": {
+                                                    "name": "a",
+                                                    "kind": "Port",
+                                                    "addr": 4114046232536,
+                                                    "type": "logic",
+                                                    "direction": "In",
+                                                    "internalSymbol": "4114046232656 a"
+                                                  },
+                                                  "expr": {
+                                                    "kind": "NamedValue",
+                                                    "type": "logic",
+                                                    "symbol": "4114046227072 a"
+                                                  }
+                                                },
+                                                {
+                                                  "port": {
+                                                    "name": "b",
+                                                    "kind": "Port",
+                                                    "addr": 4114046232816,
+                                                    "type": "logic",
+                                                    "direction": "Out",
+                                                    "internalSymbol": "4114046232936 b"
+                                                  },
+                                                  "expr": {
+                                                    "kind": "Assignment",
+                                                    "type": "logic",
+                                                    "left": {
+                                                      "kind": "ElementSelect",
+                                                      "type": "logic",
+                                                      "value": {
+                                                        "kind": "NamedValue",
+                                                        "type": "logic[5:0]",
+                                                        "symbol": "4114046227352 b"
+                                                      },
+                                                      "selector": {
+                                                        "kind": "NamedValue",
+                                                        "type": "integer",
+                                                        "symbol": "4114046228856 g",
+                                                        "constant": "0"
+                                                      }
+                                                    },
+                                                    "right": {
+                                                      "kind": "EmptyArgument",
+                                                      "type": "logic"
+                                                    },
+                                                    "isNonBlocking": false
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          ],
+                                          "constructIndex": 0,
+                                          "isUninstantiated": false,
+                                          "branchKind": "LoopIteration"
+                                        },
+                                        {
+                                          "name": "",
+                                          "kind": "GenerateBlock",
+                                          "addr": 4114046229088,
+                                          "members": [
+                                            {
+                                              "name": "g",
+                                              "kind": "Parameter",
+                                              "addr": 4114046229232,
+                                              "type": "integer",
+                                              "value": "1",
+                                              "isLocal": true,
+                                              "isPort": false,
+                                              "isBody": true
+                                            },
+                                            {
+                                              "name": "u",
+                                              "kind": "Instance",
+                                              "addr": 4114046234128,
+                                              "body": "4114046231880 leaf_m_0_0",
+                                              "connections": [
+                                                {
+                                                  "port": {
+                                                    "name": "a",
+                                                    "kind": "Port",
+                                                    "addr": 4114046234952,
+                                                    "type": "logic",
+                                                    "direction": "In",
+                                                    "internalSymbol": "4114046235072 a"
+                                                  },
+                                                  "expr": {
+                                                    "kind": "NamedValue",
+                                                    "type": "logic",
+                                                    "symbol": "4114046227072 a"
+                                                  }
+                                                },
+                                                {
+                                                  "port": {
+                                                    "name": "b",
+                                                    "kind": "Port",
+                                                    "addr": 4114046235232,
+                                                    "type": "logic",
+                                                    "direction": "Out",
+                                                    "internalSymbol": "4114046235352 b"
+                                                  },
+                                                  "expr": {
+                                                    "kind": "Assignment",
+                                                    "type": "logic",
+                                                    "left": {
+                                                      "kind": "ElementSelect",
+                                                      "type": "logic",
+                                                      "value": {
+                                                        "kind": "NamedValue",
+                                                        "type": "logic[5:0]",
+                                                        "symbol": "4114046227352 b"
+                                                      },
+                                                      "selector": {
+                                                        "kind": "NamedValue",
+                                                        "type": "integer",
+                                                        "symbol": "4114046229232 g",
+                                                        "constant": "1"
+                                                      }
+                                                    },
+                                                    "right": {
+                                                      "kind": "EmptyArgument",
+                                                      "type": "logic"
+                                                    },
+                                                    "isNonBlocking": false
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          ],
+                                          "constructIndex": 1,
+                                          "isUninstantiated": false,
+                                          "branchKind": "LoopIteration"
+                                        },
+                                        {
+                                          "name": "",
+                                          "kind": "GenerateBlock",
+                                          "addr": 4114046229464,
+                                          "members": [
+                                            {
+                                              "name": "g",
+                                              "kind": "Parameter",
+                                              "addr": 4114046229608,
+                                              "type": "integer",
+                                              "value": "2",
+                                              "isLocal": true,
+                                              "isPort": false,
+                                              "isBody": true
+                                            },
+                                            {
+                                              "name": "u",
+                                              "kind": "Instance",
+                                              "addr": 4114046236344,
+                                              "body": "4114046231880 leaf_m_0_0",
+                                              "connections": [
+                                                {
+                                                  "port": {
+                                                    "name": "a",
+                                                    "kind": "Port",
+                                                    "addr": 4114046237128,
+                                                    "type": "logic",
+                                                    "direction": "In",
+                                                    "internalSymbol": "4114046237248 a"
+                                                  },
+                                                  "expr": {
+                                                    "kind": "NamedValue",
+                                                    "type": "logic",
+                                                    "symbol": "4114046227072 a"
+                                                  }
+                                                },
+                                                {
+                                                  "port": {
+                                                    "name": "b",
+                                                    "kind": "Port",
+                                                    "addr": 4114046237408,
+                                                    "type": "logic",
+                                                    "direction": "Out",
+                                                    "internalSymbol": "4114046237528 b"
+                                                  },
+                                                  "expr": {
+                                                    "kind": "Assignment",
+                                                    "type": "logic",
+                                                    "left": {
+                                                      "kind": "ElementSelect",
+                                                      "type": "logic",
+                                                      "value": {
+                                                        "kind": "NamedValue",
+                                                        "type": "logic[5:0]",
+                                                        "symbol": "4114046227352 b"
+                                                      },
+                                                      "selector": {
+                                                        "kind": "NamedValue",
+                                                        "type": "integer",
+                                                        "symbol": "4114046229608 g",
+                                                        "constant": "2"
+                                                      }
+                                                    },
+                                                    "right": {
+                                                      "kind": "EmptyArgument",
+                                                      "type": "logic"
+                                                    },
+                                                    "isNonBlocking": false
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          ],
+                                          "constructIndex": 2,
+                                          "isUninstantiated": false,
+                                          "branchKind": "LoopIteration"
+                                        },
+                                        {
+                                          "name": "",
+                                          "kind": "GenerateBlock",
+                                          "addr": 4114046229840,
+                                          "members": [
+                                            {
+                                              "name": "g",
+                                              "kind": "Parameter",
+                                              "addr": 4114046229984,
+                                              "type": "integer",
+                                              "value": "3",
+                                              "isLocal": true,
+                                              "isPort": false,
+                                              "isBody": true
+                                            },
+                                            {
+                                              "name": "u",
+                                              "kind": "Instance",
+                                              "addr": 4114046238520,
+                                              "body": "4114046231880 leaf_m_0_0",
+                                              "connections": [
+                                                {
+                                                  "port": {
+                                                    "name": "a",
+                                                    "kind": "Port",
+                                                    "addr": 4114046239392,
+                                                    "type": "logic",
+                                                    "direction": "In",
+                                                    "internalSymbol": "4114046239512 a"
+                                                  },
+                                                  "expr": {
+                                                    "kind": "NamedValue",
+                                                    "type": "logic",
+                                                    "symbol": "4114046227072 a"
+                                                  }
+                                                },
+                                                {
+                                                  "port": {
+                                                    "name": "b",
+                                                    "kind": "Port",
+                                                    "addr": 4114046239672,
+                                                    "type": "logic",
+                                                    "direction": "Out",
+                                                    "internalSymbol": "4114046239792 b"
+                                                  },
+                                                  "expr": {
+                                                    "kind": "Assignment",
+                                                    "type": "logic",
+                                                    "left": {
+                                                      "kind": "ElementSelect",
+                                                      "type": "logic",
+                                                      "value": {
+                                                        "kind": "NamedValue",
+                                                        "type": "logic[5:0]",
+                                                        "symbol": "4114046227352 b"
+                                                      },
+                                                      "selector": {
+                                                        "kind": "NamedValue",
+                                                        "type": "integer",
+                                                        "symbol": "4114046229984 g",
+                                                        "constant": "3"
+                                                      }
+                                                    },
+                                                    "right": {
+                                                      "kind": "EmptyArgument",
+                                                      "type": "logic"
+                                                    },
+                                                    "isNonBlocking": false
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          ],
+                                          "constructIndex": 3,
+                                          "isUninstantiated": false,
+                                          "branchKind": "LoopIteration"
+                                        },
+                                        {
+                                          "name": "",
+                                          "kind": "GenerateBlock",
+                                          "addr": 4114046230216,
+                                          "members": [
+                                            {
+                                              "name": "g",
+                                              "kind": "Parameter",
+                                              "addr": 4114046230360,
+                                              "type": "integer",
+                                              "value": "4",
+                                              "isLocal": true,
+                                              "isPort": false,
+                                              "isBody": true
+                                            },
+                                            {
+                                              "name": "u",
+                                              "kind": "Instance",
+                                              "addr": 4114046240784,
+                                              "body": "4114046231880 leaf_m_0_0",
+                                              "connections": [
+                                                {
+                                                  "port": {
+                                                    "name": "a",
+                                                    "kind": "Port",
+                                                    "addr": 4114046241568,
+                                                    "type": "logic",
+                                                    "direction": "In",
+                                                    "internalSymbol": "4114046241688 a"
+                                                  },
+                                                  "expr": {
+                                                    "kind": "NamedValue",
+                                                    "type": "logic",
+                                                    "symbol": "4114046227072 a"
+                                                  }
+                                                },
+                                                {
+                                                  "port": {
+                                                    "name": "b",
+                                                    "kind": "Port",
+                                                    "addr": 4114046241848,
+                                                    "type": "logic",
+                                                    "direction": "Out",
+                                                    "internalSymbol": "4114046241968 b"
+                                                  },
+                                                  "expr": {
+                                                    "kind": "Assignment",
+                                                    "type": "logic",
+                                                    "left": {
+                                                      "kind": "ElementSelect",
+                                                      "type": "logic",
+                                                      "value": {
+                                                        "kind": "NamedValue",
+                                                        "type": "logic[5:0]",
+                                                        "symbol": "4114046227352 b"
+                                                      },
+                                                      "selector": {
+                                                        "kind": "NamedValue",
+                                                        "type": "integer",
+                                                        "symbol": "4114046230360 g",
+                                                        "constant": "4"
+                                                      }
+                                                    },
+                                                    "right": {
+                                                      "kind": "EmptyArgument",
+                                                      "type": "logic"
+                                                    },
+                                                    "isNonBlocking": false
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          ],
+                                          "constructIndex": 4,
+                                          "isUninstantiated": false,
+                                          "branchKind": "LoopIteration"
+                                        },
+                                        {
+                                          "name": "",
+                                          "kind": "GenerateBlock",
+                                          "addr": 4114046230608,
+                                          "members": [
+                                            {
+                                              "name": "g",
+                                              "kind": "Parameter",
+                                              "addr": 4114046230752,
+                                              "type": "integer",
+                                              "value": "5",
+                                              "isLocal": true,
+                                              "isPort": false,
+                                              "isBody": true
+                                            },
+                                            {
+                                              "name": "u",
+                                              "kind": "Instance",
+                                              "addr": 4114046243032,
+                                              "body": "4114046231880 leaf_m_0_0",
+                                              "connections": [
+                                                {
+                                                  "port": {
+                                                    "name": "a",
+                                                    "kind": "Port",
+                                                    "addr": 4114046243816,
+                                                    "type": "logic",
+                                                    "direction": "In",
+                                                    "internalSymbol": "4114046243936 a"
+                                                  },
+                                                  "expr": {
+                                                    "kind": "NamedValue",
+                                                    "type": "logic",
+                                                    "symbol": "4114046227072 a"
+                                                  }
+                                                },
+                                                {
+                                                  "port": {
+                                                    "name": "b",
+                                                    "kind": "Port",
+                                                    "addr": 4114046244096,
+                                                    "type": "logic",
+                                                    "direction": "Out",
+                                                    "internalSymbol": "4114046244216 b"
+                                                  },
+                                                  "expr": {
+                                                    "kind": "Assignment",
+                                                    "type": "logic",
+                                                    "left": {
+                                                      "kind": "ElementSelect",
+                                                      "type": "logic",
+                                                      "value": {
+                                                        "kind": "NamedValue",
+                                                        "type": "logic[5:0]",
+                                                        "symbol": "4114046227352 b"
+                                                      },
+                                                      "selector": {
+                                                        "kind": "NamedValue",
+                                                        "type": "integer",
+                                                        "symbol": "4114046230752 g",
+                                                        "constant": "5"
+                                                      }
+                                                    },
+                                                    "right": {
+                                                      "kind": "EmptyArgument",
+                                                      "type": "logic"
+                                                    },
+                                                    "isNonBlocking": false
+                                                  }
+                                                }
+                                              ]
+                                            }
+                                          ],
+                                          "constructIndex": 5,
+                                          "isUninstantiated": false,
+                                          "branchKind": "LoopIteration"
+                                        }
+                                      ],
+                                      "constructIndex": 1,
+                                      "initialExpression": {
+                                        "kind": "Conversion",
+                                        "type": "integer",
+                                        "operand": {
+                                          "kind": "IntegerLiteral",
+                                          "type": "int",
+                                          "value": "0",
+                                          "constant": "0"
+                                        },
+                                        "constant": "0"
+                                      },
+                                      "stopExpression": {
+                                        "kind": "BinaryOp",
+                                        "type": "logic",
+                                        "op": "LessThan",
+                                        "left": {
+                                          "kind": "NamedValue",
+                                          "type": "integer",
+                                          "symbol": "4114046228144 g"
+                                        },
+                                        "right": {
+                                          "kind": "Conversion",
+                                          "type": "integer",
+                                          "operand": {
+                                            "kind": "IntegerLiteral",
+                                            "type": "int",
+                                            "value": "6",
+                                            "constant": "6"
+                                          },
+                                          "constant": "6"
+                                        }
+                                      },
+                                      "iterExpression": {
+                                        "kind": "UnaryOp",
+                                        "type": "integer",
+                                        "op": "Postincrement",
+                                        "operand": {
+                                          "kind": "NamedValue",
+                                          "type": "integer",
+                                          "symbol": "4114046228144 g"
+                                        }
+                                      },
+                                      "loopVariable": "4114046228144 g"
+                                    }
+                                  ],
+                                  "definition": "4114042547200 l4_m_0_0"
+                                },
+                                "connections": [
+                                  {
+                                    "port": {
+                                      "name": "a",
+                                      "kind": "Port",
+                                      "addr": 4114046226952,
+                                      "type": "logic",
+                                      "direction": "In",
+                                      "internalSymbol": "4114046227072 a"
+                                    },
+                                    "expr": {
+                                      "kind": "NamedValue",
+                                      "type": "logic",
+                                      "symbol": "4114046221048 a"
+                                    }
+                                  },
+                                  {
+                                    "port": {
+                                      "name": "b",
+                                      "kind": "Port",
+                                      "addr": 4114046227232,
+                                      "type": "logic[5:0]",
+                                      "direction": "Out",
+                                      "internalSymbol": "4114046227352 b"
+                                    },
+                                    "expr": {
+                                      "kind": "Assignment",
+                                      "type": "logic[5:0]",
+                                      "left": {
+                                        "kind": "NamedValue",
+                                        "type": "logic[5:0]",
+                                        "symbol": "4114046221328 b"
+                                      },
+                                      "right": {
+                                        "kind": "EmptyArgument",
+                                        "type": "logic[5:0]"
+                                      },
+                                      "isNonBlocking": false
+                                    }
+                                  }
+                                ]
+                              }
+                            ],
+                            "definition": "4114042547968 l3_m_0_0"
+                          },
+                          "connections": [
+                            {
+                              "port": {
+                                "name": "a",
+                                "kind": "Port",
+                                "addr": 4114046220928,
+                                "type": "logic",
+                                "direction": "In",
+                                "internalSymbol": "4114046221048 a"
+                              },
+                              "expr": {
+                                "kind": "NamedValue",
+                                "type": "logic",
+                                "symbol": "4114046219168 a"
+                              }
+                            },
+                            {
+                              "port": {
+                                "name": "b",
+                                "kind": "Port",
+                                "addr": 4114046221208,
+                                "type": "logic[5:0]",
+                                "direction": "Out",
+                                "internalSymbol": "4114046221328 b"
+                              },
+                              "expr": {
+                                "kind": "Assignment",
+                                "type": "logic[5:0]",
+                                "left": {
+                                  "kind": "NamedValue",
+                                  "type": "logic[5:0]",
+                                  "symbol": "4114046219448 b"
+                                },
+                                "right": {
+                                  "kind": "EmptyArgument",
+                                  "type": "logic[5:0]"
+                                },
+                                "isNonBlocking": false
+                              }
+                            }
+                          ]
+                        }
+                      ],
+                      "definition": "4114042548736 l2_m_0_0"
+                    },
+                    "connections": [
+                      {
+                        "port": {
+                          "name": "a",
+                          "kind": "Port",
+                          "addr": 4114046219048,
+                          "type": "logic",
+                          "direction": "In",
+                          "internalSymbol": "4114046219168 a"
+                        },
+                        "expr": {
+                          "kind": "NamedValue",
+                          "type": "logic",
+                          "symbol": "4114046213128 a"
+                        }
+                      },
+                      {
+                        "port": {
+                          "name": "b",
+                          "kind": "Port",
+                          "addr": 4114046219328,
+                          "type": "logic[5:0]",
+                          "direction": "Out",
+                          "internalSymbol": "4114046219448 b"
+                        },
+                        "expr": {
+                          "kind": "Assignment",
+                          "type": "logic[5:0]",
+                          "left": {
+                            "kind": "NamedValue",
+                            "type": "logic[5:0]",
+                            "symbol": "4114046213408 b"
+                          },
+                          "right": {
+                            "kind": "EmptyArgument",
+                            "type": "logic[5:0]"
+                          },
+                          "isNonBlocking": false
+                        }
+                      }
+                    ]
+                  }
+                ],
+                "definition": "4114042549504 l1_m_0_0"
+              },
+              "connections": [
+                {
+                  "port": {
+                    "name": "a",
+                    "kind": "Port",
+                    "addr": 4114046213008,
+                    "type": "logic",
+                    "direction": "In",
+                    "internalSymbol": "4114046213128 a"
+                  },
+                  "expr": {
+                    "kind": "NamedValue",
+                    "type": "logic",
+                    "symbol": "4114046211520 a"
+                  }
+                },
+                {
+                  "port": {
+                    "name": "b",
+                    "kind": "Port",
+                    "addr": 4114046213288,
+                    "type": "logic[5:0]",
+                    "direction": "Out",
+                    "internalSymbol": "4114046213408 b"
+                  },
+                  "expr": {
+                    "kind": "Assignment",
+                    "type": "logic[5:0]",
+                    "left": {
+                      "kind": "NamedValue",
+                      "type": "logic[5:0]",
+                      "symbol": "4114046211800 b"
+                    },
+                    "right": {
+                      "kind": "EmptyArgument",
+                      "type": "logic[5:0]"
+                    },
+                    "isNonBlocking": false
+                  }
+                }
+              ]
+            }
+          ],
+          "definition": "4114042550272 l0_m_0_0"
+        },
+        "connections": [
+        ]
+      }
+    ]
+  },
+  "definitions": [
+    {
+      "name": "l0_m_0_0",
+      "kind": "Definition",
+      "addr": 4114042550272,
+      "defaultNetType": "4114043444736 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    },
+    {
+      "name": "l1_m_0_0",
+      "kind": "Definition",
+      "addr": 4114042549504,
+      "defaultNetType": "4114043444736 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    },
+    {
+      "name": "l2_m_0_0",
+      "kind": "Definition",
+      "addr": 4114042548736,
+      "defaultNetType": "4114043444736 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    },
+    {
+      "name": "l3_m_0_0",
+      "kind": "Definition",
+      "addr": 4114042547968,
+      "defaultNetType": "4114043444736 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    },
+    {
+      "name": "l4_m_0_0",
+      "kind": "Definition",
+      "addr": 4114042547200,
+      "defaultNetType": "4114043444736 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    },
+    {
+      "name": "leaf_m_0_0",
+      "kind": "Definition",
+      "addr": 4114042546432,
+      "defaultNetType": "4114043444736 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    }
+  ]
+}

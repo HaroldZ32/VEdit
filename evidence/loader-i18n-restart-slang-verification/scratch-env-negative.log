@@ -1,0 +1,9 @@
+== scratch AppDir negative control: wrapper re-adds LD_LIBRARY_PATH ==
+SELFTEST_EXIT=1
+== packaged section ==
+ok   packaged.appdir-slang — pre-existing /w/evidence/loader-i18n-restart-slang-verification/scratch-appdir/bin/slang
+ok   packaged.temp-state
+FAIL packaged.answered — elaboration failed: slang failed: the lint tool exited with code 1 and produced no diagnostics: /w/packaging/runtime/out/AppDir/bin/slang: /lib64/ld-linux-x86-64.so.2: version `GLIBC_2.35' not found (required by /w/packaging/runtime/out/AppDir/lib/libc.so.6)
+SKIP generate-fixture — fixture='' slang='/w/packaging/runtime/out/AppDir/bin/slang'
+
+57 checks, 1 failure(s)

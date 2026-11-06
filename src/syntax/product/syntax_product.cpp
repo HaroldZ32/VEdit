@@ -79,6 +79,7 @@ Report buildReport()
     report.syntax_private_dir = data.private_dir;
     report.syntax_definition_count = static_cast<int>(data.definition_names.size());
     report.syntax_private_files = data.private_definition_files;
+    report.syntax_resolved_definitions = data.resolved_private_definition_names;
     report.verilog_definition = data.verilog_available;
     report.systemverilog_definition = data.systemverilog_available;
     report.theme_names = data.theme_names;
@@ -151,6 +152,13 @@ QString describe()
     parts << QStringLiteral("kernel='%1'").arg(current.editing_kernel);
     parts << QStringLiteral("embargoed=[%1]").arg(current.embargoed_definitions.join(QLatin1Char(',')));
     parts << QStringLiteral("startup-hook=%1").arg(current.startup_hook_ran ? 1 : 0);
+    // U4b: what the loader RESOLVED from those files, not just which files exist.
+    // Appended LAST on purpose: the U4 PASS regex ended at `startup-hook=1`, so an
+    // unchanged predicate still matches this line (the negative-control evidence
+    // can show that it stayed green with a corrupt definition, while the U4b
+    // predicate in the CMake test definition fails).
+    parts << QStringLiteral("definitions-ok=[%1]")
+                 .arg(current.syntax_resolved_definitions.join(QLatin1Char(',')));
     return parts.join(QStringLiteral(" "));
 }
 

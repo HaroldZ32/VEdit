@@ -1,0 +1,129 @@
+Test project /vedit-build/target/qt6-build
+    Start 15: vedit-app-ux-selftest
+1/4 Test #15: vedit-app-ux-selftest ............***Failed    0.14 sec
+CHECK a2.toolbar.undo-disabled-without-view PASS
+This plugin does not support propagateSizeHints()
+CHECK a2.menu.order PASS &File,&Edit,&View,&Project,&Help
+CHECK a2.menu.no-settings PASS
+CHECK a2.menu.preferences-in-edit PASS
+CHECK a2.menu.preferences-last-in-edit PASS
+CHECK a2.toolbar.exists PASS
+CHECK a2.toolbar.movable PASS
+CHECK a2.toolbar.object-name PASS
+CHECK a2.toolbar.action-order FAIL action-file.new,action-file.open,action-file.open-folder,action-file.switch-project,action-file.save,action-file.save-all,action-edit.undo,action-edit.redo,---,action-search.focus,action-project.lint,action-diagnostics.format
+CHECK a2.toolbar.shares-registry-actions PASS
+CHECK a2.toolbar.toggle-command PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK a2.toolbar.hide-and-show PASS
+CHECK a2.toolbar.build-runs-command PASS
+CHECK a2.toolbar.format-runs-command PASS
+CHECK a2.toolbar.active-pane PASS
+CHECK a2.toolbar.demo-editor PASS
+CHECK a2.toolbar.new-opens-document PASS tabs 1 -> 2
+CHECK a2.toolbar.undo-enabled-with-view PASS
+CHECK a2.toolbar.undo-changes-document PASS VEdit application shell — demo editor pane #1
+
+This text view is the shell's placeholder editor. The real editor
+widget is injected by src/editor (edit-core) through the
+EditorProvider seam; nothing in the shell depends on KTextEditor.
+
+Layout operations worth trying:
+  * Ctrl+Alt+H    split horizontally (side by side)
+  * Ctrl+Shift+V  split vertically (stacked)
+  * F6            focus the next pane
+  * Ctrl+W        close the focused pane
+  * View menu     insert / hide the panel docks on demand
+
+CHECK a2.toolbar.redo-enabled PASS
+CHECK a2.toolbar.redo-restores-document PASS helloVEdit application shell — demo editor pane #1
+
+This text view is the shell's placeholder editor. The real editor
+widget is injected by src/editor (edit-core) through the
+EditorProvider seam; nothing in the shell depends on KTextEditor.
+
+Layout operations worth trying:
+  * Ctrl+Alt+H    split horizontally (side by side)
+  * Ctrl+Shift+V  split vertically (stacked)
+  * F6            focus the next pane
+  * Ctrl+W        close the focused pane
+  * View menu     insert / hide the panel docks on demand
+
+This plugin does not support propagateSizeHints()
+CHECK a2.toolbar.search-shows-panel PASS
+CHECK a2.toolbar.search-focuses-query PASS
+This plugin does not support propagateSizeHints()
+CHECK a2.help.manual-resource-not-empty PASS 22512 bytes
+CHECK a2.help.manual-has-title FAIL VEdit 用户手册
+CHECK a2.help.command-exists PASS
+CHECK a2.help.command-shortcut PASS
+This plugin does not support propagateSizeHints()
+CHECK a2.help.viewer-opens PASS
+CHECK a2.help.viewer-renders-title FAIL
+CHECK a2.i18n.qm-loaded PASS
+CHECK a2.i18n.menu-count PASS 文件(&F),编辑(&E),视图(&V),项目(&P),帮助(&H)
+CHECK a2.i18n.menu-0 PASS 文件(&F)
+CHECK a2.i18n.menu-1 PASS 编辑(&E)
+CHECK a2.i18n.menu-2 PASS 视图(&V)
+CHECK a2.i18n.menu-3 PASS 项目(&P)
+CHECK a2.i18n.menu-4 PASS 帮助(&H)
+CHECK a2.i18n.preferences PASS 首选项(&P)…
+CHECK a2.i18n.panel-toggle PASS 切换文件面板(&G)
+CHECK a2.i18n.context-menu-label PASS 跳转到定义(&D)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK a2.f1.terminal-panel PASS
+CHECK a2.f1.terminal-running PASS
+CHECK a2.f1.terminal-widget PASS
+CHECK a2.f1.terminal-focus PASS
+CHECK a2.f1.terminal-claims-shortcut-override PASS
+CHECK a2.f1.terminal-f1-reaches-pty PASS
+CHECK a2.f1.terminal-does-not-open-manual PASS
+CHECK a2.f1.editor-focus-target PASS
+This plugin does not support propagateSizeHints()
+CHECK a2.f1.manual-opens-outside-terminal PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+CHECK a2.undo.real-ktexteditor-view PASS
+CHECK a2.undo.real-enabled-after-edit PASS
+CHECK a2.undo.real-changes-document PASS
+CHECK a2.redo.real-enabled-after-undo PASS
+CHECK a2.redo.real-restores-document PASS hello
+A2-UX-SELFTEST failures=3
+
+    Start 21: vedit-native-fold-tests
+2/4 Test #21: vedit-native-fold-tests ..........***Failed    0.45 sec
+CHECK native.fold.provider PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+CHECK native.fold.editor PASS
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+CHECK native.fold.warmup PASS
+CHECK native.fold.warmup-no-auto-folds PASS  0
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+NATIVE-FOLD-TESTS big-open ms=64 lines=10497
+CHECK native.fold.big-open PASS
+CHECK native.fold.big-open-2s PASS  64
+CHECK native.fold.big-view PASS
+CHECK native.fold.big-no-auto-folds PASS  0
+CHECK native.fold.native-fold-applied FAIL  0
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+CHECK native.fold.second-open PASS
+CHECK native.fold.second-view PASS
+CHECK native.fold.second-cursor PASS
+NATIVE-FOLD-TESTS ok=0 checks=12 failures=1
+
+    Start 49: vedit-rename-e2e
+3/4 Test #49: vedit-rename-e2e .................   Passed    1.15 sec
+    Start 50: vedit-project-lint-e2e
+4/4 Test #50: vedit-project-lint-e2e ...........   Passed    2.30 sec
+
+50% tests passed, 2 tests failed out of 4
+
+Total Test time (real) =   4.04 sec
+
+The following tests FAILED:
+	 15 - vedit-app-ux-selftest (Failed)
+	 21 - vedit-native-fold-tests (Failed)
+Errors while running CTest

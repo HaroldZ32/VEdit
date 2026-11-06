@@ -1,0 +1,42 @@
+# independent screenshot assertions (bytes / dimensions / sha256 / colours)
+shots_dir: /home/haroldzhao/MyProj/DshProj/VEdit/evidence/xcb-visual-2/shots
+count: 28
+
+file                                                           bytes        size  colors  modal  verdict
+--------------------------------------------------------------------------------------------------------
+panels/10-ordinary-start-root-a.png                           187500  1500x1180     2054  0.583  PASS  sha256=88f97621ed9d8c068ae1970b010dc52aae698dee0c75cb083b9afbccc725b362
+panels/20-after-switch-root-b.png                             184946  1500x1198     2046  0.595  PASS  sha256=6fc853f6767d9558ad4ef425632278ff4a297647a41c368e0b813cee7ae70346
+panels/30-view-menu-panels.png                                117303  1500x1000     1252  0.739  PASS  sha256=c1eb4e5cdf576ac905b349a98ff42f068a7c433ea9de554c1939f47fe88d7da5
+panels/31-panels-restored.png                                  96813  1498x974      1170  0.683  PASS  sha256=dabe1ef3f43b895af703c62ad96147e4c11aaad2c054a594cf8ef55b924a3b3a
+product/10-horizontal-split.png                               122290  1440x900      1334  0.540  PASS  sha256=8df3ce1a5301f9b12f8162fea578491368389e109ec9eeb02f69ae8b901641dc
+product/11-vertical-split.png                                 163725  1440x900      1379  0.501  PASS  sha256=28004619407898782a13dff1a5df80e67f2e78a76fe5a854073d7193b88b5054
+product/12-panels-and-docks.png                               134354  1440x900      1613  0.501  PASS  sha256=13ec15ccbb8ed12776659ce9b94042c24257127378f6cbd48cc63e7540d46100
+product/13-empty-state-no-project.png                          54895  1440x900       562  0.906  PASS  sha256=84edfec572b6a07e3a70c613eecc8c8c35ba99d55a3b30a4f72019383d90fabb
+vcs/10-vcs-three-columns-1500x1000.png                         65243  1500x1000      804  0.849  PASS  sha256=45179ed25e2bdded7fef76d8fde7416a33ef76e99e3f77618fd2044971552650
+vcs/11-vcs-staged-1500x1000.png                                67235  1500x1000      817  0.828  PASS  sha256=73da138f23c0b9861ad1a6e66b2918b3aa6b9960bca6fb03955a3fa8ffc062d5
+vcs/12-vcs-empty-state-1500x1000.png                           35527  1500x1000      379  0.980  PASS  sha256=ce57b109ed804d55eafbdbc38ec2e22fbca932c63e0236c9f960abe298cb4a1b
+vcs/13-vcs-loading-1500x1000.png                               18072  1500x1000      216  0.984  PASS  sha256=62f73936d871e7ef1b71758fbdd8ed21628f3634c92b5a4818d048718c94778b
+vcs/14-vcs-error-state-1500x1000.png                           33250  1500x1000      371  0.981  PASS  sha256=6c28d920335719c77615e9544ac2a67d74ced08e6b9fbc169467622b30394f4e
+vcs/15-vcs-commit-dialog-1500x1000.png                         15952   900x360       223  0.670  PASS  sha256=6ce6c7a3f9b24ef9c456f5a0f164ab91d2d3a6048c68eccbe1cd28a32ba515ae
+vcs/20-vcs-refs-and-remotes-1500x1000.png                      50719  1500x1000      618  0.854  PASS  sha256=c7004606d1c466d5c8e3c1b978adf6475c5e46ecd18292c56fdfe694c30e3297
+vcs/21-vcs-remote-action-row-1500x1000.png                     33824  1500x1000      421  0.980  PASS  sha256=10209d47ab816f1f3a578360e84ec113908e211bc20fc4a900139be79de6172d
+vcs/22-vcs-credential-dialog-1500x1000.png                     33599  1500x1000      524  0.944  PASS  sha256=e3ac6802d365401d06f96ede8db1a80f9cb49ee0aa9d9c0192b4d76b3820af65
+vcs/23-vcs-branch-dialog-1500x1000.png                         18759  1500x1000      167  0.954  PASS  sha256=d96d4df2b5739db73f634bb76a98743902dc0c6234b808aad89a584bcc153e90
+vcs/24-vcs-tag-dialog-1500x1000.png                            13631  1500x1000      101  0.954  PASS  sha256=d61177cef7ec9c5f9d58d05eb805a01b1b455437bef050f3fc833d5959e37b21
+vcs/25-vcs-remote-dialog-1500x1000.png                         15669  1500x1000      129  0.973  PASS  sha256=e7e5ec305705e5c89a5d99a619d735eb5bab89a81dcec9358a470b545b2502f0
+vcs/30-vcs-history-commits-1500x1000.png                      246782  1500x1000     1298  0.823  PASS  sha256=d92b0aea06f29a95db827117f5dc54ea7e7ef446b263dcd4ad2b56917f3fa257
+vcs/31-vcs-history-blame-1500x1000.png                        225666  1500x1000     1086  0.829  PASS  sha256=04c95537574e7487dbbd45b330bdc56d89e21d1536649cab00b6312c656a5cbd
+vcs/32-vcs-history-empty-1500x1000.png                         24665  1500x1000      285  0.976  PASS  sha256=cda763be5c5c3857bfabf30a7de2666f19f1d4c433e362a4e2b073c87619e46f
+vcs/33-vcs-history-error-1500x1000.png                         28751  1500x1000      369  0.974  PASS  sha256=a0032c7fff375dc075c6b3efc152c18612606d5b0b7e7668c4e2a4345141b4a9
+vcs/40-vcs-conflict-state-1500x1000.png                        74850  1500x1000      869  0.822  PASS  sha256=bbe4ec12323e7740b67ea3a5ead20084d236cc1c760887a24a0a54cfab8d5cd8
+vcs/50-vcs-workspace-dialog-1500x1000.png                      54573  1500x1000      547  0.590  PASS  sha256=4316f6dfe6e289a05408c5fad61e2c42060d0e2f9cec8e828db24e658cbedf4d
+vcs/60-vcs-svn-panel-1500x1000.png                             60622  1500x1000      758  0.857  PASS  sha256=68b53090a89d7fb3a9b169099677055eed9e9a497a487162776f47750ef5cffc
+vcs/61-vcs-svn-real-1500x1000.png                              62266  1500x1000      789  0.855  PASS  sha256=d52462c4802c03de894b09b80a6b2ddb07b1aa74f9aedfb6ef399a2a4ce3db72
+
+## notes (accepted, recorded for the review)
+NOTE panels/10-ordinary-start-root-a.png: 1500x1180 (>1500x1000 by the shell's minimum height)
+NOTE panels/20-after-switch-root-b.png: 1500x1198 (>1500x1000 by the shell's minimum height)
+NOTE panels/31-panels-restored.png: 1498x974 (within 4x30px of the requested 1500x1000)
+
+checked=28 failures=0
+RESULT PASS

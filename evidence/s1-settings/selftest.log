@@ -1,0 +1,152 @@
+SETTINGS-SELFTEST start
+CHECK settings.ffi.available PASS
+CHECK settings.panel.loaded PASS
+CHECK settings.panel.object-name PASS
+CHECK settings.theme.list PASS 30 theme(s)
+CHECK settings.theme.initial PASS Breeze Light
+CHECK settings.keys.rows PASS rows=5
+CHECK settings.keys.new-commands PASS lint.rerun / fim.trigger must be listed
+CHECK settings.theme.applied PASS Atom One Dark
+CHECK settings.theme.status PASS Stored by the Rust service in /tmp/vedit-workspace-settings-selftest-zcVvFW/settings.toml
+CHECK settings.theme.persisted PASS theme = "Atom One Dark"
+
+CHECK settings.restart.loaded PASS
+CHECK settings.theme.restart PASS Atom One Dark
+CHECK settings.keys.flush PASS
+CHECK settings.keys.applied PASS Ctrl+Alt+J
+CHECK settings.keys.persisted PASS "keymap.view.split.horizontal" = "Ctrl+Alt+J"
+theme = "Atom One Dark"
+
+CHECK settings.keys.mirror PASS
+CHECK settings.keys.mirror-restart PASS
+CHECK settings.restart.keys-loaded PASS
+CHECK settings.keys.restart PASS Ctrl+Alt+J
+CHECK settings.conflict.flush PASS
+CHECK settings.conflict.detected PASS Ctrl+S: file.save, view.toggle-settings
+CHECK settings.conflict.names PASS Ctrl+S: file.save, view.toggle-settings
+CHECK settings.conflict.visible PASS Conflicting shortcuts: Ctrl+S: file.save, view.toggle-settings
+CHECK settings.badconfig.write PASS
+CHECK settings.badconfig.flush PASS
+CHECK settings.badconfig.warning PASS invalid TOML in /tmp/vedit-workspace-settings-selftest-zcVvFW/settings.toml: TOML parse error at line 2, column 10
+  |
+2 | [unclosed
+  |    
+CHECK settings.badconfig.visible PASS
+CHECK settings.badconfig.theme-valid PASS Atom One Dark
+CHECK settings.badconfig.recover-flush PASS
+CHECK settings.badconfig.recovered PASS
+CHECK settings.badconfig.file-valid PASS
+CHECK settings.nonblocking.temp-dir PASS
+CHECK settings.nonblocking.write-fixture PASS
+CHECK settings.nonblocking.start-returns-fast PASS start took 0 ms for a 1532 KB store
+CHECK settings.nonblocking.event-loop-ticks PASS ticks=7 poles=10
+CHECK settings.nonblocking.flush PASS
+CHECK settings.nonblocking.result PASS entries=120000 delivered=1
+CHECK settings.pages.ffi.available PASS
+CHECK settings.pages.loaded PASS
+CHECK settings.pages.tabs-container PASS count=3
+CHECK settings.pages.tabs-titles PASS
+CHECK settings.pages.tabs-object-names PASS
+CHECK settings.pages.tools-form PASS
+CHECK settings.pages.tools-fields PASS
+CHECK settings.pages.fim-fields PASS
+CHECK settings.pages.fim-key-write-only PASS
+CHECK settings.pages.tools-flush PASS
+CHECK settings.pages.tools-stored PASS "tools.defines" = """
+WIDTH=8
+SIM"""
+"tools.include_dirs" = """
+rtl
+rtl/include"""
+"tools.lint_engine" = "verible"
+"tools.lsp_backend" = "slang"
+"tools.slang" =
+CHECK settings.pages.tools-restart-load PASS
+CHECK settings.pages.tools-restart PASS rtl
+rtl/include
+CHECK settings.pages.backend-selected PASS
+CHECK settings.pages.include-dirs-widget PASS
+CHECK settings.pages.fim-flush PASS
+CHECK settings.pages.fim-stored PASS "fim.enabled" = "true"
+"fim.endpoint" = "http://127.0.0.1:8080"
+"fim.ghost_text" = "true"
+"fim.max_tokens" = "128"
+"fim.model" = "qwen"
+"fim.protocol" = "llama_
+CHECK settings.pages.fim-restart-load PASS
+CHECK settings.pages.fim-restart PASS
+CHECK settings.pages.key-store PASS
+CHECK settings.pages.key-flush PASS
+CHECK settings.pages.key-path PASS /tmp/vedit-workspace-settings-selftest-zcVvFW/fim_api_key
+CHECK settings.pages.key-not-in-store PASS "fim.enabled" = "true"
+"fim.endpoint" = "http://127.0.0.1:8080"
+"fim.ghost_text" = "true"
+"fim.max_tokens" = "128"
+"fim.model" = "qwen"
+"fim.protocol" = "llama_cpp"
+"fim.timeout_ms" = "2500"
+"tools.de
+CHECK settings.pages.key-file-written PASS
+CHECK settings.pages.key-file-0600 PASS mode-loose=0
+CHECK settings.pages.key-file-mode-exact PASS mode=63000 umask=022
+CHECK settings.pages.key-no-temp-debris PASS fim_api_key
+CHECK settings.pages.key-file-content PASS
+CHECK settings.pages.key-no-echo PASS
+CHECK settings.pages.key-source PASS user-file
+CHECK settings.pages.key-stored PASS
+CHECK settings.pages.key-label PASS
+CHECK settings.pages.key-restart-load PASS
+CHECK settings.pages.key-restart-source PASS
+CHECK settings.pages.key-restart-no-echo PASS
+CHECK settings.pages.key-loose.write PASS
+CHECK settings.pages.key-loose.store PASS
+CHECK settings.pages.key-loose.replaced-0600 PASS mode=63000
+CHECK settings.pages.key-loose.no-debris PASS fim_api_key
+CHECK settings.pages.key-sweep.fixtures PASS
+CHECK settings.pages.key-sweep.store PASS
+CHECK settings.pages.key-sweep.stale-removed PASS
+CHECK settings.pages.key-sweep.live-kept PASS
+CHECK settings.pages.key-sweep.cleanup PASS
+CHECK settings.pages.key-field-never-filled PASS
+CHECK settings.pages.key-cleared PASS
+CHECK settings.pages.plain.flush-others PASS
+CHECK settings.pages.plain.write PASS
+CHECK settings.pages.plain.load PASS
+CHECK settings.pages.plain.ignored PASS none
+CHECK settings.pages.plain.diagnostic PASS settings.toml held a plaintext `fim.api_key`; it is ignored and will be removed on the next save — use VEDIT_FIM_API_KEY or the owner-only key file instead.
+CHECK settings.pages.plain.scrubbed PASS
+CHECK settings.pages.plain.flush-after PASS
+CHECK settings.pages.nested.write PASS
+CHECK settings.pages.nested.load PASS
+CHECK settings.pages.nested.rejected PASS /tmp/vedit-workspace-settings-selftest-zcVvFW/nested-settings.toml: `fim` is table but the store holds strings; ignored
+CHECK settings.pages.nested.scrubbed PASS
+CHECK settings.pages.dialog-harness PASS
+CHECK settings.pages.dialog-tabs PASS
+CHECK settings.pages.dialog-deferred PASS
+CHECK settings.pages.dialog-load PASS
+CHECK settings.pages.dialog-preview PASS
+CHECK settings.pages.dialog-preview-no-key-file PASS
+CHECK settings.pages.dialog-preview-no-store PASS
+CHECK settings.pages.dialog-cancel-no-key-file PASS
+CHECK settings.pages.dialog-cancel-no-key-echo PASS
+CHECK settings.pages.dialog-apply-load PASS
+CHECK settings.pages.dialog-apply-flush PASS
+CHECK settings.pages.dialog-apply-key-file PASS
+CHECK settings.pages.dialog-apply-store PASS
+CHECK settings.screenshots.mkdir PASS
+CHECK settings.screenshots.harness PASS
+CHECK settings.screenshots.load PASS
+This plugin does not support propagateSizeHints()
+CHECK settings.screenshots.saved PASS evidence/s1-settings/screenshots/01-shortcuts.png
+SCREENSHOT evidence/s1-settings/screenshots/01-shortcuts.png 900x760
+CHECK settings.screenshots.saved PASS evidence/s1-settings/screenshots/02-tools.png
+SCREENSHOT evidence/s1-settings/screenshots/02-tools.png 900x760
+CHECK settings.screenshots.saved PASS evidence/s1-settings/screenshots/03-fim.png
+SCREENSHOT evidence/s1-settings/screenshots/03-fim.png 900x760
+CHECK settings.evidence.mkdir PASS
+CHECK settings.evidence.harness PASS
+CHECK settings.evidence.store PASS
+CHECK settings.evidence.flush PASS
+CHECK settings.evidence.secret-not-in-store PASS
+CHECK settings.evidence.key-file-removed PASS
+SETTINGS-SELFTEST ok=1 checks=119 failures=0

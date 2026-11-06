@@ -1,0 +1,10 @@
+# batch 7 seven-gate summary
+collected_at: 2026-11-04T14:13:20+08:00
+build-qt=0
+ctest=100% tests passed, 0 tests failed out of 37
+selfcheck=APP-SHELL-SELFTEST ok=1 checks=290 failures=0
+clippy=0
+fmt=0
+docs=0
+lrelease=930 finished and 0 unfinished
+lane_checks=697

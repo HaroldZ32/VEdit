@@ -122,8 +122,8 @@ void SettingsClient::load(std::function<void(Snapshot)> done)
     }
 #endif
     Snapshot snapshot;
-    snapshot.error = available() ? QStringLiteral("the Rust settings store rejected the path")
-                                 : QStringLiteral("this build has no vd-ffi settings ABI");
+    snapshot.error = available() ? QCoreApplication::translate("VEdit", "the Rust settings store rejected the path")
+                                 : QCoreApplication::translate("VEdit", "this build has no vd-ffi settings ABI");
     if (done) {
         done(snapshot);
     }
@@ -162,8 +162,8 @@ void SettingsClient::save(const QVector<Entry> &entries, std::function<void(bool
     }
 #endif
     if (done) {
-        done(false, available() ? QStringLiteral("the Rust settings store rejected the write")
-                                : QStringLiteral("this build has no vd-ffi settings ABI"));
+        done(false, available() ? QCoreApplication::translate("VEdit", "the Rust settings store rejected the write")
+                                : QCoreApplication::translate("VEdit", "this build has no vd-ffi settings ABI"));
     }
 }
 
@@ -195,7 +195,7 @@ void SettingsClient::pollJobs()
             }
         } else if (state != VD_STATUS_PENDING) {
             Snapshot snapshot;
-            snapshot.error = QStringLiteral("settings load failed (state %1)").arg(state);
+            snapshot.error = QCoreApplication::translate("VEdit", "settings load failed (state %1)").arg(state);
             VdError error{};
             if (vd_service_error(service_, &error) == 1) {
                 snapshot.error = QString::fromUtf8(error.message);
@@ -219,7 +219,7 @@ void SettingsClient::pollJobs()
                 done(true, QString());
             }
         } else if (state != VD_STATUS_PENDING) {
-            QString message = QStringLiteral("settings save failed (state %1)").arg(state);
+            QString message = QCoreApplication::translate("VEdit", "settings save failed (state %1)").arg(state);
             VdError error{};
             if (vd_service_error(service_, &error) == 1) {
                 message = QString::fromUtf8(error.message);

@@ -1,0 +1,84 @@
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+PASS probe.fixture
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+PASS shell.one-pane
+PASS shell.active-pane
+PASS editor.provider-is-ktexteditor
+PASS tabs.initial-count
+PASS tabs.strip-exists
+PASS tabs.initial-label — untitled
+PASS tabs.no-provider-name-in-pane
+PASS tabs.style-has-selected-rule
+PASS open.alpha
+PASS open.bravo
+PASS open.charlie
+PASS tabs.three-opened — tabs=3
+PASS tabs.same-pane
+PASS tabs.file-names — alpha.sv | bravo.sv | charlie_unit.sv
+PASS tabs.active-is-last-open
+PASS tabs.open-paths
+PASS tabs.current-file-is-active — /tmp/vedit-tabs-probe-VxAXQF/charlie_unit.sv
+SHOT OK evidence/review-tabs/shots/01-three-tabs.png
+PASS tabs.switch-file
+PASS tabs.switch-index
+PASS tabs.switch-editor — module alpha;
+endmod
+PASS dirty.document
+PASS dirty.tab-marker — ● charlie_unit.sv
+PASS dirty.tab-marker-only-on-active-tab
+PASS dirty.pane-state
+PASS dirty.title-placeholder — VEdit — /tmp/vedit-tabs-probe-VxAXQF/charlie_unit.sv[*]
+PASS dirty.title-names-file — VEdit — /tmp/vedit-tabs-probe-VxAXQF/charlie_unit.sv[*]
+PASS dirty.window-modified
+PASS dirty.title-star-rendered — VEdit — /tmp/vedit-tabs-probe-VxAXQF/charlie_unit.sv*
+PASS dirty.status-label — ● 未保存的更改
+SHOT OK evidence/review-tabs/shots/02-dirty-three-markers.png
+PASS save.returns-true
+PASS save.tab-marker-cleared — charlie_unit.sv
+PASS save.window-modified-cleared
+PASS save.title-star-cleared
+PASS save.status-label-hidden
+PASS save.disk-bytes
+SHOT OK evidence/review-tabs/shots/03-after-save-clean.png
+PASS close.tab-button-present
+PASS close.tab-closed — tabs=2
+PASS close.neighbour-active — index=1 text=charlie_unit.sv
+PASS overflow.twelve-tabs — tabs=12
+PASS overflow.scroll-buttons
+PASS overflow.no-layout-growth — min=113 hint=1243
+PASS overflow.active-tab-visible
+PASS overflow.clipped-at-narrow-width — bar=685 hint=1243
+PASS overflow.active-tab-visible-narrow
+SHOT OK evidence/review-tabs/shots/05-tab-overflow.png
+PASS prompt.document
+SHOT OK evidence/review-tabs/shots/04-unsaved-close-prompt.png
+PASS prompt.cancel-keeps-tab
+PASS prompt.cancel-disk-unchanged
+PASS prompt.dialog-had-three-answers
+PASS prompt.discard-closes
+PASS prompt.discard-disk-unchanged
+SHOT OK evidence/review-tabs/shots/06-after-discard.png
+PASS prompt.save-closes
+PASS prompt.save-writes-disk
+PASS teardown.round-0 — shell with 2 panes and a swapped provider destroyed cleanly
+PASS teardown.round-1 — shell with 2 panes and a swapped provider destroyed cleanly
+PASS teardown.round-2 — shell with 2 panes and a swapped provider destroyed cleanly
+TABS-PROBE failures=0 platform=xcb

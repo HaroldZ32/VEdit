@@ -1,0 +1,12 @@
+compiled messages: 1211
+  OK   Replace refused: the unsaved edits in "%1" cannot be checked against l
+        -> 替换被拒绝：“%1” 中的未保存修改无法与第 %2 行核对（编辑器未提供缓冲区文本），且该行长度超过 400 字符的搜索预览，无法重新定位匹配项；未替换任何内容。请保存文档后重新搜索。
+  OK   Replace refused: the unsaved edits in "%1" changed where line %2 sits 
+        -> 替换被拒绝：“%1” 中的未保存修改改变了第 %2 行在缓冲区中的位置，且该行长度超过 400 字符的搜索预览，仅凭预览无法重新定位匹配项；文档未保存，也未替换任何内容。请保存后重新搜索。
+  OK   Active engine. --ruleset, --rules, --rules_config and --waiver_files a
+        -> 当前引擎。--ruleset、--rules、--rules_config 与 --waiver_files 会应用到 Lint 任务；--autofix 仅保存（Lint 任务的 C ABI 没有对应字段）。
+  OK   Active engine. -W and --error-limit are applied to the lint job.
+        -> 当前引擎。-W 与 --error-limit 会应用到 Lint 任务。
+  OK   Stored but not applied yet (the lint job's C ABI has no field for them
+        -> 已保存但尚未应用（Lint 任务的 C ABI 没有对应字段）：%1。这些值保留在 settings.toml 中，不会作为静默空操作发送。
+missing from the compiled catalogue: 0

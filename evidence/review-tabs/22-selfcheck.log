@@ -1,0 +1,3 @@
+selfcheck-exit=0
+EDIT-CORE-SELFTEST ok=1 checks=67 failures=0
+APP-SHELL-SELFTEST ok=1 checks=245 failures=0 state=/tmp/vedit-app-HopCnn/state

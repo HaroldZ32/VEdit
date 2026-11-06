@@ -1,0 +1,36 @@
+=== git status --short: my declared write scope ===
+ M src/syntax/kde/README.md
+ M src/syntax/kde/ksyntax_data.cpp
+ M src/syntax/kde/ksyntax_data.h
+ M src/syntax/kde/tests/syntax_directory_equivalence.cpp
+ M src/syntax/product/CMakeLists.txt
+ M src/syntax/product/syntax_product.cpp
+ M src/syntax/product/syntax_product.h
+?? evidence/ux-batch-2/u4b-final/
+
+NOTE: src/syntax/kde/README.md, src/syntax/kde/tests/syntax_directory_equivalence.cpp and
+resources/syntax/* (README + three untracked A3 XMLs) were already modified/untracked in this
+working tree BEFORE this task (the batch is uncommitted); this task edited none of them.
+
+=== diffstat of the five files this task edited (cumulative vs HEAD: includes earlier uncommitted U4/A3 hunks) ===
+ src/syntax/kde/ksyntax_data.cpp       | 140 +++++++++++++++++++++++++++++++---
+ src/syntax/kde/ksyntax_data.h         |   6 ++
+ src/syntax/product/CMakeLists.txt     |  68 ++++++++++++++++-
+ src/syntax/product/syntax_product.cpp |   8 ++
+ src/syntax/product/syntax_product.h   |   2 +
+ 5 files changed, 210 insertions(+), 14 deletions(-)
+
+=== the five shipped XMLs are untouched (mtimes predate this session; only copied out, never written) ===
+2026-11-05 01:32 resources/syntax/vedit-markdown.xml
+2026-11-02 12:49 resources/syntax/vedit-systemverilog.xml
+2026-11-05 01:52 resources/syntax/vedit-tcl.xml
+2026-11-02 12:49 resources/syntax/vedit-verilog.xml
+2026-11-05 02:59 resources/syntax/vedit-vhdl.xml
+
+=== probe artefacts are gitignored, not part of the tree ===
+.gitignore:10:target/	target/u4b-probe
+(empty = target/ ignored)
+=== mtimes of the pre-existing modified packaging/build files (all predate this session, which started 2026-11-06 10:18) ===
+2026-11-06 09:55 build/evidence/12-gates-image-build.log
+2026-11-03 22:31 build/evidence/typecheck/00-run.txt
+2026-11-04 11:42 packaging/runtime/.gitignore

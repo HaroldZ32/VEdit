@@ -1,0 +1,8 @@
+# batch 3a-fix VCS read compatibility - run context
+collected_at: 2026-11-03T23:25:46+08:00
+workspace: /home/haroldzhao/MyProj/DshProj/VEdit
+git_head: 4e2d0a57ca50db9568db5a5b040cc66f04c9a05f
+host_git: git version 2.53.0
+build_image_git: git version 1.8.3.1
+qt6_image_git: git version 2.53.0
+header_sha256: 53a5398521e1c144a2afa0ed67a6ed0b045743b2022f7dbe00186156a3bc247a

@@ -1,0 +1,10 @@
+# AC-6.2 / AC-6.3 / AC-6.4 / AC-6.5 evidence (SVN backend + panel parity)
+collected_at: 2026-11-04T12:54:52+08:00
+svn-screenshots=2
+  shot_bytes=60622 /home/haroldzhao/MyProj/DshProj/VEdit/evidence/svn-e2e/screenshots/60-vcs-svn-panel-1500x1000.png
+  shot_bytes=62266 /home/haroldzhao/MyProj/DshProj/VEdit/evidence/svn-e2e/screenshots/61-vcs-svn-real-1500x1000.png
+green_svn_checks=108
+bundled_svn=svn=/vedit-build/packaging/runtime/out/AppDir/bin/svn version=1.14.5
+worktree_e2e=bundled git 2.53.0 through the product path (AC-6.7)
+credential_matches=0
+result=PASS

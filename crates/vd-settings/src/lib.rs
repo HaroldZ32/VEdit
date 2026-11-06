@@ -20,12 +20,21 @@
 //! new one — never a half-written file. The temporary file is removed when the
 //! rename fails, so a failed save leaves no debris next to the user's settings.
 //!
+//! # Typed keys live in [`schema`]
+//!
+//! The store does not know what a key means; [`schema`] does. It declares the
+//! keys the Preferences dialog writes (`tools.*`, `fim.*`), projects them onto
+//! typed values the services consume, and owns the FIM API-key rules (never a
+//! store value; environment first, then an owner-only `0600` user file).
+//!
 //! # Status (Slice 0)
 //!
 //! This is the FFI seam's settings backend: `vd-ffi` exposes it through the C
 //! ABI; the settings panel that edits themes and key bindings belongs to the
 //! settings-ui task.
 #![forbid(unsafe_code)]
+
+pub mod schema;
 
 use std::fmt;
 use std::io::Write;

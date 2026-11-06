@@ -1,5 +1,7 @@
 #include "global_search.h"
 
+#include "path_display.h"
+
 #include <QCoreApplication>
 #include <QDir>
 #include <QElapsedTimer>
@@ -25,7 +27,7 @@ QString serviceError(VdService *service)
 {
     VdError error{};
     if (service == nullptr || vd_service_error(service, &error) != VD_STATUS_READY) {
-        return QStringLiteral("the Rust search service did not report a reason");
+        return QCoreApplication::translate("VEdit", "the Rust search service did not report a reason");
     }
     return QString::fromUtf8(error.message);
 }
@@ -109,8 +111,11 @@ bool GlobalSearch::ranOnWorkerThread() const
     return ranOnWorkerThread_.load();
 }
 
+// The cancellation token is only consumed by the FFI job loop below; a build
+// without the Rust service fails the scan before it can poll (A-3: the
+// standalone lane build was red with -Werror=unused-parameter).
 void GlobalSearch::runScan(const SearchOptions &options, quint64 generation,
-                           const std::shared_ptr<std::atomic_bool> &cancelTag)
+                           [[maybe_unused]] const std::shared_ptr<std::atomic_bool> &cancelTag)
 {
     if (QThread::currentThread() != QCoreApplication::instance()->thread()) {
         ranOnWorkerThread_.store(true);
@@ -123,12 +128,12 @@ void GlobalSearch::runScan(const SearchOptions &options, quint64 generation,
     const QFileInfo rootInfo(options.rootPath);
     if (!rootInfo.exists() || !rootInfo.isDir()) {
         summary.state = SearchState::Failed;
-        summary.error = QStringLiteral("search root does not exist or is not a directory: %1")
+        summary.error = QCoreApplication::translate("VEdit", "search root does not exist or is not a directory: %1")
                             .arg(options.rootPath);
         summary.elapsedMs = clock.elapsed();
     } else if (!rootInfo.isReadable()) {
         summary.state = SearchState::Failed;
-        summary.error = QStringLiteral("search root is not readable: %1").arg(options.rootPath);
+        summary.error = QCoreApplication::translate("VEdit", "search root is not readable: %1").arg(options.rootPath);
         summary.elapsedMs = clock.elapsed();
     } else if (options.query.isEmpty()) {
         summary.state = SearchState::Failed;
@@ -139,16 +144,43 @@ void GlobalSearch::runScan(const SearchOptions &options, quint64 generation,
         VdService *service = vd_service_create();
         if (service == nullptr) {
             summary.state = SearchState::Failed;
-            summary.error = QStringLiteral("cannot create the Rust search service");
+            summary.error = QCoreApplication::translate("VEdit", "cannot create the Rust search service");
         } else {
             const QByteArray rootPath = options.rootPath.toUtf8();
             const QByteArray query = options.query.toUtf8();
-            const quint64 job = vd_search_tree_query(
-                service, rootPath.constData(), query.constData(),
-                static_cast<size_t>(options.maxResults),
-                static_cast<quint64>(options.maxFileBytes),
-                static_cast<quint64>(options.maxDurationMs), options.caseSensitive ? 1 : 0,
-                options.verilogOnly ? 1 : 0);
+            // The extended query (ux-batch-2 A1): whole word, regex, every
+            // occurrence per line (`allMatches`) and an extension filter.
+            // `VdSearchOptions` has no verilog flag, so the legacy
+            // Verilog-only toggle is expressed as the documented extension
+            // table of the Rust matcher (is_verilog_path: v/vh/vlg/sv/svh).
+            QList<QByteArray> extensionStorage;
+            if (options.verilogOnly) {
+                for (const char *extension : {"v", "vh", "vlg", "sv", "svh"}) {
+                    extensionStorage.append(QByteArray(extension));
+                }
+            }
+            // The pointers are taken only after the storage vector is final:
+            // appending to a QList can move the QByteArray objects.
+            QList<char *> extensionPointers;
+            extensionPointers.reserve(extensionStorage.size());
+            for (QByteArray &bytes : extensionStorage) {
+                extensionPointers.append(bytes.data());
+            }
+            VdStringList extensions{};
+            extensions.count = static_cast<size_t>(extensionPointers.size());
+            extensions.items = extensionPointers.isEmpty() ? nullptr : extensionPointers.data();
+
+            VdSearchOptions ffiOptions{};
+            ffiOptions.case_sensitive = options.caseSensitive ? 1 : 0;
+            ffiOptions.whole_word = options.wholeWords ? 1 : 0;
+            ffiOptions.regex = options.regex ? 1 : 0;
+            ffiOptions.all_matches = options.allMatches ? 1 : 0;
+            ffiOptions.extensions = extensions;
+            ffiOptions.max_results = static_cast<size_t>(options.maxResults);
+            ffiOptions.max_file_bytes = static_cast<quint64>(options.maxFileBytes);
+            ffiOptions.max_duration_ms = static_cast<quint64>(options.maxDurationMs);
+            const quint64 job = vd_search_tree_query_ex(service, rootPath.constData(),
+                                                        query.constData(), &ffiOptions);
             if (job == 0) {
                 summary.state = SearchState::Failed;
                 summary.error = serviceError(service);
@@ -172,11 +204,23 @@ void GlobalSearch::runScan(const SearchOptions &options, quint64 generation,
                         for (size_t index = 0; index < results.count; ++index) {
                             const VdSearchHit &item = results.items[index];
                             SearchHit hit;
-                            hit.relativePath = QString::fromUtf8(item.path);
-                            hit.filePath = QDir(options.rootPath).absoluteFilePath(hit.relativePath);
+                            // FIX 1: the absolute path is the open/jump key and
+                            // the display path comes from the ONE rule (relative
+                            // when inside the project root, absolute otherwise).
+                            hit.filePath = QDir(options.rootPath)
+                                               .absoluteFilePath(QString::fromUtf8(item.path));
+                            hit.relativePath =
+                                vedit::paths::displayPath(options.rootPath, hit.filePath);
                             hit.line = static_cast<int>(item.line);
                             hit.column = static_cast<int>(item.column);
+                            hit.endColumn = static_cast<int>(item.end_column);
+                            hit.matchLength = static_cast<int>(item.match_length);
                             hit.text = QString::fromUtf8(item.preview);
+                            // b2-repair-r3: the scanner's own preview is the
+                            // content the matcher read, so hashing it here gives
+                            // the replace path per-hit evidence that can be
+                            // recomputed from the file at write time.
+                            hit.lineFingerprint = matchedLineFingerprint(hit.text);
                             hits.append(hit);
                         }
                         vd_search_results_free(&results);
@@ -184,6 +228,28 @@ void GlobalSearch::runScan(const SearchOptions &options, quint64 generation,
                         summary.filesScanned = static_cast<int>(ffiSummary.files_scanned);
                         summary.filesMatched = static_cast<int>(ffiSummary.files_matched);
                         summary.hitCount = static_cast<int>(ffiSummary.hit_count);
+                        // The dock's "current file" scope: the walk is the Rust
+                        // one (never a Qt directory walk); this lane only drops
+                        // the hits outside the requested file and reports the
+                        // counters OF THE REPORTED SET, not of the whole walk.
+                        if (!options.fileFilter.isEmpty()) {
+                            const QString wanted = QFileInfo(options.fileFilter).absoluteFilePath();
+                            QList<SearchHit> filtered;
+                            QStringList matchedFiles;
+                            filtered.reserve(hits.size());
+                            for (const SearchHit &hit : hits) {
+                                if (hit.filePath != wanted) {
+                                    continue;
+                                }
+                                filtered.append(hit);
+                                if (!matchedFiles.contains(hit.filePath)) {
+                                    matchedFiles.append(hit.filePath);
+                                }
+                            }
+                            hits = filtered;
+                            summary.filesMatched = matchedFiles.size();
+                            summary.hitCount = filtered.size();
+                        }
                         summary.skippedBinary = static_cast<int>(ffiSummary.skipped_binary);
                         summary.skippedTooLarge = static_cast<int>(ffiSummary.skipped_too_large);
                         summary.skippedUnreadable = static_cast<int>(ffiSummary.skipped_unreadable);

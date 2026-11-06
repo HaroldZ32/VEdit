@@ -1,0 +1,70 @@
+## U4 scope check
+2026-11-06T10:07:17+08:00
+
+### git status (syntax/product)
+ M src/syntax/product/CMakeLists.txt
+
+### git diff --stat
+ src/syntax/product/CMakeLists.txt | 53 ++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 49 insertions(+), 4 deletions(-)
+
+### source files modified today under src/
+10:03 src/syntax/product/CMakeLists.txt
+10:06 src/workspace/diagnostics/selftests/b3_wiring_e2e.cpp
+
+### diff hunks summary
+@@ -25,6 +25,22 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
++# U4: the repository's resources/ directory is resolved HERE, at file scope, and
++# then reused by every consumer below. It must not be recomputed inside
++# vedit_syntax_link_product(): that function is DEFERRED to the end of the
++# top-level configure, where ${CMAKE_CURRENT_SOURCE_DIR} is the TOP-LEVEL source
++# directory, so the relative suffix resolved to '/resources' — a path that does
++# not exist. The test environment then pointed the loader at nothing, it silently
++# fell back to KDE's own definitions, and the test was still green.
++#
++# A plain variable cannot carry the value that far either (directory scope ends
++# with this subdirectory; the deferred call runs in the top-level scope and read
++# an EMPTY path), so the captured path travels as a GLOBAL property.
++set(SYNTAX_PRODUCT_RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../resources")
++cmake_path(ABSOLUTE_PATH SYNTAX_PRODUCT_RESOURCES_DIR NORMALIZE
++  OUTPUT_VARIABLE SYNTAX_PRODUCT_RESOURCES_DIR)
++set_property(GLOBAL PROPERTY VEDIT_SYNTAX_PRODUCT_RESOURCES_DIR "${SYNTAX_PRODUCT_RESOURCES_DIR}")
+@@ -62,14 +78,14 @@ if(VEDIT_SYNTAX_PRODUCT_BUILD_TESTS)
+-    VEDIT_SYNTAX_RESOURCES_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../../../resources")
++    VEDIT_SYNTAX_RESOURCES_DIR="${SYNTAX_PRODUCT_RESOURCES_DIR}")
+-      "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime;VEDIT_SYNTAX_DIR=${CMAKE_CURRENT_SOURCE_DIR}/../../../resources"
++      "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime;VEDIT_SYNTAX_DIR=${SYNTAX_PRODUCT_RESOURCES_DIR}"
+@@ -102,11 +118,40 @@ function(vedit_syntax_link_product)
++  #
++  # U4: the resources path comes from the GLOBAL property captured above. A local
++  # variable is NOT visible here — this function runs in the top-level directory
++  # scope at the end of the configure.
++  get_property(syntax_resources_dir GLOBAL PROPERTY VEDIT_SYNTAX_PRODUCT_RESOURCES_DIR)
++  if(NOT syntax_resources_dir)
++    message(FATAL_ERROR
++      "syn-product: the resources directory was not captured (U4); the syntax-startup "
++      "test would otherwise load no bundled definition and still pass.")
++  endif()
++  # U4: the old pattern was "syntax-product: grammar=verilog", which only repeats
++  # the COMPILE-TIME grammar id — it stayed green while the loader found nothing
++  # (private-dir='/resources', own-xml=[], verilog=0). The assertion now requires
++  # the load itself and every definition VEdit ships.
++  #
++  # The five definitions are asserted through the loader's own own-xml= field
++  # (the private definitions it actually loaded; 1:1 with Verilog, SystemVerilog,
++  # VHDL, Markdown and Tcl). The field is built from QDirIterator, so its ORDER is
++  # not stable — hence the entry pattern is repeated five times rather than
++  # written in one fixed order. Five entries drawn from exactly these five file
++  # names can only be the five shipped files (a directory iterator never lists a
++  # file twice), so all five definitions must be present. A sixth shipped
++  # definition would fail this test on purpose: the whitelist is five.
++  set(_u4_definition "vedit-(markdown|systemverilog|tcl|verilog|vhdl)\\.xml")
++  set(_u4_own_xml "${_u4_definition}")
++  foreach(_u4_repeat RANGE 3)
++    string(APPEND _u4_own_xml ",${_u4_definition}")
++  endforeach()
+-      "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime;VEDIT_SYNTAX_DIR=${CMAKE_CURRENT_SOURCE_DIR}/../../../resources"
+-    PASS_REGULAR_EXPRESSION "syntax-product: grammar=verilog"
++      "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime;VEDIT_SYNTAX_DIR=${syntax_resources_dir}"
++    PASS_REGULAR_EXPRESSION
++      "syntax-product: .*private-dir='[^']+/resources' definitions=[0-9]+ own-xml=\\[${_u4_own_xml}\\] themes=[0-9]+ verilog=1 systemverilog=1 .*startup-hook=1"

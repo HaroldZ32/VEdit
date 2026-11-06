@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <cstdint>
 #include <string_view>
+#include <QCoreApplication>
 
 namespace vedit::breadcrumb {
 
@@ -22,7 +23,7 @@ SyntaxBreadcrumbSource::SyntaxBreadcrumbSource(QString grammarId)
         provider_ = service.createProvider();
     }
     if (provider_ == nullptr) {
-        lastDiagnostic_ = QStringLiteral("no provider for grammar '%1'").arg(grammarId_);
+        lastDiagnostic_ = QCoreApplication::translate("VEdit", "no provider for grammar '%1'").arg(grammarId_);
     }
 }
 
@@ -46,14 +47,14 @@ void SyntaxBreadcrumbSource::ensureParsed(QStringView text)
     }
     if (provider_ == nullptr) {
         tree_.reset();
-        lastDiagnostic_ = QStringLiteral("no provider for grammar '%1'").arg(grammarId_);
+        lastDiagnostic_ = QCoreApplication::translate("VEdit", "no provider for grammar '%1'").arg(grammarId_);
         return;
     }
     const QByteArray utf8 = current.toUtf8();
     tree_ = provider_->parse(std::string_view(utf8.constData(), static_cast<std::size_t>(utf8.size())));
     ++parseCount_;
     if (tree_ == nullptr) {
-        lastDiagnostic_ = QStringLiteral("parse returned no tree");
+        lastDiagnostic_ = QCoreApplication::translate("VEdit", "parse returned no tree");
     }
 }
 

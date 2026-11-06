@@ -1,0 +1,5 @@
+$ grep -nE "不能新增|也不能删除|只能为已被 filelist 引用|变量对话框不能增删" docs/USER_GUIDE.md
+(no matches: the banned sentence is gone)
+
+$ wc -l -c docs/USER_GUIDE.md
+  669 53370 docs/USER_GUIDE.md

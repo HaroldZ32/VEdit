@@ -1,0 +1,5 @@
+# T20 probe build — 2026-11-02T19:52:16+08:00
+PROBE_BUILD_OK binary=/vedit-build/target/t20-probe/t20-shell-probe
+binary 2026-11-02 11:52:21.740453012 +0000 94010400 /vedit-build/target/t20-probe/t20-shell-probe
+f99a608ff2ebabbfa5a46912090713786b054f8829176b59e492d34568283807  /vedit-build/target/t20-probe/t20-shell-probe
+PROBE_BUILD_EXIT=0

@@ -1,0 +1,23 @@
+== evidence READMEs ==
+909065400450429545f94c2463e9686a9abff53277b70eb3e64b58c45bc550cd  evidence/ux-batch-2/rm8-manual/README.md
+134f67fc78c4633a0da00d0e2b1c28bd79cc1f68ddb64a54c0e0f43360df7097  evidence/ux-batch-2/rm8b-bindings/README.md
+== manual/qrc/viewer ==
+87a9f4195fba4539c41d49fcf5afc53e8fa77577cab0752fe9c2eda6b7378537  docs/USER_GUIDE.md
+2e4368095f4ce6547fedf461f46d6d8ce5f72fde121f272af069cae0e4d6834a  resources/help/user_manual.qrc
+0d2bb47ba96e98845212b929ac350589b10adfcd6546f7ab4a3677adde282e1e  src/app/help_viewer.cpp
+== shipped sources ==
+aab529a3d4211cbf2dc08728e0d6b26c733c718482c808105f5a7cb7b876b6ce  src/workspace/project/project_variables_dialog.cpp
+6980debdb46712458c6862905b22e25aef0f85e4d4cb4c6bb6b499364fcb4907  src/workspace/project/project_variables_e2e.cpp
+e9d071960a2f14816a1821d84648816826261cedaca09374dd54b48a7ea7c478  src/app/app_shell.cpp
+299559ce3406703f8150890187e2205ace6093b28ca9069a5f8f894c24cb2797  src/editor/kernel/multi_cursor.cpp
+e25eb2311a03d6a686edd6b2bed2d65fa513448e8dfd7e4f5c5fe8a985138da1  src/workspace/diagnostics/diagnostics_controller.cpp
+5e17b56f413b1ce3b8bca3e8c0a63cc278549498ea8d22b2eb96299749878695  src/workspace/filetree/file_tree_model.cpp
+== docs gate ==
+[docs] PASS: README.md docs/BUILD.md docs/USER_GUIDE.md THIRD_PARTY_NOTICES.md
+== forbidden constructs ==
+0
+== qrc embed ==
+14:        <file alias="USER_GUIDE.md">../../docs/USER_GUIDE.md</file>
+== stale variables lines ==
+142:`Variables` 对话框（标题 `Filelist variables`）目前只能为**已经被 filelist 引用、但还没解析出值**的变量填值；它**不能新增**一个尚未被引用的变量名，**也不能删除**已有条目（见第 10 节）。
+553:8. **变量对话框不能增删**：它只能为已被 filelist 引用、但还没解析出值的变量填值，不能新增一个尚未被引用的变量名，也不能删除已有条目。

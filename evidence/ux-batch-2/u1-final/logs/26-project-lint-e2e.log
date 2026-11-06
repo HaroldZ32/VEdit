@@ -1,0 +1,27 @@
+CHECK PASS product.fixture
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+CHECK PASS product.panel
+CHECK PASS product.lint-action
+LINT-PROJECT-NO-FILES loading=1 root='/tmp/vedit-project-lint-e2e-oTDrXu'
+PROJECT-ROOT-FILES root='/tmp/vedit-project-lint-e2e-oTDrXu' files=2
+OBSERVED product.attempt=0 status='The project file set is still loading — try again in a moment' pass='' files=0
+This plugin does not support propagateSizeHints()
+LINT-PROJECT engine=slang files=2 lsp-backend=verible include-dirs=0 defines=0 skipped-open=0 automatic=0
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support raise()
+LINT-PASS-FINISHED automatic=0 errors=2 files=2 dialogs=1 notice=1
+OBSERVED product.pass phase=3 errors=0 automatic=0 dialogs=1 notice=1 message='2/2 文件已扫描 — 2 条 CLI 诊断'
+CHECK PASS product.explicit-dialog  dialogs=1 automatic=0
+CHECK PASS product.dialog-modal
+CHECK PASS product.explicit-notice
+CHECK PASS product.pane
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+CHECK PASS product.file-opened
+CHECK PASS product.save
+LINT-PASS-FINISHED automatic=1 errors=2 files=2 dialogs=1 notice=1
+OBSERVED product.auto-pass automatic=1 dialogs-before=1 dialogs-after=1
+CHECK PASS product.automatic-pass-was-automatic
+CHECK PASS product.automatic-no-dialog  before=1 after=1
+SUMMARY checks=11 failures=0 skips=0

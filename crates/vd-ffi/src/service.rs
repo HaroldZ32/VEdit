@@ -56,9 +56,28 @@ pub(crate) enum JobValue {
     /// VCS status.
     Vcs(crate::vcs::VcsData),
     /// VCS branch + revision identity (T99: job-based, GUI thread never blocks).
-    VcsInfo(crate::vcs::VcsInfoData),
+    ///
+    /// Batch 7 (user ruling): the VCS read payloads are TYPED variants instead of
+    /// one "VcsInfo" slot carrying an internal enum, so the identity read can no
+    /// longer be mistaken for a generic result holder. Each poll accepts exactly
+    /// the variant its job produced and reports `WRONG_JOB_KIND` for any other.
+    VcsInfo(crate::vcs::VcsInfoPayload),
+    /// Batch 5b: the stash stack / the linked worktrees of a Git working tree.
+    VcsWorkspace(Box<crate::vcs::VcsWorkspaceData>),
+    /// Batch 4b: one page of the commit list (typed payload, batch 7).
+    VcsHistoryCommits(Box<crate::vcs::VcsHistoryData>),
+    /// Batch 4b: one commit's detail — meta + files + patch (typed, batch 7).
+    VcsHistoryCommit(Box<crate::vcs::VcsHistoryData>),
+    /// Batch 4b: one page of a single file's history (typed, batch 7).
+    VcsHistoryFile(Box<crate::vcs::VcsHistoryData>),
+    /// Batch 4b: one file's blame (typed, batch 7).
+    VcsHistoryBlame(Box<crate::vcs::VcsHistoryData>),
+    /// Batch 4b: a two-commit comparison (typed, batch 7).
+    VcsHistoryCompare(Box<crate::vcs::VcsHistoryData>),
     /// One file's VCS diff (T99: job-based, GUI thread never blocks).
     VcsDiff(crate::vcs::VcsDiffData),
+    /// One VCS write operation (batch 3a: separate from the read jobs above).
+    VcsWrite(crate::vcs::VcsWriteData),
     /// Settings read from the store.
     Settings(crate::settings::SettingsData),
     /// Settings written successfully (no payload).

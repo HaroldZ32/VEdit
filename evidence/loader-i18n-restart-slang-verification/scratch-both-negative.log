@@ -1,0 +1,6 @@
+== both paths polluted (negative) ==
+SELFTEST_EXIT=1
+ok   panel.failure-visible — no project root: open a folder
+FAIL real.service-answered — elaboration failed: slang failed: the lint tool exited with code 1 and produced no diagnostics: /w/packaging/runtime/out/AppDir/bin/slang: /lib64/ld-linux-x86-64.so.2: version `GLIBC_2.35' not found (required by /w/packaging/runtime/out/AppDir/lib/libc.so.6)
+FAIL packaged.answered — elaboration failed: slang failed: the lint tool exited with code 1 and produced no diagnostics: /w/packaging/runtime/out/AppDir/bin/slang: /lib64/ld-linux-x86-64.so.2: version `GLIBC_2.35' not found (required by /w/packaging/runtime/out/AppDir/lib/libc.so.6)
+49 checks, 2 failure(s)

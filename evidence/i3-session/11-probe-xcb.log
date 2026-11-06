@@ -1,0 +1,79 @@
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+PASS probe.fixture-dir
+PASS probe.fixtures
+PASS project-model.save
+PASS before.pane-count
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+PASS before.open-a
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+PASS before.open-b
+PASS before.pane1-two-tabs — tabs=2
+PASS before.pane2
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+PASS before.open-c
+PASS before.a-view
+PASS before.a-position — caret=12:3 scroll=5
+SHOT OK evidence/i3-session/shots/19-before-restart-a-active.png
+PASS before.b-view
+PASS before.b-scrolled — first-displayed-line=25
+BEFORE caret=45:5 scroll=25 size=1200x860 pos=0,0 active=pane-1
+SHOT OK evidence/i3-session/shots/20-before-restart.png
+PASS before.save-session
+PASS archive.written — /tmp/vedit-session-probe-mmTFxC/state/session.json
+PASS archive.sample-copied — evidence/i3-session/30-session.json
+PASS archive.version — 2
+PASS archive.project-root — /tmp/vedit-session-probe-mmTFxC/project
+PASS archive.panels
+PASS archive.layout-version
+PASS archive.layout-active
+PASS archive.layout-split
+PASS archive.leaf-documents — documents=2
+PASS archive.leaf-active-tab — 1
+PASS archive.leaf-provider
+PASS archive.caret-and-scroll-match-live-view — expected caret=45:5 scroll=25
+PASS archive.a-caret-and-scroll — expected A caret=12:3 scroll=5
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+PASS after.pane-count — panes=2
+PASS after.window-size — now=1200x860 want=1200x860
+PASS after.window-position — now=1,25 want=0,0
+PASS after.pane-identity
+PASS after.pane1-two-tabs — tabs=2
+PASS after.pane1-file-names — /tmp/vedit-session-probe-mmTFxC/project/alpha.sv | /tmp/vedit-session-probe-mmTFxC/project/bravo.sv
+PASS after.pane1-active-tab-is-b — 1
+PASS after.pane2-file — /tmp/vedit-session-probe-mmTFxC/project/charlie.sv
+PASS after.active-pane
+PASS after.project-root — project
+PASS after.panel-file-tree
+PASS after.panel-outline
+PASS after.panel-terminal-hidden
+PASS after.b-view
+PASS after.caret-line — now=45 want=45
+PASS after.caret-column — now=5 want=5
+PASS after.scroll-line — now=25 want=25
+PASS after.a-file — /tmp/vedit-session-probe-mmTFxC/project/alpha.sv
+PASS after.a-view
+PASS after.a-caret-line — now=12 want=12
+PASS after.a-caret-column — now=3 want=3
+PASS after.a-scroll-line — now=5 want=5
+SHOT OK evidence/i3-session/shots/21b-after-restart-a-active.png
+PASS after.project-model — root=/tmp/vedit-session-probe-mmTFxC/project files=3
+SHOT OK evidence/i3-session/shots/21-after-restart.png
+PASS dirty.document
+PASS dirty.state
+SHOT OK evidence/i3-session/shots/22-unsaved-restart-prompt.png
+PASS dirty.guard-cancels
+PASS dirty.archive-not-written
+PASS dirty.disk-not-written
+PASS dirty.guard-save-allows
+PASS dirty.save-wrote-disk
+PASS dirty.archive-written-after-save
+PASS corrupt.write-garbage
+[app-shell] invalid session /tmp/vedit-session-probe-mmTFxC/corrupt/session.json: unterminated object
+PASS corrupt.clean-start
+PASS corrupt.diagnostic
+PASS corrupt.visible-message — Session could not be restored (invalid session /tmp/vedit-session-probe-mmTFxC/corrupt/session.json: unterminated object) — starting clean
+PASS missing.clean-start
+PASS missing.no-alarm
+SESSION-PROBE failures=0 platform=xcb

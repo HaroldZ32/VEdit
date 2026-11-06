@@ -1,0 +1,9 @@
+# gate: lrelease
+captured_at: 2026-11-04T14:33:51+08:00
+git_head: 4e2d0a5
+cmd: docker run --rm -v /home/haroldzhao/MyProj/DshProj/VEdit:/vedit-build -w /vedit-build -e HOME=/tmp vedit-qt6-build:local bash -lc /usr/lib/qt6/bin/lrelease translations/vedit_zh_CN.ts -qm /tmp/vedit-7c.qm
+
+Updating '/tmp/vedit-7c.qm'...
+    Generated 936 translation(s) (936 finished and 0 unfinished)
+
+LRELEASE_EXIT=0

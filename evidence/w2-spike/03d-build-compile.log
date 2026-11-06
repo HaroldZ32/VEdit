@@ -1,0 +1,220 @@
+[  1%] Building CXX object _deps/mimalloc-build/CMakeFiles/mimalloc-obj.dir/src/static.c.o
+[  1%] Building CXX object external/reflect-cpp/CMakeFiles/reflectcpp.dir/cmake_pch.hxx.gch
+[  3%] Building CXX object _deps/fmt-build/CMakeFiles/fmt.dir/src/format.cc.o
+[  3%] Building CXX object _deps/fmt-build/CMakeFiles/fmt.dir/src/os.cc.o
+[  3%] Linking CXX static library ../../lib64/libfmt.a
+[  3%] Built target fmt
+[  3%] Built target mimalloc-obj
+[  3%] Generating diagnostics
+[  3%] Generating syntax
+[  5%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/SyntaxClone.cpp.o
+[  5%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/DiagCode.cpp.o
+[  5%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/AllSyntax.cpp.o
+[  5%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/TokenKind.cpp.o
+[  5%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/VersionInfo.cpp.o
+[  7%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/KnownSystemName.cpp.o
+[  7%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/analysis/AnalysisManager.cpp.o
+[  9%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/analysis/AnalyzedAssertion.cpp.o
+[  9%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/analysis/AnalysisQueries.cpp.o
+[  9%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/analysis/AnalyzedProcedure.cpp.o
+[ 11%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/analysis/CaseDecisionDag.cpp.o
+[ 11%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/analysis/ClockInference.cpp.o
+[ 11%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/analysis/DataFlowAnalysis.cpp.o
+[ 11%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/analysis/AbstractFlowAnalysis.cpp.o
+[ 11%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/analysis/DFAResults.cpp.o
+[ 12%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/analysis/DriverTracker.cpp.o
+[ 12%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/analysis/ValueDriver.cpp.o
+[ 14%] Building CXX object external/reflect-cpp/CMakeFiles/reflectcpp.dir/src/reflectcpp.cpp.o
+[ 14%] Building CXX object external/reflect-cpp/CMakeFiles/reflectcpp.dir/src/reflectcpp_json.cpp.o
+[ 14%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/diagnostics/DiagnosticClient.cpp.o
+[ 14%] Building CXX object external/reflect-cpp/CMakeFiles/reflectcpp.dir/src/yyjson.c.o
+[ 16%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/diagnostics/DiagnosticEngine.cpp.o
+[ 16%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/diagnostics/Diagnostics.cpp.o
+[ 16%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/diagnostics/JsonDiagnosticClient.cpp.o
+[ 16%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/diagnostics/StderrDiagnosticClient.cpp.o
+[ 18%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/diagnostics/TextDiagnosticClient.cpp.o
+[ 18%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/diagnostics/WaiverManager.cpp.o
+[ 18%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/driver/CompatSettings.cpp.o
+[ 18%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/driver/Driver.cpp.o
+[ 20%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/driver/MemoryStats.cpp.o
+[ 20%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/driver/SourceLoader.cpp.o
+[ 20%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/driver/UserDefinedSubroutine.cpp.o
+[ 22%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/numeric/ConstantValue.cpp.o
+[ 22%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/numeric/SVInt.cpp.o
+[ 22%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/numeric/Time.cpp.o
+[ 22%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/parsing/Lexer.cpp.o
+[ 24%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/parsing/LexerFacts.cpp.o
+[ 24%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/parsing/NumberParser.cpp.o
+[ 24%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/parsing/Parser.cpp.o
+[ 25%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/parsing/Parser_expressions.cpp.o
+[ 25%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/parsing/Parser_members.cpp.o
+[ 25%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/parsing/Parser_statements.cpp.o
+[ 25%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/parsing/ParserBase.cpp.o
+[ 27%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/parsing/ParserMetadata.cpp.o
+[ 27%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/parsing/Preprocessor.cpp.o
+[ 27%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/parsing/Preprocessor_macros.cpp.o
+[ 27%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/parsing/Preprocessor_pragmas.cpp.o
+[ 29%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/parsing/Token.cpp.o
+[ 29%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/syntax/CSTSerializer.cpp.o
+[ 29%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/syntax/SyntaxFacts.cpp.o
+[ 31%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/syntax/SyntaxNode.cpp.o
+[ 31%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/syntax/SyntaxPrinter.cpp.o
+[ 31%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/syntax/SyntaxTree.cpp.o
+[ 31%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/syntax/SyntaxRewriter.cpp.o
+[ 33%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/text/CharInfo.cpp.o
+[ 33%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/text/Glob.cpp.o
+[ 33%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/text/Json.cpp.o
+[ 35%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/text/SourceLocation.cpp.o
+[ 35%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/text/SourceManager.cpp.o
+[ 35%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/util/BumpAllocator.cpp.o
+[ 35%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/util/CommandLine.cpp.o
+[ 37%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/util/Fmt.cpp.o
+[ 37%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/util/IntervalMap.cpp.o
+[ 37%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/util/OS.cpp.o
+[ 37%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/util/SmallVector.cpp.o
+[ 38%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/util/String.cpp.o
+[ 38%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/util/ThreadPool.cpp.o
+[ 38%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/util/TimeTrace.cpp.o
+[ 38%] Linking CXX static library ../../lib64/libreflectcpp.a
+[ 38%] Built target reflectcpp
+[ 40%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/util/Util.cpp.o
+[ 40%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/builtins/ArrayMethods.cpp.o
+[ 40%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/builtins/ConversionFuncs.cpp.o
+[ 40%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/builtins/CoverageFuncs.cpp.o
+[ 42%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/builtins/EnumMethods.cpp.o
+[ 42%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/builtins/GateTypes.cpp.o
+[ 42%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/builtins/MathFuncs.cpp.o
+[ 42%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/builtins/MiscSystemFuncs.cpp.o
+[ 44%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/builtins/NonConstFuncs.cpp.o
+[ 44%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/builtins/QueryFuncs.cpp.o
+[ 44%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/builtins/StdPackage.cpp.o
+[ 46%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/builtins/StringMethods.cpp.o
+[ 46%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/builtins/SystemTasks.cpp.o
+[ 46%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/expressions/AssertionExpr.cpp.o
+[ 46%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/expressions/AssignmentExpressions.cpp.o
+[ 48%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/expressions/CallExpression.cpp.o
+[ 48%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/expressions/ConversionExpression.cpp.o
+[ 48%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/expressions/LiteralExpressions.cpp.o
+[ 50%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/expressions/MiscExpressions.cpp.o
+[ 50%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/expressions/Operator.cpp.o
+[ 50%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/expressions/OperatorExpressions.cpp.o
+[ 50%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/expressions/SelectExpressions.cpp.o
+[ 51%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/statements/ConditionalStatements.cpp.o
+[ 51%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/statements/LoopStatements.cpp.o
+[ 51%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/statements/MiscStatements.cpp.o
+[ 51%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/symbols/AttributeSymbol.cpp.o
+[ 53%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/symbols/BlockSymbols.cpp.o
+[ 53%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/symbols/CheckerSymbols.cpp.o
+[ 53%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/symbols/ClassSymbols.cpp.o
+[ 55%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/symbols/CompilationUnitSymbols.cpp.o
+[ 55%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/symbols/CoverSymbols.cpp.o
+[ 55%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/symbols/InstanceSymbols.cpp.o
+[ 55%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/symbols/MemberSymbols.cpp.o
+[ 57%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/symbols/ParameterBuilder.cpp.o
+[ 57%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/symbols/ParameterSymbols.cpp.o
+[ 57%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/symbols/PortSymbols.cpp.o
+[ 59%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/symbols/SpecifySymbols.cpp.o
+[ 59%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/symbols/SubroutineSymbols.cpp.o
+[ 59%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/symbols/SymbolBuilders.cpp.o
+[ 59%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/symbols/ValueSymbol.cpp.o
+[ 61%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/symbols/VariableSymbols.cpp.o
+[ 61%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/types/AllTypes.cpp.o
+[ 61%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/types/DeclaredType.cpp.o
+[ 61%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/types/NetType.cpp.o
+[ 62%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/types/TypePrinter.cpp.o
+[ 62%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/types/Type.cpp.o
+[ 62%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/ASTContext.cpp.o
+[ 64%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/ASTDiagMap.cpp.o
+[ 64%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/ASTSerializer.cpp.o
+[ 64%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/Bitstream.cpp.o
+[ 64%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/Compilation.cpp.o
+[ 66%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/Constraints.cpp.o
+[ 66%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/DefParamResolver.cpp.o
+[ 66%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/EvalContext.cpp.o
+[ 68%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/Expression.cpp.o
+[ 68%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/FmtHelpers.cpp.o
+[ 68%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/HierarchicalReference.cpp.o
+[ 68%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/InstanceCacheKey.cpp.o
+[ 70%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/Lookup.cpp.o
+[ 70%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/LValue.cpp.o
+[ 70%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/OpaqueInstancePath.cpp.o
+[ 70%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/Patterns.cpp.o
+[ 72%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/Scope.cpp.o
+[ 72%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/ScriptSession.cpp.o
+[ 72%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/SemanticFacts.cpp.o
+[ 74%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/SFormat.cpp.o
+[ 74%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/Statement.cpp.o
+[ 74%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/Symbol.cpp.o
+[ 74%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/SystemSubroutine.cpp.o
+[ 75%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/TimingControl.cpp.o
+[ 75%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/TypeProvider.cpp.o
+[ 75%] Building CXX object external/slang/source/CMakeFiles/slang_slang.dir/ast/ValuePath.cpp.o
+[ 77%] Linking CXX static library ../../../lib64/libsvlang.a
+[ 77%] Built target slang_slang
+[ 77%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/cmake_pch.hxx.gch
+[ 79%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/ast/ActiveDesignContext.cpp.o
+[ 79%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/VersionInfo.cpp.o
+[ 79%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/SystemTaskDocs.cpp.o
+[ 81%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/ast/ServerCompilationAnalysis.cpp.o
+[ 81%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/ast/WcpClient.cpp.o
+[ 81%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/ast/ShallowCompilation.cpp.o
+[ 81%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/ast/ConeResult.cpp.o
+[ 81%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/ast/ServerCompilation.cpp.o
+[ 83%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/document/ShallowAnalysis.cpp.o
+[ 83%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/document/DefinitionInfo.cpp.o
+[ 83%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/document/SlangDoc.cpp.o
+[ 83%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/document/SymbolIndexer.cpp.o
+[ 85%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/document/InlayHintCollector.cpp.o
+[ 85%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/document/SymbolTreeVisitor.cpp.o
+[ 85%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/document/SyntaxIndexer.cpp.o
+[ 85%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/codeactions/AddDefine.cpp.o
+[ 87%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/codeactions/AddInclude.cpp.o
+[ 87%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/codeactions/CodeActionDispatch.cpp.o
+[ 87%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/codeactions/ExpandMacro.cpp.o
+[ 87%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/completions/AssignmentPatternCompletions.cpp.o
+[ 88%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/completions/CompletionContext.cpp.o
+[ 88%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/completions/CompletionDispatch.cpp.o
+[ 88%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/completions/InstanceCompletions.cpp.o
+[ 90%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/completions/KeywordCompletions.cpp.o
+[ 90%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/completions/MacroCompletions.cpp.o
+[ 90%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/completions/MemberCompletions.cpp.o
+[ 90%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/completions/SystemTaskCompletions.cpp.o
+[ 92%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/lsp/FileWatchers.cpp.o
+[ 92%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/lsp/URI.cpp.o
+[ 92%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/util/Converters.cpp.o
+[ 94%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/util/Formatting.cpp.o
+[ 94%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/util/SlangExtensions.cpp.o
+[ 94%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/util/Markdown.cpp.o
+[ 94%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/util/Process.cpp.o
+[ 96%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/Config.cpp.o
+[ 96%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/Indexer.cpp.o
+[ 96%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/ServerDriver.cpp.o
+[ 96%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/SlangServer.cpp.o
+[ 98%] Building CXX object CMakeFiles/slang_server_obj_lib.dir/src/ServerDiagClient.cpp.o
+[ 98%] Built target slang_server_obj_lib
+[ 98%] Building CXX object CMakeFiles/slang_server.dir/src/server_main.cpp.o
+In file included from /build/slang-server-src/external/reflect-cpp/include/rfl/../rfl/generic/../parsing/Parser_named_tuple.hpp:8,
+                 from /build/slang-server-src/external/reflect-cpp/include/rfl/../rfl/generic/../parsing/Parser.hpp:19,
+                 from /build/slang-server-src/external/reflect-cpp/include/rfl/../rfl/generic/Parser.hpp:4,
+                 from /build/slang-server-src/external/reflect-cpp/include/rfl/../rfl/generic/read.hpp:7,
+                 from /build/slang-server-src/external/reflect-cpp/include/rfl/../rfl/from_generic.hpp:5,
+                 from /build/slang-server-src/external/reflect-cpp/include/rfl/../rfl.hpp:72,
+                 from /build/slang-server-src/external/reflect-cpp/include/rfl/json.hpp:4,
+                 from /build/slang-server-src/include/lsp/JsonTypes.h:11,
+                 from /build/slang-server-src/include/lsp/JsonRpc.h:11,
+                 from /build/slang-server-src/include/lsp/LspClient.h:10,
+                 from /build/slang-server-src/include/SlangLspClient.h:11,
+                 from /build/slang-server-src/include/ServerDiagClient.h:10,
+                 from /build/slang-server-src/include/SlangServer.h:11,
+                 from /build/slang-server-src/src/server_main.cpp:14:
+/build/slang-server-src/external/reflect-cpp/include/rfl/../rfl/generic/../parsing/NamedTupleParser.hpp: In instantiation of 'static void rfl::parsing::NamedTupleParser<R, W, _ignore_empty_containers, _all_required, _no_field_names, ProcessorsType, FieldTypes>::build_object(const W&, const rfl::NamedTuple<FieldTypes ...>&, rfl::parsing::NamedTupleParser<R, W, _ignore_empty_containers, _all_required, _no_field_names, ProcessorsType, FieldTypes>::OutputObjectOrArrayType*, std::integer_sequence<int, _is ...>) [with int ..._is = {}; R = rfl::generic::Reader; W = rfl::generic::Writer; bool _ignore_empty_containers = false; bool _all_required = false; bool _no_field_names = false; ProcessorsType = rfl::Processors<>; FieldTypes = {}; rfl::parsing::NamedTupleParser<R, W, _ignore_empty_containers, _all_required, _no_field_names, ProcessorsType, FieldTypes>::OutputObjectOrArrayType = rfl::generic::Writer::OutputObject]':
+/build/slang-server-src/external/reflect-cpp/include/rfl/../rfl/generic/../parsing/NamedTupleParser.hpp:157:19:   required from 'static void rfl::parsing::NamedTupleParser<R, W, _ignore_empty_containers, _all_required, _no_field_names, ProcessorsType, FieldTypes>::write(const W&, const rfl::NamedTuple<FieldTypes ...>&, const P&) [with P = rfl::parsing::Parent<rfl::generic::Writer>::Root; R = rfl::generic::Reader; W = rfl::generic::Writer; bool _ignore_empty_containers = false; bool _all_required = false; bool _no_field_names = false; ProcessorsType = rfl::Processors<>; FieldTypes = {}]'
+/build/slang-server-src/external/reflect-cpp/include/rfl/../rfl/generic/../parsing/Parser_default.hpp:117:61:   required from 'static void rfl::parsing::Parser<R, W, T, ProcessorsType>::write(const W&, const T&, const P&) [with P = rfl::parsing::Parent<rfl::generic::Writer>::Root; R = rfl::generic::Reader; W = rfl::generic::Writer; T = std::monostate; ProcessorsType = rfl::Processors<>]'
+/build/slang-server-src/external/reflect-cpp/include/rfl/../rfl/generic/write.hpp:17:38:   required from 'rfl::Generic rfl::generic::write(const auto:740&) [with Ps = {}; auto:740 = std::monostate]'
+/build/slang-server-src/external/reflect-cpp/include/rfl/../rfl/to_generic.hpp:12:36:   required from 'rfl::Generic rfl::to_generic(const auto:741&) [with Ps = {}; auto:741 = std::monostate]'
+/build/slang-server-src/include/lsp/LspClient.h:203:67:   required from here
+/build/slang-server-src/external/reflect-cpp/include/rfl/../rfl/generic/../parsing/NamedTupleParser.hpp:226:53: warning: parameter '_ptr' set but not used [-Wunused-but-set-parameter]
+  226 |                            OutputObjectOrArrayType* _ptr,
+      |                            ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~
+[100%] Linking CXX executable bin/slang-server
+[100%] Built target slang_server

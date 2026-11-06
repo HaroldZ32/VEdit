@@ -1,0 +1,22 @@
+[165/166] Building CXX object src/app/CMakeFiles/vedit-app.dir/main.cpp.o
+[166/166] Linking CXX executable src/app/vedit-app
+binary 2026-11-06 07:54:31.962834444 +0000 125471968 /vedit-build/target/rm4-jump-probe/rm4-jump-probe
+12ab39b748f988afd78712f3a808fc97295a5da2c181e16646b5e1de0de001e2  /vedit-build/target/rm4-jump-probe/rm4-jump-probe
+[lrelease] counts: 1213 translation(s) (1213 finished, 0 unfinished, 0 untranslated)
+[lrelease] qm: 129248 bytes sha256=964529b78ab94f8aadf7b47a1ac61b3f8e86c4bb4338e34a02928f09898e3043
+[lrelease] PASS: 0 unfinished and 0 untranslated in /vedit-build/translations/vedit_zh_CN.ts
+===== FINAL: project + seam + fixture-c =====
+checks=20 failures=0
+checks=20 failures=0
+     PANEL      : port clk declaration → child.sv:1:34
+FAIL rm4.seam.refusal.still-a-refusal
+FAIL rm4.seam.refusal.reason-names-what-failed
+FAIL rm4.seam.refusal.panel-carries-the-reason — port clk declaration → child.sv:1:34
+checks=10 failures=3
+[96/96] Linking CXX executable src/app/workspace-lane-module_tree/vedit-module-tree-catalog-test
+FAIL h1.first-appearance.file-set — fileSet=7 modules=6
+FAIL h1.first-appearance.uses-seeded-set — modules=6
+FAIL h1.first-appearance.source-is-model — vd_project_expand_v2(/vedit-build/src/workspace/module_tree/fixtures/ux-batch-2)
+ok   acceptance.vi.declaration-cursor — cursor=1:67 expected=1:67
+ok   acceptance.vi.instantiation-cursor — cursor=2 expected=2
+FAIL: 80 check(s), 3 failure(s)

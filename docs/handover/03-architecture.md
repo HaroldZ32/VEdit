@@ -181,7 +181,7 @@ C13 说明了为什么需要这些接缝：语义高亮必须走 KTextEditor 宿
 | `assemble-appdir.sh` | 组 AppDir：程序、Qt 插件、`ldd` 库闭包、loader+glibc、白名单 syntax XML、字体/图标、manifest/notices；末尾断言无 `syntax-bundled/` | `:61-64` 程序；`:75-96` 库闭包；`:98-106` loader/glibc；`:108-122` 白名单；`:150-157` 硬条件；`:159-174` manifest |
 | `build-appimage.sh` | 用固定 sha256 的 appimagetool 把 AppDir 打成单文件；拒绝用 probe AppDir 出交付包 | probe 拒绝 `:31-36`；工具校验 `:38-44` |
 | `selfcheck.sh` | 用干净环境经 `AppRun --selfcheck` 启动，断言 `M0-SMOKE ok=1`、`libc=<包内前缀>`、打印定义集合 | `:44-56` |
-| `verify-f2-isolation.sh` | 造 402 个宿主 XML + 1 个用户 XML，验证正控 `defs=2`、反向控制 `defs=403`（证明测试能抓到泄漏） | 夹具 `:49-54`；正控 `:71-85`；反控 `:87-95` |
+| `verify-f2-isolation.sh` | 造 402 个宿主 XML + 1 个用户 XML + 1 个同名更高版本的遮蔽夹具，验证：正控 `defs=<白名单条目数>`（A3 之后 5，A3 之前 2）且**每条定义的获胜文件都在 AppDir 的 syntax 目录下**；宿主反向控制 `defs > 白名单条目数`；用户级反向控制（`XDG_DATA_HOME=$HOME/.local/share` 时 `UserLeakProbe` 必须可见）；同名遮蔽负控（`/shadow` 的 `Tcl.xml` version 999 必须赢，且获胜文件断言必须报告它）。406 的算式是 **402 宿主名字 + 5 白名单名字 − 1 个同名 `SystemVerilog`**，不是“402 + 1 用户” | 夹具 `:39-72`；正控/反控/用户反控/遮蔽负控 `:74-230` |
 | `verify-not-shipped.sh` | 交付闸门：按 sha256 拦 KDE `systemverilog.xml`/`verilog.xml`（`:27-28,46-51`）、禁 `syntax-bundled/`（`:60-64`）、可见定义集合必须等于白名单（`:81-83`）、库内不得内嵌 GPL 定义（`:89-110`） | 失败即 `DELIVERY_BLOCKED=yes`（`:132`） |
 
 ### AppRun 里两个 XDG 变量为什么必须一起设

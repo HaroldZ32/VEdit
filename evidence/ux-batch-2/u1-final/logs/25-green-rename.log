@@ -1,0 +1,45 @@
+CHECK PASS rename.fixture
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+CHECK PASS rename.action-exists
+CHECK PASS rename.action-enabled  Rename Symbol
+CHECK PASS rename.pane
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+CHECK PASS rename.file-opened
+CHECK PASS rename.ktexteditor-view
+CHECK PASS rename.panel
+PROJECT-ROOT-FILES root='/tmp/vedit-rename-e2e-vPYCON' files=2
+CHECK PASS rename.session-ready  backend=verible · ready: backend=verible 2/2 file(s) open, 0 diagnostic(s), 0 skipped
+RENAME-REFUSED backend=verible symbol='' reason='there is no symbol under the cursor' line=2 column=1
+CHECK PASS rename.refusal-no-dialog  dialogs=0
+CHECK PASS rename.refusal-buffer-untouched
+CHECK PASS rename.refusal-reason  Rename is not possible here: there is no symbol under the cursor
+OBSERVED rename.refusal status='Rename is not possible here: there is no symbol under the cursor'
+RENAME-REFUSED backend=verible symbol='endmodule' reason=''endmodule' is a language keyword, not a renameable symbol' line=5 column=1
+This plugin does not support propagateSizeHints()
+CHECK PASS rename.keyword-no-dialog
+CHECK PASS rename.keyword-reason  Rename is not possible here: 'endmodule' is a language keyword, not a renameable symbol
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+OBSERVED rename.keyword status='Rename is not possible here: 'endmodule' is a language keyword, not a renameable symbol'
+RENAME-REQUEST backend=verible symbol='w' new='w2' line=3 column=10
+RENAME-FILE /tmp/vedit-rename-e2e-vPYCON/rtl/top.sv: 3 edit(s) [editor]
+RENAME-APPLIED backend=verible edits=3 files=1 in-editor=1 on-disk=0
+CHECK PASS rename.dialog-shown  dialogs=1
+CHECK PASS rename.buffer-applied  w2-count=3 text='module top;|  logic w2;|  assign w2 = 1'b1;|  initial $display("%0b", w2);|endmo'
+CHECK PASS rename.buffer-no-old-name
+CHECK PASS rename.disk-before-save  the open document is a buffer edit until the user saves
+CHECK PASS rename.save
+CHECK PASS rename.disk-after-save  module top;|  logic w2;|  assign w2 = 1'b1;|  initial $display("%0b", w2);|endmo
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+RENAME-REQUEST backend=verible symbol='top' new='top2' line=1 column=8
+RENAME-FILE /tmp/vedit-rename-e2e-vPYCON/rtl/top.sv: 1 edit(s) [editor]
+RENAME-APPLIED backend=verible edits=1 files=1 in-editor=1 on-disk=0
+CHECK PASS rename.crossfile-buffer  module top2;
+  logic w2;
+  assign w2 = 1
+OBSERVED rename.crossfile non-open-file-edited=0 other='module other;|  top u_top();|endmodule|'
+NOT-CLAIMED rename.crossfile-atomic-save  verible answers for the OPEN document only; cross-file rename is NOT CLAIMED in this batch (other.sv unchanged: yes). The non-open-file WRITE path is proven separately below.
+CHECK PASS rename.non-open-atomic-save  ok=1 written=1 text='module outside;|  wire renamed;|endmodul'
+SUMMARY checks=21 failures=0 skips=0 not-claimed=1

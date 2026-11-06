@@ -209,12 +209,17 @@ fn probe(
 }
 
 /// Candidate locations inside a shipped payload, in probe order.
+///
+/// `exe_dir/bin/<tool>` covers the AppImage AppDir-root layout: the launcher
+/// executes its bundled loader, so the product's executable directory is the
+/// package root rather than `bin/`.
 fn bundled_candidates(exe_dir: &Path, binary: &str) -> Vec<PathBuf> {
     let mut candidates = Vec::new();
     if let Some(parent) = exe_dir.parent() {
         candidates.push(parent.join("lib/vedit/bin").join(binary));
         candidates.push(parent.join("bin").join(binary));
     }
+    candidates.push(exe_dir.join("bin").join(binary));
     candidates.push(exe_dir.join(binary));
     candidates
 }
@@ -287,11 +292,7 @@ mod tests {
         let resolved = resolve_verible(VeribleTool::Format, &config, &env, temp.path());
         assert!(resolved.path.is_none());
         assert!(resolved.source.is_none());
-        assert_eq!(
-            resolved.attempts.len(),
-            3,
-            "three bundled candidates probed"
-        );
+        assert_eq!(resolved.attempts.len(), 4, "four bundled candidates probed");
         let Some(error) = resolved.error else {
             return Err("a missing tool must carry an error".into());
         };
@@ -314,6 +315,28 @@ mod tests {
         std::fs::create_dir_all(&exe_dir)?;
         std::fs::create_dir_all(&lib_dir)?;
         let binary = lib_dir.join("verible-verilog-lint");
+        write(&binary, "#!/bin/sh\n")?;
+        let resolved = resolve_verible(
+            VeribleTool::Lint,
+            &Config::default(),
+            &Env::from_pairs(Vec::<(String, String)>::new()),
+            &exe_dir,
+        );
+        assert_eq!(resolved.source, Some(ToolSource::Bundled));
+        assert_eq!(resolved.path, Some(binary));
+        Ok(())
+    }
+
+    #[test]
+    fn bundled_payload_is_found_in_the_appdir_root_bin() -> Result<(), Box<dyn std::error::Error>> {
+        // The AppImage launcher runs its bundled loader from the AppDir root, so
+        // the executable directory IS the package root and the tools sit in
+        // `<AppDir>/bin/`. The tarball base `exe_dir/../bin` stays absent.
+        let temp = tempfile::tempdir()?;
+        let exe_dir = temp.path().join("AppDir");
+        let bin_dir = exe_dir.join("bin");
+        std::fs::create_dir_all(&bin_dir)?;
+        let binary = bin_dir.join("verible-verilog-lint");
         write(&binary, "#!/bin/sh\n")?;
         let resolved = resolve_verible(
             VeribleTool::Lint,

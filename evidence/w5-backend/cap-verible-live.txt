@@ -1,0 +1,27 @@
+CAP-ROW codeActionProvider True
+CAP-ROW definitionProvider True
+CAP-ROW diagnosticProvider {"interFileDependencies": false, "workspaceDiagnostics": false}
+CAP-ROW documentFormattingProvider True
+CAP-ROW documentHighlightProvider True
+CAP-ROW documentRangeFormattingProvider True
+CAP-ROW documentSymbolProvider True
+CAP-ROW hoverProvider False
+CAP-ROW referencesProvider True
+CAP-ROW renameProvider True
+CAP-ROW textDocumentSync {"change": 2, "openClose": true}
+CAP-KEYS 11
+CAP-LOOKUP codeActionProvider yes
+CAP-LOOKUP callHierarchyProvider no
+CAP-LOOKUP hoverProvider no
+CAP-LOOKUP workspaceSymbolProvider no
+CAP-LOOKUP documentSymbolProvider yes
+CAP-LOOKUP referencesProvider yes
+CAP-LOOKUP renameProvider yes
+CAP-LOOKUP documentFormattingProvider yes
+CAP-LOOKUP documentRangeFormattingProvider yes
+CAP-LOOKUP completionProvider no
+CAP-LOOKUP inlayHintProvider no
+CAP-LOOKUP signatureHelpProvider no
+CAP-LOOKUP executeCommandProvider no
+CAP-LOOKUP definitionProvider yes
+CAP-LOOKUP documentHighlightProvider yes

@@ -1,0 +1,13 @@
+########## FINAL project (fixture B, cwd=/vedit-build) ##########
+     PASSED   : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/child.sv:1:34 (status=delivered)
+     PASSED   : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/top.sv:3:9 (status=delivered)
+     TREE PASSED   : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/child.sv:1:8 (status=delivered)
+checks=25 failures=0
+########## FINAL seed A ##########
+checks=7 failures=0
+########## FINAL restore A -> Open Folder B -> both panels ##########
+     PANE BEFORE: file='/vedit-build/evidence/ux-batch-2/rm4-jump/fixture-a/alpha.sv' view=KTextEditor
+     PASSED   : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/child.sv:1:34 (status=delivered)
+     PASSED   : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/top.sv:3:9 (status=delivered)
+     TREE PASSED   : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/child.sv:1:8 (status=delivered)
+checks=26 failures=0

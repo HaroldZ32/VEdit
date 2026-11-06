@@ -32,6 +32,9 @@ public:
 
     void setSymbols(const QVector<OutlineSymbol> &symbols);
     const QVector<OutlineSymbol> &symbols() const { return symbols_; }
+    /// The symbol of `row`, or nullptr when the row is out of range. The panel's
+    /// double-click handler jumps with it (AC-7.1: file:line:column).
+    const OutlineSymbol *symbolAt(int row) const;
 
 private:
     QVector<OutlineSymbol> symbols_;

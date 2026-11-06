@@ -1,0 +1,47 @@
+== writer README ==
+2e54998f9e85e6cd692fa5e4ae7e84a5336bca7487c003ee7aa4924d422d210d  evidence/ux-batch-2/rm6-gestures/README.md
+== sources ==
+299559ce3406703f8150890187e2205ace6093b28ca9069a5f8f894c24cb2797  src/editor/kernel/multi_cursor.cpp
+8594e931140315dce65c17478042e72b60f2ee2d43bf4cd4f67ae18384b02478  src/editor/kernel/multi_cursor_selftest.cpp
+87a9f4195fba4539c41d49fcf5afc53e8fa77577cab0752fe9c2eda6b7378537  docs/USER_GUIDE.md
+8affd77d0819152e0b602ea41156b053f5bc82a8d4d68b828045b50bcbb4d040  src/app/editor_area.cpp
+7f1017d382f2c57053a540bbf50e1e02aad14d4fe47d381eec9a0382de042de0  src/editor/kernel/editor_context_menu.cpp
+== red/green ==
+4e93a2bbc6fd49bc885f143a962a12dad7f56d57c2a86b3a53ff2ca3440d11ec  evidence/ux-batch-2/rm6-gestures/red-run.log
+941e69f3bba93025c01ba06fa8bd564bc5140d04035798e642abf16eed334803  evidence/ux-batch-2/rm6-gestures/green-run.log
+== predicate line ==
+593:static bool isMultiCursorGesture(Qt::KeyboardModifiers modifiers)
+594-{
+595-    if (!modifiers.testFlag(Qt::AltModifier)) {
+596-        return false;
+597-    }
+598-    const Qt::KeyboardModifiers companions =
+599-        modifiers & (Qt::ShiftModifier | Qt::ControlModifier | Qt::MetaModifier);
+600-    // Shift+Alt and Ctrl+Alt are the primaries; bare Alt is the secondary;
+601-    // Ctrl+Shift+Alt keeps working (it is still a multi-cursor gesture).
+602-    return companions == Qt::NoModifier || companions == Qt::ShiftModifier
+603-           || companions == Qt::ControlModifier
+604-           || companions == (Qt::ShiftModifier | Qt::ControlModifier);
+605-}
+--
+640:        if (isMultiCursorGesture(event->modifiers())) {
+641-            if (!clicked.isValid()) {
+642-                return false;
+643-            }
+== test combos ==
+rm6.ctrl-alt-click.add
+rm6.ctrl-alt-click.added-position
+rm6.ctrl-alt-click.adds-cursor
+rm6.ctrl-alt-click.dispatch-unchanged
+rm6.ctrl-alt-click.no-definition-dispatch
+rm6.ctrl-alt-click.readd
+rm6.ctrl-alt-click.toggle-off
+rm6.plain-click.single-cursor
+rm6.shift-alt-block.cursor-count
+rm6.shift-alt-block.drag-active
+rm6.shift-alt-block.inner-widget
+rm6.shift-alt-block.native-mode
+rm6.shift-alt-block.native-mode-off
+rm6.shift-alt-block.one-undo
+rm6.shift-alt-block.rectangle
+rm6.shift-alt-block.rectangular-insert

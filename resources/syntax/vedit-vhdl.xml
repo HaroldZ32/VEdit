@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language>
+<!--
+  VEdit VHDL syntax definition (authored for VEdit; NOT a copy of KDE's vhdl.xml).
+  Semantic source: the VHDL-2008 language reference; KDE's vhdl.xml (KF6 6.24,
+  https://invent.kde.org/frameworks/syntax-highlighting) was used only to check
+  that the keyword inventory is not missing a construct, and no text was copied.
+  SPDX-License-Identifier: LGPL-2.1-or-later
+  Folding: entity/architecture/process/generate/block/package/function/procedure
+  regions open on the declared words and close on `end` (A3 requirement: the
+  delivered AppDir uses THIS definition, so folds come from here).
+  The file name deliberately differs from KDE's `vhdl.xml`.
+-->
+<language name="VHDL" version="1" kateversion="5.0" section="Hardware"
+          extensions="*.vhd;*.vhdl" mimetype="text/x-vhdl"
+          author="VEdit" license="LGPL-2.1-or-later">
+  <highlighting>
+    <list name="keywords">
+      <item>abs</item><item>access</item><item>after</item><item>alias</item>
+      <item>all</item><item>and</item><item>architecture</item><item>array</item>
+      <item>assert</item><item>attribute</item><item>begin</item><item>block</item>
+      <item>body</item><item>buffer</item><item>case</item><item>component</item>
+      <item>configuration</item><item>constant</item><item>context</item>
+      <item>disconnect</item><item>downto</item><item>else</item><item>elsif</item>
+      <item>end</item><item>entity</item><item>exit</item><item>file</item>
+      <item>for</item><item>force</item><item>function</item><item>generate</item>
+      <item>generic</item><item>group</item><item>guarded</item><item>if</item>
+      <item>impure</item><item>in</item><item>inertial</item><item>inout</item>
+      <item>is</item><item>label</item><item>library</item><item>linkage</item>
+      <item>literal</item><item>loop</item><item>map</item><item>mod</item>
+      <item>nand</item><item>new</item><item>next</item><item>nor</item>
+      <item>not</item><item>null</item><item>of</item><item>on</item>
+      <item>open</item><item>or</item><item>others</item><item>out</item>
+      <item>package</item><item>port</item><item>postponed</item><item>procedure</item>
+      <item>process</item><item>protected</item><item>pure</item><item>range</item>
+      <item>record</item><item>register</item><item>reject</item><item>release</item>
+      <item>rem</item><item>report</item><item>return</item><item>rol</item>
+      <item>ror</item><item>select</item><item>severity</item><item>shared</item>
+      <item>signal</item><item>sla</item><item>sll</item><item>sra</item>
+      <item>srl</item><item>subtype</item><item>then</item><item>to</item>
+      <item>transport</item><item>type</item><item>unaffected</item><item>units</item>
+      <item>until</item><item>use</item><item>variable</item><item>wait</item>
+      <item>when</item><item>while</item><item>with</item><item>xnor</item>
+      <item>xor</item>
+    </list>
+    <list name="dataTypes">
+      <item>bit</item><item>bit_vector</item><item>boolean</item><item>character</item>
+      <item>integer</item><item>natural</item><item>positive</item><item>real</item>
+      <item>signed</item><item>std_logic</item><item>std_logic_vector</item>
+      <item>std_ulogic</item><item>std_ulogic_vector</item><item>string</item>
+      <item>time</item><item>unsigned</item><item>severity_level</item>
+      <item>delay_length</item><item>time_vector</item>
+    </list>
+    <contexts>
+      <context name="Normal" attribute="Normal Text" lineEndContext="#stay">
+        <!-- Folding. Anchored at the start of the line on purpose: a plain
+             keyword rule would ALSO open a region on the word inside `end entity`
+             / `end architecture` (which repeats the opener), producing two begins
+             for one block and unbalanced folds. `end` closes the region.
+             Declarations that cannot carry a label keep the plain opener; the
+             constructs that CAN carry one (`p1: process (clk) is`, `b1: block`,
+             `f: function …`) accept an optional `label :` prefix. `entity` is
+             deliberately NOT in the labelled rule: `u1 : entity work.foo port
+             map` is an instantiation and must not open a region. -->
+        <RegExpr attribute="Keyword" context="#stay" beginRegion="veditFold"
+                 String="^\s*(entity|architecture|package|configuration|component)\b"/>
+        <RegExpr attribute="Keyword" context="#stay" beginRegion="veditFold"
+                 String="^\s*([A-Za-z_][A-Za-z0-9_]*\s*:\s*)?(process|block|function|procedure)\b"/>
+        <RegExpr attribute="Keyword" context="#stay" endRegion="veditFold" String="^\s*end\b"/>
+
+        <!-- Comments first: a double hyphen inside a string is handled inside the
+             String context, which has no comment rule. -->
+        <RegExpr attribute="Comment" context="#stay" String="--.*$"/>
+        <Detect2Chars attribute="Comment" context="BlockComment" char="/" char1="*"/>
+        <DetectChar attribute="String" context="String" char="&quot;"/>
+        <!-- Character literal before the attribute name rule ('a' vs 'event). -->
+        <RegExpr attribute="String" context="#stay" String="'[^']'"/>
+        <RegExpr attribute="Attribute" context="#stay" String="'[A-Za-z_][A-Za-z0-9_]*"/>
+        <keyword attribute="Data Type" context="#stay" String="dataTypes"/>
+        <keyword attribute="Keyword" context="#stay" String="keywords"/>
+        <RegExpr attribute="Number" context="#stay" String="\b\d[\d_]*#[0-9A-Fa-f_.]+#"/>
+        <RegExpr attribute="Number" context="#stay" String="\b\d[\d_]*(\.\d[\d_]*)?([eE][+-]?\d+)?\b"/>
+        <RegExpr attribute="Operator" context="#stay" String="[+\-*/=&lt;&gt;?:&amp;|]+"/>
+      </context>
+      <context name="BlockComment" attribute="Comment" lineEndContext="#stay">
+        <Detect2Chars attribute="Comment" context="#pop" char="*" char1="/"/>
+      </context>
+      <context name="String" attribute="String" lineEndContext="#pop">
+        <Detect2Chars attribute="String" context="#stay" char="&quot;" char1="&quot;"/>
+        <DetectChar attribute="String" context="#pop" char="&quot;"/>
+      </context>
+    </contexts>
+    <itemDatas>
+      <itemData name="Normal Text" defStyleNum="dsNormal"/>
+      <itemData name="Keyword" defStyleNum="dsKeyword"/>
+      <itemData name="Data Type" defStyleNum="dsDataType"/>
+      <itemData name="Comment" defStyleNum="dsComment"/>
+      <itemData name="String" defStyleNum="dsString"/>
+      <itemData name="Number" defStyleNum="dsDecVal"/>
+      <itemData name="Operator" defStyleNum="dsOperator"/>
+      <itemData name="Attribute" defStyleNum="dsAttribute"/>
+    </itemDatas>
+    <!-- VHDL is case-insensitive: END is the same keyword as end. -->
+    <keywords casesensitive="0"/>
+  </highlighting>
+</language>

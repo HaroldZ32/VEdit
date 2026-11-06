@@ -1,0 +1,29 @@
+# 16-check-ids-after-repair — T49 复验：CHECK id 集合与死代码
+# captured: 2026-11-04T14:03:38+08:00
+
+## 1) 补回的 2 条活代码断言（同一 ctest: vedit-syntax-directory-equivalence）
+CHECK equivalence.kde-data-root.private-dir PASS  /tmp/vedit-syntax-directory-equivalence-ybSUTa
+CHECK equivalence.kde-data-root.search-path PASS  /tmp/vedit-syntax-directory-equivalence-ybSUTa/syntax
+CHECK equivalence.kde-flat-root-diagnostic PASS  private syntax directory missing: /tmp/vedit-syntax-directory-equivalence-BrdBpJ/syntax (set VEDIT_SYNTAX_DIR) | Verilog syntax definition is not available; .v files fall back to plain text | SystemVerilog definition exists only inside the syntax library (KDE build) and is not shipped by VEdit (C7): it is deliberately not used | SystemVerilog definition not shipped (C7 pending): .sv files degrade to the Verilog definition (SystemVerilog-only constructs lose highlighting/folding); this is a diagnosable degradation, not a crash | .v resolves to definition 'V' by file name (the built-in 'V'/vlang definition also claims *.v); use resolveLanguageForFile()/explicit language names instead
+CHECK equivalence.kde-flat-root-no-search-path PASS
+CHECK equivalence.kde-legacy-subdir.private-dir PASS  /tmp/vedit-syntax-directory-equivalence-ybSUTa
+CHECK equivalence.kde-legacy-subdir.search-path PASS  /tmp/vedit-syntax-directory-equivalence-ybSUTa/syntax
+CHECK equivalence.resolver-data-root PASS  /tmp/vedit-syntax-directory-equivalence-ybSUTa/syntax
+CHECK equivalence.resolver-flat-root-rejected PASS
+CHECK syntax-dir.empty-string-is-empty PASS
+CHECK syntax-dir.missing-path-is-empty PASS
+
+## 2) 死 helper 已删除（grep 两个标识符 = 0）
+grep -rn 'syntaxDefinitionFileName|applicationSyntaxDefinitionDirectory' --include=*.cpp --include=*.h --include=*.md src/ -> 0 行
+被删的 3 条死代码断言（无覆盖点，记录在案）：
+  syntax-dir.file-verilog / syntax-dir.file-systemverilog -> 测 syntaxDefinitionFileName（已删）
+  syntax-dir.application-fallback                         -> 测 applicationSyntaxDefinitionDirectory（已删）
+
+## 3) selfcheck CHECK id 集合 pre vs post（T29 日志 13-selfcheck.log vs 22-selfcheck-after-repair.log）
+pre=290 unique ids; post=290 unique ids; missing=0; added=0
+
+## 4) 断言点计数（AC-4.7 口径，src/）
+pre-T29 2447 -> T29 2437 -> T49 2439（补回 2 条活代码断言）
+
+## 5) 产品代码唯一改动：删除 2 个零调用点 helper（不改变任何 CHECK id 的来源）
+grep -rn 'resolveSyntaxDefinitionDirectory' --include=*.cpp src/ | grep -v tests

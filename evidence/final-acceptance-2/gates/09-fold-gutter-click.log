@@ -1,0 +1,40 @@
+UpdateCTestConfiguration  from :/vedit-build/target/qt6-build/DartConfiguration.tcl
+Test project /vedit-build/target/qt6-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 15
+    Start 15: vedit-fold-gutter-click
+
+15: Test command: /usr/bin/xvfb-run "-a" "-s" "-screen 0 1280x1024x24" "/vedit-build/target/qt6-build/src/app/editor-lane/fold-gutter-click-probe" "/vedit-build/src/editor/../../resources/syntax" "/vedit-build/target/qt6-build/src/app/editor-lane/fold-gutter.png"
+15: Working Directory: /vedit-build/target/qt6-build/src/app/editor-lane
+15: Environment variables: 
+15:  QT_QPA_PLATFORM=xcb
+15:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime-fold
+15: Test timeout computed to be: 120
+15: kf.sonnet.core: Sonnet: No speller backends available!
+15: NATIVE-GUI mode='SystemVerilog' set=1 view_visible=1
+15: NATIVE-GUI baseline first=0 last=61 hidden=0 scroll_max=939
+15: NATIVE-GUI geometry view=1000x900 text_x=60 global_text_x=60 global_y=1
+15: NATIVE-GUI line_height=14
+15: NATIVE-GUI screenshot=/vedit-build/target/qt6-build/src/app/editor-lane/fold-gutter.png size=1000x900
+15: NATIVE-GUI border_scan line0_px=32 line1_px=33
+15: NATIVE-GUI marker_found x=44 (gutter_x=44)
+15: NATIVE-GUI after_first_click first=0 hidden=38 scroll_max=901 changed=1
+15: NATIVE-GUI after_second_click first=0 hidden=0 scroll_max=939
+15: NATIVE-GUI verdict marker_created_by_kde=1 fold_direction=1 unfold_direction=1
+15: NATIVE-GUI negative_control changed=0
+15: NATIVE-GUI hidden-cursor-move folded=1 cursor_line=20 survived=1
+15: NATIVE-GUI result ok=1
+15: NATIVE-GUI done
+1/1 Test #15: vedit-fold-gutter-click ..........   Passed    0.23 sec
+
+The following tests passed:
+	vedit-fold-gutter-click
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.23 sec

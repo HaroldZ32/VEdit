@@ -1,0 +1,9 @@
+# sha256 verification of the repair's five files against 30-fixed-sha256.txt
+src/editor/kernel/multi_cursor.cpp: OK
+src/editor/kernel/multi_cursor.h: OK
+src/editor/kernel/lsp_actions.cpp: OK
+src/editor/kernel/lsp_actions.h: OK
+src/editor/kernel/multi_cursor_selftest.cpp: OK
+
+# mutation/simulation residue in the five files (empty = none)
+(none)

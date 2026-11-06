@@ -1,0 +1,17 @@
+# T10 security-repair pass 2 (follow-up review fixes: comment truth, stale-temp sweep, wording)
+# collected_at: 2026-11-02T07:59:46+0000
+# note: one transient failure was observed once while another lane was rebuilding vd-lsp/vd-project; 3 consecutive runs below are clean.
+== cargo test -p vd-settings -p vd-ffi --lib (run 1) ==
+test result: ok. 38 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+== cargo test -p vd-settings -p vd-ffi --lib (run 2) ==
+test result: ok. 38 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+== cargo test -p vd-settings -p vd-ffi --lib (run 3) ==
+test result: ok. 38 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+== cargo clippy -p vd-settings --all-targets -- -D warnings ==
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.05s
+CLIPPY_EXIT=0
+== rustfmt --check (changed files) ==
+FMT_EXIT=0

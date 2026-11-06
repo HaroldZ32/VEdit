@@ -1,0 +1,20 @@
+fake-lsp: started
+fake-lsp: method=initialize id=0
+fake-lsp: method=initialized id=None
+fake-lsp: method=textDocument/didOpen id=None
+fake-lsp: started
+fake-lsp: method=initialize id=0
+fake-lsp: method=initialized id=None
+fake-lsp: method=textDocument/didOpen id=None
+fake-lsp: method=textDocument/hover id=1
+fake-lsp: method=shutdown id=2
+fake-lsp: method=exit id=None
+fake-lsp: exiting
+fake-lsp: method=textDocument/didChange id=None
+fake-lsp: method=textDocument/documentSymbol id=1
+fake-lsp: method=textDocument/hover id=2
+fake-lsp: method=textDocument/signatureHelp id=3
+fake-lsp: method=textDocument/signatureHelp id=4
+fake-lsp: method=shutdown id=5
+fake-lsp: method=exit id=None
+fake-lsp: exiting

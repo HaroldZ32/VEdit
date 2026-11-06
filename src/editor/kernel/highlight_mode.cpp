@@ -12,6 +12,7 @@
 #include <QFileInfo>
 #include <QString>
 #include <QStringList>
+#include <QCoreApplication>
 
 namespace vedit::editor {
 namespace {
@@ -47,17 +48,39 @@ private:
     HighlightStats stats_;
 };
 
-// VEdit's own extension table; mirrors the `extensions=` attribute of
-// resources/syntax/vedit-verilog.xml and vedit-systemverilog.xml.
+struct ExtensionDefinition {
+    const char *suffix; // lower case, without the dot
+    const char *name;   // KSyntaxHighlighting definition name
+};
+
+// VEdit's own extension table. It mirrors the `extensions=` attribute of the
+// definitions shipped in resources/syntax (vedit-verilog/vedit-systemverilog/
+// vedit-vhdl/vedit-markdown/vedit-tcl.xml) and is consulted BEFORE the editor's
+// repository for two reasons:
+//   * `.v` must stay "Verilog" even on a developer host where KDE's own "V"
+//     (vlang) definition also claims `*.v`;
+//   * `.sdc` / `.xdc` are Tcl by the product decision, while the Tcl definition
+//     deliberately does not have to claim them in every repository.
+// A suffix that is NOT in this table falls through to the repository, which may
+// return any valid definition (the author is irrelevant there).
+constexpr ExtensionDefinition kExtensionTable[] = {
+    {"v", "Verilog"},      {"vh", "Verilog"},   {"vlg", "Verilog"},
+    {"sv", "SystemVerilog"}, {"svh", "SystemVerilog"},
+    {"vhd", "VHDL"},       {"vhdl", "VHDL"},
+    {"md", "Markdown"},    {"markdown", "Markdown"}, {"mdown", "Markdown"}, {"mkd", "Markdown"},
+    {"tcl", "Tcl"},        {"tk", "Tcl"},       {"sdc", "Tcl"}, {"xdc", "Tcl"},
+};
+
 QString modeFromExtension(const QString &absolutePath)
 {
     const QString suffix = QFileInfo(absolutePath).suffix().toLower();
-    if (suffix == QLatin1String("v") || suffix == QLatin1String("vh") ||
-        suffix == QLatin1String("vlg")) {
-        return QStringLiteral("Verilog");
+    if (suffix.isEmpty()) {
+        return {};
     }
-    if (suffix == QLatin1String("sv") || suffix == QLatin1String("svh")) {
-        return QStringLiteral("SystemVerilog");
+    for (const ExtensionDefinition &entry : kExtensionTable) {
+        if (suffix == QLatin1String(entry.suffix)) {
+            return QString::fromLatin1(entry.name);
+        }
     }
     return {};
 }
@@ -66,20 +89,24 @@ QString modeFromExtension(const QString &absolutePath)
 
 QString highlightModeForFile(const QString &absolutePath)
 {
+    // Explicit table FIRST (A3): a table hit is final, so `.v` never becomes the
+    // host's "V" definition and `.sdc` / `.xdc` resolve to Tcl by decision.
+    const QString byTable = modeFromExtension(absolutePath);
+    if (!byTable.isEmpty()) {
+        return byTable;
+    }
     KTextEditor::Editor *editor = KTextEditor::Editor::instance();
     if (editor != nullptr) {
-        // What the editor's own repository maps this file name to. In the
-        // delivered runtime (AppRun narrows the definition search path) this is
-        // VEdit's definition; on a developer host a KDE definition (e.g. "V"
-        // for *.v) may win, and then the extension table below is used instead.
+        // Fallback for extensions VEdit does not own: accept ANY valid definition
+        // the editor repository resolves the file name to (A3 dropped the former
+        // `author == "VEdit"` requirement, which rejected every host definition).
         const KSyntaxHighlighting::Definition byFileName =
             editor->repository().definitionForFileName(QFileInfo(absolutePath).fileName());
-        if (byFileName.isValid()
-            && byFileName.author() == QLatin1String(kVEditAuthor)) {
+        if (byFileName.isValid()) {
             return byFileName.name();
         }
     }
-    return modeFromExtension(absolutePath);
+    return {};
 }
 
 KSyntaxHighlighting::Definition editorDefinitionForMode(const QString &mode)
@@ -99,14 +126,14 @@ bool applyHighlightingMode(KTextEditor::Document *document, const QString &absol
     }
     if (document == nullptr) {
         if (diagnostic != nullptr) {
-            *diagnostic = QStringLiteral("no document to highlight");
+            *diagnostic = QCoreApplication::translate("VEdit", "no document to highlight");
         }
         return false;
     }
     const QString mode = highlightModeForFile(absolutePath);
     if (mode.isEmpty()) {
         if (diagnostic != nullptr) {
-            *diagnostic = QStringLiteral("no syntax definition for %1")
+            *diagnostic = QCoreApplication::translate("VEdit", "no syntax definition for %1")
                               .arg(QFileInfo(absolutePath).fileName());
         }
         return false;
@@ -121,20 +148,24 @@ bool applyHighlightingMode(KTextEditor::Document *document, const QString &absol
         return false;
     }
     if (diagnostic != nullptr && definition.author() != QLatin1String(kVEditAuthor)) {
-        *diagnostic = QStringLiteral("'%1' resolves to author '%2' (not VEdit); the delivered "
-                                     "runtime narrows the definition search path to VEdit's own")
+        // Informational only: A3 accepts any valid definition from the
+        // repository. On a developer host this is normally a KDE definition
+        // (the delivered runtime narrows the search path to VEdit's own).
+        *diagnostic = QStringLiteral("'%1' resolves to author '%2' (not VEdit); accepted as a "
+                                     "repository fallback — the delivered runtime narrows the "
+                                     "definition search path to VEdit's own")
                           .arg(mode, definition.author());
     }
     if (!document->setHighlightingMode(mode)) {
         if (diagnostic != nullptr) {
-            *diagnostic = QStringLiteral("KTextEditor::Document::setHighlightingMode('%1') failed")
+            *diagnostic = QCoreApplication::translate("VEdit", "KTextEditor::Document::setHighlightingMode('%1') failed")
                               .arg(mode);
         }
         return false;
     }
     if (document->highlightingMode() != mode) {
         if (diagnostic != nullptr) {
-            *diagnostic = QStringLiteral("the document reports highlighting mode '%1' instead of '%2'")
+            *diagnostic = QCoreApplication::translate("VEdit", "the document reports highlighting mode '%1' instead of '%2'")
                               .arg(document->highlightingMode(), mode);
         }
         return false;

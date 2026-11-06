@@ -21,9 +21,12 @@ endif()
 set(CMAKE_AUTOMOC ON)
 
 set(VEDIT_WORKSPACE_SETTINGS_SOURCES
+  format_options.cpp
+  lint_options.cpp
   settings_client.cpp
   settings_dialog.cpp
   settings_panel.cpp
+  ui_scale.cpp
 )
 if(TARGET vedit_app_shell)
   list(APPEND VEDIT_WORKSPACE_SETTINGS_SOURCES settings_integration.cpp)
@@ -77,8 +80,34 @@ target_link_libraries(vedit-workspace-settings-selftest PRIVATE vedit_workspace_
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(vedit-workspace-settings-selftest PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
+# UX batch 2 / A4, acceptance ⑥: when the product binary is part of this build,
+# the appearance scale is asserted through the REAL restart path — the ctest runs
+# `vedit-app --selfcheck` with a settings.toml and reads the UI-SCALE line the
+# pre-QApplication code printed. A standalone lane build has no vedit-app and the
+# check reports an explicit SKIP instead of faking it.
+if(TARGET vedit-app)
+  target_compile_definitions(vedit-workspace-settings-selftest PRIVATE
+    "VEDIT_APP_BINARY_PATH=\"$<TARGET_FILE:vedit-app>\"")
+endif()
+# The Format page's argv is asserted through the REAL formatVerilog the product
+# command runs (a fake formatter echoes its argv), so this lane's self-test links
+# the diagnostics lane when the whole tree is being built.
+if(TARGET vedit_workspace_diagnostics)
+  target_link_libraries(vedit-workspace-settings-selftest PRIVATE vedit_workspace_diagnostics)
+  target_compile_definitions(vedit-workspace-settings-selftest PRIVATE
+    VEDIT_HAVE_DIAGNOSTICS_FORMAT=1)
+endif()
 add_test(NAME vedit-workspace-settings-selftest COMMAND vedit-workspace-settings-selftest --selfcheck)
 set_tests_properties(vedit-workspace-settings-selftest PROPERTIES
   ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-settings"
-  TIMEOUT 120
+  TIMEOUT 300
+)
+# The dedicated row for the restart switch (acceptance ⑥), so the acceptance
+# matrix can point at a test whose name says exactly what it proves.
+add_test(NAME vedit-ui-scale-restart
+  COMMAND vedit-workspace-settings-selftest --scale-restart
+          "${CMAKE_BINARY_DIR}/a4-ui-scale-restart")
+set_tests_properties(vedit-ui-scale-restart PROPERTIES
+  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-settings"
+  TIMEOUT 300
 )

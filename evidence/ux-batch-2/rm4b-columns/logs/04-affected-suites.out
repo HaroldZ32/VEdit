@@ -1,0 +1,16 @@
+===== jump lane ctest =====
+SUMMARY checks=53 failures=0
+===== search lane selftest =====
+WORKSPACE-SEARCH-SELFTEST ok=1 checks=106 failures=0 skipped=2
+===== module tree acceptance (real seam) =====
+FAIL h1.first-appearance.file-set — fileSet=7 modules=6
+FAIL h1.first-appearance.uses-seeded-set — modules=6
+FAIL h1.first-appearance.source-is-model — vd_project_expand_v2(/vedit-build/src/workspace/module_tree/fixtures/ux-batch-2)
+ok   acceptance.iii.cursor-on-declaration — cursor=1:8 expected=1:8
+ok   acceptance.vi.declaration-cursor — cursor=1:67 expected=1:67
+ok   acceptance.vi.instantiation-cursor — cursor=2 expected=2
+ok   acceptance.iii.shared-cursor-on-definition — cursor=1:8 expected=1:8
+FAIL: 80 check(s), 3 failure(s)
+===== lrelease =====
+[lrelease] qm: 132494 bytes sha256=276ccfa2c60850f64fee0af708572fec8c142d5f542de84484d9daf2d863864d
+[lrelease] PASS: 0 unfinished and 0 untranslated in /vedit-build/translations/vedit_zh_CN.ts

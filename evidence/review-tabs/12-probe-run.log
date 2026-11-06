@@ -1,0 +1,14 @@
+== offscreen checks ==
+offscreen_rc=0
+pass_lines=52 fail_lines=0
+TABS-PROBE failures=0 platform=offscreen
+== xcb screenshots ==
+xcb_rc=0
+pass_lines=56 fail_lines=0
+TABS-PROBE failures=0 platform=xcb
+01-three-tabs.png
+02-dirty-three-markers.png
+03-after-save-clean.png
+04-unsaved-close-prompt.png
+05-tab-overflow.png
+06-after-discard.png

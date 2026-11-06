@@ -18,6 +18,10 @@ set(CMAKE_AUTOMOC ON)
 set(VEDIT_WORKSPACE_VCS_SOURCES
   vcs_source.cpp
   vcs_panel.cpp
+  vcs_history.cpp
+  vcs_toolchain.cpp
+  # Batch 6b: the per-backend capability table the action bar is gated by.
+  vcs_capabilities.cpp
 )
 if(TARGET vedit_app_shell)
   # Only the product build has the shell; the standalone lane keeps the core.

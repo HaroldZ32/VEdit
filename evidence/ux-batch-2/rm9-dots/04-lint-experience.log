@@ -1,0 +1,140 @@
+This plugin does not support propagateSizeHints()
+This plugin does not support raise()
+This plugin does not support raise()
+This plugin does not support propagateSizeHints()
+This plugin does not support raise()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+
+## R2 — one layered view (upper project pass, lower per-file/LSP)
+CHECK PASS r2.analyze-file
+CHECK PASS r2.lower-layer-present  rows=1
+CHECK PASS r2.file-status-lower
+CHECK PASS r2.pass-starts
+CHECK PASS r2.upper-overrides-lower  rows=1 upper=1 lower=0
+CHECK PASS r2.dot-red
+CHECK PASS r2.dot-yellow
+CHECK PASS r2.dot-green  covered and clean
+CHECK PASS r2.dot-none
+CHECK PASS r2.dot-colors
+CHECK PASS r2.merged-count  rows=2
+CHECK PASS r2.cli-severity-scale  upper row severity=1 (0 was the ABI's 'error')
+CHECK PASS r2.edit-drops-upper
+CHECK PASS r2.edit-voids-lower  rows=0
+CHECK PASS r2.edit-status-not-analysed  status=4
+CHECK PASS r2.edit-never-green
+CHECK PASS r2.edit-reanalyze
+CHECK PASS r2.edit-status-yellow  status=2
+CHECK PASS r2.repass-recovers
+
+## B3 repair — one count, lower-layer clean dot, rename gate, merge key
+CHECK PASS count.analyze
+CHECK PASS count.lower-zero  degraded: lsp 1/1 file(s), diagnostics 0
+CHECK PASS count.pass-starts
+CHECK PASS count.session-uses-merged  message='degraded: lsp 1/1 file(s), diagnostics 2' merged=2 session.diagnostics=2
+CHECK PASS dot.lower-analyze
+CHECK PASS dot.lower-layer-analyzed
+CHECK PASS dot.lower-clean-green  status=3
+CHECK PASS dot.lower-clean-map  value=3
+CHECK PASS dot.never-analyzed-unknown
+CHECK PASS n1.analyze-a
+CHECK PASS n1.a-error-before  status=1
+CHECK PASS n1.analyze-b
+CHECK PASS n1.a-retains-error-after-file-switch  status=1 merged=1
+CHECK PASS n1.a-retained-error-in-map  value=1
+CHECK PASS n1.analyze-a-back
+CHECK PASS n1.a-error-after-return  status=1
+CHECK PASS n1.a-not-clean-after-backend-switch  status=0
+CHECK PASS rename.null-row-refused  requests=0 reason='fake-lsp has no rename capability row'
+CHECK PASS rename.null-row-reason  fake-lsp has no rename capability row
+CHECK PASS merge.key-normalizes-path  '/tmp/vedit-lint-experience-selftest-tGVAKe/a.sv|4|1|undeclared identifier' vs '/tmp/vedit-lint-experience-selftest-tGVAKe/a.sv|4|1|undeclared identifier'
+CHECK PASS autofix.replace-doc
+CHECK PASS autofix.replace-refused  applied=0 text-unchanged=1
+CHECK PASS autofix.replace-writable
+CHECK PASS autofix.cache-basename-seed
+CHECK PASS autofix.cache-hit  count=1
+CHECK PASS autofix.cache-basename-in-key  count=2 expected=2
+CHECK PASS autofix.cache-rules-config-in-key  count=3 expected=3
+
+## item 12 repair — the counter sees a RE-SHOW of the same dialog
+CHECK PASS modal.automatic-does-not-show  first=1 afterAutomatic=1
+CHECK PASS modal.reshow-counted  dialogsShown=2
+
+## R3 — three quick saves = exactly ONE project pass
+CHECK PASS r3.non-blocking  starts=0
+CHECK PASS r3.coalesced-pending
+CHECK PASS r3.exactly-one-pass  starts=1 backend=1 saves=3
+CHECK PASS r3.running
+CHECK PASS r3.single-flight-cancelled  cancelled=1
+CHECK PASS r3.single-flight-restarted  backend starts=3
+CHECK PASS r3.automatic-flag  automatic=1
+
+## item 12 — the modal dialog is reserved for the explicit run
+CHECK PASS elab.automatic-no-dialog  dialogs=0
+CHECK PASS elab.automatic-notice  <a href="jump">⚠ 2 project error(s) — click to jump</a>
+CHECK PASS elab.automatic-rows
+CHECK PASS elab.notice-widget
+CHECK PASS elab.notice-jumps  jumps=1 file=/p/a.sv
+CHECK PASS elab.notice-still-no-dialog
+CHECK PASS elab.explicit-dialog  dialogs=1
+CHECK PASS elab.dialog-rows  rows=2
+CHECK PASS elab.dialog-modal
+CHECK PASS elab.clear
+
+## item 9 — diagnostic hover content + both fix branches
+CHECK PASS hover.range-hit
+CHECK PASS hover.range-miss
+CHECK PASS hover.whole-line  a row without an end position owns its whole line
+CHECK PASS hover.fixable-content  Error · no-trailing-spaces
+CHECK PASS hover.not-fixable-content  Warning · line-length
+Line too long.
+No automatic fix: line-length has no autofix
+CHECK PASS hover.fixable-button
+CHECK PASS hover.fix-button-emits
+CHECK PASS hover.not-fixable-no-button
+CHECK PASS hover.not-fixable-reason-visible  Warning · line-length
+Line too long.
+No automatic fix: line-length has no autofix
+
+## item 9 — the engine's autofix (real verible-verilog-lint)
+CHECK PASS autofix.probe-fixable  attempted=1 supported=1 error=''
+CHECK PASS autofix.trailing-space-gokf.sonnet.core: Sonnet: No speller backends available!
+ne  module a;|  logic x;|endmodule|
+CHECK PASS autofix.probe-not-fixable  error='line-length has no autofix here'
+CHECK PASS autofix.cache-hit  probes=2
+
+## R3 — the save seam fires on success and only then
+CHECK PASS save.seam-pane
+CHECK PASS save.seam-open
+CHECK PASS save.seam-save
+CHECK PASS save.seam-fired  calls=1 path='/tmp/vedit-lint-experience-selftest-vqrIfM/saved.sv' saveAs=0
+CHECK PASS save.seam-save-as
+CHECK PASS save.seam-save-as-flag  calls=2 last='/tmp/vedit-lint-experience-selftest-vqrIfM/copy.sv' saveAs=1
+
+## B5 — a backend without renameProvider is greyed AND refuses
+CHECK PASS rename.gate-greyed  slang-server has no textDocument/rename
+CHECK PASS rename.request-refused  slang-server has no textDocument/rename
+CHECK PASS rename.request-never-sent
+CHECK PASS rename.request-allowed
+CHECK PASS rename.keyword-scan
+
+## item 9 / ⑥ — autofix is ONE undoable edit (real KTextEditor)
+CHECK PASS autofix-undo.document-ready
+CHECK PASS autofix-undo.engine-produced
+CHECK PASS autofix-undo.applied  module a;|  logic x;|endmodule|
+CHECK PASS autofix-undo.action
+CHECK PASS autofix-undo.one-undo-reverts  module a;|  logic x;   |endmodule|
+
+## item 10 / ④ — the dot renders between the icon and the name
+CHECK PASS dot.model-rows  rows=3
+CHECK PASS dot.red  sampled=#d32f2f
+CHECK PASS dot.after-icon  dot=2..10 text=15
+CHECK PASS dot.yellow  sampled=#f9a825
+CHECK PASS dot.green  sampled=#2e7d32
+CHECK PASS dot.revision-first-sync
+CHECK PASS dot.revision-idle
+CHECK PASS dot.revision-change-repaints
+CHECK PASS dot.repainted-green  sampled=#2e7d32
+
+SUMMARY checks=103 failures=0 skips=0

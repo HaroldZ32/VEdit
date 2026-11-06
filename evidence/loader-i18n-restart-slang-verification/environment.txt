@@ -1,0 +1,7 @@
+== images ==
+CentOS Linux release 7.9.2009 (Core)
+ldd (GNU libc) 2.17
+PRETTY_NAME="Ubuntu 26.04.1 LTS"
+ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43
+vedit-qt6-build:local a1956f83bb83
+vedit-build:local 4b9617318f8a

@@ -12,16 +12,20 @@
 #include <QStringList>
 #include <QWidget>
 
+#include <functional>
+
 class QAction;
 class QLabel;
 class QModelIndex;
 class QPoint;
 class QStackedWidget;
 class QToolBar;
+class QTimer;
 class QTreeView;
 
 namespace vedit::workspace {
 
+class FileStatusDotDelegate;
 class FileTreeModel;
 
 class FileTreeWidget final : public QWidget
@@ -40,6 +44,21 @@ public:
 
     FileTreeModel *model() const;
     QTreeView *view() const;
+
+    // item 10: install the merged-diagnostics status source (see
+    // FileTreeModel::setFileStatusSource). The panel repaints the dots when the
+    // revision moves, at most a few times a second.
+    void setFileStatusSource(std::function<int(const QString &)> status,
+                             std::function<quint64()> revision);
+    /// The delegate that paints the dots (the self-test samples its geometry).
+    FileStatusDotDelegate *statusDelegate() const;
+    /// RM-9: the project's EXPANDED file set, plus a revision that moves when it
+    /// changes. Files outside this tree's root are shown in the synthetic
+    /// "From filelist" group (FileTreeModel::setFilelistFiles); the same 500 ms
+    /// timer that repaints the dots re-reads the set only when the revision
+    /// moved, so a big project is never re-scanned on a timer tick.
+    void setProjectFilesSource(std::function<QStringList()> files,
+                               std::function<quint64()> revision);
 
     // Operations, used both by the toolbar/context menu and directly by the
     // demo and the tests. On failure `error` (when given) receives the same
@@ -94,6 +113,11 @@ private:
 
     FileTreeModel *model_ = nullptr;
     QTreeView *view_ = nullptr;
+    FileStatusDotDelegate *statusDelegate_ = nullptr;
+    QTimer *statusTimer_ = nullptr;
+    std::function<QStringList()> projectFilesSource_;
+    std::function<quint64()> projectFilesRevisionSource_;
+    quint64 projectFilesRevision_ = 0;
     QToolBar *toolBar_ = nullptr;
     QStackedWidget *stack_ = nullptr;
     QWidget *treePage_ = nullptr;

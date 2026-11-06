@@ -3,17 +3,18 @@
 #include "syntax_directory.h"
 
 #include <QCryptographicHash>
-#include <QRegularExpression>
 #include <QDir>
 #include <QDirIterator>
 #include <QFile>
 #include <QFileInfo>
+#include <QXmlStreamReader>
 
 #include <KSyntaxHighlighting/Definition>
 #include <KSyntaxHighlighting/Repository>
 #include <KSyntaxHighlighting/Theme>
 
 #include <memory>
+#include <QCoreApplication>
 
 namespace vedit::kde {
 
@@ -23,6 +24,15 @@ const char *const kForbiddenSystemVerilog =
     "3361d8b4ef62c4868165ef045c02d8b6e85a1e57f61c304b399661bdc06be015"; // KDE systemverilog.xml (GPL-3.0+)
 const char *const kForbiddenVerilog =
     "7199e3677b0a942e65b40f95cb2481be062b1ca48eb048519e7d4efc098f5970"; // KDE verilog.xml (licence unstated)
+
+// A3: the sha256 embargo is scoped to THESE TWO files only. They are banned
+// because either one would shadow VEdit's own Verilog/SystemVerilog definition
+// (the definitions the product must ship: C7/T56). The VHDL / Markdown / Tcl
+// definitions bundled since A3 are VEdit's own files; they must never be caught
+// by this list, and the load below asserts exactly that (a `vedit-*` file that
+// matches one of the two hashes means the file was swapped for an upstream copy
+// and turns the report not-ok instead of being silently skipped).
+constexpr const char *const kShippedDefinitionPrefix = "vedit-";
 
 QString sha256OfFile(const QString &path)
 {
@@ -35,16 +45,49 @@ QString sha256OfFile(const QString &path)
     return QString::fromLatin1(hash.result().toHex());
 }
 
-QString languageNameInFile(const QString &path)
+// U4b: a REAL parse of the file's definition header, where the old regex only
+// matched the text `<language name="...">` anywhere in the file. A file is a
+// usable definition only when it is well-formed XML, its root element is
+// <language> with a non-empty name, and it carries at least one <context>
+// inside <contexts>; an empty file, `<syntax></syntax>` (a theme root) or a
+// truncated body therefore yields no name. Returns the declared name, or an
+// empty string when the file is not a definition.
+QString definitionNameInFile(const QString &path)
 {
     QFile file(path);
-    if (!file.open(QIODevice::ReadOnly)) {
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return {};
     }
-    const QString content = QString::fromUtf8(file.readAll());
-    const QRegularExpression re(QStringLiteral("<language\\s+name=\"([^\"]+)\""));
-    const auto match = re.match(content);
-    return match.hasMatch() ? match.captured(1) : QString();
+    QXmlStreamReader xml(&file);
+    QString name;
+    bool hasContexts = false;
+    int contextCount = 0;
+    int depth = 0;
+    while (!xml.atEnd()) {
+        const QXmlStreamReader::TokenType token = xml.readNext();
+        if (token == QXmlStreamReader::StartElement) {
+            ++depth;
+            if (depth == 1) {
+                if (xml.name() != QLatin1String("language")) {
+                    return {};
+                }
+                name = xml.attributes().value(QLatin1String("name")).toString().trimmed();
+                if (name.isEmpty()) {
+                    return {};
+                }
+            } else if (xml.name() == QLatin1String("contexts")) {
+                hasContexts = true;
+            } else if (hasContexts && xml.name() == QLatin1String("context")) {
+                ++contextCount;
+            }
+        } else if (token == QXmlStreamReader::EndElement) {
+            --depth;
+        }
+    }
+    if (xml.hasError() || !hasContexts || contextCount == 0) {
+        return {};
+    }
+    return name;
 }
 
 } // namespace
@@ -77,6 +120,21 @@ QString KsyntaxData::languageNameForExtension(const QString &fileName)
     if (suffix == QLatin1String("sv") || suffix == QLatin1String("svh")) {
         return QStringLiteral("SystemVerilog");
     }
+    // A3: the three definitions bundled with the product (resources/syntax) and
+    // the user's SDC/XDC -> Tcl decision. Mirrors the editor kernel's table
+    // (src/editor/kernel/highlight_mode.cpp) and the `extensions=` attributes of
+    // the shipped XML files.
+    if (suffix == QLatin1String("vhd") || suffix == QLatin1String("vhdl")) {
+        return QStringLiteral("VHDL");
+    }
+    if (suffix == QLatin1String("md") || suffix == QLatin1String("markdown") ||
+        suffix == QLatin1String("mdown") || suffix == QLatin1String("mkd")) {
+        return QStringLiteral("Markdown");
+    }
+    if (suffix == QLatin1String("tcl") || suffix == QLatin1String("tk") ||
+        suffix == QLatin1String("sdc") || suffix == QLatin1String("xdc")) {
+        return QStringLiteral("Tcl");
+    }
     return {};
 }
 
@@ -108,7 +166,7 @@ const LoadReport &KsyntaxData::load()
         if (definitions.isEmpty()) {
             if (required) {
                 report_.diagnostics.append(
-                    QStringLiteral("private syntax directory missing: %1/syntax (set VEDIT_SYNTAX_DIR)")
+                    QCoreApplication::translate("VEdit", "private syntax directory missing: %1/syntax (set VEDIT_SYNTAX_DIR)")
                         .arg(path));
             }
             return QString();
@@ -119,6 +177,11 @@ const LoadReport &KsyntaxData::load()
         return dataRoot;
     };
 
+    bool embargo_misfire = false;
+    // U4b: the private XML files that were accepted for loading. They are listed
+    // by FILE only here; whether the repository really built a definition from
+    // each one is resolved after it has indexed the search path (see below).
+    QStringList privateCandidates;
     if (!config_.private_dir.isEmpty()) {
         const QString privateRoot = addSearchPath(config_.private_dir, true);
         if (!privateRoot.isEmpty()) {
@@ -131,11 +194,24 @@ const LoadReport &KsyntaxData::load()
         while (it.hasNext()) {
             const QString path = it.next();
             if (isForbiddenDefinitionFile(path)) {
+                // A3 assertion: the embargo may name an upstream copy only. A file
+                // VEdit ships (the `vedit-*` names) matching it means the guard was
+                // defeated by a renamed copy; record it and fail the report instead
+                // of skipping the file as if it were a legitimate KDE leftover.
+                if (QFileInfo(path).fileName().startsWith(QLatin1String(kShippedDefinitionPrefix))) {
+                    embargo_misfire = true;
+                    report_.diagnostics.append(
+                        QStringLiteral("sha256 embargo mis-applied: the shipped definition '%1' "
+                                       "matches a forbidden KDE file (A3 scopes the embargo to "
+                                       "KDE's verilog.xml / systemverilog.xml only)")
+                            .arg(QFileInfo(path).fileName()));
+                }
                 report_.forbidden_definitions.append(path);
                 continue;
             }
             report_.private_definition_files.append(QFileInfo(path).fileName());
-            const QString language = languageNameInFile(path);
+            privateCandidates.append(path);
+            const QString language = definitionNameInFile(path);
             if (language == QLatin1String("Verilog")) {
                 report_.private_verilog_shipped = true;
             } else if (language == QLatin1String("SystemVerilog")) {
@@ -162,6 +238,49 @@ const LoadReport &KsyntaxData::load()
     const auto definitions = repository_->definitions();
     for (const KSyntaxHighlighting::Definition &definition : definitions) {
         report_.definition_names.append(definition.name());
+    }
+
+    // U4b: the definitions our private files really yield. A file name alone
+    // proves nothing (private_definition_files is appended before a file is
+    // parsed), so each candidate must (a) parse as a usable language definition
+    // and (b) be resolvable by the repository under that name. A corrupt/empty
+    // definition (e.g. `<syntax></syntax>`) fails (a) and stays out of this
+    // list — which is exactly what the product startup test asserts.
+    if (!privateCandidates.isEmpty()) {
+        for (const QString &candidate : privateCandidates) {
+            const QString declared = definitionNameInFile(candidate);
+            if (declared.isEmpty()) {
+                report_.diagnostics.append(
+                    QStringLiteral("private syntax file '%1' is not a usable definition "
+                                   "(well-formed <language name=...> root with contexts "
+                                   "required); it is listed in private_definition_files only")
+                        .arg(QFileInfo(candidate).fileName()));
+                continue;
+            }
+            const KSyntaxHighlighting::Definition definition = repository_->definitionForName(declared);
+            if (!definition.isValid()) {
+                report_.diagnostics.append(
+                    QStringLiteral("private syntax file '%1' declares definition '%2', which the "
+                                   "repository does not resolve")
+                        .arg(QFileInfo(candidate).fileName(), declared));
+                continue;
+            }
+            // Honest attribution: our file being valid does not mean the
+            // repository uses it. KSyntaxHighlighting keeps the copy with the
+            // higher `version` when a name exists twice, and the distro library
+            // embeds KDE's definitions (AGENT.md §9), so for a name KDE also
+            // provides the embedded file wins. Recorded, not fatal: the product
+            // has a valid definition, and the test asserts the five names.
+            if (QFileInfo(definition.filePath()).canonicalFilePath() !=
+                QFileInfo(candidate).canonicalFilePath()) {
+                report_.diagnostics.append(
+                    QStringLiteral("definition '%1' resolves to '%2' instead of the shipped file "
+                                   "'%3' (higher-version copy wins inside the repository)")
+                        .arg(declared, definition.filePath(), QFileInfo(candidate).fileName()));
+            }
+            report_.resolved_private_definition_names.append(definition.name());
+        }
+        report_.resolved_private_definition_names.sort();
     }
     const auto themes = repository_->themes();
     for (const KSyntaxHighlighting::Theme &theme : themes) {
@@ -214,7 +333,8 @@ const LoadReport &KsyntaxData::load()
                 .arg(report_.probe_sv_definition));
     }
 
-    report_.ok = report_.verilog_available && report_.forbidden_definitions.isEmpty();
+    report_.ok = report_.verilog_available && report_.forbidden_definitions.isEmpty() &&
+                 !embargo_misfire;
     return report_;
 }
 

@@ -1,0 +1,202 @@
++ set -u
++++ dirname -- /w/packaging/runtime/out/AppDir/AppRun
+++ CDPATH=
+++ cd -- /w/packaging/runtime/out/AppDir
+++ pwd -P
++ HERE=/w/packaging/runtime/out/AppDir
++ APPDIR=/w/packaging/runtime/out/AppDir
++ export APPDIR
++ export PATH=/w/packaging/runtime/out/AppDir/bin:/opt/cargo/bin:/usr/local/bin:/usr/bin:/bin
++ PATH=/w/packaging/runtime/out/AppDir/bin:/opt/cargo/bin:/usr/local/bin:/usr/bin:/bin
++ '[' -z '' ']'
++ '[' -x /w/packaging/runtime/out/AppDir/bin/slang ']'
++ export VEDIT_SLANG=/w/packaging/runtime/out/AppDir/bin/slang
++ VEDIT_SLANG=/w/packaging/runtime/out/AppDir/bin/slang
++ '[' -z '' ']'
++ '[' -x /w/packaging/runtime/out/AppDir/bin/verible-verilog-ls ']'
++ export VEDIT_VERIBLE_LS=/w/packaging/runtime/out/AppDir/bin/verible-verilog-ls
++ VEDIT_VERIBLE_LS=/w/packaging/runtime/out/AppDir/bin/verible-verilog-ls
++ '[' -z '' ']'
++ '[' -x /w/packaging/runtime/out/AppDir/bin/verible-verilog-lint ']'
++ export VEDIT_VERIBLE_LINT=/w/packaging/runtime/out/AppDir/bin/verible-verilog-lint
++ VEDIT_VERIBLE_LINT=/w/packaging/runtime/out/AppDir/bin/verible-verilog-lint
++ '[' -z '' ']'
++ '[' -x /w/packaging/runtime/out/AppDir/bin/verible-verilog-format ']'
++ export VEDIT_VERIBLE_FORMAT=/w/packaging/runtime/out/AppDir/bin/verible-verilog-format
++ VEDIT_VERIBLE_FORMAT=/w/packaging/runtime/out/AppDir/bin/verible-verilog-format
++ '[' -z /custom/translations ']'
++ export QT_PLUGIN_PATH=/w/packaging/runtime/out/AppDir/plugins
++ QT_PLUGIN_PATH=/w/packaging/runtime/out/AppDir/plugins
++ export QT_QPA_PLATFORM_PLUGIN_PATH=/w/packaging/runtime/out/AppDir/plugins/platforms
++ QT_QPA_PLATFORM_PLUGIN_PATH=/w/packaging/runtime/out/AppDir/plugins/platforms
++ export QML2_IMPORT_PATH=/w/packaging/runtime/out/AppDir/qml
++ QML2_IMPORT_PATH=/w/packaging/runtime/out/AppDir/qml
++ export XDG_DATA_DIRS=/w/packaging/runtime/out/AppDir/usr/share
++ XDG_DATA_DIRS=/w/packaging/runtime/out/AppDir/usr/share
++ export XDG_DATA_HOME=/w/packaging/runtime/out/AppDir/usr/share
++ XDG_DATA_HOME=/w/packaging/runtime/out/AppDir/usr/share
++ export VEDIT_SYNTAX_DIR=/w/packaging/runtime/out/AppDir/usr/share/org.kde.syntax-highlighting
++ VEDIT_SYNTAX_DIR=/w/packaging/runtime/out/AppDir/usr/share/org.kde.syntax-highlighting
++ export FONTCONFIG_FILE=/w/packaging/runtime/out/AppDir/etc/fonts/fonts.conf
++ FONTCONFIG_FILE=/w/packaging/runtime/out/AppDir/etc/fonts/fonts.conf
++ export FONTCONFIG_PATH=/w/packaging/runtime/out/AppDir/etc/fonts
++ FONTCONFIG_PATH=/w/packaging/runtime/out/AppDir/etc/fonts
+++ id -u
++ : /tmp/vedit-cache-0
++ export XDG_CACHE_HOME
++ mkdir -p /tmp/vedit-cache-0
++ CURRENT_LOCALE_DESC=unset
+++ locale charmap
++ CURRENT_CHARMAP=ANSI_X3.4-1968
++ BUNDLED_UTF8_LOCALE=/w/packaging/runtime/out/AppDir/usr/lib/locale/C.utf8
++ CHOSEN_LOCALE=
++ NEED_LOCALE_FALLBACK=0
++ printf %s ANSI_X3.4-1968
++ grep -qi '^utf-8$'
++ NEED_LOCALE_FALLBACK=1
++ '[' 1 -eq 1 ']'
++ use_bundled_utf8_locale
++ '[' -d /w/packaging/runtime/out/AppDir/usr/lib/locale/C.utf8 ']'
++ CHOSEN_LOCALE=C.UTF-8
++ return 0
++ printf '%s\n' 'AppRun: locale '\''unset'\'' (ANSI_X3.4-1968) -> '\''C.UTF-8'\'' (bundled UTF-8 fallback)'
+AppRun: locale 'unset' (ANSI_X3.4-1968) -> 'C.UTF-8' (bundled UTF-8 fallback)
++ VEDIT_NOISE_RULES='qt.multimedia.symbolsresolver=false;kf.sonnet.core=false'
++ '[' -n '' ']'
++ export 'QT_LOGGING_RULES=qt.multimedia.symbolsresolver=false;kf.sonnet.core=false'
++ QT_LOGGING_RULES='qt.multimedia.symbolsresolver=false;kf.sonnet.core=false'
++ ksh_guard
++ '[' -x /w/packaging/runtime/out/AppDir/bin/vedit-ksh-env-probe ']'
++ '[' -s /w/packaging/runtime/out/AppDir/usr/share/vedit/ksh-whitelist.txt ']'
+++ cat /w/packaging/runtime/out/AppDir/usr/share/vedit/ksh-whitelist.txt
++ wl=SystemVerilog,Verilog
+++ QT_QPA_PLATFORM=offscreen
+++ LOCPATH=/w/packaging/runtime/out/AppDir/usr/lib/locale
+++ /w/packaging/runtime/out/AppDir/ld-linux-x86-64.so.2 --library-path /w/packaging/runtime/out/AppDir/lib /w/packaging/runtime/out/AppDir/bin/vedit-ksh-env-probe --list --editor-repo
++ out='Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+KSH-ENV defs=2 hash=b31aa2cc1f717e2d5a03bbdad983f7487f8982803fe71fe243745a85454b2d37
+KSH-ENV def name="SystemVerilog"
+KSH-ENV def name="Verilog"
+KSH-ENV custom_paths=
+KSH-ENV std_paths=/w/packaging/runtime/out/AppDir/usr/share:/w/packaging/runtime/out/AppDir/usr/share
+KSH-ENV editor_repo defs=2 hash=b31aa2cc1f717e2d5a03bbdad983f7487f8982803fe71fe243745a85454b2d37
+KSH-ENV editor_def name="SystemVerilog"
+KSH-ENV editor_def name="Verilog"
+KSH-ENV result=pass'
++ rc=0
+++ printf '%s\n' 'Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, and has switched to "C.UTF-8" instead.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+KSH-ENV defs=2 hash=b31aa2cc1f717e2d5a03bbdad983f7487f8982803fe71fe243745a85454b2d37
+KSH-ENV def name="SystemVerilog"
+KSH-ENV def name="Verilog"
+KSH-ENV custom_paths=
+KSH-ENV std_paths=/w/packaging/runtime/out/AppDir/usr/share:/w/packaging/runtime/out/AppDir/usr/share
+KSH-ENV editor_repo defs=2 hash=b31aa2cc1f717e2d5a03bbdad983f7487f8982803fe71fe243745a85454b2d37
+KSH-ENV editor_def name="SystemVerilog"
+KSH-ENV editor_def name="Verilog"
+KSH-ENV result=pass'
+++ sed -n 's/^KSH-ENV def name="\(.*\)"$/\1/p'
+++ sort
+++ paste -sd, -
++ seen=SystemVerilog,Verilog
++ '[' 0 = 1 ']'
++ '[' 0 -ne 0 ']'
++ '[' SystemVerilog,Verilog '!=' SystemVerilog,Verilog ']'
++ '[' 0 = 1 ']'
++ BIN=/w/packaging/runtime/out/AppDir/bin/vd-app
++ '[' -x /w/packaging/runtime/out/AppDir/bin/vd-app ']'
++ case "${1:-}" in
++ shift
++ run_app --selfcheck
++ LIBPATH=/w/packaging/runtime/out/AppDir/lib:/opt/gsv4/lib64:/opt/gsv4/lib
++ '[' -n C.UTF-8 ']'
++ exec /usr/bin/env LANG=C.UTF-8 LC_ALL=C.UTF-8 LOCPATH=/w/packaging/runtime/out/AppDir/usr/lib/locale LD_LIBRARY_PATH=/w/packaging/runtime/out/AppDir/lib:/opt/gsv4/lib64:/opt/gsv4/lib /w/packaging/runtime/out/AppDir/ld-linux-x86-64.so.2 --library-path /w/packaging/runtime/out/AppDir/lib /w/packaging/runtime/out/AppDir/bin/vd-app --selfcheck
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='/w/packaging/runtime/out/AppDir/usr/share/org.kde.syntax-highlighting' definitions=3 own-xml=[vedit-systemverilog.xml,vedit-verilog.xml] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+[app-shell] close refused (headless): untitled has unsaved changes
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+[app-shell] invalid shortcut store /tmp/vedit-app-eAmEzk/broken/shortcuts.json: illegal number
+[app-shell] invalid session /tmp/vedit-app-eAmEzk/broken/session.json: unterminated object
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+[app-shell] Save failed: atomic save: injected write failure
+[app-shell] Save failed: atomic save: injected write failure
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()

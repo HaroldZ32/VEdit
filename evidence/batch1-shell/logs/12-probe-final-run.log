@@ -1,0 +1,664 @@
+== probe build (product ninja compile + link lines) ==
+[probe] reusing the product include flags: -I/vedit-build/src/app -I/vedit-build/src/syntax/grammars -I/vedit-build/src/syntax/grammars/../../../third_party/tree-sitter/verilog/src -I/vedit-build/src/syntax/provider -I/vedit-build/src/workspace/breadcrumb -I/vedit-build/src/workspace/jump/.. -I/vedit-build/target/qt6-build/src/app/vedit_app_shell_autogen/include -I/vedit-build/target/qt6-build/src/syntax/grammars/generated -I/vedit-build/target/qt6-build/src/syntax/provider/generated -isystem /usr/include/KF6/KSyntaxHighlighting -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtWidgets -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ 
+[probe] reuse the edit-core kernel include flags: -I/vedit-build/src/editor -I/vedit-build/src/editor/../app -I/vedit-build/src/editor/fim -I/vedit-build/src/syntax/common -I/vedit-build/src/syntax/folding -I/vedit-build/src/syntax/grammars -I/vedit-build/src/syntax/grammars/../../../third_party/tree-sitter/verilog/src -I/vedit-build/src/syntax/provider -I/vedit-build/src/workspace/breadcrumb -I/vedit-build/src/workspace/jump/.. -I/vedit-build/target/qt6-build/src/app/editor-lane/vedit_editor_core_autogen/include -I/vedit-build/target/qt6-build/src/syntax/grammars/generated -I/vedit-build/target/qt6-build/src/syntax/provider/generated -isystem /usr/include/KF6/KColorScheme -isystem /usr/include/KF6/KCompletion -isystem /usr/include/KF6/KConfig -isystem /usr/include/KF6/KConfigCore -isystem /usr/include/KF6/KConfigGui -isystem /usr/include/KF6/KConfigWidgets -isystem /usr/include/KF6/KCoreAddons -isystem /usr/include/KF6/KGuiAddons -isystem /usr/include/KF6/KIO -isystem /usr/include/KF6/KIOCore -isystem /usr/include/KF6/KParts -isystem /usr/include/KF6/KSyntaxHighlighting -isystem /usr/include/KF6/KTextEditor -isystem /usr/include/KF6/KWidgetsAddons -isystem /usr/include/KF6/KXmlGui -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6/QtDBus -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtNetwork -isystem /usr/include/x86_64-linux-gnu/qt6/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt6/QtXml -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /vedit-build/crates/vd-ffi/include 
+++ pkg-config --cflags Qt6Widgets
++ /usr/bin/c++ -std=c++20 -fPIC -O2 -DNDEBUG -DVEDIT_PROBE_HAVE_EDIT_CORE=1 -I/vedit-build/src/app -I/vedit-build/src/workspace -I/vedit-build/src/workspace/filetree -I/vedit-build/src/workspace/search -I/vedit-build/src/workspace/project -I/vedit-build/src/workspace/module_tree -I/vedit-build/src/workspace/vcs -I/vedit-build/src/editor/kernel -I/usr/include/x86_64-linux-gnu/qt6/QtWidgets -I/usr/include/x86_64-linux-gnu/qt6 -DQT_WIDGETS_LIB -I/usr/include/x86_64-linux-gnu/qt6/QtGui -DQT_GUI_LIB -I/usr/include/x86_64-linux-gnu/qt6/QtCore -DQT_CORE_LIB -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/vedit-build/src/app -I/vedit-build/src/syntax/grammars -I/vedit-build/src/syntax/grammars/../../../third_party/tree-sitter/verilog/src -I/vedit-build/src/syntax/provider -I/vedit-build/src/workspace/breadcrumb -I/vedit-build/src/workspace/jump/.. -I/vedit-build/target/qt6-build/src/app/vedit_app_shell_autogen/include -I/vedit-build/target/qt6-build/src/syntax/grammars/generated -I/vedit-build/target/qt6-build/src/syntax/provider/generated -isystem /usr/include/KF6/KSyntaxHighlighting -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtWidgets -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I/vedit-build/src/editor -I/vedit-build/src/editor/../app -I/vedit-build/src/editor/fim -I/vedit-build/src/syntax/common -I/vedit-build/src/syntax/folding -I/vedit-build/src/syntax/grammars -I/vedit-build/src/syntax/grammars/../../../third_party/tree-sitter/verilog/src -I/vedit-build/src/syntax/provider -I/vedit-build/src/workspace/breadcrumb -I/vedit-build/src/workspace/jump/.. -I/vedit-build/target/qt6-build/src/app/editor-lane/vedit_editor_core_autogen/include -I/vedit-build/target/qt6-build/src/syntax/grammars/generated -I/vedit-build/target/qt6-build/src/syntax/provider/generated -isystem /usr/include/KF6/KColorScheme -isystem /usr/include/KF6/KCompletion -isystem /usr/include/KF6/KConfig -isystem /usr/include/KF6/KConfigCore -isystem /usr/include/KF6/KConfigGui -isystem /usr/include/KF6/KConfigWidgets -isystem /usr/include/KF6/KCoreAddons -isystem /usr/include/KF6/KGuiAddons -isystem /usr/include/KF6/KIO -isystem /usr/include/KF6/KIOCore -isystem /usr/include/KF6/KParts -isystem /usr/include/KF6/KSyntaxHighlighting -isystem /usr/include/KF6/KTextEditor -isystem /usr/include/KF6/KWidgetsAddons -isystem /usr/include/KF6/KXmlGui -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6/QtDBus -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtNetwork -isystem /usr/include/x86_64-linux-gnu/qt6/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt6/QtXml -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /vedit-build/crates/vd-ffi/include -c /vedit-build/evidence/batch1-shell/probe/main.cpp -o /vedit-build/target/batch1-shell-probe/batch1-shell-probe.o
+++ ninja -C /vedit-build/target/qt6-build -t commands src/app/vedit-app
+++ tail -1
++ link=': && /usr/bin/c++ -Wall -Wextra -O2 -g -DNDEBUG -rdynamic -Wl,--dependency-file=src/app/CMakeFiles/vedit-app.dir/link.d src/app/CMakeFiles/vedit-app.dir/vedit-app_autogen/mocs_compilation.cpp.o src/app/CMakeFiles/vedit-app.dir/main.cpp.o -o src/app/vedit-app  src/app/libvedit_app_shell.a  src/terminal/libvedit_terminal.a  src/app/editor-lane/libvedit_editor_core.a  /vedit-build/target/release/libvd_ffi.a  src/app/libvedit_workspace_integration.a  -Wl,--push-state,--whole-archive  src/syntax/grammars/syntax-product/libvedit_syntax_product.a  -Wl,--pop-state  src/app/workspace-lane-filetree/libvedit_file_tree.a  src/app/workspace-lane-palette/libvedit_workspace_palette.a  src/app/workspace-lane-search/libvedit_workspace_search.a  src/app/workspace-lane-module_tree/libvedit_workspace_module_tree.a  src/app/workspace-lane-project/libvedit_workspace_project.a  src/app/workspace-lane-diagnostics/libvedit_workspace_diagnostics.a  src/app/editor-lane/libvedit_editor_core.a  src/app/editor-lane/folding-lane/libvedit_syntax_folding.a  src/app/editor-lane/fim-lane/libvedit_editor_fim.a  /vedit-build/target/release/libvd_ffi.a  src/app/workspace-lane-vcs/libvedit_workspace_vcs.a  src/app/workspace-lane-settings/libvedit_workspace_settings.a  src/app/libvedit_app_shell.a  src/app/editor-lane/breadcrumb-lane/libvedit_workspace_breadcrumb.a  src/app/editor-lane/breadcrumb-lane/jump-lane/libvedit_workspace_jump.a  /vedit-build/target/release/libvd_ffi.a  -ldl  -lm  /usr/lib/x86_64-linux-gnu/libKF6TextEditor.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6Parts.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6XmlGui.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ConfigWidgets.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6Completion.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ColorScheme.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6GuiAddons.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ConfigGui.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6WidgetsAddons.so.6.24.0  /usr/lib/x86_64-linux-gnu/libQt6Widgets.so.6.10.2  /usr/lib/x86_64-linux-gnu/libKF6KIOCore.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6CoreAddons.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ConfigCore.so.6.24.0  /usr/lib/x86_64-linux-gnu/libQt6Xml.so.6.10.2  src/syntax/grammars/libvedit_syntax_grammars.a  src/syntax/provider/libvedit_syntax_provider.a  /usr/lib/x86_64-linux-gnu/libtree-sitter.so  src/syntax/grammars/libvedit_tree_sitter_verilog.a  src/syntax/kde/libvedit_syntax_kde.a  /usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0  /usr/lib/x86_64-linux-gnu/libQt6Gui.so.6.10.2  /usr/lib/x86_64-linux-gnu/libGLX.so  /usr/lib/x86_64-linux-gnu/libOpenGL.so  /usr/lib/x86_64-linux-gnu/libQt6DBus.so.6.10.2  /usr/lib/x86_64-linux-gnu/libQt6Network.so.6.10.2  src/syntax/kde/syn-common/libvedit_syntax_common.a  /usr/lib/x86_64-linux-gnu/libQt6Core.so.6.10.2 && :'
++ link='/usr/bin/c++ -Wall -Wextra -O2 -g -DNDEBUG -rdynamic -Wl,--dependency-file=src/app/CMakeFiles/vedit-app.dir/link.d src/app/CMakeFiles/vedit-app.dir/vedit-app_autogen/mocs_compilation.cpp.o src/app/CMakeFiles/vedit-app.dir/main.cpp.o -o src/app/vedit-app  src/app/libvedit_app_shell.a  src/terminal/libvedit_terminal.a  src/app/editor-lane/libvedit_editor_core.a  /vedit-build/target/release/libvd_ffi.a  src/app/libvedit_workspace_integration.a  -Wl,--push-state,--whole-archive  src/syntax/grammars/syntax-product/libvedit_syntax_product.a  -Wl,--pop-state  src/app/workspace-lane-filetree/libvedit_file_tree.a  src/app/workspace-lane-palette/libvedit_workspace_palette.a  src/app/workspace-lane-search/libvedit_workspace_search.a  src/app/workspace-lane-module_tree/libvedit_workspace_module_tree.a  src/app/workspace-lane-project/libvedit_workspace_project.a  src/app/workspace-lane-diagnostics/libvedit_workspace_diagnostics.a  src/app/editor-lane/libvedit_editor_core.a  src/app/editor-lane/folding-lane/libvedit_syntax_folding.a  src/app/editor-lane/fim-lane/libvedit_editor_fim.a  /vedit-build/target/release/libvd_ffi.a  src/app/workspace-lane-vcs/libvedit_workspace_vcs.a  src/app/workspace-lane-settings/libvedit_workspace_settings.a  src/app/libvedit_app_shell.a  src/app/editor-lane/breadcrumb-lane/libvedit_workspace_breadcrumb.a  src/app/editor-lane/breadcrumb-lane/jump-lane/libvedit_workspace_jump.a  /vedit-build/target/release/libvd_ffi.a  -ldl  -lm  /usr/lib/x86_64-linux-gnu/libKF6TextEditor.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6Parts.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6XmlGui.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ConfigWidgets.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6Completion.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ColorScheme.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6GuiAddons.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ConfigGui.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6WidgetsAddons.so.6.24.0  /usr/lib/x86_64-linux-gnu/libQt6Widgets.so.6.10.2  /usr/lib/x86_64-linux-gnu/libKF6KIOCore.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6CoreAddons.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ConfigCore.so.6.24.0  /usr/lib/x86_64-linux-gnu/libQt6Xml.so.6.10.2  src/syntax/grammars/libvedit_syntax_grammars.a  src/syntax/provider/libvedit_syntax_provider.a  /usr/lib/x86_64-linux-gnu/libtree-sitter.so  src/syntax/grammars/libvedit_tree_sitter_verilog.a  src/syntax/kde/libvedit_syntax_kde.a  /usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0  /usr/lib/x86_64-linux-gnu/libQt6Gui.so.6.10.2  /usr/lib/x86_64-linux-gnu/libGLX.so  /usr/lib/x86_64-linux-gnu/libOpenGL.so  /usr/lib/x86_64-linux-gnu/libQt6DBus.so.6.10.2  /usr/lib/x86_64-linux-gnu/libQt6Network.so.6.10.2  src/syntax/kde/syn-common/libvedit_syntax_common.a  /usr/lib/x86_64-linux-gnu/libQt6Core.so.6.10.2 && :'
+++ sed -e 's#-Wl,--dependency-file=[^ ]*##' -e s#src/app/CMakeFiles/vedit-app.dir/main.cpp.o#/vedit-build/target/batch1-shell-probe/batch1-shell-probe.o# -e 's#-o src/app/vedit-app#-o /vedit-build/target/batch1-shell-probe/batch1-shell-probe#'
+++ printf %s '/usr/bin/c++ -Wall -Wextra -O2 -g -DNDEBUG -rdynamic -Wl,--dependency-file=src/app/CMakeFiles/vedit-app.dir/link.d src/app/CMakeFiles/vedit-app.dir/vedit-app_autogen/mocs_compilation.cpp.o src/app/CMakeFiles/vedit-app.dir/main.cpp.o -o src/app/vedit-app  src/app/libvedit_app_shell.a  src/terminal/libvedit_terminal.a  src/app/editor-lane/libvedit_editor_core.a  /vedit-build/target/release/libvd_ffi.a  src/app/libvedit_workspace_integration.a  -Wl,--push-state,--whole-archive  src/syntax/grammars/syntax-product/libvedit_syntax_product.a  -Wl,--pop-state  src/app/workspace-lane-filetree/libvedit_file_tree.a  src/app/workspace-lane-palette/libvedit_workspace_palette.a  src/app/workspace-lane-search/libvedit_workspace_search.a  src/app/workspace-lane-module_tree/libvedit_workspace_module_tree.a  src/app/workspace-lane-project/libvedit_workspace_project.a  src/app/workspace-lane-diagnostics/libvedit_workspace_diagnostics.a  src/app/editor-lane/libvedit_editor_core.a  src/app/editor-lane/folding-lane/libvedit_syntax_folding.a  src/app/editor-lane/fim-lane/libvedit_editor_fim.a  /vedit-build/target/release/libvd_ffi.a  src/app/workspace-lane-vcs/libvedit_workspace_vcs.a  src/app/workspace-lane-settings/libvedit_workspace_settings.a  src/app/libvedit_app_shell.a  src/app/editor-lane/breadcrumb-lane/libvedit_workspace_breadcrumb.a  src/app/editor-lane/breadcrumb-lane/jump-lane/libvedit_workspace_jump.a  /vedit-build/target/release/libvd_ffi.a  -ldl  -lm  /usr/lib/x86_64-linux-gnu/libKF6TextEditor.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6Parts.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6XmlGui.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ConfigWidgets.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6Completion.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ColorScheme.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6GuiAddons.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ConfigGui.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6WidgetsAddons.so.6.24.0  /usr/lib/x86_64-linux-gnu/libQt6Widgets.so.6.10.2  /usr/lib/x86_64-linux-gnu/libKF6KIOCore.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6CoreAddons.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ConfigCore.so.6.24.0  /usr/lib/x86_64-linux-gnu/libQt6Xml.so.6.10.2  src/syntax/grammars/libvedit_syntax_grammars.a  src/syntax/provider/libvedit_syntax_provider.a  /usr/lib/x86_64-linux-gnu/libtree-sitter.so  src/syntax/grammars/libvedit_tree_sitter_verilog.a  src/syntax/kde/libvedit_syntax_kde.a  /usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0  /usr/lib/x86_64-linux-gnu/libQt6Gui.so.6.10.2  /usr/lib/x86_64-linux-gnu/libGLX.so  /usr/lib/x86_64-linux-gnu/libOpenGL.so  /usr/lib/x86_64-linux-gnu/libQt6DBus.so.6.10.2  /usr/lib/x86_64-linux-gnu/libQt6Network.so.6.10.2  src/syntax/kde/syn-common/libvedit_syntax_common.a  /usr/lib/x86_64-linux-gnu/libQt6Core.so.6.10.2 && :'
++ link='/usr/bin/c++ -Wall -Wextra -O2 -g -DNDEBUG -rdynamic  src/app/CMakeFiles/vedit-app.dir/vedit-app_autogen/mocs_compilation.cpp.o /vedit-build/target/batch1-shell-probe/batch1-shell-probe.o -o /vedit-build/target/batch1-shell-probe/batch1-shell-probe  src/app/libvedit_app_shell.a  src/terminal/libvedit_terminal.a  src/app/editor-lane/libvedit_editor_core.a  /vedit-build/target/release/libvd_ffi.a  src/app/libvedit_workspace_integration.a  -Wl,--push-state,--whole-archive  src/syntax/grammars/syntax-product/libvedit_syntax_product.a  -Wl,--pop-state  src/app/workspace-lane-filetree/libvedit_file_tree.a  src/app/workspace-lane-palette/libvedit_workspace_palette.a  src/app/workspace-lane-search/libvedit_workspace_search.a  src/app/workspace-lane-module_tree/libvedit_workspace_module_tree.a  src/app/workspace-lane-project/libvedit_workspace_project.a  src/app/workspace-lane-diagnostics/libvedit_workspace_diagnostics.a  src/app/editor-lane/libvedit_editor_core.a  src/app/editor-lane/folding-lane/libvedit_syntax_folding.a  src/app/editor-lane/fim-lane/libvedit_editor_fim.a  /vedit-build/target/release/libvd_ffi.a  src/app/workspace-lane-vcs/libvedit_workspace_vcs.a  src/app/workspace-lane-settings/libvedit_workspace_settings.a  src/app/libvedit_app_shell.a  src/app/editor-lane/breadcrumb-lane/libvedit_workspace_breadcrumb.a  src/app/editor-lane/breadcrumb-lane/jump-lane/libvedit_workspace_jump.a  /vedit-build/target/release/libvd_ffi.a  -ldl  -lm  /usr/lib/x86_64-linux-gnu/libKF6TextEditor.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6Parts.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6XmlGui.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ConfigWidgets.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6Completion.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ColorScheme.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6GuiAddons.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ConfigGui.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6WidgetsAddons.so.6.24.0  /usr/lib/x86_64-linux-gnu/libQt6Widgets.so.6.10.2  /usr/lib/x86_64-linux-gnu/libKF6KIOCore.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6CoreAddons.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ConfigCore.so.6.24.0  /usr/lib/x86_64-linux-gnu/libQt6Xml.so.6.10.2  src/syntax/grammars/libvedit_syntax_grammars.a  src/syntax/provider/libvedit_syntax_provider.a  /usr/lib/x86_64-linux-gnu/libtree-sitter.so  src/syntax/grammars/libvedit_tree_sitter_verilog.a  src/syntax/kde/libvedit_syntax_kde.a  /usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0  /usr/lib/x86_64-linux-gnu/libQt6Gui.so.6.10.2  /usr/lib/x86_64-linux-gnu/libGLX.so  /usr/lib/x86_64-linux-gnu/libOpenGL.so  /usr/lib/x86_64-linux-gnu/libQt6DBus.so.6.10.2  /usr/lib/x86_64-linux-gnu/libQt6Network.so.6.10.2  src/syntax/kde/syn-common/libvedit_syntax_common.a  /usr/lib/x86_64-linux-gnu/libQt6Core.so.6.10.2 && :'
++ cd /vedit-build/target/qt6-build
++ eval '/usr/bin/c++ -Wall -Wextra -O2 -g -DNDEBUG -rdynamic  src/app/CMakeFiles/vedit-app.dir/vedit-app_autogen/mocs_compilation.cpp.o /vedit-build/target/batch1-shell-probe/batch1-shell-probe.o -o /vedit-build/target/batch1-shell-probe/batch1-shell-probe  src/app/libvedit_app_shell.a  src/terminal/libvedit_terminal.a  src/app/editor-lane/libvedit_editor_core.a  /vedit-build/target/release/libvd_ffi.a  src/app/libvedit_workspace_integration.a  -Wl,--push-state,--whole-archive  src/syntax/grammars/syntax-product/libvedit_syntax_product.a  -Wl,--pop-state  src/app/workspace-lane-filetree/libvedit_file_tree.a  src/app/workspace-lane-palette/libvedit_workspace_palette.a  src/app/workspace-lane-search/libvedit_workspace_search.a  src/app/workspace-lane-module_tree/libvedit_workspace_module_tree.a  src/app/workspace-lane-project/libvedit_workspace_project.a  src/app/workspace-lane-diagnostics/libvedit_workspace_diagnostics.a  src/app/editor-lane/libvedit_editor_core.a  src/app/editor-lane/folding-lane/libvedit_syntax_folding.a  src/app/editor-lane/fim-lane/libvedit_editor_fim.a  /vedit-build/target/release/libvd_ffi.a  src/app/workspace-lane-vcs/libvedit_workspace_vcs.a  src/app/workspace-lane-settings/libvedit_workspace_settings.a  src/app/libvedit_app_shell.a  src/app/editor-lane/breadcrumb-lane/libvedit_workspace_breadcrumb.a  src/app/editor-lane/breadcrumb-lane/jump-lane/libvedit_workspace_jump.a  /vedit-build/target/release/libvd_ffi.a  -ldl  -lm  /usr/lib/x86_64-linux-gnu/libKF6TextEditor.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6Parts.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6XmlGui.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ConfigWidgets.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6Completion.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ColorScheme.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6GuiAddons.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ConfigGui.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6WidgetsAddons.so.6.24.0  /usr/lib/x86_64-linux-gnu/libQt6Widgets.so.6.10.2  /usr/lib/x86_64-linux-gnu/libKF6KIOCore.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6CoreAddons.so.6.24.0  /usr/lib/x86_64-linux-gnu/libKF6ConfigCore.so.6.24.0  /usr/lib/x86_64-linux-gnu/libQt6Xml.so.6.10.2  src/syntax/grammars/libvedit_syntax_grammars.a  src/syntax/provider/libvedit_syntax_provider.a  /usr/lib/x86_64-linux-gnu/libtree-sitter.so  src/syntax/grammars/libvedit_tree_sitter_verilog.a  src/syntax/kde/libvedit_syntax_kde.a  /usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0  /usr/lib/x86_64-linux-gnu/libQt6Gui.so.6.10.2  /usr/lib/x86_64-linux-gnu/libGLX.so  /usr/lib/x86_64-linux-gnu/libOpenGL.so  /usr/lib/x86_64-linux-gnu/libQt6DBus.so.6.10.2  /usr/lib/x86_64-linux-gnu/libQt6Network.so.6.10.2  src/syntax/kde/syn-common/libvedit_syntax_common.a  /usr/lib/x86_64-linux-gnu/libQt6Core.so.6.10.2 && :'
+++ /usr/bin/c++ -Wall -Wextra -O2 -g -DNDEBUG -rdynamic src/app/CMakeFiles/vedit-app.dir/vedit-app_autogen/mocs_compilation.cpp.o /vedit-build/target/batch1-shell-probe/batch1-shell-probe.o -o /vedit-build/target/batch1-shell-probe/batch1-shell-probe src/app/libvedit_app_shell.a src/terminal/libvedit_terminal.a src/app/editor-lane/libvedit_editor_core.a /vedit-build/target/release/libvd_ffi.a src/app/libvedit_workspace_integration.a -Wl,--push-state,--whole-archive src/syntax/grammars/syntax-product/libvedit_syntax_product.a -Wl,--pop-state src/app/workspace-lane-filetree/libvedit_file_tree.a src/app/workspace-lane-palette/libvedit_workspace_palette.a src/app/workspace-lane-search/libvedit_workspace_search.a src/app/workspace-lane-module_tree/libvedit_workspace_module_tree.a src/app/workspace-lane-project/libvedit_workspace_project.a src/app/workspace-lane-diagnostics/libvedit_workspace_diagnostics.a src/app/editor-lane/libvedit_editor_core.a src/app/editor-lane/folding-lane/libvedit_syntax_folding.a src/app/editor-lane/fim-lane/libvedit_editor_fim.a /vedit-build/target/release/libvd_ffi.a src/app/workspace-lane-vcs/libvedit_workspace_vcs.a src/app/workspace-lane-settings/libvedit_workspace_settings.a src/app/libvedit_app_shell.a src/app/editor-lane/breadcrumb-lane/libvedit_workspace_breadcrumb.a src/app/editor-lane/breadcrumb-lane/jump-lane/libvedit_workspace_jump.a /vedit-build/target/release/libvd_ffi.a -ldl -lm /usr/lib/x86_64-linux-gnu/libKF6TextEditor.so.6.24.0 /usr/lib/x86_64-linux-gnu/libKF6Parts.so.6.24.0 /usr/lib/x86_64-linux-gnu/libKF6XmlGui.so.6.24.0 /usr/lib/x86_64-linux-gnu/libKF6ConfigWidgets.so.6.24.0 /usr/lib/x86_64-linux-gnu/libKF6Completion.so.6.24.0 /usr/lib/x86_64-linux-gnu/libKF6ColorScheme.so.6.24.0 /usr/lib/x86_64-linux-gnu/libKF6GuiAddons.so.6.24.0 /usr/lib/x86_64-linux-gnu/libKF6ConfigGui.so.6.24.0 /usr/lib/x86_64-linux-gnu/libKF6WidgetsAddons.so.6.24.0 /usr/lib/x86_64-linux-gnu/libQt6Widgets.so.6.10.2 /usr/lib/x86_64-linux-gnu/libKF6KIOCore.so.6.24.0 /usr/lib/x86_64-linux-gnu/libKF6CoreAddons.so.6.24.0 /usr/lib/x86_64-linux-gnu/libKF6ConfigCore.so.6.24.0 /usr/lib/x86_64-linux-gnu/libQt6Xml.so.6.10.2 src/syntax/grammars/libvedit_syntax_grammars.a src/syntax/provider/libvedit_syntax_provider.a /usr/lib/x86_64-linux-gnu/libtree-sitter.so src/syntax/grammars/libvedit_tree_sitter_verilog.a src/syntax/kde/libvedit_syntax_kde.a /usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0 /usr/lib/x86_64-linux-gnu/libQt6Gui.so.6.10.2 /usr/lib/x86_64-linux-gnu/libGLX.so /usr/lib/x86_64-linux-gnu/libOpenGL.so /usr/lib/x86_64-linux-gnu/libQt6DBus.so.6.10.2 /usr/lib/x86_64-linux-gnu/libQt6Network.so.6.10.2 src/syntax/kde/syn-common/libvedit_syntax_common.a /usr/lib/x86_64-linux-gnu/libQt6Core.so.6.10.2
+++ :
++ set +x
+[probe] built /vedit-build/target/batch1-shell-probe/batch1-shell-probe
+[probe] VEDIT_SLANG=/vedit-build/build/slang/out/slang
+== offscreen pass (QT_QPA_PLATFORM=offscreen) ==
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+jump: installJump registry reset; target=none
+filetree: installFileTree projectRoot='/tmp/batch1-shell-probe-zkaNzc/alpha-project' dockInserted=0 placeholderReplaced=0
+search: installSearch projectRoot='/tmp/batch1-shell-probe-zkaNzc/alpha-project' jumpTarget=registry(editor)
+QObject::connect: No such signal vedit::app::ApplicationShell::directoryOpened(QString)
+QObject::connect:  (sender name:   'vedit-app-shell')
+QObject::connect: No such signal QMainWindowLayout::directoryOpened(QString)
+QObject::connect:  (sender name:   '_layout')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'editor-area')
+QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QTimer::directoryOpened(QString)
+QObject::connect:  (sender name:   'ctrlSAuthorityGuard')
+QObject::connect: No such signal QStatusBar::directoryOpened(QString)
+QObject::connect: No such signal QSizeGrip::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'status-dirty')
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'status-project')
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'status-theme')
+QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'status-layout')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-settings.preferences')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.open')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.open-folder')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.new-layout')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.save')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.save-as')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.save-session')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.close-pane')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.quit')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.split.horizontal')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.split.vertical')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.focus.next')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.layout.mixed')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.layout.reset')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.panel.file-tree')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.panel.search')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.panel.terminal')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.panel.vcs')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.panel.outline')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-help.about')
+QObject::connect: No such signal QMenuBar::directoryOpened(QString)
+QObject::connect: No such signal QToolButton::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_menubar_ext_button')
+QObject::connect: No such signal QMenu::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal QMenu::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal QMenu::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal QMenu::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal vedit::workspace::PaletteIntegration::directoryOpened(QString)
+QObject::connect: No such signal vedit::workspace::CommandPalette::directoryOpened(QString)
+QObject::connect:  (sender name:   'command-palette')
+QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QLineEdit::directoryOpened(QString)
+QObject::connect:  (sender name:   'palette-query')
+QObject::connect: No such signal QWidgetLineControl::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   '_q_qlineeditclearaction')
+QObject::connect: No such signal QLineEditIconButton::directoryOpened(QString)
+QObject::connect: No such signal QListWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'palette-results')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QListModel::directoryOpened(QString)
+QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'palette-empty')
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'palette-status')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.goto-file')
+QObject::connect: No such signal vedit::workspace::search::EditorJumpTarget::directoryOpened(QString)
+QObject::connect: No such signal vedit::workspace::project::ProjectModel::directoryOpened(QString)
+QObject::connect: No such signal QDockWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'dock-project')
+QObject::connect: No such signal QDockWidgetLayout::directoryOpened(QString)
+QObject::connect: No such signal QDockWidgetTitleButton::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_dockwidget_floatbutton')
+QObject::connect: No such signal QDockWidgetTitleButton::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_dockwidget_closebutton')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal vedit::workspace::project::ProjectPanel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-panel')
+QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-summary')
+QObject::connect: No such signal QPushButton::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-refresh')
+QObject::connect: No such signal QPushButton::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-import-filelist')
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-empty-hint')
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-filelists-header')
+QObject::connect: No such signal QListWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-filelist-list')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QListModel::directoryOpened(QString)
+QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+QObject::connect: No such signal QPushButton::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-remove-filelist')
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-files-header')
+QObject::connect: No such signal QListWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-file-list')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QListModel::directoryOpened(QString)
+QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-include-header')
+QObject::connect: No such signal QListWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-include-dirs')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QListModel::directoryOpened(QString)
+QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-defines-header')
+QObject::connect: No such signal QListWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-defines')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QListModel::directoryOpened(QString)
+QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-variables-header')
+QObject::connect: No such signal QListWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-variables')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QListModel::directoryOpened(QString)
+QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+QObject::connect: No such signal QPushButton::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-edit-variables')
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-diagnostics-header')
+QObject::connect: No such signal QListWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-diagnostics')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QListModel::directoryOpened(QString)
+QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-status')
+module-tree: installed (root='/tmp/batch1-shell-probe-zkaNzc/alpha-project' state='/tmp/batch1-shell-probe-zkaNzc/state')
+vcs: installVcs projectRoot='/tmp/batch1-shell-probe-zkaNzc/alpha-project'
+settings: installSettings file='/tmp/batch1-shell-probe-zkaNzc/state/settings.toml'
+search: root='/tmp/batch1-shell-probe-zkaNzc/alpha-project' (ready)
+vcs: root='/tmp/batch1-shell-probe-zkaNzc/alpha-project'
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server] local=[/vedit-build/build/slang/out,/vedit-build/.mpd/recon/verible/bin]
+PROBE work=/tmp/batch1-shell-probe-zkaNzc platform=offscreen
+PROBE fixture rootA=/tmp/batch1-shell-probe-zkaNzc/alpha-project rootB=/tmp/batch1-shell-probe-zkaNzc/beta-project
+TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server] local=[/vedit-build/build/slang/out,/vedit-build/.mpd/recon/verible/bin]
+PASS a11.shell.restored-root — /tmp/batch1-shell-probe-zkaNzc/alpha-project
+PASS a11.shell.label — alpha-project
+PASS a11.panels.restored — files=1 search=1 vcs=1 moduleTree=1
+PASS a11.files.root — /tmp/batch1-shell-probe-zkaNzc/alpha-project
+PASS a11.files.ready — alpha-project
+PASS a11.files.root-row — alpha-project
+PASS a11.files.lists-root-content — rtl
+PASS a11.files.file-reachable
+PASS a11.search.root — /tmp/batch1-shell-probe-zkaNzc/alpha-project
+PASS a11.search.not-no-root — Enter a query and press Search.
+PASS a11.search.root-label — In /tmp/batch1-shell-probe-zkaNzc/alpha-project
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/batch1-shell-probe-zkaNzc/alpha-project' query='TOKEN_ALPHA_1'
+This plugin does not support propagateSizeHints()
+PASS a11.search.hit — state=done hits=1 error=
+PASS a11.search.hits-inside-root — hits=1
+PASS a11.vcs.root — /tmp/batch1-shell-probe-zkaNzc/alpha-project
+PASS a11.vcs.backend — Git alpha-project @ befc60b · 1 changed file(s)
+PASS a11.vcs.branch — Git alpha-project @ befc60b · 1 changed file(s)
+PASS a11.module-tree.poll-root — /tmp/batch1-shell-probe-zkaNzc/alpha-project
+PASS a11.module-tree.non-empty — valid=1 rows=2 status=Hierarchy ready — double-click an instance, a net or a driver/load.
+PASS a11.module-tree.summary-names-root — slang · 2 file(s) · 3 instance(s) · 0 net(s) · 6 ms · 16372 KiB peak
+root: /tmp/batch1-shell-probe-zkaNzc/alpha-project
+PASS a11.fileset.root — /tmp/batch1-shell-probe-zkaNzc/alpha-project
+PASS a11.fileset.non-empty — 2 file(s): /tmp/batch1-shell-probe-zkaNzc/alpha-project/rtl/second.v,/tmp/batch1-shell-probe-zkaNzc/alpha-project/rtl/top.sv
+PASS a11.fileset.inside-root — /tmp/batch1-shell-probe-zkaNzc/alpha-project/rtl/second.v,/tmp/batch1-shell-probe-zkaNzc/alpha-project/rtl/top.sv
+[shell-root] project root -> /tmp/batch1-shell-probe-zkaNzc/beta-project
+search: root='/tmp/batch1-shell-probe-zkaNzc/beta-project' (ready)
+This plugin does not support propagateSizeHints()
+module-tree: root -> '/tmp/batch1-shell-probe-zkaNzc/beta-project'
+vcs: root='/tmp/batch1-shell-probe-zkaNzc/beta-project'
+PASS a12.shell.switched — /tmp/batch1-shell-probe-zkaNzc/beta-project
+PASS a12.files.new-root — /tmp/batch1-shell-probe-zkaNzc/beta-project
+PASS a12.search.new-root — /tmp/batch1-shell-probe-zkaNzc/beta-project
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PASS a12.vcs.new-root — /tmp/batch1-shell-probe-zkaNzc/beta-project
+PASS a12.vcs.header-changed — Git alpha-project @ befc60b · 1 changed file(s) -> Git beta-project @ 9e7fdc7 · 1 changed file(s)
+PASS a12.module-tree.poll-root — /tmp/batch1-shell-probe-zkaNzc/beta-project
+PASS a12.module-tree.new-hierarchy — slang · 1 file(s) · 2 instance(s) · 0 net(s) · 5 ms · 16440 KiB peak
+root: /tmp/batch1-shell-probe-zkaNzc/beta-project
+PASS a12.fileset.new-root — /tmp/batch1-shell-probe-zkaNzc/beta-project
+PASS a12.fileset.re-expanded — /tmp/batch1-shell-probe-zkaNzc/beta-project/rtl/other.sv
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/batch1-shell-probe-zkaNzc/beta-project' query='TOKEN_BETA_2'
+PASS a12.search.new-root-hit — hits=1 error=
+PASS a12.search.new-root-hits-inside — hits=1
+search: query root='/tmp/batch1-shell-probe-zkaNzc/beta-project' query='TOKEN_ALPHA_1'
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PASS a12.search.old-token-not-found — hits=0 error=
+PASS a12.search.log-announces-new-root
+PASS a12.search.log-queried-new-root
+PASS a12.search.log-never-queried-old-root
+[shell-root] project root -> /tmp/batch1-shell-probe-zkaNzc/alpha-project
+search: root='/tmp/batch1-shell-probe-zkaNzc/alpha-project' (ready)
+module-tree: root -> '/tmp/batch1-shell-probe-zkaNzc/alpha-project'
+vcs: root='/tmp/batch1-shell-probe-zkaNzc/alpha-project'
+PASS a12.file-menu-open-folder — shell=/tmp/batch1-shell-probe-zkaNzc/alpha-project search=/tmp/batch1-shell-probe-zkaNzc/alpha-project
+PASS a12.file-menu-vcs-followed — /tmp/batch1-shell-probe-zkaNzc/alpha-project
+PASS a12.file-menu-module-tree-followed — /tmp/batch1-shell-probe-zkaNzc/alpha-project
+BATCH1-SHELL-PROBE ok=1 checks=40 failures=0
+offscreen exit=0
+== xcb pass under Xvfb :78 (QT_QPA_PLATFORM=xcb, software rendering) ==
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server] local=[/vedit-build/build/slang/out,/vedit-build/.mpd/recon/verible/bin]
+PROBE work=/tmp/batch1-shell-probe-WeGVsB platform=xcb
+PROBE fixture rootA=/tmp/batch1-shell-probe-WeGVsB/alpha-project rootB=/tmp/batch1-shell-probe-WeGVsB/beta-project
+jump: installJump registry reset; target=none
+filetree: installFileTree projectRoot='/tmp/batch1-shell-probe-WeGVsB/alpha-project' dockInserted=0 placeholderReplaced=0
+search: installSearch projectRoot='/tmp/batch1-shell-probe-WeGVsB/alpha-project' jumpTarget=registry(editor)
+QObject::connect: No such signal vedit::app::ApplicationShell::directoryOpened(QString)
+QObject::connect:  (sender name:   'vedit-app-shell')
+QObject::connect: No such signal QMainWindowLayout::directoryOpened(QString)
+QObject::connect:  (sender name:   '_layout')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'editor-area')
+QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QTimer::directoryOpened(QString)
+QObject::connect:  (sender name:   'ctrlSAuthorityGuard')
+QObject::connect: No such signal QStatusBar::directoryOpened(QString)
+QObject::connect: No such signal QSizeGrip::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'status-dirty')
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'status-project')
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'status-theme')
+QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'status-layout')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-settings.preferences')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.open')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.open-folder')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.new-layout')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.save')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.save-as')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.save-session')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.close-pane')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.quit')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.split.horizontal')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.split.vertical')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.focus.next')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.layout.mixed')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.layout.reset')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.panel.file-tree')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.panel.search')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.panel.terminal')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.panel.vcs')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.panel.outline')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-help.about')
+QObject::connect: No such signal QMenuBar::directoryOpened(QString)
+QObject::connect: No such signal QToolButton::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_menubar_ext_button')
+QObject::connect: No such signal QMenu::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal QMenu::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal QMenu::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal QMenu::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal vedit::workspace::PaletteIntegration::directoryOpened(QString)
+QObject::connect: No such signal vedit::workspace::CommandPalette::directoryOpened(QString)
+QObject::connect:  (sender name:   'command-palette')
+QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QLineEdit::directoryOpened(QString)
+QObject::connect:  (sender name:   'palette-query')
+QObject::connect: No such signal QWidgetLineControl::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   '_q_qlineeditclearaction')
+QObject::connect: No such signal QLineEditIconButton::directoryOpened(QString)
+QObject::connect: No such signal QListWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'palette-results')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QListModel::directoryOpened(QString)
+QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'palette-empty')
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'palette-status')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.goto-file')
+QObject::connect: No such signal vedit::workspace::search::EditorJumpTarget::directoryOpened(QString)
+QObject::connect: No such signal vedit::workspace::project::ProjectModel::directoryOpened(QString)
+QObject::connect: No such signal QDockWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'dock-project')
+QObject::connect: No such signal QDockWidgetLayout::directoryOpened(QString)
+QObject::connect: No such signal QDockWidgetTitleButton::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_dockwidget_floatbutton')
+QObject::connect: No such signal QDockWidgetTitleButton::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_dockwidget_closebutton')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal vedit::workspace::project::ProjectPanel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-panel')
+QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-summary')
+QObject::connect: No such signal QPushButton::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-refresh')
+QObject::connect: No such signal QPushButton::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-import-filelist')
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-empty-hint')
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-filelists-header')
+QObject::connect: No such signal QListWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-filelist-list')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QListModel::directoryOpened(QString)
+QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+QObject::connect: No such signal QPushButton::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-remove-filelist')
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-files-header')
+QObject::connect: No such signal QListWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-file-list')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QListModel::directoryOpened(QString)
+QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-include-header')
+QObject::connect: No such signal QListWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-include-dirs')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QListModel::directoryOpened(QString)
+QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-defines-header')
+QObject::connect: No such signal QListWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-defines')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QListModel::directoryOpened(QString)
+QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-variables-header')
+QObject::connect: No such signal QListWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-variables')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QListModel::directoryOpened(QString)
+QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+QObject::connect: No such signal QPushButton::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-edit-variables')
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-diagnostics-header')
+QObject::connect: No such signal QListWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-diagnostics')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QListModel::directoryOpened(QString)
+QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-status')
+module-tree: installed (root='/tmp/batch1-shell-probe-WeGVsB/alpha-project' state='/tmp/batch1-shell-probe-WeGVsB/state')
+vcs: installVcs projectRoot='/tmp/batch1-shell-probe-WeGVsB/alpha-project'
+settings: installSettings file='/tmp/batch1-shell-probe-WeGVsB/state/settings.toml'
+search: root='/tmp/batch1-shell-probe-WeGVsB/alpha-project' (ready)
+vcs: root='/tmp/batch1-shell-probe-WeGVsB/alpha-project'
+TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server] local=[/vedit-build/build/slang/out,/vedit-build/.mpd/recon/verible/bin]
+PASS a11.shell.restored-root — /tmp/batch1-shell-probe-WeGVsB/alpha-project
+PASS a11.shell.label — alpha-project
+PASS a11.panels.restored — files=1 search=1 vcs=1 moduleTree=1
+PASS a11.files.root — /tmp/batch1-shell-probe-WeGVsB/alpha-project
+PASS a11.files.ready — alpha-project
+PASS a11.files.root-row — alpha-project
+PASS a11.files.lists-root-content — rtl
+PASS a11.files.file-reachable
+PASS a11.search.root — /tmp/batch1-shell-probe-WeGVsB/alpha-project
+PASS a11.search.not-no-root — Enter a query and press Search.
+PASS a11.search.root-label — In /tmp/batch1-shell-probe-WeGVsB/alpha-project
+search: query root='/tmp/batch1-shell-probe-WeGVsB/alpha-project' query='TOKEN_ALPHA_1'
+PASS a11.search.hit — state=done hits=1 error=
+PASS a11.search.hits-inside-root — hits=1
+PASS a11.vcs.root — /tmp/batch1-shell-probe-WeGVsB/alpha-project
+PASS a11.vcs.backend — Git alpha-project @ a99f430 · 1 changed file(s)
+PASS a11.vcs.branch — Git alpha-project @ a99f430 · 1 changed file(s)
+PASS a11.module-tree.poll-root — /tmp/batch1-shell-probe-WeGVsB/alpha-project
+PASS a11.module-tree.non-empty — valid=1 rows=2 status=Hierarchy ready — double-click an instance, a net or a driver/load.
+PASS a11.module-tree.summary-names-root — slang · 2 file(s) · 3 instance(s) · 0 net(s) · 6 ms · 16448 KiB peak
+root: /tmp/batch1-shell-probe-WeGVsB/alpha-project
+PASS a11.fileset.root — /tmp/batch1-shell-probe-WeGVsB/alpha-project
+PASS a11.fileset.non-empty — 2 file(s): /tmp/batch1-shell-probe-WeGVsB/alpha-project/rtl/second.v,/tmp/batch1-shell-probe-WeGVsB/alpha-project/rtl/top.sv
+PASS a11.fileset.inside-root — /tmp/batch1-shell-probe-WeGVsB/alpha-project/rtl/second.v,/tmp/batch1-shell-probe-WeGVsB/alpha-project/rtl/top.sv
+PASS SCREENSHOT /vedit-build/evidence/batch1-shell/shots/10-ordinary-start-root-a.png
+[shell-root] project root -> /tmp/batch1-shell-probe-WeGVsB/beta-project
+search: root='/tmp/batch1-shell-probe-WeGVsB/beta-project' (ready)
+module-tree: root -> '/tmp/batch1-shell-probe-WeGVsB/beta-project'
+vcs: root='/tmp/batch1-shell-probe-WeGVsB/beta-project'
+PASS a12.shell.switched — /tmp/batch1-shell-probe-WeGVsB/beta-project
+PASS a12.files.new-root — /tmp/batch1-shell-probe-WeGVsB/beta-project
+PASS a12.search.new-root — /tmp/batch1-shell-probe-WeGVsB/beta-project
+PASS a12.vcs.new-root — /tmp/batch1-shell-probe-WeGVsB/beta-project
+PASS a12.vcs.header-changed — Git alpha-project @ a99f430 · 1 changed file(s) -> Git beta-project @ 6633414 · 1 changed file(s)
+PASS a12.module-tree.poll-root — /tmp/batch1-shell-probe-WeGVsB/beta-project
+PASS a12.module-tree.new-hierarchy — slang · 1 file(s) · 2 instance(s) · 0 net(s) · 6 ms · 16436 KiB peak
+root: /tmp/batch1-shell-probe-WeGVsB/beta-project
+PASS a12.fileset.new-root — /tmp/batch1-shell-probe-WeGVsB/beta-project
+PASS a12.fileset.re-expanded — /tmp/batch1-shell-probe-WeGVsB/beta-project/rtl/other.sv
+search: query root='/tmp/batch1-shell-probe-WeGVsB/beta-project' query='TOKEN_BETA_2'
+PASS a12.search.new-root-hit — hits=1 error=
+PASS a12.search.new-root-hits-inside — hits=1
+search: query root='/tmp/batch1-shell-probe-WeGVsB/beta-project' query='TOKEN_ALPHA_1'
+PASS a12.search.old-token-not-found — hits=0 error=
+PASS a12.search.log-announces-new-root
+PASS a12.search.log-queried-new-root
+PASS a12.search.log-never-queried-old-root
+PASS SCREENSHOT /vedit-build/evidence/batch1-shell/shots/20-after-switch-root-b.png
+[shell-root] project root -> /tmp/batch1-shell-probe-WeGVsB/alpha-project
+search: root='/tmp/batch1-shell-probe-WeGVsB/alpha-project' (ready)
+module-tree: root -> '/tmp/batch1-shell-probe-WeGVsB/alpha-project'
+vcs: root='/tmp/batch1-shell-probe-WeGVsB/alpha-project'
+PASS a12.file-menu-open-folder — shell=/tmp/batch1-shell-probe-WeGVsB/alpha-project search=/tmp/batch1-shell-probe-WeGVsB/alpha-project
+PASS a12.file-menu-vcs-followed — /tmp/batch1-shell-probe-WeGVsB/alpha-project
+PASS a12.file-menu-module-tree-followed — /tmp/batch1-shell-probe-WeGVsB/alpha-project
+BATCH1-SHELL-PROBE ok=1 checks=42 failures=0
+xcb exit=0
+shot: /vedit-build/evidence/batch1-shell/shots/10-ordinary-start-root-a.png 149529 bytes
+shot: /vedit-build/evidence/batch1-shell/shots/20-after-switch-root-b.png 145618 bytes
+== real vedit-app ordinary start (offscreen, seeded session, no --project) ==
+real-binary exit=0
+filetree: installFileTree projectRoot='/tmp/tmp.JqX9CixHkW/real-project' dockInserted=0 placeholderReplaced=0
+module-tree: installed (root='/tmp/tmp.JqX9CixHkW/real-project' state='/tmp/tmp.0f0XZO6Tfc')
+search: root='/tmp/tmp.JqX9CixHkW/real-project' (ready)
+vcs: root='/tmp/tmp.JqX9CixHkW/real-project'
+real-binary root-lines-missing=0
+== result: offscreen rc=0 xcb rc=0 shots_missing=0 real_rc=0 real_missing=0 ==
+BATCH1-SHELL-PROBE-OK

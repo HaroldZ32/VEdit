@@ -1,3 +1,4 @@
+aho-corasick
 anstream
 anstyle
 anstyle-parse
@@ -6,7 +7,6 @@ anyhow
 async-lsp
 base64
 bitflags
-build_script_build
 bytes
 cbindgen
 cc
@@ -59,10 +59,14 @@ pin-project-lite
 potential_utf
 proc-macro2
 quote
+regex
+regex-automata
+regex-syntax
 ring
 rustix
 rustls
 rustls-pki-types
+rustls-webpki
 serde
 serde_core
 serde_derive
@@ -105,14 +109,13 @@ utf8parse
 utf_types
 vd-config
 vd-deeplint
+vd-ffi
+vd-fim
 vd-lsp
 vd-search
 vd-settings
 vd-vcs
-vd_ffi
-vd_fim
 waitpid-any
-webpki
 webpki-roots
 winnow
 writeable

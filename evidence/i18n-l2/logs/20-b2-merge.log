@@ -1,0 +1,3 @@
+merge evidence/i18n-l2/05-b-class-translations-batch2.json -> translations/vedit_zh_CN.ts
+  filled=69 already-translated=465 still-unfinished=0
+  note: .ts contexts with no JSON table: QObject, vedit::app::ApplicationShell, vedit::editor::FindReplaceBar, vedit::workspace::FileTreeWidget, vedit::workspace::search::SearchPanel, vedit::workspace::settings::SettingsPanel

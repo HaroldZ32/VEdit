@@ -13,7 +13,7 @@
 //   * display()/describe() render the path;
 //   * nothing here touches folding: a cursor move or a semantic update can never
 //     trigger AMENDMENTS A2's fold rebuild (the breadcrumb lane has no dependency
-//     on src/syntax/folding at all, see CMakeLists.txt).
+//     on the folding lane at all (deleted in T29), see CMakeLists.txt).
 #include <QString>
 #include <QStringView>
 

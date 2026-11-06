@@ -6,12 +6,20 @@
 //! operation is ever executed" is enforced BEFORE the process exists, not by the
 //! caller's discipline.
 //!
-//! Tests inject a [`RecordingRunner`] (a stub) and assert two properties:
+//! The working directory is part of the seam, not of the argument list: the
+//! runner spawns the tool with `Command::current_dir(working_tree)`. Passing the
+//! repository as a global path option is NOT portable — the delivery baseline
+//! (CentOS 7, git 1.8.3.1) does not support it — so the seam carries the cwd and
+//! no caller can reintroduce the option.
+//!
+//! Tests inject a [`RecordingRunner`] (a stub) and assert three properties:
 //!   * a write subcommand is refused and never reaches the spawn call;
 //!   * a complete status + branch/revision + diff session issues only allowed
-//!     read-only subcommands.
+//!     read-only subcommands;
+//!   * every invocation runs in the repository root (cwd isolation).
 #![forbid(unsafe_code)]
 
+use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::{Arc, Mutex};
 
@@ -20,13 +28,14 @@ use std::sync::{Arc, Mutex};
 pub struct Invocation {
     /// Executable name (`git` / `svn`).
     pub program: String,
+    /// Working directory the tool ran in (the repository root).
+    pub working_tree: PathBuf,
     /// Arguments, without the executable.
     pub args: Vec<String>,
 }
 
 impl Invocation {
-    /// The subcommand (`status`, `diff`, ...), skipping global options such as
-    /// git's `-C <path>`.
+    /// The subcommand (`status`, `diff`, ...), skipping global options.
     #[must_use]
     pub fn subcommand(&self) -> String {
         subcommand_of(&self.program, &self.args)
@@ -35,16 +44,17 @@ impl Invocation {
 
 /// Index of the first non-option argument: the tool's subcommand.
 ///
-/// git accepts global options BEFORE the subcommand (`-C <dir>`, `-c k=v`,
-/// `--no-pager`, `--git-dir <dir>`, `--work-tree <dir>`); the read-only gate and
-/// the test assertions must look past them, or `-C <path> status` would look
-/// like an unknown subcommand `-C`.
+/// git accepts global options BEFORE the subcommand (`-c k=v`, `--no-pager`,
+/// `--git-dir <dir>`, `--work-tree <dir>`); the read-only gate and the test
+/// assertions look past them. The working directory is NOT passed as an option
+/// (see the module docs), so an option that takes a value and is not listed here
+/// is refused — default deny rather than a guessed parse.
 #[must_use]
 pub fn subcommand_index(args: &[String]) -> Option<usize> {
     let mut index = 0;
     while index < args.len() {
         let arg = &args[index];
-        if arg == "-C" || arg == "-c" || arg == "--git-dir" || arg == "--work-tree" {
+        if arg == "-c" || arg == "--git-dir" || arg == "--work-tree" {
             index += 2;
             continue;
         }
@@ -77,7 +87,61 @@ pub const GIT_READ_ONLY: &[&str] = &[
     "describe",
     "cat-file",
     "for-each-ref",
+    // `git remote` is BOTH a read (list remotes) and a write (`remote add`,
+    // `remote rm`, `remote set-url`). It is allowed here only because
+    // `remote_listing_only()` below refuses every form that is not a listing, so
+    // the "reads cannot write" rule still holds by construction.
+    "remote",
+    // `git stash` is both a read (`stash list`) and a write (`stash save`, `pop`,
+    // `apply`, `drop`); `git worktree` is both (`worktree list` vs `add` /
+    // `remove`). Same rule as `remote`: only the LISTING form is read-allowed.
+    "stash",
+    "worktree",
 ];
+
+/// `git remote` shares one subcommand token between a read and three writes, so
+/// the read gate only lets the LISTING forms through: `git remote` and
+/// `git remote -v` / `--verbose`. Everything else (`add`, `rm`, `remove`,
+/// `set-url`, `rename`, `prune`, ...) is refused before any process exists.
+fn remote_listing_only(args: &[String]) -> bool {
+    let Some(index) = subcommand_index(args) else {
+        return false;
+    };
+    if args.get(index).map(String::as_str) != Some("remote") {
+        return true;
+    }
+    let rest = &args[index + 1..];
+    rest.is_empty() || (rest.len() == 1 && (rest[0] == "-v" || rest[0] == "--verbose"))
+}
+
+/// `git stash` is a read only as `stash list` (optionally with log options);
+/// `stash save` / `pop` / `apply` / `drop` / `clear` are writes and a bare
+/// `git stash` is `stash save`, so the listing form is required explicitly.
+fn stash_listing_only(args: &[String]) -> bool {
+    listing_form(args, "stash")
+}
+
+/// `git worktree` is a read only as `worktree list`; `add` / `remove` / `prune`
+/// are writes and a bare `git worktree` prints usage (not a listing).
+fn worktree_listing_only(args: &[String]) -> bool {
+    listing_form(args, "worktree")
+}
+
+/// Shared shape of the two narrowed read/write tokens: the token followed by
+/// `list` and options only (no further positional argument can turn `list` into
+/// another operation, and an option cannot be a subcommand because the token is
+/// already consumed).
+fn listing_form(args: &[String], token: &str) -> bool {
+    let Some(index) = subcommand_index(args) else {
+        return false;
+    };
+    if args.get(index).map(String::as_str) != Some(token) {
+        return true;
+    }
+    let rest = &args[index + 1..];
+    rest.first().map(String::as_str) == Some("list")
+        && rest[1..].iter().all(|arg| arg.starts_with('-'))
+}
 
 /// Read-only Subversion subcommands.
 pub const SVN_READ_ONLY: &[&str] = &[
@@ -86,6 +150,12 @@ pub const SVN_READ_ONLY: &[&str] = &[
 
 /// Write subcommands that must never run. Kept as data (not as "just don't call
 /// it") so the refusal test can enumerate every one of them.
+///
+/// Two of these tokens (`stash`, `worktree`) are ALSO read tokens: the read gate
+/// allows their listing form only (see `stash_listing_only` /
+/// `worktree_listing_only`), so the bare token in this list — which is a WRITE
+/// form (`git stash` == `stash save`, `git worktree` prints usage) — stays
+/// refused before any process exists.
 pub const GIT_WRITE: &[&str] = &[
     "commit",
     "push",
@@ -175,7 +245,19 @@ pub fn is_allowed(program: &str, args: &[String]) -> bool {
     let Some(subcommand) = args.get(index) else {
         return false;
     };
-    table.contains(&subcommand.as_str())
+    if !table.contains(&subcommand.as_str()) {
+        return false;
+    }
+    if program == "git" && subcommand == "remote" && !remote_listing_only(args) {
+        return false;
+    }
+    if program == "git" && subcommand == "stash" && !stash_listing_only(args) {
+        return false;
+    }
+    if program == "git" && subcommand == "worktree" && !worktree_listing_only(args) {
+        return false;
+    }
+    true
 }
 
 /// The read-only gate. Returns the refusal reason for anything that is not on
@@ -214,26 +296,53 @@ pub struct CommandOutput {
 
 /// The seam the backends talk through.
 pub trait CommandRunner {
-    /// Runs one read-only invocation.
+    /// Runs one read-only invocation in `working_tree`.
     ///
     /// # Errors
     ///
-    /// Returns a message when the process could not be started. A non-zero exit
-    /// status is a normal [`CommandOutput`] with `success = false`.
-    fn run(&self, program: &str, args: &[String]) -> Result<CommandOutput, String>;
+    /// Returns a message when the gate refused the invocation or the process
+    /// could not be started. A non-zero exit status is a normal
+    /// [`CommandOutput`] with `success = false`.
+    fn run(
+        &self,
+        program: &str,
+        working_tree: &Path,
+        args: &[String],
+    ) -> Result<CommandOutput, String>;
 }
 
-/// Production runner: spawns the pinned tool, after the read-only gate.
+/// Production runner: spawns the pinned tool in `working_tree`, after the
+/// read-only gate.
 #[derive(Debug, Default, Clone, Copy)]
 pub struct SystemRunner;
 
 impl CommandRunner for SystemRunner {
-    fn run(&self, program: &str, args: &[String]) -> Result<CommandOutput, String> {
+    fn run(
+        &self,
+        program: &str,
+        working_tree: &Path,
+        args: &[String],
+    ) -> Result<CommandOutput, String> {
         ensure_read_only(program, args)?;
-        let output = Command::new(program)
+        // Resolve BEFORE spawning: bundled (AppDir) > PATH > env. The gate above
+        // only ever sees the logical program name, so this cannot widen it.
+        let resolved = crate::toolchain::resolve_or_error(program)?;
+        let output = Command::new(&resolved.path)
+            .current_dir(working_tree)
             .args(args)
+            // The product runs with the AppDir's LD_LIBRARY_PATH; the bundled
+            // git/svn wrapper starts with the HOST loader and then re-execs the
+            // AppDir loader itself, so the bundle must not leak into the shell
+            // that starts the wrapper (a 2.17 ld.so cannot load the bundled
+            // glibc; measured on CentOS 7).
+            .env_remove("LD_LIBRARY_PATH")
             .output()
-            .map_err(|error| format!("cannot run {program}: {error}"))?;
+            .map_err(|error| {
+                format!(
+                    "cannot run {program} ({}): {error}",
+                    resolved.path.display()
+                )
+            })?;
         Ok(CommandOutput {
             success: output.status.success(),
             stdout: String::from_utf8_lossy(&output.stdout).into_owned(),
@@ -303,12 +412,18 @@ impl RecordingRunner {
 }
 
 impl CommandRunner for RecordingRunner {
-    fn run(&self, program: &str, args: &[String]) -> Result<CommandOutput, String> {
+    fn run(
+        &self,
+        program: &str,
+        working_tree: &Path,
+        args: &[String],
+    ) -> Result<CommandOutput, String> {
         // The stub runs the SAME gate as production, so a test cannot "prove"
         // the read-only property with a runner that quietly allows everything.
         ensure_read_only(program, args)?;
         let invocation = Invocation {
             program: program.to_string(),
+            working_tree: working_tree.to_path_buf(),
             args: args.to_vec(),
         };
         if let Ok(mut invocations) = self.invocations.lock() {

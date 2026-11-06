@@ -1,0 +1,6 @@
+19c8bd5b49ed83ec8dd262813acc9d1d33f4883984ab2a7028564860939a6263  evidence/ux-batch-2/b3-repair-r2/screenshots/01-elab-explicit-dialog.png
+92456ad06e7160e0fdb95c4e166f8bca9f80677d1fc5e84304f42e38967cb873  evidence/ux-batch-2/b3-repair-r2/screenshots/02-window-with-dialog.png
+c7f6362d5596d31d4396db58ddc92abcb48ab8d439e64595fff8a1c8ae148a93  evidence/ux-batch-2/b3-repair-r2/screenshots/03-diagnostics-panel.png
+4184c43f025438b00c5abd21c7eff8c2b86e6483d69b8a10850de235084334a4  evidence/ux-batch-2/b3-repair-r2/screenshots/04a-hover-popup-fixable.png
+a10964960f8f756fb82f3d8a0ce8cbccce881c11679a97a2e6822f1f91b07308  evidence/ux-batch-2/b3-repair-r2/screenshots/04b-hover-popup-no-fix.png
+29844a27e536b0f55f483a0d249fe41d056b1737ae79e945bcf188824bd17b9a  evidence/ux-batch-2/b3-repair-r2/screenshots/05-file-status-dots.png

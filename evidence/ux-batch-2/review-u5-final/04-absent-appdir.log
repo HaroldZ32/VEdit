@@ -1,0 +1,2 @@
+FAIL: no AppRun in target/review-u5/does-not-exist
+EXIT=1

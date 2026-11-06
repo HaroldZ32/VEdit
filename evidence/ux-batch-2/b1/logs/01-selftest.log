@@ -1,0 +1,106 @@
+UpdateCTestConfiguration  from :/vedit-build/target/qt6-build/DartConfiguration.tcl
+Test project /vedit-build/target/qt6-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 33
+    Start 33: vedit-module-tree-selftest
+
+33: Test command: /vedit-build/target/qt6-build/src/app/workspace-lane-module_tree/vedit-module-tree-selftest
+33: Working Directory: /vedit-build/target/qt6-build/src/app/workspace-lane-module_tree
+33: Environment variables: 
+33:  QT_QPA_PLATFORM=offscreen
+33:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime-module-tree
+33: Test timeout computed to be: 180
+33: ok   tree.roots.equal-is-top — roots=[orphan, top_a, top_b] tops=[orphan, top_a, top_b]
+33: ok   tree.roots.fixture-set — orphan, top_a, top_b
+33: ok   tree.two-parents.two-occurrences — top_a.u_shared, top_b.u_shared
+33: ok   tree.two-parents.distinct-path — top_a.u_shared, top_b.u_shared
+33: ok   tree.two-parents.definitions-agree
+33: ok   tree.row-count.seven — rows=7
+33: ok   tree.no-net-driver-load-rows — kinds=7
+33: ok   tree.no-net-labels — orphan, top_a, shared, consumer, reflink, top_b, shared
+33: ok   tree.cycle.marker-note — cycle: A is already an ancestor of this row — not expanded
+33: ok   tree.cycle.visible-marker — rows=3
+33: ok   tree.cycle.terminates — rows=3
+33: ok   tree.depth.marker-note — depth limit 64 reached — this module's children are not expanded
+33: ok   tree.depth.capped-at-64 — deepest=64
+33: ok   tree.depth.visible-marker — markers=1
+33: ok   tree.depth.rows-bounded — rows=65
+33: ok   width.logic-4
+33: ok   width.no-dimension-1
+33: ok   width.interface-1
+33: ok   width.reversed-range-4
+33: ok   width.multi-dimension-8
+33: ok   width.spaces-8
+33: ok   width.parameterised-unknown — the packed range `[WIDTH-1:0]` in `logic[WIDTH-1:0]` is not a literal msb:lsb pair, so the width cannot be derived
+33: ok   width.empty-unknown — the ABI reported no type string for this port
+33: ok   focus.nearest-above — m1
+33: ok   focus.exact-definition-line — m2
+33: ok   focus.before-first-definition-none
+33: ok   focus.other-file-none
+33: ok   instantiation.two-parents — sites=2
+33: ok   instantiation.sorted
+33: ok   instantiation.top-has-none
+33: ok   jump.one-based — /proj/top_a.sv
+33: ok   jump.describe
+33: This plugin does not support propagateSizeHints()
+33: ok   panel.tree.rows — roots=3
+33: ok   panel.tree.shared-twice — occurrences=2
+33: ok   panel.tree.top-a-row
+33: ok   panel.selection.callback — top_a
+33: ok   panel.activate.delivers
+33: ok   panel.activate.target — /proj/top_a.sv:1:8
+33: ok   panel.double-click.module-definition — calls=2 line=1
+33: ok   panel.empty.no-catalog — No module catalog yet: open a project and press Refresh.
+33: ok   panel.empty.no-project — No project open — open a folder to build the module catalog.
+33: ok   panel.empty.failure-one-line — module catalog: boom second line
+33: ok   panel.empty.no-modules — No modules found: slang reported no module definitions for this project.
+33: This plugin does not support propagateSizeHints()
+33: ok   interface.focus.tree-selection — top_a
+33: ok   interface.table.columns
+33: ok   interface.table.rows — rows=3
+33: ok   interface.port.clk — clk/In/logic/1
+33: ok   interface.port.pad — pad/InOut/1
+33: ok   interface.port.y — y/Out/logic[3:0]/4
+33: ok   interface.location — top_a.sv:1:11
+33: ok   interface.tooltip.abi-limit — Double-click a port: jump to its declaration. Ctrl+double-click: jump to this module's instantiation statement. The module catalog has no per-connection position, so Ctrl+double-click targets the instance statement, not the connected port.
+33: ok   interface.tooltip.static
+33: ok   interface.width.unknown-blank
+33: ok   interface.width.unknown-tooltip — the packed range `[WIDTH-1:0]` in `logic[WIDTH-1:0]` is not a literal msb:lsb pair, so the width cannot be derived
+33: ok   interface.focus.caret — top_a
+33: ok   interface.focus.caret-above-definition
+33: ok   interface.focus.other-file
+33: ok   interface.focus.selection-wins — top_b
+33: ok   interface.port.activate
+33: ok   interface.port.declaration-target — /proj/top_a.sv:1:42
+33: This plugin does not support propagateSizeHints()
+33: ok   interface.port.double-click — calls=4 line=1
+33: ok   interface.port.ctrl-activate
+33: ok   interface.chooser.candidates — candidates=2
+33: ok   interface.instantiation-target — /proj/top_b.sv:3:3
+33: This plugin does not support propagateSizeHints()
+33: ok   interface.port.ctrl-double-click — calls=6 file=/proj/top_b.sv
+33: ok   interface.instantiation.top-none
+33: ok   interface.instantiation.top-status — no instantiation of top_a was catalogued: it is a design top, so there is no instance statement to jump to
+33: ok   interface.empty.no-catalog — No module catalog yet: open a project and press Refresh.
+33: ok   interface.empty.no-project — No project open — open a folder to build the module catalog.
+33: ok   interface.empty.no-modules — No modules found: slang reported no module definitions for this project.
+33: ok   toolchain.temp-dir
+33: ok   toolchain.bin-dir — /tmp/vedit-module-tree-selftest-UuGktu/bin
+33: ok   toolchain.packaged-slang — /tmp/vedit-module-tree-selftest-UuGktu/bin/slang
+33: ok   toolchain.published-path — /tmp/vedit-module-tree-selftest-UuGktu/bin/slang
+33: ok   toolchain.no-source-empty
+33: ok   toolchain.env-override-wins
+33: PASS: 76 check(s), 0 failure(s)
+1/1 Test #33: vedit-module-tree-selftest .......   Passed    0.04 sec
+
+The following tests passed:
+	vedit-module-tree-selftest
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.05 sec

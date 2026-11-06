@@ -2,7 +2,7 @@
 //
 // Covers: fuzzy ranking, the shared file index (one scan, publish path,
 // incremental updates, ignored/hidden entries), palette filtering, the explicit
-// "No matching files" empty state, Enter/Esc/arrow keyboard behaviour, and a
+// QCoreApplication::translate("VEdit", "No matching files") empty state, Enter/Esc/arrow keyboard behaviour, and a
 // 10,000-file keystroke measurement that must stay under the 200 ms budget.
 //
 // Run inside the pinned Qt6 image (or any host with Qt 6.10.2):
@@ -23,6 +23,7 @@
 
 #include <algorithm>
 #include <cstdio>
+#include <QCoreApplication>
 
 namespace {
 
@@ -167,6 +168,17 @@ void checkFileIndex(const QString &root)
     capped.setMaxFiles(2);
     capped.scan();
     check(QStringLiteral("index.max-files"), capped.size() == 2 && capped.truncated());
+
+    // FIX 1: a path OUTSIDE the root keeps its absolute spelling (the display
+    // rule never invents a "../.." spelling), and a path inside it is relative.
+    const QString outside = QFileInfo(root).absolutePath() + QStringLiteral("/outside-visible.cpp");
+    WorkspaceFileIndex outsideIndex(root);
+    outsideIndex.setFiles(QStringList{outside});
+    check(QStringLiteral("index.outside-root-absolute"),
+          outsideIndex.displayPaths()
+              == QStringList{QDir::cleanPath(QFileInfo(outside).absoluteFilePath())});
+    check(QStringLiteral("index.inside-root-relative"),
+          published.displayPath(0) == QStringLiteral("a/z.cpp"));
 }
 
 void checkPalette(const QString &root, WorkspaceFileIndex &diskIndex)
@@ -223,7 +235,7 @@ void checkPalette(const QString &root, WorkspaceFileIndex &diskIndex)
     bare.openPalette();
     check(QStringLiteral("palette.no-project-empty-state"),
           bare.emptyStateVisible() &&
-              bare.emptyStateText().contains(QStringLiteral("No project")));
+              bare.emptyStateText().contains(QCoreApplication::translate("VEdit", "No project")));
     bare.closePalette();
 }
 

@@ -1,0 +1,17 @@
+=== R4(e): VHDL folding for a LABELLED process — before/after ===
+captured: 2026-11-05T02:59:02+08:00
+before-fix hash: 47a4539e08fc6b6257d0897c6187c25c4d9620fe8ac2b2023729b31d6ef75451 (the repaired file)
+
+--- negative control: temporarily restore the PRE-REPAIR opener regex (one rule, no label prefix) ---
+mutated hash: 2c28c56fa49201e7133466174014cc00d1a1cff0c0de19279a59efa389edd8ed
+command: docker run ... vedit-highlight-mode-selftest   (resources-temp mode builds its share from resources/syntax)
+CHECK construct.vhdl-fold-labelled-process FAIL  begins=0 ends=1
+CHECK construct.vhdl-fold-unlabelled-process PASS  begins=1 ends=1
+HIGHLIGHT-MODE-SELFTEST mode=resources-temp checks=81 failures=1
+MUTATED_EXIT stays recorded above by the check lines; see failures count
+
+--- restore the repaired file and rerun ---
+restored hash: 47a4539e08fc6b6257d0897c6187c25c4d9620fe8ac2b2023729b31d6ef75451
+CHECK construct.vhdl-fold-labelled-process PASS  begins=1 ends=1
+CHECK construct.vhdl-fold-unlabelled-process PASS  begins=1 ends=1
+HIGHLIGHT-MODE-SELFTEST mode=resources-temp checks=81 failures=0

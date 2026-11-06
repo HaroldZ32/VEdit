@@ -1,0 +1,83 @@
+UpdateCTestConfiguration  from :/vedit-build/target/qt6-build/DartConfiguration.tcl
+Test project /vedit-build/target/qt6-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 32
+    Start 32: vedit-jump-tests
+
+32: Test command: /vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/jump-lane/vedit-jump-tests
+32: Working Directory: /vedit-build/target/qt6-build/src/app/editor-lane/breadcrumb-lane/jump-lane
+32: Environment variables: 
+32:  QT_QPA_PLATFORM=offscreen
+32:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime-jump
+32: Test timeout computed to be: 120
+32: CHECK registry.initially-no-target PASS
+32: NO-TARGET status=no-target file='rtl/top.sv' line=12 column=3
+32: CHECK noop.status PASS
+32: CHECK noop.request-preserved PASS
+32: CHECK noop.count PASS actual=1 expected=1
+32: CHECK noop.delivered PASS actual=0 expected=0
+32: CHECK noop.last-result PASS
+32: CHECK noop.count.two PASS actual=2 expected=2
+32: CHECK invalid.empty-path PASS
+32: CHECK invalid.blank-path PASS
+32: CHECK invalid.zero-line PASS
+32: CHECK invalid.zero-column PASS
+32: CHECK invalid.count PASS actual=4 expected=4
+32: CHECK invalid.target-not-called PASS actual=0 expected=0
+32: CHECK invalid.delivered PASS actual=0 expected=0
+32: CHECK delivery.has-target PASS
+32: DELIVERED target-calls=1 file='rtl/deep/mid.sv' line=42 column=7
+32: CHECK delivery.status PASS
+32: CHECK delivery.target-calls PASS actual=1 expected=1
+32: CHECK delivery.file PASS actual='rtl/deep/mid.sv' expected='rtl/deep/mid.sv'
+32: CHECK delivery.line PASS actual=42 expected=42
+32: CHECK delivery.column PASS actual=7 expected=7
+32: CHECK delivery.count PASS actual=1 expected=1
+32: CHECK delivery.last-result PASS
+32: CHECK rejected.status PASS
+32: CHECK rejected.count PASS actual=1 expected=1
+32: CHECK rejected.target-called PASS actual=2 expected=2
+32: CHECK replace.old-not-called PASS actual=2 expected=2
+32: CHECK replace.new-called PASS actual=1 expected=1
+32: CHECK replace.new-file PASS actual='rtl/other.sv' expected='rtl/other.sv'
+32: REASON target='cannot open /tmp/x.sv: not a regular file'
+32: CHECK reason.status PASS
+32: CHECK reason.target-sentence PASS actual='cannot open /tmp/x.sv: not a regular file' expected='cannot open /tmp/x.sv: not a regular file'
+32: CHECK reason.last-result PASS actual='cannot open /tmp/x.sv: not a regular file' expected='cannot open /tmp/x.sv: not a regular file'
+32: CHECK reason.default-non-empty PASS
+32: CHECK reason.default-sentence PASS actual='the editor target refused the jump without a reason' expected='the editor target refused the jump without a reason'
+32: CHECK reason.no-target-status PASS
+32: CHECK reason.no-target-non-empty PASS
+32: CHECK reason.no-target-names-the-cause PASS
+32: CHECK reason.invalid-status PASS
+32: CHECK reason.invalid-non-empty PASS
+32: CHECK reason.invalid-names-the-position PASS
+32: CHECK reason.delivered-status PASS
+32: CHECK reason.delivered-empty PASS
+32: CHECK clear-if.other-kept PASS
+32: CHECK clear-if.expected-cleared PASS
+32: CHECK clear.after-clear-no-target PASS actual=1 expected=1
+32: CHECK clear.null-nullptr-safe PASS
+32: CHECK guard.delivered-while-alive PASS
+32: CHECK guard.dropped-after-destroy PASS
+32: DESTROYED-TARGET status=no-target file='rtl/gone.sv' (no crash)
+32: CHECK guard.after-destroy-no-target PASS
+32: CHECK guard.target-getter-null PASS
+32: CHECK status-name.no-target PASS
+32: CHECK status-name.invalid PASS
+32: CHECK status-name.delivered PASS
+32: CHECK status-name.rejected PASS
+32: SUMMARY checks=53 failures=0
+1/1 Test #32: vedit-jump-tests .................   Passed    0.01 sec
+
+The following tests passed:
+	vedit-jump-tests
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.01 sec

@@ -1,12 +1,15 @@
 #pragma once
 
-// The product consumer of SearchPanel::jumpRequested (verdict ws-search H1).
+// The product's ONE jump target (T20/A-1, AC-7.7).
 //
-// SearchPanel only emits jumpRequested() and forwards it to an installed
-// IJumpTarget; until this file existed nobody installed one, so a click on a
-// result had no effect in vedit-app. installSearch() (search_integration.cpp)
-// now installs exactly one EditorJumpTarget per shell, and the panel factory
-// hands it to every panel instance it creates.
+// Every panel that can send the user to a file position - search results,
+// outline/diagnostics rows, the module tree, the project file list, the file
+// tree and the breadcrumb bar - calls the application-wide seam
+// `vedit::workspace::jump::jumpTo(file, line, column)` (src/workspace/jump).
+// This class is the target behind that seam: installSearch()
+// (search_integration.cpp) registers exactly one instance per shell through
+// `jump::setTarget()`, and the registry weak-guards it (a destroyed QObject
+// target drops out; the destructor also clears it explicitly).
 //
 // The jump itself opens the hit through the ONE shell-level open seam
 // (EditorPane::openFile(), src/app/editor_area.h - the same seam the file tree's
@@ -19,7 +22,7 @@
 // When VEDIT_SEARCH_HAVE_EDITOR_CORE is not defined (a build without the
 // edit-core lane) the target reports the missing provider through lastError()
 // instead of opening the file itself or falling back to another widget type.
-#include "search_types.h"
+#include "jump/jump_target.h"
 
 #include <QObject>
 #include <QString>
@@ -30,11 +33,11 @@ class ApplicationShell;
 
 namespace vedit::workspace::search {
 
-// Opens the hit in the shell's active editor pane and puts the cursor on the
-// hit line (1-based) and column (1-based). Failures (missing file, no editor
-// seam, no file tree lane) are reported in lastError() and on the status bar
-// through openFileInEditor, and never throw.
-class EditorJumpTarget final : public QObject, public IJumpTarget {
+// Opens the requested position in the shell's ACTIVE editor pane and puts the
+// cursor on the 1-based line and column. Failures (missing file, no editor
+// seam, no provider) are reported in lastError() and on the status bar, never
+// thrown; jumpTo() returns true only when the cursor really moved.
+class EditorJumpTarget final : public QObject, public vedit::workspace::jump::IJumpTarget {
     Q_OBJECT
 
 public:
@@ -46,16 +49,25 @@ public:
     EditorJumpTarget(const EditorJumpTarget &) = delete;
     EditorJumpTarget &operator=(const EditorJumpTarget &) = delete;
 
-    void jumpTo(const JumpRequest &request) override;
+    bool jumpTo(const QString &filePath, int line, int column) override;
 
     vedit::app::ApplicationShell *shell() const;
-    JumpRequest lastRequest() const;
     bool lastJumpSucceeded() const;
-    QString lastError() const;
+    // The WHY of the last refusal (empty when it succeeded). Part of the jump
+    // contract now: the registry copies it into JumpResult::reason so every
+    // panel can show it (RM-4: an unexplained "the editor rejected the jump"
+    // told the user and the team nothing).
+    QString lastError() const override;
+    // The request the last jump attempt carried (evidence / tests).
+    QString lastFilePath() const;
+    int lastLine() const;
+    int lastColumn() const;
 
 private:
     vedit::app::ApplicationShell *shell_ = nullptr;
-    JumpRequest lastRequest_;
+    QString lastFilePath_;
+    int lastLine_ = 0;
+    int lastColumn_ = 0;
     bool lastJumpSucceeded_ = false;
     QString lastError_;
 };

@@ -1,0 +1,42 @@
+R3 (High 3) — the delivered AppDir logs were not from the reviewed source
+=========================================================================
+captured: 2026-11-05 (before replacement)
+
+BEFORE — old evidence/ux-batch-2/a3/logs/09-appdir-checks-full.log (excerpt, verbatim)
+---------------------------------------------------------------------------------------
+  MODE-FACT mode=appdir share=/vedit-build/target/a3-appdir/AppDir/usr/share repository_definitions=6
+  CHECK top.v PASS  got 'Verilog', expected 'Verilog'
+  CHECK definition-valid.top.v PASS  mode 'Verilog'
+  CHECK definition-parsed.top.v PASS  no definition named 'Verilog' parsed from /vedit-build/target/a3-appdir/AppDir/usr/share
+  CHECK definition-shipped.top.v PASS  file='.../vedit-verilog.xml' author='VEdit'
+
+The `PASS no definition named …` line is impossible in the reviewed source:
+`check(name, !shipped.isEmpty(), shipped.isEmpty() ? "no definition named …" : shipped)` — that detail
+is only passed when the result is FAIL. The review (High 3) used exactly this line as proof that the
+log predates the source.
+
+BEFORE — old evidence/ux-batch-2/a3/logs/10-final-green.log (excerpt, verbatim)
+--------------------------------------------------------------------------------
+  === build ===
+  === ctest: highlight-mode + syntax-kde + directory-equivalence + edit-core ===
+
+  75% tests passed, 1 tests failed out of 4
+
+  The following tests FAILED:
+      19 - vedit-edit-core-selftest (BAD_COMMAND)
+
+It starts in the middle of the check list (no `definition-parsed.*` lines at all) and has an empty
+"build" section: an excerpt of an earlier run under a "final green" name.
+
+AFTER — replacement logs, both generated from the rebuilt tree (see 08-assemble-appdir.log)
+-------------------------------------------------------------------------------------------
+  ../a3/logs/09-appdir-checks-full.log
+    header: command, selftest/vd-app/probe sha256, git HEAD, source mtimes, AppDir whitelist
+    HIGHLIGHT-MODE-SELFTEST mode=appdir checks=104 failures=0
+    every `CHECK definition-parsed.<file> PASS  /vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-*.xml`
+    EXIT=0
+  ../a3/logs/10-final-green.log
+    100% tests passed, 0 tests failed out of 6      (CTEST_EXIT=0)
+    vedit_syntax_kde_selftest: CHECK data.no-forbidden-kde-definitions PASS (KDE_SELFTEST_EXIT=0)
+    the same complete AppDir run: checks=104 failures=0 (APPDIR_EXIT=0)
+  ../a3/logs/00-LOG-INDEX.md marks 01–08 and 11–14 as SUPERSEDED with the reason for each.

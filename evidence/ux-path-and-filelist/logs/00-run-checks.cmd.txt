@@ -1,0 +1,2 @@
+# cwd: /home/haroldzhao/MyProj/DshProj/VEdit
+# cmd: bash evidence/ux-path-and-filelist/run-checks.sh  (all logs 20-35; each log starts with its own command)

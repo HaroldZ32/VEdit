@@ -1,0 +1,25 @@
+[28/52] Automatic MOC for target vedit_editor_core
+[29/52] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/cross_boundary.cpp.o
+[30/52] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/document_io.cpp.o
+[31/52] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/undo_ops.cpp.o
+[32/52] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/goto_line.cpp.o
+[33/52] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/highlight_mode.cpp.o
+[34/52] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/editor_context_menu.cpp.o
+[35/52] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/atomic_save.cpp.o
+[36/52] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/editor_advanced.cpp.o
+[37/52] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/vedit_editor_core_autogen/mocs_compilation.cpp.o
+[38/52] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/fold_breadcrumb.cpp.o
+[39/52] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/fim_wiring.cpp.o
+[40/52] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/highlight_diagnosis.cpp.o
+[41/52] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/diagnostics_annotations.cpp.o
+[42/52] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/ktexteditor_provider.cpp.o
+[43/52] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/multi_cursor.cpp.o
+[44/52] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/signature_help.cpp.o
+[45/52] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/find_replace.cpp.o
+[46/52] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/edit_core_selftest.cpp.o
+[47/52] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/lsp_actions.cpp.o
+[48/52] Linking CXX static library src/app/editor-lane/libvedit_editor_core.a
+[49/52] Automatic MOC for target vedit-editor-multi-cursor-selftest
+[50/52] Building CXX object src/app/editor-lane/CMakeFiles/vedit-editor-multi-cursor-selftest.dir/vedit-editor-multi-cursor-selftest_autogen/mocs_compilation.cpp.o
+[51/52] Building CXX object src/app/editor-lane/CMakeFiles/vedit-editor-multi-cursor-selftest.dir/kernel/multi_cursor_selftest.cpp.o
+[52/52] Linking CXX executable src/app/editor-lane/vedit-editor-multi-cursor-selftest

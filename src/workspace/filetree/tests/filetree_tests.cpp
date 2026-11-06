@@ -7,6 +7,8 @@
 // any check fails, so ctest is red on a real defect.
 
 #include "file_kind.h"
+#include "file_status.h"
+#include "file_status_delegate.h"
 #include "file_tree_model.h"
 #include "file_tree_widget.h"
 #include "filetree_panel.h"
@@ -16,8 +18,11 @@
 #include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
+#include <QImage>
+#include <QPainter>
 #include <QSignalSpy>
 #include <QStringList>
+#include <QStyleOptionViewItem>
 #include <QTreeView>
 #include <QtTest/QTest>
 
@@ -26,6 +31,7 @@
 #include <cstdio>
 
 using vedit::workspace::FileKind;
+using vedit::workspace::FileStatusDotDelegate;
 using vedit::workspace::FileTreeModel;
 using vedit::workspace::FileTreeWidget;
 using vedit::workspace::fileKindForPath;
@@ -250,6 +256,17 @@ void testTreeAndInteraction(const QString &scratch)
     check("tree.alpha.folders-first",
           model->index(0, 0, alphaIndex).data(Qt::DisplayRole).toString() == QStringLiteral("deep"));
 
+    // FIX 1: the tooltip renders the display path (relative to the tree/workspace
+    // root), while PathRole keeps the absolute path the panel opens.
+    const QModelIndex deepIndex = model->indexForPath(root + QStringLiteral("/alpha/deep"), true);
+    check("tree.tooltip.relative",
+          deepIndex.data(Qt::ToolTipRole).toString().split(QLatin1Char('\n')).value(0)
+              == QStringLiteral("alpha/deep"),
+          deepIndex.data(Qt::ToolTipRole).toString());
+    check("tree.pathrole.absolute",
+          deepIndex.data(FileTreeModel::PathRole).toString()
+              == QFileInfo(root + QStringLiteral("/alpha/deep")).absoluteFilePath());
+
     widget.view()->setExpanded(alphaIndex, false);
     check("tree.collapse", !widget.view()->isExpanded(alphaIndex));
     widget.view()->setExpanded(alphaIndex, true);
@@ -370,6 +387,147 @@ void testLaziness(const QString &scratch)
     // The view stays responsive while the batches are handed out: at least one
     // event-loop turn runs between the first insert and the last one.
     check("lazy.ui-not-blocked", openMs < 500 && model->loadedRows() > 0);
+}
+
+// ---------------------------------------------------------------------------
+// RM-9: the filelist group + range-batched status repaint
+// ---------------------------------------------------------------------------
+
+void testFilelistGroupAndRepaint(const QString &scratch)
+{
+    const QString root = scratch + QStringLiteral("/filelist-group");
+    QDir().mkpath(root);
+    const QString inside = root + QStringLiteral("/inside.sv");
+    const QString other = root + QStringLiteral("/other.sv");
+    writeFile(inside);
+    writeFile(other);
+    const QString outsideDir = scratch + QStringLiteral("/outside-rm9");
+    QDir().mkpath(outsideDir);
+    const QString outside = outsideDir + QStringLiteral("/outside.sv");
+    writeFile(outside);
+
+    FileTreeWidget widget;
+    widget.resize(560, 640);
+    widget.show();
+    pump(40);
+    widget.openDirectory(root);
+    pump(80);
+    FileTreeModel *model = widget.model();
+    const QModelIndex rootIndex = model->index(0, 0, QModelIndex());
+    model->ensureFullyLoaded(rootIndex);
+
+    QHash<QString, int> statuses;
+    statuses.insert(inside, static_cast<int>(vedit::common::FileStatus::Clean));
+    statuses.insert(other, static_cast<int>(vedit::common::FileStatus::NotAnalyzed));
+    statuses.insert(outside, static_cast<int>(vedit::common::FileStatus::Error));
+    model->setFileStatusSource(
+        [statuses](const QString &path) { return statuses.value(path, 0); },
+        []() -> quint64 { return 7; });
+
+    // The project set contains the two inside files AND a filelist-only file
+    // that lives outside the tree's root. Only the outside one becomes a
+    // synthetic row: an inside member is already a normal row (no duplicate).
+    model->setFilelistFiles(QStringList{inside, other, outside});
+    model->ensureFullyLoaded(rootIndex);
+
+    int groupRow = -1;
+    for (int row = 0; row < model->rowCount(rootIndex); ++row) {
+        const QModelIndex index = model->index(row, 0, rootIndex);
+        if (index.data(Qt::DisplayRole).toString().startsWith(
+                QStringLiteral("From filelist"))) {
+            groupRow = row;
+            break;
+        }
+    }
+    check("rm9.group-present", groupRow >= 0);
+    check("rm9.group-is-last", groupRow == model->rowCount(rootIndex) - 1,
+          QStringLiteral("row=%1 rows=%2").arg(groupRow).arg(model->rowCount(rootIndex)));
+    check("rm9.group-is-dir", groupRow >= 0
+                                 && model->isDirectory(model->index(groupRow, 0, rootIndex)));
+    const QModelIndex group =
+        groupRow >= 0 ? model->index(groupRow, 0, rootIndex) : QModelIndex();
+    check("rm9.group-has-only-outside", group.isValid() && model->rowCount(group) == 1,
+          QStringLiteral("rows=%1").arg(group.isValid() ? model->rowCount(group) : -1));
+    const QModelIndex groupChild = group.isValid() ? model->index(0, 0, group) : QModelIndex();
+    check("rm9.group-child-path",
+          groupChild.isValid()
+              && groupChild.data(FileTreeModel::PathRole).toString()
+                     == QFileInfo(outside).absoluteFilePath());
+    check("rm9.group-child-status",
+          groupChild.isValid()
+              && groupChild.data(FileTreeModel::FileStatusRole).toInt()
+                     == static_cast<int>(vedit::common::FileStatus::Error));
+    // An inside member keeps its NORMAL row: the group must not duplicate it.
+    check("rm9.inside-has-normal-row", model->indexForPath(inside, true).isValid());
+
+    // The meaning of a mark is in the TOOLTIP, not only in the code.
+    const QModelIndex otherIndex = model->indexForPath(other, true);
+    const QString tooltip = otherIndex.data(Qt::ToolTipRole).toString();
+    check("rm9.tooltip-carries-meaning",
+          tooltip.contains(QStringLiteral("Not analysed")), tooltip);
+
+    // Paint the real delegate: a clean file gets the filled green dot, a
+    // not-analyzed file the HOLLOW grey ring (never the same mark).
+    const auto paintedColour = [&](const QModelIndex &index, const QColor &needle) {
+        QImage image(240, 24, QImage::Format_ARGB32);
+        image.fill(Qt::white);
+        QPainter painter(&image);
+        QStyleOptionViewItem option;
+        option.rect = QRect(0, 0, 240, 24);
+        option.state = QStyle::State_Enabled;
+        FileStatusDotDelegate delegate;
+        delegate.paint(&painter, option, index);
+        painter.end();
+        for (int y = 0; y < image.height(); ++y) {
+            for (int x = 0; x < image.width(); ++x) {
+                if (image.pixelColor(x, y) == needle) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+    const QColor green = vedit::common::fileStatusColor(
+        static_cast<int>(vedit::common::FileStatus::Clean));
+    const QColor grey = vedit::common::fileStatusColor(
+        static_cast<int>(vedit::common::FileStatus::NotAnalyzed));
+    check("rm9.delegate-filled-green", paintedColour(model->indexForPath(inside, true), green));
+    check("rm9.delegate-hollow-grey",
+          paintedColour(model->indexForPath(other, true), grey));
+    check("rm9.green-is-not-grey", green != grey);
+
+    // (e) a 1176-row listing repaints in DIRECTORY-RANGE batches: the number of
+    // dataChanged emissions must be bounded by loaded directories, not files.
+    const QString big = scratch + QStringLiteral("/big-rm9");
+    QDir().mkpath(big);
+    for (int index = 0; index < 1176; ++index) {
+        const QString name = QStringLiteral("module_%1.sv").arg(index, 5, 10, QLatin1Char('0'));
+        if (!writeFile(big + QLatin1Char('/') + name)) {
+            check("rm9.big-fixture", false, name);
+            return;
+        }
+    }
+    FileTreeWidget bigWidget;
+    bigWidget.model()->setBatchSize(2000); // the whole listing materialises in one batch
+    bigWidget.resize(560, 640);
+    bigWidget.show();
+    pump(20);
+    bigWidget.openDirectory(big);
+    pump(80);
+    FileTreeModel *bigModel = bigWidget.model();
+    const QModelIndex bigRoot = bigModel->index(0, 0, QModelIndex());
+    bigModel->ensureFullyLoaded(bigRoot);
+    check("rm9.big-rows", bigModel->rowCount(bigRoot) == 1176,
+          QString::number(bigModel->rowCount(bigRoot)));
+    QSignalSpy spy(bigModel, &QAbstractItemModel::dataChanged);
+    bigModel->setFileStatusSource(
+        [](const QString &) { return static_cast<int>(vedit::common::FileStatus::Clean); },
+        []() -> quint64 { return 1; });
+    check("rm9.big-repainted", bigModel->syncFileStatuses());
+    // 1 for the root row + 1 for the root's child range (and the single
+    // emission setFileStatusSource itself makes) - never one per file.
+    measure("rm9.big-data-changed-emissions", spy.count(), "");
+    check("rm9.big-range-batched", spy.count() <= 3, QString::number(spy.count()));
 }
 
 // ---------------------------------------------------------------------------
@@ -636,6 +794,7 @@ int main(int argc, char **argv)
         testRootStates(scratch);
         testTreeAndInteraction(scratch);
         testLaziness(scratch);
+        testFilelistGroupAndRepaint(scratch);
         testOperations(scratch);
         testPanelFactory(scratch);
     }

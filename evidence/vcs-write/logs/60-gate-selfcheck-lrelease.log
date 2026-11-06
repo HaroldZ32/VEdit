@@ -1,0 +1,10 @@
+CHECK root.open-folder-switches PASS /tmp/vedit-app-zPLvPW/project-a
+CHECK root.open-folder-broadcast PASS events=2
+CHECK root.open-folder-cancel PASS events=2
+CHECK root.switch.persisted PASS
+CHECK root.switch.persisted-value PASS
+APP-SHELL-SELFTEST ok=1 checks=290 failures=0 state=/tmp/vedit-app-zPLvPW/state
+selfcheck_pipe=0
+Updating '/tmp/vedit.ts.qm'...
+    Generated 607 translation(s) (607 finished and 0 unfinished)
+lrelease=0

@@ -1,0 +1,39 @@
+R4 doc nits — before/after excerpts (the files themselves are the artifact; this is the diff record)
+=====================================================================================================
+captured: 2026-11-05
+
+R4(a) evidence/ux-batch-2/a3/README.md §0 — "ctest 全绿" was false
+  BEFORE: "AppDir 断言 **86 checks / 0 failures**，ctest 全绿，F2 隔离脚本修复后 **6 pass / 0 fail**。"
+          (The delivered logs said otherwise: logs/10 old = "75% tests passed, 1 tests failed out of 4"
+           with vedit-edit-core-selftest BAD_COMMAND; logs/13 = "83% tests passed, 1 tests failed out
+           of 6" with vedit-app-syntax-startup (SEGFAULT).)
+  AFTER : §0 now states the real numbers for both delivered runs (75% / 5-of-6 + SEGFAULT) and the
+          current rebuilt numbers (ctest 6/6; AppDir 104/0; F2 11/0; selfcheck 22 PASS / 0 FAIL).
+          The per-row table in §3 was rewritten to point at the current logs and marks the historical
+          rows as such.
+
+R4(b) resources/syntax/README.md — wrong cross-reference
+  BEFORE: "the sha256 of each reference file is registered in `THIRD_PARTY_NOTICES.md` §9.4"
+  AFTER : "... §9.1.1" (the A3 table; §9.4 is "范围与复核").
+
+R4(c) VHDL upstream-licence rationale — "unlicensed" was wrong
+  BEFORE (resources/syntax/README.md): "vhdl.xml carries **no licence statement at all** (the same
+          situation that bans `verilog.xml`)"
+  BEFORE (THIRD_PARTY_NOTICES.md §9.1.1): "KDE `vhdl.xml` **没有任何许可声明** … 与已被禁运的 KDE
+          `verilog.xml` 同类" and "`vhdl.xml` = 未声明**不可用**"
+  AFTER : both files state that the file has no IN-FILE licence statement but the Debian copyright
+          file records `data/syntax/vhdl.xml` in the MIT block (evidence/ux-batch-2/a3/raw/
+          debian-kf6-copyright.txt:136) and upstream says contributions are MIT; the files stay
+          self-authored LGPL-2.1-or-later, and the "adapted → upstream licence" clause is kept
+          (vhdl MIT / markdown GPL-BSD / tcl BSD). The A3 README §2.1/§2.2 was corrected the same way.
+
+R4(f) `embargo_misfire` — disclosure kept and made explicit next to the claim
+  BEFORE (a3 README §4 item 3): described the branch as "未被执行" but did not tie the limitation to
+          the positive claim.
+  AFTER : item 3 now says the "three new files are not false-rejected" conclusion rests ONLY on the
+          positive all-files predicate (`forbidden-none`), that the `embargo_misfire` branch itself has
+          no negative control, and why (a fixture would require keeping a banned KDE file). The repair
+          README repeats this under "What this repair could NOT prove".
+
+R4(d)/(e) have executable before/after evidence in 06-r4d-extension-drift.log and
+05-r4e-vhdl-folding.log.

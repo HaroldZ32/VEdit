@@ -1,0 +1,112 @@
+# batch 6b: bundled svn working-copy cycle inside the pinned build image
+container: CentOS Linux release 7.9.2009 (Core)
+glibc: ldd (GNU libc) 2.17
+svn=1.14.5
+svnadmin=1.14.5
+wrapper runs under: #!/bin/sh
+
+$ /vedit-build/build/vcs-tools/svnadmin create repo
+  exit=0
+
+$ /vedit-build/packaging/runtime/out/AppDir/bin/svn checkout -q file:///tmp/c6b/repo wc
+  exit=0
+
+$ /vedit-build/packaging/runtime/out/AppDir/bin/svn add a.sv
+A         a.sv
+  exit=0
+
+$ /vedit-build/packaging/runtime/out/AppDir/bin/svn commit -q -m clean container base
+  exit=0
+
+$ /vedit-build/packaging/runtime/out/AppDir/bin/svn status
+  exit=0
+
+$ /vedit-build/packaging/runtime/out/AppDir/bin/svn info --xml
+<?xml version="1.0" encoding="UTF-8"?>
+<info>
+<entry
+   revision="0"
+   kind="dir"
+   path=".">
+<url>file:///tmp/c6b/repo</url>
+<relative-url>^/</relative-url>
+<repository>
+<root>file:///tmp/c6b/repo</root>
+<uuid>02889bf5-3326-4580-a186-9499f57e66ca</uuid>
+</repository>
+<wc-info>
+<wcroot-abspath>/tmp/c6b/wc</wcroot-abspath>
+<schedule>normal</schedule>
+<depth>infinity</depth>
+</wc-info>
+<commit
+   revision="0">
+<date>2026-11-04T04:54:26.549082Z</date>
+</commit>
+</entry>
+</info>
+  exit=0
+
+$ /vedit-build/packaging/runtime/out/AppDir/bin/svn status
+M       a.sv
+  exit=0
+
+$ /vedit-build/packaging/runtime/out/AppDir/bin/svn diff --internal-diff a.sv
+Index: a.sv
+===================================================================
+--- a.sv	(revision 1)
++++ a.sv	(working copy)
+@@ -1,2 +1,3 @@
+ module a;
++// changed
+ endmodule
+  exit=0
+
+$ /vedit-build/packaging/runtime/out/AppDir/bin/svn revert a.sv
+Reverted 'a.sv'
+  exit=0
+
+$ /vedit-build/packaging/runtime/out/AppDir/bin/svn status
+  exit=0
+
+$ /vedit-build/packaging/runtime/out/AppDir/bin/svn checkout -q file:///tmp/c6b/repo wc2
+  exit=0
+
+$ /vedit-build/packaging/runtime/out/AppDir/bin/svn add b.sv
+A         b.sv
+  exit=0
+
+$ /vedit-build/packaging/runtime/out/AppDir/bin/svn commit -q -m second working copy
+  exit=0
+
+$ /vedit-build/packaging/runtime/out/AppDir/bin/svn update
+Updating '.':
+A    b.sv
+Updated to revision 2.
+  exit=0
+
+$ /vedit-build/packaging/runtime/out/AppDir/bin/svn status
+  exit=0
+
+$ /vedit-build/packaging/runtime/out/AppDir/bin/svn remove b.sv
+D         b.sv
+  exit=0
+
+$ /vedit-build/packaging/runtime/out/AppDir/bin/svn status
+D       b.sv
+  exit=0
+
+$ /vedit-build/packaging/runtime/out/AppDir/bin/svn commit -q -m remove b
+  exit=0
+
+$ /vedit-build/packaging/runtime/out/AppDir/bin/svn log -q file:///tmp/c6b/repo
+------------------------------------------------------------------------
+r3 | root | 2026-11-04 04:54:26 +0000 (Wed, 04 Nov 2026)
+------------------------------------------------------------------------
+r2 | root | 2026-11-04 04:54:26 +0000 (Wed, 04 Nov 2026)
+------------------------------------------------------------------------
+r1 | root | 2026-11-04 04:54:26 +0000 (Wed, 04 Nov 2026)
+------------------------------------------------------------------------
+  exit=0
+
+result=PASS

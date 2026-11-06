@@ -1,0 +1,225 @@
+entries=182
+found=182 missing=0
+
+placeholder-set mismatches among the 182: 0
+accelerator '&' presence mismatches among the 182: 0
+
+--- all 182 (n | source | translation) ---
+  1 | Go to Definition is unavailable here: %1 - Ctrl+click now behaves like a plain click | 此处无法转到定义：%1——Ctrl+click 现在与普通单击相同
+  2 | No project open — open a folder to build the module catalog. | 未打开工程——请打开文件夹以构建模块目录。
+  3 | module catalog: retrying after the project model… | 模块目录：工程模型就绪后重试…
+  4 | Empty state: no module catalog yet. Open a project and press Refresh. | 空状态：尚无模块目录。请打开工程并按“刷新”。
+  5 | Interface | 接口
+  6 | Empty state: the focused module's ports appear here once the module catalog is ready. | 空状态：模块目录就绪后，焦点模块的端口将显示在此处。
+  7 | this build has no Rust service layer (vd-ffi), so the module catalog cannot run | 此构建不含 Rust 服务层（vd-ffi），因此模块目录无法运行
+  8 | no project root: open a folder or start vedit-app with --project <dir> | 无工程根目录：请打开文件夹，或以 --project <dir> 启动 vedit-app
+  9 | project expansion was rejected: %1 | 工程展开被拒绝：%1
+ 10 | the project has no source files, so there is no module catalog to build | 此工程没有源文件，因此没有可构建的模块目录
+ 11 | module catalog was rejected: %1 | 模块目录被拒绝：%1
+ 12 | cataloguing %1 project file(s)… | 正在编目 %1 个工程文件…
+ 13 | the module catalog service did not answer within 30 s | 模块目录服务在 30 秒内没有响应
+ 14 | project expansion failed: %1 | 工程展开失败：%1
+ 15 | module catalog failed: %1 | 模块目录失败：%1
+ 16 | unknown error | 未知错误
+ 17 | Hover · %1 | 悬停 · %1
+ 18 | checking whether the engine can fix this… | 正在检查引擎能否修复…
+ 19 | The fix could not be applied: the document refused the edit (is it read-only?) | 无法应用修复：文档拒绝了此次编辑（是否为只读？）
+ 20 | Fixed %1 with verible-verilog-lint (one undo reverts it) | 已用 verible-verilog-lint 修复 %1（一次撤销即可还原）
+ 21 | Rename is not available: %1 | 无法使用重命名：%1
+ 22 | Rename needs the cursor on a symbol (line %1, column %2 has none) | 重命名需要光标位于符号上（第 %1 行第 %2 列没有符号）
+ 23 | Rename is not possible here: %1 | 此处无法重命名：%1
+ 24 | Rename %1 | 重命名 %1
+ 25 | %1 refused the rename request | %1 拒绝了重命名请求
+ 26 | Rename was refused: %1 | 重命名被拒绝：%1
+ 27 | The project file set is still loading — try again in a moment | 工程文件集仍在加载——请稍后再试
+ 28 | Project lint failed: %1 | 工程 lint 失败：%1
+ 29 | Automatic project lint did not start: %1 | 自动工程 lint 未启动：%1
+ 30 | Double-click a port: jump to its declaration. Ctrl+double-click: jump to this module's instantiation statement. The module catalog has no per-connection position, so Ctrl+double-click targets the instance statement, not the connected port. | 双击端口：跳转到其声明。Ctrl+双击：跳转到本模块的例化语句。模块目录没有逐连接的位置信息，因此 Ctrl+双击定位到例化语句，而不是被连接的端口。
+ 31 | Name | 名称
+ 32 | Direction | 方向
+ 33 | Type | 类型
+ 34 | Width | 位宽
+ 35 | Double-click a port for its declaration; Ctrl+double-click for the instantiation statement. | 双击端口查看其声明；Ctrl+双击查看例化语句。
+ 36 | No module catalog yet: open a project and press Refresh. | 尚无模块目录：请打开工程并按“刷新”。
+ 37 | No modules found: slang reported no module definitions for this project. | 未找到模块：slang 未报告此工程的任何模块定义。
+ 38 | No focused module — select a module in the Module Tree, or put the caret inside a module definition. | 没有焦点模块——请在模块树中选择一个模块，或将光标置于模块定义内。
+ 39 | Module %1 · %2 port(s) | 模块 %1 · %2 个端口
+ 40 | Packed width derived from `%1` | 位宽由 `%1` 推导
+ 41 | %1 · double-click: jump to the port declaration; Ctrl+double-click: jump to this module's instantiation statement | %1 · 双击：跳转到端口声明；Ctrl+双击：跳转到本模块的例化语句
+ 42 | port %1 has no declaration position in the catalog, so nothing was opened | 端口 %1 在模块目录中没有声明位置，因此未打开任何内容
+ 43 | port %1 declaration | 端口 %1 的声明
+ 44 | no instantiation of %1 was catalogued: it is a design top, so there is no instance statement to jump to | 未编目到 %1 的任何例化：它是设计顶层，因此没有可跳转的实例语句
+ 45 | %1 · %2 · %3 | %1 · %2 · %3
+ 46 | instantiation chooser cancelled | 已取消例化选择
+ 47 | the instantiation in %1 has no source position in the catalog | %1 中的例化在模块目录中没有源位置
+ 48 | instantiation of %1 in %2 | %1 在 %2 中的例化
+ 49 | %1: no jump target is registered (the editor lane is not installed), so nothing was opened | %1：未注册跳转目标（未安装编辑器 lane），因此未打开任何内容
+ 50 | %1: the editor rejected the jump to %2 | %1：编辑器拒绝了跳转到 %2 的请求
+ 51 | %1: the jump request (%2) was refused | %1：跳转请求（%2）被拒绝
+ 52 | verible-verilog-lint was not found: no autofix is possible | 未找到 verible-verilog-lint：无法自动修复
+ 53 | the fixed copy could not be read back | 无法读回修复后的副本
+ 54 | the lint tool crashed during autofix | lint 工具在自动修复期间崩溃
+ 55 | this diagnostic carries no rule id, so no autofix can be selected | 此诊断没有规则 id，因此无法选择自动修复
+ 56 | no temporary directory is available | 没有可用的临时目录
+ 57 | the temporary copy could not be written | 无法写入临时副本
+ 58 | the lint tool could not be started: %1 | 无法启动 lint 工具：%1
+ 59 | the autofix run timed out | 自动修复运行超时
+ 60 | the lint tool could not be started | 无法启动 lint 工具
+ 61 | Error | 错误
+ 62 | Warning | 警告
+ 63 | Information | 信息
+ 64 | Hint | 提示
+ 65 | Diagnostic | 诊断
+ 66 | this backend offers no autofix for this diagnostic | 此后端不为此诊断提供自动修复
+ 67 | Checking for an automatic fix… | 正在检查自动修复…
+ 68 | No automatic fix: %1 | 无自动修复：%1
+ 69 | 修复 | 修复
+ 70 | <a href="jump">⚠ %1 project error(s) — click to jump</a> | <a href="jump">⚠ %1 个工程错误——点击跳转</a>
+ 71 | The automatic project lint found %1 error(s). Each click jumps to the next one. | 自动工程 lint 发现 %1 个错误。每次点击跳转到下一个。
+ 72 | Project lint errors | 工程 lint 错误
+ 73 | The project lint reported %1 error(s). Double-click one to jump to it. | 工程 lint 报告了 %1 个错误。双击其中一条即可跳转。
+ 74 | module catalog: %1 | 模块目录：%1
+ 75 | no module catalog yet | 尚无模块目录
+ 76 | %1 · %2 module(s) · %3 top(s) · %4 ms · %5 KiB peak | %1 · %2 个模块 · %3 个顶层 · %4 ms · %5 KiB 峰值
+ 77 |  · ⚠ %1 |  · ⚠ %1
+ 78 | the ABI reported no type string for this port | ABI 未报告此端口的类型字符串
+ 79 | the type `%1` has an unclosed packed dimension | 类型 `%1` 存在未闭合的打包维度
+ 80 | the packed range `[%1]` in `%2` is not a literal msb:lsb pair, so the width cannot be derived | `%2` 中的打包范围 `[%1]` 不是字面量 msb:lsb 对，因此无法推导位宽
+ 81 | the packed range `[%1]` in `%2` is too large to represent | `%2` 中的打包范围 `[%1]` 过大，无法表示
+ 82 | the packed dimensions in `%1` exceed the supported width | `%1` 中的打包维度超出支持的位宽
+ 83 | depth limit %1 reached — this module's children are not expanded | 已达到深度上限 %1——此模块的子模块未展开
+ 84 | the module tree was truncated at %1 rows | 模块树在 %1 行处被截断
+ 85 | cycle: %1 is already an ancestor of this row — not expanded | 循环：%1 已是本行的祖先——未展开
+ 86 | no module definition was catalogued for `%1` | 未为 `%1` 编目到模块定义
+ 87 | cycle: %1 | 循环：%1
+ 88 | depth limit (%1) reached | 已达深度上限（%1）
+ 89 | tree truncated (%1 rows) | 树已截断（%1 行）
+ 90 | Re-run the module catalog for the whole project | 为整个工程重新运行模块目录
+ 91 | Filter modules… | 过滤模块…
+ 92 | Module | 模块
+ 93 | Instantiations | 例化次数
+ 94 | Definition | 定义位置
+ 95 | nothing to refresh: no catalog client | 无可刷新内容：没有模块目录客户端
+ 96 | No top module: every catalogued module is instantiated by another module, so the hierarchy has no root. | 无顶层模块：所有已编目的模块都被其他模块例化，因此层次结构没有根。
+ 97 | \nroot: %1 | 
+根目录：%1
+ 98 | Module tree ready — double-click a module to open its declaration. | 模块树就绪——双击模块即可打开其声明。
+ 99 | Double-click: open this module's declaration | 双击：打开此模块的声明
+100 | this marker row has no location | 此标记行没有位置
+101 | %1 has no definition position in the module catalog, so nothing was opened | %1 在模块目录中没有定义位置，因此未打开任何内容
+102 | %1 definition | %1 的定义
+103 | replace is unavailable: this build does not link the atomic save path | 替换不可用：此构建未链接原子保存路径
+104 | replace refused: the operation has no query, so the ranges cannot be verified; nothing was written | 替换被拒绝：该操作没有查询，无法校验范围；未写入任何内容
+105 | replace refused: the hit list has no frozen scan identity; nothing was written | 替换被拒绝：命中列表没有冻结的扫描标识；未写入任何内容
+106 | replace: %1: line %2 belongs to a different search; nothing was written to that file (run the search again) | 替换：%1：第 %2 行属于另一次搜索；该文件未写入任何内容（请重新搜索）
+107 | replace: %1: line %2 is not covered by the frozen scan snapshot; nothing was written to that file (run the search again) | 替换：%1：第 %2 行不在冻结的扫描快照范围内；该文件未写入任何内容（请重新搜索）
+108 | replace: %1: line %2: the document was written while the scan was running, so the hit positions may be stale; nothing was written to that file (run the search again) | 替换：%1：第 %2 行：扫描运行期间文档被写入，命中位置可能已失效；该文件未写入任何内容（请重新搜索）
+109 | replace: %1: line %2: the document changed after the scan (size or modification time); nothing was written to that file (run the search again) | 替换：%1：第 %2 行：扫描之后文档发生变化（大小或修改时间）；该文件未写入任何内容（请重新搜索）
+110 | replace: %1: line %2: the document changed while it was being read; nothing was written to that file (run the search again) | 替换：%1：第 %2 行：读取期间文档发生变化；该文件未写入任何内容（请重新搜索）
+111 | Current File | 当前文件
+112 | Whole Project | 整个工程
+113 | Search this document, or hand the query to the Search panel | 搜索本文档，或将查询交给搜索面板
+114 | Project replace runs from the Search panel | 整个工程的替换在搜索面板中执行
+115 | Whole project → Search panel | 整个工程 → 搜索面板
+116 | Type a query to search the project | 输入查询以搜索整个工程
+117 | Whole project: searching in the Search panel | 整个工程：正在搜索面板中搜索
+118 | Whole project: open the Search panel to search the project | 整个工程：打开搜索面板以搜索整个工程
+119 | Whole words | 全词匹配
+120 | Regular expression (project-wide: RE2 style, no backreferences or lookaround) | 正则表达式（全工程：RE2 风格，不支持反向引用和环视）
+121 | Current File | 当前文件
+122 | Whole Project | 整个工程
+123 | Search the active document or the whole project | 搜索当前文档或整个工程
+124 | Replace with | 替换为
+125 | Replace | 替换
+126 | Replace the current match and advance to the next one | 替换当前匹配并前进到下一个
+127 | Replace All | 全部替换
+128 | Replace every match (asks for confirmation with the file and hit counts first) | 替换所有匹配（先以文件和命中数请求确认）
+129 | A replace is still running, so the Ctrl+F hand-off was not applied. Wait for it to finish and search again. | 替换仍在进行中，因此未应用 Ctrl+F 交接。请等待其完成后再重新搜索。
+130 | A replace is still running, so the search was not started. Wait for it to finish and run the search again. | 替换仍在进行中，因此未启动搜索。请等待其完成后再运行搜索。
+131 | Counting matches… | 正在统计匹配数…
+132 | No current file. Open a document or choose Whole Project. | 无当前文件。请打开文档或选择“整个工程”。
+133 | Replace All refused: the query or options changed while the counting scan was running; nothing was replaced. Run the search and Replace All again. | 全部替换被拒绝：统计扫描运行期间查询或选项发生变化；未替换任何内容。请重新搜索后再执行全部替换。
+134 | the counting scan was cancelled | 统计扫描已取消
+135 | Replace All refused: %1 | 全部替换被拒绝：%1
+136 | Replace All refused: the result limit (%1) was reached; narrow the query first | 全部替换被拒绝：已达到结果上限（%1）；请先缩小查询范围
+137 | Replace All refused: the counting scan stopped at the %1 ms time budget, so the hit list is incomplete; narrow the query first | 全部替换被拒绝：统计扫描在 %1 ms 时间预算处停止，命中列表不完整；请先缩小查询范围
+138 | Replace All refused: "%1" was written while the counting scan was running, so the hit positions may be stale; nothing was replaced. Run the search and Replace All again. | 全部替换被拒绝：“%1”在统计扫描运行期间被写入，命中位置可能已失效；未替换任何内容。请重新搜索后再执行全部替换。
+139 | The query or options changed while the search was running; run the search again. | 搜索运行期间查询或选项发生变化；请重新搜索。
+140 | The query or options changed; run the search again. | 查询或选项已变化；请重新搜索。
+141 | the result list has no frozen scan identity; run the search again before replacing | 结果列表没有冻结的扫描标识；替换前请重新搜索
+142 | the operation has no query, so the ranges cannot be verified; refusing to write without verification | 该操作没有查询，无法校验范围；未经验证拒绝写入
+143 | the query is empty, so the ranges cannot be verified; run the search again before replacing | 查询为空，无法校验范围；替换前请重新搜索
+144 | the query or match options changed since the scan; run the search again before replacing | 自扫描以来查询或匹配选项已变化；替换前请重新搜索
+145 | the search scope or options changed since the scan; run the search again before replacing | 自扫描以来搜索范围或选项已变化；替换前请重新搜索
+146 |  Nothing was replaced. |  未替换任何内容。
+147 |  %1 document(s) were already saved and remain on disk; nothing was replaced. |  已保存的 %1 个文档仍保留在磁盘上；未替换任何内容。
+148 | the editor bridge is unavailable, so the unsaved buffer state cannot be checked | 编辑器桥接不可用，无法检查未保存的缓冲区状态
+149 | "%1": %2 | “%1”：%2
+150 | Replace All refused: the editor bridge is unavailable, so the unsaved-buffer state cannot be checked. | 全部替换被拒绝：编辑器桥接不可用，无法检查未保存缓冲区状态。
+151 | Replace All refused: an unsaved editor document could not be saved: %1 | 全部替换被拒绝：有未保存的编辑器文档无法保存：%1
+152 | The %1 document(s) already saved remain on disk; nothing was replaced. | 已保存的 %1 个文档仍保留在磁盘上；未替换任何内容。
+153 | Nothing was replaced. | 未替换任何内容。
+154 | No match to replace; run the search first. | 没有可替换的匹配；请先运行搜索。
+155 | Replace refused: %1 | 替换被拒绝：%1
+156 | Replace refused: this row belongs to an older search; run the search again before replacing. | 替换被拒绝：此行属于较早的搜索；替换前请重新搜索。
+157 | The result list is out of date; run the search again. | 结果列表已过期；请重新搜索。
+158 | Replace refused: this match reports no replaceable range. | 替换被拒绝：此匹配没有报告可替换范围。
+159 | Replace refused: "%1" is not covered by the frozen scan snapshot; nothing was written (run the search again). | 替换被拒绝：“%1”不在冻结的扫描快照范围内；未写入任何内容（请重新搜索）。
+160 | Replace refused: "%1" was written while the search was running, so this match may have moved; nothing was written. Run the search again. | 替换被拒绝：“%1”在搜索运行期间被写入，此匹配可能已移动；未写入任何内容。请重新搜索。
+161 | Replace refused: "%1" changed after the search; nothing was written. Run the search again. | 替换被拒绝：“%1”在搜索之后发生变化；未写入任何内容。请重新搜索。
+162 | Replace refused: the unsaved edits in "%1" moved line %2, so this match is no longer where the search found it; the document was not saved and nothing was replaced. Save it and run the search again. | 替换被拒绝：“%1”中未保存的编辑移动了第 %2 行，此匹配已不在搜索找到的位置；该文档未保存，也未替换任何内容。请保存后重新搜索。
+163 | Replace refused: "%1" has unsaved changes that could not be saved: %2 | 替换被拒绝：“%1”有无法保存的未保存更改：%2
+164 | Replace All: no match to replace. | 全部替换：没有可替换的匹配。
+165 | Replace All cancelled; | 全部替换已取消；
+166 |  nothing was written. | 未写入任何内容。
+167 | the query or options changed while the confirmation was open | 确认对话框打开期间查询或选项发生变化
+168 | Replace All refused: %1; nothing was replaced. Run the search and Replace All again. | 全部替换被拒绝：%1；未替换任何内容。请重新搜索后再执行全部替换。
+169 | Replace "%1" with "%2"?\n\n%3 occurrence(s) in %4 file(s) will be replaced. | 将“%1”替换为“%2”？
+
+将替换 %4 个文件中的 %3 处。
+170 | \n\n%1 affected unsaved editor document(s) were saved first: %2 | 
+
+已先保存 %1 个受影响的未保存编辑器文档：%2
+171 | Replace refused: the operation has no query, so the ranges cannot be verified; nothing was written. | 替换被拒绝：该操作没有查询，无法校验范围；未写入任何内容。
+172 | Replace refused: %1; nothing was written. Run the search again. | 替换被拒绝：%1；未写入任何内容。请重新搜索。
+173 | Replace refused: a hit does not belong to the scan being replaced; nothing was written. | 替换被拒绝：有命中不属于正在替换的扫描；未写入任何内容。
+174 | Replace is unavailable: this build does not link the atomic save path. | 替换不可用：此构建未链接原子保存路径。
+175 | Replacing… | 正在替换…
+176 | Replacing %1 occurrence(s)… | 正在替换 %1 处…
+177 | Replaced %1 occurrence(s) in %2 file(s). | 已替换 %2 个文件中的 %1 处。
+178 | %1 file(s) skipped (not valid UTF-8 or unreadable). | 已跳过 %1 个文件（非有效 UTF-8 或无法读取）。
+179 | Replace cancelled; %1 occurrence(s) in %2 file(s) were written. | 替换已取消；已写入 %2 个文件中的 %1 处。
+180 | Replace failed after writing %1 occurrence(s) in %2 file(s): %3 | 在写入 %2 个文件中的 %1 处之后替换失败：%3
+181 | Replace failed: %1 | 替换失败：%1
+182 | %1 file(s) changed during replace — not reloaded: %2 | %1 个文件在替换期间发生变化——未重新加载：%2
+
+--- terminology rows ---
+'替换': 65 translation(s); samples: [VEdit] 'replace-all replaced %1 of %2 matches'->'全部替换：已替换 %2 个匹配中的 %1 个'; [VEdit] 'KTextEditor refused to replace %1:%2'->'KTextEditor 拒绝替换 %1:%2'; [VEdit] 'replace is unavailable: this build does not link the atomic save path'->'替换不可用：此构建未链接原子保存路径'
+'全部替换': 13 translation(s); samples: [VEdit] 'replace-all replaced %1 of %2 matches'->'全部替换：已替换 %2 个匹配中的 %1 个'; [vedit::editor::FindReplaceBar] 'Replace All'->'全部替换'; [vedit::workspace::search::SearchPanel] 'Replace All'->'全部替换'
+'修复': 14 translation(s); samples: [VEdit] 'No symbols — the outline backend is missing (%1). See the status line above for the one-line fix.'->'没有符号——缺少大纲后端（%1）。上方状态行给出一行修复方法。'; [VEdit] 'checking whether the engine can fix this…'->'正在检查引擎能否修复…'; [VEdit] 'The fix could not be applied: the document refused the edit (is it read-only?)'->'无法应用修复：文档拒绝了此次编辑（是否为只读？）'
+'名称': 19 translation(s); samples: [VEdit] 'KSyntaxHighlighting theme name.'->'KSyntaxHighlighting 主题名称。'; [VEdit] 'Name must not be empty'->'名称不能为空'; [VEdit] "'%1' is a reserved name"->'“%1”是保留名称'
+'方向': 2 translation(s); samples: [VEdit] 'split node without a valid orientation'->'分割节点缺少有效方向'; [VEdit] 'Direction'->'方向'
+'类型': 5 translation(s); samples: [VEdit] "unknown layout node type '%1'"->'未知布局节点类型“%1”'; [VEdit] 'the SLANG job id does not fit the backend ticket type'->'SLANG 作业 id 不适合后端凭据类型'; [VEdit] 'Type'->'类型'
+'位宽': 4 translation(s); samples: [VEdit] 'Width'->'位宽'; [VEdit] 'Packed width derived from `%1`'->'位宽由 `%1` 推导'; [VEdit] 'the packed range `[%1]` in `%2` is not a literal msb:lsb pair, so the width cannot be derived'->'`%2` 中的打包范围 `[%1]` 不是字面量 msb:lsb 对，因此无法推导位宽'
+'模块': 39 translation(s); samples: [VEdit] 'No project open — open a folder to build the module catalog.'->'未打开工程——请打开文件夹以构建模块目录。'; [VEdit] 'module catalog: retrying after the project model…'->'模块目录：工程模型就绪后重试…'; [VEdit] 'Module Tree'->'模块树'
+'例化次数': 1 translation(s); samples: [VEdit] 'Instantiations'->'例化次数'
+'定义位置': 2 translation(s); samples: [VEdit] 'Definition'->'定义位置'; [VEdit] '%1 has no definition position in the module catalog, so nothing was opened'->'%1 在模块目录中没有定义位置，因此未打开任何内容'
+'接口': 1 translation(s); samples: [VEdit] 'Interface'->'接口'
+'界面': 18 translation(s); samples: [VEdit] 'Save As refused (headless): %1 exists and cannot be overwritten without confirmation'->'另存为已被拒绝（无界面）：%1 已存在，未经确认无法覆盖'; [VEdit] 'Confirmation is unavailable headless; nothing was written.'->'无界面环境无法确认，未写入任何内容。'; [vedit::app::ApplicationShell] 'close refused (headless): %1 has unsaved changes'->'已拒绝关闭（无界面）：%1 有未保存的更改'
+
+--- key single rows ---
+  ('VEdit', 'Interface') -> '接口'
+  ('VEdit', 'Replace') -> None
+  ('VEdit', 'Replace All') -> None
+  ('VEdit', 'Module') -> '模块'
+  ('VEdit', 'Instantiations') -> '例化次数'
+  ('VEdit', 'Definition') -> '定义位置'
+  ('VEdit', 'Name') -> '名称'
+  ('VEdit', 'Direction') -> '方向'
+  ('VEdit', 'Type') -> '类型'
+  ('VEdit', 'Width') -> '位宽'
+  ('VEdit', 'Fix') -> None
+  ('VEdit', '修复') -> '修复'
+  ('VEdit', 'Save As failed: %1') -> '另存为失败：%1'
+  ('VEdit', 'Save As refused (headless): %1 exists and cannot be overwritten without confirmation') -> '另存为已被拒绝（无界面）：%1 已存在，未经确认无法覆盖'
+  ('vedit::app::ApplicationShell', 'Save As failed: %1') -> None

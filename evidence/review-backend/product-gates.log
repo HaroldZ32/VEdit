@@ -1,0 +1,16 @@
+=== rebuild product vedit-app ===
+product-build-exit=0
+[147/148] Building CXX object src/app/CMakeFiles/vedit-app.dir/main.cpp.o
+[148/148] Linking CXX executable src/app/vedit-app
+selfcheck-exit=0
+EDIT-CORE-SELFTEST ok=1 checks=67 failures=0
+APP-SHELL-SELFTEST ok=1 checks=245 failures=0 state=/tmp/vedit-app-lynzEo/state
+=== diagnostics/toolchain ctest subset ===
+    Start 34: vedit-diagnostics-product-seam
+4/5 Test #34: vedit-diagnostics-product-seam .........   Passed    6.17 sec
+    Start 35: vedit-toolchain-ux-selftest
+5/5 Test #35: vedit-toolchain-ux-selftest ............   Passed    3.11 sec
+
+100% tests passed, 0 tests failed out of 5
+
+Total Test time (real) =  14.36 sec

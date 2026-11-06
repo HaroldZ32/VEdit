@@ -1,0 +1,12 @@
+== AppRun --selfcheck under sh -x: the guarded translations export ==
+APPRUN_EXIT=0
+-- trace lines naming VEDIT_TRANSLATIONS_DIR --
+29:+ export VEDIT_TRANSLATIONS_DIR=/w/packaging/runtime/out/AppDir/bin/translations
+30:+ VEDIT_TRANSLATIONS_DIR=/w/packaging/runtime/out/AppDir/bin/translations
+-- product selfcheck tail --
+CHECK root.switch.persisted PASS
+CHECK root.switch.persisted-value PASS
+APP-SHELL-SELFTEST ok=1 checks=312 failures=0 state=/tmp/vedit-app-kKBDWd/state
+-- guard negative: explicit value must win --
+APPRUN2_EXIT=0
+explicit-export-count=0

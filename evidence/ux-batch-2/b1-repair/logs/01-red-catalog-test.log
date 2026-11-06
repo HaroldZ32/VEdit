@@ -1,0 +1,97 @@
+[94/96] Building CXX object src/app/workspace-lane-module_tree/CMakeFiles/vedit-module-tree-catalog-test.dir/vedit-module-tree-catalog-test_autogen/mocs_compilation.cpp.o
+[95/96] Building CXX object src/app/workspace-lane-module_tree/CMakeFiles/vedit-module-tree-catalog-test.dir/module_tree_catalog_test.cpp.o
+[96/96] Linking CXX executable src/app/workspace-lane-module_tree/vedit-module-tree-catalog-test
+ok   fixture.present — /vedit-build/src/workspace/module_tree/fixtures/ux-batch-2
+ok   slang.present — /vedit-build/build/slang/out/slang
+ok   state.temp-dir
+kf.sonnet.core: Sonnet: No speller backends available!
+ok   jump.product-target
+This plugin does not support propagateSizeHints()
+ok   shell.panels-present — tree=1 interface=1
+ok   shell.two-docks
+ok   shell.pane-present
+This plugin does not support propagateSizeHints()
+ok   catalog.answered
+ok   catalog.valid
+ok   catalog.module-count — modules=[consumer, orphan, reflink, shared, top_a, top_b]
+ok   catalog.sorted-and-interface-excluded — consumer, orphan, reflink, shared, top_a, top_b
+ok   catalog.no-interface-module
+ok   h1.probe.client-found
+ok   h1.probe.holder-found
+ok   h1.first-appearance.model-written
+FAIL h1.first-appearance.file-set — fileSet=7 modules=6
+FAIL h1.first-appearance.uses-seeded-set — modules=6
+FAIL h1.first-appearance.source-is-model — vd_project_expand_v2(/vedit-build/src/workspace/module_tree/fixtures/ux-batch-2)
+FAIL h1.first-appearance.rerun — runs 1 -> 1
+ok   h1.in-flight.run-started
+ok   h1.in-flight.model-written
+FAIL h1.in-flight.pending-observed — modelPending=0
+FAIL h1.in-flight.final-file-set — fileSet=6 modules=5 generation=2 runs=2
+FAIL h1.in-flight.final-tree-reflects-model — modules=5
+FAIL h1.in-flight.follow-up-run — runs 1 -> 2
+FAIL acceptance.i.roots-equal-is-top — roots=[top_a, top_b] tops=[orphan, top_a, top_b]
+FAIL acceptance.i.roots-fixture-set — top_a, top_b
+ok   acceptance.ii.shared-under-both-parents — top_a.u_shared, top_b.u_shared
+ok   acceptance.ii.distinct-instance-paths — top_a.u_shared, top_b.u_shared
+ok   acceptance.iv.only-module-rows — rows=6
+FAIL acceptance.iv.row-count — rows=6
+FAIL acceptance.iv.widget-row-count — rows=6
+ok   acceptance.iv.no-net-labels — top_a, shared, consumer, reflink, top_b, shared
+ok   panel.top-a-row
+This plugin does not support propagateSizeHints()
+ok   acceptance.v.focus-from-tree — top_a
+ok   acceptance.v.port-count — rows=3
+ok   acceptance.v.port-clk — clk / In / logic / 1
+ok   acceptance.v.port-pad — pad / InOut / 1
+ok   acceptance.v.port-y — y / Out / logic[3:0] / 4
+ok   acceptance.v.location-column — top_a.sv:1:27
+ok   acceptance.v.abi-limit-tooltip — Double-click a port: jump to its declaration. Ctrl+double-click: jump to this module's instantiation statement. The module catalog has no per-connection position, so Ctrl+double-click targets the instance statement, not the connected port.
+ok   acceptance.iii.top-a-catalogued
+ok   acceptance.iii.row-visible
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+search: jump opened '/vedit-build/src/workspace/module_tree/fixtures/ux-batch-2/top_a.sv' line=1 column=8 (cursor=1:8)
+ok   acceptance.iii.file-opened — /vedit-build/src/workspace/module_tree/fixtures/ux-batch-2/top_a.sv
+ok   acceptance.iii.ktexteditor-view
+ok   acceptance.iii.cursor-on-declaration — cursor=1:8 expected=1:8
+ok   acceptance.iii.declaration-text — module top_a (input logic clk, inout wire pad, output logic [3:0] y);
+ok   acceptance.focus.caret-view
+ok   acceptance.focus.caret-module — top_a
+ok   acceptance.focus.selection-beats-caret — shared
+ok   acceptance.vi.focus-top-a — top_a
+ok   acceptance.vi.port-row-visible
+search: jump opened '/vedit-build/src/workspace/module_tree/fixtures/ux-batch-2/top_a.sv' line=1 column=67 (cursor=1:67)
+ok   acceptance.vi.declaration-file — /vedit-build/src/workspace/module_tree/fixtures/ux-batch-2/top_a.sv
+ok   acceptance.vi.declaration-cursor — cursor=1:67 expected=1:67
+ok   acceptance.vi.top-b-instance-found — top_b.u_shared
+ok   acceptance.vi.shared-row
+ok   acceptance.vi.focus-shared — shared
+ok   acceptance.vi.shared-port-visible
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+search: jump opened '/vedit-build/src/workspace/module_tree/fixtures/ux-batch-2/top_b.sv' line=2 column=10 (cursor=2:10)
+ok   acceptance.vi.chooser-two-parents — candidates=2
+ok   acceptance.vi.chooser-parents — top_a, top_b
+ok   acceptance.vi.instantiation-file — /vedit-build/src/workspace/module_tree/fixtures/ux-batch-2/top_b.sv
+ok   acceptance.vi.instantiation-cursor — cursor=2 expected=2
+ok   acceptance.vi.chooser-count-observable — 2
+ok   acceptance.iii.shared-catalogued
+ok   acceptance.iii.shared-has-two-instance-sites — sites=2
+ok   acceptance.iii.shared-row-found
+ok   acceptance.iii.shared-row-visible
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+search: jump opened '/vedit-build/src/workspace/module_tree/fixtures/ux-batch-2/shared.sv' line=1 column=8 (cursor=1:8)
+ok   acceptance.iii.shared-file-opened — /vedit-build/src/workspace/module_tree/fixtures/ux-batch-2/shared.sv
+ok   acceptance.iii.shared-not-an-instance-file — /vedit-build/src/workspace/module_tree/fixtures/ux-batch-2/shared.sv
+ok   acceptance.iii.shared-ktexteditor-view
+ok   acceptance.iii.shared-cursor-on-definition — cursor=1:8 expected=1:8
+ok   acceptance.iii.shared-declaration-text — module shared (input logic a, output logic [3:0] y);
+SKIP screenshot — no screenshot path was requested
+This plugin does not support propagateSizeHints()
+ok   acceptance.root-change.tree-empty-state — No project open — open a folder to build the module catalog.
+ok   acceptance.root-change.interface-empty-state — No project open — open a folder to build the module catalog.
+ok   acceptance.root-change.in-flight-started
+ok   acceptance.root-change.in-flight-cancelled
+ok   acceptance.root-change.no-late-catalog
+ok   acceptance.root-change.no-stale-panel — No project open — open a folder to build the module catalog.
+ok   test.checks-ran — checks=78
+FAIL: 79 check(s), 12 failure(s)
+EXIT=1

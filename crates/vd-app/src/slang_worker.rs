@@ -91,6 +91,7 @@ fn failure_report(binary: &Option<PathBuf>, message: String) -> LintReport {
     LintReport {
         diagnostics: Vec::new(),
         total_diagnostics: 0,
+        dropped: 0,
         truncated: false,
         binary: vd_deeplint::BinaryResolution {
             chosen: binary.clone(),
@@ -102,6 +103,9 @@ fn failure_report(binary: &Option<PathBuf>, message: String) -> LintReport {
         stderr: String::new(),
         elapsed: std::time::Duration::ZERO,
         child_pid: None,
+        engine: vd_deeplint::LintEngine::Slang,
+        tool: "slang".to_string(),
+        stage: "run",
     }
 }
 

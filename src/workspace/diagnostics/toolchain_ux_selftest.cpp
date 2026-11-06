@@ -121,7 +121,7 @@ void missingScenario()
               && message.contains(QStringLiteral("build/slang/build.sh")),
           message);
     check("missing.message-once",
-          countOccurrences(message, QStringLiteral("Diagnostics unavailable")) == 1, message);
+          countOccurrences(message, QCoreApplication::translate("VEdit", "Diagnostics unavailable")) == 1, message);
     check("missing.probe-detail-separate",
           report.probeDetail().contains(QStringLiteral("probed"))
               && !message.contains(report.probeDetail()));

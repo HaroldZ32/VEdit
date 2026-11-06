@@ -1,0 +1,29 @@
+== GREEN 2026-11-04T17:56:03,797079996+08:00 ==
+CHECK PASS  apprun.syntax
+CHECK PASS  default.slang-bundled
+CHECK PASS  default.verible-bundled
+CHECK PASS  override.slang-preserved
+CHECK PASS  override.verible-preserved
+CHECK PASS  absent.slang-not-exported
+CHECK PASS  absent.verible-not-exported
+CHECK PASS  absent.slang-caller-preserved
+CHECK PASS  non-executable.slang-not-exported
+APPRUN-ENV-PROBE ok=1 checks=9 failures=0
+GREEN_EXIT=0
+== RED 2026-11-04T17:56:04,149508055+08:00 ==
+CHECK PASS  apprun.syntax
+CHECK PASS  default.slang-bundled
+CHECK PASS  default.verible-bundled
+CHECK FAIL  override.slang-preserved
+CHECK PASS  override.verible-preserved
+CHECK FAIL  absent.slang-not-exported
+CHECK PASS  absent.verible-not-exported
+CHECK FAIL  absent.slang-caller-preserved
+CHECK FAIL  non-executable.slang-not-exported
+APPRUN-ENV-PROBE ok=0 checks=9 failures=4
+RED-CONTROL probe exit=1 (non-zero expected)
+RED_EXIT=0
+== syntax ==
+APPRUN_SYNTAX_EXIT=0
+PROBE_SYNTAX_EXIT=0
+SELFCHECK_SYNTAX_EXIT=0

@@ -1,0 +1,7 @@
+CHECK find.real-focus.inner-widget PASS
+CHECK find.bar.ctrl-f-opens PASS
+CHECK find.bar.ctrl-h-replace-mode PASS
+CHECK find.f3-key-navigates PASS
+CHECK find.f3-key-hides-bar PASS
+CHECK find.shift-f3-key-navigates-back PASS
+SUMMARY checks=46 failures=0

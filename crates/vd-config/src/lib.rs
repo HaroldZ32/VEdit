@@ -43,6 +43,7 @@
 
 pub mod env;
 pub mod filelist;
+pub mod language;
 pub mod model;
 pub mod project;
 pub mod provenance;
@@ -59,6 +60,7 @@ use std::path::{Path, PathBuf};
 use anyhow::{Context, Result};
 
 pub use env::{Env, XdgDirs};
+pub use language::{Capability, LanguageSpec, LANGUAGES};
 pub use model::{
     Config, EditorConfig, FimConfig, FimProtocol, KeysConfig, ProjectSettings, UiConfig,
     VeribleConfig, DEFAULT_KEY_BINDINGS, DEFAULT_LANGUAGE, DEFAULT_THEME, KNOWN_BINDING_ACTIONS,

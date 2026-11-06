@@ -1,0 +1,7 @@
+# gate: clippy + fmt (final tree)
+collected_at: 2026-11-03T23:22:55+08:00
+   Compiling cbindgen v0.29.4
+   Compiling vd-ffi v0.1.1 (/vedit-build/crates/vd-ffi)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 3.46s
+clippy_exit=0
+fmt_exit=0

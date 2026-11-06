@@ -1,0 +1,4 @@
+SHOT OK evidence/i18n/shots/20-zh-ui.png 1400x900
+CASE zh language=zh_CN shot_rc=0 app_rc=0
+SHOT OK evidence/i18n/shots/21-en-ui.png 1400x900
+CASE en language=auto shot_rc=0 app_rc=0

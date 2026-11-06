@@ -1,0 +1,6 @@
+fixture=/tmp/verify-claims-selftest-3c_7o_8u  contexts=VEdit  messages=3
+ok   fragment-only (outside the call)   wrap=none       ts=fragment verified=ts-fragment-unwrapped claim=no
+ok   fragment+own-call                  wrap=own-call   ts=fragment verified=own-call+ts          claim=yes
+ok   own-call exact                     wrap=own-call   ts=exact    verified=own-call+ts          claim=yes
+ok   no-wrap                            wrap=none       ts=none     verified=no-wrap              claim=no
+4 cases, 0 failure(s)

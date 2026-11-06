@@ -1,0 +1,843 @@
+ M CMakeLists.txt
+ M THIRD_PARTY_NOTICES.md
+ M build/evidence/12-gates-image-build.log
+ M build/evidence/typecheck/00-run.txt
+ M build/evidence/typecheck/10-typecheck-image-build.log
+ M build/evidence/typecheck/11-typecheck-image-id.txt
+ M crates/vd-app/src/diagnostics.rs
+ M crates/vd-app/src/selftest.rs
+ M crates/vd-app/src/slang_worker.rs
+ M crates/vd-config/src/filelist.rs
+ M crates/vd-config/src/project.rs
+ M crates/vd-deeplint/src/binary.rs
+ M crates/vd-deeplint/src/lib.rs
+ M crates/vd-deeplint/src/service.rs
+ M crates/vd-ffi/include/vd_ffi.h
+ M crates/vd-ffi/src/capi.rs
+ M crates/vd-ffi/src/deeplint.rs
+ M crates/vd-ffi/src/lsp.rs
+ M crates/vd-ffi/src/project.rs
+ M crates/vd-ffi/src/settings.rs
+ M crates/vd-lsp/src/client.rs
+ M crates/vd-lsp/src/config.rs
+ M crates/vd-lsp/src/documents.rs
+ M crates/vd-lsp/src/lib.rs
+ M crates/vd-lsp/src/session.rs
+ M crates/vd-lsp/tests/buffer_change.rs
+ M crates/vd-settings/src/lib.rs
+ M docs/BUILD.md
+ M docs/USER_GUIDE.md
+ M evidence/ffi-abi/logs/10-rust-image.txt
+ M evidence/ffi-abi/logs/19-rust-stage-console.log
+ M evidence/ffi-abi/logs/20-cargo-build-release.log
+ M evidence/ffi-abi/logs/21-staticlib.txt
+ M evidence/ffi-abi/logs/22-rust-targets.txt
+ M evidence/ffi-abi/logs/23-cargo-test.log
+ M evidence/ffi-abi/logs/26-vd_ffi.h
+ M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+ M evidence/m0-build/build-logs/20-qt6-image-build.log
+ M evidence/m0-build/build-logs/21-qt6-image-id.txt
+ M evidence/m0-build/build-logs/31-qt6-configure.log
+ M evidence/m0-build/build-logs/32-qt6-build.log
+ M evidence/m0-build/build-logs/33-qt6-ctest.log
+ M evidence/m0-build/build-logs/34-qt6-elf.txt
+ M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+ M packaging/runtime/assemble-appdir.sh
+ M src/app/CMakeLists.txt
+ M src/app/app_shell.cpp
+ M src/app/app_shell.h
+ M src/app/command_registry.cpp
+ M src/app/editor_area.cpp
+ M src/app/editor_area.h
+ M src/app/editor_provider.cpp
+ M src/app/editor_provider.h
+ M src/app/main.cpp
+ M src/app/panel_registry.cpp
+ M src/app/session_store.cpp
+ M src/app/session_store.h
+ M src/app/theme_manager.cpp
+ M src/editor/CMakeLists.txt
+ M src/editor/fim/fim_backend.cpp
+ M src/editor/kernel/atomic_save.cpp
+ M src/editor/kernel/diagnostics_annotations.cpp
+ M src/editor/kernel/diagnostics_annotations.h
+ M src/editor/kernel/document_io.cpp
+ M src/editor/kernel/fim_wiring.cpp
+ M src/editor/kernel/find_replace.cpp
+ M src/editor/kernel/find_replace.h
+ M src/editor/kernel/fold_breadcrumb.cpp
+ M src/editor/kernel/fold_breadcrumb.h
+ M src/editor/kernel/goto_line.cpp
+ M src/editor/kernel/highlight_diagnosis.cpp
+ M src/editor/kernel/highlight_mode.cpp
+ M src/editor/kernel/ktexteditor_provider.cpp
+ M src/editor/kernel/ktexteditor_provider.h
+ M src/editor/kernel/multi_cursor.cpp
+ M src/editor/kernel/multi_cursor.h
+ M src/syntax/folding/ksyntax_fold_source.cpp
+ M src/syntax/folding/syntax_fold_source.cpp
+ M src/syntax/kde/ksyntax_data.cpp
+ M src/terminal/terminal_panel.cpp
+ M src/workspace/breadcrumb/CMakeLists.txt
+ M src/workspace/breadcrumb/syntax_breadcrumb_source.cpp
+ M src/workspace/diagnostics/CMakeLists.txt
+ M src/workspace/diagnostics/diagnostics_controller.cpp
+ M src/workspace/diagnostics/diagnostics_controller.h
+ M src/workspace/diagnostics/diagnostics_integration.cpp
+ M src/workspace/diagnostics/diagnostics_integration.h
+ M src/workspace/diagnostics/diagnostics_outline_model.cpp
+ M src/workspace/diagnostics/diagnostics_outline_model.h
+ M src/workspace/diagnostics/diagnostics_panel.cpp
+ M src/workspace/diagnostics/diagnostics_panel.h
+ M src/workspace/diagnostics/diagnostics_selftest.cpp
+ M src/workspace/diagnostics/diagnostics_types.h
+ M src/workspace/diagnostics/ffi_backends.cpp
+ M src/workspace/diagnostics/lsp_backend.h
+ M src/workspace/diagnostics/selftests/diagnostics_product_seam.cpp
+ M src/workspace/diagnostics/slang_backend.h
+ M src/workspace/diagnostics/toolchain.cpp
+ M src/workspace/diagnostics/toolchain.h
+ M src/workspace/diagnostics/toolchain_selftest.cpp
+ M src/workspace/diagnostics/toolchain_ux_selftest.cpp
+ M src/workspace/filetree/file_kind.cpp
+ M src/workspace/filetree/file_ops.cpp
+ M src/workspace/filetree/file_tree_model.cpp
+ M src/workspace/filetree/file_tree_widget.cpp
+ M src/workspace/filetree/filetree_integration.cpp
+ M src/workspace/integration.cpp
+ M src/workspace/integration.h
+ M src/workspace/palette/command_palette.cpp
+ M src/workspace/palette/command_palette.h
+ M src/workspace/palette/file_index.cpp
+ M src/workspace/palette/palette_bench.cpp
+ M src/workspace/palette/palette_integration.cpp
+ M src/workspace/palette/palette_integration_selftest.cpp
+ M src/workspace/palette/palette_selftest.cpp
+ M src/workspace/project/CMakeLists.txt
+ M src/workspace/project/README.md
+ M src/workspace/project/project_integration.cpp
+ M src/workspace/project/project_integration.h
+ M src/workspace/project/project_model.cpp
+ M src/workspace/project/project_model.h
+ M src/workspace/project/project_panel.cpp
+ M src/workspace/project/project_panel.h
+ M src/workspace/project/project_selftest.cpp
+ M src/workspace/project/project_service.cpp
+ M src/workspace/project/project_service.h
+ M src/workspace/project/project_state.cpp
+ M src/workspace/project/project_state.h
+ M src/workspace/search/CMakeLists.txt
+ M src/workspace/search/README.md
+ M src/workspace/search/global_search.cpp
+ M src/workspace/search/search_integration.cpp
+ M src/workspace/search/search_jump_target.cpp
+ M src/workspace/search/search_jump_target.h
+ M src/workspace/search/search_panel.cpp
+ M src/workspace/search/search_panel.h
+ M src/workspace/search/search_selftest.cpp
+ M src/workspace/search/search_types.h
+ M src/workspace/settings/settings_client.cpp
+ M src/workspace/settings/settings_dialog.cpp
+ M src/workspace/settings/settings_panel.cpp
+ M src/workspace/settings/settings_panel.h
+ M src/workspace/settings/settings_selftest.cpp
+ M src/workspace/vcs/vcs_panel.cpp
+ M src/workspace/vcs/vcs_selftest.cpp
+?? crates/vd-deeplint/src/batch.rs
+?? crates/vd-deeplint/src/dedup.rs
+?? crates/vd-deeplint/src/engine.rs
+?? crates/vd-deeplint/src/hierarchy.rs
+?? crates/vd-deeplint/tests/engine_batch.rs
+?? crates/vd-deeplint/tests/fixtures/hierarchy/ast.json
+?? crates/vd-deeplint/tests/fixtures/hierarchy/multi-root-generate.json
+?? crates/vd-deeplint/tests/fixtures/hierarchy/project/arr.sv
+?? crates/vd-deeplint/tests/fixtures/hierarchy/project/leaf.sv
+?? crates/vd-deeplint/tests/fixtures/hierarchy/project/mid.sv
+?? crates/vd-deeplint/tests/fixtures/hierarchy/project/top1.sv
+?? crates/vd-deeplint/tests/fixtures/hierarchy/project/top2.sv
+?? crates/vd-deeplint/tests/hierarchy.rs
+?? crates/vd-deeplint/tests/real_tools.rs
+?? crates/vd-ffi/tests/qt_abi_guard.cpp
+?? crates/vd-ffi/tests/qt_abi_guard.rs
+?? crates/vd-lsp/src/backend.rs
+?? crates/vd-lsp/tests/backend_capabilities.rs
+?? crates/vd-settings/src/schema.rs
+?? docs/capability-matrix.md
+?? docs/handover/CELL-20261102-STATUS.md
+?? evidence/baseline/SUMMARY.md
+?? evidence/baseline/git-status-porcelain-v1.txt
+?? evidence/d-diagnostics/README.md
+?? evidence/d-diagnostics/annotations-probe.log
+?? evidence/d-diagnostics/ctest-diagnostics.log
+?? evidence/d-diagnostics/harness/CMakeLists.txt
+?? evidence/d-diagnostics/harness/annotations_probe.cpp
+?? evidence/d-diagnostics/harness/panel_probe.cpp
+?? evidence/d-diagnostics/panel-empty-state.png
+?? evidence/d-diagnostics/panel-error-warning-groups.png
+?? evidence/d-diagnostics/panel-probe.log
+?? evidence/d-diagnostics/product-seam-inline-diagnostics.png
+?? evidence/d-diagnostics/product-seam.log
+?? evidence/d-diagnostics/product-selfcheck.log
+?? evidence/d-diagnostics/underline-error-warning.png
+?? evidence/d-diagnostics/underline-large-file.png
+?? evidence/d-diagnostics/underline-zoom.png
+?? evidence/e1-tabs/00-pins.txt
+?? evidence/e1-tabs/10-probe-offscreen.log
+?? evidence/e1-tabs/11-probe-xcb.log
+?? evidence/e1-tabs/12-probe-run.log
+?? evidence/e1-tabs/20-product-gates.log
+?? evidence/e1-tabs/21-typecheck-gate.log
+?? evidence/e1-tabs/REPORT.md
+?? evidence/e1-tabs/probe/build.sh
+?? evidence/e1-tabs/probe/main.cpp
+?? evidence/e1-tabs/probe/run.sh
+?? evidence/e1-tabs/shots/01-three-tabs.png
+?? evidence/e1-tabs/shots/02-dirty-three-markers.png
+?? evidence/e1-tabs/shots/03-after-save-clean.png
+?? evidence/e1-tabs/shots/04-unsaved-close-prompt.png
+?? evidence/e1-tabs/shots/05-tab-overflow.png
+?? evidence/e1-tabs/shots/06-after-discard.png
+?? evidence/e2-find/01-lane-ctest.log
+?? evidence/e2-find/02-find-replace-checks.log
+?? evidence/e2-find/03-product-build.log
+?? evidence/e2-find/04-product-selfcheck.log
+?? evidence/e2-find/05-lane-full-build-ctest.log
+?? evidence/e2-find/06-real-focus-before.log
+?? evidence/e2-find/07-real-focus-after.log
+?? evidence/e2-find/README.md
+?? evidence/e2-find/find-bar-find.png
+?? evidence/e2-find/find-bar-replace.png
+?? evidence/e3-edit/01-lane-ctest.log
+?? evidence/e3-edit/02-multi-cursor-checks.log
+?? evidence/e3-edit/03-product-build.log
+?? evidence/e3-edit/04-product-selfcheck.log
+?? evidence/e3-edit/05-lane-full-build-ctest.log
+?? evidence/e3-edit/README.md
+?? evidence/e3-edit/block-selection-drag.png
+?? evidence/e3-edit/bracket-match-crop.png
+?? evidence/e3-edit/bracket-match.png
+?? evidence/e3-edit/multi-cursor-result.png
+?? evidence/e4-actions/00-configure.log
+?? evidence/e4-actions/01-build-exit.txt
+?? evidence/e4-actions/01-build.log
+?? evidence/e4-actions/02-ctest-exit.txt
+?? evidence/e4-actions/02-ctest.log
+?? evidence/e4-actions/03-probe.log
+?? evidence/e4-actions/04-probe-xcb.log
+?? evidence/e4-actions/05-selfcheck-exit.txt
+?? evidence/e4-actions/05-selfcheck.log
+?? evidence/e4-actions/06-probe-build.log
+?? evidence/e4-actions/10-context-menu-xcb.png
+?? evidence/e4-actions/10-context-menu.png
+?? evidence/e4-actions/11-f8-diagnostic-xcb.png
+?? evidence/e4-actions/11-f8-diagnostic.png
+?? evidence/e4-actions/12-menu-diagnostics-enabled-xcb.png
+?? evidence/e4-actions/12-menu-diagnostics-enabled.png
+?? evidence/e4-actions/REPORT.md
+?? evidence/e4-actions/probe/build.sh
+?? evidence/e4-actions/probe/editor_actions_probe.cpp
+?? evidence/e4-actions/probe/run-xcb.sh
+?? evidence/e4-actions/probe/run.sh
+?? evidence/e5-advanced/00-tree-shape-probe.log
+?? evidence/e5-advanced/01-call-shape-probe.log
+?? evidence/e5-advanced/02-fixture-shape.log
+?? evidence/e5-advanced/20-advanced-menu.png
+?? evidence/e5-advanced/21-hover-rendered.png
+?? evidence/e5-advanced/REPORT.md
+?? evidence/e5-advanced/fixtures/fake_lsp_server.py
+?? evidence/e5-advanced/logs/01-build-exit.txt
+?? evidence/e5-advanced/logs/01-build.log
+?? evidence/e5-advanced/logs/02-ctest-exit.txt
+?? evidence/e5-advanced/logs/02-ctest.log
+?? evidence/e5-advanced/logs/03-probe.log
+?? evidence/e5-advanced/logs/04-selfcheck-exit.txt
+?? evidence/e5-advanced/logs/04-selfcheck.log
+?? evidence/e5-advanced/logs/05-fake-lsp-requests.log
+?? evidence/e5-advanced/logs/06-diagnostics-selftest.log
+?? evidence/e5-advanced/logs/07-rust-tests.log
+?? evidence/e5-advanced/logs/08-fmt-repair/00-whitespace-stripped-proof.txt
+?? evidence/e5-advanced/logs/08-fmt-repair/01-ignore-space-diff.txt
+?? evidence/e5-advanced/logs/08-fmt-repair/02-touched-files.txt
+?? evidence/e5-advanced/logs/08-fmt-repair/03-tests.log
+?? evidence/e5-advanced/logs/08-fmt-repair/03-tests.log.exit
+?? evidence/e5-advanced/logs/08-fmt-repair/04-clippy.log
+?? evidence/e5-advanced/logs/08-fmt-repair/04-clippy.log.exit
+?? evidence/e5-advanced/logs/08-fmt-repair/05-fmt-check-after.log
+?? evidence/e5-advanced/logs/08-fmt-repair/05-fmt-check-after.log.exit
+?? evidence/e5-advanced/probe/advanced_probe.cpp
+?? evidence/e5-advanced/probe/build.sh
+?? evidence/e5-advanced/probe/run.sh
+?? evidence/e5-advanced/tools/fixture_probe.cpp
+?? evidence/e5-advanced/tools/ts_probe.cpp
+?? evidence/final-acceptance/00-environment.md
+?? evidence/final-acceptance/01-git-status-porcelain-v1.txt
+?? evidence/final-acceptance/02-git-status-porcelain-v1-uall.txt
+?? evidence/g6-diag/00-red-before-fix-build.log
+?? evidence/g6-diag/00-red-before-fix-console.log
+?? evidence/g6-diag/00-red-before-fix-exit.txt
+?? evidence/g6-diag/00-red-before-fix.log
+?? evidence/g6-diag/00-worktree-baseline.txt
+?? evidence/g6-diag/30-green-after-fix-build.log
+?? evidence/g6-diag/30-green-after-fix-console.log
+?? evidence/g6-diag/30-green-after-fix-exit.txt
+?? evidence/g6-diag/30-green-after-fix.log
+?? evidence/g6-diag/40-missing-control-build.log
+?? evidence/g6-diag/40-missing-control-console.log
+?? evidence/g6-diag/40-missing-control-exit.txt
+?? evidence/g6-diag/40-missing-control.log
+?? evidence/g6-diag/50-gate-build-qt-exit.txt
+?? evidence/g6-diag/50-gate-build-qt.log
+?? evidence/g6-diag/51-lane-diagnostics-ctest-exit.txt
+?? evidence/g6-diag/51-lane-diagnostics-ctest.log
+?? evidence/g6-diag/52-selfcheck.log
+?? evidence/g6-diag/53-seam-verbose.log
+?? evidence/g6-diag/REPORT.md
+?? evidence/g6-diag/format-after.sv
+?? evidence/g6-diag/format-before.sv
+?? evidence/g6-diag/missing/format-after.sv
+?? evidence/g6-diag/missing/format-before.sv
+?? evidence/g6-diag/probe/build.sh
+?? evidence/g6-diag/probe/g6_diag_probe.cpp
+?? evidence/g6-diag/probe/run.sh
+?? evidence/i18n-l2/02-a-class-translations.json
+?? evidence/i18n-l2/03-b-reconciliation.csv
+?? evidence/i18n-l2/03-b-reconciliation.md
+?? evidence/i18n-l2/03-b-wrap-table.json
+?? evidence/i18n-l2/04-b-class-translations.json
+?? evidence/i18n-l2/04-qtbase-vendor.md
+?? evidence/i18n-l2/05-b-class-translations-batch2.json
+?? evidence/i18n-l2/05-seed-diff.md
+?? evidence/i18n-l2/06-license-third-party.md
+?? evidence/i18n-l2/50-i18n-l2-report.md
+?? evidence/i18n-l2/logs/01-lrelease-before.log
+?? evidence/i18n-l2/logs/02-any-extractor.csv
+?? evidence/i18n-l2/logs/02-any-extractor.log
+?? evidence/i18n-l2/logs/03-broad-extractor.csv
+?? evidence/i18n-l2/logs/04-a-class-unfinished.txt
+?? evidence/i18n-l2/logs/05-b-any-literal.csv
+?? evidence/i18n-l2/logs/06-a-merge.log
+?? evidence/i18n-l2/logs/07-a-lrelease-after.log
+?? evidence/i18n-l2/logs/08-b-discovery-summary.txt
+?? evidence/i18n-l2/logs/08-b-discovery.csv
+?? evidence/i18n-l2/logs/09-lupdate-after-wrap.log
+?? evidence/i18n-l2/logs/10-b-unfinished.txt
+?? evidence/i18n-l2/logs/11-b-merge.log
+?? evidence/i18n-l2/logs/12-b-lrelease-after.log
+?? evidence/i18n-l2/logs/13-build-after-b.log
+?? evidence/i18n-l2/logs/14-build-after-c.log
+?? evidence/i18n-l2/logs/15-i18n-probe.log
+?? evidence/i18n-l2/logs/16-any-literal-batch2.csv
+?? evidence/i18n-l2/logs/16-any-literal-batch2.log
+?? evidence/i18n-l2/logs/17-b-discovery-batch2-summary.txt
+?? evidence/i18n-l2/logs/17-b-discovery-batch2.csv
+?? evidence/i18n-l2/logs/18-b-wrap-table-before-batch2.json
+?? evidence/i18n-l2/logs/18-b2-extra.json
+?? evidence/i18n-l2/logs/18-b2-only.json
+?? evidence/i18n-l2/logs/18-b2-selected-rows.json
+?? evidence/i18n-l2/logs/19-lupdate-after-b2.log
+?? evidence/i18n-l2/logs/19-t38-reconciliation-reconstructed.csv
+?? evidence/i18n-l2/logs/20-b2-merge.log
+?? evidence/i18n-l2/logs/20-t40-claim-audit.csv
+?? evidence/i18n-l2/logs/21-b2-lrelease.log
+?? evidence/i18n-l2/logs/21-t40-build-with-ctest.log
+?? evidence/i18n-l2/logs/21-t40-reconcile-final.log
+?? evidence/i18n-l2/logs/22-build-after-b2.log
+?? evidence/i18n-l2/logs/22-t40-claim-audit-summary.md
+?? evidence/i18n-l2/logs/23-lupdate-after-b2-extra.log
+?? evidence/i18n-l2/logs/23-t40-probe.log
+?? evidence/i18n-l2/logs/24-b2-extra-merge.log
+?? evidence/i18n-l2/logs/24-t40-final-build-with-ctest.log
+?? evidence/i18n-l2/logs/25-b2-final-lrelease.log
+?? evidence/i18n-l2/logs/25-t40-lrelease.log
+?? evidence/i18n-l2/logs/26-final-build-with-ctest.log
+?? evidence/i18n-l2/logs/27-ac47-callsites.log
+?? evidence/i18n-l2/logs/28-i18n-probe-after-b2.log
+?? evidence/i18n-l2/logs/29-appdir-assemble.log
+?? evidence/i18n-l2/probe/build-i18n.sh
+?? evidence/i18n-l2/probe/i18n_probe.cpp
+?? evidence/i18n-l2/probe/run-i18n.sh
+?? evidence/i18n-l2/shots/01-shell-zh_CN.png
+?? evidence/i18n-l2/shots/02-qt-standard-buttons-zh_CN.png
+?? evidence/i18n-l2/tools/__pycache__/add_t40_messages.cpython-314.pyc
+?? evidence/i18n-l2/tools/__pycache__/verify_claims.cpython-314.pyc
+?? evidence/i18n-l2/tools/__pycache__/wrap_b_class.cpython-314.pyc
+?? evidence/i18n-l2/tools/add_t40_messages.py
+?? evidence/i18n-l2/tools/enumerate_b_class.py
+?? evidence/i18n-l2/tools/make_reconciliation.py
+?? evidence/i18n-l2/tools/make_reconciliation.t38.py
+?? evidence/i18n-l2/tools/merge_ts_translations.py
+?? evidence/i18n-l2/tools/select_b2_rows.py
+?? evidence/i18n-l2/tools/summarize_audit.py
+?? evidence/i18n-l2/tools/verify_claims.py
+?? evidence/i18n-l2/tools/wrap_b_class.py
+?? evidence/i18n/05-extracted-at-af85225.log
+?? evidence/i18n/05-extracted-current-broad.log
+?? evidence/i18n/05-extracted-current.json
+?? evidence/i18n/05-extracted-current.log
+?? evidence/i18n/06-extractor-diff.json
+?? evidence/i18n/06-extractor-diff.md
+?? evidence/i18n/07-triage-466.csv
+?? evidence/i18n/07-triage-466.json
+?? evidence/i18n/09-ui-translations.json
+?? evidence/i18n/10-ui-translations-supplementary.json
+?? evidence/i18n/11-reconciliation-466.csv
+?? evidence/i18n/11-reconciliation-466.md
+?? evidence/i18n/12-ui-blocks.md
+?? evidence/i18n/13-coverage.md
+?? evidence/i18n/14-selftest-coverage.md
+?? evidence/i18n/15-t21-report.md
+?? evidence/i18n/16-wrap-changes.txt
+?? evidence/i18n/apply_tr_wrapping.py
+?? evidence/i18n/build_reports.py
+?? evidence/i18n/diff_i18n_lists.py
+?? evidence/i18n/extract_i18n_candidates.py
+?? evidence/i18n/logs/20-build-selfcheck-ctest.log
+?? evidence/i18n/logs/21-zh-en-ui-screens.log
+?? evidence/i18n/logs/22-build-qt.log
+?? evidence/i18n/logs/22b-build-all.log
+?? evidence/i18n/logs/23-final-selfcheck-ctest.log
+?? evidence/i18n/logs/24-full-build-all.log
+?? evidence/i18n/merge_ui_translations.py
+?? evidence/i18n/shots/20-zh-ui.png
+?? evidence/i18n/shots/21-en-ui.png
+?? evidence/i18n/triage_i18n_candidates.py
+?? evidence/i2-i18n/10-probe-offscreen.log
+?? evidence/i2-i18n/11-probe-xcb.log
+?? evidence/i2-i18n/12-probe-run.log
+?? evidence/i2-i18n/13-restart-spawn.log
+?? evidence/i2-i18n/REPORT.md
+?? evidence/i2-i18n/logs/30-t19-session-regression.log
+?? evidence/i2-i18n/logs/31-appdir-assemble.log
+?? evidence/i2-i18n/logs/32-selfcheck-ctest.log
+?? evidence/i2-i18n/logs/33-build-qt.log
+?? evidence/i2-i18n/logs/34-real-binary-i18n.log
+?? evidence/i2-i18n/logs/35-selfcheck-ctest-final.log
+?? evidence/i2-i18n/probe/build.sh
+?? evidence/i2-i18n/probe/grab_root.cpp
+?? evidence/i2-i18n/probe/main.cpp
+?? evidence/i2-i18n/probe/real-start.sh
+?? evidence/i2-i18n/probe/run.sh
+?? evidence/i2-i18n/shots/30-zh-shell.png
+?? evidence/i2-i18n/shots/31-zh-preferences.png
+?? evidence/i2-i18n/shots/32-batch-unsaved-dialog.png
+?? evidence/i2-i18n/shots/33-language-not-switched.png
+?? evidence/i2-i18n/shots/34-cancel-message-shell.png
+?? evidence/i2-i18n/shots/35-en-shell.png
+?? evidence/i2-i18n/shots/36-real-en-start.png
+?? evidence/i2-i18n/shots/36-real-zh-start.png
+?? evidence/i2-i18n/shots/37-save-branch-restarting.png
+?? evidence/i3-session/10-probe-offscreen.log
+?? evidence/i3-session/11-probe-xcb.log
+?? evidence/i3-session/12-probe-run.log
+?? evidence/i3-session/13-fail-first-offscreen.log
+?? evidence/i3-session/30-session.json
+?? evidence/i3-session/40-product-gates.log
+?? evidence/i3-session/50-t39-recheck.md
+?? evidence/i3-session/PROGRESS.md
+?? evidence/i3-session/REPORT.md
+?? evidence/i3-session/baseline-20261102T1737/10-probe-offscreen.log
+?? evidence/i3-session/baseline-20261102T1737/11-probe-xcb.log
+?? evidence/i3-session/baseline-20261102T1737/12-probe-run.log
+?? evidence/i3-session/baseline-20261102T1737/13-fail-first-offscreen.log
+?? evidence/i3-session/baseline-20261102T1737/30-session.json
+?? evidence/i3-session/baseline-20261102T1737/shots/19-before-restart-a-active.png
+?? evidence/i3-session/baseline-20261102T1737/shots/20-before-restart.png
+?? evidence/i3-session/baseline-20261102T1737/shots/21-after-restart.png
+?? evidence/i3-session/baseline-20261102T1737/shots/21b-after-restart-a-active.png
+?? evidence/i3-session/baseline-20261102T1737/shots/22-unsaved-restart-prompt.png
+?? evidence/i3-session/logs/00-probe-build-demo.txt
+?? evidence/i3-session/logs/10-probe-run-demo.txt
+?? evidence/i3-session/logs/10-probe-run-offscreen-demo.txt
+?? evidence/i3-session/logs/10-probe-run-xcb-demo.txt
+?? evidence/i3-session/probe/build.sh
+?? evidence/i3-session/probe/container-run.sh
+?? evidence/i3-session/probe/main.cpp
+?? evidence/i3-session/probe/run.sh
+?? evidence/i3-session/probe/session_restore_probe.cpp
+?? evidence/i3-session/run-demo/after-restart.png
+?? evidence/i3-session/run-demo/before-close.png
+?? evidence/i3-session/run-demo/session-before.json
+?? evidence/i3-session/run-offscreen-demo/after-restart.png
+?? evidence/i3-session/run-offscreen-demo/before-close.png
+?? evidence/i3-session/run-offscreen-demo/session-before.json
+?? evidence/i3-session/run-xcb-demo/after-restart.png
+?? evidence/i3-session/run-xcb-demo/before-close.png
+?? evidence/i3-session/run-xcb-demo/session-before.json
+?? evidence/i3-session/shots/19-before-restart-a-active.png
+?? evidence/i3-session/shots/20-before-restart.png
+?? evidence/i3-session/shots/21-after-restart.png
+?? evidence/i3-session/shots/21b-after-restart-a-active.png
+?? evidence/i3-session/shots/22-unsaved-restart-prompt.png
+?? evidence/jump/README.md
+?? evidence/jump/ac-7.5-regression.log
+?? evidence/jump/breadcrumb-click.log
+?? evidence/jump/integration-tu-compile.log
+?? evidence/jump/jump-selftest.log
+?? evidence/jump/root-build-status.log
+?? evidence/jump/root-wiring.log
+?? evidence/jump/structural-check.log
+?? evidence/m-tree/10-selftest.log
+?? evidence/m-tree/20-product-probe.log
+?? evidence/m-tree/30-gates.log
+?? evidence/m-tree/40-qtest-events.log
+?? evidence/m-tree/41-qtest-fail-first.log
+?? evidence/m-tree/42-product-events.log
+?? evidence/m-tree/43-product-fail-first.log
+?? evidence/m-tree/50-t37-binaries-after-build.txt
+?? evidence/m-tree/50-t37-build-20261102.log
+?? evidence/m-tree/50-t37-mtimes.txt
+?? evidence/m-tree/50-t37-recheck.md
+?? evidence/m-tree/51-t37-lane-selftest-20261102.log
+?? evidence/m-tree/52-t37-probe-20261102.log
+?? evidence/m-tree/53-t37-probe-build-20261102.log
+?? evidence/m-tree/54-t37-build-rerun-20261102.log
+?? evidence/m-tree/REPORT.md
+?? evidence/m-tree/fixture-generate/gen_top.sv
+?? evidence/m-tree/fixture-generate/other_top.sv
+?? evidence/m-tree/fixture-t37/leaf.sv
+?? evidence/m-tree/fixture-t37/mid.sv
+?? evidence/m-tree/fixture-t37/top.sv
+?? evidence/m-tree/module-tree.png
+?? evidence/m-tree/probe/build-t37.sh
+?? evidence/m-tree/probe/product_module_tree_probe.cpp
+?? evidence/m-tree/probe/run-t37.sh
+?? evidence/m-tree/probe/t37_module_tree_probe.cpp
+?? evidence/m-tree/product-module-tree-failfirst.png
+?? evidence/m-tree/product-module-tree.png
+?? evidence/m-tree/t37-lane-module-tree.png
+?? evidence/m-tree/t37-module-tree.png
+?? evidence/review-a9/a-expansion.log
+?? evidence/review-a9/a/inc/defs.vh
+?? evidence/review-a9/a/inc/sub/defs2.vh
+?? evidence/review-a9/a/project.f
+?? evidence/review-a9/a/rtl/a.sv
+?? evidence/review-a9/a/rtl/dollar$.sv
+?? "evidence/review-a9/a/rtl/spaced dir/space file.sv"
+?? evidence/review-a9/a/rtl/tail.sv$
+?? evidence/review-a9/b/depth/d01.f
+?? evidence/review-a9/b/depth/d02.f
+?? evidence/review-a9/b/depth/d03.f
+?? evidence/review-a9/b/depth/d04.f
+?? evidence/review-a9/b/depth/d05.f
+?? evidence/review-a9/b/depth/d06.f
+?? evidence/review-a9/b/depth/d07.f
+?? evidence/review-a9/b/depth/d08.f
+?? evidence/review-a9/b/depth/d09.f
+?? evidence/review-a9/b/depth/d10.f
+?? evidence/review-a9/b/depth/d11.f
+?? evidence/review-a9/b/depth/d12.f
+?? evidence/review-a9/b/depth/d13.f
+?? evidence/review-a9/b/depth/d14.f
+?? evidence/review-a9/b/depth/d15.f
+?? evidence/review-a9/b/depth/d16.f
+?? evidence/review-a9/b/depth/d17.f
+?? evidence/review-a9/b/depth/d18.f
+?? evidence/review-a9/b/depth/d19.f
+?? evidence/review-a9/b/depth/d20.f
+?? evidence/review-a9/b/lists/cycle_a.f
+?? evidence/review-a9/b/lists/cycle_b.f
+?? evidence/review-a9/b/lists/self.f
+?? evidence/review-a9/b/project.f
+?? evidence/review-a9/b/rtl/deep.sv
+?? evidence/review-a9/b/rtl/top.sv
+?? evidence/review-a9/bc-expansion.log
+?? evidence/review-a9/c/lists/sub.f
+?? evidence/review-a9/c/project.f
+?? evidence/review-a9/c/rtl/a.sv
+?? evidence/review-a9/c/rtl/b.sv
+?? evidence/review-a9/d-determinism.log
+?? evidence/review-a9/d/project.f
+?? evidence/review-a9/d/rtl/ok.sv
+?? evidence/review-a9/e-expansion.log
+?? evidence/review-a9/e/project.f
+?? evidence/review-a9/outside/out_dollar$.sv
+?? evidence/review-a9/outside/out_tail.sv$
+?? evidence/review-backend/format-input.sv
+?? evidence/review-backend/format-output.sv
+?? evidence/review-backend/probe-run-sigpipe-ignored.log
+?? evidence/review-backend/probe-run.log
+?? evidence/review-backend/product-gates.log
+?? evidence/review-jump/01-jump-lane-test.log
+?? evidence/review-jump/02-structural.log
+?? evidence/review-jump/03-lane-tests.log
+?? evidence/review-jump/04-ac75-regression.log
+?? evidence/review-jump/05-search-selftest.log
+?? evidence/review-jump/06-search-build.log
+?? evidence/review-jump/07-ac75-search-ffi.log
+?? evidence/review-jump/08-root-build-and-test.log
+?? evidence/review-jump/09-breadcrumb-click-rows.log
+?? evidence/review-multicursor/lane-tests.log
+?? evidence/review-multicursor/multi-cursor-zoom.png
+?? evidence/review-multicursor/product-build.log
+?? evidence/review-project/a9-selfcheck.log
+?? evidence/review-project/ac75-regression.log
+?? evidence/review-project/run-console.log
+?? evidence/review-spike/03-version.log
+?? evidence/review-spike/04-initialize.log
+?? evidence/review-spike/04b-initialize-mounted.log
+?? evidence/review-spike/05-console.log
+?? evidence/review-spike/05-elaboration.json
+?? evidence/review-spike/05-elaboration.json.ast.json
+?? evidence/review-spike/06-hierarchy.log
+?? evidence/review-spike/break-console.log
+?? evidence/review-spike/normal-console.log
+?? evidence/review-spike/runspike-break/03-built-centos7-version.txt
+?? evidence/review-spike/runspike-break/04-built-initialize-handshake.txt
+?? evidence/review-spike/runspike-break/05-elaboration-console.txt
+?? evidence/review-spike/runspike-break/05-elaboration.json
+?? evidence/review-spike/runspike-break/05-elaboration.json.ast.json
+?? evidence/review-spike/runspike-break/06-hierarchy-lsp-shape.txt
+?? evidence/review-spike/runspike-console.log
+?? evidence/review-spike/runspike/03-built-centos7-version.txt
+?? evidence/review-spike/runspike/04-built-initialize-handshake.txt
+?? evidence/review-tabs/10-probe-offscreen.log
+?? evidence/review-tabs/11-probe-xcb.log
+?? evidence/review-tabs/12-probe-run.log
+?? evidence/review-tabs/20-search-ctest.log
+?? evidence/review-tabs/21-search-direct.log
+?? evidence/review-tabs/22-selfcheck.log
+?? evidence/review-tabs/probe/build.sh
+?? evidence/review-tabs/probe/main.cpp
+?? evidence/review-tabs/probe/run.sh
+?? evidence/review-tabs/probe/tabs-probe
+?? evidence/review-tabs/shots/01-three-tabs.png
+?? evidence/review-tabs/shots/02-dirty-three-markers.png
+?? evidence/review-tabs/shots/03-after-save-clean.png
+?? evidence/review-tabs/shots/04-unsaved-close-prompt.png
+?? evidence/review-tabs/shots/05-tab-overflow.png
+?? evidence/review-tabs/shots/06-after-discard.png
+?? evidence/s1-settings/01-cargo.log
+?? evidence/s1-settings/05-build-qt.log
+?? evidence/s1-settings/05b-lane-build.log
+?? evidence/s1-settings/06-key-file-umask000.log
+?? evidence/s1-settings/07-key-mode-probe.cpp
+?? evidence/s1-settings/07-key-mode-probe.log
+?? evidence/s1-settings/KEY-CONTRACT.md
+?? evidence/s1-settings/README.md
+?? evidence/s1-settings/screenshots/01-shortcuts.png
+?? evidence/s1-settings/screenshots/02-tools.png
+?? evidence/s1-settings/screenshots/03-fim.png
+?? evidence/s1-settings/screenshots/fim-evidence-settings.toml
+?? evidence/s1-settings/screenshots/fim-evidence-shortcuts.json
+?? evidence/s1-settings/screenshots/fim-key-evidence.txt
+?? evidence/s1-settings/selftest.log
+?? evidence/t20-shell/00-search-baseline-20261102.log
+?? evidence/t20-shell/01-search-after-jump-unify-20261102.log
+?? evidence/t20-shell/02-app-selfcheck-20261102.log
+?? evidence/t20-shell/03-probe-run-20261102.log
+?? evidence/t20-shell/04-probe-build-20261102.log
+?? evidence/t20-shell/05-build-qt-20261102.log
+?? evidence/t20-shell/06-qt-abi-guard-20261102.log
+?? evidence/t20-shell/07-typecheck-20261102.log
+?? evidence/t20-shell/08-search-standalone-20261102.log
+?? evidence/t20-shell/09-metadata-20261102.txt
+?? evidence/t20-shell/50-t20-report.md
+?? evidence/t20-shell/fixture/alpha.sv
+?? evidence/t20-shell/fixture/beta.sv
+?? evidence/t20-shell/fixture/delta.sv
+?? evidence/t20-shell/fixture/gamma.sv
+?? evidence/t20-shell/probe/build-t20.sh
+?? evidence/t20-shell/probe/run-t20.sh
+?? evidence/t20-shell/probe/t20_shell_probe.cpp
+?? evidence/t20-shell/shots/01-dual-pane-2-tabs.png
+?? evidence/t20-shell/shots/02-search-jump-active-pane.png
+?? evidence/t20-shell/shots/03-breadcrumb-click.png
+?? evidence/t20-shell/shots/03a-breadcrumb-segments.png
+?? evidence/t20-shell/shots/04-diagnostics-jump-active-pane.png
+?? evidence/w1-rust-engine/01-cargo-test.txt
+?? evidence/w1-rust-engine/02-cargo-clippy.txt
+?? evidence/w1-rust-engine/03-tool-versions.txt
+?? evidence/w1-rust-engine/04-argv-dump.txt
+?? evidence/w1-rust-engine/05-lsp-capabilities.json
+?? evidence/w1-rust-engine/06-cancel-observation.txt
+?? evidence/w1-rust-engine/07-fmt-drift.txt
+?? evidence/w1-rust-engine/08-workspace-clippy.txt
+?? evidence/w1-rust-engine/09-header-cxx-check.txt
+?? evidence/w1-rust-engine/10-verible-filelist-route.txt
+?? evidence/w1-rust-engine/README.md
+?? evidence/w2-spike/01-environment.txt
+?? evidence/w2-spike/02-prebuilt-centos7-run.txt
+?? evidence/w2-spike/03-built-centos7-version.txt
+?? evidence/w2-spike/03a-build-toolchain.txt
+?? evidence/w2-spike/03b-build-source.txt
+?? evidence/w2-spike/03c-build-configure.log
+?? evidence/w2-spike/03d-build-compile.log
+?? evidence/w2-spike/03e-build-artifact.txt
+?? evidence/w2-spike/03f-build-timings.txt
+?? evidence/w2-spike/04-built-initialize-handshake.txt
+?? evidence/w2-spike/05-elaboration-console.txt
+?? evidence/w2-spike/05-elaboration.json
+?? evidence/w2-spike/05-elaboration.json.ast.json
+?? evidence/w2-spike/06-hierarchy-lsp-shape.txt
+?? evidence/w2-spike/07-buildfile-rule.json
+?? evidence/w2-spike/07-buildfile-rule.txt
+?? evidence/w2-spike/README.md
+?? evidence/w3-project/README.md
+?? evidence/w3-project/a17-escape-outside/escaped$.sv
+?? evidence/w3-project/a17-escape/project.f
+?? evidence/w3-project/a17-fixture/project.f
+?? evidence/w3-project/a17-fixture/rtl/ok.sv
+?? evidence/w3-project/a17-missing/project.f
+?? evidence/w3-project/a17-missing/rtl/ok.sv
+?? evidence/w3-project/a17-outside/out_dollar$.sv
+?? evidence/w3-project/a17-outside/out_tail.sv$
+?? evidence/w3-project/a9-fixture/inc/defs.vh
+?? evidence/w3-project/a9-fixture/lists/cycle_a.f
+?? evidence/w3-project/a9-fixture/lists/cycle_b.f
+?? evidence/w3-project/a9-fixture/lists/nested/sub2.f
+?? evidence/w3-project/a9-fixture/lists/sub.f
+?? evidence/w3-project/a9-fixture/project.f
+?? evidence/w3-project/a9-fixture/rtl/a.sv
+?? evidence/w3-project/a9-fixture/rtl/b.sv
+?? evidence/w3-project/a9-fixture/rtl/c.sv
+?? evidence/w3-project/a9-fixture/rtl/e.sv
+?? evidence/w3-project/a9-fixture/rtl/mem.sv
+?? evidence/w3-project/logs/10-selfcheck-and-restart.log
+?? evidence/w3-project/logs/11-ctest.log
+?? evidence/w3-project/logs/12-selfcheck-final.log
+?? evidence/w3-project/logs/20-project-model-before-restart.json
+?? evidence/w3-project/logs/21-project-model-after-restart.json
+?? evidence/w3-project/logs/30-rust-project-tests.log
+?? evidence/w3-project/logs/40-clippy-fmt.log
+?? evidence/w3-project/logs/50-ffi-header-change.diff
+?? evidence/w3-project/logs/60-a9-expansion.log
+?? evidence/w3-project/logs/70-a17-before.log
+?? evidence/w3-project/logs/71-a17-gate-summary.log
+?? evidence/w3-project/logs/71-a17-vdconfig-test.log
+?? evidence/w3-project/logs/72-a17-clippy-crate.log
+?? evidence/w3-project/logs/73-a17-fmt.log
+?? evidence/w3-project/logs/73a-a17-fmt-vdconfig.log
+?? evidence/w3-project/logs/73b-a17-fmt-workspace.log
+?? evidence/w3-project/logs/74-a17-clippy-workspace.log
+?? evidence/w3-project/logs/75-a17-after.log
+?? evidence/w3-project/logs/76-a17-selfcheck.log
+?? evidence/w3-project/logs/77-a17-docs-gate.log
+?? evidence/w3-project/logs/78-a17-workspace-test.log
+?? evidence/w3-project/run.sh
+?? evidence/w4-lint/README.md
+?? evidence/w4-lint/lint_orchestration_probe.cpp
+?? evidence/w4-lint/logs/10-probe.log
+?? evidence/w4-lint/logs/11-ctest.log
+?? evidence/w4-lint/logs/15-a15-ctest.log
+?? evidence/w4-lint/logs/15-a15-green.log
+?? evidence/w4-lint/logs/15-a15-red.log
+?? evidence/w4-lint/run.sh
+?? evidence/w4-lint/scale/README.md
+?? evidence/w4-lint/scale/ast_count.py
+?? evidence/w4-lint/scale/generate.py
+?? evidence/w4-lint/scale/logs/10-40-scale-run.log
+?? evidence/w4-lint/scale/logs/10-expansion.log
+?? evidence/w4-lint/scale/logs/20-lint-1k.log
+?? evidence/w4-lint/scale/logs/30-cancel-and-2k.log
+?? evidence/w4-lint/scale/logs/35-nested-ast.log
+?? evidence/w4-lint/scale/logs/40-nested.log
+?? evidence/w4-lint/scale/logs/41-repeat-runs.log
+?? evidence/w4-lint/scale/logs/50-elaboration-t46.log
+?? evidence/w4-lint/scale/logs/50-elaboration.log
+?? evidence/w4-lint/scale/logs/ast-nested-one-file.json
+?? evidence/w4-lint/scale/measure.py
+?? evidence/w4-lint/scale/run.sh
+?? evidence/w4-lint/scale/scale_harness.cpp
+?? evidence/w5-backend/README.md
+?? evidence/w5-backend/cap-slang-live.txt
+?? evidence/w5-backend/cap-verible-live.txt
+?? evidence/w5-backend/format-input.sv
+?? evidence/w5-backend/format-output.sv
+?? evidence/w5-backend/harness/CMakeLists.txt
+?? evidence/w5-backend/harness/capability_probe.py
+?? evidence/w5-backend/harness/root_grab.cpp
+?? evidence/w5-backend/harness/t11_batch_dump.cpp
+?? evidence/w5-backend/harness/w5_probe.cpp
+?? evidence/w5-backend/product-status-badge-zoom.png
+?? evidence/w5-backend/product-token-span-zoom.png
+?? evidence/w5-backend/product-token-span.png
+?? evidence/w5-backend/t11-after-20261102T105545Z/format-input.sv
+?? evidence/w5-backend/t11-after-20261102T105545Z/format-output.sv
+?? evidence/w5-backend/t11-cli-vs-batch-20261102T105903Z.log
+?? evidence/w5-backend/t11-cli-vs-batch.sh
+?? evidence/w5-backend/t11-gates-20261102T105002Z.log
+?? evidence/w5-backend/t11-gates-20261102T105425Z-rerun.log
+?? evidence/w5-backend/t11-recheck-20261102T104850Z/format-input.sv
+?? evidence/w5-backend/t11-recheck-20261102T104850Z/format-output.sv
+?? evidence/w5-backend/t11-unlock-20261102.md
+?? evidence/w5-backend/w5-probe-20261102T104850Z-baseline.log
+?? evidence/w5-backend/w5-probe-20261102T105545Z-after.log
+?? evidence/w5-backend/w5-probe-t50.log
+?? evidence/w5-backend/w5-probe-takeover.log
+?? evidence/w5-backend/w5-probe.log
+?? evidence/w6-hier/01-c-abi-end-to-end.txt
+?? evidence/w6-hier/02-qt-macro-guard.txt
+?? evidence/w6-hier/03-service-report.txt
+?? evidence/w6-hier/04-a11-qt-guard.txt
+?? evidence/w6-hier/05-gate-tests.txt
+?? evidence/w6-hier/06-gate-clippy.txt
+?? evidence/w6-hier/07-workspace-clippy.txt
+?? evidence/w6-hier/08-owner-verification.log
+?? evidence/w6-hier/08-owner-verification.md
+?? evidence/w6-hier/09-t46-gate-clippy-fmt.txt
+?? evidence/w6-hier/09-t46-gate-tests.txt
+?? evidence/w6-hier/09-t46-hierarchy-fix.md
+?? evidence/w6-hier/10-t46-recheck-clippy-fmt.txt
+?? evidence/w6-hier/10-t46-recheck-elaborate-20261102T104444Z.log
+?? evidence/w6-hier/10-t46-recheck-groundtruth-20261102T104512Z.log
+?? evidence/w6-hier/10-t46-recheck-tests-20261102T104309Z.log
+?? evidence/w6-hier/10-t46-recheck.md
+?? evidence/w6-hier/README.md
+?? evidence/w6-hier/qt-abi-guard/negative_control.cpp
+?? evidence/w6-hier/qt-abi-guard/qt_abi_guard.cpp
+?? probes/slang-spike/README.md
+?? probes/slang-spike/build-sluserver-centos7.sh
+?? probes/slang-spike/buildfile_rule_probe.py
+?? probes/slang-spike/elab_probe.py
+?? probes/slang-spike/fixture/mid.sv
+?? probes/slang-spike/fixture/top.sv
+?? probes/slang-spike/gcc11_path_hash.h
+?? probes/slang-spike/lsp_hierarchy_probe.py
+?? probes/slang-spike/lsp_initialize.py
+?? probes/slang-spike/run-spike.sh
+?? src/app/i18n.cpp
+?? src/app/i18n.h
+?? src/editor/kernel/editor_advanced.cpp
+?? src/editor/kernel/editor_advanced.h
+?? src/editor/kernel/editor_context_menu.cpp
+?? src/editor/kernel/editor_context_menu.h
+?? src/editor/kernel/find_replace_selftest.cpp
+?? src/editor/kernel/lsp_actions.cpp
+?? src/editor/kernel/lsp_actions.h
+?? src/editor/kernel/multi_cursor_selftest.cpp
+?? src/editor/kernel/signature_help.cpp
+?? src/editor/kernel/signature_help.h
+?? src/editor/kernel/signature_help_selftest.cpp
+?? src/workspace/breadcrumb/breadcrumb_bar.cpp
+?? src/workspace/breadcrumb/breadcrumb_bar.h
+?? src/workspace/breadcrumb/tests/breadcrumb_click_tests.cpp
+?? src/workspace/diagnostics/lint_progress.cpp
+?? src/workspace/diagnostics/lint_progress.h
+?? src/workspace/jump/CMakeLists.txt
+?? src/workspace/jump/README.md
+?? src/workspace/jump/jump_integration.cpp
+?? src/workspace/jump/jump_integration.h
+?? src/workspace/jump/jump_registry.cpp
+?? src/workspace/jump/jump_registry.h
+?? src/workspace/jump/jump_target.h
+?? src/workspace/jump/tests/jump_tests.cpp
+?? src/workspace/module_tree/CMakeLists.txt
+?? src/workspace/module_tree/README.md
+?? src/workspace/module_tree/hierarchy_client.cpp
+?? src/workspace/module_tree/hierarchy_client.h
+?? src/workspace/module_tree/hierarchy_tree.cpp
+?? src/workspace/module_tree/hierarchy_tree.h
+?? src/workspace/module_tree/hierarchy_types.cpp
+?? src/workspace/module_tree/hierarchy_types.h
+?? src/workspace/module_tree/module_tree_integration.cpp
+?? src/workspace/module_tree/module_tree_integration.h
+?? src/workspace/module_tree/module_tree_panel.cpp
+?? src/workspace/module_tree/module_tree_panel.h
+?? src/workspace/module_tree/module_tree_selftest.cpp
+?? src/workspace/project/project_subscription.cpp
+?? src/workspace/project/project_subscription.h
+?? src/workspace/project/project_variables_dialog.cpp
+?? src/workspace/project/project_variables_dialog.h
+?? src/workspace/settings/settings_keys.h
+?? translations/qtbase_zh_CN.qm
+?? translations/vedit_zh_CN.ts

@@ -7,7 +7,7 @@
 //   * typing filters the shared file index, Enter activates the file and the
 //     editor bridge receives it;
 //   * opening the palette twice walks the disk exactly once (shared index);
-//   * the explicit "No matching files" empty state renders.
+//   * the explicit QCoreApplication::translate("VEdit", "No matching files") empty state renders.
 //
 // Built only when `vedit_app_shell` is part of the same CMake build (the root
 // build does, a standalone palette configure does not).
@@ -39,6 +39,7 @@
 #include <QTemporaryDir>
 
 #include <cstdio>
+#include <QCoreApplication>
 
 namespace {
 
@@ -273,6 +274,30 @@ int main(int argc, char **argv)
     check(QStringLiteral("integration.ktexteditor-opened-path-recorded"),
           integration->openedPath() == helperPath);
 #endif
+
+    // FIX 2 (F2): Ctrl+P follows a runtime root switch. File > Open Folder and
+    // the `.f` import both end in ApplicationShell::setProjectRoot(); the
+    // palette's shared index must drop the old snapshot and search the new root
+    // on the next open (before this fix it kept the old/empty root until a
+    // restart).
+    {
+        const QString projectB = temp.path() + QStringLiteral("/project-b");
+        writeFile(projectB + QStringLiteral("/src/other.cpp"), QByteArray("// other\n"));
+        shell.setProjectRoot(projectB);
+        pump();
+        check(QStringLiteral("integration.root-follows-projectRootChanged"),
+              integration->fileIndex()->root() == QFileInfo(projectB).absoluteFilePath());
+        action->trigger();
+        pump();
+        check(QStringLiteral("integration.root-rescan-new-root"),
+              integration->fileIndex()->displayPaths()
+                  == QStringList{QStringLiteral("src/other.cpp")});
+        check(QStringLiteral("integration.root-old-files-gone"),
+              !integration->fileIndex()->displayPaths().contains(
+                  QStringLiteral("src/main.cpp")));
+        palette->closePalette();
+        pump();
+    }
 
     std::printf("INTEGRATION-SELFTEST ok=%d checks=%d failures=%d\n",
                 g_failures == 0 ? 1 : 0, g_checks, g_failures);

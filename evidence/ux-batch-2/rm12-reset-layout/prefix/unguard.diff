@@ -1,0 +1,55 @@
+--- src/app/app_shell.cpp	2026-11-06 16:42:06.278282014 +0800
++++ target/rm12-prefix/app_shell_prefix.cpp	2026-11-06 16:42:08.061890006 +0800
+@@ -718,13 +718,6 @@
+         openProjectFolderDialog();
+     });
+     commands_->setHandler(QStringLiteral("file.new-layout"), [this]() {
+-        // RM-12: resetLayout() deletes every pane AND the document that dies
+-        // with it (KTextEditor bounds the document to its view). The user must
+-        // answer the SAME unsaved-document question the window close asks; a
+-        // cancelled answer leaves every buffer and the layout untouched.
+-        if (!confirmUnsavedDocuments()) {
+-            return;
+-        }
+         editorArea_->resetLayout();
+         updateStatusBar();
+     });
+@@ -746,16 +739,7 @@
+         }
+         updateStatusBar();
+     });
+-    commands_->setHandler(QStringLiteral("file.quit"), [this]() {
+-        // RM-12 family audit: QApplication::quit() ends the process WITHOUT
+-        // running closeEvent(), so File > Quit / Ctrl+Q was a second silent
+-        // data-loss path (every dirty buffer died unasked). Ask the SAME
+-        // unsaved-document question the window close asks before quitting.
+-        if (!confirmUnsavedDocuments()) {
+-            return;
+-        }
+-        QApplication::quit();
+-    });
++    commands_->setHandler(QStringLiteral("file.quit"), []() { QApplication::quit(); });
+     commands_->setHandler(QStringLiteral("view.split.horizontal"), [this]() {
+         editorArea_->splitActive(Qt::Horizontal);
+         updateStatusBar();
+@@ -769,20 +753,9 @@
+         updateStatusBar();
+     });
+     commands_->setHandler(QStringLiteral("view.layout.mixed"), [this]() {
+-        // RM-12: the mixed preset starts from resetLayout(), i.e. it destroys
+-        // every pane and document exactly like Reset Layout. Same confirmation;
+-        // a cancelled answer must not even add panes to the current layout.
+-        if (!confirmUnsavedDocuments()) {
+-            return;
+-        }
+         applyMixedSplitPreset();
+     });
+     commands_->setHandler(QStringLiteral("view.layout.reset"), [this]() {
+-        // RM-12: see file.new-layout above. Cancel keeps every dirty document
+-        // and the layout byte-for-byte (the check asserts the layout JSON).
+-        if (!confirmUnsavedDocuments()) {
+-            return;
+-        }
+         editorArea_->resetLayout();
+         updateStatusBar();
+         syncEditorCommandStates();

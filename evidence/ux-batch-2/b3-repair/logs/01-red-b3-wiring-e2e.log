@@ -1,0 +1,185 @@
+CHECK PASS product.fixture
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+CHECK PASS product.panel
+CHECK PASS product.lint-action
+CHECK PASS product.hover-action
+CHECK FAIL project.preload-message  status='No project file set — open a folder first'
+LINT-PROJECT engine=slang files=2 lsp-backend=verible include-dirs=0 defines=0 skipped-open=0 automatic=0
+This plugin does not support propagateSizeHints()
+LINT-PASS-FINISHED automatic=0 errors=1 files=2 dialogs=1 notice=1
+This plugin does not support raise()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK PASS product.explicit-pass-files  files=/tmp/vedit-b3-wiring-e2e-nYuZlJ/project1/a.sv,/tmp/vedit-b3-wiring-e2e-nYuZlJ/project1/b.sv
+CHECK PASS product.pane
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+CHECK PASS product.open-a
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+CHECK PASS product.open-b
+This plugin does not support propagateSizeHints()
+CHECK PASS hover.view-a
+DIAG-HOVER file='/tmp/vedit-b3-wiring-e2e-nYuZlJ/project1/a.sv' line=2 column=3 severity=1 rule='no-trailing-spaces' fixable=1 probe-count=1
+OBSERVED hover.after-hover alive=0 parent=0 diagnostic=0 rule=''
+CHECK FAIL hover.popup-created  map=<missing>
+CHECK FAIL hover.parent-is-active-view
+CHECK FAIL hover.shows-diagnostic
+CHECK FAIL hover.probe-off-mouse-path  pending=0
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK FAIL hover.tab-switch  parent=0 hidden=0
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK FAIL upper.initial-covers-b  upper=
+CHECK PASS r2.background-tab-invalidated  upper=
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+This plugin does not support raise()
+LINT-PASS-FINISHED automatic=0 errors=2 files=1 dialogs=2 notice=1
+CHECK PASS c8.b-is-dirty
+CHECK PASS c8.save-a
+CHECK PASS c8.auto-pass-after-save
+OBSERVED c8.after-save-a files='/tmp/vedit-b3-wiring-e2e-nYuZlJ/project1/b.sv'
+CHECK FAIL c8.saved-file-included  files=/tmp/vedit-b3-wiring-e2e-nYuZlJ/project1/b.sv
+CHECK FAIL c8.dirty-buffer-excluded  files=/tmp/vedit-b3-wiring-e2e-nYuZlJ/project1/b.sv
+CHECK PASS c8.save-b
+LINT-PASS-FINISHED automatic=1 errors=3 files=1 dialogs=2 notice=1
+This plugin does not support propagateSizeHints()
+CHECK PASS c8.auto-pass-after-save-b
+OBSERVED c8.after-save-b files='/tmp/vedit-b3-wiring-e2e-nYuZlJ/project1/a.sv'
+CHECK FAIL c8.saved-b-now-included  files=/tmp/vedit-b3-wiring-e2e-nYuZlJ/project1/a.sv
+CHECK PASS c8.unmodified-open-included  files=/tmp/vedit-b3-wiring-e2e-nYuZlJ/project1/a.sv
+OBSERVED presentation automatic=0 dialogsShown=-1 rows=0
+CHECK FAIL modal.automatic-never-shows  automatic=0 dialogsShown=-1
+CHECK PASS modal.dialog-not-visible-after-auto
+CHECK FAIL modal.counter-detects-reshow
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=1 errors=0 files=1 dialogs=2 notice=0
+This plugin does not support propagateSizeHints()
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+LINT-PROJECT engine=slang files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+LINT-PROJECT-FAILED engine=slang reason='a project lint pass is already running'
+LINT-PASS-FINISHED automatic=0 errors=0 files=1 dialogs=2 notice=0
+OBSERVED root.after-switch files='/tmp/vedit-b3-wiring-e2e-nYuZlJ/project1/a.sv'
+CHECK FAIL root.repinned  files=/tmp/vedit-b3-wiring-e2e-nYuZlJ/project1/a.sv
+CHECK FAIL root.old-rows-cleared  old=/tmp/vedit-b3-wiring-e2e-nYuZlJ/project1/a.sv upper-now=
+CHECK FAIL root.new-rows-covered  new=/tmp/vedit-b3-wiring-e2e-nYuZlJ/project2/c.sv
+CHECK PASS destroy.tab-closed
+CHECK FAIL destroy.cache-cleared  alive=0 stale=0

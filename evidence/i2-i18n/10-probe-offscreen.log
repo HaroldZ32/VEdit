@@ -1,0 +1,64 @@
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+PASS probe.temp-dir
+PASS i18n.zh.installed — tag=zh_CN setting=zh_CN
+PASS i18n.zh.tag — zh_CN
+PASS i18n.zh.qm — /vedit-build/target/qt6-build/src/app/translations/vedit_zh_CN.qm
+PASS i18n.zh.translate-shell — 文件(&F)
+PASS i18n.zh.translate-cancel-message
+PASS i18n.idempotent
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PASS shell.zh.menu — 设置(&S)
+PASS shell.zh.command — 保存(&S)
+PASS shell.pane
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+PASS open.alpha
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+PASS open.bravo
+PASS pane.two-tabs — 2
+PASS archive.saved
+PASS archive.exists
+PASS archive.schema-v2
+PASS archive.no-language-key
+PASS archive.sha-readable
+PASS panel.store-loaded — Loading settings from /tmp/vedit-i18n-probe-pHmuYN/state/settings.toml …
+PASS panel.language-row
+PASS panel.language-values — auto,en,zh_CN
+PASS panel.language-stored — zh_CN
+PASS panel.language-pending
+PASS panel.language-hint — 重启后生效。
+PASS dirty.both
+PASS archive.baseline-refreshed
+[app-shell] 语言未切换：重启已取消
+PASS cancel.one-prompt — 1
+PASS cancel.prompt-lists-two — alpha.sv, bravo.sv
+PASS cancel.panel-message — 语言未切换：重启已取消
+PASS cancel.shell-message — 语言未切换：重启已取消
+PASS cancel.no-relaunch
+PASS cancel.settings-unchanged
+PASS cancel.archive-unchanged
+PASS cancel.archive-mtime-unchanged
+PASS cancel.alpha-unchanged
+PASS cancel.bravo-unchanged
+PASS cancel.language-not-stored — zh_CN
+[app-shell] 正在重启以应用界面语言 en
+PASS save.one-prompt — 1
+PASS save.document-a-written
+PASS save.document-b-written
+PASS save.language-stored
+PASS save.language-in-panel — en
+PASS save.relaunch-fired — 1
+PASS save.panel-message — 正在重启以应用界面语言…
+PASS save.archive-valid
+PASS save.archive-no-language-key
+PASS save.archive-sha-unchanged — before=556477c049b5 after=556477c049b5
+PASS save.commands-saved
+PASS next-start.english — translated=0 tag=en
+PASS next-start.source-string — &File
+PASS store.language-write
+PASS store.settings-updated
+PASS store.archive-sha-unchanged — before=556477c049b5 after=556477c049b5
+PASS store.archive-mtime-unchanged
+PASS store.archive-no-language-key
+PASS store.roundtrip — loaded=1 value=zh_CN
+I18N-PROBE failures=0 platform=offscreen translations=/vedit-build/target/qt6-build/src/app/translations

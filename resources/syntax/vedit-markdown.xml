@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language>
+<!--
+  VEdit Markdown syntax definition (authored for VEdit; NOT a copy of KDE's
+  markdown.xml). Semantic source: the CommonMark/GFM constructs the product needs
+  (ATX headings, fenced code, inline code, emphasis, links/images, block quotes,
+  lists, rules); KDE's markdown.xml (KF6 6.24) was only consulted for its
+  construct inventory, and no text was copied.
+  SPDX-License-Identifier: LGPL-2.1-or-later
+  Folding: none (Markdown has no block keyword structure worth a fold region).
+  The file name deliberately differs from KDE's `markdown.xml`.
+-->
+<language name="Markdown" version="1" kateversion="5.0" section="Markup"
+          extensions="*.md;*.markdown;*.mdown;*.mkd" mimetype="text/markdown"
+          author="VEdit" license="LGPL-2.1-or-later" priority="15">
+  <highlighting>
+    <contexts>
+      <context name="Normal" attribute="Normal Text" lineEndContext="#stay">
+        <!-- Fenced code blocks (``` or ~~~, up to three spaces of indent). The
+             closing fence is matched first, so the opening line is re-checked
+             and the block always ends at the next fence of the same marker. -->
+        <RegExpr attribute="Code Block" context="FencedCode" String="^\s{0,3}(```|~~~)"/>
+        <!-- Block quote and list markers: only the marker is coloured. -->
+        <RegExpr attribute="Quote" context="#stay" String="^\s{0,3}&gt;\s?"/>
+        <RegExpr attribute="List Marker" context="#stay" String="^\s{0,3}([-*+]|\d+[.)])\s"/>
+        <!-- ATX heading: whole line. -->
+        <RegExpr attribute="Heading" context="#stay" String="^\s{0,3}#{1,6}\s.*$"/>
+        <!-- Inline code before emphasis: `*` inside code stays code. -->
+        <RegExpr attribute="Code" context="#stay" String="`[^`]*`"/>
+        <RegExpr attribute="Link" context="#stay" String="!?\[[^\]\n]*\]\([^)\n]*\)"/>
+        <RegExpr attribute="Link" context="#stay" String="&lt;https?://[^&gt;\n]+&gt;"/>
+        <RegExpr attribute="Link" context="#stay" String="\bhttps?://[^\s)&lt;&gt;]+"/>
+        <RegExpr attribute="Bold" context="#stay" String="\*\*[^*\n]+\*\*"/>
+        <RegExpr attribute="Bold" context="#stay" String="__[^_\n]+__"/>
+        <RegExpr attribute="Italic" context="#stay" String="\*[^*\n]+\*"/>
+        <RegExpr attribute="Italic" context="#stay" String="_[^_\n]+_"/>
+        <RegExpr attribute="Bold" context="#stay" String="~~[^~\n]+~~"/>
+        <RegExpr attribute="Code" context="#stay" String="&lt;/?[A-Za-z][A-Za-z0-9-]*(\s[^&gt;\n]*)?/?&gt;"/>
+        <RegExpr attribute="Escape" context="#stay" String="\\[\\`*_{}\[\]()#+\-.!]"/>
+      </context>
+      <context name="FencedCode" attribute="Code Block" lineEndContext="#stay">
+        <RegExpr attribute="Code Block" context="#pop" String="^\s{0,3}(```|~~~)"/>
+      </context>
+    </contexts>
+    <itemDatas>
+      <itemData name="Normal Text" defStyleNum="dsNormal"/>
+      <itemData name="Heading" defStyleNum="dsKeyword" bold="1"/>
+      <itemData name="Bold" defStyleNum="dsNormal" bold="1"/>
+      <itemData name="Italic" defStyleNum="dsNormal" italic="1"/>
+      <itemData name="Code" defStyleNum="dsVerbatimString"/>
+      <itemData name="Code Block" defStyleNum="dsVerbatimString"/>
+      <itemData name="Quote" defStyleNum="dsComment" italic="1"/>
+      <itemData name="List Marker" defStyleNum="dsOperator"/>
+      <itemData name="Link" defStyleNum="dsFunction"/>
+      <itemData name="Escape" defStyleNum="dsSpecialChar"/>
+    </itemDatas>
+    <keywords casesensitive="1"/>
+  </highlighting>
+</language>

@@ -1,0 +1,47 @@
+== vedit-jump-tests (jump lane selftest, standalone lane build in the pinned Qt6 image) ==
+host: PRETTY_NAME="Ubuntu 26.04.1 LTS"; qt6: QMake version 3.1 Using Qt version 6.10.2 in /usr/lib/x86_64-linux-gnu ; cmake: cmake version 4.2.3
+CHECK registry.initially-no-target PASS
+NO-TARGET status=no-target file='rtl/top.sv' line=12 column=3
+CHECK noop.status PASS
+CHECK noop.request-preserved PASS
+CHECK noop.count PASS actual=1 expected=1
+CHECK noop.delivered PASS actual=0 expected=0
+CHECK noop.last-result PASS
+CHECK noop.count.two PASS actual=2 expected=2
+CHECK invalid.empty-path PASS
+CHECK invalid.blank-path PASS
+CHECK invalid.zero-line PASS
+CHECK invalid.zero-column PASS
+CHECK invalid.count PASS actual=4 expected=4
+CHECK invalid.target-not-called PASS actual=0 expected=0
+CHECK invalid.delivered PASS actual=0 expected=0
+CHECK delivery.has-target PASS
+DELIVERED target-calls=1 file='rtl/deep/mid.sv' line=42 column=7
+CHECK delivery.status PASS
+CHECK delivery.target-calls PASS actual=1 expected=1
+CHECK delivery.file PASS actual='rtl/deep/mid.sv' expected='rtl/deep/mid.sv'
+CHECK delivery.line PASS actual=42 expected=42
+CHECK delivery.column PASS actual=7 expected=7
+CHECK delivery.count PASS actual=1 expected=1
+CHECK delivery.last-result PASS
+CHECK rejected.status PASS
+CHECK rejected.count PASS actual=1 expected=1
+CHECK rejected.target-called PASS actual=2 expected=2
+CHECK replace.old-not-called PASS actual=2 expected=2
+CHECK replace.new-called PASS actual=1 expected=1
+CHECK replace.new-file PASS actual='rtl/other.sv' expected='rtl/other.sv'
+CHECK clear-if.other-kept PASS
+CHECK clear-if.expected-cleared PASS
+CHECK clear.after-clear-no-target PASS actual=1 expected=1
+CHECK clear.null-nullptr-safe PASS
+CHECK guard.delivered-while-alive PASS
+CHECK guard.dropped-after-destroy PASS
+DESTROYED-TARGET status=no-target file='rtl/gone.sv' (no crash)
+CHECK guard.after-destroy-no-target PASS
+CHECK guard.target-getter-null PASS
+CHECK status-name.no-target PASS
+CHECK status-name.invalid PASS
+CHECK status-name.delivered PASS
+CHECK status-name.rejected PASS
+SUMMARY checks=40 failures=0
+[exit=0]

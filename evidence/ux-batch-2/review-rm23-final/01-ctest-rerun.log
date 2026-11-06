@@ -1,0 +1,1106 @@
+UpdateCTestConfiguration  from :/vedit-build/target/qt6-build/DartConfiguration.tcl
+Test project /vedit-build/target/qt6-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 38
+    Start 38: vedit-project-variables-e2e
+
+38: Test command: /vedit-build/target/qt6-build/src/app/workspace-lane-project/vedit-project-variables-e2e
+38: Working Directory: /vedit-build/target/qt6-build/src/app/workspace-lane-project
+38: Environment variables: 
+38:  QT_QPA_PLATFORM=offscreen
+38:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime-project
+38: Test timeout computed to be: 180
+38: CHECK PASS rm3.dialog.shows-whole-table  rows=2 names=MISSING,A
+38: CHECK PASS rm3.dialog.known-value-prefilled
+38: CHECK PASS rm3.dialog.add
+38: CHECK PASS rm3.dialog.add-in-table
+38: CHECK PASS rm3.dialog.duplicate-refused
+38: CHECK PASS rm3.dialog.invalid-refused  A name may only contain letters, digits and '_', and cannot start with a digit | A name may only contain letters, digits and '_', and cannot start with a digit | A name may only contain letters, digits and '_', and cannot start with a digit | A name may only contain letters, digits and '_', and cannot start with a digit | Enter a variable name
+38: CHECK PASS rm3.dialog.delete
+38: CHECK PASS rm3.dialog.delete-removes-entry
+38: CHECK PASS rm3.dialog.delete-note  Removed A
+38: CHECK PASS rm3.dialog.delete-required  Removed A
+38: CHECK PASS rm3.expand.missing-reported
+38: CHECK PASS rm3.panel.add-applied
+38: CHECK PASS rm3.substitution-uses-new-value
+38: CHECK PASS rm3.table-has-added  NEWVAR=v1
+38: CHECK PASS rm3.panel.add-second
+38: CHECK PASS rm3.panel.delete-applied
+38: CHECK PASS rm3.panel.delete-removed-from-model  NEWVAR=v1
+38: CHECK PASS rm3.panel.shows-table
+38: CHECK PASS rm3.persisted-file-has-per-root-map  /tmp/vedit-project-variables-e2e-rpLSYm/state/project-model.json
+38: CHECK PASS rm3.restart.restore-loads
+38: CHECK PASS rm3.restart.variables-restored  NEWVAR=v1
+38: CHECK PASS rm3.restart.re-expands-with-table
+38: CHECK PASS rm3.switch.b-settled
+38: CHECK PASS rm3.switch.b-has-no-a-variable
+38: CHECK PASS rm3.switch.b-reports-own-missing  BVAR
+38: CHECK PASS rm3.switch.b-add-applied
+38: CHECK PASS rm3.switch.b-substitutes
+38: CHECK PASS rm3.switch.back-to-a-settled
+38: CHECK PASS rm3.switch.a-table-restored  NEWVAR=v1
+38: CHECK PASS rm3.switch.a-substitutes-again  /tmp/vedit-project-variables-e2e-rpLSYm/shared/v1.sv
+38: CHECK PASS rm3.switch.both-roots-persisted
+38: CHECK PASS rm3.required.delete-applied
+38: CHECK PASS rm3.required.delete-removed-value
+38: CHECK PASS rm3.required.reported-missing-again
+38: CHECK PASS rm3.required.panel-no-longer-shows-value
+38: CHECK PASS rm3.required.dialog-asks-again
+38: SUMMARY checks=36 failures=0
+1/2 Test #38: vedit-project-variables-e2e ......   Passed    0.17 sec
+test 52
+    Start 52: vedit-rm2-project-switch-e2e
+
+52: Test command: /vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-rm2-project-switch-e2e
+52: Working Directory: /vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics
+52: Environment variables: 
+52:  QT_QPA_PLATFORM=offscreen
+52:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime-diagnostics
+52:  VEDIT_QUIET=1
+52: Test timeout computed to be: 300
+52: CHECK PASS rm2.fixture
+52: kf.sonnet.core: Sonnet: No speller backends available!
+52: qt.core.qobject.connect: QObject::connect: No such signal vedit::app::ApplicationShell::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-app-shell')
+52: qt.core.qobject.connect: QObject::connect: No such signal QMainWindowLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   '_layout')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'editor-area')
+52: qt.core.qobject.connect: QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTimer::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'ctrlSAuthorityGuard')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'pane-wrapper')
+52: qt.core.qobject.connect: QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'editor-pane')
+52: qt.core.qobject.connect: QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'editor-pane-tab-row')
+52: qt.core.qobject.connect: QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTabBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'editor-tab-bar')
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tab-close-button')
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'ScrollLeftButton')
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'ScrollRightButton')
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'editor-pane-active-badge')
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'pane-close-button')
+52: qt.core.qobject.connect: QObject::connect: No such signal vedit::breadcrumb::Bar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'breadcrumb-bar')
+52: qt.core.qobject.connect: QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QStackedWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'editor-pane-stack')
+52: qt.core.qobject.connect: QObject::connect: No such signal QStackedLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KTextEditor::ViewPrivate::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'ktexteditor-view')
+52: qt.core.qobject.connect: QObject::connect: No such signal KateViewInternal::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QObject::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTimer::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTimer::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTimer::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTimer::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTimer::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QScroller::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KateScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KateIconBorder::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KTextEditor::AbstractAnnotationItemDelegate::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KateSpellCheckDialog::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_spelling_from_cursor')
+52: qt.core.qobject.connect: QObject::connect: No such signal QObject::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'kate bookmarks')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'bookmarks_toggle')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'bookmarks_clear')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'bookmarks_next')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'bookmarks_previous')
+52: qt.core.qobject.connect: QObject::connect: No such signal KActionMenu::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'bookmarks')
+52: qt.core.qobject.connect: QObject::connect: No such signal KateSpellingMenu::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KActionMenu::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'spelling_suggestions')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QActionGroup::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KateViewBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QStackedWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QStackedLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KateStatusBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QPushButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QPushButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QPushButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QPushButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QMenu::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QActionGroup::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QPushButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QMenu::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QActionGroup::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QPushButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QPushButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QPushButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QActionGroup::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QActionGroup::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QMenu::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KateMessageWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTimer::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KMessageWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTimeLine::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KateAnimation::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KateMessageWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTimer::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KMessageWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTimeLine::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KateAnimation::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KActionMenu::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_emmetExpand')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_emmetWrap')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_emmetMatchingPair')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_emmetSelectTagPairInwards')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_emmetSelectTagPairOutwards')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_emmetToggleComment')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_emmetNext')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_emmetPrev')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_emmetSelectNext')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_emmetSelectPrev')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_emmetDelete')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_emmetSplitJoinTab')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_emmetEvaluateMathExpression')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_emmetDecrementNumberBy1')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_emmetDecrementNumberBy10')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_emmetDecrementNumberBy01')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_emmetIncrementNumberBy1')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_emmetIncrementNumberBy10')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_emmetIncrementNumberBy01')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_jumpIndentUp')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_jumpIndentDown')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_jumpToNextBlankLine')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_jumpToPrevBlankLine')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_nextParagraph')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_previousParagraph')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_rtrim')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_ltrim')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_trim')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_join')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_moveLinesDown')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_moveLinesUp')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_duplicateLinesDown')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_duplicateLinesUp')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_duplicateSelection')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_encodeURISelection')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_decodeURISelection')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_scripts_rmblank')
+52: qt.core.qobject.connect: QObject::connect: No such signal KToggleAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_toggle_write_lock')
+52: qt.core.qobject.connect: QObject::connect: No such signal KToggleAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'force_rtl_direction')
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'file_save_as_with_encoding')
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KActionMenu::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_mode')
+52: qt.core.qobject.connect: QObject::connect: No such signal KateHighlightingMenu::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_highlighting')
+52: qt.core.qobject.connect: QObject::connect: No such signal KActionMenu::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'view_schemas')
+52: qt.core.qobject.connect: QObject::connect: No such signal KateViewIndentationAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_indentation')
+52: qt.core.qobject.connect: QObject::connect: No such signal KToggleAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'set_verticalSelect')
+52: qt.core.qobject.connect: QObject::connect: No such signal KToggleAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'set_insert')
+52: qt.core.qobject.connect: QObject::connect: No such signal KToggleAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'view_show_whitespaces')
+52: qt.core.qobject.connect: QObject::connect: No such signal KToggleAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'view_dynamic_word_wrap')
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'dynamic_word_wrap_indicators')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KToggleAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'view_static_word_wrap')
+52: qt.core.qobject.connect: QObject::connect: No such signal KToggleAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'view_word_wrap_marker')
+52: qt.core.qobject.connect: QObject::connect: No such signal KToggleAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'view_folding_markers')
+52: qt.core.qobject.connect: QObject::connect: No such signal KToggleAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'view_border')
+52: qt.core.qobject.connect: QObject::connect: No such signal KToggleAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'view_line_numbers')
+52: qt.core.qobject.connect: QObject::connect: No such signal KToggleAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'view_scrollbar_marks')
+52: qt.core.qobject.connect: QObject::connect: No such signal KToggleAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'view_scrollbar_minimap')
+52: qt.core.qobject.connect: QObject::connect: No such signal KToggleAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'view_non_printable_spaces')
+52: qt.core.qobject.connect: QObject::connect: No such signal KActionMenu::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'view_input_modes')
+52: qt.core.qobject.connect: QObject::connect: No such signal QActionGroup::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'set_eol')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KToggleAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'add_bom')
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'set_encoding')
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KSelectAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KToggleAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'tools_toggle_automatic_spell_checking')
+52: qt.core.qobject.connect: QObject::connect: No such signal QObject::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'doccomplete_sh')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'doccomplete_bw')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'doccomplete_fw')
+52: qt.core.qobject.connect: QObject::connect: No such signal QGridLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KTextEditor::DocumentPrivate::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KateUndoManager::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KateBuffer::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KateAutoIndent::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QObject::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KToggleAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'view_auto_reload')
+52: qt.core.qobject.connect: QObject::connect: No such signal vedit::editor::FoldBreadcrumbBinding::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'breadcrumb-binding')
+52: qt.core.qobject.connect: QObject::connect: No such signal QTimer::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'breadcrumbDebounce')
+52: qt.core.qobject.connect: QObject::connect: No such signal vedit::editor::FimBinding::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTimer::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'fim-ghost')
+52: qt.core.qobject.connect: QObject::connect: No such signal QShortcut::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal vedit::editor::DiagnosticsAnnotations::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KTextEditor::AnnotationModel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal vedit::editor::FindReplaceBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-find-bar')
+52: qt.core.qobject.connect: QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QLineEdit::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-find-pattern')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidgetLineControl::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   '_q_qlineeditclearaction')
+52: qt.core.qobject.connect: QObject::connect: No such signal QLineEditIconButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-find-case')
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-find-whole')
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-find-regex')
+52: qt.core.qobject.connect: QObject::connect: No such signal QComboBox::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-find-scope')
+52: qt.core.qobject.connect: QObject::connect: No such signal QStandardItemModel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QComboBoxPrivateContainer::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QComboBoxListView::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QComboMenuDelegate::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QComboBoxPrivateScroller::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QComboBoxPrivateScroller::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-find-scope-selection')
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-find-prev')
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-find-next')
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-find-status')
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-find-close')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QLineEdit::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-find-replacement')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidgetLineControl::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-find-replace')
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-find-replace-all')
+52: qt.core.qobject.connect: QObject::connect: No such signal QShortcut::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal vedit::editor::EditorEnhancements::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-editor-enhancements')
+52: qt.core.qobject.connect: QObject::connect: No such signal vedit::editor::MultiCursorController::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-multi-cursor')
+52: qt.core.qobject.connect: QObject::connect: No such signal vedit::editor::LspActionChannel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-lsp-action-channel')
+52: qt.core.qobject.connect: QObject::connect: No such signal vedit::editor::EditorContextMenu::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-editor-context-menu')
+52: qt.core.qobject.connect: QObject::connect: No such signal vedit::editor::DiagnosticNavigator::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-diagnostic-navigator')
+52: qt.core.qobject.connect: QObject::connect: No such signal vedit::editor::SignatureHelp::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-signature-help-controller')
+52: qt.core.qobject.connect: QObject::connect: No such signal QFrame::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-signature-help')
+52: qt.core.qobject.connect: QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-signature-help-text')
+52: qt.core.qobject.connect: QObject::connect: No such signal vedit::editor::EditorAdvanced::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-editor-advanced')
+52: qt.core.qobject.connect: QObject::connect: No such signal QStatusBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QSizeGrip::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'status-dirty')
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'status-project')
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'status-theme')
+52: qt.core.qobject.connect: QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'status-layout')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-edit.undo')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-edit.redo')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-settings.preferences')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-file.new')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-file.open')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-file.open-folder')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-file.switch-project')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-file.new-layout')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-file.save')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-file.save-as')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-file.save-all')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-file.save-session')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-file.close-pane')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-file.quit')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-view.split.horizontal')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-view.split.vertical')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-view.focus.next')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-view.layout.mixed')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-view.layout.reset')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-view.toolbar')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-search.focus')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-view.panel.file-tree')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-view.panel.search')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-view.panel.terminal')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-view.panel.vcs')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-view.panel.outline')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-help.user-manual')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'action-help.about')
+52: qt.core.qobject.connect: QObject::connect: No such signal QMenuBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_menubar_ext_button')
+52: qt.core.qobject.connect: QObject::connect: No such signal QMenu::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'menu-file')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QMenu::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'menu-edit')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QMenu::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'menu-view')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QMenu::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'menu-help')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QMenu::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'menu-file')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QMenu::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'menu-edit')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QMenu::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'menu-view')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QMenu::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'menu-help')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'vedit-main-toolbar')
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolBarLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolBarExtension::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_toolbar_ext_button')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolBarSeparator::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KateCompletionWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KateCompletionModel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTimer::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal KateArgumentHintModel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTreeView::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QHeaderView::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTimer::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTimer::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QFrame::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QStackedWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QStackedLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTextBrowser::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidgetTextControl::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTextDocument::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTextDocumentLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTextImageHandler::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTextFrame::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QFrame::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QPlainTextEdit::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QPlainTextEditControl::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTextDocument::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QPlainTextDocumentLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QSyntaxHighlighter::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QToolButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal vedit::workspace::project::ProjectModel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QDockWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'dock-project')
+52: qt.core.qobject.connect: QObject::connect: No such signal QDockWidgetLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QDockWidgetTitleButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_dockwidget_floatbutton')
+52: qt.core.qobject.connect: QObject::connect: No such signal QDockWidgetTitleButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_dockwidget_closebutton')
+52: qt.core.qobject.connect: QObject::connect: No such signal QAction::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal vedit::workspace::project::ProjectPanel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-panel')
+52: qt.core.qobject.connect: QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-summary')
+52: qt.core.qobject.connect: QObject::connect: No such signal QPushButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-refresh')
+52: qt.core.qobject.connect: QObject::connect: No such signal QPushButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-import-filelist')
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-empty-hint')
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-filelists-header')
+52: qt.core.qobject.connect: QObject::connect: No such signal QListWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-filelist-list')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QListModel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QPushButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-remove-filelist')
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-files-header')
+52: qt.core.qobject.connect: QObject::connect: No such signal QListWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-file-list')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QListModel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QTimer::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-include-header')
+52: qt.core.qobject.connect: QObject::connect: No such signal QListWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-include-dirs')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QListModel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-defines-header')
+52: qt.core.qobject.connect: QObject::connect: No such signal QListWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-defines')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QListModel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-variables-header')
+52: qt.core.qobject.connect: QObject::connect: No such signal QListWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-variables')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QListModel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QPushButton::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-edit-variables')
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-diagnostics-header')
+52: qt.core.qobject.connect: QObject::connect: No such signal QListWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-diagnostics')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QWidget::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+52: qt.core.qobject.connect: QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QListModel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
+52: qt.core.qobject.connect: QObject::connect:  (sender name:   'project-status')
+52: PROJECT-EXPAND-INPUTS root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' filelists=1 variables=0 settings='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/state/settings.toml'
+52: This plugin does not support propagateSizeHints()
+52: This plugin does not support propagateSizeHints()
+52: CHECK PASS rm2.panel
+52: CHECK PASS rm2.controller
+52: CHECK PASS rm2.project-model
+52: CHECK PASS rm2.file-tree
+52: CHECK PASS rm2.pane
+52: CHECK PASS rm2.switch-action  text='S&witch Project…'
+52: CHECK PASS rm2.switch-action-on-toolbar
+52: CHECK PASS rm2.switch-action-labelled  S&witch Project…
+52: PROJECT-ROOT-FILES root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' files=3
+52: PROJECT-ROOT-ENV root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' source=project pinned=1 include-dirs=1 defines=1 env='-I/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/a_inc -DA_ONLY=1'
+52: LINT-PROJECT-OPEN engine=slang files=3 skipped-open=0 automatic=1
+52: RM2-START root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' analysis-files=3 panel-files=3 imported='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/lists/a-imported.f'
+52: RM2-START-FILE '/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/a.sv'
+52: RM2-START-FILE '/tmp/vedit-rm2-project-switch-e2e-ItJnmU/shared/listed.sv'
+52: RM2-START-FILE '/tmp/vedit-rm2-project-switch-e2e-ItJnmU/shared/outside.sv'
+52: CHECK PASS rm2.start-settled
+52: CHECK PASS rm2.start-manifest-not-a-source  manifest-in-set=0
+52: CHECK PASS rm2.start-non-hdl-not-sources
+52: CHECK PASS rm2.start-manifest-sources-present  listed=1
+52: CHECK PASS rm2.start-registry-source-extensions  sv,svh,v,vh
+52: CHECK PASS rm2.start-analysis-has-imported-entry  contains('/tmp/vedit-rm2-project-switch-e2e-ItJnmU/shared/outside.sv')=1
+52: CHECK PASS rm2.start-panel-and-analysis-agree  analysis=3 panel=3
+52: CHECK PASS rm2.start-env-is-project-a  root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' dirs=/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/a_inc defines=A_ONLY=1
+52: [edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+52: CHECK PASS rm2.unsaved.open
+52: CHECK PASS rm2.unsaved.modified
+52: [edit-core] syntax highlighting: 'Fortran (Fixed Format)' resolves to author 'Franchin Matteo (fnch@libero.it)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+52: LINT-PASS-FINISHED automatic=1 errors=0 files=3 dialogs=0 notice=0
+52: RM11-NON-SOURCE path='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/sources.f' opened=1 available=0 reason='not a source language; nothing to analyse' rows=0
+52: CHECK PASS rm11.not-a-source.sources.f  available=0 reason='not a source language; nothing to analyse'
+52: CHECK PASS rm11.not-a-source.rows.sources.f
+52: [edit-core] syntax highlighting: 'Markdown' resolves to author 'Darrin Yeager, Claes Holmerson' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+52: PROJECT-EXPAND-INPUTS root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' filelists=2 variables=0 settings='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/state/settings.toml'
+52: RM11-NON-SOURCE path='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/notes.md' opened=1 available=0 reason='not a source language; nothing to analyse' rows=0
+52: CHECK PASS rm11.not-a-source.notes.md  available=0 reason='not a source language; nothing to analyse'
+52: CHECK PASS rm11.not-a-source.rows.notes.md
+52: [edit-core] syntax highlighting: the editor repository has no 'Tcl' definition; the view would render without colors
+52: PROJECT-ROOT-FILES root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' files=3
+52: PROJECT-ROOT-ENV root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' source=project pinned=1 include-dirs=1 defines=1 env='-I/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/a_inc -DA_ONLY=1'
+52: LINT-PROJECT-OPEN engine=slang files=2 skipped-open=1 automatic=1
+52: RM11-NON-SOURCE path='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/run.tcl' opened=1 available=0 reason='not a source language; nothing to analyse' rows=0
+52: CHECK PASS rm11.not-a-source.run.tcl  available=0 reason='not a source language; nothing to analyse'
+52: CHECK PASS rm11.not-a-source.rows.run.tcl
+52: CHECK PASS rm11.fake-language-unknown-before
+52: CHECK PASS rm11.fake-language-registered
+52: [edit-core] syntax highlighting: no syntax definition for probe.fkh
+52: LINT-PASS-FINISHED automatic=1 errors=0 files=2 dialogs=0 notice=0
+52: CHECK PASS rm11.fake-language-enters-analysis  opened=1 available=1
+52: CHECK PASS t24.predicate.lint
+52: CHECK PASS t24.predicate.catalog
+52: T24-LINT-PASS started=1 settled=1 skipped-open='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/a.sv'
+52: T24-LINT started=1 engine-files=1 excluded=3 files='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/shared/listed.sv' excluded-files='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/sources.f,/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/notes.md,/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/run.tcl'
+52: CHECK PASS t24.lint.boundary-started
+52: CHECK PASS t24.lint.engine-never-sees-non-hdl  /tmp/vedit-rm2-project-switch-e2e-ItJnmU/shared/listed.sv
+52: CHECK PASS t24.lint.sources-reach-engine  /tmp/vedit-rm2-project-switch-e2e-ItJnmU/shared/listed.sv
+52: CHECK PASS t24.lint.excluded-recorded  /tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/sources.f,/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/notes.md,/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/run.tcl
+52: T24-LINT-NON-HDL-ONLY started=0 running=0 message='no files to lint (3 file(s) have no lint analyzer for their file type; modified buffers are excluded)' error='no files to lint (3 file(s) have no lint analyzer for their file type; modified buffers are excluded)'
+52: CHECK PASS t24.lint.non-hdl-only-refused
+52: CHECK PASS t24.lint.reason-recorded  no files to lint (3 file(s) have no lint analyzer for their file type; modified buffers are excluded)
+52: PROJECT-ROOT-CHANGED root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b' files=0 (waiting for the new file set)
+52: PROJECT-ROOT-ENV root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b' source=cleared include-dirs=0 defines=0 env=''
+52: PROJECT-EXPAND-INPUTS root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b' filelists=0 variables=0 settings='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/state/settings.toml'
+52: This plugin does not support propagateSizeHints()
+52: PROJECT-ROOT-FILES root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b' files=1
+52: PROJECT-ROOT-ENV root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b' source=project pinned=1 include-dirs=1 defines=1 env='-I/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b/b_inc -DB_ONLY=1'
+52: LINT-PROJECT-OPEN engine=slang files=1 skipped-open=1 automatic=1
+52: RM2-SWITCH A-to-B to='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b' from='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' expansions=3 settled=1
+52: RM2-SET root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b' analysis=1 panel=1 persisted=1
+52: RM2-SET-FILE '/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b/b.sv'
+52: RM2-ENV root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b' include-dirs='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b/b_inc' defines='B_ONLY=1'
+52: CHECK PASS rm2.A-to-B.settled
+52: CHECK PASS rm2.A-to-B.diagnostics-root
+52: CHECK PASS rm2.A-to-B.project-root
+52: CHECK PASS rm2.A-to-B.one-expansion  before=2 after=3 expected=3
+52: CHECK PASS rm2.A-to-B.analysis-no-previous-file  previous='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/a.sv' still-under-previous='<none>'
+52: CHECK PASS rm2.A-to-B.analysis-has-target-file
+52: CHECK PASS rm2.A-to-B.analysis-equals-panel  analysis=1 panel=1 property=1
+52: CHECK PASS rm2.A-to-B.imported-list-cleared  outside-in-set=0
+52: CHECK PASS rm2.A-to-B.env-root
+52: CHECK PASS rm2.A-to-B.env-pinned-through-backend
+52: CHECK PASS rm2.A-to-B.env-target-include-dirs  dirs='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b/b_inc'
+52: CHECK PASS rm2.A-to-B.env-no-previous-include-dirs  dirs='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b/b_inc'
+52: CHECK PASS rm2.A-to-B.env-target-defines  defines='B_ONLY=1'
+52: CHECK PASS rm2.A-to-B.env-no-previous-defines  defines='B_ONLY=1'
+52: CHECK PASS rm2.A-to-B.inputs-filelists-cleared
+52: CHECK PASS rm2.A-to-B.inputs-settings-path
+52: CHECK PASS rm2.A-to-B.persisted-root
+52: CHECK PASS rm2.A-to-B.persisted-no-previous-file  still-under-previous='<none>'
+52: CHECK PASS rm2.A-to-B.persisted-count-matches-analysis  persisted=1 analysis=1
+52: CHECK PASS rm2.A-to-B.tree-root
+52: CHECK PASS rm2.A-to-B.tree-has-target-file
+52: CHECK PASS rm2.A-to-B.tree-no-previous-file
+52: CHECK PASS rm2.A-to-B.unsaved-tab-survives
+52: CHECK PASS rm2.A-to-B.unsaved-buffer-survives
+52: PROJECT-ROOT-CHANGED root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' files=0 (waiting for the new file set)
+52: PROJECT-ROOT-ENV root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' source=cleared include-dirs=0 defines=0 env=''
+52: PROJECT-EXPAND-INPUTS root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' filelists=0 variables=0 settings='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/state/settings.toml'
+52: PROJECT-ROOT-FILES root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' files=2
+52: PROJECT-ROOT-ENV root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' source=project pinned=1 include-dirs=1 defines=1 env='-I/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/a_inc -DA_ONLY=1'
+52: LINT-PROJECT-OPEN engine=slang files=1 skipped-open=1 automatic=1
+52: RM2-SWITCH B-to-A to='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' from='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b' expansions=4 settled=1
+52: RM2-SET root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' analysis=2 panel=2 persisted=2
+52: RM2-SET-FILE '/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/a.sv'
+52: RM2-SET-FILE '/tmp/vedit-rm2-project-switch-e2e-ItJnmU/shared/listed.sv'
+52: RM2-ENV root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' include-dirs='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/a_inc' defines='A_ONLY=1'
+52: CHECK PASS rm2.B-to-A.settled
+52: CHECK PASS rm2.B-to-A.diagnostics-root
+52: CHECK PASS rm2.B-to-A.project-root
+52: CHECK PASS rm2.B-to-A.one-expansion  before=3 after=4 expected=4
+52: CHECK PASS rm2.B-to-A.analysis-no-previous-file  previous='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b/b.sv' still-under-previous='<none>'
+52: CHECK PASS rm2.B-to-A.analysis-has-target-file
+52: CHECK PASS rm2.B-to-A.analysis-equals-panel  analysis=2 panel=2 property=2
+52: CHECK PASS rm2.B-to-A.imported-list-cleared  outside-in-set=0
+52: CHECK PASS rm2.B-to-A.env-root
+52: CHECK PASS rm2.B-to-A.env-pinned-through-backend
+52: CHECK PASS rm2.B-to-A.env-target-include-dirs  dirs='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/a_inc'
+52: CHECK PASS rm2.B-to-A.env-no-previous-include-dirs  dirs='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/a_inc'
+52: CHECK PASS rm2.B-to-A.env-target-defines  defines='A_ONLY=1'
+52: CHECK PASS rm2.B-to-A.env-no-previous-defines  defines='A_ONLY=1'
+52: CHECK PASS rm2.B-to-A.inputs-filelists-cleared
+52: CHECK PASS rm2.B-to-A.inputs-settings-path
+52: CHECK PASS rm2.B-to-A.persisted-root
+52: CHECK PASS rm2.B-to-A.persisted-no-previous-file  still-under-previous='<none>'
+52: CHECK PASS rm2.B-to-A.persisted-count-matches-analysis  persisted=2 analysis=2
+52: CHECK PASS rm2.B-to-A.tree-root
+52: CHECK PASS rm2.B-to-A.tree-has-target-file
+52: CHECK PASS rm2.B-to-A.tree-no-previous-file
+52: CHECK PASS rm2.B-to-A.unsaved-tab-survives
+52: CHECK PASS rm2.B-to-A.unsaved-buffer-survives
+52: PROJECT-ROOT-CHANGED root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b' files=0 (waiting for the new file set)
+52: PROJECT-ROOT-ENV root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b' source=cleared include-dirs=0 defines=0 env=''
+52: PROJECT-EXPAND-INPUTS root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b' filelists=0 variables=0 settings='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/state/settings.toml'
+52: PROJECT-ROOT-FILES root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b' files=1
+52: PROJECT-ROOT-ENV root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b' source=project pinned=1 include-dirs=1 defines=1 env='-I/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b/b_inc -DB_ONLY=1'
+52: LINT-PROJECT-OPEN engine=slang files=1 skipped-open=1 automatic=1
+52: RM2-SWITCH A-to-B-again to='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b' from='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' expansions=5 settled=1
+52: RM2-SET root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b' analysis=1 panel=1 persisted=1
+52: RM2-SET-FILE '/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b/b.sv'
+52: RM2-ENV root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b' include-dirs='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b/b_inc' defines='B_ONLY=1'
+52: CHECK PASS rm2.A-to-B-again.settled
+52: CHECK PASS rm2.A-to-B-again.diagnostics-root
+52: CHECK PASS rm2.A-to-B-again.project-root
+52: CHECK PASS rm2.A-to-B-again.one-expansion  before=4 after=5 expected=5
+52: CHECK PASS rm2.A-to-B-again.analysis-no-previous-file  previous='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/a.sv' still-under-previous='<none>'
+52: CHECK PASS rm2.A-to-B-again.analysis-has-target-file
+52: CHECK PASS rm2.A-to-B-again.analysis-equals-panel  analysis=1 panel=1 property=1
+52: CHECK PASS rm2.A-to-B-again.imported-list-cleared  outside-in-set=0
+52: CHECK PASS rm2.A-to-B-again.env-root
+52: CHECK PASS rm2.A-to-B-again.env-pinned-through-backend
+52: CHECK PASS rm2.A-to-B-again.env-target-include-dirs  dirs='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b/b_inc'
+52: CHECK PASS rm2.A-to-B-again.env-no-previous-include-dirs  dirs='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b/b_inc'
+52: CHECK PASS rm2.A-to-B-again.env-target-defines  defines='B_ONLY=1'
+52: CHECK PASS rm2.A-to-B-again.env-no-previous-defines  defines='B_ONLY=1'
+52: CHECK PASS rm2.A-to-B-again.inputs-filelists-cleared
+52: CHECK PASS rm2.A-to-B-again.inputs-settings-path
+52: CHECK PASS rm2.A-to-B-again.persisted-root
+52: CHECK PASS rm2.A-to-B-again.persisted-no-previous-file  still-under-previous='<none>'
+52: CHECK PASS rm2.A-to-B-again.persisted-count-matches-analysis  persisted=1 analysis=1
+52: CHECK PASS rm2.A-to-B-again.tree-root
+52: CHECK PASS rm2.A-to-B-again.tree-has-target-file
+52: CHECK PASS rm2.A-to-B-again.tree-no-previous-file
+52: CHECK PASS rm2.A-to-B-again.unsaved-tab-survives
+52: CHECK PASS rm2.A-to-B-again.unsaved-buffer-survives
+52: PROJECT-ROOT-CHANGED root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' files=0 (waiting for the new file set)
+52: PROJECT-ROOT-ENV root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' source=cleared include-dirs=0 defines=0 env=''
+52: PROJECT-EXPAND-INPUTS root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' filelists=0 variables=0 settings='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/state/settings.toml'
+52: PROJECT-ROOT-FILES root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' files=2
+52: PROJECT-ROOT-ENV root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' source=project pinned=1 include-dirs=1 defines=1 env='-I/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/a_inc -DA_ONLY=1'
+52: LINT-PROJECT-OPEN engine=slang files=1 skipped-open=1 automatic=1
+52: RM2-SWITCH B-to-A-again to='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' from='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b' expansions=6 settled=1
+52: RM2-SET root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' analysis=2 panel=2 persisted=2
+52: RM2-SET-FILE '/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/a.sv'
+52: RM2-SET-FILE '/tmp/vedit-rm2-project-switch-e2e-ItJnmU/shared/listed.sv'
+52: RM2-ENV root='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a' include-dirs='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/a_inc' defines='A_ONLY=1'
+52: CHECK PASS rm2.B-to-A-again.settled
+52: CHECK PASS rm2.B-to-A-again.diagnostics-root
+52: CHECK PASS rm2.B-to-A-again.project-root
+52: CHECK PASS rm2.B-to-A-again.one-expansion  before=5 after=6 expected=6
+52: CHECK PASS rm2.B-to-A-again.analysis-no-previous-file  previous='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-b/b.sv' still-under-previous='<none>'
+52: CHECK PASS rm2.B-to-A-again.analysis-has-target-file
+52: CHECK PASS rm2.B-to-A-again.analysis-equals-panel  analysis=2 panel=2 property=2
+52: CHECK PASS rm2.B-to-A-again.imported-list-cleared  outside-in-set=0
+52: CHECK PASS rm2.B-to-A-again.env-root
+52: CHECK PASS rm2.B-to-A-again.env-pinned-through-backend
+52: CHECK PASS rm2.B-to-A-again.env-target-include-dirs  dirs='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/a_inc'
+52: CHECK PASS rm2.B-to-A-again.env-no-previous-include-dirs  dirs='/tmp/vedit-rm2-project-switch-e2e-ItJnmU/project-a/a_inc'
+52: CHECK PASS rm2.B-to-A-again.env-target-defines  defines='A_ONLY=1'
+52: CHECK PASS rm2.B-to-A-again.env-no-previous-defines  defines='A_ONLY=1'
+52: CHECK PASS rm2.B-to-A-again.inputs-filelists-cleared
+52: CHECK PASS rm2.B-to-A-again.inputs-settings-path
+52: CHECK PASS rm2.B-to-A-again.persisted-root
+52: CHECK PASS rm2.B-to-A-again.persisted-no-previous-file  still-under-previous='<none>'
+52: CHECK PASS rm2.B-to-A-again.persisted-count-matches-analysis  persisted=2 analysis=2
+52: CHECK PASS rm2.B-to-A-again.tree-root
+52: CHECK PASS rm2.B-to-A-again.tree-has-target-file
+52: CHECK PASS rm2.B-to-A-again.tree-no-previous-file
+52: CHECK PASS rm2.B-to-A-again.unsaved-tab-survives
+52: CHECK PASS rm2.B-to-A-again.unsaved-buffer-survives
+52: CHECK PASS rm2.switch-action-in-file-menu
+52: SUMMARY checks=133 failures=0
+2/2 Test #52: vedit-rm2-project-switch-e2e .....   Passed    1.60 sec
+
+The following tests passed:
+	vedit-project-variables-e2e
+	vedit-rm2-project-switch-e2e
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   1.78 sec

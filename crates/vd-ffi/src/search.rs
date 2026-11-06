@@ -7,9 +7,10 @@
 //! the UI thread.
 
 use crate::capi::{
-    c_str_array, c_string, free_string, VdError, VdSearchHit, VdSearchResults,
+    c_str_array, c_string, free_string, VdError, VdSearchHit, VdSearchOptions, VdSearchResults,
     VD_ERR_INVALID_ARGUMENT, VD_STATUS_FAILED, VD_STATUS_PENDING, VD_STATUS_READY,
 };
+use crate::deeplint::read_string_list;
 use crate::service::{service_state, unknown_job, JobValue, Polled, VdService, POLL_MISUSE};
 use std::ffi::c_char;
 use std::path::{Path, PathBuf};
@@ -61,6 +62,8 @@ pub(crate) struct SearchHitData {
     pub(crate) path: String,
     pub(crate) line: u32,
     pub(crate) column: u32,
+    pub(crate) end_column: u32,
+    pub(crate) match_length: u32,
     pub(crate) preview: String,
 }
 
@@ -91,6 +94,8 @@ impl SearchData {
                 path: c_string(&hit.path),
                 line: hit.line,
                 column: hit.column,
+                end_column: hit.end_column,
+                match_length: hit.match_length,
                 preview: c_string(&hit.preview),
             })
             .collect();
@@ -117,6 +122,8 @@ pub(crate) fn query(
             path: hit.path.display().to_string(),
             line: hit.line,
             column: hit.column,
+            end_column: hit.end_column,
+            match_length: hit.match_length,
             preview: hit.preview,
         })
         .collect();
@@ -130,20 +137,8 @@ pub(crate) fn query(
 fn tree_query(
     root: &Path,
     needle: &str,
-    limit: usize,
-    max_file_bytes: u64,
-    max_duration_ms: u64,
-    case_sensitive: bool,
-    verilog_only: bool,
+    options: vd_search::TreeOptions,
 ) -> Result<SearchData, VdError> {
-    let options = vd_search::TreeOptions {
-        case_sensitive,
-        verilog_only,
-        max_results: limit,
-        max_file_bytes,
-        max_duration_ms,
-        ..vd_search::TreeOptions::default()
-    };
     let outcome = vd_search::search_tree(root, needle, &options)
         .map_err(|error| VdError::new(VD_ERR_INVALID_ARGUMENT, &error.to_string()))?;
     let hits = outcome
@@ -153,6 +148,8 @@ fn tree_query(
             path: hit.relative_path.display().to_string(),
             line: hit.line,
             column: hit.column,
+            end_column: hit.end_column,
+            match_length: hit.match_length,
             preview: hit.text,
         })
         .collect();
@@ -166,6 +163,8 @@ fn tree_query(
 ///
 /// `case_sensitive`/`verilog_only` are `u8` booleans (0/1). The result is read
 /// with [`vd_search_tree_poll`], which also returns the observable summary.
+/// This is the legacy option set; [`vd_search_tree_query_ex`] carries whole-word,
+/// regex, extension filtering and every-match, and is the one new callers use.
 ///
 /// # Safety
 ///
@@ -205,18 +204,77 @@ pub unsafe extern "C" fn vd_search_tree_query(
     } else {
         max_duration_ms
     };
-    state.start(move || {
-        tree_query(
-            &root,
-            &needle,
-            limit,
-            max_file_bytes,
-            max_duration_ms,
-            case_sensitive != 0,
-            verilog_only != 0,
-        )
-        .map(JobValue::Search)
-    })
+    let options = vd_search::TreeOptions {
+        case_sensitive: case_sensitive != 0,
+        verilog_only: verilog_only != 0,
+        max_results: limit,
+        max_file_bytes,
+        max_duration_ms,
+        ..vd_search::TreeOptions::default()
+    };
+    state.start(move || tree_query(&root, &needle, options).map(JobValue::Search))
+}
+
+/// Start an EXTENDED tree-search job: the same walk, with the full query option
+/// set (case, whole word, regular expression, extension filter, every-match)
+/// and the exact match range on every hit.
+///
+/// `options` may be null (the legacy behaviour: case-insensitive literal, first
+/// match per line, default caps). A regular expression that does not compile is
+/// rejected before the walk: the job fails and `vd_service_error` carries the
+/// reason. Poll with [`vd_search_tree_poll`].
+///
+/// # Safety
+///
+/// `service` must be null or live; `root`/`needle` must be null or valid
+/// NUL-terminated strings; `options` must be null or point to a readable
+/// [`VdSearchOptions`] whose extension list satisfies the string-list contract.
+#[no_mangle]
+pub unsafe extern "C" fn vd_search_tree_query_ex(
+    service: *mut VdService,
+    root: *const c_char,
+    needle: *const c_char,
+    options: *const VdSearchOptions,
+) -> u64 {
+    let Some(state) = service_state(service) else {
+        return 0;
+    };
+    let (Some(root), Some(needle)) = (crate::capi::c_str(root), crate::capi::c_str(needle)) else {
+        state.record_error(VdError::new(
+            VD_ERR_INVALID_ARGUMENT,
+            "root and needle must be valid UTF-8 strings",
+        ));
+        return 0;
+    };
+    let mut tree_options = vd_search::TreeOptions::default();
+    if !options.is_null() {
+        // SAFETY: the caller contract guarantees a readable struct.
+        let options = unsafe { *options };
+        tree_options.case_sensitive = options.case_sensitive != 0;
+        tree_options.whole_word = options.whole_word != 0;
+        tree_options.regex = options.regex != 0;
+        tree_options.all_matches = options.all_matches != 0;
+        if options.max_results > 0 {
+            tree_options.max_results = options.max_results;
+        }
+        if options.max_file_bytes > 0 {
+            tree_options.max_file_bytes = options.max_file_bytes;
+        }
+        if options.max_duration_ms > 0 {
+            tree_options.max_duration_ms = options.max_duration_ms;
+        }
+        // SAFETY: a non-null list satisfies read_string_list's contract.
+        match unsafe { read_string_list(&raw const options.extensions) } {
+            Ok(extensions) => tree_options.extensions = extensions,
+            Err(message) => {
+                state.record_error(VdError::new(VD_ERR_INVALID_ARGUMENT, &message));
+                return 0;
+            }
+        }
+    }
+    let root = PathBuf::from(root);
+    let needle = needle.to_string();
+    state.start(move || tree_query(&root, &needle, tree_options).map(JobValue::Search))
 }
 
 /// Start a search job.

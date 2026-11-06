@@ -17,6 +17,7 @@
 #include <QTextOption>
 #include <QVBoxLayout>
 #include <QVariantList>
+#include <QCoreApplication>
 
 namespace vedit::workspace {
 namespace {
@@ -144,7 +145,7 @@ CommandPalette::CommandPalette(QWidget *parent)
 
     query_ = new QLineEdit(this);
     query_->setObjectName(QStringLiteral("palette-query"));
-    query_->setPlaceholderText(QStringLiteral("Go to file…"));
+    query_->setPlaceholderText(QCoreApplication::translate("VEdit", "Go to file…"));
     query_->setClearButtonEnabled(true);
     query_->setMinimumHeight(36);
     query_->installEventFilter(this);
@@ -317,7 +318,7 @@ qint64 CommandPalette::lastFilterMicros() const
 
 QString CommandPalette::noResultsText()
 {
-    return QStringLiteral("No matching files");
+    return QCoreApplication::translate("VEdit", "No matching files");
 }
 
 bool CommandPalette::eventFilter(QObject *watched, QEvent *event)
@@ -414,9 +415,9 @@ void CommandPalette::updateEmptyState()
 {
     QString message;
     if (index_ == nullptr) {
-        message = QStringLiteral("No project open — open a project root to jump between files.");
+        message = QCoreApplication::translate("VEdit", "No project open — open a project root to jump between files.");
     } else if (index_->isEmpty()) {
-        message = QStringLiteral("No files indexed for this project yet.");
+        message = QCoreApplication::translate("VEdit", "No files indexed for this project yet.");
     } else if (matches_.isEmpty()) {
         message = noResultsText();
     }
@@ -429,14 +430,14 @@ void CommandPalette::updateEmptyState()
 void CommandPalette::updateStatus()
 {
     if (index_ == nullptr) {
-        status_->setText(QStringLiteral("No project"));
+        status_->setText(QCoreApplication::translate("VEdit", "No project"));
         return;
     }
     const int total = index_->size();
     if (query_->text().isEmpty()) {
-        status_->setText(QStringLiteral("%1 files · type to filter · Enter to open").arg(total));
+        status_->setText(QCoreApplication::translate("VEdit", "%1 files · type to filter · Enter to open").arg(total));
     } else {
-        status_->setText(QStringLiteral("%1 of %2 files").arg(matches_.size()).arg(total));
+        status_->setText(QCoreApplication::translate("VEdit", "%1 of %2 files").arg(matches_.size()).arg(total));
     }
 }
 

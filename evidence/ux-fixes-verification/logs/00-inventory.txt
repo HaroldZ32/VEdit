@@ -1,0 +1,80 @@
+Head: 4e2d0a57ca50db9568db5a5b040cc66f04c9a05f
+porcelain (default): 341 ; -uall: 2886
+writer B pre-task snapshot lines: 340
+(the current count includes this verification's evidence/ and gate-refreshed build logs)
+
+== frozen files: mtime (all predate this task; task started ~16:05) ==
+2026-11-02 22:13:58.614396990 +0800  CMakeLists.txt
+2026-11-02 12:49:37.579117445 +0800  Cargo.toml
+2026-11-02 12:49:37.579117445 +0800  Cargo.lock
+2026-10-30 11:13:27.950039273 +0800  rust-toolchain.toml
+2026-10-30 10:35:17.809894610 +0800  package.json
+2026-11-02 12:49:37.798349223 +0800  scripts/build-qt.sh
+2026-11-02 12:49:37.581089395 +0800  build/gates/gates.sh
+2026-11-02 12:49:37.581089395 +0800  build/gates/tests.sh
+2026-11-02 12:49:37.581089395 +0800  build/gates/qt6-cxx.sh
+
+== source files modified after 16:05 (src/crates/packaging/docs; includes new/untracked) ==
+crates/vd-config/src/tools.rs
+crates/vd-deeplint/src/binary.rs
+docs/USER_GUIDE.md
+packaging/runtime/AppRun
+src/app/app_shell.cpp
+src/app/app_shell.h
+src/app/CMakeLists.txt
+src/app/editor_area.cpp
+src/app/editor_area.h
+src/app/main.cpp
+src/common/path_display.h
+src/workspace/diagnostics/diagnostics_integration.cpp
+src/workspace/filetree/CMakeLists.txt
+src/workspace/filetree/file_tree_model.cpp
+src/workspace/filetree/tests/filetree_tests.cpp
+src/workspace/module_tree/module_tree_integration.cpp
+src/workspace/module_tree/module_tree_integration.h
+src/workspace/module_tree/module_tree_selftest.cpp
+src/workspace/palette/CMakeLists.txt
+src/workspace/palette/file_index.cpp
+src/workspace/palette/palette_selftest.cpp
+src/workspace/project/CMakeLists.txt
+src/workspace/project/project_filelist.cpp
+src/workspace/project/project_filelist.h
+src/workspace/project/project_integration.cpp
+src/workspace/project/project_model.cpp
+src/workspace/project/project_model.h
+src/workspace/project/project_panel.cpp
+src/workspace/project/project_selftest.cpp
+src/workspace/search/CMakeLists.txt
+src/workspace/search/global_search.cpp
+src/workspace/search/search_types.h
+
+== crates/** modified after 16:05 ==
+crates/vd-config/src/tools.rs
+crates/vd-deeplint/src/binary.rs
+
+== frozen files vs HEAD (pre-existing dirt; no task-time mtime above) ==
+ M CMakeLists.txt
+
+== deleted tracked files vs HEAD (pre-existing T29 folding deletion; not these fixes) ==
+src/syntax/folding/CMakeLists.txt
+src/syntax/folding/README.md
+src/syntax/folding/fold_range.cpp
+src/syntax/folding/fold_range.h
+src/syntax/folding/fold_source.cpp
+src/syntax/folding/fold_source.h
+src/syntax/folding/ksyntax_fold_source.cpp
+src/syntax/folding/ksyntax_fold_source.h
+src/syntax/folding/syntax_fold_source.cpp
+src/syntax/folding/syntax_fold_source.h
+src/syntax/folding/tests/fold_native_gui_probe.cpp
+src/syntax/folding/tests/fold_native_probe.cpp
+src/syntax/folding/tests/syntax_directory_tests.cpp
+
+== writer A claimed (7 files) ==
+src/workspace/module_tree/module_tree_integration.{h,cpp}, src/workspace/module_tree/module_tree_selftest.cpp,
+src/workspace/diagnostics/diagnostics_integration.cpp, crates/vd-deeplint/src/binary.rs, crates/vd-config/src/tools.rs, packaging/runtime/AppRun
+== writer B claimed ==
+src/common/path_display.h (new), src/app/{app_shell,editor_area,main}.{h,cpp}, src/app/CMakeLists.txt,
+src/workspace/project/{project_model.h,project_model.cpp,project_panel.cpp,project_integration.cpp,project_filelist.{h,cpp},project_selftest.cpp,CMakeLists.txt},
+src/workspace/palette/{file_index.cpp,palette_selftest.cpp,CMakeLists.txt}, src/workspace/search/{global_search.cpp,search_types.h,CMakeLists.txt},
+src/workspace/filetree/{file_tree_model.cpp,tests/filetree_tests.cpp,CMakeLists.txt}, docs/USER_GUIDE.md

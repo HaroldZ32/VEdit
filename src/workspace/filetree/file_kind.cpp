@@ -1,6 +1,7 @@
 #include "file_kind.h"
 
 #include <QFileInfo>
+#include <QCoreApplication>
 
 namespace vedit::workspace {
 
@@ -50,7 +51,7 @@ QString fileKindLabel(FileKind kind)
     case FileKind::SystemVerilog:
         return QStringLiteral("SystemVerilog");
     case FileKind::FileList:
-        return QStringLiteral("File list");
+        return QCoreApplication::translate("VEdit", "File list");
     case FileKind::Other:
         break;
     }

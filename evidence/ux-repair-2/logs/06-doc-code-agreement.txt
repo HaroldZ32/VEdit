@@ -1,0 +1,60 @@
+== docs/USER_GUIDE.md — path display (F3) and filelist re-import (F4) ==
+### 路径显示（统一规则）
+
+Qt6 产品里，**下列界面**显示路径时用同一条规则（`src/common/path_display.h`）：
+
+- 工程根存在且文件在根内 → 显示相对工程根的路径（不带 `./`）；
+- 否则 → 显示绝对路径。
+
+覆盖编辑器标签的 tooltip、窗口标题、Files 树的 tooltip、Project 面板的文件与 filelist 列表、
+`Ctrl+P` 文件面板和搜索结果行。**打开和去重仍用绝对路径**，显示规则不改变任何打开行为；
+工程根会先规范化（绝对路径、去掉 `.` / `..` / 尾斜杠）再参与比较。编辑器标签文字本身显示文件名
+（不是路径），tooltip 才显示上面这条规则算出的路径。
+
+**状态栏 / 面板的一次性确认与错误提示是例外**：palette / Files 树 / 搜索跳转的 `Opened …`、
+Project 面板的 `Removed …` 和错误提示仍显示绝对路径（只停留几秒，不是路径视图）。除上面枚举的
+界面和这些一次性提示外，如果看到绝对路径显示，就是 bug。
+
+### 文件列表（`.f`）里的变量与转义
+
+在 Qt6 产品里，打开一个 `.f` / `.F` / `.flist` 会**同时**把它作为工程 filelist 导入（规则见上文
+"工程根的起点"）；filelist 也仍然作为普通文本标签打开。**编辑后要按 Project 面板的 `Refresh`
+重新展开**（重新打开同一个 filelist 不会重新解析），重复打开同一个 filelist 是幂等的：不会重复
+加入，也不会重复解析，Project 面板底部会提示 `Already imported: nothing changed`。解析诊断（缺失的 `+incdir+`、未知 token、
+嵌套 `-f` 问题等）显示在 Project 面板的诊断列表里，不会弹出模态框。
+
+
+== src/common/path_display.h — header comment (F3 code/doc agreement) ==
+#pragma once
+
+// The ONE path-display rule of the product (user ruling, 2026-11-04):
+//
+//   * a project root is set AND the path is inside it -> display the path
+//     relative to the root, without a leading "./";
+//   * otherwise -> display the absolute path.
+//
+// Every persistent surface that RENDERS a path (the editor tab tooltip and the
+// window title, the Files tree tooltip, the project panel lists, the command
+// palette and the search results) calls displayPath(); no surface grows its own
+// prefix test. One-shot status-bar / panel confirmations and error notes
+// ("Opened ...", "Removed ...") deliberately keep the absolute path and are
+// outside this rule (docs/USER_GUIDE.md names them). What a surface OPENS is
+// untouched: absolute paths stay the open key and the dedup key.
+//
+// Header-only and QtCore-only on purpose: a workspace lane can include it in a
+// standalone build (`cmake -S src/workspace/<lane>`) without linking src/app,
+// and src/app does not have to know a lane.
+//
+// `tests`: the app self-check asserts the three cases (under root, outside root,
+// no root) directly, and the project lane asserts them on its displayed lists.
+
+== the remaining absolute-path status/panel messages (F3 documented exception) ==
+src/workspace/palette/palette_integration.cpp:195:            message = QStringLiteral("Opened %1").arg(absolutePath);
+src/workspace/filetree/filetree_integration.cpp:48:        QCoreApplication::translate("VEdit", "Opened %1").arg(path), 5000);
+src/workspace/search/search_jump_target.cpp:120:        QCoreApplication::translate("VEdit", "Opened %1 line %2").arg(filePath).arg(targetLine), 5000);
+src/workspace/filetree/file_tree_widget.cpp:182:        setStatus(QCoreApplication::translate("VEdit", "Opened '%1'").arg(QFileInfo(model_->rootPath()).fileName()));
+src/workspace/project/project_panel.cpp:246:    setStatus(QCoreApplication::translate("VEdit", "Removed %1; the file set is being re-expanded").arg(path), false);
+
+== the F4 message in code ==
+224:                      "VEdit", "Already imported: nothing changed (use Refresh to re-read an edited filelist)"),
+227:        setStatus(QCoreApplication::translate("VEdit", "Imported %1 filelist%2")

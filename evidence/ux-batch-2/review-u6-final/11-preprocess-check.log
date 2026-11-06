@@ -1,0 +1,7 @@
+--- composed-branch symbols in the preprocessed TU:
+1
+1
+53:#define VEDIT_LINT_OPTIONS_HAVE_ABI 1
+2373:#define VEDIT_DIAGNOSTICS_HAVE_LINT_OPTIONS 1
+--- the else-branch (legacy-only) marker:
+0

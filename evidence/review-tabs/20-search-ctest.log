@@ -1,0 +1,26 @@
+ctest-rc=8
+CHECK large.worker-thread PASS
+CHECK many.start.non-blocking PASS
+CHECK many.finishes PASS
+CHECK many.hits PASS
+CHECK many.files-scanned PASS
+CHECK many.elapsed-bounded PASS
+CHECK large.timeout.accepted PASS
+CHECK large.timeout.finishes PASS
+CHECK large.timeout.flag PASS
+CHECK large.timeout.state PASS
+CHECK large.timeout.bounded PASS
+CHECK lifecycle.temp-dir PASS
+CHECK lifecycle.no-worker-before PASS
+CHECK lifecycle.scan-started PASS
+CHECK lifecycle.worker-running PASS
+CHECK lifecycle.destructor-joins-worker PASS
+CHECK slowlifecycle.temp-dir PASS
+CHECK slowlifecycle.scan-started PASS
+CHECK slowlifecycle.batch-before-block PASS
+CHECK slowlifecycle.destructor-waits-for-stalled-read PASS
+WORKSPACE-SEARCH-SLOWLIFECYCLE ok=1 checks=4 failures=0
+CHECK lifecycle.stall-child-finished PASS
+CHECK lifecycle.stall-child-pass PASS
+WORKSPACE-SEARCH-SELFTEST ok=0 checks=106 failures=4 skipped=2
+The following tests FAILED:

@@ -1,0 +1,42 @@
+== THIS RUN (focused ctest) summaries ==
+11: APP-SHELL-SELFTEST ok=1 checks=312 failures=0 state=/tmp/vedit-app-anzBPV/state
+25: PALETTE-SELFTEST ok=1 checks=46 failures=0
+26: INTEGRATION-SELFTEST ok=1 checks=31 failures=0
+27: WORKSPACE-SEARCH-SELFTEST ok=1 checks=106 failures=0 skipped=2
+28: PROJECT-MODEL-SELFTEST ok=1 checks=153 failures=0
+29: 61 checks, 0 failure(s)
+100% tests passed, 0 tests failed out of 6
+EXIT=0
+
+== predecessor label set vs THIS RUN (only-old must be empty) ==
+-- app: predecessor-labels=312 missing-from-this-run=0 extra-in-this-run-union=401
+-- project: predecessor-labels=150 missing-from-this-run=0 extra-in-this-run-union=563
+-- palette: predecessor-labels=46 missing-from-this-run=0 extra-in-this-run-union=667
+-- search: predecessor-labels=112 missing-from-this-run=0 extra-in-this-run-union=601
+-- module-tree: predecessor-labels=61 missing-from-this-run=0 extra-in-this-run-union=652
+
+== predecessor palette-integration baseline 28 vs THIS RUN ==
+baseline-labels=28
+removed-from-this-run:
+new integration labels in this run:
+integration.root-follows-projectRootChanged
+integration.root-old-files-gone
+integration.root-rescan-new-root
+
+== repair REPORT labels vs THIS RUN (missing must be 0) ==
+-- app: repair-labels=312 missing-from-this-run=0
+-- project: repair-labels=153 missing-from-this-run=0
+-- palette: repair-labels=46 missing-from-this-run=0
+-- integration: repair-labels=31 missing-from-this-run=0
+-- search: repair-labels=112 missing-from-this-run=0
+-- module-tree: repair-labels=61 missing-from-this-run=0
+
+== project: predecessor 150 -> repair 153 -> this run 153 ==
+predecessor=150 repair=153
+only-new-vs-predecessor:
+filelist.import-status
+filelist.reimport-panel-noop
+filelist.reimport-status-honest
+only-old-vs-predecessor:
+
+LABEL-COMPARE DONE

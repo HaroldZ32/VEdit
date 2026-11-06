@@ -1,0 +1,22 @@
+=== filetree dblclick regression (fresh build) ===
+build-exit=0
+CHECK tree.dblclick.rect-visible ok=1
+CHECK tree.dblclick.view-signal ok=1 detail="1"
+CHECK tree.dblclick.folder-expands ok=1
+CHECK tree.dblclick.folder-does-not-open ok=1
+CHECK tree.dblclick.file-rect ok=1
+CHECK tree.dblclick.file-opens ok=1 detail="1"
+CHECK tree.dblclick.file-path ok=1 detail="/vedit-build/filetree-testdata/tree/top.v"
+CHECK tree.activate.file-opens ok=1
+FILETREE-TESTS checks=111 failures=0
+
+=== search dblclick/jump regression (FFI build) ===
+build-exit=0
+CHECK jump.hit-row-exists PASS
+CHECK jump.row-visible PASS
+CHECK jump.click.recorded PASS
+CHECK jump.click.file PASS
+CHECK jump.click.line PASS
+CHECK jump.click.column PASS
+WORKSPACE-SEARCH-SLOWLIFECYCLE ok=1 checks=4 failures=0
+WORKSPACE-SEARCH-SELFTEST ok=1 checks=84 failures=0 skipped=2

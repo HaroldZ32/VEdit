@@ -1,0 +1,9 @@
+-rwxr-xr-x 1 root root 58667640 Nov  4 17:56 target/qt6-build/src/app/editor-lane/vedit-edit-core-selftest
+=== rerun ===
+Test project /vedit-build/target/qt6-build
+    Start 19: vedit-edit-core-selftest
+1/1 Test #19: vedit-edit-core-selftest .........   Passed    0.15 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.15 sec

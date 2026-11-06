@@ -1,0 +1,36 @@
+UpdateCTestConfiguration  from :/vedit-build/target/u4b-probe/ctest-exitcode/DartConfiguration.tcl
+Test project /vedit-build/target/u4b-probe/ctest-exitcode
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1
+    Start 1: fake-old-regex
+
+1: Test command: /bin/sh "/vedit-build/target/u4b-probe/ctest-exitcode/fake-selfcheck.sh"
+1: Working Directory: /vedit-build/target/u4b-probe/ctest-exitcode
+1: Test timeout computed to be: 30
+1: syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='/vedit-build/resources' definitions=452 own-xml=[vedit-vhdl.xml,vedit-tcl.xml,vedit-systemverilog.xml,vedit-markdown.xml,vedit-verilog.xml] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1 definitions-ok=[Markdown,SystemVerilog,Tcl,VHDL,Verilog]
+1/2 Test #1: fake-old-regex ...................   Passed    0.00 sec
+test 2
+    Start 2: fake-new-regex
+
+2: Test command: /bin/sh "/vedit-build/target/u4b-probe/ctest-exitcode/fake-selfcheck.sh"
+2: Working Directory: /vedit-build/target/u4b-probe/ctest-exitcode
+2: Test timeout computed to be: 30
+2: syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='/vedit-build/resources' definitions=452 own-xml=[vedit-vhdl.xml,vedit-tcl.xml,vedit-systemverilog.xml,vedit-markdown.xml,vedit-verilog.xml] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1 definitions-ok=[Markdown,SystemVerilog,Tcl,VHDL,Verilog]
+2/2 Test #2: fake-new-regex ...................***Failed  Required regular expression not found. Regex=[syntax-product: .*private-dir='[^']+/resources' definitions=[0-9]+ own-xml=\[vedit-(markdown|systemverilog|tcl|verilog|vhdl)\.xml,vedit-(markdown|systemverilog|tcl|verilog|vhdl)\.xml,vedit-(markdown|systemverilog|tcl|verilog|vhdl)\.xml,vedit-(markdown|systemverilog|tcl|verilog|vhdl)\.xml,vedit-(markdown|systemverilog|tcl|verilog|vhdl)\.xml\] themes=[0-9]+ verilog=1 systemverilog=1 .*startup-hook=1 definitions-ok=\[Markdown,SystemVerilog,Tcl,VHDL,Verilog\].*APP-SHELL-SELFTEST ok=1
+]  0.00 sec
+
+50% tests passed, 1 tests failed out of 2
+
+Total Test time (real) =   0.00 sec
+
+The following tests FAILED:
+	  2 - fake-new-regex (Failed)
+Errors while running CTest
+Output from these tests are in: /vedit-build/target/u4b-probe/ctest-exitcode/Testing/Temporary/LastTest.log
+Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.
+ctest_rc=8

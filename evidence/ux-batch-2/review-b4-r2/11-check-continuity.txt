@@ -1,0 +1,44 @@
+old log: evidence/ux-batch-2/b4/20-multi-cursor-selftest.log
+new log: evidence/ux-batch-2/review-b4-r2/10-selftest-rerun.log (this review's independent rerun)
+old_checks=81 new_checks=119
+removed_check_names:
+(empty above means no old check name disappeared)
+added count=38
+definition.action-only.availability
+definition.action-only.gate-row-enabled
+definition.action-only.no-request
+definition.action-only.plain-click
+definition.action-only.status-reason
+definition.collapse.ctrl-click
+definition.collapse.ctrl-click-dispatched
+definition.collapse.ctrl-click-position
+definition.collapse.ctrl-setup
+definition.collapse.plain-click
+definition.collapse.plain-setup
+definition.ctrl-click.inner-widget
+definition.gate-only.action-enabled
+definition.gate-only.availability
+definition.gate-only.no-request
+definition.gate-only.plain-click
+definition.gate-only.status-reason
+definition.rearm.changed-reason
+definition.rearm.changed-reason-one-time
+definition.rearm.first-message
+definition.rearm.message-after-restore
+definition.rearm.one-time
+definition.rearm.restored
+definition.two-pane.action-triggered
+definition.two-pane.clicked-caret
+definition.two-pane.clicked-channel
+definition.two-pane.clicked-cursor-count
+definition.two-pane.clicked-file
+definition.two-pane.inner-widget
+definition.two-pane.keyboard-focus
+definition.two-pane.other-caret-untouched
+definition.two-pane.other-channel
+definition.two-pane.seams
+definition.two-pane.views
+edit.alt-click.clicked-position
+edit.block.cursor-lines
+edit.block.inner-widget
+edit.block.inner-widget-same-for-end

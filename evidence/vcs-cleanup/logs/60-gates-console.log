@@ -1,0 +1,52 @@
+== gate 1/7: build-qt ==
+M0-SMOKE theme=Atom One Dark
+[qt6] PASS: Rust service layer + configure + build + ctest (incl. the C ABI smoke) + xcb/software-rendering smoke inside vedit-qt6-build:local
+[qt6] evidence: evidence/ffi-abi/logs/ (Rust layer) and evidence/m0-build/build-logs/2x-qt6-*, 3x-qt6-*
+gate build-qt: PASS exit=0
+== gate 2/7: ctest ==
+gate ctest: PASS (100% tests passed, 0 tests failed out of 37)
+== gate 3/7: vedit-app --selfcheck ==
+APP-SHELL-SELFTEST ok=1 checks=290 failures=0 state=/tmp/vedit-app-eBCUQU/state
+gate selfcheck: PASS
+== gate 4/7: clippy (pinned image vedit-build:local) ==
+   Compiling vd-ffi v0.1.1 (/vedit-build/crates/vd-ffi)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.92s
+gate clippy: PASS
+== gate 5/7: fmt ==
+gate fmt: PASS
+== gate 6/7: docs ==
+[docs] PASS: README.md docs/BUILD.md docs/USER_GUIDE.md THIRD_PARTY_NOTICES.md
+gate docs: PASS
+== gate 7/7: lrelease ==
+Updating '/tmp/vedit_zh_CN.qm'...
+    Generated 930 translation(s) (930 finished and 0 unfinished)
+gate lrelease: PASS (0 unfinished)
+== evidence: cargo test -p vd-ffi (ABI) + -p vd-vcs (pinned image) ==
+   vd-ffi ABI test result: ok. 21 passed
+   vd-vcs 11 test binaries green
+== evidence: typed JobValue + lane checks + i18n + workaround removal ==
+# batch 7 cleanup evidence (T45)
+collected_at: 2026-11-04T14:13:20+08:00
+lane_checks=697 (baseline 673, failures=0)
+typed_payloads=VcsInfo(VcsInfoPayload) + VcsWorkspace + VcsHistoryCommits/Commit/File/Blame/Compare
+vcs_info_data_workaround=absent
+header_sha256=ae78ce608bd1f8d06e01b2cb18ff8bcdbf9ad11689877afc748b5ca149cabca9
+rust_abi=ok rust_vd_vcs=ok
+rebase_confirmation=declined-zero-write + accepted-request + consequence preview
+second_step_refusal=discard + worktree remove (two confirms, zero write)
+toolchain_properties=asserted on a plain VcsPanel
+credential_default_headless=no-dialog, no-retry, refused
+i18n_source_literals=Chinese change row asserted
+lrelease=930 finished and 0 unfinished
+result=PASS
+# batch 7 seven-gate summary
+collected_at: 2026-11-04T14:13:20+08:00
+build-qt=0
+ctest=100% tests passed, 0 tests failed out of 37
+selfcheck=APP-SHELL-SELFTEST ok=1 checks=290 failures=0
+clippy=0
+fmt=0
+docs=0
+lrelease=930 finished and 0 unfinished
+lane_checks=697
+[vcs-cleanup] PASS: seven gates green

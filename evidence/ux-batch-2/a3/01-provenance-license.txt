@@ -1,0 +1,114 @@
+# A3 provenance & licence check — generated 2026-11-04T17:54:25Z
+
+## 1. Shipped definitions (VEdit-authored, LGPL-2.1-or-later)
+
+9724927b63ef9824739727f471ea7e98d61d0e9ff23b054c82ae21c73e70fc5a  resources/syntax/vedit-markdown.xml
+2abba3342d0878e71b99d358d96e510f857cd7f232786951be8602f513e0b992  resources/syntax/vedit-systemverilog.xml
+3e201a1df4ad0afc679635a105965a067d16fe4c3618662def4676680572e126  resources/syntax/vedit-tcl.xml
+c6adc763c7b280d7493f48d06e5779d0b1e2068ac82f75fe7f31a07b0788a6c2  resources/syntax/vedit-verilog.xml
+2664feaf542e75b1fbc5a6f2d08cd46eacbaf4b9d079788f763d50d499ad9e8f  resources/syntax/vedit-vhdl.xml
+
+-- resources/syntax/vedit-markdown.xml
+<language name="Markdown"
+extensions="*.md;*.markdown;*.mdown;*.mkd"
+author="VEdit"
+license="LGPL-2.1-or-later"
+
+-- resources/syntax/vedit-systemverilog.xml
+<language name="SystemVerilog"
+extensions="*.sv;*.svh"
+author="VEdit"
+license="LGPL-2.1-or-later"
+
+-- resources/syntax/vedit-tcl.xml
+<language name="Tcl"
+extensions="*.tcl;*.tk"
+author="VEdit"
+license="LGPL-2.1-or-later"
+
+-- resources/syntax/vedit-verilog.xml
+<language name="Verilog"
+extensions="*.v;*.vh;*.vlg"
+author="VEdit"
+license="LGPL-2.1-or-later"
+
+-- resources/syntax/vedit-vhdl.xml
+<language name="VHDL"
+extensions="*.vhd;*.vhdl"
+author="VEdit"
+license="LGPL-2.1-or-later"
+
+## 2. Upstream KDE references (functional reference only, NOT copied)
+
+5df96ab7362d9ae05008ff130836f10cafb433b3ca7323cf0dc2f197762d1c4e  evidence/ux-batch-2/a3/raw/vhdl.xml
+bf32150db4d97fbf539bcec4b6957d04c5afc2af148193e92db72223fb82c6fb  evidence/ux-batch-2/a3/raw/markdown.xml
+1a0e538646e3491406d2d895c5be5c6e8ce3e34ca2bcb897670c9c11bb26a30a  evidence/ux-batch-2/a3/raw/tcl.xml
+
+-- evidence/ux-batch-2/a3/raw/vhdl.xml (https://invent.kde.org/frameworks/syntax-highlighting/-/raw/v6.24.0/data/syntax/vhdl.xml)
+<language name="VHDL"
+   license attribute: <NONE — no license attribute in the file>
+   licence words in file: 0
+
+-- evidence/ux-batch-2/a3/raw/markdown.xml (https://invent.kde.org/frameworks/syntax-highlighting/-/raw/v6.24.0/data/syntax/markdown.xml)
+<language name="Markdown"
+   license attribute: license="GPL,BSD"
+   licence words in file: 5
+
+-- evidence/ux-batch-2/a3/raw/tcl.xml (https://invent.kde.org/frameworks/syntax-highlighting/-/raw/v6.24.0/data/syntax/tcl.xml)
+<language name="Tcl/Tk"
+   license attribute: license="BSD"
+   licence words in file: 6
+
+## 3. Debian copyright attestation for the same upstream files (kf6-syntax-highlighting 6.30.0-1)
+
+136:       data/syntax/vhdl.xml
+276:       data/syntax/tcl.xml
+353:Files: data/syntax/markdown.xml
+
+-- per-file licence blocks:
+Files: data/syntax/markdown.xml
+Copyright: 2009, Claes Holmerson. http://github.com/claes/kate-markdown/
+           2008, Darrin Yeager. http://www.dyeager.org/
+License: GPL_OR_BSD_with_parts_under_MIT
+ Dual-Licensed under both GPL and BSD licenses.
+ .
+ changes under MIT license
+Comment: Manually collected
+
+-- vhdl.xml sits in the big MIT block (line 218 is that block's License: MIT):
+           2008, Wilbert Berendsen <info@wilbertberendsen.nl>
+           Yevgen Voronenko <ysv22@drexel.edu>
+License: MIT
+Comment: Manually collected
+
+-- tcl.xml:
+       data/syntax/tcl.xml
+Copyright: 2011, Cybernetica AS ( http://www.cyber.ee/ )
+           Gleb Popov <6yearold@gmail.com>
+           Irsid - Arcelor Innovation R&D
+           Massimiliano Torromeo
+License: BSD-3-Clause
+Comment: Manually collected
+
+
+## 4. Upstream licensing policy (README of the same tag)
+
+165:### Licensing
+166-
+167-Contributions to KSyntaxHighlighting shall be licensed under [MIT](LICENSES/MIT.txt).
+
+## 5. Conclusion
+   vhdl.xml  : no licence statement in the file itself -> the same category as KDE verilog.xml,
+               which this repository bans; NOT shipped, independently authored instead.
+   markdown.xml: license="GPL,BSD" (BSD variant unstated); NOT shipped.
+   tcl.xml    : license="BSD"; language name is "Tcl/Tk", which does not match the required
+               definition name "Tcl"; NOT shipped.
+   All three shipped files are independently authored (upstream used only to cross-check the
+   keyword/construct inventory); no upstream text, rule or comment was copied.
+
+--- repair note (2026-11-05, A3 repair) ---
+`resources/syntax/vedit-vhdl.xml` changed in the repair: the folding opener was split into two rules so a
+labelled process (`p1: process (clk) is`) opens a region (R4(e)). This is a rule change only; the
+provenance statement above is unchanged. Current sha256:
+  47a4539e08fc6b6257d0897c6187c25c4d9620fe8ac2b2023729b31d6ef75451  resources/syntax/vedit-vhdl.xml
+The hash recorded in the body of this file (2664feaf…) is the pre-repair file, kept as history.

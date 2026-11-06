@@ -1,0 +1,115 @@
+kf.sonnet.core: Sonnet: No speller backends available!
+KTE-ACTION owner=view objectName=edit_find text=&Find… shortcuts=Ctrl+F context=3
+KTE-ACTION owner=view objectName=edit_find_next text=Find &Next shortcuts=F3 context=3
+KTE-ACTION owner=view objectName=edit_find_prev text=Find Pre&vious shortcuts=Shift+F3 context=3
+KTE-ACTION owner=view objectName=bookmarks_toggle text=Toggle &Bookmark shortcuts=Ctrl+B context=3
+KTE-ACTION owner=view objectName=bookmarks_next text=Next Bookmark shortcuts=Alt+PgDown context=3
+KTE-ACTION owner=view objectName=bookmarks_previous text=Previous Bookmark shortcuts=Alt+PgUp context=3
+KTE-ACTION owner=KateViewInternal objectName=edit_cut text=Cu&t shortcuts=Ctrl+X,Shift+Del context=3
+KTE-ACTION owner=KateViewInternal objectName=edit_paste text=&Paste shortcuts=Ctrl+V,Shift+Ins context=3
+KTE-ACTION owner=KateViewInternal objectName=edit_copy text=&Copy shortcuts=Ctrl+C,Ctrl+Ins context=3
+KTE-ACTION owner=KateViewInternal objectName=clipboard_history_paste text=Clipboard &History Paste shortcuts=Ctrl+Alt+Shift+V context=3
+KTE-ACTION owner=KateViewInternal objectName=file_save text=&Save shortcuts=Ctrl+S context=3
+KTE-ACTION owner=KateViewInternal objectName=edit_undo text=&Undo shortcuts=Ctrl+Z context=3
+KTE-ACTION owner=KateViewInternal objectName=edit_redo text=Re&do shortcuts=Ctrl+Shift+Z context=3
+KTE-ACTION owner=KateViewInternal objectName=tools_scripts_jumpIndentUp text=Move Cursor to Previous Matching Indent shortcuts=Alt+Shift+Up context=3
+KTE-ACTION owner=KateViewInternal objectName=tools_scripts_jumpIndentDown text=Move Cursor to Next Matching Indent shortcuts=Alt+Shift+Down context=3
+KTE-ACTION owner=KateViewInternal objectName=tools_scripts_moveLinesDown text=Move Lines Down shortcuts=Ctrl+Shift+Down context=3
+KTE-ACTION owner=KateViewInternal objectName=tools_scripts_moveLinesUp text=Move Lines Up shortcuts=Ctrl+Shift+Up context=3
+KTE-ACTION owner=KateViewInternal objectName=tools_comment text=C&omment shortcuts=Ctrl+D context=3
+KTE-ACTION owner=KateViewInternal objectName=Previous Editing Line text=Go to Previous Editing Location shortcuts=Ctrl+E context=3
+KTE-ACTION owner=KateViewInternal objectName=Next Editing Line text=Go to Next Editing Location shortcuts=Ctrl+Shift+E context=3
+KTE-ACTION owner=KateViewInternal objectName=tools_uncomment text=Unco&mment shortcuts=Ctrl+Shift+D context=3
+KTE-ACTION owner=KateViewInternal objectName=tools_toggle_comment text=Toggle Comment shortcuts=Ctrl+/ context=3
+KTE-ACTION owner=KateViewInternal objectName=tools_uppercase text=Uppercase shortcuts=Ctrl+U context=3
+KTE-ACTION owner=KateViewInternal objectName=tools_lowercase text=Lowercase shortcuts=Ctrl+Shift+U context=3
+KTE-ACTION owner=KateViewInternal objectName=tools_capitalize text=Capitalize shortcuts=Ctrl+Alt+U context=3
+KTE-ACTION owner=KateViewInternal objectName=tools_join_lines text=Join Lines shortcuts=Ctrl+J context=3
+KTE-ACTION owner=KateViewInternal objectName=tools_invoke_code_completion text=Invoke Code Completion shortcuts=Ctrl+Space context=3
+KTE-ACTION owner=KateViewInternal objectName=file_print text=&Print… shortcuts=Ctrl+P context=3
+KTE-ACTION owner=KateViewInternal objectName=file_reload text=Reloa&d shortcuts=F5,Refresh context=3
+KTE-ACTION owner=KateViewInternal objectName=file_save_as text=Save &As… shortcuts=Ctrl+Shift+S context=3
+KTE-ACTION owner=KateViewInternal objectName=go_goto_line text=&Go to Line… shortcuts=Ctrl+G context=3
+KTE-ACTION owner=KateViewInternal objectName=edit_select_all text=Select &All shortcuts=Ctrl+A context=3
+KTE-ACTION owner=KateViewInternal objectName=edit_deselect text=Dese&lect shortcuts=Ctrl+Shift+A context=3
+KTE-ACTION owner=KateViewInternal objectName=view_inc_font_sizes text=Enlarge Font shortcuts=Ctrl++,Ctrl+= context=3
+KTE-ACTION owner=KateViewInternal objectName=view_dec_font_sizes text=Shrink Font shortcuts=Ctrl+- context=3
+KTE-ACTION owner=KateViewInternal objectName=view_reset_font_sizes text=Reset Font Size shortcuts=Ctrl+0 context=3
+KTE-ACTION owner=KateViewInternal objectName=set_verticalSelect text=Bl&ock Selection Mode shortcuts=Ctrl+Shift+B context=3
+KTE-ACTION owner=KateViewInternal objectName=switch_next_input_mode text=Switch to Next Input Mode shortcuts=Ctrl+Alt+V context=3
+KTE-ACTION owner=KateViewInternal objectName=set_insert text=Overwr&ite Mode shortcuts=Ins context=3
+KTE-ACTION owner=KateViewInternal objectName=switch_to_cmd_line text=Switch to Command Line shortcuts=F7 context=3
+KTE-ACTION owner=KateViewInternal objectName=edit_find text=&Find… shortcuts=Ctrl+F context=3
+KTE-ACTION owner=KateViewInternal objectName=edit_find_selected text=Find Selected shortcuts=Ctrl+H context=3
+KTE-ACTION owner=KateViewInternal objectName=edit_find_selected_backwards text=Find Selected Backwards shortcuts=Ctrl+Shift+H context=3
+KTE-ACTION owner=KateViewInternal objectName=edit_find_multicursor_next_occurrence text=Find and Select Next Occurrence shortcuts=Alt+J context=3
+KTE-ACTION owner=KateViewInternal objectName=edit_skip_multicursor_current_occurrence text=Mark Currently Selected Occurrence as Skipped shortcuts=Alt+K context=3
+KTE-ACTION owner=KateViewInternal objectName=edit_find_multicursor_all_occurrences text=Find and Select All Occurrences shortcuts=Ctrl+Alt+Shift+J context=3
+KTE-ACTION owner=KateViewInternal objectName=edit_find_next text=Find &Next shortcuts=F3 context=3
+KTE-ACTION owner=KateViewInternal objectName=edit_find_prev text=Find Pre&vious shortcuts=Shift+F3 context=3
+KTE-ACTION owner=KateViewInternal objectName=edit_replace text=&Replace… shortcuts=Ctrl+R context=3
+KTE-ACTION owner=KateViewInternal objectName=edit_create_multi_cursor_from_sel text=Add Cursors to Line Ends shortcuts=Alt+Shift+I context=3
+KTE-ACTION owner=KateViewInternal objectName=edit_create_multi_cursor_down text=Add Caret below Cursor shortcuts=Ctrl+Alt+Down context=3
+KTE-ACTION owner=KateViewInternal objectName=edit_create_multi_cursor_up text=Add Caret above Cursor shortcuts=Ctrl+Alt+Up context=3
+KTE-ACTION owner=KateViewInternal objectName=tools_toggle_automatic_spell_checking text=Automatic Spell Checking shortcuts=Ctrl+Shift+O context=3
+KTE-ACTION owner=KateViewInternal objectName=bookmarks_toggle text=Toggle &Bookmark shortcuts=Ctrl+B context=3
+KTE-ACTION owner=KateViewInternal objectName=bookmarks_next text=Next Bookmark shortcuts=Alt+PgDown context=3
+KTE-ACTION owner=KateViewInternal objectName=bookmarks_previous text=Previous Bookmark shortcuts=Alt+PgUp context=3
+KTE-ACTION owner=KateViewInternal objectName=word_left text=Move Word Left shortcuts=Ctrl+Left context=3
+KTE-ACTION owner=KateViewInternal objectName=select_char_left text=Select Character Left shortcuts=Shift+Left context=3
+KTE-ACTION owner=KateViewInternal objectName=select_word_left text=Select Word Left shortcuts=Ctrl+Shift+Left context=3
+KTE-ACTION owner=KateViewInternal objectName=word_right text=Move Word Right shortcuts=Ctrl+Right context=3
+KTE-ACTION owner=KateViewInternal objectName=select_char_right text=Select Character Right shortcuts=Shift+Right context=3
+KTE-ACTION owner=KateViewInternal objectName=select_word_right text=Select Word Right shortcuts=Ctrl+Shift+Right context=3
+KTE-ACTION owner=KateViewInternal objectName=beginning_of_line text=Move to Beginning of Line shortcuts=Home context=3
+KTE-ACTION owner=KateViewInternal objectName=beginning_of_document text=Move to Beginning of Document shortcuts=Ctrl+Home context=3
+KTE-ACTION owner=KateViewInternal objectName=select_beginning_of_line text=Select to Beginning of Line shortcuts=Shift+Home context=3
+KTE-ACTION owner=KateViewInternal objectName=select_beginning_of_document text=Select to Beginning of Document shortcuts=Ctrl+Shift+Home context=3
+KTE-ACTION owner=KateViewInternal objectName=end_of_line text=Move to End of Line shortcuts=End context=3
+KTE-ACTION owner=KateViewInternal objectName=end_of_document text=Move to End of Document shortcuts=Ctrl+End context=3
+KTE-ACTION owner=KateViewInternal objectName=select_end_of_line text=Select to End of Line shortcuts=Shift+End context=3
+KTE-ACTION owner=KateViewInternal objectName=select_end_of_document text=Select to End of Document shortcuts=Ctrl+Shift+End context=3
+KTE-ACTION owner=KateViewInternal objectName=select_line_up text=Select to Previous Line shortcuts=Shift+Up context=3
+KTE-ACTION owner=KateViewInternal objectName=scroll_line_up text=Scroll Line Up shortcuts=Ctrl+Up context=3
+KTE-ACTION owner=KateViewInternal objectName=move_line_down text=Move to Next Line shortcuts=Down context=3
+KTE-ACTION owner=KateViewInternal objectName=move_line_up text=Move to Previous Line shortcuts=Up context=3
+KTE-ACTION owner=KateViewInternal objectName=move_cursor_right text=Move Cursor Right shortcuts=Right context=3
+KTE-ACTION owner=KateViewInternal objectName=move_cursor_left text=Move Cursor Left shortcuts=Left context=3
+KTE-ACTION owner=KateViewInternal objectName=select_line_down text=Select to Next Line shortcuts=Shift+Down context=3
+KTE-ACTION owner=KateViewInternal objectName=scroll_line_down text=Scroll Line Down shortcuts=Ctrl+Down context=3
+KTE-ACTION owner=KateViewInternal objectName=scroll_page_up text=Scroll Page Up shortcuts=PgUp context=3
+KTE-ACTION owner=KateViewInternal objectName=select_page_up text=Select Page Up shortcuts=Shift+PgUp context=3
+KTE-ACTION owner=KateViewInternal objectName=move_top_of_view text=Move to Top of View shortcuts=Alt+Home context=3
+KTE-ACTION owner=KateViewInternal objectName=select_top_of_view text=Select to Top of View shortcuts=Alt+Shift+Home context=3
+KTE-ACTION owner=KateViewInternal objectName=scroll_page_down text=Scroll Page Down shortcuts=PgDown context=3
+KTE-ACTION owner=KateViewInternal objectName=select_page_down text=Select Page Down shortcuts=Shift+PgDown context=3
+KTE-ACTION owner=KateViewInternal objectName=move_bottom_of_view text=Move to Bottom of View shortcuts=Alt+End context=3
+KTE-ACTION owner=KateViewInternal objectName=select_bottom_of_view text=Select to Bottom of View shortcuts=Alt+Shift+End context=3
+KTE-ACTION owner=KateViewInternal objectName=to_matching_bracket text=Go to Matching Bracket shortcuts=Ctrl+6 context=3
+KTE-ACTION owner=KateViewInternal objectName=select_matching_bracket text=Select to Matching Bracket shortcuts=Ctrl+Shift+6 context=3
+KTE-ACTION owner=KateViewInternal objectName=delete_line text=Delete Line shortcuts=Ctrl+K context=3
+KTE-ACTION owner=KateViewInternal objectName=delete_word_left text=Delete Word Left shortcuts=Ctrl+Backspace context=3
+KTE-ACTION owner=KateViewInternal objectName=delete_word_right text=Delete Word Right shortcuts=Ctrl+Del context=3
+KTE-ACTION owner=KateViewInternal objectName=delete_next_character text=Delete Next Character shortcuts=Del context=3
+KTE-ACTION owner=KateViewInternal objectName=backspace text=Backspace shortcuts=Backspace,Shift+Backspace context=3
+KTE-ACTION owner=KateViewInternal objectName=smart_newline text=Insert Smart Newline shortcuts=Shift+Return,Shift+Enter context=3
+KTE-ACTION owner=KateViewInternal objectName=no_indent_newline text=Insert a Non-Indented Newline shortcuts=Ctrl+Return,Ctrl+Enter context=3
+KTE-ACTION owner=KateViewInternal objectName=newline_above text=Insert a Newline Above Current Line shortcuts=Ctrl+Alt+Return,Ctrl+Alt+Enter context=3
+KTE-ACTION owner=KateViewInternal objectName=newline_below text=Insert a Newline Below Current Line shortcuts=Ctrl+Shift+Return,Ctrl+Shift+Enter context=3
+KTE-ACTION owner=KateViewInternal objectName=tools_indent text=&Indent shortcuts=Ctrl+I context=3
+KTE-ACTION owner=KateViewInternal objectName=tools_unindent text=&Unindent shortcuts=Ctrl+Shift+I context=3
+KTE-ACTION owner=KateViewInternal objectName=doccomplete_bw text=Reuse Word Above shortcuts=Ctrl+8 context=3
+KTE-ACTION owner=KateViewInternal objectName=doccomplete_fw text=Reuse Word Below shortcuts=Ctrl+9 context=3
+KTE-ACTION owner=QMenu objectName=tools_toggle_automatic_spell_checking text=Automatic Spell Checking shortcuts=Ctrl+Shift+O context=3
+KTE-ACTION owner=qobject objectName=bookmarks_toggle text=Toggle &Bookmark shortcuts=Ctrl+B
+KTE-ACTION owner=qobject objectName=bookmarks_next text=Next Bookmark shortcuts=Alt+PgDown
+KTE-ACTION owner=qobject objectName=bookmarks_previous text=Previous Bookmark shortcuts=Alt+PgUp
+KTE-ACTION owner=qobject objectName=tools_scripts_jumpIndentUp text=Move Cursor to Previous Matching Indent shortcuts=Alt+Shift+Up
+KTE-ACTION owner=qobject objectName=tools_scripts_jumpIndentDown text=Move Cursor to Next Matching Indent shortcuts=Alt+Shift+Down
+KTE-ACTION owner=qobject objectName=tools_scripts_moveLinesDown text=Move Lines Down shortcuts=Ctrl+Shift+Down
+KTE-ACTION owner=qobject objectName=tools_scripts_moveLinesUp text=Move Lines Up shortcuts=Ctrl+Shift+Up
+KTE-ACTION owner=qobject objectName=set_verticalSelect text=Bl&ock Selection Mode shortcuts=Ctrl+Shift+B
+KTE-ACTION owner=qobject objectName=set_insert text=Overwr&ite Mode shortcuts=Ins
+KTE-ACTION owner=qobject objectName=tools_toggle_automatic_spell_checking text=Automatic Spell Checking shortcuts=Ctrl+Shift+O
+KTE-ACTION owner=qobject objectName=doccomplete_bw text=Reuse Word Above shortcuts=Ctrl+8
+KTE-ACTION owner=qobject objectName=doccomplete_fw text=Reuse Word Below shortcuts=Ctrl+9

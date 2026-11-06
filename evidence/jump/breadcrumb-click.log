@@ -1,0 +1,43 @@
+== vedit-breadcrumb-click-tests (real QTest mouse clicks; AC-7.6) ==
+CHECK source.semantic-active PASS
+CHECK path.depth PASS actual=2 expected=2
+CHECK path.segment0 PASS actual='m0' expected='m0'
+CHECK path.segment1 PASS actual='inc' expected='inc'
+CHECK path.segment1.source-line-0-based PASS actual=3 expected=3
+This plugin does not support propagateSizeHints()
+CHECK bar.segments PASS actual=2 expected=2
+CHECK bar.segment0.text PASS actual='m0' expected='m0'
+CHECK bar.segment1.text PASS actual='inc' expected='inc'
+CHECK bar.segment0.contract-line PASS actual=1 expected=1
+CHECK bar.segment1.contract-line PASS actual=4 expected=4
+CHECK bar.visible-with-path PASS
+CHECK bar.segment-widgets PASS
+CHECK bar.out-of-range-widget PASS
+CHECK click.function.calls PASS actual=1 expected=1
+BREADCRUMB-CLICK segment=1 text='inc' line=4 status=delivered target-file='/tmp/vedit-fixture/top.sv' target-line=4 target-column=1 target-calls=1
+CHECK click.function.file PASS actual='/tmp/vedit-fixture/top.sv' expected='/tmp/vedit-fixture/top.sv'
+CHECK click.function.line PASS actual=4 expected=4
+CHECK click.function.column PASS actual=1 expected=1
+CHECK click.function.status PASS
+CHECK click.function.segment PASS actual=1 expected=1
+CHECK click.module.calls PASS actual=2 expected=2
+BREADCRUMB-CLICK segment=0 text='m0' line=1 status=delivered target-file='/tmp/vedit-fixture/top.sv' target-line=1 target-column=1 target-calls=2
+CHECK click.module.line PASS actual=1 expected=1
+CHECK click.rejected.status PASS
+CHECK click.rejected.calls PASS actual=3 expected=3
+CHECK noop.bar-has-no-target PASS
+BREADCRUMB-NO-TARGET segment=1 activated=0 status=no-target target-calls=3
+CHECK noop.status PASS
+CHECK noop.not-delivered PASS
+CHECK noop.no-new-delivery PASS actual=3 expected=3
+CHECK bar.empty-hidden PASS
+CHECK bar.empty-segments PASS actual=0 expected=0
+CHECK bar.empty-activate-false PASS
+CHECK bar.negative-activate-false PASS
+This plugin does not support propagateSizeHints()
+CHECK bar.rebuild.segments PASS actual=1 expected=1
+CHECK bar.rebuild.text PASS actual='m0' expected='m0'
+CHECK bar.rebuild.no-stale-segment PASS
+CHECK bar.rebuild.no-stale-separator PASS
+SUMMARY checks=35 failures=0
+[exit=0]

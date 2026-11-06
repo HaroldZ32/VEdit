@@ -1,0 +1,27 @@
+== i18n/restart selftest through the real AppDir loader, AppDir as argv[1] ==
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, but has failed to switch to one.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+ok   i18n.candidates.count
+ok   i18n.candidates.packaged-first
+ok   i18n.fixture.bin-translations
+ok   i18n.packaged-found
+ok   i18n.fixture.translations
+ok   i18n.buildtree-found
+ok   i18n.fixture.prefix
+ok   i18n.prefix-found
+ok   restart.fixture.apprun
+ok   restart.appdir.program
+ok   restart.appdir.arguments
+ok   restart.plain.program
+ok   restart.plain.arguments
+ok   restart.appimage.program
+ok   restart.appimage.arguments
+ok   restart.fixture.chmod
+ok   restart.nonexec.falls-back
+ok   probe.translations
+ok   probe.restart-selects-apprun
+ok   probe.restart-forwards-args
+0 failure(s)
+PROBE_EXIT=0

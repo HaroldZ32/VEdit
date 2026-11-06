@@ -1,0 +1,3 @@
+crates/vd-ffi/src/lsp.rs ignore-all-space rc=1
+crates/vd-lsp/src/client.rs ignore-all-space rc=1
+crates/vd-lsp/src/session.rs ignore-all-space rc=1

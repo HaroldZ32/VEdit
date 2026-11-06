@@ -1,0 +1,15 @@
+# 08-after-ctest — ctest summary AFTER deletion (build log 05-build-after.log)
+# cmd: bash scripts/build-qt.sh   (exit 0)
+1183:100% tests passed, 0 tests failed out of 37
+# the relocated native-folding criterion still exists and passes:
+726:[19/288] Automatic MOC for target fold-gutter-click-probe
+743:[36/287] Building CXX object src/app/editor-lane/CMakeFiles/fold-gutter-click-probe.dir/fold-gutter-click-probe_autogen/mocs_compilation.cpp.o
+783:[76/286] Building CXX object src/app/editor-lane/CMakeFiles/fold-gutter-click-probe.dir/kernel/fold_gutter_click_probe.cpp.o
+# registered fold-related test ids (from the ctest run):
+14/37 Test #14: vedit-native-fold-tests
+15/37 Test #15: vedit-fold-gutter-click
+
+# 08b-after-assertions — AC-4.7-style call-site count AFTER deletion
+# cmd: grep -rnE 'check\(|QVERIFY\(|QVERIFY2\(|QCOMPARE\(|expect\(' --include=*.cpp --include=*.h src/ | wc -l
+2437
+# (before: 2447, see 03-before-assertions.txt; delta = -10, all in the deleted syntax_directory_tests.cpp)

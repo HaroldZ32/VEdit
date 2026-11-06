@@ -1,0 +1,37 @@
+CHECK PASS rm3.dialog.shows-whole-table  rows=2 names=MISSING,A
+CHECK PASS rm3.dialog.known-value-prefilled
+CHECK PASS rm3.dialog.add
+CHECK PASS rm3.dialog.add-in-table
+CHECK PASS rm3.dialog.duplicate-refused
+CHECK PASS rm3.dialog.invalid-refused  A name may only contain letters, digits and '_', and cannot start with a digit | A name may only contain letters, digits and '_', and cannot start with a digit | A name may only contain letters, digits and '_', and cannot start with a digit | A name may only contain letters, digits and '_', and cannot start with a digit | Enter a variable name
+CHECK PASS rm3.dialog.delete
+CHECK PASS rm3.dialog.delete-removes-entry
+CHECK PASS rm3.dialog.delete-note  Removed A
+CHECK PASS rm3.dialog.delete-required  Removed A
+CHECK PASS rm3.expand.missing-reported
+CHECK PASS rm3.panel.add-applied
+CHECK PASS rm3.substitution-uses-new-value
+CHECK PASS rm3.table-has-added  NEWVAR=v1
+CHECK PASS rm3.panel.add-second
+CHECK PASS rm3.panel.delete-applied
+CHECK PASS rm3.panel.delete-removed-from-model  NEWVAR=v1
+CHECK PASS rm3.panel.shows-table
+CHECK PASS rm3.persisted-file-has-per-root-map  /tmp/vedit-project-variables-e2e-CrMMnK/state/project-model.json
+CHECK PASS rm3.restart.restore-loads
+CHECK PASS rm3.restart.variables-restored  NEWVAR=v1
+CHECK PASS rm3.restart.re-expands-with-table
+CHECK PASS rm3.switch.b-settled
+CHECK PASS rm3.switch.b-has-no-a-variable
+CHECK PASS rm3.switch.b-reports-own-missing  BVAR
+CHECK PASS rm3.switch.b-add-applied
+CHECK PASS rm3.switch.b-substitutes
+CHECK PASS rm3.switch.back-to-a-settled
+CHECK PASS rm3.switch.a-table-restored  NEWVAR=v1
+CHECK PASS rm3.switch.a-substitutes-again  /tmp/vedit-project-variables-e2e-CrMMnK/shared/v1.sv
+CHECK PASS rm3.switch.both-roots-persisted
+CHECK PASS rm3.required.delete-applied
+CHECK PASS rm3.required.delete-removed-value
+CHECK PASS rm3.required.reported-missing-again
+CHECK PASS rm3.required.panel-no-longer-shows-value
+CHECK PASS rm3.required.dialog-asks-again
+SUMMARY checks=36 failures=0

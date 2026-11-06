@@ -3,7 +3,7 @@ appdir: /home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/AppDir
 CHECK PASS  no KDE systemverilog.xml / verilog.xml by sha256
 CHECK PASS  no file named systemverilog.xml / verilog.xml
 CHECK PASS  no syntax-bundled/ directory (F2 C5)
-CHECK PASS  active definitions == whitelist [SystemVerilog,Verilog]
+CHECK PASS  active definitions == whitelist [Markdown,SystemVerilog,Tcl,VHDL,Verilog]
 -- shipped library: /home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/AppDir/lib/libKF6SyntaxHighlighting.so.6
    sha256: aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
    detector: zstd scanner (evidence/r2-ksh-embedded/scan-embedded-defs.py)

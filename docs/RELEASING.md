@@ -5,6 +5,10 @@
 `release/<ver>`，验证与打包通过后合入 `main`，并在 `main` 上打 tag。
 已发布的历史**永不重写**。
 
+> **当前发布线是 Qt6 产品**（`vedit-app`，单文件 AppImage，见 `docs/BUILD.md` §7.1）；本文第 5–6 节按它编写。
+> 旧 Rust/GTK3 线（`scripts/build.sh`、`packaging/appimage/`、`packaging/tarball/`）仍保留，但**不是发布路径**
+> （区别与实测校验见 `docs/BUILD.md` §7.2）。
+
 ## 1. 为什么是 dev + release，而不是单线
 
 - **`main` 只放已发布的内容**：`main` 上每个提交都对应一次发版或一个 tag，
@@ -13,7 +17,7 @@
   未发版的中间状态不会被带进 `main`。
 - **发版走 `release/<ver>`**：从 `dev` 切出后只做"冻结 + 验证 + 打包 + 打 tag"，
   通过后合入 `main`；pre-release 的修正留在 release 分支内，不夹带 `dev` 上仍在进行的改动。
-- **发布产物不进 git**（见第 5 节）：一个 40–48 MB 的二进制每次发版都进历史会让仓库迅速不可用，
+- **发布产物不进 git**（见第 5 节）：一个 100 MB 量级的 AppImage 每次发版都进历史会让仓库迅速不可用，
   产物作为 GitHub Release 附件分发。
 - **回滚直接**：`main` 上按 tag `git revert` 或重发一个 PATCH，不需要在分支图上找落点。
 
@@ -67,59 +71,60 @@ docs(evidence): workspace gate green at T19 delivery (T17 deeplint landed)
 
 - `MAJOR.MINOR.PATCH`；首个版本 **`v0.1.0`**（0.x 表示接口尚未冻结）。
 - `MAJOR`：不兼容变更；`MINOR`：向后兼容的新功能；`PATCH`：向后兼容的修复。
-- 预发布：`v0.2.0-rc.1`（后缀递增）。
+- 预发布：`v0.2.1-rc.1`（后缀递增）。
 - tag 打在 `main` 上（`release/<ver>` 合入之后），**annotated**：
 
 ```sh
 git switch main && git pull --ff-only
-git tag -a v0.1.0 -m "VEdit 0.1.0 — first release for CentOS 7"
-git push origin v0.1.0
+git tag -a v0.2.1 -m "VEdit 0.2.1 — Qt6 desktop editor for CentOS 7"
+git push origin v0.2.1
 ```
 
 ## 5. 发布产物（GitHub Release 附件，不进 git）
 
-发版时上传**三个产物 + 校验文件**：
+发版时上传**一个交付物 + 校验文件**：
 
 | 附件 | 说明 |
 |---|---|
-| `VEdit-<ver>-x86_64.AppImage` | 单文件，需要 FUSE（可用 extract-and-run） |
-| `vedit-<ver>-linux-x86_64.tar.gz` | 目录包，不需要 FUSE |
-| `VEdit-<ver>-x86_64.run` | 单文件自解压，不需要 FUSE |
-| `SHA256SUMS` | 三个产物的 sha256 **+ 包内 verible 三件套与 slang 的 sha256** |
+| `VEdit-<ver>-x86_64.AppImage` | 单文件 Qt6 交付物（F2 私有运行时，含 verible / slang / git / svn / 字体 / 翻译）；需要 FUSE，没有时用 `--appimage-extract-and-run` 或 `APPIMAGE_EXTRACT_AND_RUN=1` |
+| `SHA256SUMS` | 与 AppImage 配套，由打包脚本写在 `packaging/runtime/out/SHA256SUMS` |
 
 **产物绝不提交到 git**（仓库 `.gitignore` 已忽略 `packaging/*/out/`、`*.AppImage` 等）。
-`SHA256SUMS` 的生成方式：
+生成方式（`build.sh` 已自动完成）：
 
 ```sh
-cd <产物目录>
-sha256sum VEdit-*x86_64.AppImage vedit-*-linux-x86_64.tar.gz VEdit-*-x86_64.run > SHA256SUMS
-# 包内二进制（与 scripts/versions.env 的 pin 对照）：
-tar xzf vedit-*-linux-x86_64.tar.gz
-sha256sum VEdit/bin/verible-verilog-{ls,lint,format} VEdit/bin/slang >> SHA256SUMS
+bash packaging/runtime/build.sh
+# 产物：packaging/runtime/out/VEdit-<ver>-x86_64.AppImage
+# 校验：packaging/runtime/out/SHA256SUMS
 ```
 
-## 6. 发布前检查单
+## 6. 发布前检查单（Qt 产品线）
 
-1. `git switch dev && git pull --ff-only`，`bash scripts/gates.sh` 全绿（fmt / clippy / test / 依赖策略）；
-2. `bash scripts/build.sh` 全绿（pinned 镜像构建 + Xvfb 冒烟 + GLIBC 断言）；
-3. `bash packaging/appimage/run-evidence.sh` 与 `bash packaging/tarball/build.sh` 的**干净无网**验收全绿
-   （`--selftest all` 全部通过；数量随版本变化，不要在文档里写死，两个产物各自独立）；
-4. 从 `dev` 切出 `release/<ver>`，该分支只做冻结、验证与打包，**不要加新功能**；
-5. 证据目录中有本次运行的日志（带时间戳，**不要引用旧绿灯**）；
-6. 文档与实际行为一致：`README.md`、`docs/USER_GUIDE.md`、`THIRD_PARTY_NOTICES.md`；
-7. `release/<ver>` 以 PR 合入 `main`（merge commit），打 annotated tag，上传三个产物与 `SHA256SUMS`，
-   Release notes 写"变更 + 已知限制 + 证据路径"；若发版期间 `dev` 又有新提交，把 `main` 合回 `dev`。
+1. `git switch dev && git pull --ff-only`；工作区干净。
+2. `bash build/gates/qt6-cxx.sh` 全绿（Qt6/KF6 C++ 车道：configure + build + ctest + xcb 冒烟）。
+3. `bash scripts/gates.sh` 全绿（Rust 服务层：fmt / clippy / test / 依赖策略）。
+4. `bash build/gates/lrelease.sh` 与 `bash build/gates/docs.sh` 全绿（翻译目录零 unfinished/untranslated；文档齐备）。
+5. `bash packaging/runtime/build.sh` 成功：产出 `packaging/runtime/out/VEdit-<ver>-x86_64.AppImage` 与
+   `out/SHA256SUMS`；F2 隔离（正 + 反）与 CentOS 7 机制探针为绿。
+6. 从 `dev` 切出 `release/<ver>`，该分支只做冻结、验证与打包，**不要加新功能**。
+7. 证据目录里有本次运行的日志（带时间戳，**不要引用旧绿灯**）；文档与实际行为一致：
+   `README.md`、`docs/USER_GUIDE.md`、`THIRD_PARTY_NOTICES.md`。
+8. `release/<ver>` 以 PR 合入 `main`（merge commit），打 annotated tag，上传**一个 AppImage + `SHA256SUMS`**；
+   Release notes 写“变更 + 已知限制 + 证据路径”；若发版期间 `dev` 又有新提交，把 `main` 合回 `dev`。
+
+> 旧 GTK3 线的 `scripts/build.sh` / `packaging/appimage/run-evidence.sh` / `packaging/tarball/build.sh`
+> **不是**本检查单的一部分；它们是旧产品的发布路径（见 `docs/BUILD.md` §7.2）。
 
 ## 7. 热修（hotfix）
 
 从**最近的 tag** 拉分支，PATCH 递增；修完先合 `dev`，再按第 6 节走 release 流程进 `main`：
 
 ```sh
-git switch -c fix/crash-on-empty-file v0.1.0     # 注意：从 tag 起步
+git switch -c fix/crash-on-empty-file v0.2.0     # 注意：从上一个 release tag 起步
 # … 修复 + 测试 …
 git push -u origin fix/crash-on-empty-file
 gh pr create --base dev --head fix/crash-on-empty-file
-# 合入 dev 后按第 6 节发一个 PATCH：release/v0.1.1 → main → tag
+# 合入 dev 后按第 6 节发一个 PATCH：release/v0.2.1 → main → tag
 ```
 
 ## 8. 历史纪律

@@ -1,0 +1,7 @@
+100% tests passed, 0 tests failed out of 38
+[211/297] Automatic MOC for target vedit-workspace-vcs-selftest
+[226/297] Building CXX object src/app/workspace-lane-vcs/CMakeFiles/vedit-workspace-vcs-selftest.dir/vedit-workspace-vcs-selftest_autogen/mocs_compilation.cpp.o
+[277/297] Building CXX object src/app/workspace-lane-vcs/CMakeFiles/vedit-workspace-vcs-selftest.dir/vcs_selftest.cpp.o
+[284/297] Linking CXX executable src/app/workspace-lane-vcs/vedit-workspace-vcs-selftest
+      Start 37: vedit-workspace-vcs-selftest
+37/38 Test #37: vedit-workspace-vcs-selftest ...................   Passed    8.44 sec

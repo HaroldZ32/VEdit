@@ -1,0 +1,53 @@
+# U4b — commands run and the exit codes observed (2026-11-06, pinned image vedit-qt6-build:local)
+#
+# Every command ran with the workspace mounted at /vedit-build. Build only the
+# affected targets; the one full gate is the captain's run.
+
+configure:
+  cmake -S /vedit-build -B /vedit-build/target/qt6-build -G Ninja \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo -DCMAKE_CXX_FLAGS="-Wall -Wextra" \
+    -DVEDIT_RUST_FFI_LIB=/vedit-build/target/release/libvd_ffi.a \
+    -DVEDIT_RUST_FFI_INCLUDE=/vedit-build/crates/vd-ffi/include
+  observed exit code: 0        (log: 01-configure.log)
+
+build (affected targets only):
+  cmake --build /vedit-build/target/qt6-build \
+    --target vedit_syntax_product_tests vedit-app --parallel $(nproc)
+  observed exit code: 0        (log: 02-build.log)
+
+the two syntax tests:
+  ctest --test-dir /vedit-build/target/qt6-build \
+    -R "^(vedit-app-syntax-startup|vedit-syntax-product-tests)$" -V
+  observed exit code: 0        (log: 04-two-syntax-tests.log, 2/2 passed)
+
+kde-lane tests affected by the loader change (extra check, affected targets only):
+  cmake --build /vedit-build/target/qt6-build \
+    --target vedit_syntax_kde_selftest vedit-syntax-directory-equivalence --parallel $(nproc)
+  observed exit code: 0        (log: 13-kde-lane-build.log)
+  ctest --test-dir /vedit-build/target/qt6-build \
+    -R "^(vedit-syntax-kde-data|vedit-syntax-directory-equivalence)$" -V
+  observed exit code: 0        (log: 14-kde-lane-tests.log, 2/2 passed)
+
+negative control — corrupt vedit-tcl.xml in a TEMP resources dir, test definition COPIED
+from the generated build tree (the shared file was never edited):
+  ctest --test-dir /vedit-build/target/u4b-probe/ctest-good -R ^vedit-app-syntax-startup$ -V
+    -> exit code 0   (real resources/)
+  ctest --test-dir /vedit-build/target/u4b-probe/ctest-broken -R ^vedit-app-syntax-startup$ -V
+    -> exit code 8   ***Failed  (SHIPPED U4b predicate; definitions-ok loses Tcl)
+  ctest --test-dir /vedit-build/target/u4b-probe/ctest-broken-old -R ^vedit-app-syntax-startup$ -V
+    -> exit code 0   Passed     (U4 predicate only: reproduces the review's false green)
+  (log: 07-negative-corrupt-tcl.log)
+
+negative control — corrupt vedit-vhdl.xml (same construction):
+  ctest --test-dir /vedit-build/target/u4b-probe/ctest-broken-vhdl ...     -> exit code 8 ***Failed
+  ctest --test-dir /vedit-build/target/u4b-probe/ctest-broken-vhdl-old ... -> exit code 0 Passed
+  (log: 12-negative-corrupt-vhdl.log)
+
+exit-code probe — a script prints the real startup line and `exit 1`:
+  fake-old-regex (U4 predicate)        -> Passed   (exit code masked)
+  fake-new-regex (U4b predicate)       -> ***Failed (APP-SHELL-SELFTEST ok=1 absent)
+  observed exit code: 8        (log: 09-exit-code-probe.log)
+
+generated-file provenance — a fresh configure rewrites the generated test file with the same bytes:
+  sha256 4ae24e529f0b84a72e937db0ca5b592df2df630cf386a4e093843f6f9986aff0
+  observed exit code: 0        (log: 10-generated-file-provenance.log)

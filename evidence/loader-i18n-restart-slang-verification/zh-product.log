@@ -1,0 +1,10 @@
+bash: line 6: warning: setlocale: LC_ALL: cannot change locale (C.UTF-8)
+bash: line 6: warning: setlocale: LC_ALL: cannot change locale (C.UTF-8)
+PRODUCT_EXIT=0
+== i18n diagnostics (empty means the .qm loaded) ==
+== other stderr tail ==
+VCS-TOOLCHAIN git=/w/evidence/loader-i18n-restart-slang-verification/scratch-appdir/usr/lib/vcs/bin/git version=2.53.0 svn=/w/evidence/loader-i18n-restart-slang-verification/scratch-appdir/usr/lib/vcs/bin/svn version=1.14.5 source=bundled git_source=bundled svn_source=bundled
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+TOOLCHAIN source=verible:bundled slang:bundled missing=[] aux source=slang-server:missing verible-format:bundled verible-lint:bundled missing=[slang-server] local=[/w/build/slang/out,/w/.mpd/recon/verible/bin]

@@ -1,0 +1,8 @@
+# gate: ctest (37 tests, run inside scripts/build-qt.sh)
+33/37 Test #33: vedit-diagnostics-ffi-selftest .................   Passed    3.24 sec
+34/37 Test #34: vedit-diagnostics-product-seam .................   Passed    6.19 sec
+35/37 Test #35: vedit-toolchain-ux-selftest ....................   Passed    3.11 sec
+36/37 Test #36: vedit-workspace-vcs-selftest ...................   Passed   15.01 sec
+37/37 Test #37: vedit-workspace-settings-selftest ..............   Passed    0.56 sec
+100% tests passed, 0 tests failed out of 37
+CTEST_EXIT=0

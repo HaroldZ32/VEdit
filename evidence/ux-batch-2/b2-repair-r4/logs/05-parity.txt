@@ -1,0 +1,33 @@
+# name-level parity of the 275-check baseline (review-b2-r4) against this repair's green run
+# baseline names: 275
+# green-run names: 299
+# baseline names present in the green run: 275
+# baseline names missing: 0
+# names added by b2-repair-r4: 24
+# (the green run has 0 failures, so every present name is PASS)
+--- missing (expected empty) ---
+--- added ---
+preview-cap-ok.below-intact
+preview-cap-ok.hit
+preview-cap-ok.idle
+preview-cap-ok.ok
+preview-cap-ok.replaced-one
+preview-cap-ok.replaced-scanned-line
+preview-cap-ok.save-ran
+preview-cap-ok.search
+preview-cap-ok.started
+preview-cap.detector-at-cap
+preview-cap.detector-empty
+preview-cap.detector-short-ellipsis
+preview-cap.detector-truncated
+preview-cap.disk-unchanged
+preview-cap.error-names-file
+preview-cap.hit
+preview-cap.idle
+preview-cap.no-save
+preview-cap.refused
+preview-cap.search
+preview-cap.tail-disk-unchanged
+preview-cap.tail-idle
+preview-cap.tail-no-save
+preview-cap.tail-refused

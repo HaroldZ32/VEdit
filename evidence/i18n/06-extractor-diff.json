@@ -1,0 +1,2724 @@
+{
+ "stats": {
+  "old_rows": 466,
+  "old_unique_strings": 466,
+  "new_rows": 894,
+  "new_unique_strings": 780,
+  "kept_pairs": 422,
+  "moved_rows": 0,
+  "gone_rows": 44,
+  "gone_removed_from_tree": 15,
+  "gone_rule_dropped": 29,
+  "added_rows": 382,
+  "duplicate_strings": 79,
+  "duplicate_occurrences": 114
+ },
+ "added_areas": [
+  {
+   "area": "src/workspace/diagnostics",
+   "added": 85,
+   "in_old_list": true,
+   "old_count": 62
+  },
+  {
+   "area": "src/workspace/module_tree",
+   "added": 74,
+   "in_old_list": false,
+   "old_count": 0
+  },
+  {
+   "area": "src/workspace/project",
+   "added": 55,
+   "in_old_list": true,
+   "old_count": 26
+  },
+  {
+   "area": "src/editor/kernel",
+   "added": 44,
+   "in_old_list": true,
+   "old_count": 62
+  },
+  {
+   "area": "src/workspace/settings",
+   "added": 28,
+   "in_old_list": true,
+   "old_count": 32
+  },
+  {
+   "area": "src/terminal/terminal_selftest.cpp",
+   "added": 18,
+   "in_old_list": false,
+   "old_count": 0
+  },
+  {
+   "area": "src/app/app_shell.cpp",
+   "added": 17,
+   "in_old_list": true,
+   "old_count": 33
+  },
+  {
+   "area": "src/terminal/terminal_panel.cpp",
+   "added": 11,
+   "in_old_list": false,
+   "old_count": 0
+  },
+  {
+   "area": "src/app/editor_area.cpp",
+   "added": 10,
+   "in_old_list": true,
+   "old_count": 14
+  },
+  {
+   "area": "src/terminal/pty_session.cpp",
+   "added": 10,
+   "in_old_list": false,
+   "old_count": 0
+  },
+  {
+   "area": "src/syntax/kde",
+   "added": 9,
+   "in_old_list": true,
+   "old_count": 7
+  },
+  {
+   "area": "src/app/main.cpp",
+   "added": 4,
+   "in_old_list": true,
+   "old_count": 20
+  },
+  {
+   "area": "src/editor/probes",
+   "added": 3,
+   "in_old_list": true,
+   "old_count": 35
+  },
+  {
+   "area": "src/workspace/filetree",
+   "added": 3,
+   "in_old_list": true,
+   "old_count": 55
+  },
+  {
+   "area": "src/workspace/palette",
+   "added": 3,
+   "in_old_list": true,
+   "old_count": 22
+  },
+  {
+   "area": "src/workspace/search",
+   "added": 3,
+   "in_old_list": true,
+   "old_count": 25
+  },
+  {
+   "area": "src/app/crash_reporter.cpp",
+   "added": 1,
+   "in_old_list": true,
+   "old_count": 1
+  },
+  {
+   "area": "src/syntax/folding",
+   "added": 1,
+   "in_old_list": true,
+   "old_count": 10
+  },
+  {
+   "area": "src/syntax/product",
+   "added": 1,
+   "in_old_list": true,
+   "old_count": 1
+  },
+  {
+   "area": "src/terminal/terminal_widget.cpp",
+   "added": 1,
+   "in_old_list": false,
+   "old_count": 0
+  },
+  {
+   "area": "src/workspace/breadcrumb",
+   "added": 1,
+   "in_old_list": true,
+   "old_count": 3
+  }
+ ],
+ "moved": [],
+ "gone": [
+  {
+   "old_source": "src/app/editor_area.cpp:338",
+   "string": "    ◀ active",
+   "in_tree": false,
+   "tree_paths": [],
+   "reason": "字符串已从当前树删除"
+  },
+  {
+   "old_source": "src/workspace/breadcrumb/breadcrumb_model.cpp:41",
+   "string": " > ",
+   "in_tree": true,
+   "tree_paths": [
+    "src/syntax/grammars/tests/test_syn_grammars.cpp",
+    "src/workspace/breadcrumb/breadcrumb_model.cpp",
+    "src/workspace/breadcrumb/breadcrumb_model.h"
+   ],
+   "reason": "形状规则淘汰：C4-format-only×4"
+  },
+  {
+   "old_source": "src/editor/fim/fim_selftest.cpp:242",
+   "string": " async-suggestion",
+   "in_tree": true,
+   "tree_paths": [
+    "src/editor/fim/fim_selftest.cpp"
+   ],
+   "reason": "形状规则淘汰：C5-lowercase-token×1"
+  },
+  {
+   "old_source": "src/app/main.cpp:1331",
+   "string": " built ",
+   "in_tree": true,
+   "tree_paths": [
+    "src/app/main.cpp"
+   ],
+   "reason": "形状规则淘汰：C5-lowercase-token×1"
+  },
+  {
+   "old_source": "src/workspace/settings/settings_panel.cpp:488",
+   "string": " | ",
+   "in_tree": true,
+   "tree_paths": [
+    "src/syntax/kde/tests/syntax_directory_equivalence.cpp",
+    "src/syntax/overlay/overlay_selftest.cpp",
+    "src/syntax/product/tests/test_syntax_product.cpp",
+    "src/workspace/diagnostics/diagnostics_ffi_selftest.cpp",
+    "src/workspace/diagnostics/toolchain.cpp"
+   ],
+   "reason": "形状规则淘汰：C4-format-only×9"
+  },
+  {
+   "old_source": "src/workspace/project/project_selftest.cpp:132",
+   "string": "7 files",
+   "in_tree": false,
+   "tree_paths": [],
+   "reason": "字符串已从当前树删除"
+  },
+  {
+   "old_source": "src/workspace/settings/settings_panel.cpp:55",
+   "string": "Applied immediately and stored as `theme` by the Rust service.",
+   "in_tree": true,
+   "tree_paths": [
+    "src/workspace/settings/settings_panel.cpp"
+   ],
+   "reason": "已被 tr() 包装（已翻译），不再属于 QStringLiteral 候选族"
+  },
+  {
+   "old_source": "src/workspace/settings/settings_panel.cpp:76",
+   "string": "Assign to selected command",
+   "in_tree": true,
+   "tree_paths": [
+    "src/workspace/settings/settings_panel.cpp"
+   ],
+   "reason": "已被 tr() 包装（已翻译），不再属于 QStringLiteral 候选族"
+  },
+  {
+   "old_source": "src/workspace/search/search_types.cpp:14",
+   "string": "CMakeFiles",
+   "in_tree": true,
+   "tree_paths": [
+    "src/workspace/search/search_types.cpp"
+   ],
+   "reason": "形状规则淘汰：C10-no-whitespace×1"
+  },
+  {
+   "old_source": "src/editor/probes/tx_probe.cpp:40",
+   "string": "KTextEditor",
+   "in_tree": true,
+   "tree_paths": [
+    "src/editor/probes/tx_probe.cpp",
+    "src/syntax/product/tests/test_syntax_product.cpp"
+   ],
+   "reason": "形状规则淘汰：C10-no-whitespace×2"
+  },
+  {
+   "old_source": "src/workspace/settings/settings_panel.cpp:60",
+   "string": "Key bindings",
+   "in_tree": false,
+   "tree_paths": [],
+   "reason": "字符串已从当前树删除"
+  },
+  {
+   "old_source": "src/workspace/settings/settings_panel.cpp:80",
+   "string": "New shortcut:",
+   "in_tree": true,
+   "tree_paths": [
+    "src/workspace/settings/settings_panel.cpp"
+   ],
+   "reason": "已被 tr() 包装（已翻译），不再属于 QStringLiteral 候选族"
+  },
+  {
+   "old_source": "src/workspace/project/project_panel.cpp:38",
+   "string": "Open a project with --project <dir>; the expanded file list appears here.",
+   "in_tree": false,
+   "tree_paths": [],
+   "reason": "字符串已从当前树删除"
+  },
+  {
+   "old_source": "src/app/app_shell.cpp:629",
+   "string": "Panes: %1 · active: %2",
+   "in_tree": false,
+   "tree_paths": [],
+   "reason": "字符串已从当前树删除"
+  },
+  {
+   "old_source": "src/workspace/diagnostics/diagnostics_integration.cpp:409",
+   "string": "Re&parse Project (Verible + SLANG)",
+   "in_tree": false,
+   "tree_paths": [],
+   "reason": "字符串已从当前树删除"
+  },
+  {
+   "old_source": "src/workspace/settings/settings_panel.cpp:104",
+   "string": "Reload from disk",
+   "in_tree": true,
+   "tree_paths": [
+    "src/workspace/settings/settings_panel.cpp"
+   ],
+   "reason": "已被 tr() 包装（已翻译），不再属于 QStringLiteral 候选族"
+  },
+  {
+   "old_source": "src/app/main.cpp:923",
+   "string": "SystemVerilog",
+   "in_tree": true,
+   "tree_paths": [
+    "src/app/main.cpp",
+    "src/editor/kernel/edit_core_selftest.cpp",
+    "src/editor/kernel/highlight_diagnosis.cpp",
+    "src/editor/kernel/highlight_mode.cpp",
+    "src/syntax/folding/tests/fold_native_gui_probe.cpp"
+   ],
+   "reason": "形状规则淘汰：C10-no-whitespace×20"
+  },
+  {
+   "old_source": "src/workspace/diagnostics/toolchain.cpp:334",
+   "string": "TOOLCHAIN %1 local=[%2]",
+   "in_tree": false,
+   "tree_paths": [],
+   "reason": "字符串已从当前树删除"
+  },
+  {
+   "old_source": "src/workspace/diagnostics/diagnostics_selftest.cpp:279",
+   "string": "UndeclaredIdentifier",
+   "in_tree": true,
+   "tree_paths": [
+    "src/workspace/diagnostics/diagnostics_selftest.cpp"
+   ],
+   "reason": "形状规则淘汰：C10-no-whitespace×1"
+  },
+  {
+   "old_source": "src/app/app_shell.cpp:635",
+   "string": "VEdit — %1",
+   "in_tree": false,
+   "tree_paths": [],
+   "reason": "字符串已从当前树删除"
+  },
+  {
+   "old_source": "src/app/app_shell.cpp:634",
+   "string": "VEdit — no project",
+   "in_tree": false,
+   "tree_paths": [],
+   "reason": "字符串已从当前树删除"
+  },
+  {
+   "old_source": "src/editor/kernel/fold_breadcrumb.cpp:21",
+   "string": "breadcrumbDebounce",
+   "in_tree": true,
+   "tree_paths": [
+    "src/editor/kernel/fold_breadcrumb.cpp"
+   ],
+   "reason": "形状规则淘汰：C10-no-whitespace×1"
+  },
+  {
+   "old_source": "src/workspace/project/project_state.cpp:50",
+   "string": "capturedAtUtc",
+   "in_tree": true,
+   "tree_paths": [
+    "src/workspace/project/project_state.cpp"
+   ],
+   "reason": "形状规则淘汰：C10-no-whitespace×2"
+  },
+  {
+   "old_source": "src/app/main.cpp:788",
+   "string": "ctrlSAuthorityGuard",
+   "in_tree": true,
+   "tree_paths": [
+    "src/app/editor_area.cpp",
+    "src/app/main.cpp"
+   ],
+   "reason": "形状规则淘汰：C10-no-whitespace×2"
+  },
+  {
+   "old_source": "src/workspace/diagnostics/diagnostics_panel.cpp:40",
+   "string": "diagnosticsEmptyState",
+   "in_tree": true,
+   "tree_paths": [
+    "src/workspace/diagnostics/diagnostics_panel.cpp"
+   ],
+   "reason": "形状规则淘汰：C10-no-whitespace×1"
+  },
+  {
+   "old_source": "src/workspace/diagnostics/diagnostics_panel.cpp:31",
+   "string": "diagnosticsOutline",
+   "in_tree": true,
+   "tree_paths": [
+    "src/workspace/diagnostics/diagnostics_panel.cpp"
+   ],
+   "reason": "形状规则淘汰：C10-no-whitespace×1"
+  },
+  {
+   "old_source": "src/workspace/diagnostics/diagnostics_panel.cpp:25",
+   "string": "diagnosticsStatus",
+   "in_tree": true,
+   "tree_paths": [
+    "src/workspace/diagnostics/diagnostics_panel.cpp"
+   ],
+   "reason": "形状规则淘汰：C10-no-whitespace×1"
+  },
+  {
+   "old_source": "src/app/app_shell.cpp:472",
+   "string": "dockState",
+   "in_tree": true,
+   "tree_paths": [
+    "src/app/session_store.cpp"
+   ],
+   "reason": "形状规则淘汰：C10-no-whitespace×2"
+  },
+  {
+   "old_source": "src/app/app_shell.cpp:477",
+   "string": "editorLayout",
+   "in_tree": true,
+   "tree_paths": [
+    "src/app/session_store.cpp"
+   ],
+   "reason": "形状规则淘汰：C10-no-whitespace×2"
+  },
+  {
+   "old_source": "src/workspace/filetree/file_tree_widget.cpp:105",
+   "string": "fileTreeEmptyHint",
+   "in_tree": true,
+   "tree_paths": [
+    "src/workspace/filetree/file_tree_widget.cpp"
+   ],
+   "reason": "形状规则淘汰：C10-no-whitespace×1"
+  },
+  {
+   "old_source": "src/workspace/filetree/file_tree_widget.cpp:117",
+   "string": "fileTreeEmptyState",
+   "in_tree": true,
+   "tree_paths": [
+    "src/workspace/filetree/file_tree_widget.cpp"
+   ],
+   "reason": "形状规则淘汰：C10-no-whitespace×1"
+  },
+  {
+   "old_source": "src/workspace/filetree/file_tree_widget.cpp:129",
+   "string": "fileTreeStatus",
+   "in_tree": true,
+   "tree_paths": [
+    "src/workspace/filetree/file_tree_widget.cpp"
+   ],
+   "reason": "形状规则淘汰：C10-no-whitespace×1"
+  },
+  {
+   "old_source": "src/workspace/filetree/file_tree_widget.cpp:46",
+   "string": "fileTreeToolBar",
+   "in_tree": true,
+   "tree_paths": [
+    "src/workspace/filetree/file_tree_widget.cpp"
+   ],
+   "reason": "形状规则淘汰：C10-no-whitespace×1"
+  },
+  {
+   "old_source": "src/workspace/filetree/file_tree_widget.cpp:92",
+   "string": "fileTreeView",
+   "in_tree": true,
+   "tree_paths": [
+    "src/workspace/filetree/file_tree_widget.cpp"
+   ],
+   "reason": "形状规则淘汰：C10-no-whitespace×1"
+  },
+  {
+   "old_source": "src/workspace/project/project_state.cpp:52",
+   "string": "includeDirs",
+   "in_tree": true,
+   "tree_paths": [
+    "src/workspace/project/project_state.cpp"
+   ],
+   "reason": "形状规则淘汰：C10-no-whitespace×2"
+  },
+  {
+   "old_source": "src/app/editor_area.cpp:853",
+   "string": "nextPane",
+   "in_tree": true,
+   "tree_paths": [
+    "src/app/editor_area.cpp"
+   ],
+   "reason": "形状规则淘汰：C10-no-whitespace×2"
+  },
+  {
+   "old_source": "src/app/editor_area.cpp:336",
+   "string": "no provider",
+   "in_tree": false,
+   "tree_paths": [],
+   "reason": "字符串已从当前树删除"
+  },
+  {
+   "old_source": "src/workspace/project/project_state.cpp:49",
+   "string": "projectRoot",
+   "in_tree": true,
+   "tree_paths": [
+    "src/workspace/project/project_state.cpp"
+   ],
+   "reason": "形状规则淘汰：C10-no-whitespace×2"
+  },
+  {
+   "old_source": "src/workspace/project/project_selftest.cpp:155",
+   "string": "restored from last session",
+   "in_tree": false,
+   "tree_paths": [],
+   "reason": "字符串已从当前树删除"
+  },
+  {
+   "old_source": "src/app/editor_area.cpp:261",
+   "string": "save: the pane has no editor provider",
+   "in_tree": false,
+   "tree_paths": [],
+   "reason": "字符串已从当前树删除"
+  },
+  {
+   "old_source": "src/workspace/diagnostics/ffi_backends.cpp:361",
+   "string": "slang (FFI)",
+   "in_tree": false,
+   "tree_paths": [],
+   "reason": "字符串已从当前树删除"
+  },
+  {
+   "old_source": "src/workspace/diagnostics/ffi_backends.cpp:362",
+   "string": "slang (FFI): %1",
+   "in_tree": false,
+   "tree_paths": [],
+   "reason": "字符串已从当前树删除"
+  },
+  {
+   "old_source": "src/syntax/folding/ksyntax_fold_source.cpp:104",
+   "string": "veditFold",
+   "in_tree": true,
+   "tree_paths": [
+    "src/syntax/folding/ksyntax_fold_source.cpp"
+   ],
+   "reason": "形状规则淘汰：C10-no-whitespace×2"
+  },
+  {
+   "old_source": "src/workspace/project/project_selftest.cpp:190",
+   "string": "{ this is not json",
+   "in_tree": false,
+   "tree_paths": [],
+   "reason": "字符串已从当前树删除"
+  }
+ ],
+ "duplicates": [
+  {
+   "string": "Open a folder first.",
+   "count": 6,
+   "sources": [
+    "src/workspace/filetree/file_tree_widget.cpp:217",
+    "src/workspace/filetree/file_tree_widget.cpp:219",
+    "src/workspace/filetree/file_tree_widget.cpp:249",
+    "src/workspace/filetree/file_tree_widget.cpp:251",
+    "src/workspace/filetree/file_tree_widget.cpp:436",
+    "src/workspace/filetree/file_tree_widget.cpp:455"
+   ]
+  },
+  {
+   "string": "Select a file or folder first.",
+   "count": 6,
+   "sources": [
+    "src/workspace/filetree/file_tree_widget.cpp:276",
+    "src/workspace/filetree/file_tree_widget.cpp:278",
+    "src/workspace/filetree/file_tree_widget.cpp:305",
+    "src/workspace/filetree/file_tree_widget.cpp:307",
+    "src/workspace/filetree/file_tree_widget.cpp:474",
+    "src/workspace/filetree/file_tree_widget.cpp:493"
+   ]
+  },
+  {
+   "string": "Save failed: %1",
+   "count": 5,
+   "sources": [
+    "src/app/app_shell.cpp:84",
+    "src/app/app_shell.cpp:85",
+    "src/app/app_shell.cpp:657",
+    "src/app/app_shell.cpp:842",
+    "src/app/app_shell.cpp:843"
+   ]
+  },
+  {
+   "string": "no project",
+   "count": 4,
+   "sources": [
+    "src/app/app_shell.cpp:551",
+    "src/app/app_shell.cpp:780",
+    "src/app/main.cpp:286",
+    "src/app/main.cpp:288"
+   ]
+  },
+  {
+   "string": "FIM 未启用（默认关闭）",
+   "count": 4,
+   "sources": [
+    "src/editor/fim/fim_inline_completion.cpp:18",
+    "src/editor/fim/fim_inline_completion.cpp:28",
+    "src/editor/fim/fim_inline_completion.cpp:111",
+    "src/editor/fim/fim_inline_completion.cpp:153"
+   ]
+  },
+  {
+   "string": "no document",
+   "count": 4,
+   "sources": [
+    "src/editor/kernel/edit_core_selftest.cpp:187",
+    "src/editor/kernel/edit_core_selftest.cpp:201",
+    "src/editor/kernel/edit_core_selftest.cpp:254",
+    "src/editor/kernel/edit_core_selftest.cpp:334"
+   ]
+  },
+  {
+   "string": "Diagnostics unavailable",
+   "count": 4,
+   "sources": [
+    "src/workspace/diagnostics/diagnostics_selftest.cpp:496",
+    "src/workspace/diagnostics/selftests/diagnostics_product_seam.cpp:160",
+    "src/workspace/diagnostics/toolchain_selftest.cpp:152",
+    "src/workspace/diagnostics/toolchain_ux_selftest.cpp:124"
+   ]
+  },
+  {
+   "string": "Close blocked: %1 has unsaved changes",
+   "count": 3,
+   "sources": [
+    "src/app/app_shell.cpp:99",
+    "src/app/app_shell.cpp:797",
+    "src/app/app_shell.cpp:854"
+   ]
+  },
+  {
+   "string": "cannot open %1: not a regular file",
+   "count": 3,
+   "sources": [
+    "src/app/app_shell.cpp:202",
+    "src/editor/kernel/document_io.cpp:28",
+    "src/editor/kernel/ktexteditor_provider.cpp:135"
+   ]
+  },
+  {
+   "string": "theme: %1",
+   "count": 3,
+   "sources": [
+    "src/app/app_shell.cpp:562",
+    "src/app/app_shell.cpp:593",
+    "src/app/app_shell.cpp:598"
+   ]
+  },
+  {
+   "string": "m0 > inc",
+   "count": 3,
+   "sources": [
+    "src/app/main.cpp:1024",
+    "src/workspace/breadcrumb/tests/breadcrumb_tests.cpp:102",
+    "src/workspace/breadcrumb/tests/breadcrumb_tests.cpp:187"
+   ]
+  },
+  {
+   "string": "FIM 不可用（未链接 Rust 服务）",
+   "count": 3,
+   "sources": [
+    "src/editor/fim/fim_inline_completion.cpp:19",
+    "src/editor/fim/fim_inline_completion.cpp:29",
+    "src/editor/fim/fim_inline_completion.cpp:97"
+   ]
+  },
+  {
+   "string": "module m;",
+   "count": 3,
+   "sources": [
+    "src/editor/fim/fim_selftest.cpp:312",
+    "src/editor/fim/fim_selftest.cpp:426",
+    "src/editor/fim/fim_selftest.cpp:500"
+   ]
+  },
+  {
+   "string": "alpha alpha",
+   "count": 3,
+   "sources": [
+    "src/editor/kernel/find_replace_selftest.cpp:240",
+    "src/editor/kernel/find_replace_selftest.cpp:244",
+    "src/editor/kernel/find_replace_selftest.cpp:246"
+   ]
+  },
+  {
+   "string": "multi-cursor: no positions given",
+   "count": 3,
+   "sources": [
+    "src/editor/kernel/multi_cursor.cpp:159",
+    "src/editor/kernel/multi_cursor.cpp:193",
+    "src/editor/kernel/multi_cursor.cpp:236"
+   ]
+  },
+  {
+   "string": "no provider for grammar '%1'",
+   "count": 3,
+   "sources": [
+    "src/syntax/folding/syntax_fold_source.cpp:45",
+    "src/workspace/breadcrumb/syntax_breadcrumb_source.cpp:25",
+    "src/workspace/breadcrumb/syntax_breadcrumb_source.cpp:49"
+   ]
+  },
+  {
+   "string": "the Rust lint service is unavailable",
+   "count": 3,
+   "sources": [
+    "src/workspace/diagnostics/diagnostics_controller.cpp:861",
+    "src/workspace/diagnostics/diagnostics_controller.cpp:894",
+    "src/workspace/diagnostics/diagnostics_controller.cpp:920"
+   ]
+  },
+  {
+   "string": "not saved",
+   "count": 3,
+   "sources": [
+    "src/workspace/diagnostics/diagnostics_selftest.cpp:546",
+    "src/workspace/diagnostics/selftests/diagnostics_product_seam.cpp:180",
+    "src/workspace/diagnostics/selftests/diagnostics_product_seam.cpp:192"
+   ]
+  },
+  {
+   "string": "the Rust service handle could not be created",
+   "count": 3,
+   "sources": [
+    "src/workspace/diagnostics/ffi_backends.cpp:195",
+    "src/workspace/diagnostics/ffi_backends.cpp:551",
+    "src/workspace/module_tree/hierarchy_client.cpp:214"
+   ]
+  },
+  {
+   "string": "no toolchain",
+   "count": 3,
+   "sources": [
+    "src/workspace/diagnostics/selftests/diagnostics_product_seam.cpp:162",
+    "src/workspace/diagnostics/selftests/diagnostics_product_seam.cpp:163",
+    "src/workspace/diagnostics/selftests/diagnostics_product_seam.cpp:164"
+   ]
+  },
+  {
+   "string": "A file or folder named %1 already exists",
+   "count": 3,
+   "sources": [
+    "src/workspace/filetree/file_ops.cpp:96",
+    "src/workspace/filetree/file_ops.cpp:123",
+    "src/workspace/filetree/file_ops.cpp:154"
+   ]
+  },
+  {
+   "string": "permission denied",
+   "count": 3,
+   "sources": [
+    "src/workspace/filetree/tests/filetree_tests.cpp:196",
+    "src/workspace/filetree/tests/filetree_tests.cpp:544",
+    "src/workspace/filetree/tests/filetree_tests.cpp:572"
+   ]
+  },
+  {
+   "string": "11 files",
+   "count": 3,
+   "sources": [
+    "src/workspace/project/project_selftest.cpp:248",
+    "src/workspace/project/project_selftest.cpp:274",
+    "src/workspace/project/project_selftest.cpp:278"
+   ]
+  },
+  {
+   "string": "cannot open %1",
+   "count": 2,
+   "sources": [
+    "src/app/app_shell.cpp:227",
+    "src/workspace/search/search_jump_target.cpp:67"
+   ]
+  },
+  {
+   "string": "unknown error",
+   "count": 2,
+   "sources": [
+    "src/app/editor_area.cpp:344",
+    "src/workspace/module_tree/hierarchy_client.cpp:397"
+   ]
+  },
+  {
+   "string": "Save failed",
+   "count": 2,
+   "sources": [
+    "src/app/main.cpp:937",
+    "src/app/main.cpp:940"
+   ]
+  },
+  {
+   "string": "module:m0 > function:inc",
+   "count": 2,
+   "sources": [
+    "src/app/main.cpp:1021",
+    "src/workspace/breadcrumb/tests/breadcrumb_tests.cpp:104"
+   ]
+  },
+  {
+   "string": "FIM 请求未被 Rust 服务接受",
+   "count": 2,
+   "sources": [
+    "src/editor/fim/fim_backend.cpp:50",
+    "src/editor/fim/fim_inline_completion.cpp:79"
+   ]
+  },
+  {
+   "string": "FIM 超时（%1 ms 无结果）",
+   "count": 2,
+   "sources": [
+    "src/editor/fim/fim_backend.cpp:70",
+    "src/editor/fim/fim_inline_completion.cpp:48"
+   ]
+  },
+  {
+   "string": "FIM 建议就绪",
+   "count": 2,
+   "sources": [
+    "src/editor/fim/fim_inline_completion.cpp:108",
+    "src/editor/fim/fim_inline_completion.cpp:150"
+   ]
+  },
+  {
+   "string": "FIM 返回空建议",
+   "count": 2,
+   "sources": [
+    "src/editor/fim/fim_inline_completion.cpp:108",
+    "src/editor/fim/fim_inline_completion.cpp:150"
+   ]
+  },
+  {
+   "string": "FIM 失败（无详情）",
+   "count": 2,
+   "sources": [
+    "src/editor/fim/fim_inline_completion.cpp:114",
+    "src/editor/fim/fim_inline_completion.cpp:156"
+   ]
+  },
+  {
+   "string": "FIM 已取消",
+   "count": 2,
+   "sources": [
+    "src/editor/fim/fim_inline_completion.cpp:196",
+    "src/editor/fim/fim_inline_completion.cpp:202"
+   ]
+  },
+  {
+   "string": "FIM 未启用",
+   "count": 2,
+   "sources": [
+    "src/editor/fim/fim_selftest.cpp:310",
+    "src/editor/fim/fim_selftest.cpp:315"
+   ]
+  },
+  {
+   "string": "%1 failed: %2",
+   "count": 2,
+   "sources": [
+    "src/editor/kernel/atomic_save.cpp:39",
+    "src/workspace/diagnostics/toolchain.cpp:515"
+   ]
+  },
+  {
+   "string": "cannot read %1: %2",
+   "count": 2,
+   "sources": [
+    "src/editor/kernel/document_io.cpp:35",
+    "src/workspace/project/project_state.cpp:122"
+   ]
+  },
+  {
+   "string": "no KTextEditor view",
+   "count": 2,
+   "sources": [
+    "src/editor/kernel/edit_core_selftest.cpp:234",
+    "src/editor/kernel/edit_core_selftest.cpp:308"
+   ]
+  },
+  {
+   "string": "before=%1 after=%2",
+   "count": 2,
+   "sources": [
+    "src/editor/kernel/edit_core_selftest.cpp:409",
+    "src/editor/kernel/edit_core_selftest.cpp:415"
+   ]
+  },
+  {
+   "string": "one two one two",
+   "count": 2,
+   "sources": [
+    "src/editor/kernel/find_replace_selftest.cpp:263",
+    "src/editor/kernel/find_replace_selftest.cpp:278"
+   ]
+  },
+  {
+   "string": "multi-cursor: no view",
+   "count": 2,
+   "sources": [
+    "src/editor/kernel/multi_cursor.cpp:155",
+    "src/editor/kernel/multi_cursor.cpp:324"
+   ]
+  },
+  {
+   "string": "multi-cursor: no document",
+   "count": 2,
+   "sources": [
+    "src/editor/kernel/multi_cursor.cpp:189",
+    "src/editor/kernel/multi_cursor.cpp:232"
+   ]
+  },
+  {
+   "string": "foo bar foo",
+   "count": 2,
+   "sources": [
+    "src/editor/probes/replace_probe.cpp:82",
+    "src/editor/probes/replace_probe2.cpp:109"
+   ]
+  },
+  {
+   "string": "foobarbaz bar foobarbaz",
+   "count": 2,
+   "sources": [
+    "src/editor/probes/replace_probe.cpp:84",
+    "src/editor/probes/replace_probe2.cpp:111"
+   ]
+  },
+  {
+   "string": "alpha beta alpha",
+   "count": 2,
+   "sources": [
+    "src/editor/probes/replace_probe.cpp:86",
+    "src/editor/probes/replace_probe2.cpp:112"
+   ]
+  },
+  {
+   "string": "a beta a",
+   "count": 2,
+   "sources": [
+    "src/editor/probes/replace_probe.cpp:87",
+    "src/editor/probes/replace_probe2.cpp:113"
+   ]
+  },
+  {
+   "string": "parse returned no tree",
+   "count": 2,
+   "sources": [
+    "src/syntax/folding/syntax_fold_source.cpp:54",
+    "src/workspace/breadcrumb/syntax_breadcrumb_source.cpp:56"
+   ]
+  },
+  {
+   "string": "exited with code 7",
+   "count": 2,
+   "sources": [
+    "src/terminal/terminal_selftest.cpp:277",
+    "src/terminal/terminal_selftest.cpp:278"
+   ]
+  },
+  {
+   "string": "no LSP backend in this build",
+   "count": 2,
+   "sources": [
+    "src/workspace/diagnostics/diagnostics_controller.cpp:276",
+    "src/workspace/diagnostics/ffi_backends.cpp:767"
+   ]
+  },
+  {
+   "string": "%1:%2:%3 — %4",
+   "count": 2,
+   "sources": [
+    "src/workspace/diagnostics/diagnostics_panel.cpp:59",
+    "src/workspace/diagnostics/diagnostics_panel.cpp:419"
+   ]
+  },
+  {
+   "string": "fake session starting",
+   "count": 2,
+   "sources": [
+    "src/workspace/diagnostics/diagnostics_selftest.cpp:85",
+    "src/workspace/diagnostics/diagnostics_selftest.cpp:108"
+   ]
+  },
+  {
+   "string": "missing=[verible, slang]",
+   "count": 2,
+   "sources": [
+    "src/workspace/diagnostics/diagnostics_selftest.cpp:493",
+    "src/workspace/diagnostics/toolchain_selftest.cpp:149"
+   ]
+  },
+  {
+   "string": "no LSP session",
+   "count": 2,
+   "sources": [
+    "src/workspace/diagnostics/ffi_backends.cpp:246",
+    "src/workspace/diagnostics/ffi_backends.cpp:314"
+   ]
+  },
+  {
+   "string": "'%1' no longer exists",
+   "count": 2,
+   "sources": [
+    "src/workspace/filetree/file_ops.cpp:145",
+    "src/workspace/filetree/file_ops.cpp:180"
+   ]
+  },
+  {
+   "string": "The folder '%1' cannot be read (permission denied).",
+   "count": 2,
+   "sources": [
+    "src/workspace/filetree/file_tree_model.cpp:90",
+    "src/workspace/filetree/file_tree_model.cpp:423"
+   ]
+  },
+  {
+   "string": "Cannot delete the folder that is open. Close it first.",
+   "count": 2,
+   "sources": [
+    "src/workspace/filetree/file_tree_widget.cpp:312",
+    "src/workspace/filetree/file_tree_widget.cpp:497"
+   ]
+  },
+  {
+   "string": "Cannot open %1: no active editor pane",
+   "count": 2,
+   "sources": [
+    "src/workspace/filetree/filetree_integration.cpp:40",
+    "src/workspace/palette/palette_integration.cpp:183"
+   ]
+  },
+  {
+   "string": "Cannot open %1",
+   "count": 2,
+   "sources": [
+    "src/workspace/filetree/filetree_integration.cpp:44",
+    "src/workspace/palette/palette_integration.cpp:189"
+   ]
+  },
+  {
+   "string": "Opened %1",
+   "count": 2,
+   "sources": [
+    "src/workspace/filetree/filetree_integration.cpp:46",
+    "src/workspace/palette/palette_integration.cpp:187"
+   ]
+  },
+  {
+   "string": "does not exist",
+   "count": 2,
+   "sources": [
+    "src/workspace/filetree/tests/filetree_tests.cpp:164",
+    "src/workspace/project/project_selftest.cpp:384"
+   ]
+  },
+  {
+   "string": "%1 ms",
+   "count": 2,
+   "sources": [
+    "src/workspace/filetree/tests/filetree_tests.cpp:345",
+    "src/workspace/filetree/tests/filetree_tests.cpp:360"
+   ]
+  },
+  {
+   "string": "hierarchy: %1",
+   "count": 2,
+   "sources": [
+    "src/workspace/module_tree/hierarchy_types.cpp:42",
+    "src/workspace/module_tree/module_tree_integration.cpp:124"
+   ]
+  },
+  {
+   "string": "No hierarchy yet: open a project and press Refresh.",
+   "count": 2,
+   "sources": [
+    "src/workspace/module_tree/module_tree_panel.cpp:137",
+    "src/workspace/module_tree/module_tree_panel.cpp:147"
+   ]
+  },
+  {
+   "string": "put the cursor on a signal name in the editor first",
+   "count": 2,
+   "sources": [
+    "src/workspace/module_tree/module_tree_panel.cpp:295",
+    "src/workspace/module_tree/module_tree_panel.cpp:316"
+   ]
+  },
+  {
+   "string": "%1 · %2",
+   "count": 2,
+   "sources": [
+    "src/workspace/module_tree/module_tree_panel.cpp:309",
+    "src/workspace/module_tree/module_tree_panel.cpp:330"
+   ]
+  },
+  {
+   "string": "assign source",
+   "count": 2,
+   "sources": [
+    "src/workspace/module_tree/module_tree_selftest.cpp:144",
+    "src/workspace/module_tree/module_tree_selftest.cpp:165"
+   ]
+  },
+  {
+   "string": "port clk (in)",
+   "count": 2,
+   "sources": [
+    "src/workspace/module_tree/module_tree_selftest.cpp:149",
+    "src/workspace/module_tree/module_tree_selftest.cpp:151"
+   ]
+  },
+  {
+   "string": "no driver",
+   "count": 2,
+   "sources": [
+    "src/workspace/module_tree/module_tree_selftest.cpp:331",
+    "src/workspace/module_tree/module_tree_selftest.cpp:423"
+   ]
+  },
+  {
+   "string": "no project root: open a folder",
+   "count": 2,
+   "sources": [
+    "src/workspace/module_tree/module_tree_selftest.cpp:434",
+    "src/workspace/module_tree/module_tree_selftest.cpp:436"
+   ]
+  },
+  {
+   "string": "No project",
+   "count": 2,
+   "sources": [
+    "src/workspace/palette/command_palette.cpp:432",
+    "src/workspace/palette/palette_selftest.cpp:226"
+   ]
+  },
+  {
+   "string": "cannot create %1",
+   "count": 2,
+   "sources": [
+    "src/workspace/palette/palette_bench.cpp:100",
+    "src/workspace/project/project_state.cpp:154"
+   ]
+  },
+  {
+   "string": "No project open",
+   "count": 2,
+   "sources": [
+    "src/workspace/project/project_model.cpp:347",
+    "src/workspace/project/project_selftest.cpp:234"
+   ]
+  },
+  {
+   "string": "No project model is attached",
+   "count": 2,
+   "sources": [
+    "src/workspace/project/project_panel.cpp:209",
+    "src/workspace/project/project_panel.cpp:228"
+   ]
+  },
+  {
+   "string": "no state directory is available",
+   "count": 2,
+   "sources": [
+    "src/workspace/project/project_state.cpp:115",
+    "src/workspace/project/project_state.cpp:148"
+   ]
+  },
+  {
+   "string": "Enter a query",
+   "count": 2,
+   "sources": [
+    "src/workspace/search/search_selftest.cpp:309",
+    "src/workspace/search/search_selftest.cpp:388"
+   ]
+  },
+  {
+   "string": "this build has no vd-ffi settings ABI",
+   "count": 2,
+   "sources": [
+    "src/workspace/settings/settings_client.cpp:126",
+    "src/workspace/settings/settings_client.cpp:166"
+   ]
+  },
+  {
+   "string": "Stored by the Rust service in %1",
+   "count": 2,
+   "sources": [
+    "src/workspace/settings/settings_panel.cpp:798",
+    "src/workspace/settings/settings_panel.cpp:863"
+   ]
+  },
+  {
+   "string": "color: #a33; font-weight: bold;",
+   "count": 2,
+   "sources": [
+    "src/workspace/settings/settings_panel.cpp:1185",
+    "src/workspace/settings/settings_panel.cpp:1340"
+   ]
+  },
+  {
+   "string": "theme = \"%1\"",
+   "count": 2,
+   "sources": [
+    "src/workspace/settings/settings_selftest.cpp:226",
+    "src/workspace/settings/settings_selftest.cpp:308"
+   ]
+  },
+  {
+   "string": "invalid TOML",
+   "count": 2,
+   "sources": [
+    "src/workspace/settings/settings_selftest.cpp:293",
+    "src/workspace/settings/settings_selftest.cpp:296"
+   ]
+  }
+ ],
+ "added": [
+  {
+   "source": "src/app/app_shell.cpp:99",
+   "string": "Close blocked: %1 has unsaved changes"
+  },
+  {
+   "source": "src/app/app_shell.cpp:186",
+   "string": "cannot open a file: the editor area is not available"
+  },
+  {
+   "source": "src/app/app_shell.cpp:196",
+   "string": "cannot open %1: no such file or directory"
+  },
+  {
+   "source": "src/app/app_shell.cpp:218",
+   "string": "cannot open %1: no editor pane is available"
+  },
+  {
+   "source": "src/app/app_shell.cpp:238",
+   "string": "Opened %1 file(s)"
+  },
+  {
+   "source": "src/app/app_shell.cpp:297",
+   "string": "color: #e8a33d; font-weight: 600;"
+  },
+  {
+   "source": "src/app/app_shell.cpp:451",
+   "string": "Open File"
+  },
+  {
+   "source": "src/app/app_shell.cpp:452",
+   "string": "Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;"
+  },
+  {
+   "source": "src/app/app_shell.cpp:753",
+   "string": "● 未保存的更改"
+  },
+  {
+   "source": "src/app/app_shell.cpp:755",
+   "string": "unsaved document"
+  },
+  {
+   "source": "src/app/app_shell.cpp:766",
+   "string": "Panes: %1 · active: %2 · tabs: %3"
+  },
+  {
+   "source": "src/app/app_shell.cpp:783",
+   "string": "VEdit — %1[*]"
+  },
+  {
+   "source": "src/app/app_shell.cpp:794",
+   "string": "close refused (headless): %1 has unsaved changes"
+  },
+  {
+   "source": "src/app/app_shell.cpp:797",
+   "string": "Close blocked: %1 has unsaved changes"
+  },
+  {
+   "source": "src/app/app_shell.cpp:804",
+   "string": "%1 has unsaved changes."
+  },
+  {
+   "source": "src/app/app_shell.cpp:807",
+   "string": "This document has no file path yet, so it cannot be saved here."
+  },
+  {
+   "source": "src/app/app_shell.cpp:854",
+   "string": "Close blocked: %1 has unsaved changes"
+  },
+  {
+   "source": "src/app/crash_reporter.cpp:369",
+   "string": "%1 (%2 bytes)"
+  },
+  {
+   "source": "src/app/editor_area.cpp:342",
+   "string": "session: cannot reopen %1: %2"
+  },
+  {
+   "source": "src/app/editor_area.cpp:344",
+   "string": "unknown error"
+  },
+  {
+   "source": "src/app/editor_area.cpp:407",
+   "string": "Close File"
+  },
+  {
+   "source": "src/app/editor_area.cpp:570",
+   "string": "● %1"
+  },
+  {
+   "source": "src/app/editor_area.cpp:606",
+   "string": "QTabBar { background: %6; }"
+  },
+  {
+   "source": "src/app/editor_area.cpp:622",
+   "string": "color: %1; font-weight: 600;"
+  },
+  {
+   "source": "src/app/editor_area.cpp:766",
+   "string": "open: the pane could not create a tab"
+  },
+  {
+   "source": "src/app/editor_area.cpp:813",
+   "string": "save: the pane holds no such document"
+  },
+  {
+   "source": "src/app/editor_area.cpp:1560",
+   "string": "session: no document of pane %1 could be reopened (%2 archived)"
+  },
+  {
+   "source": "src/app/editor_area.cpp:1630",
+   "string": "session layout version %1 is newer than %2: only the "
+  },
+  {
+   "source": "src/app/main.cpp:563",
+   "string": "no such file"
+  },
+  {
+   "source": "src/app/main.cpp:1383",
+   "string": "File(s) to open (each additional file gets a split)."
+  },
+  {
+   "source": "src/app/main.cpp:1395",
+   "string": "Run the Rust C ABI checks against the vd-ffi smoke fixture "
+  },
+  {
+   "source": "src/app/main.cpp:1409",
+   "string": "Raise a signal after installing the crash reporter "
+  },
+  {
+   "source": "src/editor/kernel/atomic_save.cpp:39",
+   "string": "%1 failed: %2"
+  },
+  {
+   "source": "src/editor/kernel/document_io.cpp:71",
+   "string": "KTextEditor::Editor::instance() is null "
+  },
+  {
+   "source": "src/editor/kernel/fim_wiring.cpp:29",
+   "string": " \\u21b5"
+  },
+  {
+   "source": "src/editor/kernel/fim_wiring.cpp:49",
+   "string": "color: gray; background-color: rgba(160, 160, 160, 40); border-radius: 2px;"
+  },
+  {
+   "source": "src/editor/kernel/fim_wiring.cpp:56",
+   "string": "FIM ghost text: previews the first line only; Tab inserts the full suggestion."
+  },
+  {
+   "source": "src/editor/kernel/find_replace.cpp:123",
+   "string": "find: invalid regular expression: %1"
+  },
+  {
+   "source": "src/editor/kernel/find_replace.cpp:169",
+   "string": "find: more than %1 matches; narrow the pattern or use a "
+  },
+  {
+   "source": "src/editor/kernel/find_replace.cpp:256",
+   "string": "replace: no document"
+  },
+  {
+   "source": "src/editor/kernel/find_replace.cpp:260",
+   "string": "replace: the match range is invalid"
+  },
+  {
+   "source": "src/editor/kernel/find_replace.cpp:267",
+   "string": "replace: the document refused the replacement"
+  },
+  {
+   "source": "src/editor/kernel/find_replace_selftest.cpp:182",
+   "string": "invalid regular expression"
+  },
+  {
+   "source": "src/editor/kernel/find_replace_selftest.cpp:238",
+   "string": "X X"
+  },
+  {
+   "source": "src/editor/kernel/find_replace_selftest.cpp:240",
+   "string": "alpha alpha"
+  },
+  {
+   "source": "src/editor/kernel/find_replace_selftest.cpp:244",
+   "string": "alpha alpha"
+  },
+  {
+   "source": "src/editor/kernel/find_replace_selftest.cpp:246",
+   "string": "alpha alpha"
+  },
+  {
+   "source": "src/editor/kernel/find_replace_selftest.cpp:258",
+   "string": "1 two one two"
+  },
+  {
+   "source": "src/editor/kernel/find_replace_selftest.cpp:263",
+   "string": "one two one two"
+  },
+  {
+   "source": "src/editor/kernel/find_replace_selftest.cpp:271",
+   "string": "1 two 1 two"
+  },
+  {
+   "source": "src/editor/kernel/find_replace_selftest.cpp:274",
+   "string": "Replaced 2 of 2"
+  },
+  {
+   "source": "src/editor/kernel/find_replace_selftest.cpp:278",
+   "string": "one two one two"
+  },
+  {
+   "source": "src/editor/kernel/find_replace_selftest.cpp:292",
+   "string": "line0='%1' line1='%2'"
+  },
+  {
+   "source": "src/editor/kernel/find_replace_selftest.cpp:296",
+   "string": "alpha x alpha"
+  },
+  {
+   "source": "src/editor/kernel/find_replace_selftest.cpp:308",
+   "string": "Type to search"
+  },
+  {
+   "source": "src/editor/kernel/find_replace_selftest.cpp:309",
+   "string": "line0='%1' status='%2'"
+  },
+  {
+   "source": "src/editor/kernel/highlight_diagnosis.cpp:100",
+   "string": "%1: url='%2' mode='%3' highlightingMode='%4' availableModes=%5"
+  },
+  {
+   "source": "src/editor/kernel/highlight_diagnosis.cpp:106",
+   "string": "%1: got '%2', expected '%3'"
+  },
+  {
+   "source": "src/editor/kernel/highlight_diagnosis.cpp:111",
+   "string": "%1: resolved %2 -> formats=%3 begins=%4 ends=%5"
+  },
+  {
+   "source": "src/editor/kernel/highlight_diagnosis.cpp:120",
+   "string": "%1: formats=%2"
+  },
+  {
+   "source": "src/editor/kernel/highlight_diagnosis.cpp:123",
+   "string": "%1: begins=%2 ends=%3"
+  },
+  {
+   "source": "src/editor/kernel/highlight_mode.cpp:117",
+   "string": "the editor repository has no '%1' definition; "
+  },
+  {
+   "source": "src/editor/kernel/highlight_mode.cpp:124",
+   "string": "'%1' resolves to author '%2' (not VEdit); the delivered "
+  },
+  {
+   "source": "src/editor/kernel/multi_cursor.cpp:311",
+   "string": "multi-cursor: deleted %1 of %2 ranges"
+  },
+  {
+   "source": "src/editor/kernel/multi_cursor_selftest.cpp:354",
+   "string": "if (x) {"
+  },
+  {
+   "source": "src/editor/kernel/multi_cursor_selftest.cpp:373",
+   "string": "line='%1' cursor=%2,%3 cursors=%4"
+  },
+  {
+   "source": "src/editor/kernel/multi_cursor_selftest.cpp:395",
+   "string": "cursor=%1,%2 cursors=%3 text='%4'"
+  },
+  {
+   "source": "src/editor/kernel/multi_cursor_selftest.cpp:411",
+   "string": "text='%1' cursor=%2,%3"
+  },
+  {
+   "source": "src/editor/kernel/multi_cursor_selftest.cpp:426",
+   "string": "    // code;"
+  },
+  {
+   "source": "src/editor/kernel/multi_cursor_selftest.cpp:430",
+   "string": "    code;"
+  },
+  {
+   "source": "src/editor/kernel/multi_cursor_selftest.cpp:475",
+   "string": "ABC DEF"
+  },
+  {
+   "source": "src/editor/kernel/multi_cursor_selftest.cpp:479",
+   "string": "abc def"
+  },
+  {
+   "source": "src/editor/kernel/multi_cursor_selftest.cpp:544",
+   "string": "pixels=%1 point=%2,%3"
+  },
+  {
+   "source": "src/editor/kernel/undo_ops.cpp:27",
+   "string": "%1: no document"
+  },
+  {
+   "source": "src/editor/kernel/undo_ops.cpp:34",
+   "string": "%1: the runtime document exposes no %2 slot "
+  },
+  {
+   "source": "src/editor/kernel/undo_ops.cpp:45",
+   "string": "%1: invoking %2 failed"
+  },
+  {
+   "source": "src/editor/probes/replace_probe.cpp:58",
+   "string": "REPLACE case=%1 matches=%2 expect_matches=%3 text_sha=%4 expect_sha=%5 "
+  },
+  {
+   "source": "src/editor/probes/replace_probe2.cpp:88",
+   "string": "REPLACE2 case=%1 found=%2 replaced=%3 expect=%4 text_sha=%5 expect_sha=%6 "
+  },
+  {
+   "source": "src/editor/probes/tx_steps_probe2.cpp:59",
+   "string": "STEPS2 %1 case=one_tx_per_edit len_before=%2 steps_to_stable=%3 "
+  },
+  {
+   "source": "src/syntax/folding/ksyntax_fold_source.cpp:110",
+   "string": "%1 declares no keyword-list fold region"
+  },
+  {
+   "source": "src/syntax/kde/ksyntax_data.cpp:91",
+   "string": "Repository::addCustomSearchPath(private_dir) at startup; XDG_DATA_DIRS is not "
+  },
+  {
+   "source": "src/syntax/kde/ksyntax_data.cpp:147",
+   "string": "forbidden KDE syntax definition present in the private data "
+  },
+  {
+   "source": "src/syntax/kde/ksyntax_data.cpp:153",
+   "string": "no private syntax directory configured; falling back to standard "
+  },
+  {
+   "source": "src/syntax/kde/ksyntax_data.cpp:189",
+   "string": "Verilog syntax definition is not available; .v files fall back to plain text"
+  },
+  {
+   "source": "src/syntax/kde/ksyntax_data.cpp:193",
+   "string": "SystemVerilog definition exists only inside the syntax library (KDE build) and is "
+  },
+  {
+   "source": "src/syntax/kde/ksyntax_data.cpp:198",
+   "string": "SystemVerilog definition not shipped (C7 pending): .sv files degrade to the Verilog "
+  },
+  {
+   "source": "src/syntax/kde/ksyntax_data.cpp:204",
+   "string": ".v resolves to definition '%1' by file name (the built-in 'V'/vlang "
+  },
+  {
+   "source": "src/syntax/kde/ksyntax_data.cpp:212",
+   "string": ".sv resolves to definition '%1' by file name; use "
+  },
+  {
+   "source": "src/syntax/kde/ksyntax_data.cpp:238",
+   "string": "%1: SystemVerilog definition missing (C7) -> falling back to "
+  },
+  {
+   "source": "src/syntax/product/syntax_product.cpp:95",
+   "string": "KTextEditor::Editor::instance() returned null: the editing kernel "
+  },
+  {
+   "source": "src/terminal/pty_session.cpp:108",
+   "string": "a shell session is already running (pid %1)"
+  },
+  {
+   "source": "src/terminal/pty_session.cpp:113",
+   "string": "shell is not executable: %1"
+  },
+  {
+   "source": "src/terminal/pty_session.cpp:147",
+   "string": "posix_openpt failed: %1"
+  },
+  {
+   "source": "src/terminal/pty_session.cpp:150",
+   "string": "grantpt/unlockpt failed: %1"
+  },
+  {
+   "source": "src/terminal/pty_session.cpp:156",
+   "string": "ptsname failed: %1"
+  },
+  {
+   "source": "src/terminal/pty_session.cpp:169",
+   "string": "fork failed: %1"
+  },
+  {
+   "source": "src/terminal/pty_session.cpp:415",
+   "string": "signal %1"
+  },
+  {
+   "source": "src/terminal/pty_session.cpp:428",
+   "string": "exit status unknown"
+  },
+  {
+   "source": "src/terminal/pty_session.cpp:431",
+   "string": "killed by signal %1 (%2)"
+  },
+  {
+   "source": "src/terminal/pty_session.cpp:433",
+   "string": "exited with code %1"
+  },
+  {
+   "source": "src/terminal/terminal_panel.cpp:72",
+   "string": "Close the current shell and open a new session"
+  },
+  {
+   "source": "src/terminal/terminal_panel.cpp:74",
+   "string": "Clear the scrollback of this panel"
+  },
+  {
+   "source": "src/terminal/terminal_panel.cpp:76",
+   "string": "Close the terminal panel"
+  },
+  {
+   "source": "src/terminal/terminal_panel.cpp:85",
+   "string": "background: #5a2b2b; color: #f2dede; padding: 3px 8px;"
+  },
+  {
+   "source": "src/terminal/terminal_panel.cpp:189",
+   "string": "Shell %1. Press Enter or Restart to start a new session."
+  },
+  {
+   "source": "src/terminal/terminal_panel.cpp:199",
+   "string": "Shell: %1"
+  },
+  {
+   "source": "src/terminal/terminal_panel.cpp:202",
+   "string": "Not started"
+  },
+  {
+   "source": "src/terminal/terminal_panel.cpp:206",
+   "string": "Running · pid %1"
+  },
+  {
+   "source": "src/terminal/terminal_panel.cpp:210",
+   "string": "Killed · signal %1 (%2)"
+  },
+  {
+   "source": "src/terminal/terminal_panel.cpp:216",
+   "string": "Exited · code %1"
+  },
+  {
+   "source": "src/terminal/terminal_panel.cpp:219",
+   "string": "Stopped · %1"
+  },
+  {
+   "source": "src/terminal/terminal_selftest.cpp:266",
+   "string": "printf hello; exit 7"
+  },
+  {
+   "source": "src/terminal/terminal_selftest.cpp:277",
+   "string": "exited with code 7"
+  },
+  {
+   "source": "src/terminal/terminal_selftest.cpp:278",
+   "string": "exited with code 7"
+  },
+  {
+   "source": "src/terminal/terminal_selftest.cpp:286",
+   "string": "kill -TERM $$"
+  },
+  {
+   "source": "src/terminal/terminal_selftest.cpp:386",
+   "string": "sleep 20 & ls -l /proc/$!/fd; kill $!"
+  },
+  {
+   "source": "src/terminal/terminal_selftest.cpp:416",
+   "string": "head -c %1 /dev/zero | tr '\\0' x"
+  },
+  {
+   "source": "src/terminal/terminal_selftest.cpp:426",
+   "string": "delivered=%1 produced=%2"
+  },
+  {
+   "source": "src/terminal/terminal_selftest.cpp:429",
+   "string": "max=%1 limit=%2"
+  },
+  {
+   "source": "src/terminal/terminal_selftest.cpp:489",
+   "string": "printf done; exit 42"
+  },
+  {
+   "source": "src/terminal/terminal_selftest.cpp:527",
+   "string": "exit 5"
+  },
+  {
+   "source": "src/terminal/terminal_selftest.cpp:717",
+   "string": "VEdit — Terminal panel"
+  },
+  {
+   "source": "src/terminal/terminal_selftest.cpp:718",
+   "string": "QDockWidget::title { background: #2b2b2b; color: #d4d4d4;"
+  },
+  {
+   "source": "src/terminal/terminal_selftest.cpp:723",
+   "string": "Editor area — owned by src/app (application shell)"
+  },
+  {
+   "source": "src/terminal/terminal_selftest.cpp:725",
+   "string": "background: #232323; color: #6f6f6f;"
+  },
+  {
+   "source": "src/terminal/terminal_selftest.cpp:778",
+   "string": "printf 'work done; exiting\\n'; exit 42"
+  },
+  {
+   "source": "src/terminal/terminal_selftest.cpp:799",
+   "string": "Terminal panel self-check (T35)"
+  },
+  {
+   "source": "src/terminal/terminal_selftest.cpp:801",
+   "string": "Run the headless checks."
+  },
+  {
+   "source": "src/terminal/terminal_selftest.cpp:803",
+   "string": "Capture the panel screenshots into <dir>."
+  },
+  {
+   "source": "src/terminal/terminal_widget.cpp:93",
+   "string": "DejaVu Sans Mono"
+  },
+  {
+   "source": "src/workspace/breadcrumb/breadcrumb_bar.cpp:146",
+   "string": "%1: %2 (line %3)"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_controller.cpp:140",
+   "string": "已取消 — %1/%2 文件"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_controller.cpp:490",
+   "string": "large pass: %1 files — cancel is available (%2/%3)"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_controller.cpp:516",
+   "string": "%1/%2 文件已扫描 — %3 条 CLI 诊断"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_controller.cpp:562",
+   "string": "%1: lsp %2/%3 file(s), diagnostics %4"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_controller.cpp:647",
+   "string": "a project lint pass is already running"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_controller.cpp:660",
+   "string": "no lint backend is installed"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_controller.cpp:671",
+   "string": "%1: the lint tool could not be resolved"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_controller.cpp:695",
+   "string": "no files to lint (every file has an open LSP session)"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_controller.cpp:713",
+   "string": "%1: the pass could not be started"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_controller.cpp:732",
+   "string": "large pass: %1 files — cancel is available"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_controller.cpp:741",
+   "string": "no project lint pass has run yet"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_controller.cpp:861",
+   "string": "the Rust lint service is unavailable"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_controller.cpp:894",
+   "string": "the Rust lint service is unavailable"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_controller.cpp:920",
+   "string": "the Rust lint service is unavailable"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_controller.cpp:932",
+   "string": "the lint job is unknown to the service"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_ffi_selftest.cpp:187",
+   "string": "%1 outline entries"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:520",
+   "string": "Selected LSP backend and CLI lint engine"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:645",
+   "string": "Backend switch failed: %1"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:711",
+   "string": "%1 (%2) — %3 action(s)"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:712",
+   "string": "no table"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:714",
+   "string": "unknown basis"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:739",
+   "string": "New name:"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:768",
+   "string": "Formatting failed: %1"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:785",
+   "string": "Formatted with verible-verilog-format"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:786",
+   "string": "Already formatted (verible-verilog-format)"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:796",
+   "string": "No project file set — open a folder first"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:815",
+   "string": "Project lint did not start: %1"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:827",
+   "string": "Linting project with %1…"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:878",
+   "string": "%1 needs a KTextEditor view"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:917",
+   "string": "Rename preview: %1 edit(s) from %2"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:925",
+   "string": "No definition found"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:946",
+   "string": "%1 reference(s) from %2"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:958",
+   "string": "LSP backend=%1 · lint=%2 · %3"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:1104",
+   "string": "Go to &Definition"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:1107",
+   "string": "Find &References"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:1111",
+   "string": "&Rename Symbol..."
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:1115",
+   "string": "&Format Document"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:1119",
+   "string": "&Lint Project"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:1122",
+   "string": "Show Backend &Capabilities"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:1125",
+   "string": "Reload Backend Settings"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_integration.cpp:1172",
+   "string": "Re&parse Project"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_outline_model.cpp:39",
+   "string": "%1 (kind %2) at line %3:%4"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_panel.cpp:59",
+   "string": "%1:%2:%3 — %4"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_panel.cpp:238",
+   "string": "no problems reported for %1 — edit or save it to run the "
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_panel.cpp:242",
+   "string": "open a file to start the analysis, or open a project folder "
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_panel.cpp:246",
+   "string": "No diagnostics — the diagnostics backend is missing (%1); %2."
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_panel.cpp:249",
+   "string": "No diagnostics — %1."
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_panel.cpp:296",
+   "string": "%1 — analyzed %2 (%3): %4 diagnostic(s)"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_panel.cpp:305",
+   "string": "%1 — %2 diagnostic(s)"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_panel.cpp:316",
+   "string": "No symbols — the outline backend is missing (%1). "
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_panel.cpp:321",
+   "string": "No symbols yet for %1 — analysis is starting, "
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_panel.cpp:326",
+   "string": "No symbols yet — open a file; analysis starts "
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_panel.cpp:382",
+   "string": "Errors: %1 · Warnings: %2 · Information: %3"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_panel.cpp:388",
+   "string": "<span style='color:%1'><b>Errors: %2</b></span>"
+  },
+  {
+   "source": "src/workspace/diagnostics/diagnostics_panel.cpp:419",
+   "string": "%1:%2:%3 — %4"
+  },
+  {
+   "source": "src/workspace/diagnostics/ffi_backends.cpp:271",
+   "string": "backend=%1 · %2"
+  },
+  {
+   "source": "src/workspace/diagnostics/ffi_backends.cpp:388",
+   "string": "unknown LSP backend"
+  },
+  {
+   "source": "src/workspace/diagnostics/ffi_backends.cpp:519",
+   "string": "%1 (FFI)"
+  },
+  {
+   "source": "src/workspace/diagnostics/ffi_backends.cpp:520",
+   "string": "%1 (FFI): %2"
+  },
+  {
+   "source": "src/workspace/diagnostics/ffi_backends.cpp:704",
+   "string": "formatting always uses verible-verilog-format, independent of "
+  },
+  {
+   "source": "src/workspace/diagnostics/ffi_backends.cpp:706",
+   "string": "verible-verilog-format not found (bundled, local checkout, PATH "
+  },
+  {
+   "source": "src/workspace/diagnostics/ffi_backends.cpp:719",
+   "string": "editor-synthesised (syntax-level, not backend-provided)"
+  },
+  {
+   "source": "src/workspace/diagnostics/ffi_backends.cpp:720",
+   "string": "editor-synthesised by the editor (T16); absent until it lands"
+  },
+  {
+   "source": "src/workspace/diagnostics/ffi_backends.cpp:729",
+   "string": "no capability row for '%1' in the %2 table"
+  },
+  {
+   "source": "src/workspace/diagnostics/ffi_backends.cpp:730",
+   "string": "selected backend"
+  },
+  {
+   "source": "src/workspace/diagnostics/ffi_backends.cpp:740",
+   "string": "%1 does not provide %2"
+  },
+  {
+   "source": "src/workspace/diagnostics/ffi_backends.cpp:747",
+   "string": "%1 is not connected yet - connect to know"
+  },
+  {
+   "source": "src/workspace/diagnostics/ffi_backends.cpp:848",
+   "string": "backend=%1 lint=%2 lsp=%3 engine=%4"
+  },
+  {
+   "source": "src/workspace/diagnostics/lint_progress.cpp:110",
+   "string": "no request to re-run: the last pass had no files"
+  },
+  {
+   "source": "src/workspace/diagnostics/lint_progress.cpp:175",
+   "string": "cannot re-run this pass"
+  },
+  {
+   "source": "src/workspace/diagnostics/selftests/diagnostics_product_seam.cpp:231",
+   "string": "%1 (%2x%3)"
+  },
+  {
+   "source": "src/workspace/diagnostics/toolchain.cpp:184",
+   "string": "%1: missing (probed %2)"
+  },
+  {
+   "source": "src/workspace/diagnostics/toolchain.cpp:233",
+   "string": "aux source=slang-server:%1 verible-format:%2 verible-lint:%3 missing=[%4]"
+  },
+  {
+   "source": "src/workspace/diagnostics/toolchain.cpp:255",
+   "string": "Verible diagnostics, navigation and the outline "
+  },
+  {
+   "source": "src/workspace/diagnostics/toolchain.cpp:269",
+   "string": "Fix: bundle `verible-verilog-ls`/`slang` in the product's bin/ "
+  },
+  {
+   "source": "src/workspace/diagnostics/toolchain.cpp:300",
+   "string": "%1 not found (bundled, local checkout, PATH and env all empty)"
+  },
+  {
+   "source": "src/workspace/diagnostics/toolchain.cpp:311",
+   "string": "slang-server probed: %1"
+  },
+  {
+   "source": "src/workspace/diagnostics/toolchain.cpp:315",
+   "string": "verible-verilog-format probed: %1"
+  },
+  {
+   "source": "src/workspace/diagnostics/toolchain.cpp:319",
+   "string": "verible-verilog-lint probed: %1"
+  },
+  {
+   "source": "src/workspace/diagnostics/toolchain.cpp:340",
+   "string": "Diagnostics unavailable: %1 not found (bundled, local checkout, "
+  },
+  {
+   "source": "src/workspace/diagnostics/toolchain.cpp:430",
+   "string": "TOOLCHAIN %1 %2 local=[%3]"
+  },
+  {
+   "source": "src/workspace/diagnostics/toolchain.cpp:491",
+   "string": "verible-verilog-format is missing"
+  },
+  {
+   "source": "src/workspace/diagnostics/toolchain.cpp:499",
+   "string": "cannot start %1: %2"
+  },
+  {
+   "source": "src/workspace/diagnostics/toolchain.cpp:509",
+   "string": "%1 timed out"
+  },
+  {
+   "source": "src/workspace/diagnostics/toolchain.cpp:515",
+   "string": "%1 failed: %2"
+  },
+  {
+   "source": "src/workspace/filetree/file_ops.cpp:195",
+   "string": "%1 (the folder is not empty)"
+  },
+  {
+   "source": "src/workspace/filetree/tests/filetree_tests.cpp:345",
+   "string": "%1 ms"
+  },
+  {
+   "source": "src/workspace/filetree/tests/filetree_tests.cpp:360",
+   "string": "%1 ms"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_client.cpp:209",
+   "string": "this build has no Rust service layer (vd-ffi), so the hierarchy "
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_client.cpp:231",
+   "string": "project model (%1)"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_client.cpp:242",
+   "string": "no project root: open a folder or start vedit-app with --project <dir>"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_client.cpp:259",
+   "string": "project expansion was rejected: %1"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_client.cpp:264",
+   "string": "expanding the project file set…"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_client.cpp:303",
+   "string": "elaboration was rejected: %1"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_client.cpp:307",
+   "string": "elaborating %1 project file(s)…"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_client.cpp:330",
+   "string": "the hierarchy service did not answer within 30 s"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_client.cpp:342",
+   "string": "project expansion failed: %1"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_client.cpp:362",
+   "string": "elaboration failed: %1"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_client.cpp:397",
+   "string": "unknown error"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_tree.cpp:56",
+   "string": "no instantiation position was reported for %1"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_tree.cpp:67",
+   "string": "%1 has no driver in the elaborated design"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_tree.cpp:72",
+   "string": "source of %1: %2 · %3"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_tree.cpp:76",
+   "string": "%1 has a driver (%2) but no usable position"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_tree.cpp:87",
+   "string": "%1 has no load in the elaborated design"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_tree.cpp:91",
+   "string": "target of %1: %2 · %3"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_tree.cpp:95",
+   "string": "%1 has a load (%2) but no usable position"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_tree.cpp:108",
+   "string": "declaration of %1"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_tree.cpp:120",
+   "string": "%1 has no declaration/driver; using its first load"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_tree.cpp:125",
+   "string": "%1 has no declaration, driver or load position"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_tree.cpp:135",
+   "string": "no identifier under the cursor"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_tree.cpp:146",
+   "string": "no net named '%1' in the elaborated design"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_tree.cpp:185",
+   "string": "net %1"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_tree.cpp:187",
+   "string": "%1 nets named '%2'; chose %3"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_tree.cpp:285",
+   "string": "Nets without a reported instance"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_tree.cpp:286",
+   "string": "%1 net(s)"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_tree.cpp:309",
+   "string": "The elaboration reported no instances"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_tree.cpp:310",
+   "string": "No hierarchy yet"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_tree.cpp:311",
+   "string": "Run Refresh once a project is "
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_types.cpp:42",
+   "string": "hierarchy: %1"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_types.cpp:45",
+   "string": "no hierarchy yet"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_types.cpp:47",
+   "string": "%1 · %2 file(s) · %3 instance(s) · %4 net(s) · %5 ms · %6 KiB peak"
+  },
+  {
+   "source": "src/workspace/module_tree/hierarchy_types.cpp:55",
+   "string": " · ⚠ "
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_integration.cpp:124",
+   "string": "hierarchy: %1"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_integration.cpp:134",
+   "string": "hierarchy: retrying after the project "
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_integration.cpp:170",
+   "string": "No hierarchy yet: open a project and press "
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_integration.cpp:243",
+   "string": "Module Tree"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_integration.cpp:248",
+   "string": "Empty state: no elaborated project yet. Open a project and press "
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_panel.cpp:44",
+   "string": "%1 · no file:line reported"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_panel.cpp:79",
+   "string": "Re-elaborate the whole project"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_panel.cpp:83",
+   "string": "Jump to source"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_panel.cpp:85",
+   "string": "Put the cursor on a signal in the editor, then jump to the construct that drives it"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_panel.cpp:89",
+   "string": "Jump to target"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_panel.cpp:91",
+   "string": "Put the cursor on a signal in the editor, then jump to the construct that reads it"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_panel.cpp:95",
+   "string": "Filter instance / net / file…"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_panel.cpp:103",
+   "string": "Instance / Net"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_panel.cpp:127",
+   "string": "nothing to refresh: no hierarchy client"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_panel.cpp:137",
+   "string": "No hierarchy yet: open a project and press Refresh."
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_panel.cpp:147",
+   "string": "No hierarchy yet: open a project and press Refresh."
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_panel.cpp:157",
+   "string": "Hierarchy ready — double-click an instance, a net or a driver/load."
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_panel.cpp:255",
+   "string": "%1 → %2"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_panel.cpp:258",
+   "string": "%1: no jump target is registered (the editor lane is not "
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_panel.cpp:263",
+   "string": "%1: the editor rejected the jump to %2"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_panel.cpp:267",
+   "string": "%1: the jump request (%2) was refused"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_panel.cpp:285",
+   "string": "%1 has no file:line in the elaborated design"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_panel.cpp:295",
+   "string": "put the cursor on a signal name in the editor first"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_panel.cpp:309",
+   "string": "%1 · %2"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_panel.cpp:316",
+   "string": "put the cursor on a signal name in the editor first"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_panel.cpp:330",
+   "string": "%1 · %2"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_selftest.cpp:139",
+   "string": "port q (out)"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_selftest.cpp:142",
+   "string": "port d (in)"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_selftest.cpp:144",
+   "string": "assign source"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_selftest.cpp:149",
+   "string": "port clk (in)"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_selftest.cpp:151",
+   "string": "port clk (in)"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_selftest.cpp:165",
+   "string": "assign source"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_selftest.cpp:331",
+   "string": "no driver"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_selftest.cpp:356",
+   "string": "3 instance"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_selftest.cpp:357",
+   "string": "6 net"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_selftest.cpp:411",
+   "string": "calls=%1 status=%2"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_selftest.cpp:423",
+   "string": "no driver"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_selftest.cpp:432",
+   "string": "No hierarchy"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_selftest.cpp:434",
+   "string": "no project root: open a folder"
+  },
+  {
+   "source": "src/workspace/module_tree/module_tree_selftest.cpp:436",
+   "string": "no project root: open a folder"
+  },
+  {
+   "source": "src/workspace/palette/command_palette.cpp:126",
+   "string": "QDialog#command-palette { background: #1f2430; border: 1px solid #3b4252; }"
+  },
+  {
+   "source": "src/workspace/palette/command_palette.cpp:437",
+   "string": "%1 files · type to filter · Enter to open"
+  },
+  {
+   "source": "src/workspace/palette/command_palette.cpp:439",
+   "string": "%1 of %2 files"
+  },
+  {
+   "source": "src/workspace/project/project_model.cpp:135",
+   "string": "open a folder before importing a filelist"
+  },
+  {
+   "source": "src/workspace/project/project_model.cpp:144",
+   "string": "%1 is not a readable filelist"
+  },
+  {
+   "source": "src/workspace/project/project_model.cpp:357",
+   "string": " · %1 filelist%2"
+  },
+  {
+   "source": "src/workspace/project/project_model.cpp:363",
+   "string": " · %1 variable%2"
+  },
+  {
+   "source": "src/workspace/project/project_model.cpp:368",
+   "string": " · %1 line%2 skipped"
+  },
+  {
+   "source": "src/workspace/project/project_model.cpp:373",
+   "string": " · %1 unresolved"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:73",
+   "string": "Import Filelist…"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:76",
+   "string": "Add one or more .f filelists to the project file set"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:83",
+   "string": "Open a folder from the File Tree (or pass --project <dir>); the expanded "
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:90",
+   "string": "Filelists (0)"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:97",
+   "string": "Imported .f filelists; double-click to open one"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:101",
+   "string": "Remove Selected Filelist"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:107",
+   "string": "Files (0)"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:113",
+   "string": "Double-click a file to open it (AC-7.4)"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:116",
+   "string": "Include dirs (-I) (0)"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:125",
+   "string": "Defines (-D) (0)"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:134",
+   "string": "Variables (0)"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:141",
+   "string": "Project variable table; wins over the environment"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:145",
+   "string": "Edit Variables…"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:209",
+   "string": "No project model is attached"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:217",
+   "string": "Imported %1 filelist%2"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:228",
+   "string": "No project model is attached"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:232",
+   "string": "%1 is not an imported filelist"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:235",
+   "string": "Removed %1; the file set is being re-expanded"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:270",
+   "string": "%1 unresolved filelist variable(s): %2"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:279",
+   "string": "Import completed with %1 unresolved variable(s); the affected "
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:288",
+   "string": "Saved %1 variable(s); re-expanding"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:297",
+   "string": "Open a folder before editing variables"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:311",
+   "string": "No variables are used by this project yet"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:321",
+   "string": "Project variables updated; re-expanding"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:354",
+   "string": "Cannot open %1: no editor jump target is registered"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:360",
+   "string": "Cannot open %1: this build has no jump seam"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:409",
+   "string": "⚠ %1"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:410",
+   "string": "color: #c0392b;"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:419",
+   "string": "Open a folder before importing a filelist"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:423",
+   "string": "Import Filelist"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:424",
+   "string": "Verilog filelists (*.f *.F *.flist);;All files (*)"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:447",
+   "string": "Filelists (%1)"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:456",
+   "string": "Files (%1)"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:465",
+   "string": "Include dirs (-I) (%1)"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:470",
+   "string": "Defines (-D) (%1)"
+  },
+  {
+   "source": "src/workspace/project/project_panel.cpp:475",
+   "string": "Variables (%1)"
+  },
+  {
+   "source": "src/workspace/project/project_selftest.cpp:248",
+   "string": "11 files"
+  },
+  {
+   "source": "src/workspace/project/project_selftest.cpp:274",
+   "string": "11 files"
+  },
+  {
+   "source": "src/workspace/project/project_selftest.cpp:278",
+   "string": "11 files"
+  },
+  {
+   "source": "src/workspace/project/project_selftest.cpp:382",
+   "string": "include directory"
+  },
+  {
+   "source": "src/workspace/project/project_selftest.cpp:383",
+   "string": "unsupported filelist token"
+  },
+  {
+   "source": "src/workspace/project/project_selftest.cpp:435",
+   "string": "nested -f cycle"
+  },
+  {
+   "source": "src/workspace/project/project_selftest.cpp:436",
+   "string": "cycle_a.f -> "
+  },
+  {
+   "source": "src/workspace/project/project_selftest.cpp:496",
+   "string": "this is not json"
+  },
+  {
+   "source": "src/workspace/project/project_state.cpp:127",
+   "string": "%1 is not a project state file: %2"
+  },
+  {
+   "source": "src/workspace/project/project_state.cpp:132",
+   "string": "%1 carries no project root"
+  },
+  {
+   "source": "src/workspace/project/project_variables_dialog.cpp:20",
+   "string": "Filelist variables"
+  },
+  {
+   "source": "src/workspace/project/project_variables_dialog.cpp:27",
+   "string": "These variables are used by the imported .f filelists but are not "
+  },
+  {
+   "source": "src/workspace/project/project_variables_dialog.cpp:39",
+   "string": "value for %1"
+  },
+  {
+   "source": "src/workspace/search/global_search.cpp:223",
+   "string": "the Rust search service is not linked in this build; the Qt side does not "
+  },
+  {
+   "source": "src/workspace/search/search_jump_target.cpp:75",
+   "string": "the active editor pane is not a KTextEditor view "
+  },
+  {
+   "source": "src/workspace/search/search_selftest.cpp:1154",
+   "string": "Internal: slow-storage lifecycle probe (child of "
+  },
+  {
+   "source": "src/workspace/settings/settings_panel.cpp:163",
+   "string": "cannot create the temporary key file"
+  },
+  {
+   "source": "src/workspace/settings/settings_panel.cpp:171",
+   "string": "the created file is not owner-only"
+  },
+  {
+   "source": "src/workspace/settings/settings_panel.cpp:190",
+   "string": "short write"
+  },
+  {
+   "source": "src/workspace/settings/settings_panel.cpp:217",
+   "string": "the key file is not owner-only after the atomic replace"
+  },
+  {
+   "source": "src/workspace/settings/settings_panel.cpp:538",
+   "string": "OpenAI-compatible (/v1/completions)"
+  },
+  {
+   "source": "src/workspace/settings/settings_panel.cpp:540",
+   "string": "llama.cpp (/infill)"
+  },
+  {
+   "source": "src/workspace/settings/settings_panel.cpp:639",
+   "string": "Settings loaded from %1 with %2 warning(s); the built-in "
+  },
+  {
+   "source": "src/workspace/settings/settings_panel.cpp:666",
+   "string": "Theme '%1' is invalid; the default theme is "
+  },
+  {
+   "source": "src/workspace/settings/settings_panel.cpp:734",
+   "string": "Shortcut for '%1' set to %2 and stored by the Rust "
+  },
+  {
+   "source": "src/workspace/settings/settings_panel.cpp:774",
+   "string": "Preview — press Apply or OK to store it, "
+  },
+  {
+   "source": "src/workspace/settings/settings_panel.cpp:790",
+   "string": "the Rust settings store rejected "
+  },
+  {
+   "source": "src/workspace/settings/settings_panel.cpp:793",
+   "string": "The settings change was applied but could not "
+  },
+  {
+   "source": "src/workspace/settings/settings_panel.cpp:900",
+   "string": "%1 configuration problem(s) — the built-in defaults were kept "
+  },
+  {
+   "source": "src/workspace/settings/settings_selftest.cpp:124",
+   "string": "Re-run Project Lint"
+  },
+  {
+   "source": "src/workspace/settings/settings_selftest.cpp:132",
+   "string": "Fill in the Middle"
+  },
+  {
+   "source": "src/workspace/settings/settings_selftest.cpp:204",
+   "string": "%1 theme(s)"
+  },
+  {
+   "source": "src/workspace/settings/settings_selftest.cpp:212",
+   "string": "lint.rerun / fim.trigger must be listed"
+  },
+  {
+   "source": "src/workspace/settings/settings_selftest.cpp:226",
+   "string": "theme = \"%1\""
+  },
+  {
+   "source": "src/workspace/settings/settings_selftest.cpp:308",
+   "string": "theme = \"%1\""
+  },
+  {
+   "source": "src/workspace/settings/settings_selftest.cpp:490",
+   "string": "<no tab widget>"
+  },
+  {
+   "source": "src/workspace/settings/settings_selftest.cpp:532",
+   "string": "\"tools.lsp_backend\" = \"slang\""
+  },
+  {
+   "source": "src/workspace/settings/settings_selftest.cpp:533",
+   "string": "\"tools.lint_engine\" = \"verible\""
+  },
+  {
+   "source": "src/workspace/settings/settings_selftest.cpp:555",
+   "string": "\"fim.enabled\" = \"true\""
+  },
+  {
+   "source": "src/workspace/settings/settings_selftest.cpp:556",
+   "string": "\"fim.protocol\" = \"llama_cpp\""
+  },
+  {
+   "source": "src/workspace/settings/settings_selftest.cpp:558",
+   "string": "\"fim.endpoint\" = \"http://127.0.0.1:8080\""
+  },
+  {
+   "source": "src/workspace/settings/settings_selftest.cpp:559",
+   "string": "\"fim.timeout_ms\" = \"2500\""
+  },
+  {
+   "source": "src/workspace/settings/settings_selftest.cpp:560",
+   "string": "\"fim.ghost_text\" = \"true\""
+  },
+  {
+   "source": "src/workspace/settings/settings_selftest.cpp:586",
+   "string": "mode=%1 umask=%2"
+  }
+ ]
+}

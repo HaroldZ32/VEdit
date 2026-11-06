@@ -1,0 +1,78 @@
+# Strings lupdate extracts from src/workspace/module_tree (6 TUs)
+# Command (inside vedit-qt6-build:local):
+#   /usr/lib/qt6/bin/lupdate <6 lane .cpp files> -ts /tmp/module-tree-lupdate.ts
+# extracted: 72; already in translations/vedit_zh_CN.ts: 7; to add by the captain's lupdate step: 65
+
+ 1. [NEW    ] module catalog: %1
+ 2. [NEW    ] no module catalog yet
+ 3. [NEW    ] %1 · %2 module(s) · %3 top(s) · %4 ms · %5 KiB peak
+ 4. [NEW    ]  · ⚠ %1
+ 5. [NEW    ] the ABI reported no type string for this port
+ 6. [NEW    ] the type `%1` has an unclosed packed dimension
+ 7. [NEW    ] the packed range `[%1]` in `%2` is not a literal msb:lsb pair, so the width cannot be derived
+ 8. [NEW    ] the packed range `[%1]` in `%2` is too large to represent
+ 9. [NEW    ] the packed dimensions in `%1` exceed the supported width
+10. [NEW    ] depth limit %1 reached — this module's children are not expanded
+11. [NEW    ] the module tree was truncated at %1 rows
+12. [NEW    ] cycle: %1 is already an ancestor of this row — not expanded
+13. [NEW    ] no module definition was catalogued for `%1`
+14. [NEW    ] this build has no Rust service layer (vd-ffi), so the module catalog cannot run
+15. [PRESENT] the Rust service handle could not be created
+16. [NEW    ] no project root: open a folder or start vedit-app with --project <dir>
+17. [NEW    ] project expansion was rejected: %1
+18. [PRESENT] expanding the project file set…
+19. [NEW    ] the project has no source files, so there is no module catalog to build
+20. [NEW    ] module catalog was rejected: %1
+21. [NEW    ] cataloguing %1 project file(s)…
+22. [NEW    ] the module catalog service did not answer within 30 s
+23. [NEW    ] project expansion failed: %1
+24. [NEW    ] module catalog failed: %1
+25. [NEW    ] unknown error
+26. [NEW    ] cycle: %1
+27. [NEW    ] depth limit (%1) reached
+28. [NEW    ] tree truncated (%1 rows)
+29. [PRESENT] Refresh
+30. [NEW    ] Re-run the module catalog for the whole project
+31. [NEW    ] Filter modules…
+32. [NEW    ] Module
+33. [NEW    ] Instantiations
+34. [NEW    ] Definition
+35. [NEW    ] nothing to refresh: no catalog client
+36. [NEW    ] No module catalog yet: open a project and press Refresh.
+37. [NEW    ] No modules found: slang reported no module definitions for this project.
+38. [NEW    ] No top module: every catalogued module is instantiated by another module, so the hierarchy has no root.
+39. [NEW    ] 
+root: %1
+40. [NEW    ] Module tree ready — double-click a module to open its declaration.
+41. [NEW    ] Double-click: open this module's declaration
+42. [PRESENT] %1 → %2
+43. [NEW    ] %1: no jump target is registered (the editor lane is not installed), so nothing was opened
+44. [NEW    ] %1: the editor rejected the jump to %2
+45. [NEW    ] %1: the jump request (%2) was refused
+46. [NEW    ] this marker row has no location
+47. [NEW    ] %1 has no definition position in the module catalog, so nothing was opened
+48. [NEW    ] %1 definition
+49. [NEW    ] Double-click a port: jump to its declaration. Ctrl+double-click: jump to this module's instantiation statement. The module catalog has no per-connection position, so Ctrl+double-click targets the instance statement, not the connected port.
+50. [NEW    ] Name
+51. [NEW    ] Direction
+52. [NEW    ] Type
+53. [NEW    ] Width
+54. [PRESENT] Location
+55. [NEW    ] Double-click a port for its declaration; Ctrl+double-click for the instantiation statement.
+56. [NEW    ] No focused module — select a module in the Module Tree, or put the caret inside a module definition.
+57. [NEW    ] Module %1 · %2 port(s)
+58. [NEW    ] Packed width derived from `%1`
+59. [NEW    ] %1 · double-click: jump to the port declaration; Ctrl+double-click: jump to this module's instantiation statement
+60. [NEW    ] port %1 has no declaration position in the catalog, so nothing was opened
+61. [NEW    ] port %1 declaration
+62. [NEW    ] no instantiation of %1 was catalogued: it is a design top, so there is no instance statement to jump to
+63. [NEW    ] %1 · %2 · %3
+64. [NEW    ] instantiation chooser cancelled
+65. [NEW    ] the instantiation in %1 has no source position in the catalog
+66. [NEW    ] instantiation of %1 in %2
+67. [NEW    ] No project open — open a folder to build the module catalog.
+68. [NEW    ] module catalog: retrying after the project model…
+69. [PRESENT] Module Tree
+70. [NEW    ] Empty state: no module catalog yet. Open a project and press Refresh.
+71. [PRESENT] Interface
+72. [NEW    ] Empty state: the focused module's ports appear here once the module catalog is ready.

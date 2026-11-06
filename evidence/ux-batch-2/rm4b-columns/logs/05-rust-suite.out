@@ -1,0 +1,17 @@
+test diagnostic::tests::byte_columns_convert_to_utf16_on_cjk_and_emoji ... ok
+test tool_paths::tests::multi_directory_file_sets_resolve_each_file_correctly ... ok
+test tool_paths::tests::relative_paths_resolve_against_the_tool_directory ... ok
+test tool_paths::tests::byte_columns_convert_to_utf16_units ... ok
+test tool_paths::tests::boundary_rules_are_total ... ok
+test result: ok. 70 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test the_streamed_catalog_matches_the_whole_string_parse ... ok
+test a_cjk_prefix_does_not_shift_the_reported_column ... ok
+test sources_in_subdirectories_get_the_real_absolute_path ... ok
+test result: ok. 11 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.84s
+test result: ok. 7 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.52s
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.40s
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test a_diagnostic_names_the_real_absolute_file ... ok
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 26.76s

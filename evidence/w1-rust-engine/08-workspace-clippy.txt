@@ -1,0 +1,27 @@
+# workspace clippy: why it cannot run on this host, with attribution
+command: CARGO_HOME=$PWD/target/cargo-home RUSTUP_TOOLCHAIN=stable cargo clippy --offline --workspace --all-targets -- -D warnings
+error: failed to run custom build command for `gdk-pixbuf-sys v0.18.0`
+error: failed to run custom build command for `pango-sys v0.18.0`
+error: failed to run custom build command for `glib-sys v0.18.1`
+error: failed to run custom build command for `gdk-sys v0.18.2`
+error: failed to run custom build command for `gobject-sys v0.18.0`
+error: failed to run custom build command for `gio-sys v0.18.1`
+error: failed to run custom build command for `atk-sys v0.18.2`
+error: failed to run custom build command for `cairo-sys-rs v0.18.2`
+
+# The GTK crates (vd-editor/vd-app) need gtk+-3.0/gtksourceview-4 development files,
+# which this host does not have (AGENT.md section 4: that is why the compile gates run
+# in the pinned CentOS 7 image).
+
+# The non-GTK subset inside the same workspace, checked one crate at a time:
+  vd-config: clean
+  vd-fim: clean
+  vd-search: clean
+  vd-settings: clean
+  vd-vcs: clean
+
+# Attribution of the RED crate: crates/vd-settings/src/schema.rs is UNTRACKED and was
+# added by a concurrent teammate, not by this task (git status):
+ M crates/vd-ffi/src/settings.rs
+ M crates/vd-settings/src/lib.rs
+?? crates/vd-settings/src/schema.rs

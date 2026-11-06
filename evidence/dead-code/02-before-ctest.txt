@@ -1,0 +1,6 @@
+# 02-before-ctest — registered tests BEFORE deletion (from the last full build log)
+# cmd: grep -E 'Test #' evidence/m0-build/build-logs/33-qt6-ctest.log | wc -l  +  the summary line
+29
+100% tests passed, 0 tests failed out of 38
+vedit-fold-gutter-click
+vedit-native-fold-tests

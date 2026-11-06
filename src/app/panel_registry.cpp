@@ -7,6 +7,7 @@
 #include <QStringLiteral>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QCoreApplication>
 
 namespace vedit::app {
 
@@ -45,7 +46,7 @@ QWidget *makePlaceholder(const PanelSpec &spec, const QString &hint)
     seam->setWordWrap(true);
     layout->addWidget(seam);
 
-    auto *empty = new QLabel(hint.isEmpty() ? QStringLiteral("Empty state: no project / no data.")
+    auto *empty = new QLabel(hint.isEmpty() ? QCoreApplication::translate("VEdit", "Empty state: no project / no data.")
                                             : hint,
                              placeholder);
     empty->setWordWrap(true);
@@ -71,6 +72,12 @@ void PanelRegistry::addPanel(PanelSpec spec)
 bool PanelRegistry::contains(const QString &id) const
 {
     return specs_.contains(id);
+}
+
+QString PanelRegistry::title(const QString &id) const
+{
+    const auto it = specs_.constFind(id);
+    return it == specs_.constEnd() ? QString() : it->title;
 }
 
 QStringList PanelRegistry::ids() const
