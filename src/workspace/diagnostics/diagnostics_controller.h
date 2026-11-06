@@ -14,6 +14,7 @@
 // FFI library or a language server.
 
 #include "diagnostics_types.h"
+#include "file_status.h" // src/common: the ONE status vocabulary (RM-9)
 #include "lsp_backend.h"
 #include "slang_backend.h"
 #include "toolchain.h"
@@ -134,6 +135,11 @@ public:
     /// rows are cleared by setFileSet() with the new project's file set.
     void clearProjectDiagnostics();
     bool projectPassRunning() const { return passRunning_; }
+    /// RM-11: paths a lint request carried that this build has NO lint analyzer
+    /// for (a `.f` manifest, a `.md`, a `.tcl`, ...). They are excluded from the
+    /// pass - never parsed as HDL - and kept here with the recorded reason
+    /// "no lint analyzer for this file type".
+    const QStringList &projectPassNonSource() const { return passNonSource_; }
     LintPassSnapshot projectPass() const { return pass_; }
     /// Diagnostics collected by the CLI pass (AC-2.13 CLI side).
     const QVector<DiagnosticEntry> &cliDiagnostics() const { return cliDiagnostics_; }
@@ -162,16 +168,39 @@ public:
     /// The merged view restricted to one file (editor/gutter/hover path).
     QVector<DiagnosticEntry> mergedDiagnosticsForFile(const QString &file) const;
 
-    /// File-tree status dot, taken from the merged view.
-    enum class FileStatus {
-        Unknown = 0, ///< no layer ever reported this file: draw no dot
-        Error = 1,   ///< at least one error-severity row (red)
-        Warning = 2, ///< warnings only (yellow)
-        Clean = 3,   ///< covered and clean (green)
-    };
+    /// File status, taken from the merged view. The values (and the colours
+    /// every surface paints) live in src/common/file_status.h: one vocabulary
+    /// for the controller, the file-tree dot and the Project panel's list.
+    using FileStatus = ::vedit::common::FileStatus;
     FileStatus statusForFile(const QString &file) const;
-    /// Every file with a known status, for the file tree's cached map.
+    /// Every file with a known status, for the file tree's cached map. Built
+    /// from the SAME per-file derivation as statusForFile() (one source), so a
+    /// dot and a list row can never disagree.
     QHash<QString, int> fileStatuses() const;
+    /// RM-17: the top scope the module tree derived from the SAME catalog run
+    /// that produced its tree (see src/workspace/top_scope.h).
+    ///
+    /// `top` empty = Auto: the whole project is linted and the marks this call
+    /// set are cleared. With a top: the NEXT project pass lints only files that
+    /// are NOT excluded, and every `excluded` file keeps the visible NotAnalyzed
+    /// mark with a reason that names the top (never green, never "no mark").
+    ///
+    /// RULING (RM-17b): while a top is active, exclusion by the user's own
+    /// instruction is AUTHORITATIVE for the dot and for whether any layer may
+    /// analyse the file - it outranks the upper project layer AND the lower
+    /// per-file layer. This does NOT contradict RM-9 ruling 1 (a fresh verdict
+    /// beats a stale one for a dirty buffer): that ruling resolves STALENESS,
+    /// this one resolves EXCLUSION, and an instruction outranks a verdict.
+    /// `analysed` is accepted for the seam and documented in the publisher; it
+    /// is deliberately NOT stored: with a top, a requested file is analysed
+    /// exactly when it is not excluded, so a second list could only drift.
+    void setTopScope(const QString &top, const QStringList &analysed,
+                     const QStringList &excluded);
+
+    /// RM-9: the files of the CURRENT project set. A file of this set with no
+    /// verdict yet is NotAnalyzed (a visible "not analysed" mark), never
+    /// "no dot": "nothing" is indistinguishable from "not a file" for the user.
+    const QStringList &projectFiles() const { return projectFiles_; }
     /// Bumped whenever the merged view changes: a repaint cache key, never a
     /// reason to rescan the project.
     quint64 viewRevision() const { return viewRevision_; }
@@ -238,6 +267,31 @@ private:
     void notePassTerminal();
     void invalidateView() { ++viewRevision_; }
 
+    // --- RM-9: retained per-file verdict store ---------------------------
+    /// RM-17b ruling: true while a top is active and `file` is outside it.
+    /// Consulted FIRST by statusValueForFile()/fileStatuses(), by the project
+    /// pass filter, by the per-file start paths and by replaceUpperLayer(): the
+    /// excluded set outranks both the upper and the lower layer (exclusion by
+    /// instruction, never overridden by a verdict).
+    bool isScopeExcluded(const QString &file) const;
+    /// ONE per-file derivation, used by statusForFile() AND fileStatuses():
+    /// active-scope exclusion > upper layer > fresh lower verdict > mark >
+    /// pending (project set). 0 = no dot (not part of any analysed set).
+    int statusValueForFile(const QString &file) const;
+    /// The lower-layer rows of `file` that are still trustworthy (empty when
+    /// the file was edited after its last analysis or never analysed).
+    QVector<DiagnosticEntry> lowerRowsForFile(const QString &file) const;
+    /// Keep `file`'s CURRENT rows after a lower-layer collection. This is the
+    /// single point where the retained store is fed: the same rows the merged
+    /// view reads, so the dot/panel/count cannot disagree with the editor.
+    void retainLowerRows(const QString &file);
+    void clearRetainedRows(const QString &file);
+    /// A visible "no verdict yet" state: kept until a fresh lower verdict lands
+    /// or the pass covers the file. `reason` is a stable code ("pending" for
+    /// queued work, "modified" for a dirty buffer excluded from the pass).
+    void markNotAnalyzed(const QString &file, const QString &reason);
+    void clearNotAnalyzed(const QString &file);
+
     struct LintTicket {
         int id = 0;
         QString file;
@@ -291,6 +345,7 @@ private:
     LintPassRequest passRequest_;
     QStringList openFiles_;
     QStringList passSkipped_;
+    QStringList passNonSource_; ///< RM-11: excluded - no lint analyzer for the file type
     QVector<DiagnosticEntry> cliDiagnostics_;
     LintPassSnapshot pass_;
     quint64 passJob_ = 0;
@@ -317,6 +372,21 @@ private:
     quint64 navigation_ = 0;
     bool lspStarted_ = false;
     bool lspDiagnosticsRequested_ = false;
+
+    // RM-9: the retained per-file verdict store. `diagnostics_` below stays the
+    // CURRENT analysis' display rows; these survive a tab switch so a file that
+    // is not the active document still carries its verdict (the user-visible
+    // defect: "只在正在打开/聚焦的文件上显示"). Fed from the same collection
+    // points that feed the merged view - there is no second merge.
+    QStringList projectFiles_; ///< the project set (setFileSet; NOT files_)
+    QSet<QString> projectFileSet_; ///< O(1) membership for the per-row status
+    QHash<QString, QVector<DiagnosticEntry>> retainedLowerRows_;
+    QSet<QString> retainedLowerEvaluated_;
+    QHash<QString, QString> notAnalyzedReason_;
+    // RM-17: the top scope (empty top = Auto). The pass filter and the dot
+    // derivation both read this, so the exclusion set cannot differ.
+    QString topScopeTop_;
+    QSet<QString> scopeExcluded_; ///< clean paths the ACTIVE top excludes
 };
 
 } // namespace vedit::workspace::diagnostics

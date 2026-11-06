@@ -22,6 +22,44 @@ performed. The registry reports what happened (`NoTarget`, `InvalidRequest`,
 `Delivered`, `Rejected`) and keeps counters plus `lastResult()` for evidence and
 a future status-bar hint.
 
+## Why a jump failed (`JumpResult::reason`)
+
+A refusal used to be a bare `Rejected`: the panel printed "the editor rejected
+the jump to X" with no clue which check refused it, so every distinct cause
+(missing file, no editor view, a cursor that did not land, ...) looked identical
+(RM-4, real-machine finding). `JumpResult::reason` therefore carries one sentence
+saying WHY, filled by the registry for every status: the target's own
+`IJumpTarget::lastError()` for `Rejected`, and a fixed sentence for `NoTarget` /
+`InvalidRequest`. A panel shows it, and nothing else changes - a refusal is still
+a refusal, with no retry and no silent fallback.
+
+```cpp
+if (result.status == vedit::workspace::jump::JumpStatus::Rejected) {
+    show(result.reason); // "cannot open <path>: not a regular file [workspace root: …]"
+}
+```
+
+`IJumpTarget::lastError()` has a default (empty) implementation, so a target that
+cannot explain itself keeps compiling and the caller falls back to its generic
+sentence.
+
+## The path rule
+
+A jump names a file with an ABSOLUTE path. The rule for the one target the
+product installs (`search::EditorJumpTarget`, `src/workspace/search`) is:
+
+| the request | what happens |
+|---|---|
+| **absolute** path | opened **as given**. It may point OUTSIDE the workspace on purpose — a `.f` filelist may name files above the opened folder — so it is never re-rooted and never rejected for being outside. |
+| **relative** path | resolved against the **workspace root** (`shell->projectRoot()`), never the process working directory: an AppImage started from a file manager runs in `$HOME`, and resolving there is what produced "cannot open $HOME/x.sv" instead of opening the file (RM-4). A producer is expected to send absolute paths; this is the ONE recovery for a producer that does not. |
+| path that exists under neither reading | **refused**, and the reason names the rule that was applied (`absolute path opened as given; files outside the workspace are allowed` / `relative path resolved under the workspace root` / `relative path, not found under the workspace root`) plus the workspace root. |
+
+The producer's half of the rule: `crates/vd-deeplint::tool_paths` resolves every
+path it takes from `slang` (`--ast-json` `source_file` and `--diag-json` `file`)
+against the directory the tool actually ran in, because slang reports paths
+relative to its own cwd. A catalog that hands out a relative path is a producer
+bug, not something this seam can guess around.
+
 ## The no-target rule
 
 A jump with no registered target is a supported **no-op**: the registry records

@@ -19,6 +19,7 @@
 #endif
 
 #include <QByteArray>
+#include <QCoreApplication>
 #include <QFileInfo>
 #include <QHash>
 #include <QStringList>
@@ -849,6 +850,44 @@ void BackendSwitchState::seedToolchain(const diagnostics::ToolchainReport &toolc
     toolchain_ = toolchain;
 }
 
+QStringList BackendSwitchState::effectiveIncludeDirs() const
+{
+    // Same precedence as buildLintRequest(): the project expansion APPENDS the
+    // tools-page directories, so the project's list is the complete one when it
+    // exists; with none discovered yet the settings values stay in force.
+    return projectIncludeDirs_.isEmpty() ? settingsIncludeDirs_ : projectIncludeDirs_;
+}
+
+QStringList BackendSwitchState::effectiveDefines() const
+{
+    return projectDefines_.isEmpty() ? settingsDefines_ : projectDefines_;
+}
+
+bool BackendSwitchState::setProjectEnvironment(const QStringList &includeDirs,
+                                               const QStringList &defines)
+{
+    projectIncludeDirs_ = includeDirs;
+    projectDefines_ = defines;
+    if (lsp_ == nullptr) {
+        return false;
+    }
+    // `selectBackend` is the ONE writer of the LSP session's -I/-D. Re-selecting
+    // the SAME backend and server with the new lists is what guarantees the
+    // next `start()` cannot inherit the previous project's argv: it stops any
+    // running session (the caller's reparse starts a fresh one) and replaces
+    // the values the session builder reads. The lint engine is re-pinned on the
+    // same call so the single-file lint path cannot disagree with the pass.
+    const QString serverPath = lspPath_.isEmpty() ? toolchain_.verible.path : lspPath_;
+    QString error;
+    const bool selected = lsp_->selectBackend(lspKind_, serverPath, effectiveIncludeDirs(),
+                                              effectiveDefines(), &error);
+    if (lint_ != nullptr) {
+        lint_->selectEngine(lintKind_, toolchain_.slang.path, toolchain_.veribleLint.path,
+                            effectiveIncludeDirs(), effectiveDefines(), rulesPath_);
+    }
+    return selected;
+}
+
 bool BackendSwitchState::apply(const DiagnosticsBackendSettings &settings,
                                const diagnostics::ToolchainReport &toolchain,
                                QString *error)
@@ -901,8 +940,16 @@ bool BackendSwitchState::apply(const DiagnosticsBackendSettings &settings,
         return false;
     }
 
+    // RM-2: the settings values are the FALLBACK environment, not the whole
+    // one. Once a project has delivered its `-I`/`-D` (they already include the
+    // tools-page values, appended by the expansion), a settings change must not
+    // revert the session to the settings-only lists - let alone to a previous
+    // project's. `effectiveIncludeDirs()` keeps the project's values in force
+    // and falls back to these when it has none.
+    settingsIncludeDirs_ = settings.includeDirs;
+    settingsDefines_ = settings.defines;
     QString selectError;
-    if (!lsp_->selectBackend(lspKind, serverPath, settings.includeDirs, settings.defines,
+    if (!lsp_->selectBackend(lspKind, serverPath, effectiveIncludeDirs(), effectiveDefines(),
                              &selectError)) {
         if (error != nullptr) {
             *error = selectError;
@@ -911,7 +958,7 @@ bool BackendSwitchState::apply(const DiagnosticsBackendSettings &settings,
     }
     if (lint_ != nullptr) {
         lint_->selectEngine(lintKind, toolchain_.slang.path, toolchain_.veribleLint.path,
-                            settings.includeDirs, settings.defines, settings.veribleRules);
+                            effectiveIncludeDirs(), effectiveDefines(), settings.veribleRules);
     }
     lspKind_ = lspKind;
     lintKind_ = lintKind;

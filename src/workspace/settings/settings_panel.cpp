@@ -375,9 +375,10 @@ void SettingsPanel::buildUi()
     connect(clearButton_, &QPushButton::clicked, this, [this]() {
         const QString command = selectedCommand();
         if (!command.isEmpty()) {
-            clearShortcut(command);
+            resetShortcut(command);
         }
     });
+    connect(resetAllButton_, &QPushButton::clicked, this, [this]() { resetAllShortcuts(); });
     connect(reloadButton_, &QPushButton::clicked, this, [this]() { reload(); });
     connect(keyTable_, &QTableWidget::itemSelectionChanged, this, [this]() {
         const QString command = selectedCommand();
@@ -492,9 +493,12 @@ QWidget *SettingsPanel::buildShortcutsPage()
     auto *keyLayout = new QVBoxLayout(shortcutsPage_);
     keyLayout->setContentsMargins(8, 8, 8, 8);
 
-    keyTable_ = new QTableWidget(0, 3, shortcutsPage_);
+    // RM-5b: the page must SHOW the current effective binding and the default it
+    // falls back to; an empty cell read like a bug, so "unbound" is explicit.
+    keyTable_ = new QTableWidget(0, 4, shortcutsPage_);
     keyTable_->setObjectName(QStringLiteral("settings-keys"));
-    keyTable_->setHorizontalHeaderLabels({tr("Command"), tr("Shortcut"), tr("State")});
+    keyTable_->setHorizontalHeaderLabels(
+        {tr("Command"), tr("Effective shortcut"), tr("Default"), tr("State")});
     keyTable_->horizontalHeader()->setStretchLastSection(true);
     keyTable_->verticalHeader()->setVisible(false);
     keyTable_->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -507,12 +511,15 @@ QWidget *SettingsPanel::buildShortcutsPage()
     shortcutEditor_->setObjectName(QStringLiteral("settings-shortcut-editor"));
     assignButton_ = new QPushButton(tr("Assign to selected command"), shortcutsPage_);
     assignButton_->setObjectName(QStringLiteral("settings-assign"));
-    clearButton_ = new QPushButton(tr("Clear"), shortcutsPage_);
+    clearButton_ = new QPushButton(tr("Reset to Default"), shortcutsPage_);
     clearButton_->setObjectName(QStringLiteral("settings-clear"));
+    resetAllButton_ = new QPushButton(tr("Reset All to Defaults"), shortcutsPage_);
+    resetAllButton_->setObjectName(QStringLiteral("settings-reset-all"));
     editorRow->addWidget(new QLabel(tr("New shortcut:"), shortcutsPage_));
     editorRow->addWidget(shortcutEditor_, 1);
     editorRow->addWidget(assignButton_);
     editorRow->addWidget(clearButton_);
+    editorRow->addWidget(resetAllButton_);
     keyLayout->addLayout(editorRow);
 
     conflictLabel_ = new QLabel(shortcutsPage_);
@@ -840,6 +847,34 @@ void SettingsPanel::setShortcut(const QString &commandId, const QKeySequence &se
         clearShortcut(commandId);
         return;
     }
+    // RM-5b: never apply a sequence another owner already carries. Qt drops BOTH
+    // actions of an ambiguous sequence, so "assign it anyway" is how a working
+    // binding silently stops firing; the owner is named instead and the edit is
+    // refused (the user can free it first, then assign).
+    QStringList takenBy;
+    for (const QString &id : commands_->shortcutOwnerIds(sequence)) {
+        if (id == commandId) {
+            continue;
+        }
+        QAction *owner = commands_->action(id);
+        takenBy.append(tr("%1 (%2)").arg(owner != nullptr ? owner->text() : id, id));
+    }
+    for (const QString &label : commands_->foreignShortcutOwners(sequence)) {
+        // RM-5c: the same seam now also carries the DESKTOP's global shortcuts
+        // (the shell feeds desktop_shortcuts.h into the provider), so the owner
+        // line says which one it is; no extra suffix is invented here.
+        takenBy.append(label);
+    }
+    if (!takenBy.isEmpty()) {
+        const QString message =
+            tr("Shortcut %1 is already used by %2 — nothing was changed.")
+                .arg(sequence.toString(QKeySequence::PortableText),
+                     takenBy.join(QStringLiteral("; ")));
+        statusLabel_->setText(message);
+        addDiagnostic(message);
+        refreshConflicts();
+        return;
+    }
     commands_->store()->setShortcut(commandId, sequence);
     commands_->refreshShortcuts();
     SettingsClient::setValue(&entries_,
@@ -865,6 +900,69 @@ void SettingsPanel::clearShortcut(const QString &commandId)
     refreshWidgets();
     statusLabel_->setText(QCoreApplication::translate("VEdit", "Shortcut for '%1' cleared (default restored).")
                               .arg(commandId));
+    emit shortcutsChanged();
+}
+
+QString SettingsPanel::shortcutText(const QString &commandId) const
+{
+    if (commands_ == nullptr) {
+        return tr("(unbound)");
+    }
+    // RM-5c: a command may carry an EXTRA default (Ctrl+Y for redo, Shift+Alt+F
+    // for format); the user must see all of them, not only the primary.
+    QStringList sequences;
+    for (const QKeySequence &sequence : commands_->effectiveShortcuts(commandId)) {
+        if (!sequence.isEmpty()) {
+            sequences.append(sequence.toString(QKeySequence::PortableText));
+        }
+    }
+    return sequences.isEmpty() ? tr("(unbound)") : sequences.join(QStringLiteral(" / "));
+}
+
+QString SettingsPanel::defaultShortcutText(const QString &commandId) const
+{
+    if (commands_ == nullptr) {
+        return tr("(none)");
+    }
+    const QKeySequence sequence = commands_->defaultShortcut(commandId);
+    return sequence.isEmpty() ? tr("(none)") : sequence.toString(QKeySequence::PortableText);
+}
+
+QString SettingsPanel::shortcutState(const QString &commandId) const
+{
+    if (commands_ == nullptr) {
+        return {};
+    }
+    if (commands_->hasUserOverride(commandId)) {
+        return tr("custom");
+    }
+    if (commands_->effectiveShortcut(commandId).isEmpty()) {
+        return tr("unbound");
+    }
+    return tr("default");
+}
+
+void SettingsPanel::resetShortcut(const QString &commandId)
+{
+    // Clearing the stored override is exactly "back to the registered default":
+    // the action is refreshed from spec.defaultShortcut on the same call.
+    clearShortcut(commandId);
+}
+
+void SettingsPanel::resetAllShortcuts()
+{
+    if (commands_ == nullptr || commands_->store() == nullptr) {
+        return;
+    }
+    for (const QString &commandId : commands_->ids()) {
+        commands_->store()->clearShortcut(commandId);
+        SettingsClient::setValue(&entries_, QString::fromLatin1(kKeymapPrefix) + commandId,
+                                 QString());
+    }
+    commands_->refreshShortcuts();
+    persist();
+    refreshWidgets();
+    statusLabel_->setText(tr("Every shortcut is back to its default."));
     emit shortcutsChanged();
 }
 
@@ -1571,12 +1669,9 @@ void SettingsPanel::refreshKeyTable()
         auto *nameItem = new QTableWidgetItem(
             QStringLiteral("%1 (%2)").arg(action->text(), command));
         keyTable_->setItem(row, 0, nameItem);
-        keyTable_->setItem(row, 1, new QTableWidgetItem(action->shortcut().toString()));
-        const bool overridden = commands_->store() != nullptr
-            && commands_->store()->shortcut(command, action->shortcut()) != action->shortcut();
-        keyTable_->setItem(row, 2, new QTableWidgetItem(overridden
-                                                            ? QStringLiteral("override")
-                                                            : QStringLiteral("default")));
+        keyTable_->setItem(row, 1, new QTableWidgetItem(shortcutText(command)));
+        keyTable_->setItem(row, 2, new QTableWidgetItem(defaultShortcutText(command)));
+        keyTable_->setItem(row, 3, new QTableWidgetItem(shortcutState(command)));
         if (command == selected) {
             keyTable_->selectRow(row);
         }
@@ -1622,6 +1717,19 @@ QStringList SettingsPanel::conflicts() const
     for (auto it = bySequence.constBegin(); it != bySequence.constEnd(); ++it) {
         if (it.value().size() > 1) {
             result.append(QStringLiteral("%1: %2").arg(it.key(), it.value().join(QStringLiteral(", "))));
+        }
+    }
+    // RM-5b: a registry binding that the LIVE EDITOR also carries is equally
+    // dead (Qt drops both). The shell normally strips the editor's copy of a
+    // shell-owned sequence, so this only shows a real, unexpected collision.
+    for (const QString &command : commands_->ids()) {
+        const QKeySequence sequence = commands_->effectiveShortcut(command);
+        if (sequence.isEmpty()) {
+            continue;
+        }
+        for (const QString &foreign : commands_->foreignShortcutOwners(sequence)) {
+            result.append(tr("%1: %2 also used by the editor (%3)")
+                              .arg(sequence.toString(QKeySequence::PortableText), command, foreign));
         }
     }
     return result;

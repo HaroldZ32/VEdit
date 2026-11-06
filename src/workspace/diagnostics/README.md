@@ -157,6 +157,31 @@ The plan is `.mpd/plans/ux-batch-2/00-plan.md` §B3/§B5 and the BINDING rulings
   what keeps them silent (no modal dialog) and observable
   (`lastPassWasAutomatic()`, `projectPassSerial()`).
 
+### Lint volume limits (U9b): count bounds, not byte caps
+
+The `--diag-json` document is **streamed** (`crates/vd-deeplint/src/diagnostic.rs`
+`parse_diagnostics_reader`): the raw document is never held in memory and the old
+8 MiB byte cap no longer exists, so a real project's warning flood cannot fail a
+file or drop it from the pass.
+
+* **De-duplication** is keyed on (reported file, line, column, code, message):
+  a warning slang repeats per elaborated instance becomes ONE row with its
+  repeat count; two different findings at the same location (different code or
+  message) are never merged.
+* **Retention is bounded by count**: **500 distinct findings per file**
+  (`DEFAULT_MAX_DIAGNOSTICS`) and **20,000 distinct findings per project pass**
+  (`DEFAULT_MAX_PASS_DIAGNOSTICS`, tunable through
+  `EngineOptions.max_pass_diagnostics`). Findings past the bounds are counted,
+  never silently discarded.
+* The pass never fails on volume: its `VdLintProgress.message` summary reports
+  `N repeat(s) collapsed` and `N dropped` (exact when every file answered, "at
+  least N" when a file failed and its volume is unknown).
+* A file that could not be processed is **named with its reason** in the pass
+  summary (first two, then "and N more"), so a truncated pass is still a
+  truthful pass.
+* The pass-level bounds are engine-agnostic (slang and verible-verilog-lint
+  both flow through the same collection code).
+
 ### item 12 — the ELAB/error list
 
 `ProjectLintNotice` is the presentation policy: an EXPLICIT `project.lint` opens

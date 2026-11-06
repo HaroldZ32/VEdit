@@ -53,7 +53,11 @@ public:
 
     vedit::app::ApplicationShell *shell() const;
     bool lastJumpSucceeded() const;
-    QString lastError() const;
+    // The WHY of the last refusal (empty when it succeeded). Part of the jump
+    // contract now: the registry copies it into JumpResult::reason so every
+    // panel can show it (RM-4: an unexplained "the editor rejected the jump"
+    // told the user and the team nothing).
+    QString lastError() const override;
     // The request the last jump attempt carried (evidence / tests).
     QString lastFilePath() const;
     int lastLine() const;

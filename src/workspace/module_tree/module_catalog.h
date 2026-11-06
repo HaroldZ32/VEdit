@@ -60,6 +60,9 @@ struct ModuleCatalog {
     quint64 elapsedMs = 0;
     quint64 peakRssKb = 0;
     QString warning; ///< oversize warning from the service, or empty
+    QString top;     ///< RM-17: the top the catalog was built from ("" = Auto)
+    QStringList reachableFiles; ///< RM-17: absolute files reachable from the top
+    QStringList outsideModules; ///< RM-17: module definitions outside the top
     int fileSetSize = 0;
     QVector<ModuleDefinition> modules; ///< sorted by name (the ABI guarantees it)
 

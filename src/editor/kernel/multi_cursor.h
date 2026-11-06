@@ -15,10 +15,13 @@
 // T14 places both controllers in THIS file because the lane's frozen write scope
 // grants only multi_cursor.{h,cpp} for implementation (ktexteditor_provider.* is
 // the wiring, not a home for behaviour):
-//   * MultiCursorController — Alt+drag block selection, Alt+click add/remove
-//     cursor (UX batch 2, item 13 moved it off Ctrl+click, which is now
-//     "go to definition"), simultaneous typing / Backspace / Delete / Return at
-//     every cursor.
+//   * MultiCursorController — block selection and add/remove cursor.
+//     RM-6: the PRIMARY gestures are Shift+Alt+drag (block) and Ctrl+Alt+click
+//     (cursor) because KDE/GNOME grab plain Alt+drag/click for moving a window
+//     before the application sees it; plain Alt+drag / Alt+click stay as the
+//     SECONDARY gestures. Ctrl+click alone is "go to definition"
+//     (UX batch 2, item 13 moved add-cursor off it). Simultaneous typing /
+//     Backspace / Delete / Return at every cursor.
 //   * EditorEnhancements    — AC-4.4: auto-indent, bracket/quote auto-pair,
 //     Ctrl+/ comment toggle, Alt+↑/↓ move line, Shift+Alt+↓ duplicate line,
 //     Ctrl+Shift+K delete line, case conversion, word wrap, font zoom. The

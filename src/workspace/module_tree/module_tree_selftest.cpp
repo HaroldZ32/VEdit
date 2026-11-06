@@ -21,9 +21,14 @@
 #include "module_hierarchy.h"
 #include "module_tree_integration.h"
 #include "module_tree_panel.h"
+#if defined(VEDIT_MODULE_TREE_HAVE_PROJECT)
+#include "project_state.h"
+#endif
 
 #include "jump/jump_registry.h"
 
+#include <QLineEdit>
+#include <QComboBox>
 #include <QApplication>
 #include <QDir>
 #include <QFile>
@@ -441,6 +446,89 @@ void checkPanels()
               && countLabel(treePanel.tree(), QStringLiteral("shared")) == 2,
           QStringLiteral("occurrences=%1")
               .arg(countLabel(treePanel.tree(), QStringLiteral("shared"))));
+
+    // RM-17: the top control is the ONE place the top is set: Auto / detected
+    // candidates / free text, the effective value is shown, and clearing it
+    // returns to Auto. The exclusion line states how many files are outside.
+    {
+        auto *top = treePanel.findChild<QComboBox *>(QStringLiteral("module-tree-top"));
+        check("top.control-exists", top != nullptr && top->isEditable(),
+              QStringLiteral("combo=%1").arg(top != nullptr));
+        treePanel.setTopCandidates({QStringLiteral("top_a"), QStringLiteral("top_b")});
+        check("top.candidates-listed", top != nullptr && top->count() == 3,
+              QStringLiteral("count=%1").arg(top != nullptr ? top->count() : -1));
+        treePanel.setEffectiveTop(QStringLiteral("top_a"));
+        check("top.effective-value", treePanel.effectiveTop() == QStringLiteral("top_a"),
+              treePanel.effectiveTop());
+        QString seen;
+        treePanel.setOnTopChanged([&seen](const QString &value) { seen = value; });
+        treePanel.setEffectiveTop(QStringLiteral("typed_name"));
+        top->lineEdit()->editingFinished();
+        check("top.free-text-emits", seen == QStringLiteral("typed_name"),
+              QStringLiteral("seen=%1").arg(seen));
+        treePanel.setEffectiveTop(QString());
+        top->lineEdit()->editingFinished();
+        check("top.cleared-means-auto",
+              treePanel.effectiveTop().isEmpty() && seen.isEmpty(),
+              QStringLiteral("effective='%1' seen='%2'")
+                  .arg(treePanel.effectiveTop(), seen));
+        const QString note = QStringLiteral("3 file(s) outside the top top_a are not analysed");
+        treePanel.setScopeNote(note);
+        check("top.exclusion-line", treePanel.statusText().contains(note),
+              treePanel.statusText());
+    }
+
+#if defined(VEDIT_MODULE_TREE_HAVE_PROJECT)
+    // RM-17: the setting survives a restart and is remembered PER ROOT. The
+    // persisted JSON carries `top` + `topByRoot`, and a reload restores both
+    // roots' entries (the model seeds the live root's entry from `top`).
+    {
+        vedit::workspace::project::ProjectState state;
+        state.root = QStringLiteral("/proj/a");
+        state.top = QStringLiteral("top_a");
+        state.topByRoot.insert(state.root, state.top);
+        state.topByRoot.insert(QStringLiteral("/proj/b"), QStringLiteral("top_b"));
+        const vedit::workspace::project::ProjectState reloaded =
+            vedit::workspace::project::ProjectState::fromJson(state.toJson());
+        check("top.state-roundtrip",
+              reloaded.top == QStringLiteral("top_a")
+                  && reloaded.topByRoot.value(QStringLiteral("/proj/a"))
+                         == QStringLiteral("top_a")
+                  && reloaded.topByRoot.value(QStringLiteral("/proj/b"))
+                         == QStringLiteral("top_b"),
+              QStringLiteral("top='%1' a='%2' b='%3'")
+                  .arg(reloaded.top, reloaded.topByRoot.value(QStringLiteral("/proj/a")),
+                       reloaded.topByRoot.value(QStringLiteral("/proj/b"))));
+        check("top.per-root",
+              reloaded.topByRoot.value(QStringLiteral("/proj/b")) != reloaded.top,
+              QStringLiteral("a='%1' b='%2'")
+                  .arg(reloaded.top, reloaded.topByRoot.value(QStringLiteral("/proj/b"))));
+    }
+#endif
+
+    // U9d / M1: the catalog's warning (an oversize size note or a PARTIAL-tree
+    // reason) must reach the panel's summary label, and a clean catalog must not
+    // show one. This is the user-visible half of "the warning reaches the panel":
+    // the service warning is useless if the module tree renders it nowhere.
+    {
+        const QString warning =
+            QStringLiteral("the elaborated AST JSON is 274 MiB (over the 256 MiB size threshold)");
+        ModuleCatalog warned = catalog;
+        warned.warning = warning;
+        ModuleTreePanel warnedPanel;
+        warnedPanel.setCatalog(warned);
+        check("panel.summary.shows-warning", warnedPanel.summaryText().contains(warning),
+              warnedPanel.summaryText());
+
+        ModuleCatalog clean = catalog;
+        clean.warning.clear();
+        ModuleTreePanel cleanPanel;
+        cleanPanel.setCatalog(clean);
+        check("panel.summary.no-warning-on-clean-catalog",
+              !cleanPanel.summaryText().contains(warning)
+                  && !cleanPanel.summaryText().contains(QStringLiteral("⚠")),
+              cleanPanel.summaryText());
+    }
 
     QString selected;
     treePanel.setOnSelectionChanged([&selected](const QString &name) { selected = name; });

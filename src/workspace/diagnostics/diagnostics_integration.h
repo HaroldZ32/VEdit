@@ -31,6 +31,10 @@ class ApplicationShell;
 
 namespace vedit::workspace {
 
+namespace diagnostics {
+class DiagnosticsController;
+}
+
 /// The user's backend choices (the `tools.*` settings keys; the key spellings
 /// are owned by the settings lane, see `settings_keys.h`).
 struct DiagnosticsBackendSettings {
@@ -93,6 +97,26 @@ public:
     /// included), so seeding never masks a settings-provided path.
     void seedToolchain(const diagnostics::ToolchainReport &toolchain);
 
+    /// RM-2: re-pin the CURRENT project's `-I`/`-D` on the selected backends.
+    ///
+    /// The session environment comes from `selectBackend`/`selectEngine`, and
+    /// project switches used to leave the previous project's values in place:
+    /// every session started after File > Open Folder ran with the OLD
+    /// include dirs and defines (the user-visible "environment does not
+    /// refresh"). The wiring calls this with the new root's values when its
+    /// file set arrives, and with two empty lists the moment a switch starts
+    /// (so a session started mid-switch cannot inherit the old values either).
+    ///
+    /// A non-empty project list wins over the tools-page value, exactly like
+    /// `buildLintRequest()`: the project expansion already APPENDS
+    /// `tools.include_dirs` / `tools.defines`, so the project's list is the
+    /// complete one. With nothing discovered yet the settings values stay in
+    /// force. Returns false only when this build has no LSP backend.
+    bool setProjectEnvironment(const QStringList &includeDirs, const QStringList &defines);
+    /// What the backends currently hold as the project environment (observable).
+    const QStringList &projectIncludeDirs() const { return projectIncludeDirs_; }
+    const QStringList &projectDefines() const { return projectDefines_; }
+
     diagnostics::LspBackendKind lspKind() const { return lspKind_; }
     diagnostics::LintEngineKind lintKind() const { return lintKind_; }
     QString lspBackendName() const;
@@ -112,6 +136,10 @@ public:
     const diagnostics::ToolchainReport &toolchain() const { return toolchain_; }
 
 private:
+    /// Project values when the project declared any, else the tools-page ones.
+    QStringList effectiveIncludeDirs() const;
+    QStringList effectiveDefines() const;
+
     diagnostics::LspSessionBackend *lsp_ = nullptr;
     diagnostics::SlangBackend *lint_ = nullptr;
     diagnostics::LspBackendKind lspKind_ = diagnostics::LspBackendKind::Verible;
@@ -119,9 +147,24 @@ private:
     QString lspPath_;
     QString lintPath_;
     QString rulesPath_;
+    QStringList settingsIncludeDirs_; ///< the last tools-page `-I`
+    QStringList settingsDefines_;     ///< the last tools-page `-D`
+    QStringList projectIncludeDirs_;  ///< RM-2: the CURRENT root's `-I`
+    QStringList projectDefines_;      ///< RM-2: the CURRENT root's `-D`
     diagnostics::ToolchainReport toolchain_;
 };
 
 void installDiagnostics(vedit::app::ApplicationShell &shell, const IntegrationOptions &options);
+
+/// The live diagnostics controller of `shell`, or nullptr before
+/// installDiagnostics() ran (and in a build without the app-shell seam).
+///
+/// RM-9: the product-level regressions must be able to install a deterministic
+/// lint backend BEFORE the first event-loop turn - the project-open pass starts
+/// as soon as the file set is adopted, and a harness that could only reach the
+/// controller after pumping events would race it. Same controller instance the
+/// panel uses; nothing is created here.
+diagnostics::DiagnosticsController *diagnosticsControllerForShell(
+    const vedit::app::ApplicationShell &shell);
 
 } // namespace vedit::workspace

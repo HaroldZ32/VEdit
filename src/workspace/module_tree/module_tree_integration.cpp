@@ -42,7 +42,12 @@ QString moduleTreeSlangBinary(const QObject *shell)
 #include "integration.h"
 #include "panel_registry.h"
 
+#include "top_scope.h"
+
+#include <QDir>
+
 #if defined(VEDIT_MODULE_TREE_HAVE_PROJECT)
+#include "project_model.h"
 #include "project_state.h"
 #endif
 
@@ -155,8 +160,19 @@ public:
             // Which catalog run produced the state on screen (the test's probe:
             // a follow-up run after an in-flight model write is a NEW generation).
             setProperty("catalogGeneration", catalogRuns_);
+            // RM-17: the tree control lists the modules the catalog reports as
+            // uninstantiated (learning continues across Auto runs; a scoped run
+            // only holds the subtree). The effective value comes from the model.
+            if (catalog_.top.isEmpty()) {
+                for (const QString &candidate : catalog_.topModuleNames()) {
+                    if (!topCandidates_.contains(candidate)) {
+                        topCandidates_.append(candidate);
+                    }
+                }
+            }
             pushToTreePanel();
             pushToInterfacePanel();
+            publishScope();
             updateCaretContext(true);
             retries_ = 0;
             finishRun(false);
@@ -202,6 +218,7 @@ public:
     {
         treePanel_ = panel;
         panel->setRefreshHandler([this]() { refresh(); });
+        panel->setOnTopChanged([this](const QString &top) { applyTop(top); });
         panel->setOnSelectionChanged([this](const QString &moduleName) {
             selectedModule_ = moduleName;
             if (interfacePanel_ != nullptr) {
@@ -223,6 +240,7 @@ public:
         // Resolve on every run: the diagnostics lane publishes its report after
         // this lane is installed, and a settings override can change it later.
         client_->setSlangBinary(moduleTreeSlangBinary(shell_));
+        client_->setTop(effectiveTop());
         if (projectRoot_.isEmpty()) {
             // Cancel BEFORE clearing: a run for the previous root may still be in
             // flight, and its late answer must never paint under "no project".
@@ -266,6 +284,10 @@ public:
         }
         projectRoot_ = root;
         setProperty("projectRoot", projectRoot_);
+        // RM-17: the model restores the NEW root's own top; read it before the
+        // next run so A -> B -> A never carries a top across projects.
+        top_ = effectiveTop();
+        topCandidates_.clear();
         modelStamp_.clear();
         runModelStamp_.clear();
         modelPending_ = false;
@@ -297,6 +319,79 @@ private:
             "VEdit", "No project open — open a folder to build the module catalog.");
     }
 
+    /// RM-17: the effective top for this run ("" = Auto). Read from the
+    /// project model, which persists it per root; the holder never writes
+    /// `project-model.json` itself (the model owns that file).
+    QString effectiveTop() const
+    {
+#if defined(VEDIT_MODULE_TREE_HAVE_PROJECT)
+        if (shell_ != nullptr) {
+            if (auto *model = shell_->findChild<project::ProjectModel *>()) {
+                return model->top();
+            }
+        }
+#endif
+        return top_;
+    }
+
+    /// Persist one top through the project model (per root) and restart.
+    void applyTop(const QString &top)
+    {
+#if defined(VEDIT_MODULE_TREE_HAVE_PROJECT)
+        if (shell_ != nullptr) {
+            if (auto *model = shell_->findChild<project::ProjectModel *>()) {
+                model->setTop(top);
+            } else {
+                top_ = top;
+            }
+        } else {
+            top_ = top;
+        }
+#else
+        top_ = top;
+#endif
+        refresh();
+    }
+
+    /// RM-17: publish the ONE derived scope (the catalog's reachable files) to
+    /// the diagnostics lane, which filters the lint pass and paints the dots.
+    /// With Auto the publish clears the exclusion (the lint covers everything).
+    void publishScope()
+    {
+        const QString top = catalog_.top;
+        if (top.isEmpty() || !catalog_.valid) {
+            vedit::workspace::publishTopScope(QString(), QStringList{}, QStringList{});
+            return;
+        }
+        const QSet<QString> reachable = [this]() {
+            QSet<QString> set;
+            for (const QString &file : catalog_.reachableFiles) {
+                set.insert(QDir::cleanPath(file));
+            }
+            return set;
+        }();
+        QStringList analysed;
+        QStringList excluded;
+        for (const QString &file : client_->lastFileSet()) {
+            const QString clean = QDir::cleanPath(file);
+            if (reachable.contains(clean)) {
+                analysed.append(clean);
+            } else {
+                excluded.append(clean);
+            }
+        }
+        vedit::workspace::publishTopScope(top, analysed, excluded);
+        if (treePanel_ != nullptr) {
+            treePanel_->setScopeNote(
+                excluded.isEmpty()
+                    ? QString()
+                    : QCoreApplication::translate(
+                          "VEdit", "%1 file(s) outside the top %2 are not analysed")
+                          .arg(excluded.size())
+                          .arg(top));
+        }
+    }
+
     QString pendingReason() const
     {
         return projectRoot_.isEmpty()
@@ -310,6 +405,8 @@ private:
         if (treePanel_ == nullptr) {
             return;
         }
+        treePanel_->setTopCandidates(topCandidates_);
+        treePanel_->setEffectiveTop(effectiveTop());
         if (catalog_.valid) {
             treePanel_->setCatalog(catalog_);
         } else if (!catalog_.error.isEmpty()) {
@@ -438,6 +535,8 @@ private:
     /// A model change was observed while a run was in flight.
     bool modelPending_ = false;
     int retries_ = 0;
+    QString top_;
+    QStringList topCandidates_;
     int catalogRuns_ = 0;
 };
 

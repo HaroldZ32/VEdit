@@ -28,6 +28,8 @@ class QToolButton;
 class QTreeWidget;
 class QTreeWidgetItem;
 
+class QComboBox;
+
 namespace vedit::workspace::module_tree {
 
 class ModuleTreePanel final : public QWidget {
@@ -45,6 +47,16 @@ public:
     void setStatus(const QString &text);
     /// The Refresh button's action (the integration restarts the client chain).
     void setRefreshHandler(std::function<void()> handler);
+    /// RM-17: the ONE place the top is set — Auto, a detected candidate, or free
+    /// text. `candidates` are the modules the catalog reports as uninstantiated.
+    void setTopCandidates(const QStringList &candidates);
+    /// Shows the EFFECTIVE top ("" = Auto) without emitting a change.
+    void setEffectiveTop(const QString &top);
+    QString effectiveTop() const;
+    void setOnTopChanged(std::function<void(const QString &top)> handler);
+    /// RM-17: the explicit exclusion line ("N file(s) outside the top X are not
+    /// analysed"); empty removes it.
+    void setScopeNote(const QString &text);
     /// Fires with the selected module name, or an empty string when the
     /// selection is cleared / a marker row is selected. The interface panel
     /// follows this focus rule (a) through the integration.
@@ -80,6 +92,11 @@ private:
     QLabel *status_ = nullptr;
     QLineEdit *filter_ = nullptr;
     QToolButton *refresh_ = nullptr;
+    QComboBox *top_ = nullptr;
+    std::function<void(const QString &)> topHandler_;
+    bool settingTop_ = false;
+    QString scopeNote_;
+    void emitTopChoice();
     std::function<void()> refreshHandler_;
     std::function<void(const QString &)> selectionHandler_;
     QString selectedModule_;

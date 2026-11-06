@@ -25,6 +25,22 @@ the user asked for.
 * Starts `vd_catalog_start` and polls it from a `QTimer` — slang never runs on
   the GUI thread. The answer (`VdModuleCatalog`) is copied into plain values
   (`ModuleCatalog`) and the C memory is released immediately.
+* **Service caps (U9a/U9d, `crates/vd-deeplint/src/ast_prune.rs`)** — documented
+  here because this panel shows their consequence:
+  * the `--ast-json` document is **streamed**, never held in memory; the catalog
+    keeps only module/port/instantiation nodes;
+  * retained nodes are bounded by a **1,000,000-node budget**
+    (`DEFAULT_MAX_RETAINED_NODES`): past it the catalog is PARTIAL and the
+    warning in `VdModuleCatalog.warning` says how many modules were kept — the
+    tree renders that warning in its summary line (`module-tree-summary`), it is
+    never silent;
+  * a document above the **256 MiB size threshold** is still catalogued IN FULL
+    and only carries a size note;
+  * the reader refuses a document nesting deeper than **10,000 JSON levels**
+    (`AST_JSON_MAX_NESTING`, ≈25× the deepest design slang will elaborate) with
+    a typed reason naming the measured depth — never a stack risk, never an
+    unreported empty tree. Up to that cap the walk runs on a 64 MiB-stack thread
+    (reserved virtual; measured to add no resident memory).
 * **`module-tree` dock — a PURE MODULE HIERARCHY** (item 1):
   * roots are the modules with `is_top` (no module instantiates them; one or
     several);

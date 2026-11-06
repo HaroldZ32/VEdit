@@ -115,6 +115,19 @@ void installFileTree(vedit::app::ApplicationShell &shell, const IntegrationOptio
                 [&shell]() -> quint64 {
                     return shell.property("vedit.diagnostics.viewRevision").toULongLong();
                 });
+            // RM-9: the project's EXPANDED set (directory scan + imported `.f`
+            // lists), published by the diagnostics lane. Members outside this
+            // tree's root get the synthetic "From filelist" group, so a
+            // filelist-only file has a row (and a status dot) in the tree too.
+            tree->setProjectFilesSource(
+                [&shell]() -> QStringList {
+                    return shell.property("vedit.diagnostics.projectFiles").toStringList();
+                },
+                [&shell]() -> quint64 {
+                    return shell
+                        .property("vedit.diagnostics.projectFilesRevision")
+                        .toULongLong();
+                });
         }
         return panel;
     };

@@ -92,6 +92,13 @@ JumpResult Registry::jumpTo(const QString &filePath, int line, int column)
 
     if (filePath.trimmed().isEmpty() || line < 1 || column < 1) {
         result.status = JumpStatus::InvalidRequest;
+        // The WHY, so a panel does not have to invent one (RM-4).
+        result.reason = filePath.trimmed().isEmpty()
+                            ? QStringLiteral("the jump request names no file")
+                            : QStringLiteral("the jump request has line=%1 column=%2; positions are "
+                                             "1-based and must be at least 1")
+                                  .arg(line)
+                                  .arg(column);
         QMutexLocker locker(&mutex_);
         ++invalidCount_;
         lastResult_ = result;
@@ -105,6 +112,8 @@ JumpResult Registry::jumpTo(const QString &filePath, int line, int column)
     }
     if (target == nullptr) {
         result.status = JumpStatus::NoTarget;
+        result.reason = QStringLiteral("no jump target is registered (the editor lane is not "
+                                       "installed)");
         QMutexLocker locker(&mutex_);
         ++noTargetCount_;
         lastResult_ = result;
@@ -116,6 +125,14 @@ JumpResult Registry::jumpTo(const QString &filePath, int line, int column)
     const bool accepted = target->jumpTo(filePath, line, column);
 
     result.status = accepted ? JumpStatus::Delivered : JumpStatus::Rejected;
+    if (!accepted) {
+        // The target's own words: this is what turns an unexplained refusal
+        // into "cannot open <path>: <why>" for the user (RM-4).
+        result.reason = target->lastError();
+        if (result.reason.isEmpty()) {
+            result.reason = QStringLiteral("the editor target refused the jump without a reason");
+        }
+    }
     QMutexLocker locker(&mutex_);
     if (accepted) {
         ++deliveredCount_;

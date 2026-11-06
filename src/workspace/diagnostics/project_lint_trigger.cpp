@@ -19,6 +19,11 @@ void ProjectLintTrigger::setRequestBuilder(RequestBuilder builder)
     requestBuilder_ = std::move(builder);
 }
 
+void ProjectLintTrigger::setIncrementalRequestBuilder(IncrementalRequestBuilder builder)
+{
+    incrementalRequestBuilder_ = std::move(builder);
+}
+
 void ProjectLintTrigger::setOpenFilesProvider(OpenFilesProvider provider)
 {
     openFiles_ = std::move(provider);
@@ -64,10 +69,18 @@ void ProjectLintTrigger::flushPending()
 
 void ProjectLintTrigger::fire()
 {
-    if (controller_ == nullptr || !requestBuilder_) {
+    if (controller_ == nullptr || (!requestBuilder_ && !incrementalRequestBuilder_)) {
         return;
     }
-    LintPassRequest request = requestBuilder_();
+    LintPassRequest request;
+    if (incrementalRequestBuilder_ && !lastSavedFile_.isEmpty()) {
+        // RM-9 save policy: ONE file, not the whole project. The controller keeps
+        // the upper verdicts of every file the pass does not lint, so the other
+        // dots stay live and a save costs one lint run, not N.
+        request = incrementalRequestBuilder_(lastSavedFile_);
+    } else if (requestBuilder_) {
+        request = requestBuilder_();
+    }
     if (request.files.isEmpty()) {
         if (sink_) {
             sink_(false, QStringLiteral("no project file set"));

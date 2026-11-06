@@ -52,6 +52,13 @@ public:
                              std::function<quint64()> revision);
     /// The delegate that paints the dots (the self-test samples its geometry).
     FileStatusDotDelegate *statusDelegate() const;
+    /// RM-9: the project's EXPANDED file set, plus a revision that moves when it
+    /// changes. Files outside this tree's root are shown in the synthetic
+    /// "From filelist" group (FileTreeModel::setFilelistFiles); the same 500 ms
+    /// timer that repaints the dots re-reads the set only when the revision
+    /// moved, so a big project is never re-scanned on a timer tick.
+    void setProjectFilesSource(std::function<QStringList()> files,
+                               std::function<quint64()> revision);
 
     // Operations, used both by the toolbar/context menu and directly by the
     // demo and the tests. On failure `error` (when given) receives the same
@@ -108,6 +115,9 @@ private:
     QTreeView *view_ = nullptr;
     FileStatusDotDelegate *statusDelegate_ = nullptr;
     QTimer *statusTimer_ = nullptr;
+    std::function<QStringList()> projectFilesSource_;
+    std::function<quint64()> projectFilesRevisionSource_;
+    quint64 projectFilesRevision_ = 0;
     QToolBar *toolBar_ = nullptr;
     QStackedWidget *stack_ = nullptr;
     QWidget *treePage_ = nullptr;

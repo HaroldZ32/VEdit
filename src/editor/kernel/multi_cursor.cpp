@@ -576,6 +576,34 @@ bool MultiCursorController::handleKey(QKeyEvent *event)
     return false;
 }
 
+// RM-6 gesture matrix (one place, so the primaries cannot be shadowed by a
+// future branch):
+//
+//   Shift+Alt+DRAG  block/column selection      PRIMARY (WM-safe)
+//   Ctrl+Alt+CLICK  add/remove a cursor         PRIMARY (WM-safe)
+//   Alt+DRAG        block/column selection      secondary: a WM that does not
+//   Alt+CLICK       add/remove a cursor         grab Alt+drag/click still works
+//   Ctrl+CLICK      go to definition            (never a multi-cursor gesture)
+//   plain CLICK     the editor's own click
+//
+// Why: KDE and GNOME bind Alt+left-drag (and Alt+click) to moving a window and
+// consume it before the application sees it, which is exactly why VS Code moved
+// column selection to Shift+Alt+drag on Linux. The plain Alt forms are kept as
+// secondaries for remapped window managers and for direct event delivery.
+static bool isMultiCursorGesture(Qt::KeyboardModifiers modifiers)
+{
+    if (!modifiers.testFlag(Qt::AltModifier)) {
+        return false;
+    }
+    const Qt::KeyboardModifiers companions =
+        modifiers & (Qt::ShiftModifier | Qt::ControlModifier | Qt::MetaModifier);
+    // Shift+Alt and Ctrl+Alt are the primaries; bare Alt is the secondary;
+    // Ctrl+Shift+Alt keeps working (it is still a multi-cursor gesture).
+    return companions == Qt::NoModifier || companions == Qt::ShiftModifier
+           || companions == Qt::ControlModifier
+           || companions == (Qt::ShiftModifier | Qt::ControlModifier);
+}
+
 QPoint MultiCursorController::viewPointFor(QWidget *watched, const QMouseEvent *event) const
 {
     const QPoint local = event->position().toPoint();
@@ -603,19 +631,21 @@ bool MultiCursorController::handleMouse(QWidget *watched, QMouseEvent *event)
         // be delivered elsewhere.
         definitionClickActive_ = false;
         altPressActive_ = false;
-        const bool alt = event->modifiers().testFlag(Qt::AltModifier);
         const bool ctrl = event->modifiers().testFlag(Qt::ControlModifier);
         const KTextEditor::Cursor clicked =
             view_->coordinatesToCursor(viewPointFor(watched, event));
-        if (alt) {
+        // RM-6: any Alt form (Shift+Alt primary, Ctrl+Alt primary, plain Alt
+        // secondary) is the multi-cursor gesture; it is checked BEFORE the Ctrl
+        // branch so Ctrl+Alt can never be mistaken for go-to-definition.
+        if (isMultiCursorGesture(event->modifiers())) {
             if (!clicked.isValid()) {
                 return false;
             }
-            // UX batch 2 (item 13): Alt+CLICK adds a cursor (the gesture that
-            // used to live on Ctrl+click); Alt+DRAG is still the block
-            // selection, so the block starts lazily on the first move — a click
-            // without a drag must not become a one-line block that replaces the
-            // cursor set.
+            // UX batch 2 (item 13) + RM-6: CLICK adds/removes a cursor
+            // (Shift+Alt+click behaves like the secondary Alt+click), DRAG is
+            // the block selection, so the block starts lazily on the first move
+            // — a click without a drag must not become a one-line block that
+            // replaces the cursor set.
             altPressAnchor_ = clicked;
             altPressActive_ = true;
             return true;

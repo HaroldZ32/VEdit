@@ -37,12 +37,19 @@ class ProjectLintTrigger final : public QObject {
     Q_OBJECT
 public:
     using RequestBuilder = std::function<LintPassRequest()>;
+    using IncrementalRequestBuilder = std::function<LintPassRequest(const QString &savedFile)>;
     using OpenFilesProvider = std::function<QStringList()>;
     using ResultSink = std::function<void(bool started, const QString &error)>;
 
     explicit ProjectLintTrigger(DiagnosticsController *controller, QObject *parent = nullptr);
 
     void setRequestBuilder(RequestBuilder builder);
+    /// RM-9 save policy: when installed, the automatic pass re-lints ONLY the
+    /// file that just reached disk and every other file KEEPS its verdict (the
+    /// controller's upper layer keeps rows of files the pass did not lint). The
+    /// cost of a save then does not grow with the project. Without this builder
+    /// the trigger keeps the historical whole-set behaviour.
+    void setIncrementalRequestBuilder(IncrementalRequestBuilder builder);
     void setOpenFilesProvider(OpenFilesProvider provider);
     void setResultSink(ResultSink sink);
     /// The debounce window (default 700 ms, the ruling's value). Tests shorten
@@ -69,6 +76,7 @@ private:
     DiagnosticsController *controller_ = nullptr;
     QTimer *debounce_ = nullptr;
     RequestBuilder requestBuilder_;
+    IncrementalRequestBuilder incrementalRequestBuilder_;
     OpenFilesProvider openFiles_;
     ResultSink sink_;
     quint64 saveCount_ = 0;

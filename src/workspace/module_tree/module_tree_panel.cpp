@@ -6,6 +6,7 @@
 #include <QFileInfo>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QComboBox>
 #include <QLabel>
 #include <QLineEdit>
 #include <QToolButton>
@@ -92,6 +93,26 @@ ModuleTreePanel::ModuleTreePanel(QWidget *parent)
     refresh_->setToolTip(
         QCoreApplication::translate("VEdit", "Re-run the module catalog for the whole project"));
     toolbar->addWidget(refresh_);
+    // RM-17: the ONE place the top is chosen. Auto = today's behaviour (every
+    // uninstantiated module is a root); the list holds the detected candidates;
+    // typing a name the list does not know is allowed (slang reports the name
+    // back if it cannot elaborate it). Clearing the text returns to Auto.
+    auto *topLabel = new QLabel(QCoreApplication::translate("VEdit", "Top:"), this);
+    topLabel->setObjectName(QStringLiteral("module-tree-top-label"));
+    toolbar->addWidget(topLabel);
+    top_ = new QComboBox(this);
+    top_->setObjectName(QStringLiteral("module-tree-top"));
+    top_->setEditable(true);
+    top_->setInsertPolicy(QComboBox::NoInsert);
+    top_->addItem(QCoreApplication::translate("VEdit", "Auto"), QString());
+    top_->setToolTip(QCoreApplication::translate(
+        "VEdit", "Top module for the module tree and the lint scope (empty = Auto)"));
+    toolbar->addWidget(top_, 1);
+    QObject::connect(top_, &QComboBox::activated, this, [this](int) { emitTopChoice(); });
+    if (top_->lineEdit() != nullptr) {
+        QObject::connect(top_->lineEdit(), &QLineEdit::editingFinished, this,
+                         [this]() { emitTopChoice(); });
+    }
     filter_ = new QLineEdit(this);
     filter_->setObjectName(QStringLiteral("module-tree-filter"));
     filter_->setPlaceholderText(QCoreApplication::translate("VEdit", "Filter modules…"));
@@ -370,14 +391,24 @@ bool ModuleTreePanel::deliver(const ModuleJump &jump, const QString &description
                 .arg(description));
         return false;
     case jump::JumpStatus::Rejected:
-        setActionStatus(QCoreApplication::translate(
-                            "VEdit", "%1: the editor rejected the jump to %2")
-                            .arg(description, target));
+        // RM-4: the WHY travels with the refusal (jump::JumpResult::reason), so
+        // this is never the bare "the editor rejected the jump to X" that hid
+        // every distinct cause behind one sentence. A refusal is still a
+        // refusal: nothing is retried and nothing is silently swallowed.
+        setActionStatus(QCoreApplication::translate("VEdit",
+                                                    "%1: the editor rejected the jump to %2 — %3")
+                            .arg(description, target,
+                                 result.reason.isEmpty()
+                                     ? QCoreApplication::translate("VEdit", "no reason was reported")
+                                     : result.reason));
         return false;
     case jump::JumpStatus::InvalidRequest:
-        setActionStatus(QCoreApplication::translate(
-                            "VEdit", "%1: the jump request (%2) was refused")
-                            .arg(description, target));
+        setActionStatus(QCoreApplication::translate("VEdit",
+                                                    "%1: the jump request (%2) was refused — %3")
+                            .arg(description, target,
+                                 result.reason.isEmpty()
+                                     ? QCoreApplication::translate("VEdit", "no reason was reported")
+                                     : result.reason));
         return false;
     }
     return false;
@@ -439,6 +470,87 @@ QVector<ModuleTreeNode> ModuleTreePanel::roots() const
 QString ModuleTreePanel::lastActionStatus() const
 {
     return lastActionStatus_;
+}
+
+void ModuleTreePanel::setScopeNote(const QString &text)
+{
+    scopeNote_ = text;
+    if (!text.isEmpty()) {
+        setStatus(text);
+    }
+}
+
+void ModuleTreePanel::setTopCandidates(const QStringList &candidates)
+{
+    if (top_ == nullptr) {
+        return;
+    }
+    const QString effective = effectiveTop();
+    settingTop_ = true;
+    top_->clear();
+    top_->addItem(QCoreApplication::translate("VEdit", "Auto"), QString());
+    for (const QString &candidate : candidates) {
+        if (!candidate.isEmpty()) {
+            top_->addItem(candidate, candidate);
+        }
+    }
+    if (!effective.isEmpty()) {
+        const int index = top_->findText(effective, Qt::MatchExactly);
+        if (index >= 0) {
+            top_->setCurrentIndex(index);
+        } else {
+            top_->setCurrentText(effective);
+        }
+    } else {
+        top_->setCurrentIndex(0);
+    }
+    settingTop_ = false;
+}
+
+void ModuleTreePanel::setEffectiveTop(const QString &top)
+{
+    if (top_ == nullptr) {
+        return;
+    }
+    settingTop_ = true;
+    const QString trimmed = top.trimmed();
+    if (trimmed.isEmpty()) {
+        top_->setCurrentIndex(0);
+    } else {
+        const int index = top_->findText(trimmed, Qt::MatchExactly);
+        if (index >= 0) {
+            top_->setCurrentIndex(index);
+        } else {
+            top_->setCurrentText(trimmed);
+        }
+    }
+    settingTop_ = false;
+}
+
+QString ModuleTreePanel::effectiveTop() const
+{
+    if (top_ == nullptr) {
+        return QString();
+    }
+    if (top_->currentIndex() == 0 && top_->currentText()
+        == QCoreApplication::translate("VEdit", "Auto")) {
+        return QString();
+    }
+    const QString text = top_->currentText().trimmed();
+    return text == QCoreApplication::translate("VEdit", "Auto") ? QString() : text;
+}
+
+void ModuleTreePanel::setOnTopChanged(std::function<void(const QString &)> handler)
+{
+    topHandler_ = std::move(handler);
+}
+
+void ModuleTreePanel::emitTopChoice()
+{
+    if (settingTop_ || topHandler_ == nullptr) {
+        return;
+    }
+    topHandler_(effectiveTop());
 }
 
 QString ModuleTreePanel::summaryText() const

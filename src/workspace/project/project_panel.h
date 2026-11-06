@@ -19,12 +19,16 @@
 #include <QStringList>
 #include <QWidget>
 
+#include <functional>
+
 class QLabel;
 class QListWidget;
 class QPushButton;
+class QTimer;
 
 namespace vedit::workspace::project {
 
+class FileStatusListDelegate;
 class ProjectModel;
 
 class ProjectPanel : public QWidget {
@@ -43,6 +47,20 @@ public:
     // routed through the process-wide IJumpTarget registry.
     void activateFile(int row);
 
+    // RM-9: the per-file status the Files list paints, in the ONE vocabulary of
+    // src/common/file_status.h (0 unknown / 1 error / 2 warning / 3 clean /
+    // 4 not analysed yet or excluded, drawn as a hollow grey ring). The default
+    // source reads the diagnostics lane's published map from the TOP-LEVEL
+    // window's shell properties, so this lane gains no link dependency and
+    // project_integration.cpp stays untouched; a test injects a fake source.
+    // The status is asked at PAINT time for the visible rows only, so a
+    // 1176-file list is never walked per repaint.
+    void setFileStatusSource(std::function<int(const QString &)> status,
+                             std::function<quint64()> revision);
+    /// What the Files list paints for `row` right now (read-only; tests and the
+    /// evidence screenshot assert on it).
+    int fileStatusAt(int row) const;
+
     // ADDENDUM A-9: the project variable table as shown, and the batch
     // collection. `promptForMissingVariables()` opens ONE dialog with a row per
     // unresolved variable of the last expansion; on accept the values are
@@ -53,6 +71,15 @@ public:
     bool interactiveDialogs() const;
     bool promptForMissingVariables();
     bool editVariables();
+
+    // RM-3: the ONE write path from the variables dialog to the model. The
+    // dialog's table REPLACES the project table (that is what makes a deleted
+    // variable actually disappear), is persisted per root, and re-expands.
+    // Public so the regression drives add/delete without a modal dialog.
+    bool applyVariableTable(const QStringList &values);
+    // The dialog's row order: the known names, then the ones the project still
+    // needs. The dialog always shows the whole table, so a replace is safe.
+    QStringList variableRowNames() const;
 
     // Read-only views of what the widget actually shows; the headless
     // self-check asserts on these instead of trusting the model alone.
@@ -99,6 +126,11 @@ private:
     QListWidget *diagnostics_ = nullptr;
     QLabel *emptyHint_ = nullptr;
     QLabel *status_ = nullptr;
+    FileStatusListDelegate *statusDelegate_ = nullptr;
+    QTimer *statusTimer_ = nullptr;
+    std::function<int(const QString &)> statusSource_;
+    std::function<quint64()> statusRevisionSource_;
+    quint64 statusRevision_ = 0;
     bool interactive_ = true;
 };
 

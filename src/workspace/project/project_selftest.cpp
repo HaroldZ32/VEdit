@@ -668,11 +668,19 @@ int runSelfCheck(const QString &fixture)
     // Headless: the modal dialog is replaced by its data probe (row per name).
     ProjectVariablesDialog a9Dialog(a9.missingVariables(),
                                     ProjectVariablesDialog::parseTable(a9.variables()));
-    check("a9.dialog.one-row-per-variable", a9Dialog.rowCount() == 1);
-    check("a9.dialog.names", a9Dialog.names() == QStringList{QStringLiteral("MISSING_VAR")});
+    // RM-3: the dialog now shows the WHOLE table - the requested missing name AND
+    // the known ones - because the panel REPLACES the project table with what it
+    // returns, and a replace must never drop a variable the user did not see. The
+    // A-9 intent (one fillable row for every unresolved name) is unchanged.
+    check("a9.dialog.one-row-per-variable", a9Dialog.rowCount() == 3);
+    check("a9.dialog.names",
+          a9Dialog.names().contains(QStringLiteral("MISSING_VAR"))
+              && a9Dialog.names().contains(QStringLiteral("RTL"))
+              && a9Dialog.names().contains(QStringLiteral("PRECEDENCE")));
     a9Dialog.setValue(QStringLiteral("MISSING_VAR"), QStringLiteral("mem"));
     check("a9.dialog.variable-table",
-          a9Dialog.variableTable() == QStringList{QStringLiteral("MISSING_VAR=mem")});
+          a9Dialog.variableTable().contains(QStringLiteral("MISSING_VAR=mem"))
+              && a9Dialog.variableTable().contains(QStringLiteral("RTL=rtl")));
     a9.setVariables(a9.variables() + a9Dialog.variableTable());
     check("a9.re-expands-after-dialog", waitForCompletion(a9, 20000));
     check("a9.dialog-value-used", a9.displayFiles().contains(QStringLiteral("rtl/mem.sv")));

@@ -1,6 +1,7 @@
 #include "file_tree_model.h"
 
 #include "file_kind.h"
+#include "file_status.h" // src/common: the ONE status vocabulary (RM-9)
 #include "path_display.h"
 
 #include <QDir>
@@ -36,6 +37,9 @@ void FileTreeModel::setRootPath(const QString &path)
 {
     beginResetModel();
     resetRoot();
+    // RM-9: the project set belongs to the root being left; the diagnostics
+    // lane republishes the new root's set (with a new revision) right after.
+    filelistFiles_.clear();
     if (!path.trimmed().isEmpty()) {
         buildRoot(path);
     } else {
@@ -64,6 +68,10 @@ void FileTreeModel::resetRoot()
 {
     root_.reset();
     rootPath_.clear();
+    // The group node died with the root's children; only the pointer is reset
+    // here. `filelistFiles_` survives a refresh() of the same root (it is only
+    // cleared on a root CHANGE, in setRootPath()).
+    filelistGroup_ = nullptr;
     loadedRows_ = 0;
     scannedDirectories_ = 0;
     setRootState(RootState::NoRoot, QString());
@@ -167,6 +175,14 @@ QVariant FileTreeModel::data(const QModelIndex &index, int role) const
         return provider.icon(node->isDir ? QFileIconProvider::Folder : QFileIconProvider::File);
     }
     case Qt::ToolTipRole: {
+        if (node->synthetic) {
+            // RM-9: the group is not a directory on disk; say where its members
+            // come from instead of inventing a path for it.
+            return node->name + QLatin1String("\n")
+                   + QCoreApplication::translate(
+                       "VEdit",
+                       "Files imported through a .f filelist; they live outside this folder tree");
+        }
         // FIX 1: the tooltip renders the path with the ONE display rule
         // (relative to the tree/workspace root when inside it, absolute
         // otherwise); the PathRole below keeps the absolute path for opening.
@@ -174,6 +190,15 @@ QVariant FileTreeModel::data(const QModelIndex &index, int role) const
         tip += QLatin1String("\n") + fileKindLabel(kind);
         if (!node->error.isEmpty()) {
             tip += QLatin1String("\n") + node->error;
+        }
+        // RM-9: the tooltip carries the MEANING of the mark (not only in code):
+        // a hollow ring is "not analysed yet / excluded", and the user can read
+        // which one it is.
+        if (!node->isDir && statusSource_ != nullptr) {
+            const int status = statusSource_(node->path);
+            if (status > 0) {
+                tip += QLatin1String("\n") + vedit::common::fileStatusHint(status);
+            }
         }
         return tip;
     }
@@ -483,6 +508,12 @@ void FileTreeModel::readDirectory(Node *node)
     }
     if (node->pending.empty()) {
         emit directoryLoaded(node->path);
+        if (node == root_.get()) {
+            // An EMPTY root still shows the "From filelist" group: the members
+            // live outside it, so the folder having no entries is not a reason
+            // to hide them.
+            syncFilelistGroup();
+        }
     }
 }
 
@@ -519,6 +550,11 @@ void FileTreeModel::appendBatch(Node *node)
         node->pending.shrink_to_fit();
         node->nextPending = 0;
         emit directoryLoaded(node->path);
+        if (node == root_.get()) {
+            // The group is appended only once the root's own listing is
+            // complete, so it is always the LAST row of the root folder.
+            syncFilelistGroup();
+        }
     }
 }
 
@@ -535,6 +571,11 @@ void FileTreeModel::loadOneBatch(Node *node)
 
 void FileTreeModel::clearChildren(Node *node)
 {
+    if (node == root_.get()) {
+        // The synthetic group is one of the root's children; the pointer must
+        // never outlive the vector that owns it.
+        filelistGroup_ = nullptr;
+    }
     const int count = static_cast<int>(node->children.size());
     if (count == 0) {
         return;
@@ -606,6 +647,103 @@ void FileTreeModel::setBatchSize(int size)
     batchSize_ = std::max(size, 1);
 }
 
+void FileTreeModel::setFilelistFiles(const QStringList &files)
+{
+    if (files == filelistFiles_) {
+        return;
+    }
+    filelistFiles_ = files;
+    syncFilelistGroup();
+}
+
+int FileTreeModel::filelistRowCount() const
+{
+    if (filelistGroup_ == nullptr) {
+        return 0;
+    }
+    return 1 + static_cast<int>(filelistGroup_->children.size());
+}
+
+void FileTreeModel::syncFilelistGroup()
+{
+    if (root_ == nullptr) {
+        return;
+    }
+    // Drop the previous synthetic group first (it is always the last child).
+    if (filelistGroup_ != nullptr) {
+        int row = -1;
+        for (std::size_t index = 0; index < root_->children.size(); ++index) {
+            if (root_->children[index].get() == filelistGroup_) {
+                row = static_cast<int>(index);
+                break;
+            }
+        }
+        if (row >= 0) {
+            const int rows = 1 + static_cast<int>(filelistGroup_->children.size());
+            beginRemoveRows(indexForNode(root_.get()), row, row);
+            loadedRows_ -= rows;
+            filelistGroup_ = nullptr;
+            root_->children.erase(root_->children.begin() + row);
+            endRemoveRows();
+        } else {
+            filelistGroup_ = nullptr;
+        }
+    }
+    // Only when the root's OWN listing is complete: the group must be the last
+    // row, so it may not jump in front of entries still being handed out.
+    if (!root_->populated || !root_->complete || filelistFiles_.isEmpty()) {
+        return;
+    }
+    // Keep only the members the directory scan cannot show. A path inside the
+    // root is already a normal row and must not be duplicated in the group.
+    const QString rootPath = QDir(root_->path).absolutePath();
+    QStringList outside;
+    for (const QString &file : filelistFiles_) {
+        if (file.trimmed().isEmpty()) {
+            continue;
+        }
+        const QString absolute = QDir(file).absolutePath();
+        if (absolute == rootPath) {
+            continue;
+        }
+        const QString relative = QDir(rootPath).relativeFilePath(absolute);
+        if (relative.isEmpty() || relative.startsWith(QLatin1String(".."))) {
+            outside.append(absolute);
+        }
+    }
+    outside.removeDuplicates();
+    if (outside.isEmpty()) {
+        return;
+    }
+
+    const int first = static_cast<int>(root_->children.size());
+    beginInsertRows(indexForNode(root_.get()), first, first);
+    auto group = std::make_unique<Node>();
+    group->name = QCoreApplication::translate("VEdit", "From filelist (%1)").arg(outside.size());
+    group->isDir = true;
+    group->readable = true;
+    group->populated = true;
+    group->complete = true;
+    group->synthetic = true;
+    group->parent = root_.get();
+    group->row = first;
+    for (int index = 0; index < outside.size(); ++index) {
+        const QFileInfo info(outside.at(index));
+        auto child = std::make_unique<Node>();
+        child->name = info.fileName();
+        child->path = outside.at(index);
+        child->isDir = info.isDir();
+        child->readable = true;
+        child->parent = group.get();
+        child->row = index;
+        group->children.push_back(std::move(child));
+    }
+    loadedRows_ += 1 + static_cast<int>(group->children.size());
+    filelistGroup_ = group.get();
+    root_->children.push_back(std::move(group));
+    endInsertRows();
+}
+
 int FileTreeModel::batchSize() const
 {
     return batchSize_;
@@ -634,18 +772,27 @@ bool FileTreeModel::syncFileStatuses()
     if (root_ == nullptr) {
         return true;
     }
-    // Repaint exactly the rows that exist right now (the model is lazy, so this
-    // is bounded by what the user expanded - never the whole project).
-    emit dataChanged(index(0, 0), index(0, 0), {FileStatusRole});
+    // RM-9 (T20 item 5): ONE dataChanged per LOADED DIRECTORY RANGE - never one
+    // per file. A 1176-file tree must not emit (and thereby repaint) per file
+    // per pass: the emission count is bounded by the directories the user
+    // expanded, and Qt paints only the visible rows of each range anyway.
+    const QModelIndex rootIndex = index(0, 0, QModelIndex());
+    if (rootIndex.isValid()) {
+        emit dataChanged(rootIndex, rootIndex, {FileStatusRole});
+    }
     const std::function<void(Node *)> walk = [&](Node *node) {
-        for (std::size_t row = 0; row < node->children.size(); ++row) {
-            Node *child = node->children[row].get();
-            const QModelIndex childIndex = index(static_cast<int>(row), 0, indexForNode(node));
-            if (childIndex.isValid()) {
-                emit dataChanged(childIndex, childIndex, {FileStatusRole});
+        const int children = static_cast<int>(node->children.size());
+        if (children > 0) {
+            const QModelIndex parentIndex = indexForNode(node);
+            const QModelIndex firstIndex = index(0, 0, parentIndex);
+            const QModelIndex lastIndex = index(children - 1, 0, parentIndex);
+            if (firstIndex.isValid() && lastIndex.isValid()) {
+                emit dataChanged(firstIndex, lastIndex, {FileStatusRole});
             }
+        }
+        for (const auto &child : node->children) {
             if (child->isDir && child->populated) {
-                walk(child);
+                walk(child.get());
             }
         }
     };

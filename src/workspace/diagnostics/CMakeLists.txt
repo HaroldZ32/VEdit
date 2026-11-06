@@ -82,7 +82,12 @@ if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL)
 endif()
 
 add_library(vedit_workspace_diagnostics STATIC ${VEDIT_DIAGNOSTICS_SOURCES})
-target_include_directories(vedit_workspace_diagnostics PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+# RM-9: the ONE file-status vocabulary (src/common/file_status.h) is header-only,
+# like src/common/path_display.h; this lane is its consumer alongside the file
+# tree and the Project panel (both already carry this include path).
+target_include_directories(vedit_workspace_diagnostics PUBLIC
+  "${CMAKE_CURRENT_SOURCE_DIR}"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../../common")
 target_link_libraries(vedit_workspace_diagnostics PUBLIC
   Qt6::Core
   Qt6::Gui
@@ -152,6 +157,27 @@ endif()
 
 add_test(NAME vedit-workspace-diagnostics-selftest
          COMMAND vedit-workspace-diagnostics-selftest --selfcheck)
+
+# --- RM-9 (T20): per-file verdict retention (fakes; standalone-buildable) ----
+# The user-visible defect: a dot existed only for the document being displayed.
+# This target builds WITHOUT the app shell/panel (it needs only the controller),
+# so the acceptance property is reproducible on its own:
+#   * a verdict is retained per file across a tab switch,
+#   * every file of the project set gets a status (opened or not),
+#   * "not analysed yet / excluded" is a distinct, visible state (4),
+#   * an edit voids the verdict (never a green dot on a voided verdict), and a
+#     fresh analysis of the dirty buffer wins.
+add_executable(vedit-verdict-retention-selftest selftests/verdict_retention_selftest.cpp)
+target_link_libraries(vedit-verdict-retention-selftest PRIVATE vedit_workspace_diagnostics)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(vedit-verdict-retention-selftest PRIVATE
+    -Wall -Wextra -Wpedantic -Werror)
+endif()
+add_test(NAME vedit-verdict-retention-selftest COMMAND vedit-verdict-retention-selftest)
+set_tests_properties(vedit-verdict-retention-selftest PROPERTIES
+  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-diagnostics;VEDIT_QUIET=1"
+  TIMEOUT 120
+)
 
 # --- Toolchain observability self-test (T82) --------------------------------
 # The "missing" case is deterministic (an empty staged AppDir), so it belongs in
@@ -326,6 +352,96 @@ if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL AND VEDIT_DIAGNOSTICS_FFI)
   endif()
   add_test(NAME vedit-b3-wiring-e2e COMMAND vedit-b3-wiring-e2e)
   set_tests_properties(vedit-b3-wiring-e2e PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-diagnostics;VEDIT_QUIET=1"
+    TIMEOUT 300
+  )
+endif()
+
+# --- UX batch 2 / RM-2: switching projects in ONE window --------------------
+# The real-machine defect: after switching folders in the same window the file
+# set and the backends' -I/-D still described the previous project. This binary
+# drives the real shell + project + file-tree + diagnostics lanes, switches
+# A -> B -> A -> B -> A through the new top-level entry, and asserts the NEW
+# root's set and environment on every switch, exactly one expansion per switch,
+# and that an unsaved tab survives. Headless.
+if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL AND VEDIT_DIAGNOSTICS_FFI
+   AND TARGET vedit_file_tree AND TARGET vedit_workspace_project)
+  add_executable(vedit-rm2-project-switch-e2e selftests/rm2_project_switch_e2e.cpp)
+  target_link_libraries(vedit-rm2-project-switch-e2e PRIVATE
+    vedit_workspace_diagnostics
+    vedit_file_tree
+    vedit_workspace_project
+  )
+  target_include_directories(vedit-rm2-project-switch-e2e PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../editor/kernel"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../app"
+  )
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-rm2-project-switch-e2e PRIVATE
+      -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  add_test(NAME vedit-rm2-project-switch-e2e COMMAND vedit-rm2-project-switch-e2e)
+  set_tests_properties(vedit-rm2-project-switch-e2e PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-diagnostics;VEDIT_QUIET=1"
+    TIMEOUT 300
+  )
+endif()
+
+# --- UX batch 2 / RM-9: the status dots over the WHOLE project ---------------
+# The real shell + project + file-tree + diagnostics lanes, with a deterministic
+# fake pass installed BEFORE the first event-loop turn (a project open starts the
+# full pass at adoption). Asserts the coverage policy, the never-opened files'
+# verdicts, the filelist-only file in the tree group AND the panel list, and the
+# dirty-buffer exclusion. Offscreen; `--shot` saves the window as evidence.
+if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL AND VEDIT_DIAGNOSTICS_FFI
+   AND TARGET vedit_file_tree AND TARGET vedit_workspace_project)
+  add_executable(vedit-rm9-status-dots-e2e selftests/rm9_status_dots_e2e.cpp)
+  target_link_libraries(vedit-rm9-status-dots-e2e PRIVATE
+    vedit_workspace_diagnostics
+    vedit_file_tree
+    vedit_workspace_project
+  )
+  target_include_directories(vedit-rm9-status-dots-e2e PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../editor/kernel"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../app"
+  )
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-rm9-status-dots-e2e PRIVATE
+      -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  add_test(NAME vedit-rm9-status-dots-e2e COMMAND vedit-rm9-status-dots-e2e)
+  set_tests_properties(vedit-rm9-status-dots-e2e PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-diagnostics;VEDIT_QUIET=1"
+    TIMEOUT 300
+  )
+endif()
+
+# --- UX batch 2 / RM-17b: the top scope, end to end -------------------------
+# The real shell + project + diagnostics lanes, a deterministic pass backend and
+# the fixture top A (B reachable, C not). The scope is published through the REAL
+# seam (src/workspace/top_scope.h, exactly what the module tree calls), and the
+# lint-request boundary is observed on the backend: the pass must not contain the
+# excluded file, that file must stay hollow "not analysed" (never green), the
+# aggregate line must name the top, the project list must keep it, and Auto must
+# restore it. A second scenario runs the REALISTIC order (project-open pass
+# covers everything, THEN the top is named) - the order the app actually has.
+if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL AND VEDIT_DIAGNOSTICS_FFI
+   AND TARGET vedit_workspace_project)
+  add_executable(vedit-rm17b-top-scope-e2e selftests/top_scope_e2e.cpp)
+  target_link_libraries(vedit-rm17b-top-scope-e2e PRIVATE
+    vedit_workspace_diagnostics
+    vedit_workspace_project
+  )
+  target_include_directories(vedit-rm17b-top-scope-e2e PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../editor/kernel"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../app"
+  )
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-rm17b-top-scope-e2e PRIVATE
+      -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  add_test(NAME vedit-rm17b-top-scope-e2e COMMAND vedit-rm17b-top-scope-e2e)
+  set_tests_properties(vedit-rm17b-top-scope-e2e PROPERTIES
     ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-diagnostics;VEDIT_QUIET=1"
     TIMEOUT 300
   )

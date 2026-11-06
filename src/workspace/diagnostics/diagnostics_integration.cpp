@@ -1,5 +1,7 @@
 #include "diagnostics_integration.h"
 
+#include "../top_scope.h"
+
 #if defined(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL)
 
 #include "autofix.h"
@@ -11,6 +13,7 @@
 #include "project_lint_trigger.h"
 #include "symbol_scan.h"
 #include "slang_backend.h"
+#include "../project/language_registry.h"
 #include "toolchain.h"
 
 #include "../settings/settings_keys.h"
@@ -41,6 +44,7 @@
 #include <QDateTime>
 #include <QDialog>
 #include <QDir>
+#include <QSet>
 #include <QDockWidget>
 #include <QElapsedTimer>
 #include <QEvent>
@@ -72,6 +76,7 @@
 
 #include <functional>
 #include <memory>
+#include <vector>
 
 #if defined(VEDIT_DIAGNOSTICS_HAVE_FFI)
 #include <vd_ffi.h>
@@ -427,11 +432,32 @@ private:
         if (path.isEmpty() || text.isEmpty()) {
             return;
         }
+        // RM-11: a document is analysed only when this build has an ANALYZER
+        // for its language. A `.f` manifest, a `.md` note, a `.tcl` script has
+        // no language entry, so it is never handed to a Verilog server - the
+        // user's "syntax error on my filelist" was this call analysing the
+        // manifest as HDL. The outcome is a STATE (published below), not a
+        // skip log line and never a diagnostic row.
+        const project::LanguageRegistry &languages = project::LanguageRegistry::instance();
+        if (!languages.supports(path, project::Capability::Diagnostics)) {
+            QVariantMap availability;
+            availability.insert(QStringLiteral("path"), path);
+            availability.insert(QStringLiteral("available"), false);
+            availability.insert(QStringLiteral("reason"),
+                                languages.unavailableReason(path, project::Capability::Diagnostics));
+            shell_->setProperty("vedit.diagnostics.analysisAvailability", availability);
+            return;
+        }
         QFile file(path);
         QString disk;
         if (file.open(QIODevice::ReadOnly)) {
             disk = QString::fromUtf8(file.readAll());
         }
+        QVariantMap availability;
+        availability.insert(QStringLiteral("path"), path);
+        availability.insert(QStringLiteral("available"), true);
+        availability.insert(QStringLiteral("reason"), QString());
+        shell_->setProperty("vedit.diagnostics.analysisAvailability", availability);
         controller_->analyzeFile(path, text, disk != text);
     }
 
@@ -445,6 +471,72 @@ private:
 };
 
 #if defined(VEDIT_DIAGNOSTICS_HAVE_FFI)
+/// Borrowed UTF-8 view of a QStringList for ONE ABI call. The ABI copies the
+/// strings while the call runs; `items` only points into `storage`, so the
+/// owner must outlive the call (never the job).
+struct BorrowedStringList {
+    std::vector<QByteArray> storage;
+    std::vector<char *> items;
+    VdStringList view{0, nullptr};
+
+    explicit BorrowedStringList(const QStringList &values)
+    {
+        storage.reserve(static_cast<std::size_t>(values.size()));
+        for (const QString &value : values) {
+            storage.push_back(value.toUtf8());
+        }
+        items.reserve(storage.size());
+        for (QByteArray &value : storage) {
+            items.push_back(value.data());
+        }
+        view.count = items.size();
+        view.items = items.empty() ? nullptr : items.data();
+    }
+
+    const VdStringList *pointer() const
+    {
+        return items.empty() ? nullptr : &view;
+    }
+};
+
+/// The panel's project-expansion INPUTS, published by the project lane as the
+/// shell property `vedit.project.inputs` (root, imported filelists, variables
+/// table, settings store path).
+///
+/// RM-2: the diagnostics file set and the project panel used to expand the
+/// same root with DIFFERENT inputs - this lane passed `nullptr, nullptr`, so a
+/// project's imported `.f` lists and the tools page's `-I`/`-D` never reached
+/// lint/LSP, and the panel and the analysis disagreed about the file set. The
+/// inputs are re-read from the shell-property seam (the same decoupling the
+/// toolchain path uses) instead of linking the project lane, so this lane still
+/// builds standalone. A property for a DIFFERENT root (another project still
+/// loading) contributes nothing: the fallback settings path is used and the
+/// imported lists stay empty - a previous project's inputs are never carried.
+struct ProjectExpansionInputs {
+    QStringList filelists;
+    QStringList variables;
+    QString settingsPath;
+};
+
+ProjectExpansionInputs projectExpansionInputs(const vedit::app::ApplicationShell &shell,
+                                              const QString &root,
+                                              const QString &fallbackSettingsPath)
+{
+    ProjectExpansionInputs inputs;
+    inputs.settingsPath = fallbackSettingsPath;
+    const QVariantMap published = shell.property("vedit.project.inputs").toMap();
+    if (published.isEmpty() || published.value(QStringLiteral("root")).toString() != root) {
+        return inputs;
+    }
+    inputs.filelists = published.value(QStringLiteral("filelists")).toStringList();
+    inputs.variables = published.value(QStringLiteral("variables")).toStringList();
+    const QString settingsPath = published.value(QStringLiteral("settingsPath")).toString();
+    if (!settingsPath.isEmpty()) {
+        inputs.settingsPath = settingsPath;
+    }
+    return inputs;
+}
+
 /// Ask the project model for the effective file set and hand it to the
 /// controller. The poll is timer-driven, so `installPanels()` never blocks.
 class ProjectFileSetPoller final : public QObject {
@@ -453,35 +545,33 @@ public:
         std::function<void(const QStringList &, const QStringList &, const QStringList &)>;
 
     ProjectFileSetPoller(QObject *parent,
+                         vedit::app::ApplicationShell *shell,
                          diagnostics::DiagnosticsController *controller,
                          const QString &projectRoot,
+                         const ProjectExpansionInputs &inputs,
                          ReadyCallback ready)
         : QObject(parent)
         , controller_(controller)
+        , shell_(shell)
         , projectRoot_(projectRoot)
         , ready_(std::move(ready))
         , timer_(new QTimer(this))
+        , watchTimer_(new QTimer(this))
     {
         service_ = vd_service_create();
         if (service_ == nullptr) {
             qWarning("diagnostics: cannot create the Rust service handle for the project model");
             return;
         }
-        const QByteArray root = projectRoot_.toUtf8();
-        // R2/R3: the file set must be the C7 project model - the `.f` expansion
-        // UNION a recursive scan of the folder - not the legacy filelist-only
-        // `vd_project_parse`. Measured: with the legacy call a folder of .sv
-        // files and no `.f` produced ZERO files, so "Lint Project" (and every
-        // save-triggered pass) had nothing to lint and reported "No project file
-        // set" - the feature was dead for exactly the projects a new user opens.
-        job_ = vd_project_expand(service_, root.constData(), nullptr, nullptr);
-        if (job_ == 0) {
-            qWarning("diagnostics: project expansion was rejected: %s",
-                     qPrintable(serviceError()));
-            return;
-        }
         connect(timer_, &QTimer::timeout, this, [this]() { poll(); });
-        timer_->start(50);
+        // RM-9: the panel's expansion inputs are LIVE (Import Filelist…, the
+        // variables table). A `.f` imported AFTER startup must join the analysis
+        // set too - otherwise its files have no verdict and the tree's filelist
+        // group cannot show them. Poll the published inputs (a cheap compare);
+        // expand only on a CHANGE and never while another job is in flight.
+        connect(watchTimer_, &QTimer::timeout, this, [this]() { watchInputs(); });
+        watchTimer_->start(800);
+        beginExpansion(inputs);
     }
 
     ~ProjectFileSetPoller() override
@@ -496,6 +586,62 @@ public:
     const QStringList &defines() const { return defines_; }
 
 private:
+    /// RM-9: one expansion with exactly `inputs`. Re-entrant by design: the
+    /// RUNNING job's completion calls it again when the panel's inputs moved.
+    void beginExpansion(const ProjectExpansionInputs &inputs)
+    {
+        inputs_ = inputs;
+        settingsPath_ = inputs.settingsPath;
+        if (service_ == nullptr || job_ != 0) {
+            return; // the running job's completion re-checks the inputs
+        }
+        const QByteArray root = projectRoot_.toUtf8();
+        const QByteArray settingsPath = inputs.settingsPath.toUtf8();
+        const BorrowedStringList filelists(inputs.filelists);
+        const BorrowedStringList variables(inputs.variables);
+        // R2/R3: the file set must be the C7 project model - the `.f` expansion
+        // UNION a recursive scan of the folder - not the legacy filelist-only
+        // `vd_project_parse`. Measured: with the legacy call a folder of .sv
+        // files and no `.f` produced ZERO files, so "Lint Project" (and every
+        // save-triggered pass) had nothing to lint and reported "No project file
+        // set" - the feature was dead for exactly the projects a new user opens.
+        //
+        // RM-2: `vd_project_expand_v2` with the PANEL's inputs (imported `.f`
+        // lists, variables table, settings store). The file set, the `-I`/`-D`
+        // and the discovered rules path are then exactly the panel's - one
+        // project model, not two.
+        job_ = vd_project_expand_v2(service_, root.constData(), filelists.pointer(),
+                                    settingsPath.isEmpty() ? nullptr : settingsPath.constData(),
+                                    variables.pointer());
+        std::printf("PROJECT-EXPAND-INPUTS root='%s' filelists=%d variables=%d settings='%s'\n",
+                    qPrintable(projectRoot_), static_cast<int>(inputs.filelists.size()),
+                    static_cast<int>(inputs.variables.size()),
+                    settingsPath.isEmpty() ? "<none>" : qPrintable(inputs.settingsPath));
+        std::fflush(stdout);
+        if (job_ == 0) {
+            qWarning("diagnostics: project expansion was rejected: %s",
+                     qPrintable(serviceError()));
+            return;
+        }
+        ticks_ = 0;
+        timer_->start(50);
+    }
+
+    /// The panel's inputs changed (a `.f` was imported/removed, a variable was
+    /// set): follow it. No-op while a job runs - its completion re-checks.
+    void watchInputs()
+    {
+        if (shell_ == nullptr) {
+            return;
+        }
+        const ProjectExpansionInputs next =
+            projectExpansionInputs(*shell_, projectRoot_, settingsPath_);
+        if (next.filelists == inputs_.filelists && next.variables == inputs_.variables) {
+            return;
+        }
+        beginExpansion(next);
+    }
+
     QString serviceError() const
     {
         VdError error{};
@@ -568,15 +714,28 @@ private:
         } else {
             controller_->setFileSet(files);
         }
+        // RM-9: the inputs may have moved WHILE this expansion ran (a `.f`
+        // imported during startup). Follow them now instead of ignoring them.
+        if (shell_ != nullptr) {
+            const ProjectExpansionInputs next =
+                projectExpansionInputs(*shell_, projectRoot_, settingsPath_);
+            if (next.filelists != inputs_.filelists || next.variables != inputs_.variables) {
+                beginExpansion(next);
+            }
+        }
     }
 
     diagnostics::DiagnosticsController *controller_ = nullptr;
+    vedit::app::ApplicationShell *shell_ = nullptr;
     QString projectRoot_;
     ReadyCallback ready_;
     QTimer *timer_ = nullptr;
+    QTimer *watchTimer_ = nullptr;
     VdService *service_ = nullptr;
     quint64 job_ = 0;
     int ticks_ = 0;
+    ProjectExpansionInputs inputs_;
+    QString settingsPath_;
     QStringList files_;
     QStringList includeDirs_;
     QStringList defines_;
@@ -785,6 +944,7 @@ public:
         , state_(lsp, lint)
         , toolchain_(std::move(toolchain))
         , workspaceRoot_(std::move(workspaceRoot))
+        , settingsPath_(std::move(settingsPath))
         , restartAnalysis_(std::move(restartAnalysis))
     {
         // T29/AC-8.1: the resolved toolchain is already known here. Prime the
@@ -815,6 +975,14 @@ public:
         passTimer_ = new QTimer(this);
         passTimer_->setInterval(300);
         connect(passTimer_, &QTimer::timeout, this, [this]() {
+            // RM-9: a full pass deferred because another pass was running (a
+            // re-adoption mid-pass) starts as soon as that one is terminal. It is
+            // started BEFORE the presentation poll, so it owns its own terminal
+            // serial and is presented as automatic (notice, no dialog).
+            if (fullPassPending_ && !controller_->projectPassRunning()) {
+                fullPassPending_ = false;
+                startFullProjectAnalysis();
+            }
             controller_->refresh(); // advances the project lint pass (T8)
             reactToFinishedPass();
         });
@@ -828,6 +996,11 @@ public:
         // R3: the ONE save seam of the editor area feeds the automatic pass.
         saveTrigger_ = new diagnostics::ProjectLintTrigger(controller_, this);
         saveTrigger_->setRequestBuilder([this]() { return buildLintRequest(); });
+        // RM-9 save policy: a save re-lints exactly the file that reached disk;
+        // the other files keep their verdicts (replaceUpperLayer keeps rows of
+        // files the pass did not lint), so a save costs one lint run, not N.
+        saveTrigger_->setIncrementalRequestBuilder(
+            [this](const QString &savedFile) { return buildLintRequestFor(savedFile); });
         saveTrigger_->setOpenFilesProvider([this]() { return modifiedOpenFiles(); });
         saveTrigger_->setResultSink([this](bool started, const QString &error) {
             if (started || error.isEmpty() || shell_->statusBar() == nullptr) {
@@ -854,7 +1027,7 @@ public:
         autofix_.setLintBinary(toolchain_.veribleLint.path);
 
 #if defined(VEDIT_DIAGNOSTICS_HAVE_FFI)
-        watcher_ = new SettingsWatcher(this, std::move(settingsPath),
+        watcher_ = new SettingsWatcher(this, settingsPath_,
                                        [this](const QHash<QString, QString> &values) {
                                            applySettings(values);
                                        });
@@ -866,7 +1039,20 @@ public:
     void setProjectFiles(const QStringList &files, const QStringList &includeDirs,
                          const QStringList &defines)
     {
-        projectFiles_ = files;
+        // RM-11: membership is asked of the registry, never re-decided here.
+        // The project expansion already answers positively (its own scan uses
+        // the Rust registry), so this is the C++ half of the SAME rule: a path
+        // that is not a source language cannot become a project file even if a
+        // future input path forgets to filter.
+        QStringList members;
+        members.reserve(files.size());
+        for (const QString &file : files) {
+            if (project::LanguageRegistry::instance().supports(file,
+                                                               project::Capability::Source)) {
+                members.append(file);
+            }
+        }
+        projectFiles_ = members;
         projectIncludeDirs_ = includeDirs;
         projectDefines_ = defines;
     }
@@ -1127,10 +1313,73 @@ public:
     /// child popup, so a raw pointer here was a use-after-free on the next
     /// hover/navigation. `adoptHoverView()` re-parents on a tab switch and the
     /// view's `destroyed` signal clears the cache before anything can use it.
+    /// RM-10: the KTextEditor::View a mouse event's widget belongs to. A REAL
+    /// move inside the text lands on KatePart's inner `KateViewInternal` CHILD,
+    /// never on the public View (measured: evidence/ux-batch-2/review-b4/
+    /// 01-focus-delivery.txt; the same seam MultiCursorController::viewPointFor()
+    /// uses). That is why the old filter on the View only ever saw the moves
+    /// that PROPAGATED to it (e.g. over the gutter) and never the text.
+    static KTextEditor::View *viewForWidget(QWidget *widget)
+    {
+        for (QWidget *current = widget; current != nullptr; current = current->parentWidget()) {
+            if (auto *view = qobject_cast<KTextEditor::View *>(current)) {
+                return view;
+            }
+        }
+        return nullptr;
+    }
+
+    /// RM-10: the pane that owns `view`. A split layout must answer the hover for
+    /// the pane the MOUSE is in, not always the active one.
+    vedit::app::EditorPane *paneForView(KTextEditor::View *view) const
+    {
+        if (view == nullptr || shell_->editorArea() == nullptr) {
+            return nullptr;
+        }
+        for (vedit::app::EditorPane *pane : shell_->editorArea()->panes()) {
+            if (pane != nullptr && pane->containsEditorWidget(view)) {
+                return pane;
+            }
+        }
+        return nullptr;
+    }
+
+    /// RM-10: install the filter on `root` and its whole widget subtree
+    /// (idempotent). The inner KatePart widget can be created lazily, which is
+    /// why `ChildAdded` re-enters here.
+    void watchViewTree(QWidget *root)
+    {
+        if (root == nullptr) {
+            return;
+        }
+        for (const QPointer<QWidget> &watched : hoverWatched_) {
+            if (watched.data() == root) {
+                return;
+            }
+        }
+        hoverWatched_.append(root);
+        root->installEventFilter(this);
+        if (auto *view = qobject_cast<KTextEditor::View *>(root)) {
+            view->setMouseTracking(true);
+        }
+        const QList<QObject *> children = root->children();
+        for (QObject *child : children) {
+            if (child != nullptr && child->isWidgetType()) {
+                watchViewTree(static_cast<QWidget *>(child));
+            }
+        }
+    }
+
     diagnostics::DiagnosticHoverPopup *hoverPopup()
     {
         if (hoverPopup_.isNull()) {
-            KTextEditor::View *view = activeView();
+            // RM-10: anchor to the HOVERED view (adoptHoverView() just set it),
+            // never blindly to the active one: a split pane's bubble belongs to
+            // the view under the mouse.
+            auto *view = qobject_cast<KTextEditor::View *>(hoverView_.data());
+            if (view == nullptr) {
+                view = activeView();
+            }
             QWidget *anchor = view != nullptr ? static_cast<QWidget *>(view) : shell_;
             auto *popup = new diagnostics::DiagnosticHoverPopup(anchor);
             QObject::connect(popup, &diagnostics::DiagnosticHoverPopup::fixRequested, this,
@@ -1150,17 +1399,28 @@ public:
             return;
         }
         hideHoverPopup();
-        if (!hoverView_.isNull()) {
-            hoverView_->removeEventFilter(this);
-        }
+        // RM-10: the filter stays on every view (a split pane's hover must be
+        // seen without the view being active), so nothing is removed here; a
+        // destroyed view is disconnected by Qt itself.
         QObject::disconnect(hoverViewDestroyed_);
+        QObject::disconnect(hoverDocumentEdited_);
         hoverView_ = view;
         if (!hoverPopup_.isNull()) {
             hoverPopup_->setParent(view != nullptr ? static_cast<QWidget *>(view) : shell_);
         }
         if (view != nullptr) {
-            view->setMouseTracking(true);
-            view->installEventFilter(this);
+            watchViewTree(view);
+            // RM-10: the bubble describes a range of THIS document. An edit can
+            // move or remove the range, so the bubble must not survive an edit.
+            if (view->document() != nullptr) {
+                hoverDocumentEdited_ = QObject::connect(
+                    view->document(), &KTextEditor::Document::textChanged, this, [this]() {
+                        if (hoverShowsDiagnostic_) {
+                            hideHoverPopup();
+                            publishHoverState();
+                        }
+                    });
+            }
             hoverViewDestroyed_ = QObject::connect(view, &QObject::destroyed, this, [this]() {
                 // The view (and therefore a popup parented to it) is going away.
                 // QPointer would null it for a child popup; clearing explicitly
@@ -1171,6 +1431,7 @@ public:
                 hoverProbeSerial_++;
                 hoverView_.clear();
                 hoverViewDestroyed_ = QMetaObject::Connection();
+                hoverDocumentEdited_ = QMetaObject::Connection();
                 publishHoverState();
             });
         }
@@ -1237,16 +1498,26 @@ public:
 
     void placePopup(QWidget *popup, const QPoint &viewportPoint)
     {
-        KTextEditor::View *view = activeView();
-        if (view == nullptr || popup == nullptr) {
+        if (popup == nullptr) {
             return;
         }
         QWidget *anchor = popup->parentWidget();
         if (anchor == nullptr) {
             return;
         }
+        // RM-10: the point is in VIEW coordinates of the view under the mouse.
+        // The popup is re-parented to that view before placement, so the anchor
+        // IS the view; fall back to the active view only for a stable-parent
+        // popup (no diagnostic hover path does that).
+        KTextEditor::View *view = qobject_cast<KTextEditor::View *>(anchor);
+        if (view == nullptr) {
+            view = activeView();
+        }
+        if (view == nullptr) {
+            return;
+        }
         popup->adjustSize();
-        // `popup` is a CHILD widget (of the active view), so move() takes
+        // `popup` is a CHILD widget (of the hovered view), so move() takes
         // PARENT coordinates. The old code added the view's GLOBAL origin to a
         // point that was already parent-relative, which put the bubble roughly
         // twice the offset to the right/below - off the window on a real
@@ -1308,7 +1579,9 @@ public:
         if (view != hoverView_.data()) {
             adoptHoverView(view);
         }
-        vedit::app::EditorPane *pane = activePane();
+        // RM-10: the path belongs to the pane the VIEW is in (split panes), not
+        // to the globally active pane.
+        vedit::app::EditorPane *pane = paneForView(view);
         if (view == nullptr || pane == nullptr || view->document() == nullptr) {
             return;
         }
@@ -1316,6 +1589,8 @@ public:
         if (path.isEmpty()) {
             return;
         }
+        // RM-10: `viewportPoint` is already mapped into VIEW coordinates by the
+        // caller (the real mouse target is KatePart's inner widget).
         const KTextEditor::Cursor cursor = view->coordinatesToCursor(viewportPoint);
         const QVector<diagnostics::DiagnosticEntry> rows =
             controller_->mergedDiagnosticsForFile(path);
@@ -1324,6 +1599,10 @@ public:
         if (entry == nullptr) {
             if (hoverShowsDiagnostic_) {
                 hideHoverPopup();
+                // RM-10: publish the transition AT ONCE. The 400 ms poll used to
+                // be the only writer, so an observer (or a regression) could see
+                // "diagnostic=true" for up to 400 ms after the bubble was gone.
+                publishHoverState();
             }
             return;
         }
@@ -1385,15 +1664,22 @@ public:
     /// item 9: apply the engine's autofix as ONE undoable whole-document edit.
     void applyDiagnosticFix()
     {
-        KTextEditor::View *view = activeView();
-        vedit::app::EditorPane *pane = activePane();
+        // RM-10: the :Fix」 button belongs to the bubble, and the bubble is
+        // parented to the view it was built for - use THAT view's pane, not the
+        // globally active one (split panes).
+        auto *view = qobject_cast<KTextEditor::View *>(
+            hoverPopup_.isNull() ? nullptr : hoverPopup_->parentWidget());
+        if (view == nullptr) {
+            view = activeView();
+        }
+        vedit::app::EditorPane *pane = paneForView(view);
         if (view == nullptr || view->document() == nullptr || !hoverShowsDiagnostic_) {
             return;
         }
         // nit (review-b3-r3): in a split layout the focus can move to another
         // pane between the hover and the click. The cached rule/file describe the
-        // file the BUBBLE was built for; requiring the active pane to still show
-        // that file keeps a fix computed for A out of B's buffer.
+        // file the BUBBLE was built for; requiring that pane to still show that
+        // file keeps a fix computed for A out of B's buffer.
         if (pane == nullptr || pane->currentFilePath() != hoverFilePath_) {
             return;
         }
@@ -1568,10 +1854,42 @@ public:
     /// AC-1.6: the request of the next project pass. ONE builder for the
     /// explicit (`project.lint`) and the automatic (save-triggered) path, so the
     /// two can never disagree about the file set, -I/-D, engine or rules.
+    /// RM-17: the module tree publishes its ONE derived top scope here (see
+    /// src/workspace/top_scope.h). With a top the project pass lints only the
+    /// analysed set; every excluded file gets the visible NotAnalyzed mark with
+    /// a reason NAMING the top, and one status line says how many were excluded.
+    /// Auto (empty top) restores the whole file set and clears those marks.
+    void applyTopScope(const QString &top, const QStringList &analysed,
+                       const QStringList &excluded)
+    {
+        // The controller owns the file verdicts: it stores the scope, filters
+        // the NEXT project pass to `analysed` and paints every excluded file
+        // with the visible NotAnalyzed mark (reason names the top).
+        controller_->setTopScope(top, analysed, excluded);
+        shell_->setProperty("vedit.diagnostics.topScope", top);
+        shell_->setProperty("vedit.diagnostics.topScopeExcluded", excluded.size());
+        if (top.isEmpty()) {
+            return;
+        }
+        shell_->addShellDiagnostic(
+            QCoreApplication::translate("VEdit",
+                                        "%1 file(s) outside the top %2 are not analysed")
+                .arg(excluded.size())
+                .arg(top));
+    }
+
     diagnostics::LintPassRequest buildLintRequest() const
     {
         diagnostics::LintPassRequest request;
-        request.files = projectFiles_;
+        // A lint pass runs only on files whose language has a LINT analyzer.
+        request.files.clear();
+        request.files.reserve(projectFiles_.size());
+        for (const QString &file : projectFiles_) {
+            if (project::LanguageRegistry::instance().supports(file,
+                                                               project::Capability::Lint)) {
+                request.files.append(file);
+            }
+        }
         request.includeDirs = projectIncludeDirs_.isEmpty() ? currentSettings_.includeDirs
                                                             : projectIncludeDirs_;
         request.defines = projectDefines_.isEmpty() ? currentSettings_.defines
@@ -1581,6 +1899,65 @@ public:
         request.veriblePath = state_.toolchain().veribleLint.path;
         request.rulesPath = state_.rulesPath();
         return request;
+    }
+
+    /// RM-9: the save-triggered INCREMENTAL pass - exactly the file that just
+    /// reached disk. Everything else (engine, -I/-D, rules) comes from the same
+    /// builder, so the full and the incremental path cannot disagree about the
+    /// environment.
+    diagnostics::LintPassRequest buildLintRequestFor(const QString &savedFile) const
+    {
+        diagnostics::LintPassRequest request = buildLintRequest();
+        request.files.clear();
+        if (!savedFile.isEmpty()
+            && project::LanguageRegistry::instance().supports(savedFile,
+                                                               project::Capability::Lint)) {
+            request.files.append(savedFile);
+        }
+        return request;
+    }
+
+    /// RM-9 coverage policy: a project OPEN is a FULL analysis. One automatic
+    /// pass over the whole expanded set (directory scan + imported `.f` lists)
+    /// gives every file a verdict - including files the user never opens - and
+    /// skips only dirty buffers (their bytes on disk are stale, so the pass
+    /// would lint the wrong text). Async, single-flight and cancellable like
+    /// every other pass; reactToFinishedPass() presents the automatic result as
+    /// a notice, never a modal dialog.
+    void startFullProjectAnalysis()
+    {
+        if (projectFiles_.isEmpty()) {
+            return;
+        }
+        // RM-9: NEVER cancel a pass that is already running from here. A second
+        // adoption can land while the previous pass (or the user's explicit
+        // Lint Project!) is still running; replacing it here would silently
+        // downgrade an explicit run to an automatic one (no dialog, wrong
+        // presentation). Remember that the current set still needs its full
+        // pass; the pass timer starts it when the running pass is terminal.
+        if (controller_->projectPassRunning()) {
+            fullPassPending_ = true;
+            std::printf("LINT-PROJECT-OPEN deferred (a pass is running)\n");
+            std::fflush(stdout);
+            return;
+        }
+        fullPassPending_ = false;
+        controller_->setOpenFiles(modifiedOpenFiles());
+        controller_->setNextPassAutomatic(true);
+        QString error;
+        if (!controller_->startProjectPass(buildLintRequest(), &error)) {
+            // Startup may race the toolchain/settings resolve. The request is
+            // recorded (A-15) and a save or an explicit run re-runs it; a
+            // status-bar complaint here would blame the user for a pass that
+            // simply had not started yet.
+            std::printf("LINT-PROJECT-OPEN not-started reason='%s'\n", qPrintable(error));
+            std::fflush(stdout);
+            return;
+        }
+        std::printf("LINT-PROJECT-OPEN engine=%s files=%d skipped-open=%lld automatic=1\n",
+                    qPrintable(state_.lintEngineName()), controller_->projectPassFileCount(),
+                    static_cast<long long>(controller_->projectPassSkipped().size()));
+        std::fflush(stdout);
     }
 
     /// item 12: the EXPLICIT run (menu/toolbar). Only this path may present the
@@ -1602,6 +1979,13 @@ public:
             shell_->statusBar()->showMessage(message, 8000);
             return;
         }
+        // RM-9: an explicit click always wins over a running automatic pass
+        // (the project-open pass or a save pass). cancelProjectPass() is a TRUE
+        // stop (release + running cleared), so the explicit pass starts at once
+        // instead of being refused as "already running".
+        if (controller_->projectPassRunning()) {
+            controller_->cancelProjectPass();
+        }
         // F6 ordering fix: the open-file snapshot must be recorded BEFORE the
         // pass starts, or this run lints files the LSP session already covers
         // (the first run used to lint EVERY file because the snapshot was empty).
@@ -1619,12 +2003,20 @@ public:
             return;
         }
         std::printf("LINT-PROJECT engine=%s files=%d lsp-backend=%s include-dirs=%lld "
-                    "defines=%lld skipped-open=%lld automatic=0\n",
+                    "defines=%lld skipped-open=%lld non-source=%lld automatic=0\n",
                     qPrintable(state_.lintEngineName()), controller_->projectPassFileCount(),
                     qPrintable(state_.lspBackendName()),
                     static_cast<long long>(request.includeDirs.size()),
                     static_cast<long long>(request.defines.size()),
-                    static_cast<long long>(controller_->projectPassSkipped().size()));
+                    static_cast<long long>(controller_->projectPassSkipped().size()),
+                    static_cast<long long>(controller_->projectPassNonSource().size()));
+        // RM-11: a request path with no lint analyzer is EXCLUDED and its reason
+        // recorded - never parsed as HDL. This is the observable the regression
+        // reads (a `.f` manifest must never appear here as a linted file).
+        for (const QString &path : controller_->projectPassNonSource()) {
+            std::printf("LINT-SKIP path='%s' reason='no lint analyzer for this file type'\n",
+                        qPrintable(path));
+        }
         std::fflush(stdout);
         shell_->statusBar()->showMessage(
             QCoreApplication::translate("VEdit", "Linting project with %1…")
@@ -1805,6 +2197,8 @@ public:
     void followProjectRoot(const QString &root)
     {
         workspaceRoot_ = root;
+        // RM-9: a pending open-pass belongs to the OLD project.
+        fullPassPending_ = false;
         // N4/nit: the bubble describes a row of the OLD project. It used to stay
         // visible across the switch (the active view does not change, so
         // adoptHoverView() early-returned). Clear the cache and invalidate an
@@ -1825,6 +2219,13 @@ public:
         // new root; the new file-set poll publishes the new one when it lands.
         settings::setCurrentDiscoveredRulesPath(QString());
 #endif
+        // RM-2: drop the OLD project's `-I`/`-D` from the backends NOW. The
+        // next file set is still being expanded, and a session started in that
+        // window (or by a path that never adopts) must fall back to the
+        // tools-page values instead of running with the previous project's
+        // environment. This re-selects the SAME backend/server, so no panel or
+        // controller is recreated.
+        const bool envCleared = state_.setProjectEnvironment(QStringList{}, QStringList{});
         if (controller_->projectPassRunning()) {
             controller_->cancelProjectPass();
         }
@@ -1835,22 +2236,75 @@ public:
         controller_->setFileSet(QStringList{});
         controller_->refresh();
         publishProjectState();
+        publishProjectEnvironment(envCleared);
+        // RM-9: the file tree's "From filelist" group and the status map
+        // describe the OLD project. Publish an empty set with a NEW revision so
+        // no file of the previous root can be drawn under the new one.
+        shell_->setProperty("vedit.diagnostics.projectFiles", QStringList{});
+        shell_->setProperty("vedit.diagnostics.projectFilesRevision",
+                            QVariant::fromValue<qulonglong>(++projectSetRevision_));
         std::printf("PROJECT-ROOT-CHANGED root='%s' files=0 (waiting for the new file set)\n",
                     qPrintable(root));
+        std::printf("PROJECT-ROOT-ENV root='%s' source=cleared include-dirs=%d defines=%d env=''\n",
+                    qPrintable(root), 0, 0);
         std::fflush(stdout);
     }
 
-    /// The new root's file set arrived: re-pin the request AND the LSP session.
+    /// The new root's file set arrived: re-pin the request, the backends' `-I`/`-D`
+    /// and the LSP session. The environment is re-pinned BEFORE `setFileSet()`,
+    /// because that call starts the session the switch exists to correct.
     void adoptProjectFiles(const QStringList &files, const QStringList &includeDirs,
                            const QStringList &defines)
     {
         setProjectFiles(files, includeDirs, defines);
+        const bool envPinned = state_.setProjectEnvironment(includeDirs, defines);
         controller_->setConfiguration(configuredLspPath(), workspaceRoot_, state_.rulesPath());
         controller_->setFileSet(files);
         publishProjectState();
+        publishProjectEnvironment(envPinned);
+        QStringList argv;
+        for (const QString &directory : includeDirs) {
+            argv.append(QStringLiteral("-I%1").arg(directory));
+        }
+        for (const QString &define : defines) {
+            argv.append(QStringLiteral("-D%1").arg(define));
+        }
         std::printf("PROJECT-ROOT-FILES root='%s' files=%d\n", qPrintable(workspaceRoot_),
                     static_cast<int>(files.size()));
+        std::printf("PROJECT-ROOT-ENV root='%s' source=project pinned=%d include-dirs=%d "
+                    "defines=%d env='%s'\n",
+                    qPrintable(workspaceRoot_), envPinned ? 1 : 0,
+                    static_cast<int>(state_.projectIncludeDirs().size()),
+                    static_cast<int>(state_.projectDefines().size()),
+                    qPrintable(argv.join(QLatin1Char(' '))));
         std::fflush(stdout);
+        // RM-9: publish the EXPANDED project set (directory scan + every
+        // imported `.f` list). It is the SAME set the pass lints and the LSP
+        // session opens; the file tree renders the members that live outside its
+        // directory scan in a "From filelist" group. One publisher, one
+        // revision, so no consumer can read a half-updated set.
+        shell_->setProperty("vedit.diagnostics.projectFiles", files);
+        shell_->setProperty("vedit.diagnostics.projectFilesRevision",
+                            QVariant::fromValue<qulonglong>(++projectSetRevision_));
+        // RM-9 coverage policy: a project OPEN is a full analysis, so every file
+        // of the set (not only the opened one) gets a verdict.
+        startFullProjectAnalysis();
+    }
+
+    /// The environment the backends will hand the next session (observable, so
+    /// the switch regression can assert A->B without reading implementation).
+    void publishProjectEnvironment(bool pinned)
+    {
+        QVariantMap environment;
+        environment.insert(QStringLiteral("root"), workspaceRoot_);
+        environment.insert(QStringLiteral("includeDirs"), state_.projectIncludeDirs());
+        environment.insert(QStringLiteral("defines"), state_.projectDefines());
+        environment.insert(QStringLiteral("settingsPath"), settingsPath_);
+        // `pinned` is the RESULT of pushing these values through the backend's
+        // selectBackend/selectEngine seam - the call that writes the -I/-D the
+        // next session is built from. False = this build has no LSP backend.
+        environment.insert(QStringLiteral("pinned"), pinned);
+        shell_->setProperty("vedit.diagnostics.projectEnv", environment);
     }
 
     void publishProjectState()
@@ -1862,6 +2316,13 @@ public:
                        projectFiles_.isEmpty() && !workspaceRoot_.isEmpty());
         project.insert(QStringLiteral("openFiles"), allOpenFiles());
         project.insert(QStringLiteral("modifiedOpenFiles"), modifiedOpenFiles());
+        // RM-2: the file set and the `-I`/`-D` the lint/LSP side actually holds
+        // for it - the panel and the analysis expand the same inputs now.
+        project.insert(QStringLiteral("includeDirs"), projectIncludeDirs_);
+        project.insert(QStringLiteral("defines"), projectDefines_);
+        // RM-11: what the last lint request excluded because this build has no
+        // analyzer for that file type (a `.f` manifest, a note, a build script).
+        project.insert(QStringLiteral("nonSourceSkipped"), controller_->projectPassNonSource());
         shell_->setProperty("vedit.diagnostics.project", project);
     }
 
@@ -2170,9 +2631,54 @@ private:
         // list that predates the invalidation it just observed.
         shell_->setProperty("vedit.diagnostics.upperFiles", controller_->upperLayerFiles());
 
+        // RM-10: watch EVERY pane's view (not only the active one) so a split
+        // pane answers the hover; the inner KatePart widget is created lazily,
+        // so ChildAdded re-enters the same install.
+        if (shell_->editorArea() != nullptr) {
+            for (vedit::app::EditorPane *pane : shell_->editorArea()->panes()) {
+                if (pane == nullptr) {
+                    continue;
+                }
+                if (auto *view = qobject_cast<KTextEditor::View *>(pane->editorWidget())) {
+                    watchViewTree(view);
+                }
+            }
+        }
         // item 9: follow the ACTIVE view for the diagnostic hover. A tab switch
-        // RE-PARENTS the popup; a destroyed view clears the cache.
-        adoptHoverView(activeView());
+        // RE-PARENTS the popup; a destroyed view clears the cache. A bubble
+        // anchored to a view of ANOTHER pane is a split-pane hover: the poll
+        // must not steal it (that would hide it within 400 ms).
+        KTextEditor::View *active = activeView();
+        auto *popupView = qobject_cast<KTextEditor::View *>(
+            hoverPopup_.isNull() ? nullptr : hoverPopup_->parentWidget());
+        const bool splitPaneHover = hoverShowsDiagnostic_ && popupView != nullptr
+            && popupView != active && paneForView(popupView) != activePane();
+        if (!splitPaneHover) {
+            adoptHoverView(active);
+        }
+        // RM-10: keep the bubble honest when the text moves under a stationary
+        // mouse (keyboard scrolling). The cached view point must still resolve to
+        // the cached row; otherwise the bubble is hidden. A STALE row keeps the
+        // N4 observable path (rows cleared elsewhere) instead of hiding silently.
+        if (hoverShowsDiagnostic_ && !hoverPopup_.isNull() && hoverPopup_->isVisible()) {
+            if (popupView == nullptr || popupView->document() == nullptr) {
+                hideHoverPopup();
+            } else if (!hoverRowIsStale()) {
+                const KTextEditor::Cursor at = popupView->coordinatesToCursor(hoverViewportPoint_);
+                const diagnostics::DiagnosticEntry *entry =
+                    diagnostics::diagnosticAt(
+                        controller_->mergedDiagnosticsForFile(hoverFilePath_), at.line(),
+                        at.column());
+                const QString rule = entry == nullptr
+                    ? QString()
+                    : (entry->code.isEmpty() ? entry->source : entry->code);
+                if (entry == nullptr || rule != hoverRule_ || entry->line != hoverLine_) {
+                    hideHoverPopup();
+                } else {
+                    placePopup(hoverPopup_, hoverViewportPoint_); // scroll-safe
+                }
+            }
+        }
         publishHoverState();
         publishProjectState();
     }
@@ -2183,15 +2689,52 @@ protected:
     /// hover is answered from the rows the editor already shows.
     bool eventFilter(QObject *watched, QEvent *event) override
     {
-        if (watched == hoverView_.data() && event->type() == QEvent::MouseMove) {
+        if (event == nullptr) {
+            return QObject::eventFilter(watched, event);
+        }
+        if (event->type() == QEvent::ChildAdded) {
+            // RM-10: KatePart's inner KateViewInternal (the REAL mouse target)
+            // can appear after the view; install on the new widget subtree.
+            auto *child = static_cast<QChildEvent *>(event)->child();
+            if (child != nullptr && child->isWidgetType()) {
+                watchViewTree(static_cast<QWidget *>(child));
+            }
+            return QObject::eventFilter(watched, event);
+        }
+        auto *widget = qobject_cast<QWidget *>(watched);
+        // Never hijack the popup's own mouse (the :Fix」 button must stay
+        // clickable): a move over the bubble is not a new hover.
+        if (widget != nullptr && !hoverPopup_.isNull()
+            && (widget == hoverPopup_.data() || hoverPopup_->isAncestorOf(widget))) {
+            return QObject::eventFilter(watched, event);
+        }
+        KTextEditor::View *view = widget != nullptr ? viewForWidget(widget) : nullptr;
+        if (view == nullptr) {
+            return QObject::eventFilter(watched, event);
+        }
+        if (event->type() == QEvent::MouseMove) {
             auto *move = static_cast<QMouseEvent *>(event);
-            handleDiagnosticHover(qobject_cast<KTextEditor::View *>(hoverView_.data()),
-                                  move->pos());
-        } else if (watched == hoverView_.data() && event->type() == QEvent::Leave) {
+            // RM-10: QMouseEvent::pos() is in the RECEIVING widget's coordinates
+            // (KateViewInternal), NOT the view's: map it before resolving the
+            // cursor. This is the point the old filter never saw at all.
+            const QPoint viewPoint = widget == static_cast<QWidget *>(view)
+                                         ? move->pos()
+                                         : widget->mapTo(view, move->pos());
+            handleDiagnosticHover(view, viewPoint);
+        } else if (event->type() == QEvent::Wheel) {
+            // A scroll moves the text under the bubble: never leave it dangling.
+            if (hoverShowsDiagnostic_) {
+                hideHoverPopup();
+                publishHoverState();
+            }
+        } else if (event->type() == QEvent::Leave && watched == hoverView_.data()) {
             if (hoverShowsDiagnostic_) {
                 hideHoverPopup();
             }
         }
+        // ALWAYS false: the filter OBSERVES, it never consumes. Normal selection,
+        // KTextEditor's own tooltips and Ctrl+click keep working from the same
+        // point inside the squiggle.
         return QObject::eventFilter(watched, event);
     }
 
@@ -2202,6 +2745,7 @@ private:
     BackendSwitchState state_;
     diagnostics::ToolchainReport toolchain_;
     QString workspaceRoot_;
+    QString settingsPath_; ///< the tools-page store this lane follows
     std::function<void()> restartAnalysis_;
     DiagnosticsBackendSettings currentSettings_;
 
@@ -2222,6 +2766,11 @@ private:
     QPointer<diagnostics::DiagnosticHoverPopup> hoverPopup_;
     QPointer<QObject> hoverView_;
     QMetaObject::Connection hoverViewDestroyed_;
+    QMetaObject::Connection hoverDocumentEdited_;
+    /// RM-10: every widget the hover filter is installed on (the pane views and
+    /// their descendants, incl. KatePart's inner KateViewInternal). QPointer so a
+    /// destroyed tab never leaves a dangling entry to re-install on.
+    QList<QPointer<QWidget>> hoverWatched_;
     bool hoverShowsDiagnostic_ = false;
     bool hoverProbePending_ = false;
     bool hoverDiagnosticFixable_ = false;
@@ -2244,6 +2793,13 @@ private:
     QStringList projectFiles_;
     QStringList projectIncludeDirs_;
     QStringList projectDefines_;
+    /// RM-9: bumps every time `vedit.diagnostics.projectFiles` changes, so the
+    /// file tree re-reads the set only when it actually moved.
+    quint64 projectSetRevision_ = 0;
+    /// RM-9: a full project-open pass was requested while another pass was
+    /// running; the pass timer starts it when that one is terminal. Never
+    /// replaces an explicit Lint Project with an automatic pass.
+    bool fullPassPending_ = false;
 
 #if defined(VEDIT_DIAGNOSTICS_HAVE_FFI)
     SettingsWatcher *watcher_ = nullptr;
@@ -2346,29 +2902,45 @@ void installDiagnostics(vedit::app::ApplicationShell &shell, const IntegrationOp
     auto *wiring = new BackendWiring(
         &shell, &shell, controller, lspRaw, slangRaw, toolchain, projectRoot, settingsPath,
         [watcher, controller]() { watcher->reanalyzeNow(); });
+    // RM-17: install the top-scope sink once the wiring exists. The module tree
+    // publishes its derived scope from the SAME catalog run that produced its
+    // tree (header-only seam: no link edge between the two lanes).
+    vedit::workspace::topScopeSink() =
+        [wiring](const QString &top, const QStringList &analysed,
+                 const QStringList &excluded) {
+            wiring->applyTopScope(top, analysed, excluded);
+        };
 
 #if defined(VEDIT_DIAGNOSTICS_HAVE_FFI)
-    auto *poller = new ProjectFileSetPoller(
-        &shell, controller, projectRoot,
-        [wiring](const QStringList &files, const QStringList &includeDirs,
-                 const QStringList &defines) {
-            // The same sink the root-switch poller uses: one setFileSet per
-            // file set, not the sink's call plus the poller's second one.
-            wiring->adoptProjectFiles(files, includeDirs, defines);
-        });
+    // RM-2: ONE expansion factory for both the install-time poll and every
+    // root switch. It reads the panel's inputs from the shell-property seam at
+    // call time, so the poller for root B expands with B's imported `.f` lists,
+    // B's variables and the settings store - exactly what the project panel
+    // uses. The settings-path capture is BY VALUE: the factory outlives
+    // `installDiagnostics()` through the root-change connection.
+    const auto makeProjectPoller = [&shell, controller, settingsPath,
+                                    wiring](const QString &root) {
+        const ProjectExpansionInputs inputs =
+            projectExpansionInputs(shell, root, settingsPath);
+        return new ProjectFileSetPoller(
+            &shell, &shell, controller, root, inputs,
+            [wiring](const QStringList &files, const QStringList &includeDirs,
+                     const QStringList &defines) {
+                // The same sink the root-switch poller uses: one setFileSet per
+                // file set, not the sink's call plus the poller's second one.
+                wiring->adoptProjectFiles(files, includeDirs, defines);
+            });
+    };
+    auto *poller = makeProjectPoller(projectRoot);
     // HIGH (review finding 3): the lane must FOLLOW Open Folder. The file set,
-    // the session root and every upper-layer row are re-pinned; the old poller
-    // (with a possibly in-flight job) is destroyed and replaced for the new root.
+    // the session root, the backends' -I/-D and every upper-layer row are
+    // re-pinned; the old poller (with a possibly in-flight job) is destroyed and
+    // replaced for the new root.
     QObject::connect(&shell, &vedit::app::ApplicationShell::projectRootChanged, &shell,
-                     [&shell, controller, wiring, poller](const QString &root) mutable {
+                     [wiring, poller, makeProjectPoller](const QString &root) mutable {
                          wiring->followProjectRoot(root);
                          delete poller;
-                         poller = new ProjectFileSetPoller(
-                             &shell, controller, root,
-                             [wiring](const QStringList &files, const QStringList &includeDirs,
-                                      const QStringList &defines) {
-                                 wiring->adoptProjectFiles(files, includeDirs, defines);
-                             });
+                         poller = makeProjectPoller(root);
                      });
     (void)poller;
 #else
@@ -2468,7 +3040,12 @@ void installDiagnostics(vedit::app::ApplicationShell &shell, const IntegrationOp
         panelSpec.id = QStringLiteral("view.panel.diagnostics");
         panelSpec.text = QCoreApplication::translate("VEdit", "&Diagnostics");
         panelSpec.menu = QStringLiteral("view");
-        panelSpec.defaultShortcut = QKeySequence(QStringLiteral("Ctrl+Alt+D"));
+        // RM-5c (review M1): Ctrl+Alt+D is KDE's "show desktop" global shortcut
+        // and is consumed by the desktop before the application sees it, so the
+        // shipped default must be a sequence neither the desktop nor KTextEditor
+        // claims. Static on purpose: the effective binding is one value
+        // everywhere (manual, Shortcuts page, binding dump), not a rule.
+        panelSpec.defaultShortcut = QKeySequence(QStringLiteral("Ctrl+Alt+Shift+D"));
         panelSpec.order = 160;
         shell.commands()->add(panelSpec);
         shell.commands()->setHandler(panelSpec.id, [&shell]() {
@@ -2483,6 +3060,35 @@ void installDiagnostics(vedit::app::ApplicationShell &shell, const IntegrationOp
         shell.commands()->add(reparseSpec);
         shell.commands()->setHandler(reparseSpec.id, [controller]() { controller->reparse(); });
     }
+}
+
+/// RM-9: the testable seam to the controller that installDiagnostics() created
+/// (see the header). The holder is a child of the shell; the controller itself
+/// is owned by it, exactly as the panel sees it.
+diagnostics::DiagnosticsController *diagnosticsControllerForShell(
+    const vedit::app::ApplicationShell &shell)
+{
+    // ControllerHolder deliberately carries no Q_OBJECT (it is a lifetime
+    // holder), so findChild<T>() cannot be instantiated for it. The shell's
+    // direct children contain it; identify it by type instead.
+    for (QObject *child : shell.children()) {
+        if (auto *holder = dynamic_cast<ControllerHolder *>(child)) {
+            return holder->controller();
+        }
+    }
+    return nullptr;
+}
+
+} // namespace vedit::workspace
+
+#else
+
+namespace vedit::workspace {
+
+diagnostics::DiagnosticsController *diagnosticsControllerForShell(
+    const vedit::app::ApplicationShell &)
+{
+    return nullptr;
 }
 
 } // namespace vedit::workspace

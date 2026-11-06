@@ -244,6 +244,64 @@ void testStatusNames()
               == 0);
 }
 
+// A target that explains its refusal, like the product's editor target does.
+class ReasonTarget final : public vedit::workspace::jump::IJumpTarget {
+public:
+    bool jumpTo(const QString &, int, int) override { return false; }
+    QString lastError() const override { return reason; }
+
+    QString reason = QStringLiteral("cannot open /tmp/x.sv: not a regular file");
+};
+
+/// RM-4: a refusal must say WHY, and that WHY must survive the registry. Before
+/// this contract, `Rejected` was all a panel could see, so every distinct cause
+/// (missing file, no editor view, a cursor that did not land) looked identical.
+void testRefusalReason()
+{
+    Registry &registry = Registry::instance();
+    registry.reset();
+
+    // (1) A target that explains itself: its sentence is the reason.
+    ReasonTarget explained;
+    vedit::workspace::jump::setTarget(&explained);
+    const JumpResult refused = vedit::workspace::jump::jumpTo(QStringLiteral("/tmp/x.sv"), 4, 2);
+    std::printf("REASON target='%s'\n", refused.reason.toUtf8().constData());
+    check("reason.status", refused.status == JumpStatus::Rejected);
+    checkString("reason.target-sentence", refused.reason, explained.reason);
+    checkString("reason.last-result", registry.lastResult().reason, explained.reason);
+
+    // (2) A target that cannot explain itself still yields a usable sentence.
+    registry.reset();
+    PlainTarget silent;
+    silent.accept = false;
+    vedit::workspace::jump::setTarget(&silent);
+    const JumpResult unexplained = vedit::workspace::jump::jumpTo(QStringLiteral("a.v"), 1, 1);
+    check("reason.default-non-empty", !unexplained.reason.isEmpty());
+    checkString("reason.default-sentence", unexplained.reason,
+                QStringLiteral("the editor target refused the jump without a reason"));
+
+    // (3) NoTarget and InvalidRequest carry their own explanation.
+    registry.reset();
+    const JumpResult noTarget = vedit::workspace::jump::jumpTo(QStringLiteral("a.v"), 1, 1);
+    check("reason.no-target-status", noTarget.status == JumpStatus::NoTarget);
+    check("reason.no-target-non-empty", !noTarget.reason.isEmpty());
+    check("reason.no-target-names-the-cause",
+          noTarget.reason.contains(QStringLiteral("no jump target")));
+
+    vedit::workspace::jump::setTarget(&silent);
+    silent.accept = true;
+    const JumpResult badColumn = vedit::workspace::jump::jumpTo(QStringLiteral("a.v"), 1, 0);
+    check("reason.invalid-status", badColumn.status == JumpStatus::InvalidRequest);
+    check("reason.invalid-non-empty", !badColumn.reason.isEmpty());
+    check("reason.invalid-names-the-position",
+          badColumn.reason.contains(QStringLiteral("column=0")));
+
+    // (4) A delivered jump has no reason to report.
+    const JumpResult delivered = vedit::workspace::jump::jumpTo(QStringLiteral("a.v"), 2, 3);
+    check("reason.delivered-status", delivered.status == JumpStatus::Delivered);
+    check("reason.delivered-empty", delivered.reason.isEmpty());
+}
+
 } // namespace
 
 int main(int argc, char **argv)
@@ -253,6 +311,7 @@ int main(int argc, char **argv)
     testNoTargetNoOp();
     testInvalidRequest();
     testDelivery();
+    testRefusalReason();
     testClearSemantics();
     testDestroyedQObjectTarget();
     testStatusNames();

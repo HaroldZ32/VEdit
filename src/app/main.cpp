@@ -12,6 +12,8 @@
 #include "crash_reporter.h"
 
 #include "command_registry.h"
+#include "desktop_shortcuts.h"
+#include "file_dialog_filters.h"
 #include "editor_area.h"
 #include "i18n.h"
 #include "integration.h"
@@ -482,6 +484,24 @@ int runSelfCheck()
         const QStringList duplicates = laneShell->commands()->duplicateShortcuts();
         check("commands.no-duplicate-shortcuts", duplicates.isEmpty(),
               duplicates.join(QStringLiteral(" | ")));
+        // RM-5c (review M1): a shipped default that a DESKTOP claims globally is
+        // a dead key before the application sees it (the WM consumes it). This
+        // runs on the LANE-INSTALLED registry, so it covers commands registered
+        // outside src/app (e.g. view.panel.diagnostics from the diagnostics lane)
+        // — the bare shell in the shortcut regression cannot see those. Every
+        // sequence the action carries is checked, extras included.
+        QStringList desktopGlobal;
+        for (const QString &id : laneShell->commands()->ids()) {
+            for (const QKeySequence &sequence : laneShell->commands()->effectiveShortcuts(id)) {
+                const QString owner = vedit::app::desktopGlobalShortcutOwner(sequence);
+                if (!owner.isEmpty()) {
+                    desktopGlobal.append(QStringLiteral("%1: %2 (%3)").arg(
+                        id, sequence.toString(QKeySequence::PortableText), owner));
+                }
+            }
+        }
+        check("commands.no-desktop-global-shortcuts", desktopGlobal.isEmpty(),
+              desktopGlobal.join(QStringLiteral(" | ")));
 
         // U3r2-F2: the editor context menu's display fallback and the registry
         // default must be ONE value. The menu entry and the toolbar button are
@@ -774,9 +794,17 @@ int runSelfCheck()
     // and the signal fires for every open seam a panel uses.
     {
         const QString filter = vedit::app::openFileDialogFilter();
-        check("open.filter.filelist",
-              filter.contains(QStringLiteral("*.f")) && filter.contains(QStringLiteral("*.F"))
-                  && filter.contains(QStringLiteral("*.flist")),
+        // RM-16 (requirements-driven assertion change): the filelist set is the
+        // one the parser recognises - the `f` extension, case-insensitively (see
+        // src/common/file_dialog_filters.h and crates/vd-config/src/project.rs).
+        // The old check demanded the GUESSED `*.flist` as well; that glob is gone
+        // from every filter, and a guessed extension reappearing is a failure now.
+        bool hasSharedFilelistGlobs = !filter.isEmpty();
+        for (const QString &glob : vedit::common::filelistGlobs()) {
+            hasSharedFilelistGlobs = hasSharedFilelistGlobs && filter.contains(glob);
+        }
+        check("open.filter.filelist", hasSharedFilelistGlobs, filter);
+        check("open.filter.no-guessed-flist", !filter.contains(QStringLiteral("*.flist")),
               filter);
         check("open.filter.keeps-existing-types",
               filter.contains(QStringLiteral("*.v")) && filter.contains(QStringLiteral("*.sv"))

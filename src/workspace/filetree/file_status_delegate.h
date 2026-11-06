@@ -18,6 +18,8 @@
 // merged view the editor and the panel read; the delegate never rescans the
 // project.
 
+#include "file_status.h" // src/common: the ONE status vocabulary (RM-9)
+
 #include <QColor>
 #include <QStyledItemDelegate>
 
@@ -27,12 +29,16 @@ namespace vedit::workspace {
 
 class FileStatusDotDelegate final : public QStyledItemDelegate {
 public:
-    /// Status values of FileTreeModel::FileStatusRole.
+    /// Status values of FileTreeModel::FileStatusRole. The VALUES are the shared
+    /// vocabulary (src/common/file_status.h); these names only keep the column's
+    /// int API readable at the call sites. NotAnalyzed (4) is a hollow ring with
+    /// the meaning in the tooltip - "no mark" and "clean" must not look alike.
     enum Status {
-        Unknown = 0,
-        Error = 1,
-        Warning = 2,
-        Clean = 3,
+        Unknown = static_cast<int>(vedit::common::FileStatus::Unknown),
+        Error = static_cast<int>(vedit::common::FileStatus::Error),
+        Warning = static_cast<int>(vedit::common::FileStatus::Warning),
+        Clean = static_cast<int>(vedit::common::FileStatus::Clean),
+        NotAnalyzed = static_cast<int>(vedit::common::FileStatus::NotAnalyzed),
     };
 
     explicit FileStatusDotDelegate(QObject *parent = nullptr);
@@ -41,8 +47,8 @@ public:
                const QModelIndex &index) const override;
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 
-    /// The dot colour of one status (transparent for Unknown). The evidence
-    /// reads exactly this function.
+    /// The dot colour of one status (transparent for Unknown). One definition:
+    /// vedit::common::fileStatusColor(). The evidence reads this function.
     static QColor dotColor(int status);
 
     /// The geometry of the last painted dot and its colour - the self-test

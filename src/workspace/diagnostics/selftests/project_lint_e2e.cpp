@@ -153,6 +153,19 @@ int main(int argc, char **argv)
     }
     auto *controller = panel->controller();
 
+    // RM-9: a project OPEN now starts an AUTOMATIC full pass as soon as the file
+    // set is adopted. Wait until the set ARRIVED and every automatic pass it
+    // started (including one deferred by the pass timer) is terminal; only then
+    // is the explicit click under test certainly the NEXT pass. Otherwise this
+    // harness mistakes the automatic open pass for its explicit one
+    // (automatic=1, no dialog - the pre-RM-9 shape).
+    waitUntil([controller]() {
+        return !controller->projectFiles().isEmpty() && !controller->projectPassRunning();
+    }, 120000);
+    QThread::msleep(700); // let a deferred pass timer fire on a quiet tick
+    QCoreApplication::processEvents();
+    waitUntil([controller]() { return !controller->projectPassRunning(); }, 120000);
+
     // The project file set arrives asynchronously (ProjectFileSetPoller). Try the
     // explicit run until a pass actually starts; a first attempt before the set
     // arrives only reports "No project file set".
@@ -181,11 +194,10 @@ int main(int argc, char **argv)
         return 0;
     }
     // Wait for that pass to reach a terminal phase AND for the 300 ms presenter
-    // poll to act on it.
-    const quint64 explicitSerial = controller->projectPassSerial();
-    waitUntil([controller, explicitSerial]() {
-        return !controller->projectPassRunning() && controller->projectPassSerial() != explicitSerial;
-    }, 120000);
+    // poll to act on it. The explicit pass may already have finished above, so
+    // the terminal condition is just "not running" plus the dialog wait (the
+    // presenter reacts to the terminal SERIAL, not to a snapshot we hold).
+    waitUntil([controller]() { return !controller->projectPassRunning(); }, 120000);
     waitUntil([&shell]() { return dialogsOf(*shell) > 0; }, 5000);
 
     const int dialogsAfterExplicit = dialogsOf(*shell);

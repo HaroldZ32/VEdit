@@ -36,6 +36,11 @@ public:
     /// Explicit slang binary; empty lets the Rust service resolve it
     /// (bundled > local checkout > PATH > env, T7/T82).
     void setSlangBinary(const QString &binary);
+    /// RM-17: the top-level module the next run elaborates from ("" = Auto).
+    void setTop(const QString &top);
+    QString top() const;
+    /// The project file set the last run was started with (absolute).
+    QStringList lastFileSet() const;
 
     /// Starts (or restarts) the chain: project file set -> module catalog.
     void start(const QString &projectRoot);
@@ -68,6 +73,8 @@ private:
     int ticks_ = 0;
     bool catalogPhase_ = false;
     QString projectRoot_;
+    QString top_;
+    QStringList lastFileSet_;
     QString stateDirectory_;
     QString slangBinary_;
     int fileCount_ = 0;

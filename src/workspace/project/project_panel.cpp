@@ -1,5 +1,7 @@
 #include "project_panel.h"
 
+#include "file_dialog_filters.h" // src/common: the ONE file-dialog filter table (RM-16)
+#include "file_status.h" // src/common: the ONE status vocabulary (RM-9)
 #include "project_model.h"
 #include "project_variables_dialog.h"
 
@@ -8,14 +10,23 @@
 #endif
 
 #include <QAbstractItemView>
+#include <QApplication>
 #include <QFileDialog>
+#include <QHelpEvent>
 #include <QMap>
 #include <QFont>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QListWidget>
+#include <QPainter>
+#include <QPen>
 #include <QPushButton>
 #include <QStringLiteral>
+#include <QStyledItemDelegate>
+#include <QStyle>
+#include <QStyleOptionViewItem>
+#include <QTimer>
+#include <QToolTip>
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QCoreApplication>
@@ -53,6 +64,100 @@ QStringList listTexts(const QListWidget *list)
 }
 
 } // namespace
+
+/// RM-9: the status mark before a file name in the Project panel's FILES list
+/// (the only place a filelist-only file can be listed). The mark and its colour
+/// come from src/common/file_status.h - the same vocabulary the file tree uses.
+/// The status is asked AT PAINT TIME for the visible rows only; a revision bump
+/// therefore costs one viewport update, never a 1176-item walk.
+class FileStatusListDelegate final : public QStyledItemDelegate {
+public:
+    explicit FileStatusListDelegate(const ProjectPanel *panel, QObject *parent = nullptr)
+        : QStyledItemDelegate(parent)
+        , panel_(panel)
+    {
+    }
+
+    void paint(QPainter *painter, const QStyleOptionViewItem &option,
+               const QModelIndex &index) const override
+    {
+        const int status = panel_ != nullptr ? panel_->fileStatusAt(index.row()) : 0;
+        if (status <= 0) {
+            QStyledItemDelegate::paint(painter, option, index);
+            return;
+        }
+        QStyleOptionViewItem opt = option;
+        initStyleOption(&opt, index);
+        QStyle *style = opt.widget != nullptr ? opt.widget->style() : QApplication::style();
+        const QString text = opt.text;
+
+        // Background / selection without the text, then the mark, then the text.
+        QStyleOptionViewItem background = opt;
+        background.text.clear();
+        style->drawControl(QStyle::CE_ItemViewItem, &background, painter, opt.widget);
+
+        const QRect textRect =
+            style->subElementRect(QStyle::SE_ItemViewItemText, &opt, opt.widget);
+        constexpr int dotDiameter = 9;
+        constexpr int dotGap = 4;
+        const int centreY = opt.rect.center().y();
+        const QRect dotRect(textRect.left() + 1, centreY - dotDiameter / 2, dotDiameter,
+                            dotDiameter);
+        const QColor colour = vedit::common::fileStatusColor(status);
+        painter->save();
+        painter->setRenderHint(QPainter::Antialiasing, true);
+        if (vedit::common::fileStatusIsNotAnalyzed(status)) {
+            // Hollow grey ring: in the analysed set, no trustworthy verdict yet
+            // (queued / pass running) or excluded (dirty buffer). The tooltip
+            // carries the meaning - the user must never mistake it for clean.
+            QPen pen(colour);
+            pen.setWidthF(2.0); // opaque enough for the ring to be sampled by the evidence
+            painter->setPen(pen);
+            painter->setBrush(Qt::NoBrush);
+            painter->drawEllipse(dotRect);
+        } else {
+            painter->setPen(Qt::NoPen);
+            painter->setBrush(colour);
+            painter->drawEllipse(dotRect);
+        }
+        painter->restore();
+
+        QRect shifted = textRect;
+        shifted.setLeft(dotRect.right() + dotGap + 1);
+        if (shifted.width() > 0) {
+            const QString elided =
+                opt.fontMetrics.elidedText(text, opt.textElideMode, shifted.width());
+            const QPalette::ColorRole role = (opt.state & QStyle::State_Selected)
+                                                 ? QPalette::HighlightedText
+                                                 : QPalette::Text;
+            style->drawItemText(painter, shifted, opt.displayAlignment | Qt::AlignVCenter,
+                                opt.palette, (opt.state & QStyle::State_Enabled) != 0, elided,
+                                role);
+        }
+    }
+
+    bool helpEvent(QHelpEvent *event, QAbstractItemView *view,
+                   const QStyleOptionViewItem &option, const QModelIndex &index) override
+    {
+        if (event != nullptr && event->type() == QEvent::ToolTip && view != nullptr) {
+            const int status = panel_ != nullptr ? panel_->fileStatusAt(index.row()) : 0;
+            QString tip = index.data(Qt::DisplayRole).toString();
+            if (status > 0) {
+                tip += QLatin1String("\n") + vedit::common::fileStatusHint(status);
+            }
+            const QString path = index.data(Qt::UserRole).toString();
+            if (!path.isEmpty()) {
+                tip += QLatin1String("\n") + path;
+            }
+            QToolTip::showText(event->globalPos(), tip, view);
+            return true;
+        }
+        return QStyledItemDelegate::helpEvent(event, view, option, index);
+    }
+
+private:
+    const ProjectPanel *panel_ = nullptr;
+};
 
 ProjectPanel::ProjectPanel(ProjectModel *model, QWidget *parent)
     : QWidget(parent)
@@ -113,6 +218,43 @@ ProjectPanel::ProjectPanel(ProjectModel *model, QWidget *parent)
 
     fileList_ = makeList(this, QStringLiteral("project-file-list"));
     fileList_->setToolTip(QCoreApplication::translate("VEdit", "Double-click a file to open it (AC-7.4)"));
+    // RM-9: the Files list is the only surface that can list a filelist-only
+    // file, so it must show the same status mark as the tree.
+    statusDelegate_ = new FileStatusListDelegate(this, this);
+    fileList_->setItemDelegate(statusDelegate_);
+    // Default production source: the diagnostics lane publishes the map and its
+    // revision on the top-level window (the shell), exactly like the file tree
+    // reads it. No link dependency, and project_integration.cpp is untouched.
+    setFileStatusSource(
+        [this](const QString &path) -> int {
+            QWidget *top = window();
+            if (top == nullptr) {
+                return 0;
+            }
+            const QVariantMap map = top->property("vedit.diagnostics.fileStatus").toMap();
+            return map.value(path, 0).toInt();
+        },
+        [this]() -> quint64 {
+            QWidget *top = window();
+            return top != nullptr
+                       ? top->property("vedit.diagnostics.viewRevision").toULongLong()
+                       : 0;
+        });
+    // A revision bump only repaints the viewport: the delegate asks the source
+    // per painted row, so nothing walks the 1176 items.
+    statusTimer_ = new QTimer(this);
+    statusTimer_->setInterval(500);
+    connect(statusTimer_, &QTimer::timeout, this, [this]() {
+        const quint64 revision = statusRevisionSource_ ? statusRevisionSource_() : 0;
+        if (revision == statusRevision_) {
+            return;
+        }
+        statusRevision_ = revision;
+        if (fileList_ != nullptr) {
+            fileList_->viewport()->update();
+        }
+    });
+    statusTimer_->start();
     layout->addWidget(fileList_, 3);
 
     includeHeader_ = new QLabel(QCoreApplication::translate("VEdit", "Include dirs (-I) (0)"), this);
@@ -285,7 +427,7 @@ bool ProjectPanel::promptForMissingVariables()
         return false;
     }
     const QMap<QString, QString> known = ProjectVariablesDialog::parseTable(model_->variables());
-    ProjectVariablesDialog dialog(names, known, this);
+    ProjectVariablesDialog dialog(variableRowNames(), known, this);
     if (dialog.exec() != QDialog::Accepted) {
         setStatus(QCoreApplication::translate("VEdit", "Import completed with %1 unresolved variable(s); the affected "
                                  ".f lines stay listed below")
@@ -293,12 +435,7 @@ bool ProjectPanel::promptForMissingVariables()
                   true);
         return false;
     }
-    QStringList updated = model_->variables();
-    updated.append(dialog.variableTable());
-    model_->setVariables(updated); // persists the table and re-expands
-    setStatus(QCoreApplication::translate("VEdit", "Saved %1 variable(s); re-expanding").arg(dialog.variableTable().size()),
-              false);
-    updateUi();
+    applyVariableTable(dialog.variableTable()); // persists the table and re-expands
     return true;
 }
 
@@ -312,31 +449,61 @@ bool ProjectPanel::editVariables()
         return false;
     }
     const QMap<QString, QString> known = ProjectVariablesDialog::parseTable(model_->variables());
-    QStringList names = known.keys();
-    for (const QString &missing : model_->missingVariables()) {
-        if (!names.contains(missing)) {
-            names.append(missing);
-        }
-    }
-    if (names.isEmpty()) {
-        setStatus(QCoreApplication::translate("VEdit", "No variables are used by this project yet"), false);
-        return false;
-    }
-    ProjectVariablesDialog dialog(names, known, this);
+    // RM-3: an EMPTY table still opens the dialog — adding a variable is the
+    // whole point, so "the project uses none yet" is not a reason to refuse.
+    ProjectVariablesDialog dialog(variableRowNames(), known, this);
     if (dialog.exec() != QDialog::Accepted) {
         return false;
     }
-    QStringList merged = model_->variables();
-    merged.append(dialog.variableTable());
-    model_->setVariables(merged);
-    setStatus(QCoreApplication::translate("VEdit", "Project variables updated; re-expanding"), false);
-    updateUi();
+    applyVariableTable(dialog.variableTable());
     return true;
 }
 
 void ProjectPanel::onEditVariablesRequested()
 {
     editVariables();
+}
+
+QStringList ProjectPanel::variableRowNames() const
+{
+    QStringList names;
+    if (model_ == nullptr) {
+        return names;
+    }
+    // Known names first (the table order), then the names the project still
+    // needs. The dialog shows the whole table either way, but this order is what
+    // the auto-prompt after an import should focus on last.
+    const QMap<QString, QString> known = ProjectVariablesDialog::parseTable(model_->variables());
+    names = known.keys();
+    for (const QString &missing : model_->missingVariables()) {
+        if (!names.contains(missing)) {
+            names.append(missing);
+        }
+    }
+    return names;
+}
+
+bool ProjectPanel::applyVariableTable(const QStringList &values)
+{
+    if (model_ == nullptr || !model_->hasProject()) {
+        return false;
+    }
+    // RM-3: REPLACE, never append. Appending made a deleted variable immortal
+    // (its old entry was still in the model after the dialog closed).
+    const QStringList before = model_->variables();
+    const QStringList table = ProjectVariablesDialog::toTable(
+        ProjectVariablesDialog::parseTable(values));
+    if (table == before) {
+        setStatus(QCoreApplication::translate("VEdit", "Project variables unchanged"), false);
+        updateUi();
+        return true;
+    }
+    model_->setVariables(table); // persists per root and re-expands
+    setStatus(QCoreApplication::translate("VEdit", "Saved %1 variable(s); re-expanding")
+                  .arg(table.size()),
+              false);
+    updateUi();
+    return true;
 }
 
 void ProjectPanel::onFileActivated(int row)
@@ -375,6 +542,31 @@ void ProjectPanel::jumpToPath(const QString &path)
 QString ProjectPanel::summaryText() const
 {
     return summary_ != nullptr ? summary_->text() : QString();
+}
+
+void ProjectPanel::setFileStatusSource(std::function<int(const QString &)> status,
+                                       std::function<quint64()> revision)
+{
+    statusSource_ = std::move(status);
+    statusRevisionSource_ = std::move(revision);
+    statusRevision_ = statusRevisionSource_ ? statusRevisionSource_() : 0;
+    if (fileList_ != nullptr) {
+        fileList_->viewport()->update();
+    }
+}
+
+int ProjectPanel::fileStatusAt(int row) const
+{
+    if (fileList_ == nullptr || row < 0 || row >= fileList_->count() || !statusSource_) {
+        return 0;
+    }
+    const QListWidgetItem *item = fileList_->item(row);
+    if (item == nullptr) {
+        return 0;
+    }
+    // The item text is the display path; UserRole keeps the absolute one, which
+    // is the key of the diagnostics status map.
+    return statusSource_(item->data(Qt::UserRole).toString());
 }
 
 int ProjectPanel::fileCount() const
@@ -430,9 +622,18 @@ void ProjectPanel::onImportRequested()
         setStatus(QCoreApplication::translate("VEdit", "Open a folder before importing a filelist"), true);
         return;
     }
-    const QStringList paths = QFileDialog::getOpenFileNames(
-        this, QCoreApplication::translate("VEdit", "Import Filelist"), model_->projectRoot(),
-        QCoreApplication::translate("VEdit", "Verilog filelists (*.f *.F *.flist);;All files (*)"));
+    // RM-16: a dialog opened specifically to import a filelist must never hide
+    // filelists. The filter table and the DEFAULT (the selected filter) come
+    // from src/common/file_dialog_filters.h, the same source the open-file
+    // dialog uses; "All files" stays available for an unusual spelling.
+    QFileDialog dialog(this, QCoreApplication::translate("VEdit", "Import Filelist"),
+                       model_->projectRoot());
+    dialog.setObjectName(QStringLiteral("project-import-filelist-dialog"));
+    vedit::common::configureImportFilelistDialog(dialog);
+    if (dialog.exec() != QDialog::Accepted) {
+        return;
+    }
+    const QStringList paths = dialog.selectedFiles();
     if (paths.isEmpty()) {
         return;
     }

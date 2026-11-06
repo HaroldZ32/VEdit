@@ -21,6 +21,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 set(VEDIT_APP_SHELL_SOURCES
+  desktop_shortcuts.cpp
   app_shell.cpp
   command_registry.cpp
   crash_reporter.cpp
@@ -229,6 +230,7 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../workspace/integration.cpp")
   message(STATUS "VEdit: workspace integration enabled (src/workspace/integration.cpp)")
 endif()
 
+
 # --- T20/A-3: the pane's real (clickable) breadcrumb ------------------------
 # EditorPane mounts vedit::breadcrumb::Bar when this lane is present: each
 # segment asks the application-wide jump registry for the container's line
@@ -270,6 +272,24 @@ set_tests_properties(vedit-app-crash-report-shipped PROPERTIES TIMEOUT 120)
 # The restart must select AppRun/$APPIMAGE, never the bundled loader that
 # applicationFilePath() names in an AppDir, and the packaged .qm live under
 # <AppDir>/bin/translations. Both resolvers are pure, so this needs no GUI.
+# RM-16: the file-dialog filters are DATA. This binary takes the PRODUCT
+# open-file filter table and asserts every filelist-claiming entry offers exactly
+# the extension set the project parser recognises; it also asserts the
+# import-filelist dialog's SELECTED filter is the filelist one, and drives a real
+# QFileSystemModel (the engine Qt's file dialog uses) over a temp dir holding
+# `a.sv` + `lib.f` to prove the default filter shows `lib.f`.
+add_executable(vedit-file-dialog-filters-selftest file_dialog_filters_selftest.cpp)
+target_link_libraries(vedit-file-dialog-filters-selftest PRIVATE vedit_app_shell)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(vedit-file-dialog-filters-selftest PRIVATE
+    -Wall -Wextra -Wpedantic -Werror)
+endif()
+add_test(NAME vedit-file-dialog-filters-selftest COMMAND vedit-file-dialog-filters-selftest)
+set_tests_properties(vedit-file-dialog-filters-selftest PROPERTIES
+  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime"
+  TIMEOUT 120
+)
+
 add_executable(vedit-app-i18n-selftest i18n_selftest.cpp)
 target_link_libraries(vedit-app-i18n-selftest PRIVATE vedit_app_shell)
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
@@ -323,6 +343,60 @@ set_tests_properties(vedit-app-ux-selftest PROPERTIES
   ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_CURRENT_BINARY_DIR}/xdg-runtime-ux"
   TIMEOUT 240
 )
+# --- RM-7: disabled controls must LOOK disabled in every theme ---------------
+# The product has no .qss resources: the shell applies a KSyntaxHighlighting
+# theme as a QPalette, and `QPalette::setColor(role, colour)` fills the Disabled
+# group too — so a disabled control used to render exactly like an enabled one
+# (the user's "everything that should be grey is not"). This executable asserts
+# the visual contract NUMERICALLY, for every theme the manager can apply:
+#   * palette: the Disabled colour of each text role must differ from Active by
+#     a stated channel / relative-luminance / contrast-ratio delta (no hard-coded
+#     hex, so a theme change cannot break it);
+#   * pixels: a real QToolButton (fed by a QAction, the Undo/Redo wiring),
+#     QPushButton, QComboBox, QLineEdit and QPlainTextEdit are rendered offscreen
+#     in the enabled and disabled state and the rendered colours are compared.
+# A regression to Disabled == Active fails on every theme and every widget.
+add_executable(vedit-app-disabled-look-selftest disabled_look_selftest.cpp)
+target_link_libraries(vedit-app-disabled-look-selftest PRIVATE vedit_app_shell)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(vedit-app-disabled-look-selftest PRIVATE
+    -Wall -Wextra -Wpedantic -Werror)
+endif()
+add_test(NAME vedit-app-disabled-look-selftest COMMAND vedit-app-disabled-look-selftest)
+set_tests_properties(vedit-app-disabled-look-selftest PROPERTIES
+  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_CURRENT_BINARY_DIR}/xdg-runtime-disabled-look"
+  TIMEOUT 240
+)
+# --- RM-12: destructive layout commands must confirm unsaved documents ------
+# View -> Reset Layout and File -> New Empty Layout (and the mixed-split preset,
+# which reaches the same EditorArea::resetLayout()) used to delete every pane and
+# the document that dies with it (KTextEditor bounds the document to its view)
+# with no confirmation. This executable drives the REAL command actions (the
+# QAction objects the menu, the toolbar and the shortcut are bound to) with the
+# shell's unsaved-prompt test seam: Cancel must keep every dirty buffer and the
+# layout byte-for-byte; Discard/Save must let the reset happen; a clean layout
+# must reset with NO prompt at all.
+add_executable(vedit-app-reset-layout-guard-selftest reset_layout_guard_selftest.cpp)
+target_link_libraries(vedit-app-reset-layout-guard-selftest PRIVATE vedit_app_shell)
+if(TARGET vedit_editor_core)
+  # The product editor: proves the real KTextEditor document (whose lifetime is
+  # its view) survives a cancelled reset, not only the demo placeholder.
+  target_link_libraries(vedit-app-reset-layout-guard-selftest PRIVATE vedit_editor_core)
+  target_compile_definitions(vedit-app-reset-layout-guard-selftest PRIVATE
+    VEDIT_RESET_HAVE_EDIT_CORE=1)
+  target_include_directories(vedit-app-reset-layout-guard-selftest PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/../editor/kernel")
+endif()
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(vedit-app-reset-layout-guard-selftest PRIVATE
+    -Wall -Wextra -Wpedantic -Werror)
+endif()
+add_test(NAME vedit-app-reset-layout-guard-selftest
+         COMMAND vedit-app-reset-layout-guard-selftest)
+set_tests_properties(vedit-app-reset-layout-guard-selftest PROPERTIES
+  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_CURRENT_BINARY_DIR}/xdg-runtime-reset-guard"
+  TIMEOUT 240
+)
 # --- UX batch 2: split-pane activation --------------------------------------
 # A press (or focus-in) that lands anywhere inside a pane's editor must make that
 # pane the ACTIVE pane of the EditorArea, whichever widget of the editor tree
@@ -361,6 +435,38 @@ else()
   set_tests_properties(vedit-editor-pane-activation-tests PROPERTIES SKIP_RETURN_CODE 77)
   message(STATUS "VEdit: split-pane activation test NOT built (edit-core lane or Qt6::Test missing)")
 endif()
+# --- RM-5b: a user-changed shortcut must FIRE through the real key path -----
+# The Shortcuts page could edit a binding, but the product had no proof the new
+# sequence reached the command. This test drives the shell's own registry, then
+# delivers the key through the QWindow (the same path a physical keystroke
+# takes, including Qt's shortcut map) and asserts the command fired; it also
+# restarts a shell on the same state dir for the persistence half.
+if(TARGET Qt6::Test)
+  add_executable(vedit-shortcut-key-path-tests shortcut_key_path_test.cpp)
+  target_link_libraries(vedit-shortcut-key-path-tests PRIVATE
+    vedit_app_shell
+    vedit_workspace_settings
+    vedit_editor_core
+    Qt6::Test
+  )
+  target_include_directories(vedit-shortcut-key-path-tests PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/../editor/kernel"
+  )
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-shortcut-key-path-tests PRIVATE
+      -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  add_test(NAME vedit-shortcut-key-path-tests
+           COMMAND vedit-shortcut-key-path-tests)
+  set_tests_properties(vedit-shortcut-key-path-tests PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_CURRENT_BINARY_DIR}/xdg-runtime-shortcut-key"
+    TIMEOUT 120
+  )
+  message(STATUS "VEdit: shortcut key-path regression enabled (RM-5b)")
+else()
+  message(STATUS "VEdit: Qt6 Test missing -> shortcut key-path regression NOT built")
+endif()
+
 find_program(VEDIT_UX_XVFB_RUN xvfb-run)
 if(VEDIT_UX_XVFB_RUN)
   set(VEDIT_UX_SCREENSHOT_DIR "${CMAKE_CURRENT_BINARY_DIR}/ux-screenshots")
@@ -378,4 +484,16 @@ else()
   add_test(NAME vedit-app-ux-screenshots
            COMMAND bash -c "echo 'SKIP: xvfb-run not available'; exit 77")
   set_tests_properties(vedit-app-ux-screenshots PROPERTIES SKIP_RETURN_CODE 77)
+endif()
+
+# --- RM-7b/M2: the file-status dot is a hand-painted widget -------------------
+# The disabled-look selftest also proves the file-tree's dot dims on a disabled
+# row. Both targets exist by the end of this file (the selftest above, the lane
+# in the workspace loop), so the seam is wired last. A tree without the lane
+# still builds the selftest; its dot check is reported as an explicit SKIP.
+if(TARGET vedit_file_tree AND TARGET vedit-app-disabled-look-selftest)
+  target_link_libraries(vedit-app-disabled-look-selftest PRIVATE vedit_file_tree)
+  target_compile_definitions(vedit-app-disabled-look-selftest PRIVATE
+    VEDIT_DISABLED_LOOK_HAVE_FILETREE=1)
+  message(STATUS "VEdit: disabled-look selftest covers the file-status dot (RM-7b/M2)")
 endif()

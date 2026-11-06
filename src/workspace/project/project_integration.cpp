@@ -12,6 +12,7 @@
 #include <QFileInfo>
 #include <QJsonObject>
 #include <QString>
+#include <QVariantMap>
 #include <QStringLiteral>
 
 namespace vedit::workspace {
@@ -54,6 +55,28 @@ void installProject(vedit::app::ApplicationShell &shell, const IntegrationOption
     const QString stateDirectory = resolveStateDirectory(shell, options);
 
     auto *model = new project::ProjectModel(stateDirectory, &shell);
+
+    // RM-2: publish the model's EXPANSION INPUTS through the shell-property
+    // seam for the lanes that must expand the SAME file set (diagnostics
+    // lint/LSP, the module tree). Before this, those lanes expanded the bare
+    // root with no imported `.f` lists, no variables table and no settings
+    // store, so "the project" meant two different things depending on who
+    // asked. The property is re-published on every input change; a consumer
+    // must compare `root` before trusting the rest, so a project still loading
+    // never contributes another project's lists.
+    const auto publishInputs = [&shell, model]() {
+        QVariantMap inputs;
+        inputs.insert(QStringLiteral("root"), model->projectRoot());
+        inputs.insert(QStringLiteral("filelists"), model->filelists());
+        inputs.insert(QStringLiteral("variables"), model->variables());
+        inputs.insert(QStringLiteral("settingsPath"), model->settingsPath());
+        inputs.insert(QStringLiteral("expansions"),
+                      static_cast<qulonglong>(model->expansionCount()));
+        shell.setProperty("vedit.project.inputs", inputs);
+    };
+    QObject::connect(model, &project::ProjectModel::stateChanged, &shell, publishInputs);
+    QObject::connect(model, &project::ProjectModel::filelistsChanged, &shell, publishInputs);
+    publishInputs();
 
     auto *panel = new project::ProjectPanel(model);
     auto *dock = new QDockWidget(QCoreApplication::translate("VEdit", "Project"), &shell);

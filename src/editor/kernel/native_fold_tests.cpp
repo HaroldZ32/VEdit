@@ -105,6 +105,18 @@ int main(int argc, char **argv)
     check("native.fold.provider", provider != nullptr);
     QWidget *editor = provider != nullptr ? provider->createEditor(nullptr) : nullptr;
     check("native.fold.editor", editor != nullptr);
+    // RM-5a follow-up: give the probe the PRODUCT's view state. In a pane the
+    // view is shown and laid out; KTextEditor builds its fold tree on layout, so
+    // an unlaid-out probe view cannot observe folding at all (measured: with the
+    // old setText load the unshown view reported garbage line numbers that made
+    // `hidden() != 0` pass by accident — evidence/ux-batch-2/fold-regression/).
+    // This is NOT a product workaround: the document_io load path keeps the
+    // undo floor (openUrl), and a shown view folds the loaded document normally.
+    if (editor != nullptr) {
+        editor->resize(900, 700);
+        editor->show();
+        pump();
+    }
     if (editor == nullptr) {
         std::printf("NATIVE-FOLD-TESTS ok=0 checks=%d failures=%d\n", g_checks, g_failures);
         return 1;
@@ -142,12 +154,21 @@ int main(int argc, char **argv)
                        KTextEditor::Range(0, 0, 39, 0));
             pump();
         }
-        // The hidden-line arithmetic is viewport-relative and can legitimately be
-        // negative for a folded block whose visible span grows; what matters is
-        // that KDE's own fold command CHANGED the view.
+        // A LAID-OUT view at the top folds lines 0..39 into a collapsed block:
+        // the real-line span grows while the visible-line span stays the same, so
+        // `hidden()` becomes the number of folded lines (measured 39). A merely
+        // non-zero value is not enough — an unlaid-out view produced a garbage
+        // negative number for the old load path while the fold had NOT applied.
+        view->setCursorPosition(KTextEditor::Cursor(0, 0));
+        pump();
         const int hiddenAfterFold = hidden(view);
-        check("native.fold.native-fold-applied", hiddenAfterFold != 0,
-              QString::number(hiddenAfterFold));
+        check("native.fold.native-fold-applied", hiddenAfterFold > 0,
+              QStringLiteral("hidden=%1 firstReal=%2 lastReal=%3 firstVisible=%4 lastVisible=%5")
+                  .arg(hiddenAfterFold)
+                  .arg(view->firstDisplayedLine(KTextEditor::View::RealLine))
+                  .arg(view->lastDisplayedLine(KTextEditor::View::RealLine))
+                  .arg(view->firstDisplayedLine(KTextEditor::View::VisibleLine))
+                  .arg(view->lastDisplayedLine(KTextEditor::View::VisibleLine)));
         for (int line = 0; line < view->document()->lines(); line += 311) {
             view->setCursorPosition(KTextEditor::Cursor(line, 0));
             pump();

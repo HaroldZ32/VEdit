@@ -14,6 +14,8 @@
 #endif
 
 #include <QDebug>
+#include <QDir>
+#include <QFileInfo>
 #include <QStatusBar>
 #include <QString>
 #include <QCoreApplication>
@@ -78,10 +80,61 @@ bool EditorJumpTarget::jumpTo(const QString &filePath, int line, int column)
     // provider-less build). Casting the pane widget to QPlainTextEdit here is
     // what made a result click silently do nothing in the real product after
     // the editor lane replaced the demo widget with KTextEditor::View.
+    //
+    // RM-4 hardening: the panels pass a catalog path VERBATIM. A catalog path
+    // can name the file relative to the tool's own working directory (the module
+    // THE PATH RULE (documented in src/workspace/jump/README.md):
+    //   * an ABSOLUTE path is opened AS GIVEN. It may live outside the workspace
+    //     on purpose - a filelist can name files above the opened folder - so it
+    //     is never re-rooted and never rejected for being outside;
+    //   * a RELATIVE path is resolved against the workspace root (never the
+    //     process working directory: an AppImage started from a file manager
+    //     runs in $HOME). A producer is expected to hand over absolute paths;
+    //     this resolution is the one recovery for a producer that does not.
+    // A path that exists under neither reading is REFUSED, and the refusal says
+    // which rule was applied so the mismatch is diagnosable.
+    QString requested = filePath;
+    QString pathRule;
+    {
+        const QFileInfo given(filePath);
+        const QString root = shell_->projectRoot();
+        if (given.isAbsolute()) {
+            pathRule = QCoreApplication::translate(
+                "VEdit", "absolute path opened as given; files outside the workspace are allowed");
+        } else if (!root.isEmpty()) {
+            const QString underRoot = QDir(root).absoluteFilePath(filePath);
+            if (QFileInfo(underRoot).isFile()) {
+                qWarning("search: jump path '%s' is relative; resolved '%s' under the workspace "
+                         "root",
+                         qPrintable(filePath), qPrintable(underRoot));
+                requested = underRoot;
+                pathRule = QCoreApplication::translate(
+                    "VEdit", "relative path resolved under the workspace root");
+            } else {
+                pathRule = QCoreApplication::translate(
+                    "VEdit", "relative path, not found under the workspace root");
+            }
+        } else {
+            pathRule = QCoreApplication::translate(
+                "VEdit", "relative path and the workspace root is unknown");
+        }
+    }
     QString openError;
-    if (!pane->openFile(filePath, &openError)) {
-        return fail(openError.isEmpty() ? QCoreApplication::translate("VEdit", "cannot open %1").arg(filePath)
-                                        : openError);
+    if (!pane->openFile(requested, &openError)) {
+        QString message =
+            openError.isEmpty()
+                ? QCoreApplication::translate("VEdit", "cannot open %1").arg(requested)
+                : openError;
+        // WHAT failed is in `message`; the rule and the workspace root say WHY
+        // the request looked like that, so a refusal that only says "not a
+        // regular file" is never the end of the story.
+        const QString root = shell_->projectRoot();
+        message += QStringLiteral(" [%1").arg(pathRule);
+        if (!root.isEmpty()) {
+            message += QStringLiteral("; workspace root: %1").arg(root);
+        }
+        message += QLatin1Char(']');
+        return fail(message);
     }
 
     KTextEditor::View *view = vedit::editor::viewFor(pane->editorWidget());
@@ -96,7 +149,16 @@ bool EditorJumpTarget::jumpTo(const QString &filePath, int line, int column)
         return fail(QStringLiteral("the opened document has no lines"));
     }
     const int targetLine = qBound(1, line, lineCount);
-    const int targetColumn = qBound(1, column, document->lineLength(targetLine - 1) + 1);
+    const int lineChars = document->lineLength(targetLine - 1);
+    // The column is the EDITOR's unit (1-based UTF-16 code unit) - a producer
+    // converts its tool's byte/UTF-16 offset ONCE, where it builds the position
+    // (`crates/vd-deeplint::tool_paths::Columns` for the module catalog). This
+    // seam only clamps: guessing a unit here cannot work for every caller (a
+    // catalog byte column, an LSP UTF-16 column and a search byte offset are
+    // three different conventions), and RM-4 showed what an overflow-only guess
+    // costs - a short CJK prefix on a long line stays inside the line and is
+    // silently wrong.
+    const int targetColumn = qBound(1, column, lineChars + 1);
     const KTextEditor::Cursor target(targetLine - 1, targetColumn - 1);
     if (!view->setCursorPosition(target)) {
         return fail(QCoreApplication::translate("VEdit", "setCursorPosition(%1:%2) failed")
@@ -117,9 +179,10 @@ bool EditorJumpTarget::jumpTo(const QString &filePath, int line, int column)
     }
 
     shell_->statusBar()->showMessage(
-        QCoreApplication::translate("VEdit", "Opened %1 line %2").arg(filePath).arg(targetLine), 5000);
+        QCoreApplication::translate("VEdit", "Opened %1 line %2").arg(requested).arg(targetLine),
+        5000);
     lastJumpSucceeded_ = true;
-    qInfo("search: jump opened '%s' line=%d column=%d (cursor=%d:%d)", qPrintable(filePath),
+    qInfo("search: jump opened '%s' line=%d column=%d (cursor=%d:%d)", qPrintable(requested),
           targetLine, targetColumn, actual.line() + 1, actual.column() + 1);
     return true;
 #endif

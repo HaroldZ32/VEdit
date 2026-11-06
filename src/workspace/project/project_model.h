@@ -74,6 +74,12 @@ public:
     QStringList missingVariables() const;
     int skippedCount() const;
 
+    // RM-17: the module-tree TOP the user named for this project (a module
+    // NAME; empty = Auto). Persisted per root, exactly like `variables`: a
+    // switch A -> B -> A restores A's top and B never inherits it.
+    QString top() const;
+    void setTop(const QString &top);
+
     bool hasProject() const;
     bool isPending() const;
     bool restoredFromDisk() const;
@@ -103,6 +109,10 @@ public:
     // One line the panel shows first, e.g.
     // `Project: verilog-project — 11 files · 2 filelists (live)`.
     QString summary() const;
+    // RM-2 probe: how many expansions this model has SCHEDULED. One project
+    // switch (one root change) must move this by exactly one, however many live
+    // widgets/events report the switch.
+    quint64 expansionCount() const { return expansionCount_; }
     QString statePath() const;
     QString lastError() const;
 
@@ -124,7 +134,9 @@ signals:
     void refreshFinished(bool ok, const QString &error);
 
 private:
-    void startExpansion();
+    /// `force` re-expands even when the same inputs are already in flight; the
+    /// switch paths leave it false so a duplicate report is a no-op (RM-2).
+    void startExpansion(bool force = false);
     void pollOnce();
     void adopt(const ExpansionPayload &payload);
     void recordFailure(const QString &error);
@@ -152,6 +164,11 @@ private:
     QString lastError_;
     QString stateError_;
     quint64 job_ = 0;
+    quint64 expansionCount_ = 0;
+    // Inputs of the expansion currently in flight (RM-2's duplicate guard).
+    QString pendingRoot_;
+    QStringList pendingFilelists_;
+    QStringList pendingVariables_;
     bool pending_ = false;
     bool restored_ = false;
 };

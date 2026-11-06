@@ -18,6 +18,7 @@
 // Every observation is a shell property the lane publishes; a missing property
 // fails the check instead of being read as a pass.
 
+#include "diagnostic_hover.h"
 #include "diagnostics_controller.h"
 #include "diagnostics_integration.h"
 #include "diagnostics_panel.h"
@@ -57,6 +58,7 @@
 #include <QVariantMap>
 #include <QWidget>
 
+#include <csignal>
 #include <cstdio>
 #include <functional>
 #include <memory>
@@ -254,6 +256,13 @@ void setRows(FakeProjectLint &pass, const QString &projectDir)
 
 int main(int argc, char **argv)
 {
+    // AGENT.md §4 ("Rust is statically linked into a C++ host"): the product's
+    // main() installs SIGPIPE ignore because Rust's runtime init does not run
+    // in this host, and a lane selftest that spawns LSP children and links
+    // Rust has the same latent hazard. Without it a write to a dead child
+    // crashes the HARNESS (observed: ctest reports `SIGPIPE`), which is a test
+    // death, not a product verdict. The production binary already does this.
+    std::signal(SIGPIPE, SIG_IGN);
     QApplication app(argc, argv);
     g_shotDir = qEnvironmentVariable("VEDIT_B3_SHOT_DIR");
     if (!g_shotDir.isEmpty()) {
@@ -309,6 +318,21 @@ int main(int argc, char **argv)
     integration.stateDir = dir.filePath(QStringLiteral("state"));
     vedit::workspace::installDiagnostics(*shell, integration);
     vedit::workspace::installFileTree(*shell, integration);
+
+    // RM-9: a project OPEN now starts a full automatic pass as soon as the file
+    // set is adopted, so this harness must own the lint backend BEFORE the first
+    // event-loop turn - otherwise the real backend would run (and be cancelled
+    // by the replacement below, leaving its partial rows). The accessor returns
+    // the very controller the panel will use.
+    auto *controller = vedit::workspace::diagnosticsControllerForShell(*shell);
+    check("product.controller", controller != nullptr);
+    auto fakeOwned = std::make_unique<FakeProjectLint>();
+    FakeProjectLint *fake = fakeOwned.get();
+    setRows(*fake, project1);
+    if (controller != nullptr) {
+        controller->setProjectLintBackend(std::move(fakeOwned));
+    }
+
     shell->panels()->showPanel(QStringLiteral("outline"), shell.get());
     shell->panels()->showPanel(QStringLiteral("file-tree"), shell.get());
     shell->resize(1200, 800);
@@ -325,17 +349,13 @@ int main(int argc, char **argv)
     check("product.panel", panel != nullptr);
     check("product.lint-action", lintAction != nullptr);
     check("product.hover-action", hoverAction != nullptr);
-    if (panel == nullptr || lintAction == nullptr || hoverAction == nullptr) {
+    check("product.panel-controller", panel != nullptr && controller != nullptr
+                                           && panel->controller() == controller);
+    if (panel == nullptr || lintAction == nullptr || hoverAction == nullptr
+        || controller == nullptr) {
         std::printf("SUMMARY checks=%d failures=%d skips=%d\n", g_checks, g_failures, g_skips);
         return 1;
     }
-    auto *controller = panel->controller();
-
-    // Replace the real batch backend with the deterministic fake.
-    auto fakeOwned = std::make_unique<FakeProjectLint>();
-    FakeProjectLint *fake = fakeOwned.get();
-    setRows(*fake, project1);
-    controller->setProjectLintBackend(std::move(fakeOwned));
 
     // ---- nit 18: the first click before the async file-set poll answers -----
     lintAction->trigger();
@@ -516,6 +536,150 @@ int main(int argc, char **argv)
               QStringLiteral("text='%1'").arg(fixButton != nullptr ? fixButton->text()
                                                                   : QStringLiteral("<none>")));
         shootHover(QStringLiteral("04a-hover-popup-fixable.png"));
+
+        // ===================================================================
+        // RM-10 — the REAL mouse path: over the squiggle, not only the gutter
+        // ===================================================================
+        // A real move inside the text is delivered to KatePart's inner
+        // KateViewInternal CHILD, never to the public View. The batch's hover
+        // probes sent events STRAIGHT to the View, so they never exercised the
+        // path the user's mouse takes - exactly why the gate missed RM-10.
+        const QVariantMap gutterPath = hoverState();
+        // Hide first, so the inner-widget move below is PROVEN to be the trigger.
+        const QPoint blankView0 = viewA->cursorToCoordinate(KTextEditor::Cursor(9, 0));
+        QMouseEvent blank0(QEvent::MouseMove, blankView0, viewA->mapToGlobal(blankView0),
+                           Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+        QCoreApplication::sendEvent(viewA, &blank0);
+        QCoreApplication::processEvents();
+        check("hover.blank-hides-before-inner-probe",
+              !hoverState().value(QStringLiteral("diagnostic")).toBool(),
+              QStringLiteral("diagnostic=%1")
+                  .arg(hoverState().value(QStringLiteral("diagnostic")).toBool() ? 1 : 0));
+        // The fake error spans line 1 (0-based), columns 2..10: aim at its MIDDLE.
+        const QPoint squiggleView = viewA->cursorToCoordinate(KTextEditor::Cursor(1, 6));
+        QWidget *realTarget = viewA->childAt(squiggleView);
+        check("hover.real-target-is-inner-widget", realTarget != nullptr && realTarget != viewA,
+              realTarget != nullptr
+                  ? QString::fromLatin1(realTarget->metaObject()->className())
+                  : QStringLiteral("none"));
+        if (realTarget != nullptr && realTarget != viewA) {
+            const QPoint local = realTarget->mapFrom(viewA, squiggleView);
+            QMouseEvent innerMove(QEvent::MouseMove, local, realTarget->mapToGlobal(local),
+                                  Qt::NoButton, Qt::NoButton, Qt::NoModifier);
+            QCoreApplication::sendEvent(realTarget, &innerMove);
+            QCoreApplication::processEvents();
+            const QVariantMap innerPath = hoverState();
+            std::printf("OBSERVED hover.inner-squiggle diagnostic=%d rule='%s' line=%d "
+                        "gutter-rule='%s'\n",
+                        innerPath.value(QStringLiteral("diagnostic")).toBool() ? 1 : 0,
+                        qPrintable(innerPath.value(QStringLiteral("rule")).toString()),
+                        innerPath.value(QStringLiteral("line")).toInt(),
+                        qPrintable(gutterPath.value(QStringLiteral("rule")).toString()));
+            check("hover.inner-squiggle-shows",
+                  innerPath.value(QStringLiteral("diagnostic")).toBool()
+                      && innerPath.value(QStringLiteral("rule")).toString()
+                             == QStringLiteral("no-trailing-spaces")
+                      && innerPath.value(QStringLiteral("line")).toInt() == 1,
+                  QStringLiteral("diagnostic=%1 rule='%2' line=%3")
+                      .arg(innerPath.value(QStringLiteral("diagnostic")).toBool() ? 1 : 0)
+                      .arg(innerPath.value(QStringLiteral("rule")).toString())
+                      .arg(innerPath.value(QStringLiteral("line")).toInt()));
+            check("hover.inner-same-content-as-gutter",
+                  innerPath.value(QStringLiteral("diagnostic")).toBool()
+                      && innerPath.value(QStringLiteral("rule")) == gutterPath.value(QStringLiteral("rule"))
+                      && innerPath.value(QStringLiteral("line")) == gutterPath.value(QStringLiteral("line"))
+                      && innerPath.value(QStringLiteral("path")) == gutterPath.value(QStringLiteral("path")),
+                  QStringLiteral("inner=%1/%2/%3 gutter=%4/%5/%6")
+                      .arg(innerPath.value(QStringLiteral("rule")).toString())
+                      .arg(innerPath.value(QStringLiteral("line")).toInt())
+                      .arg(innerPath.value(QStringLiteral("path")).toString())
+                      .arg(gutterPath.value(QStringLiteral("rule")).toString())
+                      .arg(gutterPath.value(QStringLiteral("line")).toInt())
+                      .arg(gutterPath.value(QStringLiteral("path")).toString()));
+            shootHover(QStringLiteral("04c-hover-popup-inner-squiggle.png"));
+            // A non-diagnostic span through the SAME real path shows nothing.
+            const QPoint cleanView = viewA->cursorToCoordinate(KTextEditor::Cursor(3, 0));
+            QWidget *cleanTarget = viewA->childAt(cleanView);
+            if (cleanTarget == nullptr) {
+                cleanTarget = viewA;
+            }
+            const QPoint cleanLocal = cleanTarget->mapFrom(viewA, cleanView);
+            QMouseEvent cleanMove(QEvent::MouseMove, cleanLocal,
+                                  cleanTarget->mapToGlobal(cleanLocal), Qt::NoButton,
+                                  Qt::NoButton, Qt::NoModifier);
+            QCoreApplication::sendEvent(cleanTarget, &cleanMove);
+            QCoreApplication::processEvents();
+            const QVariantMap cleanState = hoverState();
+            check("hover.inner-non-diagnostic-shows-nothing",
+                  !cleanState.value(QStringLiteral("diagnostic")).toBool()
+                      && cleanState.value(QStringLiteral("hiddenOnViewChange")).toBool(),
+                  QStringLiteral("diagnostic=%1 hidden=%2")
+                      .arg(cleanState.value(QStringLiteral("diagnostic")).toBool() ? 1 : 0)
+                      .arg(cleanState.value(QStringLiteral("hiddenOnViewChange")).toBool() ? 1 : 0));
+            // Ctrl+click from INSIDE the squiggle must still reach Go to
+            // Definition: the hover filter OBSERVES mouse moves, it never
+            // consumes them.
+            QAction *definitionAction = shell->commands() != nullptr
+                ? shell->commands()->action(QStringLiteral("diagnostics.definition"))
+                : nullptr;
+            int definitionTriggers = 0;
+            if (definitionAction != nullptr) {
+                QObject::connect(definitionAction, &QAction::triggered, definitionAction,
+                                 [&definitionTriggers]() { ++definitionTriggers; });
+            }
+            QMouseEvent ctrlPress(QEvent::MouseButtonPress, local,
+                                  realTarget->mapToGlobal(local), Qt::LeftButton,
+                                  Qt::LeftButton, Qt::ControlModifier);
+            QCoreApplication::sendEvent(realTarget, &ctrlPress);
+            QMouseEvent ctrlRelease(QEvent::MouseButtonRelease, local,
+                                    realTarget->mapToGlobal(local), Qt::LeftButton,
+                                    Qt::NoButton, Qt::ControlModifier);
+            QCoreApplication::sendEvent(realTarget, &ctrlRelease);
+            QCoreApplication::processEvents();
+            check("hover.ctrl-click-inside-squiggle-still-dispatches",
+                  definitionAction != nullptr && definitionTriggers >= 1,
+                  QStringLiteral("triggers=%1 action=%2")
+                      .arg(definitionTriggers)
+                      .arg(definitionAction != nullptr ? 1 : 0));
+            check("hover.ctrl-click-moves-caret-to-squiggle",
+                  viewA->cursorPosition() == KTextEditor::Cursor(1, 6),
+                  QStringLiteral("caret=%1:%2")
+                      .arg(viewA->cursorPosition().line())
+                      .arg(viewA->cursorPosition().column()));
+        }
+
+        // RM-10: a multi-line diagnostic must be hoverable on EVERY line it
+        // covers, not only the first (the pure decision function).
+        {
+            vedit::workspace::diagnostics::DiagnosticEntry multi;
+            multi.file = aPath;
+            multi.line = 3;
+            multi.column = 2;
+            multi.endLine = 6;
+            multi.endColumn = 5;
+            multi.severity = 1;
+            multi.code = QStringLiteral("multi-line");
+            QVector<vedit::workspace::diagnostics::DiagnosticEntry> rows{multi};
+            check("hover.multiline.first-line",
+                  vedit::workspace::diagnostics::diagnosticAt(rows, 3, 10) == &rows.first());
+            check("hover.multiline.middle-line",
+                  vedit::workspace::diagnostics::diagnosticAt(rows, 5, 0) == &rows.first());
+            check("hover.multiline.last-line",
+                  vedit::workspace::diagnostics::diagnosticAt(rows, 6, 4) == &rows.first());
+            check("hover.multiline.before-start",
+                  vedit::workspace::diagnostics::diagnosticAt(rows, 3, 1) == nullptr);
+            check("hover.multiline.past-last-line-end",
+                  vedit::workspace::diagnostics::diagnosticAt(rows, 6, 5) == nullptr);
+            // The underline drawing falls back to the end of the line for a
+            // negative end column; the hover target must cover that same line.
+            auto openEnd = multi;
+            openEnd.endColumn = -1;
+            QVector<vedit::workspace::diagnostics::DiagnosticEntry> openRows{openEnd};
+            check("hover.multiline.negative-end-covers-last-line",
+                  vedit::workspace::diagnostics::diagnosticAt(openRows, 6, 100)
+                      == &openRows.first());
+        }
+
         // The other branch: a rule with no autofix gets the reason and no button.
         if (viewA != nullptr) {
             const QPoint noFixPos = viewA->cursorToCoordinate(KTextEditor::Cursor(2, 4));
@@ -634,10 +798,21 @@ int main(int argc, char **argv)
     std::printf("OBSERVED c8.after-save-a files='%s'\n", qPrintable(fake->filesSeen.join(QLatin1Char(','))));
     check("c8.saved-file-included", fake->filesSeen.contains(aPath),
           QStringLiteral("files=%1").arg(fake->filesSeen.join(QLatin1Char(','))));
+    // RM-9 save policy (T20 contract): the automatic pass is INCREMENTAL - it
+    // re-lints EXACTLY the file that reached disk. Before, every save re-linted
+    // the whole project, so the cost of a save grew with the project.
+    check("c8.save-pass-is-incremental", fake->filesSeen == QStringList{aPath},
+          QStringLiteral("files=%1").arg(fake->filesSeen.join(QLatin1Char(','))));
     check("c8.dirty-buffer-excluded", !fake->filesSeen.contains(bPath),
           QStringLiteral("files=%1").arg(fake->filesSeen.join(QLatin1Char(','))));
+    // ... and a file the pass did NOT lint (e.sv: never opened here) keeps its
+    // verdict - the incremental save must not void the rest of the project.
+    check("c8.other-file-verdict-kept",
+          waitUntil([&upperFiles, &ePath]() { return upperFiles().contains(ePath); }, 5000),
+          QStringLiteral("upper=%1").arg(upperFiles().join(QLatin1Char(','))));
 
-    // After B is saved the next automatic pass must cover it too.
+    // After B is saved the next automatic pass covers B only - and A's verdict
+    // survives it (the half that must not regress).
     pane->setActiveTab(pane->tabIndexForPath(bPath));
     QCoreApplication::processEvents();
     const int passesBeforeB = fake->startCount;
@@ -647,8 +822,11 @@ int main(int argc, char **argv)
     std::printf("OBSERVED c8.after-save-b files='%s'\n", qPrintable(fake->filesSeen.join(QLatin1Char(','))));
     check("c8.saved-b-now-included", fake->filesSeen.contains(bPath),
           QStringLiteral("files=%1").arg(fake->filesSeen.join(QLatin1Char(','))));
-    check("c8.unmodified-open-included", fake->filesSeen.contains(aPath),
+    check("c8.save-b-pass-is-incremental", fake->filesSeen == QStringList{bPath},
           QStringLiteral("files=%1").arg(fake->filesSeen.join(QLatin1Char(','))));
+    check("c8.unmodified-open-verdict-kept",
+          waitUntil([&upperFiles, &aPath]() { return upperFiles().contains(aPath); }, 5000),
+          QStringLiteral("upper=%1").arg(upperFiles().join(QLatin1Char(','))));
 
     // =======================================================================
     // N2 — the FIRST edit of a newly opened, already-covered file

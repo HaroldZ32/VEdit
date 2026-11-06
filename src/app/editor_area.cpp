@@ -21,6 +21,7 @@
 #include <QPalette>
 #include <QPointer>
 #include <QScrollBar>
+#include <QSet>
 #include <QSizePolicy>
 #include <QSplitter>
 #include <QStackedWidget>
@@ -95,35 +96,40 @@ namespace {
 // style-drawn close button) so it can be named, found and screenshotted.
 constexpr auto kTabCloseButtonName = "tab-close-button";
 
-// Task T80: an editor widget may bring its own standard shortcuts. The
-// KTextEditor view owns a KStandardAction::save action bound to Ctrl+S; together
-// with the shell's file.save command Qt reports "Ambiguous shortcut overload"
-// and runs NEITHER of them, which is exactly what the user hit at stop 1.
+// Task T80 / RM-5b: an editor widget may bring its own standard shortcuts. The
+// KTextEditor view owns KStandardAction copies bound to Ctrl+S (save),
+// Ctrl+Shift+S (save as), Ctrl+Z (undo), Ctrl+Shift+Z (redo) and Ctrl+P (print);
+// together with the shell's own command for the same key Qt reports "Ambiguous
+// shortcut overload" and runs NEITHER of them — a dead key. RM-5b measured that
+// this was silently true for save-as, split-horizontal (Ctrl+Shift+H is the
+// editor's Find Selected Backwards) and the VCS panel (Ctrl+Alt+V is the
+// editor's input-mode switch), which is exactly the "editing a shortcut does not
+// take effect" report.
 //
-// The shell's command is the single authority, so the editor widget's own Ctrl+S
-// bindings are cleared here, when the widget enters the pane. The KTextEditor
-// action is not in the view's own action list: it lives in a parentless
-// KActionCollection and is registered on the internal KateViewInternal child
+// The shell's command registry is the single authority: the pane is told which
+// sequences the shell owns (`setOwnedShortcuts`) and clears them from the
+// editor widget's own actions when the widget enters the pane. The KTextEditor
+// actions are not in the view's own action list: they live in a parentless
+// KActionCollection and are registered on the internal KateViewInternal child
 // widget, so the whole editor subtree is walked. The actions stay alive and
 // triggerable from the editor's own menus; only the duplicate key binding goes
-// away. This runs for every editor widget - the first tab, every added tab, a
-// provider swap and every split - because that is the same code path a document
+// away. This runs for every editor widget — the first tab, every added tab, a
+// provider swap and every split — because that is the same code path a document
 // tab is created through.
-int clearEditorSaveShortcut(QWidget *editor)
+int clearOwnedShortcuts(QWidget *editor, const QStringList &owned)
 {
-    if (editor == nullptr) {
+    if (editor == nullptr || owned.isEmpty()) {
         return 0;
     }
-    const QKeySequence save(QStringLiteral("Ctrl+S"));
     int removed = 0;
-    const auto clear = [&save, &removed](QAction *action) {
+    const auto clear = [&owned, &removed](QAction *action) {
         if (action == nullptr) {
             return;
         }
         QList<QKeySequence> kept;
         bool changed = false;
         for (const QKeySequence &sequence : action->shortcuts()) {
-            if (sequence == save) {
+            if (owned.contains(sequence.toString(QKeySequence::PortableText))) {
                 changed = true;
             } else {
                 kept.append(sequence);
@@ -240,7 +246,11 @@ EditorPane::EditorPane(QString paneId, EditorProvider *provider, QWidget *parent
     activeBadge_ = new QLabel(tabRow);
     activeBadge_->setObjectName(QStringLiteral("editor-pane-active-badge"));
     activeBadge_->setContentsMargins(6, 0, 6, 0);
-    activeBadge_->setText(QStringLiteral("active"));
+    // The one word of the old pane header that is still shown: the badge that
+    // marks the keyboard-focused pane. Translated in the same "VEdit" context as
+    // the neighbouring strings; the zh_CN catalogue row is added by the i18n
+    // lane in its final pass (single writer for translations/vedit_zh_CN.ts).
+    activeBadge_->setText(QCoreApplication::translate("VEdit", "active"));
     activeBadge_->setVisible(false);
     tabRowLayout->addWidget(activeBadge_, 0);
 
@@ -498,15 +508,17 @@ void EditorPane::wireEditor(QWidget *editor)
         return;
     }
     editor->installEventFilter(this);
-    // T80: the shell's file.save command is the only Ctrl+S authority.
-    clearEditorSaveShortcut(editor);
+    // T80/RM-5b: the shell's command registry is the only authority for the
+    // sequences it binds; remove the editor's own copies before a key press.
+    clearOwnedShortcuts(editor, ownedShortcuts_);
     // KTextEditor populates its standard actions lazily (its KActionCollection
     // has no QObject parent, so it cannot be found from the widget tree
     // afterwards), so re-apply once the current event-loop turn is over.
     const QPointer<QWidget> guarded(editor);
-    QTimer::singleShot(0, this, [guarded]() {
+    const QStringList owned = ownedShortcuts_;
+    QTimer::singleShot(0, this, [guarded, owned]() {
         if (guarded != nullptr) {
-            clearEditorSaveShortcut(guarded.data());
+            clearOwnedShortcuts(guarded.data(), owned);
         }
     });
     if (provider_ == nullptr) {
@@ -801,10 +813,23 @@ int EditorPane::enforceSingleCtrlSAuthority()
     int removed = 0;
     for (const Document *document : documents_) {
         if (document != nullptr) {
-            removed += clearEditorSaveShortcut(document->editor);
+            removed += clearOwnedShortcuts(document->editor, ownedShortcuts_);
         }
     }
     return removed;
+}
+
+void EditorPane::setOwnedShortcuts(const QStringList &portableSequences)
+{
+    ownedShortcuts_ = portableSequences;
+    ownedShortcuts_.removeDuplicates();
+    ownedShortcuts_.sort();
+    enforceSingleCtrlSAuthority();
+}
+
+QStringList EditorPane::ownedShortcuts() const
+{
+    return ownedShortcuts_;
 }
 
 void EditorPane::newDocument()
@@ -1279,10 +1304,10 @@ bool EditorPane::eventFilter(QObject *watched, QEvent *event)
     }
     if (watchedIsDocument && event != nullptr
         && (event->type() == QEvent::Show || event->type() == QEvent::FocusIn)) {
-        // T80: providers may populate their standard actions lazily, after
-        // createEditor() returned. Re-applying the invariant when the widget is
-        // shown or focused guarantees it holds before a user can press Ctrl+S.
-        clearEditorSaveShortcut(qobject_cast<QWidget *>(watched));
+        // T80/RM-5b: providers may populate their standard actions lazily,
+        // after createEditor() returned. Re-applying the invariant when the
+        // widget is shown or focused guarantees it holds before a key press.
+        clearOwnedShortcuts(qobject_cast<QWidget *>(watched), ownedShortcuts_);
     }
     if (watchedIsDocument && event != nullptr && event->type() == QEvent::Show) {
         // T19: this tab just became the visible one; now its viewport has a real
@@ -1406,6 +1431,80 @@ int EditorArea::enforceSingleCtrlSAuthority()
     return removed;
 }
 
+void EditorArea::setOwnedShortcuts(const QStringList &portableSequences)
+{
+    ownedShortcuts_ = portableSequences;
+    ownedShortcuts_.removeDuplicates();
+    ownedShortcuts_.sort();
+    const QList<EditorPane *> current = panes();
+    for (EditorPane *pane : current) {
+        if (pane != nullptr) {
+            pane->setOwnedShortcuts(ownedShortcuts_);
+        }
+    }
+}
+
+QStringList EditorArea::ownedShortcuts() const
+{
+    return ownedShortcuts_;
+}
+
+QStringList EditorArea::editorShortcutOwners() const
+{
+    // Every sequence a live editor's own action carries, with a readable owner
+    // label. KTextEditor registers its standard actions on the inner
+    // KateViewInternal widget (and some on the view), so the whole subtree is
+    // walked exactly like the authority code above.
+    QStringList owners;
+    QSet<QString> seen;
+    const QList<EditorPane *> current = panes();
+    for (EditorPane *pane : current) {
+        if (pane == nullptr) {
+            continue;
+        }
+        for (int index = 0; index < pane->tabCount(); ++index) {
+            QWidget *editor = pane->tabEditorWidget(index);
+            if (editor == nullptr) {
+                continue;
+            }
+            const auto record = [&owners, &seen](QAction *action) {
+                if (action == nullptr || action->shortcuts().isEmpty()) {
+                    return;
+                }
+                QString label = action->text().remove(QLatin1Char('&')).trimmed();
+                if (label.isEmpty()) {
+                    label = action->objectName();
+                }
+                if (!action->objectName().isEmpty()) {
+                    label += QStringLiteral(" (") + action->objectName() + QLatin1Char(')');
+                }
+                for (const QKeySequence &sequence : action->shortcuts()) {
+                    const QString portable = sequence.toString(QKeySequence::PortableText);
+                    const QString key = portable + QLatin1Char('\t') + label;
+                    if (portable.isEmpty() || seen.contains(key)) {
+                        continue;
+                    }
+                    seen.insert(key);
+                    owners.append(key);
+                }
+            };
+            for (QAction *action : editor->actions()) {
+                record(action);
+            }
+            for (QWidget *widget : editor->findChildren<QWidget *>()) {
+                for (QAction *action : widget->actions()) {
+                    record(action);
+                }
+            }
+            for (QAction *action : editor->findChildren<QAction *>()) {
+                record(action);
+            }
+        }
+    }
+    owners.sort();
+    return owners;
+}
+
 void EditorArea::setProvider(EditorProvider *provider)
 {
     if (provider_ == provider) {
@@ -1438,6 +1537,9 @@ EditorPane *EditorArea::createPane(const QString &paneId)
         nextPaneNumber_ = std::max(nextPaneNumber_, numeric + 1);
     }
     auto *pane = new EditorPane(id, provider_, nullptr);
+    // RM-5b: a pane created after the shell registered its commands (a split,
+    // a restored layout) must start with the same shortcut authority.
+    pane->setOwnedShortcuts(ownedShortcuts_);
     pane->setOnFocusRequested([this](EditorPane *requested) { setActivePane(requested); });
     pane->setOnCloseRequested([this](EditorPane *requested) {
         setActivePane(requested);

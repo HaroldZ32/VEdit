@@ -10,6 +10,7 @@
 #include <cstdio>
 
 #if defined(VEDIT_MODULE_TREE_HAVE_PROJECT)
+#include "language_registry.h"
 #include "project_state.h"
 #endif
 
@@ -134,6 +135,9 @@ ModuleCatalog toCatalog(const VdModuleCatalog &catalog, const QString &root, int
     snapshot.elapsedMs = catalog.elapsed_ms;
     snapshot.peakRssKb = catalog.peak_rss_kb;
     snapshot.warning = fromC(catalog.warning);
+    snapshot.top = fromC(catalog.top);
+    snapshot.reachableFiles = toStringList(catalog.reachable_files);
+    snapshot.outsideModules = toStringList(catalog.outside_modules);
     snapshot.fileSetSize = fileCount;
     snapshot.valid = true;
     snapshot.modules.reserve(static_cast<int>(catalog.modules.count));
@@ -183,6 +187,21 @@ CatalogClient::~CatalogClient()
     }
 #endif
     service_ = nullptr;
+}
+
+void CatalogClient::setTop(const QString &top)
+{
+    top_ = top.trimmed();
+}
+
+QString CatalogClient::top() const
+{
+    return top_;
+}
+
+QStringList CatalogClient::lastFileSet() const
+{
+    return lastFileSet_;
 }
 
 void CatalogClient::setStateDirectory(const QString &stateDirectory)
@@ -278,12 +297,50 @@ void CatalogClient::beginProjectFallback()
 {
 #if defined(VEDIT_MODULE_TREE_HAVE_FFI)
     const QByteArray root = projectRoot_.toUtf8();
-    // No imported filelists / settings path here on purpose: this path only runs
-    // when the project model has not produced its persisted state yet; the root's
-    // own scan is what the service can expand without that state.
+    // RM-2: expand with the PANEL's inputs, not with a bare root. The previous
+    // version passed `nullptr, nullptr`, so right after a project switch (the
+    // persisted model still describes the OLD root) the catalog was built from
+    // the folder scan alone: a project with `[project]` / imported `.f`
+    // filelists catalogued a different file set than the panel showed, and the
+    // tools page's `-I`/`-D` never reached the elaboration.
+    //
+    // The inputs come from the SAME persisted model this run is reading:
+    //   * the settings store beside `project-model.json` (the path the project
+    //     panel itself passes), always;
+    //   * the imported `.f` lists and the variables table ONLY when the
+    //     persisted model belongs to THIS root - a previous project's lists
+    //     must never be expanded into this one.
+    QStringList filelists;
+    QStringList variables;
+    QString settingsPath;
+#if defined(VEDIT_MODULE_TREE_HAVE_PROJECT)
+    project::ProjectStateStore store(stateDirectory_);
+    // Same rule as ProjectModel::settingsPath(): `<state dir>/settings.toml`,
+    // where an empty directory resolves to the platform app-config location.
+    const QString storePath = store.path();
+    if (!storePath.isEmpty()) {
+        settingsPath = QFileInfo(storePath).absolutePath()
+            + QStringLiteral("/settings.toml");
+    }
+    bool stateOk = false;
+    const project::ProjectState state = store.load(&stateOk, nullptr);
+    if (stateOk && state.root == projectRoot_) {
+        filelists = state.filelists;
+        variables = state.variables;
+    }
+#endif
+    BorrowedList filelistList;
+    filelistList.fill(filelists);
+    BorrowedList variableList;
+    variableList.fill(variables);
+    VdStringList filelistView = filelistList.view();
+    VdStringList variableView = variableList.view();
+    const QByteArray settings = settingsPath.toUtf8();
     job_ = vd_project_expand_v2(static_cast<VdService *>(service_),
-                                root.isEmpty() ? nullptr : root.constData(), nullptr, nullptr,
-                                nullptr);
+                                root.isEmpty() ? nullptr : root.constData(),
+                                filelists.isEmpty() ? nullptr : &filelistView,
+                                settings.isEmpty() ? nullptr : settings.constData(),
+                                variables.isEmpty() ? nullptr : &variableView);
     catalogPhase_ = false;
     ticks_ = 0;
     if (job_ == 0) {
@@ -291,7 +348,10 @@ void CatalogClient::beginProjectFallback()
                  .arg(serviceError()));
         return;
     }
-    source_ = QStringLiteral("vd_project_expand_v2(%1)").arg(projectRoot_);
+    source_ = QStringLiteral("vd_project_expand_v2(%1, filelists=%2, settings=%3)")
+                  .arg(projectRoot_)
+                  .arg(filelists.size())
+                  .arg(settingsPath.isEmpty() ? QStringLiteral("<none>") : settingsPath);
     if (onProgress_ != nullptr) {
         onProgress_(QCoreApplication::translate("VEdit", "expanding the project file set…"));
     }
@@ -304,13 +364,29 @@ void CatalogClient::beginCatalog(const QStringList &files, const QStringList &in
                                  const QString &source)
 {
 #if defined(VEDIT_MODULE_TREE_HAVE_FFI)
-    if (files.isEmpty()) {
+    // RM-11: the catalog ingests only files whose language has the CATALOG
+    // capability in this build. The persisted project model is already
+    // filtered, and this is the same rule at the consumer boundary, so a state
+    // written by an older build (or a future input path) can never feed a
+    // manifest, note or build script to the elaborator.
+    QStringList sources = files;
+#if defined(VEDIT_MODULE_TREE_HAVE_PROJECT)
+    sources.clear();
+    sources.reserve(files.size());
+    for (const QString &file : files) {
+        if (project::LanguageRegistry::instance().supports(file,
+                                                           project::Capability::Catalog)) {
+            sources.append(file);
+        }
+    }
+#endif
+    if (sources.isEmpty()) {
         fail(QCoreApplication::translate(
             "VEdit", "the project has no source files, so there is no module catalog to build"));
         return;
     }
     BorrowedList fileList;
-    fileList.fill(files);
+    fileList.fill(sources);
     BorrowedList includeList;
     includeList.fill(includeDirs);
     BorrowedList defineList;
@@ -328,16 +404,21 @@ void CatalogClient::beginCatalog(const QStringList &files, const QStringList &in
     options.slang_binary = slang.isEmpty() ? nullptr : slang.constData();
     options.include_dirs = includeView;
     options.defines = defineView;
-    options.timeout_ms = 0;      // the service default (30 s)
-    options.max_json_bytes = 0;  // the service default (256 MiB)
+    options.timeout_ms = 0;      // the catalog default (120 s for the slang child)
+    options.max_json_bytes = 0;  // the service default (a 256 MiB warning threshold; the document is streamed)
     options.max_files = 0;       // the service default (oversize warning)
+    // RM-17: the named top ("" = Auto) — the SAME run feeds the tree and the
+    // reachable file set the lint scope consumes.
+    const QByteArray topName = top_.toUtf8();
+    options.top = topName.isEmpty() ? nullptr : topName.constData();
 
+    lastFileSet_ = files;
     source_ = source;
-    fileCount_ = fileCount;
+    fileCount_ = static_cast<int>(sources.size());
     projectRoot_ = root.isEmpty() ? projectRoot_ : root;
     if (qEnvironmentVariableIsSet("VEDIT_DEBUG")) {
-        std::fprintf(stderr, "module-catalog: run source='%s' files=%d root='%s'\n",
-                     qPrintable(source), fileCount, qPrintable(projectRoot_));
+        std::fprintf(stderr, "module-catalog: run source='%s' files=%d kept=%d root='%s'\n",
+                     qPrintable(source), fileCount, fileCount_, qPrintable(projectRoot_));
     }
     job_ = vd_catalog_start(static_cast<VdService *>(service_), &fileView, &options);
     catalogPhase_ = true;
@@ -349,7 +430,7 @@ void CatalogClient::beginCatalog(const QStringList &files, const QStringList &in
     }
     if (onProgress_ != nullptr) {
         onProgress_(QCoreApplication::translate("VEdit", "cataloguing %1 project file(s)…")
-                        .arg(fileCount));
+                        .arg(fileCount_));
     }
     timer_->start();
 #else
@@ -369,11 +450,14 @@ void CatalogClient::poll()
         timer_->stop();
         return;
     }
-    // 30 s at 50 ms; a stuck worker must not poll forever.
-    if (++ticks_ > 600) {
+    // 300 s at 50 ms; a stuck worker must not poll forever. The budget covers a
+    // whole-project elaboration PLUS the streamed parse, so the old 30 s (a
+    // single-file-lint budget) turned a large but healthy project into
+    // "did not answer" after the 256 MiB AST cap stopped being the limit.
+    if (++ticks_ > 6000) {
         resetJobs();
         fail(QCoreApplication::translate(
-            "VEdit", "the module catalog service did not answer within 30 s"));
+            "VEdit", "the module catalog service did not answer within 300 s"));
         return;
     }
     if (!catalogPhase_) {

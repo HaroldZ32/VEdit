@@ -51,6 +51,12 @@ struct JumpResult {
     QString filePath;
     int line = 0;
     int column = 0;
+    // One sentence saying WHY the jump was not delivered (empty on Delivered).
+    // For a Rejected jump this is the target's own explanation, so a panel can
+    // say "the editor rejected the jump to X: <reason>" instead of an
+    // unexplained refusal (RM-4). The registry fills it for every status, so a
+    // caller never has to guess.
+    QString reason;
 };
 
 class Registry final {

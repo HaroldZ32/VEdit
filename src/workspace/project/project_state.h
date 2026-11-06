@@ -9,7 +9,15 @@
 // survives a restart, so the project, its imported filelists and its members are
 // still listed before (or even without) the service answering again —
 // acceptance AC-2.4 "重启后根目录、导入的 .f 列表、-I/-D、展开结果与关前一致".
+//
+// RM-3: `variablesByRoot` is the per-root memory of the project variable table.
+// The live `variables` field belongs to `root`; the map keeps what the user typed
+// for OTHER roots, so a switch A -> B -> A brings A's values back instead of
+// losing them with the live state (the ProjectModel wipe). It is additive in the
+// same file (`version` 3); a version-2 file simply loads with an empty map and
+// the model seeds the entry for its own root.
 #include <QJsonObject>
+#include <QMap>
 #include <QString>
 #include <QStringList>
 
@@ -19,6 +27,15 @@ struct ProjectState {
     QString root;               // empty => no project has been resolved
     QStringList filelists;      // imported .f files, absolute, import order
     QStringList variables;      // ADDENDUM A-9: `NAME=VALUE`, project table (wins over env)
+    // RM-3: the table typed for each root, keyed by the ROOT the user opened.
+    // `variables` is the entry of `root` (kept in sync by the model); the other
+    // entries are what a switch back must restore.
+    QMap<QString, QStringList> variablesByRoot;
+    // RM-17: the module-tree TOP the user named for this project (module NAME;
+    // empty = Auto = every design root). `top` is the entry of `root`; the map
+    // remembers the other roots so A -> B -> A restores A's top.
+    QString top;
+    QMap<QString, QString> topByRoot;
     QStringList files;          // absolute paths, filelist order, duplicates removed
     QStringList includeDirs;    // absolute `-I` paths (project + tools page)
     QStringList defines;        // `-D` defines, `NAME` or `NAME=VALUE`

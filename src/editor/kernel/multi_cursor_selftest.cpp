@@ -328,6 +328,106 @@ int main(int argc, char **argv)
               document->text() == altOriginal,
           undoError);
 
+    // --- RM-6: the WM-safe primaries (Shift+Alt+drag, Ctrl+Alt+click) ------
+    // KDE/GNOME grab plain Alt+drag for the window move, so on the user's
+    // desktops Alt+... never reaches the application. The primary gestures are
+    // Shift+Alt+drag (block) and Ctrl+Alt+click (cursor); the plain Alt forms
+    // stay as the secondary path (asserted above). Same real inner widget
+    // (KateViewInternal), same coordinate mapping as the Alt checks.
+    document->setText(QStringLiteral("one\ntwo\nthree\nfour\n"));
+    QApplication::processEvents();
+    singleCursor(0, 0);
+    QApplication::processEvents();
+    {
+        const QPoint start = view->cursorToCoordinate(KTextEditor::Cursor(1, 0));
+        const QPoint end = view->cursorToCoordinate(KTextEditor::Cursor(3, 2));
+        QWidget *target = deliveryTarget(view, start);
+        check(QStringLiteral("rm6.shift-alt-block.inner-widget"),
+              target != nullptr && target != view && view->isAncestorOf(target),
+              target != nullptr ? QString(target->metaObject()->className())
+                                : QStringLiteral("none"));
+        QTest::mousePress(target, Qt::LeftButton, Qt::ShiftModifier | Qt::AltModifier,
+                          pointInTarget(target, view, start));
+        QTest::mouseMove(target, pointInTarget(target, view, end));
+        QApplication::processEvents();
+        check(QStringLiteral("rm6.shift-alt-block.drag-active"), multi->blockSelectionActive());
+        check(QStringLiteral("rm6.shift-alt-block.native-mode"), view->blockSelection());
+        QTest::mouseRelease(target, Qt::LeftButton, Qt::ShiftModifier | Qt::AltModifier,
+                            pointInTarget(target, view, end));
+        QApplication::processEvents();
+        check(QStringLiteral("rm6.shift-alt-block.cursor-count"), multi->cursorCount() == 3,
+              QString::number(multi->cursorCount()));
+        bool sameRectangle = true;
+        const QList<KTextEditor::Cursor> blockCursors = multi->cursors();
+        for (int index = 0; index < static_cast<int>(blockCursors.size()); ++index) {
+            if (blockCursors.at(index) != KTextEditor::Cursor(index + 1, 0)) {
+                sameRectangle = false;
+            }
+        }
+        check(QStringLiteral("rm6.shift-alt-block.rectangle"), sameRectangle,
+              QStringLiteral("cursors=%1").arg(blockCursors.size()));
+        check(QStringLiteral("rm6.shift-alt-block.native-mode-off"), !view->blockSelection());
+        const QString blockOriginal = document->text();
+        QTest::keyClick(keyTarget(), Qt::Key_X);
+        QApplication::processEvents();
+        check(QStringLiteral("rm6.shift-alt-block.rectangular-insert"),
+              lineText(document, 1) == QStringLiteral("xtwo")
+                  && lineText(document, 2) == QStringLiteral("xthree")
+                  && lineText(document, 3) == QStringLiteral("xfour"),
+              detailedLines(document, 4));
+        undoError.clear();
+        check(QStringLiteral("rm6.shift-alt-block.one-undo"),
+              vedit::editor::documentUndo(document, &undoError)
+                  && document->text() == blockOriginal,
+              undoError);
+    }
+
+    // Ctrl+Alt+click adds a cursor, a second one on the same place removes it.
+    document->setText(QStringLiteral("aaa\nbbb\nccc\n"));
+    QApplication::processEvents();
+    singleCursor(0, 1);
+    QApplication::processEvents();
+    {
+        const KTextEditor::Cursor targetCursor(1, 1);
+        const QPoint point = view->cursorToCoordinate(targetCursor);
+        const auto ctrlAltClick = [&]() {
+            QWidget *target = deliveryTarget(view, point);
+            QTest::mousePress(target, Qt::LeftButton, Qt::ControlModifier | Qt::AltModifier,
+                              pointInTarget(target, view, point));
+            QTest::mouseRelease(target, Qt::LeftButton, Qt::ControlModifier | Qt::AltModifier,
+                                pointInTarget(target, view, point));
+            QApplication::processEvents();
+        };
+        ctrlAltClick();
+        check(QStringLiteral("rm6.ctrl-alt-click.add"), multi->cursorCount() == 2,
+              QString::number(multi->cursorCount()));
+        check(QStringLiteral("rm6.ctrl-alt-click.added-position"),
+              multi->cursors().contains(targetCursor),
+              QStringLiteral("cursors=%1").arg(multi->cursorCount()));
+        ctrlAltClick();
+        check(QStringLiteral("rm6.ctrl-alt-click.toggle-off"), multi->cursorCount() == 1,
+              QString::number(multi->cursorCount()));
+        ctrlAltClick();
+        check(QStringLiteral("rm6.ctrl-alt-click.readd"), multi->cursorCount() == 2,
+              QString::number(multi->cursorCount()));
+    }
+
+    // Conflict matrix: a plain click stays a plain click (one cursor, no block).
+    singleCursor(0, 1);
+    QApplication::processEvents();
+    {
+        const QPoint point = view->cursorToCoordinate(KTextEditor::Cursor(2, 1));
+        QWidget *target = deliveryTarget(view, point);
+        QTest::mousePress(target, Qt::LeftButton, Qt::NoModifier,
+                          pointInTarget(target, view, point));
+        QTest::mouseRelease(target, Qt::LeftButton, Qt::NoModifier,
+                            pointInTarget(target, view, point));
+        QApplication::processEvents();
+        check(QStringLiteral("rm6.plain-click.single-cursor"),
+              multi->cursorCount() == 1 && !multi->blockSelectionActive(),
+              QString::number(multi->cursorCount()));
+    }
+
     // --- multi-cursor typing / Backspace / Delete / Return: one undo each --
     const auto resetThreeCursors = [&](const QList<KTextEditor::Cursor> &positions) {
         document->setText(QStringLiteral("abc\ndef\nghi\n"));
@@ -799,6 +899,29 @@ int main(int argc, char **argv)
                 check(QStringLiteral("definition.collapse.ctrl-click-dispatched"),
                       triggered == triggeredBeforeCollapse + 1,
                       QStringLiteral("%1 -> %2").arg(triggeredBeforeCollapse).arg(triggered));
+
+                // RM-6 conflict matrix: Ctrl+Alt+click is the WM-safe PRIMARY
+                // add/remove-cursor gesture and must never reach the
+                // go-to-definition path (Ctrl+click without Alt).
+                {
+                    const KTextEditor::Cursor ctrlAltCursor(1, 4);
+                    const int triggeredBeforeCtrlAlt = triggered;
+                    const int lineBefore = dispatchedLine;
+                    const int columnBefore = dispatchedColumn;
+                    clickAt(ctrlAltCursor, Qt::ControlModifier | Qt::AltModifier);
+                    check(QStringLiteral("rm6.ctrl-alt-click.no-definition-dispatch"),
+                          triggered == triggeredBeforeCtrlAlt,
+                          QStringLiteral("%1 -> %2").arg(triggeredBeforeCtrlAlt).arg(triggered));
+                    check(QStringLiteral("rm6.ctrl-alt-click.dispatch-unchanged"),
+                          dispatchedLine == lineBefore && dispatchedColumn == columnBefore,
+                          QStringLiteral("%1:%2 -> %3:%4")
+                              .arg(lineBefore).arg(columnBefore)
+                              .arg(dispatchedLine).arg(dispatchedColumn));
+                    check(QStringLiteral("rm6.ctrl-alt-click.adds-cursor"),
+                          definitionCursors->cursorCount() == 2
+                              && definitionCursors->cursors().contains(ctrlAltCursor),
+                          QStringLiteral("count=%1").arg(definitionCursors->cursorCount()));
+                }
 
                 // --- the backend gate is off: plain click + ONE reason ------
                 const QString backendGoneReason =

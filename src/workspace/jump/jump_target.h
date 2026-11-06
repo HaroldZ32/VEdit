@@ -26,6 +26,15 @@ public:
     // Returns true only when the jump was actually performed; a failure
     // (missing file, no editor pane, ...) returns false instead of throwing.
     virtual bool jumpTo(const QString &filePath, int line, int column) = 0;
+
+    // WHY the last jump did not happen, in one sentence (empty when it did).
+    // The registry copies this into JumpResult::reason, so a panel can tell the
+    // user WHAT failed and WHY without knowing which target is installed - the
+    // panels used to report only "the editor rejected the jump to X", which hid
+    // the real reason (RM-4: every refused jump looked identical).
+    // A target that cannot explain itself keeps the default and the panel falls
+    // back to its generic sentence.
+    virtual QString lastError() const { return QString(); }
 };
 
 } // namespace vedit::workspace::jump

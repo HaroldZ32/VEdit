@@ -20,7 +20,7 @@
 //   * after the zh_CN .qm is installed the five menu titles, Preferences… and a
 //     panel toggle render in Chinese;
 //   * Help -> User Manual (F1) opens the reader and renders the embedded
-//     docs/USER_GUIDE.md (the "VEdit 用户指南" title is present in the text).
+//     docs/USER_GUIDE.md (its shipped "VEdit 用户手册" H1 is rendered).
 #include "app_shell.h"
 #include "command_registry.h"
 #include "editor_area.h"
@@ -171,11 +171,21 @@ struct ToolbarEntry {
     const char *id;
 };
 
+// The SHIPPED toolbar order, exactly as `ApplicationShell` builds it
+// (app_shell.cpp `kToolBarOrder`). The comparison below is an ordered equality,
+// deliberately: the order is the requirement, not a subset. RM-2 added
+// `file.switch-project` next to Open Folder, so it must appear here too.
 const QList<const char *> kToolbarOrder{
-    "file.new",      "file.open",   "file.open-folder", "file.save", "file.save-all",
-    "edit.undo",     "edit.redo",   nullptr, /* separator */ "search.focus",
-    "project.lint",  "diagnostics.format",
+    "file.new",       "file.open",     "file.open-folder", "file.switch-project",
+    "file.save",      "file.save-all", "edit.undo",        "edit.redo",
+    nullptr, /* separator */ "search.focus", "project.lint", "diagnostics.format",
 };
+
+// The shipped H1 of docs/USER_GUIDE.md (RM-8 rewrote the manual). ONE constant
+// feeds both the header-accessor assertion and the rendered-viewer assertion so
+// the two cannot drift apart; it is the exact shipped title, not the old
+// "用户指南" substring.
+const QString kManualTitle = QStringLiteral("VEdit 用户手册");
 
 void testStructure(const QString &directory)
 {
@@ -334,7 +344,7 @@ void testHelpViewer(const QString &directory)
     check(QStringLiteral("a2.help.manual-resource-not-empty"), !markdown.isEmpty(),
           QStringLiteral("%1 bytes").arg(markdown.size()));
     check(QStringLiteral("a2.help.manual-has-title"),
-          vedit::app::HelpViewer::manualTitle().contains(QStringLiteral("用户指南")),
+          vedit::app::HelpViewer::manualTitle() == kManualTitle,
           vedit::app::HelpViewer::manualTitle());
 
     QAction *manual = shell.commands()->action(QStringLiteral("help.user-manual"));
@@ -349,7 +359,7 @@ void testHelpViewer(const QString &directory)
     check(QStringLiteral("a2.help.viewer-opens"), viewer != nullptr && viewer->isVisible());
     check(QStringLiteral("a2.help.viewer-renders-title"),
           viewer != nullptr && viewer->textView() != nullptr
-              && viewer->textView()->toPlainText().contains(QStringLiteral("用户指南")));
+              && viewer->textView()->toPlainText().contains(kManualTitle));
     if (viewer != nullptr) {
         viewer->close();
     }

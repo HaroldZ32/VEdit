@@ -311,9 +311,27 @@ void checkPanelAndPersistence(const QString &settingsPath, const QString &shortc
               && restoredAction->shortcut() == QKeySequence(QStringLiteral("Ctrl+Alt+J")),
           restoredAction != nullptr ? restoredAction->shortcut().toString() : QStringLiteral("<missing>"));
 
-    // Conflict: bind Ctrl+S to a second command and expect the visible hint.
-    fromRust.panel->setShortcut(QStringLiteral("view.toggle-settings"),
-                                QKeySequence(QStringLiteral("Ctrl+S")));
+    // RM-5b: a USER edit can no longer CREATE a duplicate. Qt drops BOTH actions
+    // of an ambiguous sequence, so the page refuses the assignment and names the
+    // command that already owns it (the old behaviour stored it and left the user
+    // with two dead keys).
+    const QKeySequence saveKey(QStringLiteral("Ctrl+S"));
+    const QKeySequence panelBefore =
+        fromRust.commands.action(QStringLiteral("view.toggle-settings"))->shortcut();
+    fromRust.panel->setShortcut(QStringLiteral("view.toggle-settings"), saveKey);
+    check("settings.conflict.refused",
+          fromRust.commands.action(QStringLiteral("view.toggle-settings"))->shortcut()
+              == panelBefore,
+          fromRust.commands.action(QStringLiteral("view.toggle-settings"))->shortcut().toString());
+    check("settings.conflict.refused-names-owner",
+          fromRust.panel->statusText().contains(QStringLiteral("file.save")),
+          fromRust.panel->statusText());
+
+    // A conflict that ALREADY exists (a hand-edited / legacy store) is still
+    // detected and shown in red: the guard is on edits, the report is on state.
+    fromRust.commands.store()->setShortcut(QStringLiteral("view.toggle-settings"), saveKey);
+    fromRust.commands.refreshShortcuts();
+    fromRust.panel->reload();
     check("settings.conflict.flush", fromRust.panel->flush());
     const QString conflictText = fromRust.panel->conflicts().join(QStringLiteral(" | "));
     check("settings.conflict.detected", fromRust.panel->conflictCount() >= 1, conflictText);
@@ -325,6 +343,9 @@ void checkPanelAndPersistence(const QString &settingsPath, const QString &shortc
     check("settings.conflict.visible",
           fromRust.panel->conflictLabel()->text().contains(QStringLiteral("Conflicting")),
           fromRust.panel->conflictLabel()->text());
+    // Clean the legacy duplicate again so the later checks start from a known state.
+    fromRust.commands.store()->clearShortcut(QStringLiteral("view.toggle-settings"));
+    fromRust.commands.refreshShortcuts();
 
     // Bad configuration: the file no longer parses. The panel must show the store's
     // diagnostics and keep a usable theme (defaults where needed), never crash.

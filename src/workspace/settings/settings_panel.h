@@ -115,6 +115,20 @@ public:
     void setShortcut(const QString &commandId, const QKeySequence &sequence);
     void clearShortcut(const QString &commandId);
     void applyEditorShortcut();
+
+    // --- RM-5b: the Shortcuts page must SHOW the effective binding ----------
+    // `shortcutText` is what the table paints: the effective sequence, or the
+    // explicit "(unbound)" — never an empty cell that reads like a bug.
+    // `defaultShortcutText` is the registered default (what reset restores), also
+    // explicit when the command has none.
+    QString shortcutText(const QString &commandId) const;
+    QString defaultShortcutText(const QString &commandId) const;
+    // "default" | "custom" | "unbound" — the third table column.
+    QString shortcutState(const QString &commandId) const;
+    // Reset ONE command / EVERY command to the registered default (removes the
+    // stored override; the default binding becomes effective again).
+    void resetShortcut(const QString &commandId);
+    void resetAllShortcuts();
     // Sets every field of the Tools page and stores the change.
     void setToolValues(const ToolValues &values);
     // Sets every field of the FIM page and stores the change.
@@ -356,6 +370,7 @@ private:
     QKeySequenceEdit *shortcutEditor_ = nullptr;
     QPushButton *assignButton_ = nullptr;
     QPushButton *clearButton_ = nullptr;
+    QPushButton *resetAllButton_ = nullptr;
     QPushButton *reloadButton_ = nullptr;
     QLabel *conflictLabel_ = nullptr;
     QLabel *statusLabel_ = nullptr;

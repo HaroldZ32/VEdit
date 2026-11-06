@@ -343,8 +343,21 @@ bool InterfacePanel::jumpToInstantiation()
 bool InterfacePanel::deliver(const ModuleJump &jump, const QString &description)
 {
     if (!jump.isValid()) {
+        // Backstop for a caller that reached deliver() without a usable position:
+        // it must say WHY (what the catalog reported), exactly like the refusal
+        // paths below - a status line with only the description told the user and
+        // the team nothing (RM-4).
         ++jumpsSkipped_;
-        setStatus(description);
+        setStatus(QCoreApplication::translate(
+                      "VEdit",
+                      "%1: the catalog reports no usable position (file=%2, line=%3, column=%4), "
+                      "so nothing was opened")
+                      .arg(description,
+                           jump.file.isEmpty()
+                               ? QCoreApplication::translate("VEdit", "<none>")
+                               : jump.file)
+                      .arg(jump.line)
+                      .arg(jump.column));
         return false;
     }
     ++jumpAttempts_;
@@ -366,12 +379,23 @@ bool InterfacePanel::deliver(const ModuleJump &jump, const QString &description)
                       .arg(description));
         return false;
     case jump::JumpStatus::Rejected:
-        setStatus(QCoreApplication::translate("VEdit", "%1: the editor rejected the jump to %2")
-                      .arg(description, target));
+        // RM-4: the WHY travels with the refusal (jump::JumpResult::reason), so
+        // this is never the bare "the editor rejected the jump to X" that hid
+        // every distinct cause behind one sentence. A refusal is still a
+        // refusal: nothing is retried and nothing is silently swallowed.
+        setStatus(QCoreApplication::translate("VEdit",
+                                              "%1: the editor rejected the jump to %2 — %3")
+                      .arg(description, target,
+                           result.reason.isEmpty()
+                               ? QCoreApplication::translate("VEdit", "no reason was reported")
+                               : result.reason));
         return false;
     case jump::JumpStatus::InvalidRequest:
-        setStatus(QCoreApplication::translate("VEdit", "%1: the jump request (%2) was refused")
-                      .arg(description, target));
+        setStatus(QCoreApplication::translate("VEdit", "%1: the jump request (%2) was refused — %3")
+                      .arg(description, target,
+                           result.reason.isEmpty()
+                               ? QCoreApplication::translate("VEdit", "no reason was reported")
+                               : result.reason));
         return false;
     }
     return false;

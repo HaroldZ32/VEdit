@@ -1,6 +1,9 @@
 #include "diagnostics_controller.h"
 
+#include "../project/language_registry.h"
+
 #include <QDateTime>
+#include <QDir>
 #include <QFileInfo>
 #include <QHash>
 #include <QRegularExpression>
@@ -188,6 +191,12 @@ void DiagnosticsController::setConfiguration(const QString &lsPath,
 
 void DiagnosticsController::setFileSet(const QStringList &files)
 {
+    // RM-9: the project set is its own member. `files_` is the ACTIVE analysis
+    // set (analyzeFile() narrows it to the focused document); a file outside the
+    // active analysis is still a project file and must keep a visible state -
+    // either its retained verdict or an explicit "not analysed" mark.
+    projectFiles_ = files;
+    projectFileSet_ = QSet<QString>(files.begin(), files.end());
     files_ = files;
     reparse();
 }
@@ -215,6 +224,21 @@ void DiagnosticsController::reparse()
     // were just dropped. Keeping them would turn a file with errors into a green
     // dot (Clean) after the analysis is gone; the verdict must follow the rows.
     lowerAnalyzed_.clear();
+    // RM-9: a reparse starts a NEW lower session, so every RETAINED lower
+    // verdict is about the old session and is void. The project set keeps an
+    // explicit "not analysed" state until the new session (or the pass) reports.
+    retainedLowerRows_.clear();
+    retainedLowerEvaluated_.clear();
+    notAnalyzedReason_.clear();
+    // RM-17b: every setFileSet() re-parses and the clear above would erase the
+    // ACTIVE scope's reasons, turning an excluded file green on the next paint.
+    // Re-apply them from the ONE derivation (the excluded set).
+    if (!topScopeTop_.isEmpty()) {
+        const QString prefix = QStringLiteral("outside-top:");
+        for (const QString &file : scopeExcluded_) {
+            markNotAnalyzed(file, prefix + topScopeTop_);
+        }
+    }
     outline_.clear();
     lastError_.clear();
     invalidateView();
@@ -256,6 +280,20 @@ bool DiagnosticsController::analyzeFile(const QString &file, const QString &buff
     symbolsRequested_ = false;
     ++analysisCount_;
     lastAnalysisAt_ = QDateTime::currentDateTime();
+
+    // RM-9 retention rule (R2): an edit voids the file's verdict until the
+    // analysis below lands. A dirty buffer's previous rows were computed on
+    // older text, so they are dropped and the file shows the explicit
+    // "not analysed / excluded" state - never a stale green. A clean file keeps
+    // its previous verdict while the fresh one is in flight (no flicker), and a
+    // file that has never been analysed gets a visible "pending" mark instead of
+    // having no mark at all.
+    if (bufferDirty) {
+        clearRetainedRows(file);
+        markNotAnalyzed(file, QStringLiteral("modified"));
+    } else if (!retainedLowerEvaluated_.contains(file)) {
+        markNotAnalyzed(file, QStringLiteral("pending"));
+    }
 
     const bool sameFile = files_.size() == 1 && files_.first() == file;
     if (!sameFile || !lspStarted_) {
@@ -347,6 +385,11 @@ void DiagnosticsController::startLints()
         return;
     }
     for (const QString &file : files_) {
+        // RM-17b ruling: the per-file layer skips excluded files ENTIRELY - no
+        // request, so a zero-row answer can never be retained as Clean.
+        if (isScopeExcluded(file)) {
+            continue;
+        }
         QString error;
         const int ticket = slang_->startLint(file, &error);
         if (ticket > 0) {
@@ -415,6 +458,9 @@ void DiagnosticsController::refresh()
             if (!lspDiagnosticsRequested_) {
                 lspDiagnosticsRequested_ = true;
                 for (const QString &file : files_) {
+                    if (isScopeExcluded(file)) {
+                        continue; // RM-17b: an excluded file is not requested
+                    }
                     const quint64 id = lsp_->requestDiagnostics(file);
                     if (id != 0) {
                         lspDiagnostics_.append(DiagnosticTicket{id, file});
@@ -447,6 +493,9 @@ void DiagnosticsController::collectLints()
     }
     QVector<LintTicket> pending;
     for (const LintTicket &ticket : lints_) {
+        if (isScopeExcluded(ticket.file)) {
+            continue; // RM-17b: a scope change voids the in-flight lower result
+        }
         LspPolled polled = slang_ ? slang_->pollLint(ticket.id) : LspPolled::failure(
                                             QCoreApplication::translate("VEdit", "no SLANG backend"));
         if (polled.pending) {
@@ -468,6 +517,10 @@ void DiagnosticsController::collectLints()
             }
             diagnostics_.append(entry);
         }
+        // RM-9: keep this file's rows in the retained per-file store (the SAME
+        // rows the merged view reads) and lift the "pending" mark.
+        retainLowerRows(ticket.file);
+        clearNotAnalyzed(ticket.file);
     }
     lints_ = pending;
     if (!pending.isEmpty() || !diagnostics_.isEmpty()) {
@@ -482,6 +535,9 @@ void DiagnosticsController::collectLspDiagnostics()
     }
     QVector<DiagnosticTicket> pending;
     for (const DiagnosticTicket &ticket : lspDiagnostics_) {
+        if (isScopeExcluded(ticket.file)) {
+            continue; // RM-17b: an excluded file keeps NO lower verdict
+        }
         LspPolled polled = lsp_->poll(ticket.id);
         if (polled.pending) {
             pending.append(ticket);
@@ -515,6 +571,11 @@ void DiagnosticsController::collectLspDiagnostics()
         // CLEAN verdict, not "unknown" - that is the green dot for the file the
         // user is looking at, independent of any project pass.
         lowerAnalyzed_.insert(ticket.file);
+        // RM-9: retain the verdict per file. Retaining is the ONLY new store:
+        // it is fed here, from the rows the merged view already reads, so the
+        // dot/count/hover never compute a second answer.
+        retainLowerRows(ticket.file);
+        clearNotAnalyzed(ticket.file);
         invalidateView();
     }
     lspDiagnostics_ = pending;
@@ -757,7 +818,32 @@ bool DiagnosticsController::startProjectPass(const LintPassRequest &request, QSt
     // at `resolve` (the tool is not installed yet) must still leave a valid
     // request behind, or Re-run — the documented recovery path — would refuse
     // with "no project lint pass has run yet" and the button would be a no-op.
-    passRequest_ = request;
+    //
+    // RM-11: this is the LAST boundary before the engine. The request builders
+    // already ask the language registry, but a `.f` manifest / note / build
+    // script that somehow arrives here must be EXCLUDED - never handed to a
+    // HDL parser (the real-machine symptom was a syntax error on the filelist).
+    // The rule stays positive: only a language with the Lint capability is a
+    // candidate; everything else is recorded with the reason.
+    passNonSource_.clear();
+    QStringList requestedFiles;
+    requestedFiles.reserve(request.files.size());
+    for (const QString &file : request.files) {
+        // RM-17: with a named top the pass covers only files reachable from it
+        // (the SAME set the module tree derived and the dots show as excluded).
+        if (isScopeExcluded(file)) {
+            continue;
+        }
+        if (vedit::workspace::project::LanguageRegistry::instance().supports(
+                file, vedit::workspace::project::Capability::Lint)) {
+            requestedFiles.append(file);
+        } else {
+            passNonSource_.append(file);
+        }
+    }
+    LintPassRequest effective = request;
+    effective.files = requestedFiles;
+    passRequest_ = effective;
     if (!passBackend_) {
         pass_ = LintPassSnapshot{};
         pass_.phase = LintPhase::Failed;
@@ -785,8 +871,8 @@ bool DiagnosticsController::startProjectPass(const LintPassRequest &request, QSt
     // their LSP diagnostics keep flowing (the pass never touches diagnostics_).
     const QStringList skipped = openFiles_;
     QStringList files;
-    files.reserve(request.files.size());
-    for (const QString &file : request.files) {
+    files.reserve(effective.files.size());
+    for (const QString &file : effective.files) {
         if (!skipped.contains(file)) {
             files.append(file);
         }
@@ -794,6 +880,14 @@ bool DiagnosticsController::startProjectPass(const LintPassRequest &request, QSt
     passSkipped_ = skipped;
     passFiles_ = files.size();
     passLintedFiles_ = files;
+    // RM-9: a skipped document is NOT "clean". The pass cannot read its unsaved
+    // buffer from disk, so the file is explicitly excluded until a fresh lower
+    // analysis (or the next pass) covers it. A fresh retained verdict still wins
+    // in statusValueForFile(), so a dirty buffer the LSP just analysed keeps its
+    // real red/yellow/green.
+    for (const QString &file : skipped) {
+        markNotAnalyzed(file, QStringLiteral("modified"));
+    }
     passStartEditSeq_ = editCounter_;
     passAutomaticRequested_ = nextPassAutomatic_;
     nextPassAutomatic_ = false;
@@ -801,9 +895,14 @@ bool DiagnosticsController::startProjectPass(const LintPassRequest &request, QSt
         pass_ = LintPassSnapshot{};
         pass_.phase = LintPhase::Finished;
         pass_.tool = passBackend_->toolName();
-        pass_.message = QStringLiteral(
-            "no files to lint (every requested file is a modified buffer; the language "
-            "server lints unsaved edits)");
+        pass_.message = passNonSource_.isEmpty()
+            ? QStringLiteral(
+                  "no files to lint (every requested file is a modified buffer; the language "
+                  "server lints unsaved edits)")
+            : QStringLiteral(
+                  "no files to lint (%1 file(s) have no lint analyzer for their file type; "
+                  "modified buffers are excluded)")
+                  .arg(passNonSource_.size());
         lastError_ = pass_.message;
         if (error != nullptr) {
             *error = pass_.message;
@@ -811,7 +910,7 @@ bool DiagnosticsController::startProjectPass(const LintPassRequest &request, QSt
         return false;
     }
 
-    LintPassRequest backendRequest = request;
+    LintPassRequest backendRequest = effective;
     backendRequest.files = files;
     QString startError;
     const quint64 job = passBackend_->start(backendRequest, &startError);
@@ -879,6 +978,14 @@ void DiagnosticsController::clearProjectDiagnostics()
     cliDiagnostics_.clear();
     coveredFiles_.clear();
     lowerAnalyzed_.clear();
+    // RM-9: the retained per-file store belongs to the project being left. A
+    // switch must not paint the previous project's dots (the same rule RM-2
+    // applies to the upper layer and to the analysis set).
+    retainedLowerRows_.clear();
+    retainedLowerEvaluated_.clear();
+    notAnalyzedReason_.clear();
+    projectFiles_.clear();
+    projectFileSet_.clear();
     passSkipped_.clear();
     passLintedFiles_.clear();
     passFiles_ = 0;
@@ -997,8 +1104,15 @@ void DiagnosticsController::markFileEdited(const QString &file)
         // R2: an edited file's upper rows are void. Drop them from the store as
         // well, so a later pass cannot resurrect a stale row by dedupe key.
         dropUpperRows(file);
-        invalidateView();
     }
+    // RM-9 / R2: the edit voids the LOWER verdict too - it was computed on the
+    // text from BEFORE this edit. Retaining it would keep a green dot alive on a
+    // file whose verdict no longer describes its buffer. The file shows the
+    // explicit "excluded" state until the next analysis lands (active buffer) or
+    // the next pass covers it.
+    clearRetainedRows(file);
+    markNotAnalyzed(file, QStringLiteral("modified"));
+    invalidateView();
 }
 
 void DiagnosticsController::dropUpperRows(const QString &file)
@@ -1008,6 +1122,30 @@ void DiagnosticsController::dropUpperRows(const QString &file)
             cliDiagnostics_.removeAt(index);
         }
     }
+}
+
+/// The ONE classification rule for a set of already-collected rows: error
+/// dominates, then warning, then clean. Shared by statusValueForFile() (one
+/// file) and fileStatuses() (the whole map), so the dot and the map cannot
+/// diverge. It is only called when a layer produced a verdict, so an empty row
+/// set means CLEAN - exactly the green dot.
+static int classifyStatusRows(const QVector<DiagnosticEntry> &rows, bool cliScale)
+{
+    bool error = false;
+    bool warning = false;
+    for (const DiagnosticEntry &entry : rows) {
+        const int severity = cliScale ? canonicalSeverity(entry.severity, DiagnosticOrigin::Cli)
+                                      : entry.severity;
+        error = error || severity == 1;
+        warning = warning || severity == 2;
+    }
+    if (error) {
+        return static_cast<int>(vedit::common::FileStatus::Error);
+    }
+    if (warning) {
+        return static_cast<int>(vedit::common::FileStatus::Warning);
+    }
+    return static_cast<int>(vedit::common::FileStatus::Clean);
 }
 
 QVector<DiagnosticEntry> DiagnosticsController::mergedDiagnostics() const
@@ -1025,16 +1163,23 @@ QVector<DiagnosticEntry> DiagnosticsController::mergedDiagnostics() const
         keys.insert(key);
         rows.append(toDisplayEntry(entry));
     }
-    for (const DiagnosticEntry &entry : diagnostics_) {
-        if (coveredFiles_.contains(entry.file)) {
+    // LOWER: the RETAINED per-file verdicts, for every file the upper layer
+    // does not cover. This is the same store the dots and the panel read, so a
+    // file that is not the active document still contributes its real rows -
+    // the defect this row fixes was exactly that it did not.
+    for (auto it = retainedLowerRows_.constBegin(); it != retainedLowerRows_.constEnd(); ++it) {
+        const QString &file = it.key();
+        if (coveredFiles_.contains(file) || !retainedLowerEvaluated_.contains(file)) {
             continue;
         }
-        const QString key = diagnosticMergeKey(entry, DiagnosticOrigin::Lsp);
-        if (keys.contains(key)) {
-            continue;
+        for (const DiagnosticEntry &entry : it.value()) {
+            const QString key = diagnosticMergeKey(entry, DiagnosticOrigin::Lsp);
+            if (keys.contains(key)) {
+                continue;
+            }
+            keys.insert(key);
+            rows.append(entry);
         }
-        keys.insert(key);
-        rows.append(entry);
     }
     std::sort(rows.begin(), rows.end(), [](const DiagnosticEntry &left, const DiagnosticEntry &right) {
         if (left.file != right.file) {
@@ -1073,11 +1218,13 @@ QVector<DiagnosticEntry> DiagnosticsController::mergedDiagnosticsForFile(const Q
                 take(entry, DiagnosticOrigin::Cli);
             }
         }
-    } else {
-        for (const DiagnosticEntry &entry : diagnostics_) {
-            if (entry.file == file) {
-                take(entry, DiagnosticOrigin::Lsp);
-            }
+    } else if (retainedLowerEvaluated_.contains(file)) {
+        // The retained per-file verdict - the SAME store the dot reads. A file
+        // edited after its last analysis has no retained verdict (markFileEdited
+        // drops it), so it contributes no rows and no stale squiggle survives an
+        // edit; it shows the explicit "not analysed / excluded" state instead.
+        for (const DiagnosticEntry &entry : retainedLowerRows_.value(file)) {
+            take(entry, DiagnosticOrigin::Lsp);
         }
     }
     std::sort(rows.begin(), rows.end(), [](const DiagnosticEntry &left, const DiagnosticEntry &right) {
@@ -1094,85 +1241,193 @@ QVector<DiagnosticEntry> DiagnosticsController::mergedDiagnosticsForFile(const Q
 
 DiagnosticsController::FileStatus DiagnosticsController::statusForFile(const QString &file) const
 {
+    return static_cast<FileStatus>(statusValueForFile(file));
+}
+
+bool DiagnosticsController::isScopeExcluded(const QString &file) const
+{
+    return !topScopeTop_.isEmpty() && scopeExcluded_.contains(QDir::cleanPath(file));
+}
+
+int DiagnosticsController::statusValueForFile(const QString &file) const
+{
     if (file.isEmpty()) {
-        return FileStatus::Unknown;
+        return static_cast<int>(FileStatus::Unknown);
     }
-    bool any = false;
-    bool error = false;
-    bool warning = false;
-    const auto scan = [&](const DiagnosticEntry &entry, bool cliScale) {
-        if (entry.file != file) {
-            return;
-        }
-        any = true;
-        const int severity = cliScale ? canonicalSeverity(entry.severity, DiagnosticOrigin::Cli)
-                                      : entry.severity;
-        error = error || severity == 1;
-        warning = warning || severity == 2;
-    };
+    // 0) RM-17b RULING: while a top is active, exclusion by the user's own
+    //    instruction is AUTHORITATIVE for the dot. It outranks the upper project
+    //    layer and the lower per-file verdict. This does not contradict RM-9
+    //    ruling 1 (a fresh verdict beats a stale one for a dirty buffer): ruling
+    //    1 resolves STALENESS, this resolves EXCLUSION by explicit instruction,
+    //    and an instruction outranks any verdict.
+    if (isScopeExcluded(file)) {
+        return static_cast<int>(FileStatus::NotAnalyzed);
+    }
+    // 1) UPPER layer: the project pass covered this file and the file was not
+    //    edited since. Its rows are the verdict (empty = clean).
     if (coveredFiles_.contains(file)) {
+        QVector<DiagnosticEntry> rows;
         for (const DiagnosticEntry &entry : cliDiagnostics_) {
-            scan(entry, true);
+            if (entry.file == file) {
+                rows.append(entry);
+            }
         }
-        // The pass evaluated this file and found nothing: that is CLEAN, and it
-        // is exactly the green dot (an un-evaluated file must stay dot-less).
-        if (!any) {
-            return FileStatus::Clean;
-        }
-    } else {
-        for (const DiagnosticEntry &entry : diagnostics_) {
-            scan(entry, false);
-        }
-        if (!any) {
-            // The lower layer evaluated this file and reported nothing: clean,
-            // exactly like a covered-and-clean project file. A file no layer
-            // ever looked at stays dot-less.
-            return lowerAnalyzed_.contains(file) ? FileStatus::Clean : FileStatus::Unknown;
+        return classifyStatusRows(rows, true);
+    }
+    // 2) A FRESH lower verdict (analysed after the last edit). This wins over
+    //    the "excluded" mark: the user's rule is that a file with a real
+    //    verdict shows it, dirty buffer or not (RM-9 ruling 1).
+    if (retainedLowerEvaluated_.contains(file)) {
+        return classifyStatusRows(retainedLowerRows_.value(file), false);
+    }
+    // 3) No trustworthy verdict since the last edit, or excluded from the pass.
+    if (notAnalyzedReason_.contains(file)) {
+        return static_cast<int>(FileStatus::NotAnalyzed);
+    }
+    // 4) In the project set but nothing analysed it yet (queued / pass still
+    //    running): the explicit visible "not analysed" mark, never "no dot".
+    if (projectFileSet_.contains(file)) {
+        return static_cast<int>(FileStatus::NotAnalyzed);
+    }
+    // 5) Not part of any analysed set: no dot at all.
+    return static_cast<int>(FileStatus::Unknown);
+}
+
+QVector<DiagnosticEntry> DiagnosticsController::lowerRowsForFile(const QString &file) const
+{
+    if (!retainedLowerEvaluated_.contains(file)) {
+        return {}; // no trustworthy verdict (never analysed, or edited since)
+    }
+    return retainedLowerRows_.value(file);
+}
+
+void DiagnosticsController::retainLowerRows(const QString &file)
+{
+    if (file.isEmpty()) {
+        return;
+    }
+    QVector<DiagnosticEntry> rows;
+    for (const DiagnosticEntry &entry : diagnostics_) {
+        if (entry.file == file) {
+            rows.append(entry);
         }
     }
-    if (error) {
-        return FileStatus::Error;
+    retainedLowerRows_.insert(file, rows);
+    retainedLowerEvaluated_.insert(file);
+    invalidateView();
+}
+
+void DiagnosticsController::clearRetainedRows(const QString &file)
+{
+    retainedLowerRows_.remove(file);
+    retainedLowerEvaluated_.remove(file);
+    invalidateView();
+}
+
+void DiagnosticsController::markNotAnalyzed(const QString &file, const QString &reason)
+{
+    if (file.isEmpty()) {
+        return;
     }
-    if (warning) {
-        return FileStatus::Warning;
+    notAnalyzedReason_.insert(file, reason);
+    invalidateView();
+}
+
+void DiagnosticsController::clearNotAnalyzed(const QString &file)
+{
+    if (notAnalyzedReason_.remove(file) > 0) {
+        invalidateView();
     }
-    return FileStatus::Clean;
+}
+
+void DiagnosticsController::setTopScope(const QString &top, const QStringList &analysed,
+                                        const QStringList &excluded)
+{
+    // `analysed` is the publisher's positive half; see the header: the ONE
+    // derivation this controller stores is the EXCLUDED set (with a top, a
+    // requested file is analysed exactly when it is not excluded).
+    Q_UNUSED(analysed);
+    // Clear ONLY the marks this seam set: a "modified" mark belongs to the
+    // buffer rule and must survive a scope change.
+    const QString prefix = QStringLiteral("outside-top:");
+    QStringList stale;
+    for (auto it = notAnalyzedReason_.constBegin(); it != notAnalyzedReason_.constEnd(); ++it) {
+        if (it.value().startsWith(prefix)) {
+            stale.append(it.key());
+        }
+    }
+    for (const QString &file : stale) {
+        clearNotAnalyzed(file);
+    }
+    topScopeTop_ = top;
+    scopeExcluded_.clear();
+    if (!top.isEmpty()) {
+        for (const QString &file : excluded) {
+            const QString clean = QDir::cleanPath(file);
+            scopeExcluded_.insert(clean);
+            markNotAnalyzed(clean, prefix + top);
+        }
+    }
+    invalidateView();
 }
 
 QHash<QString, int> DiagnosticsController::fileStatuses() const
 {
     QHash<QString, int> statuses;
-    const auto classify = [&statuses](const DiagnosticEntry &entry, bool cliScale) {
-        const int current = statuses.value(entry.file, 0);
-        const int severity = cliScale ? canonicalSeverity(entry.severity, DiagnosticOrigin::Cli)
-                                      : entry.severity;
-        if (severity == 1) {
-            statuses.insert(entry.file, 1); // error dominates
-        } else if (severity == 2 && current != 1) {
-            statuses.insert(entry.file, 2);
-        } else if (current == 0) {
-            statuses.insert(entry.file, 3); // covered with a non-error row: clean
-        }
-    };
+    const bool scopeActive = !topScopeTop_.isEmpty();
+    // UPPER: every covered file is clean until one of its rows says otherwise;
+    // the rows are classified in ONE pass, never per file over every row.
+    // RM-17b: an excluded file is NOT covered for status purposes - the scope
+    // outranks both layers here exactly as it does in statusValueForFile().
     for (const QString &file : coveredFiles_) {
-        statuses.insert(file, 3); // clean until a row says otherwise
-    }
-    for (const DiagnosticEntry &entry : cliDiagnostics_) {
-        if (coveredFiles_.contains(entry.file)) {
-            classify(entry, true);
-        }
-    }
-    for (const DiagnosticEntry &entry : diagnostics_) {
-        if (coveredFiles_.contains(entry.file)) {
+        if (scopeActive && scopeExcluded_.contains(file)) {
             continue;
         }
-        // The lower layer only exists for files it actually reports on: a file
-        // the LSP never mentioned stays dot-less (0 absent from the map).
-        classify(entry, false);
+        statuses.insert(file, static_cast<int>(FileStatus::Clean));
     }
-    for (const QString &file : lowerAnalyzed_) {
-        if (!statuses.contains(file) && !coveredFiles_.contains(file)) {
-            statuses.insert(file, 3); // evaluated clean by the lower layer
+    for (const DiagnosticEntry &entry : cliDiagnostics_) {
+        if (scopeActive && scopeExcluded_.contains(entry.file)) {
+            continue;
+        }
+        if (!coveredFiles_.contains(entry.file)) {
+            continue;
+        }
+        const int severity = canonicalSeverity(entry.severity, DiagnosticOrigin::Cli);
+        if (severity == 1) {
+            statuses.insert(entry.file, static_cast<int>(FileStatus::Error));
+        } else if (severity == 2
+                   && statuses.value(entry.file, 0) != static_cast<int>(FileStatus::Error)) {
+            statuses.insert(entry.file, static_cast<int>(FileStatus::Warning));
+        }
+    }
+    // LOWER: the retained per-file store - the same rows mergedDiagnostics()
+    // reads, so the dot map and the editor/panel rows cannot disagree.
+    for (auto it = retainedLowerEvaluated_.constBegin();
+         it != retainedLowerEvaluated_.constEnd(); ++it) {
+        if (coveredFiles_.contains(*it)) {
+            continue;
+        }
+        if (scopeActive && scopeExcluded_.contains(*it)) {
+            continue; // the scope outranks a fresh lower verdict (RM-17b ruling)
+        }
+        statuses.insert(*it, classifyStatusRows(retainedLowerRows_.value(*it), false));
+    }
+    // EXCLUDED / PENDING: visible "not analysed" marks (state 4), never "clean".
+    for (auto it = notAnalyzedReason_.constBegin(); it != notAnalyzedReason_.constEnd(); ++it) {
+        if (!statuses.contains(it.key())) {
+            statuses.insert(it.key(), static_cast<int>(FileStatus::NotAnalyzed));
+        }
+    }
+    for (const QString &file : projectFiles_) {
+        if (!statuses.contains(file)) {
+            statuses.insert(file, static_cast<int>(FileStatus::NotAnalyzed));
+        }
+    }
+    // RM-17b: the excluded set is inserted LAST, so no stale row/verdict can
+    // leave an excluded file looking analysed - one derivation, no exceptions.
+    if (scopeActive) {
+        for (const QString &file : scopeExcluded_) {
+            statuses.insert(file, static_cast<int>(FileStatus::NotAnalyzed));
         }
     }
     return statuses;
@@ -1218,6 +1473,16 @@ void DiagnosticsController::replaceUpperLayer(const QStringList &files,
         }
     }
     coveredFiles_ = live;
+    // RM-9: a fresh pass verdict supersedes an "excluded / not analysed" mark.
+    // RM-17b: EXCEPT the scope's own mark - a pass that never linted an excluded
+    // file must not clear the reason it was skipped, or the next pass would
+    // silently turn the hollow state into a verdict (the defect this row fixes).
+    for (const QString &file : live) {
+        if (isScopeExcluded(file)) {
+            continue;
+        }
+        clearNotAnalyzed(file);
+    }
     invalidateView();
 }
 

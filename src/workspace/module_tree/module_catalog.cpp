@@ -70,6 +70,9 @@ QString ModuleCatalog::summaryLine() const
     if (!warning.isEmpty()) {
         line += QCoreApplication::translate("VEdit", " · ⚠ %1").arg(warning);
     }
+    if (!top.isEmpty()) {
+        line += QCoreApplication::translate("VEdit", " · top: %1").arg(top);
+    }
     return line;
 }
 

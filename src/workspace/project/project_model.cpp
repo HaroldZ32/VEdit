@@ -75,6 +75,19 @@ bool ProjectModel::restoreFromDisk(QString *error)
         return false;
     }
     state_ = state;
+    // RM-3: a version-2 project-model.json has one live variable table and no
+    // per-root map. Seed the entry for its own root so switching away and back
+    // cannot lose what the user typed.
+    if (!state_.root.isEmpty() && !state_.variables.isEmpty()
+        && !state_.variablesByRoot.contains(state_.root)) {
+        state_.variablesByRoot.insert(state_.root, state_.variables);
+    }
+    // RM-17: an older file has no top; seed the live root's entry from `top`
+    // (mirror of the variables seeding above) so switching cannot lose it.
+    if (!state_.root.isEmpty() && !state_.top.isEmpty()
+        && !state_.topByRoot.contains(state_.root)) {
+        state_.topByRoot.insert(state_.root, state_.top);
+    }
     relativeFiles_.clear();
     missingVariables_.clear();
     skipped_ = 0;
@@ -98,13 +111,24 @@ void ProjectModel::open(const QString &projectRoot)
         return;
     }
     if (absolute != state_.root) {
+        // RM-3: the wipe must NOT take the per-root variable tables with it.
+        // The NEW root's own table is restored (never the previous project's),
+        // so a switch A -> B -> A brings A's values back from the store.
+        const QMap<QString, QStringList> variablesByRoot = state_.variablesByRoot;
+        const QMap<QString, QString> topByRoot = state_.topByRoot;
         state_ = ProjectState{};
+        state_.variablesByRoot = variablesByRoot;
+        state_.topByRoot = topByRoot;
         state_.root = absolute;
+        state_.variables = variablesByRoot.value(absolute);
+        // RM-17: the NEW root's own top; never the previous project's.
+        state_.top = topByRoot.value(absolute);
         relativeFiles_.clear();
         missingVariables_.clear();
         skipped_ = 0;
         restored_ = false;
         emit filelistsChanged();
+        emit stateChanged();
     }
     startExpansion();
 }
@@ -122,7 +146,7 @@ void ProjectModel::refresh()
         emit refreshFinished(false, QCoreApplication::translate("VEdit", "no project is open"));
         return;
     }
-    startExpansion();
+    startExpansion(true);
 }
 
 bool ProjectModel::importFilelists(const QStringList &paths, QString *error, int *addedFilelists)
@@ -236,11 +260,40 @@ void ProjectModel::setVariables(const QStringList &variables)
         return;
     }
     state_.variables = normalized;
+    // RM-3: the table is remembered PER ROOT, so a later switch back restores
+    // exactly what was typed for this project (and nothing for another one).
+    if (!state_.root.isEmpty()) {
+        state_.variablesByRoot.insert(state_.root, normalized);
+    }
     saveState();
     emit stateChanged();
     if (!state_.root.isEmpty()) {
         startExpansion();
     }
+}
+
+QString ProjectModel::top() const
+{
+    return state_.top;
+}
+
+void ProjectModel::setTop(const QString &top)
+{
+    const QString trimmed = top.trimmed();
+    if (trimmed == state_.top) {
+        return;
+    }
+    state_.top = trimmed;
+    // RM-17: remembered PER ROOT, exactly like the variable tables above.
+    if (!state_.root.isEmpty()) {
+        if (trimmed.isEmpty()) {
+            state_.topByRoot.remove(state_.root);
+        } else {
+            state_.topByRoot.insert(state_.root, trimmed);
+        }
+    }
+    saveState();
+    emit stateChanged();
 }
 
 void ProjectModel::setVariable(const QString &name, const QString &value)
@@ -274,7 +327,8 @@ void ProjectModel::reloadSettings()
         return;
     }
     settingsStamp_ = settingsStamp();
-    startExpansion();
+    // The settings FILE changed but the inputs are identical: force.
+    startExpansion(true);
 }
 
 bool ProjectModel::hasProject() const
@@ -492,8 +546,19 @@ bool ProjectModel::saveState()
     return true;
 }
 
-void ProjectModel::startExpansion()
+void ProjectModel::startExpansion(bool force)
 {
+    // RM-2: ONE expansion per project switch. One root change is announced by
+    // several live surfaces (the file tree's `directoryOpened`, the shell's
+    // `projectRootChanged`, the `.f` importer / a restore), and each report
+    // used to cancel and restart the same job. A duplicate report with the
+    // SAME inputs while one is in flight is now a no-op; `force` is reserved
+    // for an explicit Refresh or a settings-file change, where the inputs are
+    // unchanged but the answer must be recomputed.
+    if (!force && pending_ && job_ != 0 && pendingRoot_ == state_.root
+        && pendingFilelists_ == state_.filelists && pendingVariables_ == state_.variables) {
+        return;
+    }
     if (pending_ && job_ != 0) {
         service_.cancel(job_);
         job_ = 0;
@@ -506,6 +571,10 @@ void ProjectModel::startExpansion()
     }
     job_ = id;
     pending_ = true;
+    pendingRoot_ = state_.root;
+    pendingFilelists_ = state_.filelists;
+    pendingVariables_ = state_.variables;
+    ++expansionCount_;
     lastError_.clear();
     deadline_.start();
     pollTimer_.start();

@@ -340,3 +340,38 @@ if(VEDIT_EDIT_CORE_HAVE_FIM)
     TIMEOUT 120
   )
 endif()
+
+# --- RM-5a: repeated undo must never detach the view from its document ------
+# Real-machine defect: several edits then Ctrl+Z a few times left the editor
+# area blank and dead (the buffer had been undone past the state the file was
+# opened with). The test drives the PRODUCT seam — EditorArea/EditorPane and the
+# real edit-core provider, then EditorPane::triggerEditorAction() exactly like
+# the edit.undo command/toolbar — and asserts view/document identity, a non-empty
+# buffer, a tab that still shows the file, and that typing still lands.
+# It needs the shell (EditorArea lives there), so it exists only in the product
+# tree; a standalone kernel build skips it.
+if(TARGET vedit_app_shell AND TARGET Qt6::Test)
+  add_executable(vedit-undo-view-lifetime-tests kernel/undo_view_lifetime_test.cpp)
+  target_link_libraries(vedit-undo-view-lifetime-tests PRIVATE
+    vedit_editor_core
+    vedit_app_shell
+    Qt6::Test
+  )
+  target_include_directories(vedit-undo-view-lifetime-tests PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/../app"
+  )
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-undo-view-lifetime-tests PRIVATE
+      -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  add_test(NAME vedit-undo-view-lifetime-tests
+           COMMAND vedit-undo-view-lifetime-tests)
+  set_tests_properties(vedit-undo-view-lifetime-tests PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-undo"
+    TIMEOUT 120
+    SKIP_RETURN_CODE 77
+  )
+  message(STATUS "VEdit edit-core: undo/view-lifetime regression enabled (RM-5a)")
+else()
+  message(STATUS "VEdit edit-core: undo/view-lifetime regression NOT built (no shell target)")
+endif()

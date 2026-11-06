@@ -27,10 +27,13 @@ class QToolBar;
 namespace vedit::app {
 
 // The File -> Open name filter, as one testable function instead of a literal
-// buried in the dialog call. Filelists (`.f` / `.F` / `.flist`) are openable
-// documents: opening one also imports it as the project (the project lane
-// subscribes to ApplicationShell::fileOpened). The existing source types are
-// kept in front of it, so Ctrl+O still offers them first.
+// buried in the dialog call. A filelist (the project recognises the `f`
+// extension, case-insensitively) is an openable document: opening one also
+// imports it as the project (the project lane subscribes to
+// ApplicationShell::fileOpened). The table itself lives in
+// src/common/file_dialog_filters.h, so it cannot drift from the parser or from
+// the import-filelist dialog. The existing source types stay in front of it, so
+// Ctrl+O still offers them first.
 QString openFileDialogFilter();
 
 class CommandRegistry;
@@ -238,6 +241,13 @@ private:
     // UX batch 2 (item 7): mirror the active editor's own undo/redo availability
     // on the shell's commands (greyed out without an active view / undo step).
     void syncEditorCommandStates();
+    // RM-5b: push the registry's EFFECTIVE bindings into the editor area as the
+    // shell-owned sequences. Qt triggers neither action of an ambiguous
+    // sequence, so the editor's own copies (Ctrl+S, Ctrl+Shift+S, Ctrl+Z,
+    // Ctrl+Shift+Z, Ctrl+P …) are removed whenever the registry owns them — and
+    // again after every rebinding, which is what makes a user's change effective
+    // immediately.
+    void syncOwnedShortcuts();
     // UX batch 2 (item 7): the toolbar's Search button — show the search dock and
     // put the caret in its query field (the panel's stable objectName).
     void focusSearchPanel();

@@ -36,7 +36,11 @@ const DiagnosticEntry *diagnosticAt(const QVector<DiagnosticEntry> &rows, int li
             if (line > entry.line && line < entry.endLine) {
                 return &entry;
             }
-            if (line == entry.endLine && column < entry.endColumn) {
+            // RM-10: parity with the UNDERLINE drawing. diagnostics_annotations
+            // treats a negative end column as "to the end of the line", so the
+            // hover target must cover that same last line - otherwise the squiggle
+            // answers on every line but the one it visibly ends on.
+            if (line == entry.endLine && (entry.endColumn < 0 || column < entry.endColumn)) {
                 return &entry;
             }
         }

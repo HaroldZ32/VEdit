@@ -412,16 +412,29 @@ int main(int argc, char **argv)
         check("r2.cli-severity-scale", aSeverity == 1,
               QStringLiteral("upper row severity=%1 (0 was the ABI's 'error')").arg(aSeverity));
 
-        // ③ editing the file drops it back to the lower layer.
+        // ③ RM-9 (requirements change, T20): an edit VOIDS the file's verdict.
+        // The lower rows were computed on the text BEFORE the edit, so they must
+        // not be shown as if they described the buffer: the file shows the
+        // explicit "not analysed / excluded" state and never a stale green. A
+        // fresh analysis then restores a real verdict (the user's rule: a fresh
+        // verdict wins, dirty buffer or not).
         controller.markFileEdited(a);
         check("r2.edit-drops-upper", !controller.hasUpperLayer(a));
-        const QVector<DiagnosticEntry> afterEdit = controller.mergedDiagnosticsForFile(a);
-        check("r2.edit-falls-back", afterEdit.size() == 1
-                  && afterEdit.first().code == QStringLiteral("lsp-warning"),
-              QStringLiteral("rows=%1 code=%2").arg(afterEdit.size()).arg(
-                  afterEdit.isEmpty() ? QString() : afterEdit.first().code));
-        check("r2.edit-status-yellow", controller.statusForFile(a)
-                  == DiagnosticsController::FileStatus::Warning);
+        check("r2.edit-voids-lower", controller.mergedDiagnosticsForFile(a).isEmpty(),
+              QStringLiteral("rows=%1").arg(controller.mergedDiagnosticsForFile(a).size()));
+        check("r2.edit-status-not-analysed",
+              controller.statusForFile(a) == DiagnosticsController::FileStatus::NotAnalyzed,
+              QStringLiteral("status=%1").arg(static_cast<int>(controller.statusForFile(a))));
+        check("r2.edit-never-green",
+              controller.statusForFile(a) != DiagnosticsController::FileStatus::Clean);
+        check("r2.edit-reanalyze",
+              controller.analyzeFile(a, QStringLiteral("module a;\n"), false));
+        waitForRefresh(controller,
+                       [&controller]() { return controller.state() != BackendState::Reparsing; },
+                       3000);
+        check("r2.edit-status-yellow",
+              controller.statusForFile(a) == DiagnosticsController::FileStatus::Warning,
+              QStringLiteral("status=%1").arg(static_cast<int>(controller.statusForFile(a))));
         // A later pass re-covers it with the fresh verdict.
         pass->rows.clear();
         pass->rows.append(row(a, 9, 0, QStringLiteral("no-trailing-spaces"),
@@ -547,22 +560,36 @@ int main(int argc, char **argv)
               controller.statusForFile(a) == DiagnosticsController::FileStatus::Error,
               QStringLiteral("status=%1").arg(static_cast<int>(controller.statusForFile(a))));
 
-        // Opening B starts a NEW file-scope session: A's rows are cleared.
+        // RM-9 (requirements change; the user's words: "不是'打开过才有'，是'正在
+        // 打开的文件'才有"). Opening B used to ERASE A's verdict - that was the
+        // DEFECT, not the guarantee. The stronger property is asserted now: A
+        // keeps its REAL verdict (Error) across the tab switch and when the user
+        // comes back. The stale-green defect N1 originally guarded is still
+        // guarded: the retained value is the pre-switch ERROR, never a Clean.
         check("n1.analyze-b",
               controller.analyzeFile(b, QStringLiteral("module b;\n  logic y;\nendmodule\n"),
                                      false));
         waitForRefresh(controller,
                        [&controller]() { return controller.state() != BackendState::Reparsing; },
                        3000);
-        const DiagnosticsController::FileStatus afterFileSwitch = controller.statusForFile(a);
-        check("n1.a-not-clean-after-file-switch",
-              afterFileSwitch != DiagnosticsController::FileStatus::Clean,
+        check("n1.a-retains-error-after-file-switch",
+              controller.statusForFile(a) == DiagnosticsController::FileStatus::Error,
               QStringLiteral("status=%1 merged=%2")
-                  .arg(static_cast<int>(afterFileSwitch))
+                  .arg(static_cast<int>(controller.statusForFile(a)))
                   .arg(controller.mergedDiagnosticsForFile(a).size()));
-        check("n1.a-no-green-dot-after-file-switch",
-              !controller.fileStatuses().contains(a),
+        check("n1.a-retained-error-in-map",
+              controller.fileStatuses().value(a, 0)
+                  == static_cast<int>(DiagnosticsController::FileStatus::Error),
               QStringLiteral("value=%1").arg(controller.fileStatuses().value(a, -1)));
+        check("n1.analyze-a-back",
+              controller.analyzeFile(a, QStringLiteral("module a;\n  logic x;   \nendmodule\n"),
+                                     false));
+        waitForRefresh(controller,
+                       [&controller]() { return controller.state() != BackendState::Reparsing; },
+                       3000);
+        check("n1.a-error-after-return",
+              controller.statusForFile(a) == DiagnosticsController::FileStatus::Error,
+              QStringLiteral("status=%1").arg(static_cast<int>(controller.statusForFile(a))));
 
         // A backend/settings switch clears the project rows and reparses: the
         // controller-side path is clearProjectDiagnostics() + setFileSet({}).

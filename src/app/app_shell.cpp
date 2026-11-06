@@ -1,8 +1,10 @@
 #include "app_shell.h"
 
-#include "crash_reporter.h"
-
 #include "command_registry.h"
+#include "crash_reporter.h"
+#include "desktop_shortcuts.h"
+#include "file_dialog_filters.h"
+
 #include "editor_area.h"
 #include "editor_provider.h"
 #include "help_viewer.h"
@@ -41,15 +43,12 @@ namespace vedit::app {
 
 QString openFileDialogFilter()
 {
-    // Filelists are openable documents: the project lane imports one as the
-    // project, but the editor still shows it, so the filter lists them next to
-    // the HDL sources (and the existing types stay).
-    return QCoreApplication::translate(
-        "VEdit",
-        "Verilog/SystemVerilog/filelist (*.v *.sv *.svh *.vh *.f *.F *.flist);;"
-        "Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;"
-        "Filelists (*.f *.F *.flist);;"
-        "All Files (*)");
+    // RM-16: the table is DATA in src/common/file_dialog_filters.h, together
+    // with the filelist extension set the project parser recognises. The old
+    // literal here advertised `.flist`, which no producer/consumer of a filelist
+    // accepts; the shared table cannot drift from the parser or from the
+    // import-filelist dialog again.
+    return vedit::common::openFileDialogFilters().join(QStringLiteral(";;"));
 }
 
 ApplicationShell::ApplicationShell(ShellOptions options, QWidget *parent)
@@ -102,6 +101,41 @@ ApplicationShell::ApplicationShell(ShellOptions options, QWidget *parent)
 
     editorArea_ = new EditorArea(this);
     editorArea_->setProvider(provider_.get());
+    // RM-5b: the command registry owns the shell's key bindings; the KTextEditor
+    // view ships its own copies of several of them. Qt drops BOTH actions of an
+    // ambiguous sequence, which is how a "working" binding silently stops
+    // firing. The registry therefore asks the area for the live editor owners
+    // (so the Shortcuts page can name them) and, after every rebinding, the
+    // shell pushes the effective sequences back as the editor-excluded set.
+    commands_->setForeignShortcutProvider([this]() {
+        QList<vedit::app::ForeignShortcut> owners;
+        // RM-5c (review M1): the DESKTOP is an owner too. A user assignment to a
+        // DE-global sequence would be consumed by the desktop before the app sees
+        // it, exactly like an editor-owned sequence: the Shortcuts page must
+        // refuse it and name the desktop action, and the product self-check uses
+        // the same list to prove no shipped default is DE-reserved.
+        for (const DesktopShortcut &shortcut : desktopGlobalShortcuts()) {
+            ForeignShortcut owner;
+            owner.sequence = QString::fromLatin1(shortcut.sequence);
+            owner.owner = tr("desktop: %1").arg(QString::fromLatin1(shortcut.owner));
+            owners.append(owner);
+        }
+        if (editorArea_ == nullptr) {
+            return owners;
+        }
+        for (const QString &line : editorArea_->editorShortcutOwners()) {
+            const int tab = line.indexOf(QLatin1Char('\t'));
+            if (tab <= 0) {
+                continue;
+            }
+            ForeignShortcut owner;
+            owner.sequence = line.left(tab);
+            owner.owner = tr("editor: %1").arg(line.mid(tab + 1));
+            owners.append(owner);
+        }
+        return owners;
+    });
+    commands_->setShortcutApplier([this]() { syncOwnedShortcuts(); });
     // FIX 1: panes render paths (the tab tooltip) with the ONE display rule, so
     // they need the current root — and a root switch repaints them below.
     editorArea_->setDisplayRoot(options_.projectRoot);
@@ -231,6 +265,15 @@ void ApplicationShell::startSession()
     // a new dock.
     buildMenuBar();
     buildToolBar();
+    // RM-5c (review M2): the format command's primary is pinned by the editor
+    // kernel (Ctrl+Shift+F, one source of truth), so VS Code's Shift+Alt+F is
+    // added as an EXTRA default. The command only exists when the diagnostics
+    // lane is installed, hence the id lookup.
+    commands_->addExtraDefaultShortcut(QStringLiteral("diagnostics.format"),
+                                       QKeySequence(QStringLiteral("Shift+Alt+F")));
+    // RM-5b: after every lane registered its commands, tell the editor which
+    // sequences the shell owns (the editor's own copies must not stay ambiguous).
+    syncOwnedShortcuts();
     syncEditorCommandStates();
     updateStatusBar();
 }
@@ -520,13 +563,21 @@ void ApplicationShell::registerCommands()
 
     // Edit (UX batch 2 item 7): Undo/Redo are real commands. The handler drives
     // the ACTIVE editor's own action (KTextEditor's KStandardAction), so the
-    // menu/toolbar entry and the editor context menu do the same thing; the
-    // command has NO key sequence of its own because Ctrl+Z/Ctrl+Y stay the
-    // editor's own bindings (the shell does not steal them — T80's rule).
+    // menu/toolbar entry and the editor context menu do the same thing.
+    // RM-5b: they now CARRY the VS Code bindings. The editor's own
+    // edit_undo/edit_redo actions also carry Ctrl+Z and Ctrl+Shift+Z, which Qt
+    // would treat as ambiguous (both dropped); the shell's authority removes the
+    // editor's copies (EditorPane::setOwnedShortcuts), so exactly one action —
+    // this command — owns the key and the command drives the editor's undo slot.
     addCommand(QStringLiteral("edit.undo"), tr("&Undo"), QStringLiteral("edit"),
-               QKeySequence(), 10);
+               QKeySequence(QStringLiteral("Ctrl+Z")), 10);
     addCommand(QStringLiteral("edit.redo"), tr("&Redo"), QStringLiteral("edit"),
-               QKeySequence(), 20);
+               QKeySequence(QStringLiteral("Ctrl+Shift+Z")), 20);
+    // RM-5c (review M2): a VS Code user on Linux/Windows also presses Ctrl+Y for
+    // redo. It is an EXTRA default (the primary stays Ctrl+Shift+Z); a user
+    // override replaces the whole set, and the Shortcuts page lists both.
+    commands_->addExtraDefaultShortcut(QStringLiteral("edit.redo"),
+                                       QKeySequence(QStringLiteral("Ctrl+Y")));
     // Preferences (T132): the modal Preferences dialog, moved here from the
     // removed Settings menu. Ctrl+, is unchanged.
     addCommand(QStringLiteral("settings.preferences"), tr("&Preferences…"),
@@ -536,14 +587,26 @@ void ApplicationShell::registerCommands()
     // UX batch 2 (item 7): New is a fresh empty document (not "New Empty
     // Layout", which keeps its own command).
     addCommand(QStringLiteral("file.new"), tr("&New"), QStringLiteral("file"),
-               QKeySequence(), 1);
+               QKeySequence(QStringLiteral("Ctrl+N")), 1);
     addCommand(QStringLiteral("file.open"), tr("&Open…"), QStringLiteral("file"),
                QKeySequence(QStringLiteral("Ctrl+O")), 5);
     // AC-1.2 (batch 1): the user-facing entry that switches the workspace root
     // at runtime. It is a real File command (not only the Files panel toolbar
     // button) so the one broadcast path is reachable from the menu bar too.
+    // RM-2: `file.switch-project` below is the same reset path under the name
+    // the user asked for mid-session; both are in the File menu and toolbar.
+    // RM-5b: VS Code uses Ctrl+K Ctrl+O; a two-stroke sequence is awkward in an
+    // editable one-field shortcut UI, so the free single-stroke form is used.
     addCommand(QStringLiteral("file.open-folder"), tr("Open F&older…"), QStringLiteral("file"),
-               QKeySequence(), 6);
+               QKeySequence(QStringLiteral("Ctrl+Shift+Alt+O")), 6);
+    // RM-2: the user's "switch project from the top" entry. Mid-session the
+    // action is a SWITCH, and a top-level label that says so was the missing
+    // part; it opens the same folder dialog and goes through the same reset
+    // path as Open Folder (`openProjectFolderDialog()` -> `setProjectRoot()`,
+    // which re-broadcasts `projectRootChanged` to every lane). It is a real
+    // File command AND a main-toolbar button (see `kToolBarOrder`).
+    addCommand(QStringLiteral("file.switch-project"), tr("S&witch Project…"),
+               QStringLiteral("file"), QKeySequence(QStringLiteral("Ctrl+Shift+Alt+P")), 7);
     addCommand(QStringLiteral("file.new-layout"), tr("&New Empty Layout"),
                QStringLiteral("file"), QKeySequence(QStringLiteral("Ctrl+Alt+N")), 10);
     // Save (T71): the entry the editor is actually used through. It goes to the
@@ -558,8 +621,10 @@ void ApplicationShell::registerCommands()
                QKeySequence(QStringLiteral("Ctrl+Shift+S")), 16);
     // UX batch 2 (item 7): one write for every modified document that has a
     // file. Untitled dirty documents need Save As and are reported, not dropped.
+    // RM-5b: VS Code's Save All is Ctrl+K S; this is the free single-stroke
+    // sibling of Ctrl+S / Ctrl+Shift+S that keeps the Ctrl+Shift+Alt family.
     addCommand(QStringLiteral("file.save-all"), tr("Save A&ll"), QStringLiteral("file"),
-               QKeySequence(), 17);
+               QKeySequence(QStringLiteral("Ctrl+Shift+Alt+S")), 17);
     addCommand(QStringLiteral("file.save-session"), tr("&Save Session Now"),
                QStringLiteral("file"), QKeySequence(), 20);
     // T130: the user-facing entry lives in View. The id stays stable so an
@@ -570,26 +635,44 @@ void ApplicationShell::registerCommands()
                QKeySequence(QStringLiteral("Ctrl+Q")), 90, false, true);
 
     // View: layout operations
+    // RM-5b: Ctrl+Shift+H belonged to KTextEditor's "Find Selected Backwards";
+    // two actions with one sequence are BOTH dropped by Qt, so this default was
+    // dead. Ctrl+Alt+H is free (measured against the live editor's action table,
+    // evidence/ux-batch-2/rm5b-shortcuts/probe/log-kte-action-dump.txt).
     addCommand(QStringLiteral("view.split.horizontal"), tr("Split Pane &Horizontally"),
-               QStringLiteral("view"), QKeySequence(QStringLiteral("Ctrl+Shift+H")), 10);
+               QStringLiteral("view"), QKeySequence(QStringLiteral("Ctrl+Alt+H")), 10);
     addCommand(QStringLiteral("view.split.vertical"), tr("Split Pane &Vertically"),
                QStringLiteral("view"), QKeySequence(QStringLiteral("Ctrl+Shift+V")), 20);
     addCommand(QStringLiteral("view.focus.next"), tr("&Focus Next Pane"),
                QStringLiteral("view"), QKeySequence(QStringLiteral("F6")), 30);
     addCommand(QStringLiteral("view.layout.mixed"), tr("&Mixed Split (demo)"),
-               QStringLiteral("view"), QKeySequence(), 40);
+               QStringLiteral("view"), QKeySequence(QStringLiteral("Ctrl+Alt+M")), 40);
     addCommand(QStringLiteral("view.layout.reset"), tr("&Reset Layout"),
                QStringLiteral("view"), QKeySequence(QStringLiteral("Ctrl+Alt+R")), 50, false, true);
     // UX batch 2 (item 7): the toolbar is hideable from the menu (its own
     // toggleViewAction is not part of the command registry, so the menu entry is
     // declared here and kept in sync through QToolBar::visibilityChanged).
+    // RM-5c (review M1): Ctrl+Alt+T is the GNOME/Ubuntu "open terminal" global
+    // shortcut, so the desktop would consume it before us; Ctrl+Shift+Alt+T is
+    // in the family neither the desktop nor KTextEditor claims.
     addCommand(QStringLiteral("view.toolbar"), tr("&Toolbar"), QStringLiteral("view"),
-               QKeySequence(), 55, /*checkable=*/true);
+               QKeySequence(QStringLiteral("Ctrl+Shift+Alt+T")), 55, /*checkable=*/true);
     // UX batch 2 (item 7): the toolbar's Search button opens the panel AND puts
     // the caret in the query field. It is a distinct id from the panel toggle so
     // a click can never mean "hide the search panel".
+    // RM-5b: Ctrl+Shift+F is already the pinned default of `diagnostics.format`
+    // (single source: src/editor/kernel/lsp_actions.cpp editorActionShortcut();
+    // changing it is a cross-lane contract change), so the next free
+    // project-search sequence is used and the deviation is documented.
     addCommand(QStringLiteral("search.focus"), tr("Search in &Files"), QStringLiteral("view"),
-               QKeySequence(), 90);
+               QKeySequence(QStringLiteral("Ctrl+Shift+Alt+F")), 90);
+
+    // RM-5c (review M2): the user's Ctrl+Tab / Ctrl+Shift+Tab had no command at
+    // all. They are REAL commands now, in the View menu next to Focus Next Pane.
+    addCommand(QStringLiteral("view.tab.next"), tr("&Next Tab"), QStringLiteral("view"),
+               QKeySequence(QStringLiteral("Ctrl+Tab")), 35);
+    addCommand(QStringLiteral("view.tab.previous"), tr("Pre&vious Tab"), QStringLiteral("view"),
+               QKeySequence(QStringLiteral("Ctrl+Shift+Tab")), 36);
 
     // UX batch 2 (item 7): the five panel toggles are translated. The struct is
     // initialised with tr() directly, so lupdate extracts every title.
@@ -601,7 +684,9 @@ void ApplicationShell::registerCommands()
         {"file-tree", tr("To&ggle Files Panel"), "Ctrl+Alt+F"},
         {"search", tr("To&ggle Search Panel"), "Ctrl+Alt+S"},
         {"terminal", tr("To&ggle Terminal Panel"), "Ctrl+Alt+J"},
-        {"vcs", tr("To&ggle Source Control Panel"), "Ctrl+Alt+V"},
+        // RM-5b: Ctrl+Alt+V is KTextEditor's input-mode switch (ambiguous, both
+        // dead); Ctrl+Alt+C is free and keeps the Ctrl+Alt panel family.
+        {"vcs", tr("To&ggle Source Control Panel"), "Ctrl+Alt+C"},
         {"outline", tr("To&ggle Outline Panel"), "Ctrl+Alt+O"},
     };
     int order = 100;
@@ -642,11 +727,21 @@ void ApplicationShell::registerCommands()
     commands_->setHandler(QStringLiteral("file.open"), [this]() {
         const QString start = options_.projectRoot.isEmpty() ? QDir::homePath()
                                                              : options_.projectRoot;
-        const QString path = openFileDialogProvider_
-                                 ? openFileDialogProvider_()
-                                 : QFileDialog::getOpenFileName(
-                                       this, QCoreApplication::translate("VEdit", "Open File"), start,
-                                       openFileDialogFilter());
+        QString path;
+        if (openFileDialogProvider_) {
+            path = openFileDialogProvider_();
+        } else {
+            // RM-16b: an OBJECT dialog configured by the shared table, so the
+            // intended filter is selected AND applied to the file view before the
+            // dialog is shown - the static one-shot could display a filter the
+            // view had not applied yet (the user's "must click the type once").
+            QFileDialog dialog(this, QCoreApplication::translate("VEdit", "Open File"), start);
+            dialog.setObjectName(QStringLiteral("file-open-dialog"));
+            vedit::common::configureOpenFileDialog(dialog);
+            if (dialog.exec() == QDialog::Accepted) {
+                path = dialog.selectedFiles().value(0);
+            }
+        }
         if (path.isEmpty()) {
             return;
         }
@@ -659,7 +754,18 @@ void ApplicationShell::registerCommands()
     commands_->setHandler(QStringLiteral("file.open-folder"), [this]() {
         openProjectFolderDialog();
     });
+    // RM-2: the same reset path, never a second implementation.
+    commands_->setHandler(QStringLiteral("file.switch-project"), [this]() {
+        openProjectFolderDialog();
+    });
     commands_->setHandler(QStringLiteral("file.new-layout"), [this]() {
+        // RM-12: resetLayout() deletes every pane AND the document that dies
+        // with it (KTextEditor bounds the document to its view). The user must
+        // answer the SAME unsaved-document question the window close asks; a
+        // cancelled answer leaves every buffer and the layout untouched.
+        if (!confirmUnsavedDocuments()) {
+            return;
+        }
         editorArea_->resetLayout();
         updateStatusBar();
     });
@@ -681,7 +787,16 @@ void ApplicationShell::registerCommands()
         }
         updateStatusBar();
     });
-    commands_->setHandler(QStringLiteral("file.quit"), []() { QApplication::quit(); });
+    commands_->setHandler(QStringLiteral("file.quit"), [this]() {
+        // RM-12 family audit: QApplication::quit() ends the process WITHOUT
+        // running closeEvent(), so File > Quit / Ctrl+Q was a second silent
+        // data-loss path (every dirty buffer died unasked). Ask the SAME
+        // unsaved-document question the window close asks before quitting.
+        if (!confirmUnsavedDocuments()) {
+            return;
+        }
+        QApplication::quit();
+    });
     commands_->setHandler(QStringLiteral("view.split.horizontal"), [this]() {
         editorArea_->splitActive(Qt::Horizontal);
         updateStatusBar();
@@ -694,10 +809,33 @@ void ApplicationShell::registerCommands()
         editorArea_->focusNextPane();
         updateStatusBar();
     });
+    const auto switchTab = [this](int delta) {
+        EditorPane *pane = editorArea_ != nullptr ? editorArea_->activePane() : nullptr;
+        if (pane == nullptr || pane->tabCount() < 2) {
+            return;
+        }
+        const int count = pane->tabCount();
+        const int index = ((pane->activeTabIndex() + delta) % count + count) % count;
+        pane->setActiveTab(index);
+        updateStatusBar();
+    };
+    commands_->setHandler(QStringLiteral("view.tab.next"), [switchTab]() { switchTab(1); });
+    commands_->setHandler(QStringLiteral("view.tab.previous"), [switchTab]() { switchTab(-1); });
     commands_->setHandler(QStringLiteral("view.layout.mixed"), [this]() {
+        // RM-12: the mixed preset starts from resetLayout(), i.e. it destroys
+        // every pane and document exactly like Reset Layout. Same confirmation;
+        // a cancelled answer must not even add panes to the current layout.
+        if (!confirmUnsavedDocuments()) {
+            return;
+        }
         applyMixedSplitPreset();
     });
     commands_->setHandler(QStringLiteral("view.layout.reset"), [this]() {
+        // RM-12: see file.new-layout above. Cancel keeps every dirty document
+        // and the layout byte-for-byte (the check asserts the layout JSON).
+        if (!confirmUnsavedDocuments()) {
+            return;
+        }
         editorArea_->resetLayout();
         updateStatusBar();
         syncEditorCommandStates();
@@ -830,15 +968,16 @@ void ApplicationShell::buildToolBar()
     }
     mainToolBar_->clear();
 
-    // The order the user specified: new, open, open folder, save, save all,
-    // undo, redo | separator | search, build (Lint Project), format.
+    // The order the user specified: new, open, open folder, SWITCH PROJECT,
+    // save, save all, undo, redo | separator | search, build (Lint Project),
+    // format. The switch entry sits next to open-folder by request (RM-2).
     // Each entry holds the command registry's OWN QAction, so a toolbar button
     // and its menu entry can never diverge; an id a lane did not register (the
     // diagnostics lane owns Build/Format) is skipped rather than faked.
     static const char *const kToolBarOrder[] = {
-        "file.new",      "file.open",   "file.open-folder", "file.save", "file.save-all",
-        "edit.undo",     "edit.redo",   nullptr, /* separator */ "search.focus",
-        "project.lint",  "diagnostics.format",
+        "file.new",       "file.open",   "file.open-folder", "file.switch-project",
+        "file.save",      "file.save-all", "edit.undo",     "edit.redo",
+        nullptr, /* separator */ "search.focus", "project.lint", "diagnostics.format",
     };
     for (const char *id : kToolBarOrder) {
         if (id == nullptr) {
@@ -855,6 +994,21 @@ void ApplicationShell::buildToolBar()
         toggle->setChecked(mainToolBar_->isVisible());
     }
     syncEditorCommandStates();
+}
+
+void ApplicationShell::syncOwnedShortcuts()
+{
+    if (editorArea_ == nullptr || commands_ == nullptr) {
+        return;
+    }
+    QStringList sequences;
+    for (const QString &id : commands_->ids()) {
+        const QKeySequence sequence = commands_->effectiveShortcut(id);
+        if (!sequence.isEmpty()) {
+            sequences.append(sequence.toString(QKeySequence::PortableText));
+        }
+    }
+    editorArea_->setOwnedShortcuts(sequences);
 }
 
 void ApplicationShell::syncEditorCommandStates()

@@ -108,9 +108,20 @@ void FileTreeWidget::buildUi()
     statusTimer_ = new QTimer(this);
     statusTimer_->setInterval(500);
     connect(statusTimer_, &QTimer::timeout, this, [this]() {
-        if (model_ != nullptr) {
-            model_->syncFileStatuses();
+        if (model_ == nullptr) {
+            return;
         }
+        // RM-9: the project set moves rarely (one revision per expansion). The
+        // timer reads it only when the revision changed - never a rescan per
+        // tick - and the synthetic group then carries the same status dots.
+        if (projectFilesSource_ && projectFilesRevisionSource_) {
+            const quint64 revision = projectFilesRevisionSource_();
+            if (revision != projectFilesRevision_) {
+                projectFilesRevision_ = revision;
+                model_->setFilelistFiles(projectFilesSource_());
+            }
+        }
+        model_->syncFileStatuses();
     });
     statusTimer_->start();
     treeLayout->addWidget(view_, 1);
@@ -217,6 +228,19 @@ void FileTreeWidget::setFileStatusSource(std::function<int(const QString &)> sta
 {
     if (model_ != nullptr) {
         model_->setFileStatusSource(std::move(status), std::move(revision));
+    }
+}
+
+void FileTreeWidget::setProjectFilesSource(std::function<QStringList()> files,
+                                           std::function<quint64()> revision)
+{
+    projectFilesSource_ = std::move(files);
+    projectFilesRevisionSource_ = std::move(revision);
+    // Pull once now so a tree that already exists shows the group without
+    // waiting for the next timer tick.
+    if (projectFilesSource_ && projectFilesRevisionSource_ && model_ != nullptr) {
+        projectFilesRevision_ = projectFilesRevisionSource_();
+        model_->setFilelistFiles(projectFilesSource_());
     }
 }
 

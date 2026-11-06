@@ -200,7 +200,16 @@ public:
     // editor widget this pane owns (an editor may re-inject its own standard
     // save shortcut at runtime). Returns the number of duplicate bindings
     // removed.
+    //
+    // RM-5b: the invariant is now general — `setOwnedShortcuts()` names every
+    // sequence the SHELL's command registry owns (save, save-as, undo, redo,
+    // quick open …), and the enforcement removes those sequences from the
+    // editor's own action copies. Qt drops BOTH actions of an ambiguous
+    // sequence, so "the shell command owns it" must mean "the editor does not".
     int enforceSingleCtrlSAuthority();
+    // Portable text of the shell-owned sequences (sorted, de-duplicated).
+    void setOwnedShortcuts(const QStringList &portableSequences);
+    QStringList ownedShortcuts() const;
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -236,6 +245,9 @@ private:
     void applyPendingPosition(QWidget *editor);
 
     QString paneId_;
+    // RM-5b: sequences the shell's command registry owns; the editor's own
+    // actions must not carry them (ambiguous -> both dead).
+    QStringList ownedShortcuts_;
     EditorProvider *provider_ = nullptr;
     QTabBar *tabs_ = nullptr;
     QStackedWidget *stack_ = nullptr;
@@ -351,6 +363,15 @@ public:
     // binding back after the pane was created; this re-runs the enforcement on
     // every pane. Returns the number of duplicate bindings removed.
     int enforceSingleCtrlSAuthority();
+    // RM-5b: the shell's effective command bindings. Every pane (and every tab,
+    // provider swap and split) removes these sequences from the editor's own
+    // actions, so exactly ONE action owns each sequence.
+    void setOwnedShortcuts(const QStringList &portableSequences);
+    QStringList ownedShortcuts() const;
+    // RM-5b: every key sequence owned by an editor action in any pane, as
+    // "<sequence>\t<label>". The shell feeds this to the command registry so a
+    // default or a user binding is never ambiguous with the editor.
+    QStringList editorShortcutOwners() const;
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
@@ -388,6 +409,8 @@ private:
     std::function<void(const QString &, bool)> onDocumentSaved_;
     // FIX 1: applied to every pane at creation and on a root switch.
     QString displayRoot_;
+    // RM-5b: shell-owned key sequences, applied to every pane.
+    QStringList ownedShortcuts_;
     QStringList diagnostics_;
     bool rebuilding_ = false;
     QTimer *shortcutGuard_ = nullptr;

@@ -131,6 +131,25 @@ if(NOT VEDIT_WORKSPACE_PROJECT_STANDALONE)
     VEDIT_PROJECT_HAVE_APP_SHELL=1)
 endif()
 
+# RM-3: the project variables dialog (add / delete / inline validation) and the
+# per-root persistence of the table, driven without a modal dialog: the test
+# builds the REAL dialog and the REAL ProjectPanel/ProjectModel.
+add_executable(vedit-project-variables-e2e project_variables_e2e.cpp)
+target_link_libraries(vedit-project-variables-e2e PRIVATE vedit_workspace_project)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(vedit-project-variables-e2e PRIVATE
+    -Wall -Wextra -Wpedantic -Werror)
+endif()
+if(NOT VEDIT_WORKSPACE_PROJECT_STANDALONE)
+  target_compile_definitions(vedit-project-variables-e2e PRIVATE
+    VEDIT_PROJECT_HAVE_APP_SHELL=1)
+endif()
+add_test(NAME vedit-project-variables-e2e COMMAND vedit-project-variables-e2e)
+set_tests_properties(vedit-project-variables-e2e PROPERTIES
+  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-project"
+  TIMEOUT 180
+)
+
 # The repository-owned Verilog fixture (task T14) is the acceptance input.
 set(VEDIT_PROJECT_FIXTURE
   "${CMAKE_CURRENT_SOURCE_DIR}/../../../tests/fixtures/verilog-project")
