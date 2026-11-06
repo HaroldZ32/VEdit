@@ -150,14 +150,14 @@ bash packaging/runtime/build.sh
 `packaging/runtime/out/SHA256SUMS`。它是 F2 私有运行时形态：包内自带 loader / glibc / Qt6 / KF6 /
 KTextEditor / 自建 KSyntaxHighlighting / tree-sitter / 字体，并带 `bin/translations/` 的中文翻译
 （`vedit_zh_CN.qm`、`qtbase_zh_CN.qm`）。流程、白名单与隔离契约见 `packaging/runtime/README.md`
-（该 README 把 `out/AppDir/` 明确列为**中间产物**；当前基线产物 137,079,288 字节，sha256 见
-`out/SHA256SUMS`）。
+（该 README 把 `out/AppDir/` 明确列为**中间产物**；产物大小与 sha256 以 `out/SHA256SUMS`
+与实际文件为准，不在文档里写死）。
 
-**版本号说明**：`<ver>` 来自工作区 `Cargo.toml` 的 `version`（打包脚本
-`packaging/runtime/build-appimage.sh:53` 读取），当前是 **0.1.1**，所以现在产物名是
-`VEdit-0.1.1-x86_64.AppImage`；Qt 产品自报的版本是 **0.2.0**（`src/app/main.cpp:1851`）。
-两个数字**不是同一来源**，本轮不统一（产品决策）：读文档时，产物名以打包脚本读到的
-`Cargo.toml` 版本为准，应用内版本以 `main.cpp` 为准。
+**版本号说明**：代码、构建与文档现在统一为 **0.2.1**。打包脚本从工作区 `Cargo.toml` 的
+`version` 取值（`packaging/runtime/build-appimage.sh:53`），`CMakeLists.txt` 与
+`src/terminal/CMakeLists.txt` 的 `project(... VERSION ...)`、`src/app/main.cpp` 与
+`cmake/smoke/qt6_window_smoke.cpp` 的 `setApplicationVersion()` 都是同一个值，所以产物名
+`VEdit-0.2.1-x86_64.AppImage` 与应用内版本 0.2.1 一致。
 
 ### 7.2 旧版 GTK 产物（不是 Qt 交付物）
 
@@ -172,7 +172,7 @@ bash packaging/tarball/build.sh           # 旧 vd-app 的 tar.gz + 自解压 .r
 
 - 旧 AppImage 内**没有** `bin/translations/`（实测 `unsquashfs -o <offset> -l` 匹配
   `zh_CN|translations` = 0），而 7.1 的 Qt AppImage 有 `vedit_zh_CN.qm` / `qtbase_zh_CN.qm`；
-- 体积不同：旧管线 47,745,528 字节 vs Qt 交付物 137,079,288 字节（同一台机器、同一天构建）；
+- 体积不同：旧管线 47,745,528 字节 vs Qt 交付物 137,079,288 字节（0.1.1 时期同机同日实测；0.2.1 重建后以实际文件为准）；
 - 旧管线的干净容器验收仍从宿主 glibc 家族解析 **8** 个库
   （`evidence/appimage/clean-room.log`：`from host glibc family: 8`），而 Qt 交付物是 F2 私有运行时。
 

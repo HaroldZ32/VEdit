@@ -2,7 +2,7 @@
 # verify-appimage-centos7.sh — one-file, no-network, no-install acceptance check
 # for the VEdit AppImage on a real CentOS 7 machine (kernel 3.10 / glibc 2.17).
 #
-#   scp VEdit-0.1.1-x86_64.AppImage verify-appimage-centos7.sh  <user>@<vm>:~/
+#   scp VEdit-0.2.1-x86_64.AppImage verify-appimage-centos7.sh  <user>@<vm>:~/
 #   bash verify-appimage-centos7.sh
 #
 # What it does (every item is evidence, not "looks right"):
@@ -39,8 +39,11 @@ mkdir -p "$TMP" "$TMP/home" 2>/dev/null || true
 cleanup() { [ "${VEDIT_KEEP_TMP:-0}" = "1" ] || rm -rf "$TMP"; }
 trap cleanup EXIT
 
-EXPECTED_SHA256="e7ae067fe66c8e271ba72da974795a7ee3db0efa59bda45079b5a048b4a09558"
-EXPECTED_SIZE="95349240"
+# The release build writes out/SHA256SUMS; that row is the default pin. Set
+# VEDIT_EXPECTED_SHA256 / VEDIT_EXPECTED_SIZE only when checking against a value
+# recorded elsewhere (a release note, a CI artefact). No stale hash lives here.
+EXPECTED_SHA256="${VEDIT_EXPECTED_SHA256:-}"
+EXPECTED_SIZE="${VEDIT_EXPECTED_SIZE:-}"
 PASS=0; FAIL=0; SKIP=0
 
 # ---------------------------------------------------------------------------
@@ -82,12 +85,12 @@ APPIMAGE=""
 if [ $# -gt 0 ] && [ -f "$1" ]; then
     APPIMAGE="$1"
 else
-    for cand in "$SCRIPT_DIR/VEdit-0.1.1-x86_64.AppImage" "$SCRIPT_DIR"/VEdit-*x86_64.AppImage; do
+    for cand in "$SCRIPT_DIR/VEdit-0.2.1-x86_64.AppImage" "$SCRIPT_DIR"/VEdit-*x86_64.AppImage; do
         [ -f "$cand" ] && { APPIMAGE="$cand"; break; }
     done
 fi
 if [ -z "$APPIMAGE" ]; then
-    result FAIL appimage.found expected="VEdit-0.1.1-x86_64.AppImage next to this script" \
+    result FAIL appimage.found expected="VEdit-0.2.1-x86_64.AppImage next to this script" \
         actual="not found in $SCRIPT_DIR" note="copy the AppImage and this script into the same directory"
     record ""
     record "SUMMARY: PASS=$PASS FAIL=$FAIL SKIP=$SKIP"
@@ -128,20 +131,33 @@ case "$GLIBC_LINE" in
 esac
 
 # ---------------------------------------------------------------------------
-# 3. appimage.sha256 — transfer integrity against the expected hash and, when
-#    present, the shipped SHA256SUMS.
+# 3. appimage.sha256 — transfer integrity against the shipped SHA256SUMS row
+#    (or an optional pinned hash via VEDIT_EXPECTED_SHA256).
 # ---------------------------------------------------------------------------
 if have sha256sum; then
     ACTUAL_SHA=$(sha256sum "$APPIMAGE" 2>/dev/null | awk '{print $1}')
     ACTUAL_SIZE=$(wc -c <"$APPIMAGE" 2>/dev/null | tr -d ' ')
-    if [ "$ACTUAL_SHA" = "$EXPECTED_SHA256" ]; then
+    SUMS="$(dirname -- "$APPIMAGE")/SHA256SUMS"
+    PIN_SOURCE="env VEDIT_EXPECTED_SHA256"
+    if [ -z "$EXPECTED_SHA256" ] && [ -f "$SUMS" ]; then
+        EXPECTED_SHA256=$(grep -F "$(basename -- "$APPIMAGE")" "$SUMS" 2>/dev/null | head -1 | awk '{print $1}')
+        [ -n "$EXPECTED_SHA256" ] && PIN_SOURCE="SHA256SUMS"
+    fi
+    if [ -z "$EXPECTED_SHA256" ]; then
+        result SKIP appimage.sha256 expected="pinned sha256 (SHA256SUMS row or VEDIT_EXPECTED_SHA256)" \
+            actual="sha256=$ACTUAL_SHA size=$ACTUAL_SIZE" \
+            note="no pin supplied; the SHA256SUMS cross-check below still verifies the copy"
+    elif [ "$ACTUAL_SHA" = "$EXPECTED_SHA256" ]; then
         result PASS appimage.sha256 expected="$EXPECTED_SHA256" actual="$ACTUAL_SHA" \
-            note="size=$ACTUAL_SIZE (expected $EXPECTED_SIZE)"
+            note="size=$ACTUAL_SIZE source=$PIN_SOURCE${EXPECTED_SIZE:+ (expected size $EXPECTED_SIZE)}"
     else
         result FAIL appimage.sha256 expected="$EXPECTED_SHA256" actual="$ACTUAL_SHA" \
-            note="re-copy the file; a truncated transfer cannot be verified any further"
+            note="re-copy the file; a truncated transfer cannot be verified any further (source=$PIN_SOURCE)"
     fi
-    SUMS="$(dirname -- "$APPIMAGE")/SHA256SUMS"
+    if [ -n "$EXPECTED_SIZE" ] && [ "$ACTUAL_SIZE" != "$EXPECTED_SIZE" ]; then
+        result FAIL appimage.size expected="$EXPECTED_SIZE" actual="$ACTUAL_SIZE" \
+            note="size differs from VEDIT_EXPECTED_SIZE"
+    fi
     if [ -f "$SUMS" ]; then
         ROW=$(grep -F "$(basename -- "$APPIMAGE")" "$SUMS" 2>/dev/null | head -1)
         if [ -n "$ROW" ] && printf '%s' "$ROW" | grep -q "$ACTUAL_SHA"; then
@@ -152,7 +168,8 @@ if have sha256sum; then
             result SKIP appimage.sha256sums expected="row for $(basename -- "$APPIMAGE")" actual="none" note="SHA256SUMS present but has no row for this file"
         fi
     else
-        result SKIP appimage.sha256sums expected="optional SHA256SUMS next to the AppImage" actual="absent" note="not needed: the expected hash is built into this script"
+        result SKIP appimage.sha256sums expected="optional SHA256SUMS next to the AppImage" actual="absent" \
+            note="copy SHA256SUMS too for the cross-check; a pinned hash is optional (VEDIT_EXPECTED_SHA256)"
     fi
 else
     result FAIL appimage.sha256 expected="sha256sum available" actual="missing" note="cannot verify transfer integrity"

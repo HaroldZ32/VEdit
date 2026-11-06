@@ -9,7 +9,7 @@
 
 | 文件 | 在哪 | 必须吗 |
 |---|---|---|
-| `VEdit-0.1.1-x86_64.AppImage` | 仓库 `packaging/runtime/out/` | **必须**（交付物本体） |
+| `VEdit-0.2.1-x86_64.AppImage` | 仓库 `packaging/runtime/out/` | **必须**（交付物本体） |
 | `verify-appimage-centos7.sh` | 仓库 `packaging/runtime/verify/` | **必须**（验证脚本） |
 | `SHA256SUMS` | 与 AppImage 同目录 | 可选（有的话会多一条交叉校验；没有也能跑） |
 
@@ -19,18 +19,18 @@
 
 ```bash
 cd <仓库目录>/packaging/runtime/out
-scp VEdit-0.1.1-x86_64.AppImage SHA256SUMS <用户名>@<VM_IP>:~/
+scp VEdit-0.2.1-x86_64.AppImage SHA256SUMS <用户名>@<VM_IP>:~/
 cd ../../../packaging/runtime/verify     # 注意：脚本在 verify/ 下
 scp verify-appimage-centos7.sh <用户名>@<VM_IP>:~/
 ```
 
 > 懒得 cd 的话，两个文件在仓库里的**绝对路径**分别是：
-> `packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage` 和
+> `packaging/runtime/out/VEdit-0.2.1-x86_64.AppImage` 和
 > `packaging/runtime/verify/verify-appimage-centos7.sh`。
 
-文件大小 95,349,240 字节（≈91 MiB）；sha256 应为
-`e7ae067fe66c8e271ba72da974795a7ee3db0efa59bda45079b5a048b4a09558`
-（脚本里已内置这个值，传坏了脚本会直接告诉你）。
+文件大小与 sha256 **以同目录的 `SHA256SUMS` 为准**：脚本会读取该行并核对
+（传坏了会直接报 `appimage.sha256` / `appimage.sha256sums` 失败）。如果要与别处记录的固定值对照，
+可用 `VEDIT_EXPECTED_SHA256` / `VEDIT_EXPECTED_SIZE` 传入。
 
 ---
 
@@ -38,7 +38,7 @@ scp verify-appimage-centos7.sh <用户名>@<VM_IP>:~/
 
 ```bash
 cd ~
-chmod +x VEdit-0.1.1-x86_64.AppImage verify-appimage-centos7.sh
+chmod +x VEdit-0.2.1-x86_64.AppImage verify-appimage-centos7.sh
 bash verify-appimage-centos7.sh
 ```
 
@@ -106,7 +106,7 @@ RESULT PASS|FAIL|SKIP <检查名> | expected=… | actual=… | note=…
 
 报告末尾有一个“manual checks”栏。如果这台 VM 有桌面：
 
-1. 文件管理器里**双击** `VEdit-0.1.1-x86_64.AppImage`（或 `./VEdit-0.1.1-x86_64.AppImage`）；
+1. 文件管理器里**双击** `VEdit-0.2.1-x86_64.AppImage`（或 `./VEdit-0.2.1-x86_64.AppImage`）；
 2. 窗口能否打开；
 3. 打开一个 `.v`/`.sv` 文件，看关键字是否有颜色；
 4. 改一行，`Ctrl+S` 保存，再打开确认内容变了；
@@ -130,7 +130,7 @@ RESULT PASS|FAIL|SKIP <检查名> | expected=… | actual=… | note=…
 
 **Q：能指定别的文件名/路径吗？**
 可以：`bash verify-appimage-centos7.sh /path/to/Some.AppImage`。不加参数时脚本会找同目录下的
-`VEdit-0.1.1-x86_64.AppImage`（或 `VEdit-*x86_64.AppImage`）。
+`VEdit-0.2.1-x86_64.AppImage`（或 `VEdit-*x86_64.AppImage`）。
 
 **Q：报告太大发不出去？**
 报告是纯文本（约 20–40 KB），正常邮件/聊天都能发；里面主要是程序自检的完整输出。
