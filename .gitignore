@@ -58,3 +58,8 @@ build/centos7-verify/dist/
 #   bash src/workspace/filetree/tools/generate-testdata.sh
 # (the lane's own entries regenerate it too). Never commit it.
 filetree-testdata/
+
+# Compiled probe executables under evidence/ are build artifacts, not evidence:
+# their sources (*.cpp, *.sh) stay tracked, only the ELF binaries are ignored.
+# (A 73 MB probe binary committed once by accident; this keeps it out.)
+evidence/**/*-probe

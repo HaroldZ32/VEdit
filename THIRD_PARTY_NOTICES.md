@@ -155,6 +155,49 @@ sha256）的原始输出见 [`evidence/docs-amendments/02-sha256-check.txt`](evi
   （GPL-3.0-or-later，sha256 `3361d8b4…`）**永不随包**（sha256 + 文件名 + 内嵌扫描三重禁运）。
 - LGPL 义务（许可声明 + 源码可得）：**XML 本身即源码**，随包安装于上述落点；仓库内文件可修改。
 
+#### 9.1.1（A3 / UX 批次 2）新增三份定义：VHDL / Markdown / Tcl
+
+与 9.1 同一条目性质（**本仓库自有**、`author="VEdit"`、`license="LGPL-2.1-or-later"`，
+许可全文 `docs/licenses/LGPL-2.1.txt`，随包 `resources/syntax/LICENSE-LGPL-2.1`）：
+
+| 项 | `vedit-vhdl.xml` | `vedit-markdown.xml` | `vedit-tcl.xml` |
+|---|---|---|---|
+| 语言名 | `VHDL` | `Markdown` | `Tcl` |
+| 许可 | **LGPL-2.1-or-later** | **LGPL-2.1-or-later** | **LGPL-2.1-or-later** |
+| 仓库路径 | `resources/syntax/vedit-vhdl.xml` | `resources/syntax/vedit-markdown.xml` | `resources/syntax/vedit-tcl.xml` |
+| `extensions=` | `*.vhd;*.vhdl` | `*.md;*.markdown;*.mdown;*.mkd` | `*.tcl;*.tk` |
+| 行数 / 字节 | 106 / 6,836 B | 59 / 3,559 B | 78 / 7,429 B |
+| **sha256** | `47a4539e08fc6b6257d0897c6187c25c4d9620fe8ac2b2023729b31d6ef75451` | `9724927b63ef9824739727f471ea7e98d61d0e9ff23b054c82ae21c73e70fc5a` | `3e201a1df4ad0afc679635a105965a067d16fe4c3618662def4676680572e126` |
+| 安装落点（AppDir） | `usr/share/org.kde.syntax-highlighting/syntax/vedit-vhdl.xml` | …`/vedit-markdown.xml` | …`/vedit-tcl.xml` |
+| 上游功能参照（**非复制**） | KDE `syntax-highlighting` v6.24.0 `data/syntax/vhdl.xml`（76,513 B，sha256 `5df96ab7362d9ae05008ff130836f10cafb433b3ca7323cf0dc2f197762d1c4e`） | 同版本 `data/syntax/markdown.xml`（51,969 B，sha256 `bf32150db4d97fbf539bcec4b6957d04c5afc2af148193e92db72223fb82c6fb`） | 同版本 `data/syntax/tcl.xml`（20,286 B，sha256 `1a0e538646e3491406d2d895c5be5c6e8ce3e34ca2bcb897670c9c11bb26a30a`） |
+| 参照文件 URL | `https://invent.kde.org/frameworks/syntax-highlighting/-/raw/v6.24.0/data/syntax/<name>.xml` | 同左 | 同左 |
+
+**编写方式（逐份如实声明，BINDING）**：三份都是**独立编写**——只把上游定义当作**功能参照**
+（关键词/命令/构造清单的交叉核对与遗漏检查），**没有复制**任何上游的文件结构、注释、正则或文本；
+因此按本仓库自己的许可登记（LGPL-2.1-or-later），而不是按上游许可登记。若将来有人把其中任何一份
+改成"改编自上游 X 文件"，那一份**必须**改写为上游的许可（KDE `tcl.xml` = BSD、`markdown.xml` =
+GPL/BSD、`vhdl.xml` = MIT——见下条），不能沿用本节结论。
+
+**为什么是自研而不是上游拷贝**（与 9.1 的 KDE 禁运同一条纪律）：
+
+- KDE `vhdl.xml` 的**文件内没有许可声明**（连 `license=""` 属性都没有）。但它**不是"无许可"**：
+  本仓库保存的 Debian 版权整理（`evidence/ux-batch-2/a3/raw/debian-kf6-copyright.txt`）把
+  `data/syntax/vhdl.xml` 明确列在版权文件的 **MIT** 段（行 136），上游 README 也称贡献按 MIT。
+  所以 A3 选择自研的理由**不是**"该文件不可用"，而是：①文件内没有可随拷贝保留的许可文本，
+  复制后无法在文件里如实登记来源；②本仓库"文件内无声明即不随包"的既有纪律（9.1）适用于
+  取证，而不是给该文件扣一顶"无许可"的帽子；③语言名/验收要求（见下条）。
+  `markdown.xml` 自述 `license="GPL,BSD"`（双许可，BSD 变体未指明）；`tcl.xml` 自述
+  `license="BSD"`（Debian 版权整理记录为 BSD-3-Clause）。把这三份**原样**纳入 MIT 产品都要
+  额外承担许可解释成本。
+- 产品按**定义名**设置高亮模式，验收断言的名字是 `VHDL` / `Markdown` / `Tcl`；
+  上游 Tcl 定义的语言名是 **`Tcl/Tk`**，原样拷贝会直接对不上，仍须改文件。
+- 因此三份均为**自有 LGPL-2.1-or-later 定义**，上游文件只作**功能参照**（关键词/构造清单
+  交叉核对），文件正文未复制任何上游文本，文件名也刻意不同。
+- `.sdc` / `.xdc` **没有**独立定义：产品扩展名表（`src/editor/kernel/highlight_mode.cpp`）
+  把它们映射到 `Tcl`（用户裁定）。映射由 ctest `vedit-highlight-mode-selftest` 断言。
+
+证据：`evidence/ux-batch-2/a3/`（上游参照文件原件 + sha256、许可核对、ctest 与 AppDir 断言日志）。
+
 ### 9.2 MIT `tree-sitter-verilog`（静态编入）
 
 | 项 | 值 |
@@ -218,3 +261,69 @@ CJK 字体时，中文正文/中文文件名会渲染成方块（T115 的 `inFon
   sha 不符即失败。`selfcheck.sh` 断言包内字体存在、OFL 文本存在且含
   `SIL OPEN FONT LICENSE` 与版权行。
 - 许可文本随包分发（OFL 的再分发条件）；包内文件与仓内文件内容相同。
+
+## 10. Qt6 产品线：Qt 标准对话框翻译（`qtbase_zh_CN.qm`，T38 / AC-9.3）
+
+> **范围声明（captain 书面授予的本次例外）**：本节由 T38（G7 i18n L2）在该任
+> 务的写域之外追加，写 `THIRD_PARTY_NOTICES.md` 是 captain 明确授权的 scope
+> 例外；除此之外本任务未改本文件其他内容。追加前 sha256
+> `af69af60ee160574e06e387c736a947eade8e0f9ac962e9ad836b100125c6853`（17,739 B），
+> 追加后 sha256 记录在 `evidence/i18n-l2/06-license-third-party.md`。
+
+Qt 自带的标准对话框按钮（OK/Cancel/Open/Save/Apply/Close…）由 Qt 自己翻译，
+文案不在 VEdit 的 `vedit_zh_CN.qm` 里。产品因此随包一份 **`qtbase_zh_CN.qm`**：
+
+| 组件 | 版本 / 来源 | 随包文件（sha256） | 许可（事实核对） | 分发形态 |
+|---|---|---|---|---|
+| **Qt6 基础翻译（中文）** | Debian/Ubuntu 包 **`qt6-translations-l10n`** 提供的 `qtbase_zh_CN.qm`；宿主文件 `/usr/share/qt6/translations/qtbase_zh_CN.qm`；Qt **6.10.2+dfsg-7**（与 `vedit-qt6-build:local` 的 Qt 6.10.2 同版本） | `translations/qtbase_zh_CN.qm`（**147,222 B**，sha256 **`0481a9b92a6f0578400e960a7d5ee70217a6a450eaf7f98b7d32b8dbd0d58616`**）；构建期复制到 `<build>/src/app/translations/`，安装/打包到 `bin/translations/` | 该文件在 Debian 包的 copyright 中登记为 **GPL-3 with the Qt-1.0 exception**（`Files: * Copyright 2017-2021 The Qt Company Ltd.`）；**不是 LGPL**（LGPL 说法见下方更正），**GFDL 只覆盖 Qt 文档，不覆盖本 `.qm`** | 独立数据文件，随 AppDir 的 `bin/translations/` 分发，不链接进任何 ELF |
+
+- **聚合方式**：`.qm` 是独立翻译数据文件，与 VEdit 的 MIT 代码不构成派生作品；
+  产品在运行时用 `QTranslator::load` 读取它（`src/app/i18n.cpp`），不改写、不重编译该文件。
+- **装载顺序**：先装 `qtbase_<tag>.qm`、再装 `vedit_<tag>.qm`，因此 VEdit 自己的上下文
+  （若将来撞名）优先；缺失 qtbase 不是启动错误，标准按钮回落英文（`i18n.h` 的
+  `InstallResult::qtbaseLoaded` 记录装载结果）。
+- **可复现**：源文件路径、字节数、sha256 与 Qt 版本见 `evidence/i18n-l2/04-qtbase-vendor.md`；
+  `git status`/校验命令在 `evidence/i18n-l2/50-i18n-l2-report.md` 的 gate 段。
+- **许可全文**：该包的完整 Debian copyright 由 `qt6-translations-l10n` 包提供；仓库不复制
+  Qt 自身的 GPL 文本（项目原有 `docs/licenses/` 无 Qt 条目）。分发 AppImage/tar.gz 时
+  上述「来源 + 版本 + 许可 + sha256」即为该数据文件的归属声明。
+
+## 11. Qt6 产品线：随包 VCS 工具链（git / Subversion，T23 / requirements rev3）
+
+产品交付自带运行环境（含自有 glibc/Qt6），因此也**自带 VCS 工具**，目标机不需要安装
+git 或 svn。两个客户端及其依赖库都来自 `scripts/versions.env` 中 **URL + sha256 固定**
+的 Ubuntu 26.04 `.deb`（未修改的上游二进制），由 `packaging/runtime/assemble-appdir.sh`
+校验后解包到 AppDir 的 `usr/lib/vcs/`，通过 AppDir 自带的 loader 启动；
+解析顺序为 **bundled > PATH > env（`VEDIT_GIT`/`VEDIT_SVN`）**，产品 VCS lane 会在初始化时
+打印一行 `VCS-TOOLCHAIN ...`（`src/workspace/vcs/vcs_toolchain.cpp`）。
+
+| 组件 | 版本 | 许可 | 来源（固定方式） | 分发形态 |
+|---|---|---|---|---|
+| **git** | `2.53.0-1ubuntu1.1` | **GPL-2.0-only** | `VCS_DEB_URLS`/`VCS_DEB_SHA256S`（`scripts/versions.env`）；Ubuntu 26.04 `git` 包 | `usr/lib/vcs/libexec/git` + `git-core/` + `bin/git` 包装脚本 |
+| **Subversion**（`svn`） | `1.14.5-6build1` | **Apache-2.0** | 同上；Ubuntu 26.04 `subversion` 包 | `usr/lib/vcs/libexec/svn` + `bin/svn` 包装脚本 |
+| **libsvn1** | `1.14.5` | **Apache-2.0** | Ubuntu 26.04 `libsvn1` 包 | `usr/lib/vcs/lib/libsvn_*.so.1` |
+| **APR** | `1.7.6` | **Apache-2.0** | Ubuntu 26.04 `libapr1t64` 包 | `usr/lib/vcs/lib/libapr-1.so.0` |
+| **APR-util** | `1.6.3` | **Apache-2.0** | Ubuntu 26.04 `libaprutil1t64` 包 | `usr/lib/vcs/lib/libaprutil-1.so.0` |
+| **serf** | `1.3.10` | **Apache-2.0** | Ubuntu 26.04 `libserf-1-1` 包 | `usr/lib/vcs/lib/libserf-1.so.1` |
+| **utf8proc** | `2.10.0` | **MIT** | Ubuntu 26.04 `libutf8proc3` 包 | `usr/lib/vcs/lib/libutf8proc.so.3` |
+| git / svn 的其余共享库（libcurl-gnutls、OpenSSL、zlib、pcre2、SQLite、liblz4、expat、krb5、Berkeley DB 等） | 构建镜像同版本 | 各自的许可（MIT 系 / Apache-2.0 / OpenSSL / Zlib / LGPL-2.1 等） | 由同一固定镜像提供，`assemble-appdir.sh` 按 `ldd` 闭包复制到 `usr/lib/vcs/lib/` | 独立目录，与产品自己的 `lib/` 互不遮蔽 |
+
+- **svnadmin 不随包**：它只被解包到 `build/vcs-tools/` 供批 6b 的 E2E 使用；`assemble-appdir.sh`
+  会在离开前断言 AppDir 内不存在 `svnadmin`。
+- **许可全文随包**：`usr/share/doc/vedit/licenses/git-GPL-2.0.txt`（构建镜像的
+  `/usr/share/common-licenses/GPL-2`）与 `usr/share/doc/vedit/licenses/Apache-2.0.txt`
+  （仓库 `docs/licenses/Apache-2.0.txt`）。
+- **源码可得性（GPLv2 §3 / Apache-2.0 §4 的对应做法）**：
+  - git 2.53.0 上游源码：`https://git.kernel.org/pub/scm/git/git.git`（tag `v2.53.0`）；
+    对应 Debian 源码包：`apt-get source git=1:2.53.0-1ubuntu1.1`（archive.ubuntu.com，
+    与二进制包同一套固定 URL/sha256 记录在 `scripts/versions.env`）。
+  - Subversion 1.14.5：`https://svn.apache.org/repos/asf/subversion/`（tag `1.14.5`），
+    发行归档 `https://archive.apache.org/dist/subversion/`；Debian 源码包
+    `apt-get source subversion=1.14.5-6build1`。
+  - APR 1.7.6 / APR-util 1.6.3 / serf 1.3.10：`https://apr.apache.org/`、
+    `https://serf.apache.org/`（Apache 发行归档）；Debian 源码包同名可 `apt-get source`。
+  - utf8proc 2.10.0：`https://github.com/JuliaStrings/utf8proc`（tag `v2.10.0`）。
+  以上地址与版本即为分发时的源码指认；产品自身仍为 **MIT**，上述组件各自保留其许可。
+- **可复现与验证**：deb 的 URL + sha256、AppDir 内两个二进制的 sha256、`svnadmin` 缺席、
+  捆绑版本（`git --version` ≥ 2.43、`svn --version --quiet` ≥ 1.14）与干净容器内的
+  `AppRun --selfcheck` 证据见 `evidence/vcs-toolchain/`。
