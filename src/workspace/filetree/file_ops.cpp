@@ -6,6 +6,7 @@
 
 #include <cerrno>
 #include <cstring>
+#include <QCoreApplication>
 
 namespace vedit::workspace {
 namespace fileops {
@@ -30,7 +31,7 @@ QString permissionHint(const QString &parentDirectory)
     if (parentDirectory.isEmpty() || QFileInfo(parentDirectory).isWritable()) {
         return QString();
     }
-    return QStringLiteral("the folder '%1' is not writable").arg(parentDirectory);
+    return QCoreApplication::translate("VEdit", "the folder '%1' is not writable").arg(parentDirectory);
 }
 
 } // namespace
@@ -63,19 +64,19 @@ bool isPlainEntryName(const QString &name, QString *error)
     };
 
     if (name.isEmpty()) {
-        return reject(QStringLiteral("Name must not be empty"));
+        return reject(QCoreApplication::translate("VEdit", "Name must not be empty"));
     }
     if (name == QLatin1String(".") || name == QLatin1String("..")) {
-        return reject(QStringLiteral("'%1' is a reserved name").arg(name));
+        return reject(QCoreApplication::translate("VEdit", "'%1' is a reserved name").arg(name));
     }
     if (name.contains(QLatin1Char('/')) || name.contains(QLatin1Char('\\'))) {
-        return reject(QStringLiteral("Name must not contain a path separator"));
+        return reject(QCoreApplication::translate("VEdit", "Name must not contain a path separator"));
     }
     if (name.contains(QChar(0))) {
-        return reject(QStringLiteral("Name must not contain a NUL character"));
+        return reject(QCoreApplication::translate("VEdit", "Name must not contain a NUL character"));
     }
     if (name.toUtf8().size() > 255) {
-        return reject(QStringLiteral("Name is longer than the 255-byte filesystem limit"));
+        return reject(QCoreApplication::translate("VEdit", "Name is longer than the 255-byte filesystem limit"));
     }
     if (error != nullptr) {
         error->clear();
@@ -93,7 +94,7 @@ FileOpResult createFile(const QString &directory, const QString &name)
     const QString path = QDir(directory).filePath(name);
     if (QFileInfo::exists(path)) {
         return FileOpResult::failure(
-            path, QStringLiteral("A file or folder named %1 already exists").arg(describeTarget(name)));
+            path, QCoreApplication::translate("VEdit", "A file or folder named %1 already exists").arg(describeTarget(name)));
     }
 
     QFile file(path);
@@ -104,7 +105,7 @@ FileOpResult createFile(const QString &directory, const QString &name)
             detail = detail.isEmpty() ? hint : QStringLiteral("%1 (%2)").arg(detail, hint);
         }
         return FileOpResult::failure(
-            path, QStringLiteral("Could not create file %1").arg(describeTarget(name)), detail);
+            path, QCoreApplication::translate("VEdit", "Could not create file %1").arg(describeTarget(name)), detail);
     }
     file.close();
     return FileOpResult::success(path);
@@ -120,14 +121,14 @@ FileOpResult createDirectory(const QString &directory, const QString &name)
     const QString path = QDir(directory).filePath(name);
     if (QFileInfo::exists(path)) {
         return FileOpResult::failure(
-            path, QStringLiteral("A file or folder named %1 already exists").arg(describeTarget(name)));
+            path, QCoreApplication::translate("VEdit", "A file or folder named %1 already exists").arg(describeTarget(name)));
     }
 
     errno = 0;
     if (!QDir(directory).mkdir(name)) {
         const QString detail = systemError();
         return FileOpResult::failure(
-            path, QStringLiteral("Could not create folder %1").arg(describeTarget(name)), detail);
+            path, QCoreApplication::translate("VEdit", "Could not create folder %1").arg(describeTarget(name)), detail);
     }
     return FileOpResult::success(path);
 }
@@ -142,7 +143,7 @@ FileOpResult renameEntry(const QString &path, const QString &newName)
     const QFileInfo info(path);
     if (!info.exists()) {
         return FileOpResult::failure(
-            path, QStringLiteral("'%1' no longer exists").arg(info.fileName()));
+            path, QCoreApplication::translate("VEdit", "'%1' no longer exists").arg(info.fileName()));
     }
 
     const QString target = info.dir().filePath(newName);
@@ -151,7 +152,7 @@ FileOpResult renameEntry(const QString &path, const QString &newName)
     }
     if (QFileInfo::exists(target)) {
         return FileOpResult::failure(
-            path, QStringLiteral("A file or folder named %1 already exists").arg(describeTarget(newName)),
+            path, QCoreApplication::translate("VEdit", "A file or folder named %1 already exists").arg(describeTarget(newName)),
             QStringLiteral("target: %1").arg(target));
     }
 
@@ -165,7 +166,7 @@ FileOpResult renameEntry(const QString &path, const QString &newName)
         }
         return FileOpResult::failure(
             path,
-            QStringLiteral("Could not rename %1 to %2")
+            QCoreApplication::translate("VEdit", "Could not rename %1 to %2")
                 .arg(describeTarget(info.fileName()), describeTarget(newName)),
             detail);
     }
@@ -177,7 +178,7 @@ FileOpResult removeEntry(const QString &path, bool recursive)
     const QFileInfo info(path);
     if (!info.exists()) {
         return FileOpResult::failure(
-            path, QStringLiteral("'%1' no longer exists").arg(info.fileName()));
+            path, QCoreApplication::translate("VEdit", "'%1' no longer exists").arg(info.fileName()));
     }
 
     const QString directory = info.dir().path();
@@ -191,7 +192,7 @@ FileOpResult removeEntry(const QString &path, bool recursive)
     if (!removed) {
         QString detail = systemError();
         if (info.isDir() && !recursive && !QDir(path).isEmpty()) {
-            detail = detail.isEmpty() ? QStringLiteral("the folder is not empty")
+            detail = detail.isEmpty() ? QCoreApplication::translate("VEdit", "the folder is not empty")
                                       : QStringLiteral("%1 (the folder is not empty)").arg(detail);
         }
         const QString hint = permissionHint(directory);
@@ -199,7 +200,7 @@ FileOpResult removeEntry(const QString &path, bool recursive)
             detail = detail.isEmpty() ? hint : QStringLiteral("%1 (%2)").arg(detail, hint);
         }
         return FileOpResult::failure(
-            path, QStringLiteral("Could not delete %1").arg(describeTarget(info.fileName())), detail);
+            path, QCoreApplication::translate("VEdit", "Could not delete %1").arg(describeTarget(info.fileName())), detail);
     }
     return FileOpResult::success(path);
 }

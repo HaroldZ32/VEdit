@@ -1,6 +1,7 @@
 #include "file_tree_model.h"
 
 #include "file_kind.h"
+#include "path_display.h"
 
 #include <QDir>
 #include <QFileIconProvider>
@@ -11,6 +12,7 @@
 
 #include <algorithm>
 #include <utility>
+#include <QCoreApplication>
 
 namespace vedit::workspace {
 namespace {
@@ -69,13 +71,16 @@ void FileTreeModel::resetRoot()
 
 void FileTreeModel::buildRoot(const QString &path)
 {
-    const QFileInfo info(path);
-    const QString absolute = info.absoluteFilePath();
+    // FIX 1: the tree's root is the workspace root (the shell keeps them equal),
+    // and it is stored in the ONE normalised spelling so a tooltip can decide
+    // "inside the root" with the shared rule.
+    const QString absolute = vedit::paths::normalizedRoot(path);
+    const QFileInfo info(absolute);
     rootPath_ = absolute;
 
     if (!info.exists()) {
         setRootState(RootState::Missing,
-                     QStringLiteral("The folder '%1' does not exist.").arg(absolute));
+                     QCoreApplication::translate("VEdit", "The folder '%1' does not exist.").arg(absolute));
         recordDiagnostic(rootError_);
         return;
     }
@@ -87,7 +92,7 @@ void FileTreeModel::buildRoot(const QString &path)
     }
     if (!info.isReadable()) {
         setRootState(RootState::PermissionDenied,
-                     QStringLiteral("The folder '%1' cannot be read (permission denied).")
+                     QCoreApplication::translate("VEdit", "The folder '%1' cannot be read (permission denied).")
                          .arg(absolute));
         recordDiagnostic(rootError_);
         return;
@@ -162,7 +167,10 @@ QVariant FileTreeModel::data(const QModelIndex &index, int role) const
         return provider.icon(node->isDir ? QFileIconProvider::Folder : QFileIconProvider::File);
     }
     case Qt::ToolTipRole: {
-        QString tip = node->path;
+        // FIX 1: the tooltip renders the path with the ONE display rule
+        // (relative to the tree/workspace root when inside it, absolute
+        // otherwise); the PathRole below keeps the absolute path for opening.
+        QString tip = vedit::paths::displayPath(rootPath_, node->path);
         tip += QLatin1String("\n") + fileKindLabel(kind);
         if (!node->error.isEmpty()) {
             tip += QLatin1String("\n") + node->error;
@@ -181,6 +189,13 @@ QVariant FileTreeModel::data(const QModelIndex &index, int role) const
         return node->readable;
     case LoadedRole:
         return node->isDir ? node->complete : true;
+    case FileStatusRole:
+        // item 10: folders carry no status; a file asks the installed merged
+        // view source (cheap: one hash lookup), never a project rescan.
+        if (node->isDir) {
+            return 0;
+        }
+        return statusSource_ != nullptr ? statusSource_(node->path) : 0;
     default:
         break;
     }
@@ -417,10 +432,10 @@ void FileTreeModel::readDirectory(Node *node)
     const QFileInfo info(node->path);
     if (!info.isReadable()) {
         node->readable = false;
-        node->error = QStringLiteral("permission denied: %1").arg(node->path);
+        node->error = QCoreApplication::translate("VEdit", "permission denied: %1").arg(node->path);
         if (node == root_.get()) {
             setRootState(RootState::PermissionDenied,
-                         QStringLiteral("The folder '%1' cannot be read (permission denied).")
+                         QCoreApplication::translate("VEdit", "The folder '%1' cannot be read (permission denied).")
                              .arg(node->path));
             emit rootStateChanged();
         }
@@ -594,6 +609,48 @@ void FileTreeModel::setBatchSize(int size)
 int FileTreeModel::batchSize() const
 {
     return batchSize_;
+}
+
+void FileTreeModel::setFileStatusSource(std::function<int(const QString &)> status,
+                                        std::function<quint64()> revision)
+{
+    statusSource_ = std::move(status);
+    statusRevisionSource_ = std::move(revision);
+    statusRevision_ = 0;
+    // A new source (or none) invalidates every dot already painted.
+    if (root_ != nullptr) {
+        emit dataChanged(index(0, 0), index(0, 0), {FileStatusRole});
+    }
+}
+
+bool FileTreeModel::syncFileStatuses()
+{
+    const quint64 revision = statusRevisionSource_ != nullptr ? statusRevisionSource_() : 0;
+    if (revision == statusRevision_) {
+        return false;
+    }
+    statusRevision_ = revision;
+    ++statusRepaints_;
+    if (root_ == nullptr) {
+        return true;
+    }
+    // Repaint exactly the rows that exist right now (the model is lazy, so this
+    // is bounded by what the user expanded - never the whole project).
+    emit dataChanged(index(0, 0), index(0, 0), {FileStatusRole});
+    const std::function<void(Node *)> walk = [&](Node *node) {
+        for (std::size_t row = 0; row < node->children.size(); ++row) {
+            Node *child = node->children[row].get();
+            const QModelIndex childIndex = index(static_cast<int>(row), 0, indexForNode(node));
+            if (childIndex.isValid()) {
+                emit dataChanged(childIndex, childIndex, {FileStatusRole});
+            }
+            if (child->isDir && child->populated) {
+                walk(child);
+            }
+        }
+    };
+    walk(root_.get());
+    return true;
 }
 
 int FileTreeModel::loadedRows() const

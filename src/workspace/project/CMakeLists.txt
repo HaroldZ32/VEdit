@@ -70,10 +70,13 @@ if(NOT TARGET vd_ffi)
 endif()
 
 set(VEDIT_WORKSPACE_PROJECT_SOURCES
+  project_filelist.cpp
   project_model.cpp
   project_panel.cpp
   project_service.cpp
   project_state.cpp
+  project_subscription.cpp
+  project_variables_dialog.cpp
 )
 if(NOT VEDIT_WORKSPACE_PROJECT_STANDALONE)
   if(NOT TARGET vedit_app_shell)
@@ -86,7 +89,10 @@ if(NOT VEDIT_WORKSPACE_PROJECT_STANDALONE)
 endif()
 
 add_library(vedit_workspace_project STATIC ${VEDIT_WORKSPACE_PROJECT_SOURCES})
-target_include_directories(vedit_workspace_project PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+# The shared path-display rule (src/common/path_display.h), header-only.
+target_include_directories(vedit_workspace_project PUBLIC
+  "${CMAKE_CURRENT_SOURCE_DIR}"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../../common")
 target_link_libraries(vedit_workspace_project PUBLIC
   Qt6::Core
   Qt6::Gui
@@ -96,15 +102,33 @@ target_link_libraries(vedit_workspace_project PUBLIC
 if(NOT VEDIT_WORKSPACE_PROJECT_STANDALONE)
   target_link_libraries(vedit_workspace_project PUBLIC vedit_app_shell)
 endif()
+# AC-7.4/AC-7.7: the project file list jumps through the one process-wide
+# IJumpTarget registry instead of growing its own file-opening code. Guarded so a
+# standalone configure (no jump lane in the build) still compiles; the panel then
+# reports that no jump seam is available instead of pretending.
+if(TARGET vedit_workspace_jump)
+  target_link_libraries(vedit_workspace_project PUBLIC vedit_workspace_jump)
+  target_compile_definitions(vedit_workspace_project PRIVATE VEDIT_PROJECT_HAVE_JUMP=1)
+endif()
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(vedit_workspace_project PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 
 add_executable(vedit-workspace-project-selftest project_selftest.cpp)
 target_link_libraries(vedit-workspace-project-selftest PRIVATE vedit_workspace_project)
+if(TARGET vedit_workspace_jump)
+  target_compile_definitions(vedit-workspace-project-selftest PRIVATE VEDIT_PROJECT_HAVE_JUMP=1)
+endif()
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(vedit-workspace-project-selftest PRIVATE
     -Wall -Wextra -Wpedantic -Werror)
+endif()
+# The root build compiles project_integration.cpp and links the app shell, so the
+# selftest can exercise the REAL ApplicationShell::fileOpened wiring (FIX 2).
+# A standalone lane configure has no shell and keeps the lane-only checks.
+if(NOT VEDIT_WORKSPACE_PROJECT_STANDALONE)
+  target_compile_definitions(vedit-workspace-project-selftest PRIVATE
+    VEDIT_PROJECT_HAVE_APP_SHELL=1)
 endif()
 
 # The repository-owned Verilog fixture (task T14) is the acceptance input.

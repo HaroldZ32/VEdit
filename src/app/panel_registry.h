@@ -39,6 +39,10 @@ public:
 
     void addPanel(PanelSpec spec);
     bool contains(const QString &id) const;
+    // AC-1.3 (batch 1b): the registered title, so the shell can build a View-menu
+    // toggle for a panel a lane registered AFTER the shell constructor (module
+    // tree). Empty for an unknown id.
+    QString title(const QString &id) const;
     QStringList ids() const;                 // registration order
     QStringList insertedIds() const;         // docks that currently exist
     void setFactory(const QString &id, std::function<QWidget *()> factory);

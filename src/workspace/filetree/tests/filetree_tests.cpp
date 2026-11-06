@@ -250,6 +250,17 @@ void testTreeAndInteraction(const QString &scratch)
     check("tree.alpha.folders-first",
           model->index(0, 0, alphaIndex).data(Qt::DisplayRole).toString() == QStringLiteral("deep"));
 
+    // FIX 1: the tooltip renders the display path (relative to the tree/workspace
+    // root), while PathRole keeps the absolute path the panel opens.
+    const QModelIndex deepIndex = model->indexForPath(root + QStringLiteral("/alpha/deep"), true);
+    check("tree.tooltip.relative",
+          deepIndex.data(Qt::ToolTipRole).toString().split(QLatin1Char('\n')).value(0)
+              == QStringLiteral("alpha/deep"),
+          deepIndex.data(Qt::ToolTipRole).toString());
+    check("tree.pathrole.absolute",
+          deepIndex.data(FileTreeModel::PathRole).toString()
+              == QFileInfo(root + QStringLiteral("/alpha/deep")).absoluteFilePath());
+
     widget.view()->setExpanded(alphaIndex, false);
     check("tree.collapse", !widget.view()->isExpanded(alphaIndex));
     widget.view()->setExpanded(alphaIndex, true);

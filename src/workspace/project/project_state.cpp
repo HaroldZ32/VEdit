@@ -13,6 +13,7 @@
 #include <QStringLiteral>
 
 #include <utility>
+#include <QCoreApplication>
 
 namespace vedit::workspace::project {
 
@@ -45,9 +46,11 @@ bool ProjectState::isValid() const
 QJsonObject ProjectState::toJson() const
 {
     QJsonObject object;
-    object.insert(QStringLiteral("version"), 1);
+    object.insert(QStringLiteral("version"), 2);
     object.insert(QStringLiteral("projectRoot"), root);
     object.insert(QStringLiteral("capturedAtUtc"), capturedAt);
+    object.insert(QStringLiteral("filelists"), toArray(filelists));
+    object.insert(QStringLiteral("variables"), toArray(variables));
     object.insert(QStringLiteral("files"), toArray(files));
     object.insert(QStringLiteral("includeDirs"), toArray(includeDirs));
     object.insert(QStringLiteral("defines"), toArray(defines));
@@ -60,6 +63,8 @@ ProjectState ProjectState::fromJson(const QJsonObject &object)
     ProjectState state;
     state.root = object.value(QStringLiteral("projectRoot")).toString();
     state.capturedAt = object.value(QStringLiteral("capturedAtUtc")).toString();
+    state.filelists = stringList(object, "filelists");
+    state.variables = stringList(object, "variables");
     state.files = stringList(object, "files");
     state.includeDirs = stringList(object, "includeDirs");
     state.defines = stringList(object, "defines");
@@ -108,14 +113,14 @@ ProjectState ProjectStateStore::load(bool *ok, QString *error) const
 
     const QString filePath = path();
     if (filePath.isEmpty()) {
-        return fail(QStringLiteral("no state directory is available"));
+        return fail(QCoreApplication::translate("VEdit", "no state directory is available"));
     }
     QFile file(filePath);
     if (!file.exists()) {
         return fail(QString());
     }
     if (!file.open(QIODevice::ReadOnly)) {
-        return fail(QStringLiteral("cannot read %1: %2").arg(filePath, file.errorString()));
+        return fail(QCoreApplication::translate("VEdit", "cannot read %1: %2").arg(filePath, file.errorString()));
     }
     QJsonParseError parseError{};
     const QJsonDocument document = QJsonDocument::fromJson(file.readAll(), &parseError);
@@ -141,27 +146,27 @@ bool ProjectStateStore::save(const ProjectState &state, QString *error) const
     const QString filePath = path();
     if (filePath.isEmpty()) {
         if (error != nullptr) {
-            *error = QStringLiteral("no state directory is available");
+            *error = QCoreApplication::translate("VEdit", "no state directory is available");
         }
         return false;
     }
     if (!QDir().mkpath(QFileInfo(filePath).absolutePath())) {
         if (error != nullptr) {
-            *error = QStringLiteral("cannot create %1").arg(QFileInfo(filePath).absolutePath());
+            *error = QCoreApplication::translate("VEdit", "cannot create %1").arg(QFileInfo(filePath).absolutePath());
         }
         return false;
     }
     QSaveFile file(filePath);
     if (!file.open(QIODevice::WriteOnly)) {
         if (error != nullptr) {
-            *error = QStringLiteral("cannot write %1: %2").arg(filePath, file.errorString());
+            *error = QCoreApplication::translate("VEdit", "cannot write %1: %2").arg(filePath, file.errorString());
         }
         return false;
     }
     file.write(QJsonDocument(state.toJson()).toJson(QJsonDocument::Indented));
     if (!file.commit()) {
         if (error != nullptr) {
-            *error = QStringLiteral("cannot commit %1: %2").arg(filePath, file.errorString());
+            *error = QCoreApplication::translate("VEdit", "cannot commit %1: %2").arg(filePath, file.errorString());
         }
         return false;
     }

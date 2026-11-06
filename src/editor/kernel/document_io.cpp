@@ -10,6 +10,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QUrl>
+#include <QCoreApplication>
 
 namespace vedit::editor {
 
@@ -18,34 +19,34 @@ bool loadFileIntoDocument(KTextEditor::Document *document, const QString &absolu
 {
     if (document == nullptr) {
         if (error != nullptr) {
-            *error = QStringLiteral("openFile: no document");
+            *error = QCoreApplication::translate("VEdit", "openFile: no document");
         }
         return false;
     }
     const QFileInfo info(absolutePath);
     if (!info.exists() || !info.isFile()) {
         if (error != nullptr) {
-            *error = QStringLiteral("cannot open %1: not a regular file").arg(absolutePath);
+            *error = QCoreApplication::translate("VEdit", "cannot open %1: not a regular file").arg(absolutePath);
         }
         return false;
     }
     QFile file(info.absoluteFilePath());
     if (!file.open(QIODevice::ReadOnly)) {
         if (error != nullptr) {
-            *error = QStringLiteral("cannot read %1: %2").arg(absolutePath, file.errorString());
+            *error = QCoreApplication::translate("VEdit", "cannot read %1: %2").arg(absolutePath, file.errorString());
         }
         return false;
     }
     const QByteArray data = file.readAll();
     if (data.contains('\0')) {
         if (error != nullptr) {
-            *error = QStringLiteral("cannot open %1: it looks like a binary file").arg(absolutePath);
+            *error = QCoreApplication::translate("VEdit", "cannot open %1: it looks like a binary file").arg(absolutePath);
         }
         return false;
     }
     if (!document->setText(QString::fromUtf8(data))) {
         if (error != nullptr) {
-            *error = QStringLiteral("KTextEditor::Document::setText() failed for %1")
+            *error = QCoreApplication::translate("VEdit", "KTextEditor::Document::setText() failed for %1")
                          .arg(absolutePath);
         }
         return false;
@@ -76,7 +77,7 @@ std::unique_ptr<EditorDocument> EditorDocument::create(QString *error)
     KTextEditor::Document *document = editor->createDocument(nullptr);
     if (document == nullptr) {
         if (error != nullptr) {
-            *error = QStringLiteral("KTextEditor::Editor::createDocument() returned null");
+            *error = QCoreApplication::translate("VEdit", "KTextEditor::Editor::createDocument() returned null");
         }
         return nullptr;
     }
@@ -100,13 +101,13 @@ bool EditorDocument::setText(const QString &text, QString *error)
 {
     if (document_ == nullptr) {
         if (error != nullptr) {
-            *error = QStringLiteral("setText: no document");
+            *error = QCoreApplication::translate("VEdit", "setText: no document");
         }
         return false;
     }
     if (!document_->setText(text)) {
         if (error != nullptr) {
-            *error = QStringLiteral("KTextEditor::Document::setText() failed");
+            *error = QCoreApplication::translate("VEdit", "KTextEditor::Document::setText() failed");
         }
         return false;
     }
@@ -167,7 +168,7 @@ bool EditorDocument::saveAtomic(QString *error, const QString &pathTo)
     const QString target = pathTo.isEmpty() ? filePath() : pathTo;
     if (target.isEmpty()) {
         if (error != nullptr) {
-            *error = QStringLiteral("saveAtomic: the document has no file path");
+            *error = QCoreApplication::translate("VEdit", "saveAtomic: the document has no file path");
         }
         return false;
     }

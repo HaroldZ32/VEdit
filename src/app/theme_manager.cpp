@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <QStringLiteral>
+#include <QCoreApplication>
 
 namespace vedit::app {
 
@@ -52,7 +53,7 @@ bool ThemeManager::resolveTheme(const QString &name, KSyntaxHighlighting::Theme 
     *theme = repository_.theme(name);
     if (!theme->isValid()) {
         if (error != nullptr) {
-            *error = QStringLiteral("unknown theme '%1' (or not loaded by KSyntaxHighlighting)").arg(name);
+            *error = QCoreApplication::translate("VEdit", "unknown theme '%1' (or not loaded by KSyntaxHighlighting)").arg(name);
         }
         return false;
     }

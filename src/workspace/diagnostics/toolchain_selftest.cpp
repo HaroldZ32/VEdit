@@ -149,7 +149,7 @@ int main(int argc, char **argv)
                   && report.statusLine().contains(QStringLiteral("missing=[verible, slang]")),
               report.statusLine());
         check("missing.user-message",
-              report.userMessage().contains(QStringLiteral("Diagnostics unavailable"))
+              report.userMessage().contains(QCoreApplication::translate("VEdit", "Diagnostics unavailable"))
                   && report.userMessage().contains(QStringLiteral("Fix:")),
               report.userMessage());
         check("missing.no-fabricated-diagnostics", report.verible.path.isEmpty()

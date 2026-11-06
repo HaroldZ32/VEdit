@@ -5,6 +5,9 @@
 #include <QByteArray>
 #include <QStringLiteral>
 
+#include <vector>
+#include <QCoreApplication>
+
 namespace vedit::workspace::project {
 
 namespace {
@@ -25,11 +28,36 @@ ExpansionPayload toPayload(const VdProjectInfo &info)
 {
     ExpansionPayload payload;
     payload.files = toList(info.files);
+    payload.relativeFiles = toList(info.relative_files);
     payload.includeDirs = toList(info.include_dirs);
     payload.defines = toList(info.defines);
     payload.diagnostics = toList(info.warnings);
+    payload.missingVariables = toList(info.missing_variables);
+    payload.skipped = static_cast<int>(info.skipped_lines);
     return payload;
 }
+
+// Borrowed view of a string list. The UTF-8 buffers are owned by `storage`,
+// which the caller keeps alive for the whole call; `items` only points into it.
+struct BorrowedList {
+    std::vector<QByteArray> storage;
+    std::vector<char *> items;
+    VdStringList list{0, nullptr};
+
+    explicit BorrowedList(const QStringList &values)
+    {
+        storage.reserve(static_cast<std::size_t>(values.size()));
+        for (const QString &value : values) {
+            storage.push_back(value.toUtf8());
+        }
+        items.reserve(storage.size());
+        for (QByteArray &value : storage) {
+            items.push_back(value.data());
+        }
+        list.count = items.size();
+        list.items = items.empty() ? nullptr : items.data();
+    }
+};
 
 } // namespace
 
@@ -45,13 +73,20 @@ ProjectService::~ProjectService()
     }
 }
 
-ProjectService::Start ProjectService::start(const QString &projectRoot, quint64 *job)
+ProjectService::Start ProjectService::start(const QString &projectRoot, const QStringList &filelists,
+                                            const QStringList &variables, const QString &settingsPath,
+                                            quint64 *job)
 {
     if (service_ == nullptr || job == nullptr) {
         return Start::Rejected;
     }
     const QByteArray path = projectRoot.toUtf8();
-    const quint64 id = static_cast<quint64>(vd_project_parse(service_, path.constData()));
+    const QByteArray settings = settingsPath.toUtf8();
+    BorrowedList lists(filelists);
+    BorrowedList table(variables);
+    const quint64 id = static_cast<quint64>(vd_project_expand_v2(
+        service_, path.constData(), &lists.list,
+        settings.isEmpty() ? nullptr : settings.constData(), &table.list));
     if (id == 0) {
         return Start::Rejected;
     }
@@ -86,7 +121,7 @@ ProjectService::Poll ProjectService::poll(quint64 job, ExpansionPayload *payload
 QString ProjectService::lastError() const
 {
     if (service_ == nullptr) {
-        return QStringLiteral("the Rust project service is unavailable");
+        return QCoreApplication::translate("VEdit", "the Rust project service is unavailable");
     }
     VdError error{};
     if (vd_service_error(service_, &error) != 1) {

@@ -63,6 +63,16 @@ int main(int argc, char **argv)
     const QString expected = vedit::syntax::resolveSyntaxDefinitionDirectory(dataRoot);
     check("equivalence.resolver-data-root", expected == syntaxDir, expected);
 
+    // T49: the two resolver boundaries the deleted folding-lane test used to own
+    // (`syntax-dir.missing-path-is-empty` / `syntax-dir.empty-string-is-empty`).
+    // `resolveSyntaxDefinitionDirectory` is LIVE — `ksyntax_data.cpp:108` calls it
+    // — so these belong here with the ids unchanged.
+    check("syntax-dir.missing-path-is-empty",
+          vedit::syntax::resolveSyntaxDefinitionDirectory(QStringLiteral("/nonexistent/t109"))
+              .isEmpty());
+    check("syntax-dir.empty-string-is-empty",
+          vedit::syntax::resolveSyntaxDefinitionDirectory(QString()).isEmpty());
+
     {
         vedit::kde::KsyntaxData data(vedit::kde::DataConfig{dataRoot, {}});
         const vedit::kde::LoadReport &report = data.load();

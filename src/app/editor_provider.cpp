@@ -6,6 +6,7 @@
 #include <QPlainTextEdit>
 #include <QSaveFile>
 #include <QStringLiteral>
+#include <QCoreApplication>
 
 namespace vedit::app {
 
@@ -20,7 +21,7 @@ QString DemoEditorProvider::id() const
 
 QString DemoEditorProvider::displayName() const
 {
-    return QStringLiteral("demo editor (shell placeholder)");
+    return QCoreApplication::translate("VEdit", "demo editor (shell placeholder)");
 }
 
 QWidget *DemoEditorProvider::createEditor(QWidget *parent)

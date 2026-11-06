@@ -19,6 +19,7 @@
 #include "fuzzy_matcher.h"
 
 #include <functional>
+#include <QCoreApplication>
 
 class QLabel;
 class QLineEdit;
@@ -65,7 +66,7 @@ public:
     // benchmark asserts this stays far below the 200 ms acceptance budget.
     qint64 lastFilterMicros() const;
 
-    // "No matching files" — the explicit empty state required by the contract.
+    // QCoreApplication::translate("VEdit", "No matching files") — the explicit empty state required by the contract.
     static QString noResultsText();
 
 protected:

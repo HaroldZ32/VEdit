@@ -10,6 +10,7 @@
 #include "editor_provider.h"
 
 #include <QHash>
+#include <QMetaObject>
 #include <QString>
 
 #include <functional>
@@ -50,10 +51,20 @@ public:
     QString statusText(QWidget *editor) const override;
     void setStatusListener(QWidget *editor, std::function<void()> listener) override;
 
+    // Dirty seam (T12): the pane's tab marker, the window title and the status
+    // bar subscribe here; the KTextEditor document's modifiedChanged drives it.
+    void setModifiedListener(QWidget *editor, std::function<void(bool)> listener) override;
+
+    // Session-restore seam (T19): caret + first displayed REAL line. The demo
+    // fallback keeps the base class's QPlainTextEdit implementation.
+    ViewState viewState(QWidget *editor) const override;
+    void setViewState(QWidget *editor, const ViewState &state) override;
+
 private:
     void notifyStatus(QWidget *editor);
 
     QHash<QWidget *, std::function<void()>> statusListeners_;
+    QHash<QWidget *, QMetaObject::Connection> modifiedConnections_;
 };
 
 std::unique_ptr<vedit::app::EditorProvider> makeEditCoreProvider();

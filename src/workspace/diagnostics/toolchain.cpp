@@ -3,6 +3,16 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QFileInfo>
+#include <QHash>
+#include <QProcess>
+
+// UX batch 2 / A4: the Preferences Format page's knobs reach the formatter here.
+// `formatArguments` is inline in the header, so this lane gains no link
+// dependency on the settings library.
+#if __has_include("../settings/format_options.h")
+#include "../settings/format_options.h"
+#define VEDIT_FORMAT_HAVE_OPTIONS 1
+#endif
 
 namespace vedit::workspace::diagnostics {
 
@@ -166,6 +176,8 @@ QString toolSourceLabel(ToolSource source, const QString &envName)
         return QStringLiteral("PATH");
     case ToolSource::Env:
         return envName.isEmpty() ? QStringLiteral("env") : QStringLiteral("env:") + envName;
+    case ToolSource::Settings:
+        return QStringLiteral("settings");
     case ToolSource::Missing:
         return QStringLiteral("missing");
     }
@@ -180,6 +192,23 @@ QString ToolResolution::describe() const
     return QStringLiteral("%1: missing (probed %2)").arg(name, readableCandidates(searched));
 }
 
+const ToolResolution &ToolchainReport::toolFor(ToolKind kind) const
+{
+    switch (kind) {
+    case ToolKind::Verible:
+        return verible;
+    case ToolKind::Slang:
+        return slang;
+    case ToolKind::SlangServer:
+        return slangServer;
+    case ToolKind::VeribleFormat:
+        return veribleFormat;
+    case ToolKind::VeribleLint:
+        return veribleLint;
+    }
+    return slang;
+}
+
 QStringList ToolchainReport::missing() const
 {
     QStringList absent;
@@ -190,6 +219,30 @@ QStringList ToolchainReport::missing() const
         absent.append(QStringLiteral("slang"));
     }
     return absent;
+}
+
+QStringList ToolchainReport::auxiliaryMissing() const
+{
+    QStringList absent;
+    if (!slangServer.found()) {
+        absent.append(QStringLiteral("slang-server"));
+    }
+    if (!veribleFormat.found()) {
+        absent.append(QStringLiteral("verible-format"));
+    }
+    if (!veribleLint.found()) {
+        absent.append(QStringLiteral("verible-lint"));
+    }
+    return absent;
+}
+
+QString ToolchainReport::auxiliaryStatusLine() const
+{
+    return QStringLiteral("aux source=slang-server:%1 verible-format:%2 verible-lint:%3 missing=[%4]")
+        .arg(slangServer.sourceLabel(),
+             veribleFormat.sourceLabel(),
+             veribleLint.sourceLabel(),
+             auxiliaryMissing().join(QStringLiteral(", ")));
 }
 
 QString ToolchainReport::statusLine() const
@@ -229,14 +282,29 @@ QString ToolchainReport::fixHint() const
 
 QString ToolchainReport::missingMessage(ToolKind kind) const
 {
-    const ToolResolution &tool = kind == ToolKind::Verible ? verible : slang;
+    const ToolResolution &tool = toolFor(kind);
     if (tool.found()) {
         return tool.describe();
     }
-    const QString name = tool.name.isEmpty()
-        ? (kind == ToolKind::Verible ? QStringLiteral("verible-verilog-ls")
-                                     : QStringLiteral("slang"))
-        : tool.name;
+    QString fallback;
+    switch (kind) {
+    case ToolKind::Verible:
+        fallback = QStringLiteral("verible-verilog-ls");
+        break;
+    case ToolKind::Slang:
+        fallback = QStringLiteral("slang");
+        break;
+    case ToolKind::SlangServer:
+        fallback = QStringLiteral("slang-server");
+        break;
+    case ToolKind::VeribleFormat:
+        fallback = QStringLiteral("verible-verilog-format");
+        break;
+    case ToolKind::VeribleLint:
+        fallback = QStringLiteral("verible-verilog-lint");
+        break;
+    }
+    const QString name = tool.name.isEmpty() ? fallback : tool.name;
     return QStringLiteral("%1 not found (bundled, local checkout, PATH and env all empty)")
         .arg(name);
 }
@@ -247,6 +315,18 @@ QString ToolchainReport::probeDetail() const
     parts.append(QStringLiteral("verible-verilog-ls probed: %1")
                      .arg(readableCandidates(verible.searched)));
     parts.append(QStringLiteral("slang probed: %1").arg(readableCandidates(slang.searched)));
+    if (!slangServer.searched.isEmpty() || slangServer.found()) {
+        parts.append(QStringLiteral("slang-server probed: %1")
+                         .arg(readableCandidates(slangServer.searched)));
+    }
+    if (!veribleFormat.searched.isEmpty() || veribleFormat.found()) {
+        parts.append(QStringLiteral("verible-verilog-format probed: %1")
+                         .arg(readableCandidates(veribleFormat.searched)));
+    }
+    if (!veribleLint.searched.isEmpty() || veribleLint.found()) {
+        parts.append(QStringLiteral("verible-verilog-lint probed: %1")
+                         .arg(readableCandidates(veribleLint.searched)));
+    }
     return parts.join(QStringLiteral(" | "));
 }
 
@@ -288,6 +368,27 @@ ToolchainReport resolveToolchain(const ToolchainSearchContext &context)
                               context.localDirs,
                               context.pathDirs,
                               context.env);
+    report.slangServer = resolveOne(ToolKind::SlangServer,
+                                    context.slangServerName,
+                                    QStringLiteral("VEDIT_SLANG_SERVER"),
+                                    context.bundledDirs,
+                                    context.localDirs,
+                                    context.pathDirs,
+                                    context.env);
+    report.veribleFormat = resolveOne(ToolKind::VeribleFormat,
+                                      context.veribleFormatName,
+                                      QStringLiteral("VEDIT_VERIBLE_FORMAT"),
+                                      context.bundledDirs,
+                                      context.localDirs,
+                                      context.pathDirs,
+                                      context.env);
+    report.veribleLint = resolveOne(ToolKind::VeribleLint,
+                                    context.veribleLintName,
+                                    QStringLiteral("VEDIT_VERIBLE_LINT"),
+                                    context.bundledDirs,
+                                    context.localDirs,
+                                    context.pathDirs,
+                                    context.env);
     return report;
 }
 
@@ -321,6 +422,9 @@ ToolchainSearchContext applicationToolchainContext()
     remember("VEDIT_VERIBLE_LS_DIR");
     remember("VEDIT_SLANG");
     remember("VEDIT_SLANG_DIR");
+    remember("VEDIT_SLANG_SERVER");
+    remember("VEDIT_VERIBLE_FORMAT");
+    remember("VEDIT_VERIBLE_LINT");
 
     ToolchainSearchContext context = contextFor(bundledDirs, pathDirs, env);
     context.localDirs = localDirs;
@@ -331,8 +435,108 @@ QString toolchainStatusLine()
 {
     const ToolchainSearchContext context = applicationToolchainContext();
     const ToolchainReport report = resolveToolchain(context);
-    return QStringLiteral("TOOLCHAIN %1 local=[%2]")
-        .arg(report.statusLine(), context.localDirs.join(QLatin1Char(',')));
+    return QStringLiteral("TOOLCHAIN %1 %2 local=[%3]")
+        .arg(report.statusLine(), report.auxiliaryStatusLine(),
+             context.localDirs.join(QLatin1Char(',')));
+}
+
+namespace {
+
+ToolResolution *resolutionForName(ToolchainReport *report, const QString &name)
+{
+    const QString canonical = QFileInfo(name).fileName();
+    if (canonical == QStringLiteral("verible-verilog-ls")) {
+        return &report->verible;
+    }
+    if (canonical == QStringLiteral("slang")) {
+        return &report->slang;
+    }
+    if (canonical == QStringLiteral("slang-server")) {
+        return &report->slangServer;
+    }
+    if (canonical == QStringLiteral("verible-verilog-format")) {
+        return &report->veribleFormat;
+    }
+    if (canonical == QStringLiteral("verible-verilog-lint")) {
+        return &report->veribleLint;
+    }
+    return nullptr;
+}
+
+} // namespace
+
+void applyToolOverrides(ToolchainReport *report, const QHash<QString, QString> &paths)
+{
+    if (report == nullptr) {
+        return;
+    }
+    for (auto it = paths.cbegin(); it != paths.cend(); ++it) {
+        const QString value = it.value().trimmed();
+        if (value.isEmpty()) {
+            continue;
+        }
+        ToolResolution *tool = resolutionForName(report, it.key());
+        if (tool == nullptr) {
+            continue;
+        }
+        const QFileInfo info(value);
+        if (!info.isFile() || !info.isExecutable()) {
+            continue;
+        }
+        tool->path = info.absoluteFilePath();
+        tool->source = ToolSource::Settings;
+    }
+}
+
+bool formatVerilog(const QString &formatterPath, const QString &text, QString *formatted,
+                   QString *error)
+{
+    if (formatted == nullptr) {
+        return false;
+    }
+    if (formatterPath.isEmpty() || !QFileInfo(formatterPath).isExecutable()) {
+        if (error != nullptr) {
+            *error = QStringLiteral("verible-verilog-format is missing");
+        }
+        return false;
+    }
+    QProcess process;
+    QStringList arguments;
+#if defined(VEDIT_FORMAT_HAVE_OPTIONS)
+    // One flag per non-empty knob, in the table's order (plan §1 F3); an unset
+    // knob emits nothing, so an untouched page keeps the pre-A4 argv exactly.
+    arguments = vedit::workspace::settings::formatArguments(
+        vedit::workspace::settings::currentFormatValues());
+#endif
+    // The formatter reads stdin when the file argument is `-`.
+    arguments.append(QStringLiteral("-"));
+    process.start(formatterPath, arguments);
+    if (!process.waitForStarted(3000)) {
+        if (error != nullptr) {
+            *error = QStringLiteral("cannot start %1: %2").arg(formatterPath, process.errorString());
+        }
+        return false;
+    }
+    process.write(text.toUtf8());
+    process.closeWriteChannel();
+    if (!process.waitForFinished(10000)) {
+        process.kill();
+        process.waitForFinished(1000);
+        if (error != nullptr) {
+            *error = QStringLiteral("%1 timed out").arg(QFileInfo(formatterPath).fileName());
+        }
+        return false;
+    }
+    if (process.exitStatus() != QProcess::NormalExit || process.exitCode() != 0) {
+        if (error != nullptr) {
+            *error = QStringLiteral("%1 failed: %2")
+                         .arg(QFileInfo(formatterPath).fileName(),
+                              QString::fromUtf8(process.readAllStandardError()).trimmed());
+        }
+        return false;
+    }
+    *formatted = QString::fromUtf8(process.readAllStandardOutput());
+    return true;
 }
 
 } // namespace vedit::workspace::diagnostics

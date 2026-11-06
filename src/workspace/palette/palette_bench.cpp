@@ -30,6 +30,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <QCoreApplication>
 
 namespace {
 
@@ -97,7 +98,7 @@ QString createFixture(const QString &root, int files)
         }
         QFile file(path);
         if (!file.open(QIODevice::WriteOnly)) {
-            return QStringLiteral("cannot create %1").arg(path);
+            return QCoreApplication::translate("VEdit", "cannot create %1").arg(path);
         }
         file.write(QByteArray("palette bench fixture\n"));
     }

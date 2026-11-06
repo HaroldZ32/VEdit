@@ -16,6 +16,7 @@
 //
 // The shell itself is untouched: this harness only calls the public seams.
 #include "global_search.h"
+#include "jump/jump_registry.h"
 #include "search_integration.h"
 #include "search_panel.h"
 #include "search_types.h"
@@ -66,7 +67,7 @@
 #include <unistd.h>
 
 using vedit::workspace::search::GlobalSearch;
-using vedit::workspace::search::IJumpTarget;
+using vedit::workspace::jump::IJumpTarget;
 using vedit::workspace::search::JumpRequest;
 using vedit::workspace::search::SearchHit;
 using vedit::workspace::search::SearchOptions;
@@ -259,11 +260,21 @@ bool clickHitRow(SearchPanel &panel, const SearchHit &hit)
 class RecordingJumpTarget final : public IJumpTarget
 {
 public:
-    void jumpTo(const JumpRequest &request) override { requests.append(request); }
+    bool jumpTo(const QString &filePath, int line, int column) override
+    {
+        JumpRequest request;
+        request.filePath = filePath;
+        request.line = line;
+        request.column = column;
+        requests.append(request);
+        return true;
+    }
     QList<JumpRequest> requests;
 };
 
 // What edit-core will do for real: open the file and put the cursor at the hit.
+// Registered through the application-wide jump registry (A-1/T20); the panel no
+// longer owns a per-panel target seam.
 class DemoJumpTarget final : public IJumpTarget
 {
 public:
@@ -272,22 +283,27 @@ public:
     {
     }
 
-    void jumpTo(const JumpRequest &request) override
+    bool jumpTo(const QString &filePath, int line, int column) override
     {
+        JumpRequest request;
+        request.filePath = filePath;
+        request.line = line;
+        request.column = column;
         requests.append(request);
         if (editor_ == nullptr) {
-            return;
+            return false;
         }
-        QFile file(request.filePath);
+        QFile file(filePath);
         if (file.open(QIODevice::ReadOnly)) {
             editor_->setPlainText(QString::fromUtf8(file.readAll()));
         }
-        const int lineIndex = request.line > 0 ? request.line - 1 : 0;
+        const int lineIndex = line > 0 ? line - 1 : 0;
         QTextCursor cursor(editor_->document()->findBlockByLineNumber(lineIndex));
         cursor.movePosition(QTextCursor::StartOfLine);
         cursor.movePosition(QTextCursor::EndOfLine, QTextCursor::KeepAnchor);
         editor_->setTextCursor(cursor);
         editor_->centerCursor();
+        return true;
     }
 
     QList<JumpRequest> requests;
@@ -502,7 +518,10 @@ void testJump(const Fixture &fixture)
     QCoreApplication::processEvents();
     panel.setRootPath(fixture.root());
     RecordingJumpTarget target;
-    panel.setJumpTarget(&target);
+    // A-1/T20: the panel has no per-panel target seam any more; it forwards the
+    // request to the application-wide registry. Installing the recording target
+    // there is the harness standing in for the product target.
+    vedit::workspace::jump::setTarget(&target);
     panel.setQuery(QStringLiteral("always_ff"));
     panel.startSearch();
     waitForSearch(panel);
@@ -545,11 +564,12 @@ void testJump(const Fixture &fixture)
     // The demo consumer proves the whole path: click -> open file -> line.
     QPlainTextEdit editor;
     DemoJumpTarget demo(&editor);
-    panel.setJumpTarget(&demo);
+    vedit::workspace::jump::setTarget(&demo);
     check("jump.activate", panel.activateHit(0));
     check("jump.demo.opened", editor.toPlainText().contains(QStringLiteral("always_ff")));
     const int block = editor.textCursor().blockNumber();
     check("jump.demo.line", block + 1 == panel.hits().at(0).line);
+    vedit::workspace::jump::clearTargetIf(&demo);
 }
 
 #ifdef VEDIT_WORKSPACE_SEARCH_HAVE_SHELL
@@ -628,21 +648,40 @@ void testProductJump(const Fixture &fixture)
     }
 
 #if defined(VEDIT_SEARCH_HAVE_EDITOR_CORE)
-    KTextEditor::View *view = vedit::editor::viewFor(pane->editorWidget());
-    KTextEditor::Document *document = vedit::editor::documentFor(pane->editorWidget());
+    // A-2/T20: the view/document belong to the pane's ACTIVE TAB, not to the
+    // pane for the whole test. The second hit opens as a NEW TAB (T12), so a
+    // pointer cached from the first tab reads the first document forever - the
+    // stale-cache bug that kept jump.product.second-* red. Re-resolve them from
+    // `pane->editorWidget()` after every click; the assertions themselves are
+    // unchanged (same checks, same expected file/line/column).
+    KTextEditor::View *view = nullptr;
+    KTextEditor::Document *document = nullptr;
+    const auto refreshTab = [pane, &view, &document]() {
+        view = vedit::editor::viewFor(pane->editorWidget());
+        document = vedit::editor::documentFor(pane->editorWidget());
+    };
+    refreshTab();
     check("jump.product.ktexteditor-provider", view != nullptr && document != nullptr);
     if (view == nullptr || document == nullptr) {
         return;
     }
-    const auto documentText = [document]() { return document->text(); };
-    const auto cursorLine = [view]() { return view->cursorPosition().line() + 1; };
-    const auto cursorColumn = [view]() { return view->cursorPosition().column() + 1; };
+    const auto documentText = [&document]() {
+        return document != nullptr ? document->text() : QString();
+    };
+    const auto cursorLine = [&view]() {
+        return view != nullptr ? view->cursorPosition().line() + 1 : 0;
+    };
+    const auto cursorColumn = [&view]() {
+        return view != nullptr ? view->cursorPosition().column() + 1 : 0;
+    };
 #else
     check("jump.product.ktexteditor-provider", false);
     return;
 #endif
 
-    check("jump.product.target-installed", panel->jumpTarget() != nullptr);
+    // The product target is the one installSearch() registered in the
+    // application-wide registry (A-1/T20); the panel no longer owns one.
+    check("jump.product.target-installed", vedit::workspace::jump::hasTarget());
     check("jump.product.initially-no-file", pane->currentFilePath().isEmpty());
 
     panel->setQuery(QStringLiteral("always_ff"));
@@ -686,6 +725,9 @@ void testProductJump(const Fixture &fixture)
     const QString expectedB = readAll(hitB.filePath);
 
     check("jump.product.click-first", clickHitRow(*panel, hitA));
+#if defined(VEDIT_SEARCH_HAVE_EDITOR_CORE)
+    refreshTab();
+#endif
     std::printf("SEARCH-JUMP first requested='%s':%d current='%s' cursor=%d:%d\n",
                 qPrintable(hitA.relativePath), hitA.line,
                 qPrintable(pane->currentFilePath()), cursorLine(), cursorColumn());
@@ -698,6 +740,9 @@ void testProductJump(const Fixture &fixture)
           shell->statusBar()->currentMessage().contains(hitA.filePath));
 
     check("jump.product.click-second", clickHitRow(*panel, hitB));
+#if defined(VEDIT_SEARCH_HAVE_EDITOR_CORE)
+    refreshTab();
+#endif
     std::printf("SEARCH-JUMP second requested='%s':%d current='%s' cursor=%d:%d\n",
                 qPrintable(hitB.relativePath), hitB.line,
                 qPrintable(pane->currentFilePath()), cursorLine(), cursorColumn());
@@ -1068,9 +1113,13 @@ int captureScreenshots(const QString &directory)
             }
             if (editor != nullptr) {
                 DemoJumpTarget target(editor);
-                panel->setJumpTarget(&target);
+                // The screenshot harness stands in for the product target in the
+                // application-wide registry (A-1/T20); cleared before `target`
+                // (a stack object) dies.
+                vedit::workspace::jump::setTarget(&target);
                 panel->activateHit(0);
                 QCoreApplication::processEvents();
+                vedit::workspace::jump::clearTargetIf(&target);
             }
             grab(shell.get(), QStringLiteral("03-search-jump.png"));
 

@@ -11,6 +11,7 @@
 #include <QStringLiteral>
 
 #include <algorithm>
+#include <QCoreApplication>
 
 namespace vedit::app {
 
@@ -31,7 +32,7 @@ void JsonShortcutStore::load(QString *error)
     }
     if (!file.open(QIODevice::ReadOnly)) {
         if (error != nullptr) {
-            *error = QStringLiteral("cannot read shortcut store %1").arg(path_);
+            *error = QCoreApplication::translate("VEdit", "cannot read shortcut store %1").arg(path_);
         }
         return;
     }
@@ -39,7 +40,7 @@ void JsonShortcutStore::load(QString *error)
     const QJsonDocument document = QJsonDocument::fromJson(file.readAll(), &parseError);
     if (parseError.error != QJsonParseError::NoError || !document.isObject()) {
         if (error != nullptr) {
-            *error = QStringLiteral("invalid shortcut store %1: %2").arg(path_, parseError.errorString());
+            *error = QCoreApplication::translate("VEdit", "invalid shortcut store %1: %2").arg(path_, parseError.errorString());
         }
         return;
     }
@@ -81,7 +82,7 @@ bool JsonShortcutStore::save(QString *error)
     const QString directory = QFileInfo(path_).absolutePath();
     if (!directory.isEmpty() && !QDir().mkpath(directory)) {
         if (error != nullptr) {
-            *error = QStringLiteral("cannot create shortcut store directory %1").arg(directory);
+            *error = QCoreApplication::translate("VEdit", "cannot create shortcut store directory %1").arg(directory);
         }
         return false;
     }
@@ -96,14 +97,14 @@ bool JsonShortcutStore::save(QString *error)
     QSaveFile file(path_);
     if (!file.open(QIODevice::WriteOnly)) {
         if (error != nullptr) {
-            *error = QStringLiteral("cannot write shortcut store %1").arg(path_);
+            *error = QCoreApplication::translate("VEdit", "cannot write shortcut store %1").arg(path_);
         }
         return false;
     }
     file.write(QJsonDocument(root).toJson(QJsonDocument::Indented));
     if (!file.commit()) {
         if (error != nullptr) {
-            *error = QStringLiteral("cannot commit shortcut store %1").arg(path_);
+            *error = QCoreApplication::translate("VEdit", "cannot commit shortcut store %1").arg(path_);
         }
         return false;
     }
@@ -154,6 +155,22 @@ QAction *CommandRegistry::add(CommandSpec spec)
         store_ != nullptr ? store_->shortcut(spec.id, spec.defaultShortcut) : spec.defaultShortcut;
     action->setShortcut(shortcut);
     action->setShortcutVisibleInContextMenu(true);
+
+    // U3-F1 (A2 review H1): a duplicate default is a product defect — Qt treats
+    // the sequence as ambiguous and drops BOTH bindings, and Preferences shows
+    // the same sequence for two commands. Warn at registration so the class can
+    // never recur silently; the product selfcheck also asserts the table is
+    // duplicate-free and prints the bindings.
+    if (!shortcut.isEmpty()) {
+        for (auto it = entries_.constBegin(); it != entries_.constEnd(); ++it) {
+            if (it->action != nullptr && it->action->shortcut() == shortcut) {
+                qWarning("CommandRegistry: duplicate shortcut '%s' for '%s' and '%s'",
+                         qPrintable(shortcut.toString()), qPrintable(it.key()),
+                         qPrintable(spec.id));
+                break;
+            }
+        }
+    }
 
     if (!menus_.contains(spec.menu)) {
         menus_.append(spec.menu);
@@ -250,11 +267,49 @@ bool CommandRegistry::saveShortcuts(QString *error)
 {
     if (store_ == nullptr) {
         if (error != nullptr) {
-            *error = QStringLiteral("no shortcut store configured");
+            *error = QCoreApplication::translate("VEdit", "no shortcut store configured");
         }
         return false;
     }
     return store_->save(error);
+}
+
+QStringList CommandRegistry::shortcutBindings() const
+{
+    QStringList lines;
+    for (const QString &id : order_) {
+        const auto it = entries_.constFind(id);
+        if (it == entries_.constEnd() || it->action == nullptr
+            || it->action->shortcut().isEmpty()) {
+            continue;
+        }
+        lines.append(it->action->shortcut().toString() + QLatin1Char('\t') + id);
+    }
+    lines.sort();
+    return lines;
+}
+
+QStringList CommandRegistry::duplicateShortcuts() const
+{
+    QHash<QString, QStringList> byShortcut;
+    for (const QString &line : shortcutBindings()) {
+        const int tab = line.indexOf(QLatin1Char('\t'));
+        if (tab <= 0) {
+            continue;
+        }
+        byShortcut[line.left(tab)].append(line.mid(tab + 1));
+    }
+    QStringList duplicates;
+    for (auto it = byShortcut.constBegin(); it != byShortcut.constEnd(); ++it) {
+        if (it.value().size() < 2) {
+            continue;
+        }
+        QStringList ids = it.value();
+        ids.sort();
+        duplicates.append(it.key() + QStringLiteral(": ") + ids.join(QStringLiteral(", ")));
+    }
+    duplicates.sort();
+    return duplicates;
 }
 
 } // namespace vedit::app

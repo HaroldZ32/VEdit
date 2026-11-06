@@ -84,6 +84,14 @@ public:
     void setMenuLabel(const QString &menu, const QString &label);
     void refreshShortcuts();
     bool saveShortcuts(QString *error);
+    // Every non-empty effective shortcut of the registry, sorted, in the form
+    // "<sequence>\t<command id>". The product selfcheck prints this as the
+    // machine-readable bindings dump (the evidence for "no shared sequence").
+    QStringList shortcutBindings() const;
+    // Groups of command ids that share one non-empty effective shortcut, in the
+    // form "<sequence>: <id>, <id>". A non-empty result is a product defect:
+    // Qt treats a duplicated sequence as ambiguous and drops BOTH bindings.
+    QStringList duplicateShortcuts() const;
 
 private:
     struct Entry {

@@ -37,13 +37,18 @@ message(STATUS "VEdit file tree: Qt ${Qt6_VERSION} (standalone=${VEDIT_FILETREE_
 set(VEDIT_FILETREE_SOURCES
   file_kind.cpp
   file_ops.cpp
+  file_status_delegate.cpp
   file_tree_model.cpp
   file_tree_widget.cpp
   filetree_panel.cpp
 )
 
 add_library(vedit_file_tree STATIC ${VEDIT_FILETREE_SOURCES})
-target_include_directories(vedit_file_tree PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+# The shared path-display rule (src/common/path_display.h): header-only, so the
+# core library includes it without linking src/app (SEAM.md §2.4 still holds).
+target_include_directories(vedit_file_tree PUBLIC
+  "${CMAKE_CURRENT_SOURCE_DIR}"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../../common")
 target_link_libraries(vedit_file_tree PUBLIC Qt6::Core Qt6::Gui Qt6::Widgets)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")

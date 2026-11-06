@@ -1,13 +1,14 @@
 #pragma once
 
-// Data model of the project panel (workspace lane, Slice 1 / task T6).
+// Data model of the project panel (workspace lane, task T6).
 //
 // `ProjectState` is one resolved project: the root the Rust service expanded,
-// the members (files), the include directories and defines it contributes, the
-// diagnostics it reported, and when the service answered. It is also the
-// persisted form: `<state dir>/project-model.json` survives a restart, so the
-// project and its members are still listed before (or even without) the service
-// answering again — acceptance AC-S1.3 "重启后工程与成员仍在".
+// the imported `.f` filelists, the members (files), the include directories and
+// defines it contributes, the diagnostics it reported, and when the service
+// answered. It is also the persisted form: `<state dir>/project-model.json`
+// survives a restart, so the project, its imported filelists and its members are
+// still listed before (or even without) the service answering again —
+// acceptance AC-2.4 "重启后根目录、导入的 .f 列表、-I/-D、展开结果与关前一致".
 #include <QJsonObject>
 #include <QString>
 #include <QStringList>
@@ -16,10 +17,12 @@ namespace vedit::workspace::project {
 
 struct ProjectState {
     QString root;               // empty => no project has been resolved
+    QStringList filelists;      // imported .f files, absolute, import order
+    QStringList variables;      // ADDENDUM A-9: `NAME=VALUE`, project table (wins over env)
     QStringList files;          // absolute paths, filelist order, duplicates removed
-    QStringList includeDirs;    // absolute paths from `+incdir+` / configuration
-    QStringList defines;        // `NAME` or `NAME=VALUE`
-    QStringList diagnostics;    // structured warnings rendered by the Rust service
+    QStringList includeDirs;    // absolute `-I` paths (project + tools page)
+    QStringList defines;        // `-D` defines, `NAME` or `NAME=VALUE`
+    QStringList diagnostics;    // `.f`/scan/service problems, phrased for the UI
     QString capturedAt;         // ISO-8601 UTC of the last live expansion
 
     bool isValid() const;

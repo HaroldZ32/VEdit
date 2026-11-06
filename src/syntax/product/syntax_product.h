@@ -59,6 +59,8 @@ struct Report {
     int syntax_definition_count = 0;
     /// Definition files found in the private directory (ours).
     QStringList syntax_private_files;
+    /// Definitions actually resolved from those private files (U4b; sorted).
+    QStringList syntax_resolved_definitions;
     /// Whether a Verilog definition is usable.
     bool verilog_definition = false;
     /// Whether a SystemVerilog definition is usable.

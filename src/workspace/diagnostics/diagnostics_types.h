@@ -83,6 +83,14 @@ enum class ResponseKind {
     Symbols = 2,
     Edits = 3,
     Diagnostics = 4,
+    Hover = 5,
+    SignatureHelp = 6,
+};
+
+/// One call signature of a `textDocument/signatureHelp` answer (T16).
+struct LspSignature {
+    QString label;
+    QStringList parameters;
 };
 
 /// Result of polling one backend request; exactly one payload field is filled.
@@ -96,6 +104,12 @@ struct LspPolled {
     QVector<OutlineSymbol> symbols;
     QVector<LspTextEdit> edits;
     QVector<DiagnosticEntry> diagnostics;
+    /// Hover text, when `kind` is Hover.
+    QString hoverText;
+    /// Signatures, when `kind` is SignatureHelp.
+    QVector<LspSignature> signatures;
+    int activeSignature = -1;
+    int activeParameter = -1;
 
     static LspPolled pendingResult() { return LspPolled{}; }
     static LspPolled failure(const QString &message)
@@ -120,5 +134,85 @@ struct FileSetReport {
     QString lspMessage;
     QString slangMessage;
 };
+
+// --- T8: project-wide lint pass + display-level merge (AC-2.6..2.14) --------
+
+/// Phase of a project-wide CLI lint pass (mirrors the C ABI `VdLintProgress`).
+enum class LintPhase {
+    Idle = 0,      ///< no pass has run yet
+    Queued = 1,
+    Running = 2,
+    Finished = 3,
+    Cancelled = 4,
+    Failed = 5,
+};
+
+/// Observable snapshot of the project pass; the progress widget renders exactly
+/// this and the controller polls it from `refresh()`.
+struct LintPassSnapshot {
+    LintPhase phase = LintPhase::Idle;
+    int done = 0;         ///< files already linted
+    int total = 0;        ///< files in the pass snapshot
+    QString current;      ///< file being linted (empty when idle/terminal)
+    QString tool;         ///< "slang" / "verible-verilog-lint" (or fake)
+    QString stage;        ///< failure stage: resolve / spawn / run / parse
+    QString message;      ///< one line for the progress bar / status
+
+    bool running() const { return phase == LintPhase::Queued || phase == LintPhase::Running; }
+    bool terminal() const
+    {
+        return phase == LintPhase::Finished || phase == LintPhase::Cancelled
+            || phase == LintPhase::Failed;
+    }
+    int percent() const { return total <= 0 ? 0 : (done * 100) / total; }
+};
+
+/// Inputs of one project pass. `files` is the project file set (already the
+/// union); the controller subtracts the OPEN-FILE snapshot (C8) before start.
+struct LintPassRequest {
+    QStringList files;
+    QStringList includeDirs; ///< -I from the project model
+    QStringList defines;     ///< -D from the project model
+    int engine = 0;          ///< 0 slang, 1 verible-verilog-lint
+    QString slangPath;
+    QString veriblePath;
+    QString rulesPath;
+    int timeoutMs = 0;
+    int maxDiagnostics = 0;
+};
+
+/// Where a displayed diagnostic came from (AC-2.13).
+enum class DiagnosticOrigin {
+    Lsp = 0,
+    Cli = 1,
+    Both = 2,
+};
+
+/// One row of the merged display list: the canonical entry (LSP entry wins for
+/// a merged row) plus where it came from.
+struct DisplayDiagnostic {
+    DiagnosticEntry entry;
+    DiagnosticOrigin origin = DiagnosticOrigin::Lsp;
+    QString key; ///< path + start line + severity + normalized message
+};
+
+/// The AC-2.13 merge key: file path, 0-based start line, NORMALIZED severity
+/// (both producers' scales map to Error/Warning/Info/Hint/Unknown) and the
+/// whitespace-normalized message.
+QString diagnosticMergeKey(const DiagnosticEntry &entry, DiagnosticOrigin origin);
+
+/// LEGACY (R2): merges the LSP rows with the CLI rows and marks a row found in
+/// both as `Both` - i.e. it STACKS the two layers, which R2 forbids for the
+/// product surfaces. It is kept only for the historical orchestration probe
+/// (`evidence/w4-lint/lint_orchestration_probe.cpp`) and must not be used by a
+/// product path; the product reads `DiagnosticsController`'s layered view
+/// (`mergedDiagnostics()` / `displayDiagnostics()`), which never emits `Both`.
+QVector<DisplayDiagnostic> mergeDiagnostics(const QVector<DiagnosticEntry> &lsp,
+                                            const QVector<DiagnosticEntry> &cli);
+
+/// The skipped-lines sentence used by the panel/status line, e.g.
+/// `cancelled — 120/1000 file(s)` (the zh catalogue renders
+/// `已取消 — 120/1000 文件`).
+QString lintCancelledMessage(int done, int total);
 
 } // namespace vedit::workspace::diagnostics
