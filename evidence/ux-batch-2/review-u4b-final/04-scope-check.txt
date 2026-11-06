@@ -1,0 +1,40 @@
+## U4b scope check (my independent run)
+2026-11-06T11:06:05+08:00
+
+### files newer than 2026-11-06 10:20 under src/syntax
+10:28 src/syntax/product/syntax_product.h
+10:38 src/syntax/kde/ksyntax_data.h
+10:40 src/syntax/kde/ksyntax_data.cpp
+10:46 src/syntax/product/CMakeLists.txt
+10:57 src/syntax/product/syntax_product.cpp
+
+### git status for the five claimed files
+ M src/syntax/kde/ksyntax_data.cpp
+ M src/syntax/kde/ksyntax_data.h
+ M src/syntax/product/CMakeLists.txt
+ M src/syntax/product/syntax_product.cpp
+ M src/syntax/product/syntax_product.h
+
+### diffstat
+ src/syntax/kde/ksyntax_data.cpp       | 140 +++++++++++++++++++++++++++++++---
+ src/syntax/kde/ksyntax_data.h         |   6 ++
+ src/syntax/product/CMakeLists.txt     |  68 ++++++++++++++++-
+ src/syntax/product/syntax_product.cpp |   8 ++
+ src/syntax/product/syntax_product.h   |   2 +
+ 5 files changed, 210 insertions(+), 14 deletions(-)
+
+### files newer than 10:20 under resources/ packaging/ build/ (U4b must not touch these)
+10:28 build/gates/lrelease.sh
+
+### resources/syntax hashes (unchanged?)
+9724927b63ef9824739727f471ea7e98d61d0e9ff23b054c82ae21c73e70fc5a  resources/syntax/vedit-markdown.xml
+2abba3342d0878e71b99d358d96e510f857cd7f232786951be8602f513e0b992  resources/syntax/vedit-systemverilog.xml
+3e201a1df4ad0afc679635a105965a067d16fe4c3618662def4676680572e126  resources/syntax/vedit-tcl.xml
+c6adc763c7b280d7493f48d06e5779d0b1e2068ac82f75fe7f31a07b0788a6c2  resources/syntax/vedit-verilog.xml
+47a4539e08fc6b6257d0897c6187c25c4d9620fe8ac2b2023729b31d6ef75451  resources/syntax/vedit-vhdl.xml
+
+### real test binary and generated property
+-rw-r--r-- 1 haroldzhao haroldzhao      1501 2026-11-06 10:54 target/qt6-build/CTestTestfile.cmake
+-rwxr-xr-x 1 haroldzhao haroldzhao 130277512 2026-11-06 10:59 target/qt6-build/src/app/vedit-app
+4ae24e529f0b84a72e937db0ca5b592df2df630cf386a4e093843f6f9986aff0  target/qt6-build/CTestTestfile.cmake
+15e84e7bca5e2909c39d125c79f0598a1b4a691224c83630bce257f9fa3706ba  src/syntax/product/CMakeLists.txt

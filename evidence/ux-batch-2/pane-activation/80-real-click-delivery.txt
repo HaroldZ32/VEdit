@@ -1,0 +1,8 @@
+APPFILTER press watched=QLabel
+APPFILTER press watched=QWidget
+route=widget-notify seen=2 child=1 target=QWidget
+APPFILTER press watched=QWidgetWindow
+APPFILTER press watched=QLabel
+APPFILTER press watched=QWidget
+route=window-system seen=3 child=1 target=QWidget
+SUMMARY widget-route=1/2 window-route=1/3 (child/total)

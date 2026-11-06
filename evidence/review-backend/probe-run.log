@@ -1,0 +1,27 @@
+=== configure probe harness ===
+configure-exit=0
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /vedit-build/target/review-w5-probe
+=== build probe ===
+build-exit=0
+[10/14] Linking CXX static library libw5_core.a
+[11/14] Automatic MOC for target w5-probe
+[12/14] Building CXX object CMakeFiles/w5-probe.dir/w5-probe_autogen/mocs_compilation.cpp.o
+[13/14] Building CXX object CMakeFiles/w5-probe.dir/w5_probe.cpp.o
+[14/14] Linking CXX executable w5-probe
+=== run probe ===
+TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server]
+TOOLCHAIN-PATHS verible='/vedit-build/.mpd/recon/verible/bin/verible-verilog-ls' slang='/vedit-build/build/slang/out/slang' format='/vedit-build/.mpd/recon/verible/bin/verible-verilog-format' lint='/vedit-build/.mpd/recon/verible/bin/verible-verilog-lint' slang-server='target/tmp/spike/slang-server'
+CHECK binaries.verible-toolchain PASS
+CHECK binaries.slang-server PASS
+CHECK fixture.temp-dir PASS
+CHECK fixture.written PASS
+CHECK switch.a.applied PASS
+CHECK switch.a.cleared-before-restart PASS
+SWITCH-A backend=verible ready=1 ready-ms=451 session='degraded: lsp 1/1 file(s), diagnostics 5' diagnostics=5 outline=0
+SWITCH-A-ARGV 'backend=verible program=/vedit-build/.mpd/recon/verible/bin/verible-verilog-ls'
+CHECK switch.a.ready PASS
+CHECK switch.a.session-names-backend PASS
+CHECK switch.a.diagnostics PASS
+probe-exit=141

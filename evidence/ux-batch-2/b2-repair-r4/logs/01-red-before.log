@@ -1,0 +1,682 @@
+search: root='/tmp/vedit-search-replace-tests-pNKNze' (ready)
+This plugin does not support propagateSizeHints()
+FIXTURE /tmp/vedit-search-replace-tests-pNKNze
+CHECK model.dock.widgets.case PASS
+CHECK model.dock.widgets.whole PASS
+CHECK model.dock.widgets.regex PASS
+CHECK model.dock.widgets.scope PASS
+CHECK model.dock.widgets.replace PASS
+CHECK model.dock.options.round-trip PASS
+CHECK model.dock.scope.keys PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+CHECK model.bar.installed PASS
+CHECK model.bar.widgets.case PASS
+CHECK model.bar.widgets.whole PASS
+CHECK model.bar.widgets.regex PASS
+CHECK model.bar.widgets.scope PASS
+CHECK model.both-surfaces.same-options PASS
+search: root='/tmp/vedit-search-replace-tests-pNKNze' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-pNKNze' query='foo' case=0 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK options.search.finished PASS
+CHECK options.case-insensitive.hits PASS
+CHECK options.case-insensitive.files PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-pNKNze' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK options.case-sensitive.finished PASS
+CHECK options.case-sensitive.hits PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-pNKNze' query='FOO' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK options.uppercase.finished PASS
+CHECK options.uppercase.hits PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-pNKNze' query='foo' case=0 whole=1 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK options.whole-word.finished PASS
+CHECK options.whole-word.hits PASS
+CHECK options.whole-word.excludes-underscore PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-pNKNze' query='^assign foo' case=1 whole=0 regex=1 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK options.regex.finished PASS
+CHECK options.regex.hits PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-pNKNze' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK options.unicode.finished PASS
+CHECK options.unicode.column PASS
+search: root='/tmp/vedit-search-replace-tests-pNKNze' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-pNKNze' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK replace-one.search.finished PASS
+CHECK replace-one.hit.count PASS
+CHECK replace-one.hit1.position PASS
+This plugin does not support propagateSizeHints()
+CHECK replace-one.start PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-pNKNze' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK replace-one.idle PASS
+CHECK replace-one.one-write PASS
+CHECK replace-one.one-occurrence-removed PASS
+CHECK replace-one.line-content PASS
+CHECK replace-one.outcome PASS
+CHECK replace-one.advances PASS
+search: root='/tmp/vedit-search-replace-tests-pNKNze' (ready)
+This plugin does not support propagateSizeHints()
+CHECK replace-all.expected-count PASS
+CHECK replace-all.file-count PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-pNKNze' query='foo' case=0 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK replace-all.search.finished PASS
+CHECK replace-all.browse-hits PASS
+CHECK replace-all.atomic-writer-available PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-pNKNze' query='foo' case=0 whole=0 regex=0 all=1 filter=''
+CHECK replace-all.start PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-pNKNze' query='foo' case=0 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK replace-all.idle PASS
+CHECK replace-all.confirmed PASS
+CHECK replace-all.plan.counts PASS
+CHECK replace-all.plan.files PASS
+CHECK replace-all.outcome PASS
+CHECK replace-all.each-file-once PASS
+CHECK replace-all.no-old-matches PASS
+CHECK replace-all.new-occurrences PASS
+CHECK replace-all.crlf-preserved PASS
+CHECK replace-all.unicode-preserved PASS
+CHECK replace-all.refreshed PASS
+search: root='/tmp/vedit-search-replace-tests-pNKNze' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK handoff.bar.in-file-first PASS
+CHECK handoff.bar.scope-widget PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-pNKNze' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK handoff.dock.finished PASS
+CHECK handoff.dock.query PASS
+CHECK handoff.dock.options PASS
+CHECK handoff.dock.scope PASS
+CHECK handoff.dock.project-results PASS
+CHECK handoff.bar.no-in-file-project PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK handoff.sync.dock-to-bar.query PASS
+CHECK handoff.sync.dock-to-bar.options PASS
+CHECK shell-handoff.dock-absent-before PASS
+This plugin does not support propagateSizeHints()
+search: root='/tmp/vedit-search-replace-tests-pNKNze' (ready)
+search: query root='/tmp/vedit-search-replace-tests-pNKNze' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+CHECK shell-handoff.dock-created PASS
+This plugin does not support propagateSizeHints()
+CHECK shell-handoff.dock.query-synced PASS
+CHECK shell-handoff.dock.options-synced PASS
+CHECK shell-handoff.dock.project-results PASS
+This plugin does not support propagateSizeHints()
+CHECK unsaved-buffer.loaded PASS
+[edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+CHECK unsaved-buffer.modified PASS
+search: root='/tmp/vedit-search-replace-tests-pNKNze' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-pNKNze' query='foo' case=0 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK unsaved-buffer.search.finished PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-pNKNze' query='foo' case=0 whole=0 regex=0 all=1 filter=''
+CHECK unsaved-buffer.replace-started PASS
+search: query root='/tmp/vedit-search-replace-tests-pNKNze' query='foo' case=0 whole=0 regex=0 all=1 filter=''
+This plugin does not support propagateSizeHints()
+[edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-pNKNze' query='foo' case=0 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK unsaved-buffer.idle PASS
+CHECK unsaved-buffer.saved-before-replace PASS
+CHECK unsaved-buffer.replacement-on-saved-text PASS
+CHECK unsaved-buffer.outcome-ok PASS
+CHECK unsaved-buffer.buffer-reloaded PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-pNKNze' query='foo' case=0 whole=0 regex=0 all=1 filter=''
+search: query root='/tmp/vedit-search-replace-tests-pNKNze' query='foo' case=0 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK unsaved-buffer.refused PASS
+CHECK unsaved-buffer.refused-error PASS
+CHECK unsaved-buffer.refused-no-write PASS
+CHECK replace-timeout.fixture PASS
+search: root='/tmp/vedit-search-replace-tests-DJqhzk' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-DJqhzk' query='foo' case=1 whole=0 regex=0 all=1 filter=''
+CHECK replace-timeout.start PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-DJqhzk' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK replace-timeout.idle PASS
+CHECK replace-timeout.refused PASS
+CHECK replace-timeout.message PASS
+CHECK replace-timeout.no-write PASS
+search: root='/tmp/vedit-search-replace-tests-hZwtQh' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-hZwtQh' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK stale-one.search PASS
+CHECK stale-one.hit PASS
+This plugin does not support propagateSizeHints()
+CHECK stale-one.start PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-hZwtQh' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK stale-one.idle PASS
+CHECK stale-one.refused PASS
+CHECK stale-one.error-names-file PASS
+CHECK stale-one.disk-unchanged PASS
+search: root='/tmp/vedit-search-replace-tests-WPjdFk' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-WPjdFk' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK stale-batch.search PASS
+CHECK stale-batch.browse-hits PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-WPjdFk' query='foo' case=1 whole=0 regex=0 all=1 filter=''
+CHECK stale-batch.start PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-WPjdFk' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK stale-batch.idle PASS
+CHECK stale-batch.refused PASS
+CHECK stale-batch.error-names-file PASS
+CHECK stale-batch.first-file-written PASS
+CHECK stale-batch.stale-file-untouched PASS
+CHECK stale-batch.counts-reported PASS
+search: root='/tmp/vedit-search-replace-tests-AMULPJ' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-AMULPJ' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK bom.search PASS
+CHECK bom.hits PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-AMULPJ' query='foo' case=1 whole=0 regex=0 all=1 filter=''
+CHECK bom.start PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-AMULPJ' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK bom.idle PASS
+CHECK bom.start-bytes PASS
+CHECK bom.mid-bytes PASS
+CHECK bom.astral-bytes PASS
+CHECK bom.outcome PASS
+search: root='/tmp/vedit-search-replace-tests-HvUYDp' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-HvUYDp' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK mid-batch.search PASS
+CHECK mid-batch.atomic-writer PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-HvUYDp' query='foo' case=1 whole=0 regex=0 all=1 filter=''
+CHECK mid-batch.start PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-HvUYDp' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK mid-batch.idle PASS
+CHECK mid-batch.partial-outcome PASS
+CHECK mid-batch.status-counts PASS
+CHECK mid-batch.status-file PASS
+CHECK mid-batch.short-line-names-file PASS
+search: root='/tmp/vedit-search-replace-tests-ISKkTB' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-ISKkTB' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK selected-row.search PASS
+CHECK selected-row.tree-count PASS
+CHECK selected-row.third-item PASS
+This plugin does not support propagateSizeHints()
+CHECK selected-row.start PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-ISKkTB' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK selected-row.idle PASS
+CHECK selected-row.third-line PASS
+search: root='/tmp/vedit-search-replace-tests-sHVwIh' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-sHVwIh' query='a.c' case=0 whole=0 regex=1 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK regex-replace.search PASS
+CHECK regex-replace.browse-hits PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-sHVwIh' query='a.c' case=0 whole=0 regex=1 all=1 filter=''
+CHECK regex-replace.start PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-sHVwIh' query='a.c' case=0 whole=0 regex=1 all=0 filter=''
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK regex-replace.idle PASS
+CHECK regex-replace.outcome PASS
+CHECK regex-replace.content PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-sHVwIh' query='foo' case=1 whole=1 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK whole-word-replace.search PASS
+CHECK whole-word-replace.hits PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-sHVwIh' query='foo' case=1 whole=1 regex=0 all=1 filter=''
+CHECK whole-word-replace.start PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-sHVwIh' query='foo' case=1 whole=1 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK whole-word-replace.idle PASS
+CHECK whole-word-replace.outcome PASS
+CHECK whole-word-replace.content PASS
+This plugin does not support propagateSizeHints()
+CHECK dock-open.bar-query-widget PASS
+CHECK dock-open.bar-prepared PASS
+search: root='/tmp/vedit-search-replace-tests-CnRTtv' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK dock-open.bar-query-preserved PASS
+CHECK dock-open.bar-options-preserved PASS
+CHECK dock-open.bar-matches-preserved PASS
+CHECK dock-open.dock-adopts-bar PASS
+search: root='/tmp/vedit-search-replace-tests-qhquBC' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-qhquBC' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK save-only.search PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-qhquBC' query='foo' case=1 whole=0 regex=0 all=1 filter=''
+CHECK save-only.start PASS
+search: query root='/tmp/vedit-search-replace-tests-qhquBC' query='foo' case=1 whole=0 regex=0 all=1 filter=''
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-qhquBC' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK save-only.idle PASS
+CHECK save-only.outcome PASS
+CHECK save-only.only-affected-saved PASS
+CHECK save-only.confirm-list PASS
+CHECK save-only.unaffected-untouched PASS
+CHECK save-only.replaced PASS
+search: root='/tmp/vedit-search-replace-tests-xBwqem' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-xBwqem' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK save-failure.search PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-xBwqem' query='foo' case=1 whole=0 regex=0 all=1 filter=''
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-xBwqem' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK save-failure.idle PASS
+CHECK save-failure.refused PASS
+CHECK save-failure.names-file PASS
+CHECK save-failure.earlier-saves-remain PASS
+CHECK save-failure.no-replace PASS
+This plugin does not support propagateSizeHints()
+CHECK edit-during-replace.loaded PASS
+[edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+search: root='/tmp/vedit-search-replace-tests-geOzFf' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-geOzFf' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK edit-during-replace.search PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-geOzFf' query='foo' case=1 whole=0 regex=0 all=1 filter=''
+CHECK edit-during-replace.start PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-geOzFf' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK edit-during-replace.idle PASS
+CHECK edit-during-replace.typed PASS
+CHECK edit-during-replace.disk-replaced PASS
+CHECK edit-during-replace.edit-survives PASS
+CHECK edit-during-replace.reported PASS
+CHECK edit-during-replace.outcome-lists-file PASS
+search: root='/tmp/vedit-search-replace-tests-gtxOhG' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-gtxOhG' query='foo' case=1 whole=1 regex=0 all=1 filter=''
+CHECK frozen-option.start PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-gtxOhG' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK frozen-option.idle PASS
+CHECK frozen-option.changed-during-scan PASS
+CHECK frozen-option.controls-disabled-during-scan PASS
+CHECK frozen-option.refused PASS
+CHECK frozen-option.no-write PASS
+CHECK frozen-option.query-controls-restored PASS
+search: root='/tmp/vedit-search-replace-tests-UwfEdY' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-UwfEdY' query='foo' case=1 whole=1 regex=0 all=1 filter=''
+CHECK frozen-empty.start PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK frozen-empty.idle PASS
+CHECK frozen-empty.changed-during-scan PASS
+CHECK frozen-empty.query-disabled-during-scan PASS
+CHECK frozen-empty.refused PASS
+CHECK frozen-empty.no-write PASS
+search: root='/tmp/vedit-search-replace-tests-DBSlcN' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-DBSlcN' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK frozen-single.search PASS
+CHECK frozen-single.hit PASS
+This plugin does not support propagateSizeHints()
+CHECK frozen-single.query-cleared PASS
+This plugin does not support propagateSizeHints()
+CHECK frozen-single.idle PASS
+CHECK frozen-single.no-write PASS
+CHECK frozen-single.no-save PASS
+CHECK frozen-single.refused PASS
+search: root='/tmp/vedit-search-replace-tests-ANcMZl' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-ANcMZl' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK frozen-shift.search PASS
+CHECK frozen-shift.hit PASS
+This plugin does not support propagateSizeHints()
+CHECK frozen-shift.idle PASS
+CHECK frozen-shift.started PASS
+CHECK frozen-shift.refused PASS
+CHECK frozen-shift.no-wrong-occurrence PASS
+CHECK frozen-shift.error-names-file PASS
+search: root='/tmp/vedit-search-replace-tests-hYugCF' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-hYugCF' query='foo' case=1 whole=1 regex=0 all=1 filter='/tmp/vedit-search-replace-tests-hYugCF/a.v'
+CHECK post-save-scope.start PASS
+search: query root='/tmp/vedit-search-replace-tests-hYugCF' query='foo' case=1 whole=1 regex=0 all=1 filter='/tmp/vedit-search-replace-tests-hYugCF/a.v'
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-hYugCF' query='foo' case=1 whole=1 regex=0 all=0 filter='/tmp/vedit-search-replace-tests-hYugCF/a.v'
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK post-save-scope.idle PASS
+CHECK post-save-scope.lost-active PASS
+CHECK post-save-scope.plan PASS
+CHECK post-save-scope.no-widen PASS
+CHECK post-save-scope.written PASS
+search: root='/tmp/vedit-search-replace-tests-MObSVz' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-MObSVz' query='foo' case=1 whole=1 regex=0 all=1 filter=''
+CHECK cancel-wording.start PASS
+search: query root='/tmp/vedit-search-replace-tests-MObSVz' query='foo' case=1 whole=1 regex=0 all=1 filter=''
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-MObSVz' query='foo' case=1 whole=1 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK cancel-wording.idle PASS
+CHECK cancel-wording.cancelled PASS
+CHECK cancel-wording.saved-named PASS
+CHECK cancel-wording.nothing-replaced PASS
+CHECK cancel-wording.no-replace PASS
+search: root='/tmp/vedit-search-replace-tests-fDyOJX' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-fDyOJX' query='foo' case=1 whole=1 regex=0 all=1 filter=''
+CHECK buffer-only.start PASS
+search: query root='/tmp/vedit-search-replace-tests-fDyOJX' query='foo' case=1 whole=1 regex=0 all=1 filter=''
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-fDyOJX' query='foo' case=1 whole=1 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK buffer-only.idle PASS
+CHECK buffer-only.saved PASS
+CHECK buffer-only.counted PASS
+CHECK buffer-only.replaced PASS
+CHECK buffer-only.outcome PASS
+search: root='/tmp/vedit-search-replace-tests-bIvgja' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-bIvgja' query='foo' case=1 whole=1 regex=0 all=1 filter=''
+CHECK confirm-window.empty.start PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK confirm-window.empty.idle PASS
+CHECK confirm-window.empty.refused PASS
+CHECK confirm-window.empty.user-save-kept PASS
+CHECK confirm-window.empty.no-replacement PASS
+search: root='/tmp/vedit-search-replace-tests-iWoEht' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-iWoEht' query='foo' case=1 whole=1 regex=0 all=1 filter=''
+CHECK confirm-window.option.start PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-iWoEht' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK confirm-window.option.idle PASS
+CHECK confirm-window.option.refused PASS
+CHECK confirm-window.option.user-save-kept PASS
+CHECK confirm-window.option.no-replacement PASS
+search: root='/tmp/vedit-search-replace-tests-YijekA' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-YijekA' query='foo' case=1 whole=1 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK scan-window.single.search PASS
+CHECK scan-window.single.saved-during-scan PASS
+CHECK scan-window.single.save-on-disk PASS
+CHECK scan-window.single.hit PASS
+This plugin does not support propagateSizeHints()
+CHECK scan-window.single.idle PASS
+CHECK scan-window.single.refused PASS
+CHECK scan-window.single.file-untouched PASS
+CHECK scan-window.single.no-wrong-occurrence PASS
+search: root='/tmp/vedit-search-replace-tests-GspGTh' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-GspGTh' query='foo' case=1 whole=1 regex=0 all=1 filter=''
+CHECK scan-window.all.start PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-GspGTh' query='foo' case=1 whole=1 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK scan-window.all.idle PASS
+CHECK scan-window.all.saved-during-scan PASS
+CHECK scan-window.all.refused PASS
+CHECK scan-window.all.file-untouched PASS
+CHECK scan-window.all.no-wrong-occurrence PASS
+search: root='/tmp/vedit-search-replace-tests-MpHKKQ' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-MpHKKQ' query='foo' case=1 whole=1 regex=0 all=1 filter=''
+CHECK handoff-op.apply.start PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-MpHKKQ' query='foo' case=1 whole=1 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK handoff-op.apply.idle PASS
+CHECK handoff-op.apply.delivered PASS
+CHECK handoff-op.apply.no-write PASS
+CHECK handoff-op.apply.query-enabled PASS
+CHECK handoff-op.apply.replace-all-enabled PASS
+CHECK handoff-op.apply.replace-edit-enabled PASS
+CHECK handoff-op.apply.message PASS
+search: root='/tmp/vedit-search-replace-tests-uGMtwU' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-uGMtwU' query='foo' case=1 whole=1 regex=0 all=1 filter=''
+CHECK handoff-op.search.start PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-uGMtwU' query='foo' case=1 whole=1 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK handoff-op.search.idle PASS
+CHECK handoff-op.search.delivered PASS
+CHECK handoff-op.search.no-write PASS
+CHECK handoff-op.search.query-enabled PASS
+CHECK handoff-op.search.replace-all-enabled PASS
+search: root='/tmp/vedit-search-replace-tests-bxYeIN' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-bxYeIN' query='foo' case=1 whole=1 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK dirty-single.search PASS
+CHECK dirty-single.hit PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-bxYeIN' query='foo' case=1 whole=1 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK dirty-single.idle PASS
+CHECK dirty-single.save-ran PASS
+CHECK dirty-single.started PASS
+CHECK dirty-single.ok PASS
+CHECK dirty-single.replaced-on-saved-text PASS
+search: root='/tmp/vedit-search-replace-tests-tRFPTw' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-tRFPTw' query='foo' case=1 whole=1 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK dirty-stale.search PASS
+CHECK dirty-stale.hit PASS
+This plugin does not support propagateSizeHints()
+CHECK dirty-stale.idle PASS
+CHECK dirty-stale.refused PASS
+CHECK dirty-stale.no-save PASS
+CHECK dirty-stale.disk-unchanged PASS
+CHECK dirty-stale.error-names-file PASS
+CHECK fingerprint.mismatch-refused PASS
+CHECK fingerprint.mismatch-names-file PASS
+CHECK fingerprint.match-applied PASS
+CHECK fingerprint.absent-range-check-still-guards PASS
+CHECK preview-cap.detector-truncated PASS
+CHECK preview-cap.detector-at-cap PASS
+CHECK preview-cap.detector-short-ellipsis PASS
+CHECK preview-cap.detector-empty PASS
+search: root='/tmp/vedit-search-replace-tests-aYnwcD' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-aYnwcD' query='foo' case=1 whole=1 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK preview-cap.search PASS
+CHECK preview-cap.hit PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-aYnwcD' query='foo' case=1 whole=1 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK preview-cap.idle PASS
+CHECK preview-cap.refused FAIL (ok=1 replacements=1 error=)
+CHECK preview-cap.no-save FAIL (saves=1)
+CHECK preview-cap.disk-unchanged FAIL (BAR XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX)
+CHECK preview-cap.error-names-file FAIL
+CHECK preview-cap.tail-idle PASS
+CHECK preview-cap.tail-refused PASS
+CHECK preview-cap.tail-no-save PASS
+CHECK preview-cap.tail-disk-unchanged FAIL (BAR XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX)
+search: root='/tmp/vedit-search-replace-tests-trqMNH' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-trqMNH' query='foo' case=1 whole=1 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK preview-cap-ok.search PASS
+CHECK preview-cap-ok.hit PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/vedit-search-replace-tests-trqMNH' query='foo' case=1 whole=1 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+CHECK preview-cap-ok.idle PASS
+CHECK preview-cap-ok.started PASS
+CHECK preview-cap-ok.ok PASS
+CHECK preview-cap-ok.replaced-one PASS
+CHECK preview-cap-ok.save-ran PASS
+CHECK preview-cap-ok.replaced-scanned-line PASS
+CHECK preview-cap-ok.below-intact PASS
+[edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+CHECK current-file.open PASS
+CHECK current-file.two-panes PASS
+CHECK current-file.panes-found PASS
+search: root='/tmp/vedit-search-replace-tests-jXoEtZ' (ready)
+CHECK current-file.dock-created PASS
+search: query root='/tmp/vedit-search-replace-tests-jXoEtZ' query='foo' case=1 whole=1 regex=0 all=0 filter='/tmp/vedit-search-replace-tests-jXoEtZ/pane-b.v'
+CHECK current-file.b.search PASS
+CHECK current-file.b.hits PASS
+search: query root='/tmp/vedit-search-replace-tests-jXoEtZ' query='foo' case=1 whole=1 regex=0 all=0 filter='/tmp/vedit-search-replace-tests-jXoEtZ/pane-a.v'
+CHECK current-file.a.search PASS
+CHECK current-file.a.hits PASS
+SUMMARY checks=299 failures=5 skips=0

@@ -1,0 +1,4 @@
+kf.sonnet.core: Sonnet: No speller backends available!
+RENDER after_load ink=23568 text=32
+RENDER after_undo_to_empty presses=1 text=0 ink=20988 changed_vs_loaded=8133
+RENDER after_typing text=8 ink=21373 changed_vs_empty=495

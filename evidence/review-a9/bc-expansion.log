@@ -1,0 +1,17 @@
+=== B: a->b->a cycle, self-cycle, 20-deep chain (limit claimed 16) ===
+EXPANSION ok=1 root=/vedit-build/evidence/review-a9/b files=2 skipped=3 missing=[]
+FILE rtl/top.sv
+FILE rtl/deep.sv
+DIAG filelist.cycle: /vedit-build/evidence/review-a9/b/lists/cycle_b.f:1: nested -f cycle: /vedit-build/evidence/review-a9/b/lists/cycle_a.f -> /vedit-build/evidence/review-a9/b/lists/cycle_b.f -> /vedit-build/evidence/review-a9/b/lists/cycle_a.f; skipped
+DIAG filelist.cycle: /vedit-build/evidence/review-a9/b/lists/self.f:1: nested -f cycle: /vedit-build/evidence/review-a9/b/lists/self.f -> /vedit-build/evidence/review-a9/b/lists/self.f; skipped
+DIAG filelist.depth_exceeded: /vedit-build/evidence/review-a9/b/depth/d16.f:1: nested -f recursion deeper than 16; stopped
+B-exit=0
+
+=== C: CRLF filelist + CRLF nested -f ===
+EXPANSION ok=1 root=/vedit-build/evidence/review-a9/c files=3 skipped=0 missing=[]
+FILE rtl/a.sv
+FILE /vedit-build/evidence/review-a9/rtl/b.sv
+FILE rtl/b.sv
+INCDIR /vedit-build/evidence/review-a9/c/inc
+DIAG filelist.missing: /vedit-build/evidence/review-a9/c/project.f:1: include directory `inc` does not exist (or is not a directory); the -I entry is kept so it works once the directory appears
+C-exit=0

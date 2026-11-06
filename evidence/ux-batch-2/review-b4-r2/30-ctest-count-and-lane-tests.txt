@@ -1,0 +1,12 @@
+  Test #50: vedit-ui-scale-restart
+
+Total Tests: 50
+=== relevant ===
+    Start 16: vedit-editor-pane-activation-tests
+1/2 Test #16: vedit-editor-pane-activation-tests ...   Passed    0.39 sec
+    Start 23: vedit-editor-multi-cursor-selftest
+2/2 Test #23: vedit-editor-multi-cursor-selftest ...   Passed    0.21 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.60 sec

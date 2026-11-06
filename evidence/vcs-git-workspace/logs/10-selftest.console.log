@@ -1,0 +1,62 @@
+CHECK vcs.workspace.stash-drop-request PASS
+CHECK vcs.workspace.stash-drop-double-confirmed PASS confirm calls=3
+CHECK vcs.workspace.worktree-remove-declined PASS
+CHECK vcs.workspace.worktree-remove-declined-zero-write PASS
+CHECK vcs.workspace.worktree-remove-first-confirm PASS
+CHECK vcs.workspace.worktree-remove-requested PASS
+CHECK vcs.workspace.worktree-remove-request PASS
+CHECK vcs.workspace.worktree-remove-double-confirmed PASS
+CHECK vcs.workspace.worktree-add-empty-path-refused PASS
+CHECK vcs.workspace.worktree-add-empty-path-zero-write PASS
+CHECK vcs.workspace.worktree-add-option-path-refused PASS
+CHECK vcs.workspace.worktree-add-option-path-zero-write PASS
+CHECK vcs.workspace.worktree-remove-empty-refused PASS
+CHECK vcs.workspace.error-visible PASS git: 'worktree' is not a git command. See 'git --help'.
+CHECK vcs.workspace.error-status-text PASS
+CHECK vcs.workspace.dialog.fields PASS
+CHECK vcs.workspace.dialog.stash-list PASS rows=2
+CHECK vcs.workspace.dialog.worktree-list PASS
+CHECK vcs.workspace.dialog.selected-stash PASS stash@{0}
+CHECK vcs.workspace.dialog.selected-worktree PASS /repo
+CHECK vcs.workspace.dialog.detached-row PASS /wt  (detached)
+CHECK vcs.workspace.dialog.no-action-by-default PASS
+CHECK vcs.workspace.dialog.save-button PASS
+CHECK vcs.workspace.dialog.click-selects-action PASS
+CHECK vcs.workspace.dialog.drop-action PASS
+CHECK vcs.workspace.e2e.git PASS /usr/bin/git
+CHECK vcs.workspace.e2e.fixture PASS /tmp/vedit-workspace-vcs-selftest-pVTizE/workspace-repo
+CHECK vcs.workspace.e2e.not-worktree PASS fixture=/tmp/vedit-workspace-vcs-selftest-pVTizE/workspace-repo cwd=/tmp/vedit-vcs-5b-RIykYU
+CHECK vcs.workspace.e2e.stash-save-requested PASS
+CHECK vcs.workspace.e2e.stash-save PASS The working tree was stashed.
+CHECK vcs.workspace.e2e.stash-save-git PASS stash@{0}: On master: e2e stash one
+CHECK vcs.workspace.e2e.stash-list PASS stashes=1
+CHECK vcs.workspace.e2e.stash-ref PASS stash@{0}
+CHECK vcs.workspace.e2e.stash-apply-requested PASS
+CHECK vcs.workspace.e2e.stash-apply PASS The stash was applied.
+CHECK vcs.workspace.e2e.stash-apply-kept PASS module a;
+CHECK vcs.workspace.e2e.stash-apply-count PASS
+CHECK vcs.workspace.e2e.stash-drop-requested PASS
+CHECK vcs.workspace.e2e.stash-drop PASS The stash was dropped.
+CHECK vcs.workspace.e2e.stash-drop-count PASS
+CHECK vcs.workspace.e2e.stash-save-two PASS
+CHECK vcs.workspace.e2e.stash-pop-requested PASS
+CHECK vcs.workspace.e2e.stash-pop PASS The stash was applied and dropped.
+CHECK vcs.workspace.e2e.stash-pop-dropped PASS
+CHECK vcs.workspace.e2e.stash-pop-content PASS module a;
+CHECK vcs.workspace.e2e.worktree-add-requested PASS
+CHECK vcs.workspace.e2e.worktree-add PASS Worktree added at /tmp/vedit-workspace-vcs-selftest-pVTizE/linked worktree.
+CHECK vcs.workspace.e2e.worktree-list PASS worktrees=1
+CHECK vcs.workspace.e2e.worktree-list-text PASS /tmp/vedit-workspace-vcs-selftest-pVTizE/linked worktree [feature/ws]
+CHECK vcs.workspace.e2e.worktree-remove-requested PASS
+CHECK vcs.workspace.e2e.worktree-dirty PASS Nothing was written.
+CHECK vcs.workspace.e2e.worktree-remove-requested-two PASS
+CHECK vcs.workspace.e2e.worktree-remove PASS Worktree /tmp/vedit-workspace-vcs-selftest-pVTizE/linked worktree removed.
+CHECK vcs.workspace.e2e.worktree-remove-count PASS
+CHECK vcs.workspace.e2e.submodule-init-requested PASS
+CHECK vcs.workspace.e2e.submodule-init PASS Submodules initialized.
+CHECK vcs.workspace.e2e.submodule-update-requested PASS
+CHECK vcs.workspace.e2e.submodule-update PASS Submodules updated.
+CHECK vcs.workspace.e2e.submodule-in-sync PASS 684509cce8bc83157c662a5c5043a49bc0f9e7be sub (heads/master)
+CHECK vcs.i18n.workspace PASS Git 工作区 / 移除工作树
+cwd_still=/tmp/vedit-vcs-5b-RIykYU
+selftest=PASS

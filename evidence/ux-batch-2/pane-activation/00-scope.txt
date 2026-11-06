@@ -1,0 +1,44 @@
+# Scope + build identity — split-pane activation (UX batch 2)
+# Captured: 2026-11-05T14:24:03+08:00
+# Branch: main   HEAD: 4e2d0a57ca50db9568db5a5b040cc66f04c9a05f (Merge pull request #12 from HaroldZ32/release/v0.2.0)
+
+== write scope touched by this fix ==
+src/app/editor_area.h                         2026-11-05 14:15:47  6619807b13713e7b1f5670eeb9f12c0598645d3a46e6675789ba77e410b9e900
+src/app/editor_area.cpp                       2026-11-05 14:15:56  2c4f2cfcc1cff2aafac871a222e914b84cf91886291615e5ae751bc8f959dc14
+src/app/CMakeLists.txt                        2026-11-05 14:13:35  37cee024c63887427f15c6977f98df8fd77d124d9d3ad50fed9f7a572ed65d9b
+src/app/editor_area_activation_test.cpp       2026-11-05 14:13:15  383b246d05797ef1cd3a01bd23056efc42988bf1b16ebdd9074fe92957470d60
+
+== files NOT touched (forbidden scope check: mtime older than this session) ==
+src/editor/kernel/multi_cursor.cpp                           2026-11-05 10:13:52
+src/editor/kernel/lsp_actions.cpp                            2026-11-05 10:13:52
+src/app/app_shell.cpp                                        2026-11-05 01:53:10
+src/app/main.cpp                                             2026-11-05 02:24:01
+src/workspace/diagnostics/diagnostics_integration.cpp        2026-11-05 11:26:00
+
+== build image + artefacts ==
+image_id=sha256:6674315bb134e30f67c22300c60620c5f4347718a77ca1c3cbda4e78c53650bf created=2026-11-02T04:49:12Z
+cb99f2676df466ecd18ee6217e0552496f1b92e5d88657a4c040bd5e4e7f924a  target/qt6-build/src/app/vedit-editor-pane-activation-tests
+8aa79cab6100dd3f34f46637a26571e30e7d6a53e6e8892d990526a1f6c39134  target/qt6-build/src/app/vedit-app
+
+== toolchain inside the pinned image ==
+qt6-base-dev: 6.10.2+dfsg-7
+cmake: cmake version 4.2.3
+g++: g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+
+== pinned image (evidence/m0-build/build-logs/30-qt6-container-facts.txt, rewritten by the gate run) ==
+PRETTY_NAME="Ubuntu 26.04.1 LTS"
+NAME="Ubuntu"
+VERSION_ID="26.04"
+glibc: ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43
+qt6-base-dev: 6.10.2+dfsg-7
+kf6-texteditor: 6.24.0-0ubuntu1
+kf6-syntaxhighlighting: 6.24.0-0ubuntu1
+tree-sitter (pkg-config): 0.25.9
+cmake: cmake version 4.2.3
+g++: g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+
+== forbidden-scope mtime sweep (files modified since this fix started, 13:50) ==
+(end; empty above = no forbidden file touched)
+
+== translations/ files modified since 13:50 ==
+(end)

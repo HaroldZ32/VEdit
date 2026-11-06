@@ -1,5 +1,6 @@
 #include "fim_inline_completion.h"
 
+#include <QCoreApplication>
 #include <QElapsedTimer>
 #include <QThread>
 
@@ -15,8 +16,8 @@ constexpr int kBlockingBudgetMs = 15'000;
 InlineCompletion::InlineCompletion(Backend *backend)
     : backend_(backend)
 {
-    status_ = backend_ != nullptr ? QStringLiteral("FIM 未启用（默认关闭）")
-                                  : QStringLiteral("FIM 不可用（未链接 Rust 服务）");
+    status_ = backend_ != nullptr ? QCoreApplication::translate("VEdit", "FIM disabled (off by default)")
+                                  : QCoreApplication::translate("VEdit", "FIM unavailable (no Rust service linked)");
 }
 
 void InlineCompletion::setBackend(Backend *backend)
@@ -25,8 +26,8 @@ void InlineCompletion::setBackend(Backend *backend)
     backend_ = backend;
     pending_ = false;
     suggestion_.clear();
-    status_ = backend_ != nullptr ? QStringLiteral("FIM 未启用（默认关闭）")
-                                  : QStringLiteral("FIM 不可用（未链接 Rust 服务）");
+    status_ = backend_ != nullptr ? QCoreApplication::translate("VEdit", "FIM disabled (off by default)")
+                                  : QCoreApplication::translate("VEdit", "FIM unavailable (no Rust service linked)");
 }
 
 bool InlineCompletion::request(const QString &text, int zeroBasedLine, int zeroBasedColumn)
@@ -45,7 +46,7 @@ bool InlineCompletion::request(const QString &text, int zeroBasedLine, int zeroB
     }
     if (inFlight_ != 0) {
         cancelRequest(job);
-        status_ = QStringLiteral("FIM 超时（%1 ms 无结果）").arg(kBlockingBudgetMs);
+        status_ = QCoreApplication::translate("VEdit", "FIM timed out (%1 ms without a result)").arg(kBlockingBudgetMs);
         return false;
     }
     return pending_;
@@ -62,7 +63,7 @@ quint64 InlineCompletion::requestJob(const QString &text, int zeroBasedLine, int
     suggestion_.clear();
     pending_ = false;
     if (backend_ == nullptr) {
-        status_ = QStringLiteral("FIM 不可用（未链接 Rust 服务；未发出请求）");
+        status_ = QCoreApplication::translate("VEdit", "FIM unavailable (no Rust service linked; no request was sent)");
         return 0;
     }
     const Context context = contextAt(text, zeroBasedLine, zeroBasedColumn);
@@ -76,11 +77,11 @@ quint64 InlineCompletion::requestJob(const QString &text, int zeroBasedLine, int
     QString error;
     const quint64 token = backend_->start(context.prefix, context.suffix, &error);
     if (token == 0) {
-        status_ = error.isEmpty() ? QStringLiteral("FIM 请求未被 Rust 服务接受") : error;
+        status_ = error.isEmpty() ? QCoreApplication::translate("VEdit", "FIM request was not accepted by the Rust service") : error;
         return 0;
     }
     inFlight_ = token;
-    status_ = QStringLiteral("FIM 请求中…");
+    status_ = QCoreApplication::translate("VEdit", "FIM request in flight…");
     return token;
 }
 
@@ -94,7 +95,7 @@ bool InlineCompletion::pollRequest(quint64 job)
         return true;
     }
     if (backend_ == nullptr) {
-        status_ = QStringLiteral("FIM 不可用（未链接 Rust 服务）");
+        status_ = QCoreApplication::translate("VEdit", "FIM unavailable (no Rust service linked)");
         finishJob();
         return true;
     }
@@ -105,16 +106,16 @@ bool InlineCompletion::pollRequest(quint64 job)
     case AsyncReply::State::Text:
         suggestion_ = reply.text;
         pending_ = !suggestion_.isEmpty();
-        status_ = pending_ ? QStringLiteral("FIM 建议就绪") : QStringLiteral("FIM 返回空建议");
+        status_ = pending_ ? QCoreApplication::translate("VEdit", "FIM suggestion ready") : QCoreApplication::translate("VEdit", "FIM returned an empty suggestion");
         break;
     case AsyncReply::State::Disabled:
-        status_ = reply.text.isEmpty() ? QStringLiteral("FIM 未启用（默认关闭）") : reply.text;
+        status_ = reply.text.isEmpty() ? QCoreApplication::translate("VEdit", "FIM disabled (off by default)") : reply.text;
         break;
     case AsyncReply::State::Error:
-        status_ = reply.text.isEmpty() ? QStringLiteral("FIM 失败（无详情）") : reply.text;
+        status_ = reply.text.isEmpty() ? QCoreApplication::translate("VEdit", "FIM failed (no details)") : reply.text;
         break;
     case AsyncReply::State::Stale:
-        status_ = QStringLiteral("FIM 请求已失效");
+        status_ = QCoreApplication::translate("VEdit", "FIM request went stale");
         break;
     }
     finishJob();
@@ -132,7 +133,7 @@ void InlineCompletion::cancelRequest(quint64 job)
     finishJob();
     suggestion_.clear();
     pending_ = false;
-    status_ = QStringLiteral("FIM 请求已取消");
+    status_ = QCoreApplication::translate("VEdit", "FIM request cancelled");
 }
 
 void InlineCompletion::finishJob()
@@ -147,16 +148,16 @@ void InlineCompletion::applyReply(const Reply &reply)
     case Reply::State::Text:
         suggestion_ = reply.text;
         pending_ = !suggestion_.isEmpty();
-        status_ = pending_ ? QStringLiteral("FIM 建议就绪") : QStringLiteral("FIM 返回空建议");
+        status_ = pending_ ? QCoreApplication::translate("VEdit", "FIM suggestion ready") : QCoreApplication::translate("VEdit", "FIM returned an empty suggestion");
         return;
     case Reply::State::Disabled:
-        status_ = reply.text.isEmpty() ? QStringLiteral("FIM 未启用（默认关闭）") : reply.text;
+        status_ = reply.text.isEmpty() ? QCoreApplication::translate("VEdit", "FIM disabled (off by default)") : reply.text;
         return;
     case Reply::State::Error:
-        status_ = reply.text.isEmpty() ? QStringLiteral("FIM 失败（无详情）") : reply.text;
+        status_ = reply.text.isEmpty() ? QCoreApplication::translate("VEdit", "FIM failed (no details)") : reply.text;
         return;
     }
-    status_ = QStringLiteral("FIM 未知状态");
+    status_ = QCoreApplication::translate("VEdit", "FIM unknown state");
 }
 
 void InlineCompletion::onTextEdited()
@@ -170,7 +171,7 @@ void InlineCompletion::onTextEdited()
     }
     pending_ = false;
     suggestion_.clear();
-    status_ = QStringLiteral("FIM 建议已作废（继续输入）");
+    status_ = QCoreApplication::translate("VEdit", "FIM suggestion invalidated (typing continued)");
 }
 
 QString InlineCompletion::accept()
@@ -181,7 +182,7 @@ QString InlineCompletion::accept()
     const QString accepted = suggestion_;
     suggestion_.clear();
     pending_ = false;
-    status_ = QStringLiteral("FIM 已接受建议");
+    status_ = QCoreApplication::translate("VEdit", "FIM suggestion accepted");
     return accepted;
 }
 
@@ -193,13 +194,13 @@ void InlineCompletion::cancel()
     }
     if (!pending_) {
         if (!hadJob) {
-            status_ = QStringLiteral("FIM 已取消");
+            status_ = QCoreApplication::translate("VEdit", "FIM cancelled");
         }
         return;
     }
     suggestion_.clear();
     pending_ = false;
-    status_ = QStringLiteral("FIM 已取消");
+    status_ = QCoreApplication::translate("VEdit", "FIM cancelled");
 }
 
 } // namespace vedit::editor::fim

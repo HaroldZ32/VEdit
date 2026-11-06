@@ -1,0 +1,14 @@
+402
+whitelist: Markdown,SystemVerilog,Tcl,VHDL,Verilog
+whitelist_entries: 5
+fixtures: host_xml=402 user_xml=1
+== positive (AppDir) ==
+CHECK PASS  appdir: defs=5 (whitelist entries)
+CHECK PASS  appdir: names == whitelist [Markdown,SystemVerilog,Tcl,Verilog,VHDL]
+CHECK PASS  appdir: no shadowed/duplicate definition names
+CHECK PASS  appdir: HostLeakProbe invisible
+CHECK PASS  appdir: UserLeakProbe invisible
+== reverse control (AppDir) ==
+CHECK PASS  appdir-reverse: reverse control reproduces the leak (defs=406 > whitelist 5)
+== summary: pass=6 fail=0 ==
+F2-ISOLATION PASS

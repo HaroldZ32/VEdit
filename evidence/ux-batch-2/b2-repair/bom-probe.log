@@ -1,0 +1,9 @@
+Qt QStringDecoder probe in vedit-qt6-build:local
+input = EF BB BF + "module a;\n"
+
+stateless size=10 first=U+006D startsWithBom=0
+convert size=11 first=U+FEFF startsWithBom=1
+roundtrip=efbbbf6d6f64756c6520613b0a
+both size=11 first=U+FEFF startsWithBom=1
+
+=> Stateless alone drops U+FEFF (old behaviour); Stateless|ConvertInitialBom keeps it and toUtf8() round-trips the BOM.

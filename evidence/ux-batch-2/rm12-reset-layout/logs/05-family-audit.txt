@@ -1,0 +1,111 @@
+# RM-12 family audit — every path that destroys panes/documents
+
+## clearTree() callers (the destructor of every pane/document)
+1688:        // itself: rebuild()/clearTree() reparent panes out and delete the
+1850:    clearTree();
+1892:void EditorArea::clearTree()
+2059:    clearTree();
+
+## resetLayout() callers
+src/app/app_shell.cpp:721:        // RM-12: resetLayout() deletes every pane AND the document that dies
+src/app/app_shell.cpp:728:        editorArea_->resetLayout();
+src/app/app_shell.cpp:772:        // RM-12: the mixed preset starts from resetLayout(), i.e. it destroys
+src/app/app_shell.cpp:786:        editorArea_->resetLayout();
+src/app/app_shell.cpp:1309:    editorArea_->resetLayout();
+src/app/app_shell.cpp:1322:    editorArea_->resetLayout();
+src/app/app_shell.cpp:1335:    editorArea_->resetLayout();
+src/app/main.cpp:608:    shell->editorArea()->resetLayout();
+src/app/main.cpp:731:    shell->editorArea()->resetLayout();
+src/app/main.cpp:742:    shell->editorArea()->resetLayout();
+src/app/main.cpp:768:    shell->editorArea()->resetLayout();
+src/app/main.cpp:816:        shell->editorArea()->resetLayout();
+src/app/main.cpp:1728:    shell.editorArea()->resetLayout();
+src/app/editor_area.h:313:    void resetLayout();
+
+## command handlers that reach resetLayout() (all four now guarded)
+725:        if (!confirmUnsavedDocuments()) {
+754:        if (!confirmUnsavedDocuments()) {
+775:        if (!confirmUnsavedDocuments()) {
+783:        if (!confirmUnsavedDocuments()) {
+1613:bool ApplicationShell::confirmUnsavedDocuments()
+1748:    if (!confirmUnsavedDocuments()) {
+1793:    if (!confirmUnsavedDocuments()) {
+
+## applyHorizontalSplitPreset / applyVerticalSplitPreset: command handlers?
+src/app/app_shell.cpp:627:    addCommand(QStringLiteral("view.layout.mixed"), tr("&Mixed Split (demo)"),
+src/app/app_shell.cpp:629:    addCommand(QStringLiteral("view.layout.reset"), tr("&Reset Layout"),
+src/app/app_shell.cpp:771:    commands_->setHandler(QStringLiteral("view.layout.mixed"), [this]() {
+src/app/app_shell.cpp:780:    commands_->setHandler(QStringLiteral("view.layout.reset"), [this]() {
+src/app/app_shell.cpp:1307:void ApplicationShell::applyHorizontalSplitPreset(int paneCount)
+src/app/app_shell.cpp:1320:void ApplicationShell::applyVerticalSplitPreset(int paneCount)
+src/app/main.cpp:507:                                "view.focus.next", "view.layout.reset", "help.about",
+src/app/main.cpp:575:    shell->applyHorizontalSplitPreset(3);
+src/app/main.cpp:586:    shell->applyVerticalSplitPreset(3);
+src/app/main.cpp:1710:    shell.applyHorizontalSplitPreset(3);
+
+## restoreLayout() callers (clearTree on the restore path)
+src/app/app_shell.cpp:1146:        if (!editorArea_->restoreLayout(state.editorLayout, &layoutError)) {
+startSession() guard:
+216:    if (sessionStarted_) {
+219:    sessionStarted_ = true;
+
+## setEditorProvider() callers (replaces every editor widget, re-reads docs)
+src/app/main.cpp:1023:    shell->setEditorProvider(vedit::editor::makeEditCoreProvider());
+src/app/main.cpp:2009:    shell.setEditorProvider(vedit::editor::makeEditCoreProvider());
+src/app/ux_selftest.cpp:533:    shell.setEditorProvider(vedit::editor::makeEditCoreProvider());
+src/app/shortcut_key_path_test.cpp:385:    realShell.setEditorProvider(vedit::editor::makeEditCoreProvider());
+src/workspace/filetree/tools/rootcheck/seamcheck.cpp:149:    shell.setEditorProvider(vedit::editor::makeEditCoreProvider());
+src/workspace/palette/palette_integration_selftest.cpp:246:    shell.setEditorProvider(vedit::editor::makeEditCoreProvider());
+src/workspace/module_tree/module_tree_catalog_test.cpp:227:    shell->setEditorProvider(vedit::editor::makeEditCoreProvider());
+src/workspace/search/search_replace_selftest.cpp:2776:    shell.setEditorProvider(vedit::editor::makeEditCoreProvider());
+src/workspace/search/search_selftest.cpp:629:    shell->setEditorProvider(vedit::editor::makeEditCoreProvider());
+product main.cpp call site context (before startSession):
+1019-
+1020-    // --- edit-core kernel in the product (Slice 1, AC-S1.1) ----------------
+1021-    // The provider is swapped on a live shell: every pane must get the real
+1022-    // KTextEditor widget, and the pane's document seam must open/save a file.
+1023:    shell->setEditorProvider(vedit::editor::makeEditCoreProvider());
+1024-    pump();
+1025-    check("editor.provider.id",
+1026-          shell->editorProvider() != nullptr
+1027-              && shell->editorProvider()->id() == QStringLiteral("ktexteditor"));
+1028-    EditorPane *editPane = shell->editorArea()->activePane();
+1029-    check("editor.pane.ktexteditor-widget",
+--
+2005-#if defined(VEDIT_HAVE_EDIT_CORE)
+2006-    // Slice 1 (AC-S1.1): the product editor is the KTextEditor editing kernel.
+2007-    // A deferred start makes the restored panes use it directly (no re-creation
+2008-    // of the demo pane).
+2009:    shell.setEditorProvider(vedit::editor::makeEditCoreProvider());
+2010-
+2011-    // T94: the runtime tree-sitter switch is a product command, not a test hook:
+2012-    // turning it off releases the fold registry (the injector unfolds it first)
+2013-    // and clears the breadcrumb (no text-heuristic path is invented).
+2014-    if (shell.commands() != nullptr) {
+2015-        vedit::app::CommandSpec spec;
+
+## already-guarded close/quit paths
+157:        switch (promptUnsaved(display, path)) {
+190:        return confirmPaneClose(pane);
+725:        if (!confirmUnsavedDocuments()) {
+754:        if (!confirmUnsavedDocuments()) {
+775:        if (!confirmUnsavedDocuments()) {
+783:        if (!confirmUnsavedDocuments()) {
+1238:    // say why (the same rule promptUnsaved() follows).
+1529:ApplicationShell::CloseChoice ApplicationShell::promptUnsaved(const QString &displayName,
+1571:bool ApplicationShell::confirmPaneClose(EditorPane *pane)
+1583:        switch (promptUnsaved(display, path)) {
+1613:bool ApplicationShell::confirmUnsavedDocuments()
+1661:        choice = promptUnsaved(dirty.first().display, dirty.first().path);
+1663:        choice = promptUnsavedBatch(displays, paths);
+1692:ApplicationShell::CloseChoice ApplicationShell::promptUnsavedBatch(const QStringList &displays,
+1696:    // be shown"), exactly like promptUnsaved().
+1748:    if (!confirmUnsavedDocuments()) {
+1793:    if (!confirmUnsavedDocuments()) {
+
+## QApplication::quit / exit outside the command registry
+src/app/i18n.cpp:314:    // QCoreApplication::quit() does not leave a nested QDialog::exec() loop (it is
+src/app/app_shell.cpp:750:        // RM-12 family audit: QApplication::quit() ends the process WITHOUT
+src/app/app_shell.cpp:757:        QApplication::quit();
+src/app/main.cpp:2063:        QTimer::singleShot(holdMs, &app, &QCoreApplication::quit);
+src/app/reset_layout_guard_selftest.cpp:409:// Family: File > Quit / Ctrl+Q must ask too. `QApplication::quit()` ends the

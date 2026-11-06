@@ -1,0 +1,367 @@
+[
+  {
+    "file": "src/workspace/diagnostics/diagnostics_outline_model.cpp",
+    "line_hint": 55,
+    "literal": "Symbol"
+  },
+  {
+    "file": "src/workspace/diagnostics/diagnostics_outline_model.cpp",
+    "line_hint": 57,
+    "literal": "Detail"
+  },
+  {
+    "file": "src/workspace/diagnostics/diagnostics_outline_model.cpp",
+    "line_hint": 59,
+    "literal": "Line"
+  },
+  {
+    "file": "src/workspace/diagnostics/diagnostics_panel.cpp",
+    "line_hint": 239,
+    "literal": "no problems reported for %1 — edit or save it to run the analysis again"
+  },
+  {
+    "file": "src/workspace/diagnostics/diagnostics_panel.cpp",
+    "line_hint": 243,
+    "literal": "open a file to start the analysis, or open a project folder and run Lint project"
+  },
+  {
+    "file": "src/workspace/diagnostics/diagnostics_panel.cpp",
+    "line_hint": 247,
+    "literal": "No diagnostics — the diagnostics backend is missing (%1); %2."
+  },
+  {
+    "file": "src/workspace/diagnostics/diagnostics_panel.cpp",
+    "line_hint": 250,
+    "literal": "No diagnostics — %1."
+  },
+  {
+    "file": "src/workspace/diagnostics/diagnostics_panel.cpp",
+    "line_hint": 297,
+    "literal": "%1 — analyzed %2 (%3): %4 diagnostic(s)"
+  },
+  {
+    "file": "src/workspace/diagnostics/diagnostics_panel.cpp",
+    "line_hint": 317,
+    "literal": "No symbols — the outline backend is missing (%1). See the status line above for the one-line fix."
+  },
+  {
+    "file": "src/workspace/diagnostics/diagnostics_panel.cpp",
+    "line_hint": 322,
+    "literal": "No symbols yet for %1 — analysis is starting, or this file has no structure."
+  },
+  {
+    "file": "src/workspace/diagnostics/diagnostics_panel.cpp",
+    "line_hint": 327,
+    "literal": "No symbols yet — open a file; analysis starts automatically."
+  },
+  {
+    "file": "src/workspace/diagnostics/diagnostics_panel.cpp",
+    "line_hint": 420,
+    "literal": "%1:%2:%3 — %4"
+  },
+  {
+    "file": "src/workspace/module_tree/module_tree_integration.cpp",
+    "line_hint": 135,
+    "literal": "hierarchy: retrying after the project model…"
+  },
+  {
+    "file": "src/workspace/module_tree/module_tree_integration.cpp",
+    "line_hint": 171,
+    "literal": "No hierarchy yet: open a project and press Refresh."
+  },
+  {
+    "file": "src/workspace/module_tree/module_tree_integration.cpp",
+    "line_hint": 249,
+    "literal": "Empty state: no elaborated project yet. Open a project and press Refresh."
+  },
+  {
+    "file": "src/workspace/module_tree/module_tree_panel.cpp",
+    "line_hint": 45,
+    "literal": "%1 · no file:line reported"
+  },
+  {
+    "file": "src/workspace/module_tree/module_tree_panel.cpp",
+    "line_hint": 138,
+    "literal": "No hierarchy yet: open a project and press Refresh."
+  },
+  {
+    "file": "src/workspace/module_tree/module_tree_panel.cpp",
+    "line_hint": 148,
+    "literal": "No hierarchy yet: open a project and press Refresh."
+  },
+  {
+    "file": "src/workspace/module_tree/module_tree_panel.cpp",
+    "line_hint": 158,
+    "literal": "Hierarchy ready — double-click an instance, a net or a driver/load."
+  },
+  {
+    "file": "src/workspace/module_tree/hierarchy_client.cpp",
+    "line_hint": 265,
+    "literal": "expanding the project file set…"
+  },
+  {
+    "file": "src/workspace/module_tree/hierarchy_client.cpp",
+    "line_hint": 313,
+    "literal": "elaborating %1 project file(s)…"
+  },
+  {
+    "file": "src/workspace/diagnostics/lint_progress.cpp",
+    "line_hint": 98,
+    "literal": "linting…"
+  },
+  {
+    "file": "src/workspace/diagnostics/lint_progress.cpp",
+    "line_hint": 98,
+    "literal": "idle"
+  },
+  {
+    "file": "src/workspace/diagnostics/lint_progress.cpp",
+    "line_hint": 111,
+    "literal": "no request to re-run: the last pass had no files"
+  },
+  {
+    "file": "src/workspace/diagnostics/lint_progress.cpp",
+    "line_hint": 176,
+    "literal": "cannot re-run this pass"
+  },
+  {
+    "file": "src/workspace/palette/command_palette.cpp",
+    "line_hint": 438,
+    "literal": "%1 files · type to filter · Enter to open"
+  },
+  {
+    "file": "src/workspace/palette/command_palette.cpp",
+    "line_hint": 440,
+    "literal": "%1 of %2 files"
+  },
+  {
+    "file": "src/workspace/filetree/file_tree_widget.cpp",
+    "line_hint": 182,
+    "literal": "Opened '%1'"
+  },
+  {
+    "file": "src/workspace/filetree/file_tree_widget.cpp",
+    "line_hint": 334,
+    "literal": "Deleted '%1'"
+  },
+  {
+    "file": "src/workspace/filetree/file_tree_widget.cpp",
+    "line_hint": 528,
+    "literal": "Refreshed '%1'"
+  },
+  {
+    "file": "src/workspace/filetree/file_tree_widget.cpp",
+    "line_hint": 563,
+    "literal": "%1 - %2"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 77,
+    "literal": "Add one or more .f filelists to the project file set"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 84,
+    "literal": "Open a folder from the File Tree (or pass --project <dir>); the expanded file list, include dirs and defines appear here."
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 218,
+    "literal": "Imported %1 filelist%2"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 236,
+    "literal": "Removed %1; the file set is being re-expanded"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 271,
+    "literal": "%1 unresolved filelist variable(s): %2"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 280,
+    "literal": "Import completed with %1 unresolved variable(s); the affected .f lines stay listed below"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 289,
+    "literal": "Saved %1 variable(s); re-expanding"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 312,
+    "literal": "No variables are used by this project yet"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 322,
+    "literal": "Project variables updated; re-expanding"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 355,
+    "literal": "Cannot open %1: no editor jump target is registered"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 361,
+    "literal": "Cannot open %1: this build has no jump seam"
+  },
+  {
+    "file": "src/editor/kernel/editor_context_menu.cpp",
+    "line_hint": 35,
+    "literal": "Ask %1 for the definition at the cursor and jump to it"
+  },
+  {
+    "file": "src/editor/kernel/editor_context_menu.cpp",
+    "line_hint": 37,
+    "literal": "Ask %1 for the references at the cursor and report their count"
+  },
+  {
+    "file": "src/editor/kernel/editor_context_menu.cpp",
+    "line_hint": 40,
+    "literal": "Ask %1 for a rename preview of the symbol at the cursor"
+  },
+  {
+    "file": "src/editor/kernel/editor_context_menu.cpp",
+    "line_hint": 43,
+    "literal": "Run the external verible-verilog-format over this document (one undoable edit)"
+  },
+  {
+    "file": "src/editor/kernel/editor_context_menu.cpp",
+    "line_hint": 46,
+    "literal": "Ask %1 for a hover at the cursor (no hover request path exists in this build)"
+  },
+  {
+    "file": "src/editor/kernel/editor_context_menu.cpp",
+    "line_hint": 50,
+    "literal": "Move the cursor to the next diagnostic of this file (F8)"
+  },
+  {
+    "file": "src/editor/kernel/editor_context_menu.cpp",
+    "line_hint": 52,
+    "literal": "Move the cursor to the previous diagnostic of this file (Shift+F8)"
+  },
+  {
+    "file": "src/editor/kernel/editor_context_menu.cpp",
+    "line_hint": 198,
+    "literal": "Language Server"
+  },
+  {
+    "file": "src/editor/kernel/editor_context_menu.cpp",
+    "line_hint": 210,
+    "literal": "Diagnostics"
+  },
+  {
+    "file": "src/editor/kernel/editor_advanced.cpp",
+    "line_hint": 78,
+    "literal": "LSP Completion"
+  },
+  {
+    "file": "src/editor/kernel/editor_advanced.cpp",
+    "line_hint": 80,
+    "literal": "Keyword Completion (KTextEditor)"
+  },
+  {
+    "file": "src/editor/kernel/editor_advanced.cpp",
+    "line_hint": 82,
+    "literal": "Signature Help (editor-synthesised)"
+  },
+  {
+    "file": "src/editor/kernel/editor_advanced.cpp",
+    "line_hint": 84,
+    "literal": "Code Actions"
+  },
+  {
+    "file": "src/editor/kernel/editor_advanced.cpp",
+    "line_hint": 86,
+    "literal": "Sticky Scroll"
+  },
+  {
+    "file": "src/editor/kernel/editor_advanced.cpp",
+    "line_hint": 88,
+    "literal": "Inlay Hints"
+  },
+  {
+    "file": "src/editor/kernel/editor_advanced.cpp",
+    "line_hint": 90,
+    "literal": "Snippets"
+  },
+  {
+    "file": "src/editor/kernel/editor_advanced.cpp",
+    "line_hint": 92,
+    "literal": "Indent Guides"
+  },
+  {
+    "file": "src/editor/kernel/editor_advanced.cpp",
+    "line_hint": 94,
+    "literal": "Show Whitespace"
+  },
+  {
+    "file": "src/editor/kernel/editor_advanced.cpp",
+    "line_hint": 96,
+    "literal": "Column Ruler"
+  },
+  {
+    "file": "src/editor/kernel/editor_advanced.cpp",
+    "line_hint": 342,
+    "literal": "%1 — available (%2)"
+  },
+  {
+    "file": "src/editor/kernel/editor_advanced.cpp",
+    "line_hint": 352,
+    "literal": "Module skeleton"
+  },
+  {
+    "file": "src/editor/kernel/editor_advanced.cpp",
+    "line_hint": 353,
+    "literal": "always_ff block"
+  },
+  {
+    "file": "src/editor/kernel/editor_advanced.cpp",
+    "line_hint": 354,
+    "literal": "case statement"
+  },
+  {
+    "file": "src/editor/kernel/fim_wiring.cpp",
+    "line_hint": 55,
+    "literal": "FIM ghost text: previews the first line only; Tab inserts the full suggestion."
+  },
+  {
+    "file": "src/workspace/project/project_variables_dialog.cpp",
+    "line_hint": 28,
+    "literal": "These variables are used by the imported .f filelists but are not resolved by the project table or the environment. Fill them in once."
+  },
+  {
+    "file": "src/workspace/settings/settings_panel.cpp",
+    "line_hint": 702,
+    "literal": "Theme '%1' is invalid; the default theme is applied instead."
+  },
+  {
+    "file": "src/workspace/settings/settings_panel.cpp",
+    "line_hint": 770,
+    "literal": "Shortcut for '%1' set to %2 and stored by the Rust service."
+  },
+  {
+    "file": "src/workspace/settings/settings_panel.cpp",
+    "line_hint": 810,
+    "literal": "Preview — press Apply or OK to store it, Cancel to discard."
+  },
+  {
+    "file": "src/workspace/settings/settings_panel.cpp",
+    "line_hint": 829,
+    "literal": "The settings change was applied but could not be stored; see the diagnostics."
+  },
+  {
+    "file": "src/workspace/diagnostics/diagnostics_integration.cpp",
+    "line_hint": 1070,
+    "literal": "LSP backend=%1 · lint=%2 · %3"
+  },
+  {
+    "file": "src/workspace/settings/settings_panel.cpp",
+    "line_hint": 826,
+    "literal": "the Rust settings store rejected the write"
+  }
+]

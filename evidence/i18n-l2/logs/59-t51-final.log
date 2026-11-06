@@ -1,0 +1,72 @@
+# 59-t51-final — vedit_zh_CN.ts 绝对行重建 + .qm 重编 + 对账恢复
+# captured: 2026-11-04T14:24:57+08:00   cwd: /home/haroldzhao/MyProj/DshProj/VEdit
+
+## 1) 重建命令（runbook §10.3）
+lupdate -locations absolute -recursive src -ts translations/vedit_zh_CN.ts
+  -> Found 930 source text(s) (0 new and 930 already existing)   (logs/52)
+python3 evidence/i18n-l2/tools/add_t40_messages.py   -> refinished 6（ternary 分支后缀）(logs/53)
+python3 evidence/i18n-l2/tools/add_t27_messages.py   -> 0 added（6 条已在）(logs/53)
+
+## 2) 绝对 location 证明
+grep -c 'line="+' translations/vedit_zh_CN.ts = 0
+带 filename+绝对行号的 location 行数 = 1066
+重建前（降级态）相对行数 = 964 (logs/51)
+
+## 3) .ts 现状
+messages = 942（936 finished + 6 vanished）
+sha256 = 151b3f8448aad71ec4979add10e056d2ea12c1200103a59a3b7f2646e2bacca1
+
+## 4) VCS（batch-7-cleanup）消息存活核对
+要求逐条核对：Rebase %1 onto %2? / Rebase the branch? / A rebase target is required; nothing was written.
+            / File history / Blame + backendName()/changeKindName() 8 个字面量
+结果：
+  12/13 以同名字面量存在且已译：Rebase the branch? -> Rebase 分支？; A rebase target is required; nothing was written.
+       -> 需要 rebase 目标；未写入任何内容。; File history -> 文件历史; Blame -> 追溯;
+       Git -> Git（专有名词，原样保留）; Subversion -> Subversion; added -> 新增; modified -> 修改;
+       deleted -> 删除; renamed -> 重命名; conflict -> 冲突; unknown -> 未知
+  'Rebase %1 onto %2?' 不是缺失：源码里它是多行拼接
+       （src/workspace/vcs/vcs_panel.cpp:1549-1553），.ts 里以完整消息存在并已译：
+       <source>Rebase %1 onto %2? ... Conflicts stop the rebase until you Continue or Abort.</source>
+       -> 将 %1 rebase 到 %2？ ...（translation 已完成，无 type）
+  结论：无丢失，无需补写。
+
+## 5) 编译产物 .qm 重编（与修复后的 .ts 对齐）
+lrelease translations/vedit_zh_CN.ts -qm target/qt6-build/src/app/translations/vedit_zh_CN.qm
+  -> Generated 936 translation(s) (936 finished and 0 unfinished)  (logs/56)
+.qm 路径 = target/qt6-build/src/app/translations/vedit_zh_CN.qm
+.qm sha256 = 1c0a9e068cea51311bb4667d875430c9f42b54a3c6cc80a55d9b4f5ceea9c00e
+.qm mtime  = 2026-11-04 14:24:05.643415942 +0800
+.qm 内容抽检（UTF-16BE 字节搜索）：文件历史 / 追溯 / 重命名 / 将 %1 rebase 到 均在 .qm 中 -> 找到
+
+## 6) 对账 + 自测
+findings=319 rows=319 supplement=15 -> evidence/i18n-l2/03-b-reconciliation.csv
+  不译: 18
+  译（已完成）: 205
+  译（本批）: 73
+  译（片段）: 23
+  verified: {'no-wrap': 19, 'own-call+ts': 300}
+audit rows changed=47 -> evidence/i18n-l2/logs/20-t40-claim-audit.csv
+  audit claim-flip(no->yes): 27
+  audit claim-flip(no->yes);decision-change(待定->译（已完成）): 17
+  audit claim-flip(no->yes);decision-change(不译->译（已完成）): 3
+RECONCILE_EXIT=0（319 行 / 205·73·23·18 / supplement=15 / 待定 0）
+verify_claims_selftest.py -> exit 0，4 cases 0 failure (logs/55)
+03-b-reconciliation.csv 已由生成器重写（不是 reviewer 跑出的降级副本）
+
+## 7) 探针（用修复后的 .qm）
+status-i18n-probe  -> 10 checks / 0 failures (logs/57)
+i18n-probe (43)    -> 43 checks / 0 failures (logs/58)
+
+## 8) docs 门禁
+bash build/gates/docs.sh -> exit 0
+evidence id = ev-20261104T062442-52dbb2 (.mpd/verify/evidence/ev-20261104T062442-52dbb2.log)
+
+## 9) docs 门禁（报告定稿后重跑，最终 id）
+bash build/gates/docs.sh -> exit 0
+evidence id (final) = ev-20261104T062530-4b66db (.mpd/verify/evidence/ev-20261104T062530-4b66db.log)
+evidence id (首次, 报告编辑前) = ev-20261104T062442-52dbb2
+
+## 10) 报告同步
+evidence/i18n-l2/50-i18n-l2-report.md §4/§5 的 .ts 计数已改为 T51 实测值
+（942 <message> / 936 finished / 6 vanished, sha256 151b3f84…；lrelease 936），
+T27/T29 的旧值保留但标注为历史。

@@ -1,0 +1,27 @@
+[assemble] vd-app: d3dc9242858bf28959b7af9f46b720b71568acc280b7430c2c57166b1828a31a  probe: b709d6924ec9a6f6da6ec80aaf915aa27d9b9ddb3e18de73ced44316353fc242
+[assemble] translations: vedit_zh_CN.qm 
+[assemble] locale: C.utf8 416K (bundled glibc)
+[assemble] syntax data root: 2 xml under <root>/syntax/
+[assemble] whitelist: SystemVerilog,Verilog
+binary verible-verilog-ls sha256=07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845
+binary verible-verilog-lint sha256=b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29
+binary verible-verilog-format sha256=b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473
+[assemble] toolchain: verible bundled (3 binaries, sha256 pinned)
+binary slang sha256=63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252
+[assemble] toolchain: slang bundled (sha256 pinned)
+[assemble] toolchain: complete (verible + slang), missing=[]
+[assemble] cjk font: 19484784 bytes sha256=b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a; licence: usr/share/doc/vedit/licenses/Noto-CJK-OFL-1.1.txt
+[assemble] active whitelist files: 2 (no syntax-bundled/)
+[assemble] delivery invariants: vd-app + Qt platform plugins + toolchain + whitelist present
+[assemble] AppDir: /vedit-build/packaging/runtime/out/AppDir files=217 bytes=325586002
+[assemble] f2lib sha256: aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
+APPDIR=/vedit-build/packaging/runtime/out/AppDir
+APPDIR_FORM=F2
+APPDIR_FILES=217
+APPDIR_BYTES=325586002
+APPDIR_WHITELIST=SystemVerilog,Verilog
+ASSEMBLE_EXIT=0
+total 20
+drwxr-xr-x 2 haroldzhao haroldzhao 4096 Nov  2 22:34 .
+drwxr-xr-x 3 haroldzhao haroldzhao 4096 Nov  2 22:34 ..
+-rw-r--r-- 1 haroldzhao haroldzhao 9433 Nov  2 22:34 vedit_zh_CN.qm

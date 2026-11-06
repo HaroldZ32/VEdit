@@ -1,0 +1,15 @@
+# A-11 Qt/ABI guard — T20 compile-only CMake target evidence (2026-11-02T19:48:28+08:00)
+
+## 1. the CMake target compiles the TREE header with a REAL Qt header (pinned image)
+target: vedit_qt_abi_guard (OBJECT, default build)
+ninja: warning: premature end of file; recovering
+[1/1] Building CXX object CMakeFiles/vedit_qt_abi_guard.dir/crates/vd-ffi/tests/qt_abi_guard.cpp.o
+object: -rw-r--r-- 1 root root 38976 Nov  2 11:48 target/qt6-build/CMakeFiles/vedit_qt_abi_guard.dir/crates/vd-ffi/tests/qt_abi_guard.cpp.o
+header in the tree: f195a40a0943518c36fb3fbc458d3d3794b7d6f12dbdec4e1d930b479e4ba267  crates/vd-ffi/include/vd_ffi.h
+source in the tree: 00b8b281421d22228b06005234bb16fe01792b7ff792169fb2361b56fee0b139  crates/vd-ffi/tests/qt_abi_guard.cpp
+
+## 2. negative control: the SAME TU against a header copy with a `signals` field MUST FAIL
+negative-control exit=1 (expected non-zero)
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qtmetamacros.h:47:20: error: expected unqualified-id before ‘public’
+   43 | #     define signals Q_SIGNALS
+/tmp/tmp.fEFWFMlkpZ/vd_ffi.h:2008:22: note: in expansion of macro ‘signals’

@@ -1,4 +1,5 @@
 #include "settings_dialog.h"
+#include <QCoreApplication>
 
 #include "settings_panel.h"
 
@@ -14,9 +15,11 @@ SettingsDialog::SettingsDialog(vedit::app::ThemeManager *themes,
     : QDialog(parent)
 {
     setObjectName(QStringLiteral("settings-dialog"));
-    setWindowTitle(QStringLiteral("Preferences"));
+    setWindowTitle(QCoreApplication::translate("VEdit", "Preferences"));
     setModal(true);
-    resize(760, 620);
+    // Tall enough for the three pages (item 10.2): the tools form and the FIM
+    // key group are the tallest, and the diagnostics box must stay visible.
+    resize(900, 760);
 
     auto *layout = new QVBoxLayout(this);
     layout->setContentsMargins(8, 8, 8, 8);

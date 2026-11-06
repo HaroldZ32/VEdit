@@ -12,10 +12,14 @@
 #include "crash_reporter.h"
 
 #include "command_registry.h"
+#include "desktop_shortcuts.h"
+#include "file_dialog_filters.h"
 #include "editor_area.h"
+#include "i18n.h"
 #include "integration.h"
 #include "../workspace/diagnostics/toolchain.h"
 #include "panel_registry.h"
+#include "path_display.h"
 #include "terminal_panel.h"
 #include "theme_manager.h"
 #if defined(VEDIT_HAVE_EDIT_CORE)
@@ -23,12 +27,24 @@
 #include "kernel/edit_core_selftest.h"
 #include "kernel/ktexteditor_provider.h"
 #include "../editor/kernel/fold_breadcrumb.h"
+#include "../editor/kernel/lsp_actions.h"
 #include "../syntax/provider/syntax_service.h"
 #include <KTextEditor/Document>
 #include <KTextEditor/View>
 #endif
 #ifdef VEDIT_HAVE_RUST_FFI
 #include "vd_ffi.h"
+#endif
+// UX batch 2 / A4: appearance (font + interface scale) and the process-wide
+// format/lint configuration the diagnostics lane consumes. The include path
+// arrives through the workspace integration -> settings lane link edge; a tree
+// without that lane still compiles (the __has_include guard).
+#if __has_include("ui_scale.h")
+#include "format_options.h"
+#include "lint_options.h"
+#include "settings_client.h"
+#include "ui_scale.h"
+#define VEDIT_HAVE_APPEARANCE_SETTINGS 1
 #endif
 
 #include <QAction>
@@ -52,6 +68,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QPlainTextEdit>
+#include <QTabBar>
 #include <QToolButton>
 #include <QString>
 #include <QStatusBar>
@@ -64,6 +81,8 @@
 #include <QWindow>
 
 #include <cstdio>
+#include <cstring>
+#include <utility>
 #include <memory>
 #include <string>
 
@@ -275,6 +294,43 @@ int runSelfCheck()
     }
     const QString stateDir = temp.path() + QStringLiteral("/state");
 
+    // --- FIX 1: the ONE path-display rule (src/common/path_display.h) --------
+    // The three cases the user ruling names, asserted directly; every surface
+    // below calls this one function, so this is the rule the UI renders.
+    {
+        const auto absoluteOf = [](const QString &value) {
+            return QDir::cleanPath(QFileInfo(value).absoluteFilePath());
+        };
+        const QString root = temp.path() + QStringLiteral("/display-root/");
+        const QString under = temp.path() + QStringLiteral("/display-root/rtl/top.sv");
+        const QString outside = temp.path() + QStringLiteral("/display-outside/top.sv");
+        check("path.display.under-root",
+              vedit::paths::displayPath(root, under) == QStringLiteral("rtl/top.sv"),
+              vedit::paths::displayPath(root, under));
+        check("path.display.under-root.normalized-root",
+              vedit::paths::displayPath(vedit::paths::normalizedRoot(root), under)
+                  == QStringLiteral("rtl/top.sv"));
+        check("path.display.outside-root",
+              vedit::paths::displayPath(root, outside) == absoluteOf(outside),
+              vedit::paths::displayPath(root, outside));
+        check("path.display.no-root",
+              vedit::paths::displayPath(QString(), outside) == absoluteOf(outside),
+              vedit::paths::displayPath(QString(), outside));
+        // A sibling whose NAME starts with the root's name ("/a/root2" next to
+        // "/a/root") is outside: the separator is what makes that safe.
+        check("path.display.sibling-prefix-outside",
+              vedit::paths::displayPath(root,
+                                        temp.path() + QStringLiteral("/display-root-2/x.sv"))
+                  == absoluteOf(temp.path() + QStringLiteral("/display-root-2/x.sv")));
+        // The root itself is not "inside" itself: no bare "." in the UI.
+        check("path.display.root-itself-absolute",
+              vedit::paths::displayPath(root, root) == absoluteOf(root));
+        check("path.display.root-normalized",
+              vedit::paths::normalizedRoot(root) == absoluteOf(root)
+                  && !vedit::paths::normalizedRoot(root).endsWith(QLatin1Char('/')),
+              vedit::paths::normalizedRoot(root));
+    }
+
     ShellOptions options;
     options.stateDir = stateDir;
     options.restoreSession = false;
@@ -316,14 +372,17 @@ int runSelfCheck()
     // Menu / shortcut framework.
     check("menus.file", shell->commands()->menus().contains(QStringLiteral("file")));
     check("menus.view", shell->commands()->menus().contains(QStringLiteral("view")));
-    check("menus.settings", shell->commands()->menus().contains(QStringLiteral("settings")));
+    check("menus.edit", shell->commands()->menus().contains(QStringLiteral("edit")));
     check("menus.help", shell->commands()->menus().contains(QStringLiteral("help")));
     // T132: Settings -> Preferences... (Ctrl+,) replaces the old panel toggle.
     QAction *preferences = shell->commands()->action(QStringLiteral("settings.preferences"));
     check("settings.preferences.exists", preferences != nullptr);
+    // AC-4.7: compared through the translation key, not the English original, so
+    // the check holds in every interface language (the selfcheck installs none,
+    // so today it still reads "&Settings").
     check("settings.preferences.menu",
-          preferences != nullptr && shell->commands()->menuLabel(QStringLiteral("settings"))
-              == QStringLiteral("&Settings"));
+          preferences != nullptr && shell->commands()->menuLabel(QStringLiteral("edit"))
+              == QCoreApplication::translate("vedit::app::ApplicationShell", "&Edit"));
     check("settings.preferences.shortcut",
           preferences != nullptr
               && preferences->shortcut() == QKeySequence(QStringLiteral("Ctrl+,")),
@@ -337,6 +396,132 @@ int runSelfCheck()
     }
     check("settings.preferences.unique-shortcut", ctrlCommaBindings == 1,
           QStringLiteral("bindings=%1").arg(ctrlCommaBindings));
+
+    // A2 review M2 (requirement 7 was only pinned by the simulated-shell ctest):
+    // the shell above is lane-free, so it can only ever see the four menus the
+    // shell itself registers. The product installs the workspace lanes BEFORE
+    // startSession(); repeat that exact sequence (the same installPanels()
+    // main() calls) and assert what the user really sees: the five canonical
+    // menus, their fixed order, where Preferences lives, and the registry's
+    // shortcut table.
+    {
+        ShellOptions laneOptions;
+        laneOptions.stateDir = temp.path() + QStringLiteral("/lane-state");
+        laneOptions.restoreSession = false;
+        laneOptions.showDefaultPanels = false;
+        laneOptions.deferSessionRestore = true;
+        auto laneShell = std::make_unique<ApplicationShell>(laneOptions);
+        vedit::workspace::IntegrationOptions laneIntegration;
+        laneIntegration.projectRoot = temp.path() + QStringLiteral("/lane-project");
+        laneIntegration.stateDir = laneOptions.stateDir;
+        QDir().mkpath(laneIntegration.projectRoot);
+        vedit::workspace::installPanels(*laneShell, laneIntegration);
+        laneShell->startSession();
+        laneShell->show();
+        pump();
+
+        // (a) all five canonical menus exist — Project is registered by the
+        // diagnostics lane, so a lane-free shell cannot satisfy this.
+        const QStringList laneMenus = laneShell->commands()->menus();
+        const QStringList requiredMenus{QStringLiteral("file"), QStringLiteral("edit"),
+                                        QStringLiteral("view"), QStringLiteral("project"),
+                                        QStringLiteral("help")};
+        QStringList missingMenus;
+        for (const QString &menu : requiredMenus) {
+            if (!laneMenus.contains(menu)) {
+                missingMenus.append(menu);
+            }
+        }
+        check("menus.five.registered", missingMenus.isEmpty(),
+              missingMenus.isEmpty()
+                  ? QStringLiteral("all five")
+                  : QStringLiteral("missing=%1").arg(missingMenus.join(QLatin1Char(','))));
+
+        // (b) the top-level order is FIXED: File, Edit, View, Project, Help.
+        QStringList barMenus;
+        for (QAction *menuAction : laneShell->menuBar()->actions()) {
+            if (menuAction != nullptr && menuAction->menu() != nullptr) {
+                barMenus.append(menuAction->menu()->objectName());
+            }
+        }
+        const QStringList expectedBar{QStringLiteral("menu-file"), QStringLiteral("menu-edit"),
+                                      QStringLiteral("menu-view"), QStringLiteral("menu-project"),
+                                      QStringLiteral("menu-help")};
+        check("menus.five.order", barMenus == expectedBar, barMenus.join(QLatin1Char(',')));
+
+        // (c) Preferences is IN the Edit menu — resolved through the registry
+        // action, not by comparing the Edit menu label with itself.
+        QAction *lanePreferences =
+            laneShell->commands()->action(QStringLiteral("settings.preferences"));
+        const QList<QAction *> editActions =
+            laneShell->commands()->actionsInMenu(QStringLiteral("edit"));
+        check("menus.preferences.in-edit-registry",
+              lanePreferences != nullptr && editActions.contains(lanePreferences),
+              QStringLiteral("edit-actions=%1").arg(editActions.size()));
+        bool preferencesOutsideEdit = false;
+        for (const QString &menu : requiredMenus) {
+            if (menu == QStringLiteral("edit")) {
+                continue;
+            }
+            if (laneShell->commands()->actionsInMenu(menu).contains(lanePreferences)) {
+                preferencesOutsideEdit = true;
+            }
+        }
+        check("menus.preferences.only-edit",
+              lanePreferences != nullptr && !preferencesOutsideEdit);
+        check("menus.preferences.last-in-edit",
+              lanePreferences != nullptr && !editActions.isEmpty()
+                  && editActions.last() == lanePreferences);
+
+        // A2 review H1 / U3-F1: no two commands may share one default sequence.
+        // The registry warns on registration; this is the machine check, and the
+        // dump below is the evidence the verifier reads.
+        const QStringList bindings = laneShell->commands()->shortcutBindings();
+        std::printf("COMMAND-BINDINGS count=%d\n", static_cast<int>(bindings.size()));
+        for (const QString &binding : bindings) {
+            std::printf("COMMAND-BINDING %s\n", qPrintable(binding));
+        }
+        const QStringList duplicates = laneShell->commands()->duplicateShortcuts();
+        check("commands.no-duplicate-shortcuts", duplicates.isEmpty(),
+              duplicates.join(QStringLiteral(" | ")));
+        // RM-5c (review M1): a shipped default that a DESKTOP claims globally is
+        // a dead key before the application sees it (the WM consumes it). This
+        // runs on the LANE-INSTALLED registry, so it covers commands registered
+        // outside src/app (e.g. view.panel.diagnostics from the diagnostics lane)
+        // — the bare shell in the shortcut regression cannot see those. Every
+        // sequence the action carries is checked, extras included.
+        QStringList desktopGlobal;
+        for (const QString &id : laneShell->commands()->ids()) {
+            for (const QKeySequence &sequence : laneShell->commands()->effectiveShortcuts(id)) {
+                const QString owner = vedit::app::desktopGlobalShortcutOwner(sequence);
+                if (!owner.isEmpty()) {
+                    desktopGlobal.append(QStringLiteral("%1: %2 (%3)").arg(
+                        id, sequence.toString(QKeySequence::PortableText), owner));
+                }
+            }
+        }
+        check("commands.no-desktop-global-shortcuts", desktopGlobal.isEmpty(),
+              desktopGlobal.join(QStringLiteral(" | ")));
+
+        // U3r2-F2: the editor context menu's display fallback and the registry
+        // default must be ONE value. The menu entry and the toolbar button are
+        // the SAME QAction (buildMenuBar()/buildToolBar() both take
+        // commands_->action(id)); the context menu prefers that wired action's
+        // shortcut and falls back to editorActionShortcut() only when the shell
+        // action cannot be resolved. This line proves the two cannot drift.
+#if defined(VEDIT_HAVE_EDIT_CORE)
+        const QAction *formatAction =
+            laneShell->commands()->action(QStringLiteral("diagnostics.format"));
+        const QKeySequence registryFormat =
+            formatAction != nullptr ? formatAction->shortcut() : QKeySequence();
+        const QKeySequence fallbackFormat =
+            vedit::editor::editorActionShortcut(vedit::editor::EditorAction::Format);
+        check("shortcut.format.registry-equals-fallback",
+              formatAction != nullptr && registryFormat == fallbackFormat,
+              QStringLiteral("registry=%1 fallback=%2")
+                  .arg(registryFormat.toString(), fallbackFormat.toString()));
+#endif
+    }
     const char *commandIds[] = {"file.new-layout", "file.close-pane", "file.quit",
                                 "view.split.horizontal", "view.split.vertical",
                                 "view.focus.next", "view.layout.reset", "help.about",
@@ -585,8 +770,79 @@ int runSelfCheck()
           shell->editorArea()->activePane() != nullptr
               && shell->editorArea()->activePane()->currentFilePath()
                      == QFileInfo(openA).absoluteFilePath());
+
+    // FIX 1 (no project): the title and the tab tooltip show the ABSOLUTE path.
+    {
+        const QString absoluteOpenA = QDir::cleanPath(QFileInfo(openA).absoluteFilePath());
+        EditorPane *pathPane = shell->editorArea()->activePane();
+        check("path.display.title.absolute-no-root",
+              shell->windowTitle().contains(absoluteOpenA), shell->windowTitle());
+        check("path.display.tab-tooltip.absolute-no-root",
+              pathPane != nullptr && pathPane->tabBar() != nullptr
+                  && pathPane->tabBar()->tabToolTip(pathPane->activeTabIndex()) == absoluteOpenA,
+              pathPane != nullptr && pathPane->tabBar() != nullptr
+                  ? pathPane->tabBar()->tabToolTip(pathPane->activeTabIndex())
+                  : QStringLiteral("<no pane>"));
+    }
     shell->setOpenFileDialogProvider(nullptr);
     shell->editorArea()->resetLayout();
+
+    // --- FIX 2: ONE lane-agnostic signal for every successful open ----------
+    // The project lane is not installed in this self-check (that wiring is
+    // asserted by the project lane's own selftest against a real shell), so here
+    // the contract of the app layer is asserted: the filter offers filelists,
+    // and the signal fires for every open seam a panel uses.
+    {
+        const QString filter = vedit::app::openFileDialogFilter();
+        // RM-16 (requirements-driven assertion change): the filelist set is the
+        // one the parser recognises - the `f` extension, case-insensitively (see
+        // src/common/file_dialog_filters.h and crates/vd-config/src/project.rs).
+        // The old check demanded the GUESSED `*.flist` as well; that glob is gone
+        // from every filter, and a guessed extension reappearing is a failure now.
+        bool hasSharedFilelistGlobs = !filter.isEmpty();
+        for (const QString &glob : vedit::common::filelistGlobs()) {
+            hasSharedFilelistGlobs = hasSharedFilelistGlobs && filter.contains(glob);
+        }
+        check("open.filter.filelist", hasSharedFilelistGlobs, filter);
+        check("open.filter.no-guessed-flist", !filter.contains(QStringLiteral("*.flist")),
+              filter);
+        check("open.filter.keeps-existing-types",
+              filter.contains(QStringLiteral("*.v")) && filter.contains(QStringLiteral("*.sv"))
+                  && filter.contains(QStringLiteral("*.svh"))
+                  && filter.contains(QStringLiteral("*.vh")),
+              filter);
+
+        QStringList fileOpened;
+        // The connection must not outlive this block: the lambda captures a
+        // stack object. Explicit disconnect keeps that contract obvious.
+        const QMetaObject::Connection fileOpenedConnection =
+            QObject::connect(shell.get(), &ApplicationShell::fileOpened, shell.get(),
+                             [&fileOpened](const QString &path) { fileOpened.append(path); });
+        const QString absoluteA = QDir::cleanPath(QFileInfo(openA).absoluteFilePath());
+        const QString absoluteB = QDir::cleanPath(QFileInfo(openB).absoluteFilePath());
+
+        QString signalError;
+        check("open.signal.opens", shell->openPaths({openA, openB}, &signalError), signalError);
+        check("open.signal.one-per-open",
+              fileOpened == QStringList{absoluteA, absoluteB},
+              fileOpened.join(QLatin1Char(',')));
+
+        fileOpened.clear();
+        check("open.signal.failed-open-silent",
+              !shell->openPaths({temp.path() + QStringLiteral("/does-not-exist.f")}, &signalError)
+                  && fileOpened.isEmpty());
+
+        // The panel/palette/search/jump surfaces call EditorPane::openFile
+        // directly; that is the same seam, so it must fire the same signal.
+        EditorPane *signalPane = shell->editorArea()->activePane();
+        fileOpened.clear();
+        check("open.signal.direct-pane-open",
+              signalPane != nullptr && signalPane->openFile(absoluteA, &signalError)
+                  && fileOpened == QStringList{absoluteA},
+              fileOpened.join(QLatin1Char(',')));
+        QObject::disconnect(fileOpenedConnection);
+        shell->editorArea()->resetLayout();
+    }
 
     // Persistence round-trip.
     shell->applyMixedSplitPreset();
@@ -680,7 +936,7 @@ int runSelfCheck()
         seamShell->panels()->setFactory(QStringLiteral("terminal"),
                                         vedit::terminal::terminalPanelFactory());
         seamShell->panels()->setFactory(QStringLiteral("search"), []() -> QWidget * {
-            auto *probe = new QLabel(QStringLiteral("search panel from a registered factory"));
+            auto *probe = new QLabel(QCoreApplication::translate("VEdit", "search panel from a registered factory"));
             probe->setObjectName(QStringLiteral("search-panel-probe"));
             return probe;
         });
@@ -934,10 +1190,10 @@ int runSelfCheck()
             pump();
             check("save.failure.disk-unchanged", readFileBytes(savePath) == beforeFailure);
             check("save.failure.status-bar",
-                  shell->statusBar()->currentMessage().contains(QStringLiteral("Save failed")));
+                  shell->statusBar()->currentMessage().contains(QCoreApplication::translate("VEdit", "Save failed")));
             bool failureDiagnostic = false;
             for (const QString &diagnostic : shell->diagnostics()) {
-                if (diagnostic.contains(QStringLiteral("Save failed"))) {
+                if (diagnostic.contains(QCoreApplication::translate("VEdit", "Save failed"))) {
                     failureDiagnostic = true;
                 }
             }
@@ -1073,6 +1329,157 @@ int runSelfCheck()
     g_checks += editCore.checks;
     g_failures += editCore.failures;
 #endif
+
+    // --- AC-1.1/AC-1.2 (batch 1): the ONE workspace root --------------------
+    // The shell resolves the persisted session root in its CONSTRUCTOR, i.e.
+    // before any lane registers a panel factory (main.cpp installs the lanes
+    // after the shell exists), and a runtime switch is broadcast through
+    // projectRootChanged. These are shell-level assertions only: the panel
+    // propagation itself is proven by the real-shell probe in
+    // evidence/batch1-shell/, never by --selfcheck (which returns before
+    // installPanels and can therefore never see a panel).
+    {
+        const QString rootStateDir = temp.path() + QStringLiteral("/root-restore");
+        const QString projectA = temp.path() + QStringLiteral("/project-a");
+        const QString projectB = temp.path() + QStringLiteral("/project-b");
+        QDir().mkpath(projectA);
+        QDir().mkpath(projectB);
+        QJsonObject archive;
+        archive.insert(QStringLiteral("version"), 2);
+        archive.insert(QStringLiteral("project"), projectA);
+        writeFile(rootStateDir + QStringLiteral("/session.json"),
+                  QJsonDocument(archive).toJson(QJsonDocument::Compact));
+
+        // 1) An ordinary start (no --project) knows the root BEFORE the lanes
+        //    install: projectRoot() already carries the persisted value.
+        ShellOptions rootOptions;
+        rootOptions.stateDir = rootStateDir;
+        rootOptions.restoreSession = true;
+        rootOptions.deferSessionRestore = true;
+        rootOptions.showDefaultPanels = false;
+        auto rootShell = std::make_unique<ApplicationShell>(rootOptions);
+        check("root.restored-before-install", rootShell->projectRoot() == projectA,
+              rootShell->projectRoot());
+        // An explicit --project still wins over the archive.
+        ShellOptions explicitOptions = rootOptions;
+        explicitOptions.stateDir = temp.path() + QStringLiteral("/root-explicit");
+        explicitOptions.projectRoot = projectB;
+        auto explicitShell = std::make_unique<ApplicationShell>(explicitOptions);
+        check("root.explicit-wins", explicitShell->projectRoot() == projectB,
+              explicitShell->projectRoot());
+
+        // FIX 1: the SAME display rule on the rendered surfaces once a root
+        // exists. The open key stays absolute; only the rendering changes.
+        const QString underRoot = projectA + QStringLiteral("/rtl/foo.sv");
+        const QString outsideRoot = temp.path() + QStringLiteral("/outside/other.sv");
+        const auto absoluteOf = [](const QString &value) {
+            return QDir::cleanPath(QFileInfo(value).absoluteFilePath());
+        };
+        writeFile(underRoot, QByteArray("module foo; endmodule\n"));
+        writeFile(outsideRoot, QByteArray("module other; endmodule\n"));
+        rootShell->show();
+        pump();
+        QString displayError;
+        check("path.display.under-root.open", rootShell->openPaths({underRoot}, &displayError),
+              displayError);
+        pump();
+        check("path.display.window-title.relative",
+              rootShell->windowTitle().contains(QStringLiteral("rtl/foo.sv"))
+                  && !rootShell->windowTitle().contains(projectA),
+              rootShell->windowTitle());
+        EditorPane *displayPane = rootShell->editorArea()->activePane();
+        check("path.display.tab-tooltip.relative",
+              displayPane != nullptr && displayPane->tabBar() != nullptr
+                  && displayPane->tabBar()->tabToolTip(displayPane->activeTabIndex())
+                         == QStringLiteral("rtl/foo.sv"),
+              displayPane != nullptr && displayPane->tabBar() != nullptr
+                  ? displayPane->tabBar()->tabToolTip(displayPane->activeTabIndex())
+                  : QStringLiteral("<no pane>"));
+        check("path.display.open-key-still-absolute",
+              displayPane != nullptr && displayPane->currentFilePath() == absoluteOf(underRoot),
+              displayPane != nullptr ? displayPane->currentFilePath() : QStringLiteral("<no pane>"));
+        check("path.display.outside-root.open", rootShell->openPaths({outsideRoot}, &displayError),
+              displayError);
+        pump();
+        check("path.display.window-title.outside-absolute",
+              rootShell->windowTitle().contains(absoluteOf(outsideRoot)),
+              rootShell->windowTitle());
+        displayPane = rootShell->editorArea()->activePane();
+        check("path.display.tab-tooltip.outside-absolute",
+              displayPane != nullptr && displayPane->tabBar() != nullptr
+                  && displayPane->tabBar()->tabToolTip(displayPane->activeTabIndex())
+                         == absoluteOf(outsideRoot),
+              displayPane != nullptr && displayPane->tabBar() != nullptr
+                  ? displayPane->tabBar()->tabToolTip(displayPane->activeTabIndex())
+                  : QStringLiteral("<no pane>"));
+
+        // 2) A runtime switch is exactly ONE broadcast, and the new root is what
+        //    the status bar/title and the next archive carry.
+        QStringList broadcast;
+        QObject::connect(rootShell.get(), &ApplicationShell::projectRootChanged,
+                         rootShell.get(),
+                         [&broadcast](const QString &root) { broadcast.append(root); });
+        rootShell->show();
+        pump();
+        rootShell->setProjectRoot(projectB);
+        pump();
+        check("root.switch-broadcast", broadcast == QStringList{projectB},
+              broadcast.join(QLatin1Char(',')));
+        check("root.switch-value", rootShell->projectRoot() == projectB,
+              rootShell->projectRoot());
+        check("root.switch-label", rootShell->projectLabel() == QFileInfo(projectB).fileName(),
+              rootShell->projectLabel());
+        // The same root again is not a second event: a panel that re-reports the
+        // root it was just given must not loop the broadcast.
+        rootShell->setProjectRoot(projectB);
+        pump();
+        check("root.switch-idempotent", broadcast.size() == 1,
+              QStringLiteral("events=%1").arg(broadcast.size()));
+
+        // 3) File > Open Folder is the user entry point and goes through the SAME
+        //    path. Only the modal dialog is replaced by the probe seam.
+        QAction *openFolder = rootShell->commands()->action(QStringLiteral("file.open-folder"));
+        check("root.open-folder-command", openFolder != nullptr);
+        bool openFolderInFileMenu = false;
+        for (QAction *topLevel : rootShell->menuBar()->actions()) {
+            QMenu *menu = topLevel != nullptr ? topLevel->menu() : nullptr;
+            if (menu != nullptr && menu->actions().contains(openFolder)) {
+                openFolderInFileMenu = true;
+            }
+        }
+        check("root.open-folder-menu", openFolderInFileMenu);
+        rootShell->setOpenFolderDialogProvider([projectA]() { return projectA; });
+        if (openFolder != nullptr) {
+            openFolder->trigger();
+        }
+        pump();
+        check("root.open-folder-switches", rootShell->projectRoot() == projectA,
+              rootShell->projectRoot());
+        check("root.open-folder-broadcast",
+              broadcast.size() == 2 && broadcast.last() == projectA,
+              QStringLiteral("events=%1").arg(broadcast.size()));
+        // A cancelled dialog changes nothing at all (no write, no broadcast).
+        rootShell->setOpenFolderDialogProvider([]() { return QString(); });
+        if (openFolder != nullptr) {
+            openFolder->trigger();
+        }
+        pump();
+        check("root.open-folder-cancel",
+              rootShell->projectRoot() == projectA && broadcast.size() == 2,
+              QStringLiteral("events=%1").arg(broadcast.size()));
+
+        // 4) The switched root is what the next session archive persists, so the
+        //    next ordinary start comes back to it.
+        QString rootSaveError;
+        check("root.switch.persisted", rootShell->saveSession(&rootSaveError), rootSaveError);
+        QFile rootArchiveFile(rootStateDir + QStringLiteral("/session.json"));
+        QJsonObject rootArchiveJson;
+        if (rootArchiveFile.open(QIODevice::ReadOnly)) {
+            rootArchiveJson = QJsonDocument::fromJson(rootArchiveFile.readAll()).object();
+        }
+        check("root.switch.persisted-value",
+              rootArchiveJson.value(QStringLiteral("project")).toString() == projectA);
+    }
 
     std::printf("APP-SHELL-SELFTEST ok=%d checks=%d failures=%d state=%s\n",
                 g_failures == 0 ? 1 : 0, g_checks, g_failures, qPrintable(stateDir));
@@ -1356,6 +1763,64 @@ int captureScreenshots(const QString &directory)
 
 } // namespace
 
+namespace {
+
+#if defined(VEDIT_HAVE_APPEARANCE_SETTINGS)
+// UX batch 2 / A4: `--state-dir` must be known BEFORE the QApplication is
+// constructed (the interface scale is applied through the environment at that
+// moment), but QCommandLineParser itself needs the application object. This is
+// the smallest possible pre-scan: exactly the one option, no validation, no
+// side effects. The parser later reads the same value the normal way.
+QString stateDirArgument(int argc, char **argv)
+{
+    static constexpr char kOption[] = "--state-dir";
+    constexpr int kOptionLength = sizeof(kOption) - 1;
+    for (int index = 1; index < argc; ++index) {
+        if (std::strncmp(argv[index], kOption, kOptionLength) == 0) {
+            if (argv[index][kOptionLength] == '\0') {
+                return index + 1 < argc ? QString::fromLocal8Bit(argv[index + 1]) : QString();
+            }
+            if (argv[index][kOptionLength] == '=') {
+                return QString::fromLocal8Bit(argv[index] + kOptionLength + 1);
+            }
+        }
+    }
+    return QString();
+}
+
+// UX batch 2 / A4: where the STARTUP appearance read looks for settings.toml.
+// With `--state-dir` the answer is exact. Without it, the store lives at Qt's
+// AppConfigLocation, which is only computable AFTER the QApplication exists (it
+// embeds the organization/application names main() sets at that point) — so the
+// same location is spelled out here for the pre-QApplication read, and the first
+// EXISTING candidate wins. An ordinary start (no settings file anywhere) simply
+// keeps the defaults, exactly like the store's own "missing file" rule.
+QStringList startupSettingsCandidates(const QString &stateDir)
+{
+    QStringList candidates;
+    candidates.append(vedit::app::i18n::settingsFilePath(stateDir));
+    if (stateDir.isEmpty()) {
+        const QString configHome = qEnvironmentVariable(
+            "XDG_CONFIG_HOME", QDir::homePath() + QStringLiteral("/.config"));
+        candidates.append(configHome
+                          + QStringLiteral("/VEdit/vedit-app/settings.toml"));
+    }
+    return candidates;
+}
+
+QString existingSettingsPath(const QStringList &candidates)
+{
+    for (const QString &candidate : candidates) {
+        if (QFileInfo::exists(candidate)) {
+            return candidate;
+        }
+    }
+    return candidates.value(0);
+}
+#endif // VEDIT_HAVE_APPEARANCE_SETTINGS
+
+} // namespace
+
 int main(int argc, char **argv)
 {
     // T134: Rust is STATICALLY LINKED into this C++ host (crates/vd-lsp drives
@@ -1370,37 +1835,53 @@ int main(int argc, char **argv)
     // Do not add SA_RESETHAND: the ignore must stay for the whole process.
     std::signal(SIGPIPE, SIG_IGN);
 
+    // UX batch 2 / A4: the interface scale is a RESTART switch — Qt reads
+    // QT_SCALE_FACTOR once, while the QApplication is being constructed — so the
+    // value has to be in the environment BEFORE the next statement. 100 % (the
+    // default) sets nothing and leaves an ambient HiDPI value alone.
+#if defined(VEDIT_HAVE_APPEARANCE_SETTINGS)
+    const QString startupSettingsPath =
+        existingSettingsPath(startupSettingsCandidates(stateDirArgument(argc, argv)));
+    vedit::workspace::settings::ui_scale::applyScaleEnvironment(
+        vedit::workspace::settings::ui_scale::readValues(startupSettingsPath).scalePercent);
+#endif
+
     QApplication app(argc, argv);
     QCoreApplication::setApplicationName(QStringLiteral("vedit-app"));
     QCoreApplication::setApplicationVersion(QStringLiteral("0.2.0"));
     QCoreApplication::setOrganizationName(QStringLiteral("VEdit"));
 
     QCommandLineParser parser;
-    parser.setApplicationDescription(QStringLiteral("VEdit application shell (Qt6/KTextEditor rewrite)."));
+    parser.setApplicationDescription(QCoreApplication::translate("VEdit", "VEdit application shell (Qt6/KTextEditor rewrite)."));
     parser.addHelpOption();
     parser.addVersionOption();
     parser.addPositionalArgument(QStringLiteral("file"),
                                  QStringLiteral("File(s) to open (each additional file gets a split)."),
                                  QStringLiteral("[file...]"));
     parser.addOption({QStringLiteral("state-dir"),
-                      QStringLiteral("Directory for session.json and shortcuts.json."),
+                      QCoreApplication::translate("VEdit", "Directory for session.json and shortcuts.json."),
                       QStringLiteral("dir")});
     parser.addOption({QStringLiteral("project"), QStringLiteral("Project root to display (optional)."),
                       QStringLiteral("dir")});
-    parser.addOption({QStringLiteral("theme"), QStringLiteral("KSyntaxHighlighting theme name."),
+    parser.addOption({QStringLiteral("theme"), QCoreApplication::translate("VEdit", "KSyntaxHighlighting theme name."),
                       QStringLiteral("name")});
     parser.addOption({QStringLiteral("selfcheck"),
                       QStringLiteral("Run non-interactive layout/theme/persistence checks and exit.")});
+    // UX batch 2 / A4: print the startup appearance line and exit, so a test can
+    // assert the RESTART path of `ui.scale_percent` (the QT_SCALE_FACTOR the next
+    // start really has) without running the whole shell self-check.
+    parser.addOption({QStringLiteral("ui-scale-echo"),
+                      QStringLiteral("Print the resolved UI-SCALE line and exit. Test-only.")});
     parser.addOption({QStringLiteral("selfcheck-ffi"),
                       QStringLiteral("Run the Rust C ABI checks against the vd-ffi smoke fixture "
                                      "(crates/vd-ffi/tests/fixtures/project) and exit."),
                       QStringLiteral("dir")});
     parser.addOption({QStringLiteral("screenshots"),
-                      QStringLiteral("Capture split-state screenshots into this directory and exit."),
+                      QCoreApplication::translate("VEdit", "Capture split-state screenshots into this directory and exit."),
                       QStringLiteral("dir")});
     parser.addOption({QStringLiteral("no-session-restore"),
-                      QStringLiteral("Ignore an existing session file at startup.")});
-    parser.addOption({QStringLiteral("hold"), QStringLiteral("Keep the window for this many ms."),
+                      QCoreApplication::translate("VEdit", "Ignore an existing session file at startup.")});
+    parser.addOption({QStringLiteral("hold"), QCoreApplication::translate("VEdit", "Keep the window for this many ms."),
                       QStringLiteral("ms"), QStringLiteral("0")});
     // T117: proves the crash reporter works on the SHIPPED binary (the ctest
     // `vedit-app-crash-report-shipped` runs exactly this). It raises before any
@@ -1410,6 +1891,52 @@ int main(int argc, char **argv)
                                      "(segv|abort|bus|fpe|ill) and exit. Test-only."),
                       QStringLiteral("signal")});
     parser.process(app);
+
+#if defined(VEDIT_HAVE_APPEARANCE_SETTINGS)
+    // UX batch 2 / A4, part 2: the font applies to the running application, and
+    // the format/lint configuration has to be in the process-wide holders before
+    // the shell can trigger a format or a project lint. Both values come from the
+    // SAME store the Preferences page writes (`<stateDir>/settings.toml`).
+    {
+        namespace settings = vedit::workspace::settings;
+        const QString settingsPath = existingSettingsPath(
+            startupSettingsCandidates(parser.value(QStringLiteral("state-dir"))));
+        settings::ui_scale::rememberStartupFont();
+        settings::ui_scale::applyFontPointSize(
+            settings::ui_scale::readValues(settingsPath).fontPointSize);
+        settings::SettingsClient client(settingsPath);
+        settings::Snapshot snapshot;
+        bool delivered = false;
+        client.load([&snapshot, &delivered](settings::Snapshot loaded) {
+            snapshot = std::move(loaded);
+            delivered = true;
+        });
+        // flush() pumps the store job; it is the same wait a restart-free
+        // Preferences reload does. A store that does not answer leaves the
+        // defaults in place — startup never fails over settings.
+        if (client.flush() && delivered && snapshot.completed) {
+            settings::setCurrentFormatValues(settings::formatValuesFromEntries(snapshot.entries));
+            settings::setCurrentLintValues(settings::lintValuesFromEntries(snapshot.entries));
+        }
+        // The restart path is observable from the OUTSIDE (the ctest runs the
+        // real binary): the line reports both the stored value and what the
+        // environment carries AFTER the QApplication was constructed.
+        const bool echoScale = parser.isSet(QStringLiteral("selfcheck"))
+            || parser.isSet(QStringLiteral("ui-scale-echo"));
+        if (echoScale) {
+            const QByteArray factor = qgetenv("QT_SCALE_FACTOR");
+            std::printf("UI-SCALE scale_percent=%d qt_scale_factor=%s font_point_size=%d "
+                        "settings=%s\n",
+                        settings::ui_scale::readValues(settingsPath).scalePercent,
+                        factor.isEmpty() ? "<unset>" : factor.constData(),
+                        QApplication::font().pointSize(), qPrintable(settingsPath));
+            std::fflush(stdout);
+        }
+        if (parser.isSet(QStringLiteral("ui-scale-echo"))) {
+            return 0; // the seam above is the whole job of this invocation
+        }
+    }
+#endif
 
     // Crash self-reporting is installed as early as possible: from here on a
     // SIGSEGV/SIGBUS/SIGFPE/SIGILL/SIGABRT writes $XDG_STATE_HOME/vedit/crash-*.log
@@ -1474,7 +2001,35 @@ int main(int argc, char **argv)
     // construction left every restored dock a shell placeholder (review M1 --
     // terminal and search). startSession() runs once the factories are ready.
     options.deferSessionRestore = true;
+
+    // T18/AC-4.1/AC-4.8: the interface language is installed BEFORE the shell is
+    // built, so menus, panel titles and dialog strings are created in the
+    // persisted language. Auto follows the system locale; a missing .qm is a
+    // diagnostic, never a failed start. The --selfcheck path above deliberately
+    // runs without a translator: its assertions are the English source strings.
+    {
+        const QString settingsPath = vedit::app::i18n::settingsFilePath(options.stateDir);
+        const vedit::app::i18n::InstallResult language =
+            vedit::app::i18n::installTranslations(settingsPath);
+        if (!language.diagnostic.isEmpty()) {
+            std::fprintf(stderr, "vedit-app: %s\n", qPrintable(language.diagnostic));
+        }
+    }
+
     ApplicationShell shell(options);
+    // AC-1.1 (batch 1): the shell resolved the workspace root in its constructor
+    // — from --project, else from the persisted session archive — BEFORE any
+    // lane registered a panel factory. Hand that ONE root to every lane through
+    // the options they already consume (Files / Search / VCS / project / module
+    // tree / palette / diagnostics), so no lane needs a second session peek and
+    // an ordinary start (no --project) shows the restored project everywhere.
+    options.projectRoot = shell.projectRoot();
+    // T18/AC-4.2: the Preferences page drives the one restart path through this
+    // handler; the shell owns the strict ordering (guard -> persist ->
+    // saveSession -> relaunch), so the dialog never touches shell internals.
+    vedit::app::i18n::setRestartHandler(
+        [&shell](const QString &tag, const vedit::app::i18n::PersistLanguage &persist,
+                 QString *error) { return shell.restartForLanguageChange(tag, persist, error); });
 #if defined(VEDIT_HAVE_EDIT_CORE)
     // Slice 1 (AC-S1.1): the product editor is the KTextEditor editing kernel.
     // A deferred start makes the restored panes use it directly (no re-creation
@@ -1487,7 +2042,7 @@ int main(int argc, char **argv)
     if (shell.commands() != nullptr) {
         vedit::app::CommandSpec spec;
         spec.id = QStringLiteral("view.treesitter");
-        spec.text = QStringLiteral("Use &tree-sitter parsing");
+        spec.text = QCoreApplication::translate("VEdit", "Use &tree-sitter parsing");
         spec.menu = QStringLiteral("view");
         spec.order = 90;
         spec.checkable = true;

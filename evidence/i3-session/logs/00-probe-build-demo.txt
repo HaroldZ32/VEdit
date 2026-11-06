@@ -1,0 +1,12 @@
+== probe build (mode=demo) ==
+evidence/i3-session/probe/session_restore_probe.cpp: In function ‘void {anonymous}::scenarioTolerance(const QString&)’:
+evidence/i3-session/probe/session_restore_probe.cpp:542:18: warning: ignoring return value of ‘virtual bool QFile::open(QIODeviceBase::OpenMode)’, declared with attribute ‘nodiscard’ [-Wunused-result]
+  542 |         file.open(QIODevice::WriteOnly | QIODevice::Truncate);
+      |         ~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/x86_64-linux-gnu/qt6/QtCore/qdir.h:11,
+                 from /usr/include/x86_64-linux-gnu/qt6/QtCore/QDir:1,
+                 from evidence/i3-session/probe/session_restore_probe.cpp:24:
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qfile.h:291:32: note: declared here
+  291 |     QFILE_MAYBE_NODISCARD bool open(OpenMode flags) override;
+      |                                ^~~~
+build exit=0

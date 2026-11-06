@@ -1,0 +1,5 @@
+# 03-before-assertions — AC-4.7-style assertion call-site count BEFORE deletion
+# cmd: grep -rnE 'check\(|QVERIFY2?\(|QCOMPARE\(|expect\(' --include=*.cpp --include=*.h src/ | wc -l
+2447
+# folding-lane-only files' share of it:
+10

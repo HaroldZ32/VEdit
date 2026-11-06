@@ -1,0 +1,17 @@
+# artifact (2026-11-02T07:36:33Z)
+-rwxr-xr-x 1 root root 11689440 Nov  2 07:36 /work/out/slang-server
+/work/out/slang-server: ELF 64-bit LSB executable, x86-64, version 1 (GNU/Linux), dynamically linked (uses shared libs), BuildID[sha1]=cbc5c6b27229a8ab2803192fdac41b3a95ab3c86, for GNU/Linux 2.6.32, stripped
+f691600fadc139110deed64663394daf740fa2f7d6ecbd663bd3944368df5c31  /work/out/slang-server
+## highest GLIBC symbol versions required:
+GLIBC_2.3.2
+GLIBC_2.4
+GLIBC_2.6
+GLIBC_2.14
+GLIBC_2.15
+GLIBC_2.17
+## ldd:
+	linux-vdso.so.1 =>  (0x00007d3cd5d52000)
+	libm.so.6 => /lib64/libm.so.6 (0x00007d3cd56fe000)
+	libpthread.so.0 => /lib64/libpthread.so.0 (0x00007d3cd54e2000)
+	libc.so.6 => /lib64/libc.so.6 (0x00007d3cd5114000)
+	/lib64/ld-linux-x86-64.so.2 (0x00007d3cd5a00000)

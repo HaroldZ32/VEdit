@@ -1,0 +1,3 @@
+BUILD_EXIT=1
+[129/140] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/diagnostics_controller.cpp.o
+ninja: build stopped: subcommand failed.

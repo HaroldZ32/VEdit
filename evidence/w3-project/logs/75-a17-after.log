@@ -1,0 +1,15 @@
+--- a17-fixture: literal-dollar paths (1 file before A-17, 3 after)
+EXPANSION ok=1 root=/vedit-build/evidence/w3-project/a17-fixture files=3 skipped=0 missing=[]
+FILE /vedit-build/evidence/w3-project/a17-outside/out_dollar$.sv
+FILE /vedit-build/evidence/w3-project/a17-outside/out_tail.sv$
+FILE rtl/ok.sv
+--- a17-escape: $$ control (always 1 file)
+EXPANSION ok=1 root=/vedit-build/evidence/w3-project/a17-escape files=1 skipped=0 missing=[]
+FILE /vedit-build/evidence/w3-project/a17-escape-outside/escaped$.sv
+--- a17-missing: expanded + home paths that do not exist (kept + reported)
+EXPANSION ok=1 root=/vedit-build/evidence/w3-project/a17-missing files=3 skipped=0 missing=[]
+FILE rtl/missing_after_expansion.sv
+FILE ~nosuchuser/never_home.sv
+FILE rtl/ok.sv
+DIAG filelist.missing: /vedit-build/evidence/w3-project/a17-missing/project.f:2: entry `/vedit-build/evidence/w3-project/a17-missing/rtl/missing_after_expansion.sv` does not exist (after variable expansion); the path is kept so a generated file is picked up once it appears
+DIAG filelist.missing: /vedit-build/evidence/w3-project/a17-missing/project.f:3: entry `/vedit-build/evidence/w3-project/a17-missing/~nosuchuser/never_home.sv` does not exist (a leading `~` is only expanded as `~/`, so the `~` is literal); the path is kept so a generated file is picked up once it appears

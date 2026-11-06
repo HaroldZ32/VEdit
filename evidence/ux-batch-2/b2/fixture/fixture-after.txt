@@ -1,0 +1,25 @@
+=== a.v ===
+module a;
+  wire qux;
+  assign bar = qux + qux;
+endmodule
+
+=== b.sv ===
+assign qux = 1;
+assign qux = 2;
+
+=== c.sv ===
+qux
+qux_bar
+qux
+
+=== crlf.v ===
+qux
+qux
+
+=== notes.md ===
+qux in markdown
+
+=== unicode.v ===
+// 中文 qux 注释
+

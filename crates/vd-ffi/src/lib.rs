@@ -50,6 +50,7 @@
 #![allow(clippy::result_large_err)]
 
 pub mod capi;
+pub mod catalog;
 pub mod deeplint;
 pub mod fim;
 pub mod lsp;

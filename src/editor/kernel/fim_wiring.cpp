@@ -1,4 +1,5 @@
 #include "fim_wiring.h"
+#include <QCoreApplication>
 
 #include "fim_backend.h"
 #include "fim_inline_completion.h"
@@ -52,7 +53,7 @@ FimBinding::FimBinding(KTextEditor::View *view, QObject *parent)
     ghostFont.setItalic(true);
     ghost_->setFont(ghostFont);
     ghost_->hide();
-    ghost_->setToolTip(QStringLiteral(
+    ghost_->setToolTip(QCoreApplication::translate("VEdit", 
         "FIM ghost text: previews the first line only; Tab inserts the full suggestion."));
 
     pollTimer_ = new QTimer(this);
@@ -278,7 +279,7 @@ void FimBinding::pollJob()
             pollTimer_->stop();
             hideGhost();
             removeAcceptShortcuts();
-            timeoutStatus_ = QStringLiteral("FIM 超时（%1 ms 无结果，已取消）").arg(pollBudgetMs_);
+            timeoutStatus_ = QCoreApplication::translate("VEdit", "FIM timed out (%1 ms without a result; cancelled)").arg(pollBudgetMs_);
             emit suggestionChanged(false);
         }
         return;

@@ -1,0 +1,7 @@
+== /proc/self/exe when run via the AppDir loader ==
+/w/packaging/runtime/out/AppDir/ld-linux-x86-64.so.2
+READLINK_EXIT=0
+== argv check via sh ==
+argv0=/bin/sh
+/usr/bin/readlink
+SH_EXIT=0

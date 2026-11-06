@@ -12,6 +12,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QStatusBar>
+#include <QCoreApplication>
 
 namespace vedit::workspace {
 
@@ -35,6 +36,13 @@ PaletteIntegration *PaletteIntegration::install(vedit::app::ApplicationShell &sh
     }
     auto *integration = new PaletteIntegration(&shell); // owned by the shell
     integration->setProjectRoot(projectRoot);
+    // FIX 2 (F2): a runtime root switch (File > Open Folder, and the `.f` import
+    // that sets the filelist's directory as root) must rebind the shared index
+    // too; otherwise Ctrl+P keeps searching the old/empty root until restart.
+    // setRoot() drops the old snapshot and the next open walks the NEW root.
+    // The integration is the context, so the subscription dies with the lane.
+    QObject::connect(&shell, &vedit::app::ApplicationShell::projectRootChanged, integration,
+                     [integration](const QString &root) { integration->setProjectRoot(root); });
     integration->registerCommand();
     return integration;
 }
@@ -88,7 +96,7 @@ void PaletteIntegration::registerCommand()
 
     vedit::app::CommandSpec spec;
     spec.id = QStringLiteral("file.goto-file");
-    spec.text = QStringLiteral("&Go to File…");
+    spec.text = QCoreApplication::translate("VEdit", "&Go to File…");
     spec.menu = QStringLiteral("file");
     spec.defaultShortcut = QKeySequence(QStringLiteral("Ctrl+P"));
     spec.order = 25;
@@ -180,13 +188,13 @@ void PaletteIntegration::openInEditor(const QString &absolutePath)
 
     QString message;
     if (pane == nullptr) {
-        message = QStringLiteral("Cannot open %1: no active editor pane").arg(absolutePath);
+        message = QCoreApplication::translate("VEdit", "Cannot open %1: no active editor pane").arg(absolutePath);
     } else {
         QString paneError;
         if (pane->openFile(absolutePath, &paneError)) {
             message = QStringLiteral("Opened %1").arg(absolutePath);
         } else {
-            message = paneError.isEmpty() ? QStringLiteral("Cannot open %1").arg(absolutePath)
+            message = paneError.isEmpty() ? QCoreApplication::translate("VEdit", "Cannot open %1").arg(absolutePath)
                                           : paneError;
         }
     }

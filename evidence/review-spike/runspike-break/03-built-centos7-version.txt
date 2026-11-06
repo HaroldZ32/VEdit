@@ -1,0 +1,6 @@
+Unable to find image 'docker.m.daocloud.io/library/centos:no-such-tag-7' locally
+docker: Error response from daemon: error from registry: denied
+denied
+
+Run 'docker run --help' for more information
+exit=125

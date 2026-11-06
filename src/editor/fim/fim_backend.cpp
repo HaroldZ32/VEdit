@@ -7,6 +7,7 @@
 
 #if defined(VEDIT_FIM_HAVE_FFI)
 #include <vd_ffi.h>
+#include <QCoreApplication>
 #endif
 
 namespace vedit::editor::fim {
@@ -21,7 +22,7 @@ QString serviceError(VdService *service)
     if (service != nullptr && vd_service_error(service, &error) == 1) {
         return QString::fromUtf8(error.message);
     }
-    return QStringLiteral("the Rust service reported no detail");
+    return QCoreApplication::translate("VEdit", "the Rust service reported no detail");
 }
 
 // Production adapter. T106: the request path is job-based and NON-BLOCKING —
@@ -47,7 +48,7 @@ public:
         const quint64 token = start(prefix, suffix, &error);
         if (token == 0) {
             return Reply{Reply::State::Error,
-                         error.isEmpty() ? QStringLiteral("FIM 请求未被 Rust 服务接受") : error};
+                         error.isEmpty() ? QCoreApplication::translate("VEdit", "FIM request was not accepted by the Rust service") : error};
         }
         QElapsedTimer timer;
         timer.start();
@@ -67,7 +68,7 @@ public:
         }
         cancel(token);
         return Reply{Reply::State::Error,
-                     QStringLiteral("FIM 超时（%1 ms 无结果）").arg(kBlockingBudgetMs)};
+                     QCoreApplication::translate("VEdit", "FIM timed out (%1 ms without a result)").arg(kBlockingBudgetMs)};
     }
 
     quint64 start(const QString &prefix, const QString &suffix, QString *error) override
@@ -75,7 +76,7 @@ public:
         VdService *service = vd_service_create();
         if (service == nullptr) {
             if (error != nullptr) {
-                *error = QStringLiteral("FIM 服务不可用（无法创建 Rust 句柄）");
+                *error = QCoreApplication::translate("VEdit", "FIM service unavailable (could not create the Rust handle)");
             }
             return 0;
         }
@@ -87,7 +88,7 @@ public:
             const QString detail = serviceError(service);
             vd_service_destroy(service);
             if (error != nullptr) {
-                *error = QStringLiteral("FIM 请求未被 Rust 服务接受：%1").arg(detail);
+                *error = QCoreApplication::translate("VEdit", "FIM request was not accepted by the Rust service: %1").arg(detail);
             }
             return 0;
         }
@@ -123,10 +124,10 @@ public:
             }
         } else if (status == VD_STATUS_FAILED) {
             reply.state = AsyncReply::State::Error;
-            reply.text = QStringLiteral("FIM 失败：%1").arg(serviceError(it->service));
+            reply.text = QCoreApplication::translate("VEdit", "FIM failed: %1").arg(serviceError(it->service));
         } else {
             reply.state = AsyncReply::State::Error;
-            reply.text = QStringLiteral("FIM 轮询异常（state %1）").arg(status);
+            reply.text = QCoreApplication::translate("VEdit", "FIM poll failed (state %1)").arg(status);
         }
         vd_fim_result_free(&result);
         releaseToken(request);
@@ -174,7 +175,7 @@ QString backendDescription()
 #if defined(VEDIT_FIM_HAVE_FFI)
     return QStringLiteral("Rust service (vd_fim_complete -> vd-fim)");
 #else
-    return QStringLiteral("unavailable (no Rust service in this build)");
+    return QCoreApplication::translate("VEdit", "unavailable (no Rust service in this build)");
 #endif
 }
 

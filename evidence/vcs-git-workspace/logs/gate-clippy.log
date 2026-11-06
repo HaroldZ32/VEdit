@@ -1,0 +1,13 @@
+   Compiling getrandom v0.4.3
+   Compiling libc v0.2.191
+   Compiling rustix v1.1.6
+    Checking tempfile v3.27.0
+    Checking vd-deeplint v0.1.1 (/vedit-build/crates/vd-deeplint)
+    Checking vd-search v0.1.1 (/vedit-build/crates/vd-search)
+    Checking vd-vcs v0.1.1 (/vedit-build/crates/vd-vcs)
+    Checking vd-config v0.1.1 (/vedit-build/crates/vd-config)
+    Checking vd-settings v0.1.1 (/vedit-build/crates/vd-settings)
+    Checking vd-app v0.1.1 (/vedit-build/crates/vd-app)
+   Compiling cbindgen v0.29.4
+   Compiling vd-ffi v0.1.1 (/vedit-build/crates/vd-ffi)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 4.45s

@@ -1,0 +1,7 @@
+# gate: product selfcheck + lrelease (qt6 image)
+CHECK root.switch.persisted-value PASS
+APP-SHELL-SELFTEST ok=1 checks=290 failures=0 state=/tmp/vedit-app-UFCddz/state
+selfcheck_pipe=0
+Updating '/tmp/vedit.ts.qm'...
+    Generated 607 translation(s) (607 finished and 0 unfinished)
+lrelease=0

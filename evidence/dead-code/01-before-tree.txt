@@ -1,0 +1,16 @@
+# 01-before-tree — files under src/syntax/folding BEFORE deletion
+# cmd: find src/syntax/folding -type f | sort   (cwd /home/haroldzhao/MyProj/DshProj/VEdit, 2026-11-04T13:42:36+08:00)
+src/syntax/folding/CMakeLists.txt
+src/syntax/folding/fold_range.cpp
+src/syntax/folding/fold_range.h
+src/syntax/folding/fold_source.cpp
+src/syntax/folding/fold_source.h
+src/syntax/folding/ksyntax_fold_source.cpp
+src/syntax/folding/ksyntax_fold_source.h
+src/syntax/folding/README.md
+src/syntax/folding/syntax_fold_source.cpp
+src/syntax/folding/syntax_fold_source.h
+src/syntax/folding/tests/fold_native_gui_probe.cpp
+src/syntax/folding/tests/fold_native_probe.cpp
+src/syntax/folding/tests/syntax_directory_tests.cpp
+# file count: 13

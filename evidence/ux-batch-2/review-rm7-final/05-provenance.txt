@@ -1,0 +1,17 @@
+== source hashes (worktree) ==
+3aad0537b7cfe98c891640408e0eba9dfb5339dc367935407dfaba801fea2670  src/app/theme_manager.cpp
+1309c7c269203c74002a8cb341df86041c514b04a624de3de6affdd378666377  src/app/disabled_look_selftest.cpp
+cbcd2764bd8b51720d0673adf90e1892d3e06de6bfaf4a4ebd72cfd9806603c4  src/app/CMakeLists.txt
+== git HEAD theme_manager.cpp ==
+ec8b69a5e8ac407a3dbfc7b4a513fd29a553bfc33b6eaa66c3ae292efef69865  -
+== prefix file Disabled assignments ==
+0
+== build freshness ==
+2026-11-06 15:47:21.952738441 +0800 src/app/disabled_look_selftest.cpp
+2026-11-06 15:48:16.331169024 +0800 src/app/theme_manager.cpp
+2026-11-06 15:48:31.791078532 +0800 target/qt6-build/src/app/vedit-app-disabled-look-selftest
+== writer evidence hashes ==
+3e32d4da796d09327c7485f29074aa477bae3d8df2ff3b070db0ef4ac60d6901  evidence/ux-batch-2/rm7-disabled-look/README.md
+ecd56fa48d068af8e8c98f9c253752e905b2015d65fadf09bb31b2ceb03d81ee  evidence/ux-batch-2/rm7-disabled-look/logs/03-red-prefix-selftest.log
+b8b48861ac5ac2e40297c7610c789eeb7ce2db696676bc6f285ab5aec1de5190  evidence/ux-batch-2/rm7-disabled-look/logs/06-green-ctest-verbose.log
+73a02203acfd503530d1f4df8e8324b34b50d6c8484efb28cf7adb59dfd86014  evidence/ux-batch-2/rm7-disabled-look/logs/00-source-sha256.txt

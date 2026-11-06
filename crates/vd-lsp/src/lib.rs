@@ -48,6 +48,7 @@
 
 #![forbid(unsafe_code)]
 
+mod backend;
 mod client;
 mod config;
 mod diagnostics;
@@ -56,6 +57,10 @@ mod edits;
 mod position;
 mod session;
 
+pub use backend::{
+    capabilities, capabilities_from_server, filelist_text, ActionSupport, BackendCapabilities,
+    CapabilityBasis, LspAction, LspBackend, Support,
+};
 pub use client::{CancelHandle, CancelToken, LspClient, MAX_RESTARTS};
 pub use config::LspConfig;
 pub use diagnostics::{diagnostic_rule, DiagnosticsSnapshot, PublishedDiagnostics};
@@ -68,9 +73,10 @@ pub use lsp_types::Location as SessionLocation;
 pub use lsp_types::Range as SessionRange;
 
 pub use session::{
-    range_parts, severity_code, PollOutcome, SessionDiagnostic, SessionHandle, SessionPhase,
-    SessionRequest, SessionResponse, SessionStatus, SkippedFile, SymbolNode, WorkspaceTextEdit,
-    DEFAULT_DIAGNOSTICS_BUDGET, DEFAULT_STOP_BUDGET, DEFAULT_TAB_SIZE,
+    range_parts, severity_code, HoverResult, PollOutcome, SessionDiagnostic, SessionHandle,
+    SessionPhase, SessionRequest, SessionResponse, SessionStatus, SignatureHelpResult,
+    SignatureInfo, SkippedFile, SymbolNode, WorkspaceTextEdit, DEFAULT_DIAGNOSTICS_BUDGET,
+    DEFAULT_STOP_BUDGET, DEFAULT_TAB_SIZE,
 };
 
 /// Version of this crate, from its manifest.

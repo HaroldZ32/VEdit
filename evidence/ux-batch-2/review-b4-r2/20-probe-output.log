@@ -1,0 +1,57 @@
+kf.sonnet.core: Sonnet: No speller backends available!
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+CHECK setup.pane-a PASS
+CHECK setup.open-a PASS
+CHECK setup.pane-b PASS
+CHECK setup.open-b PASS
+CHECK setup.a-active PASS
+CHECK setup.view-b PASS
+CHECK setup.inner-widget PASS
+MATH viewPoint=60,15 targetPoint=14,14 roundTrip=60,15 delta=46,1 (KateViewInternal)
+CHECK r1.inner-and-view-space-differ PASS
+CHECK r1.mapping-round-trips PASS
+RECORDER press receiver=KateViewInternal activeAtPress=pane-2
+ACTION action=definition dispatched=1 via='diagnostics.definition'
+HANDLER active=pane-2 file=/tmp/b4-r2-probe-b.sv caret=1:2
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK r3.recorder-saw-press PASS
+CHECK r3.pane-activated-before-object-filter PASS
+CHECK r3.press-receiver-is-inner-widget PASS
+CHECK r3.action-triggered PASS
+CHECK r3.handler-reads-clicked-pane PASS
+CHECK r3.handler-reads-clicked-file PASS
+CHECK r3.handler-reads-clicked-caret PASS
+CHECK r1.clicked-caret-is-the-clicked-position PASS
+CHECK r3.other-pane-caret-untouched PASS
+CHECK r2.setup-three-cursors PASS
+RECORDER press receiver=KateViewInternal activeAtPress=pane-2
+ACTION action=definition dispatched=1 via='diagnostics.definition'
+HANDLER active=pane-2 file=/tmp/b4-r2-probe-b.sv caret=1:2
+CHECK r2.ctrl-click-collapses-to-one PASS
+CHECK r2.ctrl-click-caret PASS
+CHECK r2.ctrl-click-dispatched PASS
+CHECK r2.refusal.setup-three-cursors PASS
+RECORDER press receiver=KateViewInternal activeAtPress=pane-2
+DEFINITION-CLICK unavailable=1 reason='probe: definition backend went away'
+This plugin does not support propagateSizeHints()
+CHECK r2.refusal.no-dispatch PASS
+CHECK r2.refusal.plain-click-collapses PASS
+CHECK r4.first-reason-shown PASS
+RECORDER press receiver=KateViewInternal activeAtPress=pane-2
+CHECK r4.same-reason-one-time PASS
+CHECK r4.restored PASS
+RECORDER press receiver=KateViewInternal activeAtPress=pane-2
+DEFINITION-CLICK unavailable=1 reason='probe: definition backend went away'
+CHECK r4.same-reason-shown-after-rearm PASS
+RECORDER press receiver=KateViewInternal activeAtPress=pane-2
+DEFINITION-CLICK unavailable=1 reason='probe: a different definition reason'
+CHECK r4.changed-reason-shown PASS
+RECORDER press receiver=KateViewInternal activeAtPress=pane-2
+CHECK r4.changed-reason-one-time PASS
+CHECK r3.clicked-pane-still-active PASS
+CHECK r3.dispatches-from-clicked-channel PASS
+SUMMARY checks=33 failures=0

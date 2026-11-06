@@ -1,0 +1,80 @@
+== version ==
+git version 2.53.0
+== stash save positional ==
+Saved working directory and index state On master: msg one
+rc=0
+== stash list --format ==
+stash@{0}	42a1a8c74707ad2b6ee0e6b282ebabf3f1ec1eea	On master: msg one
+rc=0
+== stash pop ==
+no changes added to commit (use "git add" and/or "git commit -a")
+Dropped refs/stash@{0} (42a1a8c74707ad2b6ee0e6b282ebabf3f1ec1eea)
+pop rc=0
+== stash save -- leading-dash msg ==
+Saved working directory and index state On master: -- -m looks like an option
+rc=0
+== stash list after ==
+stash@{0}	d28ca09058be6050db58d02ecade77cf9c61e506	On master: -- -m looks like an option
+rc=0
+== stash apply stash@{0} ==
+
+no changes added to commit (use "git add" and/or "git commit -a")
+apply rc=0
+== stash drop stash@{0} ==
+Dropped stash@{0} (d28ca09058be6050db58d02ecade77cf9c61e506)
+rc=0
+== stash save (no msg) ==
+Saved working directory and index state WIP on master: f9a680d init
+rc=0
+== stash pop (final) ==
+Dropped refs/stash@{0} (4666244b88d98c1aed169e50b65ec5308b0a1c4f)
+pop rc=0
+== worktree list (one) ==
+/tmp/probe2/repo f9a680d [master]
+rc=0
+== worktree add <path> <branch> ==
+Preparing worktree (detached HEAD f9a680d)
+HEAD is now at f9a680d init
+rc=0
+== worktree add named branch ==
+Preparing worktree (new branch 'feature/wt2')
+HEAD is now at f9a680d init
+rc=0
+== worktree list (three, spaced path) ==
+Preparing worktree (new branch 'feature/spaced')
+/tmp/probe2/repo          f9a680d [master]
+/tmp/probe2/wt with space f9a680d [feature/spaced]
+/tmp/probe2/wt-1          f9a680d (detached HEAD)
+/tmp/probe2/wt-2          f9a680d [feature/wt2]
+rc=0
+== worktree remove dirty ==
+fatal: '../wt-1' contains modified or untracked files, use --force to delete it
+rc=128
+== worktree remove clean ==
+rc=0
+== worktree remove clean spaced ==
+rc=0
+== worktree list (one again) ==
+/tmp/probe2/repo f9a680d [master]
+/tmp/probe2/wt-1 f9a680d (detached HEAD)
+== worktree remove missing ==
+fatal: '../nope' is not a working tree
+rc=128
+== submodule add local, no protocol config ==
+Cloning into '/tmp/probe2/repo/sub'...
+fatal: transport 'file' not allowed
+fatal: clone of '/tmp/probe2/sub' into submodule path '/tmp/probe2/repo/sub' failed
+rc=128
+== submodule update --init (no protocol config) ==
+rc=0
+== with protocol.file.allow=always in superproject ==
+Cloning into '/tmp/probe2/repo/sub2'...
+fatal: transport 'file' not allowed
+fatal: clone of '/tmp/probe2/sub' into submodule path '/tmp/probe2/repo/sub2' failed
+rc=128
+rc=0
+== submodule status ==
+rc=0
+== submodule init on fresh clone ==
+rc=0
+rc=0

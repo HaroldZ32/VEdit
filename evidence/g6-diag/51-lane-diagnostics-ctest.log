@@ -1,0 +1,17 @@
+Test project /vedit-build/target/qt6-build
+    Start 31: vedit-lint-orchestration-probe
+1/6 Test #31: vedit-lint-orchestration-probe .........   Passed    0.02 sec
+    Start 32: vedit-workspace-diagnostics-selftest
+2/6 Test #32: vedit-workspace-diagnostics-selftest ...   Passed    1.82 sec
+    Start 33: vedit-toolchain-missing-selftest
+3/6 Test #33: vedit-toolchain-missing-selftest .......   Passed    0.01 sec
+    Start 34: vedit-diagnostics-ffi-selftest
+4/6 Test #34: vedit-diagnostics-ffi-selftest .........   Passed    3.23 sec
+    Start 35: vedit-diagnostics-product-seam
+5/6 Test #35: vedit-diagnostics-product-seam .........   Passed    6.47 sec
+    Start 36: vedit-toolchain-ux-selftest
+6/6 Test #36: vedit-toolchain-ux-selftest ............   Passed    3.13 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Total Test time (real) =  14.68 sec

@@ -1,0 +1,50 @@
+KTextEditor actions: 114
+desktop-global sequences: 17
+
+sequence               command id                   editor owner(s)                                    verdict
+F12                    diagnostics.definition       FREE                                               free
+Ctrl+Shift+F           diagnostics.format           FREE                                               free
+Shift+F12              diagnostics.references       FREE                                               free
+F2                     diagnostics.rename           FREE                                               free
+Ctrl+Shift+Z           edit.redo                    edit_redo (Re&do)                                  TAKEN OVER by the shell
+Ctrl+Z                 edit.undo                    edit_undo (&Undo)                                  TAKEN OVER by the shell
+Ctrl+W                 file.close-pane              FREE                                               free
+Ctrl+P                 file.goto-file               file_print (&Print…)                               TAKEN OVER by the shell
+Ctrl+N                 file.new                     FREE                                               free
+Ctrl+Alt+N             file.new-layout              FREE                                               free
+Ctrl+O                 file.open                    FREE                                               free
+Ctrl+Alt+Shift+O       file.open-folder             FREE                                               free
+Ctrl+Q                 file.quit                    FREE                                               free
+Ctrl+S                 file.save                    file_save (&Save)                                  TAKEN OVER by the shell
+Ctrl+Alt+Shift+S       file.save-all                FREE                                               free
+Ctrl+Shift+S           file.save-as                 file_save_as (Save &As…)                           TAKEN OVER by the shell
+Ctrl+Alt+Shift+P       file.switch-project          FREE                                               free
+F1                     help.user-manual             FREE                                               free
+Ctrl+Alt+Shift+F       search.focus                 FREE                                               free
+Ctrl+,                 settings.preferences         FREE                                               free
+F6                     view.focus.next              FREE                                               free
+Ctrl+Alt+M             view.layout.mixed            FREE                                               free
+Ctrl+Alt+R             view.layout.reset            FREE                                               free
+Ctrl+Alt+Shift+D       view.panel.diagnostics       FREE                                               free
+Ctrl+Alt+F             view.panel.file-tree         FREE                                               free
+Ctrl+Alt+O             view.panel.outline           FREE                                               free
+Ctrl+Alt+S             view.panel.search            FREE                                               free
+Ctrl+Alt+J             view.panel.terminal          FREE                                               free
+Ctrl+Alt+C             view.panel.vcs               FREE                                               free
+Ctrl+Alt+H             view.split.horizontal        FREE                                               free
+Ctrl+Shift+V           view.split.vertical          FREE                                               free
+Ctrl+Tab               view.tab.next                FREE                                               free
+Ctrl+Shift+Tab         view.tab.previous            FREE                                               free
+Ctrl+Alt+Shift+T       view.toolbar                 FREE                                               free
+Alt+Shift+F            diagnostics.format (extra)   FREE                                               free
+Ctrl+Y                 edit.redo (extra)            FREE                                               free
+
+collisions: 5 -> Ctrl+P, Ctrl+S, Ctrl+Shift+S, Ctrl+Shift+Z, Ctrl+Z
+all collisions are in the taken-over set: yes
+
+sequences the OLD manual used, owned by the editor, now avoided:
+  Ctrl+Alt+V       -> switch_next_input_mode (Switch to Next Input Mode)
+  Ctrl+Shift+H     -> edit_find_selected_backwards (Find Selected Backwards)
+
+SUMMARY checked=36 failures=0
+exit=0

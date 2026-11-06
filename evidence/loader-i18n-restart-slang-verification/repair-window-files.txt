@@ -1,0 +1,24 @@
+== repair-window product/source files ==
+crates/vd-deeplint/src/binary.rs
+crates/vd-deeplint/src/hierarchy.rs
+crates/vd-deeplint/src/lib.rs
+crates/vd-deeplint/src/service.rs
+crates/vd-deeplint/tests/fake_binary.rs
+crates/vd-deeplint/tests/hierarchy.rs
+docs/USER_GUIDE.md
+packaging/runtime/AppRun
+packaging/runtime/assemble-appdir.sh
+packaging/runtime/out/AppDir/AppRun
+packaging/runtime/out/AppDir/bin/translations/qtbase_zh_CN.qm
+packaging/runtime/out/AppDir/bin/translations/vedit_zh_CN.qm
+packaging/runtime/out/AppDir/bin/vd-app
+src/app/CMakeLists.txt
+src/app/i18n.cpp
+src/app/i18n.h
+src/app/i18n_selftest.cpp
+== hashes ==
+f614079ff3d40f23ed3b255660fc3029055343f1759d926133818ae0f696eb8b  target/qt6-build/src/app/vedit-app
+7c3a04a1b92d752a149a6fa6ce9b0d94783601dc1cb12698a9dda89cf7a6df87  packaging/runtime/out/AppDir/bin/vd-app
+63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  packaging/runtime/out/AppDir/bin/slang
+0481a9b92a6f0578400e960a7d5ee70217a6a450eaf7f98b7d32b8dbd0d58616  packaging/runtime/out/AppDir/bin/translations/qtbase_zh_CN.qm
+1c0a9e068cea51311bb4667d875430c9f42b54a3c6cc80a55d9b4f5ceea9c00e  packaging/runtime/out/AppDir/bin/translations/vedit_zh_CN.qm

@@ -1,0 +1,75 @@
+== AppDir syntax files ==
+total 36
+-rw-r--r-- 1 root root 3559 Nov  4 17:45 vedit-markdown.xml
+-rw-r--r-- 1 root root 5492 Nov  4 17:45 vedit-systemverilog.xml
+-rw-r--r-- 1 root root 7614 Nov  4 17:45 vedit-tcl.xml
+-rw-r--r-- 1 root root 5111 Nov  4 17:45 vedit-verilog.xml
+-rw-r--r-- 1 root root 6416 Nov  4 17:45 vedit-vhdl.xml
+== effective library ==
+	libKF6SyntaxHighlighting.so.6 => /vedit-build/target/a3-appdir/libonly/libKF6SyntaxHighlighting.so.6 (0x00007192c2de7000)
+== AppRun environment the packaged product exports ==
+XDG_DATA_DIRS=/vedit-build/target/a3-appdir/AppDir/usr/share
+XDG_DATA_HOME=/vedit-build/target/a3-appdir/AppDir/usr/share
+VEDIT_SYNTAX_DIR=/vedit-build/target/a3-appdir/AppDir/usr/share/org.kde.syntax-highlighting
+== offscreen loader assertion ==
+MODE-FACT mode=appdir share=/vedit-build/target/a3-appdir/AppDir/usr/share repository_definitions=6
+MODE-FACT repository.definitionForFileName(timing.sdc)='None'
+CHECK top.v PASS  got 'Verilog', expected 'Verilog'
+CHECK definition-valid.top.v PASS  mode 'Verilog'
+CHECK definition-parsed.top.v PASS  no definition named 'Verilog' parsed from /vedit-build/target/a3-appdir/AppDir/usr/share
+CHECK definition-shipped.top.v PASS  file='/vedit-build/target/a3-appdir/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml' author='VEdit'
+CHECK top.vh PASS  got 'Verilog', expected 'Verilog'
+CHECK definition-valid.top.vh PASS  mode 'Verilog'
+CHECK definition-parsed.top.vh PASS  no definition named 'Verilog' parsed from /vedit-build/target/a3-appdir/AppDir/usr/share
+CHECK definition-shipped.top.vh PASS  file='/vedit-build/target/a3-appdir/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml' author='VEdit'
+CHECK top.vlg PASS  got 'Verilog', expected 'Verilog'
+CHECK definition-valid.top.vlg PASS  mode 'Verilog'
+CHECK definition-parsed.top.vlg PASS  no definition named 'Verilog' parsed from /vedit-build/target/a3-appdir/AppDir/usr/share
+CHECK definition-shipped.top.vlg PASS  file='/vedit-build/target/a3-appdir/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml' author='VEdit'
+CHECK top.sv PASS  got 'SystemVerilog', expected 'SystemVerilog'
+CHECK definition-valid.top.sv PASS  mode 'SystemVerilog'
+CHECK definition-parsed.top.sv PASS  no definition named 'SystemVerilog' parsed from /vedit-build/target/a3-appdir/AppDir/usr/share
+CHECK definition-shipped.top.sv PASS  file='/vedit-build/target/a3-appdir/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-systemverilog.xml' author='VEdit'
+CHECK top.svh PASS  got 'SystemVerilog', expected 'SystemVerilog'
+CHECK definition-valid.top.svh PASS  mode 'SystemVerilog'
+CHECK definition-parsed.top.svh PASS  no definition named 'SystemVerilog' parsed from /vedit-build/target/a3-appdir/AppDir/usr/share
+CHECK definition-shipped.top.svh PASS  file='/vedit-build/target/a3-appdir/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-systemverilog.xml' author='VEdit'
+CHECK mod.vhd PASS  got 'VHDL', expected 'VHDL'
+CHECK definition-valid.mod.vhd PASS  mode 'VHDL'
+CHECK definition-parsed.mod.vhd PASS  no definition named 'VHDL' parsed from /vedit-build/target/a3-appdir/AppDir/usr/share
+CHECK definition-shipped.mod.vhd PASS  file='/vedit-build/target/a3-appdir/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-vhdl.xml' author='VEdit'
+CHECK mod.vhdl PASS  got 'VHDL', expected 'VHDL'
+CHECK definition-valid.mod.vhdl PASS  mode 'VHDL'
+CHECK definition-parsed.mod.vhdl PASS  no definition named 'VHDL' parsed from /vedit-build/target/a3-appdir/AppDir/usr/share
+CHECK definition-shipped.mod.vhdl PASS  file='/vedit-build/target/a3-appdir/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-vhdl.xml' author='VEdit'
+CHECK notes.md PASS  got 'Markdown', expected 'Markdown'
+CHECK definition-valid.notes.md PASS  mode 'Markdown'
+CHECK definition-parsed.notes.md PASS  no definition named 'Markdown' parsed from /vedit-build/target/a3-appdir/AppDir/usr/share
+CHECK definition-shipped.notes.md PASS  file='/vedit-build/target/a3-appdir/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-markdown.xml' author='VEdit'
+CHECK doc.markdown PASS  got 'Markdown', expected 'Markdown'
+CHECK definition-valid.doc.markdown PASS  mode 'Markdown'
+CHECK definition-parsed.doc.markdown PASS  no definition named 'Markdown' parsed from /vedit-build/target/a3-appdir/AppDir/usr/share
+CHECK definition-shipped.doc.markdown PASS  file='/vedit-build/target/a3-appdir/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-markdown.xml' author='VEdit'
+CHECK run.tcl PASS  got 'Tcl', expected 'Tcl'
+CHECK definition-valid.run.tcl PASS  mode 'Tcl'
+CHECK definition-parsed.run.tcl PASS  no definition named 'Tcl' parsed from /vedit-build/target/a3-appdir/AppDir/usr/share
+CHECK definition-shipped.run.tcl PASS  file='/vedit-build/target/a3-appdir/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-tcl.xml' author='VEdit'
+CHECK timing.sdc PASS  got 'Tcl', expected 'Tcl'
+CHECK definition-valid.timing.sdc PASS  mode 'Tcl'
+CHECK definition-parsed.timing.sdc PASS  no definition named 'Tcl' parsed from /vedit-build/target/a3-appdir/AppDir/usr/share
+CHECK definition-shipped.timing.sdc PASS  file='/vedit-build/target/a3-appdir/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-tcl.xml' author='VEdit'
+CHECK pins.xdc PASS  got 'Tcl', expected 'Tcl'
+CHECK definition-valid.pins.xdc PASS  mode 'Tcl'
+CHECK definition-parsed.pins.xdc PASS  no definition named 'Tcl' parsed from /vedit-build/target/a3-appdir/AppDir/usr/share
+CHECK definition-shipped.pins.xdc PASS  file='/vedit-build/target/a3-appdir/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-tcl.xml' author='VEdit'
+CHECK table-first.sdc-only-in-table PASS
+MODE-FACT fallback decoy absent (AppDir share): probeMode=''
+CHECK fallback.unknown-extension-stays-empty PASS
+CHECK unknown-extension-empty PASS
+CHECK document.created PASS
+CHECK document.applied PASS
+CHECK document.highlighting-mode PASS  VHDL
+MODE-FACT vhdl formats=16 folds=2/1
+CHECK document.formats PASS  16
+HIGHLIGHT-MODE-SELFTEST mode=appdir checks=56 failures=0
+=== APPDIR RUN EXIT: 0 ===

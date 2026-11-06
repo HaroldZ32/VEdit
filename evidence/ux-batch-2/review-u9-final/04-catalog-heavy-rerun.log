@@ -1,0 +1,7 @@
+
+running 1 test
+big-catalog: files=1176 modules=1176 tops=118 service_elapsed_ms=12182 slang_peak_rss_kb=3350172 self_peak_rss_kb=12740 wall_ms=12317 warning=Some("the elaborated AST JSON is 1160 MiB (over the 256 MiB size threshold); the project has 1176 files (limit 1000): the module tree may be slow") failure=None
+test the_1176_file_design_yields_a_full_catalog ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 9 filtered out; finished in 12.32s
+

@@ -1,0 +1,24 @@
+# cmd: grep -E "^(CHECK (path\.display|open\.filter|open\.signal)|APP-SHELL-SELFTEST)" logs/20-app-selfcheck.log
+CHECK path.display.under-root PASS rtl/top.sv
+CHECK path.display.under-root.normalized-root PASS
+CHECK path.display.outside-root PASS /tmp/vedit-app-BAPjJQ/display-outside/top.sv
+CHECK path.display.no-root PASS /tmp/vedit-app-BAPjJQ/display-outside/top.sv
+CHECK path.display.sibling-prefix-outside PASS
+CHECK path.display.root-itself-absolute PASS
+CHECK path.display.root-normalized PASS /tmp/vedit-app-BAPjJQ/display-root
+CHECK path.display.title.absolute-no-root PASS VEdit — /tmp/vedit-app-BAPjJQ/open-a.sv[*]
+CHECK path.display.tab-tooltip.absolute-no-root PASS /tmp/vedit-app-BAPjJQ/open-a.sv
+CHECK open.filter.filelist PASS Verilog/SystemVerilog/filelist (*.v *.sv *.svh *.vh *.f *.F *.flist);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F *.flist);;All Files (*)
+CHECK open.filter.keeps-existing-types PASS Verilog/SystemVerilog/filelist (*.v *.sv *.svh *.vh *.f *.F *.flist);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F *.flist);;All Files (*)
+CHECK open.signal.opens PASS
+CHECK open.signal.one-per-open PASS /tmp/vedit-app-BAPjJQ/open-a.sv,/tmp/vedit-app-BAPjJQ/open-b.sv
+CHECK open.signal.failed-open-silent PASS
+CHECK open.signal.direct-pane-open PASS
+CHECK path.display.under-root.open PASS
+CHECK path.display.window-title.relative PASS VEdit — rtl/foo.sv[*]
+CHECK path.display.tab-tooltip.relative PASS rtl/foo.sv
+CHECK path.display.open-key-still-absolute PASS /tmp/vedit-app-BAPjJQ/project-a/rtl/foo.sv
+CHECK path.display.outside-root.open PASS
+CHECK path.display.window-title.outside-absolute PASS VEdit — /tmp/vedit-app-BAPjJQ/outside/other.sv[*]
+CHECK path.display.tab-tooltip.outside-absolute PASS /tmp/vedit-app-BAPjJQ/outside/other.sv
+APP-SHELL-SELFTEST ok=1 checks=312 failures=0 state=/tmp/vedit-app-BAPjJQ/state

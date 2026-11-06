@@ -1,0 +1,51 @@
+=== jump binary direct run ===
+CHECK clear.after-clear-no-target PASS actual=1 expected=1
+CHECK clear.null-nullptr-safe PASS
+CHECK guard.delivered-while-alive PASS
+CHECK guard.dropped-after-destroy PASS
+DESTROYED-TARGET status=no-target file='rtl/gone.sv' (no crash)
+CHECK guard.after-destroy-no-target PASS
+CHECK guard.target-getter-null PASS
+CHECK status-name.no-target PASS
+CHECK status-name.invalid PASS
+CHECK status-name.delivered PASS
+CHECK status-name.rejected PASS
+SUMMARY checks=40 failures=0
+
+=== breadcrumb lane configure/build/ctest ===
+Test project /vedit-build/target/lane-breadcrumb
+    Start 1: vedit-breadcrumb-tests
+1/7 Test #1: vedit-breadcrumb-tests ...............   Passed    0.08 sec
+    Start 2: vedit-breadcrumb-click-tests
+2/7 Test #2: vedit-breadcrumb-click-tests .........   Passed    0.08 sec
+    Start 3: vedit-syntax-provider-tests
+3/7 Test #3: vedit-syntax-provider-tests ..........   Passed    0.00 sec
+    Start 4: vedit-syntax-product-tests
+4/7 Test #4: vedit-syntax-product-tests ...........   Passed    0.10 sec
+    Start 5: vedit-syntax-kde-data
+5/7 Test #5: vedit-syntax-kde-data ................   Passed    0.04 sec
+    Start 6: vedit-syntax-directory-equivalence
+6/7 Test #6: vedit-syntax-directory-equivalence ...   Passed    0.04 sec
+    Start 7: vedit-jump-tests
+7/7 Test #7: vedit-jump-tests .....................   Passed    0.01 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Total Test time (real) =   0.37 sec
+
+=== breadcrumb click test binary direct run ===
+CHECK noop.bar-has-no-target PASS
+BREADCRUMB-NO-TARGET segment=1 activated=0 status=no-target target-calls=3
+CHECK noop.status PASS
+CHECK noop.not-delivered PASS
+CHECK noop.no-new-delivery PASS actual=3 expected=3
+CHECK bar.empty-hidden PASS
+CHECK bar.empty-segments PASS actual=0 expected=0
+CHECK bar.empty-activate-false PASS
+CHECK bar.negative-activate-false PASS
+This plugin does not support propagateSizeHints()
+CHECK bar.rebuild.segments PASS actual=1 expected=1
+CHECK bar.rebuild.text PASS actual='m0' expected='m0'
+CHECK bar.rebuild.no-stale-segment PASS
+CHECK bar.rebuild.no-stale-separator PASS
+SUMMARY checks=35 failures=0

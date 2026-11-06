@@ -1,0 +1,78 @@
+Diff in /home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-ffi/src/vcs.rs:1317:
+     let root = PathBuf::from(root);
+     let path = path.to_string();
+     state.start(move || {
+-        Ok(JobValue::VcsHistoryBlame(Box::new(history_blame_data(&root, &path))))
++        Ok(JobValue::VcsHistoryBlame(Box::new(history_blame_data(
++            &root, &path,
++        ))))
+     })
+ }
+ 
+Diff in /home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-ffi/src/vcs.rs:1408:
+                 ));
+                 POLL_MISUSE
+             }
+-        }
++        },
+     }
+ }
+ 
+Diff in /home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-ffi/src/vcs.rs:1632:
+     // `c_str` borrows the caller's buffer: copy before it crosses into the job.
+     let root = PathBuf::from(root);
+     state.start(move || {
+-        Ok(JobValue::VcsWorkspace(Box::new(workspace_stashes_data(&root))))
++        Ok(JobValue::VcsWorkspace(Box::new(workspace_stashes_data(
++            &root,
++        ))))
+     })
+ }
+ 
+Diff in /home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-ffi/src/vcs.rs:1662:
+     };
+     let root = PathBuf::from(root);
+     state.start(move || {
+-        Ok(JobValue::VcsWorkspace(Box::new(workspace_worktrees_data(&root))))
++        Ok(JobValue::VcsWorkspace(Box::new(workspace_worktrees_data(
++            &root,
++        ))))
+     })
+ }
+ 
+Diff in /home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-ffi/tests/abi.rs:1365:
+             || vd_vcs_workspace_poll(service, job, &mut workspace),
+             Duration::from_secs(10),
+         );
+-        assert_eq!(state, -1, "a history job must not be read as a workspace listing");
++        assert_eq!(
++            state, -1,
++            "a history job must not be read as a workspace listing"
++        );
+         vd_vcs_workspace_free(&mut workspace);
+ 
+         // A workspace job through the HISTORY poll.
+Diff in /home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-ffi/tests/abi.rs:1376:
+             || vd_vcs_history_poll(service, job, &mut history),
+             Duration::from_secs(10),
+         );
+-        assert_eq!(state, -1, "a workspace job must not be read as a history result");
++        assert_eq!(
++            state, -1,
++            "a workspace job must not be read as a history result"
++        );
+         vd_vcs_history_free(&mut history);
+ 
+         // A workspace job through the INFO poll, and an info job through the
+Diff in /home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-ffi/tests/abi.rs:1398:
+             || vd_vcs_history_poll(service, job, &mut history),
+             Duration::from_secs(10),
+         );
+-        assert_eq!(state, -1, "an identity job must not be read as a history result");
++        assert_eq!(
++            state, -1,
++            "an identity job must not be read as a history result"
++        );
+         vd_vcs_history_free(&mut history);
+         vd_service_destroy(service);
+     }

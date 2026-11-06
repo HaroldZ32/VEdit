@@ -1,0 +1,171 @@
+# AC-3.3 Git write E2E (lane selftest, real git)
+collected_at: 2026-11-03T15:59:17+00:00
+cwd=/tmp
+fixture_root=/tmp/vedit-vcs-write-EG3Hg0  (every repository the probe uses is created under it)
+git=git version 2.53.0
+binary_sha256=c318cd7b1544e58abbba95bce272b0b990280a4976db7db48a625840999af873
+
+WORKSPACE-VCS-SELFTEST start
+CHECK vcs.panel.empty-state.backend-none PASS No repository
+CHECK vcs.panel.empty-state.header PASS No repository
+CHECK vcs.panel.empty-state.note-visible PASS not a Git or Subversion working tree
+
+Open a directory that is a Git or Subversi
+CHECK vcs.panel.empty-state.no-files PASS
+CHECK vcs.panel.empty-state.stub-queried PASS calls=1
+CHECK vcs.panel.empty-state.no-write-attempt PASS
+CHECK vcs.panel.git.backend PASS Git feature/vcs-panel @ abc1234 · 2 changed file(s)
+CHECK vcs.panel.git.branch-and-revision PASS Git feature/vcs-panel @ abc1234 · 2 changed file(s)
+CHECK vcs.panel.git.changed-file-count PASS rows=2
+CHECK vcs.panel.git.file-row PASS rtl/top.sv  modified
+CHECK vcs.panel.git.added-row PASS rtl/added.sv  added
+CHECK vcs.panel.git.empty-state-hidden PASS
+CHECK vcs.panel.diff.shown PASS diff --git a/rtl/top.sv b/rtl/top.sv
+--- a/rtl/top.sv
++++ b/rtl/top.sv
+@@ -1 +1 @@
+-module
+CHECK vcs.panel.diff.read-only PASS
+CHECK vcs.panel.diff.missing-is-a-note PASS rtl/missing.sv: stub has no diff for this path
+CHECK vcs.panel.diff.no-write-attempt PASS calls=4
+CHECK vcs.panel.svn.backend-and-revision PASS Subversion trunk @ 42 · 1 changed file(s)
+CHECK vcs.panel.svn.file-count PASS Subversion trunk @ 42 · 1 changed file(s)
+CHECK vcs.panel.no-source.empty-state PASS No repository
+CHECK vcs.panel.refresh.empty-stays-empty PASS
+CHECK vcs.panel.refresh.populates PASS
+CHECK vcs.ffi.service PASS
+CHECK vcs.ffi.info.start PASS
+CHECK vcs.ffi.info-empty-state PASS not a Git or Subversion working tree
+CHECK vcs.ffi.diff.start PASS
+CHECK vcs.ffi.diff-empty-state PASS not a repository
+CHECK vcs.ffi.invalid-root-rejected PASS
+CHECK vcs.ffi.write.unknown-op-refused PASS
+CHECK vcs.ffi.write.unknown-op-typed-error PASS
+CHECK vcs.ffi.write.null-request-refused PASS
+CHECK vcs.ffi.write.temp-dir PASS
+CHECK vcs.ffi.write.listed-op-starts-a-job PASS
+CHECK vcs.ffi.write.norepo-default-deny PASS
+CHECK vcs.ffi.write.norepo-typed-error PASS
+CHECK vcs.ffi.write.poll-null-out-misuse PASS
+CHECK vcs.ffi.write.free-null-safe PASS
+CHECK vcs.read.compat.git-available PASS /usr/bin/git
+CHECK vcs.read.compat.fixture PASS
+CHECK vcs.read.compat.fixture-committed PASS
+CHECK vcs.read.compat.second-repo PASS
+CHECK vcs.read.compat.service PASS
+CHECK vcs.read.compat.status PASS state=1 branch=master count=1 path=rtl/a.sv
+CHECK vcs.read.compat.cwd-isolation PASS state=1 count=1 path=rtl/b.sv
+CHECK vcs.read.compat.info PASS 15b1f58
+CHECK vcs.read.compat.diff PASS diff --git a/rtl/a.sv b/rtl/a.sv
+index 0fb97fc..a0e8734 1006
+CHECK vcs.read.compat.no-write-executed PASS head_same=1 porcelain_same=1
+CHECK vcs.nonblocking.temp-dir PASS
+CHECK vcs.nonblocking.fake-git PASS
+CHECK vcs.nonblocking.start-returns-fast PASS start took 0 ms while the fake git sleeps 400 ms
+CHECK vcs.nonblocking.event-loop-ticks PASS ticks=12
+CHECK vcs.nonblocking.job-still-pending PASS polls=24
+CHECK vcs.nonblocking.result-delivered PASS git repository has no commit yet
+CHECK vcs.write.service PASS
+CHECK vcs.write.start-returns-fast PASS start took 0 ms while the fake git sleeps 400 ms
+CHECK vcs.write.whitelisted-op-runs PASS polls=227 state=0
+CHECK vcs.write.event-loop-ticks PASS ticks=12
+CHECK vcs.write.result-delivered PASS fatal: not a git repository (or any of the parent directorie
+CHECK vcs.nonblocking.metric-detects-block PASS timer fired at 300 ms after scheduling (expected late)
+CHECK vcs.layout.splitter PASS
+CHECK vcs-column-refs PASS
+CHECK vcs-column-changes PASS
+CHECK vcs-column-diff PASS
+CHECK vcs.layout.refs-column PASS Branches | feature/vcs-panel | Tags | no tags reported by this backend
+CHECK vcs.layout.changes-and-staged-columns PASS changes=2 staged=0
+CHECK vcs.layout.changes-list PASS changes=2 staged=0
+CHECK vcs.layout.action-bar PASS vcs-action-refresh,vcs-action-stage,vcs-action-unstage,vcs-action-discard,vcs-action-commit
+CHECK vcs.layout.action-bar-gated PASS actions are gated on a selection
+CHECK vcs.seam.write-op-codes PASS stage=1 unstage=2 discard=3 commit=4
+CHECK vcs.state.ready PASS Git feature/vcs-panel @ abc1234 · 2 changed file(s)
+CHECK vcs.state.empty PASS not a repository
+
+Open a directory that is a Git or Subversi
+CHECK vcs.state.error PASS The VCS backend failed: git: fatal: not a repository
+CHECK vcs.state.loading PASS Loading…
+CHECK vcs.state.loading-clears PASS changes=2
+CHECK vcs.write.discard-confirm-declines PASS
+CHECK vcs.write.discard-confirm-zero-write PASS writes=0
+CHECK vcs.write.discard-requested PASS
+CHECK vcs.write.discard-op-and-path PASS writes=1 op=3
+CHECK vcs.write.discard-reported PASS Discarded the working-tree changes of rtl/top.sv
+CHECK vcs.write.stage-requested PASS
+CHECK vcs.write.stage-op PASS
+CHECK vcs.write.stage-moves-the-row PASS changes=1 staged=1
+CHECK vcs.write.unstage-requested PASS
+CHECK vcs.write.unstage-op PASS
+CHECK vcs.write.unstage-restores-the-row PASS changes=2 staged=0
+CHECK vcs.write.commit-requires-a-message PASS
+CHECK vcs.write.commit-empty-is-zero-write PASS writes=3
+CHECK vcs.write.commit-requested PASS
+CHECK vcs.write.commit-carries-message-author PASS
+CHECK vcs.write.amend-confirm-declines PASS
+CHECK vcs.write.amend-confirm-zero-write PASS writes=4
+CHECK vcs.write.amend-requested PASS
+CHECK vcs.write.amend-op-and-flag PASS writes=5
+CHECK vcs.write.failure-is-reported PASS
+CHECK vcs.write.failure-reason-visible PASS The VCS operation failed: fatal: pathspec 'rtl/top.sv' did not match any files
+CHECK vcs.write.e2e.git PASS /usr/bin/git
+CHECK vcs.write.e2e.fixture PASS /tmp/vedit-workspace-vcs-selftest-dcHspW/write-repo
+CHECK vcs.write.e2e.not-worktree PASS fixture=/tmp/vedit-workspace-vcs-selftest-dcHspW/write-repo cwd=/tmp/vedit-vcs-write-EG3Hg0
+CHECK vcs.write.e2e.status-first PASS files=1
+CHECK vcs.write.e2e.stage-requested PASS
+CHECK vcs.write.e2e.stage-ok PASS Staged rtl/a.sv
+CHECK vcs.write.e2e.staged-porcelain PASS M  rtl/a.sv
+CHECK vcs.write.e2e.staged-column PASS staged=1
+CHECK vcs.write.e2e.unstage-requested PASS
+CHECK vcs.write.e2e.unstage-ok PASS
+CHECK vcs.write.e2e.unstaged-porcelain PASS M rtl/a.sv
+CHECK vcs.write.e2e.discard-cancel PASS
+CHECK vcs.write.e2e.discard-cancel-zero-write PASS M rtl/a.sv
+CHECK vcs.write.e2e.discard-requested PASS
+CHECK vcs.write.e2e.discard-ok PASS Discarded the working-tree changes of rtl/a.sv
+CHECK vcs.write.e2e.discarded-porcelain PASS
+CHECK vcs.write.e2e.stage-new PASS
+CHECK vcs.write.e2e.stage-new-ok PASS Staged rtl/new.sv
+CHECK vcs.write.e2e.commit-requested PASS
+CHECK vcs.write.e2e.commit-ok PASS Commit written.
+CHECK vcs.write.e2e.commit-subject PASS fixture: add new.sv
+CHECK vcs.write.e2e.commit-author PASS VEdit Test <test@vedit.local>
+CHECK vcs.write.e2e.amend-requested PASS
+CHECK vcs.write.e2e.amend-ok PASS Commit written.
+CHECK vcs.write.e2e.amend-subject PASS fixture: add new.sv (amended)
+CHECK vcs.write.e2e.amend-rewrote-one-commit PASS 2 -> 2
+CHECK vcs.refresh.fixture PASS /tmp/vedit-workspace-vcs-selftest-LiHNah/refresh-repo
+CHECK vcs.refresh.initial PASS backend=1 files=1
+CHECK vcs.refresh.diff-before PASS diff --git a/rtl/a.sv b/rtl/a.sv
+index 0fb97fc..8873923 1006
+CHECK vcs.refresh.save-written PASS
+CHECK vcs.refresh.save-detected PASS refreshes 1 -> 2 (file-saved)
+CHECK vcs.refresh.save-state-after PASS diff --git a/rtl/a.sv b/rtl/a.sv
+index 0fb97fc..259fdcb 1006
+CHECK vcs.refresh.new-file-written PASS
+CHECK vcs.refresh.new-file-detected PASS files=2 refreshes=3
+CHECK vcs.refresh.activation-detected PASS refreshes 3 -> 4
+CHECK vcs.refresh.activation-reason PASS activated
+CHECK vcs.refresh.write-requested PASS
+CHECK vcs.refresh.write-completed PASS ok
+CHECK vcs.refresh.write-detected PASS refreshes 4 -> 5
+CHECK vcs.refresh.write-reason PASS write
+CHECK vcs.refresh.coalesce-requests PASS requests=5
+CHECK vcs.refresh.coalesce-merged PASS merged=4
+CHECK vcs.refresh.coalesce-single PASS
+CHECK vcs.refresh.coalesce-no-storm PASS 5 triggers -> 1 refresh(es) in 1000 ms
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK vcs.panel.close-reopen.no-crash PASS 3 show/refresh/close/destroy cycles
+CHECK vcs.panel.close-reopen.pending-job PASS destroyed with a status job pending
+CHECK vcs.i18n.zh-cn-catalogue PASS /vedit-build/target/qt6-build/src/app/workspace-lane-vcs/../translations/vedit_zh_CN.qm
+CHECK vcs.i18n.action-bar PASS 暂存 / 提交…
+CHECK vcs.i18n.confirmations PASS 丢弃改动？
+CHECK vcs.i18n.states PASS 加载中…
+WORKSPACE-VCS-SELFTEST ok=1 checks=144 failures=0
+# --- the AC-3.3 assertions (git status --porcelain / git log -1) ---

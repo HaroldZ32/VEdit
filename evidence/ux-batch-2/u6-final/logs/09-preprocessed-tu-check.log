@@ -1,0 +1,36 @@
+## macro check (the composed branch is compiled into FfiProjectLintBackend::start)
+VEDIT_LINT_OPTIONS_HAVE_ABI -> #define VEDIT_LINT_OPTIONS_HAVE_ABI 1
+VEDIT_DIAGNOSTICS_HAVE_LINT_OPTIONS -> #define VEDIT_DIAGNOSTICS_HAVE_LINT_OPTIONS 1
+## preprocessed FfiProjectLintBackend::start call site
+present: True
+: verible.constData();
+        options.include_dirs = includeDirs.list;
+        options.defines = defines.list;
+        options.timeout_ms = static_cast<uint64_t>(request.timeoutMs);
+        options.max_diagnostics = static_cast<size_t>(request.maxDiagnostics);
+
+
+
+
+
+        settings::LintBatchAbiStorage abiStrings;
+        const settings::LintJobOptions jobOptions = settings::buildLintJobOptions(
+            settings::currentLintValues(),
+            request.engine == 1 ? settings::LintBackend::Verible : settings::LintBackend::Slang,
+            request.rulesPath, settings::currentDiscoveredRulesPath());
+        settings::fillLintBatchOptions(jobOptions, &options, &abiStrings);
+
+
+
+
+        const quint64 job = static_cast<quint64>(vd_deeplint_batch_start(service_, &files.list, &options));
+        if (job == 0 && error != nullptr) {
+            *error = serviceError();
+        }
+        return job;
+    }
+
+    LintPassSnapshot progress(quint64 job) const override
+    {
+        LintPassSnapshot snapshot;
+    

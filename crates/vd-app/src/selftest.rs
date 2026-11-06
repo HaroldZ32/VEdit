@@ -1145,8 +1145,10 @@ fn probe_lint_report() -> vd_deeplint::LintReport {
             }),
             conversion_note: None,
             parse_note: None,
+            repeat: 1,
         }],
         total_diagnostics: 1,
+        dropped: 0,
         truncated: false,
         binary: vd_deeplint::BinaryResolution {
             chosen: None,
@@ -1158,6 +1160,9 @@ fn probe_lint_report() -> vd_deeplint::LintReport {
         stderr: String::new(),
         elapsed: Duration::ZERO,
         child_pid: None,
+        engine: vd_deeplint::LintEngine::Slang,
+        tool: "slang".to_string(),
+        stage: "done",
     }
 }
 

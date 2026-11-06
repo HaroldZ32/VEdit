@@ -1,0 +1,8 @@
+kind=NamedValue   (declaration AND use — `symbol` is the resolved identity, shared by both)
+
+symbol=2365457582792 clk          file=leaf.sv    start=2:23  end=2:26
+symbol=2365457583352 q            file=leaf.sv    start=2:28  end=2:29
+symbol=2365457583072 d            file=leaf.sv    start=2:33  end=2:34
+symbol=2365457581216 clk          file=top.sv     start=4:20  end=4:23
+symbol=2365457581352 d            file=top.sv     start=4:29  end=4:30
+symbol=2365457581488 q            file=top.sv     start=4:36  end=4:37

@@ -1,0 +1,29 @@
+# gate: build-qt (bash scripts/build-qt.sh) - summary slice
+collected_at: 2026-11-03T23:23:04+08:00
+exit=0 (full log: target/vcs-write-logs/26-build-qt-full.log)
+== cargo test (the service unit tests, AC-0.2) ==
+     Running unittests src/lib.rs (target/debug/deps/vd_ffi-d7d088bbe0f89edb)
+test result: ok. 45 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+     Running tests/abi.rs (target/debug/deps/abi-c804d6a23d6a8517)
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+     Running tests/qt_abi_guard.rs (target/debug/deps/qt_abi_guard-2f335892ec40a5dc)
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs (target/debug/deps/vd_search-ccee45e2854f35f2)
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running unittests src/lib.rs (target/debug/deps/vd_settings-6db6bb138f178aed)
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+     Running unittests src/lib.rs (target/debug/deps/vd_vcs-172bba4941aeb03b)
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/compat.rs (target/debug/deps/compat-32a0df7758470ec2)
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+     Running tests/readonly.rs (target/debug/deps/readonly-dbb1f326a4173505)
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+     Running tests/write.rs (target/debug/deps/write-1d99869a32ec16bc)
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+100% tests passed, 0 tests failed out of 38
+M0-SMOKE ok=1 platform=xcb qt=6.10.2 kf6=6.24.0 ktexteditor=1 ksynhl=6.24.0 tree_sitter=0.25.9 window=1 editor=1 document=1 definitions=451 themes=30 verilog=1 systemverilog=loadable(not-asserted,C7-pending) custom_path=1 tree_sitter_parser=1 builtin_valid_defs=450 whitelist_verilog=0 highlight_formats=-1 kshlib=/usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0 libc=/usr/lib/x86_64-linux-gnu/libc.so.6
+[qt6] PASS: Rust service layer + configure + build + ctest (incl. the C ABI smoke) + xcb/software-rendering smoke inside vedit-qt6-build:local

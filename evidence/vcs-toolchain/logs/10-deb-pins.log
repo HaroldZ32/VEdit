@@ -1,0 +1,30 @@
+# pinned .deb verification (cache: packaging/runtime/.cache/vcs-debs)
+PASS         git_2.53.0-1ubuntu1.1_amd64.deb
+  url=http://archive.ubuntu.com/ubuntu/pool/main/g/git/git_2.53.0-1ubuntu1.1_amd64.deb
+  want=5d3bbbb8e5bee7ddeb1d023b9a9d2063633e30c3ec404fd1d75136d9c6e48603
+  got =5d3bbbb8e5bee7ddeb1d023b9a9d2063633e30c3ec404fd1d75136d9c6e48603
+PASS         subversion_1.14.5-6build1_amd64.deb
+  url=http://archive.ubuntu.com/ubuntu/pool/universe/s/subversion/subversion_1.14.5-6build1_amd64.deb
+  want=e5efc3e6f38d43a2d5f2f198c1c54d520683d0986d6eb6c8a7d3f1bde8d53a7f
+  got =e5efc3e6f38d43a2d5f2f198c1c54d520683d0986d6eb6c8a7d3f1bde8d53a7f
+PASS         libsvn1_1.14.5-6build1_amd64.deb
+  url=http://archive.ubuntu.com/ubuntu/pool/universe/s/subversion/libsvn1_1.14.5-6build1_amd64.deb
+  want=0e6f54bd82ba80244905b714ef42614cf53be02232d754f5d22f9a83e2a18b7f
+  got =0e6f54bd82ba80244905b714ef42614cf53be02232d754f5d22f9a83e2a18b7f
+PASS         libapr1t64_1.7.6-3_amd64.deb
+  url=http://archive.ubuntu.com/ubuntu/pool/main/a/apr/libapr1t64_1.7.6-3_amd64.deb
+  want=7c1f4005fc41adfba1ce1a000a10fbf3a87f83c0c98525ab76a5483e9147192c
+  got =7c1f4005fc41adfba1ce1a000a10fbf3a87f83c0c98525ab76a5483e9147192c
+PASS         libaprutil1t64_1.6.3-3ubuntu3.1_amd64.deb
+  url=http://archive.ubuntu.com/ubuntu/pool/main/a/apr-util/libaprutil1t64_1.6.3-3ubuntu3.1_amd64.deb
+  want=6b4e3aab702b0a3b71767bdf93c7f625196170774ad5724c0e9314bea4cafaa8
+  got =6b4e3aab702b0a3b71767bdf93c7f625196170774ad5724c0e9314bea4cafaa8
+PASS         libserf-1-1_1.3.10-3ubuntu2_amd64.deb
+  url=http://archive.ubuntu.com/ubuntu/pool/universe/s/serf/libserf-1-1_1.3.10-3ubuntu2_amd64.deb
+  want=ff3fa687048f955bc67e8d31683a5664e4575530a3ed1783c6e68c8c3345e98b
+  got =ff3fa687048f955bc67e8d31683a5664e4575530a3ed1783c6e68c8c3345e98b
+PASS         libutf8proc3_2.10.0-2_amd64.deb
+  url=http://archive.ubuntu.com/ubuntu/pool/universe/u/utf8proc/libutf8proc3_2.10.0-2_amd64.deb
+  want=9d220df86d3c2dc6f847537358ffae17d99726d703404a13f5548e60f9ff0695
+  got =9d220df86d3c2dc6f847537358ffae17d99726d703404a13f5548e60f9ff0695
+deb_pins_fail=0

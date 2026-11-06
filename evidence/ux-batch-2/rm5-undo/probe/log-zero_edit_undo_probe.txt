@@ -1,0 +1,6 @@
+ZERO A setText_load text=32 zero_edits=1
+ZERO A1 one_undo text=0 (blank if 0)
+ZERO A2 one_undo_one_redo text=32
+ZERO A3 load_undo_then_redo after_undo=0 after_redo=32
+ZERO B1 openUrl_load loaded=32 press=undo returned=1 after=32
+ZERO B2 openUrl_load loaded=32 press=redo returned=1 after=32

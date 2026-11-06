@@ -1,0 +1,8 @@
+    Start 21: vedit-native-fold-tests
+1/2 Test #21: vedit-native-fold-tests ..........   Passed    0.57 sec
+    Start 29: vedit-undo-view-lifetime-tests
+2/2 Test #29: vedit-undo-view-lifetime-tests ...   Passed    0.22 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.80 sec

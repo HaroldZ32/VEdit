@@ -1,0 +1,8 @@
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+PASS spawn.check-dir
+PASS spawn.parent-marker
+RELAUNCHED marker=OK
+parent-exit=0
+parent-marker=yes
+relaunched-marker=yes
+unexpected-return=no

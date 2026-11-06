@@ -1,0 +1,40 @@
+== A. translate()/tr() first argument containing CJK (own scan, comments included)
+(none above = 0)
+
+== B. inventory spot-checks
+-- diagnostics_controller.cpp lintCancelledMessage / finished message
+156:    return QStringLiteral("已取消 — %1/%2 文件").arg(done).arg(total);
+560:            pass_.message = QStringLiteral("%1/%2 文件已扫描 — %3 条 CLI 诊断")
+-- fim_backend.cpp CJK
+        const quint64 token = start(prefix, suffix, &error);
+        if (token == 0) {
+            return Reply{Reply::State::Error,
+                         error.isEmpty() ? QStringLiteral("FIM 请求未被 Rust 服务接受") : error};
+        }
+        QElapsedTimer timer;
+6
+-- settings language endonym
+540:    languageCombo_->addItem(QString::fromUtf8("简体中文"),
+
+== C. 修复 anywhere in src (should be gone)
+src/workspace/diagnostics/diagnostic_hover.h:7:// diagnostic's severity, rule id and message, and a 「修复」 button iff the
+src/workspace/diagnostics/diagnostic_hover.h:39:    /// Why no 「修复」 button is offered (empty when `fixable`).
+src/workspace/diagnostics/diagnostic_hover.h:51:/// The popup: severity + rule id + message, plus the 「修复」 button only when
+src/workspace/diagnostics/diagnostics_integration.cpp:1287:    /// 「修复」 button only when the engine really can autofix that rule).
+src/workspace/diagnostics/README.md:174:* The 「修复」 button appears ONLY when the engine really can fix that rule.
+src/workspace/diagnostics/selftests/b3_wiring_e2e.cpp:512:        // the source was Chinese, so this check would fail on "修复".
+(none above = 0)
+
+== D. new check in test
+514:        check("hover.fix-button-label-english",
+515-              fixButton != nullptr && fixButton->text() == QStringLiteral("Fix"),
+516-              QStringLiteral("text='%1'").arg(fixButton != nullptr ? fixButton->text()
+517-                                                                  : QStringLiteral("<none>")));
+
+== E. check-name set: U1 green log vs current binary run
+  70 /tmp/u1names.txt
+  71 /tmp/nownames.txt
+ 141 total
+-- removed from U1 set:
+-- added vs U1 set:
+hover.fix-button-label-english

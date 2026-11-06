@@ -1,0 +1,88 @@
+ok   tree.roots.equal-is-top — roots=[orphan, top_a, top_b] tops=[orphan, top_a, top_b]
+ok   tree.roots.fixture-set — orphan, top_a, top_b
+ok   tree.two-parents.two-occurrences — top_a.u_shared, top_b.u_shared
+ok   tree.two-parents.distinct-path — top_a.u_shared, top_b.u_shared
+ok   tree.two-parents.definitions-agree
+ok   tree.row-count.seven — rows=7
+ok   tree.no-net-driver-load-rows — kinds=7
+ok   tree.no-net-labels — orphan, top_a, shared, consumer, reflink, top_b, shared
+ok   tree.cycle.marker-note — cycle: A is already an ancestor of this row — not expanded
+ok   tree.cycle.visible-marker — rows=3
+ok   tree.cycle.terminates — rows=3
+ok   tree.depth.marker-note — depth limit 64 reached — this module's children are not expanded
+ok   tree.depth.capped-at-64 — deepest=64
+ok   tree.depth.visible-marker — markers=1
+ok   tree.depth.rows-bounded — rows=65
+ok   width.logic-4
+ok   width.no-dimension-1
+ok   width.interface-1
+ok   width.reversed-range-4
+ok   width.multi-dimension-8
+ok   width.spaces-8
+ok   width.parameterised-unknown — the packed range `[WIDTH-1:0]` in `logic[WIDTH-1:0]` is not a literal msb:lsb pair, so the width cannot be derived
+ok   width.empty-unknown — the ABI reported no type string for this port
+ok   focus.nearest-above — m1
+ok   focus.exact-definition-line — m2
+ok   focus.before-first-definition-none
+ok   focus.other-file-none
+ok   instantiation.two-parents — sites=2
+ok   instantiation.sorted
+ok   instantiation.top-has-none
+ok   jump.one-based — /proj/top_a.sv
+ok   jump.describe
+This plugin does not support propagateSizeHints()
+ok   panel.tree.rows — roots=3
+ok   panel.tree.shared-twice — occurrences=2
+ok   panel.tree.top-a-row
+ok   panel.selection.callback — top_a
+ok   panel.activate.delivers
+ok   panel.activate.target — /proj/top_a.sv:1:8
+ok   panel.double-click.module-definition — calls=2 line=1
+ok   panel.empty.no-catalog — No module catalog yet: open a project and press Refresh.
+ok   panel.empty.no-project — No project open — open a folder to build the module catalog.
+ok   panel.empty.failure-one-line — module catalog: boom second line
+ok   panel.empty.no-modules — No modules found: slang reported no module definitions for this project.
+This plugin does not support propagateSizeHints()
+ok   interface.focus.tree-selection — top_a
+ok   interface.table.columns
+ok   interface.table.rows — rows=3
+ok   interface.port.clk — clk/In/logic/1
+ok   interface.port.pad — pad/InOut/1
+ok   interface.port.y — y/Out/logic[3:0]/4
+ok   interface.location — top_a.sv:1:11
+ok   interface.tooltip.abi-limit — Double-click a port: jump to its declaration. Ctrl+double-click: jump to this module's instantiation statement. The module catalog has no per-connection position, so Ctrl+double-click targets the instance statement, not the connected port.
+ok   interface.tooltip.static
+ok   interface.width.unknown-blank
+ok   interface.width.unknown-tooltip — the packed range `[WIDTH-1:0]` in `logic[WIDTH-1:0]` is not a literal msb:lsb pair, so the width cannot be derived
+ok   interface.focus.caret — top_a
+ok   interface.focus.caret-above-definition
+ok   interface.focus.other-file
+ok   interface.focus.selection-wins — top_b
+ok   interface.port.activate
+ok   interface.port.declaration-target — /proj/top_a.sv:1:42
+This plugin does not support propagateSizeHints()
+ok   interface.port.double-click — calls=4 line=1
+ok   interface.port.ctrl-activate
+ok   interface.chooser.candidates — candidates=2
+ok   interface.instantiation-target — /proj/top_b.sv:3:3
+This plugin does not support propagateSizeHints()
+ok   interface.port.ctrl-double-click — calls=6 file=/proj/top_b.sv
+ok   interface.instantiation.top-none
+ok   interface.instantiation.top-status — no instantiation of top_a was catalogued: it is a design top, so there is no instance statement to jump to
+ok   interface.empty.no-catalog — No module catalog yet: open a project and press Refresh.
+ok   interface.empty.no-project — No project open — open a folder to build the module catalog.
+ok   interface.empty.no-modules — No modules found: slang reported no module definitions for this project.
+ok   toolchain.temp-dir
+ok   toolchain.bin-dir — /tmp/vedit-module-tree-selftest-eWYRiu/bin
+ok   toolchain.packaged-slang — /tmp/vedit-module-tree-selftest-eWYRiu/bin/slang
+ok   toolchain.published-path — /tmp/vedit-module-tree-selftest-eWYRiu/bin/slang
+ok   toolchain.no-source-empty
+ok   toolchain.env-override-wins
+PASS: 76 check(s), 0 failure(s)
+SELFTEST_EXIT=0
+=== M3: missing fixture/slang ===
+FAIL catalog.real — the lane fixture and a built slang are required (fixture='/nonexistent/fixture' slang='/nonexistent/slang'); run bash build/slang/build.sh
+FAIL: 0 check(s), 1 failure(s)
+MISSING_EXIT=1
+=== ctest total ===
+Total Tests: 47

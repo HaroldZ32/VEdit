@@ -1,0 +1,6 @@
+# AC-5.1 / AC-5.3 evidence (conflict state + double confirmation)
+collected_at: 2026-11-04T10:09:29+08:00
+conflict-screenshot=1
+  shot_bytes=66149 /home/haroldzhao/MyProj/DshProj/VEdit/evidence/vcs-git-ops/screenshots/40-vcs-conflict-state-1500x1000.png
+green_ops_checks=61
+result=PASS

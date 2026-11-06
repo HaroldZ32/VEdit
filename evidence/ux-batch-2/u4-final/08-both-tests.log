@@ -1,0 +1,9 @@
+Test project /vedit-build/target/qt6-build
+    Start 1: vedit-app-syntax-startup
+1/2 Test #1: vedit-app-syntax-startup .........   Passed    0.80 sec
+    Start 7: vedit-syntax-product-tests
+2/2 Test #7: vedit-syntax-product-tests .......   Passed    0.05 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.86 sec

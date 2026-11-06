@@ -1,0 +1,32 @@
+## files this lane touched (git status)
+ M src/app/CMakeLists.txt
+ M src/app/app_shell.cpp
+ M src/app/app_shell.h
+ M src/app/editor_area.cpp
+ M src/app/editor_area.h
+ M src/app/main.cpp
+ M src/terminal/terminal_widget.cpp
+ M src/terminal/terminal_widget.h
+ M src/workspace/diagnostics/diagnostics_integration.cpp
+ M src/workspace/project/project_model.cpp
+?? evidence/ux-batch-2/
+?? resources/help/
+?? src/app/help_viewer.cpp
+?? src/app/help_viewer.h
+?? src/app/ux_selftest.cpp
+?? src/editor/kernel/lsp_actions.cpp
+?? translations/
+
+## main.cpp: only the three authorized assertion lines changed
+ src/app/main.cpp | 442 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 429 insertions(+), 13 deletions(-)
+
+## product binary + qm
+1d6846a520a650919750d71a87f170b65fb43ddaf2bf7a240d6cfd4a9c416460  target/qt6-build/src/app/vedit-app
+4906342a8d529d4efa87c722dd18a9682911db966c0a31f04e8160a1f1b243bf  target/qt6-build/src/app/translations/vedit_zh_CN.qm
+9bead85cff863a05d0ea6fa307eaf9dcc622cea5751f8120c45f2eaaeb93d5d4  translations/vedit_zh_CN.ts
+
+## screenshots
+e262226da514d365d65714cc2ac29b96ba02d3330de86fd7516d74283dc60911  evidence/ux-batch-2/a2/screenshots/10-main-toolbar-menu.png
+6a6f18d13c4776bc3b3790db95dd949155cce7341f04da1993afbb9385bea8e3  evidence/ux-batch-2/a2/screenshots/11-user-manual.png
+61eccad08b48b314d643bf24a60fafcf7a4167545cf9bc03cd6c4ef295bf2ddf  evidence/ux-batch-2/a2/screenshots/12-main-menu-zh.png

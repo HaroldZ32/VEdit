@@ -1,0 +1,13 @@
+[lrelease] /usr/lib/qt6/bin/lrelease /home/haroldzhao/MyProj/DshProj/VEdit/target/u8-lrelease-neg/neg-untranslated-only.ts -qm /tmp/tmp.F2y2RKv5er/neg-untranslated-only.qm
+Updating '/tmp/tmp.F2y2RKv5er/neg-untranslated-only.qm'...
+    Generated 1004 translation(s) (1004 finished and 0 unfinished)
+    Ignored 182 untranslated source text(s)
+[lrelease] FAIL: 0 unfinished and 182 untranslated translation(s)
+       (1004 finished of 1004 generated).
+       An unfinished entry ships as a partial translation and an untranslated one
+       ships as English, both invisible in a Chinese UI review, so the delivered
+       catalogue must be complete.
+       Fix      : translate the missing entries in translations/vedit_zh_CN.ts
+                  (evidence/ux-batch-2/integration-translations/02-unfinished-before.txt
+                  lists what the last lupdate added), then re-run this gate.
+       This gate does NOT skip and does NOT pass with unfinished/untranslated entries.

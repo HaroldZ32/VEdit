@@ -1,0 +1,9 @@
+# existing (fixed baseline) vs 7c-new screenshots — same-size pixel comparison
+pair | old_size | new_size | old_sha | new_sha | identical_pixels_share | mean_abs_diff
+vcs three-columns | (1500, 1000) | (1500, 1000) | f4925c0e8612db4f | 45179ed25e2bdded | 0.9329 | 2.10
+vcs staged | (1500, 1000) | (1500, 1000) | 9ffe661f095fed3e | 73da138f23c0b986 | 0.9209 | 3.32
+vcs commit dialog | (900, 360) | (900, 360) | 6ce6c7a3f9b24ef9 | 6ce6c7a3f9b24ef9 | 1.0000 | 0.00
+vcs history commits (6b) | (1500, 1000) | (1500, 1000) | d92b0aea06f29a95 | d92b0aea06f29a95 | 1.0000 | 0.00
+workspace dialog (6b) | (1500, 1000) | (1500, 1000) | 4356c85118529bca | 4316f6dfe6e289a0 | 0.9969 | 0.23
+svn panel (6b) | (1500, 1000) | (1500, 1000) | 68b53090a89d7fb3 | 68b53090a89d7fb3 | 1.0000 | 0.00
+svn real (6b) | (1500, 1000) | (1500, 1000) | d52462c4802c03de | d52462c4802c03de | 1.0000 | 0.00

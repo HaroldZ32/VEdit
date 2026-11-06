@@ -1,0 +1,5 @@
+# Recompiled the four changed translation units with -Wpedantic -Werror added
+# to their exact compile_commands.json command (-Wall -Wextra already come from
+# the project's CMAKE_CXX_FLAGS). Empty output below = no warning, exit 0.
+# Command (inside vedit-qt6-build:local): bash evidence/ux-batch-2/b2-repair-r4/probes/recompile-werror.sh
+

@@ -1,0 +1,37 @@
+== version ==
+git version 2.53.0
+== stash save -- leading-dash ==
+Saved working directory and index state On master: -- -m looks like an option
+rc=0
+== stash list ==
+stash@{0}	1c2c10c695868fc94bddd732594bf23b9f1a47ca	On master: -- -m looks like an option
+== stash pop ==
+Dropped refs/stash@{0} (1c2c10c695868fc94bddd732594bf23b9f1a47ca)
+pop rc=0
+== stash save -- plain ==
+Saved working directory and index state On master: -- plain msg
+rc=0
+== stash drop ==
+Dropped refs/stash@{0} (6393b8cc898c35573be6f445a33b75424af380d0)
+rc=0
+== submodule add with -c protocol.file.allow=always ==
+Cloning into '/tmp/probe3/repo/sub'...
+done.
+rc=0
+== .gitmodules ==
+[submodule "sub"]
+	path = sub
+	url = /tmp/probe3/sub
+== submodule status ==
+ 1ceb5208cde2d82b9eae84287920652ff002c0e3 sub (heads/master)
+rc=0
+== fresh clone + submodule update --init (with -c) ==
+rc=0
+== submodule status in clone ==
+rc=0
+== submodule init then update (product shape) ==
+init rc=0
+update rc=0
+== submodule update --init on a repo without submodules ==
+init rc=0
+update rc=0

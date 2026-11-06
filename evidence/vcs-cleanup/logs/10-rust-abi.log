@@ -1,0 +1,29 @@
+   Compiling vd-ffi v0.1.1 (/vedit-build/crates/vd-ffi)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 3.64s
+     Running tests/abi.rs (target/debug/deps/abi-73d3a52e89bce543)
+
+running 21 tests
+test abi_version_is_one ... ok
+test cancelling_a_job_discards_its_result ... ok
+test deeplint_reports_a_missing_binary_as_a_typed_failure ... ok
+test fim_is_disabled_by_default_and_starts_no_worker ... ok
+test history_and_workspace_polls_reject_a_foreign_payload ... ok
+test lsp_configures_lazily_without_starting_the_server ... ok
+test lsp_rejects_a_missing_server_binary ... ok
+test null_and_unknown_arguments_are_rejected_with_a_typed_error ... ok
+test project_parse_expands_the_fixture_filelist ... ok
+test projected_fixture_serves_all_seven_services ... ok
+test search_returns_hits_over_the_project_file_list ... ok
+test settings_round_trip_through_the_abi ... ok
+test vcs_history_jobs_return_pages_detail_blame_and_comparison ... ok
+test vcs_history_op_codes_and_operation_state_are_stable ... ok
+test vcs_read_jobs_return_status_info_and_diff_from_a_real_repository ... ok
+test vcs_reports_the_empty_state_for_a_plain_directory ... ok
+test vcs_workspace_codes_and_listings_are_stable ... ok
+test vcs_write_codes_are_stable ... ok
+test vcs_write_job_refuses_invalid_requests ... ok
+test vcs_write_job_runs_a_real_git_round_trip ... ok
+test vcs_write_poll_misuse_is_typed ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.42s
+

@@ -1,0 +1,12 @@
+# 1500x1000 xcb screenshots (Xvfb :79, screen 1500x1000x24)
+collected_at: 2026-11-03T16:01:11+00:00
+xvfb=11 Xvfb :79 -screen 0 1500x1000x24
+WORKSPACE-VCS-SELFTEST start
+CHECK vcs.screenshot.platform PASS xcb
+CHECK 10-vcs-three-columns-1500x1000.png PASS /vedit-build/evidence/vcs-ui/screenshots/10-vcs-three-columns-1500x1000.png bytes=46589
+CHECK 11-vcs-staged-1500x1000.png PASS /vedit-build/evidence/vcs-ui/screenshots/11-vcs-staged-1500x1000.png bytes=48757
+CHECK 13-vcs-loading-1500x1000.png PASS /vedit-build/evidence/vcs-ui/screenshots/13-vcs-loading-1500x1000.png bytes=12227
+CHECK 12-vcs-empty-state-1500x1000.png PASS /vedit-build/evidence/vcs-ui/screenshots/12-vcs-empty-state-1500x1000.png bytes=24807
+CHECK 14-vcs-error-state-1500x1000.png PASS /vedit-build/evidence/vcs-ui/screenshots/14-vcs-error-state-1500x1000.png bytes=18709
+CHECK 15-vcs-commit-dialog-1500x1000.png PASS /vedit-build/evidence/vcs-ui/screenshots/15-vcs-commit-dialog-1500x1000.png bytes=15952
+WORKSPACE-VCS-SELFTEST screenshots ok=1 checks=7 failures=0

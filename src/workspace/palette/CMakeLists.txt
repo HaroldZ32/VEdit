@@ -32,7 +32,10 @@ add_library(vedit_workspace_palette STATIC
   file_index.cpp
   fuzzy_matcher.cpp
 )
-target_include_directories(vedit_workspace_palette PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+# The shared path-display rule (src/common/path_display.h), header-only.
+target_include_directories(vedit_workspace_palette PUBLIC
+  "${CMAKE_CURRENT_SOURCE_DIR}"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../../common")
 target_link_libraries(vedit_workspace_palette PUBLIC Qt6::Core Qt6::Gui Qt6::Widgets)
 target_compile_options(vedit_workspace_palette PRIVATE ${VEDIT_PALETTE_WARNING_FLAGS})
 

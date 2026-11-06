@@ -1,0 +1,15 @@
+== shell syntax ==
+sh -n packaging/runtime/AppRun: OK
+== case 1: no caller overrides ==
+LOADER-SEEN APPDIR=/tmp/vedit-apprun-probe.xkNvUj
+LOADER-SEEN VEDIT_SLANG=/tmp/vedit-apprun-probe.xkNvUj/bin/slang
+LOADER-SEEN VEDIT_VERIBLE_LS=/tmp/vedit-apprun-probe.xkNvUj/bin/verible-verilog-ls
+LOADER-SEEN VEDIT_VERIBLE_LINT=/tmp/vedit-apprun-probe.xkNvUj/bin/verible-verilog-lint
+LOADER-SEEN VEDIT_VERIBLE_FORMAT=/tmp/vedit-apprun-probe.xkNvUj/bin/verible-verilog-format
+== case 2: caller pre-sets VEDIT_VERIBLE_LS (must be preserved) ==
+LOADER-SEEN APPDIR=/tmp/vedit-apprun-probe.xkNvUj
+LOADER-SEEN VEDIT_SLANG=/tmp/vedit-apprun-probe.xkNvUj/bin/slang
+LOADER-SEEN VEDIT_VERIBLE_LS=/caller/verible-ls
+LOADER-SEEN VEDIT_VERIBLE_LINT=/tmp/vedit-apprun-probe.xkNvUj/bin/verible-verilog-lint
+LOADER-SEEN VEDIT_VERIBLE_FORMAT=/tmp/vedit-apprun-probe.xkNvUj/bin/verible-verilog-format
+EXIT=0

@@ -1,0 +1,2 @@
+command: g++ -std=c++17 -fsyntax-only (TU includes the generated header and zero-initialises the new structs)
+PASS: the generated header is valid C++17 and the new structs are usable with {} initialisation

@@ -1,0 +1,42 @@
+CHECK vcs.remote.e2e.refs-match-for-each-ref PASS panel=master|v-detached git=master|v-detached
+CHECK vcs.remote.e2e.current-ref-flagged PASS master
+CHECK vcs.remote.e2e.remote-set-url-ok PASS
+CHECK vcs.remote.e2e.remote-url-changed PASS /tmp/vedit-workspace-vcs-selftest-brYDqD/other-origin.git
+CHECK vcs.remote.e2e.remote-set-url-back PASS
+CHECK vcs.remote.e2e.unreachable-set-url PASS
+CHECK vcs.remote.e2e.unreachable-fetch-issued PASS
+CHECK vcs.remote.e2e.unreachable-fails PASS The VCS operation failed: fatal: '/tmp/vedit-workspace-vcs-selftest-brYDqD/missing-origin.git' does not appear to be a git repository
+CHECK vcs.remote.e2e.unreachable-recovered PASS
+CHECK vcs.remote.e2e.unreachable-recovered-fetch PASS The VCS operation failed: fatal: '/tmp/vedit-workspace-vcs-selftest-brYDqD/missing-origin.git' does not appear to be a git repository
+CHECK vcs.remote.e2e.upstream-set-ok PASS
+CHECK vcs.remote.e2e.upstream-set PASS origin/master
+CHECK vcs.remote.e2e.remote-remove-declined PASS
+CHECK vcs.remote.e2e.remote-still-configured PASS origin
+CHECK vcs.remote.e2e.remote-remove-requested PASS
+CHECK vcs.remote.e2e.remote-removed PASS
+CHECK vcs.cred.e2e.server PASS port=43005
+CHECK vcs.cred.e2e.remote-add-ok PASS
+CHECK vcs.cred.e2e.remote-read PASS remotes=1
+CHECK vcs.cred.e2e.push-requested PASS
+CHECK vcs.cred.e2e.prompt-content PASS The push operation needs credentials for http://127.0.0.1:43005/repo.git. They are kept in memory for this operation only and are never written to disk.
+CHECK vcs.cred.e2e.prompted PASS prompts=1
+CHECK vcs.cred.e2e.transport-received-credentials PASS authorized=1 requests=3
+CHECK vcs.cred.e2e.op-fails-honestly PASS The VCS operation failed: fatal: Authentication failed for 'http://127.0.0.1:43005/repo.git/'
+CHECK vcs.cred.e2e.secret-not-in-ui PASS The VCS operation failed: fatal: Authentication failed for 'http://127.0.0.1:43005/repo.git/'
+CHECK vcs.cred.e2e.secret-not-in-argv PASS lines=2
+CHECK vcs.cred.e2e.helper-not-in-argv-value PASS the retry configured the helper without carrying the secret
+CHECK vcs.cred.e2e.cancel-push-requested PASS
+CHECK vcs.cred.e2e.cancel-prompted-once PASS prompts=1
+CHECK vcs.cred.e2e.cancel-no-authorization PASS authorized=1 push-lines=1
+CHECK vcs.cred.e2e.cancel-real-reason PASS The VCS operation failed: fatal: could not read Username for 'http://127.0.0.1:43005': terminal prompts disabled
+CHECK vcs.cred.e2e.cancel-says-aborted PASS Authentication cancelled; the operation was aborted and nothing was written.
+CHECK vcs.cred.e2e.modal-fixture PASS /tmp/vedit-workspace-vcs-selftest-brYDqD/creds2
+CHECK vcs.cred.e2e.modal-push-requested PASS
+CHECK vcs.cred.e2e.modal-dialog-opened PASS driven=1 ticks=1
+CHECK vcs.cred.e2e.modal-exactly-one-authorization PASS authorized 1 -> 2
+CHECK vcs.cred.e2e.modal-secret-cleared PASS
+CHECK vcs.cred.e2e.modal-secret-not-in-ui PASS The VCS operation failed: fatal: Authentication failed for 'http://127.0.0.1:43005/repo.git/'
+CHECK vcs.cred.e2e.modal-dialog-destroyed PASS
+CHECK vcs.cred.e2e.secret-not-on-disk PASS scanned /tmp/vedit-workspace-vcs-selftest-brYDqD
+cwd_still=/tmp/vedit-vcs-4a-GIm57i
+selftest=PASS

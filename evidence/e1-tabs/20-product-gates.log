@@ -1,0 +1,21 @@
+## T12 product-level gates — one block, so the binary sha belongs to the results below
+date=2026-11-02T07:13:24Z
+image=vedit-qt6-build:local
+os=PRETTY_NAME="Ubuntu 26.04.1 LTS"
+qt=6.10.2+dfsg-7
+kf6-texteditor=6.24.0-0ubuntu1
+kf6-syntaxhighlighting=6.24.0-0ubuntu1
+g++=g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+binary=60d340ae496e7c6e3795d207ea89672f64c9526de93fb453b9f640fe53e597a0  target/qt6-build/src/app/vedit-app
+
+## [1] product selfcheck: QT_QPA_PLATFORM=offscreen target/qt6-build/src/app/vedit-app --selfcheck
+CHECK editcore.boundary.counter-live PASS before=0 after=1
+EDIT-CORE-SELFTEST ok=1 checks=67 failures=0
+APP-SHELL-SELFTEST ok=1 checks=245 failures=0 state=/tmp/vedit-app-tZdgvN/state
+SELFCHECK_EXIT=0
+
+## [2] ctest --test-dir target/qt6-build
+25/33 Test #25: vedit-workspace-search-selftest ................***Failed   12.27 sec
+97% tests passed, 1 tests failed out of 33
+	 25 - vedit-workspace-search-selftest (Failed)
+CTEST_EXIT=8

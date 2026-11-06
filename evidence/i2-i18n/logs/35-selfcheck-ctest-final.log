@@ -1,0 +1,8 @@
+SELFCHECK_EXIT=0
+EDIT-CORE-SELFTEST ok=1 checks=67 failures=0
+APP-SHELL-SELFTEST ok=1 checks=245 failures=0 state=/tmp/vedit-app-JxUZBg/state
+CTEST_EXIT=0
+
+100% tests passed, 0 tests failed out of 38
+
+Total Test time (real) =  38.87 sec

@@ -1,0 +1,1077 @@
+
+== 1/4 build slang-server for CentOS 7 (source)
+reusing /home/haroldzhao/MyProj/DshProj/VEdit/target/tmp/spike-work/out/slang-server (f691600fadc139110deed64663394daf740fa2f7d6ecbd663bd3944368df5c31)
+
+== 2/4 --version in a clean CentOS 7 (glibc 2.17)
+Unable to find image 'docker.m.daocloud.io/library/centos:no-such-tag-7' locally
+docker: Error response from daemon: error from registry: denied
+denied
+
+Run 'docker run --help' for more information
+step2_exit=125
+
+== 3/4 real initialize handshake (server inside the container, client on the host)
+mounts: /home/haroldzhao/MyProj/DshProj/VEdit/target/tmp/spike-work/out:/w (binary) and /home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture:/fixture (workspace)
+<-- NO RESPONSE
+Unable to find image 'docker.m.daocloud.io/library/centos:no-such-tag-7' locally
+docker: Error response from daemon: error from registry: denied
+denied
+
+Run 'docker run --help' for more information
+
+--> {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"processId": null, "clientInfo": {"name": "vedit-spike", "version": "0"}, "rootUri": "file:///fixture", "capabilities": {}, "workspaceFolders": null}}
+step3_exit=1
+
+== 4/4 hierarchical elaboration on the fixture (CLI: hierarchy + driver/load)
+{
+ "tool": {
+  "command": [
+   "/home/haroldzhao/MyProj/DshProj/VEdit/build/slang/out/slang",
+   "--top",
+   "top",
+   "--ast-json",
+   "/home/haroldzhao/MyProj/DshProj/VEdit/evidence/review-spike/runspike-break/05-elaboration.json.ast.json",
+   "--ast-json-source-info",
+   "/home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/mid.sv",
+   "/home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv"
+  ],
+  "exit_code": 0,
+  "stderr": "",
+  "elapsed_ms": 4,
+  "peak_rss_kb": 19356,
+  "peak_rss_mb": 18.9,
+  "rss_note": "resource.getrusage(RUSAGE_CHILDREN).ru_maxrss (KiB on Linux), the maximum over all children of this probe",
+  "limits": {
+   "max_elapsed_s": 30,
+   "max_peak_rss_mb": 1024
+  },
+  "passes_limits": true
+ },
+ "hierarchy": [
+  {
+   "path": "top",
+   "module": "top",
+   "instantiation": {
+    "file": "probes/slang-spike/fixture/top.sv",
+    "line": 3,
+    "column": 8
+   }
+  },
+  {
+   "path": "top.u0",
+   "module": "mid",
+   "instantiation": {
+    "file": "probes/slang-spike/fixture/top.sv",
+    "line": 11,
+    "column": 7
+   }
+  },
+  {
+   "path": "top.u1",
+   "module": "mid",
+   "instantiation": {
+    "file": "probes/slang-spike/fixture/top.sv",
+    "line": 12,
+    "column": 7
+   }
+  }
+ ],
+ "signals": {
+  "top.u0.clk": {
+   "path": "top.u0.clk",
+   "kind": "Net",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/mid.sv",
+    "line": 3,
+    "column": 18
+   },
+   "drivers": [],
+   "loads": []
+  },
+  "top.u0.d": {
+   "path": "top.u0.d",
+   "kind": "Net",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/mid.sv",
+    "line": 4,
+    "column": 18
+   },
+   "drivers": [],
+   "loads": []
+  },
+  "top.u0.q": {
+   "path": "top.u0.q",
+   "kind": "Variable",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/mid.sv",
+    "line": 5,
+    "column": 18
+   },
+   "drivers": [
+    {
+     "via": "top.u0.q (continuous assign)",
+     "kind": "assign",
+     "at": {
+      "file": "probes/slang-spike/fixture/mid.sv",
+      "line": 13,
+      "column": 10
+     }
+    }
+   ],
+   "loads": [],
+   "assign_from": [
+    "top.u0.state"
+   ]
+  },
+  "top.u0.state": {
+   "path": "top.u0.state",
+   "kind": "Variable",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/mid.sv",
+    "line": 7,
+    "column": 9
+   },
+   "drivers": [
+    {
+     "via": "top.u0.state (AlwaysFF)",
+     "kind": "procedural",
+     "at": {
+      "file": "probes/slang-spike/fixture/mid.sv",
+      "line": 10,
+      "column": 5
+     }
+    }
+   ],
+   "loads": [
+    {
+     "via": "top.u0.state (continuous assign source)",
+     "kind": "assign",
+     "at": {
+      "file": "probes/slang-spike/fixture/mid.sv",
+      "line": 13,
+      "column": 10
+     }
+    }
+   ]
+  },
+  "top.u1.clk": {
+   "path": "top.u1.clk",
+   "kind": "Net",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/mid.sv",
+    "line": 3,
+    "column": 18
+   },
+   "drivers": [],
+   "loads": []
+  },
+  "top.u1.d": {
+   "path": "top.u1.d",
+   "kind": "Net",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/mid.sv",
+    "line": 4,
+    "column": 18
+   },
+   "drivers": [],
+   "loads": []
+  },
+  "top.u1.q": {
+   "path": "top.u1.q",
+   "kind": "Variable",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/mid.sv",
+    "line": 5,
+    "column": 18
+   },
+   "drivers": [
+    {
+     "via": "top.u1.q (continuous assign)",
+     "kind": "assign",
+     "at": {
+      "file": "probes/slang-spike/fixture/mid.sv",
+      "line": 13,
+      "column": 10
+     }
+    }
+   ],
+   "loads": [],
+   "assign_from": [
+    "top.u1.state"
+   ]
+  },
+  "top.u1.state": {
+   "path": "top.u1.state",
+   "kind": "Variable",
+   "declaration": {
+    "file": "probes/slang-spike/fixture/mid.sv",
+    "line": 7,
+    "column": 9
+   },
+   "drivers": [
+    {
+     "via": "top.u1.state (AlwaysFF)",
+     "kind": "procedural",
+     "at": {
+      "file": "probes/slang-spike/fixture/mid.sv",
+      "line": 10,
+      "column": 5
+     }
+    }
+   ],
+   "loads": [
+    {
+     "via": "top.u1.state (continu
+step4_exit=0
+
+== 4b/4 hierarchy + driver/load through slang-server's own LSP commands
+--> {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"processId": null, "clientInfo": {"name": "vedit-spike", "version": "0"}, "rootUri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture", "capabilities": {}, "workspaceFolders": [{"uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture", "name": "fixture"}]}}
+<-- notification {"jsonrpc": "2.0", "method": "slang/setConfig", "params": {"flags": "", "incdirs": [], "indexGlobs": [], "index": [], "excludeDirs": [], "indexingThreads": 0, "buildPattern": "**/*.f", "buildRelativePaths": false, "hovers": {"docCommentFormat": "markdown"}, "inlayHints": {"portTypes": false, "assignmentPatternTypes": true, "activeParameterValues": true, "orderedInstanceNames": true, "wildcardNames": true, "funcArgNames": 2, "macroArgNames": 2}, "builds": []}}
+<-- {
+ "jsonrpc": "2.0",
+ "id": 1,
+ "result": {
+  "capabilities": {
+   "textDocumentSync": {
+    "openClose": true,
+    "change": 2,
+    "save": {
+     "includeText": true
+    }
+   },
+   "completionProvider": {
+    "triggerCharacters": [
+     "`",
+     "#",
+     ".",
+     "(",
+     ":",
+     "[",
+     "$",
+     "{"
+    ],
+    "resolveProvider": true,
+    "completionItem": {
+     "labelDetailsSupport": true
+    }
+   },
+   "hoverProvider": true,
+   "definitionProvider": true,
+   "referencesProvider": true,
+   "documentHighlightProvider": true,
+   "documentSymbolProvider": true,
+   "codeActionProvider": true,
+   "codeLensProvider": {
+    "resolveProvider": false
+   },
+   "documentLinkProvider": {
+    "resolveProvider": false,
+    "workDoneProgress": false
+   },
+   "workspaceSymbolProvider": true,
+   "renameProvider": true,
+   "executeCommandProvider": {
+    "commands": [
+     "slang.autoConfigure",
+     "slang.addDefine",
+     "slang.setIncludeContext",
+     "slang.showLocation",
+     "slang.getActiveInstance",
+     "slang.activateInstance",
+     "slang.setActiveInstance",
+     "slang.getScopesByModule",
+     "slang.getInstancesOfModule",
+     "slang.getFilesContainingModule",
+     "slang.setTopLevel",
+     "slang.openModuleDefinition",
+     "slang.setBuildFile",
+     "slang.searchHierarchy",
+     "slang.getInstances",
+     "slang.getDriversWithLocation",
+     "slang.expandMacros",
+     "slang.openWaveform",
+     "slang.getModulesInFile",
+     "slang.addToWaveform",
+     "slang.getScope",
+     "slang.getLoadsWithLocation",
+     "slang.getScopes",
+     "slang.showHierLocation"
+    ]
+   },
+   "callHierarchyProvider": true,
+   "inlayHintProvider": {
+    "resolveProvider": false
+   }
+  },
+  "serverInfo": {
+   "name": "slang-server",
+   "version": "0.3.1+2ad996f\n"
+  }
+ }
+}
+handshake_seconds=0.003
+--> {"jsonrpc": "2.0", "method": "initialized", "params": {}}
+--> {"jsonrpc": "2.0", "method": "textDocument/didOpen", "params": {"textDocument": {"uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/mid.sv", "languageId": "systemverilog", "version": 1, "text": "// Spike fixture (AC-3.0): the signal `state` is DRIVEN here, inside mid.\nmodule mid (\n    input  logic clk,\n    input  logic d,\n    output logic q\n);\n  logic state;\n\n 
+--> {"jsonrpc": "2.0", "method": "textDocument/didOpen", "params": {"textDocument": {"uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv", "languageId": "systemverilog", "version": 1, "text": "// Spike fixture (AC-3.0): top instantiates mid twice; the wire `link` is driven\n// by u0.q (inside mid) and LOADED here by u1.d and the output q.\nmodule top (\n    input  lo
+build_file=/home/haroldzhao/MyProj/DshProj/VEdit/target/tmp/spike-work/buildfiles/vedit-spike-w5iugvfg.f contents="mid.sv\ntop.sv\n"
+--> {"jsonrpc": "2.0", "id": 2, "method": "workspace/executeCommand", "params": {"command": "slang.setBuildFile", "arguments": ["/home/haroldzhao/MyProj/DshProj/VEdit/target/tmp/spike-work/buildfiles/vedit-spike-w5iugvfg.f"]}}
+<-- notification {"jsonrpc": "2.0", "method": "slang/setConfig", "params": {"flags": "", "incdirs": [], "indexGlobs": [], "index": [], "excludeDirs": [], "indexingThreads": 0, "buildPattern": "**/*.f", "buildRelativePaths": false, "hovers": {"docCommentFormat": "markdown"}, "inlayHints": {"portTypes": false, "assignmentPatternTypes": true, "activeParameterValues": true, "orderedInstanceNames": true, "wildcardNames": true, "funcArgNames": 2, "macroArgNames": 2}, "builds": []}}
+<-- notification {"jsonrpc": "2.0", "method": "textDocument/publishDiagnostics", "params": {"uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/mid.sv", "diagnostics": []}}
+<-- notification {"jsonrpc": "2.0", "method": "textDocument/publishDiagnostics", "params": {"uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv", "diagnostics": [{"range": {"start": {"line": 5, "character": 17}, "end": {"line": 5, "character": 20}}, "severity": 2, "code": "unused-port", "codeDescription": {"href": "https://sv-lang.com/warning-ref.html#unused-port"}, "message": "unused port signal 'rst'", "tags": [1]}, {"range": {"start": {"line": 14, "character": 8}, "end": {"line": 14, "character": 16}}, "severity": 2, "code": "unused-but-set-variable", "codeDescription": {"href": "https://sv-lang.com/warning-ref.html#unused-but-set-variable"}, "message": "variable 'observed' is assigned but its value is never used"}]}}
+<-- notification {"jsonrpc": "2.0", "method": "textDocument/publishDiagnostics", "params": {"uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv", "diagnostics": []}}
+<-- notification {"jsonrpc": "2.0", "method": "textDocument/publishDiagnostics", "params": {"uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv", "diagnostics": [{"range": {"start": {"line": 5, "character": 17}, "end": {"line": 5, "character": 20}}, "severity": 2, "code": "unused-port", "codeDescription": {"href": "https://sv-lang.com/warning-ref.html#unused-port"}, "message": "unused port signal 'rst'", "tags": [1]}, {"range": {"start": {"line": 14, "character": 8}, "end": {"line": 14, "character": 16}}, "severity": 2, "code": "unused-but-set-variable", "codeDescription": {"href": "https://sv-lang.com/warning-ref.html#unused-but-set-variable"}, "message": "variable 'observed' is assigned but its value is never used"}]}}
+== slang.setBuildFile -> {
+ "jsonrpc": "2.0",
+ "id": 2,
+ "result": null
+}
+--> {"jsonrpc": "2.0", "id": 3, "method": "workspace/executeCommand", "params": {"command": "slang.getScopesByModule", "arguments": []}}
+design_ready_after_ms=0
+--> {"jsonrpc": "2.0", "id": 4, "method": "workspace/executeCommand", "params": {"command": "slang.setTopLevel", "arguments": ["top"]}}
+<-- notification {"jsonrpc": "2.0", "method": "textDocument/publishDiagnostics", "params": {"uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv", "diagnostics": []}}
+<-- notification {"jsonrpc": "2.0", "method": "textDocument/publishDiagnostics", "params": {"uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/mid.sv", "diagnostics": []}}
+<-- notification {"jsonrpc": "2.0", "method": "textDocument/publishDiagnostics", "params": {"uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv", "diagnostics": [{"range": {"start": {"line": 5, "character": 17}, "end": {"line": 5, "character": 20}}, "severity": 2, "code": "unused-port", "codeDescription": {"href": "https://sv-lang.com/warning-ref.html#unused-port"}, "message": "unused port signal 'rst'", "tags": [1]}, {"range": {"start": {"line": 14, "character": 8}, "end": {"line": 14, "character": 16}}, "severity": 2, "code": "unused-but-set-variable", "codeDescription": {"href": "https://sv-lang.com/warning-ref.html#unused-but-set-variable"}, "message": "variable 'observed' is assigned but its value is never used"}]}}
+<-- notification {"jsonrpc": "2.0", "method": "textDocument/publishDiagnostics", "params": {"uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv", "diagnostics": []}}
+== slang.setTopLevel -> {
+ "jsonrpc": "2.0",
+ "id": 4,
+ "error": {
+  "code": -32603,
+  "message": "No such file or directory"
+ }
+}
+--> {"jsonrpc": "2.0", "id": 5, "method": "workspace/executeCommand", "params": {"command": "slang.getScope", "arguments": [""]}}
+== slang.getScope -> {
+ "jsonrpc": "2.0",
+ "id": 5,
+ "result": [
+  {
+   "kind": "Instance",
+   "instName": "top",
+   "instLoc": {
+    "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+    "range": {
+     "start": {
+      "line": 2,
+      "character": 0
+     },
+     "end": {
+      "line": 16,
+      "character": 9
+     }
+    }
+   },
+   "declName": "top",
+   "declLoc": {
+    "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+    "range": {
+     "start": {
+      "line": 2,
+      "character": 0
+     },
+     "end": {
+      "line": 16,
+      "character": 9
+     }
+    }
+   },
+   "declKind": "Module",
+   "hasChildren": true,
+   "children": [
+    {
+     "kind": "Port",
+     "instName": "clk",
+     "instLoc": {
+      "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+      "range": {
+       "start": {
+        "line": 3,
+        "character": 17
+       },
+       "end": {
+        "line": 3,
+        "character": 20
+       }
+      }
+     },
+     "type": "input logic"
+    },
+    {
+     "kind": "Port",
+     "instName": "d",
+     "instLoc": {
+      "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+      "range": {
+       "start": {
+        "line": 4,
+        "character": 17
+       },
+       "end": {
+        "line": 4,
+        "character": 18
+       }
+      }
+     },
+     "type": "input logic"
+    },
+    {
+     "kind": "Port",
+     "instName": "rst",
+     "instLoc": {
+      "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+      "range": {
+       "start": {
+        "line": 5,
+        "character": 17
+       },
+       "end": {
+        "line": 5,
+        "character": 20
+       }
+      }
+     },
+     "type": "input logic"
+    },
+    {
+     "kind": "Port",
+     "instName": "q",
+     "instLoc": {
+      "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+      "range": {
+       "start": {
+        "line": 6,
+        "character": 17
+       },
+       "end": {
+        "line": 6,
+        "character": 18
+       }
+      }
+     },
+     "type": "output logic"
+    },
+    {
+     "kind": "Logic",
+     "instName": "link",
+     "instLoc": {
+      "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+      "range": {
+       "start": {
+        "line": 8,
+        "character": 8
+       },
+       "end": {
+        "line": 8,
+        "character": 12
+       }
+      }
+     },
+     "type": "logic"
+    },
+    {
+     "kind": "Instance",
+     "instName": "u0",
+     "instLoc": {
+      "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+      "range": {
+       "start": {
+        "line": 10,
+        "character": 6
+       },
+       "end": {
+        "line": 10,
+        "character": 43
+       }
+      }
+     },
+     "declName": "mid",
+     "declLoc": {
+      "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/mid.sv",
+      "range": {
+       "start": {
+        "line": 1,
+        "character": 0
+       },
+       "end": {
+        "line": 13,
+        "character": 9
+       }
+      }
+     },
+     "declKind": "Module",
+     "hasChildren": true,
+     "children": []
+    },
+    {
+     "kind": "Instance",
+     "instName": "u1",
+     "instLoc": {
+      "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+      "range": {
+       "start": {
+        "line": 11,
+        "character": 6
+       },
+       "end": {
+        "line": 11,
+        "character": 40
+       }
+      }
+     },
+     "declName": "mid",
+     "declLoc": {
+      "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/mid.sv",
+      "range": {
+       "start": {
+        "line": 1,
+        "character": 0
+       },
+       "end": {
+        "line": 13,
+        "character": 9
+       }
+      }
+     },
+     "declKind": "Module",
+     "hasChildren": true,
+     "children": []
+    },
+    {
+     "kind": "Logic",
+     "instName": "observed",
+     "instLoc": {
+      "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+      "range": {
+       "start": {
+        "line": 14,
+        "character": 8
+       },
+       "end": {
+        "line": 14,
+        "character": 16
+       }
+      }
+     },
+     "type": "logic"
+    }
+   ]
+  }
+ ]
+}
+--> {"jsonrpc": "2.0", "id": 6, "method": "workspace/executeCommand", "params": {"command": "slang.getScopes", "arguments": [""]}}
+== slang.getScopes -> {
+ "jsonrpc": "2.0",
+ "id": 6,
+ "result": [
+  {
+   "path": "",
+   "children": [
+    {
+     "kind": "Instance",
+     "instName": "top",
+     "instLoc": {
+      "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+      "range": {
+       "start": {
+        "line": 2,
+        "character": 0
+       },
+       "end": {
+        "line": 16,
+        "character": 9
+       }
+      }
+     },
+     "declName": "top",
+     "declLoc": {
+      "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+      "range": {
+       "start": {
+        "line": 2,
+        "character": 0
+       },
+       "end": {
+        "line": 16,
+        "character": 9
+       }
+      }
+     },
+     "declKind": "Module",
+     "hasChildren": true,
+     "children": [
+      {
+       "kind": "Port",
+       "instName": "clk",
+       "instLoc": {
+        "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+        "range": {
+         "start": {
+          "line": 3,
+          "character": 17
+         },
+         "end": {
+          "line": 3,
+          "character": 20
+         }
+        }
+       },
+       "type": "input logic"
+      },
+      {
+       "kind": "Port",
+       "instName": "d",
+       "instLoc": {
+        "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+        "range": {
+         "start": {
+          "line": 4,
+          "character": 17
+         },
+         "end": {
+          "line": 4,
+          "character": 18
+         }
+        }
+       },
+       "type": "input logic"
+      },
+      {
+       "kind": "Port",
+       "instName": "rst",
+       "instLoc": {
+        "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+        "range": {
+         "start": {
+          "line": 5,
+          "character": 17
+         },
+         "end": {
+          "line": 5,
+          "character": 20
+         }
+        }
+       },
+       "type": "input logic"
+      },
+      {
+       "kind": "Port",
+       "instName": "q",
+       "instLoc": {
+        "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+        "range": {
+         "start": {
+          "line": 6,
+          "character": 17
+         },
+         "end": {
+          "line": 6,
+          "character": 18
+         }
+        }
+       },
+       "type": "output logic"
+      },
+      {
+       "kind": "Logic",
+       "instName": "link",
+       "instLoc": {
+        "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+        "range": {
+         "start": {
+          "line": 8,
+          "character": 8
+         },
+         "end": {
+          "line": 8,
+          "character": 12
+         }
+        }
+       },
+       "type": "logic"
+      },
+      {
+       "kind": "Instance",
+       "instName": "u0",
+       "instLoc": {
+        "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+        "range": {
+         "start": {
+          "line": 10,
+          "character": 6
+         },
+         "end": {
+          "line": 10,
+          "character": 43
+         }
+        }
+       },
+       "declName": "mid",
+       "declLoc": {
+        "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/mid.sv",
+        "range": {
+         "start": {
+          "line": 1,
+          "character": 0
+         },
+         "end": {
+          "line": 13,
+          "character": 9
+         }
+        }
+       },
+       "declKind": "Module",
+       "hasChildren": true,
+       "children": []
+      },
+      {
+       "kind": "Instance",
+       "instName": "u1",
+       "instLoc": {
+        "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+        "range": {
+         "start": {
+          "line": 11,
+          "character": 6
+         },
+         "end": {
+          "line": 11,
+          "character": 40
+         }
+        }
+       },
+       "declName": "mid",
+       "declLoc": {
+        "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/mid.sv",
+        "range": {
+         "start": {
+          "line": 1,
+          "character": 0
+         },
+         "end": {
+          "line": 13,
+          "character": 9
+         }
+        }
+       },
+       "declKind": "Module",
+       "hasChildren": true,
+       "children": []
+      },
+      {
+       "kind": "Logic",
+       "instName": "observed",
+       "instLoc": {
+        "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+        "range": {
+         "start": {
+          "line": 14,
+          "character": 8
+         },
+         "end": {
+          "line": 14,
+          "character": 16
+         }
+        }
+       },
+       "type": "logic"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
+--> {"jsonrpc": "2.0", "id": 7, "method": "workspace/executeCommand", "params": {"command": "slang.getScopesByModule", "arguments": []}}
+== slang.getScopesByModule -> {
+ "jsonrpc": "2.0",
+ "id": 7,
+ "result": [
+  {
+   "declName": "mid",
+   "declLoc": {
+    "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/mid.sv",
+    "range": {
+     "start": {
+      "line": 1,
+      "character": 0
+     },
+     "end": {
+      "line": 13,
+      "character": 9
+     }
+    }
+   },
+   "instCount": 2
+  },
+  {
+   "declName": "top",
+   "declLoc": {
+    "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+    "range": {
+     "start": {
+      "line": 2,
+      "character": 0
+     },
+     "end": {
+      "line": 16,
+      "character": 9
+     }
+    }
+   },
+   "instCount": 1,
+   "inst": {
+    "instPath": "top",
+    "instLoc": {
+     "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+     "range": {
+      "start": {
+       "line": 2,
+       "character": 0
+      },
+      "end": {
+       "line": 16,
+       "character": 9
+      }
+     }
+    }
+   }
+  }
+ ]
+}
+--> {"jsonrpc": "2.0", "id": 8, "method": "workspace/executeCommand", "params": {"command": "slang.searchHierarchy", "arguments": [""]}}
+== slang.searchHierarchy -> {
+ "jsonrpc": "2.0",
+ "id": 8,
+ "result": {
+  "totalResults": 17,
+  "matches": [
+   {
+    "name": "top",
+    "path": "top",
+    "kind": "Instance",
+    "description": "top"
+   },
+   {
+    "name": "d",
+    "path": "top.d",
+    "kind": "Port",
+    "description": "input logic",
+    "containerName": "top"
+   },
+   {
+    "name": "q",
+    "path": "top.q",
+    "kind": "Port",
+    "description": "output logic",
+    "containerName": "top"
+   },
+   {
+    "name": "u0",
+    "path": "top.u0",
+    "kind": "Instance",
+    "description": "mid",
+    "containerName": "top"
+   },
+   {
+    "name": "u1",
+    "path": "top.u1",
+    "kind": "Instance",
+    "description": "mid",
+    "containerName": "top"
+   },
+   {
+    "name": "clk",
+    "path": "top.clk",
+    "kind": "Port",
+    "description": "input logic",
+    "containerName": "top"
+   },
+   {
+    "name": "rst",
+    "path": "top.rst",
+    "kind": "Port",
+    "description": "input logic",
+    "containerName": "top"
+   },
+   {
+    "name": "link",
+    "path": "top.link",
+    "kind": "Logic",
+    "description": "logic",
+    "containerName": "top"
+   },
+   {
+    "name": "d",
+    "path": "top.u0.d",
+    "kind": "Port",
+    "description": "input logic",
+    "containerName": "mid"
+   },
+   {
+    "name": "q",
+    "path": "top.u0.q",
+    "kind": "Port",
+    "description": "output logic",
+    "containerName": "mid"
+   },
+   {
+    "name": "d",
+    "path": "top.u1.d",
+    "kind": "Port",
+    "description": "input logic",
+    "containerName": "mid"
+   },
+   {
+    "name": "q",
+    "path": "top.u1.q",
+    "kind": "Port",
+    "description": "output logic",
+    "containerName": "mid"
+   },
+   {
+    "name": "clk",
+    "path": "top.u0.clk",
+    "kind": "Port",
+    "description": "input logic",
+    "containerName": "mid"
+   },
+   {
+    "name": "clk",
+    "path": "top.u1.clk",
+    "kind": "Port",
+    "description": "input logic",
+    "containerName": "mid"
+   },
+   {
+    "name": "observed",
+    "path": "top.observed",
+    "kind": "Logic",
+    "description": "logic",
+    "containerName": "top"
+   },
+   {
+    "name": "state",
+    "path": "top.u0.state",
+    "kind": "Logic",
+    "description": "logic",
+    "containerName": "mid"
+   },
+   {
+    "name": "state",
+    "path": "top.u1.state",
+    "kind": "Logic",
+    "description": "logic",
+    "containerName": "mid"
+   }
+  ]
+ }
+}
+--> {"jsonrpc": "2.0", "id": 9, "method": "workspace/executeCommand", "params": {"command": "slang.getInstancesOfModule", "arguments": ["mid"]}}
+== slang.getInstancesOfModule -> {
+ "jsonrpc": "2.0",
+ "id": 9,
+ "result": [
+  {
+   "instPath": "top.u0",
+   "instLoc": {
+    "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+    "range": {
+     "start": {
+      "line": 10,
+      "character": 6
+     },
+     "end": {
+      "line": 10,
+      "character": 43
+     }
+    }
+   }
+  },
+  {
+   "instPath": "top.u1",
+   "instLoc": {
+    "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+    "range": {
+     "start": {
+      "line": 11,
+      "character": 6
+     },
+     "end": {
+      "line": 11,
+      "character": 40
+     }
+    }
+   }
+  }
+ ]
+}
+--> {"jsonrpc": "2.0", "id": 10, "method": "workspace/executeCommand", "params": {"command": "slang.getDriversWithLocation", "arguments": ["top.link"]}}
+== slang.getDriversWithLocation -> {
+ "jsonrpc": "2.0",
+ "id": 10,
+ "result": [
+  {
+   "path": "top.u0.q",
+   "location": {
+    "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/mid.sv",
+    "range": {
+     "start": {
+      "line": 4,
+      "character": 17
+     },
+     "end": {
+      "line": 4,
+      "character": 18
+     }
+    }
+   }
+  }
+ ]
+}
+--> {"jsonrpc": "2.0", "id": 11, "method": "workspace/executeCommand", "params": {"command": "slang.getLoadsWithLocation", "arguments": ["top.link"]}}
+== slang.getLoadsWithLocation -> {
+ "jsonrpc": "2.0",
+ "id": 11,
+ "result": [
+  {
+   "path": "top.observed",
+   "location": {
+    "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv",
+    "range": {
+     "start": {
+      "line": 14,
+      "character": 8
+     },
+     "end": {
+      "line": 14,
+      "character": 16
+     }
+    }
+   }
+  },
+  {
+   "path": "top.u1.d",
+   "location": {
+    "uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/mid.sv",
+    "range": {
+     "start": {
+      "line": 3,
+      "character": 17
+     },
+     "end": {
+      "line": 3,
+      "character": 18
+     }
+    }
+   }
+  }
+ ]
+}
+server_measurements={"handshake_seconds": 0.003, "design_build_seconds": 0.002, "server_peak_rss_kb": 26216, "server_peak_rss_mb": 25.6, "limits": {"max_elapsed_s": 30, "max_peak_rss_mb": 1024}, "passes_limits": true}
+--> {"jsonrpc": "2.0", "id": 12, "method": "shutdown", "params": null}
+--> {"jsonrpc": "2.0", "method": "exit", "params": null}
+notifications_seen=["slang/setConfig", "slang/setConfig", "client/registerCapability", "textDocument/publishDiagnostics", "textDocument/publishDiagnostics", "textDocument/publishDiagnostics", "textDocument/publishDiagnostics", "textDocument/publishDiagnostics", "textDocument/publishDiagnostics", "textDocument/publishDiagnostics", "textDocument/publishDiagnostics"]
+step4b_exit=0
+
+verdict: step2=125 step3=1 step4=0 step4b=0
+SPIKE REPRODUCTION FAILED

@@ -7,8 +7,12 @@
 //   * every *.xml found under <location>/org.kde.syntax-highlighting/syntax*,
 //     with the <language name="..."> parsed out of plain XML files (source
 //     attribution),
-//   * every VALID definition the library actually loaded (sorted names + count +
-//     sha256 over the sorted names, so runs are comparable),
+//   * every VALID definition the library actually loaded: its name AND the
+//     WINNING Definition::filePath(), sorted by name (R2). The file path is the
+//     part that can detect a shadow: KSyntaxHighlighting keeps one definition
+//     per name, so a host/user definition that overrides ours does not change
+//     the name list at all — only which file wins. The count + sha256 over the
+//     sorted names are kept for compatibility; `hash_files` covers the paths,
 //   * (with --editor-repo) the same for KTextEditor's own repository, and
 //     optionally a const_cast injection into it (--inject-editor).
 //
@@ -34,18 +38,43 @@
 #include <KSyntaxHighlighting/Definition>
 #include <KSyntaxHighlighting/Repository>
 
+#include <algorithm>
+
 namespace {
+
+struct LoadedDefinition {
+    QString name;
+    QString filePath;
+};
+
+// Every valid definition the repository actually exposes, with the file that
+// WON for its name. Sorted by (name, file) so runs are comparable.
+QList<LoadedDefinition> sortedValidDefinitions(const KSyntaxHighlighting::Repository &repo)
+{
+    QList<LoadedDefinition> definitions;
+    for (const auto &definition : repo.definitions()) {
+        if (definition.isValid()) {
+            definitions.append({definition.name(), definition.filePath()});
+        }
+    }
+    std::sort(definitions.begin(), definitions.end(),
+              [](const LoadedDefinition &left, const LoadedDefinition &right) {
+                  if (left.name != right.name) {
+                      return left.name < right.name;
+                  }
+                  return left.filePath < right.filePath;
+              });
+    return definitions;
+}
 
 QStringList sortedValidNames(const KSyntaxHighlighting::Repository &repo)
 {
     QStringList names;
-    const auto definitions = repo.definitions();
-    for (const auto &definition : definitions) {
-        if (definition.isValid()) {
-            names.append(definition.name());
-        }
+    const auto definitions = sortedValidDefinitions(repo);
+    names.reserve(definitions.size());
+    for (const LoadedDefinition &definition : definitions) {
+        names.append(definition.name);
     }
-    names.sort();
     return names;
 }
 
@@ -54,6 +83,30 @@ QString hashNames(const QStringList &names)
     QCryptographicHash hash(QCryptographicHash::Sha256);
     hash.addData(names.join(QLatin1Char('\n')).toUtf8());
     return QString::fromLatin1(hash.result().toHex());
+}
+
+// sha256 over "name<TAB>winner-file" lines: changes when a shadow changes the
+// winning file, where hashNames() would stay identical.
+QString hashDefinitionFiles(const QList<LoadedDefinition> &definitions)
+{
+    QStringList lines;
+    lines.reserve(definitions.size());
+    for (const LoadedDefinition &definition : definitions) {
+        lines.append(definition.name + QLatin1Char('\t') + definition.filePath);
+    }
+    QCryptographicHash hash(QCryptographicHash::Sha256);
+    hash.addData(lines.join(QLatin1Char('\n')).toUtf8());
+    return QString::fromLatin1(hash.result().toHex());
+}
+
+// Prints `KSH-ENV <prefix>name="..." file="..."` for every loaded definition.
+void printLoaded(const QString &prefix, const QList<LoadedDefinition> &definitions, QTextStream &out)
+{
+    for (const LoadedDefinition &definition : definitions) {
+        out << QStringLiteral("KSH-ENV %1name=\"%2\" file=\"%3\"")
+                   .arg(prefix, definition.name, definition.filePath)
+            << Qt::endl;
+    }
 }
 
 // [name, file] for every plain-XML syntax definition under a directory.
@@ -107,13 +160,15 @@ int main(int argc, char **argv)
     QTextStream out(stdout);
 
     KSyntaxHighlighting::Repository repository;
+    const QList<LoadedDefinition> loaded = sortedValidDefinitions(repository);
     const QStringList names = sortedValidNames(repository);
     const QStringList customPaths = repository.customSearchPaths();
 
-    out << QStringLiteral("KSH-ENV defs=%1 hash=%2").arg(names.size()).arg(hashNames(names)) << Qt::endl;
-    for (const QString &name : names) {
-        out << QStringLiteral("KSH-ENV def name=\"%1\"").arg(name) << Qt::endl;
-    }
+    out << QStringLiteral("KSH-ENV defs=%1 hash=%2 hash_files=%3")
+               .arg(names.size())
+               .arg(hashNames(names), hashDefinitionFiles(loaded))
+        << Qt::endl;
+    printLoaded(QStringLiteral("def "), loaded, out);
     out << QStringLiteral("KSH-ENV custom_paths=%1").arg(customPaths.join(QLatin1Char(':'))) << Qt::endl;
 
     const QStringList standardPaths = QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation);
@@ -152,12 +207,13 @@ int main(int argc, char **argv)
                 editable.addCustomSearchPath(injectDir);
                 out << QStringLiteral("KSH-ENV editor_repo_injected=\"%1\"").arg(injectDir) << Qt::endl;
             }
+            const QList<LoadedDefinition> editorLoaded = sortedValidDefinitions(editor->repository());
             const QStringList editorNames = sortedValidNames(editor->repository());
-            out << QStringLiteral("KSH-ENV editor_repo defs=%1 hash=%2").arg(editorNames.size()).arg(hashNames(editorNames))
+            out << QStringLiteral("KSH-ENV editor_repo defs=%1 hash=%2 hash_files=%3")
+                       .arg(editorNames.size())
+                       .arg(hashNames(editorNames), hashDefinitionFiles(editorLoaded))
                 << Qt::endl;
-            for (const QString &name : editorNames) {
-                out << QStringLiteral("KSH-ENV editor_def name=\"%1\"").arg(name) << Qt::endl;
-            }
+            printLoaded(QStringLiteral("editor_def "), editorLoaded, out);
         }
     }
 

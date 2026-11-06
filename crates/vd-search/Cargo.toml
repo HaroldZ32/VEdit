@@ -9,8 +9,12 @@ publish.workspace = true
 workspace = true
 
 [dependencies]
-# Search index service (Slice 2, T21): the file set is owned by the project
-# model, so this crate has no dependencies of its own yet.
+# The file set is owned by the project model, so this crate needs no index
+# dependency. `regex` is the match engine of the *project* search: the plan
+# (ux-batch-2 §2) puts regex matching on the Rust side — RE2-style, so no
+# backreferences/lookaround — because Qt must never walk the tree or re-match.
+# Added to this crate's manifest only; the workspace root manifest is untouched.
+regex = "1"
 
 [dev-dependencies]
 tempfile.workspace = true

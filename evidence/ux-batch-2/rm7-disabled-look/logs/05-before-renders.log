@@ -1,0 +1,18 @@
+This plugin does not support propagateSizeHints()
+THEME Breeze Light active_text=#1f1c1b disabled_text=#1f1c1b
+PAIR breeze-light-toolbar-undo    size=180x40 differing_px=1027 bg=#f5f5f5 enabled_ink=#271c1b disabled_ink=#271c1b ink_channel_delta=0
+PAIR breeze-light-combo-ruleset   size=220x40 differing_px=4658 bg=#fcfcfc enabled_ink=#1f1c1b disabled_ink=#1f1c1b ink_channel_delta=0
+PAIR breeze-light-lineedit-rules  size=260x40 differing_px=1206 bg=#ffffff enabled_ink=#000000 disabled_ink=#1f1c1b ink_channel_delta=31
+PAIR breeze-light-button-apply    size=180x40 differing_px=3826 bg=#fcfcfc enabled_ink=#1f1c1b disabled_ink=#1f1c1b ink_channel_delta=0
+This plugin does not support propagateSizeHints()
+THEME Breeze Dark active_text=#cfcfc2 disabled_text=#cfcfc2
+PAIR breeze-dark-toolbar-undo     size=180x40 differing_px=2090 bg=#232629 enabled_ink=#cfcfc2 disabled_ink=#cfcfc2 ink_channel_delta=0
+PAIR breeze-dark-combo-ruleset    size=220x40 differing_px=496 bg=#191b1d enabled_ink=#cfcfc2 disabled_ink=#cfcfc2 ink_channel_delta=0
+PAIR breeze-dark-lineedit-rules   size=260x40 differing_px=1202 bg=#232629 enabled_ink=#dcd9d6 disabled_ink=#cfcfc2 ink_channel_delta=20
+PAIR breeze-dark-button-apply     size=180x40 differing_px=416 bg=#191b1d enabled_ink=#cfcfc2 disabled_ink=#cfcfc2 ink_channel_delta=0
+This plugin does not support propagateSizeHints()
+THEME Nord active_text=#d8dee9 disabled_text=#d8dee9
+PAIR nord-toolbar-undo            size=180x40 differing_px=2106 bg=#2e3440 enabled_ink=#d3dee9 disabled_ink=#d2dee9 ink_channel_delta=1
+PAIR nord-combo-ruleset           size=220x40 differing_px=710 bg=#21252e enabled_ink=#d8dee9 disabled_ink=#d8dee9 ink_channel_delta=0
+PAIR nord-lineedit-rules          size=260x40 differing_px=618 bg=#2e3440 enabled_ink=#d8dee9 disabled_ink=#d8dee9 ink_channel_delta=0
+PAIR nord-button-apply            size=180x40 differing_px=590 bg=#21252e enabled_ink=#d8dee9 disabled_ink=#d8dee9 ink_channel_delta=0

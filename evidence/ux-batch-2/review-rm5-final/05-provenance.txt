@@ -1,0 +1,22 @@
+== READMEs ==
+9180867d613a74bb36703ab389edcf5d54115e57acd07499030cd629323c03de  evidence/ux-batch-2/rm5-undo/README.md
+cd82872fe1415dc87b9cad9b47d6c163e7e75b07508ad7f64c662d488ad0e461  evidence/ux-batch-2/rm5b-shortcuts/README.md
+== sources ==
+1810e77982546f29835d6d7eba8a0428ee0a04c7b2dd826c3bb0c766611eb344  src/editor/kernel/document_io.cpp
+e17133ef46d5e1eebfb584b64c0597a16ca0ef7235f51c87c36d3f93d27de335  src/editor/kernel/undo_view_lifetime_test.cpp
+207fa71f2680e9a23ae5ac2675e1addc3cf4f149867627b57fe98493c259e843  src/app/shortcut_key_path_test.cpp
+d469c8d361d04c42bc15e647364ef7e029c341ced3abfb63657af9c88c086da9  src/app/command_registry.cpp
+e01a273e3e684e103b2293636ea3a660ead08ada2731ac68ac703f09847ffa82  src/app/app_shell.cpp
+cdc33ab2ae1ec2295784c2e337394656a582240a930d7d90ec0715c8d4b8f826  src/editor/kernel/ktexteditor_provider.cpp
+== red/green ==
+65390ebbdb621fce3211e587013722fcec3ba13b8671eddd3ae949f39d919b97  evidence/ux-batch-2/rm5-undo/red-run.log
+da9e0508f307735b20f992425e61c48f88faedd781db4fb1b7f74f010e8e76d7  evidence/ux-batch-2/rm5-undo/green-run.log
+0a776b17b8f78d9a527c6f2ea4e7518ce84e22e8f2c6f0bd8ae0f9bc6ccef7e7  evidence/ux-batch-2/rm5b-shortcuts/red-run.log
+e7660d46fa7ac3b114e3402d4a1b828e70274f0fe36ca79dfbb432945504e7cd  evidence/ux-batch-2/rm5b-shortcuts/green-run.log
+== bindings ==
+317b18d0b89fd74842e219d8e8b751314fcca87385c2a5318f43eadb142a3037  evidence/ux-batch-2/rm5b-shortcuts/product-bindings.txt
+1171ff707c839f78806d91efbf3df5157c6085a66d59bcdd54d217fecd93f0f2  evidence/ux-batch-2/rm5b-shortcuts/probe/log-kte-action-dump.txt
+== mtimes ==
+2026-11-06 15:50:59.517002529 +0800 src/editor/kernel/document_io.cpp
+2026-11-06 15:49:19.147889495 +0800 src/editor/kernel/undo_view_lifetime_test.cpp
+2026-11-06 16:42:52.625306005 +0800 src/app/shortcut_key_path_test.cpp

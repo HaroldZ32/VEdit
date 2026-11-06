@@ -58,3 +58,20 @@ build/centos7-verify/dist/
 #   bash src/workspace/filetree/tools/generate-testdata.sh
 # (the lane's own entries regenerate it too). Never commit it.
 filetree-testdata/
+
+# Compiled probe executables under evidence/ are build artifacts, not evidence:
+# their sources (*.cpp, *.sh) stay tracked, only the ELF binaries are ignored.
+# The pattern is anchored to probe directories on purpose: a bare
+# `evidence/**/*-probe` also swallowed DIRECTORIES named ...-probe.
+evidence/**/probes/*-probe
+evidence/**/probe/*-probe
+# Same for the ksh-env probe binaries a previous batch left in scratch AppDirs.
+evidence/**/vedit-*-probe
+
+# Generated fixtures (AST dumps, scale trees) under evidence/: reproducible, hundreds of MB each.
+evidence/**/scratch/
+
+# Generated scale fixtures (1176 files each, reproducible from the lane's script).
+evidence/**/bigdesign*/
+# Compiled probe executable with an underscore name (the -probe rule misses it).
+evidence/**/probe/*_probe

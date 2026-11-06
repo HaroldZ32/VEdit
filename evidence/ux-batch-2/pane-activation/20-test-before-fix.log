@@ -1,0 +1,31 @@
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK setup.one-pane PASS
+CHECK setup.editor-a PASS
+CHECK single-pane.press-keeps-active PASS
+CHECK single-pane.no-activation-callback PASS
+CHECK setup.two-panes PASS
+CHECK setup.a-active PASS
+CHECK setup.editor-b PASS
+CHECK press.target-is-inner-widget PASS
+CHECK press.non-active-pane-becomes-active FAIL (active=pane-1 (expected pane-2))
+CHECK press.new-pane-reports-active FAIL
+CHECK press.previous-pane-reports-inactive FAIL
+CHECK press.exactly-one-activation FAIL (switches=0 to=none)
+CHECK press.active-editor-is-clicked-pane FAIL
+CHECK press.focus-is-in-clicked-pane PASS
+CHECK press.badges-follow-the-active-pane FAIL
+CHECK control.already-active-pane-stays-active FAIL
+CHECK control.no-double-activation PASS
+CHECK control.previous-pane-stays-inactive FAIL
+CHECK tab.tab-bar-present PASS
+CHECK tab.click-activates-its-pane PASS
+CHECK tab.exactly-one-activation FAIL (0)
+CHECK focus-in.precondition-b-active FAIL
+CHECK focus-in.target-is-inner-widget PASS
+CHECK focus-in.activates-its-pane PASS
+CHECK focus-in.exactly-one-activation FAIL (0)
+SUMMARY checks=25 failures=11

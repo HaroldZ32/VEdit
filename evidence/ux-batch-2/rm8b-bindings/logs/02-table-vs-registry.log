@@ -1,0 +1,21 @@
+manual table rows: 45
+OK: 45 command ids enumerated from the sources == reference map
+desktop-global sequences known: 17
+OK: no primary default is a desktop-global sequence
+product selfcheck snapshot: 36 bindings, 34 commands
+OK: every product COMMAND-BINDING matches the manual (36 bindings, 34 commands)
+OK: product selfcheck commands.no-desktop-global-shortcuts PASS
+RM-5b product dump (historical): 32 commands
+delta: view.toolbar: dump='Ctrl+Alt+T' -> now='Ctrl+Alt+Shift+T'  (src/app/app_shell.cpp:660-661 static Ctrl+Shift+Alt+T literal)
+delta: view.panel.diagnostics: dump='Ctrl+Alt+D' -> now='Ctrl+Alt+Shift+D'  (diagnostics_integration.cpp:3013 static default (no relocation))
+delta: view.tab.next: dump=None -> now='Ctrl+Tab'  (src/app/app_shell.cpp view.tab.next)
+delta: view.tab.previous: dump=None -> now='Ctrl+Shift+Tab'  (src/app/app_shell.cpp view.tab.previous)
+OK: the remaining 28 dump rows match the manual
+RM-5c green-run bindings: 30
+OK: 30 green-run rows agree with the manual table
+OK: no runtime relocation machinery (rehomeDesktopGlobalDefaults absent)
+OK: product gate commands.no-desktop-global-shortcuts present
+unbound rows (11): diagnostics.capabilities, diagnostics.hover, diagnostics.reloadSettings, file.save-session, help.about, project.lint, project.reparse, view.dock.dock-project, view.panel.interface-panel, view.panel.module-tree, view.treesitter
+bound primaries: 34 (+ extras: 2)
+SUMMARY rows=45 failures=0
+exit=0

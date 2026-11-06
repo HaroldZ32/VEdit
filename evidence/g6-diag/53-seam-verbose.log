@@ -1,0 +1,55 @@
+UpdateCTestConfiguration  from :/vedit-build/target/qt6-build/DartConfiguration.tcl
+Test project /vedit-build/target/qt6-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 35
+    Start 35: vedit-diagnostics-product-seam
+
+35: Test command: /vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics/vedit-diagnostics-product-seam
+35: Working Directory: /vedit-build/target/qt6-build/src/app/workspace-lane-diagnostics
+35: Environment variables: 
+35:  QT_QPA_PLATFORM=offscreen
+35:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime-diagnostics
+35:  VEDIT_QUIET=1
+35: Test timeout computed to be: 180
+35: CHECK seam.file-written PASS
+35: CHECK seam.edit-core-provider PASS
+35: kf.sonnet.core: Sonnet: No speller backends available!
+35: This plugin does not support propagateSizeHints()
+35: CHECK seam.panel-installed PASS
+35: CHECK seam.active-pane PASS
+35: [edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+35: CHECK seam.file-opened PASS
+35: CHECK seam.analysis-after-open PASS  edited.sv — analyzed 15:27:17 (saved file): 0 diagnostic(s)
+35: OBSERVED seam.after-open status='edited.sv — analyzed 15:27:17 (saved file): 0 diagnostic(s)'
+35: CHECK seam.editor-widget PASS
+35: This plugin does not support propagateSizeHints()
+35: This plugin does not support propagateSizeHints()
+35: This plugin does not support propagateSizeHints()
+35: OBSERVED seam.after-edit status='edited.sv — analyzed 15:27:18 (editor buffer, not saved yet): 1 diagnostic(s)'
+35: OBSERVED seam.controller state=1 session='backend=verible · buffer changed (75 bytes): /tmp/vedit-diagnostics-product-seam-CYQTVe/edited.sv' diagnostics=1 analyses=2
+35: CHECK seam.panel-shows-buffer-source PASS  edited.sv — analyzed 15:27:18 (editor buffer, not saved yet): 1 diagnostic(s)
+35: CHECK seam.buffer-edit-diagnosed PASS  edited.sv — analyzed 15:27:18 (editor buffer, not saved yet): 1 diagnostic(s)
+35: CHECK seam.disk-untouched PASS  disk=76 bytes
+35: CHECK seam.panel-lists-the-issue PASS  1
+35: CHECK seam.ktexteditor-view PASS
+35: CHECK seam.annotations-installed PASS
+35: OBSERVED seam.annotation_lines=1 tooltip='syntax error at "b" [verible]'
+35: CHECK seam.annotation-on-error-line PASS  syntax error at "b" [verible]
+35: CHECK seam.annotation-tooltip-has-syntax PASS  syntax error at "b" [verible]
+35: This plugin does not support propagateSizeHints()
+35: OBSERVED seam.reverse-control status='no effective file set — 0 diagnostic(s)'
+35: CHECK seam.reverse-control-no-analysis PASS  no effective file set — 0 diagnostic(s)
+35: VE-DIAGNOSTICS-PRODUCT-SEAM checks=16 failures=0 skipped=0
+1/1 Test #35: vedit-diagnostics-product-seam ...   Passed    6.16 sec
+
+The following tests passed:
+	vedit-diagnostics-product-seam
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   6.16 sec

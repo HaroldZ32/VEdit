@@ -1,0 +1,56 @@
+== F1 probe checks (final) ==
+CHECK PASS  apprun.syntax
+CHECK PASS  default.slang-bundled
+CHECK PASS  default.verible-bundled
+CHECK PASS  override.slang-preserved
+CHECK PASS  override.verible-preserved
+CHECK PASS  absent.slang-not-exported
+CHECK PASS  absent.verible-not-exported
+CHECK PASS  absent.slang-caller-preserved
+CHECK PASS  non-executable.slang-not-exported
+APPRUN-ENV-PROBE ok=1 checks=9 failures=0
+
+== F1 RED control (final) ==
+== RED control: pre-repair AppRun (unconditional export) under the new probe ==
+CHECK PASS  apprun.syntax
+CHECK PASS  default.slang-bundled
+CHECK PASS  default.verible-bundled
+CHECK FAIL  override.slang-preserved
+CHECK PASS  override.verible-preserved
+CHECK FAIL  absent.slang-not-exported
+CHECK PASS  absent.verible-not-exported
+CHECK FAIL  absent.slang-caller-preserved
+CHECK FAIL  non-executable.slang-not-exported
+APPRUN-ENV-PROBE ok=0 checks=9 failures=4
+RED-CONTROL probe exit=1 (non-zero expected)
+RED-CONTROL-SCRIPT EXIT=0 (0 means the probe caught the regression)
+
+== F2 checks (palette integration) ==
+CHECK integration.root-follows-projectRootChanged PASS
+CHECK integration.root-rescan-new-root PASS
+CHECK integration.root-old-files-gone PASS
+
+== F4 checks (project selftest) ==
+CHECK filelist.import-status PASS
+CHECK filelist.reimport-panel-noop PASS
+CHECK filelist.reimport-status-honest PASS
+
+== preserved display / filelist checks (spot check) ==
+CHECK path.display.under-root PASS rtl/top.sv
+CHECK path.display.under-root.normalized-root PASS
+CHECK path.display.outside-root PASS /tmp/vedit-app-KELPal/display-outside/top.sv
+CHECK path.display.no-root PASS /tmp/vedit-app-KELPal/display-outside/top.sv
+CHECK path.display.sibling-prefix-outside PASS
+CHECK path.display.under-root.open PASS
+CHECK path.display.open-key-still-absolute PASS /tmp/vedit-app-KELPal/project-a/rtl/foo.sv
+CHECK path.display.outside-root.open PASS
+CHECK display.files.under-root-finishes PASS
+CHECK display.files.under-root PASS
+CHECK display.files.open-key-absolute PASS
+CHECK display.panel.files-under-root PASS
+CHECK display.filelist.outside-import PASS
+CHECK display.filelist.outside-finishes PASS
+CHECK display.files.outside-absolute PASS
+CHECK display.filelists.outside-absolute PASS
+CHECK display.panel.filelists-outside-absolute PASS
+CHECK display.filelist.inside-import PASS

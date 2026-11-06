@@ -19,6 +19,7 @@
 #include <QString>
 #include <QStringList>
 
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -45,6 +46,12 @@ public:
         IsDirRole,
         ReadableRole,
         LoadedRole,
+        /// item 10 / RM-9: the R2 merged-view status of this file, in the ONE
+        /// vocabulary of src/common/file_status.h: 0 unknown (no mark), 1 error
+        /// (red), 2 warning (yellow), 3 clean (green), 4 not analysed yet /
+        /// excluded (hollow grey ring, meaning in the tooltip). Folders always
+        /// answer 0.
+        FileStatusRole,
     };
 
     explicit FileTreeModel(QObject *parent = nullptr);
@@ -88,6 +95,32 @@ public:
     void setBatchSize(int size);
     int batchSize() const;
 
+    // ---- RM-9: files that only an imported `.f` list brings in -------------
+    /// The project's EXPANDED file set (absolute paths, published by the
+    /// diagnostics lane through the shell property seam). The members that live
+    /// OUTSIDE this tree's directory scan are shown in a synthetic
+    /// "From filelist" group at the bottom of the root folder, with the SAME
+    /// FileStatusRole dots: a filelist-only file must have a status surface in
+    /// the tree, not only in the Project panel's list.
+    void setFilelistFiles(const QStringList &files);
+    QStringList filelistFiles() const { return filelistFiles_; }
+    /// Synthetic rows currently materialised (group + members; 0 when none).
+    int filelistRowCount() const;
+
+    // ---- item 10: merged-view status dots --------------------------------
+    /// Install the status source. `status` answers FileStatusRole per path
+    /// (0 unknown / 1 error / 2 warning / 3 clean); `revision` is a cheap
+    /// monotonic counter of the merged diagnostics view. The model only asks
+    /// the source on data() and repaints when `revision` moved: it never
+    /// rescans the project, and no timer lives here.
+    void setFileStatusSource(std::function<int(const QString &)> status,
+                             std::function<quint64()> revision);
+    /// Re-evaluate the revision; true when the visible rows were repainted.
+    bool syncFileStatuses();
+    quint64 statusRevision() const { return statusRevision_; }
+    /// How many status syncs actually repainted (observability).
+    int statusRepaints() const { return statusRepaints_; }
+
     // Evidence counters. `loadedRows()` is the number of rows materialised right
     // now (the laziness proof); `scannedDirectories()` counts readdir calls that
     // succeeded since the model was created.
@@ -117,6 +150,10 @@ private:
         bool readable = true;
         bool populated = false; // readdir finished
         bool complete = true;   // no pending entries left
+        /// RM-9: a row this model invented (the "From filelist" group) rather
+        /// than a directory entry. It is never read from disk and its tooltip
+        /// explains where its members come from.
+        bool synthetic = false;
         int row = 0;
         QString error;
         std::vector<Entry> pending;
@@ -138,13 +175,23 @@ private:
     void resetRoot();
     void setRootState(RootState state, const QString &error);
     void recordDiagnostic(const QString &message);
+    /// Drop and re-create the synthetic "From filelist" group. Called when the
+    /// set changes and when the root's own listing finishes (the group must be
+    /// the LAST row, so it is only appended once every real entry is in).
+    void syncFilelistGroup();
 
     std::unique_ptr<Node> root_;
     QString rootPath_;
     RootState rootState_ = RootState::NoRoot;
     QString rootError_;
     int batchSize_ = 250;
+    std::function<int(const QString &)> statusSource_;
+    std::function<quint64()> statusRevisionSource_;
+    quint64 statusRevision_ = 0;
+    int statusRepaints_ = 0;
     int loadedRows_ = 0;
+    QStringList filelistFiles_;   ///< absolute paths from the project set
+    Node *filelistGroup_ = nullptr; ///< owned by root_->children (never separate)
     int scannedDirectories_ = 0;
     QStringList diagnostics_;
 };

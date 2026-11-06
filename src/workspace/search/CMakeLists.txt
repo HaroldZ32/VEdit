@@ -74,7 +74,9 @@ else()
 endif()
 
 set(VEDIT_WORKSPACE_SEARCH_SOURCES
+  document_sync.cpp
   global_search.cpp
+  project_replace.cpp
   search_panel.cpp
   search_types.cpp
 )
@@ -86,11 +88,27 @@ if(VEDIT_WORKSPACE_SEARCH_HAVE_SHELL)
 endif()
 
 add_library(vedit_workspace_search STATIC ${VEDIT_WORKSPACE_SEARCH_SOURCES})
-target_include_directories(vedit_workspace_search PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+# The shared path-display rule (src/common/path_display.h), header-only.
+target_include_directories(vedit_workspace_search PUBLIC
+  "${CMAKE_CURRENT_SOURCE_DIR}"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../../common")
+# A-1/T20: the panel routes every result click through the application-wide jump
+# seam (src/workspace/jump) instead of its own IJumpTarget. The jump lane is
+# configured early when it is not a target yet (same pattern as the breadcrumb
+# lane); its GLOBAL guard makes the later lane-list inclusion a no-op.
+if(NOT TARGET vedit_workspace_jump AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../jump/CMakeLists.txt")
+  add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../jump" "${CMAKE_CURRENT_BINARY_DIR}/jump-lane")
+endif()
+if(NOT TARGET vedit_workspace_jump)
+  message(FATAL_ERROR
+    "vedit_workspace_search needs the jump lane (src/workspace/jump): the panel has no second "
+    "jump implementation")
+endif()
 target_link_libraries(vedit_workspace_search PUBLIC
   Qt6::Core
   Qt6::Gui
   Qt6::Widgets
+  vedit_workspace_jump
 )
 if(VEDIT_WORKSPACE_SEARCH_HAVE_FFI)
   target_link_libraries(vedit_workspace_search PUBLIC vd_ffi)
@@ -155,3 +173,48 @@ set_tests_properties(vedit-workspace-search-selftest PROPERTIES
   ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-search"
   TIMEOUT 180
 )
+
+# --- ux-batch-2 B2: shared option model, hand-off, project-wide replace ------
+# One offscreen harness for the six acceptance points of the lane: option-set
+# parity of the two surfaces, replace-one, replace-all (counts + one write per
+# file), regex/whole-word/case, the Ctrl+F whole-project hand-off, and the
+# unsaved-buffer rule. It links the real KTextEditor when the kernel provides it
+# (the bar and the unsaved-buffer check need a real document/view), otherwise
+# those checks report SKIP.
+add_executable(vedit-search-replace-tests search_replace_selftest.cpp)
+target_link_libraries(vedit-search-replace-tests PRIVATE
+  vedit_workspace_search
+  Qt6::Test
+)
+if(TARGET vedit_editor_core)
+  target_link_libraries(vedit-search-replace-tests PRIVATE vedit_editor_core)
+  target_compile_definitions(vedit-search-replace-tests PRIVATE
+    VEDIT_SEARCH_HAVE_EDITOR_CORE=1)
+endif()
+if(VEDIT_WORKSPACE_SEARCH_HAVE_SHELL)
+  # The product wiring check: the Ctrl+F hand-off reaches the dock through
+  # installSearch()'s handler (the dock is created on demand by the shell).
+  target_link_libraries(vedit-search-replace-tests PRIVATE vedit_app_shell)
+  target_compile_definitions(vedit-search-replace-tests PRIVATE
+    VEDIT_SEARCH_HAVE_SHELL=1)
+endif()
+if(VEDIT_WORKSPACE_SEARCH_HAVE_FFI)
+  target_compile_definitions(vedit-search-replace-tests PRIVATE
+    VEDIT_SEARCH_HAVE_FFI=1)
+endif()
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(vedit-search-replace-tests PRIVATE
+    -Wall -Wextra -Wpedantic -Werror)
+endif()
+if(VEDIT_WORKSPACE_SEARCH_HAVE_FFI)
+  add_test(NAME vedit-search-replace-tests
+           COMMAND vedit-search-replace-tests --selfcheck
+                   --evidence "${CMAKE_CURRENT_BINARY_DIR}/search-replace-evidence")
+  set_tests_properties(vedit-search-replace-tests PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-search"
+    TIMEOUT 180
+  )
+else()
+  message(STATUS
+    "VEdit: vedit-search-replace-tests built without the Rust search service; ctest entry skipped")
+endif()

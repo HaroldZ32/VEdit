@@ -239,6 +239,15 @@ vd-ffi v0.1.1 (/vedit-build/crates/vd-ffi)
 │       ├── pin-project-lite v0.2.17
 │       └── tokio v1.54.1 (*)
 ├── vd-search v0.1.1 (/vedit-build/crates/vd-search)
+│   └── regex v1.13.1
+│       ├── aho-corasick v1.1.5
+│       │   └── memchr v2.8.3
+│       ├── memchr v2.8.3
+│       ├── regex-automata v0.4.18
+│       │   ├── aho-corasick v1.1.5 (*)
+│       │   ├── memchr v2.8.3
+│       │   └── regex-syntax v0.8.11
+│       └── regex-syntax v0.8.11
 ├── vd-settings v0.1.1 (/vedit-build/crates/vd-settings)
 │   └── toml v1.1.8+spec-1.1.0 (*)
 └── vd-vcs v0.1.1 (/vedit-build/crates/vd-vcs)

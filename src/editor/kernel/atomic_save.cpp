@@ -10,6 +10,7 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <QCoreApplication>
 
 namespace vedit::editor {
 namespace {
@@ -65,11 +66,11 @@ AtomicSaveResult atomicSaveText(const QString &targetPath, const QByteArray &con
     const QFileInfo targetInfo(targetPath);
     const QDir directory = targetInfo.absoluteDir();
     if (!directory.exists()) {
-        return failure(QStringLiteral("cannot save %1: directory %2 does not exist")
+        return failure(QCoreApplication::translate("VEdit", "cannot save %1: directory %2 does not exist")
                            .arg(targetPath, directory.absolutePath()));
     }
     if (!QFileInfo(directory.absolutePath()).isWritable()) {
-        return failure(QStringLiteral("cannot save %1: directory %2 is not writable")
+        return failure(QCoreApplication::translate("VEdit", "cannot save %1: directory %2 is not writable")
                            .arg(targetPath, directory.absolutePath()));
     }
 
@@ -90,7 +91,7 @@ AtomicSaveResult atomicSaveText(const QString &targetPath, const QByteArray &con
     const QByteArray tmpEncoded = QFile::encodeName(tmpPath);
     int fd = ::open(tmpEncoded.constData(), O_WRONLY | O_CREAT | O_EXCL, mode);
     if (fd < 0) {
-        return failure(QStringLiteral("cannot create the temporary file %1: %2")
+        return failure(QCoreApplication::translate("VEdit", "cannot create the temporary file %1: %2")
                            .arg(tmpPath, QString::fromLocal8Bit(std::strerror(errno))));
     }
 
@@ -139,7 +140,7 @@ AtomicSaveResult atomicSaveText(const QString &targetPath, const QByteArray &con
         } else if (::fsync(dirFd) != 0) {
             if (errno == EINVAL || errno == ENOTSUP) {
                 result.diagnostics.append(
-                    QStringLiteral("directory fsync not supported here (%1); the rename is complete")
+                    QCoreApplication::translate("VEdit", "directory fsync not supported here (%1); the rename is complete")
                         .arg(QString::fromLocal8Bit(std::strerror(errno))));
             } else {
                 result.error = describe(QStringLiteral("fsync(directory)"));
@@ -150,7 +151,7 @@ AtomicSaveResult atomicSaveText(const QString &targetPath, const QByteArray &con
         }
         ::close(dirFd);
     } else {
-        result.diagnostics.append(QStringLiteral("cannot open the directory for fsync: %1")
+        result.diagnostics.append(QCoreApplication::translate("VEdit", "cannot open the directory for fsync: %1")
                                       .arg(QString::fromLocal8Bit(std::strerror(errno))));
     }
 

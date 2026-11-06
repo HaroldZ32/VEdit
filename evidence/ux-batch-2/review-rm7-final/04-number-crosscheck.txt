@@ -1,0 +1,6 @@
+== my PALETTE-THEME vs writer green log ==
+IDENTICAL 30 theme rows
+== my PALETTE-ROLE-MIN vs writer ==
+IDENTICAL 9 role-min rows
+== red rerun vs writer red log (CHECK lines) ==
+IDENTICAL 638 lines (FAIL=584)

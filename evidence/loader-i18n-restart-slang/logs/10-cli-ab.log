@@ -1,0 +1,6 @@
+== CLI A: LD_LIBRARY_PATH exported (the packaged child environment) ==
+slang version 12.1.0+0
+EXIT=0
+== CLI B: LD_LIBRARY_PATH removed ==
+slang version 12.1.0+0
+EXIT=0

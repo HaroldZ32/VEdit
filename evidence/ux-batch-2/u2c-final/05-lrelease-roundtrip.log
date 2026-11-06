@@ -1,0 +1,27 @@
+Updating '/tmp/u2c.qm'...
+    Generated 1208 translation(s) (1208 finished and 0 unfinished)
+lrelease exit=0
+compiled messages: 1208
+  OK   'cancelled — %1/%2 file(s)' -> '已取消 — %1/%2 文件'
+  OK   '%1/%2 file(s) scanned — %3 CLI diagnostics' -> '%1/%2 文件已扫描 — %3 条 CLI 诊断'
+  OK   'FIM request was not accepted by the Rust service' -> 'FIM 请求未被 Rust 服务接受'
+  OK   'FIM timed out (%1 ms without a result)' -> 'FIM 超时（%1 ms 无结果）'
+  OK   'FIM service unavailable (could not create the Rust handle)' -> 'FIM 服务不可用（无法创建 Rust 句柄）'
+  OK   'FIM request was not accepted by the Rust service: %1' -> 'FIM 请求未被 Rust 服务接受：%1'
+  OK   'FIM failed: %1' -> 'FIM 失败：%1'
+  OK   'FIM poll failed (state %1)' -> 'FIM 轮询异常（state %1）'
+  OK   'FIM disabled (off by default)' -> 'FIM 未启用（默认关闭）'
+  OK   'FIM unavailable (no Rust service linked)' -> 'FIM 不可用（未链接 Rust 服务）'
+  OK   'FIM unavailable (no Rust service linked; no request was sent)' -> 'FIM 不可用（未链接 Rust 服务；未发出请求）'
+  OK   'FIM request in flight…' -> 'FIM 请求中…'
+  OK   'FIM suggestion ready' -> 'FIM 建议就绪'
+  OK   'FIM returned an empty suggestion' -> 'FIM 返回空建议'
+  OK   'FIM failed (no details)' -> 'FIM 失败（无详情）'
+  OK   'FIM request went stale' -> 'FIM 请求已失效'
+  OK   'FIM request cancelled' -> 'FIM 请求已取消'
+  OK   'FIM unknown state' -> 'FIM 未知状态'
+  OK   'FIM suggestion invalidated (typing continued)' -> 'FIM 建议已作废（继续输入）'
+  OK   'FIM suggestion accepted' -> 'FIM 已接受建议'
+  OK   'FIM cancelled' -> 'FIM 已取消'
+  OK   'FIM timed out (%1 ms without a result; cancelled)' -> 'FIM 超时（%1 ms 无结果，已取消）'
+round-trip failures: 0 of 22

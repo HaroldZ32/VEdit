@@ -26,8 +26,11 @@ namespace vedit::workspace::diagnostics {
 
 /// Which command-line tool is being resolved.
 enum class ToolKind {
-    Verible, ///< `verible-verilog-ls` (diagnostics / navigation / outline)
-    Slang,   ///< `slang` (deep lint)
+    Verible,       ///< `verible-verilog-ls` (diagnostics / navigation / outline)
+    Slang,         ///< `slang` (deep lint)
+    SlangServer,   ///< `slang-server` (the alternate LSP backend, T138/T11)
+    VeribleFormat, ///< `verible-verilog-format` (formatting ALWAYS uses it)
+    VeribleLint,   ///< `verible-verilog-lint` (the alternate lint engine, T138/T11)
 };
 
 /// Where the resolved binary came from.
@@ -36,6 +39,7 @@ enum class ToolSource {
     Local, ///< the source checkout's own artifact (`build/slang/out`, verible extract)
     Path,
     Env,
+    Settings, ///< an explicit path from `settings.toml` (`tools.*` keys)
     Missing,
 };
 
@@ -59,13 +63,32 @@ struct ToolResolution {
     QString describe() const;
 };
 
-/// The joint report for both tools (the visible observability surface).
+/// The joint report for the toolchain (the visible observability surface).
+///
+/// `missing()` and `statusLine()` keep their historical meaning: they cover the
+/// TWO tools the default configuration needs (`verible-verilog-ls`, `slang`).
+/// The T138/T11 tools (`slang-server`, `verible-verilog-format`,
+/// `verible-verilog-lint`) live in their own fields and are reported through
+/// `auxiliaryMissing()` / `auxiliaryStatusLine()`, so an optional engine being
+/// absent never flips the existing "diagnostics unavailable" status.
 struct ToolchainReport {
     ToolResolution verible;
     ToolResolution slang;
+    ToolResolution slangServer;
+    ToolResolution veribleFormat;
+    ToolResolution veribleLint;
+
+    /// The resolution for one kind (never nullptr; an unknown kind returns
+    /// the `slang` slot so a caller can never dereference null).
+    const ToolResolution &toolFor(ToolKind kind) const;
 
     /// Tool families with no executable, e.g. `{"verible", "slang"}`.
     QStringList missing() const;
+    /// The T11 extra tools that are absent (`slang-server`, `verible-format`,
+    /// `verible-lint`), for a backend-specific status line only.
+    QStringList auxiliaryMissing() const;
+    /// `aux source=slang-server:local verible-format:local verible-lint:local missing=[...]`
+    QString auxiliaryStatusLine() const;
     /// `toolchain source=verible:bundled slang:missing missing=[slang]` style line.
     QString statusLine() const;
     /// What the missing tools disable (empty when nothing is missing).
@@ -89,6 +112,9 @@ struct ToolchainSearchContext {
     QHash<QString, QString> env;        ///< override variables
     QString veribleName = QStringLiteral("verible-verilog-ls");
     QString slangName = QStringLiteral("slang");
+    QString slangServerName = QStringLiteral("slang-server");
+    QString veribleFormatName = QStringLiteral("verible-verilog-format");
+    QString veribleLintName = QStringLiteral("verible-verilog-lint");
 };
 
 /// Resolve both tools against `context` (pure; no process spawning).
@@ -97,6 +123,18 @@ ToolchainReport resolveToolchain(const ToolchainSearchContext &context);
 /// The real application context: bundled dirs next to the product binary, the
 /// process PATH and the override environment variables.
 ToolchainSearchContext applicationToolchainContext();
+
+/// Apply explicit user paths (the `tools.*` settings keys) on top of a resolved
+/// report. Keys are canonical tool names (`verible-verilog-ls`, `slang`,
+/// `slang-server`, `verible-verilog-format`, `verible-verilog-lint`); an empty
+/// or non-executable path is ignored and keeps the resolved tool.
+void applyToolOverrides(ToolchainReport *report, const QHash<QString, QString> &paths);
+
+/// Format `text` with the given `verible-verilog-format` binary (stdin -> stdout,
+/// synchronous; the GUI calls this on an explicit action only). Formatting ALWAYS
+/// uses this binary, never the LSP backend. Returns false with `error` filled.
+bool formatVerilog(const QString &formatterPath, const QString &text, QString *formatted,
+                   QString *error);
 
 /// `TOOLCHAIN ...` machine line for `--selfcheck` and evidence logs.
 QString toolchainStatusLine();

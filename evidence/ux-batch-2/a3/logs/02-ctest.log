@@ -1,0 +1,9 @@
+=== BUILD EXIT: 0 ===
+Test project /vedit-build/target/qt6-build
+    Start 20: vedit-highlight-mode-selftest
+1/1 Test #20: vedit-highlight-mode-selftest ....   Passed    0.07 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.07 sec
+=== CTEST EXIT: 0 ===

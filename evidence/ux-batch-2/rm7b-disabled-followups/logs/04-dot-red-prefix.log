@@ -1,0 +1,256 @@
+PREFIX-DELEGATE m2_removed=2
+0a4555422712df50859403aecba01a8118f3e1e75cd09d7f50bd60e6630522e9  /vedit-build/src/workspace/filetree/file_status_delegate.cpp
+1ba1e8e1b7baca7d236984c65db1bb11db79645b003c225384833fbe2ef97077  /vedit-build/target/rm7b-prefix/file_status_delegate_prefix.cpp
+CHECK disabled.palette.catalogue PASS 30 theme(s)
+PALETTE-THEME Atom One Dark          worst_role=button-text      channel_delta=72 luminance_delta=0.294 contrast_drop=2.48
+PALETTE-THEME Atom One Light         worst_role=button-text      channel_delta=96 luminance_delta=0.276 contrast_drop=3.98
+PALETTE-THEME Breeze Dark            worst_role=button-text      channel_delta=92 luminance_delta=0.442 contrast_drop=2.96
+PALETTE-THEME Breeze Light           worst_role=button-text      channel_delta=115 luminance_delta=0.260 contrast_drop=5.20
+PALETTE-THEME Catppuccin Frappé     worst_role=button-text      channel_delta=91 luminance_delta=0.423 contrast_drop=2.60
+PALETTE-THEME Catppuccin Latte       worst_role=button-text      channel_delta=80 luminance_delta=0.264 contrast_drop=3.00
+PALETTE-THEME Catppuccin Macchiato   worst_role=button-text      channel_delta=98 luminance_delta=0.467 contrast_drop=2.94
+PALETTE-THEME Catppuccin Mocha       worst_role=button-text      channel_delta=105 luminance_delta=0.501 contrast_drop=3.23
+PALETTE-THEME Dracula                worst_role=button-text      channel_delta=111 luminance_delta=0.680 contrast_drop=3.23
+PALETTE-THEME Falcon                 worst_role=button-text      channel_delta=100 luminance_delta=0.494 contrast_drop=2.83
+PALETTE-THEME GitHub Dark            worst_role=button-text      channel_delta=101 luminance_delta=0.559 contrast_drop=3.11
+PALETTE-THEME GitHub Light           worst_role=button-text      channel_delta=110 luminance_delta=0.274 contrast_drop=4.82
+PALETTE-THEME Homunculus             worst_role=button-text      channel_delta=100 luminance_delta=0.256 contrast_drop=4.22
+PALETTE-THEME Monokai                worst_role=button-text      channel_delta=112 luminance_delta=0.688 contrast_drop=3.31
+PALETTE-THEME Nord                   worst_role=button-text      channel_delta=90 luminance_delta=0.494 contrast_drop=2.75
+PALETTE-THEME Oblivion               worst_role=button-text      channel_delta=98 luminance_delta=0.489 contrast_drop=3.18
+PALETTE-THEME Printing               worst_role=button-text      channel_delta=130 luminance_delta=0.223 contrast_drop=5.46
+PALETTE-THEME Radical                worst_role=button-text      channel_delta=74 luminance_delta=0.225 contrast_drop=2.72
+PALETTE-THEME Solarized Dark         worst_role=window-text      channel_delta=72 luminance_delta=0.183 contrast_drop=2.23
+PALETTE-THEME Solarized Light        worst_role=button-text      channel_delta=73 luminance_delta=0.265 contrast_drop=2.13
+PALETTE-THEME Tokyo Night            worst_role=button-text      channel_delta=93 luminance_delta=0.325 contrast_drop=2.88
+PALETTE-THEME Tokyo Night Light      worst_role=button-text      channel_delta=80 luminance_delta=0.199 contrast_drop=3.08
+PALETTE-THEME Tokyo Night Storm      worst_role=button-text      channel_delta=80 luminance_delta=0.303 contrast_drop=2.55
+PALETTE-THEME VSCodium Dark          worst_role=button-text      channel_delta=97 luminance_delta=0.487 contrast_drop=3.20
+PALETTE-THEME Vim Dark               worst_role=window-text      channel_delta=98 luminance_delta=0.365 contrast_drop=3.80
+PALETTE-THEME ayu Dark               worst_role=button-text      channel_delta=92 luminance_delta=0.343 contrast_drop=3.32
+PALETTE-THEME ayu Light              worst_role=button-text      channel_delta=79 luminance_delta=0.287 contrast_drop=2.78
+PALETTE-THEME ayu Mirage             worst_role=button-text      channel_delta=92 luminance_delta=0.432 contrast_drop=2.99
+PALETTE-THEME gruvbox Dark           worst_role=button-text      channel_delta=104 luminance_delta=0.513 contrast_drop=3.03
+PALETTE-THEME gruvbox Light          worst_role=button-text      channel_delta=95 luminance_delta=0.256 contrast_drop=3.83
+PALETTE-ROLE-MIN window-text        channel_delta=72 (Solarized Dark) luminance_delta=0.191 (Solarized Dark) contrast_drop=2.25 (Solarized Light)
+PALETTE-ROLE-MIN text               channel_delta=72 (Solarized Dark) luminance_delta=0.191 (Solarized Dark) contrast_drop=2.35 (Solarized Dark)
+PALETTE-ROLE-MIN button-text        channel_delta=72 (Atom One Dark) luminance_delta=0.183 (Solarized Dark) contrast_drop=2.13 (Solarized Light)
+PALETTE-ROLE-MIN tooltip-text       channel_delta=72 (Solarized Dark) luminance_delta=0.185 (Solarized Dark) contrast_drop=2.26 (Solarized Dark)
+PALETTE-ROLE-MIN placeholder-text   channel_delta=50 (Solarized Light) luminance_delta=0.202 (Solarized Light) contrast_drop=1.35 (Solarized Light)
+PALETTE-ROLE-MIN link               channel_delta=64 (gruvbox Dark) luminance_delta=0.077 (Breeze Dark) contrast_drop=1.33 (ayu Light)
+PALETTE-ROLE-MIN link-visited       channel_delta=64 (gruvbox Dark) luminance_delta=0.158 (Monokai) contrast_drop=1.55 (ayu Light)
+PALETTE-ROLE-MIN highlight          channel_delta=9 (Tokyo Night Light) luminance_delta=0.007 (Tokyo Night) contrast_drop=1.09 (Tokyo Night Light) (secondary role)
+PALETTE-ROLE-MIN highlighted-text   channel_delta=60 (Vim Dark) luminance_delta=0.071 (Radical) contrast_drop=0.49 (Tokyo Night Light) (secondary role)
+CHECK disabled.palette.themes-tested PASS 30/30
+CHECK disabled.palette.active-intact PASS enabled colours are still the theme's own
+CHECK disabled.palette.min-channel-delta PASS min=72 theme=Atom One Dark floor=40
+CHECK disabled.palette.min-luminance-delta PASS min=0.183 theme=Solarized Dark floor=0.100
+CHECK disabled.palette.min-contrast-drop PASS min=2.13 theme=Solarized Light floor=1.40
+CHECK disabled.apply-theme PASS Breeze Light
+CHECK disabled.pixels.styles PASS 2 style(s): Windows, Fusion
+STYLE-SAMPLE style=Windows class=QWindowsStyle kind=reduced widgets=2 themes=30 exact_colour=0
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PIXELS style=Windows    widget=toolbar-action   role=button-text themes=30 worst_theme=Atom One Dark      channel_delta=72 luminance_delta=0.294 differing_px=2233 enabled_hits=159 disabled_hits=183 exact_colour=0
+CHECK disabled.pixels.toolbar-action PASS style=Windows themes=30 worst_theme=Atom One Dark channel_delta=72 luminance_delta=0.294 differing_px=2233
+PIXELS style=Windows    widget=combo-box        role=button-text themes=30 worst_theme=Atom One Dark      channel_delta=72 luminance_delta=0.294 differing_px=4632 enabled_hits=20 disabled_hits=2 exact_colour=0
+CHECK disabled.pixels.combo-box PASS style=Windows themes=30 worst_theme=Atom One Dark channel_delta=72 luminance_delta=0.294 differing_px=4632
+STYLE-SAMPLE style=Fusion class=QFusionStyle kind=full widgets=5 themes=30 exact_colour=1
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PIXELS style=Fusion     widget=toolbar-action   role=button-text themes=30 worst_theme=Atom One Dark      channel_delta=72 luminance_delta=0.294 differing_px=2333 enabled_hits=162 disabled_hits=190 exact_colour=1
+CHECK disabled.pixels.toolbar-action PASS style=Fusion themes=30 worst_theme=Atom One Dark channel_delta=72 luminance_delta=0.294 differing_px=2333
+PIXELS style=Fusion     widget=push-button      role=button-text themes=30 worst_theme=Atom One Dark      channel_delta=72 luminance_delta=0.294 differing_px=1047 enabled_hits=197 disabled_hits=235 exact_colour=1
+CHECK disabled.pixels.push-button PASS style=Fusion themes=30 worst_theme=Atom One Dark channel_delta=72 luminance_delta=0.294 differing_px=1047
+PIXELS style=Fusion     widget=combo-box        role=button-text themes=30 worst_theme=Atom One Dark      channel_delta=72 luminance_delta=0.294 differing_px=1191 enabled_hits=235 disabled_hits=272 exact_colour=1
+CHECK disabled.pixels.combo-box PASS style=Fusion themes=30 worst_theme=Atom One Dark channel_delta=72 luminance_delta=0.294 differing_px=1191
+PIXELS style=Fusion     widget=line-edit        role=text        themes=30 worst_theme=Solarized Dark     channel_delta=72 luminance_delta=0.191 differing_px=2022 enabled_hits=457 disabled_hits=515 exact_colour=1
+CHECK disabled.pixels.line-edit PASS style=Fusion themes=30 worst_theme=Solarized Dark channel_delta=72 luminance_delta=0.191 differing_px=2022
+PIXELS style=Fusion     widget=plain-text-edit  role=text        themes=30 worst_theme=Solarized Dark     channel_delta=72 luminance_delta=0.191 differing_px=850 enabled_hits=243 disabled_hits=280 exact_colour=1
+CHECK disabled.pixels.plain-text-edit PASS style=Fusion themes=30 worst_theme=Solarized Dark channel_delta=72 luminance_delta=0.191 differing_px=850
+PIXEL-STYLES app_style_class=QFusionStyle app_style_measured=1 measured=[Windows, Fusion] skipped=[]
+SKIP disabled.pixels.style.Breeze not offered by this image; the bounded child measures it where Qt exposes it (user-style unmeasured here)
+SKIP disabled.pixels.style.Oxygen not offered by this image; the bounded child measures it where Qt exposes it (user-style unmeasured here)
+CHECK disabled.pixels.measured-at-least-one-style PASS measured=2 skipped=0
+CHECK disabled.dot.error FAIL theme=Atom One Dark enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Atom One Dark enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Atom One Dark enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Atom One Dark enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=Atom One Light enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Atom One Light enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Atom One Light enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Atom One Light enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=Breeze Dark enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Breeze Dark enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Breeze Dark enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Breeze Dark enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=Breeze Light enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Breeze Light enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Breeze Light enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Breeze Light enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=Catppuccin Frappé enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Catppuccin Frappé enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Catppuccin Frappé enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Catppuccin Frappé enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=Catppuccin Latte enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Catppuccin Latte enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Catppuccin Latte enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Catppuccin Latte enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=Catppuccin Macchiato enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Catppuccin Macchiato enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Catppuccin Macchiato enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Catppuccin Macchiato enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=Catppuccin Mocha enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Catppuccin Mocha enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Catppuccin Mocha enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Catppuccin Mocha enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=Dracula enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Dracula enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Dracula enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Dracula enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=Falcon enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Falcon enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Falcon enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Falcon enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=GitHub Dark enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=GitHub Dark enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=GitHub Dark enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=GitHub Dark enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=GitHub Light enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=GitHub Light enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=GitHub Light enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=GitHub Light enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=Homunculus enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Homunculus enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Homunculus enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Homunculus enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=Monokai enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Monokai enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Monokai enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Monokai enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=Nord enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Nord enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Nord enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Nord enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=Oblivion enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Oblivion enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Oblivion enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Oblivion enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=Printing enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Printing enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Printing enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Printing enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=Radical enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Radical enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Radical enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Radical enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=Solarized Dark enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Solarized Dark enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Solarized Dark enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Solarized Dark enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=Solarized Light enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Solarized Light enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Solarized Light enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Solarized Light enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=Tokyo Night enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Tokyo Night enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Tokyo Night enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Tokyo Night enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=Tokyo Night Light enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Tokyo Night Light enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Tokyo Night Light enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Tokyo Night Light enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=Tokyo Night Storm enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Tokyo Night Storm enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Tokyo Night Storm enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Tokyo Night Storm enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=VSCodium Dark enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=VSCodium Dark enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=VSCodium Dark enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=VSCodium Dark enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=Vim Dark enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=Vim Dark enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=Vim Dark enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=Vim Dark enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=ayu Dark enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=ayu Dark enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=ayu Dark enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=ayu Dark enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=ayu Light enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=ayu Light enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=ayu Light enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=ayu Light enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=ayu Mirage enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=ayu Mirage enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=ayu Mirage enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=ayu Mirage enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=gruvbox Dark enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=gruvbox Dark enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=gruvbox Dark enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=gruvbox Dark enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+CHECK disabled.dot.error FAIL theme=gruvbox Light enabled=#d32f2f disabled=#d32f2f delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.warning FAIL theme=gruvbox Light enabled=#f9a825 disabled=#f9a825 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.clean FAIL theme=gruvbox Light enabled=#2e7d32 disabled=#2e7d32 delta=0 luminance=0.000 drop=1.00 enabled_hollow=0 disabled_hollow=0
+CHECK disabled.dot.not-analyzed FAIL theme=gruvbox Light enabled=#9e9e9e disabled=#9e9e9e delta=0 luminance=0.000 drop=1.00 enabled_hollow=1 disabled_hollow=1
+PIXEL-DOT themes=30 samples=120 channel_delta=0 (Atom One Dark) luminance_delta=0.000 (Atom One Dark) contrast_drop=1.00 (Atom One Dark)
+CHECK disabled.dot.disabled-differs-from-enabled FAIL samples=120 channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.dot.unknown-draws-nothing PASS no dot for Unknown
+CHECK disabled.dot FAIL dot-probe child_exit=1
+DISABLED-LOOK-SELFTEST failures=1
+RM7B-PREFIX-DOT-RED exit=1

@@ -1,0 +1,162 @@
+   Compiling libc v0.2.191
+   Compiling linux-raw-sys v0.12.1
+   Compiling once_cell v1.21.4
+   Compiling rustix v1.1.6
+   Compiling getrandom v0.4.3
+   Compiling tempfile v3.27.0
+   Compiling vd-vcs v0.1.1 (/vedit-build/crates/vd-vcs)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.79s
+     Running unittests src/lib.rs (target/debug/deps/vd_vcs-ae0fc2879704b1ca)
+
+running 21 tests
+test history::tests::a_log_failure_is_an_error_and_an_empty_repository_is_not ... ok
+test history::tests::a_page_requests_one_extra_row_to_detect_more ... ok
+test history::tests::parses_a_commit_header_with_body ... ok
+test history::tests::parses_a_log_page ... ok
+test history::tests::parses_blame_porcelain ... ok
+test history::tests::parses_numstat_with_binary ... ok
+test history::tests::refuses_an_escaping_path ... ok
+test history::tests::refuses_an_option_shaped_hash ... ok
+test service::tests::svn_info_xml_without_values_is_the_empty_state_not_a_panic ... ok
+test service::tests::svn_info_xml_yields_revision_and_url ... ok
+test tests::git_detached_head_has_no_branch ... ok
+test tests::git_porcelain_maps_statuses_and_branch ... ok
+test tests::markers_select_the_backend ... ok
+test tests::nested_directory_finds_the_repository_above_it ... ok
+test tests::plain_directory_is_the_empty_state_not_an_error ... ok
+test tests::svn_status_maps_codes ... ok
+test workspace::tests::a_bare_worktree_row_has_no_commit_id ... ok
+test workspace::tests::malformed_stash_rows_are_skipped ... ok
+test workspace::tests::stash_rows_are_split_on_tabs ... ok
+test workspace::tests::stash_rows_keep_a_tab_in_the_subject ... ok
+test workspace::tests::worktree_rows_survive_spaces_in_the_path ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/compat.rs (target/debug/deps/compat-95a25540d7333a54)
+
+running 3 tests
+test read_path_returns_status_info_and_diff_on_the_installed_git ... ok
+test the_read_gate_still_refuses_every_write_subcommand_on_the_new_seam ... ok
+test two_repositories_keep_their_own_working_tree ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/history.rs (target/debug/deps/history-a03a18b5d9cb1903)
+
+running 9 tests
+test a_non_repository_and_a_foreign_backend_are_reported ... ok
+test a_repository_with_many_commits_pages_without_reading_everything ... ok
+test an_empty_repository_is_an_empty_state_not_an_error ... ok
+test blame_attributes_each_line_to_its_commit ... ok
+test commit_detail_reports_meta_files_and_patch ... ok
+test commit_pages_are_bounded_and_carry_has_more ... ok
+test commit_search_is_literal_and_case_insensitive ... ok
+test comparison_lists_the_files_and_the_patch ... ok
+test file_history_lists_only_the_paths_commits ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.61s
+
+     Running tests/ops.rs (target/debug/deps/ops-4229248abc58d682)
+
+running 9 tests
+test a_merge_conflict_is_a_visible_state_that_continues_and_aborts ... ok
+test a_non_repository_reports_the_empty_operation_state ... ok
+test cherry_pick_replays_one_commit_and_revert_undoes_it ... ok
+test clean_removes_only_the_given_untracked_files ... ok
+test continue_and_abort_require_the_operation_in_progress ... ok
+test merge_fast_forwards_and_merges_with_a_commit ... ok
+test rebase_replays_the_branch_and_abort_restores_it ... ok
+test reset_soft_mixed_and_hard_move_different_state ... ok
+test the_no_edit_flags_are_present_so_no_editor_blocks ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.64s
+
+     Running tests/readonly.rs (target/debug/deps/readonly-2fd86585095a37b2)
+
+running 10 tests
+test allow_lists_are_disjoint_from_write_lists ... ok
+test every_git_write_subcommand_is_refused_before_spawn ... ok
+test every_svn_write_subcommand_is_refused_before_spawn ... ok
+test git_session_uses_only_read_only_subcommands ... ok
+test plain_directory_is_the_empty_state_in_every_query ... ok
+test production_runner_gate_refuses_writes_without_spawning ... ok
+test read_and_write_tables_are_disjoint_and_default_deny ... ok
+test stub_service_drives_the_panel_without_processes ... ok
+test svn_session_reads_status_info_and_diff ... ok
+test unknown_tool_and_empty_subcommand_are_refused ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/svn_e2e.rs (target/debug/deps/svn_e2e-701dcbd86ed093e5)
+
+running 1 test
+test bundled_subversion_reads_and_writes_run_through_the_product_path ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/toolchain.rs (target/debug/deps/toolchain-a4397666c5a3b31f)
+
+running 8 tests
+test a_missing_tool_is_reported_as_none ... ok
+test a_non_executable_candidate_is_skipped ... ok
+test bundled_candidates_are_the_appdir_layout_first ... ok
+test bundled_layout_wins ... ok
+test env_is_the_last_resort ... ok
+test next_to_the_binary_is_also_bundled ... ok
+test order_is_bundled_then_path_then_env ... ok
+test path_is_used_when_nothing_is_bundled ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/workspace.rs (target/debug/deps/workspace-41e190bc4415937c)
+
+running 13 tests
+test stash_drop_and_pop_target_the_named_stash_only ... ok
+test stash_operations_on_an_empty_stack_report_the_real_git_reason ... ok
+test stash_parameters_are_validated_before_any_process ... ok
+test stash_save_argv_is_positional_because_the_baseline_has_no_dash_m ... ok
+test stash_save_pop_apply_and_drop_round_trip ... ok
+test stashes_on_a_plain_directory_are_empty_with_a_note_not_an_error ... ok
+test submodule_init_and_update_check_out_the_pinned_commit ... ok
+test submodule_on_a_repository_without_submodules_is_a_normal_result ... ok
+test the_workspace_operations_are_git_only_and_parameter_checked ... ok
+test workspace_entries_are_plain_data_capped_by_the_reader ... ok
+test worktree_add_list_remove_round_trip ... ok
+test worktree_list_reports_the_main_worktree_even_without_worktree_support ... ok
+test worktree_parameters_are_validated_before_any_process ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.18s
+
+     Running tests/worktree_e2e.rs (target/debug/deps/worktree_e2e-c742e70ae1e4dd6a)
+
+running 1 test
+test bundled_git_worktree_round_trip_runs_through_the_product_path ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/write.rs (target/debug/deps/write-e65c17c01493e842)
+
+running 13 tests
+test a_directory_that_is_not_a_working_tree_is_refused ... ok
+test a_tool_failure_is_a_normal_result_not_a_rejected_request ... ok
+test accepted_operations_build_exactly_one_documented_invocation ... ok
+test batch_4a_operations_build_the_documented_invocations ... ok
+test batch_4a_parameters_are_validated_before_any_process ... ok
+test credentials_travel_in_the_environment_and_are_redacted ... ok
+test every_operation_code_round_trips_and_unknown_codes_are_refused ... ok
+test git_remote_round_trip_against_a_local_bare_repository ... ok
+test git_round_trip_runs_in_a_temp_fixture ... ok
+test parameters_outside_the_operation_contract_are_refused ... ok
+test the_backend_must_match_the_operation ... ok
+test the_read_gate_still_refuses_every_subcommand_the_write_path_runs ... ok
+test the_write_gate_is_also_enforced_by_the_runner ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+   Doc-tests vd_vcs
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

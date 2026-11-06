@@ -1,0 +1,31 @@
+# gate-5: cargo fmt --all -- --check
+# collected: 2026-11-03T01:33 +08:00
+
+## A. The declared command, run literally on the host
+$ cargo fmt --all -- --check
+error: the 'cargo' binary, normally provided by the 'cargo' component, is not applicable to the '1.99.0-x86_64-unknown-linux-gnu' toolchain
+EXIT=1
+
+### Why this is an ENVIRONMENT limitation, not a formatting failure
+- `rust-toolchain.toml` pins `channel = "1.99.0"`, so rustup selects the
+  toolchain directory `~/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/`.
+- That directory's `bin/` contains rustc, rustfmt, cargo-fmt, rust-gdb, rustdoc
+  but **no `cargo`** (partial installation):
+  `ls ~/.rustup/toolchains/1.99.0-x86_64-unknown-linux-gnu/bin/cargo` -> No such file or directory
+- The host's `stable` toolchain is the SAME compiler version:
+    stable: rustc 1.99.0 (b940084d7 2026-09-28)
+    pinned: rustc 1.99.0 (b940084d7 2026-09-28)
+  (identical commit hash; the pin and stable are the same rustc)
+
+## B. The same check on the SAME rustc version (stable == 1.99.0)
+$ RUSTUP_TOOLCHAIN=stable rustc --version
+rustc 1.99.0 (b940084d7 2026-09-28)
+
+$ RUSTUP_TOOLCHAIN=stable cargo fmt --all -- --check
+(no output)
+EXIT=0
+
+## Verdict
+- fmt: **PASS** — `cargo fmt --all -- --check` on rustc 1.99.0 (b940084d7) exits 0 with zero output.
+- The only failure is `cargo` missing from the pinned 1.99.0 toolchain DIRECTORY on this host
+  (rustup partial install), which prevents the literal command from starting.

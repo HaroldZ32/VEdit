@@ -1,0 +1,13 @@
+Test project /vedit-build/target/qt6-build
+    Start 11: vedit-app-shell-selftest
+1/4 Test #11: vedit-app-shell-selftest .........   Passed    0.91 sec
+    Start 21: vedit-edit-core-selftest
+2/4 Test #21: vedit-edit-core-selftest .........   Passed    0.24 sec
+    Start 27: vedit-undo-view-lifetime-tests
+3/4 Test #27: vedit-undo-view-lifetime-tests ...   Passed    0.30 sec
+    Start 35: vedit-search-replace-tests
+4/4 Test #35: vedit-search-replace-tests .......   Passed    6.12 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   7.57 sec

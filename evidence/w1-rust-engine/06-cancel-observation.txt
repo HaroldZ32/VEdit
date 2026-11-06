@@ -1,0 +1,1 @@
+cancel observation: phase=cancelled done=0/5 diagnostics_after_cancel=0 invocations_at_cancel=1 invocations_500ms_later=1

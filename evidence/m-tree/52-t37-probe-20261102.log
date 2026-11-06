@@ -1,0 +1,34 @@
+# T37 probe run — 2026-11-02T19:20:14+08:00
+command: t37-module-tree-probe evidence/m-tree/fixture-t37 evidence/m-tree/t37-module-tree.png (QT_QPA_PLATFORM=offscreen, VEDIT_SLANG=build/slang/out/slang)
+---
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+This plugin does not support propagateSizeHints()
+ok   t37.dock-inserted
+ok   t37.dock-visible
+ok   t37.panel-content
+ok   t37.hierarchy-painted — status=Hierarchy ready — double-click an instance, a net or a driver/load.
+ok   t37.summary — slang · 3 file(s) · 13 instance(s) · 41 net(s) · 6 ms · 23596 KiB peak
+root: /vedit-build/evidence/m-tree/fixture-t37
+     rows=133 summary=slang · 3 file(s) · 13 instance(s) · 41 net(s) · 6 ms · 23596 KiB peak
+root: /vedit-build/evidence/m-tree/fixture-t37
+     instance rows (top*): top top.u_mid top.u_arr[0] top.u_arr[1] top.u_arr[2] top.u_arr[3] top.u_mid.g_leaf[0].u top.u_mid.g_leaf[1].u top.u_mid.g_leaf[2].u top.u_mid.g_leaf[3].u top.u_mid.g_leaf[4].u top.u_mid.g_leaf[5].u top.u_mid.g_if.u_if
+ok   t37.row.g_leaf0 — top.u_mid.g_leaf[0].u
+ok   t37.segment.g_leaf0 — row=top.u_mid.g_leaf[0].u segment=g_leaf[0]
+ok   t37.ground-truth.g_leaf0 — g_leaf0: mid.sv/u line 6 col 12
+This plugin does not support propagateSizeHints()
+ok   t37.jump.g_leaf0 — top.u_mid.g_leaf[0].u -> mid.sv:6:12
+     top.u_mid.g_leaf[0].u -> mid.sv:6:12 (expected mid.sv:6:12)
+ok   t37.row.g_if — top.u_mid.g_if.u_if
+ok   t37.segment.g_if — row=top.u_mid.g_if.u_if segment=g_if.u_if
+ok   t37.ground-truth.g_if — g_if: mid.sv/u_if line 10 col 10
+ok   t37.jump.g_if — top.u_mid.g_if.u_if -> mid.sv:10:10
+     top.u_mid.g_if.u_if -> mid.sv:10:10 (expected mid.sv:10:10)
+ok   t37.row.u_arr3 — top.u_arr[3]
+ok   t37.segment.u_arr3 — row=top.u_arr[3] segment=u_arr[3]
+ok   t37.ground-truth.u_arr3 — u_arr3: top.sv/u_arr line 10 col 8
+ok   t37.jump.u_arr3 — top.u_arr[3] -> top.sv:10:8
+     top.u_arr[3] -> top.sv:10:8 (expected top.sv:10:8)
+ok   t37.screenshot — evidence/m-tree/t37-module-tree.png
+
+18 checks, 0 failure(s)
+PROBE_EXIT=0

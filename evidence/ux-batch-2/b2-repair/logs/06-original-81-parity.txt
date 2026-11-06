@@ -1,0 +1,11 @@
+Original B2 acceptance (reviewed tree): evidence/ux-batch-2/b2/logs/02-ctest-new.log
+Final repaired suite:               evidence/ux-batch-2/b2-repair/logs/03-b2-green.log
+
+original checks: 81
+final checks:    174
+
+original check names missing from the final run: 0
+original check names not PASS in the final run:
+  (none above means all 81 original checks PASS)
+
+new checks added: 93

@@ -1,0 +1,83 @@
+UpdateCTestConfiguration  from :/vedit-build/target/qt6-build/DartConfiguration.tcl
+Test project /vedit-build/target/qt6-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 17
+    Start 17: vedit-app-reset-layout-guard-selftest
+
+17: Test command: /vedit-build/target/qt6-build/src/app/vedit-app-reset-layout-guard-selftest
+17: Working Directory: /vedit-build/target/qt6-build/src/app
+17: Environment variables: 
+17:  QT_QPA_PLATFORM=offscreen
+17:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/src/app/xdg-runtime-reset-guard
+17: Test timeout computed to be: 240
+17: CHECK rm12.reset.action-dispatched PASS
+17: SHAPE view.layout.reset            prompt_calls=1 panes=1 document=intact
+17: CHECK rm12.reset.prompt-asked PASS prompt calls=1
+17: CHECK rm12.reset.document PASS pane survived
+17: CHECK rm12.reset.text-and-modified PASS
+17: CHECK rm12.new-empty.action-dispatched PASS
+17: SHAPE file.new-layout              prompt_calls=1 panes=1 document=intact
+17: CHECK rm12.new-empty.prompt-asked PASS prompt calls=1
+17: CHECK rm12.new-empty.document PASS pane survived
+17: CHECK rm12.new-empty.text-and-modified PASS
+17: CHECK rm12.mixed.action-dispatched PASS
+17: SHAPE view.layout.mixed            prompt_calls=1 panes=1 document=intact
+17: CHECK rm12.mixed.prompt-asked PASS prompt calls=1
+17: CHECK rm12.mixed.document PASS pane survived
+17: CHECK rm12.mixed.text-and-modified PASS
+17: CHECK rm12.one-prompt.two-panes PASS
+17: CHECK rm12.one-prompt.editor PASS
+17: CHECK rm12.one-prompt.editor PASS
+17: SHAPE view.layout.reset(2 dirty) prompt_calls=1 prompt_docs=2 panes=2
+17: CHECK rm12.one-prompt.single-call PASS calls=1
+17: CHECK rm12.one-prompt.lists-both PASS docs=2
+17: CHECK rm12.one-prompt.documents-kept PASS
+17: SHAPE view.layout.reset(discard) prompt_calls=1 panes_before=1 panes_after=1
+17: CHECK rm12.discard.prompt-asked PASS calls=1
+17: CHECK rm12.discard.layout-reset PASS
+17: CHECK rm12.discard.no-dirty-left PASS
+17: CHECK rm12.clean.two-panes PASS
+17: SHAPE view.layout.reset(clean) prompt_calls=0 panes_after=1
+17: CHECK rm12.clean.reset-no-prompt PASS calls=0
+17: CHECK rm12.clean.reset-works PASS
+17: SHAPE file.new-layout(clean) prompt_calls=0 panes_after=1
+17: CHECK rm12.clean.new-empty-no-prompt PASS calls=0
+17: CHECK rm12.clean.new-empty-works PASS
+17: CHECK rm12.save.temp-dir PASS
+17: CHECK rm12.save.seed-file PASS
+17: CHECK rm12.save.open PASS
+17: CHECK rm12.save.editor PASS
+17: CHECK rm12.save.dirty PASS
+17: SHAPE view.layout.reset(save) prompt_calls=1 panes_after=1
+17: CHECK rm12.save.prompt-asked PASS calls=1
+17: CHECK rm12.save.file-written PASS // rm12 saved edit
+17: CHECK rm12.save.layout-reset PASS
+17: kf.sonnet.core: Sonnet: No speller backends available!
+17: CHECK rm12.real-editor.view PASS
+17: CHECK rm12.real-editor.dirty PASS
+17: SHAPE view.layout.reset(ktexteditor) prompt_calls=1 document=same-object
+17: CHECK rm12.real-editor.prompt-asked PASS calls=1
+17: CHECK rm12.real-editor.document-survives PASS text intact: // rm12 ktexteditor
+17: [app-shell] close refused (headless): untitled has unsaved changes
+17: SHAPE file.close-pane(dirty) panes=1
+17: CHECK rm12.close-pane.document-kept PASS
+17: SHAPE file.quit(dirty) prompt_calls=1
+17: CHECK rm12.quit.action-dispatched PASS
+17: CHECK rm12.quit.prompt-asked PASS calls=1
+17: CHECK rm12.quit.document-kept PASS
+17: SHAPE file.quit(clean) prompt_calls=0
+17: CHECK rm12.quit.clean-no-prompt PASS calls=0
+17: RM12-RESET-LAYOUT-SELFTEST failures=0
+1/1 Test #17: vedit-app-reset-layout-guard-selftest ...   Passed    0.12 sec
+
+The following tests passed:
+	vedit-app-reset-layout-guard-selftest
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.12 sec

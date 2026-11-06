@@ -1,0 +1,26 @@
+== writer READMEs ==
+bac09e6560b62b29dc40909569597ed21c77c692ff718a967e3bd8185c24e3cc  evidence/ux-batch-2/u9a-catalog-scale/README.md
+acd99d233003530bf74e77db3b506c80d26b296bf74f03fa4e3c0a213051feab  evidence/ux-batch-2/u9b-lint-flood/README.md
+== sources ==
+ba23ec67d569cd26f997db206680b0d1ebc27a97d7340804a2555329c35d438f  crates/vd-deeplint/src/ast_prune.rs
+47d47c377f7a6485601dcb41388d5494ea5c551ed0c889909c0ac6d945ef6407  crates/vd-deeplint/src/catalog.rs
+432a1f189f7131b64f54fb48a6e26c5683714f3891200d7a0aebb11a1fc28c34  crates/vd-deeplint/src/hierarchy.rs
+03e6355b8cc225e27a4810778dccc22f45452792473fe451e897e40e2e140a7c  crates/vd-deeplint/src/lib.rs
+336ccb641485c044851280b14cc75b366f2c7b04abc64186ebff147ad57a0031  crates/vd-deeplint/src/diagnostic.rs
+0602323ff83c65839c0580691159b0f8728b890fe004a82e22f865f083765f6d  crates/vd-deeplint/src/batch.rs
+00689372af1484def43eed10eefdb6f1d519f4644c39669c518b0b58e7a6cac7  crates/vd-deeplint/src/service.rs
+84318bc4262148b90b891075069a1938f5dfc3165da03d15e50b283b41a51414  crates/vd-ffi/src/catalog.rs
+b09f3b2131851cf35c3c60d4cd14c75bfda6be8ebcdaf07c339425bcc3b3a82d  src/workspace/module_tree/catalog_client.cpp
+b6384d76760b427e498d99d9aa1af902ce2c31cc945e41f398f49f6a28ba5bb3  src/workspace/module_tree/module_catalog.cpp
+f641127634781a824985ab243264549d3c30f130f17f11b0bcd8772b44fd44d2  src/workspace/module_tree/module_tree_panel.cpp
+f9e3634b92704f30989b77b10eafb5b8cb6db6af53ab637759ea979b92d71f46  src/workspace/diagnostics/lint_progress.cpp
+== writer run logs ==
+18bb44bf84d55bc0d88f44998b1281fd20af9fbbd6bea3523b93224d9e47fde9  evidence/ux-batch-2/u9a-catalog-scale/scratch/catalog-med-run.log
+a537f73d7f0d642bc1e9c203f7880aff57f140bee71873b64b139d2aac57cd1c  evidence/ux-batch-2/u9a-catalog-scale/scratch/catalog-heavy-run.log
+8034d522604e0778e2156c5b1b00bec55d1b4800f3dd47408f7c60ffeb45d265  evidence/ux-batch-2/u9a-catalog-scale/scratch/catalog-deep-run.log
+64d88c8a3c723d1fe1e045575ea6aab72818e1d94fabfcdf3013b3437b38afc9  evidence/ux-batch-2/u9b-lint-flood/scratch/green-after-real-flood.log
+== fixtures ==
+1176
+1176
+1176
+2257873 evidence/ux-batch-2/u9b-lint-flood/flood.sv

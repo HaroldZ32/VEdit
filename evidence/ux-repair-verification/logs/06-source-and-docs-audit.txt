@@ -1,0 +1,372 @@
+== F2: palette root subscription and index reset ==
+PaletteIntegration *PaletteIntegration::install(vedit::app::ApplicationShell &shell,
+                                                const QString &projectRoot)
+{
+    if (PaletteIntegration *existing = instance(shell)) {
+        existing->setProjectRoot(projectRoot);
+        return existing;
+    }
+    auto *integration = new PaletteIntegration(&shell); // owned by the shell
+    integration->setProjectRoot(projectRoot);
+    // FIX 2 (F2): a runtime root switch (File > Open Folder, and the `.f` import
+    // that sets the filelist's directory as root) must rebind the shared index
+    // too; otherwise Ctrl+P keeps searching the old/empty root until restart.
+    // setRoot() drops the old snapshot and the next open walks the NEW root.
+    // The integration is the context, so the subscription dies with the lane.
+    QObject::connect(&shell, &vedit::app::ApplicationShell::projectRootChanged, integration,
+                     [integration](const QString &root) { integration->setProjectRoot(root); });
+    integration->registerCommand();
+    return integration;
+}
+-- file_index setRoot --
+void WorkspaceFileIndex::setRoot(const QString &root)
+{
+    // FIX 1: the ONE root spelling (src/common/path_display.h), so the palette
+    // and the other surfaces render the same relative/absolute decision.
+    const QString cleaned = vedit::paths::normalizedRoot(root);
+    if (cleaned == root_) {
+        return;
+    }
+    root_ = cleaned;
+    absolute_.clear();
+    display_.clear();
+    basename_.clear();
+    truncated_ = false;
+    scanCount_ = 0;
+    ++revision_;
+    notifyChanged();
+}
+-- app_shell setProjectRoot (sets root, then emits) --
+void ApplicationShell::setProjectRoot(const QString &root)
+{
+    // FIX 1: the same normalisation the constructor applies, so a root selected
+    // at runtime (File > Open Folder, the file tree, a `.f` import) is the same
+    // stable spelling the display rule compares against.
+    const QString normalized = vedit::paths::normalizedRoot(root);
+    if (normalized == options_.projectRoot) {
+        return;
+    }
+    options_.projectRoot = normalized;
+    if (qEnvironmentVariableIsSet("VEDIT_DEBUG")) {
+        qInfo().noquote() << "[shell-root] project root ->"
+                          << (normalized.isEmpty() ? QStringLiteral("<none>") : normalized);
+    }
+    // FIX 1: the tab tooltips are painted from the root, so the panes are
+    // rebound BEFORE the title/status bar are repainted from the same value.
+    if (editorArea_ != nullptr) {
+        editorArea_->setDisplayRoot(options_.projectRoot);
+    }
+    // The persistent label AND the window title are derived from the root, so
+    // they are repainted from the one source of truth (never set twice by hand).
+    updateStatusBar();
+    statusBar()->showMessage(tr("Project: %1").arg(projectLabel()), 5000);
+    // AC-1.2: the lanes rebind their LIVE widgets here. Emitted last, so a
+    // receiver already sees the new projectRoot().
+    emit projectRootChanged(options_.projectRoot);
+}
+-- project_integration .f flow calls setProjectRoot before import --
+    QObject::connect(
+        &shell, &vedit::app::ApplicationShell::fileOpened, model,
+        [&shell, model, panel](const QString &path) {
+            const project::OpenedFilelistPlan plan =
+                project::planOpenedFilelist(path, model->hasProject());
+            if (!plan.isFilelist) {
+                return;
+            }
+            if (plan.needsRoot) {
+                // The filelist's own directory becomes the project root
+                // (RootSource::Filelist). The shell broadcast opens it on the
+                // model (projectRootChanged below) BEFORE the import runs, so
+                // importFilelists() already sees the root.
+                shell.setProjectRoot(plan.root);
+            }
+            // Parse + diagnostics stay in ProjectModel::importFilelists (the Rust
+            // parser). The panel is the existing surface for the result and for
+            // the `filelist.*` diagnostics; the app layer shows no modal. The
+            // import is idempotent: a second open of the same `.f` is a no-op.
+            panel->importFilelists({plan.absolutePath});
+        });
+
+    // AC-1.2 (batch 1): a root switched from anywhere else (File -> Open Folder,
+    // the shell API) is the same event. Guarded on the model's current root, so
+    // the file tree's own directoryOpened — which already opened it through the
+    // subscription above — is never expanded twice.
+    QObject::connect(&shell, &vedit::app::ApplicationShell::projectRootChanged, &shell,
+                     [model](const QString &root) {
+                         if (root.isEmpty() || root == model->projectRoot()) {
+                             return;
+                         }
+                         model->openRoot(root);
+                     });
+-- filetree directoryOpened also calls setProjectRoot --
+    // setProjectRoot(), which is the switch AC-1.2 observes.
+    const auto factory = [&shell]() {
+        QWidget *panel = makeFileTreePanel(shell.projectRoot());
+        if (auto *tree = qobject_cast<FileTreeWidget *>(panel)) {
+            QObject::connect(tree, &FileTreeWidget::openFileRequested, &shell,
+                             [&shell](const QString &path) { openFileInEditor(shell, path); });
+            QObject::connect(tree, &FileTreeWidget::directoryOpened, &shell,
+                             [&shell](const QString &path) { shell.setProjectRoot(path); });
+        }
+        return panel;
+    };
+
+    shell.panels()->setFactory(QStringLiteral("file-tree"), factory);
+
+    // A runtime switch rebinds a tree that ALREADY exists (the dock keeps its
+    // widget): openDirectory() is the same load the panel's own Open Folder runs.
+    // It emits directoryOpened again, but setProjectRoot() ignores an unchanged
+    // root, so this cannot loop. The factory above covers a later re-insert.
+    QObject::connect(&shell, &vedit::app::ApplicationShell::projectRootChanged, &shell,
+                     [&shell](const QString &root) {
+                         for (FileTreeWidget *tree : shell.findChildren<FileTreeWidget *>()) {
+-- F2 new selftest block --
+    // FIX 2 (F2): Ctrl+P follows a runtime root switch. File > Open Folder and
+    // the `.f` import both end in ApplicationShell::setProjectRoot(); the
+    // palette's shared index must drop the old snapshot and search the new root
+    // on the next open (before this fix it kept the old/empty root until a
+    // restart).
+    {
+        const QString projectB = temp.path() + QStringLiteral("/project-b");
+        writeFile(projectB + QStringLiteral("/src/other.cpp"), QByteArray("// other\n"));
+        shell.setProjectRoot(projectB);
+        pump();
+        check(QStringLiteral("integration.root-follows-projectRootChanged"),
+              integration->fileIndex()->root() == QFileInfo(projectB).absoluteFilePath());
+        action->trigger();
+        pump();
+        check(QStringLiteral("integration.root-rescan-new-root"),
+              integration->fileIndex()->displayPaths()
+                  == QStringList{QStringLiteral("src/other.cpp")});
+        check(QStringLiteral("integration.root-old-files-gone"),
+              !integration->fileIndex()->displayPaths().contains(
+                  QStringLiteral("src/main.cpp")));
+        palette->closePalette();
+        pump();
+    }
+-- F2 run lines --
+26: CHECK integration.root-follows-projectRootChanged PASS
+26: CHECK integration.root-rescan-new-root PASS
+26: CHECK integration.root-old-files-gone PASS
+
+== F4: model out-param, panel message, refresh path ==
+    void open(const QString &projectRoot);
+
+    // Re-expands the current root; no-op with a failed signal when none is open.
+    void refresh();
+
+    // AC-2.2: "Import Filelist…". Adds one or more `.f` files (absolute paths,
+    // import order, duplicates rejected) and re-expands. Atomic: an unreadable
+    // path rejects the whole call and nothing is added. `addedFilelists` (when
+    // given) receives how many entries were NEWLY added; 0 means the call was a
+    // no-op ("already imported"), which the panel reports honestly instead of
+    // claiming a re-import.
+    bool importFilelists(const QStringList &paths, QString *error = nullptr,
+                         int *addedFilelists = nullptr);
+    // Removes one imported `.f` (by path as shown or absolute) and re-expands.
+    bool removeFilelist(const QString &path);
+    QStringList filelists() const;
+bool ProjectModel::importFilelists(const QStringList &paths, QString *error, int *addedFilelists)
+{
+    if (addedFilelists != nullptr) {
+        *addedFilelists = 0;
+    }
+    if (state_.root.isEmpty()) {
+        if (error != nullptr) {
+            *error = QStringLiteral("open a folder before importing a filelist");
+        }
+        return false;
+    }
+    QStringList accepted = state_.filelists;
+    for (const QString &path : paths) {
+        const QFileInfo info(path);
+        if (!info.exists() || !info.isFile()) {
+            if (error != nullptr) {
+                *error = QStringLiteral("%1 is not a readable filelist").arg(path);
+            }
+            return false; // atomic: nothing is added on a bad entry
+        }
+        const QString absolute = info.absoluteFilePath();
+        if (!accepted.contains(absolute)) {
+            accepted.append(absolute);
+        }
+    }
+    if (error != nullptr) {
+        error->clear();
+    }
+    if (accepted == state_.filelists) {
+        return true; // already imported: no re-parse needed
+    }
+    if (addedFilelists != nullptr) {
+        *addedFilelists =
+            static_cast<int>(accepted.size() - state_.filelists.size());
+    }
+    state_.filelists = accepted;
+    saveState();
+    emit filelistsChanged();
+    startExpansion();
+    return true;
+}
+bool ProjectPanel::importFilelists(const QStringList &paths)
+{
+    if (model_ == nullptr) {
+        setStatus(QCoreApplication::translate("VEdit", "No project model is attached"), true);
+        return false;
+    }
+    QString error;
+    int added = 0;
+    if (!model_->importFilelists(paths, &error, &added)) {
+        setStatus(error, true);
+        return false;
+    }
+    if (added == 0) {
+        // FIX 4 (F4): re-opening an already-imported `.f` is a no-op in the
+        // model; do not claim an import happened. Refresh is the re-parse path.
+        setStatus(QCoreApplication::translate(
+                      "VEdit", "Already imported: nothing changed (use Refresh to re-read an edited filelist)"),
+                  false);
+    } else {
+        setStatus(QCoreApplication::translate("VEdit", "Imported %1 filelist%2")
+                      .arg(added)
+                      .arg(added == 1 ? QString() : QStringLiteral("s")),
+                  false);
+    }
+    updateUi();
+    return true;
+}
+void ProjectModel::startExpansion()
+{
+    if (pending_ && job_ != 0) {
+        service_.cancel(job_);
+        job_ = 0;
+    }
+    quint64 id = 0;
+    if (service_.start(state_.root, state_.filelists, state_.variables, settingsPath(), &id)
+        != ProjectService::Start::Started) {
+        recordFailure(service_.lastError());
+        return;
+    }
+    job_ = id;
+    pending_ = true;
+    lastError_.clear();
+    deadline_.start();
+    pollTimer_.start();
+ProjectService::Start ProjectService::start(const QString &projectRoot, const QStringList &filelists,
+                                            const QStringList &variables, const QString &settingsPath,
+                                            quint64 *job)
+{
+    if (service_ == nullptr || job == nullptr) {
+        return Start::Rejected;
+    }
+    const QByteArray path = projectRoot.toUtf8();
+    const QByteArray settings = settingsPath.toUtf8();
+    BorrowedList lists(filelists);
+    BorrowedList table(variables);
+    const quint64 id = static_cast<quint64>(vd_project_expand_v2(
+        service_, path.constData(), &lists.list,
+        settings.isEmpty() ? nullptr : settings.constData(), &table.list));
+    if (id == 0) {
+        return Start::Rejected;
+    }
+    *job = id;
+    return Start::Started;
+}
+
+ProjectService::Poll ProjectService::poll(quint64 job, ExpansionPayload *payload)
+{
+    if (service_ == nullptr || payload == nullptr) {
+        return Poll::Misuse;
+-- F4 new selftest block --
+    // FIX 4 (F4): re-opening an already-imported `.f` is a no-op in the model;
+    // the panel must say so instead of claiming "Imported".
+    check("filelist.import-status",
+          panel.statusText().contains(QStringLiteral("Imported 1 filelist")));
+    check("filelist.reimport-panel-noop", panel.importFilelists({importedPath}));
+    check("filelist.reimport-status-honest",
+          panel.statusText().contains(QStringLiteral("Already imported")));
+    check("filelist.import-no-duplicate", !model.importFilelists({importedPath})
+-- F4 run lines --
+28: CHECK filelist.import-status PASS
+28: CHECK filelist.reimport-panel-noop PASS
+28: CHECK filelist.reimport-status-honest PASS
+
+== F3: guide + header + displayPath call sites ==
+### 路径显示（统一规则）
+
+Qt6 产品里，**下列界面**显示路径时用同一条规则（`src/common/path_display.h`）：
+
+- 工程根存在且文件在根内 → 显示相对工程根的路径（不带 `./`）；
+- 否则 → 显示绝对路径。
+
+覆盖编辑器标签的 tooltip、窗口标题、Files 树的 tooltip、Project 面板的文件与 filelist 列表、
+`Ctrl+P` 文件面板和搜索结果行。**打开和去重仍用绝对路径**，显示规则不改变任何打开行为；
+工程根会先规范化（绝对路径、去掉 `.` / `..` / 尾斜杠）再参与比较。编辑器标签文字本身显示文件名
+（不是路径），tooltip 才显示上面这条规则算出的路径。
+
+**状态栏 / 面板的一次性确认与错误提示是例外**：palette / Files 树 / 搜索跳转的 `Opened …`、
+Project 面板的 `Removed …` 和错误提示仍显示绝对路径（只停留几秒，不是路径视图）。除上面枚举的
+界面和这些一次性提示外，如果看到绝对路径显示，就是 bug。
+
+### 文件列表（`.f`）里的变量与转义
+
+在 Qt6 产品里，打开一个 `.f` / `.F` / `.flist` 会**同时**把它作为工程 filelist 导入（规则见上文
+"工程根的起点"）；filelist 也仍然作为普通文本标签打开。**编辑后要按 Project 面板的 `Refresh`
+重新展开**（重新打开同一个 filelist 不会重新解析），重复打开同一个 filelist 是幂等的：不会重复
+加入，也不会重复解析，Project 面板底部会提示 `Already imported: nothing changed`。解析诊断（缺失的 `+incdir+`、未知 token、
+嵌套 `-f` 问题等）显示在 Project 面板的诊断列表里，不会弹出模态框。
+-- header --
+#pragma once
+
+// The ONE path-display rule of the product (user ruling, 2026-11-04):
+//
+//   * a project root is set AND the path is inside it -> display the path
+//     relative to the root, without a leading "./";
+//   * otherwise -> display the absolute path.
+//
+// Every persistent surface that RENDERS a path (the editor tab tooltip and the
+// window title, the Files tree tooltip, the project panel lists, the command
+// palette and the search results) calls displayPath(); no surface grows its own
+// prefix test. One-shot status-bar / panel confirmations and error notes
+// ("Opened ...", "Removed ...") deliberately keep the absolute path and are
+// outside this rule (docs/USER_GUIDE.md names them). What a surface OPENS is
+// untouched: absolute paths stay the open key and the dedup key.
+//
+// Header-only and QtCore-only on purpose: a workspace lane can include it in a
+// standalone build (`cmake -S src/workspace/<lane>`) without linking src/app,
+// and src/app does not have to know a lane.
+//
+// `tests`: the app self-check asserts the three cases (under root, outside root,
+// no root) directly, and the project lane asserts them on its displayed lists.
+-- displayPath call sites --
+src/workspace/project/project_model.cpp:310:        out.append(vedit::paths::displayPath(state_.root, file));
+src/workspace/project/project_model.cpp:320:        out.append(vedit::paths::displayPath(state_.root, filelist));
+src/workspace/filetree/file_tree_model.cpp:173:        QString tip = vedit::paths::displayPath(rootPath_, node->path);
+src/workspace/palette/file_index.cpp:72:    return vedit::paths::displayPath(root_, absolute);
+src/workspace/palette/file_index.cpp:234:QString WorkspaceFileIndex::displayPath(int index) const
+src/workspace/search/global_search.cpp:186:                                vedit::paths::displayPath(options.rootPath, hit.filePath);
+src/app/app_shell.cpp:1098:    const QString displayedPath = vedit::paths::displayPath(options_.projectRoot, path);
+src/app/main.cpp:292:              vedit::paths::displayPath(root, under) == QStringLiteral("rtl/top.sv"),
+src/app/main.cpp:293:              vedit::paths::displayPath(root, under));
+src/app/main.cpp:295:              vedit::paths::displayPath(vedit::paths::normalizedRoot(root), under)
+src/app/main.cpp:298:              vedit::paths::displayPath(root, outside) == absoluteOf(outside),
+src/app/main.cpp:299:              vedit::paths::displayPath(root, outside));
+src/app/main.cpp:301:              vedit::paths::displayPath(QString(), outside) == absoluteOf(outside),
+src/app/main.cpp:302:              vedit::paths::displayPath(QString(), outside));
+src/app/main.cpp:306:              vedit::paths::displayPath(root,
+src/app/main.cpp:311:              vedit::paths::displayPath(root, root) == absoluteOf(root));
+src/app/editor_area.cpp:570:                                    : vedit::paths::displayPath(displayRoot_, document->path));
+-- remaining absolute one-shot status messages named by the guide --
+src/workspace/palette/palette_integration.cpp:195:            message = QStringLiteral("Opened %1").arg(absolutePath);
+src/workspace/filetree/filetree_integration.cpp:48:        QCoreApplication::translate("VEdit", "Opened %1").arg(path), 5000);
+src/workspace/search/search_jump_target.cpp:120:        QCoreApplication::translate("VEdit", "Opened %1 line %2").arg(filePath).arg(targetLine), 5000);
+src/workspace/project/project_panel.cpp:246:    setStatus(QCoreApplication::translate("VEdit", "Removed %1; the file set is being re-expanded").arg(path), false);
+
+== suite summaries (this run) ==
+11: APP-SHELL-SELFTEST ok=1 checks=312 failures=0 state=/tmp/vedit-app-anzBPV/state
+25: PALETTE-SELFTEST ok=1 checks=46 failures=0
+26: INTEGRATION-SELFTEST ok=1 checks=31 failures=0
+27: WORKSPACE-SEARCH-SELFTEST ok=1 checks=106 failures=0 skipped=2
+28: PROJECT-MODEL-SELFTEST ok=1 checks=153 failures=0
+29: 61 checks, 0 failure(s)
+100% tests passed, 0 tests failed out of 6
+EXIT=0

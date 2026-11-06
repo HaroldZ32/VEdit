@@ -1,0 +1,66 @@
+== A. vanished source strings: occurrences in src (expect 0; &Settings/Save As explained below)
+ 0  hierarchy: retrying after the project model
+ 0  No hierarchy yet: open a project and press Refresh
+ 0  Empty state: no elaborated project yet
+ 0  no file:line reported
+ 0  Re-elaborate the whole project
+ 0  Jump to source
+ 0  Jump to target
+ 0  jump to the construct that drives it
+ 0  jump to the construct that reads it
+ 0  Filter instance / net / file
+ 0  Instance / Net
+ 0  Hierarchy ready
+ 0  elaborating %1 project file(s)
+ 0  A branch name is required
+ 0  A tag name is required
+ 0  A remote name and a URL are required
+ 0  no tags reported by this backend
+
+== B. the only &Settings matches (member-pointer / comment, not translatable)
+src/workspace/settings/settings_dialog.cpp:40:    connect(buttons_, &QDialogButtonBox::accepted, this, &SettingsDialog::accept);
+src/workspace/settings/settings_dialog.cpp:41:    connect(buttons_, &QDialogButtonBox::rejected, this, &SettingsDialog::reject);
+src/workspace/settings/settings_dialog.cpp:43:        connect(apply, &QPushButton::clicked, this, &SettingsDialog::applyPending);
+src/app/main.cpp:379:    // so today it still reads "&Settings").
+
+== C. Save As strings: live call sites carry context VEdit
+src/app/app_shell.cpp:1138:            "VEdit", "Save As refused (headless): %1 exists and cannot be overwritten without confirmation")
+src/app/app_shell.cpp:1153:        const QString message = QCoreApplication::translate("VEdit", "Save As failed: %1").arg(detail);
+
+== D. reworded replacements in src
+ 1  module catalog: retrying after the project model
+ 3  No module catalog yet: open a project and press Refresh
+ 1  Empty state: no module catalog yet
+ 1  this marker row has no location
+ 1  has no definition position in the module catalog
+ 1  Re-run the module catalog for the whole project
+ 1  Double-click: open this module's declaration
+ 1  Filter modules
+ 1  Instantiations
+ 1  Module tree ready
+ 1  cataloguing %1 project file(s)
+ 1  Invalid branch name
+ 1  Invalid tag name
+ 1  Invalid remote name
+ 1  Invalid URL
+ 2  No tags
+
+== E. dead claims
+Kind as a translatable literal:
+(none above = dead)
+net/driver/load design note:
+// It paints a PURE MODULE HIERARCHY: the `is_top` modules as roots and, under
+// each module, the modules its body instantiates. There are no instance paths,
+// nets, drivers, loads or chains anywhere in this panel - the old elaborated
+// hierarchy was replaced, not filtered. A module instantiated by two parents
+// appears under both parents (the model, not the panel, guarantees it).
+
+== F. Interface panel title vs Preferences appearance group
+468:    interfaceSpec.title = QCoreApplication::translate("VEdit", "Interface");
+1774:    auto *group = new QGroupBox(tr("Interface"), appearancePage_);
+
+== G. hover Fix button source string (Chinese source)
+112:    fixButton_ = new QPushButton(QCoreApplication::translate("VEdit", "修复"), this);
+
+== H. status dot is colour-only (no catalogue string)
+(none above = no string surface)

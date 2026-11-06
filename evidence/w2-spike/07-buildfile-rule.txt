@@ -1,0 +1,49 @@
+{
+ "root": "/home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture",
+ "cases": [
+  {
+   "label": "cwd=root, f outside root, relative entries",
+   "build_file": "/tmp/slang-buildfile-rule-wbppz83c/outside.f",
+   "entries": [
+    "mid.sv",
+    "top.sv"
+   ],
+   "modules_found": 2,
+   "driver_uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/mid.sv",
+   "correct_uri": true
+  },
+  {
+   "label": "cwd=root, f outside root, ABSOLUTE entries",
+   "build_file": "/tmp/slang-buildfile-rule-wbppz83c/outside-absolute.f",
+   "entries": [
+    "/home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/mid.sv",
+    "/home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv"
+   ],
+   "modules_found": 2,
+   "driver_uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/mid.sv",
+   "correct_uri": true
+  },
+  {
+   "label": "cwd=root, f inside root, relative entries",
+   "build_file": "/home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/inside.f",
+   "entries": [
+    "mid.sv",
+    "top.sv"
+   ],
+   "modules_found": 2,
+   "driver_uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/mid.sv",
+   "correct_uri": true
+  },
+  {
+   "label": "cwd=PARENT of root, f outside root, relative entries",
+   "build_file": "/tmp/slang-buildfile-rule-wbppz83c/outside.f",
+   "entries": [
+    "mid.sv",
+    "top.sv"
+   ],
+   "modules_found": 2,
+   "driver_uri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/mid.sv",
+   "correct_uri": false
+  }
+ ]
+}

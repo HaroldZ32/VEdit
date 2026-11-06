@@ -1,0 +1,3 @@
+COMMAND-BINDING Ctrl+Alt+D	view.panel.diagnostics
+CHECK commands.no-desktop-global-shortcuts FAIL view.toolbar: Ctrl+Alt+T (GNOME/Ubuntu: open terminal) | view.panel.diagnostics: Ctrl+Alt+D (KDE: show desktop)
+EXIT=0

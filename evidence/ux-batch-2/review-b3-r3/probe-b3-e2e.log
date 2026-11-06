@@ -1,0 +1,2 @@
+CHECK PASS product.fixture
+This plugin does not support propagateSizeHints()

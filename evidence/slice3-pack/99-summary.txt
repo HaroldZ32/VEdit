@@ -1,9 +1,9 @@
 form=F2
 appdir=/home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/AppDir
-appdir_files=216
-whitelist=SystemVerilog,Verilog
+appdir_files=350
+whitelist=Markdown,SystemVerilog,Tcl,VHDL,Verilog
 kshlib_sha256=aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
 appimage=/home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage
-appimage_bytes=110443000
-appimage_sha256=de19746c62a9e633de85e40b34f41f7e70350ca14ba4be284a9adca9d544501d
+appimage_bytes=136051192
+appimage_sha256=2b95e56fef4098a12b72e96ef5d27ab8a5d7452e008cbd80f4b824979df080c9
 steps_failed=0

@@ -1,0 +1,22 @@
+# grep proof (cwd=/home/haroldzhao/MyProj/DshProj/VEdit)
+collected_at: 2026-11-03T23:25:48+08:00
+
+## quoted option-string literals in product sources and tests
+$ grep -rnE -- "\"-C\"|'-C'" crates/ src/workspace/vcs/
+count=0
+
+## the legacy porcelain spelling
+$ grep -rn -- "--porcelain=v1" crates/ src/workspace/vcs/
+count=0
+
+## the 1.9-only SVN selector form
+$ grep -rn -- "--show-item" crates/ src/workspace/vcs/
+count=0
+
+## the only occurrences left are the EVIDENCE negative controls (by design):
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/vcs-read-compat/matrix.sh:57:run legacy-path-option git -C "$PWD" status --porcelain --branch
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/vcs-read-compat/matrix.sh:58:run legacy-porcelain-v1 git status --porcelain=v1 --branch
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/vcs-read-compat/shim/git:24:    -C | -C?* | --porcelain=v1)
+
+source_hits=0
+grep_probe=PASS

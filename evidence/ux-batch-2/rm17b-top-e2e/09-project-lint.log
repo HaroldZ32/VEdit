@@ -1,0 +1,29 @@
+CHECK PASS product.fixture
+kf.sonnet.core: Sonnet: No speller backends available!
+PROJECT-EXPAND-INPUTS root='/tmp/vedit-project-lint-e2e-BEDMAx' filelists=0 variables=0 settings='/tmp/vedit-project-lint-e2e-BEDMAx/state/settings.toml'
+This plugin does not support propagateSizeHints()
+CHECK PASS product.panel
+CHECK PASS product.lint-action
+PROJECT-ROOT-FILES root='/tmp/vedit-project-lint-e2e-BEDMAx' files=2
+PROJECT-ROOT-ENV root='/tmp/vedit-project-lint-e2e-BEDMAx' source=project pinned=1 include-dirs=0 defines=0 env=''
+LINT-PROJECT-OPEN engine=slang files=2 skipped-open=0 automatic=1
+LINT-PASS-FINISHED automatic=1 errors=2 files=2 dialogs=0 notice=1
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+LINT-PROJECT engine=slang files=2 lsp-backend=verible include-dirs=0 defines=0 skipped-open=0 non-source=0 automatic=0
+LINT-PASS-FINISHED automatic=0 errors=2 files=2 dialogs=1 notice=1
+This plugin does not support propagateSizeHints()
+This plugin does not support raise()
+OBSERVED product.pass phase=3 errors=0 automatic=0 dialogs=1 notice=1 message='2/2 file(s) scanned — 2 CLI diagnostics'
+CHECK PASS product.explicit-dialog  dialogs=1 automatic=0
+CHECK PASS product.dialog-modal
+CHECK PASS product.explicit-notice
+CHECK PASS product.pane
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+CHECK PASS product.file-opened
+CHECK PASS product.save
+LINT-PASS-FINISHED automatic=1 errors=2 files=1 dialogs=1 notice=1
+OBSERVED product.auto-pass automatic=1 dialogs-before=1 dialogs-after=1
+CHECK PASS product.automatic-pass-was-automatic
+CHECK PASS product.automatic-no-dialog  before=1 after=1
+SUMMARY checks=11 failures=0 skips=0

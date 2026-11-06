@@ -1,0 +1,4 @@
+SELFCHECK_EXIT=0
+CHECK editcore.boundary.counter-live PASS before=0 after=1
+EDIT-CORE-SELFTEST ok=1 checks=67 failures=0
+APP-SHELL-SELFTEST ok=1 checks=245 failures=0 state=/tmp/vedit-app-anAKPp/state

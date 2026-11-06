@@ -1,0 +1,72 @@
+compat_bin=/vedit-build/target/debug/deps/compat-95a25540d7333a54
+abi_bin=/vedit-build/target/debug/deps/abi-73d3a52e89bce543
+== shim self-test: both legacy spellings must be rejected ==
+  legacy-path-option exit=129
+  legacy-porcelain-v1 exit=129
+self_test_log:
+cwd=/tmp arg=-C arg=/ arg=status
+REJECTED -C
+cwd=/tmp arg=status arg=--porcelain=v1
+REJECTED --porcelain=v1
+== product read tests through the shim ==
+
+running 3 tests
+test read_path_returns_status_info_and_diff_on_the_installed_git ... ok
+test the_read_gate_still_refuses_every_write_subcommand_on_the_new_seam ... ok
+test two_repositories_keep_their_own_working_tree ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+
+
+running 1 test
+test vcs_read_jobs_return_status_info_and_diff_from_a_real_repository ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 16 filtered out; finished in 0.04s
+
+== shim log of the read tests ==
+cwd=/tmp arg=--version
+cwd=/tmp/.tmp7qTEmJ arg=init arg=-q
+cwd=/tmp/.tmp7qTEmJ arg=config arg=user.email arg=compat@example.com
+cwd=/tmp/.tmp7qTEmJ arg=config arg=user.name arg=VEdit Compat
+cwd=/tmp/.tmp7qTEmJ arg=add arg=rtl/top.sv
+cwd=/tmp/.tmp7qTEmJ arg=commit arg=-m arg=compat fixture
+cwd=/tmp/.tmp7qTEmJ arg=status arg=--porcelain arg=--branch
+cwd=/tmp/.tmp7qTEmJ arg=rev-parse arg=--abbrev-ref arg=HEAD
+cwd=/tmp/.tmp7qTEmJ arg=rev-parse arg=--short arg=HEAD
+cwd=/tmp/.tmp7qTEmJ arg=diff arg=--cached arg=--no-color arg=-- arg=rtl/top.sv
+cwd=/tmp/.tmp7qTEmJ arg=diff arg=--no-color arg=-- arg=rtl/top.sv
+cwd=/tmp arg=status
+cwd=/tmp arg=--version
+cwd=/tmp/.tmpY6Y0fp arg=init arg=-q
+cwd=/tmp/.tmpY6Y0fp arg=config arg=user.email arg=compat@example.com
+cwd=/tmp/.tmpY6Y0fp arg=config arg=user.name arg=VEdit Compat
+cwd=/tmp/.tmpY6Y0fp arg=add arg=rtl/first.sv
+cwd=/tmp/.tmpY6Y0fp arg=commit arg=-m arg=compat fixture
+cwd=/tmp/.tmpDMU1ex arg=init arg=-q
+cwd=/tmp/.tmpDMU1ex arg=config arg=user.email arg=compat@example.com
+cwd=/tmp/.tmpDMU1ex arg=config arg=user.name arg=VEdit Compat
+cwd=/tmp/.tmpDMU1ex arg=add arg=rtl/second.sv
+cwd=/tmp/.tmpDMU1ex arg=commit arg=-m arg=compat fixture
+cwd=/tmp/.tmpY6Y0fp arg=status arg=--porcelain arg=--branch
+cwd=/tmp/.tmpDMU1ex arg=status arg=--porcelain arg=--branch
+cwd=/tmp/.tmpY6Y0fp arg=rev-parse arg=--abbrev-ref arg=HEAD
+cwd=/tmp/.tmpY6Y0fp arg=rev-parse arg=--short arg=HEAD
+cwd=/tmp/.tmpDMU1ex arg=rev-parse arg=--abbrev-ref arg=HEAD
+cwd=/tmp/.tmpDMU1ex arg=rev-parse arg=--short arg=HEAD
+cwd=/tmp arg=--version
+cwd=/tmp/.tmpcG8Ylf arg=init arg=-q
+cwd=/tmp/.tmpcG8Ylf arg=config arg=user.email arg=compat@example.com
+cwd=/tmp/.tmpcG8Ylf arg=config arg=user.name arg=VEdit Compat
+cwd=/tmp/.tmpcG8Ylf arg=add arg=rtl/top.sv
+cwd=/tmp/.tmpcG8Ylf arg=commit arg=-m arg=compat fixture
+cwd=/tmp/.tmpcG8Ylf arg=status arg=--porcelain arg=--branch
+cwd=/tmp/.tmpcG8Ylf arg=rev-parse arg=--abbrev-ref arg=HEAD
+cwd=/tmp/.tmpcG8Ylf arg=rev-parse arg=--short arg=HEAD
+cwd=/tmp/.tmpcG8Ylf arg=diff arg=--cached arg=--no-color arg=-- arg=rtl/top.sv
+cwd=/tmp/.tmpcG8Ylf arg=diff arg=--no-color arg=-- arg=rtl/top.sv
+rejected=0
+forwarded=40
+outside_tmp=0
+workspace_hits=0
+fixture_reads=4
+shim_probe=PASS

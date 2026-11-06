@@ -34,6 +34,13 @@ find_package(KF6CoreAddons ${VEDIT_KF6_VERSION} EXACT REQUIRED)
 find_package(KF6Config ${VEDIT_KF6_VERSION} EXACT REQUIRED)
 find_package(KF6SyntaxHighlighting ${VEDIT_KSYNTAXHIGHLIGHTING_VERSION} EXACT REQUIRED)
 find_package(KF6TextEditor ${VEDIT_KTEXTEDITOR_VERSION} EXACT REQUIRED)
+# T18 i18n: Qt6 LinguistTools turns translations/*.ts into the shipped .qm.
+# Optional on purpose: a host without the tools still configures and builds; the
+# pinned image ships them (verified: /usr/lib/qt6/bin/lrelease, 6.10.2).
+find_package(Qt6 ${VEDIT_QT6_VERSION} QUIET COMPONENTS LinguistTools)
+if(NOT TARGET Qt6::lrelease)
+  message(STATUS "  Qt6 LinguistTools: absent (no .qm generated; UI stays English)")
+endif()
 
 # tree-sitter ships no CMake package, so it is pinned through pkg-config with
 # the exact runtime version (C18: the runtime is part of the private bundle).
@@ -45,6 +52,47 @@ message(STATUS "  tree-sitter:       ${TREE_SITTER_VERSION} at ${TREE_SITTER_LIB
 # Imported target + the hard requirement that the product binary carries the
 # C ABI. The library is built by scripts/build-qt.sh before configure.
 include(VEditRustFfi)
+
+# --- A-11: Qt/ABI compile-only guard (T20) ----------------------------------
+# `qobjectdefs.h` defines `signals`/`slots`/`emit` as macros, so a field or
+# parameter named after one of them in the generated C ABI header breaks every
+# Qt translation unit that includes vd_ffi.h (the 2026-11-02 `signals` collision
+# took the editor lane down). This target COMPILES
+# crates/vd-ffi/tests/qt_abi_guard.cpp together with a REAL Qt header and the
+# header AS IT EXISTS IN THE TREE (crates/vd-ffi/include/vd_ffi.h, regenerated
+# by build.rs on every Rust build) - never a copy. Compile-only: the TU has
+# main() and is never linked or run. The host-side wrapper is the Rust test
+# crates/vd-ffi/tests/qt_abi_guard.rs; without Qt6 development files that test
+# prints a loud SKIP naming the command it would have run, and this CMake target
+# does not exist at all (the warning below names the missing path and command).
+set(VEDIT_QT_ABI_GUARD_SOURCE
+  "${CMAKE_CURRENT_SOURCE_DIR}/crates/vd-ffi/tests/qt_abi_guard.cpp")
+set(VEDIT_QT_ABI_GUARD_HEADER
+  "${CMAKE_CURRENT_SOURCE_DIR}/crates/vd-ffi/include/vd_ffi.h")
+if(EXISTS "${VEDIT_QT_ABI_GUARD_SOURCE}" AND EXISTS "${VEDIT_QT_ABI_GUARD_HEADER}")
+  add_library(vedit_qt_abi_guard OBJECT "${VEDIT_QT_ABI_GUARD_SOURCE}")
+  set_target_properties(vedit_qt_abi_guard PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
+    # The in-tree generated header is not a CMake dependency; without this the
+    # guard would keep a stale object when build.rs rewrites the header.
+    OBJECT_DEPENDS "${VEDIT_QT_ABI_GUARD_HEADER}")
+  target_include_directories(vedit_qt_abi_guard PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/crates/vd-ffi/include")
+  # Qt6::Core gives the REAL Qt headers (QObject/QString); compile time only.
+  target_link_libraries(vedit_qt_abi_guard PRIVATE Qt6::Core)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit_qt_abi_guard PRIVATE -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  message(STATUS "VEdit: Qt/ABI compile-only guard enabled (in-tree header: ${VEDIT_QT_ABI_GUARD_HEADER})")
+else()
+  message(WARNING
+    "VEdit: Qt/ABI compile guard SKIPPED - missing "
+    "${VEDIT_QT_ABI_GUARD_SOURCE} or ${VEDIT_QT_ABI_GUARD_HEADER}. "
+    "When both exist the guard compiles: c++ -std=c++17 -fsyntax-only -fPIC "
+    "$(pkg-config --cflags Qt6Core) -I crates/vd-ffi/include "
+    "crates/vd-ffi/tests/qt_abi_guard.cpp")
+endif()
 
 # --- M0 build-base smoke target ---------------------------------------------
 option(VEDIT_BUILD_M0_SMOKE

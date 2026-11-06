@@ -1,0 +1,75 @@
+before messages=1025  active=1025  vanished=0  finished=1018
+after  messages=1186  active=1186  vanished=0  finished=1186
+duplicate (context,source) keys in finished file: 0
+
+before-active carried into finished catalogue, same text: 1004
+before-active missing from finished catalogue: 21
+  MISSING [VEdit] 'hierarchy: retrying after the project model…' (prior tr '层次：工程模型更新后重试…')
+  MISSING [VEdit] 'No hierarchy yet: open a project and press Refresh.' (prior tr '尚无层次：打开工程并点击“刷新”。')
+  MISSING [VEdit] 'Empty state: no elaborated project yet. Open a project and press Refresh.' (prior tr '空状态：尚无已展开的工程。打开工程并点击“刷新”。')
+  MISSING [VEdit] '%1 · no file:line reported' (prior tr '%1 · 未报告 file:line')
+  MISSING [VEdit] 'Re-elaborate the whole project' (prior tr '重新展开整个工程')
+  MISSING [VEdit] 'Jump to source' (prior tr '跳转到源')
+  MISSING [VEdit] 'Put the cursor on a signal in the editor, then jump to the construct that drives it' (prior tr '将光标放在编辑器中的信号上，然后跳转到驱动它的构造')
+  MISSING [VEdit] 'Jump to target' (prior tr '跳转到目标')
+  MISSING [VEdit] 'Put the cursor on a signal in the editor, then jump to the construct that reads it' (prior tr '将光标放在编辑器中的信号上，然后跳转到读取它的构造')
+  MISSING [VEdit] 'Filter instance / net / file…' (prior tr '过滤实例 / 网络 / 文件…')
+  MISSING [VEdit] 'Instance / Net' (prior tr '实例 / 网络')
+  MISSING [VEdit] 'Kind' (prior tr '类型')
+  MISSING [VEdit] 'Hierarchy ready — double-click an instance, a net or a driver/load.' (prior tr '层次已就绪——双击实例、网络或驱动/负载。')
+  MISSING [VEdit] 'elaborating %1 project file(s)…' (prior tr '正在展开 %1 个工程文件…')
+  MISSING [VEdit] 'A branch name is required.' (prior tr '必须填写分支名称。')
+  MISSING [VEdit] 'A tag name is required.' (prior tr '必须填写标签名称。')
+  MISSING [VEdit] 'A remote name and a URL are required.' (prior tr '必须填写远程仓库名称和 URL。')
+  MISSING [VEdit] 'no tags reported by this backend' (prior tr '此后端未报告标签')
+  MISSING [vedit::app::ApplicationShell] '&Settings' (prior tr '设置(&S)')
+  MISSING [vedit::app::ApplicationShell] 'Save As failed: %1' (prior tr '另存为失败：%1')
+  MISSING [vedit::app::ApplicationShell] 'Save As refused (headless): %1 exists and cannot be overwritten without confirmation' (prior tr '另存为被拒绝（无界面运行）：%1 已存在，未经确认不能覆盖')
+before-active present but text changed / not finished: 0
+
+before-vanished entries:
+
+182-list parsed: 182 entries; numbering contiguous: True
+182-list present in finished catalogue: 179/182
+  missing: 3
+    MISSING 97 [VEdit] '\\nroot: %1' (workspace/module_tree/module_tree_panel.cpp:180)
+    MISSING 169 [vedit::workspace::search::SearchPanel] 'Replace "%1" with "%2"?\\n\\n%3 occurrence(s) in %4 file(s) will be replaced.' (workspace/search/search_panel.cpp:1604)
+    MISSING 170 [vedit::workspace::search::SearchPanel] '\\n\\n%1 affected unsaved editor document(s) were saved first: %2' (workspace/search/search_panel.cpp:1616)
+  empty translation: 0; not-finished: 0; identical-to-source: 3
+    SAME-AS-SOURCE 45 [VEdit] '%1 · %2 · %3'
+    SAME-AS-SOURCE 69 [VEdit] '修复'
+    SAME-AS-SOURCE 77 [VEdit] ' · ⚠ %1'
+
+keys in finished catalogue that were not active in the backup: 182
+  of those, NOT in the 182-list: 3
+    EXTRA [VEdit] '\nroot: %1' -> '\n根目录：%1'
+    EXTRA [vedit::workspace::search::SearchPanel] 'Replace "%1" with "%2"?\n\n%3 occurrence(s) in %4 file(s) will be replaced.' -> '将“%1”替换为“%2”？\n\n将替换 %4 个文件中的 %3 处。'
+    EXTRA [vedit::workspace::search::SearchPanel] '\n\n%1 affected unsaved editor document(s) were saved first: %2' -> '\n\n已先保存 %1 个受影响的未保存编辑器文档：%2'
+
+removed-json entries: 21
+  lost-from-before sources == stated removed sources: True
+  before-vanished sources subset of stated: True
+
+whole-file placeholder/garbage/not-finished scan: 0
+
+finished translations with English source but NO CJK chars: 20
+  NO-CJK [VEdit] 'VEdit — %1[*]' -> 'VEdit — %1[*]'
+  NO-CJK [VEdit] 'definitionForName(Verilog): %1' -> 'definitionForName(Verilog)：%1'
+  NO-CJK [VEdit] 'definitionForName(SystemVerilog): %1' -> 'definitionForName(SystemVerilog)：%1'
+  NO-CJK [VEdit] 'definitionForFileName(top.v): %1' -> 'definitionForFileName(top.v)：%1'
+  NO-CJK [VEdit] 'definitionForFileName(top.sv): %1' -> 'definitionForFileName(top.sv)：%1'
+  NO-CJK [VEdit] 'Filelists (0)' -> 'filelist（0）'
+  NO-CJK [VEdit] 'Filelists (%1)' -> 'filelist（%1）'
+  NO-CJK [VEdit] 'Shell' -> 'Shell'
+  NO-CJK [VEdit] 'Shell: %1' -> 'Shell：%1'
+  NO-CJK [VEdit] 'URL' -> 'URL'
+  NO-CJK [VEdit] 'Git' -> 'Git'
+  NO-CJK [VEdit] 'Subversion' -> 'Subversion'
+  NO-CJK [vedit::workspace::settings::SettingsPanel] 'FIM' -> 'FIM'
+  NO-CJK [vedit::workspace::settings::SettingsPanel] 'Lint' -> 'Lint'
+  NO-CJK [vedit::workspace::settings::SettingsPanel] 'verible-verilog-ls:' -> 'verible-verilog-ls：'
+  NO-CJK [vedit::workspace::settings::SettingsPanel] 'slang:' -> 'slang：'
+  NO-CJK [vedit::workspace::settings::SettingsPanel] 'slang-server:' -> 'slang-server：'
+  NO-CJK [vedit::workspace::settings::SettingsPanel] 'verible-verilog-format:' -> 'verible-verilog-format：'
+  NO-CJK [vedit::workspace::settings::SettingsPanel] 'verible-verilog-lint' -> 'verible-verilog-lint'
+  NO-CJK [vedit::workspace::settings::SettingsPanel] 'slang' -> 'slang'

@@ -1,0 +1,6 @@
+# cmd: grep -E "tests passed|tests failed|Total Test time|PASS: Rust service layer" logs/10-build-qt.log
+100% tests passed, 0 tests failed out of 37
+Total Test time (real) =  53.39 sec
+[qt6] PASS: Rust service layer + configure + build + ctest (incl. the C ABI smoke) + xcb/software-rendering smoke inside vedit-qt6-build:local
+# cmd: cat logs/10-build-qt.exit
+EXIT=0

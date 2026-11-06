@@ -32,6 +32,7 @@ v1 明确不做（不是永远不做，见 Open questions）：
 3. WASI/WASM 插件系统（Lapce 的 volt 等价物）。
 4. 远程开发 / SSH / 独立 proxy 进程。
 5. 跨文件替换——Lapce 本身也没有；v1 只有文件内替换 + 全局搜索。
+   **（2026-11-05 更正：UX 批次 2 item 5 已交付“全工程搜索 + 替换（替换 / 全部替换）”，本条是 rev2 当时的口径，不再成立。）**
 6. minimap、which-key——Lapce 同样没有。
 7. 免 FUSE 运行（用户未要求；libfuse2 被登记为运行前提）。
 8. 系统级安装包（deb/rpm）——只交付 AppImage。

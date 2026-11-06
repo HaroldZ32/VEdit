@@ -1,0 +1,42 @@
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+OBSERVED platform offscreen
+OBSERVED expect missing
+PRECONDITION state-dir='/tmp/g6-diag-probe-NYIyaY/state' entries=<empty> settings-toml=absent
+CHECK precondition.state-dir-empty PASS detail='<empty>'
+CHECK precondition.no-settings-toml PASS detail='/tmp/g6-diag-probe-NYIyaY/state/settings.toml'
+CHECK precondition.file-exists PASS detail='/tmp/g6-diag-probe-NYIyaY/project/format.sv'
+TOOLCHAIN-RESOLVED source=verible:missing slang:missing missing=[verible, slang] aux source=slang-server:missing verible-format:missing verible-lint:missing missing=[slang-server, verible-format, verible-lint]
+TOOLCHAIN-FORMAT found=0 source='missing' path='' env='VEDIT_VERIBLE_FORMAT'
+CHECK toolchain.formatter-executable-when-available PASS
+CHECK probe.edit-core-provider PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+[app-shell] Diagnostics unavailable: verible-verilog-ls, slang not found (bundled, local checkout, PATH and env all empty). Impact: Verible diagnostics, navigation and the outline are unavailable; SLANG deep lint is unavailable. Fix: bundle `verible-verilog-ls`/`slang` in the product's bin/ next to vd-app, run `bash scripts/fetch-verible.sh` and `bash build/slang/build.sh` in a source checkout, install them on PATH, or set VEDIT_VERIBLE_LS / VEDIT_SLANG.
+This plugin does not support propagateSizeHints()
+TOOLCHAIN source=verible:missing slang:missing missing=[verible, slang] aux source=slang-server:missing verible-format:missing verible-lint:missing missing=[slang-server, verible-format, verible-lint] local=[]
+GATES-READ sequence=after-install-before-file-open
+GATE action=formatting present=1 enabled=0 known=1 source='always-verible-format' reason='verible-verilog-format: missing (probed /tmp/g6-missing/verible-verilog-format, /tmp/g6-missing/bin/verible-verilog-format, /tmp/g6-missing/../lib/vedit/bin/verible-verilog-format, /tmp/g6-missing/../share/vedit/bin/verible-verilog-format, /usr/bin/verible-verilog-format, /bin/verible-verilog-format)'
+GATE action=definition present=1 enabled=1 known=1 source='backend' reason=''
+GATE action=hover present=1 enabled=0 known=1 source='backend' reason='hoverProvider = false in the initialize result (measured)'
+CHECK gate.formatting-published PASS
+CHECK gate.formatting-matches-toolchain PASS detail='gate=0 toolchain=0'
+CHECK gate.formatting-independent-of-backend PASS detail='always-verible-format'
+CHECK action.formatting-exists PASS
+ACTION action=diagnostics.format enabled=0 reason='verible-verilog-format: missing (probed /tmp/g6-missing/verible-verilog-format, /tmp/g6-missing/bin/verible-verilog-format, /tmp/g6-missing/../lib/vedit/bin/verible-verilog-format, /tmp/g6-missing/../share/vedit/bin/verible-verilog-format, /usr/bin/verible-verilog-format, /bin/verible-verilog-format)'
+CHECK action.formatting-disabled-when-missing PASS
+CHECK reason.names-the-missing-tool PASS detail='verible-verilog-format: missing (probed /tmp/g6-missing/verible-verilog-format, /tmp/g6-missing/bin/verible-verilog-format, /tmp/g6-missing/../lib/vedit/bin/verible-verilog-format, /tmp/g6-missing/../share/vedit/bin/verible-verilog-format, /usr/bin/verible-verilog-format, /bin/verible-verilog-format)'
+CHECK reason.names-the-probed-candidates PASS detail='verible-verilog-format: missing (probed /tmp/g6-missing/verible-verilog-format, /tmp/g6-missing/bin/verible-verilog-format, /tmp/g6-missing/../lib/vedit/bin/verible-verilog-format, /tmp/g6-missing/../share/vedit/bin/verible-verilog-format, /usr/bin/verible-verilog-format, /bin/verible-verilog-format)'
+CHECK reason.no-fake-local-claim PASS detail='verible-verilog-format: missing (probed /tmp/g6-missing/verible-verilog-format, /tmp/g6-missing/bin/verible-verilog-format, /tmp/g6-missing/../lib/vedit/bin/verible-verilog-format, /tmp/g6-missing/../share/vedit/bin/verible-verilog-format, /usr/bin/verible-verilog-format, /bin/verible-verilog-format)'
+CHECK probe.active-pane PASS
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+CHECK format.file-opened PASS
+CHECK format.ktexteditor-view PASS
+CHECK format.current-file PASS detail='/tmp/g6-diag-probe-NYIyaY/project/format.sv'
+OBSERVED format.before bytes=59 sha256=1f434e206212dafb47c58e393eb21657396a176e95311d0ac338c743d484ddce
+OBSERVED format.after bytes=59 sha256=1f434e206212dafb47c58e393eb21657396a176e95311d0ac338c743d484ddce changed=0
+CHECK format.document-unchanged-when-missing PASS
+CHECK evidence.before-written PASS detail='/vedit-build/evidence/g6-diag/missing/format-before.sv'
+CHECK evidence.after-written PASS detail='/vedit-build/evidence/g6-diag/missing/format-after.sv'
+EVIDENCE format-before='/vedit-build/evidence/g6-diag/missing/format-before.sv' format-after='/vedit-build/evidence/g6-diag/missing/format-after.sv'
+POSTCONDITION state-dir='/tmp/g6-diag-probe-NYIyaY/state' entries=<empty> settings-toml=absent
+CHECK postcondition.no-settings-toml PASS detail='/tmp/g6-diag-probe-NYIyaY/state/settings.toml'
+G6-DIAG-PROBE exit=0 checks=21 failures=0 expect=missing

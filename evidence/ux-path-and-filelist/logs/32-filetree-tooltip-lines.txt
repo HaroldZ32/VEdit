@@ -1,0 +1,3 @@
+# cmd: grep "tree.tooltip\|tree.pathrole" logs/31-filetree-standalone-tests.log
+CHECK tree.tooltip.relative ok=1 detail="alpha/deep
+CHECK tree.pathrole.absolute ok=1

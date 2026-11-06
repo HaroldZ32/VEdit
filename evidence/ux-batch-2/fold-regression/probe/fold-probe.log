@@ -1,0 +1,32 @@
+FOLD A loaded=1 error=''
+FOLD tag=A-openUrl lines=10497 mode='SystemVerilog' modified=0 url_set=1 hidden_before=0 firstReal=0 lastReal=0 firstVis=0 lastVis=0 y40=-1
+FOLD tag=A-openUrl fold_command=1 exec_ok=1 message='' hidden_after=0 firstReal=0 lastReal=0 firstVis=0 lastVis=0 y40=-1 mode_after='SystemVerilog'
+FOLD B forced_mode 'SystemVerilog' -> reset -> 'SystemVerilog'
+FOLD tag=B-forced lines=10497 mode='SystemVerilog' modified=0 url_set=1 hidden_before=0 firstReal=0 lastReal=0 firstVis=0 lastVis=0 y40=-1
+FOLD tag=B-forced fold_command=1 exec_ok=1 message='' hidden_after=0 firstReal=0 lastReal=0 firstVis=0 lastVis=0 y40=-1 mode_after='SystemVerilog'
+FOLD D mode_first=1 loaded=1 mode='SystemVerilog' text_matches=1
+FOLD tag=D-mode-first lines=10497 mode='SystemVerilog' modified=0 url_set=1 hidden_before=0 firstReal=0 lastReal=0 firstVis=0 lastVis=0 y40=-1
+FOLD tag=D-mode-first fold_command=1 exec_ok=1 message='' hidden_after=0 firstReal=0 lastReal=0 firstVis=0 lastVis=0 y40=-1 mode_after='SystemVerilog'
+FOLD E after_other_mode='C++'
+FOLD tag=E-transition lines=10497 mode='SystemVerilog' modified=0 url_set=1 hidden_before=0 firstReal=0 lastReal=0 firstVis=0 lastVis=0 y40=-1
+FOLD tag=E-transition fold_command=1 exec_ok=1 message='' hidden_after=0 firstReal=0 lastReal=0 firstVis=0 lastVis=0 y40=-1 mode_after='SystemVerilog'
+FOLD tag=F-openUrl-then-setText lines=10497 mode='SystemVerilog' modified=0 url_set=1 hidden_before=0 firstReal=10495 lastReal=10496 firstVis=10495 lastVis=10496 y40=-1
+FOLD tag=F-openUrl-then-setText fold_command=1 exec_ok=1 message='' hidden_after=-39 firstReal=10495 lastReal=0 firstVis=10456 lastVis=0 y40=-1 mode_after='SystemVerilog'
+FOLD G undo_action=1 enabled_after_openurl=0
+FOLD G enabled_after_setText_same=1 text_unchanged=1
+FOLD tag=G-setText-same lines=10497 mode='SystemVerilog' modified=0 url_set=1 hidden_before=0 firstReal=10495 lastReal=10496 firstVis=10495 lastVis=10496 y40=-1
+FOLD tag=G-setText-same fold_command=1 exec_ok=1 message='' hidden_after=-39 firstReal=10495 lastReal=0 firstVis=10456 lastVis=0 y40=-1 mode_after='SystemVerilog'
+FOLD G after_undo text_unchanged=0 enabled=0
+FOLD tag=G-after-undo lines=10498 mode='SystemVerilog' modified=1 url_set=1 hidden_before=0 firstReal=0 lastReal=0 firstVis=0 lastVis=0 y40=-1
+FOLD tag=G-after-undo fold_command=1 exec_ok=1 message='' hidden_after=0 firstReal=0 lastReal=0 firstVis=0 lastVis=0 y40=-1 mode_after='SystemVerilog'
+FOLD H shown=1 size=900x700
+FOLD tag=H-shown lines=10497 mode='SystemVerilog' modified=0 url_set=1 hidden_before=0 firstReal=0 lastReal=47 firstVis=0 lastVis=47 y40=561
+FOLD tag=H-shown fold_command=1 exec_ok=1 message='' hidden_after=39 firstReal=0 lastReal=86 firstVis=0 lastVis=47 y40=15 mode_after='SystemVerilog'
+FOLD I visible=0 size=900x700
+FOLD tag=I-resize-only lines=10497 mode='SystemVerilog' modified=0 url_set=1 hidden_before=0 firstReal=0 lastReal=0 firstVis=0 lastVis=0 y40=-1
+FOLD tag=I-resize-only fold_command=1 exec_ok=1 message='' hidden_after=0 firstReal=0 lastReal=0 firstVis=0 lastVis=0 y40=-1 mode_after='SystemVerilog'
+FOLD C setText=1 modeSet=1 text_matches=1 diag=''SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own'
+FOLD tag=C-setText lines=10497 mode='SystemVerilog' modified=0 url_set=0 hidden_before=0 firstReal=10495 lastReal=10496 firstVis=10495 lastVis=10496 y40=-1
+FOLD tag=C-setText fold_command=1 exec_ok=1 message='' hidden_after=-39 firstReal=10495 lastReal=0 firstVis=10456 lastVis=0 y40=-1 mode_after='SystemVerilog'
+FOLD tag=C2-setText-shown lines=10497 mode='SystemVerilog' modified=0 url_set=0 hidden_before=0 firstReal=10449 lastReal=10496 firstVis=10449 lastVis=10496 y40=-1
+FOLD tag=C2-setText-shown fold_command=1 exec_ok=1 message='' hidden_after=0 firstReal=10449 lastReal=10496 firstVis=10410 lastVis=10457 y40=-1 mode_after='SystemVerilog'

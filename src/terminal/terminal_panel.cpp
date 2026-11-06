@@ -1,4 +1,5 @@
 #include "terminal_panel.h"
+#include <QCoreApplication>
 
 #include "pty_session.h"
 #include "terminal_widget.h"
@@ -68,12 +69,12 @@ void TerminalPanel::buildUi()
         return button;
     };
 
-    QToolButton *restartButton = addButton(QStringLiteral("Restart"), QStringLiteral("terminal-restart"),
-                                          QStringLiteral("Close the current shell and open a new session"));
-    QToolButton *clearButton = addButton(QStringLiteral("Clear"), QStringLiteral("terminal-clear"),
-                                        QStringLiteral("Clear the scrollback of this panel"));
-    QToolButton *closeButton = addButton(QStringLiteral("Close"), QStringLiteral("terminal-close"),
-                                        QStringLiteral("Close the terminal panel"));
+    QToolButton *restartButton = addButton(QCoreApplication::translate("VEdit", "Restart"), QStringLiteral("terminal-restart"),
+                                          QCoreApplication::translate("VEdit", "Close the current shell and open a new session"));
+    QToolButton *clearButton = addButton(QCoreApplication::translate("VEdit", "Clear"), QStringLiteral("terminal-clear"),
+                                        QCoreApplication::translate("VEdit", "Clear the scrollback of this panel"));
+    QToolButton *closeButton = addButton(QCoreApplication::translate("VEdit", "Close"), QStringLiteral("terminal-close"),
+                                        QCoreApplication::translate("VEdit", "Close the terminal panel"));
 
     layout->addWidget(header);
 
@@ -186,7 +187,7 @@ void TerminalPanel::handleFinished(int exitCode, int signal, const QString &desc
     Q_UNUSED(signal);
     running_ = false;
     lastDescription_ = description;
-    banner_->setText(QStringLiteral("Shell %1. Press Enter or Restart to start a new session.")
+    banner_->setText(QCoreApplication::translate("VEdit", "Shell %1. Press Enter or Restart to start a new session.")
                          .arg(description));
     banner_->setVisible(true);
     updateState();
@@ -196,27 +197,27 @@ void TerminalPanel::handleFinished(int exitCode, int signal, const QString &desc
 void TerminalPanel::updateState()
 {
     const QString path = session_ != nullptr ? session_->shellPath() : QString();
-    shellLabel_->setText(path.isEmpty() ? QStringLiteral("Shell") : QStringLiteral("Shell: %1").arg(path));
+    shellLabel_->setText(path.isEmpty() ? QCoreApplication::translate("VEdit", "Shell") : QCoreApplication::translate("VEdit", "Shell: %1").arg(path));
 
     if (session_ == nullptr) {
-        statusLabel_->setText(QStringLiteral("Not started"));
+        statusLabel_->setText(QCoreApplication::translate("VEdit", "Not started"));
         return;
     }
     if (running_ && session_->isRunning()) {
-        statusLabel_->setText(QStringLiteral("Running · pid %1").arg(session_->pid()));
+        statusLabel_->setText(QCoreApplication::translate("VEdit", "Running · pid %1").arg(session_->pid()));
         return;
     }
     if (session_->terminationSignal() != 0) {
-        statusLabel_->setText(QStringLiteral("Killed · signal %1 (%2)")
+        statusLabel_->setText(QCoreApplication::translate("VEdit", "Killed · signal %1 (%2)")
                                   .arg(session_->terminationSignal())
                                   .arg(session_->exitDescription()));
         return;
     }
     if (session_->exitKnown()) {
-        statusLabel_->setText(QStringLiteral("Exited · code %1").arg(session_->exitCode()));
+        statusLabel_->setText(QCoreApplication::translate("VEdit", "Exited · code %1").arg(session_->exitCode()));
         return;
     }
-    statusLabel_->setText(QStringLiteral("Stopped · %1").arg(lastDescription_.isEmpty()
+    statusLabel_->setText(QCoreApplication::translate("VEdit", "Stopped · %1").arg(lastDescription_.isEmpty()
                                                                  ? session_->exitDescription()
                                                                  : lastDescription_));
 }

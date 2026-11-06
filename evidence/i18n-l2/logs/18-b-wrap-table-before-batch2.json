@@ -1,0 +1,392 @@
+[
+  {
+    "file": "src/app/app_shell.cpp",
+    "line_hint": 346,
+    "literal": "Files"
+  },
+  {
+    "file": "src/app/app_shell.cpp",
+    "line_hint": 347,
+    "literal": "Search"
+  },
+  {
+    "file": "src/app/app_shell.cpp",
+    "line_hint": 348,
+    "literal": "Terminal"
+  },
+  {
+    "file": "src/app/app_shell.cpp",
+    "line_hint": 353,
+    "literal": "Outline"
+  },
+  {
+    "file": "src/app/app_shell.cpp",
+    "line_hint": 461,
+    "literal": "Open File"
+  },
+  {
+    "file": "src/app/app_shell.cpp",
+    "line_hint": 462,
+    "literal": "Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;All Files (*)"
+  },
+  {
+    "file": "src/app/app_shell.cpp",
+    "line_hint": 517,
+    "literal": "VEdit application shell (app-shell lane).\n\nEditor provider: %1\nTheme: %2\nPanes: %3\nState: %4\nDiagnostics: %5"
+  },
+  {
+    "file": "src/app/app_shell.cpp",
+    "line_hint": 793,
+    "literal": "VEdit — %1[*]"
+  },
+  {
+    "file": "src/app/editor_area.cpp",
+    "line_hint": 396,
+    "literal": "Close File"
+  },
+  {
+    "file": "src/terminal/terminal_panel.cpp",
+    "line_hint": 71,
+    "literal": "Restart"
+  },
+  {
+    "file": "src/terminal/terminal_panel.cpp",
+    "line_hint": 72,
+    "literal": "Close the current shell and open a new session"
+  },
+  {
+    "file": "src/terminal/terminal_panel.cpp",
+    "line_hint": 73,
+    "literal": "Clear"
+  },
+  {
+    "file": "src/terminal/terminal_panel.cpp",
+    "line_hint": 74,
+    "literal": "Clear the scrollback of this panel"
+  },
+  {
+    "file": "src/terminal/terminal_panel.cpp",
+    "line_hint": 75,
+    "literal": "Close"
+  },
+  {
+    "file": "src/terminal/terminal_panel.cpp",
+    "line_hint": 76,
+    "literal": "Close the terminal panel"
+  },
+  {
+    "file": "src/terminal/terminal_panel.cpp",
+    "line_hint": 189,
+    "literal": "Shell %1. Press Enter or Restart to start a new session."
+  },
+  {
+    "file": "src/terminal/terminal_panel.cpp",
+    "line_hint": 199,
+    "literal": "Shell"
+  },
+  {
+    "file": "src/terminal/terminal_panel.cpp",
+    "line_hint": 199,
+    "literal": "Shell: %1"
+  },
+  {
+    "file": "src/terminal/terminal_panel.cpp",
+    "line_hint": 202,
+    "literal": "Not started"
+  },
+  {
+    "file": "src/terminal/terminal_panel.cpp",
+    "line_hint": 206,
+    "literal": "Running · pid %1"
+  },
+  {
+    "file": "src/terminal/terminal_panel.cpp",
+    "line_hint": 210,
+    "literal": "Killed · signal %1 (%2)"
+  },
+  {
+    "file": "src/terminal/terminal_panel.cpp",
+    "line_hint": 216,
+    "literal": "Exited · code %1"
+  },
+  {
+    "file": "src/terminal/terminal_panel.cpp",
+    "line_hint": 219,
+    "literal": "Stopped · %1"
+  },
+  {
+    "file": "src/workspace/breadcrumb/breadcrumb_bar.cpp",
+    "line_hint": 146,
+    "literal": "%1: %2 (line %3)"
+  },
+  {
+    "file": "src/workspace/diagnostics/diagnostics_integration.cpp",
+    "line_hint": 529,
+    "literal": "Selected LSP backend and CLI lint engine"
+  },
+  {
+    "file": "src/workspace/diagnostics/diagnostics_integration.cpp",
+    "line_hint": 834,
+    "literal": "Rename"
+  },
+  {
+    "file": "src/workspace/diagnostics/diagnostics_integration.cpp",
+    "line_hint": 835,
+    "literal": "New name:"
+  },
+  {
+    "file": "src/workspace/diagnostics/diagnostics_panel.cpp",
+    "line_hint": 81,
+    "literal": "Diagnostics"
+  },
+  {
+    "file": "src/workspace/diagnostics/diagnostics_panel.cpp",
+    "line_hint": 383,
+    "literal": "Errors: %1 · Warnings: %2 · Information: %3"
+  },
+  {
+    "file": "src/workspace/diagnostics/diagnostics_panel.cpp",
+    "line_hint": 389,
+    "literal": "<span style='color:%1'><b>Errors: %2</b></span>&nbsp;&nbsp;<span style='color:%3'><b>Warnings: %4</b></span>&nbsp;&nbsp;<span style='color:%5'>Information: %6</span>"
+  },
+  {
+    "file": "src/workspace/diagnostics/lint_progress.cpp",
+    "line_hint": 35,
+    "literal": "Cancel"
+  },
+  {
+    "file": "src/workspace/diagnostics/lint_progress.cpp",
+    "line_hint": 37,
+    "literal": "Re-run"
+  },
+  {
+    "file": "src/workspace/filetree/file_tree_widget.cpp",
+    "line_hint": 53,
+    "literal": "Open..."
+  },
+  {
+    "file": "src/workspace/filetree/file_tree_widget.cpp",
+    "line_hint": 57,
+    "literal": "New File"
+  },
+  {
+    "file": "src/workspace/filetree/file_tree_widget.cpp",
+    "line_hint": 61,
+    "literal": "New Folder"
+  },
+  {
+    "file": "src/workspace/filetree/file_tree_widget.cpp",
+    "line_hint": 65,
+    "literal": "Rename"
+  },
+  {
+    "file": "src/workspace/filetree/file_tree_widget.cpp",
+    "line_hint": 69,
+    "literal": "Delete"
+  },
+  {
+    "file": "src/workspace/filetree/file_tree_widget.cpp",
+    "line_hint": 73,
+    "literal": "Refresh"
+  },
+  {
+    "file": "src/workspace/filetree/file_tree_widget.cpp",
+    "line_hint": 77,
+    "literal": "Collapse"
+  },
+  {
+    "file": "src/workspace/module_tree/module_tree_integration.cpp",
+    "line_hint": 243,
+    "literal": "Module Tree"
+  },
+  {
+    "file": "src/workspace/module_tree/module_tree_panel.cpp",
+    "line_hint": 78,
+    "literal": "Refresh"
+  },
+  {
+    "file": "src/workspace/module_tree/module_tree_panel.cpp",
+    "line_hint": 79,
+    "literal": "Re-elaborate the whole project"
+  },
+  {
+    "file": "src/workspace/module_tree/module_tree_panel.cpp",
+    "line_hint": 83,
+    "literal": "Jump to source"
+  },
+  {
+    "file": "src/workspace/module_tree/module_tree_panel.cpp",
+    "line_hint": 84,
+    "literal": "Put the cursor on a signal in the editor, then jump to the construct that drives it"
+  },
+  {
+    "file": "src/workspace/module_tree/module_tree_panel.cpp",
+    "line_hint": 89,
+    "literal": "Jump to target"
+  },
+  {
+    "file": "src/workspace/module_tree/module_tree_panel.cpp",
+    "line_hint": 90,
+    "literal": "Put the cursor on a signal in the editor, then jump to the construct that reads it"
+  },
+  {
+    "file": "src/workspace/module_tree/module_tree_panel.cpp",
+    "line_hint": 95,
+    "literal": "Filter instance / net / file…"
+  },
+  {
+    "file": "src/workspace/module_tree/module_tree_panel.cpp",
+    "line_hint": 103,
+    "literal": "Instance / Net"
+  },
+  {
+    "file": "src/workspace/module_tree/module_tree_panel.cpp",
+    "line_hint": 103,
+    "literal": "Kind"
+  },
+  {
+    "file": "src/workspace/module_tree/module_tree_panel.cpp",
+    "line_hint": 103,
+    "literal": "Location"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 72,
+    "literal": "Refresh"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 74,
+    "literal": "Import Filelist…"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 91,
+    "literal": "Filelists (0)"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 98,
+    "literal": "Imported .f filelists; double-click to open one"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 102,
+    "literal": "Remove Selected Filelist"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 108,
+    "literal": "Files (0)"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 114,
+    "literal": "Double-click a file to open it (AC-7.4)"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 117,
+    "literal": "Include dirs (-I) (0)"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 126,
+    "literal": "Defines (-D) (0)"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 135,
+    "literal": "Variables (0)"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 142,
+    "literal": "Project variable table; wins over the environment"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 146,
+    "literal": "Edit Variables…"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 210,
+    "literal": "No project model is attached"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 229,
+    "literal": "No project model is attached"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 233,
+    "literal": "%1 is not an imported filelist"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 298,
+    "literal": "Open a folder before editing variables"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 420,
+    "literal": "Open a folder before importing a filelist"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 424,
+    "literal": "Import Filelist"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 425,
+    "literal": "Verilog filelists (*.f *.F *.flist);;All files (*)"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 448,
+    "literal": "Filelists (%1)"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 457,
+    "literal": "Files (%1)"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 466,
+    "literal": "Include dirs (-I) (%1)"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 471,
+    "literal": "Defines (-D) (%1)"
+  },
+  {
+    "file": "src/workspace/project/project_panel.cpp",
+    "line_hint": 476,
+    "literal": "Variables (%1)"
+  },
+  {
+    "file": "src/workspace/project/project_variables_dialog.cpp",
+    "line_hint": 20,
+    "literal": "Filelist variables"
+  },
+  {
+    "file": "src/workspace/project/project_variables_dialog.cpp",
+    "line_hint": 39,
+    "literal": "value for %1"
+  },
+  {
+    "file": "src/workspace/settings/settings_dialog.cpp",
+    "line_hint": 17,
+    "literal": "Preferences"
+  },
+  {
+    "file": "src/workspace/vcs/vcs_panel.cpp",
+    "line_hint": 126,
+    "literal": "%1\n\nOpen a directory that is a Git or Subversion working tree to see its branch, changed files and diffs."
+  }
+]

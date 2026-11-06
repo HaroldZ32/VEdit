@@ -1,0 +1,4 @@
+# gate-6: bash build/gates/docs.sh (host)
+# collected: 2026-11-03T21:59:39+08:00
+[docs] PASS: README.md docs/BUILD.md docs/USER_GUIDE.md THIRD_PARTY_NOTICES.md
+DOCS_EXIT=0

@@ -1,0 +1,31 @@
+CHECK construct.vhdl-definition PASS  /tmp/qt_temp-vHPUCD/org.kde.syntax-highlighting/syntax/probe-VHDL.xml
+CHECK construct.vhdl-keyword-entity PASS  'entity' -> 'Keyword' (expected 'Keyword')
+CHECK construct.vhdl-keyword-is PASS  'is' -> 'Keyword' (expected 'Keyword')
+CHECK construct.vhdl-keyword-architecture PASS  'architecture' -> 'Keyword' (expected 'Keyword')
+CHECK construct.vhdl-keyword-end PASS  'end' -> 'Keyword' (expected 'Keyword')
+CHECK construct.vhdl-comment PASS  '-- counter' -> 'Comment' (expected 'Comment')
+CHECK construct.vhdl-bit-literal PASS  ''1'' -> 'String' (expected 'String')
+CHECK construct.vhdl-string PASS  '"reset asserted"' -> 'String' (expected 'String')
+CHECK construct.vhdl-type-name PASS  'std_logic_vector' -> 'Data Type' (expected 'Data Type')
+CHECK construct.vhdl-number PASS  '3' -> 'Number' (expected 'Number')
+CHECK construct.markdown-definition PASS  /tmp/qt_temp-vHPUCD/org.kde.syntax-highlighting/syntax/probe-Markdown.xml
+CHECK construct.markdown-heading PASS  '# Timing constraints' -> 'Heading' (expected 'Heading')
+CHECK construct.markdown-list-marker PASS  '-' -> 'List Marker' (expected 'List Marker')
+CHECK construct.markdown-inline-code PASS  '`inline code`' -> 'Code' (expected 'Code')
+CHECK construct.markdown-link PASS  '[a link](https://example.com/doc)' -> 'Link' (expected 'Link')
+CHECK construct.markdown-fenced-content-is-code PASS  'set period 10' -> 'Code Block' (expected 'Code Block')
+CHECK construct.tcl-definition PASS  /tmp/qt_temp-vHPUCD/org.kde.syntax-highlighting/syntax/probe-Tcl.xml
+CHECK construct.tcl-proc PASS  'proc' -> 'Keyword' (expected 'Keyword')
+CHECK construct.tcl-set PASS  'set' -> 'Keyword' (expected 'Keyword')
+CHECK construct.tcl-if PASS  'if' -> 'Keyword' (expected 'Keyword')
+CHECK construct.tcl-foreach PASS  'foreach' -> 'Keyword' (expected 'Keyword')
+CHECK construct.tcl-comment PASS  '# build' -> 'Comment' (expected 'Comment')
+CHECK construct.tcl-variable PASS  '$period' -> 'Variable' (expected 'Variable')
+CHECK construct.tcl-double-quoted-string PASS  '"period is' -> 'String' (expected 'String')
+CHECK construct.tcl-command-substitution PASS  '[' -> 'Operator' (expected 'Operator')
+CHECK construct.tcl-substitution-runs-a-command PASS  'expr' -> 'Keyword' (expected 'Keyword')
+CHECK construct.sdc-create-clock PASS  'create_clock' -> 'SDC Command' (expected 'SDC Command')
+CHECK construct.sdc-input-delay PASS  'set_input_delay' -> 'SDC Command' (expected 'SDC Command')
+CHECK construct.sdc-command-substitution PASS  '[' -> 'Operator' (expected 'Operator')
+CHECK construct.sdc-suffix-maps-to-tcl PASS
+HIGHLIGHT-MODE-SELFTEST mode=resources-temp checks=63 failures=0

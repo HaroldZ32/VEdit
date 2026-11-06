@@ -1,0 +1,7 @@
+Test project /vedit-build/target/qt6-build
+    Start 44: vedit-project-lint-e2e
+1/1 Test #44: vedit-project-lint-e2e ...........   Passed    1.54 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   1.54 sec

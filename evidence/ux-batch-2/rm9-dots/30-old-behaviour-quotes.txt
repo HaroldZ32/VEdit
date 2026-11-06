@@ -1,0 +1,13 @@
+=== HEAD (before this change) — b3 C8 assertions encoding the OLD policy:
+635:    check("c8.saved-file-included", fake->filesSeen.contains(aPath),
+637:    check("c8.dirty-buffer-excluded", !fake->filesSeen.contains(bPath),
+650:    check("c8.unmodified-open-included", fake->filesSeen.contains(aPath),
+
+=== HEAD — n1 assertions encoding the OLD "forget the other file" behaviour:
+419:        check("r2.edit-falls-back", afterEdit.size() == 1
+423:        check("r2.edit-status-yellow", controller.statusForFile(a)
+558:        check("n1.a-not-clean-after-file-switch",
+563:        check("n1.a-no-green-dot-after-file-switch",
+
+=== HEAD — no project-open pass existed (startProjectPass call sites):
+1612:        if (!controller_->startProjectPass(request, &error)) {

@@ -1,0 +1,30 @@
+--- /tmp/head_ffi.h	2026-11-02 15:59:13.206754920 +0800
++++ crates/vd-ffi/include/vd_ffi.h	2026-11-02 15:56:48.314731999 +0800
+@@ -129,7 +129,21 @@
+ typedef struct VdService VdService;
+ 
+ /*
+- One slang diagnostic.
++ A C array of NUL-terminated strings.
++ */
++typedef struct VdStringList {
++  /*
++   Number of entries in `items` (`size_t` on the C side).
++   */
++  size_t count;
++  /*
++   Owned array of owned strings; null when `count` is zero.
++   */
++  char **items;
++} VdStringList;
++
++/*
++ One lint diagnostic.
+  */
+ typedef struct VdDiagnostic {
+   /*
+@@ -153,13 +167,28 @@
+    */
+   uint32_t end_column;
+   /*
+-   slang diagnostic code (`UndeclaredIdentifier`, …).

@@ -1,0 +1,68 @@
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK edit.controllers.installed PASS
+CHECK edit.provider.editor PASS
+CHECK edit.provider.multi-cursor PASS
+CHECK edit.provider.enhancements PASS
+CHECK edit.real-focus.inner-widget PASS
+CHECK edit.real-focus.multi-cursor-setup PASS
+CHECK edit.real-focus.multi-cursor-typing PASS
+CHECK edit.real-focus.line-setup PASS
+CHECK edit.real-focus.line-op PASS
+CHECK edit.block.drag-active PASS
+CHECK edit.block.drag-native-mode PASS
+CHECK edit.block.cursor-count PASS
+CHECK edit.block.left-column PASS
+CHECK edit.block.native-mode-off PASS
+CHECK edit.real-focus.block-typing-target PASS
+CHECK edit.block.rectangular-insert PASS
+CHECK edit.block.one-undo PASS
+CHECK edit.ctrl-click.add PASS
+CHECK edit.ctrl-click.toggle-off PASS
+CHECK edit.ctrl-click.readd PASS
+CHECK edit.ctrl-click.typing PASS
+CHECK edit.ctrl-click.one-undo PASS
+CHECK edit.multi.three-cursors PASS
+CHECK edit.multi.type PASS
+CHECK edit.multi.type-one-undo PASS
+CHECK edit.multi.backspace-setup PASS
+CHECK edit.multi.backspace PASS
+CHECK edit.multi.backspace-one-undo PASS
+CHECK edit.multi.delete-setup PASS
+CHECK edit.multi.delete PASS
+CHECK edit.multi.delete-one-undo PASS
+CHECK edit.multi.return-setup PASS
+CHECK edit.multi.return PASS
+CHECK edit.multi.return-one-undo PASS
+CHECK edit.return.auto-indent PASS
+CHECK edit.return.cursor-after-indent PASS
+CHECK edit.return.brace-indent PASS
+CHECK edit.typing.control PASS
+CHECK edit.pair.round PASS
+CHECK edit.pair.inside PASS
+CHECK edit.pair.skip-over PASS
+CHECK edit.pair.backspace-precondition PASS
+CHECK edit.pair.backspace-deletes-both PASS
+CHECK edit.pair.quote-precondition PASS
+CHECK edit.pair.quote PASS
+CHECK edit.comment.on PASS
+CHECK edit.comment.off PASS
+CHECK edit.move.up PASS
+CHECK edit.move.down PASS
+CHECK edit.duplicate.line PASS
+CHECK edit.delete.line PASS
+CHECK edit.case.upper PASS
+CHECK edit.case.lower PASS
+CHECK edit.zoom.in PASS
+CHECK edit.zoom.config-changed PASS
+CHECK edit.zoom.out PASS
+CHECK edit.wrap.flip PASS
+CHECK edit.wrap.config PASS
+CHECK edit.wrap.back PASS
+CHECK-DETAIL bracket config key 'disable-bracket-match-highlight-if-inactive': listed=0 accepted=0
+CHECK edit.bracket.native-highlight PASS
+CHECK edit.keys.single-owner PASS
+SUMMARY checks=61 failures=0

@@ -1,0 +1,64 @@
+   Compiling syn v2.0.119
+   Compiling smallvec v1.16.4
+   Compiling serde v1.0.229
+   Compiling futures-channel v0.3.34
+   Compiling once_cell v1.21.4
+   Compiling icu_normalizer v2.4.0
+   Compiling tempfile v3.27.0
+   Compiling futures-util v0.3.34
+   Compiling idna_adapter v1.2.2
+   Compiling idna v1.1.0
+   Compiling url v2.5.8
+   Compiling lsp-types v0.95.1
+   Compiling futures v0.3.34
+   Compiling cbindgen v0.29.4
+   Compiling tracing-attributes v0.1.31
+   Compiling tracing v0.1.44
+   Compiling vd-ffi v0.1.1 (/vedit-build/crates/vd-ffi)
+   Compiling async-lsp v0.2.4
+   Compiling vd-lsp v0.1.1 (/vedit-build/crates/vd-lsp)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 11.70s
+     Running unittests src/lib.rs (target/debug/deps/vd_ffi-c218ace1bbb0a2eb)
+
+running 13 tests
+test project::tests::a_missing_project_root_is_a_typed_error ... ok
+REGRESSION-CONTROL warnings=["filelist.unknown_token: /tmp/.tmpowfZsk/top.f:1: unsupported filelist token `+broken+token`; skipped"]
+NEGATIVE-CONTROL project_without_rules warnings=[]
+test project::tests::missing_optional_rules_file_is_not_a_panel_diagnostic ... ok
+test project::tests::actionable_filelist_warnings_still_reach_the_panel ... ok
+test project::tests::fixture_expansion_matches_the_service_contract ... ok
+test project::tests::bad_entries_render_actionable_diagnostics ... ok
+BAD-FILELIST warnings=[
+    "filelist.missing: /tmp/.tmpjK88H9/bad.f:2: include directory `no_such_dir` does not exist (resolved to `/tmp/.tmpjK88H9/no_such_dir`, or it is not a directory); the -I entry is kept so it works once the directory appears",
+    "filelist.unknown_token: /tmp/.tmpjK88H9/bad.f:3: unsupported filelist token `+frobnicate`; skipped",
+    "filelist.missing: /tmp/.tmpjK88H9/bad.f:4: nested -f target `missing_nested.f` does not exist; skipped",
+]
+test project::tests::expand_reports_the_three_bad_filelist_cases_with_file_and_line ... ok
+POSITIVE-CONTROL project_with_rules warnings=[]
+test project::tests::a_present_rules_file_produces_no_panel_noise ... ok
+EXPAND files=["/tmp/.tmpRPLiFr/rtl/extra.sv", "/tmp/.tmpRPLiFr/inc/shared.vh", "/tmp/.tmpRPLiFr/rtl/a.sv"] incdirs=["/tmp/.tmpRPLiFr/inc"] defines=["IMPORTED", "BOARD=7"]
+test project::tests::expansion_is_deterministic ... ok
+UNREADABLE-CONTROL warnings=["rules.unreadable: the Verilog lint rules file .rules.verible_lint could not be read; falling back to built-in rules"]
+test project::tests::expand_with_inputs_merges_the_imported_filelists_and_the_tools_page ... ok
+test project::tests::unreadable_rules_file_still_warns_without_an_absolute_path ... ok
+BACKEND-ARGV engine=slang tool=slang program=/opt/slang --lint-only -Weverything --diag-column-unit byte --diag-json <diagnostics.json> -I/tmp/.tmpmAbmJP/inc -DBOARD=7 -DSIM /tmp/.tmpmAbmJP/rtl/a.sv | include dirs and defines are passed as -I<dir> / -D<name>=<value> in the real argv
+test project::tests::the_engine_command_line_carries_the_expansion_include_dirs_and_defines ... ok
+ABI files=["/tmp/.tmpuIuIFC/rtl/extra.sv", "/tmp/.tmpuIuIFC/rtl/a.sv"] relative=["rtl/extra.sv", "rtl/a.sv"] defines=["BOARD=7"]
+test project::tests::the_expand_abi_delivers_the_union_through_a_job ... ok
+A9-ABI files=["/tmp/.tmpbHzTXi/rtl/a.sv"] missing=["NOPE"] skipped=1 defines=["ARCH=x86"] warnings=["config.invalid_value: /tmp/.tmpbHzTXi/top.f:2: unresolved variable `$NOPE` (set it in the project variables or the environment); the line is skipped"]
+test project::tests::the_expand_abi_collects_unresolved_variables_and_skipped_lines ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 30 filtered out; finished in 0.00s
+
+     Running tests/abi.rs (target/debug/deps/abi-73d3a52e89bce543)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.00s
+
+     Running tests/qt_abi_guard.rs (target/debug/deps/qt_abi_guard-96701b4b1b071f4a)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 1 filtered out; finished in 0.00s
+

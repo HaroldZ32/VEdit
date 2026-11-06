@@ -1,0 +1,13 @@
+lupdate current sources: 1187 | shipped .ts sources: 1185
+
+### MISSING from shipped catalogue (current code sources): 5
+  - Active engine. --ruleset, --rules, --rules_config and --waiver_files are applied to the lint job; --autofix is stored only (the lint job&apos;s C ABI has no field for it).
+  - Active engine. -W and --error-limit are applied to the lint job.
+  - Replace refused: the unsaved edits in &quot;%1&quot; cannot be checked against line %2 (the editor did not provide the buffer text), and that line is longer than the 400-character search preview, so the match cannot be re-identified; nothing was replaced. Save the document and run the search again.
+  - Replace refused: the unsaved edits in &quot;%1&quot; changed where line %2 sits in the buffer, and that line is longer than the 400-character search preview, so the match cannot be re-identified from the preview alone; the document was not saved and nothing was replaced. Save it and run the search a
+  - Stored but not applied yet (the lint job&apos;s C ABI has no field for them): %1. The values stay in settings.toml and are never sent as a silent no-op.
+
+### STALE in shipped catalogue (no longer extracted): 3
+  ~ Active engine. --rules_config is applied; the other options are stored but not sent yet (transport pending).
+  ~ Active engine. -W and --error-limit are stored but not sent yet (transport pending).
+  ~ Stored but not applied yet (the lint job&apos;s C ABI does not carry them): %1. They stay in settings.toml and will be sent once the ABI is extended.

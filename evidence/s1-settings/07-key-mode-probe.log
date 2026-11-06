@@ -1,0 +1,4 @@
+# negative control executed in vedit-qt6-build:local under 'umask 000'
+OLD opened=1 mode-before-chmod=0666
+NEW fd=3 mode-at-creation=0600
+PROBE_EXIT=0

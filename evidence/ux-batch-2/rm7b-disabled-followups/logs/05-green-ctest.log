@@ -1,0 +1,156 @@
+UpdateCTestConfiguration  from :/vedit-build/target/qt6-build/DartConfiguration.tcl
+Test project /vedit-build/target/qt6-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 16
+    Start 16: vedit-app-disabled-look-selftest
+
+16: Test command: /vedit-build/target/qt6-build/src/app/vedit-app-disabled-look-selftest
+16: Working Directory: /vedit-build/target/qt6-build/src/app
+16: Environment variables: 
+16:  QT_QPA_PLATFORM=offscreen
+16:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/src/app/xdg-runtime-disabled-look
+16: Test timeout computed to be: 240
+16: CHECK disabled.palette.catalogue PASS 30 theme(s)
+16: PALETTE-THEME Atom One Dark          worst_role=button-text      channel_delta=72 luminance_delta=0.294 contrast_drop=2.48
+16: PALETTE-THEME Atom One Light         worst_role=button-text      channel_delta=96 luminance_delta=0.276 contrast_drop=3.98
+16: PALETTE-THEME Breeze Dark            worst_role=button-text      channel_delta=92 luminance_delta=0.442 contrast_drop=2.96
+16: PALETTE-THEME Breeze Light           worst_role=button-text      channel_delta=115 luminance_delta=0.260 contrast_drop=5.20
+16: PALETTE-THEME Catppuccin Frappé     worst_role=button-text      channel_delta=91 luminance_delta=0.423 contrast_drop=2.60
+16: PALETTE-THEME Catppuccin Latte       worst_role=button-text      channel_delta=80 luminance_delta=0.264 contrast_drop=3.00
+16: PALETTE-THEME Catppuccin Macchiato   worst_role=button-text      channel_delta=98 luminance_delta=0.467 contrast_drop=2.94
+16: PALETTE-THEME Catppuccin Mocha       worst_role=button-text      channel_delta=105 luminance_delta=0.501 contrast_drop=3.23
+16: PALETTE-THEME Dracula                worst_role=button-text      channel_delta=111 luminance_delta=0.680 contrast_drop=3.23
+16: PALETTE-THEME Falcon                 worst_role=button-text      channel_delta=100 luminance_delta=0.494 contrast_drop=2.83
+16: PALETTE-THEME GitHub Dark            worst_role=button-text      channel_delta=101 luminance_delta=0.559 contrast_drop=3.11
+16: PALETTE-THEME GitHub Light           worst_role=button-text      channel_delta=110 luminance_delta=0.274 contrast_drop=4.82
+16: PALETTE-THEME Homunculus             worst_role=button-text      channel_delta=100 luminance_delta=0.256 contrast_drop=4.22
+16: PALETTE-THEME Monokai                worst_role=button-text      channel_delta=112 luminance_delta=0.688 contrast_drop=3.31
+16: PALETTE-THEME Nord                   worst_role=button-text      channel_delta=90 luminance_delta=0.494 contrast_drop=2.75
+16: PALETTE-THEME Oblivion               worst_role=button-text      channel_delta=98 luminance_delta=0.489 contrast_drop=3.18
+16: PALETTE-THEME Printing               worst_role=button-text      channel_delta=130 luminance_delta=0.223 contrast_drop=5.46
+16: PALETTE-THEME Radical                worst_role=button-text      channel_delta=74 luminance_delta=0.225 contrast_drop=2.72
+16: PALETTE-THEME Solarized Dark         worst_role=window-text      channel_delta=72 luminance_delta=0.183 contrast_drop=2.23
+16: PALETTE-THEME Solarized Light        worst_role=button-text      channel_delta=73 luminance_delta=0.265 contrast_drop=2.13
+16: PALETTE-THEME Tokyo Night            worst_role=button-text      channel_delta=93 luminance_delta=0.325 contrast_drop=2.88
+16: PALETTE-THEME Tokyo Night Light      worst_role=button-text      channel_delta=80 luminance_delta=0.199 contrast_drop=3.08
+16: PALETTE-THEME Tokyo Night Storm      worst_role=button-text      channel_delta=80 luminance_delta=0.303 contrast_drop=2.55
+16: PALETTE-THEME VSCodium Dark          worst_role=button-text      channel_delta=97 luminance_delta=0.487 contrast_drop=3.20
+16: PALETTE-THEME Vim Dark               worst_role=window-text      channel_delta=98 luminance_delta=0.365 contrast_drop=3.80
+16: PALETTE-THEME ayu Dark               worst_role=button-text      channel_delta=92 luminance_delta=0.343 contrast_drop=3.32
+16: PALETTE-THEME ayu Light              worst_role=button-text      channel_delta=79 luminance_delta=0.287 contrast_drop=2.78
+16: PALETTE-THEME ayu Mirage             worst_role=button-text      channel_delta=92 luminance_delta=0.432 contrast_drop=2.99
+16: PALETTE-THEME gruvbox Dark           worst_role=button-text      channel_delta=104 luminance_delta=0.513 contrast_drop=3.03
+16: PALETTE-THEME gruvbox Light          worst_role=button-text      channel_delta=95 luminance_delta=0.256 contrast_drop=3.83
+16: PALETTE-ROLE-MIN window-text        channel_delta=72 (Solarized Dark) luminance_delta=0.191 (Solarized Dark) contrast_drop=2.25 (Solarized Light)
+16: PALETTE-ROLE-MIN text               channel_delta=72 (Solarized Dark) luminance_delta=0.191 (Solarized Dark) contrast_drop=2.35 (Solarized Dark)
+16: PALETTE-ROLE-MIN button-text        channel_delta=72 (Atom One Dark) luminance_delta=0.183 (Solarized Dark) contrast_drop=2.13 (Solarized Light)
+16: PALETTE-ROLE-MIN tooltip-text       channel_delta=72 (Solarized Dark) luminance_delta=0.185 (Solarized Dark) contrast_drop=2.26 (Solarized Dark)
+16: PALETTE-ROLE-MIN placeholder-text   channel_delta=50 (Solarized Light) luminance_delta=0.202 (Solarized Light) contrast_drop=1.35 (Solarized Light)
+16: PALETTE-ROLE-MIN link               channel_delta=64 (gruvbox Dark) luminance_delta=0.077 (Breeze Dark) contrast_drop=1.33 (ayu Light)
+16: PALETTE-ROLE-MIN link-visited       channel_delta=64 (gruvbox Dark) luminance_delta=0.158 (Monokai) contrast_drop=1.55 (ayu Light)
+16: PALETTE-ROLE-MIN highlight          channel_delta=9 (Tokyo Night Light) luminance_delta=0.007 (Tokyo Night) contrast_drop=1.09 (Tokyo Night Light) (secondary role)
+16: PALETTE-ROLE-MIN highlighted-text   channel_delta=60 (Vim Dark) luminance_delta=0.071 (Radical) contrast_drop=0.49 (Tokyo Night Light) (secondary role)
+16: CHECK disabled.palette.themes-tested PASS 30/30
+16: CHECK disabled.palette.active-intact PASS enabled colours are still the theme's own
+16: CHECK disabled.palette.min-channel-delta PASS min=72 theme=Atom One Dark floor=40
+16: CHECK disabled.palette.min-luminance-delta PASS min=0.183 theme=Solarized Dark floor=0.100
+16: CHECK disabled.palette.min-contrast-drop PASS min=2.13 theme=Solarized Light floor=1.40
+16: CHECK disabled.apply-theme PASS Breeze Light
+16: CHECK disabled.pixels.styles PASS 2 style(s): Windows, Fusion
+16: STYLE-SAMPLE style=Windows class=QWindowsStyle kind=reduced widgets=2 themes=30 exact_colour=0
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: PIXELS style=Windows    widget=toolbar-action   role=button-text themes=30 worst_theme=Atom One Dark      channel_delta=72 luminance_delta=0.294 differing_px=2233 enabled_hits=159 disabled_hits=183 exact_colour=0
+16: CHECK disabled.pixels.toolbar-action PASS style=Windows themes=30 worst_theme=Atom One Dark channel_delta=72 luminance_delta=0.294 differing_px=2233
+16: PIXELS style=Windows    widget=combo-box        role=button-text themes=30 worst_theme=Atom One Dark      channel_delta=72 luminance_delta=0.294 differing_px=4632 enabled_hits=20 disabled_hits=2 exact_colour=0
+16: CHECK disabled.pixels.combo-box PASS style=Windows themes=30 worst_theme=Atom One Dark channel_delta=72 luminance_delta=0.294 differing_px=4632
+16: STYLE-SAMPLE style=Fusion class=QFusionStyle kind=full widgets=5 themes=30 exact_colour=1
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: This plugin does not support propagateSizeHints()
+16: PIXELS style=Fusion     widget=toolbar-action   role=button-text themes=30 worst_theme=Atom One Dark      channel_delta=72 luminance_delta=0.294 differing_px=2333 enabled_hits=162 disabled_hits=190 exact_colour=1
+16: CHECK disabled.pixels.toolbar-action PASS style=Fusion themes=30 worst_theme=Atom One Dark channel_delta=72 luminance_delta=0.294 differing_px=2333
+16: PIXELS style=Fusion     widget=push-button      role=button-text themes=30 worst_theme=Atom One Dark      channel_delta=72 luminance_delta=0.294 differing_px=1047 enabled_hits=197 disabled_hits=235 exact_colour=1
+16: CHECK disabled.pixels.push-button PASS style=Fusion themes=30 worst_theme=Atom One Dark channel_delta=72 luminance_delta=0.294 differing_px=1047
+16: PIXELS style=Fusion     widget=combo-box        role=button-text themes=30 worst_theme=Atom One Dark      channel_delta=72 luminance_delta=0.294 differing_px=1191 enabled_hits=235 disabled_hits=272 exact_colour=1
+16: CHECK disabled.pixels.combo-box PASS style=Fusion themes=30 worst_theme=Atom One Dark channel_delta=72 luminance_delta=0.294 differing_px=1191
+16: PIXELS style=Fusion     widget=line-edit        role=text        themes=30 worst_theme=Solarized Dark     channel_delta=72 luminance_delta=0.191 differing_px=2022 enabled_hits=457 disabled_hits=515 exact_colour=1
+16: CHECK disabled.pixels.line-edit PASS style=Fusion themes=30 worst_theme=Solarized Dark channel_delta=72 luminance_delta=0.191 differing_px=2022
+16: PIXELS style=Fusion     widget=plain-text-edit  role=text        themes=30 worst_theme=Solarized Dark     channel_delta=72 luminance_delta=0.191 differing_px=850 enabled_hits=243 disabled_hits=280 exact_colour=1
+16: CHECK disabled.pixels.plain-text-edit PASS style=Fusion themes=30 worst_theme=Solarized Dark channel_delta=72 luminance_delta=0.191 differing_px=850
+16: PIXEL-STYLES app_style_class=QFusionStyle app_style_measured=1 measured=[Windows, Fusion] skipped=[]
+16: SKIP disabled.pixels.style.Breeze not offered by this image; the bounded child measures it where Qt exposes it (user-style unmeasured here)
+16: SKIP disabled.pixels.style.Oxygen not offered by this image; the bounded child measures it where Qt exposes it (user-style unmeasured here)
+16: CHECK disabled.pixels.measured-at-least-one-style PASS measured=2 skipped=0
+16: PIXEL-DOT themes=30 samples=120 channel_delta=34 (Tokyo Night Light) luminance_delta=0.080 (Catppuccin Frappé) contrast_drop=1.16 (Tokyo Night Light)
+16: CHECK disabled.dot.disabled-differs-from-enabled PASS samples=120 channel_delta=34 luminance_delta=0.080 contrast_drop=1.16
+16: CHECK disabled.dot.unknown-draws-nothing PASS no dot for Unknown
+16: DISABLED-LOOK-SELFTEST failures=0
+1/1 Test #16: vedit-app-disabled-look-selftest ...   Passed    0.29 sec
+
+The following tests passed:
+	vedit-app-disabled-look-selftest
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.29 sec

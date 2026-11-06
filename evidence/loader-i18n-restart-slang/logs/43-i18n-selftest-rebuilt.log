@@ -1,0 +1,46 @@
+ninja: warning: premature end of file; recovering
+[1/38] Automatic MOC for target vedit_workspace_jump
+[2/38] Building CXX object src/app/editor-lane/breadcrumb-lane/jump-lane/CMakeFiles/vedit_workspace_jump.dir/vedit_workspace_jump_autogen/mocs_compilation.cpp.o
+[3/38] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/syntax_provider.cpp.o
+[4/38] Building CXX object src/syntax/grammars/CMakeFiles/vedit_syntax_grammars.dir/bindings.cpp.o
+[5/38] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/disabled_provider.cpp.o
+[6/38] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/syntax_service.cpp.o
+[7/38] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/grammar_binding.cpp.o
+[8/38] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/owner_arbiter.cpp.o
+[9/38] Building CXX object src/app/editor-lane/breadcrumb-lane/jump-lane/CMakeFiles/vedit_workspace_jump.dir/jump_integration.cpp.o
+[10/38] Building CXX object src/app/editor-lane/breadcrumb-lane/jump-lane/CMakeFiles/vedit_workspace_jump.dir/jump_registry.cpp.o
+[11/38] Linking CXX static library src/app/editor-lane/breadcrumb-lane/jump-lane/libvedit_workspace_jump.a
+[12/38] Building C object src/syntax/grammars/CMakeFiles/vedit_tree_sitter_verilog.dir/__/__/__/third_party/tree-sitter/verilog/src/parser.c.o
+[13/38] Linking C static library src/syntax/grammars/libvedit_tree_sitter_verilog.a
+[14/38] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/tree_sitter_provider.cpp.o
+[15/38] Linking CXX static library src/syntax/provider/libvedit_syntax_provider.a
+[16/38] Linking CXX static library src/syntax/grammars/libvedit_syntax_grammars.a
+[17/38] Automatic MOC for target vedit_workspace_breadcrumb
+[18/38] Building CXX object src/app/editor-lane/breadcrumb-lane/CMakeFiles/vedit_workspace_breadcrumb.dir/breadcrumb_model.cpp.o
+[19/38] Building CXX object src/app/editor-lane/breadcrumb-lane/CMakeFiles/vedit_workspace_breadcrumb.dir/vedit_workspace_breadcrumb_autogen/mocs_compilation.cpp.o
+[20/38] Building CXX object src/app/editor-lane/breadcrumb-lane/CMakeFiles/vedit_workspace_breadcrumb.dir/syntax_breadcrumb_source.cpp.o
+[21/38] Building CXX object src/app/editor-lane/breadcrumb-lane/CMakeFiles/vedit_workspace_breadcrumb.dir/breadcrumb_bar.cpp.o
+[22/38] Linking CXX static library src/app/editor-lane/breadcrumb-lane/libvedit_workspace_breadcrumb.a
+[23/38] Automatic MOC for target vedit_app_shell
+[24/38] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/i18n.cpp.o
+[25/38] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/editor_provider.cpp.o
+[26/38] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/vedit_app_shell_autogen/mocs_compilation.cpp.o
+[27/38] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/session_store.cpp.o
+[28/38] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/crash_reporter.cpp.o
+[29/38] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/theme_manager.cpp.o
+[30/38] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/command_registry.cpp.o
+[31/38] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/panel_registry.cpp.o
+[32/38] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/editor_area.cpp.o
+[33/38] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/app_shell.cpp.o
+[34/38] Linking CXX static library src/app/libvedit_app_shell.a
+[35/38] Automatic MOC for target vedit-app-i18n-selftest
+[36/38] Building CXX object src/app/CMakeFiles/vedit-app-i18n-selftest.dir/vedit-app-i18n-selftest_autogen/mocs_compilation.cpp.o
+[37/38] Building CXX object src/app/CMakeFiles/vedit-app-i18n-selftest.dir/i18n_selftest.cpp.o
+[38/38] Linking CXX executable src/app/vedit-app-i18n-selftest
+Test project /vedit-build/target/qt6-build
+    Start 14: vedit-app-i18n-selftest
+1/1 Test #14: vedit-app-i18n-selftest ..........   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.01 sec

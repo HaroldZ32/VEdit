@@ -1,0 +1,18 @@
+== lane test inside the full build-qt.sh ctest run ==
+1238:      Start 22: vedit-editor-multi-cursor-selftest
+1239:22/47 Test #22: vedit-editor-multi-cursor-selftest .............   Passed    0.21 sec
+
+== ctest ==
+100% tests passed, 0 tests failed out of 47
+Total Test time (real) =  65.39 sec
+
+== xcb smoke ==
+M0-SMOKE ok=1 platform=xcb qt=6.10.2 kf6=6.24.0 ktexteditor=1 ksynhl=6.24.0 tree_sitter=0.25.9 window=1 editor=1 document=1 definitions=451 themes=30 verilog=1 systemverilog=loadable(not-asserted,C7-pending) custom_path=1 tree_sitter_parser=1 builtin_valid_defs=450 whitelist_verilog=0 highlight_formats=-1 kshlib=/usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0 libc=/usr/lib/x86_64-linux-gnu/libc.so.6
+
+== full build-qt.sh verdict ==
+[qt6] PASS: Rust service layer + configure + build + ctest (incl. the C ABI smoke) + xcb/software-rendering smoke inside vedit-qt6-build:local
+
+== attempt 1 (saved separately) ==
+test #43 vedit-project-lint-e2e failed with SIGPIPE; the same test passed in the
+preceding and following runs; no source outside this lane changed between runs.
+1322:	 43 - vedit-project-lint-e2e (SIGPIPE)

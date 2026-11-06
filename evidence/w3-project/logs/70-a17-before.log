@@ -1,0 +1,17 @@
+=== BEFORE (pre-A-17 binary, built Mon Nov  2 09:38:27 UTC 2026 ) ===
+--- a17-fixture: must become files=3
+EXPANSION ok=1 root=/vedit-build/evidence/w3-project/a17-fixture files=1 skipped=2 missing=[]
+FILE rtl/ok.sv
+DIAG config.invalid_value: /vedit-build/evidence/w3-project/a17-fixture/project.f:2: cannot expand this line (a `$` must be followed by a name, `{`, `(` or `$`); skipped
+DIAG config.invalid_value: /vedit-build/evidence/w3-project/a17-fixture/project.f:3: cannot expand this line (a `$` at the end of the line is not a variable); skipped
+exit=0
+--- a17-escape: $$ control, must stay files=1
+EXPANSION ok=1 root=/vedit-build/evidence/w3-project/a17-escape files=1 skipped=0 missing=[]
+FILE /vedit-build/evidence/w3-project/a17-escape-outside/escaped$.sv
+exit=0
+--- a17-missing: expanded+home paths that do not exist
+EXPANSION ok=1 root=/vedit-build/evidence/w3-project/a17-missing files=3 skipped=0 missing=[]
+FILE rtl/missing_after_expansion.sv
+FILE ~nosuchuser/never_home.sv
+FILE rtl/ok.sv
+exit=0

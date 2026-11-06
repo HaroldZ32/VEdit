@@ -1,0 +1,3 @@
+0cfb5b9d22c2c204ba65c3ea8ea61a66848fbf7eb873204fcc52c38d2902459a  src/app/app_shell.cpp
+ca36a76de0e5672c26c9ab6ff551a953af68b9d7754c5ca3cb3f391f3e3271b0  src/app/CMakeLists.txt
+eaf7a24569fc93a26e93d5e2430e5345f2644fa9e1af183e8f9e9c2feef56198  src/app/reset_layout_guard_selftest.cpp

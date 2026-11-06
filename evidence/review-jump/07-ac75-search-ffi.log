@@ -1,0 +1,14 @@
+build-ok
+selftest-exit=0
+CHECK jump.hit-row-exists PASS
+CHECK jump.row-visible PASS
+CHECK jump.click.recorded PASS
+CHECK jump.click.file PASS
+CHECK jump.click.line PASS
+CHECK jump.click.column PASS
+CHECK jump.file-row.no-jump PASS
+CHECK jump.activate PASS
+CHECK jump.demo.opened PASS
+CHECK jump.demo.line PASS
+WORKSPACE-SEARCH-SLOWLIFECYCLE ok=1 checks=4 failures=0
+WORKSPACE-SEARCH-SELFTEST ok=1 checks=84 failures=0 skipped=2

@@ -1,0 +1,6 @@
+# settings lane target rebuild after the follow-up review fixes (pinned Qt6 image, -Werror)
+# collected_at: 2026-11-02T07:59:24+00:00
+[20/22] Building CXX object src/app/workspace-lane-settings/CMakeFiles/vedit-workspace-settings-selftest.dir/vedit-workspace-settings-selftest_autogen/mocs_compilation.cpp.o
+[21/22] Building CXX object src/app/workspace-lane-settings/CMakeFiles/vedit-workspace-settings-selftest.dir/settings_selftest.cpp.o
+[22/22] Linking CXX executable src/app/workspace-lane-settings/vedit-workspace-settings-selftest
+LANE_BUILD_EXIT=0

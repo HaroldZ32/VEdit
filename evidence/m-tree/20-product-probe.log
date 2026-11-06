@@ -1,0 +1,21 @@
+This plugin does not support propagateSizeHints()
+ok   product.dock-inserted
+ok   product.dock-visible
+ok   product.panel-content
+ok   product.hierarchy-painted — status=Hierarchy ready — double-click an instance, a net or a driver/load.
+ok   product.summary-mentions-project — slang · 2 file(s) · 3 instance(s) · 14 net(s) · 5 ms · 19556 KiB peak
+root: /vedit-build/probes/slang-spike/fixture
+ok   product.rows — rows=47
+ok   product.instance-paths — slang · 2 file(s) · 3 instance(s) · 14 net(s) · 5 ms · 19556 KiB peak
+root: /vedit-build/probes/slang-spike/fixture
+ok   product.double-click-instance — top.sv:11:7
+ok   product.open-file
+This plugin does not support propagateSizeHints()
+ok   product.active-editor
+ok   product.cursor-source — net top.link · source of top.link: top.u0.q · top.sv:11:38 → top.sv:11:38
+ok   product.cursor-target — net top.link · target of top.link: top.u1.d · top.sv:12:25 → top.sv:12:25
+ok   product.screenshot — /vedit-build/evidence/m-tree/product-module-tree.png
+ok   product.no-location-no-jump — activated=0 calls=3->3
+ok   product.null-row-safe
+
+15 checks, 0 failure(s)

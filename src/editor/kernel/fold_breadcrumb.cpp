@@ -8,6 +8,8 @@
 
 #include <QEvent>
 #include <QTimer>
+#include <QVariantList>
+#include <QVariantMap>
 
 namespace vedit::editor {
 
@@ -98,6 +100,9 @@ void FoldBreadcrumbBinding::notifyReparsed()
 void FoldBreadcrumbBinding::refreshBreadcrumb()
 {
     if (view_ == nullptr || view_->document() == nullptr || !opened_ || breadcrumbSource_ == nullptr) {
+        // Keep the pane bar in step with the (empty) model instead of leaving a
+        // previous document's path on the view.
+        publishEntries();
         return;
     }
     const QString text = view_->document()->text();
@@ -109,6 +114,10 @@ void FoldBreadcrumbBinding::refreshBreadcrumb()
     }
     const bool changed = !breadcrumbModel_.matches(path);
     breadcrumbModel_.setPath(std::move(path));
+    // The pane bar reads this property, so it must follow every update (not
+    // only the ones that changed the display string: a same-text path with a
+    // different line still has to move the click targets).
+    publishEntries();
     if (changed) {
         emit breadcrumbChanged(breadcrumbModel_.display());
         if (statusListener_) {
@@ -120,6 +129,29 @@ void FoldBreadcrumbBinding::refreshBreadcrumb()
 QString FoldBreadcrumbBinding::breadcrumbDisplay() const
 {
     return breadcrumbModel_.display();
+}
+
+std::vector<vedit::breadcrumb::Entry> FoldBreadcrumbBinding::pathEntries() const
+{
+    return breadcrumbModel_.path();
+}
+
+void FoldBreadcrumbBinding::publishEntries()
+{
+    if (view_ == nullptr) {
+        return;
+    }
+    QVariantList entries;
+    for (const vedit::breadcrumb::Entry &entry : breadcrumbModel_.path()) {
+        QVariantMap item;
+        item.insert(QStringLiteral("kind"), QString::fromStdString(entry.kind));
+        item.insert(QStringLiteral("name"), QString::fromStdString(entry.name));
+        item.insert(QStringLiteral("line"), entry.line);
+        entries.append(item);
+    }
+    // The app shell has no KTextEditor dependency; a QObject property is the
+    // documented hand-off for the pane's Bar (see fold_breadcrumb.h).
+    view_->setProperty("veditBreadcrumbEntries", entries);
 }
 
 QString FoldBreadcrumbBinding::breadcrumbDescribe() const

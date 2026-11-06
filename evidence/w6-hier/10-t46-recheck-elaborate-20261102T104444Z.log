@@ -1,0 +1,38 @@
+# T46 recheck: fresh C-ABI elaboration measurement on the CURRENT tree
+date: 2026-11-02T18:44:44+08:00
+git_head: 4e2d0a57ca50db9568db5a5b040cc66f04c9a05f
+git_status_entries: 158
+lib: target/release/libvd_ffi.a a7931d4c8cdd4521c7316616dc4a64cccd1682ab1fee5698093dfbd6f1d40e0c stat=2026-11-02 18:44:26.469029803 +0800
+harness source: evidence/w4-lint/scale/scale_harness.cpp
+
+harness: 2026-11-02 10:44:47.582079119 +0000
+slang: slang version 12.1.0+0
+--- flat 1k, one hierarchy (--top m_0_0) ---
+ELABORATE top=«m_0_0» tool=«slang» files=1000 instances=11 max_depth=2 deepest=«m_0_0.u0» polls=15 wall_ms=151 worst_tick_ms=0 elapsed_ms=143 peak_rss_kb=72144 warning=«»
+CHECK elaborate.instances PASS
+CHECK elaborate.depth-at-least-2 PASS
+CHECK elaborate.wall-under-30s PASS
+CHECK elaborate.tick-under-100ms PASS
+ELABORATE-HARNESS ok=1 checks=4 failures=0
+--- flat 1k, whole project (no top) ---
+ELABORATE top=«» tool=«slang» files=1000 instances=11000 max_depth=2 deepest=«m_0_0.u0» polls=65 wall_ms=696 worst_tick_ms=0 elapsed_ms=643 peak_rss_kb=216264 warning=«the design has 11000 instances (limit 10000): the module tree may be slow»
+CHECK elaborate.instances PASS
+CHECK elaborate.depth-at-least-2 PASS
+CHECK elaborate.wall-under-30s PASS
+CHECK elaborate.tick-under-100ms PASS
+ELABORATE-HARNESS ok=1 checks=4 failures=0
+--- nested 1k, one hierarchy (--top l0_m_0_0) ---
+ELABORATE top=«l0_m_0_0» tool=«slang» files=1000 instances=11 max_depth=7 deepest=«l0_m_0_0.u1.u2.u3.u4.g_leaf[0].u» polls=9 wall_ms=91 worst_tick_ms=0 elapsed_ms=85 peak_rss_kb=99676 warning=«»
+CHECK elaborate.instances PASS
+CHECK elaborate.depth-at-least-2 PASS
+CHECK elaborate.wall-under-30s PASS
+CHECK elaborate.tick-under-100ms PASS
+ELABORATE-HARNESS ok=1 checks=4 failures=0
+--- nested 1k, whole project (no top) ---
+ELABORATE top=«» tool=«slang» files=1000 instances=11000 max_depth=7 deepest=«l0_m_0_0.u1.u2.u3.u4.g_leaf[0].u» polls=124 wall_ms=1293 worst_tick_ms=0 elapsed_ms=1238 peak_rss_kb=540480 warning=«the design has 11000 instances (limit 10000): the module tree may be slow»
+CHECK elaborate.instances PASS
+CHECK elaborate.depth-at-least-2 PASS
+CHECK elaborate.wall-under-30s PASS
+CHECK elaborate.tick-under-100ms PASS
+ELABORATE-HARNESS ok=1 checks=4 failures=0
+docker-exit=0

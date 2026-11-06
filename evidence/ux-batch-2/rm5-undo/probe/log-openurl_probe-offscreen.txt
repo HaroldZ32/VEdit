@@ -1,0 +1,22 @@
+/vedit-build/evidence/ux-batch-2/rm5-undo/probe/openurl_probe.cpp: In function ‘int main(int, char**)’:
+/vedit-build/evidence/ux-batch-2/rm5-undo/probe/openurl_probe.cpp:38:34: warning: ignoring return value of ‘virtual bool QFile::open(QIODeviceBase::OpenMode)’, declared with attribute ‘nodiscard’ [-Wunused-result]
+   38 |     { QFile file(path); file.open(QIODevice::WriteOnly); file.write(content.toUtf8()); }
+      |                         ~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/x86_64-linux-gnu/qt6/QtCore/QFile:1,
+                 from /vedit-build/evidence/ux-batch-2/rm5-undo/probe/openurl_probe.cpp:15:
+/usr/include/x86_64-linux-gnu/qt6/QtCore/qfile.h:291:32: note: declared here
+  291 |     QFILE_MAYBE_NODISCARD bool open(OpenMode flags) override;
+      |                                ^~~~
+kf.sonnet.core: Sonnet: No speller backends available!
+OPENURL platform=offscreen
+OPENURL call returned=1 elapsed_ms=4 text=32 match=1 modified=0 docname=top.sv
+OPENURL after_edits text=65 modified=1
+OPENURL undo=1 ran=1 text=32 floor_hit=1
+OPENURL undo=2 ran=1 text=32 floor_hit=1
+OPENURL undo=3 ran=1 text=32 floor_hit=1
+OPENURL undo=4 ran=1 text=32 floor_hit=1
+OPENURL undo=5 ran=1 text=32 floor_hit=1
+OPENURL undo=6 ran=1 text=32 floor_hit=1
+OPENURL undo=7 ran=1 text=32 floor_hit=1
+OPENURL undo=8 ran=1 text=32 floor_hit=1
+OPENURL type before=32 after=35 landed=1

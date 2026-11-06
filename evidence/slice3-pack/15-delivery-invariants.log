@@ -5,7 +5,16 @@ OK   plugins/platforms/libqoffscreen.so
 OK   plugins/kf6/parts/katepart.so
 OK   bin/verible-verilog-ls
 OK   bin/slang
+OK   bin/git
+OK   bin/svn
+OK   usr/lib/vcs/libexec/git
+OK   usr/lib/vcs/libexec/svn
+OK   usr/share/vedit/vcs-toolchain.txt
 OK   usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml
+== bundled VCS toolchain ==
+git version 2.53.0
+1.14.5
+svnadmin=absent
 == FFI linkage (static into vd-app) ==
    0x0000000000000001 (NEEDED)             Shared library: [libKF6TextEditor.so.6]
    0x0000000000000001 (NEEDED)             Shared library: [libKF6Parts.so.6]
@@ -20,9 +29,9 @@ OK   usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml
    0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
    0x0000000000000001 (NEEDED)             Shared library: [ld-linux-x86-64.so.2]
   libvd_ffi.so NEEDED entries: 0
-  vd_* symbols in vd-app: 45
+  vd_* symbols in vd-app: 89
 == toolchain sha256 ==
   07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845  /home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/AppDir/bin/verible-verilog-ls
   63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  /home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/AppDir/bin/slang
 == AppRun VEDIT_SYNTAX_DIR ==
-33:export VEDIT_SYNTAX_DIR="$APPDIR/usr/share/org.kde.syntax-highlighting"
+74:export VEDIT_SYNTAX_DIR="$APPDIR/usr/share/org.kde.syntax-highlighting"

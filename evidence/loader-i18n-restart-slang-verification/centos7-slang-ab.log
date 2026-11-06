@@ -1,0 +1,8 @@
+== CentOS 7.9 / glibc A/B on the packaged slang ==
+ldd (GNU libc) 2.17
+== A: LD_LIBRARY_PATH=/w/packaging/runtime/out/AppDir/lib ==
+/w/packaging/runtime/out/AppDir/bin/slang: /lib64/ld-linux-x86-64.so.2: version `GLIBC_2.35' not found (required by /w/packaging/runtime/out/AppDir/lib/libc.so.6)
+A_EXIT=1
+== B: env -u LD_LIBRARY_PATH ==
+slang version 12.1.0+0
+B_EXIT=0

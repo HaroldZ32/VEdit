@@ -1,0 +1,147 @@
+[1/30] Automatic MOC for target vedit_app_shell
+[2/30] Automatic MOC for target vedit_workspace_jump
+[3/30] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/vedit_app_shell_autogen/mocs_compilation.cpp.o
+[4/30] Building CXX object src/app/editor-lane/breadcrumb-lane/jump-lane/CMakeFiles/vedit_workspace_jump.dir/vedit_workspace_jump_autogen/mocs_compilation.cpp.o
+[5/30] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/crash_reporter.cpp.o
+[6/30] Building CXX object src/app/editor-lane/breadcrumb-lane/jump-lane/CMakeFiles/vedit_workspace_jump.dir/jump_integration.cpp.o
+[7/30] Building CXX object src/app/editor-lane/breadcrumb-lane/jump-lane/CMakeFiles/vedit_workspace_jump.dir/jump_registry.cpp.o
+[8/30] Linking CXX static library src/app/editor-lane/breadcrumb-lane/jump-lane/libvedit_workspace_jump.a
+[9/30] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/theme_manager.cpp.o
+[10/30] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/session_store.cpp.o
+[11/30] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/editor_provider.cpp.o
+[12/30] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/command_registry.cpp.o
+[13/30] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/panel_registry.cpp.o
+[14/30] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/app_shell.cpp.o
+[15/30] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/editor_area.cpp.o
+[16/30] Linking CXX static library src/app/libvedit_app_shell.a
+[17/30] Automatic MOC for target vedit_workspace_project
+[18/30] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_service.cpp.o
+[19/30] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/vedit_workspace_project_autogen/mocs_compilation.cpp.o
+[20/30] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_integration.cpp.o
+[21/30] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_subscription.cpp.o
+[22/30] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_state.cpp.o
+[23/30] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_variables_dialog.cpp.o
+[24/30] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_panel.cpp.o
+[25/30] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_model.cpp.o
+[26/30] Linking CXX static library src/app/workspace-lane-project/libvedit_workspace_project.a
+[27/30] Automatic MOC for target vedit-workspace-project-selftest
+[28/30] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit-workspace-project-selftest.dir/vedit-workspace-project-selftest_autogen/mocs_compilation.cpp.o
+[29/30] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit-workspace-project-selftest.dir/project_selftest.cpp.o
+[30/30] Linking CXX executable src/app/workspace-lane-project/vedit-workspace-project-selftest
+CHECK state.temp-dir PASS
+CHECK empty.no-project PASS
+CHECK empty.summary PASS
+CHECK empty.import-disabled PASS
+CHECK directoryOpened.subscribed PASS
+CHECK directoryOpened.non-blocking PASS
+CHECK directoryOpened.pending PASS
+CHECK directoryOpened.finishes PASS
+CHECK directoryOpened.root PASS
+CHECK directoryOpened.panel-visible? PASS
+CHECK files.count PASS
+CHECK files.carry-every-filelist-entry PASS
+CHECK files.scan-adds-headers PASS
+CHECK files.relative-for-generated-filelist PASS
+CHECK files.relative-matches-display PASS
+CHECK incdirs.count PASS
+CHECK defines.count PASS
+CHECK diagnostics.duplicate-entry PASS
+CHECK diagnostics.unknown-token PASS
+CHECK diagnostics.name-the-filelist PASS
+CHECK summary.states-the-count PASS
+CHECK state.file-written PASS
+CHECK panel.summary PASS
+CHECK panel.file-count PASS
+CHECK panel.files-match-model PASS
+CHECK panel.include-dirs PASS
+CHECK panel.defines PASS
+CHECK panel.diagnostics-match PASS
+CHECK settings.finishes PASS
+CHECK settings.include-dir-reaches-model PASS
+CHECK settings.define-reaches-model PASS
+CHECK settings.backend-arguments PASS
+CHECK settings.persisted PASS
+SETTINGS-WATCH settings=/tmp/vedit-workspace-project-selftest-EjZnTb/settings.toml exists=1 defines-before=[WIDTH=8,DEPTH=16,DEBUG,SIMULATION,BOARD=7]
+SETTINGS-WATCH defines-after=[WIDTH=8,DEPTH=16,DEBUG,SIMULATION,BOARD=9] last-error=[]
+CHECK settings.watch-reloads PASS
+CHECK settings.watch-second-include PASS
+CHECK filelist.import-bad-path PASS
+CHECK filelist.import-bad-path-keeps-list PASS
+CHECK filelist.import PASS
+CHECK filelist.import-finishes PASS
+CHECK filelist.import-model PASS
+CHECK filelist.import-panel PASS
+CHECK filelist.import-no-duplicate PASS
+CHECK filelist.import-keeps-union PASS
+CHECK filelist.remove PASS
+CHECK filelist.remove-finishes PASS
+CHECK filelist.remove-model PASS
+CHECK filelist.remove-keeps-union PASS
+CHECK filelist.remove-unknown-rejected PASS
+CHECK jump.delivered PASS
+CHECK jump.absolute-path PASS
+CHECK jump.position-1-based PASS
+CHECK bad.finishes PASS
+CHECK bad.files PASS
+CHECK bad.incdir-line PASS
+CHECK bad.unknown-line PASS
+CHECK bad.nested-line PASS
+CHECK bad.reasons PASS
+CHECK bad.panel-shows PASS
+CHECK a9.finishes PASS
+CHECK a9.expands-with-table PASS
+CHECK a9.expands-dollar-var PASS
+CHECK a9.expands-braced-var PASS
+CHECK a9.expands-parenthesized-var PASS
+CHECK a9.expands-tilde PASS
+CHECK a9.two-level-nested-f PASS
+CHECK a9.project-table-wins-over-environment PASS
+CHECK a9.cycle-names-both-files PASS
+CHECK a9.missing-collected PASS
+CHECK a9.skipped-count PASS
+CHECK a9.missing-file-and-line PASS
+CHECK a9.summary-shows-unresolved PASS
+CHECK a9.panel.variables-shown PASS
+CHECK a9.dialog.one-row-per-variable PASS
+CHECK a9.dialog.names PASS
+CHECK a9.dialog.variable-table PASS
+CHECK a9.re-expands-after-dialog PASS
+CHECK a9.dialog-value-used PASS
+CHECK a9.unresolved-cleared PASS
+CHECK a9.variables-persisted-in-state PASS
+CHECK a17.finishes PASS
+CHECK a17.files PASS
+CHECK a17.literal-dollar-kept PASS
+CHECK a17.literal-trailing-dollar-kept PASS
+CHECK a17.scanned-entry-kept PASS
+CHECK a17.no-expansion-error PASS
+CHECK a17.escape-finishes PASS
+CHECK a17.escape-one-dollar PASS
+CHECK a17.missing-finishes PASS
+CHECK a17.missing-re-expands PASS
+CHECK a17.missing-files-kept PASS
+CHECK a17.missing-expanded-reported PASS
+CHECK a17.missing-home-reported PASS
+CHECK a17.missing-kept-not-dropped PASS
+CHECK a17.missing-literal-not-reported PASS
+CHECK restore.ok PASS
+CHECK restore.root PASS
+CHECK restore.files PASS
+CHECK restore.include-dirs PASS
+CHECK restore.defines PASS
+CHECK restore.relative-files PASS
+CHECK missing-root.finishes PASS
+CHECK missing-root.reports PASS
+CHECK missing-root.diagnostics PASS
+CHECK missing-root.no-members PASS
+CHECK corrupt.reports PASS
+CHECK corrupt.error-text PASS
+PROJECT-MODEL-SELFTEST ok=1 checks=106 failures=0
+== seed (process 1) ==
+SEED phase=seed ok=1 files=11 filelists=1 incdirs=5 defines=6 root=/vedit-build/tests/fixtures/verilog-project state=/vedit-build/target/tmp/w3-state/project-model.json
+SEED backend-arguments -I/vedit-build/tests/fixtures/verilog-project/inc -I/vedit-build/tests/fixtures/verilog-project/inc/generated -I/vedit-build/tests/fixtures/verilog-project/rtl/include -I/vedit-build/tests/fixtures/verilog-project/tb/include -I/vedit-build/target/tmp/w3-state/seed_inc -DWIDTH=8 -DDEPTH=16 -DDEBUG -DSIMULATION -DBOARD=7 -DSIM
+== restore (process 2, separate process, state dir only) ==
+RESTORE phase=restore ok=1 files=11 filelists=1 incdirs=5 defines=6 root=/vedit-build/tests/fixtures/verilog-project error=
+RESTORE backend-arguments -I/vedit-build/tests/fixtures/verilog-project/inc -I/vedit-build/tests/fixtures/verilog-project/inc/generated -I/vedit-build/tests/fixtures/verilog-project/rtl/include -I/vedit-build/tests/fixtures/verilog-project/tb/include -I/vedit-build/target/tmp/w3-state/seed_inc -DWIDTH=8 -DDEPTH=16 -DDEBUG -DSIMULATION -DBOARD=7 -DSIM
+== project-model.json before vs after (empty diff = identical) ==
+STATE-IDENTICAL

@@ -1,0 +1,576 @@
+{
+  "design": {
+    "name": "$root",
+    "kind": "Root",
+    "addr": 3634617712800,
+    "members": [
+      {
+        "name": "",
+        "kind": "CompilationUnit",
+        "addr": 3634620412368
+      },
+      {
+        "name": "notused",
+        "kind": "Instance",
+        "source_file": "top.sv",
+        "source_line": 17,
+        "source_column": 8,
+        "addr": 3634620412944,
+        "body": {
+          "name": "notused",
+          "kind": "InstanceBody",
+          "source_file": "top.sv",
+          "source_line": 17,
+          "source_column": 8,
+          "addr": 3634620412640,
+          "members": [
+            {
+              "name": "x",
+              "kind": "Port",
+              "source_file": "top.sv",
+              "source_line": 17,
+              "source_column": 28,
+              "addr": 3634620414288,
+              "type": "logic",
+              "direction": "In",
+              "internalSymbol": "3634620414408 x"
+            },
+            {
+              "name": "x",
+              "kind": "Net",
+              "source_file": "top.sv",
+              "source_line": 17,
+              "source_column": 28,
+              "addr": 3634620414408,
+              "type": "logic",
+              "netType": {
+                "name": "wire",
+                "kind": "NetType",
+                "addr": 3634617719680,
+                "type": "logic"
+              }
+            },
+            {
+              "name": "z",
+              "kind": "Port",
+              "source_file": "top.sv",
+              "source_line": 17,
+              "source_column": 44,
+              "addr": 3634620414568,
+              "type": "logic",
+              "direction": "Out",
+              "internalSymbol": "3634620414688 z"
+            },
+            {
+              "name": "z",
+              "kind": "Variable",
+              "source_file": "top.sv",
+              "source_line": 17,
+              "source_column": 44,
+              "addr": 3634620414688,
+              "type": "logic",
+              "lifetime": "Static"
+            },
+            {
+              "name": "",
+              "kind": "ContinuousAssign",
+              "source_file": "top.sv",
+              "source_line": 18,
+              "source_column": 10,
+              "addr": 3634620414840,
+              "assignment": {
+                "source_file_start": "top.sv",
+                "source_file_end": "top.sv",
+                "source_line_start": 18,
+                "source_line_end": 18,
+                "source_column_start": 10,
+                "source_column_end": 15,
+                "kind": "Assignment",
+                "type": "logic",
+                "left": {
+                  "source_file_start": "top.sv",
+                  "source_file_end": "top.sv",
+                  "source_line_start": 18,
+                  "source_line_end": 18,
+                  "source_column_start": 10,
+                  "source_column_end": 11,
+                  "kind": "NamedValue",
+                  "type": "logic",
+                  "symbol": "3634620414688 z"
+                },
+                "right": {
+                  "source_file_start": "top.sv",
+                  "source_file_end": "top.sv",
+                  "source_line_start": 18,
+                  "source_line_end": 18,
+                  "source_column_start": 14,
+                  "source_column_end": 15,
+                  "kind": "NamedValue",
+                  "type": "logic",
+                  "symbol": "3634620414408 x"
+                },
+                "isNonBlocking": false
+              }
+            }
+          ],
+          "definition": "3634616824320 notused"
+        },
+        "connections": [
+        ]
+      },
+      {
+        "name": "top",
+        "kind": "Instance",
+        "source_file": "top.sv",
+        "source_line": 10,
+        "source_column": 8,
+        "addr": 3634620413640,
+        "body": {
+          "name": "top",
+          "kind": "InstanceBody",
+          "source_file": "top.sv",
+          "source_line": 10,
+          "source_column": 8,
+          "addr": 3634620413072,
+          "members": [
+            {
+              "name": "clk",
+              "kind": "Port",
+              "source_file": "top.sv",
+              "source_line": 10,
+              "source_column": 24,
+              "addr": 3634620415264,
+              "type": "logic",
+              "direction": "In",
+              "internalSymbol": "3634620415384 clk"
+            },
+            {
+              "name": "clk",
+              "kind": "Net",
+              "source_file": "top.sv",
+              "source_line": 10,
+              "source_column": 24,
+              "addr": 3634620415384,
+              "type": "logic",
+              "netType": {
+                "name": "wire",
+                "kind": "NetType",
+                "addr": 3634617719680,
+                "type": "logic"
+              }
+            },
+            {
+              "name": "q",
+              "kind": "Port",
+              "source_file": "top.sv",
+              "source_line": 10,
+              "source_column": 48,
+              "addr": 3634620415544,
+              "type": "logic[3:0]",
+              "direction": "Out",
+              "internalSymbol": "3634620415664 q"
+            },
+            {
+              "name": "q",
+              "kind": "Variable",
+              "source_file": "top.sv",
+              "source_line": 10,
+              "source_column": 48,
+              "addr": 3634620415664,
+              "type": "logic[3:0]",
+              "lifetime": "Static"
+            },
+            {
+              "name": "w",
+              "kind": "Variable",
+              "source_file": "top.sv",
+              "source_line": 11,
+              "source_column": 9,
+              "addr": 3634620413312,
+              "type": "logic",
+              "lifetime": "Static"
+            },
+            {
+              "name": "u_leaf",
+              "kind": "Instance",
+              "source_file": "top.sv",
+              "source_line": 12,
+              "source_column": 8,
+              "addr": 3634620415816,
+              "body": {
+                "name": "leaf",
+                "kind": "InstanceBody",
+                "source_file": "top.sv",
+                "source_line": 6,
+                "source_column": 8,
+                "addr": 3634620420112,
+                "members": [
+                  {
+                    "name": "a",
+                    "kind": "Port",
+                    "source_file": "top.sv",
+                    "source_line": 6,
+                    "source_column": 25,
+                    "addr": 3634620421304,
+                    "type": "logic",
+                    "direction": "In",
+                    "internalSymbol": "3634620421424 a"
+                  },
+                  {
+                    "name": "a",
+                    "kind": "Net",
+                    "source_file": "top.sv",
+                    "source_line": 6,
+                    "source_column": 25,
+                    "addr": 3634620421424,
+                    "type": "logic",
+                    "netType": {
+                      "name": "wire",
+                      "kind": "NetType",
+                      "addr": 3634617719680,
+                      "type": "logic"
+                    }
+                  },
+                  {
+                    "name": "y",
+                    "kind": "Port",
+                    "source_file": "top.sv",
+                    "source_line": 6,
+                    "source_column": 47,
+                    "addr": 3634620421584,
+                    "type": "logic[3:0]",
+                    "direction": "Out",
+                    "internalSymbol": "3634620421704 y"
+                  },
+                  {
+                    "name": "y",
+                    "kind": "Variable",
+                    "source_file": "top.sv",
+                    "source_line": 6,
+                    "source_column": 47,
+                    "addr": 3634620421704,
+                    "type": "logic[3:0]",
+                    "lifetime": "Static"
+                  },
+                  {
+                    "name": "",
+                    "kind": "ContinuousAssign",
+                    "source_file": "top.sv",
+                    "source_line": 7,
+                    "source_column": 10,
+                    "addr": 3634620421856,
+                    "assignment": {
+                      "source_file_start": "top.sv",
+                      "source_file_end": "top.sv",
+                      "source_line_start": 7,
+                      "source_line_end": 7,
+                      "source_column_start": 10,
+                      "source_column_end": 20,
+                      "kind": "Assignment",
+                      "type": "logic[3:0]",
+                      "left": {
+                        "source_file_start": "top.sv",
+                        "source_file_end": "top.sv",
+                        "source_line_start": 7,
+                        "source_line_end": 7,
+                        "source_column_start": 10,
+                        "source_column_end": 11,
+                        "kind": "NamedValue",
+                        "type": "logic[3:0]",
+                        "symbol": "3634620421704 y"
+                      },
+                      "right": {
+                        "source_file_start": "top.sv",
+                        "source_file_end": "top.sv",
+                        "source_line_start": 7,
+                        "source_line_end": 7,
+                        "source_column_start": 14,
+                        "source_column_end": 20,
+                        "kind": "Replication",
+                        "type": "logic[3:0]",
+                        "count": {
+                          "source_file_start": "top.sv",
+                          "source_file_end": "top.sv",
+                          "source_line_start": 7,
+                          "source_line_end": 7,
+                          "source_column_start": 15,
+                          "source_column_end": 16,
+                          "kind": "IntegerLiteral",
+                          "type": "int",
+                          "value": "4",
+                          "constant": "4"
+                        },
+                        "concat": {
+                          "source_file_start": "top.sv",
+                          "source_file_end": "top.sv",
+                          "source_line_start": 7,
+                          "source_line_end": 7,
+                          "source_column_start": 16,
+                          "source_column_end": 19,
+                          "kind": "Concatenation",
+                          "type": "logic[0:0]",
+                          "operands": [
+                            {
+                              "source_file_start": "top.sv",
+                              "source_file_end": "top.sv",
+                              "source_line_start": 7,
+                              "source_line_end": 7,
+                              "source_column_start": 17,
+                              "source_column_end": 18,
+                              "kind": "NamedValue",
+                              "type": "logic",
+                              "symbol": "3634620421424 a"
+                            }
+                          ]
+                        }
+                      },
+                      "isNonBlocking": false
+                    }
+                  }
+                ],
+                "definition": "3634616822784 leaf"
+              },
+              "connections": [
+                {
+                  "port": {
+                    "name": "a",
+                    "kind": "Port",
+                    "source_file": "top.sv",
+                    "source_line": 6,
+                    "source_column": 25,
+                    "addr": 3634620421304,
+                    "type": "logic",
+                    "direction": "In",
+                    "internalSymbol": "3634620421424 a"
+                  },
+                  "expr": {
+                    "source_file_start": "top.sv",
+                    "source_file_end": "top.sv",
+                    "source_line_start": 12,
+                    "source_line_end": 12,
+                    "source_column_start": 18,
+                    "source_column_end": 21,
+                    "kind": "NamedValue",
+                    "type": "logic",
+                    "symbol": "3634620415384 clk"
+                  }
+                },
+                {
+                  "port": {
+                    "name": "y",
+                    "kind": "Port",
+                    "source_file": "top.sv",
+                    "source_line": 6,
+                    "source_column": 47,
+                    "addr": 3634620421584,
+                    "type": "logic[3:0]",
+                    "direction": "Out",
+                    "internalSymbol": "3634620421704 y"
+                  },
+                  "expr": {
+                    "source_file_start": "top.sv",
+                    "source_file_end": "top.sv",
+                    "source_line_start": 12,
+                    "source_line_end": 12,
+                    "source_column_start": 27,
+                    "source_column_end": 28,
+                    "kind": "Assignment",
+                    "type": "logic",
+                    "left": {
+                      "source_file_start": "top.sv",
+                      "source_file_end": "top.sv",
+                      "source_line_start": 12,
+                      "source_line_end": 12,
+                      "source_column_start": 27,
+                      "source_column_end": 28,
+                      "kind": "NamedValue",
+                      "type": "logic",
+                      "symbol": "3634620413312 w"
+                    },
+                    "right": {
+                      "source_file_start": "top.sv",
+                      "source_file_end": "top.sv",
+                      "source_line_start": 12,
+                      "source_line_end": 12,
+                      "source_column_start": 27,
+                      "source_column_end": 28,
+                      "kind": "Conversion",
+                      "type": "logic",
+                      "operand": {
+                        "source_file_start": "top.sv",
+                        "source_file_end": "top.sv",
+                        "source_line_start": 12,
+                        "source_line_end": 12,
+                        "source_column_start": 27,
+                        "source_column_end": 28,
+                        "kind": "EmptyArgument",
+                        "type": "logic[3:0]"
+                      }
+                    },
+                    "isNonBlocking": false
+                  }
+                }
+              ]
+            },
+            {
+              "name": "u_leaf2",
+              "kind": "Instance",
+              "source_file": "top.sv",
+              "source_line": 13,
+              "source_column": 8,
+              "addr": 3634620420416,
+              "body": "3634620420112 leaf",
+              "connections": [
+                {
+                  "port": {
+                    "name": "a",
+                    "kind": "Port",
+                    "source_file": "top.sv",
+                    "source_line": 6,
+                    "source_column": 25,
+                    "addr": 3634620423176,
+                    "type": "logic",
+                    "direction": "In",
+                    "internalSymbol": "3634620423296 a"
+                  },
+                  "expr": {
+                    "source_file_start": "top.sv",
+                    "source_file_end": "top.sv",
+                    "source_line_start": 13,
+                    "source_line_end": 13,
+                    "source_column_start": 19,
+                    "source_column_end": 22,
+                    "kind": "NamedValue",
+                    "type": "logic",
+                    "symbol": "3634620415384 clk"
+                  }
+                },
+                {
+                  "port": {
+                    "name": "y",
+                    "kind": "Port",
+                    "source_file": "top.sv",
+                    "source_line": 6,
+                    "source_column": 47,
+                    "addr": 3634620423456,
+                    "type": "logic[3:0]",
+                    "direction": "Out",
+                    "internalSymbol": "3634620423576 y"
+                  }
+                }
+              ]
+            },
+            {
+              "name": "",
+              "kind": "ContinuousAssign",
+              "source_file": "top.sv",
+              "source_line": 14,
+              "source_column": 10,
+              "addr": 3634620420848,
+              "assignment": {
+                "source_file_start": "top.sv",
+                "source_file_end": "top.sv",
+                "source_line_start": 14,
+                "source_line_end": 14,
+                "source_column_start": 10,
+                "source_column_end": 15,
+                "kind": "Assignment",
+                "type": "logic[3:0]",
+                "left": {
+                  "source_file_start": "top.sv",
+                  "source_file_end": "top.sv",
+                  "source_line_start": 14,
+                  "source_line_end": 14,
+                  "source_column_start": 10,
+                  "source_column_end": 11,
+                  "kind": "NamedValue",
+                  "type": "logic[3:0]",
+                  "symbol": "3634620415664 q"
+                },
+                "right": {
+                  "source_file_start": "top.sv",
+                  "source_file_end": "top.sv",
+                  "source_line_start": 14,
+                  "source_line_end": 14,
+                  "source_column_start": 14,
+                  "source_column_end": 15,
+                  "kind": "Conversion",
+                  "type": "logic[3:0]",
+                  "operand": {
+                    "source_file_start": "top.sv",
+                    "source_file_end": "top.sv",
+                    "source_line_start": 14,
+                    "source_line_end": 14,
+                    "source_column_start": 14,
+                    "source_column_end": 15,
+                    "kind": "NamedValue",
+                    "type": "logic",
+                    "symbol": "3634620413312 w"
+                  }
+                },
+                "isNonBlocking": false
+              }
+            }
+          ],
+          "definition": "3634616823552 top"
+        },
+        "connections": [
+        ]
+      }
+    ]
+  },
+  "definitions": [
+    {
+      "name": "bus_if",
+      "kind": "Definition",
+      "source_file": "top.sv",
+      "source_line": 1,
+      "source_column": 11,
+      "addr": 3634616822016,
+      "defaultNetType": "3634617719680 wire",
+      "definitionKind": "Interface",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    },
+    {
+      "name": "leaf",
+      "kind": "Definition",
+      "source_file": "top.sv",
+      "source_line": 6,
+      "source_column": 8,
+      "addr": 3634616822784,
+      "defaultNetType": "3634617719680 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    },
+    {
+      "name": "notused",
+      "kind": "Definition",
+      "source_file": "top.sv",
+      "source_line": 17,
+      "source_column": 8,
+      "addr": 3634616824320,
+      "defaultNetType": "3634617719680 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    },
+    {
+      "name": "top",
+      "kind": "Definition",
+      "source_file": "top.sv",
+      "source_line": 10,
+      "source_column": 8,
+      "addr": 3634616823552,
+      "defaultNetType": "3634617719680 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    }
+  ]
+}

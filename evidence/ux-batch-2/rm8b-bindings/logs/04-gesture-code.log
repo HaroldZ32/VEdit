@@ -1,0 +1,38 @@
+$ grep -n "static bool isMultiCursorGesture" -A14 src/editor/kernel/multi_cursor.cpp
+593:static bool isMultiCursorGesture(Qt::KeyboardModifiers modifiers)
+594-{
+595-    if (!modifiers.testFlag(Qt::AltModifier)) {
+596-        return false;
+597-    }
+598-    const Qt::KeyboardModifiers companions =
+599-        modifiers & (Qt::ShiftModifier | Qt::ControlModifier | Qt::MetaModifier);
+600-    // Shift+Alt and Ctrl+Alt are the primaries; bare Alt is the secondary;
+601-    // Ctrl+Shift+Alt keeps working (it is still a multi-cursor gesture).
+602-    return companions == Qt::NoModifier || companions == Qt::ShiftModifier
+603-           || companions == Qt::ControlModifier
+604-           || companions == (Qt::ShiftModifier | Qt::ControlModifier);
+605-}
+606-
+607-QPoint MultiCursorController::viewPointFor(QWidget *watched, const QMouseEvent *event) const
+
+$ grep -n "isMultiCursorGesture(event->modifiers())" -A4 -B6 src/editor/kernel/multi_cursor.cpp
+634-        const bool ctrl = event->modifiers().testFlag(Qt::ControlModifier);
+635-        const KTextEditor::Cursor clicked =
+636-            view_->coordinatesToCursor(viewPointFor(watched, event));
+637-        // RM-6: any Alt form (Shift+Alt primary, Ctrl+Alt primary, plain Alt
+638-        // secondary) is the multi-cursor gesture; it is checked BEFORE the Ctrl
+639-        // branch so Ctrl+Alt can never be mistaken for go-to-definition.
+640:        if (isMultiCursorGesture(event->modifiers())) {
+641-            if (!clicked.isValid()) {
+642-                return false;
+643-            }
+644-            // UX batch 2 (item 13) + RM-6: CLICK adds/removes a cursor
+
+$ grep -n "addCursor(altPressAnchor_)" -B6 src/editor/kernel/multi_cursor.cpp
+732-                    extendBlock(extent);
+733-                }
+734-                finishBlock();
+735-            } else {
+736-                // Alt+click (no drag): add the cursor, or remove it when the
+737-                // click lands exactly on one that is already there.
+738:                addCursor(altPressAnchor_);

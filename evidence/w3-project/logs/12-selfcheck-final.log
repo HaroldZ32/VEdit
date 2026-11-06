@@ -1,0 +1,79 @@
+CHECK state.temp-dir PASS
+This plugin does not support propagateSizeHints()
+CHECK empty.no-project PASS
+CHECK empty.summary PASS
+CHECK empty.import-disabled PASS
+CHECK directoryOpened.subscribed PASS
+CHECK directoryOpened.non-blocking PASS
+CHECK directoryOpened.pending PASS
+This plugin does not support propagateSizeHints()
+CHECK directoryOpened.finishes PASS
+CHECK directoryOpened.root PASS
+CHECK directoryOpened.panel-visible? PASS
+CHECK files.count PASS
+CHECK files.carry-every-filelist-entry PASS
+CHECK files.scan-adds-headers PASS
+CHECK files.relative-for-generated-filelist PASS
+CHECK files.relative-matches-display PASS
+CHECK incdirs.count PASS
+CHECK defines.count PASS
+CHECK diagnostics.duplicate-entry PASS
+CHECK diagnostics.unknown-token PASS
+CHECK diagnostics.name-the-filelist PASS
+CHECK summary.states-the-count PASS
+CHECK state.file-written PASS
+CHECK panel.summary PASS
+CHECK panel.file-count PASS
+CHECK panel.files-match-model PASS
+CHECK panel.include-dirs PASS
+CHECK panel.defines PASS
+CHECK panel.diagnostics-match PASS
+CHECK settings.finishes PASS
+CHECK settings.include-dir-reaches-model PASS
+CHECK settings.define-reaches-model PASS
+CHECK settings.backend-arguments PASS
+CHECK settings.persisted PASS
+SETTINGS-WATCH settings=/tmp/vedit-workspace-project-selftest-RlOYxQ/settings.toml exists=1 defines-before=[WIDTH=8,DEPTH=16,DEBUG,SIMULATION,BOARD=7]
+SETTINGS-WATCH defines-after=[WIDTH=8,DEPTH=16,DEBUG,SIMULATION,BOARD=9] last-error=[]
+CHECK settings.watch-reloads PASS
+CHECK settings.watch-second-include PASS
+CHECK filelist.import-bad-path PASS
+CHECK filelist.import-bad-path-keeps-list PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK filelist.import PASS
+CHECK filelist.import-finishes PASS
+CHECK filelist.import-model PASS
+CHECK filelist.import-panel PASS
+CHECK filelist.import-no-duplicate PASS
+CHECK filelist.import-keeps-union PASS
+CHECK filelist.remove PASS
+This plugin does not support propagateSizeHints()
+CHECK filelist.remove-finishes PASS
+CHECK filelist.remove-model PASS
+CHECK filelist.remove-keeps-union PASS
+CHECK filelist.remove-unknown-rejected PASS
+CHECK jump.delivered PASS
+CHECK jump.absolute-path PASS
+CHECK jump.position-1-based PASS
+CHECK bad.finishes PASS
+CHECK bad.files PASS
+CHECK bad.incdir-line PASS
+CHECK bad.unknown-line PASS
+CHECK bad.nested-line PASS
+CHECK bad.reasons PASS
+CHECK bad.panel-shows PASS
+CHECK restore.ok PASS
+CHECK restore.root PASS
+CHECK restore.files PASS
+CHECK restore.include-dirs PASS
+CHECK restore.defines PASS
+CHECK restore.relative-files PASS
+CHECK missing-root.finishes PASS
+CHECK missing-root.reports PASS
+CHECK missing-root.diagnostics PASS
+CHECK missing-root.no-members PASS
+CHECK corrupt.reports PASS
+CHECK corrupt.error-text PASS
+PROJECT-MODEL-SELFTEST ok=1 checks=70 failures=0

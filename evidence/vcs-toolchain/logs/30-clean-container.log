@@ -1,0 +1,55 @@
+# clean container: docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+== host ==
+CentOS Linux release 7.9.2009 (Core)
+ldd (GNU libc) 2.17
+== bundled versions ==
+git version 2.53.0
+1.14.5
+== AppRun --selfcheck ==
+CHECK root.switch.persisted PASS
+CHECK root.switch.persisted-value PASS
+APP-SHELL-SELFTEST ok=1 checks=290 failures=0 state=/tmp/vedit-app-uRxzVm/state
+selfcheck_exit=0
+== AC-3.0 functional set (bundled git/svn) ==
+fixture=/tmp/vedit-vcs-toolchain-zIuLto
+cwd=/tmp
+appdir=/app
+git=/app/bin/git
+svn=/app/bin/svn
+== versions ==
+git_version=2.53.0 raw=git version 2.53.0
+svn_version=1.14.5
+CHECK git>=2.43                          PASS 2.53.0
+CHECK svn>=1.14                          PASS 1.14.5
+== fixture repository ==
+== status ==
+## master
+ M rtl/top.sv
+CHECK status-branch-and-change           PASS ## master| M rtl/top.sv
+== info ==
+branch=master revision=577247d
+CHECK info-branch-and-revision           PASS master @ 577247d
+== diff ==
+CHECK diff-shows-change                  PASS diff --git a/rtl/top.sv b/rtl/top.sv
+== refs ==
+CHECK refs-list                          PASS refs/heads/master
+== history ==
+CHECK history-log                        PASS 577247d fixture commit
+== workspace ==
+CHECK workspace-toplevel                 PASS /tmp/vedit-vcs-toolchain-zIuLto/repo
+== worktree add/list/remove ==
+worktree_add_exit=0
+/tmp/vedit-vcs-toolchain-zIuLto/repo 577247d [master]
+/tmp/vedit-vcs-toolchain-zIuLto/wt   577247d (detached HEAD)
+CHECK worktree-add-list                  PASS 
+CHECK worktree-remove                    PASS add=0 remove=0
+== svn ==
+svn, version 1.14.5 (r1922182)
+CHECK svn-binary-runs                    PASS svn, version 1.14.5 (r1922182)
+== svnadmin must not be shipped ==
+CHECK svnadmin-absent                    PASS build-only
+fixture_kept=/tmp/vedit-vcs-toolchain-zIuLto
+ac30_fail=0
+ac30_exit=0
+== product resolver line (GUI offscreen, VCS lane init) ==
+VCS-TOOLCHAIN git=/app/usr/lib/vcs/bin/git version=2.53.0 svn=/app/usr/lib/vcs/bin/svn version=1.14.5 source=bundled git_source=bundled svn_source=bundled

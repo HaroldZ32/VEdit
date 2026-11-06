@@ -1,0 +1,10 @@
+# 229-check baseline parity — review-b2-r4
+# baseline: evidence/ux-batch-2/review-b2-r3/probes/01-229-suite.log (reviewer, 229 checks)
+# current:  logs/01-suite-green.log (my run of vedit-search-replace-tests --selfcheck)
+# date: 2026-11-06T10:13:35+08:00
+
+baseline_names=229 current_names=275
+-- names in baseline missing from current:
+-- baseline names not PASS in current:
+-- RESULT: baseline PASS in current: 229/229; not-pass=0
+-- names added since baseline: 46

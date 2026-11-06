@@ -1,0 +1,37 @@
+=== ctest names (syntax/editor) ===
+  Test  #1: vedit-app-syntax-startup
+  Test  #3: vedit-syntax-provider-tests
+  Test  #4: vedit-syntax-kde-data
+  Test  #5: vedit-syntax-directory-equivalence
+  Test  #7: vedit-syntax-product-tests
+  Test  #9: vedit-syntax-overlay-selftest
+  Test #19: vedit-edit-core-selftest
+  Test #20: vedit-highlight-mode-selftest
+=== rebuild selftest ===
+=== ctest subset ===
+Test project /vedit-build/target/qt6-build
+    Start  4: vedit-syntax-kde-data
+1/4 Test  #4: vedit-syntax-kde-data ................   Passed    0.03 sec
+    Start  5: vedit-syntax-directory-equivalence
+2/4 Test  #5: vedit-syntax-directory-equivalence ...   Passed    0.03 sec
+    Start 19: vedit-edit-core-selftest
+3/4 Test #19: vedit-edit-core-selftest .............   Passed    0.13 sec
+    Start 20: vedit-highlight-mode-selftest
+4/4 Test #20: vedit-highlight-mode-selftest ........   Passed    0.07 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   0.26 sec
+=== assemble AppDir (XML changes) ===
+[assemble] delivery invariants: vd-app + Qt platform plugins + toolchain + whitelist present
+[assemble] AppDir: target/a3-appdir/AppDir files=350 bytes=381254996
+[assemble] f2lib sha256: aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
+APPDIR=target/a3-appdir/AppDir
+APPDIR_FORM=F2
+APPDIR_FILES=350
+APPDIR_BYTES=381254996
+APPDIR_WHITELIST=Markdown,SystemVerilog,Tcl,VHDL,Verilog
+=== AppDir offscreen assertion (delivered F2 library) ===
+MODE-FACT mode=appdir share=/vedit-build/target/a3-appdir/AppDir/usr/share repository_definitions=6
+HIGHLIGHT-MODE-SELFTEST mode=appdir checks=86 failures=0
+=== APPDIR EXIT: 0 ===

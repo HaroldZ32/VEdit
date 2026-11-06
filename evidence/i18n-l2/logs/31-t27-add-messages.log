@@ -1,0 +1,8 @@
+context=VEdit existing=734 add=6 skip=0 stale=0
+  + Diagnostic %1/%2 - %3: %4
+  + error
+  + warning
+  + information
+  + hint
+  + problem
+wrote translations/vedit_zh_CN.ts; messages now 944

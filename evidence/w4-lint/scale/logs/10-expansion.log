@@ -1,0 +1,9 @@
+=== baseline (Qt startup + 1-file expansion) ===
+EXPANSION ok=1 root=/vedit-build/target/tmp/scale-baseline files=1 skipped=0 missing=[]
+MEASURE exit=0 wall_s=0.029 peak_rss_mib=25.6
+=== 1k files expansion ===
+EXPANSION ok=1 root=/vedit-build/target/tmp/scale-1k files=1001 skipped=0 missing=[]
+MEASURE exit=0 wall_s=0.068 peak_rss_mib=26.2
+=== 2k files expansion ===
+EXPANSION ok=1 root=/vedit-build/target/tmp/scale-2k files=2001 skipped=0 missing=[]
+MEASURE exit=0 wall_s=0.112 peak_rss_mib=27.0

@@ -1,0 +1,39 @@
+=== A: table INCDIR_VAR=inc ROOT_VAR=/opt/root PREC_VAR=project, env PREC_VAR=environment, MISSING_VAR unset ===
+EXPANSION ok=1 root=/vedit-build/evidence/review-a9/a files=6 skipped=5 missing=[MISSING_VAR]
+FILE rtl/a.sv
+FILE rtl/spaced dir/space file.sv
+FILE ~nosuchuser/nouser.sv
+FILE inc/defs.vh
+FILE inc/sub/defs2.vh
+FILE rtl/dollar$.sv
+INCDIR /vedit-build/evidence/review-a9/a/inc
+INCDIR /vedit-build/evidence/review-a9/a/inc/sub
+DEFINE ROOTVAL="/opt/root"
+DEFINE PREC=project
+MISSING MISSING_VAR
+DIAG config.invalid_value: /vedit-build/evidence/review-a9/a/project.f:7: cannot expand this line (a `$` must be followed by a name, `{`, `(` or `$`); skipped
+DIAG config.invalid_value: /vedit-build/evidence/review-a9/a/project.f:8: cannot expand this line (a `$` at the end of the line is not a variable); skipped
+DIAG config.invalid_value: /vedit-build/evidence/review-a9/a/project.f:9: cannot expand this line (an empty `${...}` reference is not a variable); skipped
+DIAG config.invalid_value: /vedit-build/evidence/review-a9/a/project.f:10: cannot expand this line (an empty `$(...)` reference is not a variable); skipped
+DIAG config.invalid_value: /vedit-build/evidence/review-a9/a/project.f:12: unresolved variable `$MISSING_VAR` (set it in the project variables or the environment); the line is skipped
+
+=== A control: no table, env PREC_VAR=environment only ===
+EXPANSION ok=1 root=/vedit-build/evidence/review-a9/a files=6 skipped=8 missing=[INCDIR_VAR,MISSING_VAR,ROOT_VAR]
+FILE rtl/a.sv
+FILE rtl/spaced dir/space file.sv
+FILE ~nosuchuser/nouser.sv
+FILE inc/defs.vh
+FILE inc/sub/defs2.vh
+FILE rtl/dollar$.sv
+DEFINE PREC=environment
+MISSING INCDIR_VAR
+MISSING MISSING_VAR
+MISSING ROOT_VAR
+DIAG config.invalid_value: /vedit-build/evidence/review-a9/a/project.f:1: unresolved variable `$INCDIR_VAR` (set it in the project variables or the environment); the line is skipped
+DIAG config.invalid_value: /vedit-build/evidence/review-a9/a/project.f:2: unresolved variable `$INCDIR_VAR` (set it in the project variables or the environment); the line is skipped
+DIAG config.invalid_value: /vedit-build/evidence/review-a9/a/project.f:3: unresolved variable `$ROOT_VAR` (set it in the project variables or the environment); the line is skipped
+DIAG config.invalid_value: /vedit-build/evidence/review-a9/a/project.f:7: cannot expand this line (a `$` must be followed by a name, `{`, `(` or `$`); skipped
+DIAG config.invalid_value: /vedit-build/evidence/review-a9/a/project.f:8: cannot expand this line (a `$` at the end of the line is not a variable); skipped
+DIAG config.invalid_value: /vedit-build/evidence/review-a9/a/project.f:9: cannot expand this line (an empty `${...}` reference is not a variable); skipped
+DIAG config.invalid_value: /vedit-build/evidence/review-a9/a/project.f:10: cannot expand this line (an empty `$(...)` reference is not a variable); skipped
+DIAG config.invalid_value: /vedit-build/evidence/review-a9/a/project.f:12: unresolved variable `$MISSING_VAR` (set it in the project variables or the environment); the line is skipped

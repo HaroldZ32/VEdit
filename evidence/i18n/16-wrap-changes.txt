@@ -1,0 +1,328 @@
+/home/haroldzhao/MyProj/DshProj/VEdit/src/app/app_shell.cpp: 14 change(s)
+   T032 L516: 'About VEdit'
+   T068 L342: 'Empty state: no project open. This panel stays usable and empty.'
+   T069 L343: 'Empty state: nothing to show for this project yet.'
+   T173 L666: 'Save failed: %1'
+   T182 L348: 'Source Control'
+   T249 L236: 'cannot open %1'
+   T252 L211: 'cannot open %1: not a regular file'
+   T281 L615: 'dock layout could not be restored (KTextEditor/version mismatch?)'
+   T285 L621: 'editor layout: %1'
+   T349 L673: 'no active editor pane'
+   T403 L552: "session mentions unknown panel '%1'"
+   T435 L679: 'the editor provider refused the save'
+   T445 L574: 'theme fallback: %1'
+   T462 L632: 'window geometry could not be restored'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/app/command_registry.cpp: 6 change(s)
+   T240 L106: 'cannot commit shortcut store %1'
+   T245 L84: 'cannot create shortcut store directory %1'
+   T257 L34: 'cannot read shortcut store %1'
+   T262 L99: 'cannot write shortcut store %1'
+   T321 L42: 'invalid shortcut store %1: %2'
+   T363 L253: 'no shortcut store configured'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/app/editor_area.cpp: 9 change(s)
+   T047 L215: 'Close Pane'
+   T120 L367: 'No editor provider connected.'
+   T322 L1653: 'layout has no root object'
+   T323 L1673: 'layout parse failed'
+   T324 L1562: 'leaf node without pane id'
+   T373 L766: 'open: the pane has no editor provider'
+   T416 L1609: 'split node needs two object children'
+   T417 L1601: 'split node without a valid orientation'
+   T456 L1629: "unknown layout node type '%1'"
+/home/haroldzhao/MyProj/DshProj/VEdit/src/app/editor_provider.cpp: 1 change(s)
+   T271 L23: 'demo editor (shell placeholder)'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/app/editor_provider.h: 3 change(s)
+   T252 L124: 'cannot open %1: not a regular file'
+   T255 L131: 'cannot read %1: %2'
+   T260 L258: 'cannot write %1: %2'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/app/main.cpp: 10 change(s)
+   T045 L1400: 'Capture split-state screenshots into this directory and exit.'
+   T066 L1387: 'Directory for session.json and shortcuts.json.'
+   T097 L1403: 'Ignore an existing session file at startup.'
+   T098 L1391: 'KSyntaxHighlighting theme name.'
+   T106 L1404: 'Keep the window for this many ms.'
+   T172 L938: 'Save failed'
+   T172 L941: 'Save failed'
+   T209 L1512: 'Use &tree-sitter parsing'
+   T210 L1380: 'VEdit application shell (Qt6/KTextEditor rewrite).'
+   T399 L684: 'search panel from a registered factory'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/app/panel_registry.cpp: 1 change(s)
+   T067 L48: 'Empty state: no project / no data.'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/app/session_store.cpp: 5 change(s)
+   T239 L260: 'cannot commit session %1'
+   T244 L246: 'cannot create session directory %1'
+   T256 L226: 'cannot read session %1'
+   T261 L253: 'cannot write session %1'
+   T320 L234: 'invalid session %1: %2'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/app/theme_manager.cpp: 1 change(s)
+   T457 L55: "unknown theme '%1' (or not loaded by KSyntaxHighlighting)"
+/home/haroldzhao/MyProj/DshProj/VEdit/src/editor/fim/fim_backend.cpp: 2 change(s)
+   T428 L24: 'the Rust service reported no detail'
+   T453 L177: 'unavailable (no Rust service in this build)'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/editor/kernel/atomic_save.cpp: 5 change(s)
+   T248 L93: 'cannot create the temporary file %1: %2'
+   T253 L153: 'cannot open the directory for fsync: %1'
+   T258 L68: 'cannot save %1: directory %2 does not exist'
+   T259 L72: 'cannot save %1: directory %2 is not writable'
+   T277 L142: 'directory fsync not supported here (%1); the rename is complete'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/editor/kernel/document_io.cpp: 9 change(s)
+   T103 L109: 'KTextEditor::Document::setText() failed'
+   T104 L48: 'KTextEditor::Document::setText() failed for %1'
+   T105 L79: 'KTextEditor::Editor::createDocument() returned null'
+   T251 L42: 'cannot open %1: it looks like a binary file'
+   T252 L28: 'cannot open %1: not a regular file'
+   T255 L35: 'cannot read %1: %2'
+   T374 L21: 'openFile: no document'
+   T397 L170: 'saveAtomic: the document has no file path'
+   T406 L103: 'setText: no document'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/editor/kernel/find_replace.cpp: 3 change(s)
+   T307 L113: 'find: no document'
+   T308 L117: 'find: the pattern is empty'
+   T389 L234: 'replace-all replaced %1 of %2 matches'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/editor/kernel/goto_line.cpp: 4 change(s)
+   T313 L37: 'goto-line: cursor landed at %1:%2 instead of %3:0'
+   T314 L12: 'goto-line: no view/document'
+   T315 L31: 'goto-line: setCursorPosition(%1) failed'
+   T316 L18: 'goto-line: the document has no lines'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/editor/kernel/highlight_diagnosis.cpp: 5 change(s)
+   T267 L162: 'definitionForFileName(top.sv): %1'
+   T268 L160: 'definitionForFileName(top.v): %1'
+   T269 L159: 'definitionForName(SystemVerilog): %1'
+   T270 L158: 'definitionForName(Verilog): %1'
+   T390 L153: 'repository-definition %1'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/editor/kernel/highlight_mode.cpp: 4 change(s)
+   T102 L130: "KTextEditor::Document::setHighlightingMode('%1') failed"
+   T353 L102: 'no document to highlight'
+   T365 L109: 'no syntax definition for %1'
+   T434 L137: "the document reports highlighting mode '%1' instead of '%2'"
+/home/haroldzhao/MyProj/DshProj/VEdit/src/editor/kernel/ktexteditor_provider.cpp: 3 change(s)
+   T101 L77: 'KTextEditor (edit-core)'
+   T252 L155: 'cannot open %1: not a regular file'
+   T395 L317: 'save: the document has no file path yet'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/editor/kernel/multi_cursor.cpp: 10 change(s)
+   T333 L329: 'multi-cursor: View::insertText() failed'
+   T334 L166: 'multi-cursor: asked for %1 cursors, the view reports %2'
+   T335 L214: 'multi-cursor: inserted at %1 of %2 cursors'
+   T336 L189: 'multi-cursor: no document'
+   T336 L232: 'multi-cursor: no document'
+   T337 L159: 'multi-cursor: no positions given'
+   T337 L193: 'multi-cursor: no positions given'
+   T337 L236: 'multi-cursor: no positions given'
+   T338 L155: 'multi-cursor: no view'
+   T338 L324: 'multi-cursor: no view'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/syntax/folding/ksyntax_fold_source.cpp: 4 change(s)
+   T250 L51: 'cannot open %1: %2'
+   T254 L90: 'cannot parse %1: %2'
+   T309 L117: 'fold lists of region %1 are empty'
+   T414 L137: 'source is not loaded: %1'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/syntax/folding/syntax_fold_source.cpp: 5 change(s)
+   T317 L38: "grammar '%1' is not registered"
+   T362 L45: "no provider for grammar '%1'"
+   T379 L54: 'parse returned no tree'
+   T385 L63: "provider '%1' parsed %2 fold ranges"
+   T452 L31: 'tree-sitter switch is off'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/syntax/kde/ksyntax_data.cpp: 1 change(s)
+   T383 L111: 'private syntax directory missing: %1/syntax (set VEDIT_SYNTAX_DIR)'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/breadcrumb/syntax_breadcrumb_source.cpp: 3 change(s)
+   T362 L25: "no provider for grammar '%1'"
+   T362 L49: "no provider for grammar '%1'"
+   T379 L56: 'parse returned no tree'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/diagnostics/diagnostics_controller.cpp: 9 change(s)
+   T108 L286: 'LSP backend is not configured (no workspace root)'
+   T343 L276: 'no LSP backend in this build'
+   T346 L411: 'no SLANG backend'
+   T347 L312: 'no SLANG backend in this build'
+   T355 L201: 'no effective file set'
+   T357 L617: 'no navigation request in flight'
+   T388 L207: 'reparsing %1 file(s)'
+   T404 L294: 'session started over %1 file(s)'
+   T424 L392: 'the LSP session did not start'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/diagnostics/diagnostics_panel.cpp: 2 change(s)
+   T284 L301: 'editor buffer, not saved yet'
+   T351 L281: 'no diagnostics controller'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/diagnostics/diagnostics_selftest.cpp: 1 change(s)
+   T065 L534: 'Diagnostics unavailable'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/diagnostics/ffi_backends.cpp: 8 change(s)
+   T343 L797: 'no LSP backend in this build'
+   T344 L342: 'no LSP request to poll'
+   T345 L246: 'no LSP session'
+   T345 L322: 'no LSP session'
+   T348 L619: 'no SLANG ticket to poll'
+   T427 L195: 'the Rust service handle could not be created'
+   T427 L581: 'the Rust service handle could not be created'
+   T431 L609: 'the SLANG job id does not fit the backend ticket type'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/diagnostics/selftests/diagnostics_product_seam.cpp: 3 change(s)
+   T029 L181: ': 0 diagnostic(s)'
+   T065 L160: 'Diagnostics unavailable'
+   T366 L103: 'no temporary directory'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/diagnostics/toolchain_selftest.cpp: 1 change(s)
+   T065 L152: 'Diagnostics unavailable'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/diagnostics/toolchain_ux_selftest.cpp: 1 change(s)
+   T065 L124: 'Diagnostics unavailable'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/filetree/file_kind.cpp: 1 change(s)
+   T095 L53: 'File list'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/filetree/file_ops.cpp: 16 change(s)
+   T022 L69: "'%1' is a reserved name"
+   T024 L145: "'%1' no longer exists"
+   T024 L180: "'%1' no longer exists"
+   T031 L96: 'A file or folder named %1 already exists'
+   T031 L123: 'A file or folder named %1 already exists'
+   T031 L154: 'A file or folder named %1 already exists'
+   T050 L107: 'Could not create file %1'
+   T051 L130: 'Could not create folder %1'
+   T052 L202: 'Could not delete %1'
+   T053 L168: 'Could not rename %1 to %2'
+   T110 L78: 'Name is longer than the 255-byte filesystem limit'
+   T111 L66: 'Name must not be empty'
+   T112 L75: 'Name must not contain a NUL character'
+   T113 L72: 'Name must not contain a path separator'
+   T437 L33: "the folder '%1' is not writable"
+   T438 L194: 'the folder is not empty'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/filetree/file_tree_model.cpp: 4 change(s)
+   T201 L90: "The folder '%1' cannot be read (permission denied)."
+   T201 L423: "The folder '%1' cannot be read (permission denied)."
+   T202 L78: "The folder '%1' does not exist."
+   T381 L420: 'permission denied: %1'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/filetree/file_tree_widget.cpp: 25 change(s)
+   T040 L312: 'Cannot delete the folder that is open. Close it first.'
+   T040 L497: 'Cannot delete the folder that is open. Close it first.'
+   T043 L151: "Cannot read '%1': %2"
+   T048 L77: 'Collapse every expanded folder'
+   T054 L57: 'Create a file here (Ctrl+N)'
+   T055 L61: 'Create a folder here (Ctrl+Shift+N)'
+   T058 L234: "Created file '%1' (%2)"
+   T059 L266: "Created folder '%1'"
+   T061 L69: 'Delete the selection (Del)'
+   T131 L53: 'Open a folder'
+   T132 L217: 'Open a folder first.'
+   T132 L219: 'Open a folder first.'
+   T132 L249: 'Open a folder first.'
+   T132 L251: 'Open a folder first.'
+   T132 L436: 'Open a folder first.'
+   T132 L455: 'Open a folder first.'
+   T145 L73: 'Re-read the folder from disk (F5)'
+   T148 L65: 'Rename the selection (F2)'
+   T149 L295: "Renamed '%1' to '%2'"
+   T176 L276: 'Select a file or folder first.'
+   T176 L278: 'Select a file or folder first.'
+   T176 L305: 'Select a file or folder first.'
+   T176 L307: 'Select a file or folder first.'
+   T176 L474: 'Select a file or folder first.'
+   T176 L493: 'Select a file or folder first.'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/filetree/filetree_integration.cpp: 3 change(s)
+   T041 L44: 'Cannot open %1'
+   T042 L40: 'Cannot open %1: no active editor pane'
+   T375 L52: 'openFileInEditor: the application shell is not part of this build'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/module_tree/hierarchy_client.cpp: 1 change(s)
+   T427 L214: 'the Rust service handle could not be created'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/palette/command_palette.cpp: 5 change(s)
+   T096 L147: 'Go to file…'
+   T121 L419: 'No files indexed for this project yet.'
+   T123 L320: 'No matching files'
+   T124 L432: 'No project'
+   T126 L417: 'No project open — open a project root to jump between files.'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/palette/command_palette.h: 1 change(s)
+   T123 L68: 'No matching files'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/palette/file_index.cpp: 2 change(s)
+   T368 L82: 'no workspace root configured'
+   T463 L89: 'workspace root is not a directory: %1'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/palette/palette_bench.cpp: 1 change(s)
+   T241 L100: 'cannot create %1'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/palette/palette_integration.cpp: 3 change(s)
+   T017 L91: '&Go to File…'
+   T041 L189: 'Cannot open %1'
+   T042 L183: 'Cannot open %1: no active editor pane'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/palette/palette_integration_selftest.cpp: 1 change(s)
+   T123 L10: 'No matching files'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/palette/palette_selftest.cpp: 2 change(s)
+   T123 L5: 'No matching files'
+   T124 L226: 'No project'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/project/project_model.cpp: 9 change(s)
+   T002 L376: ' (expanding…)'
+   T003 L382: ' (live)'
+   T004 L378: ' (refresh failed)'
+   T005 L380: ' (restored from last session)'
+   T125 L347: 'No project open'
+   T360 L125: 'no project is open'
+   T441 L528: 'the project job was rejected by the service'
+   T442 L502: 'the project service did not answer in %1 ms'
+   T443 L551: 'the project service failed'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/project/project_panel.cpp: 2 change(s)
+   T063 L483: 'Diagnostics (%1)'
+   T064 L151: 'Diagnostics (0)'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/project/project_selftest.cpp: 1 change(s)
+   T125 L234: 'No project open'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/project/project_service.cpp: 1 change(s)
+   T425 L123: 'the Rust project service is unavailable'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/project/project_state.cpp: 6 change(s)
+   T238 L168: 'cannot commit %1: %2'
+   T241 L154: 'cannot create %1'
+   T255 L122: 'cannot read %1: %2'
+   T260 L161: 'cannot write %1: %2'
+   T364 L115: 'no state directory is available'
+   T364 L148: 'no state directory is available'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/search/global_search.cpp: 4 change(s)
+   T246 L145: 'cannot create the Rust search service'
+   T400 L129: 'search root does not exist or is not a directory: %1'
+   T401 L134: 'search root is not readable: %1'
+   T426 L28: 'the Rust search service did not report a reason'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/search/search_jump_target.cpp: 3 change(s)
+   T135 L119: 'Opened %1 line %2'
+   T249 L82: 'cannot open %1'
+   T405 L101: 'setCursorPosition(%1:%2) failed'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/settings/settings_client.cpp: 6 change(s)
+   T408 L198: 'settings load failed (state %1)'
+   T409 L222: 'settings save failed (state %1)'
+   T429 L125: 'the Rust settings store rejected the path'
+   T430 L165: 'the Rust settings store rejected the write'
+   T448 L126: 'this build has no vd-ffi settings ABI'
+   T448 L166: 'this build has no vd-ffi settings ABI'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/settings/settings_panel.cpp: 14 change(s)
+   T046 L921: 'Changes discarded; nothing was stored.'
+   T049 L1498: 'Conflicting shortcuts: %1'
+   T109 L649: 'Loading settings from %1 …'
+   T118 L933: 'No configuration problems reported by the Rust store.'
+   T119 L1494: 'No conflicting shortcuts.'
+   T175 L794: 'Select a command in the table first.'
+   T179 L673: 'Settings loaded from %1'
+   T180 L655: 'Settings unavailable; showing the built-in defaults.'
+   T181 L785: "Shortcut for '%1' cleared (default restored)."
+   T187 L833: 'Stored by the Rust service in %1'
+   T187 L897: 'Stored by the Rust service in %1'
+   T203 L748: "Theme '%1' applied and stored by the Rust service."
+   T204 L741: "Theme '%1' could not be applied."
+   T407 L652: 'settings could not be loaded'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/vcs/vcs_panel.cpp: 3 change(s)
+   T117 L133: 'No VCS backend available.'
+   T369 L123: 'not a Git or Subversion working tree'
+   T465 L109: '· %1 changed file(s)'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/vcs/vcs_selftest.cpp: 3 change(s)
+   T128 L108: 'No repository'
+   T369 L99: 'not a Git or Subversion working tree'
+   T369 L111: 'not a Git or Subversion working tree'
+/home/haroldzhao/MyProj/DshProj/VEdit/src/workspace/vcs/vcs_source.cpp: 1 change(s)
+   T128 L28: 'No repository'
+
+TOTAL files=54 changes=251 skipped=20
+SKIP /home/haroldzhao/MyProj/DshProj/VEdit/src/app/app_shell.cpp T014 already-wrapped
+SKIP /home/haroldzhao/MyProj/DshProj/VEdit/src/app/app_shell.cpp T015 already-wrapped
+SKIP /home/haroldzhao/MyProj/DshProj/VEdit/src/app/app_shell.cpp T016 already-wrapped
+SKIP /home/haroldzhao/MyProj/DshProj/VEdit/src/app/app_shell.cpp T018 already-wrapped
+SKIP /home/haroldzhao/MyProj/DshProj/VEdit/src/app/app_shell.cpp T019 already-wrapped
+SKIP /home/haroldzhao/MyProj/DshProj/VEdit/src/app/app_shell.cpp T020 already-wrapped
+SKIP /home/haroldzhao/MyProj/DshProj/VEdit/src/app/app_shell.cpp T021 already-wrapped
+SKIP /home/haroldzhao/MyProj/DshProj/VEdit/src/app/app_shell.cpp T140 already-wrapped
+SKIP /home/haroldzhao/MyProj/DshProj/VEdit/src/app/app_shell.cpp T173 already-wrapped
+SKIP /home/haroldzhao/MyProj/DshProj/VEdit/src/app/app_shell.cpp T173 already-wrapped
+SKIP /home/haroldzhao/MyProj/DshProj/VEdit/src/app/app_shell.cpp T173 already-wrapped
+SKIP /home/haroldzhao/MyProj/DshProj/VEdit/src/app/app_shell.cpp T173 already-wrapped
+SKIP /home/haroldzhao/MyProj/DshProj/VEdit/src/app/app_shell.cpp T173 already-wrapped
+SKIP /home/haroldzhao/MyProj/DshProj/VEdit/src/app/app_shell.cpp T173 already-wrapped
+SKIP /home/haroldzhao/MyProj/DshProj/VEdit/src/app/app_shell.cpp T178 already-wrapped
+SKIP /home/haroldzhao/MyProj/DshProj/VEdit/src/app/app_shell.cpp T184 already-wrapped
+SKIP /home/haroldzhao/MyProj/DshProj/VEdit/src/app/app_shell.cpp T185 already-wrapped
+SKIP /home/haroldzhao/MyProj/DshProj/VEdit/src/app/app_shell.cpp T205 already-wrapped
+SKIP /home/haroldzhao/MyProj/DshProj/VEdit/src/app/app_shell.cpp T208 already-wrapped
+SKIP /home/haroldzhao/MyProj/DshProj/VEdit/src/app/app_shell.cpp T208 already-wrapped
+APPLIED

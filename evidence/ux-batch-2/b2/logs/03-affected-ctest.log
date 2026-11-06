@@ -1,0 +1,13 @@
+Test project /vedit-build/target/qt6-build
+    Start 19: vedit-edit-core-selftest
+1/4 Test #19: vedit-edit-core-selftest .............   Passed    0.12 sec
+    Start 21: vedit-editor-find-replace-selftest
+2/4 Test #21: vedit-editor-find-replace-selftest ...   Passed    0.06 sec
+    Start 31: vedit-workspace-search-selftest
+3/4 Test #31: vedit-workspace-search-selftest ......   Passed   12.24 sec
+    Start 32: vedit-search-replace-tests
+4/4 Test #32: vedit-search-replace-tests ...........   Passed    0.61 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =  13.04 sec

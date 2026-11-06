@@ -1,0 +1,13 @@
+Test project /vedit-build/target/qt6-build
+    Start 11: vedit-app-shell-selftest
+1/4 Test #11: vedit-app-shell-selftest ............   Passed    0.78 sec
+    Start 19: vedit-shortcut-key-path-tests
+2/4 Test #19: vedit-shortcut-key-path-tests .......   Passed    0.67 sec
+    Start 29: vedit-undo-view-lifetime-tests
+3/4 Test #29: vedit-undo-view-lifetime-tests ......   Passed    0.22 sec
+    Start 56: vedit-workspace-settings-selftest
+4/4 Test #56: vedit-workspace-settings-selftest ...   Passed    1.35 sec
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   3.02 sec

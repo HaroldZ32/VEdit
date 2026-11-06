@@ -1,0 +1,84 @@
+# source/binary mtimes recorded at 2026-11-02T19:08:09+08:00 (CST)
+## product sources
+2026-11-02 12:49:37.5847847380 crates/vd-ffi/src/fim.rs
+2026-11-02 12:49:37.5847847380 crates/vd-ffi/src/lib.rs
+2026-11-02 12:49:37.5847847380 crates/vd-ffi/src/search.rs
+2026-11-02 12:49:37.5847847380 crates/vd-ffi/src/service.rs
+2026-11-02 12:49:37.5847847380 crates/vd-ffi/src/vcs.rs
+2026-11-02 14:40:07.4354763070 src/workspace/integration.h
+2026-11-02 14:57:37.8719878590 crates/vd-ffi/src/settings.rs
+2026-11-02 15:43:51.9130984070 crates/vd-ffi/src
+2026-11-02 15:45:35.4258184910 crates/vd-ffi/src/lsp.rs
+2026-11-02 16:18:42.9044101350 crates/vd-ffi/src/capi.rs
+2026-11-02 16:18:42.9184108410 crates/vd-ffi/src/deeplint.rs
+2026-11-02 16:22:53.0010280900 crates/vd-ffi/src/project.rs
+2026-11-02 16:43:35.2819442940 src/workspace/module_tree/hierarchy_tree.h
+2026-11-02 16:49:10.2007056140 src/workspace/module_tree/hierarchy_client.h
+2026-11-02 16:52:22.9223991630 src/workspace/module_tree/module_tree_panel.h
+2026-11-02 16:52:38.2966221400 src/workspace/module_tree/module_tree_integration.h
+2026-11-02 16:54:07.4141190130 src/app/CMakeLists.txt
+2026-11-02 16:54:17.6486326090 src/workspace/integration.cpp
+2026-11-02 16:56:44.5066010900 src/workspace/module_tree/hierarchy_types.h
+2026-11-02 16:56:44.5071357960 src/workspace/module_tree/hierarchy_types.cpp
+2026-11-02 16:56:44.5076861520 src/workspace/module_tree/hierarchy_tree.cpp
+2026-11-02 16:56:44.5079680020 src/workspace/module_tree/module_tree_integration.cpp
+2026-11-02 17:01:55.6786178320 src/workspace/module_tree/hierarchy_client.cpp
+2026-11-02 17:07:34.3716143200 crates/vd-deeplint/src/hierarchy.rs
+2026-11-02 17:10:09.2323856670 src/workspace/module_tree
+2026-11-02 17:10:09.2343857670 src/workspace/module_tree/README.md
+2026-11-02 17:21:12.5462838030 src/workspace/module_tree/CMakeLists.txt
+2026-11-02 17:23:35.9411689610 src/workspace/module_tree/module_tree_selftest.cpp
+2026-11-02 17:28:56.9660166610 src/workspace/module_tree/module_tree_panel.cpp
+## existing binaries
+2026-11-02 19:07:05.448531414 +0800 98160568 target/qt6-build/src/app/vedit-app
+2026-11-02 19:06:58.968209662 +0800 27619312 target/qt6-build/src/app/workspace-lane-module_tree/vedit-module-tree-selftest
+2026-11-02 17:29:31.883301668 +0800 34725624 target/m-tree-probe/product-module-tree-probe
+## fixture
+2026-11-02 17:03:18.813789767 +0800 evidence/m-tree/fixture-generate/gen_top.sv
+2026-11-02 17:03:18.816789917 +0800 evidence/m-tree/fixture-generate/other_top.sv
+2026-11-02 15:16:55.983273258 +0800 probes/slang-spike/fixture/mid.sv
+2026-11-02 15:16:55.988273503 +0800 probes/slang-spike/fixture/top.sv
+## HEAD
+4e2d0a57ca50db9568db5a5b040cc66f04c9a05f
+
+## T37 run artifacts (recorded 2026-11-02T19:18:29+08:00)
+2026-11-02 19:16:29.449378602 +0800 98160568 target/qt6-build/src/app/vedit-app
+2026-11-02 19:16:22.849053909 +0800 27619312 target/qt6-build/src/app/workspace-lane-module_tree/vedit-module-tree-selftest
+2026-11-02 19:18:11.613404407 +0800 58863736 target/t37-probe/t37-module-tree-probe
+2026-11-02 19:18:03.840948763 +0800 14336 evidence/m-tree/probe/t37_module_tree_probe.cpp
+2026-11-02 19:09:33.138864360 +0800 532 evidence/m-tree/fixture-t37/top.sv
+2026-11-02 19:09:33.141864510 +0800 335 evidence/m-tree/fixture-t37/mid.sv
+2026-11-02 19:09:33.144864659 +0800 88 evidence/m-tree/fixture-t37/leaf.sv
+## sha256
+ac9935b527a6a0ce153c4bbaae28ce2b3aa7e43b91a05ed5cdfeafb44429de6f  target/t37-probe/t37-module-tree-probe
+4a070b105e85c31ad98432c922e2d887704865250df9bf63f3a719c87d13eeb5  evidence/m-tree/probe/t37_module_tree_probe.cpp
+44f0149a5cd77535ebb1e6065d9c066e289e7884ef79bfb8302c3e0ad5be3cda  evidence/m-tree/t37-module-tree.png
+6a6c8b6561000cda9f3ffdbf1c48885a45032d8c7699df5ea6ca2995c7b54a6b  evidence/m-tree/t37-lane-module-tree.png
+5482b0793fb5e53ece6e7b86f55ebc66c22b78cc07cdbe8d21af2169ff7b2b51  evidence/m-tree/50-t37-build-20261102.log
+bf16997412b2f86ed5766892d5c766f59fd77715e293732f8c25345f617d5a61  evidence/m-tree/51-t37-lane-selftest-20261102.log
+0e04a2b88905df5495ccec080c9b41b01ba38496a07f1e0efe83b78a344fca60  evidence/m-tree/52-t37-probe-20261102.log
+## image
+image_id=sha256:ad6557e3f5b796e5b928487d87800531bf6c167f362f9a434b93ca7a6542e18f
+## tree state
+HEAD 4e2d0a57ca50db9568db5a5b040cc66f04c9a05f dirty=159
+
+## final chain (2026-11-02T19:20:34+08:00)
+2026-11-02 19:19:59.387706203 +0800 98160568 target/qt6-build/src/app/vedit-app
+2026-11-02 19:19:53.387411028 +0800 27619312 target/qt6-build/src/app/workspace-lane-module_tree/vedit-module-tree-selftest
+2026-11-02 19:20:14.032426628 +0800 58863736 target/t37-probe/t37-module-tree-probe
+5a6b92039e42f471e198e5db618c13e72da24c2619f779567c9519abbde3e640  target/qt6-build/src/app/vedit-app
+989b7c962ffb2987339c8d96d3993274247d9ba6d53a14a1ed26ae7304073376  target/qt6-build/src/app/workspace-lane-module_tree/vedit-module-tree-selftest
+ac9935b527a6a0ce153c4bbaae28ce2b3aa7e43b91a05ed5cdfeafb44429de6f  target/t37-probe/t37-module-tree-probe
+968d3840e84271aa8edb4a21a84d0d58cee3a8557c487893cbbe7e871e4cc6ec  evidence/m-tree/t37-module-tree.png
+85059ad68a2f810835af4d1c8486f95a15b0b568572d8502924ae46406025ecc  evidence/m-tree/t37-lane-module-tree.png
+5482b0793fb5e53ece6e7b86f55ebc66c22b78cc07cdbe8d21af2169ff7b2b51  evidence/m-tree/50-t37-build-20261102.log
+02f67b711f066e724ba57e06ba87f0bbe536ca7715b7c6722d1583adcb0d9411  evidence/m-tree/51-t37-lane-selftest-20261102.log
+143fc328d92953ba6cf25dc002fe99b30a1299251716415242f5eedae48c6e2d  evidence/m-tree/52-t37-probe-20261102.log
+fd770e3b2a2a46f2be1d49d3b34a1853a6a2b8fee4695383901700f1dccd577b  evidence/m-tree/53-t37-probe-build-20261102.log
+f8c14d1be49d125593cfd5a368c8d0bf31285af48fa924c96f8f0d3f5b5bb48c  evidence/m-tree/54-t37-build-rerun-20261102.log
+## dirty=159 HEAD=4e2d0a57ca50db9568db5a5b040cc66f04c9a05f
+## src/crates files newer than 19:00 (other lanes in flight, not this task):
+crates/vd-config/src/filelist.rs
+build/evidence/12-gates-image-build.log
+## evidence/m-tree new/changed in this task:
+?? evidence/m-tree/

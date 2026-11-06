@@ -1,0 +1,7 @@
+# phase durations (2026-11-02T07:36:33Z)
+yum_install_s=53
+python_build_s=45
+configure_s=101
+compile_link_s=241
+total_s=440
+cpus=16

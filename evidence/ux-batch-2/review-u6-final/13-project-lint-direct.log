@@ -1,0 +1,5 @@
+OBSERVED product.auto-pass automatic=1 dialogs-before=1 dialogs-after=1
+CHECK PASS product.automatic-pass-was-automatic
+CHECK PASS product.automatic-no-dialog  before=1 after=1
+SUMMARY checks=11 failures=0 skips=0
+exit=0

@@ -1,0 +1,236 @@
+ M CMakeLists.txt
+ M build/evidence/12-gates-image-build.log
+ M build/evidence/typecheck/00-run.txt
+ M build/evidence/typecheck/10-typecheck-image-build.log
+ M build/evidence/typecheck/11-typecheck-image-id.txt
+ M crates/vd-app/src/diagnostics.rs
+ M crates/vd-app/src/selftest.rs
+ M crates/vd-app/src/slang_worker.rs
+ M crates/vd-config/src/filelist.rs
+ M crates/vd-config/src/project.rs
+ M crates/vd-deeplint/src/binary.rs
+ M crates/vd-deeplint/src/lib.rs
+ M crates/vd-deeplint/src/service.rs
+ M crates/vd-ffi/include/vd_ffi.h
+ M crates/vd-ffi/src/capi.rs
+ M crates/vd-ffi/src/deeplint.rs
+ M crates/vd-ffi/src/lsp.rs
+ M crates/vd-ffi/src/project.rs
+ M crates/vd-ffi/src/settings.rs
+ M crates/vd-lsp/src/client.rs
+ M crates/vd-lsp/src/config.rs
+ M crates/vd-lsp/src/documents.rs
+ M crates/vd-lsp/src/lib.rs
+ M crates/vd-lsp/src/session.rs
+ M crates/vd-lsp/tests/buffer_change.rs
+ M crates/vd-settings/src/lib.rs
+ M docs/BUILD.md
+ M docs/USER_GUIDE.md
+ M evidence/ffi-abi/logs/10-rust-image.txt
+ M evidence/ffi-abi/logs/19-rust-stage-console.log
+ M evidence/ffi-abi/logs/20-cargo-build-release.log
+ M evidence/ffi-abi/logs/21-staticlib.txt
+ M evidence/ffi-abi/logs/22-rust-targets.txt
+ M evidence/ffi-abi/logs/23-cargo-test.log
+ M evidence/ffi-abi/logs/26-vd_ffi.h
+ M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+ M evidence/m0-build/build-logs/20-qt6-image-build.log
+ M evidence/m0-build/build-logs/21-qt6-image-id.txt
+ M evidence/m0-build/build-logs/31-qt6-configure.log
+ M evidence/m0-build/build-logs/32-qt6-build.log
+ M evidence/m0-build/build-logs/33-qt6-ctest.log
+ M evidence/m0-build/build-logs/34-qt6-elf.txt
+ M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+ M packaging/runtime/assemble-appdir.sh
+ M src/app/CMakeLists.txt
+ M src/app/app_shell.cpp
+ M src/app/app_shell.h
+ M src/app/command_registry.cpp
+ M src/app/editor_area.cpp
+ M src/app/editor_area.h
+ M src/app/editor_provider.cpp
+ M src/app/editor_provider.h
+ M src/app/main.cpp
+ M src/app/panel_registry.cpp
+ M src/app/session_store.cpp
+ M src/app/session_store.h
+ M src/app/theme_manager.cpp
+ M src/editor/CMakeLists.txt
+ M src/editor/fim/fim_backend.cpp
+ M src/editor/kernel/atomic_save.cpp
+ M src/editor/kernel/diagnostics_annotations.cpp
+ M src/editor/kernel/diagnostics_annotations.h
+ M src/editor/kernel/document_io.cpp
+ M src/editor/kernel/find_replace.cpp
+ M src/editor/kernel/find_replace.h
+ M src/editor/kernel/fold_breadcrumb.cpp
+ M src/editor/kernel/fold_breadcrumb.h
+ M src/editor/kernel/goto_line.cpp
+ M src/editor/kernel/highlight_diagnosis.cpp
+ M src/editor/kernel/highlight_mode.cpp
+ M src/editor/kernel/ktexteditor_provider.cpp
+ M src/editor/kernel/ktexteditor_provider.h
+ M src/editor/kernel/multi_cursor.cpp
+ M src/editor/kernel/multi_cursor.h
+ M src/syntax/folding/ksyntax_fold_source.cpp
+ M src/syntax/folding/syntax_fold_source.cpp
+ M src/syntax/kde/ksyntax_data.cpp
+ M src/workspace/breadcrumb/CMakeLists.txt
+ M src/workspace/breadcrumb/syntax_breadcrumb_source.cpp
+ M src/workspace/diagnostics/CMakeLists.txt
+ M src/workspace/diagnostics/diagnostics_controller.cpp
+ M src/workspace/diagnostics/diagnostics_controller.h
+ M src/workspace/diagnostics/diagnostics_integration.cpp
+ M src/workspace/diagnostics/diagnostics_integration.h
+ M src/workspace/diagnostics/diagnostics_outline_model.cpp
+ M src/workspace/diagnostics/diagnostics_outline_model.h
+ M src/workspace/diagnostics/diagnostics_panel.cpp
+ M src/workspace/diagnostics/diagnostics_panel.h
+ M src/workspace/diagnostics/diagnostics_selftest.cpp
+ M src/workspace/diagnostics/diagnostics_types.h
+ M src/workspace/diagnostics/ffi_backends.cpp
+ M src/workspace/diagnostics/lsp_backend.h
+ M src/workspace/diagnostics/selftests/diagnostics_product_seam.cpp
+ M src/workspace/diagnostics/slang_backend.h
+ M src/workspace/diagnostics/toolchain.cpp
+ M src/workspace/diagnostics/toolchain.h
+ M src/workspace/diagnostics/toolchain_selftest.cpp
+ M src/workspace/diagnostics/toolchain_ux_selftest.cpp
+ M src/workspace/filetree/file_kind.cpp
+ M src/workspace/filetree/file_ops.cpp
+ M src/workspace/filetree/file_tree_model.cpp
+ M src/workspace/filetree/file_tree_widget.cpp
+ M src/workspace/filetree/filetree_integration.cpp
+ M src/workspace/integration.cpp
+ M src/workspace/integration.h
+ M src/workspace/palette/command_palette.cpp
+ M src/workspace/palette/command_palette.h
+ M src/workspace/palette/file_index.cpp
+ M src/workspace/palette/palette_bench.cpp
+ M src/workspace/palette/palette_integration.cpp
+ M src/workspace/palette/palette_integration_selftest.cpp
+ M src/workspace/palette/palette_selftest.cpp
+ M src/workspace/project/CMakeLists.txt
+ M src/workspace/project/README.md
+ M src/workspace/project/project_integration.cpp
+ M src/workspace/project/project_integration.h
+ M src/workspace/project/project_model.cpp
+ M src/workspace/project/project_model.h
+ M src/workspace/project/project_panel.cpp
+ M src/workspace/project/project_panel.h
+ M src/workspace/project/project_selftest.cpp
+ M src/workspace/project/project_service.cpp
+ M src/workspace/project/project_service.h
+ M src/workspace/project/project_state.cpp
+ M src/workspace/project/project_state.h
+ M src/workspace/search/CMakeLists.txt
+ M src/workspace/search/README.md
+ M src/workspace/search/global_search.cpp
+ M src/workspace/search/search_integration.cpp
+ M src/workspace/search/search_jump_target.cpp
+ M src/workspace/search/search_jump_target.h
+ M src/workspace/search/search_panel.cpp
+ M src/workspace/search/search_panel.h
+ M src/workspace/search/search_selftest.cpp
+ M src/workspace/search/search_types.h
+ M src/workspace/settings/settings_client.cpp
+ M src/workspace/settings/settings_dialog.cpp
+ M src/workspace/settings/settings_panel.cpp
+ M src/workspace/settings/settings_panel.h
+ M src/workspace/settings/settings_selftest.cpp
+ M src/workspace/vcs/vcs_panel.cpp
+ M src/workspace/vcs/vcs_selftest.cpp
+?? crates/vd-deeplint/src/batch.rs
+?? crates/vd-deeplint/src/dedup.rs
+?? crates/vd-deeplint/src/engine.rs
+?? crates/vd-deeplint/src/hierarchy.rs
+?? crates/vd-deeplint/tests/engine_batch.rs
+?? crates/vd-deeplint/tests/fixtures/hierarchy/
+?? crates/vd-deeplint/tests/hierarchy.rs
+?? crates/vd-deeplint/tests/real_tools.rs
+?? crates/vd-ffi/tests/qt_abi_guard.cpp
+?? crates/vd-ffi/tests/qt_abi_guard.rs
+?? crates/vd-lsp/src/backend.rs
+?? crates/vd-lsp/tests/backend_capabilities.rs
+?? crates/vd-settings/src/schema.rs
+?? docs/capability-matrix.md
+?? docs/handover/CELL-20261102-STATUS.md
+?? evidence/baseline/
+?? evidence/d-diagnostics/
+?? evidence/e1-tabs/
+?? evidence/e2-find/
+?? evidence/e3-edit/
+?? evidence/e4-actions/
+?? evidence/e5-advanced/
+?? evidence/g6-diag/
+?? evidence/i18n/05-extracted-at-af85225.log
+?? evidence/i18n/05-extracted-current-broad.log
+?? evidence/i18n/05-extracted-current.json
+?? evidence/i18n/05-extracted-current.log
+?? evidence/i18n/06-extractor-diff.json
+?? evidence/i18n/06-extractor-diff.md
+?? evidence/i18n/07-triage-466.csv
+?? evidence/i18n/07-triage-466.json
+?? evidence/i18n/09-ui-translations.json
+?? evidence/i18n/10-ui-translations-supplementary.json
+?? evidence/i18n/11-reconciliation-466.csv
+?? evidence/i18n/11-reconciliation-466.md
+?? evidence/i18n/12-ui-blocks.md
+?? evidence/i18n/13-coverage.md
+?? evidence/i18n/14-selftest-coverage.md
+?? evidence/i18n/15-t21-report.md
+?? evidence/i18n/16-wrap-changes.txt
+?? evidence/i18n/apply_tr_wrapping.py
+?? evidence/i18n/build_reports.py
+?? evidence/i18n/diff_i18n_lists.py
+?? evidence/i18n/extract_i18n_candidates.py
+?? evidence/i18n/logs/
+?? evidence/i18n/merge_ui_translations.py
+?? evidence/i18n/shots/
+?? evidence/i18n/triage_i18n_candidates.py
+?? evidence/i2-i18n/
+?? evidence/i3-session/
+?? evidence/jump/
+?? evidence/m-tree/
+?? evidence/review-a9/
+?? evidence/review-backend/
+?? evidence/review-jump/
+?? evidence/review-multicursor/
+?? evidence/review-project/
+?? evidence/review-spike/
+?? evidence/review-tabs/
+?? evidence/s1-settings/
+?? evidence/t20-shell/
+?? evidence/w1-rust-engine/
+?? evidence/w2-spike/
+?? evidence/w3-project/
+?? evidence/w4-lint/
+?? evidence/w5-backend/
+?? evidence/w6-hier/
+?? probes/slang-spike/
+?? src/app/i18n.cpp
+?? src/app/i18n.h
+?? src/editor/kernel/editor_advanced.cpp
+?? src/editor/kernel/editor_advanced.h
+?? src/editor/kernel/editor_context_menu.cpp
+?? src/editor/kernel/editor_context_menu.h
+?? src/editor/kernel/find_replace_selftest.cpp
+?? src/editor/kernel/lsp_actions.cpp
+?? src/editor/kernel/lsp_actions.h
+?? src/editor/kernel/multi_cursor_selftest.cpp
+?? src/editor/kernel/signature_help.cpp
+?? src/editor/kernel/signature_help.h
+?? src/editor/kernel/signature_help_selftest.cpp
+?? src/workspace/breadcrumb/breadcrumb_bar.cpp
+?? src/workspace/breadcrumb/breadcrumb_bar.h
+?? src/workspace/breadcrumb/tests/breadcrumb_click_tests.cpp
+?? src/workspace/diagnostics/lint_progress.cpp
+?? src/workspace/diagnostics/lint_progress.h
+?? src/workspace/jump/
+?? src/workspace/module_tree/
+?? src/workspace/project/project_subscription.cpp
+?? src/workspace/project/project_subscription.h
+?? src/workspace/project/project_variables_dialog.cpp
+?? src/workspace/project/project_variables_dialog.h
+?? src/workspace/settings/settings_keys.h
+?? translations/

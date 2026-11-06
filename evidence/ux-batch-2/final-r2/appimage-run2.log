@@ -1,0 +1,585 @@
+== [1/3] package image (vedit-build + gtk3-immodule-xim + ibus-gtk3) ==
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.package
+#1 transferring dockerfile: 1.16kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/vedit-build:local
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/3] FROM docker.io/library/vedit-build:local@sha256:997f74069333f565c2e9166800813f75c80bc5cb0d34749fbffe3a2f320b08f4
+#4 resolve docker.io/library/vedit-build:local@sha256:997f74069333f565c2e9166800813f75c80bc5cb0d34749fbffe3a2f320b08f4 0.0s done
+#4 DONE 0.0s
+
+#5 [2/3] RUN rm -f /etc/yum.repos.d/CentOS-*.repo  && printf '[base]\nname=CentOS-7.9.2009-Base\nbaseurl=%s/os/x86_64/\ngpgcheck=0\n[updates]\nname=CentOS-7.9.2009-Updates\nbaseurl=%s/updates/x86_64/\ngpgcheck=0\n'       "https://mirrors.tuna.tsinghua.edu.cn/centos-vault/7.9.2009" "https://mirrors.tuna.tsinghua.edu.cn/centos-vault/7.9.2009" > /etc/yum.repos.d/packaging.repo  && yum -y install gtk3-immodule-xim ibus-gtk3 wqy-zenhei-fonts file  && yum clean all
+#5 CACHED
+
+#6 [3/3] RUN rpm -q gtk3-immodule-xim ibus-gtk3 wqy-zenhei-fonts  && ls -l /usr/lib64/gtk-3.0/3.0.0/immodules/im-xim.so            /usr/lib64/gtk-3.0/3.0.0/immodules/im-ibus.so            /usr/share/fonts/wqy-zenhei/wqy-zenhei.ttc
+#6 CACHED
+
+#7 exporting to image
+#7 exporting layers done
+#7 exporting manifest sha256:4de47af138744fccd32287afe7b2a8273afc1d951ac0e0da1b9ccfabecedce84 done
+#7 exporting config sha256:63bff40fef50e7ab2cb67a8adbd8d3a19c0590f0a0d2da5b31b06d571f88bf64 done
+#7 exporting attestation manifest sha256:e05ca72ee832d7aad849a7bff87c65736f06b03c5af7fb19dd6e554d88589724
+#7 exporting attestation manifest sha256:e05ca72ee832d7aad849a7bff87c65736f06b03c5af7fb19dd6e554d88589724 0.0s done
+#7 exporting manifest list sha256:025c8c9706f482ecc9f7420859b09d96ef86862063c04960537bdf8da1e12325 0.0s done
+#7 naming to docker.io/library/vedit-appimage-package:local done
+#7 unpacking to docker.io/library/vedit-appimage-package:local done
+#7 DONE 0.1s
+== [2/3] assemble the AppImage from pinned sources ==
+== [1/9] consume the shared release binary (identical in all three products) ==
+source_mode=shared-release-artifact
+git_head=f1b860256b3784b0ecf324b1d17293472f271560
+git_status_porcelain:
+ M build/evidence/12-gates-image-build.log
+ M crates/vd-app/src/diagnostics.rs
+ M crates/vd-app/src/selftest.rs
+ M crates/vd-app/src/slang_worker.rs
+ M crates/vd-config/src/lib.rs
+ M crates/vd-config/src/project.rs
+ M crates/vd-deeplint/Cargo.toml
+ M crates/vd-deeplint/src/batch.rs
+ M crates/vd-deeplint/src/catalog.rs
+ M crates/vd-deeplint/src/diagnostic.rs
+ M crates/vd-deeplint/src/engine.rs
+ M crates/vd-deeplint/src/hierarchy.rs
+ M crates/vd-deeplint/src/lib.rs
+ M crates/vd-deeplint/src/service.rs
+ M crates/vd-deeplint/tests/catalog.rs
+ M crates/vd-deeplint/tests/engine_batch.rs
+ M crates/vd-deeplint/tests/fake_binary.rs
+ M crates/vd-deeplint/tests/real_tools.rs
+ M crates/vd-ffi/include/vd_ffi.h
+ M crates/vd-ffi/src/capi.rs
+ M crates/vd-ffi/src/catalog.rs
+ M crates/vd-ffi/tests/ux_batch_2.rs
+ M docs/USER_GUIDE.md
+ M evidence/appimage/appimagetool-verification.txt
+ M evidence/appimage/build.log
+ M evidence/appimage/glibc-gate.txt
+ M evidence/appimage/payload-binaries.txt
+ M evidence/appimage/payload-vd-app.txt
+ M evidence/appimage/rpath-gate.txt
+ M evidence/appimage/source-tree.txt
+ M evidence/appimage/verible-fetch.log
+ M evidence/ffi-abi/logs/10-rust-image.txt
+ M evidence/ffi-abi/logs/19-rust-stage-console.log
+ M evidence/ffi-abi/logs/20-cargo-build-release.log
+ M evidence/ffi-abi/logs/21-staticlib.txt
+ M evidence/ffi-abi/logs/22-rust-targets.txt
+ M evidence/ffi-abi/logs/23-cargo-test.log
+ M evidence/ffi-abi/logs/24-cargo-tree-vd-ffi.txt
+ M evidence/ffi-abi/logs/26-vd_ffi.h
+ M evidence/m0-build/build-logs/20-qt6-image-build.log
+ M evidence/m0-build/build-logs/21-qt6-image-id.txt
+ M evidence/m0-build/build-logs/31-qt6-configure.log
+ M evidence/m0-build/build-logs/32-qt6-build.log
+ M evidence/m0-build/build-logs/33-qt6-ctest.log
+ M evidence/m0-build/build-logs/34-qt6-elf.txt
+ M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+ M src/app/CMakeLists.txt
+ M src/app/app_shell.cpp
+ M src/app/app_shell.h
+ M src/app/command_registry.cpp
+ M src/app/command_registry.h
+ M src/app/editor_area.cpp
+ M src/app/editor_area.h
+ M src/app/editor_provider.cpp
+ M src/app/main.cpp
+ M src/app/theme_manager.cpp
+ M src/app/ux_selftest.cpp
+ M src/editor/CMakeLists.txt
+ M src/editor/kernel/document_io.cpp
+ M src/editor/kernel/document_io.h
+ M src/editor/kernel/multi_cursor.cpp
+ M src/editor/kernel/multi_cursor.h
+ M src/editor/kernel/multi_cursor_selftest.cpp
+ M src/editor/kernel/native_fold_tests.cpp
+ M src/workspace/diagnostics/CMakeLists.txt
+ M src/workspace/diagnostics/README.md
+ M src/workspace/diagnostics/diagnostic_hover.cpp
+ M src/workspace/diagnostics/diagnostics_controller.cpp
+ M src/workspace/diagnostics/diagnostics_controller.h
+ M src/workspace/diagnostics/diagnostics_integration.cpp
+ M src/workspace/diagnostics/diagnostics_integration.h
+ M src/workspace/diagnostics/ffi_backends.cpp
+ M src/workspace/diagnostics/project_lint_trigger.cpp
+ M src/workspace/diagnostics/project_lint_trigger.h
+ M src/workspace/diagnostics/selftests/b3_wiring_e2e.cpp
+ M src/workspace/diagnostics/selftests/lint_experience_selftest.cpp
+ M src/workspace/diagnostics/selftests/project_lint_e2e.cpp
+ M src/workspace/filetree/file_status_delegate.cpp
+ M src/workspace/filetree/file_status_delegate.h
+ M src/workspace/filetree/file_tree_model.cpp
+ M src/workspace/filetree/file_tree_model.h
+ M src/workspace/filetree/file_tree_widget.cpp
+ M src/workspace/filetree/file_tree_widget.h
+ M src/workspace/filetree/filetree_integration.cpp
+ M src/workspace/filetree/tests/filetree_tests.cpp
+ M src/workspace/jump/README.md
+ M src/workspace/jump/jump_registry.cpp
+ M src/workspace/jump/jump_registry.h
+ M src/workspace/jump/jump_target.h
+ M src/workspace/jump/tests/jump_tests.cpp
+ M src/workspace/module_tree/README.md
+ M src/workspace/module_tree/catalog_client.cpp
+ M src/workspace/module_tree/interface_panel.cpp
+ M src/workspace/module_tree/module_tree_panel.cpp
+ M src/workspace/module_tree/module_tree_selftest.cpp
+ M src/workspace/project/CMakeLists.txt
+ M src/workspace/project/project_integration.cpp
+ M src/workspace/project/project_model.cpp
+ M src/workspace/project/project_model.h
+ M src/workspace/project/project_panel.cpp
+ M src/workspace/project/project_panel.h
+ M src/workspace/project/project_selftest.cpp
+ M src/workspace/project/project_state.cpp
+ M src/workspace/project/project_state.h
+ M src/workspace/project/project_variables_dialog.cpp
+ M src/workspace/project/project_variables_dialog.h
+ M src/workspace/search/search_jump_target.cpp
+ M src/workspace/search/search_jump_target.h
+ M src/workspace/settings/settings_panel.cpp
+ M src/workspace/settings/settings_panel.h
+ M src/workspace/settings/settings_selftest.cpp
+ M translations/vedit_zh_CN.ts
+?? crates/vd-config/src/language.rs
+?? crates/vd-deeplint/src/ast_prune.rs
+?? crates/vd-deeplint/src/tool_paths.rs
+?? crates/vd-deeplint/tests/scale_gate.rs
+?? crates/vd-deeplint/tests/stream_memory.rs
+?? evidence/ux-batch-2/REAL-MACHINE-FINDINGS.md
+?? evidence/ux-batch-2/RETEST-CHECKLIST.md
+?? evidence/ux-batch-2/final-r2/
+?? evidence/ux-batch-2/fold-regression/
+?? evidence/ux-batch-2/i18n-closeout/
+?? evidence/ux-batch-2/integration-selftests/
+?? evidence/ux-batch-2/review-rm10-final/
+?? evidence/ux-batch-2/review-rm23-final/
+?? evidence/ux-batch-2/review-rm4-final/
+?? evidence/ux-batch-2/review-rm5-final/
+?? evidence/ux-batch-2/review-rm6-final/
+?? evidence/ux-batch-2/review-rm7-final/
+?? evidence/ux-batch-2/review-rm8-final/
+?? evidence/ux-batch-2/review-rm9-final/
+?? evidence/ux-batch-2/review-u9-final/
+?? evidence/ux-batch-2/rm10-hover/
+?? evidence/ux-batch-2/rm11-hdl-filter/
+?? evidence/ux-batch-2/rm12-reset-layout/
+?? evidence/ux-batch-2/rm2-project-switch/
+?? evidence/ux-batch-2/rm3-variables/
+?? evidence/ux-batch-2/rm4-jump/
+?? evidence/ux-batch-2/rm4b-columns/
+?? evidence/ux-batch-2/rm5-undo/
+?? evidence/ux-batch-2/rm5b-shortcuts/
+?? evidence/ux-batch-2/rm5c-defaults/
+?? evidence/ux-batch-2/rm6-gestures/
+?? evidence/ux-batch-2/rm7-disabled-look/
+?? evidence/ux-batch-2/rm7b-disabled-followups/
+?? evidence/ux-batch-2/rm8-manual/
+?? evidence/ux-batch-2/rm8b-bindings/
+?? evidence/ux-batch-2/rm9-dots/
+?? evidence/ux-batch-2/u8-final/ctest-failing4.log
+?? evidence/ux-batch-2/u8-final/ctest-integration-2.log
+?? evidence/ux-batch-2/u8-final/ctest-integration.log
+?? evidence/ux-batch-2/u8-final/rust-gates-rerun.log
+?? evidence/ux-batch-2/u8-final/rust-gates-rerun2.log
+?? evidence/ux-batch-2/u9-slang-limit/
+?? evidence/ux-batch-2/u9a-catalog-scale/
+?? evidence/ux-batch-2/u9b-lint-flood/
+?? evidence/ux-batch-2/u9c-scale-gate/
+?? evidence/ux-batch-2/u9d-depth/
+?? probes/slang-spike/
+?? qt6-build/
+?? src/app/desktop_shortcuts.cpp
+?? src/app/desktop_shortcuts.h
+?? src/app/disabled_look_selftest.cpp
+?? src/app/reset_layout_guard_selftest.cpp
+?? src/app/shortcut_key_path_test.cpp
+?? src/common/file_status.h
+?? src/editor/kernel/undo_view_lifetime_test.cpp
+?? src/workspace/diagnostics/selftests/rm2_project_switch_e2e.cpp
+?? src/workspace/diagnostics/selftests/rm9_status_dots_e2e.cpp
+?? src/workspace/diagnostics/selftests/verdict_retention_selftest.cpp
+?? src/workspace/project/language_registry.h
+?? src/workspace/project/project_variables_e2e.cpp
+shared_vd_app=/vedit-build/build/artifacts/vd-app
+shared_vd_app_sha256=b1d81ec632858ceec4c115cabc40cbcec27c7db69eaa46ce89d7675dafd6fc34
+archive_revision=f1b860256b3784b0ecf324b1d17293472f271560
+archive_dir=/vedit-build/packaging/appimage/.cache/src-head (git archive HEAD, fixtures + provenance)
+== [2/9] fetch and verify the pinned Verible suite ==
+using cached /vedit-build/packaging/appimage/.cache/verible.tar.gz
+/vedit-build/packaging/appimage/.cache/verible.tar.gz: OK
+# pinned source
+VERIBLE_URL=https://github.com/chipsalliance/verible/releases/download/v0.0-4298-g085eef05/verible-v0.0-4298-g085eef05-linux-static-x86_64.tar.gz
+VERIBLE_VERSION=v0.0-4298-g085eef05
+
+$ sha256sum /vedit-build/packaging/appimage/.cache/verible.tar.gz
+ca83778c7c2b73272277bd670d1851c8caf973fd3283688aeb0d36d4b3598a90  /vedit-build/packaging/appimage/.cache/verible.tar.gz
+expected=ca83778c7c2b73272277bd670d1851c8caf973fd3283688aeb0d36d4b3598a90
+tarball sha256: OK
+extracted_bin=/vedit-build/packaging/appimage/.cache/verible-extract/verible-v0.0-4298-g085eef05/bin
+$ sha256sum /vedit-build/packaging/appimage/.cache/verible-extract/verible-v0.0-4298-g085eef05/bin/verible-verilog-ls
+07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845  /vedit-build/packaging/appimage/.cache/verible-extract/verible-v0.0-4298-g085eef05/bin/verible-verilog-ls
+expected=07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845
+/vedit-build/packaging/appimage/.cache/verible-extract/verible-v0.0-4298-g085eef05/bin/verible-verilog-ls: OK
+EXIT=0
+$ sha256sum /vedit-build/packaging/appimage/.cache/verible-extract/verible-v0.0-4298-g085eef05/bin/verible-verilog-format
+b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473  /vedit-build/packaging/appimage/.cache/verible-extract/verible-v0.0-4298-g085eef05/bin/verible-verilog-format
+expected=b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473
+/vedit-build/packaging/appimage/.cache/verible-extract/verible-v0.0-4298-g085eef05/bin/verible-verilog-format: OK
+EXIT=0
+$ sha256sum /vedit-build/packaging/appimage/.cache/verible-extract/verible-v0.0-4298-g085eef05/bin/verible-verilog-lint
+b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29  /vedit-build/packaging/appimage/.cache/verible-extract/verible-v0.0-4298-g085eef05/bin/verible-verilog-lint
+expected=b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29
+/vedit-build/packaging/appimage/.cache/verible-extract/verible-v0.0-4298-g085eef05/bin/verible-verilog-lint: OK
+EXIT=0
+shared_vd_app_sha256=b1d81ec632858ceec4c115cabc40cbcec27c7db69eaa46ce89d7675dafd6fc34
+payload_vd_app_sha256=b1d81ec632858ceec4c115cabc40cbcec27c7db69eaa46ce89d7675dafd6fc34
+BYTES_EQUAL=true
+VEDIT_BUILD_LEAKS=0
+== [3/9] consume the T3 slang artifact by its pinned sha256 (never rebuilt) ==
+$ sha256sum /vedit-build/build/slang/out/slang
+63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  /vedit-build/build/slang/out/slang
+expected=63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252
+/vedit-build/packaging/appimage/AppDir/usr/lib/vedit/bin/slang: OK
+EXIT=0
+
+# payload manifest (name, size, sha256, static?)
+verible-verilog-ls	6300864	07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845		not a dynamic executable
+verible-verilog-format	4231008	b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473		not a dynamic executable
+verible-verilog-lint	4759200	b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29		not a dynamic executable
+slang	9526400	63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252		linux-vdso.so.1 =>  (0x00007c125f14e000)
+== [4/9] GTK3 runtime closure, GtkSourceView data, loaders, immodules ==
+# GTK3 runtime + transitive closure (recursive ldd; glibc/libgcc/libstdc++ excluded)
+# count: 74
+libEGL.so.1	/lib64/libEGL.so.1
+libGL.so.1	/lib64/libGL.so.1
+libGLX.so.0	/lib64/libGLX.so.0
+libGLdispatch.so.0	/lib64/libGLdispatch.so.0
+libX11.so.6	/lib64/libX11.so.6
+libXau.so.6	/lib64/libXau.so.6
+libXcomposite.so.1	/lib64/libXcomposite.so.1
+libXcursor.so.1	/lib64/libXcursor.so.1
+libXdamage.so.1	/lib64/libXdamage.so.1
+libXext.so.6	/lib64/libXext.so.6
+libXfixes.so.3	/lib64/libXfixes.so.3
+libXi.so.6	/lib64/libXi.so.6
+libXinerama.so.1	/lib64/libXinerama.so.1
+libXrandr.so.2	/lib64/libXrandr.so.2
+libXrender.so.1	/lib64/libXrender.so.1
+libatk-1.0.so.0	/lib64/libatk-1.0.so.0
+libatk-bridge-2.0.so.0	/lib64/libatk-bridge-2.0.so.0
+libatspi.so.0	/lib64/libatspi.so.0
+libattr.so.1	/lib64/libattr.so.1
+libblkid.so.1	/lib64/libblkid.so.1
+libbz2.so.1	/lib64/libbz2.so.1
+libcairo-gobject.so.2	/lib64/libcairo-gobject.so.2
+libcairo.so.2	/lib64/libcairo.so.2
+libcap.so.2	/lib64/libcap.so.2
+libcroco-0.6.so.3	/lib64/libcroco-0.6.so.3
+libdbus-1.so.3	/lib64/libdbus-1.so.3
+libdw.so.1	/lib64/libdw.so.1
+libelf.so.1	/lib64/libelf.so.1
+libepoxy.so.0	/lib64/libepoxy.so.0
+libexpat.so.1	/lib64/libexpat.so.1
+libffi.so.6	/lib64/libffi.so.6
+libfontconfig.so.1	/lib64/libfontconfig.so.1
+libfreetype.so.6	/lib64/libfreetype.so.6
+libfribidi.so.0	/lib64/libfribidi.so.0
+libgcrypt.so.11	/lib64/libgcrypt.so.11
+libgdk-3.so.0	/lib64/libgdk-3.so.0
+libgdk_pixbuf-2.0.so.0	/lib64/libgdk_pixbuf-2.0.so.0
+libgio-2.0.so.0	/lib64/libgio-2.0.so.0
+libglib-2.0.so.0	/lib64/libglib-2.0.so.0
+libgmodule-2.0.so.0	/lib64/libgmodule-2.0.so.0
+libgobject-2.0.so.0	/lib64/libgobject-2.0.so.0
+libgpg-error.so.0	/lib64/libgpg-error.so.0
+libgraphite2.so.3	/lib64/libgraphite2.so.3
+libgtk-3.so.0	/lib64/libgtk-3.so.0
+libgtksourceview-4.so.0	/opt/gsv4/lib64/libgtksourceview-4.so.0
+libharfbuzz.so.0	/lib64/libharfbuzz.so.0
+libibus-1.0.so.5	/lib64/libibus-1.0.so.5
+libjasper.so.1	/lib64/libjasper.so.1
+libjbig.so.2.0	/lib64/libjbig.so.2.0
+libjpeg.so.62	/lib64/libjpeg.so.62
+liblz4.so.1	/lib64/liblz4.so.1
+liblzma.so.5	/lib64/liblzma.so.5
+libmount.so.1	/lib64/libmount.so.1
+libpango-1.0.so.0	/lib64/libpango-1.0.so.0
+libpangocairo-1.0.so.0	/lib64/libpangocairo-1.0.so.0
+libpangoft2-1.0.so.0	/lib64/libpangoft2-1.0.so.0
+libpcre.so.1	/lib64/libpcre.so.1
+libpixman-1.so.0	/lib64/libpixman-1.so.0
+libpng15.so.15	/lib64/libpng15.so.15
+librsvg-2.so.2	/lib64/librsvg-2.so.2
+libselinux.so.1	/lib64/libselinux.so.1
+libsystemd.so.0	/lib64/libsystemd.so.0
+libthai.so.0	/lib64/libthai.so.0
+libtiff.so.5	/lib64/libtiff.so.5
+libuuid.so.1	/lib64/libuuid.so.1
+libwayland-client.so.0	/lib64/libwayland-client.so.0
+libwayland-cursor.so.0	/lib64/libwayland-cursor.so.0
+libwayland-egl.so.1	/lib64/libwayland-egl.so.1
+libxcb-render.so.0	/lib64/libxcb-render.so.0
+libxcb-shm.so.0	/lib64/libxcb-shm.so.0
+libxcb.so.1	/lib64/libxcb.so.1
+libxkbcommon.so.0	/lib64/libxkbcommon.so.0
+libxml2.so.2	/lib64/libxml2.so.2
+libz.so.1	/lib64/libz.so.1
+systemverilog.lang
+verilog.lang
+# gdk-pixbuf loaders
+libpixbufloader-ani.so
+libpixbufloader-bmp.so
+libpixbufloader-gif.so
+libpixbufloader-icns.so
+libpixbufloader-ico.so
+libpixbufloader-jasper.so
+libpixbufloader-jpeg.so
+libpixbufloader-pnm.so
+libpixbufloader-qtif.so
+libpixbufloader-svg.so
+libpixbufloader-tga.so
+libpixbufloader-tiff.so
+libpixbufloader-xbm.so
+libpixbufloader-xpm.so
+
+# GTK input-method modules (AC-16)
+total 72
+-rwxr-xr-x 1 root root 33416 Sep 12  2023 im-ibus.so
+-rwxr-xr-x 1 root root 33000 Apr  5  2022 im-xim.so
+b550938d5f264674738965d5d19efdc26ce9ea94fc8c4f4e3c111f1e1ca6c5af  /vedit-build/packaging/appimage/AppDir/usr/lib/gtk-3.0/3.0.0/immodules/im-ibus.so
+0b328924152726c0685e04e06482b4bc55e6799f64a44b8a493081c6775dc24e  /vedit-build/packaging/appimage/AppDir/usr/lib/gtk-3.0/3.0.0/immodules/im-xim.so
+
+# gtk-query-immodules-3.0-64 output (before @APPDIR@ substitution)
+# GTK+ Input Method Modules file
+# Automatically generated file, do not edit
+# Created by gtk-query-immodules-3.0-64 from gtk+-3.22.30
+#
+"@APPDIR@/usr/lib/gtk-3.0/3.0.0/immodules/im-ibus.so" 
+"ibus" "IBus (Intelligent Input Bus)" "ibus" "" "ja:ko:zh:*" 
+
+"@APPDIR@/usr/lib/gtk-3.0/3.0.0/immodules/im-xim.so" 
+"xim" "X Input Method" "gtk30" "/usr/share/locale" "ko:ja:th:zh" 
+
+
+== [5/9] schemas, fonts, icons, desktop entry ==
+# fonts bundled in the payload (no host font is required)
+wqy-zenhei-fonts-0.9.46-11.el7.noarch
+dejavu-sans-fonts-2.33-6.el7.noarch
+dejavu-sans-mono-fonts-2.33-6.el7.noarch
+
+# CJK font licence (recorded for THIRD_PARTY_NOTICES)
+wqy-zenhei-fonts 0.9.46 | licence=GPLv2 with exceptions | url=http://wenq.org/enindex.cgi
+
+/vedit-build/packaging/appimage/AppDir/usr/share/fonts/dejavu:
+total 6396
+-rw-r--r-- 1 root root 672300 Feb 27  2011 DejaVuSans-Bold.ttf
+-rw-r--r-- 1 root root 611212 Feb 27  2011 DejaVuSans-BoldOblique.ttf
+-rw-r--r-- 1 root root 345204 Feb 27  2011 DejaVuSans-ExtraLight.ttf
+-rw-r--r-- 1 root root 611556 Feb 27  2011 DejaVuSans-Oblique.ttf
+-rw-r--r-- 1 root root 720012 Feb 27  2011 DejaVuSans.ttf
+-rw-r--r-- 1 root root 631992 Feb 27  2011 DejaVuSansCondensed-Bold.ttf
+-rw-r--r-- 1 root root 580168 Feb 27  2011 DejaVuSansCondensed-BoldOblique.ttf
+-rw-r--r-- 1 root root 576004 Feb 27  2011 DejaVuSansCondensed-Oblique.ttf
+-rw-r--r-- 1 root root 643852 Feb 27  2011 DejaVuSansCondensed.ttf
+-rw-r--r-- 1 root root 313856 Feb 27  2011 DejaVuSansMono-Bold.ttf
+-rw-r--r-- 1 root root 235848 Feb 27  2011 DejaVuSansMono-BoldOblique.ttf
+-rw-r--r-- 1 root root 241968 Feb 27  2011 DejaVuSansMono-Oblique.ttf
+-rw-r--r-- 1 root root 333632 Feb 27  2011 DejaVuSansMono.ttf
+
+/vedit-build/packaging/appimage/AppDir/usr/share/fonts/wqy-zenhei:
+total 16684
+-rw-r--r-- 1 root root 17083583 May  2  2011 wqy-zenhei.ttc
+/vedit-build/packaging/appimage/AppDir/usr/share/vedit/testdata/definition/a.sv
+/vedit-build/packaging/appimage/AppDir/usr/share/vedit/testdata/definition/b.sv
+== [6/9] AppRun (relocatable launcher) ==
+== [7/9] host-path audit, RUNPATH gate, GLIBC gate ==
+# build-tree path leakage audit
+# 1) build-host checkout paths (the release remap target is /vedit, never /vedit-build):
+none
+BUILD_HOST_PATH_HITS=0
+
+# 1b) remapped source paths under the sandbox root /vedit (panic locations):
+SANDBOX_SOURCE_PATH_LITERALS=508
+/vedit/target/cargo-home/registry/src/index.crates.io-1949cf8c6b5b557f/glib-0.18.5/src/object.rs
+/vedit/target/cargo-home/registry/src/index.crates.io-1949cf8c6b5b557f/futures-channel-0.3.34/src/mpsc/queue.rs
+CONCLUSION: /vedit-build count is 0 (measured on NUL-delimited strings, not
+`strings` output, which glues adjacent literals). What remains are 508
+panic source locations remapped to the sandbox root /vedit — build metadata,
+not a host checkout path, and no runtime lookup. The former env!() fixture
+fallback is gone: vd-app derives the fixtures at runtime and the payload's
+VEDIT_SELFTEST_FIXTURES points at <payload>/usr/share/vedit/testdata.
+
+# 2) launcher/config templates (expect @APPDIR@ placeholders only):
+none
+# 3) @APPDIR@ placeholder counts:
+loaders.cache.in: 14
+immodules.cache.in: 2
+# 4) RPATH/RUNPATH on the main binary:
+none
+ALLOWED	/usr/lib64/elfutils	usr/lib/libdw.so.1
+ELF_SCANNED=95
+ELF_WITH_RUNPATH=1
+ALLOWLIST_HITS=1
+UNKNOWN=0
+RESULT=PASS
+== [8/9] AppImage (appimagetool from the pinned sha256) ==
+APPIMAGETOOL_URL=https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+APPIMAGETOOL_SHA256=793fca0ce4bcc309dc65d3f66669f58e3755643e4dadbe03932e7b436128494f
+793fca0ce4bcc309dc65d3f66669f58e3755643e4dadbe03932e7b436128494f  /vedit-build/packaging/appimage/.cache/appimagetool.AppImage
+/vedit-build/packaging/appimage/.cache/appimagetool.AppImage: OK
+EXIT=0
+appimagetool, continuous build (git version b082d2e), build 333 built on 2026-10-29 19:15:25 UTC
+/vedit-build/packaging/appimage/AppDir/io.github.vedit.VEdit.desktop: hint: value item "TextEditor" in key "Categories" in group "Desktop Entry" can be extended with another category among the following categories: Utility
+Using architecture x86_64
+/vedit-build/packaging/appimage/AppDir should be packaged as /vedit-build/packaging/appimage/out/VEdit-0.1.1-x86_64.AppImage
+Creating .DirIcon symlink based on information from desktop file
+Generating squashfs...
+Downloading runtime file from https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-x86_64
+Downloaded runtime binary of size 944632
+Parallel mksquashfs: Using 16 processors
+Creating 4.0 filesystem on /vedit-build/packaging/appimage/out/VEdit-0.1.1-x86_64.AppImage, block size 131072.
+[=====================================\                        ] 4000/6507  61%[=============================================================\] 6507/6507 100%
+
+Exportable Squashfs 4.0 filesystem, zstd compressed, data block size 131072
+	compressed data, compressed metadata, compressed fragments,
+	compressed xattrs, compressed ids
+	duplicates are removed
+Filesystem size 45703.08 Kbytes (44.63 Mbytes)
+	40.42% of uncompressed filesystem size (113077.75 Kbytes)
+Inode table size 50972 bytes (49.78 Kbytes)
+	24.60% of uncompressed inode table size (207163 bytes)
+Directory table size 68703 bytes (67.09 Kbytes)
+	30.18% of uncompressed directory table size (227617 bytes)
+Number of duplicate files found 338
+Number of inodes 6363
+Number of files 5825
+Number of fragments 212
+Number of symbolic links 68
+Number of device nodes 0
+Number of fifo nodes 0
+Number of socket nodes 0
+Number of directories 470
+Number of hard-links 0
+Number of ids (unique uids + gids) 1
+Number of uids 1
+	root (0)
+Number of gids 1
+	root (0)
+Embedding ELF...
+Marking the AppImage as executable...
+Embedding MD5 digest
+Success
+
+Please consider submitting your AppImage to AppImageHub, the crowd-sourced
+central directory of available AppImages, by opening a pull request
+at https://github.com/AppImage/appimage.github.io
+== [9/9] sizes and checksums ==
+-rwxr-xr-x 1 root root 47745528 Nov  6 10:07 /vedit-build/packaging/appimage/out/VEdit-0.1.1-x86_64.AppImage
+129M	/vedit-build/packaging/appimage/AppDir
+AppImage_bytes=47745528
+AppDir_bytes=117424841
+53622ea8815ba81b8df8cba5279c63c188ed63736a2aab82d35414feaf42eacd  /vedit-build/packaging/appimage/out/VEdit-0.1.1-x86_64.AppImage
+BUILD APPIMAGE OK: /vedit-build/packaging/appimage/out/VEdit-0.1.1-x86_64.AppImage
+== [3/3] clean-room image + offline acceptance ==
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.test
+#1 transferring dockerfile: 1.00kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.m.daocloud.io/library/centos:7
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [1/3] FROM docker.m.daocloud.io/library/centos:7@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+#4 resolve docker.m.daocloud.io/library/centos:7@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4 0.0s done
+#4 DONE 0.0s
+
+#5 [2/3] RUN rm -f /etc/yum.repos.d/CentOS-*.repo  && printf '[base]\nname=CentOS-7.9.2009-Base\nbaseurl=%s/os/x86_64/\ngpgcheck=0\n[updates]\nname=CentOS-7.9.2009-Updates\nbaseurl=%s/updates/x86_64/\ngpgcheck=0\n'       "https://mirrors.tuna.tsinghua.edu.cn/centos-vault/7.9.2009" "https://mirrors.tuna.tsinghua.edu.cn/centos-vault/7.9.2009" > /etc/yum.repos.d/test.repo  && yum -y install xorg-x11-server-Xvfb xorg-x11-utils xorg-x11-apps netpbm netpbm-progs glx-utils mesa-libGL fontconfig  && yum clean all
+#5 CACHED
+
+#6 [3/3] RUN ! rpm -q gtk3 gtksourceview3 gtksourceview4 && echo "clean-room: no gtk/gsv packages present"
+#6 CACHED
+
+#7 exporting to image
+#7 exporting layers done
+#7 exporting manifest sha256:fb4f1a3f78f275a7992417f51fbe8005bfede2858148baad62704e11a80d3836 done
+#7 exporting config sha256:1cc2c5d5a1546fa2779b07e671053fc6028d416e1319fe4929f6f927bdf16f16 done
+#7 exporting attestation manifest sha256:4d3b22dcb3d97ab677980120e0e56603bd44749309fc70120be9d3c7011bd764
+#7 exporting attestation manifest sha256:4d3b22dcb3d97ab677980120e0e56603bd44749309fc70120be9d3c7011bd764 0.0s done
+#7 exporting manifest list sha256:ffbe80ecfca2a99165badfe55f2ed0e4c8d93d35c31b38e65c99f08f033eebd1 0.0s done
+#7 naming to docker.io/library/vedit-appimage-test:local done
+#7 unpacking to docker.io/library/vedit-appimage-test:local done
+#7 DONE 0.1s
+[clean-room] host: CentOS Linux release 7.9.2009 (Core)
+[clean-room] glibc: glibc-2.17-317.el7.x86_64
+[clean-room] PASS: no system gtk3/gsv package installed (negative assertion)
+[clean-room] host CJK fonts available before the payload runs: 0
+[clean-room] PASS: clean room has no CJK font (negative assertion)
+[clean-room] test harness: wrote a 32-hex /etc/machine-id (real CentOS 7 has one)
+[clean-room] PASS: Xvfb :99 up
+[clean-room] appimage=/art/VEdit-0.1.1-x86_64.AppImage
+[clean-room] AppImage --appimage-extract-and-run --selftest all exit=0
+      "checks": [
+      "suite": "smoke"
+      "checks": [
+      "suite": "highlight"
+      "checks": [
+      "suite": "config"
+      "checks": [
+      "suite": "lsp"
+      "checks": [
+      "suite": "slang"
+      "checks": [
+      "suite": "fim"
+  "suite": "all",
+[clean-room] selftest all: 63 checks, 0 failed
+[clean-room] app --screenshot (highlight) exit=0 bytes=33161
+[clean-room] CJK window capture: largest window PNG bytes=21994
+[clean-room] PASS: rendered window captured to screenshots/cjk-window.png (21994 bytes)
+[clean-room] APPIMAGE_EXTRACT_AND_RUN=1 --selftest smoke exit=0
+[clean-room] AppImage direct exec exit=127 (expected 127 without /dev/fuse)
+for more information
+open dir error: No such file or directory
+[clean-room] runtime fallback (XDG_RUNTIME_DIR=/proc/nonexistent): exit=0 warning=1
+[clean-room] runtime fatal (both unusable): exit=1 both-paths-and-hint=1
+[clean-room] runtime default (no XDG_RUNTIME_DIR): exit=0 no-warning=1
+[clean-room] PASS: per-user runtime directory /tmp/vedit-runtime-0 was used
+run=1 exec_to_window_ms=199
+run=2 exec_to_window_ms=200
+run=3 exec_to_window_ms=197
+[clean-room] effective GTK_IM_MODULE_FILE=/tmp/vedit-runtime-0/immodules.cache
+[clean-room] PASS: immodules cache has im-xim and im-ibus with payload paths
+[clean-room] GTK_IM_MODULE=xim selftest smoke exit=0
+[clean-room] PASS: fontconfig resolves the bundled wqy-zenhei CJK font
+[clean-room] PASS: every dependency of vd-app resolves inside the payload
+[clean-room] deps resolved from payload: 67; from host glibc family: 8
+[clean-room] PASS: no verible/slang process or zombie left behind
+AppImage_bytes=47745528
+53622ea8815ba81b8df8cba5279c63c188ed63736a2aab82d35414feaf42eacd  /art/VEdit-0.1.1-x86_64.AppImage
+payload_canonical_bytes=115302370   # method: find -type f -printf '%s' | awk sum (regular files only)
+payload_regular_file_count=5825
+payload_symlink_count=68 payload_symlink_target_bytes=743
+payload_directory_count=470
+payload_du_sb=117408457   # method: du -sb (apparent size incl. 4096 B per directory inode)
+payload_du_sb_apparent_size=117408457
+payload_tar_stream_bytes=120043520   # method: tar -cf - . | wc -c (adds 512 B headers)
+run=1 exec_to_window_ms=199
+run=2 exec_to_window_ms=200
+run=3 exec_to_window_ms=197
+[clean-room] RESULT=PASS
+== done ==
+total 46M
+-rwxr-xr-x 1 haroldzhao haroldzhao 46M Nov  6 18:07 VEdit-0.1.1-x86_64.AppImage

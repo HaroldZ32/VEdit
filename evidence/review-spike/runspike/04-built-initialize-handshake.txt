@@ -1,0 +1,15 @@
+--> {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"processId": null, "clientInfo": {"name": "vedit-spike", "version": "0"}, "rootUri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture", "capabilities": {}, "workspaceFolders": null}}
+<-- {
+ "jsonrpc": "2.0",
+ "id": 1,
+ "error": {
+  "code": -32603,
+  "message": "filesystem error: cannot set current path: No such file or directory"
+ }
+}
+handshake_seconds=0.192
+serverInfo=null
+capabilities=[]
+notifications_before_response=[]
+<-- {"jsonrpc": "2.0", "method": "slang/setConfig", "params": {"flags": "", "incdirs": [], "indexGlobs": [], "index": [], "excludeDirs": [], "indexingThreads": 0, "buildRelativePaths": false, "hovers": {"docCommentFormat": "markdown"}, "inlayHints": {"portTypes": false, "assignmentPatternTypes": true, "activeParameterValues": true, "orderedInstanceNames": true, "wildcardNames": true, "funcArgNames": 2, "macroArgNames": 2}, "builds": []}}
+the server answered initialize without capabilities

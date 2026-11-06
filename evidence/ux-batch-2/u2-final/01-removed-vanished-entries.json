@@ -1,0 +1,149 @@
+[
+ {
+  "lupdate_line": 312,
+  "source": "hierarchy: retrying after the project model…",
+  "prior_translation": "层次：工程模型更新后重试…",
+  "verdict": "reworded",
+  "reason": "\"module catalog: retrying after the project model…\" (module_tree_integration.cpp:414, ModuleTreeHolder::finishRun)"
+ },
+ {
+  "lupdate_line": 313,
+  "source": "No hierarchy yet: open a project and press Refresh.",
+  "prior_translation": "尚无层次：打开工程并点击“刷新”。",
+  "verdict": "reworded",
+  "reason": "\"No module catalog yet: open a project and press Refresh.\" (module_tree_panel.cpp:142 / module_tree_integration.cpp:462)"
+ },
+ {
+  "lupdate_line": 320,
+  "source": "Empty state: no elaborated project yet. Open a project and press Refresh.",
+  "prior_translation": "空状态：尚无已展开的工程。打开工程并点击“刷新”。",
+  "verdict": "reworded",
+  "reason": "\"Empty state: no module catalog yet. Open a project and press Refresh.\" (module_tree_integration.cpp:463)"
+ },
+ {
+  "lupdate_line": 321,
+  "source": "%1 · no file:line reported",
+  "prior_translation": "%1 · 未报告 file:line",
+  "verdict": "reworded",
+  "reason": "\"this marker row has no location\" (module_tree_panel.cpp:398) + \"%1 has no definition position in the module catalog, so nothing was opened\""
+ },
+ {
+  "lupdate_line": 322,
+  "source": "Re-elaborate the whole project",
+  "prior_translation": "重新展开整个工程",
+  "verdict": "reworded",
+  "reason": "\"Re-run the module catalog for the whole project\" (module_tree_panel.cpp:93)"
+ },
+ {
+  "lupdate_line": 323,
+  "source": "Jump to source",
+  "prior_translation": "跳转到源",
+  "verdict": "reworded",
+  "reason": "\"Double-click: open this module's declaration\" (module_tree_panel.cpp:274)"
+ },
+ {
+  "lupdate_line": 324,
+  "source": "Put the cursor on a signal in the editor, then jump to the construct that drives it",
+  "prior_translation": "将光标放在编辑器中的信号上，然后跳转到驱动它的构造",
+  "verdict": "dead",
+  "reason": "signal-driver jump; net/driver/load rows were removed from the module tree by design (module_tree_panel.h:7)"
+ },
+ {
+  "lupdate_line": 325,
+  "source": "Jump to target",
+  "prior_translation": "跳转到目标",
+  "verdict": "dead",
+  "reason": "old jump-to-target / driver-row semantics removed; only the generic Ctrl+double-click instantiation jump remains (interface_panel.cpp:32)"
+ },
+ {
+  "lupdate_line": 326,
+  "source": "Put the cursor on a signal in the editor, then jump to the construct that reads it",
+  "prior_translation": "将光标放在编辑器中的信号上，然后跳转到读取它的构造",
+  "verdict": "dead",
+  "reason": "signal-load jump removed together with nets/drivers/loads"
+ },
+ {
+  "lupdate_line": 327,
+  "source": "Filter instance / net / file…",
+  "prior_translation": "过滤实例 / 网络 / 文件…",
+  "verdict": "reworded",
+  "reason": "\"Filter modules…\" (module_tree_panel.cpp:97)"
+ },
+ {
+  "lupdate_line": 328,
+  "source": "Instance / Net",
+  "prior_translation": "实例 / 网络",
+  "verdict": "reworded",
+  "reason": "headers \"Module\" / \"Instantiations\" / \"Definition\" (module_tree_panel.cpp:105-107)"
+ },
+ {
+  "lupdate_line": 329,
+  "source": "Kind",
+  "prior_translation": "类型",
+  "verdict": "dead",
+  "reason": "no \"Kind\" column or label anywhere in src"
+ },
+ {
+  "lupdate_line": 331,
+  "source": "Hierarchy ready — double-click an instance, a net or a driver/load.",
+  "prior_translation": "层次已就绪——双击实例、网络或驱动/负载。",
+  "verdict": "reworded",
+  "reason": "\"Module tree ready — double-click a module to open its declaration.\" (module_tree_panel.cpp:185)"
+ },
+ {
+  "lupdate_line": 365,
+  "source": "elaborating %1 project file(s)…",
+  "prior_translation": "正在展开 %1 个工程文件…",
+  "verdict": "reworded",
+  "reason": "\"cataloguing %1 project file(s)…\" (catalog_client.cpp:351)"
+ },
+ {
+  "lupdate_line": 697,
+  "source": "A branch name is required.",
+  "prior_translation": "必须填写分支名称。",
+  "verdict": "reworded",
+  "reason": "\"Invalid branch name: %1; nothing was written.\" (vcs_panel.cpp:2401)"
+ },
+ {
+  "lupdate_line": 701,
+  "source": "A tag name is required.",
+  "prior_translation": "必须填写标签名称。",
+  "verdict": "reworded",
+  "reason": "\"Invalid tag name: %1; nothing was written.\" (vcs_panel.cpp:2516)"
+ },
+ {
+  "lupdate_line": 705,
+  "source": "A remote name and a URL are required.",
+  "prior_translation": "必须填写远程仓库名称和 URL。",
+  "verdict": "reworded",
+  "reason": "\"Invalid remote name: %1; nothing was written.\" (vcs_panel.cpp:2589) + \"Invalid URL: %1; nothing was written.\""
+ },
+ {
+  "lupdate_line": 725,
+  "source": "no tags reported by this backend",
+  "prior_translation": "此后端未报告标签",
+  "verdict": "reworded",
+  "reason": "\"No tags\" (vcs_panel.cpp:1145) — the active catalogue entry is translated (没有标签)"
+ },
+ {
+  "lupdate_line": 868,
+  "source": "&Settings",
+  "prior_translation": "设置(&S)",
+  "verdict": "reworded",
+  "reason": "the Settings menu was removed: \"&Edit\" menu label + \"&Preferences…\" item (app_shell.cpp:532)"
+ },
+ {
+  "lupdate_line": 882,
+  "source": "Save As failed: %1",
+  "prior_translation": "另存为失败：%1",
+  "verdict": "stale duplicate",
+  "reason": "live text still emitted as QCoreApplication::translate(\"VEdit\", …) (app_shell.cpp:1153); the ACTIVE \"VEdit\" entry is translated — this old \"ApplicationShell\" entry is a duplicate"
+ },
+ {
+  "lupdate_line": 885,
+  "source": "Save As refused (headless): %1 exists and cannot be overwritten without confirmation",
+  "prior_translation": "另存为被拒绝（无界面运行）：%1 已存在，未经确认不能覆盖",
+  "verdict": "stale duplicate",
+  "reason": "live text still emitted as QCoreApplication::translate(\"VEdit\", …) (app_shell.cpp:1138); the ACTIVE \"VEdit\" entry is translated — this old \"ApplicationShell\" entry is a duplicate"
+ }
+]

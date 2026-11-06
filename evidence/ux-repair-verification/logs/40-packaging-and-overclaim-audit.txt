@@ -1,0 +1,72 @@
+== packaging rebuild prerequisites present ==
+OK target/qt6-build/src/app/vedit-app
+OK target/qt6-build/cmake/smoke/vedit-ksh-env-probe
+OK target/ksh-selfbuild/F2/install
+OK .mpd/recon/verible/bin/verible-verilog-ls
+OK build/slang/out/slang
+OK packaging/appimage/vendor/appimagetool-x86_64
+
+== probe wired into runtime selfcheck and gated ==
+62:if bash "$HERE/probe-apprun-env.sh"; then
+65:  echo "CHECK FAIL  AppRun caller-environment contract"; fail=1
+-- selfcheck exit gate --
+
+echo
+if [ "$fail" -eq 0 ] && [ "$RC" -eq 0 ]; then
+  echo "SELFCHECK PASS"; exit 0
+fi
+echo "SELFCHECK FAIL"; exit 1
+-- build.sh selfcheck step --
+step "3/7 runtime self-check (AppDir, clean env)"
+bash packaging/runtime/selfcheck.sh --appdir "$OUT/AppDir" > "$EVID/30-selfcheck-appdir.log" 2>&1
+rc=$?; echo "selfcheck(appdir) exit=$rc" | tee -a "$EVID/30-selfcheck-appdir.log"
+grep -E 'KSH-ENV defs=|KSH-GUARD|APP-SHELL-SELFTEST|TOOLCHAIN|CHECK |SELFCHECK' "$EVID/30-selfcheck-appdir.log"
+[ "$rc" -eq 0 ] || fail=1
+
+
+== AppRun is installed verbatim into the AppDir ==
+466:install -m 0755 "$ROOT/packaging/runtime/AppRun" "$OUT/AppRun"
+
+== existing out/ artifacts are stale (pre-repair) ==
+2026-11-04 17:38:24.104067507 +0800 packaging/runtime/AppRun
+2026-11-04 14:22:38.127742045 +0800 packaging/runtime/out/AppDir/AppRun
+2026-11-04 14:22:50.276344065 +0800 packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage
+out AppRun VEDIT_SLANG lines:
+  (none: built before the packaged-toolchain block existed)
+77914bf954f99b04ac281ffa805fa63c5c0264faeebc228ea4190a2dfe29ae0d  packaging/runtime/AppRun
+7163be943775a8d852fcc9821f972da2b1ae9cf29cbc8e41f6ca82402dfdbaf4  packaging/runtime/out/AppDir/AppRun
+
+== legacy tarball launcher (out of F1 scope) ==
+# it the editor would open with no syntax colouring (measured in T11).
+export VEDIT_GSV_DATADIR="$HERE/share/gtksourceview-4"
+# Bundled tool locations. Package-relative resolution would find them too, but
+# naming them explicitly keeps the payload unambiguous and makes the selftest's
+# configuration check meaningful.
+export VEDIT_VERIBLE_DIR="$HERE/bin"
+export VEDIT_SLANG="$HERE/bin/slang"
+# The selftest suites need two Verilog fixtures; the packaged copy is used instead
+# of the build-tree path compiled into the binary.
+-- tarball is the legacy Rust/GTK3 product, not packaging/runtime --
+43:# The release ships ONE vd-app binary. build/artifacts/vd-app is the canonical
+48:CANONICAL="$ROOT/build/artifacts/vd-app"
+50:  say "using the canonical release binary: build/artifacts/vd-app"
+52:  VD_APP_SOURCE="canonical:build/artifacts/vd-app"
+53:elif [ -x "$ROOT/target/release/vd-app" ]; then
+54:  say "canonical artifact missing; reusing the workspace release build"
+55:  APP="$ROOT/target/release/vd-app"
+56:  VD_APP_SOURCE="workspace:target/release/vd-app"
+-- packaging/runtime/build.sh does not build packaging/tarball --
+  (no tarball reference)
+
+== diff-check scope ==
+whole-tree: EXIT=2 on six pre-existing, unrelated files (see 00-inventory.txt)
+repair-scoped: EXIT=0
+
+== worktree status note ==
+porcelain -uall count includes this verification directory, gate-refreshed logs and build artifacts; the product-source set newer than 17:30 is exactly the 11 claimed files (00-inventory.txt).
+
+== declared limits from the repair + what this verification did NOT run ==
+- no full AppDir/AppImage build, no CentOS 7 probe, no clean-room run
+- no literal GUI .f open; F2 verified through ApplicationShell::setProjectRoot (the same signal)
+- no GUI dialog for F4; panel/model status path verified directly
+- F1 probe uses the source AppRun; assemble-appdir.sh installs that file verbatim, but the packaged copy itself was not re-extracted

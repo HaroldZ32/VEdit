@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE language>
+<!--
+  VEdit Tcl syntax definition (authored for VEdit; NOT a copy of KDE's tcl.xml).
+  Semantic source: the Tcl 8.6 command set plus the Synopsys SDC/Genus XDC
+  constraint commands (a .sdc / .xdc file is Tcl, per the product decision), so
+  the same definition colours scripts and timing constraints. The definition
+  claims `*.tcl;*.tk` only: `.sdc`/`.xdc` are mapped to "Tcl" by the product's
+  extension table (src/editor/kernel/highlight_mode.cpp), which is what proves
+  that table comes first. KDE's tcl.xml
+  (KF6 6.24) was only consulted for its command inventory; no text was copied.
+  SPDX-License-Identifier: LGPL-2.1-or-later
+  Braces: `{...}` is NOT a string context. Tcl uses braces for word grouping
+  AND for bodies (`proc ... { ... }`); treating them as strings painted whole
+  procedure bodies as text and lost every command inside them. Braces are
+  separators (Operator) here, so the body keeps its keyword/variable colour.
+  Folding: none (a fold region guessed from braces would be wrong more often
+  than right).
+  The file name deliberately differs from KDE's `tcl.xml`.
+-->
+<language name="Tcl" version="1" kateversion="5.0" section="Scripts"
+          extensions="*.tcl;*.tk" mimetype="text/x-tcl"
+          author="VEdit" license="LGPL-2.1-or-later">
+  <highlighting>
+    <list name="keywords">
+      <item>after</item><item>append</item><item>apply</item><item>array</item><item>binary</item><item>break</item><item>catch</item><item>cd</item><item>chan</item><item>clock</item><item>close</item><item>concat</item><item>continue</item><item>coroutine</item><item>dict</item><item>encoding</item><item>eof</item><item>error</item><item>eval</item><item>exec</item><item>exit</item><item>expr</item><item>fblocked</item><item>fconfigure</item><item>file</item><item>fileevent</item><item>flush</item><item>for</item><item>foreach</item><item>format</item><item>gets</item><item>glob</item><item>global</item><item>history</item><item>if</item><item>incr</item><item>info</item><item>interp</item><item>join</item><item>lappend</item><item>lassign</item><item>lindex</item><item>linsert</item><item>list</item><item>llength</item><item>lmap</item><item>load</item><item>lrange</item><item>lrepeat</item><item>lreplace</item><item>lreverse</item><item>lsearch</item><item>lset</item><item>lsort</item><item>namespace</item><item>open</item><item>package</item><item>pid</item><item>proc</item><item>puts</item><item>pwd</item><item>read</item><item>regexp</item><item>regsub</item><item>rename</item><item>return</item><item>scan</item><item>seek</item><item>set</item><item>socket</item><item>source</item><item>split</item><item>string</item><item>subst</item><item>switch</item><item>tailcall</item><item>tell</item><item>throw</item><item>time</item><item>trace</item><item>try</item><item>unknown</item><item>unload</item><item>unset</item><item>update</item><item>uplevel</item><item>upvar</item><item>variable</item><item>vwait</item><item>while</item><item>yield</item><item>yieldto</item><item>else</item><item>elseif</item><item>then</item><item>default</item><item>finally</item><item>on</item><item>export</item><item>import</item><item>provide</item><item>require</item><item>button</item><item>canvas</item><item>checkbutton</item><item>entry</item><item>frame</item><item>grid</item><item>label</item><item>listbox</item><item>menu</item><item>menubutton</item><item>message</item><item>pack</item><item>place</item><item>radiobutton</item><item>scale</item><item>scrollbar</item><item>spinbox</item><item>text</item><item>toplevel</item><item>bind</item><item>bindtags</item><item>event</item><item>font</item><item>image</item><item>focus</item><item>grab</item><item>selection</item><item>wm</item><item>tk</item><item>ttk</item><item>bell</item><item>clipboard</item><item>destroy</item><item>winfo</item><item>raise</item><item>lower</item><item>option</item>
+    </list>
+    <list name="sdcCommands">
+      <item>create_clock</item><item>create_generated_clock</item><item>set_clock_latency</item>
+      <item>set_clock_uncertainty</item><item>set_clock_transition</item><item>set_clock_gating_check</item>
+      <item>set_propagated_clock</item><item>set_input_delay</item><item>set_output_delay</item>
+      <item>set_input_transition</item><item>set_driving_cell</item><item>set_load</item>
+      <item>set_max_delay</item><item>set_min_delay</item><item>set_false_path</item>
+      <item>set_multicycle_path</item><item>set_max_transition</item><item>set_min_transition</item>
+      <item>set_max_fanout</item><item>set_max_capacitance</item><item>set_max_area</item>
+      <item>set_max_leakage_power</item><item>set_max_dynamic_power</item><item>set_operating_conditions</item>
+      <item>set_wire_load_model</item><item>set_wire_load_mode</item><item>set_units</item>
+      <item>set_time_unit</item><item>set_voltage</item><item>set_case_analysis</item>
+      <item>set_disable_timing</item><item>set_data_check</item><item>set_clock_groups</item>
+      <item>set_dont_touch</item><item>set_dont_use</item><item>set_ideal_network</item>
+      <item>set_logic_one</item><item>set_logic_zero</item><item>set_aocv_derate</item>
+      <item>set_timing_derate</item><item>create_voltage_area</item><item>create_power_domain</item>
+      <item>create_net</item><item>create_cell</item><item>current_design</item>
+      <item>current_instance</item><item>link</item><item>link_design</item>
+      <item>read_verilog</item><item>read_def</item><item>read_lef</item><item>read_lib</item>
+      <item>read_sdc</item><item>write_sdc</item><item>source</item>
+    </list>
+    <contexts>
+      <context name="Normal" attribute="Normal Text" lineEndContext="#stay">
+        <!-- `#` starts a comment only at the start of a command; the whitespace
+             form is the one real scripts use and keeps `puts a#b` uncoloured. -->
+        <RegExpr attribute="Comment" context="#stay" String="(^|\s)#.*$"/>
+        <DetectChar attribute="String" context="String" char="&quot;"/>
+        <RegExpr attribute="Variable" context="#stay" String="\$\{[^}\n]*\}"/>
+        <RegExpr attribute="Variable" context="#stay" String="\$[A-Za-z_][A-Za-z0-9_:]*"/>
+        <keyword attribute="SDC Command" context="#stay" String="sdcCommands"/>
+        <keyword attribute="Keyword" context="#stay" String="keywords"/>
+        <RegExpr attribute="Number" context="#stay" String="\b\d+(\.\d+)?([eE][+-]?\d+)?\b"/>
+        <RegExpr attribute="Operator" context="#stay" String="[\[\];+\-*/%&lt;&gt;=&amp;|!~^]+"/>
+      </context>
+      <context name="String" attribute="String" lineEndContext="#pop">
+        <Detect2Chars attribute="String" context="#stay" char="\" char1="&quot;"/>
+        <DetectChar attribute="String" context="#pop" char="&quot;"/>
+      </context>
+    </contexts>
+    <itemDatas>
+      <itemData name="Normal Text" defStyleNum="dsNormal"/>
+      <itemData name="Keyword" defStyleNum="dsKeyword"/>
+      <itemData name="SDC Command" defStyleNum="dsFunction"/>
+      <itemData name="Variable" defStyleNum="dsVariable"/>
+      <itemData name="Comment" defStyleNum="dsComment"/>
+      <itemData name="String" defStyleNum="dsString"/>
+      <itemData name="Number" defStyleNum="dsDecVal"/>
+      <itemData name="Operator" defStyleNum="dsOperator"/>
+    </itemDatas>
+    <keywords casesensitive="1"/>
+  </highlighting>
+</language>

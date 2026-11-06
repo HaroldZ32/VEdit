@@ -45,6 +45,12 @@ struct LoadReport {
     // Definitions shipped in OUR private data dir (file-name based; the distro
     // library may also embed KDE definitions, which must not be used — C7).
     QStringList private_definition_files;
+    // U4b: the definition names the private files really yield — each file must
+    // parse as a usable definition AND be resolvable by the repository under
+    // that name (sorted). A file that is present but is not a usable definition
+    // appears in private_definition_files and NOT here; the product startup-line
+    // assertion reads this list, so a corrupt definition cannot stay green.
+    QStringList resolved_private_definition_names;
     bool private_verilog_shipped = false;
     bool private_systemverilog_shipped = false;
     QStringList theme_names;

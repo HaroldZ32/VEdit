@@ -1,0 +1,34 @@
+# T11: verible-verilog-lint — real CLI vs shipped project-batch ABI
+date: 2026-11-02T18:59:03+08:00
+git_head: 4e2d0a57ca50db9568db5a5b040cc66f04c9a05f
+cli: .mpd/recon/verible/bin/verible-verilog-lint (Version	v0.0-4298-g085eef05)
+batch: evidence/w5-backend/harness/t11_batch_dump.cpp linked against target/release/libvd_ffi.a (fb61b475bc62b25a00685495ad9abe6cd81941928e6b7dbb837d4ea88871e2e5)
+units: CLI = 1-based byte columns; ABI = 0-based line, 0-based UTF-16 column (ASCII differs by 1)
+
+=== undeclared (/tmp/t11-fixture/undeclared.sv) ===
+-- CLI (real binary) exit=1
+-- CLI stdout --
+/tmp/t11-fixture/undeclared.sv:2:11: syntax error at token "b"
+/tmp/t11-fixture/undeclared.sv:4:14-117: syntax error at token "really_long_unknown_signal_name_that_makes_this_line_long_enough_to_trip_the_line_length_rule_1234567890"
+-- CLI stderr --
+-- BATCH (shipped C ABI, engine=1) --
+BATCH status=1 phase-terminal tool='verible-verilog-lint' stage='' message='verible-verilog-lint — 1/1 files, 2 diagnostic(s)'
+BATCH-POLL status=1 count=2
+BATCH-DIAG file='/tmp/t11-fixture/undeclared.sv' line=1 column=10 end_line=1 end_column=10 severity=warning code='' message='syntax error at token "b"'
+BATCH-DIAG file='/tmp/t11-fixture/undeclared.sv' line=3 column=13 end_line=3 end_column=116 severity=warning code='' message='syntax error at token "really_long_unknown_signal_name_that_makes_this_line_long_enough_to_trip_the_line_length_rule_1234567890"'
+COMPARE label=undeclared cli-exit=1 batch-exit=0 cli-findings=2 batch-findings=2 equal=1
+
+=== tabs (/tmp/t11-fixture/tabs.sv) ===
+-- CLI (real binary) exit=1
+-- CLI stdout --
+-- CLI stderr --
+/tmp/t11-fixture/tabs.sv:1:8-10: Declared module does not match the first dot-delimited component of file name: "tabs" [Style: file-names] [module-filename]
+/tmp/t11-fixture/tabs.sv:2:1: Use spaces, not tabs. [Style: tabs] [no-tabs]
+-- BATCH (shipped C ABI, engine=1) --
+BATCH status=1 phase-terminal tool='verible-verilog-lint' stage='' message='verible-verilog-lint — 1/1 files, 2 diagnostic(s)'
+BATCH-POLL status=1 count=2
+BATCH-DIAG file='/tmp/t11-fixture/tabs.sv' line=0 column=7 end_line=0 end_column=9 severity=warning code='module-filename' message='Declared module does not match the first dot-delimited component of file name: "tabs"'
+BATCH-DIAG file='/tmp/t11-fixture/tabs.sv' line=1 column=0 end_line=1 end_column=0 severity=warning code='no-tabs' message='Use spaces, not tabs.'
+COMPARE label=tabs cli-exit=1 batch-exit=0 cli-findings=2 batch-findings=2 equal=1
+
+docker-exit=0

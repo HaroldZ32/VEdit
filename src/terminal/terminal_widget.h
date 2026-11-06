@@ -69,6 +69,11 @@ protected:
     void mouseDoubleClickEvent(QMouseEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
     void showEvent(QShowEvent *event) override;
+    // UX batch 2 (item 11): F1 is the User Manual's window-level shortcut. While
+    // this widget has focus F1 is a PTY key (VT100 "OP"), so the ShortcutOverride
+    // is claimed here and the key arrives at keyPressEvent() instead of firing
+    // the menu action. Same mechanism the editor's find bar uses for Ctrl+F.
+    bool event(QEvent *event) override;
 
 private:
     struct Position {

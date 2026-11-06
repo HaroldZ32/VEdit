@@ -1,0 +1,36 @@
+=== A3 repair R2 — F2 isolation gate (positive + host/user reverse + shadow negative control) ===
+captured: 2026-11-05T03:01:14+08:00
+host: Linux 7.0.0-38-generic x86_64  LANG=zh_CN.UTF-8 LC_ALL=unset
+git HEAD: 4e2d0a57ca50db9568db5a5b040cc66f04c9a05f dirty-entries: 387
+vd-app: 45d929ce287e6a97edd6e287f08ec5470f1bdb4c50a1eba891cae78da9520298
+AppRun: 925ab1500e1504412a2cfa8a492d8140453f803dc3081702fa4412edb62406c3
+probe:  2a6d6ff3c6966f591d8e112a1e55f7b728d0ee35a25b617443d32556437fc87e
+whitelist: Markdown,SystemVerilog,Tcl,VHDL,Verilog
+
+script: packaging/runtime/verify-f2-isolation.sh  sha256=3e8f7736895357d8cc43fe25b0a4ac96b93915be37034c62d0ca4ed91ede68a7
+executed copy: target/a3repair-f2/packaging/runtime/verify-f2-isolation.sh (byte-identical; copied only so ROOT/EVID stay out of other lanes' evidence dirs)  sha256=3e8f7736895357d8cc43fe25b0a4ac96b93915be37034c62d0ca4ed91ede68a7
+command: bash target/a3repair-f2/packaging/runtime/verify-f2-isolation.sh --appdir /home/haroldzhao/MyProj/DshProj/VEdit/target/a3-appdir-repair/AppDir
+
+402
+whitelist: Markdown,SystemVerilog,Tcl,VHDL,Verilog
+whitelist_entries: 5
+fixtures: host_xml=402 user_xml=1 shadow_xml=1
+== positive (AppDir) ==
+appdir winners: Markdown=/app/usr/share/org.kde.syntax-highlighting/syntax/vedit-markdown.xml SystemVerilog=/app/usr/share/org.kde.syntax-highlighting/syntax/vedit-systemverilog.xml Tcl=/app/usr/share/org.kde.syntax-highlighting/syntax/vedit-tcl.xml VHDL=/app/usr/share/org.kde.syntax-highlighting/syntax/vedit-vhdl.xml Verilog=/app/usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml
+CHECK PASS  appdir: defs=5 (whitelist entries)
+CHECK PASS  appdir: names == whitelist [Markdown,SystemVerilog,Tcl,VHDL,Verilog]
+CHECK PASS  appdir: every whitelist name wins from /app/usr/share/org.kde.syntax-highlighting/syntax
+CHECK PASS  appdir: all 5 loaded definitions win from the AppDir
+CHECK PASS  appdir: HostLeakProbe invisible
+CHECK PASS  appdir: UserLeakProbe invisible
+== reverse control: host leak (AppDir) ==
+CHECK PASS  appdir-reverse: reverse control reproduces the host leak (defs=406 > whitelist 5)
+== reverse control: user-level leak (AppDir) ==
+CHECK PASS  appdir-reverse-user: XDG_DATA_HOME=$HOME/.local/share makes the user definition visible (defs=6 > 5; UserLeakProbe=/root/.local/share/org.kde.syntax-highlighting/syntax/UserLeakProbe.xml)
+== negative control: same-name higher-version shadow (AppDir) ==
+CHECK PASS  appdir-shadow: higher-version same-name host Tcl.xml wins when visible (/shadow/org.kde.syntax-highlighting/syntax/Tcl.xml)
+CHECK PASS  appdir-shadow: the winner-path assertion REPORTS the shadowed Tcl (offenders: Tcl=/shadow/org.kde.syntax-highlighting/syntax/Tcl.xml)
+CHECK PASS  appdir-shadow: shadow leaves the name set unchanged (defs=5) - why names alone are insufficient
+== summary: pass=11 fail=0 ==
+F2-ISOLATION PASS
+EXIT=0

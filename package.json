@@ -8,6 +8,7 @@
     "verify:tests": "bash build/gates/tests.sh",
     "verify:typecheck": "bash build/gates/typecheck.sh",
     "verify:docs": "bash build/gates/docs.sh",
+    "verify:lrelease": "bash build/gates/lrelease.sh",
     "verify:manifest": "bash build/gates/manifest.sh",
     "verify:comments": "bash build/gates/comments.sh",
     "verify:rows": "bash build/gates/rows.sh",

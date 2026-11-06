@@ -1,0 +1,25 @@
+{
+ "capabilities": {
+  "codeActionProvider": true,
+  "definitionProvider": true,
+  "diagnosticProvider": {
+   "interFileDependencies": false,
+   "workspaceDiagnostics": false
+  },
+  "documentFormattingProvider": true,
+  "documentHighlightProvider": true,
+  "documentRangeFormattingProvider": true,
+  "documentSymbolProvider": true,
+  "hoverProvider": false,
+  "referencesProvider": true,
+  "renameProvider": true,
+  "textDocumentSync": {
+   "change": 2,
+   "openClose": true
+  }
+ },
+ "serverInfo": {
+  "name": "Verible Verilog language server.",
+  "version": "v0.0-4298-g085eef05"
+ }
+}

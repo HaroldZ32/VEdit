@@ -1,0 +1,26 @@
+## stale-claim corrections (my greps)
+2026-11-06T10:29:53+08:00
+
+### builtin_valid_defs=2
+  docs/handover/CELL-20261105-UX-BATCH2-HANDOVER.md:97:纠错：`docs/handover/04-hard-facts.md` 的 `builtin_valid_defs=2` → 5；`docs/handover/**` 里"模块树是例化树/没有跨文件替换/hover 不可用"之类过时叙述；`src/syntax/kde/README.md` 的两份定义；`evidence/ux-batch-2/b1/README.md` 的 "Every string is wrapped"（返修后才成立）。
+
+### 04-hard-facts current value
+37:- 送达构建（UX 批次 2 / A3 之后）：随包 **5 份**定义 `Markdown,SystemVerilog,Tcl,VHDL,Verilog`；
+38:  `KSH-ENV defs=5`、`KSH-GUARD PASS whitelist=Markdown,SystemVerilog,Tcl,VHDL,Verilog`，且 C / zh_CN.UTF-8 /
+41:  A3 之前随包只有 Verilog/SystemVerilog 两份；旧的「2 份」口径（`builtin_valid_defs` 探针）已作废，不是当前值。
+
+### Every string is wrapped (b1)
+  GONE
+
+### kde README two/five
+50:All five are our own LGPL-2.1-or-later definitions. Verilog/SystemVerilog are a
+
+### handover narrative corrections
+docs/handover/appendix/requirements-rev2.md:34:5. 跨文件替换——Lapce 本身也没有；v1 只有文件内替换 + 全局搜索。
+docs/handover/CELL-20261102-STATUS.md:10:> 信号跳转；双击模块行打开其声明）。因此下文关于 T17 模块树的 §C/D 路径段、信号跳转叙述，以及“跨文件替换是
+docs/handover/CELL-20261102-STATUS.md:186:  （**2026-11-05 更正：“跨文件替换”已由 UX 批次 2 item 5 交付〔全工程搜索 + 替换 / 全部替换〕，不再是非目标。**）
+docs/handover/CELL-20261102-STATUS.md:8:> **2026-11-05 更正（UX 批次 2）**：本文件里的 T17「工程级模块树 + 信号 source/target 一键跳转」是**旧 lane**——
+docs/handover/CELL-20261102-STATUS.md:15:本 cell 把 requirements rev1 的 10 条目拆成 40 个任务（20 work + 20 review，10 成员），并因写域缺口追加 T43–T48（当前看板 48 行：31 completed / 15 pending / 2 in_progress）。**M0 基础设施与 M1 编辑器基本盘基本落地**：工程模型（开文件夹即根、.f 导入、并集、-I/-D、持久化）、工程级 lint 编排（后台 job+poll、进度、取消/重跑、去重）、诊断呈现（warn/error 分栏 + 行内波浪线 + 双击跳转）、文件标签/未保存标记、查找替换、多光标/块选择、会话恢复、设置三页、模块树/信号跳转（旧 lane；见文首更正）。**最大成果是 Rust 引擎与规模证据**：1k 文件/10k 实例实测通过，T46 修复层次服务两个 walker 缺陷后 **11000/11000 实例与 ground truth 一致**。**最大未完成**：T11 的 slang 方向切换（被 `vd-lsp` 客户端 router 缺陷阻塞），以及 T20→T18→T21→T22 这条「主壳 → i18n 运行时 → i18n 覆盖 → 集成验收」链尚未开始。
+docs/handover/CELL-20261102-STATUS.md:39:| T17 | 工程级模块树 + 信号 source/target 一键跳转（Qt 侧；**旧 lane，已被 UX 批次 2 item 1 的纯模块层级树取代**） | `evidence/m-tree/`（REPORT.md、截图、probe） | **T37 review in_progress**；规模完整性受 T46 影响 |
+docs/handover/CELL-20261103-STATUS.md:10:> **2026-11-05 更正（UX 批次 2）**：本文件里的 T37「模块树 §C/D」是**旧 lane**（实例层级树 + 信号跳转）——
+docs/handover/CELL-20261103-STATUS.md:20:**本轮已落地**：G0 遗留全收口（T46 walker 第三方 PASS、T37 模块树 §D 2/5→5/5（旧 lane，见文首更正）、T39 会话恢复旧 FAIL 收口、

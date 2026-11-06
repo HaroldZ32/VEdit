@@ -1,0 +1,81 @@
+Test project /vedit-build/target/qt6-build
+      Start  1: vedit-app-syntax-startup
+ 1/38 Test  #1: vedit-app-syntax-startup .......................   Passed    0.65 sec
+      Start  2: vedit-m0-smoke
+ 2/38 Test  #2: vedit-m0-smoke .................................   Passed    0.06 sec
+      Start  3: vedit-syntax-provider-tests
+ 3/38 Test  #3: vedit-syntax-provider-tests ....................   Passed    0.00 sec
+      Start  4: vedit-syntax-kde-data
+ 4/38 Test  #4: vedit-syntax-kde-data ..........................   Passed    0.02 sec
+      Start  5: vedit-syntax-directory-equivalence
+ 5/38 Test  #5: vedit-syntax-directory-equivalence .............   Passed    0.02 sec
+      Start  6: vedit-syn-grammars-tests
+ 6/38 Test  #6: vedit-syn-grammars-tests .......................   Passed    0.17 sec
+      Start  7: vedit-syntax-product-tests
+ 7/38 Test  #7: vedit-syntax-product-tests .....................   Passed    0.05 sec
+      Start  8: vedit-terminal-selftest
+ 8/38 Test  #8: vedit-terminal-selftest ........................   Passed    2.09 sec
+      Start  9: vedit-syntax-overlay-selftest
+ 9/38 Test  #9: vedit-syntax-overlay-selftest ..................   Passed    2.24 sec
+      Start 10: vedit-app-ffi-abi-selftest
+10/38 Test #10: vedit-app-ffi-abi-selftest .....................   Passed    0.33 sec
+      Start 11: vedit-app-shell-selftest
+11/38 Test #11: vedit-app-shell-selftest .......................   Passed    0.60 sec
+      Start 12: vedit-app-crash-reporter-selftest
+12/38 Test #12: vedit-app-crash-reporter-selftest ..............   Passed    0.14 sec
+      Start 13: vedit-app-crash-report-shipped
+13/38 Test #13: vedit-app-crash-report-shipped .................   Passed    0.13 sec
+      Start 14: vedit-native-fold-tests
+14/38 Test #14: vedit-native-fold-tests ........................   Passed    0.47 sec
+      Start 15: vedit-edit-core-selftest
+15/38 Test #15: vedit-edit-core-selftest .......................   Passed    0.11 sec
+      Start 16: vedit-editor-find-replace-selftest
+16/38 Test #16: vedit-editor-find-replace-selftest .............   Passed    0.07 sec
+      Start 17: vedit-editor-multi-cursor-selftest
+17/38 Test #17: vedit-editor-multi-cursor-selftest .............   Passed    0.09 sec
+      Start 18: vedit-signature-help-selftest
+18/38 Test #18: vedit-signature-help-selftest ..................   Passed    0.07 sec
+      Start 19: vedit-fim-wiring-selftest
+19/38 Test #19: vedit-fim-wiring-selftest ......................   Passed    1.91 sec
+      Start 20: vedit-syntax-directory-tests
+20/38 Test #20: vedit-syntax-directory-tests ...................   Passed    0.00 sec
+      Start 21: vedit-fold-gutter-click
+21/38 Test #21: vedit-fold-gutter-click ........................   Passed    0.25 sec
+      Start 22: vedit-breadcrumb-tests
+22/38 Test #22: vedit-breadcrumb-tests .........................   Passed    0.04 sec
+      Start 23: vedit-breadcrumb-click-tests
+23/38 Test #23: vedit-breadcrumb-click-tests ...................   Passed    0.05 sec
+      Start 24: vedit-jump-tests
+24/38 Test #24: vedit-jump-tests ...............................   Passed    0.00 sec
+      Start 25: vedit-fim-selftest
+25/38 Test #25: vedit-fim-selftest .............................   Passed    0.11 sec
+      Start 26: vedit-workspace-palette-selftest
+26/38 Test #26: vedit-workspace-palette-selftest ...............   Passed    0.09 sec
+      Start 27: vedit-workspace-palette-integration-selftest
+27/38 Test #27: vedit-workspace-palette-integration-selftest ...   Passed    0.18 sec
+      Start 28: vedit-workspace-search-selftest
+28/38 Test #28: vedit-workspace-search-selftest ................   Passed   12.24 sec
+      Start 29: vedit-workspace-project-selftest
+29/38 Test #29: vedit-workspace-project-selftest ...............   Passed    0.40 sec
+      Start 30: vedit-module-tree-selftest
+30/38 Test #30: vedit-module-tree-selftest .....................   Passed    0.25 sec
+      Start 31: vedit-lint-orchestration-probe
+31/38 Test #31: vedit-lint-orchestration-probe .................   Passed    0.02 sec
+      Start 32: vedit-workspace-diagnostics-selftest
+32/38 Test #32: vedit-workspace-diagnostics-selftest ...........   Passed    1.82 sec
+      Start 33: vedit-toolchain-missing-selftest
+33/38 Test #33: vedit-toolchain-missing-selftest ...............   Passed    0.00 sec
+      Start 34: vedit-diagnostics-ffi-selftest
+34/38 Test #34: vedit-diagnostics-ffi-selftest .................   Passed    3.26 sec
+      Start 35: vedit-diagnostics-product-seam
+35/38 Test #35: vedit-diagnostics-product-seam .................   Passed    6.22 sec
+      Start 36: vedit-toolchain-ux-selftest
+36/38 Test #36: vedit-toolchain-ux-selftest ....................   Passed    3.10 sec
+      Start 37: vedit-workspace-vcs-selftest
+37/38 Test #37: vedit-workspace-vcs-selftest ...................   Passed    1.14 sec
+      Start 38: vedit-workspace-settings-selftest
+38/38 Test #38: vedit-workspace-settings-selftest ..............   Passed    0.58 sec
+
+100% tests passed, 0 tests failed out of 38
+
+Total Test time (real) =  39.01 sec

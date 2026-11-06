@@ -1,0 +1,190 @@
+# Code pointers — split-pane activation fix (UX batch 2)
+# Captured: 2026-11-05T14:20:36+08:00
+# Branch: main  HEAD: 4e2d0a5
+
+== 1. The fix: EditorArea::eventFilter now maps press/focus-in to the pane ==
+1355:bool EditorArea::eventFilter(QObject *watched, QEvent *event)
+1356-{
+1357-    if (event == nullptr) {
+1358-        return false;
+1359-    }
+1360-    if (event->type() == QEvent::ApplicationActivate
+1361-        || event->type() == QEvent::WindowActivate) {
+1362-        enforceSingleCtrlSAuthority();
+1363-    } else if (event->type() == QEvent::MouseButtonPress
+1364-               || event->type() == QEvent::FocusIn) {
+1365-        // UX batch 2: a press or focus-in anywhere inside a pane's editor makes
+1366-        // that pane the ACTIVE one, so commands, the status bar and the
+1367-        // definition/rename/toolbar paths that read activePane() follow the pane
+1368-        // the user is working in. The filter has to run at the APPLICATION level:
+1369-        // the real mouse target of the product editor is KatePart's inner
+1370-        // KateViewInternal widget, a CHILD of the KTextEditor::View, and a filter
+1371-        // installed on the view never sees those events (evidence:
+1372-        // evidence/ux-batch-2/review-b4/01-focus-delivery.txt).
+1373-        activatePaneContaining(qobject_cast<QWidget *>(watched));
+1374-    }
+1375-    return false;
+1376-}
+1377-
+
+== 2. The fix: EditorArea::activatePaneContaining ==
+1378:void EditorArea::activatePaneContaining(const QWidget *widget)
+1379-{
+1380-    if (widget == nullptr || rebuilding_) {
+1381-        // A re-layout reparents the panes; the focus events it produces are not
+1382-        // the user choosing a pane.
+1383-        return;
+1384-    }
+1385-    if (active_ != nullptr && active_->containsEditorWidget(widget)) {
+1386-        return;
+1387-    }
+1388-    const QList<EditorPane *> current = panes();
+1389-    for (EditorPane *pane : current) {
+1390-        if (pane != nullptr && pane->containsEditorWidget(widget)) {
+1391-            setActivePane(pane);
+1392-            return;
+1393-        }
+1394-    }
+1395-}
+1396-
+
+== 3. The fix: EditorPane::containsEditorWidget ==
+1192:bool EditorPane::containsEditorWidget(const QWidget *widget) const
+1193-{
+1194-    if (widget == nullptr) {
+1195-        return false;
+1196-    }
+1197-    // Every tab is checked, not only the active one: a focus event can name a
+1198-    // hidden tab's view while a tab switch is in flight.
+1199-    for (const Document *document : documents_) {
+1200-        QWidget *editor = document != nullptr ? document->editor : nullptr;
+1201-        if (editor != nullptr && (editor == widget || editor->isAncestorOf(widget))) {
+1202-            return true;
+1203-        }
+1204-    }
+1205-    return false;
+1206-}
+1207-
+
+== 4. Declaration (public seam) ==
+68-    // True when `widget` is one of this pane's editor widgets or a DESCENDANT of
+69-    // one. The product editor (KTextEditor) hosts its real mouse target in a
+70-    // nested widget (KatePart's KateViewInternal), so pane activation has to
+71-    // recognise the whole editor subtree, not only the top-level view.
+72:    bool containsEditorWidget(const QWidget *widget) const;
+73-    void setActive(bool active);
+
+== 5. Declaration (private helper) ==
+372-    void deletePane(EditorPane *pane);
+373-    // UX batch 2: picks the pane whose editor subtree contains `widget`.
+374:    void activatePaneContaining(const QWidget *widget);
+375-
+
+== 6. Existing pane-side path KEPT (unchanged): EditorPane::eventFilter activation ==
+291-    QObject::connect(tabs_, &QTabBar::tabBarClicked, this, [this](int index) {
+292-        Q_UNUSED(index);
+293-        if (onFocusRequested_ != nullptr) {
+294:            onFocusRequested_(this);
+295-        }
+--
+1263-void EditorPane::mousePressEvent(QMouseEvent *event)
+1264-{
+1265-    if (onFocusRequested_ != nullptr) {
+1266:        onFocusRequested_(this);
+1267-    }
+--
+1292-    if (event != nullptr
+1293-        && (event->type() == QEvent::FocusIn || event->type() == QEvent::MouseButtonPress)
+1294-        && onFocusRequested_ != nullptr) {
+1295:        onFocusRequested_(this);
+1296-    }
+
+== 7. The app-level filter already installed by the EditorArea (constructor) ==
+498-        return;
+499-    }
+500:    editor->installEventFilter(this);
+501-    // T80: the shell's file.save command is the only Ctrl+S authority.
+--
+1336-    shortcutGuard_->start();
+1337-    if (QCoreApplication::instance() != nullptr) {
+1338:        QCoreApplication::instance()->installEventFilter(this);
+1339-    }
+
+== 8. Consumers that read activePane() (shell status bar / toolbar) ==
+117:    editorArea_->setOnActivePaneChanged([this](EditorPane *) {
+118-        updateStatusBar();
+119-        syncPanelToggleStates();
+120-        // UX batch 2 (item 7): the toolbar's Undo/Redo follow the ACTIVE editor.
+121-        syncEditorCommandStates();
+122-    });
+123-    // T12: the tab strip is the per-pane document list. A dirty tab close asks
+
+== 9. New test registration (src/app/CMakeLists.txt) ==
+326:# --- UX batch 2: split-pane activation --------------------------------------
+327-# A press (or focus-in) that lands anywhere inside a pane's editor must make that
+328-# pane the ACTIVE pane of the EditorArea, whichever widget of the editor tree
+329-# receives it. The product editor is KTextEditor, whose real mouse target is
+330-# KatePart's inner widget (a CHILD of the public View), so this OFFSCREEN test
+331-# drives real QTest events to the deepest child under the click point of a
+332-# two-pane EditorArea. It needs the edit-core lane (real provider + real
+333-# KTextEditor::View); without it the entry is an explicit SKIP (exit 77), never a
+334-# silent pass.
+335-if(TARGET vedit_editor_core AND TARGET Qt6::Test)
+336-  add_executable(vedit-editor-pane-activation-tests editor_area_activation_test.cpp)
+337-  target_link_libraries(vedit-editor-pane-activation-tests PRIVATE
+338-    vedit_app_shell
+339-    vedit_editor_core
+340-    Qt6::Test
+341-  )
+342-  # ktexteditor_provider.h lives in the kernel lane; the test installs the real
+343-  # provider through its public factory, exactly like the product shell does.
+344-  target_include_directories(vedit-editor-pane-activation-tests PRIVATE
+345-    "${CMAKE_CURRENT_SOURCE_DIR}/../editor/kernel")
+346-  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+347-    target_compile_options(vedit-editor-pane-activation-tests PRIVATE
+348-      -Wall -Wextra -Wpedantic -Werror)
+349-  endif()
+350-  add_test(NAME vedit-editor-pane-activation-tests
+351-           COMMAND vedit-editor-pane-activation-tests)
+352-  set_tests_properties(vedit-editor-pane-activation-tests PROPERTIES
+353-    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_CURRENT_BINARY_DIR}/xdg-runtime-pane-activation"
+354-    TIMEOUT 120
+355-    SKIP_RETURN_CODE 77
+356-  )
+357:  message(STATUS "VEdit: split-pane activation test enabled (two panes, real KTextEditor)")
+358-else()
+359-  add_test(NAME vedit-editor-pane-activation-tests
+360-           COMMAND bash -c "echo 'SKIP: edit-core lane or Qt6::Test missing'; exit 77")
+361-  set_tests_properties(vedit-editor-pane-activation-tests PROPERTIES SKIP_RETURN_CODE 77)
+362:  message(STATUS "VEdit: split-pane activation test NOT built (edit-core lane or Qt6::Test missing)")
+363-endif()
+364-find_program(VEDIT_UX_XVFB_RUN xvfb-run)
+365-if(VEDIT_UX_XVFB_RUN)
+366-  set(VEDIT_UX_SCREENSHOT_DIR "${CMAKE_CURRENT_BINARY_DIR}/ux-screenshots")
+367-  add_test(NAME vedit-app-ux-screenshots
+368-           COMMAND ${VEDIT_UX_XVFB_RUN} -a -s "-screen 0 1600x1000x24"
+369-                   $<TARGET_FILE:vedit-app-ux-selftest> --screenshots
+370-                   "${VEDIT_UX_SCREENSHOT_DIR}")
+371-  set_tests_properties(vedit-app-ux-screenshots PROPERTIES
+372-    ENVIRONMENT
+373-      "QT_QPA_PLATFORM=xcb;XDG_RUNTIME_DIR=${CMAKE_CURRENT_BINARY_DIR}/xdg-runtime-ux-shot;VEDIT_UX_SCREENSHOT_DIR=${VEDIT_UX_SCREENSHOT_DIR}"
+374-    SKIP_RETURN_CODE 77
+375-    TIMEOUT 300
+376-  )
+377-else()
+378-  add_test(NAME vedit-app-ux-screenshots
+379-           COMMAND bash -c "echo 'SKIP: xvfb-run not available'; exit 77")
+380-  set_tests_properties(vedit-app-ux-screenshots PROPERTIES SKIP_RETURN_CODE 77)
+381-endif()
+
+== 10. Test source (new file) ==
+280 src/app/editor_area_activation_test.cpp
+78:QWidget *deliveryTarget(KTextEditor::View *view, const QPoint &viewPoint)
+103:    QWidget *target = deliveryTarget(view, viewPoint);
+189:    QWidget *targetB = deliveryTarget(viewB, viewPointB);
+205:    check(QStringLiteral("press.non-active-pane-becomes-active"),
+211:    check(QStringLiteral("press.previous-pane-reports-inactive"), !paneA->isActive());
+234:    check(QStringLiteral("control.no-double-activation"), switches == 0,
+247:        check(QStringLiteral("tab.click-activates-its-pane"),
+262:    QWidget *targetA = deliveryTarget(viewA, viewA->cursorToCoordinate(KTextEditor::Cursor(0, 1)));
+269:        check(QStringLiteral("focus-in.activates-its-pane"),

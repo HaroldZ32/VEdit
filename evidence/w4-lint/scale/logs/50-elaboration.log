@@ -1,0 +1,33 @@
+=== elaboration at scale (AC-3.5): shipped C ABI vd_hier_start/vd_hier_poll, real slang ===
+--- flat 1k, one hierarchy (--top m_0_0) ---
+ELABORATE top=«m_0_0» tool=«slang» files=1000 instances=11 max_depth=2 deepest=«m_0_0.u0» polls=18 wall_ms=184 worst_tick_ms=0 elapsed_ms=176 peak_rss_kb=89032 warning=«»
+ELABORATE-HARNESS ok=1 checks=4 failures=0
+MEASURE exit=0 wall_s=0.195 peak_rss_mib=86.6
+--- flat 1k, whole project (no top) ---
+ELABORATE top=«» tool=«slang» files=1000 instances=11 max_depth=2 deepest=«m_0_0.u0» polls=74 wall_ms=747 worst_tick_ms=0 elapsed_ms=732 peak_rss_kb=251016 warning=«»
+ELABORATE-HARNESS ok=1 checks=4 failures=0
+MEASURE exit=0 wall_s=0.763 peak_rss_mib=244.9
+--- nested 1k, one hierarchy (--top l0_m_0_0) ---
+ELABORATE top=«l0_m_0_0» tool=«slang» files=1000 instances=5 max_depth=5 deepest=«l0_m_0_0.u1.u2.u3.u4» polls=21 wall_ms=220 worst_tick_ms=0 elapsed_ms=213 peak_rss_kb=97508 warning=«»
+ELABORATE-HARNESS ok=1 checks=4 failures=0
+MEASURE exit=0 wall_s=0.229 peak_rss_mib=95.0
+--- nested 1k, whole project (no top) ---
+ELABORATE top=«» tool=«slang» files=1000 instances=5 max_depth=5 deepest=«l0_m_0_0.u1.u2.u3.u4» polls=181 wall_ms=1847 worst_tick_ms=0 elapsed_ms=1829 peak_rss_kb=521660 warning=«»
+ELABORATE-HARNESS ok=1 checks=4 failures=0
+MEASURE exit=0 wall_s=1.875 peak_rss_mib=509.2
+--- nested scaling curve, whole project (no top) ---
+files=100
+ELABORATE top=«» tool=«slang» files=100 instances=5 max_depth=5 deepest=«l0_m_0_0.u1.u2.u3.u4» polls=20 wall_ms=202 worst_tick_ms=0 elapsed_ms=199 peak_rss_kb=89352 warning=«»
+ELABORATE-HARNESS ok=1 checks=4 failures=0
+MEASURE exit=0 wall_s=0.212 peak_rss_mib=87.0
+files=250
+ELABORATE top=«» tool=«slang» files=250 instances=5 max_depth=5 deepest=«l0_m_0_0.u1.u2.u3.u4» polls=35 wall_ms=354 worst_tick_ms=0 elapsed_ms=344 peak_rss_kb=134388 warning=«»
+ELABORATE-HARNESS ok=1 checks=4 failures=0
+MEASURE exit=0 wall_s=0.367 peak_rss_mib=131.0
+files=500
+ELABORATE top=«» tool=«slang» files=500 instances=5 max_depth=5 deepest=«l0_m_0_0.u1.u2.u3.u4» polls=65 wall_ms=691 worst_tick_ms=0 elapsed_ms=673 peak_rss_kb=255212 warning=«»
+ELABORATE-HARNESS ok=1 checks=4 failures=0
+MEASURE exit=0 wall_s=0.708 peak_rss_mib=249.0
+--- ground truth: Instance nodes in the whole-project AST (both variants) ---
+flat AST-GROUND-TRUTH roots=1000 instance_nodes=11000 max_depth=2
+nested AST-GROUND-TRUTH roots=1000 instance_nodes=11000 max_depth=6

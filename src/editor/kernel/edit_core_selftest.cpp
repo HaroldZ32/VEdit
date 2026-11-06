@@ -5,6 +5,7 @@
 #include "find_replace.h"
 #include "highlight_mode.h"
 #include "goto_line.h"
+#include "lsp_actions.h"
 #include "multi_cursor.h"
 #include "undo_ops.h"
 
@@ -18,12 +19,15 @@
 #include <KTextEditor/View>
 #include <KSyntaxHighlighting/Definition>
 
+#include <QAction>
 #include <QCryptographicHash>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QMainWindow>
 #include <QStringList>
 #include <QTemporaryDir>
+#include <QVariantMap>
 
 #include <cstdio>
 
@@ -350,6 +354,244 @@ void checkMultiCursor()
           error);
 }
 
+
+// ---------------------------------------------------------------------------
+// batch 2, AC-2.1/AC-2.2/AC-2.4: applying a rename WorkspaceEdit and the rows a
+// references list shows. No server is involved: the engine is fed the answer the
+// LSP bridge produces, so the acceptance is about what the PRODUCT does with it.
+// ---------------------------------------------------------------------------
+void checkWorkspaceEdit(const QString &scratch)
+{
+    const QString openPath = scratch + QStringLiteral("/rename-open.sv");
+    const QString diskPath = scratch + QStringLiteral("/rename-disk.sv");
+    check("editcore.wsedit.fixture-open",
+          writeFixture(openPath,
+                       QByteArray("module top;\n  wire old_name;\n  old_name = 1;\nendmodule\n")));
+    check("editcore.wsedit.fixture-disk", writeFixture(diskPath, QByteArray("// old_name\n")));
+
+    // An OPEN document: the view carries the same path property the product's
+    // providers set, so the engine's application-wide scan finds it.
+    ViewFixture fixture;
+    {
+        KTextEditor::Editor *editor = KTextEditor::Editor::instance();
+        if (editor != nullptr) {
+            fixture.document = editor->createDocument(nullptr);
+            if (fixture.document != nullptr) {
+                fixture.view = fixture.document->createView(nullptr);
+            }
+        }
+    }
+    check("editcore.wsedit.view", fixture.document != nullptr && fixture.view != nullptr);
+    if (fixture.document == nullptr || fixture.view == nullptr) {
+        return;
+    }
+    fixture.document->setText(QStringLiteral("module top;\n  wire old_name;\n  old_name = 1;\nendmodule\n"));
+    fixture.document->setModified(false);
+    fixture.view->setProperty("vedit.openFilePath", openPath);
+    check("editcore.wsedit.open-visible", openDocumentCount() >= 1,
+          QString::number(openDocumentCount()));
+
+    // Two occurrences in the open buffer + one in a file that is NOT open.
+    WorkspaceTextEdit openFirst;
+    openFirst.filePath = openPath;
+    openFirst.startLine = 1;
+    openFirst.startColumn = 7;
+    openFirst.endLine = 1;
+    openFirst.endColumn = 15;
+    openFirst.newText = QStringLiteral("new_name");
+    WorkspaceTextEdit openSecond = openFirst;
+    openSecond.startLine = 2;
+    openSecond.startColumn = 2;
+    openSecond.endLine = 2;
+    openSecond.endColumn = 10;
+    WorkspaceTextEdit onDisk;
+    onDisk.filePath = diskPath;
+    onDisk.startLine = 0;
+    onDisk.startColumn = 3;
+    onDisk.endLine = 0;
+    onDisk.endColumn = 11;
+    onDisk.newText = QStringLiteral("new_name");
+
+    const WorkspaceEditReport report =
+        applyWorkspaceEdit(QList<WorkspaceTextEdit>{openFirst, openSecond, onDisk});
+    check("editcore.wsedit.applied", report.ok, report.error);
+    check("editcore.wsedit.counts",
+          report.editCount == 3 && report.fileCount == 2 && report.openDocumentCount == 1
+              && report.writtenFileCount == 1,
+          QStringLiteral("edits=%1 files=%2 editor=%3 disk=%4")
+              .arg(report.editCount)
+              .arg(report.fileCount)
+              .arg(report.openDocumentCount)
+              .arg(report.writtenFileCount));
+    check("editcore.wsedit.open-text",
+          fixture.document->text()
+              == QStringLiteral("module top;\n  wire new_name;\n  new_name = 1;\nendmodule\n"),
+          fixture.document->text());
+    check("editcore.wsedit.open-dirty", fixture.document->isModified());
+    check("editcore.wsedit.disk-text",
+          readFixture(diskPath) == QByteArray("// new_name\n"),
+          QString::fromUtf8(readFixture(diskPath)));
+    check("editcore.wsedit.summary",
+          report.summary().contains(QStringLiteral("3 edit(s)"))
+              && report.summary().contains(QStringLiteral("2 file(s)")),
+          report.summary());
+
+    // ONE undo restores both changes of the open document (the rename edits ran
+    // inside one KTextEditor EditingTransaction).
+    QString undoError;
+    check("editcore.wsedit.one-undo",
+          documentUndo(fixture.document, &undoError)
+              && fixture.document->text()
+                     == QStringLiteral("module top;\n  wire old_name;\n  old_name = 1;\nendmodule\n"),
+          undoError);
+    check("editcore.wsedit.one-redo",
+          documentRedo(fixture.document, &undoError)
+              && fixture.document->text()
+                     == QStringLiteral("module top;\n  wire new_name;\n  new_name = 1;\nendmodule\n"),
+          undoError);
+
+    // A rejected range refuses the WHOLE rename: nothing in the buffer or on disk
+    // may change (phase 1 validates before phase 2 applies).
+    const QString beforeText = fixture.document->text();
+    WorkspaceTextEdit outOfRange;
+    outOfRange.filePath = openPath;
+    outOfRange.startLine = 999;
+    outOfRange.startColumn = 0;
+    outOfRange.endLine = 999;
+    outOfRange.endColumn = 0;
+    outOfRange.newText = QStringLiteral("nope");
+    WorkspaceTextEdit validButLate = onDisk;
+    validButLate.newText = QStringLiteral("should_not_land");
+    const WorkspaceEditReport rejected =
+        applyWorkspaceEdit(QList<WorkspaceTextEdit>{validButLate, outOfRange});
+    check("editcore.wsedit.out-of-range-refused", !rejected.ok && !rejected.error.isEmpty(),
+          rejected.error);
+    check("editcore.wsedit.refusal-keeps-buffer", fixture.document->text() == beforeText);
+    check("editcore.wsedit.refusal-keeps-file",
+          readFixture(diskPath) == QByteArray("// new_name\n"),
+          QString::fromUtf8(readFixture(diskPath)));
+
+    // A target that is neither open nor readable is a real, named error.
+    WorkspaceTextEdit missing;
+    missing.filePath = scratch + QStringLiteral("/does-not-exist.sv");
+    missing.startLine = 0;
+    missing.startColumn = 0;
+    missing.endLine = 0;
+    missing.endColumn = 1;
+    missing.newText = QStringLiteral("x");
+    const WorkspaceEditReport missingReport = applyWorkspaceEdit(QList<WorkspaceTextEdit>{missing});
+    check("editcore.wsedit.missing-file-refused",
+          !missingReport.ok && missingReport.error.contains(QStringLiteral("cannot change")),
+          missingReport.error);
+    check("editcore.wsedit.empty-refused", !applyWorkspaceEdit({}).ok);
+
+    // --- references rows (AC-2.2) -------------------------------------------
+    check("editcore.references.empty", buildReferenceRows({}).isEmpty());
+    WorkspaceLocation inOpen;
+    inOpen.filePath = openPath;
+    inOpen.line = 1;
+    inOpen.column = 7;
+    WorkspaceLocation duplicate = inOpen;
+    WorkspaceLocation onDiskLocation;
+    onDiskLocation.filePath = diskPath;
+    onDiskLocation.line = 0;
+    onDiskLocation.column = 3;
+    const QList<ReferenceRow> rows =
+        buildReferenceRows(QList<WorkspaceLocation>{inOpen, duplicate, onDiskLocation});
+    check("editcore.references.count", rows.size() == 2, QString::number(rows.size()));
+    check("editcore.references.ordered",
+          rows.size() == 2 && rows.at(0).filePath == diskPath && rows.at(1).filePath == openPath);
+    check("editcore.references.open-snippet",
+          rows.size() == 2 && rows.at(1).snippet == QStringLiteral("wire new_name;"),
+          rows.size() == 2 ? rows.at(1).snippet : QString());
+    check("editcore.references.location-text",
+          rows.size() == 2 && rows.at(1).location() == openPath + QStringLiteral(":2:8"),
+          rows.size() == 2 ? rows.at(1).location() : QString());
+    check("editcore.references.disk-snippet",
+          rows.size() == 2 && rows.at(0).snippet == QStringLiteral("// new_name"),
+          rows.size() == 2 ? rows.at(0).snippet : QString());
+}
+
+// AC-2.1/AC-2.2 capability gating: an unavailable action is disabled WITH the
+// backend's own reason (never "not implemented"), and the channel refuses it.
+void checkLspActionGates()
+{
+    QMainWindow host;
+    KTextEditor::Editor *editor = KTextEditor::Editor::instance();
+    KTextEditor::Document *document = editor != nullptr ? editor->createDocument(nullptr) : nullptr;
+    check("editcore.gates.document", document != nullptr);
+    if (document == nullptr) {
+        return;
+    }
+    document->setText(QStringLiteral("module gated;\n  wire sig;\nendmodule\n"));
+    KTextEditor::View *view = document->createView(&host);
+    check("editcore.gates.view", view != nullptr);
+    if (view == nullptr) {
+        return;
+    }
+    view->setProperty("vedit.openFilePath", QStringLiteral("/tmp/gated.sv"));
+    // The shell action the menu uses, created exactly like the shell does.
+    auto *renameAction = new QAction(QStringLiteral("&Rename Symbol..."), &host);
+    renameAction->setObjectName(QStringLiteral("action-diagnostics.rename"));
+    host.addAction(renameAction);
+    host.show();
+
+    QVariantMap gates;
+    QVariantMap renameRow;
+    renameRow.insert(QStringLiteral("enabled"), false);
+    renameRow.insert(QStringLiteral("known"), true);
+    renameRow.insert(QStringLiteral("source"), QStringLiteral("backend"));
+    renameRow.insert(
+        QStringLiteral("reason"),
+        QStringLiteral("verible does not advertise renameProvider for this session"));
+    gates.insert(QStringLiteral("rename"), renameRow);
+    QVariantMap backendMap;
+    backendMap.insert(QStringLiteral("backend"), QStringLiteral("verible"));
+    host.setProperty("vedit.diagnostics.gates", gates);
+    host.setProperty("vedit.diagnostics.capabilities", backendMap);
+
+    LspActionChannel *channel = LspActionChannel::install(view);
+    check("editcore.gates.channel", channel != nullptr);
+    if (channel == nullptr) {
+        delete view;
+        return;
+    }
+    const ActionAvailability unavailable = channel->availability(EditorAction::Rename);
+    check("editcore.gates.rename-disabled", !unavailable.enabled && unavailable.source == QStringLiteral("backend"),
+          unavailable.reason);
+    check("editcore.gates.rename-real-reason",
+          unavailable.reason.contains(QStringLiteral("renameProvider")),
+          unavailable.reason);
+    // The lane disables the action from the same decision; this is that state.
+    renameAction->setEnabled(unavailable.enabled);
+    renameAction->setToolTip(unavailable.reason);
+    check("editcore.gates.rename-action-greyed",
+          !renameAction->isEnabled()
+              && renameAction->toolTip() == unavailable.reason);
+    const ActionDispatch refused = channel->dispatch(EditorAction::Rename);
+    check("editcore.gates.rename-refused", !refused.dispatched && !refused.reason.isEmpty(),
+          refused.reason);
+
+    // Supported again => enabled, and the reason is gone.
+    renameRow.insert(QStringLiteral("enabled"), true);
+    renameRow.insert(QStringLiteral("reason"), QString());
+    renameRow.insert(QStringLiteral("source"), QStringLiteral("backend"));
+    gates.insert(QStringLiteral("rename"), renameRow);
+    host.setProperty("vedit.diagnostics.gates", gates);
+    // The lane re-applies the gate to the action on every live-state refresh
+    // (applyGate); the channel then merges that action state with the map.
+    renameAction->setEnabled(true);
+    renameAction->setToolTip(QString());
+    const ActionAvailability available = channel->availability(EditorAction::Rename);
+    check("editcore.gates.rename-enabled", available.enabled, available.reason);
+    renameAction->setEnabled(available.enabled);
+    check("editcore.gates.rename-action-enabled", renameAction->isEnabled());
+
+    view->setParent(nullptr);
+    delete view;
+    delete document;
+}
+
 #if defined(VEDIT_EDIT_CORE_HAVE_APP_SEAM)
 void checkProvider()
 {
@@ -505,6 +747,8 @@ SelfCheckResult runSelfChecks(const BoundaryHooks &hooks)
     checkGotoLine();
     checkUndoRedoSteps();
     checkMultiCursor();
+    checkWorkspaceEdit(scratch.path());
+    checkLspActionGates();
 #if defined(VEDIT_EDIT_CORE_HAVE_APP_SEAM)
     checkProvider();
 #else

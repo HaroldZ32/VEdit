@@ -1,0 +1,18 @@
+=== D: literal-dollar / dollar-at-EOL files OUTSIDE the scanned root ===
+EXPANSION ok=1 root=/vedit-build/evidence/review-a9/d files=1 skipped=2 missing=[]
+FILE rtl/ok.sv
+DIAG config.invalid_value: /vedit-build/evidence/review-a9/d/project.f:1: cannot expand this line (a `$` must be followed by a name, `{`, `(` or `$`); skipped
+DIAG config.invalid_value: /vedit-build/evidence/review-a9/d/project.f:2: cannot expand this line (a `$` at the end of the line is not a variable); skipped
+D-exit=0
+
+=== C(fixed): CRLF filelist, nested path ../rtl/b.sv ===
+EXPANSION ok=1 root=/vedit-build/evidence/review-a9/c files=2 skipped=0 missing=[]
+FILE rtl/a.sv
+FILE rtl/b.sv
+INCDIR /vedit-build/evidence/review-a9/c/inc
+DIAG filelist.missing: /vedit-build/evidence/review-a9/c/project.f:1: include directory `inc` does not exist (or is not a directory); the -I entry is kept so it works once the directory appears
+C-exit=0
+
+=== determinism: fixture A twice ===
+DETERMINISTIC-IDENTICAL
+DETERMINISTIC-IDENTICAL-EXCLUDING-ROOT-LINE

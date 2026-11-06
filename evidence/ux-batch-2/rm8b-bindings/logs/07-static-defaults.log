@@ -1,0 +1,47 @@
+$ grep -n "addExtraDefaultShortcut" src/app/app_shell.cpp
+274:    commands_->addExtraDefaultShortcut(QStringLiteral("diagnostics.format"),
+581:    commands_->addExtraDefaultShortcut(QStringLiteral("edit.redo"),
+
+$ grep -n "view.tab.next\|view.tab.previous\|addCommand(QStringLiteral(\"view.toolbar\")" src/app/app_shell.cpp
+660:    addCommand(QStringLiteral("view.toolbar"), tr("&Toolbar"), QStringLiteral("view"),
+674:    addCommand(QStringLiteral("view.tab.next"), tr("&Next Tab"), QStringLiteral("view"),
+676:    addCommand(QStringLiteral("view.tab.previous"), tr("Pre&vious Tab"), QStringLiteral("view"),
+814:    commands_->setHandler(QStringLiteral("view.tab.next"), [switchTab]() { switchTab(1); });
+815:    commands_->setHandler(QStringLiteral("view.tab.previous"), [switchTab]() { switchTab(-1); });
+
+$ grep -n "panelSpec.defaultShortcut" src/workspace/diagnostics/diagnostics_integration.cpp
+3013:        panelSpec.defaultShortcut = QKeySequence(QStringLiteral("Ctrl+Alt+Shift+D"));
+
+$ grep -rn "rehomeDesktopGlobalDefaults" src (expect none: relocation removed)
+(none)
+
+$ grep -n "commands.no-desktop-global-shortcuts" src/app/main.cpp
+502:        check("commands.no-desktop-global-shortcuts", desktopGlobal.isEmpty(),
+
+$ sed -n "5,30p" src/app/desktop_shortcuts.cpp
+const QList<DesktopShortcut> &desktopGlobalShortcuts()
+{
+    static const QList<DesktopShortcut> shortcuts{
+        // GNOME / Ubuntu defaults.
+        {"Ctrl+Alt+T", "GNOME/Ubuntu: open terminal"},
+        {"Ctrl+Alt+L", "GNOME/KDE: lock screen"},
+        {"Ctrl+Alt+Del", "GNOME/KDE: log out / shutdown dialog"},
+        {"Ctrl+Alt+Up", "GNOME/KDE: switch workspace up"},
+        {"Ctrl+Alt+Down", "GNOME/KDE: switch workspace down"},
+        {"Ctrl+Alt+Left", "GNOME/KDE: switch workspace left"},
+        {"Ctrl+Alt+Right", "GNOME/KDE: switch workspace right"},
+        // KDE Plasma defaults.
+        {"Ctrl+Alt+D", "KDE: show desktop"},
+        {"Ctrl+Alt+Esc", "KDE/X11: kill window"},
+        {"Ctrl+Alt+Backspace", "X11: terminate the X server (legacy)"},
+        // Virtual terminals: the kernel grabs Ctrl+Alt+F1..F7 before any desktop.
+        {"Ctrl+Alt+F1", "Virtual terminal 1"},
+        {"Ctrl+Alt+F2", "Virtual terminal 2"},
+        {"Ctrl+Alt+F3", "Virtual terminal 3"},
+        {"Ctrl+Alt+F4", "Virtual terminal 4"},
+        {"Ctrl+Alt+F5", "Virtual terminal 5"},
+        {"Ctrl+Alt+F6", "Virtual terminal 6"},
+        {"Ctrl+Alt+F7", "Virtual terminal 7"},
+    };
+    return shortcuts;
+}

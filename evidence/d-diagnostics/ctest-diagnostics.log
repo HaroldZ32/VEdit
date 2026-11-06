@@ -1,0 +1,21 @@
+== diagnostics-presentation (T9) regression: the repository ctest entries that cover the panel, the annotations and the editor kernel ==
+host: PRETTY_NAME="Ubuntu 26.04.1 LTS"; qt6: QMake version 3.1 Using Qt version 6.10.2 in /usr/lib/x86_64-linux-gnu 
+
+Test project /vedit-build/target/qt6-build
+    Start 14: vedit-native-fold-tests
+1/6 Test #14: vedit-native-fold-tests ................   Passed    0.43 sec
+    Start 15: vedit-edit-core-selftest
+2/6 Test #15: vedit-edit-core-selftest ...............   Passed    0.11 sec
+    Start 27: vedit-workspace-diagnostics-selftest
+3/6 Test #27: vedit-workspace-diagnostics-selftest ...   Passed    1.82 sec
+    Start 29: vedit-diagnostics-ffi-selftest
+4/6 Test #29: vedit-diagnostics-ffi-selftest .........   Passed    3.25 sec
+    Start 30: vedit-diagnostics-product-seam
+5/6 Test #30: vedit-diagnostics-product-seam .........   Passed    6.24 sec
+    Start 31: vedit-toolchain-ux-selftest
+6/6 Test #31: vedit-toolchain-ux-selftest ............   Passed    3.17 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Total Test time (real) =  15.02 sec
+[ctest-exit=0]

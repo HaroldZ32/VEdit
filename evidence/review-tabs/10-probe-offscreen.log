@@ -1,0 +1,104 @@
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+This plugin does not support propagateSizeHints()
+[app-shell] close refused (headless): extra_9.sv has unsaved changes
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PASS probe.fixture
+PASS shell.one-pane
+PASS shell.active-pane
+PASS editor.provider-is-ktexteditor
+PASS tabs.initial-count
+PASS tabs.strip-exists
+PASS tabs.initial-label — untitled
+PASS tabs.no-provider-name-in-pane
+PASS tabs.style-has-selected-rule
+PASS open.alpha
+PASS open.bravo
+PASS open.charlie
+PASS tabs.three-opened — tabs=3
+PASS tabs.same-pane
+PASS tabs.file-names — alpha.sv | bravo.sv | charlie_unit.sv
+PASS tabs.active-is-last-open
+PASS tabs.open-paths
+PASS tabs.current-file-is-active — /tmp/vedit-tabs-probe-iyTljP/charlie_unit.sv
+PASS tabs.switch-file
+PASS tabs.switch-index
+PASS tabs.switch-editor — module alpha;
+endmod
+PASS dirty.document
+PASS dirty.tab-marker — ● charlie_unit.sv
+PASS dirty.tab-marker-only-on-active-tab
+PASS dirty.pane-state
+PASS dirty.title-placeholder — VEdit — /tmp/vedit-tabs-probe-iyTljP/charlie_unit.sv[*]
+PASS dirty.title-names-file — VEdit — /tmp/vedit-tabs-probe-iyTljP/charlie_unit.sv[*]
+PASS dirty.window-modified
+PASS dirty.title-star-rendered — VEdit — /tmp/vedit-tabs-probe-iyTljP/charlie_unit.sv*
+PASS dirty.status-label — ● 未保存的更改
+PASS save.returns-true
+PASS save.tab-marker-cleared — charlie_unit.sv
+PASS save.window-modified-cleared
+PASS save.title-star-cleared
+PASS save.status-label-hidden
+PASS save.disk-bytes
+PASS close.tab-button-present
+PASS close.tab-closed — tabs=2
+PASS close.neighbour-active — index=1 text=charlie_unit.sv
+PASS overflow.twelve-tabs — tabs=12
+PASS overflow.scroll-buttons
+PASS overflow.no-layout-growth — min=113 hint=1243
+PASS overflow.active-tab-visible
+PASS overflow.clipped-at-narrow-width — bar=685 hint=1243
+PASS overflow.active-tab-visible-narrow
+PASS prompt.document
+PASS prompt.headless-cancel-blocks
+PASS prompt.headless-status
+PASS prompt.clean-close-allowed
+PASS teardown.round-0 — shell with 2 panes and a swapped provider destroyed cleanly
+PASS teardown.round-1 — shell with 2 panes and a swapped provider destroyed cleanly
+PASS teardown.round-2 — shell with 2 panes and a swapped provider destroyed cleanly
+TABS-PROBE failures=0 platform=offscreen

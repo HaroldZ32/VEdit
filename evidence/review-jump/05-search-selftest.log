@@ -1,0 +1,4 @@
+search-selftest-exit=127
+1 /tmp/se-run.log
+---tail---
+bash: line 3: ./target/review-lane-search/vedit-workspace-search-selftest: No such file or directory

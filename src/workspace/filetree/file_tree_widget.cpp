@@ -2,6 +2,7 @@
 
 #include "file_kind.h"
 #include "file_ops.h"
+#include "file_status_delegate.h"
 #include "file_tree_model.h"
 
 #include <QAction>
@@ -16,9 +17,11 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QStackedWidget>
+#include <QTimer>
 #include <QToolBar>
 #include <QTreeView>
 #include <QVBoxLayout>
+#include <QCoreApplication>
 
 namespace vedit::workspace {
 namespace {
@@ -49,32 +52,32 @@ void FileTreeWidget::buildUi()
     toolBar_->setToolButtonStyle(Qt::ToolButtonTextOnly);
     toolBar_->setIconSize(QSize(16, 16));
 
-    openAction_ = toolBar_->addAction(QStringLiteral("Open..."));
-    openAction_->setToolTip(QStringLiteral("Open a folder"));
+    openAction_ = toolBar_->addAction(QCoreApplication::translate("VEdit", "Open..."));
+    openAction_->setToolTip(QCoreApplication::translate("VEdit", "Open a folder"));
     openAction_->setShortcut(QKeySequence(QStringLiteral("Ctrl+Shift+O")));
 
-    newFileAction_ = toolBar_->addAction(QStringLiteral("New File"));
-    newFileAction_->setToolTip(QStringLiteral("Create a file here (Ctrl+N)"));
+    newFileAction_ = toolBar_->addAction(QCoreApplication::translate("VEdit", "New File"));
+    newFileAction_->setToolTip(QCoreApplication::translate("VEdit", "Create a file here (Ctrl+N)"));
     newFileAction_->setShortcut(QKeySequence(QStringLiteral("Ctrl+N")));
 
-    newFolderAction_ = toolBar_->addAction(QStringLiteral("New Folder"));
-    newFolderAction_->setToolTip(QStringLiteral("Create a folder here (Ctrl+Shift+N)"));
+    newFolderAction_ = toolBar_->addAction(QCoreApplication::translate("VEdit", "New Folder"));
+    newFolderAction_->setToolTip(QCoreApplication::translate("VEdit", "Create a folder here (Ctrl+Shift+N)"));
     newFolderAction_->setShortcut(QKeySequence(QStringLiteral("Ctrl+Shift+N")));
 
-    renameAction_ = toolBar_->addAction(QStringLiteral("Rename"));
-    renameAction_->setToolTip(QStringLiteral("Rename the selection (F2)"));
+    renameAction_ = toolBar_->addAction(QCoreApplication::translate("VEdit", "Rename"));
+    renameAction_->setToolTip(QCoreApplication::translate("VEdit", "Rename the selection (F2)"));
     renameAction_->setShortcut(QKeySequence(Qt::Key_F2));
 
-    deleteAction_ = toolBar_->addAction(QStringLiteral("Delete"));
-    deleteAction_->setToolTip(QStringLiteral("Delete the selection (Del)"));
+    deleteAction_ = toolBar_->addAction(QCoreApplication::translate("VEdit", "Delete"));
+    deleteAction_->setToolTip(QCoreApplication::translate("VEdit", "Delete the selection (Del)"));
     deleteAction_->setShortcut(QKeySequence(Qt::Key_Delete));
 
-    refreshAction_ = toolBar_->addAction(QStringLiteral("Refresh"));
-    refreshAction_->setToolTip(QStringLiteral("Re-read the folder from disk (F5)"));
+    refreshAction_ = toolBar_->addAction(QCoreApplication::translate("VEdit", "Refresh"));
+    refreshAction_->setToolTip(QCoreApplication::translate("VEdit", "Re-read the folder from disk (F5)"));
     refreshAction_->setShortcut(QKeySequence(Qt::Key_F5));
 
-    collapseAction_ = toolBar_->addAction(QStringLiteral("Collapse"));
-    collapseAction_->setToolTip(QStringLiteral("Collapse every expanded folder"));
+    collapseAction_ = toolBar_->addAction(QCoreApplication::translate("VEdit", "Collapse"));
+    collapseAction_->setToolTip(QCoreApplication::translate("VEdit", "Collapse every expanded folder"));
 
     for (QAction *action : {openAction_, newFileAction_, newFolderAction_, renameAction_,
                             deleteAction_, refreshAction_, collapseAction_}) {
@@ -99,6 +102,28 @@ void FileTreeWidget::buildUi()
     view_->setEditTriggers(QAbstractItemView::NoEditTriggers);
     view_->setContextMenuPolicy(Qt::CustomContextMenu);
     view_->setTextElideMode(Qt::ElideMiddle);
+    // item 10: the status dot is painted between the icon and the name.
+    statusDelegate_ = new FileStatusDotDelegate(this);
+    view_->setItemDelegate(statusDelegate_);
+    statusTimer_ = new QTimer(this);
+    statusTimer_->setInterval(500);
+    connect(statusTimer_, &QTimer::timeout, this, [this]() {
+        if (model_ == nullptr) {
+            return;
+        }
+        // RM-9: the project set moves rarely (one revision per expansion). The
+        // timer reads it only when the revision changed - never a rescan per
+        // tick - and the synthetic group then carries the same status dots.
+        if (projectFilesSource_ && projectFilesRevisionSource_) {
+            const quint64 revision = projectFilesRevisionSource_();
+            if (revision != projectFilesRevision_) {
+                projectFilesRevision_ = revision;
+                model_->setFilelistFiles(projectFilesSource_());
+            }
+        }
+        model_->syncFileStatuses();
+    });
+    statusTimer_->start();
     treeLayout->addWidget(view_, 1);
 
     hintLabel_ = new QLabel(treePage_);
@@ -148,7 +173,7 @@ void FileTreeWidget::buildUi()
     connect(model_, &FileTreeModel::rootStateChanged, this, &FileTreeWidget::applyRootState);
     connect(model_, &FileTreeModel::loadFailed, this,
             [this](const QString &path, const QString &error) {
-                const QString message = QStringLiteral("Cannot read '%1': %2").arg(path, error);
+                const QString message = QCoreApplication::translate("VEdit", "Cannot read '%1': %2").arg(path, error);
                 diagnostics_.append(message);
                 while (diagnostics_.size() > kMaxDiagnostics) {
                     diagnostics_.removeFirst();
@@ -178,7 +203,7 @@ void FileTreeWidget::openDirectory(const QString &path)
     }
     applyRootState();
     if (model_->rootState() == FileTreeModel::RootState::Ready) {
-        setStatus(QStringLiteral("Opened '%1'").arg(QFileInfo(model_->rootPath()).fileName()));
+        setStatus(QCoreApplication::translate("VEdit", "Opened '%1'").arg(QFileInfo(model_->rootPath()).fileName()));
     }
     emit directoryOpened(model_->rootPath());
 }
@@ -198,6 +223,32 @@ FileTreeModel *FileTreeWidget::model() const
     return model_;
 }
 
+void FileTreeWidget::setFileStatusSource(std::function<int(const QString &)> status,
+                                         std::function<quint64()> revision)
+{
+    if (model_ != nullptr) {
+        model_->setFileStatusSource(std::move(status), std::move(revision));
+    }
+}
+
+void FileTreeWidget::setProjectFilesSource(std::function<QStringList()> files,
+                                           std::function<quint64()> revision)
+{
+    projectFilesSource_ = std::move(files);
+    projectFilesRevisionSource_ = std::move(revision);
+    // Pull once now so a tree that already exists shows the group without
+    // waiting for the next timer tick.
+    if (projectFilesSource_ && projectFilesRevisionSource_ && model_ != nullptr) {
+        projectFilesRevision_ = projectFilesRevisionSource_();
+        model_->setFilelistFiles(projectFilesSource_());
+    }
+}
+
+FileStatusDotDelegate *FileTreeWidget::statusDelegate() const
+{
+    return statusDelegate_;
+}
+
 QTreeView *FileTreeWidget::view() const
 {
     return view_;
@@ -214,9 +265,9 @@ bool FileTreeWidget::createFile(const QString &parentDirectory, const QString &n
     }
     const QString directory = parentDirectory.isEmpty() ? targetDirectory() : parentDirectory;
     if (directory.isEmpty()) {
-        reportFailure(QStringLiteral("Open a folder first."), QString());
+        reportFailure(QCoreApplication::translate("VEdit", "Open a folder first."), QString());
         if (error != nullptr) {
-            *error = QStringLiteral("Open a folder first.");
+            *error = QCoreApplication::translate("VEdit", "Open a folder first.");
         }
         return false;
     }
@@ -231,7 +282,7 @@ bool FileTreeWidget::createFile(const QString &parentDirectory, const QString &n
     }
 
     refreshAfterOperation(directory, result.path);
-    setStatus(QStringLiteral("Created file '%1' (%2)")
+    setStatus(QCoreApplication::translate("VEdit", "Created file '%1' (%2)")
                   .arg(name, fileKindLabel(fileKindForPath(result.path, false))));
     return true;
 }
@@ -246,9 +297,9 @@ bool FileTreeWidget::createFolder(const QString &parentDirectory, const QString 
     }
     const QString directory = parentDirectory.isEmpty() ? targetDirectory() : parentDirectory;
     if (directory.isEmpty()) {
-        reportFailure(QStringLiteral("Open a folder first."), QString());
+        reportFailure(QCoreApplication::translate("VEdit", "Open a folder first."), QString());
         if (error != nullptr) {
-            *error = QStringLiteral("Open a folder first.");
+            *error = QCoreApplication::translate("VEdit", "Open a folder first.");
         }
         return false;
     }
@@ -263,7 +314,7 @@ bool FileTreeWidget::createFolder(const QString &parentDirectory, const QString 
     }
 
     refreshAfterOperation(directory, result.path);
-    setStatus(QStringLiteral("Created folder '%1'").arg(name));
+    setStatus(QCoreApplication::translate("VEdit", "Created folder '%1'").arg(name));
     return true;
 }
 
@@ -273,9 +324,9 @@ bool FileTreeWidget::renameEntry(const QString &path, const QString &newName, QS
         error->clear();
     }
     if (path.isEmpty()) {
-        reportFailure(QStringLiteral("Select a file or folder first."), QString());
+        reportFailure(QCoreApplication::translate("VEdit", "Select a file or folder first."), QString());
         if (error != nullptr) {
-            *error = QStringLiteral("Select a file or folder first.");
+            *error = QCoreApplication::translate("VEdit", "Select a file or folder first.");
         }
         return false;
     }
@@ -292,7 +343,7 @@ bool FileTreeWidget::renameEntry(const QString &path, const QString &newName, QS
     }
 
     refreshAfterOperation(directory, result.path);
-    setStatus(QStringLiteral("Renamed '%1' to '%2'").arg(oldName, newName));
+    setStatus(QCoreApplication::translate("VEdit", "Renamed '%1' to '%2'").arg(oldName, newName));
     return true;
 }
 
@@ -302,14 +353,14 @@ bool FileTreeWidget::deleteEntry(const QString &path, bool recursive, QString *e
         error->clear();
     }
     if (path.isEmpty()) {
-        reportFailure(QStringLiteral("Select a file or folder first."), QString());
+        reportFailure(QCoreApplication::translate("VEdit", "Select a file or folder first."), QString());
         if (error != nullptr) {
-            *error = QStringLiteral("Select a file or folder first.");
+            *error = QCoreApplication::translate("VEdit", "Select a file or folder first.");
         }
         return false;
     }
     if (path == model_->rootPath()) {
-        const QString message = QStringLiteral("Cannot delete the folder that is open. Close it first.");
+        const QString message = QCoreApplication::translate("VEdit", "Cannot delete the folder that is open. Close it first.");
         reportFailure(message, QString());
         if (error != nullptr) {
             *error = message;
@@ -330,7 +381,7 @@ bool FileTreeWidget::deleteEntry(const QString &path, bool recursive, QString *e
     }
 
     refreshAfterOperation(directory, QString());
-    setStatus(QStringLiteral("Deleted '%1'").arg(name));
+    setStatus(QCoreApplication::translate("VEdit", "Deleted '%1'").arg(name));
     return true;
 }
 
@@ -433,7 +484,7 @@ void FileTreeWidget::onNewFile()
 {
     const QString directory = targetDirectory();
     if (directory.isEmpty()) {
-        setStatus(QStringLiteral("Open a folder first."), true);
+        setStatus(QCoreApplication::translate("VEdit", "Open a folder first."), true);
         return;
     }
     QString name = QStringLiteral("untitled.v");
@@ -452,7 +503,7 @@ void FileTreeWidget::onNewFolder()
 {
     const QString directory = targetDirectory();
     if (directory.isEmpty()) {
-        setStatus(QStringLiteral("Open a folder first."), true);
+        setStatus(QCoreApplication::translate("VEdit", "Open a folder first."), true);
         return;
     }
     QString name = QStringLiteral("new_folder");
@@ -471,7 +522,7 @@ void FileTreeWidget::onRename()
 {
     const QString path = targetEntryPath();
     if (path.isEmpty()) {
-        setStatus(QStringLiteral("Select a file or folder first."), true);
+        setStatus(QCoreApplication::translate("VEdit", "Select a file or folder first."), true);
         return;
     }
     QString name = QFileInfo(path).fileName();
@@ -490,11 +541,11 @@ void FileTreeWidget::onDelete()
 {
     const QString path = targetEntryPath();
     if (path.isEmpty()) {
-        setStatus(QStringLiteral("Select a file or folder first."), true);
+        setStatus(QCoreApplication::translate("VEdit", "Select a file or folder first."), true);
         return;
     }
     if (path == model_->rootPath()) {
-        reportFailure(QStringLiteral("Cannot delete the folder that is open. Close it first."),
+        reportFailure(QCoreApplication::translate("VEdit", "Cannot delete the folder that is open. Close it first."),
                       QString());
         return;
     }
@@ -524,7 +575,7 @@ void FileTreeWidget::onRefresh()
         model_->ensureLoaded(rootIndex);
     }
     applyRootState();
-    setStatus(QStringLiteral("Refreshed '%1'").arg(QFileInfo(path).fileName()));
+    setStatus(QCoreApplication::translate("VEdit", "Refreshed '%1'").arg(QFileInfo(path).fileName()));
 }
 
 void FileTreeWidget::onCollapseAll()
@@ -559,7 +610,7 @@ void FileTreeWidget::showKindForIndex(const QModelIndex &index)
     }
     const QString path = model_->pathForIndex(index);
     const bool directory = model_->isDirectory(index);
-    setStatus(QStringLiteral("%1 - %2")
+    setStatus(QCoreApplication::translate("VEdit", "%1 - %2")
                   .arg(QFileInfo(path).fileName(), fileKindLabel(fileKindForPath(path, directory))));
 }
 

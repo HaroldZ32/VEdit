@@ -1,0 +1,123 @@
+CHECK PASS product.fixture
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+CHECK PASS product.panel
+CHECK PASS product.lint-action
+CHECK PASS product.hover-action
+LINT-PROJECT-NO-FILES loading=1 root='/tmp/vedit-b3-wiring-e2e-yoknJa/project1'
+CHECK PASS project.preload-message  status='The project file set is still loading — try again in a moment'
+LINT-PROJECT-NO-FILES loading=1 root='/tmp/vedit-b3-wiring-e2e-yoknJa/project1'
+PROJECT-ROOT-FILES root='/tmp/vedit-b3-wiring-e2e-yoknJa/project1' files=4
+This plugin does not support propagateSizeHints()
+LINT-PROJECT engine=slang files=4 lsp-backend=verible include-dirs=0 defines=0 skipped-open=0 automatic=0
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support raise()
+LINT-PASS-FINISHED automatic=0 errors=2 files=4 dialogs=1 notice=1
+CHECK PASS product.explicit-pass-files  files=/tmp/vedit-b3-wiring-e2e-yoknJa/project1/a.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/b.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/d.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/rename.sv
+CHECK PASS product.pane
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+CHECK PASS product.open-a
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+CHECK PASS product.open-b
+CHECK PASS hover.view-a
+DIAG-HOVER file='/tmp/vedit-b3-wiring-e2e-yoknJa/project1/a.sv' line=2 column=3 severity=1 rule='no-trailing-spaces' pending=1 probe-count=0
+OBSERVED hover.after-hover alive=1 parent=1 diagnostic=1 rule='no-trailing-spaces'
+CHECK PASS hover.popup-created  map=present
+CHECK PASS hover.parent-is-active-view
+CHECK PASS hover.shows-diagnostic
+CHECK PASS hover.probe-off-mouse-path  pending-at-hover=1 diagnostic=1
+DIAG-HOVER-PROBE rule='no-trailing-spaces' fixable=1 async-count=1
+CHECK PASS hover.fixable-after-async-probe  fixable=1
+OBSERVED screenshot.hover-popup visible=1 rect=92,37 167x68
+DIAG-HOVER file='/tmp/vedit-b3-wiring-e2e-yoknJa/project1/a.sv' line=3 column=3 severity=1 rule='line-length' pending=1 probe-count=1
+DIAG-HOVER-PROBE rule='line-length' fixable=0 async-count=2
+CHECK PASS hover.no-fix-branch  fixable=0
+OBSERVED screenshot.hover-popup visible=1 rect=92,51 310x56
+CHECK PASS hover.stale-detects-cleared-row  diagnostic=1 stale=1
+LINT-PROJECT engine=slang files=4 lsp-backend=verible include-dirs=0 defines=0 skipped-open=0 automatic=0
+This plugin does not support raise()
+LINT-PASS-FINISHED automatic=0 errors=2 files=4 dialogs=2 notice=1
+CHECK PASS hover.tab-switch  parent=1 hidden=1
+CHECK PASS upper.initial-covers-b  upper=/tmp/vedit-b3-wiring-e2e-yoknJa/project1/a.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/b.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/d.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/rename.sv
+CHECK PASS r2.background-tab-view
+CHECK PASS r2.edit-was-background  active='/tmp/vedit-b3-wiring-e2e-yoknJa/project1/a.sv' edited='/tmp/vedit-b3-wiring-e2e-yoknJa/project1/b.sv'
+CHECK PASS r2.background-tab-invalidated  upper=/tmp/vedit-b3-wiring-e2e-yoknJa/project1/a.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/d.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/rename.sv
+LINT-PROJECT engine=slang files=3 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+This plugin does not support raise()
+LINT-PASS-FINISHED automatic=0 errors=2 files=3 dialogs=3 notice=1
+CHECK PASS c8.b-is-dirty
+CHECK PASS c8.save-a
+CHECK PASS c8.auto-pass-after-save
+OBSERVED c8.after-save-a files='/tmp/vedit-b3-wiring-e2e-yoknJa/project1/a.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/d.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/rename.sv'
+CHECK PASS c8.saved-file-included  files=/tmp/vedit-b3-wiring-e2e-yoknJa/project1/a.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/d.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/rename.sv
+CHECK PASS c8.dirty-buffer-excluded  files=/tmp/vedit-b3-wiring-e2e-yoknJa/project1/a.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/d.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/rename.sv
+CHECK PASS c8.save-b
+LINT-PASS-FINISHED automatic=1 errors=2 files=3 dialogs=3 notice=1
+CHECK PASS c8.auto-pass-after-save-b
+OBSERVED c8.after-save-b files='/tmp/vedit-b3-wiring-e2e-yoknJa/project1/a.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/b.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/d.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/rename.sv'
+CHECK PASS c8.saved-b-now-included  files=/tmp/vedit-b3-wiring-e2e-yoknJa/project1/a.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/b.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/d.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/rename.sv
+CHECK PASS c8.unmodified-open-included  files=/tmp/vedit-b3-wiring-e2e-yoknJa/project1/a.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/b.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/d.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/rename.sv
+CHECK PASS n2.file-covered-before-open  upper=/tmp/vedit-b3-wiring-e2e-yoknJa/project1/a.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/d.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/rename.sv
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+CHECK PASS n2.open-d
+CHECK PASS n2.view-d
+CHECK PASS n2.d-is-dirty
+LINT-PASS-FINISHED automatic=1 errors=2 files=4 dialogs=3 notice=1
+CHECK FAIL n2.first-edit-before-poll-invalidates  upper=/tmp/vedit-b3-wiring-e2e-yoknJa/project1/a.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/b.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/d.sv,/tmp/vedit-b3-wiring-e2e-yoknJa/project1/rename.sv
+CHECK PASS switch.write-settings  /tmp/vedit-b3-wiring-e2e-yoknJa/state/settings.toml
+BACKEND-SWITCHED backend=verible lint=verible-verilog-lint lsp=/vedit-build/.mpd/recon/verible/bin/verible-verilog-ls engine=/vedit-build/.mpd/recon/verible/bin/verible-verilog-lint basis=measured argv='backend=verible program=/vedit-build/.mpd/recon/verible/bin/verible-verilog-ls'
+BACKEND-AUX aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server]
+SWITCH elapsed-ms=0 backend=verible lint=verible-verilog-lint basis=measured
+This plugin does not support propagateSizeHints()
+OBSERVED switch.ok=1 backend='verible' lint='verible-verilog-lint' reason=''
+CHECK PASS switch.applied  ok=1 reason=''
+CHECK PASS n3.old-upper-rows-cleared  upper=
+CHECK PASS n1.old-file-not-covered-after-switch  covered-a=0 dot-map=0
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+OBSERVED rename.gate enabled=1 reason=''
+CHECK PASS rename.open-fixture
+CHECK PASS rename.view
+RENAME-REFUSED backend=verible symbol='123' reason=''123' is a number literal, not a renameable symbol' line=5 column=23
+CHECK PASS rename.number-literal-digit  reason=''123' is a number literal, not a renameable symbol'
+RENAME-REFUSED backend=verible symbol='b0' reason=''b0' is a number literal, not a renameable symbol' line=4 column=16
+CHECK PASS rename.number-literal-based  reason=''b0' is a number literal, not a renameable symbol'
+RENAME-REFUSED backend=verible symbol='commentword' reason='the cursor is inside a comment, not on a symbol' line=2 column=9
+CHECK PASS rename.comment  reason='the cursor is inside a comment, not on a symbol'
+RENAME-REFUSED backend=verible symbol='hello' reason='the cursor is inside a string, not on a symbol' line=3 column=21
+CHECK PASS rename.string  reason='the cursor is inside a string, not on a symbol'
+RENAME-REFUSED backend=verible symbol='$display' reason=''$display' is a system task/function, not a renameable symbol' line=3 column=12
+CHECK PASS rename.system-task  reason=''$display' is a system task/function, not a renameable symbol'
+RENAME-REFUSED backend=verible symbol='module' reason=''module' is a language keyword, not a renameable symbol' line=1 column=3
+CHECK PASS rename.keyword  reason=''module' is a language keyword, not a renameable symbol'
+CHECK PASS modal.explicit-dialog-hidden
+LINT-PASS-FINISHED automatic=1 errors=2 files=3 dialogs=3 notice=1
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+OBSERVED presentation automatic=1 dialogsBefore=3 dialogsAfter=3 rows=2 visible=0
+CHECK PASS modal.automatic-never-shows  automatic=1 before=3 after=3
+CHECK PASS modal.dialog-not-visible-after-auto
+CHECK PASS modal.counter-detects-reshow
+PROJECT-ROOT-CHANGED root='/tmp/vedit-b3-wiring-e2e-yoknJa/project2' files=0 (waiting for the new file set)
+LINT-PROJECT-NO-FILES loading=1 root='/tmp/vedit-b3-wiring-e2e-yoknJa/project2'
+PROJECT-ROOT-FILES root='/tmp/vedit-b3-wiring-e2e-yoknJa/project2' files=1
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+LINT-PROJECT engine=verible-verilog-lint files=1 lsp-backend=verible include-dirs=0 defines=0 skipped-open=1 automatic=0
+This plugin does not support raise()
+LINT-PASS-FINISHED automatic=0 errors=2 files=1 dialogs=4 notice=1
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+OBSERVED root.after-switch files='/tmp/vedit-b3-wiring-e2e-yoknJa/project2/c.sv'
+CHECK PASS root.repinned  files=/tmp/vedit-b3-wiring-e2e-yoknJa/project2/c.sv
+CHECK PASS root.old-rows-cleared  old=/tmp/vedit-b3-wiring-e2e-yoknJa/project1/a.sv upper-now=
+CHECK PASS root.new-rows-covered  new=/tmp/vedit-b3-wiring-e2e-yoknJa/project2/c.sv
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+CHECK PASS destroy.open-c
+DIAG-HOVER file='/tmp/vedit-b3-wiring-e2e-yoknJa/project2/c.sv' line=2 column=3 severity=1 rule='no-trailing-spaces' pending=1 probe-count=2
+CHECK PASS destroy.tab-closed
+CHECK PASS destroy.cache-cleared  alive=0 stale=0
+HOVER-REQUEST backend=verible file='/tmp/vedit-b3-wiring-e2e-yoknJa/project1/rename.sv' line=0 column=2 request=4
+CHECK PASS destroy.actions-clean  known=1 alive=0 parent=0 stale=0
+CHECK PASS destroy.no-stale-pointer  alive=0 diagnostic=0 stale=0
+SUMMARY checks=60 failures=1 skips=0

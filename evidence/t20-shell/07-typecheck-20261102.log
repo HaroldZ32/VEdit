@@ -1,0 +1,1962 @@
+[typecheck] C++/Qt6 lane: configure + build with warnings-as-errors (pinned image)
+[qt6-cxx] pinned image + cmake configure/build--no-test: bash scripts/build-qt.sh --no-test
+[rust-ffi] pinned Rust image: vedit-build:local (toolchain 1.99.0)
+[rust-ffi] reusing the existing image vedit-build:local
+image_id=sha256:2401e5bdf213ba0c84b52782979ced8d81b587d682860069ff3e43d476c6025c
+[rust-ffi] build + unit tests + dependency-tree + header checks in vedit-build:local
+== cargo build -p vd-ffi --release (verbose: the target list is in the log) ==
+       Fresh unicode-ident v1.0.27
+       Fresh proc-macro2 v1.0.107
+       Fresh stable_deref_trait v1.2.1
+       Fresh writeable v0.6.4
+       Fresh utf_types v1.0.0
+       Fresh litemap v0.8.3
+       Fresh quote v1.0.47
+       Fresh utf8_iter v1.1.0
+       Fresh shlex v2.0.1
+       Fresh find-msvc-tools v0.1.15
+       Fresh serde_core v1.0.229
+       Fresh bytes v1.12.1
+       Fresh utf8parse v0.2.2
+       Fresh smallvec v1.16.4
+       Fresh syn v3.0.9
+       Fresh cc v1.10.0
+       Fresh icu_normalizer_data v2.4.0
+       Fresh syn v2.0.119
+       Fresh percent-encoding v2.3.2
+       Fresh pin-project-lite v0.2.17
+       Fresh anstyle-parse v1.0.0
+       Fresh anstyle-query v1.1.5
+       Fresh is_terminal_polyfill v1.70.2
+       Fresh zeroize v1.9.1
+       Fresh futures-core v0.3.34
+       Fresh colorchoice v1.0.5
+       Fresh synstructure v0.14.0
+       Fresh zerovec-derive v0.11.7
+       Fresh serde_derive v1.0.229
+       Fresh displaydoc v0.2.7
+       Fresh icu_properties_data v2.4.0
+       Fresh anstyle v1.0.14
+       Fresh futures-sink v0.3.34
+       Fresh libc v0.2.191
+       Fresh rustls-pki-types v1.15.1
+       Fresh getrandom v0.2.17
+       Fresh zerofrom-derive v0.1.8
+       Fresh yoke-derive v0.8.4
+       Fresh anstream v1.0.0
+       Fresh futures-io v0.3.34
+       Fresh bitflags v2.13.2
+       Fresh strsim v0.11.1
+       Fresh linux-raw-sys v0.12.1
+       Fresh zerofrom v0.1.8
+       Fresh cfg-if v1.0.5
+       Fresh untrusted v0.9.0
+       Fresh clap_lex v1.1.1
+       Fresh rustix v1.1.6
+       Fresh zmij v1.0.23
+       Fresh anyhow v1.0.104
+       Fresh futures-channel v0.3.34
+       Fresh futures-macro v0.3.34
+       Fresh form_urlencoded v1.2.2
+       Fresh toml_datetime v0.7.5+spec-1.1.0
+       Fresh errno v0.3.14
+       Fresh yoke v0.8.4
+       Fresh clap_builder v4.6.7
+       Fresh ring v0.17.14
+       Fresh memchr v2.8.3
+       Fresh winnow v1.0.4
+       Fresh itoa v1.0.18
+       Fresh winnow v0.7.15
+       Fresh hashbrown v0.17.1
+       Fresh slab v0.4.12
+       Fresh zerovec v0.11.9
+       Fresh zerotrie v0.2.5
+       Fresh futures-task v0.3.34
+       Fresh once_cell v1.21.4
+       Fresh equivalent v1.0.3
+       Fresh rustls-webpki v0.103.16
+       Fresh serde_json v1.0.154
+       Fresh toml_parser v1.1.5+spec-1.1.0
+       Fresh toml v0.9.12+spec-1.1.0
+       Fresh clap v4.6.7
+       Fresh signal-hook-registry v1.4.8
+       Fresh httparse v1.10.1
+       Fresh serde v1.0.229
+       Fresh tinystr v0.8.5
+       Fresh potential_utf v0.1.6
+       Fresh indexmap v2.14.2
+       Fresh futures-util v0.3.34
+       Fresh tracing-attributes v0.1.31
+       Fresh tokio-macros v2.7.2
+       Fresh serde_repr v0.1.21
+       Fresh thiserror-impl v2.0.21
+       Fresh toml_datetime v1.1.2+spec-1.1.0
+       Fresh mio v1.2.4
+       Fresh http v1.5.0
+       Fresh serde_spanned v1.1.2
+       Fresh tracing-core v0.1.36
+       Fresh icu_locale_core v2.4.0
+       Fresh icu_collections v2.4.0
+       Fresh bitflags v1.3.2
+       Fresh subtle v2.6.1
+       Fresh heck v0.5.0
+       Fresh toml_writer v1.1.3+spec-1.1.0
+       Fresh base64 v0.23.1
+       Fresh log v0.4.34
+       Fresh tokio v1.54.1
+       Fresh thiserror v2.0.21
+       Fresh tracing v0.1.44
+       Fresh getrandom v0.4.3
+       Fresh futures v0.3.34
+       Fresh waitpid-any v0.3.0
+       Fresh webpki-roots v1.0.11
+       Fresh tower-layer v0.3.3
+       Fresh icu_provider v2.4.0
+       Fresh cbindgen v0.29.4
+       Fresh ureq-proto v0.6.5
+       Fresh toml v1.1.8+spec-1.1.0
+       Fresh rustls v0.23.46
+       Fresh utf8-zero v0.8.1
+       Fresh fastrand v2.5.0
+       Fresh tower-service v0.3.3
+       Fresh tokio-util v0.7.20
+       Fresh vd-vcs v0.1.1 (/vedit-build/crates/vd-vcs)
+       Fresh vd-search v0.1.1 (/vedit-build/crates/vd-search)
+       Fresh icu_properties v2.4.0
+       Fresh icu_normalizer v2.4.0
+       Fresh ureq v3.5.0
+       Fresh tempfile v3.27.0
+       Fresh vd-settings v0.1.1 (/vedit-build/crates/vd-settings)
+       Fresh vd-config v0.1.1 (/vedit-build/crates/vd-config)
+       Fresh idna_adapter v1.2.2
+       Fresh vd-fim v0.1.1 (/vedit-build/crates/vd-fim)
+       Fresh vd-deeplint v0.1.1 (/vedit-build/crates/vd-deeplint)
+       Fresh idna v1.1.0
+       Fresh url v2.5.8
+       Fresh lsp-types v0.95.1
+       Fresh async-lsp v0.2.4
+       Fresh vd-lsp v0.1.1 (/vedit-build/crates/vd-lsp)
+       Fresh vd-ffi v0.1.1 (/vedit-build/crates/vd-ffi)
+    Finished `release` profile [optimized] target(s) in 0.06s
+-rw-r--r-- 2 root root 62256800 Nov  2 11:06 target/release/libvd_ffi.a
+== compiled Rust targets (rustc --crate-name lines, or Fresh lines when cached) ==
+anstream
+anstyle
+anstyle-parse
+anstyle-query
+anyhow
+async-lsp
+base64
+bitflags
+bytes
+cbindgen
+cc
+cfg-if
+clap
+clap_builder
+clap_lex
+colorchoice
+displaydoc
+equivalent
+errno
+fastrand
+find-msvc-tools
+form_urlencoded
+futures
+futures-channel
+futures-core
+futures-io
+futures-macro
+futures-sink
+futures-task
+futures-util
+getrandom
+hashbrown
+heck
+http
+httparse
+icu_collections
+icu_locale_core
+icu_normalizer
+icu_normalizer_data
+icu_properties
+icu_properties_data
+icu_provider
+idna
+idna_adapter
+indexmap
+is_terminal_polyfill
+itoa
+libc
+linux-raw-sys
+litemap
+log
+lsp-types
+memchr
+mio
+once_cell
+percent-encoding
+pin-project-lite
+potential_utf
+proc-macro2
+quote
+ring
+rustix
+rustls
+rustls-pki-types
+rustls-webpki
+serde
+serde_core
+serde_derive
+serde_json
+serde_repr
+serde_spanned
+shlex
+signal-hook-registry
+slab
+smallvec
+stable_deref_trait
+strsim
+subtle
+syn
+synstructure
+tempfile
+thiserror
+thiserror-impl
+tinystr
+tokio
+tokio-macros
+tokio-util
+toml
+toml_datetime
+toml_parser
+toml_writer
+tower-layer
+tower-service
+tracing
+tracing-attributes
+tracing-core
+unicode-ident
+untrusted
+ureq
+ureq-proto
+url
+utf8-zero
+utf8_iter
+utf8parse
+utf_types
+vd-config
+vd-deeplint
+vd-ffi
+vd-fim
+vd-lsp
+vd-search
+vd-settings
+vd-vcs
+waitpid-any
+webpki-roots
+winnow
+writeable
+yoke
+yoke-derive
+zerofrom
+zerofrom-derive
+zeroize
+zerotrie
+zerovec
+zerovec-derive
+zmij
+== cargo test (the service unit tests, AC-0.2) ==
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s
+     Running unittests src/lib.rs (target/debug/deps/vd_ffi-d7d088bbe0f89edb)
+
+running 43 tests
+test deeplint::tests::the_dedup_key_is_identical_for_an_lsp_and_a_cli_row ... ok
+test capi::tests::the_scanner_catches_a_known_collision ... ok
+test deeplint::tests::the_verible_command_line_states_that_it_takes_no_include_dirs ... ok
+test deeplint::tests::the_slang_command_line_shows_the_project_settings ... ok
+test fim::tests::mapping_carries_every_configured_value_without_leaking_the_key ... ok
+test lsp::tests::an_invalid_backend_is_rejected ... ok
+test lsp::tests::the_slang_table_is_the_measured_one_from_the_spike ... ok
+test lsp::tests::start_v2_rejects_an_unknown_backend_and_starts_a_known_one ... ok
+test lsp::tests::the_verible_table_is_measured_and_answers_every_action ... ok
+test project::tests::a_missing_project_root_is_a_typed_error ... ok
+test lsp::tests::the_slang_command_line_shows_the_include_dirs_and_defines ... ok
+test fim::tests::loaded_project_and_environment_configure_the_service ... ok
+test project::tests::a_present_rules_file_produces_no_panel_noise ... ok
+test project::tests::actionable_filelist_warnings_still_reach_the_panel ... ok
+test project::tests::expand_reports_the_three_bad_filelist_cases_with_file_and_line ... ok
+test lsp::tests::the_verible_file_list_preview_carries_incdir_and_define ... ok
+test project::tests::bad_entries_render_actionable_diagnostics ... ok
+test project::tests::missing_optional_rules_file_is_not_a_panel_diagnostic ... ok
+test project::tests::fixture_expansion_matches_the_service_contract ... ok
+test project::tests::expansion_is_deterministic ... ok
+test project::tests::expand_with_inputs_merges_the_imported_filelists_and_the_tools_page ... ok
+test lsp::tests::the_verible_file_list_route_is_visible_in_the_session_argv ... ok
+test settings::tests::an_unconfigured_store_keeps_fim_disabled_without_a_transport ... ok
+test project::tests::unreadable_rules_file_still_warns_without_an_absolute_path ... ok
+test project::tests::the_expand_abi_collects_unresolved_variables_and_skipped_lines ... ok
+test project::tests::the_engine_command_line_carries_the_expansion_include_dirs_and_defines ... ok
+test vcs::tests::invalid_arguments_return_no_job ... ok
+test project::tests::the_expand_abi_delivers_the_union_through_a_job ... ok
+test fim::tests::unreachable_endpoint_is_an_explicit_error_without_the_key ... ok
+test settings::tests::a_world_readable_key_file_is_refused ... ok
+test capi::tests::no_generated_abi_name_collides_with_a_qt_or_windows_macro ... ok
+test fim::tests::configured_loopback_request_reaches_the_rust_transport ... ok
+test vcs::tests::diff_job_reaches_ready_for_a_plain_directory ... ok
+test vcs::tests::info_job_reaches_ready_for_a_plain_directory ... ok
+test settings::tests::a_plaintext_store_key_never_reaches_the_transport_or_a_debug_line ... ok
+test settings::tests::the_settings_pages_reach_the_vd_fim_settings_type ... ok
+test settings::tests::the_environment_key_wins_over_the_user_file ... ok
+test vcs::tests::polling_a_job_with_the_wrong_kind_is_misuse ... ok
+test deeplint::tests::a_missing_slang_binary_fails_the_elaboration_with_its_tool_name ... ok
+test deeplint::tests::a_batch_cancel_really_stops_it_and_delivers_no_results ... ok
+test deeplint::tests::a_batch_reports_progress_and_delivers_its_result_once ... ok
+test deeplint::tests::the_elaboration_job_returns_the_hierarchy_and_the_driver_load_positions ... ok
+test fim::tests::default_config_is_disabled_and_sends_nothing ... ok
+
+test result: ok. 43 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/abi.rs (target/debug/deps/abi-c804d6a23d6a8517)
+
+running 12 tests
+test abi_version_is_one ... ok
+test cancelling_a_job_discards_its_result ... ok
+test null_and_unknown_arguments_are_rejected_with_a_typed_error ... ok
+test projected_fixture_serves_all_seven_services ... ok
+test lsp_configures_lazily_without_starting_the_server ... ok
+test fim_is_disabled_by_default_and_starts_no_worker ... ok
+test deeplint_reports_a_missing_binary_as_a_typed_failure ... ok
+test project_parse_expands_the_fixture_filelist ... ok
+test lsp_rejects_a_missing_server_binary ... ok
+test search_returns_hits_over_the_project_file_list ... ok
+test vcs_reports_the_empty_state_for_a_plain_directory ... ok
+test settings_round_trip_through_the_abi ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/qt_abi_guard.rs (target/debug/deps/qt_abi_guard-2f335892ec40a5dc)
+
+running 1 test
+test the_generated_header_compiles_together_with_a_real_qt_header ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_search-ccee45e2854f35f2)
+
+running 10 tests
+test tests::missing_root_is_reported ... ok
+test tests::preview_is_trimmed_and_capped ... ok
+test tests::tree_missing_root_is_reported ... ok
+test tests::non_utf8_and_missing_files_are_skipped ... ok
+test tests::limit_truncates_from_the_tail ... ok
+test tests::empty_needle_and_zero_limit_return_nothing ... ok
+test tests::tree_honours_the_result_limit_and_timeout ... ok
+test tests::query_finds_every_line_in_file_order ... ok
+test tests::tree_matches_case_insensitively_and_reports_summary ... ok
+test tests::tree_skips_binary_oversized_and_excluded_dirs ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_settings-6db6bb138f178aed)
+
+running 20 tests
+test schema::tests::a_plaintext_api_key_in_the_store_is_ignored_and_never_debug_printed ... ok
+test schema::tests::an_empty_store_yields_the_baseline_defaults ... ok
+test schema::tests::api_key_debug_is_redacted ... ok
+test schema::tests::backend_values_round_trip_and_unknown_values_keep_the_default ... ok
+test schema::tests::fim_values_parse_and_unparsable_numbers_keep_the_default ... ok
+test schema::tests::key_contract_is_stable ... ok
+test schema::tests::a_missing_store_and_key_file_resolve_to_no_key ... ok
+test schema::tests::a_world_readable_key_file_is_refused_not_used ... ok
+test schema::tests::tool_paths_and_lists_are_read_verbatim ... ok
+test tests::broken_toml_degrades_to_a_warning ... ok
+test tests::missing_file_is_the_default_state ... ok
+test tests::non_string_values_are_reported_and_skipped ... ok
+test schema::tests::a_successful_write_leaves_only_the_key_file_behind ... ok
+test schema::tests::an_existing_loose_key_file_is_replaced_by_an_owner_only_one ... ok
+test schema::tests::the_environment_key_wins_over_the_user_file ... ok
+test schema::tests::the_key_file_is_written_owner_only_and_can_be_removed ... ok
+test schema::tests::writing_an_empty_key_removes_the_file ... ok
+test tests::round_trip_preserves_every_pair ... ok
+test tests::save_replaces_atomically_and_leaves_no_temporary_file ... ok
+test tests::failed_rename_leaves_the_original_file_intact ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_vcs-172bba4941aeb03b)
+
+running 6 tests
+test tests::git_detached_head_has_no_branch ... ok
+test tests::git_porcelain_maps_statuses_and_branch ... ok
+test tests::svn_status_maps_codes ... ok
+test tests::plain_directory_is_the_empty_state_not_an_error ... ok
+test tests::nested_directory_finds_the_repository_above_it ... ok
+test tests::markers_select_the_backend ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/readonly.rs (target/debug/deps/readonly-dbb1f326a4173505)
+
+running 9 tests
+test allow_lists_are_disjoint_from_write_lists ... ok
+test every_git_write_subcommand_is_refused_before_spawn ... ok
+test every_svn_write_subcommand_is_refused_before_spawn ... ok
+test production_runner_gate_refuses_writes_without_spawning ... ok
+test stub_service_drives_the_panel_without_processes ... ok
+test unknown_tool_and_empty_subcommand_are_refused ... ok
+test git_session_uses_only_read_only_subcommands ... ok
+test plain_directory_is_the_empty_state_in_every_query ... ok
+test svn_session_reads_status_info_and_diff ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_ffi
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_search
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_settings
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_vcs
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+== cargo tree (GTK isolation, AC-0.3 / AC-S0.5) ==
+├── vd-config v0.1.1 (/vedit-build/crates/vd-config)
+├── vd-deeplint v0.1.1 (/vedit-build/crates/vd-deeplint)
+├── vd-fim v0.1.1 (/vedit-build/crates/vd-fim)
+├── vd-lsp v0.1.1 (/vedit-build/crates/vd-lsp)
+== cbindgen header ==
+header check: no Rust type outside comments
+[qt6] pinned matrix: Qt 6.10.2 / KF6 6.24.0 / KTextEditor 6.24.0 / KSyntaxHighlighting 6.24.0 / tree-sitter 0.25.9
+[qt6] build image: vedit-qt6-build:local (stage qt6-build of scripts/docker/Dockerfile.build, base docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c)
+[qt6-image] building vedit-qt6-build:local (stage qt6-build, base docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c)
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.build
+#1 transferring dockerfile: 11.56kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [qt6-build 1/4] FROM docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c
+#4 resolve docker.m.daocloud.io/library/ubuntu@sha256:6a06111c3b0a8600feadb270aec771dc239bf407b25625f93f44ab00e11f4d3c 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 45B done
+#5 DONE 0.0s
+
+#6 [qt6-build 2/4] COPY qt6-locked-packages.txt /opt/vedit/qt6-locked-packages.txt
+#6 CACHED
+
+#7 [qt6-build 3/4] RUN set -eux;     apt-get update;     mkdir -p /tmp/qt6-debs; cd /tmp/qt6-debs;     while read -r spec sha rest; do       case "$spec" in ''|'#'*) continue;; esac;       apt-get download "$spec";       deb=$(ls "${spec%%=*}"_*.deb);       printf '%s  %s\n' "$sha" "$deb" | sha256sum -c -;     done < /opt/vedit/qt6-locked-packages.txt;     cd /; rm -rf /tmp/qt6-debs;     DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends       build-essential pkg-config git curl ca-certificates binutils file       xvfb xauth fonts-dejavu-core libgl1-mesa-dri mesa-utils       libxcb-cursor0 libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0       libxcb-keysyms1 libxcb-randr0 libxcb-render-util0 libxcb-shape0       libxcb-xkb1 libxkbcommon0       $(awk '!/^#/ && NF {print $1}' /opt/vedit/qt6-locked-packages.txt);     rm -rf /var/lib/apt/lists/*
+#7 CACHED
+
+#8 [qt6-build 4/4] RUN set -eux;     while read -r spec sha rest; do       case "$spec" in ''|'#'*) continue;; esac;       pkg="${spec%%=*}"; ver="${spec#*=}";       got=$(dpkg-query -W -f='${Version}' "$pkg");       [ "$got" = "$ver" ] || { echo "FATAL: $pkg installed=$got locked=$ver" >&2; exit 1; };     done < /opt/vedit/qt6-locked-packages.txt;     { echo "## image facts"; head -3 /etc/os-release;       echo "glibc: $(dpkg-query -W -f='${Version}' libc6)";       strings /lib/x86_64-linux-gnu/libc.so.6 | grep -m1 'Minimum supported kernel';       echo "qt6-base-dev: $(dpkg-query -W -f='${Version}' qt6-base-dev)";       echo "kf6-texteditor: $(dpkg-query -W -f='${Version}' libkf6texteditor-dev)";       echo "kf6-syntaxhighlighting: $(dpkg-query -W -f='${Version}' libkf6syntaxhighlighting-dev)";       echo "tree-sitter: $(pkg-config --modversion tree-sitter)";       echo "cmake: $(cmake --version | head -1)";       echo "g++: $(g++ --version | head -1)";     } | tee /opt/vedit/build-image.txt;     dpkg-query -W -f='${Package} ${Version} ${Architecture}\n' | sort > /opt/vedit/package-snapshot.txt
+#8 CACHED
+
+#9 exporting to image
+#9 exporting layers done
+#9 exporting manifest sha256:a040d4b81223fe1ae948f3912300ad7d76f759a95f9e4aa5698c07563a594ff1 done
+#9 exporting config sha256:27678889307ae57ee5e7b82cd30c1fe10955e7a1fcd52e7a5823dcae8b892fe4
+#9 exporting config sha256:27678889307ae57ee5e7b82cd30c1fe10955e7a1fcd52e7a5823dcae8b892fe4 done
+#9 exporting attestation manifest sha256:e77842e6d0ccfff63d18673f06e83c41760e5063d01ce514cb997cfcfb51a844 0.0s done
+#9 exporting manifest list sha256:0110012f28f868015f5cf7659f5f964036607ac230a9a9310fad6118780971e9 0.0s done
+#9 naming to docker.io/library/vedit-qt6-build:local done
+#9 unpacking to docker.io/library/vedit-qt6-build:local done
+#9 DONE 0.1s
+image_id=sha256:0110012f28f868015f5cf7659f5f964036607ac230a9a9310fad6118780971e9
+[qt6] container facts
+PRETTY_NAME="Ubuntu 26.04.1 LTS"
+NAME="Ubuntu"
+VERSION_ID="26.04"
+glibc: ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43
+qt6-base-dev: 6.10.2+dfsg-7
+kf6-texteditor: 6.24.0-0ubuntu1
+kf6-syntaxhighlighting: 6.24.0-0ubuntu1
+tree-sitter (pkg-config): 0.25.9
+cmake: cmake version 4.2.3
+g++: g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+## image facts
+PRETTY_NAME="Ubuntu 26.04.1 LTS"
+NAME="Ubuntu"
+VERSION_ID="26.04"
+glibc: 2.43-2ubuntu2.4
+Minimum supported kernel: 3.2.0
+qt6-base-dev: 6.10.2+dfsg-7
+kf6-texteditor: 6.24.0-0ubuntu1
+kf6-syntaxhighlighting: 6.24.0-0ubuntu1
+tree-sitter: 0.25.9
+cmake: cmake version 4.2.3
+g++: g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+[qt6] cmake configure (versions are requested EXACT from scripts/versions-qt.env)
+-- VEdit version matrix (scripts/versions-qt.env):
+--   distro:            Ubuntu 26.04.1 LTS build image, glibc 2.43-2ubuntu2.4 (min kernel 3.2.0)
+--   Qt6:               6.10.2 (floor 6.5)
+--   KF6:               6.24.0 (floor 6.5, upstream needs Qt >= 6.8.0)
+--   KTextEditor:       6.24.0
+--   KSyntaxHighlighting: 6.24.0
+--   tree-sitter:       0.25.9
+-- Could NOT find Cups (missing: CUPS_LIBRARIES CUPS_INCLUDE_DIR) 
+--   tree-sitter:       0.25.9 at /usr/lib/x86_64-linux-gnu
+-- VEdit: Rust service layer vd-ffi -> /vedit-build/target/release/libvd_ffi.a
+-- VEdit: Rust C header           -> /vedit-build/crates/vd-ffi/include/vd_ffi.h
+-- VEdit: Qt/ABI compile-only guard enabled (in-tree header: /vedit-build/crates/vd-ffi/include/vd_ffi.h)
+-- VEdit: building lane directory src/syntax/provider
+-- VEdit: building lane directory src/syntax/kde
+-- syn-grammars: compiled grammar id='verilog' verilog=1 systemverilog=1
+-- VEdit: building lane directory src/syntax/grammars
+-- VEdit: building lane directory src/terminal
+-- VEdit: building lane directory src/syntax/overlay
+-- VEdit edit-core: folding + breadcrumb lanes wired into the live editor (T94)
+-- VEdit FIM: Rust service layer linked (the Qt side never sends HTTP)
+-- VEdit edit-core: FIM inline-completion lane wired into the live editor (T104)
+-- VEdit edit-core: src/app EditorProvider seam found -> provider adapter built
+-- VEdit edit-core: find/replace bar selftest enabled (T13)
+-- VEdit edit-core: multi-cursor/editing selftest enabled (T14)
+-- VEdit: edit-core lane wired (vedit_editor_core); KTextEditor is the product editor
+-- VEdit: vedit-app links the Rust service layer (vd-ffi); ABI selftest registered
+-- VEdit: workspace lane 'jump' included
+-- VEdit file tree: Qt 6.10.2 (standalone=OFF)
+-- VEdit file tree: vedit_app_shell present -> installFileTree() is active
+-- VEdit: workspace lane 'filetree' included
+-- VEdit palette: edit-core provider assertions enabled in the integration selftest
+-- VEdit: workspace lane 'palette' included
+-- VEdit: workspace lane 'search' included
+-- VEdit project panel: Qt 6.10.2 (standalone=OFF)
+-- VEdit: workspace lane 'project' included
+-- VEdit: workspace lane 'module_tree' included
+-- VEdit: diagnostics lane links the Rust service layer (vd-ffi)
+-- VEdit: workspace lane 'diagnostics' included
+-- workspace-vcs: linking the vd-ffi VCS ABI (/vedit-build/target/release/libvd_ffi.a)
+-- VEdit: workspace lane 'vcs' included
+-- workspace-settings: linking the vd-ffi settings ABI (/vedit-build/target/release/libvd_ffi.a)
+-- VEdit: workspace lane 'settings' included
+-- VEdit: workspace lane 'jump' wired (vedit_workspace_jump)
+-- VEdit: workspace lane 'filetree' wired (vedit_file_tree)
+-- VEdit: workspace lane 'palette' wired (vedit_workspace_palette)
+-- VEdit: workspace lane 'search' wired (vedit_workspace_search)
+-- VEdit: workspace lane 'project' wired (vedit_workspace_project)
+-- VEdit: workspace lane 'module_tree' wired (vedit_workspace_module_tree)
+-- VEdit: workspace lane 'diagnostics' wired (vedit_workspace_diagnostics)
+-- VEdit: workspace lane 'vcs' wired (vedit_workspace_vcs)
+-- VEdit: workspace lane 'settings' wired (vedit_workspace_settings)
+-- VEdit: workspace integration enabled (src/workspace/integration.cpp)
+-- VEdit: editor pane mounts the breadcrumb lane's clickable Bar (T20/A-3)
+-- VEdit: building src/app (application shell)
+-- syn-provider: baked grammar id='verilog' for /vedit-build/src/syntax/provider (owner: src/syntax/grammars)
+-- syn-product: vedit-app links the syntax stack (provider+kde+grammars, tree-sitter, KTextEditor, KSyntaxHighlighting) and its startup hook is asserted by ctest
+-- Configuring done (0.4s)
+-- Generating done (0.2s)
+-- Build files have been written to: /vedit-build/target/qt6-build
+[qt6] cmake build
+ninja: warning: premature end of file; recovering
+[1/290] Automatic MOC for target vedit_editor_fim
+[2/290] Automatic MOC for target vedit_search_slowio
+[3/290] Building CXX object src/app/editor-lane/fim-lane/CMakeFiles/vedit_editor_fim.dir/vedit_editor_fim_autogen/mocs_compilation.cpp.o
+[4/290] Automatic MOC for target vedit_workspace_jump
+[5/290] Automatic MOC for target vedit_terminal
+[6/290] Building CXX object src/app/editor-lane/breadcrumb-lane/jump-lane/CMakeFiles/vedit_workspace_jump.dir/vedit_workspace_jump_autogen/mocs_compilation.cpp.o
+[7/290] Building C object src/syntax/provider/CMakeFiles/vedit_syntax_test_fixture_grammar.dir/tests/fixture/parser.c.o
+[8/290] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/syntax_provider.cpp.o
+[9/290] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/disabled_provider.cpp.o
+[10/290] Building CXX object src/syntax/grammars/CMakeFiles/vedit_syntax_grammars.dir/bindings.cpp.o
+[11/290] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/syntax_service.cpp.o
+[12/290] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/grammar_binding.cpp.o
+[13/290] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit_search_slowio.dir/vedit_search_slowio_autogen/mocs_compilation.cpp.o
+[14/290] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit_search_slowio.dir/tools/slowio/slowio.cpp.o
+[15/290] Linking CXX shared library src/app/workspace-lane-search/libvedit_search_slowio.so
+[16/290] Building CXX object src/app/editor-lane/breadcrumb-lane/jump-lane/CMakeFiles/vedit_workspace_jump.dir/jump_integration.cpp.o
+[17/290] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/owner_arbiter.cpp.o
+[18/290] Building CXX object src/syntax/kde/syn-common/CMakeFiles/vedit_syntax_common.dir/syntax_directory.cpp.o
+[19/290] Linking CXX static library src/syntax/kde/syn-common/libvedit_syntax_common.a
+[20/290] Building CXX object src/app/editor-lane/fim-lane/CMakeFiles/vedit_editor_fim.dir/fim_inline_completion.cpp.o
+[21/290] Building CXX object src/syntax/kde/CMakeFiles/vedit_syntax_kde.dir/ksyntax_data.cpp.o
+[22/290] Linking CXX static library src/syntax/kde/libvedit_syntax_kde.a
+[23/290] Linking C static library src/syntax/provider/libvedit_syntax_test_fixture_grammar.a
+[24/290] Building CXX object src/syntax/grammars/syntax-product/CMakeFiles/vedit_syntax_product.dir/syntax_product.cpp.o
+[25/290] Building CXX object src/app/editor-lane/breadcrumb-lane/jump-lane/CMakeFiles/vedit_workspace_jump.dir/jump_registry.cpp.o
+[26/290] Linking CXX static library src/app/editor-lane/breadcrumb-lane/jump-lane/libvedit_workspace_jump.a
+[27/290] Building CXX object src/terminal/CMakeFiles/vedit_terminal.dir/vt_screen.cpp.o
+[28/290] Building CXX object src/terminal/CMakeFiles/vedit_terminal.dir/vedit_terminal_autogen/mocs_compilation.cpp.o
+[29/290] Automatic MOC for target vedit-jump-tests
+[30/290] Building CXX object src/syntax/overlay/CMakeFiles/vedit_syntax_overlay.dir/paint.cpp.o
+[31/290] Automatic MOC for target vedit_terminal_seam_check
+[32/289] Building CXX object src/app/editor-lane/fim-lane/CMakeFiles/vedit_editor_fim.dir/fim_backend.cpp.o
+[33/289] Linking CXX static library src/app/editor-lane/fim-lane/libvedit_editor_fim.a
+[34/289] Building CXX object src/terminal/CMakeFiles/vedit_terminal.dir/terminal_panel.cpp.o
+[35/289] Building CXX object src/app/editor-lane/breadcrumb-lane/jump-lane/CMakeFiles/vedit-jump-tests.dir/vedit-jump-tests_autogen/mocs_compilation.cpp.o
+[36/289] Automatic MOC for target vedit-fim-selftest
+[37/289] Building CXX object src/app/editor-lane/fim-lane/CMakeFiles/vedit-fim-selftest.dir/vedit-fim-selftest_autogen/mocs_compilation.cpp.o
+[38/289] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider_tests.dir/tests/fixture/fixture_binding.cpp.o
+[39/289] Building CXX object src/syntax/overlay/CMakeFiles/vedit_syntax_overlay.dir/overlay.cpp.o
+[40/289] Building CXX object src/terminal/CMakeFiles/vedit_terminal.dir/pty_session.cpp.o
+[41/289] Building CXX object CMakeFiles/vedit_qt_abi_guard.dir/crates/vd-ffi/tests/qt_abi_guard.cpp.o
+[42/289] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider_tests.dir/tests/test_syntax_provider.cpp.o
+[43/289] Building C object src/syntax/grammars/CMakeFiles/vedit_tree_sitter_verilog.dir/__/__/__/third_party/tree-sitter/verilog/src/parser.c.o
+[44/289] Linking C static library src/syntax/grammars/libvedit_tree_sitter_verilog.a
+[45/289] Building CXX object src/terminal/CMakeFiles/vedit_terminal.dir/terminal_widget.cpp.o
+[46/289] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/tree_sitter_provider.cpp.o
+[47/289] Linking CXX static library src/terminal/libvedit_terminal.a
+[48/289] Automatic MOC for target vedit-terminal-selftest
+[49/288] Linking CXX static library src/syntax/provider/libvedit_syntax_provider.a
+[50/288] Linking CXX static library src/syntax/grammars/libvedit_syntax_grammars.a
+[51/288] Linking CXX static library src/syntax/overlay/libvedit_syntax_overlay.a
+[52/288] Automatic MOC for target vedit_syntax_folding
+[53/288] Linking CXX static library src/syntax/grammars/syntax-product/libvedit_syntax_product.a
+[54/288] Automatic MOC for target vedit_workspace_breadcrumb
+[55/288] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit_syntax_folding.dir/vedit_syntax_folding_autogen/mocs_compilation.cpp.o
+[56/288] Linking CXX executable src/syntax/provider/vedit_syntax_provider_tests
+[57/288] Building CXX object src/app/editor-lane/breadcrumb-lane/jump-lane/CMakeFiles/vedit-jump-tests.dir/tests/jump_tests.cpp.o
+[58/288] Building CXX object src/syntax/grammars/CMakeFiles/vedit_syn_grammars_tests.dir/tests/test_syn_grammars.cpp.o
+[59/288] Building CXX object src/terminal/CMakeFiles/vedit_terminal_seam_check.dir/seam_check.cpp.o
+[60/288] Building CXX object cmake/smoke/CMakeFiles/vedit-ksh-env-probe.dir/ksh_env_probe.cpp.o
+[61/288] Building CXX object cmake/smoke/CMakeFiles/vedit-m0-smoke.dir/qt6_window_smoke.cpp.o
+[62/288] Building CXX object src/syntax/grammars/syntax-product/CMakeFiles/vedit_syntax_product_tests.dir/tests/test_syntax_product.cpp.o
+[63/288] Linking CXX executable src/syntax/grammars/vedit_syn_grammars_tests
+[64/288] Building CXX object src/syntax/kde/CMakeFiles/vedit-syntax-directory-equivalence.dir/tests/syntax_directory_equivalence.cpp.o
+[65/288] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit_syntax_folding.dir/fold_range.cpp.o
+[66/288] Linking CXX executable cmake/smoke/vedit-m0-smoke
+[67/288] Linking CXX executable cmake/smoke/vedit-ksh-env-probe
+[68/288] Linking CXX executable src/syntax/kde/vedit-syntax-directory-equivalence
+[69/288] Linking CXX executable src/app/editor-lane/breadcrumb-lane/jump-lane/vedit-jump-tests
+[70/288] Linking CXX executable src/syntax/grammars/syntax-product/vedit_syntax_product_tests
+[71/288] Building CXX object src/syntax/kde/CMakeFiles/vedit_syntax_kde_selftest.dir/tests/validate_syntax_data.cpp.o
+[72/288] Building CXX object src/app/editor-lane/breadcrumb-lane/CMakeFiles/vedit_workspace_breadcrumb.dir/breadcrumb_model.cpp.o
+[73/288] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit_syntax_folding.dir/fold_source.cpp.o
+[74/288] Building CXX object src/syntax/overlay/CMakeFiles/vedit-syntax-overlay-selftest.dir/overlay_selftest.cpp.o
+[75/288] Linking CXX executable src/syntax/overlay/vedit-syntax-overlay-selftest
+[76/288] Linking CXX executable src/syntax/kde/vedit_syntax_kde_selftest
+[77/288] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit_syntax_folding.dir/syntax_fold_source.cpp.o
+[78/288] Building CXX object src/app/editor-lane/fim-lane/CMakeFiles/vedit-fim-selftest.dir/fim_selftest.cpp.o
+[79/288] Building CXX object src/app/editor-lane/breadcrumb-lane/CMakeFiles/vedit_workspace_breadcrumb.dir/syntax_breadcrumb_source.cpp.o
+[80/288] Building CXX object src/app/editor-lane/breadcrumb-lane/CMakeFiles/vedit_workspace_breadcrumb.dir/vedit_workspace_breadcrumb_autogen/mocs_compilation.cpp.o
+[81/288] Linking CXX executable src/app/editor-lane/fim-lane/vedit-fim-selftest
+[82/288] Building CXX object src/app/editor-lane/breadcrumb-lane/CMakeFiles/vedit_workspace_breadcrumb.dir/breadcrumb_bar.cpp.o
+[83/288] Linking CXX static library src/app/editor-lane/breadcrumb-lane/libvedit_workspace_breadcrumb.a
+[84/288] Automatic MOC for target vedit_app_shell
+[85/288] Automatic MOC for target vedit-breadcrumb-tests
+[86/288] Automatic MOC for target vedit-breadcrumb-click-tests
+[87/288] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/vedit_app_shell_autogen/mocs_compilation.cpp.o
+[88/288] Building CXX object src/app/editor-lane/breadcrumb-lane/CMakeFiles/vedit-breadcrumb-tests.dir/vedit-breadcrumb-tests_autogen/mocs_compilation.cpp.o
+[89/288] Building CXX object src/app/editor-lane/breadcrumb-lane/CMakeFiles/vedit-breadcrumb-click-tests.dir/vedit-breadcrumb-click-tests_autogen/mocs_compilation.cpp.o
+[90/288] Building CXX object src/terminal/CMakeFiles/vedit-terminal-selftest.dir/terminal_selftest.cpp.o
+[91/288] Linking CXX executable src/terminal/vedit-terminal-selftest
+[92/288] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit_syntax_folding.dir/ksyntax_fold_source.cpp.o
+[93/288] Linking CXX static library src/app/editor-lane/folding-lane/libvedit_syntax_folding.a
+[94/288] Automatic MOC for target vedit-fold-native-probe
+[95/288] Automatic MOC for target vedit_editor_core
+[96/288] Automatic MOC for target vedit-syntax-directory-tests
+[97/288] Automatic MOC for target vedit-fold-native-gui-probe
+[98/288] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit-fold-native-probe.dir/vedit-fold-native-probe_autogen/mocs_compilation.cpp.o
+[99/288] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/theme_manager.cpp.o
+[100/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/cross_boundary.cpp.o
+[101/288] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/crash_reporter.cpp.o
+[102/288] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/editor_provider.cpp.o
+[103/288] Building CXX object src/app/editor-lane/breadcrumb-lane/CMakeFiles/vedit-breadcrumb-tests.dir/tests/breadcrumb_tests.cpp.o
+[104/288] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/session_store.cpp.o
+[105/288] Building CXX object src/app/editor-lane/breadcrumb-lane/CMakeFiles/vedit-breadcrumb-click-tests.dir/tests/breadcrumb_click_tests.cpp.o
+[106/288] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/panel_registry.cpp.o
+[107/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/vedit_editor_core_autogen/mocs_compilation.cpp.o
+[108/288] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/command_registry.cpp.o
+[109/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/atomic_save.cpp.o
+[110/288] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit-syntax-directory-tests.dir/vedit-syntax-directory-tests_autogen/mocs_compilation.cpp.o
+[111/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/document_io.cpp.o
+[112/288] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit-fold-native-gui-probe.dir/vedit-fold-native-gui-probe_autogen/mocs_compilation.cpp.o
+[113/288] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit-fold-native-probe.dir/tests/fold_native_probe.cpp.o
+[114/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/highlight_mode.cpp.o
+[115/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/goto_line.cpp.o
+[116/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/diagnostics_annotations.cpp.o
+[117/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/undo_ops.cpp.o
+[118/288] Linking CXX executable src/app/editor-lane/folding-lane/vedit-fold-native-probe
+[119/288] Linking CXX executable src/app/editor-lane/breadcrumb-lane/vedit-breadcrumb-tests
+[120/288] Linking CXX executable src/app/editor-lane/breadcrumb-lane/vedit-breadcrumb-click-tests
+[121/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/highlight_diagnosis.cpp.o
+[122/288] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/app_shell.cpp.o
+[123/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/find_replace.cpp.o
+[124/288] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/editor_area.cpp.o
+[125/288] Linking CXX static library src/app/libvedit_app_shell.a
+[126/288] Automatic MOC for target vedit-app-crash-reporter-selftest
+[127/288] Automatic MOC for target vedit_workspace_vcs
+[128/288] Automatic MOC for target vedit_workspace_palette
+[129/288] Automatic MOC for target vedit_workspace_settings
+[130/288] Building CXX object src/app/CMakeFiles/vedit-app-crash-reporter-selftest.dir/vedit-app-crash-reporter-selftest_autogen/mocs_compilation.cpp.o
+[131/288] Automatic MOC for target vedit_workspace_project
+[132/288] Automatic MOC for target vedit_file_tree
+[133/288] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit-syntax-directory-tests.dir/tests/syntax_directory_tests.cpp.o
+[134/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/ktexteditor_provider.cpp.o
+[135/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/edit_core_selftest.cpp.o
+[136/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/fim_wiring.cpp.o
+[137/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/fold_breadcrumb.cpp.o
+[138/288] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_service.cpp.o
+[139/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/multi_cursor.cpp.o
+[140/288] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit-fold-native-gui-probe.dir/tests/fold_native_gui_probe.cpp.o
+[141/288] Building CXX object src/app/workspace-lane-vcs/CMakeFiles/vedit_workspace_vcs.dir/vedit_workspace_vcs_autogen/mocs_compilation.cpp.o
+[142/288] Linking CXX static library src/app/editor-lane/libvedit_editor_core.a
+[143/288] Automatic MOC for target vedit_workspace_search
+[144/288] Automatic MOC for target vedit_workspace_diagnostics
+[145/288] Building CXX object src/app/workspace-lane-palette/CMakeFiles/vedit_workspace_palette.dir/vedit_workspace_palette_autogen/mocs_compilation.cpp.o
+[146/288] Building CXX object src/app/CMakeFiles/vedit-app-crash-reporter-selftest.dir/crash_reporter_selftest.cpp.o
+[147/288] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/vedit_workspace_project_autogen/mocs_compilation.cpp.o
+[148/288] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_model.cpp.o
+[149/288] Building CXX object src/app/workspace-lane-palette/CMakeFiles/vedit_workspace_palette.dir/command_palette.cpp.o
+[150/288] Building CXX object src/app/workspace-lane-palette/CMakeFiles/vedit_workspace_palette.dir/file_index.cpp.o
+[151/288] Building CXX object src/app/workspace-lane-vcs/CMakeFiles/vedit_workspace_vcs.dir/vcs_panel.cpp.o
+[152/288] Building CXX object src/app/workspace-lane-vcs/CMakeFiles/vedit_workspace_vcs.dir/vcs_source.cpp.o
+[153/288] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_state.cpp.o
+[154/288] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_subscription.cpp.o
+[155/288] Building CXX object src/app/workspace-lane-filetree/CMakeFiles/vedit_file_tree.dir/file_kind.cpp.o
+[156/288] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_integration.cpp.o
+[157/288] Building CXX object src/app/workspace-lane-filetree/CMakeFiles/vedit_file_tree.dir/file_ops.cpp.o
+[158/288] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_panel.cpp.o
+[159/288] Building CXX object src/app/workspace-lane-filetree/CMakeFiles/vedit_file_tree.dir/vedit_file_tree_autogen/mocs_compilation.cpp.o
+[160/288] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_variables_dialog.cpp.o
+[161/288] Linking CXX static library src/app/workspace-lane-project/libvedit_workspace_project.a
+[162/288] Automatic MOC for target vedit_workspace_module_tree
+[163/288] Building CXX object src/app/workspace-lane-filetree/CMakeFiles/vedit_file_tree.dir/file_tree_model.cpp.o
+[164/288] Building CXX object src/app/workspace-lane-palette/CMakeFiles/vedit_workspace_palette.dir/fuzzy_matcher.cpp.o
+[165/288] Building CXX object src/app/workspace-lane-filetree/CMakeFiles/vedit_file_tree.dir/filetree_panel.cpp.o
+[166/288] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit_workspace_search.dir/search_types.cpp.o
+[167/288] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit_workspace_search.dir/vedit_workspace_search_autogen/mocs_compilation.cpp.o
+[168/288] Building CXX object src/app/workspace-lane-filetree/CMakeFiles/vedit_file_tree.dir/file_tree_widget.cpp.o
+[169/288] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit_workspace_search.dir/global_search.cpp.o
+[170/288] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit_workspace_search.dir/search_integration.cpp.o
+[171/288] Building CXX object src/app/workspace-lane-filetree/CMakeFiles/vedit_file_tree.dir/filetree_integration.cpp.o
+[172/288] Building CXX object src/app/workspace-lane-palette/CMakeFiles/vedit_workspace_palette.dir/palette_integration.cpp.o
+[173/288] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/diagnostics_outline_model.cpp.o
+[174/288] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/vedit_workspace_diagnostics_autogen/mocs_compilation.cpp.o
+[175/288] Building CXX object src/app/workspace-lane-module_tree/CMakeFiles/vedit_workspace_module_tree.dir/vedit_workspace_module_tree_autogen/mocs_compilation.cpp.o
+[176/288] Building CXX object src/app/workspace-lane-module_tree/CMakeFiles/vedit_workspace_module_tree.dir/hierarchy_types.cpp.o
+[177/288] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit_workspace_search.dir/search_jump_target.cpp.o
+[178/288] Building CXX object src/app/workspace-lane-module_tree/CMakeFiles/vedit_workspace_module_tree.dir/hierarchy_tree.cpp.o
+[179/288] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit_workspace_search.dir/search_panel.cpp.o
+[180/288] Linking CXX static library src/app/workspace-lane-filetree/libvedit_file_tree.a
+[181/288] Linking CXX static library src/app/workspace-lane-palette/libvedit_workspace_palette.a
+[182/288] Linking CXX static library src/app/workspace-lane-search/libvedit_workspace_search.a
+[183/288] Automatic MOC for target vedit-edit-core-selftest
+[184/288] Automatic MOC for target vedit-native-fold-tests
+[185/288] Automatic MOC for target vedit-editor-find-replace-selftest
+[186/288] Automatic MOC for target vedit-editor-multi-cursor-selftest
+[187/288] Automatic MOC for target vedit-fim-wiring-selftest
+[188/288] Automatic MOC for target vedit-workspace-palette-selftest
+[189/288] Automatic MOC for target vedit-workspace-palette-bench
+[190/288] Automatic MOC for target vedit-workspace-palette-integration-selftest
+[191/288] Building CXX object src/app/workspace-lane-settings/CMakeFiles/vedit_workspace_settings.dir/vedit_workspace_settings_autogen/mocs_compilation.cpp.o
+[192/288] Automatic MOC for target vedit-workspace-search-selftest
+[193/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit-edit-core-selftest.dir/vedit-edit-core-selftest_autogen/mocs_compilation.cpp.o
+[194/288] Automatic MOC for target vedit-workspace-project-selftest
+[195/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit-native-fold-tests.dir/vedit-native-fold-tests_autogen/mocs_compilation.cpp.o
+[196/288] Building CXX object src/app/workspace-lane-vcs/CMakeFiles/vedit_workspace_vcs.dir/vcs_integration.cpp.o
+[197/288] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/lint_progress.cpp.o
+[198/288] Linking CXX static library src/app/workspace-lane-vcs/libvedit_workspace_vcs.a
+[199/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit-editor-find-replace-selftest.dir/vedit-editor-find-replace-selftest_autogen/mocs_compilation.cpp.o
+[200/288] Automatic MOC for target vedit-workspace-vcs-selftest
+[201/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit-editor-multi-cursor-selftest.dir/vedit-editor-multi-cursor-selftest_autogen/mocs_compilation.cpp.o
+[202/288] Building CXX object src/app/workspace-lane-module_tree/CMakeFiles/vedit_workspace_module_tree.dir/hierarchy_client.cpp.o
+[203/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit-fim-wiring-selftest.dir/vedit-fim-wiring-selftest_autogen/mocs_compilation.cpp.o
+[204/288] Building CXX object src/app/workspace-lane-module_tree/CMakeFiles/vedit_workspace_module_tree.dir/module_tree_panel.cpp.o
+[205/288] Building CXX object src/app/workspace-lane-palette/CMakeFiles/vedit-workspace-palette-selftest.dir/vedit-workspace-palette-selftest_autogen/mocs_compilation.cpp.o
+[206/288] Building CXX object src/app/workspace-lane-settings/CMakeFiles/vedit_workspace_settings.dir/settings_dialog.cpp.o
+[207/288] Building CXX object src/app/workspace-lane-palette/CMakeFiles/vedit-workspace-palette-bench.dir/vedit-workspace-palette-bench_autogen/mocs_compilation.cpp.o
+[208/288] Building CXX object src/app/workspace-lane-module_tree/CMakeFiles/vedit_workspace_module_tree.dir/module_tree_integration.cpp.o
+[209/288] Linking CXX static library src/app/workspace-lane-module_tree/libvedit_workspace_module_tree.a
+[210/288] Automatic MOC for target vedit-module-tree-selftest
+[211/288] Building CXX object src/app/workspace-lane-palette/CMakeFiles/vedit-workspace-palette-integration-selftest.dir/vedit-workspace-palette-integration-selftest_autogen/mocs_compilation.cpp.o
+[212/288] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/toolchain.cpp.o
+[213/288] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit-workspace-search-selftest.dir/vedit-workspace-search-selftest_autogen/mocs_compilation.cpp.o
+[214/288] Building CXX object src/app/workspace-lane-settings/CMakeFiles/vedit_workspace_settings.dir/settings_client.cpp.o
+[215/288] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/diagnostics_controller.cpp.o
+[216/288] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit-workspace-project-selftest.dir/vedit-workspace-project-selftest_autogen/mocs_compilation.cpp.o
+[217/288] Building CXX object src/app/workspace-lane-module_tree/CMakeFiles/vedit-module-tree-selftest.dir/vedit-module-tree-selftest_autogen/mocs_compilation.cpp.o
+[218/288] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/ffi_backends.cpp.o
+[219/288] Building CXX object src/app/workspace-lane-vcs/CMakeFiles/vedit-workspace-vcs-selftest.dir/vedit-workspace-vcs-selftest_autogen/mocs_compilation.cpp.o
+[220/288] Building CXX object src/app/workspace-lane-settings/CMakeFiles/vedit_workspace_settings.dir/settings_integration.cpp.o
+[221/288] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/diagnostics_panel.cpp.o
+[222/288] Linking CXX executable src/app/editor-lane/folding-lane/vedit-syntax-directory-tests
+[223/288] Linking CXX executable src/app/vedit-app-crash-reporter-selftest
+[224/288] Linking CXX executable src/app/editor-lane/folding-lane/vedit-fold-native-gui-probe
+[225/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit-edit-core-selftest.dir/kernel/edit_core_selftest_main.cpp.o
+[226/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit-native-fold-tests.dir/kernel/native_fold_tests.cpp.o
+[227/288] Linking CXX executable src/app/editor-lane/vedit-edit-core-selftest
+[228/288] Linking CXX executable src/app/editor-lane/vedit-native-fold-tests
+[229/288] Building CXX object src/app/workspace-lane-palette/CMakeFiles/vedit-workspace-palette-selftest.dir/palette_selftest.cpp.o
+[230/288] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/diagnostics_integration.cpp.o
+[231/288] Building CXX object src/app/workspace-lane-vcs/CMakeFiles/vedit-workspace-vcs-selftest.dir/vcs_selftest.cpp.o
+[232/288] Building CXX object src/app/workspace-lane-palette/CMakeFiles/vedit-workspace-palette-integration-selftest.dir/palette_integration_selftest.cpp.o
+[233/288] Linking CXX static library src/app/workspace-lane-diagnostics/libvedit_workspace_diagnostics.a
+[234/288] Automatic MOC for target vedit-lint-orchestration-probe
+[235/288] Automatic MOC for target vedit-diagnostics-ffi-selftest
+[236/288] Automatic MOC for target vedit-workspace-diagnostics-selftest
+[237/288] Automatic MOC for target vedit-toolchain-selftest
+[238/288] Automatic MOC for target vedit-diagnostics-product-seam
+[239/288] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-lint-orchestration-probe.dir/vedit-lint-orchestration-probe_autogen/mocs_compilation.cpp.o
+[240/288] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-workspace-diagnostics-selftest.dir/vedit-workspace-diagnostics-selftest_autogen/mocs_compilation.cpp.o
+[241/288] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-toolchain-selftest.dir/vedit-toolchain-selftest_autogen/mocs_compilation.cpp.o
+[242/288] Automatic MOC for target vedit-toolchain-ux-selftest
+[243/288] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-diagnostics-ffi-selftest.dir/vedit-diagnostics-ffi-selftest_autogen/mocs_compilation.cpp.o
+[244/288] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-diagnostics-product-seam.dir/vedit-diagnostics-product-seam_autogen/mocs_compilation.cpp.o
+[245/288] Building CXX object src/app/workspace-lane-palette/CMakeFiles/vedit-workspace-palette-bench.dir/palette_bench.cpp.o
+[246/288] Linking CXX executable src/app/workspace-lane-palette/vedit-workspace-palette-selftest
+[247/288] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-toolchain-ux-selftest.dir/vedit-toolchain-ux-selftest_autogen/mocs_compilation.cpp.o
+[248/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit-fim-wiring-selftest.dir/kernel/fim_wiring_selftest.cpp.o
+[249/288] Building CXX object src/app/workspace-lane-settings/CMakeFiles/vedit_workspace_settings.dir/settings_panel.cpp.o
+[250/288] Linking CXX static library src/app/workspace-lane-settings/libvedit_workspace_settings.a
+[251/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit-editor-find-replace-selftest.dir/kernel/find_replace_selftest.cpp.o
+[252/288] Automatic MOC for target vedit-workspace-settings-selftest
+[253/288] Automatic MOC for target vedit_workspace_integration
+[254/288] Building CXX object src/app/workspace-lane-settings/CMakeFiles/vedit-workspace-settings-selftest.dir/vedit-workspace-settings-selftest_autogen/mocs_compilation.cpp.o
+[255/288] Building CXX object src/app/CMakeFiles/vedit_workspace_integration.dir/vedit_workspace_integration_autogen/mocs_compilation.cpp.o
+[256/288] Linking CXX executable src/app/workspace-lane-palette/vedit-workspace-palette-bench
+[257/288] Linking CXX executable src/app/workspace-lane-vcs/vedit-workspace-vcs-selftest
+[258/288] Linking CXX executable src/app/workspace-lane-palette/vedit-workspace-palette-integration-selftest
+[259/288] Linking CXX executable src/app/editor-lane/vedit-fim-wiring-selftest
+[260/288] Linking CXX executable src/app/editor-lane/vedit-editor-find-replace-selftest
+[261/288] Building CXX object src/app/editor-lane/CMakeFiles/vedit-editor-multi-cursor-selftest.dir/kernel/multi_cursor_selftest.cpp.o
+[262/288] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit-workspace-project-selftest.dir/project_selftest.cpp.o
+[263/288] Building CXX object src/app/workspace-lane-module_tree/CMakeFiles/vedit-module-tree-selftest.dir/module_tree_selftest.cpp.o
+[264/288] Building CXX object src/app/CMakeFiles/vedit_workspace_integration.dir/__/workspace/integration.cpp.o
+[265/288] Linking CXX static library src/app/libvedit_workspace_integration.a
+[266/288] Automatic MOC for target vedit-app
+[267/288] Building CXX object src/app/CMakeFiles/vedit-app.dir/vedit-app_autogen/mocs_compilation.cpp.o
+[268/288] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-diagnostics-ffi-selftest.dir/diagnostics_ffi_selftest.cpp.o
+[269/288] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-toolchain-selftest.dir/toolchain_selftest.cpp.o
+[270/288] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit-workspace-search-selftest.dir/search_selftest.cpp.o
+[271/288] Linking CXX executable src/app/editor-lane/vedit-editor-multi-cursor-selftest
+[272/288] Linking CXX executable src/app/workspace-lane-project/vedit-workspace-project-selftest
+[273/288] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-toolchain-selftest
+[274/288] Linking CXX executable src/app/workspace-lane-module_tree/vedit-module-tree-selftest
+[275/288] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-toolchain-ux-selftest.dir/toolchain_ux_selftest.cpp.o
+[276/288] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-diagnostics-product-seam.dir/selftests/diagnostics_product_seam.cpp.o
+[277/288] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-lint-orchestration-probe.dir/__/__/__/evidence/w4-lint/lint_orchestration_probe.cpp.o
+[278/288] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-diagnostics-ffi-selftest
+[279/288] Linking CXX executable src/app/workspace-lane-search/vedit-workspace-search-selftest
+[280/288] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-lint-orchestration-probe
+[281/288] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-toolchain-ux-selftest
+[282/288] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-diagnostics-product-seam
+[283/288] Building CXX object src/app/workspace-lane-settings/CMakeFiles/vedit-workspace-settings-selftest.dir/settings_selftest.cpp.o
+[284/288] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-workspace-diagnostics-selftest.dir/diagnostics_selftest.cpp.o
+[285/288] Linking CXX executable src/app/workspace-lane-settings/vedit-workspace-settings-selftest
+[286/288] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-workspace-diagnostics-selftest
+[287/288] Building CXX object src/app/CMakeFiles/vedit-app.dir/main.cpp.o
+[288/288] Linking CXX executable src/app/vedit-app
+[qt6] Rust C ABI symbols in vedit-app
+## file
+/vedit-build/target/qt6-build/src/app/vedit-app: ELF 64-bit LSB pie executable, x86-64, version 1 (GNU/Linux), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=9013d3a9cb8a0cadc7045224caccac7fbc138b8d, for GNU/Linux 3.2.0, with debug_info, not stripped
+## exported vd_* C ABI symbols (nm)
+00000000002924b0 T vd_abi_version
+00000000002924c0 T vd_job_cancel
+0000000000292710 T vd_job_release
+0000000000292830 T vd_service_create
+00000000002929d0 T vd_service_destroy
+0000000000292a20 T vd_service_error
+00000000002981c0 T vd_project_expand
+0000000000298980 T vd_project_info_free
+0000000000298ce0 T vd_project_parse
+0000000000298df0 T vd_project_poll
+000000000029b810 T vd_search_poll
+000000000029b990 T vd_search_query
+000000000029bca0 T vd_search_results_free
+000000000029bd90 T vd_search_tree_poll
+000000000029c050 T vd_search_tree_query
+000000000029c2c0 T vd_settings_free
+000000000029c420 T vd_settings_load
+000000000029c530 T vd_settings_poll
+000000000029c8a0 T vd_settings_save
+000000000029cdb0 T vd_vcs_diff_free
+000000000029ce60 T vd_vcs_diff_job
+000000000029d050 T vd_vcs_diff_poll
+000000000029d2d0 T vd_vcs_info_free
+000000000029d380 T vd_vcs_info_job
+000000000029d490 T vd_vcs_info_poll
+000000000029d770 T vd_vcs_poll
+000000000029db10 T vd_vcs_status
+000000000029dc20 T vd_vcs_status_free
+000000000029ecc0 T vd_diagnostic_key
+000000000029ee10 T vd_string_free
+00000000002a2a10 T vd_fim_complete
+00000000002a2bf0 T vd_fim_poll
+00000000002a2d90 T vd_fim_result_free
+0000000000773590 T vd_lsp_backend_capabilities
+0000000000773610 T vd_lsp_capabilities_free
+00000000007737b0 T vd_lsp_command_line
+0000000000773dd0 T vd_lsp_file_list_preview
+0000000000774230 T vd_lsp_info_free
+00000000007742b0 T vd_lsp_poll
+00000000007744c0 T vd_lsp_request_poll
+0000000000774930 T vd_lsp_response_free
+0000000000774cd0 T vd_lsp_session_capabilities
+0000000000774dc0 T vd_lsp_session_change
+0000000000775090 T vd_lsp_session_command_line
+0000000000775140 T vd_lsp_session_free
+00000000007752d0 T vd_lsp_session_request
+0000000000775820 T vd_lsp_session_start
+0000000000775860 T vd_lsp_session_status
+0000000000775ae0 T vd_lsp_session_stop
+0000000000775b90 T vd_lsp_start
+0000000000775e90 T vd_lsp_status_free
+0000000000778980 T vd_deeplint_batch_cancel
+00000000007789f0 T vd_deeplint_batch_poll
+0000000000778d60 T vd_deeplint_batch_progress
+0000000000779040 T vd_deeplint_batch_release
+00000000007791a0 T vd_deeplint_batch_start
+00000000007798d0 T vd_deeplint_lint
+0000000000779d90 T vd_deeplint_poll
+0000000000779f00 T vd_diagnostics_free
+000000000077a040 T vd_hier_poll
+000000000077aa60 T vd_hier_release
+000000000077ab90 T vd_hier_start
+000000000077b670 T vd_hierarchy_free
+000000000077bc30 T vd_lint_command_line
+000000000077c2f0 T vd_lint_progress_free
+## count
+65
+## highest GLIBC symbol the product binary requires (the private runtime supplies 2.43)
+GLIBC_2.39
+## sha256
+6be9ceb7c21077c418ed1c1dbfbb1b3710977a884d99b03904da982dd7bfd4c8  /vedit-build/target/qt6-build/src/app/vedit-app
+[qt6] ELF facts (T11 must bundle a glibc that satisfies this floor)
+## file
+/vedit-build/target/qt6-build/cmake/smoke/vedit-m0-smoke: ELF 64-bit LSB pie executable, x86-64, version 1 (GNU/Linux), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=f3a7ef576116cc7d110b1eec39529be1adfa2053, for GNU/Linux 3.2.0, with debug_info, not stripped
+## NEEDED
+ 0x0000000000000001 (NEEDED)             Shared library: [libKF6TextEditor.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libKF6SyntaxHighlighting.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libQt6Widgets.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libQt6Core.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libtree-sitter.so.0.25]
+ 0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+ 0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+ 0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+## highest GLIBC symbol the binary itself requires (informational; the private runtime supplies it)
+GLIBC_2.34
+## libraries resolved at build time
+	libKF6TextEditor.so.6 => /usr/lib/x86_64-linux-gnu/libKF6TextEditor.so.6 (0x000073baf78e8000)
+	libKF6SyntaxHighlighting.so.6 => /usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6 (0x000073baf76fc000)
+	libQt6Core.so.6 => /usr/lib/x86_64-linux-gnu/libQt6Core.so.6 (0x000073baf6957000)
+	libtree-sitter.so.0.25 => /usr/lib/x86_64-linux-gnu/libtree-sitter.so.0.25 (0x000073baf6928000)
+	libstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x000073baf6686000)
+	libc.so.6 => /usr/lib/x86_64-linux-gnu/libc.so.6 (0x000073baf6437000)
+## sha256
+cc9f67782ed61cde765e39dca17d2e170b32de56cb5400096504d4b72b3ebe97  /vedit-build/target/qt6-build/cmake/smoke/vedit-m0-smoke
+[qt6] --no-tests: ctest and the xcb smoke were not run
+[qt6] PASS: Rust service layer + configure + build (warnings-as-errors) inside vedit-qt6-build:local; tests skipped (--no-test)
+[qt6] evidence: evidence/ffi-abi/logs/ (Rust layer) and evidence/m0-build/build-logs/2x-qt6-*, 3x-qt6-*
+[typecheck] host clippy unusable (pinned 1.99.0 toolchain has no cargo binary)
+[typecheck] delegating to the pinned image, same command (scripts/gates.sh pattern)
+[typecheck]   cargo clippy --workspace --all-targets -- -D warnings
+[image] building vedit-build:local from the pinned inputs
+[image] base image: docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+#0 building with "default" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile.build
+#1 transferring dockerfile: 11.56kB done
+#1 DONE 0.0s
+
+#2 [internal] load metadata for docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+#2 DONE 0.1s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 2B done
+#3 DONE 0.0s
+
+#4 [rust-build 1/9] FROM docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+#4 resolve docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 310B done
+#5 DONE 0.0s
+
+#6 [rust-build 3/9] RUN rm -f /etc/yum.repos.d/CentOS-*.repo  && sed "s|@CENTOS_VAULT_BASE@|https://mirrors.tuna.tsinghua.edu.cn/centos-vault/7.9.2009|g" /tmp/vault.repo.in > /etc/yum.repos.d/vault.repo  && rm -f /tmp/vault.repo.in  && cat /etc/yum.repos.d/vault.repo
+#6 CACHED
+
+#7 [rust-build 4/9] RUN yum -y install       gcc gcc-c++ make pkgconfig git curl tar xz bzip2 which findutils file       glib2-devel gtk3-devel libxml2-devel gettext       gdk-pixbuf2 gdk-pixbuf2-devel       python3       dejavu-sans-fonts dejavu-sans-mono-fonts fontconfig       xorg-x11-server-Xvfb xorg-x11-utils mesa-demos mesa-libGL  && yum clean all
+#7 CACHED
+
+#8 [rust-build 5/9] RUN mkdir -p /opt/vedit  && { echo "## gtk3 immodule packages in the CentOS 7.9.2009 vault:";       for pkg in gtk3-immodule-xim gtk3-immodule-ibus ibus-gtk3; do         if yum -y install "$pkg" >/dev/null 2>&1; then echo "installed $pkg";         else echo "not available: $pkg"; fi;       done;       echo "## immodule files:";       ls -l /usr/lib64/gtk-3.0/3.0.0/immodules/ 2>&1 || true;     } | tee /opt/vedit/immodules.txt
+#8 CACHED
+
+#9 [rust-build 7/9] RUN set -eux;     curl -fsSL -o /tmp/rustup-init "https://static.rust-lang.org/rustup/archive/1.29.2/x86_64-unknown-linux-gnu/rustup-init";     echo "5be191e8c70a5007074254cb74d78dbfdd25cd5a61c27de7b8e5410122ec24f4  /tmp/rustup-init" | sha256sum -c -;     chmod 755 /tmp/rustup-init;     RUSTUP_HOME=/opt/rust CARGO_HOME=/opt/cargo /tmp/rustup-init       -y --no-modify-path --profile minimal --default-toolchain "1.99.0";     RUSTUP_HOME=/opt/rust CARGO_HOME=/opt/cargo /opt/cargo/bin/rustup component add       --toolchain "1.99.0" rustfmt clippy;     chmod -R a+rX /opt/rust /opt/cargo;     RUSTUP_HOME=/opt/rust CARGO_HOME=/opt/cargo /opt/cargo/bin/rustc --version
+#9 CACHED
+
+#10 [rust-build 8/9] RUN set -eux;     curl -fsSL -o /tmp/gtksourceview.tar.xz "https://download.gnome.org/sources/gtksourceview/4.6/gtksourceview-4.6.1.tar.xz";     echo "63f487a7ab59612ffa9e7be1883dbd274ab1016afcede3239b93b0fc384df874  /tmp/gtksourceview.tar.xz" | sha256sum -c -;     mkdir -p /opt/src/gtksourceview;     tar -xJf /tmp/gtksourceview.tar.xz -C /opt/src/gtksourceview --strip-components=1;     cd /opt/src/gtksourceview;     meson setup build --prefix=/opt/gsv4 --libdir=lib64       -Dgtk_doc=false -Dgir=false -Dvapi=false -Dinstall_tests=false -Dglade_catalog=false;     ninja -C build;     ninja -C build install;     rm -rf /opt/src/gtksourceview /tmp/gtksourceview.tar.xz
+#10 CACHED
+
+#11 [rust-build 6/9] RUN set -eux;     curl -fsSL -o /tmp/meson.whl "https://files.pythonhosted.org/packages/01/48/b4ba2490ed26c73618736dece01a68a609713f1a7923563d4c41ac966b3b/meson-0.59.4-py3-none-any.whl";     echo "9db5bb89d3bd1c8e9c15974be5fa656f50491c48d53c43b6eb5cfe406dff3fd6  /tmp/meson.whl" | sha256sum -c -;     curl -fsSL -o /tmp/ninja.whl "https://files.pythonhosted.org/packages/0f/58/854ce5aab0ff5c33d66e1341b0be42f0330797335011880f7fbd88449996/ninja-1.11.1-py2.py3-none-manylinux_2_12_x86_64.manylinux2010_x86_64.whl";     echo "817e2aee2a4d28a708a67bcfba1817ae502c32c6d8ef80e50d63b0f23adf3a08  /tmp/ninja.whl" | sha256sum -c -;     mkdir -p /opt/wheels/meson /opt/wheels/ninja;     python3 -m zipfile -e /tmp/meson.whl /opt/wheels/meson;     pysite=$(python3 -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])');     mkdir -p "$pysite";     cp -a /opt/wheels/meson/mesonbuild "$pysite/";     { echo '#!/usr/bin/python3';       echo 'import sys';       echo 'from mesonbuild.mesonmain import main';       echo 'if __name__ == "__main__":';       echo '    sys.exit(main())';     } > /usr/local/bin/meson;     chmod 755 /usr/local/bin/meson;     python3 -m zipfile -e /tmp/ninja.whl /opt/wheels/ninja;     cp /opt/wheels/ninja/ninja/data/bin/ninja /usr/local/bin/ninja;     chmod 755 /usr/local/bin/ninja;     meson --version; ninja --version
+#11 CACHED
+
+#12 [rust-build 2/9] COPY vault.repo.in /tmp/vault.repo.in
+#12 CACHED
+
+#13 [rust-build 9/9] RUN { echo "## image facts"; cat /etc/centos-release;       echo "glibc: $(rpm -q glibc)";       echo "gtk3: $(rpm -q gtk3)";       echo "rust: $(/opt/cargo/bin/rustc --version)";       echo "gsv4: $(PKG_CONFIG_PATH=/opt/gsv4/lib64/pkgconfig pkg-config --modversion gtksourceview-4)";     } > /opt/vedit/build-image.txt  && rpm -qa --qf '%{NAME}-%{VERSION}-%{RELEASE}.%{ARCH}\n' | sort > /opt/vedit/rpm-snapshot.txt
+#13 CACHED
+
+#14 exporting to image
+#14 exporting layers done
+#14 exporting manifest sha256:2a74a4f0f304d5686f221712db6ed0aad747cfb0fc33e5a3007ffceb1a481385 done
+#14 exporting config sha256:4703b958028529283a1d1e92c132542b5189e8cd19206c2a1f8454fcc961cdaa done
+#14 exporting attestation manifest sha256:ebbb339e3c1ca98477e053e599b4a449bef925439a7371f0bec29a9ff8ab0f3b 0.0s done
+#14 exporting manifest list sha256:90ef161af278a362031a7b58e3315240a2ff94e00cca7bb44a5bb9eb2f62892a
+#14 exporting manifest list sha256:90ef161af278a362031a7b58e3315240a2ff94e00cca7bb44a5bb9eb2f62892a 0.0s done
+#14 naming to docker.io/library/vedit-build:local done
+#14 unpacking to docker.io/library/vedit-build:local done
+#14 DONE 0.1s
+image_id=sha256:90ef161af278a362031a7b58e3315240a2ff94e00cca7bb44a5bb9eb2f62892a
+[typecheck] container facts: CentOS Linux release 7.9.2009 (Core) | rustc 1.99.0 (b940084d7 2026-09-28) | cargo 1.99.0 (5f94df478 2026-08-27)
+[typecheck] cargo clippy --workspace --all-targets -- -D warnings
+   Compiling vd-ffi v0.1.1 (/vedit-build/crates/vd-ffi)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.65s
+--- /tmp/tmp.x043jDBPIX/head.h	2026-11-02 19:50:51.290001049 +0800
++++ /home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-ffi/include/vd_ffi.h	2026-11-02 16:12:21.058542461 +0800
+@@ -129,7 +129,21 @@
+ typedef struct VdService VdService;
+ 
+ /*
+- One slang diagnostic.
++ A C array of NUL-terminated strings.
++ */
++typedef struct VdStringList {
++  /*
++   Number of entries in `items` (`size_t` on the C side).
++   */
++  size_t count;
++  /*
++   Owned array of owned strings; null when `count` is zero.
++   */
++  char **items;
++} VdStringList;
++
++/*
++ One lint diagnostic.
+  */
+ typedef struct VdDiagnostic {
+   /*
+@@ -153,13 +167,28 @@
+    */
+   uint32_t end_column;
+   /*
+-   slang diagnostic code (`UndeclaredIdentifier`, …).
++   Diagnostic code (`UndeclaredIdentifier`, or the verible rule name).
+    */
+   char *code;
+   /*
+    Human-readable message.
+    */
+   char *message;
++  /*
++   The file the diagnostic belongs to (batch runs); null on the single-file
++   call, where the caller already knows it.
++   */
++  char *file;
++  /*
++   The cross-engine dedup key (AC-2.13): file path, 0-based start line,
++   severity class and normalised message separated by `0x1F`. Two engines
++   reporting the same problem produce the same key.
++   */
++  char *key;
++  /*
++   0 unknown, 1 LSP, 2 CLI, 3 both (the source column, AC-2.13).
++   */
++  int32_t origin;
+ } VdDiagnostic;
+ 
+ /*
+@@ -177,6 +206,289 @@
+ } VdDiagnostics;
+ 
+ /*
++ Inputs of one project-wide lint pass (borrowed for the duration of the call).
++ */
++typedef struct VdLintBatchOptions {
++  /*
++   0 slang, 1 verible-verilog-lint.
++   */
++  int32_t engine;
++  /*
++   Explicit slang binary, or null to resolve it.
++   */
++  const char *slang_binary;
++  /*
++   Explicit verible-verilog-lint binary, or null to resolve it.
++   */
++  const char *verible_binary;
++  /*
++   Verible lint rules file (`--rules_config=`), or null.
++   */
++  const char *rules_path;
++  /*
++   Project include dirs (`-I`; slang only).
++   */
++  struct VdStringList include_dirs;
++  /*
++   Project defines (`-D`; slang only).
++   */
++  struct VdStringList defines;
++  /*
++   Per-file wall-clock budget in milliseconds; 0 selects the default.
++   */
++  uint64_t timeout_ms;
++  /*
++   Maximum diagnostics kept per file; 0 selects the default.
++   */
++  size_t max_diagnostics;
++} VdLintBatchOptions;
++
++/*
++ Progress of one project-wide lint pass (AC-2.7/2.8/2.9).
++ */
++typedef struct VdLintProgress {
++  /*
++   0 queued, 1 running, 2 finished, 3 cancelled, 4 failed.
++   */
++  int32_t phase;
++  /*
++   Files already linted.
++   */
++  size_t done;
++  /*
++   Files in the pass's snapshot.
++   */
++  size_t total;
++  /*
++   The file being linted right now, or null.
++   */
++  char *current;
++  /*
++   The tool that ran (`slang` / `verible-verilog-lint`).
++   */
++  char *tool;
++  /*
++   The failure stage (`resolve`, `spawn`, `run`, `parse`), or null.
++   */
++  char *stage;
++  /*
++   One-line state for the status bar.
++   */
++  char *message;
++} VdLintProgress;
++
++/*
++ Inputs of one elaboration run (borrowed for the duration of the call).
++ */
++typedef struct VdHierOptions {
++  /*
++   Explicit slang binary, or null to resolve it.
++   */
++  const char *slang_binary;
++  /*
++   Top module, or null to let slang pick the roots.
++   */
++  const char *top;
++  /*
++   Project include dirs (`-I`).
++   */
++  struct VdStringList include_dirs;
++  /*
++   Project defines (`-D`).
++   */
++  struct VdStringList defines;
++  /*
++   Wall-clock budget in milliseconds; 0 selects the default (30 s).
++   */
++  uint64_t timeout_ms;
++  /*
++   Oversize threshold for the instance count; 0 selects the default (10000).
++   */
++  size_t max_instances;
++  /*
++   Oversize threshold for the file count; 0 selects the default (1000).
++   */
++  size_t max_files;
++} VdHierOptions;
++
++/*
++ One elaborated instance (AC-3.1's data side).
++ */
++typedef struct VdHierInstance {
++  /*
++   Hierarchical path (`top.u0`).
++   */
++  char *path;
++  /*
++   Module name (`mid`).
++   */
++  char *module;
++  /*
++   File of the instantiation site.
++   */
++  char *file;
++  /*
++   0-based line of the instantiation site.
++   */
++  uint32_t line;
++  /*
++   0-based column of the instantiation site.
++   */
++  uint32_t column;
++} VdHierInstance;
++
++/*
++ Array of instances.
++ */
++typedef struct VdHierInstanceList {
++  /*
++   Number of entries.
++   */
++  size_t count;
++  /*
++   Owned array of instances.
++   */
++  struct VdHierInstance *items;
++} VdHierInstanceList;
++
++/*
++ One driver or load of a net.
++ */
++typedef struct VdHierEndpoint {
++  /*
++   Hierarchical path of the driving/loading symbol.
++   */
++  char *path;
++  /*
++   File of the position.
++   */
++  char *file;
++  /*
++   0-based line.
++   */
++  uint32_t line;
++  /*
++   0-based column.
++   */
++  uint32_t column;
++  /*
++   0 instance-output-port, 1 instance-input-port, 2 continuous-assign,
++   3 procedural.
++   */
++  int32_t kind;
++  /*
++   Extra label (`AlwaysFF`, `assign`, `port q (out)`).
++   */
++  char *detail;
++} VdHierEndpoint;
++
++/*
++ Array of endpoints.
++ */
++typedef struct VdHierEndpointList {
++  /*
++   Number of entries.
++   */
++  size_t count;
++  /*
++   Owned array of endpoints.
++   */
++  struct VdHierEndpoint *items;
++} VdHierEndpointList;
++
++/*
++ One net with its drivers and loads (AC-3.2's data side).
++ */
++typedef struct VdHierSignal {
++  /*
++   Hierarchical path (`top.link`).
++   */
++  char *path;
++  /*
++   `Net`, `Variable` or `Port`.
++   */
++  char *kind;
++  /*
++   1 when a declaration position was reported.
++   */
++  int32_t has_declaration;
++  /*
++   Declaration file, or null.
++   */
++  char *declaration_file;
++  /*
++   0-based declaration line.
++   */
++  uint32_t declaration_line;
++  /*
++   0-based declaration column.
++   */
++  uint32_t declaration_column;
++  /*
++   Constructs that drive the net.
++   */
++  struct VdHierEndpointList drivers;
++  /*
++   Constructs that read the net.
++   */
++  struct VdHierEndpointList loads;
++  /*
++   Driver chain that continues inside a child instance.
++   */
++  struct VdHierEndpointList chain;
++} VdHierSignal;
++
++/*
++ Array of nets.
++ */
++typedef struct VdHierSignalList {
++  /*
++   Number of entries.
++   */
++  size_t count;
++  /*
++   Owned array of nets.
++   */
++  struct VdHierSignal *items;
++} VdHierSignalList;
++
++/*
++ One elaboration result.
++ */
++typedef struct VdHierarchy {
++  /*
++   The tool that ran (`slang`).
++   */
++  char *tool;
++  /*
++   The requested top, or null when slang picked the roots.
++   */
++  char *top;
++  /*
++   Wall-clock time of the run, in milliseconds.
++   */
++  uint64_t elapsed_ms;
++  /*
++   Peak RSS of the child, in KiB (sampled from `/proc/<pid>/status`).
++   */
++  uint64_t peak_rss_kb;
++  /*
++   Oversize warning for the UI (AC-3.5), or null.
++   */
++  char *warning;
++  /*
++   Elaborated instances.
++   */
++  struct VdHierInstanceList instances;
++  /*
++   Nets of every instance. Named `signal_list`, not `signals`: `signals` is
++   a Qt macro (`#define signals public`), and this header is included by Qt
++   translation units.
++   */
++  struct VdHierSignalList signal_list;
++} VdHierarchy;
++
++/*
+  Result of one FIM completion request.
+  */
+ typedef struct VdFimResult {
+@@ -209,20 +521,6 @@
+ } VdLspInfo;
+ 
+ /*
+- A C array of NUL-terminated strings.
+- */
+-typedef struct VdStringList {
+-  /*
+-   Number of entries in `items` (`size_t` on the C side).
+-   */
+-  size_t count;
+-  /*
+-   Owned array of owned strings; null when `count` is zero.
+-   */
+-  char **items;
+-} VdStringList;
+-
+-/*
+  Observable state of one session (A3d).
+  */
+ typedef struct VdLspStatus {
+@@ -262,6 +560,14 @@
+    `path: reason` for files that could not be opened.
+    */
+   struct VdStringList skipped;
++  /*
++   The backend this session drives: 0 verible, 1 slang (T138).
++   */
++  int32_t backend;
++  /*
++   The backend name for the status line (`backend=slang`).
++   */
++  char *backend_name;
+ } VdLspStatus;
+ 
+ /*
+@@ -406,6 +712,10 @@
+    Message text.
+    */
+   char *message;
++  /*
++   1 LSP, 2 CLI, 3 both (the source column, AC-2.13). LSP rows are always 1.
++   */
++  int32_t origin;
+ } VdLspDiagnostic;
+ 
+ /*
+@@ -453,6 +763,55 @@
+ } VdLspResponse;
+ 
+ /*
++ One row of a language server's capability table (T138).
++ */
++typedef struct VdLspCapability {
++  /*
++   Action name (`definition`, `references`, `documentSymbol`, …).
++   */
++  char *action;
++  /*
++   1 supported, 0 unsupported, -1 unknown (not measured in this environment).
++   */
++  int32_t supported;
++  /*
++   Why; never null (an unsupported action always says why).
++   */
++  char *reason;
++} VdLspCapability;
++
++/*
++ A backend's capability table, with how it was established.
++ */
++typedef struct VdLspCapabilities {
++  /*
++   Backend name (`verible` / `slang`).
++   */
++  char *backend;
++  /*
++   How the table was established: `measured`, `live` or `declared`.
++   */
++  char *basis;
++  /*
++   Where the rows come from (binary version / live handshake).
++   */
++  char *source;
++  /*
++   What this backend offers that the other does not (the UI-gating
++   asymmetry, one sentence; never null).
++   */
++  char *note;
++  /*
++   Number of rows.
++   */
++  size_t count;
++  /*
++   Owned array of rows.
++   */
++  struct VdLspCapability *items;
++} VdLspCapabilities;
++
++/*
+  One project member list: files, include dirs, defines and warnings.
+  */
+ typedef struct VdProjectInfo {
+@@ -472,6 +831,33 @@
+    Non-fatal diagnostics collected while resolving the project.
+    */
+   struct VdStringList warnings;
++  /*
++   The SAME file set relative to the project root (absolute only for a file
++   outside it), same order as `files`.
++
++   Recommended spelling for a generated `.f`: portable across a moved
++   checkout. It is NOT the determining rule for correct jump URIs — the
++   controlled 4-way spike (2026-11-02) showed the server's cwd must be the
++   project root; with that cwd, absolute entries resolve correctly too, and
++   with the wrong cwd even relative entries land on a sibling path. The root
++   this projection is based on is the single source of truth for cwd and
++   `rootUri` (never re-derive it in the launcher).
++   */
++  struct VdStringList relative_files;
++  /*
++   Filelist variable names still unresolved after the project variable
++   table + the process environment (ADDENDUM A-9), unique and sorted. The
++   UI asks for all of them in ONE dialog; every affected line also appears
++   in `warnings` with its `.f` file and 1-based line.
++   */
++  struct VdStringList missing_variables;
++  /*
++   Lines that produced no entry (unresolved/invalid variable, unknown
++   token, malformed define, missing/cyclic nested `-f`). A non-zero value
++   must be shown to the user: a dropped line is a file the pass will not
++   lint.
++   */
++  uint32_t skipped_lines;
+ } VdProjectInfo;
+ 
+ /*
+@@ -703,7 +1089,36 @@
+ #endif // __cplusplus
+ 
+ /*
+- Start a SLANG lint job for one file.
++ The cross-engine dedup key of one diagnostic (AC-2.13).
++
++ `origin` selects how `severity` is read: `1` = LSP (1 error … 4 hint), `2` =
++ CLI (0 error … 4 unknown). The key is `file`, 0-based `line`, the shared
++ severity class and the normalised message separated by `0x1F`, so an LSP row
++ and a CLI row of the same problem produce the same string. Returns an owned
++ string (release with [`vd_string_free`]) or null for invalid arguments.
++
++ # Safety
++
++ `file` and `message` must be null or valid NUL-terminated strings.
++ */
++char *vd_diagnostic_key(int32_t origin,
++                        const char *file,
++                        uint32_t line,
++                        int32_t severity,
++                        const char *message);
++
++/*
++ Release an owned string returned by [`vd_diagnostic_key`],
++ `vd_lint_command_line` or `vd_lsp_command_line`; null-safe.
++
++ # Safety
++
++ `text` must be null or a pointer this library returned and not freed yet.
++ */
++void vd_string_free(char *text);
++
++/*
++ Start a SLANG lint job for one file (the original entry point).
+ 
+  `binary_override` may be null (the service then resolves the binary itself).
+  Returns the job id, or `0` when the arguments were rejected.
+@@ -716,6 +1131,46 @@
+ uint64_t vd_deeplint_lint(struct VdService *service, const char *file, const char *binary_override);
+ 
+ /*
++ Start one lint job with an explicit engine and the project settings (T138).
++
++ `engine` is `0` (slang) or `1` (verible-verilog-lint). `slang_binary`,
++ `verible_binary` and `rules_path` may be null. `include_dirs` / `defines` may
++ be null; the slang engine receives them as `-I` / `-D`, the verible engine
++ does not accept them (see `vd_deeplint::knobs_note`). Returns the job id, or
++ `0` when the arguments were rejected.
++
++ # Safety
++
++ `service` must be null or live; every `*const c_char` must be null or a valid
++ NUL-terminated string; the lists must satisfy the string-list contract.
++ */
++uint64_t vd_deeplint_lint_v2(struct VdService *service,
++                             const char *file,
++                             int32_t engine,
++                             const char *slang_binary,
++                             const char *verible_binary,
++                             const char *rules_path,
++                             const struct VdStringList *include_dirs,
++                             const struct VdStringList *defines);
++
++/*
++ The exact argv one lint run would use, as one owned string (AC-2.5's dump).
++
++ Spawns nothing. `file` may be null (the dump then shows `<file>`). Returns
++ null only when `engine` is invalid. Release the result with `vd_string_free`.
++
++ # Safety
++
++ Every pointer argument must be null or valid for the duration of the call.
++ */
++char *vd_lint_command_line(int32_t engine,
++                           const char *binary,
++                           const char *file,
++                           const char *rules_path,
++                           const struct VdStringList *include_dirs,
++                           const struct VdStringList *defines);
++
++/*
+  Poll a lint job.
+ 
+  # Safety
+@@ -731,11 +1186,144 @@
+  # Safety
+ 
+  `diagnostics` must be null or point to a struct filled by
+- [`vd_deeplint_poll`] and not freed yet.
++ [`vd_deeplint_poll`] / [`vd_deeplint_batch_poll`] and not freed yet.
+  */
+ void vd_diagnostics_free(struct VdDiagnostics *diagnostics);
+ 
+ /*
++ Start a project-wide lint pass (AC-2.7/2.8).
++
++ `files` is the pass's snapshot of the file set (already unioned and
++ de-duplicated by the caller). `options` must not be null. Returns a job id
++ (`>= 1 << 32`) or `0` when the arguments were rejected.
++
++ # Safety
++
++ `service` must be null or live; `files` must satisfy the string-list
++ contract; `options` must be null or point to a readable
++ [`VdLintBatchOptions`] whose lists satisfy that same contract.
++ */
++uint64_t vd_deeplint_batch_start(struct VdService *service,
++                                 const struct VdStringList *files,
++                                 const struct VdLintBatchOptions *options);
++
++/*
++ Progress of a project-wide pass.
++
++ Returns `VD_STATUS_PENDING` while it runs (with `out` filled),
++ `VD_STATUS_READY` once it reached a terminal phase (with `out` filled), and
++ `POLL_MISUSE` for an unknown id or a null `out`.
++
++ # Safety
++
++ `service` must be null or live; `out` must be null or writable for one
++ [`VdLintProgress`].
++ */
++int32_t vd_deeplint_batch_progress(struct VdService *service,
++                                   uint64_t job,
++                                   struct VdLintProgress *out);
++
++/*
++ Poll the result of a project-wide pass.
++
++ `VD_STATUS_PENDING` while it runs; `VD_STATUS_READY` with the collected
++ diagnostics once it finished or was cancelled (a cancel delivers no
++ diagnostics collected after it); `VD_STATUS_FAILED` when the pass could not
++ run (the reason names the tool and the stage). The result is delivered once.
++
++ # Safety
++
++ `service` must be null or live; `out` must be null or writable for one
++ [`VdDiagnostics`].
++ */
++int32_t vd_deeplint_batch_poll(struct VdService *service, uint64_t job, struct VdDiagnostics *out);
++
++/*
++ Cancel a project-wide pass: it stops after the current file, the running
++ child is killed, and no later file starts (AC-2.8).
++
++ Returns `1` when the job was live, `0` when the id was unknown.
++
++ # Safety
++
++ `service` must be null or live; only null-safe access happens here.
++ */
++int32_t vd_deeplint_batch_cancel(struct VdService *service, uint64_t job);
++
++/*
++ Release a project-wide pass and its progress state (null-safe for an unknown
++ id). A running pass is cancelled first.
++
++ # Safety
++
++ `service` must be null or live.
++ */
++int32_t vd_deeplint_batch_release(struct VdService *service, uint64_t job);
++
++/*
++ Release a filled [`VdLintProgress`]; null-safe.
++
++ # Safety
++
++ `progress` must be null or point to a struct filled by
++ [`vd_deeplint_batch_progress`] and not freed yet.
++ */
++void vd_lint_progress_free(struct VdLintProgress *progress);
++
++/*
++ Start a project-wide hierarchical elaboration (T7, AC-3.1/3.2/3.4).
++
++ `files` is the project's effective file set and `options` carries the top and
++ the `-I`/`-D` settings. The work runs on a worker thread, so the UI thread
++ never waits; poll with [`vd_hier_poll`]. Returns a job id (`>= 1 << 48`) or
++ `0` when the arguments were rejected.
++
++ # Safety
++
++ `service` must be null or live; `files` must satisfy the string-list contract;
++ `options` must be null or point to a readable [`VdHierOptions`] whose lists
++ satisfy that same contract.
++ */
++uint64_t vd_hier_start(struct VdService *service,
++                       const struct VdStringList *files,
++                       const struct VdHierOptions *options);
++
++/*
++ Poll an elaboration job.
++
++ `VD_STATUS_PENDING` while it runs; `VD_STATUS_READY` with `out` filled once it
++ finished; `VD_STATUS_FAILED` when the elaboration itself failed (the reason,
++ naming the tool and the stage, is readable with `vd_service_error`). The
++ result is delivered once.
++
++ # Safety
++
++ `service` must be null or live; `out` must be null or writable for one
++ [`VdHierarchy`].
++ */
++int32_t vd_hier_poll(struct VdService *service, uint64_t job, struct VdHierarchy *out);
++
++/*
++ Release an elaboration job without delivering its result (null-safe for an
++ unknown id). A running job finishes into memory nobody reads.
++
++ # Safety
++
++ `service` must be null or live.
++ */
++int32_t vd_hier_release(struct VdService *service, uint64_t job);
++
++/*
++ Release a filled [`VdHierarchy`]; null-safe and idempotent.
++
++ # Safety
++
++ `hierarchy` must be null or point to a struct filled by [`vd_hier_poll`] and
++ not freed yet.
++ */
++void vd_hierarchy_free(struct VdHierarchy *hierarchy);
++
++/*
+  Start a FIM completion job.
+ 
+  Returns the job id, or `0` when the arguments were rejected.
+@@ -804,22 +1392,14 @@
+ void vd_lsp_info_free(struct VdLspInfo *info);
+ 
+ /*
+- Start an LSP session over the effective file set.
++ Start an LSP session over the effective file set (verible backend).
+ 
+- `ls_path` must be the Verible language-server binary, `workspace_root` the
+- project root; `rules_path` may be null; `files` must point to the file list
+- the project model produced (the same list the caller passes to SLANG).
+-
+- Returns a session id, or `0` when the arguments were rejected; the reason is
+- then readable with `vd_service_error`. No process is started here: the
+- worker starts the server on its first `didOpen`, so this call cannot block
+- the UI thread (C2).
++ Kept exactly as it was for the existing callers; it is equivalent to
++ [`vd_lsp_session_start_v2`] with `backend = 0` and no include dirs/defines.
+ 
+  # Safety
+ 
+- `service` must be null or live; the `*const c_char` arguments must be null or
+- valid NUL-terminated strings; `files` must satisfy [`read_file_list`]'s
+- contract.
++ See [`start_session_impl`].
+  */
+ uint64_t vd_lsp_session_start(struct VdService *service,
+                               const char *ls_path,
+@@ -828,6 +1408,29 @@
+                               const struct VdStringList *files);
+ 
+ /*
++ Start an LSP session with an explicit backend and the project settings (T138).
++
++ `backend` is `0` (verible) or `1` (slang). `include_dirs` / `defines` may be
++ null; when given, they reach the selected backend (see [`start_session_impl`]).
++ Returns a session id, or `0` when the arguments were rejected (the reason is
++ then readable with `vd_service_error`). Nothing is spawned here.
++
++ # Safety
++
++ `service` must be null or live; the `*const c_char` arguments must be null or
++ valid NUL-terminated strings; the lists must satisfy [`read_file_list`]'s
++ contract.
++ */
++uint64_t vd_lsp_session_start_v2(struct VdService *service,
++                                 const char *ls_path,
++                                 const char *workspace_root,
++                                 const char *rules_path,
++                                 const struct VdStringList *files,
++                                 int32_t backend,
++                                 const struct VdStringList *include_dirs,
++                                 const struct VdStringList *defines);
++
++/*
+  Read the observable state of one session (A3d).
+ 
+  Returns `VD_STATUS_READY` with `out` filled, or `POLL_MISUSE` when the id is
+@@ -943,6 +1546,99 @@
+ void vd_lsp_session_free(struct VdService *service, uint64_t session);
+ 
+ /*
++ Release a filled [`VdLspCapabilities`]; null-safe and idempotent.
++
++ # Safety
++
++ `capabilities` must be null or point to a struct filled by
++ [`vd_lsp_backend_capabilities`] / [`vd_lsp_session_capabilities`] and not
++ freed yet.
++ */
++void vd_lsp_capabilities_free(struct VdLspCapabilities *capabilities);
++
++/*
++ The static capability table of one backend (T138, AC-1.3).
++
++ `backend` is `0` (verible) or `1` (slang). The verible rows are measured; the
++ slang rows are `-1` (unknown) until a live session answers, because no
++ slang-server binary is built in this environment. Never touches a session.
++
++ # Safety
++
++ `out` must be null or writable for one [`VdLspCapabilities`].
++ */
++int32_t vd_lsp_backend_capabilities(int32_t backend, struct VdLspCapabilities *out);
++
++/*
++ The capability table of a live session (T138).
++
++ Before the server answers `initialize` this equals the static table; after it
++ the rows are the server's own advertisements (`basis = live`).
++
++ # Safety
++
++ `service` must be null or live; `out` must be null or writable for one
++ [`VdLspCapabilities`].
++ */
++int32_t vd_lsp_session_capabilities(struct VdService *service,
++                                    uint64_t session,
++                                    struct VdLspCapabilities *out);
++
++/*
++ The exact argv a session would use, as one owned string (AC-2.5's dump).
++
++ Spawns nothing. `file_list_path` may be null (the caller can generate one with
++ the project settings instead; the string then omits it). Returns null only
++ when `backend`, `ls_path` or `workspace_root` is invalid. Release the result
++ with `vd_string_free`.
++
++ # Safety
++
++ Every pointer argument must be null or valid for the duration of the call; the
++ two lists must satisfy [`read_file_list`]'s contract.
++ */
++char *vd_lsp_command_line(int32_t backend,
++                          const char *ls_path,
++                          const char *workspace_root,
++                          const char *rules_path,
++                          const char *file_list_path,
++                          const struct VdStringList *include_dirs,
++                          const struct VdStringList *defines);
++
++/*
++ The Verible file list this session would write for the project settings.
++
++ This is the AC-2.5 "config dump" for the verible backend: the project's
++ include dirs and defines reach `verible-verilog-ls` as `+incdir+` /
++ `+define+` lines in a `.f` passed with `--file_list_path`, because the server
++ has no include/define flag. Spawns and writes nothing. Returns an owned string
++ (release with `vd_string_free`) or null for invalid arguments.
++
++ # Safety
++
++ `files`, `include_dirs` and `defines` must be null or satisfy the
++ string-list contract.
++ */
++char *vd_lsp_file_list_preview(const struct VdStringList *files,
++                               const struct VdStringList *include_dirs,
++                               const struct VdStringList *defines);
++
++/*
++ The exact program plus argv one session was started with (AC-2.5's dump).
++
++ For the verible backend with project include dirs/defines this is where the
++ generated file list shows up as `--file_list_path=<path>`; the file itself
++ contains the `+incdir+` / `+define+` lines (`vd_lsp_file_list_preview` shows
++ the same text before a session exists). Returns an owned string (release with
++ `vd_string_free`), or null for an unknown session.
++
++ # Safety
++
++ `service` must be null or live.
++ */
++char *vd_lsp_session_command_line(struct VdService *service, uint64_t session);
++
++/*
+  Start a project/.f expansion job.
+ 
+  Returns the job id, or `0` when the arguments were rejected (the reason is
+@@ -956,6 +1652,61 @@
+ uint64_t vd_project_parse(struct VdService *service, const char *start_dir);
+ 
+ /*
++ Start a full project-model expansion job (T6, AC-2.1–2.5).
++
++ Unlike [`vd_project_parse`] — kept unchanged for the existing callers — this
++ entry point implements the project model of C7:
++
++ * `start_dir` is the folder the user opened and becomes the ROOT; the upward
++   discovery never moves it above that folder;
++ * `filelists` (null or empty when none) are the imported `.f` files;
++ * `settings_path` (null for "no tools page yet") is the `settings.toml` whose
++   `tools.include_dirs` / `tools.defines` are appended to the project's own;
++ * the file set is the union of the `.f` expansion and a recursive scan of
++   the root (`.v`/`.sv`/`.vh`/`.svh`), de-duplicated.
++
++ Returns the job id, or `0` when the arguments were rejected (the reason is
++ readable with `vd_service_error`). Poll it with [`vd_project_poll`] and free
++ the result with [`vd_project_info_free`].
++
++ # Safety
++
++ `service` must be null or a live handle; `start_dir`/`settings_path` must be
++ null or valid NUL-terminated strings; `filelists` must be null or satisfy the
++ [`VdStringList`] contract for the duration of the call.
++ */
++uint64_t vd_project_expand(struct VdService *service,
++                           const char *start_dir,
++                           const struct VdStringList *filelists,
++                           const char *settings_path);
++
++/*
++ Start a full project-model expansion with the project's filelist VARIABLE
++ TABLE (ADDENDUM A-9).
++
++ Same contract as [`vd_project_expand`], plus `variables`: a list of
++ `NAME=VALUE` entries (a bare `NAME` is a defined-but-empty variable). The
++ table wins over the process environment; `$VAR` / `${VAR}` / `$(VAR)` / `~`
++ inside the `.f` files expand from it. Unresolved names come back in
++ `VdProjectInfo.missing_variables` and each affected line is a warning with
++ its `.f` file and 1-based line.
++
++ Returns the job id, or `0` when the arguments were rejected (the reason is
++ readable with `vd_service_error`). Poll with [`vd_project_poll`], free with
++ [`vd_project_info_free`].
++
++ # Safety
++
++ Same pointer contract as [`vd_project_expand`]; `variables` must be null or
++ satisfy the [`VdStringList`] contract for the duration of the call.
++ */
++uint64_t vd_project_expand_v2(struct VdService *service,
++                              const char *start_dir,
++                              const struct VdStringList *filelists,
++                              const char *settings_path,
++                              const struct VdStringList *variables);
++
++/*
+  Poll a project job.
+ 
+  `VD_STATUS_READY` fills `out`; `VD_STATUS_FAILED` leaves it untouched and the
+[typecheck] FAIL: crates/vd-ffi/include/vd_ffi.h drifted from its source (build.rs/cbindgen regenerated it).
+[typecheck]        The committed copy must be identical to the generated one; regenerate it and commit the header.
+TYPECHECK_EXIT=1

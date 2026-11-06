@@ -1,0 +1,44 @@
+CHECK PASS a3c.lsp-received-same-set  rtl/alu_pkg.sv,rtl/alu.sv,rtl/top.sv
+CHECK PASS a3c.slang-received-same-set  rtl/alu_pkg.sv,rtl/alu.sv,rtl/top.sv
+CHECK PASS a3c.report-marks-same-set  lsp=3 slang=3/3
+CHECK PASS a3d.state-ready  2
+CHECK PASS a3d.generation-advanced  2
+CHECK PASS a3d.new-counts-follow-set  2
+CHECK PASS a3d.state-ready-after-change
+CHECK PASS entry.definition
+CHECK PASS entry.definition-result
+CHECK PASS entry.references
+CHECK PASS entry.references-result
+CHECK PASS entry.symbols
+CHECK PASS entry.symbols-result
+CHECK PASS entry.symbols-updates-outline
+CHECK PASS entry.rename
+CHECK PASS entry.rename-result
+CHECK PASS entry.format
+CHECK PASS entry.format-result
+CHECK PASS entry.hover
+CHECK PASS entry.hover-result
+CHECK PASS entry.signature
+CHECK PASS entry.signature-result
+CHECK PASS diagnostics.collected  2
+CHECK PASS degrade.slang-missing-is-observable  Diagnostics unavailable: verible-verilog-ls, slang not found (bundled, local checkout, PATH and env all empty). Impact: Verible diagnostics, navigation and the outline are unavailable; SLANG deep lint is unavailable. Fix: bundle `verible-verilog-ls`/`slang` in the product's bin/ next to vd-app, run `bash scripts/fetch-verible.sh` and `bash build/slang/build.sh` in a source checkout, install them on PATH, or set VEDIT_VERIBLE_LS / VEDIT_SLANG.
+CHECK PASS degrade.slang-missing-not-crash
+CHECK PASS degrade.lsp-missing-is-diagnosable  fake LSP refused to start (missing binary)
+CHECK PASS degrade.lsp-missing-request-fails-typed
+CHECK PASS degrade.no-backend-is-diagnosable
+CHECK PASS toolchain.bundled-wins  source=verible:bundled slang:bundled missing=[]
+CHECK PASS toolchain.path-before-env  source=verible:PATH slang:PATH missing=[]
+CHECK PASS toolchain.env-is-last  source=verible:env:VEDIT_VERIBLE_LS slang:env:VEDIT_SLANG missing=[]
+CHECK PASS toolchain.missing-list  source=verible:missing slang:missing missing=[verible, slang]
+CHECK PASS toolchain.missing-message-visible  Diagnostics unavailable: verible-verilog-ls, slang not found (bundled, local checkout, PATH and env all empty). Impact: Verible diagnostics, navigation and the outline are unavailable; SLANG deep lint is unavailable. Fix: bundle `verible-verilog-ls`/`slang` in the product's bin/ next to vd-app, run `bash scripts/fetch-verible.sh` and `bash build/slang/build.sh` in a source checkout, install them on PATH, or set VEDIT_VERIBLE_LS / VEDIT_SLANG.
+CHECK PASS t118.analyze-starts  analysis count=1
+CHECK PASS t118.analyze-is-file-scope  /fixture/rtl/top.sv
+CHECK PASS t118.analyze-counted  1
+CHECK PASS t118.buffer-pushed  changes=1
+CHECK PASS t118.panel-refreshed-before   — 0 diagnostic(s)
+CHECK PASS t118.panel-analyzed  top.sv — analyzed 13:45:59 (editor buffer, not saved yet): 1 diagnostic(s)
+CHECK PASS t118.panel-source-is-buffer  top.sv — analyzed 13:45:59 (editor buffer, not saved yet): 1 diagnostic(s)
+CHECK PASS t118.panel-counts-diagnostics  top.sv — analyzed 13:45:59 (editor buffer, not saved yet): 1 diagnostic(s)
+CHECK PASS t118.panel-outline-filled  2
+CHECK PASS t118.buffer-refusal-observable  3
+VE-DIAGNOSTICS-SELFTEST checks=43 failures=0

@@ -1,0 +1,10 @@
+# A-11 Qt/ABI guard: the TREE artifact compiles in the Qt6 image
+date: 2026-11-02T16:16:39+08:00
+$ docker run --rm -v <repo>:/w -w /w vedit-qt6-build:local bash -lc 'g++ -std=c++17 -fsyntax-only -fPIC $(pkg-config --cflags Qt6Core) -I crates/vd-ffi/include crates/vd-ffi/tests/qt_abi_guard.cpp'
+QT_ABI_GUARD(tree artifact): PASS
+exit=0
+
+# Host (no Qt6 dev files): the Rust wrapper must SKIP loudly with the command it would run
+$ CARGO_HOME=$PWD/target/cargo-home RUSTUP_TOOLCHAIN=stable cargo test -p vd-ffi --test qt_abi_guard -- --nocapture
+SKIP: Qt6 development files are not available on this host, so the Qt/ABI compile guard did not run. It would have run:
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

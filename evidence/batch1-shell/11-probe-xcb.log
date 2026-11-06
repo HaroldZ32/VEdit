@@ -1,0 +1,310 @@
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server] local=[/vedit-build/build/slang/out,/vedit-build/.mpd/recon/verible/bin]
+PROBE work=/tmp/batch1-shell-probe-WeGVsB platform=xcb
+PROBE fixture rootA=/tmp/batch1-shell-probe-WeGVsB/alpha-project rootB=/tmp/batch1-shell-probe-WeGVsB/beta-project
+jump: installJump registry reset; target=none
+filetree: installFileTree projectRoot='/tmp/batch1-shell-probe-WeGVsB/alpha-project' dockInserted=0 placeholderReplaced=0
+search: installSearch projectRoot='/tmp/batch1-shell-probe-WeGVsB/alpha-project' jumpTarget=registry(editor)
+QObject::connect: No such signal vedit::app::ApplicationShell::directoryOpened(QString)
+QObject::connect:  (sender name:   'vedit-app-shell')
+QObject::connect: No such signal QMainWindowLayout::directoryOpened(QString)
+QObject::connect:  (sender name:   '_layout')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'editor-area')
+QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QTimer::directoryOpened(QString)
+QObject::connect:  (sender name:   'ctrlSAuthorityGuard')
+QObject::connect: No such signal QStatusBar::directoryOpened(QString)
+QObject::connect: No such signal QSizeGrip::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'status-dirty')
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'status-project')
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'status-theme')
+QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'status-layout')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-settings.preferences')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.open')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.open-folder')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.new-layout')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.save')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.save-as')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.save-session')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.close-pane')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.quit')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.split.horizontal')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.split.vertical')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.focus.next')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.layout.mixed')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.layout.reset')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.panel.file-tree')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.panel.search')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.panel.terminal')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.panel.vcs')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-view.panel.outline')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-help.about')
+QObject::connect: No such signal QMenuBar::directoryOpened(QString)
+QObject::connect: No such signal QToolButton::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_menubar_ext_button')
+QObject::connect: No such signal QMenu::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal QMenu::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal QMenu::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal QMenu::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal vedit::workspace::PaletteIntegration::directoryOpened(QString)
+QObject::connect: No such signal vedit::workspace::CommandPalette::directoryOpened(QString)
+QObject::connect:  (sender name:   'command-palette')
+QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QLineEdit::directoryOpened(QString)
+QObject::connect:  (sender name:   'palette-query')
+QObject::connect: No such signal QWidgetLineControl::directoryOpened(QString)
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   '_q_qlineeditclearaction')
+QObject::connect: No such signal QLineEditIconButton::directoryOpened(QString)
+QObject::connect: No such signal QListWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'palette-results')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QListModel::directoryOpened(QString)
+QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'palette-empty')
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'palette-status')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect:  (sender name:   'action-file.goto-file')
+QObject::connect: No such signal vedit::workspace::search::EditorJumpTarget::directoryOpened(QString)
+QObject::connect: No such signal vedit::workspace::project::ProjectModel::directoryOpened(QString)
+QObject::connect: No such signal QDockWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'dock-project')
+QObject::connect: No such signal QDockWidgetLayout::directoryOpened(QString)
+QObject::connect: No such signal QDockWidgetTitleButton::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_dockwidget_floatbutton')
+QObject::connect: No such signal QDockWidgetTitleButton::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_dockwidget_closebutton')
+QObject::connect: No such signal QAction::directoryOpened(QString)
+QObject::connect: No such signal vedit::workspace::project::ProjectPanel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-panel')
+QObject::connect: No such signal QVBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QHBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-summary')
+QObject::connect: No such signal QPushButton::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-refresh')
+QObject::connect: No such signal QPushButton::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-import-filelist')
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-empty-hint')
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-filelists-header')
+QObject::connect: No such signal QListWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-filelist-list')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QListModel::directoryOpened(QString)
+QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+QObject::connect: No such signal QPushButton::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-remove-filelist')
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-files-header')
+QObject::connect: No such signal QListWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-file-list')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QListModel::directoryOpened(QString)
+QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-include-header')
+QObject::connect: No such signal QListWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-include-dirs')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QListModel::directoryOpened(QString)
+QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-defines-header')
+QObject::connect: No such signal QListWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-defines')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QListModel::directoryOpened(QString)
+QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-variables-header')
+QObject::connect: No such signal QListWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-variables')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QListModel::directoryOpened(QString)
+QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+QObject::connect: No such signal QPushButton::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-edit-variables')
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-diagnostics-header')
+QObject::connect: No such signal QListWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-diagnostics')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_viewport')
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_hcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QWidget::directoryOpened(QString)
+QObject::connect:  (sender name:   'qt_scrollarea_vcontainer')
+QObject::connect: No such signal QScrollBar::directoryOpened(QString)
+QObject::connect: No such signal QBoxLayout::directoryOpened(QString)
+QObject::connect: No such signal QStyledItemDelegate::directoryOpened(QString)
+QObject::connect: No such signal QListModel::directoryOpened(QString)
+QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
+QObject::connect: No such signal QLabel::directoryOpened(QString)
+QObject::connect:  (sender name:   'project-status')
+module-tree: installed (root='/tmp/batch1-shell-probe-WeGVsB/alpha-project' state='/tmp/batch1-shell-probe-WeGVsB/state')
+vcs: installVcs projectRoot='/tmp/batch1-shell-probe-WeGVsB/alpha-project'
+settings: installSettings file='/tmp/batch1-shell-probe-WeGVsB/state/settings.toml'
+search: root='/tmp/batch1-shell-probe-WeGVsB/alpha-project' (ready)
+vcs: root='/tmp/batch1-shell-probe-WeGVsB/alpha-project'
+TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server] local=[/vedit-build/build/slang/out,/vedit-build/.mpd/recon/verible/bin]
+PASS a11.shell.restored-root — /tmp/batch1-shell-probe-WeGVsB/alpha-project
+PASS a11.shell.label — alpha-project
+PASS a11.panels.restored — files=1 search=1 vcs=1 moduleTree=1
+PASS a11.files.root — /tmp/batch1-shell-probe-WeGVsB/alpha-project
+PASS a11.files.ready — alpha-project
+PASS a11.files.root-row — alpha-project
+PASS a11.files.lists-root-content — rtl
+PASS a11.files.file-reachable
+PASS a11.search.root — /tmp/batch1-shell-probe-WeGVsB/alpha-project
+PASS a11.search.not-no-root — Enter a query and press Search.
+PASS a11.search.root-label — In /tmp/batch1-shell-probe-WeGVsB/alpha-project
+search: query root='/tmp/batch1-shell-probe-WeGVsB/alpha-project' query='TOKEN_ALPHA_1'
+PASS a11.search.hit — state=done hits=1 error=
+PASS a11.search.hits-inside-root — hits=1
+PASS a11.vcs.root — /tmp/batch1-shell-probe-WeGVsB/alpha-project
+PASS a11.vcs.backend — Git alpha-project @ a99f430 · 1 changed file(s)
+PASS a11.vcs.branch — Git alpha-project @ a99f430 · 1 changed file(s)
+PASS a11.module-tree.poll-root — /tmp/batch1-shell-probe-WeGVsB/alpha-project
+PASS a11.module-tree.non-empty — valid=1 rows=2 status=Hierarchy ready — double-click an instance, a net or a driver/load.
+PASS a11.module-tree.summary-names-root — slang · 2 file(s) · 3 instance(s) · 0 net(s) · 6 ms · 16448 KiB peak
+root: /tmp/batch1-shell-probe-WeGVsB/alpha-project
+PASS a11.fileset.root — /tmp/batch1-shell-probe-WeGVsB/alpha-project
+PASS a11.fileset.non-empty — 2 file(s): /tmp/batch1-shell-probe-WeGVsB/alpha-project/rtl/second.v,/tmp/batch1-shell-probe-WeGVsB/alpha-project/rtl/top.sv
+PASS a11.fileset.inside-root — /tmp/batch1-shell-probe-WeGVsB/alpha-project/rtl/second.v,/tmp/batch1-shell-probe-WeGVsB/alpha-project/rtl/top.sv
+PASS SCREENSHOT /vedit-build/evidence/batch1-shell/shots/10-ordinary-start-root-a.png
+[shell-root] project root -> /tmp/batch1-shell-probe-WeGVsB/beta-project
+search: root='/tmp/batch1-shell-probe-WeGVsB/beta-project' (ready)
+module-tree: root -> '/tmp/batch1-shell-probe-WeGVsB/beta-project'
+vcs: root='/tmp/batch1-shell-probe-WeGVsB/beta-project'
+PASS a12.shell.switched — /tmp/batch1-shell-probe-WeGVsB/beta-project
+PASS a12.files.new-root — /tmp/batch1-shell-probe-WeGVsB/beta-project
+PASS a12.search.new-root — /tmp/batch1-shell-probe-WeGVsB/beta-project
+PASS a12.vcs.new-root — /tmp/batch1-shell-probe-WeGVsB/beta-project
+PASS a12.vcs.header-changed — Git alpha-project @ a99f430 · 1 changed file(s) -> Git beta-project @ 6633414 · 1 changed file(s)
+PASS a12.module-tree.poll-root — /tmp/batch1-shell-probe-WeGVsB/beta-project
+PASS a12.module-tree.new-hierarchy — slang · 1 file(s) · 2 instance(s) · 0 net(s) · 6 ms · 16436 KiB peak
+root: /tmp/batch1-shell-probe-WeGVsB/beta-project
+PASS a12.fileset.new-root — /tmp/batch1-shell-probe-WeGVsB/beta-project
+PASS a12.fileset.re-expanded — /tmp/batch1-shell-probe-WeGVsB/beta-project/rtl/other.sv
+search: query root='/tmp/batch1-shell-probe-WeGVsB/beta-project' query='TOKEN_BETA_2'
+PASS a12.search.new-root-hit — hits=1 error=
+PASS a12.search.new-root-hits-inside — hits=1
+search: query root='/tmp/batch1-shell-probe-WeGVsB/beta-project' query='TOKEN_ALPHA_1'
+PASS a12.search.old-token-not-found — hits=0 error=
+PASS a12.search.log-announces-new-root
+PASS a12.search.log-queried-new-root
+PASS a12.search.log-never-queried-old-root
+PASS SCREENSHOT /vedit-build/evidence/batch1-shell/shots/20-after-switch-root-b.png
+[shell-root] project root -> /tmp/batch1-shell-probe-WeGVsB/alpha-project
+search: root='/tmp/batch1-shell-probe-WeGVsB/alpha-project' (ready)
+module-tree: root -> '/tmp/batch1-shell-probe-WeGVsB/alpha-project'
+vcs: root='/tmp/batch1-shell-probe-WeGVsB/alpha-project'
+PASS a12.file-menu-open-folder — shell=/tmp/batch1-shell-probe-WeGVsB/alpha-project search=/tmp/batch1-shell-probe-WeGVsB/alpha-project
+PASS a12.file-menu-vcs-followed — /tmp/batch1-shell-probe-WeGVsB/alpha-project
+PASS a12.file-menu-module-tree-followed — /tmp/batch1-shell-probe-WeGVsB/alpha-project
+BATCH1-SHELL-PROBE ok=1 checks=42 failures=0

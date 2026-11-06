@@ -299,7 +299,7 @@ void testStateMachine()
         vedit::editor::fim::InlineCompletion client(nullptr);
         check("fim.state.no-backend.request", !client.request(QStringLiteral("a"), 0, 0));
         check("fim.state.no-backend.status",
-              client.statusText().contains(QStringLiteral("未链接 Rust 服务")),
+              client.statusText().contains(QStringLiteral("FIM unavailable (no Rust service linked")),
               client.statusText());
         check("fim.state.no-backend.no-suggestion", !client.hasSuggestion());
     }
@@ -326,7 +326,7 @@ void testStateMachine()
               client.hasSuggestion()
                   && client.suggestion() == QStringLiteral(" assign x = 1;\n"));
         check("fim.state.text.status",
-              client.statusText().contains(QStringLiteral("建议就绪")), client.statusText());
+              client.statusText().contains(QStringLiteral("FIM suggestion ready")), client.statusText());
         client.onTextEdited();
         check("fim.state.text.invalidated", !client.hasSuggestion());
         check("fim.state.text.accept-after-invalidate", client.accept().isEmpty());

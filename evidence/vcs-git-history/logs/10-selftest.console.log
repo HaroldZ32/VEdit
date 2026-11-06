@@ -1,0 +1,43 @@
+CHECK vcs.history.search-cleared PASS
+CHECK vcs.history.detail-request PASS 0123456789abcdef0123456789abcdef01234560
+CHECK vcs.history.detail-text PASS Commit 0123456789abcdef0123456789abcdef01234567
+CHECK vcs.history.tabs PASS Commit,File history,Blame,Compare
+CHECK vcs.history.file-request PASS rtl/top.sv
+CHECK vcs.history.file-text PASS History of rtl/top.sv
+CHECK vcs.history.file-empty-path-ignored PASS
+CHECK vcs.history.blame-request PASS
+CHECK vcs.history.blame-text PASS Blame of rtl/top.sv
+CHECK vcs.history.compare-needs-two PASS Select two commits to compare.
+CHECK vcs.history.tree-exists PASS
+CHECK vcs.history.compare-request PASS 0123456789abcdef0123456789abcdef01234561 -> 0123456789abcdef0123456789abcdef01234560
+CHECK vcs.history.compare-text PASS aaaa → bbbb
+CHECK vcs.history.empty-state PASS No commits to show: this repository has no commits yet
+CHECK vcs.history.empty-text PASS No commits to show: this repository has no commits yet
+CHECK vcs.history.error-state PASS The history read failed: fatal: not a git repository
+CHECK vcs.history.error-text PASS The history read failed: fatal: not a git repository
+CHECK vcs.history.no-source PASS No commits to show: no VCS backend available
+CHECK vcs.history.e2e.p1000 PASS /tmp/vedit-workspace-vcs-selftest-mxDvVa/history-1000
+CHECK vcs.history.e2e.not-worktree PASS fixture=/tmp/vedit-workspace-vcs-selftest-mxDvVa/history-1000 cwd=/tmp/vedit-vcs-4b-OTOUfe
+CHECK vcs.history.abi.raw-page PASS state=1 kind=1 count=2 hash0=0b2cd3cbe9a5eb911d4568b8ca52c5f3b6f6424d
+CHECK vcs.history.e2e.page PASS rows=50 more=1
+CHECK vcs.history.e2e.page-newest-first PASS commit 0999
+CHECK vcs.history.e2e.page-label PASS Commits 1–50
+CHECK vcs.history.nonblocking.returns-fast PASS setSource() returned in 0 ms
+CHECK vcs.history.nonblocking.ticks PASS 2 ticks of 5 ms while the read was in flight (17 ms, rows=50)
+CHECK vcs.history.e2e.last-page PASS rows=50 more=0
+CHECK vcs.history.e2e.search PASS commit 0777
+CHECK vcs.history.e2e.search-empty PASS No commit matches "no such message anywhere".
+CHECK vcs.history.e2e.detail PASS Commit 0b2cd3cbe9a5eb911d4568b8ca52c5f3b6f6424d
+CHECK vcs.history.e2e.detail-patch PASS Commit 0b2cd3cbe9a5eb911d4568b8ca52c5f3b6f6424d
+CHECK vcs.history.e2e.file-history PASS History of rtl/a.sv
+CHECK vcs.history.e2e.file-history-rows PASS row present
+CHECK vcs.history.e2e.blame PASS Blame of rtl/a.sv
+CHECK vcs.history.e2e.blame-author PASS author present
+CHECK vcs.history.e2e.compare PASS 0b2cd3cbe9a5eb911d4568b8ca52c5f3b6f6424d → 0f0fe42d8a9150583bccb531e5ed1a75d3348195
+CHECK vcs.history.e2e.compare-patch PASS 0b2cd3cbe9a5eb911d4568b8ca52c5f3b6f6424d → 0f0fe42d8a9150583bccb531e5ed1a75d3348195
+CHECK vcs.history.nonblocking.sync-control PASS 0 ticks for a synchronous source (the metric detects blocking)
+CHECK vcs.history.e2e.empty-repo PASS No commits to show: this repository has no commits yet
+CHECK vcs.history.e2e.empty-repo-text PASS No commits to show: this repository has no commits yet
+HISTORY-TIMING p1000 rows=50 read_ms=17 ticks=2
+cwd_still=/tmp/vedit-vcs-4b-OTOUfe
+selftest=PASS

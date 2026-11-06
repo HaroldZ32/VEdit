@@ -1,0 +1,36 @@
+CHECK vcs.write.e2e.git PASS /usr/bin/git
+CHECK vcs.write.e2e.fixture PASS /tmp/vedit-workspace-vcs-selftest-dcHspW/write-repo
+CHECK vcs.write.e2e.not-worktree PASS fixture=/tmp/vedit-workspace-vcs-selftest-dcHspW/write-repo cwd=/tmp/vedit-vcs-write-EG3Hg0
+CHECK vcs.write.e2e.status-first PASS files=1
+CHECK vcs.write.e2e.stage-requested PASS
+CHECK vcs.write.e2e.stage-ok PASS Staged rtl/a.sv
+CHECK vcs.write.e2e.staged-porcelain PASS M  rtl/a.sv
+CHECK vcs.write.e2e.staged-column PASS staged=1
+CHECK vcs.write.e2e.unstage-requested PASS
+CHECK vcs.write.e2e.unstage-ok PASS
+CHECK vcs.write.e2e.unstaged-porcelain PASS M rtl/a.sv
+CHECK vcs.write.e2e.discard-cancel PASS
+CHECK vcs.write.e2e.discard-cancel-zero-write PASS M rtl/a.sv
+CHECK vcs.write.e2e.discard-requested PASS
+CHECK vcs.write.e2e.discard-ok PASS Discarded the working-tree changes of rtl/a.sv
+CHECK vcs.write.e2e.discarded-porcelain PASS
+CHECK vcs.write.e2e.stage-new PASS
+CHECK vcs.write.e2e.stage-new-ok PASS Staged rtl/new.sv
+CHECK vcs.write.e2e.commit-requested PASS
+CHECK vcs.write.e2e.commit-ok PASS Commit written.
+CHECK vcs.write.e2e.commit-subject PASS fixture: add new.sv
+CHECK vcs.write.e2e.commit-author PASS VEdit Test <test@vedit.local>
+CHECK vcs.write.e2e.amend-requested PASS
+CHECK vcs.write.e2e.amend-ok PASS Commit written.
+CHECK vcs.write.e2e.amend-subject PASS fixture: add new.sv (amended)
+CHECK vcs.write.e2e.amend-rewrote-one-commit PASS 2 -> 2
+write_e2e_checks=26
+CHECK vcs.write.e2e.staged-porcelain PASS M  rtl/a.sv
+CHECK vcs.write.e2e.unstaged-porcelain PASS M rtl/a.sv
+CHECK vcs.write.e2e.discard-cancel-zero-write PASS M rtl/a.sv
+CHECK vcs.write.e2e.discarded-porcelain PASS
+CHECK vcs.write.e2e.commit-subject PASS fixture: add new.sv
+CHECK vcs.write.e2e.commit-author PASS VEdit Test <test@vedit.local>
+CHECK vcs.write.e2e.amend-subject PASS fixture: add new.sv (amended)
+CHECK vcs.write.e2e.amend-rewrote-one-commit PASS 2 -> 2
+write_e2e=PASS

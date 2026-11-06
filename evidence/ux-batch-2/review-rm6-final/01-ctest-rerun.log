@@ -1,0 +1,182 @@
+UpdateCTestConfiguration  from :/vedit-build/target/qt6-build/DartConfiguration.tcl
+Test project /vedit-build/target/qt6-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 26
+    Start 26: vedit-editor-multi-cursor-selftest
+
+26: Test command: /vedit-build/target/qt6-build/src/app/editor-lane/vedit-editor-multi-cursor-selftest
+26: Working Directory: /vedit-build/target/qt6-build/src/app/editor-lane
+26: Environment variables: 
+26:  QT_QPA_PLATFORM=offscreen
+26:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime-edit
+26: Test timeout computed to be: 180
+26: kf.sonnet.core: Sonnet: No speller backends available!
+26: This plugin does not support propagateSizeHints()
+26: This plugin does not support propagateSizeHints()
+26: This plugin does not support propagateSizeHints()
+26: This plugin does not support propagateSizeHints()
+26: This plugin does not support propagateSizeHints()
+26: CHECK edit.controllers.installed PASS
+26: CHECK edit.provider.editor PASS
+26: CHECK edit.provider.multi-cursor PASS
+26: CHECK edit.provider.enhancements PASS
+26: CHECK edit.real-focus.inner-widget PASS
+26: CHECK edit.real-focus.multi-cursor-setup PASS
+26: CHECK edit.real-focus.multi-cursor-typing PASS
+26: CHECK edit.real-focus.line-setup PASS
+26: CHECK edit.real-focus.line-op PASS
+26: CHECK edit.block.inner-widget PASS
+26: CHECK edit.block.inner-widget-same-for-end PASS
+26: CHECK edit.block.drag-active PASS
+26: CHECK edit.block.drag-native-mode PASS
+26: CHECK edit.block.cursor-count PASS
+26: CHECK edit.block.left-column PASS
+26: CHECK edit.block.cursor-lines PASS
+26: CHECK edit.block.native-mode-off PASS
+26: CHECK edit.real-focus.block-typing-target PASS
+26: CHECK edit.block.rectangular-insert PASS
+26: CHECK edit.block.one-undo PASS
+26: CHECK edit.alt-click.add PASS
+26: CHECK edit.alt-click.clicked-position PASS
+26: CHECK edit.alt-click.toggle-off PASS
+26: CHECK edit.alt-click.readd PASS
+26: CHECK edit.alt-click.typing PASS
+26: CHECK edit.alt-click.one-undo PASS
+26: CHECK rm6.shift-alt-block.inner-widget PASS
+26: CHECK rm6.shift-alt-block.drag-active PASS
+26: CHECK rm6.shift-alt-block.native-mode PASS
+26: CHECK rm6.shift-alt-block.cursor-count PASS
+26: CHECK rm6.shift-alt-block.rectangle PASS
+26: CHECK rm6.shift-alt-block.native-mode-off PASS
+26: CHECK rm6.shift-alt-block.rectangular-insert PASS
+26: CHECK rm6.shift-alt-block.one-undo PASS
+26: CHECK rm6.ctrl-alt-click.add PASS
+26: CHECK rm6.ctrl-alt-click.added-position PASS
+26: CHECK rm6.ctrl-alt-click.toggle-off PASS
+26: CHECK rm6.ctrl-alt-click.readd PASS
+26: CHECK rm6.plain-click.single-cursor PASS
+26: CHECK edit.multi.three-cursors PASS
+26: CHECK edit.multi.type PASS
+26: CHECK edit.multi.type-one-undo PASS
+26: CHECK edit.multi.backspace-setup PASS
+26: CHECK edit.multi.backspace PASS
+26: CHECK edit.multi.backspace-one-undo PASS
+26: CHECK edit.multi.delete-setup PASS
+26: CHECK edit.multi.delete PASS
+26: CHECK edit.multi.delete-one-undo PASS
+26: CHECK edit.multi.return-setup PASS
+26: CHECK edit.multi.return PASS
+26: CHECK edit.multi.return-one-undo PASS
+26: CHECK edit.return.auto-indent PASS
+26: CHECK edit.return.cursor-after-indent PASS
+26: CHECK edit.return.brace-indent PASS
+26: CHECK edit.typing.control PASS
+26: CHECK edit.pair.round PASS
+26: CHECK edit.pair.inside PASS
+26: CHECK edit.pair.skip-over PASS
+26: CHECK edit.pair.backspace-precondition PASS
+26: CHECK edit.pair.backspace-deletes-both PASS
+26: CHECK edit.pair.quote-precondition PASS
+26: CHECK edit.pair.quote PASS
+26: CHECK edit.comment.on PASS
+26: CHECK edit.comment.off PASS
+26: CHECK edit.move.up PASS
+26: CHECK edit.move.down PASS
+26: CHECK edit.duplicate.line PASS
+26: CHECK edit.delete.line PASS
+26: CHECK edit.case.upper PASS
+26: CHECK edit.case.lower PASS
+26: CHECK edit.zoom.in PASS
+26: CHECK edit.zoom.config-changed PASS
+26: CHECK edit.zoom.out PASS
+26: CHECK edit.wrap.flip PASS
+26: CHECK edit.wrap.config PASS
+26: CHECK edit.wrap.back PASS
+26: CHECK-DETAIL bracket config key 'disable-bracket-match-highlight-if-inactive': listed=0 accepted=0
+26: CHECK edit.bracket.native-highlight PASS
+26: CHECK edit.keys.single-owner PASS
+26: CHECK definition.document PASS
+26: CHECK definition.view PASS
+26: CHECK definition.seams PASS
+26: CHECK definition.action-is-the-f12-path PASS
+26: CHECK definition.click-coordinate PASS
+26: CHECK definition.ctrl-click.inner-widget PASS
+26: ACTION action=definition dispatched=1 via='diagnostics.definition'
+26: CHECK definition.ctrl-click.dispatched PASS
+26: CHECK definition.ctrl-click.action-triggered PASS
+26: CHECK definition.ctrl-click.file PASS
+26: CHECK definition.ctrl-click.line-column PASS
+26: CHECK definition.ctrl-click.document-unchanged PASS
+26: CHECK definition.ctrl-click.no-added-cursor PASS
+26: CHECK definition.collapse.plain-setup PASS
+26: CHECK definition.collapse.plain-click PASS
+26: CHECK definition.collapse.ctrl-setup PASS
+26: ACTION action=definition dispatched=1 via='diagnostics.definition'
+26: This plugin does not support propagateSizeHints()
+26: CHECK definition.collapse.ctrl-click PASS
+26: CHECK definition.collapse.ctrl-click-position PASS
+26: CHECK definition.collapse.ctrl-click-dispatched PASS
+26: CHECK rm6.ctrl-alt-click.no-definition-dispatch PASS
+26: CHECK rm6.ctrl-alt-click.dispatch-unchanged PASS
+26: CHECK rm6.ctrl-alt-click.adds-cursor PASS
+26: CHECK definition.plain-click.inner-widget PASS
+26: CHECK definition.plain-click.caret PASS
+26: DEFINITION-CLICK unavailable=1 reason='verible-verilog-ls does not advertise definitionProvider'
+26: This plugin does not support propagateSizeHints()
+26: CHECK definition.gate-off.no-request PASS
+26: CHECK definition.gate-off.document-unchanged PASS
+26: CHECK definition.gate-off.plain-click PASS
+26: CHECK definition.gate-off.status-reason PASS
+26: CHECK definition.gate-off.one-time-message PASS
+26: CHECK definition.gate-off.second-plain-click PASS
+26: CHECK definition.gate-off.still-no-request PASS
+26: CHECK definition.gate-only.action-enabled PASS
+26: CHECK definition.gate-only.availability PASS
+26: DEFINITION-CLICK unavailable=1 reason='gate-only: verible-verilog-ls does not advertise definitionProvider'
+26: CHECK definition.gate-only.no-request PASS
+26: CHECK definition.gate-only.plain-click PASS
+26: CHECK definition.gate-only.status-reason PASS
+26: CHECK definition.action-only.gate-row-enabled PASS
+26: CHECK definition.action-only.availability PASS
+26: DEFINITION-CLICK unavailable=1 reason='action-only: the definition QAction is disabled'
+26: CHECK definition.action-only.no-request PASS
+26: CHECK definition.action-only.plain-click PASS
+26: CHECK definition.action-only.status-reason PASS
+26: DEFINITION-CLICK unavailable=1 reason='rearm: the definition backend went away'
+26: CHECK definition.rearm.first-message PASS
+26: CHECK definition.rearm.one-time PASS
+26: CHECK definition.rearm.restored PASS
+26: DEFINITION-CLICK unavailable=1 reason='rearm: the definition backend went away'
+26: CHECK definition.rearm.message-after-restore PASS
+26: DEFINITION-CLICK unavailable=1 reason='rearm: a different definition reason'
+26: This plugin does not support propagateSizeHints()
+26: This plugin does not support propagateSizeHints()
+26: This plugin does not support propagateSizeHints()
+26: CHECK definition.rearm.changed-reason PASS
+26: CHECK definition.rearm.changed-reason-one-time PASS
+26: CHECK definition.two-pane.views PASS
+26: CHECK definition.two-pane.seams PASS
+26: CHECK definition.two-pane.inner-widget PASS
+26: ACTION action=definition dispatched=1 via='diagnostics.definition'
+26: CHECK definition.two-pane.clicked-channel PASS
+26: CHECK definition.two-pane.other-channel PASS
+26: CHECK definition.two-pane.action-triggered PASS
+26: CHECK definition.two-pane.clicked-caret PASS
+26: CHECK definition.two-pane.clicked-file PASS
+26: CHECK definition.two-pane.other-caret-untouched PASS
+26: CHECK definition.two-pane.clicked-cursor-count PASS
+26: CHECK definition.two-pane.keyboard-focus PASS
+26: SUMMARY checks=135 failures=0
+1/1 Test #26: vedit-editor-multi-cursor-selftest ...   Passed    0.37 sec
+
+The following tests passed:
+	vedit-editor-multi-cursor-selftest
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.38 sec

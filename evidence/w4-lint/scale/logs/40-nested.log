@@ -1,0 +1,41 @@
+slang: slang version 12.1.0+0
+=== expansion, flat 1k ===
+EXPANSION ok=1 root=/vedit-build/target/tmp/scale-flat-1k files=1001 skipped=0 missing=[]
+MEASURE exit=0 wall_s=0.103 peak_rss_mib=26.3
+=== expansion, NESTED 1k (depth 6, generate, param propagation) ===
+EXPANSION ok=1 root=/vedit-build/target/tmp/scale-nested-1k files=1001 skipped=0 missing=[]
+MEASURE exit=0 wall_s=0.078 peak_rss_mib=26.3
+=== full lint pass, flat 1k (real slang) ===
+START files=1000 phase=1 tool=slang message=«queued: 1000 file(s)»
+RESULT files=1000 ticks=860 wall_ms=8740 worst_tick_ms=0 phase=3 done=1000 total=1000 percent=100 monotonic=1 progress_samples=860 cli_diagnostics=0 overscale_warn=0 message=«1000/1000 文件已扫描 — 0 条 CLI 诊断»
+CHECK ui.tick-under-100ms PASS
+CHECK progress.monotonic PASS
+CHECK pass.finished PASS
+CHECK progress.reached-total PASS
+CHECK progress.samples PASS
+LINT-SCALE-HARNESS ok=1 checks=5 failures=0
+MEASURE exit=0 wall_s=8.748 peak_rss_mib=16.4
+=== full lint pass, NESTED 1k (real slang) ===
+START files=1000 phase=2 tool=slang message=«linting /vedit-build/target/tmp/scale-nested-1k/rtl/d0/m_0_0.sv (1/1000)»
+RESULT files=1000 ticks=602 wall_ms=6072 worst_tick_ms=0 phase=3 done=1000 total=1000 percent=100 monotonic=1 progress_samples=602 cli_diagnostics=0 overscale_warn=0 message=«1000/1000 文件已扫描 — 0 条 CLI 诊断»
+CHECK ui.tick-under-100ms PASS
+CHECK progress.monotonic PASS
+CHECK pass.finished PASS
+CHECK progress.reached-total PASS
+CHECK progress.samples PASS
+LINT-SCALE-HARNESS ok=1 checks=5 failures=0
+MEASURE exit=0 wall_s=6.079 peak_rss_mib=16.4
+=== cancel mid-pass, NESTED 1k (after 500 ms) ===
+START files=1000 phase=1 tool=slang message=«queued: 1000 file(s)»
+RESULT files=1000 ticks=50 wall_ms=504 worst_tick_ms=0 phase=4 done=83 total=1000 percent=8 monotonic=1 progress_samples=50 cli_diagnostics=0 overscale_warn=0 message=«已取消 — 83/1000 文件»
+CHECK ui.tick-under-100ms PASS
+CHECK progress.monotonic PASS
+CANCEL latency_ms=0 phase=4 running=0 message=«已取消 — 83/1000 文件»
+CHECK cancel.phase PASS
+CHECK cancel.flag-cleared PASS
+CHECK cancel.bounded-latency PASS
+AFTER-CANCEL cli_before=0 cli_after=0 running=0
+CHECK cancel.no-late-diagnostics PASS
+CHECK overscale.warning PASS
+LINT-SCALE-HARNESS ok=1 checks=7 failures=0
+MEASURE exit=0 wall_s=0.511 peak_rss_mib=16.4

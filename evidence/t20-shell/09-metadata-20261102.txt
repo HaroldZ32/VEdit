@@ -1,0 +1,103 @@
+# T20 tree/artifact metadata (2026-11-02T19:51:03+08:00)
+HEAD 4e2d0a57ca50db9568db5a5b040cc66f04c9a05f dirty=173
+image sha256:0110012f28f868015f5cf7659f5f964036607ac230a9a9310fad6118780971e9
+
+## my changed files (T20)
+2026-11-02 19:36:15.380807705 +0800 CMakeLists.txt
+2026-11-02 19:41:09.106769887 +0800 src/app/CMakeLists.txt
+2026-11-02 19:40:56.791195099 +0800 src/app/editor_area.cpp
+2026-11-02 19:41:02.228145027 +0800 src/app/editor_area.h
+2026-11-02 19:40:34.637320396 +0800 src/editor/kernel/fold_breadcrumb.cpp
+2026-11-02 19:40:24.467888749 +0800 src/editor/kernel/fold_breadcrumb.h
+2026-11-02 19:35:51.086752070 +0800 src/workspace/search/global_search.cpp
+2026-11-02 19:38:04.409190749 +0800 src/workspace/search/search_integration.cpp
+2026-11-02 19:37:35.466741211 +0800 src/workspace/search/search_jump_target.cpp
+2026-11-02 19:36:53.459576741 +0800 src/workspace/search/search_panel.cpp
+2026-11-02 19:38:42.951380088 +0800 src/workspace/search/search_selftest.cpp
+2026-11-02 12:49:37.812413096 +0800 src/workspace/search/search_types.cpp
+2026-11-02 12:49:37.812413096 +0800 src/workspace/search/global_search.h
+2026-11-02 12:49:37.812413096 +0800 src/workspace/search/search_integration.h
+2026-11-02 19:37:13.446801957 +0800 src/workspace/search/search_jump_target.h
+2026-11-02 19:36:46.973652665 +0800 src/workspace/search/search_panel.h
+2026-11-02 19:36:41.551183787 +0800 src/workspace/search/search_types.h
+2026-11-02 19:37:57.060840933 +0800 src/workspace/search/CMakeLists.txt
+2026-11-02 19:49:08.753329857 +0800 src/workspace/search/README.md
+
+## binaries / products
+2026-11-02 19:50:47.558817401 +0800 99274848 target/qt6-build/src/app/vedit-app
+2026-11-02 19:50:41.010495093 +0800 64101640 target/qt6-build/src/app/workspace-lane-search/vedit-workspace-search-selftest
+2026-11-02 19:47:13.288271021 +0800 94010400 target/t20-probe/t20-shell-probe
+2026-11-02 19:49:57.982377251 +0800 38976 target/qt6-build/CMakeFiles/vedit_qt_abi_guard.dir/crates/vd-ffi/tests/qt_abi_guard.cpp.o
+
+## sha256
+f99a608ff2ebabbfa5a46912090713786b054f8829176b59e492d34568283807  target/t20-probe/t20-shell-probe
+b25128d0cd2f4e204f2fb7e1fd0bb4cfeccadc9470be25c5a9cc9c544b36e4df  target/qt6-build/src/app/workspace-lane-search/vedit-workspace-search-selftest
+6be9ceb7c21077c418ed1c1dbfbb1b3710977a884d99b03904da982dd7bfd4c8  target/qt6-build/src/app/vedit-app
+
+## evidence
+2073816ee837220c64e234dac4a9c0aa8ff36451f127fdb10620da1b08b28062  evidence/t20-shell/00-search-baseline-20261102.log
+4127841fef836f519e4c95907862d53e4eadef028b087d8fb23555e9bb33c006  evidence/t20-shell/01-search-after-jump-unify-20261102.log
+65cbfc182fd8a604676d519c642d5edc4b4e22e604cc604f5dc092a3a10bec77  evidence/t20-shell/02-app-selfcheck-20261102.log
+8163e1b25c5a966882ae2fc10b660df1d3b1776f4823469453cba0c5a53eaa92  evidence/t20-shell/03-probe-run-20261102.log
+14bb1d68aba8536612d58dd2432da61d4d46bda31a196d3ea969bf3b4cef3c75  evidence/t20-shell/04-probe-build-20261102.log
+1a8965e9929834cf6dbd338122b40fea0d19ee857582f73c26b46cfbe1f51ba3  evidence/t20-shell/05-build-qt-20261102.log
+3817529dedf7aefae678fca1cebd3dc5d0969cc7d79ac8ac0fc46aeefaff208a  evidence/t20-shell/06-qt-abi-guard-20261102.log
+16ba65b6d9672e30b942ba1021e03a02bc43d5d0e9233abc9618807fecada1e0  evidence/t20-shell/07-typecheck-20261102.log
+26fab2670ab1e1cbc896a1362b676570b51a91b93e8031b86cfeabaf45e9232e  evidence/t20-shell/08-search-standalone-20261102.log
+4711eb87137e0c6b117368943af09e106cfe36a7cb970252a5a8d36dfe62bc47  evidence/t20-shell/shots/01-dual-pane-2-tabs.png
+4bc12c8b81cda9e0358bda22b58f648d83c750cf8744106abed2c0577a8a105a  evidence/t20-shell/shots/02-search-jump-active-pane.png
+a7e1010286bf0bf6d077ab9e2c26ce14e835cb305da6ebaa02924c14bea70aaa  evidence/t20-shell/shots/03a-breadcrumb-segments.png
+638f3296c6694ea92046d8e887b6a44be60b33b5cf3ca40a5bd526d0f9aa2544  evidence/t20-shell/shots/03-breadcrumb-click.png
+1e992342b98eb7b55d1a4872b561912413def4aff6580d8dc6154477cc0c7d12  evidence/t20-shell/shots/04-diagnostics-jump-active-pane.png
+
+## final (recorded 2026-11-02T19:52:56+08:00)
+HEAD 4e2d0a57ca50db9568db5a5b040cc66f04c9a05f dirty=173
+image_now sha256:0110012f28f868015f5cf7659f5f964036607ac230a9a9310fad6118780971e9
+2026-11-02 19:50:47.558817401 +0800 99274848 target/qt6-build/src/app/vedit-app
+2026-11-02 19:50:41.010495093 +0800 64101640 target/qt6-build/src/app/workspace-lane-search/vedit-workspace-search-selftest
+2026-11-02 19:52:21.740453012 +0800 94010400 target/t20-probe/t20-shell-probe
+2026-11-02 19:49:57.982377251 +0800 38976 target/qt6-build/CMakeFiles/vedit_qt_abi_guard.dir/crates/vd-ffi/tests/qt_abi_guard.cpp.o
+2026-11-02 19:52:09.692959134 +0800 14588 evidence/t20-shell/50-t20-report.md
+## evidence sha256
+f99a608ff2ebabbfa5a46912090713786b054f8829176b59e492d34568283807  target/t20-probe/t20-shell-probe
+b25128d0cd2f4e204f2fb7e1fd0bb4cfeccadc9470be25c5a9cc9c544b36e4df  target/qt6-build/src/app/workspace-lane-search/vedit-workspace-search-selftest
+6be9ceb7c21077c418ed1c1dbfbb1b3710977a884d99b03904da982dd7bfd4c8  target/qt6-build/src/app/vedit-app
+2073816ee837220c64e234dac4a9c0aa8ff36451f127fdb10620da1b08b28062  evidence/t20-shell/00-search-baseline-20261102.log
+29f586acba83ecc5aaf33174830041d8320e42916c8d5c4e6fea9da5d3464d6c  evidence/t20-shell/01-search-after-jump-unify-20261102.log
+643cfe6a54969a751e51c6adb65399f90bd28f73a8cdf56e4fccfa054c1be9b6  evidence/t20-shell/02-app-selfcheck-20261102.log
+141f5b0c9295a346b1356362a55777e33331c140edf954ebd3804d669506d695  evidence/t20-shell/03-probe-run-20261102.log
+1ec3841236f4e2df5d8a31fa1eaa410211320dfbd18ef276bcf6a85517852e55  evidence/t20-shell/04-probe-build-20261102.log
+1a8965e9929834cf6dbd338122b40fea0d19ee857582f73c26b46cfbe1f51ba3  evidence/t20-shell/05-build-qt-20261102.log
+3817529dedf7aefae678fca1cebd3dc5d0969cc7d79ac8ac0fc46aeefaff208a  evidence/t20-shell/06-qt-abi-guard-20261102.log
+16ba65b6d9672e30b942ba1021e03a02bc43d5d0e9233abc9618807fecada1e0  evidence/t20-shell/07-typecheck-20261102.log
+26fab2670ab1e1cbc896a1362b676570b51a91b93e8031b86cfeabaf45e9232e  evidence/t20-shell/08-search-standalone-20261102.log
+fe6c3e3f98b53ee4e9a1f9f28bc68ca6db562fe09c28051e9af5ddec59e3f403  evidence/t20-shell/50-t20-report.md
+d59e3eaf4a792988882981e925d6c4deb55f5c5c9a38502520670b15f4592516  evidence/t20-shell/shots/01-dual-pane-2-tabs.png
+38ab669e246217c5db937fa1dd5eef16a8627ecf849cb7bc71d564937858b454  evidence/t20-shell/shots/02-search-jump-active-pane.png
+828b8746afa821e1797c81af91b63397c37cb4b3b2e60212504d62e3023f67da  evidence/t20-shell/shots/03a-breadcrumb-segments.png
+f08ad595eda071e38543056c8bd911e706fc9ea0f39e6f74979e4110ce3855bb  evidence/t20-shell/shots/03-breadcrumb-click.png
+bb2ee74bbf1181d7e64a08794e6a24699e88dddb5f224bfbb1d2785f99c27505  evidence/t20-shell/shots/04-diagnostics-jump-active-pane.png
+75a355f33b87db9fa62e799eb7e46ddbf0809adf551ecb5986c088730ff122f4  evidence/t20-shell/fixture/alpha.sv
+0cdfe4a6304d2d54f2ca7a2fb0034bce6c38c53c375a09f47e6c174821e18770  evidence/t20-shell/fixture/beta.sv
+32e1836816435b90cf3fc5f3af5dd8a867ec27b4c88aeff251ec2bd60a393c8e  evidence/t20-shell/fixture/delta.sv
+ec346177e4c03ba7f8ce7c8ef47eeb1d836d085859d84f34eda11fdd8820291f  evidence/t20-shell/fixture/gamma.sv
+## changed paths (T20 scope)
+ M CMakeLists.txt
+ M src/app/CMakeLists.txt
+ M src/app/editor_area.cpp
+ M src/app/editor_area.h
+ M src/editor/kernel/fold_breadcrumb.cpp
+ M src/editor/kernel/fold_breadcrumb.h
+ M src/workspace/search/CMakeLists.txt
+ M src/workspace/search/README.md
+ M src/workspace/search/global_search.cpp
+ M src/workspace/search/search_integration.cpp
+ M src/workspace/search/search_jump_target.cpp
+ M src/workspace/search/search_jump_target.h
+ M src/workspace/search/search_panel.cpp
+ M src/workspace/search/search_panel.h
+ M src/workspace/search/search_selftest.cpp
+ M src/workspace/search/search_types.h
+?? crates/vd-ffi/tests/qt_abi_guard.cpp
+?? crates/vd-ffi/tests/qt_abi_guard.rs
+?? evidence/t20-shell/

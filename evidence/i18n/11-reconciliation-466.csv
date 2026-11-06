@@ -1,0 +1,467 @@
+id,source_01,string,classification,decision,translation,reason,glossary_note,confidence
+T001,src/app/editor_area.cpp:338,    ◀ active,obsolete,删除,,R03 当前树里已不存在该字面量（注释中残留或已删除/改写）；01 出处 src/app/editor_area.cpp；当前树中已无该字面量，无需代码动作,ok,high
+T002,src/workspace/project/project_model.cpp:156, (expanding…),UI,译,（展开中…）,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T003,src/workspace/project/project_model.cpp:162, (live),UI,译,（实时）,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T004,src/workspace/project/project_model.cpp:158, (refresh failed),UI,译,（刷新失败）,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Refresh=重新加载 / 刷新;译:Failed=失败 / 错误 / 警告,medium
+T005,src/workspace/project/project_model.cpp:160, (restored from last session),UI,译,（已从上次会话恢复）,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T006,src/workspace/breadcrumb/breadcrumb_model.cpp:41, > ,non-UI,不译,,R14 无任何单词字符（纯格式/标点）（非 UI 表面，不进入 .ts）,ok,high
+T007,src/editor/kernel/fim_wiring_selftest.cpp:258, assign y = 2;,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T008,src/editor/fim/fim_selftest.cpp:242, async-suggestion,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T009,src/app/main.cpp:1331, built ,non-UI,不译,,R06 无空白的标识符形状：Qt objectName / JSON 键 / 命令 id（非 UI 表面，不进入 .ts）,ok,high
+T010,src/workspace/filetree/tools/rootcheck/seamcheck.cpp:212, bytes on disk,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T011,src/workspace/diagnostics/diagnostics_controller.cpp:205, is unavailable,non-UI,不译,,R11 Verilog/SystemVerilog 代码片段或实例化文本（测试夹具/示例）（非 UI 表面，不进入 .ts）,ok,high
+T012,src/workspace/settings/settings_panel.cpp:488, | ,non-UI,不译,,R14 无任何单词字符（纯格式/标点）（非 UI 表面，不进入 .ts）,ok,high
+T013,src/syntax/kde/tests/validate_syntax_data.cpp:93, … (+%1),non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T014,src/app/app_shell.cpp:322,&About VEdit,UI,译,关于 VEdit(&A),R15 出现在 Qt UI 调用点（ui_action）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T015,src/app/app_shell.cpp:268,&Close Pane,UI,译,关闭窗格(&C),R15 出现在 Qt UI 调用点（ui_action）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Close=关闭 / 关闭窗格 / 关闭标签页;译:Close Pane=关闭 / 关闭窗格 / 关闭标签页,high
+T016,src/app/app_shell.cpp:278,&Focus Next Pane,UI,译,聚焦下一个窗格(&F),R15 出现在 Qt UI 调用点（ui_action）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T017,src/workspace/palette/palette_integration.cpp:91,&Go to File…,UI,译,转到文件(&G)…,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T018,src/app/app_shell.cpp:280,&Mixed Split (demo),UI,译,混合分屏(&M)（演示）,R15 出现在 Qt UI 调用点（ui_action）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Split=分屏 / 水平分屏 / 垂直分屏,high
+T019,src/app/app_shell.cpp:256,&New Empty Layout,UI,译,新建空布局(&N),R15 出现在 Qt UI 调用点（ui_action）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T020,src/app/app_shell.cpp:282,&Reset Layout,UI,译,重置布局(&R),R15 出现在 Qt UI 调用点（ui_action）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T021,src/app/app_shell.cpp:264,&Save Session Now,UI,译,立即保存会话(&S),R15 出现在 Qt UI 调用点（ui_action）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Save=保存 / 另存为 / 全部保存,high
+T022,src/workspace/filetree/file_ops.cpp:69,'%1' is a reserved name,UI,译,“%1”是保留名称,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T023,src/workspace/filetree/file_tree_model.cpp:84,'%1' is not a folder.,already-translated,已译,“%1”不是文件夹。,R01 已被 tr()/QObject::tr() 直接包装，无需再包；英文源串已补中文（10-ui-translations-supplementary.json）,ok,high
+T024,src/workspace/filetree/file_ops.cpp:145,'%1' no longer exists,UI,译,“%1”已不存在,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T025,src/workspace/vcs/vcs_selftest.cpp:152,+module top;,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T026,src/workspace/palette/palette_bench.cpp:122,10k-file Ctrl+P palette benchmark (VEdit T22 / A2b).,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T027,src/editor/kernel/fim_wiring_selftest.cpp:439,20 ms timer fired at %1 ms after scheduling,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T028,src/workspace/project/project_selftest.cpp:132,7 files,obsolete,删除,,R03 当前树里已不存在该字面量（注释中残留或已删除/改写）；01 出处 src/workspace/project/project_selftest.cpp；当前树中已无该字面量，无需代码动作,译:Files=文件树 / 文件,high
+T029,src/workspace/diagnostics/selftests/diagnostics_product_seam.cpp:183,: 0 diagnostic(s),UI,译,：0 条诊断,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T030,src/app/crash_reporter.cpp:234,<too large to hash>,non-UI,不译,,R21 代码符号/数据片段（以符号开头或含 ->）（非 UI 表面，不进入 .ts）,ok,high
+T031,src/workspace/filetree/file_ops.cpp:96,A file or folder named %1 already exists,UI,译,名为 %1 的文件或文件夹已存在,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T032,src/app/app_shell.cpp:370,About VEdit,UI,译,关于 VEdit,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T033,src/workspace/settings/settings_panel.cpp:55,Applied immediately and stored as `theme` by the Rust service.,already-translated,已译,,R01 已被 tr()/QObject::tr() 直接包装，无需再包；tr() 已包装，中文条目随本次 .ts 合并,ok,high
+T034,src/workspace/settings/settings_panel.cpp:76,Assign to selected command,already-translated,已译,分配给所选命令,R01 已被 tr()/QObject::tr() 直接包装，无需再包；英文源串已补中文（10-ui-translations-supplementary.json）,ok,high
+T035,src/editor/fim/fim_selftest.cpp:478,Authorization: Bearer <redacted>,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T036,src/app/main.cpp:1196,Breeze Dark,UI,不译,,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；主题标识为 KSyntaxHighlighting 的库内名称，按术语表技术名词保留英文,ok,medium
+T037,src/app/theme_manager.cpp:42,Breeze Light,UI,不译,,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；同 T036：主题标识符保留英文,ok,medium
+T038,src/workspace/search/search_types.cpp:14,CMakeFiles,non-UI,不译,,R06 无空白的标识符形状：Qt objectName / JSON 键 / 命令 id（非 UI 表面，不进入 .ts）,ok,high
+T039,src/workspace/palette/palette_bench.cpp:124,Candidate file count.,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T040,src/workspace/filetree/file_tree_widget.cpp:312,Cannot delete the folder that is open. Close it first.,UI,译,无法删除已打开的文件夹。请先关闭它。,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Open=打开 / 打开文件 / 打开文件夹;译:Close=关闭 / 关闭窗格 / 关闭标签页,medium
+T041,src/workspace/filetree/filetree_integration.cpp:44,Cannot open %1,UI,译,无法打开 %1,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Open=打开 / 打开文件 / 打开文件夹,medium
+T042,src/workspace/filetree/filetree_integration.cpp:40,Cannot open %1: no active editor pane,UI,译,无法打开 %1：没有活动的编辑器窗格,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Open=打开 / 打开文件 / 打开文件夹;译:Editor=编辑器,medium
+T043,src/workspace/filetree/file_tree_widget.cpp:151,Cannot read '%1': %2,UI,译,无法读取“%1”：%2,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T044,src/workspace/search/search_selftest.cpp:1151,Capture screenshots into this directory and exit.,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T045,src/app/main.cpp:1311,Capture split-state screenshots into this directory and exit.,UI,译,把分屏状态截图保存到该目录后退出。,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Split=分屏 / 水平分屏 / 垂直分屏,medium
+T046,src/workspace/settings/settings_panel.cpp:400,Changes discarded; nothing was stored.,UI,译,更改已丢弃；未存储任何内容。,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T047,src/app/editor_area.cpp:125,Close Pane,UI,译,关闭窗格,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Close=关闭 / 关闭窗格 / 关闭标签页;译:Close Pane=关闭 / 关闭窗格 / 关闭标签页,high
+T048,src/workspace/filetree/file_tree_widget.cpp:77,Collapse every expanded folder,UI,译,折叠所有已展开的文件夹,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T049,src/workspace/settings/settings_panel.cpp:487,Conflicting shortcuts: %1,UI,译,快捷键冲突：%1,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T050,src/workspace/filetree/file_ops.cpp:107,Could not create file %1,UI,译,无法创建文件 %1,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T051,src/workspace/filetree/file_ops.cpp:130,Could not create folder %1,UI,译,无法创建文件夹 %1,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T052,src/workspace/filetree/file_ops.cpp:202,Could not delete %1,UI,译,无法删除 %1,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T053,src/workspace/filetree/file_ops.cpp:168,Could not rename %1 to %2,UI,译,无法把 %1 重命名为 %2,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T054,src/workspace/filetree/file_tree_widget.cpp:57,Create a file here (Ctrl+N),UI,译,在此创建文件 (Ctrl+N),R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T055,src/workspace/filetree/file_tree_widget.cpp:61,Create a folder here (Ctrl+Shift+N),UI,译,在此创建文件夹 (Ctrl+Shift+N),R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T056,src/workspace/palette/palette_bench.cpp:131,Create/scan a real file tree under this directory.,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:File Tree=文件树 / 文件,high
+T057,src/workspace/filetree/tests/filetree_tests.cpp:398,Created file,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T058,src/workspace/filetree/file_tree_widget.cpp:234,Created file '%1' (%2),UI,译,已创建文件“%1”（%2）,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T059,src/workspace/filetree/file_tree_widget.cpp:266,Created folder '%1',UI,译,已创建文件夹“%1”,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T060,src/workspace/palette/palette_integration_selftest.cpp:109,Ctrl+P palette integration selftest inside the VEdit shell.,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T061,src/workspace/filetree/file_tree_widget.cpp:69,Delete the selection (Del),UI,译,删除所选内容 (Del),R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T062,src/workspace/filetree/file_tree_widget.cpp:333,Deleted '%1',uncertain,待定→保留英文,,R25 无决定信号：既不像代码/键，也没有 UI 调用点；保留英文（AC-4.5 默认口径：未判定 → keep-en + 登记理由）,ok,low
+T063,src/workspace/project/project_panel.cpp:130,Diagnostics (%1),UI,译,诊断（%1）,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Diagnostics=诊断,high
+T064,src/workspace/project/project_panel.cpp:55,Diagnostics (0),UI,译,诊断 (0),R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Diagnostics=诊断,high
+T065,src/workspace/diagnostics/toolchain_ux_selftest.cpp:124,Diagnostics unavailable,UI,译,诊断不可用,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Diagnostics=诊断,medium
+T066,src/app/main.cpp:1298,Directory for session.json and shortcuts.json.,UI,译,session.json 与 shortcuts.json 的目录。,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T067,src/app/panel_registry.cpp:48,Empty state: no project / no data.,UI,译,空状态：无工程 / 无数据。,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T068,src/app/app_shell.cpp:216,Empty state: no project open. This panel stays usable and empty.,UI,译,空状态：未打开工程。此面板保持可用但为空。,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Open=打开 / 打开文件 / 打开文件夹,medium
+T069,src/app/app_shell.cpp:217,Empty state: nothing to show for this project yet.,UI,译,空状态：此工程暂无可显示内容。,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Show=显示 / 隐藏,medium
+T070,src/workspace/search/search_selftest.cpp:309,Enter a query,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T071,src/editor/fim/fim_inline_completion.cpp:19,FIM 不可用（未链接 Rust 服务）,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T072,src/editor/fim/fim_inline_completion.cpp:65,FIM 不可用（未链接 Rust 服务；未发出请求）,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T073,src/editor/fim/fim_inline_completion.cpp:114,FIM 失败（无详情）,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T074,src/editor/fim/fim_backend.cpp:126,FIM 失败：%1,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T075,src/editor/fim/fim_inline_completion.cpp:196,FIM 已取消,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T076,src/editor/fim/fim_inline_completion.cpp:184,FIM 已接受建议,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T077,src/editor/fim/fim_inline_completion.cpp:108,FIM 建议就绪,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T078,src/editor/fim/fim_inline_completion.cpp:173,FIM 建议已作废（继续输入）,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T079,src/editor/fim/fim_backend.cpp:78,FIM 服务不可用（无法创建 Rust 句柄）,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T080,src/editor/fim/fim_selftest.cpp:310,FIM 未启用,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T081,src/editor/fim/fim_inline_completion.cpp:18,FIM 未启用（默认关闭）,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T082,src/editor/fim/fim_inline_completion.cpp:159,FIM 未知状态,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T083,src/editor/fim/fim_inline_completion.cpp:83,FIM 请求中…,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T084,src/editor/fim/fim_inline_completion.cpp:135,FIM 请求已取消,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T085,src/editor/fim/fim_inline_completion.cpp:117,FIM 请求已失效,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T086,src/editor/fim/fim_backend.cpp:50,FIM 请求未被 Rust 服务接受,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T087,src/editor/fim/fim_backend.cpp:90,FIM 请求未被 Rust 服务接受：%1,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T088,src/editor/fim/fim_selftest.cpp:355,FIM 超时,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T089,src/editor/fim/fim_backend.cpp:70,FIM 超时（%1 ms 无结果）,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T090,src/editor/kernel/fim_wiring.cpp:281,FIM 超时（%1 ms 无结果，已取消）,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T091,src/editor/fim/fim_selftest.cpp:351,FIM 超时（3000ms）,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T092,src/editor/fim/fim_backend.cpp:129,FIM 轮询异常（state %1）,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T093,src/editor/fim/fim_inline_completion.cpp:108,FIM 返回空建议,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high
+T094,src/workspace/palette/palette_bench.cpp:136,Fail when the overall palette p95 exceeds this budget.,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T095,src/workspace/filetree/file_kind.cpp:53,File list,UI,译,文件列表,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,variant:file list≠filelist;variant:File list≠filelist,medium
+T096,src/workspace/palette/command_palette.cpp:147,Go to file…,UI,译,转到文件…,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T097,src/app/main.cpp:1314,Ignore an existing session file at startup.,UI,译,启动时忽略已有的会话文件。,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T098,src/app/main.cpp:1302,KSyntaxHighlighting theme name.,UI,译,KSyntaxHighlighting 主题名称。,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,keep-en:KSyntaxHighlighting,medium
+T099,src/editor/probes/tx_probe.cpp:40,KTextEditor,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,keep-en:KTextEditor,high
+T100,src/syntax/product/syntax_product.cpp:92,KTextEditor %1,uncertain,待定→保留英文,,R25 无决定信号：既不像代码/键，也没有 UI 调用点；保留英文（AC-4.5 默认口径：未判定 → keep-en + 登记理由）,keep-en:KTextEditor,low
+T101,src/editor/kernel/ktexteditor_provider.cpp:66,KTextEditor (edit-core),UI,译,KTextEditor（编辑内核）,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,keep-en:KTextEditor,medium
+T102,src/editor/kernel/highlight_mode.cpp:130,KTextEditor::Document::setHighlightingMode('%1') failed,UI,译,KTextEditor::Document::setHighlightingMode('%1') 失败,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Failed=失败 / 错误 / 警告;keep-en:KTextEditor,medium
+T103,src/editor/kernel/document_io.cpp:109,KTextEditor::Document::setText() failed,UI,译,KTextEditor::Document::setText() 失败,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Failed=失败 / 错误 / 警告;keep-en:KTextEditor,medium
+T104,src/editor/kernel/document_io.cpp:48,KTextEditor::Document::setText() failed for %1,UI,译,KTextEditor::Document::setText() 对 %1 失败,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Failed=失败 / 错误 / 警告;keep-en:KTextEditor,medium
+T105,src/editor/kernel/document_io.cpp:79,KTextEditor::Editor::createDocument() returned null,UI,译,KTextEditor::Editor::createDocument() 返回空,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Editor=编辑器;keep-en:KTextEditor,medium
+T106,src/app/main.cpp:1315,Keep the window for this many ms.,UI,译,让窗口保持该毫秒数。,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T107,src/workspace/settings/settings_panel.cpp:60,Key bindings,obsolete,删除,,R03 当前树里已不存在该字面量（注释中残留或已删除/改写）；01 出处 src/workspace/settings/settings_panel.cpp；当前树中已无该字面量，无需代码动作,ok,high
+T108,src/workspace/diagnostics/diagnostics_controller.cpp:180,LSP backend is not configured (no workspace root),UI,译,LSP 后端未配置（无工作区根目录）,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,keep-en:LSP,medium
+T109,src/workspace/settings/settings_panel.cpp:140,Loading settings from %1 …,UI,译,正在从 %1 加载设置…,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Settings=设置,high
+T110,src/workspace/filetree/file_ops.cpp:78,Name is longer than the 255-byte filesystem limit,UI,译,名称超过文件系统的 255 字节限制,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T111,src/workspace/filetree/file_ops.cpp:66,Name must not be empty,UI,译,名称不能为空,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T112,src/workspace/filetree/file_ops.cpp:75,Name must not contain a NUL character,UI,译,名称不能包含 NUL 字符,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T113,src/workspace/filetree/file_ops.cpp:72,Name must not contain a path separator,UI,译,名称不能包含路径分隔符,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T114,src/workspace/filetree/file_tree_widget.cpp:56,New File,already-translated,已译,新建文件,R01 已被 tr()/QObject::tr() 直接包装，无需再包；英文源串已补中文（10-ui-translations-supplementary.json）,译:New File=新建 / 新建文件,high
+T115,src/workspace/filetree/file_tree_widget.cpp:60,New Folder,already-translated,已译,新建文件夹,R01 已被 tr()/QObject::tr() 直接包装，无需再包；英文源串已补中文（10-ui-translations-supplementary.json）,ok,high
+T116,src/workspace/settings/settings_panel.cpp:80,New shortcut:,already-translated,已译,新快捷键：,R01 已被 tr()/QObject::tr() 直接包装，无需再包；英文源串已补中文（10-ui-translations-supplementary.json）,ok,high
+T117,src/workspace/vcs/vcs_panel.cpp:133,No VCS backend available.,UI,译,没有可用的 VCS 后端。,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T118,src/workspace/settings/settings_panel.cpp:411,No configuration problems reported by the Rust store.,UI,译,Rust 存储未报告配置问题。,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Problems=问题;variant:Configuration≠Settings;variant:Problems≠Diagnostics,high
+T119,src/workspace/settings/settings_panel.cpp:483,No conflicting shortcuts.,UI,译,没有冲突的快捷键。,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T120,src/app/editor_area.cpp:148,No editor provider connected.,UI,译,未连接编辑器 provider。,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Editor=编辑器,medium
+T121,src/workspace/palette/command_palette.cpp:419,No files indexed for this project yet.,UI,译,此工程尚未索引文件。,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Files=文件树 / 文件,medium
+T122,src/workspace/filetree/tests/filetree_tests.cpp:155,No folder open,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Open=打开 / 打开文件 / 打开文件夹;译:No folder open=未打开文件夹,high
+T123,src/workspace/palette/command_palette.cpp:320,No matching files,UI,译,无匹配文件,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Files=文件树 / 文件,medium
+T124,src/workspace/palette/command_palette.cpp:432,No project,UI,译,无工程,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T125,src/workspace/project/project_model.cpp:147,No project open,UI,译,未打开工程,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Open=打开 / 打开文件 / 打开文件夹,medium
+T126,src/workspace/palette/command_palette.cpp:417,No project open — open a project root to jump between files.,UI,译,未打开工程——打开工程根目录即可在文件间跳转。,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Open=打开 / 打开文件 / 打开文件夹;译:Files=文件树 / 文件,medium
+T127,src/workspace/search/search_selftest.cpp:377,No project root,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T128,src/workspace/vcs/vcs_selftest.cpp:108,No repository,UI,译,无仓库,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T129,src/workspace/search/search_selftest.cpp:404,No results,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:No results=无结果 / 无匹配,high
+T130,src/workspace/diagnostics/toolchain_ux_selftest.cpp:165,No symbols,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,variant:Symbols≠Outline,high
+T131,src/workspace/filetree/file_tree_widget.cpp:53,Open a folder,UI,译,打开文件夹,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Open=打开 / 打开文件 / 打开文件夹,high
+T132,src/workspace/filetree/file_tree_widget.cpp:217,Open a folder first.,UI,译,请先打开文件夹。,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Open=打开 / 打开文件 / 打开文件夹,medium
+T133,src/workspace/project/project_panel.cpp:38,Open a project with --project <dir>; the expanded file list appears here.,obsolete,删除,,R03 当前树里已不存在该字面量（注释中残留或已删除/改写）；01 出处 src/workspace/project/project_panel.cpp；当前树中已无该字面量，无需代码动作,译:Open=打开 / 打开文件 / 打开文件夹;variant:file list≠filelist;variant:File list≠filelist,high
+T134,src/workspace/filetree/filetree_integration.cpp:46,Opened %1,uncertain,待定→保留英文,,R25 无决定信号：既不像代码/键，也没有 UI 调用点；保留英文（AC-4.5 默认口径：未判定 → keep-en + 登记理由）,ok,low
+T135,src/workspace/search/search_jump_target.cpp:107,Opened %1 line %2,UI,译,已打开 %1 第 %2 行,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T136,src/workspace/filetree/file_tree_widget.cpp:181,Opened '%1',uncertain,待定→保留英文,,R25 无决定信号：既不像代码/键，也没有 UI 调用点；保留英文（AC-4.5 默认口径：未判定 → keep-en + 登记理由）,ok,low
+T137,src/editor/fim/fim_selftest.cpp:485,POST /v1/completions ,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T138,src/app/app_shell.cpp:629,Panes: %1 · active: %2,obsolete,删除,,R03 当前树里已不存在该字面量（注释中残留或已删除/改写）；01 出处 src/app/app_shell.cpp；当前树中已无该字面量，无需代码动作,ok,high
+T139,src/app/main.cpp:1300,Project root to display (optional).,non-UI,不译,,R13 命令行（CLI）帮助/用法文本，不走 Qt 翻译管线（非 UI 表面，不进入 .ts）,ok,medium
+T140,src/app/app_shell.cpp:621,Project: %1,UI,译,项目：%1,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T141,src/workspace/project/project_model.cpp:151,Project: %1 — %2 %3,uncertain,待定→保留英文,,R25 无决定信号：既不像代码/键，也没有 UI 调用点；保留英文（AC-4.5 默认口径：未判定 → keep-en + 登记理由）,ok,low
+T142,src/editor/probes/replace_probe.cpp:71,REPLACE editor=null FAIL,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Replace=查找 / 查找下一个 / 查找上一个 / 替换;译:Editor=编辑器,high
+T143,src/editor/probes/replace_probe2.cpp:101,REPLACE2 editor=null FAIL,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Replace=查找 / 查找下一个 / 查找上一个 / 替换;译:Editor=编辑器,high
+T144,src/workspace/diagnostics/diagnostics_integration.cpp:409,Re&parse Project (Verible + SLANG),obsolete,删除,,R03 当前树里已不存在该字面量（注释中残留或已删除/改写）；01 出处 src/workspace/diagnostics/diagnostics_integration.cpp；当前树中已无该字面量，无需代码动作,ok,high
+T145,src/workspace/filetree/file_tree_widget.cpp:73,Re-read the folder from disk (F5),UI,译,从磁盘重新读取文件夹 (F5),R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T146,src/workspace/filetree/file_tree_widget.cpp:527,Refreshed '%1',uncertain,待定→保留英文,,R25 无决定信号：既不像代码/键，也没有 UI 调用点；保留英文（AC-4.5 默认口径：未判定 → keep-en + 登记理由）,ok,low
+T147,src/workspace/settings/settings_panel.cpp:104,Reload from disk,already-translated,已译,,R01 已被 tr()/QObject::tr() 直接包装，无需再包；tr() 已包装，中文条目随本次 .ts 合并,译:Reload=重新加载 / 刷新,high
+T148,src/workspace/filetree/file_tree_widget.cpp:65,Rename the selection (F2),UI,译,重命名所选内容 (F2),R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T149,src/workspace/filetree/file_tree_widget.cpp:295,Renamed '%1' to '%2',UI,译,已将“%1”重命名为“%2”,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T150,src/app/main.cpp:1305,Run non-interactive layout/theme/persistence checks and exit.,non-UI,不译,,R16 断言/校验模板（测试期望文本）（非 UI 表面，不进入 .ts）,ok,high
+T151,src/workspace/search/search_selftest.cpp:1149,Run the global search self-checks and exit.,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Search=搜索,high
+T152,src/editor/fim/fim_backend.cpp:175,Rust service (vd_fim_complete -> vd-fim),non-UI,不译,,R21 代码符号/数据片段（以符号开头或含 ->）（非 UI 表面，不进入 .ts）,ok,high
+T153,src/workspace/diagnostics/toolchain.cpp:214,SLANG deep lint is unavailable,non-UI,不译,,R22 只出现在自检断言/输出调用点（self-check expectation）（非 UI 表面，不进入 .ts）,keep-en:lint;variant:LINT≠lint,medium
+T154,src/editor/probes/tx_steps_probe.cpp:76,STEPS editor=null FAIL,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Editor=编辑器,high
+T155,src/editor/probes/tx_steps_probe.cpp:85,STEPS meta undo()=%1 redo()=%2 undoCount()=%3,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Undo=撤销 / 重做;译:Redo=撤销 / 重做,high
+T156,src/editor/probes/tx_steps_probe.cpp:65,STEPS mode=%1 len_before=%2 undoCount=%3 steps_to_empty=%4 verdict=%5,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T157,src/editor/probes/tx_steps_probe2.cpp:85,STEPS2 %1 case=one_tx_100_edits steps=%2 verdict=%3,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T158,src/editor/probes/tx_steps_probe2.cpp:70,STEPS2 %1 case=redo_all restored_ok=%2 verdict=%3,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Redo=撤销 / 重做,high
+T159,src/editor/probes/tx_steps_probe2.cpp:100,STEPS2 editor=null FAIL,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Editor=编辑器,high
+T160,src/editor/probes/tx_steps_probe3.cpp:34,STEPS3 editor=null FAIL,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Editor=编辑器,high
+T161,src/editor/probes/tx_steps_probe3.cpp:67,STEPS3 keyevents chars=%1 steps_to_stable=%2 verdict=%3,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T162,src/editor/probes/tx_steps_probe3.cpp:72,STEPS3 keyevents redo_all restored_ok=%1,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Redo=撤销 / 重做,high
+T163,src/editor/probes/tx_steps_probe3.cpp:39,STEPS3 mergeFlag indexOfMethod=%1 invokable=%2,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T164,src/editor/probes/tx_steps_probe3.cpp:50,STEPS3 mergeFlag=off case=3_tx steps=%1 verdict=%2,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T165,src/editor/probes/tx_steps_probe4.cpp:34,STEPS4 editor=null FAIL,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Editor=编辑器,high
+T166,src/editor/probes/tx_steps_probe4.cpp:51,STEPS4 keys chars=%1 steps_to_stable=%2 verdict=%3,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T167,src/editor/probes/tx_steps_probe4.cpp:64,STEPS4 prog_with_events chars=%1 steps=%2 verdict=%3,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T168,src/editor/probes/tx_steps_probe5.cpp:54,STEPS5 editor=null FAIL,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Editor=编辑器,high
+T169,src/editor/probes/tx_steps_probe5.cpp:33,STEPS5 insert_lines=100 steps=%1 verdict=%2,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T170,src/editor/probes/tx_steps_probe5.cpp:46,STEPS5 replace_text=100 steps=%1 verdict=%2,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Replace=查找 / 查找下一个 / 查找上一个 / 替换,high
+T171,src/workspace/palette/palette_bench.cpp:126,Samples per query.,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T172,src/app/main.cpp:864,Save failed,UI,译,保存失败,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Save=保存 / 另存为 / 全部保存;译:Failed=失败 / 错误 / 警告,medium
+T173,src/app/app_shell.cpp:532,Save failed: %1,UI,译,保存失败：%1,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Save=保存 / 另存为 / 全部保存;译:Failed=失败 / 错误 / 警告,medium
+T174,src/app/app_shell.cpp:550,Saved %1,uncertain,待定→保留英文,,R25 无决定信号：既不像代码/键，也没有 UI 调用点；保留英文（AC-4.5 默认口径：未判定 → keep-en + 登记理由）,译:Saved=已保存 / 未保存的更改,low
+T175,src/workspace/settings/settings_panel.cpp:280,Select a command in the table first.,UI,译,请先在表中选择一个命令。,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T176,src/workspace/filetree/file_tree_widget.cpp:276,Select a file or folder first.,UI,译,请先选择文件或文件夹。,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T177,src/workspace/palette/palette_selftest.cpp:310,Selftest of the VEdit Ctrl+P file palette lane (T22 / A2b).,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T178,src/app/app_shell.cpp:336,Session saved (%1),UI,译,会话已保存（%1）,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Saved=已保存 / 未保存的更改;译:Session saved=会话已保存,medium
+T179,src/workspace/settings/settings_panel.cpp:159,Settings loaded from %1,UI,译,已从 %1 加载设置,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Settings=设置,high
+T180,src/workspace/settings/settings_panel.cpp:146,Settings unavailable; showing the built-in defaults.,UI,译,设置不可用；显示内置默认值。,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Settings=设置,high
+T181,src/workspace/settings/settings_panel.cpp:271,Shortcut for '%1' cleared (default restored).,UI,译,已清除“%1”的快捷键（恢复默认）。,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T182,src/app/app_shell.cpp:222,Source Control,UI,译,版本控制,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,variant:Source Control≠Version Control (VCS),medium
+T183,src/workspace/settings/settings_selftest.cpp:87,Split Horizontally,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Split=分屏 / 水平分屏 / 垂直分屏,high
+T184,src/app/app_shell.cpp:274,Split Pane &Horizontally,UI,译,水平分屏(&H),R15 出现在 Qt UI 调用点（ui_action）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Split=分屏 / 水平分屏 / 垂直分屏,high
+T185,src/app/app_shell.cpp:276,Split Pane &Vertically,UI,译,垂直分屏(&V),R15 出现在 Qt UI 调用点（ui_action）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Split=分屏 / 水平分屏 / 垂直分屏,high
+T186,src/workspace/settings/settings_selftest.cpp:167,Stored by the Rust service,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T187,src/workspace/settings/settings_panel.cpp:317,Stored by the Rust service in %1,UI,译,已由 Rust 服务存储到 %1,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T188,src/app/main.cpp:923,SystemVerilog,non-UI,不译,,R06 无空白的标识符形状：Qt objectName / JSON 键 / 命令 id（非 UI 表面，不进入 .ts）,keep-en:SystemVerilog;keep-en:Verilog,high
+T189,src/syntax/kde/tests/validate_syntax_data.cpp:176,SystemVerilog definition not shipped,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,keep-en:SystemVerilog;keep-en:Verilog,high
+T190,src/workspace/diagnostics/toolchain.cpp:334,TOOLCHAIN %1 local=[%2],obsolete,删除,,R03 当前树里已不存在该字面量（注释中残留或已删除/改写）；01 出处 src/workspace/diagnostics/toolchain.cpp；当前树中已无该字面量，无需代码动作,ok,high
+T191,src/editor/probes/tx_probe.cpp:115,TX %1 case=plain100_insert len=%2 after_undo_len=%3 one_step=%4 verdict=%5,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Undo=撤销 / 重做,high
+T192,src/editor/probes/tx_probe.cpp:72,TX %1 case=plain3_insert text3=%2 after_undo=%3 verdict=%4,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Undo=撤销 / 重做,high
+T193,src/editor/probes/tx_probe.cpp:122,TX %1 case=redo_after_plain_undo len=%2 verdict=%3,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Undo=撤销 / 重做;译:Redo=撤销 / 重做,high
+T194,src/editor/probes/tx_probe.cpp:102,TX %1 case=tx100_insert len=%2 after_undo_len=%3 empty=%4 verdict=%5,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Undo=撤销 / 重做,high
+T195,src/editor/probes/tx_probe.cpp:87,TX %1 case=tx3_insert text=%2 after_undo=%3 empty=%4 verdict=%5,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Undo=撤销 / 重做,high
+T196,src/editor/probes/tx_probe.cpp:54,TX %1 metaClass=%2 undoIndex=%3 redoIndex=%4,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T197,src/editor/probes/tx_probe.cpp:59,TX %1 undo_unreachable=1,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Undo=撤销 / 重做,high
+T198,src/editor/probes/tx_probe.cpp:45,TX doc=null FAIL view=%1,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T199,src/editor/probes/tx_probe.cpp:37,TX editor=null FAIL,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Editor=编辑器,high
+T200,src/editor/probes/tx_probe.cpp:40,TX editor=ok class=%1,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Editor=编辑器,high
+T201,src/workspace/filetree/file_tree_model.cpp:90,The folder '%1' cannot be read (permission denied).,UI,译,无法读取文件夹“%1”（权限被拒绝）。,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T202,src/workspace/filetree/file_tree_model.cpp:78,The folder '%1' does not exist.,UI,译,文件夹“%1”不存在。,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T203,src/workspace/settings/settings_panel.cpp:234,Theme '%1' applied and stored by the Rust service.,UI,译,主题“%1”已应用并由 Rust 服务存储。,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T204,src/workspace/settings/settings_panel.cpp:227,Theme '%1' could not be applied.,UI,译,无法应用主题“%1”。,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T205,src/app/app_shell.cpp:625,Theme: %1,UI,译,主题：%1,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,high
+T206,src/workspace/settings/settings_selftest.cpp:95,Toggle Settings Panel,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Settings=设置,high
+T207,src/workspace/diagnostics/diagnostics_selftest.cpp:279,UndeclaredIdentifier,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T208,src/app/app_shell.cpp:76,Unsaved changes,UI,译,未保存的更改,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Unsaved changes=已保存 / 未保存的更改,high
+T209,src/app/main.cpp:1388,Use &tree-sitter parsing,UI,译,使用 &tree-sitter 解析,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,keep-en:tree-sitter,medium
+T210,src/app/main.cpp:1294,VEdit application shell (Qt6/KTextEditor rewrite).,UI,译,VEdit 应用外壳（Qt6/KTextEditor 重写版）。,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,keep-en:KTextEditor,medium
+T211,src/workspace/search/search_selftest.cpp:1145,VEdit global search self-check (task T23),non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Search=搜索,high
+T212,src/app/app_shell.cpp:635,VEdit — %1,obsolete,删除,,R03 当前树里已不存在该字面量（注释中残留或已删除/改写）；01 出处 src/app/app_shell.cpp；当前树中已无该字面量，无需代码动作,ok,high
+T213,src/app/app_shell.cpp:634,VEdit — no project,obsolete,删除,,R03 当前树里已不存在该字面量（注释中残留或已删除/改写）；01 出处 src/app/app_shell.cpp；当前树中已无该字面量，无需代码动作,ok,high
+T214,src/workspace/palette/palette_bench.cpp:128,Visible results per query.,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T215,src/workspace/palette/palette_bench.cpp:133,Write machine-readable results here.,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T216,src/workspace/palette/palette_selftest.cpp:313,Write palette screenshots into this directory.,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T217,src/workspace/palette/palette_integration_selftest.cpp:112,Write shell/palette screenshots into this directory.,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T218,src/editor/probes/replace_probe2.cpp:113,a beta a,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T219,src/app/main.cpp:1100,actual=%1 files=[%2] (C ABI fixture expects 3),non-UI,不译,,R09 机器可读诊断模板（key=%1 …），供日志/门禁解析（非 UI 表面，不进入 .ts）,译:Files=文件树 / 文件,high
+T220,src/editor/kernel/fim_wiring_selftest.cpp:454,after %1 ms with a 300 ms budget,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T221,src/editor/probes/replace_probe2.cpp:112,alpha beta alpha,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T222,src/workspace/diagnostics/diagnostics_ffi_selftest.cpp:194,alu u_alu,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T223,src/workspace/diagnostics/diagnostics_selftest.cpp:530,analysis count=%1,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T224,src/workspace/diagnostics/diagnostics_controller.cpp:155,analyzing %1,uncertain,待定→保留英文,,R25 无决定信号：既不像代码/键，也没有 UI 调用点；保留英文（AC-4.5 默认口径：未判定 → keep-en + 登记理由）,ok,low
+T225,src/editor/fim/fim_selftest.cpp:461,assign x = 1;,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T226,src/editor/kernel/atomic_save.cpp:136,atomic save: injected directory fsync failure,non-UI,不译,,R16 断言/校验模板（测试期望文本）（非 UI 表面，不进入 .ts）,译:Save=保存 / 另存为 / 全部保存;keep-en:atomic save;variant:Atomic save≠atomic save,high
+T227,src/editor/kernel/atomic_save.cpp:114,atomic save: injected fsync failure,non-UI,不译,,R16 断言/校验模板（测试期望文本）（非 UI 表面，不进入 .ts）,译:Save=保存 / 另存为 / 全部保存;keep-en:atomic save;variant:Atomic save≠atomic save,high
+T228,src/editor/kernel/atomic_save.cpp:124,atomic save: injected rename failure,non-UI,不译,,R16 断言/校验模板（测试期望文本）（非 UI 表面，不进入 .ts）,译:Save=保存 / 另存为 / 全部保存;keep-en:atomic save;variant:Atomic save≠atomic save,high
+T229,src/editor/kernel/atomic_save.cpp:107,atomic save: injected write failure,non-UI,不译,,R16 断言/校验模板（测试期望文本）（非 UI 表面，不进入 .ts）,译:Save=保存 / 另存为 / 全部保存;keep-en:atomic save;variant:Atomic save≠atomic save,high
+T230,src/editor/fim/fim_selftest.cpp:479,authorization: bearer <redacted>,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T231,src/editor/kernel/edit_core_selftest.cpp:409,before=%1 after=%2,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T232,src/editor/kernel/edit_core_selftest.cpp:478,begins=%1 ends=%2,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T233,src/workspace/search/search_selftest.cpp:322,binary skipped,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T234,src/editor/kernel/fold_breadcrumb.cpp:21,breadcrumbDebounce,non-UI,不译,,R06 无空白的标识符形状：Qt objectName / JSON 键 / 命令 id（非 UI 表面，不进入 .ts）,ok,high
+T235,src/workspace/diagnostics/toolchain_ux_selftest.cpp:283,build/slang/out/slang not built here,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,keep-en:slang,high
+T236,src/editor/kernel/edit_core_selftest.cpp:511,built without the src/app EditorProvider seam,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T237,src/app/crash_reporter_selftest.cpp:110,canary segv-canary-42,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T238,src/workspace/project/project_state.cpp:164,cannot commit %1: %2,UI,译,无法提交 %1：%2,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T239,src/app/session_store.cpp:73,cannot commit session %1,UI,译,无法提交会话 %1,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T240,src/app/command_registry.cpp:106,cannot commit shortcut store %1,UI,译,无法提交快捷键存储 %1,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T241,src/workspace/project/project_state.cpp:150,cannot create %1,UI,译,无法创建 %1,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T242,src/editor/kernel/edit_core_selftest.cpp:493,cannot create a temporary directory,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T243,src/workspace/palette/palette_bench.cpp:96,cannot create directory for %1,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T244,src/app/session_store.cpp:59,cannot create session directory %1,UI,译,无法创建会话目录 %1,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T245,src/app/command_registry.cpp:84,cannot create shortcut store directory %1,UI,译,无法创建快捷键存储目录 %1,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T246,src/workspace/search/global_search.cpp:142,cannot create the Rust search service,UI,译,无法创建 Rust 搜索服务,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Search=搜索,medium
+T247,src/syntax/folding/tests/syntax_directory_tests.cpp:84,cannot create the temporary directory,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T248,src/editor/kernel/atomic_save.cpp:93,cannot create the temporary file %1: %2,UI,译,无法创建临时文件 %1：%2,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T249,src/workspace/search/search_jump_target.cpp:67,cannot open %1,UI,译,无法打开 %1,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Open=打开 / 打开文件 / 打开文件夹,medium
+T250,src/syntax/folding/ksyntax_fold_source.cpp:51,cannot open %1: %2,UI,译,无法打开 %1：%2,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Open=打开 / 打开文件 / 打开文件夹,medium
+T251,src/editor/kernel/document_io.cpp:42,cannot open %1: it looks like a binary file,UI,译,无法打开 %1：它看起来是二进制文件,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Open=打开 / 打开文件 / 打开文件夹,medium
+T252,src/editor/kernel/ktexteditor_provider.cpp:122,cannot open %1: not a regular file,UI,译,无法打开 %1：不是常规文件,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Open=打开 / 打开文件 / 打开文件夹,medium
+T253,src/editor/kernel/atomic_save.cpp:153,cannot open the directory for fsync: %1,UI,译,无法打开目录以执行 fsync：%1,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Open=打开 / 打开文件 / 打开文件夹,medium
+T254,src/syntax/folding/ksyntax_fold_source.cpp:90,cannot parse %1: %2,UI,译,无法解析 %1：%2,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T255,src/editor/kernel/document_io.cpp:35,cannot read %1: %2,UI,译,无法读取 %1：%2,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T256,src/app/session_store.cpp:39,cannot read session %1,UI,译,无法读取会话 %1,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T257,src/app/command_registry.cpp:34,cannot read shortcut store %1,UI,译,无法读取快捷键存储 %1,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T258,src/editor/kernel/atomic_save.cpp:68,cannot save %1: directory %2 does not exist,UI,译,无法保存 %1：目录 %2 不存在,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Save=保存 / 另存为 / 全部保存,medium
+T259,src/editor/kernel/atomic_save.cpp:72,cannot save %1: directory %2 is not writable,UI,译,无法保存 %1：目录 %2 不可写,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Save=保存 / 另存为 / 全部保存,medium
+T260,src/workspace/project/project_state.cpp:157,cannot write %1: %2,UI,译,无法写入 %1：%2,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T261,src/app/session_store.cpp:66,cannot write session %1,UI,译,无法写入会话 %1,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T262,src/app/command_registry.cpp:99,cannot write shortcut store %1,UI,译,无法写入快捷键存储 %1,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T263,src/workspace/project/project_state.cpp:50,capturedAtUtc,non-UI,不译,,R06 无空白的标识符形状：Qt objectName / JSON 键 / 命令 id（非 UI 表面，不进入 .ts）,ok,high
+T264,src/workspace/settings/settings_panel.cpp:486,color: #a33; font-weight: bold;,non-UI,不译,,R08 Qt 样式表片段（CSS 属性）（非 UI 表面，不进入 .ts）,ok,high
+T265,src/workspace/filetree/file_tree_widget.cpp:653,color: #b3261e;,non-UI,不译,,R08 Qt 样式表片段（CSS 属性）（非 UI 表面，不进入 .ts）,ok,high
+T266,src/app/main.cpp:788,ctrlSAuthorityGuard,non-UI,不译,,R06 无空白的标识符形状：Qt objectName / JSON 键 / 命令 id（非 UI 表面，不进入 .ts）,ok,high
+T267,src/editor/kernel/highlight_diagnosis.cpp:162,definitionForFileName(top.sv): %1,UI,译,definitionForFileName(top.sv)：%1,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T268,src/editor/kernel/highlight_diagnosis.cpp:160,definitionForFileName(top.v): %1,UI,译,definitionForFileName(top.v)：%1,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T269,src/editor/kernel/highlight_diagnosis.cpp:159,definitionForName(SystemVerilog): %1,UI,译,definitionForName(SystemVerilog)：%1,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,keep-en:SystemVerilog;keep-en:Verilog,medium
+T270,src/editor/kernel/highlight_diagnosis.cpp:158,definitionForName(Verilog): %1,UI,译,definitionForName(Verilog)：%1,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,keep-en:Verilog,medium
+T271,src/app/editor_provider.cpp:23,demo editor (shell placeholder),UI,译,演示编辑器（外壳占位）,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Editor=编辑器,medium
+T272,src/app/main.cpp:959,describe='%1' bar='%2',non-UI,不译,,R09 机器可读诊断模板（key=%1 …），供日志/门禁解析（非 UI 表面，不进入 .ts）,ok,high
+T273,src/syntax/kde/ksyntax_data.cpp:159,development fallback syntax path added: %1,non-UI,不译,,R20 开发/故障注入诊断文本（fault-injection、selftest、probe）（非 UI 表面，不进入 .ts）,ok,high
+T274,src/workspace/diagnostics/diagnostics_panel.cpp:40,diagnosticsEmptyState,non-UI,不译,,R06 无空白的标识符形状：Qt objectName / JSON 键 / 命令 id（非 UI 表面，不进入 .ts）,ok,high
+T275,src/workspace/diagnostics/diagnostics_panel.cpp:31,diagnosticsOutline,non-UI,不译,,R06 无空白的标识符形状：Qt objectName / JSON 键 / 命令 id（非 UI 表面，不进入 .ts）,ok,high
+T276,src/workspace/diagnostics/diagnostics_panel.cpp:25,diagnosticsStatus,non-UI,不译,,R06 无空白的标识符形状：Qt objectName / JSON 键 / 命令 id（非 UI 表面，不进入 .ts）,ok,high
+T277,src/editor/kernel/atomic_save.cpp:142,directory fsync not supported here (%1); the rename is complete,UI,译,此处不支持目录 fsync（%1）；重命名已完成,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T278,src/editor/kernel/atomic_save.cpp:138,directory fsync skipped by fault injection,non-UI,不译,,R20 开发/故障注入诊断文本（fault-injection、selftest、probe）（非 UI 表面，不进入 .ts）,ok,high
+T279,src/workspace/diagnostics/selftests/diagnostics_product_seam.cpp:202,disk=%1 bytes,non-UI,不译,,R09 机器可读诊断模板（key=%1 …），供日志/门禁解析（非 UI 表面，不进入 .ts）,ok,high
+T280,src/workspace/diagnostics/diagnostics_ffi_selftest.cpp:277,"disk=%1 bytes, buffer=%2 bytes",non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T281,src/app/app_shell.cpp:474,dock layout could not be restored (KTextEditor/version mismatch?),UI,译,无法恢复停靠布局（KTextEditor/版本不匹配？）,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,keep-en:KTextEditor,medium
+T282,src/app/app_shell.cpp:472,dockState,non-UI,不译,,R06 无空白的标识符形状：Qt objectName / JSON 键 / 命令 id（非 UI 表面，不进入 .ts）,ok,high
+T283,src/workspace/filetree/tests/filetree_tests.cpp:164,does not exist,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T284,src/workspace/diagnostics/diagnostics_panel.cpp:116,"editor buffer, not saved yet",UI,译,编辑器缓冲区，尚未保存,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Saved=已保存 / 未保存的更改;译:Editor=编辑器,medium
+T285,src/app/app_shell.cpp:481,editor layout: %1,UI,译,编辑器布局：%1,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Editor=编辑器,medium
+T286,src/app/app_shell.cpp:477,editorLayout,non-UI,不译,,R06 无空白的标识符形状：Qt objectName / JSON 键 / 命令 id（非 UI 表面，不进入 .ts）,ok,high
+T287,src/editor/kernel/highlight_diagnosis.cpp:149,editor_repository_definitions=%1 custom_paths=%2,non-UI,不译,,R09 机器可读诊断模板（key=%1 …），供日志/门禁解析（非 UI 表面，不进入 .ts）,译:Editor=编辑器,high
+T288,src/workspace/search/global_search.cpp:135,empty query,non-UI,不译,,R11 Verilog/SystemVerilog 代码片段或实例化文本（测试夹具/示例）（非 UI 表面，不进入 .ts）,ok,high
+T289,src/workspace/settings/settings_selftest.cpp:312,entries=%1 delivered=%2,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T290,src/workspace/diagnostics/diagnostics_ffi_selftest.cpp:134,expected/files.txt -> %1 file(s),non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Files=文件树 / 文件,high
+T291,src/workspace/diagnostics/diagnostics_selftest.cpp:163,fake LSP cannot follow buffers,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,keep-en:LSP,high
+T292,src/workspace/diagnostics/diagnostics_selftest.cpp:222,fake LSP diagnostic,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,keep-en:LSP,high
+T293,src/workspace/diagnostics/diagnostics_selftest.cpp:88,fake LSP refused to start (missing binary),non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,keep-en:LSP,high
+T294,src/workspace/diagnostics/diagnostics_selftest.cpp:105,fake session ready,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T295,src/workspace/diagnostics/diagnostics_selftest.cpp:85,fake session starting,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T296,src/workspace/diagnostics/diagnostics_selftest.cpp:242,fake slang,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,keep-en:slang,high
+T297,src/workspace/diagnostics/diagnostics_selftest.cpp:254,fake slang binary is missing,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,keep-en:slang,high
+T298,src/workspace/diagnostics/diagnostics_selftest.cpp:280,fake slang diagnostic,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,keep-en:slang,high
+T299,src/workspace/diagnostics/diagnostics_selftest.cpp:248,fake slang is unavailable,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,keep-en:slang,high
+T300,src/syntax/kde/tests/validate_syntax_data.cpp:180,falling back to Verilog,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,keep-en:Verilog,high
+T301,src/workspace/filetree/file_tree_widget.cpp:105,fileTreeEmptyHint,non-UI,不译,,R06 无空白的标识符形状：Qt objectName / JSON 键 / 命令 id（非 UI 表面，不进入 .ts）,ok,high
+T302,src/workspace/filetree/file_tree_widget.cpp:117,fileTreeEmptyState,non-UI,不译,,R06 无空白的标识符形状：Qt objectName / JSON 键 / 命令 id（非 UI 表面，不进入 .ts）,ok,high
+T303,src/workspace/filetree/file_tree_widget.cpp:129,fileTreeStatus,non-UI,不译,,R06 无空白的标识符形状：Qt objectName / JSON 键 / 命令 id（非 UI 表面，不进入 .ts）,ok,high
+T304,src/workspace/filetree/file_tree_widget.cpp:46,fileTreeToolBar,non-UI,不译,,R06 无空白的标识符形状：Qt objectName / JSON 键 / 命令 id（非 UI 表面，不进入 .ts）,ok,high
+T305,src/workspace/filetree/file_tree_widget.cpp:92,fileTreeView,non-UI,不译,,R06 无空白的标识符形状：Qt objectName / JSON 键 / 命令 id（非 UI 表面，不进入 .ts）,ok,high
+T306,src/syntax/kde/tests/validate_syntax_data.cpp:140,filename probe -> %1 (expected the known V/vlang trap); explicit name mapping is used instead,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T307,src/editor/kernel/find_replace.cpp:41,find: no document,UI,译,查找：没有文档,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Find=查找 / 查找下一个 / 查找上一个 / 替换,medium
+T308,src/editor/kernel/find_replace.cpp:45,find: the pattern is empty,UI,译,查找：模式为空,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Find=查找 / 查找下一个 / 查找上一个 / 替换,medium
+T309,src/syntax/folding/ksyntax_fold_source.cpp:117,fold lists of region %1 are empty,UI,译,区域 %1 的折叠列表为空,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T310,src/editor/probes/replace_probe2.cpp:109,foo bar foo,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T311,src/editor/probes/replace_probe2.cpp:111,foobarbaz bar foobarbaz,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T312,src/editor/kernel/edit_core_selftest.cpp:216,found=%1 replaced=%2,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T313,src/editor/kernel/goto_line.cpp:37,goto-line: cursor landed at %1:%2 instead of %3:0,UI,译,跳转到行：光标落在 %1:%2，而非 %3:0,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T314,src/editor/kernel/goto_line.cpp:12,goto-line: no view/document,UI,译,跳转到行：没有视图/文档,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T315,src/editor/kernel/goto_line.cpp:31,goto-line: setCursorPosition(%1) failed,UI,译,跳转到行：setCursorPosition(%1) 失败,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Failed=失败 / 错误 / 警告,medium
+T316,src/editor/kernel/goto_line.cpp:18,goto-line: the document has no lines,UI,译,跳转到行：文档没有行,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T317,src/syntax/folding/syntax_fold_source.cpp:38,grammar '%1' is not registered,UI,译,语法“%1”未注册,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T318,src/workspace/project/project_state.cpp:52,includeDirs,non-UI,不译,,R06 无空白的标识符形状：Qt objectName / JSON 键 / 命令 id（非 UI 表面，不进入 .ts）,ok,high
+T319,src/workspace/settings/settings_selftest.cpp:238,invalid TOML,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,keep-en:TOML,high
+T320,src/app/session_store.cpp:47,invalid session %1: %2,UI,译,无效会话 %1：%2,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T321,src/app/command_registry.cpp:42,invalid shortcut store %1: %2,UI,译,无效快捷键存储 %1：%2,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T322,src/app/editor_area.cpp:864,layout has no root object,UI,译,布局没有根对象,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T323,src/app/editor_area.cpp:877,layout parse failed,UI,译,布局解析失败,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Failed=失败 / 错误 / 警告,medium
+T324,src/app/editor_area.cpp:796,leaf node without pane id,UI,译,叶子节点缺少窗格 id,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T325,src/syntax/folding/ksyntax_fold_source.cpp:121,loaded %1 (%2) region=%3 begin=%4 end=%5,non-UI,不译,,R09 机器可读诊断模板（key=%1 …），供日志/门禁解析（非 UI 表面，不进入 .ts）,ok,high
+T326,src/workspace/diagnostics/diagnostics_selftest.cpp:341,lsp=%1 slang=%2/%3,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,keep-en:slang,high
+T327,src/app/main.cpp:951,m0 > inc,non-UI,不译,,R22 只出现在自检断言/输出调用点（self-check expectation）（非 UI 表面，不进入 .ts）,ok,medium
+T328,src/editor/kernel/edit_core_selftest.cpp:289,mismatches=%1 error=%2,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,译:Error=失败 / 错误 / 警告,high
+T329,src/workspace/diagnostics/diagnostics_selftest.cpp:493,"missing=[verible, slang]",non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,keep-en:verible;keep-en:slang,high
+T330,src/editor/kernel/edit_core_selftest.cpp:464,mode='%1' expected='%2',non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T331,src/editor/fim/fim_selftest.cpp:312,module m;,non-UI,不译,,R11 Verilog/SystemVerilog 代码片段或实例化文本（测试夹具/示例）（非 UI 表面，不进入 .ts）,ok,high
+T332,src/app/main.cpp:948,module:m0 > function:inc,non-UI,不译,,R11 Verilog/SystemVerilog 代码片段或实例化文本（测试夹具/示例）（非 UI 表面，不进入 .ts）,ok,high
+T333,src/editor/kernel/multi_cursor.cpp:105,multi-cursor: View::insertText() failed,UI,译,多光标：View::insertText() 失败,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Failed=失败 / 错误 / 警告,medium
+T334,src/editor/kernel/multi_cursor.cpp:49,"multi-cursor: asked for %1 cursors, the view reports %2",UI,译,多光标：请求 %1 个光标，视图报告 %2 个,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T335,src/editor/kernel/multi_cursor.cpp:87,multi-cursor: inserted at %1 of %2 cursors,UI,译,多光标：已在 %2 个光标中的 %1 个处插入,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T336,src/editor/kernel/multi_cursor.cpp:69,multi-cursor: no document,UI,译,多光标：没有文档,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T337,src/editor/kernel/multi_cursor.cpp:42,multi-cursor: no positions given,UI,译,多光标：未提供位置,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T338,src/editor/kernel/multi_cursor.cpp:38,multi-cursor: no view,UI,译,多光标：没有视图,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T339,src/editor/kernel/highlight_diagnosis.cpp:65,name='%1' author='%2' section='%3' version=%4 valid=%5,non-UI,不译,,R09 机器可读诊断模板（key=%1 …），供日志/门禁解析（非 UI 表面，不进入 .ts）,ok,high
+T340,src/app/editor_area.cpp:853,nextPane,non-UI,不译,,R06 无空白的标识符形状：Qt objectName / JSON 键 / 命令 id（非 UI 表面，不进入 .ts）,ok,high
+T341,src/editor/kernel/edit_core_selftest.cpp:390,no C ABI hooks in this build,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T342,src/editor/kernel/edit_core_selftest.cpp:234,no KTextEditor view,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,keep-en:KTextEditor,high
+T343,src/workspace/diagnostics/diagnostics_controller.cpp:170,no LSP backend in this build,UI,译,此构建没有 LSP 后端,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,keep-en:LSP,medium
+T344,src/workspace/diagnostics/ffi_backends.cpp:280,no LSP request to poll,UI,译,没有可轮询的 LSP 请求,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,keep-en:LSP,medium
+T345,src/workspace/diagnostics/ffi_backends.cpp:200,no LSP session,UI,译,没有 LSP 会话,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,keep-en:LSP,medium
+T346,src/workspace/diagnostics/diagnostics_controller.cpp:302,no SLANG backend,UI,译,没有 SLANG 后端,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T347,src/workspace/diagnostics/diagnostics_controller.cpp:206,no SLANG backend in this build,UI,译,此构建没有 SLANG 后端,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T348,src/workspace/diagnostics/ffi_backends.cpp:396,no SLANG ticket to poll,UI,译,没有可轮询的 SLANG 凭据,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T349,src/app/app_shell.cpp:539,no active editor pane,UI,译,没有活动的编辑器窗格,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Editor=编辑器,medium
+T350,src/workspace/search/search_jump_target.cpp:43,no application shell,non-UI,不译,,R22 只出现在自检断言/输出调用点（self-check expectation）（非 UI 表面，不进入 .ts）,ok,medium
+T351,src/workspace/diagnostics/diagnostics_panel.cpp:96,no diagnostics controller,UI,译,没有诊断控制器,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Diagnostics=诊断,high
+T352,src/editor/kernel/edit_core_selftest.cpp:187,no document,non-UI,不译,,R11 Verilog/SystemVerilog 代码片段或实例化文本（测试夹具/示例）（非 UI 表面，不进入 .ts）,ok,high
+T353,src/editor/kernel/highlight_mode.cpp:102,no document to highlight,UI,译,没有要高亮的文档,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T354,src/workspace/search/search_jump_target.cpp:51,no edit-core provider: the search jump needs the KTextEditor editor lane,non-UI,不译,,R22 只出现在自检断言/输出调用点（self-check expectation）（非 UI 表面，不进入 .ts）,译:Search=搜索;译:Editor=编辑器;keep-en:KTextEditor,medium
+T355,src/workspace/diagnostics/diagnostics_controller.cpp:95,no effective file set,UI,译,没有有效文件集,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T356,src/workspace/diagnostics/toolchain_ux_selftest.cpp:312,no local verible-verilog-ls / fixture,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,keep-en:verible-verilog-ls;keep-en:verible,high
+T357,src/workspace/diagnostics/diagnostics_controller.cpp:444,no navigation request in flight,UI,译,没有进行中的导航请求,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T358,src/editor/kernel/edit_core_selftest.cpp:417,no positive-control hook,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T359,src/app/app_shell.cpp:414,no project,non-UI,不译,,R11 Verilog/SystemVerilog 代码片段或实例化文本（测试夹具/示例）（非 UI 表面，不进入 .ts）,ok,high
+T360,src/workspace/project/project_model.cpp:81,no project is open,UI,译,未打开工程,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Open=打开 / 打开文件 / 打开文件夹,medium
+T361,src/app/editor_area.cpp:336,no provider,obsolete,删除,,R03 当前树里已不存在该字面量（注释中残留或已删除/改写）；01 出处 src/app/editor_area.cpp；当前树中已无该字面量，无需代码动作,ok,high
+T362,src/workspace/breadcrumb/syntax_breadcrumb_source.cpp:25,no provider for grammar '%1',UI,译,语法“%1”没有 provider,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T363,src/app/command_registry.cpp:253,no shortcut store configured,UI,译,未配置快捷键存储,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T364,src/workspace/project/project_state.cpp:111,no state directory is available,UI,译,没有可用的状态目录,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T365,src/editor/kernel/highlight_mode.cpp:109,no syntax definition for %1,UI,译,%1 没有语法定义,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T366,src/workspace/diagnostics/selftests/diagnostics_product_seam.cpp:109,no temporary directory,UI,译,没有临时目录,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T367,src/workspace/diagnostics/selftests/diagnostics_product_seam.cpp:164,no toolchain,non-UI,不译,,R11 Verilog/SystemVerilog 代码片段或实例化文本（测试夹具/示例）（非 UI 表面，不进入 .ts）,ok,high
+T368,src/workspace/palette/file_index.cpp:82,no workspace root configured,UI,译,未配置工作区根目录,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T369,src/workspace/vcs/vcs_selftest.cpp:111,not a Git or Subversion working tree,UI,译,不是 Git 或 Subversion 工作树,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,keep-en:Git,medium
+T370,src/workspace/filetree/tests/filetree_tests.cpp:172,not a folder,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T371,src/workspace/search/search_selftest.cpp:428,not readable,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T372,src/workspace/diagnostics/diagnostics_selftest.cpp:546,not saved,non-UI,不译,,R11 Verilog/SystemVerilog 代码片段或实例化文本（测试夹具/示例）（非 UI 表面，不进入 .ts）,译:Saved=已保存 / 未保存的更改,high
+T373,src/app/editor_area.cpp:239,open: the pane has no editor provider,UI,译,打开：窗格没有编辑器 provider,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Open=打开 / 打开文件 / 打开文件夹;译:Editor=编辑器,medium
+T374,src/editor/kernel/document_io.cpp:21,openFile: no document,UI,译,openFile：没有文档,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T375,src/workspace/filetree/filetree_integration.cpp:52,openFileInEditor: the application shell is not part of this build,UI,译,openFileInEditor：此构建不包含应用外壳,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T376,src/workspace/palette/palette_integration.cpp:151,palette: cannot index workspace: %1,non-UI,不译,,R05 只出现在 qDebug/qInfo/qWarning/printf 日志调用点（非 UI 表面，不进入 .ts）,ok,high
+T377,src/workspace/palette/palette_integration.cpp:155,palette: indexed %1 files under %2 in %3 ms,non-UI,不译,,R05 只出现在 qDebug/qInfo/qWarning/printf 日志调用点（非 UI 表面，不进入 .ts）,译:Files=文件树 / 文件,high
+T378,src/app/editor_area.cpp:802,"pane %1 was saved by provider '%2', restored with '%3'",non-UI,不译,,R22 只出现在自检断言/输出调用点（self-check expectation）（非 UI 表面，不进入 .ts）,译:Saved=已保存 / 未保存的更改,medium
+T379,src/workspace/breadcrumb/syntax_breadcrumb_source.cpp:56,parse returned no tree,UI,译,解析未返回语法树,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T380,src/workspace/filetree/tests/filetree_tests.cpp:196,permission denied,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T381,src/workspace/filetree/file_tree_model.cpp:420,permission denied: %1,UI,译,权限被拒绝：%1,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T382,src/syntax/kde/tests/syntax_directory_equivalence.cpp:94,private syntax directory missing,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T383,src/syntax/kde/ksyntax_data.cpp:111,private syntax directory missing: %1/syntax (set VEDIT_SYNTAX_DIR),UI,译,私有语法目录缺失：%1/syntax（设置 VEDIT_SYNTAX_DIR）,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T384,src/workspace/project/project_state.cpp:49,projectRoot,non-UI,不译,,R06 无空白的标识符形状：Qt objectName / JSON 键 / 命令 id（非 UI 表面，不进入 .ts）,ok,high
+T385,src/syntax/folding/syntax_fold_source.cpp:63,provider '%1' parsed %2 fold ranges,UI,译,provider“%1”解析出 %2 个折叠范围,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T386,src/workspace/diagnostics/diagnostics_ffi_selftest.cpp:293,remaining errors=%1,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T387,src/app/main.cpp:784,removed=%1 bindings=%2,non-UI,不译,,R09 机器可读诊断模板（key=%1 …），供日志/门禁解析（非 UI 表面，不进入 .ts）,ok,high
+T388,src/workspace/diagnostics/diagnostics_controller.cpp:101,reparsing %1 file(s),UI,译,正在重新解析 %1 个文件,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T389,src/editor/kernel/find_replace.cpp:121,replace-all replaced %1 of %2 matches,UI,译,全部替换：已替换 %2 个匹配中的 %1 个,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Replace=查找 / 查找下一个 / 查找上一个 / 替换,medium
+T390,src/editor/kernel/highlight_diagnosis.cpp:153,repository-definition %1,UI,译,仓库定义 %1,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T391,src/workspace/diagnostics/diagnostics_ffi_selftest.cpp:161,requested=%1 completed=%2 failures=%3,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T392,src/workspace/project/project_selftest.cpp:155,restored from last session,obsolete,删除,,R03 当前树里已不存在该字面量（注释中残留或已删除/改写）；01 出处 src/workspace/project/project_selftest.cpp；当前树中已无该字面量，无需代码动作,ok,high
+T393,src/workspace/search/search_selftest.cpp:483,result limit 3 reached,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T394,src/workspace/diagnostics/toolchain_ux_selftest.cpp:291,run scripts/fetch-verible.sh in a checkout to enable this,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,keep-en:verible,high
+T395,src/editor/kernel/ktexteditor_provider.cpp:211,save: the document has no file path yet,UI,译,保存：文档尚无文件路径,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Save=保存 / 另存为 / 全部保存,medium
+T396,src/app/editor_area.cpp:261,save: the pane has no editor provider,obsolete,删除,,R03 当前树里已不存在该字面量（注释中残留或已删除/改写）；01 出处 src/app/editor_area.cpp；当前树中已无该字面量，无需代码动作,译:Save=保存 / 另存为 / 全部保存;译:Editor=编辑器,high
+T397,src/editor/kernel/document_io.cpp:170,saveAtomic: the document has no file path,UI,译,saveAtomic：文档没有文件路径,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T398,src/workspace/diagnostics/diagnostics_panel.cpp:117,saved file,non-UI,不译,,R11 Verilog/SystemVerilog 代码片段或实例化文本（测试夹具/示例）（非 UI 表面，不进入 .ts）,译:Saved=已保存 / 未保存的更改,high
+T399,src/app/main.cpp:610,search panel from a registered factory,UI,译,来自已注册工厂的搜索面板,R15 出现在 Qt UI 调用点（ui_text）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Search=搜索,high
+T400,src/workspace/search/global_search.cpp:126,search root does not exist or is not a directory: %1,UI,译,搜索根目录不存在或不是目录：%1,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Search=搜索,medium
+T401,src/workspace/search/global_search.cpp:131,search root is not readable: %1,UI,译,搜索根目录不可读：%1,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Search=搜索,medium
+T402,src/workspace/project/project_model.cpp:139,service: %1,non-UI,不译,,R22 只出现在自检断言/输出调用点（self-check expectation）（非 UI 表面，不进入 .ts）,ok,medium
+T403,src/app/app_shell.cpp:406,session mentions unknown panel '%1',UI,译,会话提到未知面板“%1”,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T404,src/workspace/diagnostics/diagnostics_controller.cpp:188,session started over %1 file(s),UI,译,会话已在 %1 个文件上启动,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T405,src/workspace/search/search_jump_target.cpp:89,setCursorPosition(%1:%2) failed,UI,译,setCursorPosition(%1:%2) 失败,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Failed=失败 / 错误 / 警告,medium
+T406,src/editor/kernel/document_io.cpp:103,setText: no document,UI,译,setText：没有文档,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T407,src/workspace/settings/settings_panel.cpp:143,settings could not be loaded,UI,译,无法加载设置,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Settings=设置,medium
+T408,src/workspace/settings/settings_client.cpp:198,settings load failed (state %1),UI,译,设置加载失败（状态 %1）,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Settings=设置;译:Failed=失败 / 错误 / 警告,medium
+T409,src/workspace/settings/settings_client.cpp:222,settings save failed (state %1),UI,译,设置保存失败（状态 %1）,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Save=保存 / 另存为 / 全部保存;译:Settings=设置;译:Failed=失败 / 错误 / 警告,medium
+T410,src/app/crash_reporter_selftest.cpp:104,signal=11 (SIGSEGV),non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T411,src/workspace/diagnostics/ffi_backends.cpp:361,slang (FFI),obsolete,删除,,R03 当前树里已不存在该字面量（注释中残留或已删除/改写）；01 出处 src/workspace/diagnostics/ffi_backends.cpp；当前树中已无该字面量，无需代码动作,keep-en:slang,high
+T412,src/workspace/diagnostics/ffi_backends.cpp:362,slang (FFI): %1,obsolete,删除,,R03 当前树里已不存在该字面量（注释中残留或已删除/改写）；01 出处 src/workspace/diagnostics/ffi_backends.cpp；当前树中已无该字面量，无需代码动作,keep-en:slang,high
+T413,src/workspace/diagnostics/toolchain.cpp:249,slang probed: %1,non-UI,不译,,R20 开发/故障注入诊断文本（fault-injection、selftest、probe）（非 UI 表面，不进入 .ts）,keep-en:slang,high
+T414,src/syntax/folding/ksyntax_fold_source.cpp:137,source is not loaded: %1,UI,译,源码未加载：%1,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T415,src/workspace/diagnostics/toolchain.cpp:199,source=verible:%1 slang:%2 missing=%3,non-UI,不译,,R09 机器可读诊断模板（key=%1 …），供日志/门禁解析（非 UI 表面，不进入 .ts）,keep-en:verible;keep-en:slang,high
+T416,src/app/editor_area.cpp:824,split node needs two object children,UI,译,分割节点需要两个对象子节点,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Split=分屏 / 水平分屏 / 垂直分屏,medium
+T417,src/app/editor_area.cpp:816,split node without a valid orientation,UI,译,分割节点缺少有效方向,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Split=分屏 / 水平分屏 / 垂直分屏,medium
+T418,src/editor/kernel/fim_wiring_selftest.cpp:399,start took %1 ms (the endpoint sleeps 400 ms),non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T419,src/workspace/settings/settings_selftest.cpp:292,start took %1 ms for a %2 KB store,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T420,src/workspace/vcs/vcs_selftest.cpp:318,start took %1 ms while the fake git sleeps 400 ms,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T421,src/workspace/project/project_model.cpp:136,state: %1,non-UI,不译,,R22 只出现在自检断言/输出调用点（self-check expectation）（非 UI 表面，不进入 .ts）,ok,medium
+T422,src/workspace/vcs/vcs_selftest.cpp:158,stub has no diff,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T423,src/workspace/filetree/file_ops.cpp:155,target: %1,uncertain,待定→保留英文,,R25 无决定信号：既不像代码/键，也没有 UI 调用点；保留英文（AC-4.5 默认口径：未判定 → keep-en + 登记理由）,ok,low
+T424,src/workspace/diagnostics/diagnostics_controller.cpp:283,the LSP session did not start,UI,译,LSP 会话未启动,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,keep-en:LSP,medium
+T425,src/workspace/project/project_service.cpp:89,the Rust project service is unavailable,UI,译,Rust 项目服务不可用,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T426,src/workspace/search/global_search.cpp:28,the Rust search service did not report a reason,UI,译,Rust 搜索服务未报告原因,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Search=搜索,medium
+T427,src/workspace/diagnostics/ffi_backends.cpp:163,the Rust service handle could not be created,UI,译,无法创建 Rust 服务句柄,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T428,src/editor/fim/fim_backend.cpp:24,the Rust service reported no detail,UI,译,Rust 服务未报告细节,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T429,src/workspace/settings/settings_client.cpp:125,the Rust settings store rejected the path,UI,译,Rust 设置存储拒绝了该路径,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Settings=设置,medium
+T430,src/workspace/settings/settings_client.cpp:165,the Rust settings store rejected the write,UI,译,Rust 设置存储拒绝了写入,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Settings=设置,medium
+T431,src/workspace/diagnostics/ffi_backends.cpp:386,the SLANG job id does not fit the backend ticket type,UI,译,SLANG 作业 id 不适合后端凭据类型,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T432,src/app/crash_reporter_selftest.cpp:114,the backtrace must name the crash handler,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T433,src/workspace/search/search_jump_target.cpp:98,the cursor landed at %1:%2 instead of %3:%4,non-UI,不译,,R22 只出现在自检断言/输出调用点（self-check expectation）（非 UI 表面，不进入 .ts）,ok,medium
+T434,src/editor/kernel/highlight_mode.cpp:137,the document reports highlighting mode '%1' instead of '%2',UI,译,文档报告的高亮模式为“%1”，而非“%2”,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T435,src/app/app_shell.cpp:545,the editor provider refused the save,UI,译,编辑器 provider 拒绝了保存,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Save=保存 / 另存为 / 全部保存;译:Editor=编辑器,medium
+T436,src/workspace/filetree/file_ops.cpp:25,the entry,non-UI,不译,,R11 Verilog/SystemVerilog 代码片段或实例化文本（测试夹具/示例）（非 UI 表面，不进入 .ts）,ok,high
+T437,src/workspace/filetree/file_ops.cpp:33,the folder '%1' is not writable,UI,译,文件夹“%1”不可写,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T438,src/workspace/filetree/file_ops.cpp:194,the folder is not empty,UI,译,文件夹不为空,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T439,src/workspace/diagnostics/diagnostics_ffi_selftest.cpp:107,the navigation request did not settle in 20 s,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T440,src/workspace/search/search_jump_target.cpp:82,the opened document has no lines,non-UI,不译,,R22 只出现在自检断言/输出调用点（self-check expectation）（非 UI 表面，不进入 .ts）,ok,medium
+T441,src/workspace/project/project_model.cpp:228,the project job was rejected by the service,UI,译,项目作业被服务拒绝,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T442,src/workspace/project/project_model.cpp:206,the project service did not answer in %1 ms,UI,译,项目服务未在 %1 毫秒内响应,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T443,src/workspace/project/project_model.cpp:254,the project service failed,UI,译,项目服务失败,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Failed=失败 / 错误 / 警告,medium
+T444,src/workspace/search/search_jump_target.cpp:56,the shell has no active editor pane,non-UI,不译,,R22 只出现在自检断言/输出调用点（self-check expectation）（非 UI 表面，不进入 .ts）,译:Editor=编辑器,medium
+T445,src/app/app_shell.cpp:428,theme fallback: %1,UI,译,主题回退：%1,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T446,src/app/app_shell.cpp:425,theme: %1,uncertain,待定→保留英文,,R25 无决定信号：既不像代码/键，也没有 UI 调用点；保留英文（AC-4.5 默认口径：未判定 → keep-en + 登记理由）,ok,low
+T447,src/workspace/diagnostics/toolchain_ux_selftest.cpp:342,this build has no Rust service layer (FFI),non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T448,src/workspace/settings/settings_client.cpp:126,this build has no vd-ffi settings ABI,UI,译,此构建没有 vd-ffi 设置 ABI,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,译:Settings=设置,medium
+T449,src/workspace/settings/settings_selftest.cpp:307,ticks=%1 poles=%2,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T450,src/workspace/vcs/vcs_selftest.cpp:356,timer fired at %1 ms after scheduling (expected late),non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T451,src/workspace/search/search_selftest.cpp:323,too large skipped,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T452,src/syntax/folding/syntax_fold_source.cpp:31,tree-sitter switch is off,UI,译,tree-sitter 开关已关闭,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,keep-en:tree-sitter,medium
+T453,src/editor/fim/fim_backend.cpp:177,unavailable (no Rust service in this build),UI,译,不可用（此构建没有 Rust 服务）,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T454,src/workspace/diagnostics/diagnostics_selftest.cpp:181,unknown fake request id,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T455,src/workspace/diagnostics/diagnostics_selftest.cpp:266,unknown fake slang ticket,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,keep-en:slang,high
+T456,src/app/editor_area.cpp:844,unknown layout node type '%1',UI,译,未知布局节点类型“%1”,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T457,src/app/theme_manager.cpp:55,unknown theme '%1' (or not loaded by KSyntaxHighlighting),UI,译,未知主题“%1”（或未被 KSyntaxHighlighting 加载）,R17 人类可读的消息/标签，位于交付源文件（间接显示或由上层弹出）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,keep-en:KSyntaxHighlighting,medium
+T458,src/workspace/search/search_selftest.cpp:459,unreadable skipped,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T459,src/syntax/folding/ksyntax_fold_source.cpp:104,veditFold,non-UI,不译,,R06 无空白的标识符形状：Qt objectName / JSON 键 / 命令 id（非 UI 表面，不进入 .ts）,ok,high
+T460,src/workspace/diagnostics/toolchain.cpp:247,verible-verilog-ls probed: %1,non-UI,不译,,R20 开发/故障注入诊断文本（fault-injection、selftest、probe）（非 UI 表面，不进入 .ts）,keep-en:verible-verilog-ls;keep-en:verible,high
+T461,src/editor/probes/tx_steps_probe5.cpp:40,w%1 ,non-UI,不译,,R04 只出现在开发自检/探针/基准文件里（_selftest.cpp、tests/、probes/），不是交付 UI 表面（非 UI 表面，不进入 .ts）,ok,high
+T462,src/app/app_shell.cpp:494,window geometry could not be restored,UI,译,无法恢复窗口几何,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T463,src/workspace/palette/file_index.cpp:89,workspace root is not a directory: %1,UI,译,工作区根目录不是目录：%1,R23 英文消息/状态文本（服务层以 message/error 字段传到界面，显示点未逐条证明）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T464,src/workspace/project/project_selftest.cpp:190,{ this is not json,obsolete,删除,,R03 当前树里已不存在该字面量（注释中残留或已删除/改写）；01 出处 src/workspace/project/project_selftest.cpp；当前树中已无该字面量，无需代码动作,ok,high
+T465,src/workspace/vcs/vcs_panel.cpp:109,· %1 changed file(s),UI,译,· %1 个已更改文件,R18 括号/省略号修饰的界面标签（附加在状态文本上）；译文按 02-bilingual-table-draft.md + 03-glossary.md 口径，落点见 12-ui-blocks.md,ok,medium
+T466,src/editor/fim/fim_selftest.cpp:302,未链接 Rust 服务,already-translated,已译,,R02 字符串本身已是中文（CJK 文本），不需要翻译；源串本身是中文（另一 lane 已落），英文界面下仍显示中文 —— 登记为已知缺陷，不在 AC-4.5/4.6 写域内,ok,high

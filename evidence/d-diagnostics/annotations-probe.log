@@ -1,0 +1,49 @@
+CHECK editor.instance PASS
+CHECK document.created PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+CHECK view.created PASS
+CHECK document.text-set PASS
+CHECK annotations.installed PASS
+CHECK underline.range-count PASS actual=3 expected=3
+CHECK gutter.annotated-lines PASS actual=3 expected=3
+CHECK gutter.tooltip-kept PASS
+CHECK error.style-is-spellcheck PASS actual=7 expected=7
+CHECK warning.style-is-spellcheck PASS actual=7 expected=7
+OBSERVED underline colours error=#c62828 warning=#b26a00 z=-90000
+CHECK error.colour-red PASS
+CHECK warning.colour-orange PASS
+CHECK colors.differ PASS
+CHECK underline.z-depth PASS
+CHECK error.exact-span-text PASS actual='b;' expected='b;'
+CHECK line-level.whole-line PASS actual='  logic a;' expected='  logic a;'
+PIXELS text-area changed=168 bbox=(62,27)-(169,69) red-ish=48 orange-ish=2 bands(error=15 warning=80 control=0)
+CHECK pixels.squiggle-painted PASS
+CHECK pixels.red-present PASS
+CHECK pixels.orange-present PASS
+CHECK pixels.error-line-repainted PASS
+CHECK pixels.warning-line-repainted PASS
+CHECK pixels.control-line-untouched PASS
+SHOT underline-zoom 'evidence/d-diagnostics/underline-zoom.png' saved=1
+CHECK shot.underline-zoom-saved PASS
+SHOT underline 'evidence/d-diagnostics/underline-error-warning.png' saved=1
+CHECK shot.underline-saved PASS
+CHECK edit.inserted PASS
+OBSERVED after-edit ranges=3 start(3,13)=1 text='b;'
+CHECK edit.range-moved PASS
+CHECK edit.range-text-unchanged PASS actual='b;' expected='b;'
+CHECK fix.ranges-cleared PASS actual=0 expected=0
+CHECK fix.no-live-ranges PASS actual=0 expected=0
+OBSERVED cap ranges=1024 per-line=1024 merged=476 max=1024
+CHECK cap.per-line-limit PASS actual=1024 expected=1024
+CHECK cap.max-ranges-per-line PASS actual=1024 expected=1024
+CHECK cap.merged-count PASS actual=476 expected=476
+CHECK cap.line-still-underlined PASS
+CHECK cap.cleared PASS actual=0 expected=0
+CHECK large.ranges PASS actual=500 expected=500
+SHOT large-file 'evidence/d-diagnostics/underline-large-file.png' saved=1 ranges-after-scroll=500
+CHECK large.scroll-survived PASS
+CHECK shot.large-file-saved PASS
+OBSERVED after-close live-ranges=0
+CHECK close.no-residual-ranges PASS actual=0 expected=0
+SUMMARY checks=38 failures=0
+[annotations-probe-exit=0]

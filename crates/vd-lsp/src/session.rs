@@ -36,11 +36,13 @@ use std::time::{Duration, Instant};
 
 use anyhow::{anyhow, Result};
 use lsp_types::{
-    Diagnostic, DocumentSymbol, DocumentSymbolResponse, Location, Position, Range, TextEdit,
-    TextDocumentContentChangeEvent, Url, WorkspaceEdit,
+    Diagnostic, DocumentSymbol, DocumentSymbolResponse, HoverContents, Location, MarkedString,
+    ParameterLabel, Position, Range, SignatureHelp, TextDocumentContentChangeEvent, TextEdit, Url,
+    WorkspaceEdit,
 };
 use tokio::sync::mpsc;
 
+use crate::backend::{capabilities_from_server, BackendCapabilities, LspBackend};
 use crate::client::LspClient;
 use crate::config::LspConfig;
 use crate::diagnostics::PublishedDiagnostics;
@@ -91,6 +93,11 @@ pub struct SkippedFile {
 pub struct SessionStatus {
     /// Lifecycle phase.
     pub phase: SessionPhase,
+    /// Which language server this session drives (T138).
+    pub backend: LspBackend,
+    /// Capability table: the static one until the server answered `initialize`,
+    /// then the live one. `None` only before the worker has a table to report.
+    pub capabilities: Option<BackendCapabilities>,
     /// How many files the caller handed in (the project model's effective set).
     pub files_expected: usize,
     /// How many of those were opened on the server.
@@ -110,9 +117,11 @@ pub struct SessionStatus {
 }
 
 impl SessionStatus {
-    fn new(files_expected: usize) -> Self {
+    fn new(files_expected: usize, backend: LspBackend) -> Self {
         Self {
             phase: SessionPhase::Starting,
+            backend,
+            capabilities: Some(crate::backend::capabilities(backend)),
             files_expected,
             files_opened: 0,
             skipped: Vec::new(),
@@ -120,7 +129,10 @@ impl SessionStatus {
             generation: 0,
             server_pid: None,
             restarts: 0,
-            message: format!("opening {files_expected} file(s)"),
+            message: format!(
+                "opening {files_expected} file(s) with {}",
+                backend.display_name()
+            ),
         }
     }
 }
@@ -172,6 +184,24 @@ pub enum SessionRequest {
         /// Source file.
         file: PathBuf,
     },
+    /// `textDocument/hover` at a zero-based position (T16).
+    Hover {
+        /// Source file.
+        file: PathBuf,
+        /// Zero-based line.
+        line: u32,
+        /// Zero-based UTF-16 character.
+        character: u32,
+    },
+    /// `textDocument/signatureHelp` at a zero-based position (T16).
+    SignatureHelp {
+        /// Source file.
+        file: PathBuf,
+        /// Zero-based line.
+        line: u32,
+        /// Zero-based UTF-16 character.
+        character: u32,
+    },
 }
 
 /// One outline entry (flat; nested symbols are flattened in document order).
@@ -211,6 +241,36 @@ pub struct SessionDiagnostic {
     pub message: String,
 }
 
+/// One call signature of a `textDocument/signatureHelp` answer (T16).
+#[derive(Debug, Clone, Default)]
+pub struct SignatureInfo {
+    /// The signature's label, exactly as the server sent it.
+    pub label: String,
+    /// Parameter labels (resolved from `LabelOffsets` against `label`).
+    pub parameters: Vec<String>,
+}
+
+/// A `textDocument/signatureHelp` answer, flattened for the C ABI (T16).
+#[derive(Debug, Clone, Default)]
+pub struct SignatureHelpResult {
+    /// The signatures, in the server's order.
+    pub signatures: Vec<SignatureInfo>,
+    /// Which signature is active, when the server selected one.
+    pub active_signature: Option<u32>,
+    /// Which parameter is active, when the server selected one.
+    pub active_parameter: Option<u32>,
+}
+
+/// A `textDocument/hover` answer (T16): the text the server sent back, plus the
+/// range it applies to.
+#[derive(Debug, Clone, Default)]
+pub struct HoverResult {
+    /// Plain text of the hover (markup values are passed through unchanged).
+    pub text: String,
+    /// The range the hover applies to, when the server supplied one.
+    pub range: Option<Range>,
+}
+
 /// Result payload of one finished request.
 #[derive(Debug, Clone)]
 pub enum SessionResponse {
@@ -222,6 +282,10 @@ pub enum SessionResponse {
     Edits(Vec<WorkspaceTextEdit>),
     /// Diagnostics for one file.
     Diagnostics(Vec<SessionDiagnostic>),
+    /// Hover text (T16).
+    Hover(HoverResult),
+    /// Signature help (T16).
+    SignatureHelp(SignatureHelpResult),
 }
 
 /// Result of one [`SessionHandle::poll`] attempt.
@@ -244,11 +308,17 @@ enum RequestState {
 }
 
 enum Command {
-    Request { id: u64, request: SessionRequest },
+    Request {
+        id: u64,
+        request: SessionRequest,
+    },
     /// Replace one tracked document's text with the caller's buffer (a
     /// full-document `didChange`); this is how diagnostics follow the EDITOR
     /// BUFFER instead of the bytes on disk.
-    Change { path: PathBuf, text: String },
+    Change {
+        path: PathBuf,
+        text: String,
+    },
     Stop,
 }
 
@@ -273,6 +343,9 @@ impl Inner {
             .unwrap_or_else(|poisoned| poisoned.into_inner())
     }
 
+    // One call site fills every observable field at once, which is clearer than
+    // a builder for a worker-thread hand-off.
+    #[allow(clippy::too_many_arguments)]
     fn set_ready(
         &self,
         opened: usize,
@@ -281,9 +354,13 @@ impl Inner {
         generation: u64,
         pid: Option<u32>,
         restarts: u32,
+        capabilities: Option<BackendCapabilities>,
     ) {
         let mut status = self.lock_status();
         status.phase = SessionPhase::Ready;
+        if capabilities.is_some() {
+            status.capabilities = capabilities;
+        }
         status.files_opened = opened;
         status.skipped = skipped;
         status.diagnostics = diagnostics;
@@ -291,7 +368,8 @@ impl Inner {
         status.server_pid = pid;
         status.restarts = restarts;
         status.message = format!(
-            "ready: {opened}/{} file(s) open, {diagnostics} diagnostic(s), {} skipped",
+            "ready: backend={} {opened}/{} file(s) open, {diagnostics} diagnostic(s), {} skipped",
+            status.backend.as_str(),
             status.files_expected,
             status.skipped.len()
         );
@@ -378,8 +456,9 @@ impl SessionHandle {
         stop_budget: Duration,
     ) -> Result<Self> {
         let (sender, receiver) = mpsc::unbounded_channel();
+        let backend = config.backend;
         let inner = Arc::new(Inner {
-            status: Mutex::new(SessionStatus::new(files.len())),
+            status: Mutex::new(SessionStatus::new(files.len(), backend)),
             requests: Mutex::new(HashMap::new()),
             commands: sender,
             next_request: AtomicU64::new(1),
@@ -420,6 +499,21 @@ impl SessionHandle {
     /// A snapshot of the observable session state (never blocks on the server).
     pub fn status(&self) -> SessionStatus {
         self.inner.lock_status().clone()
+    }
+
+    /// The backend this session drives.
+    pub fn backend(&self) -> LspBackend {
+        self.inner.lock_status().backend
+    }
+
+    /// The capability table to show the UI: the static table until the server
+    /// answered `initialize`, then the table refined from that live answer.
+    pub fn capabilities(&self) -> BackendCapabilities {
+        let status = self.inner.lock_status();
+        status
+            .capabilities
+            .clone()
+            .unwrap_or_else(|| crate::backend::capabilities(status.backend))
     }
 
     /// Queue one request; returns its id for [`Self::poll`].
@@ -616,6 +710,9 @@ async fn session_loop(
     }
     let diagnostics = client.diagnostics().borrow().diagnostic_count();
 
+    let capabilities = client
+        .server_capabilities()
+        .map(|advertised| capabilities_from_server(inner.lock_status().backend, advertised));
     inner.set_ready(
         opened.len(),
         skipped,
@@ -623,6 +720,7 @@ async fn session_loop(
         client.diagnostics_generation(),
         client.pid(),
         client.restart_count(),
+        capabilities,
     );
 
     while let Some(command) = commands.recv().await {
@@ -640,7 +738,9 @@ async fn session_loop(
                 {
                     let mut status = inner.lock_status();
                     status.message = match &outcome {
-                        Ok(bytes) => format!("buffer changed ({} bytes): {}", bytes, path.display()),
+                        Ok(bytes) => {
+                            format!("buffer changed ({} bytes): {}", bytes, path.display())
+                        }
                         Err(error) => format!("buffer change failed: {error}"),
                     };
                 }
@@ -676,9 +776,7 @@ async fn apply_buffer_change(client: &mut LspClient, path: &Path, text: String) 
             )
             .await?;
     } else {
-        client
-            .open_document(uri, language_id(path), text)
-            .await?;
+        client.open_document(uri, language_id(path), text).await?;
     }
     Ok(bytes)
 }
@@ -691,6 +789,16 @@ async fn serve(client: &mut LspClient, request: SessionRequest) -> Result<Sessio
             character,
         }
         | SessionRequest::References {
+            file,
+            line,
+            character,
+        }
+        | SessionRequest::Hover {
+            file,
+            line,
+            character,
+        }
+        | SessionRequest::SignatureHelp {
             file,
             line,
             character,
@@ -742,6 +850,88 @@ async fn serve(client: &mut LspClient, request: SessionRequest) -> Result<Sessio
                 .map(normalise_diagnostics)
                 .unwrap_or_default();
             Ok(SessionResponse::Diagnostics(diagnostics))
+        }
+        SessionRequest::Hover { .. } => Ok(SessionResponse::Hover(
+            client
+                .hover(&uri, position)
+                .await?
+                .map(hover_result)
+                .unwrap_or_default(),
+        )),
+        SessionRequest::SignatureHelp { .. } => Ok(SessionResponse::SignatureHelp(
+            client
+                .signature_help(&uri, position)
+                .await?
+                .map(signature_help_result)
+                .unwrap_or_default(),
+        )),
+    }
+}
+
+/// Flatten an LSP hover payload into plain text.
+///
+/// The three wire forms (`MarkupContent`, a single `MarkedString`, a list of
+/// them) all become text; nothing is invented when the server sent nothing.
+fn hover_result(hover: lsp_types::Hover) -> HoverResult {
+    HoverResult {
+        text: hover_text(hover.contents),
+        range: hover.range,
+    }
+}
+
+fn hover_text(contents: HoverContents) -> String {
+    match contents {
+        HoverContents::Scalar(marked) => marked_string_text(marked),
+        HoverContents::Array(items) => items
+            .into_iter()
+            .map(marked_string_text)
+            .collect::<Vec<String>>()
+            .join("\n\n"),
+        HoverContents::Markup(markup) => markup.value,
+    }
+}
+
+fn marked_string_text(marked: MarkedString) -> String {
+    match marked {
+        MarkedString::String(text) => text,
+        MarkedString::LanguageString(code) => code.value,
+    }
+}
+
+/// Flatten a `textDocument/signatureHelp` answer for the C ABI.
+fn signature_help_result(help: SignatureHelp) -> SignatureHelpResult {
+    SignatureHelpResult {
+        signatures: help
+            .signatures
+            .into_iter()
+            .map(|signature| SignatureInfo {
+                parameters: signature
+                    .parameters
+                    .unwrap_or_default()
+                    .into_iter()
+                    .map(|parameter| parameter_label_text(&signature.label, parameter.label))
+                    .collect(),
+                label: signature.label,
+            })
+            .collect(),
+        active_signature: help.active_signature,
+        active_parameter: help.active_parameter,
+    }
+}
+
+/// Resolve one parameter label against its signature: a plain label is used
+/// verbatim, `LabelOffsets` are sliced out of the signature label.
+fn parameter_label_text(signature_label: &str, label: ParameterLabel) -> String {
+    match label {
+        ParameterLabel::Simple(text) => text,
+        ParameterLabel::LabelOffsets([start, end]) => {
+            let units: Vec<u16> = signature_label.encode_utf16().collect();
+            let start = start as usize;
+            let end = (end as usize).min(units.len());
+            if start >= end {
+                return String::new();
+            }
+            String::from_utf16_lossy(&units[start..end])
         }
     }
 }
@@ -907,7 +1097,10 @@ pub const fn range_parts(range: Range) -> (u32, u32, u32, u32) {
 
 #[cfg(test)]
 mod tests {
-    use super::{flatten_symbols, flatten_workspace_edit, language_id, severity_code};
+    use super::{
+        flatten_symbols, flatten_workspace_edit, hover_text, language_id, parameter_label_text,
+        severity_code, signature_help_result,
+    };
     use lsp_types::{
         DocumentSymbol, DocumentSymbolResponse, Location, SymbolInformation, SymbolKind, TextEdit,
         Url, WorkspaceEdit,
@@ -1003,5 +1196,81 @@ mod tests {
     fn severity_codes_are_zero_when_absent() {
         assert_eq!(severity_code(None), 0);
         assert_eq!(severity_code(Some(1)), 1);
+    }
+
+    // --- T16: hover / signatureHelp conversion (no server needed) ----------
+
+    #[test]
+    fn hover_text_handles_all_three_wire_forms() {
+        // Scalar markup string.
+        let scalar = lsp_types::HoverContents::Scalar(lsp_types::MarkedString::String(
+            "logic [7:0] data".into(),
+        ));
+        assert_eq!(hover_text(scalar), "logic [7:0] data");
+        // Markup content: passed through unchanged (never re-rendered here).
+        let markup = lsp_types::HoverContents::Markup(lsp_types::MarkupContent {
+            kind: lsp_types::MarkupKind::Markdown,
+            value: "```systemverilog\nlogic a;\n```".into(),
+        });
+        assert_eq!(hover_text(markup), "```systemverilog\nlogic a;\n```");
+        // Array of marked strings, joined with a blank line.
+        let array = lsp_types::HoverContents::Array(vec![
+            lsp_types::MarkedString::String("first".into()),
+            lsp_types::MarkedString::LanguageString(lsp_types::LanguageString {
+                language: "systemverilog".into(),
+                value: "second".into(),
+            }),
+        ]);
+        assert_eq!(hover_text(array), "first\n\nsecond");
+    }
+
+    #[test]
+    fn signature_help_resolves_parameter_labels() {
+        let help = lsp_types::SignatureHelp {
+            signatures: vec![
+                lsp_types::SignatureInformation {
+                    label: "foo(int a, int b)".into(),
+                    documentation: None,
+                    parameters: Some(vec![
+                        lsp_types::ParameterInformation {
+                            label: lsp_types::ParameterLabel::Simple("int a".into()),
+                            documentation: None,
+                        },
+                        lsp_types::ParameterInformation {
+                            label: lsp_types::ParameterLabel::LabelOffsets([11, 16]),
+                            documentation: None,
+                        },
+                    ]),
+                    active_parameter: None,
+                },
+                lsp_types::SignatureInformation {
+                    label: "foo()".into(),
+                    documentation: None,
+                    parameters: None,
+                    active_parameter: None,
+                },
+            ],
+            active_signature: Some(0),
+            active_parameter: Some(1),
+        };
+        let result = signature_help_result(help);
+        assert_eq!(result.signatures.len(), 2);
+        assert_eq!(result.signatures[0].label, "foo(int a, int b)");
+        assert_eq!(result.signatures[0].parameters, vec!["int a", "int b"]);
+        assert!(result.signatures[1].parameters.is_empty());
+        assert_eq!(result.active_signature, Some(0));
+        assert_eq!(result.active_parameter, Some(1));
+    }
+
+    #[test]
+    fn parameter_labels_clamp_out_of_range_offsets() {
+        assert_eq!(
+            parameter_label_text("short", lsp_types::ParameterLabel::LabelOffsets([99, 120])),
+            ""
+        );
+        assert_eq!(
+            parameter_label_text("a,b", lsp_types::ParameterLabel::LabelOffsets([2, 99])),
+            "b"
+        );
     }
 }

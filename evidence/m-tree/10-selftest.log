@@ -1,0 +1,59 @@
+ok   tree.single-root — roots=1
+ok   tree.root-label — top
+ok   tree.root-module — top
+ok   tree.root-position-1based — top.sv:3:8
+ok   tree.instance-nesting — top.u0, top.u1, link, clk, rst
+ok   tree.full-instance-path — top.u0
+ok   tree.instance-module — mid
+ok   tree.instance-jump — /proj/top.sv:11:7
+ok   tree.signal-node
+ok   tree.signal-children — children=3
+ok   tree.signal-driver-node — driver: top.u0.q
+ok   jump.conversion
+ok   signal.source — source of top.link: top.u0.q · top.sv:11:38
+ok   signal.target — target of top.link: top.u1.d · top.sv:12:25
+ok   signal.declaration-falls-back-to-driver — source of top.link: top.u0.q · top.sv:11:38
+ok   signal.no-driver-is-honest — top.rst has no driver in the elaborated design
+ok   lookup.single — net top.link
+ok   lookup.ambiguous-reports-choice — 2 nets named 'q'; chose top.u0.q
+ok   lookup.unknown — no net named 'nope' in the elaborated design
+ok   panel.rows-built — rows=19
+ok   panel.summary — slang · 2 file(s) · 3 instance(s) · 6 net(s) · 5 ms · 19592 KiB peak
+root: /proj
+ok   panel.instance-row
+ok   panel.double-click-instance — /proj/top.sv:11:7
+ok   panel.signal-row
+ok   panel.double-click-signal-declaration — /proj/top.sv:11:38
+ok   panel.cursor-source — net top.link · source of top.link: top.u0.q · top.sv:11:38 → top.sv:11:38
+ok   panel.cursor-target — net top.link · target of top.link: top.u1.d · top.sv:12:25 → top.sv:12:25
+ok   panel.cursor-cross-file — /proj/mid.sv:10:5
+ok   panel.no-location-row
+ok   panel.no-location-no-jump — calls=5 status=rst has no file:line in the elaborated design
+ok   panel.null-row-safe
+ok   panel.no-driver-status — top.rst has no driver in the elaborated design
+ok   panel.no-cursor-word — put the cursor on a signal name in the editor first
+ok   panel.empty-state — No hierarchy yet: open a project and press Refresh.
+ok   panel.failure-visible — no project root: open a folder
+ok   panel.empty-snapshot — No hierarchy yet: open a project and press Refresh.
+ok   real.temp-state
+ok   real.service-answered
+ok   real.source-description — vd_project_expand_v2(/vedit-build/probes/slang-spike/fixture)
+ok   real.instances — instances=3
+ok   real.instance-paths — top, top.u0, top.u1
+     measurement: slang · 2 file(s) · 3 instance(s) · 14 net(s) · 60 ms · 17564 KiB peak
+ok   real.tree-built — rows=47
+ok   real.double-click-instance — top.sv:11:7
+ok   real.signal-source — net top.link · source of top.link: top.u0.q · top.sv:11:38 → top.sv:11:38
+ok   real.signal-target — net top.link · target of top.link: top.u1.d · top.sv:12:25 → top.sv:12:25
+ok   real.cross-file-source — 2 nets named 'state'; chose top.u0.state · source of top.u0.state: top.u0.state · mid.sv:10:5 → mid.sv:10:5
+This plugin does not support propagateSizeHints()
+ok   panel.screenshot — /vedit-build/evidence/m-tree/module-tree.png
+ok   generate.answered
+     generate fixture: slang · 2 file(s) · 2 instance(s) · 6 net(s) · 34 ms · 19688 KiB peak
+     observed instance paths: gen_top, gen_top.u_bank
+     observed 2/5 ground-truth instance(s); missing: gen_top.u_bank.g[0].u_leaf, gen_top.u_bank.g[1].u_leaf, other_top
+     note: the gap is T46's (hierarchy service: first root only + GenerateBlockArray skipped), not the UI consumer's; this lane paints exactly what VdHierarchy reports and will be re-run when T46 lands.
+ok   generate.first-root-visible — gen_top, gen_top.u_bank
+ok   generate.tree-painted — rows=12 instances=2
+
+50 checks, 0 failure(s)

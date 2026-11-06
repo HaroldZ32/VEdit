@@ -1,0 +1,6 @@
+direct-rc=1
+113:CHECK jump.product.second-loads-bytes FAIL
+114:CHECK jump.product.second-cursor-line FAIL
+115:CHECK jump.product.second-cursor-column FAIL
+117:CHECK jump.product.second-open-paint-stable FAIL
+WORKSPACE-SEARCH-SELFTEST ok=0 checks=106 failures=4 skipped=2

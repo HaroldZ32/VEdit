@@ -1,0 +1,6 @@
+== real AppRun with explicit zh_CN and --hold ==
+APPRUN_EXIT=0
+== VEDIT_TRANSLATIONS_DIR export ==
+29:+ export VEDIT_TRANSLATIONS_DIR=/w/packaging/runtime/out/AppDir/bin/translations
+== translation diagnostic (empty = loaded) ==
+== stdout tail ==

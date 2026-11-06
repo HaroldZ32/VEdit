@@ -1,0 +1,15 @@
+R1 — the locale fix did NOT weaken the guard: a WRONG whitelist must still fail closed
+captured: 2026-11-05T03:05:02+08:00
+AppRun sha256: 925ab1500e1504412a2cfa8a492d8140453f803dc3081702fa4412edb62406c3
+original whitelist: Markdown,SystemVerilog,Tcl,VHDL,Verilog
+
+--- deliberately wrong whitelist: append 'FakeDefinition' ---
+whitelist now: Markdown,SystemVerilog,Tcl,VHDL,Verilog,FakeDefinition
+  KSH-ENV defs=5 hash=7a004024007d64ae2f042f288bba900a60601d453b599c6ada6feac3be34d294 hash_files=7aba38cae1195ec348e51ccdbd85cfa3043b25c888a4bac639c977c216a10edc
+  KSH-GUARD FAIL: visible definitions [Markdown,SystemVerilog,Tcl,VHDL,Verilog] != whitelist [FakeDefinition,Markdown,SystemVerilog,Tcl,VHDL,Verilog]
+  exit=2
+
+--- restored whitelist; guard passes again under zh_CN.UTF-8 ---
+whitelist now: Markdown,SystemVerilog,Tcl,VHDL,Verilog
+  KSH-GUARD PASS whitelist=Markdown,SystemVerilog,Tcl,VHDL,Verilog
+  exit=0

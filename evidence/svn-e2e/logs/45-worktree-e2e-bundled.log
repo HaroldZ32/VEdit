@@ -1,0 +1,30 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.02s
+     Running tests/worktree_e2e.rs (target/debug/deps/worktree_e2e-c742e70ae1e4dd6a)
+
+running 1 test
+test bundled_git_worktree_round_trip_runs_through_the_product_path ... EVIDENCE bundled git version 2.53.0
+EVIDENCE $ /vedit-build/packaging/runtime/out/AppDir/bin/git init -q
+EVIDENCE $ /vedit-build/packaging/runtime/out/AppDir/bin/git config user.email worktree@example.com
+EVIDENCE $ /vedit-build/packaging/runtime/out/AppDir/bin/git config user.name VEdit Worktree
+EVIDENCE $ /vedit-build/packaging/runtime/out/AppDir/bin/git add a.sv
+EVIDENCE $ /vedit-build/packaging/runtime/out/AppDir/bin/git commit -q -m worktree base
+EVIDENCE $ /vedit-build/packaging/runtime/out/AppDir/bin/git branch feature/bundled
+EVIDENCE product worktrees before: WorkspaceListing { backend: Git, entries: [WorkspaceEntry { ref_name: "", hash: "f4a2a82", subject: "", path: "/tmp/.tmpfDTY46/repo", branch: "master", main_worktree: true, detached: false, bare: false }], truncated: false, error: false, note: None }
+EVIDENCE product write git worktree add: GitWorktreeAdd
+EVIDENCE | HEAD is now at f4a2a82 worktree base
+EVIDENCE | 
+EVIDENCE | Preparing worktree (checking out 'feature/bundled')
+EVIDENCE $ /vedit-build/packaging/runtime/out/AppDir/bin/git rev-parse --abbrev-ref HEAD
+EVIDENCE | feature/bundled
+EVIDENCE product worktrees after add: WorkspaceListing { backend: Git, entries: [WorkspaceEntry { ref_name: "", hash: "f4a2a82", subject: "", path: "/tmp/.tmpfDTY46/repo", branch: "master", main_worktree: true, detached: false, bare: false }, WorkspaceEntry { ref_name: "", hash: "f4a2a82", subject: "", path: "/tmp/.tmpfDTY46/linked worktree", branch: "feature/bundled", main_worktree: false, detached: false, bare: false }], truncated: false, error: false, note: None }
+EVIDENCE product write git worktree remove (dirty): GitWorktreeRemove
+EVIDENCE | 
+EVIDENCE | fatal: '/tmp/.tmpfDTY46/linked worktree' contains modified or untracked files, use --force to delete it
+EVIDENCE dirty removal stderr="fatal: '/tmp/.tmpfDTY46/linked worktree' contains modified or untracked files, use --force to delete it\n"
+EVIDENCE product write git worktree remove: GitWorktreeRemove
+EVIDENCE | 
+EVIDENCE product worktrees after remove: WorkspaceListing { backend: Git, entries: [WorkspaceEntry { ref_name: "", hash: "f4a2a82", subject: "", path: "/tmp/.tmpfDTY46/repo", branch: "master", main_worktree: true, detached: false, bare: false }], truncated: false, error: false, note: None }
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+

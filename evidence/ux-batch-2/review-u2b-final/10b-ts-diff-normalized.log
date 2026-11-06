@@ -1,0 +1,8 @@
+T10 snapshot rows: 182; repaired row(s): [69]
+rows not present verbatim in the current catalogue (excluding the repaired row): 0
+
+repaired row check:
+  VEdit/'Fix' -> '修复'
+  VEdit/'修复' still present: False
+
+message count: 1186

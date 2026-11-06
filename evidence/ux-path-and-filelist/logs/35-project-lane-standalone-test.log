@@ -1,0 +1,11 @@
+# container: vedit-qt6-build:local (workspace mounted at /vedit-build)
+# cmd:
+#   cd /vedit-build && QT_QPA_PLATFORM=offscreen XDG_RUNTIME_DIR=/tmp/xdg-runtime ctest --test-dir target/project-lane-build --output-on-failure
+Test project /vedit-build/target/project-lane-build
+    Start 1: vedit-workspace-project-selftest
+1/1 Test #1: vedit-workspace-project-selftest ...   Passed    0.44 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.44 sec
+EXIT=0

@@ -1,0 +1,28 @@
+$ sed -n "20,30p" Cargo.toml
+    "crates/vd-settings",
+    "crates/vd-vcs",
+]
+
+[workspace.package]
+version = "0.1.1"
+edition = "2021"
+rust-version = "1.99"
+publish = false
+
+# One place for the versions every crate shares. Lanes opt in with
+
+$ sed -n "50,56p" packaging/runtime/build-appimage.sh
+[ "$got" = "$want" ] || { echo "ERROR: appimagetool sha256 mismatch: want=$want got=$got" >&2; exit 1; }
+echo "appimagetool sha256 OK ($got)"
+
+VERSION=$(awk -F'"' '/^version = / {print $2; exit}' "$ROOT/Cargo.toml" 2>/dev/null || echo 0.0.0)
+SUFFIX=""
+[ "$PROBE" -eq 1 ] && SUFFIX=".probe"
+OUTFILE="$OUTDIR/VEdit-${VERSION}-x86_64${SUFFIX}.AppImage"
+
+$ grep -n "setApplicationVersion" src/app/main.cpp
+1850:    QCoreApplication::setApplicationName(QStringLiteral("vedit-app"));
+1851:    QCoreApplication::setApplicationVersion(QStringLiteral("0.2.0"));
+
+$ ls packaging/runtime/out/*.AppImage
+packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage

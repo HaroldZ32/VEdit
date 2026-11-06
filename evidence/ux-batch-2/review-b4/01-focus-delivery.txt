@@ -1,0 +1,9 @@
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+focus after A: KateViewInternal A.hasFocus=1 B.hasFocus=0
+--- click inner B ---
+after click: focus=KateViewInternal A.hasFocus=0 B.hasFocus=1
+--- b->setFocus() (what dispatchDefinitionAt does) ---
+after b setFocus: focus=KateViewInternal A.hasFocus=0 B.hasFocus=1

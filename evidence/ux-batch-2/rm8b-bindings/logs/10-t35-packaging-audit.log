@@ -1,0 +1,11 @@
+$ unsquashfs -l packaging/appimage/out/VEdit-0.1.1-x86_64.AppImage | grep -ci "zh_CN\\|translations"
+0
+
+$ unsquashfs -l packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage | grep -i "zh_CN"
+
+$ stat -c "%s %n" ...
+137079288 packaging/runtime/out/VEdit-0.1.1-x86_64.AppImage
+47745528 packaging/appimage/out/VEdit-0.1.1-x86_64.AppImage
+
+$ grep "from host glibc family" evidence/appimage/clean-room.log
+[clean-room] deps resolved from payload: 67; from host glibc family: 8

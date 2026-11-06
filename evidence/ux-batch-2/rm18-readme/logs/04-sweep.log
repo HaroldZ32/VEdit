@@ -1,0 +1,26 @@
+$ grep -rn "vd-app|GTK3|GtkSourceView" README.md docs/*.md
+README.md:16:| 包内入口 | Qt6 版 `vedit-app`（AppDir 内 `bin/vd-app`），`AppRun` 经包内 loader 启动 |
+README.md:60:## 旧版 GTK3 产品线（不是交付物）
+README.md:62:仓库还保留**旧 Rust/GTK3 产品** `vd-app` 的构建与打包：`bash scripts/build.sh` 产出
+README.md:63:`build/artifacts/vd-app`，`packaging/appimage/` 与 `packaging/tarball/` 是它的 AppImage / tar.gz /
+README.md:82:  描述旧 GTK3 产物、§9 描述 Qt6 产品线的语法数据与工具链；范围以该文件为准）。
+docs/ACCEPTANCE-MATRIX.md:209:- 主机 rustup 的 `1.99.0` 工具链目录缺 `cargo`，且主机无 GTK3 dev 文件 → clippy/fmt 改用同版本 `stable`（rustc 1.99.0 b940084d7，与 pin 同一 commit）/ 固定 Rust 镜像 → G4/G5 文件头。
+docs/BUILD.md:4:GtkSourceView 与 slang 的源码构建、三种产物的打包命令，以及可复现性的边界。
+docs/BUILD.md:29:   Rust 1.99.0 + 源码构建的 GtkSourceView 4.6.1 + meson/ninja）；
+docs/BUILD.md:34:产物：`build/artifacts/vd-app`（编辑器主程序）。门禁：`bash scripts/gates.sh`
+docs/BUILD.md:46:| GtkSourceView | URL + sha256 | 4.6.1 / `63f487a7…df874` |
+docs/BUILD.md:68:## 5. GtkSourceView 4.6.1（源码构建）
+docs/BUILD.md:119:bash packaging/appimage/run-evidence.sh   # 旧 Rust/GTK vd-app 的 AppImage
+docs/BUILD.md:120:bash packaging/tarball/build.sh           # 旧 vd-app 的 tar.gz + 自解压 .run
+docs/BUILD.md:125:载荷是 `build/artifacts/vd-app`，不是 `vedit-app`。它们**不是** Qt 交付物：
+docs/BUILD.md:150:  否则不同产物里的 vd-app 不是同一个二进制。打包脚本会**统计并分类**产物中残存的 `/vedit-build` 字符串（目标 0；`--remap-path-prefix`
+docs/BUILD.md:183:1. **随包（bundled）**：把两个二进制放进 `vd-app` 同目录的 `bin/`（AppDir/AppImage
+docs/BUILD.md:207:| `ci.yml` | PR → `dev`/`main`；push → `dev` | `scripts/gates.sh` + `scripts/build.sh`（release build、Xvfb smoke、GLIBC ≤ 2.17 断言），上传 `build/evidence/` 与 `build/artifacts/vd-app` |
+docs/BUILD.md:269:`bash scripts/build.sh` 是旧 Rust/GTK3 产品，只写 `target/release/vd-app`，不产出 `vedit-app`。
+docs/RELEASING.md:9:> 旧 Rust/GTK3 线（`scripts/build.sh`、`packaging/appimage/`、`packaging/tarball/`）仍保留，但**不是发布路径**
+docs/RELEASING.md:56:- `scope`：crate 或区域名，例如 `vd-app`、`vd-syntax`、`packaging`、`build`、`skeleton`
+docs/RELEASING.md:115:> 旧 GTK3 线的 `scripts/build.sh` / `packaging/appimage/run-evidence.sh` / `packaging/tarball/build.sh`
+
+# verdict: README/RELEASING hits are intentional (legacy section / current bin/vd-app entry);
+# BUILD.md 12 hits are its legacy build sections (§1-§6) and the already-correct §7.2 legacylabel;
+# ACCEPTANCE-MATRIX hit is a host "no GTK3 dev files" environment note.

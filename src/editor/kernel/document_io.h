@@ -13,12 +13,17 @@ class Editor;
 
 namespace vedit::editor {
 
-// Replaces the document buffer with the file's UTF-8 content and records the
-// path. The kernel reads the bytes itself instead of KParts::openUrl(): the
-// KParts open path starts a KIO job and can spin (or wait for an event loop)
-// under the headless/offscreen platform this product is verified on, which made
-// `--selfcheck` hang. Reading + setText keeps the open path synchronous and
-// deterministic; the atomic save path is unaffected.
+// Replaces the document buffer with the file's content and records the path.
+// The load goes through KParts::ReadOnlyPart::openUrl() — the documented
+// "load a document" entry — because that leaves the loaded state as the undo
+// FLOOR: a later Ctrl+Z stops at the text the file was opened with.
+// RM-5a: the old read + Document::setText() path recorded the whole load as ONE
+// undoable step, so repeated Ctrl+Z walked the buffer back to EMPTY (the editor
+// area went blank and the undo command greyed out, while the file on disk was
+// intact). Measured on the pinned image: openUrl() is synchronous for a LOCAL
+// file (4-6 ms, offscreen and xcb), sets the right text and leaves
+// modified=false; the earlier "KIO job spins under offscreen" concern did not
+// reproduce for local files. The atomic save path is unaffected.
 bool loadFileIntoDocument(KTextEditor::Document *document, const QString &absolutePath,
                           QString *error = nullptr);
 

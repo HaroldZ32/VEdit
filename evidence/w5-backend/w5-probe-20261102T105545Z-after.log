@@ -1,0 +1,110 @@
+# T11 after the fix: w5-probe rerun (relinked against the rebuilt libvd_ffi.a)
+date: 2026-11-02T18:55:45+08:00
+git_head: 4e2d0a57ca50db9568db5a5b040cc66f04c9a05f
+libvd_ffi: 2c5fc3fb23e5d82ae08e9988abffb4c7724b92b507f439b25d8eaf4f7c3972a6  target/release/libvd_ffi.a
+
+harness rebuilt ok
+batch dump built ok
+TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server]
+TOOLCHAIN-PATHS verible='/vedit-build/.mpd/recon/verible/bin/verible-verilog-ls' slang='/vedit-build/build/slang/out/slang' format='/vedit-build/.mpd/recon/verible/bin/verible-verilog-format' lint='/vedit-build/.mpd/recon/verible/bin/verible-verilog-lint' slang-server='target/tmp/spike/slang-server'
+CHECK binaries.verible-toolchain PASS
+CHECK binaries.slang-server PASS
+CHECK fixture.temp-dir PASS
+CHECK fixture.written PASS
+CHECK switch.a.applied PASS
+CHECK switch.a.cleared-before-restart PASS
+SWITCH-A backend=verible ready=1 ready-ms=452 session='degraded: lsp 1/1 file(s), diagnostics 5' diagnostics=5 outline=0
+SWITCH-A-ARGV 'backend=verible program=/vedit-build/.mpd/recon/verible/bin/verible-verilog-ls'
+CHECK switch.a.ready PASS
+CHECK switch.a.session-names-backend PASS
+CHECK switch.a.diagnostics PASS
+OUTLINE-A symbols=3 names='clean_top' backend='backend=verible · buffer changed (115 bytes): /tmp/w5-probe-yfgKiY/clean.sv'
+CHECK switch.a.outline PASS
+CHECK switch.a.command-line PASS
+CAPABILITIES tag=verible backend=verible basis=live source='live initialize result of verible-verilog-ls in this process' rows=13
+CAP-NOTE tag=verible 'rows reflect the running server; a server version that differs from the measured one may move any row'
+CAP-ROW tag=verible definition supported=1 reason='the running server advertises definitionProvider (live initialize result)'
+CAP-ROW tag=verible references supported=1 reason='the running server advertises referencesProvider (live initialize result)'
+CAP-ROW tag=verible documentSymbol supported=1 reason='the running server advertises documentSymbolProvider (live initialize result)'
+CAP-ROW tag=verible rename supported=1 reason='the running server advertises renameProvider (live initialize result)'
+CAP-ROW tag=verible documentHighlight supported=1 reason='the running server advertises documentHighlightProvider (live initialize result)'
+CAP-ROW tag=verible formatting supported=1 reason='the running server advertises documentFormattingProvider (live initialize result)'
+CAP-ROW tag=verible rangeFormatting supported=1 reason='the running server advertises documentRangeFormattingProvider (live initialize result)'
+CAP-ROW tag=verible codeAction supported=1 reason='the running server advertises codeActionProvider (live initialize result)'
+CAP-ROW tag=verible diagnostics supported=1 reason='the server pushes textDocument/publishDiagnostics for open documents'
+CAP-ROW tag=verible hover supported=0 reason='the running server advertises no hoverProvider (live initialize result)'
+CAP-ROW tag=verible completion supported=0 reason='the running server advertises no completionProvider (live initialize result)'
+CAP-ROW tag=verible signatureHelp supported=0 reason='the running server advertises no signatureHelpProvider (live initialize result)'
+CAP-ROW tag=verible inlayHint supported=0 reason='the running server advertises no inlayHintProvider (live initialize result)'
+CAP-GATE tag=verible definition enabled=1 known=1 source=backend reason=''
+CAP-GATE tag=verible references enabled=1 known=1 source=backend reason=''
+CAP-GATE tag=verible rename enabled=1 known=1 source=backend reason=''
+CAP-GATE tag=verible hover enabled=0 known=1 source=backend reason='the running server advertises no hoverProvider (live initialize result)'
+CAP-GATE tag=verible completion enabled=0 known=1 source=backend reason='the running server advertises no completionProvider (live initialize result)'
+CAP-GATE tag=verible inlayHint enabled=0 known=1 source=backend reason='the running server advertises no inlayHintProvider (live initialize result)'
+CAP-GATE tag=verible codeAction enabled=1 known=1 source=backend reason=''
+CAP-GATE tag=verible formatting enabled=1 known=1 source=always-verible-format reason='formatting always uses verible-verilog-format, independent of the LSP backend'
+CAP-GATE tag=verible signatureHelp enabled=0 known=1 source=editor-synthesised reason='editor-synthesised by the editor (T16); absent until it lands'
+CHECK switch.b.applied PASS
+SWITCH-B cleared-old-rows=1
+CHECK switch.b.old-rows-cleared PASS
+SWITCH-B lastError='' lspMessage='backend=slang · buffer changed (169 bytes): /tmp/w5-probe-yfgKiY/undeclared.sv' state=3
+SWITCH-B backend=slang ready=1 ready-ms=61 diagnostics-ms=271 session='degraded: lsp 1/1 file(s), diagnostics 7' diagnostics=7 outline=4
+SWITCH-B-ARGV 'backend=slang program=/vedit-build/target/tmp/spike/slang-server'
+CHECK switch.b.ready PASS
+CHECK switch.b.ready-within-5s PASS
+CHECK switch.b.diagnostics-within-5s PASS
+CHECK switch.b.session-names-backend PASS
+CHECK switch.b.diagnostics PASS
+OUTLINE-B symbols=3 backend='backend=slang · buffer changed (115 bytes): /tmp/w5-probe-yfgKiY/clean.sv'
+CHECK switch.b.outline PASS
+CHECK switch.b.command-line PASS
+CAPABILITIES tag=slang backend=slang basis=live source='live initialize result of slang-server in this process' rows=13
+CAP-NOTE tag=slang 'rows reflect the running server; a server version that differs from the measured one may move any row'
+CAP-ROW tag=slang definition supported=1 reason='the running server advertises definitionProvider (live initialize result)'
+CAP-ROW tag=slang references supported=1 reason='the running server advertises referencesProvider (live initialize result)'
+CAP-ROW tag=slang documentSymbol supported=1 reason='the running server advertises documentSymbolProvider (live initialize result)'
+CAP-ROW tag=slang rename supported=1 reason='the running server advertises renameProvider (live initialize result)'
+CAP-ROW tag=slang documentHighlight supported=1 reason='the running server advertises documentHighlightProvider (live initialize result)'
+CAP-ROW tag=slang formatting supported=0 reason='the running server advertises no documentFormattingProvider (live initialize result)'
+CAP-ROW tag=slang rangeFormatting supported=0 reason='the running server advertises no documentRangeFormattingProvider (live initialize result)'
+CAP-ROW tag=slang codeAction supported=1 reason='the running server advertises codeActionProvider (live initialize result)'
+CAP-ROW tag=slang diagnostics supported=1 reason='the server pushes textDocument/publishDiagnostics for open documents'
+CAP-ROW tag=slang hover supported=1 reason='the running server advertises hoverProvider (live initialize result)'
+CAP-ROW tag=slang completion supported=1 reason='the running server advertises completionProvider (live initialize result)'
+CAP-ROW tag=slang signatureHelp supported=0 reason='the running server advertises no signatureHelpProvider (live initialize result)'
+CAP-ROW tag=slang inlayHint supported=1 reason='the running server advertises inlayHintProvider (live initialize result)'
+CAP-GATE tag=slang definition enabled=1 known=1 source=backend reason=''
+CAP-GATE tag=slang references enabled=1 known=1 source=backend reason=''
+CAP-GATE tag=slang rename enabled=1 known=1 source=backend reason=''
+CAP-GATE tag=slang hover enabled=1 known=1 source=backend reason=''
+CAP-GATE tag=slang completion enabled=1 known=1 source=backend reason=''
+CAP-GATE tag=slang inlayHint enabled=1 known=1 source=backend reason=''
+CAP-GATE tag=slang codeAction enabled=1 known=1 source=backend reason=''
+CAP-GATE tag=slang formatting enabled=1 known=1 source=always-verible-format reason='formatting always uses verible-verilog-format, independent of the LSP backend'
+CAP-GATE tag=slang signatureHelp enabled=0 known=1 source=editor-synthesised reason='editor-synthesised by the editor (T16); absent until it lands'
+CHECK gate.formatting-enabled-under-slang PASS
+CHECK gate.formatting-source PASS
+CHECK gate.signature-help-editor-synthesised PASS
+CHECK gate.signature-help-not-gated-by-table PASS
+GATE-UNKNOWN enabled=0 known=0 reason='slang is not connected yet - connect to know'
+CHECK gate.unknown-not-claimed PASS
+CHECK gate.unknown-says-connect-to-know PASS
+CHECK switch.c.applied PASS
+CHECK gate.formatting-enabled-under-verible PASS
+CHECK format.under-slang PASS
+CHECK format.matches-verible-cli PASS
+FORMAT backend=slang formatter='/vedit-build/.mpd/recon/verible/bin/verible-verilog-format' output-first-line='module top;'
+CHECK switch.d.applied PASS
+PROJECT-PASS label=verible-lint engine=verible-verilog-lint engine-id=1 started=1 terminal=1 phase=3 done=1/1 tool='verible-verilog-lint' cli-diagnostics=2 message='1/1 文件已扫描 — 2 条 CLI 诊断'
+CHECK pass.verible-lint.terminal PASS
+CHECK pass.verible-lint.diagnostics PASS
+CHECK engine.verible-id PASS actual=1 expected=1
+CHECK switch.e.applied PASS
+PROJECT-PASS label=slang engine=slang engine-id=0 started=1 terminal=1 phase=3 done=1/1 tool='slang' cli-diagnostics=6 message='1/1 文件已扫描 — 6 条 CLI 诊断'
+CHECK pass.slang.terminal PASS
+CHECK pass.slang.diagnostics PASS
+CHECK engine.slang-id PASS actual=0 expected=0
+SUMMARY checks=38 failures=0
+probe-exit=0
+probe-docker-exit=0

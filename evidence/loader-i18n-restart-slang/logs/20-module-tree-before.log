@@ -1,0 +1,63 @@
+mkdir: /lib64/ld-linux-x86-64.so.2: version `GLIBC_2.35' not found (required by /w/packaging/runtime/out/AppDir/lib/libc.so.6)
+== pre-fix module-tree selftest through the AppDir loader (LD_LIBRARY_PATH exported) ==
+qt.multimedia.symbolsresolver: Couldn't load pipewire-0.3 library
+qt.multimedia.symbolsresolver: Couldn't resolve pipewire-0.3 symbols
+Detected locale "C" with character encoding "ANSI_X3.4-1968", which is not UTF-8.
+Qt depends on a UTF-8 locale, but has failed to switch to one.
+If this causes problems, reconfigure your locale. See the locale(1) manual
+for more information.
+ok   tree.single-root — roots=1
+ok   tree.root-label — top
+ok   tree.root-module — top
+ok   tree.root-position-1based — top.sv:3:8
+ok   tree.instance-nesting — top.u0, top.u1, link, clk, rst
+ok   tree.full-instance-path — top.u0
+ok   tree.instance-module — mid
+ok   tree.instance-jump — /proj/top.sv:11:7
+ok   tree.signal-node
+ok   tree.signal-children — children=3
+ok   tree.signal-driver-node — driver: top.u0.q
+ok   jump.conversion
+ok   signal.source — source of top.link: top.u0.q · top.sv:11:38
+ok   signal.target — target of top.link: top.u1.d · top.sv:12:25
+ok   signal.declaration-falls-back-to-driver — source of top.link: top.u0.q · top.sv:11:38
+ok   signal.no-driver-is-honest — top.rst has no driver in the elaborated design
+ok   lookup.single — net top.link
+ok   lookup.ambiguous-reports-choice — 2 nets named 'q'; chose top.u0.q
+ok   lookup.unknown — no net named 'nope' in the elaborated design
+This plugin does not support propagateSizeHints()
+ok   panel.rows-built — rows=19
+ok   panel.summary — slang · 2 file(s) · 3 instance(s) · 6 net(s) · 5 ms · 19592 KiB peak
+root: /proj
+ok   panel.instance-row
+ok   panel.event.row-clickable — rect=40,14 566x14
+ok   panel.event.double-click-instance — delivered=1 /proj/top.sv:11:7
+ok   panel.signal-row
+ok   panel.event.double-click-signal-declaration — delivered=1 /proj/top.sv:11:38
+ok   panel.event.button-source — net top.link · source of top.link: top.u0.q · top.sv:11:38 → top.sv:11:38
+ok   panel.event.button-target — net top.link · target of top.link: top.u1.d · top.sv:12:25 → top.sv:12:25
+ok   panel.event.button-source-cross-file — /proj/mid.sv:10:5
+ok   panel.no-location-row
+ok   panel.event.no-location-double-click — delivered=1 calls=5->5 status=rst has no file:line in the elaborated design
+ok   panel.null-row-safe
+ok   panel.no-driver-status — top.rst has no driver in the elaborated design
+ok   panel.no-cursor-word — put the cursor on a signal name in the editor first
+ok   panel.empty-state — No hierarchy yet: open a project and press Refresh.
+ok   panel.failure-visible — no project root: open a folder
+ok   panel.empty-snapshot — No hierarchy yet: open a project and press Refresh.
+ok   toolchain.appdir-temp
+ok   toolchain.appdir-bin — /tmp/vedit-module-tree-selftest-IuBjeT/bin
+ok   toolchain.appdir-slang — /tmp/vedit-module-tree-selftest-IuBjeT/bin/slang
+ok   toolchain.published-path — /tmp/vedit-module-tree-selftest-IuBjeT/bin/slang
+ok   toolchain.no-source-empty
+ok   toolchain.override-executable — /tmp/vedit-module-tree-selftest-IuBjeT/slang-override
+ok   toolchain.env-override-wins — /tmp/vedit-module-tree-selftest-IuBjeT/slang-override
+ok   real.temp-state
+FAIL real.service-answered — elaboration failed: slang failed: the lint tool exited with code 1 and produced no diagnostics
+ok   packaged.appdir-slang — pre-existing /w/packaging/runtime/out/AppDir/bin/slang
+ok   packaged.temp-state
+FAIL packaged.answered — elaboration failed: slang failed: the lint tool exited with code 1 and produced no diagnostics
+SKIP generate-fixture — fixture='' slang='/w/packaging/runtime/out/AppDir/bin/slang'
+
+49 checks, 2 failure(s)
+SELFTEST_EXIT=1

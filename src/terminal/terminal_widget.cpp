@@ -523,6 +523,24 @@ void TerminalWidget::sendText(const QString &text)
     send(text.toUtf8());
 }
 
+bool TerminalWidget::event(QEvent *event)
+{
+    // UX batch 2 (item 11): F1 is the User Manual's window-level shortcut. This
+    // widget is a raw input surface, so while it has focus F1 must reach the pty
+    // as the VT100 sequence "OP" instead of firing that action. Claiming the
+    // ShortcutOverride makes Qt deliver the key as an ordinary KeyPress, which
+    // keyPressEvent() sends to the child. Only plain F1 is claimed: every other
+    // window shortcut (F6 focus-next, F8 diagnostics, ...) keeps its meaning.
+    if (event->type() == QEvent::ShortcutOverride) {
+        auto *keyEvent = static_cast<QKeyEvent *>(event);
+        if (keyEvent->key() == Qt::Key_F1 && keyEvent->modifiers() == Qt::NoModifier) {
+            keyEvent->accept();
+            return true;
+        }
+    }
+    return QWidget::event(event);
+}
+
 void TerminalWidget::keyPressEvent(QKeyEvent *event)
 {
     const int key = event->key();

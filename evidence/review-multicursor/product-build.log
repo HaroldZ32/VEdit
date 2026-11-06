@@ -1,0 +1,7 @@
+product-build-exit=0
+[138/140] Building CXX object src/app/CMakeFiles/vedit-app.dir/vedit-app_autogen/mocs_compilation.cpp.o
+[139/140] Building CXX object src/app/CMakeFiles/vedit-app.dir/main.cpp.o
+[140/140] Linking CXX executable src/app/vedit-app
+selfcheck-exit=0
+EDIT-CORE-SELFTEST ok=1 checks=67 failures=0
+APP-SHELL-SELFTEST ok=1 checks=245 failures=0 state=/tmp/vedit-app-YCWAKM/state

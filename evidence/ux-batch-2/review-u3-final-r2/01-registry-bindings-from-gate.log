@@ -1,0 +1,34 @@
+# U3 repair r2: registry dump from the FINAL gate selfcheck.log
+2026-11-06T11:55:40+08:00
+CHECK menus.five.registered PASS all five
+CHECK menus.five.order PASS menu-file,menu-edit,menu-view,menu-project,menu-help
+CHECK menus.preferences.in-edit-registry PASS edit-actions=3
+CHECK menus.preferences.only-edit PASS
+CHECK menus.preferences.last-in-edit PASS
+COMMAND-BINDINGS count=23
+COMMAND-BINDING Ctrl+,	settings.preferences
+COMMAND-BINDING Ctrl+Alt+D	view.panel.diagnostics
+COMMAND-BINDING Ctrl+Alt+F	view.panel.file-tree
+COMMAND-BINDING Ctrl+Alt+J	view.panel.terminal
+COMMAND-BINDING Ctrl+Alt+N	file.new-layout
+COMMAND-BINDING Ctrl+Alt+O	view.panel.outline
+COMMAND-BINDING Ctrl+Alt+R	view.layout.reset
+COMMAND-BINDING Ctrl+Alt+S	view.panel.search
+COMMAND-BINDING Ctrl+Alt+V	view.panel.vcs
+COMMAND-BINDING Ctrl+O	file.open
+COMMAND-BINDING Ctrl+P	file.goto-file
+COMMAND-BINDING Ctrl+Q	file.quit
+COMMAND-BINDING Ctrl+S	file.save
+COMMAND-BINDING Ctrl+Shift+F	diagnostics.format
+COMMAND-BINDING Ctrl+Shift+H	view.split.horizontal
+COMMAND-BINDING Ctrl+Shift+S	file.save-as
+COMMAND-BINDING Ctrl+Shift+V	view.split.vertical
+COMMAND-BINDING Ctrl+W	file.close-pane
+COMMAND-BINDING F1	help.user-manual
+COMMAND-BINDING F12	diagnostics.definition
+COMMAND-BINDING F2	diagnostics.rename
+COMMAND-BINDING F6	view.focus.next
+COMMAND-BINDING Shift+F12	diagnostics.references
+CHECK commands.no-duplicate-shortcuts PASS
+EDIT-CORE-SELFTEST ok=1 checks=99 failures=0
+APP-SHELL-SELFTEST ok=1 checks=318 failures=0 state=/tmp/vedit-app-whYkis/state

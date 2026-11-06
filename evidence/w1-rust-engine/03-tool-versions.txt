@@ -1,0 +1,27 @@
+# tool versions measured for the argv/capability claims
+date: 2026-11-02T15:01:39+08:00
+
+$ .mpd/recon/verible/bin/verible-verilog-ls --version
+Verible Verilog Language Server built at v0.0-4298-g085eef05
+commandline: .mpd/recon/verible/bin/verible-verilog-ls --version 
+Version	v0.0-4298-g085eef05
+$ .mpd/recon/verible/bin/verible-verilog-lint --version
+Version	v0.0-4298-g085eef05
+Commit-Timestamp	2026-10-29T12:47:31Z
+Built	2026-10-29T12:52:33Z
+$ build/slang/out/slang --version
+slang version 12.1.0+0
+
+slang include/define flags (slang --help):
+  -I,--include-directory,+incdir <dir-pattern>[,...]              Additional include search paths
+  -D,--define-macro,+define <macro>=<value>                       Define <macro> to <value> (or 1 if
+
+verible-verilog-lint flags (--helpfull, include/define/file-list search):
+      the command line even if the program does not define a flag with that
+$ verible-verilog-lint --file_list_path=/tmp/x.f
+ERROR: Unknown command line flag 'file_list_path'
+
+verible-verilog-ls flags (--helpfull):
+    --rules_config (Path to lint rules configuration file. Disables
+    --rules_config_search (Look for lint rules configuration file
+    --file_list_path (Name of the file with Verible FileList for the project);

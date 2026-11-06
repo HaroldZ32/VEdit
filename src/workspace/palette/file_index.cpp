@@ -1,11 +1,14 @@
 #include "file_index.h"
 
+#include "path_display.h"
+
 #include <QDir>
 #include <QFileInfo>
 #include <QSet>
 
 #include <algorithm>
 #include <utility>
+#include <QCoreApplication>
 
 namespace vedit::workspace {
 namespace {
@@ -29,10 +32,9 @@ WorkspaceFileIndex::WorkspaceFileIndex(QString root)
 
 void WorkspaceFileIndex::setRoot(const QString &root)
 {
-    QString cleaned;
-    if (!root.trimmed().isEmpty()) {
-        cleaned = QDir::cleanPath(QDir(root).absolutePath());
-    }
+    // FIX 1: the ONE root spelling (src/common/path_display.h), so the palette
+    // and the other surfaces render the same relative/absolute decision.
+    const QString cleaned = vedit::paths::normalizedRoot(root);
     if (cleaned == root_) {
         return;
     }
@@ -65,28 +67,23 @@ QString WorkspaceFileIndex::absoluteOf(const QString &path) const
 
 QString WorkspaceFileIndex::relativeOf(const QString &absolute) const
 {
-    if (root_.isEmpty()) {
-        return absolute;
-    }
-    const QString prefix = root_.endsWith(u'/') ? root_ : root_ + u'/';
-    if (absolute.startsWith(prefix)) {
-        return absolute.mid(prefix.size());
-    }
-    return absolute;
+    // FIX 1: the display spelling comes from the ONE rule; outside the root the
+    // entry keeps its absolute path instead of a "../.." spelling.
+    return vedit::paths::displayPath(root_, absolute);
 }
 
 bool WorkspaceFileIndex::scan(QString *error, bool forceRefresh)
 {
     if (root_.isEmpty()) {
         if (error != nullptr) {
-            *error = QStringLiteral("no workspace root configured");
+            *error = QCoreApplication::translate("VEdit", "no workspace root configured");
         }
         return false;
     }
     const QFileInfo rootInfo(root_);
     if (!rootInfo.exists() || !rootInfo.isDir()) {
         if (error != nullptr) {
-            *error = QStringLiteral("workspace root is not a directory: %1").arg(root_);
+            *error = QCoreApplication::translate("VEdit", "workspace root is not a directory: %1").arg(root_);
         }
         return false;
     }

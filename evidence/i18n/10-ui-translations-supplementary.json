@@ -1,0 +1,7 @@
+[
+ {"id":"T023","string":"'%1' is not a folder.","decision":"译","translation":"“%1”不是文件夹。","reason":"already-translated 分类中的英文 UI 串；tr() 已包装，本任务补中文"},
+ {"id":"T034","string":"Assign to selected command","decision":"译","translation":"分配给所选命令","reason":"already-translated 分类；设置页按钮"},
+ {"id":"T114","string":"New File","decision":"译","translation":"新建文件","reason":"already-translated 分类；文件树菜单（术语表 New File=新建文件）"},
+ {"id":"T115","string":"New Folder","decision":"译","translation":"新建文件夹","reason":"already-translated 分类；文件树菜单"},
+ {"id":"T116","string":"New shortcut:","decision":"译","translation":"新快捷键：","reason":"already-translated 分类；设置页标签"}
+]

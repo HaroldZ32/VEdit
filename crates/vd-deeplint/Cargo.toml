@@ -12,5 +12,11 @@ workspace = true
 # SLANG deep lint (T17): serde for --diag-json parsing, tempfile for scratch files.
 anyhow.workspace = true
 serde.workspace = true
-serde_json.workspace = true
+# U9d: `unbounded_depth` exposes `Deserializer::disable_recursion_limit()`, which
+# the module catalog needs for designs nested deeper than serde_json's default
+# 128-value guard (one instance level costs 3 JSON levels, so the guard trips at
+# ~42 instance levels — a NORMAL design depth). The feature is only an API
+# visibility switch: `ast_prune` gates it behind a streaming depth scan and calls
+# it for the catalog's own deserializer only. No crate is added.
+serde_json = { workspace = true, features = ["unbounded_depth"] }
 tempfile.workspace = true

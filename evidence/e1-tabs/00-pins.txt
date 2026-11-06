@@ -1,0 +1,34 @@
+# T12 (tabs-dirty) evidence pins — 文件标签栏 + 未保存显式标记 + 窗口标题/状态栏
+# Cell cell-20261102T050548232Z · task T12 · member lead-shell
+
+## source tree
+HEAD=4e2d0a57ca50db9568db5a5b040cc66f04c9a05f
+dirty_files:
+   M src/app/CMakeLists.txt
+   M src/app/app_shell.cpp
+   M src/app/app_shell.h
+   M src/app/editor_area.cpp
+   M src/app/editor_area.h
+   M src/app/editor_provider.h
+   M src/editor/kernel/diagnostics_annotations.h
+   M src/editor/kernel/ktexteditor_provider.cpp
+   M src/editor/kernel/ktexteditor_provider.h
+
+## build/run environment (evidence produced INSIDE the pinned image)
+image=vedit-qt6-build:local
+os=Ubuntu 26.04.1 LTS (glibc in image)
+qt=6.10.2+dfsg-7
+kf6-texteditor=6.24.0-0ubuntu1
+kf6-syntaxhighlighting: see evidence/e1-tabs/20-product-gates.log
+g++=g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0
+
+## product binary used for the product-level gates
+60d340ae496e7c6e3795d207ea89672f64c9526de93fb453b9f640fe53e597a0  target/qt6-build/src/app/vedit-app
+size=85223320
+
+## commands (all re-runnable; see REPORT.md §6)
+1. bash scripts/build-qt.sh --no-test            (product build, pinned image)
+2. QT_QPA_PLATFORM=offscreen target/qt6-build/src/app/vedit-app --selfcheck --state-dir /tmp/selfcheck-state
+3. ctest --test-dir target/qt6-build
+4. bash evidence/e1-tabs/probe/run.sh            (lane probe: offscreen + Xvfb/xcb)
+5. bash build/gates/typecheck.sh                 (declared project gate; C++ half + clippy half)

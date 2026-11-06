@@ -1,0 +1,4 @@
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+static-open selected='Verilog/SystemVerilog/filelist (*.v *.sv *.svh *.vh *.f *.F)' modelFilters='*.v|*.sv|*.svh|*.vh|*.f|*.F' rows='a.sv,lib.f'
+object-exec selected='Verilog filelists (*.f *.F)' modelFilters='*.f|*.F' rows='lib.f'

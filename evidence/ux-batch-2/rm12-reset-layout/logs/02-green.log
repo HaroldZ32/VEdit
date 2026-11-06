@@ -1,0 +1,58 @@
+CHECK rm12.reset.action-dispatched PASS
+SHAPE view.layout.reset            prompt_calls=1 panes=1 document=intact
+CHECK rm12.reset.prompt-asked PASS prompt calls=1
+CHECK rm12.reset.document PASS pane survived
+CHECK rm12.reset.text-and-modified PASS
+CHECK rm12.new-empty.action-dispatched PASS
+SHAPE file.new-layout              prompt_calls=1 panes=1 document=intact
+CHECK rm12.new-empty.prompt-asked PASS prompt calls=1
+CHECK rm12.new-empty.document PASS pane survived
+CHECK rm12.new-empty.text-and-modified PASS
+CHECK rm12.mixed.action-dispatched PASS
+SHAPE view.layout.mixed            prompt_calls=1 panes=1 document=intact
+CHECK rm12.mixed.prompt-asked PASS prompt calls=1
+CHECK rm12.mixed.document PASS pane survived
+CHECK rm12.mixed.text-and-modified PASS
+CHECK rm12.one-prompt.two-panes PASS
+CHECK rm12.one-prompt.editor PASS
+CHECK rm12.one-prompt.editor PASS
+SHAPE view.layout.reset(2 dirty) prompt_calls=1 prompt_docs=2 panes=2
+CHECK rm12.one-prompt.single-call PASS calls=1
+CHECK rm12.one-prompt.lists-both PASS docs=2
+CHECK rm12.one-prompt.documents-kept PASS
+SHAPE view.layout.reset(discard) prompt_calls=1 panes_before=1 panes_after=1
+CHECK rm12.discard.prompt-asked PASS calls=1
+CHECK rm12.discard.layout-reset PASS
+CHECK rm12.discard.no-dirty-left PASS
+CHECK rm12.clean.two-panes PASS
+SHAPE view.layout.reset(clean) prompt_calls=0 panes_after=1
+CHECK rm12.clean.reset-no-prompt PASS calls=0
+CHECK rm12.clean.reset-works PASS
+SHAPE file.new-layout(clean) prompt_calls=0 panes_after=1
+CHECK rm12.clean.new-empty-no-prompt PASS calls=0
+CHECK rm12.clean.new-empty-works PASS
+CHECK rm12.save.temp-dir PASS
+CHECK rm12.save.seed-file PASS
+CHECK rm12.save.open PASS
+CHECK rm12.save.editor PASS
+CHECK rm12.save.dirty PASS
+SHAPE view.layout.reset(save) prompt_calls=1 panes_after=1
+CHECK rm12.save.prompt-asked PASS calls=1
+CHECK rm12.save.file-written PASS // rm12 saved edit
+CHECK rm12.save.layout-reset PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+CHECK rm12.real-editor.view PASS
+CHECK rm12.real-editor.dirty PASS
+SHAPE view.layout.reset(ktexteditor) prompt_calls=1 document=same-object
+CHECK rm12.real-editor.prompt-asked PASS calls=1
+CHECK rm12.real-editor.document-survives PASS text intact: // rm12 ktexteditor
+[app-shell] close refused (headless): untitled has unsaved changes
+SHAPE file.close-pane(dirty) panes=1
+CHECK rm12.close-pane.document-kept PASS
+SHAPE file.quit(dirty) prompt_calls=1
+CHECK rm12.quit.action-dispatched PASS
+CHECK rm12.quit.prompt-asked PASS calls=1
+CHECK rm12.quit.document-kept PASS
+SHAPE file.quit(clean) prompt_calls=0
+CHECK rm12.quit.clean-no-prompt PASS calls=0
+RM12-RESET-LAYOUT-SELFTEST failures=0

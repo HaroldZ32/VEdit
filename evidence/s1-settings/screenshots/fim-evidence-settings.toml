@@ -1,0 +1,7 @@
+"fim.enabled" = "true"
+"fim.endpoint" = "http://127.0.0.1:8080"
+"fim.ghost_text" = "true"
+"fim.max_tokens" = "128"
+"fim.model" = "qwen"
+"fim.protocol" = "llama_cpp"
+"fim.timeout_ms" = "2500"

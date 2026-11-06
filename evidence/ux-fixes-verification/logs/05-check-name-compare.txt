@@ -1,0 +1,14 @@
+== check-name sets: writer evidence vs my independent run ==
+app: writer=312 mine=312 diff-lines=0
+project: writer=150 mine=150 diff-lines=0
+palette: writer=46 mine=46 diff-lines=0
+search: writer=112 mine=112 diff-lines=0
+module-tree: writer=61 mine=61 diff-lines=0
+
+== summaries ==
+APP-SHELL-SELFTEST ok=1 checks=312 failures=0 state=/tmp/vedit-app-uVUYXq/state
+PROJECT-MODEL-SELFTEST ok=1 checks=150 failures=0
+PALETTE-SELFTEST ok=1 checks=46 failures=0
+WORKSPACE-SEARCH-SELFTEST ok=1 checks=106 failures=0 skipped=2
+61 checks, 0 failure(s)
+TEST_EXIT=0

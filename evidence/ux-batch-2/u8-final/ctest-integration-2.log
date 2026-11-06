@@ -1,0 +1,60 @@
+      Start 31: vedit-breadcrumb-click-tests
+31/58 Test #31: vedit-breadcrumb-click-tests ...................   Passed    0.08 sec
+      Start 32: vedit-jump-tests
+32/58 Test #32: vedit-jump-tests ...............................   Passed    0.01 sec
+      Start 33: vedit-fim-selftest
+33/58 Test #33: vedit-fim-selftest .............................   Passed    0.11 sec
+      Start 34: vedit-workspace-palette-selftest
+34/58 Test #34: vedit-workspace-palette-selftest ...............   Passed    0.18 sec
+      Start 35: vedit-workspace-palette-integration-selftest
+35/58 Test #35: vedit-workspace-palette-integration-selftest ...   Passed    0.25 sec
+      Start 36: vedit-workspace-search-selftest
+36/58 Test #36: vedit-workspace-search-selftest ................   Passed   12.35 sec
+      Start 37: vedit-search-replace-tests
+37/58 Test #37: vedit-search-replace-tests .....................   Passed    5.83 sec
+      Start 38: vedit-project-variables-e2e
+38/58 Test #38: vedit-project-variables-e2e ....................   Passed    0.17 sec
+      Start 39: vedit-workspace-project-selftest
+39/58 Test #39: vedit-workspace-project-selftest ...............   Passed    0.55 sec
+      Start 40: vedit-module-tree-selftest
+40/58 Test #40: vedit-module-tree-selftest .....................   Passed    0.05 sec
+      Start 41: vedit-module-tree-catalog-test
+41/58 Test #41: vedit-module-tree-catalog-test .................   Passed    3.76 sec
+      Start 42: vedit-lint-orchestration-probe
+42/58 Test #42: vedit-lint-orchestration-probe .................   Passed    0.02 sec
+      Start 43: vedit-workspace-diagnostics-selftest
+43/58 Test #43: vedit-workspace-diagnostics-selftest ...........   Passed    1.82 sec
+      Start 44: vedit-verdict-retention-selftest
+44/58 Test #44: vedit-verdict-retention-selftest ...............   Passed    0.00 sec
+      Start 45: vedit-toolchain-missing-selftest
+45/58 Test #45: vedit-toolchain-missing-selftest ...............   Passed    0.00 sec
+      Start 46: vedit-diagnostics-ffi-selftest
+46/58 Test #46: vedit-diagnostics-ffi-selftest .................   Passed    3.24 sec
+      Start 47: vedit-diagnostics-product-seam
+47/58 Test #47: vedit-diagnostics-product-seam .................   Passed    6.23 sec
+      Start 48: vedit-lint-experience-selftest
+48/58 Test #48: vedit-lint-experience-selftest .................   Passed    0.50 sec
+      Start 49: vedit-rename-e2e
+49/58 Test #49: vedit-rename-e2e ...............................   Passed    1.17 sec
+      Start 50: vedit-project-lint-e2e
+50/58 Test #50: vedit-project-lint-e2e .........................   Passed    2.30 sec
+      Start 51: vedit-b3-wiring-e2e
+51/58 Test #51: vedit-b3-wiring-e2e ............................   Passed    6.10 sec
+      Start 52: vedit-rm2-project-switch-e2e
+52/58 Test #52: vedit-rm2-project-switch-e2e ...................   Passed    1.49 sec
+      Start 53: vedit-rm9-status-dots-e2e
+53/58 Test #53: vedit-rm9-status-dots-e2e ......................   Passed    0.72 sec
+      Start 54: vedit-b3-repair-api-selftest
+54/58 Test #54: vedit-b3-repair-api-selftest ...................   Passed    0.04 sec
+      Start 55: vedit-toolchain-ux-selftest
+55/58 Test #55: vedit-toolchain-ux-selftest ....................   Passed    3.12 sec
+      Start 56: vedit-workspace-vcs-selftest
+56/58 Test #56: vedit-workspace-vcs-selftest ...................   Passed   15.14 sec
+      Start 57: vedit-workspace-settings-selftest
+57/58 Test #57: vedit-workspace-settings-selftest ..............   Passed    1.32 sec
+      Start 58: vedit-ui-scale-restart
+58/58 Test #58: vedit-ui-scale-restart .........................   Passed    0.32 sec
+
+100% tests passed, 0 tests failed out of 58
+
+Total Test time (real) =  79.53 sec

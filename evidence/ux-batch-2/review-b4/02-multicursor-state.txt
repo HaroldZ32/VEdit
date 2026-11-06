@@ -1,0 +1,6 @@
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+plain click on inner: count=1 positions: 2:2
+ACTION action=definition dispatched=1 via='diagnostics.definition'
+ctrl click on inner: count=3 positions: 1:0 1:0 2:0

@@ -1,0 +1,14 @@
+=== lint pass, 1k files, slang 12.1.0, tick 10ms ===
+START files=1000 phase=1 tool=slang message=«queued: 1000 file(s)»
+RESULT files=1000 ticks=559 wall_ms=5636 worst_tick_ms=0 phase=3 done=1000 total=1000 percent=100 monotonic=1 progress_samples=559 cli_diagnostics=0 overscale_warn=0 message=«1000/1000 文件已扫描 — 0 条 CLI 诊断»
+CHECK ui.tick-under-100ms PASS
+CHECK progress.monotonic PASS
+CHECK pass.finished PASS
+CHECK progress.reached-total PASS
+CHECK progress.samples PASS
+FINAL cli_diagnostics=0 message=«1000/1000 文件已扫描 — 0 条 CLI 诊断»
+LINT-SCALE-HARNESS ok=1 checks=5 failures=0
+MEASURE exit=0 wall_s=5.642 peak_rss_mib=16.4
+=== one slang child (per-file peak RSS, informational) ===
+Build succeeded: 0 errors, 0 warnings
+MEASURE exit=0 wall_s=0.005 peak_rss_mib=15.9

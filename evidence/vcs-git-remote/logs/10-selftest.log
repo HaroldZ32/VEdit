@@ -1,0 +1,385 @@
+# lane selftest (batch 4a: git remote sync, refs, credentials)
+collected_at: 2026-11-03T17:13:17+00:00
+cwd=/tmp
+binary=/vedit-build/target/qt6-build/src/app/workspace-lane-vcs/vedit-workspace-vcs-selftest
+binary_sha256=cce1c9dfd3c71ea92c32c521fc8bddd17c901354acaa9465c33b028eff54dbc3
+git=git version 2.53.0
+image=<unknown>
+
+fixture_cwd=/tmp/vedit-vcs-4a-GIm57i
+WORKSPACE-VCS-SELFTEST start
+CHECK vcs.panel.empty-state.backend-none PASS No repository
+CHECK vcs.panel.empty-state.header PASS No repository
+CHECK vcs.panel.empty-state.note-visible PASS not a Git or Subversion working tree
+
+Open a directory that is a Git or Subversi
+CHECK vcs.panel.empty-state.no-files PASS
+CHECK vcs.panel.empty-state.stub-queried PASS calls=1
+CHECK vcs.panel.empty-state.no-write-attempt PASS
+CHECK vcs.panel.git.backend PASS Git feature/vcs-panel → origin/feature/vcs-panel @ abc1234 · 2 changed file(s)
+CHECK vcs.panel.git.branch-and-revision PASS Git feature/vcs-panel → origin/feature/vcs-panel @ abc1234 · 2 changed file(s)
+CHECK vcs.panel.git.changed-file-count PASS rows=2
+CHECK vcs.panel.git.file-row PASS rtl/top.sv  modified
+CHECK vcs.panel.git.added-row PASS rtl/added.sv  added
+CHECK vcs.panel.git.empty-state-hidden PASS
+CHECK vcs.panel.diff.shown PASS diff --git a/rtl/top.sv b/rtl/top.sv
+--- a/rtl/top.sv
++++ b/rtl/top.sv
+@@ -1 +1 @@
+-module
+CHECK vcs.panel.diff.read-only PASS
+CHECK vcs.panel.diff.missing-is-a-note PASS rtl/missing.sv: stub has no diff for this path
+CHECK vcs.panel.diff.no-write-attempt PASS calls=4
+CHECK vcs.panel.svn.backend-and-revision PASS Subversion trunk @ 42 · 1 changed file(s)
+CHECK vcs.panel.svn.file-count PASS Subversion trunk @ 42 · 1 changed file(s)
+CHECK vcs.panel.no-source.empty-state PASS No repository
+CHECK vcs.panel.refresh.empty-stays-empty PASS
+CHECK vcs.panel.refresh.populates PASS
+CHECK vcs.ffi.service PASS
+CHECK vcs.ffi.info.start PASS
+CHECK vcs.ffi.info-empty-state PASS not a Git or Subversion working tree
+CHECK vcs.ffi.diff.start PASS
+CHECK vcs.ffi.diff-empty-state PASS not a repository
+CHECK vcs.ffi.invalid-root-rejected PASS
+CHECK vcs.ffi.write.unknown-op-refused PASS
+CHECK vcs.ffi.write.unknown-op-typed-error PASS
+CHECK vcs.ffi.write.null-request-refused PASS
+CHECK vcs.ffi.write.temp-dir PASS
+CHECK vcs.ffi.write.listed-op-starts-a-job PASS
+CHECK vcs.ffi.write.norepo-default-deny PASS
+CHECK vcs.ffi.write.norepo-typed-error PASS
+CHECK vcs.ffi.write.poll-null-out-misuse PASS
+CHECK vcs.ffi.write.free-null-safe PASS
+CHECK vcs.read.compat.git-available PASS /usr/bin/git
+CHECK vcs.read.compat.fixture PASS
+CHECK vcs.read.compat.fixture-committed PASS
+CHECK vcs.read.compat.second-repo PASS
+CHECK vcs.read.compat.service PASS
+CHECK vcs.read.compat.status PASS state=1 branch=master count=1 path=rtl/a.sv
+CHECK vcs.read.compat.cwd-isolation PASS state=1 count=1 path=rtl/b.sv
+CHECK vcs.read.compat.info PASS 4a90398
+CHECK vcs.read.compat.diff PASS diff --git a/rtl/a.sv b/rtl/a.sv
+index 0fb97fc..a0e8734 1006
+CHECK vcs.read.compat.no-write-executed PASS head_same=1 porcelain_same=1
+CHECK vcs.nonblocking.temp-dir PASS
+CHECK vcs.nonblocking.fake-git PASS
+CHECK vcs.nonblocking.start-returns-fast PASS start took 0 ms while the fake git sleeps 400 ms
+CHECK vcs.nonblocking.event-loop-ticks PASS ticks=12
+CHECK vcs.nonblocking.job-still-pending PASS polls=24
+CHECK vcs.nonblocking.result-delivered PASS git repository has no commit yet
+CHECK vcs.write.service PASS
+CHECK vcs.write.start-returns-fast PASS start took 0 ms while the fake git sleeps 400 ms
+CHECK vcs.write.whitelisted-op-runs PASS polls=236 state=0
+CHECK vcs.write.event-loop-ticks PASS ticks=12
+CHECK vcs.write.result-delivered PASS fatal: not a git repository (or any of the parent directorie
+CHECK vcs.nonblocking.metric-detects-block PASS timer fired at 300 ms after scheduling (expected late)
+CHECK vcs.layout.splitter PASS
+CHECK vcs-column-refs PASS
+CHECK vcs-column-changes PASS
+CHECK vcs-column-diff PASS
+CHECK vcs.layout.refs-column PASS Branches | main | * feature/vcs-panel | Tags | v1.0 | Remote branches | origin/main | Remotes | origin  https://example.com/vedit.git
+CHECK vcs.layout.changes-and-staged-columns PASS changes=2 staged=0
+CHECK vcs.layout.changes-list PASS changes=2 staged=0
+CHECK vcs.layout.action-bar PASS vcs-action-refresh,vcs-action-stage,vcs-action-unstage,vcs-action-discard,vcs-action-commit,vcs-action-fetch,vcs-action-pull,vcs-action-push,vcs-action-branch,vcs-action-tag,vcs-action-remote
+CHECK vcs.layout.action-bar-gated PASS actions are gated on a selection
+CHECK vcs.seam.write-op-codes PASS stage=1 fetch=5 push=7 remote-add=20 set-upstream=23
+CHECK vcs.state.ready PASS Git feature/vcs-panel → origin/feature/vcs-panel @ abc1234 · 2 changed file(s)
+CHECK vcs.state.empty PASS not a repository
+
+Open a directory that is a Git or Subversi
+CHECK vcs.state.error PASS The VCS backend failed: git: fatal: not a repository
+CHECK vcs.state.loading PASS Loading…
+CHECK vcs.state.loading-clears PASS changes=2
+CHECK vcs.write.discard-confirm-declines PASS
+CHECK vcs.write.discard-confirm-zero-write PASS writes=0
+CHECK vcs.write.discard-requested PASS
+CHECK vcs.write.discard-op-and-path PASS writes=1 op=3
+CHECK vcs.write.discard-reported PASS Discarded the working-tree changes of rtl/top.sv
+CHECK vcs.write.stage-requested PASS
+CHECK vcs.write.stage-op PASS
+CHECK vcs.write.stage-moves-the-row PASS changes=1 staged=1
+CHECK vcs.write.unstage-requested PASS
+CHECK vcs.write.unstage-op PASS
+CHECK vcs.write.unstage-restores-the-row PASS changes=2 staged=0
+CHECK vcs.write.commit-requires-a-message PASS
+CHECK vcs.write.commit-empty-is-zero-write PASS writes=3
+CHECK vcs.write.commit-requested PASS
+CHECK vcs.write.commit-carries-message-author PASS
+CHECK vcs.write.amend-confirm-declines PASS
+CHECK vcs.write.amend-confirm-zero-write PASS writes=4
+CHECK vcs.write.amend-requested PASS
+CHECK vcs.write.amend-op-and-flag PASS writes=5
+CHECK vcs.write.failure-is-reported PASS
+CHECK vcs.write.failure-reason-visible PASS The VCS operation failed: fatal: pathspec 'rtl/top.sv' did not match any files
+CHECK vcs.refs.sections PASS Branches | main | * feature/vcs-panel | Tags | v1.0 | Remote branches | origin/main | Remotes | origin  https://example.com/vedit.git
+CHECK vcs.refs.current-branch-marked PASS Branches | main | * feature/vcs-panel | Tags | v1.0 | Remote branches | origin/main | Remotes | origin  https://example.com/vedit.git
+CHECK vcs.refs.tag-listed PASS Branches | main | * feature/vcs-panel | Tags | v1.0 | Remote branches | origin/main | Remotes | origin  https://example.com/vedit.git
+CHECK vcs.refs.remote-branch-listed PASS Branches | main | * feature/vcs-panel | Tags | v1.0 | Remote branches | origin/main | Remotes | origin  https://example.com/vedit.git
+CHECK vcs.refs.remote-url-listed PASS Branches | main | * feature/vcs-panel | Tags | v1.0 | Remote branches | origin/main | Remotes | origin  https://example.com/vedit.git
+CHECK vcs.refs.upstream-in-header PASS Git feature/vcs-panel → origin/feature/vcs-panel @ abc1234 · 2 changed file(s)
+CHECK vcs.refs.row-count PASS rows=5
+CHECK vcs.refs.kind-codes PASS branch=1 tag=2 remote=3
+CHECK vcs.seam.network-op-set PASS
+CHECK vcs.seam.irreversible-branch-tag PASS
+CHECK vcs.op.fetch-requested PASS
+CHECK vcs.op.fetch-request PASS op=5 target=origin
+CHECK vcs.op.pull-requested PASS
+CHECK vcs.op.pull-uses-the-configured-upstream PASS op=6 name= target=
+CHECK vcs.op.push-requested PASS
+CHECK vcs.op.push-request PASS op=7 target=origin name=feature/vcs-panel up=0
+CHECK vcs.op.push-first-publishes PASS
+CHECK vcs.op.push-first-sets-upstream PASS up=1 target=origin
+CHECK vcs.op.push-no-remote-refused PASS
+CHECK vcs.op.push-no-remote-zero-write PASS writes=4
+CHECK vcs.op.branch-create-requested PASS
+CHECK vcs.op.branch-create-request PASS name=feature/new start=main
+CHECK vcs.op.branch-create-switch-requested PASS
+CHECK vcs.op.branch-create-switch-is-a-chain PASS writes=7 last-op=9
+CHECK vcs.op.branch-switch-requested PASS
+CHECK vcs.op.branch-switch-request PASS main
+CHECK vcs.op.branch-rename-requested PASS
+CHECK vcs.op.branch-rename-request PASS old-name -> new-name
+CHECK vcs.op.branch-delete-declined PASS
+CHECK vcs.op.branch-delete-declined-zero-write PASS writes=9
+CHECK vcs.op.branch-delete-requested PASS
+CHECK vcs.op.branch-delete-request PASS main
+CHECK vcs.op.tag-create-requested PASS
+CHECK vcs.op.tag-create-request PASS name=v2.0 target=abc1234
+CHECK vcs.op.tag-delete-declined PASS
+CHECK vcs.op.tag-delete-declined-zero-write PASS writes=11
+CHECK vcs.op.tag-delete-requested PASS
+CHECK vcs.op.tag-delete-request PASS v1.0
+CHECK vcs.op.checkout-requested PASS
+CHECK vcs.op.checkout-request PASS v1.0
+CHECK vcs.op.remote-add-requested PASS
+CHECK vcs.op.remote-add-request PASS name=upstream url=https://example.com/upstream.git
+CHECK vcs.op.remote-set-url-requested PASS
+CHECK vcs.op.remote-set-url-request PASS https://example.com/moved.git
+CHECK vcs.op.set-upstream-requested PASS
+CHECK vcs.op.set-upstream-request PASS name=feature/vcs-panel target=origin/feature/vcs-panel
+CHECK vcs.op.remote-remove-declined PASS
+CHECK vcs.op.remote-remove-declined-zero-write PASS writes=16
+CHECK vcs.op.remote-remove-requested PASS
+CHECK vcs.op.remote-remove-request PASS upstream
+CHECK vcs.op.branch-create-empty-refused PASS
+CHECK vcs.op.tag-create-empty-refused PASS
+CHECK vcs.op.remote-add-empty-refused PASS
+CHECK vcs.op.invalid-args-zero-write PASS writes=17
+CHECK vcs.cred.prompt-is-sanitized PASS The push operation needs credentials for https://example.com/vedit.git. They are kept in memory for this operation only and are never written to disk.
+CHECK vcs.cred.push-issued PASS
+CHECK vcs.cred.prompted-once PASS prompts=1
+CHECK vcs.cred.retried-with-credentials PASS writes=19 user=alice
+CHECK vcs.cred.secret-never-rendered PASS The VCS operation failed: fatal: could not read Username for 'https://example.com': terminal prompts disabled
+CHECK vcs.cred.retry-only-once PASS writes=19 prompts=1
+CHECK vcs.cred.cancel-push-issued PASS
+CHECK vcs.cred.cancel-no-retry PASS writes=20
+CHECK vcs.cred.cancel-reports-real-reason PASS The VCS operation failed: fatal: could not read Username for 'https://example.com': terminal prompts disabled
+CHECK vcs.cred.cancel-says-aborted PASS Authentication cancelled; the operation was aborted and nothing was written.
+CHECK vcs.cred.non-auth-failure-issued PASS
+CHECK vcs.cred.non-auth-failure-no-prompt PASS prompts=2
+CHECK vcs.cred.classifier PASS
+CHECK vcs.write.e2e.git PASS /usr/bin/git
+CHECK vcs.write.e2e.fixture PASS /tmp/vedit-workspace-vcs-selftest-UfUnHV/write-repo
+CHECK vcs.write.e2e.not-worktree PASS fixture=/tmp/vedit-workspace-vcs-selftest-UfUnHV/write-repo cwd=/tmp/vedit-vcs-4a-GIm57i
+CHECK vcs.write.e2e.status-first PASS files=1
+CHECK vcs.write.e2e.stage-requested PASS
+CHECK vcs.write.e2e.stage-ok PASS Staged rtl/a.sv
+CHECK vcs.write.e2e.staged-porcelain PASS M  rtl/a.sv
+CHECK vcs.write.e2e.staged-column PASS staged=1
+CHECK vcs.write.e2e.unstage-requested PASS
+CHECK vcs.write.e2e.unstage-ok PASS
+CHECK vcs.write.e2e.unstaged-porcelain PASS M rtl/a.sv
+CHECK vcs.write.e2e.discard-cancel PASS
+CHECK vcs.write.e2e.discard-cancel-zero-write PASS M rtl/a.sv
+CHECK vcs.write.e2e.discard-requested PASS
+CHECK vcs.write.e2e.discard-ok PASS Discarded the working-tree changes of rtl/a.sv
+CHECK vcs.write.e2e.discarded-porcelain PASS
+CHECK vcs.write.e2e.stage-new PASS
+CHECK vcs.write.e2e.stage-new-ok PASS Staged rtl/new.sv
+CHECK vcs.write.e2e.commit-requested PASS
+CHECK vcs.write.e2e.commit-ok PASS Commit written.
+CHECK vcs.write.e2e.commit-subject PASS fixture: add new.sv
+CHECK vcs.write.e2e.commit-author PASS VEdit Test <test@vedit.local>
+CHECK vcs.write.e2e.amend-requested PASS
+CHECK vcs.write.e2e.amend-ok PASS Commit written.
+CHECK vcs.write.e2e.amend-subject PASS fixture: add new.sv (amended)
+CHECK vcs.write.e2e.amend-rewrote-one-commit PASS 2 -> 2
+CHECK vcs.remote.e2e.git PASS /usr/bin/git
+CHECK vcs.remote.e2e.fixture PASS /tmp/vedit-workspace-vcs-selftest-brYDqD
+CHECK vcs.remote.e2e.not-worktree PASS fixture=/tmp/vedit-workspace-vcs-selftest-brYDqD/work cwd=/tmp/vedit-vcs-4a-GIm57i
+CHECK vcs.remote.e2e.info-ready PASS refs=1
+CHECK vcs.remote.e2e.remote-add-requested PASS
+CHECK vcs.remote.e2e.remote-add-reported PASS
+CHECK vcs.remote.e2e.remote-add-reported PASS
+CHECK vcs.remote.e2e.remote-reported PASS origin	/tmp/vedit-workspace-vcs-selftest-brYDqD/origin.git (fetch)
+origin	/tmp/vedit-workspace-vcs-selftest-brYDqD/origin.git (push)
+CHECK vcs.remote.e2e.branch-known PASS master
+CHECK vcs.remote.e2e.push-requested PASS
+CHECK vcs.remote.e2e.push-ok PASS
+CHECK vcs.remote.e2e.push-landed-in-bare PASS fixture base
+CHECK vcs.remote.e2e.upstream-established PASS origin/master
+CHECK vcs.remote.e2e.push2-ok PASS
+CHECK vcs.remote.e2e.push2-landed PASS  | second commit
+fixture base
+CHECK vcs.remote.e2e.clone PASS /tmp/vedit-workspace-vcs-selftest-brYDqD/work2
+CHECK vcs.remote.e2e.pull-ok PASS
+CHECK vcs.remote.e2e.pull-moved-worktree PASS work=1636f64638e5b827b345ec687717b60d81c0b73f work2=1636f64638e5b827b345ec687717b60d81c0b73f
+CHECK vcs.remote.e2e.pull-file-content PASS file updated
+CHECK vcs.remote.e2e.fetch-ok PASS
+CHECK vcs.remote.e2e.fetch-updated-tracking PASS tracking=2f4cec08c9380c91e70f88cd6d6e34dd42d3e0f3 work2=2f4cec08c9380c91e70f88cd6d6e34dd42d3e0f3
+CHECK vcs.remote.e2e.fetch-left-worktree PASS 1636f64638e5b827b345ec687717b60d81c0b73f
+CHECK vcs.remote.e2e.pull-diverged-fails PASS
+CHECK vcs.remote.e2e.pull-diverged-reason PASS The VCS operation failed: From /tmp/vedit-workspace-vcs-selftest-brYDqD/origin
+CHECK vcs.remote.e2e.recovery-requested PASS
+CHECK vcs.remote.e2e.recovered-after-failure PASS The VCS operation failed: From /tmp/vedit-workspace-vcs-selftest-brYDqD/origin
+CHECK vcs.remote.e2e.branch-create-ok PASS
+CHECK vcs.remote.e2e.branch-created PASS feature/e2e,master
+CHECK vcs.remote.e2e.branch-switched PASS
+CHECK vcs.remote.e2e.branch-switched PASS feature/e2e
+CHECK vcs.remote.e2e.branch-rename-ok PASS
+CHECK vcs.remote.e2e.branch-renamed PASS feature/renamed,master
+CHECK vcs.remote.e2e.branch-switch-back PASS
+CHECK vcs.remote.e2e.branch-delete-declined PASS
+CHECK vcs.remote.e2e.branch-still-present PASS feature/renamed,master
+CHECK vcs.remote.e2e.branch-delete-requested PASS
+CHECK vcs.remote.e2e.branch-deleted PASS master
+CHECK vcs.remote.e2e.tag-create-ok PASS
+CHECK vcs.remote.e2e.tag-created PASS v-e2e
+CHECK vcs.remote.e2e.tag-delete-declined PASS
+CHECK vcs.remote.e2e.tag-still-present PASS v-e2e
+CHECK vcs.remote.e2e.tag-delete-requested PASS
+CHECK vcs.remote.e2e.tag-deleted PASS
+CHECK vcs.remote.e2e.detached-tag-created PASS
+CHECK vcs.remote.e2e.checkout-detached PASS
+CHECK vcs.remote.e2e.checkout-detached-head PASS HEAD
+CHECK vcs.remote.e2e.checkout-back PASS
+CHECK vcs.remote.e2e.refs-match-for-each-ref PASS panel=master|v-detached git=master|v-detached
+CHECK vcs.remote.e2e.current-ref-flagged PASS master
+CHECK vcs.remote.e2e.remote-set-url-ok PASS
+CHECK vcs.remote.e2e.remote-url-changed PASS /tmp/vedit-workspace-vcs-selftest-brYDqD/other-origin.git
+CHECK vcs.remote.e2e.remote-set-url-back PASS
+CHECK vcs.remote.e2e.unreachable-set-url PASS
+CHECK vcs.remote.e2e.unreachable-fetch-issued PASS
+CHECK vcs.remote.e2e.unreachable-fails PASS The VCS operation failed: fatal: '/tmp/vedit-workspace-vcs-selftest-brYDqD/missing-origin.git' does not appear to be a git repository
+CHECK vcs.remote.e2e.unreachable-recovered PASS
+CHECK vcs.remote.e2e.unreachable-recovered-fetch PASS The VCS operation failed: fatal: '/tmp/vedit-workspace-vcs-selftest-brYDqD/missing-origin.git' does not appear to be a git repository
+CHECK vcs.remote.e2e.upstream-set-ok PASS
+CHECK vcs.remote.e2e.upstream-set PASS origin/master
+CHECK vcs.remote.e2e.remote-remove-declined PASS
+CHECK vcs.remote.e2e.remote-still-configured PASS origin
+CHECK vcs.remote.e2e.remote-remove-requested PASS
+CHECK vcs.remote.e2e.remote-removed PASS
+CHECK vcs.cred.e2e.server PASS port=43005
+CHECK vcs.cred.e2e.remote-add-ok PASS
+CHECK vcs.cred.e2e.remote-read PASS remotes=1
+CHECK vcs.cred.e2e.push-requested PASS
+CHECK vcs.cred.e2e.prompt-content PASS The push operation needs credentials for http://127.0.0.1:43005/repo.git. They are kept in memory for this operation only and are never written to disk.
+CHECK vcs.cred.e2e.prompted PASS prompts=1
+CHECK vcs.cred.e2e.transport-received-credentials PASS authorized=1 requests=3
+CHECK vcs.cred.e2e.op-fails-honestly PASS The VCS operation failed: fatal: Authentication failed for 'http://127.0.0.1:43005/repo.git/'
+CHECK vcs.cred.e2e.secret-not-in-ui PASS The VCS operation failed: fatal: Authentication failed for 'http://127.0.0.1:43005/repo.git/'
+CHECK vcs.cred.e2e.secret-not-in-argv PASS lines=2
+CHECK vcs.cred.e2e.helper-not-in-argv-value PASS the retry configured the helper without carrying the secret
+CHECK vcs.cred.e2e.cancel-push-requested PASS
+CHECK vcs.cred.e2e.cancel-prompted-once PASS prompts=1
+CHECK vcs.cred.e2e.cancel-no-authorization PASS authorized=1 push-lines=1
+CHECK vcs.cred.e2e.cancel-real-reason PASS The VCS operation failed: fatal: could not read Username for 'http://127.0.0.1:43005': terminal prompts disabled
+CHECK vcs.cred.e2e.cancel-says-aborted PASS Authentication cancelled; the operation was aborted and nothing was written.
+CHECK vcs.cred.e2e.modal-fixture PASS /tmp/vedit-workspace-vcs-selftest-brYDqD/creds2
+CHECK vcs.cred.e2e.modal-push-requested PASS
+This plugin does not support propagateSizeHints()
+CHECK vcs.cred.e2e.modal-dialog-opened PASS driven=1 ticks=1
+CHECK vcs.cred.e2e.modal-exactly-one-authorization PASS authorized 1 -> 2
+CHECK vcs.cred.e2e.modal-secret-cleared PASS
+CHECK vcs.cred.e2e.modal-secret-not-in-ui PASS The VCS operation failed: fatal: Authentication failed for 'http://127.0.0.1:43005/repo.git/'
+CHECK vcs.cred.e2e.modal-dialog-destroyed PASS
+CHECK vcs.cred.e2e.secret-not-on-disk PASS scanned /tmp/vedit-workspace-vcs-selftest-brYDqD
+This plugin does not support propagateSizeHints()
+CHECK vcs.modal.credential-push-issued PASS
+CHECK vcs.modal.credential-dialog-opened PASS driven=1 ticks=1
+CHECK vcs.modal.credential-prompt-shown PASS
+CHECK vcs.modal.credential-password-masked PASS
+CHECK vcs.modal.credential-retried PASS writes=2
+CHECK vcs.modal.credential-dialog-destroyed PASS
+CHECK vcs.modal.credential-secret-cleared PASS
+CHECK vcs.modal.credential-counted PASS credential=1 dialogs=1
+CHECK vcs.modal.credential-secret-not-in-ui PASS
+This plugin does not support propagateSizeHints()
+CHECK vcs.modal.credential-cancel-issued PASS
+CHECK vcs.modal.credential-cancel-dialog-opened PASS
+CHECK vcs.modal.credential-cancel-no-retry PASS writes=1
+CHECK vcs.modal.credential-cancel-real-reason PASS The VCS operation failed: fatal: could not read Username for 'https://example.com': terminal prompts disabled
+CHECK vcs.modal.credential-cancel-says-aborted PASS Authentication cancelled; the operation was aborted and nothing was written.
+CHECK vcs.modal.credential-cancel-no-secret-retained PASS
+CHECK vcs.modal.credential-cancel-dialog-destroyed PASS
+CHECK vcs.modal.credential-cancel-secret-not-in-ui PASS
+CHECK vcs.dialog.select-ref PASS
+CHECK vcs.dialog.selected-ref PASS main
+This plugin does not support propagateSizeHints()
+CHECK vcs.dialog.branch-prefill-from-selection PASS main
+CHECK vcs.dialog.branch-cancel-zero-write PASS writes=0
+CHECK vcs.dialog.branch-cancel-message PASS Branch creation cancelled; nothing was written.
+This plugin does not support propagateSizeHints()
+CHECK vcs.dialog.branch-accept-request PASS writes=2
+CHECK vcs.dialog.select-tag PASS
+This plugin does not support propagateSizeHints()
+CHECK vcs.dialog.tag-prefill-from-selection PASS v1.0
+CHECK vcs.dialog.tag-cancel-zero-write PASS writes=2
+This plugin does not support propagateSizeHints()
+CHECK vcs.dialog.tag-accept-request PASS writes=3
+This plugin does not support propagateSizeHints()
+CHECK vcs.dialog.remote-add-request PASS
+This plugin does not support propagateSizeHints()
+CHECK vcs.dialog.edit-remote-opened PASS driven=1 returned=false
+CHECK vcs.dialog.edit-remote-prefill PASS origin https://example.com/vedit.git
+CHECK vcs.dialog.edit-remote-cancel-zero-write PASS writes=4
+This plugin does not support propagateSizeHints()
+CHECK vcs.dialog.edit-remote-accept PASS
+CHECK vcs.dialog.edit-remote-request PASS
+CHECK vcs.dialog.modal-count PASS dialogs=7
+CHECK vcs.dialog.reject-empty-branch PASS
+CHECK vcs.dialog.reject-space-branch PASS
+CHECK vcs.dialog.reject-dash-branch PASS
+CHECK vcs.dialog.reject-dotdot-tag PASS
+CHECK vcs.dialog.reject-slash-branch PASS
+CHECK vcs.dialog.reject-lock-branch PASS
+CHECK vcs.dialog.reject-bad-rename PASS
+CHECK vcs.dialog.reject-bad-upstream PASS
+CHECK vcs.dialog.reject-bad-url PASS
+CHECK vcs.dialog.reject-dash-url PASS
+CHECK vcs.dialog.validation-zero-writes PASS writes=5
+CHECK vcs.dialog.validation-reason PASS Invalid URL: it starts with '-'; nothing was written.
+CHECK vcs.refresh.fixture PASS /tmp/vedit-workspace-vcs-selftest-LnVyee/refresh-repo
+CHECK vcs.refresh.initial PASS backend=1 files=1
+CHECK vcs.refresh.diff-before PASS diff --git a/rtl/a.sv b/rtl/a.sv
+index 0fb97fc..8873923 1006
+CHECK vcs.refresh.save-written PASS
+CHECK vcs.refresh.save-detected PASS refreshes 1 -> 2 (file-saved)
+CHECK vcs.refresh.save-state-after PASS diff --git a/rtl/a.sv b/rtl/a.sv
+index 0fb97fc..259fdcb 1006
+CHECK vcs.refresh.new-file-written PASS
+CHECK vcs.refresh.new-file-detected PASS files=2 refreshes=3
+CHECK vcs.refresh.activation-detected PASS refreshes 3 -> 4
+CHECK vcs.refresh.activation-reason PASS activated
+CHECK vcs.refresh.write-requested PASS
+CHECK vcs.refresh.write-completed PASS ok
+CHECK vcs.refresh.write-detected PASS refreshes 4 -> 5
+CHECK vcs.refresh.write-reason PASS write
+CHECK vcs.refresh.coalesce-requests PASS requests=5
+CHECK vcs.refresh.coalesce-merged PASS merged=4
+CHECK vcs.refresh.coalesce-single PASS
+CHECK vcs.refresh.coalesce-no-storm PASS 5 triggers -> 1 refresh(es) in 1000 ms
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK vcs.panel.close-reopen.no-crash PASS 3 show/refresh/close/destroy cycles
+CHECK vcs.panel.close-reopen.pending-job PASS destroyed with a status job pending
+CHECK vcs.i18n.zh-cn-catalogue PASS /vedit-build/target/qt6-build/src/app/workspace-lane-vcs/../translations/vedit_zh_CN.qm
+CHECK vcs.i18n.action-bar PASS 暂存 / 获取 / 分支…
+CHECK vcs.i18n.confirmations PASS 丢弃改动？
+CHECK vcs.i18n.states PASS 加载中…
+CHECK vcs.i18n.credentials PASS 需要凭据
+WORKSPACE-VCS-SELFTEST ok=1 checks=345 failures=0

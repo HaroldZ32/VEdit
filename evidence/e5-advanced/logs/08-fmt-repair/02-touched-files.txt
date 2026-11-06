@@ -1,0 +1,5 @@
+=== files modified in the last 25 min under crates/ ===
+2026-11-02 23:14:23.6041884260 crates/vd-ffi/build.rs
+2026-11-02 23:22:48.3122547810 crates/vd-ffi/src/lsp.rs
+2026-11-02 23:22:48.3542568660 crates/vd-lsp/src/client.rs
+2026-11-02 23:22:48.3672575120 crates/vd-lsp/src/session.rs

@@ -1,0 +1,1507 @@
+[
+ {
+  "id": "T002",
+  "string": " (expanding…)",
+  "decision": "译",
+  "translation": "（展开中…）",
+  "reason": ""
+ },
+ {
+  "id": "T003",
+  "string": " (live)",
+  "decision": "译",
+  "translation": "（实时）",
+  "reason": ""
+ },
+ {
+  "id": "T004",
+  "string": " (refresh failed)",
+  "decision": "译",
+  "translation": "（刷新失败）",
+  "reason": ""
+ },
+ {
+  "id": "T005",
+  "string": " (restored from last session)",
+  "decision": "译",
+  "translation": "（已从上次会话恢复）",
+  "reason": ""
+ },
+ {
+  "id": "T014",
+  "string": "&About VEdit",
+  "decision": "译",
+  "translation": "关于 VEdit(&A)",
+  "reason": ""
+ },
+ {
+  "id": "T015",
+  "string": "&Close Pane",
+  "decision": "译",
+  "translation": "关闭窗格(&C)",
+  "reason": ""
+ },
+ {
+  "id": "T016",
+  "string": "&Focus Next Pane",
+  "decision": "译",
+  "translation": "聚焦下一个窗格(&F)",
+  "reason": ""
+ },
+ {
+  "id": "T017",
+  "string": "&Go to File…",
+  "decision": "译",
+  "translation": "转到文件(&G)…",
+  "reason": ""
+ },
+ {
+  "id": "T018",
+  "string": "&Mixed Split (demo)",
+  "decision": "译",
+  "translation": "混合分屏(&M)（演示）",
+  "reason": ""
+ },
+ {
+  "id": "T019",
+  "string": "&New Empty Layout",
+  "decision": "译",
+  "translation": "新建空布局(&N)",
+  "reason": ""
+ },
+ {
+  "id": "T020",
+  "string": "&Reset Layout",
+  "decision": "译",
+  "translation": "重置布局(&R)",
+  "reason": ""
+ },
+ {
+  "id": "T021",
+  "string": "&Save Session Now",
+  "decision": "译",
+  "translation": "立即保存会话(&S)",
+  "reason": ""
+ },
+ {
+  "id": "T022",
+  "string": "'%1' is a reserved name",
+  "decision": "译",
+  "translation": "“%1”是保留名称",
+  "reason": ""
+ },
+ {
+  "id": "T024",
+  "string": "'%1' no longer exists",
+  "decision": "译",
+  "translation": "“%1”已不存在",
+  "reason": ""
+ },
+ {
+  "id": "T029",
+  "string": ": 0 diagnostic(s)",
+  "decision": "译",
+  "translation": "：0 条诊断",
+  "reason": ""
+ },
+ {
+  "id": "T031",
+  "string": "A file or folder named %1 already exists",
+  "decision": "译",
+  "translation": "名为 %1 的文件或文件夹已存在",
+  "reason": ""
+ },
+ {
+  "id": "T032",
+  "string": "About VEdit",
+  "decision": "译",
+  "translation": "关于 VEdit",
+  "reason": ""
+ },
+ {
+  "id": "T036",
+  "string": "Breeze Dark",
+  "decision": "不译",
+  "translation": "",
+  "reason": "主题标识为 KSyntaxHighlighting 的库内名称，按术语表技术名词保留英文"
+ },
+ {
+  "id": "T037",
+  "string": "Breeze Light",
+  "decision": "不译",
+  "translation": "",
+  "reason": "同 T036：主题标识符保留英文"
+ },
+ {
+  "id": "T040",
+  "string": "Cannot delete the folder that is open. Close it first.",
+  "decision": "译",
+  "translation": "无法删除已打开的文件夹。请先关闭它。",
+  "reason": ""
+ },
+ {
+  "id": "T041",
+  "string": "Cannot open %1",
+  "decision": "译",
+  "translation": "无法打开 %1",
+  "reason": ""
+ },
+ {
+  "id": "T042",
+  "string": "Cannot open %1: no active editor pane",
+  "decision": "译",
+  "translation": "无法打开 %1：没有活动的编辑器窗格",
+  "reason": ""
+ },
+ {
+  "id": "T043",
+  "string": "Cannot read '%1': %2",
+  "decision": "译",
+  "translation": "无法读取“%1”：%2",
+  "reason": ""
+ },
+ {
+  "id": "T045",
+  "string": "Capture split-state screenshots into this directory and exit.",
+  "decision": "译",
+  "translation": "把分屏状态截图保存到该目录后退出。",
+  "reason": ""
+ },
+ {
+  "id": "T046",
+  "string": "Changes discarded; nothing was stored.",
+  "decision": "译",
+  "translation": "更改已丢弃；未存储任何内容。",
+  "reason": ""
+ },
+ {
+  "id": "T047",
+  "string": "Close Pane",
+  "decision": "译",
+  "translation": "关闭窗格",
+  "reason": ""
+ },
+ {
+  "id": "T048",
+  "string": "Collapse every expanded folder",
+  "decision": "译",
+  "translation": "折叠所有已展开的文件夹",
+  "reason": ""
+ },
+ {
+  "id": "T049",
+  "string": "Conflicting shortcuts: %1",
+  "decision": "译",
+  "translation": "快捷键冲突：%1",
+  "reason": ""
+ },
+ {
+  "id": "T050",
+  "string": "Could not create file %1",
+  "decision": "译",
+  "translation": "无法创建文件 %1",
+  "reason": ""
+ },
+ {
+  "id": "T051",
+  "string": "Could not create folder %1",
+  "decision": "译",
+  "translation": "无法创建文件夹 %1",
+  "reason": ""
+ },
+ {
+  "id": "T052",
+  "string": "Could not delete %1",
+  "decision": "译",
+  "translation": "无法删除 %1",
+  "reason": ""
+ },
+ {
+  "id": "T053",
+  "string": "Could not rename %1 to %2",
+  "decision": "译",
+  "translation": "无法把 %1 重命名为 %2",
+  "reason": ""
+ },
+ {
+  "id": "T054",
+  "string": "Create a file here (Ctrl+N)",
+  "decision": "译",
+  "translation": "在此创建文件 (Ctrl+N)",
+  "reason": ""
+ },
+ {
+  "id": "T055",
+  "string": "Create a folder here (Ctrl+Shift+N)",
+  "decision": "译",
+  "translation": "在此创建文件夹 (Ctrl+Shift+N)",
+  "reason": ""
+ },
+ {
+  "id": "T058",
+  "string": "Created file '%1' (%2)",
+  "decision": "译",
+  "translation": "已创建文件“%1”（%2）",
+  "reason": ""
+ },
+ {
+  "id": "T059",
+  "string": "Created folder '%1'",
+  "decision": "译",
+  "translation": "已创建文件夹“%1”",
+  "reason": ""
+ },
+ {
+  "id": "T061",
+  "string": "Delete the selection (Del)",
+  "decision": "译",
+  "translation": "删除所选内容 (Del)",
+  "reason": ""
+ },
+ {
+  "id": "T063",
+  "string": "Diagnostics (%1)",
+  "decision": "译",
+  "translation": "诊断（%1）",
+  "reason": ""
+ },
+ {
+  "id": "T064",
+  "string": "Diagnostics (0)",
+  "decision": "译",
+  "translation": "诊断 (0)",
+  "reason": ""
+ },
+ {
+  "id": "T065",
+  "string": "Diagnostics unavailable",
+  "decision": "译",
+  "translation": "诊断不可用",
+  "reason": ""
+ },
+ {
+  "id": "T066",
+  "string": "Directory for session.json and shortcuts.json.",
+  "decision": "译",
+  "translation": "session.json 与 shortcuts.json 的目录。",
+  "reason": ""
+ },
+ {
+  "id": "T067",
+  "string": "Empty state: no project / no data.",
+  "decision": "译",
+  "translation": "空状态：无工程 / 无数据。",
+  "reason": ""
+ },
+ {
+  "id": "T068",
+  "string": "Empty state: no project open. This panel stays usable and empty.",
+  "decision": "译",
+  "translation": "空状态：未打开工程。此面板保持可用但为空。",
+  "reason": ""
+ },
+ {
+  "id": "T069",
+  "string": "Empty state: nothing to show for this project yet.",
+  "decision": "译",
+  "translation": "空状态：此工程暂无可显示内容。",
+  "reason": ""
+ },
+ {
+  "id": "T095",
+  "string": "File list",
+  "decision": "译",
+  "translation": "文件列表",
+  "reason": ""
+ },
+ {
+  "id": "T096",
+  "string": "Go to file…",
+  "decision": "译",
+  "translation": "转到文件…",
+  "reason": ""
+ },
+ {
+  "id": "T097",
+  "string": "Ignore an existing session file at startup.",
+  "decision": "译",
+  "translation": "启动时忽略已有的会话文件。",
+  "reason": ""
+ },
+ {
+  "id": "T098",
+  "string": "KSyntaxHighlighting theme name.",
+  "decision": "译",
+  "translation": "KSyntaxHighlighting 主题名称。",
+  "reason": ""
+ },
+ {
+  "id": "T101",
+  "string": "KTextEditor (edit-core)",
+  "decision": "译",
+  "translation": "KTextEditor（编辑内核）",
+  "reason": ""
+ },
+ {
+  "id": "T102",
+  "string": "KTextEditor::Document::setHighlightingMode('%1') failed",
+  "decision": "译",
+  "translation": "KTextEditor::Document::setHighlightingMode('%1') 失败",
+  "reason": ""
+ },
+ {
+  "id": "T103",
+  "string": "KTextEditor::Document::setText() failed",
+  "decision": "译",
+  "translation": "KTextEditor::Document::setText() 失败",
+  "reason": ""
+ },
+ {
+  "id": "T104",
+  "string": "KTextEditor::Document::setText() failed for %1",
+  "decision": "译",
+  "translation": "KTextEditor::Document::setText() 对 %1 失败",
+  "reason": ""
+ },
+ {
+  "id": "T105",
+  "string": "KTextEditor::Editor::createDocument() returned null",
+  "decision": "译",
+  "translation": "KTextEditor::Editor::createDocument() 返回空",
+  "reason": ""
+ },
+ {
+  "id": "T106",
+  "string": "Keep the window for this many ms.",
+  "decision": "译",
+  "translation": "让窗口保持该毫秒数。",
+  "reason": ""
+ },
+ {
+  "id": "T108",
+  "string": "LSP backend is not configured (no workspace root)",
+  "decision": "译",
+  "translation": "LSP 后端未配置（无工作区根目录）",
+  "reason": ""
+ },
+ {
+  "id": "T109",
+  "string": "Loading settings from %1 …",
+  "decision": "译",
+  "translation": "正在从 %1 加载设置…",
+  "reason": ""
+ },
+ {
+  "id": "T110",
+  "string": "Name is longer than the 255-byte filesystem limit",
+  "decision": "译",
+  "translation": "名称超过文件系统的 255 字节限制",
+  "reason": ""
+ },
+ {
+  "id": "T111",
+  "string": "Name must not be empty",
+  "decision": "译",
+  "translation": "名称不能为空",
+  "reason": ""
+ },
+ {
+  "id": "T112",
+  "string": "Name must not contain a NUL character",
+  "decision": "译",
+  "translation": "名称不能包含 NUL 字符",
+  "reason": ""
+ },
+ {
+  "id": "T113",
+  "string": "Name must not contain a path separator",
+  "decision": "译",
+  "translation": "名称不能包含路径分隔符",
+  "reason": ""
+ },
+ {
+  "id": "T117",
+  "string": "No VCS backend available.",
+  "decision": "译",
+  "translation": "没有可用的 VCS 后端。",
+  "reason": ""
+ },
+ {
+  "id": "T118",
+  "string": "No configuration problems reported by the Rust store.",
+  "decision": "译",
+  "translation": "Rust 存储未报告配置问题。",
+  "reason": ""
+ },
+ {
+  "id": "T119",
+  "string": "No conflicting shortcuts.",
+  "decision": "译",
+  "translation": "没有冲突的快捷键。",
+  "reason": ""
+ },
+ {
+  "id": "T120",
+  "string": "No editor provider connected.",
+  "decision": "译",
+  "translation": "未连接编辑器 provider。",
+  "reason": ""
+ },
+ {
+  "id": "T121",
+  "string": "No files indexed for this project yet.",
+  "decision": "译",
+  "translation": "此工程尚未索引文件。",
+  "reason": ""
+ },
+ {
+  "id": "T123",
+  "string": "No matching files",
+  "decision": "译",
+  "translation": "无匹配文件",
+  "reason": ""
+ },
+ {
+  "id": "T124",
+  "string": "No project",
+  "decision": "译",
+  "translation": "无工程",
+  "reason": ""
+ },
+ {
+  "id": "T125",
+  "string": "No project open",
+  "decision": "译",
+  "translation": "未打开工程",
+  "reason": ""
+ },
+ {
+  "id": "T126",
+  "string": "No project open — open a project root to jump between files.",
+  "decision": "译",
+  "translation": "未打开工程——打开工程根目录即可在文件间跳转。",
+  "reason": ""
+ },
+ {
+  "id": "T128",
+  "string": "No repository",
+  "decision": "译",
+  "translation": "无仓库",
+  "reason": ""
+ },
+ {
+  "id": "T131",
+  "string": "Open a folder",
+  "decision": "译",
+  "translation": "打开文件夹",
+  "reason": ""
+ },
+ {
+  "id": "T132",
+  "string": "Open a folder first.",
+  "decision": "译",
+  "translation": "请先打开文件夹。",
+  "reason": ""
+ },
+ {
+  "id": "T135",
+  "string": "Opened %1 line %2",
+  "decision": "译",
+  "translation": "已打开 %1 第 %2 行",
+  "reason": ""
+ },
+ {
+  "id": "T140",
+  "string": "Project: %1",
+  "decision": "译",
+  "translation": "项目：%1",
+  "reason": ""
+ },
+ {
+  "id": "T145",
+  "string": "Re-read the folder from disk (F5)",
+  "decision": "译",
+  "translation": "从磁盘重新读取文件夹 (F5)",
+  "reason": ""
+ },
+ {
+  "id": "T148",
+  "string": "Rename the selection (F2)",
+  "decision": "译",
+  "translation": "重命名所选内容 (F2)",
+  "reason": ""
+ },
+ {
+  "id": "T149",
+  "string": "Renamed '%1' to '%2'",
+  "decision": "译",
+  "translation": "已将“%1”重命名为“%2”",
+  "reason": ""
+ },
+ {
+  "id": "T172",
+  "string": "Save failed",
+  "decision": "译",
+  "translation": "保存失败",
+  "reason": ""
+ },
+ {
+  "id": "T173",
+  "string": "Save failed: %1",
+  "decision": "译",
+  "translation": "保存失败：%1",
+  "reason": ""
+ },
+ {
+  "id": "T175",
+  "string": "Select a command in the table first.",
+  "decision": "译",
+  "translation": "请先在表中选择一个命令。",
+  "reason": ""
+ },
+ {
+  "id": "T176",
+  "string": "Select a file or folder first.",
+  "decision": "译",
+  "translation": "请先选择文件或文件夹。",
+  "reason": ""
+ },
+ {
+  "id": "T178",
+  "string": "Session saved (%1)",
+  "decision": "译",
+  "translation": "会话已保存（%1）",
+  "reason": ""
+ },
+ {
+  "id": "T179",
+  "string": "Settings loaded from %1",
+  "decision": "译",
+  "translation": "已从 %1 加载设置",
+  "reason": ""
+ },
+ {
+  "id": "T180",
+  "string": "Settings unavailable; showing the built-in defaults.",
+  "decision": "译",
+  "translation": "设置不可用；显示内置默认值。",
+  "reason": ""
+ },
+ {
+  "id": "T181",
+  "string": "Shortcut for '%1' cleared (default restored).",
+  "decision": "译",
+  "translation": "已清除“%1”的快捷键（恢复默认）。",
+  "reason": ""
+ },
+ {
+  "id": "T182",
+  "string": "Source Control",
+  "decision": "译",
+  "translation": "版本控制",
+  "reason": ""
+ },
+ {
+  "id": "T184",
+  "string": "Split Pane &Horizontally",
+  "decision": "译",
+  "translation": "水平分屏(&H)",
+  "reason": ""
+ },
+ {
+  "id": "T185",
+  "string": "Split Pane &Vertically",
+  "decision": "译",
+  "translation": "垂直分屏(&V)",
+  "reason": ""
+ },
+ {
+  "id": "T187",
+  "string": "Stored by the Rust service in %1",
+  "decision": "译",
+  "translation": "已由 Rust 服务存储到 %1",
+  "reason": ""
+ },
+ {
+  "id": "T201",
+  "string": "The folder '%1' cannot be read (permission denied).",
+  "decision": "译",
+  "translation": "无法读取文件夹“%1”（权限被拒绝）。",
+  "reason": ""
+ },
+ {
+  "id": "T202",
+  "string": "The folder '%1' does not exist.",
+  "decision": "译",
+  "translation": "文件夹“%1”不存在。",
+  "reason": ""
+ },
+ {
+  "id": "T203",
+  "string": "Theme '%1' applied and stored by the Rust service.",
+  "decision": "译",
+  "translation": "主题“%1”已应用并由 Rust 服务存储。",
+  "reason": ""
+ },
+ {
+  "id": "T204",
+  "string": "Theme '%1' could not be applied.",
+  "decision": "译",
+  "translation": "无法应用主题“%1”。",
+  "reason": ""
+ },
+ {
+  "id": "T205",
+  "string": "Theme: %1",
+  "decision": "译",
+  "translation": "主题：%1",
+  "reason": ""
+ },
+ {
+  "id": "T208",
+  "string": "Unsaved changes",
+  "decision": "译",
+  "translation": "未保存的更改",
+  "reason": ""
+ },
+ {
+  "id": "T209",
+  "string": "Use &tree-sitter parsing",
+  "decision": "译",
+  "translation": "使用 &tree-sitter 解析",
+  "reason": ""
+ },
+ {
+  "id": "T210",
+  "string": "VEdit application shell (Qt6/KTextEditor rewrite).",
+  "decision": "译",
+  "translation": "VEdit 应用外壳（Qt6/KTextEditor 重写版）。",
+  "reason": ""
+ },
+ {
+  "id": "T238",
+  "string": "cannot commit %1: %2",
+  "decision": "译",
+  "translation": "无法提交 %1：%2",
+  "reason": ""
+ },
+ {
+  "id": "T239",
+  "string": "cannot commit session %1",
+  "decision": "译",
+  "translation": "无法提交会话 %1",
+  "reason": ""
+ },
+ {
+  "id": "T240",
+  "string": "cannot commit shortcut store %1",
+  "decision": "译",
+  "translation": "无法提交快捷键存储 %1",
+  "reason": ""
+ },
+ {
+  "id": "T241",
+  "string": "cannot create %1",
+  "decision": "译",
+  "translation": "无法创建 %1",
+  "reason": ""
+ },
+ {
+  "id": "T244",
+  "string": "cannot create session directory %1",
+  "decision": "译",
+  "translation": "无法创建会话目录 %1",
+  "reason": ""
+ },
+ {
+  "id": "T245",
+  "string": "cannot create shortcut store directory %1",
+  "decision": "译",
+  "translation": "无法创建快捷键存储目录 %1",
+  "reason": ""
+ },
+ {
+  "id": "T246",
+  "string": "cannot create the Rust search service",
+  "decision": "译",
+  "translation": "无法创建 Rust 搜索服务",
+  "reason": ""
+ },
+ {
+  "id": "T248",
+  "string": "cannot create the temporary file %1: %2",
+  "decision": "译",
+  "translation": "无法创建临时文件 %1：%2",
+  "reason": ""
+ },
+ {
+  "id": "T249",
+  "string": "cannot open %1",
+  "decision": "译",
+  "translation": "无法打开 %1",
+  "reason": ""
+ },
+ {
+  "id": "T250",
+  "string": "cannot open %1: %2",
+  "decision": "译",
+  "translation": "无法打开 %1：%2",
+  "reason": ""
+ },
+ {
+  "id": "T251",
+  "string": "cannot open %1: it looks like a binary file",
+  "decision": "译",
+  "translation": "无法打开 %1：它看起来是二进制文件",
+  "reason": ""
+ },
+ {
+  "id": "T252",
+  "string": "cannot open %1: not a regular file",
+  "decision": "译",
+  "translation": "无法打开 %1：不是常规文件",
+  "reason": ""
+ },
+ {
+  "id": "T253",
+  "string": "cannot open the directory for fsync: %1",
+  "decision": "译",
+  "translation": "无法打开目录以执行 fsync：%1",
+  "reason": ""
+ },
+ {
+  "id": "T254",
+  "string": "cannot parse %1: %2",
+  "decision": "译",
+  "translation": "无法解析 %1：%2",
+  "reason": ""
+ },
+ {
+  "id": "T255",
+  "string": "cannot read %1: %2",
+  "decision": "译",
+  "translation": "无法读取 %1：%2",
+  "reason": ""
+ },
+ {
+  "id": "T256",
+  "string": "cannot read session %1",
+  "decision": "译",
+  "translation": "无法读取会话 %1",
+  "reason": ""
+ },
+ {
+  "id": "T257",
+  "string": "cannot read shortcut store %1",
+  "decision": "译",
+  "translation": "无法读取快捷键存储 %1",
+  "reason": ""
+ },
+ {
+  "id": "T258",
+  "string": "cannot save %1: directory %2 does not exist",
+  "decision": "译",
+  "translation": "无法保存 %1：目录 %2 不存在",
+  "reason": ""
+ },
+ {
+  "id": "T259",
+  "string": "cannot save %1: directory %2 is not writable",
+  "decision": "译",
+  "translation": "无法保存 %1：目录 %2 不可写",
+  "reason": ""
+ },
+ {
+  "id": "T260",
+  "string": "cannot write %1: %2",
+  "decision": "译",
+  "translation": "无法写入 %1：%2",
+  "reason": ""
+ },
+ {
+  "id": "T261",
+  "string": "cannot write session %1",
+  "decision": "译",
+  "translation": "无法写入会话 %1",
+  "reason": ""
+ },
+ {
+  "id": "T262",
+  "string": "cannot write shortcut store %1",
+  "decision": "译",
+  "translation": "无法写入快捷键存储 %1",
+  "reason": ""
+ },
+ {
+  "id": "T267",
+  "string": "definitionForFileName(top.sv): %1",
+  "decision": "译",
+  "translation": "definitionForFileName(top.sv)：%1",
+  "reason": ""
+ },
+ {
+  "id": "T268",
+  "string": "definitionForFileName(top.v): %1",
+  "decision": "译",
+  "translation": "definitionForFileName(top.v)：%1",
+  "reason": ""
+ },
+ {
+  "id": "T269",
+  "string": "definitionForName(SystemVerilog): %1",
+  "decision": "译",
+  "translation": "definitionForName(SystemVerilog)：%1",
+  "reason": ""
+ },
+ {
+  "id": "T270",
+  "string": "definitionForName(Verilog): %1",
+  "decision": "译",
+  "translation": "definitionForName(Verilog)：%1",
+  "reason": ""
+ },
+ {
+  "id": "T271",
+  "string": "demo editor (shell placeholder)",
+  "decision": "译",
+  "translation": "演示编辑器（外壳占位）",
+  "reason": ""
+ },
+ {
+  "id": "T277",
+  "string": "directory fsync not supported here (%1); the rename is complete",
+  "decision": "译",
+  "translation": "此处不支持目录 fsync（%1）；重命名已完成",
+  "reason": ""
+ },
+ {
+  "id": "T281",
+  "string": "dock layout could not be restored (KTextEditor/version mismatch?)",
+  "decision": "译",
+  "translation": "无法恢复停靠布局（KTextEditor/版本不匹配？）",
+  "reason": ""
+ },
+ {
+  "id": "T284",
+  "string": "editor buffer, not saved yet",
+  "decision": "译",
+  "translation": "编辑器缓冲区，尚未保存",
+  "reason": ""
+ },
+ {
+  "id": "T285",
+  "string": "editor layout: %1",
+  "decision": "译",
+  "translation": "编辑器布局：%1",
+  "reason": ""
+ },
+ {
+  "id": "T307",
+  "string": "find: no document",
+  "decision": "译",
+  "translation": "查找：没有文档",
+  "reason": ""
+ },
+ {
+  "id": "T308",
+  "string": "find: the pattern is empty",
+  "decision": "译",
+  "translation": "查找：模式为空",
+  "reason": ""
+ },
+ {
+  "id": "T309",
+  "string": "fold lists of region %1 are empty",
+  "decision": "译",
+  "translation": "区域 %1 的折叠列表为空",
+  "reason": ""
+ },
+ {
+  "id": "T313",
+  "string": "goto-line: cursor landed at %1:%2 instead of %3:0",
+  "decision": "译",
+  "translation": "跳转到行：光标落在 %1:%2，而非 %3:0",
+  "reason": ""
+ },
+ {
+  "id": "T314",
+  "string": "goto-line: no view/document",
+  "decision": "译",
+  "translation": "跳转到行：没有视图/文档",
+  "reason": ""
+ },
+ {
+  "id": "T315",
+  "string": "goto-line: setCursorPosition(%1) failed",
+  "decision": "译",
+  "translation": "跳转到行：setCursorPosition(%1) 失败",
+  "reason": ""
+ },
+ {
+  "id": "T316",
+  "string": "goto-line: the document has no lines",
+  "decision": "译",
+  "translation": "跳转到行：文档没有行",
+  "reason": ""
+ },
+ {
+  "id": "T317",
+  "string": "grammar '%1' is not registered",
+  "decision": "译",
+  "translation": "语法“%1”未注册",
+  "reason": ""
+ },
+ {
+  "id": "T320",
+  "string": "invalid session %1: %2",
+  "decision": "译",
+  "translation": "无效会话 %1：%2",
+  "reason": ""
+ },
+ {
+  "id": "T321",
+  "string": "invalid shortcut store %1: %2",
+  "decision": "译",
+  "translation": "无效快捷键存储 %1：%2",
+  "reason": ""
+ },
+ {
+  "id": "T322",
+  "string": "layout has no root object",
+  "decision": "译",
+  "translation": "布局没有根对象",
+  "reason": ""
+ },
+ {
+  "id": "T323",
+  "string": "layout parse failed",
+  "decision": "译",
+  "translation": "布局解析失败",
+  "reason": ""
+ },
+ {
+  "id": "T324",
+  "string": "leaf node without pane id",
+  "decision": "译",
+  "translation": "叶子节点缺少窗格 id",
+  "reason": ""
+ },
+ {
+  "id": "T333",
+  "string": "multi-cursor: View::insertText() failed",
+  "decision": "译",
+  "translation": "多光标：View::insertText() 失败",
+  "reason": ""
+ },
+ {
+  "id": "T334",
+  "string": "multi-cursor: asked for %1 cursors, the view reports %2",
+  "decision": "译",
+  "translation": "多光标：请求 %1 个光标，视图报告 %2 个",
+  "reason": ""
+ },
+ {
+  "id": "T335",
+  "string": "multi-cursor: inserted at %1 of %2 cursors",
+  "decision": "译",
+  "translation": "多光标：已在 %2 个光标中的 %1 个处插入",
+  "reason": ""
+ },
+ {
+  "id": "T336",
+  "string": "multi-cursor: no document",
+  "decision": "译",
+  "translation": "多光标：没有文档",
+  "reason": ""
+ },
+ {
+  "id": "T337",
+  "string": "multi-cursor: no positions given",
+  "decision": "译",
+  "translation": "多光标：未提供位置",
+  "reason": ""
+ },
+ {
+  "id": "T338",
+  "string": "multi-cursor: no view",
+  "decision": "译",
+  "translation": "多光标：没有视图",
+  "reason": ""
+ },
+ {
+  "id": "T343",
+  "string": "no LSP backend in this build",
+  "decision": "译",
+  "translation": "此构建没有 LSP 后端",
+  "reason": ""
+ },
+ {
+  "id": "T344",
+  "string": "no LSP request to poll",
+  "decision": "译",
+  "translation": "没有可轮询的 LSP 请求",
+  "reason": ""
+ },
+ {
+  "id": "T345",
+  "string": "no LSP session",
+  "decision": "译",
+  "translation": "没有 LSP 会话",
+  "reason": ""
+ },
+ {
+  "id": "T346",
+  "string": "no SLANG backend",
+  "decision": "译",
+  "translation": "没有 SLANG 后端",
+  "reason": ""
+ },
+ {
+  "id": "T347",
+  "string": "no SLANG backend in this build",
+  "decision": "译",
+  "translation": "此构建没有 SLANG 后端",
+  "reason": ""
+ },
+ {
+  "id": "T348",
+  "string": "no SLANG ticket to poll",
+  "decision": "译",
+  "translation": "没有可轮询的 SLANG 凭据",
+  "reason": ""
+ },
+ {
+  "id": "T349",
+  "string": "no active editor pane",
+  "decision": "译",
+  "translation": "没有活动的编辑器窗格",
+  "reason": ""
+ },
+ {
+  "id": "T351",
+  "string": "no diagnostics controller",
+  "decision": "译",
+  "translation": "没有诊断控制器",
+  "reason": ""
+ },
+ {
+  "id": "T353",
+  "string": "no document to highlight",
+  "decision": "译",
+  "translation": "没有要高亮的文档",
+  "reason": ""
+ },
+ {
+  "id": "T355",
+  "string": "no effective file set",
+  "decision": "译",
+  "translation": "没有有效文件集",
+  "reason": ""
+ },
+ {
+  "id": "T357",
+  "string": "no navigation request in flight",
+  "decision": "译",
+  "translation": "没有进行中的导航请求",
+  "reason": ""
+ },
+ {
+  "id": "T360",
+  "string": "no project is open",
+  "decision": "译",
+  "translation": "未打开工程",
+  "reason": ""
+ },
+ {
+  "id": "T362",
+  "string": "no provider for grammar '%1'",
+  "decision": "译",
+  "translation": "语法“%1”没有 provider",
+  "reason": ""
+ },
+ {
+  "id": "T363",
+  "string": "no shortcut store configured",
+  "decision": "译",
+  "translation": "未配置快捷键存储",
+  "reason": ""
+ },
+ {
+  "id": "T364",
+  "string": "no state directory is available",
+  "decision": "译",
+  "translation": "没有可用的状态目录",
+  "reason": ""
+ },
+ {
+  "id": "T365",
+  "string": "no syntax definition for %1",
+  "decision": "译",
+  "translation": "%1 没有语法定义",
+  "reason": ""
+ },
+ {
+  "id": "T366",
+  "string": "no temporary directory",
+  "decision": "译",
+  "translation": "没有临时目录",
+  "reason": ""
+ },
+ {
+  "id": "T368",
+  "string": "no workspace root configured",
+  "decision": "译",
+  "translation": "未配置工作区根目录",
+  "reason": ""
+ },
+ {
+  "id": "T369",
+  "string": "not a Git or Subversion working tree",
+  "decision": "译",
+  "translation": "不是 Git 或 Subversion 工作树",
+  "reason": ""
+ },
+ {
+  "id": "T373",
+  "string": "open: the pane has no editor provider",
+  "decision": "译",
+  "translation": "打开：窗格没有编辑器 provider",
+  "reason": ""
+ },
+ {
+  "id": "T374",
+  "string": "openFile: no document",
+  "decision": "译",
+  "translation": "openFile：没有文档",
+  "reason": ""
+ },
+ {
+  "id": "T375",
+  "string": "openFileInEditor: the application shell is not part of this build",
+  "decision": "译",
+  "translation": "openFileInEditor：此构建不包含应用外壳",
+  "reason": ""
+ },
+ {
+  "id": "T379",
+  "string": "parse returned no tree",
+  "decision": "译",
+  "translation": "解析未返回语法树",
+  "reason": ""
+ },
+ {
+  "id": "T381",
+  "string": "permission denied: %1",
+  "decision": "译",
+  "translation": "权限被拒绝：%1",
+  "reason": ""
+ },
+ {
+  "id": "T383",
+  "string": "private syntax directory missing: %1/syntax (set VEDIT_SYNTAX_DIR)",
+  "decision": "译",
+  "translation": "私有语法目录缺失：%1/syntax（设置 VEDIT_SYNTAX_DIR）",
+  "reason": ""
+ },
+ {
+  "id": "T385",
+  "string": "provider '%1' parsed %2 fold ranges",
+  "decision": "译",
+  "translation": "provider“%1”解析出 %2 个折叠范围",
+  "reason": ""
+ },
+ {
+  "id": "T388",
+  "string": "reparsing %1 file(s)",
+  "decision": "译",
+  "translation": "正在重新解析 %1 个文件",
+  "reason": ""
+ },
+ {
+  "id": "T389",
+  "string": "replace-all replaced %1 of %2 matches",
+  "decision": "译",
+  "translation": "全部替换：已替换 %2 个匹配中的 %1 个",
+  "reason": ""
+ },
+ {
+  "id": "T390",
+  "string": "repository-definition %1",
+  "decision": "译",
+  "translation": "仓库定义 %1",
+  "reason": ""
+ },
+ {
+  "id": "T395",
+  "string": "save: the document has no file path yet",
+  "decision": "译",
+  "translation": "保存：文档尚无文件路径",
+  "reason": ""
+ },
+ {
+  "id": "T397",
+  "string": "saveAtomic: the document has no file path",
+  "decision": "译",
+  "translation": "saveAtomic：文档没有文件路径",
+  "reason": ""
+ },
+ {
+  "id": "T399",
+  "string": "search panel from a registered factory",
+  "decision": "译",
+  "translation": "来自已注册工厂的搜索面板",
+  "reason": ""
+ },
+ {
+  "id": "T400",
+  "string": "search root does not exist or is not a directory: %1",
+  "decision": "译",
+  "translation": "搜索根目录不存在或不是目录：%1",
+  "reason": ""
+ },
+ {
+  "id": "T401",
+  "string": "search root is not readable: %1",
+  "decision": "译",
+  "translation": "搜索根目录不可读：%1",
+  "reason": ""
+ },
+ {
+  "id": "T403",
+  "string": "session mentions unknown panel '%1'",
+  "decision": "译",
+  "translation": "会话提到未知面板“%1”",
+  "reason": ""
+ },
+ {
+  "id": "T404",
+  "string": "session started over %1 file(s)",
+  "decision": "译",
+  "translation": "会话已在 %1 个文件上启动",
+  "reason": ""
+ },
+ {
+  "id": "T405",
+  "string": "setCursorPosition(%1:%2) failed",
+  "decision": "译",
+  "translation": "setCursorPosition(%1:%2) 失败",
+  "reason": ""
+ },
+ {
+  "id": "T406",
+  "string": "setText: no document",
+  "decision": "译",
+  "translation": "setText：没有文档",
+  "reason": ""
+ },
+ {
+  "id": "T407",
+  "string": "settings could not be loaded",
+  "decision": "译",
+  "translation": "无法加载设置",
+  "reason": ""
+ },
+ {
+  "id": "T408",
+  "string": "settings load failed (state %1)",
+  "decision": "译",
+  "translation": "设置加载失败（状态 %1）",
+  "reason": ""
+ },
+ {
+  "id": "T409",
+  "string": "settings save failed (state %1)",
+  "decision": "译",
+  "translation": "设置保存失败（状态 %1）",
+  "reason": ""
+ },
+ {
+  "id": "T414",
+  "string": "source is not loaded: %1",
+  "decision": "译",
+  "translation": "源码未加载：%1",
+  "reason": ""
+ },
+ {
+  "id": "T416",
+  "string": "split node needs two object children",
+  "decision": "译",
+  "translation": "分割节点需要两个对象子节点",
+  "reason": ""
+ },
+ {
+  "id": "T417",
+  "string": "split node without a valid orientation",
+  "decision": "译",
+  "translation": "分割节点缺少有效方向",
+  "reason": ""
+ },
+ {
+  "id": "T424",
+  "string": "the LSP session did not start",
+  "decision": "译",
+  "translation": "LSP 会话未启动",
+  "reason": ""
+ },
+ {
+  "id": "T425",
+  "string": "the Rust project service is unavailable",
+  "decision": "译",
+  "translation": "Rust 项目服务不可用",
+  "reason": ""
+ },
+ {
+  "id": "T426",
+  "string": "the Rust search service did not report a reason",
+  "decision": "译",
+  "translation": "Rust 搜索服务未报告原因",
+  "reason": ""
+ },
+ {
+  "id": "T427",
+  "string": "the Rust service handle could not be created",
+  "decision": "译",
+  "translation": "无法创建 Rust 服务句柄",
+  "reason": ""
+ },
+ {
+  "id": "T428",
+  "string": "the Rust service reported no detail",
+  "decision": "译",
+  "translation": "Rust 服务未报告细节",
+  "reason": ""
+ },
+ {
+  "id": "T429",
+  "string": "the Rust settings store rejected the path",
+  "decision": "译",
+  "translation": "Rust 设置存储拒绝了该路径",
+  "reason": ""
+ },
+ {
+  "id": "T430",
+  "string": "the Rust settings store rejected the write",
+  "decision": "译",
+  "translation": "Rust 设置存储拒绝了写入",
+  "reason": ""
+ },
+ {
+  "id": "T431",
+  "string": "the SLANG job id does not fit the backend ticket type",
+  "decision": "译",
+  "translation": "SLANG 作业 id 不适合后端凭据类型",
+  "reason": ""
+ },
+ {
+  "id": "T434",
+  "string": "the document reports highlighting mode '%1' instead of '%2'",
+  "decision": "译",
+  "translation": "文档报告的高亮模式为“%1”，而非“%2”",
+  "reason": ""
+ },
+ {
+  "id": "T435",
+  "string": "the editor provider refused the save",
+  "decision": "译",
+  "translation": "编辑器 provider 拒绝了保存",
+  "reason": ""
+ },
+ {
+  "id": "T437",
+  "string": "the folder '%1' is not writable",
+  "decision": "译",
+  "translation": "文件夹“%1”不可写",
+  "reason": ""
+ },
+ {
+  "id": "T438",
+  "string": "the folder is not empty",
+  "decision": "译",
+  "translation": "文件夹不为空",
+  "reason": ""
+ },
+ {
+  "id": "T441",
+  "string": "the project job was rejected by the service",
+  "decision": "译",
+  "translation": "项目作业被服务拒绝",
+  "reason": ""
+ },
+ {
+  "id": "T442",
+  "string": "the project service did not answer in %1 ms",
+  "decision": "译",
+  "translation": "项目服务未在 %1 毫秒内响应",
+  "reason": ""
+ },
+ {
+  "id": "T443",
+  "string": "the project service failed",
+  "decision": "译",
+  "translation": "项目服务失败",
+  "reason": ""
+ },
+ {
+  "id": "T445",
+  "string": "theme fallback: %1",
+  "decision": "译",
+  "translation": "主题回退：%1",
+  "reason": ""
+ },
+ {
+  "id": "T448",
+  "string": "this build has no vd-ffi settings ABI",
+  "decision": "译",
+  "translation": "此构建没有 vd-ffi 设置 ABI",
+  "reason": ""
+ },
+ {
+  "id": "T452",
+  "string": "tree-sitter switch is off",
+  "decision": "译",
+  "translation": "tree-sitter 开关已关闭",
+  "reason": ""
+ },
+ {
+  "id": "T453",
+  "string": "unavailable (no Rust service in this build)",
+  "decision": "译",
+  "translation": "不可用（此构建没有 Rust 服务）",
+  "reason": ""
+ },
+ {
+  "id": "T456",
+  "string": "unknown layout node type '%1'",
+  "decision": "译",
+  "translation": "未知布局节点类型“%1”",
+  "reason": ""
+ },
+ {
+  "id": "T457",
+  "string": "unknown theme '%1' (or not loaded by KSyntaxHighlighting)",
+  "decision": "译",
+  "translation": "未知主题“%1”（或未被 KSyntaxHighlighting 加载）",
+  "reason": ""
+ },
+ {
+  "id": "T462",
+  "string": "window geometry could not be restored",
+  "decision": "译",
+  "translation": "无法恢复窗口几何",
+  "reason": ""
+ },
+ {
+  "id": "T463",
+  "string": "workspace root is not a directory: %1",
+  "decision": "译",
+  "translation": "工作区根目录不是目录：%1",
+  "reason": ""
+ },
+ {
+  "id": "T465",
+  "string": "· %1 changed file(s)",
+  "decision": "译",
+  "translation": "· %1 个已更改文件",
+  "reason": ""
+ }
+]

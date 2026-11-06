@@ -1,0 +1,133 @@
+[1/78] Automatic MOC for target vedit_editor_fim
+[2/78] Automatic MOC for target vedit_app_shell
+[3/78] Automatic MOC for target vedit_workspace_jump
+[4/78] Building CXX object src/app/editor-lane/fim-lane/CMakeFiles/vedit_editor_fim.dir/vedit_editor_fim_autogen/mocs_compilation.cpp.o
+[5/78] Building CXX object src/app/editor-lane/breadcrumb-lane/jump-lane/CMakeFiles/vedit_workspace_jump.dir/vedit_workspace_jump_autogen/mocs_compilation.cpp.o
+[6/78] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/vedit_app_shell_autogen/mocs_compilation.cpp.o
+[7/78] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/syntax_provider.cpp.o
+[8/78] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/syntax_service.cpp.o
+[9/78] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/disabled_provider.cpp.o
+[10/78] Building CXX object src/syntax/grammars/CMakeFiles/vedit_syntax_grammars.dir/bindings.cpp.o
+[11/78] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/grammar_binding.cpp.o
+[12/78] Building CXX object src/app/editor-lane/breadcrumb-lane/jump-lane/CMakeFiles/vedit_workspace_jump.dir/jump_integration.cpp.o
+[13/78] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/owner_arbiter.cpp.o
+[14/78] Building CXX object src/app/editor-lane/breadcrumb-lane/jump-lane/CMakeFiles/vedit_workspace_jump.dir/jump_registry.cpp.o
+[15/78] Linking CXX static library src/app/editor-lane/breadcrumb-lane/jump-lane/libvedit_workspace_jump.a
+[16/78] Building CXX object src/syntax/kde/syn-common/CMakeFiles/vedit_syntax_common.dir/syntax_directory.cpp.o
+[17/78] Linking CXX static library src/syntax/kde/syn-common/libvedit_syntax_common.a
+[18/78] Building CXX object src/app/editor-lane/fim-lane/CMakeFiles/vedit_editor_fim.dir/fim_inline_completion.cpp.o
+[19/78] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/crash_reporter.cpp.o
+[20/78] Building CXX object src/app/editor-lane/fim-lane/CMakeFiles/vedit_editor_fim.dir/fim_backend.cpp.o
+[21/78] Linking CXX static library src/app/editor-lane/fim-lane/libvedit_editor_fim.a
+[22/78] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/editor_provider.cpp.o
+[23/78] Building C object src/syntax/grammars/CMakeFiles/vedit_tree_sitter_verilog.dir/__/__/__/third_party/tree-sitter/verilog/src/parser.c.o
+[24/78] Linking C static library src/syntax/grammars/libvedit_tree_sitter_verilog.a
+[25/78] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/session_store.cpp.o
+[26/78] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/theme_manager.cpp.o
+[27/78] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/panel_registry.cpp.o
+[28/78] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/command_registry.cpp.o
+[29/78] Building CXX object src/syntax/provider/CMakeFiles/vedit_syntax_provider.dir/tree_sitter_provider.cpp.o
+[30/78] Linking CXX static library src/syntax/provider/libvedit_syntax_provider.a
+[31/78] Linking CXX static library src/syntax/grammars/libvedit_syntax_grammars.a
+[32/78] Automatic MOC for target vedit_syntax_folding
+[33/78] Automatic MOC for target vedit_workspace_breadcrumb
+[34/78] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit_syntax_folding.dir/vedit_syntax_folding_autogen/mocs_compilation.cpp.o
+[35/78] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/app_shell.cpp.o
+[36/78] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit_syntax_folding.dir/fold_range.cpp.o
+[37/78] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit_syntax_folding.dir/fold_source.cpp.o
+[38/78] Building CXX object src/app/editor-lane/breadcrumb-lane/CMakeFiles/vedit_workspace_breadcrumb.dir/breadcrumb_model.cpp.o
+[39/78] Building CXX object src/app/editor-lane/breadcrumb-lane/CMakeFiles/vedit_workspace_breadcrumb.dir/syntax_breadcrumb_source.cpp.o
+[40/78] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/editor_area.cpp.o
+[41/78] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit_syntax_folding.dir/syntax_fold_source.cpp.o
+[42/78] Linking CXX static library src/app/libvedit_app_shell.a
+[43/78] Building CXX object src/app/editor-lane/breadcrumb-lane/CMakeFiles/vedit_workspace_breadcrumb.dir/vedit_workspace_breadcrumb_autogen/mocs_compilation.cpp.o
+[44/78] Building CXX object src/app/editor-lane/breadcrumb-lane/CMakeFiles/vedit_workspace_breadcrumb.dir/breadcrumb_bar.cpp.o
+[45/78] Linking CXX static library src/app/editor-lane/breadcrumb-lane/libvedit_workspace_breadcrumb.a
+[46/78] Building CXX object src/app/editor-lane/folding-lane/CMakeFiles/vedit_syntax_folding.dir/ksyntax_fold_source.cpp.o
+[47/78] Linking CXX static library src/app/editor-lane/folding-lane/libvedit_syntax_folding.a
+[48/78] Automatic MOC for target vedit_editor_core
+[49/78] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/cross_boundary.cpp.o
+[50/78] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/vedit_editor_core_autogen/mocs_compilation.cpp.o
+[51/78] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/document_io.cpp.o
+[52/78] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/undo_ops.cpp.o
+[53/78] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/goto_line.cpp.o
+[54/78] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/atomic_save.cpp.o
+[55/78] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/highlight_mode.cpp.o
+[56/78] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/fim_wiring.cpp.o
+[57/78] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/fold_breadcrumb.cpp.o
+[58/78] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/highlight_diagnosis.cpp.o
+[59/78] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/find_replace.cpp.o
+[60/78] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/ktexteditor_provider.cpp.o
+[61/78] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/diagnostics_annotations.cpp.o
+[62/78] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/edit_core_selftest.cpp.o
+[63/78] Building CXX object src/app/editor-lane/CMakeFiles/vedit_editor_core.dir/kernel/multi_cursor.cpp.o
+[64/78] Linking CXX static library src/app/editor-lane/libvedit_editor_core.a
+[65/78] Automatic MOC for target vedit_workspace_diagnostics
+[66/78] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/diagnostics_outline_model.cpp.o
+[67/78] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/vedit_workspace_diagnostics_autogen/mocs_compilation.cpp.o
+[68/78] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/lint_progress.cpp.o
+[69/78] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/toolchain.cpp.o
+[70/78] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/diagnostics_panel.cpp.o
+[71/78] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/ffi_backends.cpp.o
+[72/78] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/diagnostics_integration.cpp.o
+[73/78] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/diagnostics_controller.cpp.o
+[74/78] Linking CXX static library src/app/workspace-lane-diagnostics/libvedit_workspace_diagnostics.a
+[75/78] Automatic MOC for target vedit-lint-orchestration-probe
+[76/78] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-lint-orchestration-probe.dir/vedit-lint-orchestration-probe_autogen/mocs_compilation.cpp.o
+[77/78] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit-lint-orchestration-probe.dir/__/__/__/evidence/w4-lint/lint_orchestration_probe.cpp.o
+[78/78] Linking CXX executable src/app/workspace-lane-diagnostics/vedit-lint-orchestration-probe
+MERGE rows=2 both=1 lsp=0 cli=1
+CHECK merge.one-row-for-lsp-and-cli PASS
+CHECK merge.cli-only-marked PASS
+CHECK merge.cli-severity-converted PASS
+CHECK c8.start PASS
+CHECK c8.skipped-open-files PASS
+CHECK c8.pass-file-count PASS
+CHECK c8.backend-received-pass-set PASS
+CHECK c8.include-dirs-forwarded PASS
+CHECK c8.defines-forwarded PASS
+CHECK c8.new-open-does-not-shrink-pass PASS
+CHECK c8.finishes PASS
+CHECK c8.cli-diagnostics PASS
+CHECK c8.merged-display PASS
+CHECK cancel.start PASS
+CANCEL before phase=2 done=20/100 running=1
+CHECK cancel.running-before PASS
+CANCEL after phase=4 running=0 message=«已取消 — 20/100 文件» diagnostics=0
+CHECK cancel.phase PASS
+CHECK cancel.flag-cleared PASS
+CHECK cancel.message-counts PASS
+CHECK cancel.no-diagnostics-after PASS
+CHECK cancel.still-nothing-after-ticks PASS
+CHECK cancel.released PASS
+CHECK cancel.rerun-starts PASS
+CHECK cancel.rerun-finishes PASS
+CHECK cancel.rerun-delivers PASS
+CHECK fail.unavailable-refused PASS
+FAIL unavailable tool=fake-verible stage=resolve message=«fake-verible: the lint tool could not be resolved»
+CHECK fail.tool-named PASS
+CHECK fail.stage-named PASS
+CHECK fail.spawn-started PASS
+FAIL spawn phase=5 tool=fake-slang stage=spawn message=«tool=fake-slang stage=spawn: the lint child could not be started»
+CHECK fail.spawn-phase PASS
+CHECK fail.spawn-tool-and-stage PASS
+CHECK scale.start-1k PASS
+SCALE files=1000 ticks=27 worst_tick_ms=0 total_ms=0 done=1000
+CHECK scale.finishes-1k PASS
+CHECK scale.ui-tick-under-50ms PASS
+CHECK scale.progress-reached-total PASS
+CHECK scale.large-starts PASS
+SCALE large-message=«large pass: 1500 files — cancel is available (10/1500)»
+CHECK scale.large-warns PASS
+CHECK scale.large-cancels PASS
+CHECK widget.hidden-before-pass PASS
+CHECK widget.start PASS
+CHECK widget.running PASS
+CHECK widget.cancel-visible PASS
+CHECK widget.progress-song PASS
+CHECK widget.cancel-message PASS
+CHECK widget.rerun-enabled PASS
+CHECK widget.rerun-running PASS
+CHECK widget.finished PASS
+CHECK widget.finished-text PASS
+LINT-ORCHESTRATION-PROBE ok=1 checks=47 failures=0
