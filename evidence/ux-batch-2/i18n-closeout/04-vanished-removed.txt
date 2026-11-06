@@ -1,0 +1,17 @@
+REMOVED 6 vanished entries:
+  [VEdit] 'KTextEditor::Document::setText() failed for %1'
+    reason: replaced: document_io.cpp now uses 'KTextEditor::Document::setText() failed' (no %1)
+  [VEdit] 'No variables are used by this project yet'
+    reason: dead: the empty-table copy was replaced by 'Project variables unchanged'
+  [VEdit] 'Project variables updated; re-expanding'
+    reason: replaced: project_panel.cpp now says 'Project variables unchanged' / 'Saved %1 variable(s); re-expanding'
+  [VEdit] 'the module catalog service did not answer within 30 s'
+    reason: replaced: the timeout is 300 s (catalog_client.cpp:436)
+  [vedit::workspace::settings::SettingsPanel] 'Clear'
+    reason: replaced: the shortcut buttons are 'Reset to Default' / 'Reset All to Defaults'
+  [vedit::workspace::settings::SettingsPanel] 'Shortcut'
+    reason: dead: the shortcuts page now uses the 'Command/Effective shortcut/Default/State' headers
+ALIGNED 2 term(s):
+  [VEdit] 'From filelist (%1)': '来自文件清单（%1）' -> '来自 filelist（%1）'
+  [VEdit] 'Files imported through a .f filelist; they live outside this folder tree': '通过 .f 文件清单导入的文件；它们位于此目录树之外' -> '通过 .f filelist 导入的文件；它们位于此目录树之外'
+vanished+unfinished left: 0

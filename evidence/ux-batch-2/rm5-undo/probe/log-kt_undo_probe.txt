@@ -1,0 +1,20 @@
+kf.sonnet.core: Sonnet: No speller backends available!
+PROBE after_load text=32 lines=4 undoCount=-1 modified=0 viewdoc_same=1
+QMetaObject::invokeMethod: No such method KTextEditor::DocumentPrivate::undoCount()
+PROBE A_control before=32 after=35 landed=1
+QMetaObject::invokeMethod: No such method KTextEditor::DocumentPrivate::undoCount()
+PROBE after_edits text=68 undoCount=-1 modified=1
+PROBE undo=1 ran=1 text=35 lines=4 modified=1 changed=1 view_doc_same=1
+PROBE undo=2 ran=1 text=32 lines=4 modified=1 changed=1 view_doc_same=1
+PROBE undo=3 ran=1 text=0 lines=1 modified=1 changed=1 view_doc_same=1
+PROBE undo=4 ran=1 text=0 lines=1 modified=1 changed=0 view_doc_same=1
+PROBE undo=5 ran=1 text=0 lines=1 modified=1 changed=0 view_doc_same=1
+PROBE undo=6 ran=1 text=0 lines=1 modified=1 changed=0 view_doc_same=1
+PROBE undo=7 ran=1 text=0 lines=1 modified=1 changed=0 view_doc_same=1
+PROBE undo=8 ran=1 text=0 lines=1 modified=1 changed=0 view_doc_same=1
+PROBE undo=9 ran=1 text=0 lines=1 modified=1 changed=0 view_doc_same=1
+PROBE undo=10 ran=1 text=0 lines=1 modified=1 changed=0 view_doc_same=1
+PROBE undo=11 ran=1 text=0 lines=1 modified=1 changed=0 view_doc_same=1
+PROBE undo=12 ran=1 text=0 lines=1 modified=1 changed=0 view_doc_same=1
+PROBE C_type_after_undo before=0 after=5 landed=1 viewdoc_same=1
+PROBE D_delete_window ok=1 (document died with its view)

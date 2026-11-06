@@ -1,0 +1,155 @@
+CHECK setup.temp-dir PASS
+CHECK setup.registry PASS
+BINDING edit.undo                    effective=Ctrl+Z           default=Ctrl+Z           state=default
+BINDING edit.redo                    effective=Ctrl+Shift+Z     default=Ctrl+Shift+Z     state=default
+BINDING settings.preferences         effective=Ctrl+,           default=Ctrl+,           state=default
+BINDING file.new                     effective=Ctrl+N           default=Ctrl+N           state=default
+BINDING file.open                    effective=Ctrl+O           default=Ctrl+O           state=default
+BINDING file.open-folder             effective=Ctrl+Alt+Shift+O default=Ctrl+Alt+Shift+O state=default
+BINDING file.switch-project          effective=Ctrl+Alt+Shift+P default=Ctrl+Alt+Shift+P state=default
+BINDING file.new-layout              effective=Ctrl+Alt+N       default=Ctrl+Alt+N       state=default
+BINDING file.save                    effective=Ctrl+S           default=Ctrl+S           state=default
+BINDING file.save-as                 effective=Ctrl+Shift+S     default=Ctrl+Shift+S     state=default
+BINDING file.save-all                effective=Ctrl+Alt+Shift+S default=Ctrl+Alt+Shift+S state=default
+BINDING file.save-session            effective=                 default=                 state=unbound
+BINDING file.close-pane              effective=Ctrl+W           default=Ctrl+W           state=default
+BINDING file.quit                    effective=Ctrl+Q           default=Ctrl+Q           state=default
+BINDING view.split.horizontal        effective=Ctrl+Alt+H       default=Ctrl+Alt+H       state=default
+BINDING view.split.vertical          effective=Ctrl+Shift+V     default=Ctrl+Shift+V     state=default
+BINDING view.focus.next              effective=F6               default=F6               state=default
+BINDING view.layout.mixed            effective=Ctrl+Alt+M       default=Ctrl+Alt+M       state=default
+BINDING view.layout.reset            effective=Ctrl+Alt+R       default=Ctrl+Alt+R       state=default
+BINDING view.toolbar                 effective=Ctrl+Alt+T       default=Ctrl+Alt+T       state=default
+BINDING search.focus                 effective=Ctrl+Alt+Shift+F default=Ctrl+Alt+Shift+F state=default
+BINDING view.tab.next                effective=Ctrl+Tab         default=Ctrl+Tab         state=default
+BINDING view.tab.previous            effective=Ctrl+Shift+Tab   default=Ctrl+Shift+Tab   state=default
+BINDING view.panel.file-tree         effective=Ctrl+Alt+F       default=Ctrl+Alt+F       state=default
+BINDING view.panel.search            effective=Ctrl+Alt+S       default=Ctrl+Alt+S       state=default
+BINDING view.panel.terminal          effective=Ctrl+Alt+J       default=Ctrl+Alt+J       state=default
+BINDING view.panel.vcs               effective=Ctrl+Alt+C       default=Ctrl+Alt+C       state=default
+BINDING view.panel.outline           effective=Ctrl+Alt+O       default=Ctrl+Alt+O       state=default
+BINDING help.user-manual             effective=F1               default=F1               state=default
+BINDING help.about                   effective=                 default=                 state=unbound
+CHECK defaults.no-duplicate-bindings PASS
+CHECK defaults.edit.undo-has-binding PASS
+CHECK defaults.edit.redo-has-binding PASS
+CHECK defaults.file.new-has-binding PASS
+CHECK defaults.file.save-all-has-binding PASS
+CHECK defaults.search.focus-has-binding PASS
+CHECK defaults.view.toolbar-has-binding PASS
+CHECK defaults.split-horizontal-free-sequence PASS
+CHECK de.no-global-default.edit.undo.Ctrl+Z PASS
+CHECK de.no-global-default.edit.redo.Ctrl+Shift+Z PASS
+CHECK de.no-global-default.edit.redo.Ctrl+Y PASS
+CHECK de.no-global-default.settings.preferences.Ctrl+, PASS
+CHECK de.no-global-default.file.new.Ctrl+N PASS
+CHECK de.no-global-default.file.open.Ctrl+O PASS
+CHECK de.no-global-default.file.open-folder.Ctrl+Alt+Shift+O PASS
+CHECK de.no-global-default.file.switch-project.Ctrl+Alt+Shift+P PASS
+CHECK de.no-global-default.file.new-layout.Ctrl+Alt+N PASS
+CHECK de.no-global-default.file.save.Ctrl+S PASS
+CHECK de.no-global-default.file.save-as.Ctrl+Shift+S PASS
+CHECK de.no-global-default.file.save-all.Ctrl+Alt+Shift+S PASS
+CHECK de.no-global-default.file.close-pane.Ctrl+W PASS
+CHECK de.no-global-default.file.quit.Ctrl+Q PASS
+CHECK de.no-global-default.view.split.horizontal.Ctrl+Alt+H PASS
+CHECK de.no-global-default.view.split.vertical.Ctrl+Shift+V PASS
+CHECK de.no-global-default.view.focus.next.F6 PASS
+CHECK de.no-global-default.view.layout.mixed.Ctrl+Alt+M PASS
+CHECK de.no-global-default.view.layout.reset.Ctrl+Alt+R PASS
+CHECK de.no-global-default.view.toolbar.Ctrl+Alt+T FAIL (Ctrl+Alt+T is a desktop-global shortcut (GNOME/Ubuntu: open terminal))
+CHECK de.no-global-default.search.focus.Ctrl+Alt+Shift+F PASS
+CHECK de.no-global-default.view.tab.next.Ctrl+Tab PASS
+CHECK de.no-global-default.view.tab.previous.Ctrl+Shift+Tab PASS
+CHECK de.no-global-default.view.panel.file-tree.Ctrl+Alt+F PASS
+CHECK de.no-global-default.view.panel.search.Ctrl+Alt+S PASS
+CHECK de.no-global-default.view.panel.terminal.Ctrl+Alt+J PASS
+CHECK de.no-global-default.view.panel.vcs.Ctrl+Alt+C PASS
+CHECK de.no-global-default.view.panel.outline.Ctrl+Alt+O PASS
+CHECK de.no-global-default.help.user-manual.F1 PASS
+CHECK de.toolbar-moved-off-ctrl-alt-t FAIL (Ctrl+Alt+T)
+CHECK de.redo-has-ctrl-y-extra PASS
+CHECK page.loaded PASS
+CHECK page.widgets PASS
+CHECK visible.split-row PASS
+CHECK visible.split-effective-default PASS
+CHECK visible.split-default-column PASS
+CHECK visible.split-state-default PASS
+CHECK visible.redo-shows-both PASS
+CHECK visible.unbound-is-explicit PASS
+CHECK conflict.registry-refused PASS
+CHECK conflict.registry-owner-named PASS
+CHECK conflict.desktop-refused PASS
+CHECK conflict.desktop-owner-named PASS
+CHECK custom.effective-updated PASS
+CHECK visible.custom-state PASS
+CHECK custom.new-key-fires PASS
+CHECK custom.old-default-inert PASS
+CHECK dialog.loaded PASS
+CHECK dialog.widgets PASS
+CHECK dialog.row PASS
+CHECK dialog.preview-effective PASS
+CHECK dialog.ok-persisted PASS
+CHECK dialog.ok-restart-value PASS
+CHECK dialog.cleanup-default PASS
+CHECK persist.restart-loaded PASS
+CHECK persist.restart-key-fires PASS
+CHECK reset.per-command PASS
+CHECK reset.all-at-once PASS
+CHECK de.data-names-kde-show-desktop PASS
+CHECK de.data-names-gnome-terminal PASS
+CHECK real.setup-pane PASS
+CHECK real.setup-open PASS
+CHECK real.setup-view PASS
+CHECK zero-edit-shell.undo-command-disabled PASS
+CHECK zero-edit-shell.buffer-unchanged PASS
+CHECK zero-edit-shell.identity PASS
+CHECK zero-edit-shell.undo-still-disabled PASS
+CHECK tabs.setup-second-open PASS
+CHECK tabs.setup-two-tabs PASS
+CHECK tabs.ctrl-tab-next PASS
+CHECK tabs.ctrl-shift-tab-previous PASS
+CHECK authority.editor-find-kept PASS
+CHECK authority.no-editor-collision.edit.undo PASS
+CHECK authority.no-editor-collision.edit.redo PASS
+CHECK authority.no-editor-collision.settings.preferences PASS
+CHECK authority.no-editor-collision.file.new PASS
+CHECK authority.no-editor-collision.file.open PASS
+CHECK authority.no-editor-collision.file.open-folder PASS
+CHECK authority.no-editor-collision.file.switch-project PASS
+CHECK authority.no-editor-collision.file.new-layout PASS
+CHECK authority.no-editor-collision.file.save PASS
+CHECK authority.no-editor-collision.file.save-as PASS
+CHECK authority.no-editor-collision.file.save-all PASS
+CHECK authority.no-editor-collision.file.close-pane PASS
+CHECK authority.no-editor-collision.file.quit PASS
+CHECK authority.no-editor-collision.view.split.horizontal PASS
+CHECK authority.no-editor-collision.view.split.vertical PASS
+CHECK authority.no-editor-collision.view.focus.next PASS
+CHECK authority.no-editor-collision.view.layout.mixed PASS
+CHECK authority.no-editor-collision.view.layout.reset PASS
+CHECK authority.no-editor-collision.view.toolbar FAIL (Ctrl+Alt+T also owned by desktop: GNOME/Ubuntu: open terminal)
+CHECK authority.no-editor-collision.search.focus PASS
+CHECK authority.no-editor-collision.view.tab.next PASS
+CHECK authority.no-editor-collision.view.tab.previous PASS
+CHECK authority.no-editor-collision.view.panel.file-tree PASS
+CHECK authority.no-editor-collision.view.panel.search PASS
+CHECK authority.no-editor-collision.view.panel.terminal PASS
+CHECK authority.no-editor-collision.view.panel.vcs PASS
+CHECK authority.no-editor-collision.view.panel.outline PASS
+CHECK authority.no-editor-collision.help.user-manual PASS
+CHECK authority.no-editor-collision.test.ctrl-p-probe PASS
+CHECK authority.ctrl-p-shell-owned PASS
+CHECK authority.ctrl-p-fires PASS
+CHECK real.split-horizontal-fires PASS
+CHECK real.split-vertical-fires PASS
+CHECK real.typing-lands PASS
+CHECK real.ctrl-z-undoes PASS
+CHECK real.ctrl-shift-z-redoes PASS
+CHECK real.ctrl-z-undoes-again PASS
+CHECK real.ctrl-y-redoes PASS
+CHECK real.ctrl-z-after-ctrl-y PASS
+CHECK real.editor-conflict-refused PASS
+CHECK real.editor-conflict-named PASS
+SUMMARY checks=123 failures=3
+EXIT=1

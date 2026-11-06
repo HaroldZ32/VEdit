@@ -1,0 +1,37 @@
+CHECK PASS rm3.dialog.shows-whole-table  rows=2 names=MISSING,A
+CHECK PASS rm3.dialog.known-value-prefilled
+CHECK PASS rm3.dialog.add
+CHECK PASS rm3.dialog.add-in-table
+CHECK PASS rm3.dialog.duplicate-refused
+CHECK PASS rm3.dialog.invalid-refused  A name may only contain letters, digits and '_', and cannot start with a digit | A name may only contain letters, digits and '_', and cannot start with a digit | A name may only contain letters, digits and '_', and cannot start with a digit | A name may only contain letters, digits and '_', and cannot start with a digit | Enter a variable name
+CHECK PASS rm3.dialog.delete
+CHECK PASS rm3.dialog.delete-removes-entry
+CHECK FAIL rm3.dialog.delete-note
+CHECK FAIL rm3.dialog.delete-required
+CHECK PASS rm3.expand.missing-reported
+CHECK FAIL rm3.panel.add-applied
+CHECK PASS rm3.substitution-uses-new-value  rtl/v1.sv,rtl/v2.sv
+CHECK FAIL rm3.table-has-added
+CHECK PASS rm3.panel.add-second
+CHECK PASS rm3.panel.delete-applied
+CHECK FAIL rm3.panel.delete-removed-from-model
+CHECK FAIL rm3.panel.shows-table
+CHECK FAIL rm3.persisted-file-has-per-root-map  /tmp/vedit-project-variables-e2e-ziCgJh/state/project-model.json
+CHECK PASS rm3.restart.restore-loads
+CHECK FAIL rm3.restart.variables-restored
+CHECK PASS rm3.restart.re-expands-with-table
+CHECK PASS rm3.switch.b-settled
+CHECK PASS rm3.switch.b-has-no-a-variable
+CHECK PASS rm3.switch.b-reports-own-missing  BVAR
+CHECK FAIL rm3.switch.b-add-applied
+CHECK PASS rm3.switch.b-substitutes
+CHECK PASS rm3.switch.back-to-a-settled
+CHECK FAIL rm3.switch.a-table-restored
+CHECK PASS rm3.switch.a-substitutes-again  rtl/v1.sv,rtl/v2.sv
+CHECK FAIL rm3.switch.both-roots-persisted
+CHECK PASS rm3.required.delete-applied
+CHECK PASS rm3.required.delete-removed-value
+CHECK PASS rm3.required.reported-missing-again  NEWVAR
+CHECK PASS rm3.required.panel-no-longer-shows-value
+CHECK PASS rm3.required.dialog-asks-again
+SUMMARY checks=36 failures=11

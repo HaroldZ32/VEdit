@@ -1,0 +1,16 @@
+    Start 11: vedit-app-shell-selftest
+1/6 Test #11: vedit-app-shell-selftest .............   Passed    0.73 sec
+    Start 19: vedit-shortcut-key-path-tests
+2/6 Test #19: vedit-shortcut-key-path-tests ........   Passed    0.72 sec
+    Start 21: vedit-native-fold-tests
+3/6 Test #21: vedit-native-fold-tests ..............   Passed    0.54 sec
+    Start 26: vedit-editor-multi-cursor-selftest
+4/6 Test #26: vedit-editor-multi-cursor-selftest ...   Passed    0.21 sec
+    Start 29: vedit-undo-view-lifetime-tests
+5/6 Test #29: vedit-undo-view-lifetime-tests .......   Passed    0.21 sec
+    Start 57: vedit-workspace-settings-selftest
+6/6 Test #57: vedit-workspace-settings-selftest ....   Passed    1.33 sec
+
+100% tests passed, 0 tests failed out of 6
+
+Total Test time (real) =   3.74 sec

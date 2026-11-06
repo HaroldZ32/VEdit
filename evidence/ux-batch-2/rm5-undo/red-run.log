@@ -1,0 +1,73 @@
+[65/66] Building CXX object src/app/editor-lane/CMakeFiles/vedit-undo-view-lifetime-tests.dir/kernel/undo_view_lifetime_test.cpp.o
+[66/66] Linking CXX executable src/app/editor-lane/vedit-undo-view-lifetime-tests
+kf.sonnet.core: Sonnet: No speller backends available!
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+This plugin does not support propagateSizeHints()
+CHECK setup.temp-dir PASS
+CHECK setup.file-writable PASS
+CHECK setup.pane PASS
+CHECK setup.open-file PASS
+CHECK setup.tab-shows-file PASS
+CHECK setup.view PASS
+CHECK setup.document PASS
+CHECK setup.opened-text PASS
+CHECK zero-edit.undo-command-buffer-unchanged FAIL (ran=1 text=0 opened=51)
+CHECK zero-edit.undo-command-identity PASS
+CHECK zero-edit.undo-key-buffer-unchanged FAIL (text=0 opened=51)
+CHECK zero-edit.undo-key-identity PASS
+CHECK zero-edit.redo-command-buffer-unchanged PASS
+CHECK zero-edit.redo-key-buffer-unchanged PASS
+CHECK zero-edit.typing-after-refused-undo PASS
+CHECK zero-edit.undo-returns-to-opened-text PASS
+CHECK edit.typing-lands PASS
+CHECK edit.text-changed PASS
+CHECK undo.1.editor-identity PASS
+CHECK undo.1.buffer-is-opened-state-or-changed PASS
+CHECK undo.1.buffer-not-empty PASS
+CHECK undo.1.changed-something PASS
+CHECK undo.1.tab-shows-file PASS
+CHECK undo.2.editor-identity PASS
+CHECK undo.2.buffer-is-opened-state-or-changed PASS
+CHECK undo.2.buffer-not-empty PASS
+CHECK undo.2.changed-something PASS
+CHECK undo.2.tab-shows-file PASS
+CHECK undo.3.editor-identity PASS
+CHECK undo.3.buffer-is-opened-state-or-changed PASS
+CHECK undo.3.buffer-not-empty FAIL (press=3 text=0)
+CHECK undo.3.changed-something PASS
+CHECK undo.3.tab-shows-file PASS
+CHECK undo.4.editor-identity PASS
+CHECK undo.4.buffer-is-opened-state-or-changed FAIL (press=4 text=0)
+CHECK undo.4.buffer-not-empty FAIL (press=4 text=0)
+CHECK undo.4.tab-shows-file PASS
+CHECK undo.5.editor-identity PASS
+CHECK undo.5.buffer-is-opened-state-or-changed FAIL (press=5 text=0)
+CHECK undo.5.buffer-not-empty FAIL (press=5 text=0)
+CHECK undo.5.tab-shows-file PASS
+CHECK undo.6.editor-identity PASS
+CHECK undo.6.buffer-is-opened-state-or-changed FAIL (press=6 text=0)
+CHECK undo.6.buffer-not-empty FAIL (press=6 text=0)
+CHECK undo.6.tab-shows-file PASS
+CHECK undo.7.editor-identity PASS
+CHECK undo.7.buffer-is-opened-state-or-changed FAIL (press=7 text=0)
+CHECK undo.7.buffer-not-empty FAIL (press=7 text=0)
+CHECK undo.7.tab-shows-file PASS
+CHECK undo.8.editor-identity PASS
+CHECK undo.8.buffer-is-opened-state-or-changed FAIL (press=8 text=0)
+CHECK undo.8.buffer-not-empty FAIL (press=8 text=0)
+CHECK undo.8.tab-shows-file PASS
+CHECK undo.first-press-runs PASS
+CHECK undo.floor-is-opened-text FAIL (text=0 opened=51)
+CHECK edit.typing-after-undo PASS
+CHECK key-undo.1.buffer-not-empty FAIL (text=0)
+CHECK key-undo.1.editor-identity PASS
+CHECK key-undo.2.buffer-not-empty FAIL (text=0)
+CHECK key-undo.2.editor-identity PASS
+CHECK key-undo.3.buffer-not-empty FAIL (text=0)
+CHECK key-undo.3.editor-identity PASS
+CHECK key-undo.4.buffer-not-empty FAIL (text=0)
+CHECK key-undo.4.editor-identity PASS
+CHECK key-undo.floor-is-opened-text FAIL (text=0 opened=51)
+CHECK edit.typing-after-key-undo PASS
+SUMMARY checks=66 failures=19
+EXIT=1

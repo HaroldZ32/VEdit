@@ -1,0 +1,29 @@
+=== BEFORE (git HEAD:README.md) — legacy claims ===
+3:VEdit 是一个用 **Rust + GTK3 + GtkSourceView** 写的 Verilog / SystemVerilog 专用文本编辑器，
+5:IDE 能力全部复用上游组件（Verible、SLANG、GtkSourceView），自研只限胶水层。
+13:| 1 | **语法高亮**：`.v/.vh` → Verilog，`.sv/.svh/.svi` → SystemVerilog | 上游 GtkSourceView 4.6.1 的 `verilog.lang` / `systemverilog.lang` + `cobalt` 主题，**不写词法器** |
+19:## 三种产物，怎么选
+23:| `VEdit-<ver>-x86_64.AppImage` | ≈ 48 MB | 最省事。`chmod +x` 后直接运行；**需要 FUSE**。没有 FUSE 时用 `--appimage-extract-and-run`（或 `APPIMAGE_EXTRACT_AND_RUN=1`） |
+30:三者都自带：GTK3 运行时、GtkSourceView 4.6.1 数据（163 个语言定义 + 主题）、
+71:theme = "cobalt"            # GtkSourceView 主题（上游 scheme 名）
+121:`VEDIT_VERIBLE_DIR`、`VEDIT_SLANG`；GtkSourceView 数据目录 `VEDIT_GSV_DATADIR`（一般无需设置，
+132:| `undo` / `redo` | `Ctrl+Z` / `Ctrl+Shift+Z` | 撤销 / 重做（GtkSourceView 原生撤销栈） |
+176:| [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) | 安装三种产物、编辑/诊断/格式化/深度 lint/FIM、中文输入、排障 |
+186:  **GtkSourceView / GTK3 为 LGPL**，源码获取方式在 NOTICES 的 "LGPL source availability" 一节。
+
+=== BEFORE (git HEAD:docs/RELEASING.md) ===
+81:发版时上传**三个产物 + 校验文件**：
+88:| `SHA256SUMS` | 三个产物的 sha256 **+ 包内 verible 三件套与 slang 的 sha256** |
+104:2. `bash scripts/build.sh` 全绿（pinned 镜像构建 + Xvfb 冒烟 + GLIBC 断言）；
+105:3. `bash packaging/appimage/run-evidence.sh` 与 `bash packaging/tarball/build.sh` 的**干净无网**验收全绿
+110:7. `release/<ver>` 以 PR 合入 `main`（merge commit），打 annotated tag，上传三个产物与 `SHA256SUMS`，
+
+=== AFTER (working tree) ===
+-- README.md:
+16:| 包内入口 | Qt6 版 `vedit-app`（AppDir 内 `bin/vd-app`），`AppRun` 经包内 loader 启动 |
+60:## 旧版 GTK3 产品线（不是交付物）
+62:仓库还保留**旧 Rust/GTK3 产品** `vd-app` 的构建与打包：`bash scripts/build.sh` 产出
+63:`build/artifacts/vd-app`，`packaging/appimage/` 与 `packaging/tarball/` 是它的 AppImage / tar.gz /
+-- docs/RELEASING.md:
+9:> 旧 Rust/GTK3 线（`scripts/build.sh`、`packaging/appimage/`、`packaging/tarball/`）仍保留，但**不是发布路径**
+115:> 旧 GTK3 线的 `scripts/build.sh` / `packaging/appimage/run-evidence.sh` / `packaging/tarball/build.sh`

@@ -1,0 +1,50 @@
+[166/166] Linking CXX executable src/app/vedit-app
+3d4eb51f2f60bdff4a040d24b92025de25833890ff748d0f37d041ac547352a9  /vedit-build/target/rm4-jump-probe/rm4-jump-probe
+===== BEFORE case2: real catalog, RELATIVE file set in project-model.json, cwd=/tmp =====
+ok   rm4.jump-target-is-the-product-target — EditorJumpTarget installed
+ok   rm4.module-tree-dock
+ok   rm4.interface-dock
+ok   rm4.active-pane
+ok   rm4.catalog-painted — Module tree ready — double-click a module to open its declaration.
+ok   rm4.module-row
+ok   rm4.interface-focus — focused=child rows=2
+ok   rm4.ground-truth.port-declaration — child.sv:1:34
+ok   rm4.ground-truth.instantiation — top.sv:3:11
+ok   rm4.port-row — clk
+ok   rm4.double-click.port-declaration.gesture-delivered
+     PASSED   : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/child.sv:1:34 (status=delivered)
+     SEAM-ERR : <none>
+ok   rm4.double-click.port-declaration.opened-file — resolved=child.sv expected=child.sv
+ok   rm4.double-click.port-declaration.cursor-line — observed=1 expected=1
+ok   rm4.double-click.port-declaration.cursor-on-identifier — identifier-under-cursor='clk' expected='clk' column=34
+ok   rm4.double-click.port-declaration.seam-delivered
+ok   rm4.ctrl-double-click.instantiation.gesture-delivered
+     PASSED   : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/top.sv:3:9 (status=delivered)
+     SEAM-ERR : <none>
+ok   rm4.ctrl-double-click.instantiation.opened-file — resolved=top.sv expected=top.sv
+ok   rm4.ctrl-double-click.instantiation.cursor-line — observed=3 expected=3
+ok   rm4.ctrl-double-click.instantiation.cursor-on-identifier — identifier-under-cursor='u_child' expected='u_child' column=9
+ok   rm4.ctrl-double-click.instantiation.seam-delivered
+ok   rm4.ground-truth.module-declaration — child.sv:1:8
+ok   rm4.module-tree.row — child
+ok   rm4.module-tree.gesture-delivered
+     TREE PASSED   : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/child.sv:1:8 (status=delivered)
+ok   rm4.module-tree.opened-declaration-file — /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/child.sv
+ok   rm4.module-tree.cursor-on-definition — cursor=1:8 identifier='child' expected line=1
+checks=25 failures=0
+===== BEFORE case2b: seam mode, panel handed a RELATIVE catalog path =====
+ok   rm4.jump-target-is-the-product-target — EditorJumpTarget installed
+ok   rm4.module-tree-dock
+ok   rm4.interface-dock
+ok   rm4.active-pane
+ok   rm4.catalog-painted — cataloguing 2 project file(s)…
+     RELATIVE   : requested='child.sv' delivered=0 opened='' error='cannot open /tmp/child.sv: not a regular file'
+FAIL rm4.seam.relative-path.delivered — cannot open /tmp/child.sv: not a regular file
+FAIL rm4.seam.relative-path.under-workspace-root
+FAIL rm4.seam.panel.relative-catalog-path-delivered — port clk declaration: the editor rejected the jump to child.sv:1:1 — cannot open /tmp/child.sv: not a regular file
+FAIL rm4.seam.panel.relative-catalog-path-opened
+     PANEL      : port p declaration: the editor rejected the jump to ghost.sv:1:1 — cannot open /nonexistent-rm4/ghost.sv: not a regular file
+ok   rm4.seam.refusal.still-a-refusal
+ok   rm4.seam.refusal.reason-names-what-failed — cannot open /nonexistent-rm4/ghost.sv: not a regular file
+ok   rm4.seam.refusal.panel-carries-the-reason — port p declaration: the editor rejected the jump to ghost.sv:1:1 — cannot open /nonexistent-rm4/ghost.sv: not a regular file
+checks=12 failures=4

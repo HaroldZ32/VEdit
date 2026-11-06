@@ -1,29 +1,60 @@
 # 构建 VEdit
 
-本文覆盖：从零构建（干净 CentOS 7 容器内）、固定（pinned）输入、镜像源替换、
-GtkSourceView 与 slang 的源码构建、三种产物的打包命令，以及可复现性的边界。
+本文覆盖：**Qt6 交付物**的构建与打包（§2、§7.1、§12）、**旧 Rust/GTK3 产品线**的构建与打包
+（§2.1、§7.2，以及 §3–§5、§8、§10、§11 的 CentOS 7 / GTK 内容；§6 与 §9 为两条 lane 共用）、
+固定（pinned）输入与可复现性边界。
 
-> **两条构建 lane 并存**：§1–§11 是仍在树里的 Rust/GTK 产品（旧产品，Open Q7 未决）；
-> §12 是重写后的 **C++/Qt6 构建底座**（M0，T10：`bash scripts/build-qt.sh`，
-> 固定 Ubuntu 26.04 镜像 + Qt6/KF6/KTextEditor/KSyntaxHighlighting/tree-sitter）。
-> 两者互不替代，门禁同时覆盖。
+> **两条构建 lane 并存，交付物只有一条。**
+>
+> - **Qt6 交付物**（`vedit-app`）：`bash scripts/build-qt.sh`（§2）→ `bash packaging/runtime/build.sh`
+>   （§7.1）→ `packaging/runtime/out/VEdit-<ver>-x86_64.AppImage` + `out/SHA256SUMS`。
+>   构建底座、版本矩阵与边界见 §12。
+> - **旧 Rust/GTK3 产品**（`vd-app`）：`bash scripts/build.sh`（§2.1）→ `build/artifacts/vd-app`，
+>   打包见 §7.2。按需求非目标 5 保留，**不是交付物**。
+>
+> 两条 lane 互不替代；§6 的 slang 二进制、§9 的 Rust crate 清单两条 lane 共用，§10.1 是 Qt 产品的
+> 运行期工具链发现。
 
 ## 1. 前提
 
 - **Docker**（daemon 可用即可；rootless 也可，`scripts/lib.sh` 有说明）。
-- 宿主操作系统不限（macOS/Linux 均可），真正的构建发生在
-  `docker.m.daocloud.io/library/centos:7` 的**摘要固定**镜像里。
-- **构建期允许联网**（AC-19）：需要拉取固定版本的 tarball / wheel / rpm / verible 发布包。
+- 宿主操作系统不限（macOS/Linux 均可），真正的构建发生在**摘要固定**的镜像里：
+  Qt6 交付物用 **Ubuntu 26.04** 镜像（§12.1），旧 GTK3 线用
+  `docker.m.daocloud.io/library/centos:7`（§2.1）。
+- **构建期允许联网**：需要拉取固定版本的 tarball / deb / rpm / verible 发布包。
   **产物运行期完全不需要网络**。
-- 磁盘：构建镜像 + Cargo 缓存 + 产物，建议预留 **≥ 8 GB**。
+- 磁盘：构建镜像 + Cargo 缓存 + CMake 构建树，建议预留 **≥ 8 GB**。
 
-## 2. 一条命令
+## 2. 一条命令（Qt6 交付物）
+
+```sh
+bash scripts/build-qt.sh          # 固定镜像 → Rust 服务层 → CMake configure/build/ctest → xcb/软件渲染冒烟
+```
+
+产物：**`target/qt6-build/src/app/vedit-app`**（CMake 构建树 `target/qt6-build/` 已被 gitignore）。
+这一步只构建产品二进制；**交付物**是下一步的单文件 AppImage：
+
+```sh
+bash packaging/runtime/build.sh   # 组装 AppDir + 许可/F2 隔离 + AppImage + 自检/隔离 + CentOS 7 探针
+# -> packaging/runtime/out/VEdit-<ver>-x86_64.AppImage + out/SHA256SUMS
+```
+
+门禁（当前命令）：
+
+- `bash build/gates/qt6-cxx.sh` —— Qt6/KF6 C++ 车道（configure + build + ctest + xcb 冒烟）；
+- `bash scripts/gates.sh` —— Rust 服务层（fmt / clippy / test / 依赖策略）；
+- `bash build/gates/lrelease.sh` —— 中文目录零 unfinished / untranslated；
+- `bash build/gates/docs.sh` —— 文档门禁。
+
+运行期依赖（KF6/Qt6 运行库、`libtree-sitter` 0.25、Qt 平台插件）与版本矩阵见 §12.3 / §12.6。
+
+### 2.1 旧版 GTK3 构建（不是 Qt 交付物）
 
 ```sh
 bash scripts/build.sh
 ```
 
-它做四件事（每一步的原始输出都落在 `build/evidence/`）：
+它做四件事（每一步的输出落在 `build/evidence/`）：
 
 1. 用 `scripts/versions.env` 里的 pin 构建 **pinned 构建镜像**（摘要固定的 centos:7 +
    Rust 1.99.0 + 源码构建的 GtkSourceView 4.6.1 + meson/ninja）；
@@ -31,14 +62,18 @@ bash scripts/build.sh
 3. 在宿主上断言产物 ELF 的最高 GLIBC 符号版本 **≤ 2.17**，并记录 sha256；
 4. 记录打包 lane 会消费的外部产物（T3 构建的 slang 二进制；此处不重建）。
 
-产物：`build/artifacts/vd-app`（编辑器主程序）。门禁：`bash scripts/gates.sh`
+产物：`build/artifacts/vd-app`（**旧产品**主程序，不是 `vedit-app`）。门禁：`bash scripts/gates.sh`
 （`cargo fmt --check` / `cargo clippy --all-targets -D warnings` / `cargo test --workspace`，
-外加 `Cargo.lock` 策略检查：禁止 `tree-sitter` / `openssl` / `native-tls`，gtk-rs 固定 0.18 世代）。
-宿主没有 GTK 开发文件时，编译类门禁会自动放进 pinned 镜像里跑并**明确打印这一降级**。
+外加 `Cargo.lock` 策略检查）。宿主没有 GTK 开发文件时，编译类门禁会自动放进 pinned 镜像里跑并
+**明确打印这一降级**。这条 lane 的其余细节见 §3–§5、§8、§10、§11，打包见 §7.2。
 
-## 3. 固定输入（`scripts/versions.env` 是唯一来源）
+## 3. 固定输入（旧版 lane 与共用工具：`scripts/versions.env` 是唯一来源）
 
-| 输入 | 固定方式 | 值（0.1.0） |
+> Qt6 车道的版本矩阵不在这里：它在 `scripts/versions-qt.env` 与
+> `scripts/docker/qt6-locked-packages.txt`，见 §12.3。本表是旧版 GTK3 线的 pin，外加两条 lane
+> 共用的 Verible / slang / appimagetool。
+
+| 输入 | 固定方式 | 值 |
 |---|---|---|
 | 基础镜像 | **digest** | `docker.m.daocloud.io/library/centos@sha256:be65f488…8ea4`（7.9.2009） |
 | centos-vault 镜像源 | URL | `https://mirrors.tuna.tsinghua.edu.cn/centos-vault/7.9.2009` |
@@ -51,7 +86,7 @@ bash scripts/build.sh
 
 `scripts/docker/rpm-baseline.txt`（382 个包）是构建镜像的 rpm 快照，用来发现"构建环境被悄悄改动"。
 
-## 4. 镜像源替换（CentOS 7 的坑）
+## 4. 镜像源替换（旧版 lane：CentOS 7 的坑）
 
 `vault.centos.org` 从本项目构建宿主返回 **403**，因此必须用 **centos-vault 快照镜像**：
 
@@ -65,26 +100,31 @@ bash scripts/build.sh
   回退到 `VEDIT_BASE_IMAGE_FALLBACK`（默认 `docker.io`），并把解析出的 ref 通过 `--build-arg BASE_IMAGE`
   传给 Dockerfile；主镜像源可用 `VEDIT_BASE_IMAGE` 覆盖（digest 不变）。
 
-## 5. GtkSourceView 4.6.1（源码构建）
+## 5. GtkSourceView 4.6.1（旧版 lane 的源码构建）
 
-CentOS 7 只有 gsv 3.24.8 的 yum 包；VEdit 需要 gsv4 的 `verilog.lang` / `systemverilog.lang`，
+> Qt 产品**不用** GtkSourceView：它用 KDE 的 KSyntaxHighlighting（§12.3）。本节只服务旧 GTK3 线。
+
+CentOS 7 只有 gsv 3.24.8 的 yum 包；旧产品需要 gsv4 的 `verilog.lang` / `systemverilog.lang`，
 所以从源码构建并安装到镜像里的 `/opt/gsv4`：
 
 - 为什么是 **4.6.1** 而不是 4.8.x：4.8 的 `meson.build` 要求 `gtk+-3.0 >= 3.24`，而 CentOS 7 只有
   3.22.30（升 GTK 会连带升 GLib/Pango，等于自建桌面栈，违背"免安装"前提）；
   4.6.1 是接受 3.22 的最新 gsv4 版本；
 - 4.6.1 与 4.8.4 的 **verilog/systemverilog 语言定义逐字节相同**（sha256 一致，
-  见 `assets/language-specs/README.md`），因此这个版本回退对本产品零损失；
+  见 `assets/language-specs/README.md`），因此这个版本回退对旧产品零损失；
 - 构建参数：`meson setup build --prefix=/opt/gsv4 --libdir=lib64 -Dgtk_doc=false -Dgir=false
   -Dvapi=false -Dinstall_tests=false -Dglade_catalog=false`。
 
-## 6. slang（glibc 2.17 专用构建）
+## 6. slang（两条 lane 共用：glibc 2.17 专用构建）
 
 官方 Linux 二进制依赖 GLIBC 2.18/2.25/2.27，CentOS 7 跑不了，因此本项目从源码构建：
 
 ```sh
 bash build/slang/build.sh
 ```
+
+产物 `build/slang/out/slang` 既被旧线打包消费，也被 Qt 交付物的打包与裸构建的运行期解析消费
+（§10.1）。
 
 - 在**全新的** centos:7 容器内构建（宿主工具链不参与），slang `v12.1`
   （commit 固定为 `42710c78…`）；CMake 用 Kitware 的官方 x86_64 二进制（3.31.6，
@@ -95,23 +135,54 @@ bash build/slang/build.sh
 - 产物 `build/slang/out/slang`（sha256 与 `scripts/versions.env` 的 `SLANG_BIN_SHA256` 对应），
   证据在 `build/slang/evidence/`，说明在 `build/slang/REPORT.md`。
 
-## 7. 打包三种产物
+## 7. 打包：Qt 交付物与旧版产物
+
+### 7.1 Qt 交付物（唯一 AppImage）
+
+**交付物 = `bash packaging/runtime/build.sh` 的产物 `packaging/runtime/out/VEdit-<ver>-x86_64.AppImage`（配 `out/SHA256SUMS`）。**
 
 ```sh
-bash packaging/appimage/run-evidence.sh   # AppImage（含离线干净容器验收）
-bash packaging/tarball/build.sh           # tar.gz + 自解压 .run（含离线干净容器验收）
+bash packaging/runtime/build.sh
 ```
 
-- 两者都只消费 pinned 输入：verible 从 `VERIBLE_URL` 下载并按 sha256 校验（**不复制** `.mpd/recon/`）、
-  slang 用 `SLANG_BIN_SHA256` 校验、gsv/GTK 来自 pinned 镜像；
-- 两者都做 **GLIBC ≤ 2.17 全量断言**（遍历包内每个 ELF）与 **RPATH/RUNPATH 白名单**检查
-  （唯一允许项是 CentOS 7 上游 elfutils 自带的 `/usr/lib64/elfutils`，理由见
-  `packaging/tarball/rpath-allowlist.txt`）；
-- 干净容器验收镜像**不含** gtk3/GtkSourceView，负断言写在镜像定义里，
-  验收脚本在 `--network none` 下跑 `--selftest all`（6 个套件；检查总数随版本增长，
-  以实际输出为准，不要在文档里写死）。
+这一条命令产出**唯一交付物**：单文件 AppImage
+`packaging/runtime/out/VEdit-<ver>-x86_64.AppImage`，以及配套的
+`packaging/runtime/out/SHA256SUMS`。它是 F2 私有运行时形态：包内自带 loader / glibc / Qt6 / KF6 /
+KTextEditor / 自建 KSyntaxHighlighting / tree-sitter / 字体，并带 `bin/translations/` 的中文翻译
+（`vedit_zh_CN.qm`、`qtbase_zh_CN.qm`）。流程、白名单与隔离契约见 `packaging/runtime/README.md`
+（该 README 把 `out/AppDir/` 明确列为**中间产物**；当前基线产物 137,079,288 字节，sha256 见
+`out/SHA256SUMS`）。
 
-## 8. 可复现性：已控制到什么程度
+**版本号说明**：`<ver>` 来自工作区 `Cargo.toml` 的 `version`（打包脚本
+`packaging/runtime/build-appimage.sh:53` 读取），当前是 **0.1.1**，所以现在产物名是
+`VEdit-0.1.1-x86_64.AppImage`；Qt 产品自报的版本是 **0.2.0**（`src/app/main.cpp:1851`）。
+两个数字**不是同一来源**，本轮不统一（产品决策）：读文档时，产物名以打包脚本读到的
+`Cargo.toml` 版本为准，应用内版本以 `main.cpp` 为准。
+
+### 7.2 旧版 GTK 产物（不是 Qt 交付物）
+
+```sh
+bash packaging/appimage/run-evidence.sh   # 旧 Rust/GTK vd-app 的 AppImage
+bash packaging/tarball/build.sh           # 旧 vd-app 的 tar.gz + 自解压 .run
+```
+
+这两条是**旧 Rust/GTK 产品**的打包/验收管线，按需求非目标 5 保留；`packaging/appimage/README.md`
+首段自述为 “Legacy GTK product packaging … do not present this pipeline as the final Qt AppImage”，
+载荷是 `build/artifacts/vd-app`，不是 `vedit-app`。它们**不是** Qt 交付物：
+
+- 旧 AppImage 内**没有** `bin/translations/`（实测 `unsquashfs -o <offset> -l` 匹配
+  `zh_CN|translations` = 0），而 7.1 的 Qt AppImage 有 `vedit_zh_CN.qm` / `qtbase_zh_CN.qm`；
+- 体积不同：旧管线 47,745,528 字节 vs Qt 交付物 137,079,288 字节（同一台机器、同一天构建）；
+- 旧管线的干净容器验收仍从宿主 glibc 家族解析 **8** 个库
+  （`evidence/appimage/clean-room.log`：`from host glibc family: 8`），而 Qt 交付物是 F2 私有运行时。
+
+旧管线自身的断言（pinned 输入 + sha256、GLIBC ≤ 2.17 全量断言、RPATH/RUNPATH 白名单）仍然有效，
+但它们证明的是**旧产物**的性质，不能用来证明 Qt 交付物。
+
+## 8. 可复现性（旧版 lane 的边界）
+
+> 本节以下条目针对**旧产物**（`vd-app` / tar.gz / `.run`）。Qt 交付物的私有运行时、F2 隔离与
+> 四容器矩阵证据见 `packaging/runtime/README.md` 与 `evidence/slice3-pack/`。
 
 **已控制**
 
@@ -132,7 +203,8 @@ bash packaging/tarball/build.sh           # tar.gz + 自解压 .run（含离线�
 
 ## 9. 重新生成 Rust crate 许可清单
 
-`docs/rust-crates.txt` 是生成物，不要手改。在 pinned 镜像里：
+`docs/rust-crates.txt` 是生成物，不要手改。清单覆盖工作区 Rust crate；Qt 产品通过 `vd-ffi` 链接
+Rust 服务层，所以两条 lane 共用它。在 pinned 镜像里：
 
 ```sh
 cargo metadata --format-version 1 --all-features > meta.json
@@ -141,7 +213,9 @@ cargo metadata --format-version 1 --all-features > meta.json
 
 七个 `vd-*` crate 是本项目自有代码，其许可随项目根 `LICENSE`。
 
-## 10. 排障
+## 10. 排障（旧版 lane）
+
+> 下表是旧 GTK3 线的常见问题；Qt 产品的构建问题见 §12.7，运行期工具链发现见 §10.1。
 
 | 现象 | 原因与处理 |
 |---|---|
@@ -152,7 +226,7 @@ cargo metadata --format-version 1 --all-features > meta.json
 | `verible-verilog-ls` / `slang` 找不到 | 运行期按 **随包 → 本地取 → PATH → env** 解析（见 §10.1）；裸构建里先跑 `bash scripts/fetch-verible.sh` 与 `bash build/slang/build.sh`，或用 `VEDIT_VERIBLE_LS` / `VEDIT_SLANG` 指定 |
 | `--selftest all` 失败在 `lsp` 的 definition 检查 | 运行目录里没有 fixtures：设置 `VEDIT_SELFTEST_FIXTURES=<share>/vedit/testdata` |
 
-### 10.1 运行期工具链发现（诊断 / 大纲：随包 / 本地取 / env）
+### 10.1 运行期工具链发现（Qt 产品：诊断 / 大纲：随包 / 本地取 / env）
 
 `vedit-app` 的诊断/大纲面板需要 `verible-verilog-ls`（LSP）与 `slang`（deep lint）。
 解析顺序固定为 **bundled → local checkout → PATH → env**，并把结果打印出来
@@ -176,7 +250,10 @@ cargo metadata --format-version 1 --all-features > meta.json
 三条修复路径），outline 保持空表 + 一行原因；不会按文件/请求重复报错，也不把
 “环境未满足”当作文件级 Error。
 
-## 11. GitHub Actions（CI / 镜像 / 发版）
+## 11. GitHub Actions（旧版 lane 的 CI / 镜像 / 发版）
+
+> 以下三条工作流仍针对旧 GTK3 线。Qt 交付物的构建与发布流程见 `docs/RELEASING.md` §6 与本文 §7.1；
+> 它们不是 Qt 交付物的发布路径。
 
 仓库有三条工作流（`.github/workflows/`），全部复用同一个 pinned CentOS 7 镜像：
 
@@ -212,8 +289,8 @@ VEDIT_SKIP_IMAGE_BUILD=1 \
 
 ## 12. Qt6 / KF6 C++ 构建底座（M0，T10）
 
-> 本节描述**重写后的 C++/Qt6 产品**的构建底座；§1–§11 描述仍在树里的 Rust/GTK 产品
-> （Open Q7 未决，两条 lane 并存，彼此不替代）。
+> 本节是 **Qt6 交付物**（`vedit-app`）的构建底座，也就是 §2 那条命令的细节；§2.1 与 §3–§5、§8、
+> §10、§11 是旧 Rust/GTK 线（§6 的 slang 二进制、§9 的 Rust crate 清单两条 lane 共用）。
 
 ### 12.1 为什么用现代发行版做构建镜像
 
@@ -236,12 +313,14 @@ CentOS 7（kernel 3.10）仍然成立：镜像里的 glibc 2.43 编译下限是 
 `.note.ABI-tag` 也是 `ABI: 3.2.0`）；ELF 基线是普通 x86-64
 （`x86 ISA needed: x86-64-baseline`），不是 x86-64-v3。
 
-### 12.2 一条命令
+### 12.2 构建命令与产物
 
 ```sh
 bash scripts/build-qt.sh              # 镜像 → configure → build → ctest → xcb/软件渲染冒烟
 bash scripts/build-qt.sh --no-test    # 只 configure + build（即 C++ 静态检查）
 ```
+
+与 §2 相同的一条命令；本节列出产物路径、运行期依赖与证据。
 
 **产物路径：`target/qt6-build/src/app/vedit-app`**（CMake 构建树 `target/qt6-build/` 已被 gitignore）。
 `bash scripts/build.sh` 是旧 Rust/GTK3 产品，只写 `target/release/vd-app`，不产出 `vedit-app`。
@@ -318,7 +397,8 @@ C++ lane 没有独立的 MPD gate id（ledger 的 id 表是固定的），因此
 ### 12.6 已知边界（如实记录）
 
 - **T10 不含运行时打包**：把 loader/glibc/Qt6/KF6/plugins/syntax data 打进 AppImage 是
-  T11（m0-runtime）；本节的产物是可执行的冒烟程序，不是交付物。
+  T11（m0-runtime）；本节的产物是可执行的冒烟程序，**不是交付物**（交付物是 §7.1 的 AppImage，
+  由 `packaging/runtime/build.sh` 产出）。
 - **双宿主闸门是 T12**：本机构建容器与宿主**共享内核**，"CentOS 7.9 + glibc 2.17
   userland 能跑"已在 `centos:7` 容器里验证（`evidence/m0-build/14-*`：包内 loader 与
   包内 glibc 解析成功），但 kernel 3.10 本身没有在这里被跑到；真实 3.10 主机由 T12 验。
@@ -329,9 +409,9 @@ C++ lane 没有独立的 MPD gate id（ledger 的 id 表是固定的），因此
   `definitionForName("Verilog")` 有效，但 `definitionForFileName("test.v")` 返回 `V`
   （vlang 也占用 `*.v`）。T16/T20 必须按名字或自定义映射处理，不能只依赖扩展名。
   证据：`evidence/m0-build/12-ksyntax-definitions-probe.txt`。
-- **SystemVerilog 定义**：镜像里 `definitionForName("SystemVerilog")` 可加载，但冒烟
-  **只报告不断言**，因为 C7 的许可处置未定（Open Q1），"构建镜像能加载"不等于
-  "交付物随包"。
+- **SystemVerilog 定义**：构建镜像里 `definitionForName("SystemVerilog")` 可加载（来自 KDE 内嵌
+  定义），冒烟**只报告不断言**；交付物随包的是我们自己的 5 份 `resources/syntax/vedit-*.xml`
+  （白名单由 §7.1 的 F2 形态断言），不是 KDE 内嵌定义。
 - 镜像重建需要联网拉取固定版本 .deb；归档一旦停供某个精确版本，镜像构建会**硬失败**
   （预期行为：复用已发布镜像 ref，而不是悄悄换版本）。
 

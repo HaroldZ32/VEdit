@@ -1,0 +1,13 @@
+REFUSED: 12 target(s) did not match exactly once:
+  count=0 'cannot open %1: the editor could not load the file'
+  count=0 'Files imported through a .f filelist; they live outside this folder tree'
+  count=0 'From filelist (%1)'
+  count=0 'absolute path opened as given; files outside the workspace are allowed'
+  count=0 'relative path resolved under the workspace root'
+  count=0 'relative path, not found under the workspace root'
+  count=0 'relative path and the workspace root is unknown'
+  count=0 'the module catalog service did not answer within 300 s'
+  count=0 'Has errors'
+  count=0 'Warnings only'
+  count=0 'Analysed: no problems found'
+  count=0 'Not analysed yet (queued, or excluded because the buffer has unsaved changes)'

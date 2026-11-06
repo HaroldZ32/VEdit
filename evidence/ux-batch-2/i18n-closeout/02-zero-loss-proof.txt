@@ -1,0 +1,16 @@
+old messages: 1238  new messages: 1250
+old finished+translated: 1238
+new finished+translated: 1232
+ADDED: 12  REMOVED: 0  CHANGED: 0  LOST: 0
+  ADDED  ctx='VEdit' src='Analysed: no problems found' kind=unfinished
+  ADDED  ctx='VEdit' src='Files imported through a .f filelist; they live outside this folder tree' kind=unfinished
+  ADDED  ctx='VEdit' src='From filelist (%1)' kind=unfinished
+  ADDED  ctx='VEdit' src='Has errors' kind=unfinished
+  ADDED  ctx='VEdit' src='Not analysed yet (queued, or excluded because the buffer has unsaved changes)' kind=unfinished
+  ADDED  ctx='VEdit' src='Warnings only' kind=unfinished
+  ADDED  ctx='VEdit' src='absolute path opened as given; files outside the workspace are allowed' kind=unfinished
+  ADDED  ctx='VEdit' src='cannot open %1: the editor could not load the file' kind=unfinished
+  ADDED  ctx='VEdit' src='relative path and the workspace root is unknown' kind=unfinished
+  ADDED  ctx='VEdit' src='relative path resolved under the workspace root' kind=unfinished
+  ADDED  ctx='VEdit' src='relative path, not found under the workspace root' kind=unfinished
+  ADDED  ctx='VEdit' src='the module catalog service did not answer within 300 s' kind=unfinished

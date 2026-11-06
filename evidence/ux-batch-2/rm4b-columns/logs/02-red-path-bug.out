@@ -1,0 +1,38 @@
+########## RED: nested project (sources in rtl/), PRE-FIX producer ##########
+     PASSED   : /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-nested/child.sv:1:34 (status=rejected)
+     SEAM-ERR : cannot open /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-nested/child.sv: not a regular file [absolute path opened as given; files outside the workspace are allowed; workspace root: /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-nested]
+     PANEL    : port clk declaration: the editor rejected the jump to child.sv:1:34 — cannot open /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-nested/child.sv: not a regular file [absolute path opened as given; files outside the workspace are allowed; workspace root: /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-nested]
+FAIL rm4.double-click.port-declaration.opened-file — resolved= expected=child.sv
+FAIL rm4.double-click.port-declaration.cursor-on-identifier — identifier-under-cursor='module' expected='clk' column=1
+FAIL rm4.double-click.port-declaration.seam-delivered — cannot open /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-nested/child.sv: not a regular file [absolute path opened as given; files outside the workspace are allowed; workspace root: /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-nested]
+     PASSED   : /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-nested/top.sv:3:9 (status=rejected)
+     SEAM-ERR : cannot open /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-nested/top.sv: not a regular file [absolute path opened as given; files outside the workspace are allowed; workspace root: /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-nested]
+     PANEL    : instantiation of child in top: the editor rejected the jump to top.sv:3:9 — cannot open /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-nested/top.sv: not a regular file [absolute path opened as given; files outside the workspace are allowed; workspace root: /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-nested]
+FAIL rm4.ctrl-double-click.instantiation.opened-file — resolved= expected=top.sv
+FAIL rm4.ctrl-double-click.instantiation.cursor-line — observed=1 expected=3
+FAIL rm4.ctrl-double-click.instantiation.cursor-on-identifier — identifier-under-cursor='module' expected='u_child' column=1
+FAIL rm4.ctrl-double-click.instantiation.seam-delivered — cannot open /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-nested/top.sv: not a regular file [absolute path opened as given; files outside the workspace are allowed; workspace root: /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-nested]
+     TREE PASSED   : /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-nested/child.sv:1:8 (status=rejected)
+     TREE PANEL    : child definition: the editor rejected the jump to child.sv:1:8 — cannot open /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-nested/child.sv: not a regular file [absolute path opened as given; files outside the workspace are allowed; workspace root: /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-nested]
+FAIL rm4.module-tree.opened-declaration-file
+FAIL rm4.module-tree.cursor-on-definition — cursor=1:1 identifier='module' expected line=1
+checks=25 failures=9
+########## RED: multi-directory project, PRE-FIX producer ##########
+     PASSED   : /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-multidir/child.sv:1:34 (status=rejected)
+     SEAM-ERR : cannot open /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-multidir/child.sv: not a regular file [absolute path opened as given; files outside the workspace are allowed; workspace root: /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-multidir]
+FAIL rm4.double-click.port-declaration.opened-file — resolved= expected=child.sv
+FAIL rm4.double-click.port-declaration.cursor-on-identifier — identifier-under-cursor='module' expected='clk' column=1
+FAIL rm4.double-click.port-declaration.seam-delivered — cannot open /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-multidir/child.sv: not a regular file [absolute path opened as given; files outside the workspace are allowed; workspace root: /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-multidir]
+     PASSED   : /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-multidir/top.sv:3:9 (status=rejected)
+     SEAM-ERR : cannot open /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-multidir/top.sv: not a regular file [absolute path opened as given; files outside the workspace are allowed; workspace root: /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-multidir]
+FAIL rm4.ctrl-double-click.instantiation.opened-file — resolved= expected=top.sv
+FAIL rm4.ctrl-double-click.instantiation.cursor-line — observed=1 expected=3
+FAIL rm4.ctrl-double-click.instantiation.cursor-on-identifier — identifier-under-cursor='module' expected='u_child' column=1
+FAIL rm4.ctrl-double-click.instantiation.seam-delivered — cannot open /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-multidir/top.sv: not a regular file [absolute path opened as given; files outside the workspace are allowed; workspace root: /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-multidir]
+     TREE PASSED   : /vedit-build/evidence/ux-batch-2/rm4b-columns/fixture-multidir/child.sv:1:8 (status=rejected)
+FAIL rm4.module-tree.opened-declaration-file
+FAIL rm4.module-tree.cursor-on-definition — cursor=1:1 identifier='module' expected line=1
+     TREE PASSED   : /vedit-build/evidence/ux-batch-2/rm4b-columns/tb/tb.sv:1:8 (status=rejected)
+FAIL rm4.module-tree.opened-declaration-file
+FAIL rm4.module-tree.cursor-on-definition — cursor=1:1 identifier='module' expected line=1
+checks=30 failures=11

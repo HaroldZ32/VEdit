@@ -1,0 +1,35 @@
+CHECK PASS shared.extensions-are-f  f
+CHECK PASS shared.globs-f-and-F  *.f,*.F
+CHECK PASS shared.is-filelist-lower
+CHECK PASS shared.is-filelist-upper
+CHECK PASS shared.not-filelist-flist
+CHECK PASS shared.not-filelist-source
+CHECK PASS open.table-has-entries  entries=4
+CHECK PASS open.entry0.filelist-globs-exact  entry='Verilog/SystemVerilog/filelist' filelist-globs='*.F,*.f' expected='*.F,*.f'
+CHECK PASS open.entry1.filelist-globs-exact  entry='Filelists' filelist-globs='*.F,*.f' expected='*.F,*.f'
+CHECK PASS open.has-filelist-claiming-entry  claiming=2
+CHECK PASS open.default-entry-offers-filelists  default='Verilog/SystemVerilog/filelist'
+CHECK PASS open.entry0.no-guessed-flist  Verilog/SystemVerilog/filelist (*.f *.F *.v *.sv *.svh *.vh)
+CHECK PASS open.entry1.no-guessed-flist  Verilog/SystemVerilog (*.v *.sv *.svh *.vh)
+CHECK PASS open.entry2.no-guessed-flist  Filelists (*.f *.F)
+CHECK PASS open.entry3.no-guessed-flist  All Files (*)
+CHECK PASS open.entry0.no-unrecognised-globs  entry='Verilog/SystemVerilog/filelist' guessed=''
+CHECK PASS open.entry2.no-unrecognised-globs  entry='Filelists' guessed=''
+CHECK PASS import.table-first-is-filelist  Verilog filelists (*.f *.F)
+CHECK PASS import.selected-filter-is-filelist  selected='Verilog filelists (*.f *.F)' expected='Verilog filelists (*.f *.F)'
+CHECK PASS import.selected-offers-exact-filelist-globs  selected='Verilog filelists (*.f *.F)' globs='*.F,*.f'
+CHECK PASS import.selected-offers-f-and-F  Verilog filelists (*.f *.F)
+CHECK PASS fixture.tempdir
+CHECK PASS fixture.a-sv
+CHECK PASS fixture.lib-f
+CHECK PASS dialog.same-engine-as-the-file-dialog  /tmp/vedit-file-dialog-filters-selftest-dCBRHl
+OBSERVED import-default-filter names='lib.f'
+CHECK PASS dialog.default-filter-shows-lib.f  lib.f
+CHECK PASS dialog.default-filter-hides-a.sv  lib.f
+CHECK PASS dialog.all-files-shows-both  a.sv,lib.f
+OBSERVED open-filter-engine index=0 filter='Verilog/SystemVerilog/filelist' names='lib.f,a.sv'
+CHECK PASS open.engine0.filelist-visible  filter='Verilog/SystemVerilog/filelist' names='lib.f,a.sv'
+OBSERVED open-filter-engine index=1 filter='Filelists' names='lib.f'
+CHECK PASS open.engine1.filelist-visible  filter='Filelists' names='lib.f'
+CHECK PASS open.engine-proved-at-least-one  proved=2
+VE-FILE-DIALOG-FILTERS-SELFTEST checks=31 failures=0

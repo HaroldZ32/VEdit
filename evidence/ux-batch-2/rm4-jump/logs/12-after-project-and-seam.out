@@ -1,0 +1,81 @@
+[164/165] Building CXX object src/app/CMakeFiles/vedit-app.dir/main.cpp.o
+[165/165] Linking CXX executable src/app/vedit-app
+binary 2026-11-06 07:45:00.984555575 +0000 125459464 /vedit-build/target/rm4-jump-probe/rm4-jump-probe
+3ef27b48ac4bfe85caf6dcea08105e4e85d6db3ab081170d4a3a6833e6406dac  /vedit-build/target/rm4-jump-probe/rm4-jump-probe
+===== AFTER 1/4: project fixture B =====
+mode=project startRoot=/vedit-build/evidence/ux-batch-2/rm4-jump/fixture
+ok   rm4.jump-target-is-the-product-target — EditorJumpTarget installed
+ok   rm4.module-tree-dock
+ok   rm4.interface-dock
+ok   rm4.active-pane
+ok   rm4.catalog-painted — cataloguing 2 project file(s)…
+ok   rm4.module-row
+ok   rm4.interface-focus — focused=child rows=2
+ok   rm4.ground-truth.port-declaration — child.sv:1:34
+ok   rm4.ground-truth.instantiation — top.sv:3:11
+ok   rm4.port-row — clk
+ok   rm4.double-click.port-declaration.gesture-delivered
+     PASSED   : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/child.sv:1:34 (status=delivered)
+     RECEIVED : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/child.sv:1:34
+     SEAM-ERR : <none>
+     RESOLVED : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/child.sv cursor=1:34
+     PANEL    : port clk declaration → child.sv:1:34
+ok   rm4.double-click.port-declaration.opened-file — resolved=child.sv expected=child.sv
+ok   rm4.double-click.port-declaration.cursor-line — observed=1 expected=1
+ok   rm4.double-click.port-declaration.cursor-on-identifier — identifier-under-cursor='clk' expected='clk' column=34
+ok   rm4.double-click.port-declaration.seam-delivered
+ok   rm4.ctrl-double-click.instantiation.gesture-delivered
+     PASSED   : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/top.sv:3:9 (status=delivered)
+     RECEIVED : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/top.sv:3:9
+     SEAM-ERR : <none>
+     RESOLVED : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/top.sv cursor=3:9
+     PANEL    : instantiation of child in top → top.sv:3:9
+ok   rm4.ctrl-double-click.instantiation.opened-file — resolved=top.sv expected=top.sv
+ok   rm4.ctrl-double-click.instantiation.cursor-line — observed=3 expected=3
+ok   rm4.ctrl-double-click.instantiation.cursor-on-identifier — identifier-under-cursor='u_child' expected='u_child' column=9
+ok   rm4.ctrl-double-click.instantiation.seam-delivered
+checks=20 failures=0
+===== AFTER 2/4: fixture C (non-ASCII line) =====
+mode=project startRoot=/vedit-build/evidence/ux-batch-2/rm4-jump/fixture-c
+ok   rm4.jump-target-is-the-product-target — EditorJumpTarget installed
+ok   rm4.module-tree-dock
+ok   rm4.interface-dock
+ok   rm4.active-pane
+ok   rm4.catalog-painted — cataloguing 2 project file(s)…
+ok   rm4.module-row
+ok   rm4.interface-focus — focused=child rows=2
+ok   rm4.ground-truth.port-declaration — child.sv:1:45
+ok   rm4.ground-truth.instantiation — top.sv:3:11
+ok   rm4.port-row — clk
+ok   rm4.double-click.port-declaration.gesture-delivered
+     PASSED   : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture-c/child.sv:1:53 (status=delivered)
+     RESOLVED : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture-c/child.sv cursor=1:45
+ok   rm4.double-click.port-declaration.opened-file — resolved=child.sv expected=child.sv
+ok   rm4.double-click.port-declaration.cursor-line — observed=1 expected=1
+ok   rm4.double-click.port-declaration.cursor-on-identifier — identifier-under-cursor='clk' expected='clk' column=45
+ok   rm4.double-click.port-declaration.seam-delivered
+ok   rm4.ctrl-double-click.instantiation.gesture-delivered
+     PASSED   : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture-c/top.sv:3:9 (status=delivered)
+     RESOLVED : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture-c/top.sv cursor=3:9
+ok   rm4.ctrl-double-click.instantiation.opened-file — resolved=top.sv expected=top.sv
+ok   rm4.ctrl-double-click.instantiation.cursor-line — observed=3 expected=3
+ok   rm4.ctrl-double-click.instantiation.cursor-on-identifier — identifier-under-cursor='u_child' expected='u_child' column=9
+ok   rm4.ctrl-double-click.instantiation.seam-delivered
+checks=20 failures=0
+===== AFTER 3/4: seam checks =====
+mode=seam startRoot=/vedit-build/evidence/ux-batch-2/rm4-jump/fixture
+ok   rm4.jump-target-is-the-product-target — EditorJumpTarget installed
+ok   rm4.module-tree-dock
+ok   rm4.interface-dock
+ok   rm4.active-pane
+ok   rm4.catalog-painted — cataloguing 2 project file(s)…
+     RELATIVE   : requested='child.sv' delivered=1 opened='/vedit-build/evidence/ux-batch-2/rm4-jump/fixture/child.sv' error=''
+ok   rm4.seam.relative-path.delivered
+ok   rm4.seam.relative-path.under-workspace-root — /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/child.sv
+     GHOST      : activated=0 status=rejected
+     PANEL      : port p declaration: the editor rejected the jump to ghost.sv:1:1 — cannot open /nonexistent-rm4/ghost.sv: not a regular file [workspace root: /vedit-build/evidence/ux-batch-2/rm4-jump/fixture]
+     REASON     : cannot open /nonexistent-rm4/ghost.sv: not a regular file [workspace root: /vedit-build/evidence/ux-batch-2/rm4-jump/fixture]
+ok   rm4.seam.refusal.still-a-refusal
+ok   rm4.seam.refusal.reason-names-what-failed — cannot open /nonexistent-rm4/ghost.sv: not a regular file [workspace root: /vedit-build/evidence/ux-batch-2/rm4-jump/fixture]
+ok   rm4.seam.refusal.panel-carries-the-reason — port p declaration: the editor rejected the jump to ghost.sv:1:1 — cannot open /nonexistent-rm4/ghost.sv: not a regular file [workspace root: /vedit-build/evidence/ux-batch-2/rm4-jump/fixture]
+checks=10 failures=0

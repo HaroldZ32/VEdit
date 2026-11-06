@@ -1,0 +1,698 @@
+CHECK disabled.palette.catalogue PASS 30 theme(s)
+CHECK disabled.palette.window-text FAIL theme=Atom One Dark enabled=#abb2bf disabled=#abb2bf delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Atom One Dark enabled=#abb2bf disabled=#abb2bf delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Atom One Dark enabled=#abb2bf disabled=#abb2bf delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Atom One Dark enabled=#abb2bf disabled=#abb2bf delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Atom One Dark enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Atom One Dark enabled=#61afef disabled=#61afef delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Atom One Dark enabled=#98c379 disabled=#98c379 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Atom One Dark enabled=#363c4a disabled=#363c4a delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Atom One Dark enabled=#141414 disabled=#141414 delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Atom One Dark          worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=Atom One Light enabled=#383a42 disabled=#383a42 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Atom One Light enabled=#383a42 disabled=#383a42 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Atom One Light enabled=#383a42 disabled=#383a42 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Atom One Light enabled=#383a42 disabled=#383a42 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Atom One Light enabled=#5a5d6a disabled=#5a5d6a delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Atom One Light enabled=#4078f2 disabled=#4078f2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Atom One Light enabled=#50a14f disabled=#50a14f delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Atom One Light enabled=#e5e5e6 disabled=#e5e5e6 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Atom One Light enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Atom One Light         worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=Breeze Dark enabled=#cfcfc2 disabled=#cfcfc2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Breeze Dark enabled=#cfcfc2 disabled=#cfcfc2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Breeze Dark enabled=#cfcfc2 disabled=#cfcfc2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Breeze Dark enabled=#cfcfc2 disabled=#cfcfc2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Breeze Dark enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Breeze Dark enabled=#8e44ad disabled=#8e44ad delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Breeze Dark enabled=#27ae60 disabled=#27ae60 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Breeze Dark enabled=#2d5c76 disabled=#2d5c76 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Breeze Dark enabled=#141414 disabled=#141414 delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Breeze Dark            worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=Breeze Light enabled=#1f1c1b disabled=#1f1c1b delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Breeze Light enabled=#1f1c1b disabled=#1f1c1b delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Breeze Light enabled=#1f1c1b disabled=#1f1c1b delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Breeze Light enabled=#1f1c1b disabled=#1f1c1b delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Breeze Light enabled=#322d2b disabled=#322d2b delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Breeze Light enabled=#644a9b disabled=#644a9b delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Breeze Light enabled=#ff5500 disabled=#ff5500 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Breeze Light enabled=#94caef disabled=#94caef delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Breeze Light enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Breeze Light           worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=Catppuccin Frappé enabled=#c6d0f5 disabled=#c6d0f5 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Catppuccin Frappé enabled=#c6d0f5 disabled=#c6d0f5 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Catppuccin Frappé enabled=#c6d0f5 disabled=#c6d0f5 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Catppuccin Frappé enabled=#c6d0f5 disabled=#c6d0f5 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Catppuccin Frappé enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Catppuccin Frappé enabled=#8caaee disabled=#8caaee delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Catppuccin Frappé enabled=#a6d189 disabled=#a6d189 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Catppuccin Frappé enabled=#51576d disabled=#51576d delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Catppuccin Frappé enabled=#141414 disabled=#141414 delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Catppuccin Frappé     worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=Catppuccin Latte enabled=#4c4f69 disabled=#4c4f69 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Catppuccin Latte enabled=#4c4f69 disabled=#4c4f69 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Catppuccin Latte enabled=#4c4f69 disabled=#4c4f69 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Catppuccin Latte enabled=#4c4f69 disabled=#4c4f69 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Catppuccin Latte enabled=#7a7ea8 disabled=#7a7ea8 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Catppuccin Latte enabled=#1e66f5 disabled=#1e66f5 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Catppuccin Latte enabled=#40a02b disabled=#40a02b delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Catppuccin Latte enabled=#bcc0cc disabled=#bcc0cc delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Catppuccin Latte enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Catppuccin Latte       worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=Catppuccin Macchiato enabled=#cad3f5 disabled=#cad3f5 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Catppuccin Macchiato enabled=#cad3f5 disabled=#cad3f5 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Catppuccin Macchiato enabled=#cad3f5 disabled=#cad3f5 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Catppuccin Macchiato enabled=#cad3f5 disabled=#cad3f5 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Catppuccin Macchiato enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Catppuccin Macchiato enabled=#8aadf4 disabled=#8aadf4 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Catppuccin Macchiato enabled=#a6da95 disabled=#a6da95 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Catppuccin Macchiato enabled=#494d64 disabled=#494d64 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Catppuccin Macchiato enabled=#141414 disabled=#141414 delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Catppuccin Macchiato   worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=Catppuccin Mocha enabled=#cdd6f4 disabled=#cdd6f4 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Catppuccin Mocha enabled=#cdd6f4 disabled=#cdd6f4 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Catppuccin Mocha enabled=#cdd6f4 disabled=#cdd6f4 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Catppuccin Mocha enabled=#cdd6f4 disabled=#cdd6f4 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Catppuccin Mocha enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Catppuccin Mocha enabled=#89b4fa disabled=#89b4fa delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Catppuccin Mocha enabled=#a6e3a1 disabled=#a6e3a1 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Catppuccin Mocha enabled=#45475a disabled=#45475a delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Catppuccin Mocha enabled=#141414 disabled=#141414 delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Catppuccin Mocha       worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=Dracula enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Dracula enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Dracula enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Dracula enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Dracula enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Dracula enabled=#50fa7b disabled=#50fa7b delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Dracula enabled=#ff79c6 disabled=#ff79c6 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Dracula enabled=#44475a disabled=#44475a delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Dracula enabled=#141414 disabled=#141414 delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Dracula                worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=Falcon enabled=#ddddcc disabled=#ddddcc delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Falcon enabled=#ddddcc disabled=#ddddcc delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Falcon enabled=#ddddcc disabled=#ddddcc delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Falcon enabled=#ddddcc disabled=#ddddcc delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Falcon enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Falcon enabled=#7799cc disabled=#7799cc delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Falcon enabled=#88ee33 disabled=#88ee33 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Falcon enabled=#3366aa disabled=#3366aa delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Falcon enabled=#141414 disabled=#141414 delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Falcon                 worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=GitHub Dark enabled=#e1e4e8 disabled=#e1e4e8 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=GitHub Dark enabled=#e1e4e8 disabled=#e1e4e8 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=GitHub Dark enabled=#e1e4e8 disabled=#e1e4e8 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=GitHub Dark enabled=#e1e4e8 disabled=#e1e4e8 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=GitHub Dark enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=GitHub Dark enabled=#b392f0 disabled=#b392f0 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=GitHub Dark enabled=#9ecbff disabled=#9ecbff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=GitHub Dark enabled=#253749 disabled=#253749 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=GitHub Dark enabled=#141414 disabled=#141414 delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME GitHub Dark            worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=GitHub Light enabled=#24292e disabled=#24292e delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=GitHub Light enabled=#24292e disabled=#24292e delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=GitHub Light enabled=#24292e disabled=#24292e delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=GitHub Light enabled=#24292e disabled=#24292e delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=GitHub Light enabled=#3a424a disabled=#3a424a delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=GitHub Light enabled=#6f42c1 disabled=#6f42c1 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=GitHub Light enabled=#032f62 disabled=#032f62 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=GitHub Light enabled=#dee6fc disabled=#dee6fc delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=GitHub Light enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME GitHub Light           worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=Homunculus enabled=#303030 disabled=#303030 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Homunculus enabled=#303030 disabled=#303030 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Homunculus enabled=#303030 disabled=#303030 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Homunculus enabled=#303030 disabled=#303030 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Homunculus enabled=#4d4d4d disabled=#4d4d4d delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Homunculus enabled=#721045 disabled=#721045 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Homunculus enabled=#813e00 disabled=#813e00 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Homunculus enabled=#bcbcbc disabled=#bcbcbc delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Homunculus enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Homunculus             worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=Monokai enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Monokai enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Monokai enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Monokai enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Monokai enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Monokai enabled=#a6e22e disabled=#a6e22e delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Monokai enabled=#f92672 disabled=#f92672 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Monokai enabled=#3f413e disabled=#3f413e delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Monokai enabled=#141414 disabled=#141414 delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Monokai                worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=Nord enabled=#d8dee9 disabled=#d8dee9 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Nord enabled=#d8dee9 disabled=#d8dee9 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Nord enabled=#d8dee9 disabled=#d8dee9 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Nord enabled=#d8dee9 disabled=#d8dee9 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Nord enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Nord enabled=#88c0d0 disabled=#88c0d0 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Nord enabled=#a3be8c disabled=#a3be8c delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Nord enabled=#4c566a disabled=#4c566a delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Nord enabled=#141414 disabled=#141414 delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Nord                   worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=Oblivion enabled=#d3d7c1 disabled=#d3d7c1 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Oblivion enabled=#d3d7c1 disabled=#d3d7c1 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Oblivion enabled=#d3d7c1 disabled=#d3d7c1 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Oblivion enabled=#d3d7c1 disabled=#d3d7c1 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Oblivion enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Oblivion enabled=#729fcf disabled=#729fcf delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Oblivion enabled=#ad7fa8 disabled=#ad7fa8 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Oblivion enabled=#184880 disabled=#184880 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Oblivion enabled=#141414 disabled=#141414 delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Oblivion               worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=Printing enabled=#000000 disabled=#000000 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Printing enabled=#000000 disabled=#000000 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Printing enabled=#000000 disabled=#000000 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Printing enabled=#000000 disabled=#000000 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Printing enabled=#000000 disabled=#000000 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Printing enabled=#644a9b disabled=#644a9b delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Printing enabled=#644a9b disabled=#644a9b delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Printing enabled=#94caef disabled=#94caef delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Printing enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Printing               worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=Radical enabled=#7c9c9e disabled=#7c9c9e delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Radical enabled=#7c9c9e disabled=#7c9c9e delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Radical enabled=#7c9c9e disabled=#7c9c9e delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Radical enabled=#7c9c9e disabled=#7c9c9e delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Radical enabled=#baeaed disabled=#baeaed delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Radical enabled=#a9fef7 disabled=#a9fef7 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Radical enabled=#a9fef7 disabled=#a9fef7 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Radical enabled=#4f2e93 disabled=#4f2e93 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Radical enabled=#141414 disabled=#141414 delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Radical                worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=Solarized Dark enabled=#839496 disabled=#839496 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Solarized Dark enabled=#839496 disabled=#839496 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Solarized Dark enabled=#839496 disabled=#839496 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Solarized Dark enabled=#839496 disabled=#839496 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Solarized Dark enabled=#c5dee1 disabled=#c5dee1 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Solarized Dark enabled=#268bd2 disabled=#268bd2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Solarized Dark enabled=#2aa198 disabled=#2aa198 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Solarized Dark enabled=#083d4a disabled=#083d4a delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Solarized Dark enabled=#141414 disabled=#141414 delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Solarized Dark         worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=Solarized Light enabled=#657b83 disabled=#657b83 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Solarized Light enabled=#657b83 disabled=#657b83 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Solarized Light enabled=#657b83 disabled=#657b83 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Solarized Light enabled=#657b83 disabled=#657b83 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Solarized Light enabled=#a2c5d2 disabled=#a2c5d2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Solarized Light enabled=#268bd2 disabled=#268bd2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Solarized Light enabled=#2aa198 disabled=#2aa198 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Solarized Light enabled=#073642 disabled=#073642 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Solarized Light enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Solarized Light        worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=Tokyo Night enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Tokyo Night enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Tokyo Night enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Tokyo Night enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Tokyo Night enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Tokyo Night enabled=#7aa2f7 disabled=#7aa2f7 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Tokyo Night enabled=#7dcfff disabled=#7dcfff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Tokyo Night enabled=#27283e disabled=#27283e delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Tokyo Night enabled=#141414 disabled=#141414 delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Tokyo Night            worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=Tokyo Night Light enabled=#343b58 disabled=#343b58 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Tokyo Night Light enabled=#343b58 disabled=#343b58 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Tokyo Night Light enabled=#343b58 disabled=#343b58 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Tokyo Night Light enabled=#343b58 disabled=#343b58 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Tokyo Night Light enabled=#535e8d disabled=#535e8d delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Tokyo Night Light enabled=#34548a disabled=#34548a delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Tokyo Night Light enabled=#0f4b6e disabled=#0f4b6e delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Tokyo Night Light enabled=#e5e6eb disabled=#e5e6eb delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Tokyo Night Light enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Tokyo Night Light      worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=Tokyo Night Storm enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Tokyo Night Storm enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Tokyo Night Storm enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Tokyo Night Storm enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Tokyo Night Storm enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Tokyo Night Storm enabled=#7aa2f7 disabled=#7aa2f7 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Tokyo Night Storm enabled=#7dcfff disabled=#7dcfff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Tokyo Night Storm enabled=#323450 disabled=#323450 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Tokyo Night Storm enabled=#141414 disabled=#141414 delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Tokyo Night Storm      worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=VSCodium Dark enabled=#d4d4d4 disabled=#d4d4d4 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=VSCodium Dark enabled=#d4d4d4 disabled=#d4d4d4 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=VSCodium Dark enabled=#d4d4d4 disabled=#d4d4d4 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=VSCodium Dark enabled=#d4d4d4 disabled=#d4d4d4 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=VSCodium Dark enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=VSCodium Dark enabled=#dcdcaa disabled=#dcdcaa delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=VSCodium Dark enabled=#c586c0 disabled=#c586c0 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=VSCodium Dark enabled=#264f78 disabled=#264f78 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=VSCodium Dark enabled=#141414 disabled=#141414 delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME VSCodium Dark          worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=Vim Dark enabled=#b2b2b2 disabled=#b2b2b2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=Vim Dark enabled=#b2b2b2 disabled=#b2b2b2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=Vim Dark enabled=#b2b2b2 disabled=#b2b2b2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=Vim Dark enabled=#b2b2b2 disabled=#b2b2b2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=Vim Dark enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=Vim Dark enabled=#cd00cd disabled=#cd00cd delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=Vim Dark enabled=#ff54ff disabled=#ff54ff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=Vim Dark enabled=#232323 disabled=#232323 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=Vim Dark enabled=#141414 disabled=#141414 delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME Vim Dark               worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=ayu Dark enabled=#b3b1ad disabled=#b3b1ad delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=ayu Dark enabled=#b3b1ad disabled=#b3b1ad delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=ayu Dark enabled=#b3b1ad disabled=#b3b1ad delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=ayu Dark enabled=#b3b1ad disabled=#b3b1ad delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=ayu Dark enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=ayu Dark enabled=#ffb454 disabled=#ffb454 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=ayu Dark enabled=#c2d94c disabled=#c2d94c delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=ayu Dark enabled=#273747 disabled=#273747 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=ayu Dark enabled=#141414 disabled=#141414 delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME ayu Dark               worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=ayu Light enabled=#575f66 disabled=#575f66 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=ayu Light enabled=#575f66 disabled=#575f66 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=ayu Light enabled=#575f66 disabled=#575f66 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=ayu Light enabled=#575f66 disabled=#575f66 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=ayu Light enabled=#8b98a3 disabled=#8b98a3 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=ayu Light enabled=#f2ae49 disabled=#f2ae49 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=ayu Light enabled=#86b300 disabled=#86b300 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=ayu Light enabled=#d1e4f4 disabled=#d1e4f4 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=ayu Light enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME ayu Light              worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=ayu Mirage enabled=#cbccc6 disabled=#cbccc6 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=ayu Mirage enabled=#cbccc6 disabled=#cbccc6 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=ayu Mirage enabled=#cbccc6 disabled=#cbccc6 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=ayu Mirage enabled=#cbccc6 disabled=#cbccc6 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=ayu Mirage enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=ayu Mirage enabled=#ffd580 disabled=#ffd580 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=ayu Mirage enabled=#bae67e disabled=#bae67e delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=ayu Mirage enabled=#33415e disabled=#33415e delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=ayu Mirage enabled=#141414 disabled=#141414 delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME ayu Mirage             worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=gruvbox Dark enabled=#ebdbb2 disabled=#ebdbb2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=gruvbox Dark enabled=#ebdbb2 disabled=#ebdbb2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=gruvbox Dark enabled=#ebdbb2 disabled=#ebdbb2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=gruvbox Dark enabled=#ebdbb2 disabled=#ebdbb2 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=gruvbox Dark enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=gruvbox Dark enabled=#689d6a disabled=#689d6a delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=gruvbox Dark enabled=#689d6a disabled=#689d6a delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=gruvbox Dark enabled=#504945 disabled=#504945 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=gruvbox Dark enabled=#141414 disabled=#141414 delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME gruvbox Dark           worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+CHECK disabled.palette.window-text FAIL theme=gruvbox Light enabled=#3c3836 disabled=#3c3836 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.text FAIL theme=gruvbox Light enabled=#3c3836 disabled=#3c3836 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.button-text FAIL theme=gruvbox Light enabled=#3c3836 disabled=#3c3836 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.tooltip-text FAIL theme=gruvbox Light enabled=#3c3836 disabled=#3c3836 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.placeholder-text FAIL theme=gruvbox Light enabled=#605a56 disabled=#605a56 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link FAIL theme=gruvbox Light enabled=#689d6a disabled=#689d6a delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.link-visited FAIL theme=gruvbox Light enabled=#689d6a disabled=#689d6a delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlight FAIL theme=gruvbox Light enabled=#d5c4a1 disabled=#d5c4a1 delta=0 luminance=0.000 drop=1.00
+CHECK disabled.palette.highlighted-text FAIL theme=gruvbox Light enabled=#ffffff disabled=#ffffff delta=0 luminance=0.000 drop=1.00
+PALETTE-THEME gruvbox Light          worst_role=window-text      channel_delta=0 luminance_delta=0.000 contrast_drop=1.00
+PALETTE-ROLE-MIN window-text        channel_delta=0 (Atom One Dark) luminance_delta=0.000 (Atom One Dark) contrast_drop=1.00 (Atom One Dark)
+PALETTE-ROLE-MIN text               channel_delta=0 (Atom One Dark) luminance_delta=0.000 (Atom One Dark) contrast_drop=1.00 (Atom One Dark)
+PALETTE-ROLE-MIN button-text        channel_delta=0 (Atom One Dark) luminance_delta=0.000 (Atom One Dark) contrast_drop=1.00 (Atom One Dark)
+PALETTE-ROLE-MIN tooltip-text       channel_delta=0 (Atom One Dark) luminance_delta=0.000 (Atom One Dark) contrast_drop=1.00 (Atom One Dark)
+PALETTE-ROLE-MIN placeholder-text   channel_delta=0 (Atom One Dark) luminance_delta=0.000 (Atom One Dark) contrast_drop=1.00 (Atom One Dark)
+PALETTE-ROLE-MIN link               channel_delta=0 (Atom One Dark) luminance_delta=0.000 (Atom One Dark) contrast_drop=1.00 (Atom One Dark)
+PALETTE-ROLE-MIN link-visited       channel_delta=0 (Atom One Dark) luminance_delta=0.000 (Atom One Dark) contrast_drop=1.00 (Atom One Dark)
+PALETTE-ROLE-MIN highlight          channel_delta=0 (Atom One Dark) luminance_delta=0.000 (Atom One Dark) contrast_drop=1.00 (Atom One Dark) (secondary role)
+PALETTE-ROLE-MIN highlighted-text   channel_delta=0 (Atom One Dark) luminance_delta=0.000 (Atom One Dark) contrast_drop=1.00 (Atom One Dark) (secondary role)
+CHECK disabled.palette.themes-tested PASS 30/30
+CHECK disabled.palette.active-intact PASS enabled colours are still the theme's own
+CHECK disabled.palette.min-channel-delta FAIL min=0 theme=Atom One Dark floor=40
+CHECK disabled.palette.min-luminance-delta FAIL min=0.000 theme=Atom One Dark floor=0.100
+CHECK disabled.palette.min-contrast-drop FAIL min=1.00 theme=Atom One Dark floor=1.40
+CHECK disabled.apply-theme FAIL Breeze Light
+CHECK disabled.pixels.styles PASS 2 style(s): Windows, Fusion
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Atom One Dark differing=2101 enabled_hits=162 disabled_hits=153 enabled=#abb2bf disabled=#abb2bf delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Atom One Light differing=1266 enabled_hits=150 disabled_hits=150 enabled=#383a42 disabled=#383a42 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Breeze Dark differing=2090 enabled_hits=153 disabled_hits=151 enabled=#cfcfc2 disabled=#cfcfc2 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Breeze Light differing=1027 enabled_hits=137 disabled_hits=137 enabled=#1f1c1b disabled=#1f1c1b delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Catppuccin Frappé differing=2108 enabled_hits=154 disabled_hits=152 enabled=#c6d0f5 disabled=#c6d0f5 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Catppuccin Latte differing=1552 enabled_hits=151 disabled_hits=153 enabled=#4c4f69 disabled=#4c4f69 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Catppuccin Macchiato differing=2104 enabled_hits=153 disabled_hits=150 enabled=#cad3f5 disabled=#cad3f5 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Catppuccin Mocha differing=2097 enabled_hits=152 disabled_hits=150 enabled=#cdd6f4 disabled=#cdd6f4 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Dracula differing=2102 enabled_hits=151 disabled_hits=150 enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Falcon differing=2101 enabled_hits=153 disabled_hits=151 enabled=#ddddcc disabled=#ddddcc delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=GitHub Dark differing=2098 enabled_hits=151 disabled_hits=150 enabled=#e1e4e8 disabled=#e1e4e8 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=GitHub Light differing=1023 enabled_hits=149 disabled_hits=150 enabled=#24292e disabled=#24292e delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Homunculus differing=1423 enabled_hits=150 disabled_hits=150 enabled=#303030 disabled=#303030 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Monokai differing=2091 enabled_hits=150 disabled_hits=150 enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Nord differing=2106 enabled_hits=153 disabled_hits=150 enabled=#d8dee9 disabled=#d8dee9 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Oblivion differing=2079 enabled_hits=151 disabled_hits=150 enabled=#d3d7c1 disabled=#d3d7c1 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Printing differing=1028 enabled_hits=137 disabled_hits=137 enabled=#000000 disabled=#000000 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Radical differing=2078 enabled_hits=172 disabled_hits=163 enabled=#7c9c9e disabled=#7c9c9e delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Solarized Dark differing=2098 enabled_hits=171 disabled_hits=162 enabled=#839496 disabled=#839496 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Solarized Light differing=2027 enabled_hits=161 disabled_hits=165 enabled=#657b83 disabled=#657b83 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Tokyo Night differing=2090 enabled_hits=154 disabled_hits=152 enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Tokyo Night Light differing=1935 enabled_hits=151 disabled_hits=155 enabled=#343b58 disabled=#343b58 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Tokyo Night Storm differing=2104 enabled_hits=163 disabled_hits=153 enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=VSCodium Dark differing=2075 enabled_hits=150 disabled_hits=150 enabled=#d4d4d4 disabled=#d4d4d4 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=Vim Dark differing=204 enabled_hits=150 disabled_hits=150 enabled=#b2b2b2 disabled=#b2b2b2 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=ayu Dark differing=2031 enabled_hits=152 disabled_hits=151 enabled=#b3b1ad disabled=#b3b1ad delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=ayu Light differing=1269 enabled_hits=153 disabled_hits=153 enabled=#575f66 disabled=#575f66 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=ayu Mirage differing=2095 enabled_hits=155 disabled_hits=151 enabled=#cbccc6 disabled=#cbccc6 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=gruvbox Dark differing=2090 enabled_hits=153 disabled_hits=151 enabled=#ebdbb2 disabled=#ebdbb2 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Windows theme=gruvbox Light differing=2045 enabled_hits=150 disabled_hits=151 enabled=#3c3836 disabled=#3c3836 delta=0 luminance=0.000
+PIXELS style=Windows  widget=toolbar-action   role=button-text themes=30 worst_theme=Atom One Dark      channel_delta=0 luminance_delta=0.000 differing_px=2101 enabled_hits=162 disabled_hits=153 exact_colour=0
+CHECK disabled.pixels.toolbar-action FAIL style=Windows themes=30 worst_theme=Atom One Dark channel_delta=0 luminance_delta=0.000 differing_px=2101
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Atom One Dark differing=1010 enabled_hits=194 disabled_hits=221 enabled=#abb2bf disabled=#abb2bf delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Atom One Light differing=904 enabled_hits=186 disabled_hits=186 enabled=#383a42 disabled=#383a42 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Breeze Dark differing=992 enabled_hits=191 disabled_hits=222 enabled=#cfcfc2 disabled=#cfcfc2 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Breeze Light differing=886 enabled_hits=186 disabled_hits=180 enabled=#1f1c1b disabled=#1f1c1b delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Catppuccin Frappé differing=991 enabled_hits=187 disabled_hits=257 enabled=#c6d0f5 disabled=#c6d0f5 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Catppuccin Latte differing=914 enabled_hits=193 disabled_hits=192 enabled=#4c4f69 disabled=#4c4f69 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Catppuccin Macchiato differing=991 enabled_hits=186 disabled_hits=257 enabled=#cad3f5 disabled=#cad3f5 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Catppuccin Mocha differing=992 enabled_hits=186 disabled_hits=255 enabled=#cdd6f4 disabled=#cdd6f4 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Dracula differing=991 enabled_hits=186 disabled_hits=256 enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Falcon differing=991 enabled_hits=191 disabled_hits=219 enabled=#ddddcc disabled=#ddddcc delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=GitHub Dark differing=1010 enabled_hits=186 disabled_hits=228 enabled=#e1e4e8 disabled=#e1e4e8 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=GitHub Light differing=892 enabled_hits=186 disabled_hits=185 enabled=#24292e disabled=#24292e delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Homunculus differing=916 enabled_hits=186 disabled_hits=186 enabled=#303030 disabled=#303030 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Monokai differing=1010 enabled_hits=186 disabled_hits=256 enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Nord differing=1010 enabled_hits=191 disabled_hits=236 enabled=#d8dee9 disabled=#d8dee9 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Oblivion differing=1010 enabled_hits=191 disabled_hits=220 enabled=#d3d7c1 disabled=#d3d7c1 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Printing differing=887 enabled_hits=176 disabled_hits=176 enabled=#000000 disabled=#000000 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Radical differing=1013 enabled_hits=197 disabled_hits=222 enabled=#7c9c9e disabled=#7c9c9e delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Solarized Dark differing=994 enabled_hits=213 disabled_hits=220 enabled=#839496 disabled=#839496 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Solarized Light differing=922 enabled_hits=213 disabled_hits=194 enabled=#657b83 disabled=#657b83 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Tokyo Night differing=1010 enabled_hits=187 disabled_hits=225 enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Tokyo Night Light differing=947 enabled_hits=193 disabled_hits=188 enabled=#343b58 disabled=#343b58 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Tokyo Night Storm differing=991 enabled_hits=192 disabled_hits=225 enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=VSCodium Dark differing=1010 enabled_hits=186 disabled_hits=222 enabled=#d4d4d4 disabled=#d4d4d4 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=Vim Dark differing=1013 enabled_hits=186 disabled_hits=431 enabled=#b2b2b2 disabled=#b2b2b2 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=ayu Dark differing=1013 enabled_hits=191 disabled_hits=220 enabled=#b3b1ad disabled=#b3b1ad delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=ayu Light differing=904 enabled_hits=192 disabled_hits=192 enabled=#575f66 disabled=#575f66 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=ayu Mirage differing=992 enabled_hits=191 disabled_hits=222 enabled=#cbccc6 disabled=#cbccc6 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=gruvbox Dark differing=1011 enabled_hits=191 disabled_hits=219 enabled=#ebdbb2 disabled=#ebdbb2 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Windows theme=gruvbox Light differing=931 enabled_hits=191 disabled_hits=186 enabled=#3c3836 disabled=#3c3836 delta=0 luminance=0.000
+PIXELS style=Windows  widget=push-button      role=button-text themes=30 worst_theme=Atom One Dark      channel_delta=0 luminance_delta=0.000 differing_px=1010 enabled_hits=194 disabled_hits=221 exact_colour=0
+CHECK disabled.pixels.push-button FAIL style=Windows themes=30 worst_theme=Atom One Dark channel_delta=0 luminance_delta=0.000 differing_px=1010
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Atom One Dark differing=4632 enabled_hits=20 disabled_hits=258 enabled=#abb2bf disabled=#abb2bf delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Atom One Light differing=1604 enabled_hits=20 disabled_hits=219 enabled=#383a42 disabled=#383a42 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Breeze Dark differing=4632 enabled_hits=20 disabled_hits=262 enabled=#cfcfc2 disabled=#cfcfc2 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Breeze Light differing=4632 enabled_hits=20 disabled_hits=216 enabled=#1f1c1b disabled=#1f1c1b delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Catppuccin Frappé differing=4632 enabled_hits=20 disabled_hits=279 enabled=#c6d0f5 disabled=#c6d0f5 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Catppuccin Latte differing=4632 enabled_hits=20 disabled_hits=228 enabled=#4c4f69 disabled=#4c4f69 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Catppuccin Macchiato differing=4632 enabled_hits=20 disabled_hits=280 enabled=#cad3f5 disabled=#cad3f5 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Catppuccin Mocha differing=4632 enabled_hits=20 disabled_hits=278 enabled=#cdd6f4 disabled=#cdd6f4 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Dracula differing=4631 enabled_hits=20 disabled_hits=286 enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Falcon differing=4631 enabled_hits=20 disabled_hits=260 enabled=#ddddcc disabled=#ddddcc delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=GitHub Dark differing=4631 enabled_hits=20 disabled_hits=268 enabled=#e1e4e8 disabled=#e1e4e8 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=GitHub Light differing=4632 enabled_hits=20 disabled_hits=218 enabled=#24292e disabled=#24292e delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Homunculus differing=4632 enabled_hits=20 disabled_hits=219 enabled=#303030 disabled=#303030 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Monokai differing=4632 enabled_hits=20 disabled_hits=284 enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Nord differing=4632 enabled_hits=20 disabled_hits=274 enabled=#d8dee9 disabled=#d8dee9 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Oblivion differing=4632 enabled_hits=20 disabled_hits=261 enabled=#d3d7c1 disabled=#d3d7c1 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Printing differing=4632 enabled_hits=20 disabled_hits=215 enabled=#000000 disabled=#000000 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Radical differing=4632 enabled_hits=20 disabled_hits=258 enabled=#7c9c9e disabled=#7c9c9e delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Solarized Dark differing=4632 enabled_hits=20 disabled_hits=252 enabled=#839496 disabled=#839496 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Solarized Light differing=4632 enabled_hits=20 disabled_hits=231 enabled=#657b83 disabled=#657b83 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Tokyo Night differing=4632 enabled_hits=20 disabled_hits=257 enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Tokyo Night Light differing=4618 enabled_hits=20 disabled_hits=227 enabled=#343b58 disabled=#343b58 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Tokyo Night Storm differing=4631 enabled_hits=20 disabled_hits=259 enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=VSCodium Dark differing=4632 enabled_hits=20 disabled_hits=261 enabled=#d4d4d4 disabled=#d4d4d4 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=Vim Dark differing=4624 enabled_hits=20 disabled_hits=504 enabled=#b2b2b2 disabled=#b2b2b2 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=ayu Dark differing=4632 enabled_hits=20 disabled_hits=256 enabled=#b3b1ad disabled=#b3b1ad delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=ayu Light differing=4632 enabled_hits=20 disabled_hits=228 enabled=#575f66 disabled=#575f66 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=ayu Mirage differing=4632 enabled_hits=20 disabled_hits=262 enabled=#cbccc6 disabled=#cbccc6 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=gruvbox Dark differing=4631 enabled_hits=20 disabled_hits=259 enabled=#ebdbb2 disabled=#ebdbb2 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Windows theme=gruvbox Light differing=4632 enabled_hits=20 disabled_hits=219 enabled=#3c3836 disabled=#3c3836 delta=0 luminance=0.000
+PIXELS style=Windows  widget=combo-box        role=button-text themes=30 worst_theme=Atom One Dark      channel_delta=0 luminance_delta=0.000 differing_px=4632 enabled_hits=20 disabled_hits=258 exact_colour=0
+CHECK disabled.pixels.combo-box FAIL style=Windows themes=30 worst_theme=Atom One Dark channel_delta=0 luminance_delta=0.000 differing_px=4632
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Atom One Dark differing=512 enabled_hits=448 disabled_hits=448 enabled=#abb2bf disabled=#abb2bf delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Atom One Light differing=512 enabled_hits=443 disabled_hits=443 enabled=#383a42 disabled=#383a42 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Breeze Dark differing=512 enabled_hits=447 disabled_hits=447 enabled=#cfcfc2 disabled=#cfcfc2 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Breeze Light differing=512 enabled_hits=429 disabled_hits=429 enabled=#1f1c1b disabled=#1f1c1b delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Catppuccin Frappé differing=512 enabled_hits=444 disabled_hits=444 enabled=#c6d0f5 disabled=#c6d0f5 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Catppuccin Latte differing=512 enabled_hits=447 disabled_hits=447 enabled=#4c4f69 disabled=#4c4f69 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Catppuccin Macchiato differing=512 enabled_hits=443 disabled_hits=443 enabled=#cad3f5 disabled=#cad3f5 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Catppuccin Mocha differing=512 enabled_hits=443 disabled_hits=443 enabled=#cdd6f4 disabled=#cdd6f4 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Dracula differing=512 enabled_hits=443 disabled_hits=443 enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Falcon differing=512 enabled_hits=447 disabled_hits=447 enabled=#ddddcc disabled=#ddddcc delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=GitHub Dark differing=512 enabled_hits=443 disabled_hits=443 enabled=#e1e4e8 disabled=#e1e4e8 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=GitHub Light differing=512 enabled_hits=435 disabled_hits=435 enabled=#24292e disabled=#24292e delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Homunculus differing=512 enabled_hits=443 disabled_hits=443 enabled=#303030 disabled=#303030 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Monokai differing=512 enabled_hits=443 disabled_hits=443 enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Nord differing=512 enabled_hits=443 disabled_hits=443 enabled=#d8dee9 disabled=#d8dee9 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Oblivion differing=512 enabled_hits=443 disabled_hits=443 enabled=#d3d7c1 disabled=#d3d7c1 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Printing differing=512 enabled_hits=451 disabled_hits=429 enabled=#000000 disabled=#000000 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Radical differing=512 enabled_hits=478 disabled_hits=478 enabled=#7c9c9e disabled=#7c9c9e delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Solarized Dark differing=512 enabled_hits=457 disabled_hits=457 enabled=#839496 disabled=#839496 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Solarized Light differing=512 enabled_hits=457 disabled_hits=457 enabled=#657b83 disabled=#657b83 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Tokyo Night differing=512 enabled_hits=444 disabled_hits=444 enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Tokyo Night Light differing=512 enabled_hits=447 disabled_hits=447 enabled=#343b58 disabled=#343b58 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Tokyo Night Storm differing=512 enabled_hits=448 disabled_hits=448 enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=VSCodium Dark differing=512 enabled_hits=443 disabled_hits=443 enabled=#d4d4d4 disabled=#d4d4d4 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=Vim Dark differing=512 enabled_hits=443 disabled_hits=686 enabled=#b2b2b2 disabled=#b2b2b2 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=ayu Dark differing=512 enabled_hits=447 disabled_hits=447 enabled=#b3b1ad disabled=#b3b1ad delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=ayu Light differing=512 enabled_hits=447 disabled_hits=447 enabled=#575f66 disabled=#575f66 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=ayu Mirage differing=512 enabled_hits=447 disabled_hits=447 enabled=#cbccc6 disabled=#cbccc6 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=gruvbox Dark differing=512 enabled_hits=447 disabled_hits=447 enabled=#ebdbb2 disabled=#ebdbb2 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Windows theme=gruvbox Light differing=512 enabled_hits=447 disabled_hits=447 enabled=#3c3836 disabled=#3c3836 delta=0 luminance=0.000
+PIXELS style=Windows  widget=line-edit        role=text        themes=30 worst_theme=Atom One Dark      channel_delta=0 luminance_delta=0.000 differing_px=512 enabled_hits=448 disabled_hits=448 exact_colour=0
+CHECK disabled.pixels.line-edit FAIL style=Windows themes=30 worst_theme=Atom One Dark channel_delta=0 luminance_delta=0.000 differing_px=512
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Atom One Dark differing=572 enabled_hits=237 disabled_hits=237 enabled=#abb2bf disabled=#abb2bf delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Atom One Light differing=572 enabled_hits=227 disabled_hits=227 enabled=#383a42 disabled=#383a42 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Breeze Dark differing=572 enabled_hits=234 disabled_hits=234 enabled=#cfcfc2 disabled=#cfcfc2 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Breeze Light differing=572 enabled_hits=211 disabled_hits=211 enabled=#1f1c1b disabled=#1f1c1b delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Catppuccin Frappé differing=572 enabled_hits=230 disabled_hits=230 enabled=#c6d0f5 disabled=#c6d0f5 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Catppuccin Latte differing=572 enabled_hits=234 disabled_hits=234 enabled=#4c4f69 disabled=#4c4f69 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Catppuccin Macchiato differing=572 enabled_hits=227 disabled_hits=227 enabled=#cad3f5 disabled=#cad3f5 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Catppuccin Mocha differing=572 enabled_hits=227 disabled_hits=227 enabled=#cdd6f4 disabled=#cdd6f4 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Dracula differing=572 enabled_hits=227 disabled_hits=227 enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Falcon differing=572 enabled_hits=234 disabled_hits=234 enabled=#ddddcc disabled=#ddddcc delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=GitHub Dark differing=572 enabled_hits=227 disabled_hits=227 enabled=#e1e4e8 disabled=#e1e4e8 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=GitHub Light differing=572 enabled_hits=218 disabled_hits=218 enabled=#24292e disabled=#24292e delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Homunculus differing=572 enabled_hits=227 disabled_hits=227 enabled=#303030 disabled=#303030 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Monokai differing=572 enabled_hits=227 disabled_hits=227 enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Nord differing=572 enabled_hits=227 disabled_hits=227 enabled=#d8dee9 disabled=#d8dee9 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Oblivion differing=572 enabled_hits=227 disabled_hits=227 enabled=#d3d7c1 disabled=#d3d7c1 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Printing differing=572 enabled_hits=229 disabled_hits=211 enabled=#000000 disabled=#000000 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Radical differing=572 enabled_hits=254 disabled_hits=254 enabled=#7c9c9e disabled=#7c9c9e delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Solarized Dark differing=572 enabled_hits=243 disabled_hits=243 enabled=#839496 disabled=#839496 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Solarized Light differing=572 enabled_hits=243 disabled_hits=243 enabled=#657b83 disabled=#657b83 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Tokyo Night differing=572 enabled_hits=230 disabled_hits=230 enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Tokyo Night Light differing=572 enabled_hits=234 disabled_hits=234 enabled=#343b58 disabled=#343b58 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Tokyo Night Storm differing=572 enabled_hits=237 disabled_hits=237 enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=VSCodium Dark differing=572 enabled_hits=227 disabled_hits=227 enabled=#d4d4d4 disabled=#d4d4d4 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=Vim Dark differing=572 enabled_hits=227 disabled_hits=500 enabled=#b2b2b2 disabled=#b2b2b2 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=ayu Dark differing=572 enabled_hits=234 disabled_hits=234 enabled=#b3b1ad disabled=#b3b1ad delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=ayu Light differing=572 enabled_hits=234 disabled_hits=234 enabled=#575f66 disabled=#575f66 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=ayu Mirage differing=572 enabled_hits=234 disabled_hits=234 enabled=#cbccc6 disabled=#cbccc6 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=gruvbox Dark differing=572 enabled_hits=234 disabled_hits=234 enabled=#ebdbb2 disabled=#ebdbb2 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows theme=gruvbox Light differing=572 enabled_hits=234 disabled_hits=234 enabled=#3c3836 disabled=#3c3836 delta=0 luminance=0.000
+PIXELS style=Windows  widget=plain-text-edit  role=text        themes=30 worst_theme=Atom One Dark      channel_delta=0 luminance_delta=0.000 differing_px=572 enabled_hits=237 disabled_hits=237 exact_colour=0
+CHECK disabled.pixels.plain-text-edit FAIL style=Windows themes=30 worst_theme=Atom One Dark channel_delta=0 luminance_delta=0.000 differing_px=572
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Atom One Dark differing=2101 enabled_hits=162 disabled_hits=153 enabled=#abb2bf disabled=#abb2bf delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Atom One Light differing=1266 enabled_hits=150 disabled_hits=150 enabled=#383a42 disabled=#383a42 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Breeze Dark differing=2090 enabled_hits=153 disabled_hits=151 enabled=#cfcfc2 disabled=#cfcfc2 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Breeze Light differing=1027 enabled_hits=137 disabled_hits=137 enabled=#1f1c1b disabled=#1f1c1b delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Catppuccin Frappé differing=2108 enabled_hits=154 disabled_hits=152 enabled=#c6d0f5 disabled=#c6d0f5 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Catppuccin Latte differing=1552 enabled_hits=151 disabled_hits=153 enabled=#4c4f69 disabled=#4c4f69 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Catppuccin Macchiato differing=2104 enabled_hits=153 disabled_hits=150 enabled=#cad3f5 disabled=#cad3f5 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Catppuccin Mocha differing=2097 enabled_hits=152 disabled_hits=150 enabled=#cdd6f4 disabled=#cdd6f4 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Dracula differing=2102 enabled_hits=151 disabled_hits=150 enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Falcon differing=2101 enabled_hits=153 disabled_hits=151 enabled=#ddddcc disabled=#ddddcc delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=GitHub Dark differing=2098 enabled_hits=151 disabled_hits=150 enabled=#e1e4e8 disabled=#e1e4e8 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=GitHub Light differing=1023 enabled_hits=149 disabled_hits=150 enabled=#24292e disabled=#24292e delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Homunculus differing=1423 enabled_hits=150 disabled_hits=150 enabled=#303030 disabled=#303030 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Monokai differing=2091 enabled_hits=150 disabled_hits=150 enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Nord differing=2106 enabled_hits=153 disabled_hits=150 enabled=#d8dee9 disabled=#d8dee9 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Oblivion differing=2079 enabled_hits=151 disabled_hits=150 enabled=#d3d7c1 disabled=#d3d7c1 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Printing differing=1028 enabled_hits=137 disabled_hits=137 enabled=#000000 disabled=#000000 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Radical differing=2078 enabled_hits=172 disabled_hits=163 enabled=#7c9c9e disabled=#7c9c9e delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Solarized Dark differing=2098 enabled_hits=171 disabled_hits=162 enabled=#839496 disabled=#839496 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Solarized Light differing=2027 enabled_hits=161 disabled_hits=165 enabled=#657b83 disabled=#657b83 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Tokyo Night differing=2090 enabled_hits=154 disabled_hits=152 enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Tokyo Night Light differing=1935 enabled_hits=151 disabled_hits=155 enabled=#343b58 disabled=#343b58 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Tokyo Night Storm differing=2104 enabled_hits=163 disabled_hits=153 enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=VSCodium Dark differing=2075 enabled_hits=150 disabled_hits=150 enabled=#d4d4d4 disabled=#d4d4d4 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=Vim Dark differing=204 enabled_hits=150 disabled_hits=150 enabled=#b2b2b2 disabled=#b2b2b2 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=ayu Dark differing=2031 enabled_hits=152 disabled_hits=151 enabled=#b3b1ad disabled=#b3b1ad delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=ayu Light differing=1269 enabled_hits=153 disabled_hits=153 enabled=#575f66 disabled=#575f66 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=ayu Mirage differing=2095 enabled_hits=155 disabled_hits=151 enabled=#cbccc6 disabled=#cbccc6 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=gruvbox Dark differing=2090 enabled_hits=153 disabled_hits=151 enabled=#ebdbb2 disabled=#ebdbb2 delta=0 luminance=0.000
+This plugin does not support propagateSizeHints()
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion theme=gruvbox Light differing=2045 enabled_hits=150 disabled_hits=151 enabled=#3c3836 disabled=#3c3836 delta=0 luminance=0.000
+PIXELS style=Fusion   widget=toolbar-action   role=button-text themes=30 worst_theme=Atom One Dark      channel_delta=0 luminance_delta=0.000 differing_px=2101 enabled_hits=162 disabled_hits=153 exact_colour=1
+CHECK disabled.pixels.toolbar-action FAIL style=Fusion themes=30 worst_theme=Atom One Dark channel_delta=0 luminance_delta=0.000 differing_px=2101
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Atom One Dark differing=410 enabled_hits=197 disabled_hits=197 enabled=#abb2bf disabled=#abb2bf delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Atom One Light differing=3282 enabled_hits=186 disabled_hits=186 enabled=#383a42 disabled=#383a42 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Breeze Dark differing=404 enabled_hits=192 disabled_hits=192 enabled=#cfcfc2 disabled=#cfcfc2 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Breeze Light differing=3147 enabled_hits=176 disabled_hits=180 enabled=#1f1c1b disabled=#1f1c1b delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Catppuccin Frappé differing=1234 enabled_hits=194 disabled_hits=194 enabled=#c6d0f5 disabled=#c6d0f5 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Catppuccin Latte differing=3271 enabled_hits=191 disabled_hits=192 enabled=#4c4f69 disabled=#4c4f69 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Catppuccin Macchiato differing=412 enabled_hits=192 disabled_hits=191 enabled=#cad3f5 disabled=#cad3f5 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Catppuccin Mocha differing=404 enabled_hits=187 disabled_hits=187 enabled=#cdd6f4 disabled=#cdd6f4 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Dracula differing=404 enabled_hits=189 disabled_hits=186 enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Falcon differing=404 enabled_hits=192 disabled_hits=191 enabled=#ddddcc disabled=#ddddcc delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=GitHub Dark differing=408 enabled_hits=189 disabled_hits=186 enabled=#e1e4e8 disabled=#e1e4e8 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=GitHub Light differing=3144 enabled_hits=183 disabled_hits=186 enabled=#24292e disabled=#24292e delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Homunculus differing=3275 enabled_hits=186 disabled_hits=186 enabled=#303030 disabled=#303030 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Monokai differing=0 enabled_hits=186 disabled_hits=186 enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Nord differing=404 enabled_hits=192 disabled_hits=192 enabled=#d8dee9 disabled=#d8dee9 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Oblivion differing=0 enabled_hits=191 disabled_hits=191 enabled=#d3d7c1 disabled=#d3d7c1 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Printing differing=3148 enabled_hits=176 disabled_hits=176 enabled=#000000 disabled=#000000 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Radical differing=0 enabled_hits=218 disabled_hits=216 enabled=#7c9c9e disabled=#7c9c9e delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Solarized Dark differing=404 enabled_hits=215 disabled_hits=215 enabled=#839496 disabled=#839496 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Solarized Light differing=3266 enabled_hits=201 disabled_hits=208 enabled=#657b83 disabled=#657b83 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Tokyo Night differing=0 enabled_hits=194 disabled_hits=194 enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Tokyo Night Light differing=5735 enabled_hits=191 disabled_hits=192 enabled=#343b58 disabled=#343b58 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Tokyo Night Storm differing=404 enabled_hits=197 disabled_hits=197 enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=VSCodium Dark differing=0 enabled_hits=186 disabled_hits=186 enabled=#d4d4d4 disabled=#d4d4d4 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=Vim Dark differing=0 enabled_hits=186 disabled_hits=186 enabled=#b2b2b2 disabled=#b2b2b2 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=ayu Dark differing=0 enabled_hits=192 disabled_hits=191 enabled=#b3b1ad disabled=#b3b1ad delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=ayu Light differing=3280 enabled_hits=192 disabled_hits=192 enabled=#575f66 disabled=#575f66 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=ayu Mirage differing=404 enabled_hits=193 disabled_hits=193 enabled=#cbccc6 disabled=#cbccc6 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=gruvbox Dark differing=0 enabled_hits=192 disabled_hits=192 enabled=#ebdbb2 disabled=#ebdbb2 delta=0 luminance=0.000
+CHECK disabled.pixels.push-button FAIL style=Fusion theme=gruvbox Light differing=5704 enabled_hits=186 disabled_hits=188 enabled=#3c3836 disabled=#3c3836 delta=0 luminance=0.000
+PIXELS style=Fusion   widget=push-button      role=button-text themes=30 worst_theme=Atom One Dark      channel_delta=0 luminance_delta=0.000 differing_px=410 enabled_hits=197 disabled_hits=197 exact_colour=1
+CHECK disabled.pixels.push-button FAIL style=Fusion themes=30 worst_theme=Atom One Dark channel_delta=0 luminance_delta=0.000 differing_px=410
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Atom One Dark differing=406 enabled_hits=235 disabled_hits=233 enabled=#abb2bf disabled=#abb2bf delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Atom One Light differing=3002 enabled_hits=219 disabled_hits=219 enabled=#383a42 disabled=#383a42 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Breeze Dark differing=400 enabled_hits=229 disabled_hits=229 enabled=#cfcfc2 disabled=#cfcfc2 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Breeze Light differing=2899 enabled_hits=215 disabled_hits=216 enabled=#1f1c1b disabled=#1f1c1b delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Catppuccin Frappé differing=1224 enabled_hits=231 disabled_hits=231 enabled=#c6d0f5 disabled=#c6d0f5 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Catppuccin Latte differing=3004 enabled_hits=221 disabled_hits=224 enabled=#4c4f69 disabled=#4c4f69 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Catppuccin Macchiato differing=408 enabled_hits=229 disabled_hits=229 enabled=#cad3f5 disabled=#cad3f5 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Catppuccin Mocha differing=400 enabled_hits=227 disabled_hits=227 enabled=#cdd6f4 disabled=#cdd6f4 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Dracula differing=400 enabled_hits=221 disabled_hits=219 enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Falcon differing=400 enabled_hits=222 disabled_hits=221 enabled=#ddddcc disabled=#ddddcc delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=GitHub Dark differing=404 enabled_hits=221 disabled_hits=219 enabled=#e1e4e8 disabled=#e1e4e8 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=GitHub Light differing=2896 enabled_hits=218 disabled_hits=219 enabled=#24292e disabled=#24292e delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Homunculus differing=3000 enabled_hits=219 disabled_hits=219 enabled=#303030 disabled=#303030 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Monokai differing=0 enabled_hits=219 disabled_hits=219 enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Nord differing=400 enabled_hits=229 disabled_hits=229 enabled=#d8dee9 disabled=#d8dee9 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Oblivion differing=0 enabled_hits=225 disabled_hits=221 enabled=#d3d7c1 disabled=#d3d7c1 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Printing differing=2891 enabled_hits=215 disabled_hits=215 enabled=#000000 disabled=#000000 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Radical differing=0 enabled_hits=256 disabled_hits=253 enabled=#7c9c9e disabled=#7c9c9e delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Solarized Dark differing=400 enabled_hits=251 disabled_hits=250 enabled=#839496 disabled=#839496 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Solarized Light differing=3003 enabled_hits=236 disabled_hits=240 enabled=#657b83 disabled=#657b83 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Tokyo Night differing=0 enabled_hits=231 disabled_hits=231 enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Tokyo Night Light differing=5300 enabled_hits=221 disabled_hits=223 enabled=#343b58 disabled=#343b58 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Tokyo Night Storm differing=400 enabled_hits=234 disabled_hits=233 enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=VSCodium Dark differing=0 enabled_hits=219 disabled_hits=219 enabled=#d4d4d4 disabled=#d4d4d4 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=Vim Dark differing=0 enabled_hits=219 disabled_hits=219 enabled=#b2b2b2 disabled=#b2b2b2 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=ayu Dark differing=0 enabled_hits=229 disabled_hits=225 enabled=#b3b1ad disabled=#b3b1ad delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=ayu Light differing=3015 enabled_hits=225 disabled_hits=229 enabled=#575f66 disabled=#575f66 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=ayu Mirage differing=400 enabled_hits=230 disabled_hits=230 enabled=#cbccc6 disabled=#cbccc6 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=gruvbox Dark differing=0 enabled_hits=222 disabled_hits=222 enabled=#ebdbb2 disabled=#ebdbb2 delta=0 luminance=0.000
+CHECK disabled.pixels.combo-box FAIL style=Fusion theme=gruvbox Light differing=5265 enabled_hits=219 disabled_hits=219 enabled=#3c3836 disabled=#3c3836 delta=0 luminance=0.000
+PIXELS style=Fusion   widget=combo-box        role=button-text themes=30 worst_theme=Atom One Dark      channel_delta=0 luminance_delta=0.000 differing_px=406 enabled_hits=235 disabled_hits=233 exact_colour=1
+CHECK disabled.pixels.combo-box FAIL style=Fusion themes=30 worst_theme=Atom One Dark channel_delta=0 luminance_delta=0.000 differing_px=406
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Atom One Dark differing=518 enabled_hits=448 disabled_hits=448 enabled=#abb2bf disabled=#abb2bf delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Atom One Light differing=1006 enabled_hits=443 disabled_hits=443 enabled=#383a42 disabled=#383a42 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Breeze Dark differing=1002 enabled_hits=447 disabled_hits=447 enabled=#cfcfc2 disabled=#cfcfc2 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Breeze Light differing=1006 enabled_hits=429 disabled_hits=429 enabled=#1f1c1b disabled=#1f1c1b delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Catppuccin Frappé differing=518 enabled_hits=444 disabled_hits=444 enabled=#c6d0f5 disabled=#c6d0f5 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Catppuccin Latte differing=1006 enabled_hits=447 disabled_hits=447 enabled=#4c4f69 disabled=#4c4f69 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Catppuccin Macchiato differing=522 enabled_hits=443 disabled_hits=443 enabled=#cad3f5 disabled=#cad3f5 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Catppuccin Mocha differing=518 enabled_hits=443 disabled_hits=443 enabled=#cdd6f4 disabled=#cdd6f4 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Dracula differing=518 enabled_hits=443 disabled_hits=443 enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Falcon differing=1006 enabled_hits=447 disabled_hits=447 enabled=#ddddcc disabled=#ddddcc delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=GitHub Dark differing=518 enabled_hits=443 disabled_hits=443 enabled=#e1e4e8 disabled=#e1e4e8 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=GitHub Light differing=1006 enabled_hits=435 disabled_hits=435 enabled=#24292e disabled=#24292e delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Homunculus differing=1006 enabled_hits=443 disabled_hits=443 enabled=#303030 disabled=#303030 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Monokai differing=518 enabled_hits=443 disabled_hits=443 enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Nord differing=518 enabled_hits=443 disabled_hits=443 enabled=#d8dee9 disabled=#d8dee9 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Oblivion differing=1006 enabled_hits=443 disabled_hits=443 enabled=#d3d7c1 disabled=#d3d7c1 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Printing differing=1006 enabled_hits=451 disabled_hits=429 enabled=#000000 disabled=#000000 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Radical differing=1006 enabled_hits=478 disabled_hits=478 enabled=#7c9c9e disabled=#7c9c9e delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Solarized Dark differing=518 enabled_hits=457 disabled_hits=457 enabled=#839496 disabled=#839496 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Solarized Light differing=1006 enabled_hits=457 disabled_hits=457 enabled=#657b83 disabled=#657b83 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Tokyo Night differing=518 enabled_hits=444 disabled_hits=444 enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Tokyo Night Light differing=1003 enabled_hits=447 disabled_hits=447 enabled=#343b58 disabled=#343b58 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Tokyo Night Storm differing=518 enabled_hits=448 disabled_hits=448 enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=VSCodium Dark differing=1006 enabled_hits=443 disabled_hits=443 enabled=#d4d4d4 disabled=#d4d4d4 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=Vim Dark differing=518 enabled_hits=443 disabled_hits=443 enabled=#b2b2b2 disabled=#b2b2b2 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=ayu Dark differing=995 enabled_hits=447 disabled_hits=447 enabled=#b3b1ad disabled=#b3b1ad delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=ayu Light differing=1006 enabled_hits=447 disabled_hits=447 enabled=#575f66 disabled=#575f66 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=ayu Mirage differing=524 enabled_hits=447 disabled_hits=447 enabled=#cbccc6 disabled=#cbccc6 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=gruvbox Dark differing=518 enabled_hits=447 disabled_hits=447 enabled=#ebdbb2 disabled=#ebdbb2 delta=0 luminance=0.000
+CHECK disabled.pixels.line-edit FAIL style=Fusion theme=gruvbox Light differing=1006 enabled_hits=447 disabled_hits=447 enabled=#3c3836 disabled=#3c3836 delta=0 luminance=0.000
+PIXELS style=Fusion   widget=line-edit        role=text        themes=30 worst_theme=Atom One Dark      channel_delta=0 luminance_delta=0.000 differing_px=518 enabled_hits=448 disabled_hits=448 exact_colour=1
+CHECK disabled.pixels.line-edit FAIL style=Fusion themes=30 worst_theme=Atom One Dark channel_delta=0 luminance_delta=0.000 differing_px=518
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Atom One Dark differing=22 enabled_hits=237 disabled_hits=237 enabled=#abb2bf disabled=#abb2bf delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Atom One Light differing=22 enabled_hits=227 disabled_hits=227 enabled=#383a42 disabled=#383a42 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Breeze Dark differing=22 enabled_hits=234 disabled_hits=234 enabled=#cfcfc2 disabled=#cfcfc2 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Breeze Light differing=22 enabled_hits=211 disabled_hits=211 enabled=#1f1c1b disabled=#1f1c1b delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Catppuccin Frappé differing=22 enabled_hits=230 disabled_hits=230 enabled=#c6d0f5 disabled=#c6d0f5 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Catppuccin Latte differing=22 enabled_hits=234 disabled_hits=234 enabled=#4c4f69 disabled=#4c4f69 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Catppuccin Macchiato differing=22 enabled_hits=227 disabled_hits=227 enabled=#cad3f5 disabled=#cad3f5 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Catppuccin Mocha differing=22 enabled_hits=227 disabled_hits=227 enabled=#cdd6f4 disabled=#cdd6f4 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Dracula differing=22 enabled_hits=227 disabled_hits=227 enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Falcon differing=22 enabled_hits=234 disabled_hits=234 enabled=#ddddcc disabled=#ddddcc delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=GitHub Dark differing=22 enabled_hits=227 disabled_hits=227 enabled=#e1e4e8 disabled=#e1e4e8 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=GitHub Light differing=22 enabled_hits=218 disabled_hits=218 enabled=#24292e disabled=#24292e delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Homunculus differing=22 enabled_hits=227 disabled_hits=227 enabled=#303030 disabled=#303030 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Monokai differing=22 enabled_hits=227 disabled_hits=227 enabled=#f8f8f2 disabled=#f8f8f2 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Nord differing=22 enabled_hits=227 disabled_hits=227 enabled=#d8dee9 disabled=#d8dee9 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Oblivion differing=22 enabled_hits=227 disabled_hits=227 enabled=#d3d7c1 disabled=#d3d7c1 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Printing differing=22 enabled_hits=229 disabled_hits=211 enabled=#000000 disabled=#000000 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Radical differing=22 enabled_hits=254 disabled_hits=254 enabled=#7c9c9e disabled=#7c9c9e delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Solarized Dark differing=22 enabled_hits=243 disabled_hits=243 enabled=#839496 disabled=#839496 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Solarized Light differing=22 enabled_hits=243 disabled_hits=243 enabled=#657b83 disabled=#657b83 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Tokyo Night differing=22 enabled_hits=230 disabled_hits=230 enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Tokyo Night Light differing=22 enabled_hits=234 disabled_hits=234 enabled=#343b58 disabled=#343b58 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Tokyo Night Storm differing=22 enabled_hits=237 disabled_hits=237 enabled=#a9b1d6 disabled=#a9b1d6 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=VSCodium Dark differing=22 enabled_hits=227 disabled_hits=227 enabled=#d4d4d4 disabled=#d4d4d4 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=Vim Dark differing=22 enabled_hits=227 disabled_hits=227 enabled=#b2b2b2 disabled=#b2b2b2 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=ayu Dark differing=22 enabled_hits=234 disabled_hits=234 enabled=#b3b1ad disabled=#b3b1ad delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=ayu Light differing=22 enabled_hits=234 disabled_hits=234 enabled=#575f66 disabled=#575f66 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=ayu Mirage differing=22 enabled_hits=234 disabled_hits=234 enabled=#cbccc6 disabled=#cbccc6 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=gruvbox Dark differing=22 enabled_hits=234 disabled_hits=234 enabled=#ebdbb2 disabled=#ebdbb2 delta=0 luminance=0.000
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion theme=gruvbox Light differing=22 enabled_hits=234 disabled_hits=234 enabled=#3c3836 disabled=#3c3836 delta=0 luminance=0.000
+PIXELS style=Fusion   widget=plain-text-edit  role=text        themes=30 worst_theme=Atom One Dark      channel_delta=0 luminance_delta=0.000 differing_px=22 enabled_hits=237 disabled_hits=237 exact_colour=1
+CHECK disabled.pixels.plain-text-edit FAIL style=Fusion themes=30 worst_theme=Atom One Dark channel_delta=0 luminance_delta=0.000 differing_px=22
+DISABLED-LOOK-SELFTEST failures=584

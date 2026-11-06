@@ -1,0 +1,96 @@
+CHECK setup.temp-dir PASS
+CHECK setup.registry PASS
+BINDING edit.undo                    effective=                 default=                 state=unbound
+BINDING edit.redo                    effective=                 default=                 state=unbound
+BINDING settings.preferences         effective=Ctrl+,           default=Ctrl+,           state=default
+BINDING file.new                     effective=                 default=                 state=unbound
+BINDING file.open                    effective=Ctrl+O           default=Ctrl+O           state=default
+BINDING file.open-folder             effective=                 default=                 state=unbound
+BINDING file.switch-project          effective=                 default=                 state=unbound
+BINDING file.new-layout              effective=Ctrl+Alt+N       default=Ctrl+Alt+N       state=default
+BINDING file.save                    effective=Ctrl+S           default=Ctrl+S           state=default
+BINDING file.save-as                 effective=Ctrl+Shift+S     default=Ctrl+Shift+S     state=default
+BINDING file.save-all                effective=                 default=                 state=unbound
+BINDING file.save-session            effective=                 default=                 state=unbound
+BINDING file.close-pane              effective=Ctrl+W           default=Ctrl+W           state=default
+BINDING file.quit                    effective=Ctrl+Q           default=Ctrl+Q           state=default
+BINDING view.split.horizontal        effective=Ctrl+Shift+H     default=Ctrl+Shift+H     state=default
+BINDING view.split.vertical          effective=Ctrl+Shift+V     default=Ctrl+Shift+V     state=default
+BINDING view.focus.next              effective=F6               default=F6               state=default
+BINDING view.layout.mixed            effective=                 default=                 state=unbound
+BINDING view.layout.reset            effective=Ctrl+Alt+R       default=Ctrl+Alt+R       state=default
+BINDING view.toolbar                 effective=                 default=                 state=unbound
+BINDING search.focus                 effective=                 default=                 state=unbound
+BINDING view.panel.file-tree         effective=Ctrl+Alt+F       default=Ctrl+Alt+F       state=default
+BINDING view.panel.search            effective=Ctrl+Alt+S       default=Ctrl+Alt+S       state=default
+BINDING view.panel.terminal          effective=Ctrl+Alt+J       default=Ctrl+Alt+J       state=default
+BINDING view.panel.vcs               effective=Ctrl+Alt+V       default=Ctrl+Alt+V       state=default
+BINDING view.panel.outline           effective=Ctrl+Alt+O       default=Ctrl+Alt+O       state=default
+BINDING help.user-manual             effective=F1               default=F1               state=default
+BINDING help.about                   effective=                 default=                 state=unbound
+CHECK defaults.no-duplicate-bindings PASS
+CHECK defaults.edit.undo-has-binding FAIL
+CHECK defaults.edit.redo-has-binding FAIL
+CHECK defaults.file.new-has-binding FAIL
+CHECK defaults.file.save-all-has-binding FAIL
+CHECK defaults.search.focus-has-binding FAIL
+CHECK defaults.view.toolbar-has-binding FAIL
+CHECK defaults.split-horizontal-free-sequence FAIL (Ctrl+Shift+H)
+CHECK page.loaded PASS
+CHECK page.widgets PASS
+CHECK visible.split-row PASS
+CHECK visible.split-effective-default FAIL (Ctrl+Shift+H)
+CHECK visible.split-default-column FAIL (Ctrl+Shift+H)
+CHECK visible.split-state-default PASS
+CHECK visible.unbound-is-explicit PASS
+CHECK conflict.registry-refused FAIL (Ctrl+Shift+H)
+CHECK conflict.registry-owner-named PASS
+CHECK custom.effective-updated PASS
+CHECK visible.custom-state PASS
+CHECK custom.new-key-fires PASS
+CHECK custom.old-default-inert PASS
+CHECK dialog.loaded PASS
+CHECK dialog.widgets PASS
+CHECK dialog.row PASS
+CHECK dialog.preview-effective PASS
+CHECK dialog.ok-persisted PASS
+CHECK dialog.ok-restart-value PASS
+CHECK dialog.cleanup-default PASS
+CHECK persist.restart-loaded PASS
+CHECK persist.restart-key-fires PASS
+CHECK reset.per-command FAIL (Ctrl+Shift+H)
+CHECK reset.all-at-once FAIL (split=Ctrl+Shift+H vertical=Ctrl+Shift+V)
+CHECK real.setup-pane PASS
+CHECK real.setup-open PASS
+CHECK real.setup-view PASS
+CHECK authority.editor-find-kept PASS
+CHECK authority.no-editor-collision.settings.preferences PASS
+CHECK authority.no-editor-collision.file.open PASS
+CHECK authority.no-editor-collision.file.new-layout PASS
+CHECK authority.no-editor-collision.file.save PASS
+CHECK authority.no-editor-collision.file.save-as FAIL (Ctrl+Shift+S also owned by Save As… (file_save_as))
+CHECK authority.no-editor-collision.file.close-pane PASS
+CHECK authority.no-editor-collision.file.quit PASS
+CHECK authority.no-editor-collision.view.split.horizontal FAIL (Ctrl+Shift+H also owned by Find Selected Backwards (edit_find_selected_backwards))
+CHECK authority.no-editor-collision.view.split.vertical PASS
+CHECK authority.no-editor-collision.view.focus.next PASS
+CHECK authority.no-editor-collision.view.layout.reset PASS
+CHECK authority.no-editor-collision.view.panel.file-tree PASS
+CHECK authority.no-editor-collision.view.panel.search PASS
+CHECK authority.no-editor-collision.view.panel.terminal PASS
+CHECK authority.no-editor-collision.view.panel.vcs FAIL (Ctrl+Alt+V also owned by Switch to Next Input Mode (switch_next_input_mode))
+CHECK authority.no-editor-collision.view.panel.outline PASS
+CHECK authority.no-editor-collision.help.user-manual PASS
+CHECK authority.no-editor-collision.test.ctrl-p-probe FAIL (Ctrl+P also owned by Print… (file_print))
+CHECK authority.ctrl-p-shell-owned FAIL
+CHECK authority.ctrl-p-fires PASS
+CHECK real.split-horizontal-fires FAIL (panes 1 -> 1)
+CHECK real.split-vertical-fires PASS
+CHECK real.typing-lands PASS
+CHECK real.ctrl-z-undoes PASS
+CHECK real.ctrl-shift-z-redoes PASS
+CHECK real.ctrl-z-undoes-again PASS
+CHECK real.editor-conflict-refused FAIL (Ctrl+Shift+H)
+CHECK real.editor-conflict-named PASS
+SUMMARY checks=66 failures=19
+EXIT=1

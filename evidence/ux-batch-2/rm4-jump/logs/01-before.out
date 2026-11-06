@@ -1,0 +1,47 @@
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1 definitions-ok=[]
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+fixture=/vedit-build/evidence/ux-batch-2/rm4-jump/fixture
+stateDir=/tmp/vedit-rm4-jump-probe
+ok   rm4.jump-target-is-the-product-target — EditorJumpTarget installed
+ok   rm4.module-tree-dock
+This plugin does not support propagateSizeHints()
+ok   rm4.catalog-painted — Module tree ready — double-click a module to open its declaration.
+ok   rm4.interface-dock
+ok   rm4.module-row
+This plugin does not support propagateSizeHints()
+ok   rm4.interface-focus — focused=child rows=2
+     port row 0 = clk
+     port row 1 = y
+ok   rm4.active-pane
+ok   rm4.ground-truth.port-declaration — :0:0
+ok   rm4.ground-truth.instantiation — :0:0
+ok   rm4.port-row
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+search: jump opened '/vedit-build/evidence/ux-batch-2/rm4-jump/fixture/child.sv' line=1 column=34 (cursor=1:34)
+
+== rm4.double-click.port-declaration (control=0, expected child.sv:1:34 token=clk)
+ok   rm4.double-click.port-declaration.gesture-delivered
+     PASSED   : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/child.sv:1:34 (status=delivered)
+     RECEIVED : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/child.sv:1:34
+     SEAM-ERR : <none>
+     RESOLVED : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/child.sv cursor=1:34
+     PANEL    : port clk declaration → child.sv:1:34
+ok   rm4.double-click.port-declaration.opened-file — resolved=child.sv expected=child.sv
+ok   rm4.double-click.port-declaration.cursor-line — observed=1 expected=1
+ok   rm4.double-click.port-declaration.cursor-on-identifier — identifier-under-cursor='clk' expected='clk' column=34
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+search: jump opened '/vedit-build/evidence/ux-batch-2/rm4-jump/fixture/top.sv' line=3 column=9 (cursor=3:9)
+
+== rm4.ctrl-double-click.instantiation (control=1, expected top.sv:3:11 token=child)
+ok   rm4.ctrl-double-click.instantiation.gesture-delivered
+     PASSED   : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/top.sv:3:9 (status=delivered)
+     RECEIVED : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/top.sv:3:9
+     SEAM-ERR : <none>
+     RESOLVED : /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/top.sv cursor=3:9
+     PANEL    : instantiation of child in top → top.sv:3:9
+ok   rm4.ctrl-double-click.instantiation.opened-file — resolved=top.sv expected=top.sv
+ok   rm4.ctrl-double-click.instantiation.cursor-line — observed=3 expected=3
+FAIL rm4.ctrl-double-click.instantiation.cursor-on-identifier — identifier-under-cursor='u_child' expected='child' column=9
+
+checks=18 failures=1

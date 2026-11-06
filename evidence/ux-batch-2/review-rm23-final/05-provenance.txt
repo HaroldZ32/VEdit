@@ -1,0 +1,27 @@
+== writer READMEs ==
+f187403d8b88d4bb41cf12eb8e58df75826e3e10734a5b9354c0d5733ea4623d  evidence/ux-batch-2/rm2-project-switch/README.md
+4a74d250f273e632e9f10e8a121edd0277b5eb60299b92f61b8f8cd7acb1603b  evidence/ux-batch-2/rm3-variables/README.md
+== key sources ==
+1bba079fb4bfb5dfba02b140c3f38df3e6543a02415a678fb122f46caf70efff  src/app/app_shell.cpp
+307c69eebb64ebe98c00cb89623cc40d47d92aa37fc9eb0466b451b0a9ad71f7  src/workspace/diagnostics/ffi_backends.cpp
+14568eb71d6d1ff3c9052fa0f1342acda87d7a9c99fa946bab12d26eb83d6251  src/workspace/diagnostics/diagnostics_integration.cpp
+aa5ed365857143b45707930efdf76827a9338b1359499001a70eb1c2237eb591  crates/vd-config/src/project.rs
+3c7345e82b9ec6f9de436ba63a24a896a587855b1a36b0ac6275b63ccd79ab26  src/workspace/project/project_model.cpp
+ffc88c9da4abc22b9363a0bf0c0ba3d62a4bdd3ec4990ca7e450b69a3c9bf287  src/workspace/project/project_state.cpp
+aab529a3d4211cbf2dc08728e0d6b26c733c718482c808105f5a7cb7b876b6ce  src/workspace/project/project_variables_dialog.cpp
+a6183b0b40c8059193118357b50842df794bf9f5bbfbb6233a175e01dec34d33  src/workspace/project/project_panel.cpp
+42cda8c24ae25ce59c49610cf01d7a4215eb8928ef5f18c40e2102f32c384f7e  src/workspace/project/language_registry.h
+f573dd79ab76e1f51b9fb5ff656f8a8df470bda1969cb27e6ce461aa1415a1b5  crates/vd-config/src/language.rs
+98d9b5438de93bfb756bce7e25439d0f81bfb5e94e23d38b5e1d0f0d749106b1  src/workspace/diagnostics/selftests/rm2_project_switch_e2e.cpp
+6980debdb46712458c6862905b22e25aef0f85e4d4cb4c6bb6b499364fcb4907  src/workspace/project/project_variables_e2e.cpp
+== switch/translation ==
+src/app/app_shell.cpp:610:    // RM-2: `file.switch-project` below is the same reset path under the name
+src/app/app_shell.cpp:622:    addCommand(QStringLiteral("file.switch-project"), tr("S&witch Project…"),
+src/app/app_shell.cpp:762:    commands_->setHandler(QStringLiteral("file.switch-project"), [this]() {
+src/app/app_shell.cpp:982:        "file.new",       "file.open",   "file.open-folder", "file.switch-project",
+translations/vedit_zh_CN.ts:4709:        <translation>切换工程(&amp;W)…</translation>
+== e2e logs ==
+b9506df52a1ca1262b86d89319b9fa9f09490745c1800d3cfccbf35faeaebc48  evidence/ux-batch-2/rm2-project-switch/12-e2e-final.log
+f82aee13127005c500692e7f1138a55039a4114fafeabddbffe59b3912249fea  evidence/ux-batch-2/rm2-project-switch/14-ctest-affected.log
+495bf3cb43ab34b3ee35cfd9a36a16e8b1f577c53fa4e8bd3440e9b813e62983  evidence/ux-batch-2/rm3-variables/05-e2e-final.log
+41c7c5d0be6501a755a25b7f5b3e70b34b3e15c621e83bc837a782f22414b2fb  evidence/ux-batch-2/rm3-variables/09-project-selftest.log

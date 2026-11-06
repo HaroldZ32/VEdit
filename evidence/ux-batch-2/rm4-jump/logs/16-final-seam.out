@@ -1,0 +1,17 @@
+===== FINAL seam =====
+mode=seam startRoot=/vedit-build/evidence/ux-batch-2/rm4-jump/fixture
+ok   rm4.jump-target-is-the-product-target — EditorJumpTarget installed
+ok   rm4.module-tree-dock
+ok   rm4.interface-dock
+ok   rm4.active-pane
+ok   rm4.catalog-painted — cataloguing 2 project file(s)…
+ok   rm4.seam.relative-path.delivered
+ok   rm4.seam.relative-path.under-workspace-root — /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/child.sv
+     GHOST FOCUS: 'ghost' rows=1
+     GHOST      : activated=0 status=rejected
+     PANEL      : port p declaration: the editor rejected the jump to ghost.sv:1:1 — cannot open /nonexistent-rm4/ghost.sv: not a regular file [workspace root: /vedit-build/evidence/ux-batch-2/rm4-jump/fixture]
+     REASON     : cannot open /nonexistent-rm4/ghost.sv: not a regular file [workspace root: /vedit-build/evidence/ux-batch-2/rm4-jump/fixture]
+ok   rm4.seam.refusal.still-a-refusal
+ok   rm4.seam.refusal.reason-names-what-failed — cannot open /nonexistent-rm4/ghost.sv: not a regular file [workspace root: /vedit-build/evidence/ux-batch-2/rm4-jump/fixture]
+ok   rm4.seam.refusal.panel-carries-the-reason — port p declaration: the editor rejected the jump to ghost.sv:1:1 — cannot open /nonexistent-rm4/ghost.sv: not a regular file [workspace root: /vedit-build/evidence/ux-batch-2/rm4-jump/fixture]
+checks=10 failures=0

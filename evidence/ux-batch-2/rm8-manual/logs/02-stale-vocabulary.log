@@ -1,0 +1,3 @@
+$ grep -n -E "<stale vocabulary>" docs/USER_GUIDE.md
+terms: GTK3|GtkSourceView|gtk3|gtksourceview|vd-app|GTK_IM_MODULE|VEDIT_GSV|WenQuanYi|im-xim|ibus-gtk3|cargo build|vedit\.sh|--selftest all|网络 ?/ ?驱动 ?/ ?负载
+hits=0

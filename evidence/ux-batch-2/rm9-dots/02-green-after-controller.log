@@ -1,0 +1,25 @@
+CHECK PASS rm9.analyze-a
+CHECK PASS rm9.a-error-before-switch  1
+CHECK PASS rm9.analyze-b
+CHECK PASS rm9.b-clean-after-analysis  3
+CHECK PASS rm9.a-retained-after-switch  1
+CHECK PASS rm9.a-retained-in-map  1
+CHECK PASS rm9.a-retained-rows-feed-merged  1
+CHECK PASS rm9.count-follows-retained  count=1
+CHECK PASS rm9.analyze-a-again
+CHECK PASS rm9.a-still-error-after-return  1
+CHECK PASS rm9.project-every-file-verdict  a=1 c=2 d=3
+CHECK PASS rm9.project-no-file-left-as-no-verdict  size=3
+CHECK PASS rm9.project-never-opened-not-unknown
+CHECK PASS rm9.pending-a-visible  4
+CHECK PASS rm9.pending-b-in-map  4
+CHECK PASS rm9.pending-is-not-clean
+CHECK PASS rm9.outside-set-still-unknown
+CHECK PASS rm9.e-analyze
+CHECK PASS rm9.e-clean-before-edit  3
+CHECK PASS rm9.e-not-green-after-edit  4
+CHECK PASS rm9.e-map-says-not-analysed  4
+CHECK PASS rm9.e-merged-empty-after-edit  0
+CHECK PASS rm9.e-analyze-dirty
+CHECK PASS rm9.e-dirty-fresh-verdict-wins  3
+VE-VERDICT-RETENTION-SELFTEST checks=24 failures=0

@@ -1,0 +1,70 @@
+=== section headers (after) ===
+18:## 1. 前提
+28:## 2. 一条命令（Qt6 交付物）
+51:### 2.1 旧版 GTK3 构建（不是 Qt 交付物）
+70:## 3. 固定输入（旧版 lane 与共用工具：`scripts/versions.env` 是唯一来源）
+89:## 4. 镜像源替换（旧版 lane：CentOS 7 的坑）
+103:## 5. GtkSourceView 4.6.1（旧版 lane 的源码构建）
+118:## 6. slang（两条 lane 共用：glibc 2.17 专用构建）
+138:## 7. 打包：Qt 交付物与旧版产物
+140:### 7.1 Qt 交付物（唯一 AppImage）
+162:### 7.2 旧版 GTK 产物（不是 Qt 交付物）
+182:## 8. 可复现性（旧版 lane 的边界）
+204:## 9. 重新生成 Rust crate 许可清单
+216:## 10. 排障（旧版 lane）
+229:### 10.1 运行期工具链发现（Qt 产品：诊断 / 大纲：随包 / 本地取 / env）
+253:## 11. GitHub Actions（旧版 lane 的 CI / 镜像 / 发版）
+290:## 12. Qt6 / KF6 C++ 构建底座（M0，T10）
+295:### 12.1 为什么用现代发行版做构建镜像
+316:### 12.2 构建命令与产物
+344:### 12.3 版本矩阵与锁定方式
+367:### 12.4 CMake 骨架
+386:### 12.5 门禁
+397:### 12.6 已知边界（如实记录）
+418:### 12.7 排障
+429:## 13. slang-server（LSP 后端二）：spike 结论与构建/运行方式
+436:### 13.1 上游预编译：不可用（实测）
+449:### 13.2 源码构建：一条命令
+472:### 13.3 实测结果（2026-11-02，16 核）
+485:### 13.4 运行要点（给接入方）
+
+=== legacy command mentions ===
+12:> - **旧 Rust/GTK3 产品**（`vd-app`）：`bash scripts/build.sh`（§2.1）→ `build/artifacts/vd-app`，
+54:bash scripts/build.sh
+223:| `pkg-config ... gtksourceview-4 not found` | 在宿主直接 `cargo build` 了；GTK 栈只在 pinned 镜像里存在，用 `bash scripts/build.sh` |
+262:| `ci.yml` | PR → `dev`/`main`；push → `dev` | `scripts/gates.sh` + `scripts/build.sh`（release build、Xvfb smoke、GLIBC ≤ 2.17 断言），上传 `build/evidence/` 与 `build/artifacts/vd-app` |
+264:| `release.yml` | tag `v*`；手动 | slang → `scripts/build.sh` → AppImage → tar.gz/.run → `SHA256SUMS` → GitHub Release |
+285:- `scripts/build.sh` 在镜像内跑两处 `--selftest`：先 `--selftest smoke --probe-hold-ms 2500`
+326:`bash scripts/build.sh` 是旧 Rust/GTK3 产品，只写 `target/release/vd-app`，不产出 `vedit-app`。
+
+=== current gate commands ===
+44:- `bash build/gates/qt6-cxx.sh` —— Qt6/KF6 C++ 车道（configure + build + ctest + xcb 冒烟）；
+45:- `bash scripts/gates.sh` —— Rust 服务层（fmt / clippy / test / 依赖策略）；
+46:- `bash build/gates/lrelease.sh` —— 中文目录零 unfinished / untranslated；
+47:- `bash build/gates/docs.sh` —— 文档门禁。
+65:产物：`build/artifacts/vd-app`（**旧产品**主程序，不是 `vedit-app`）。门禁：`bash scripts/gates.sh`
+262:| `ci.yml` | PR → `dev`/`main`；push → `dev` | `scripts/gates.sh` + `scripts/build.sh`（release build、Xvfb smoke、GLIBC ≤ 2.17 断言），上传 `build/evidence/` 与 `build/artifacts/vd-app` |
+271:  bash scripts/gates.sh
+389:（公共实现在 `build/gates/qt6-cxx.sh`）：
+
+=== product words ===
+3:本文覆盖：**Qt6 交付物**的构建与打包（§2、§7.1、§12）、**旧 Rust/GTK3 产品线**的构建与打包
+7:> **两条构建 lane 并存，交付物只有一条。**
+9:> - **Qt6 交付物**（`vedit-app`）：`bash scripts/build-qt.sh`（§2）→ `bash packaging/runtime/build.sh`
+13:>   打包见 §7.2。按需求非目标 5 保留，**不是交付物**。
+22:  Qt6 交付物用 **Ubuntu 26.04** 镜像（§12.1），旧 GTK3 线用
+28:## 2. 一条命令（Qt6 交付物）
+35:这一步只构建产品二进制；**交付物**是下一步的单文件 AppImage：
+51:### 2.1 旧版 GTK3 构建（不是 Qt 交付物）
+65:产物：`build/artifacts/vd-app`（**旧产品**主程序，不是 `vedit-app`）。门禁：`bash scripts/gates.sh`
+107:CentOS 7 只有 gsv 3.24.8 的 yum 包；旧产品需要 gsv4 的 `verilog.lang` / `systemverilog.lang`，
+114:  见 `assets/language-specs/README.md`），因此这个版本回退对旧产品零损失；
+126:产物 `build/slang/out/slang` 既被旧线打包消费，也被 Qt 交付物的打包与裸构建的运行期解析消费
+138:## 7. 打包：Qt 交付物与旧版产物
+140:### 7.1 Qt 交付物（唯一 AppImage）
+142:**交付物 = `bash packaging/runtime/build.sh` 的产物 `packaging/runtime/out/VEdit-<ver>-x86_64.AppImage`（配 `out/SHA256SUMS`）。**
+148:这一条命令产出**唯一交付物**：单文件 AppImage
+162:### 7.2 旧版 GTK 产物（不是 Qt 交付物）
+171:载荷是 `build/artifacts/vd-app`，不是 `vedit-app`。它们**不是** Qt 交付物：
+175:- 体积不同：旧管线 47,745,528 字节 vs Qt 交付物 137,079,288 字节（同一台机器、同一天构建）；
+177:  （`evidence/appimage/clean-room.log`：`from host glibc family: 8`），而 Qt 交付物是 F2 私有运行时。

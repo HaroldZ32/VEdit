@@ -1,0 +1,16 @@
+
+running 1 test
+big-catalog: files=1176 modules=0 tops=0 service_elapsed_ms=2147 slang_peak_rss_kb=2011660 self_peak_rss_kb=3952 wall_ms=2232 warning=None failure=Some(AstJsonNestedTooDeep)
+
+thread 'the_1176_file_design_yields_a_full_catalog' (8) panicked at crates/vd-deeplint/tests/catalog.rs:543:5:
+a real-scale catalog must not fail: Some(AstJsonNestedTooDeep)
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test the_1176_file_design_yields_a_full_catalog ... FAILED
+
+failures:
+
+failures:
+    the_1176_file_design_yields_a_full_catalog
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 9 filtered out; finished in 2.24s
+

@@ -1,0 +1,14 @@
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+case1-before-show selected='Verilog/SystemVerilog/filelist (*.v *.sv *.svh *.vh *.f *.F)' modelFilters='*.v|*.sv|*.svh|*.vh|*.f|*.F' rows=''
+case1-after-show selected='Verilog/SystemVerilog/filelist (*.v *.sv *.svh *.vh *.f *.F)' modelFilters='*.v|*.sv|*.svh|*.vh|*.f|*.F' rows='a.sv,lib.f'
+case2-before-show selected='Filelists (*.f *.F)' modelFilters='*.f|*.F' rows=''
+case2-after-show selected='Filelists (*.f *.F)' modelFilters='*.f|*.F' rows='lib.f'
+case3-before-show selected='Filelists (*.f *.F)' modelFilters='*.f|*.F' rows=''
+case3-after-show selected='Filelists (*.f *.F)' modelFilters='*.f|*.F' rows='lib.f'
+case4-before-show selected='Verilog/SystemVerilog/filelist (*.v *.sv *.svh *.vh *.f *.F)' modelFilters='*.v|*.sv|*.svh|*.vh|*.f|*.F' rows=''
+case4-after-show selected='Verilog/SystemVerilog/filelist (*.v *.sv *.svh *.vh *.f *.F)' modelFilters='*.v|*.sv|*.svh|*.vh|*.f|*.F' rows='a.sv,lib.f'
+case5-manual-model selected='Filelists (*.f *.F)' modelFilters='*.f|*.F' rows='lib.f'

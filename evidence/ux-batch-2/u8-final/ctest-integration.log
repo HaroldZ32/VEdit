@@ -1,0 +1,50 @@
+This plugin does not support propagateSizeHints()
+CHECK PASS product.panel
+CHECK PASS product.lint-action
+LINT-PROJECT-NO-FILES loading=1 root='/tmp/vedit-project-lint-e2e-HpDsYa'
+PROJECT-ROOT-FILES root='/tmp/vedit-project-lint-e2e-HpDsYa' files=2
+PROJECT-ROOT-ENV root='/tmp/vedit-project-lint-e2e-HpDsYa' source=project pinned=1 include-dirs=0 defines=0 env=''
+LINT-PROJECT-OPEN engine=slang files=2 skipped-open=0 automatic=1
+LINT-PASS-FINISHED automatic=1 errors=2 files=2 dialogs=0 notice=1
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+OBSERVED product.pass phase=3 errors=0 automatic=1 dialogs=0 notice=1 message='2/2 file(s) scanned — 2 CLI diagnostics'
+CHECK FAIL product.explicit-dialog  dialogs=0 automatic=1
+CHECK PASS product.explicit-notice
+CHECK PASS product.pane
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+CHECK PASS product.file-opened
+CHECK PASS product.save
+LINT-PASS-FINISHED automatic=1 errors=2 files=1 dialogs=0 notice=1
+OBSERVED product.auto-pass automatic=1 dialogs-before=0 dialogs-after=0
+CHECK PASS product.automatic-pass-was-automatic
+CHECK PASS product.automatic-no-dialog  before=0 after=0
+SUMMARY checks=10 failures=1 skips=0
+
+      Start 51: vedit-b3-wiring-e2e
+51/58 Test #51: vedit-b3-wiring-e2e ............................   Passed    6.35 sec
+      Start 52: vedit-rm2-project-switch-e2e
+52/58 Test #52: vedit-rm2-project-switch-e2e ...................   Passed    1.53 sec
+      Start 53: vedit-rm9-status-dots-e2e
+53/58 Test #53: vedit-rm9-status-dots-e2e ......................   Passed    0.73 sec
+      Start 54: vedit-b3-repair-api-selftest
+54/58 Test #54: vedit-b3-repair-api-selftest ...................   Passed    0.04 sec
+      Start 55: vedit-toolchain-ux-selftest
+55/58 Test #55: vedit-toolchain-ux-selftest ....................   Passed    3.15 sec
+      Start 56: vedit-workspace-vcs-selftest
+56/58 Test #56: vedit-workspace-vcs-selftest ...................   Passed   16.42 sec
+      Start 57: vedit-workspace-settings-selftest
+57/58 Test #57: vedit-workspace-settings-selftest ..............   Passed    1.76 sec
+      Start 58: vedit-ui-scale-restart
+58/58 Test #58: vedit-ui-scale-restart .........................   Passed    0.55 sec
+
+93% tests passed, 4 tests failed out of 58
+
+Total Test time (real) =  86.41 sec
+
+The following tests FAILED:
+	 15 - vedit-app-ux-selftest (Failed)
+	 21 - vedit-native-fold-tests (Failed)
+	 49 - vedit-rename-e2e (SIGPIPE)
+	 50 - vedit-project-lint-e2e (Failed)
+Errors while running CTest

@@ -1,0 +1,57 @@
+CHECK PASS rm17b.fixture
+CHECK PASS rm17b.s1.harness
+CHECK PASS rm17b.s1.project-set  files=0
+CHECK PASS rm17b.s1.no-coverage-before-scope  upper-top=0 upper-c=0
+CHECK PASS rm17b.s1.shell-top  A
+CHECK PASS rm17b.s1.shell-excluded-count  1
+CHECK PASS rm17b.s1.aggregate-line  1 file(s) outside the top A are not analysed
+CHECK PASS rm17b.s1.excluded-mark  c=4
+CHECK PASS rm17b.s1.excluded-never-green  c=4
+CHECK PASS rm17b.s1.pass-runs
+CHECK PASS rm17b.s1.request-analysed-only  /tmp/<fixture>/project/top.sv,/tmp/vedit-rm17b-top-scope-e2e-mmfmpi/project/b.sv
+CHECK PASS rm17b.s1.request-excludes-outside  /tmp/<fixture>/project/top.sv,/tmp/vedit-rm17b-top-scope-e2e-mmfmpi/project/b.sv
+CHECK PASS rm17b.s1.request-no-foreign-files  /tmp/<fixture>/project/top.sv,/tmp/vedit-rm17b-top-scope-e2e-mmfmpi/project/b.sv
+CHECK PASS rm17b.s1.a-verdict  a=1
+CHECK PASS rm17b.s1.b-clean  b=3
+CHECK FAIL rm17b.s1.outside-still-notanalysed  c=3
+OBSERVED rm17b.s1.after-scoped-pass filesSeen='/tmp/<fixture>/project/top.sv,/tmp/vedit-rm17b-top-scope-e2e-mmfmpi/project/b.sv' upper='/tmp/vedit-rm17b-top-scope-e2e-mmfmpi/project/b.sv,/tmp/vedit-rm17b-top-scope-e2e-mmfmpi/project/top.sv' c-status-map=3 c-status-direct=3 c-covered=0 c-merged-rows=0 passFiles=2
+CHECK PASS rm17b.s1.project-model-keeps-c  files=3
+CHECK PASS rm17b.s1.project-list-shows-c  top.sv,b.sv,c.sv
+CHECK PASS rm17b.s1.auto-shell-top
+CHECK PASS rm17b.s1.auto-shell-excluded  0
+CHECK PASS rm17b.s1.auto-pass-runs
+CHECK PASS rm17b.s1.auto-request-includes-c  /tmp/<fixture>/project/top.sv,/tmp/vedit-rm17b-top-scope-e2e-mmfmpi/project/b.sv,/tmp/vedit-rm17b-top-scope-e2e-mmfmpi/project/c.sv
+CHECK PASS rm17b.s1.auto-c-analysed-again  c=2
+CHECK PASS rm17b.s1.auto-c-not-notanalysed  c=2
+CHECK PASS rm17b.s2.harness
+CHECK PASS rm17b.s2.project-set
+CHECK PASS rm17b.s2.control-pass-ran  /tmp/<fixture>/project/top.sv,/tmp/vedit-rm17b-top-scope-e2e-mmfmpi/project/b.sv,/tmp/vedit-rm17b-top-scope-e2e-mmfmpi/project/c.sv
+CHECK PASS rm17b.s2.control-request-includes-c  /tmp/<fixture>/project/top.sv,/tmp/vedit-rm17b-top-scope-e2e-mmfmpi/project/b.sv,/tmp/vedit-rm17b-top-scope-e2e-mmfmpi/project/c.sv
+CHECK PASS rm17b.s2.control-c-analysed  c=2
+CHECK PASS rm17b.s2.control-covered  covered=1
+CHECK PASS rm17b.s2.shell-top  A
+CHECK PASS rm17b.s2.aggregate-line  1 file(s) outside the top A are not analysed
+CHECK FAIL rm17b.s2.excluded-is-hollow  c=2 covered=1
+CHECK PASS rm17b.s2.excluded-never-green  c=2
+CHECK PASS rm17b.s2.next-pass-runs
+CHECK PASS rm17b.s2.request-excludes-outside  /tmp/<fixture>/project/top.sv,/tmp/vedit-rm17b-top-scope-e2e-mmfmpi/project/b.sv
+CHECK PASS rm17b.s2.request-analysed-only  /tmp/<fixture>/project/top.sv,/tmp/vedit-rm17b-top-scope-e2e-mmfmpi/project/b.sv
+CHECK PASS rm17b.s2.a-verdict  a=1
+CHECK PASS rm17b.s2.b-clean  b=3
+OBSERVED rm17b.s2.after-pass c-status=2 covered=1
+CHECK FAIL rm17b.s2.still-hollow-after-pass  c=2 covered=1
+CHECK PASS rm17b.s2.auto-pass-runs
+CHECK PASS rm17b.s2.auto-request-includes-c  /tmp/<fixture>/project/top.sv,/tmp/vedit-rm17b-top-scope-e2e-mmfmpi/project/b.sv,/tmp/vedit-rm17b-top-scope-e2e-mmfmpi/project/c.sv
+CHECK PASS rm17b.s2.auto-c-analysed-again  c=2
+CHECK PASS rm17b.s3.package-fixture
+CHECK PASS rm17b.s3.harness
+CHECK PASS rm17b.s3.project-set  files=0
+CHECK PASS rm17b.s3.aggregate-counts-package  2
+CHECK PASS rm17b.s3.aggregate-line  2 file(s) outside the top A are not analysed
+CHECK PASS rm17b.s3.package-hollow  pkg=4
+CHECK PASS rm17b.s3.pass-runs
+CHECK PASS rm17b.s3.request-excludes-package  /tmp/<fixture>/project/top.sv,/tmp/vedit-rm17b-top-scope-e2e-mmfmpi/project/b.sv
+CHECK PASS rm17b.s3.request-analysed-only  /tmp/<fixture>/project/top.sv,/tmp/vedit-rm17b-top-scope-e2e-mmfmpi/project/b.sv
+CHECK PASS rm17b.s3.a-verdict  a=1
+CHECK FAIL rm17b.s3.package-still-hollow  pkg=3
+VE-RM17B-TOP-SCOPE-E2E checks=54 failures=4

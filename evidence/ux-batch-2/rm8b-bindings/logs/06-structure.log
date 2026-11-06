@@ -1,0 +1,6 @@
+$ wc -l -c docs/USER_GUIDE.md
+  669 53370 docs/USER_GUIDE.md
+
+$ git diff --stat -- docs/USER_GUIDE.md
+ docs/USER_GUIDE.md | 1138 +++++++++++++++++++++++++++-------------------------
+ 1 file changed, 585 insertions(+), 553 deletions(-)

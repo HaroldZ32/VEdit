@@ -1,0 +1,7 @@
+$ grep -n -E "<[a-zA-Z/][^>]*>|\\[\\^[^]]*\\]|^[[:space:]]*\\[[^]]*\\]:" docs/USER_GUIDE.md
+forbidden_hits=1 (1 = none)
+
+tables=9 fences=8
+
+$ grep -n USER_GUIDE resources/help/user_manual.qrc
+14:        <file alias="USER_GUIDE.md">../../docs/USER_GUIDE.md</file>

@@ -1,0 +1,19 @@
+[164/165] Building CXX object src/app/CMakeFiles/vedit-app.dir/main.cpp.o
+[165/165] Linking CXX executable src/app/vedit-app
+binary 2026-11-06 07:43:27.377083410 +0000 125448808 /vedit-build/target/rm4-jump-probe/rm4-jump-probe
+e0727a90134d48f0abba65b8aa1e6e534160623702262c914c3fae3644edd7af  /vedit-build/target/rm4-jump-probe/rm4-jump-probe
+===== BEFORE: panel message (reason dropped) =====
+mode=seam startRoot=/vedit-build/evidence/ux-batch-2/rm4-jump/fixture
+ok   rm4.jump-target-is-the-product-target — EditorJumpTarget installed
+ok   rm4.module-tree-dock
+ok   rm4.interface-dock
+ok   rm4.active-pane
+ok   rm4.catalog-painted — cataloguing 2 project file(s)…
+ok   rm4.seam.relative-path.delivered
+ok   rm4.seam.relative-path.under-workspace-root — /vedit-build/evidence/ux-batch-2/rm4-jump/fixture/child.sv
+     PANEL      : port p declaration: the editor rejected the jump to ghost.sv:1:1
+     REASON     : cannot open /nonexistent-rm4/ghost.sv: not a regular file [workspace root: /vedit-build/evidence/ux-batch-2/rm4-jump/fixture]
+ok   rm4.seam.refusal.still-a-refusal
+ok   rm4.seam.refusal.reason-names-what-failed — cannot open /nonexistent-rm4/ghost.sv: not a regular file [workspace root: /vedit-build/evidence/ux-batch-2/rm4-jump/fixture]
+FAIL rm4.seam.refusal.panel-carries-the-reason — port p declaration: the editor rejected the jump to ghost.sv:1:1
+checks=10 failures=1

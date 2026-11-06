@@ -1,0 +1,18 @@
+=== Committed (HEAD) filter tables — the pre-fix state:
+QString openFileDialogFilter()
+{
+    // Filelists are openable documents: the project lane imports one as the
+    // project, but the editor still shows it, so the filter lists them next to
+    // the HDL sources (and the existing types stay).
+    return QCoreApplication::translate(
+        "VEdit",
+        "Verilog/SystemVerilog/filelist (*.v *.sv *.svh *.vh *.f *.F *.flist);;"
+        "Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;"
+        "Filelists (*.f *.F *.flist);;"
+        "All Files (*)");
+}
+
+=== After (product output from the app self-check):
+CHECK open.filter.filelist PASS Verilog/SystemVerilog/filelist (*.f *.F *.v *.sv *.svh *.vh);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F);;All Files (*)
+CHECK open.filter.no-guessed-flist PASS Verilog/SystemVerilog/filelist (*.f *.F *.v *.sv *.svh *.vh);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F);;All Files (*)
+CHECK open.filter.keeps-existing-types PASS Verilog/SystemVerilog/filelist (*.f *.F *.v *.sv *.svh *.vh);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F);;All Files (*)

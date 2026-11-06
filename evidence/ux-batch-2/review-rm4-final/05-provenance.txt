@@ -1,0 +1,26 @@
+== writer README ==
+7f9b5fbcd8d61d952310af8cb234590697265460b62e99e82973518f982aeaa9  evidence/ux-batch-2/rm4-jump/README.md
+== key sources ==
+3de823a917bcb292fa120523d5fa88d8a64db595bdccfe8e8db5caa906584beb  src/workspace/search/search_jump_target.cpp
+53b37aed73ad0f852c3cf9471ff10456b29f615e3413e1f684f05835c218c748  src/workspace/jump/jump_registry.cpp
+0b794f8f11aeea9a719813abbb1e38535062103184268b8dd1f1a24c7ea66426  src/workspace/jump/jump_target.h
+8b9f15ce33abcab551ea66afcb5da724906d0df98a991f6adc6dae758d6a46dd  src/workspace/module_tree/interface_panel.cpp
+f641127634781a824985ab243264549d3c30f130f17f11b0bcd8772b44fd44d2  src/workspace/module_tree/module_tree_panel.cpp
+55dba87997435cea56433d338a792038daed0fd71e657b5eeb833a1844075879  src/workspace/jump/tests/jump_tests.cpp
+== probe binary ==
+fe7adfe6a103613065d655798d50889979244f05df3cf3aa6da3794a5b386d0d  target/rm4-jump-probe/rm4-jump-probe
+== writer logs quoted ==
+6103acf7ca8db25220639c6e56a3e23e2c3fb163902a2dcd03d48e0b38cb6480  evidence/ux-batch-2/rm4-jump/logs/10-before-position-path.out
+50d3b3704c307caf17db507bf86702fc13c763b74d51e1d968592fa372782b86  evidence/ux-batch-2/rm4-jump/logs/11-before-panel-reason.out
+179902a6fae9881b579aab61fe2ded2648e1efd1afd150c186ec158fa0216eea  evidence/ux-batch-2/rm4-jump/logs/12-after-project-and-seam.out
+d1bdb5aa722f9f3ab91c77171e94226bc95354c26a723f29342d69469d3cbdad  evidence/ux-batch-2/rm4-jump/logs/21-case2-before.out
+227b08d5d4b1567892df8848caf154a6d4bd2a6e6ce5ada3394c87dd1a938626  evidence/ux-batch-2/rm4-jump/logs/22-cases-after.out
+293d5831bae8356bb6e163a403998f09b89ec77c5ca25947ff6868780cccb1d2  evidence/ux-batch-2/rm4-jump/logs/23-after-suites.out
+== fixtures ==
+d962f5b04cf42cace36e8c57d424d8fbcbe71781c3605b809a9c0cef2230e795  evidence/ux-batch-2/rm4-jump/fixture/child.sv
+4b945ddaf0cbecdfcfa8a3ed585bdf389bd3ae97f83486d0654ee2c7c0e93467  evidence/ux-batch-2/review-rm4-final/fixture-bytecol/child.sv
+db9da62eaf1d5c35cd830262e562bd2af650f42f4680e01b7e5a4ea23275eabd  evidence/ux-batch-2/review-rm4-final/fixture-bytecol/top.sv
+== mtimes ==
+2026-11-06 16:11:11.721404209 +0800 src/workspace/search/search_jump_target.cpp
+2026-11-06 16:12:32.466635360 +0800 target/rm4-jump-probe/rm4-jump-probe
+2026-11-06 16:16:38.346471559 +0800 evidence/ux-batch-2/rm4-jump/README.md
