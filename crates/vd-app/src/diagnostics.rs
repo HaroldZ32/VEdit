@@ -253,8 +253,10 @@ mod tests {
                 editor_range: None,
                 conversion_note: Some("no location".to_string()),
                 parse_note: None,
+                repeat: 1,
             }],
             total_diagnostics: 1,
+            dropped: 0,
             truncated: false,
             binary: vd_deeplint::BinaryResolution {
                 chosen: None,

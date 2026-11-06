@@ -224,6 +224,10 @@ pub(crate) fn discover_in_root_with(
 }
 
 /// Source-file extensions the directory scan collects (AC-2.2).
+///
+/// A PROJECTION of [`crate::language::LANGUAGES`] for documentation/readers;
+/// the scan itself asks the registry (`language::supports(.., Source)`), and the
+/// registry tests pin this list so the two can never drift.
 pub const SCANNED_EXTENSIONS: [&str; 4] = ["v", "sv", "vh", "svh"];
 
 /// One fully expanded project: the union of the directory scan and every
@@ -270,6 +274,13 @@ pub struct ProjectExpansion {
 ///   for its configuration layers, never to move the root above the folder the
 ///   user opened (AC-2.1 — otherwise opening `repo/rtl` inside a git checkout
 ///   would silently expand `repo`).
+/// * The `[project]` table is **project membership, not a preference** (RM-2):
+///   a `vedit.toml` that lives ABOVE the opened folder does not contribute its
+///   `filelists` / `include_dirs` / `defines` to a folder that is not that
+///   project. Its other layers (UI, editor, tool paths) still apply, and a
+///   user-level `[project]` table still applies when no enclosing `vedit.toml`
+///   exists. Discovery is re-run from the new root on every expansion, so a
+///   project switch cannot inherit the previous project's merge state.
 /// * `imported_filelists` are additional `.f` files the user imported; each is
 ///   parsed by [`filelist::parse`] with the same diagnostics as a discovered
 ///   one, and a `.f` that is both discovered and imported is parsed once.
@@ -334,9 +345,7 @@ pub fn expand_with_variables(
 
     let root = root.to_path_buf();
     let home = std::env::var_os("HOME").map(PathBuf::from);
-    // The opened folder wins over the upward discovery (AC-2.1). The
-    // configuration layers were still read by `Loader`, so a `vedit.toml`
-    // above the folder keeps applying; only the ROOT is pinned. Discovery is
+    // The opened folder wins over the upward discovery (AC-2.1). Discovery is
     // re-run WITH the variable table so `$VAR` inside a discovered `.f` expands
     // too (the Loader parsed it with the environment only).
     let (root_source, search_stop) = if discovered.root == root {
@@ -344,6 +353,33 @@ pub fn expand_with_variables(
     } else {
         (RootSource::Fallback, root.clone())
     };
+    // RM-2: the `[project]` table is PROJECT MEMBERSHIP, not a preference.
+    //
+    // `Loader` walks UP from the opened folder, so opening `repo/rtl` inside a
+    // checkout whose `repo/vedit.toml` carries `[project] filelists/include_dirs/
+    // defines` used to KEEP that enclosing project's membership: the new folder
+    // was expanded with the OTHER project's filelists, -I and -D — the
+    // real-machine "stale files pile up after switching projects" defect (the
+    // folder shown was new, the environment and file set were not).
+    //
+    // The rule is now explicit and self-contained per expansion:
+    //   * the opened folder is the root AND the discovery root is that same
+    //     folder (its own `vedit.toml`, or a user/config-only `[project]`):
+    //     the `[project]` table applies, exactly as before;
+    //   * the discovered `vedit.toml` lives ABOVE the opened folder: its
+    //     `[project]` table described the enclosing project and is dropped.
+    //     Non-project layers from it (UI, editor, tool paths) still apply —
+    //     those are preferences, not membership — and the user-level
+    //     `[project]` table still applies when no enclosing `vedit.toml`
+    //     exists.
+    // Every expansion re-reads the layers from the NEW root, so no previous
+    // project's merge state can be carried over by construction.
+    let project_settings =
+        if discovered.root != root && discovered.root.join(CONFIG_FILE_NAME).is_file() {
+            ProjectSettings::default()
+        } else {
+            config.project.clone()
+        };
     let mut missing: BTreeSet<String> = BTreeSet::new();
     let mut skipped = 0usize;
     let mut discovery_warnings: Vec<Warning> = Vec::new();
@@ -351,7 +387,7 @@ pub fn expand_with_variables(
         root.clone(),
         root_source,
         search_stop,
-        &config.project,
+        &project_settings,
         home.as_deref(),
         &mut discovery_warnings,
         variables,
@@ -387,6 +423,15 @@ pub fn expand_with_variables(
     let mut file_seen: BTreeSet<PathBuf> = BTreeSet::new();
     for filelist in &all_lists {
         for entry in &filelist.entries {
+            // A filelist names SOURCE files. An entry whose language this build
+            // does not analyse (a nested `.f` listed as a path, a `.tcl` build
+            // script, a `.md` note ...) is not a project source: the registry
+            // has no language for it, so it never enters the file set and no
+            // consumer can ever hand it to a parser. Positive, not a skip: it
+            // was never a candidate.
+            if !crate::language::supports(entry, crate::language::Capability::Source) {
+                continue;
+            }
             if file_seen.insert(canonical_path(entry)) {
                 files.push(entry.clone());
             }
@@ -498,14 +543,11 @@ fn scan_directory(dir: &Path, warnings: &mut Vec<Warning>, found: &mut Vec<PathB
     }
 }
 
+/// The scan's one question: does this build's registry give `path` the
+/// [`Capability::Source`] answer? (`SCANNED_EXTENSIONS` is only this table's
+/// projection — see `language::extensions_with`.)
 fn is_scanned_source(path: &Path) -> bool {
-    path.extension()
-        .and_then(std::ffi::OsStr::to_str)
-        .is_some_and(|ext| {
-            SCANNED_EXTENSIONS
-                .iter()
-                .any(|known| ext.eq_ignore_ascii_case(known))
-        })
+    crate::language::supports(path, crate::language::Capability::Source)
 }
 
 /// Path identity for de-duplication: symlinks resolve to one entry when the
@@ -1073,6 +1115,132 @@ mod tests {
         assert_eq!(expansion.root, opened);
         assert_eq!(expansion.root_source, RootSource::Fallback);
         assert_eq!(expansion.files, vec![opened.join("rtl/x.sv")]);
+        Ok(())
+    }
+
+    /// The scan's extension list is a PROJECTION of the language registry, not
+    /// a second predicate (RM-11): drift between the two is a test failure.
+    #[test]
+    fn the_scan_extensions_are_the_registrys_source_projection() {
+        let mut registry = crate::language::extensions_with(crate::language::Capability::Source);
+        let mut scan: Vec<&str> = super::SCANNED_EXTENSIONS.to_vec();
+        registry.sort_unstable();
+        scan.sort_unstable();
+        assert_eq!(scan, registry);
+    }
+
+    /// RM-2/RM-11: a filelist names SOURCE files. Its own path, a nested `.f`
+    /// listed as a path, and a `.md`/`.tcl`/`.json` entry are not languages this
+    /// build analyses, so they never enter the file set - while the HDL entries
+    /// it lists do. A manifest can therefore never be parsed as HDL.
+    #[test]
+    fn a_filelist_contributes_sources_never_itself_or_non_hdl_entries(
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let temp = tempfile::tempdir()?;
+        let root = temp.path();
+        write(&root.join("rtl/a.sv"), "module a; endmodule\n")?;
+        write(&root.join("rtl/b.vh"), "`define B 1\n")?;
+        write(&root.join("notes.md"), "# notes\n")?;
+        write(&root.join("run.tcl"), "puts hi\n")?;
+        write(&root.join("pins.xdc"), "set_property\n")?;
+        write(&root.join("nested.f"), "rtl/b.vh\n")?;
+        write(
+            &root.join("top.f"),
+            "rtl/a.sv\nnotes.md\nrun.tcl\npins.xdc\nnested.f\n",
+        )?;
+
+        let expansion = expand(root, &[], &[], &[])?;
+        let relative: Vec<PathBuf> = expansion
+            .files
+            .iter()
+            .map(|path| path.strip_prefix(root).unwrap_or(path).to_path_buf())
+            .collect();
+        assert_eq!(
+            relative,
+            vec![PathBuf::from("rtl/b.vh"), PathBuf::from("rtl/a.sv")],
+            "only the HDL entries are sources (filelist order: nested.f sorts first)"
+        );
+        assert!(
+            !expansion
+                .files
+                .iter()
+                .any(|path| path == &root.join("top.f")),
+            "a manifest is never a source"
+        );
+        // Imported lists follow the same rule as discovered ones.
+        let imported = expand(root, &[root.join("nested.f")], &[], &[])?;
+        assert!(imported
+            .files
+            .iter()
+            .all(|path| path != &root.join("nested.f")));
+        Ok(())
+    }
+
+    /// RM-2: a switch re-roots project membership. Opening a folder INSIDE a
+    /// project whose `vedit.toml` declares `[project] filelists/include_dirs/
+    /// defines` must not keep that enclosing project's file set or environment
+    /// (the real-machine "stale files pile up after switching projects" bug);
+    /// the same `[project]` table DOES apply when its own folder is opened.
+    #[test]
+    fn expand_drops_an_ancestor_projects_membership_but_keeps_its_own(
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let temp = tempfile::tempdir()?;
+        let outer = temp.path();
+        std::fs::create_dir_all(outer.join(".git"))?;
+        write(
+            &outer.join("vedit.toml"),
+            "[project]\nfilelists = [\"outer.f\"]\ninclude_dirs = [\"outer_inc\"]\n\
+             defines = [\"OUTER_ONLY=1\"]\n",
+        )?;
+        write(&outer.join("outer.f"), "outer.sv\n")?;
+        write(&outer.join("outer.sv"), "module outer; endmodule\n")?;
+        let inner = outer.join("inner");
+        write(&inner.join("inner.sv"), "module inner; endmodule\n")?;
+
+        // Opening the OUTER project keeps its own [project] table.
+        let from_outer = expand(outer, &[], &[], &[])?;
+        assert_eq!(from_outer.root, std::path::absolute(outer)?);
+        assert!(
+            from_outer.files.contains(&outer.join("outer.sv")),
+            "the outer project's configured filelist must expand: {:?}",
+            from_outer.files
+        );
+        assert!(
+            from_outer.include_dirs.contains(&outer.join("outer_inc")),
+            "the outer project's -I must apply: {:?}",
+            from_outer.include_dirs
+        );
+        assert!(
+            from_outer
+                .defines
+                .iter()
+                .any(|define| define.name == "OUTER_ONLY"),
+            "the outer project's -D must apply: {:?}",
+            from_outer.defines
+        );
+
+        // Opening a folder INSIDE it (a project switch): the enclosing
+        // project's membership is not inherited.
+        let from_inner = expand(&inner, &[], &[], &[])?;
+        assert_eq!(from_inner.root, std::path::absolute(&inner)?);
+        assert_eq!(
+            from_inner.files,
+            vec![inner.join("inner.sv")],
+            "only the opened folder's own sources, never the outer project's"
+        );
+        assert!(
+            !from_inner.include_dirs.contains(&outer.join("outer_inc")),
+            "the outer project's -I must not leak: {:?}",
+            from_inner.include_dirs
+        );
+        assert!(
+            !from_inner
+                .defines
+                .iter()
+                .any(|define| define.name == "OUTER_ONLY"),
+            "the outer project's -D must not leak: {:?}",
+            from_inner.defines
+        );
         Ok(())
     }
 

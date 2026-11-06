@@ -1145,8 +1145,10 @@ fn probe_lint_report() -> vd_deeplint::LintReport {
             }),
             conversion_note: None,
             parse_note: None,
+            repeat: 1,
         }],
         total_diagnostics: 1,
+        dropped: 0,
         truncated: false,
         binary: vd_deeplint::BinaryResolution {
             chosen: None,

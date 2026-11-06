@@ -88,7 +88,6 @@ fn base_options(binary: PathBuf) -> LintOptions {
     LintOptions {
         binary: Some(binary),
         timeout: Duration::from_millis(500),
-        max_json_bytes: 1024 * 1024,
         max_diagnostics: 500,
     }
 }
@@ -208,19 +207,31 @@ fn diagnostics_are_parsed_and_converted_to_utf16_positions() {
 }
 
 #[test]
-fn diagnostics_are_capped_and_the_total_is_reported() {
+fn identical_findings_collapse_and_the_total_stays_truthful() {
     let _serial = serial();
     let dir = TestDir::new("cap");
+    // Three COPIES of the same finding: with the streaming parser they are one
+    // row with repeat = 3, and the document's total stays truthful.
     let json = fake_three_diagnostics_json();
     let binary = json_script(&dir, "slang", &json, 1);
     let mut options = base_options(binary);
     options.max_diagnostics = 2;
     let report = vd_deeplint::lint(&fixture("undeclared.sv"), &options);
     assert!(report.is_success(), "{:?}", report.failure);
-    assert_eq!(report.diagnostics.len(), 2);
+    assert_eq!(
+        report.diagnostics.len(),
+        1,
+        "three identical findings are one row"
+    );
+    assert_eq!(report.diagnostics[0].repeat, 3, "the repeat count is kept");
     assert_eq!(report.total_diagnostics, 3);
-    assert!(report.truncated);
-    assert!(report.summary().contains("3"));
+    assert_eq!(report.dropped, 0, "collapsing is not dropping");
+    assert!(!report.truncated);
+    assert!(
+        report.summary().contains('3') && report.summary().contains("distinct"),
+        "the summary stays truthful: {}",
+        report.summary()
+    );
 }
 
 #[test]
@@ -260,21 +271,37 @@ fn nonzero_exit_without_json_reports_stderr() {
 }
 
 #[test]
-fn oversized_json_is_rejected_before_parsing() {
+fn a_diagnostics_flood_is_bounded_by_count_and_never_fails_the_file() {
     let _serial = serial();
-    let dir = TestDir::new("huge");
+    let dir = TestDir::new("flood");
+    // 3000 VALID diagnostics: far past the old 256-byte "cap" the byte check
+    // used to set, and past this run's 10-distinct cap. The document must be
+    // streamed and counted, never rejected for its size.
     let binary = dir.script(
         "slang",
-        "#!/bin/sh\nprev=\"\"\nfor arg in \"$@\"; do\n  if [ \"$prev\" = \"--diag-json\" ]; then out=\"$arg\"; fi\n  prev=\"$arg\"\ndone\nhead -c 4096 /dev/zero | tr '\\0' ' ' > \"$out\"\nexit 1\n",
+        "#!/bin/sh\nprev=\"\"\nfor arg in \"$@\"; do\n  if [ \"$prev\" = \"--diag-json\" ]; then out=\"$arg\"; fi\n  prev=\"$arg\"\ndone\n{\n  printf '['\n  i=0\n  while [ $i -lt 3000 ]; do\n    if [ $i -gt 0 ]; then printf ','; fi\n    printf '{\"severity\":\"warning\",\"message\":\"w%d\",\"code\":\"W%d\",\"location\":\"undeclared.sv:1:%d\"}' $i $i $((i+1))\n    i=$((i+1))\n  done\n  printf ']'\n} > \"$out\"\nexit 1\n",
     );
     let mut options = base_options(binary);
-    options.max_json_bytes = 256;
+    options.max_diagnostics = 10;
     let report = vd_deeplint::lint(&fixture("undeclared.sv"), &options);
-    assert!(!report.is_success());
-    match &report.failure {
-        Some(vd_deeplint::LintFailure::OutputTooLarge { limit }) => assert_eq!(*limit, 256),
-        other => panic!("expected OutputTooLarge, got {other:?}"),
-    }
+    assert!(
+        report.is_success(),
+        "a volume flood must not fail the file: {:?}",
+        report.failure
+    );
+    assert_eq!(report.total_diagnostics, 3000, "every element is counted");
+    assert_eq!(
+        report.diagnostics.len(),
+        10,
+        "retention is bounded by count"
+    );
+    assert_eq!(report.dropped, 2990, "the tail is counted, not kept");
+    assert!(report.truncated);
+    assert!(
+        report.summary().contains("2990"),
+        "the summary names the dropped count: {}",
+        report.summary()
+    );
 }
 
 #[test]

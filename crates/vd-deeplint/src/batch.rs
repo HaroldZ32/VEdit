@@ -137,11 +137,16 @@ pub struct BatchReport {
     pub tool: String,
     /// Terminal phase.
     pub phase: BatchPhase,
-    /// Diagnostics of the files that ran, in file order.
+    /// Diagnostics of the files that ran, in file order, one row per DISTINCT
+    /// finding (`diagnostic.repeat` carries how many raw findings it stands for).
     pub diagnostics: Vec<BatchDiagnostic>,
-    /// Diagnostics before the per-file cap.
+    /// Raw findings in the files that ran (retained + collapsed + dropped).
     pub total_diagnostics: usize,
-    /// Whether any file's diagnostics were truncated by the cap.
+    /// Raw findings folded into another row by the pass de-duplication.
+    pub collapsed: usize,
+    /// Distinct findings the pass did not keep (per-file or pass count bound).
+    pub dropped: usize,
+    /// Whether any file's diagnostics were truncated by a count bound.
     pub truncated: bool,
     /// How many files were linted.
     pub files_linted: usize,
@@ -178,18 +183,52 @@ impl BatchReport {
                     self.done, self.total, self.tool, reason
                 )
             }
-            _ => format!(
-                "{} — {}/{} files, {} diagnostic(s){}",
-                self.tool,
-                self.done,
-                self.total,
-                self.diagnostics.len(),
-                if self.failures.is_empty() {
-                    String::new()
-                } else {
-                    format!(", {} file(s) failed", self.failures.len())
+            _ => {
+                let mut line = format!(
+                    "{} — {}/{} files, {} distinct diagnostic(s)",
+                    self.tool,
+                    self.done,
+                    self.total,
+                    self.diagnostics.len(),
+                );
+                if self.collapsed > 0 {
+                    line.push_str(&format!(", {} repeat(s) collapsed", self.collapsed));
                 }
-            ),
+                if self.dropped > 0 {
+                    // Exact when every file answered (the parser COUNTS the
+                    // elements it did not keep); `at least` when files failed
+                    // and their diagnostic volume is unknown.
+                    let prefix = if self.failures.is_empty() {
+                        ""
+                    } else {
+                        "at least "
+                    };
+                    line.push_str(&format!(", {prefix}{} dropped", self.dropped));
+                }
+                if !self.failures.is_empty() {
+                    // A file that could not be processed must be NAMED with its
+                    // reason: silently losing a file from the pass is exactly
+                    // the failure mode the byte cap used to hide.
+                    let shown: Vec<String> = self
+                        .failures
+                        .iter()
+                        .take(2)
+                        .map(|failure| format!("{} ({})", failure.file.display(), failure.message))
+                        .collect();
+                    let more = self.failures.len().saturating_sub(shown.len());
+                    line.push_str(&format!(
+                        ", {} file(s) failed: {}{}",
+                        self.failures.len(),
+                        shown.join("; "),
+                        if more > 0 {
+                            format!("; and {more} more")
+                        } else {
+                            String::new()
+                        }
+                    ));
+                }
+                line
+            }
         }
     }
 }
@@ -340,11 +379,22 @@ fn run_batch(inner: &Arc<BatchInner>, files: Vec<PathBuf>, options: EngineOption
     let started = Instant::now();
     let service = LintService::new();
     let mut diagnostics: Vec<BatchDiagnostic> = Vec::new();
+    // Pass-level de-duplication: one row per distinct finding, `repeat` counting
+    // how often it occurred. Two different findings at the same position stay
+    // separate because the code and the message are part of the key.
+    let mut seen: std::collections::HashMap<String, usize> = std::collections::HashMap::new();
     let mut failures: Vec<BatchFileFailure> = Vec::new();
     let mut total_diagnostics = 0usize;
+    let mut collapsed = 0usize;
+    let mut dropped = 0usize;
     let mut truncated = false;
     let mut unrecoverable: Option<LintFailure> = None;
     let mut done = 0usize;
+    let max_pass = if options.max_pass_diagnostics == 0 {
+        crate::DEFAULT_MAX_PASS_DIAGNOSTICS
+    } else {
+        options.max_pass_diagnostics
+    };
 
     inner.set(
         BatchPhase::Running,
@@ -406,16 +456,26 @@ fn run_batch(inner: &Arc<BatchInner>, files: Vec<PathBuf>, options: EngineOption
             continue;
         }
         total_diagnostics += report.total_diagnostics;
+        dropped += report.dropped;
         truncated |= report.truncated;
-        diagnostics.extend(
-            report
-                .diagnostics
-                .into_iter()
-                .map(|diagnostic| BatchDiagnostic {
+        for diagnostic in report.diagnostics {
+            let key = batch_dedupe_key(file, &diagnostic);
+            if let Some(&retained) = seen.get(&key) {
+                diagnostics[retained].diagnostic.repeat += diagnostic.repeat;
+                collapsed += diagnostic.repeat;
+            } else if diagnostics.len() < max_pass {
+                seen.insert(key, diagnostics.len());
+                // The per-file parser already collapses repetitions, so a new
+                // row may stand for more than one raw finding.
+                collapsed += diagnostic.repeat.saturating_sub(1);
+                diagnostics.push(BatchDiagnostic {
                     file: file.clone(),
                     diagnostic,
-                }),
-        );
+                });
+            } else {
+                dropped += diagnostic.repeat;
+            }
+        }
         done += 1;
     }
 
@@ -434,6 +494,8 @@ fn run_batch(inner: &Arc<BatchInner>, files: Vec<PathBuf>, options: EngineOption
         phase,
         diagnostics,
         total_diagnostics,
+        collapsed,
+        dropped,
         truncated,
         files_linted: done,
         failure,
@@ -455,6 +517,26 @@ fn run_batch(inner: &Arc<BatchInner>, files: Vec<PathBuf>, options: EngineOption
     if let Ok(mut slot) = inner.report.lock() {
         *slot = Some(report);
     }
+}
+
+/// The pass de-duplication identity: the file the finding is reported in, its
+/// position, and the rule/message pair. The DIAGNOSTIC's own location file is
+/// used when it has one (a finding can be in an include), else the linted file.
+fn batch_dedupe_key(file: &std::path::Path, diagnostic: &Diagnostic) -> String {
+    let reported_file = diagnostic
+        .ranges
+        .first()
+        .map(|range| range.file.clone())
+        .unwrap_or_else(|| file.display().to_string());
+    let (line, column) = diagnostic
+        .editor_range
+        .as_ref()
+        .map(|range| (range.start.line, range.start.character))
+        .unwrap_or((0, 0));
+    format!(
+        "{reported_file}\u{1f}{line}\u{1f}{column}\u{1f}{}\u{1f}{}",
+        diagnostic.code, diagnostic.message
+    )
 }
 
 #[cfg(test)]

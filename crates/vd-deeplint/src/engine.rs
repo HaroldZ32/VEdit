@@ -598,6 +598,7 @@ fn parse_verible_line(line: &str) -> Option<Diagnostic> {
         editor_range: None,
         conversion_note: Some(VERIBLE_PARSE_NOTE.to_string()),
         parse_note: None,
+        repeat: 1,
     })
 }
 

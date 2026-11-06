@@ -173,3 +173,66 @@ fn verible_lint_findings_are_parsed_from_the_real_tool() {
         .unwrap_or_else(|| panic!("the position converts"));
     assert_eq!(range.start.line, 1, "0-based line of the tab");
 }
+
+/// RM-4 (lint side): `slang --diag-json` reports `file` relative to ITS process
+/// cwd, exactly like `--ast-json` does. The lint child inherits the app's cwd
+/// (no `current_dir`), so a project in a subdirectory produced diagnostics whose
+/// file never matched the editor's absolute path - verdicts would key on a path
+/// that does not exist, and a file dot could never attach. This test places the
+/// source OUTSIDE the test's working directory on purpose, so the tool MUST
+/// report it relatively, and asserts the diagnostic names the real absolute file.
+#[test]
+fn a_diagnostic_names_the_real_absolute_file() {
+    let dir = tempfile::Builder::new()
+        .prefix("vd-lint-subdir-")
+        .tempdir()
+        .unwrap_or_else(|error| panic!("tempdir: {error}"));
+    let source = dir.path().join("rtl/warn.sv");
+    fs::create_dir_all(dir.path().join("rtl")).unwrap_or_else(|error| panic!("mkdir rtl: {error}"));
+    // A width mismatch is one real slang warning (verified with 12.x): the
+    // 1-bit `clk` is assigned to the 4-bit `y`.
+    fs::write(
+        &source,
+        "module warn_me (input logic clk, output logic [3:0] y);\n  assign y = clk;\nendmodule\n",
+    )
+    .unwrap_or_else(|error| panic!("write warn.sv: {error}"));
+
+    let report = lint_with(
+        &source,
+        &EngineOptions {
+            engine: LintEngine::Slang,
+            slang_binary: Some(slang_binary()),
+            ..EngineOptions::default()
+        },
+    );
+    assert!(report.is_success(), "{:?}", report.failure);
+    assert!(
+        !report.diagnostics.is_empty(),
+        "the fixture must produce at least one real warning"
+    );
+    let expected = fs::canonicalize(&source)
+        .unwrap_or_else(|error| panic!("canonicalise {}: {error}", source.display()))
+        .display()
+        .to_string();
+    for diagnostic in &report.diagnostics {
+        let location = diagnostic
+            .location
+            .as_ref()
+            .unwrap_or_else(|| panic!("{}: no location", diagnostic.code));
+        assert!(
+            std::path::Path::new(&location.file).is_absolute(),
+            "{}: the diagnostic file is not absolute: {}",
+            diagnostic.code,
+            location.file
+        );
+        assert_eq!(
+            fs::canonicalize(&location.file)
+                .unwrap_or_else(|error| panic!("canonicalise {}: {error}", location.file))
+                .display()
+                .to_string(),
+            expected,
+            "{}: the diagnostic must name the file that was linted",
+            diagnostic.code
+        );
+    }
+}

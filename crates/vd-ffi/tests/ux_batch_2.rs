@@ -195,6 +195,7 @@ fn catalog_abi_returns_the_definition_keyed_module_tree() {
             timeout_ms: 30_000,
             max_json_bytes: 0,
             max_files: 0,
+            top: std::ptr::null(),
         };
         let job = vd_catalog_start(service, &file_list, &options);
         assert_ne!(job, 0, "rejected: {:?}", last_error(service));
@@ -662,6 +663,128 @@ fn project_info_exposes_the_discovered_rules_file_absolute_or_null() {
             "the ABI promises an absolute path"
         );
         assert_eq!(project_rules_path(service, without_rules.path()), None);
+        vd_service_destroy(service);
+    }
+}
+
+/// A fake `slang` that copies `source` to the `--ast-json` argument and exits 0.
+fn fake_slang_copying(dir: &Path, source: &Path) -> CString {
+    let fake = dir.join("fake-slang");
+    let script = format!(
+        "#!/bin/sh\nprev=\"\"\nfor arg in \"$@\"; do\n  if [ \"$prev\" = \"--ast-json\" ]; then out=\"$arg\"; fi\n  prev=\"$arg\"\ndone\ncp '{}' \"$out\"\nexit 0\n",
+        source.display()
+    );
+    assert!(
+        std::fs::write(&fake, script).is_ok(),
+        "writing the fake tool"
+    );
+    {
+        use std::os::unix::fs::PermissionsExt;
+        let mut permissions = std::fs::metadata(&fake)
+            .unwrap_or_else(|error| panic!("stat the fake tool: {error}"))
+            .permissions();
+        permissions.set_mode(0o755);
+        assert!(
+            std::fs::set_permissions(&fake, permissions).is_ok(),
+            "chmod the fake tool"
+        );
+    }
+    CString::new(fake.display().to_string()).unwrap_or_default()
+}
+
+/// U9a at the C ABI: a document above `max_json_bytes` is a delivered catalog
+/// WITH a warning (not `VD_STATUS_FAILED`), and a catalog failure never reads
+/// like a lint-diagnostic flood.
+#[test]
+fn catalog_size_warning_reaches_the_abi_and_failures_are_truthful() {
+    let Some(dir) = tempfile::tempdir().ok() else {
+        return;
+    };
+    write_catalog_project(dir.path());
+    let mut sources: Vec<PathBuf> = std::fs::read_dir(dir.path())
+        .unwrap_or_else(|error| panic!("reading the fixture: {error}"))
+        .filter_map(Result::ok)
+        .map(|entry| entry.path())
+        .filter(|path| path.extension().is_some_and(|extension| extension == "sv"))
+        .collect();
+    sources.sort();
+    let files: Vec<CString> = sources
+        .iter()
+        .map(|path| CString::new(path.display().to_string()).unwrap_or_default())
+        .collect();
+    let captured = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../vd-deeplint/tests/fixtures/catalog/ast.json");
+    let fake = fake_slang_copying(dir.path(), &captured);
+    let broken = dir.path().join("broken.json");
+    assert!(std::fs::write(&broken, "{\"design\": {}}").is_ok());
+
+    let service = vd_service_create();
+    // SAFETY: every pointer stays alive for the duration of the calls.
+    unsafe {
+        let file_list = string_list(&files);
+        let options = VdCatalogOptions {
+            slang_binary: fake.as_ptr(),
+            include_dirs: string_list(&[]),
+            defines: string_list(&[]),
+            timeout_ms: 30_000,
+            // A threshold far below the 44 KiB fixture document: it must be a
+            // NOTE on a complete catalog, never the old fatal "cap".
+            max_json_bytes: 1024,
+            max_files: 0,
+            top: std::ptr::null(),
+        };
+        let job = vd_catalog_start(service, &file_list, &options);
+        assert_ne!(job, 0, "rejected: {:?}", last_error(service));
+        let mut catalog = std::mem::zeroed::<VdModuleCatalog>();
+        let status = wait_for(
+            || vd_catalog_poll(service, job, &mut catalog),
+            Duration::from_secs(30),
+        );
+        assert_eq!(
+            status,
+            VD_STATUS_READY,
+            "a document over the size threshold must not fail the catalog: {:?}",
+            last_error(service)
+        );
+        assert_eq!(
+            catalog.modules.count, 6,
+            "the whole module tree is delivered"
+        );
+        let warning = optional_string(catalog.warning).unwrap_or_default();
+        assert!(
+            warning.contains("size threshold"),
+            "the size note must reach the ABI: {warning:?}"
+        );
+        assert!(
+            !warning.contains("partial"),
+            "a complete catalog must not claim to be partial: {warning:?}"
+        );
+        vd_module_catalog_free(&mut catalog);
+
+        // A document with no elaborated design: the failure sentence has to name
+        // the AST JSON, never the lint vocabulary the old shared wording used.
+        let fake_broken = fake_slang_copying(dir.path(), &broken);
+        let options = VdCatalogOptions {
+            slang_binary: fake_broken.as_ptr(),
+            ..options
+        };
+        let job = vd_catalog_start(service, &file_list, &options);
+        assert_ne!(job, 0, "rejected: {:?}", last_error(service));
+        let mut failed = std::mem::zeroed::<VdModuleCatalog>();
+        let status = wait_for(
+            || vd_catalog_poll(service, job, &mut failed),
+            Duration::from_secs(30),
+        );
+        assert_eq!(status, VD_STATUS_FAILED);
+        let (_, message) = last_error(service);
+        assert!(
+            message.contains("AST JSON"),
+            "the ABI error must name the AST JSON: {message}"
+        );
+        assert!(
+            !message.contains("diagnostics") && !message.contains("lint"),
+            "a catalog failure must not borrow the lint wording: {message}"
+        );
         vd_service_destroy(service);
     }
 }

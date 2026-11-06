@@ -91,6 +91,7 @@ fn failure_report(binary: &Option<PathBuf>, message: String) -> LintReport {
     LintReport {
         diagnostics: Vec::new(),
         total_diagnostics: 0,
+        dropped: 0,
         truncated: false,
         binary: vd_deeplint::BinaryResolution {
             chosen: binary.clone(),

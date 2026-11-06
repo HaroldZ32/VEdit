@@ -250,31 +250,53 @@ pub fn elaborate(files: &[PathBuf], options: &HierarchyOptions) -> HierarchyRepo
     elaborate_impl(files, options, None)
 }
 
-/// Elaborate `files` and hand the raw `--ast-json` document to a sink instead of
-/// parsing it into the hierarchy's instance/net lists.
+/// Elaborate `files` and let `parse` interpret the raw `--ast-json` document
+/// instead of parsing it into the hierarchy's instance/net lists.
 ///
 /// The module catalog needs the same `slang` invocation, binary resolution, cwd
-/// rule, timeout and size bounds as [`elaborate`] but a different interpretation
-/// of the document, and it must not pay for the hierarchy parse first. One
-/// runner keeps the two products from drifting on how the tool is invoked; the
-/// returned report still carries the tool name, the elapsed time, the peak RSS
-/// and the typed failure, only with empty `instances`/`signals`.
-pub(crate) fn run_ast_json(
+/// rule, timeout and size handling as [`elaborate`] but a different
+/// interpretation of the document, and it must not pay for the hierarchy parse
+/// first. One runner keeps the two products from drifting on how the tool is
+/// invoked; the returned report still carries the tool name, the elapsed time,
+/// the peak RSS and the typed failure, only with empty `instances`/`signals`.
+///
+/// The closure receives the PATH, not the text: the catalog streams the
+/// document, so the runner must not read it into memory first.
+pub(crate) fn run_ast_json<T>(
     files: &[PathBuf],
     options: &HierarchyOptions,
-) -> (HierarchyReport, Option<String>) {
-    let mut captured: Option<String> = None;
+    parse: impl FnOnce(&Path, Option<i32>, &str) -> Result<T, LintFailure>,
+) -> (HierarchyReport, Option<T>) {
+    let mut captured: Option<T> = None;
     let report = {
-        let mut sink = |text: &str| captured = Some(text.to_string());
+        let mut parse = Some(parse);
+        let mut sink =
+            |path: &Path, exit_code: Option<i32>, stderr: &str| -> Result<(), LintFailure> {
+                let Some(parse) = parse.take() else {
+                    return Err(LintFailure::Io {
+                        message: "the AST JSON document was handed to the sink twice".to_string(),
+                    });
+                };
+                match parse(path, exit_code, stderr) {
+                    Ok(value) => {
+                        captured = Some(value);
+                        Ok(())
+                    }
+                    Err(failure) => Err(failure),
+                }
+            };
         elaborate_impl(files, options, Some(&mut sink))
     };
     (report, captured)
 }
 
+/// What the caller does with the `--ast-json` file while its tempdir is alive.
+type JsonSink<'a> = Option<&'a mut dyn FnMut(&Path, Option<i32>, &str) -> Result<(), LintFailure>>;
+
 fn elaborate_impl(
     files: &[PathBuf],
     options: &HierarchyOptions,
-    mut on_json: Option<&mut dyn FnMut(&str)>,
+    mut on_json: JsonSink<'_>,
 ) -> HierarchyReport {
     let started = Instant::now();
     let mut report = empty_report(options.top.clone());
@@ -407,8 +429,20 @@ fn elaborate_impl(
         report.elapsed = started.elapsed();
         return report;
     }
+    if let Some(sink) = on_json.as_mut() {
+        // The catalog streams the document itself (so retained memory is bounded
+        // by the catalog, not by the raw JSON); it owns the size policy and the
+        // parse, and reports its own typed failure.
+        if let Err(failure) = sink(&json_path, exit_code, &stderr) {
+            report.failure = Some(failure);
+            report.elapsed = started.elapsed();
+            return report;
+        }
+        report.elapsed = started.elapsed();
+        return report;
+    }
     if metadata.len() > options.max_json_bytes as u64 {
-        report.failure = Some(LintFailure::OutputTooLarge {
+        report.failure = Some(LintFailure::AstJsonTooLarge {
             limit: options.max_json_bytes,
         });
         report.elapsed = started.elapsed();
@@ -424,37 +458,34 @@ fn elaborate_impl(
             return report;
         }
     };
-    if let Some(sink) = on_json.as_mut() {
-        // The catalog interprets the document itself; parsing it into the
-        // hierarchy's instance/net lists here would be wasted work (and memory)
-        // on a large project.
-        sink(&text);
-    } else {
-        match parse_design(&text) {
-            Ok(design) => {
-                report.instances = design.instances;
-                report.signals = design.signals;
-                if files.len() > options.max_files {
-                    report.warning = Some(format!(
-                        "the project has {} files (limit {}): elaboration may take longer than usual",
-                        files.len(),
-                        options.max_files
-                    ));
-                } else if report.instances.len() > options.max_instances {
-                    report.warning = Some(format!(
-                        "the design has {} instances (limit {}): the module tree may be slow",
-                        report.instances.len(),
-                        options.max_instances
-                    ));
-                }
+    match parse_design_at(&text, Some(&project_root(files))) {
+        Ok(design) => {
+            report.instances = design.instances;
+            report.signals = design.signals;
+            if files.len() > options.max_files {
+                report.warning = Some(format!(
+                    "the project has {} files (limit {}): elaboration may take longer than usual",
+                    files.len(),
+                    options.max_files
+                ));
+            } else if report.instances.len() > options.max_instances {
+                report.warning = Some(format!(
+                    "the design has {} instances (limit {}): the module tree may be slow",
+                    report.instances.len(),
+                    options.max_instances
+                ));
             }
-            Err(message) => {
-                report.failure = Some(if exit_code != Some(0) && text.trim().is_empty() {
-                    missing_output(exit_code, &stderr)
-                } else {
-                    LintFailure::InvalidJson { message, stderr }
-                });
-            }
+        }
+        Err(message) => {
+            report.failure = Some(if message.contains("recursion limit exceeded") {
+                // Valid JSON whose hierarchy is deeper than the reader supports;
+                // never reported as a malformed document.
+                LintFailure::AstJsonNestedTooDeep { measured: None }
+            } else if exit_code != Some(0) && text.trim().is_empty() {
+                missing_output(exit_code, &stderr)
+            } else {
+                LintFailure::InvalidJson { message, stderr }
+            });
         }
     }
     report.elapsed = started.elapsed();
@@ -472,7 +503,7 @@ fn missing_output(exit_code: Option<i32>, stderr: &str) -> LintFailure {
 /// The directory the child runs in: the first file's parent (the project root
 /// as the caller handed it in). Any other cwd makes slang's `source_file`
 /// values relative to the wrong base.
-fn project_root(files: &[PathBuf]) -> PathBuf {
+pub(crate) fn project_root(files: &[PathBuf]) -> PathBuf {
     files
         .first()
         .and_then(|file| file.parent().map(Path::to_path_buf))
@@ -779,8 +810,17 @@ fn push_generate_blocks<'a>(
 
 /// Parse the `--ast-json` document into the report's two lists.
 fn parse_design(text: &str) -> Result<Design, String> {
-    let document: Value = serde_json::from_str(text)
+    parse_design_at(text, None)
+}
+
+/// Parse with the directory the tool ran in, so every reported path becomes
+/// absolute (see [`crate::tool_paths`]).
+fn parse_design_at(text: &str, tool_dir: Option<&Path>) -> Result<Design, String> {
+    let mut document: Value = serde_json::from_str(text)
         .map_err(|error| format!("the AST JSON is malformed: {error}"))?;
+    if let Some(tool_dir) = tool_dir {
+        crate::tool_paths::absolutize_ast(&mut document, tool_dir);
+    }
     let design = document
         .get("design")
         .ok_or_else(|| "the AST JSON has no `design` object".to_string())?;

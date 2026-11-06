@@ -127,13 +127,52 @@ unsafe fn catalog_to_c(catalog: &ModuleCatalog) -> VdModuleCatalog {
             items: Box::into_raw(boxed) as *mut VdModule,
         }
     };
+    let reachable: Vec<String> = catalog
+        .reachable_files
+        .iter()
+        .map(|path| path.to_string_lossy().into_owned())
+        .collect();
     VdModuleCatalog {
         tool: c_string(&catalog.tool),
         elapsed_ms: catalog.elapsed.as_millis() as u64,
         peak_rss_kb: catalog.peak_rss_kb,
         warning: catalog.warning.as_deref().map_or(ptr::null_mut(), c_string),
         modules,
+        top: catalog.top.as_deref().map_or(ptr::null_mut(), c_string),
+        reachable_files: strings_to_c(&reachable),
+        outside_modules: strings_to_c(&catalog.outside_modules),
     }
+}
+
+/// RM-17: an owned C string list from owned strings (freed by
+/// [`free_string_list`]).
+unsafe fn strings_to_c(values: &[String]) -> VdStringList {
+    if values.is_empty() {
+        return VdStringList {
+            count: 0,
+            items: ptr::null_mut(),
+        };
+    }
+    let items: Vec<*mut std::ffi::c_char> = values.iter().map(|value| c_string(value)).collect();
+    let boxed = items.into_boxed_slice();
+    VdStringList {
+        count: boxed.len(),
+        items: Box::into_raw(boxed) as *mut *mut std::ffi::c_char,
+    }
+}
+
+/// Free one [`strings_to_c`] list.
+unsafe fn free_string_list(list: &mut VdStringList) {
+    if !list.items.is_null() && list.count > 0 {
+        let slice = unsafe { &mut *ptr::slice_from_raw_parts_mut(list.items, list.count) };
+        for item in slice.iter_mut() {
+            free_string(*item);
+            *item = ptr::null_mut();
+        }
+        drop(unsafe { Box::from_raw(slice as *mut [*mut std::ffi::c_char]) });
+    }
+    list.count = 0;
+    list.items = ptr::null_mut();
 }
 
 /// Build the catalog options from the C arguments.
@@ -165,6 +204,16 @@ unsafe fn build_catalog_options(options: &VdCatalogOptions) -> Result<CatalogOpt
     }
     if options.max_files > 0 {
         built.max_files = options.max_files;
+    }
+    if !options.top.is_null() {
+        // SAFETY: a non-null pointer is documented as a valid string.
+        match unsafe { c_str(options.top) } {
+            Some(value) if !value.trim().is_empty() => {
+                built.top = Some(value.trim().to_string());
+            }
+            Some(_) => {}
+            None => return Err("top must be a valid non-empty module name or null".to_string()),
+        }
     }
     Ok(built)
 }
@@ -240,6 +289,9 @@ pub unsafe extern "C" fn vd_catalog_start(
                 elapsed: std::time::Duration::ZERO,
                 peak_rss_kb: 0,
                 warning: None,
+                top: None,
+                reachable_files: Vec::new(),
+                outside_modules: Vec::new(),
                 failure: Some(LintFailure::Io {
                     message: "the catalog job panicked; its result was discarded".to_string(),
                 }),
@@ -300,10 +352,13 @@ pub unsafe extern "C" fn vd_catalog_poll(
         return VD_STATUS_PENDING;
     };
     catalogs().remove(&job);
-    if let Some(failure) = &catalog.failure {
+    if let Some(message) = catalog.failure_message() {
+        // The catalog re-words every failure in its own vocabulary (the AST
+        // JSON), so an oversized AST dump can never be reported as a lint
+        // diagnostic flood.
         state.record_error(VdError::new(
             crate::capi::VD_ERR_SERVICE,
-            &format!("{} failed: {}", catalog.tool, failure.user_message()),
+            &format!("{} failed: {message}", catalog.tool),
         ));
         return VD_STATUS_FAILED;
     }
@@ -340,10 +395,14 @@ pub unsafe extern "C" fn vd_module_catalog_free(catalog: *mut VdModuleCatalog) {
     unsafe {
         free_string(catalog.tool);
         free_string(catalog.warning);
+        free_string(catalog.top);
         free_module_list(&mut catalog.modules);
+        free_string_list(&mut catalog.reachable_files);
+        free_string_list(&mut catalog.outside_modules);
     }
     catalog.tool = ptr::null_mut();
     catalog.warning = ptr::null_mut();
+    catalog.top = ptr::null_mut();
 }
 
 /// # Safety
@@ -454,6 +513,9 @@ mod tests {
             elapsed: std::time::Duration::ZERO,
             peak_rss_kb: 0,
             warning: None,
+            top: None,
+            reachable_files: Vec::new(),
+            outside_modules: Vec::new(),
             failure: None,
         };
         // SAFETY: the conversion owns its strings, and the free is the paired one.

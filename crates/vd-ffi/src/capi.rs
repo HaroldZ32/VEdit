@@ -779,6 +779,13 @@ pub struct VdModuleCatalog {
     pub warning: *mut c_char,
     /// Modules, sorted by name.
     pub modules: VdModuleList,
+    /// RM-17: the effective top the elaboration used, or null = Auto.
+    pub top: *mut c_char,
+    /// RM-17: absolute source files reachable from the top (the lint scope and
+    /// the status-dot exclusion set both come from this ONE list).
+    pub reachable_files: VdStringList,
+    /// RM-17: module definitions outside the top (empty in Auto), sorted.
+    pub outside_modules: VdStringList,
 }
 
 /// Inputs of one catalog run (borrowed for the duration of the call).
@@ -791,12 +798,18 @@ pub struct VdCatalogOptions {
     pub include_dirs: VdStringList,
     /// Project defines (`-D`).
     pub defines: VdStringList,
-    /// Wall-clock budget in milliseconds; 0 selects the default (30 s).
+    /// Wall-clock budget for the `slang` child in milliseconds; 0 selects the
+    /// catalog default (120 s). The streamed parse is not covered by it.
     pub timeout_ms: u64,
-    /// Cap for the `--ast-json` file in bytes; 0 selects the default (256 MiB).
+    /// Size threshold for the catalog's AST-JSON warning in bytes; 0 selects
+    /// the default (256 MiB). The document is STREAMED, so a larger dump is
+    /// still catalogued in full: this threshold only adds a size note to
+    /// `VdModuleCatalog.warning`, it never fails the catalog.
     pub max_json_bytes: usize,
     /// Oversize threshold for the file count; 0 selects the default (1000).
     pub max_files: usize,
+    /// RM-17: top-level module NAME to elaborate from, or null = Auto.
+    pub top: *const c_char,
 }
 
 #[cfg(test)]

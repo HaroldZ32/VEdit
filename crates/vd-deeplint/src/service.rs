@@ -20,7 +20,7 @@ use crate::binary::{
     resolve_binary_for_current_process, resolve_verible_lint_for_current_process,
     sanitize_tool_child_env, BinaryResolution,
 };
-use crate::diagnostic::{convert_diagnostic, parse_diagnostics, Diagnostic, Severity, SourceLines};
+use crate::diagnostic::{convert_diagnostic, Diagnostic, Severity, SourceLines};
 use crate::engine::{parse_verible_output, LintEngine};
 use crate::{command_args_for, EngineOptions, LintFailure, LintOptions};
 
@@ -38,8 +38,10 @@ const READER_GRACE: Duration = Duration::from_millis(250);
 pub struct LintReport {
     /// Diagnostics kept after the [`LintOptions::max_diagnostics`] cap.
     pub diagnostics: Vec<Diagnostic>,
-    /// Number of diagnostics slang reported before the cap.
+    /// Number of raw findings the document contained (retained + dropped).
     pub total_diagnostics: usize,
+    /// Distinct findings dropped by the per-file count bound.
+    pub dropped: usize,
     /// Whether [`Self::diagnostics`] was truncated by the cap.
     pub truncated: bool,
     /// Where the binary was expected / found.
@@ -80,8 +82,14 @@ impl LintReport {
         match &self.failure {
             Some(failure) => failure.user_message(),
             None if self.total_diagnostics == 0 => "no diagnostics".to_string(),
-            None if self.truncated => format!(
-                "{} diagnostics (showing the first {})",
+            None if self.dropped > 0 => format!(
+                "{} diagnostic(s) ({} distinct, {} dropped)",
+                self.total_diagnostics,
+                self.diagnostics.len(),
+                self.dropped
+            ),
+            None if self.diagnostics.len() != self.total_diagnostics => format!(
+                "{} diagnostic(s) ({} distinct)",
                 self.total_diagnostics,
                 self.diagnostics.len()
             ),
@@ -112,6 +120,7 @@ fn empty_report(binary: BinaryResolution, engine: LintEngine) -> LintReport {
     LintReport {
         diagnostics: Vec::new(),
         total_diagnostics: 0,
+        dropped: 0,
         truncated: false,
         binary,
         failure: None,
@@ -255,6 +264,20 @@ impl LintService {
 
         report.stage = "spawn";
         let mut command = Command::new(&chosen);
+        // Run the tool in the LINTED FILE's directory: its `--diag-json` paths
+        // are relative to its own cwd (verified: an absolute argument comes back
+        // as `../…/warn.sv` from a foreign cwd), so the child's cwd must be a
+        // directory we KNOW and can resolve against - never the process cwd,
+        // which the application does not control (a file-manager launch runs in
+        // $HOME). A relative `file` argument keeps the inherited cwd and is
+        // resolved against it.
+        let tool_dir = match file.parent() {
+            Some(parent) if !parent.as_os_str().is_empty() && parent.is_absolute() => {
+                command.current_dir(parent);
+                Some(parent.to_path_buf())
+            }
+            _ => std::env::current_dir().ok(),
+        };
         // Bundled tools must not inherit the AppDir's packaged loader paths; see
         // `binary::sanitize_tool_child_env`.
         sanitize_tool_child_env(&mut command);
@@ -339,7 +362,9 @@ impl LintService {
             ExitOutcome::Finished(code) => {
                 report.exit_code = code;
                 match options.engine {
-                    LintEngine::Slang => read_json(&mut report, &json_path, file, options),
+                    LintEngine::Slang => {
+                        read_json(&mut report, &json_path, file, options, tool_dir.as_deref())
+                    }
                     LintEngine::Verible => read_verible(&mut report, file, options),
                 }
             }
@@ -485,9 +510,15 @@ fn read_verible(report: &mut LintReport, file: &Path, options: &EngineOptions) {
     report.stage = "done";
 }
 
-fn read_json(report: &mut LintReport, json_path: &Path, file: &Path, options: &EngineOptions) {
-    let metadata = match fs::metadata(json_path) {
-        Ok(metadata) => metadata,
+fn read_json(
+    report: &mut LintReport,
+    json_path: &Path,
+    file: &Path,
+    options: &EngineOptions,
+    tool_dir: Option<&Path>,
+) {
+    match fs::metadata(json_path) {
+        Ok(_) => {}
         Err(error) => {
             if report.exit_code == Some(0) {
                 // slang exited successfully but wrote no report: treat as a
@@ -506,15 +537,12 @@ fn read_json(report: &mut LintReport, json_path: &Path, file: &Path, options: &E
             }
             return;
         }
-    };
-    if metadata.len() > options.max_json_bytes as u64 {
-        report.failure = Some(LintFailure::OutputTooLarge {
-            limit: options.max_json_bytes,
-        });
-        return;
     }
-    let text = match fs::read_to_string(json_path) {
-        Ok(text) => text,
+    // The document is STREAMED: no byte cap and no whole-string read. Retention
+    // is bounded by `max_diagnostics` DISTINCT findings (repeats are collapsed
+    // into a count), so a project-scale warning flood cannot fail the file.
+    let handle = match fs::File::open(json_path) {
+        Ok(handle) => handle,
         Err(error) => {
             report.failure = Some(LintFailure::InvalidJson {
                 message: format!("reading {} failed: {error}", json_path.display()),
@@ -523,8 +551,11 @@ fn read_json(report: &mut LintReport, json_path: &Path, file: &Path, options: &E
             return;
         }
     };
-    let parsed = match parse_diagnostics(&text) {
-        Ok(parsed) => parsed,
+    let stream = match crate::diagnostic::parse_diagnostics_reader(
+        std::io::BufReader::new(handle),
+        options.max_diagnostics,
+    ) {
+        Ok(stream) => stream,
         Err(error) => {
             report.failure = Some(LintFailure::InvalidJson {
                 message: error.0,
@@ -533,8 +564,10 @@ fn read_json(report: &mut LintReport, json_path: &Path, file: &Path, options: &E
             return;
         }
     };
-    report.total_diagnostics = parsed.len();
-    if parsed.is_empty() {
+    report.total_diagnostics = stream.total;
+    report.dropped = stream.dropped;
+    report.truncated = stream.dropped > 0;
+    if stream.total == 0 {
         if report.exit_code != Some(0) {
             report.failure = Some(LintFailure::MissingOutput {
                 exit_code: report.exit_code,
@@ -559,11 +592,10 @@ fn read_json(report: &mut LintReport, json_path: &Path, file: &Path, options: &E
             return;
         }
     };
-    report.truncated = parsed.len() > options.max_diagnostics;
-    report.diagnostics = parsed
+    report.diagnostics = stream
+        .diagnostics
         .into_iter()
-        .take(options.max_diagnostics)
-        .map(|parsed| convert_diagnostic(parsed, &source))
+        .map(|parsed| convert_diagnostic(parsed, &source, tool_dir))
         .collect();
     report.stage = "done";
 }
