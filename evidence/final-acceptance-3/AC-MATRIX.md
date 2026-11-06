@@ -120,7 +120,7 @@ R2 工程 LINT 上位、模块下位、同一文件一份判决 ✓（`review-u1
 8. **`svnadmin` 不随包**（build-only），符合既有设计。
 9. **`settings.toml` 双候选路径**（缩放读 pre-QApplication、字体/format 读 post-construction）是既有罕见边界，A4 已披露（`review-a4-final` N3）。
 10. **`lint.verible.autofix` 仍是 `TransportPending`**：`VdLintBatchOptions` 无 autofix 字段；面板照常可编辑/持久化并**明示**"C ABI 无 autofix 字段"，第六个断言是"设了值 → argv 里不出现任何 flag + 仍报 pending"（R1：绝不静默发无效参数）。真正的 autofix 通路是悬浮框一键修复。
-11. **`translations/` 目前未被 git 跟踪**（`git ls-files translations/` 为空、未被 ignore）——提交时必须显式 `git add`，否则干净检出会构建出**英文 UI**（`qt_add_lrelease` 在缺 `.ts` 时静默回退）。
+11. **`translations/` 的跟踪状态（已修正）**：本批次之前它**从未被 git 跟踪**（`git ls-files translations/` 为空、且未被 ignore），干净检出会静默构建出**英文 UI**（`qt_add_lrelease` 在缺 `.ts` 时回退而不报错）。本次提交（`34aa7b9`）已首次纳入；后续任何让该目录脱离版本控制或改名 `.ts` 的改动，都必须同时确认这条不回退。
 
 ## 7. 真机烟测清单（用户在真机验收时逐项打勾）
 
