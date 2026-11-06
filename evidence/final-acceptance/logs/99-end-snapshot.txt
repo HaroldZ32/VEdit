@@ -1,0 +1,6 @@
+HEAD=4e2d0a5 porcelain=242 uall=859
+# 与 00-environment.md 的开工快照对比：
+#   HEAD 不变（4e2d0a5）· porcelain 241 -> 242（+1 = docs/ACCEPTANCE-MATRIX.md）
+#   -uall 843 -> 859（+16 = evidence/final-acceptance/ 下本任务日志与矩阵文件）
+# 近 15 分钟内被修改的非 target 文件仅 docs/ACCEPTANCE-MATRIX.md（本任务交付物）——
+# 说明门禁窗口内没有其他 lane 并发改树，证据对应同一棵树。

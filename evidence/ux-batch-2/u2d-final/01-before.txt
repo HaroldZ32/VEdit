@@ -1,0 +1,2 @@
+before: 6321 lines, 1209 messages, 0 vanished, 0 unfinished
+01181643d6705244b28450cefaada5ba0159bbe852558c42f5897cf665c417ac  translations/vedit_zh_CN.ts

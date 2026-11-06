@@ -1,0 +1,9 @@
+ninja: warning: premature end of file; recovering
+[1/8] Building CXX object src/syntax/kde/syn-common/CMakeFiles/vedit_syntax_common.dir/syntax_directory.cpp.o
+[2/8] Linking CXX static library src/syntax/kde/syn-common/libvedit_syntax_common.a
+[3/8] Building CXX object src/syntax/kde/CMakeFiles/vedit-syntax-directory-equivalence.dir/tests/syntax_directory_equivalence.cpp.o
+[4/8] Building CXX object src/syntax/kde/CMakeFiles/vedit_syntax_kde_selftest.dir/tests/validate_syntax_data.cpp.o
+[5/8] Building CXX object src/syntax/kde/CMakeFiles/vedit_syntax_kde.dir/ksyntax_data.cpp.o
+[6/8] Linking CXX static library src/syntax/kde/libvedit_syntax_kde.a
+[7/8] Linking CXX executable src/syntax/kde/vedit-syntax-directory-equivalence
+[8/8] Linking CXX executable src/syntax/kde/vedit_syntax_kde_selftest

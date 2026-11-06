@@ -1,0 +1,40 @@
+== product-build state while this task was verified (shared workspace: other lanes are mid-flight) ==
+time: 2026-11-02T06:53:04Z
+
+--- 1) app shell library ---
+[10/11] Building CXX object src/app/CMakeFiles/vedit_app_shell.dir/app_shell.cpp.o
+[11/11] Linking CXX static library src/app/libvedit_app_shell.a
+[vedit_app_shell-exit=0]
+
+--- 2) workspace integration library (installPanels -> installJump) ---
+[121/122] Building CXX object src/app/CMakeFiles/vedit_workspace_integration.dir/__/workspace/integration.cpp.o
+[122/122] Linking CXX static library src/app/libvedit_workspace_integration.a
+[vedit_workspace_integration-exit=0]
+
+--- 3) product binary (all lanes linked, including vedit_workspace_jump) ---
+[136/137] Building CXX object src/app/CMakeFiles/vedit-app.dir/main.cpp.o
+[137/137] Linking CXX executable src/app/vedit-app
+[vedit-app-exit=0]
+-rwxr-xr-x 1 root root 85052056 Nov  2 06:55 target/qt6-build/src/app/vedit-app
+
+--- 4) T97 Rust C ABI selftest on the SHIPPED binary ---
+[selfcheck-ffi-exit=0]
+CHECK ffi.settings.round-trip PASS
+FFI-ABI-SELFTEST ok=1 checks=20 failures=0
+
+--- 5) shell selfcheck: pre-existing teardown crash OUTSIDE this task ---
+bash: line 39:  1361 Segmentation fault         (core dumped) QT_QPA_PLATFORM=offscreen XDG_RUNTIME_DIR=/tmp/xdg-app target/qt6-build/src/app/vedit-app --selfcheck --state-dir /tmp/vedit-sc > /tmp/sc.log 2>&1
+[selfcheck-exit=139]
+120
+last checks before the crash:
+CHECK restore.theme PASS
+CHECK restore.panel-visible PASS
+CHECK restore.shortcut PASS
+CHECK panel-seam.seed-session PASS
+
+Where it dies: src/app/main.cpp:669 seed.reset() destroys an ApplicationShell; the next check
+(line 677) never prints. installPanels() is called ONLY on the interactive path
+(src/app/main.cpp:1519), NOT in --selfcheck, so installJump/the jump lane is not on that path.
+The same teardown crash appears at the end of the root search selftest (all checks PASS,
+then SIGSEGV on shell destruction). Both are in the shell/editor code the tabs-dirty lane is
+currently rewriting; not caused by this task and not fixable inside its write scopes.

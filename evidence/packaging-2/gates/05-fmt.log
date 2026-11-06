@@ -1,0 +1,7 @@
+# gate: fmt
+captured_at: 2026-11-04T14:33:50+08:00
+git_head: 4e2d0a5
+cmd: docker run --rm -v /home/haroldzhao/MyProj/DshProj/VEdit:/vedit-build -w /vedit-build -e HOME=/tmp vedit-build:local bash -lc cargo fmt --all -- --check
+
+
+FMT_EXIT=0

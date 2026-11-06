@@ -1,0 +1,8 @@
+# toolchain (2026-11-02T07:30:06Z)
+CentOS Linux release 7.9.2009 (Core)
+ldd (GNU libc) 2.17
+gcc (GCC) 11.2.1 20220127 (Red Hat 11.2.1-9)
+g++ (GCC) 11.2.1 20220127 (Red Hat 11.2.1-9)
+GNU Make 3.82
+git version 1.8.3.1
+16

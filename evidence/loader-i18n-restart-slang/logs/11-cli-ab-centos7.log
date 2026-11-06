@@ -1,0 +1,6 @@
+== CLI A: LD_LIBRARY_PATH exported (the packaged child environment) ==
+/w/packaging/runtime/out/AppDir/bin/slang: /lib64/ld-linux-x86-64.so.2: version `GLIBC_2.35' not found (required by /w/packaging/runtime/out/AppDir/lib/libc.so.6)
+EXIT=1
+== CLI B: LD_LIBRARY_PATH removed ==
+slang version 12.1.0+0
+EXIT=0

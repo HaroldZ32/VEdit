@@ -1,0 +1,18 @@
+== AppRun environment contract probe (GREEN, current worktree) ==
+$ sh packaging/runtime/probe-apprun-env.sh
+CHECK PASS  apprun.syntax
+CHECK PASS  default.slang-bundled
+CHECK PASS  default.verible-bundled
+CHECK PASS  override.slang-preserved
+CHECK PASS  override.verible-preserved
+CHECK PASS  absent.slang-not-exported
+CHECK PASS  absent.verible-not-exported
+CHECK PASS  absent.slang-caller-preserved
+CHECK PASS  non-executable.slang-not-exported
+APPRUN-ENV-PROBE ok=1 checks=9 failures=0
+EXIT=0
+
+== shell syntax ==
+sh -n packaging/runtime/AppRun EXIT=0
+sh -n probe EXIT=0
+bash -n selfcheck.sh EXIT=0

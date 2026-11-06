@@ -1,0 +1,2 @@
+# cwd: /home/haroldzhao/MyProj/DshProj/VEdit
+# cmd: bash scripts/build-qt.sh  (> logs/10-build-qt.log 2>&1; exit code in logs/10-build-qt.exit)

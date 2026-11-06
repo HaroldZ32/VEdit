@@ -1,0 +1,62 @@
+# batch 4a 1500x1000 xcb screenshots (Xvfb :81, screen 1500x1000x24)
+collected_at: 2026-11-04T02:21:02+00:00
+xvfb=11 Xvfb :81 -screen 0 1500x1000x24
+WORKSPACE-VCS-SELFTEST start
+CHECK vcs.screenshot.platform PASS xcb
+CHECK 10-vcs-three-columns-1500x1000.png.bytes PASS /vedit-build/evidence/vcs-git-ops/screenshots/10-vcs-three-columns-1500x1000.png bytes=56744
+CHECK 10-vcs-three-columns-1500x1000.png.dimensions PASS 1500x1000
+CHECK 10-vcs-three-columns-1500x1000.png.pixels PASS distinct sampled colours=300
+CHECK 11-vcs-staged-1500x1000.png.bytes PASS /vedit-build/evidence/vcs-git-ops/screenshots/11-vcs-staged-1500x1000.png bytes=58760
+CHECK 11-vcs-staged-1500x1000.png.dimensions PASS 1500x1000
+CHECK 11-vcs-staged-1500x1000.png.pixels PASS distinct sampled colours=320
+CHECK 13-vcs-loading-1500x1000.png.bytes PASS /vedit-build/evidence/vcs-git-ops/screenshots/13-vcs-loading-1500x1000.png bytes=16518
+CHECK 13-vcs-loading-1500x1000.png.dimensions PASS 1500x1000
+CHECK 13-vcs-loading-1500x1000.png.pixels PASS distinct sampled colours=82
+CHECK 12-vcs-empty-state-1500x1000.png.bytes PASS /vedit-build/evidence/vcs-git-ops/screenshots/12-vcs-empty-state-1500x1000.png bytes=29244
+CHECK 12-vcs-empty-state-1500x1000.png.dimensions PASS 1500x1000
+CHECK 12-vcs-empty-state-1500x1000.png.pixels PASS distinct sampled colours=176
+CHECK 14-vcs-error-state-1500x1000.png.bytes PASS /vedit-build/evidence/vcs-git-ops/screenshots/14-vcs-error-state-1500x1000.png bytes=24362
+CHECK 14-vcs-error-state-1500x1000.png.dimensions PASS 1500x1000
+CHECK 14-vcs-error-state-1500x1000.png.pixels PASS distinct sampled colours=132
+CHECK 15-vcs-commit-dialog-1500x1000.png.bytes PASS /vedit-build/evidence/vcs-git-ops/screenshots/15-vcs-commit-dialog-1500x1000.png bytes=15952
+CHECK 15-vcs-commit-dialog-1500x1000.png.dimensions PASS 900x360
+CHECK 15-vcs-commit-dialog-1500x1000.png.pixels PASS distinct sampled colours=107
+CHECK vcs.screenshot.refs-fixture PASS /tmp/vedit-workspace-vcs-selftest-bReaGV/ui-remote/work
+CHECK vcs.screenshot.refs-info PASS refs=5 remotes=1
+CHECK 20-vcs-refs-and-remotes-1500x1000.png.bytes PASS /vedit-build/evidence/vcs-git-ops/screenshots/20-vcs-refs-and-remotes-1500x1000.png bytes=41823
+CHECK 20-vcs-refs-and-remotes-1500x1000.png.dimensions PASS 1500x1000
+CHECK 20-vcs-refs-and-remotes-1500x1000.png.pixels PASS distinct sampled colours=215
+CHECK 21-vcs-remote-action-row-1500x1000.png.bytes PASS /vedit-build/evidence/vcs-git-ops/screenshots/21-vcs-remote-action-row-1500x1000.png bytes=24823
+CHECK 21-vcs-remote-action-row-1500x1000.png.dimensions PASS 1500x1000
+CHECK 21-vcs-remote-action-row-1500x1000.png.pixels PASS distinct sampled colours=126
+CHECK 22-vcs-credential-dialog-1500x1000.png.bytes PASS /vedit-build/evidence/vcs-git-ops/screenshots/22-vcs-credential-dialog-1500x1000.png bytes=33599
+CHECK 22-vcs-credential-dialog-1500x1000.png.dimensions PASS 1500x1000
+CHECK 22-vcs-credential-dialog-1500x1000.png.pixels PASS distinct sampled colours=207
+CHECK 23-vcs-branch-dialog-1500x1000.png.bytes PASS /vedit-build/evidence/vcs-git-ops/screenshots/23-vcs-branch-dialog-1500x1000.png bytes=18759
+CHECK 23-vcs-branch-dialog-1500x1000.png.dimensions PASS 1500x1000
+CHECK 23-vcs-branch-dialog-1500x1000.png.pixels PASS distinct sampled colours=89
+CHECK 24-vcs-tag-dialog-1500x1000.png.bytes PASS /vedit-build/evidence/vcs-git-ops/screenshots/24-vcs-tag-dialog-1500x1000.png bytes=13631
+CHECK 24-vcs-tag-dialog-1500x1000.png.dimensions PASS 1500x1000
+CHECK 24-vcs-tag-dialog-1500x1000.png.pixels PASS distinct sampled colours=49
+CHECK 25-vcs-remote-dialog-1500x1000.png.bytes PASS /vedit-build/evidence/vcs-git-ops/screenshots/25-vcs-remote-dialog-1500x1000.png bytes=15669
+CHECK 25-vcs-remote-dialog-1500x1000.png.dimensions PASS 1500x1000
+CHECK 25-vcs-remote-dialog-1500x1000.png.pixels PASS distinct sampled colours=62
+CHECK vcs.screenshot.history-ready PASS rows=40
+CHECK 30-vcs-history-commits-1500x1000.png.bytes PASS /vedit-build/evidence/vcs-git-ops/screenshots/30-vcs-history-commits-1500x1000.png bytes=246782
+CHECK 30-vcs-history-commits-1500x1000.png.dimensions PASS 1500x1000
+CHECK 30-vcs-history-commits-1500x1000.png.pixels PASS distinct sampled colours=666
+CHECK 31-vcs-history-blame-1500x1000.png.bytes PASS /vedit-build/evidence/vcs-git-ops/screenshots/31-vcs-history-blame-1500x1000.png bytes=225666
+CHECK 31-vcs-history-blame-1500x1000.png.dimensions PASS 1500x1000
+CHECK 31-vcs-history-blame-1500x1000.png.pixels PASS distinct sampled colours=536
+CHECK 32-vcs-history-empty-1500x1000.png.bytes PASS /vedit-build/evidence/vcs-git-ops/screenshots/32-vcs-history-empty-1500x1000.png bytes=24665
+CHECK 32-vcs-history-empty-1500x1000.png.dimensions PASS 1500x1000
+CHECK 32-vcs-history-empty-1500x1000.png.pixels PASS distinct sampled colours=142
+CHECK vcs.screenshot.conflict-fixture PASS /tmp/vedit-workspace-vcs-selftest-bReaGV/ops-conflict
+CHECK vcs.screenshot.conflict-state PASS Merge in progress: 1 conflicted file(s). Resolve them, stage the result, then Continue (or Abort).
+CHECK 40-vcs-conflict-state-1500x1000.png.bytes PASS /vedit-build/evidence/vcs-git-ops/screenshots/40-vcs-conflict-state-1500x1000.png bytes=66194
+CHECK 40-vcs-conflict-state-1500x1000.png.dimensions PASS 1500x1000
+CHECK 40-vcs-conflict-state-1500x1000.png.pixels PASS distinct sampled colours=361
+CHECK 33-vcs-history-error-1500x1000.png.bytes PASS /vedit-build/evidence/vcs-git-ops/screenshots/33-vcs-history-error-1500x1000.png bytes=28751
+CHECK 33-vcs-history-error-1500x1000.png.dimensions PASS 1500x1000
+CHECK 33-vcs-history-error-1500x1000.png.pixels PASS distinct sampled colours=174
+WORKSPACE-VCS-SELFTEST screenshots ok=1 checks=57 failures=0

@@ -1,0 +1,3 @@
+$ diff -u <header before build.rs rerun> crates/vd-ffi/include/vd_ffi.h
+IDENTICAL: the working copy is exactly what cbindgen generates
+EXIT=0

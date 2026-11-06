@@ -1,0 +1,7 @@
+== docs gate 2026-11-04T17:59:14,444793655+08:00 ==
+[docs] PASS: README.md docs/BUILD.md docs/USER_GUIDE.md THIRD_PARTY_NOTICES.md
+DOCS_EXIT=0
+== scoped diff-check ==
+SCOPED_DIFF_CHECK_EXIT=0
+== whole-tree diff-check ==
+WHOLE_DIFF_CHECK_EXIT=2

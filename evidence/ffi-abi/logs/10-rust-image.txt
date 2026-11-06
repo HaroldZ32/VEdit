@@ -1,2 +1,2 @@
 [rust-ffi] reusing the existing image vedit-build:local
-image_id=sha256:3d8636a02a1739f51f04d87ea119c7b8b0d12a9c03cf79ec4fb353d3bb851bf7
+image_id=sha256:297e4cb499af950c7d9ca4dd20d19e9bf7af0557d2eb494b04b470e3c6aec3fc

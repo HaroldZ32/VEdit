@@ -1,0 +1,11 @@
+BUILD_EXIT=0
+[153/154] Building CXX object src/app/CMakeFiles/vedit-app.dir/main.cpp.o
+[154/154] Linking CXX executable src/app/vedit-app
+SELFCHECK_EXIT=0
+EDIT-CORE-SELFTEST ok=1 checks=67 failures=0
+APP-SHELL-SELFTEST ok=1 checks=245 failures=0 state=/tmp/vedit-app-HQKUOQ/state
+CTEST_EXIT=0
+
+100% tests passed, 0 tests failed out of 38
+
+Total Test time (real) =  38.81 sec

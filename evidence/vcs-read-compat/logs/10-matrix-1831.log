@@ -1,0 +1,18 @@
+label=baseline-git-1.8.3.1
+cwd=/tmp/vedit-vcs-matrix-XgJt6S
+fixture=/tmp/vedit-vcs-matrix-XgJt6S
+git_binary=/usr/bin/git
+git_version=git version 1.8.3.1
+# read commands the product issues (status / identity / diff)
+status                     exit=0   | ## master| M rtl/a.sv|
+rev-parse-abbrev           exit=0   | master
+rev-parse-short            exit=0   | d803090
+diff-worktree              exit=0   | diff --git a/rtl/a.sv b/rtl/a.sv|index 0fb97fc..a0e8734 100644|
+diff-cached                exit=0   | 
+diff-no-index              exit=1   | diff --git a/rtl/b.sv b/rtl/b.sv|new file mode 100644|
+# negative control: the legacy spellings the product used to emit
+legacy-path-option         exit=129 | Unknown option: -C|usage: git [--version] [--help] [-c name=value]|
+legacy-porcelain-v1        exit=129 | error: option `porcelain' takes no value|usage: git status [options] [--] <pathspec>...|
+# note: diff-no-index exits 1 when the files differ (expected); the product
+#       reads the output and ignores the exit status for that one query.
+matrix_done=yes

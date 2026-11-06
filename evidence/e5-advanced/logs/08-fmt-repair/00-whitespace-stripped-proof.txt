@@ -1,0 +1,4 @@
+=== whitespace-stripped sha256 (byte-identical modulo ALL whitespace) ===
+crates/vd-ffi/src/lsp.rs               before=b5dd1b9e6a47de957db101585c84a076eb29831ec4aa809f159d81f5114a6f48 after=b5dd1b9e6a47de957db101585c84a076eb29831ec4aa809f159d81f5114a6f48 equal=YES
+crates/vd-lsp/src/client.rs            before=69823d09710a6a76e1f6de70c292b93cc1c47f6e04dda864ef97a91190dbfd51 after=69823d09710a6a76e1f6de70c292b93cc1c47f6e04dda864ef97a91190dbfd51 equal=YES
+crates/vd-lsp/src/session.rs           before=f599e3eaa7aee85ced38ae7849a0ab148e4cce3bd776643a32670105e47fb843 after=f599e3eaa7aee85ced38ae7849a0ab148e4cce3bd776643a32670105e47fb843 equal=YES

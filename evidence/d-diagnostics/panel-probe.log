@@ -1,0 +1,55 @@
+This plugin does not support propagateSizeHints()
+OBSERVED controller entries=8 state=3
+CHECK group.errors PASS actual=2 expected=2
+CHECK group.warnings PASS actual=4 expected=4
+CHECK group.information PASS actual=2 expected=2
+CHECK group.rows PASS actual=8 expected=8
+CHECK group.counts-text PASS actual='Errors: 2 · Warnings: 4 · Information: 2' expected='Errors: 2 · Warnings: 4 · Information: 2'
+CHECK group.widget PASS
+CHECK group.top-level PASS actual=3 expected=3
+CHECK group.errors.title PASS actual='Errors (2)' expected='Errors (2)'
+CHECK group.warnings.title PASS actual='Warnings (4)' expected='Warnings (4)'
+CHECK group.information.title PASS actual='Information (2)' expected='Information (2)'
+OBSERVED group colours errors=#c62828 warnings=#b26a00 editor-error=#c62828 editor-warning=#b26a00
+CHECK group.error-colour-is-editor-red PASS
+CHECK group.warning-colour-is-editor-orange PASS
+CHECK group.colours-differ PASS
+CHECK group.severity-never-mixed PASS
+CHECK sort.error.file-order PASS
+CHECK sort.warning.line-order PASS
+OBSERVED rows errors='first.sv:11:5 — driven signal has no driver [fake]' | 'second.sv:11:5 — driven signal has no driver [fake]' warnings='first.sv:3:2 — width mismatch [fake]' | 'first.sv:21:1 — unused signal [fake]' ...
+CHECK empty.hidden-with-diagnostics PASS
+SHOT panel 'evidence/d-diagnostics/panel-error-warning-groups.png' saved=1
+CHECK shot.panel-saved PASS
+This plugin does not support propagateSizeHints()
+CHECK empty.rows PASS actual=0 expected=0
+CHECK empty.visible PASS
+CHECK empty.mentions-next-step PASS
+CHECK empty.counts-are-zero PASS actual='Errors: 0 · Warnings: 0 · Information: 0' expected='Errors: 0 · Warnings: 0 · Information: 0'
+OBSERVED empty-state 'No diagnostics — open a file to start the analysis, or open a project folder and run Lint project.'
+SHOT empty-state 'evidence/d-diagnostics/panel-empty-state.png' saved=1
+CHECK shot.empty-state-saved PASS
+This plugin does not support propagateSizeHints()
+CHECK jump.outline-rows PASS actual=2 expected=2
+CHECK jump.issue-rows PASS actual=1 expected=1
+CHECK jump.widgets PASS
+DEBUG tree row=0 valid=1 rect=(0,0 100x14) view-visible=1 vp-visible=1 index-at=0
+CHECK jump.outline.calls PASS actual=1 expected=1
+OUTLINE-DOUBLE-CLICK file='/tmp/vedit-fixture/rtl/top.sv' line=5 column=8
+CHECK jump.outline.file PASS actual='/tmp/vedit-fixture/rtl/top.sv' expected='/tmp/vedit-fixture/rtl/top.sv'
+CHECK jump.outline.line PASS actual=5 expected=5
+CHECK jump.outline.column PASS actual=8 expected=8
+CHECK jump.errors-group PASS
+DEBUG issue item-valid=1 rect=(40,14 578x14) view-visible=1 vp-visible=1
+CHECK jump.issue.calls PASS actual=2 expected=2
+DIAGNOSTIC-DOUBLE-CLICK file='/tmp/vedit-fixture/rtl/top.sv' line=6 column=4
+CHECK jump.issue.file PASS actual='/tmp/vedit-fixture/rtl/top.sv' expected='/tmp/vedit-fixture/rtl/top.sv'
+CHECK jump.issue.line PASS actual=6 expected=6
+CHECK jump.issue.column PASS actual=4 expected=4
+DEBUG tree row=1 valid=1 rect=(0,14 100x14) view-visible=1 vp-visible=1 index-at=1
+DEBUG issue item-valid=1 rect=(40,14 578x14) view-visible=1 vp-visible=1
+NO-TARGET double clicks completed, records=2 (unchanged=1)
+CHECK jump.no-target-no-crash PASS
+CHECK jump.no-target-registry-empty PASS
+SUMMARY checks=37 failures=0
+[panel-probe-exit=0]

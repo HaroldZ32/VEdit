@@ -1,0 +1,42 @@
+CHECK vcs.ops.clean-requested PASS
+CHECK vcs.ops.clean-request PASS
+CHECK vcs.ops.clean-empty-refused PASS
+CHECK vcs.ops.continue-without-operation PASS
+CHECK vcs.ops.abort-without-operation PASS
+CHECK vcs.ops.continue-without-operation-zero-write PASS
+CHECK vcs.conflict.operation-reported PASS merge
+CHECK vcs.conflict.banner-visible PASS Merge in progress: 1 conflicted file(s). Resolve them, stage the result, then Continue (or Abort).
+CHECK vcs.conflict.banner-names-operation-and-count PASS Merge in progress: 1 conflicted file(s). Resolve them, stage the result, then Continue (or Abort).
+CHECK vcs.conflict.continue-available PASS
+CHECK vcs.conflict.abort-available PASS
+CHECK vcs.conflict.file-row-shows-conflict PASS rtl/top.sv  conflict
+CHECK vcs.conflict.continue-requested PASS
+CHECK vcs.conflict.continue-request PASS merge
+CHECK vcs.conflict.abort-requested PASS
+CHECK vcs.conflict.abort-request PASS merge
+CHECK vcs.conflict.no-banner-when-idle PASS
+CHECK vcs.conflict.no-continue-when-idle PASS
+CHECK vcs.conflict.no-abort-when-idle PASS
+CHECK vcs.ops.e2e.fixture PASS /tmp/vedit-workspace-vcs-selftest-YmFNUe/ops-repo
+CHECK vcs.ops.e2e.merge-conflict PASS
+CHECK vcs.ops.e2e.merge-conflict-failed PASS Nothing was written.
+CHECK vcs.ops.e2e.conflict-state PASS op=merge banner='Merge in progress: 1 conflicted file(s). Resolve them, stage the result, then Continue (or Abort).'
+CHECK vcs.ops.e2e.conflict-banner PASS Merge in progress: 1 conflicted file(s). Resolve them, stage the result, then Continue (or Abort).
+CHECK vcs.ops.e2e.conflict-file-row PASS rtl/a.sv  conflict
+CHECK vcs.ops.e2e.stage-resolution PASS
+CHECK vcs.ops.e2e.continue-requested PASS
+CHECK vcs.ops.e2e.continue-ok PASS Continued the merge.
+CHECK vcs.ops.e2e.operation-cleared PASS none
+CHECK vcs.ops.e2e.merge-commit-created PASS 18c8d8d7418ff9119851ded0875f58708abf5fe5 af2ca0a05fb07e27e0ab0f346cadb4246e34a250 14045de23f9212adca16d6e3f9c0a11a3f004a31
+CHECK vcs.ops.e2e.reset-hard-declined PASS
+CHECK vcs.ops.e2e.reset-hard-declined-zero-write PASS calls=1
+CHECK vcs.ops.e2e.reset-hard-declined-head PASS
+CHECK vcs.ops.e2e.reset-hard-requested PASS
+CHECK vcs.ops.e2e.reset-hard-ok PASS The VCS operation failed.
+CHECK vcs.ops.e2e.reset-hard-moved-head PASS
+CHECK vcs.ops.e2e.reset-hard-clean-tree PASS
+CHECK vcs.ops.e2e.clean-requested PASS
+CHECK vcs.ops.e2e.clean-ok PASS The VCS operation failed.
+CHECK vcs.ops.e2e.clean-removed PASS
+cwd_still=/tmp/vedit-vcs-5a-0NFMKn
+selftest=PASS

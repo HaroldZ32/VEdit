@@ -1,0 +1,49 @@
+# T7 gate: cargo clippy --workspace --all-targets -- -D warnings
+# collected_at: 2026-11-02T08:31:42+0000
+# site: vedit-build:local (CentOS 7 + GTK), the repository declared site for this gate
+# git head: 4e2d0a57ca50db9568db5a5b040cc66f04c9a05f
+# dirty paths (truncated):
+ M build/evidence/12-gates-image-build.log
+ M build/evidence/typecheck/00-run.txt
+ M build/evidence/typecheck/10-typecheck-image-build.log
+ M build/evidence/typecheck/11-typecheck-image-id.txt
+ M crates/vd-app/src/diagnostics.rs
+ M crates/vd-app/src/selftest.rs
+ M crates/vd-app/src/slang_worker.rs
+ M crates/vd-config/src/filelist.rs
+ M crates/vd-config/src/project.rs
+ M crates/vd-deeplint/src/binary.rs
+ M crates/vd-deeplint/src/lib.rs
+ M crates/vd-deeplint/src/service.rs
+ M crates/vd-ffi/include/vd_ffi.h
+ M crates/vd-ffi/src/capi.rs
+ M crates/vd-ffi/src/deeplint.rs
+ M crates/vd-ffi/src/lsp.rs
+ M crates/vd-ffi/src/project.rs
+ M crates/vd-ffi/src/settings.rs
+ M crates/vd-lsp/src/config.rs
+ M crates/vd-lsp/src/documents.rs
+ M crates/vd-lsp/src/lib.rs
+ M crates/vd-lsp/src/session.rs
+ M crates/vd-lsp/tests/buffer_change.rs
+ M crates/vd-settings/src/lib.rs
+ M docs/BUILD.md
+ M evidence/ffi-abi/logs/10-rust-image.txt
+ M evidence/ffi-abi/logs/19-rust-stage-console.log
+ M evidence/ffi-abi/logs/20-cargo-build-release.log
+ M evidence/ffi-abi/logs/21-staticlib.txt
+ M evidence/ffi-abi/logs/22-rust-targets.txt
+ M evidence/ffi-abi/logs/23-cargo-test.log
+ M evidence/ffi-abi/logs/26-vd_ffi.h
+ M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+ M evidence/m0-build/build-logs/20-qt6-image-build.log
+ M evidence/m0-build/build-logs/21-qt6-image-id.txt
+ M evidence/m0-build/build-logs/31-qt6-configure.log
+ M evidence/m0-build/build-logs/32-qt6-build.log
+ M evidence/m0-build/build-logs/33-qt6-ctest.log
+ M evidence/m0-build/build-logs/34-qt6-elf.txt
+ M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+
+== cargo clippy --workspace --all-targets -- -D warnings ==
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.13s
+WORKSPACE_CLIPPY_EXIT=0

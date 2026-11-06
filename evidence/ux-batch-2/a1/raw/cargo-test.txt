@@ -1,0 +1,288 @@
+$ CARGO_HOME=$PWD/target/cargo-home cargo test -p vd-deeplint -p vd-search -p vd-ffi
+date: 2026-11-05T02:07:48+08:00
+git head: 4e2d0a57ca50db9568db5a5b040cc66f04c9a05f
+
+   Compiling vd-search v0.1.1 (/home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-search)
+   Compiling vd-deeplint v0.1.1 (/home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-deeplint)
+   Compiling vd-ffi v0.1.1 (/home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-ffi)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.90s
+     Running unittests src/lib.rs (target/debug/deps/vd_deeplint-7096139a419e0698)
+
+running 52 tests
+test batch::tests::phase_codes_and_terminals ... ok
+test binary::tests::appdir_root_layout_is_found_relative_to_the_executable ... ok
+test binary::tests::all_attempts_are_listed_when_nothing_is_found ... ok
+test binary::tests::explicit_option_wins_and_is_recorded ... ok
+test binary::tests::appdir_root_layout_finds_verible_lint ... ok
+test binary::tests::environment_variable_is_used_when_set ... ok
+test binary::tests::tool_children_request_the_packaged_loader_variables_be_removed ... ok
+test binary::tests::package_layout_is_found_relative_to_the_executable ... ok
+test catalog::tests::an_empty_document_is_reported_not_silently_empty ... ok
+test catalog::tests::direction_spelling_round_trips ... ok
+test binary::tests::non_executable_file_is_not_chosen ... ok
+test dedup::tests::different_line_severity_or_message_changes_the_key ... ok
+test dedup::tests::severity_codes_map_onto_the_shared_class ... ok
+test dedup::tests::sources_round_trip_and_merge ... ok
+test dedup::tests::the_same_problem_gets_the_same_key_from_both_paths ... ok
+test dedup::tests::whitespace_is_trimmed_and_folded ... ok
+test diagnostic::tests::a_diagnostic_without_location_or_ranges_is_kept ... ok
+test diagnostic::tests::a_diagnostic_without_ranges_converts_the_location_as_a_point ... ok
+test diagnostic::tests::byte_columns_convert_inside_a_tab_line ... ok
+test diagnostic::tests::an_unparsable_location_string_is_a_note_not_a_failure ... ok
+test diagnostic::tests::crlf_trailing_carriage_return_is_not_part_of_the_line ... ok
+test diagnostic::tests::invalid_utf8_source_is_rejected ... ok
+test diagnostic::tests::implicit_net_has_a_location_but_no_ranges_and_keeps_option_name ... ok
+test diagnostic::tests::location_string_with_colons_in_the_path_is_parsed_from_the_right ... ok
+test diagnostic::tests::location_falls_back_to_first_range ... ok
+test diagnostic::tests::malformed_json_is_rejected ... ok
+test diagnostic::tests::calibration_table_converts_byte_columns_to_utf16 ... ok
+test diagnostic::tests::parses_recorded_undeclared_diagnostic ... ok
+test diagnostic::tests::byte_columns_convert_to_utf16_on_cjk_and_emoji ... ok
+test diagnostic::tests::conversion_rejects_bad_lines_columns_and_split_characters ... ok
+test diagnostic::tests::parses_the_empty_clean_report ... ok
+test diagnostic::tests::severity_mapping_includes_unknown ... ok
+test diagnostic::tests::parses_recorded_unicode_diagnostics_without_losing_fields ... ok
+test engine::tests::command_line_for_echoes_the_same_argv_the_run_uses ... ok
+test engine::tests::default_lint_options_send_no_flag_on_either_engine ... ok
+test engine::tests::engine_codes_round_trip_and_unknown_codes_are_rejected ... ok
+test engine::tests::ruleset_codes_map_to_the_flag_values ... ok
+test engine::tests::slang_argv_carries_include_dirs_and_defines ... ok
+test engine::tests::slang_receives_its_knobs_and_ignores_the_verible_ones ... ok
+test engine::tests::unsupported_knobs_name_exactly_the_no_ops ... ok
+test engine::tests::the_lint_option_validators_accept_the_documented_shapes_and_reject_the_rest ... ok
+test engine::tests::verible_argv_carries_only_what_the_tool_accepts ... ok
+test engine::tests::verible_lines_parse_with_and_without_ranges ... ok
+test engine::tests::verible_log_lines_are_not_findings ... ok
+test engine::tests::verible_positions_convert_through_source_lines ... ok
+test engine::tests::verible_receives_its_knobs_and_ignores_the_slang_ones ... ok
+test service::tests::failure_user_messages_are_actionable ... ok
+test service::tests::std_summary_messages_are_short ... ok
+test service::tests::stream_capture_truncates_at_the_limit ... ok
+test tests::missing_output_message_names_the_first_non_empty_stderr_line ... ok
+test tests::missing_output_message_without_stderr_keeps_the_short_form ... ok
+test batch::tests::a_missing_binary_fails_the_pass_with_its_stage_and_tool ... ok
+
+test result: ok. 52 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/catalog.rs (target/debug/deps/catalog-cbeb0d7b2dd3ca3a)
+
+running 3 tests
+test the_captured_ast_yields_the_module_catalog ... ok
+test generate_instances_collapse_to_one_edge_per_site ... ok
+test the_real_slang_binary_matches_the_hand_written_catalog ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/engine_batch.rs (target/debug/deps/engine_batch-640b8cef71c4ea53)
+
+running 4 tests
+test the_slang_argv_carries_the_project_include_dirs_and_defines ... ok
+test the_verible_engine_parses_findings_and_records_its_tool ... ok
+test a_batch_reports_progress_and_finishes_over_the_whole_set ... ok
+test cancel_stops_the_pass_and_no_later_file_is_linted ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.52s
+
+     Running tests/fake_binary.rs (target/debug/deps/fake_binary-e48607d90f05f113)
+
+running 15 tests
+test tool_child_environment_probe ... ok
+test a_new_run_cancels_the_previous_one ... ok
+test cancel_kills_and_reaps_the_child ... ok
+test diagnostics_are_parsed_and_converted_to_utf16_positions ... ok
+test clean_file_is_a_success_with_no_diagnostics ... ok
+test diagnostics_are_capped_and_the_total_is_reported ... ok
+test non_executable_binary_is_not_found ... ok
+test nonzero_exit_without_json_reports_stderr ... ok
+test oversized_json_is_rejected_before_parsing ... ok
+test executable_with_a_missing_interpreter_is_a_spawn_failure ... ok
+test missing_binary_lists_every_attempt ... ok
+test malformed_json_is_a_typed_failure ... ok
+test report_captures_stderr_of_a_successful_run ... ok
+test tool_child_environment_is_sanitized ... ok
+test timeout_kills_and_reaps_the_child ... ok
+
+test result: ok. 15 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.33s
+
+     Running tests/hierarchy.rs (target/debug/deps/hierarchy-e122e4341e190955)
+
+running 12 tests
+test the_driven_and_loaded_signal_carries_exact_positions ... ok
+test a_child_that_dies_without_output_reports_its_stderr_line ... ok
+test the_captured_ast_json_yields_the_elaborated_hierarchy ... ok
+test ports_inside_a_generate_block_reach_the_parent_signal ... ok
+test generate_constructs_and_instance_arrays_are_walked ... ok
+test every_design_root_is_elaborated_not_only_the_first ... ok
+test an_oversized_project_sets_the_warning_instead_of_failing_silently ... ok
+test a_hanging_elaboration_times_out_and_is_reaped ... ok
+test a_nonzero_exit_with_a_parseable_ast_json_is_a_normal_result ... ok
+test the_elaboration_command_passes_the_files_include_dirs_and_defines ... ok
+test the_real_tool_produces_the_same_hierarchy_within_the_bounds ... ok
+test the_real_tool_elaborates_every_root_and_generate_instantiation ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.24s
+
+     Running tests/real_slang.rs (target/debug/deps/real_slang-e7b8905d95d474db)
+
+running 6 tests
+test real_slang_calibration_set_matches_independent_utf16_positions ... ok
+test real_slang_binary_attempts_are_recorded_even_on_success ... ok
+test real_slang_implicit_net_has_no_ranges_but_keeps_its_location ... ok
+test real_slang_reports_undeclared_identifier_exactly ... ok
+test real_slang_unicode_columns_map_to_utf16_positions ... ok
+test real_slang_clean_file_has_no_diagnostics ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/real_tools.rs (target/debug/deps/real_tools-25aa581282f6324d)
+
+running 2 tests
+test verible_lint_findings_are_parsed_from_the_real_tool ... ok
+test slang_really_receives_the_include_dirs_and_defines ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_ffi-56421843a0a5cfe1)
+
+running 47 tests
+test catalog::tests::job_ids_live_in_their_own_range ... ok
+test capi::tests::the_scanner_catches_a_known_collision ... ok
+test deeplint::tests::the_dedup_key_is_identical_for_an_lsp_and_a_cli_row ... ok
+test catalog::tests::an_empty_catalog_converts_and_frees_cleanly ... ok
+test deeplint::tests::the_slang_command_line_shows_the_project_settings ... ok
+test deeplint::tests::the_verible_command_line_states_that_it_takes_no_include_dirs ... ok
+test fim::tests::mapping_carries_every_configured_value_without_leaking_the_key ... ok
+test lsp::tests::signature_help_response_maps_labels_and_active_indexes ... ok
+test lsp::tests::an_invalid_backend_is_rejected ... ok
+test lsp::tests::hover_response_maps_to_kind_text_and_range ... ok
+test lsp::tests::the_slang_table_is_the_measured_one_from_the_spike ... ok
+test lsp::tests::start_v2_rejects_an_unknown_backend_and_starts_a_known_one ... ok
+test lsp::tests::the_verible_file_list_route_is_visible_in_the_session_argv ... ok
+test lsp::tests::the_verible_file_list_preview_carries_incdir_and_define ... ok
+test lsp::tests::the_slang_command_line_shows_the_include_dirs_and_defines ... ok
+test fim::tests::loaded_project_and_environment_configure_the_service ... ok
+test lsp::tests::the_verible_table_is_measured_and_answers_every_action ... ok
+test project::tests::a_missing_project_root_is_a_typed_error ... ok
+test project::tests::actionable_filelist_warnings_still_reach_the_panel ... ok
+test project::tests::a_present_rules_file_produces_no_panel_noise ... ok
+test project::tests::bad_entries_render_actionable_diagnostics ... ok
+test project::tests::missing_optional_rules_file_is_not_a_panel_diagnostic ... ok
+test project::tests::expand_reports_the_three_bad_filelist_cases_with_file_and_line ... ok
+test project::tests::expand_with_inputs_merges_the_imported_filelists_and_the_tools_page ... ok
+test settings::tests::a_world_readable_key_file_is_refused ... ok
+test project::tests::the_engine_command_line_carries_the_expansion_include_dirs_and_defines ... ok
+test settings::tests::an_unconfigured_store_keeps_fim_disabled_without_a_transport ... ok
+test settings::tests::a_plaintext_store_key_never_reaches_the_transport_or_a_debug_line ... ok
+test settings::tests::the_environment_key_wins_over_the_user_file ... ok
+test project::tests::expansion_is_deterministic ... ok
+test project::tests::unreadable_rules_file_still_warns_without_an_absolute_path ... ok
+test settings::tests::the_settings_pages_reach_the_vd_fim_settings_type ... ok
+test vcs::tests::invalid_arguments_return_no_job ... ok
+test project::tests::fixture_expansion_matches_the_service_contract ... ok
+test project::tests::the_expand_abi_delivers_the_union_through_a_job ... ok
+test project::tests::the_expand_abi_collects_unresolved_variables_and_skipped_lines ... ok
+test fim::tests::unreachable_endpoint_is_an_explicit_error_without_the_key ... ok
+test vcs::tests::info_job_reaches_ready_for_a_plain_directory ... ok
+test vcs::tests::diff_job_reaches_ready_for_a_plain_directory ... ok
+test fim::tests::configured_loopback_request_reaches_the_rust_transport ... ok
+test capi::tests::no_generated_abi_name_collides_with_a_qt_or_windows_macro ... ok
+test vcs::tests::polling_a_job_with_the_wrong_kind_is_misuse ... ok
+test deeplint::tests::a_missing_slang_binary_fails_the_elaboration_with_its_tool_name ... ok
+test deeplint::tests::a_batch_cancel_really_stops_it_and_delivers_no_results ... ok
+test deeplint::tests::the_elaboration_job_returns_the_hierarchy_and_the_driver_load_positions ... ok
+test deeplint::tests::a_batch_reports_progress_and_delivers_its_result_once ... ok
+test fim::tests::default_config_is_disabled_and_sends_nothing ... ok
+
+test result: ok. 47 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running tests/abi.rs (target/debug/deps/abi-76a3b184e0054c9e)
+
+running 21 tests
+test abi_version_is_one ... ok
+test null_and_unknown_arguments_are_rejected_with_a_typed_error ... ok
+test cancelling_a_job_discards_its_result ... ok
+test projected_fixture_serves_all_seven_services ... ok
+test vcs_write_codes_are_stable ... ok
+test lsp_configures_lazily_without_starting_the_server ... ok
+test deeplint_reports_a_missing_binary_as_a_typed_failure ... ok
+test lsp_rejects_a_missing_server_binary ... ok
+test fim_is_disabled_by_default_and_starts_no_worker ... ok
+test project_parse_expands_the_fixture_filelist ... ok
+test search_returns_hits_over_the_project_file_list ... ok
+test vcs_reports_the_empty_state_for_a_plain_directory ... ok
+test vcs_write_poll_misuse_is_typed ... ok
+test settings_round_trip_through_the_abi ... ok
+test vcs_write_job_refuses_invalid_requests ... ok
+test history_and_workspace_polls_reject_a_foreign_payload ... ok
+test vcs_read_jobs_return_status_info_and_diff_from_a_real_repository ... ok
+test vcs_workspace_codes_and_listings_are_stable ... ok
+test vcs_write_job_runs_a_real_git_round_trip ... ok
+test vcs_history_jobs_return_pages_detail_blame_and_comparison ... ok
+test vcs_history_op_codes_and_operation_state_are_stable ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.07s
+
+     Running tests/qt_abi_guard.rs (target/debug/deps/qt_abi_guard-c1922fc9cbd5282b)
+
+running 1 test
+test the_generated_header_compiles_together_with_a_real_qt_header ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/ux_batch_2.rs (target/debug/deps/ux_batch_2-e43a23f09cf483cf)
+
+running 8 tests
+test catalog_rejects_an_empty_file_set_with_a_typed_error ... ok
+test lint_defaults_send_no_flag_and_each_engine_gets_only_its_own_knobs ... ok
+test lint_batch_rejects_an_invalid_knob_before_any_job_starts ... ok
+test unsupported_knob_lists_are_exposed_for_the_settings_page ... ok
+test extended_search_returns_every_occurrence_with_its_exact_range ... ok
+test extended_search_regex_and_invalid_pattern_are_observable ... ok
+test project_info_exposes_the_discovered_rules_file_absolute_or_null ... ok
+test catalog_abi_returns_the_definition_keyed_module_tree ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src/lib.rs (target/debug/deps/vd_search-c157a41a1b83c88e)
+
+running 18 tests
+test tests::tree_missing_root_is_reported ... ok
+test tests::non_utf8_and_missing_files_are_skipped ... ok
+test tests::missing_root_is_reported ... ok
+test tests::limit_truncates_from_the_tail ... ok
+test tests::empty_needle_and_zero_limit_return_nothing ... ok
+test tests::query_finds_every_line_in_file_order ... ok
+test tests::tree_zero_width_matches_are_not_hits_and_never_loop ... ok
+test tests::tree_case_sensitive_option_narrows_the_match ... ok
+test tests::tree_all_matches_returns_every_occurrence_with_its_range ... ok
+test tests::preview_is_trimmed_and_capped ... ok
+test tests::tree_skips_binary_oversized_and_excluded_dirs ... ok
+test tests::tree_whole_word_rejects_embedded_matches ... ok
+test tests::tree_matches_case_insensitively_and_reports_summary ... ok
+test tests::tree_reports_exact_match_ranges_for_replacement ... ok
+test tests::tree_regex_mode_matches_patterns_and_rejects_bad_syntax ... ok
+test tests::tree_honours_the_result_limit_and_timeout ... ok
+test tests::tree_match_columns_are_characters_not_bytes ... ok
+test tests::tree_extension_filter_restricts_the_walk ... ok
+
+test result: ok. 18 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_deeplint
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_ffi
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests vd_search
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+EXIT=0

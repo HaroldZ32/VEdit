@@ -1,0 +1,55 @@
+## Shortcut claims: manual vs Qt6 code vs old GTK3 code
+2026-11-06T10:30:07+08:00
+
+### manual (docs/USER_GUIDE.md)
+241:| 一键格式化 | `Ctrl+Shift+F` | 通过 LSP 的 documentFormatting，**一步撤销**即可回退 |
+244:| 符号大纲 | `Ctrl+Shift+O` | 当前文件的符号 |
+566:  （`F12` / `Shift+F12` / `Ctrl+Shift+O` / `F2`）。
+585:- 编辑器里的 `Ctrl+Shift+F` 仍是一键格式化；格式化结果**一次撤销**即可回退。
+
+### Qt6 product: format command
+                                     QKeySequence(Qt::Key_F2), 62);
+        QAction *format = addCommand(QStringLiteral("diagnostics.format"),
+                                     QCoreApplication::translate("VEdit", "&Format Document"),
+                                     QStringLiteral("project"),
+                                     QKeySequence(QStringLiteral("Ctrl+Alt+F")), 63);
+        // T16 / AC-3.5: the hover request path the editor's context menu uses.
+        // It is gated by the LIVE capability row, so it is enabled exactly while
+
+### Qt6 product: panel toggles
+        const char *id;
+        QString title;
+        const char *shortcut;
+    } panelCommands[] = {
+        {"file-tree", tr("To&ggle Files Panel"), "Ctrl+Alt+F"},
+        {"search", tr("To&ggle Search Panel"), "Ctrl+Alt+S"},
+        {"terminal", tr("To&ggle Terminal Panel"), "Ctrl+Alt+J"},
+        {"vcs", tr("To&ggle Source Control Panel"), "Ctrl+Alt+V"},
+        {"outline", tr("To&ggle Outline Panel"), "Ctrl+Alt+O"},
+    };
+    int order = 100;
+
+### Qt6 product: Ctrl+Shift+O owner (file tree open action)
+    toolBar_->setToolButtonStyle(Qt::ToolButtonTextOnly);
+    toolBar_->setIconSize(QSize(16, 16));
+
+    openAction_ = toolBar_->addAction(QCoreApplication::translate("VEdit", "Open..."));
+    openAction_->setToolTip(QCoreApplication::translate("VEdit", "Open a folder"));
+    openAction_->setShortcut(QKeySequence(QStringLiteral("Ctrl+Shift+O")));
+
+    newFileAction_ = toolBar_->addAction(QCoreApplication::translate("VEdit", "New File"));
+    newFileAction_->setToolTip(QCoreApplication::translate("VEdit", "Create a file here (Ctrl+N)"));
+
+### old GTK3 product bindings
+/// an action the shell actually registers.
+pub const DEFAULT_KEY_BINDINGS: &[(&str, &str)] = &[
+    ("format", "Ctrl+Shift+F"),
+    ("slang", "Ctrl+Shift+L"),
+    ("definition", "F12"),
+    ("references", "Shift+F12"),
+    ("outline", "Ctrl+Shift+O"),
+    ("accept-fim", "Tab"),
+    ("cancel-fim", "Esc"),
+
+### manual scope note for the new sections
+417:> **适用范围**：§11–§15 只适用于 **Qt6 产品（`vedit-app`）**。§1.1–1.3 的旧 GTK3 产物没有这些面板与设置页。

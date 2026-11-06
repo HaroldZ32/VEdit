@@ -1,0 +1,27 @@
+# 50-t47-report-fix — AC-7.2 自相矛盾修正（rep-20261104T053841-e7ab5b）
+# captured: 2026-11-04T13:49:12+08:00   cwd: /home/haroldzhao/MyProj/DshProj/VEdit
+
+## 唯一改动：evidence/i18n-l2/50-i18n-l2-report.md:224
+before: - 对账表新增 **13 条 supplement 行**（T38 的 UI-sink 窗口没选中这些 call-site），逐条带来源与理由。
+after : - 对账表新增 **15 条 supplement 行**（T38 的 UI-sink 窗口没选中这些 call-site），逐条带来源与理由。
+# 同段没有其它计数；句义不变，只改数字。
+
+## 对账复跑：python3 evidence/i18n-l2/tools/make_reconciliation.py
+findings=319 rows=319 supplement=15 -> evidence/i18n-l2/03-b-reconciliation.csv
+  不译: 18
+  译（已完成）: 205
+  译（本批）: 73
+  译（片段）: 23
+  verified: {'no-wrap': 19, 'own-call+ts': 300}
+audit rows changed=0 -> evidence/i18n-l2/logs/20-t40-claim-audit.csv
+RECONCILE_EXIT=0
+
+## docs 门禁
+bash build/gates/docs.sh -> exit 0
+evidence id: ev-20261104T054850-9a5677 (.mpd/verify/evidence/ev-20261104T054850-9a5677.log)
+
+## 全文残留计数扫描（grep -n '13' / '304'）
+'13' 剩余 3 处，均非当前计数：sha256 中的字符、文件行号 settings_panel.cpp:1343/1498、§10 里对「13 条→10 条」这次修正的历史叙述。
+'304' 剩余 6 处，均为历史/分解口径：319 = 304 discovery + 15 supplement（:57）、discovery CSV 行数（:61）、
+T38 旧计数（:65、:246、:343）、以及 §9 F1 里的文件行号 saved file(:304)。
+supplement 现在四处一致为 15（:57、:63、:224、:244）。

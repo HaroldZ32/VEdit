@@ -1,0 +1,88 @@
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+PASS probe.fixture-dir
+PASS probe.fixtures
+PASS project-model.save
+This plugin does not support propagateSizeHints()
+PASS before.pane-count
+This plugin does not support propagateSizeHints()
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+PASS before.open-a
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+PASS before.open-b
+PASS before.pane1-two-tabs — tabs=2
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PASS before.pane2
+This plugin does not support propagateSizeHints()
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+PASS before.open-c
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PASS before.a-view
+PASS before.a-position — caret=12:3 scroll=6
+PASS before.b-view
+PASS before.b-scrolled — first-displayed-line=30
+BEFORE caret=45:5 scroll=30 size=775x720 pos=0,0 active=pane-1
+PASS before.save-session
+PASS archive.written — /tmp/vedit-session-probe-zNzBTp/state/session.json
+PASS archive.version — 2
+PASS archive.project-root — /tmp/vedit-session-probe-zNzBTp/project
+PASS archive.panels
+PASS archive.layout-version
+PASS archive.layout-active
+PASS archive.layout-split
+PASS archive.leaf-documents — documents=2
+PASS archive.leaf-active-tab — 1
+PASS archive.leaf-provider
+PASS archive.caret-and-scroll-match-live-view — expected caret=45:5 scroll=30
+PASS archive.a-caret-and-scroll — expected A caret=12:3 scroll=6
+PASS failfirst.archive-corrupted
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+This plugin does not support propagateSizeHints()
+PASS after.pane-count — panes=2
+PASS after.window-size — now=775x720 want=775x720
+PASS after.window-position — now=0,23 want=0,0
+PASS after.pane-identity
+PASS after.pane1-two-tabs — tabs=2
+PASS after.pane1-file-names — /tmp/vedit-session-probe-zNzBTp/project/alpha.sv | /tmp/vedit-session-probe-zNzBTp/project/bravo.sv
+PASS after.pane1-active-tab-is-b — 1
+PASS after.pane2-file — /tmp/vedit-session-probe-zNzBTp/project/charlie.sv
+PASS after.active-pane
+PASS after.project-root — project
+PASS after.panel-file-tree
+PASS after.panel-outline
+PASS after.panel-terminal-hidden
+PASS after.b-view
+PASS after.caret-line — now=45 want=45
+PASS after.caret-column — now=5 want=5
+PASS after.scroll-line — now=30 want=30
+PASS after.a-file — /tmp/vedit-session-probe-zNzBTp/project/alpha.sv
+PASS after.a-view
+FAIL after.a-caret-line — now=0 want=12
+FAIL after.a-caret-column — now=0 want=3
+FAIL after.a-scroll-line — now=0 want=6
+PASS after.project-model — root=/tmp/vedit-session-probe-zNzBTp/project files=3
+PASS dirty.document
+This plugin does not support propagateSizeHints()
+PASS dirty.state
+[app-shell] close refused (headless): bravo.sv has unsaved changes
+PASS dirty.guard-cancels
+PASS dirty.archive-not-written
+PASS dirty.disk-not-written
+PASS dirty.window-stays
+This plugin does not support propagateSizeHints()
+PASS dirty.clean-close-allowed
+PASS corrupt.write-garbage
+[app-shell] invalid session /tmp/vedit-session-probe-zNzBTp/corrupt/session.json: unterminated object
+This plugin does not support propagateSizeHints()
+PASS corrupt.clean-start
+PASS corrupt.diagnostic
+PASS corrupt.visible-message — Session could not be restored (invalid session /tmp/vedit-session-probe-zNzBTp/corrupt/session.json: unterminated object) — starting clean
+This plugin does not support propagateSizeHints()
+PASS missing.clean-start
+PASS missing.no-alarm
+SESSION-PROBE failures=3 platform=offscreen

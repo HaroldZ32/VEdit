@@ -1,0 +1,43 @@
+## changed symbols (path:line)
+src/editor/kernel/lsp_actions.h:228:ActionDispatch dispatchDefinitionAt(KTextEditor::View *view,
+src/editor/kernel/lsp_actions.cpp:650:ActionDispatch dispatchDefinitionAt(KTextEditor::View *view, const KTextEditor::Cursor &position)
+src/editor/kernel/multi_cursor.h:137:    void reportDefinitionUnavailable(const QString &reason);
+src/editor/kernel/multi_cursor.h:144:    KTextEditor::Cursor altPressAnchor_;
+src/editor/kernel/multi_cursor.h:145:    bool altPressActive_ = false;
+src/editor/kernel/multi_cursor.h:146:    bool definitionClickActive_ = false;
+src/editor/kernel/multi_cursor.h:147:    bool definitionNoticeShown_ = false;
+src/editor/kernel/multi_cursor.cpp:591:        definitionClickActive_ = false;
+src/editor/kernel/multi_cursor.cpp:592:        altPressActive_ = false;
+src/editor/kernel/multi_cursor.cpp:606:            altPressAnchor_ = clicked;
+src/editor/kernel/multi_cursor.cpp:607:            altPressActive_ = true;
+src/editor/kernel/multi_cursor.cpp:622:                reportDefinitionUnavailable(dispatch.reason);
+src/editor/kernel/multi_cursor.cpp:625:            definitionNoticeShown_ = false; // a working backend may fail later
+src/editor/kernel/multi_cursor.cpp:626:            definitionClickActive_ = true;
+src/editor/kernel/multi_cursor.cpp:632:        if (definitionClickActive_) {
+src/editor/kernel/multi_cursor.cpp:638:        if (altPressActive_) {
+src/editor/kernel/multi_cursor.cpp:645:                if (extent == altPressAnchor_) {
+src/editor/kernel/multi_cursor.cpp:648:                beginBlock(altPressAnchor_);
+src/editor/kernel/multi_cursor.cpp:668:        if (definitionClickActive_) {
+src/editor/kernel/multi_cursor.cpp:672:            definitionClickActive_ = false;
+src/editor/kernel/multi_cursor.cpp:675:        if (altPressActive_) {
+src/editor/kernel/multi_cursor.cpp:676:            altPressActive_ = false;
+src/editor/kernel/multi_cursor.cpp:687:                addCursor(altPressAnchor_);
+src/editor/kernel/multi_cursor.cpp:708:void MultiCursorController::reportDefinitionUnavailable(const QString &reason)
+src/editor/kernel/multi_cursor.cpp:710:    if (definitionNoticeShown_) {
+src/editor/kernel/multi_cursor.cpp:713:    definitionNoticeShown_ = true;
+
+## the gesture comments in handleMouse
+601:            // UX batch 2 (item 13): Alt+CLICK adds a cursor (the gesture that
+614:            // UX batch 2 (item 13): Ctrl+click is "go to definition". The seam
+
+## no second definition-request implementation in the lane files
+$ grep -rn "requestDefinition" src/editor/
+(no matches: the kernel reaches definition only through LspActionChannel)
+
+$ grep -rn "textDocument/definition" src/editor/
+(no matches)
+
+## the single product request path (unchanged, outside this lane)
+868:    void requestDefinition()
+1861:                                         [wiring]() { wiring->requestDefinition(); });
+1352:            ? controller_->requestDefinition(file, cursor.line(), cursor.column())

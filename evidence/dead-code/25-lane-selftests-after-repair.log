@@ -1,0 +1,215 @@
+UpdateCTestConfiguration  from :/vedit-build/target/qt6-build/DartConfiguration.tcl
+Test project /vedit-build/target/qt6-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 4
+    Start  4: vedit-syntax-kde-data
+
+4: Test command: /vedit-build/target/qt6-build/src/syntax/kde/vedit_syntax_kde_selftest
+4: Working Directory: /vedit-build/target/qt6-build/src/syntax/kde
+4: Test timeout computed to be: 120
+4: INFO resources_dir=/vedit-build/src/syntax/kde/../../../resources
+4: LOAD strategy=Repository::addCustomSearchPath(private_dir) at startup; XDG_DATA_DIRS is not mutated; NO_STANDARD_PATHS is not required (see src/syntax/kde/README.md)
+4: LOAD private_dir=/vedit-build/resources
+4: LOAD search_paths=/vedit-build/resources/syntax
+4: LOAD definitions=451 themes=30
+4: LOAD definition_names=None, G-Code, GLSL, Klipper Config, Klipper G-Code, OpenSCAD, PLY, POV-Ray, RenderMan RIB, STL, VRML, Wavefront OBJ … (+439)
+4: LOAD theme_count=30
+4: LOAD probe_v=V probe_sv=SystemVerilog
+4: DIAG .v resolves to definition 'V' by file name (the built-in 'V'/vlang definition also claims *.v); use resolveLanguageForFile()/explicit language names instead
+4: LOAD private_definition_files=vedit-systemverilog.xml, vedit-verilog.xml
+4: CHECK load.ok PASS
+4: CHECK load.verilog-available PASS
+4: CHECK load.systemverilog-available PASS
+4: CHECK load.private-dir-used PASS
+4: CHECK load.private-shipped-verilog PASS
+4: CHECK load.private-shipped-systemverilog PASS
+4: CHECK load.forbidden-none PASS
+4: CHECK load.v-resolved-by-name-not-filename PASS  filename probe -> V (expected the known V/vlang trap); explicit name mapping is used instead
+4: CHECK load.extension-map-v PASS
+4: CHECK load.extension-map-sv PASS
+4: CHECK load.resolve-sv-when-present PASS
+4: LOAD degraded.definitions=451 sv_available=0
+4: DIAG degraded: SystemVerilog definition exists only inside the syntax library (KDE build) and is not shipped by VEdit (C7): it is deliberately not used
+4: DIAG degraded: SystemVerilog definition not shipped (C7 pending): .sv files degrade to the Verilog definition (SystemVerilog-only constructs lose highlighting/folding); this is a diagnosable degradation, not a crash
+4: DIAG degraded: .v resolves to definition 'V' by file name (the built-in 'V'/vlang definition also claims *.v); use resolveLanguageForFile()/explicit language names instead
+4: CHECK degrade.verilog-still-available PASS
+4: CHECK degrade.sv-not-available PASS
+4: CHECK degrade.sv-missing-diagnostic PASS
+4: CHECK degrade.sv-falls-back-to-verilog PASS
+4: CHECK degrade.fallback-diagnostic PASS
+4: CHECK degrade.no-crash PASS
+4: CHECK data.no-forbidden-kde-definitions PASS
+4: CHECK data.no-kde-file-names PASS  vedit-systemverilog.xml, vedit-verilog.xml
+4: DATA files=vedit-systemverilog.xml, vedit-verilog.xml
+4: CHECK def.verilog-valid PASS
+4: CHECK def.systemverilog-valid PASS
+4: CHECK def.verilog-section PASS  Hardware
+4: CHECK def.systemverilog-extensions-contain-sv PASS  *.sv, *.svh
+4: FOLD verilog formats=50 begins=7 ends=7
+4: CHECK fold.verilog-highlighting PASS
+4: CHECK fold.verilog-regions-begin PASS  7
+4: CHECK fold.verilog-regions-balanced PASS  7
+4: FOLD systemverilog formats=51 begins=9 ends=9
+4: CHECK fold.sv-highlighting PASS
+4: CHECK fold.sv-a4-constructs-begin PASS  9
+4: CHECK fold.sv-a4-constructs-balanced PASS  9
+4: SYN-KDE-DATA-SELFTEST ok=1 checks=29 failures=0
+1/3 Test  #4: vedit-syntax-kde-data ................   Passed    0.02 sec
+test 5
+    Start  5: vedit-syntax-directory-equivalence
+
+5: Test command: /vedit-build/target/qt6-build/src/syntax/kde/vedit-syntax-directory-equivalence
+5: Working Directory: /vedit-build/target/qt6-build/src/syntax/kde
+5: Test timeout computed to be: 60
+5: CHECK equivalence.resolver-data-root PASS  /tmp/vedit-syntax-directory-equivalence-WvMhTz/syntax
+5: CHECK syntax-dir.missing-path-is-empty PASS
+5: CHECK syntax-dir.empty-string-is-empty PASS
+5: CHECK equivalence.kde-data-root.search-path PASS  /tmp/vedit-syntax-directory-equivalence-WvMhTz/syntax
+5: CHECK equivalence.kde-data-root.private-dir PASS  /tmp/vedit-syntax-directory-equivalence-WvMhTz
+5: CHECK equivalence.kde-legacy-subdir.search-path PASS  /tmp/vedit-syntax-directory-equivalence-WvMhTz/syntax
+5: CHECK equivalence.kde-legacy-subdir.private-dir PASS  /tmp/vedit-syntax-directory-equivalence-WvMhTz
+5: CHECK equivalence.resolver-flat-root-rejected PASS
+5: CHECK equivalence.kde-flat-root-no-search-path PASS
+5: CHECK equivalence.kde-flat-root-diagnostic PASS  private syntax directory missing: /tmp/vedit-syntax-directory-equivalence-htrOLy/syntax (set VEDIT_SYNTAX_DIR) | Verilog syntax definition is not available; .v files fall back to plain text | SystemVerilog definition exists only inside the syntax library (KDE build) and is not shipped by VEdit (C7): it is deliberately not used | SystemVerilog definition not shipped (C7 pending): .sv files degrade to the Verilog definition (SystemVerilog-only constructs lose highlighting/folding); this is a diagnosable degradation, not a crash | .v resolves to definition 'V' by file name (the built-in 'V'/vlang definition also claims *.v); use resolveLanguageForFile()/explicit language names instead
+5: SYNTAX-DIRECTORY-EQUIVALENCE ok=1 checks=10 failures=0
+2/3 Test  #5: vedit-syntax-directory-equivalence ...   Passed    0.02 sec
+test 16
+    Start 16: vedit-edit-core-selftest
+
+16: Test command: /vedit-build/target/qt6-build/src/app/editor-lane/vedit-edit-core-selftest
+16: Working Directory: /vedit-build/target/qt6-build/src/app/editor-lane
+16: Environment variables: 
+16:  QT_QPA_PLATFORM=offscreen
+16:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime
+16: Test timeout computed to be: 300
+16: CHECK editcore.scratch PASS
+16: CHECK editcore.ktexteditor.instance PASS
+16: CHECK editcore.document.create PASS
+16: CHECK editcore.undo.metaobject-slot PASS
+16: CHECK editcore.document.setText PASS
+16: CHECK editcore.open.fixture-written PASS
+16: [edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+16: CHECK editcore.open.file PASS
+16: CHECK editcore.open.records-path PASS /tmp/vedit-edit-core-selftest-gVvRKk/open.v
+16: CHECK editcore.highlight.verilog.fixture PASS
+16: [edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+16: CHECK editcore.highlight.verilog.open PASS
+16: CHECK editcore.highlight.verilog.mode PASS mode='Verilog' expected='Verilog'
+16: CHECK editcore.highlight.verilog.definition PASS Verilog
+16: CHECK editcore.highlight.verilog.format-ranges PASS 25
+16: CHECK editcore.highlight.verilog.folding-regions PASS begins=2 ends=2
+16: CHECK editcore.highlight.systemverilog.fixture PASS
+16: [edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+16: CHECK editcore.highlight.systemverilog.open PASS
+16: CHECK editcore.highlight.systemverilog.mode PASS mode='SystemVerilog' expected='SystemVerilog'
+16: CHECK editcore.highlight.systemverilog.definition PASS SystemVerilog
+16: CHECK editcore.highlight.systemverilog.format-ranges PASS 26
+16: CHECK editcore.highlight.systemverilog.folding-regions PASS begins=1 ends=1
+16: CHECK editcore.atomic.fresh-file PASS
+16: CHECK editcore.atomic.fresh-content PASS
+16: CHECK editcore.atomic.no-temp-left PASS
+16: CHECK editcore.atomic.replace PASS
+16: CHECK editcore.atomic.replace-no-temp PASS
+16: CHECK editcore.atomic.fault.write-fails PASS
+16: CHECK editcore.atomic.fault.write-keeps-target PASS
+16: CHECK editcore.atomic.fault.write-cleans-temp PASS
+16: CHECK editcore.atomic.fault.rename-fails PASS
+16: CHECK editcore.atomic.fault.rename-keeps-target PASS
+16: CHECK editcore.atomic.fault.rename-cleans-temp PASS
+16: CHECK editcore.atomic.fault.dir-fsync-nonfatal PASS atomic save: injected directory fsync failure;directory fsync skipped by fault injection
+16: CHECK editcore.atomic.fault.dir-fsync-content PASS
+16: CHECK editcore.save.kernel PASS
+16: CHECK editcore.save.bytes PASS
+16: CHECK editcore.save.clears-modified PASS
+16: CHECK editcore.find.count PASS 3
+16: CHECK editcore.find.adjacent PASS
+16: CHECK editcore.replace.count PASS found=3 replaced=3
+16: CHECK editcore.replace.text PASS zz bbb zz ccc zz
+16: 
+16: CHECK editcore.replace.one-undo PASS
+16: CHECK editcore.replace.redo PASS
+16: kf.sonnet.core: Sonnet: No speller backends available!
+16: CHECK editcore.goto.line PASS
+16: CHECK editcore.goto.clamp-low PASS
+16: CHECK editcore.goto.clamp-high PASS line=3
+16: CHECK editcore.goto.column-zero PASS
+16: CHECK editcore.undo.100-operations PASS 100
+16: CHECK editcore.undo.100-back-to-original PASS mismatches=0 error=
+16: CHECK editcore.redo.100-forwards PASS mismatches=0
+16: EDITCORE-UNDO sha-before=c2a908d98f5df987ade41b5fce213067efbcc21ef2240212a41e54b5e7c28ae5 sha-after=991ab4d4e3f17a75c77ed6a7000fe568ae995f0dd92fe827129ee74ae2214f98
+16: CHECK editcore.multicursor.native-api PASS
+16: CHECK editcore.multicursor.native-read-back PASS
+16: CHECK editcore.multicursor.native-insert-call PASS
+16: EDITCORE-MULTICURSOR native-cursors=3 native-inserted-x=1 text="Xaaa
+16: "
+16: CHECK editcore.multicursor.native-insert-primary PASS 1
+16: CHECK editcore.multicursor.batch-insert PASS
+16: CHECK editcore.multicursor.batch-text PASS XaXaXa
+16: 
+16: CHECK editcore.multicursor.batch-one-undo PASS
+16: CHECK editcore.multicursor.batch-redo PASS
+16: CHECK editcore.wsedit.fixture-open PASS
+16: CHECK editcore.wsedit.fixture-disk PASS
+16: CHECK editcore.wsedit.view PASS
+16: CHECK editcore.wsedit.open-visible PASS 1
+16: CHECK editcore.wsedit.applied PASS
+16: CHECK editcore.wsedit.counts PASS edits=3 files=2 editor=1 disk=1
+16: CHECK editcore.wsedit.open-text PASS module top;
+16:   wire new_name;
+16:   new_name = 1;
+16: endmodule
+16: 
+16: CHECK editcore.wsedit.open-dirty PASS
+16: CHECK editcore.wsedit.disk-text PASS // new_name
+16: 
+16: CHECK editcore.wsedit.summary PASS Rename applied: 3 edit(s) in 2 file(s) — 1 document(s) changed in the editor, 1 file(s) written on disk
+16: CHECK editcore.wsedit.one-undo PASS
+16: CHECK editcore.wsedit.one-redo PASS
+16: CHECK editcore.wsedit.out-of-range-refused PASS /tmp/vedit-edit-core-selftest-gVvRKk/rename-open.sv: edit line 1000-1000 is outside rename-open.sv (5 line(s))
+16: CHECK editcore.wsedit.refusal-keeps-buffer PASS
+16: CHECK editcore.wsedit.refusal-keeps-file PASS // new_name
+16: 
+16: CHECK editcore.wsedit.missing-file-refused PASS cannot change /tmp/vedit-edit-core-selftest-gVvRKk/does-not-exist.sv: No such file or directory
+16: CHECK editcore.wsedit.empty-refused PASS
+16: CHECK editcore.references.empty PASS
+16: CHECK editcore.references.count PASS 2
+16: CHECK editcore.references.ordered PASS
+16: CHECK editcore.references.open-snippet PASS wire new_name;
+16: CHECK editcore.references.location-text PASS /tmp/vedit-edit-core-selftest-gVvRKk/rename-open.sv:2:8
+16: CHECK editcore.references.disk-snippet PASS // new_name
+16: CHECK editcore.gates.document PASS
+16: CHECK editcore.gates.view PASS
+16: CHECK editcore.gates.channel PASS
+16: CHECK editcore.gates.rename-disabled PASS verible does not advertise renameProvider for this session
+16: CHECK editcore.gates.rename-real-reason PASS verible does not advertise renameProvider for this session
+16: CHECK editcore.gates.rename-action-greyed PASS
+16: ACTION-REFUSED action=rename enabled=0 known=1 source=backend reason='verible does not advertise renameProvider for this session'
+16: CHECK editcore.gates.rename-refused PASS verible does not advertise renameProvider for this session
+16: CHECK editcore.gates.rename-enabled PASS
+16: CHECK editcore.gates.rename-action-enabled PASS
+16: CHECK editcore.provider.id PASS ktexteditor
+16: CHECK editcore.provider.creates-view PASS
+16: CHECK editcore.provider.fixture PASS
+16: [edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+16: CHECK editcore.provider.open PASS
+16: CHECK editcore.provider.open-records-path PASS /tmp/vedit-edit-core-selftest-NMlAbj/provider.v
+16: CHECK editcore.provider.document PASS
+16: CHECK editcore.provider.save PASS
+16: CHECK editcore.provider.save-bytes PASS
+16: SKIP editcore.boundary.zero-calls no C ABI hooks in this build
+16: EDIT-CORE-SELFTEST ok=1 checks=97 failures=0
+3/3 Test #16: vedit-edit-core-selftest .............   Passed    0.13 sec
+
+The following tests passed:
+	vedit-syntax-kde-data
+	vedit-syntax-directory-equivalence
+	vedit-edit-core-selftest
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   0.18 sec

@@ -1,0 +1,64 @@
+ok   fixture.present — /vedit-build/src/workspace/module_tree/fixtures/ux-batch-2
+ok   slang.present — /vedit-build/build/slang/out/slang
+ok   state.temp-dir
+kf.sonnet.core: Sonnet: No speller backends available!
+search: installSearch projectRoot='/vedit-build/src/workspace/module_tree/fixtures/ux-batch-2' jumpTarget=registry(editor)
+ok   jump.product-target
+module-tree: installed (root='/vedit-build/src/workspace/module_tree/fixtures/ux-batch-2' state='/tmp/vedit-module-tree-catalog-test-aMsRAR' docks=module-tree,interface-panel)
+This plugin does not support propagateSizeHints()
+ok   shell.panels-present — tree=1 interface=1
+ok   shell.two-docks
+ok   shell.pane-present
+module-catalog: run source='vd_project_expand_v2(/vedit-build/src/workspace/module_tree/fixtures/ux-batch-2)' files=7 root='/vedit-build/src/workspace/module_tree/fixtures/ux-batch-2'
+module-tree: catalog ready files=7 modules=6 source='vd_project_expand_v2(/vedit-build/src/workspace/module_tree/fixtures/ux-batch-2)'
+This plugin does not support propagateSizeHints()
+ok   catalog.answered
+ok   catalog.valid
+ok   catalog.module-count — modules=[consumer, orphan, reflink, shared, top_a, top_b]
+ok   catalog.sorted-and-interface-excluded — consumer, orphan, reflink, shared, top_a, top_b
+ok   catalog.no-interface-module
+ok   h1.probe.client-found
+ok   h1.probe.holder-found
+ok   h1.first-appearance.model-written
+FAIL h1.first-appearance.file-set — fileSet=7 modules=6
+FAIL h1.first-appearance.uses-seeded-set — modules=6
+FAIL h1.first-appearance.source-is-model — vd_project_expand_v2(/vedit-build/src/workspace/module_tree/fixtures/ux-batch-2)
+FAIL h1.first-appearance.rerun — runs 1 -> 1
+module-catalog: run source='project model (project-model.json)' files=6 root='/vedit-build/src/workspace/module_tree/fixtures/ux-batch-2'
+ok   h1.in-flight.run-started
+ok   h1.in-flight.model-written
+FAIL h1.in-flight.pending-observed — modelPending=0
+ok   h1.in-flight.final-file-set — fileSet=7 modules=6
+ok   h1.in-flight.final-tree-reflects-model — modules=6
+FAIL h1.in-flight.follow-up-run — runs 1 -> 2
+ok   acceptance.i.roots-equal-is-top — roots=[orphan, top_a, top_b] tops=[orphan, top_a, top_b]
+ok   acceptance.i.roots-fixture-set — orphan, top_a, top_b
+ok   acceptance.ii.shared-under-both-parents — top_a.u_shared, top_b.u_shared
+ok   acceptance.ii.distinct-instance-paths — top_a.u_shared, top_b.u_shared
+ok   acceptance.iv.only-module-rows — rows=7
+ok   acceptance.iv.row-count — rows=7
+ok   acceptance.iv.widget-row-count — rows=7
+ok   acceptance.iv.no-net-labels — orphan, top_a, shared, consumer, reflink, top_b, shared
+ok   panel.top-a-row
+This plugin does not support propagateSizeHints()
+ok   acceptance.v.focus-from-tree — top_a
+ok   acceptance.v.port-count — rows=3
+ok   acceptance.v.port-clk — clk / In / logic / 1
+ok   acceptance.v.port-pad — pad / InOut / 1
+ok   acceptance.v.port-y — y / Out / logic[3:0] / 4
+ok   acceptance.v.location-column — top_a.sv:1:27
+ok   acceptance.v.abi-limit-tooltip — Double-click a port: jump to its declaration. Ctrl+double-click: jump to this module's instantiation statement. The module catalog has no per-connection position, so Ctrl+double-click targets the instance statement, not the connected port.
+ok   acceptance.iii.top-a-catalogued
+ok   acceptance.iii.row-visible
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+search: jump opened '/vedit-build/src/workspace/module_tree/fixtures/ux-batch-2/top_a.sv' line=1 column=8 (cursor=1:8)
+ok   acceptance.iii.file-opened — /vedit-build/src/workspace/module_tree/fixtures/ux-batch-2/top_a.sv
+ok   acceptance.iii.ktexteditor-view
+ok   acceptance.iii.cursor-on-declaration — cursor=1:8 expected=1:8
+ok   acceptance.iii.declaration-text — module top_a (input logic clk, inout wire pad, output logic [3:0] y);
+ok   acceptance.focus.caret-view
+module-tree: catalog ready files=6 modules=5 source='project model (project-model.json)'
+ok   acceptance.focus.caret-module — top_a
+ok   acceptance.focus.selection-beats-caret — shared
+EXIT=139
+bash: line 1:    11 Segmentation fault         (core dumped) VEDIT_DEBUG=1 QT_QPA_PLATFORM=offscreen XDG_RUNTIME_DIR=/tmp/xdg-runtime-red timeout 300 target/qt6-build/src/app/workspace-lane-module_tree/vedit-module-tree-catalog-test "$PWD/src/workspace/module_tree/fixtures/ux-batch-2" "$PWD/build/slang/out/slang"

@@ -1,0 +1,109 @@
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+ok   probe.edit-core-provider
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server] local=[/vedit-build/build/slang/out,/vedit-build/.mpd/recon/verible/bin]
+ok   probe.diagnostics-panel
+ok   probe.active-pane
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+BACKEND-SWITCHED backend=verible lint=slang lsp=/vedit-build/.mpd/recon/verible/bin/verible-verilog-ls engine=/vedit-build/build/slang/out/slang basis=measured argv='backend=verible program=/vedit-build/.mpd/recon/verible/bin/verible-verilog-ls'
+BACKEND-AUX aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server]
+SWITCH elapsed-ms=0 backend=verible lint=slang basis=measured
+ok   probe.file-analysed - nav.sv — analyzed 13:46:41 (saved file): 0 diagnostic(s)
+OBSERVED probe.status nav.sv — analyzed 13:46:41 (saved file): 0 diagnostic(s)
+ok   probe.ktexteditor-view
+ok   signature.installed-by-provider
+ok   signature.popup-visible - current file
+ok   signature.popup-text - foo(int a, int b)
+ok   signature.active-parameter - 1
+ok   signature.esc-closes
+ok   signature.typing-after-esc
+ok   signature.closes-on-cursor-leave - no call context
+ok   advanced.installed-by-provider
+OBSERVED advanced.config-keys icon-bar,line-numbers,dynamic-word-wrap,background-color,selection-color,search-highlight-color,replace-highlight-color,default-mark-type,allow-mark-menu,folding-bar,folding-preview,icon-border-color,folding-marker-color,line-number-color,current-line-number-color,modification-markers,keyword-completion,word-count,line-count,scrollbar-minimap,scrollbar-preview,font,theme
+FEATURE lsp-completion       group='1 lsp-completion-signature-code-action' enabled=0 known=1 source=abi          reason='no completion request in the C ABI (the LSP session serves definition / references / symbols / rename / formatting / diagnostics / hover / signatureHelp) and KTextEditor 6.24 exposes no public completion entry point; keyword completion is the supported substitute'
+ok   advanced.lsp-completion.greyed-with-reason
+FEATURE keyword-completion   group='1 lsp-completion-signature-code-action' enabled=1 known=1 source=ktexteditor  reason=''
+FEATURE signature-help       group='1 lsp-completion-signature-code-action' enabled=1 known=1 source=editor       reason=''
+FEATURE code-action          group='1 lsp-completion-signature-code-action' enabled=0 known=1 source=abi          reason='no textDocument/codeAction request in the C ABI, so the menu item would have to fake its result'
+ok   advanced.code-action.greyed-with-reason
+FEATURE sticky-scroll        group='2 sticky-scroll' enabled=0 known=1 source=ktexteditor  reason='KTextEditor 6.24 has no sticky-scroll API (no such symbol in the installed headers); the pane's breadcrumb bar is what shows the enclosing scope'
+ok   advanced.sticky-scroll.greyed-with-reason
+FEATURE inlay-hints          group='3 inlay-hints' enabled=0 known=1 source=abi          reason='no textDocument/inlayHint request in the C ABI; InlineNoteProvider exists in the kernel but there is no inlay data source to feed it'
+ok   advanced.inlay-hints.greyed-with-reason
+FEATURE snippets             group='4 snippets' enabled=1 known=1 source=editor       reason=''
+FEATURE indent-guides        group='5 indent-guides-whitespace-column-ruler' enabled=0 known=1 source=ktexteditor  reason='Indent Guides is a KatePart renderer option and KTextEditor 6.24 does not expose it through View::configKeys() (measured keys: font, theme, line-numbers, folding-bar, keyword-completion, ...), so the product cannot toggle it without private KatePart APIs'
+ok   advanced.indent-guides.greyed-with-reason
+FEATURE whitespace           group='5 indent-guides-whitespace-column-ruler' enabled=0 known=1 source=ktexteditor  reason='Show Whitespace is a KatePart renderer option and KTextEditor 6.24 does not expose it through View::configKeys() (measured keys: font, theme, line-numbers, folding-bar, keyword-completion, ...), so the product cannot toggle it without private KatePart APIs'
+ok   advanced.whitespace.greyed-with-reason
+FEATURE column-ruler         group='5 indent-guides-whitespace-column-ruler' enabled=0 known=1 source=ktexteditor  reason='Column Ruler is a KatePart renderer option and KTextEditor 6.24 does not expose it through View::configKeys() (measured keys: font, theme, line-numbers, folding-bar, keyword-completion, ...), so the product cannot toggle it without private KatePart APIs'
+ok   advanced.column-ruler.greyed-with-reason
+ok   advanced.five-groups - groups=5
+ADVANCED-APPLIED feature=keyword-completion value=0 readback=0
+ok   advanced.keyword-completion-apply
+ok   advanced.keyword-completion-effect - before=1 after=0
+ADVANCED-APPLIED feature=keyword-completion value=1 readback=1
+ADVANCED-APPLIED feature=snippets snippet=always_ff bytes=38
+ok   advanced.snippet-apply
+ok   advanced.snippet-effect - bytes 134 -> 172
+ADVANCED-REFUSED feature=sticky-scroll group='2 sticky-scroll' source=ktexteditor reason='KTextEditor 6.24 has no sticky-scroll API (no such symbol in the installed headers); the pane's breadcrumb bar is what shows the enclosing scope'
+ok   advanced.sticky-scroll-refuses
+ok   advanced.refusal-has-reason - KTextEditor 6.24 has no sticky-scroll API (no such symbol in the installed headers); the pane's breadcrumb bar is what shows the enclosing scope
+OBSERVED advanced.last-refusal KTextEditor 6.24 has no sticky-scroll API (no such symbol in the installed headers); the pane's breadcrumb bar is what shows the enclosing scope
+OBSERVED advanced.menu.texts: --- | LSP Completion | Keyword Completion (KTextEditor) | Signature Help (editor-synthesised) | Code Actions | --- | --- | Sticky Scroll | --- | --- | Inlay Hints | --- | --- | Snippets | --- | --- | Indent Guides | Show Whitespace | Column Ruler
+ok   hover.reload-settings-action
+ok   hover.channel
+BACKEND-SWITCHED backend=slang lint=slang lsp=/vedit-build/evidence/e5-advanced/fixtures/fake_lsp_server.py engine=/vedit-build/build/slang/out/slang basis=measured argv='backend=slang program=/vedit-build/evidence/e5-advanced/fixtures/fake_lsp_server.py'
+BACKEND-AUX aux source=slang-server:settings verible-format:local verible-lint:local missing=[]
+SWITCH elapsed-ms=0 backend=slang lint=slang basis=measured
+ok   hover.backend-switched
+ok   hover.analysis-settled - nav.sv — analyzed 13:46:41 (saved file): 0 diagnostic(s)
+OBSERVED hover.gate enabled
+ok   hover.advertised-then-enabled
+ACTION action=hover dispatched=1 via='diagnostics.hover'
+HOVER-REQUEST backend=slang file='/tmp/vedit-advanced-probe-aPCZjf/project/nav.sv' line=6 column=14 request=1
+BACKEND-SWITCHED backend=slang lint=slang lsp=/vedit-build/evidence/e5-advanced/fixtures/fake_lsp_server.py engine=/vedit-build/build/slang/out/slang basis=measured argv='backend=slang program=/vedit-build/evidence/e5-advanced/fixtures/fake_lsp_server.py'
+BACKEND-AUX aux source=slang-server:settings verible-format:local verible-lint:local missing=[]
+SWITCH elapsed-ms=0 backend=slang lint=slang basis=measured
+NAV-FAILED action=hover backend=slang reason='no navigation request in flight'
+ACTION action=hover dispatched=1 via='diagnostics.hover'
+HOVER-REQUEST backend=slang file='/tmp/vedit-advanced-probe-aPCZjf/project/nav.sv' line=6 column=14 request=5
+HOVER-RESPONSE backend=slang kind=hover bytes=44 empty=0
+HOVER-RENDERED backend=slang widget='veditHoverPopup' visible=1 bytes=44 text='**fake hover**
+
+logic [7:0] data
+
+(hover #1)'
+ok   hover.dispatch
+ok   hover.rendered-server-text - **fake hover**
+
+logic [7:0] data
+
+(hover #1)
+OBSERVED hover.rendered-text **fake hover**
+
+logic [7:0] data
+
+(hover #1)
+OBSERVED hover.server-log fake-lsp: started ; fake-lsp: method=initialize id=0 ; fake-lsp: method=initialized id=None ; fake-lsp: method=textDocument/didOpen id=None ; fake-lsp: started ; fake-lsp: method=initialize id=0 ; fake-lsp: method=initialized id=None ; fake-lsp: method=textDocument/didOpen id=None ; fake-lsp: method=textDocument/hover id=1 ; fake-lsp: method=shutdown id=2 ; fake-lsp: method=exit id=None ; fake-lsp: exiting ; fake-lsp: method=textDocument/didChange id=None ; fake-lsp: method=textDocument/documentSymbol id=1 ; fake-lsp: method=textDocument/hover id=2 ; 
+ok   hover.request-reached-the-server - fake-lsp: started
+fake-lsp: method=initialize id=0
+fake-lsp: method=initialized id=None
+fake-lsp: method=textDocument/didOpen id=None
+fake-lsp: started
+fake-lsp: method=initialize id=0
+fake-lsp: method=initialized id=None
+fake-lsp: method=textDocument/didOpen id=None
+fake-lsp: method=textDocument/hover id=1
+fake-lsp: method=shutdown id=2
+fake-lsp: method=exit id=None
+fake-lsp: exiting
+fake-lsp: method=textDocument/didChange id=None
+fake-lsp: method=textDocument/documentSymbol id=1
+fake-lsp: method=textDocument/hover id=2
+
+ok   signature-abi.controller
+ok   signature-abi.queued
+ok   signature-abi.retry-queued
+SKIP signature-abi.live-round-trip - controller navigation slot was taken: no navigation request in flight
+SUMMARY checks=38 failures=0 skips=1

@@ -1,0 +1,4 @@
+=== E: escaped literal dollar (1) outside the scanned root ===
+EXPANSION ok=1 root=/vedit-build/evidence/review-a9/e files=1 skipped=0 missing=[]
+FILE /vedit-build/evidence/review-a9/outside/out_dollar$.sv
+E-exit=0

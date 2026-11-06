@@ -1,0 +1,6 @@
+# AC-5.2 / AC-5.4 evidence (workspace dialog + stash/worktree/submodule)
+collected_at: 2026-11-04T11:18:45+08:00
+workspace-screenshot=1
+  shot_bytes=53887 /home/haroldzhao/MyProj/DshProj/VEdit/evidence/vcs-git-workspace/screenshots/50-vcs-workspace-dialog-1500x1000.png
+green_workspace_checks=88
+result=PASS

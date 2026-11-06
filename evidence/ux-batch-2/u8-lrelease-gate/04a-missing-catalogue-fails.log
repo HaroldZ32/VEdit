@@ -1,0 +1,3 @@
+[lrelease] FAIL: the translation catalogue is missing or empty: /home/haroldzhao/MyProj/DshProj/VEdit/does/not/exist.ts
+       Expected : translations/vedit_zh_CN.ts (the delivered zh_CN catalogue).
+       This gate does NOT skip and does NOT pass without the catalogue.

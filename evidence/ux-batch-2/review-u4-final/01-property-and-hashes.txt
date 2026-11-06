@@ -1,0 +1,11 @@
+# U4 review independent checks
+2026-11-06T10:04:58+08:00
+
+## file hashes
+9291e6d37f3515f80ab1d406a430ca5bde5f1ef78dc18c3bc2e383f5d482063f  src/syntax/product/CMakeLists.txt
+f961d35371ae772c632301b01e62e6fadd22f248535d44baf359932d765dd3af  target/qt6-build/CTestTestfile.cmake
+
+## generated property lines
+# testing this directory and lists subdirectories to be tested as well.
+add_test([=[vedit-app-syntax-startup]=] "/vedit-build/target/qt6-build/src/app/vedit-app" "--selfcheck")
+set_tests_properties([=[vedit-app-syntax-startup]=] PROPERTIES  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime;VEDIT_SYNTAX_DIR=/vedit-build/resources" PASS_REGULAR_EXPRESSION "syntax-product: .*private-dir='[^']+/resources' definitions=[0-9]+ own-xml=\\[vedit-(markdown|systemverilog|tcl|verilog|vhdl)\\.xml,vedit-(markdown|systemverilog|tcl|verilog|vhdl)\\.xml,vedit-(markdown|systemverilog|tcl|verilog|vhdl)\\.xml,vedit-(markdown|systemverilog|tcl|verilog|vhdl)\\.xml,vedit-(markdown|systemverilog|tcl|verilog|vhdl)\\.xml\\] themes=[0-9]+ verilog=1 systemverilog=1 .*startup-hook=1" TIMEOUT "120" _BACKTRACE_TRIPLES "/vedit-build/src/syntax/product/CMakeLists.txt;131;add_test;/vedit-build/src/syntax/product/CMakeLists.txt;162;vedit_syntax_link_product;/vedit-build/CMakeLists.txt;-1;;/vedit-build/CMakeLists.txt;0;")

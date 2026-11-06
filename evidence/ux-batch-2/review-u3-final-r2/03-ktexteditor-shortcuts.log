@@ -1,0 +1,17 @@
+kf.sonnet.core: Sonnet: No speller backends available!
+VIEW ACTION shortcut='Ctrl+B' text='Toggle &Bookmark'
+VIEW ACTION shortcut='Alt+PgDown' text='Next Bookmark'
+VIEW ACTION shortcut='Alt+PgUp' text='Previous Bookmark'
+VIEW ACTION shortcut='Alt+Shift+Up' text='Move Cursor to Previous Matching Indent'
+VIEW ACTION shortcut='Alt+Shift+Down' text='Move Cursor to Next Matching Indent'
+VIEW ACTION shortcut='Ctrl+Shift+Down' text='Move Lines Down'
+VIEW ACTION shortcut='Ctrl+Shift+Up' text='Move Lines Up'
+VIEW ACTION shortcut='Ctrl+Shift+B' text='Bl&ock Selection Mode'
+VIEW ACTION shortcut='Ins' text='Overwr&ite Mode'
+VIEW ACTION shortcut='Ctrl+Shift+O' text='Automatic Spell Checking'
+VIEW ACTION shortcut='Ctrl+8' text='Reuse Word Above'
+VIEW ACTION shortcut='Ctrl+9' text='Reuse Word Below'
+TOTAL_ACTIONS_WITH_SHORTCUTS=12
+KTEXTEDITOR_HAS_CTRL_SHIFT_F=0
+KTEXTEDITOR_HAS_CTRL_ALT_F=0
+PROBE_EXIT=0

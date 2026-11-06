@@ -345,3 +345,74 @@ C++ lane 没有独立的 MPD gate id（ledger 的 id 表是固定的），因此
 | `Could not find Qt6Qml/TextToSpeech` | KTextEditor 的链接依赖；镜像装 `qt6-declarative-dev` / `qt6-speech-dev`（已锁定） |
 | `KTextEditor::Editor::instance()` 为 null | 缺 katepart 插件（`libkf6texteditor-katepart`，已锁定） |
 | 想复用已发布镜像 | `VEDIT_QT6_BUILD_IMAGE_REF=… VEDIT_QT6_BUILD_IMAGE_PULL=1 bash scripts/build-qt.sh` |
+
+## 13. slang-server（LSP 后端二）：spike 结论与构建/运行方式
+
+`slang-server` **不随 slang 发布**，是第三方项目
+[`hudson-trading/slang-server`](https://github.com/hudson-trading/slang-server)（基于 slang 库的
+SystemVerilog LSP）。本节记录 AC-1.5 / AC-3.0 spike 的结论：**上游预编译产物不能在 CentOS 7 运行，
+源码构建可以**。原始日志与结论见 `evidence/w2-spike/`。
+
+### 13.1 上游预编译：不可用（实测）
+
+v0.3.1 的 `slang-server-linux-x64.tar.gz`（sha256 `5162701e…`，`slang-server-old-linux-x64-gcc` 与其
+字节相同）在干净的 `centos:7`（CentOS 7.9.2009，glibc 2.17）容器里启动即失败：
+
+```text
+/w/slang-server: /lib64/libm.so.6: version `GLIBC_2.27' not found (required by /w/slang-server)
+/w/slang-server: /lib64/libc.so.6: version `GLIBC_2.18' not found (required by /w/slang-server)
+/w/slang-server: /lib64/libc.so.6: version `GLIBC_2.25' not found (required by /w/slang-server)
+```
+
+证据：`evidence/w2-spike/02-prebuilt-centos7-run.txt`（`objdump -T` 的最高符号版本也是 2.27）。
+
+### 13.2 源码构建：一条命令
+
+```bash
+bash probes/slang-spike/run-spike.sh
+```
+
+它做四件事：源码构建 → 干净 `centos:7` 里 `--version` → 真实 `initialize` 握手（客户端在宿主，
+server 在容器内）→ fixture 上的层次化 elaboration（实例路径 + signal driver/load，含耗时与峰值内存）。
+中间产物在 `target/tmp/spike-work/`，证据写 `evidence/w2-spike/`；需要 docker 与网络。
+
+构建配方与仓库既有的 slang 构建（§6）同一条路线，脚本
+`probes/slang-spike/build-sluserver-centos7.sh`：
+
+- CentOS 7.9.2009 + tuna vault 镜像（含 SCLo）；`devtoolset-11`（gcc 11.2.1，CentOS 7 可用的最新编译器）；
+- CMake 3.31.6（Kitware 预编译，跑在 glibc 2.17 上）与 CPython 3.12.8（slang 代码生成需要 ≥ 3.9），
+  两者都按 sha256 校验，缓存放在 `target/tmp/spike-work/cache/`；
+- 子模块 `external/slang`（AndrewNolte fork）、`external/reflect-cpp`、`external/ctre`；
+- `-static-libstdc++ -static-libgcc`，产物只依赖 `libm/libpthread/libc`，最高 GLIBC 符号 **2.17**；
+- **GCC 11.2 兼容**：libstdc++ 在 11.3 之前没有 `std::hash<std::filesystem::path>`，slang 的
+  `hash<T>` fallback 会编译失败。仓库对 slang 12.1 用的是源码补丁
+  `build/slang/patches/0001-gcc11-libstdcxx-path-hash.patch`；这里对 slang-server 改用
+  `-include probes/slang-spike/gcc11_path_hash.h`，子模块保持原样。
+
+### 13.3 实测结果（2026-11-02，16 核）
+
+| 项目 | 观察值 | 证据 |
+| --- | --- | --- |
+| 构建耗时 | 440 s（yum 15 s + CPython ~90 s + clone + configure + compile/link） | `evidence/w2-spike/03f-build-timings.txt` |
+| 产物 | `sha256 f691600f…`，11.7 MB，最高 `GLIBC_2.17` | `evidence/w2-spike/03e-build-artifact.txt` |
+| 干净 centos:7 `--version` | `slang-server version 0.3.1+2ad996f`，exit 0 | `evidence/w2-spike/03-built-centos7-version.txt` |
+| 真实 `initialize` 握手（server 在容器内） | 0.189 s，`serverInfo=0.3.1+2ad996f`，15 组 capability | `evidence/w2-spike/04-built-initialize-handshake.txt` |
+| fixture elaboration（CLI `slang --ast-json`） | 4 ms，峰值 RSS 19.0 MB | `evidence/w2-spike/05-elaboration.json` |
+| fixture elaboration（server，`slang.setBuildFile`） | 2 ms，峰值 RSS 25.6 MB（`/proc/<pid>/status` 的 VmHWM） | `evidence/w2-spike/06-hierarchy-lsp-shape.txt` |
+
+spike 的 kill 判据是 **>30 s 或 >1 GiB**：两个引擎都远低于该门槛。
+
+### 13.4 运行要点（给接入方）
+
+- **cwd 必须是工程根，`rootUri` 必须指向它**：`slang-server` 以工作目录为基准解析文件路径；
+  `initialize` 的 `rootUri` 还必须在该进程可见的文件系统里存在（容器里跑时把工程挂到 `rootUri` 路径，
+  否则 initialize 直接报 `cannot set current path`）。
+- **`.f` 的位置无关，`.f` 里的条目相对工程根最稳**：文件本身放哪都行（工程外、绝对路径都实测正确），
+  条目写相对工程根（或绝对路径）在 cwd=工程根时都能解析。**真正决定 `location.uri` 是否正确的是 cwd**：
+  cwd 不是工程根时，`getDrivers/GetLoads` 返回的 `location.uri` 会按错误的基准解析到工程根的兄弟/上一级
+  （模块树看起来完全正常，双击却跳到另一个文件）。四个组合的实测见
+  `evidence/w2-spike/07-buildfile-rule.txt`（`probes/slang-spike/buildfile_rule_probe.py`）。
+- 层次/驱动命令：`slang.getScopes`、`slang.getScope`、`slang.getScopesByModule`、
+  `slang.getInstancesOfModule`、`slang.searchHierarchy`、`slang.getDriversWithLocation`、
+  `slang.getLoadsWithLocation`、`slang.setTopLevel`、`slang.setBuildFile`；响应形状见
+  `evidence/w2-spike/06-hierarchy-lsp-shape.txt`。

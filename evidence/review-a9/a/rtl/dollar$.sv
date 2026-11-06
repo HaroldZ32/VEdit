@@ -1,0 +1,1 @@
+module dollar; endmodule

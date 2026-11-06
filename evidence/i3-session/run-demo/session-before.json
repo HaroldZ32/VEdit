@@ -1,0 +1,41 @@
+{
+    "dockState": "AAAA/wAAAAD9AAAAAwAAAAAAAAEBAAACAPwCAAAAAfsAAAAcAGQAbwBjAGsALQBmAGkAbABlAC0AdAByAGUAZQAAAAATAAACAAAAAHYA////AAAAAQAAAQEAAAIA/AIAAAAB+wAAABgAZABvAGMAawAtAG8AdQB0AGwAaQBuAGUBAAAAEwAAAgAAAAB2AP///wAAAAMAAARXAAAArvwBAAAAAfsAAAAaAGQAbwBjAGsALQB0AGUAcgBtAGkAbgBhAGwBAAAAAAAABFcAAADxAP///wAAA1AAAAIAAAAABAAAAAQAAAAIAAAACPwAAAAA",
+    "editorLayout": {
+        "active": "pane-1",
+        "nextPane": 2,
+        "root": {
+            "activeTab": 1,
+            "documents": [
+                {
+                    "caret": {
+                        "column": 1,
+                        "line": 5
+                    },
+                    "path": "/vedit-build/target/i3-session-probe/work-demo/scenario-ab/a.sv",
+                    "scroll": 0
+                },
+                {
+                    "caret": {
+                        "column": 6,
+                        "line": 300
+                    },
+                    "path": "/vedit-build/target/i3-session-probe/work-demo/scenario-ab/b.sv",
+                    "scroll": 120
+                }
+            ],
+            "pane": "pane-1",
+            "provider": "demo",
+            "type": "leaf"
+        },
+        "version": 2
+    },
+    "geometry": "AdnQywADAAAAAAAAAAAAAAAABFoAAALgAAAAAgAAAAIAAARYAAAC3gAAAAAAAAAAAyAAAAACAAAAAgAABFgAAALe",
+    "panels": [
+        "file-tree",
+        "terminal",
+        "outline"
+    ],
+    "project": "/vedit-build/target/i3-session-probe/work-demo/scenario-ab",
+    "theme": "Breeze Light",
+    "version": 2
+}

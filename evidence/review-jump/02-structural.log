@@ -1,0 +1,28 @@
+== IJumpTarget definition sites (whole tree, excluding build dirs) ==
+src/workspace/jump/jump_target.h:21:class IJumpTarget {
+src/workspace/search/search_types.h:86:class IJumpTarget {
+
+== vedit::workspace::jump entry points ==
+src/workspace/integration.h:14:// `vedit::workspace::jump::jumpTo(file, line, column)` directly; installJump()
+src/workspace/integration.cpp:41:    installJump(shell, options);
+src/workspace/jump/jump_integration.h:7:// CONTRACT plus a process-wide registry, not a dock. installJump() only resets
+src/workspace/jump/jump_integration.h:21:void installJump(vedit::app::ApplicationShell &shell, const IntegrationOptions &options);
+src/workspace/jump/jump_integration.cpp:9:void installJump(vedit::app::ApplicationShell &shell, const IntegrationOptions &options)
+src/workspace/jump/jump_integration.cpp:20:        qInfo("jump: installJump registry reset; target=%s",
+src/workspace/jump/jump_registry.h:87:    // Test + install support: drop the target and the counters. installJump()
+
+== lane registration ==
+119:# `jump` first: it is the process-wide jump contract the panel lanes consume
+120:# (their CMakeLists may link vedit_workspace_jump at configure time), and it has
+122:set(VEDIT_WORKSPACE_LANES jump filetree palette search project diagnostics vcs settings)
+
+== integration.cpp install order ==
+35:void installPanels(vedit::app::ApplicationShell &shell, const IntegrationOptions &options)
+41:    installJump(shell, options);
+44:    installPalette(shell, options);
+47:    installFileTree(shell, options);
+50:    installSearch(shell, options);
+53:    installProject(shell, options);
+56:    installDiagnostics(shell, options);
+59:    installVcs(shell, options);
+62:    installSettings(shell, options);

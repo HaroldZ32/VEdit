@@ -1,0 +1,58 @@
+Diff in /vedit-build/crates/vd-config/src/filelist.rs:898:
+             ],
+             "the literal `$` lines must survive as entries"
+         );
+-        assert!(warnings.is_empty(), "a literal `$` must not warn: {warnings:?}");
++        assert!(
++            warnings.is_empty(),
++            "a literal `$` must not warn: {warnings:?}"
++        );
+         Ok(())
+     }
+ 
+Diff in /vedit-build/crates/vd-config/src/filelist.rs:924:
+     /// resolves, or it is collected and its line skipped. The literal rule must
+     /// not swallow `$NAME` semantics.
+     #[test]
+-    fn a_real_reference_still_resolves_or_is_reported(
+-    ) -> Result<(), Box<dyn std::error::Error>> {
++    fn a_real_reference_still_resolves_or_is_reported() -> Result<(), Box<dyn std::error::Error>> {
+         let temp = tempfile::tempdir()?;
+         let root = temp.path();
+         write(&root.join("top.f"), "rtl/$KNOWN.sv\nrtl/$UNKNOWN.sv\n")?;
+Diff in /vedit-build/crates/vd-config/src/filelist.rs:941:
+             .find(|warning| warning.code == WarningCode::ConfigInvalidValue)
+             .unwrap_or_else(|| panic!("no unresolved-variable warning: {warnings:?}"));
+         assert_eq!(unresolved.line, Some(2));
+-        assert!(unresolved.message.contains("UNKNOWN"), "{}", unresolved.message);
++        assert!(
++            unresolved.message.contains("UNKNOWN"),
++            "{}",
++            unresolved.message
++        );
+         Ok(())
+     }
+ 
+Diff in /vedit-build/crates/vd-config/src/filelist.rs:984:
+                     .message
+                     .contains(&root.join("rtl/generated.sv").display().to_string())
+         }));
+-        assert!(missing_entries.iter().any(|warning| warning.line == Some(2)));
++        assert!(missing_entries
++            .iter()
++            .any(|warning| warning.line == Some(2)));
+         Ok(())
+     }
+ 
+Diff in /vedit-build/crates/vd-lsp/src/client.rs:599:
+             // nothing known is swallowed.
+             router.unhandled_notification(
+                 |state: &mut ClientState, notification: AnyNotification| {
+-                    state.record_log(format!(
+-                        "[unhandled notification] {}",
+-                        notification.method
+-                    ));
++                    state.record_log(format!("[unhandled notification] {}", notification.method));
+                     ControlFlow::Continue(())
+                 },
+             );

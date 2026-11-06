@@ -1,0 +1,28 @@
+# Rust resolver tests (vedit-build:local; same source the product links)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.04s
+     Running tests/toolchain.rs (/vedit-build/target/debug/deps/toolchain-a4397666c5a3b31f)
+
+running 8 tests
+test bundled_candidates_are_the_appdir_layout_first ... ok
+test a_missing_tool_is_reported_as_none ... ok
+test next_to_the_binary_is_also_bundled ... ok
+test order_is_bundled_then_path_then_env ... ok
+test env_is_the_last_resort ... ok
+test path_is_used_when_nothing_is_bundled ... ok
+test a_non_executable_candidate_is_skipped ... ok
+test bundled_layout_wins ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+# lane selfcheck: the VCS-TOOLCHAIN line + its assertions
+WORKSPACE-VCS-SELFTEST start
+VCS-TOOLCHAIN git=/usr/bin/git version=2.53.0 svn=<missing> version=<missing> source=mixed git_source=path svn_source=missing
+CHECK vcs.toolchain.line-shape PASS VCS-TOOLCHAIN git=/usr/bin/git version=2.53.0 svn=<missing> version=<missing> source=mixed git_source=path svn_source=missing
+CHECK vcs.toolchain.sources-known PASS git_source=path svn_source=missing
+CHECK vcs.toolchain.appdir PASS /vedit-build/target/qt6-build/src/app/workspace-lane-vcs
+CHECK vcs.toolchain.git-version PASS /usr/bin/git -> 2.53.0
+CHECK vcs.toolchain.svn-version SKIP svn is not available in this environment
+CHECK vcs.toolchain.fake-appdir PASS
+CHECK vcs.toolchain.bundled-layout PASS /tmp/vedit-workspace-vcs-selftest-VvUZxQ/usr/lib/vcs/bin/git
+WORKSPACE-VCS-SELFTEST ok=1 checks=558 failures=0

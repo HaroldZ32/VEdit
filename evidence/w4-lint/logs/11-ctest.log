@@ -1,0 +1,9 @@
+Test project /vedit-build/target/qt6-build
+    Start 29: vedit-lint-orchestration-probe
+1/2 Test #29: vedit-lint-orchestration-probe .........   Passed    0.02 sec
+    Start 30: vedit-workspace-diagnostics-selftest
+2/2 Test #30: vedit-workspace-diagnostics-selftest ...   Passed    1.82 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   1.84 sec

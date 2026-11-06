@@ -1,0 +1,88 @@
+## multi_cursor.h
+136:    QPoint viewPointFor(QWidget *watched, const QMouseEvent *event) const;
+146:    void watchDefinitionAvailability();
+147:    void refreshDefinitionNotice();
+158:    QString definitionNoticeReason_;
+159:    QWidget *availabilityHost_ = nullptr;
+160:    QAction *definitionAction_ = nullptr;
+
+## multi_cursor.cpp
+361:    controller->watchDefinitionAvailability();
+579:QPoint MultiCursorController::viewPointFor(QWidget *watched, const QMouseEvent *event) const
+609:            view_->coordinatesToCursor(viewPointFor(watched, event));
+635:            watchDefinitionAvailability();
+636:            refreshDefinitionNotice();
+646:            definitionNoticeReason_.clear();
+661:                view_->coordinatesToCursor(viewPointFor(watched, event));
+678:            view_->coordinatesToCursor(viewPointFor(watched, event));
+700:                    view_->coordinatesToCursor(viewPointFor(watched, event));
+716:            view_->coordinatesToCursor(viewPointFor(watched, event));
+729:void MultiCursorController::watchDefinitionAvailability()
+752:                     [this]() { refreshDefinitionNotice(); });
+755:void MultiCursorController::refreshDefinitionNotice()
+761:        definitionNoticeReason_.clear();
+769:    if (definitionNoticeShown_ && definitionNoticeReason_ == reason) {
+773:    definitionNoticeReason_ = reason;
+797:    if (watched == availabilityHost_ && event->type() == QEvent::DynamicPropertyChange) {
+798:        refreshDefinitionNotice();
+819:            widget != nullptr && handleMouse(widget, static_cast<QMouseEvent *>(event))) {
+
+## lsp_actions.cpp / .h
+src/editor/kernel/lsp_actions.cpp:679:    // Install it as the SINGLE cursor position: Ctrl+click is a click, and the
+src/editor/kernel/lsp_actions.cpp:683:    view->setCursorPositions({position});
+src/editor/kernel/lsp_actions.h:224:/// installed as the SINGLE cursor position, because a Ctrl+click is a click:
+
+## selftest helpers + new checks
+74:QWidget *deliveryTarget(KTextEditor::View *view, const QPoint &viewPoint)
+83:QPoint pointInTarget(QWidget *target, KTextEditor::View *view, const QPoint &viewPoint)
+225:    // deliveryTarget(); the plain-click control already worked this way).
+226:    QWidget *blockTarget = deliveryTarget(view, blockStart);
+227:    check(QStringLiteral("edit.block.inner-widget"),
+231:    check(QStringLiteral("edit.block.inner-widget-same-for-end"),
+232:          blockTarget == deliveryTarget(view, blockEnd));
+234:                      pointInTarget(blockTarget, view, blockStart));
+235:    QTest::mouseMove(blockTarget, pointInTarget(blockTarget, view, blockEnd));
+244:                        pointInTarget(blockTarget, view, blockEnd));
+263:    check(QStringLiteral("edit.block.cursor-lines"), expectedLines,
+300:        QWidget *target = deliveryTarget(view, altClickPoint);
+302:                          pointInTarget(target, view, altClickPoint));
+304:                            pointInTarget(target, view, altClickPoint));
+310:    check(QStringLiteral("edit.alt-click.clicked-position"),
+716:                QWidget *clickTarget = deliveryTarget(definitionView, clickPoint);
+725:                    QWidget *target = deliveryTarget(definitionView, point);
+726:                    const QPoint local = pointInTarget(target, definitionView, point);
+761:                check(QStringLiteral("definition.collapse.plain-setup"),
+768:                check(QStringLiteral("definition.collapse.plain-click"),
+776:                check(QStringLiteral("definition.collapse.ctrl-setup"),
+785:                check(QStringLiteral("definition.collapse.ctrl-click"),
+790:                check(QStringLiteral("definition.collapse.ctrl-click-position"),
+799:                check(QStringLiteral("definition.collapse.ctrl-click-dispatched"),
+897:                check(QStringLiteral("definition.gate-only.action-enabled"),
+899:                check(QStringLiteral("definition.gate-only.availability"),
+904:                check(QStringLiteral("definition.gate-only.no-request"),
+906:                check(QStringLiteral("definition.gate-only.plain-click"),
+911:                check(QStringLiteral("definition.gate-only.status-reason"),
+926:                check(QStringLiteral("definition.action-only.gate-row-enabled"),
+928:                check(QStringLiteral("definition.action-only.availability"),
+934:                check(QStringLiteral("definition.action-only.no-request"),
+936:                check(QStringLiteral("definition.action-only.plain-click"),
+941:                check(QStringLiteral("definition.action-only.status-reason"),
+959:                check(QStringLiteral("definition.rearm.first-message"),
+964:                check(QStringLiteral("definition.rearm.one-time"),
+979:                check(QStringLiteral("definition.rearm.restored"),
+993:                check(QStringLiteral("definition.rearm.message-after-restore"),
+1006:                check(QStringLiteral("definition.rearm.changed-reason"),
+1011:                check(QStringLiteral("definition.rearm.changed-reason-one-time"),
+1036:            check(QStringLiteral("definition.two-pane.views"),
+1086:                check(QStringLiteral("definition.two-pane.seams"),
+1124:                QWidget *twoPaneTarget = deliveryTarget(viewB, twoPanePoint);
+1125:                check(QStringLiteral("definition.two-pane.inner-widget"),
+1132:                    pointInTarget(twoPaneTarget, viewB, twoPanePoint);
+1139:                check(QStringLiteral("definition.two-pane.clicked-channel"),
+1143:                check(QStringLiteral("definition.two-pane.other-channel"),
+1147:                check(QStringLiteral("definition.two-pane.action-triggered"),
+1149:                check(QStringLiteral("definition.two-pane.clicked-caret"),
+1157:                check(QStringLiteral("definition.two-pane.clicked-file"),
+1160:                check(QStringLiteral("definition.two-pane.other-caret-untouched"),
+1165:                check(QStringLiteral("definition.two-pane.clicked-cursor-count"),
+1169:                check(QStringLiteral("definition.two-pane.keyboard-focus"),

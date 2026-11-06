@@ -1,0 +1,26 @@
+== root (product) build wiring of the jump lane ==
+configure: cmake -S . -B target/qt6-build -G Ninja -DCMAKE_BUILD_TYPE=RelWithDebInfo
+           -DCMAKE_CXX_FLAGS="-Wall -Wextra" -DVEDIT_RUST_FFI_LIB=<libvd_ffi.a> -DVEDIT_RUST_FFI_INCLUDE=<crates/vd-ffi/include>
+[configure-exit=0]
+
+--- configure lines that prove the lane is part of the product build ---
+-- VEdit edit-core: folding + breadcrumb lanes wired into the live editor (T94)
+-- VEdit: workspace lane 'jump' included
+-- VEdit: workspace lane 'jump' wired (vedit_workspace_jump)
+-- VEdit: workspace integration enabled (src/workspace/integration.cpp)
+
+--- how src/workspace/integration.cpp was compiled (lane macro + installJump) ---
+
+== ctest: jump + breadcrumb tests in the ROOT build ==
+[ctest-exit=0]
+Test project /vedit-build/target/qt6-build
+    Start 19: vedit-breadcrumb-tests
+1/3 Test #19: vedit-breadcrumb-tests ...........   Passed    0.04 sec
+    Start 20: vedit-breadcrumb-click-tests
+2/3 Test #20: vedit-breadcrumb-click-tests .....   Passed    0.05 sec
+    Start 21: vedit-jump-tests
+3/3 Test #21: vedit-jump-tests .................   Passed    0.00 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   0.10 sec

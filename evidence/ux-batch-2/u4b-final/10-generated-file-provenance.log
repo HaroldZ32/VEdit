@@ -1,0 +1,5 @@
+=== generated CTestTestfile.cmake: provenance = cmake configure only ===
+- sha256 before a fresh configure: 4ae24e529f0b84a72e937db0ca5b592df2df630cf386a4e093843f6f9986aff0
+fresh_configure_rc=0
+- sha256 after that fresh configure:  4ae24e529f0b84a72e937db0ca5b592df2df630cf386a4e093843f6f9986aff0
+- the file was never hand-edited by this task: the negative controls ran from copies under target/u4b-probe/.

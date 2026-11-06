@@ -1,0 +1,31 @@
+# B1 evidence environment (sampled 2026-11-05T04:12:13+08:00)
+
+## host
+Linux haroldzhao-aipc 7.0.0-38-generic #38-Ubuntu SMP PREEMPT_DYNAMIC Fri Sep  4 09:10:14 UTC 2026 x86_64 GNU/Linux
+git HEAD: 4e2d0a57ca50db9568db5a5b040cc66f04c9a05f  branch: main
+
+## pinned build image
+id=sha256:eee7476b1527c2404485a7ecee8a5b7027bb4a171c15d6a2f88d02760952647e created=2026-11-02T04:49:12Z
+
+## toolchain inside the image (from the build log)
+[qt6] container facts
+PRETTY_NAME="Ubuntu 26.04.1 LTS"
+NAME="Ubuntu"
+VERSION_ID="26.04"
+glibc: ldd (Ubuntu GLIBC 2.43-2ubuntu2.4) 2.43
+qt6-base-dev: 6.10.2+dfsg-7
+kf6-texteditor: 6.24.0-0ubuntu1
+kf6-syntaxhighlighting: 6.24.0-0ubuntu1
+tree-sitter (pkg-config): 0.25.9
+cmake: cmake version 4.2.3
+
+## slang
+slang version 12.1.0+0
+sha256: 63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252
+
+## product binary (final build)
+-rwxr-xr-x 1 haroldzhao haroldzhao 120650880 Nov  5 04:10 target/qt6-build/src/app/vedit-app
+
+## screenshot (the summary/elapsed line in it varies run to run, so the hash is informational)
+bbb6cb8108d93548c841b158d788b8d1d11588e17aec17cbc2954acac6ab851b  evidence/ux-batch-2/b1/screenshots/b1-panels.png
+evidence/ux-batch-2/b1/screenshots/b1-panels.png: PNG image data, 1400 x 900, 8-bit/color RGB, non-interlaced

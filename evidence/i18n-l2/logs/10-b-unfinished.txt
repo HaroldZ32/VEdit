@@ -1,0 +1,82 @@
+1|VEdit|Files
+2|VEdit|Search
+3|VEdit|Terminal
+4|VEdit|Outline
+5|VEdit|Open File
+6|VEdit|Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;All Files (*)
+7|VEdit|VEdit application shell (app-shell lane).
+
+Editor provider: %1
+Theme: %2
+Panes: %3
+State: %4
+Diagnostics: %5
+8|VEdit|VEdit — %1[*]
+9|VEdit|Close File
+10|VEdit|Diagnostics
+11|VEdit|Errors: %1 · Warnings: %2 · Information: %3
+12|VEdit|<span style='color:%1'><b>Errors: %2</b></span>&nbsp;&nbsp;<span style='color:%3'><b>Warnings: %4</b></span>&nbsp;&nbsp;<span style='color:%5'>Information: %6</span>
+13|VEdit|Open...
+14|VEdit|New File
+15|VEdit|New Folder
+16|VEdit|Delete
+17|VEdit|Refresh
+18|VEdit|Collapse
+19|VEdit|Import Filelist…
+20|VEdit|Filelists (0)
+21|VEdit|Imported .f filelists; double-click to open one
+22|VEdit|Remove Selected Filelist
+23|VEdit|Files (0)
+24|VEdit|Double-click a file to open it (AC-7.4)
+25|VEdit|Include dirs (-I) (0)
+26|VEdit|Defines (-D) (0)
+27|VEdit|Variables (0)
+28|VEdit|Project variable table; wins over the environment
+29|VEdit|Edit Variables…
+30|VEdit|No project model is attached
+31|VEdit|%1 is not an imported filelist
+32|VEdit|Open a folder before editing variables
+33|VEdit|Open a folder before importing a filelist
+34|VEdit|Import Filelist
+35|VEdit|Verilog filelists (*.f *.F *.flist);;All files (*)
+36|VEdit|Filelists (%1)
+37|VEdit|Files (%1)
+38|VEdit|Include dirs (-I) (%1)
+39|VEdit|Defines (-D) (%1)
+40|VEdit|Variables (%1)
+41|VEdit|%1
+
+Open a directory that is a Git or Subversion working tree to see its branch, changed files and diffs.
+42|VEdit|Restart
+43|VEdit|Close the current shell and open a new session
+44|VEdit|Clear
+45|VEdit|Clear the scrollback of this panel
+46|VEdit|Close
+47|VEdit|Close the terminal panel
+48|VEdit|Shell %1. Press Enter or Restart to start a new session.
+49|VEdit|Shell
+50|VEdit|Shell: %1
+51|VEdit|Not started
+52|VEdit|Running · pid %1
+53|VEdit|Killed · signal %1 (%2)
+54|VEdit|Exited · code %1
+55|VEdit|Stopped · %1
+56|VEdit|%1: %2 (line %3)
+57|VEdit|Selected LSP backend and CLI lint engine
+58|VEdit|Rename
+59|VEdit|New name:
+60|VEdit|Cancel
+61|VEdit|Re-run
+62|VEdit|Module Tree
+63|VEdit|Re-elaborate the whole project
+64|VEdit|Jump to source
+65|VEdit|Put the cursor on a signal in the editor, then jump to the construct that drives it
+66|VEdit|Jump to target
+67|VEdit|Put the cursor on a signal in the editor, then jump to the construct that reads it
+68|VEdit|Filter instance / net / file…
+69|VEdit|Instance / Net
+70|VEdit|Kind
+71|VEdit|Location
+72|VEdit|Filelist variables
+73|VEdit|value for %1
+74|VEdit|Preferences

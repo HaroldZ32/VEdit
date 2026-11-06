@@ -1,0 +1,10 @@
+# 7c product screenshots (Xvfb :85, screen 1500x1000x24, QT_QPA_PLATFORM=xcb)
+collected_at: 2026-11-04T06:25:09+00:00
+product_sha256=
+xvfb=11 Xvfb :85 -screen 0 1500x1000x24
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+SCREENSHOT OK /vedit-build/evidence/xcb-visual-2/shots/product/10-horizontal-split.png
+SCREENSHOT OK /vedit-build/evidence/xcb-visual-2/shots/product/11-vertical-split.png
+SCREENSHOT OK /vedit-build/evidence/xcb-visual-2/shots/product/12-panels-and-docks.png
+SCREENSHOT OK /vedit-build/evidence/xcb-visual-2/shots/product/13-empty-state-no-project.png
+APP-SHELL-SCREENSHOTS ok=1 dir=/vedit-build/evidence/xcb-visual-2/shots/product

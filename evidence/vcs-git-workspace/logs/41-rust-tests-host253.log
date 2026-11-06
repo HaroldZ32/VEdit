@@ -1,0 +1,61 @@
+# batch 5b Rust integration tests on the HOST git (2.53.0)
+collected_at: 2026-11-04T11:15:13+08:00
+host_git=git version 2.53.0
+
+   Compiling libc v0.2.191
+   Compiling rustix v1.1.6
+   Compiling getrandom v0.4.3
+   Compiling linux-raw-sys v0.12.1
+   Compiling cfg-if v1.0.5
+   Compiling bitflags v2.13.2
+   Compiling once_cell v1.21.4
+   Compiling fastrand v2.5.0
+   Compiling tempfile v3.27.0
+   Compiling vd-vcs v0.1.1 (/home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-vcs)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 1.78s
+     Running unittests src/lib.rs (target/debug/deps/vd_vcs-ae0fc2879704b1ca)
+
+running 21 tests
+test history::tests::a_log_failure_is_an_error_and_an_empty_repository_is_not ... ok
+test history::tests::a_page_requests_one_extra_row_to_detect_more ... ok
+test history::tests::parses_a_commit_header_with_body ... ok
+test history::tests::parses_a_log_page ... ok
+test history::tests::parses_blame_porcelain ... ok
+test history::tests::parses_numstat_with_binary ... ok
+test history::tests::refuses_an_escaping_path ... ok
+test history::tests::refuses_an_option_shaped_hash ... ok
+test service::tests::svn_info_xml_without_values_is_the_empty_state_not_a_panic ... ok
+test service::tests::svn_info_xml_yields_revision_and_url ... ok
+test tests::git_detached_head_has_no_branch ... ok
+test tests::git_porcelain_maps_statuses_and_branch ... ok
+test tests::markers_select_the_backend ... ok
+test tests::nested_directory_finds_the_repository_above_it ... ok
+test tests::plain_directory_is_the_empty_state_not_an_error ... ok
+test tests::svn_status_maps_codes ... ok
+test workspace::tests::a_bare_worktree_row_has_no_commit_id ... ok
+test workspace::tests::malformed_stash_rows_are_skipped ... ok
+test workspace::tests::stash_rows_are_split_on_tabs ... ok
+test workspace::tests::stash_rows_keep_a_tab_in_the_subject ... ok
+test workspace::tests::worktree_rows_survive_spaces_in_the_path ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/workspace.rs (target/debug/deps/workspace-41e190bc4415937c)
+
+running 13 tests
+test stash_drop_and_pop_target_the_named_stash_only ... ok
+test stash_operations_on_an_empty_stack_report_the_real_git_reason ... ok
+test stash_parameters_are_validated_before_any_process ... ok
+test stash_save_argv_is_positional_because_the_baseline_has_no_dash_m ... ok
+test stash_save_pop_apply_and_drop_round_trip ... ok
+test stashes_on_a_plain_directory_are_empty_with_a_note_not_an_error ... ok
+test submodule_init_and_update_check_out_the_pinned_commit ... ok
+test submodule_on_a_repository_without_submodules_is_a_normal_result ... ok
+test the_workspace_operations_are_git_only_and_parameter_checked ... ok
+test workspace_entries_are_plain_data_capped_by_the_reader ... ok
+test worktree_add_list_remove_round_trip ... ok
+test worktree_list_reports_the_main_worktree_even_without_worktree_support ... ok
+test worktree_parameters_are_validated_before_any_process ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.48s
+

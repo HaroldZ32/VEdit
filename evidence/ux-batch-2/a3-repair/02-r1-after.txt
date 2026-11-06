@@ -1,0 +1,29 @@
+R1 (Blocker 1) — AFTER: packaged AppRun ksh_guard is locale-independent
+captured: 2026-11-05T03:01:42+08:00
+AppDir: target/a3-appdir-repair/AppDir (assembled from the repaired source)
+AppRun sha256: 925ab1500e1504412a2cfa8a492d8140453f803dc3081702fa4412edb62406c3
+source AppRun sha256: 925ab1500e1504412a2cfa8a492d8140453f803dc3081702fa4412edb62406c3
+whitelist file: Markdown,SystemVerilog,Tcl,VHDL,Verilog
+
+== sort collation of the whitelist names under each locale (the underlying hazard; unchanged) ==
+LC_ALL=C            -> Markdown,SystemVerilog,Tcl,VHDL,Verilog
+LC_ALL=zh_CN.UTF-8  -> Markdown,SystemVerilog,Tcl,Verilog,VHDL
+LC_ALL=en_US.UTF-8  -> Markdown,SystemVerilog,Tcl,Verilog,VHDL
+
+== AppRun guard path: env -i ... LC_ALL=<loc> VEDIT_DEBUG=1 AppRun --hold 10 ==
+--- LC_ALL=C ---
+  KSH-ENV defs=5 hash=7a004024007d64ae2f042f288bba900a60601d453b599c6ada6feac3be34d294 hash_files=7aba38cae1195ec348e51ccdbd85cfa3043b25c888a4bac639c977c216a10edc
+  KSH-GUARD PASS whitelist=Markdown,SystemVerilog,Tcl,VHDL,Verilog
+  exit=0
+--- LC_ALL=zh_CN.UTF-8 ---
+  KSH-ENV defs=5 hash=7a004024007d64ae2f042f288bba900a60601d453b599c6ada6feac3be34d294 hash_files=7aba38cae1195ec348e51ccdbd85cfa3043b25c888a4bac639c977c216a10edc
+  KSH-GUARD PASS whitelist=Markdown,SystemVerilog,Tcl,VHDL,Verilog
+  exit=0
+--- LC_ALL=en_US.UTF-8 ---
+  KSH-ENV defs=5 hash=7a004024007d64ae2f042f288bba900a60601d453b599c6ada6feac3be34d294 hash_files=7aba38cae1195ec348e51ccdbd85cfa3043b25c888a4bac639c977c216a10edc
+  KSH-GUARD PASS whitelist=Markdown,SystemVerilog,Tcl,VHDL,Verilog
+  exit=0
+
+== selfcheck.sh locale cases (from the packaging self-check) ==
+  CHECK PASS  ksh_guard under LC_ALL=C (C locale)
+  CHECK PASS  ksh_guard under LC_ALL=zh_CN.UTF-8 (non-C locale; A3 blocker 1)

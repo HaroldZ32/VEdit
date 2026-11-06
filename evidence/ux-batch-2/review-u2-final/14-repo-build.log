@@ -1,0 +1,31 @@
+== A. translations/ in git
+?? translations/
+tracked files under translations/ in HEAD:
+0
+check-ignore:
+not ignored
+
+== B. location path form in the finished catalogue
+absolute locations: 0
+relative ../src/ locations: 1351
+other forms: 0
+
+== C. shipped .qm build (build tree) vs source .ts
+-rw-r--r-- 1 haroldzhao haroldzhao 125624 Nov  6 10:03 target/qt6-build/src/app/translations/vedit_zh_CN.qm
+-rw-r--r-- 1 haroldzhao haroldzhao 302283 Nov  6 09:55 translations/vedit_zh_CN.ts
+build-tree .qm messages=1186 unfinished=0
+        <source>Instantiations</source>
+        <translation>例化次数</translation>
+        <source>Replace All</source>
+        <translation>全部替换</translation>
+
+== D. lrelease gate surface (plan 5.1 step 3 names an lrelease gate)
+no lrelease gate id in package.json / build/gates
+
+== E. build wiring for the .ts -> .qm
+87:set(VEDIT_TRANSLATIONS_SOURCE_DIR
+89:if(TARGET Qt6::lrelease AND EXISTS "${VEDIT_TRANSLATIONS_SOURCE_DIR}/vedit_zh_CN.ts")
+90:  qt_add_lrelease(
+91:    TS_FILES "${VEDIT_TRANSLATIONS_SOURCE_DIR}/vedit_zh_CN.ts"
+102:  set(VEDIT_QT_BASE_QM "${VEDIT_TRANSLATIONS_SOURCE_DIR}/qtbase_zh_CN.qm")
+127:    "${VEDIT_TRANSLATIONS_SOURCE_DIR}/vedit_zh_CN.ts missing); UI stays English")

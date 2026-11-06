@@ -1,0 +1,45 @@
+# A-3 standalone search lane build (NO Rust FFI, NO shell) — 2026-11-02T11:50:14+00:00
+command: cmake -S src/workspace/search -B target/t20-search-standalone -G Ninja
+-- The CXX compiler identification is GNU 15.2.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Performing Test HAVE_STDATOMIC
+-- Performing Test HAVE_STDATOMIC - Success
+-- Found WrapAtomic: TRUE
+-- Found OpenGL: /usr/lib/x86_64-linux-gnu/libOpenGL.so
+-- Found WrapOpenGL: TRUE
+-- Found WrapVulkanHeaders: /usr/include
+-- Configuring done (0.8s)
+-- Generating done (0.0s)
+-- Build files have been written to: /vedit-build/target/t20-search-standalone
+CONFIGURE_EXIT=0
+[1/23] Automatic MOC for target vedit_workspace_jump
+[2/23] Automatic MOC for target vedit_search_slowio
+[3/23] Building CXX object jump-lane/CMakeFiles/vedit_workspace_jump.dir/vedit_workspace_jump_autogen/mocs_compilation.cpp.o
+[4/23] Building CXX object CMakeFiles/vedit_search_slowio.dir/vedit_search_slowio_autogen/mocs_compilation.cpp.o
+[5/23] Building CXX object CMakeFiles/vedit_search_slowio.dir/tools/slowio/slowio.cpp.o
+[6/23] Linking CXX shared library libvedit_search_slowio.so
+[7/23] Building CXX object jump-lane/CMakeFiles/vedit_workspace_jump.dir/jump_registry.cpp.o
+[8/23] Building CXX object jump-lane/CMakeFiles/vedit_workspace_jump.dir/jump_integration.cpp.o
+[9/23] Linking CXX static library jump-lane/libvedit_workspace_jump.a
+[10/23] Automatic MOC for target vedit-jump-tests
+[11/23] Building CXX object jump-lane/CMakeFiles/vedit-jump-tests.dir/vedit-jump-tests_autogen/mocs_compilation.cpp.o
+[12/23] Automatic MOC for target vedit_workspace_search
+[13/23] Building CXX object jump-lane/CMakeFiles/vedit-jump-tests.dir/tests/jump_tests.cpp.o
+[14/23] Linking CXX executable jump-lane/vedit-jump-tests
+[15/23] Building CXX object CMakeFiles/vedit_workspace_search.dir/search_types.cpp.o
+[16/23] Building CXX object CMakeFiles/vedit_workspace_search.dir/vedit_workspace_search_autogen/mocs_compilation.cpp.o
+[17/23] Building CXX object CMakeFiles/vedit_workspace_search.dir/global_search.cpp.o
+[18/23] Building CXX object CMakeFiles/vedit_workspace_search.dir/search_panel.cpp.o
+[19/23] Linking CXX static library libvedit_workspace_search.a
+[20/23] Automatic MOC for target vedit-workspace-search-selftest
+[21/23] Building CXX object CMakeFiles/vedit-workspace-search-selftest.dir/vedit-workspace-search-selftest_autogen/mocs_compilation.cpp.o
+[22/23] Building CXX object CMakeFiles/vedit-workspace-search-selftest.dir/search_selftest.cpp.o
+[23/23] Linking CXX executable vedit-workspace-search-selftest
+BUILD_EXIT=0

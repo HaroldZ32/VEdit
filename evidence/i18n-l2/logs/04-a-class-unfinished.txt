@@ -1,0 +1,103 @@
+  1|QObject|empty: use the resolved toolchain
+  2|QObject|Choose %1
+  3|QObject|Select %1
+  4|vedit::editor::FindReplaceBar|Find
+  5|vedit::editor::FindReplaceBar|Case sensitive
+  6|vedit::editor::FindReplaceBar|Whole words
+  7|vedit::editor::FindReplaceBar|Regular expression
+  8|vedit::editor::FindReplaceBar|Search and replace only inside the selection
+  9|vedit::editor::FindReplaceBar|Prev
+ 10|vedit::editor::FindReplaceBar|Previous match (Shift+F3)
+ 11|vedit::editor::FindReplaceBar|Next
+ 12|vedit::editor::FindReplaceBar|Next match (F3)
+ 13|vedit::editor::FindReplaceBar|Close (Esc)
+ 14|vedit::editor::FindReplaceBar|Replace with
+ 15|vedit::editor::FindReplaceBar|Replace
+ 16|vedit::editor::FindReplaceBar|Replace the current match
+ 17|vedit::editor::FindReplaceBar|Replace All
+ 18|vedit::editor::FindReplaceBar|Replace every match in one undo step
+ 19|vedit::editor::FindReplaceBar|Select text to scope the search
+ 20|vedit::editor::FindReplaceBar|Replaced 1 match
+ 21|vedit::editor::FindReplaceBar|Replaced %1 of %2 matches
+ 22|vedit::editor::FindReplaceBar|Type to search
+ 23|vedit::editor::FindReplaceBar|No matches
+ 24|vedit::editor::FindReplaceBar|%1 / %2
+ 25|vedit::editor::FindReplaceBar|%1 matches
+ 26|vedit::editor::FindReplaceBar| in selection
+ 27|vedit::workspace::FileTreeWidget|Open Folder
+ 28|vedit::workspace::FileTreeWidget|File name:
+ 29|vedit::workspace::FileTreeWidget|Folder name:
+ 30|vedit::workspace::FileTreeWidget|Rename
+ 31|vedit::workspace::FileTreeWidget|New name:
+ 32|vedit::workspace::FileTreeWidget|Delete the folder '%1' and everything inside it?
+ 33|vedit::workspace::FileTreeWidget|Delete the file '%1'?
+ 34|vedit::workspace::FileTreeWidget|Delete
+ 35|vedit::workspace::FileTreeWidget|This folder is empty.
+ 36|vedit::workspace::FileTreeWidget|No folder open.
+Use "Open..." to browse a project.
+ 37|vedit::workspace::FileTreeWidget|The folder does not exist: '%1'
+ 38|vedit::workspace::FileTreeWidget|Cannot read folder '%1': permission denied.
+ 39|vedit::workspace::search::SearchPanel|No project root. Open a project to search its files.
+ 40|vedit::workspace::search::SearchPanel|Search text in the project…
+ 41|vedit::workspace::search::SearchPanel|Match case
+ 42|vedit::workspace::search::SearchPanel|Only .v/.vh/.sv/.svh files (explicit extension table)
+ 43|vedit::workspace::search::SearchPanel|Search
+ 44|vedit::workspace::search::SearchPanel|Cancel
+ 45|vedit::workspace::search::SearchPanel|File
+ 46|vedit::workspace::search::SearchPanel|Line
+ 47|vedit::workspace::search::SearchPanel|Match
+ 48|vedit::workspace::search::SearchPanel|Enter a query and press Search.
+ 49|vedit::workspace::search::SearchPanel|Searching…
+ 50|vedit::workspace::search::SearchPanel|The previous search did not stop in time; try again.
+ 51|vedit::workspace::search::SearchPanel|Cancelling…
+ 52|vedit::workspace::search::SearchPanel|Search failed: %1
+ 53|vedit::workspace::search::SearchPanel|Search cancelled before any hit.
+ 54|vedit::workspace::search::SearchPanel|No results within the %1 ms time budget.
+ 55|vedit::workspace::search::SearchPanel|No results. Nothing matched "%1" in %2.
+ 56|vedit::workspace::search::SearchPanel|No project root.
+ 57|vedit::workspace::search::SearchPanel|In %1
+ 58|vedit::workspace::search::SearchPanel|Search failed.
+ 59|vedit::workspace::search::SearchPanel|%1 hits in %2 of %3 files — %4 ms
+ 60|vedit::workspace::search::SearchPanel|Cancelled: 
+ 61|vedit::workspace::search::SearchPanel|result limit %1 reached
+ 62|vedit::workspace::search::SearchPanel|time budget %1 ms reached
+ 63|vedit::workspace::search::SearchPanel|%1 too large skipped
+ 64|vedit::workspace::search::SearchPanel|%1 binary skipped
+ 65|vedit::workspace::search::SearchPanel|%1 unreadable skipped
+ 66|vedit::workspace::settings::SettingsPanel|FIM
+ 67|vedit::workspace::settings::SettingsPanel|Fill-in completions. The API key is never stored in settings.toml.
+ 68|vedit::workspace::settings::SettingsPanel|Type the API key first; the field is write-only.
+ 69|vedit::workspace::settings::SettingsPanel|API key stored owner-only (0600) in %1
+ 70|vedit::workspace::settings::SettingsPanel|Command
+ 71|vedit::workspace::settings::SettingsPanel|Shortcut
+ 72|vedit::workspace::settings::SettingsPanel|State
+ 73|vedit::workspace::settings::SettingsPanel|Clear
+ 74|vedit::workspace::settings::SettingsPanel|verible-verilog-ls:
+ 75|vedit::workspace::settings::SettingsPanel|slang:
+ 76|vedit::workspace::settings::SettingsPanel|slang-server:
+ 77|vedit::workspace::settings::SettingsPanel|verible-verilog-format:
+ 78|vedit::workspace::settings::SettingsPanel|Enable FIM completion
+ 79|vedit::workspace::settings::SettingsPanel|Show the suggestion as ghost text in the editor
+ 80|vedit::workspace::settings::SettingsPanel|Protocol:
+ 81|vedit::workspace::settings::SettingsPanel|Endpoint:
+ 82|vedit::workspace::settings::SettingsPanel|model name (required for the OpenAI protocol)
+ 83|vedit::workspace::settings::SettingsPanel|Model:
+ 84|vedit::workspace::settings::SettingsPanel|Timeout:
+ 85|vedit::workspace::settings::SettingsPanel|Max tokens:
+ 86|vedit::workspace::settings::SettingsPanel|API key
+ 87|vedit::workspace::settings::SettingsPanel|write-only — the stored key is never shown
+ 88|vedit::workspace::settings::SettingsPanel|Save key
+ 89|vedit::workspace::settings::SettingsPanel|Remove key file
+ 90|vedit::workspace::settings::SettingsPanel|The key is never written to settings.toml and never logged. VEDIT_FIM_API_KEY takes priority; otherwise it is read from the owner-only (0600) file `fim_api_key` beside settings.toml.
+ 91|vedit::workspace::settings::SettingsPanel|FIM is off by default: with no endpoint configured VEdit never touches the network.
+ 92|vedit::workspace::settings::SettingsPanel|settings.toml held a plaintext `fim.api_key`; it is ignored and will be removed on the next save — use %1 or the owner-only key file instead.
+ 93|vedit::workspace::settings::SettingsPanel|Key source: environment variable %1 — it takes priority and is never written to disk.
+ 94|vedit::workspace::settings::SettingsPanel|Key source: owner-only key file (0600) %1
+ 95|vedit::workspace::settings::SettingsPanel|Key source: %1 is readable by other users, so it is IGNORED. Run `chmod 600` on it, or use %2.
+ 96|vedit::workspace::settings::SettingsPanel|Key source: none — set %1 or save a key here.
+ 97|vedit::workspace::settings::SettingsPanel|cannot create the settings directory %1; the API key was NOT stored
+ 98|vedit::workspace::settings::SettingsPanel|cannot write the API key file %1: %2; the API key was NOT stored
+ 99|vedit::workspace::settings::SettingsPanel|the API key is empty; nothing was stored
+100|vedit::workspace::settings::SettingsPanel|cannot remove the API key file %1
+101|vedit::workspace::settings::SettingsPanel|The owner-only key file was removed; %1 is still set and still wins.
+102|vedit::workspace::settings::SettingsPanel|The API key file was removed; FIM has no key.

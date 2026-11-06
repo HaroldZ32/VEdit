@@ -1,0 +1,47 @@
+context=VEdit existing=733 add=6 skip=32 stale=1 refinished=6
+  ~  · %1 filelist (was type="vanished"; restored)
+  ~  · %1 filelists (was type="vanished"; restored)
+  ~  · %1 variable (was type="vanished"; restored)
+  ~  · %1 variables (was type="vanished"; restored)
+  ~  · %1 line skipped (was type="vanished"; restored)
+  ~  · %1 lines skipped (was type="vanished"; restored)
+  +  · %1 filelist
+  +  · %1 filelists
+  +  · %1 variable
+  +  · %1 variables
+  +  · %1 line skipped
+  +  · %1 lines skipped
+  - Rename preview: %1 edit(s) from %2 (no call site left; .ts block stays vanished)
+  = pending (already present)
+  = saved file (already present)
+  = %1 — %2 diagnostic(s) (already present)
+  = Project (already present)
+  = Project: %1 — %2 %3 (already present)
+  = file (already present)
+  = files (already present)
+  =  · %1 unresolved (already present)
+  = Session could not be restored (%1) — starting clean (already present)
+  = Saved (already present)
+  = Saved %1 (already present)
+  = no project (already present)
+  = No diagnostics in this file (already present)
+  = Backend switch failed: %1 (already present)
+  = %1 (%2) — %3 action(s) (already present)
+  = no table (already present)
+  = unknown basis (already present)
+  = Hover needs a KTextEditor view (already present)
+  = Hover request refused by %1 (already present)
+  = Formatting failed: %1 (already present)
+  = Formatted with verible-verilog-format (already present)
+  = Already formatted (verible-verilog-format) (already present)
+  = No project file set — open a folder first (already present)
+  = Project lint did not start: %1 (already present)
+  = Linting project with %1… (already present)
+  = %1 needs a KTextEditor view (already present)
+  = No hover from %1 here (already present)
+  = No definition found (already present)
+  = %1 reference(s) from %2 (already present)
+  = Opened %1 (already present)
+  = Settings loaded from %1 with %2 warning(s); the built-in defaults were kept where the file is invalid. (already present)
+  = %1 configuration problem(s) — the built-in defaults were kept where needed: (already present)
+wrote translations/vedit_zh_CN.ts; messages now 943

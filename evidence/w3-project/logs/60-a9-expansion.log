@@ -1,0 +1,39 @@
+=== project table + environment (table wins) ===
+EXPANSION ok=1 root=/vedit-build/evidence/w3-project/a9-fixture files=7 skipped=2 missing=[MISSING_VAR]
+FILE rtl/a.sv
+FILE rtl/b.sv
+FILE rtl/c.sv
+FILE /tmp/a9home-evidence/a9-home/d.sv
+FILE rtl/e.sv
+FILE inc/defs.vh
+FILE rtl/mem.sv
+INCDIR /vedit-build/evidence/w3-project/a9-fixture/inc
+INCDIR /vedit-build/evidence/w3-project/a9-fixture/no_such_dir
+DEFINE WIDTH=8
+DEFINE PRECEDENCE=project
+MISSING MISSING_VAR
+DIAG filelist.missing: /vedit-build/evidence/w3-project/a9-fixture/project.f:3: include directory `no_such_dir` does not exist (resolved to `/vedit-build/evidence/w3-project/a9-fixture/no_such_dir`, or it is not a directory); the -I entry is kept so it works once the directory appears
+DIAG config.invalid_value: /vedit-build/evidence/w3-project/a9-fixture/project.f:8: unresolved variable `$MISSING_VAR` (set it in the project variables or the environment); the line is skipped
+DIAG filelist.cycle: /vedit-build/evidence/w3-project/a9-fixture/lists/cycle_b.f:1: nested -f cycle: /vedit-build/evidence/w3-project/a9-fixture/lists/cycle_a.f -> /vedit-build/evidence/w3-project/a9-fixture/lists/cycle_b.f -> /vedit-build/evidence/w3-project/a9-fixture/lists/cycle_a.f; skipped
+=== control: environment only ===
+EXPANSION ok=1 root=/vedit-build/evidence/w3-project/a9-fixture files=7 skipped=6 missing=[MISSING_VAR,RTL,WIDTH_VALUE]
+FILE /tmp/a9home-evidence/a9-home/d.sv
+FILE rtl/e.sv
+FILE inc/defs.vh
+FILE rtl/a.sv
+FILE rtl/b.sv
+FILE rtl/c.sv
+FILE rtl/mem.sv
+INCDIR /vedit-build/evidence/w3-project/a9-fixture/inc
+INCDIR /vedit-build/evidence/w3-project/a9-fixture/no_such_dir
+DEFINE PRECEDENCE=environment
+MISSING MISSING_VAR
+MISSING RTL
+MISSING WIDTH_VALUE
+DIAG filelist.missing: /vedit-build/evidence/w3-project/a9-fixture/project.f:3: include directory `no_such_dir` does not exist (resolved to `/vedit-build/evidence/w3-project/a9-fixture/no_such_dir`, or it is not a directory); the -I entry is kept so it works once the directory appears
+DIAG config.invalid_value: /vedit-build/evidence/w3-project/a9-fixture/project.f:4: unresolved variable `$RTL` (set it in the project variables or the environment); the line is skipped
+DIAG config.invalid_value: /vedit-build/evidence/w3-project/a9-fixture/project.f:5: unresolved variable `$RTL` (set it in the project variables or the environment); the line is skipped
+DIAG config.invalid_value: /vedit-build/evidence/w3-project/a9-fixture/project.f:6: unresolved variable `$RTL` (set it in the project variables or the environment); the line is skipped
+DIAG config.invalid_value: /vedit-build/evidence/w3-project/a9-fixture/project.f:8: unresolved variable `$MISSING_VAR` (set it in the project variables or the environment); the line is skipped
+DIAG filelist.cycle: /vedit-build/evidence/w3-project/a9-fixture/lists/cycle_b.f:1: nested -f cycle: /vedit-build/evidence/w3-project/a9-fixture/lists/cycle_a.f -> /vedit-build/evidence/w3-project/a9-fixture/lists/cycle_b.f -> /vedit-build/evidence/w3-project/a9-fixture/lists/cycle_a.f; skipped
+DIAG config.invalid_value: /vedit-build/evidence/w3-project/a9-fixture/project.f:11: unresolved variable `$WIDTH_VALUE` (set it in the project variables or the environment); the line is skipped

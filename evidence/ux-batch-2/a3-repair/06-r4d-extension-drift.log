@@ -1,0 +1,18 @@
+=== R4(d): extension-table drift guard — before/after ===
+captured: 2026-11-05T02:59:15+08:00
+repair adds CHECK drift.extension.<suffix> for all 15 contract suffixes, comparing
+  highlight_mode.cpp kExtensionTable  vs  KsyntaxData::languageNameForExtension
+negative control: temporarily remove 'mdown' from the ksyntax_data branch (simulated drift)
+
+mutated hash: 882f0a01227fa354cb5fce756204d3148ad97dc323b27c8f922d786e3342f6f6
+mutated rebuild: OK
+CHECK drift.extension.mdown FAIL  highlight_mode='Markdown' ksyntax_data=''
+CHECK drift.unknown-extension PASS
+HIGHLIGHT-MODE-SELFTEST mode=resources-temp checks=81 failures=1
+(the pipeline exit code captured there was grep's, not the test's - not evidence; the
+authoritative result is the line above: checks=81 failures=1)
+restored hash: b077c6c43ddc89cca2e316f5cf474d696c403cf69128f2d54c18c17798dadaef
+restored rebuild: OK
+CHECK drift.extension.mdown PASS  highlight_mode='Markdown' ksyntax_data='Markdown'
+CHECK drift.unknown-extension PASS
+HIGHLIGHT-MODE-SELFTEST mode=resources-temp checks=81 failures=0

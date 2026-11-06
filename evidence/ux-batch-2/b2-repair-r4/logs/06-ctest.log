@@ -1,0 +1,7 @@
+Test project /vedit-build/target/qt6-build
+    Start 33: vedit-search-replace-tests
+1/1 Test #33: vedit-search-replace-tests .......   Passed    5.77 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   5.78 sec

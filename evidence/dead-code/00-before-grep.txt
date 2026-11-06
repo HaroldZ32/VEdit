@@ -1,0 +1,14 @@
+# 00-before-grep — vedit_syntax_folding references BEFORE deletion
+# cmd: grep -rn vedit_syntax_folding --include=*.txt --include=*.cpp --include=*.h --include=*.sh --include=*.md src/ tests/ scripts/ build/ CMakeLists.txt
+# cwd: /home/haroldzhao/MyProj/DshProj/VEdit   captured: 2026-11-04T13:42:36+08:00
+src/editor/CMakeLists.txt:65:# `vedit_syntax_folding`): KDE 6 computes folding from its own
+src/editor/CMakeLists.txt:120:  # T29: `vedit_syntax_folding` is gone; only the breadcrumb lane remains.
+src/editor/CMakeLists.txt:175:# called a `vedit_syntax_folding` symbol), so T29 moved the source into the editor
+src/syntax/folding/CMakeLists.txt:19:  project(vedit_syntax_folding LANGUAGES C CXX)
+src/syntax/folding/CMakeLists.txt:43:add_library(vedit_syntax_folding STATIC
+src/syntax/folding/CMakeLists.txt:49:target_include_directories(vedit_syntax_folding PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
+src/syntax/folding/CMakeLists.txt:50:target_link_libraries(vedit_syntax_folding PUBLIC
+src/syntax/folding/CMakeLists.txt:59:  target_compile_options(vedit_syntax_folding PRIVATE -Wall -Wextra -Wpedantic -Werror)
+src/syntax/folding/CMakeLists.txt:63:target_link_libraries(vedit-syntax-directory-tests PRIVATE vedit_syntax_folding Qt6::Core)
+src/syntax/folding/CMakeLists.txt:74:target_link_libraries(vedit-fold-native-gui-probe PRIVATE vedit_syntax_folding Qt6::Gui)
+src/syntax/folding/CMakeLists.txt:100:target_link_libraries(vedit-fold-native-probe PRIVATE vedit_syntax_folding Qt6::Gui)

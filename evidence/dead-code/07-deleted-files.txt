@@ -1,0 +1,28 @@
+# 07-deleted-files — every file removed with src/syntax/folding/ (13 total)
+# captured: 2026-11-04T13:45:23+08:00
+ D src/syntax/folding/CMakeLists.txt
+ D src/syntax/folding/README.md
+ D src/syntax/folding/fold_range.cpp
+# (the directory was untracked; the list below is the pre-deletion find from 01-before-tree.txt)
+src/syntax/folding/CMakeLists.txt
+src/syntax/folding/fold_range.cpp
+src/syntax/folding/fold_range.h
+src/syntax/folding/fold_source.cpp
+src/syntax/folding/fold_source.h
+src/syntax/folding/ksyntax_fold_source.cpp
+src/syntax/folding/ksyntax_fold_source.h
+src/syntax/folding/README.md
+src/syntax/folding/syntax_fold_source.cpp
+src/syntax/folding/syntax_fold_source.h
+src/syntax/folding/tests/fold_native_gui_probe.cpp
+src/syntax/folding/tests/fold_native_probe.cpp
+src/syntax/folding/tests/syntax_directory_tests.cpp
+
+# line counts:
+# (files are gone; sizes were captured in the pre-deletion listing below)
+# targets/executables removed from the build graph:
+#   vedit_syntax_folding          (STATIC library)
+#   vedit-syntax-directory-tests  (executable + ctest id vedit-syntax-directory-tests)
+#   vedit-fold-native-probe       (executable, no add_test)
+#   vedit-fold-native-gui-probe   (executable MOVED -> fold-gutter-click-probe; ctest id vedit-fold-gutter-click KEPT)
+#   vedit-fold-gutter-click       (ctest id: re-registered in src/editor/CMakeLists.txt, unchanged name)

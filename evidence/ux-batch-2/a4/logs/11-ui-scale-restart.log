@@ -1,0 +1,9 @@
+Test project /vedit-build/target/qt6-build
+    Start 41: vedit-workspace-settings-selftest
+1/2 Test #41: vedit-workspace-settings-selftest ...   Passed    1.31 sec
+    Start 42: vedit-ui-scale-restart
+2/2 Test #42: vedit-ui-scale-restart ..............   Passed    0.33 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   1.65 sec

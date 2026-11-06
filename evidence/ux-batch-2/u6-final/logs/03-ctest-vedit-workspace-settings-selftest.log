@@ -1,0 +1,7 @@
+Test project /vedit-build/target/qt6-build
+    Start 49: vedit-workspace-settings-selftest
+1/1 Test #49: vedit-workspace-settings-selftest ...   Passed    1.34 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   1.34 sec

@@ -1,0 +1,17 @@
+# AppDir provenance for U5
+assembled: 2026-11-06T10:16:06+08:00 from the working tree via packaging/runtime/assemble-appdir.sh --out target/u5-appdir
+appdir: target/u5-appdir
+vedit-markdown.xml
+vedit-systemverilog.xml
+vedit-tcl.xml
+vedit-verilog.xml
+vedit-vhdl.xml
+whitelist: Markdown,SystemVerilog,Tcl,VHDL,Verilog
+
+# negative control copy: target/u5-appdir-neg (cp -a of the above)
+removed: vedit-vhdl.xml
+whitelist rewritten to: Markdown,SystemVerilog,Tcl,Verilog
+
+# AppRun is NOT touched by this task (read-only from the script)
+2026-11-05 02:43:48.864927849 +0800 9788 packaging/runtime/AppRun
+925ab1500e1504412a2cfa8a492d8140453f803dc3081702fa4412edb62406c3  packaging/runtime/AppRun

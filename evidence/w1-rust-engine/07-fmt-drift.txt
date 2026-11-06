@@ -1,0 +1,9 @@
+# fmt gate on the whole workspace (pre-existing drift, attributed)
+command: CARGO_HOME=$PWD/target/cargo-home RUSTUP_TOOLCHAIN=stable cargo fmt --all -- --check
+Diff in /home/haroldzhao/MyProj/DshProj/VEdit/crates/vd-lsp/tests/buffer_change.rs
+
+# the files this task changed, checked directly:
+0
+(0 means every file this task changed is formatted)
+
+# git status of the drifting file (unmodified by this task):

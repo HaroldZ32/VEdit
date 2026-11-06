@@ -1,0 +1,40 @@
+# container: vedit-qt6-build:local (workspace mounted at /vedit-build)
+# cmd:
+#   cd /vedit-build && cmake -S src/workspace/filetree -B target/filetree-lane-build -G Ninja && cmake --build target/filetree-lane-build --parallel 8
+-- The CXX compiler identification is GNU 15.2.0
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++ - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD
+-- Performing Test CMAKE_HAVE_LIBC_PTHREAD - Success
+-- Found Threads: TRUE
+-- Performing Test HAVE_STDATOMIC
+-- Performing Test HAVE_STDATOMIC - Success
+-- Found WrapAtomic: TRUE
+-- Found OpenGL: /usr/lib/x86_64-linux-gnu/libOpenGL.so
+-- Found WrapOpenGL: TRUE
+-- Found WrapVulkanHeaders: /usr/include
+-- VEdit file tree: Qt 6.10.2 (standalone=ON)
+-- VEdit file tree: independent build (no vedit_app_shell) -> filetree_integration.cpp not compiled
+-- Configuring done (0.4s)
+-- Generating done (0.0s)
+-- Build files have been written to: /vedit-build/target/filetree-lane-build
+[1/16] Automatic MOC for target vedit_file_tree
+[2/16] Building CXX object CMakeFiles/vedit_file_tree.dir/file_kind.cpp.o
+[3/16] Building CXX object CMakeFiles/vedit_file_tree.dir/filetree_panel.cpp.o
+[4/16] Building CXX object CMakeFiles/vedit_file_tree.dir/file_ops.cpp.o
+[5/16] Building CXX object CMakeFiles/vedit_file_tree.dir/vedit_file_tree_autogen/mocs_compilation.cpp.o
+[6/16] Building CXX object CMakeFiles/vedit_file_tree.dir/file_tree_model.cpp.o
+[7/16] Building CXX object CMakeFiles/vedit_file_tree.dir/file_tree_widget.cpp.o
+[8/16] Linking CXX static library libvedit_file_tree.a
+[9/16] Automatic MOC for target vedit-filetree-tests
+[10/16] Automatic MOC for target vedit-filetree-demo
+[11/16] Building CXX object CMakeFiles/vedit-filetree-tests.dir/vedit-filetree-tests_autogen/mocs_compilation.cpp.o
+[12/16] Building CXX object CMakeFiles/vedit-filetree-demo.dir/vedit-filetree-demo_autogen/mocs_compilation.cpp.o
+[13/16] Building CXX object CMakeFiles/vedit-filetree-demo.dir/demo/filetree_demo.cpp.o
+[14/16] Linking CXX executable vedit-filetree-demo
+[15/16] Building CXX object CMakeFiles/vedit-filetree-tests.dir/tests/filetree_tests.cpp.o
+[16/16] Linking CXX executable vedit-filetree-tests
+EXIT=0

@@ -1,0 +1,90 @@
+CHECK vcs.write.service PASS
+CHECK vcs.write.start-returns-fast PASS start took 0 ms while the fake git sleeps 400 ms
+CHECK vcs.write.whitelisted-op-runs PASS polls=235 state=0
+CHECK vcs.write.event-loop-ticks PASS ticks=12
+CHECK vcs.write.result-delivered PASS fatal: not a git repository (or any of the parent directorie
+CHECK vcs.layout.splitter PASS
+CHECK vcs.layout.refs-column PASS Branches | feature/vcs-panel | Tags | no tags reported by this backend
+CHECK vcs.layout.changes-and-staged-columns PASS changes=2 staged=0
+CHECK vcs.layout.changes-list PASS changes=2 staged=0
+CHECK vcs.layout.action-bar PASS vcs-action-refresh,vcs-action-stage,vcs-action-unstage,vcs-action-discard,vcs-action-commit
+CHECK vcs.layout.action-bar-gated PASS actions are gated on a selection
+CHECK vcs.seam.write-op-codes PASS stage=1 unstage=2 discard=3 commit=4
+CHECK vcs.state.ready PASS Git feature/vcs-panel @ abc1234 · 2 changed file(s)
+CHECK vcs.state.empty PASS not a repository
+CHECK vcs.state.error PASS The VCS backend failed: git: fatal: not a repository
+CHECK vcs.state.loading PASS Loading…
+CHECK vcs.state.loading-clears PASS changes=2
+CHECK vcs.write.discard-confirm-declines PASS
+CHECK vcs.write.discard-confirm-zero-write PASS writes=0
+CHECK vcs.write.discard-requested PASS
+CHECK vcs.write.discard-op-and-path PASS writes=1 op=3
+CHECK vcs.write.discard-reported PASS Discarded the working-tree changes of rtl/top.sv
+CHECK vcs.write.stage-requested PASS
+CHECK vcs.write.stage-op PASS
+CHECK vcs.write.stage-moves-the-row PASS changes=1 staged=1
+CHECK vcs.write.unstage-requested PASS
+CHECK vcs.write.unstage-op PASS
+CHECK vcs.write.unstage-restores-the-row PASS changes=2 staged=0
+CHECK vcs.write.commit-requires-a-message PASS
+CHECK vcs.write.commit-empty-is-zero-write PASS writes=3
+CHECK vcs.write.commit-requested PASS
+CHECK vcs.write.commit-carries-message-author PASS
+CHECK vcs.write.amend-confirm-declines PASS
+CHECK vcs.write.amend-confirm-zero-write PASS writes=4
+CHECK vcs.write.amend-requested PASS
+CHECK vcs.write.amend-op-and-flag PASS writes=5
+CHECK vcs.write.failure-is-reported PASS
+CHECK vcs.write.failure-reason-visible PASS The VCS operation failed: fatal: pathspec 'rtl/top.sv' did not match any files
+CHECK vcs.write.e2e.git PASS /usr/bin/git
+CHECK vcs.write.e2e.fixture PASS /tmp/vedit-workspace-vcs-selftest-iXiWSu/write-repo
+CHECK vcs.write.e2e.not-worktree PASS fixture=/tmp/vedit-workspace-vcs-selftest-iXiWSu/write-repo cwd=/tmp/vedit-vcs-3b-X5Uwph
+CHECK vcs.write.e2e.status-first PASS files=1
+CHECK vcs.write.e2e.stage-requested PASS
+CHECK vcs.write.e2e.stage-ok PASS Staged rtl/a.sv
+CHECK vcs.write.e2e.staged-porcelain PASS M  rtl/a.sv
+CHECK vcs.write.e2e.staged-column PASS staged=1
+CHECK vcs.write.e2e.unstage-requested PASS
+CHECK vcs.write.e2e.unstage-ok PASS
+CHECK vcs.write.e2e.unstaged-porcelain PASS M rtl/a.sv
+CHECK vcs.write.e2e.discard-cancel PASS
+CHECK vcs.write.e2e.discard-cancel-zero-write PASS M rtl/a.sv
+CHECK vcs.write.e2e.discard-requested PASS
+CHECK vcs.write.e2e.discard-ok PASS Discarded the working-tree changes of rtl/a.sv
+CHECK vcs.write.e2e.discarded-porcelain PASS
+CHECK vcs.write.e2e.stage-new PASS
+CHECK vcs.write.e2e.stage-new-ok PASS Staged rtl/new.sv
+CHECK vcs.write.e2e.commit-requested PASS
+CHECK vcs.write.e2e.commit-ok PASS Commit written.
+CHECK vcs.write.e2e.commit-subject PASS fixture: add new.sv
+CHECK vcs.write.e2e.commit-author PASS VEdit Test <test@vedit.local>
+CHECK vcs.write.e2e.amend-requested PASS
+CHECK vcs.write.e2e.amend-ok PASS Commit written.
+CHECK vcs.write.e2e.amend-subject PASS fixture: add new.sv (amended)
+CHECK vcs.write.e2e.amend-rewrote-one-commit PASS 2 -> 2
+CHECK vcs.refresh.fixture PASS /tmp/vedit-workspace-vcs-selftest-rgZGbt/refresh-repo
+CHECK vcs.refresh.initial PASS backend=1 files=1
+CHECK vcs.refresh.diff-before PASS diff --git a/rtl/a.sv b/rtl/a.sv
+CHECK vcs.refresh.save-written PASS
+CHECK vcs.refresh.save-detected PASS refreshes 1 -> 2 (file-saved)
+CHECK vcs.refresh.save-state-after PASS diff --git a/rtl/a.sv b/rtl/a.sv
+CHECK vcs.refresh.new-file-written PASS
+CHECK vcs.refresh.new-file-detected PASS files=2 refreshes=3
+CHECK vcs.refresh.activation-detected PASS refreshes 3 -> 4
+CHECK vcs.refresh.activation-reason PASS activated
+CHECK vcs.refresh.write-requested PASS
+CHECK vcs.refresh.write-completed PASS ok
+CHECK vcs.refresh.write-detected PASS refreshes 4 -> 5
+CHECK vcs.refresh.write-reason PASS write
+CHECK vcs.refresh.coalesce-requests PASS requests=5
+CHECK vcs.refresh.coalesce-merged PASS merged=4
+CHECK vcs.refresh.coalesce-single PASS
+CHECK vcs.refresh.coalesce-no-storm PASS 5 triggers -> 1 refresh(es) in 1000 ms
+CHECK vcs.panel.close-reopen.no-crash PASS 3 show/refresh/close/destroy cycles
+CHECK vcs.panel.close-reopen.pending-job PASS destroyed with a status job pending
+CHECK vcs.i18n.zh-cn-catalogue PASS /vedit-build/target/qt6-build/src/app/workspace-lane-vcs/../translations/vedit_zh_CN.qm
+CHECK vcs.i18n.action-bar PASS 暂存 / 提交…
+CHECK vcs.i18n.confirmations PASS 丢弃改动？
+CHECK vcs.i18n.states PASS 加载中…
+cwd_still=/tmp/vedit-vcs-3b-X5Uwph
+selftest=PASS

@@ -1,0 +1,14 @@
+== AppRun --selfcheck with sh -x ==
+APPRUN_EXIT=0
+== trace lines naming VEDIT_TRANSLATIONS_DIR ==
+29:+ export VEDIT_TRANSLATIONS_DIR=/w/packaging/runtime/out/AppDir/bin/translations
+30:+ VEDIT_TRANSLATIONS_DIR=/w/packaging/runtime/out/AppDir/bin/translations
+== selfcheck tail ==
+CHECK root.open-folder-broadcast PASS events=2
+CHECK root.open-folder-cancel PASS events=2
+CHECK root.switch.persisted PASS
+CHECK root.switch.persisted-value PASS
+APP-SHELL-SELFTEST ok=1 checks=312 failures=0 state=/tmp/vedit-app-YpNHKk/state
+== negative: explicit VEDIT_TRANSLATIONS_DIR wins ==
+APPRUN2_EXIT=0
+explicit-export-count=0

@@ -1,0 +1,80 @@
+MERGE rows=2 both=1 lsp=0 cli=1
+CHECK merge.one-row-for-lsp-and-cli PASS
+CHECK merge.cli-only-marked PASS
+CHECK merge.cli-severity-converted PASS
+CHECK c8.start PASS
+CHECK c8.skipped-open-files PASS
+CHECK c8.pass-file-count PASS
+CHECK c8.backend-received-pass-set PASS
+CHECK c8.include-dirs-forwarded PASS
+CHECK c8.defines-forwarded PASS
+CHECK c8.new-open-does-not-shrink-pass PASS
+CHECK c8.finishes PASS
+CHECK c8.cli-diagnostics PASS
+CHECK c8.merged-display PASS
+CHECK cancel.start PASS
+CANCEL before phase=2 done=20/100 running=1
+CHECK cancel.running-before PASS
+CANCEL after phase=4 running=0 message=«已取消 — 20/100 文件» diagnostics=0
+CHECK cancel.phase PASS
+CHECK cancel.flag-cleared PASS
+CHECK cancel.message-counts PASS
+CHECK cancel.no-diagnostics-after PASS
+CHECK cancel.still-nothing-after-ticks PASS
+CHECK cancel.released PASS
+CHECK cancel.rerun-starts PASS
+CHECK cancel.rerun-finishes PASS
+CHECK cancel.rerun-delivers PASS
+CHECK fail.unavailable-refused PASS
+FAIL unavailable tool=fake-verible stage=resolve message=«fake-verible: the lint tool could not be resolved»
+CHECK fail.tool-named PASS
+CHECK fail.stage-named PASS
+CHECK fail.spawn-started PASS
+FAIL spawn phase=5 tool=fake-slang stage=spawn message=«tool=fake-slang stage=spawn: the lint child could not be started»
+CHECK fail.spawn-phase PASS
+CHECK fail.spawn-tool-and-stage PASS
+CHECK rerun.fail-first PASS
+A15 first run: stage=resolve message=«fake-verible: the lint tool could not be resolved» rerunAvailable=0 request_files=0
+CHECK rerun.fail-first-stage PASS
+CHECK rerun.request-recorded FAIL
+CHECK rerun.request-kept FAIL
+CHECK rerun.after-failure-starts FAIL
+A15 rerun attempt: error=«no project lint pass has run yet»
+A15 rerun after failure: phase=5 diagnostics=0
+CHECK rerun.after-failure-finishes FAIL
+CHECK rerun.after-failure-delivers FAIL
+This plugin does not support propagateSizeHints()
+CHECK rerun.strip-enabled-after-failure FAIL
+CHECK rerun.strip-hint-empty FAIL
+CHECK rerun.strip-starts FAIL
+CHECK rerun.strip-finishes PASS
+CHECK rerun.empty-request-refused PASS
+This plugin does not support propagateSizeHints()
+A15 empty request: message=«no files to lint (every file has an open LSP session)» rerunEnabled=0 hint=«no request to re-run: the last pass had no files»
+CHECK rerun.empty-request-not-available PASS
+CHECK rerun.empty-request-button-disabled PASS
+CHECK rerun.empty-request-explained PASS
+CHECK scale.start-1k PASS
+SCALE files=1000 ticks=27 worst_tick_ms=0 total_ms=0 done=1000
+CHECK scale.finishes-1k PASS
+CHECK scale.ui-tick-under-50ms PASS
+CHECK scale.progress-reached-total PASS
+CHECK scale.large-starts PASS
+SCALE large-message=«large pass: 1500 files — cancel is available (10/1500)»
+CHECK scale.large-warns PASS
+CHECK scale.large-cancels PASS
+CHECK widget.hidden-before-pass PASS
+CHECK widget.start PASS
+This plugin does not support propagateSizeHints()
+CHECK widget.running PASS
+CHECK widget.cancel-visible PASS
+CHECK widget.progress-song PASS
+This plugin does not support propagateSizeHints()
+CHECK widget.cancel-message PASS
+CHECK widget.rerun-enabled PASS
+This plugin does not support propagateSizeHints()
+CHECK widget.rerun-running PASS
+This plugin does not support propagateSizeHints()
+CHECK widget.finished PASS
+CHECK widget.finished-text PASS
+LINT-ORCHESTRATION-PROBE ok=0 checks=62 failures=8

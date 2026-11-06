@@ -1,0 +1,35 @@
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 14
+    Start 14: vedit-app-i18n-selftest
+
+14: Test command: /vedit-build/target/qt6-build/src/app/vedit-app-i18n-selftest
+14: Working Directory: /vedit-build/target/qt6-build/src/app
+14: Test timeout computed to be: 60
+14: ok   i18n.candidates.count
+14: ok   i18n.candidates.packaged-first
+14: ok   i18n.fixture.bin-translations
+14: ok   i18n.packaged-found
+14: ok   i18n.fixture.translations
+14: ok   i18n.buildtree-found
+14: ok   i18n.fixture.prefix
+14: ok   i18n.prefix-found
+14: ok   restart.fixture.apprun
+14: ok   restart.appdir.program
+14: ok   restart.appdir.arguments
+14: ok   restart.plain.program
+14: ok   restart.plain.arguments
+14: ok   restart.appimage.program
+14: ok   restart.appimage.arguments
+14: ok   restart.fixture.chmod
+14: ok   restart.nonexec.falls-back
+14: 0 failure(s)
+1/1 Test #14: vedit-app-i18n-selftest ..........   Passed    0.00 sec
+
+The following tests passed:
+	vedit-app-i18n-selftest
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.01 sec

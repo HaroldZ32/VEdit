@@ -1,0 +1,9 @@
+# AC-4.3 evidence (screenshots + async timing)
+collected_at: 2026-11-04T02:18:22+08:00
+screenshots=4
+  shot_bytes=246782 /home/haroldzhao/MyProj/DshProj/VEdit/evidence/vcs-git-history/screenshots/30-vcs-history-commits-1500x1000.png
+  shot_bytes=225666 /home/haroldzhao/MyProj/DshProj/VEdit/evidence/vcs-git-history/screenshots/31-vcs-history-blame-1500x1000.png
+  shot_bytes=24665 /home/haroldzhao/MyProj/DshProj/VEdit/evidence/vcs-git-history/screenshots/32-vcs-history-empty-1500x1000.png
+  shot_bytes=28751 /home/haroldzhao/MyProj/DshProj/VEdit/evidence/vcs-git-history/screenshots/33-vcs-history-error-1500x1000.png
+timing=HISTORY-TIMING p1000 rows=50 read_ms=17 ticks=2
+result=PASS

@@ -1,0 +1,11 @@
+[1/6] Building CXX object CMakeFiles/vedit_workspace_search.dir/global_search.cpp.o
+FAILED: [code=1] CMakeFiles/vedit_workspace_search.dir/global_search.cpp.o 
+/usr/bin/c++ -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NO_DEBUG -DQT_WIDGETS_LIB -I/vedit-build/target/review-lane-search/vedit_workspace_search_autogen/include -I/vedit-build/src/workspace/search -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtWidgets -std=gnu++20 -Wall -Wextra -Wpedantic -Werror -MD -MT CMakeFiles/vedit_workspace_search.dir/global_search.cpp.o -MF CMakeFiles/vedit_workspace_search.dir/global_search.cpp.o.d -o CMakeFiles/vedit_workspace_search.dir/global_search.cpp.o -c /vedit-build/src/workspace/search/global_search.cpp
+/vedit-build/src/workspace/search/global_search.cpp: In member function ‘void vedit::workspace::search::GlobalSearch::runScan(const vedit::workspace::search::SearchOptions&, quint64, const std::shared_ptr<std::atomic<bool> >&)’:
+/vedit-build/src/workspace/search/global_search.cpp:113:69: error: unused parameter ‘cancelTag’ [-Werror=unused-parameter]
+  113 |                            const std::shared_ptr<std::atomic_bool> &cancelTag)
+      |                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+cc1plus: all warnings being treated as errors
+ninja: build stopped: subcommand failed.
+build-exit=0
+ls: cannot access 'target/review-lane-search/vedit-workspace-search-selftest': No such file or directory

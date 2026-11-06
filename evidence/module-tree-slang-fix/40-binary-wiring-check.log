@@ -1,0 +1,9 @@
+== shared property key in the product binary ==
+1
+== producer TU ==
+1
+== consumer TU: selector symbol ==
+0000000000000300 T vedit::workspace::moduleTreeSlangBinary(QObject const*)
+0000000000000000 t vedit::workspace::moduleTreeSlangBinary(QObject const*) [clone .cold]
+== rebuilt Rust static library ==
+2026-11-04 16:20:20.150207135 +0800 target/release/libvd_ffi.a

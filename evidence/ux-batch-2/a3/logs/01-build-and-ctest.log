@@ -1,0 +1,40 @@
+[13/52] Linking CXX static library src/app/editor-lane/breadcrumb-lane/jump-lane/libvedit_workspace_jump.a
+[16/52] Linking C static library src/syntax/grammars/libvedit_tree_sitter_verilog.a
+[18/52] Linking CXX static library src/app/editor-lane/fim-lane/libvedit_editor_fim.a
+[20/52] Linking CXX static library src/syntax/provider/libvedit_syntax_provider.a
+[21/52] Linking CXX static library src/syntax/grammars/libvedit_syntax_grammars.a
+[27/52] Linking CXX static library src/app/editor-lane/breadcrumb-lane/libvedit_workspace_breadcrumb.a
+[48/52] Linking CXX static library src/app/editor-lane/libvedit_editor_core.a
+[52/52] Linking CXX executable src/app/editor-lane/vedit-highlight-mode-selftest
+=== BUILD EXIT: 0 ===
+CHECK definition-valid.mod.vhdl PASS  mode 'VHDL'
+CHECK definition-parsed.mod.vhdl FAIL  no definition named 'VHDL' parsed from /tmp/qt_temp-UFdeFf
+CHECK notes.md PASS  got 'Markdown', expected 'Markdown'
+CHECK definition-valid.notes.md PASS  mode 'Markdown'
+CHECK definition-parsed.notes.md FAIL  no definition named 'Markdown' parsed from /tmp/qt_temp-UFdeFf
+CHECK doc.markdown PASS  got 'Markdown', expected 'Markdown'
+CHECK definition-valid.doc.markdown PASS  mode 'Markdown'
+CHECK definition-parsed.doc.markdown FAIL  no definition named 'Markdown' parsed from /tmp/qt_temp-UFdeFf
+CHECK run.tcl PASS  got 'Tcl', expected 'Tcl'
+CHECK definition-valid.run.tcl PASS  mode 'Tcl'
+CHECK definition-parsed.run.tcl PASS  no definition named 'Tcl' parsed from /tmp/qt_temp-UFdeFf
+MODE-FACT run.tcl -> parsed='/tmp/qt_temp-UFdeFf/org.kde.syntax-highlighting/syntax/vedit-tcl.xml' chosen='/tmp/qt_temp-UFdeFf/org.kde.syntax-highlighting/syntax/vedit-tcl.xml'
+CHECK timing.sdc PASS  got 'Tcl', expected 'Tcl'
+CHECK definition-valid.timing.sdc PASS  mode 'Tcl'
+CHECK definition-parsed.timing.sdc PASS  no definition named 'Tcl' parsed from /tmp/qt_temp-UFdeFf
+MODE-FACT timing.sdc -> parsed='/tmp/qt_temp-UFdeFf/org.kde.syntax-highlighting/syntax/vedit-tcl.xml' chosen='/tmp/qt_temp-UFdeFf/org.kde.syntax-highlighting/syntax/vedit-tcl.xml'
+CHECK pins.xdc PASS  got 'Tcl', expected 'Tcl'
+CHECK definition-valid.pins.xdc PASS  mode 'Tcl'
+CHECK definition-parsed.pins.xdc PASS  no definition named 'Tcl' parsed from /tmp/qt_temp-UFdeFf
+MODE-FACT pins.xdc -> parsed='/tmp/qt_temp-UFdeFf/org.kde.syntax-highlighting/syntax/vedit-tcl.xml' chosen='/tmp/qt_temp-UFdeFf/org.kde.syntax-highlighting/syntax/vedit-tcl.xml'
+CHECK table-first.sdc-beats-repository PASS  repository='ProbeLanguage' product='Tcl'
+CHECK fallback.accepts-non-vedit-definition PASS  got 'ProbeLanguage'
+CHECK fallback.author-is-not-vedit PASS  Probe
+CHECK unknown-extension-empty PASS
+CHECK document.created PASS
+CHECK document.applied PASS  'VHDL' resolves to author 'Rocky Scaletta (rocky@purdue.edu), Stefan Endrullis (stefan@endrullis.de), Florent Ouchet (outchy@users.sourceforge.net), Chris Higgs (chiggs.99@gmail.com), Jan Michel (jan@mueschelsoft.de), Luigi Calligaris (luigi.calligaris@stfc.ac.uk)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+CHECK document.highlighting-mode PASS  VHDL
+MODE-FACT vhdl formats=18 folds=1/1
+CHECK document.formats PASS  18
+HIGHLIGHT-MODE-SELFTEST mode=resources-temp checks=45 failures=9
+=== RUN EXIT: 1 ===

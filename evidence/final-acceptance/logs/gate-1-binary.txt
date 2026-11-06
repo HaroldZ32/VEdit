@@ -1,0 +1,6 @@
+302dd8f5a29e117c276e46963738686f8cac0cafe1575ef031a3f97e8339004e  target/qt6-build/src/app/vedit-app
+target/qt6-build/src/app/vedit-app: ELF 64-bit LSB pie executable, x86-64, version 1 (GNU/Linux), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=49838e1b5a70bf1ee0c393102db0e1316b1061fb, for GNU/Linux 3.2.0, with debug_info, not stripped
+
+# after the full build (gate 2) the binary was rebuilt:
+-rwxr-xr-x 1 haroldzhao haroldzhao 103716024 Nov  3 01:33 target/qt6-build/src/app/vedit-app
+5060ed3970c1bd094716fb0040109cb108e821d1e2958e25133b34baedad96ac  target/qt6-build/src/app/vedit-app

@@ -1,0 +1,25 @@
+[1/2] Building CXX object CMakeFiles/defprobe.dir/main.cpp.o
+[2/2] Linking CXX executable defprobe
+=== no custom path ===
+DEF name=SystemVerilog valid=1 filePath=:/org.kde.syntax-highlighting/syntax/systemverilog.xml
+DEF name=Verilog valid=1 filePath=:/org.kde.syntax-highlighting/syntax/verilog.xml
+DEF name=VHDL valid=1 filePath=:/org.kde.syntax-highlighting/syntax/vhdl.xml
+DEF name=Markdown valid=1 filePath=:/org.kde.syntax-highlighting/syntax/markdown.xml
+TOTAL=451
+RESOLVE Verilog valid=1 filePath=:/org.kde.syntax-highlighting/syntax/verilog.xml
+RESOLVE SystemVerilog valid=1 filePath=:/org.kde.syntax-highlighting/syntax/systemverilog.xml
+RESOLVE VHDL valid=1 filePath=:/org.kde.syntax-highlighting/syntax/vhdl.xml
+RESOLVE Markdown valid=1 filePath=:/org.kde.syntax-highlighting/syntax/markdown.xml
+RESOLVE Tcl valid=0 filePath=
+=== with /vedit-build/resources ===
+DEF name=SystemVerilog valid=1 filePath=:/org.kde.syntax-highlighting/syntax/systemverilog.xml
+DEF name=Verilog valid=1 filePath=:/org.kde.syntax-highlighting/syntax/verilog.xml
+DEF name=VHDL valid=1 filePath=:/org.kde.syntax-highlighting/syntax/vhdl.xml
+DEF name=Markdown valid=1 filePath=:/org.kde.syntax-highlighting/syntax/markdown.xml
+DEF name=Tcl valid=1 filePath=/vedit-build/resources/syntax/vedit-tcl.xml
+TOTAL=452
+RESOLVE Verilog valid=1 filePath=:/org.kde.syntax-highlighting/syntax/verilog.xml
+RESOLVE SystemVerilog valid=1 filePath=:/org.kde.syntax-highlighting/syntax/systemverilog.xml
+RESOLVE VHDL valid=1 filePath=:/org.kde.syntax-highlighting/syntax/vhdl.xml
+RESOLVE Markdown valid=1 filePath=:/org.kde.syntax-highlighting/syntax/markdown.xml
+RESOLVE Tcl valid=1 filePath=/vedit-build/resources/syntax/vedit-tcl.xml

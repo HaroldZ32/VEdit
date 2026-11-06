@@ -1,0 +1,25 @@
+== i18n/restart probe against the real AppDir through its loader ==
+bash: line 5: warning: setlocale: LC_ALL: cannot change locale (C.UTF-8)
+bash: line 5: warning: setlocale: LC_ALL: cannot change locale (C.UTF-8)
+ok   i18n.candidates.count
+ok   i18n.candidates.packaged-first
+ok   i18n.fixture.bin-translations
+ok   i18n.packaged-found
+ok   i18n.fixture.translations
+ok   i18n.buildtree-found
+ok   i18n.fixture.prefix
+ok   i18n.prefix-found
+ok   restart.fixture.apprun
+ok   restart.appdir.program
+ok   restart.appdir.arguments
+ok   restart.plain.program
+ok   restart.plain.arguments
+ok   restart.appimage.program
+ok   restart.appimage.arguments
+ok   restart.fixture.chmod
+ok   restart.nonexec.falls-back
+ok   probe.translations
+ok   probe.restart-selects-apprun
+ok   probe.restart-forwards-args
+0 failure(s)
+PROBE_EXIT=0

@@ -1,0 +1,2 @@
+== rebuilt vd-app through the real AppDir loader (AppRun not involved; VEDIT_SLANG unset) ==
+PIPELINE_EXIT=124

@@ -1,0 +1,50 @@
+# T7 — owner verification (new owner, after the dw-rust handoff)
+# collected_at: 2026-11-02T08:31:08+0000
+# tree head: 4e2d0a57ca50db9568db5a5b040cc66f04c9a05f
+
+== 1. cargo test -p vd-deeplint -p vd-ffi ==
+test result: ok. 38 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.52s
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.34s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.26s
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+test result: ok. 43 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+TEST_EXIT=0
+
+== 2. cargo clippy -p vd-deeplint -p vd-ffi --all-targets -- -D warnings ==
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.15s
+CLIPPY_EXIT=0
+
+== 3. rustfmt --check (files this task touched) ==
+FMT_EXIT=0
+
+== 4. data: vd_deeplint real tool on the AC-3.0 fixture ==
+"elapsed_ms":7
+"path":"top"
+"path":"top.u0"
+"path":"top.u1"
+"peak_rss_kb":19104
+"path":"top.u0.clk"
+"path":"top.u1.clk"
+"path":"top.clk"
+"path":"top.u0.d"
+"path":"top.d"
+"path":"top.rst"
+"path":"top.u1.q"
+
+== 5. data: C ABI job on the same fixture ==
+hierarchy job: 281474976710656, 3 instance(s), 14 net(s), 8 ms, 19052 KiB peak
+
+== 6. flake rate: hierarchy test binary, 100 runs at --test-threads=8 (hardened) ==
+  Executable tests/hierarchy.rs (target/debug/deps/hierarchy-513ed08444eac2c6)
+FLAKE_FAILS=0/100
+
+== 7. Qt/ABI guard: Rust wrapper (no Qt dev in this image => loud SKIP) ==
+SKIP: Qt6 development files are not available on this host, so the Qt/ABI compile guard did not run. It would have run:
+  g++ -std=c++17 -fsyntax-only -fPIC $(pkg-config --cflags Qt6Core) -I /vedit-build/crates/vd-ffi/include /vedit-build/crates/vd-ffi/tests/qt_abi_guard.cpp
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

@@ -1,0 +1,36 @@
+FULL_BUILD_EXIT=0
+Test project /vedit-build/target/lane-find
+      Start  1: vedit-native-fold-tests
+ 1/15 Test  #1: vedit-native-fold-tests ..............   Passed    0.44 sec
+      Start  2: vedit-edit-core-selftest
+ 2/15 Test  #2: vedit-edit-core-selftest .............   Passed    0.11 sec
+      Start  3: vedit-editor-find-replace-selftest
+ 3/15 Test  #3: vedit-editor-find-replace-selftest ...   Passed    0.07 sec
+      Start  4: vedit-editor-multi-cursor-selftest
+ 4/15 Test  #4: vedit-editor-multi-cursor-selftest ...   Passed    0.09 sec
+      Start  5: vedit-fim-wiring-selftest
+ 5/15 Test  #5: vedit-fim-wiring-selftest ............   Passed    1.91 sec
+      Start  6: vedit-syntax-directory-tests
+ 6/15 Test  #6: vedit-syntax-directory-tests .........   Passed    0.00 sec
+      Start  7: vedit-fold-gutter-click
+ 7/15 Test  #7: vedit-fold-gutter-click ..............   Passed    0.25 sec
+      Start  8: vedit-syntax-provider-tests
+ 8/15 Test  #8: vedit-syntax-provider-tests ..........   Passed    0.00 sec
+      Start  9: vedit-syntax-product-tests
+ 9/15 Test  #9: vedit-syntax-product-tests ...........   Passed    0.06 sec
+      Start 10: vedit-syntax-kde-data
+10/15 Test #10: vedit-syntax-kde-data ................   Passed    0.03 sec
+      Start 11: vedit-syntax-directory-equivalence
+11/15 Test #11: vedit-syntax-directory-equivalence ...   Passed    0.02 sec
+      Start 12: vedit-breadcrumb-tests
+12/15 Test #12: vedit-breadcrumb-tests ...............   Passed    0.05 sec
+      Start 13: vedit-breadcrumb-click-tests
+13/15 Test #13: vedit-breadcrumb-click-tests .........   Passed    0.06 sec
+      Start 14: vedit-jump-tests
+14/15 Test #14: vedit-jump-tests .....................   Passed    0.00 sec
+      Start 15: vedit-fim-selftest
+15/15 Test #15: vedit-fim-selftest ...................   Passed    0.11 sec
+
+100% tests passed, 0 tests failed out of 15
+
+Total Test time (real) =   3.22 sec

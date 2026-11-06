@@ -1,0 +1,18 @@
+
+## B5 repair — renameTargetAt rejects everything it can name
+CHECK PASS rename.valid-identifier  symbol='rn' reason=''
+CHECK PASS rename.valid-signal  symbol='x'
+CHECK PASS rename.keyword  'module' is a language keyword, not a renameable symbol
+CHECK PASS rename.line-comment  the cursor is inside a comment, not on a symbol
+CHECK PASS rename.block-comment  the cursor is inside a comment, not on a symbol
+CHECK PASS rename.string  the cursor is inside a string, not on a symbol
+CHECK PASS rename.system-task  '$display' is a system task/function, not a renameable symbol
+CHECK PASS rename.number-decimal  '123' is a number literal, not a renameable symbol
+CHECK PASS rename.number-based  'b0' is a number literal, not a renameable symbol
+CHECK PASS rename.no-token  there is no symbol under the cursor
+CHECK PASS rename.outside-document  the position is outside the document
+
+## item 9 repair — probeAsync never blocks the caller
+SKIP autofix.async  no verible-verilog-lint
+
+SUMMARY checks=11 failures=0 skips=1

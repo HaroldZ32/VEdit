@@ -1,0 +1,25 @@
+current messages: 1186; unique keys: 1186
+baseline: 1207 = finished 1004 + unfinished 182 + vanished 21
+[1] finished rows changed/lost vs pre-U2 baseline: 0
+[2] keys removed vs baseline-active: [('VEdit', '修复')]
+[2] keys added vs baseline-active: [('VEdit', 'Fix')]
+[3] T10 snapshot entries parsed: 182
+[3] T10-snapshot pairs not present verbatim (excluding the repaired row): 4
+    MISSING 97 '\\nroot: %1' -> '\n根目录：%1'
+    MISSING 169 'Replace "%1" with "%2"?\\n\\n%3 occurrence(s) in %4 file(s) will be replaced.' -> '将“%1”替换为“%2”？\n\n将替换 %4 个文件中的 %3 处。'
+    MISSING 170 '\\n\\n%1 affected unsaved editor document(s) were saved first: %2' -> '\n\n已先保存 %1 个受影响的未保存编辑器文档：%2'
+    MISSING 182 '%1 file(s) changed during replace — not reloaded: %2' -> '%1 个文件在替换期间发生变化——未重新加载：%2\n'
+[3] repaired row in T10 snapshot: [(69, '修复', '修复')]
+[3] current VEdit/'Fix' row: '修复'
+[3] current VEdit/'修复' row exists: False
+[3] duplicate (source,translation) pairs in current file: 19
+    DUP ('Search', '搜索')
+    DUP ('Save failed: %1', '保存失败：%1')
+    DUP ('Diagnostics', '诊断')
+    DUP ('New File', '新建文件')
+    DUP ('New Folder', '新建文件夹')
+    DUP ('Delete', '删除')
+    DUP ('Rename', '重命名')
+    DUP ('New name:', '新名称：')
+    DUP ('Cancel', '取消')
+    DUP ('Line', '行')

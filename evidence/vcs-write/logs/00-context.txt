@@ -1,0 +1,26 @@
+# batch 3a VCS write foundation - run context
+collected_at: 2026-11-03T23:01:13+08:00
+workspace: /home/haroldzhao/MyProj/DshProj/VEdit
+git_head: 4e2d0a57ca50db9568db5a5b040cc66f04c9a05f
+host_git: git version 2.53.0
+porcelain (declared write scopes):
+   M crates/vd-ffi/include/vd_ffi.h
+   M crates/vd-ffi/src/capi.rs
+   M crates/vd-ffi/src/deeplint.rs
+   M crates/vd-ffi/src/lsp.rs
+   M crates/vd-ffi/src/project.rs
+   M crates/vd-ffi/src/service.rs
+   M crates/vd-ffi/src/settings.rs
+   M crates/vd-ffi/src/vcs.rs
+   M crates/vd-ffi/tests/abi.rs
+   M crates/vd-vcs/src/lib.rs
+   M crates/vd-vcs/tests/readonly.rs
+   M src/workspace/vcs/vcs_integration.cpp
+   M src/workspace/vcs/vcs_panel.cpp
+   M src/workspace/vcs/vcs_selftest.cpp
+  ?? crates/vd-ffi/tests/qt_abi_guard.cpp
+  ?? crates/vd-ffi/tests/qt_abi_guard.rs
+  ?? crates/vd-vcs/src/write.rs
+  ?? crates/vd-vcs/tests/write.rs
+  ?? translations/
+header_sha256: 53a5398521e1c144a2afa0ed67a6ed0b045743b2022f7dbe00186156a3bc247a

@@ -1,0 +1,16 @@
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+view class=KTextEditor::ViewPrivate geom=820x420
+inner class=KateViewInternal geom=(36,1 723x400) originInView=(36,1) focus=1
+cursorToCoordinate(1,2)= view(50,15)
+same point in inner=(14,14)
+coordinatesToCursor(viewPoint)=1:2   coordinatesToCursor(innerPoint)=0:0
+seams channel=1 cursors=1 actionFound=1
+ACTION action=definition dispatched=1 via='diagnostics.definition'
+A ctrl-click on INNER at (14,14): triggered=1 line=0 column=0 dispatch=1 cursorCount=3
+A cursorPositions: 0:0 1:0 2:0
+ACTION action=definition dispatched=1 via='diagnostics.definition'
+B ctrl-click on VIEW at (50,15): triggered=1 line=1 column=2 dispatchDelta=1
+C plain click on INNER at (14,14): KatePart caret=1:2
+D setCursorPosition(1,2) on a 3-cursor view -> count=3 positions: 1:2 1:0 2:0

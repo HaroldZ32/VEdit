@@ -1,0 +1,19 @@
+Test project /vedit-build/target/qt6-build
+    Start  8: vedit-terminal-selftest
+1/7 Test  #8: vedit-terminal-selftest ............   Passed    2.08 sec
+    Start 11: vedit-app-shell-selftest
+2/7 Test #11: vedit-app-shell-selftest ...........   Passed    0.77 sec
+    Start 14: vedit-app-i18n-selftest
+3/7 Test #14: vedit-app-i18n-selftest ............   Passed    0.01 sec
+    Start 15: vedit-app-ux-selftest
+4/7 Test #15: vedit-app-ux-selftest ..............   Passed    0.26 sec
+    Start 16: vedit-app-ux-screenshots
+5/7 Test #16: vedit-app-ux-screenshots ...........   Passed    0.39 sec
+    Start 19: vedit-edit-core-selftest
+6/7 Test #19: vedit-edit-core-selftest ...........   Passed    0.25 sec
+    Start 32: vedit-workspace-project-selftest
+7/7 Test #32: vedit-workspace-project-selftest ...   Passed    0.61 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Total Test time (real) =   4.37 sec

@@ -1,0 +1,22 @@
+
+## B5 repair — renameTargetAt rejects everything it can name
+CHECK PASS rename.valid-identifier  symbol='rn' reason=''
+CHECK PASS rename.valid-signal  symbol='x'
+CHECK PASS rename.keyword  'module' is a language keyword, not a renameable symbol
+CHECK FAIL rename.line-comment
+CHECK FAIL rename.block-comment
+CHECK FAIL rename.string
+CHECK FAIL rename.system-task  '$display' is not an identifier
+CHECK FAIL rename.number-decimal  '123' is not an identifier
+CHECK FAIL rename.number-based
+CHECK PASS rename.no-token  there is no symbol under the cursor
+CHECK PASS rename.outside-document  the position is outside the document
+
+## item 9 repair — probeAsync never blocks the caller
+CHECK PASS autofix.async-returns-immediately  elapsed-ms=1 called=1
+CHECK FAIL autofix.async-not-called-inline  the child process must not run on the caller's stack
+CHECK PASS autofix.async-completes  called=1 supported=1 error=''
+CHECK FAIL autofix.async-cache-is-deferred
+CHECK PASS autofix.async-cache-completes  probes=1
+
+SUMMARY checks=16 failures=8 skips=0

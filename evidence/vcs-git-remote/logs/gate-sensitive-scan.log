@@ -1,0 +1,7 @@
+# credential sentinel scan (AC-4.4)
+collected_at: 2026-11-04T01:14:27+08:00
+sentinel_defined_at=src/workspace/vcs/vcs_selftest.cpp:2332
+sentinel_length=17
+scanned=/home/haroldzhao/MyProj/DshProj/VEdit/evidence/vcs-git-remote (recursive, binary files read as text)
+matches=0
+result=PASS

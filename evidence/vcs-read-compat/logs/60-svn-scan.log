@@ -1,0 +1,46 @@
+# SVN read-path parameter scan (AC-3.0 item 6)
+collected_at=2026-11-03T23:25:48+08:00
+svn_binary_in_build_image=NO_SVN
+
+== every svn invocation in the read path (source excerpt) ==
+crates/vd-vcs/src/lib.rs:215:            match command_runner.run("svn", &working_tree, &args) {
+crates/vd-vcs/src/lib.rs-216-                Ok(output) if output.success => RepoStatus {
+crates/vd-vcs/src/lib.rs-217-                    backend,
+crates/vd-vcs/src/lib.rs-218-                    branch: None,
+crates/vd-vcs/src/lib.rs-219-                    changes: parse_svn_status(&output.stdout),
+--
+crates/vd-vcs/src/service.rs:101:    fn svn(&self, working_tree: &Path, args: &[&str]) -> Result<String, String> {
+crates/vd-vcs/src/service.rs-102-        let owned: Vec<String> = args.iter().map(|arg| (*arg).to_string()).collect();
+crates/vd-vcs/src/service.rs-103-        let output = self.runner.run("svn", working_tree, &owned)?;
+crates/vd-vcs/src/service.rs-104-        if output.success {
+crates/vd-vcs/src/service.rs-105-            Ok(output.stdout)
+--
+crates/vd-vcs/src/service.rs:159:                    .svn(
+crates/vd-vcs/src/service.rs-160-                        &working_tree,
+crates/vd-vcs/src/service.rs-161-                        &["info", "--xml", working_tree.to_str().unwrap_or(".")],
+crates/vd-vcs/src/service.rs-162-                    )
+crates/vd-vcs/src/service.rs-163-                    .ok()
+--
+crates/vd-vcs/src/service.rs:243:                    .svn(
+crates/vd-vcs/src/service.rs-244-                        &working_tree,
+crates/vd-vcs/src/service.rs-245-                        &[
+crates/vd-vcs/src/service.rs-246-                            "diff",
+crates/vd-vcs/src/service.rs-247-                            "--internal-diff",
+
+== options introduced in Subversion 1.8 / 1.9 (must be 0 in the source) ==
+--show-item            hits=0
+--include-externals    hits=0
+--search               hits=0
+--accept               hits=0
+--parents              hits=0
+--pin-externals        hits=0
+
+== verdicts: the commands the read path actually issues ==
+svn status <path>                since 1.0   compatible with the bundled 1.7.14
+svn info --xml <path>            since 1.0   compatible; replaced the 1.9-only single-field selector form
+svn diff --internal-diff <path>  since 1.7   compatible with 1.7.14
+svn log/list/cat/propget/proplist/blame   allow-listed, but not issued by the service today
+
+conclusion=no 1.8+ option remains in the SVN read path
+note=the real subprocess E2E is deferred to batch 6b (rev2 §126); this image ships no svn
+scan_fail=0

@@ -1,0 +1,37 @@
+== AC-7.7 structural check: one jump interface, one registry, consumers do not re-implement ==
+
+--- the interface (ONE definition in the tree; src/workspace/search is the pre-existing lane-owned seam, outside this task's write scope) ---
+src/workspace/jump/jump_target.h:21:class IJumpTarget {
+src/workspace/search/search_types.h:86:class IJumpTarget {
+
+--- the registry seam (free functions every panel calls) ---
+65:    void setTarget(IJumpTarget *target);
+71:    bool hasTarget() const;
+78:    JumpResult jumpTo(const QString &filePath, int line, int column);
+112:void setTarget(IJumpTarget *target);
+115:bool hasTarget();
+116:JumpResult jumpTo(const QString &filePath, int line, int column);
+
+--- the breadcrumb bar consumes the contract (no second jump path) ---
+85:    lastStatus_ =
+86:        vedit::workspace::jump::jumpTo(filePath_, segmentLine(index), 1).status;
+87:    return lastStatus_ == vedit::workspace::jump::JumpStatus::Delivered;
+92:    return lastStatus_;
+
+--- lane registration: VEDIT_WORKSPACE_LANES + integration install sequence ---
+122:set(VEDIT_WORKSPACE_LANES jump filetree palette search project diagnostics vcs settings)
+123:foreach(lane IN LISTS VEDIT_WORKSPACE_LANES)
+147:  foreach(lane IN LISTS VEDIT_WORKSPACE_LANES)
+8:#if defined(VEDIT_WORKSPACE_HAVE_JUMP)
+40:#if defined(VEDIT_WORKSPACE_HAVE_JUMP)
+src/workspace/integration.cpp:41:    installJump(shell, options);
+src/workspace/jump/jump_integration.h:7:// CONTRACT plus a process-wide registry, not a dock. installJump() only resets
+src/workspace/jump/jump_integration.h:21:void installJump(vedit::app::ApplicationShell &shell, const IntegrationOptions &options);
+
+--- lane convention: <lane>/<lane>_integration.cpp exists and is wired by the lane loop ---
+src/workspace/jump/jump_integration.cpp
+src/workspace/jump/jump_registry.cpp
+src/workspace/jump/jump_target.h
+
+--- residual (reported to the captain, NOT silently duplicated): the search lane still has its own IJumpTarget ---
+86:class IJumpTarget {

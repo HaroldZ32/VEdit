@@ -1,0 +1,9 @@
+== AppRun caller-env probe (fake AppDir, fake loader prints the environment) ==
+-- case A: caller sets VEDIT_SLANG=/caller/slang VEDIT_VERIBLE_LS=/caller/ls --
+VEDIT_SLANG=/tmp/apprun-probe.SvtgR3/bin/slang
+VEDIT_VERIBLE_LS=/caller/ls
+-- case B: caller sets neither --
+VEDIT_SLANG=/tmp/apprun-probe.SvtgR3/bin/slang
+VEDIT_VERIBLE_LS=/tmp/apprun-probe.SvtgR3/bin/verible-verilog-ls
+-- code: the export is unconditional --
+35:export VEDIT_SLANG="$APPDIR/bin/slang"

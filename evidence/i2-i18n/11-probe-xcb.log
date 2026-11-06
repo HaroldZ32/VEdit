@@ -1,0 +1,32 @@
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+PASS probe.temp-dir
+PASS shot.zh-installed
+PASS shot.zh-menu
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+SHOT OK evidence/i2-i18n/shots/30-zh-shell.png
+PASS shot.archive
+PASS shot.archive-baseline
+PASS shot.panel-loaded
+SHOT OK evidence/i2-i18n/shots/31-zh-preferences.png
+SHOT OK evidence/i2-i18n/shots/32-batch-unsaved-dialog.png
+[app-shell] 语言未切换：重启已取消
+SHOT OK evidence/i2-i18n/shots/33-language-not-switched.png
+SHOT OK evidence/i2-i18n/shots/34-cancel-message-shell.png
+PASS shot.one-batch-dialog
+PASS shot.cancel-message — 语言未切换：重启已取消
+PASS shot.cancel-no-settings-write
+PASS shot.cancel-no-archive-write
+PASS shot.cancel-no-document-write
+[app-shell] 正在重启以应用界面语言 en
+SHOT OK evidence/i2-i18n/shots/37-save-branch-restarting.png
+PASS shot.save-branch-dialog
+PASS shot.save-branch-documents
+PASS shot.save-branch-language
+PASS shot.save-branch-relaunch — 1
+PASS shot.save-branch-archive-sha
+PASS shot.save-branch-settings-changed
+PASS shot.en-installed
+PASS shot.en-menu
+SHOT OK evidence/i2-i18n/shots/35-en-shell.png
+I18N-PROBE failures=0 platform=xcb translations=/vedit-build/target/qt6-build/src/app/translations

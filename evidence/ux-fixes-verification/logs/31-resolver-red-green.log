@@ -1,0 +1,18 @@
+== OLD (pre-fix) ==
+OLD attempts=4 chosen=None
+  VEDIT_SLANG: unset
+  exe_dir/../lib/vedit/bin/slang: /tmp/vedit-red-old-49/AppDir/../lib/vedit/bin/slang [not found]
+  exe_dir/../bin/slang: /tmp/vedit-red-old-49/AppDir/../bin/slang [not found]
+  exe_dir/slang: /tmp/vedit-red-old-49/AppDir/slang [not found]
+
+RED-OK: old resolver misses the AppDir-root base (4 attempts), tarball base still works
+== NEW (fixed) ==
+NEW attempts=5 chosen=Some("/tmp/vedit-green-new-50/AppDir/bin/slang")
+  VEDIT_SLANG: unset
+  exe_dir/../lib/vedit/bin/slang: /tmp/vedit-green-new-50/AppDir/../lib/vedit/bin/slang [not found]
+  exe_dir/../bin/slang: /tmp/vedit-green-new-50/AppDir/../bin/slang [not found]
+  exe_dir/bin/slang: /tmp/vedit-green-new-50/AppDir/bin/slang [found]
+  exe_dir/slang: /tmp/vedit-green-new-50/AppDir/slang [not found]
+
+GREEN-OK: fixed resolver chooses the AppDir-root base with no VEDIT_SLANG
+HARNESS_EXIT=0

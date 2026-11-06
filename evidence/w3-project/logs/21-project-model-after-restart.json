@@ -1,0 +1,44 @@
+{
+    "capturedAtUtc": "2026-11-02T11:01:24Z",
+    "defines": [
+        "WIDTH=8",
+        "DEPTH=16",
+        "DEBUG",
+        "SIMULATION",
+        "BOARD=7",
+        "SIM"
+    ],
+    "diagnostics": [
+        "filelist.unknown_token: /vedit-build/tests/fixtures/verilog-project/project.f:21: unsupported filelist token `+libext+.v+.sv`; skipped",
+        "filelist.unknown_token: /vedit-build/tests/fixtures/verilog-project/project.f:22: unsupported filelist token `-y`; skipped",
+        "filelist.duplicate_entry: /vedit-build/tests/fixtures/verilog-project/filelists/extra.f:3: duplicate source path in filelist; kept the first occurrence"
+    ],
+    "filelists": [
+        "/vedit-build/target/tmp/w3-state/seed.f"
+    ],
+    "files": [
+        "/vedit-build/tests/fixtures/verilog-project/rtl/alu_pkg.sv",
+        "/vedit-build/tests/fixtures/verilog-project/rtl/alu.sv",
+        "/vedit-build/tests/fixtures/verilog-project/rtl/counter.v",
+        "/vedit-build/tests/fixtures/verilog-project/rtl/top.sv",
+        "/vedit-build/tests/fixtures/verilog-project/tb/tb_top.sv",
+        "/vedit-build/tests/fixtures/verilog-project/tb/tb_aux.sv",
+        "/vedit-build/tests/fixtures/verilog-project/rtl/mem.sv",
+        "/vedit-build/tests/fixtures/verilog-project/inc/defs.vh",
+        "/vedit-build/tests/fixtures/verilog-project/inc/generated/width.vh",
+        "/vedit-build/tests/fixtures/verilog-project/rtl/include/rtl_defs.vh",
+        "/vedit-build/tests/fixtures/verilog-project/tb/include/tb_defs.vh"
+    ],
+    "includeDirs": [
+        "/vedit-build/tests/fixtures/verilog-project/inc",
+        "/vedit-build/tests/fixtures/verilog-project/inc/generated",
+        "/vedit-build/tests/fixtures/verilog-project/rtl/include",
+        "/vedit-build/tests/fixtures/verilog-project/tb/include",
+        "/vedit-build/target/tmp/w3-state/seed_inc"
+    ],
+    "projectRoot": "/vedit-build/tests/fixtures/verilog-project",
+    "variables": [
+        "SEED_VAR=seed"
+    ],
+    "version": 2
+}

@@ -1,0 +1,94 @@
+UpdateCTestConfiguration  from :/vedit-build/target/qt6-build/DartConfiguration.tcl
+Test project /vedit-build/target/qt6-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 34
+    Start 34: vedit-module-tree-catalog-test
+
+34: Test command: /vedit-build/target/qt6-build/src/app/workspace-lane-module_tree/vedit-module-tree-catalog-test "/vedit-build/src/workspace/module_tree/fixtures/ux-batch-2" "/vedit-build/src/workspace/module_tree/../../../build/slang/out/slang"
+34: Working Directory: /vedit-build/target/qt6-build/src/app/workspace-lane-module_tree
+34: Environment variables: 
+34:  QT_QPA_PLATFORM=offscreen
+34:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime-module-tree
+34: Test timeout computed to be: 240
+34: ok   fixture.present — /vedit-build/src/workspace/module_tree/fixtures/ux-batch-2
+34: ok   slang.present — /vedit-build/src/workspace/module_tree/../../../build/slang/out/slang
+34: ok   state.temp-dir
+34: kf.sonnet.core: Sonnet: No speller backends available!
+34: ok   jump.product-target
+34: This plugin does not support propagateSizeHints()
+34: ok   shell.panels-present — tree=1 interface=1
+34: ok   shell.two-docks
+34: ok   shell.pane-present
+34: This plugin does not support propagateSizeHints()
+34: ok   catalog.answered
+34: ok   catalog.valid
+34: ok   catalog.module-count — modules=[consumer, orphan, reflink, shared, top_a, top_b]
+34: ok   catalog.sorted-and-interface-excluded — consumer, orphan, reflink, shared, top_a, top_b
+34: ok   catalog.no-interface-module
+34: ok   acceptance.i.roots-equal-is-top — roots=[orphan, top_a, top_b] tops=[orphan, top_a, top_b]
+34: ok   acceptance.i.roots-fixture-set — orphan, top_a, top_b
+34: ok   acceptance.ii.shared-under-both-parents — top_a.u_shared, top_b.u_shared
+34: ok   acceptance.ii.distinct-instance-paths — top_a.u_shared, top_b.u_shared
+34: ok   acceptance.iv.only-module-rows — rows=7
+34: ok   acceptance.iv.row-count — rows=7
+34: ok   acceptance.iv.widget-row-count — rows=7
+34: ok   acceptance.iv.no-net-labels — orphan, top_a, shared, consumer, reflink, top_b, shared
+34: ok   panel.top-a-row
+34: This plugin does not support propagateSizeHints()
+34: ok   acceptance.v.focus-from-tree — top_a
+34: ok   acceptance.v.port-count — rows=3
+34: ok   acceptance.v.port-clk — clk / In / logic / 1
+34: ok   acceptance.v.port-pad — pad / InOut / 1
+34: ok   acceptance.v.port-y — y / Out / logic[3:0] / 4
+34: ok   acceptance.v.location-column — top_a.sv:1:27
+34: ok   acceptance.v.abi-limit-tooltip — Double-click a port: jump to its declaration. Ctrl+double-click: jump to this module's instantiation statement. The module catalog has no per-connection position, so Ctrl+double-click targets the instance statement, not the connected port.
+34: ok   acceptance.iii.top-a-catalogued
+34: ok   acceptance.iii.row-visible
+34: [edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+34: search: jump opened '/vedit-build/src/workspace/module_tree/fixtures/ux-batch-2/top_a.sv' line=1 column=8 (cursor=1:8)
+34: ok   acceptance.iii.file-opened — /vedit-build/src/workspace/module_tree/fixtures/ux-batch-2/top_a.sv
+34: ok   acceptance.iii.ktexteditor-view
+34: ok   acceptance.iii.cursor-on-declaration — cursor=1:8 expected=1:8
+34: ok   acceptance.iii.declaration-text — module top_a (input logic clk, inout wire pad, output logic [3:0] y);
+34: ok   acceptance.focus.caret-view
+34: ok   acceptance.focus.caret-module — top_a
+34: ok   acceptance.focus.selection-beats-caret — shared
+34: ok   acceptance.vi.focus-top-a — top_a
+34: ok   acceptance.vi.port-row-visible
+34: search: jump opened '/vedit-build/src/workspace/module_tree/fixtures/ux-batch-2/top_a.sv' line=1 column=67 (cursor=1:67)
+34: ok   acceptance.vi.declaration-file — /vedit-build/src/workspace/module_tree/fixtures/ux-batch-2/top_a.sv
+34: ok   acceptance.vi.declaration-cursor — cursor=1 expected=1
+34: ok   acceptance.vi.top-b-instance-found — top_b.u_shared
+34: ok   acceptance.vi.shared-row
+34: ok   acceptance.vi.focus-shared — shared
+34: ok   acceptance.vi.shared-port-visible
+34: [edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+34: search: jump opened '/vedit-build/src/workspace/module_tree/fixtures/ux-batch-2/top_b.sv' line=2 column=10 (cursor=2:10)
+34: ok   acceptance.vi.chooser-two-parents — candidates=2
+34: ok   acceptance.vi.chooser-parents — top_a, top_b
+34: ok   acceptance.vi.instantiation-file — /vedit-build/src/workspace/module_tree/fixtures/ux-batch-2/top_b.sv
+34: ok   acceptance.vi.instantiation-cursor — cursor=2 expected=2
+34: ok   acceptance.vi.chooser-count-observable — 2
+34: SKIP screenshot — no screenshot path was requested
+34: This plugin does not support propagateSizeHints()
+34: ok   acceptance.root-change.tree-empty-state — No project open — open a folder to build the module catalog.
+34: ok   acceptance.root-change.interface-empty-state — No project open — open a folder to build the module catalog.
+34: ok   acceptance.root-change.in-flight-started
+34: ok   acceptance.root-change.in-flight-cancelled
+34: This plugin does not support propagateSizeHints()
+34: ok   acceptance.root-change.no-late-catalog
+34: ok   acceptance.root-change.no-stale-panel — No project open — open a folder to build the module catalog.
+34: PASS: 56 check(s), 0 failure(s)
+1/1 Test #34: vedit-module-tree-catalog-test ...   Passed    1.90 sec
+
+The following tests passed:
+	vedit-module-tree-catalog-test
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   1.90 sec

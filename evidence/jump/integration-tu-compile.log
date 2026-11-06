@@ -1,0 +1,12 @@
+== src/workspace/integration.cpp: product-build flags, compiled as its own TU ==
+(compiled from compile_commands.json, output redirected to /tmp; the build system itself
+ stops on OTHER lanes right now - see root-build-status.log)
+
+--- compile definitions the build applies to the integration TU ---
+-DVEDIT_WORKSPACE_HAVE_DIAGNOSTICS=1 -DVEDIT_WORKSPACE_HAVE_FILETREE=1 -DVEDIT_WORKSPACE_HAVE_JUMP=1 -DVEDIT_WORKSPACE_HAVE_PALETTE=1 -DVEDIT_WORKSPACE_HAVE_PROJECT=1 -DVEDIT_WORKSPACE_HAVE_SEARCH=1 -DVEDIT_WORKSPACE_HAVE_SETTINGS=1 -DVEDIT_WORKSPACE_HAVE_VCS=1
+
+--- compile + symbol check ---
+[compile-exit=0]
+-rw-r--r-- 1 root root 580744 Nov  2 06:50 /tmp/vedit-integration-check.o
+                 U vedit::workspace::installJump(vedit::app::ApplicationShell&, vedit::workspace::IntegrationOptions const&)
+0000000000000000 T vedit::workspace::installPanels(vedit::app::ApplicationShell&, vedit::workspace::IntegrationOptions const&)

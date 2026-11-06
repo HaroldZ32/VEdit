@@ -1,0 +1,14 @@
+# batch 7 cleanup evidence (T45)
+collected_at: 2026-11-04T14:13:20+08:00
+lane_checks=697 (baseline 673, failures=0)
+typed_payloads=VcsInfo(VcsInfoPayload) + VcsWorkspace + VcsHistoryCommits/Commit/File/Blame/Compare
+vcs_info_data_workaround=absent
+header_sha256=ae78ce608bd1f8d06e01b2cb18ff8bcdbf9ad11689877afc748b5ca149cabca9
+rust_abi=ok rust_vd_vcs=ok
+rebase_confirmation=declined-zero-write + accepted-request + consequence preview
+second_step_refusal=discard + worktree remove (two confirms, zero write)
+toolchain_properties=asserted on a plain VcsPanel
+credential_default_headless=no-dialog, no-retry, refused
+i18n_source_literals=Chinese change row asserted
+lrelease=930 finished and 0 unfinished
+result=PASS

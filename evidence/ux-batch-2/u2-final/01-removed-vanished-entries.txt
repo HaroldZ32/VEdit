@@ -1,0 +1,108 @@
+# The 21 vanished <message> blocks removed from translations/vedit_zh_CN.ts
+# (verbatim, in catalogue order; nothing else in the file was touched)
+
+<!-- lupdate line 312: reworded -->
+    <message>
+        <source>hierarchy: retrying after the project model…</source>
+        <translation>层次：工程模型更新后重试…</translation>
+    </message>
+<!-- lupdate line 313: reworded -->
+    <message>
+        <source>No hierarchy yet: open a project and press Refresh.</source>
+        <translation>尚无层次：打开工程并点击“刷新”。</translation>
+    </message>
+<!-- lupdate line 320: reworded -->
+    <message>
+        <source>Empty state: no elaborated project yet. Open a project and press Refresh.</source>
+        <translation>空状态：尚无已展开的工程。打开工程并点击“刷新”。</translation>
+    </message>
+<!-- lupdate line 321: reworded -->
+    <message>
+        <source>%1 · no file:line reported</source>
+        <translation>%1 · 未报告 file:line</translation>
+    </message>
+<!-- lupdate line 322: reworded -->
+    <message>
+        <source>Re-elaborate the whole project</source>
+        <translation>重新展开整个工程</translation>
+    </message>
+<!-- lupdate line 323: reworded -->
+    <message>
+        <source>Jump to source</source>
+        <translation>跳转到源</translation>
+    </message>
+<!-- lupdate line 324: dead -->
+    <message>
+        <source>Put the cursor on a signal in the editor, then jump to the construct that drives it</source>
+        <translation>将光标放在编辑器中的信号上，然后跳转到驱动它的构造</translation>
+    </message>
+<!-- lupdate line 325: dead -->
+    <message>
+        <source>Jump to target</source>
+        <translation>跳转到目标</translation>
+    </message>
+<!-- lupdate line 326: dead -->
+    <message>
+        <source>Put the cursor on a signal in the editor, then jump to the construct that reads it</source>
+        <translation>将光标放在编辑器中的信号上，然后跳转到读取它的构造</translation>
+    </message>
+<!-- lupdate line 327: reworded -->
+    <message>
+        <source>Filter instance / net / file…</source>
+        <translation>过滤实例 / 网络 / 文件…</translation>
+    </message>
+<!-- lupdate line 328: reworded -->
+    <message>
+        <source>Instance / Net</source>
+        <translation>实例 / 网络</translation>
+    </message>
+<!-- lupdate line 329: dead -->
+    <message>
+        <source>Kind</source>
+        <translation>类型</translation>
+    </message>
+<!-- lupdate line 331: reworded -->
+    <message>
+        <source>Hierarchy ready — double-click an instance, a net or a driver/load.</source>
+        <translation>层次已就绪——双击实例、网络或驱动/负载。</translation>
+    </message>
+<!-- lupdate line 365: reworded -->
+    <message>
+        <source>elaborating %1 project file(s)…</source>
+        <translation>正在展开 %1 个工程文件…</translation>
+    </message>
+<!-- lupdate line 697: reworded -->
+    <message>
+        <source>A branch name is required.</source>
+        <translation>必须填写分支名称。</translation>
+    </message>
+<!-- lupdate line 701: reworded -->
+    <message>
+        <source>A tag name is required.</source>
+        <translation>必须填写标签名称。</translation>
+    </message>
+<!-- lupdate line 705: reworded -->
+    <message>
+        <source>A remote name and a URL are required.</source>
+        <translation>必须填写远程仓库名称和 URL。</translation>
+    </message>
+<!-- lupdate line 725: reworded -->
+    <message>
+        <source>no tags reported by this backend</source>
+        <translation>此后端未报告标签</translation>
+    </message>
+<!-- lupdate line 868: reworded -->
+    <message>
+        <source>&amp;Settings</source>
+        <translation>设置(&S)</translation>
+    </message>
+<!-- lupdate line 882: stale duplicate -->
+    <message>
+        <source>Save As failed: %1</source>
+        <translation>另存为失败：%1</translation>
+    </message>
+<!-- lupdate line 885: stale duplicate -->
+    <message>
+        <source>Save As refused (headless): %1 exists and cannot be overwritten without confirmation</source>
+        <translation>另存为被拒绝（无界面运行）：%1 已存在，未经确认不能覆盖</translation>
+    </message>

@@ -1,0 +1,286 @@
+SETTINGS-SELFTEST start
+CHECK settings.ffi.available PASS
+CHECK settings.panel.loaded PASS
+CHECK settings.panel.object-name PASS
+CHECK settings.theme.list PASS 30 theme(s)
+CHECK settings.theme.initial PASS Breeze Light
+CHECK settings.keys.rows PASS rows=5
+CHECK settings.keys.new-commands PASS lint.rerun / fim.trigger must be listed
+CHECK settings.theme.applied PASS Atom One Dark
+CHECK settings.theme.status PASS Stored by the Rust service in /tmp/vedit-workspace-settings-selftest-CgvUpM/settings.toml
+CHECK settings.theme.persisted PASS theme = "Atom One Dark"
+
+CHECK settings.restart.loaded PASS
+CHECK settings.theme.restart PASS Atom One Dark
+CHECK settings.keys.flush PASS
+CHECK settings.keys.applied PASS Ctrl+Alt+J
+CHECK settings.keys.persisted PASS "keymap.view.split.horizontal" = "Ctrl+Alt+J"
+theme = "Atom One Dark"
+
+CHECK settings.keys.mirror PASS
+CHECK settings.keys.mirror-restart PASS
+CHECK settings.restart.keys-loaded PASS
+CHECK settings.keys.restart PASS Ctrl+Alt+J
+CHECK settings.conflict.flush PASS
+CHECK settings.conflict.detected PASS Ctrl+S: file.save, view.toggle-settings
+CHECK settings.conflict.names PASS Ctrl+S: file.save, view.toggle-settings
+CHECK settings.conflict.visible PASS Conflicting shortcuts: Ctrl+S: file.save, view.toggle-settings
+CHECK settings.badconfig.write PASS
+CHECK settings.badconfig.flush PASS
+CHECK settings.badconfig.warning PASS invalid TOML in /tmp/vedit-workspace-settings-selftest-CgvUpM/settings.toml: TOML parse error at line 2, column 10
+  |
+2 | [unclosed
+  |    
+CHECK settings.badconfig.visible PASS
+CHECK settings.badconfig.theme-valid PASS Atom One Dark
+CHECK settings.badconfig.recover-flush PASS
+CHECK settings.badconfig.recovered PASS
+CHECK settings.badconfig.file-valid PASS
+CHECK settings.nonblocking.temp-dir PASS
+CHECK settings.nonblocking.write-fixture PASS
+CHECK settings.nonblocking.start-returns-fast PASS start took 0 ms for a 1532 KB store
+CHECK settings.nonblocking.event-loop-ticks PASS ticks=7 poles=9
+CHECK settings.nonblocking.flush PASS
+CHECK settings.nonblocking.result PASS entries=120000 delivered=1
+CHECK settings.pages.ffi.available PASS
+CHECK settings.pages.loaded PASS
+CHECK settings.pages.tabs-container PASS count=6
+CHECK settings.pages.tabs-titles PASS
+CHECK settings.pages.tabs-object-names PASS
+CHECK settings.pages.tools-form PASS
+CHECK settings.pages.tools-fields PASS
+CHECK settings.pages.fim-fields PASS
+CHECK settings.pages.fim-key-write-only PASS
+CHECK settings.pages.tools-flush PASS
+CHECK settings.pages.tools-stored PASS "tools.defines" = """
+WIDTH=8
+SIM"""
+"tools.include_dirs" = """
+rtl
+rtl/include"""
+"tools.lint_engine" = "verible"
+"tools.lsp_backend" = "slang"
+"tools.slang" =
+CHECK settings.pages.tools-restart-load PASS
+CHECK settings.pages.tools-restart PASS rtl
+rtl/include
+CHECK settings.pages.backend-selected PASS
+CHECK settings.pages.include-dirs-widget PASS
+CHECK settings.pages.fim-flush PASS
+CHECK settings.pages.fim-stored PASS "fim.enabled" = "true"
+"fim.endpoint" = "http://127.0.0.1:8080"
+"fim.ghost_text" = "true"
+"fim.max_tokens" = "128"
+"fim.model" = "qwen"
+"fim.protocol" = "llama_
+CHECK settings.pages.fim-restart-load PASS
+CHECK settings.pages.fim-restart PASS
+CHECK settings.pages.key-store PASS
+CHECK settings.pages.key-flush PASS
+CHECK settings.pages.key-path PASS /tmp/vedit-workspace-settings-selftest-CgvUpM/fim_api_key
+CHECK settings.pages.key-not-in-store PASS "fim.enabled" = "true"
+"fim.endpoint" = "http://127.0.0.1:8080"
+"fim.ghost_text" = "true"
+"fim.max_tokens" = "128"
+"fim.model" = "qwen"
+"fim.protocol" = "llama_cpp"
+"fim.timeout_ms" = "2500"
+"tools.de
+CHECK settings.pages.key-file-written PASS
+CHECK settings.pages.key-file-0600 PASS mode-loose=0
+CHECK settings.pages.key-file-mode-exact PASS mode=63000 umask=022
+CHECK settings.pages.key-no-temp-debris PASS fim_api_key
+CHECK settings.pages.key-file-content PASS
+CHECK settings.pages.key-no-echo PASS
+CHECK settings.pages.key-source PASS user-file
+CHECK settings.pages.key-stored PASS
+CHECK settings.pages.key-label PASS
+CHECK settings.pages.key-restart-load PASS
+CHECK settings.pages.key-restart-source PASS
+CHECK settings.pages.key-restart-no-echo PASS
+CHECK settings.pages.key-loose.write PASS
+CHECK settings.pages.key-loose.store PASS
+CHECK settings.pages.key-loose.replaced-0600 PASS mode=63000
+CHECK settings.pages.key-loose.no-debris PASS fim_api_key
+CHECK settings.pages.key-sweep.fixtures PASS
+CHECK settings.pages.key-sweep.store PASS
+CHECK settings.pages.key-sweep.stale-removed PASS
+CHECK settings.pages.key-sweep.live-kept PASS
+CHECK settings.pages.key-sweep.cleanup PASS
+CHECK settings.pages.key-field-never-filled PASS
+CHECK settings.pages.key-cleared PASS
+CHECK settings.pages.plain.flush-others PASS
+CHECK settings.pages.plain.write PASS
+CHECK settings.pages.plain.load PASS
+CHECK settings.pages.plain.ignored PASS none
+CHECK settings.pages.plain.diagnostic PASS settings.toml held a plaintext `fim.api_key`; it is ignored and will be removed on the next save — use VEDIT_FIM_API_KEY or the owner-only key file instead.
+CHECK settings.pages.plain.scrubbed PASS
+CHECK settings.pages.plain.flush-after PASS
+CHECK settings.pages.nested.write PASS
+CHECK settings.pages.nested.load PASS
+CHECK settings.pages.nested.rejected PASS /tmp/vedit-workspace-settings-selftest-CgvUpM/nested-settings.toml: `fim` is table but the store holds strings; ignored
+CHECK settings.pages.nested.scrubbed PASS
+CHECK settings.pages.dialog-harness PASS
+CHECK settings.pages.dialog-tabs PASS
+CHECK settings.pages.dialog-deferred PASS
+CHECK settings.pages.dialog-load PASS
+CHECK settings.pages.dialog-preview PASS
+CHECK settings.pages.dialog-preview-no-key-file PASS
+CHECK settings.pages.dialog-preview-no-store PASS
+CHECK settings.pages.dialog-cancel-no-key-file PASS
+CHECK settings.pages.dialog-cancel-no-key-echo PASS
+CHECK settings.pages.dialog-apply-load PASS
+CHECK settings.pages.dialog-apply-flush PASS
+CHECK settings.pages.dialog-apply-key-file PASS
+CHECK settings.pages.dialog-apply-store PASS
+CHECK settings.a4.appearance.loaded PASS
+CHECK settings.a4.appearance.fields PASS
+CHECK settings.a4.appearance.scale-choices PASS 4
+CHECK settings.a4.font.applied PASS 9
+CHECK settings.a4.font.qapplication PASS 17
+CHECK settings.a4.font.widget PASS 13
+CHECK settings.a4.font.flush PASS
+CHECK settings.a4.font.stored PASS
+CHECK settings.a4.font.restart-load PASS
+CHECK settings.a4.font.restart-value PASS 13
+CHECK settings.a4.font.restart-applied PASS 13
+CHECK settings.a4.font.system PASS now=9 startup=9
+CHECK settings.a4.font.system-not-stored PASS
+CHECK settings.a4.scale.flush PASS
+CHECK settings.a4.scale.stored PASS "fim.enabled" = "false"
+"fim.ghost_text" = "false"
+"fim.max_tokens" = "64"
+"fim.protocol" = "open_ai"
+"fim.timeout_ms" = "5000"
+"tools.lint_engine" = "slang"
+"tools.lsp_backend" = "verible"
+"ui.font_p
+CHECK settings.a4.scale.hint PASS Scale 150 %: the next start sets QT_SCALE_FACTOR=1.5 — restart VEdit to apply it.
+CHECK settings.a4.scale.read PASS
+CHECK settings.a4.scale.restart-load PASS
+CHECK settings.a4.scale.restart-value PASS
+CHECK settings.a4.scale.default-cleared PASS
+CHECK settings.a4.format.loaded PASS
+CHECK settings.a4.format.default-values PASS
+CHECK settings.a4.format.default-argv PASS
+CHECK settings.a4.format.knobs PASS 23/23
+CHECK settings.a4.format.advanced-folded PASS
+CHECK settings.a4.format.argv-one-to-one PASS --indentation_spaces=4 --column_limit=120 --wrap_spaces=4 --line_terminator=CRLF --try_wrap_long_lines=true --compact_indexing_and_selections=true --assignment_statement_alignment=flush-left --case_items_alignment=flush-left --class_member_variable_alignment=flush-left --distribution_items_alignment=flush-left --enum_assignment_statement_alignment=flush-left --formal_parameters_alignment=flush-left --module_net_variable_alignment=flush-left --named_parameter_alignment=flush-left --named_port_alignment=flush-left --port_declarations_alignment=flush-left --struct_union_members_alignment=flush-left --formal_parameters_indentation=indent --named_parameter_indentation=indent --named_port_indentation=indent --port_declarations_indentation=indent --port_declarations_right_align_packed_dimensions=true --port_declarations_right_align_unpacked_dimensions=true
+CHECK settings.a4.format.argv-count PASS 23
+CHECK settings.a4.format.widgets PASS
+CHECK settings.a4.format.flags PASS
+CHECK settings.a4.format.flush PASS
+CHECK settings.a4.format.restart-load PASS
+CHECK settings.a4.format.restart-values PASS
+CHECK settings.a4.format.restart-argv PASS
+CHECK settings.a4.format.single-key PASS
+CHECK settings.a4.format.idempotent-flush PASS
+CHECK settings.a4.format.idempotent PASS
+CHECK settings.a4.format.restored-flush PASS
+CHECK settings.a4.format.restored PASS
+CHECK settings.a4.format.restored-argv PASS
+CHECK settings.a4.format.holder PASS
+CHECK settings.a4.format.holder-argv PASS
+CHECK settings.a4.format.holder-cleared PASS
+CHECK settings.a4.format.fake-write PASS
+CHECK settings.a4.format.fake-executable PASS
+CHECK settings.a4.format.transport-runs PASS
+CHECK settings.a4.format.transport-argv PASS --indentation_spaces=4 --column_limit=120 --wrap_spaces=4 --line_terminator=CRLF --try_wrap_long_lines=true --compact_indexing_and_selections=true --assignment_statement_alignment=flush-left --case_items_alignment=flush-left --class_member_variable_alignment=flush-left --distribution_items_alignment=flush-left --enum_assignment_statement_alignment=flush-left --formal_parameters_alignment=flush-left --module_net_variable_alignment=flush-left --named_parameter_alignment=flush-left --named_port_alignment=flush-left --port_declarations_alignment=flush-left --struct_union_members_alignment=flush-left --formal_parameters_indentation=indent --named_parameter_indentation=indent --named_port_indentation=indent --port_declarations_indentation=indent --port_declarations_right_align_packed_dimensions=true --port_declarations_right_align_unpacked_dimensions=true -
+CHECK settings.a4.format.transport-default PASS -
+CHECK settings.a4.lint.loaded PASS
+CHECK settings.a4.lint.knobs PASS 7
+CHECK settings.a4.lint.default-engine PASS slang
+CHECK settings.a4.lint.slang.ruleset-disabled PASS
+CHECK settings.a4.lint.slang.ruleset-reason PASS Not available: slang has no rule set / rule selection (this is a verible-verilog-lint option).
+CHECK settings.a4.lint.slang.config-reason PASS Not available: slang has no .rules.verible_lint (this is a verible-verilog-lint option).
+CHECK settings.a4.lint.slang.waiver-reason PASS Not available: slang takes no verible waiver files (this is a verible-verilog-lint option).
+CHECK settings.a4.lint.slang.autofix-reason PASS Not available: slang has no automatic fixing (this is a verible-verilog-lint option).
+CHECK settings.a4.lint.slang.warnings-enabled PASS
+CHECK settings.a4.lint.state.backend-unsupported PASS
+CHECK settings.a4.lint.state.transport-pending PASS
+CHECK settings.a4.lint.state.supported PASS
+CHECK settings.a4.lint.slang-flush PASS
+CHECK settings.a4.lint.slang-stored PASS
+CHECK settings.a4.lint.verible-flush PASS
+CHECK settings.a4.lint.verible-engine PASS verible
+CHECK settings.a4.lint.verible.ruleset-enabled PASS
+CHECK settings.a4.lint.verible.ruleset-pending PASS --ruleset is stored, but the lint job does not carry it yet: the C ABI option struct has no field for it (transport pending).
+CHECK settings.a4.lint.verible.slang-disabled PASS
+CHECK settings.a4.lint.verible.slang-reason PASS Not available: verible-verilog-lint has no -W warning selection (this is a slang option).
+CHECK settings.a4.lint.verible.config-supported PASS
+CHECK settings.a4.lint.verible.status-label PASS Active engine. --rules_config is applied; the other options are stored but not sent yet (transport pending).
+CHECK settings.a4.lint.verible.slang-status-label PASS Not the selected engine — these controls are disabled. Switch Tools → Lint engine to slang to edit them; their values are kept.
+CHECK settings.a4.lint.verible-flush2 PASS
+CHECK settings.a4.lint.two-sets PASS "lint.slang.error_limit" = "25"
+"lint.slang.warnings" = """
+everything
+no-unused-variable"""
+"lint.verible.autofix" = "patch"
+"lint.verible.rules" = "line-length,no-tabs"
+"lint.verible.rules_config" = "/proj/.rules.verible_lint"
+"lint.verible.ruleset" = "all"
+"lint.verible.waiver_files" = """
+/p/a.waiver
+/p/b.waiver"""
+"tools.lint_engine" = "verible"
+"tools.lsp_backend" = "verible"
+
+CHECK settings.a4.lint.switch-flush PASS
+CHECK settings.a4.lint.switch-back-slang PASS
+CHECK settings.a4.lint.switch-back-verible PASS
+CHECK settings.a4.lint.no-crosswrite PASS
+CHECK settings.a4.lint.restart-load PASS
+CHECK settings.a4.lint.restart-values PASS
+CHECK settings.a4.lint.idempotent-flush PASS
+CHECK settings.a4.lint.idempotent PASS
+CHECK settings.a4.lint.options.page-wins PASS
+CHECK settings.a4.lint.options.legacy-second PASS
+CHECK settings.a4.lint.options.discovered-third PASS
+CHECK settings.a4.lint.options.none PASS
+CHECK settings.a4.lint.options.slang-never PASS
+CHECK settings.a4.lint.holder PASS
+CHECK settings.a4.legacy.write PASS
+CHECK settings.a4.legacy.loaded PASS
+CHECK settings.a4.legacy.defaults PASS
+CHECK settings.a4.legacy.no-diagnostics PASS
+CHECK settings.a4.legacy.flush PASS
+CHECK settings.a4.legacy.preserved PASS theme = ""
+"tools.include_dirs" = "rtl"
+"tools.lint_engine" = "verible"
+
+CHECK settings.a4.legacy.no-new-keys PASS
+CHECK settings.a4.scale.env-100 PASS
+CHECK settings.a4.scale.env-125 PASS
+CHECK settings.a4.scale.env-150 PASS
+CHECK settings.a4.scale.env-200 PASS
+CHECK settings.a4.scale.env-invalid PASS
+CHECK settings.a4.scale.factors PASS
+CHECK settings.a4.read.write PASS
+CHECK settings.a4.read.quoted PASS 150/11
+CHECK settings.a4.read.bare-write PASS
+CHECK settings.a4.read.bare PASS
+CHECK settings.a4.read.degraded-write PASS
+CHECK settings.a4.read.degrades PASS 100/0
+CHECK settings.a4.read.missing PASS
+CHECK settings.a4.scale.product-exists PASS /vedit-build/target/qt6-build/src/app/vedit-app
+CHECK settings.a4.scale.state-dir PASS
+CHECK settings.a4.scale.product-runs PASS exit=0
+CHECK settings.a4.scale.product-exit PASS 0
+CHECK settings.a4.scale.product-line PASS UI-SCALE scale_percent=150 qt_scale_factor=1.5 font_point_size=9 settings=/tmp/vedit-workspace-settings-selftest-CgvUpM/a4-scale-state/settings.toml
+
+CHECK settings.a4.scale.product-runs-default PASS exit=0
+CHECK settings.a4.scale.product-default-line PASS UI-SCALE scale_percent=100 qt_scale_factor=<unset> font_point_size=9 settings=/tmp/vedit-workspace-settings-selftest-CgvUpM/a4-scale-state/settings.toml
+
+CHECK settings.a4.scale.default-dir PASS
+CHECK settings.a4.scale.default-write PASS
+CHECK settings.a4.scale.default-runs PASS exit=0
+CHECK settings.a4.scale.default-line PASS UI-SCALE scale_percent=200 qt_scale_factor=2 font_point_size=9 settings=/tmp/vedit-workspace-settings-selftest-CgvUpM/a4-xdg-config/VEdit/vedit-app/settings.toml
+
+CHECK settings.a4.scale.default-path PASS UI-SCALE scale_percent=200 qt_scale_factor=2 font_point_size=9 settings=/tmp/vedit-workspace-settings-selftest-CgvUpM/a4-xdg-config/VEdit/vedit-app/settings.toml
+
+CHECK settings.a4.scale.default-empty PASS UI-SCALE scale_percent=100 qt_scale_factor=<unset> font_point_size=9 settings=/tmp/vedit-workspace-settings-selftest-CgvUpM/a4-empty-config/VEdit/vedit-app/settings.toml
+
+CHECK settings.a4.font.product-runs PASS exit=0
+CHECK settings.a4.font.product-line PASS UI-SCALE scale_percent=100 qt_scale_factor=<unset> font_point_size=19 settings=/tmp/vedit-workspace-settings-selftest-CgvUpM/a4-scale-state/settings.toml
+
+SETTINGS-SELFTEST ok=1 checks=228 failures=0

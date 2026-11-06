@@ -1,0 +1,12 @@
+=== filetree standalone lane (fresh build dir) ===
+CHECK tree.dblclick.rect-visible ok=1
+CHECK tree.dblclick.view-signal ok=1 detail="1"
+CHECK tree.dblclick.folder-expands ok=1
+CHECK tree.dblclick.folder-does-not-open ok=1
+CHECK tree.dblclick.file-rect ok=1
+CHECK tree.dblclick.file-opens ok=1 detail="1"
+CHECK tree.dblclick.file-path ok=1 detail="/vedit-build/filetree-testdata/tree/top.v"
+CHECK tree.activate.file-opens ok=1
+FILETREE-TESTS checks=111 failures=0
+
+=== search standalone lane (fresh build dir) ===

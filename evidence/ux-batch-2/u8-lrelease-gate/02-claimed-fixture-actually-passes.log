@@ -1,0 +1,6 @@
+[lrelease] /usr/lib/qt6/bin/lrelease /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ux-batch-2/integration-translations/00-catalogue-before.ts -qm /tmp/tmp.F46tA7VrQH/00-catalogue-before.qm
+Updating '/tmp/tmp.F46tA7VrQH/00-catalogue-before.qm'...
+    Generated 1018 translation(s) (1018 finished and 0 unfinished)
+[lrelease] counts: 1018 translation(s) (1018 finished, 0 unfinished, 0 untranslated)
+[lrelease] qm: 102200 bytes sha256=4906342a8d529d4efa87c722dd18a9682911db966c0a31f04e8160a1f1b243bf
+[lrelease] PASS: 0 unfinished and 0 untranslated in /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ux-batch-2/integration-translations/00-catalogue-before.ts

@@ -1,0 +1,9 @@
+# AC-9.2/4.8 recheck: lrelease on the CURRENT translations/vedit_zh_CN.ts (inside pinned Qt image)
+# collected: 2026-11-03T01:36:14+08:00
+docker: Error response from daemon: failed to create task for container: failed to create shim task: OCI runtime create failed: runc create failed: unable to start container process: error during container init: exec: "lrelease": executable file not found in $PATH
+
+Run 'docker run --help' for more information
+EXIT=127
+Updating '/tmp/vedit_check.qm'...
+    Generated 573 translation(s) (573 finished and 0 unfinished)
+EXIT=0

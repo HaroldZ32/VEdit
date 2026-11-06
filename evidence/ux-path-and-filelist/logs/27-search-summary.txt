@@ -1,0 +1,5 @@
+CHECK slowlifecycle.scan-started PASS
+CHECK slowlifecycle.batch-before-block PASS
+CHECK slowlifecycle.destructor-waits-for-stalled-read PASS
+CHECK lifecycle.stall-child-finished PASS
+CHECK lifecycle.stall-child-pass PASS

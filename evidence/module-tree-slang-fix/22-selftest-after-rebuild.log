@@ -1,0 +1,96 @@
+UpdateCTestConfiguration  from :/vedit-build/target/qt6-build/DartConfiguration.tcl
+Test project /vedit-build/target/qt6-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 29
+    Start 29: vedit-module-tree-selftest
+
+29: Test command: /vedit-build/target/qt6-build/src/app/workspace-lane-module_tree/vedit-module-tree-selftest "/vedit-build/src/workspace/module_tree/../../../probes/slang-spike/fixture" "/vedit-build/src/workspace/module_tree/../../../build/slang/out/slang" "" "/vedit-build/src/workspace/module_tree/../../../evidence/m-tree/fixture-generate"
+29: Working Directory: /vedit-build/target/qt6-build/src/app/workspace-lane-module_tree
+29: Environment variables: 
+29:  QT_QPA_PLATFORM=offscreen
+29:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime-module-tree
+29: Test timeout computed to be: 180
+29: ok   tree.single-root — roots=1
+29: ok   tree.root-label — top
+29: ok   tree.root-module — top
+29: ok   tree.root-position-1based — top.sv:3:8
+29: ok   tree.instance-nesting — top.u0, top.u1, link, clk, rst
+29: ok   tree.full-instance-path — top.u0
+29: ok   tree.instance-module — mid
+29: ok   tree.instance-jump — /proj/top.sv:11:7
+29: ok   tree.signal-node
+29: ok   tree.signal-children — children=3
+29: ok   tree.signal-driver-node — driver: top.u0.q
+29: ok   jump.conversion
+29: ok   signal.source — source of top.link: top.u0.q · top.sv:11:38
+29: ok   signal.target — target of top.link: top.u1.d · top.sv:12:25
+29: ok   signal.declaration-falls-back-to-driver — source of top.link: top.u0.q · top.sv:11:38
+29: ok   signal.no-driver-is-honest — top.rst has no driver in the elaborated design
+29: ok   lookup.single — net top.link
+29: ok   lookup.ambiguous-reports-choice — 2 nets named 'q'; chose top.u0.q
+29: ok   lookup.unknown — no net named 'nope' in the elaborated design
+29: This plugin does not support propagateSizeHints()
+29: ok   panel.rows-built — rows=19
+29: ok   panel.summary — slang · 2 file(s) · 3 instance(s) · 6 net(s) · 5 ms · 19592 KiB peak
+29: root: /proj
+29: ok   panel.instance-row
+29: ok   panel.event.row-clickable — rect=40,14 566x14
+29: ok   panel.event.double-click-instance — delivered=1 /proj/top.sv:11:7
+29: ok   panel.signal-row
+29: ok   panel.event.double-click-signal-declaration — delivered=1 /proj/top.sv:11:38
+29: ok   panel.event.button-source — net top.link · source of top.link: top.u0.q · top.sv:11:38 → top.sv:11:38
+29: ok   panel.event.button-target — net top.link · target of top.link: top.u1.d · top.sv:12:25 → top.sv:12:25
+29: ok   panel.event.button-source-cross-file — /proj/mid.sv:10:5
+29: ok   panel.no-location-row
+29: ok   panel.event.no-location-double-click — delivered=1 calls=5->5 status=rst has no file:line in the elaborated design
+29: ok   panel.null-row-safe
+29: ok   panel.no-driver-status — top.rst has no driver in the elaborated design
+29: ok   panel.no-cursor-word — put the cursor on a signal name in the editor first
+29: ok   panel.empty-state — No hierarchy yet: open a project and press Refresh.
+29: ok   panel.failure-visible — no project root: open a folder
+29: ok   panel.empty-snapshot — No hierarchy yet: open a project and press Refresh.
+29: ok   toolchain.appdir-temp
+29: ok   toolchain.appdir-bin — /tmp/vedit-module-tree-selftest-pTxvMJ/bin
+29: ok   toolchain.appdir-slang — /tmp/vedit-module-tree-selftest-pTxvMJ/bin/slang
+29: ok   toolchain.published-path — /tmp/vedit-module-tree-selftest-pTxvMJ/bin/slang
+29: ok   toolchain.no-source-empty
+29: ok   toolchain.override-executable — /tmp/vedit-module-tree-selftest-pTxvMJ/slang-override
+29: ok   toolchain.env-override-wins — /tmp/vedit-module-tree-selftest-pTxvMJ/slang-override
+29: ok   real.temp-state
+29: ok   real.service-answered
+29: ok   real.source-description — vd_project_expand_v2(/vedit-build/probes/slang-spike/fixture)
+29: ok   real.instances — instances=3
+29: ok   real.instance-paths — top, top.u0, top.u1
+29:      measurement: slang · 2 file(s) · 3 instance(s) · 14 net(s) · 5 ms · 19304 KiB peak
+29: ok   real.tree-built — rows=47
+29: ok   real.double-click-instance — top.sv:11:7
+29: ok   real.signal-source — net top.link · source of top.link: top.u0.q · top.sv:11:38 → top.sv:11:38
+29: ok   real.signal-target — net top.link · target of top.link: top.u1.d · top.sv:12:25 → top.sv:12:25
+29: ok   real.cross-file-source — 2 nets named 'state'; chose top.u0.state · source of top.u0.state: top.u0.state · mid.sv:10:5 → mid.sv:10:5
+29: ok   packaged.appdir-slang — /vedit-build/target/qt6-build/src/app/workspace-lane-module_tree/bin/slang
+29: ok   packaged.temp-state
+29: ok   packaged.answered
+29: ok   packaged.instances — instances=3
+29:      measurement: slang · 2 file(s) · 3 instance(s) · 14 net(s) · 5 ms · 19284 KiB peak
+29: ok   generate.answered
+29:      generate fixture: slang · 2 file(s) · 5 instance(s) · 14 net(s) · 5 ms · 19236 KiB peak
+29:      observed instance paths: gen_top, gen_top.u_bank, gen_top.u_bank.g[0].u_leaf, gen_top.u_bank.g[1].u_leaf, other_top
+29:      observed 5/5 ground-truth instance(s); missing: 
+29: ok   generate.first-root-visible — gen_top, gen_top.u_bank, gen_top.u_bank.g[0].u_leaf, gen_top.u_bank.g[1].u_leaf, other_top
+29: ok   generate.tree-painted — rows=42 instances=5
+29: 
+29: 61 checks, 0 failure(s)
+1/1 Test #29: vedit-module-tree-selftest .......   Passed    0.36 sec
+
+The following tests passed:
+	vedit-module-tree-selftest
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.36 sec
+EXIT=0

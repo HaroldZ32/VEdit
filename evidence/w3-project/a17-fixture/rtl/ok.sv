@@ -1,0 +1,1 @@
+module ok; endmodule

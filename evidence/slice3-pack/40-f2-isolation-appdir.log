@@ -1,13 +1,23 @@
 402
-whitelist: SystemVerilog,Verilog
-fixtures: host_xml=402 user_xml=1
+whitelist: Markdown,SystemVerilog,Tcl,VHDL,Verilog
+whitelist_entries: 5
+fixtures: host_xml=402 user_xml=1 shadow_xml=1
 == positive (AppDir) ==
-CHECK PASS  appdir: defs=2
-CHECK PASS  appdir: names == whitelist [SystemVerilog,Verilog]
+appdir winners: Markdown=/app/usr/share/org.kde.syntax-highlighting/syntax/vedit-markdown.xml SystemVerilog=/app/usr/share/org.kde.syntax-highlighting/syntax/vedit-systemverilog.xml Tcl=/app/usr/share/org.kde.syntax-highlighting/syntax/vedit-tcl.xml VHDL=/app/usr/share/org.kde.syntax-highlighting/syntax/vedit-vhdl.xml Verilog=/app/usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml
+CHECK PASS  appdir: defs=5 (whitelist entries)
+CHECK PASS  appdir: names == whitelist [Markdown,SystemVerilog,Tcl,VHDL,Verilog]
+CHECK PASS  appdir: every whitelist name wins from /app/usr/share/org.kde.syntax-highlighting/syntax
+CHECK PASS  appdir: all 5 loaded definitions win from the AppDir
 CHECK PASS  appdir: HostLeakProbe invisible
 CHECK PASS  appdir: UserLeakProbe invisible
-== reverse control (AppDir) ==
-CHECK PASS  appdir-reverse: reverse control reproduces the leak (defs=403)
-== summary: pass=5 fail=0 ==
+== reverse control: host leak (AppDir) ==
+CHECK PASS  appdir-reverse: reverse control reproduces the host leak (defs=406 > whitelist 5)
+== reverse control: user-level leak (AppDir) ==
+CHECK PASS  appdir-reverse-user: XDG_DATA_HOME=$HOME/.local/share makes the user definition visible (defs=6 > 5; UserLeakProbe=/root/.local/share/org.kde.syntax-highlighting/syntax/UserLeakProbe.xml)
+== negative control: same-name higher-version shadow (AppDir) ==
+CHECK PASS  appdir-shadow: higher-version same-name host Tcl.xml wins when visible (/shadow/org.kde.syntax-highlighting/syntax/Tcl.xml)
+CHECK PASS  appdir-shadow: the winner-path assertion REPORTS the shadowed Tcl (offenders: Tcl=/shadow/org.kde.syntax-highlighting/syntax/Tcl.xml)
+CHECK PASS  appdir-shadow: shadow leaves the name set unchanged (defs=5) - why names alone are insufficient
+== summary: pass=11 fail=0 ==
 F2-ISOLATION PASS
 isolation(appdir) exit=0

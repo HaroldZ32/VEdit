@@ -1,0 +1,15 @@
+# 51-t51-before — 降级状态（parallel cleanup lane 于 14:05:15 用 lupdate 默认选项重建）
+# captured: 2026-11-04T14:23:24+08:00
+sha256: 9a371921fe6a66cf6247a216802084510c77b872435c6f2e7f23739462bc80ec  translations/vedit_zh_CN.ts
+relative <location line="+N"> 行数: 964
+message 数: 942
+--- make_reconciliation 当前输出 ---
+  不译: 21
+  待定: 17
+  译（已完成）: 185
+  译（本批）: 73
+  译（片段）: 23
+  verified: {'no-wrap': 19, 'own-call+ts': 253, 'wrap-only': 47}
+audit rows changed=0 -> evidence/i18n-l2/logs/20-t40-claim-audit.csv
+FAIL: 17 待定 row(s)
+EXIT=0

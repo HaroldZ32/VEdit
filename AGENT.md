@@ -67,22 +67,50 @@ CentOS 7 image, because the deliverable must run on CentOS 7 (glibc 2.17).
 The slang deep-lint binary has its own one-command build:
 `bash build/slang/build.sh`.
 
-### VCS panel: read-only, asynchronous, Git verified / SVN stub-only (T99)
+### VCS panel: asynchronous reads AND writes, with a write allow-list (T99 + batch 3–6)
 
-The VCS panel is a read-only view (backend, branch/revision, changed files, one
-file's diff). All three reads are **asynchronous jobs** in the C ABI
-(`vd_vcs_status` / `vd_vcs_info_job` / `vd_vcs_diff_job` + poll); the panel
-polls them from a QTimer, so no `git`/`svn` subprocess ever runs on the GUI
-thread. There is no write entry point in the seam or the C ABI, and the runner
-rejects write subcommands before spawning.
+The panel shows backend/branch/revision, changed files and diffs, plus the
+History tab, the three-column working tree and the workspace (stash / worktree)
+dialog. **Every subprocess — read or write — is an asynchronous C ABI job**
+(`vd_vcs_status` / `vd_vcs_info_job` / `vd_vcs_diff_job` and the write
+`vd_vcs_write_job` variants, each paired with poll/free); the panel polls them
+from a QTimer, so no `git`/`svn` process ever runs on the GUI thread.
 
-Real-subprocess evidence: Git is covered end to end (the lane selftest starts a
-job against a repository and proves the event loop keeps ticking while a slow
-`git` wrapper sleeps; `vedit-app --selfcheck-ffi` also exercises the VCS status
-job). **SVN is stub-only**: neither the host nor the pinned image ships
-`svn`/`svnadmin`, so the real SVN subprocess path has no end-to-end test — the
-lane tests drive `StubVcsSource`/canned runners. Do not describe SVN support as
-verified until a real `svn` working-copy smoke exists.
+The safety boundary is now "reads still refuse every write subcommand; writes
+are allowed only through a per-operation allow-list":
+
+- **Read gate refuses writes.** The read runner rejects every write subcommand
+  *before spawning* (`commit`, `push`, `checkout`, `reset`, `revert`, `switch`,
+  `update`, …), and the two tables are disjoint — asserted by
+  `crates/vd-vcs/tests/readonly.rs` (positive and negative cases) and the lane
+  selftest (`vcs.ffi.read-only-surface` was strengthened, not relaxed).
+- **Write allow-list, default deny.** Nine typed operations (4 Git, 5 SVN) are
+  permitted; an unknown operation code, a non-repository, a backend mismatch or
+  a path outside the repository is refused before any process starts.
+- **Confirmations.** Destructive operations (`reset --hard`, `clean`, `discard`,
+  delete branch/tag, remote remove, `worktree remove`) ask **twice**
+  (`confirmTwice`); declining at either step writes nothing.
+- **Credentials never persist.** When no helper/SSH is available the credential
+  dialog passes the secret to the child through its **environment only** — never
+  argv, never a file, never a log or an evidence artefact; the evidence greps for
+  secret material stay at zero. Cancelling aborts the operation with git's real
+  reason.
+
+Toolchain: the delivered AppDir bundles `git 2.53.0` and `subversion 1.14.5`
+under `usr/lib/vcs/` (57-library ldd closure, mutually non-shadowing with the
+product's own `lib/`); resolution is **bundled > PATH > env** and observable as
+`VCS-TOOLCHAIN git=… version=… svn=… version=… source=bundled`. `svnadmin` is
+**build-only** (used to create the E2E fixture, deliberately not shipped).
+
+Evidence: reads and writes are covered against REAL subprocesses — Git end to
+end (including `file://` bare-repo remotes, a 401 credential transport, history
+and workspace operations) and SVN with a real `svnadmin create` + `svn
+checkout` working copy driven by the bundled `svn` (`evidence/vcs-write/`,
+`evidence/vcs-toolchain/`, `evidence/vcs-git-remote/`, `evidence/vcs-git-history/`,
+`evidence/vcs-git-ops/`, `evidence/vcs-git-workspace/`, `evidence/svn-e2e/`).
+SVN is **no longer stub-only**: the `.svn` project path runs the bundled client.
+Still not claimed: real network / HTTPS / SSH transports — those are limited to
+local bare repositories and the local 401 auth fixture.
 
 ### Project discovery: optional files are not errors (T114)
 
@@ -190,6 +218,15 @@ so all pure-ASCII metrics change.
 - Keep requirement, implementation and review as separate records.
 - Record evidence (command, observed result, path) on disk; a claim without evidence is
   incomplete.
+- Evidence lives in a per-batch directory under `evidence/` (one README plus its
+  raw logs), and every acceptance claim points at it. The final acceptance
+  matrix for a delivery is `evidence/final-acceptance-2/AC-MATRIX.md`: it lists
+  each requirement id, its verdict and its evidence pointer, and it carries the
+  known limitations and the carried (non-defect) exemptions. Do not overwrite an
+  older batch's evidence to make a new claim fit — add a new directory.
+- Gate evidence rows live under `.mpd/verify/evidence/` and verdict records under
+  `.mpd/verify/records/`; a PASS names its sources (frozen contract, requirements,
+  the batch evidence) and the gate evidence ids it rests on.
 
 ## 8. Security
 
@@ -204,8 +241,9 @@ KTextEditor 的 `KSyntaxHighlighting::Repository` **不认**我们随包的两�
 `Repository::addCustomSearchPath()` 与私有 XDG 目录都改变不了这一点，
 因为 `KTextEditor::Editor::repository()` 返回 const，没有公共注入路径。
 
-**后果**：编辑器里实际生效的高亮/原生折叠来自 KDE 自带定义；我们的 XML 只被我们自己的
-`vedit::folding::KsyntaxFoldSource`（以及面包屑的语法扫描）使用。
+**后果**：编辑器里实际生效的高亮/原生折叠来自 KDE 自带定义；我们的 XML 只被面包屑的语法扫描
+（`syntax_breadcrumb_source.*`，读 `resources/queries/*/structure.scm`）使用（T29 删掉折叠 lane 后
+已无第二个消费者）。
 所以“高亮是好的”与“我们的 XML”没有关系；要改我们的定义，必须走我们自己的扫描路径，
 不能指望 KTextEditor 加载它。
 
@@ -226,6 +264,15 @@ VEdit **不再注入折叠**（T128 删掉了 `FoldInjector` 的 `exec("fold")` 
   `vedit-native-fold-tests`（10k 行 open ≤2 s、二次打开不崩、折叠时移动光标不崩、打开无自动折叠）。
 - 删除清单：`src/syntax/folding/fold_injector.{h,cpp}`、`tests/folding_tests.cpp`、
   以及 `FoldBreadcrumbBinding` 里的折叠字段/方法；面包屑保留不变。
-- 仍保留但**已无产品消费方**：`fold_range.*`、`fold_source.*`、`syntax_fold_source.*`、
-  `ksyntax_fold_source.*`（折叠扫描能力/旧的 tree-sitter fold 查询）。它们只服务于测试/探针；
-  下一步可整体删除（删 `vedit_syntax_folding` 及其 CMake 接线）。
+- **T29 已把这条 lane 整体删除**：`src/syntax/folding/`（`fold_range.*`、`fold_source.*`、
+  `syntax_fold_source.*`、`ksyntax_fold_source.*`、`README.md`）、静态库 `vedit_syntax_folding`、
+  它在 `src/editor/CMakeLists.txt` 的 `add_subdirectory`/链接，以及 2 个测试可执行一并删除；
+  `grep -r vedit_syntax_folding`（源码/CMake/脚本）= 0。证据 `evidence/dead-code/`。
+- **真实点击判据没有随之消失**：`vedit-fold-gutter-click`（xcb+Xvfb 下真实鼠标点 KDE 自带 gutter
+  标记，双向折叠，非 region 行负控制）的源码迁到 `src/editor/kernel/fold_gutter_click_probe.cpp`，
+  在 `src/editor/CMakeLists.txt` 重新注册，**ctest id 不变**；实测 `hidden 0→38→0`、
+  `scroll_max 939→901→939`，`NATIVE-GUI result ok=1`。它只依赖 KTextEditor/Qt，不依赖已删的库。
+- `resources/queries/**` 保留：`highlights/folds/structure.scm` 被 `src/syntax/grammars` 嵌入构建产物，
+  `structure.scm` 还被面包屑产品路径消费，删除需要改 grammars 的 CMake（越界）。`src/syntax/common/`
+  里只服务那条 lane 的两个 helper（definition-file-name mapper 与 application-directory fallback）已无调用点，
+  随 T49 删除。

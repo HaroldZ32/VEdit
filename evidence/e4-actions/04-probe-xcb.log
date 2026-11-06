@@ -1,0 +1,154 @@
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+OBSERVED platform=xcb
+ok   probe.edit-core-provider
+kf.sonnet.core: Sonnet: No speller backends available!
+TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server] local=[/vedit-build/build/slang/out,/vedit-build/.mpd/recon/verible/bin]
+ok   probe.diagnostics-panel
+ok   probe.active-pane
+ok   gate.published-on-shell
+OBSERVED gate.backend verible
+OBSERVED gate.map backend='verible'
+GATE action=codeAction enabled=1 known=1 source='backend' reason=''
+GATE action=completion enabled=0 known=1 source='backend' reason='the initialize result has no completionProvider; FIM is the only completion source'
+GATE action=definition enabled=1 known=1 source='backend' reason=''
+GATE action=formatting enabled=0 known=1 source='always-verible-format' reason='verible-verilog-format not found (bundled, local checkout, PATH and env all empty)'
+GATE action=hover enabled=0 known=1 source='backend' reason='hoverProvider = false in the initialize result (measured)'
+GATE action=inlayHint enabled=0 known=1 source='backend' reason='the initialize result has no inlayHintProvider (measured)'
+GATE action=references enabled=1 known=1 source='backend' reason=''
+GATE action=rename enabled=1 known=1 source='backend' reason=''
+GATE action=signatureHelp enabled=0 known=1 source='editor-synthesised' reason='editor-synthesised by the editor (T16); absent until it lands'
+BACKEND-SWITCHED backend=verible lint=slang lsp=/vedit-build/.mpd/recon/verible/bin/verible-verilog-ls engine=/vedit-build/build/slang/out/slang basis=measured argv=''
+BACKEND-AUX aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server]
+SWITCH elapsed-ms=0 backend=verible lint=slang basis=measured
+ok   gate.formatting-enabled - formatter=formatting always uses verible-verilog-format, independent of the LSP backend
+ok   probe.ktexteditor-view
+ok   channel.installed-by-provider
+ok   menu.installed-by-provider
+ok   navigator.installed-by-provider
+ok   channel.no-file-refused - no file is open in this editor
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+ok   probe.file-opened
+ok   probe.analyzed - nav.sv — analyzed 13:47:18 (saved file): 0 diagnostic(s)
+OBSERVED probe.status nav.sv — analyzed 13:47:18 (saved file): 0 diagnostic(s)
+ok   probe.view-after-open
+ok   channel.rebound-to-open-view
+OBSERVED menu.event-target=KateViewInternal
+ok   menu.real-right-click-opens-menu - handled=1 menu=1 platform=xcb
+ok   menu.real-menu-has-our-items
+ok   menu.real-menu-has-default-actions - items=28
+OBSERVED menu.real.texts: &Undo[on] | Re&do[off] | ---[on] | Cu&t[on] | &Copy[on] | &Paste[on] | Paste Selection[on] | Take Screenshot of Selection[off] | Swap with Clipboard Contents[on] | ---[on] | Select &All[on] | Dese&lect[off] | Editing[on] | ---[on] | Spelling[off] | ---[on] | &Bookmarks[on] | ---[on] | ---[on] | Go to &Definition	F12[on] | Find &References	Shift+F12[on] | &Rename Symbol...	F2[on] | &Format Document	Ctrl+Alt+F[on] | Show &Hover[off] | ---[on] | ---[on] | &Next Diagnostic	F8[off] | &Previous Diagnostic	Shift+F8[off]
+OBSERVED menu.real.visible=1 platform=xcb
+ok   menu.real-popup-visible
+ok   menu.default-context-menu
+ok   menu.default-actions-kept - 19
+ok   menu.our-items-added - 9
+OBSERVED menu.texts: &Undo[on] | Re&do[off] | ---[on] | Cu&t[on] | &Copy[on] | &Paste[on] | Paste Selection[on] | Take Screenshot of Selection[off] | Swap with Clipboard Contents[on] | ---[on] | Select &All[on] | Dese&lect[off] | Editing[on] | ---[on] | Spelling[off] | ---[on] | &Bookmarks[on] | ---[on] | ---[on] | Go to &Definition	F12[on] | Find &References	Shift+F12[on] | &Rename Symbol...	F2[on] | &Format Document	Ctrl+Alt+F[on] | Show &Hover[off] | ---[on] | ---[on] | &Next Diagnostic	F8[off] | &Previous Diagnostic	Shift+F8[off]
+ok   vedit.action.definition
+ok   vedit.action.definition.enabled-matches-gate - menu=1 channel=1
+ITEM vedit.action.definition enabled=1 shortcut='F12' tooltip='Ask verible for the definition at the cursor and jump to it'
+ok   vedit.action.references
+ok   vedit.action.references.enabled-matches-gate - menu=1 channel=1
+ITEM vedit.action.references enabled=1 shortcut='Shift+F12' tooltip='Ask verible for the references at the cursor and report their count'
+ok   vedit.action.rename
+ok   vedit.action.rename.enabled-matches-gate - menu=1 channel=1
+ITEM vedit.action.rename enabled=1 shortcut='F2' tooltip='Ask verible for a rename preview of the symbol at the cursor'
+ok   vedit.action.format
+ok   vedit.action.format.enabled-matches-gate - menu=1 channel=1
+ITEM vedit.action.format enabled=1 shortcut='Ctrl+Alt+F' tooltip='Run the external verible-verilog-format over this document (one undoable edit)'
+ok   vedit.action.hover
+ok   vedit.action.hover.enabled-matches-gate - menu=0 channel=0
+ITEM vedit.action.hover enabled=0 shortcut='' tooltip='hoverProvider = false in the initialize result (measured)'
+ok   vedit.action.next-diagnostic
+ok   vedit.action.next-diagnostic.enabled-matches-gate - menu=0 channel=0
+ITEM vedit.action.next-diagnostic enabled=0 shortcut='F8' tooltip='no diagnostics in this file'
+ok   vedit.action.previous-diagnostic
+ok   vedit.action.previous-diagnostic.enabled-matches-gate - menu=0 channel=0
+ITEM vedit.action.previous-diagnostic enabled=0 shortcut='Shift+F8' tooltip='no diagnostics in this file'
+ok   hover.greyed
+ok   hover.reason-is-backend-reason - hoverProvider = false in the initialize result (measured)
+ACTION-REFUSED action=hover enabled=0 known=1 source=backend reason='hoverProvider = false in the initialize result (measured)'
+ok   hover.dispatch-refused-with-reason - hoverProvider = false in the initialize result (measured)
+ACTION action=definition dispatched=1 via='diagnostics.definition'
+DEFINITION backend=verible file='/tmp/vedit-editor-actions-probe-jlvQJF/project/nav.sv' line=1 column=8
+ok   action.definition-jumped - calls=1 target=/tmp/vedit-editor-actions-probe-jlvQJF/project/nav.sv:1
+ok   action.definition-target - target=/tmp/vedit-editor-actions-probe-jlvQJF/project/nav.sv:1 expected=/tmp/vedit-editor-actions-probe-jlvQJF/project/nav.sv:1
+ACTION action=references dispatched=1 via='diagnostics.references'
+REFERENCES backend=verible count=1 first='/tmp/vedit-editor-actions-probe-jlvQJF/project/nav.sv'
+ok   action.references-reported - 1 reference(s) from verible
+ACTION action=rename dispatched=1 via='diagnostics.rename'
+BACKEND-SWITCHED backend=verible lint=slang lsp=/vedit-build/.mpd/recon/verible/bin/verible-verilog-ls engine=/vedit-build/build/slang/out/slang basis=measured argv='backend=verible program=/vedit-build/.mpd/recon/verible/bin/verible-verilog-ls'
+BACKEND-AUX aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server]
+SWITCH elapsed-ms=0 backend=verible lint=slang basis=measured
+RENAME-PREVIEW backend=verible edits=2 files=0
+ok   action.rename-preview - Rename preview: 2 edit(s) from verible
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+ok   format.view-open
+ok   format.menu-binding
+OBSERVED format.availability enabled=1 source='always-verible-format' reason='formatting always uses verible-verilog-format, independent of the LSP backend' shell_action=1 shell_enabled=1 file='/tmp/vedit-editor-actions-probe-jlvQJF/project/format.sv'
+OBSERVED format.menu items=28 texts: &Undo[on] | Re&do[off] | ---[on] | Cu&t[on] | &Copy[on] | &Paste[on] | Paste Selection[on] | Take Screenshot of Selection[off] | Swap with Clipboard Contents[on] | ---[on] | Select &All[on] | Dese&lect[off] | Editing[on] | ---[on] | Spelling[off] | ---[on] | &Bookmarks[on] | ---[on] | ---[on] | Go to &Definition	F12[on] | Find &References	Shift+F12[on] | &Rename Symbol...	F2[on] | &Format Document	Ctrl+Alt+F[on] | Show &Hover[off] | ---[on] | ---[on] | &Next Diagnostic	F8[off] | &Previous Diagnostic	Shift+F8[off]
+OBSERVED format.menu.item object='edit_undo' enabled=1
+OBSERVED format.menu.item object='edit_redo' enabled=0
+OBSERVED format.menu.item object='' enabled=1
+OBSERVED format.menu.item object='edit_cut' enabled=1
+OBSERVED format.menu.item object='edit_copy' enabled=1
+OBSERVED format.menu.item object='edit_paste' enabled=1
+OBSERVED format.menu.item object='edit_paste_selection' enabled=1
+OBSERVED format.menu.item object='text_screenshot_selection' enabled=0
+OBSERVED format.menu.item object='edit_swap_with_clipboard' enabled=1
+OBSERVED format.menu.item object='' enabled=1
+OBSERVED format.menu.item object='edit_select_all' enabled=1
+OBSERVED format.menu.item object='edit_deselect' enabled=0
+OBSERVED format.menu.item object='tools_scripts_Editing' enabled=1
+OBSERVED format.menu.item object='' enabled=1
+OBSERVED format.menu.item object='spelling_suggestions' enabled=0
+OBSERVED format.menu.item object='' enabled=1
+OBSERVED format.menu.item object='bookmarks' enabled=1
+OBSERVED format.menu.item object='' enabled=1
+OBSERVED format.menu.item object='' enabled=1
+OBSERVED format.menu.item object='vedit.action.definition' enabled=1
+OBSERVED format.menu.item object='vedit.action.references' enabled=1
+OBSERVED format.menu.item object='vedit.action.rename' enabled=1
+OBSERVED format.menu.item object='vedit.action.format' enabled=1
+OBSERVED format.menu.item object='vedit.action.hover' enabled=0
+OBSERVED format.menu.item object='' enabled=1
+OBSERVED format.menu.item object='' enabled=1
+OBSERVED format.menu.item object='vedit.action.next-diagnostic' enabled=0
+OBSERVED format.menu.item object='vedit.action.previous-diagnostic' enabled=0
+ok   format.item-enabled
+ACTION action=format dispatched=1 via='diagnostics.format'
+FORMAT backend=verible formatter=/vedit-build/.mpd/recon/verible/bin/verible-verilog-format changed=1 enabled-by='always-verible-format' in-bytes=59 out-bytes=73 file='/tmp/vedit-editor-actions-probe-jlvQJF/project/format.sv'
+ok   action.format-changed-document - bytes 59 -> 73
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+ok   f8.view-open
+ok   f8.navigator-rebound
+OBSERVED f8.diagnostics=3
+DIAG line=1 column=10 severity=1 message='syntax error at "b"'
+DIAG line=2 column=13 severity=1 message='syntax error at ";"'
+DIAG line=5 column=2 severity=1 message='syntax error at "end"'
+ok   f8.renamed-file-diagnostics - 3 entries
+ok   f8.rule-ordering
+ok   f8.rule-next - line=7
+ok   f8.rule-next-wraps - line=2 wrapped=1
+ok   f8.rule-previous - line=2
+ok   f8.rule-previous-wraps - line=20 wrapped=1
+ok   f8.rule-empty-no-move
+DIAG-NAV action=next count=3 index=0 from=0:0 to=1:10 wrapped=0 severity=error message='syntax error at "b"' file='/tmp/vedit-editor-actions-probe-jlvQJF/project/broken.sv'
+ok   f8.key-next-lands-on-diagnostic - cursor=1:10 expected=1:10
+OBSERVED f8.status Diagnostic 1/3 - error: syntax error at "b"
+DIAG-NAV action=next count=3 index=1 from=1:10 to=2:13 wrapped=0 severity=error message='syntax error at ";"' file='/tmp/vedit-editor-actions-probe-jlvQJF/project/broken.sv'
+ok   f8.key-next-advances - cursor=2 expected=2
+DIAG-NAV action=previous count=3 index=0 from=2:13 to=1:10 wrapped=0 severity=error message='syntax error at "b"' file='/tmp/vedit-editor-actions-probe-jlvQJF/project/broken.sv'
+ok   f8.key-shift-previous - cursor=1 expected=1
+ok   f8.navigator-steps - 3
+DIAG-NAV action=next count=0 moved=0 file='/tmp/vedit-editor-actions-probe-jlvQJF/project/broken.sv'
+ok   f8.empty-no-move - cursor=1:10
+OBSERVED f8.empty-status No diagnostics in this file
+ok   f8.empty-status-message
+ok   menu.broken-binding
+ok   menu.nav-enabled-with-diagnostics - next=1 previous=1
+OBSERVED menu.diagnostics.texts: &Undo[on] | Re&do[off] | ---[on] | Cu&t[on] | &Copy[on] | &Paste[on] | Paste Selection[on] | Take Screenshot of Selection[off] | Swap with Clipboard Contents[on] | ---[on] | Select &All[on] | Dese&lect[off] | Editing[on] | ---[on] | Spelling[off] | ---[on] | &Bookmarks[on] | ---[on] | ---[on] | Go to &Definition	F12[on] | Find &References	Shift+F12[on] | &Rename Symbol...	F2[on] | &Format Document	Ctrl+Alt+F[on] | Show &Hover[off] | ---[on] | ---[on] | &Next Diagnostic	F8[on] | &Previous Diagnostic	Shift+F8[on]
+ok   hover.request-path-registered - action-diagnostics.hover
+ok   hover.gated-by-capability-not-by-wiring - the running server advertises no hoverProvider (live initialize result)
+ok   channel.definition-dispatched
+ok   channel.hover-refused-count - hoverProvider = false in the initialize result (measured)
+SUMMARY checks=67 failures=0 skips=0

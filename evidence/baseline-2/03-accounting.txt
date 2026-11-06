@@ -1,0 +1,100 @@
+# 03-accounting — 批0 基线快照账目（只读；未修正任何路径）
+# cwd: /home/haroldzhao/MyProj/DshProj/VEdit
+# captured: 2026-11-03T21:11:29+08:00
+
+## 命令与退出码
+git rev-parse HEAD                    exit=0  -> 00-head.txt
+git status --porcelain=v1             exit=0  -> 01-porcelain-v1.txt
+git status --porcelain=v1 -uall       exit=0  -> 02-porcelain-v1-uall.txt
+
+## HEAD
+4e2d0a57ca50db9568db5a5b040cc66f04c9a05f (期望前缀 4e2d0a5 -> 命中)
+
+## 行数（01/02 为纯命令正文，无附加行）
+porcelain-v1        : 244 (期望 241)
+porcelain-v1 -uall  : 863 (期望 843)
+
+## 自身可归因行（本次证据目录 evidence/baseline-2/ 为未跟踪，计入状态）
+porcelain-v1        : 1 行 -> 扣除此项后 243
+porcelain-v1 -uall  : 3 行 -> 扣除此项后 860
+
+## 差异摘要（相对期望，如实记录，不修正）
+porcelain-v1        : 243 - 241 = 2
+porcelain-v1 -uall  : 860 - 843 = 17
+
+## porcelain-v1 状态码直方图
+      145  M
+       99 ??
+
+## 未跟踪条目顶层分组（porcelain-v1，已排除 evidence/baseline-2/ 自身）
+       25 evidence/i18n
+       12 src/workspace
+       11 src/editor
+        8 crates/vd-deeplint
+        2 src/app
+        2 docs/handover
+        2 crates/vd-lsp
+        2 crates/vd-ffi
+        1 translations/
+        1 probes/slang-spike
+        1 evidence/w6-hier
+        1 evidence/w5-backend
+        1 evidence/w4-lint
+        1 evidence/w3-project
+        1 evidence/w2-spike
+        1 evidence/w1-rust-engine
+        1 evidence/t20-shell
+        1 evidence/s1-settings
+        1 evidence/review-tabs
+        1 evidence/review-spike
+        1 evidence/review-project
+        1 evidence/review-multicursor
+        1 evidence/review-jump
+        1 evidence/review-backend
+        1 evidence/review-a9
+        1 evidence/m-tree
+        1 evidence/jump
+        1 evidence/i3-session
+        1 evidence/i2-i18n
+        1 evidence/i18n-l2
+        1 evidence/g6-diag
+        1 evidence/final-acceptance
+        1 evidence/e5-advanced
+        1 evidence/e4-actions
+        1 evidence/e3-edit
+        1 evidence/e2-find
+        1 evidence/e1-tabs
+        1 evidence/d-diagnostics
+        1 evidence/baseline
+        1 docs/capability-matrix.md
+        1 docs/ACCEPTANCE-MATRIX.md
+        1 crates/vd-settings
+
+## 已修改条目顶层分组（porcelain-v1）
+       65 src/workspace
+       18 src/editor
+       13 src/app
+        8 evidence/ffi-abi
+        7 evidence/m0-build
+        6 crates/vd-lsp
+        6 crates/vd-ffi
+        4 build/evidence
+        3 src/syntax
+        3 crates/vd-deeplint
+        3 crates/vd-app
+        2 crates/vd-config
+        1 src/terminal
+        1 packaging/runtime
+        1 docs/USER_GUIDE.md
+        1 docs/BUILD.md
+        1 crates/vd-settings
+        1 THIRD_PARTY_NOTICES.md
+        1 CMakeLists.txt
+
+## 与上一份基线清单 evidence/baseline/git-status-porcelain-v1.txt 的差异
+  上一份行数: 157
+  旧有新无(diff '<'): 0 ; 新有旧无(diff '>'): 87
+
+## 硬边界遵守情况
+  未执行 revert/stash/clean/checkout；未写 src/、crates/ 或其他产品代码；未清理任何他人改动。
+  本目录以外唯一写入为 git 只读查询。

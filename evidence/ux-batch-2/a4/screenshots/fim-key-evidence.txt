@@ -1,0 +1,20 @@
+settings.toml:             /vedit-build/evidence/ux-batch-2/a4/screenshots/fim-evidence-settings.toml
+key file:                  /vedit-build/evidence/ux-batch-2/a4/screenshots/fim_api_key
+key source reported:       user-file
+key stored:                yes
+key file grants group/other access: no
+key echoed in the UI field: no
+secret present in settings.toml:   no
+fim.api_key present in settings.toml: no
+
+--- settings.toml (verbatim) ---
+"fim.enabled" = "true"
+"fim.endpoint" = "http://127.0.0.1:8080"
+"fim.ghost_text" = "true"
+"fim.max_tokens" = "128"
+"fim.model" = "qwen"
+"fim.protocol" = "llama_cpp"
+"fim.timeout_ms" = "2500"
+
+--- key file ---
+26 bytes (content not recorded)

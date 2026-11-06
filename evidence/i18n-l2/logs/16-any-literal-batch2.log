@@ -1,0 +1,4 @@
+[v1] scanned=148 literals=8589 candidates=1456 unique=1268 skipped_files=0
+  dropped by rule: C1-empty=110, C10-no-whitespace=1418, C2-preprocessor=15, C3-path=970, C4-format-only=227, C5-lowercase-token=3634, C7-single-char=34, C8-embedded-newline=725
+  candidate call-sites: other=903, selftest_out=239, tr=156, ui_text=102, log=46, ui_action=10
+extract-exit=0

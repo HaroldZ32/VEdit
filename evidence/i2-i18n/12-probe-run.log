@@ -1,0 +1,126 @@
+== rebuild the product targets the probe links ==
+[151/153] Building CXX object src/app/CMakeFiles/vedit-app.dir/vedit-app_autogen/mocs_compilation.cpp.o
+[152/153] Building CXX object src/app/CMakeFiles/vedit-app.dir/main.cpp.o
+[153/153] Linking CXX executable src/app/vedit-app
+== translations ==
+total 20
+drwxr-xr-x  2 root root 4096 Nov  2 14:14 .
+drwxr-xr-x 21 root root 4096 Nov  2 14:41 ..
+-rw-r--r--  1 root root 9433 Nov  2 14:29 vedit_zh_CN.qm
+== build the probe (links the product static libraries) ==
+++ :
++ set +x
+[probe] built /vedit-build/target/i18n-probe/i18n-probe
+== headless assertions (QT_QPA_PLATFORM=offscreen) ==
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+PASS probe.temp-dir
+PASS i18n.zh.installed — tag=zh_CN setting=zh_CN
+PASS i18n.zh.tag — zh_CN
+PASS i18n.zh.qm — /vedit-build/target/qt6-build/src/app/translations/vedit_zh_CN.qm
+PASS i18n.zh.translate-shell — 文件(&F)
+PASS i18n.zh.translate-cancel-message
+PASS i18n.idempotent
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PASS shell.zh.menu — 设置(&S)
+PASS shell.zh.command — 保存(&S)
+PASS shell.pane
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+PASS open.alpha
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+PASS open.bravo
+PASS pane.two-tabs — 2
+PASS archive.saved
+PASS archive.exists
+PASS archive.schema-v2
+PASS archive.no-language-key
+PASS archive.sha-readable
+PASS panel.store-loaded — Loading settings from /tmp/vedit-i18n-probe-pHmuYN/state/settings.toml …
+PASS panel.language-row
+PASS panel.language-values — auto,en,zh_CN
+PASS panel.language-stored — zh_CN
+PASS panel.language-pending
+PASS panel.language-hint — 重启后生效。
+PASS dirty.both
+PASS archive.baseline-refreshed
+[app-shell] 语言未切换：重启已取消
+PASS cancel.one-prompt — 1
+PASS cancel.prompt-lists-two — alpha.sv, bravo.sv
+PASS cancel.panel-message — 语言未切换：重启已取消
+PASS cancel.shell-message — 语言未切换：重启已取消
+PASS cancel.no-relaunch
+PASS cancel.settings-unchanged
+PASS cancel.archive-unchanged
+PASS cancel.archive-mtime-unchanged
+PASS cancel.alpha-unchanged
+PASS cancel.bravo-unchanged
+PASS cancel.language-not-stored — zh_CN
+[app-shell] 正在重启以应用界面语言 en
+PASS save.one-prompt — 1
+PASS save.document-a-written
+PASS save.document-b-written
+PASS save.language-stored
+PASS save.language-in-panel — en
+PASS save.relaunch-fired — 1
+PASS save.panel-message — 正在重启以应用界面语言…
+PASS save.archive-valid
+PASS save.archive-no-language-key
+PASS save.archive-sha-unchanged — before=556477c049b5 after=556477c049b5
+PASS save.commands-saved
+PASS next-start.english — translated=0 tag=en
+PASS next-start.source-string — &File
+PASS store.language-write
+PASS store.settings-updated
+PASS store.archive-sha-unchanged — before=556477c049b5 after=556477c049b5
+PASS store.archive-mtime-unchanged
+PASS store.archive-no-language-key
+PASS store.roundtrip — loaded=1 value=zh_CN
+I18N-PROBE failures=0 platform=offscreen translations=/vedit-build/target/qt6-build/src/app/translations
+== screenshots + real batch dialog (Xvfb, xcb) ==
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+PASS probe.temp-dir
+PASS shot.zh-installed
+PASS shot.zh-menu
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+SHOT OK evidence/i2-i18n/shots/30-zh-shell.png
+PASS shot.archive
+PASS shot.archive-baseline
+PASS shot.panel-loaded
+SHOT OK evidence/i2-i18n/shots/31-zh-preferences.png
+SHOT OK evidence/i2-i18n/shots/32-batch-unsaved-dialog.png
+[app-shell] 语言未切换：重启已取消
+SHOT OK evidence/i2-i18n/shots/33-language-not-switched.png
+SHOT OK evidence/i2-i18n/shots/34-cancel-message-shell.png
+PASS shot.one-batch-dialog
+PASS shot.cancel-message — 语言未切换：重启已取消
+PASS shot.cancel-no-settings-write
+PASS shot.cancel-no-archive-write
+PASS shot.cancel-no-document-write
+[app-shell] 正在重启以应用界面语言 en
+SHOT OK evidence/i2-i18n/shots/37-save-branch-restarting.png
+PASS shot.save-branch-dialog
+PASS shot.save-branch-documents
+PASS shot.save-branch-language
+PASS shot.save-branch-relaunch — 1
+PASS shot.save-branch-archive-sha
+PASS shot.save-branch-settings-changed
+PASS shot.en-installed
+PASS shot.en-menu
+SHOT OK evidence/i2-i18n/shots/35-en-shell.png
+I18N-PROBE failures=0 platform=xcb translations=/vedit-build/target/qt6-build/src/app/translations
+== result: offscreen rc=0 xcb rc=0 ==
+== real relaunch: the default restartApplication spawns this probe and exits ==
+parent-exit=0
+parent-marker=yes
+relaunched-marker=yes
+unexpected-return=no
+I18N-PROBE-OK
+== shipped binary startup (zh_CN / auto) ==
+SHOT OK evidence/i2-i18n/shots/36-real-zh-start.png 1400x900
+CASE zh language=zh_CN shot_rc=0 app_rc=0
+SHOT OK evidence/i2-i18n/shots/36-real-en-start.png 1400x900
+CASE en language=auto shot_rc=0 app_rc=0
+REAL-START-OK
+T18-EVIDENCE-OK
+RUN_EXIT=0

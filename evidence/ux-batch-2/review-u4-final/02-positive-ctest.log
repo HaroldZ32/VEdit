@@ -1,0 +1,450 @@
+UpdateCTestConfiguration  from :/vedit-build/target/qt6-build/DartConfiguration.tcl
+Test project /vedit-build/target/qt6-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 1
+    Start 1: vedit-app-syntax-startup
+
+1: Test command: /vedit-build/target/qt6-build/src/app/vedit-app "--selfcheck"
+1: Working Directory: /vedit-build/target/qt6-build
+1: Environment variables: 
+1:  QT_QPA_PLATFORM=offscreen
+1:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime
+1:  VEDIT_SYNTAX_DIR=/vedit-build/resources
+1: Test timeout computed to be: 120
+1: syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='/vedit-build/resources' definitions=452 own-xml=[vedit-vhdl.xml,vedit-tcl.xml,vedit-systemverilog.xml,vedit-markdown.xml,vedit-verilog.xml] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1
+1: UI-SCALE scale_percent=100 qt_scale_factor=<unset> font_point_size=9 settings=/tmp/.config/VEdit/vedit-app/settings.toml
+1: TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server] local=[/vedit-build/build/slang/out,/vedit-build/.mpd/recon/verible/bin]
+1: CHECK path.display.under-root PASS rtl/top.sv
+1: CHECK path.display.under-root.normalized-root PASS
+1: CHECK path.display.outside-root PASS /tmp/vedit-app-GlfjSq/display-outside/top.sv
+1: CHECK path.display.no-root PASS /tmp/vedit-app-GlfjSq/display-outside/top.sv
+1: CHECK path.display.sibling-prefix-outside PASS
+1: CHECK path.display.root-itself-absolute PASS
+1: CHECK path.display.root-normalized PASS /tmp/vedit-app-GlfjSq/display-root
+1: This plugin does not support propagateSizeHints()
+1: CHECK empty.no-project-label PASS
+1: CHECK empty.one-pane PASS
+1: CHECK empty.window-title PASS
+1: CHECK panels.no-settings-dock PASS
+1: CHECK panels.registry.five PASS
+1: CHECK panels.registered.file-tree PASS
+1: CHECK panels.registered.search PASS
+1: CHECK panels.registered.terminal PASS
+1: CHECK panels.registered.vcs PASS
+1: CHECK panels.registered.outline PASS
+1: CHECK panels.none-inserted-by-default PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.show.file-tree PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.toggle-hide.file-tree PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.toggle-show.file-tree PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.show.search PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.toggle-hide.search PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.toggle-show.search PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.show.terminal PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.toggle-hide.terminal PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.toggle-show.terminal PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.show.vcs PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.toggle-hide.vcs PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.toggle-show.vcs PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.show.outline PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.toggle-hide.outline PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.toggle-show.outline PASS
+1: CHECK panels.five-docks PASS
+1: CHECK menus.file PASS
+1: CHECK menus.view PASS
+1: CHECK menus.edit PASS
+1: CHECK menus.help PASS
+1: CHECK settings.preferences.exists PASS
+1: CHECK settings.preferences.menu PASS
+1: CHECK settings.preferences.shortcut PASS Ctrl+,
+1: CHECK settings.preferences.unique-shortcut PASS bindings=1
+1: CHECK commands.action.file.new-layout PASS
+1: CHECK commands.action.file.close-pane PASS
+1: CHECK commands.action.file.quit PASS
+1: CHECK commands.action.view.split.horizontal PASS
+1: CHECK commands.action.view.split.vertical PASS
+1: CHECK commands.action.view.focus.next PASS
+1: CHECK commands.action.view.layout.reset PASS
+1: CHECK commands.action.help.about PASS
+1: CHECK commands.action.view.panel.file-tree PASS
+1: CHECK commands.action.view.panel.outline PASS
+1: CHECK commands.file-menu-actions PASS
+1: CHECK commands.view-panel-actions-checkable PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.sync.closed.file-tree PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.sync.action-show.file-tree PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.sync.close-clears-check.file-tree PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.sync.one-click-reopen.file-tree PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.sync.closed.search PASS
+1: CHECK panels.sync.action-show.search PASS
+1: CHECK panels.sync.close-clears-check.search PASS
+1: CHECK panels.sync.one-click-reopen.search PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.sync.closed.terminal PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.sync.action-show.terminal PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.sync.close-clears-check.terminal PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.sync.one-click-reopen.terminal PASS
+1: This plugin does not support propagateSizeHints()
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.sync.closed.vcs PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.sync.action-show.vcs PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.sync.close-clears-check.vcs PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.sync.one-click-reopen.vcs PASS
+1: This plugin does not support propagateSizeHints()
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.sync.closed.outline PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.sync.action-show.outline PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.sync.close-clears-check.outline PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.sync.one-click-reopen.outline PASS
+1: This plugin does not support propagateSizeHints()
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.sync.reverse-precondition PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panels.sync.reverse-control PASS
+1: This plugin does not support propagateSizeHints()
+1: This plugin does not support propagateSizeHints()
+1: CHECK split.horizontal.pane-count PASS
+1: CHECK split.horizontal.root-orientation PASS
+1: This plugin does not support propagateSizeHints()
+1: This plugin does not support propagateSizeHints()
+1: CHECK split.vertical.pane-count PASS
+1: CHECK split.vertical.root-orientation PASS
+1: CHECK panes.three PASS
+1: CHECK focus.set-second PASS
+1: CHECK focus.next-wraps PASS
+1: This plugin does not support propagateSizeHints()
+1: This plugin does not support propagateSizeHints()
+1: CHECK close.pane-count PASS
+1: This plugin does not support propagateSizeHints()
+1: This plugin does not support propagateSizeHints()
+1: CHECK reset.one-pane PASS
+1: CHECK close.last-pane.keeps-one PASS
+1: CHECK close.last-pane.active PASS
+1: CHECK close.command.exists PASS
+1: CHECK close.command.in-view PASS
+1: CHECK close.command.shortcut-ctrl-w PASS
+1: CHECK close.shortcuts.no-conflicts PASS
+1: CHECK close.shortcuts.binding-count PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK close.split.pane-count PASS
+1: CHECK close.split.editor-editable PASS
+1: This plugin does not support propagateSizeHints()
+1: [app-shell] close refused (headless): untitled has unsaved changes
+1: CHECK close.unsaved.blocked PASS
+1: CHECK close.reverse-control PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK close.unsaved-saved-close PASS
+1: CHECK close.remaining-editable PASS
+1: CHECK close.last-single-view PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK close.button.split PASS
+1: CHECK close.button.present PASS
+1: This plugin does not support propagateSizeHints()
+1: This plugin does not support propagateSizeHints()
+1: CHECK close.button.single-view PASS
+1: CHECK open.command.exists PASS
+1: CHECK open.command.in-file-menu PASS
+1: CHECK open.command.shortcut-ctrl-o PASS
+1: CHECK open.fixture-a PASS
+1: CHECK open.fixture-b PASS
+1: CHECK open.missing.rejected PASS
+1: CHECK open.missing.nonzero-readable PASS
+1: CHECK open.multiple.ok PASS
+1: CHECK open.multiple.pane-count PASS
+1: CHECK open.multiple.paths PASS
+1: CHECK open.multiple.active-second PASS
+1: This plugin does not support propagateSizeHints()
+1: This plugin does not support propagateSizeHints()
+1: CHECK open.dialog.action-opens PASS
+1: CHECK path.display.title.absolute-no-root PASS VEdit — /tmp/vedit-app-GlfjSq/open-a.sv[*]
+1: CHECK path.display.tab-tooltip.absolute-no-root PASS /tmp/vedit-app-GlfjSq/open-a.sv
+1: CHECK open.filter.filelist PASS Verilog/SystemVerilog/filelist (*.v *.sv *.svh *.vh *.f *.F *.flist);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F *.flist);;All Files (*)
+1: CHECK open.filter.keeps-existing-types PASS Verilog/SystemVerilog/filelist (*.v *.sv *.svh *.vh *.f *.F *.flist);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F *.flist);;All Files (*)
+1: CHECK open.signal.opens PASS
+1: CHECK open.signal.one-per-open PASS /tmp/vedit-app-GlfjSq/open-a.sv,/tmp/vedit-app-GlfjSq/open-b.sv
+1: CHECK open.signal.failed-open-silent PASS
+1: CHECK open.signal.direct-pane-open PASS
+1: This plugin does not support propagateSizeHints()
+1: This plugin does not support propagateSizeHints()
+1: This plugin does not support propagateSizeHints()
+1: CHECK theme.catalogue PASS
+1: CHECK theme.apply PASS
+1: CHECK theme.invalid.rejected PASS
+1: CHECK theme.invalid.keeps-palette PASS
+1: CHECK shortcut.override.applied PASS
+1: CHECK session.save PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK restore.pane-count PASS
+1: CHECK restore.layout-tree PASS
+1: CHECK restore.active-pane PASS
+1: CHECK restore.theme PASS
+1: CHECK restore.panel-visible PASS
+1: CHECK restore.shortcut PASS
+1: CHECK panel-seam.seed-session PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK panel-seam.deferred-nothing-inserted PASS
+1: This plugin does not support propagateSizeHints()
+1: This plugin does not support propagateSizeHints()
+1: This plugin does not support propagateSizeHints()
+1: This plugin does not support propagateSizeHints()
+1: CHECK panel-seam.dock-restored PASS
+1: CHECK panel-seam.terminal-content PASS
+1: CHECK panel-seam.search-content PASS
+1: CHECK panel-seam.no-placeholder PASS
+1: CHECK panel-seam.editor-layout-restored PASS panes=2
+1: [app-shell] invalid shortcut store /tmp/vedit-app-GlfjSq/broken/shortcuts.json: illegal number
+1: [app-shell] invalid session /tmp/vedit-app-GlfjSq/broken/session.json: unterminated object
+1: This plugin does not support propagateSizeHints()
+1: CHECK broken.config.survives PASS
+1: CHECK broken.config.diagnostics PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK stress.one-pane-initial PASS
+1: This plugin does not support propagateSizeHints()
+1: This plugin does not support propagateSizeHints()
+1: This plugin does not support propagateSizeHints()
+1: This plugin does not support propagateSizeHints()
+1: CHECK stress.pane-invariant PASS
+1: CHECK stress.non-null-active PASS
+1: CHECK save.command.registered PASS
+1: CHECK save.shortcut.ctrl-s PASS
+1: CHECK save.menu.file-item PASS
+1: CHECK save.demo.open PASS
+1: CHECK save.demo.action.disk-bytes PASS
+1: CHECK save.demo.action.path-unchanged PASS
+1: CHECK save.demo.action.no-temp-file PASS
+1: kf.sonnet.core: Sonnet: No speller backends available!
+1: [edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+1: This plugin does not support propagateSizeHints()
+1: CHECK editor.provider.id PASS
+1: CHECK editor.pane.ktexteditor-widget PASS
+1: CTRL-S-BINDING after-provider-install objectName=action-file.save class=QAction shortcut=Ctrl+S context=1 associated=[QMenu(menu-file) QMenu(menu-file) QToolBar(vedit-main-toolbar) QToolButton() ] holders=[QMenu(menu-file) QMenu(menu-file) QToolBar(vedit-main-toolbar) QToolButton() ] chain=vedit::app::ApplicationShell<
+1: CHECK save.shortcut.unique PASS bindings=1
+1: CHECK save.shortcut.authority PASS
+1: CHECK save.shortcut.runtime-duplicate-enumerated PASS bindings=2
+1: CHECK save.shortcut.runtime-unguarded-turn-keeps-duplicate PASS bindings=2
+1: CHECK save.shortcut.runtime-guard-clears PASS bindings=1
+1: CHECK save.shortcut.runtime-guard-authority PASS
+1: CHECK save.shortcut.runtime-guard-entry-point PASS removed=1 bindings=1
+1: CHECK save.shortcut.runtime-guard-timer PASS
+1: [edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+1: CHECK editor.pane.open PASS
+1: CHECK editor.pane.open-path PASS /tmp/vedit-app-GlfjSq/pane-open.v
+1: CHECK editor.pane.save PASS
+1: CHECK save.ktexteditor.document PASS
+1: CHECK save.shortcut.window PASS
+1: CHECK save.shortcut.disk-bytes PASS
+1: CHECK save.shortcut.modified-cleared PASS
+1: CHECK save.shortcut.path-unchanged PASS
+1: CHECK save.menu.disk-bytes PASS
+1: CHECK save.menu.path-unchanged PASS
+1: CHECK save.no-temp-file PASS
+1: [app-shell] Save failed: atomic save: injected write failure
+1: [app-shell] Save failed: atomic save: injected write failure
+1: CHECK save.failure.disk-unchanged PASS
+1: CHECK save.failure.status-bar PASS
+1: CHECK save.failure.diagnostic PASS
+1: CHECK save.failure.still-modified PASS
+1: CHECK save.recovery.disk-bytes PASS
+1: CHECK save.recovery.not-modified PASS
+1: This plugin does not support propagateSizeHints()
+1: CTRL-S-BINDING after-split objectName=action-file.save class=QAction shortcut=Ctrl+S context=1 associated=[QMenu(menu-file) QMenu(menu-file) QToolBar(vedit-main-toolbar) QToolButton() ] holders=[QMenu(menu-file) QMenu(menu-file) QToolBar(vedit-main-toolbar) QToolButton() ] chain=vedit::app::ApplicationShell<
+1: CHECK save.shortcut.unique.multi-pane PASS bindings=1
+1: This plugin does not support propagateSizeHints()
+1: This plugin does not support propagateSizeHints()
+1: This plugin does not support propagateSizeHints()
+1: CHECK fold.native.pane PASS
+1: This plugin does not support propagateSizeHints()
+1: [edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+1: CHECK fold.native.open PASS
+1: CHECK fold.native.view PASS
+1: CHECK fold.native.highlight-mode PASS SystemVerilog
+1: CHECK fold.native.binding PASS
+1: CHECK fold.native.no-auto-folds PASS hidden=0
+1: FOLD-NATIVE breadcrumb describe='module:m0 > function:inc' bar='m0 > inc'
+1: CHECK fold.native.breadcrumb.describe PASS module:m0 > function:inc
+1: CHECK fold.native.breadcrumb.pane-bar PASS m0 > inc
+1: CHECK fold.native.breadcrumb.no-invention PASS describe='' bar=''
+1: [edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+1: CHECK fold.native.second-open PASS
+1: CHECK fold.native.second-view PASS
+1: CHECK fold.native.second-cursor PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK editcore.scratch PASS
+1: CHECK editcore.ktexteditor.instance PASS
+1: CHECK editcore.document.create PASS
+1: CHECK editcore.undo.metaobject-slot PASS
+1: CHECK editcore.document.setText PASS
+1: CHECK editcore.open.fixture-written PASS
+1: [edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+1: CHECK editcore.open.file PASS
+1: CHECK editcore.open.records-path PASS /tmp/vedit-app-nGZtsC/open.v
+1: CHECK editcore.highlight.verilog.fixture PASS
+1: [edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+1: CHECK editcore.highlight.verilog.open PASS
+1: CHECK editcore.highlight.verilog.mode PASS mode='Verilog' expected='Verilog'
+1: CHECK editcore.highlight.verilog.definition PASS Verilog
+1: CHECK editcore.highlight.verilog.format-ranges PASS 25
+1: CHECK editcore.highlight.verilog.folding-regions PASS begins=2 ends=2
+1: CHECK editcore.highlight.systemverilog.fixture PASS
+1: [edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+1: CHECK editcore.highlight.systemverilog.open PASS
+1: CHECK editcore.highlight.systemverilog.mode PASS mode='SystemVerilog' expected='SystemVerilog'
+1: CHECK editcore.highlight.systemverilog.definition PASS SystemVerilog
+1: CHECK editcore.highlight.systemverilog.format-ranges PASS 26
+1: CHECK editcore.highlight.systemverilog.folding-regions PASS begins=1 ends=1
+1: CHECK editcore.atomic.fresh-file PASS
+1: CHECK editcore.atomic.fresh-content PASS
+1: CHECK editcore.atomic.no-temp-left PASS
+1: CHECK editcore.atomic.replace PASS
+1: CHECK editcore.atomic.replace-no-temp PASS
+1: CHECK editcore.atomic.fault.write-fails PASS
+1: CHECK editcore.atomic.fault.write-keeps-target PASS
+1: CHECK editcore.atomic.fault.write-cleans-temp PASS
+1: CHECK editcore.atomic.fault.rename-fails PASS
+1: CHECK editcore.atomic.fault.rename-keeps-target PASS
+1: CHECK editcore.atomic.fault.rename-cleans-temp PASS
+1: CHECK editcore.atomic.fault.dir-fsync-nonfatal PASS atomic save: injected directory fsync failure;directory fsync skipped by fault injection
+1: CHECK editcore.atomic.fault.dir-fsync-content PASS
+1: CHECK editcore.save.kernel PASS
+1: CHECK editcore.save.bytes PASS
+1: CHECK editcore.save.clears-modified PASS
+1: CHECK editcore.find.count PASS 3
+1: CHECK editcore.find.adjacent PASS
+1: CHECK editcore.replace.count PASS found=3 replaced=3
+1: CHECK editcore.replace.text PASS zz bbb zz ccc zz
+1: 
+1: CHECK editcore.replace.one-undo PASS
+1: CHECK editcore.replace.redo PASS
+1: CHECK editcore.goto.line PASS
+1: CHECK editcore.goto.clamp-low PASS
+1: CHECK editcore.goto.clamp-high PASS line=3
+1: CHECK editcore.goto.column-zero PASS
+1: CHECK editcore.undo.100-operations PASS 100
+1: CHECK editcore.undo.100-back-to-original PASS mismatches=0 error=
+1: CHECK editcore.redo.100-forwards PASS mismatches=0
+1: EDITCORE-UNDO sha-before=c2a908d98f5df987ade41b5fce213067efbcc21ef2240212a41e54b5e7c28ae5 sha-after=991ab4d4e3f17a75c77ed6a7000fe568ae995f0dd92fe827129ee74ae2214f98
+1: CHECK editcore.multicursor.native-api PASS
+1: CHECK editcore.multicursor.native-read-back PASS
+1: CHECK editcore.multicursor.native-insert-call PASS
+1: EDITCORE-MULTICURSOR native-cursors=3 native-inserted-x=1 text="Xaaa
+1: "
+1: CHECK editcore.multicursor.native-insert-primary PASS 1
+1: CHECK editcore.multicursor.batch-insert PASS
+1: CHECK editcore.multicursor.batch-text PASS XaXaXa
+1: 
+1: CHECK editcore.multicursor.batch-one-undo PASS
+1: CHECK editcore.multicursor.batch-redo PASS
+1: CHECK editcore.wsedit.fixture-open PASS
+1: CHECK editcore.wsedit.fixture-disk PASS
+1: CHECK editcore.wsedit.view PASS
+1: CHECK editcore.wsedit.open-visible PASS 3
+1: CHECK editcore.wsedit.applied PASS
+1: CHECK editcore.wsedit.counts PASS edits=3 files=2 editor=1 disk=1
+1: CHECK editcore.wsedit.open-text PASS module top;
+1:   wire new_name;
+1:   new_name = 1;
+1: endmodule
+1: 
+1: CHECK editcore.wsedit.open-dirty PASS
+1: CHECK editcore.wsedit.disk-text PASS // new_name
+1: 
+1: CHECK editcore.wsedit.summary PASS Rename applied: 3 edit(s) in 2 file(s) — 1 document(s) changed in the editor, 1 file(s) written on disk
+1: CHECK editcore.wsedit.one-undo PASS
+1: CHECK editcore.wsedit.one-redo PASS
+1: CHECK editcore.wsedit.out-of-range-refused PASS /tmp/vedit-app-nGZtsC/rename-open.sv: edit line 1000-1000 is outside rename-open.sv (5 line(s))
+1: CHECK editcore.wsedit.refusal-keeps-buffer PASS
+1: CHECK editcore.wsedit.refusal-keeps-file PASS // new_name
+1: 
+1: CHECK editcore.wsedit.missing-file-refused PASS cannot change /tmp/vedit-app-nGZtsC/does-not-exist.sv: No such file or directory
+1: CHECK editcore.wsedit.empty-refused PASS
+1: CHECK editcore.references.empty PASS
+1: CHECK editcore.references.count PASS 2
+1: CHECK editcore.references.ordered PASS
+1: CHECK editcore.references.open-snippet PASS wire new_name;
+1: CHECK editcore.references.location-text PASS /tmp/vedit-app-nGZtsC/rename-open.sv:2:8
+1: CHECK editcore.references.disk-snippet PASS // new_name
+1: CHECK editcore.gates.document PASS
+1: CHECK editcore.gates.view PASS
+1: CHECK editcore.gates.channel PASS
+1: CHECK editcore.gates.rename-disabled PASS verible does not advertise renameProvider for this session
+1: CHECK editcore.gates.rename-real-reason PASS verible does not advertise renameProvider for this session
+1: CHECK editcore.gates.rename-action-greyed PASS
+1: ACTION-REFUSED action=rename enabled=0 known=1 source=backend reason='verible does not advertise renameProvider for this session'
+1: CHECK editcore.gates.rename-refused PASS verible does not advertise renameProvider for this session
+1: CHECK editcore.gates.rename-enabled PASS
+1: CHECK editcore.gates.rename-action-enabled PASS
+1: CHECK editcore.provider.id PASS ktexteditor
+1: CHECK editcore.provider.creates-view PASS
+1: CHECK editcore.provider.fixture PASS
+1: [edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+1: CHECK editcore.provider.open PASS
+1: CHECK editcore.provider.open-records-path PASS /tmp/vedit-app-uvrunL/provider.v
+1: CHECK editcore.provider.document PASS
+1: CHECK editcore.provider.save PASS
+1: CHECK editcore.provider.save-bytes PASS
+1: CHECK editcore.boundary.zero-calls PASS before=0 after=0
+1: CHECK editcore.boundary.counter-live PASS before=0 after=1
+1: EDIT-CORE-SELFTEST ok=1 checks=99 failures=0
+1: CHECK root.restored-before-install PASS /tmp/vedit-app-GlfjSq/project-a
+1: CHECK root.explicit-wins PASS /tmp/vedit-app-GlfjSq/project-b
+1: This plugin does not support propagateSizeHints()
+1: CHECK path.display.under-root.open PASS
+1: This plugin does not support propagateSizeHints()
+1: CHECK path.display.window-title.relative PASS VEdit — rtl/foo.sv[*]
+1: CHECK path.display.tab-tooltip.relative PASS rtl/foo.sv
+1: CHECK path.display.open-key-still-absolute PASS /tmp/vedit-app-GlfjSq/project-a/rtl/foo.sv
+1: CHECK path.display.outside-root.open PASS
+1: CHECK path.display.window-title.outside-absolute PASS VEdit — /tmp/vedit-app-GlfjSq/outside/other.sv[*]
+1: CHECK path.display.tab-tooltip.outside-absolute PASS /tmp/vedit-app-GlfjSq/outside/other.sv
+1: CHECK root.switch-broadcast PASS /tmp/vedit-app-GlfjSq/project-b
+1: CHECK root.switch-value PASS /tmp/vedit-app-GlfjSq/project-b
+1: CHECK root.switch-label PASS project-b
+1: CHECK root.switch-idempotent PASS events=1
+1: CHECK root.open-folder-command PASS
+1: CHECK root.open-folder-menu PASS
+1: CHECK root.open-folder-switches PASS /tmp/vedit-app-GlfjSq/project-a
+1: CHECK root.open-folder-broadcast PASS events=2
+1: CHECK root.open-folder-cancel PASS events=2
+1: CHECK root.switch.persisted PASS
+1: CHECK root.switch.persisted-value PASS
+1: APP-SHELL-SELFTEST ok=1 checks=312 failures=0 state=/tmp/vedit-app-GlfjSq/state
+1/1 Test #1: vedit-app-syntax-startup .........   Passed    0.72 sec
+
+The following tests passed:
+	vedit-app-syntax-startup
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.72 sec

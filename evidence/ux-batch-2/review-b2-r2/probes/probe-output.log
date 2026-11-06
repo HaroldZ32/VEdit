@@ -1,0 +1,130 @@
+PROBE A1.literal-valid PASS (  assign bar = BAR + foo;
+ / )
+PROBE A2.stale-refused PASS (replace: : line 1 column 16 no longer holds "foo" (the file changed); nothing was written to that file)
+PROBE A3.line-shift-accepted PASS (abc foo
+xyz BAR
+ / )
+PROBE A4.literal-meta-stale-refused PASS (replace: : line 1 column 5 no longer holds "a.b" (the file changed); nothing was written to that file)
+PROBE A5.whole-word PASS (replace: : line 1 column 1 no longer holds "foo" (the file changed); nothing was written to that file / foo_bar BAR
+)
+PROBE A6.regex PASS ( / replace: : line 1 column 5 no longer holds "[0-9]+" (the file changed); nothing was written to that file)
+PROBE A7.case-insensitive PASS
+PROBE A8.bom PASS (efbbbf42415220613b0a42415220623b0a)
+PROBE A9.crlf PASS (4241520d0a4241520d0a)
+PROBE A10.astral PASS
+PROBE A11.two-hits PASS
+PROBE B0.editor PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+PROBE B0.document PASS
+This plugin does not support propagateSizeHints()
+PROBE B0.bridge PASS
+PROBE B1.open-detected PASS
+PROBE B2.saved PASS
+PROBE B2.saved-unmodified PASS
+PROBE B2.token-captured PASS
+PROBE B3.changed-status PASS
+PROBE B3.edit-survives PASS (foo foo
+// typed-before-save
+// typed-after-save
+)
+PROBE B3.still-modified PASS
+PROBE B3.saved-text-survives PASS
+PROBE B4.user-save PASS
+PROBE B4.token-mismatch-status PASS
+PROBE B4.saved-edit-still-in-buffer PASS (foo foo
+// typed-before-save
+// typed-after-save
+)
+QIODevice::read (QFile, "/tmp/review-b2-r2-probe-yyEPxM/doc.v"): device not open
+[edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+PROBE B4.after-state modified=0 disk=''
+PROBE B5.reload-control PASS
+PROBE B5.reloaded-text PASS (qux qux
+// typed-before-save
+)
+PROBE B6.empty-token-modified-kept PASS
+PROBE B6.text-kept PASS
+[edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+PROBE B7.empty-token-unmodified-reloaded PASS
+PROBE B7.reloaded-now PASS (qux qux
+// typed-before-save
+)
+search: root='/tmp/review-b2-r2-probe-szNhfQ' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r2-probe-szNhfQ' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+PROBE C1.search-idle PASS
+PROBE C2.stale-hit-found PASS (3)
+This plugin does not support propagateSizeHints()
+PROBE C3.replace-started PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r2-probe-szNhfQ' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+PROBE C3.replace-idle PASS
+PROBE C4.saved-buffer-writes=1 after='abc foo
+xyz BAR
+'
+PROBE C4.wrong-occurrence-replaced PASS (abc foo
+xyz BAR
+)
+PROBE C4.outcome-ok PASS
+search: root='/tmp/review-b2-r2-probe-CcjRVF' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r2-probe-CcjRVF' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+PROBE D1.search-idle PASS
+PROBE D2.hit-found PASS (1)
+PROBE D3.stale-hits-kept PASS
+This plugin does not support propagateSizeHints()
+PROBE D4.replace-started PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PROBE D4.replace-idle PASS
+PROBE D5.after='  assign bar = BAR + foo;
+' ok=1 replacements=1
+PROBE D5.empty-query-guard-bypass-writes-stale-range PASS (  assign bar = BAR + foo;
+)
+search: root='/tmp/review-b2-r2-probe-OAeAlN' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r2-probe-OAeAlN' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+PROBE E1.search-idle PASS
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r2-probe-OAeAlN' query='foo' case=1 whole=0 regex=0 all=1 filter=''
+PROBE E2.replace-started PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PROBE E2.replace-idle PASS
+PROBE E3.after='BAR BAR
+' ok=1 replacements=2
+PROBE E3.replace-all-empty-query-writes-stale-range PASS (BAR BAR
+)
+search: root='/tmp/review-b2-r2-probe-NDieAt' (ready)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r2-probe-NDieAt' query='foo' case=1 whole=1 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+PROBE F1.search-idle PASS
+PROBE F1.whole-word-hit PASS (1)
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r2-probe-NDieAt' query='foo' case=1 whole=1 regex=0 all=1 filter=''
+PROBE F2.replace-started PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+search: query root='/tmp/review-b2-r2-probe-NDieAt' query='foo' case=1 whole=0 regex=0 all=0 filter=''
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+PROBE F2.replace-idle PASS
+PROBE F3.after='BAR_bar
+' ok=1 replacements=1
+PROBE F3.replace-all-looser-options-write-stale-range PASS (BAR_bar
+)
+PROBE SUMMARY failures=0

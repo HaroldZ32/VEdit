@@ -1,0 +1,2 @@
+LD_LIBRARY_PATH=<unset>
+LOCPATH=<unset>

@@ -1,0 +1,11 @@
+Test project /vedit-build/target/qt6-build
+    Start 44: vedit-project-lint-e2e
+1/3 Test #44: vedit-project-lint-e2e ..............   Passed    1.58 sec
+    Start 45: vedit-b3-wiring-e2e
+2/3 Test #45: vedit-b3-wiring-e2e .................   Passed    6.89 sec
+    Start 49: vedit-workspace-settings-selftest
+3/3 Test #49: vedit-workspace-settings-selftest ...   Passed    1.40 sec
+
+100% tests passed, 0 tests failed out of 3
+
+Total Test time (real) =   9.88 sec

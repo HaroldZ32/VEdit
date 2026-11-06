@@ -1,0 +1,22 @@
+CHECK save.demo.action.path-unchanged PASS
+CHECK save.demo.action.no-temp-file PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+
+    Start  4: vedit-syntax-kde-data
+2/6 Test  #4: vedit-syntax-kde-data ................   Passed    0.03 sec
+    Start  5: vedit-syntax-directory-equivalence
+3/6 Test  #5: vedit-syntax-directory-equivalence ...   Passed    0.03 sec
+    Start  7: vedit-syntax-product-tests
+4/6 Test  #7: vedit-syntax-product-tests ...........   Passed    0.08 sec
+    Start 19: vedit-edit-core-selftest
+5/6 Test #19: vedit-edit-core-selftest .............   Passed    0.13 sec
+    Start 20: vedit-highlight-mode-selftest
+6/6 Test #20: vedit-highlight-mode-selftest ........   Passed    0.07 sec
+
+83% tests passed, 1 tests failed out of 6
+
+Total Test time (real) =   0.93 sec
+
+The following tests FAILED:
+	  1 - vedit-app-syntax-startup (SEGFAULT)
+Errors while running CTest

@@ -1,0 +1,31 @@
+CAP-ROW callHierarchyProvider True
+CAP-ROW codeActionProvider True
+CAP-ROW codeLensProvider {"resolveProvider": false}
+CAP-ROW completionProvider {"completionItem": {"labelDetailsSupport": true}, "resolveProvider": true, "triggerCharacters": ["`", "#", ".", "(", ":", "[", "$", "{"]}
+CAP-ROW definitionProvider True
+CAP-ROW documentHighlightProvider True
+CAP-ROW documentLinkProvider {"resolveProvider": false, "workDoneProgress": false}
+CAP-ROW documentSymbolProvider True
+CAP-ROW executeCommandProvider {"commands": ["slang.autoConfigure", "slang.addDefine", "slang.setIncludeContext", "slang.showLocation", "slang.getActiveInstance", "slang.activateInstance", "slang.setActiveInstance", "slang.getScopesByModule", "slang.getInstancesOfModule", "slang.getFilesContainingModule", "slang.setTopLevel", "slang.openModuleDefinition", "slang.setBuildFile", "slang.searchHierarchy", "slang.getInstances", "slang.getDriversWithLocation", "slang.expandMacros", "slang.openWaveform", "slang.getModulesInFile", "slang.addToWaveform", "slang.getScope", "slang.getLoadsWithLocation", "slang.getScopes", "slang.showHierLocation"]}
+CAP-ROW hoverProvider True
+CAP-ROW inlayHintProvider {"resolveProvider": false}
+CAP-ROW referencesProvider True
+CAP-ROW renameProvider True
+CAP-ROW textDocumentSync {"change": 2, "openClose": true, "save": {"includeText": true}}
+CAP-ROW workspaceSymbolProvider True
+CAP-KEYS 15
+CAP-LOOKUP codeActionProvider yes
+CAP-LOOKUP callHierarchyProvider yes
+CAP-LOOKUP hoverProvider yes
+CAP-LOOKUP workspaceSymbolProvider yes
+CAP-LOOKUP documentSymbolProvider yes
+CAP-LOOKUP referencesProvider yes
+CAP-LOOKUP renameProvider yes
+CAP-LOOKUP documentFormattingProvider no
+CAP-LOOKUP documentRangeFormattingProvider no
+CAP-LOOKUP completionProvider yes
+CAP-LOOKUP inlayHintProvider yes
+CAP-LOOKUP signatureHelpProvider no
+CAP-LOOKUP executeCommandProvider yes
+CAP-LOOKUP definitionProvider yes
+CAP-LOOKUP documentHighlightProvider yes

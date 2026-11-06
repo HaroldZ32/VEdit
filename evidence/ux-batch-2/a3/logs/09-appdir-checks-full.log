@@ -1,0 +1,129 @@
+=== A3 repair R3 — AppDir assertion (COMPLETE, selftest unedited) ===
+captured: 2026-11-05T03:00:57+08:00
+host: Linux 7.0.0-38-generic x86_64  LANG=zh_CN.UTF-8 LC_ALL=unset
+git HEAD: 4e2d0a57ca50db9568db5a5b040cc66f04c9a05f dirty-entries: 387
+binaries:
+  vd-app                                     45d929ce287e6a97edd6e287f08ec5470f1bdb4c50a1eba891cae78da9520298
+  vedit-ksh-env-probe                        2a6d6ff3c6966f591d8e112a1e55f7b728d0ee35a25b617443d32556437fc87e
+  vedit-highlight-mode-selftest              4cb99cb13a19dcd24a13bff8e9ea4adab81bee6e396f9eee2301b272c18566a1
+  vedit_syntax_kde_selftest                  c93468bbdfb66dd8087a63c4d799dfea99cf58790e8c77fb7380fcf3a579f83f
+source mtimes:
+  src/editor/kernel/highlight_mode_selftest.cpp 2026-11-05 02:49:15.960661173 +0800
+  src/editor/kernel/highlight_mode.cpp         2026-11-05 01:34:10.720007716 +0800
+  src/editor/CMakeLists.txt                    2026-11-05 02:49:21.743857914 +0800
+  src/syntax/kde/ksyntax_data.cpp              2026-11-05 02:59:33.337550882 +0800
+  resources/syntax/vedit-vhdl.xml              2026-11-05 02:59:03.426668309 +0800
+  cmake/smoke/ksh_env_probe.cpp                2026-11-05 02:46:06.155893446 +0800
+
+command: docker run --rm -v $PWD:/vedit-build -w /vedit-build -e HOME=/tmp vedit-qt6-build:local bash -lc 'mkdir -p target/a3-appdir-repair/libonly && ln -sf /vedit-build/target/a3-appdir-repair/AppDir/lib/libKF6SyntaxHighlighting.so.6 target/a3-appdir-repair/libonly/ && LD_LIBRARY_PATH=/vedit-build/target/a3-appdir-repair/libonly QT_QPA_PLATFORM=offscreen target/qt6-build/src/app/editor-lane/vedit-highlight-mode-selftest --appdir /vedit-build/target/a3-appdir-repair/AppDir'
+
+CHECK editor.instance PASS
+MODE-FACT mode=appdir share=/vedit-build/target/a3-appdir-repair/AppDir/usr/share repository_definitions=6
+MODE-FACT repository.definitionForFileName(timing.sdc)='None'
+CHECK top.v PASS  got 'Verilog', expected 'Verilog'
+CHECK definition-valid.top.v PASS  mode 'Verilog'
+CHECK definition-parsed.top.v PASS  /vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml
+CHECK definition-shipped.top.v PASS  file='/vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml' author='VEdit'
+CHECK top.vh PASS  got 'Verilog', expected 'Verilog'
+CHECK definition-valid.top.vh PASS  mode 'Verilog'
+CHECK definition-parsed.top.vh PASS  /vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml
+CHECK definition-shipped.top.vh PASS  file='/vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml' author='VEdit'
+CHECK top.vlg PASS  got 'Verilog', expected 'Verilog'
+CHECK definition-valid.top.vlg PASS  mode 'Verilog'
+CHECK definition-parsed.top.vlg PASS  /vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml
+CHECK definition-shipped.top.vlg PASS  file='/vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml' author='VEdit'
+CHECK top.sv PASS  got 'SystemVerilog', expected 'SystemVerilog'
+CHECK definition-valid.top.sv PASS  mode 'SystemVerilog'
+CHECK definition-parsed.top.sv PASS  /vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-systemverilog.xml
+CHECK definition-shipped.top.sv PASS  file='/vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-systemverilog.xml' author='VEdit'
+CHECK top.svh PASS  got 'SystemVerilog', expected 'SystemVerilog'
+CHECK definition-valid.top.svh PASS  mode 'SystemVerilog'
+CHECK definition-parsed.top.svh PASS  /vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-systemverilog.xml
+CHECK definition-shipped.top.svh PASS  file='/vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-systemverilog.xml' author='VEdit'
+CHECK mod.vhd PASS  got 'VHDL', expected 'VHDL'
+CHECK definition-valid.mod.vhd PASS  mode 'VHDL'
+CHECK definition-parsed.mod.vhd PASS  /vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-vhdl.xml
+CHECK definition-shipped.mod.vhd PASS  file='/vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-vhdl.xml' author='VEdit'
+CHECK mod.vhdl PASS  got 'VHDL', expected 'VHDL'
+CHECK definition-valid.mod.vhdl PASS  mode 'VHDL'
+CHECK definition-parsed.mod.vhdl PASS  /vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-vhdl.xml
+CHECK definition-shipped.mod.vhdl PASS  file='/vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-vhdl.xml' author='VEdit'
+CHECK notes.md PASS  got 'Markdown', expected 'Markdown'
+CHECK definition-valid.notes.md PASS  mode 'Markdown'
+CHECK definition-parsed.notes.md PASS  /vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-markdown.xml
+CHECK definition-shipped.notes.md PASS  file='/vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-markdown.xml' author='VEdit'
+CHECK doc.markdown PASS  got 'Markdown', expected 'Markdown'
+CHECK definition-valid.doc.markdown PASS  mode 'Markdown'
+CHECK definition-parsed.doc.markdown PASS  /vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-markdown.xml
+CHECK definition-shipped.doc.markdown PASS  file='/vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-markdown.xml' author='VEdit'
+CHECK run.tcl PASS  got 'Tcl', expected 'Tcl'
+CHECK definition-valid.run.tcl PASS  mode 'Tcl'
+CHECK definition-parsed.run.tcl PASS  /vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-tcl.xml
+CHECK definition-shipped.run.tcl PASS  file='/vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-tcl.xml' author='VEdit'
+CHECK timing.sdc PASS  got 'Tcl', expected 'Tcl'
+CHECK definition-valid.timing.sdc PASS  mode 'Tcl'
+CHECK definition-parsed.timing.sdc PASS  /vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-tcl.xml
+CHECK definition-shipped.timing.sdc PASS  file='/vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-tcl.xml' author='VEdit'
+CHECK pins.xdc PASS  got 'Tcl', expected 'Tcl'
+CHECK definition-valid.pins.xdc PASS  mode 'Tcl'
+CHECK definition-parsed.pins.xdc PASS  /vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-tcl.xml
+CHECK definition-shipped.pins.xdc PASS  file='/vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-tcl.xml' author='VEdit'
+CHECK table-first.sdc-only-in-table PASS
+MODE-FACT fallback decoy absent (AppDir share): probeMode=''
+CHECK fallback.unknown-extension-stays-empty PASS
+CHECK unknown-extension-empty PASS
+CHECK construct.vhdl-definition PASS  /vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-vhdl.xml
+CHECK construct.vhdl-keyword-entity PASS  'entity' -> 'Keyword' (expected 'Keyword')
+CHECK construct.vhdl-keyword-is PASS  'is' -> 'Keyword' (expected 'Keyword')
+CHECK construct.vhdl-keyword-architecture PASS  'architecture' -> 'Keyword' (expected 'Keyword')
+CHECK construct.vhdl-keyword-end PASS  'end' -> 'Keyword' (expected 'Keyword')
+CHECK construct.vhdl-comment PASS  '-- counter' -> 'Comment' (expected 'Comment')
+CHECK construct.vhdl-bit-literal PASS  ''1'' -> 'String' (expected 'String')
+CHECK construct.vhdl-string PASS  '"reset asserted"' -> 'String' (expected 'String')
+CHECK construct.vhdl-type-name PASS  'std_logic_vector' -> 'Data Type' (expected 'Data Type')
+CHECK construct.vhdl-number PASS  '3' -> 'Number' (expected 'Number')
+CHECK construct.vhdl-fold-labelled-process PASS  begins=1 ends=1
+CHECK construct.vhdl-fold-unlabelled-process PASS  begins=1 ends=1
+CHECK construct.markdown-definition PASS  /vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-markdown.xml
+CHECK construct.markdown-heading PASS  '# Timing constraints' -> 'Heading' (expected 'Heading')
+CHECK construct.markdown-list-marker PASS  '-' -> 'List Marker' (expected 'List Marker')
+CHECK construct.markdown-inline-code PASS  '`inline code`' -> 'Code' (expected 'Code')
+CHECK construct.markdown-link PASS  '[a link](https://example.com/doc)' -> 'Link' (expected 'Link')
+CHECK construct.markdown-fenced-content-is-code PASS  'set period 10' -> 'Code Block' (expected 'Code Block')
+CHECK construct.tcl-definition PASS  /vedit-build/target/a3-appdir-repair/AppDir/usr/share/org.kde.syntax-highlighting/syntax/vedit-tcl.xml
+CHECK construct.tcl-proc PASS  'proc' -> 'Keyword' (expected 'Keyword')
+CHECK construct.tcl-set PASS  'set' -> 'Keyword' (expected 'Keyword')
+CHECK construct.tcl-if PASS  'if' -> 'Keyword' (expected 'Keyword')
+CHECK construct.tcl-foreach PASS  'foreach' -> 'Keyword' (expected 'Keyword')
+CHECK construct.tcl-comment PASS  '# build' -> 'Comment' (expected 'Comment')
+CHECK construct.tcl-variable PASS  '$period' -> 'Variable' (expected 'Variable')
+CHECK construct.tcl-double-quoted-string PASS  '"period is' -> 'String' (expected 'String')
+CHECK construct.tcl-command-substitution PASS  '[' -> 'Operator' (expected 'Operator')
+CHECK construct.tcl-substitution-runs-a-command PASS  'expr' -> 'Keyword' (expected 'Keyword')
+CHECK construct.sdc-create-clock PASS  'create_clock' -> 'SDC Command' (expected 'SDC Command')
+CHECK construct.sdc-input-delay PASS  'set_input_delay' -> 'SDC Command' (expected 'SDC Command')
+CHECK construct.sdc-command-substitution PASS  '[' -> 'Operator' (expected 'Operator')
+CHECK construct.sdc-suffix-maps-to-tcl PASS
+CHECK drift.extension.v PASS  highlight_mode='Verilog' ksyntax_data='Verilog'
+CHECK drift.extension.vh PASS  highlight_mode='Verilog' ksyntax_data='Verilog'
+CHECK drift.extension.vlg PASS  highlight_mode='Verilog' ksyntax_data='Verilog'
+CHECK drift.extension.sv PASS  highlight_mode='SystemVerilog' ksyntax_data='SystemVerilog'
+CHECK drift.extension.svh PASS  highlight_mode='SystemVerilog' ksyntax_data='SystemVerilog'
+CHECK drift.extension.vhd PASS  highlight_mode='VHDL' ksyntax_data='VHDL'
+CHECK drift.extension.vhdl PASS  highlight_mode='VHDL' ksyntax_data='VHDL'
+CHECK drift.extension.md PASS  highlight_mode='Markdown' ksyntax_data='Markdown'
+CHECK drift.extension.markdown PASS  highlight_mode='Markdown' ksyntax_data='Markdown'
+CHECK drift.extension.mdown PASS  highlight_mode='Markdown' ksyntax_data='Markdown'
+CHECK drift.extension.mkd PASS  highlight_mode='Markdown' ksyntax_data='Markdown'
+CHECK drift.extension.tcl PASS  highlight_mode='Tcl' ksyntax_data='Tcl'
+CHECK drift.extension.tk PASS  highlight_mode='Tcl' ksyntax_data='Tcl'
+CHECK drift.extension.sdc PASS  highlight_mode='Tcl' ksyntax_data='Tcl'
+CHECK drift.extension.xdc PASS  highlight_mode='Tcl' ksyntax_data='Tcl'
+CHECK drift.unknown-extension PASS
+CHECK document.created PASS
+CHECK document.applied PASS
+CHECK document.highlighting-mode PASS  VHDL
+MODE-FACT vhdl formats=16 folds=1/0
+CHECK document.formats PASS  16
+HIGHLIGHT-MODE-SELFTEST mode=appdir checks=104 failures=0
+EXIT=0

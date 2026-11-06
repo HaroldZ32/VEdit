@@ -1,0 +1,181 @@
+lupdate warning: For some reason, 'translations/vedit_zh_CN.ts' is not writable.
+lupdate warning: no TS files specified. Only diagnostics will be produced.
+Scanning directory 'src'...
+/vedit-build/src/app/app_shell.h:13: Cannot open /vedit-build/src/app/i18n.h: Permission denied
+/vedit-build/src/app/app_shell.cpp:8: Cannot open /vedit-build/src/app/help_viewer.h: Permission denied
+/vedit-build/src/app/app_shell.cpp:10: Cannot open /vedit-build/src/common/path_display.h: Permission denied
+/vedit-build/src/app/app_shell.h:13: Cannot open /vedit-build/src/app/i18n.h: Permission denied
+/vedit-build/src/app/editor_area.cpp:6: Cannot open /vedit-build/src/common/path_display.h: Permission denied
+/vedit-build/src/app/editor_area.cpp:9: Cannot open /vedit-build/src/workspace/breadcrumb/breadcrumb_bar.h: Permission denied
+/vedit-build/src/app/main.cpp:16: Cannot open /vedit-build/src/app/i18n.h: Permission denied
+/vedit-build/src/app/main.cpp:20: Cannot open /vedit-build/src/common/path_display.h: Permission denied
+/vedit-build/src/app/main.cpp:40: Cannot open /vedit-build/src/workspace/settings/format_options.h: Permission denied
+/vedit-build/src/app/main.cpp:41: Cannot open /vedit-build/src/workspace/settings/lint_options.h: Permission denied
+/vedit-build/src/app/main.cpp:43: Cannot open /vedit-build/src/workspace/settings/ui_scale.h: Permission denied
+/vedit-build/src/editor/kernel/find_replace.h:24: Cannot open /vedit-build/src/workspace/search/search_query.h: Permission denied
+/vedit-build/src/editor/kernel/edit_core_selftest.cpp:8: Cannot open /vedit-build/src/editor/kernel/lsp_actions.h: Permission denied
+/vedit-build/src/editor/kernel/find_replace.h:24: Cannot open /vedit-build/src/workspace/search/search_query.h: Permission denied
+/vedit-build/src/editor/kernel/ktexteditor_provider.cpp:6: Cannot open /vedit-build/src/editor/kernel/editor_advanced.h: Permission denied
+/vedit-build/src/editor/kernel/ktexteditor_provider.cpp:7: Cannot open /vedit-build/src/editor/kernel/editor_context_menu.h: Permission denied
+/vedit-build/src/editor/kernel/ktexteditor_provider.cpp:9: Cannot open /vedit-build/src/editor/kernel/lsp_actions.h: Permission denied
+/vedit-build/src/editor/kernel/ktexteditor_provider.cpp:11: Cannot open /vedit-build/src/editor/kernel/signature_help.h: Permission denied
+/vedit-build/src/editor/kernel/multi_cursor.cpp:3: Cannot open /vedit-build/src/editor/kernel/lsp_actions.h: Permission denied
+/vedit-build/src/workspace/diagnostics/autofix_document.cpp:1: Cannot open /vedit-build/src/workspace/diagnostics/autofix.h: Permission denied
+/vedit-build/src/workspace/diagnostics/diagnostics_controller.cpp:21: Cannot open /vedit-build/src/workspace/settings/lint_options.h: Permission denied
+/vedit-build/src/workspace/diagnostics/diagnostics_integration.cpp:5: Cannot open /vedit-build/src/workspace/diagnostics/autofix.h: Permission denied
+/vedit-build/src/workspace/diagnostics/diagnostics_integration.cpp:6: Cannot open /vedit-build/src/workspace/diagnostics/diagnostic_hover.h: Permission denied
+/vedit-build/src/workspace/diagnostics/diagnostics_integration.cpp:10: Cannot open /vedit-build/src/workspace/diagnostics/project_lint_notice.h: Permission denied
+/vedit-build/src/workspace/diagnostics/diagnostics_integration.cpp:11: Cannot open /vedit-build/src/workspace/diagnostics/project_lint_trigger.h: Permission denied
+/vedit-build/src/workspace/diagnostics/diagnostics_integration.cpp:12: Cannot open /vedit-build/src/workspace/diagnostics/symbol_scan.h: Permission denied
+/vedit-build/src/workspace/diagnostics/diagnostics_integration.cpp:16: Cannot open /vedit-build/src/workspace/settings/settings_keys.h: Permission denied
+/vedit-build/src/workspace/diagnostics/diagnostics_integration.cpp:20: Cannot open /vedit-build/src/workspace/settings/lint_options.h: Permission denied
+/vedit-build/src/workspace/diagnostics/diagnostics_integration.cpp:31: Cannot open /vedit-build/src/workspace/jump/jump_registry.h: Permission denied
+/vedit-build/src/workspace/diagnostics/diagnostics_integration.cpp:36: Cannot open /vedit-build/src/editor/kernel/lsp_actions.h: Permission denied
+/vedit-build/src/workspace/diagnostics/diagnostics_panel.cpp:6: Cannot open /vedit-build/src/workspace/jump/jump_registry.h: Permission denied
+/vedit-build/src/workspace/diagnostics/ffi_backends.cpp:17: Cannot open /vedit-build/src/workspace/settings/lint_options.h: Permission denied
+/vedit-build/src/workspace/diagnostics/symbol_scan.cpp:1: Cannot open /vedit-build/src/workspace/diagnostics/symbol_scan.h: Permission denied
+/vedit-build/src/workspace/diagnostics/toolchain.cpp:13: Cannot open /vedit-build/src/workspace/settings/format_options.h: Permission denied
+/vedit-build/src/workspace/filetree/file_tree_model.cpp:4: Cannot open /vedit-build/src/common/path_display.h: Permission denied
+/vedit-build/src/workspace/filetree/file_tree_widget.cpp:5: Cannot open /vedit-build/src/workspace/filetree/file_status_delegate.h: Permission denied
+/vedit-build/src/workspace/integration.cpp:9: Cannot open /vedit-build/src/workspace/jump/jump_integration.h: Permission denied
+/vedit-build/src/workspace/integration.cpp:24: Cannot open /vedit-build/src/workspace/module_tree/module_tree_integration.h: Permission denied
+/vedit-build/src/workspace/module_tree/interface_panel.h:23: Cannot open /vedit-build/src/workspace/module_tree/module_catalog.h: Permission denied
+/vedit-build/src/workspace/module_tree/interface_panel.cpp:3: Cannot open /vedit-build/src/workspace/jump/jump_registry.h: Permission denied
+/vedit-build/src/workspace/module_tree/interface_panel.h:23: Cannot open /vedit-build/src/workspace/module_tree/module_catalog.h: Permission denied
+/vedit-build/src/workspace/module_tree/module_tree_catalog_test.cpp:22: Cannot open /vedit-build/src/workspace/module_tree/catalog_client.h: Permission denied
+/vedit-build/src/workspace/module_tree/module_tree_catalog_test.cpp:24: Cannot open /vedit-build/src/workspace/module_tree/module_catalog.h: Permission denied
+/vedit-build/src/workspace/module_tree/module_tree_catalog_test.cpp:25: Cannot open /vedit-build/src/workspace/module_tree/module_hierarchy.h: Permission denied
+/vedit-build/src/workspace/module_tree/module_tree_catalog_test.cpp:26: Cannot open /vedit-build/src/workspace/module_tree/module_tree_integration.h: Permission denied
+/vedit-build/src/workspace/module_tree/module_tree_panel.h:16: Cannot open /vedit-build/src/workspace/module_tree/module_catalog.h: Permission denied
+/vedit-build/src/workspace/module_tree/module_tree_panel.h:17: Cannot open /vedit-build/src/workspace/module_tree/module_hierarchy.h: Permission denied
+/vedit-build/src/workspace/module_tree/module_tree_catalog_test.cpp:32: Cannot open /vedit-build/src/workspace/jump/jump_registry.h: Permission denied
+/vedit-build/src/workspace/module_tree/module_tree_panel.h:16: Cannot open /vedit-build/src/workspace/module_tree/module_catalog.h: Permission denied
+/vedit-build/src/workspace/module_tree/module_tree_panel.h:17: Cannot open /vedit-build/src/workspace/module_tree/module_hierarchy.h: Permission denied
+/vedit-build/src/workspace/palette/file_index.cpp:3: Cannot open /vedit-build/src/common/path_display.h: Permission denied
+/vedit-build/src/workspace/project/project_integration.cpp:4: Cannot open /vedit-build/src/workspace/project/project_filelist.h: Permission denied
+/vedit-build/src/workspace/project/project_integration.cpp:7: Cannot open /vedit-build/src/workspace/project/project_subscription.h: Permission denied
+/vedit-build/src/workspace/project/project_model.cpp:3: Cannot open /vedit-build/src/common/path_display.h: Permission denied
+/vedit-build/src/workspace/project/project_panel.cpp:4: Cannot open /vedit-build/src/workspace/project/project_variables_dialog.h: Permission denied
+/vedit-build/src/workspace/project/project_panel.cpp:7: Cannot open /vedit-build/src/workspace/jump/jump_registry.h: Permission denied
+/vedit-build/src/workspace/project/project_selftest.cpp:34: Cannot open /vedit-build/src/workspace/project/project_filelist.h: Permission denied
+/vedit-build/src/workspace/project/project_selftest.cpp:37: Cannot open /vedit-build/src/workspace/project/project_subscription.h: Permission denied
+/vedit-build/src/workspace/project/project_selftest.cpp:38: Cannot open /vedit-build/src/workspace/project/project_variables_dialog.h: Permission denied
+/vedit-build/src/workspace/project/project_selftest.cpp:47: Cannot open /vedit-build/src/workspace/jump/jump_registry.h: Permission denied
+/vedit-build/src/workspace/search/global_search.cpp:3: Cannot open /vedit-build/src/common/path_display.h: Permission denied
+/vedit-build/src/workspace/search/search_integration.cpp:5: Cannot open /vedit-build/src/workspace/jump/jump_registry.h: Permission denied
+/vedit-build/src/workspace/search/search_jump_target.h:25: Cannot open /vedit-build/src/workspace/jump/jump_target.h: Permission denied
+/vedit-build/src/workspace/search/search_panel.h:36: Cannot open /vedit-build/src/workspace/search/document_sync.h: Permission denied
+/vedit-build/src/workspace/search/search_panel.h:38: Cannot open /vedit-build/src/workspace/search/project_replace.h: Permission denied
+/vedit-build/src/workspace/search/search_panel.h:39: Cannot open /vedit-build/src/workspace/search/search_query.h: Permission denied
+/vedit-build/src/workspace/search/search_integration.cpp:9: Cannot open /vedit-build/src/workspace/search/search_query.h: Permission denied
+/vedit-build/src/workspace/search/search_jump_target.cpp:6: Cannot open /vedit-build/src/workspace/jump/jump_registry.h: Permission denied
+/vedit-build/src/workspace/search/search_jump_target.h:25: Cannot open /vedit-build/src/workspace/jump/jump_target.h: Permission denied
+/vedit-build/src/workspace/search/search_panel.cpp:3: Cannot open /vedit-build/src/workspace/jump/jump_registry.h: Permission denied
+/vedit-build/src/workspace/search/search_panel.cpp:4: Cannot open /vedit-build/src/workspace/search/search_query.h: Permission denied
+/vedit-build/src/workspace/search/search_panel.h:36: Cannot open /vedit-build/src/workspace/search/document_sync.h: Permission denied
+/vedit-build/src/workspace/search/search_panel.h:38: Cannot open /vedit-build/src/workspace/search/project_replace.h: Permission denied
+/vedit-build/src/workspace/search/search_panel.h:39: Cannot open /vedit-build/src/workspace/search/search_query.h: Permission denied
+/vedit-build/src/workspace/search/search_selftest.cpp:19: Cannot open /vedit-build/src/workspace/jump/jump_registry.h: Permission denied
+/vedit-build/src/workspace/settings/settings_panel.h:17: Cannot open /vedit-build/src/workspace/settings/format_options.h: Permission denied
+/vedit-build/src/workspace/settings/settings_panel.h:18: Cannot open /vedit-build/src/workspace/settings/lint_options.h: Permission denied
+/vedit-build/src/workspace/settings/settings_panel.h:20: Cannot open /vedit-build/src/workspace/settings/ui_scale.h: Permission denied
+/vedit-build/src/workspace/settings/settings_panel.cpp:4: Cannot open /vedit-build/src/app/i18n.h: Permission denied
+/vedit-build/src/workspace/settings/settings_panel.cpp:5: Cannot open /vedit-build/src/workspace/settings/settings_keys.h: Permission denied
+/vedit-build/src/workspace/settings/settings_panel.h:17: Cannot open /vedit-build/src/workspace/settings/format_options.h: Permission denied
+/vedit-build/src/workspace/settings/settings_panel.h:18: Cannot open /vedit-build/src/workspace/settings/lint_options.h: Permission denied
+/vedit-build/src/workspace/settings/settings_panel.h:20: Cannot open /vedit-build/src/workspace/settings/ui_scale.h: Permission denied
+/vedit-build/src/workspace/settings/settings_selftest.cpp:13: Cannot open /vedit-build/src/workspace/settings/format_options.h: Permission denied
+/vedit-build/src/workspace/settings/settings_selftest.cpp:14: Cannot open /vedit-build/src/workspace/settings/lint_options.h: Permission denied
+/vedit-build/src/workspace/settings/settings_selftest.cpp:17: Cannot open /vedit-build/src/workspace/settings/settings_keys.h: Permission denied
+/vedit-build/src/workspace/settings/settings_selftest.cpp:20: Cannot open /vedit-build/src/workspace/settings/ui_scale.h: Permission denied
+/vedit-build/src/workspace/vcs/vcs_integration.cpp:5: Cannot open /vedit-build/src/workspace/vcs/vcs_history.h: Permission denied
+/vedit-build/src/workspace/vcs/vcs_panel.h:18: Cannot open /vedit-build/src/workspace/vcs/vcs_capabilities.h: Permission denied
+/vedit-build/src/workspace/vcs/vcs_integration.cpp:8: Cannot open /vedit-build/src/workspace/vcs/vcs_toolchain.h: Permission denied
+/vedit-build/src/workspace/vcs/vcs_panel.cpp:3: Cannot open /vedit-build/src/workspace/vcs/vcs_capabilities.h: Permission denied
+/vedit-build/src/workspace/vcs/vcs_panel.h:18: Cannot open /vedit-build/src/workspace/vcs/vcs_capabilities.h: Permission denied
+/vedit-build/src/workspace/vcs/vcs_selftest.cpp:8: Cannot open /vedit-build/src/workspace/vcs/vcs_history.h: Permission denied
+/vedit-build/src/workspace/vcs/vcs_selftest.cpp:11: Cannot open /vedit-build/src/workspace/vcs/vcs_toolchain.h: Permission denied
+/vedit-build/src/workspace/vcs/vcs_source.cpp:3: Cannot open /vedit-build/src/workspace/vcs/vcs_toolchain.h: Permission denied
+Cannot open /vedit-build/src/app/editor_area_activation_test.cpp: Permission denied
+Cannot open /vedit-build/src/app/help_viewer.cpp: Permission denied
+Cannot open /vedit-build/src/app/help_viewer.h: Permission denied
+Cannot open /vedit-build/src/app/i18n.cpp: Permission denied
+Cannot open /vedit-build/src/app/i18n.h: Permission denied
+Cannot open /vedit-build/src/app/i18n_selftest.cpp: Permission denied
+Cannot open /vedit-build/src/app/ux_selftest.cpp: Permission denied
+Cannot open /vedit-build/src/common/path_display.h: Permission denied
+Cannot open /vedit-build/src/editor/kernel/editor_advanced.cpp: Permission denied
+Cannot open /vedit-build/src/editor/kernel/editor_advanced.h: Permission denied
+Cannot open /vedit-build/src/editor/kernel/editor_context_menu.cpp: Permission denied
+Cannot open /vedit-build/src/editor/kernel/editor_context_menu.h: Permission denied
+Cannot open /vedit-build/src/editor/kernel/find_replace_selftest.cpp: Permission denied
+Cannot open /vedit-build/src/editor/kernel/highlight_mode_selftest.cpp: Permission denied
+Cannot open /vedit-build/src/editor/kernel/lsp_actions.cpp: Permission denied
+Cannot open /vedit-build/src/editor/kernel/lsp_actions.h: Permission denied
+Cannot open /vedit-build/src/editor/kernel/multi_cursor_selftest.cpp: Permission denied
+Cannot open /vedit-build/src/editor/kernel/signature_help.cpp: Permission denied
+Cannot open /vedit-build/src/editor/kernel/signature_help.h: Permission denied
+Cannot open /vedit-build/src/editor/kernel/signature_help_selftest.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/breadcrumb/breadcrumb_bar.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/breadcrumb/breadcrumb_bar.h: Permission denied
+Cannot open /vedit-build/src/workspace/breadcrumb/tests/breadcrumb_click_tests.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/diagnostics/autofix.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/diagnostics/autofix.h: Permission denied
+Cannot open /vedit-build/src/workspace/diagnostics/diagnostic_hover.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/diagnostics/diagnostic_hover.h: Permission denied
+Cannot open /vedit-build/src/workspace/diagnostics/lint_progress.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/diagnostics/lint_progress.h: Permission denied
+Cannot open /vedit-build/src/workspace/diagnostics/project_lint_notice.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/diagnostics/project_lint_notice.h: Permission denied
+Cannot open /vedit-build/src/workspace/diagnostics/project_lint_trigger.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/diagnostics/project_lint_trigger.h: Permission denied
+Cannot open /vedit-build/src/workspace/diagnostics/selftests/b3_repair_api_selftest.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/diagnostics/selftests/b3_wiring_e2e.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/diagnostics/selftests/lint_experience_selftest.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/diagnostics/selftests/lint_orchestration_probe.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/diagnostics/selftests/project_lint_e2e.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/diagnostics/selftests/rename_e2e.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/diagnostics/symbol_scan.h: Permission denied
+Cannot open /vedit-build/src/workspace/filetree/file_status_delegate.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/filetree/file_status_delegate.h: Permission denied
+Cannot open /vedit-build/src/workspace/jump/jump_integration.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/jump/jump_integration.h: Permission denied
+Cannot open /vedit-build/src/workspace/jump/jump_registry.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/jump/jump_registry.h: Permission denied
+Cannot open /vedit-build/src/workspace/jump/jump_target.h: Permission denied
+Cannot open /vedit-build/src/workspace/jump/tests/jump_tests.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/module_tree/catalog_client.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/module_tree/catalog_client.h: Permission denied
+Cannot open /vedit-build/src/workspace/module_tree/module_catalog.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/module_tree/module_catalog.h: Permission denied
+Cannot open /vedit-build/src/workspace/module_tree/module_hierarchy.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/module_tree/module_hierarchy.h: Permission denied
+Cannot open /vedit-build/src/workspace/module_tree/module_tree_integration.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/module_tree/module_tree_integration.h: Permission denied
+Cannot open /vedit-build/src/workspace/module_tree/module_tree_panel.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/module_tree/module_tree_selftest.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/project/project_filelist.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/project/project_filelist.h: Permission denied
+Cannot open /vedit-build/src/workspace/project/project_subscription.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/project/project_subscription.h: Permission denied
+Cannot open /vedit-build/src/workspace/project/project_variables_dialog.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/project/project_variables_dialog.h: Permission denied
+Cannot open /vedit-build/src/workspace/search/document_sync.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/search/document_sync.h: Permission denied
+Cannot open /vedit-build/src/workspace/search/project_replace.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/search/project_replace.h: Permission denied
+Cannot open /vedit-build/src/workspace/search/search_query.h: Permission denied
+Cannot open /vedit-build/src/workspace/search/search_replace_selftest.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/settings/format_options.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/settings/format_options.h: Permission denied
+Cannot open /vedit-build/src/workspace/settings/lint_options.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/settings/lint_options.h: Permission denied
+Cannot open /vedit-build/src/workspace/settings/settings_keys.h: Permission denied
+Cannot open /vedit-build/src/workspace/settings/ui_scale.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/settings/ui_scale.h: Permission denied
+Cannot open /vedit-build/src/workspace/vcs/vcs_capabilities.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/vcs/vcs_capabilities.h: Permission denied
+Cannot open /vedit-build/src/workspace/vcs/vcs_history.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/vcs/vcs_history.h: Permission denied
+Cannot open /vedit-build/src/workspace/vcs/vcs_toolchain.cpp: Permission denied
+Cannot open /vedit-build/src/workspace/vcs/vcs_toolchain.h: Permission denied

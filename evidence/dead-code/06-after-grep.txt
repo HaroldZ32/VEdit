@@ -1,0 +1,13 @@
+# 06-after-grep — the library/target token AFTER deletion
+# cmd: grep -rn vedit_syntax_folding src/ CMakeLists.txt scripts/ tests/ build/ resources/ packaging/ translations/
+# cwd: /home/haroldzhao/MyProj/DshProj/VEdit   captured: 2026-11-04T13:44:58+08:00
+# matches: 0
+
+# stale-path comments that remain in files OUTSIDE T29's write scope (not the token):
+src/workspace/breadcrumb/CMakeLists.txt:8:# dependency on src/syntax/folding: updating the breadcrumbs can never rebuild
+src/workspace/breadcrumb/breadcrumb_model.h:16://     on src/syntax/folding at all, see CMakeLists.txt).
+src/workspace/breadcrumb/README.md:27:本 lane **不依赖** `src/syntax/folding`（`CMakeLists.txt` 里没有该链接，也没有任何 include）。
+src/editor/CMakeLists.txt:64:# T29 deleted the folding lane (`src/syntax/folding`, its static library):
+src/editor/CMakeLists.txt:172:# the negative control. The probe lived in `src/syntax/folding/tests/` only
+src/editor/kernel/fold_gutter_click_probe.cpp:2:// `src/syntax/folding/tests/fold_native_gui_probe.cpp`, whose lane was deleted).
+src/syntax/common/CMakeLists.txt:5:# KDE data loader (`src/syntax/kde`) and the folding lane (`src/syntax/folding`),

@@ -1,0 +1,5 @@
+# gate: docs (bash build/gates/docs.sh)
+[docs] PASS: README.md docs/BUILD.md docs/USER_GUIDE.md THIRD_PARTY_NOTICES.md
+docs_exit=0
+# gate: fmt (RUSTUP_TOOLCHAIN=stable cargo fmt --all -- --check)
+fmt_exit=0

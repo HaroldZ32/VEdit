@@ -1,0 +1,13 @@
+TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server]
+TOOLCHAIN-PATHS verible='/vedit-build/.mpd/recon/verible/bin/verible-verilog-ls' slang='/vedit-build/build/slang/out/slang' format='/vedit-build/.mpd/recon/verible/bin/verible-verilog-format' lint='/vedit-build/.mpd/recon/verible/bin/verible-verilog-lint' slang-server='target/tmp/spike/slang-server'
+CHECK binaries.verible-toolchain PASS
+CHECK binaries.slang-server PASS
+CHECK fixture.temp-dir PASS
+CHECK fixture.written PASS
+CHECK switch.a.applied PASS
+CHECK switch.a.cleared-before-restart PASS
+SWITCH-A backend=verible ready=1 ready-ms=441 session='degraded: lsp 1/1 file(s), diagnostics 5' diagnostics=5 outline=0
+SWITCH-A-ARGV 'backend=verible program=/vedit-build/.mpd/recon/verible/bin/verible-verilog-ls'
+CHECK switch.a.ready PASS
+CHECK switch.a.session-names-backend PASS
+CHECK switch.a.diagnostics PASS

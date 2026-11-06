@@ -1,0 +1,13 @@
+# AC-4.7 recount (same method as evidence/i18n/14-selftest-coverage.md)
+date: 2026-11-03T00:26:15+08:00
+method: count of check(/QVERIFY(/QVERIFY2(/QCOMPARE(/expect( call sites in the nine selftest files listed in 14-selftest-coverage.md
+src/app/main.cpp 160
+src/workspace/settings/settings_selftest.cpp 124
+src/workspace/project/project_selftest.cpp 108
+src/workspace/vcs/vcs_selftest.cpp 37
+src/workspace/palette/palette_selftest.cpp 45
+src/workspace/diagnostics/diagnostics_selftest.cpp 44
+src/workspace/diagnostics/toolchain_selftest.cpp 27
+src/workspace/diagnostics/toolchain_ux_selftest.cpp 43
+src/workspace/palette/palette_integration_selftest.cpp 29
+TOTAL=617

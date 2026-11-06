@@ -1,0 +1,10 @@
+findings=319 rows=319 supplement=15 -> evidence/i18n-l2/03-b-reconciliation.csv
+  不译: 18
+  译（已完成）: 205
+  译（本批）: 73
+  译（片段）: 23
+  verified: {'no-wrap': 19, 'own-call+ts': 300}
+audit rows changed=47 -> evidence/i18n-l2/logs/20-t40-claim-audit.csv
+  audit claim-flip(no->yes): 27
+  audit claim-flip(no->yes);decision-change(待定->译（已完成）): 17
+  audit claim-flip(no->yes);decision-change(不译->译（已完成）): 3

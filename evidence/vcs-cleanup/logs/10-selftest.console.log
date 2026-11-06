@@ -1,0 +1,92 @@
+CHECK vcs.cred.e2e.op-fails-honestly PASS The VCS operation failed: fatal: Authentication failed for 'http://127.0.0.1:40493/repo.git/'
+CHECK vcs.cred.e2e.secret-not-in-ui PASS The VCS operation failed: fatal: Authentication failed for 'http://127.0.0.1:40493/repo.git/'
+CHECK vcs.cred.e2e.secret-not-in-argv PASS lines=2
+CHECK vcs.cred.e2e.helper-not-in-argv-value PASS the retry configured the helper without carrying the secret
+CHECK vcs.cred.e2e.cancel-push-requested PASS
+CHECK vcs.cred.e2e.cancel-prompted-once PASS prompts=1
+CHECK vcs.cred.e2e.cancel-no-authorization PASS authorized=1 push-lines=1
+CHECK vcs.cred.e2e.cancel-real-reason PASS The VCS operation failed: fatal: could not read Username for 'http://127.0.0.1:40493': terminal prompts disabled
+CHECK vcs.cred.e2e.cancel-says-aborted PASS Authentication cancelled; the operation was aborted and nothing was written.
+CHECK vcs.cred.e2e.modal-fixture PASS /tmp/vedit-workspace-vcs-selftest-kxgRbK/creds2
+CHECK vcs.cred.e2e.modal-push-requested PASS
+CHECK vcs.cred.e2e.modal-dialog-opened PASS driven=1 ticks=3
+CHECK vcs.cred.e2e.modal-exactly-one-authorization PASS authorized 1 -> 2
+CHECK vcs.cred.e2e.modal-secret-cleared PASS
+CHECK vcs.cred.e2e.modal-secret-not-in-ui PASS The VCS operation failed: fatal: Authentication failed for 'http://127.0.0.1:40493/repo.git/'
+CHECK vcs.cred.e2e.modal-dialog-destroyed PASS
+CHECK vcs.cred.e2e.secret-not-on-disk PASS scanned /tmp/vedit-workspace-vcs-selftest-kxgRbK
+CHECK vcs.ops.merge-requested PASS
+CHECK vcs.ops.merge-request PASS feature/x
+CHECK vcs.ops.rebase-requested PASS
+CHECK vcs.ops.rebase-request PASS
+CHECK vcs.ops.rebase-declined PASS
+CHECK vcs.ops.rebase-declined-zero-write PASS writes=2
+CHECK vcs.ops.rebase-single-confirm PASS confirm calls=1
+CHECK vcs.ops.rebase-preview-spells-consequence PASS Rebase feature/vcs-panel onto main?
+CHECK vcs.ops.rebase-empty-target-refused PASS
+CHECK vcs.ops.rebase-empty-target-zero-write PASS
+CHECK vcs.ops.rebase-confirmed-requested PASS
+CHECK vcs.ops.rebase-confirmed-request PASS
+CHECK vcs.ops.cherry-pick-requested PASS
+CHECK vcs.ops.cherry-pick-request PASS
+CHECK vcs.ops.revert-requested PASS
+CHECK vcs.ops.revert-request PASS
+CHECK vcs.ops.reset-invalid-mode-refused PASS
+CHECK vcs.ops.reset-invalid-mode-zero-write PASS writes=5
+CHECK vcs.ops.reset-hard-declined PASS
+CHECK vcs.ops.reset-hard-declined-zero-write PASS writes=5
+CHECK vcs.ops.reset-hard-first-confirm PASS
+CHECK vcs.ops.reset-preview-mentions-target PASS Reset feature/vcs-panel to abc1234 (hard)?
+CHECK vcs.ops.reset-hard-requested PASS
+CHECK vcs.ops.reset-hard-double-confirmed PASS calls=6
+CHECK vcs.ops.reset-request PASS hard
+CHECK vcs.ops.reset-soft-single-confirm PASS
+CHECK vcs.ops.reset-soft-request PASS calls=7
+CHECK vcs.ops.clean-declined PASS
+CHECK vcs.ops.clean-declined-zero-write PASS
+CHECK vcs.ops.clean-requested PASS
+CHECK vcs.ops.clean-request PASS
+CHECK vcs.ops.clean-empty-refused PASS
+CHECK vcs.ops.discard-second-step-declined PASS
+CHECK vcs.ops.discard-second-step-zero-write PASS writes=8
+CHECK vcs.ops.discard-second-step-two-confirms PASS confirm calls=2
+CHECK vcs.ops.discard-second-step-message PASS Discard cancelled; nothing was written.
+CHECK vcs.ops.discard-first-step-accepted-after PASS
+CHECK vcs.ops.continue-without-operation PASS
+CHECK vcs.ops.abort-without-operation PASS
+CHECK vcs.ops.continue-without-operation-zero-write PASS
+CHECK vcs.ops.e2e.fixture PASS /tmp/vedit-workspace-vcs-selftest-ibzNUI/ops-repo
+CHECK vcs.ops.e2e.merge-conflict PASS
+CHECK vcs.ops.e2e.merge-conflict-failed PASS Nothing was written.
+CHECK vcs.ops.e2e.conflict-state PASS op=merge banner='Merge in progress: 1 conflicted file(s). Resolve them, stage the result, then Continue (or Abort).'
+CHECK vcs.ops.e2e.conflict-banner PASS Merge in progress: 1 conflicted file(s). Resolve them, stage the result, then Continue (or Abort).
+CHECK vcs.ops.e2e.conflict-file-row PASS rtl/a.sv  conflict
+CHECK vcs.ops.e2e.stage-resolution PASS
+CHECK vcs.ops.e2e.continue-requested PASS
+CHECK vcs.ops.e2e.continue-ok PASS Continued the merge.
+CHECK vcs.ops.e2e.operation-cleared PASS none
+CHECK vcs.ops.e2e.merge-commit-created PASS c508041c60be74015b06eba445cd45f982283f76 6700722d0a587168e865b6279e15776393181f8a 0f22276840d2f1c1e3fa7b2587b7c2d068b946aa
+CHECK vcs.ops.e2e.reset-hard-declined PASS
+CHECK vcs.ops.e2e.reset-hard-declined-zero-write PASS calls=1
+CHECK vcs.ops.e2e.reset-hard-declined-head PASS
+CHECK vcs.ops.e2e.reset-hard-requested PASS
+CHECK vcs.ops.e2e.reset-hard-ok PASS The VCS operation failed.
+CHECK vcs.ops.e2e.reset-hard-moved-head PASS
+CHECK vcs.ops.e2e.reset-hard-clean-tree PASS
+CHECK vcs.ops.e2e.clean-requested PASS
+CHECK vcs.ops.e2e.clean-ok PASS The VCS operation failed.
+CHECK vcs.ops.e2e.clean-removed PASS
+CHECK vcs.i18n.zh-cn-catalogue PASS /vedit-build/target/qt6-build/src/app/workspace-lane-vcs/../translations/vedit_zh_CN.qm
+CHECK vcs.i18n.action-bar PASS 暂存 / 获取 / 分支…
+CHECK vcs.i18n.confirmations PASS 丢弃改动？
+CHECK vcs.i18n.states PASS 加载中…
+CHECK vcs.i18n.ops PASS 继续 / 中止
+CHECK vcs.i18n.history PASS 追溯 / 历史
+CHECK vcs.i18n.source-literals PASS 无仓库 / 修改
+CHECK vcs.i18n.change-row-chinese PASS rtl/top.sv  修改
+CHECK vcs.i18n.workspace PASS Git 工作区 / 移除工作树
+CHECK vcs.i18n.svn PASS 还原更改？ / 移除文件？
+CHECK vcs.i18n.svn-button-labels PASS 还原… / 更新
+CHECK vcs.i18n.credentials PASS 需要凭据
+cwd_still=/tmp/vedit-vcs-7-y4CLGh
+selftest=PASS

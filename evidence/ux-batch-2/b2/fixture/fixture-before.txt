@@ -1,0 +1,25 @@
+=== a.v ===
+module a;
+  wire foo;
+  assign bar = foo + foo;
+endmodule
+
+=== b.sv ===
+assign foo = 1;
+assign foo = 2;
+
+=== c.sv ===
+FOO
+foo_bar
+foo
+
+=== crlf.v ===
+foo
+foo
+
+=== notes.md ===
+foo in markdown
+
+=== unicode.v ===
+// 中文 foo 注释
+

@@ -1,0 +1,43 @@
+=== A3 repair R3 — assemble the AppDir from the final source ===
+captured: 2026-11-05T03:00:48+08:00
+host: Linux 7.0.0-38-generic x86_64  LANG=zh_CN.UTF-8 LC_ALL=unset
+git HEAD: 4e2d0a57ca50db9568db5a5b040cc66f04c9a05f dirty-entries: 387
+binaries:
+  vd-app                                     45d929ce287e6a97edd6e287f08ec5470f1bdb4c50a1eba891cae78da9520298
+  vedit-ksh-env-probe                        2a6d6ff3c6966f591d8e112a1e55f7b728d0ee35a25b617443d32556437fc87e
+  vedit-highlight-mode-selftest              4cb99cb13a19dcd24a13bff8e9ea4adab81bee6e396f9eee2301b272c18566a1
+  vedit_syntax_kde_selftest                  c93468bbdfb66dd8087a63c4d799dfea99cf58790e8c77fb7380fcf3a579f83f
+source mtimes:
+  src/editor/kernel/highlight_mode_selftest.cpp 2026-11-05 02:49:15.960661173 +0800
+  src/editor/kernel/highlight_mode.cpp         2026-11-05 01:34:10.720007716 +0800
+  src/editor/CMakeLists.txt                    2026-11-05 02:49:21.743857914 +0800
+  src/syntax/kde/ksyntax_data.cpp              2026-11-05 02:59:33.337550882 +0800
+  resources/syntax/vedit-vhdl.xml              2026-11-05 02:59:03.426668309 +0800
+  cmake/smoke/ksh_env_probe.cpp                2026-11-05 02:46:06.155893446 +0800
+
+command: docker run --rm -v $PWD:/vedit-build -w /vedit-build -e HOME=/tmp vedit-qt6-build:local bash packaging/runtime/assemble-appdir.sh --out /vedit-build/target/a3-appdir-repair/AppDir --require-toolchain
+
+[assemble] vd-app: 45d929ce287e6a97edd6e287f08ec5470f1bdb4c50a1eba891cae78da9520298  probe: 2a6d6ff3c6966f591d8e112a1e55f7b728d0ee35a25b617443d32556437fc87e
+[assemble] translations: qtbase_zh_CN.qm vedit_zh_CN.qm 
+[assemble] locale: C.utf8 416K (bundled glibc)
+[assemble] syntax data root: 5 xml under <root>/syntax/
+[assemble] whitelist: Markdown,SystemVerilog,Tcl,VHDL,Verilog
+binary verible-verilog-ls sha256=07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845
+binary verible-verilog-lint sha256=b9d56f9a180c33fb57f601174586c81348422ca28e27632074106c130d673b29
+binary verible-verilog-format sha256=b0a7b1ae948ca82e9d73a8a93e3844e4b2daa1db59df1f1eb5e1050260828473
+[assemble] toolchain: verible bundled (3 binaries, sha256 pinned)
+binary slang sha256=63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252
+[assemble] toolchain: slang bundled (sha256 pinned)
+[assemble] toolchain: complete (verible + slang), missing=[]
+[assemble] vcs: git=2.53.0 svn=1.14.5 libs=57 git-core=171 (svnadmin build-only, not shipped)
+[assemble] cjk font: 19484784 bytes sha256=b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a; licence: usr/share/doc/vedit/licenses/Noto-CJK-OFL-1.1.txt
+[assemble] active whitelist files: 5 (no syntax-bundled/)
+[assemble] delivery invariants: vd-app + Qt platform plugins + toolchain + whitelist present
+[assemble] AppDir: /vedit-build/target/a3-appdir-repair/AppDir files=350 bytes=384673581
+[assemble] f2lib sha256: aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
+APPDIR=/vedit-build/target/a3-appdir-repair/AppDir
+APPDIR_FORM=F2
+APPDIR_FILES=350
+APPDIR_BYTES=384673581
+APPDIR_WHITELIST=Markdown,SystemVerilog,Tcl,VHDL,Verilog
+ASSEMBLE_EXIT=0

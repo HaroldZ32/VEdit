@@ -1,0 +1,18 @@
+== scratch AppDir env-probe (sanitizer active) ==
+SELFTEST_EXIT=0
+== tail ==
+ok   real.double-click-instance — top.sv:11:7
+ok   real.signal-source — net top.link · source of top.link: top.u0.q · top.sv:11:38 → top.sv:11:38
+ok   real.signal-target — net top.link · target of top.link: top.u1.d · top.sv:12:25 → top.sv:12:25
+ok   real.cross-file-source — 2 nets named 'state'; chose top.u0.state · source of top.u0.state: top.u0.state · mid.sv:10:5 → mid.sv:10:5
+ok   packaged.appdir-slang — pre-existing /w/evidence/loader-i18n-restart-slang-verification/scratch-appdir/bin/slang
+ok   packaged.temp-state
+ok   packaged.answered
+ok   packaged.instances — instances=3
+     measurement: slang · 2 file(s) · 3 instance(s) · 14 net(s) · 9 ms · 18984 KiB peak
+SKIP generate-fixture — fixture='' slang='/w/packaging/runtime/out/AppDir/bin/slang'
+
+58 checks, 0 failure(s)
+== child env dump ==
+LD_LIBRARY_PATH=<unset>
+LOCPATH=<unset>

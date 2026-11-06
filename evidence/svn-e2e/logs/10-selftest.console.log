@@ -1,0 +1,82 @@
+CHECK vcs.capability.svn.workspace-reason PASS Stashes and linked worktrees are Git concepts; a Subversion working copy is a single directory.
+CHECK vcs.capability.svn.remote-reason PASS A Subversion working copy is bound to one URL; there is no remote set to add or remove.
+CHECK vcs.capability.svn.history-reason PASS The history view reads Git's log; Subversion's log (available in svn 1.14.5) is outside this build's accepted read set.
+CHECK vcs.capability.svn.disabled-count PASS disabled=11
+CHECK vcs.capability.svn.report PASS svn refresh=yes add=yes unstage=no(Subversion has no staging area: changed files are committed directly from the working
+CHECK vcs.capability.git.table-size PASS
+CHECK vcs.capability.git.unstage-supported PASS
+CHECK vcs.capability.git.remove-unsupported PASS Git records a deletion when the deleted file is staged; there is no separate remove operation.
+CHECK vcs.capability.git.update-unsupported PASS
+CHECK vcs.capability.none.only-refresh PASS
+CHECK vcs.svn.panel.backend PASS
+CHECK vcs.svn.panel.header PASS Subversion trunk @ 42 · 2 changed file(s)
+CHECK vcs.svn.panel.three-columns PASS files=2
+CHECK vcs.svn.panel.add-label PASS Add
+CHECK vcs.svn.panel.revert-label PASS Revert…
+CHECK vcs.svn.panel.update-label PASS
+CHECK vcs.svn.panel.remove-label PASS
+CHECK vcs.svn.panel.capability-line PASS Subversion: add, commit, revert, remove and update are available. Staging, fetches, pushes, branches, tags, remotes, stashes, worktrees and conflict continuation are not — hover a disabled action for its reason.
+CHECK vcs.svn.panel.staged-column-hidden PASS
+CHECK vcs.svn.panel.enabled.add-before-selection PASS
+CHECK vcs.svn.panel.enabled.add PASS
+CHECK vcs.svn.panel.enabled.commit PASS
+CHECK vcs.svn.panel.enabled.update PASS
+CHECK vcs.svn.panel.disabled.unstage PASS
+CHECK vcs.svn.panel.unstage-reason PASS Subversion has no staging area: changed files are committed directly from the working copy.
+CHECK vcs.svn.panel.disabled.workspace PASS
+CHECK vcs.svn.panel.workspace-reason PASS Stashes and linked worktrees are Git concepts; a Subversion working copy is a single directory.
+CHECK vcs.svn.panel.disabled.fetch-push-branch-tag-remote PASS
+CHECK vcs.svn.panel.disabled.continue-abort PASS
+CHECK vcs.svn.panel.diff PASS Index: rtl/top.sv
+CHECK vcs.svn.write.add-requested PASS
+CHECK vcs.svn.write.add-request PASS rtl/top.sv
+CHECK vcs.svn.write.commit-requested PASS
+CHECK vcs.svn.write.commit-request PASS svn fixture message
+CHECK vcs.svn.write.amend-refused PASS
+CHECK vcs.svn.write.amend-zero-write PASS
+CHECK vcs.svn.write.amend-reason PASS Subversion has no amend: commit a new revision instead; nothing was written.
+CHECK vcs.svn.write.update-requested PASS
+CHECK vcs.svn.write.update-request PASS
+CHECK vcs.svn.write.revert-declined PASS
+CHECK vcs.svn.write.revert-declined-zero-write PASS
+CHECK vcs.svn.write.revert-first-confirm PASS
+CHECK vcs.svn.write.revert-requested PASS
+CHECK vcs.svn.write.revert-request PASS
+CHECK vcs.svn.write.revert-double-confirmed PASS
+CHECK vcs.svn.write.remove-declined PASS
+CHECK vcs.svn.write.remove-declined-zero-write PASS
+CHECK vcs.svn.write.remove-requested PASS
+CHECK vcs.svn.write.remove-request PASS
+CHECK vcs.svn.write.remove-double-confirmed PASS
+CHECK vcs.svn.write.unstage-refused PASS
+CHECK vcs.svn.write.unstage-zero-write PASS
+CHECK vcs.svn.write.unstage-message PASS Subversion has no staging area: changed files are committed directly from the working copy.
+CHECK vcs.svn.e2e.tools PASS /vedit-build/packaging/runtime/out/AppDir/bin/svn + /vedit-build/build/vcs-tools/svnadmin
+CHECK vcs.svn.e2e.fixture PASS /tmp/vedit-workspace-vcs-selftest-aXeHFk/wc
+CHECK vcs.svn.e2e.not-worktree PASS /tmp/vedit-workspace-vcs-selftest-aXeHFk/wc
+CHECK vcs.svn.e2e.backend PASS
+CHECK vcs.svn.e2e.header PASS Subversion repo @ 0 · 1 changed file(s)
+CHECK vcs.svn.e2e.no-cannot-run PASS Subversion repo @ 0 · 1 changed file(s)
+CHECK vcs.svn.e2e.changed-row PASS a.sv  added
+CHECK vcs.svn.e2e.add-request PASS
+CHECK vcs.svn.e2e.add-ok PASS Added a.sv.
+CHECK vcs.svn.e2e.commit-request PASS
+CHECK vcs.svn.e2e.commit-ok PASS Committed the working copy.
+CHECK vcs.svn.e2e.revision-1 PASS ------------------------------------------------------------------------
+CHECK vcs.svn.e2e.diff PASS Index: a.sv
+CHECK vcs.svn.e2e.revert-request PASS
+CHECK vcs.svn.e2e.revert-ok PASS Reverted a.sv.
+CHECK vcs.svn.e2e.revert-restored PASS module a;
+CHECK vcs.svn.e2e.update-request PASS
+CHECK vcs.svn.e2e.update-ok PASS Working copy updated.
+CHECK vcs.svn.e2e.update-file PASS /tmp/vedit-workspace-vcs-selftest-aXeHFk/wc/b.sv
+CHECK vcs.svn.e2e.update-row PASS Subversion repo @ 0 · 1 changed file(s)
+CHECK vcs.svn.e2e.remove-request PASS
+CHECK vcs.svn.e2e.remove-ok PASS Removed b.sv.
+CHECK vcs.svn.e2e.remove-commit-request PASS
+CHECK vcs.svn.e2e.remove-committed PASS Committed the working copy.
+CHECK vcs.svn.e2e.revision-3 PASS ------------------------------------------------------------------------
+CHECK vcs.i18n.svn PASS 还原更改？ / 移除文件？
+CHECK vcs.i18n.svn-button-labels PASS 还原… / 更新
+cwd_still=/tmp/vedit-vcs-6b-0vAjyU
+selftest=PASS

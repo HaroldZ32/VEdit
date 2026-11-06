@@ -1,0 +1,140 @@
+# batch 5b Rust integration tests in the delivery-baseline image (git 1.8.3.1)
+collected_at: 2026-11-04T11:15:00+08:00
+image=vedit-build:local
+git=git version 1.8.3.1
+
+   Compiling libc v0.2.191
+   Compiling rustix v1.1.6
+   Compiling linux-raw-sys v0.12.1
+   Compiling bitflags v2.13.2
+   Compiling cfg-if v1.0.5
+   Compiling once_cell v1.21.4
+   Compiling fastrand v2.5.0
+   Compiling vd-vcs v0.1.1 (/vedit-build/crates/vd-vcs)
+   Compiling getrandom v0.4.3
+   Compiling tempfile v3.27.0
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.00s
+     Running unittests src/lib.rs (target/debug/deps/vd_vcs-ae0fc2879704b1ca)
+
+running 21 tests
+test history::tests::a_log_failure_is_an_error_and_an_empty_repository_is_not ... ok
+test history::tests::a_page_requests_one_extra_row_to_detect_more ... ok
+test history::tests::parses_a_commit_header_with_body ... ok
+test history::tests::parses_a_log_page ... ok
+test history::tests::parses_blame_porcelain ... ok
+test history::tests::parses_numstat_with_binary ... ok
+test history::tests::refuses_an_escaping_path ... ok
+test history::tests::refuses_an_option_shaped_hash ... ok
+test service::tests::svn_info_xml_without_values_is_the_empty_state_not_a_panic ... ok
+test service::tests::svn_info_xml_yields_revision_and_url ... ok
+test tests::git_detached_head_has_no_branch ... ok
+test tests::git_porcelain_maps_statuses_and_branch ... ok
+test tests::markers_select_the_backend ... ok
+test tests::nested_directory_finds_the_repository_above_it ... ok
+test tests::plain_directory_is_the_empty_state_not_an_error ... ok
+test tests::svn_status_maps_codes ... ok
+test workspace::tests::a_bare_worktree_row_has_no_commit_id ... ok
+test workspace::tests::malformed_stash_rows_are_skipped ... ok
+test workspace::tests::stash_rows_are_split_on_tabs ... ok
+test workspace::tests::stash_rows_keep_a_tab_in_the_subject ... ok
+test workspace::tests::worktree_rows_survive_spaces_in_the_path ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/readonly.rs (target/debug/deps/readonly-2fd86585095a37b2)
+
+running 10 tests
+test allow_lists_are_disjoint_from_write_lists ... ok
+test every_git_write_subcommand_is_refused_before_spawn ... ok
+test every_svn_write_subcommand_is_refused_before_spawn ... ok
+test git_session_uses_only_read_only_subcommands ... ok
+test plain_directory_is_the_empty_state_in_every_query ... ok
+test production_runner_gate_refuses_writes_without_spawning ... ok
+test read_and_write_tables_are_disjoint_and_default_deny ... ok
+test stub_service_drives_the_panel_without_processes ... ok
+test svn_session_reads_status_info_and_diff ... ok
+test unknown_tool_and_empty_subcommand_are_refused ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/workspace.rs (target/debug/deps/workspace-41e190bc4415937c)
+
+running 13 tests
+test stash_drop_and_pop_target_the_named_stash_only ... ok
+test stash_operations_on_an_empty_stack_report_the_real_git_reason ... ok
+test stash_parameters_are_validated_before_any_process ... ok
+test stash_save_argv_is_positional_because_the_baseline_has_no_dash_m ... ok
+test stash_save_pop_apply_and_drop_round_trip ... ok
+test stashes_on_a_plain_directory_are_empty_with_a_note_not_an_error ... ok
+test submodule_init_and_update_check_out_the_pinned_commit ... ok
+test submodule_on_a_repository_without_submodules_is_a_normal_result ... ok
+test the_workspace_operations_are_git_only_and_parameter_checked ... ok
+test workspace_entries_are_plain_data_capped_by_the_reader ... ok
+test worktree_add_list_remove_round_trip ... SKIP worktree round trip: this git has no 'worktree' command (the delivery baseline, git 1.8.3.1); the lane E2E on git 2.53 owns the panel path
+ok
+test worktree_list_reports_the_main_worktree_even_without_worktree_support ... ok
+test worktree_parameters_are_validated_before_any_process ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.19s
+
+     Running tests/write.rs (target/debug/deps/write-e65c17c01493e842)
+
+running 13 tests
+test a_directory_that_is_not_a_working_tree_is_refused ... ok
+test a_tool_failure_is_a_normal_result_not_a_rejected_request ... ok
+test accepted_operations_build_exactly_one_documented_invocation ... ok
+test batch_4a_operations_build_the_documented_invocations ... ok
+test batch_4a_parameters_are_validated_before_any_process ... ok
+test credentials_travel_in_the_environment_and_are_redacted ... ok
+test every_operation_code_round_trips_and_unknown_codes_are_refused ... ok
+test git_remote_round_trip_against_a_local_bare_repository ... ok
+test git_round_trip_runs_in_a_temp_fixture ... ok
+test parameters_outside_the_operation_contract_are_refused ... ok
+test the_backend_must_match_the_operation ... ok
+test the_read_gate_still_refuses_every_subcommand_the_write_path_runs ... ok
+test the_write_gate_is_also_enforced_by_the_runner ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+
+   Compiling getrandom v0.2.17
+   Compiling rustix v1.1.6
+   Compiling getrandom v0.4.3
+   Compiling ring v0.17.14
+   Compiling rustls-webpki v0.103.16
+   Compiling tempfile v3.27.0
+   Compiling cbindgen v0.29.4
+   Compiling rustls v0.23.46
+   Compiling waitpid-any v0.3.0
+   Compiling async-lsp v0.2.4
+   Compiling vd-deeplint v0.1.1 (/vedit-build/crates/vd-deeplint)
+   Compiling vd-lsp v0.1.1 (/vedit-build/crates/vd-lsp)
+   Compiling vd-ffi v0.1.1 (/vedit-build/crates/vd-ffi)
+   Compiling ureq v3.5.0
+   Compiling vd-fim v0.1.1 (/vedit-build/crates/vd-fim)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 7.76s
+     Running tests/abi.rs (target/debug/deps/abi-73d3a52e89bce543)
+
+running 20 tests
+test abi_version_is_one ... ok
+test cancelling_a_job_discards_its_result ... ok
+test deeplint_reports_a_missing_binary_as_a_typed_failure ... ok
+test fim_is_disabled_by_default_and_starts_no_worker ... ok
+test lsp_configures_lazily_without_starting_the_server ... ok
+test lsp_rejects_a_missing_server_binary ... ok
+test null_and_unknown_arguments_are_rejected_with_a_typed_error ... ok
+test project_parse_expands_the_fixture_filelist ... ok
+test projected_fixture_serves_all_seven_services ... ok
+test search_returns_hits_over_the_project_file_list ... ok
+test settings_round_trip_through_the_abi ... ok
+test vcs_history_jobs_return_pages_detail_blame_and_comparison ... ok
+test vcs_history_op_codes_and_operation_state_are_stable ... ok
+test vcs_read_jobs_return_status_info_and_diff_from_a_real_repository ... ok
+test vcs_reports_the_empty_state_for_a_plain_directory ... ok
+test vcs_workspace_codes_and_listings_are_stable ... ok
+test vcs_write_codes_are_stable ... ok
+test vcs_write_job_refuses_invalid_requests ... ok
+test vcs_write_job_runs_a_real_git_round_trip ... ok
+test vcs_write_poll_misuse_is_typed ... ok
+
+test result: ok. 20 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.37s
+

@@ -1,0 +1,143 @@
+UpdateCTestConfiguration  from :/vedit-build/target/qt6-build/DartConfiguration.tcl
+Test project /vedit-build/target/qt6-build
+Constructing a list of tests
+Done constructing a list of tests
+Updating test list for fixtures
+Added 0 tests to meet fixture requirements
+Checking test dependency graph...
+Checking test dependency graph end
+test 4
+    Start  4: vedit-syntax-kde-data
+
+4: Test command: /vedit-build/target/qt6-build/src/syntax/kde/vedit_syntax_kde_selftest
+4: Working Directory: /vedit-build/target/qt6-build/src/syntax/kde
+4: Test timeout computed to be: 120
+4: INFO resources_dir=/vedit-build/src/syntax/kde/../../../resources
+4: LOAD strategy=Repository::addCustomSearchPath(private_dir) at startup; XDG_DATA_DIRS is not mutated; NO_STANDARD_PATHS is not required (see src/syntax/kde/README.md)
+4: LOAD private_dir=/vedit-build/resources
+4: LOAD search_paths=/vedit-build/resources/syntax
+4: LOAD definitions=451 themes=30
+4: LOAD definition_names=None, G-Code, GLSL, Klipper Config, Klipper G-Code, OpenSCAD, PLY, POV-Ray, RenderMan RIB, STL, VRML, Wavefront OBJ … (+439)
+4: LOAD theme_count=30
+4: LOAD probe_v=V probe_sv=SystemVerilog
+4: DIAG .v resolves to definition 'V' by file name (the built-in 'V'/vlang definition also claims *.v); use resolveLanguageForFile()/explicit language names instead
+4: LOAD private_definition_files=vedit-systemverilog.xml, vedit-verilog.xml
+4: CHECK load.ok PASS
+4: CHECK load.verilog-available PASS
+4: CHECK load.systemverilog-available PASS
+4: CHECK load.private-dir-used PASS
+4: CHECK load.private-shipped-verilog PASS
+4: CHECK load.private-shipped-systemverilog PASS
+4: CHECK load.forbidden-none PASS
+4: CHECK load.v-resolved-by-name-not-filename PASS  filename probe -> V (expected the known V/vlang trap); explicit name mapping is used instead
+4: CHECK load.extension-map-v PASS
+4: CHECK load.extension-map-sv PASS
+4: CHECK load.resolve-sv-when-present PASS
+4: LOAD degraded.definitions=451 sv_available=0
+4: DIAG degraded: SystemVerilog definition exists only inside the syntax library (KDE build) and is not shipped by VEdit (C7): it is deliberately not used
+4: DIAG degraded: SystemVerilog definition not shipped (C7 pending): .sv files degrade to the Verilog definition (SystemVerilog-only constructs lose highlighting/folding); this is a diagnosable degradation, not a crash
+4: DIAG degraded: .v resolves to definition 'V' by file name (the built-in 'V'/vlang definition also claims *.v); use resolveLanguageForFile()/explicit language names instead
+4: CHECK degrade.verilog-still-available PASS
+4: CHECK degrade.sv-not-available PASS
+4: CHECK degrade.sv-missing-diagnostic PASS
+4: CHECK degrade.sv-falls-back-to-verilog PASS
+4: CHECK degrade.fallback-diagnostic PASS
+4: CHECK degrade.no-crash PASS
+4: CHECK data.no-forbidden-kde-definitions PASS
+4: CHECK data.no-kde-file-names PASS  vedit-systemverilog.xml, vedit-verilog.xml
+4: DATA files=vedit-systemverilog.xml, vedit-verilog.xml
+4: CHECK def.verilog-valid PASS
+4: CHECK def.systemverilog-valid PASS
+4: CHECK def.verilog-section PASS  Hardware
+4: CHECK def.systemverilog-extensions-contain-sv PASS  *.sv, *.svh
+4: FOLD verilog formats=50 begins=7 ends=7
+4: CHECK fold.verilog-highlighting PASS
+4: CHECK fold.verilog-regions-begin PASS  7
+4: CHECK fold.verilog-regions-balanced PASS  7
+4: FOLD systemverilog formats=51 begins=9 ends=9
+4: CHECK fold.sv-highlighting PASS
+4: CHECK fold.sv-a4-constructs-begin PASS  9
+4: CHECK fold.sv-a4-constructs-balanced PASS  9
+4: SYN-KDE-DATA-SELFTEST ok=1 checks=29 failures=0
+1/4 Test  #4: vedit-syntax-kde-data ................   Passed    0.03 sec
+test 5
+    Start  5: vedit-syntax-directory-equivalence
+
+5: Test command: /vedit-build/target/qt6-build/src/syntax/kde/vedit-syntax-directory-equivalence
+5: Working Directory: /vedit-build/target/qt6-build/src/syntax/kde
+5: Test timeout computed to be: 60
+5: CHECK equivalence.resolver-data-root PASS  /tmp/vedit-syntax-directory-equivalence-ybSUTa/syntax
+5: CHECK syntax-dir.missing-path-is-empty PASS
+5: CHECK syntax-dir.empty-string-is-empty PASS
+5: CHECK equivalence.kde-data-root.search-path PASS  /tmp/vedit-syntax-directory-equivalence-ybSUTa/syntax
+5: CHECK equivalence.kde-data-root.private-dir PASS  /tmp/vedit-syntax-directory-equivalence-ybSUTa
+5: CHECK equivalence.kde-legacy-subdir.search-path PASS  /tmp/vedit-syntax-directory-equivalence-ybSUTa/syntax
+5: CHECK equivalence.kde-legacy-subdir.private-dir PASS  /tmp/vedit-syntax-directory-equivalence-ybSUTa
+5: CHECK equivalence.resolver-flat-root-rejected PASS
+5: CHECK equivalence.kde-flat-root-no-search-path PASS
+5: CHECK equivalence.kde-flat-root-diagnostic PASS  private syntax directory missing: /tmp/vedit-syntax-directory-equivalence-BrdBpJ/syntax (set VEDIT_SYNTAX_DIR) | Verilog syntax definition is not available; .v files fall back to plain text | SystemVerilog definition exists only inside the syntax library (KDE build) and is not shipped by VEdit (C7): it is deliberately not used | SystemVerilog definition not shipped (C7 pending): .sv files degrade to the Verilog definition (SystemVerilog-only constructs lose highlighting/folding); this is a diagnosable degradation, not a crash | .v resolves to definition 'V' by file name (the built-in 'V'/vlang definition also claims *.v); use resolveLanguageForFile()/explicit language names instead
+5: SYNTAX-DIRECTORY-EQUIVALENCE ok=1 checks=10 failures=0
+2/4 Test  #5: vedit-syntax-directory-equivalence ...   Passed    0.02 sec
+test 14
+    Start 14: vedit-native-fold-tests
+
+14: Test command: /vedit-build/target/qt6-build/src/app/editor-lane/vedit-native-fold-tests
+14: Working Directory: /vedit-build/target/qt6-build/src/app/editor-lane
+14: Environment variables: 
+14:  QT_QPA_PLATFORM=offscreen
+14:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime
+14: Test timeout computed to be: 120
+14: CHECK native.fold.provider PASS
+14: kf.sonnet.core: Sonnet: No speller backends available!
+14: CHECK native.fold.editor PASS
+14: [edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+14: CHECK native.fold.warmup PASS
+14: CHECK native.fold.warmup-no-auto-folds PASS  0
+14: [edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+14: NATIVE-FOLD-TESTS big-open ms=148 lines=10497
+14: CHECK native.fold.big-open PASS
+14: CHECK native.fold.big-open-2s PASS  148
+14: CHECK native.fold.big-view PASS
+14: CHECK native.fold.big-no-auto-folds PASS  0
+14: CHECK native.fold.native-fold-applied PASS  -39
+14: [edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); the delivered runtime narrows the definition search path to VEdit's own
+14: CHECK native.fold.second-open PASS
+14: CHECK native.fold.second-view PASS
+14: CHECK native.fold.second-cursor PASS
+14: NATIVE-FOLD-TESTS ok=1 checks=12 failures=0
+3/4 Test #14: vedit-native-fold-tests ..............   Passed    0.49 sec
+test 15
+    Start 15: vedit-fold-gutter-click
+
+15: Test command: /usr/bin/xvfb-run "-a" "-s" "-screen 0 1280x1024x24" "/vedit-build/target/qt6-build/src/app/editor-lane/fold-gutter-click-probe" "/vedit-build/src/editor/../../resources/syntax" "/vedit-build/target/qt6-build/src/app/editor-lane/fold-gutter.png"
+15: Working Directory: /vedit-build/target/qt6-build/src/app/editor-lane
+15: Environment variables: 
+15:  QT_QPA_PLATFORM=xcb
+15:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/xdg-runtime-fold
+15: Test timeout computed to be: 120
+15: kf.sonnet.core: Sonnet: No speller backends available!
+15: NATIVE-GUI mode='SystemVerilog' set=1 view_visible=1
+15: NATIVE-GUI baseline first=0 last=61 hidden=0 scroll_max=939
+15: NATIVE-GUI geometry view=1000x900 text_x=60 global_text_x=60 global_y=1
+15: NATIVE-GUI line_height=14
+15: NATIVE-GUI screenshot=/vedit-build/target/qt6-build/src/app/editor-lane/fold-gutter.png size=1000x900
+15: NATIVE-GUI border_scan line0_px=32 line1_px=33
+15: NATIVE-GUI marker_found x=44 (gutter_x=44)
+15: NATIVE-GUI after_first_click first=0 hidden=38 scroll_max=901 changed=1
+15: NATIVE-GUI after_second_click first=0 hidden=0 scroll_max=939
+15: NATIVE-GUI verdict marker_created_by_kde=1 fold_direction=1 unfold_direction=1
+15: NATIVE-GUI negative_control changed=0
+15: NATIVE-GUI hidden-cursor-move folded=1 cursor_line=20 survived=1
+15: NATIVE-GUI result ok=1
+15: NATIVE-GUI done
+4/4 Test #15: vedit-fold-gutter-click ..............   Passed    0.23 sec
+
+The following tests passed:
+	vedit-syntax-kde-data
+	vedit-syntax-directory-equivalence
+	vedit-native-fold-tests
+	vedit-fold-gutter-click
+
+100% tests passed, 0 tests failed out of 4
+
+Total Test time (real) =   0.78 sec

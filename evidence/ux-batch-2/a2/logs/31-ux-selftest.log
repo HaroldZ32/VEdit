@@ -1,0 +1,91 @@
+CHECK a2.toolbar.undo-disabled-without-view PASS
+This plugin does not support propagateSizeHints()
+CHECK a2.menu.order PASS &File,&Edit,&View,&Project,&Help
+CHECK a2.menu.no-settings PASS
+CHECK a2.menu.preferences-in-edit PASS
+CHECK a2.menu.preferences-last-in-edit PASS
+CHECK a2.toolbar.exists PASS
+CHECK a2.toolbar.movable PASS
+CHECK a2.toolbar.object-name PASS
+CHECK a2.toolbar.action-order PASS action-file.new,action-file.open,action-file.open-folder,action-file.save,action-file.save-all,action-edit.undo,action-edit.redo,---,action-search.focus,action-project.lint,action-diagnostics.format
+CHECK a2.toolbar.shares-registry-actions PASS
+CHECK a2.toolbar.toggle-command PASS
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK a2.toolbar.hide-and-show PASS
+CHECK a2.toolbar.build-runs-command PASS
+CHECK a2.toolbar.format-runs-command PASS
+CHECK a2.toolbar.active-pane PASS
+CHECK a2.toolbar.demo-editor PASS
+CHECK a2.toolbar.new-opens-document PASS tabs 1 -> 2
+CHECK a2.toolbar.undo-enabled-with-view PASS
+CHECK a2.toolbar.undo-changes-document PASS VEdit application shell — demo editor pane #1
+
+This text view is the shell's placeholder editor. The real editor
+widget is injected by src/editor (edit-core) through the
+EditorProvider seam; nothing in the shell depends on KTextEditor.
+
+Layout operations worth trying:
+  * Ctrl+Shift+H  split horizontally (side by side)
+  * Ctrl+Shift+V  split vertically (stacked)
+  * F6            focus the next pane
+  * Ctrl+W        close the focused pane
+  * View menu     insert / hide the panel docks on demand
+
+CHECK a2.toolbar.redo-enabled PASS
+CHECK a2.toolbar.redo-restores-document PASS helloVEdit application shell — demo editor pane #1
+
+This text view is the shell's placeholder editor. The real editor
+widget is injected by src/editor (edit-core) through the
+EditorProvider seam; nothing in the shell depends on KTextEditor.
+
+Layout operations worth trying:
+  * Ctrl+Shift+H  split horizontally (side by side)
+  * Ctrl+Shift+V  split vertically (stacked)
+  * F6            focus the next pane
+  * Ctrl+W        close the focused pane
+  * View menu     insert / hide the panel docks on demand
+
+This plugin does not support propagateSizeHints()
+CHECK a2.toolbar.search-shows-panel PASS
+CHECK a2.toolbar.search-focuses-query PASS
+This plugin does not support propagateSizeHints()
+CHECK a2.help.manual-resource-not-empty PASS 14539 bytes
+CHECK a2.help.manual-has-title PASS VEdit 用户指南
+CHECK a2.help.command-exists PASS
+CHECK a2.help.command-shortcut PASS
+This plugin does not support propagateSizeHints()
+CHECK a2.help.viewer-opens PASS
+CHECK a2.help.viewer-renders-title PASS
+CHECK a2.i18n.qm-loaded PASS
+CHECK a2.i18n.menu-count PASS 文件(&F),编辑(&E),视图(&V),项目(&P),帮助(&H)
+CHECK a2.i18n.menu-0 PASS 文件(&F)
+CHECK a2.i18n.menu-1 PASS 编辑(&E)
+CHECK a2.i18n.menu-2 PASS 视图(&V)
+CHECK a2.i18n.menu-3 PASS 项目(&P)
+CHECK a2.i18n.menu-4 PASS 帮助(&H)
+CHECK a2.i18n.preferences PASS 首选项(&P)…
+CHECK a2.i18n.panel-toggle PASS 切换文件面板(&G)
+CHECK a2.i18n.context-menu-label PASS 跳转到定义(&D)
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK a2.f1.terminal-panel PASS
+CHECK a2.f1.terminal-running PASS
+CHECK a2.f1.terminal-widget PASS
+CHECK a2.f1.terminal-focus PASS
+CHECK a2.f1.terminal-claims-shortcut-override PASS
+CHECK a2.f1.terminal-f1-reaches-pty PASS
+CHECK a2.f1.terminal-does-not-open-manual PASS
+CHECK a2.f1.editor-focus-target PASS
+This plugin does not support propagateSizeHints()
+CHECK a2.f1.manual-opens-outside-terminal PASS
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+CHECK a2.undo.real-ktexteditor-view PASS
+CHECK a2.undo.real-enabled-after-edit PASS
+CHECK a2.undo.real-changes-document PASS
+CHECK a2.redo.real-enabled-after-undo PASS
+CHECK a2.redo.real-restores-document PASS hello
+A2-UX-SELFTEST failures=0

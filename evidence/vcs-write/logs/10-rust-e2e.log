@@ -1,0 +1,56 @@
+# rust probe
+cwd=/tmp
+fixture=/tmp/vedit-vcs-write-GPxNDj
+git=git version 1.8.3.1
+cargo=cargo 1.99.0 (5f94df478 2026-08-27)
+worktree_snapshot_before_entries=19
+fixture_cwd=/tmp/vedit-vcs-write-GPxNDj
+== vd-vcs gate tests (positive + negative groups) ==
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.05s
+     Running tests/readonly.rs (/vedit-build/target/debug/deps/readonly-2fd86585095a37b2)
+
+running 10 tests
+test allow_lists_are_disjoint_from_write_lists ... ok
+test production_runner_gate_refuses_writes_without_spawning ... ok
+test every_svn_write_subcommand_is_refused_before_spawn ... ok
+test every_git_write_subcommand_is_refused_before_spawn ... ok
+test read_and_write_tables_are_disjoint_and_default_deny ... ok
+test unknown_tool_and_empty_subcommand_are_refused ... ok
+test stub_service_drives_the_panel_without_processes ... ok
+test git_session_uses_only_read_only_subcommands ... ok
+test svn_session_reads_status_info_and_diff ... ok
+test plain_directory_is_the_empty_state_in_every_query ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/write.rs (/vedit-build/target/debug/deps/write-e65c17c01493e842)
+
+running 9 tests
+test every_operation_code_round_trips_and_unknown_codes_are_refused ... ok
+test the_read_gate_still_refuses_every_subcommand_the_write_path_runs ... ok
+test a_tool_failure_is_a_normal_result_not_a_rejected_request ... ok
+test the_backend_must_match_the_operation ... ok
+test parameters_outside_the_operation_contract_are_refused ... ok
+test a_directory_that_is_not_a_working_tree_is_refused ... ok
+test the_write_gate_is_also_enforced_by_the_runner ... ok
+test accepted_operations_build_exactly_one_documented_invocation ... ok
+test git_round_trip_runs_in_a_temp_fixture ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+== vd-ffi write job through the C ABI ==
+   Compiling vd-ffi v0.1.1 (/vedit-build/crates/vd-ffi)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.51s
+     Running tests/abi.rs (/vedit-build/target/debug/deps/abi-73d3a52e89bce543)
+
+running 4 tests
+test vcs_write_codes_are_stable ... ok
+test vcs_write_poll_misuse_is_typed ... ok
+test vcs_write_job_refuses_invalid_requests ... ok
+test vcs_write_job_runs_a_real_git_round_trip ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.05s
+
+worktree_snapshot_after_entries=19
+worktree_unchanged=yes
+fixture_kept_for_inspection=/tmp/vedit-vcs-write-GPxNDj

@@ -1,0 +1,8 @@
+# gate: docs
+captured_at: 2026-11-04T14:33:51+08:00
+git_head: 4e2d0a5
+cmd: bash /home/haroldzhao/MyProj/DshProj/VEdit/build/gates/docs.sh
+
+[docs] PASS: README.md docs/BUILD.md docs/USER_GUIDE.md THIRD_PARTY_NOTICES.md
+
+DOCS_EXIT=0

@@ -1,0 +1,11 @@
+# lrelease on the current catalogue (2026-11-06T10:38:11+08:00)
+$ /usr/lib/qt6/bin/lrelease translations/vedit_zh_CN.ts -qm <tmp>/vedit_zh_CN.qm
+Updating '/tmp/a2-final-check.qm'...
+    Generated 1186 translation(s) (1186 finished and 0 unfinished)
+exit=0
+
+# sha256
+55261d0136028fc0a87b8c766a4ad84ee4027ab72ff0c082571fba02362f9779  translations/vedit_zh_CN.ts
+
+# catalogue counts (message / unfinished / vanished / obsolete)
+messages=1186 unfinished=0 vanished=0 obsolete=0

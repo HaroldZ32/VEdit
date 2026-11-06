@@ -1,0 +1,70 @@
+== probe run (mode=demo, QT_QPA_PLATFORM=xcb under Xvfb 1440x900) ==
+provider=demo
+ok   seed.open-a
+ok   seed.open-b
+ok   seed.two-tabs — tabs=2
+ok   seed.positions
+ok   seed.b-active — activeTab=1
+ok   seed.panel-state
+ok   seed.geometry — 1111x733
+ok   seed.save-session
+ok   restore.pane-count — panes=1
+ok   restore.pane-active
+ok   restore.tab-count — tabs=2
+ok   restore.tab-a — /vedit-build/target/i3-session-probe/work-xcb-demo/scenario-ab/a.sv
+ok   restore.tab-b — /vedit-build/target/i3-session-probe/work-xcb-demo/scenario-ab/b.sv
+ok   restore.active-tab-is-a-b-tab — activeTab=1 (B)
+ok   restore.b.caret — line=300 column=6 scroll=120
+ok   restore.b.scroll — line=300 column=6 scroll=120
+ok   restore.a.caret — line=5 column=1 scroll=0
+ok   restore.a.scroll — line=5 column=1 scroll=0
+ok   restore.geometry — 1111x733 (saved 1111x733, platform=xcb)
+ok   restore.geometry.position — 140,90 (saved 140,90)
+ok   restore.panel-terminal
+ok   restore.panel-outline
+ok   restore.panel-file-tree-hidden
+ok   restore.project-root — label=scenario-ab expected=scenario-ab
+ok   archive.version — version=2
+ok   archive.layout-version
+ok   archive.leaf-documents — documents=2
+ok   archive.b-caret — {"column":6,"line":300}
+ok   archive.b-scroll — scroll=120
+ok   archive.active-tab
+ok   seed.split.open-1
+ok   seed.split.open-2
+ok   seed.split.open-3
+ok   seed.split.panes — panes=3
+ok   seed.split.save
+ok   split.pane-count — panes=3
+ok   split.root-orientation — after=horizontal
+ok   split.structure-roundtrip — {"first":{"activeTab":0,"documents":["/vedit-build/target/i3-session-probe/work-xcb-demo/scenario-split/one.sv"],"pane":"pane-1","provider":"demo","type":"leaf"},"orientation":"horizontal","ratio":0.5,"second":{"first":{"activeTab":0,"documents":["/vedit-build/target/i3-session-probe/work-xcb-demo/scenario-split/two.sv"],"pane":"pane-2","provider":"demo","type":"leaf"},"orientation":"vertical","ratio":0.5,"second":{"activeTab":0,"documents":["/vedit-build/target/i3-session-probe/work-xcb-demo/scenario-split/three.sv"],"pane":"pane-3","provider":"demo","type":"leaf"},"type":"split"},"type":"split"}
+ok   split.active-pane — after=pane-3 before=pane-3
+ok   split.pane-has-document — pane=pane-1 path=/vedit-build/target/i3-session-probe/work-xcb-demo/scenario-split/one.sv
+ok   split.pane-has-document — pane=pane-2 path=/vedit-build/target/i3-session-probe/work-xcb-demo/scenario-split/two.sv
+ok   split.pane-has-document — pane=pane-3 path=/vedit-build/target/i3-session-probe/work-xcb-demo/scenario-split/three.sv
+ok   v1.pane-count — panes=2
+ok   v1.tree
+ok   v1.active-pane
+ok   v1.empty-tabs
+ok   v1.no-crash-diagnostics
+ok   missing.seed-keep
+ok   missing.seed-gone
+ok   missing.seed-save
+[app-shell] session: cannot reopen /vedit-build/target/i3-session-probe/work-xcb-demo/scenario-tolerance/gone.sv: cannot open /vedit-build/target/i3-session-probe/work-xcb-demo/scenario-tolerance/gone.sv: not a regular file
+ok   missing.pane-exists
+ok   missing.kept-document — tabs=1 path=/vedit-build/target/i3-session-probe/work-xcb-demo/scenario-tolerance/keep.sv
+ok   missing.diagnostic — session: cannot reopen /vedit-build/target/i3-session-probe/work-xcb-demo/scenario-tolerance/gone.sv: cannot open /vedit-build/target/i3-session-probe/work-xcb-demo/scenario-tolerance/gone.sv: not a regular file
+ok   missing.still-starts
+ok   dirty.open
+ok   dirty.editor
+ok   dirty.flag
+ok   dirty.cancel-close-refused
+ok   dirty.cancel-no-archive
+ok   dirty.cancel-buffer-kept
+ok   dirty.cancel-file-untouched
+ok   dirty.save-close-accepted
+ok   dirty.save-file-written
+ok   dirty.save-archive-written
+
+64 checks, 0 failure(s)
+probe exit=0

@@ -1,0 +1,4 @@
+# clippy on the crates this task changed (final tree)
+command: CARGO_HOME=$PWD/target/cargo-home RUSTUP_TOOLCHAIN=stable cargo clippy --offline -p vd-lsp -p vd-deeplint -p vd-ffi --all-targets -- -D warnings
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.11s
+cargo-clippy-exit=0
