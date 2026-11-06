@@ -46,14 +46,14 @@ AppImage **已重打**（136,051,192 B），包内 `.qm` 与当前目录**sha256
 | A3 | 高亮：5 份定义（新增 VHDL/Markdown/Tcl 自研）+ 表优先映射 + `verify-f2-isolation` 重写 + 许可登记 | **PASS** | `review-a3/`(FAIL) → `review-a3-r2/`(**PASS**) |
 | A4 | 设置：字体即时 / 缩放重启 / 23 个 format 旋钮 / 双后端 Lint 页 | **PASS**（risk Medium） | `review-a4-final/`（H1 转 T13；N2 "test-green dead path" 由 T13 断言真实调用方） |
 | B1 | 模块树（纯模块层级，顶层=从未被例化）+ 接口面板 | **PASS** | `review-b1/`(FAIL) → `review-b1-r2/`(**PASS**) |
-| B2 | 搜索对齐 + 全工程搜索/替换（冻结快照 + 逐命中指纹），共 4 轮 | **FAIL → 已返修，复审中** | `review-b2-r4/`(**FAIL**, P5 错误写入) → `b2-repair-r4/` → `review-b2-r5/`（待） |
+| B2 | 搜索对齐 + 全工程搜索/替换（冻结快照 + 逐命中指纹 + **保存前整行身份**），共 4 轮 | **FAIL → 已返修 → PASS** | `review-b2-r4/`(**FAIL**, P5 错误写入) → `b2-repair-r4/` → `review-b2-r5/`(**PASS**：P5 探针字节相同复跑，`saves=0 ok=0 replacements=0`) |
 | B3 | R2 分层诊断 + R3 保存后自动工程 lint + 悬浮/一键修复/文件点/ELAB | **FAIL → 已返修 → PASS** | `review-b3-r3/`(FAIL, N2/N3) → `u1-final/` → `review-u1-final/`(**PASS**) |
 | B4 | Ctrl+点击 = 定义、Alt+点击 = 多光标、坐标映射、折叠陈旧光标 | **PASS** | `review-b4/` → `review-b4-r2/`(**PASS**) |
 | pane-activation | 点非活动分屏即激活 | **PASS** | 被 `review-b4-r2/` 独立探针覆盖；`pane-activation/` |
 | U2 | 翻译收尾：182 条新译落盘 + 21 条 vanished 处置 | **PASS** | `review-u2-final/`(**PASS**，集合等式证明) |
 | U2b | 悬浮「修复」按钮源串中文化 → `Fix` + 目录 | **PASS** | `review-u2b-final/`(**PASS**，仅 1 Nit) |
 | U2c | 剩余用户可见中文字面量 22 处（诊断 2 + FIM 20）→ 英文源串 + 目录 | 已完成，随终审验收 | `u2c-final/`（内含 3 处测试期望字面量变更的说明） |
-| U3 | 用户手册 + 文档纠错（含快捷键冲突修复 + 键盘表逐行重推 + 产品自检三条可失败断言） | **FAIL → 返修完成 → 复核中** | `review-u3-final/`(**FAIL**) → `u3-repair/`（selfcheck 318 项 0 失败、23 条绑定无重复、红/绿+变异证明）→ `review-u3-final-r2/`（待） |
+| U3 | 用户手册 + 文档纠错（快捷键冲突修复 + 键盘表逐行重推 + 产品自检三条可失败断言） | **FAIL → 已返修 → PASS** | `review-u3-final/`(**FAIL**) → `u3-repair/` + `u3-repair2/` → `review-u3-final-r2/`(**PASS**：23 条绑定无重复、检测器能触发、键盘表逐行对上；其 Medium 由 `u2d` 关闭) |
 | U4 | 语法启动测试完整性（CMake deferred 路径 + PASS 正则） | **PASS**（含 Medium） | `review-u4-final/`(**PASS**) |
 | U4b | 断言**解析后的定义名** + 关掉"打印即通过"的退出码洞 | **PASS**（risk LOW，1 Nit） | `review-u4b-final/`(**PASS**) |
 | U5 | 打包自检覆盖五份定义（fail-closed） | **PASS** | `review-u5-final/`(**PASS**) |
@@ -72,13 +72,13 @@ AppImage **已重打**（136,051,192 B），包内 `.qm` 与当前目录**sha256
 | 2 | 接口面板跟随焦点 module，显示类型/方向/位宽，双击跳声明、Ctrl+双击跳例化 | **PASS** | `src/workspace/module_tree/interface_panel.*` | 同上 |
 | 3 | 右键菜单与顶栏中文翻译 | **PASS（框架+条目）** | `src/app/app_shell.cpp`、`src/editor/kernel/lsp_actions.cpp`、`diagnostics_integration.cpp` | `review-a2-final/`、`review-u2-final/`、`review-u2b-final/`、`u2c-final/`（反方向中文字面量清零） |
 | 4 | Rename Symbol 可用；后端不支持则置灰 + 请求路径也拒绝 | **PASS** | `src/workspace/diagnostics/symbol_scan.cpp` + 能力门控 | `review-u1-final/`（rename 21/21；跨文件 rename 明示 NOT-CLAIMED） |
-| 5 | 搜索面板与 Ctrl+F 对齐 + 全工程搜索 + **两个**替换按钮 | **待最终判定** | `src/workspace/search/**`、`src/editor/kernel/find_replace.*` | `review-b2-r4/`(FAIL) → `b2-repair-r4/` → `review-b2-r5/`（待） |
-| 6 | format / LINT 可配项做成设置（统一面板、两套配置、不支持置灰） | **PASS（format）/ 复审判定中（lint）** | `src/workspace/settings/**`、`crates/vd-settings/**` | `review-a4-final/`（format PASS，真实进程收到 23 flag）；lint 见 `review-u6-final/`（待） |
-| 7 | 顶栏重排（撤销/重做等文件操作、Preferences 并入 Edit） | **PASS，但快捷键冲突返修中** | `src/app/app_shell.cpp`、`CommandRegistry` | `review-a2-final/`（PASS，H1 携带）→ T34 → `review-u3-final-r2/`（待） |
+| 5 | 搜索面板与 Ctrl+F 对齐 + 全工程搜索 + **两个**替换按钮 | **PASS** | `src/workspace/search/**`、`src/editor/kernel/find_replace.*` | `review-b2-r4/`(FAIL) → `b2-repair-r4/` → `review-b2-r5/`(**PASS**) |
+| 6 | format / LINT 可配项做成设置（统一面板、两套配置、不支持置灰） | **PASS** | `src/workspace/settings/**`、`crates/vd-settings/**` | `review-a4-final/`（format：真实进程收到 23 flag、默认 0 flag）+ `review-u6-final/`（**PASS**：5 旋钮 argv 实测回显、autofix 否定断言、三级优先） |
+| 7 | 顶栏重排（撤销/重做等文件操作、Preferences 并入 Edit） | **PASS** | `src/app/app_shell.cpp`、`CommandRegistry` | `review-a2-final/`（PASS，H1 携带）→ `u3-repair2/` → `review-u3-final-r2/`（**PASS**：`Ctrl+Alt+F` 冲突消除，格式化改 `Ctrl+Shift+F`，并新增"注册表==显示快捷键"自检） |
 | 8 | 可选 UI 字体大小（高分屏）：字体即时 + 整体缩放重启生效 | **PASS** | `src/workspace/settings/ui_scale.*`、`main.cpp`（QApplication 之前） | `review-a4-final/`（150→1.5、200→2、100→不覆盖） |
 | 9 | error/warning 悬浮框 + 有修复能力时一键修复 | **PASS** | `src/workspace/diagnostics/diagnostic_hover.*`、`autofix.*` | `review-u1-final/`（R2/R3 复跑全绿）；`review-u2b-final/`（按钮源串） |
 | 10 | 文件名前黄/红/绿问题点 | **PASS** | `src/workspace/filetree/file_status_delegate.*` | `review-u1-final/`（`n2r.e-no-longer-green` 点数跟随失效；`lint-experience` 点色全绿） |
-| 11 | 帮助里塞真手册 | **PASS** | `src/app/help_viewer.*`、`resources/help/user_manual.qrc` | `review-a2-final/`（qrc→setMarkdown、F1 与终端按键双向）；手册内容见 `review-u3-final-r2/`（待） |
+| 11 | 帮助里塞真手册 | **PASS** | `src/app/help_viewer.*`、`resources/help/user_manual.qrc` | `review-a2-final/`（qrc→setMarkdown、F1 与终端按键双向）；手册内容 `review-u3-final-r2/`（**PASS**：§12–§16 齐备、四处纠错落地） |
 | 12 | LINT 时 ELAB 错误弹窗引导跳转（仅显式触发弹模态） | **PASS** | `src/workspace/diagnostics/project_lint_notice.*` | `review-u1-final/`（`modal.automatic-never-shows` 恒真、`product.automatic-no-dialog`） |
 | 13 | Ctrl+点击 = Go to definition；多光标改 Alt+点击 | **PASS** | `src/editor/kernel/multi_cursor.*`、`lsp_actions.*` | `b4-repair/`、`review-b4-r2/` |
 | 14 | VHDL / markdown / tcl 语法高亮 | **PASS（功能）/ 生效来源有披露** | `resources/syntax/vedit-{vhdl,markdown,tcl}.xml`、`highlight_mode.cpp`、`ksyntax_data.*` | `review-a3-r2/`、`review-u4-final/`、`review-u4b-final/`；见 §6.4 |
@@ -103,6 +103,8 @@ R2 工程 LINT 上位、模块下位、同一文件一份判决 ✓（`review-u1
 | lrelease | `bash build/gates/lrelease.sh`（本批次新增） | **0** | `[lrelease] counts: 1211 translation(s) (1211 finished, 0 unfinished, 0 untranslated)` | `u8-final/lrelease.log` |
 
 打包后另跑 `verify-appimage.sh`：**U8.2 PASS**（包内自检 + 目录 sha256 一致 + 双 locale exit 0）。
+
+逐门日志与汇总表已落盘：`u8-final/gate-summary.txt`（含首次运行的失败记录与返修说明，不隐藏）。
 
 > `--selfcheck` 必须在 `vedit-qt6-build:local` 镜像内跑：宿主机缺 `libtree-sitter.so.0.25`（只有镜像与 AppDir 里有），直接跑会 exit 127。
 
@@ -153,9 +155,9 @@ R2 工程 LINT 上位、模块下位、同一文件一份判决 ✓（`review-u1
 | `review-batch-acceptance` | 全批 round-1 | **FAIL**（4 条 High） | `.../review-batch-acceptance/REPORT.md` |
 | `review-b3-r3` | B3 第二轮 | FAIL（N2/N3） | 已被 `review-u1-final` 取代 |
 | `review-b2-r5` | B2b 返修 | **PASS**（P5 已关闭：0 saves / 0 replacements） | `.../review-b2-r5/REPORT.md` |
-| `review-u3-final-r2` | U3 返修 | **（待填）** | `.../review-u3-final-r2/REPORT.md` |
+| `review-u3-final-r2` | U3 返修 | **PASS**（Medium：目录缺 5 条 → 由 U2d 关闭） | `.../review-u3-final-r2/REPORT.md` |
 | `review-u6-final` | U6 lint 接线 | PASS（1 Nit） | `.../review-u6-final/REPORT.md` |
-| `review-batch-acceptance-r2` | 全批 round-2 | **（待填）** | `.../review-batch-acceptance-r2/REPORT.md` |
+| `review-batch-acceptance-r2` | 全批 round-2 | **RELEASE**（14 项全 PASS，无 Blocker/High） | `.../review-batch-acceptance-r2/REPORT.md` |
 | `review-a3-r2` / `review-b1-r2` / `review-b4-r2` | A3 / B1 / B4 | PASS | 各自目录 |
 
 ## 9. 本轮发现与处置台账
@@ -182,3 +184,23 @@ R2 工程 LINT 上位、模块下位、同一文件一份判决 ✓（`review-u1
 | D18 | 手册 §15.3 引用的中文与出厂译文不一致（旧转述） | `review-u3-final-r2` | U3b：改成与目录**逐字一致**的 36 字符串 + 程序化子串断言 |
 | D19 | 格式化显示快捷键仍显示旧值 `Ctrl+Alt+F`（注册表已是 `Ctrl+Shift+F`），且 §3 写成走 LSP `documentFormatting` | `review-u3-final-r2` Nit | U3b：单一来源（`grep 'Ctrl+Shift+F' src/` 仅 1 处字面量）+ 自检项 `shortcut.format.registry-equals-fallback`；§3 改为外部 `verible-verilog-format` |
 | D20 | 误读：`-locations absolute` 输出仍是 `../src/…`（源路径相对 `.ts`），此前 F3/F5 的"相对路径警报"不成立 | `u2d-final` | 以 `lupdate -help` 原文为准，记入 `u2d-final/README.md` §7；**不构成缺陷** |
+
+## 10. 提交与 PR
+
+| 项 | 值 |
+|---|---|
+| 分支 | `feat/ux-batch-2`（从 `main` @ `4e2d0a5` 起） |
+| 提交（按域 4 次） | `29678d1` feat(rust) · `aaf07de` feat(ui) · `34aa7b9` build · `96c0dd9` docs(evidence) |
+| PR | https://github.com/HaroldZ32/VEdit/pull/13 （`feat/ux-batch-2` → `dev`） |
+| 提交身份 | `MPD Captain <mpd-captain@localhost>`（AGENT.md §6：角色身份进 commit） |
+| 未纳入 | `probes/slang-spike/`（上一批临时实验目录，仍为未跟踪）；`evidence/**/*-probe` 编译产物已由 `.gitignore` 排除 |
+| 首次推送的更正 | 第一次推送把 `evidence/` 里的 8 个探针 ELF（566.6 MB）一并提交；经用户同意后删除该远端分支、回滚重提交并加 `.gitignore` 规则后重推。**已发布历史只此一次改写，且仅限这个刚建 10 分钟、无 PR、无人使用的分支**。 |
+
+### 终审的 4 条 Medium 与本文件的处置
+
+| Medium | 处置 |
+|---|---|
+| 矩阵仍有"待"格 | 已全部填成终态（§3/§4/§8） |
+| gate 汇总表未落盘 | 已写 `u8-final/gate-summary.txt` |
+| `translations/` 未跟踪 | 已随 `build` 提交纳入 |
+| 四条 lane 复核早于最后集成编辑 | **公开披露**：`app_shell.cpp`(11:21)、`main.cpp`(12:33)、`diagnostics_integration.cpp`(12:35)、`USER_GUIDE.md`(12:37) 的改动分别由 `review-a2-final` / `review-u4-final` / `review-u1-final` / `review-u3-final-r2` 覆盖了同一代码区域，但**没有针对这几处最后编辑的单独复核报告**；终局 gate 复跑了受影响的套件（ctest 50/50、selfcheck 319/0、docs、lrelease）为绿。真机 13 项仍由用户验收。 |

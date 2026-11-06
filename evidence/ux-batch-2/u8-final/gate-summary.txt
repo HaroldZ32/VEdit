@@ -1,0 +1,31 @@
+U8.1 — the one full gate run on the final tree
+command:   bash evidence/ux-batch-2/u8-final/run-gates.sh
+script:    evidence/ux-batch-2/u8-final/run-gates.sh   (any non-zero gate => overall FAIL)
+logged at: 2026-11-06, after the last source edit (U3b, 12:33)
+
+================ U8.1 GATE SUMMARY ================
+GATE           EXIT   LOG
+rust-gates     0      u8-final/rust-gates.log        (clippy -D warnings + fmt --check + cargo test --workspace)
+qt6-lane       0      u8-final/qt6-lane.log          (configure + build + ctest + xcb/software-rendering smoke)
+selfcheck      0      u8-final/selfcheck.log         (APP-SHELL-SELFTEST ok=1 checks=319 failures=0
+                                                      + EDIT-CORE-SELFTEST ok=1 checks=99 failures=0)
+docs           0      u8-final/docs.log
+lrelease       0      u8-final/lrelease.log          (1211 translation(s) (1211 finished, 0 unfinished, 0 untranslated))
+===================================================
+U8.1 PASS — every gate exited 0     (script exit code 0)
+
+Key lines, quoted from the logs:
+  qt6-lane   : "100% tests passed, 0 tests failed out of 50"  /  "M0-SMOKE ok=1 platform=xcb ... window=1 editor=1 document=1"
+  selfcheck  : "APP-SHELL-SELFTEST ok=1 checks=319 failures=0"
+  lrelease   : "[lrelease] PASS: 0 unfinished and 0 untranslated in translations/vedit_zh_CN.ts"
+
+History (not hidden): the FIRST run of this script failed on one test
+(`37 - vedit-lint-orchestration-probe`, `ok=0 checks=62 failures=3`) because the
+U2c i18n change moved two status strings to English sources while three test
+assertions still expected the Chinese text. The repair (evidence/ux-batch-2/
+u8-repair-37/) fixed the assertions without weakening them and swept the tree
+for the same class of staleness; the run above is the run after that repair.
+
+Packaging and artefact verification (U8.2) are separate:
+  u8-final/package-build.log          packaging/runtime/build.sh -> steps_failed=0
+  u8-final/verify-selfcheck-appdir.log, verify-apprun-*.log, verify-lrelease-current.log
