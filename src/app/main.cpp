@@ -1848,7 +1848,7 @@ int main(int argc, char **argv)
 
     QApplication app(argc, argv);
     QCoreApplication::setApplicationName(QStringLiteral("vedit-app"));
-    QCoreApplication::setApplicationVersion(QStringLiteral("0.2.0"));
+    QCoreApplication::setApplicationVersion(QStringLiteral("0.2.1"));
     QCoreApplication::setOrganizationName(QStringLiteral("VEdit"));
 
     QCommandLineParser parser;

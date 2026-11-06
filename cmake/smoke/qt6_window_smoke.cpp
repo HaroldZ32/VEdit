@@ -130,7 +130,7 @@ int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
     QCoreApplication::setApplicationName(QStringLiteral("vedit-m0-smoke"));
-    QCoreApplication::setApplicationVersion(QStringLiteral("0.2.0"));
+    QCoreApplication::setApplicationVersion(QStringLiteral("0.2.1"));
 
     QCommandLineParser parser;
     parser.addHelpOption();
