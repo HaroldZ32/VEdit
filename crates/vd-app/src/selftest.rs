@@ -1158,6 +1158,9 @@ fn probe_lint_report() -> vd_deeplint::LintReport {
         stderr: String::new(),
         elapsed: Duration::ZERO,
         child_pid: None,
+        engine: vd_deeplint::LintEngine::Slang,
+        tool: "slang".to_string(),
+        stage: "done",
     }
 }
 

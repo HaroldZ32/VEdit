@@ -102,6 +102,9 @@ fn failure_report(binary: &Option<PathBuf>, message: String) -> LintReport {
         stderr: String::new(),
         elapsed: std::time::Duration::ZERO,
         child_pid: None,
+        engine: vd_deeplint::LintEngine::Slang,
+        tool: "slang".to_string(),
+        stage: "run",
     }
 }
 

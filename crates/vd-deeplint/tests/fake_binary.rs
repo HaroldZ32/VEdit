@@ -451,3 +451,70 @@ fn report_captures_stderr_of_a_successful_run() {
     assert!(report.is_success());
     assert!(report.stderr.contains("warning-free"));
 }
+
+/// Inner half of [`tool_child_environment_is_sanitized`]: it only does work when
+/// the outer test re-executed this test binary with `VD_TOOL_ENV_PROBE_BINARY`
+/// set. That re-exec is how the test gives the whole process a bogus
+/// `LD_LIBRARY_PATH`/`LOCPATH` without mutating the environment of the other
+/// (parallel) tests in this binary.
+#[test]
+fn tool_child_environment_probe() {
+    let Some(binary) = std::env::var_os("VD_TOOL_ENV_PROBE_BINARY") else {
+        return;
+    };
+    let report = LintService::new().lint(
+        &fixture("undeclared.sv"),
+        &base_options(PathBuf::from(binary)),
+    );
+    assert!(
+        report.is_success(),
+        "the fake slang failed: {:?}",
+        report.failure
+    );
+}
+
+/// The module tree/lint services spawn bundled tools from a process that the
+/// AppDir's `AppRun` started with `LD_LIBRARY_PATH=<AppDir>/lib` and
+/// `LOCPATH=<AppDir>/usr/lib/locale`. Those must NOT reach the child: the child's
+/// host loader would load the packaged glibc and abort
+/// (`version 'GLIBC_2.35' not found`) before the tool runs.
+#[cfg(unix)]
+#[test]
+fn tool_child_environment_is_sanitized() {
+    let _serial = serial();
+    let dir = TestDir::new("env-sanitized");
+    let dump = dir.file("env.txt");
+    let script = dir.script(
+        "slang",
+        "#!/bin/sh\nprev=\"\"\nout=\"\"\nfor arg in \"$@\"; do\n  if [ \"$prev\" = \"--diag-json\" ]; then out=\"$arg\"; fi\n  prev=\"$arg\"\ndone\nprintf 'LD_LIBRARY_PATH=%s\\nLOCPATH=%s\\n' \"${LD_LIBRARY_PATH-<unset>}\" \"${LOCPATH-<unset>}\" > \"$VD_TOOL_ENV_PROBE_DUMP\"\nprintf '[]' > \"$out\"\nexit 0\n",
+    );
+    let existing = std::env::var_os("LD_LIBRARY_PATH")
+        .map(|value| value.to_string_lossy().into_owned())
+        .unwrap_or_default();
+    let output = std::process::Command::new(
+        std::env::current_exe().unwrap_or_else(|error| panic!("current_exe: {error}")),
+    )
+    .args(["--exact", "tool_child_environment_probe"])
+    .env("VD_TOOL_ENV_PROBE_BINARY", &script)
+    .env("VD_TOOL_ENV_PROBE_DUMP", &dump)
+    .env(
+        "LD_LIBRARY_PATH",
+        format!("/nonexistent-vd-tool-env:{existing}"),
+    )
+    .env("LOCPATH", "/nonexistent-vd-locale")
+    .output()
+    .unwrap_or_else(|error| panic!("re-executing the test binary failed: {error}"));
+    assert!(
+        output.status.success(),
+        "inner probe failed (status {:?}):\nstdout: {}\nstderr: {}",
+        output.status.code(),
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let dumped = fs::read_to_string(&dump)
+        .unwrap_or_else(|error| panic!("reading {} failed: {error}", dump.display()));
+    assert_eq!(
+        dumped, "LD_LIBRARY_PATH=<unset>\nLOCPATH=<unset>\n",
+        "the tool child inherited the packaged loader environment:\n{dumped}"
+    );
+}

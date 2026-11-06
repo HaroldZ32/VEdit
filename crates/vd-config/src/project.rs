@@ -1,6 +1,6 @@
 //! Project root, `.f` filelists and `.rules.verible_lint` discovery.
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 use serde::Serialize;
@@ -78,7 +78,59 @@ pub struct ProjectContext {
     pub rules_search_stop: PathBuf,
 }
 
-/// Discover the project context inside an already discovered root.
+/// Variable lookup for the filelist preprocessor (ADDENDUM A-9).
+///
+/// The project's own table wins over the process environment; `HOME` feeds the
+/// leading `~` form. Expansion is deterministic for a given table + environment.
+#[derive(Debug, Clone, Default)]
+pub struct Variables {
+    project: BTreeMap<String, String>,
+    environment: BTreeMap<String, String>,
+    home: Option<PathBuf>,
+}
+
+impl Variables {
+    /// The persisted `NAME=VALUE` project table plus the process environment.
+    #[must_use]
+    pub fn from_pairs(project: &[(String, String)]) -> Self {
+        Self {
+            project: project.iter().cloned().collect(),
+            environment: std::env::vars().collect(),
+            home: std::env::var_os("HOME").map(PathBuf::from),
+        }
+    }
+
+    /// Explicit environment/home (tests and embedding; never reads the process).
+    #[must_use]
+    pub fn with_environment(
+        project: &[(String, String)],
+        environment: impl IntoIterator<Item = (String, String)>,
+        home: Option<PathBuf>,
+    ) -> Self {
+        Self {
+            project: project.iter().cloned().collect(),
+            environment: environment.into_iter().collect(),
+            home,
+        }
+    }
+
+    /// Project table first, environment second.
+    #[must_use]
+    pub fn resolve(&self, name: &str) -> Option<&str> {
+        self.project
+            .get(name)
+            .or_else(|| self.environment.get(name))
+            .map(String::as_str)
+    }
+
+    #[must_use]
+    pub fn home(&self) -> Option<&Path> {
+        self.home.as_deref()
+    }
+}
+
+/// Discover the project context inside an already discovered root using only
+/// the process environment for filelist variables (the legacy path).
 pub(crate) fn discover_in_root(
     root: PathBuf,
     root_source: RootSource,
@@ -87,7 +139,44 @@ pub(crate) fn discover_in_root(
     home: Option<&Path>,
     warnings: &mut Vec<Warning>,
 ) -> ProjectContext {
-    let mut filelists = discover_filelists(&root, settings, warnings);
+    let variables = Variables::from_pairs(&[]);
+    let mut missing = BTreeSet::new();
+    let mut skipped = 0usize;
+    discover_in_root_with(
+        root,
+        root_source,
+        search_stop,
+        settings,
+        home,
+        warnings,
+        &variables,
+        &mut missing,
+        &mut skipped,
+    )
+}
+
+/// Discover the project context inside an already discovered root, expanding
+/// the filelist variables from `variables` (ADDENDUM A-9).
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn discover_in_root_with(
+    root: PathBuf,
+    root_source: RootSource,
+    search_stop: PathBuf,
+    settings: &ProjectSettings,
+    home: Option<&Path>,
+    warnings: &mut Vec<Warning>,
+    variables: &Variables,
+    missing: &mut BTreeSet<String>,
+    skipped: &mut usize,
+) -> ProjectContext {
+    let mut filelists = discover_filelists(
+        root.as_path(),
+        settings,
+        warnings,
+        variables,
+        missing,
+        skipped,
+    );
     filelists.sort_by(|left, right| left.path.cmp(&right.path));
 
     let mut include_dirs: Vec<PathBuf> = Vec::new();
@@ -132,6 +221,297 @@ pub(crate) fn discover_in_root(
         rules_path,
         rules_search_stop,
     }
+}
+
+/// Source-file extensions the directory scan collects (AC-2.2).
+pub const SCANNED_EXTENSIONS: [&str; 4] = ["v", "sv", "vh", "svh"];
+
+/// One fully expanded project: the union of the directory scan and every
+/// filelist, plus the include directories and defines the backends receive.
+///
+/// This is the project model of C7: the root, the imported `.f` list, the
+/// expansion, and the include dirs and defines; the file set is
+/// `scan(root) ∪ expand(filelists)` with duplicates removed.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ProjectExpansion {
+    /// The folder the user opened; never an ancestor of it (AC-2.1).
+    pub root: PathBuf,
+    /// How configuration discovery found the configuration layers. When the
+    /// opened folder is pinned as the root this is [`RootSource::Fallback`].
+    pub root_source: RootSource,
+    /// Every filelist that contributed: discovered ones first (config +
+    /// root-level `.f`), then the imported ones, first occurrence wins.
+    pub filelists: Vec<Filelist>,
+    /// The file set: filelist entries in filelist order, then the scan in
+    /// sorted order; duplicates removed.
+    pub files: Vec<PathBuf>,
+    /// Include directories (`-I`): configuration and `+incdir+` first, then the
+    /// extra (tools-page) directories appended, duplicates removed.
+    pub include_dirs: Vec<PathBuf>,
+    /// Defines (`-D`): configuration and `+define+` first, then the extra
+    /// (tools-page) defines appended, duplicates removed.
+    pub defines: Vec<Define>,
+    /// Non-fatal diagnostics, each naming the `.f` file and 1-based line that
+    /// caused it where a line exists.
+    pub warnings: Vec<Warning>,
+    /// Variable names still unresolved after the project table + environment
+    /// (ADDENDUM A-9), unique and sorted. The import dialog fills all of them in
+    /// one pass.
+    pub missing_variables: Vec<String>,
+    /// Lines that produced no entry (unresolved/!invalid variable, unknown
+    /// token, malformed define, missing/cyclic nested `-f`). The panel shows a
+    /// non-zero counter whenever this is non-zero, so a dropped file is visible.
+    pub skipped_lines: usize,
+}
+
+/// Expand the project rooted at `root` (AC-2.2/AC-2.4).
+///
+/// * The **opened folder is the root**: `Loader`'s upward discovery is used only
+///   for its configuration layers, never to move the root above the folder the
+///   user opened (AC-2.1 — otherwise opening `repo/rtl` inside a git checkout
+///   would silently expand `repo`).
+/// * `imported_filelists` are additional `.f` files the user imported; each is
+///   parsed by [`filelist::parse`] with the same diagnostics as a discovered
+///   one, and a `.f` that is both discovered and imported is parsed once.
+/// * `extra_include_dirs` / `extra_defines` are the tools-page values
+///   (`tools.include_dirs` / `tools.defines` in `settings.toml`). They are
+///   **appended** to what the project itself declares and de-duplicated, so the
+///   page can add an include path without losing the filelist's own.
+/// * The file set is the `.f` expansion **∪** a recursive scan of `root` for
+///   [`SCANNED_EXTENSIONS`], de-duplicated by canonical path.
+///
+/// Everything here is filesystem work, so it runs inside the C ABI's worker job,
+/// never on the GUI thread (C4).
+pub fn expand(
+    root: &Path,
+    imported_filelists: &[PathBuf],
+    extra_include_dirs: &[PathBuf],
+    extra_defines: &[String],
+) -> anyhow::Result<ProjectExpansion> {
+    expand_with_variables(
+        root,
+        imported_filelists,
+        extra_include_dirs,
+        extra_defines,
+        &Variables::from_pairs(&[]),
+    )
+}
+
+/// [`expand`] with an explicit filelist variable table (ADDENDUM A-9: the
+/// persisted project table wins over the environment).
+#[allow(clippy::too_many_arguments)]
+pub fn expand_with_variables(
+    root: &Path,
+    imported_filelists: &[PathBuf],
+    extra_include_dirs: &[PathBuf],
+    extra_defines: &[String],
+    variables: &Variables,
+) -> anyhow::Result<ProjectExpansion> {
+    let loaded = crate::Loader::new(root).load()?;
+    let crate::Loaded {
+        config,
+        project: discovered,
+        warnings: loader_warnings,
+        ..
+    } = loaded;
+    // `Loader` parsed the discovered `.f` files with the ENVIRONMENT only, so
+    // its filelist/rules warnings are the wrong ones when a project variable
+    // table exists (a `$VAR` the table resolves was reported as unresolved).
+    // Discovery is re-run below with the table; keep only the unrelated layers
+    // (xdg/config), which are not re-derived here.
+    let mut warnings: Vec<Warning> = loader_warnings
+        .into_iter()
+        .filter(|warning| {
+            let filelist_scoped = warning
+                .file
+                .as_deref()
+                .and_then(std::path::Path::extension)
+                .and_then(std::ffi::OsStr::to_str)
+                .is_some_and(|extension| extension.eq_ignore_ascii_case("f"));
+            !filelist_scoped && !warning.code.as_str().starts_with("rules.")
+        })
+        .collect();
+
+    let root = root.to_path_buf();
+    let home = std::env::var_os("HOME").map(PathBuf::from);
+    // The opened folder wins over the upward discovery (AC-2.1). The
+    // configuration layers were still read by `Loader`, so a `vedit.toml`
+    // above the folder keeps applying; only the ROOT is pinned. Discovery is
+    // re-run WITH the variable table so `$VAR` inside a discovered `.f` expands
+    // too (the Loader parsed it with the environment only).
+    let (root_source, search_stop) = if discovered.root == root {
+        (discovered.root_source, discovered.search_stop)
+    } else {
+        (RootSource::Fallback, root.clone())
+    };
+    let mut missing: BTreeSet<String> = BTreeSet::new();
+    let mut skipped = 0usize;
+    let mut discovery_warnings: Vec<Warning> = Vec::new();
+    let project = discover_in_root_with(
+        root.clone(),
+        root_source,
+        search_stop,
+        &config.project,
+        home.as_deref(),
+        &mut discovery_warnings,
+        variables,
+        &mut missing,
+        &mut skipped,
+    );
+    warnings.append(&mut discovery_warnings);
+
+    let mut all_lists: Vec<Filelist> = Vec::new();
+    let mut list_seen: BTreeSet<PathBuf> = BTreeSet::new();
+    for filelist in project.filelists {
+        if list_seen.insert(canonical_path(&filelist.path)) {
+            all_lists.push(filelist);
+        }
+    }
+    for path in imported_filelists {
+        // Skip a list the discovery already parsed BEFORE parsing it again:
+        // parsing twice would double its diagnostics and the skipped counter.
+        let key = canonical_path(path);
+        if list_seen.contains(&key) {
+            continue;
+        }
+        if let Some(filelist) =
+            filelist::parse_with(path, &mut warnings, variables, &mut missing, &mut skipped)
+        {
+            if list_seen.insert(canonical_path(&filelist.path)) {
+                all_lists.push(filelist);
+            }
+        }
+    }
+
+    let mut files: Vec<PathBuf> = Vec::new();
+    let mut file_seen: BTreeSet<PathBuf> = BTreeSet::new();
+    for filelist in &all_lists {
+        for entry in &filelist.entries {
+            if file_seen.insert(canonical_path(entry)) {
+                files.push(entry.clone());
+            }
+        }
+    }
+    for scanned in scan_sources(&root, &mut warnings) {
+        if file_seen.insert(canonical_path(&scanned)) {
+            files.push(scanned);
+        }
+    }
+
+    let mut include_dirs: Vec<PathBuf> = project.include_dirs;
+    let mut include_seen: BTreeSet<PathBuf> =
+        include_dirs.iter().map(|dir| canonical_path(dir)).collect();
+    for filelist in &all_lists {
+        for dir in &filelist.include_dirs {
+            if include_seen.insert(canonical_path(dir)) {
+                include_dirs.push(dir.clone());
+            }
+        }
+    }
+    for dir in extra_include_dirs {
+        let resolved = resolve_relative(&root, dir);
+        if include_seen.insert(canonical_path(&resolved)) {
+            include_dirs.push(resolved);
+        }
+    }
+
+    let mut defines: Vec<Define> = project.defines;
+    let mut define_seen: BTreeSet<Define> = defines.iter().cloned().collect();
+    for filelist in &all_lists {
+        for define in &filelist.defines {
+            if define_seen.insert(define.clone()) {
+                defines.push(define.clone());
+            }
+        }
+    }
+    for entry in extra_defines {
+        match parse_define(entry) {
+            Some(define) => {
+                if define_seen.insert(define.clone()) {
+                    defines.push(define);
+                }
+            }
+            None => warnings.push(Warning::new(
+                WarningCode::ConfigInvalidValue,
+                format!("tools.defines entry `{entry}` is not NAME or NAME=VALUE; ignored"),
+            )),
+        }
+    }
+
+    Ok(ProjectExpansion {
+        root,
+        root_source: project.root_source,
+        filelists: all_lists,
+        files,
+        include_dirs,
+        defines,
+        warnings,
+        missing_variables: missing.into_iter().collect(),
+        skipped_lines: skipped,
+    })
+}
+
+/// Recursively collect the project's source files (AC-2.2).
+///
+/// Hidden directories are skipped: `.git`/`.svn` metadata and editor caches
+/// never hold project sources, and walking them would let one checkout double
+/// the scan. Symlinked directories are not followed, so a link back to an
+/// ancestor cannot recurse forever.
+fn scan_sources(root: &Path, warnings: &mut Vec<Warning>) -> Vec<PathBuf> {
+    let mut found: Vec<PathBuf> = Vec::new();
+    scan_directory(root, warnings, &mut found);
+    found.sort();
+    found
+}
+
+fn scan_directory(dir: &Path, warnings: &mut Vec<Warning>, found: &mut Vec<PathBuf>) {
+    let read_dir = match std::fs::read_dir(dir) {
+        Ok(read_dir) => read_dir,
+        Err(error) => {
+            warnings.push(Warning::new(
+                WarningCode::FilelistUnreadable,
+                format!(
+                    "directory scan could not read `{}`: {error}; its files are missing from the project",
+                    dir.display()
+                ),
+            ));
+            return;
+        }
+    };
+    let mut entries: Vec<(PathBuf, std::fs::FileType)> = read_dir
+        .filter_map(Result::ok)
+        .filter_map(|entry| entry.file_type().ok().map(|kind| (entry.path(), kind)))
+        .collect();
+    entries.sort_by(|left, right| left.0.cmp(&right.0));
+    for (path, kind) in entries {
+        if kind.is_dir() {
+            let hidden = path
+                .file_name()
+                .and_then(std::ffi::OsStr::to_str)
+                .is_some_and(|name| name.starts_with('.'));
+            if !hidden {
+                scan_directory(&path, warnings, found);
+            }
+        } else if kind.is_file() && is_scanned_source(&path) {
+            found.push(path);
+        }
+    }
+}
+
+fn is_scanned_source(path: &Path) -> bool {
+    path.extension()
+        .and_then(std::ffi::OsStr::to_str)
+        .is_some_and(|ext| {
+            SCANNED_EXTENSIONS
+                .iter()
+                .any(|known| ext.eq_ignore_ascii_case(known))
+        })
+}
+
+/// Path identity for de-duplication: symlinks resolve to one entry when the
+/// target exists; a path that does not exist yet compares by spelling.
+fn canonical_path(path: &Path) -> PathBuf {
+    std::fs::canonicalize(path).unwrap_or_else(|_| path.to_path_buf())
 }
 
 /// Walk up from `start_dir` until a `vedit.toml`, `.git` or direct `.f` marker is found.
@@ -242,6 +622,9 @@ fn discover_filelists(
     root: &Path,
     settings: &ProjectSettings,
     warnings: &mut Vec<Warning>,
+    variables: &Variables,
+    missing: &mut BTreeSet<String>,
+    skipped: &mut usize,
 ) -> Vec<Filelist> {
     let mut candidates: Vec<PathBuf> = Vec::new();
     for configured in &settings.filelists {
@@ -284,7 +667,9 @@ fn discover_filelists(
         if !seen.insert(key) {
             continue;
         }
-        if let Some(filelist) = filelist::parse(&candidate, warnings) {
+        if let Some(filelist) =
+            filelist::parse_with(&candidate, warnings, variables, missing, skipped)
+        {
             parsed.push(filelist);
         }
     }
@@ -351,10 +736,12 @@ fn is_identifier(text: &str) -> bool {
 #[cfg(test)]
 mod tests {
     use super::{
-        discover_root, discover_rules, parse_define, Define, RootSource, VERIBLE_RULES_FILE_NAME,
+        discover_root, discover_rules, expand, expand_with_variables, parse_define, Define,
+        RootSource, Variables, VERIBLE_RULES_FILE_NAME,
     };
     use crate::test_support::write;
     use crate::warnings::WarningCode;
+    use std::path::PathBuf;
 
     #[test]
     fn define_parsing() {
@@ -578,6 +965,203 @@ mod tests {
         assert_eq!(found, None);
         assert_eq!(stop, home, "the search must stop at $HOME, not at /");
         assert!(warnings.is_empty());
+        Ok(())
+    }
+
+    /// ADDENDUM A-9: variables expand in the filelist preprocessor, the project
+    /// table wins over the environment, and every dropped line is reported with
+    /// file:line + the unresolved name (never a silent loss).
+    #[test]
+    fn expand_with_variables_reports_unresolved_lines_and_is_deterministic(
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let temp = tempfile::tempdir()?;
+        let root = temp.path();
+        write(&root.join("rtl/a.sv"), "module a; endmodule\n")?;
+        write(&root.join("rtl/b.sv"), "module b; endmodule\n")?;
+        write(
+            &root.join("top.f"),
+            "$SUB/a.sv\nrtl/$MISSING.sv\n+define+ARCH=$ARCH\n",
+        )?;
+        let project: Vec<(String, String)> = vec![
+            ("SUB".to_string(), "rtl".to_string()),
+            ("ARCH".to_string(), "x86".to_string()),
+            ("WHICH".to_string(), "project".to_string()),
+        ];
+        let vars = Variables::with_environment(
+            &project,
+            vec![("WHICH".to_string(), "environment".to_string())],
+            Some(root.join("home")),
+        );
+        let expansion = expand_with_variables(root, &[], &[], &[], &vars)?;
+        println!(
+            "A9 files={:?} missing={:?} skipped={} warnings={:?}",
+            expansion.files,
+            expansion.missing_variables,
+            expansion.skipped_lines,
+            expansion.warnings
+        );
+        assert_eq!(
+            expansion.files,
+            vec![root.join("rtl/a.sv"), root.join("rtl/b.sv")],
+            "the expanded entry and the scan union"
+        );
+        assert_eq!(expansion.missing_variables, vec!["MISSING".to_string()]);
+        assert_eq!(expansion.skipped_lines, 1);
+        assert!(expansion.defines.contains(&Define {
+            name: "ARCH".to_string(),
+            value: Some("x86".to_string()),
+        }));
+        assert!(expansion.warnings.iter().any(|warning| {
+            warning.line == Some(2)
+                && warning.message.contains("unresolved variable `$MISSING`")
+                && warning.file.as_deref() == Some(root.join("top.f").as_path())
+        }));
+
+        // Same table + environment => byte-identical expansion (A-9.6).
+        let again = expand_with_variables(root, &[], &[], &[], &vars)?;
+        assert_eq!(again.files, expansion.files);
+        assert_eq!(again.include_dirs, expansion.include_dirs);
+        assert_eq!(again.defines, expansion.defines);
+        assert_eq!(again.missing_variables, expansion.missing_variables);
+        Ok(())
+    }
+
+    /// AC-2.2: the file set is `scan(root) ∪ expand(filelists)`, de-duplicated,
+    /// with the filelist order first and the scan (sorted) after it.
+    #[test]
+    fn expand_unions_the_scan_and_the_filelists_without_duplicates(
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let temp = tempfile::tempdir()?;
+        let root = temp.path();
+        write(&root.join("top.f"), "rtl/a.sv\nrtl/a.sv\n")?;
+        write(&root.join("rtl/a.sv"), "module a; endmodule\n")?;
+        write(&root.join("rtl/b.v"), "module b; endmodule\n")?;
+        write(&root.join("inc/c.vh"), "`define C 1\n")?;
+        write(&root.join("notes.txt"), "not a source\n")?;
+        write(&root.join(".git/d.sv"), "module d; endmodule\n")?;
+
+        let expansion = expand(root, &[], &[], &[])?;
+        let relative: Vec<PathBuf> = expansion
+            .files
+            .iter()
+            .map(|path| path.strip_prefix(root).unwrap_or(path).to_path_buf())
+            .collect();
+        assert_eq!(
+            relative,
+            vec![
+                PathBuf::from("rtl/a.sv"),
+                PathBuf::from("inc/c.vh"),
+                PathBuf::from("rtl/b.v"),
+            ],
+            "filelist order first, then the sorted scan, duplicates removed"
+        );
+        assert_eq!(expansion.filelists.len(), 1);
+        Ok(())
+    }
+
+    /// AC-2.1: the folder the user opened IS the root, even inside a checkout
+    /// that carries a `.git` marker above it.
+    #[test]
+    fn expand_pins_the_opened_folder_as_the_root() -> Result<(), Box<dyn std::error::Error>> {
+        let temp = tempfile::tempdir()?;
+        let repo = temp.path();
+        std::fs::create_dir_all(repo.join(".git"))?;
+        let opened = repo.join("sub");
+        write(&opened.join("rtl/x.sv"), "module x; endmodule\n")?;
+
+        let expansion = expand(&opened, &[], &[], &[])?;
+        assert_eq!(expansion.root, opened);
+        assert_eq!(expansion.root_source, RootSource::Fallback);
+        assert_eq!(expansion.files, vec![opened.join("rtl/x.sv")]);
+        Ok(())
+    }
+
+    /// AC-2.3, the three specified bad entries: a `+incdir+` directory that does
+    /// not exist, an unknown directive, and a missing nested `-f`. Each one is
+    /// reported with the `.f` and its 1-based line — none is silently dropped.
+    /// A top-level imported filelist that is missing is reported too (there is no
+    /// line for a file that does not exist).
+    #[test]
+    fn expand_reports_bad_filelist_entries_with_file_and_line(
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let temp = tempfile::tempdir()?;
+        let root = temp.path();
+        write(&root.join("good.sv"), "module good; endmodule\n")?;
+        write(
+            &root.join("bad.f"),
+            "good.sv\n+incdir+no_such_dir\n+frobnicate now\n-f missing_nested.f\n",
+        )?;
+        let bad = root.join("bad.f");
+        let expansion = expand(root, &[], &[], &[])?;
+        let at = |code: &str, line: u32| {
+            expansion.warnings.iter().any(|warning| {
+                warning.code.as_str() == code
+                    && warning.line == Some(line)
+                    && warning.file.as_deref() == Some(bad.as_path())
+            })
+        };
+        assert!(
+            at("filelist.missing", 2),
+            "missing +incdir+: {:?}",
+            expansion.warnings
+        );
+        assert!(
+            at("filelist.unknown_token", 3),
+            "unknown directive: {:?}",
+            expansion.warnings
+        );
+        assert!(
+            at("filelist.missing", 4),
+            "missing nested -f: {:?}",
+            expansion.warnings
+        );
+
+        let imported = root.join("gone.f");
+        let with_import = expand(root, std::slice::from_ref(&imported), &[], &[])?;
+        assert!(
+            with_import.warnings.iter().any(|warning| {
+                warning.code == WarningCode::FilelistMissing
+                    && warning.file.as_deref() == Some(imported.as_path())
+            }),
+            "an imported filelist that vanished must be reported: {:?}",
+            with_import.warnings
+        );
+        Ok(())
+    }
+
+    /// AC-2.5: the tools-page values are appended (and de-duplicated) after the
+    /// project's own include dirs and defines; a malformed define is reported
+    /// instead of being passed through.
+    #[test]
+    fn expand_appends_tools_page_include_dirs_and_defines() -> Result<(), Box<dyn std::error::Error>>
+    {
+        let temp = tempfile::tempdir()?;
+        let root = temp.path();
+        std::fs::create_dir_all(root.join("extra_inc"))?;
+        write(&root.join("rtl/a.sv"), "module a; endmodule\n")?;
+
+        let expansion = expand(
+            root,
+            &[],
+            &[PathBuf::from("extra_inc")],
+            &["WIDTH=8".to_string(), "BAD DEFINE".to_string()],
+        )?;
+        assert_eq!(expansion.include_dirs, vec![root.join("extra_inc")]);
+        assert_eq!(
+            expansion.defines,
+            vec![Define {
+                name: "WIDTH".to_string(),
+                value: Some("8".to_string()),
+            }]
+        );
+        assert!(
+            expansion
+                .warnings
+                .iter()
+                .any(|warning| warning.code == WarningCode::ConfigInvalidValue),
+            "a malformed tools.defines entry must be reported: {:?}",
+            expansion.warnings
+        );
         Ok(())
     }
 }

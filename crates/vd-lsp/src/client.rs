@@ -13,25 +13,26 @@ use std::time::Duration;
 
 use anyhow::{anyhow, bail, Context, Result};
 use async_lsp::router::Router;
-use async_lsp::{MainLoop, ServerSocket};
+use async_lsp::{AnyNotification, MainLoop, ServerSocket};
 use lsp_types::notification::{
     DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument, DidSaveTextDocument, Exit,
     LogMessage, PublishDiagnostics, ShowMessage,
 };
 use lsp_types::request::{
     CodeActionRequest, DocumentHighlightRequest, DocumentSymbolRequest, Formatting, GotoDefinition,
-    References, Rename, Request, Shutdown,
+    HoverRequest, References, Rename, Request, Shutdown, SignatureHelpRequest,
 };
 use lsp_types::{
     ClientCapabilities, ClientInfo, CodeActionOrCommand, CodeActionParams,
     DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
     DidSaveTextDocumentParams, DocumentFormattingParams, DocumentHighlightParams,
     DocumentRangeFormattingParams, DocumentSymbolParams, DocumentSymbolResponse, FormattingOptions,
-    GotoDefinitionParams, GotoDefinitionResponse, InitializeParams, InitializeResult,
-    InitializedParams, Location, LogMessageParams, Position, PublishDiagnosticsParams,
-    ReferenceParams, RenameParams, ServerCapabilities, ShowMessageParams,
-    TextDocumentContentChangeEvent, TextDocumentIdentifier, TextDocumentItem,
-    TextDocumentPositionParams, TextEdit, Url, VersionedTextDocumentIdentifier, WorkspaceEdit,
+    GotoDefinitionParams, GotoDefinitionResponse, Hover, HoverParams, InitializeParams,
+    InitializeResult, InitializedParams, Location, LogMessageParams, Position,
+    PublishDiagnosticsParams, ReferenceParams, RenameParams, ServerCapabilities, ShowMessageParams,
+    SignatureHelp, SignatureHelpParams, TextDocumentContentChangeEvent, TextDocumentIdentifier,
+    TextDocumentItem, TextDocumentPositionParams, TextEdit, Url, VersionedTextDocumentIdentifier,
+    WorkspaceEdit,
 };
 use serde_json::Value;
 use tokio::process::{Child, Command};
@@ -356,6 +357,29 @@ impl LspClient {
         .await
     }
 
+    /// `textDocument/hover` (T16): the server's hover payload, or none.
+    pub async fn hover(&mut self, uri: &Url, position: Position) -> Result<Option<Hover>> {
+        self.request::<HoverRequest>(HoverParams {
+            text_document_position_params: position_params(uri, position),
+            work_done_progress_params: Default::default(),
+        })
+        .await
+    }
+
+    /// `textDocument/signatureHelp` (T16): the server's signature help, or none.
+    pub async fn signature_help(
+        &mut self,
+        uri: &Url,
+        position: Position,
+    ) -> Result<Option<SignatureHelp>> {
+        self.request::<SignatureHelpRequest>(SignatureHelpParams {
+            text_document_position_params: position_params(uri, position),
+            work_done_progress_params: Default::default(),
+            context: None,
+        })
+        .await
+    }
+
     /// `textDocument/rename`.
     pub async fn rename(
         &mut self,
@@ -586,6 +610,20 @@ impl LspClient {
             router.notification::<ShowMessage>(
                 |state: &mut ClientState, params: ShowMessageParams| {
                     state.record_log(format!("[message] {}", params.message));
+                    ControlFlow::Continue(())
+                },
+            );
+            // A server may send an extension notification this client never
+            // registered — slang-server v0.3.1 sends `slang/setConfig` *before*
+            // its initialize response. async-lsp's default unhandled-notification
+            // handler breaks the main loop on anything outside `$/`, which the
+            // caller then observes as `initialize failed: service stopped`
+            // (T11/T30: the slang direction of the backend switch). Log and
+            // ignore instead; the registered handlers above still win, so
+            // nothing known is swallowed.
+            router.unhandled_notification(
+                |state: &mut ClientState, notification: AnyNotification| {
+                    state.record_log(format!("[unhandled notification] {}", notification.method));
                     ControlFlow::Continue(())
                 },
             );

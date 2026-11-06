@@ -1,0 +1,1454 @@
+{
+  "design": {
+    "name": "$root",
+    "kind": "Root",
+    "addr": 4402343116960,
+    "members": [
+      {
+        "name": "",
+        "kind": "CompilationUnit",
+        "addr": 4402356883920
+      },
+      {
+        "name": "",
+        "kind": "CompilationUnit",
+        "addr": 4402356884192
+      },
+      {
+        "name": "",
+        "kind": "CompilationUnit",
+        "addr": 4402356884464
+      },
+      {
+        "name": "",
+        "kind": "CompilationUnit",
+        "addr": 4402356884736
+      },
+      {
+        "name": "",
+        "kind": "CompilationUnit",
+        "addr": 4402356885008
+      },
+      {
+        "name": "arr",
+        "kind": "Instance",
+        "source_file": "arr.sv",
+        "source_line": 1,
+        "source_column": 8,
+        "addr": 4402356885584,
+        "body": {
+          "name": "arr",
+          "kind": "InstanceBody",
+          "source_file": "arr.sv",
+          "source_line": 1,
+          "source_column": 8,
+          "addr": 4402356885280,
+          "members": [
+            {
+              "name": "a",
+              "kind": "Port",
+              "source_file": "arr.sv",
+              "source_line": 1,
+              "source_column": 25,
+              "addr": 4402356886600,
+              "type": "logic",
+              "direction": "In",
+              "internalSymbol": "4402356886720 a"
+            },
+            {
+              "name": "a",
+              "kind": "Net",
+              "source_file": "arr.sv",
+              "source_line": 1,
+              "source_column": 25,
+              "addr": 4402356886720,
+              "type": "logic",
+              "netType": {
+                "name": "wire",
+                "kind": "NetType",
+                "addr": 4402343124640,
+                "type": "logic"
+              }
+            },
+            {
+              "name": "u_arr",
+              "kind": "InstanceArray",
+              "source_file": "arr.sv",
+              "source_line": 2,
+              "source_column": 7,
+              "addr": 4402356892952,
+              "members": [
+                {
+                  "name": "",
+                  "kind": "Instance",
+                  "source_file": "arr.sv",
+                  "source_line": 2,
+                  "source_column": 7,
+                  "addr": 4402356887032,
+                  "body": {
+                    "name": "mid",
+                    "kind": "InstanceBody",
+                    "source_file": "mid.sv",
+                    "source_line": 1,
+                    "source_column": 8,
+                    "addr": 4402356887160,
+                    "members": [
+                      {
+                        "name": "a",
+                        "kind": "Port",
+                        "source_file": "mid.sv",
+                        "source_line": 1,
+                        "source_column": 25,
+                        "addr": 4402356893160,
+                        "type": "logic",
+                        "direction": "In",
+                        "internalSymbol": "4402356893280 a"
+                      },
+                      {
+                        "name": "a",
+                        "kind": "Net",
+                        "source_file": "mid.sv",
+                        "source_line": 1,
+                        "source_column": 25,
+                        "addr": 4402356893280,
+                        "type": "logic",
+                        "netType": {
+                          "name": "wire",
+                          "kind": "NetType",
+                          "addr": 4402343124640,
+                          "type": "logic"
+                        }
+                      },
+                      {
+                        "name": "b",
+                        "kind": "Port",
+                        "source_file": "mid.sv",
+                        "source_line": 1,
+                        "source_column": 47,
+                        "addr": 4402356893440,
+                        "type": "logic[3:0]",
+                        "direction": "Out",
+                        "internalSymbol": "4402356893560 b"
+                      },
+                      {
+                        "name": "b",
+                        "kind": "Variable",
+                        "source_file": "mid.sv",
+                        "source_line": 1,
+                        "source_column": 47,
+                        "addr": 4402356893560,
+                        "type": "logic[3:0]",
+                        "lifetime": "Static"
+                      },
+                      {
+                        "name": "t",
+                        "kind": "Variable",
+                        "source_file": "mid.sv",
+                        "source_line": 2,
+                        "source_column": 15,
+                        "addr": 4402356887400,
+                        "type": "logic[1:0]",
+                        "lifetime": "Static"
+                      },
+                      {
+                        "name": "g",
+                        "kind": "Genvar",
+                        "source_file": "mid.sv",
+                        "source_line": 3,
+                        "source_column": 10,
+                        "addr": 4402356891664
+                      },
+                      {
+                        "name": "g_leaf",
+                        "kind": "GenerateBlockArray",
+                        "source_file": "mid.sv",
+                        "source_line": 5,
+                        "source_column": 37,
+                        "addr": 4402356893712,
+                        "members": [
+                          {
+                            "name": "",
+                            "kind": "GenerateBlock",
+                            "source_file": "mid.sv",
+                            "source_line": 5,
+                            "source_column": 37,
+                            "addr": 4402356894864,
+                            "members": [
+                              {
+                                "name": "g",
+                                "kind": "Parameter",
+                                "source_file": "mid.sv",
+                                "source_line": 5,
+                                "source_column": 10,
+                                "addr": 4402356895008,
+                                "type": "integer",
+                                "value": "0",
+                                "isLocal": true,
+                                "isPort": false,
+                                "isBody": true
+                              },
+                              {
+                                "name": "u",
+                                "kind": "Instance",
+                                "source_file": "mid.sv",
+                                "source_line": 6,
+                                "source_column": 12,
+                                "addr": 4402356897000,
+                                "body": {
+                                  "name": "leaf",
+                                  "kind": "InstanceBody",
+                                  "source_file": "leaf.sv",
+                                  "source_line": 1,
+                                  "source_column": 8,
+                                  "addr": 4402356897128,
+                                  "members": [
+                                    {
+                                      "name": "a",
+                                      "kind": "Port",
+                                      "source_file": "leaf.sv",
+                                      "source_line": 1,
+                                      "source_column": 26,
+                                      "addr": 4402356897432,
+                                      "type": "logic",
+                                      "direction": "In",
+                                      "internalSymbol": "4402356897552 a"
+                                    },
+                                    {
+                                      "name": "a",
+                                      "kind": "Net",
+                                      "source_file": "leaf.sv",
+                                      "source_line": 1,
+                                      "source_column": 26,
+                                      "addr": 4402356897552,
+                                      "type": "logic",
+                                      "netType": {
+                                        "name": "wire",
+                                        "kind": "NetType",
+                                        "addr": 4402343124640,
+                                        "type": "logic"
+                                      }
+                                    },
+                                    {
+                                      "name": "b",
+                                      "kind": "Port",
+                                      "source_file": "leaf.sv",
+                                      "source_line": 1,
+                                      "source_column": 42,
+                                      "addr": 4402356897712,
+                                      "type": "logic",
+                                      "direction": "Out",
+                                      "internalSymbol": "4402356897832 b"
+                                    },
+                                    {
+                                      "name": "b",
+                                      "kind": "Variable",
+                                      "source_file": "leaf.sv",
+                                      "source_line": 1,
+                                      "source_column": 42,
+                                      "addr": 4402356897832,
+                                      "type": "logic",
+                                      "lifetime": "Static"
+                                    },
+                                    {
+                                      "name": "",
+                                      "kind": "ContinuousAssign",
+                                      "source_file": "leaf.sv",
+                                      "source_line": 2,
+                                      "source_column": 10,
+                                      "addr": 4402356897984,
+                                      "assignment": {
+                                        "source_file_start": "leaf.sv",
+                                        "source_file_end": "leaf.sv",
+                                        "source_line_start": 2,
+                                        "source_line_end": 2,
+                                        "source_column_start": 10,
+                                        "source_column_end": 15,
+                                        "kind": "Assignment",
+                                        "type": "logic",
+                                        "left": {
+                                          "source_file_start": "leaf.sv",
+                                          "source_file_end": "leaf.sv",
+                                          "source_line_start": 2,
+                                          "source_line_end": 2,
+                                          "source_column_start": 10,
+                                          "source_column_end": 11,
+                                          "kind": "NamedValue",
+                                          "type": "logic",
+                                          "symbol": "4402356897832 b"
+                                        },
+                                        "right": {
+                                          "source_file_start": "leaf.sv",
+                                          "source_file_end": "leaf.sv",
+                                          "source_line_start": 2,
+                                          "source_line_end": 2,
+                                          "source_column_start": 14,
+                                          "source_column_end": 15,
+                                          "kind": "NamedValue",
+                                          "type": "logic",
+                                          "symbol": "4402356897552 a"
+                                        },
+                                        "isNonBlocking": false
+                                      }
+                                    }
+                                  ],
+                                  "definition": "4402342226176 leaf"
+                                },
+                                "connections": [
+                                  {
+                                    "port": {
+                                      "name": "a",
+                                      "kind": "Port",
+                                      "source_file": "leaf.sv",
+                                      "source_line": 1,
+                                      "source_column": 26,
+                                      "addr": 4402356897432,
+                                      "type": "logic",
+                                      "direction": "In",
+                                      "internalSymbol": "4402356897552 a"
+                                    },
+                                    "expr": {
+                                      "source_file_start": "mid.sv",
+                                      "source_file_end": "mid.sv",
+                                      "source_line_start": 6,
+                                      "source_line_end": 6,
+                                      "source_column_start": 18,
+                                      "source_column_end": 19,
+                                      "kind": "NamedValue",
+                                      "type": "logic",
+                                      "symbol": "4402356893280 a"
+                                    }
+                                  },
+                                  {
+                                    "port": {
+                                      "name": "b",
+                                      "kind": "Port",
+                                      "source_file": "leaf.sv",
+                                      "source_line": 1,
+                                      "source_column": 42,
+                                      "addr": 4402356897712,
+                                      "type": "logic",
+                                      "direction": "Out",
+                                      "internalSymbol": "4402356897832 b"
+                                    },
+                                    "expr": {
+                                      "source_file_start": "mid.sv",
+                                      "source_file_end": "mid.sv",
+                                      "source_line_start": 6,
+                                      "source_line_end": 6,
+                                      "source_column_start": 25,
+                                      "source_column_end": 29,
+                                      "kind": "Assignment",
+                                      "type": "logic",
+                                      "left": {
+                                        "source_file_start": "mid.sv",
+                                        "source_file_end": "mid.sv",
+                                        "source_line_start": 6,
+                                        "source_line_end": 6,
+                                        "source_column_start": 25,
+                                        "source_column_end": 29,
+                                        "kind": "ElementSelect",
+                                        "type": "logic",
+                                        "value": {
+                                          "source_file_start": "mid.sv",
+                                          "source_file_end": "mid.sv",
+                                          "source_line_start": 6,
+                                          "source_line_end": 6,
+                                          "source_column_start": 25,
+                                          "source_column_end": 26,
+                                          "kind": "NamedValue",
+                                          "type": "logic[1:0]",
+                                          "symbol": "4402356887400 t"
+                                        },
+                                        "selector": {
+                                          "source_file_start": "mid.sv",
+                                          "source_file_end": "mid.sv",
+                                          "source_line_start": 6,
+                                          "source_line_end": 6,
+                                          "source_column_start": 27,
+                                          "source_column_end": 28,
+                                          "kind": "NamedValue",
+                                          "type": "integer",
+                                          "symbol": "4402356895008 g",
+                                          "constant": "0"
+                                        }
+                                      },
+                                      "right": {
+                                        "source_file_start": "mid.sv",
+                                        "source_file_end": "mid.sv",
+                                        "source_line_start": 6,
+                                        "source_line_end": 6,
+                                        "source_column_start": 25,
+                                        "source_column_end": 29,
+                                        "kind": "EmptyArgument",
+                                        "type": "logic"
+                                      },
+                                      "isNonBlocking": false
+                                    }
+                                  }
+                                ]
+                              }
+                            ],
+                            "constructIndex": 0,
+                            "isUninstantiated": false,
+                            "branchKind": "LoopIteration"
+                          },
+                          {
+                            "name": "",
+                            "kind": "GenerateBlock",
+                            "source_file": "mid.sv",
+                            "source_line": 5,
+                            "source_column": 37,
+                            "addr": 4402356895240,
+                            "members": [
+                              {
+                                "name": "g",
+                                "kind": "Parameter",
+                                "source_file": "mid.sv",
+                                "source_line": 5,
+                                "source_column": 10,
+                                "addr": 4402356895384,
+                                "type": "integer",
+                                "value": "1",
+                                "isLocal": true,
+                                "isPort": false,
+                                "isBody": true
+                              },
+                              {
+                                "name": "u",
+                                "kind": "Instance",
+                                "source_file": "mid.sv",
+                                "source_line": 6,
+                                "source_column": 12,
+                                "addr": 4402356898912,
+                                "body": "4402356897128 leaf",
+                                "connections": [
+                                  {
+                                    "port": {
+                                      "name": "a",
+                                      "kind": "Port",
+                                      "source_file": "leaf.sv",
+                                      "source_line": 1,
+                                      "source_column": 26,
+                                      "addr": 4402356899344,
+                                      "type": "logic",
+                                      "direction": "In",
+                                      "internalSymbol": "4402356899464 a"
+                                    },
+                                    "expr": {
+                                      "source_file_start": "mid.sv",
+                                      "source_file_end": "mid.sv",
+                                      "source_line_start": 6,
+                                      "source_line_end": 6,
+                                      "source_column_start": 18,
+                                      "source_column_end": 19,
+                                      "kind": "NamedValue",
+                                      "type": "logic",
+                                      "symbol": "4402356893280 a"
+                                    }
+                                  },
+                                  {
+                                    "port": {
+                                      "name": "b",
+                                      "kind": "Port",
+                                      "source_file": "leaf.sv",
+                                      "source_line": 1,
+                                      "source_column": 42,
+                                      "addr": 4402356899624,
+                                      "type": "logic",
+                                      "direction": "Out",
+                                      "internalSymbol": "4402356903952 b"
+                                    },
+                                    "expr": {
+                                      "source_file_start": "mid.sv",
+                                      "source_file_end": "mid.sv",
+                                      "source_line_start": 6,
+                                      "source_line_end": 6,
+                                      "source_column_start": 25,
+                                      "source_column_end": 29,
+                                      "kind": "Assignment",
+                                      "type": "logic",
+                                      "left": {
+                                        "source_file_start": "mid.sv",
+                                        "source_file_end": "mid.sv",
+                                        "source_line_start": 6,
+                                        "source_line_end": 6,
+                                        "source_column_start": 25,
+                                        "source_column_end": 29,
+                                        "kind": "ElementSelect",
+                                        "type": "logic",
+                                        "value": {
+                                          "source_file_start": "mid.sv",
+                                          "source_file_end": "mid.sv",
+                                          "source_line_start": 6,
+                                          "source_line_end": 6,
+                                          "source_column_start": 25,
+                                          "source_column_end": 26,
+                                          "kind": "NamedValue",
+                                          "type": "logic[1:0]",
+                                          "symbol": "4402356887400 t"
+                                        },
+                                        "selector": {
+                                          "source_file_start": "mid.sv",
+                                          "source_file_end": "mid.sv",
+                                          "source_line_start": 6,
+                                          "source_line_end": 6,
+                                          "source_column_start": 27,
+                                          "source_column_end": 28,
+                                          "kind": "NamedValue",
+                                          "type": "integer",
+                                          "symbol": "4402356895384 g",
+                                          "constant": "1"
+                                        }
+                                      },
+                                      "right": {
+                                        "source_file_start": "mid.sv",
+                                        "source_file_end": "mid.sv",
+                                        "source_line_start": 6,
+                                        "source_line_end": 6,
+                                        "source_column_start": 25,
+                                        "source_column_end": 29,
+                                        "kind": "EmptyArgument",
+                                        "type": "logic"
+                                      },
+                                      "isNonBlocking": false
+                                    }
+                                  }
+                                ]
+                              }
+                            ],
+                            "constructIndex": 1,
+                            "isUninstantiated": false,
+                            "branchKind": "LoopIteration"
+                          }
+                        ],
+                        "constructIndex": 1,
+                        "initialExpression": {
+                          "source_file_start": "mid.sv",
+                          "source_file_end": "mid.sv",
+                          "source_line_start": 5,
+                          "source_line_end": 5,
+                          "source_column_start": 14,
+                          "source_column_end": 15,
+                          "kind": "Conversion",
+                          "type": "integer",
+                          "operand": {
+                            "source_file_start": "mid.sv",
+                            "source_file_end": "mid.sv",
+                            "source_line_start": 5,
+                            "source_line_end": 5,
+                            "source_column_start": 14,
+                            "source_column_end": 15,
+                            "kind": "IntegerLiteral",
+                            "type": "int",
+                            "value": "0",
+                            "constant": "0"
+                          },
+                          "constant": "0"
+                        },
+                        "stopExpression": {
+                          "source_file_start": "mid.sv",
+                          "source_file_end": "mid.sv",
+                          "source_line_start": 5,
+                          "source_line_end": 5,
+                          "source_column_start": 17,
+                          "source_column_end": 22,
+                          "kind": "BinaryOp",
+                          "type": "logic",
+                          "op": "LessThan",
+                          "left": {
+                            "source_file_start": "mid.sv",
+                            "source_file_end": "mid.sv",
+                            "source_line_start": 5,
+                            "source_line_end": 5,
+                            "source_column_start": 17,
+                            "source_column_end": 18,
+                            "kind": "NamedValue",
+                            "type": "integer",
+                            "symbol": "4402356894296 g"
+                          },
+                          "right": {
+                            "source_file_start": "mid.sv",
+                            "source_file_end": "mid.sv",
+                            "source_line_start": 5,
+                            "source_line_end": 5,
+                            "source_column_start": 21,
+                            "source_column_end": 22,
+                            "kind": "Conversion",
+                            "type": "integer",
+                            "operand": {
+                              "source_file_start": "mid.sv",
+                              "source_file_end": "mid.sv",
+                              "source_line_start": 5,
+                              "source_line_end": 5,
+                              "source_column_start": 21,
+                              "source_column_end": 22,
+                              "kind": "IntegerLiteral",
+                              "type": "int",
+                              "value": "2",
+                              "constant": "2"
+                            },
+                            "constant": "2"
+                          }
+                        },
+                        "iterExpression": {
+                          "source_file_start": "mid.sv",
+                          "source_file_end": "mid.sv",
+                          "source_line_start": 5,
+                          "source_line_end": 5,
+                          "source_column_start": 24,
+                          "source_column_end": 27,
+                          "kind": "UnaryOp",
+                          "type": "integer",
+                          "op": "Postincrement",
+                          "operand": {
+                            "source_file_start": "mid.sv",
+                            "source_file_end": "mid.sv",
+                            "source_line_start": 5,
+                            "source_line_end": 5,
+                            "source_column_start": 24,
+                            "source_column_end": 25,
+                            "kind": "NamedValue",
+                            "type": "integer",
+                            "symbol": "4402356894296 g"
+                          }
+                        },
+                        "loopVariable": "4402356894296 g"
+                      },
+                      {
+                        "name": "g_if",
+                        "kind": "GenerateBlock",
+                        "source_file": "mid.sv",
+                        "source_line": 9,
+                        "source_column": 18,
+                        "addr": 4402356895760,
+                        "members": [
+                          {
+                            "name": "u_if",
+                            "kind": "Instance",
+                            "source_file": "mid.sv",
+                            "source_line": 10,
+                            "source_column": 10,
+                            "addr": 4402356904832,
+                            "body": "4402356897128 leaf",
+                            "connections": [
+                              {
+                                "port": {
+                                  "name": "a",
+                                  "kind": "Port",
+                                  "source_file": "leaf.sv",
+                                  "source_line": 1,
+                                  "source_column": 26,
+                                  "addr": 4402356905264,
+                                  "type": "logic",
+                                  "direction": "In",
+                                  "internalSymbol": "4402356905384 a"
+                                },
+                                "expr": {
+                                  "source_file_start": "mid.sv",
+                                  "source_file_end": "mid.sv",
+                                  "source_line_start": 10,
+                                  "source_line_end": 10,
+                                  "source_column_start": 19,
+                                  "source_column_end": 20,
+                                  "kind": "NamedValue",
+                                  "type": "logic",
+                                  "symbol": "4402356893280 a"
+                                }
+                              },
+                              {
+                                "port": {
+                                  "name": "b",
+                                  "kind": "Port",
+                                  "source_file": "leaf.sv",
+                                  "source_line": 1,
+                                  "source_column": 42,
+                                  "addr": 4402356905544,
+                                  "type": "logic",
+                                  "direction": "Out",
+                                  "internalSymbol": "4402356905664 b"
+                                },
+                                "expr": {
+                                  "source_file_start": "mid.sv",
+                                  "source_file_end": "mid.sv",
+                                  "source_line_start": 10,
+                                  "source_line_end": 10,
+                                  "source_column_start": 26,
+                                  "source_column_end": 30,
+                                  "kind": "Assignment",
+                                  "type": "logic",
+                                  "left": {
+                                    "source_file_start": "mid.sv",
+                                    "source_file_end": "mid.sv",
+                                    "source_line_start": 10,
+                                    "source_line_end": 10,
+                                    "source_column_start": 26,
+                                    "source_column_end": 30,
+                                    "kind": "ElementSelect",
+                                    "type": "logic",
+                                    "value": {
+                                      "source_file_start": "mid.sv",
+                                      "source_file_end": "mid.sv",
+                                      "source_line_start": 10,
+                                      "source_line_end": 10,
+                                      "source_column_start": 26,
+                                      "source_column_end": 27,
+                                      "kind": "NamedValue",
+                                      "type": "logic[3:0]",
+                                      "symbol": "4402356893560 b"
+                                    },
+                                    "selector": {
+                                      "source_file_start": "mid.sv",
+                                      "source_file_end": "mid.sv",
+                                      "source_line_start": 10,
+                                      "source_line_end": 10,
+                                      "source_column_start": 28,
+                                      "source_column_end": 29,
+                                      "kind": "IntegerLiteral",
+                                      "type": "int",
+                                      "value": "0",
+                                      "constant": "0"
+                                    }
+                                  },
+                                  "right": {
+                                    "source_file_start": "mid.sv",
+                                    "source_file_end": "mid.sv",
+                                    "source_line_start": 10,
+                                    "source_line_end": 10,
+                                    "source_column_start": 26,
+                                    "source_column_end": 30,
+                                    "kind": "EmptyArgument",
+                                    "type": "logic"
+                                  },
+                                  "isNonBlocking": false
+                                }
+                              }
+                            ]
+                          }
+                        ],
+                        "constructIndex": 2,
+                        "isUninstantiated": false,
+                        "branchKind": "IfTrue",
+                        "conditionExpression": {
+                          "source_file_start": "mid.sv",
+                          "source_file_end": "mid.sv",
+                          "source_line_start": 9,
+                          "source_line_end": 9,
+                          "source_column_start": 7,
+                          "source_column_end": 8,
+                          "kind": "IntegerLiteral",
+                          "type": "int",
+                          "value": "1",
+                          "constant": "1"
+                        }
+                      },
+                      {
+                        "name": "",
+                        "kind": "ContinuousAssign",
+                        "source_file": "mid.sv",
+                        "source_line": 12,
+                        "source_column": 10,
+                        "addr": 4402356895968,
+                        "assignment": {
+                          "source_file_start": "mid.sv",
+                          "source_file_end": "mid.sv",
+                          "source_line_start": 12,
+                          "source_line_end": 12,
+                          "source_column_start": 10,
+                          "source_column_end": 21,
+                          "kind": "Assignment",
+                          "type": "logic",
+                          "left": {
+                            "source_file_start": "mid.sv",
+                            "source_file_end": "mid.sv",
+                            "source_line_start": 12,
+                            "source_line_end": 12,
+                            "source_column_start": 10,
+                            "source_column_end": 14,
+                            "kind": "ElementSelect",
+                            "type": "logic",
+                            "value": {
+                              "source_file_start": "mid.sv",
+                              "source_file_end": "mid.sv",
+                              "source_line_start": 12,
+                              "source_line_end": 12,
+                              "source_column_start": 10,
+                              "source_column_end": 11,
+                              "kind": "NamedValue",
+                              "type": "logic[3:0]",
+                              "symbol": "4402356893560 b"
+                            },
+                            "selector": {
+                              "source_file_start": "mid.sv",
+                              "source_file_end": "mid.sv",
+                              "source_line_start": 12,
+                              "source_line_end": 12,
+                              "source_column_start": 12,
+                              "source_column_end": 13,
+                              "kind": "IntegerLiteral",
+                              "type": "int",
+                              "value": "1",
+                              "constant": "1"
+                            }
+                          },
+                          "right": {
+                            "source_file_start": "mid.sv",
+                            "source_file_end": "mid.sv",
+                            "source_line_start": 12,
+                            "source_line_end": 12,
+                            "source_column_start": 17,
+                            "source_column_end": 21,
+                            "kind": "ElementSelect",
+                            "type": "logic",
+                            "value": {
+                              "source_file_start": "mid.sv",
+                              "source_file_end": "mid.sv",
+                              "source_line_start": 12,
+                              "source_line_end": 12,
+                              "source_column_start": 17,
+                              "source_column_end": 18,
+                              "kind": "NamedValue",
+                              "type": "logic[1:0]",
+                              "symbol": "4402356887400 t"
+                            },
+                            "selector": {
+                              "source_file_start": "mid.sv",
+                              "source_file_end": "mid.sv",
+                              "source_line_start": 12,
+                              "source_line_end": 12,
+                              "source_column_start": 19,
+                              "source_column_end": 20,
+                              "kind": "IntegerLiteral",
+                              "type": "int",
+                              "value": "0",
+                              "constant": "0"
+                            }
+                          },
+                          "isNonBlocking": false
+                        }
+                      },
+                      {
+                        "name": "",
+                        "kind": "ContinuousAssign",
+                        "source_file": "mid.sv",
+                        "source_line": 13,
+                        "source_column": 10,
+                        "addr": 4402356896048,
+                        "assignment": {
+                          "source_file_start": "mid.sv",
+                          "source_file_end": "mid.sv",
+                          "source_line_start": 13,
+                          "source_line_end": 13,
+                          "source_column_start": 10,
+                          "source_column_end": 21,
+                          "kind": "Assignment",
+                          "type": "logic",
+                          "left": {
+                            "source_file_start": "mid.sv",
+                            "source_file_end": "mid.sv",
+                            "source_line_start": 13,
+                            "source_line_end": 13,
+                            "source_column_start": 10,
+                            "source_column_end": 14,
+                            "kind": "ElementSelect",
+                            "type": "logic",
+                            "value": {
+                              "source_file_start": "mid.sv",
+                              "source_file_end": "mid.sv",
+                              "source_line_start": 13,
+                              "source_line_end": 13,
+                              "source_column_start": 10,
+                              "source_column_end": 11,
+                              "kind": "NamedValue",
+                              "type": "logic[3:0]",
+                              "symbol": "4402356893560 b"
+                            },
+                            "selector": {
+                              "source_file_start": "mid.sv",
+                              "source_file_end": "mid.sv",
+                              "source_line_start": 13,
+                              "source_line_end": 13,
+                              "source_column_start": 12,
+                              "source_column_end": 13,
+                              "kind": "IntegerLiteral",
+                              "type": "int",
+                              "value": "2",
+                              "constant": "2"
+                            }
+                          },
+                          "right": {
+                            "source_file_start": "mid.sv",
+                            "source_file_end": "mid.sv",
+                            "source_line_start": 13,
+                            "source_line_end": 13,
+                            "source_column_start": 17,
+                            "source_column_end": 21,
+                            "kind": "ElementSelect",
+                            "type": "logic",
+                            "value": {
+                              "source_file_start": "mid.sv",
+                              "source_file_end": "mid.sv",
+                              "source_line_start": 13,
+                              "source_line_end": 13,
+                              "source_column_start": 17,
+                              "source_column_end": 18,
+                              "kind": "NamedValue",
+                              "type": "logic[1:0]",
+                              "symbol": "4402356887400 t"
+                            },
+                            "selector": {
+                              "source_file_start": "mid.sv",
+                              "source_file_end": "mid.sv",
+                              "source_line_start": 13,
+                              "source_line_end": 13,
+                              "source_column_start": 19,
+                              "source_column_end": 20,
+                              "kind": "IntegerLiteral",
+                              "type": "int",
+                              "value": "1",
+                              "constant": "1"
+                            }
+                          },
+                          "isNonBlocking": false
+                        }
+                      },
+                      {
+                        "name": "",
+                        "kind": "ContinuousAssign",
+                        "source_file": "mid.sv",
+                        "source_line": 14,
+                        "source_column": 10,
+                        "addr": 4402356896128,
+                        "assignment": {
+                          "source_file_start": "mid.sv",
+                          "source_file_end": "mid.sv",
+                          "source_line_start": 14,
+                          "source_line_end": 14,
+                          "source_column_start": 10,
+                          "source_column_end": 21,
+                          "kind": "Assignment",
+                          "type": "logic",
+                          "left": {
+                            "source_file_start": "mid.sv",
+                            "source_file_end": "mid.sv",
+                            "source_line_start": 14,
+                            "source_line_end": 14,
+                            "source_column_start": 10,
+                            "source_column_end": 14,
+                            "kind": "ElementSelect",
+                            "type": "logic",
+                            "value": {
+                              "source_file_start": "mid.sv",
+                              "source_file_end": "mid.sv",
+                              "source_line_start": 14,
+                              "source_line_end": 14,
+                              "source_column_start": 10,
+                              "source_column_end": 11,
+                              "kind": "NamedValue",
+                              "type": "logic[3:0]",
+                              "symbol": "4402356893560 b"
+                            },
+                            "selector": {
+                              "source_file_start": "mid.sv",
+                              "source_file_end": "mid.sv",
+                              "source_line_start": 14,
+                              "source_line_end": 14,
+                              "source_column_start": 12,
+                              "source_column_end": 13,
+                              "kind": "IntegerLiteral",
+                              "type": "int",
+                              "value": "3",
+                              "constant": "3"
+                            }
+                          },
+                          "right": {
+                            "source_file_start": "mid.sv",
+                            "source_file_end": "mid.sv",
+                            "source_line_start": 14,
+                            "source_line_end": 14,
+                            "source_column_start": 17,
+                            "source_column_end": 21,
+                            "kind": "Conversion",
+                            "type": "logic",
+                            "operand": {
+                              "source_file_start": "mid.sv",
+                              "source_file_end": "mid.sv",
+                              "source_line_start": 14,
+                              "source_line_end": 14,
+                              "source_column_start": 17,
+                              "source_column_end": 21,
+                              "kind": "IntegerLiteral",
+                              "type": "bit[0:0]",
+                              "value": "1'b0",
+                              "constant": "1'b0"
+                            },
+                            "constant": "1'b0"
+                          },
+                          "isNonBlocking": false
+                        }
+                      }
+                    ],
+                    "definition": "4402342226944 mid"
+                  },
+                  "connections": [
+                    {
+                      "port": {
+                        "name": "a",
+                        "kind": "Port",
+                        "source_file": "mid.sv",
+                        "source_line": 1,
+                        "source_column": 25,
+                        "addr": 4402356893160,
+                        "type": "logic",
+                        "direction": "In",
+                        "internalSymbol": "4402356893280 a"
+                      },
+                      "expr": {
+                        "source_file_start": "arr.sv",
+                        "source_file_end": "arr.sv",
+                        "source_line_start": 2,
+                        "source_line_end": 2,
+                        "source_column_start": 23,
+                        "source_column_end": 24,
+                        "kind": "NamedValue",
+                        "type": "logic",
+                        "symbol": "4402356886720 a"
+                      }
+                    },
+                    {
+                      "port": {
+                        "name": "b",
+                        "kind": "Port",
+                        "source_file": "mid.sv",
+                        "source_line": 1,
+                        "source_column": 47,
+                        "addr": 4402356893440,
+                        "type": "logic[3:0]",
+                        "direction": "Out",
+                        "internalSymbol": "4402356893560 b"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "name": "",
+                  "kind": "Instance",
+                  "source_file": "arr.sv",
+                  "source_line": 2,
+                  "source_column": 7,
+                  "addr": 4402356892048,
+                  "body": "4402356887160 mid",
+                  "connections": [
+                    {
+                      "port": {
+                        "name": "a",
+                        "kind": "Port",
+                        "source_file": "mid.sv",
+                        "source_line": 1,
+                        "source_column": 25,
+                        "addr": 4402356908128,
+                        "type": "logic",
+                        "direction": "In",
+                        "internalSymbol": "4402356908248 a"
+                      },
+                      "expr": {
+                        "source_file_start": "arr.sv",
+                        "source_file_end": "arr.sv",
+                        "source_line_start": 2,
+                        "source_line_end": 2,
+                        "source_column_start": 23,
+                        "source_column_end": 24,
+                        "kind": "NamedValue",
+                        "type": "logic",
+                        "symbol": "4402356886720 a"
+                      }
+                    },
+                    {
+                      "port": {
+                        "name": "b",
+                        "kind": "Port",
+                        "source_file": "mid.sv",
+                        "source_line": 1,
+                        "source_column": 47,
+                        "addr": 4402356908408,
+                        "type": "logic[3:0]",
+                        "direction": "Out",
+                        "internalSymbol": "4402356908528 b"
+                      }
+                    }
+                  ]
+                }
+              ],
+              "range": "[1:0]"
+            }
+          ],
+          "definition": "4402342225408 arr"
+        },
+        "connections": [
+        ]
+      },
+      {
+        "name": "top1",
+        "kind": "Instance",
+        "source_file": "top1.sv",
+        "source_line": 1,
+        "source_column": 8,
+        "addr": 4402356886016,
+        "body": {
+          "name": "top1",
+          "kind": "InstanceBody",
+          "source_file": "top1.sv",
+          "source_line": 1,
+          "source_column": 8,
+          "addr": 4402356885712,
+          "members": [
+            {
+              "name": "a",
+              "kind": "Port",
+              "source_file": "top1.sv",
+              "source_line": 1,
+              "source_column": 26,
+              "addr": 4402356911504,
+              "type": "logic",
+              "direction": "In",
+              "internalSymbol": "4402356911624 a"
+            },
+            {
+              "name": "a",
+              "kind": "Net",
+              "source_file": "top1.sv",
+              "source_line": 1,
+              "source_column": 26,
+              "addr": 4402356911624,
+              "type": "logic",
+              "netType": {
+                "name": "wire",
+                "kind": "NetType",
+                "addr": 4402343124640,
+                "type": "logic"
+              }
+            },
+            {
+              "name": "b",
+              "kind": "Port",
+              "source_file": "top1.sv",
+              "source_line": 1,
+              "source_column": 48,
+              "addr": 4402356911784,
+              "type": "logic[3:0]",
+              "direction": "Out",
+              "internalSymbol": "4402356911904 b"
+            },
+            {
+              "name": "b",
+              "kind": "Variable",
+              "source_file": "top1.sv",
+              "source_line": 1,
+              "source_column": 48,
+              "addr": 4402356911904,
+              "type": "logic[3:0]",
+              "lifetime": "Static"
+            },
+            {
+              "name": "u_mid",
+              "kind": "Instance",
+              "source_file": "top1.sv",
+              "source_line": 2,
+              "source_column": 7,
+              "addr": 4402356912144,
+              "body": "4402356887160 mid",
+              "connections": [
+                {
+                  "port": {
+                    "name": "a",
+                    "kind": "Port",
+                    "source_file": "mid.sv",
+                    "source_line": 1,
+                    "source_column": 25,
+                    "addr": 4402356913312,
+                    "type": "logic",
+                    "direction": "In",
+                    "internalSymbol": "4402356913432 a"
+                  },
+                  "expr": {
+                    "source_file_start": "top1.sv",
+                    "source_file_end": "top1.sv",
+                    "source_line_start": 2,
+                    "source_line_end": 2,
+                    "source_column_start": 17,
+                    "source_column_end": 18,
+                    "kind": "NamedValue",
+                    "type": "logic",
+                    "symbol": "4402356911624 a"
+                  }
+                },
+                {
+                  "port": {
+                    "name": "b",
+                    "kind": "Port",
+                    "source_file": "mid.sv",
+                    "source_line": 1,
+                    "source_column": 47,
+                    "addr": 4402356913592,
+                    "type": "logic[3:0]",
+                    "direction": "Out",
+                    "internalSymbol": "4402356913712 b"
+                  },
+                  "expr": {
+                    "source_file_start": "top1.sv",
+                    "source_file_end": "top1.sv",
+                    "source_line_start": 2,
+                    "source_line_end": 2,
+                    "source_column_start": 24,
+                    "source_column_end": 25,
+                    "kind": "Assignment",
+                    "type": "logic[3:0]",
+                    "left": {
+                      "source_file_start": "top1.sv",
+                      "source_file_end": "top1.sv",
+                      "source_line_start": 2,
+                      "source_line_end": 2,
+                      "source_column_start": 24,
+                      "source_column_end": 25,
+                      "kind": "NamedValue",
+                      "type": "logic[3:0]",
+                      "symbol": "4402356911904 b"
+                    },
+                    "right": {
+                      "source_file_start": "top1.sv",
+                      "source_file_end": "top1.sv",
+                      "source_line_start": 2,
+                      "source_line_end": 2,
+                      "source_column_start": 24,
+                      "source_column_end": 25,
+                      "kind": "EmptyArgument",
+                      "type": "logic[3:0]"
+                    },
+                    "isNonBlocking": false
+                  }
+                }
+              ]
+            }
+          ],
+          "definition": "4402342227712 top1"
+        },
+        "connections": [
+        ]
+      },
+      {
+        "name": "top2",
+        "kind": "Instance",
+        "source_file": "top2.sv",
+        "source_line": 1,
+        "source_column": 8,
+        "addr": 4402356886448,
+        "body": {
+          "name": "top2",
+          "kind": "InstanceBody",
+          "source_file": "top2.sv",
+          "source_line": 1,
+          "source_column": 8,
+          "addr": 4402356886144,
+          "members": [
+            {
+              "name": "a",
+              "kind": "Port",
+              "source_file": "top2.sv",
+              "source_line": 1,
+              "source_column": 26,
+              "addr": 4402356916904,
+              "type": "logic",
+              "direction": "In",
+              "internalSymbol": "4402356917024 a"
+            },
+            {
+              "name": "a",
+              "kind": "Net",
+              "source_file": "top2.sv",
+              "source_line": 1,
+              "source_column": 26,
+              "addr": 4402356917024,
+              "type": "logic",
+              "netType": {
+                "name": "wire",
+                "kind": "NetType",
+                "addr": 4402343124640,
+                "type": "logic"
+              }
+            },
+            {
+              "name": "b",
+              "kind": "Port",
+              "source_file": "top2.sv",
+              "source_line": 1,
+              "source_column": 48,
+              "addr": 4402356917184,
+              "type": "logic[3:0]",
+              "direction": "Out",
+              "internalSymbol": "4402356917304 b"
+            },
+            {
+              "name": "b",
+              "kind": "Variable",
+              "source_file": "top2.sv",
+              "source_line": 1,
+              "source_column": 48,
+              "addr": 4402356917304,
+              "type": "logic[3:0]",
+              "lifetime": "Static"
+            },
+            {
+              "name": "u_mid",
+              "kind": "Instance",
+              "source_file": "top2.sv",
+              "source_line": 2,
+              "source_column": 7,
+              "addr": 4402356917456,
+              "body": "4402356887160 mid",
+              "connections": [
+                {
+                  "port": {
+                    "name": "a",
+                    "kind": "Port",
+                    "source_file": "mid.sv",
+                    "source_line": 1,
+                    "source_column": 25,
+                    "addr": 4402356918624,
+                    "type": "logic",
+                    "direction": "In",
+                    "internalSymbol": "4402356918744 a"
+                  },
+                  "expr": {
+                    "source_file_start": "top2.sv",
+                    "source_file_end": "top2.sv",
+                    "source_line_start": 2,
+                    "source_line_end": 2,
+                    "source_column_start": 17,
+                    "source_column_end": 18,
+                    "kind": "NamedValue",
+                    "type": "logic",
+                    "symbol": "4402356917024 a"
+                  }
+                },
+                {
+                  "port": {
+                    "name": "b",
+                    "kind": "Port",
+                    "source_file": "mid.sv",
+                    "source_line": 1,
+                    "source_column": 47,
+                    "addr": 4402356918904,
+                    "type": "logic[3:0]",
+                    "direction": "Out",
+                    "internalSymbol": "4402356919024 b"
+                  },
+                  "expr": {
+                    "source_file_start": "top2.sv",
+                    "source_file_end": "top2.sv",
+                    "source_line_start": 2,
+                    "source_line_end": 2,
+                    "source_column_start": 24,
+                    "source_column_end": 25,
+                    "kind": "Assignment",
+                    "type": "logic[3:0]",
+                    "left": {
+                      "source_file_start": "top2.sv",
+                      "source_file_end": "top2.sv",
+                      "source_line_start": 2,
+                      "source_line_end": 2,
+                      "source_column_start": 24,
+                      "source_column_end": 25,
+                      "kind": "NamedValue",
+                      "type": "logic[3:0]",
+                      "symbol": "4402356917304 b"
+                    },
+                    "right": {
+                      "source_file_start": "top2.sv",
+                      "source_file_end": "top2.sv",
+                      "source_line_start": 2,
+                      "source_line_end": 2,
+                      "source_column_start": 24,
+                      "source_column_end": 25,
+                      "kind": "EmptyArgument",
+                      "type": "logic[3:0]"
+                    },
+                    "isNonBlocking": false
+                  }
+                }
+              ]
+            }
+          ],
+          "definition": "4402342228480 top2"
+        },
+        "connections": [
+        ]
+      }
+    ]
+  },
+  "definitions": [
+    {
+      "name": "arr",
+      "kind": "Definition",
+      "source_file": "arr.sv",
+      "source_line": 1,
+      "source_column": 8,
+      "addr": 4402342225408,
+      "defaultNetType": "4402343124640 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    },
+    {
+      "name": "leaf",
+      "kind": "Definition",
+      "source_file": "leaf.sv",
+      "source_line": 1,
+      "source_column": 8,
+      "addr": 4402342226176,
+      "defaultNetType": "4402343124640 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    },
+    {
+      "name": "mid",
+      "kind": "Definition",
+      "source_file": "mid.sv",
+      "source_line": 1,
+      "source_column": 8,
+      "addr": 4402342226944,
+      "defaultNetType": "4402343124640 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    },
+    {
+      "name": "top1",
+      "kind": "Definition",
+      "source_file": "top1.sv",
+      "source_line": 1,
+      "source_column": 8,
+      "addr": 4402342227712,
+      "defaultNetType": "4402343124640 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    },
+    {
+      "name": "top2",
+      "kind": "Definition",
+      "source_file": "top2.sv",
+      "source_line": 1,
+      "source_column": 8,
+      "addr": 4402342228480,
+      "defaultNetType": "4402343124640 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    }
+  ]
+}

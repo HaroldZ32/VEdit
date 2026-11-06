@@ -16,9 +16,13 @@ use std::sync::{Arc, Mutex, MutexGuard};
 use std::thread;
 use std::time::{Duration, Instant};
 
-use crate::binary::{resolve_binary_for_current_process, BinaryResolution};
+use crate::binary::{
+    resolve_binary_for_current_process, resolve_verible_lint_for_current_process,
+    sanitize_tool_child_env, BinaryResolution,
+};
 use crate::diagnostic::{convert_diagnostic, parse_diagnostics, Diagnostic, Severity, SourceLines};
-use crate::{LintFailure, LintOptions};
+use crate::engine::{parse_verible_output, LintEngine};
+use crate::{command_args_for, EngineOptions, LintFailure, LintOptions};
 
 /// Cap for captured stdout/stderr (each); longer streams are truncated.
 const STREAM_CAPTURE_LIMIT: usize = 64 * 1024;
@@ -50,9 +54,17 @@ pub struct LintReport {
     pub stderr: String,
     /// Wall-clock time of the run.
     pub elapsed: Duration,
-    /// PID of the spawned slang process (diagnostics/evidence; the process is
+    /// PID of the spawned lint process (diagnostics/evidence; the process is
     /// reaped before this report is returned).
     pub child_pid: Option<u32>,
+    /// Which engine ran (T138: the two engines are never blended).
+    pub engine: LintEngine,
+    /// The tool that actually ran: `slang` or `verible-verilog-lint` (the
+    /// resolved binary's file name when a binary was found).
+    pub tool: String,
+    /// How far the run got: `resolve`, `spawn`, `run`, `parse`, or `done`. This
+    /// is the failure stage the UI shows next to the tool name (AC-2.10).
+    pub stage: &'static str,
 }
 
 impl LintReport {
@@ -96,7 +108,7 @@ impl LintReport {
     }
 }
 
-fn empty_report(binary: BinaryResolution) -> LintReport {
+fn empty_report(binary: BinaryResolution, engine: LintEngine) -> LintReport {
     LintReport {
         diagnostics: Vec::new(),
         total_diagnostics: 0,
@@ -108,6 +120,9 @@ fn empty_report(binary: BinaryResolution) -> LintReport {
         stderr: String::new(),
         elapsed: Duration::ZERO,
         child_pid: None,
+        engine,
+        tool: engine.tool_name().to_string(),
+        stage: "resolve",
     }
 }
 
@@ -154,11 +169,31 @@ impl LintService {
         }
     }
 
-    /// Run slang on `file`. Cancels any previous in-flight run.
+    /// Run the default (slang) engine on `file`. Cancels any previous in-flight
+    /// run.
     #[must_use]
     pub fn lint(&self, file: &Path, options: &LintOptions) -> LintReport {
+        self.lint_with(file, &EngineOptions::from_options(options))
+    }
+
+    /// Run the selected engine on `file` with the project's `-I`/`-D` settings.
+    /// Cancels any previous in-flight run.
+    #[must_use]
+    pub fn lint_with(&self, file: &Path, options: &EngineOptions) -> LintReport {
+        self.lint_with_cancel(file, options, Arc::new(AtomicBool::new(false)))
+    }
+
+    /// Like [`Self::lint_with`], but sharing an EXTERNAL cancel flag: the batch
+    /// pass passes its own token, so one `cancel()` kills the running child and
+    /// no later file starts (AC-2.8). The flag is only ever raised by the caller.
+    #[must_use]
+    pub fn lint_with_cancel(
+        &self,
+        file: &Path,
+        options: &EngineOptions,
+        cancel: Arc<AtomicBool>,
+    ) -> LintReport {
         let started = Instant::now();
-        let cancel = Arc::new(AtomicBool::new(false));
         let id = {
             let mut state = self.state();
             state.next_id += 1;
@@ -173,7 +208,7 @@ impl LintService {
             id
         };
 
-        let mut report = Self::run(file, options, &cancel);
+        let mut report = Self::run_engine(file, options, &cancel);
         report.elapsed = started.elapsed();
 
         {
@@ -185,9 +220,16 @@ impl LintService {
         report
     }
 
-    fn run(file: &Path, options: &LintOptions, cancel: &AtomicBool) -> LintReport {
-        let binary = resolve_binary_for_current_process(options.binary.as_deref());
-        let mut report = empty_report(binary.clone());
+    fn run_engine(file: &Path, options: &EngineOptions, cancel: &AtomicBool) -> LintReport {
+        let binary = match options.engine {
+            LintEngine::Slang => {
+                resolve_binary_for_current_process(options.slang_binary.as_deref())
+            }
+            LintEngine::Verible => {
+                resolve_verible_lint_for_current_process(options.verible_binary.as_deref())
+            }
+        };
+        let mut report = empty_report(binary.clone(), options.engine);
 
         let Some(chosen) = binary.chosen.clone() else {
             report.failure = Some(LintFailure::BinaryNotFound {
@@ -195,6 +237,10 @@ impl LintService {
             });
             return report;
         };
+        report.tool = chosen
+            .file_name()
+            .map(|name| name.to_string_lossy().into_owned())
+            .unwrap_or_else(|| options.engine.tool_name().to_string());
 
         let temp = match tempfile::Builder::new().prefix("vd-deeplint-").tempdir() {
             Ok(temp) => temp,
@@ -207,17 +253,18 @@ impl LintService {
         };
         let json_path = temp.path().join("diagnostics.json");
 
+        report.stage = "spawn";
         let mut command = Command::new(&chosen);
+        // Bundled tools must not inherit the AppDir's packaged loader paths; see
+        // `binary::sanitize_tool_child_env`.
+        sanitize_tool_child_env(&mut command);
         command
-            .args([
-                "--lint-only",
-                "-Weverything",
-                "--diag-column-unit",
-                "byte",
-                "--diag-json",
-            ])
-            .arg(&json_path)
-            .arg(file)
+            .args(command_args_for(
+                options.engine,
+                file,
+                Some(&json_path),
+                options,
+            ))
             .stdin(Stdio::null())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped());
@@ -256,6 +303,7 @@ impl LintService {
             });
         }
 
+        report.stage = "run";
         let wait_started = Instant::now();
         let outcome = loop {
             if cancel.load(Ordering::SeqCst) {
@@ -290,7 +338,10 @@ impl LintService {
         match outcome {
             ExitOutcome::Finished(code) => {
                 report.exit_code = code;
-                read_json(&mut report, &json_path, file, options);
+                match options.engine {
+                    LintEngine::Slang => read_json(&mut report, &json_path, file, options),
+                    LintEngine::Verible => read_verible(&mut report, file, options),
+                }
             }
             ExitOutcome::TimedOut(cleanup_error) => {
                 append_cleanup_error(&mut report, cleanup_error);
@@ -312,10 +363,16 @@ impl LintService {
     }
 }
 
-/// Convenience wrapper for a single run.
+/// Convenience wrapper for a single run of the default (slang) engine.
 #[must_use]
 pub fn lint(file: &Path, options: &LintOptions) -> LintReport {
     LintService::new().lint(file, options)
+}
+
+/// Convenience wrapper for a single run of the selected engine.
+#[must_use]
+pub fn lint_with(file: &Path, options: &EngineOptions) -> LintReport {
+    LintService::new().lint_with(file, options)
 }
 
 enum ExitOutcome {
@@ -383,7 +440,52 @@ fn read_capped(mut reader: impl Read, limit: usize) -> (String, bool) {
     (String::from_utf8_lossy(&buffer).into_owned(), truncated)
 }
 
-fn read_json(report: &mut LintReport, json_path: &Path, file: &Path, options: &LintOptions) {
+/// Parse `verible-verilog-lint`'s text findings (T138).
+///
+/// Verible writes one `path:line:col[-end]: message [Category] [rule]` line per
+/// finding, but not always to the same stream: *lint-rule* findings go to
+/// stderr, *syntax errors* go to stdout (measured with
+/// v0.0-4298-g085eef05 — `logic a b;` produces two `syntax error at token …`
+/// lines on stdout and an empty stderr). Both streams are parsed. The tool exits
+/// `1` when it found any — a nonzero exit *with* findings is a normal result,
+/// exactly like slang's.
+fn read_verible(report: &mut LintReport, file: &Path, options: &EngineOptions) {
+    report.stage = "parse";
+    let source = SourceLines::from_path(file);
+    let source = match source {
+        Ok(source) => Some(source),
+        Err(crate::ConvertError::InvalidUtf8) => {
+            report.failure = Some(LintFailure::InvalidSourceEncoding {
+                path: file.to_path_buf(),
+            });
+            return;
+        }
+        Err(_) => None,
+    };
+    let mut parsed = parse_verible_output(&report.stdout, source.as_ref());
+    parsed.extend(parse_verible_output(&report.stderr, source.as_ref()));
+    report.total_diagnostics = parsed.len();
+    if parsed.is_empty() {
+        if report.exit_code != Some(0) {
+            let mut captured = report.stdout.clone();
+            if !captured.is_empty() && !report.stderr.is_empty() {
+                captured.push('\n');
+            }
+            captured.push_str(&report.stderr);
+            report.failure = Some(LintFailure::MissingOutput {
+                exit_code: report.exit_code,
+                stderr: captured,
+            });
+        }
+        report.stage = "done";
+        return;
+    }
+    report.truncated = parsed.len() > options.max_diagnostics;
+    report.diagnostics = parsed.into_iter().take(options.max_diagnostics).collect();
+    report.stage = "done";
+}
+
+fn read_json(report: &mut LintReport, json_path: &Path, file: &Path, options: &EngineOptions) {
     let metadata = match fs::metadata(json_path) {
         Ok(metadata) => metadata,
         Err(error) => {
@@ -439,6 +541,7 @@ fn read_json(report: &mut LintReport, json_path: &Path, file: &Path, options: &L
                 stderr: report.stderr.clone(),
             });
         }
+        report.stage = "done";
         return;
     }
     let source = match SourceLines::from_path(file) {
@@ -462,6 +565,7 @@ fn read_json(report: &mut LintReport, json_path: &Path, file: &Path, options: &L
         .take(options.max_diagnostics)
         .map(|parsed| convert_diagnostic(parsed, &source))
         .collect();
+    report.stage = "done";
 }
 
 #[cfg(test)]
@@ -478,10 +582,13 @@ mod tests {
 
     #[test]
     fn std_summary_messages_are_short() {
-        let report = empty_report(BinaryResolution {
-            chosen: None,
-            attempts: Vec::new(),
-        });
+        let report = empty_report(
+            BinaryResolution {
+                chosen: None,
+                attempts: Vec::new(),
+            },
+            LintEngine::Slang,
+        );
         assert_eq!(report.summary(), "no diagnostics");
         assert!(report.is_success());
     }

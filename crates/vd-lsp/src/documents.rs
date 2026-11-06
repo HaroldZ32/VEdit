@@ -45,7 +45,9 @@ impl DocumentStore {
 
     /// True when `uri` is tracked (it was opened and not closed).
     pub(crate) fn contains(&self, uri: &Url) -> bool {
-        self.lock().map(|documents| documents.contains_key(uri)).unwrap_or(false)
+        self.lock()
+            .map(|documents| documents.contains_key(uri))
+            .unwrap_or(false)
     }
 
     pub(crate) fn change(

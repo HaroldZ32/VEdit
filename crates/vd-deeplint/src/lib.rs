@@ -3,12 +3,22 @@
 //! This crate does exactly three things: it **starts the slang process**, it
 //! **parses the `--diag-json` output**, and it **maps the diagnostics into the
 //! editor's problem model**. There is no SystemVerilog front end, parser or
-//! linter here — all diagnostic semantics come from slang.
+//! linter here — all diagnostic semantics come from slang. On top of the same
+//! tool it also answers the two structural questions the editor asks — the
+//! elaborated hierarchy ([`hierarchy`]) and the definition-keyed module catalog
+//! ([`catalog`]) — from the `--ast-json` document.
 //!
-//! # Invocation
+//! # Two engines (T138)
+//!
+//! The engine is selected by the caller ([`LintEngine`]); each one keeps its own
+//! argv, its own parser and its own binary resolution, and every report records
+//! which engine and tool ran (AC-1.6). Verible's engine is described in
+//! [`engine`]; the rest of this header describes slang.
+//!
+//! # Invocation (slang)
 //!
 //! ```text
-//! slang --lint-only -Weverything --diag-column-unit byte --diag-json <tmp.json> <file>
+//! slang --lint-only -Weverything --diag-column-unit byte --diag-json <tmp.json> [-I<dir>]… [-D<name>=<value>]… <file>
 //! ```
 //!
 //! `-Wall` is not a slang option; individual checks use `-W<name>`, and
@@ -39,19 +49,46 @@
 //! the child, so no zombie is left behind (asserted by the runtime tests).
 #![forbid(unsafe_code)]
 
+mod batch;
 mod binary;
+mod catalog;
+mod dedup;
 mod diagnostic;
+mod engine;
+mod hierarchy;
 mod service;
 
+pub use batch::{
+    BatchDiagnostic, BatchFileFailure, BatchHandle, BatchPhase, BatchProgress, BatchReport,
+};
 pub use binary::{
-    resolve_binary, resolve_binary_for_current_process, AttemptOutcome, AttemptSource,
-    BinaryAttempt, BinaryResolution,
+    resolve_binary, resolve_binary_for_current_process, resolve_verible_lint,
+    resolve_verible_lint_for_current_process, AttemptOutcome, AttemptSource, BinaryAttempt,
+    BinaryResolution,
+};
+pub use catalog::{
+    build_catalog, parse_catalog_json, CatalogModule, CatalogOptions, ModuleCatalog,
+    ModuleInstance, ModulePort, PortDirection,
+};
+pub use dedup::{
+    class_of_cli_code, class_of_deeplint, class_of_lsp, diagnostic_key, normalize_message,
+    DiagnosticSource, SeverityClass,
 };
 pub use diagnostic::{
     ConvertError, Diagnostic, EditorPosition, EditorRange, RawLocation, RawRange, RawRangePosition,
     Severity, SourceLines,
 };
-pub use service::{lint, LintReport, LintService};
+pub use engine::{
+    command_args, command_args_for, command_line, command_line_for, knobs_note, parse_rules_list,
+    parse_slang_suppressions, parse_waiver_files, unsupported_knobs, LintEngine, Ruleset,
+};
+pub use hierarchy::{
+    elaborate, is_empty, parse_ast_json, resolution as hierarchy_resolution, Endpoint,
+    EndpointKind, HierarchyOptions, HierarchyReport, InstanceNode, SignalInfo, DEFAULT_MAX_FILES,
+    DEFAULT_MAX_INSTANCES, DEFAULT_MAX_JSON_BYTES as DEFAULT_HIERARCHY_JSON_BYTES,
+    DEFAULT_TIMEOUT as DEFAULT_HIERARCHY_TIMEOUT,
+};
+pub use service::{lint, lint_with, LintReport, LintService};
 
 use std::fmt;
 use std::path::PathBuf;
@@ -90,8 +127,89 @@ impl Default for LintOptions {
     }
 }
 
+/// Options for one engine-aware lint run (T138).
+///
+/// [`LintOptions`] is the legacy single-binary form and stays exactly as it was
+/// (its callers keep compiling); this type adds the engine choice, the project's
+/// include dirs / defines and the second tool's path.
+#[derive(Debug, Clone)]
+pub struct EngineOptions {
+    /// Which engine runs the file.
+    pub engine: LintEngine,
+    /// Explicit slang binary (tests, packaging). `None` resolves it like before.
+    pub slang_binary: Option<PathBuf>,
+    /// Explicit `verible-verilog-lint` binary. `None` resolves it per engine.
+    pub verible_binary: Option<PathBuf>,
+    /// Verible lint rules file (`--rules_config=<path>`; verible only).
+    pub rules_config: Option<PathBuf>,
+    /// Project include directories (`-I<dir>`; slang only — see [`knobs_note`]).
+    pub include_dirs: Vec<PathBuf>,
+    /// Project defines (`-D<name>=<value>`; slang only — see [`knobs_note`]).
+    pub defines: Vec<String>,
+    /// Wall-clock budget for one lint process.
+    pub timeout: Duration,
+    /// Maximum size of the `--diag-json` file that will be parsed (slang).
+    pub max_json_bytes: usize,
+    /// Maximum number of diagnostics kept per file.
+    pub max_diagnostics: usize,
+    /// Verible `--ruleset=` selection. `None` (the default) sends NO flag: the
+    /// tool's own default is the default, so "default value sends no flag".
+    pub ruleset: Option<Ruleset>,
+    /// Verible `--rules=` list (`+rule,-rule`, comma separated), validated by
+    /// [`engine::parse_rules_list`]. `None` sends no flag.
+    pub rules: Option<String>,
+    /// Verible `--waiver_files=` (comma-joined into ONE argv value). Empty sends
+    /// no flag.
+    pub waiver_files: Vec<PathBuf>,
+    /// Extra slang `-W…` tokens appended after `-Weverything` (validated by
+    /// [`engine::parse_slang_suppressions`]). Empty sends no flag.
+    pub slang_suppressions: Vec<String>,
+    /// Slang `--error-limit=N`. `None` (or 0 at the ABI) sends no flag.
+    pub error_limit: Option<u32>,
+}
+
+impl Default for EngineOptions {
+    fn default() -> Self {
+        Self {
+            engine: LintEngine::Slang,
+            slang_binary: None,
+            verible_binary: None,
+            rules_config: None,
+            include_dirs: Vec::new(),
+            defines: Vec::new(),
+            timeout: DEFAULT_TIMEOUT,
+            max_json_bytes: DEFAULT_MAX_JSON_BYTES,
+            max_diagnostics: DEFAULT_MAX_DIAGNOSTICS,
+            ruleset: None,
+            rules: None,
+            waiver_files: Vec::new(),
+            slang_suppressions: Vec::new(),
+            error_limit: None,
+        }
+    }
+}
+
+impl EngineOptions {
+    /// The slang-only legacy options, unchanged, as an engine-aware value.
+    #[must_use]
+    pub fn from_options(options: &LintOptions) -> Self {
+        Self {
+            engine: LintEngine::Slang,
+            slang_binary: options.binary.clone(),
+            verible_binary: None,
+            rules_config: None,
+            include_dirs: Vec::new(),
+            defines: Vec::new(),
+            timeout: options.timeout,
+            max_json_bytes: options.max_json_bytes,
+            max_diagnostics: options.max_diagnostics,
+            ..Self::default()
+        }
+    }
+}
+
 /// A degraded lint result. Each variant carries a short user-facing phrase.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum LintFailure {
     /// No slang binary was found; every attempt is listed.
     BinaryNotFound { attempts: Vec<BinaryAttempt> },
@@ -130,13 +248,24 @@ impl LintFailure {
                 format!("slang timed out after {} ms", after.as_millis())
             }
             Self::Cancelled => "lint cancelled".to_string(),
-            Self::MissingOutput { exit_code, .. } => match exit_code {
-                Some(code) => format!("slang exited with code {code} and produced no diagnostics"),
-                None => "slang terminated without a result".to_string(),
-            },
-            Self::InvalidJson { .. } => "slang produced malformed diagnostics".to_string(),
+            Self::MissingOutput { exit_code, stderr } => {
+                let base = match exit_code {
+                    Some(code) => {
+                        format!("the lint tool exited with code {code} and produced no diagnostics")
+                    }
+                    None => "the lint tool terminated without a result".to_string(),
+                };
+                // The child's stderr is the only witness when a tool dies before
+                // it can write JSON (e.g. the loader's `GLIBC_… not found`);
+                // surface its first non-empty line instead of hiding it.
+                match stderr.lines().map(str::trim).find(|line| !line.is_empty()) {
+                    Some(line) => format!("{base}: {line}"),
+                    None => base,
+                }
+            }
+            Self::InvalidJson { .. } => "the lint tool produced malformed diagnostics".to_string(),
             Self::OutputTooLarge { limit } => {
-                format!("slang diagnostics exceeded the {limit} byte limit")
+                format!("lint diagnostics exceeded the {limit} byte limit")
             }
             Self::InvalidSourceEncoding { path } => {
                 format!("{} is not valid UTF-8", path.display())
@@ -177,3 +306,38 @@ impl fmt::Display for LintFailure {
 }
 
 impl std::error::Error for LintFailure {}
+
+#[cfg(test)]
+mod tests {
+    use super::LintFailure;
+
+    #[test]
+    fn missing_output_message_names_the_first_non_empty_stderr_line() {
+        let failure = LintFailure::MissingOutput {
+            exit_code: Some(1),
+            stderr: "\n  version `GLIBC_2.35' not found (required by libc.so.6)\nmore\n"
+                .to_string(),
+        };
+        let message = failure.user_message();
+        assert!(
+            message.contains("exited with code 1"),
+            "the exit code stays visible: {message}"
+        );
+        assert!(
+            message.contains("version `GLIBC_2.35' not found"),
+            "the loader's reason must reach the UI: {message}"
+        );
+    }
+
+    #[test]
+    fn missing_output_message_without_stderr_keeps_the_short_form() {
+        let failure = LintFailure::MissingOutput {
+            exit_code: None,
+            stderr: String::new(),
+        };
+        assert_eq!(
+            failure.user_message(),
+            "the lint tool terminated without a result"
+        );
+    }
+}

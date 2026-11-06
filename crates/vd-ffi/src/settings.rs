@@ -77,6 +77,59 @@ pub(crate) fn save(path: &Path, entries: Vec<(String, String)>) -> Result<(), Vd
         .map_err(|error| VdError::new(VD_ERR_SERVICE, &error.to_string()))
 }
 
+/// Project the settings store's `fim.*` block onto the transport settings type.
+///
+/// `vd-fim` is the transport crate and cannot depend on `vd-settings`, so the
+/// application-layer mapping lives here, exactly like the `vd_config::FimConfig`
+/// mapping in [`crate::fim`]. The API key is **not** part of this projection:
+/// the store never holds one. Use [`fim_settings_from_store`] when the key has
+/// to be attached as well.
+#[must_use]
+pub fn fim_settings_from_entries(entries: &[(String, String)]) -> vd_fim::FimSettings {
+    let entries: Vec<vd_settings::Entry> = entries
+        .iter()
+        .map(|(key, value)| vd_settings::Entry {
+            key: key.clone(),
+            value: value.clone(),
+        })
+        .collect();
+    let stored = vd_settings::schema::FimSettings::from_entries(&entries);
+    let protocol = match stored.protocol {
+        vd_settings::schema::FimProtocol::OpenAi => vd_fim::Protocol::OpenAi,
+        vd_settings::schema::FimProtocol::LlamaCpp => vd_fim::Protocol::LlamaCpp,
+    };
+    vd_fim::FimSettings {
+        enabled: stored.enabled,
+        protocol,
+        endpoint: stored.endpoint,
+        model: stored.model,
+        timeout_ms: stored.timeout_ms,
+        max_tokens: stored.max_tokens,
+        api_key: None,
+    }
+}
+
+/// Read the settings store at `path` and project its FIM block, resolving the
+/// API key the documented way: `environment_key` first (the caller passes
+/// `VEDIT_FIM_API_KEY`), then the owner-only user key file next to the store.
+///
+/// This is the seam the FIM request path adopts to read the Preferences dialog's
+/// FIM page instead of `vd_config`'s `[fim]` block.
+#[must_use]
+pub fn fim_settings_from_store(path: &Path, environment_key: Option<&str>) -> vd_fim::FimSettings {
+    let loaded = vd_settings::load(path);
+    let pairs: Vec<(String, String)> = loaded
+        .entries
+        .into_iter()
+        .map(|entry| (entry.key, entry.value))
+        .collect();
+    let mut settings = fim_settings_from_entries(&pairs);
+    settings.api_key = vd_settings::schema::resolve_api_key(path, environment_key)
+        .key
+        .map(|key| vd_fim::ApiKey::new(key.expose_secret()));
+    settings
+}
+
 /// Start a settings-read job.
 ///
 /// # Safety
@@ -226,4 +279,137 @@ pub unsafe extern "C" fn vd_settings_free(settings: *mut VdSettings) {
     free_string_list(&mut settings.warnings);
     settings.count = 0;
     settings.items = std::ptr::null_mut();
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::fs;
+    use std::path::PathBuf;
+
+    const SECRET: &str = "sk-test-DO-NOT-LEAK-123456";
+
+    fn store(dir: &std::path::Path, pairs: &[(&str, &str)]) -> PathBuf {
+        let path = dir.join("settings.toml");
+        let entries: Vec<vd_settings::Entry> = pairs
+            .iter()
+            .map(|(key, value)| vd_settings::Entry {
+                key: (*key).to_string(),
+                value: (*value).to_string(),
+            })
+            .collect();
+        assert_eq!(vd_settings::save(&path, &entries), Ok(()));
+        path
+    }
+
+    #[test]
+    fn the_settings_pages_reach_the_vd_fim_settings_type() {
+        let Ok(dir) = tempfile::tempdir() else {
+            return;
+        };
+        let path = store(
+            dir.path(),
+            &[
+                ("fim.enabled", "true"),
+                ("fim.protocol", "llama_cpp"),
+                ("fim.endpoint", "http://127.0.0.1:8080"),
+                ("fim.model", "qwen"),
+                ("fim.timeout_ms", "2500"),
+                ("fim.max_tokens", "128"),
+            ],
+        );
+        let settings = fim_settings_from_store(&path, None);
+        assert!(settings.enabled);
+        assert_eq!(settings.protocol, vd_fim::Protocol::LlamaCpp);
+        assert_eq!(settings.endpoint, "http://127.0.0.1:8080");
+        assert_eq!(settings.model, "qwen");
+        assert_eq!(settings.timeout_ms, 2_500);
+        assert_eq!(settings.max_tokens, 128);
+        assert_eq!(
+            settings.request_url().as_deref(),
+            Some("http://127.0.0.1:8080/infill")
+        );
+    }
+
+    #[test]
+    fn an_unconfigured_store_keeps_fim_disabled_without_a_transport() {
+        let Ok(dir) = tempfile::tempdir() else {
+            return;
+        };
+        let settings = fim_settings_from_store(&dir.path().join("settings.toml"), None);
+        assert!(!settings.enabled);
+        assert_eq!(settings.unavailable(), Some(vd_fim::FimError::Disabled));
+        assert!(settings.api_key.is_none());
+        assert_eq!(settings.request_url(), None);
+    }
+
+    #[test]
+    fn the_environment_key_wins_over_the_user_file() {
+        let Ok(dir) = tempfile::tempdir() else {
+            return;
+        };
+        let path = store(dir.path(), &[("fim.enabled", "true")]);
+        let key_file = vd_settings::schema::api_key_path(&path);
+        assert_eq!(
+            vd_settings::schema::write_api_key_file(
+                &key_file,
+                &vd_settings::schema::ApiKey::new("from-file"),
+            ),
+            Ok(())
+        );
+        let from_file = fim_settings_from_store(&path, None);
+        assert_eq!(
+            from_file
+                .api_key
+                .as_ref()
+                .map(vd_fim::ApiKey::expose_secret),
+            Some("from-file")
+        );
+        let from_env = fim_settings_from_store(&path, Some("from-env"));
+        assert_eq!(
+            from_env.api_key.as_ref().map(vd_fim::ApiKey::expose_secret),
+            Some("from-env")
+        );
+    }
+
+    #[test]
+    fn a_plaintext_store_key_never_reaches_the_transport_or_a_debug_line() {
+        let Ok(dir) = tempfile::tempdir() else {
+            return;
+        };
+        let path = store(
+            dir.path(),
+            &[
+                ("fim.endpoint", "http://127.0.0.1:8080"),
+                ("fim.api_key", SECRET),
+            ],
+        );
+        let settings = fim_settings_from_store(&path, None);
+        assert!(
+            settings.api_key.is_none(),
+            "a plaintext settings.toml key must be ignored"
+        );
+        let rendered = format!("{settings:?}");
+        assert!(!rendered.contains(SECRET), "debug output leaked the key");
+    }
+
+    #[test]
+    fn a_world_readable_key_file_is_refused() {
+        let Ok(dir) = tempfile::tempdir() else {
+            return;
+        };
+        let path = store(dir.path(), &[("fim.enabled", "true")]);
+        let key_file = vd_settings::schema::api_key_path(&path);
+        assert!(fs::write(&key_file, SECRET).is_ok());
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            assert!(fs::set_permissions(&key_file, fs::Permissions::from_mode(0o644)).is_ok());
+            let settings = fim_settings_from_store(&path, None);
+            assert!(
+                settings.api_key.is_none(),
+                "an insecure key file must never be used"
+            );
+        }
+    }
 }

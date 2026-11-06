@@ -27,7 +27,8 @@ fn binary(name: &str) -> PathBuf {
     directory.join(name)
 }
 
-const GOOD: &str = "module top;\n  logic a, b;\n  always_comb begin\n    a = b;\n  end\nendmodule\n";
+const GOOD: &str =
+    "module top;\n  logic a, b;\n  always_comb begin\n    a = b;\n  end\nendmodule\n";
 const MISSING_COMMA: &str =
     "module top;\n  logic a b;\n  always_comb begin\n    a = b;\n  end\nendmodule\n";
 
@@ -40,10 +41,11 @@ impl Scratch {
         let path = std::env::temp_dir().join(format!(
             "vd-lsp-buffer-{tag}-{}-{}",
             std::process::id(),
-            Instant::now().elapsed().as_nanos() + std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .map(|d| d.as_nanos())
-                .unwrap_or(0)
+            Instant::now().elapsed().as_nanos()
+                + std::time::SystemTime::now()
+                    .duration_since(std::time::UNIX_EPOCH)
+                    .map(|d| d.as_nanos())
+                    .unwrap_or(0)
         ));
         std::fs::create_dir_all(&path)?;
         Ok(Self { path })
@@ -56,10 +58,7 @@ impl Drop for Scratch {
     }
 }
 
-fn diagnostics_of(
-    session: &SessionHandle,
-    file: &Path,
-) -> Result<Vec<SessionDiagnostic>> {
+fn diagnostics_of(session: &SessionHandle, file: &Path) -> Result<Vec<SessionDiagnostic>> {
     let id = session.request(SessionRequest::Diagnostics {
         file: file.to_path_buf(),
     })?;
@@ -121,15 +120,17 @@ fn buffer_edit_without_saving_is_diagnosed() -> Result<()> {
         Ok(session.status().phase == SessionPhase::Ready)
     })?;
     let initial = diagnostics_of(&session, &file)?;
-    eprintln!("initial diagnostics for the saved good file: {}", initial.len());
+    eprintln!(
+        "initial diagnostics for the saved good file: {}",
+        initial.len()
+    );
 
     // The user deletes one comma IN THE BUFFER; nothing is written to disk.
     session.change_document(&file, MISSING_COMMA.to_string())?;
     wait_for(Duration::from_secs(20), || {
         let current = diagnostics_of(&session, &file)?;
         if current.iter().any(|diagnostic| {
-            diagnostic.message.to_lowercase().contains("syntax")
-                || diagnostic.severity == Some(1)
+            diagnostic.message.to_lowercase().contains("syntax") || diagnostic.severity == Some(1)
         }) {
             Ok(true)
         } else {
@@ -151,7 +152,11 @@ fn buffer_edit_without_saving_is_diagnosed() -> Result<()> {
     );
 
     // Proof that the lint ran on the BUFFER: the file on disk never changed.
-    assert_eq!(std::fs::read_to_string(&file)?, GOOD, "disk file was modified");
+    assert_eq!(
+        std::fs::read_to_string(&file)?,
+        GOOD,
+        "disk file was modified"
+    );
 
     // Putting the comma back in the buffer must clear the syntax error.
     session.change_document(&file, GOOD.to_string())?;
