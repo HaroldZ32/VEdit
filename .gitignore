@@ -61,5 +61,7 @@ filetree-testdata/
 
 # Compiled probe executables under evidence/ are build artifacts, not evidence:
 # their sources (*.cpp, *.sh) stay tracked, only the ELF binaries are ignored.
-# (A 73 MB probe binary committed once by accident; this keeps it out.)
-evidence/**/*-probe
+# The pattern is anchored to probe directories on purpose: a bare
+# `evidence/**/*-probe` also swallowed DIRECTORIES named ...-probe.
+evidence/**/probes/*-probe
+evidence/**/probe/*-probe
