@@ -16,8 +16,8 @@ bash packaging/runtime/build.sh          # 组装 → 许可闸门 → 自检 �
 | 路径 | 说明 |
 |---|---|
 | `packaging/runtime/out/AppDir/` | **中间产物**（不是交付物）：202 个文件，约 283 MB；`bin/vd-app` 的 sha256 与交付 AppImage 内的同一份（当前 `b93f8cf4…`）。目录内容来自最终基线，仅用于检查/调试。 |
-| `packaging/runtime/out/VEdit-<ver>-x86_64.AppImage` | **唯一交付物**：单文件 AppImage（当前基线 `55a874d` 的产物 sha256 `e7ae067f…`）；`out/SHA256SUMS` 与之配套。 |
-| `evidence/slice3-pack/` | 最终打包证据（`final-55a874d/`：C9、构建、干净容器 selfcheck、四容器矩阵）。 |
+| `packaging/runtime/out/VEdit-<ver>-x86_64.AppImage` | **唯一交付物**：单文件 AppImage（sha256 见 `out/SHA256SUMS`，不在文档里写死）；`out/SHA256SUMS` 与之配套。 |
+| `evidence/slice3-pack/` | 最终打包证据（`final-<commit>/`：C9、构建、干净容器 selfcheck、四容器矩阵）。 |
 
 ## F2 形态（T61 定案；缺一条就会泄漏宿主定义）
 
@@ -98,12 +98,12 @@ bash packaging/runtime/build.sh          # 组装 → 许可闸门 → 自检 �
 - `build.sh` writes `out/SHA256SUMS` for the single-file AppImage and copies the
   evidence into `evidence/slice3-pack/`.
 
-**Delivery baseline:** `55a874da076d605c6b620e0bb20f9ac5932d5f46`. The delivery
-AppImage is `out/VEdit-0.1.1-x86_64.AppImage` with sha256
-`e7ae067fe66c8e271ba72da974795a7ee3db0efa59bda45079b5a048b4a09558`; any source or
-packaging-script change invalidates it and requires a rebuild. `out/AppDir/` is
-an intermediate inspection tree (its `bin/vd-app` sha matches the AppImage), not
-a deliverable.
+**Delivery baseline:** the AppImage is `out/VEdit-0.2.1-x86_64.AppImage`, and its
+sha256 is recorded in `out/SHA256SUMS` (written by `build.sh`) rather than restated
+here, so a rebuild cannot leave a stale hash in the docs. Any source or
+packaging-script change invalidates a published AppImage and requires a rebuild.
+`out/AppDir/` is an intermediate inspection tree (its `bin/vd-app` sha matches the
+AppImage), not a deliverable.
 
 
 ## CJK font fallback (T119)

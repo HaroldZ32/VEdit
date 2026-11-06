@@ -7,6 +7,9 @@ Reviewer (board T26).
 Two relocatable products, built from the same payload, that run on a clean, offline CentOS 7
 (glibc 2.17) without installing anything:
 
+> **历史记录（0.1.1 时期的旧 GTK 产物）**：下表是当时真实产出的文件与 sha256，作为历史保留；
+> 它不代表 0.2.1 的产物，也不是当前交付物（Qt 交付物见 `packaging/runtime/README.md`）。
+
 | product | bytes | sha256 |
 |---|---|---|
 | `out/vedit-0.1.1-linux-x86_64.tar.gz` | 40,499,955 | `98f2a548d9e725b55439498b79476ed5ecc514383a6e95a127004f52023586f2` |

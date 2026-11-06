@@ -71,13 +71,13 @@ docs(evidence): workspace gate green at T19 delivery (T17 deeplint landed)
 
 - `MAJOR.MINOR.PATCH`；首个版本 **`v0.1.0`**（0.x 表示接口尚未冻结）。
 - `MAJOR`：不兼容变更；`MINOR`：向后兼容的新功能；`PATCH`：向后兼容的修复。
-- 预发布：`v0.2.0-rc.1`（后缀递增）。
+- 预发布：`v0.2.1-rc.1`（后缀递增）。
 - tag 打在 `main` 上（`release/<ver>` 合入之后），**annotated**：
 
 ```sh
 git switch main && git pull --ff-only
-git tag -a v0.1.0 -m "VEdit 0.1.0 — first release for CentOS 7"
-git push origin v0.1.0
+git tag -a v0.2.1 -m "VEdit 0.2.1 — Qt6 desktop editor for CentOS 7"
+git push origin v0.2.1
 ```
 
 ## 5. 发布产物（GitHub Release 附件，不进 git）
@@ -120,11 +120,11 @@ bash packaging/runtime/build.sh
 从**最近的 tag** 拉分支，PATCH 递增；修完先合 `dev`，再按第 6 节走 release 流程进 `main`：
 
 ```sh
-git switch -c fix/crash-on-empty-file v0.1.0     # 注意：从 tag 起步
+git switch -c fix/crash-on-empty-file v0.2.0     # 注意：从上一个 release tag 起步
 # … 修复 + 测试 …
 git push -u origin fix/crash-on-empty-file
 gh pr create --base dev --head fix/crash-on-empty-file
-# 合入 dev 后按第 6 节发一个 PATCH：release/v0.1.1 → main → tag
+# 合入 dev 后按第 6 节发一个 PATCH：release/v0.2.1 → main → tag
 ```
 
 ## 8. 历史纪律
