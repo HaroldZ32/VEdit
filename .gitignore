@@ -65,3 +65,5 @@ filetree-testdata/
 # `evidence/**/*-probe` also swallowed DIRECTORIES named ...-probe.
 evidence/**/probes/*-probe
 evidence/**/probe/*-probe
+# Same for the ksh-env probe binaries a previous batch left in scratch AppDirs.
+evidence/**/vedit-*-probe
