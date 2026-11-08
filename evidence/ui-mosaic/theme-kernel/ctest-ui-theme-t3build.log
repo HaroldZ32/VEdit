@@ -1,0 +1,8 @@
+Test project /vedit-build/target/qt6-build
+    Start 16: vedit-app-ui-theme-selftest
+1/1 Test #16: vedit-app-ui-theme-selftest ......   Passed    0.04 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.04 sec
+ctest exit=0

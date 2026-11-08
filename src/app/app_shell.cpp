@@ -10,18 +10,27 @@
 #include "help_viewer.h"
 #include "panel_registry.h"
 #include "path_display.h"
+#include "product_theme.h"
 #include "session_store.h"
 #include "theme_manager.h"
+#include "themed_icons.h"
 
 #include <QAction>
+#include <QActionGroup>
 #include <QApplication>
 #include <QByteArray>
 #include <QCloseEvent>
 #include <QDebug>
 #include <QDir>
 #include <QDockWidget>
+#include <QEvent>
+#include <QFile>
 #include <QFileDialog>
+#include <QDateTime>
 #include <QFileInfo>
+#include <QFrame>
+#include <QImage>
+#include <QHash>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QKeySequence>
@@ -32,11 +41,17 @@
 #include <QMessageBox>
 #include <QPointer>
 #include <QPushButton>
+#include <QRegularExpression>
+#include <QSizePolicy>
 #include <QStandardPaths>
 #include <QStatusBar>
 #include <QStringLiteral>
+#include <QTimer>
 #include <QToolBar>
+#include <QToolButton>
+#include <QVBoxLayout>
 #include <QVector>
+#include <QWidget>
 #include <QCoreApplication>
 
 namespace vedit::app {
@@ -51,12 +66,87 @@ QString openFileDialogFilter()
     return vedit::common::openFileDialogFilters().join(QStringLiteral(";;"));
 }
 
+namespace {
+
+// UI-Mosaic T3: one toolbar command -> one SVG in resources/app_icon.qrc. The
+// contract (§3.3) names `settings` as the fallback when a command has no
+// dedicated drawing, so no button is left blank and the missing mapping stays
+// visible in the report instead of being invented here.
+QString toolbarIconName(const QString &commandId)
+{
+    static const QHash<QString, QString> icons{
+        {QStringLiteral("file.new"), QStringLiteral("new")},
+        {QStringLiteral("file.open"), QStringLiteral("open")},
+        {QStringLiteral("file.open-folder"), QStringLiteral("open")},
+        // No dedicated "switch project" drawing yet: the folder-open glyph is
+        // the closest true meaning (both choose a project folder).
+        {QStringLiteral("file.switch-project"), QStringLiteral("open")},
+        {QStringLiteral("file.save"), QStringLiteral("save")},
+        {QStringLiteral("file.save-all"), QStringLiteral("save")},
+        {QStringLiteral("edit.undo"), QStringLiteral("undo")},
+        {QStringLiteral("edit.redo"), QStringLiteral("redo")},
+        {QStringLiteral("search.focus"), QStringLiteral("find")},
+        {QStringLiteral("project.lint"), QStringLiteral("build")},
+        // Contract §3.3 fallback: no formatter glyph is shipped this round.
+        {QStringLiteral("diagnostics.format"), QStringLiteral("settings")},
+    };
+    return icons.value(commandId);
+}
+
+// The product theme the application palette currently represents. The palette
+// is the ONE source both applyUiTheme() and any independent switch (the
+// Preferences combo) go through, so a widget that only sees the palette can find
+// the theme tokens without a second registration point. `canvas` is unique per
+// theme, which makes the match unambiguous; before any theme is applied the
+// contract default is the honest answer.
+const ProductTheme &paletteProductTheme()
+{
+    const QPalette palette = QApplication::palette();
+    const QColor window = palette.color(QPalette::Window);
+    for (const ProductTheme &theme : productThemes()) {
+        if (theme.canvas.rgb() == window.rgb()) {
+            return theme;
+        }
+    }
+    return defaultProductTheme();
+}
+
+// Reads ONE string pair out of the flat Rust settings store, mirroring the
+// language reader in i18n.cpp (the store quotes dotted keys, a hand-written file
+// may not). This is not a second TOML parser: every other line is ignored.
+QString readSettingsString(const QString &settingsPath, const QString &key)
+{
+    QFile file(settingsPath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return {};
+    }
+    const QRegularExpression pair(
+        QStringLiteral("^\\s*(?:\"%1\"|'%1'|%1)\\s*=\\s*(?:\"([^\"]*)\"|'([^']*)')\\s*(?:#.*)?$")
+            .arg(QRegularExpression::escape(key)));
+    while (!file.atEnd()) {
+        const QString line = QString::fromUtf8(file.readLine()).trimmed();
+        if (line.isEmpty() || line.startsWith(QLatin1Char('#'))) {
+            continue;
+        }
+        const QRegularExpressionMatch match = pair.match(line);
+        if (match.hasMatch()) {
+            return match.captured(1).isEmpty() ? match.captured(2) : match.captured(1);
+        }
+    }
+    return {};
+}
+
+} // namespace
+
 ApplicationShell::ApplicationShell(ShellOptions options, QWidget *parent)
     : QMainWindow(parent)
     , options_(std::move(options))
     , provider_(std::make_unique<DemoEditorProvider>())
 {
-    setObjectName(QStringLiteral("vedit-app-shell"));
+    // UI-Mosaic T3: the QSS card stylesheet selects the window by this stable
+    // objectName (`QMainWindow#veditMainWindow` is not used today, but the
+    // contract names the object so a future selector has one anchor).
+    setObjectName(QStringLiteral("veditMainWindow"));
     resize(1280, 820);
 
     if (options_.stateDir.isEmpty()) {
@@ -146,7 +236,23 @@ ApplicationShell::ApplicationShell(ShellOptions options, QWidget *parent)
     editorArea_->setOnFileOpened([this](const QString &absolutePath) {
         emit fileOpened(absolutePath);
     });
-    setCentralWidget(editorArea_);
+    // UI-Mosaic T3: the editor area is the main card. The plain central widget
+    // carries the 8px canvas gap (@gap@ in cards.qss) and the QFrame#veditCard
+    // inside is what the stylesheet paints with surface/border/radius tokens.
+    // QMainWindow keeps the canvas colour behind both.
+    auto *centralCanvas = new QWidget(this);
+    centralCanvas->setObjectName(QStringLiteral("veditCentralCanvas"));
+    auto *centralLayout = new QVBoxLayout(centralCanvas);
+    centralLayout->setContentsMargins(8, 8, 8, 8); // must stay equal to @gap@
+    centralLayout->setSpacing(0);
+    auto *editorCard = new QFrame(centralCanvas);
+    editorCard->setObjectName(QStringLiteral("veditCard"));
+    auto *editorCardLayout = new QVBoxLayout(editorCard);
+    editorCardLayout->setContentsMargins(0, 0, 0, 0);
+    editorCardLayout->setSpacing(0);
+    editorCardLayout->addWidget(editorArea_);
+    centralLayout->addWidget(editorCard);
+    setCentralWidget(centralCanvas);
     editorArea_->setOnLayoutChanged([this]() { updateStatusBar(); });
     editorArea_->setOnActivePaneChanged([this](EditorPane *) {
         updateStatusBar();
@@ -276,6 +382,14 @@ void ApplicationShell::startSession()
     syncOwnedShortcuts();
     syncEditorCommandStates();
     updateStatusBar();
+    // UI-Mosaic R1 test seam: replay a product-theme switch through the REAL
+    // View-menu QAction, so "switch -> restart -> read back" can be proven on the
+    // shipped binary without GUI automation (the VEDIT_UI_PROBE precedent). Inert
+    // unless the variable names one of the six ids.
+    const QString scriptedTheme = qEnvironmentVariable("VEDIT_UI_THEME_SWITCH").trimmed();
+    if (!scriptedTheme.isEmpty()) {
+        applyScriptedThemeSwitch(scriptedTheme);
+    }
 }
 
 ApplicationShell::~ApplicationShell()
@@ -382,6 +496,11 @@ void ApplicationShell::setPreferencesOpener(std::function<void()> opener)
     preferencesOpener_ = std::move(opener);
 }
 
+void ApplicationShell::setUiThemePersister(UiThemePersister persister)
+{
+    uiThemePersister_ = std::move(persister);
+}
+
 ThemeManager *ApplicationShell::themes() const
 {
     return themes_.get();
@@ -469,6 +588,20 @@ void ApplicationShell::setEditorProvider(std::unique_ptr<EditorProvider> provide
     std::unique_ptr<EditorProvider> previous = std::move(provider_);
     provider_ = std::move(provider);
     editorArea_->setProvider(provider_.get());
+    // UI-Mosaic F2: the syntax theme is rendered by the EDITOR's own theme
+    // support now that a product theme owns the application palette. Wire the
+    // one consumer — this shell's ThemeManager — and apply the already-chosen
+    // theme immediately: the product start applies the theme before the editor
+    // lane swaps the provider, so waiting for the next applyTheme() would leave
+    // the first panes on KTextEditor's default theme.
+    if (themes_ != nullptr) {
+        themes_->setSyntaxThemeApplier([this](const QString &name) {
+            if (provider_ != nullptr) {
+                provider_->applySyntaxTheme(name);
+            }
+        });
+        provider_->applySyntaxTheme(themes_->syntaxThemeName());
+    }
     // `previous` dies here, after every pane has stopped using it.
 }
 
@@ -933,6 +1066,12 @@ void ApplicationShell::buildMenuBar()
             }
             menu->addAction(action);
         }
+        // UI-Mosaic T3: the product-theme entry is a SUBMENU of View. Adding a
+        // sixth top-level menu would break ux_selftest's five-menu contract.
+        if (menuId == QStringLiteral("view")) {
+            viewThemeMenu_ = createThemeMenu(menu, QStringLiteral("menu-theme"));
+            menu->addMenu(viewThemeMenu_);
+        }
     }
 }
 
@@ -951,10 +1090,15 @@ void ApplicationShell::buildToolBar()
         mainToolBar_->setMovable(true);
         mainToolBar_->setFloatable(true);
         mainToolBar_->setAllowedAreas(Qt::AllToolBarAreas);
-        // Text buttons: the actions are shared with the menus, and setting an
-        // icon on a shared QAction would also repaint the menu entries — the
-        // toolbar is the only new surface this change is allowed to touch.
-        mainToolBar_->setToolButtonStyle(Qt::ToolButtonTextOnly);
+        // UI-Mosaic T3: icon + text on the toolbar buttons. The actions are
+        // SHARED with the menus, so `setIconVisibleInMenu(false)` below is what
+        // keeps the menus text-only without duplicating every action.
+        mainToolBar_->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        // UI-Mosaic T6: the toolbar row is the window width; eleven icon+text
+        // buttons at 24px left the theme toolbar only 30px, so its button was
+        // hidden as an overflow item. 20px icons free ~44px and keep the button
+        // inside the row at the default window size.
+        mainToolBar_->setIconSize(QSize(20, 20));
         addToolBar(Qt::TopToolBarArea, mainToolBar_);
         // Keep the View menu check state honest in both directions: the X/hide
         // path and the menu path must agree.
@@ -988,12 +1132,240 @@ void ApplicationShell::buildToolBar()
         if (action == nullptr) {
             continue;
         }
+        const QString iconName = toolbarIconName(QString::fromLatin1(id));
+        if (!iconName.isEmpty()) {
+            action->setIcon(themed_icons::actionIcon(iconName, paletteProductTheme().text));
+            // The toolbar button and the menu entry share this QAction; the menu
+            // must stay text-only, so the icon is hidden there.
+            action->setIconVisibleInMenu(false);
+        }
         mainToolBar_->addAction(action);
     }
+    // UI-Mosaic T3: the theme entry sits at the RIGHT end of the toolbar row.
+    // It cannot be an addWidget() on mainToolBar_: a toolbar widget action is
+    // also returned by QToolBar::actions(), and ux_selftest compares that list
+    // to the shipped order with an ordered equality. A second toolbar in the
+    // same TopToolBarArea shares the row; its expanding spacer pushes the one
+    // button to the window's right edge.
+    if (themeToolBar_ == nullptr) {
+        themeToolBar_ = new QToolBar(tr("Theme"), this);
+        themeToolBar_->setObjectName(QStringLiteral("vedit-theme-toolbar"));
+        themeToolBar_->setMovable(false);
+        themeToolBar_->setFloatable(false);
+        themeToolBar_->setAllowedAreas(Qt::TopToolBarArea);
+        // Guarantee the one button keeps its width even if the main toolbar
+        // grows; without this the layout gave the theme toolbar the 30px that
+        // was left and QToolBar hid the button as an overflow item.
+        themeToolBar_->setMinimumWidth(56);
+        addToolBar(Qt::TopToolBarArea, themeToolBar_);
+        auto *spacer = new QWidget(themeToolBar_);
+        spacer->setObjectName(QStringLiteral("theme-toolbar-spacer"));
+        spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        themeToolBar_->addWidget(spacer);
+        themeButtonMenu_ = createThemeMenu(themeToolBar_, QStringLiteral("menu-theme-button"));
+        auto *button = new QToolButton(themeToolBar_);
+        button->setObjectName(QStringLiteral("theme-button"));
+        button->setPopupMode(QToolButton::InstantPopup);
+        button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        // A fixed size keeps QToolBarLayout from stretching the widget action:
+        // without it the layout gave the button a 100px width inside a 56px
+        // toolbar, so the toolbar treated it as an overflow item and hid it.
+        button->setFixedSize(36, 36);
+        button->setIconSize(QSize(22, 22));
+        button->setToolTip(tr("Theme"));
+        button->setMenu(themeButtonMenu_);
+        themeToolBar_->addWidget(button);
+        themeButton_ = button;
+    }
+    refreshToolBarIcons();
     if (QAction *toggle = commands_->action(QStringLiteral("view.toolbar"))) {
         toggle->setChecked(mainToolBar_->isVisible());
     }
     syncEditorCommandStates();
+    // UI-Mosaic T6 运行期探针：只在 VEDIT_UI_PROBE=1 时打印。存在的理由：
+    // 全透明图标能骗过 `QIcon::isNull()` 断言，只有数不透明像素才看得见；
+    // 工具栏是否真的分到宽度、KTextEditor 内部状态行是否被样式表压扁，也只能
+    // 在 show 之后量几何。探针本身不改任何状态。
+    if (qEnvironmentVariableIsSet("VEDIT_UI_PROBE")) {
+        QTimer::singleShot(2500, this, [this]() { logUiProbe(); });
+    }
+}
+
+void ApplicationShell::logUiProbe()
+{
+    if (!qEnvironmentVariableIsSet("VEDIT_UI_PROBE") || mainToolBar_ == nullptr) {
+        return;
+    }
+    qWarning("[ui-probe] theme=%s syntax=%s status-theme=%s style=%d toolbarIconSize=%dx%d",
+             qPrintable(themes_ != nullptr ? themes_->currentUiTheme() : QString()),
+             qPrintable(themes_ != nullptr ? themes_->currentTheme() : QString()),
+             statusTheme_ != nullptr ? qPrintable(statusTheme_->text()) : "null",
+             int(mainToolBar_->toolButtonStyle()), mainToolBar_->iconSize().width(),
+             mainToolBar_->iconSize().height());
+    // R1/M2: an ignored/invalid persisted theme must be OBSERVABLE from outside,
+    // so the probe prints every startup/switch diagnostic (it changes no state).
+    for (const QString &diagnostic : diagnostics_) {
+        qWarning("[ui-probe] diagnostic=%s", qPrintable(diagnostic));
+    }
+    for (QAction *action : mainToolBar_->actions()) {
+        if (action == nullptr || action->isSeparator()) {
+            continue;
+        }
+        const QImage image = action->icon().pixmap(24, 24).toImage();
+        int opaque = 0;
+        for (int y = 0; y < image.height(); ++y) {
+            for (int x = 0; x < image.width(); ++x) {
+                if (qAlpha(image.pixel(x, y)) > 0) {
+                    ++opaque;
+                }
+            }
+        }
+        qWarning("[ui-probe] action=%s iconNull=%d opaquePixels=%d",
+                 qPrintable(action->objectName()), int(action->icon().isNull()), opaque);
+    }
+    if (themeButton_ != nullptr) {
+        const QImage themeImage = themeButton_->icon().pixmap(24, 24).toImage();
+        int opaque = 0;
+        for (int y = 0; y < themeImage.height(); ++y) {
+            for (int x = 0; x < themeImage.width(); ++x) {
+                if (qAlpha(themeImage.pixel(x, y)) > 0) {
+                    ++opaque;
+                }
+            }
+        }
+        const QPoint pos = themeButton_->mapToGlobal(QPoint(0, 0));
+        qWarning("[ui-probe] themeButton global=%d,%d %dx%d visible=%d hint=%dx%d opaquePixels=%d",
+                 pos.x(), pos.y(), themeButton_->width(), themeButton_->height(),
+                 int(themeButton_->isVisible()), themeButton_->sizeHint().width(),
+                 themeButton_->sizeHint().height(), opaque);
+    }
+    qWarning("[ui-probe] toolbar mainGeom=%d,%d %dx%d themeGeom=%d,%d %dx%d themeVisible=%d",
+             mainToolBar_->x(), mainToolBar_->y(), mainToolBar_->width(),
+             mainToolBar_->height(),
+             themeToolBar_ != nullptr ? themeToolBar_->x() : -1,
+             themeToolBar_ != nullptr ? themeToolBar_->y() : -1,
+             themeToolBar_ != nullptr ? themeToolBar_->width() : -1,
+             themeToolBar_ != nullptr ? themeToolBar_->height() : -1,
+             int(themeToolBar_ != nullptr && themeToolBar_->isVisible()));
+    if (editorArea_ == nullptr) {
+        return;
+    }
+    QWidget *card = centralWidget() != nullptr
+                        ? centralWidget()->findChild<QFrame *>(QStringLiteral("veditCard"))
+                        : nullptr;
+    QWidget *stack = editorArea_->findChild<QWidget *>(QStringLiteral("editor-pane-stack"));
+    qWarning("[ui-probe] geom window=%dx%d central=%d,%d %dx%d card=%d,%d %dx%d editor=%d,%d %dx%d editorMin=%dx%d status=%d,%d %dx%d",
+             width(), height(),
+             centralWidget() != nullptr ? centralWidget()->x() : -1,
+             centralWidget() != nullptr ? centralWidget()->y() : -1,
+             centralWidget() != nullptr ? centralWidget()->width() : -1,
+             centralWidget() != nullptr ? centralWidget()->height() : -1,
+             card != nullptr ? card->x() : -1, card != nullptr ? card->y() : -1,
+             card != nullptr ? card->width() : -1, card != nullptr ? card->height() : -1,
+             editorArea_->x(), editorArea_->y(), editorArea_->width(), editorArea_->height(),
+             editorArea_->minimumSizeHint().width(), editorArea_->minimumSizeHint().height(),
+             statusBar() != nullptr ? statusBar()->x() : -1,
+             statusBar() != nullptr ? statusBar()->y() : -1,
+             statusBar() != nullptr ? statusBar()->width() : -1,
+             statusBar() != nullptr ? statusBar()->height() : -1);
+    qWarning("[ui-probe] geom stack=%d,%d %dx%d",
+             stack != nullptr ? stack->x() : -1, stack != nullptr ? stack->y() : -1,
+             stack != nullptr ? stack->width() : -1, stack != nullptr ? stack->height() : -1);
+    // 编辑器底部区域（KTextEditor 的 KateViewBar / KateStatusBar + 它的按钮）：
+    // 这些控件的文字裁切才是"状态行被压住"的可观测形态。
+    int budget = 40;
+    for (QWidget *child : editorArea_->findChildren<QWidget *>()) {
+        if (budget-- <= 0) {
+            break;
+        }
+        if (child->isWindow()) {
+            continue;
+        }
+        const QPoint pos = child->mapToGlobal(QPoint(0, 0));
+        if (pos.y() < 600) {
+            continue;
+        }
+        qWarning("[ui-probe] widget cls=%s obj=%s parentObj=%s global=%d,%d %dx%d hint=%dx%d",
+                 child->metaObject()->className(), qPrintable(child->objectName()),
+                 child->parentWidget() != nullptr
+                     ? qPrintable(child->parentWidget()->objectName())
+                     : "null",
+                 pos.x(), pos.y(), child->width(), child->height(),
+                 child->sizeHint().width(), child->sizeHint().height());
+    }
+}
+
+QMenu *ApplicationShell::createThemeMenu(QWidget *parent, const QString &objectName)
+{
+    auto *menu = new QMenu(tr("&Theme"), parent);
+    menu->setObjectName(objectName);
+    auto *group = new QActionGroup(menu);
+    group->setExclusive(true);
+    const QString current =
+        themes_ != nullptr ? themes_->currentUiTheme() : defaultProductTheme().id;
+    for (const ProductTheme &theme : productThemes()) {
+        QAction *action = menu->addAction(theme.displayName);
+        action->setObjectName(QStringLiteral("action-theme-") + theme.id);
+        action->setCheckable(true);
+        action->setChecked(theme.id == current);
+        action->setData(theme.id);
+        const QString id = theme.id;
+        QObject::connect(action, &QAction::triggered, this,
+                         [this, id]() { applyProductUiTheme(id, true); });
+        group->addAction(action);
+    }
+    return menu;
+}
+
+void ApplicationShell::syncThemeMenuChecks()
+{
+    if (themes_ == nullptr) {
+        return;
+    }
+    const QString current = themes_->currentUiTheme();
+    const QList<QMenu *> menus{viewThemeMenu_, themeButtonMenu_};
+    for (QMenu *menu : menus) {
+        if (menu == nullptr) {
+            continue;
+        }
+        for (QAction *action : menu->actions()) {
+            if (action->isSeparator()) {
+                continue;
+            }
+            action->setChecked(action->data().toString() == current);
+        }
+    }
+}
+
+void ApplicationShell::refreshToolBarIcons()
+{
+    const ProductTheme &theme = paletteProductTheme();
+    if (mainToolBar_ != nullptr) {
+        for (QAction *action : mainToolBar_->actions()) {
+            if (action->isSeparator()) {
+                continue;
+            }
+            const QString id = action->objectName().mid(QStringLiteral("action-").size());
+            const QString iconName = toolbarIconName(id);
+            if (iconName.isEmpty()) {
+                continue;
+            }
+            action->setIcon(themed_icons::actionIcon(iconName, theme.text));
+            action->setIconVisibleInMenu(false);
+        }
+    }
+    if (themeButton_ != nullptr) {
+        themeButton_->setIcon(themed_icons::actionIcon(QStringLiteral("theme"), theme.accent));
+    }
+}
+
+void ApplicationShell::changeEvent(QEvent *event)
+{
+    QMainWindow::changeEvent(event);
+    if (event != nullptr && event->type() == QEvent::ApplicationPaletteChange) {
+        refreshToolBarIcons();
+        syncThemeMenuChecks();
+    }
 }
 
 void ApplicationShell::syncOwnedShortcuts()
@@ -1134,27 +1506,263 @@ QString ApplicationShell::projectLabel() const
 
 void ApplicationShell::applyThemeForStartup()
 {
+    applyStartupThemes(QString(), QString());
+}
+
+void ApplicationShell::applyStartupThemes(const QString &archiveSyntaxTheme,
+                                          const QString &archiveUiTheme)
+{
     vedit::app::crash::event("theme startup name=%s", qPrintable(options_.themeName));
+    const QString settingsPath = i18n::settingsFilePath(options_.stateDir);
+
+    // UI-Mosaic T3 precedence: explicit seam > settings.toml > archive > yunwu.
+    // UI-Mosaic R1/M2: an id no product theme answers is treated as UNSET — the
+    // next source gets its turn, so an invalid settings.toml value can no longer
+    // swallow a usable archived theme — and the rejection is VISIBLE (diagnostic
+    // plus a timed status line), never silent.
+    // UI-Mosaic R3/A1: settings.toml and the session archive are TWO writers of the
+    // same preference, so when both carry a VALID but DIFFERENT id the newer FILE
+    // wins ("last writer wins"); equal mtimes fall back to settings (the persistent
+    // preference) and an unreadable/missing mtime falls back to the fixed
+    // precedence settings > archive. A normal switch writes both, so this only
+    // decides the case a write failed, a file was edited by hand, or the process
+    // died between the two writes.
+    const QString settingsUiTheme =
+        readSettingsString(settingsPath, QStringLiteral("uiTheme")).trimmed();
+    const QString archiveUiThemeId = archiveUiTheme.trimmed();
+    const QString seamUiTheme = options_.uiTheme.trimmed();
+    const bool settingsUiThemeValid =
+        !settingsUiTheme.isEmpty() && productThemeById(settingsUiTheme) != nullptr;
+    const bool archiveUiThemeValid =
+        !archiveUiThemeId.isEmpty() && productThemeById(archiveUiThemeId) != nullptr;
+
+    QString uiThemeId;
+
+    // An unknown persisted id is reported even when the OTHER source wins: a bad
+    // value must never disappear silently (R1/M2).
+    if (!seamUiTheme.isEmpty() && productThemeById(seamUiTheme) == nullptr) {
+        reportUnknownUiTheme(seamUiTheme, QStringLiteral("shell option"));
+    }
+    if (!settingsUiTheme.isEmpty() && !settingsUiThemeValid) {
+        reportUnknownUiTheme(settingsUiTheme, QStringLiteral("settings.toml"));
+    }
+    if (!archiveUiThemeId.isEmpty() && !archiveUiThemeValid) {
+        reportUnknownUiTheme(archiveUiThemeId, QStringLiteral("session archive"));
+    }
+
+    if (productThemeById(seamUiTheme) != nullptr) {
+        // The seam is an explicit in-process decision (no shipped CLI fills it);
+        // it outranks both files.
+        uiThemeId = seamUiTheme;
+    } else if (settingsUiThemeValid && archiveUiThemeValid
+               && settingsUiTheme != archiveUiThemeId) {
+        // `session_->path()` is the archive this start actually read; a missing
+        // file yields an invalid QDateTime, which falls through to settings.
+        const QDateTime settingsMtime = QFileInfo(settingsPath).lastModified();
+        const QDateTime archiveMtime =
+            session_ != nullptr ? QFileInfo(session_->path()).lastModified() : QDateTime();
+        if (settingsMtime.isValid() && archiveMtime.isValid() && archiveMtime > settingsMtime) {
+            uiThemeId = archiveUiThemeId;
+        } else {
+            uiThemeId = settingsUiTheme;
+        }
+    } else if (settingsUiThemeValid) {
+        uiThemeId = settingsUiTheme;
+    } else if (archiveUiThemeValid) {
+        uiThemeId = archiveUiThemeId;
+    }
+
+    // UI-Mosaic T6: syntax theme. An explicit choice (--theme, then Preferences)
+    // always wins. Otherwise the archive may still carry a directly applied
+    // theme (the shell selfcheck saves one and restores it), but an archive that
+    // only holds the DEFAULT is not a choice — the product theme's paired
+    // syntaxTheme is the contract default then. A uiTheme configured in
+    // settings.toml also re-pairs: it is an external theme decision, and a dark
+    // chrome must not keep a light syntax palette.
+    QString syntaxTheme = options_.themeName;
+    if (syntaxTheme.isEmpty()) {
+        syntaxTheme = readSettingsString(settingsPath, QStringLiteral("theme"));
+    }
+    if (syntaxTheme.isEmpty()) {
+        const bool archiveIsChoice = !archiveSyntaxTheme.isEmpty()
+                                     && archiveSyntaxTheme != themes_->defaultThemeName();
+        // An INVALID settings uiTheme was treated as unset above, so it must not
+        // suppress the archive's explicit syntax-theme choice either. R3 keeps this
+        // R1 rule unchanged: only an EXTERNAL (settings/seam) valid uiTheme re-pairs;
+        // when the archive wins the mtime arbitration its own syntax theme records
+        // the same last session, and pairing the winning product theme reproduces it.
+        if (archiveIsChoice && !settingsUiThemeValid) {
+            syntaxTheme = archiveSyntaxTheme;
+        } else {
+            const ProductTheme *product = productThemeById(
+                uiThemeId.isEmpty() ? defaultProductTheme().id : uiThemeId);
+            if (product != nullptr) {
+                syntaxTheme = product->syntaxTheme;
+            }
+        }
+    }
+
     QString error;
-    if (!themes_->applyTheme(options_.themeName, &error)) {
+    if (!themes_->applyTheme(syntaxTheme, &error)) {
         addDiagnostic(QStringLiteral("theme: %1").arg(error));
         QString fallbackError;
         if (!themes_->applyTheme(QString(), &fallbackError)) {
             addDiagnostic(QCoreApplication::translate("VEdit", "theme fallback: %1").arg(fallbackError));
         }
     }
+    applyProductUiTheme(uiThemeId, false);
     updateStatusBar();
+}
+
+void ApplicationShell::applyPairedSyntaxTheme()
+{
+    if (themes_ == nullptr) {
+        return;
+    }
+    // An explicit choice is never overridden (REQUIREMENTS §6.3): the CLI wins,
+    // then a `theme` written by the Preferences panel.
+    if (!options_.themeName.isEmpty()) {
+        return;
+    }
+    if (!readSettingsString(i18n::settingsFilePath(options_.stateDir),
+                            QStringLiteral("theme")).isEmpty()) {
+        return;
+    }
+    const ProductTheme *product = productThemeById(themes_->currentUiTheme());
+    if (product == nullptr || product->syntaxTheme.isEmpty()) {
+        return;
+    }
+    QString error;
+    if (!themes_->applyTheme(product->syntaxTheme, &error)) {
+        addDiagnostic(QStringLiteral("theme: %1").arg(error));
+    }
+}
+
+void ApplicationShell::applyProductUiTheme(const QString &id, bool reportFailure)
+{
+    if (themes_ == nullptr) {
+        return;
+    }
+    // The id actually in effect: the requested one, or the contract default when
+    // the requested id is empty/unknown. A USER switch persists THIS value, so the
+    // settings key, the session archive and the live chrome cannot disagree.
+    QString appliedId = id.isEmpty() ? defaultProductTheme().id : id;
+    QString error;
+    if (!themes_->applyUiTheme(appliedId, &error)) {
+        const QString message = tr("Theme '%1' could not be applied: %2").arg(appliedId, error);
+        addDiagnostic(message);
+        if (reportFailure) {
+            // The shell's existing error surface: a permanent-or-transient status
+            // line, never a silently swallowed failure.
+            statusBar()->showMessage(message, 8000);
+        }
+        // A stored id that no longer exists must not leave the chrome unstyled.
+        QString fallbackError;
+        if (!themes_->applyUiTheme(QString(), &fallbackError)) {
+            addDiagnostic(QStringLiteral("ui-theme fallback: %1").arg(fallbackError));
+        }
+        appliedId = themes_->currentUiTheme();
+    }
+    if (reportFailure) {
+        // UI-Mosaic R1/F1: a menu/toolbar switch now persists through the SAME
+        // settings store the Preferences dropdown writes. Before this, only the
+        // exit-time archive was updated and the next start preferred the OLD
+        // settings.toml value, so the switch silently disappeared on restart.
+        persistUiTheme(appliedId);
+        applyPairedSyntaxTheme();
+    }
+    refreshToolBarIcons();
+    syncThemeMenuChecks();
+    updateStatusBar();
+}
+
+void ApplicationShell::persistUiTheme(const QString &id)
+{
+    if (id.isEmpty() || persistingUiTheme_) {
+        return;
+    }
+    persistingUiTheme_ = true;
+    // 1) settings.toml — through the seam the product installs from main.cpp,
+    // which is the SAME SettingsClient write the Preferences page performs. The
+    // shell itself must not include that lane: `vedit_workspace_settings` links
+    // `vedit_app_shell`, so the dependency points the other way.
+    if (!uiThemePersister_) {
+        const QString message =
+            tr("Interface theme '%1' was applied but not stored: no settings store is available.")
+                .arg(id);
+        addDiagnostic(message);
+        statusBar()->showMessage(message, 8000);
+    } else {
+        QString error;
+        if (!uiThemePersister_(id, &error)) {
+            QString message = tr("Interface theme '%1' was applied but could not be stored.").arg(id);
+            if (!error.isEmpty()) {
+                message += QStringLiteral(" ") + error;
+            }
+            addDiagnostic(message);
+            statusBar()->showMessage(message, 8000);
+        }
+    }
+    // 2) the session archive — the SECOND source of the startup decision. Updating
+    // it now (not only in saveSession at exit) means a crash right after a switch
+    // cannot resurrect the previous theme. A missing archive is the ordinary first
+    // start; saveSession() writes it at exit with the same id.
+    if (session_ != nullptr) {
+        QString loadError;
+        const QJsonObject archive = session_->load(&loadError);
+        if (!archive.isEmpty()) {
+            QJsonObject updated = archive;
+            updated.insert(QStringLiteral("uiTheme"), id);
+            QString saveError;
+            if (!session_->save(updated, &saveError) && !saveError.isEmpty()) {
+                addDiagnostic(saveError);
+            }
+        }
+    }
+    persistingUiTheme_ = false;
+}
+
+void ApplicationShell::reportUnknownUiTheme(const QString &id, const QString &source)
+{
+    const QString message = tr("Ignoring unknown interface theme '%1' (from %2)").arg(id, source);
+    addDiagnostic(message);
+    // Startup is exactly where a hand-edited settings.toml used to change the look
+    // silently; one timed status line makes the fallback visible without a dialog.
+    statusBar()->showMessage(message, 12000);
+}
+
+void ApplicationShell::applyScriptedThemeSwitch(const QString &id)
+{
+    QAction *target = nullptr;
+    if (viewThemeMenu_ != nullptr) {
+        for (QAction *action : viewThemeMenu_->actions()) {
+            if (action->data().toString() == id) {
+                target = action;
+                break;
+            }
+        }
+    }
+    if (target == nullptr) {
+        reportUnknownUiTheme(id, QStringLiteral("VEDIT_UI_THEME_SWITCH"));
+        return;
+    }
+    // The REAL QAction: exactly the triggered() connection a user's click runs, so
+    // the regression proof cannot pass through a private shortcut.
+    target->trigger();
 }
 
 bool ApplicationShell::restoreSession(QString *error)
 {
-    SessionState state;
-    if (session_ != nullptr) {
-        state = session_->loadState(error);
-    }
+    // UI-Mosaic T3: the archive is read as ONE raw object so the `uiTheme` key
+    // can be taken without changing SessionStore's typed contract. Every other
+    // field still goes through SessionState::fromJson(), so tolerance for a v1
+    // archive / unknown keys is unchanged.
+    const QJsonObject archive = session_ != nullptr ? session_->load(error) : QJsonObject();
+    SessionState state = SessionState::fromJson(archive);
     if (!state.isValid()) {
         return false;
     }
+    state.uiTheme = archive.value(QStringLiteral("uiTheme")).toString();
 
     // T19: the project root is restored BEFORE the panels are inserted, so the
     // project lane's install() already sees it on this start and expands the
@@ -1175,18 +1783,11 @@ bool ApplicationShell::restoreSession(QString *error)
         emit projectRootChanged(options_.projectRoot);
     }
 
-    QString themeError;
-    if (!options_.themeName.isEmpty()) {
-        if (!themes_->applyTheme(options_.themeName, &themeError)) {
-            addDiagnostic(QStringLiteral("theme: %1").arg(themeError));
-            applyThemeForStartup();
-        }
-    } else if (state.theme.isEmpty() || !themes_->applyTheme(state.theme, &themeError)) {
-        if (!themeError.isEmpty()) {
-            addDiagnostic(QStringLiteral("theme: %1").arg(themeError));
-        }
-        applyThemeForStartup();
-    }
+    // UI-Mosaic T6: ONE startup decision shared with the no-archive path. The
+    // archive contributes its syntax theme (an explicit API-level choice) and its
+    // UI theme; the precedence and the product-theme pairing live in
+    // applyStartupThemes() so the two start paths cannot drift.
+    applyStartupThemes(state.theme, state.uiTheme);
 
     applyPanelsFromSession(state.panels);
 
@@ -1225,12 +1826,18 @@ bool ApplicationShell::saveSession(QString *error)
     SessionState state;
     state.projectRoot = options_.projectRoot;
     state.theme = themes_->currentTheme();
+    state.uiTheme = themes_->currentUiTheme();
     state.geometry = saveGeometry();
     state.dockState = saveState();
     state.panels = panels_->insertedIds();
     state.editorLayout = editorArea_->saveLayout();
 
-    bool ok = session_->saveState(state, error);
+    // The typed writer carries every pre-existing key; `uiTheme` is appended
+    // here because SessionStore's serialisation stays outside this lane's frozen
+    // write scope (see src/app/session_store.h).
+    QJsonObject archive = state.toJson();
+    archive.insert(QStringLiteral("uiTheme"), state.uiTheme);
+    bool ok = session_->save(archive, error);
     QString shortcutError;
     if (!commands_->saveShortcuts(&shortcutError)) {
         addDiagnostic(shortcutError);
@@ -1550,8 +2157,17 @@ void ApplicationShell::updateStatusBar()
         statusProject_->setText(tr("Project: %1").arg(projectLabel()));
     }
     if (statusTheme_ != nullptr) {
-        const QString theme = themes_->currentTheme();
-        statusTheme_->setText(tr("Theme: %1").arg(theme.isEmpty() ? tr("(default)") : theme));
+        // UI-Mosaic T3: ONE label carries both axes — the product theme is what
+        // the chrome shows, the syntax theme is what the editor renders. The
+        // label already existed; no second status widget is added.
+        const ProductTheme *product = themes_ != nullptr
+                                          ? productThemeById(themes_->currentUiTheme())
+                                          : nullptr;
+        const QString productName = product != nullptr ? product->displayName
+                                                       : defaultProductTheme().displayName;
+        const QString syntax = themes_ != nullptr ? themes_->currentTheme() : QString();
+        statusTheme_->setText(tr("Theme: %1 / %2")
+                                  .arg(productName, syntax.isEmpty() ? tr("(default)") : syntax));
     }
     if (statusLayout_ != nullptr) {
         const int tabs = active != nullptr ? active->tabCount() : 0;
@@ -1577,6 +2193,10 @@ void ApplicationShell::updateStatusBar()
     }
     setWindowModified(dirty);
     setWindowTitle(QCoreApplication::translate("VEdit", "VEdit — %1[*]").arg(subject));
+    // The check mark in both theme menus follows the live ThemeManager state,
+    // including a switch made from the Preferences dialog (this function is
+    // called on the next state change, so the menus cannot keep a stale tick).
+    syncThemeMenuChecks();
 }
 
 ApplicationShell::CloseChoice ApplicationShell::promptUnsaved(const QString &displayName,

@@ -1,0 +1,6 @@
+--- mtimes (epoch + human) ---
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict-v2/caseD1-invalid-settings/state/settings.toml mtime=1794151562 (2026-11-08 23:26:02.000000000 +0800)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict-v2/caseD1-invalid-settings/state/session.json mtime=1794148022 (2026-11-08 22:27:02.000000000 +0800)
+--- original values ---
+settings: uiTheme = "bogus"
+archive : bohe

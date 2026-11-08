@@ -1,0 +1,14 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <!-- UI-Mosaic T1：卡片样式模板作为资源随可执行文件走。
+
+         为什么不把 QSS 写成 C++ 字符串：模板要能被非程序员按设计稿调整，
+         而资源方式让构建期就校验文件存在；rcc 把它编进二进制后，任何打包形态
+         （构建树 / tarball / AppDir）都自动带上，不需要额外的安装规则。
+
+         模板里的令牌由 src/app/product_theme.cpp 的 renderStyleSheet() 在应用
+         主题时替换，rcc 不做任何处理。 -->
+    <qresource prefix="/themes">
+        <file alias="cards.qss">cards.qss</file>
+    </qresource>
+</RCC>

@@ -1,0 +1,34 @@
+== R3/A1: mtime arbitration between settings.toml and session.json ==
+   container names: r3-probe-<case>; QPA=offscreen (no X display is used)
+PASS  case-a: setup — settings (1794173400) is older than archive (1794177000)
+        settings.toml mtime = 2026-11-09 05:30:00.000000000 +0800
+        session.json  mtime = 2026-11-09 06:30:00.000000000 +0800
+        observed: theme=shenye  status-theme=Theme: Deep Navy / Breeze Dark style=2 toolbarIconSize=20x20
+PASS  case-a: startup took the NEWER archive value (shenye), not the older settings (bohe)
+PASS  case-b: setup — settings (1794177000) is newer than archive (1794173400)
+        settings.toml mtime = 2026-11-09 06:30:00.000000000 +0800
+        session.json  mtime = 2026-11-09 05:30:00.000000000 +0800
+        observed: theme=qingkong  status-theme=Theme: Sky Blue / Breeze Light style=2 toolbarIconSize=20x20
+PASS  case-b: startup took the NEWER settings value (qingkong), not the older archive (shenye)
+PASS  case-c: setup — both files carry the same mtime (1794175200)
+        settings.toml mtime = 2026-11-09 06:00:00.000000000 +0800
+        session.json  mtime = 2026-11-09 06:00:00.000000000 +0800
+        observed: theme=bohe  status-theme=Theme: Mint Green / Breeze Light style=2 toolbarIconSize=20x20
+PASS  case-c: equal mtimes fall back to settings (bohe), not the archive (shenye)
+        no session.json; settings mtime = 2026-11-09 06:10:00.000000000 +0800
+        observed: theme=qingkong  status-theme=Theme: Sky Blue / Breeze Light style=2 toolbarIconSize=20x20
+PASS  case-d1: with no archive, settings supplies the theme (qingkong)
+        no settings.toml; archive mtime = 2026-11-09 06:10:00.000000000 +0800
+        observed: theme=shenye  status-theme=Theme: Deep Navy / Breeze Dark style=2 toolbarIconSize=20x20
+PASS  case-d2: with no settings, the archive supplies the theme (shenye)
+        settings.toml mtime = 2026-11-09 06:05:00.000000000 +0800
+        session.json  mtime = 2026-11-09 06:06:00.000000000 +0800
+        observed: theme=yunwu  status-theme=Theme: Cloud White / Breeze Dark style=2 toolbarIconSize=20x20
+        [ui-probe] diagnostic=Ignoring unknown interface theme 'no-such-theme' (from settings.toml)
+        [ui-probe] diagnostic=Ignoring unknown interface theme 'also-bogus' (from session archive)
+PASS  case-d3: two invalid ids fall back to the contract default (yunwu)
+PASS  case-d3: the invalid settings id is reported (M2 unchanged)
+PASS  case-d3: the invalid archive id is reported too
+
+== summary: pass=11 fail=0 ==
+R3-MTIME PASS

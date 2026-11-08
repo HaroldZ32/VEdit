@@ -1,0 +1,648 @@
+/* VEdit 产品卡片样式模板（UI-Mosaic T1）。
+ *
+ * 这不是一份可直接加载的样式表：形如 @canvas@ 的令牌由
+ * src/app/product_theme.cpp 的 renderStyleSheet() 在应用主题时替换成当前产品
+ * 主题的颜色/尺寸。模板不绑定任何一套主题，所以新增主题只改数据表，不改这个
+ * 文件。契约：.mpd/plans/ui-mosaic/CONTRACT.md §1.4。
+ *
+ * 设计语言（需求 A2）：画布留 8px 间隙，面板是 12px 圆角 + 1px 描边的卡片，
+ * 工具栏/状态栏无边框、透出画布，标签页是胶囊形，hover/pressed 有明确但克制
+ * 的反馈。深色主题下每个带文字的控件都显式给了 :disabled 颜色——QSS 的普通
+ * color 规则会盖过 QPalette 的 Disabled 组，漏掉它禁用文字就会和启用一样亮
+ * （这就是 RM-7 修过的“禁用看起来没禁用”缺陷的 QSS 版本）。
+ */
+
+QMainWindow {
+    background: @canvas@;
+    color: @text@;
+}
+
+/* dock 之间的真实留白：QMainWindow::separator 是 dock 布局自己的分隔条，
+ * 给它 @gap@ 画布色就得到卡片间隙，不需要在控件树里加任何包裹（接线车道实测
+ * 包裹 QFrame 会打红 4 条既有断言）。 */
+QMainWindow::separator {
+    background: @canvas@;
+    width: @gap@;
+    height: @gap@;
+}
+
+/* 拖动分隔条时不出现刺眼高亮：保持画布色，鼠标指针本身会变成分隔形状。 */
+QMainWindow::separator:hover {
+    background: @canvas@;
+}
+
+QDialog {
+    background: @canvas@;
+    color: @text@;
+}
+
+/* --- 停靠面板：dock 本体就是卡片 -------------------------------------------
+ *
+ * 为什么不是给 dock 内容包一层 QFrame：界面接线车道实测，包裹 QFrame 会打红
+ * 4 条既有断言（shell 的 panel-seam、ux 的 terminal-panel、terminal 的
+ * dock.content、filetree 的占位面板替换逻辑），而「不许改测试来迁就实现」是
+ * 硬约束。所以卡片外观只能由 QSS 画在 QDockWidget 自身上：底色 + 1px 描边 +
+ * 12px 圆角，dock 之间的 8px 间隙由 QMainWindow::separator 提供。
+ */
+
+/* 实测（Qt 6.10.2 / Fusion / offscreen，探针记录见
+ * evidence/ui-mosaic/theme-kernel/REPORT.md §8 与 qss-dock-probe.log）：
+ *   - QDockWidget 自身的 `border` / `border-radius` **不会**被绘制（只有
+ *     `background` 生效）；
+ *   - `QDockWidget::title` 子控件的 background / border / border-radius 都会
+ *     正常绘制；
+ *   - QDockWidget 的直接内容控件可以自由画 background / border / border-radius。
+ * 所以卡片轮廓由「title 的上半圈 + 内容控件的下半圈」拼成：dock 本体只铺画布色，
+ * 让 12px 圆角处透出画布，得到真正的圆角卡片剪影。 */
+QDockWidget {
+    background: @canvas@;
+    color: @text@;
+    border: none;
+}
+
+/* 卡片头（上半圈）：surface 底、加粗、左右留白；上描边 + 上方两角圆角，
+ * 下边不画线（与内容层的上半圈无缝衔接成一张卡片）。 */
+QDockWidget::title {
+    background: @surface@;
+    color: @text@;
+    padding: 6px @gap@;
+    font-weight: bold;
+    border: 1px solid @border@;
+    border-bottom: none;
+    border-top-left-radius: @radius@;
+    border-top-right-radius: @radius@;
+}
+
+/* 卡片体（下半圈）：内容控件默认画 palette Window（画布色），会把卡片中间涂成
+ * 一块画布，所以给它 surface 底 + 左右下描边 + 下方两角圆角；上边不画线，与
+ * 标题的上半圈拼成连续的 1px 轮廓。这条选择器只匹配 QDockWidget 的**直接**
+ * 子控件（内容面板与标题栏按钮，按钮的 subcontrol 规则在前面已经覆盖），
+ * 不是无差别的全局 QWidget 规则，对话框 / 菜单 / 下拉弹层不受影响。 */
+QDockWidget > QWidget {
+    background: @surface@;
+    border: 1px solid @border@;
+    border-top: none;
+    border-bottom-left-radius: @radius@;
+    border-bottom-right-radius: @radius@;
+}
+
+/* 标题栏按钮是 QAbstractButton 子类，上面的「直接子控件」规则与这里的
+ * subcontrol 规则特异度相同，所以必须放在它**后面**才不会被卡片体的描边/底色
+ * 盖住。显式复位成透明按钮，只在 hover 时给一点 surfaceAlt 反馈。 */
+QDockWidget > QAbstractButton,
+QDockWidget::close-button,
+QDockWidget::float-button {
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    padding: 0;
+}
+
+QDockWidget > QAbstractButton:hover,
+QDockWidget::close-button:hover,
+QDockWidget::float-button:hover {
+    background: @surfaceAlt@;
+}
+
+/* QTabWidget 的空隙同理（VCS 面板用 tab 装历史 / 差异，tab 之外的底色默认
+ * 也是 Window）。仍限定在 dock 内。 */
+QDockWidget QTabWidget {
+    background: transparent;
+}
+
+/* 卡片：圆角 + 1px 描边。保留这条规则给仍显式使用 QFrame#veditCard 的容器
+ * （编辑器区域外层，接线车道 §2.3）；dock 面板不再依赖它。 */
+QFrame#veditCard {
+    background: @surface@;
+    border: 1px solid @border@;
+    border-radius: @radius@;
+}
+
+/* --- 工具栏 / 菜单栏 / 状态栏：无边框、随画布 --- */
+
+QToolBar {
+    background: @canvas@;
+    border: none;
+    spacing: 2px;
+    padding: 4px @gap@;
+}
+
+QToolBar::separator {
+    background: @border@;
+    width: 1px;
+    margin: 4px 2px;
+}
+
+QToolButton {
+    background: transparent;
+    color: @text@;
+    border: 1px solid transparent;
+    border-radius: @radiusSm@;
+    padding: 4px 8px;
+}
+
+QToolButton:hover {
+    background: @surfaceAlt@;
+    border-color: @border@;
+}
+
+QToolButton:pressed {
+    background: @accent@;
+    color: @accentText@;
+}
+
+QToolButton:checked {
+    background: @surface@;
+    border-color: @accent@;
+}
+
+QToolButton:disabled {
+    color: @textDisabled@;
+}
+
+QToolButton::menu-indicator {
+    image: none;
+}
+
+QMenuBar {
+    background: @canvas@;
+    color: @text@;
+    border: none;
+}
+
+QMenuBar::item {
+    background: transparent;
+    color: @text@;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
+QMenuBar::item:selected {
+    background: @surfaceAlt@;
+}
+
+QMenuBar::item:pressed {
+    background: @accent@;
+    color: @accentText@;
+}
+
+QStatusBar {
+    background: @canvas@;
+    color: @textMuted@;
+    border: none;
+}
+
+QStatusBar::item {
+    border: none;
+}
+
+QStatusBar QLabel {
+    color: @textMuted@;
+}
+
+/* --- 标签页：胶囊形；选中态是卡片，未选中态透明 --- */
+
+QTabWidget::pane {
+    background: @surface@;
+    border: 1px solid @border@;
+    border-radius: @radius@;
+    top: -1px;
+}
+
+QTabBar::tab {
+    background: transparent;
+    color: @textMuted@;
+    border: 1px solid transparent;
+    border-radius: @radiusSm@;
+    padding: 6px 14px;
+    margin: 2px 2px 0 0;
+}
+
+QTabBar::tab:selected {
+    background: @surface@;
+    color: @text@;
+    border-color: @border@;
+}
+
+QTabBar::tab:hover:!selected {
+    background: @surfaceAlt@;
+    color: @text@;
+}
+
+QTabBar::tab:disabled {
+    color: @textDisabled@;
+}
+
+/* QTabBar 的左右滚动按钮也是 QToolButton（全局工具栏的 `padding: 4px 8px`
+ * 会把 16px 的小滚动按钮撑大）；tab 关闭按钮是 QAbstractButton 子类，只走
+ * subcontrol。两处都显式复位，避免全局按钮规则漏进来。 */
+QTabBar QToolButton {
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+QTabBar::close-button {
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+}
+
+QTabBar::close-button:hover {
+    background: @surfaceAlt@;
+}
+
+/* --- 菜单 --- */
+
+QMenu {
+    background: @surface@;
+    color: @text@;
+    border: 1px solid @border@;
+    border-radius: @radiusSm@;
+    padding: 4px;
+}
+
+QMenu::item {
+    background: transparent;
+    padding: 6px 24px 6px 12px;
+    border-radius: 6px;
+}
+
+QMenu::item:selected {
+    background: @accent@;
+    color: @accentText@;
+}
+
+QMenu::item:disabled {
+    color: @textDisabled@;
+}
+
+QMenu::separator {
+    height: 1px;
+    background: @border@;
+    margin: 4px @gap@;
+}
+
+/* --- 输入控件 --- */
+
+QLineEdit {
+    background: @surface@;
+    color: @text@;
+    border: 1px solid @border@;
+    border-radius: @radiusSm@;
+    padding: 5px 8px;
+    selection-background-color: @accent@;
+    selection-color: @accentText@;
+}
+
+QLineEdit:focus {
+    border: 1px solid @accent@;
+}
+
+QLineEdit:disabled {
+    background: @surfaceAlt@;
+    color: @textDisabled@;
+}
+
+QPushButton {
+    background: @surface@;
+    color: @text@;
+    border: 1px solid @border@;
+    border-radius: @radiusSm@;
+    padding: 6px 14px;
+}
+
+QPushButton:hover {
+    background: @surfaceAlt@;
+}
+
+QPushButton:pressed {
+    background: @accent@;
+    color: @accentText@;
+    border-color: @accent@;
+}
+
+QPushButton:checked {
+    background: @accent@;
+    color: @accentText@;
+    border-color: @accent@;
+}
+
+QPushButton:focus {
+    border-color: @accent@;
+}
+
+QPushButton:disabled {
+    background: @surfaceAlt@;
+    color: @textDisabled@;
+}
+
+/* --- 嵌入式第三方控件复位：KTextEditor ---------------------------------------
+ *
+ * 为什么需要这一段：全局 QPushButton 的 `padding: 6px 14px` 会命中 KTextEditor
+ * 自己的小按钮。运行期取证：编辑区卡片几何完全正确，被裁的是 KateStatusBar 里
+ * 18px 高的 UTF-8 / Soft Tabs / LF / Normal 按钮——18 - 2*6 - 2*1 = 4px 内容高，
+ * 13px 字体被压成横切。这是「全局面板样式污染嵌入式控件」的典型：面板按钮需要
+ * 6px 内边距，嵌入式小按钮需要 0。
+ *
+ * 收法：不删全局规则（面板/对话框按钮仍需要它），而是在**所有已知会嵌入按钮的
+ * KTextEditor 容器**内把盒模型复位。类名逐个取自 libKF6TextEditor 自身的 moc 类表
+ * （KateStatusBar / KateViewBar / KateViewBarWidget / KateSearchBar /
+ * KateCommandLineBar；注意库里没有名为 KateView 的 QObject 类，所以不写它）。
+ * 这些选择器比单个 `QPushButton` 更具体（0,0,2 对 0,0,1），所以能稳定覆盖。
+ * 代价：KTE 若新增容器类，需要在这里补一行（QSS 没有通配类选择器）。
+ */
+KateStatusBar QPushButton,
+KateStatusBar QToolButton,
+KateViewBar QPushButton,
+KateViewBar QToolButton,
+KateViewBarWidget QPushButton,
+KateViewBarWidget QToolButton,
+KateSearchBar QPushButton,
+KateSearchBar QToolButton,
+KateCommandLineBar QPushButton,
+KateCommandLineBar QToolButton {
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    padding: 0 6px;
+    color: @text@;
+}
+
+KateStatusBar QPushButton:hover,
+KateStatusBar QToolButton:hover,
+KateViewBar QPushButton:hover,
+KateViewBar QToolButton:hover,
+KateViewBarWidget QPushButton:hover,
+KateViewBarWidget QToolButton:hover,
+KateSearchBar QPushButton:hover,
+KateSearchBar QToolButton:hover,
+KateCommandLineBar QPushButton:hover,
+KateCommandLineBar QToolButton:hover {
+    background: @surfaceAlt@;
+}
+
+KateStatusBar QPushButton:pressed,
+KateStatusBar QToolButton:pressed,
+KateViewBarWidget QPushButton:pressed,
+KateViewBarWidget QToolButton:pressed,
+KateSearchBar QPushButton:pressed,
+KateSearchBar QToolButton:pressed,
+KateCommandLineBar QPushButton:pressed,
+KateCommandLineBar QToolButton:pressed {
+    background: @surface@;
+}
+
+/* KTextEditor 搜索/命令行条里的 QLineEdit 也复位垂直内边距：全局 5px 会在
+ * 18~24px 的嵌入条里把输入框撑高。 */
+KateViewBarWidget QLineEdit,
+KateSearchBar QLineEdit,
+KateCommandLineBar QLineEdit {
+    padding: 2px 6px;
+}
+
+QComboBox {
+    background: @surface@;
+    color: @text@;
+    border: 1px solid @border@;
+    border-radius: @radiusSm@;
+    padding: 5px 8px;
+}
+
+QComboBox:hover {
+    border-color: @textMuted@;
+}
+
+QComboBox:focus {
+    border-color: @accent@;
+}
+
+QComboBox:disabled {
+    background: @surfaceAlt@;
+    color: @textDisabled@;
+}
+
+QComboBox::drop-down {
+    border: none;
+    width: 18px;
+}
+
+QComboBox QAbstractItemView {
+    background: @surface@;
+    color: @text@;
+    border: 1px solid @border@;
+    border-radius: @radiusSm@;
+    outline: none;
+    selection-background-color: @accent@;
+    selection-color: @accentText@;
+}
+
+QCheckBox {
+    background: transparent;
+    color: @text@;
+    spacing: 6px;
+}
+
+QCheckBox::indicator {
+    width: 14px;
+    height: 14px;
+    border: 1px solid @border@;
+    border-radius: 4px;
+    background: @surface@;
+}
+
+QCheckBox::indicator:hover {
+    border-color: @accent@;
+}
+
+QCheckBox::indicator:checked {
+    background: @accent@;
+    border-color: @accent@;
+}
+
+QCheckBox::indicator:disabled {
+    background: @surfaceAlt@;
+    border-color: @border@;
+}
+
+QCheckBox:disabled {
+    color: @textDisabled@;
+}
+
+/* --- 视图：树 / 列表 / 表头 --- */
+
+QTreeView,
+QListView,
+QTableView {
+    background: @surface@;
+    color: @text@;
+    border: none;
+    outline: none;
+    alternate-background-color: @surfaceAlt@;
+    selection-background-color: @accent@;
+    selection-color: @accentText@;
+}
+
+QTreeView::item,
+QListView::item,
+QTableView::item {
+    padding: 2px 4px;
+}
+
+QTreeView::item:hover,
+QListView::item:hover,
+QTableView::item:hover {
+    background: @surfaceAlt@;
+}
+
+QTreeView::item:selected,
+QListView::item:selected,
+QTableView::item:selected {
+    background: @accent@;
+    color: @accentText@;
+}
+
+QTreeView:disabled,
+QListView:disabled,
+QTableView:disabled {
+    color: @textDisabled@;
+}
+
+QHeaderView {
+    background: transparent;
+}
+
+QHeaderView::section {
+    background: @surfaceAlt@;
+    color: @textMuted@;
+    border: none;
+    border-bottom: 1px solid @border@;
+    border-right: 1px solid @border@;
+    padding: 4px 8px;
+}
+
+QHeaderView::section:hover {
+    color: @text@;
+}
+
+/* --- 滚动条：细、无箭头、hover 才提亮 --- */
+
+QScrollBar:vertical {
+    background: transparent;
+    border: none;
+    width: 10px;
+    margin: 0;
+}
+
+QScrollBar::handle:vertical {
+    background: @border@;
+    border-radius: 5px;
+    min-height: 24px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: @textMuted@;
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    background: transparent;
+    border: none;
+    height: 0;
+}
+
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    background: transparent;
+}
+
+QScrollBar:horizontal {
+    background: transparent;
+    border: none;
+    height: 10px;
+    margin: 0;
+}
+
+QScrollBar::handle:horizontal {
+    background: @border@;
+    border-radius: 5px;
+    min-width: 24px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background: @textMuted@;
+}
+
+QScrollBar::add-line:horizontal,
+QScrollBar::sub-line:horizontal {
+    background: transparent;
+    border: none;
+    width: 0;
+}
+
+QScrollBar::add-page:horizontal,
+QScrollBar::sub-page:horizontal {
+    background: transparent;
+}
+
+/* --- 文本与杂项 --- */
+
+/* 面板里的多行文本 / 差异视图（VCS 历史、设置页的清单编辑框、帮助窗口）：
+ * 底色用卡片的 surface，避免默认的 Window 画布色在卡片中间留补丁。 */
+QPlainTextEdit,
+QTextEdit {
+    background: @surface@;
+    color: @text@;
+    border: 1px solid @border@;
+    border-radius: @radiusSm@;
+    selection-background-color: @accent@;
+    selection-color: @accentText@;
+}
+
+QPlainTextEdit:disabled,
+QTextEdit:disabled {
+    background: @surfaceAlt@;
+    color: @textDisabled@;
+}
+
+QLabel {
+    background: transparent;
+    color: @text@;
+}
+
+QLabel:disabled {
+    color: @textDisabled@;
+}
+
+QGroupBox {
+    background: transparent;
+    color: @text@;
+    border: 1px solid @border@;
+    border-radius: @radius@;
+    margin-top: 1.2em;
+    padding: @gap@;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: @gap@;
+    padding: 0 4px;
+    color: @textMuted@;
+}
+
+QToolTip {
+    background: @surface@;
+    color: @text@;
+    border: 1px solid @border@;
+    border-radius: 6px;
+    padding: 4px 8px;
+}
+
+QSplitter::handle {
+    background: @canvas@;
+}
+
+QSplitter::handle:hover {
+    background: @border@;
+}

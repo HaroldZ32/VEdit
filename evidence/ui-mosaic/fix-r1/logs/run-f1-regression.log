@@ -1,0 +1,17 @@
+PASS  case1: the live switch applied qingkong (status-theme=主题：晴空蓝 / Breeze Light style=2 toolbarIconSize=20x20)
+PASS  case1: settings.toml now carries uiTheme = "qingkong" (the Preferences key)
+PASS  case1: session archive uiTheme was synced to qingkong
+PASS  case1: restart read the switch back (theme=qingkong)
+PASS  case1: status-theme names the stored Sky Blue theme (zh_CN UI)
+PASS  case2: with no switch, settings.toml still wins over the archive (bohe)
+PASS  case2: the second start also reads bohe (settings stays authoritative)
+PASS  case3: an absent settings.toml falls back to the archived shenye
+PASS  case4: invalid settings id fell through to the archive (shenye), not yunwu
+PASS  case4: the fallback is a VISIBLE diagnostic (not silent)
+PASS  case5: invalid settings id with no archive lands on the contract default (yunwu)
+PASS  case5: the default fallback is still diagnosed
+PASS  case6: the menu switch wrote the store's exact spelling (uiTheme = "xinghuang")
+PASS  case6: settings.toml is still valid TOML with the OTHER key preserved
+
+== summary: pass=14 fail=0 ==
+F1-REGRESSION PASS

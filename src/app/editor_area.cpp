@@ -4,12 +4,14 @@
 
 #include "editor_provider.h"
 #include "path_display.h"
+#include "product_theme.h"
 
 #if defined(VEDIT_APP_HAVE_BREADCRUMB)
 #include "breadcrumb_bar.h"
 #endif
 
 #include <QAction>
+#include <QApplication>
 #include <QCoreApplication>
 #include <QEvent>
 #include <QFileInfo>
@@ -42,6 +44,26 @@
 #include <vector>
 
 namespace vedit::app {
+
+namespace {
+
+// UI-Mosaic T3: the product theme the application palette currently represents.
+// The palette is the one place every product-theme switch converges (the shell
+// and the Preferences combo both go through ThemeManager::applyUiTheme), so the
+// tab strip can follow it without a second registration seam. `canvas` is unique
+// per theme; before the first application the contract default is used.
+const ProductTheme &currentProductTheme()
+{
+    const QColor window = QApplication::palette().color(QPalette::Window);
+    for (const ProductTheme &theme : productThemes()) {
+        if (theme.canvas.rgb() == window.rgb()) {
+            return theme;
+        }
+    }
+    return defaultProductTheme();
+}
+
+} // namespace
 
 namespace {
 
@@ -632,41 +654,32 @@ void EditorPane::applyTabStyle()
     // here. The flag breaks that cycle, the cached string keeps a repaint that
     // changes nothing from touching the style system at all.
     applyingTabStyle_ = true;
-    // AC-9.2: the active tab is unmistakable — a saturated background, bold
-    // text and an accent bar on its TOP edge. Every colour comes from the
-    // application palette, because the shell applies a theme as a QPalette (not
-    // as a stylesheet), so the five syntax themes keep working.
-    const QPalette pal = palette();
-    const QColor bar = pal.color(QPalette::Window);
-    const QColor tab = pal.color(QPalette::Button);
-    const QColor tabText = pal.color(QPalette::ButtonText);
-    const QColor hover = tab.lighter(115);
-    const QColor border = bar.darker(125);
-    const QColor selected = pal.color(QPalette::Highlight);
-    const QColor selectedText = pal.color(QPalette::HighlightedText);
+    // AC-9.2 + UI-Mosaic T3: the active tab is unmistakable and both states come
+    // from the PRODUCT theme tokens instead of palette blends (contract §2.3):
+    // 8px pill radius, the selected pill is surface + accent text + 1px border,
+    // the unselected pill stays transparent, hover uses surfaceAlt.
+    const ProductTheme &theme = currentProductTheme();
     const QString sheet = QStringLiteral(
-                             "QTabBar { background: %6; }"
-                             "QTabBar::tab { background: %1; color: %2; padding: 4px 8px 4px 10px;"
-                             " margin: 0px; border: none; border-right: 1px solid %5; }"
-                             "QTabBar::tab:selected { background: %3; color: %4;"
-                             " font-weight: 600; border-top: 2px solid %9; }"
-                             "QTabBar::tab:hover:!selected { background: %7; }"
-                             "QToolButton { border: none; background: transparent; color: %8; }")
-                             .arg(tab.name(), tabText.name(), selected.name(), selectedText.name(),
-                                  border.name(), bar.name(), hover.name(), tabText.name(),
-                                  selectedText.name());
+                             "QTabBar { background: transparent; }"
+                             "QTabBar::tab { background: transparent; color: %1;"
+                             " padding: 4px 10px; margin: 3px 4px 0px 0px;"
+                             " border: 1px solid transparent; border-radius: 8px; }"
+                             "QTabBar::tab:selected { background: %2; color: %3;"
+                             " border: 1px solid %4; font-weight: 600; }"
+                             "QTabBar::tab:hover:!selected { background: %5; }"
+                             "QToolButton { border: none; background: transparent; color: %1; }")
+                             .arg(theme.textMuted.name(), theme.surface.name(),
+                                  theme.accent.name(), theme.border.name(),
+                                  theme.surfaceAlt.name());
     if (sheet != tabStyleSheet_) {
         tabStyleSheet_ = sheet;
         tabs_->setStyleSheet(sheet);
     }
     if (activeBadge_ != nullptr) {
-        // HighlightText is white on the light themes: as plain text on the pane
-        // strip it is unreadable (and it sits right next to the pane's × button,
-        // where white-on-white reads as nothing at all). The accent colour is the
-        // same hue as the selected tab, so the badge ties to it and stays legible
-        // on every theme.
+        // The accent colour is also the selected pill's text colour, so the badge
+        // ties to it and stays legible on every product theme.
         const QString badgeSheet =
-            QStringLiteral("color: %1; font-weight: 600;").arg(selected.name());
+            QStringLiteral("color: %1; font-weight: 600;").arg(theme.accent.name());
         if (activeBadge_->styleSheet() != badgeSheet) {
             activeBadge_->setStyleSheet(badgeSheet);
         }
@@ -1340,7 +1353,10 @@ void EditorPane::changeEvent(QEvent *event)
 EditorArea::EditorArea(QWidget *parent)
     : QWidget(parent)
 {
-    setObjectName(QStringLiteral("editor-area"));
+    // UI-Mosaic T3: the editor area is a card surface. The chrome shell wraps it
+    // in the QFrame that carries this objectName (cards.qss selects it), and the
+    // name is set here too so the container is identifiable from inside the lane.
+    setObjectName(QStringLiteral("veditCard"));
     layout_ = new QVBoxLayout(this);
     layout_->setContentsMargins(0, 0, 0, 0);
     layout_->setSpacing(0);

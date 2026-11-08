@@ -1,0 +1,3 @@
+dock: gap=8 corner=#fff4f4f2 titleBorder=#fff5f5f4 bodyLeft=#fff5f5f4 bodyMid=#ffffffff
+old(before)    darkTextPixels=25
+patched(after) darkTextPixels=210

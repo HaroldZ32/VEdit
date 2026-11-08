@@ -1,0 +1,22 @@
+total 8
+drwxrwxrwt  2 haroldzhao haroldzhao 4096 Nov  8 23:12 .
+drwxrwxr-x 19 haroldzhao haroldzhao 4096 Nov  8 23:12 ..
+srwxrwxrwx  1 haroldzhao haroldzhao    0 Nov  8 23:12 X97
+--- yunwu + paired default syntax theme (Breeze Light) ---
+BACKEND-SWITCHED backend=verible lint=slang lsp=/vedit-build/.mpd/recon/verible/bin/verible-verilog-ls engine=/vedit-build/build/slang/out/slang basis=measured argv='backend=verible program=/vedit-build/.mpd/recon/verible/bin/verible-verilog-ls'
+BACKEND-AUX aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server]
+SWITCH elapsed-ms=0 backend=verible lint=slang basis=measured
+captured yunwu-breeze-light size=(1680, 1050) mean_luma=144.3
+--- yunwu + explicit syntax theme (Breeze Dark), same file ---
+BACKEND-SWITCHED backend=verible lint=slang lsp=/vedit-build/.mpd/recon/verible/bin/verible-verilog-ls engine=/vedit-build/build/slang/out/slang basis=measured argv='backend=verible program=/vedit-build/.mpd/recon/verible/bin/verible-verilog-ls'
+BACKEND-AUX aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server]
+SWITCH elapsed-ms=0 backend=verible lint=slang basis=measured
+captured yunwu-breeze-dark size=(1680, 1050) mean_luma=119.5
+light mean_luma=144.3 dark mean_luma=119.5
+diff bbox: (587, 113, 1178, 817)
+changed pixels (>8): 226018
+changed row bands: [(113, 769), (804, 816)]
+changed pixels in editor/panel area (y<780): 224784
+changed pixels in status strip (y>=780): 1234
+changed rows: top=113 bottom=816
+F2-PIXEL: PASS - the editor text area changed

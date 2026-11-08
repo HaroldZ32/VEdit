@@ -1,0 +1,15 @@
+CHECK PASS  drop-48: vedit.desktop carries Icon=io.github.vedit.VEdit
+CHECK PASS  drop-48: vedit.desktop carries StartupWMClass=io.github.vedit.VEdit
+CHECK PASS  drop-48: icon artifact present: io.github.vedit.VEdit.png (858 bytes)
+CHECK PASS  drop-48: icon artifact present: .DirIcon (858 bytes)
+CHECK PASS  drop-48: icon artifact present: usr/share/icons/hicolor/16x16/apps/io.github.vedit.VEdit.png (86 bytes)
+CHECK PASS  drop-48: icon artifact present: usr/share/icons/hicolor/24x24/apps/io.github.vedit.VEdit.png (97 bytes)
+CHECK PASS  drop-48: icon artifact present: usr/share/icons/hicolor/32x32/apps/io.github.vedit.VEdit.png (108 bytes)
+CHECK FAIL  drop-48: icon artifact missing or empty: usr/share/icons/hicolor/48x48/apps/io.github.vedit.VEdit.png
+CHECK PASS  drop-48: icon artifact present: usr/share/icons/hicolor/64x64/apps/io.github.vedit.VEdit.png (210 bytes)
+CHECK PASS  drop-48: icon artifact present: usr/share/icons/hicolor/128x128/apps/io.github.vedit.VEdit.png (394 bytes)
+CHECK PASS  drop-48: icon artifact present: usr/share/icons/hicolor/256x256/apps/io.github.vedit.VEdit.png (858 bytes)
+CHECK PASS  drop-48: icon artifact present: usr/share/icons/hicolor/512x512/apps/io.github.vedit.VEdit.png (2203 bytes)
+CHECK PASS  drop-48: io.github.vedit.VEdit.png is a PNG (magic ok)
+CHECK PASS  drop-48: .DirIcon is a PNG (magic ok)
+SUMMARY label=drop-48 ok=13 bad=1

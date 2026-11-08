@@ -1,0 +1,24 @@
+=== F1 probe entry=view label=prefix-view bin=/vedit-build/evidence/ui-mosaic/review-r1/logs/prefix-vedit-app at 2026-11-08T22:56:06+08:00 ===
+app win=0x200007 geom=(x=0,y=0,w=1280,h=820)
+app origin=(0,0) size=1280x820
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-prefix-view/01-start.png (1680, 1050)
+settings@start:
+uiTheme = "bohe"
+archive@start: 
+view menu popup=(103,22 353x576)
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-prefix-view/02-viewmenu.png (1680, 1050)
+theme submenu=(449,562 86x166)
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-prefix-view/03-themesubmenu.png (1680, 1050)
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-prefix-view/06-after-switch.png (1680, 1050)
+settings@after-switch:
+uiTheme = "bohe"
+archive@after-switch: 
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-prefix-view/07-prefs-after-switch.png (1680, 1050)
+color-after-switch=(238, 243, 248) color-with-prefs-open=(239, 245, 241)
+settings@after-quit:
+uiTheme = "bohe"
+archive@after-quit: 
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-prefix-view/08-after-quit.png (1680, 1050)
+restart-probe:
+theme=bohe
+status-theme=Theme:

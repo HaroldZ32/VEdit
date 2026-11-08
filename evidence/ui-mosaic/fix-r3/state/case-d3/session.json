@@ -1,0 +1,25 @@
+{
+    "dockState": "AAAA/wAAAAD9AAAAAgAAAAAAAAAAAAAAAPwCAAAAAfsAAAAYAGQAbwBjAGsALQBwAHIAbwBqAGUAYwB0AAAAAAD/////AAAB2gD///8AAAABAAABSwAAAtT8AgAAAAL7AAAAIABkAG8AYwBrAC0AbQBvAGQAdQBsAGUALQB0AHIAZQBlAQAAAEoAAAH1AAAAogD////7AAAAKABkAG8AYwBrAC0AaQBuAHQAZQByAGYAYQBjAGUALQBwAGEAbgBlAGwBAAACRwAAANcAAABaAP///wAAA60AAALUAAAABAAAAAQAAAAIAAAACPwAAAABAAAAAgAAAAIAAAAkAHYAZQBkAGkAdAAtAG0AYQBpAG4ALQB0AG8AbwBsAGIAYQByAQAAAAD/////AAAAAAAAAAAAAAAmAHYAZQBkAGkAdAAtAHQAaABlAG0AZQAtAHQAbwBvAGwAYgBhAHIBAAAEyP////8AAAAAAAAAAA==",
+    "editorLayout": {
+        "active": "pane-1",
+        "nextPane": 2,
+        "root": {
+            "activeTab": -1,
+            "documents": [
+            ],
+            "pane": "pane-1",
+            "provider": "ktexteditor",
+            "type": "leaf"
+        },
+        "version": 2
+    },
+    "geometry": "AdnQywADAAAAAAAAAAAAAAAABQMAAAM3AAAAAgAAAAIAAAUBAAADNQAAAAAAAAAAAyAAAAACAAAAAgAABQEAAAM1",
+    "panels": [
+        "module-tree",
+        "interface-panel"
+    ],
+    "project": "",
+    "theme": "Breeze Dark",
+    "uiTheme": "yunwu",
+    "version": 2
+}

@@ -1,0 +1,42 @@
+ M build/evidence/12-gates-image-build.log
+ M docs/USER_GUIDE.md
+ M evidence/ffi-abi/logs/10-rust-image.txt
+ M evidence/ffi-abi/logs/19-rust-stage-console.log
+ M evidence/ffi-abi/logs/20-cargo-build-release.log
+ M evidence/ffi-abi/logs/21-staticlib.txt
+ M evidence/ffi-abi/logs/23-cargo-test.log
+ M evidence/ffi-abi/logs/24-cargo-tree-vd-ffi.txt
+ M evidence/ffi-abi/logs/25-reused-crates.txt
+ M evidence/ffi-abi/logs/26-vd_ffi.h
+ M evidence/ffi-abi/logs/27-vd_ffi-comment-free.txt
+ M evidence/m0-build/build-logs/20-qt6-image-build.log
+ M evidence/m0-build/build-logs/21-qt6-image-id.txt
+ M evidence/m0-build/build-logs/31-qt6-configure.log
+ M evidence/m0-build/build-logs/32-qt6-build.log
+ M evidence/m0-build/build-logs/33-qt6-ctest.log
+ M evidence/m0-build/build-logs/34-qt6-elf.txt
+ M evidence/m0-build/build-logs/37-qt6-rust-abi.txt
+ M packaging/appimage/assets/io.github.vedit.VEdit.png
+ M packaging/runtime/assemble-appdir.sh
+ M packaging/runtime/assets/vedit.desktop
+ M packaging/runtime/verify-f2-isolation.sh
+ M src/app/CMakeLists.txt
+ M src/app/app_shell.cpp
+ M src/app/app_shell.h
+ M src/app/editor_area.cpp
+ M src/app/main.cpp
+ M src/app/session_store.h
+ M src/app/theme_manager.cpp
+ M src/app/theme_manager.h
+ M src/workspace/settings/settings_panel.cpp
+ M translations/vedit_zh_CN.ts
+?? evidence/ui-mosaic/
+?? resources/app_icon.qrc
+?? resources/icons/
+?? resources/themes/
+?? scripts/build-app-icons.py
+?? src/app/product_theme.cpp
+?? src/app/product_theme.h
+?? src/app/themed_icons.cpp
+?? src/app/themed_icons.h
+?? src/app/ui_theme_selftest.cpp

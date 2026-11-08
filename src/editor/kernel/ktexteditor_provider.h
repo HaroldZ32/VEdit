@@ -41,6 +41,11 @@ public:
     QString displayName() const override;
     QWidget *createEditor(QWidget *parent) override;
 
+    // UI-Mosaic F2: the editor owns the syntax-theme rendering. The name comes
+    // from vedit::app::ThemeManager; it is applied to every open view and to
+    // every view created later (KTextEditor keeps the theme per view).
+    void applySyntaxTheme(const QString &themeName) override;
+
     bool openFile(QWidget *editor, const QString &absolutePath, QString *error) override;
     QString currentFilePath(QWidget *editor) const override;
     bool saveFile(QWidget *editor, QString *error) override;
@@ -62,6 +67,12 @@ public:
 
 private:
     void notifyStatus(QWidget *editor);
+
+    // UI-Mosaic F2: the last theme name KTextEditor accepted, so a view created
+    // after the switch starts out with the right colors instead of the library
+    // default. Empty until the shell hands one over (or when KTextEditor is
+    // unavailable in this build).
+    QString syntaxTheme_;
 
     QHash<QWidget *, std::function<void()>> statusListeners_;
     QHash<QWidget *, QMetaObject::Connection> modifiedConnections_;

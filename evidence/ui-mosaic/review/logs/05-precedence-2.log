@@ -1,0 +1,9 @@
+--- seed a valid archive from a real run (settings yaoshi) ---
+seed                           theme=yaoshi
+                               archive-after-exit=yaoshi
+--- archive-only: archive edited to shenye, NO settings.toml ---
+archive-shenye                 theme=shenye
+                               archive-after-exit=shenye
+--- invalid settings id + archive shenye: what wins? ---
+invalid-settings               theme=yunwu
+                               archive-after-exit=yunwu

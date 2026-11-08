@@ -1,0 +1,6 @@
+yunwu: save=1 size=900x560
+  dock card: corner(0,0)=#fff4f4f2 titleBorder=#fff5f5f4 bodyLeft=#fff5f5f4 bodyMid=#ffffffff | expected surface=#ffffff border=#f5f5f4 canvas=#f4f4f2
+yaoshi: save=1 size=900x560
+  dock card: corner(0,0)=#ff131315 titleBorder=#ff141416 bodyLeft=#ff141416 bodyMid=#ff1d1d20 | expected surface=#1d1d20 border=#141416 canvas=#131315
+shenye: save=1 size=900x560
+  dock card: corner(0,0)=#ff0f1622 titleBorder=#ff101723 bodyLeft=#ff101723 bodyMid=#ff161f2e | expected surface=#161f2e border=#101723 canvas=#0f1622

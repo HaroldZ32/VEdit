@@ -1,0 +1,13 @@
+Pillow 12.1.1
+path                                                                size          corners  centre               alpha_bbox opaque% verdict
+resources/icons/hicolor/16x16/apps/io.github.vedit.VEdit.png   16x16          [0, 0, 0, 0]     255           (0, 0, 16, 16)   98.44 OK
+resources/icons/hicolor/24x24/apps/io.github.vedit.VEdit.png   24x24          [0, 0, 0, 0]     255           (0, 0, 24, 24)   97.22 OK
+resources/icons/hicolor/32x32/apps/io.github.vedit.VEdit.png   32x32          [0, 0, 0, 0]     255           (0, 0, 32, 32)   96.88 OK
+resources/icons/hicolor/48x48/apps/io.github.vedit.VEdit.png   48x48          [0, 0, 0, 0]     255           (0, 0, 48, 48)   96.01 OK
+resources/icons/hicolor/64x64/apps/io.github.vedit.VEdit.png   64x64          [0, 0, 0, 0]     255           (0, 0, 64, 64)   91.80 OK
+resources/icons/hicolor/128x128/apps/io.github.vedit.VEdit.png 128x128         [0, 0, 0, 0]     255         (0, 0, 128, 128)   92.65 OK
+resources/icons/hicolor/256x256/apps/io.github.vedit.VEdit.png 256x256         [0, 0, 0, 0]     255         (2, 2, 254, 254)   91.01 OK
+resources/icons/hicolor/512x512/apps/io.github.vedit.VEdit.png 512x512         [0, 0, 0, 0]     255         (7, 7, 505, 505)   89.75 OK
+resources/icons/app/vedit-light.png                            512x512         [0, 0, 0, 0]     255         (7, 7, 505, 505)   89.75 OK
+resources/icons/app/vedit-dark.png                             512x512         [0, 0, 0, 0]     255         (7, 7, 505, 505)   89.75 OK
+resources/icons/app/vedit-mono.png                             512x512         [0, 0, 0, 0]     255         (7, 7, 505, 505)   89.75 OK

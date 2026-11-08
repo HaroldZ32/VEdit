@@ -1,0 +1,33 @@
+== source copies (byte-identical originals) ==
+  resources/icons/src/vedit-dark.png  sha256=fd53e0570b7a8f5a67fbb862862ab5577f8579a8c706832adbdc843601a7e704  (from 1.png)
+  resources/icons/src/vedit-light.png  sha256=da475ebe50841d59ca45333b562d55f6b51a5ef81828222e1569cf558138fa47  (from 2.png)
+  resources/icons/src/vedit-mono.png  sha256=ab20f26a4d04935b01b18c495829de8008a92e93d667b249a473785f81f1ec54  (from 3.png)
+== silhouette (four-corner flood fill, tolerance 12) ==
+  dark  independent fill: opaque=0.9582 bbox=(0, 0, 2160, 2160)
+  light independent fill: opaque=0.2026 bbox=(204, 204, 1956, 1936)
+  mono  independent fill: opaque=0.9582 bbox=(0, 0, 2160, 2160)
+  light: its own fill leaked into the artwork (0.2026 vs 0.9582 opaque) — using the shared dark silhouette
+== app masters (512x512, :/icons/app/) ==
+== hicolor theme (light variant, Lanczos) ==
+assert: hicolor 16x16 and 512x512 exist with the expected dimensions
+== alpha criterion (corner 0 / centre 255) ==
+verify hicolor 16x16: 16x16 corner_alpha=[0, 0, 0, 0] centre_alpha=255 -> ok
+verify hicolor 256x256: 256x256 corner_alpha=[0, 0, 0, 0] centre_alpha=255 -> ok
+verify hicolor 512x512: 512x512 corner_alpha=[0, 0, 0, 0] centre_alpha=255 -> ok
+verify app light: 512x512 corner_alpha=[0, 0, 0, 0] centre_alpha=255 -> ok
+== artifacts ==
+  resources/icons/src/vedit-dark.png  2160x2160  sha256=fd53e0570b7a8f5a67fbb862862ab5577f8579a8c706832adbdc843601a7e704
+  resources/icons/src/vedit-light.png  2160x2160  sha256=da475ebe50841d59ca45333b562d55f6b51a5ef81828222e1569cf558138fa47
+  resources/icons/src/vedit-mono.png  2160x2160  sha256=ab20f26a4d04935b01b18c495829de8008a92e93d667b249a473785f81f1ec54
+  resources/icons/app/vedit-dark.png  512x512  sha256=f3509db824b38d02d970b0c2d191187bdaa49879adedd94936a8d13819d4982e
+  resources/icons/app/vedit-light.png  512x512  sha256=2ec5b469ae311bf73e95b2574e16619f0c87407a563b1928b527a0cf7692c4b8
+  resources/icons/app/vedit-mono.png  512x512  sha256=529175898f2ac0b4a42949fc7a1c6c7daf3d7ecdad4742badeb1539be8e44841
+  resources/icons/hicolor/16x16/apps/io.github.vedit.VEdit.png  16x16  sha256=8d7c7dc1d887a6a394f5c13fd70283e04ec356f8a4bf9c1ae1a2bba319701b51
+  resources/icons/hicolor/24x24/apps/io.github.vedit.VEdit.png  24x24  sha256=2370e425aab60aa2c6f47f0b2da1e9627d2dfd51b0597cb301aff18835fd653e
+  resources/icons/hicolor/32x32/apps/io.github.vedit.VEdit.png  32x32  sha256=029bd674c4338cc955c7845c0040ae9193dccd0a38d8b6adf72a6eba4b3d596b
+  resources/icons/hicolor/48x48/apps/io.github.vedit.VEdit.png  48x48  sha256=32f60f0b519ea8e9f982b6f88958766d0d06f6849855cf52fb136ba41b7aca74
+  resources/icons/hicolor/64x64/apps/io.github.vedit.VEdit.png  64x64  sha256=d011f0b459948885b3808df07f94e5984e038c7d3d15b0fa8dfa5237fd114d21
+  resources/icons/hicolor/128x128/apps/io.github.vedit.VEdit.png  128x128  sha256=e035cecb941ba5358203def3c1fa01a72f8119fdb9a85f49be12c96f525e497c
+  resources/icons/hicolor/256x256/apps/io.github.vedit.VEdit.png  256x256  sha256=3e7efb5b041332e6530e9e7b1bf21fa53c02b355a4406b854c2b9e80f37c4eb3
+  resources/icons/hicolor/512x512/apps/io.github.vedit.VEdit.png  512x512  sha256=2ec5b469ae311bf73e95b2574e16619f0c87407a563b1928b527a0cf7692c4b8
+OK: 14 artifacts written under resources/icons/

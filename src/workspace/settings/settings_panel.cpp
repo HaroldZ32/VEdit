@@ -2,6 +2,7 @@
 
 #include "command_registry.h"
 #include "i18n.h"
+#include "product_theme.h"
 #include "settings_keys.h"
 #include "theme_manager.h"
 
@@ -49,6 +50,10 @@ namespace i18n = vedit::app::i18n;
 
 namespace {
 const char *const kThemeKey = "theme";
+// UI-Mosaic T3: the product (chrome) theme id. ApplicationShell reads the same
+// key at startup (settings.toml > session archive > yunwu), so the spelling is
+// shared state, not a private detail of this panel.
+const char *const kUiThemeKey = "uiTheme";
 const char *const kKeymapPrefix = "keymap.";
 
 // FIM timeout/token bounds; the Rust transport clamps to the same range, so a
@@ -312,6 +317,19 @@ void SettingsPanel::buildUi()
     // not a page of its own (item 10.2 fixes the three pages).
     auto *themeGroup = new QGroupBox(tr("Theme"), this);
     auto *themeForm = new QFormLayout(themeGroup);
+    // UI-Mosaic T3: the PRODUCT theme is listed above the syntax theme. One
+    // switches the whole chrome (palette + cards.qss), the other only the
+    // editor's syntax colours; the display names are the contract's frozen data.
+    auto *uiThemeCombo = new QComboBox(themeGroup);
+    uiThemeCombo->setObjectName(QStringLiteral("settings-ui-theme"));
+    for (const vedit::app::ProductTheme &theme : vedit::app::productThemes()) {
+        uiThemeCombo->addItem(theme.displayName, theme.id);
+    }
+    themeForm->addRow(tr("Interface theme:"), uiThemeCombo);
+    auto *uiThemeHint = new QLabel(
+        tr("Applied immediately and stored as `uiTheme` by the Rust service."), themeGroup);
+    uiThemeHint->setWordWrap(true);
+    themeForm->addRow(uiThemeHint);
     themeCombo_ = new QComboBox(themeGroup);
     themeCombo_->setObjectName(QStringLiteral("settings-theme"));
     themeForm->addRow(tr("Theme:"), themeCombo_);
@@ -371,6 +389,38 @@ void SettingsPanel::buildUi()
 
     connect(themeCombo_, &QComboBox::activated, this,
             [this](int index) { setTheme(themeCombo_->itemText(index)); });
+    // UI-Mosaic T3: the interface theme applies immediately and is persisted
+    // under `uiTheme`; the state label uses the same wording as the syntax
+    // theme's success/failure paths.
+    connect(uiThemeCombo, &QComboBox::activated, this, [this, uiThemeCombo](int index) {
+        if (themes_ == nullptr) {
+            return;
+        }
+        const QString id = uiThemeCombo->itemData(index).toString();
+        QString error;
+        if (!themes_->applyUiTheme(id, &error)) {
+            addDiagnostic(error);
+            statusLabel_->setText(tr("Interface theme '%1' could not be applied.").arg(id));
+            refreshThemeCombo();
+            return;
+        }
+        // UI-Mosaic T6: a product theme carries a paired syntax theme. It is
+        // applied only when the user never chose a syntax theme explicitly
+        // (the `theme` key is then absent); an explicit choice is preserved.
+        const vedit::app::ProductTheme *product = vedit::app::productThemeById(id);
+        if (product != nullptr
+            && SettingsClient::valueOf(entries_, QString::fromLatin1(kThemeKey)).isEmpty()) {
+            QString syntaxError;
+            if (!themes_->applyTheme(product->syntaxTheme, &syntaxError)) {
+                addDiagnostic(syntaxError);
+            }
+        }
+        SettingsClient::setValue(&entries_, QString::fromLatin1(kUiThemeKey), id);
+        persist();
+        refreshThemeCombo();
+        statusLabel_->setText(
+            tr("Interface theme '%1' applied and stored by the Rust service.").arg(id));
+    });
     connect(assignButton_, &QPushButton::clicked, this, [this]() { applyEditorShortcut(); });
     connect(clearButton_, &QPushButton::clicked, this, [this]() {
         const QString command = selectedCommand();
@@ -774,7 +824,30 @@ bool SettingsPanel::flush(int timeoutMs)
 void SettingsPanel::applyThemeFromEntries()
 {
     const QString stored = SettingsClient::valueOf(entries_, QString::fromLatin1(kThemeKey));
-    if (stored.isEmpty() || themes_ == nullptr) {
+    if (themes_ == nullptr) {
+        return;
+    }
+    // UI-Mosaic T3: the stored product theme is restored first (the shell reads
+    // the same `uiTheme` key at startup). An empty value means "not chosen yet",
+    // so whatever the session/startup path applied is kept.
+    const QString storedUi = SettingsClient::valueOf(entries_, QString::fromLatin1(kUiThemeKey));
+    if (!storedUi.isEmpty()) {
+        // UI-Mosaic R1/M2: an id no product theme answers is treated as UNSET here
+        // too (same rule as the startup path), so reloading Preferences keeps the
+        // theme the shell is running instead of logging a failed re-apply.
+        if (vedit::app::productThemeById(storedUi) == nullptr) {
+            addDiagnostic(tr("Ignoring unknown interface theme '%1' (from %2)")
+                              .arg(storedUi, QStringLiteral("settings.toml")));
+        } else if (themes_->currentUiTheme() != storedUi) {
+            QString uiError;
+            if (!themes_->applyUiTheme(storedUi, &uiError)) {
+                addDiagnostic(
+                    tr("Interface theme '%1' could not be applied: %2").arg(storedUi, uiError));
+            }
+        }
+    }
+    if (stored.isEmpty()) {
+        refreshThemeCombo();
         return;
     }
     QString error;
@@ -1644,6 +1717,18 @@ void SettingsPanel::refreshThemeCombo()
         themeCombo_->setCurrentIndex(themeCombo_->count() - 1);
     }
     themeCombo_->blockSignals(false);
+    // The product-theme combo (UI-Mosaic T3) follows the SAME live state: a
+    // switch made from the View menu or the toolbar is reflected here without a
+    // second source of truth.
+    auto *uiCombo = findChild<QComboBox *>(QStringLiteral("settings-ui-theme"));
+    if (uiCombo != nullptr) {
+        const int uiIndex = uiCombo->findData(themes_->currentUiTheme());
+        uiCombo->blockSignals(true);
+        if (uiIndex >= 0) {
+            uiCombo->setCurrentIndex(uiIndex);
+        }
+        uiCombo->blockSignals(false);
+    }
 }
 
 void SettingsPanel::refreshKeyTable()

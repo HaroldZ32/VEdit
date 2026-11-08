@@ -1,0 +1,25 @@
+=== F1 probe entry=toolbar label=r2a-toolbar-iso bin=/vedit-build/evidence/ui-mosaic/review-r1/logs/r1-binary at 2026-11-08T23:06:17+08:00 ===
+focus win=0x200007
+app win=0x200007 geom=(x=0,y=0,w=1280,h=820)
+app origin=(0,0) size=1280x820
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/r2/r2a-toolbar-iso/01-start.png (1680, 1050)
+settings@start:
+uiTheme = "bohe"
+archive@start: 
+toolbar theme popup=(1236,66 146x166)
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/r2/r2a-toolbar-iso/02-toolbarmenu.png (1680, 1050)
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/r2/r2a-toolbar-iso/06-after-switch.png (1680, 1050)
+settings@after-switch:
+uiTheme = "qingkong"
+archive@after-switch: 
+focus win=0x200007
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/r2/r2a-toolbar-iso/07-prefs-after-switch.png (1680, 1050)
+color-after-switch=(238, 243, 248) color-with-prefs-open=(238, 243, 248)
+focus win=0x200007
+settings@after-quit:
+uiTheme = "qingkong"
+archive@after-quit: qingkong
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/r2/r2a-toolbar-iso/08-after-quit.png (1680, 1050)
+restart-probe:
+theme=qingkong
+status-theme=Theme:

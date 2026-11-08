@@ -20,6 +20,11 @@ set(CMAKE_AUTOMOC ON)
 # second install rule.
 set(CMAKE_AUTORCC ON)
 
+# UI-Mosaic T1: themed_icons.cpp recolours the SVG action set at render time, so
+# the shell links QtSvg. It is part of the pinned Qt6 6.10.2 image (see
+# scripts/docker/qt6-locked-packages.txt) — not a new third-party dependency.
+find_package(Qt6 REQUIRED COMPONENTS Svg)
+
 set(VEDIT_APP_SHELL_SOURCES
   desktop_shortcuts.cpp
   app_shell.cpp
@@ -30,10 +35,24 @@ set(VEDIT_APP_SHELL_SOURCES
   help_viewer.cpp
   i18n.cpp
   panel_registry.cpp
+  product_theme.cpp
   session_store.cpp
   theme_manager.cpp
+  themed_icons.cpp
   "${CMAKE_CURRENT_SOURCE_DIR}/../../resources/help/user_manual.qrc"
 )
+
+# UI-Mosaic T1: the product theme is DATA — the card stylesheet template and the
+# window/action icons are compiled into the executable that displays them.
+# They are attached to the EXECUTABLES (not to the static library) so Qt's rcc
+# initialiser always runs before main() without a Q_INIT_RESOURCE call:
+# main.cpp belongs to the icon lane and is frozen for this task, and a qrc that
+# sits only in the archive is dropped by the linker unless something references
+# its init symbol. The ui-theme selftest links the shell library and exercises
+# the same rendering code, so it receives the same resources.
+set(VEDIT_APP_THEME_RESOURCES
+  "${CMAKE_CURRENT_SOURCE_DIR}/../../resources/themes/theme.qss.qrc"
+  "${CMAKE_CURRENT_SOURCE_DIR}/../../resources/app_icon.qrc")
 
 # T117: the build identity a crash report carries (HEAD + build time).
 set(VEDIT_BUILD_HEAD "unknown")
@@ -60,6 +79,7 @@ target_link_libraries(vedit_app_shell PUBLIC
   Qt6::Core
   Qt6::Gui
   Qt6::Widgets
+  Qt6::Svg
   KF6::SyntaxHighlighting
 )
 # Same C++ static-check policy as the M0 smoke target (docs/BUILD.md §12.4/12.5):
@@ -68,7 +88,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(vedit_app_shell PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 
-add_executable(vedit-app main.cpp)
+add_executable(vedit-app main.cpp ${VEDIT_APP_THEME_RESOURCES})
 target_link_libraries(vedit-app PRIVATE vedit_app_shell)
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   # `-rdynamic` lets backtrace_symbols_fd() print function names in a crash
@@ -297,6 +317,21 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 endif()
 add_test(NAME vedit-app-i18n-selftest COMMAND vedit-app-i18n-selftest)
 set_tests_properties(vedit-app-i18n-selftest PROPERTIES TIMEOUT 60)
+
+# UI-Mosaic T1: the six product themes, the cards.qss token template, the
+# palette contrast floors (A3: body >= 4.5:1, disabled >= 3:1) and the embedded
+# icon set are a frozen contract (.mpd/plans/ui-mosaic/CONTRACT.md §1.7). Hand-
+# written main() + failure counter, like the other app selftests.
+add_executable(vedit-app-ui-theme-selftest ui_theme_selftest.cpp ${VEDIT_APP_THEME_RESOURCES})
+target_link_libraries(vedit-app-ui-theme-selftest PRIVATE vedit_app_shell)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(vedit-app-ui-theme-selftest PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+add_test(NAME vedit-app-ui-theme-selftest COMMAND vedit-app-ui-theme-selftest)
+set_tests_properties(vedit-app-ui-theme-selftest PROPERTIES
+  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_CURRENT_BINARY_DIR}/xdg-runtime-ui-theme"
+  TIMEOUT 120
+)
 
 # --- UX batch 2 (lane A2): menus, main toolbar, i18n, built-in manual --------
 # `vedit-app-ux-selftest` asserts, with real widgets and real actions: the fixed

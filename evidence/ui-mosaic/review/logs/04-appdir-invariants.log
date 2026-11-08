@@ -1,0 +1,19 @@
+extracted block: 19 lines from /home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/assemble-appdir.sh
+bash -n block: OK
+--- positive control ---
+PASS positive: exit=0 (expected 0)
+--- negative 1: 64x64 hicolor removed ---
+PASS missing-64: exit=1 (expected 1)
+ERROR: icon-chain artifact missing or empty: usr/share/icons/hicolor/64x64/apps/io.github.vedit.VEdit.png
+--- negative 2: .DirIcon truncated to 0 bytes ---
+PASS empty-diricon: exit=1 (expected 1)
+ERROR: icon-chain artifact missing or empty: .DirIcon
+--- negative 3: AppDir root icon is not a PNG ---
+PASS corrupt-png: exit=1 (expected 1)
+ERROR: io.github.vedit.VEdit.png is not a PNG (magic=6e6f742d612d706e)
+--- negative 4: desktop entry loses StartupWMClass ---
+PASS no-wmclass: exit=1 (expected 1)
+ERROR: vedit.desktop lacks StartupWMClass=io.github.vedit.VEdit
+--- negative 5: desktop entry missing entirely ---
+PASS no-desktop: exit=1 (expected 1)
+ERROR: icon-chain artifact missing or empty: vedit.desktop

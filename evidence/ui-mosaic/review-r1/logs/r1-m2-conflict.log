@@ -1,0 +1,6 @@
+=== M2 invalid settings + valid archive ===
+[ui-probe] theme=shenye syntax=Breeze Dark status-theme=Theme: Deep Navy / Breeze Dark style=2 toolbarIconSize=20x20
+[ui-probe] diagnostic=Ignoring unknown interface theme 'no-such-theme' (from settings.toml)
+[ui-probe] diagnostic=window geometry could not be restored
+=== F1 conflict: settings bohe(old) + archive qingkong(newer), no switch ===
+theme=bohe

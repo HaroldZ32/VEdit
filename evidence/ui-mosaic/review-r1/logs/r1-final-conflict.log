@@ -1,0 +1,5 @@
+=== final-tree (R3 mtime arbitration) conflict test 2026-11-08T23:28:24+08:00 ===
+binary: 5c0bacdf3fff2b3e mtime 2026-11-08 23:22:58.939119333 +0800
+A-settings-old -> theme=yaoshi
+B-settings-new -> theme=bohe
+C-equal -> theme=bohe

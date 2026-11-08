@@ -1,0 +1,10 @@
+positive: CHECK FAIL count = 0 (expect 0)
+negative drop-16: RED as expected (fails=1)
+negative drop-24: RED as expected (fails=1)
+negative drop-32: RED as expected (fails=1)
+negative drop-48: RED as expected (fails=1)
+negative drop-64: RED as expected (fails=1)
+negative drop-128: RED as expected (fails=1)
+negative drop-256: RED as expected (fails=1)
+negative drop-512: RED as expected (fails=1)
+M3-RESULT: positive-clean-and-all-eight-tier-negatives-red=YES

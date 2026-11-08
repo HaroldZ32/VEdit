@@ -17,6 +17,11 @@
 #           the winner-path assertion reports it. KSyntaxHighlighting keeps one
 #           definition per name, so this is the ONLY observable form of a shadow:
 #           the name list and the count do not change.
+# Icon:     the launcher chain must be intact in the delivered tree — .desktop
+#           with Icon/StartupWMClass, AppDir root PNG, .DirIcon and the hicolor
+#           sizes. Same paths assemble-appdir.sh enforces at build time; here
+#           they are re-checked on the SHIPPED AppDir/AppImage, where a broken
+#           AppImage assembly would already be invisible to the build-time check.
 #
 # Usage: verify-f2-isolation.sh [--appdir <dir>] [--appimage <file>] [--keep]
 set -uo pipefail
@@ -32,7 +37,7 @@ while [ $# -gt 0 ]; do
     --appdir) APPDIR=${2:?}; shift 2 ;;
     --appimage) APPIMAGE=${2:?}; shift 2 ;;
     --keep) KEEP=1; shift ;;
-    -h|--help) sed -n '2,18p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,26p' "$0"; exit 0 ;;
     *) echo "unknown: $1" >&2; exit 2 ;;
   esac
 done
@@ -234,8 +239,50 @@ check_shadow_control() { # <label> <root>
     || fail "$label: shadow changed the name set (names [$names] != [$WANT_NAMES])"
 }
 
+check_icon_chain() { # <label> <root>
+  local label=$1 root=$2 required png magic
+  if [ -s "$root/vedit.desktop" ]; then
+    grep -qx 'Icon=io.github.vedit.VEdit' "$root/vedit.desktop" \
+      && pass "$label: vedit.desktop carries Icon=io.github.vedit.VEdit" \
+      || fail "$label: vedit.desktop lacks Icon=io.github.vedit.VEdit"
+    grep -qx 'StartupWMClass=io.github.vedit.VEdit' "$root/vedit.desktop" \
+      && pass "$label: vedit.desktop carries StartupWMClass=io.github.vedit.VEdit" \
+      || fail "$label: vedit.desktop lacks StartupWMClass=io.github.vedit.VEdit"
+  else
+    fail "$label: vedit.desktop missing or empty"
+  fi
+  # Every size assemble-appdir.sh installs must be asserted here: asserting a
+  # subset let 24/32/48/128 disappear from a packaged AppDir while this probe
+  # stayed green (R1/M3). The list is the SAME eight tiers the installer writes.
+  for required in io.github.vedit.VEdit.png .DirIcon \
+                  usr/share/icons/hicolor/16x16/apps/io.github.vedit.VEdit.png \
+                  usr/share/icons/hicolor/24x24/apps/io.github.vedit.VEdit.png \
+                  usr/share/icons/hicolor/32x32/apps/io.github.vedit.VEdit.png \
+                  usr/share/icons/hicolor/48x48/apps/io.github.vedit.VEdit.png \
+                  usr/share/icons/hicolor/64x64/apps/io.github.vedit.VEdit.png \
+                  usr/share/icons/hicolor/128x128/apps/io.github.vedit.VEdit.png \
+                  usr/share/icons/hicolor/256x256/apps/io.github.vedit.VEdit.png \
+                  usr/share/icons/hicolor/512x512/apps/io.github.vedit.VEdit.png; do
+    if [ -s "$root/$required" ]; then
+      pass "$label: icon artifact present: $required ($(stat -c%s "$root/$required") bytes)"
+    else
+      fail "$label: icon artifact missing or empty: $required"
+    fi
+  done
+  # A 0-byte or non-PNG launcher icon only shows up as a generic placeholder on
+  # the user's desktop, so the signature is asserted here, not just the path.
+  for png in io.github.vedit.VEdit.png .DirIcon; do
+    magic=$(head -c 8 "$root/$png" 2>/dev/null | od -An -tx1 | tr -d ' \n')
+    [ "$magic" = "89504e470d0a1a0a" ] \
+      && pass "$label: $png is a PNG (magic ok)" \
+      || fail "$label: $png is not a PNG (magic=${magic:-<absent>})"
+  done
+}
+
 echo "== positive (AppDir) ==" | tee -a "$LOG"
 check_positive appdir "$APPDIR"
+echo "== icon chain (AppDir) ==" | tee -a "$LOG"
+check_icon_chain appdir "$APPDIR"
 echo "== reverse control: host leak (AppDir) ==" | tee -a "$LOG"
 check_reverse appdir-reverse "$APPDIR"
 echo "== reverse control: user-level leak (AppDir) ==" | tee -a "$LOG"
@@ -251,6 +298,8 @@ if [ -n "$APPIMAGE" ]; then
       && mv "$WORK/img/squashfs-root" "$WORK/img/root" || fail "AppImage extraction failed"
     echo "== positive (AppImage) ==" | tee -a "$LOG"
     check_positive appimage "$WORK/img/root"
+    echo "== icon chain (AppImage) ==" | tee -a "$LOG"
+    check_icon_chain appimage "$WORK/img/root"
     echo "== reverse control: host leak (AppImage) ==" | tee -a "$LOG"
     check_reverse appimage-reverse "$WORK/img/root"
     echo "== reverse control: user-level leak (AppImage) ==" | tee -a "$LOG"

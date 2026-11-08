@@ -1,0 +1,36 @@
+kf.sonnet.core: Sonnet: No speller backends available!
+This plugin does not support propagateSizeHints()
+[edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+CHECK theme.apply                                PASS
+CHECK theme.callback.name                        PASS (Breeze Dark)
+CHECK theme.current                              PASS (Breeze Dark)
+CHECK theme.invalid.refused                      PASS (unknown theme '__vedit-f2-no-such-theme__' (or not loaded by KSyntaxHighlighting))
+CHECK theme.invalid.silent                       PASS (calls=1)
+CHECK theme.second.apply                         PASS (Breeze Dark,Breeze Light)
+CHECK theme.no-applier.noop                      PASS
+CHECK themes.kteditor-repository-parity          PASS (30/30 names valid)
+CHECK fixture.syntax-definition-found            PASS (V)
+INFO ktexteditor-themes=30 fixture-definition=V
+CHECK chain.apply                                PASS
+CHECK view.created                               PASS
+CHECK view.theme.config-value                    PASS (Breeze Dark)
+CHECK view.theme.object                          PASS (Breeze Dark)
+CHECK status.label-matches-render                PASS (label=Breeze Dark render=Breeze Dark)
+CHECK view.fixture.open                          PASS
+CHECK view.dark.render-size                      PASS (960x620)
+CHECK chain.switch                               PASS
+CHECK view.theme.switched                        PASS (Breeze Light)
+CHECK view.theme.object.switched                 PASS (Breeze Light)
+CHECK status.label-matches-render.switched       PASS (label=Breeze Light render=Breeze Light)
+CHECK view.render.differs                        PASS (differing=595200)
+CHECK view.background.dark-theme                 PASS (hits=514236/595200 (86.4%))
+CHECK view.background.light-theme                PASS (hits=488813/595200 (82.1%))
+CHECK view.second.uses-current-theme             PASS (Breeze Light)
+INFO editor-global-theme=Breeze Light (per-view theme settings do not change it)
+CHECK view.invalid-name.falls-back               PASS (render=Breeze Light expected=Breeze Light)
+F2-PROBE PASS failures=0
++ /usr/bin/c++ -DKCOREADDONS_LIB -DKGUIADDONS_LIB -DQT_CORE_LIB -DQT_DBUS_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_NO_DEBUG -DQT_SVG_LIB -DQT_TESTCASE_BUILDDIR="/vedit-build/target/qt6-build/src/app" -DQT_TESTCASE_SOURCEDIR="/vedit-build/src/app" -DQT_TESTLIB_LIB -DQT_WIDGETS_LIB -DQT_XML_LIB -DVEDIT_APP_HAVE_BREADCRUMB=1 -DVEDIT_BUILD_HEAD="9dce1130df939e00a5c7842d40b86d646fd07653" -DVEDIT_EDIT_CORE_HAVE_APP_SEAM=1 -DVEDIT_EDIT_CORE_HAVE_FIM=1 -DVEDIT_EDIT_CORE_HAVE_FOLDING=1 -DVEDIT_FIM_HAVE_FFI=1 -I/vedit-build/target/qt6-build/src/app/vedit-editor-pane-activation-tests_autogen/include -I/vedit-build/src/app/../editor/kernel -I/vedit-build/src/app -I/vedit-build/src/app/../common -I/vedit-build/src/workspace/breadcrumb -I/vedit-build/src/syntax/grammars -I/vedit-build/target/qt6-build/src/syntax/grammars/generated -I/vedit-build/src/syntax/provider -I/vedit-build/target/qt6-build/src/syntax/provider/generated -I/vedit-build/src/syntax/grammars/../../../third_party/tree-sitter/verilog/src -I/vedit-build/src/workspace/jump/.. -I/vedit-build/src/editor -I/vedit-build/src/editor/fim -isystem /usr/include/x86_64-linux-gnu/qt6/QtCore -isystem /usr/include/x86_64-linux-gnu/qt6 -isystem /usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -isystem /usr/include/x86_64-linux-gnu/qt6/QtGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtWidgets -isystem /usr/include/x86_64-linux-gnu/qt6/QtSvg -isystem /usr/include/KF6/KSyntaxHighlighting -isystem /usr/include/KF6/KTextEditor -isystem /usr/include/KF6/KParts -isystem /usr/include/KF6/KIOCore -isystem /usr/include/KF6/KIO -isystem /usr/include/KF6/KCoreAddons -isystem /usr/include/x86_64-linux-gnu/qt6/QtNetwork -isystem /usr/include/x86_64-linux-gnu/qt6/QtDBus -isystem /usr/include/KF6/KXmlGui -isystem /usr/include/x86_64-linux-gnu/qt6/QtXml -isystem /usr/include/KF6/KConfig -isystem /usr/include/KF6/KConfigCore -isystem /usr/include/KF6/KConfigWidgets -isystem /usr/include/KF6/KWidgetsAddons -isystem /usr/include/KF6/KConfigGui -isystem /usr/include/KF6/KColorScheme -isystem /usr/include/KF6/KGuiAddons -isystem /usr/include/KF6/KCompletion -isystem /vedit-build/crates/vd-ffi/include -isystem /usr/include/x86_64-linux-gnu/qt6/QtTest -Wall -Wextra -O2 -g -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -Werror -c /vedit-build/evidence/ui-mosaic/fix-f2/theme_seam_probe.cpp -o /vedit-build/evidence/ui-mosaic/fix-f2/theme_seam_probe.o
++ link /usr/bin/c++ -Wall -Wextra -O2 -g -DNDEBUG /vedit-build/evidence/ui-mosaic/fix-f2/theme_seam_probe.o -o /vedit-build/evidence/ui-mosaic/fix-f2/theme_seam_probe src/app/libvedit_app_shell.a src/app/editor-lane/libvedit_editor_core.a /usr/lib/x86_64-linux-gnu/libQt6Test.so.6.10.2 /usr/lib/x86_64-linux-gnu/libQt6Svg.so.6.10.2 src/app/editor-lane/breadcrumb-lane/libvedit_workspace_breadcrumb.a src/syntax/grammars/libvedit_syntax_grammars.a src/syntax/provider/libvedit_syntax_provider.a /usr/lib/x86_64-linux-gnu/libtree-sitter.so src/syntax/grammars/libvedit_tree_sitter_verilog.a src/app/editor-lane/breadcrumb-lane/jump-lane/libvedit_workspace_jump.a /usr/lib/x86_64-linux-gnu/libKF6TextEditor.so.6.24.0 /usr/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0 /usr/lib/x86_64-linux-gnu/libKF6Parts.so.6.24.0 /usr/lib/x86_64-linux-gnu/libKF6XmlGui.so.6.24.0 /usr/lib/x86_64-linux-gnu/libKF6ConfigWidgets.so.6.24.0 /usr/lib/x86_64-linux-gnu/libKF6Completion.so.6.24.0 /usr/lib/x86_64-linux-gnu/libKF6ColorScheme.so.6.24.0 /usr/lib/x86_64-linux-gnu/libKF6GuiAddons.so.6.24.0 /usr/lib/x86_64-linux-gnu/libKF6ConfigGui.so.6.24.0 /usr/lib/x86_64-linux-gnu/libKF6WidgetsAddons.so.6.24.0 /usr/lib/x86_64-linux-gnu/libQt6Widgets.so.6.10.2 /usr/lib/x86_64-linux-gnu/libKF6KIOCore.so.6.24.0 /usr/lib/x86_64-linux-gnu/libQt6Network.so.6.10.2 /usr/lib/x86_64-linux-gnu/libKF6CoreAddons.so.6.24.0 /usr/lib/x86_64-linux-gnu/libKF6ConfigCore.so.6.24.0 /usr/lib/x86_64-linux-gnu/libQt6Xml.so.6.10.2 /usr/lib/x86_64-linux-gnu/libQt6Gui.so.6.10.2 /usr/lib/x86_64-linux-gnu/libGLX.so /usr/lib/x86_64-linux-gnu/libOpenGL.so /usr/lib/x86_64-linux-gnu/libQt6DBus.so.6.10.2 src/app/editor-lane/fim-lane/libvedit_editor_fim.a /vedit-build/target/release/libvd_ffi.a -ldl -lm /usr/lib/x86_64-linux-gnu/libQt6Core.so.6.10.2
++ run /vedit-build/evidence/ui-mosaic/fix-f2/theme_seam_probe /vedit-build/evidence/ui-mosaic/fix-f2/fixture/syntax-mosaic.v

@@ -1,0 +1,6 @@
+$ bash -n packaging/runtime/assemble-appdir.sh
+exit=0
+$ bash -n packaging/runtime/verify-f2-isolation.sh
+exit=0
+$ bash -n evidence/ui-mosaic/icon-assets/icon-chain-sim.sh
+exit=0

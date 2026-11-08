@@ -1,0 +1,13 @@
+diff bbox: (587, 113, 1178, 817)
+total changed pixels (>8): 226018
+editor text region (x587..930, y113..769) changed pixels: 224674
+editor background luma: light=240.7 dark=47.5
+status strip (y804..816) changed pixels: 1234
+diagnostics-panel timestamp band (x1151..1177,y530..538) changed pixels: 110
+left file-tree panel (x0..300,y80..780) changed pixels: 0
+toolbar (x400..1200,y0..80) changed pixels: 0
+changed column bands (x_start,x_end,pixels):
+   (587, 930, 225908)
+   (1163, 1177, 110)
+screenshots: screens/yunwu-breeze-light.png screens/yunwu-breeze-dark.png
+state dir used by both runs: evidence/ui-mosaic/fix-f2/state/ (uiTheme=yunwu)

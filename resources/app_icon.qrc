@@ -1,0 +1,33 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+    <!-- UI-Mosaic T1：产品窗口图标与工具栏 SVG 图标。
+
+         两条资源路径就是 API：
+           :/icons/app/vedit-{light,dark,mono}.png   -> themed_icons::appIcon()/appIconMono()
+           :/icons/actions/<name>.svg                -> themed_icons::actionIcon(name, colour)
+
+         文件逐条列出（不用通配）：rcc 在构建期检查每个文件都存在，漏掉一个图标
+         是构建错误而不是运行期空图标；运行期仍然对缺失资源优雅降级（空 QIcon）。
+         素材由 icon-assets 车道产出，本文件与 CMake 登记由 theme-kernel 车道负责。 -->
+    <qresource prefix="/icons">
+        <file alias="app/vedit-light.png">icons/app/vedit-light.png</file>
+        <file alias="app/vedit-dark.png">icons/app/vedit-dark.png</file>
+        <file alias="app/vedit-mono.png">icons/app/vedit-mono.png</file>
+
+        <file alias="actions/new.svg">icons/actions/new.svg</file>
+        <file alias="actions/open.svg">icons/actions/open.svg</file>
+        <file alias="actions/save.svg">icons/actions/save.svg</file>
+        <file alias="actions/save-as.svg">icons/actions/save-as.svg</file>
+        <file alias="actions/undo.svg">icons/actions/undo.svg</file>
+        <file alias="actions/redo.svg">icons/actions/redo.svg</file>
+        <file alias="actions/find.svg">icons/actions/find.svg</file>
+        <file alias="actions/replace.svg">icons/actions/replace.svg</file>
+        <file alias="actions/sidebar.svg">icons/actions/sidebar.svg</file>
+        <file alias="actions/terminal.svg">icons/actions/terminal.svg</file>
+        <file alias="actions/build.svg">icons/actions/build.svg</file>
+        <file alias="actions/vcs.svg">icons/actions/vcs.svg</file>
+        <file alias="actions/settings.svg">icons/actions/settings.svg</file>
+        <file alias="actions/theme.svg">icons/actions/theme.svg</file>
+        <file alias="actions/help.svg">icons/actions/help.svg</file>
+    </qresource>
+</RCC>

@@ -21,8 +21,11 @@
 #include <memory>
 
 class QCloseEvent;
+class QEvent;
 class QLabel;
+class QMenu;
 class QToolBar;
+class QToolButton;
 
 namespace vedit::app {
 
@@ -49,6 +52,12 @@ struct ShellOptions {
     QString stateDir;       // empty => QStandardPaths app config location
     QString projectRoot;    // empty => no project (empty state must stay usable)
     QString themeName;      // empty => saved theme, else the default theme
+    // UI-Mosaic T3: the product (chrome) theme id, the seam a `--theme-ui` CLI
+    // option would fill. Empty means "not forced": settings.toml `uiTheme` wins
+    // next, then the session archive, then the contract default (yunwu). The
+    // product entry point does not parse such an option yet (main.cpp belongs
+    // to the icon-assets lane), so the field is the extension point only.
+    QString uiTheme;
     bool restoreSession = true;
     bool showDefaultPanels = true;
     // Defer the session restore (and the no-session defaults) until the caller
@@ -85,6 +94,16 @@ public:
     // `Settings -> Preferences...` menu command (Ctrl+,). The shell knows no
     // settings type; it only invokes the opener.
     void setPreferencesOpener(std::function<void()> opener);
+
+    // UI-Mosaic R1/F1: the ONE persistence seam for a USER-initiated product-theme
+    // switch (View submenu, toolbar button). The shell cannot include the settings
+    // lane (`vedit_workspace_settings` links `vedit_app_shell`, so the dependency
+    // points the other way); the product entry point installs the SAME
+    // `SettingsClient` write the Preferences page uses. Returning false (with
+    // *error) means "applied but not stored" and is reported to the user, never
+    // swallowed. A startup application (reportFailure == false) never persists.
+    using UiThemePersister = std::function<bool(const QString &id, QString *error)>;
+    void setUiThemePersister(UiThemePersister persister);
 
     // UX batch 2 (item 7): the main toolbar (New/Open/Open Folder/Save/Save All/
     // Undo/Redo + separator + Search/Build/Format). It is created once, then
@@ -275,10 +294,53 @@ private:
     bool confirmOverwrite(const QString &path);
     void applyPanelsFromSession(const QStringList &insertedPanels);
     void applyThemeForStartup();
+    // UI-Mosaic T6: the startup theme decision in ONE place. The UI theme keeps
+    // the T3 precedence (seam > settings.toml > archive > yunwu); the syntax
+    // theme is an explicit choice (CLI, then Preferences) or, when the user never
+    // made one, the chosen product theme's paired `syntaxTheme`.
+    void applyStartupThemes(const QString &archiveSyntaxTheme, const QString &archiveUiTheme);
+    // UI-Mosaic T6: a user product-theme switch follows the paired syntax theme
+    // unless an explicit choice exists. Never overrides Preferences / --theme.
+    void applyPairedSyntaxTheme();
+    // UI-Mosaic T3: one product-theme application point. `reportFailure` is true
+    // for a user-initiated switch (the status bar says why) and false at startup
+    // (a bad persisted id falls back to the default with a diagnostic only).
+    void applyProductUiTheme(const QString &id, bool reportFailure);
+    // UI-Mosaic R1: persist a USER switch — the settings store (when the product
+    // installed the seam) and the session archive, so the three entry points and
+    // the startup precedence can never disagree (last writer wins).
+    void persistUiTheme(const QString &id);
+    // UI-Mosaic R1/M2: one visible line for a persisted id no product theme
+    // answers ("treated as unset", never silently replaced by the default).
+    void reportUnknownUiTheme(const QString &id, const QString &source);
+    // UI-Mosaic R1 test seam: replays a product-theme switch through the real
+    // View-menu QAction. Inert unless VEDIT_UI_THEME_SWITCH names an id.
+    void applyScriptedThemeSwitch(const QString &id);
+    // Builds the SAME six-item, mutually exclusive theme menu for the View
+    // submenu and for the toolbar button. Both stay in sync through
+    // syncThemeMenuChecks().
+    QMenu *createThemeMenu(QWidget *parent, const QString &objectName);
+    void syncThemeMenuChecks();
+    // Re-colours the toolbar icons after a product-theme change. The colour is
+    // read from the CURRENT application palette (matched against productThemes())
+    // instead of ThemeManager, because the palette-change event is delivered
+    // while applyUiTheme() is still running.
+    void refreshToolBarIcons();
+    // UI-Mosaic T6: the VEDIT_UI_PROBE=1 runtime probe (transparent icons, real
+    // toolbar widths and the KTextEditor status row). Kept in the product because
+    // `QIcon::isNull()` cannot observe a rendered-but-empty icon.
+    void logUiProbe();
     void updateStatusBar();
     void syncPanelToggleStates();
     void addDiagnostic(const QString &message);
 
+protected:
+    // A product theme is applied through the application palette; the toolbar
+    // icons must follow it. ApplicationPaletteChange is the Qt 6 replacement of
+    // the deprecated QGuiApplication::paletteChanged signal.
+    void changeEvent(QEvent *event) override;
+
+private:
     ShellOptions options_;
     std::unique_ptr<EditorProvider> provider_;
     EditorArea *editorArea_ = nullptr; // owned by QMainWindow (central widget)
@@ -305,7 +367,21 @@ private:
     QLabel *statusDirty_ = nullptr;
     QStringList diagnostics_;
     std::function<void()> preferencesOpener_;
+    // UI-Mosaic R1/F1: installed by the product entry point (src/app/main.cpp)
+    // because the settings lane depends on this library, not the other way round.
+    UiThemePersister uiThemePersister_;
+    // The persister pumps the event loop while the Rust store answers, so a second
+    // switch arriving inside that wait must not start a second write.
+    bool persistingUiTheme_ = false;
     QToolBar *mainToolBar_ = nullptr;
+    // UI-Mosaic T3: the theme entry. It is a SECOND toolbar (instead of an
+    // addWidget() on mainToolBar_) because a toolbar widget action also lands in
+    // QToolBar::actions(), and ux_selftest compares that list to the shipped
+    // order with an ordered equality.
+    QToolBar *themeToolBar_ = nullptr;
+    QToolButton *themeButton_ = nullptr;
+    QMenu *viewThemeMenu_ = nullptr;
+    QMenu *themeButtonMenu_ = nullptr;
     bool sessionStarted_ = false;
 };
 
