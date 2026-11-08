@@ -3,11 +3,11 @@ UI-SCALE scale_percent=100 qt_scale_factor=<unset> font_point_size=9 settings=/r
 TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server] local=[/vedit-build/build/slang/out,/vedit-build/.mpd/recon/verible/bin]
 CHECK path.display.under-root PASS rtl/top.sv
 CHECK path.display.under-root.normalized-root PASS
-CHECK path.display.outside-root PASS /tmp/vedit-app-maiwey/display-outside/top.sv
-CHECK path.display.no-root PASS /tmp/vedit-app-maiwey/display-outside/top.sv
+CHECK path.display.outside-root PASS /tmp/vedit-app-xGwCsY/display-outside/top.sv
+CHECK path.display.no-root PASS /tmp/vedit-app-xGwCsY/display-outside/top.sv
 CHECK path.display.sibling-prefix-outside PASS
 CHECK path.display.root-itself-absolute PASS
-CHECK path.display.root-normalized PASS /tmp/vedit-app-maiwey/display-root
+CHECK path.display.root-normalized PASS /tmp/vedit-app-xGwCsY/display-root
 This plugin does not support propagateSizeHints()
 CHECK empty.no-project-label PASS
 CHECK empty.one-pane PASS
@@ -23,14 +23,14 @@ CHECK panels.none-inserted-by-default PASS
 This plugin does not support propagateSizeHints()
 CHECK panels.show.file-tree PASS
 This plugin does not support propagateSizeHints()
-This plugin does not support propagateSizeHints()
 CHECK panels.toggle-hide.file-tree PASS
+This plugin does not support propagateSizeHints()
 CHECK panels.toggle-show.file-tree PASS
 This plugin does not support propagateSizeHints()
 CHECK panels.show.search PASS
 This plugin does not support propagateSizeHints()
-CHECK panels.toggle-hide.search PASS
 This plugin does not support propagateSizeHints()
+CHECK panels.toggle-hide.search PASS
 CHECK panels.toggle-show.search PASS
 This plugin does not support propagateSizeHints()
 CHECK panels.show.terminal PASS
@@ -41,14 +41,14 @@ CHECK panels.toggle-show.terminal PASS
 This plugin does not support propagateSizeHints()
 CHECK panels.show.vcs PASS
 This plugin does not support propagateSizeHints()
-CHECK panels.toggle-hide.vcs PASS
 This plugin does not support propagateSizeHints()
+CHECK panels.toggle-hide.vcs PASS
 CHECK panels.toggle-show.vcs PASS
 This plugin does not support propagateSizeHints()
 CHECK panels.show.outline PASS
 This plugin does not support propagateSizeHints()
-CHECK panels.toggle-hide.outline PASS
 This plugin does not support propagateSizeHints()
+CHECK panels.toggle-hide.outline PASS
 CHECK panels.toggle-show.outline PASS
 CHECK panels.five-docks PASS
 CHECK menus.file PASS
@@ -327,7 +327,7 @@ qt.core.qobject.connect: QObject::connect: No such signal QItemSelectionModel::d
 qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
 qt.core.qobject.connect: QObject::connect:  (sender name:   'project-status')
 TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server] local=[/vedit-build/build/slang/out,/vedit-build/.mpd/recon/verible/bin]
-PROJECT-EXPAND-INPUTS root='/tmp/vedit-app-maiwey/lane-project' filelists=0 variables=0 settings='/tmp/vedit-app-maiwey/lane-state/settings.toml'
+PROJECT-EXPAND-INPUTS root='/tmp/vedit-app-xGwCsY/lane-project' filelists=0 variables=0 settings='/tmp/vedit-app-xGwCsY/lane-state/settings.toml'
 VCS-TOOLCHAIN git=/usr/bin/git version=2.53.0 svn=<missing> version=<missing> source=mixed git_source=path svn_source=missing
 This plugin does not support propagateSizeHints()
 CHECK menus.five.registered PASS all five
@@ -401,8 +401,8 @@ CHECK panels.sync.action-show.search PASS
 CHECK panels.sync.close-clears-check.search PASS
 CHECK panels.sync.one-click-reopen.search PASS
 This plugin does not support propagateSizeHints()
-CHECK panels.sync.closed.terminal PASS
 This plugin does not support propagateSizeHints()
+CHECK panels.sync.closed.terminal PASS
 CHECK panels.sync.action-show.terminal PASS
 This plugin does not support propagateSizeHints()
 This plugin does not support propagateSizeHints()
@@ -419,8 +419,8 @@ CHECK panels.sync.close-clears-check.vcs PASS
 CHECK panels.sync.one-click-reopen.vcs PASS
 This plugin does not support propagateSizeHints()
 This plugin does not support propagateSizeHints()
-CHECK panels.sync.closed.outline PASS
 This plugin does not support propagateSizeHints()
+CHECK panels.sync.closed.outline PASS
 CHECK panels.sync.action-show.outline PASS
 This plugin does not support propagateSizeHints()
 This plugin does not support propagateSizeHints()
@@ -430,8 +430,8 @@ This plugin does not support propagateSizeHints()
 This plugin does not support propagateSizeHints()
 CHECK panels.sync.reverse-precondition PASS
 This plugin does not support propagateSizeHints()
-This plugin does not support propagateSizeHints()
 CHECK panels.sync.reverse-control PASS
+This plugin does not support propagateSizeHints()
 This plugin does not support propagateSizeHints()
 CHECK split.horizontal.pane-count PASS
 CHECK split.horizontal.root-orientation PASS
@@ -486,13 +486,13 @@ CHECK open.multiple.active-second PASS
 This plugin does not support propagateSizeHints()
 This plugin does not support propagateSizeHints()
 CHECK open.dialog.action-opens PASS
-CHECK path.display.title.absolute-no-root PASS VEdit — /tmp/vedit-app-maiwey/open-a.sv[*]
-CHECK path.display.tab-tooltip.absolute-no-root PASS /tmp/vedit-app-maiwey/open-a.sv
+CHECK path.display.title.absolute-no-root PASS VEdit — /tmp/vedit-app-xGwCsY/open-a.sv[*]
+CHECK path.display.tab-tooltip.absolute-no-root PASS /tmp/vedit-app-xGwCsY/open-a.sv
 CHECK open.filter.filelist PASS Verilog/SystemVerilog/filelist (*.f *.F *.v *.sv *.svh *.vh);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F);;All Files (*)
 CHECK open.filter.no-guessed-flist PASS Verilog/SystemVerilog/filelist (*.f *.F *.v *.sv *.svh *.vh);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F);;All Files (*)
 CHECK open.filter.keeps-existing-types PASS Verilog/SystemVerilog/filelist (*.f *.F *.v *.sv *.svh *.vh);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F);;All Files (*)
 CHECK open.signal.opens PASS
-CHECK open.signal.one-per-open PASS /tmp/vedit-app-maiwey/open-a.sv,/tmp/vedit-app-maiwey/open-b.sv
+CHECK open.signal.one-per-open PASS /tmp/vedit-app-xGwCsY/open-a.sv,/tmp/vedit-app-xGwCsY/open-b.sv
 CHECK open.signal.failed-open-silent PASS
 CHECK open.signal.direct-pane-open PASS
 This plugin does not support propagateSizeHints()
@@ -523,8 +523,8 @@ CHECK panel-seam.terminal-content PASS
 CHECK panel-seam.search-content PASS
 CHECK panel-seam.no-placeholder PASS
 CHECK panel-seam.editor-layout-restored PASS panes=2
-[app-shell] invalid shortcut store /tmp/vedit-app-maiwey/broken/shortcuts.json: illegal number
-[app-shell] invalid session /tmp/vedit-app-maiwey/broken/session.json: unterminated object
+[app-shell] invalid shortcut store /tmp/vedit-app-xGwCsY/broken/shortcuts.json: illegal number
+[app-shell] invalid session /tmp/vedit-app-xGwCsY/broken/session.json: unterminated object
 This plugin does not support propagateSizeHints()
 CHECK broken.config.survives PASS
 CHECK broken.config.diagnostics PASS
@@ -559,7 +559,7 @@ CHECK save.shortcut.runtime-guard-entry-point PASS removed=1 bindings=1
 CHECK save.shortcut.runtime-guard-timer PASS
 [edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
 CHECK editor.pane.open PASS
-CHECK editor.pane.open-path PASS /tmp/vedit-app-maiwey/pane-open.v
+CHECK editor.pane.open-path PASS /tmp/vedit-app-xGwCsY/pane-open.v
 CHECK editor.pane.save PASS
 CHECK save.ktexteditor.document PASS
 CHECK save.shortcut.window PASS
@@ -586,8 +586,8 @@ This plugin does not support propagateSizeHints()
 This plugin does not support propagateSizeHints()
 CHECK fold.native.pane PASS
 [edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
-CHECK fold.native.open PASS
 This plugin does not support propagateSizeHints()
+CHECK fold.native.open PASS
 CHECK fold.native.view PASS
 CHECK fold.native.highlight-mode PASS SystemVerilog
 CHECK fold.native.binding PASS
@@ -610,7 +610,7 @@ CHECK editcore.document.setText PASS
 CHECK editcore.open.fixture-written PASS
 [edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
 CHECK editcore.open.file PASS
-CHECK editcore.open.records-path PASS /tmp/vedit-app-fLvIDi/open.v
+CHECK editcore.open.records-path PASS /tmp/vedit-app-jDxJDu/open.v
 CHECK editcore.highlight.verilog.fixture PASS
 [edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
 CHECK editcore.highlight.verilog.open PASS
@@ -684,17 +684,17 @@ CHECK editcore.wsedit.disk-text PASS // new_name
 CHECK editcore.wsedit.summary PASS Rename applied: 3 edit(s) in 2 file(s) — 1 document(s) changed in the editor, 1 file(s) written on disk
 CHECK editcore.wsedit.one-undo PASS
 CHECK editcore.wsedit.one-redo PASS
-CHECK editcore.wsedit.out-of-range-refused PASS /tmp/vedit-app-fLvIDi/rename-open.sv: edit line 1000-1000 is outside rename-open.sv (5 line(s))
+CHECK editcore.wsedit.out-of-range-refused PASS /tmp/vedit-app-jDxJDu/rename-open.sv: edit line 1000-1000 is outside rename-open.sv (5 line(s))
 CHECK editcore.wsedit.refusal-keeps-buffer PASS
 CHECK editcore.wsedit.refusal-keeps-file PASS // new_name
 
-CHECK editcore.wsedit.missing-file-refused PASS cannot change /tmp/vedit-app-fLvIDi/does-not-exist.sv: No such file or directory
+CHECK editcore.wsedit.missing-file-refused PASS cannot change /tmp/vedit-app-jDxJDu/does-not-exist.sv: No such file or directory
 CHECK editcore.wsedit.empty-refused PASS
 CHECK editcore.references.empty PASS
 CHECK editcore.references.count PASS 2
 CHECK editcore.references.ordered PASS
 CHECK editcore.references.open-snippet PASS wire new_name;
-CHECK editcore.references.location-text PASS /tmp/vedit-app-fLvIDi/rename-open.sv:2:8
+CHECK editcore.references.location-text PASS /tmp/vedit-app-jDxJDu/rename-open.sv:2:8
 CHECK editcore.references.disk-snippet PASS // new_name
 CHECK editcore.gates.document PASS
 CHECK editcore.gates.view PASS
@@ -711,33 +711,33 @@ CHECK editcore.provider.creates-view PASS
 CHECK editcore.provider.fixture PASS
 [edit-core] syntax highlighting: 'Verilog' resolves to author 'Yevgen Voronenko (ysv22@drexel.edu), Ryan Dalzell (ryan@tullyroan.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
 CHECK editcore.provider.open PASS
-CHECK editcore.provider.open-records-path PASS /tmp/vedit-app-NotyaS/provider.v
+CHECK editcore.provider.open-records-path PASS /tmp/vedit-app-iPPOkm/provider.v
 CHECK editcore.provider.document PASS
 CHECK editcore.provider.save PASS
 CHECK editcore.provider.save-bytes PASS
 CHECK editcore.boundary.zero-calls PASS before=0 after=0
 CHECK editcore.boundary.counter-live PASS before=0 after=1
 EDIT-CORE-SELFTEST ok=1 checks=99 failures=0
-CHECK root.restored-before-install PASS /tmp/vedit-app-maiwey/project-a
-CHECK root.explicit-wins PASS /tmp/vedit-app-maiwey/project-b
+CHECK root.restored-before-install PASS /tmp/vedit-app-xGwCsY/project-a
+CHECK root.explicit-wins PASS /tmp/vedit-app-xGwCsY/project-b
 This plugin does not support propagateSizeHints()
 CHECK path.display.under-root.open PASS
 This plugin does not support propagateSizeHints()
 CHECK path.display.window-title.relative PASS VEdit — rtl/foo.sv[*]
 CHECK path.display.tab-tooltip.relative PASS rtl/foo.sv
-CHECK path.display.open-key-still-absolute PASS /tmp/vedit-app-maiwey/project-a/rtl/foo.sv
+CHECK path.display.open-key-still-absolute PASS /tmp/vedit-app-xGwCsY/project-a/rtl/foo.sv
 CHECK path.display.outside-root.open PASS
-CHECK path.display.window-title.outside-absolute PASS VEdit — /tmp/vedit-app-maiwey/outside/other.sv[*]
-CHECK path.display.tab-tooltip.outside-absolute PASS /tmp/vedit-app-maiwey/outside/other.sv
-CHECK root.switch-broadcast PASS /tmp/vedit-app-maiwey/project-b
-CHECK root.switch-value PASS /tmp/vedit-app-maiwey/project-b
+CHECK path.display.window-title.outside-absolute PASS VEdit — /tmp/vedit-app-xGwCsY/outside/other.sv[*]
+CHECK path.display.tab-tooltip.outside-absolute PASS /tmp/vedit-app-xGwCsY/outside/other.sv
+CHECK root.switch-broadcast PASS /tmp/vedit-app-xGwCsY/project-b
+CHECK root.switch-value PASS /tmp/vedit-app-xGwCsY/project-b
 CHECK root.switch-label PASS project-b
 CHECK root.switch-idempotent PASS events=1
 CHECK root.open-folder-command PASS
 CHECK root.open-folder-menu PASS
-CHECK root.open-folder-switches PASS /tmp/vedit-app-maiwey/project-a
+CHECK root.open-folder-switches PASS /tmp/vedit-app-xGwCsY/project-a
 CHECK root.open-folder-broadcast PASS events=2
 CHECK root.open-folder-cancel PASS events=2
 CHECK root.switch.persisted PASS
 CHECK root.switch.persisted-value PASS
-APP-SHELL-SELFTEST ok=1 checks=321 failures=0 state=/tmp/vedit-app-maiwey/state
+APP-SHELL-SELFTEST ok=1 checks=321 failures=0 state=/tmp/vedit-app-xGwCsY/state
