@@ -1,0 +1,6 @@
+[lrelease] /usr/lib/qt6/bin/lrelease /home/haroldzhao/MyProj/DshProj/VEdit/translations/vedit_zh_CN.ts -qm /tmp/tmp.5JYBmGUBMl/vedit_zh_CN.qm
+Updating '/tmp/tmp.5JYBmGUBMl/vedit_zh_CN.qm'...
+    Generated 1256 translation(s) (1256 finished and 0 unfinished)
+[lrelease] counts: 1256 translation(s) (1256 finished, 0 unfinished, 0 untranslated)
+[lrelease] qm: 133093 bytes sha256=a7cf73a79088aa8fa4be37cc2488497f7c7412a41a0100362520c69ff73e4665
+[lrelease] PASS: 0 unfinished and 0 untranslated in /home/haroldzhao/MyProj/DshProj/VEdit/translations/vedit_zh_CN.ts
