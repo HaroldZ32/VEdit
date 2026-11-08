@@ -70,7 +70,7 @@ VEdit 是面向 Verilog / SystemVerilog 工程的桌面编辑器。打开一个�
 
 ### 2.1 打开文件
 
-- `File → Open…`（`Ctrl+O`）打开一个文件。文件对话框的过滤器分三组：`Verilog/SystemVerilog (*.v *.sv *.svh *.vh)`、`Filelists (*.f *.F *.flist)`、`All Files (*)`。
+- `File → Open…`（`Ctrl+O`）打开一个文件。文件对话框的过滤器分三组：`Verilog/SystemVerilog (*.v *.sv *.svh *.vh)`、`Filelists (*.f *.F)`、`All Files (*)`。过滤器只列 `*.f` / `*.F`；`.flist` 长拼写不在过滤器里，但仍可通过 `All Files (*)` 选中并打开，导入行为相同。
 - 也可以在启动时把文件路径作为参数：`./VEdit-<版本>-x86_64.AppImage path/to/top.sv`；给多个文件时，每个文件各占一个分屏。
 - 从 `Files` 树双击文件，或从 `Project` 面板双击文件，也会打开它。
 
@@ -93,7 +93,7 @@ VEdit 是面向 Verilog / SystemVerilog 工程的桌面编辑器。打开一个�
 
 ### 2.3 打开 filelist（`.f`）会发生什么
 
-打开一个 `.f` / `.F` / `.flist`：
+打开一个 `.f` / `.F`（`.flist` 长拼写用对话框的 `All Files (*)` 选中）：
 
 - 如果**当前没有工程**：该 filelist 所在目录成为工程根，并把它导入工程；
 - 如果**已经有工程**：只把它导入当前工程，**不切换**工程；
@@ -609,7 +609,7 @@ bash scripts/build-qt.sh --no-test    # 只构建
 
 工程内的文件：
 
-- `*.f` / `*.F` / `*.flist`：filelist；
+- `*.f` / `*.F`：filelist（对话框默认只筛这两种；`.flist` 拼写通过 `All Files (*)` 打开后仍按 filelist 导入）；
 - `.rules.verible_lint`：工程级 verible 规则文件，存在时自动发现；不存在时用内置规则，不报错。
 
 常用启动参数（把 `vedit-app` 换成你的启动方式）：

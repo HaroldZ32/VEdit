@@ -1,0 +1,11 @@
+BEFORE (recorded before the edits)
+$ grep -n 'flist' docs/USER_GUIDE.md
+73:- ... `Filelists (*.f *.F *.flist)`、`All Files (*)`。
+96:打开一个 `.f` / `.F` / `.flist`：
+612:- `*.f` / `*.F` / `*.flist`：filelist；
+
+$ grep -rn '用户指南' docs/
+(no output — docs/ was already clean; the stale string is the product comment)
+
+$ grep -rn 'BUILD\.md:[0-9]' docs/handover/
+157:`package.json:7-17` ... Qt lane 是折进去的（`docs/BUILD.md:278-287`）。...

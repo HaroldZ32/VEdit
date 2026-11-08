@@ -1,0 +1,16 @@
+$ grep -n "flist" docs/USER_GUIDE.md
+73:- `File → Open…`（`Ctrl+O`）打开一个文件。文件对话框的过滤器分三组：`Verilog/SystemVerilog (*.v *.sv *.svh *.vh)`、`Filelists (*.f *.F)`、`All Files (*)`。过滤器只列 `*.f` / `*.F`；`.flist` 长拼写不在过滤器里，但仍可通过 `All Files (*)` 选中并打开，导入行为相同。
+96:打开一个 `.f` / `.F`（`.flist` 长拼写用对话框的 `All Files (*)` 选中）：
+612:- `*.f` / `*.F`：filelist（对话框默认只筛这两种；`.flist` 拼写通过 `All Files (*)` 打开后仍按 filelist 导入）；
+
+$ grep -n "\*.flist" docs/USER_GUIDE.md
+exit=1 (1 = no old glob)
+
+$ grep -rn "用户指南" docs/
+exit=1 (1 = none)
+
+$ grep -rn "BUILD\.md:[0-9]" docs/
+exit=1 (1 = no line-number citations left)
+
+$ grep -n "BUILD\.md" docs/handover/03-architecture.md
+157:`package.json:7-17` 把 MPD gate id 映射到脚本；但**这套门禁的主语仍是旧 Rust 产品**，Qt lane 是折进去的（`docs/BUILD.md §12.5`「门禁」）。下表中的脚本路径均相对 `build/gates/`。
