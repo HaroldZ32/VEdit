@@ -1,4 +1,4 @@
-=== F1 probe entry=view label=r2-final-view bin=/vedit-build/evidence/ui-mosaic/review-r1/logs/final-binary at 2026-11-08T23:28:28+08:00 ===
+=== F1 probe entry=view label=r2-final-view bin=/vedit-build/evidence/ui-mosaic/review-r1/logs/final-binary at 2026-11-08T23:36:16+08:00 ===
 focus win=0x200007
 app win=0x200007 geom=(x=0,y=0,w=1280,h=820)
 app origin=(0,0) size=1280x820

@@ -91,3 +91,62 @@ positive: CHECK FAIL count = 0; negative drop-{16,24,32,48,64,128,256,512}: RED 
 - 我在该二进制上独立验证了 R3 的 mtime 仲裁（`logs/r1-final-conflict.log`）：settings 旧(22:27)/archive 新(23:26) → `theme=yaoshi`（archive 胜）；settings 新/archive 旧 → `theme=bohe`（settings 胜）；mtime 相等 → `theme=bohe`（回退 settings）。因此上面「Medium（范围/依赖）」一项在最终树上已关闭；R3 自身的独立 review 仍以 T4 的验收为准。
 - 三个入口的 F1 探针仍是在 T1 二进制（22:42:43）上完成的；最终树（T3+T4 都改过 `app_shell.cpp`）的 F1 重跑由**并行复验实例**在同一容器上进行（`logs/r2/r2-final-view/`，23:28），我没有与该实例并发抢占同一容器；最终验收应以那次重跑 + 本结论合并。
 - 说明：`review-r1/` 下另有并行 reviewer 实例写入的 `logs/r1-binary`、`logs/r2-binary`、`logs/r2/`、`logs/f1-conflict2*`（23:05–23:28），非本验证者产物，我未改动/未删除。
+
+## 补记 2（2026-11-08 23:44，reviewer-3 并行实例）：最终集成树 `d7f7209` + `ecb4ab9` 复验
+
+- 本补充由**同一 reviewer-3 角色、并行会话**完成（上面的报告写于 23:29、钉在 T1 基线；其“补记”已把最终树的 F1 重跑交给并行实例）。**最终验收以本补充为准。**
+- 最终树：提交 `d7f7209`（feat，23:33:28）+ `ecb4ab9`（docs，23:38:24）；工作树对 `src/ packaging/ translations/ resources/ scripts/` **干净**（`git status` 为空）→ 被审代码 = 上述提交。
+- 我自建并用于全部功能证据的二进制：`e9ede03e03fe82273be14e6706cdde8eb91b2db506045ad059b60be9a6c25fcd`
+  （`bash scripts/build-qt.sh`，exit 0，`logs/r2-build2.log`；**ctest 100% passed, 0 failed out of 62**；
+  `vedit-app-syntax-startup` / `vedit-app-shell-selftest` / `vedit-app-ux-selftest` 全 **Passed**）。
+- 环境：隔离容器 `review-r1-iso`（自有 `/state`、显示 `:98`）；证据 `logs/r2/`、`logs/f1-conflict-v2/`、`logs/m3/`。
+
+### 最终树逐条判定
+
+- **A1 PASS**：真实点击三入口（视图菜单 / 工具栏按钮 / Ctrl+, 首选项）均写 `uiTheme=qingkong` 并同步 archive，重启 `theme=qingkong`；
+  打开首选项不回弹；**view 与 toolbar 切换后截图 0 像素差**，prefs 仅差状态栏文案 1,188 px + 菜单栏 72 px（无主题差异）。
+  mtime 七用例（`logs/f1-conflict-v2/`，逐例记录两文件 mtime 与原值）：a（settings 旧+archive 新）→ **bohe（archive）**、
+  b → bohe（settings 新）、c（同 mtime）→ settings、d1/d2 → bohe + 诊断、d3/d4 → yunwu（+诊断）→ **T4 的 F1 级发现在最终树不可复现**。
+- **A8 PASS（五点）**：light vs dark **225,710 px**，bbox **(587,113,1172,817)**，编辑器文本区 **224,309 px（99.4%）**、状态栏 1,234、其余 167；
+  **pre-F2 阴性对照 1,204 px、编辑器区 0**；分屏两窗格同主题（暗 (35,38,41)/亮 (255,255,255)，新视图继承）；
+  无效名回退默认 Light（与 light 对照 159 px ≈ 同主题噪声 155 px）+ 可见诊断；状态栏 `syntax=` 与文案一致（切到 qingkong 后 `Sky Blue / Breeze Light`）；
+  `--theme` 入口正常（含无效值路径）。
+- **A9 PASS**：英文 View→Theme 子菜单六名逐字正确；zh_CN 状态栏 `主题：云雾白 / Breeze Light`；
+  **A7 截图已在 23:30–23:31 重拍**：抽查 `after-qingkong.png` 状态栏为 `Theme: Sky Blue / Breeze Light`（无豆腐块）
+  → 上面 Medium（A7 旧截图）在最终树**已关闭**。`.ts` 在 `d7f7209` 中 **93 insertions / 0 deletions**、0 条 unfinished、22 条新 source 全译；
+  `lrelease`（最终树）**1278 finished / 0 unfinished / 0 untranslated**；`docs.sh` PASS。
+- **A2/A3/A4/A5**：调色板逐值与 CONTRACT §1.3 相等（`product_theme.cpp:75-86`），`cards.qss` 自 21:49 未变 → T4 的 A2/A3 结论继续有效；
+  窗口图标 `main.cpp:1859` + `theme_manager.cpp:234` 随深浅切换；工具栏图标 `opaquePixels>0`、`setIconVisibleInMenu(false)` 在两处菜单构建路径。
+- **M3 正负例（我补做，用出厂断言）**：从 shipped `verify-f2-isolation.sh` 抽出 `check_icon_chain`，对我自建 AppDir 形状树运行：
+  正例 **14/14 PASS**；负例（删 `24x24`）**精确 1 条 FAIL**（`logs/m3/`）。提交内该函数断言 8 档 + PNG magic。
+- **无偷改/无新依赖/无 stub**：`tests/`、`build/gates/` 在提交中无改动；`verify-f2-isolation.sh` 为**增强**（断言 4→8 档，+50/−1 仅删 help 行）；
+  无新增第三方依赖（仅 `Qt6::Svg` 组件，固定镜像内）；改动文件无 TODO/FIXME/占位实现。
+- **R1/R3 边界（复核维持原判）**：依赖方向 `vedit_workspace_settings PUBLIC vedit_app_shell` 成立；接缝与首选项同
+  SettingsClient/同键/同文件（`i18n::settingsFilePath` 与 `settings_integration.cpp:18-24` 逐字一致）、Rust 原子写；
+  `VEDIT_UI_THEME_SWITCH` 默认惰性且触发真实视图菜单 QAction；R3 最终代码保留 R1 判据（archive 语法主题仅在 settings uiTheme 无效时采用），
+  相关 ctest 绿。
+
+### 最终树发现（风险级：**Low**）
+
+**无 Blocker / 无 High。** 上面报告的两条 Medium 在最终树**均已关闭**（A7 截图重拍；字面最后写入者由 R3 mtime 仲裁覆盖）。
+维持的非阻塞项：
+- **Low-1（死 seam）**：`ShellOptions::uiTheme` 在产品入口从不赋值（注释称扩展点）。
+- **Low-2（图标副本）**：`packaging/appimage/build-appimage.sh:248` 仍复制 `packaging/appimage/assets/io.github.vedit.VEdit.png`，
+  该文件是 `resources/icons/hicolor/256x256` 的字节副本（sha `3e7efb5b…` 相同）——当前一致，存在漂移风险。
+- **Low-3（既有）**：首选项 OK 会把面板默认键（`fim.*`/`tools.*`）一并落盘（与主题无关）。
+- **Nit（carry）**：状态栏一次性消息与 `Project:` 标签重叠（M2 诊断可见但呈现有瑕疵）；`SessionState::uiTheme` 未进序列化
+  （shell 手动 `insert("uiTheme")`，第二个消费者风险仍在）；`VEDIT_UI_THEME_SWITCH` 为生产二进制测试缝（船长已裁决接受，建议发布说明标注）。
+
+### 并发与作废（最终记录）
+
+- 22:57–23:05 与 23:29–23:30 的并行写入来自**本角色的另一并行实例**（其报告即本文件上半部）及其清理动作
+  （`BINARIES-REMOVED.sha256`，三个 sha 与我记录一致：`5c0bacdf…`/`09795469…`/`eff368dc…`）；
+  22:57 的 toolbar “主题回弹”是共用 `review-r1-x` 容器 `/state`+`:99` 的**假象**，该批运行**作废**。
+- 本补充的全部功能证据来自 23:31 之后、隔离环境 + 我自建二进制 `e9ede0…` 的重跑；22:57–23:05 的旧运行不参与任何判定。
+
+### 审阅边界（本补充）
+
+- 未跑端到端 AppDir/AppImage 组装（M3 用出厂断言 + 最小树正负例替代）；无窗口管理器 → 任务栏/桌面图标观感未观察；
+  本镜像无 CJK 字体（zh_CN 菜单渲染为方块，探针文本与 `.ts` 数据正确）；未逐一验证 30 个语法主题（只抽 Light/Dark + 无效名）。
+
+**最终树 Verdict：approve（无 Blocker/High；Low/Nit 不阻塞交付；交付口径 `d7f7209` + `ecb4ab9`）。**

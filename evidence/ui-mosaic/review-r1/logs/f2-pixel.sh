@@ -12,7 +12,7 @@ THEME=${2:-}
 SEED_THEME=${SEED_THEME:-}
 
 # A fresh state with the SAME product theme (yunwu) so only the syntax theme differs.
-docker exec "$NAME" bash -lc 'pkill -f "[r]2-binary" || true; find /state -mindepth 1 -delete; printf "uiTheme = \"yunwu\"\n" > /state/settings.toml'
+docker exec "$NAME" bash -lc 'pkill -f "[r]2-binary" || true; pkill -f "[r]eview-r1-binary" || true; pkill -f "[f]inal-binary" || true; find /state -mindepth 1 -delete; printf "uiTheme = \"yunwu\"\n" > /state/settings.toml'
 if [ -n "$SEED_THEME" ]; then
   docker exec "$NAME" bash -lc "printf 'theme = \"$SEED_THEME\"\n' >> /state/settings.toml"
 fi

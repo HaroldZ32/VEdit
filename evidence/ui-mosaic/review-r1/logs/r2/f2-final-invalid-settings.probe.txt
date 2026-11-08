@@ -1,0 +1,3 @@
+[ui-probe] theme=yunwu syntax=Breeze Light status-theme=Theme: Cloud White / Breeze Light style=2 toolbarIconSize=20x20
+[app-shell] theme: unknown theme 'DefinitelyNotATheme' (or not loaded by KSyntaxHighlighting)
+[ui-probe] diagnostic=theme: unknown theme 'DefinitelyNotATheme' (or not loaded by KSyntaxHighlighting)
