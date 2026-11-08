@@ -72,3 +72,12 @@
 - `bash scripts/build-qt.sh` → **exit 0**，`100% tests passed, 0 tests failed out of 62`，xcb smoke `M0-SMOKE ok=1`
 - 船长最终自查（提交后、最终二进制）：全量 ctest 连跑两次均 **62/62**；更早一次为 61/62，唯一失败是 **既有 flake** `vedit-rename-e2e (SIGPIPE)`——单独复跑两次均 Passed（1.19s / 1.18s），且历史同款见 `evidence/ux-batch-2/u8-final/ctest-integration.log:48`，与本批改动无关（该用例不在改动集内）。
 - 图标链路：船长独立复跑 `icon-assets/icon-chain-sim.sh` → 正向 10/10 通过；负向删除 `64x64` 时**正确报红**（`missing or empty` 并被 `check_icon_chain` 捕获），汇总 `ICON-CHAIN SIM PASS`。
+
+### AppImage 端到端打包（2026-11-09 补充，关闭此前的 A4 端到端缺口）
+
+`bash packaging/runtime/build.sh` → **exit 0，`BUILD: F2 runtime OK`，`steps_failed=0`**：
+
+- AppDir 359 文件；AppImage `138,758,648` 字节，sha256 `aef125095dac5985cb4ac0e8610c4c848a6377948ac78d467d064dc09d6f78c8`（与 `out/SHA256SUMS` 一致）。
+- 包内 `F2-ISOLATION PASS`：八档 hicolor（16/24/32/48/64/128/256/512）、`.DirIcon`、根 `io.github.vedit.VEdit.png`、`vedit.desktop` 的 `Icon=`/`StartupWMClass=` **全部 PASS**，含反向控制（宿主泄漏 406 定义、shadow 用例）。
+- CentOS 7 机制探针 PASS：包内 `git 2.53.0` / `svn 1.14.5` 来自 bundled 工具链；`APP-SHELL-SELFTEST ok=1 checks=321 failures=0`。
+- 包内 UI 实拍：`screenshots/appimage-verify.png`（AppImage 以 `APPIMAGE_EXTRACT_AND_RUN=1` 在 Xvfb 内运行）——工具栏图标、右上角主题按钮、卡片外观、状态栏 `Theme: Cloud White / Breeze Light` 均在交付物中生效。
