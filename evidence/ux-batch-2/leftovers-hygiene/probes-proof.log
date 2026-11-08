@@ -1,0 +1,50 @@
+=== [C] help_viewer.h comment diff
+diff --git a/src/app/help_viewer.h b/src/app/help_viewer.h
+index 00e0a80..2dd2d35 100644
+--- a/src/app/help_viewer.h
++++ b/src/app/help_viewer.h
+@@ -27,7 +27,7 @@ public:
+ 
+     // The Markdown source shipped in the binary (empty when the resource is
+     // missing, e.g. a build tree without the .qrc); the manual's first H1
+-    // heading ("VEdit 用户指南"); and the window title.
++    // heading ("VEdit 用户手册"); and the window title.
+     static QString manualMarkdown();
+     static QString manualTitle();
+ 
+
+=== [D] probes/slang-spike: does it belong in the tree?
+--- git status:
+?? probes/slang-spike/
+--- tracked sibling probe dirs:
+probes/c15-seam
+probes/c17-overlay
+probes/fold-interface
+--- live references to its files:
+docs/BUILD.md:452:bash probes/slang-spike/run-spike.sh
+docs/BUILD.md:460:`probes/slang-spike/build-sluserver-centos7.sh`：
+docs/BUILD.md:470:  `-include probes/slang-spike/gcc11_path_hash.h`，子模块保持原样。
+docs/BUILD.md:494:  `evidence/w2-spike/07-buildfile-rule.txt`（`probes/slang-spike/buildfile_rule_probe.py`）。
+evidence/review-spike/runspike/04-built-initialize-handshake.txt:1:--> {"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"processId": null, "clientInfo": {"name": "vedit-spike", "version": "0"}, "rootUri": "file:///home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture", "capabilities": {}, "workspaceFolders": null}}
+evidence/review-spike/break-console.log:14:mounts: /home/haroldzhao/MyProj/DshProj/VEdit/target/tmp/spike-work/out:/w (binary) and /home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture:/fixture (workspace)
+evidence/review-spike/break-console.log:35:   "/home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/mid.sv",
+evidence/review-spike/break-console.log:36:   "/home/haroldzhao/MyProj/DshProj/VEdit/probes/slang-spike/fixture/top.sv"
+--- contents and size:
+84K	probes/slang-spike
+10
+probes/slang-spike/buildfile_rule_probe.py: Python script, ASCII text executable
+probes/slang-spike/build-sluserver-centos7.sh: Bourne-Again shell script, ASCII text executable
+probes/slang-spike/elab_probe.py: Python script, Unicode text, UTF-8 text executable
+probes/slang-spike/fixture: directory
+probes/slang-spike/gcc11_path_hash.h: C++ source, ASCII text
+probes/slang-spike/lsp_hierarchy_probe.py: Python script, Unicode text, UTF-8 text executable
+probes/slang-spike/lsp_initialize.py: Python script, Unicode text, UTF-8 text executable
+probes/slang-spike/README.md: Unicode text, UTF-8 text
+probes/slang-spike/run-spike.sh: Bourne-Again shell script, Unicode text, UTF-8 text executable
+--- binary payloads?
+probes/slang-spike/build-sluserver-centos7.sh: Bourne-Again shell script, ASCII text executable
+probes/slang-spike/lsp_initialize.py:          Python script, Unicode text, UTF-8 text executable
+probes/slang-spike/elab_probe.py:              Python script, Unicode text, UTF-8 text executable
+(none above = source-only)
+--- secret-ish material?
+(none above = clean)

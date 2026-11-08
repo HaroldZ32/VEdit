@@ -1,0 +1,43 @@
+CHECK PASS split.fixture
+CHECK PASS split.controller
+CHECK PASS split.covered  a=1 b=1 pass=0
+CHECK PASS split.pane-a
+CHECK PASS split.open-a
+CHECK PASS split.action-exists
+CHECK PASS split.pane-count  panes=2
+CHECK PASS split.new-pane-active
+CHECK PASS split.open-b
+CHECK PASS split.views
+CHECK PASS split.view-docs
+CHECK PASS split.b-visible
+CHECK PASS split.focus-action
+CHECK PASS split.a-active  activeIsA=1
+CHECK PASS hover.state-known
+CHECK PASS hover.b-point  92,15
+OBSERVED hover.after-move alive=1 diagnostic=1 rule='line-length' path='/tmp/<fixture>/project/b.sv' line=1 parentIsActiveView=0
+CHECK PASS hover.popup-alive
+CHECK PASS hover.shows-b-diagnostic  rule='line-length' line=1 path='/tmp/<fixture>/project/b.sv'
+CHECK PASS hover.popup-widget
+CHECK PASS hover.popup-parented-to-inactive-b  B
+CHECK PASS hover.popup-inside-b-geometry  popup=110,37 382x56 bView=638x701
+CHECK PASS hover.popup-visible
+CHECK PASS hover.parent-is-not-the-active-view
+OBSERVED hover.after-poll alive=1 visible=1 rule='line-length' path='/tmp/<fixture>/project/b.sv' parent='B'
+CHECK PASS poll.does-not-steal-bubble  diagnostic=1 visible=1 parentB=1
+CHECK PASS poll.bubble-survives-b-active  activeB=1 parentB=1
+CHECK PASS poll.bubble-does-not-jump-to-active-a  activeA=1 parentB=1 visible=1
+CHECK PASS hover.control-non-diagnostic-hides  diagnostic=0 visible=0
+CHECK PASS gesture.controllers
+OBSERVED gesture.ctrl-alt-click a=1->1 b=1->2 clicked-in-b=1
+CHECK PASS gesture.b-gained-cursor  b=1->2
+CHECK PASS gesture.cursor-at-click-point  cursors=2
+CHECK PASS gesture.a-unchanged  a=1->1
+CHECK PASS gesture.native-view-cursors  b=2 a=1
+CHECK PASS definition.action-exists
+OBSERVED definition.ctrl-click enabled=1 triggers=1 b-caret=0:8 a-caret=0:0 doc='/tmp/<fixture>/project/b.sv'
+CHECK PASS definition.action-enabled
+CHECK PASS definition.ctrl-click-dispatches  triggers=1
+CHECK PASS definition.b-caret-at-click  b-caret=0:8
+CHECK PASS definition.b-document-is-b
+CHECK PASS definition.a-carets-untouched  a=0:0
+VE-SPLIT-PANE-MOUSE-E2E checks=38 failures=0

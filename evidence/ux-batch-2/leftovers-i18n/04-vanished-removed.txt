@@ -1,0 +1,8 @@
+REMOVED 3 vanished entries:
+  [VEdit] 'Verilog filelists (*.f *.F *.flist);;All files (*)'
+    reason: replaced: the import-filelist dialog filters are now 'Verilog filelists (%1)' + 'All files (*)'
+  [VEdit] 'Verilog/SystemVerilog/filelist (*.v *.sv *.svh *.vh *.f *.F *.flist);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F *.flist);;All Files (*)'
+    reason: replaced: File->Open filters now come from src/common/file_dialog_filters.h as 4 separate entries
+  [vedit::workspace::settings::SettingsPanel] "%1 (the editor's own action)"
+    reason: replaced: foreign shortcut owners are now labelled '%1 (desktop/editor)' by the shell
+vanished+unfinished left: 0

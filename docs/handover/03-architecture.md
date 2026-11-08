@@ -154,7 +154,7 @@ C13 说明了为什么需要这些接缝：语义高亮必须走 KTextEditor 宿
 
 ### 4.4 `build/gates/*.sh` 各管什么
 
-`package.json:7-17` 把 MPD gate id 映射到脚本；但**这套门禁的主语仍是旧 Rust 产品**，Qt lane 是折进去的（`docs/BUILD.md:278-287`）。下表中的脚本路径均相对 `build/gates/`。
+`package.json:7-17` 把 MPD gate id 映射到脚本；但**这套门禁的主语仍是旧 Rust 产品**，Qt lane 是折进去的（`docs/BUILD.md §12.5`「门禁」）。下表中的脚本路径均相对 `build/gates/`。
 
 | 脚本 | 管什么 | 现状/边界 |
 |---|---|---|

@@ -1,0 +1,13 @@
+[49/52] Automatic MOC for target vedit-workspace-project-selftest
+[50/52] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit-workspace-project-selftest.dir/vedit-workspace-project-selftest_autogen/mocs_compilation.cpp.o
+[51/52] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit-workspace-project-selftest.dir/project_selftest.cpp.o
+[52/52] Linking CXX executable src/app/workspace-lane-project/vedit-workspace-project-selftest
+Test project /vedit-build/target/qt6-build
+    Start 14: vedit-file-dialog-filters-selftest
+1/2 Test #14: vedit-file-dialog-filters-selftest ...   Passed    0.06 sec
+    Start 40: vedit-workspace-project-selftest
+2/2 Test #40: vedit-workspace-project-selftest .....   Passed    0.53 sec
+
+100% tests passed, 0 tests failed out of 2
+
+Total Test time (real) =   0.60 sec

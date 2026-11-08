@@ -212,7 +212,9 @@ signals:
     // EditorPane::openFile, which is where this signal is raised. The path is
     // absolute (the open key); a lane decides what an extension means, so the
     // shell never learns a panel or a project. The project lane uses it to
-    // import a `.f`/`.F`/`.flist` filelist as the project.
+    // import a `.f` / `.F` filelist as the project; which extensions count is
+    // decided by isFilelistPath() in src/common/file_dialog_filters.h — `f`,
+    // case-insensitive, so a `.flist` is not a filelist.
     void fileOpened(const QString &absolutePath);
 
 protected:

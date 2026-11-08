@@ -1,0 +1,14 @@
+=== [A] hostmatrix default vs reality
+--- the line now:
+46:APPIMAGE=${VEDIT_APPIMAGE:-$(pick_default_appimage)}
+48:    APPIMAGE=$ROOT/packaging/runtime/out/VEdit-0.2.1-x86_64.AppImage
+58:    --appimage) APPIMAGE=${2:?}; shift 2 ;;
+--- shipped function + shipped fallback, ROOT=repo:
+APPIMAGE=/home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/VEdit-0.2.1-x86_64.AppImage
+exists=yes size=137320952
+--- controlled: newest wins across versions
+picked=VEdit-9.9.9-x86_64.AppImage
+--- controlled: only an OLD version present (no pinned name)
+picked=VEdit-0.1.1-x86_64.AppImage
+--- controlled: nothing present -> fallback names the current release
+fallback=VEdit-0.2.1-x86_64.AppImage

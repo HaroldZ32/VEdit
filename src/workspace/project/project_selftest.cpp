@@ -235,10 +235,11 @@ void runFilelistOpenChecks()
 
     // A second filelist in another directory: the project is open by then, so it
     // must be imported into the CURRENT root (changing the root would clear the
-    // first import through ProjectModel::open()).
+    // first import through ProjectModel::open()). The spelling is a real filelist
+    // extension: `.flist` is NOT one (see the ruling in 6c below).
     const QString otherDirectory = temp.path() + QStringLiteral("/lists");
     QDir().mkpath(otherDirectory);
-    const QString secondFilelist = otherDirectory + QStringLiteral("/extra.flist");
+    const QString secondFilelist = otherDirectory + QStringLiteral("/extra.F");
     writeFile(secondFilelist, projectFile + QLatin1Char('\n'));
 
     // A broken filelist: the parser diagnostics must reach the project panel,
@@ -303,8 +304,8 @@ void runFilelistOpenChecks()
           model->filelists() == QStringList{QFileInfo(designFilelist).absoluteFilePath()});
     check("filelist-open.idempotent-files", model->files().size() == filesAfterFirst);
 
-    // 3. A project IS open: a `.flist` elsewhere is imported into the current
-    //    root, and the root does not change.
+    // 3. A project IS open: a second filelist elsewhere is imported into the
+    //    current root, and the root does not change.
     const QString rootAfterFirst = model->projectRoot();
     check("filelist-open.second-open", shell.openPaths({secondFilelist}, &openError));
     check("filelist-open.second-import-finishes", waitForCompletion(*model, 20000));
@@ -551,9 +552,14 @@ int runSelfCheck(const QString &fixture)
             vedit::workspace::project::planOpenedFilelist(QStringLiteral("/p/DESIGN.F"), true);
         check("filelist.plan.uppercase-f",
               openProject.isFilelist && !openProject.needsRoot && openProject.root.isEmpty());
+        // Ruling: `.flist` is not a filelist extension; only `f` case-insensitive,
+        // decided by the parser (crates/vd-config/src/project.rs). The planner
+        // takes the set from src/common/file_dialog_filters.h, the same source
+        // the file dialogs offer, so the long spelling plans as a plain document.
         const auto flist =
             vedit::workspace::project::planOpenedFilelist(QStringLiteral("/p/run.flist"), true);
-        check("filelist.plan.flist", flist.isFilelist && !flist.needsRoot);
+        check("filelist.plan.flist-not-a-filelist",
+              !flist.isFilelist && !flist.needsRoot && flist.absolutePath.isEmpty());
         check("filelist.plan.non-filelist",
               !vedit::workspace::project::planOpenedFilelist(QStringLiteral("/p/top.sv"), false)
                    .isFilelist);
