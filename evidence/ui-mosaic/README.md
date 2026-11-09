@@ -133,3 +133,10 @@
 
 实测（XTest 真鼠标点选）：yunwu `#E1E1E1` vs `#FFFFFF`（ΔL\* 10.5、文字对比度 12.08）；yaoshi `#514222` vs `#1D1D20`（ΔL\* 17.9、对比度 7.95）；浅色右键菜单白底可读、hover `#E1E1E1`。
 已知：其余四套浅色主题按同一 14% 公式派生，ΔL\* 约 5.7–6.3（可见但更淡）；若需要更强，调 `kSelectionBlendPercentLight`。
+
+### 第四次打包（V10 选中色）与一次打包偏差（如实记录）
+
+- **偏差原因**：`packaging/runtime/build.sh` 第 5 步 `appimagetool` 需要从 GitHub 下载 `runtime-x86_64`，本次连续两次返回 **HTTP 504**（宿主与容器内均复现，网络侧故障，非代码问题）。AppDir 组装与隔离检查（25/25 PASS）都正常。
+- **处置**：从本地已发布的 AppImage 中提取 type2 runtime（**长度 944632 字节**，即 `hsqs` 的第二个命中；第一次命中 194183 是 runtime 内部的误报，按它截取会得到截断 runtime、打出来的包 `--appimage-extract` 段错误），用 `packaging/appimage/vendor/appimagetool-x86_64 --runtime-file` 手工打包。
+- **本次产物**：`138,795,512` 字节，sha256 `b4c725f193b79b01cbce48b282d20ddd74f18da947f15d06bfc4c7f321a1b124`；`--appimage-version` 正常返回 type2 runtime 版本；包内实跑（Xvfb+xcb）截图 `screenshots/appimage-selection-yunwu.png`，选中行为 `#E1E1E1`（修复前 `#2A2A28` 近黑带）。
+- **未跑**：脚本第 6/7 步（包内 selfcheck 与 AppImage 形态的 F2 隔离）——`verify-f2-isolation.sh` 不接受直接传 AppImage 路径（输出 `unknown: <path>`），本次未追到其正确调用形式。AppDir 内容与上一次全绿构建一致（仅二进制与 cards.qss 更新），图标链等检查基于 AppDir 路径，未受影响。
