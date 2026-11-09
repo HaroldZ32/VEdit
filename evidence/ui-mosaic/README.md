@@ -104,3 +104,17 @@
 - AppImage `138,795,512` 字节，sha256 `3cfd24f06dea154990d6ed08da7932231760923737e8286085f451766844dadb`（与 `out/SHA256SUMS` 一致）。
 - 包内实跑截图 `screenshots/appimage-verify.png`：卡片白底 + 可见描边 + 阴影 + 画布间隙 + 按钮轮廓，状态栏 `Theme: Cloud White / Breeze Light` —— 证明修复已进入交付物。
 - 包内 `F1/T2` 复测（同一口径）：外圈 8px 卡片像素 **0**、纵向连续画布 **10px**。
+
+### 视觉修复二轮（V8/V9，用户第二轮反馈）
+
+用户反馈："工程窗口阴影除标题外无渲染；文件、大纲窗口左下右下角变成直角；暗色模式别阴影直接描边；文件树重命名输入框文字只显示一半"。
+
+| 反馈 | 根因 | 修复 | 实测 |
+|---|---|---|---|
+| 工程窗口只有标题有阴影 | `Project` dock 在 `project_integration.cpp` 里**直接 `addDockWidget`**，绕过 `PanelRegistry`，没有 `veditDockCard` 属性/边距/阴影 | 抽出 `PanelRegistry::applyCardChrome(QDockWidget*)`，`insert()` 与 `project_integration.cpp` 共用 | 左栏上半区 surface 占比 **0.645 → 0.913**；卡片体 `#FFFFFF`、左边 `#E4E5E5` 描边 |
+| 左下/右下是直角 | 圆角只画在描边上，**子控件（树/表格）方形背景盖住弧线** | 卡片容器加 `padding: 2px` + 内层视图背景透明，让容器圆角底透出 | 左下角 12×12 非 surface 像素 **0 → 65**；右下 24；六套一致 |
+| 暗色阴影太黑 | 深色也上了 α220 黑阴影 | 深色主题**不加阴影**（`setGraphicsEffect(nullptr)`），只用描边；深浅判定改读 `QApplication::palette()` | 深色外侧阴影 **0–1px**（无阴影带），描边 Δ24 且比表面亮 |
+| 重命名输入框文字被裁一半 | 全局 `QLineEdit` 的 padding 命中文件树内联编辑器（行高 ~20px） | 追加 `QTreeView/QTableView/QListView/QAbstractItemView QLineEdit { padding: 0 4px; margin:0; min-height:0; border-radius:3px }` | 构建 62/62；实机待用户确认 |
+
+最终六套量化（`screenshots/after-*.png`）：下/左/右阴影 4–5px（深色 0–1px 属"无阴影"）；纵向画布 10px（深色 16px）；横向 18–21px；角点弧线六套一致。
+项目态证据：`screenshots/project-yunwu.png`（`--project tests/fixtures/verilog-project`）。

@@ -1,0 +1,12 @@
+=== yunwu
+ terminal dark bbox (20, 691, 899, 789) dark px 10877
+ terminal bg candidate (255, 255, 255)
+ terminal brightest text (255, 255, 255) contrast 1.0
+ dialog dominant [((255, 255, 255), 272064), ((248, 248, 247), 19099)]
+ menu dominant [((255, 255, 255), 65988), ((244, 244, 242), 969)]
+=== shenye
+ terminal dark bbox (20, 690, 899, 789) dark px 86334
+ terminal bg candidate (22, 31, 46)
+ terminal brightest text (230, 232, 236) contrast 14.46
+ dialog dominant [((22, 31, 46), 272092), ((18, 26, 39), 19099)]
+ menu dominant [((22, 31, 46), 65988), ((15, 22, 34), 969)]

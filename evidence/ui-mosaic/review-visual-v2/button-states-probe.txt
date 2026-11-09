@@ -1,0 +1,10 @@
+=== yunwu
+ hover-toolbar: edge(33,47)=(206, 207, 208) fill(50,47)=(248, 248, 247) dLum=80.3
+ pressed-toolbar: edge(33,47)=(206, 207, 208) fill(50,47)=(42, 42, 40) dLum=153.0
+ hover-button: edge(938,117)=(206, 207, 208) fill(980,117)=(248, 248, 247) dLum=80.3
+ pressed-button: edge(938,117)=(206, 207, 208) fill(980,117)=(42, 42, 40) dLum=153.0
+=== shenye
+ hover-toolbar: edge(33,47)=(68, 75, 88) fill(50,47)=(18, 26, 39) dLum=15.2
+ pressed-toolbar: edge(33,47)=(68, 75, 88) fill(50,47)=(81, 139, 227) dLum=47.9
+ hover-button: edge(938,117)=(68, 75, 88) fill(980,117)=(18, 26, 39) dLum=15.2
+ pressed-button: edge(938,117)=(68, 75, 88) fill(980,117)=(81, 139, 227) dLum=47.9

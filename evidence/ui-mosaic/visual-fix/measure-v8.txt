@@ -1,0 +1,2 @@
+after-yaoshi.png win=(0,0,1276,816) card x=[17,585] bottom=796 stroke_delta=24 shadow_down=0 left=0 right=0 corner_canvas=left:7 right:7
+after-yunwu.png win=(0,0,1276,816) card x=[17,585] bottom=796 stroke_delta=27 shadow_down=5 left=4 right=4 corner_canvas=left:0 right:0

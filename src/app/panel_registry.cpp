@@ -60,35 +60,39 @@ QWidget *makePlaceholder(const PanelSpec &spec, const QString &hint)
     return placeholder;
 }
 
-// 卡片投影（UI-Mosaic V5/V6）：轻量、柔和——blur 12（浅色）/ 14（深色）、offset (0,1)。
-// 第一轮 blur 8/10 实测纵向间隙 10px 达标，但上边只剩 1px、左边 2px 阴影（差 Δ≥3
-// 的连续像素）；按复核给的修复方向把阴影带放宽到 blur 12/14，同时 separator 纵向
-// 间隙提到 16px，让间隙中段保留 ≥6px 纯画布。
-// 深色主题的画布接近黑色，同一条黑投影必须更浓才看得见（阴影带 Δ≥3 的要求），
-// 所以透明度仍按画布亮度分两档：浅色 22/255、深色 220/255。
+// 卡片投影（UI-Mosaic V5/V6）：浅色主题轻量、柔和——blur 12、offset (0,1)、α22。
+// 深色主题（V8）不加投影：画布本身接近黑色，黑投影既看不见，又把卡片之间压成
+// 一片，"暗色模式就别阴影了太黑了直接描边吧"——只保留 1px 描边。
 //
 // V6：深浅必须读 QApplication::palette()。右栏的 Module Tree / Interface 两张 dock 在
-// 产品主题应用之前创建，owner->palette() 会停留在浅色，阴影就永远停在 α22，在
-// #131315 上不可见；而 dock 的 palette 也可能滞后于应用调色板。因此这里做成可
-// 重复调用的 applyCardShadow，主题变化时由 CardShadowWatcher 重新应用。
+// 产品主题应用之前创建，owner->palette() 会停留在浅色；而 dock 的 palette 也可能
+// 滞后于应用调色板。因此这里做成可重复调用的 applyCardShadow，主题变化时由
+// CardShadowWatcher 重新应用。
+// V8：深色判定改用画布亮度 0.299R+0.587G+0.114B < 128（HSL lightness 对饱和色
+// 不敏感，且判据要跟"看起来黑不黑"一致）。
 void applyCardShadow(QWidget *owner)
 {
     if (owner == nullptr) {
         return;
     }
-    const bool light = QApplication::palette().color(QPalette::Window).lightness() > 128;
-    // 深色主题的投影用稍大的 blur 与更高的 α：Δ≥3 的阴影带要求至少 3px，而
-    // 在 #131315 这样的画布上，同一条黑边只有再浓一点、再铺开一点才够宽；
-    // 浅色主题反过来，α 一大就会把间隙填灰。
+    const QColor canvas = QApplication::palette().color(QPalette::Window);
+    const bool dark =
+        0.299 * canvas.red() + 0.587 * canvas.green() + 0.114 * canvas.blue() < 128.0;
+    if (dark) {
+        // 深色主题不创建、也不保留投影：已有的一并移除（setGraphicsEffect(nullptr)
+        // 连同旧 effect 一起销毁），切回浅色时在下面重建。
+        owner->setGraphicsEffect(nullptr);
+        return;
+    }
     // 已存在的 effect 就地更新，避免重复叠加多个投影。
     auto *shadow = qobject_cast<QGraphicsDropShadowEffect *>(owner->graphicsEffect());
     if (shadow == nullptr) {
         shadow = new QGraphicsDropShadowEffect(owner);
         owner->setGraphicsEffect(shadow);
     }
-    shadow->setBlurRadius(light ? 12 : 14);
+    shadow->setBlurRadius(12);
     shadow->setOffset(0, 1);
-    shadow->setColor(QColor(0, 0, 0, light ? 22 : 220));
+    shadow->setColor(QColor(0, 0, 0, 22));
 }
 
 // 轻量事件过滤器：parent 到 owner，随 owner 一起销毁（不泄漏、不轮询）。
@@ -115,6 +119,26 @@ private:
 };
 
 } // namespace
+
+// 卡片外观的唯一入口：注册表创建的 dock 与 lane 自己创建的 dock（Project）都走
+// 这里，避免两份实现漂移。属性 + 投影 + 调色板监听缺一不可。
+void PanelRegistry::applyCardChrome(QDockWidget *dock)
+{
+    if (dock == nullptr) {
+        return;
+    }
+    if (QWidget *content = dock->widget()) {
+        // 卡片体：QSS 用这个属性给真实面板画描边与圆角（QDockWidget 自身的
+        // border 在 Qt 6.10 上不绘制，`QDockWidget > QWidget` 又匹配不到真实
+        // 面板的根控件——见 resources/themes/cards.qss 与 probe.py 的 before 对照）。
+        content->setProperty("veditDockCard", true);
+        content->setAttribute(Qt::WA_StyledBackground, true);
+        content->setContentsMargins(1, 0, 1, 1);
+    }
+    applyCardShadow(dock);
+    // 主题切换后重新按应用调色板算阴影（两张右栏 dock 在主题应用之前创建）。
+    dock->installEventFilter(new CardShadowWatcher(dock));
+}
 
 void PanelRegistry::addPanel(PanelSpec spec)
 {
@@ -210,16 +234,8 @@ QDockWidget *PanelRegistry::insert(const QString &id, QMainWindow *window)
     dock->setObjectName(QStringLiteral("dock-") + spec.id);
     dock->setAllowedAreas(Qt::AllDockWidgetAreas);
     QWidget *content = createContent(spec);
-    // 卡片体：QSS 用这个属性给真实面板画描边与圆角（QDockWidget 自身的
-    // border 在 Qt 6.10 上不绘制，`QDockWidget > QWidget` 又匹配不到真实
-    // 面板的根控件——见 resources/themes/cards.qss 与 probe.py 的 before 对照）。
-    content->setProperty("veditDockCard", true);
-    content->setAttribute(Qt::WA_StyledBackground, true);
-    content->setContentsMargins(1, 0, 1, 1);
     dock->setWidget(content);
-    applyCardShadow(dock);
-    // 主题切换后重新按应用调色板算阴影（两张右栏 dock 在主题应用之前创建）。
-    dock->installEventFilter(new CardShadowWatcher(dock));
+    applyCardChrome(dock);
     window_->addDockWidget(spec.area, dock);
     docks_.insert(spec.id, dock);
     // T129: a dock's own X button hides it without touching the menu action;

@@ -1,0 +1,25 @@
+grab src-yunwu (1680, 1050)
+grab src-xinghuang (1680, 1050)
+grab src-bohe (1680, 1050)
+grab src-qingkong (1680, 1050)
+grab src-yaoshi (1680, 1050)
+grab src-shenye (1680, 1050)
+grab project-yunwu (1680, 1050)
+grab project-yaoshi (1680, 1050)
+shot yunwu-menu
+shot yunwu-hover-toolbar
+shot yunwu-pressed-toolbar
+shot yunwu-hover-button
+shot yunwu-pressed-button
+shot yunwu-terminal
+shot yunwu-dialog
+done
+shot shenye-menu
+shot shenye-hover-toolbar
+shot shenye-pressed-toolbar
+shot shenye-hover-button
+shot shenye-pressed-button
+shot shenye-terminal
+shot shenye-dialog
+done
+OK: reviewer-v2 screenshots in /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-visual-v2/shots

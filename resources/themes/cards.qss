@@ -81,34 +81,61 @@ QDockWidget::title {
  * 标题的上半圈拼成连续的 1px 轮廓。这条选择器只匹配 QDockWidget 的**直接**
  * 子控件（内容面板与标题栏按钮，按钮的 subcontrol 规则在前面已经覆盖），
  * 不是无差别的全局 QWidget 规则，对话框 / 菜单 / 下拉弹层不受影响。 */
-/* 卡片体基线（V1 实测，2026-11）：Qt 6.10 上 `dock->widget()` **不是**
- * QDockWidget 的直接子控件（`QDockWidget > QWidget` 一条像素都不命中，实测
- * 见 evidence/ui-mosaic/visual-fix/probe.py 的 before 对照），真实面板控件全在
- * 更深一层。所以卡片体按“dock 内的所有控件”铺 surface：效果就是调色板
- * Window 基线本来要保证的事——卡片内部默认是卡片色，画布只留给
- * QMainWindow / separator / 工具栏 / 菜单栏。子控件的显式规则（滚动条、
- * tab、hover）特异度更高，不会被这条覆盖。 */
-QDockWidget QWidget {
-    background: @surface@;
-}
-
 QDockWidget > QWidget {
     background: @surface@;
     border: 1px solid @border@;
     border-top: none;
     border-bottom-left-radius: @radius@;
     border-bottom-right-radius: @radius@;
+    /* V8：子控件（树/表格）的方形底往内缩 2px，下方两角的弧线才露得出来。 */
+    padding: 2px;
 }
 
 /* 真实 dock 的卡片抽屉：panel_registry.cpp 给内容根控件打上 veditDockCard
  * 属性，卡片的左右下三边描边由它画（上边由 QDockWidget::title 的上半圈承担），
- * 圆角只在下方两角——与 title 的上方两角拼成一张连续卡片。 */
+ * 圆角只在下方两角——与 title 的上方两角拼成一张连续卡片。
+ *
+ * V9：这里**不再**用 `QDockWidget QWidget` 给 dock 内所有控件铺 surface。那条
+ * 通配会把卡片里的 QStackedWidget / 面板页 / 视图 viewport 一起涂成方形
+ * surface，一直铺到卡片边缘，把容器画的四角圆角盖掉（V8 的 padding 只让描边
+ * 弧线露出来，卡片体仍是方的；像素证据见
+ * evidence/ui-mosaic/visual-fix/REPORT-V9.md）。卡片内部的默认底色由内容根控件
+ * 的 surface + 圆角提供，容器保持透明即可；需要自己底色的控件（QLineEdit /
+ * QPushButton / QPlainTextEdit / 树 / 表格 / 列表等）模板里都有显式规则。 */
 QWidget[veditDockCard="true"] {
     background: @surface@;
     border: 1px solid @border@;
     border-top: none;
     border-bottom-left-radius: @radius@;
     border-bottom-right-radius: @radius@;
+    /* V8：QTreeView / QTableView 的方形背景会把下方两角盖成直角；2px 内缩让
+     * 父层 border-bottom-*-radius 的弧线重新露出来（Files / Outline 卡片）。 */
+    padding: 2px;
+}
+
+/* V9：圆角是容器画的（background + border-radius），但卡片里的树/表格/列表有
+ * 自己的方形底色，会一直铺到卡片边缘，把四角的弧线盖住——V8 的 2px 内缩只让
+ * **描边**的弧线露出来，白色卡片体仍然是方的。像素证据与修后对照见
+ * evidence/ui-mosaic/visual-fix/REPORT-V9.md。
+ *
+ * 只列这三个类，不写 QAbstractScrollArea：QPlainTextEdit / QTextEdit 也是它的
+ * 子类，终端面板需要自己的深底，不能被卡片作用域透明化。视图的底色改为透明后，
+ * 容器的 @surface@ 与下方两角圆角就是最终看到的卡片体；选中/悬停仍由
+ * ::item:selected / ::item:hover 的 accent / surfaceAlt 画，不受影响。 */
+QWidget[veditDockCard="true"] QTreeView,
+QWidget[veditDockCard="true"] QTableView,
+QWidget[veditDockCard="true"] QListView {
+    background: transparent;
+}
+
+/* 视图的滚动区 viewport（QAbstractScrollAreaWidget）是普通 QWidget，默认用
+ * palette Base（surface）自动填底，所以即使视图本身透明，viewport 仍会把卡片
+ * 四角铺成方的。只对这三类视图的**直接子控件**（viewport 与滚动条）复位透明；
+ * 仍不写 QAbstractScrollArea，避免连终端的 viewport 一起透明化。 */
+QWidget[veditDockCard="true"] QTreeView > QWidget,
+QWidget[veditDockCard="true"] QTableView > QWidget,
+QWidget[veditDockCard="true"] QListView > QWidget {
+    background: transparent;
 }
 
 /* 标题栏按钮是 QAbstractButton 子类，上面的「直接子控件」规则与这里的
@@ -344,20 +371,23 @@ QPushButton:hover {
     background: @surfaceAlt@;
 }
 
+/* V9：按下/选中/聚焦时底色就是 accent，若描边也写 accent，轮廓会与底色同色而
+ * “消失”（当前 Qt 版本渲染侥幸仍有边框，属脆弱点）。描边改用中性 borderStrong，
+ * 轮廓在任何底色上都可见。 */
 QPushButton:pressed {
     background: @accent@;
     color: @accentText@;
-    border-color: @accent@;
+    border-color: @borderStrong@;
 }
 
 QPushButton:checked {
     background: @accent@;
     color: @accentText@;
-    border-color: @accent@;
+    border-color: @borderStrong@;
 }
 
 QPushButton:focus {
-    border-color: @accent@;
+    border-color: @borderStrong@;
 }
 
 QPushButton:disabled {
@@ -674,4 +704,17 @@ QSplitter::handle {
 
 QSplitter::handle:hover {
     background: @border@;
+}
+
+/* 树/表格/列表里的内联编辑框（文件树新建/重命名）行高只有 ~20px：
+   全局 QLineEdit 的 padding 会把可用高度吃掉，文字只剩一半。这里按容器复位。 */
+QTreeView QLineEdit,
+QTableView QLineEdit,
+QListView QLineEdit,
+QAbstractItemView QLineEdit {
+    padding: 0px 4px;
+    margin: 0px;
+    min-height: 0px;
+    max-height: none;
+    border-radius: 3px;
 }

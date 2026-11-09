@@ -290,6 +290,8 @@ qt.core.qobject.connect: QObject::connect: No such signal QListModel::directoryO
 qt.core.qobject.connect: QObject::connect: No such signal QItemSelectionModel::directoryOpened(QString)
 qt.core.qobject.connect: QObject::connect: No such signal QLabel::directoryOpened(QString)
 qt.core.qobject.connect: QObject::connect:  (sender name:   'project-status')
+qt.core.qobject.connect: QObject::connect: No such signal QGraphicsDropShadowEffect::directoryOpened(QString)
+qt.core.qobject.connect: QObject::connect: No such signal QObject::directoryOpened(QString)
 TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:missing verible-format:local verible-lint:local missing=[slang-server] local=[/vedit-build/build/slang/out,/vedit-build/.mpd/recon/verible/bin]
 PROJECT-EXPAND-INPUTS root='' filelists=0 variables=0 settings='/root/.config/VEdit/vedit-app/settings.toml'
 VCS-TOOLCHAIN git=/usr/bin/git version=2.53.0 svn=<missing> version=<missing> source=mixed git_source=path svn_source=missing

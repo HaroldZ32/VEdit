@@ -1,0 +1,16 @@
+=== yunwu PASS= True
+ A {'left': ([255, 255, 255], 1.0, 0, True), 'r1': ([255, 255, 255], 1.0, 0, True), 'r2': ([255, 255, 255], 1.0, 0, True), 'r3': ([255, 255, 255], 1.0, 0, True), 'editor_info': ([255, 255, 255], 1.0, 0, None)}
+ B min 26.3 15.1 True
+ C {'left.left': 4, 'left.right': 4, 'left.top': 0, 'left.bottom': 5, 'editor.left': 4, 'editor.right': 4, 'editor.top': 3, 'editor.bottom': 5, 'r1.left': 4, 'r1.right': 4, 'r1.top': 0, 'r1.bottom': 5, 'r2.left': 4, 'r2.right': 4, 'r2.top': 3, 'r2.bottom': 5, 'r3.left': 4, 'r3.right': 4, 'r3.top': 3, 'r3.bottom': 5}
+ D 11 11 True
+ F1 True {'left': (0, 0), 'right': (0, 0), 'top': (0, 77), 'bottom': (0, 918)}
+ F2 {'h:left|editor': 18, 'h:editor|r2': 18, 'v:r1|r2': 10, 'v:r2|r3': 10} True
+ F3 {'h:left|editor': 7, 'h:editor|r2': 7, 'v:r1|r2': 8, 'v:r2|r3': 8} True
+=== shenye PASS= True
+ A {'left': ([22, 31, 46], 1.0, 0, True), 'r1': ([22, 31, 46], 1.0, 0, True), 'r2': ([22, 31, 46], 1.0, 0, True), 'r3': ([22, 31, 46], 1.0, 0, True), 'editor_info': ([35, 38, 41], 1.0, 13, None)}
+ B min 24.2 32.9 True
+ C {'left.left': 5, 'left.right': 5, 'left.top': 0, 'left.bottom': 6, 'editor.left': 5, 'editor.right': 5, 'editor.top': 4, 'editor.bottom': 6, 'r1.left': 5, 'r1.right': 5, 'r1.top': 0, 'r1.bottom': 6, 'r2.left': 5, 'r2.right': 5, 'r2.top': 4, 'r2.bottom': 6, 'r3.left': 5, 'r3.right': 5, 'r3.top': 4, 'r3.bottom': 6}
+ D 11 11 True
+ F1 True {'left': (0, 0), 'right': (0, 0), 'top': (0, 78), 'bottom': (0, 983)}
+ F2 {'h:left|editor': 16, 'h:editor|r2': 16, 'v:r1|r2': 8, 'v:r2|r3': 8} True
+ F3 {'h:left|editor': 10, 'h:editor|r2': 10, 'v:r1|r2': 9, 'v:r2|r3': 11} True

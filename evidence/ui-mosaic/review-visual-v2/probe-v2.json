@@ -1,0 +1,6490 @@
+{
+ "yunwu": {
+  "theme": "yunwu",
+  "file": "evidence/ui-mosaic/screenshots/after-yunwu.png",
+  "size": [
+   1680,
+   1050
+  ],
+  "A": {
+   "left": {
+    "at": [
+     100,
+     300
+    ],
+    "mode": [
+     255,
+     255,
+     255
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "r1": {
+    "at": [
+     1000,
+     200
+    ],
+    "mode": [
+     255,
+     255,
+     255
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "r2": {
+    "at": [
+     1200,
+     400
+    ],
+    "mode": [
+     255,
+     255,
+     255
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "r3": {
+    "at": [
+     1000,
+     600
+    ],
+    "mode": [
+     255,
+     255,
+     255
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "editor_info": {
+    "mode": [
+     255,
+     255,
+     255
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "d_canvas": 13
+   }
+  },
+  "B": {
+   "left.left": {
+    "pos": 16,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 15.1
+   },
+   "left.right": {
+    "pos": 586,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 15.1
+   },
+   "editor.left": {
+    "pos": 611,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 15.1
+   },
+   "editor.right": {
+    "pos": 906,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 15.1
+   },
+   "r1.left": {
+    "pos": 931,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 15.1
+   },
+   "r1.right": {
+    "pos": 1263,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 15.1
+   },
+   "r2.left": {
+    "pos": 931,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 15.1
+   },
+   "r2.right": {
+    "pos": 1263,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 15.1
+   },
+   "r3.left": {
+    "pos": 931,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 15.1
+   },
+   "r3.right": {
+    "pos": 1263,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 15.1
+   },
+   "min_d_surface": 26.3,
+   "min_d_canvas": 15.1,
+   "ok": true
+  },
+  "C": {
+   "left.left": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "left.right": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "left.top": {
+    "band_px": 0,
+    "deltas": [],
+    "exempt": false,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": false
+   },
+   "left.bottom": {
+    "band_px": 5,
+    "deltas": [
+     12,
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.left": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.right": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.top": {
+    "band_px": 3,
+    "deltas": [
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.bottom": {
+    "band_px": 5,
+    "deltas": [
+     12,
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r1.left": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r1.right": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r1.top": {
+    "band_px": 0,
+    "deltas": [],
+    "exempt": false,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": false
+   },
+   "r1.bottom": {
+    "band_px": 5,
+    "deltas": [
+     12,
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.left": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.right": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.top": {
+    "band_px": 3,
+    "deltas": [
+     6,
+     4,
+     3
+    ],
+    "exempt": true,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.bottom": {
+    "band_px": 5,
+    "deltas": [
+     11,
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.left": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.right": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.top": {
+    "band_px": 3,
+    "deltas": [
+     6,
+     4,
+     3
+    ],
+    "exempt": true,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.bottom": {
+    "band_px": 5,
+    "deltas": [
+     11,
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "ok": true,
+   "strict_ok": false,
+   "strict_note": "left/r1 top = 0 px; only r2/r3 are literally 'vertically stacked' in the contract text"
+  },
+  "D": {
+   "found": 11,
+   "ok_count": 11,
+   "buttons": [
+    {
+     "box": [
+      1220,
+      30,
+      36,
+      36
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.63,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      33,
+      31,
+      80,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.15,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      115,
+      31,
+      98,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.31,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      215,
+      31,
+      138,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.54,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      355,
+      31,
+      150,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.42,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      507,
+      31,
+      83,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.3,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      592,
+      31,
+      102,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.33,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      696,
+      31,
+      85,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.26,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      783,
+      31,
+      84,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.2,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      876,
+      31,
+      140,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.22,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      1018,
+      31,
+      121,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.52,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    }
+   ],
+   "ok": true
+  },
+  "E": {
+   "lum_surface": 255.0,
+   "lum_border": 228.7,
+   "border_lighter": false,
+   "ok": true
+  },
+  "F1": {
+   "edges": {
+    "left": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 0,
+     "noncanvas_examples": [],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    },
+    "right": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 0,
+     "noncanvas_examples": [],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    },
+    "top": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 132,
+     "noncanvas_examples": [
+      [
+       39,
+       5,
+       [
+        241,
+        214,
+        149
+       ]
+      ],
+      [
+       40,
+       5,
+       [
+        79,
+        55,
+        116
+       ]
+      ],
+      [
+       41,
+       5,
+       [
+        182,
+        238,
+        242
+       ]
+      ],
+      [
+       42,
+       5,
+       [
+        244,
+        244,
+        236
+       ]
+      ],
+      [
+       43,
+       5,
+       [
+        181,
+        113,
+        58
+       ]
+      ],
+      [
+       44,
+       5,
+       [
+        79,
+        149,
+        213
+       ]
+      ],
+      [
+       91,
+       5,
+       [
+        244,
+        242,
+        212
+       ]
+      ],
+      [
+       92,
+       5,
+       [
+        145,
+        81,
+        60
+       ]
+      ]
+     ],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    },
+    "bottom": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 1184,
+     "noncanvas_examples": [
+      [
+       1252,
+       818,
+       [
+        248,
+        248,
+        247
+       ]
+      ],
+      [
+       1253,
+       818,
+       [
+        248,
+        248,
+        247
+       ]
+      ],
+      [
+       1255,
+       818,
+       [
+        248,
+        248,
+        247
+       ]
+      ],
+      [
+       1256,
+       818,
+       [
+        248,
+        248,
+        247
+       ]
+      ],
+      [
+       1258,
+       818,
+       [
+        248,
+        248,
+        247
+       ]
+      ],
+      [
+       1259,
+       818,
+       [
+        248,
+        248,
+        247
+       ]
+      ],
+      [
+       1261,
+       818,
+       [
+        248,
+        248,
+        247
+       ]
+      ],
+      [
+       1262,
+       818,
+       [
+        248,
+        248,
+        247
+       ]
+      ]
+     ],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    }
+   },
+   "ok": true
+  },
+  "F2": {
+   "pairs": {
+    "h:left|editor": {
+     "gap": [
+      587,
+      610
+     ],
+     "longest_canvas": 18,
+     "range": [
+      590,
+      607
+     ],
+     "ok": true
+    },
+    "h:editor|r2": {
+     "gap": [
+      907,
+      930
+     ],
+     "longest_canvas": 18,
+     "range": [
+      910,
+      927
+     ],
+     "ok": true
+    },
+    "v:r1|r2": {
+     "gap": [
+      354,
+      369
+     ],
+     "longest_canvas": 10,
+     "range": [
+      358,
+      367
+     ],
+     "ok": true
+    },
+    "v:r2|r3": {
+     "gap": [
+      491,
+      506
+     ],
+     "longest_canvas": 10,
+     "range": [
+      495,
+      504
+     ],
+     "ok": true
+    }
+   },
+   "ok": true
+  },
+  "F3": {
+   "gaps": {
+    "h:left|editor": {
+     "levels": 7,
+     "colors": [
+      [
+       235,
+       235,
+       233
+      ],
+      [
+       238,
+       238,
+       236
+      ],
+      [
+       240,
+       240,
+       238
+      ],
+      [
+       241,
+       241,
+       239
+      ],
+      [
+       242,
+       242,
+       240
+      ],
+      [
+       243,
+       243,
+       241
+      ],
+      [
+       244,
+       244,
+       242
+      ]
+     ],
+     "ok": true
+    },
+    "h:editor|r2": {
+     "levels": 7,
+     "colors": [
+      [
+       235,
+       235,
+       233
+      ],
+      [
+       238,
+       238,
+       236
+      ],
+      [
+       240,
+       240,
+       238
+      ],
+      [
+       241,
+       241,
+       239
+      ],
+      [
+       242,
+       242,
+       240
+      ],
+      [
+       243,
+       243,
+       241
+      ],
+      [
+       244,
+       244,
+       242
+      ]
+     ],
+     "ok": true
+    },
+    "v:r1|r2": {
+     "levels": 8,
+     "colors": [
+      [
+       232,
+       232,
+       230
+      ],
+      [
+       235,
+       235,
+       233
+      ],
+      [
+       238,
+       238,
+       236
+      ],
+      [
+       240,
+       240,
+       238
+      ],
+      [
+       241,
+       241,
+       239
+      ],
+      [
+       242,
+       242,
+       240
+      ],
+      [
+       243,
+       243,
+       241
+      ],
+      [
+       244,
+       244,
+       242
+      ]
+     ],
+     "ok": true
+    },
+    "v:r2|r3": {
+     "levels": 8,
+     "colors": [
+      [
+       233,
+       233,
+       231
+      ],
+      [
+       235,
+       235,
+       233
+      ],
+      [
+       238,
+       238,
+       236
+      ],
+      [
+       240,
+       240,
+       238
+      ],
+      [
+       241,
+       241,
+       239
+      ],
+      [
+       242,
+       242,
+       240
+      ],
+      [
+       243,
+       243,
+       241
+      ],
+      [
+       244,
+       244,
+       242
+      ]
+     ],
+     "ok": true
+    }
+   },
+   "ok": true
+  },
+  "window": [
+   0,
+   0,
+   1279,
+   819
+  ],
+  "PASS": true
+ },
+ "xinghuang": {
+  "theme": "xinghuang",
+  "file": "evidence/ui-mosaic/screenshots/after-xinghuang.png",
+  "size": [
+   1680,
+   1050
+  ],
+  "A": {
+   "left": {
+    "at": [
+     100,
+     300
+    ],
+    "mode": [
+     255,
+     253,
+     246
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "r1": {
+    "at": [
+     1000,
+     200
+    ],
+    "mode": [
+     255,
+     253,
+     246
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "r2": {
+    "at": [
+     1200,
+     400
+    ],
+    "mode": [
+     255,
+     253,
+     246
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "r3": {
+    "at": [
+     1000,
+     600
+    ],
+    "mode": [
+     255,
+     253,
+     246
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "editor_info": {
+    "mode": [
+     253,
+     246,
+     227
+    ],
+    "share": 1.0,
+    "d_surface": 19,
+    "d_canvas": 4
+   }
+  },
+  "B": {
+   "left.left": {
+    "pos": 16,
+    "border": [
+     228,
+     227,
+     221
+    ],
+    "d_surface": 26.2,
+    "d_canvas": 15.5
+   },
+   "left.right": {
+    "pos": 586,
+    "border": [
+     228,
+     227,
+     221
+    ],
+    "d_surface": 26.2,
+    "d_canvas": 15.5
+   },
+   "editor.left": {
+    "pos": 611,
+    "border": [
+     228,
+     227,
+     221
+    ],
+    "d_surface": 26.2,
+    "d_canvas": 15.5
+   },
+   "editor.right": {
+    "pos": 906,
+    "border": [
+     228,
+     227,
+     221
+    ],
+    "d_surface": 26.2,
+    "d_canvas": 15.5
+   },
+   "r1.left": {
+    "pos": 931,
+    "border": [
+     228,
+     227,
+     221
+    ],
+    "d_surface": 26.2,
+    "d_canvas": 15.5
+   },
+   "r1.right": {
+    "pos": 1263,
+    "border": [
+     228,
+     227,
+     221
+    ],
+    "d_surface": 26.2,
+    "d_canvas": 15.5
+   },
+   "r2.left": {
+    "pos": 931,
+    "border": [
+     228,
+     227,
+     221
+    ],
+    "d_surface": 26.2,
+    "d_canvas": 15.5
+   },
+   "r2.right": {
+    "pos": 1263,
+    "border": [
+     228,
+     227,
+     221
+    ],
+    "d_surface": 26.2,
+    "d_canvas": 15.5
+   },
+   "r3.left": {
+    "pos": 931,
+    "border": [
+     228,
+     227,
+     221
+    ],
+    "d_surface": 26.2,
+    "d_canvas": 15.5
+   },
+   "r3.right": {
+    "pos": 1263,
+    "border": [
+     228,
+     227,
+     221
+    ],
+    "d_surface": 26.2,
+    "d_canvas": 15.5
+   },
+   "min_d_surface": 26.2,
+   "min_d_canvas": 15.5,
+   "ok": true
+  },
+  "C": {
+   "left.left": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "left.right": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "left.top": {
+    "band_px": 0,
+    "deltas": [],
+    "exempt": false,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": false
+   },
+   "left.bottom": {
+    "band_px": 5,
+    "deltas": [
+     13,
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.left": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.right": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.top": {
+    "band_px": 3,
+    "deltas": [
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.bottom": {
+    "band_px": 5,
+    "deltas": [
+     13,
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r1.left": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r1.right": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r1.top": {
+    "band_px": 0,
+    "deltas": [],
+    "exempt": false,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": false
+   },
+   "r1.bottom": {
+    "band_px": 5,
+    "deltas": [
+     13,
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.left": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.right": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.top": {
+    "band_px": 3,
+    "deltas": [
+     6,
+     4,
+     3
+    ],
+    "exempt": true,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.bottom": {
+    "band_px": 5,
+    "deltas": [
+     12,
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.left": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.right": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.top": {
+    "band_px": 3,
+    "deltas": [
+     6,
+     4,
+     3
+    ],
+    "exempt": true,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.bottom": {
+    "band_px": 5,
+    "deltas": [
+     12,
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "ok": true,
+   "strict_ok": false,
+   "strict_note": "left/r1 top = 0 px; only r2/r3 are literally 'vertically stacked' in the contract text"
+  },
+  "D": {
+   "found": 11,
+   "ok_count": 11,
+   "buttons": [
+    {
+     "box": [
+      1220,
+      30,
+      36,
+      36
+     ],
+     "fill": [
+      255,
+      253,
+      246
+     ],
+     "fill_share": 0.63,
+     "d_lum": 48.0,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      33,
+      31,
+      80,
+      33
+     ],
+     "fill": [
+      255,
+      253,
+      246
+     ],
+     "fill_share": 0.15,
+     "d_lum": 48.0,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      115,
+      31,
+      98,
+      33
+     ],
+     "fill": [
+      255,
+      253,
+      246
+     ],
+     "fill_share": 0.31,
+     "d_lum": 48.0,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      215,
+      31,
+      138,
+      33
+     ],
+     "fill": [
+      255,
+      253,
+      246
+     ],
+     "fill_share": 0.54,
+     "d_lum": 48.0,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      355,
+      31,
+      150,
+      33
+     ],
+     "fill": [
+      255,
+      253,
+      246
+     ],
+     "fill_share": 0.42,
+     "d_lum": 48.0,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      507,
+      31,
+      83,
+      33
+     ],
+     "fill": [
+      255,
+      253,
+      246
+     ],
+     "fill_share": 0.3,
+     "d_lum": 48.0,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      592,
+      31,
+      102,
+      33
+     ],
+     "fill": [
+      255,
+      253,
+      246
+     ],
+     "fill_share": 0.33,
+     "d_lum": 48.0,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      696,
+      31,
+      85,
+      33
+     ],
+     "fill": [
+      255,
+      253,
+      246
+     ],
+     "fill_share": 0.26,
+     "d_lum": 48.0,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      783,
+      31,
+      84,
+      33
+     ],
+     "fill": [
+      255,
+      253,
+      246
+     ],
+     "fill_share": 0.2,
+     "d_lum": 48.0,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      876,
+      31,
+      140,
+      33
+     ],
+     "fill": [
+      255,
+      253,
+      246
+     ],
+     "fill_share": 0.22,
+     "d_lum": 48.0,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      1018,
+      31,
+      121,
+      33
+     ],
+     "fill": [
+      255,
+      253,
+      246
+     ],
+     "fill_share": 0.52,
+     "d_lum": 48.0,
+     "corner_cut": 4,
+     "ok": true
+    }
+   ],
+   "ok": true
+  },
+  "E": {
+   "lum_surface": 252.8,
+   "lum_border": 226.6,
+   "border_lighter": false,
+   "ok": true
+  },
+  "F1": {
+   "edges": {
+    "left": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 0,
+     "noncanvas_examples": [],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    },
+    "right": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 0,
+     "noncanvas_examples": [],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    },
+    "top": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 132,
+     "noncanvas_examples": [
+      [
+       39,
+       5,
+       [
+        246,
+        212,
+        140
+       ]
+      ],
+      [
+       40,
+       5,
+       [
+        80,
+        54,
+        110
+       ]
+      ],
+      [
+       41,
+       5,
+       [
+        186,
+        236,
+        225
+       ]
+      ],
+      [
+       42,
+       5,
+       [
+        249,
+        242,
+        220
+       ]
+      ],
+      [
+       43,
+       5,
+       [
+        185,
+        112,
+        57
+       ]
+      ],
+      [
+       44,
+       5,
+       [
+        81,
+        148,
+        199
+       ]
+      ],
+      [
+       91,
+       5,
+       [
+        249,
+        240,
+        197
+       ]
+      ],
+      [
+       92,
+       5,
+       [
+        148,
+        80,
+        58
+       ]
+      ]
+     ],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    },
+    "bottom": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 1217,
+     "noncanvas_examples": [
+      [
+       1252,
+       818,
+       [
+        251,
+        247,
+        236
+       ]
+      ],
+      [
+       1253,
+       818,
+       [
+        251,
+        247,
+        236
+       ]
+      ],
+      [
+       1255,
+       818,
+       [
+        251,
+        247,
+        236
+       ]
+      ],
+      [
+       1256,
+       818,
+       [
+        251,
+        247,
+        236
+       ]
+      ],
+      [
+       1258,
+       818,
+       [
+        251,
+        247,
+        236
+       ]
+      ],
+      [
+       1259,
+       818,
+       [
+        251,
+        247,
+        236
+       ]
+      ],
+      [
+       1261,
+       818,
+       [
+        251,
+        247,
+        236
+       ]
+      ],
+      [
+       1262,
+       818,
+       [
+        251,
+        247,
+        236
+       ]
+      ]
+     ],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    }
+   },
+   "ok": true
+  },
+  "F2": {
+   "pairs": {
+    "h:left|editor": {
+     "gap": [
+      587,
+      610
+     ],
+     "longest_canvas": 18,
+     "range": [
+      590,
+      607
+     ],
+     "ok": true
+    },
+    "h:editor|r2": {
+     "gap": [
+      907,
+      930
+     ],
+     "longest_canvas": 18,
+     "range": [
+      910,
+      927
+     ],
+     "ok": true
+    },
+    "v:r1|r2": {
+     "gap": [
+      354,
+      369
+     ],
+     "longest_canvas": 10,
+     "range": [
+      358,
+      367
+     ],
+     "ok": true
+    },
+    "v:r2|r3": {
+     "gap": [
+      491,
+      506
+     ],
+     "longest_canvas": 10,
+     "range": [
+      495,
+      504
+     ],
+     "ok": true
+    }
+   },
+   "ok": true
+  },
+  "F3": {
+   "gaps": {
+    "h:left|editor": {
+     "levels": 7,
+     "colors": [
+      [
+       240,
+       233,
+       217
+      ],
+      [
+       243,
+       236,
+       220
+      ],
+      [
+       245,
+       238,
+       221
+      ],
+      [
+       246,
+       239,
+       222
+      ],
+      [
+       247,
+       240,
+       223
+      ],
+      [
+       248,
+       241,
+       224
+      ],
+      [
+       249,
+       242,
+       225
+      ]
+     ],
+     "ok": true
+    },
+    "h:editor|r2": {
+     "levels": 7,
+     "colors": [
+      [
+       240,
+       233,
+       217
+      ],
+      [
+       243,
+       236,
+       220
+      ],
+      [
+       245,
+       238,
+       221
+      ],
+      [
+       246,
+       239,
+       222
+      ],
+      [
+       247,
+       240,
+       223
+      ],
+      [
+       248,
+       241,
+       224
+      ],
+      [
+       249,
+       242,
+       225
+      ]
+     ],
+     "ok": true
+    },
+    "v:r1|r2": {
+     "levels": 8,
+     "colors": [
+      [
+       236,
+       230,
+       214
+      ],
+      [
+       240,
+       233,
+       217
+      ],
+      [
+       243,
+       236,
+       220
+      ],
+      [
+       245,
+       238,
+       221
+      ],
+      [
+       246,
+       239,
+       222
+      ],
+      [
+       247,
+       240,
+       223
+      ],
+      [
+       248,
+       241,
+       224
+      ],
+      [
+       249,
+       242,
+       225
+      ]
+     ],
+     "ok": true
+    },
+    "v:r2|r3": {
+     "levels": 8,
+     "colors": [
+      [
+       237,
+       231,
+       214
+      ],
+      [
+       240,
+       233,
+       217
+      ],
+      [
+       243,
+       236,
+       220
+      ],
+      [
+       245,
+       238,
+       221
+      ],
+      [
+       246,
+       239,
+       222
+      ],
+      [
+       247,
+       240,
+       223
+      ],
+      [
+       248,
+       241,
+       224
+      ],
+      [
+       249,
+       242,
+       225
+      ]
+     ],
+     "ok": true
+    }
+   },
+   "ok": true
+  },
+  "window": [
+   0,
+   0,
+   1279,
+   819
+  ],
+  "PASS": true
+ },
+ "bohe": {
+  "theme": "bohe",
+  "file": "evidence/ui-mosaic/screenshots/after-bohe.png",
+  "size": [
+   1680,
+   1050
+  ],
+  "A": {
+   "left": {
+    "at": [
+     100,
+     300
+    ],
+    "mode": [
+     255,
+     255,
+     255
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "r1": {
+    "at": [
+     1000,
+     200
+    ],
+    "mode": [
+     255,
+     255,
+     255
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "r2": {
+    "at": [
+     1200,
+     400
+    ],
+    "mode": [
+     255,
+     255,
+     255
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "r3": {
+    "at": [
+     1000,
+     600
+    ],
+    "mode": [
+     255,
+     255,
+     255
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "editor_info": {
+    "mode": [
+     255,
+     255,
+     255
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "d_canvas": 18
+   }
+  },
+  "B": {
+   "left.left": {
+    "pos": 16,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 12.5
+   },
+   "left.right": {
+    "pos": 586,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 12.5
+   },
+   "editor.left": {
+    "pos": 611,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 12.5
+   },
+   "editor.right": {
+    "pos": 906,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 12.5
+   },
+   "r1.left": {
+    "pos": 931,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 12.5
+   },
+   "r1.right": {
+    "pos": 1263,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 12.5
+   },
+   "r2.left": {
+    "pos": 931,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 12.5
+   },
+   "r2.right": {
+    "pos": 1263,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 12.5
+   },
+   "r3.left": {
+    "pos": 931,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 12.5
+   },
+   "r3.right": {
+    "pos": 1263,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 12.5
+   },
+   "min_d_surface": 26.3,
+   "min_d_canvas": 12.5,
+   "ok": true
+  },
+  "C": {
+   "left.left": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "left.right": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "left.top": {
+    "band_px": 0,
+    "deltas": [],
+    "exempt": false,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": false
+   },
+   "left.bottom": {
+    "band_px": 5,
+    "deltas": [
+     12,
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.left": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.right": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.top": {
+    "band_px": 3,
+    "deltas": [
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.bottom": {
+    "band_px": 5,
+    "deltas": [
+     12,
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r1.left": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r1.right": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r1.top": {
+    "band_px": 0,
+    "deltas": [],
+    "exempt": false,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": false
+   },
+   "r1.bottom": {
+    "band_px": 5,
+    "deltas": [
+     12,
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.left": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.right": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.top": {
+    "band_px": 3,
+    "deltas": [
+     6,
+     4,
+     3
+    ],
+    "exempt": true,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.bottom": {
+    "band_px": 5,
+    "deltas": [
+     11,
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.left": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.right": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.top": {
+    "band_px": 3,
+    "deltas": [
+     6,
+     4,
+     3
+    ],
+    "exempt": true,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.bottom": {
+    "band_px": 5,
+    "deltas": [
+     11,
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "ok": true,
+   "strict_ok": false,
+   "strict_note": "left/r1 top = 0 px; only r2/r3 are literally 'vertically stacked' in the contract text"
+  },
+  "D": {
+   "found": 11,
+   "ok_count": 11,
+   "buttons": [
+    {
+     "box": [
+      1220,
+      30,
+      36,
+      36
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.63,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      33,
+      31,
+      80,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.15,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      115,
+      31,
+      98,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.31,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      215,
+      31,
+      138,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.54,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      355,
+      31,
+      150,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.42,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      507,
+      31,
+      83,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.3,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      592,
+      31,
+      102,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.33,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      696,
+      31,
+      85,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.26,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      783,
+      31,
+      84,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.2,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      876,
+      31,
+      140,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.22,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      1018,
+      31,
+      121,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.52,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    }
+   ],
+   "ok": true
+  },
+  "E": {
+   "lum_surface": 255.0,
+   "lum_border": 228.7,
+   "border_lighter": false,
+   "ok": true
+  },
+  "F1": {
+   "edges": {
+    "left": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 0,
+     "noncanvas_examples": [],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    },
+    "right": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 0,
+     "noncanvas_examples": [],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    },
+    "top": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 132,
+     "noncanvas_examples": [
+      [
+       39,
+       5,
+       [
+        235,
+        214,
+        147
+       ]
+      ],
+      [
+       40,
+       5,
+       [
+        77,
+        55,
+        115
+       ]
+      ],
+      [
+       41,
+       5,
+       [
+        177,
+        238,
+        238
+       ]
+      ],
+      [
+       42,
+       5,
+       [
+        237,
+        244,
+        233
+       ]
+      ],
+      [
+       43,
+       5,
+       [
+        176,
+        113,
+        58
+       ]
+      ],
+      [
+       44,
+       5,
+       [
+        78,
+        149,
+        210
+       ]
+      ],
+      [
+       91,
+       5,
+       [
+        237,
+        242,
+        208
+       ]
+      ],
+      [
+       92,
+       5,
+       [
+        142,
+        81,
+        59
+       ]
+      ]
+     ],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    },
+    "bottom": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 1166,
+     "noncanvas_examples": [
+      [
+       1252,
+       818,
+       [
+        243,
+        248,
+        244
+       ]
+      ],
+      [
+       1253,
+       818,
+       [
+        243,
+        248,
+        244
+       ]
+      ],
+      [
+       1255,
+       818,
+       [
+        243,
+        248,
+        244
+       ]
+      ],
+      [
+       1256,
+       818,
+       [
+        243,
+        248,
+        244
+       ]
+      ],
+      [
+       1258,
+       818,
+       [
+        243,
+        248,
+        244
+       ]
+      ],
+      [
+       1259,
+       818,
+       [
+        243,
+        248,
+        244
+       ]
+      ],
+      [
+       1261,
+       818,
+       [
+        243,
+        248,
+        244
+       ]
+      ],
+      [
+       1262,
+       818,
+       [
+        243,
+        248,
+        244
+       ]
+      ]
+     ],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    }
+   },
+   "ok": true
+  },
+  "F2": {
+   "pairs": {
+    "h:left|editor": {
+     "gap": [
+      587,
+      610
+     ],
+     "longest_canvas": 18,
+     "range": [
+      590,
+      607
+     ],
+     "ok": true
+    },
+    "h:editor|r2": {
+     "gap": [
+      907,
+      930
+     ],
+     "longest_canvas": 18,
+     "range": [
+      910,
+      927
+     ],
+     "ok": true
+    },
+    "v:r1|r2": {
+     "gap": [
+      354,
+      369
+     ],
+     "longest_canvas": 10,
+     "range": [
+      358,
+      367
+     ],
+     "ok": true
+    },
+    "v:r2|r3": {
+     "gap": [
+      491,
+      506
+     ],
+     "longest_canvas": 10,
+     "range": [
+      495,
+      504
+     ],
+     "ok": true
+    }
+   },
+   "ok": true
+  },
+  "F3": {
+   "gaps": {
+    "h:left|editor": {
+     "levels": 7,
+     "colors": [
+      [
+       229,
+       235,
+       230
+      ],
+      [
+       231,
+       238,
+       232
+      ],
+      [
+       233,
+       240,
+       234
+      ],
+      [
+       234,
+       241,
+       235
+      ],
+      [
+       235,
+       242,
+       236
+      ],
+      [
+       236,
+       243,
+       237
+      ],
+      [
+       237,
+       244,
+       238
+      ]
+     ],
+     "ok": true
+    },
+    "h:editor|r2": {
+     "levels": 7,
+     "colors": [
+      [
+       229,
+       235,
+       230
+      ],
+      [
+       231,
+       238,
+       232
+      ],
+      [
+       233,
+       240,
+       234
+      ],
+      [
+       234,
+       241,
+       235
+      ],
+      [
+       235,
+       242,
+       236
+      ],
+      [
+       236,
+       243,
+       237
+      ],
+      [
+       237,
+       244,
+       238
+      ]
+     ],
+     "ok": true
+    },
+    "v:r1|r2": {
+     "levels": 8,
+     "colors": [
+      [
+       225,
+       232,
+       226
+      ],
+      [
+       229,
+       235,
+       230
+      ],
+      [
+       231,
+       238,
+       232
+      ],
+      [
+       233,
+       240,
+       234
+      ],
+      [
+       234,
+       241,
+       235
+      ],
+      [
+       235,
+       242,
+       236
+      ],
+      [
+       236,
+       243,
+       237
+      ],
+      [
+       237,
+       244,
+       238
+      ]
+     ],
+     "ok": true
+    },
+    "v:r2|r3": {
+     "levels": 8,
+     "colors": [
+      [
+       226,
+       233,
+       227
+      ],
+      [
+       229,
+       235,
+       230
+      ],
+      [
+       231,
+       238,
+       232
+      ],
+      [
+       233,
+       240,
+       234
+      ],
+      [
+       234,
+       241,
+       235
+      ],
+      [
+       235,
+       242,
+       236
+      ],
+      [
+       236,
+       243,
+       237
+      ],
+      [
+       237,
+       244,
+       238
+      ]
+     ],
+     "ok": true
+    }
+   },
+   "ok": true
+  },
+  "window": [
+   0,
+   0,
+   1279,
+   819
+  ],
+  "PASS": true
+ },
+ "qingkong": {
+  "theme": "qingkong",
+  "file": "evidence/ui-mosaic/screenshots/after-qingkong.png",
+  "size": [
+   1680,
+   1050
+  ],
+  "A": {
+   "left": {
+    "at": [
+     100,
+     300
+    ],
+    "mode": [
+     255,
+     255,
+     255
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "r1": {
+    "at": [
+     1000,
+     200
+    ],
+    "mode": [
+     255,
+     255,
+     255
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "r2": {
+    "at": [
+     1200,
+     400
+    ],
+    "mode": [
+     255,
+     255,
+     255
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "r3": {
+    "at": [
+     1000,
+     600
+    ],
+    "mode": [
+     255,
+     255,
+     255
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "editor_info": {
+    "mode": [
+     255,
+     255,
+     255
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "d_canvas": 20
+   }
+  },
+  "B": {
+   "left.left": {
+    "pos": 16,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 10.6
+   },
+   "left.right": {
+    "pos": 586,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 10.6
+   },
+   "editor.left": {
+    "pos": 611,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 10.6
+   },
+   "editor.right": {
+    "pos": 906,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 10.6
+   },
+   "r1.left": {
+    "pos": 931,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 10.6
+   },
+   "r1.right": {
+    "pos": 1263,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 10.6
+   },
+   "r2.left": {
+    "pos": 931,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 10.6
+   },
+   "r2.right": {
+    "pos": 1263,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 10.6
+   },
+   "r3.left": {
+    "pos": 931,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 10.6
+   },
+   "r3.right": {
+    "pos": 1263,
+    "border": [
+     228,
+     229,
+     229
+    ],
+    "d_surface": 26.3,
+    "d_canvas": 10.6
+   },
+   "min_d_surface": 26.3,
+   "min_d_canvas": 10.6,
+   "ok": true
+  },
+  "C": {
+   "left.left": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "left.right": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "left.top": {
+    "band_px": 0,
+    "deltas": [],
+    "exempt": false,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": false
+   },
+   "left.bottom": {
+    "band_px": 5,
+    "deltas": [
+     13,
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.left": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.right": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.top": {
+    "band_px": 3,
+    "deltas": [
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.bottom": {
+    "band_px": 5,
+    "deltas": [
+     13,
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r1.left": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r1.right": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r1.top": {
+    "band_px": 0,
+    "deltas": [],
+    "exempt": false,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": false
+   },
+   "r1.bottom": {
+    "band_px": 5,
+    "deltas": [
+     13,
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.left": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.right": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.top": {
+    "band_px": 3,
+    "deltas": [
+     6,
+     4,
+     3
+    ],
+    "exempt": true,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.bottom": {
+    "band_px": 5,
+    "deltas": [
+     12,
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.left": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.right": {
+    "band_px": 4,
+    "deltas": [
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.top": {
+    "band_px": 3,
+    "deltas": [
+     6,
+     4,
+     3
+    ],
+    "exempt": true,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.bottom": {
+    "band_px": 5,
+    "deltas": [
+     12,
+     9,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "ok": true,
+   "strict_ok": false,
+   "strict_note": "left/r1 top = 0 px; only r2/r3 are literally 'vertically stacked' in the contract text"
+  },
+  "D": {
+   "found": 11,
+   "ok_count": 11,
+   "buttons": [
+    {
+     "box": [
+      1220,
+      30,
+      36,
+      36
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.63,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      33,
+      31,
+      80,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.15,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      115,
+      31,
+      98,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.31,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      215,
+      31,
+      138,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.54,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      355,
+      31,
+      150,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.42,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      507,
+      31,
+      83,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.3,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      592,
+      31,
+      102,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.33,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      696,
+      31,
+      85,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.26,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      783,
+      31,
+      84,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.2,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      876,
+      31,
+      140,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.22,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      1018,
+      31,
+      121,
+      33
+     ],
+     "fill": [
+      255,
+      255,
+      255
+     ],
+     "fill_share": 0.52,
+     "d_lum": 48.2,
+     "corner_cut": 4,
+     "ok": true
+    }
+   ],
+   "ok": true
+  },
+  "E": {
+   "lum_surface": 255.0,
+   "lum_border": 228.7,
+   "border_lighter": false,
+   "ok": true
+  },
+  "F1": {
+   "edges": {
+    "left": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 0,
+     "noncanvas_examples": [],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    },
+    "right": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 0,
+     "noncanvas_examples": [],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    },
+    "top": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 132,
+     "noncanvas_examples": [
+      [
+       39,
+       5,
+       [
+        233,
+        210,
+        152
+       ]
+      ],
+      [
+       40,
+       5,
+       [
+        77,
+        54,
+        118
+       ]
+      ],
+      [
+       41,
+       5,
+       [
+        176,
+        234,
+        247
+       ]
+      ],
+      [
+       42,
+       5,
+       [
+        235,
+        240,
+        241
+       ]
+      ],
+      [
+       43,
+       5,
+       [
+        175,
+        111,
+        59
+       ]
+      ],
+      [
+       44,
+       5,
+       [
+        77,
+        147,
+        218
+       ]
+      ],
+      [
+       91,
+       5,
+       [
+        235,
+        238,
+        216
+       ]
+      ],
+      [
+       92,
+       5,
+       [
+        141,
+        80,
+        60
+       ]
+      ]
+     ],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    },
+    "bottom": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 1157,
+     "noncanvas_examples": [
+      [
+       1252,
+       818,
+       [
+        242,
+        245,
+        250
+       ]
+      ],
+      [
+       1253,
+       818,
+       [
+        242,
+        245,
+        250
+       ]
+      ],
+      [
+       1255,
+       818,
+       [
+        242,
+        245,
+        250
+       ]
+      ],
+      [
+       1256,
+       818,
+       [
+        242,
+        245,
+        250
+       ]
+      ],
+      [
+       1258,
+       818,
+       [
+        242,
+        245,
+        250
+       ]
+      ],
+      [
+       1259,
+       818,
+       [
+        242,
+        245,
+        250
+       ]
+      ],
+      [
+       1261,
+       818,
+       [
+        242,
+        245,
+        250
+       ]
+      ],
+      [
+       1262,
+       818,
+       [
+        242,
+        245,
+        250
+       ]
+      ]
+     ],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    }
+   },
+   "ok": true
+  },
+  "F2": {
+   "pairs": {
+    "h:left|editor": {
+     "gap": [
+      587,
+      610
+     ],
+     "longest_canvas": 18,
+     "range": [
+      590,
+      607
+     ],
+     "ok": true
+    },
+    "h:editor|r2": {
+     "gap": [
+      907,
+      930
+     ],
+     "longest_canvas": 18,
+     "range": [
+      910,
+      927
+     ],
+     "ok": true
+    },
+    "v:r1|r2": {
+     "gap": [
+      354,
+      369
+     ],
+     "longest_canvas": 10,
+     "range": [
+      358,
+      367
+     ],
+     "ok": true
+    },
+    "v:r2|r3": {
+     "gap": [
+      491,
+      506
+     ],
+     "longest_canvas": 10,
+     "range": [
+      495,
+      504
+     ],
+     "ok": true
+    }
+   },
+   "ok": true
+  },
+  "F3": {
+   "gaps": {
+    "h:left|editor": {
+     "levels": 7,
+     "colors": [
+      [
+       227,
+       232,
+       238
+      ],
+      [
+       229,
+       234,
+       241
+      ],
+      [
+       231,
+       236,
+       243
+      ],
+      [
+       232,
+       237,
+       244
+      ],
+      [
+       233,
+       238,
+       245
+      ],
+      [
+       234,
+       239,
+       246
+      ],
+      [
+       235,
+       240,
+       247
+      ]
+     ],
+     "ok": true
+    },
+    "h:editor|r2": {
+     "levels": 7,
+     "colors": [
+      [
+       227,
+       232,
+       238
+      ],
+      [
+       229,
+       234,
+       241
+      ],
+      [
+       231,
+       236,
+       243
+      ],
+      [
+       232,
+       237,
+       244
+      ],
+      [
+       233,
+       238,
+       245
+      ],
+      [
+       234,
+       239,
+       246
+      ],
+      [
+       235,
+       240,
+       247
+      ]
+     ],
+     "ok": true
+    },
+    "v:r1|r2": {
+     "levels": 8,
+     "colors": [
+      [
+       223,
+       228,
+       234
+      ],
+      [
+       227,
+       232,
+       238
+      ],
+      [
+       229,
+       234,
+       241
+      ],
+      [
+       231,
+       236,
+       243
+      ],
+      [
+       232,
+       237,
+       244
+      ],
+      [
+       233,
+       238,
+       245
+      ],
+      [
+       234,
+       239,
+       246
+      ],
+      [
+       235,
+       240,
+       247
+      ]
+     ],
+     "ok": true
+    },
+    "v:r2|r3": {
+     "levels": 8,
+     "colors": [
+      [
+       224,
+       229,
+       235
+      ],
+      [
+       227,
+       232,
+       238
+      ],
+      [
+       229,
+       234,
+       241
+      ],
+      [
+       231,
+       236,
+       243
+      ],
+      [
+       232,
+       237,
+       244
+      ],
+      [
+       233,
+       238,
+       245
+      ],
+      [
+       234,
+       239,
+       246
+      ],
+      [
+       235,
+       240,
+       247
+      ]
+     ],
+     "ok": true
+    }
+   },
+   "ok": true
+  },
+  "window": [
+   0,
+   0,
+   1279,
+   819
+  ],
+  "PASS": true
+ },
+ "yaoshi": {
+  "theme": "yaoshi",
+  "file": "evidence/ui-mosaic/screenshots/after-yaoshi.png",
+  "size": [
+   1680,
+   1050
+  ],
+  "A": {
+   "left": {
+    "at": [
+     100,
+     300
+    ],
+    "mode": [
+     29,
+     29,
+     32
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "r1": {
+    "at": [
+     1000,
+     200
+    ],
+    "mode": [
+     29,
+     29,
+     32
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "r2": {
+    "at": [
+     1200,
+     400
+    ],
+    "mode": [
+     29,
+     29,
+     32
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "r3": {
+    "at": [
+     1000,
+     600
+    ],
+    "mode": [
+     29,
+     29,
+     32
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "editor_info": {
+    "mode": [
+     35,
+     38,
+     41
+    ],
+    "share": 1.0,
+    "d_surface": 9,
+    "d_canvas": 20
+   }
+  },
+  "B": {
+   "left.left": {
+    "pos": 16,
+    "border": [
+     53,
+     53,
+     56
+    ],
+    "d_surface": 24.0,
+    "d_canvas": 34.1
+   },
+   "left.right": {
+    "pos": 586,
+    "border": [
+     53,
+     53,
+     56
+    ],
+    "d_surface": 24.0,
+    "d_canvas": 34.1
+   },
+   "editor.left": {
+    "pos": 611,
+    "border": [
+     53,
+     53,
+     56
+    ],
+    "d_surface": 24.0,
+    "d_canvas": 34.1
+   },
+   "editor.right": {
+    "pos": 906,
+    "border": [
+     53,
+     53,
+     56
+    ],
+    "d_surface": 24.0,
+    "d_canvas": 34.1
+   },
+   "r1.left": {
+    "pos": 931,
+    "border": [
+     53,
+     53,
+     56
+    ],
+    "d_surface": 24.0,
+    "d_canvas": 34.1
+   },
+   "r1.right": {
+    "pos": 1263,
+    "border": [
+     53,
+     53,
+     56
+    ],
+    "d_surface": 24.0,
+    "d_canvas": 34.1
+   },
+   "r2.left": {
+    "pos": 931,
+    "border": [
+     53,
+     53,
+     56
+    ],
+    "d_surface": 24.0,
+    "d_canvas": 34.1
+   },
+   "r2.right": {
+    "pos": 1263,
+    "border": [
+     53,
+     53,
+     56
+    ],
+    "d_surface": 24.0,
+    "d_canvas": 34.1
+   },
+   "r3.left": {
+    "pos": 931,
+    "border": [
+     53,
+     53,
+     56
+    ],
+    "d_surface": 24.0,
+    "d_canvas": 34.1
+   },
+   "r3.right": {
+    "pos": 1263,
+    "border": [
+     53,
+     53,
+     56
+    ],
+    "d_surface": 24.0,
+    "d_canvas": 34.1
+   },
+   "min_d_surface": 24.0,
+   "min_d_canvas": 34.1,
+   "ok": true
+  },
+  "C": {
+   "left.left": {
+    "band_px": 4,
+    "deltas": [
+     7,
+     5,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "left.right": {
+    "band_px": 4,
+    "deltas": [
+     8,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "left.top": {
+    "band_px": 0,
+    "deltas": [],
+    "exempt": false,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": false
+   },
+   "left.bottom": {
+    "band_px": 5,
+    "deltas": [
+     11,
+     7,
+     5,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.left": {
+    "band_px": 4,
+    "deltas": [
+     7,
+     5,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.right": {
+    "band_px": 3,
+    "deltas": [
+     7,
+     5,
+     4
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.top": {
+    "band_px": 2,
+    "deltas": [
+     5,
+     4
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": false,
+    "ok_strict": false
+   },
+   "editor.bottom": {
+    "band_px": 5,
+    "deltas": [
+     11,
+     7,
+     5,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r1.left": {
+    "band_px": 4,
+    "deltas": [
+     7,
+     5,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r1.right": {
+    "band_px": 4,
+    "deltas": [
+     8,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r1.top": {
+    "band_px": 0,
+    "deltas": [],
+    "exempt": false,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": false
+   },
+   "r1.bottom": {
+    "band_px": 5,
+    "deltas": [
+     11,
+     7,
+     5,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.left": {
+    "band_px": 4,
+    "deltas": [
+     7,
+     5,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.right": {
+    "band_px": 4,
+    "deltas": [
+     8,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.top": {
+    "band_px": 2,
+    "deltas": [
+     5,
+     4
+    ],
+    "exempt": true,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.bottom": {
+    "band_px": 5,
+    "deltas": [
+     10,
+     8,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.left": {
+    "band_px": 4,
+    "deltas": [
+     7,
+     5,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.right": {
+    "band_px": 4,
+    "deltas": [
+     8,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.top": {
+    "band_px": 2,
+    "deltas": [
+     5,
+     4
+    ],
+    "exempt": true,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.bottom": {
+    "band_px": 5,
+    "deltas": [
+     10,
+     8,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "ok": false,
+   "strict_ok": false,
+   "strict_note": "left/r1 top = 0 px; only r2/r3 are literally 'vertically stacked' in the contract text"
+  },
+  "D": {
+   "found": 11,
+   "ok_count": 11,
+   "buttons": [
+    {
+     "box": [
+      1220,
+      30,
+      36,
+      36
+     ],
+     "fill": [
+      29,
+      29,
+      32
+     ],
+     "fill_share": 0.63,
+     "d_lum": 44.7,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      33,
+      31,
+      80,
+      33
+     ],
+     "fill": [
+      29,
+      29,
+      32
+     ],
+     "fill_share": 0.15,
+     "d_lum": 44.7,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      115,
+      31,
+      98,
+      33
+     ],
+     "fill": [
+      29,
+      29,
+      32
+     ],
+     "fill_share": 0.31,
+     "d_lum": 44.7,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      215,
+      31,
+      138,
+      33
+     ],
+     "fill": [
+      29,
+      29,
+      32
+     ],
+     "fill_share": 0.54,
+     "d_lum": 44.7,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      355,
+      31,
+      150,
+      33
+     ],
+     "fill": [
+      29,
+      29,
+      32
+     ],
+     "fill_share": 0.42,
+     "d_lum": 44.7,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      507,
+      31,
+      83,
+      33
+     ],
+     "fill": [
+      29,
+      29,
+      32
+     ],
+     "fill_share": 0.3,
+     "d_lum": 44.7,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      592,
+      31,
+      102,
+      33
+     ],
+     "fill": [
+      29,
+      29,
+      32
+     ],
+     "fill_share": 0.33,
+     "d_lum": 44.7,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      696,
+      31,
+      85,
+      33
+     ],
+     "fill": [
+      29,
+      29,
+      32
+     ],
+     "fill_share": 0.27,
+     "d_lum": 44.7,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      783,
+      31,
+      84,
+      33
+     ],
+     "fill": [
+      29,
+      29,
+      32
+     ],
+     "fill_share": 0.2,
+     "d_lum": 44.7,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      876,
+      31,
+      140,
+      33
+     ],
+     "fill": [
+      29,
+      29,
+      32
+     ],
+     "fill_share": 0.22,
+     "d_lum": 44.7,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      1018,
+      31,
+      121,
+      33
+     ],
+     "fill": [
+      29,
+      29,
+      32
+     ],
+     "fill_share": 0.52,
+     "d_lum": 44.7,
+     "corner_cut": 4,
+     "ok": true
+    }
+   ],
+   "ok": true
+  },
+  "E": {
+   "lum_surface": 29.3,
+   "lum_border": 53.3,
+   "border_lighter": true,
+   "ok": true
+  },
+  "F1": {
+   "edges": {
+    "left": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 0,
+     "noncanvas_examples": [],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    },
+    "right": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 0,
+     "noncanvas_examples": [],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    },
+    "top": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 132,
+     "noncanvas_examples": [
+      [
+       39,
+       5,
+       [
+        21,
+        50,
+        120
+       ]
+      ],
+      [
+       40,
+       5,
+       [
+        183,
+        212,
+        155
+       ]
+      ],
+      [
+       41,
+       5,
+       [
+        80,
+        25,
+        21
+       ]
+      ],
+      [
+       42,
+       5,
+       [
+        19,
+        19,
+        27
+       ]
+      ],
+      [
+       43,
+       5,
+       [
+        81,
+        153,
+        217
+       ]
+      ],
+      [
+       44,
+       5,
+       [
+        182,
+        116,
+        51
+       ]
+      ],
+      [
+       91,
+       5,
+       [
+        19,
+        22,
+        53
+       ]
+      ],
+      [
+       92,
+       5,
+       [
+        117,
+        185,
+        215
+       ]
+      ]
+     ],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    },
+    "bottom": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 1154,
+     "noncanvas_examples": [
+      [
+       1252,
+       818,
+       [
+        102,
+        102,
+        104
+       ]
+      ],
+      [
+       1253,
+       818,
+       [
+        102,
+        102,
+        104
+       ]
+      ],
+      [
+       1255,
+       818,
+       [
+        102,
+        102,
+        104
+       ]
+      ],
+      [
+       1256,
+       818,
+       [
+        102,
+        102,
+        104
+       ]
+      ],
+      [
+       1258,
+       818,
+       [
+        102,
+        102,
+        104
+       ]
+      ],
+      [
+       1259,
+       818,
+       [
+        102,
+        102,
+        104
+       ]
+      ],
+      [
+       1261,
+       818,
+       [
+        102,
+        102,
+        104
+       ]
+      ],
+      [
+       1262,
+       818,
+       [
+        102,
+        102,
+        104
+       ]
+      ]
+     ],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    }
+   },
+   "ok": true
+  },
+  "F2": {
+   "pairs": {
+    "h:left|editor": {
+     "gap": [
+      587,
+      610
+     ],
+     "longest_canvas": 18,
+     "range": [
+      590,
+      607
+     ],
+     "ok": true
+    },
+    "h:editor|r2": {
+     "gap": [
+      907,
+      930
+     ],
+     "longest_canvas": 18,
+     "range": [
+      910,
+      927
+     ],
+     "ok": true
+    },
+    "v:r1|r2": {
+     "gap": [
+      354,
+      369
+     ],
+     "longest_canvas": 10,
+     "range": [
+      358,
+      367
+     ],
+     "ok": true
+    },
+    "v:r2|r3": {
+     "gap": [
+      491,
+      506
+     ],
+     "longest_canvas": 10,
+     "range": [
+      495,
+      504
+     ],
+     "ok": true
+    }
+   },
+   "ok": true
+  },
+  "F3": {
+   "gaps": {
+    "h:left|editor": {
+     "levels": 11,
+     "colors": [
+      [
+       12,
+       12,
+       13
+      ],
+      [
+       12,
+       12,
+       14
+      ],
+      [
+       14,
+       14,
+       15
+      ],
+      [
+       14,
+       14,
+       16
+      ],
+      [
+       15,
+       15,
+       17
+      ],
+      [
+       16,
+       16,
+       17
+      ],
+      [
+       16,
+       16,
+       18
+      ],
+      [
+       17,
+       17,
+       18
+      ],
+      [
+       17,
+       17,
+       19
+      ],
+      [
+       18,
+       18,
+       20
+      ],
+      [
+       19,
+       19,
+       21
+      ]
+     ],
+     "ok": true
+    },
+    "h:editor|r2": {
+     "levels": 6,
+     "colors": [
+      [
+       12,
+       12,
+       14
+      ],
+      [
+       14,
+       14,
+       16
+      ],
+      [
+       16,
+       16,
+       17
+      ],
+      [
+       17,
+       17,
+       19
+      ],
+      [
+       18,
+       18,
+       20
+      ],
+      [
+       19,
+       19,
+       21
+      ]
+     ],
+     "ok": true
+    },
+    "v:r1|r2": {
+     "levels": 8,
+     "colors": [
+      [
+       9,
+       9,
+       10
+      ],
+      [
+       12,
+       12,
+       14
+      ],
+      [
+       14,
+       14,
+       16
+      ],
+      [
+       16,
+       16,
+       17
+      ],
+      [
+       17,
+       17,
+       18
+      ],
+      [
+       17,
+       17,
+       19
+      ],
+      [
+       18,
+       18,
+       20
+      ],
+      [
+       19,
+       19,
+       21
+      ]
+     ],
+     "ok": true
+    },
+    "v:r2|r3": {
+     "levels": 10,
+     "colors": [
+      [
+       10,
+       10,
+       11
+      ],
+      [
+       12,
+       12,
+       13
+      ],
+      [
+       14,
+       14,
+       15
+      ],
+      [
+       14,
+       14,
+       16
+      ],
+      [
+       15,
+       15,
+       17
+      ],
+      [
+       16,
+       16,
+       17
+      ],
+      [
+       16,
+       16,
+       18
+      ],
+      [
+       17,
+       17,
+       19
+      ],
+      [
+       18,
+       18,
+       20
+      ],
+      [
+       19,
+       19,
+       21
+      ]
+     ],
+     "ok": true
+    }
+   },
+   "ok": true
+  },
+  "window": [
+   0,
+   0,
+   1279,
+   819
+  ],
+  "PASS": false
+ },
+ "shenye": {
+  "theme": "shenye",
+  "file": "evidence/ui-mosaic/screenshots/after-shenye.png",
+  "size": [
+   1680,
+   1050
+  ],
+  "A": {
+   "left": {
+    "at": [
+     100,
+     300
+    ],
+    "mode": [
+     22,
+     31,
+     46
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "r1": {
+    "at": [
+     1000,
+     200
+    ],
+    "mode": [
+     22,
+     31,
+     46
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "r2": {
+    "at": [
+     1200,
+     400
+    ],
+    "mode": [
+     22,
+     31,
+     46
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "r3": {
+    "at": [
+     1000,
+     600
+    ],
+    "mode": [
+     22,
+     31,
+     46
+    ],
+    "share": 1.0,
+    "d_surface": 0,
+    "ok": true
+   },
+   "editor_info": {
+    "mode": [
+     35,
+     38,
+     41
+    ],
+    "share": 1.0,
+    "d_surface": 13,
+    "d_canvas": 20
+   }
+  },
+  "B": {
+   "left.left": {
+    "pos": 16,
+    "border": [
+     47,
+     55,
+     69
+    ],
+    "d_surface": 24.2,
+    "d_canvas": 32.9
+   },
+   "left.right": {
+    "pos": 586,
+    "border": [
+     47,
+     55,
+     69
+    ],
+    "d_surface": 24.2,
+    "d_canvas": 32.9
+   },
+   "editor.left": {
+    "pos": 611,
+    "border": [
+     47,
+     55,
+     69
+    ],
+    "d_surface": 24.2,
+    "d_canvas": 32.9
+   },
+   "editor.right": {
+    "pos": 906,
+    "border": [
+     47,
+     55,
+     69
+    ],
+    "d_surface": 24.2,
+    "d_canvas": 32.9
+   },
+   "r1.left": {
+    "pos": 931,
+    "border": [
+     47,
+     55,
+     69
+    ],
+    "d_surface": 24.2,
+    "d_canvas": 32.9
+   },
+   "r1.right": {
+    "pos": 1263,
+    "border": [
+     47,
+     55,
+     69
+    ],
+    "d_surface": 24.2,
+    "d_canvas": 32.9
+   },
+   "r2.left": {
+    "pos": 931,
+    "border": [
+     47,
+     55,
+     69
+    ],
+    "d_surface": 24.2,
+    "d_canvas": 32.9
+   },
+   "r2.right": {
+    "pos": 1263,
+    "border": [
+     47,
+     55,
+     69
+    ],
+    "d_surface": 24.2,
+    "d_canvas": 32.9
+   },
+   "r3.left": {
+    "pos": 931,
+    "border": [
+     47,
+     55,
+     69
+    ],
+    "d_surface": 24.2,
+    "d_canvas": 32.9
+   },
+   "r3.right": {
+    "pos": 1263,
+    "border": [
+     47,
+     55,
+     69
+    ],
+    "d_surface": 24.2,
+    "d_canvas": 32.9
+   },
+   "min_d_surface": 24.2,
+   "min_d_canvas": 32.9,
+   "ok": true
+  },
+  "C": {
+   "left.left": {
+    "band_px": 5,
+    "deltas": [
+     12,
+     8,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "left.right": {
+    "band_px": 5,
+    "deltas": [
+     13,
+     9,
+     6,
+     5,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "left.top": {
+    "band_px": 0,
+    "deltas": [],
+    "exempt": false,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": false
+   },
+   "left.bottom": {
+    "band_px": 6,
+    "deltas": [
+     17,
+     12,
+     8,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.left": {
+    "band_px": 5,
+    "deltas": [
+     12,
+     8,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.right": {
+    "band_px": 5,
+    "deltas": [
+     12,
+     8,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.top": {
+    "band_px": 4,
+    "deltas": [
+     8,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "editor.bottom": {
+    "band_px": 6,
+    "deltas": [
+     17,
+     12,
+     8,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r1.left": {
+    "band_px": 5,
+    "deltas": [
+     12,
+     8,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r1.right": {
+    "band_px": 5,
+    "deltas": [
+     13,
+     9,
+     6,
+     5,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r1.top": {
+    "band_px": 0,
+    "deltas": [],
+    "exempt": false,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": false
+   },
+   "r1.bottom": {
+    "band_px": 6,
+    "deltas": [
+     17,
+     12,
+     8,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.left": {
+    "band_px": 5,
+    "deltas": [
+     12,
+     8,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.right": {
+    "band_px": 5,
+    "deltas": [
+     13,
+     9,
+     6,
+     5,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.top": {
+    "band_px": 4,
+    "deltas": [
+     8,
+     6,
+     4,
+     3
+    ],
+    "exempt": true,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r2.bottom": {
+    "band_px": 6,
+    "deltas": [
+     16,
+     13,
+     9,
+     6,
+     5,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.left": {
+    "band_px": 5,
+    "deltas": [
+     12,
+     8,
+     6,
+     4,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.right": {
+    "band_px": 5,
+    "deltas": [
+     13,
+     9,
+     6,
+     5,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.top": {
+    "band_px": 4,
+    "deltas": [
+     8,
+     6,
+     4,
+     3
+    ],
+    "exempt": true,
+    "exempt_paint": true,
+    "ok": true,
+    "ok_strict": true
+   },
+   "r3.bottom": {
+    "band_px": 6,
+    "deltas": [
+     16,
+     13,
+     9,
+     6,
+     5,
+     3
+    ],
+    "exempt": false,
+    "exempt_paint": false,
+    "ok": true,
+    "ok_strict": true
+   },
+   "ok": true,
+   "strict_ok": false,
+   "strict_note": "left/r1 top = 0 px; only r2/r3 are literally 'vertically stacked' in the contract text"
+  },
+  "D": {
+   "found": 11,
+   "ok_count": 11,
+   "buttons": [
+    {
+     "box": [
+      1220,
+      30,
+      36,
+      36
+     ],
+     "fill": [
+      22,
+      31,
+      46
+     ],
+     "fill_share": 0.63,
+     "d_lum": 44.4,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      33,
+      31,
+      80,
+      33
+     ],
+     "fill": [
+      22,
+      31,
+      46
+     ],
+     "fill_share": 0.15,
+     "d_lum": 44.4,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      115,
+      31,
+      98,
+      33
+     ],
+     "fill": [
+      22,
+      31,
+      46
+     ],
+     "fill_share": 0.31,
+     "d_lum": 44.4,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      215,
+      31,
+      138,
+      33
+     ],
+     "fill": [
+      22,
+      31,
+      46
+     ],
+     "fill_share": 0.54,
+     "d_lum": 44.4,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      355,
+      31,
+      150,
+      33
+     ],
+     "fill": [
+      22,
+      31,
+      46
+     ],
+     "fill_share": 0.42,
+     "d_lum": 44.4,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      507,
+      31,
+      83,
+      33
+     ],
+     "fill": [
+      22,
+      31,
+      46
+     ],
+     "fill_share": 0.3,
+     "d_lum": 44.4,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      592,
+      31,
+      102,
+      33
+     ],
+     "fill": [
+      22,
+      31,
+      46
+     ],
+     "fill_share": 0.33,
+     "d_lum": 44.4,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      696,
+      31,
+      85,
+      33
+     ],
+     "fill": [
+      22,
+      31,
+      46
+     ],
+     "fill_share": 0.27,
+     "d_lum": 44.4,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      783,
+      31,
+      84,
+      33
+     ],
+     "fill": [
+      22,
+      31,
+      46
+     ],
+     "fill_share": 0.2,
+     "d_lum": 44.4,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      876,
+      31,
+      140,
+      33
+     ],
+     "fill": [
+      22,
+      31,
+      46
+     ],
+     "fill_share": 0.22,
+     "d_lum": 44.4,
+     "corner_cut": 4,
+     "ok": true
+    },
+    {
+     "box": [
+      1018,
+      31,
+      121,
+      33
+     ],
+     "fill": [
+      22,
+      31,
+      46
+     ],
+     "fill_share": 0.52,
+     "d_lum": 44.4,
+     "corner_cut": 4,
+     "ok": true
+    }
+   ],
+   "ok": true
+  },
+  "E": {
+   "lum_surface": 30.0,
+   "lum_border": 54.2,
+   "border_lighter": true,
+   "ok": true
+  },
+  "F1": {
+   "edges": {
+    "left": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 0,
+     "noncanvas_examples": [],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    },
+    "right": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 0,
+     "noncanvas_examples": [],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    },
+    "top": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 132,
+     "noncanvas_examples": [
+      [
+       39,
+       5,
+       [
+        18,
+        52,
+        127
+       ]
+      ],
+      [
+       40,
+       5,
+       [
+        182,
+        212,
+        160
+       ]
+      ],
+      [
+       41,
+       5,
+       [
+        77,
+        28,
+        34
+       ]
+      ],
+      [
+       42,
+       5,
+       [
+        15,
+        22,
+        40
+       ]
+      ],
+      [
+       43,
+       5,
+       [
+        78,
+        154,
+        218
+       ]
+      ],
+      [
+       44,
+       5,
+       [
+        181,
+        118,
+        63
+       ]
+      ],
+      [
+       91,
+       5,
+       [
+        15,
+        24,
+        64
+       ]
+      ],
+      [
+       92,
+       5,
+       [
+        114,
+        186,
+        216
+       ]
+      ]
+     ],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    },
+    "bottom": {
+     "card_pixels": 0,
+     "card_examples": [],
+     "noncanvas_pixels": 1187,
+     "noncanvas_examples": [
+      [
+       1252,
+       818,
+       [
+        100,
+        104,
+        112
+       ]
+      ],
+      [
+       1253,
+       818,
+       [
+        100,
+        104,
+        112
+       ]
+      ],
+      [
+       1255,
+       818,
+       [
+        100,
+        104,
+        112
+       ]
+      ],
+      [
+       1256,
+       818,
+       [
+        100,
+        104,
+        112
+       ]
+      ],
+      [
+       1258,
+       818,
+       [
+        100,
+        104,
+        112
+       ]
+      ],
+      [
+       1259,
+       818,
+       [
+        100,
+        104,
+        112
+       ]
+      ],
+      [
+       1261,
+       818,
+       [
+        100,
+        104,
+        112
+       ]
+      ],
+      [
+       1262,
+       818,
+       [
+        100,
+        104,
+        112
+       ]
+      ]
+     ],
+     "outside_exception_short_runs": 0,
+     "outside_examples": [],
+     "ok": true
+    }
+   },
+   "ok": true
+  },
+  "F2": {
+   "pairs": {
+    "h:left|editor": {
+     "gap": [
+      587,
+      610
+     ],
+     "longest_canvas": 16,
+     "range": [
+      591,
+      606
+     ],
+     "ok": true
+    },
+    "h:editor|r2": {
+     "gap": [
+      907,
+      930
+     ],
+     "longest_canvas": 16,
+     "range": [
+      911,
+      926
+     ],
+     "ok": true
+    },
+    "v:r1|r2": {
+     "gap": [
+      354,
+      369
+     ],
+     "longest_canvas": 8,
+     "range": [
+      359,
+      366
+     ],
+     "ok": true
+    },
+    "v:r2|r3": {
+     "gap": [
+      491,
+      506
+     ],
+     "longest_canvas": 8,
+     "range": [
+      496,
+      503
+     ],
+     "ok": true
+    }
+   },
+   "ok": true
+  },
+  "F3": {
+   "gaps": {
+    "h:left|editor": {
+     "levels": 13,
+     "colors": [
+      [
+       9,
+       14,
+       21
+      ],
+      [
+       10,
+       14,
+       22
+      ],
+      [
+       11,
+       16,
+       25
+      ],
+      [
+       11,
+       17,
+       26
+      ],
+      [
+       12,
+       18,
+       28
+      ],
+      [
+       13,
+       19,
+       29
+      ],
+      [
+       13,
+       19,
+       30
+      ],
+      [
+       14,
+       20,
+       31
+      ],
+      [
+       14,
+       21,
+       32
+      ],
+      [
+       14,
+       21,
+       33
+      ],
+      [
+       15,
+       21,
+       33
+      ],
+      [
+       15,
+       22,
+       33
+      ],
+      [
+       15,
+       22,
+       34
+      ]
+     ],
+     "ok": true
+    },
+    "h:editor|r2": {
+     "levels": 10,
+     "colors": [
+      [
+       10,
+       14,
+       22
+      ],
+      [
+       11,
+       17,
+       26
+      ],
+      [
+       12,
+       18,
+       28
+      ],
+      [
+       13,
+       19,
+       30
+      ],
+      [
+       14,
+       20,
+       31
+      ],
+      [
+       14,
+       21,
+       32
+      ],
+      [
+       14,
+       21,
+       33
+      ],
+      [
+       15,
+       21,
+       33
+      ],
+      [
+       15,
+       22,
+       33
+      ],
+      [
+       15,
+       22,
+       34
+      ]
+     ],
+     "ok": true
+    },
+    "v:r1|r2": {
+     "levels": 9,
+     "colors": [
+      [
+       7,
+       11,
+       17
+      ],
+      [
+       10,
+       14,
+       22
+      ],
+      [
+       11,
+       17,
+       26
+      ],
+      [
+       12,
+       18,
+       28
+      ],
+      [
+       13,
+       19,
+       30
+      ],
+      [
+       14,
+       20,
+       31
+      ],
+      [
+       14,
+       21,
+       32
+      ],
+      [
+       14,
+       21,
+       33
+      ],
+      [
+       15,
+       21,
+       32
+      ]
+     ],
+     "ok": true
+    },
+    "v:r2|r3": {
+     "levels": 11,
+     "colors": [
+      [
+       8,
+       11,
+       18
+      ],
+      [
+       9,
+       14,
+       21
+      ],
+      [
+       11,
+       16,
+       25
+      ],
+      [
+       11,
+       17,
+       26
+      ],
+      [
+       12,
+       18,
+       28
+      ],
+      [
+       13,
+       19,
+       29
+      ],
+      [
+       13,
+       19,
+       30
+      ],
+      [
+       14,
+       20,
+       31
+      ],
+      [
+       14,
+       21,
+       32
+      ],
+      [
+       14,
+       21,
+       33
+      ],
+      [
+       15,
+       21,
+       32
+      ]
+     ],
+     "ok": true
+    }
+   },
+   "ok": true
+  },
+  "window": [
+   0,
+   0,
+   1279,
+   819
+  ],
+  "PASS": true
+ }
+}
