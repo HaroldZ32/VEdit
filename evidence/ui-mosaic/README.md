@@ -153,3 +153,16 @@
 
 验证：构建 exit 0 + ctest 62/62；`QT_STYLE_OVERRIDE=fusion|windows` 两风格下，文件对话框右键菜单与 View 菜单**纯黑像素均为 0**、主导色 = surface；包内（暖杏黄 + windows 风格）截图 `screenshots/pkg-ctxmenu-xinghuang.png` 菜单 `#FFFDF6` 可读、方角、无纯黑。
 **未证明**：实机合成器路径、QToolTip 与下拉列表实拍——无头环境缺这些条件，需用户实机复核。
+
+### 原生对话框排查与菜单诊断（V12）
+
+用户反馈：新包（`5f433086`）里文件的对话框右键菜单**照样纯黑**，包层 QSS 加固无效。
+
+排查发现：**生产代码原本 0 处 `QFileDialog::DontUseNativeDialog`** —— 文件对话框可能落到原生/portal 实现，那样 QSS 与调色板都管不到它的菜单。已把 6 个创建点统一强制 Qt 自绘（`src/common/file_dialog_filters.h` 集中封装）。
+
+同时加了**自动落盘**的弹层诊断（无需环境变量）：`ApplicationShell` 装 `QApplication` 级 `Show` 过滤器，每个 `QMenu` 弹层向 `<stateDir>/ui-menu-diag.log` 追加一行 JSON，字段含 `class / parentClass / parentObjectName / isWindow / translucent / size / palette(Window,Base,Text,Button) / styleObjectName / styleClass / styleSheetEmpty`。
+
+- 本环境实测（无合成器）：每个打开的菜单都有对应行，文件对话框右键菜单为 `class=QMenu parentClass=QTreeView parentObjectName=treeView translucent=false paletteWindow=#ffffff styleClass=QStyleSheetStyle`。
+- 包内实测日志实际落点：`~/.config/VEdit/vedit-app/ui-menu-diag.log`。
+- 产物：`3ee5b07d607bfdd5739e79acea5b54480b1b1872595b25723b45043c5cc186a7`（`138,811,896` 字节），构建 `steps_failed=0`。
+- **仍未证明**：用户实机纯黑无法在本环境复现；强制自绘能否修复取决于其原对话框是否为原生实现，需用户实机复跑并回传上述日志。
