@@ -30,7 +30,8 @@ struct ProductTheme {
     QColor  canvas;       // 窗口画布（卡片之间的间隙）
     QColor  surface;      // 卡片底色
     QColor  surfaceAlt;   // 次级卡片 / chip / hover
-    QColor  border;       // 1px 描边
+    QColor  border;       // 1px 描边（比 surface 暗/亮 20~30 个 sRGB 单位）
+    QColor  borderStrong; // 按钮等“必须有轮廓”的控件用的加强描边
     QColor  text;         // 正文
     QColor  textMuted;    // 次要文本
     QColor  accent;       // 强调色（按钮/选中/焦点）

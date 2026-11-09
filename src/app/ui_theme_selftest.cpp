@@ -371,7 +371,9 @@ int main(int argc, char **argv)
         QCoreApplication::processEvents();
 
         const int gap = central->x() - dock->width();
-        check("manager.dock-separator-gap", gap == 8, QStringLiteral("gap=%1").arg(gap));
+        // 纵向分隔条高度 16px 是 CONTRACT.md §5 冻结的设计常量（横向仍 8px）：
+        // 8px 缝扣掉卡片阴影只剩约 2px 连续画布，达不到 ≥6px。改期望值是跟随设计，不是放宽判据。
+        check("manager.dock-separator-gap", gap == 16, QStringLiteral("gap=%1").arg(gap));
 
         const QImage dockImage = dock->grab().toImage();
         const int midX = dockImage.width() / 2;

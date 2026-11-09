@@ -23,7 +23,7 @@ QMainWindow {
 QMainWindow::separator {
     background: @canvas@;
     width: @gap@;
-    height: @gap@;
+    height: 16px;
 }
 
 /* 拖动分隔条时不出现刺眼高亮：保持画布色，鼠标指针本身会变成分隔形状。 */
@@ -31,8 +31,11 @@ QMainWindow::separator:hover {
     background: @canvas@;
 }
 
+/* 对话框是卡片而不是画布：V1 的实机缺陷里对话框/弹层的默认底色跟着
+ * QPalette::Window 走，而调色板基线是画布色。对话框自己铺 surface，里面
+ * 没被显式上色的子控件才不会在卡片中间露出画布补丁。 */
 QDialog {
-    background: @canvas@;
+    background: @surface@;
     color: @text@;
 }
 
@@ -78,7 +81,29 @@ QDockWidget::title {
  * 标题的上半圈拼成连续的 1px 轮廓。这条选择器只匹配 QDockWidget 的**直接**
  * 子控件（内容面板与标题栏按钮，按钮的 subcontrol 规则在前面已经覆盖），
  * 不是无差别的全局 QWidget 规则，对话框 / 菜单 / 下拉弹层不受影响。 */
+/* 卡片体基线（V1 实测，2026-11）：Qt 6.10 上 `dock->widget()` **不是**
+ * QDockWidget 的直接子控件（`QDockWidget > QWidget` 一条像素都不命中，实测
+ * 见 evidence/ui-mosaic/visual-fix/probe.py 的 before 对照），真实面板控件全在
+ * 更深一层。所以卡片体按“dock 内的所有控件”铺 surface：效果就是调色板
+ * Window 基线本来要保证的事——卡片内部默认是卡片色，画布只留给
+ * QMainWindow / separator / 工具栏 / 菜单栏。子控件的显式规则（滚动条、
+ * tab、hover）特异度更高，不会被这条覆盖。 */
+QDockWidget QWidget {
+    background: @surface@;
+}
+
 QDockWidget > QWidget {
+    background: @surface@;
+    border: 1px solid @border@;
+    border-top: none;
+    border-bottom-left-radius: @radius@;
+    border-bottom-right-radius: @radius@;
+}
+
+/* 真实 dock 的卡片抽屉：panel_registry.cpp 给内容根控件打上 veditDockCard
+ * 属性，卡片的左右下三边描边由它画（上边由 QDockWidget::title 的上半圈承担），
+ * 圆角只在下方两角——与 title 的上方两角拼成一张连续卡片。 */
+QWidget[veditDockCard="true"] {
     background: @surface@;
     border: 1px solid @border@;
     border-top: none;
@@ -133,17 +158,20 @@ QToolBar::separator {
     margin: 4px 2px;
 }
 
+/* 工具栏按钮默认就是“看得见的按钮”：卡片底色 + borderStrong 描边。V1 实机
+ * 缺陷之一是工具栏只有字形像素、没有轮廓线（原来 border 是 transparent，
+ * 描边色本身又几乎和 surface 同色）。 */
 QToolButton {
-    background: transparent;
+    background: @surface@;
     color: @text@;
-    border: 1px solid transparent;
+    border: 1px solid @borderStrong@;
     border-radius: @radiusSm@;
     padding: 4px 8px;
 }
 
 QToolButton:hover {
     background: @surfaceAlt@;
-    border-color: @border@;
+    border-color: @borderStrong@;
 }
 
 QToolButton:pressed {
@@ -307,7 +335,7 @@ QLineEdit:disabled {
 QPushButton {
     background: @surface@;
     color: @text@;
-    border: 1px solid @border@;
+    border: 1px solid @borderStrong@;
     border-radius: @radiusSm@;
     padding: 6px 14px;
 }
@@ -335,6 +363,7 @@ QPushButton:focus {
 QPushButton:disabled {
     background: @surfaceAlt@;
     color: @textDisabled@;
+    border-color: @border@;
 }
 
 /* --- 嵌入式第三方控件复位：KTextEditor ---------------------------------------

@@ -81,3 +81,18 @@
 - 包内 `F2-ISOLATION PASS`：八档 hicolor（16/24/32/48/64/128/256/512）、`.DirIcon`、根 `io.github.vedit.VEdit.png`、`vedit.desktop` 的 `Icon=`/`StartupWMClass=` **全部 PASS**，含反向控制（宿主泄漏 406 定义、shadow 用例）。
 - CentOS 7 机制探针 PASS：包内 `git 2.53.0` / `svn 1.14.5` 来自 bundled 工具链；`APP-SHELL-SELFTEST ok=1 checks=321 failures=0`。
 - 包内 UI 实拍：`screenshots/appimage-verify.png`（AppImage 以 `APPIMAGE_EXTRACT_AND_RUN=1` 在 Xvfb 内运行）——工具栏图标、右上角主题按钮、卡片外观、状态栏 `Theme: Cloud White / Breeze Light` 均在交付物中生效。
+
+### 视觉修复（用户实机反馈后，V1→V7）
+
+用户反馈："没有框边阴影、卡片颜色与背景颜色相同、圆角按钮全部缺框线勾勒"。量化定位与修复：
+
+| 现象 | 根因（实测） | 修复 |
+|---|---|---|
+| 卡片与背景同色 | 面板主体像素 = `#F4F4F2`（画布色），不是卡片色；未显式上色的子控件继承调色板 Window=canvas | QSS 在卡片子树铺 `surface`（渲染等价，A 判据六套 Δ=0） |
+| 无描边 | 沿卡边扫 40px 无任何色差；`border` 派生与 surface 只差 5 | `border`/`borderStrong` 改为 surface→text 混合 12%/22%（Δ 24–26） |
+| 无阴影 | 无 effect | `QGraphicsDropShadowEffect`（blur 12/14、offset 0,1、浅色 α22/深色 α220）+ 纵向分隔条 8px→16px 让出画布带 |
+| 按钮无轮廓 | 只有字形像素 | `QPushButton`/`QToolButton` 用 `borderStrong` 描边，保留圆角 |
+| 深色两卡无阴影 | dock 在主题应用**之前**创建，`owner->palette()` 走浅色 α22 分支，在 `#131315` 上 Δ≤1.6 | 阴影改为按 `QApplication::palette()` 计算，并在 `ApplicationPaletteChange`/`PaletteChange` 时重算 |
+
+最终验收（船长自测，六套主题，`screenshots/after-*.png`）：外圈 8px 卡片像素 **0**；纵向连续画布 **10px**、横向 **16–18px**；卡片下/左/右阴影 **3–5px**；描边 Δ **24–26**；按钮轮廓 Δ **48–55**（均圆角）。顶部边阴影被子控件重绘覆盖属 Qt 绘制顺序，已按 `CONTRACT.md §5` 豁免并留痕。
+构建 `bash scripts/build-qt.sh` exit 0，全量 ctest **62/62**。`vedit-app-ui-theme-selftest` 的 `dock-separator-gap` 期望值随冻结常量 8→16 同步（仅此一处，见 §5「间隙语义」）。

@@ -15,13 +15,18 @@ namespace {
 //   两档中性色保证正文在六套主题上都有稳定对比度，也避免把强调色带进正文。
 // * `textMuted` = text 向 surface 混合 55%：越靠近卡片底色越“退后”，所以它在
 //   六套主题上都稳定地比正文淡、又不会淡到读不出来（占位符/状态文本用它）。
-// * `surfaceAlt` = surface 向 canvas 混合 60%，`border` = surface 向 canvas 混合
-//   88%。六套主题里 canvas 都比 surface 暗，因此两个派生色都比卡片底色更深：
-//   hover/chip 看得见，1px 描边能在卡片边缘收出一圈细线，同时保持参考图那种
-//   克制的层次感（不用纯黑/纯灰的硬边）。
+// * `surfaceAlt` = surface 向 canvas 混合 60%：hover/chip 比卡片底色后退一档。
+// * `border` / `borderStrong` = surface 向 **text** 混合 12% / 22%，而不是向
+//   canvas。V1 的实机缺陷就是后者：canvas 与 surface 的亮度差只有 4（云雾白
+//   #F4F4F2 vs #FFFFFF），按 88% 混出来的 #FAFAF9 与卡片只差 5 个 sRGB 单位，
+//   1px 描边在真机上完全不可见。向 text 混合不依赖两套底色的接近程度，浅色主题
+//   得到比 surface 暗、深色主题得到比 surface 亮的描边（方向自动正确），两个
+//   方向的亮度差都在 20~30 sRGB 单位，肉眼可辨且仍然是克制的细边。
+//   borderStrong 给需要“明显是按钮”的控件（QPushButton / QToolButton）。
 constexpr int kTextMutedBlendPercent = 55;
 constexpr int kSurfaceAltBlendPercent = 60;
-constexpr int kBorderBlendPercent = 88;
+constexpr int kBorderBlendPercent = 12;
+constexpr int kBorderStrongBlendPercent = 22;
 
 // Disabled 文字向它所在的底色混合 40%。40% 是算出来的而不是猜的：语法主题
 // 调色板用的 55% 在云雾白上只剩约 2.7:1，低于需求 A3 的 3:1 下限；40% 在六套
@@ -57,8 +62,10 @@ ProductTheme makeTheme(const char *id, const char *displayName, bool dark, QRgb 
     theme.syntaxTheme = QString::fromLatin1(syntaxTheme);
 
     theme.surfaceAlt = blendToward(theme.surface, theme.canvas, kSurfaceAltBlendPercent);
-    theme.border = blendToward(theme.surface, theme.canvas, kBorderBlendPercent);
+    // 描边向 text 混色，所以 text 必须先确定。
     theme.text = dark ? QColor(0xE6, 0xE8, 0xEC) : QColor(0x1F, 0x23, 0x28);
+    theme.border = blendToward(theme.surface, theme.text, kBorderBlendPercent);
+    theme.borderStrong = blendToward(theme.surface, theme.text, kBorderStrongBlendPercent);
     theme.textMuted = blendToward(theme.text, theme.surface, kTextMutedBlendPercent);
     return theme;
 }
@@ -182,6 +189,7 @@ QString renderStyleSheet(const ProductTheme &theme)
     const TokenValue tokens[] = {
         {"@canvas@", theme.canvas.name()},       {"@surface@", theme.surface.name()},
         {"@surfaceAlt@", theme.surfaceAlt.name()}, {"@border@", theme.border.name()},
+        {"@borderStrong@", theme.borderStrong.name()},
         {"@text@", theme.text.name()},           {"@textMuted@", theme.textMuted.name()},
         {"@accent@", theme.accent.name()},       {"@accentText@", theme.accentText.name()},
         // 契约只要求“至少”这些令牌；@textDisabled@ 是额外的一个：QSS 里普通的

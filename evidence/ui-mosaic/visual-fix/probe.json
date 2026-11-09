@@ -1,0 +1,1115 @@
+{
+  "themes": [
+    {
+      "image": "evidence/ui-mosaic/visual-fix/after-yunwu.png",
+      "theme": "yunwu",
+      "dark": false,
+      "ok": true,
+      "window": [
+        0,
+        0,
+        1279,
+        819
+      ],
+      "checks": [
+        {
+          "metric": "A",
+          "name": "left-panel",
+          "ok": true,
+          "dominant": "#FFFFFF",
+          "surface": "#FFFFFF",
+          "distance": 0,
+          "fraction": 0.9939
+        },
+        {
+          "metric": "A",
+          "name": "right-panel",
+          "ok": true,
+          "dominant": "#FFFFFF",
+          "surface": "#FFFFFF",
+          "distance": 0,
+          "fraction": 0.9396
+        },
+        {
+          "metric": "A",
+          "name": "editor-card",
+          "ok": true,
+          "dominant": "#FFFFFF",
+          "surface": "#FFFFFF",
+          "distance": 0,
+          "fraction": 1.0
+        },
+        {
+          "metric": "B",
+          "ok": true,
+          "x": 703,
+          "edge_y": 82,
+          "fill_y": 83,
+          "edge": "#E4E5E5",
+          "surface": "#FFFFFF",
+          "canvas": "#F4F4F2",
+          "border_expected": "#E4E5E5",
+          "delta_surface": 27,
+          "delta_canvas": 16,
+          "border_distance": 0,
+          "brighter_than_surface": false,
+          "surface_canvas_gap": 13
+        },
+        {
+          "metric": "C",
+          "ok": true,
+          "x": 319,
+          "edge_y": 797,
+          "band_px": 10,
+          "deltas": [
+            23,
+            18,
+            14,
+            11,
+            9,
+            7,
+            6,
+            4,
+            3,
+            3
+          ]
+        },
+        {
+          "metric": "D",
+          "ok": true,
+          "buttons_found": 6,
+          "buttons_passed": 6,
+          "detail": [
+            {
+              "box": [
+                18,
+                32,
+                78,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                100,
+                32,
+                96,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                200,
+                32,
+                136,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                340,
+                32,
+                148,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                492,
+                32,
+                81,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                577,
+                32,
+                100,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "image": "evidence/ui-mosaic/visual-fix/after-xinghuang.png",
+      "theme": "xinghuang",
+      "dark": false,
+      "ok": true,
+      "window": [
+        0,
+        0,
+        1279,
+        819
+      ],
+      "checks": [
+        {
+          "metric": "A",
+          "name": "left-panel",
+          "ok": true,
+          "dominant": "#FFFDF6",
+          "surface": "#FFFDF6",
+          "distance": 0,
+          "fraction": 0.9939
+        },
+        {
+          "metric": "A",
+          "name": "right-panel",
+          "ok": true,
+          "dominant": "#FFFDF6",
+          "surface": "#FFFDF6",
+          "distance": 0,
+          "fraction": 0.9396
+        },
+        {
+          "metric": "A",
+          "name": "editor-card",
+          "ok": true,
+          "dominant": "#FFFDF6",
+          "surface": "#FFFDF6",
+          "distance": 0,
+          "fraction": 1.0
+        },
+        {
+          "metric": "B",
+          "ok": true,
+          "x": 703,
+          "edge_y": 82,
+          "fill_y": 83,
+          "edge": "#E4E3DD",
+          "surface": "#FFFDF6",
+          "canvas": "#F9F2E1",
+          "border_expected": "#E4E3DD",
+          "delta_surface": 27,
+          "delta_canvas": 21,
+          "border_distance": 0,
+          "brighter_than_surface": false,
+          "surface_canvas_gap": 21
+        },
+        {
+          "metric": "C",
+          "ok": true,
+          "x": 319,
+          "edge_y": 797,
+          "band_px": 10,
+          "deltas": [
+            23,
+            19,
+            15,
+            12,
+            9,
+            7,
+            6,
+            4,
+            3,
+            3
+          ]
+        },
+        {
+          "metric": "D",
+          "ok": true,
+          "buttons_found": 6,
+          "buttons_passed": 6,
+          "detail": [
+            {
+              "box": [
+                18,
+                32,
+                78,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                100,
+                32,
+                96,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                200,
+                32,
+                136,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                340,
+                32,
+                148,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                492,
+                32,
+                81,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                577,
+                32,
+                100,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "image": "evidence/ui-mosaic/visual-fix/after-bohe.png",
+      "theme": "bohe",
+      "dark": false,
+      "ok": true,
+      "window": [
+        0,
+        0,
+        1279,
+        819
+      ],
+      "checks": [
+        {
+          "metric": "A",
+          "name": "left-panel",
+          "ok": true,
+          "dominant": "#FFFFFF",
+          "surface": "#FFFFFF",
+          "distance": 0,
+          "fraction": 0.9939
+        },
+        {
+          "metric": "A",
+          "name": "right-panel",
+          "ok": true,
+          "dominant": "#FFFFFF",
+          "surface": "#FFFFFF",
+          "distance": 0,
+          "fraction": 0.9396
+        },
+        {
+          "metric": "A",
+          "name": "editor-card",
+          "ok": true,
+          "dominant": "#FFFFFF",
+          "surface": "#FFFFFF",
+          "distance": 0,
+          "fraction": 1.0
+        },
+        {
+          "metric": "B",
+          "ok": true,
+          "x": 703,
+          "edge_y": 82,
+          "fill_y": 83,
+          "edge": "#E4E5E5",
+          "surface": "#FFFFFF",
+          "canvas": "#EDF4EE",
+          "border_expected": "#E4E5E5",
+          "delta_surface": 27,
+          "delta_canvas": 15,
+          "border_distance": 0,
+          "brighter_than_surface": false,
+          "surface_canvas_gap": 18
+        },
+        {
+          "metric": "C",
+          "ok": true,
+          "x": 319,
+          "edge_y": 797,
+          "band_px": 10,
+          "deltas": [
+            23,
+            18,
+            14,
+            11,
+            9,
+            7,
+            6,
+            4,
+            3,
+            3
+          ]
+        },
+        {
+          "metric": "D",
+          "ok": true,
+          "buttons_found": 6,
+          "buttons_passed": 6,
+          "detail": [
+            {
+              "box": [
+                18,
+                32,
+                78,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                100,
+                32,
+                96,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                200,
+                32,
+                136,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                340,
+                32,
+                148,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                492,
+                32,
+                81,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                577,
+                32,
+                100,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "image": "evidence/ui-mosaic/visual-fix/after-qingkong.png",
+      "theme": "qingkong",
+      "dark": false,
+      "ok": true,
+      "window": [
+        0,
+        0,
+        1279,
+        819
+      ],
+      "checks": [
+        {
+          "metric": "A",
+          "name": "left-panel",
+          "ok": true,
+          "dominant": "#FFFFFF",
+          "surface": "#FFFFFF",
+          "distance": 0,
+          "fraction": 0.9939
+        },
+        {
+          "metric": "A",
+          "name": "right-panel",
+          "ok": true,
+          "dominant": "#FFFFFF",
+          "surface": "#FFFFFF",
+          "distance": 0,
+          "fraction": 0.9396
+        },
+        {
+          "metric": "A",
+          "name": "editor-card",
+          "ok": true,
+          "dominant": "#FFFFFF",
+          "surface": "#FFFFFF",
+          "distance": 0,
+          "fraction": 1.0
+        },
+        {
+          "metric": "B",
+          "ok": true,
+          "x": 703,
+          "edge_y": 82,
+          "fill_y": 83,
+          "edge": "#E4E5E5",
+          "surface": "#FFFFFF",
+          "canvas": "#EBF0F7",
+          "border_expected": "#E4E5E5",
+          "delta_surface": 27,
+          "delta_canvas": 18,
+          "border_distance": 0,
+          "brighter_than_surface": false,
+          "surface_canvas_gap": 20
+        },
+        {
+          "metric": "C",
+          "ok": true,
+          "x": 319,
+          "edge_y": 797,
+          "band_px": 10,
+          "deltas": [
+            23,
+            18,
+            15,
+            12,
+            9,
+            7,
+            6,
+            4,
+            3,
+            3
+          ]
+        },
+        {
+          "metric": "D",
+          "ok": true,
+          "buttons_found": 6,
+          "buttons_passed": 6,
+          "detail": [
+            {
+              "box": [
+                18,
+                32,
+                78,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                100,
+                32,
+                96,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                200,
+                32,
+                136,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                340,
+                32,
+                148,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                492,
+                32,
+                81,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                577,
+                32,
+                100,
+                31
+              ],
+              "outline_deltas": {
+                "left": 49,
+                "right": 49,
+                "top": 49,
+                "bottom": 49
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "image": "evidence/ui-mosaic/visual-fix/after-yaoshi.png",
+      "theme": "yaoshi",
+      "dark": true,
+      "ok": true,
+      "window": [
+        0,
+        0,
+        1279,
+        819
+      ],
+      "checks": [
+        {
+          "metric": "A",
+          "name": "left-panel",
+          "ok": true,
+          "dominant": "#1D1D20",
+          "surface": "#1D1D20",
+          "distance": 0,
+          "fraction": 0.9939
+        },
+        {
+          "metric": "A",
+          "name": "right-panel",
+          "ok": true,
+          "dominant": "#1D1D20",
+          "surface": "#1D1D20",
+          "distance": 0,
+          "fraction": 0.9396
+        },
+        {
+          "metric": "A",
+          "name": "editor-card",
+          "ok": true,
+          "dominant": "#1D1D20",
+          "surface": "#1D1D20",
+          "distance": 0,
+          "fraction": 1.0
+        },
+        {
+          "metric": "B",
+          "ok": true,
+          "x": 703,
+          "edge_y": 82,
+          "fill_y": 83,
+          "edge": "#353538",
+          "surface": "#1D1D20",
+          "canvas": "#131315",
+          "border_expected": "#353538",
+          "delta_surface": 24,
+          "delta_canvas": 35,
+          "border_distance": 0,
+          "brighter_than_surface": true,
+          "surface_canvas_gap": 11
+        },
+        {
+          "metric": "C",
+          "ok": true,
+          "x": 319,
+          "edge_y": 797,
+          "band_px": 5,
+          "deltas": [
+            7,
+            5,
+            4,
+            3,
+            3,
+            2
+          ]
+        },
+        {
+          "metric": "D",
+          "ok": true,
+          "buttons_found": 6,
+          "buttons_passed": 6,
+          "detail": [
+            {
+              "box": [
+                18,
+                32,
+                78,
+                31
+              ],
+              "outline_deltas": {
+                "left": 45,
+                "right": 45,
+                "top": 45,
+                "bottom": 45
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                100,
+                32,
+                96,
+                31
+              ],
+              "outline_deltas": {
+                "left": 45,
+                "right": 45,
+                "top": 45,
+                "bottom": 45
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                200,
+                32,
+                136,
+                31
+              ],
+              "outline_deltas": {
+                "left": 45,
+                "right": 45,
+                "top": 45,
+                "bottom": 45
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                340,
+                32,
+                148,
+                31
+              ],
+              "outline_deltas": {
+                "left": 45,
+                "right": 45,
+                "top": 45,
+                "bottom": 45
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                492,
+                32,
+                81,
+                31
+              ],
+              "outline_deltas": {
+                "left": 45,
+                "right": 45,
+                "top": 45,
+                "bottom": 45
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                577,
+                32,
+                100,
+                31
+              ],
+              "outline_deltas": {
+                "left": 45,
+                "right": 45,
+                "top": 45,
+                "bottom": 45
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "image": "evidence/ui-mosaic/visual-fix/after-shenye.png",
+      "theme": "shenye",
+      "dark": true,
+      "ok": true,
+      "window": [
+        0,
+        0,
+        1279,
+        819
+      ],
+      "checks": [
+        {
+          "metric": "A",
+          "name": "left-panel",
+          "ok": true,
+          "dominant": "#161F2E",
+          "surface": "#161F2E",
+          "distance": 0,
+          "fraction": 0.9939
+        },
+        {
+          "metric": "A",
+          "name": "right-panel",
+          "ok": true,
+          "dominant": "#161F2E",
+          "surface": "#161F2E",
+          "distance": 0,
+          "fraction": 0.9396
+        },
+        {
+          "metric": "A",
+          "name": "editor-card",
+          "ok": true,
+          "dominant": "#161F2E",
+          "surface": "#161F2E",
+          "distance": 0,
+          "fraction": 1.0
+        },
+        {
+          "metric": "B",
+          "ok": true,
+          "x": 703,
+          "edge_y": 82,
+          "fill_y": 83,
+          "edge": "#2F3745",
+          "surface": "#161F2E",
+          "canvas": "#0F1622",
+          "border_expected": "#2F3745",
+          "delta_surface": 25,
+          "delta_canvas": 35,
+          "border_distance": 0,
+          "brighter_than_surface": true,
+          "surface_canvas_gap": 12
+        },
+        {
+          "metric": "C",
+          "ok": true,
+          "x": 319,
+          "edge_y": 797,
+          "band_px": 7,
+          "deltas": [
+            11,
+            9,
+            7,
+            5,
+            4,
+            3,
+            3,
+            2
+          ]
+        },
+        {
+          "metric": "D",
+          "ok": true,
+          "buttons_found": 6,
+          "buttons_passed": 6,
+          "detail": [
+            {
+              "box": [
+                18,
+                32,
+                78,
+                31
+              ],
+              "outline_deltas": {
+                "left": 46,
+                "right": 46,
+                "top": 46,
+                "bottom": 46
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                100,
+                32,
+                96,
+                31
+              ],
+              "outline_deltas": {
+                "left": 46,
+                "right": 46,
+                "top": 46,
+                "bottom": 46
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                200,
+                32,
+                136,
+                31
+              ],
+              "outline_deltas": {
+                "left": 46,
+                "right": 46,
+                "top": 46,
+                "bottom": 46
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                340,
+                32,
+                148,
+                31
+              ],
+              "outline_deltas": {
+                "left": 46,
+                "right": 46,
+                "top": 46,
+                "bottom": 46
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                492,
+                32,
+                81,
+                31
+              ],
+              "outline_deltas": {
+                "left": 46,
+                "right": 46,
+                "top": 46,
+                "bottom": 46
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            },
+            {
+              "box": [
+                577,
+                32,
+                100,
+                31
+              ],
+              "outline_deltas": {
+                "left": 46,
+                "right": 46,
+                "top": 46,
+                "bottom": 46
+              },
+              "outline_ok": true,
+              "corner_gap": 2,
+              "rounded_ok": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "ok": true
+}

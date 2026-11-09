@@ -16,6 +16,8 @@
 #include <QEvent>
 #include <QFileInfo>
 #include <QFont>
+#include <QFrame>
+#include <QGraphicsDropShadowEffect>
 #include <QJsonValue>
 #include <QKeySequence>
 #include <QHBoxLayout>
@@ -1378,6 +1380,26 @@ EditorArea::EditorArea(QWidget *parent)
     if (QCoreApplication::instance() != nullptr) {
         QCoreApplication::instance()->installEventFilter(this);
     }
+
+    // UI-Mosaic V1: 编辑器卡片和面板卡片用同一条柔和投影（同一组参数）。QFrame#veditCard
+    // 由外壳在构造完本控件之后创建并把本控件重挂进去，所以投影放到下一轮
+    // 事件循环再装（此时父链已定）。父控件不是卡片（例如只单独构造编辑区的
+    // 测试）就什么都不做。
+    QTimer::singleShot(0, this, [this]() {
+        auto *card = qobject_cast<QFrame *>(parentWidget());
+        if (card == nullptr || card->objectName() != QStringLiteral("veditCard")
+            || card->graphicsEffect() != nullptr) {
+            return;
+        }
+        // 参数与 panel_registry.cpp 的 makeCardShadow() 保持一致：同一套卡片
+        // 只有一条阴影语言（V5：blur 12 浅色 / 14 深色，offset 0,1，浅色 α22 / 深色 α220）。
+        const bool light = QApplication::palette().color(QPalette::Window).lightness() > 128;
+        auto *shadow = new QGraphicsDropShadowEffect(card);
+        shadow->setBlurRadius(light ? 12 : 14);
+        shadow->setOffset(0, 1);
+        shadow->setColor(QColor(0, 0, 0, light ? 22 : 220));
+        card->setGraphicsEffect(shadow);
+    });
 }
 
 EditorArea::~EditorArea()

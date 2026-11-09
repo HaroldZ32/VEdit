@@ -1,0 +1,76 @@
+
+== yunwu  (evidence/ui-mosaic/visual-fix/after-yunwu.png)  light
+  A PASS  left-panel  dominant=#FFFFFF surface=#FFFFFF delta=0 share=0.99
+  A PASS  right-panel dominant=#FFFFFF surface=#FFFFFF delta=0 share=0.94
+  A PASS  editor-card dominant=#FFFFFF surface=#FFFFFF delta=0 share=1.00
+  B PASS  edge=#E4E5E5 vs surface=27 vs canvas=16 expected=#E4E5E5 match_delta=0 brighter=False
+  C PASS  band=10px deltas=[23, 18, 14, 11, 9, 7, 6, 4, 3, 3]
+  D PASS  buttons found=6 passed=6
+          box=[18, 32, 78, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+          box=[100, 32, 96, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+          box=[200, 32, 136, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+  -> PASS
+
+== xinghuang  (evidence/ui-mosaic/visual-fix/after-xinghuang.png)  light
+  A PASS  left-panel  dominant=#FFFDF6 surface=#FFFDF6 delta=0 share=0.99
+  A PASS  right-panel dominant=#FFFDF6 surface=#FFFDF6 delta=0 share=0.94
+  A PASS  editor-card dominant=#FFFDF6 surface=#FFFDF6 delta=0 share=1.00
+  B PASS  edge=#E4E3DD vs surface=27 vs canvas=21 expected=#E4E3DD match_delta=0 brighter=False
+  C PASS  band=10px deltas=[23, 19, 15, 12, 9, 7, 6, 4, 3, 3]
+  D PASS  buttons found=6 passed=6
+          box=[18, 32, 78, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+          box=[100, 32, 96, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+          box=[200, 32, 136, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+  -> PASS
+
+== bohe  (evidence/ui-mosaic/visual-fix/after-bohe.png)  light
+  A PASS  left-panel  dominant=#FFFFFF surface=#FFFFFF delta=0 share=0.99
+  A PASS  right-panel dominant=#FFFFFF surface=#FFFFFF delta=0 share=0.94
+  A PASS  editor-card dominant=#FFFFFF surface=#FFFFFF delta=0 share=1.00
+  B PASS  edge=#E4E5E5 vs surface=27 vs canvas=15 expected=#E4E5E5 match_delta=0 brighter=False
+  C PASS  band=10px deltas=[23, 18, 14, 11, 9, 7, 6, 4, 3, 3]
+  D PASS  buttons found=6 passed=6
+          box=[18, 32, 78, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+          box=[100, 32, 96, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+          box=[200, 32, 136, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+  -> PASS
+
+== qingkong  (evidence/ui-mosaic/visual-fix/after-qingkong.png)  light
+  A PASS  left-panel  dominant=#FFFFFF surface=#FFFFFF delta=0 share=0.99
+  A PASS  right-panel dominant=#FFFFFF surface=#FFFFFF delta=0 share=0.94
+  A PASS  editor-card dominant=#FFFFFF surface=#FFFFFF delta=0 share=1.00
+  B PASS  edge=#E4E5E5 vs surface=27 vs canvas=18 expected=#E4E5E5 match_delta=0 brighter=False
+  C PASS  band=10px deltas=[23, 18, 15, 12, 9, 7, 6, 4, 3, 3]
+  D PASS  buttons found=6 passed=6
+          box=[18, 32, 78, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+          box=[100, 32, 96, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+          box=[200, 32, 136, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+  -> PASS
+
+== yaoshi  (evidence/ui-mosaic/visual-fix/after-yaoshi.png)  dark
+  A PASS  left-panel  dominant=#1D1D20 surface=#1D1D20 delta=0 share=0.99
+  A PASS  right-panel dominant=#1D1D20 surface=#1D1D20 delta=0 share=0.94
+  A PASS  editor-card dominant=#1D1D20 surface=#1D1D20 delta=0 share=1.00
+  B PASS  edge=#353538 vs surface=24 vs canvas=35 expected=#353538 match_delta=0 brighter=True
+  C PASS  band=5px deltas=[7, 5, 4, 3, 3, 2]
+  D PASS  buttons found=6 passed=6
+          box=[18, 32, 78, 31] outline={'left': 45, 'right': 45, 'top': 45, 'bottom': 45} corner_gap=2
+          box=[100, 32, 96, 31] outline={'left': 45, 'right': 45, 'top': 45, 'bottom': 45} corner_gap=2
+          box=[200, 32, 136, 31] outline={'left': 45, 'right': 45, 'top': 45, 'bottom': 45} corner_gap=2
+  -> PASS
+
+== shenye  (evidence/ui-mosaic/visual-fix/after-shenye.png)  dark
+  A PASS  left-panel  dominant=#161F2E surface=#161F2E delta=0 share=0.99
+  A PASS  right-panel dominant=#161F2E surface=#161F2E delta=0 share=0.94
+  A PASS  editor-card dominant=#161F2E surface=#161F2E delta=0 share=1.00
+  B PASS  edge=#2F3745 vs surface=25 vs canvas=35 expected=#2F3745 match_delta=0 brighter=True
+  C PASS  band=7px deltas=[11, 9, 7, 5, 4, 3, 3, 2]
+  D PASS  buttons found=6 passed=6
+          box=[18, 32, 78, 31] outline={'left': 46, 'right': 46, 'top': 46, 'bottom': 46} corner_gap=2
+          box=[100, 32, 96, 31] outline={'left': 46, 'right': 46, 'top': 46, 'bottom': 46} corner_gap=2
+          box=[200, 32, 136, 31] outline={'left': 46, 'right': 46, 'top': 46, 'bottom': 46} corner_gap=2
+  -> PASS
+
+JSON: evidence/ui-mosaic/visual-fix/probe.json
+
+PASS: 0 failing check(s) over 6 image(s)
