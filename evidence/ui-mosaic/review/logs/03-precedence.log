@@ -1,0 +1,15 @@
+--- 1. settings uiTheme=bohe, no archive: expect bohe, archive written ---
+seed-bohe                    theme=bohe
+drwxrwxr-x 2 haroldzhao haroldzhao 4096 Nov  8 22:05 .
+drwxrwxr-x 3 haroldzhao haroldzhao 4096 Nov  8 22:05 ..
+-rw-r--r-- 1 haroldzhao haroldzhao 1246 Nov  8 22:05 session.json
+-rw-rw-r-- 1 haroldzhao haroldzhao   17 Nov  8 22:05 settings.toml
+-rw-r--r-- 1 haroldzhao haroldzhao   47 Nov  8 22:05 shortcuts.json
+archive.uiTheme = bohe
+rewrote archive.uiTheme = shenye
+--- 2. settings bohe vs archive shenye: contract says settings wins ---
+settings-beats-archive       theme=bohe
+--- 3. no settings: archive shenye must be used ---
+archive-only                 theme=bohe
+--- 4. invalid settings id blocks the archive fallback (observed) ---
+invalid-settings             theme=yunwu

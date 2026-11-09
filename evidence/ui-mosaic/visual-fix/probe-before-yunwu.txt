@@ -1,0 +1,11 @@
+
+== yunwu  (evidence/ui-mosaic/screenshots/appimage-verify.png)  light
+  A FAIL  left-panel  dominant=#F4F4F2 surface=#FFFFFF delta=13 share=1.00
+  A FAIL  right-panel dominant=#FFFFFF surface=#FFFFFF delta=0 share=0.61
+  A PASS  editor-card dominant=#FFFFFF surface=#FFFFFF delta=0 share=1.00
+  B FAIL  edge=#F5F5F4 vs surface=11 vs canvas=2 expected=#E4E5E5 match_delta=17 brighter=False
+  C FAIL  band=0px deltas=[0]
+  D FAIL  buttons found=0 passed=0
+  -> FAIL
+
+FAIL: 5 failing check(s) over 1 image(s)

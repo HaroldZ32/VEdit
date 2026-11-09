@@ -1,0 +1,43 @@
+c++: warning: src/app/CMakeFiles/vedit-app-ux-selftest.dir/ux_selftest.cpp.o: linker input file unused because linking not done
+probe built
+PASS window.objectName :: veditMainWindow
+PASS menubar.at-most-five :: menu-file,menu-edit,menu-view,menu-help
+PASS view.theme-submenu
+PASS view.theme-six-items :: 云雾白,暖杏黄,薄荷绿,晴空蓝,曜石黑,深夜蓝
+PASS view.theme-checked-default :: yunwu
+PASS view.theme-names :: 云雾白,暖杏黄,薄荷绿,晴空蓝,曜石黑,深夜蓝
+PASS toolbar.text-beside-icon
+PASS toolbar.every-action-has-icon :: 9/9
+PASS toolbar.icons-hidden-in-menu
+PASS toolbar.theme-toolbar
+PASS toolbar.theme-button
+PASS toolbar.theme-button-menu
+PASS toolbar.theme-button-icon
+PASS status.two-theme-names :: Theme: 云雾白 / Breeze Light
+PASS editor-area.veditCard :: veditCard
+PASS central.gap-8px
+PASS central.editor-card-frame
+PASS switch.current-id :: yaoshi
+PASS switch.stylesheet-accent
+PASS switch.status-updated :: Theme: 曜石黑 / Breeze Light
+PASS switch.menu-check-follows
+PASS switch.tab-style-follows-accent
+PASS session.save
+PASS startup.archive-ui-theme :: yaoshi
+PASS startup.settings-beats-archive :: bohe
+PASS startup.seam-beats-settings :: qingkong
+RESULT checks=26 failures=0
+THEME_PROBE_EXIT=0
+
+c++: warning: src/app/workspace-lane-settings/CMakeFiles/vedit-workspace-settings-selftest.dir/settings_selftest.cpp.o: linker input file unused because linking not done
+probe built
+PASS prefs.ui-theme-combo
+PASS prefs.ui-theme-six-items :: 6
+PASS prefs.ui-theme-id-order :: yunwu,xinghuang,bohe,qingkong,yaoshi,shenye
+PASS prefs.ui-theme-above-syntax
+PASS prefs.ui-theme-applies :: yaoshi
+PASS prefs.ui-theme-persists :: uiTheme = "yaoshi"
+
+PASS prefs.ui-theme-status :: Stored by the Rust service in /tmp/settings_probe-mJUOgO/settings.toml
+RESULT checks=7 failures=0
+SETTINGS_PROBE_EXIT=0

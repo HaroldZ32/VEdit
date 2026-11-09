@@ -1,0 +1,25 @@
+== yunwu ==
+[ui-probe] theme=yunwu syntax=Breeze Light status-theme=Theme: 云雾白 / Breeze Light style=2 toolbarIconSize=20x20
+== xinghuang ==
+[ui-probe] theme=xinghuang syntax=Solarized Light status-theme=Theme: 暖杏黄 / Solarized Light style=2 toolbarIconSize=20x20
+== bohe ==
+[ui-probe] theme=bohe syntax=Breeze Light status-theme=Theme: 薄荷绿 / Breeze Light style=2 toolbarIconSize=20x20
+== qingkong ==
+[ui-probe] theme=qingkong syntax=Breeze Light status-theme=Theme: 晴空蓝 / Breeze Light style=2 toolbarIconSize=20x20
+== yaoshi ==
+[ui-probe] theme=yaoshi syntax=Breeze Dark status-theme=Theme: 曜石黑 / Breeze Dark style=2 toolbarIconSize=20x20
+== shenye ==
+[ui-probe] theme=shenye syntax=Breeze Dark status-theme=Theme: 深夜蓝 / Breeze Dark style=2 toolbarIconSize=20x20
+--- icon opaque-pixel lines (one theme) ---
+[ui-probe] action=action-file.new iconNull=0 opaquePixels=195
+[ui-probe] action=action-file.open iconNull=0 opaquePixels=172
+[ui-probe] action=action-file.open-folder iconNull=0 opaquePixels=172
+[ui-probe] action=action-file.switch-project iconNull=0 opaquePixels=172
+[ui-probe] action=action-file.save iconNull=0 opaquePixels=240
+[ui-probe] action=action-file.save-all iconNull=0 opaquePixels=240
+[ui-probe] action=action-edit.undo iconNull=0 opaquePixels=117
+[ui-probe] action=action-edit.redo iconNull=0 opaquePixels=117
+[ui-probe] action=action-search.focus iconNull=0 opaquePixels=139
+[ui-probe] action=action-project.lint iconNull=0 opaquePixels=208
+[ui-probe] action=action-diagnostics.format iconNull=0 opaquePixels=177
+[ui-probe] themeButton global=1238,32 36x36 visible=1 hint=45x37 opaquePixels=108

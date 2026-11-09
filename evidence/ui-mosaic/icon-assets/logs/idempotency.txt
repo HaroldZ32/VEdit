@@ -1,0 +1,4 @@
+run1 manifest (taken after build-app-icons-run1.log): 14 PNG artifacts
+run2 (the third invocation) now re-executes the script and re-hashes:
+artifacts: 14
+idempotent (run1 sha256 == run2 sha256): True

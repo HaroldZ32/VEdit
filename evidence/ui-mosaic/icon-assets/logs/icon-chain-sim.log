@@ -1,0 +1,54 @@
+== positive: real §6 install block + real 7b invariant block ==
+PASS  install block exited 0
+LOG: icons: AppDir root + .DirIcon + hicolor 16..512 from resources/icons/hicolor (256px light)
+installed tree:
+./.DirIcon
+./io.github.vedit.VEdit.png
+./usr/share/icons/hicolor/128x128/apps/io.github.vedit.VEdit.png
+./usr/share/icons/hicolor/16x16/apps/io.github.vedit.VEdit.png
+./usr/share/icons/hicolor/24x24/apps/io.github.vedit.VEdit.png
+./usr/share/icons/hicolor/256x256/apps/io.github.vedit.VEdit.png
+./usr/share/icons/hicolor/32x32/apps/io.github.vedit.VEdit.png
+./usr/share/icons/hicolor/48x48/apps/io.github.vedit.VEdit.png
+./usr/share/icons/hicolor/512x512/apps/io.github.vedit.VEdit.png
+./usr/share/icons/hicolor/64x64/apps/io.github.vedit.VEdit.png
+./vedit.desktop
+PASS  7b icon invariants exited 0
+LOG: icon invariants: vedit.desktop + StartupWMClass + root/16/64/256/512 PNGs present
+PASS  full tree is accepted
+== negative controls: every icon-chain hole must fail the build ==
+PASS  missing .DirIcon (invariants refused the tree)
+PASS  missing AppDir root PNG (invariants refused the tree)
+PASS  missing vedit.desktop (invariants refused the tree)
+PASS  missing hicolor 16x16 (invariants refused the tree)
+PASS  missing hicolor 256x256 (invariants refused the tree)
+PASS  empty AppDir root PNG (invariants refused the tree)
+PASS  root icon is not a PNG (invariants refused the tree)
+PASS  desktop lacks StartupWMClass (invariants refused the tree)
+PASS  desktop lacks Icon= (invariants refused the tree)
+== verify-f2-isolation.sh check_icon_chain (real function) ==
+CHECK PASS  sim: vedit.desktop carries Icon=io.github.vedit.VEdit
+CHECK PASS  sim: vedit.desktop carries StartupWMClass=io.github.vedit.VEdit
+CHECK PASS  sim: icon artifact present: io.github.vedit.VEdit.png (34447 bytes)
+CHECK PASS  sim: icon artifact present: .DirIcon (34447 bytes)
+CHECK PASS  sim: icon artifact present: usr/share/icons/hicolor/16x16/apps/io.github.vedit.VEdit.png (629 bytes)
+CHECK PASS  sim: icon artifact present: usr/share/icons/hicolor/64x64/apps/io.github.vedit.VEdit.png (5073 bytes)
+CHECK PASS  sim: icon artifact present: usr/share/icons/hicolor/256x256/apps/io.github.vedit.VEdit.png (34447 bytes)
+CHECK PASS  sim: icon artifact present: usr/share/icons/hicolor/512x512/apps/io.github.vedit.VEdit.png (122932 bytes)
+CHECK PASS  sim: io.github.vedit.VEdit.png is a PNG (magic ok)
+CHECK PASS  sim: .DirIcon is a PNG (magic ok)
+sim: pass=10 fail=0
+CHECK PASS  sim-negative: vedit.desktop carries Icon=io.github.vedit.VEdit
+CHECK PASS  sim-negative: vedit.desktop carries StartupWMClass=io.github.vedit.VEdit
+CHECK PASS  sim-negative: icon artifact present: io.github.vedit.VEdit.png (34447 bytes)
+CHECK PASS  sim-negative: icon artifact present: .DirIcon (34447 bytes)
+CHECK PASS  sim-negative: icon artifact present: usr/share/icons/hicolor/16x16/apps/io.github.vedit.VEdit.png (629 bytes)
+CHECK FAIL  sim-negative: icon artifact missing or empty: usr/share/icons/hicolor/64x64/apps/io.github.vedit.VEdit.png
+CHECK PASS  sim-negative: icon artifact present: usr/share/icons/hicolor/256x256/apps/io.github.vedit.VEdit.png (34447 bytes)
+CHECK PASS  sim-negative: icon artifact present: usr/share/icons/hicolor/512x512/apps/io.github.vedit.VEdit.png (122932 bytes)
+CHECK PASS  sim-negative: io.github.vedit.VEdit.png is a PNG (magic ok)
+CHECK PASS  sim-negative: .DirIcon is a PNG (magic ok)
+sim-negative: pass=9 fail=1
+PASS  check_icon_chain reports the missing 64x64 icon
+== summary: fails=0 ==
+ICON-CHAIN SIM PASS

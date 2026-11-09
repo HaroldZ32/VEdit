@@ -1,0 +1,27 @@
+{
+    "dockState": "AAAA/wAAAAD9AAAAAgAAAAAAAAI5AAAC1PwCAAAAAvsAAAAYAGQAbwBjAGsALQBwAHIAbwBqAGUAYwB0AAAAAAD/////AAAB2gD////7AAAAHABkAG8AYwBrAC0AZgBpAGwAZQAtAHQAcgBlAGUBAAAASgAAAtQAAACfAP///wAAAAEAAAFLAAAC1PwCAAAAA/sAAAAgAGQAbwBjAGsALQBtAG8AZAB1AGwAZQAtAHQAcgBlAGUBAAAASgAAAR8AAACiAP////sAAAAoAGQAbwBjAGsALQBpAG4AdABlAHIAZgBhAGMAZQAtAHAAYQBuAGUAbAEAAAFxAAAAewAAAFoA////+wAAABgAZABvAGMAawAtAG8AdQB0AGwAaQBuAGUBAAAB9AAAASoAAACMAP///wAAAWwAAALUAAAABAAAAAQAAAAIAAAACPwAAAABAAAAAgAAAAIAAAAkAHYAZQBkAGkAdAAtAG0AYQBpAG4ALQB0AG8AbwBsAGIAYQByAQAAAAD/////AAAAAAAAAAAAAAAmAHYAZQBkAGkAdAAtAHQAaABlAG0AZQAtAHQAbwBvAGwAYgBhAHIBAAAEyP////8AAAAAAAAAAA==",
+    "editorLayout": {
+        "active": "pane-1",
+        "nextPane": 2,
+        "root": {
+            "activeTab": -1,
+            "documents": [
+            ],
+            "pane": "pane-1",
+            "provider": "ktexteditor",
+            "type": "leaf"
+        },
+        "version": 2
+    },
+    "geometry": "AdnQywADAAAAAAAAAAAAAAAABQMAAAM3AAAAAgAAAAIAAAUBAAADNQAAAAAAAAAAAyAAAAACAAAAAgAABQEAAAM1",
+    "panels": [
+        "file-tree",
+        "outline",
+        "module-tree",
+        "interface-panel"
+    ],
+    "project": "",
+    "theme": "Breeze Light",
+    "uiTheme": "bohe",
+    "version": 2
+}

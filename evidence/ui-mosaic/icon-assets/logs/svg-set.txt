@@ -1,0 +1,18 @@
+files: 15
+exact-name match: True
+names: build.svg find.svg help.svg new.svg open.svg redo.svg replace.svg save-as.svg save.svg settings.svg sidebar.svg terminal.svg theme.svg undo.svg vcs.svg
+  new       xml=parse-ok root_attrs=True currentColor_occurrences=1
+  open      xml=parse-ok root_attrs=True currentColor_occurrences=1
+  save      xml=parse-ok root_attrs=True currentColor_occurrences=1
+  save-as   xml=parse-ok root_attrs=True currentColor_occurrences=1
+  undo      xml=parse-ok root_attrs=True currentColor_occurrences=1
+  redo      xml=parse-ok root_attrs=True currentColor_occurrences=1
+  find      xml=parse-ok root_attrs=True currentColor_occurrences=1
+  replace   xml=parse-ok root_attrs=True currentColor_occurrences=1
+  sidebar   xml=parse-ok root_attrs=True currentColor_occurrences=1
+  terminal  xml=parse-ok root_attrs=True currentColor_occurrences=1
+  build     xml=parse-ok root_attrs=True currentColor_occurrences=1
+  vcs       xml=parse-ok root_attrs=True currentColor_occurrences=1
+  settings  xml=parse-ok root_attrs=True currentColor_occurrences=1
+  theme     xml=parse-ok root_attrs=True currentColor_occurrences=2
+  help      xml=parse-ok root_attrs=True currentColor_occurrences=1

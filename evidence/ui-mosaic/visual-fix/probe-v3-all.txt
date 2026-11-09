@@ -1,0 +1,94 @@
+
+== yunwu  (evidence/ui-mosaic/visual-fix/v3-after-yunwu.png)  light
+  A PASS  left-panel  dominant=#FFFFFF surface=#FFFFFF delta=0 share=1.00
+  A PASS  right-panel dominant=#FFFFFF surface=#FFFFFF delta=0 share=0.94
+  A PASS  editor-card dominant=#FFFFFF surface=#FFFFFF delta=0 share=1.00
+  B PASS  edge=#E4E5E5 vs surface=27 vs canvas=16 expected=#E4E5E5 match_delta=0 brighter=False
+  C PASS  band=4px deltas=[12, 8, 5, 3, 2]
+  D PASS  buttons found=6 passed=6
+          box=[34, 32, 78, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+          box=[116, 32, 96, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+          box=[216, 32, 136, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+  F1 PASS card-edge distance={'left': 16, 'right': 15, 'top': 32, 'bottom': 20} first-non-canvas={'left': 14, 'right': 13, 'top': 31, 'bottom': 5}
+  F2 PASS h-gap=12px at x=[589, 600] levels=4 ['#F1F1EF', '#F2F2F0', '#F3F3F1', '#F4F4F2']
+          v-gap=17px at y=[64, 80] levels=4 ['#F4F4F2', '#F3F3F1', '#F2F2F0', '#F1F1EF']
+  -> PASS
+
+== xinghuang  (evidence/ui-mosaic/visual-fix/v3-after-xinghuang.png)  light
+  A PASS  left-panel  dominant=#FFFDF6 surface=#FFFDF6 delta=0 share=1.00
+  A PASS  right-panel dominant=#FFFDF6 surface=#FFFDF6 delta=0 share=0.94
+  A PASS  editor-card dominant=#FFFDF6 surface=#FFFDF6 delta=0 share=1.00
+  B PASS  edge=#E4E3DD vs surface=27 vs canvas=21 expected=#E4E3DD match_delta=0 brighter=False
+  C PASS  band=4px deltas=[13, 8, 5, 3, 2]
+  D PASS  buttons found=6 passed=6
+          box=[34, 32, 78, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+          box=[116, 32, 96, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+          box=[216, 32, 136, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+  F1 PASS card-edge distance={'left': 16, 'right': 15, 'top': 32, 'bottom': 21} first-non-canvas={'left': 14, 'right': 13, 'top': 31, 'bottom': 5}
+  F2 PASS h-gap=12px at x=[589, 600] levels=4 ['#F6EFDE', '#F7F0DF', '#F8F1E0', '#F9F2E1']
+          v-gap=17px at y=[64, 80] levels=4 ['#F9F2E1', '#F8F1E0', '#F7F0DF', '#F6EFDE']
+  -> PASS
+
+== bohe  (evidence/ui-mosaic/visual-fix/v3-after-bohe.png)  light
+  A PASS  left-panel  dominant=#FFFFFF surface=#FFFFFF delta=0 share=1.00
+  A PASS  right-panel dominant=#FFFFFF surface=#FFFFFF delta=0 share=0.94
+  A PASS  editor-card dominant=#FFFFFF surface=#FFFFFF delta=0 share=1.00
+  B PASS  edge=#E4E5E5 vs surface=27 vs canvas=15 expected=#E4E5E5 match_delta=0 brighter=False
+  C PASS  band=4px deltas=[12, 8, 5, 3, 2]
+  D PASS  buttons found=6 passed=6
+          box=[34, 32, 78, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+          box=[116, 32, 96, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+          box=[216, 32, 136, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+  F1 PASS card-edge distance={'left': 16, 'right': 15, 'top': 32, 'bottom': 20} first-non-canvas={'left': 14, 'right': 13, 'top': 31, 'bottom': 5}
+  F2 PASS h-gap=12px at x=[589, 600] levels=4 ['#EAF1EB', '#EBF2EC', '#ECF3ED', '#EDF4EE']
+          v-gap=17px at y=[64, 80] levels=4 ['#EDF4EE', '#ECF3ED', '#EBF2EC', '#EAF1EB']
+  -> PASS
+
+== qingkong  (evidence/ui-mosaic/visual-fix/v3-after-qingkong.png)  light
+  A PASS  left-panel  dominant=#FFFFFF surface=#FFFFFF delta=0 share=1.00
+  A PASS  right-panel dominant=#FFFFFF surface=#FFFFFF delta=0 share=0.94
+  A PASS  editor-card dominant=#FFFFFF surface=#FFFFFF delta=0 share=1.00
+  B PASS  edge=#E4E5E5 vs surface=27 vs canvas=18 expected=#E4E5E5 match_delta=0 brighter=False
+  C PASS  band=4px deltas=[13, 8, 5, 3, 2]
+  D PASS  buttons found=6 passed=6
+          box=[34, 32, 78, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+          box=[116, 32, 96, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+          box=[216, 32, 136, 31] outline={'left': 49, 'right': 49, 'top': 49, 'bottom': 49} corner_gap=2
+  F1 PASS card-edge distance={'left': 16, 'right': 15, 'top': 32, 'bottom': 21} first-non-canvas={'left': 14, 'right': 13, 'top': 31, 'bottom': 5}
+  F2 PASS h-gap=12px at x=[589, 600] levels=4 ['#E8EDF4', '#E9EEF5', '#EAEFF6', '#EBF0F7']
+          v-gap=17px at y=[64, 80] levels=4 ['#EBF0F7', '#EAEFF6', '#E9EEF5', '#E8EDF4']
+  -> PASS
+
+== yaoshi  (evidence/ui-mosaic/visual-fix/v3-after-yaoshi.png)  dark
+  A PASS  left-panel  dominant=#1D1D20 surface=#1D1D20 delta=0 share=1.00
+  A PASS  right-panel dominant=#1D1D20 surface=#1D1D20 delta=0 share=0.94
+  A PASS  editor-card dominant=#1D1D20 surface=#1D1D20 delta=0 share=1.00
+  B PASS  edge=#353538 vs surface=24 vs canvas=35 expected=#353538 match_delta=0 brighter=True
+  C PASS  band=4px deltas=[11, 7, 5, 3, 2]
+  D PASS  buttons found=6 passed=6
+          box=[34, 32, 78, 31] outline={'left': 45, 'right': 45, 'top': 45, 'bottom': 45} corner_gap=2
+          box=[116, 32, 96, 31] outline={'left': 45, 'right': 45, 'top': 45, 'bottom': 45} corner_gap=2
+          box=[216, 32, 136, 31] outline={'left': 45, 'right': 45, 'top': 45, 'bottom': 45} corner_gap=2
+  F1 PASS card-edge distance={'left': 16, 'right': 15, 'top': 32, 'bottom': 21} first-non-canvas={'left': 14, 'right': 13, 'top': 31, 'bottom': 5}
+  F2 PASS h-gap=14px at x=[917, 930] levels=4 ['#101012', '#111113', '#121214', '#131315']
+          v-gap=17px at y=[64, 80] levels=4 ['#131315', '#121214', '#111113', '#101012']
+  -> PASS
+
+== shenye  (evidence/ui-mosaic/visual-fix/v3-after-shenye.png)  dark
+  A PASS  left-panel  dominant=#161F2E surface=#161F2E delta=0 share=1.00
+  A PASS  right-panel dominant=#161F2E surface=#161F2E delta=0 share=0.94
+  A PASS  editor-card dominant=#161F2E surface=#161F2E delta=0 share=1.00
+  B PASS  edge=#2F3745 vs surface=25 vs canvas=35 expected=#2F3745 match_delta=0 brighter=True
+  C PASS  band=5px deltas=[17, 12, 8, 5, 3, 2]
+  D PASS  buttons found=6 passed=6
+          box=[34, 32, 78, 31] outline={'left': 46, 'right': 46, 'top': 46, 'bottom': 46} corner_gap=2
+          box=[116, 32, 96, 31] outline={'left': 46, 'right': 46, 'top': 46, 'bottom': 46} corner_gap=2
+          box=[216, 32, 136, 31] outline={'left': 46, 'right': 46, 'top': 46, 'bottom': 46} corner_gap=2
+  F1 PASS card-edge distance={'left': 16, 'right': 15, 'top': 32, 'bottom': 21} first-non-canvas={'left': 13, 'right': 11, 'top': 31, 'bottom': 5}
+  F2 PASS h-gap=13px at x=[918, 930] levels=6 ['#0E141F', '#0E1520', '#0E1521', '#0F1521', '#0F1621', '#0F1622']
+          v-gap=16px at y=[64, 79] levels=6 ['#0F1622', '#0F1621', '#0F1521', '#0E1521', '#0E1520', '#0E141F']
+  -> PASS
+
+JSON: evidence/ui-mosaic/visual-fix/probe-v3.json
+
+PASS: 0 failing check(s) over 6 image(s)

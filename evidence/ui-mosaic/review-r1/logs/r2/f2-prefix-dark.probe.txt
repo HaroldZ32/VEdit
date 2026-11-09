@@ -1,0 +1,1 @@
+[ui-probe] theme=yunwu syntax=Breeze Dark status-theme=Theme: 云雾白 / Breeze Dark style=2 toolbarIconSize=20x20

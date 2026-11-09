@@ -1,0 +1,16 @@
+total 8
+drwxrwxrwt  2 haroldzhao haroldzhao 4096 Nov  8 22:16 .
+drwxrwxr-x 19 haroldzhao haroldzhao 4096 Nov  8 22:16 ..
+srwxrwxrwx  1 haroldzhao haroldzhao    0 Nov  8 22:16 X97
+--- yunwu + default syntax pairing (Breeze Light) ---
+kf.sonnet.core: Sonnet: No speller backends available!
+diagnostics: the project job failed: the project root  does not exist or is not a directory
+captured yunwu-plain mean_luma=145.7
+--- yunwu + explicit --theme 'Breeze Dark' ---
+kf.sonnet.core: Sonnet: No speller backends available!
+diagnostics: the project job failed: the project root  does not exist or is not a directory
+captured yunwu-syntaxdark mean_luma=145.7
+diff bbox: (613, 804, 771, 817)
+changed pixels (>8): 1090
+changed row bands: [(804, 816)]
+VERDICT: ONLY THE STATUS TEXT CHANGED

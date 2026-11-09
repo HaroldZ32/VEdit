@@ -1,0 +1,15 @@
+PASS  fixture: vedit.desktop carries Icon=io.github.vedit.VEdit
+PASS  fixture: vedit.desktop carries StartupWMClass=io.github.vedit.VEdit
+PASS  fixture: icon artifact present: io.github.vedit.VEdit.png (122932 bytes)
+PASS  fixture: icon artifact present: .DirIcon (122932 bytes)
+PASS  fixture: icon artifact present: usr/share/icons/hicolor/16x16/apps/io.github.vedit.VEdit.png (629 bytes)
+PASS  fixture: icon artifact present: usr/share/icons/hicolor/24x24/apps/io.github.vedit.VEdit.png (1129 bytes)
+PASS  fixture: icon artifact present: usr/share/icons/hicolor/32x32/apps/io.github.vedit.VEdit.png (1946 bytes)
+PASS  fixture: icon artifact present: usr/share/icons/hicolor/48x48/apps/io.github.vedit.VEdit.png (3331 bytes)
+PASS  fixture: icon artifact present: usr/share/icons/hicolor/64x64/apps/io.github.vedit.VEdit.png (5073 bytes)
+PASS  fixture: icon artifact present: usr/share/icons/hicolor/128x128/apps/io.github.vedit.VEdit.png (12061 bytes)
+PASS  fixture: icon artifact present: usr/share/icons/hicolor/256x256/apps/io.github.vedit.VEdit.png (34447 bytes)
+PASS  fixture: icon artifact present: usr/share/icons/hicolor/512x512/apps/io.github.vedit.VEdit.png (122932 bytes)
+PASS  fixture: io.github.vedit.VEdit.png is a PNG (magic ok)
+PASS  fixture: .DirIcon is a PNG (magic ok)
+== extracted-check pass=14 fail=0 ==

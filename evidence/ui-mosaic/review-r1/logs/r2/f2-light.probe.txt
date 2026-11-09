@@ -1,0 +1,3 @@
+[ui-probe] geom window=1280x820 central=577,74 364x724 card=8,8 348x708 editor=1,1 346x706 editorMin=188x49 status=0,798 1280x22
+[ui-probe] geom stack=0,29 346x677
+0

@@ -1,0 +1,27 @@
+=== A1 startup arbitration, r1 binary eff368dc3891364caff9b1af699c82bb78ef4105232e47abe82b37f05434d001 ===
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict/case0-archive-only/state/session.json 2026-11-09 06:00:00.000000000 +0800
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict/case0-archive-only/state/xdg 2026-11-08 22:54:38.362891493 +0800
+probe:  [ui-probe] theme=bohe
+settings@exit: <absent>
+archive@exit:  bohe
+
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict/caseA-settings-old/state/session.json 2026-11-09 06:30:00.000000000 +0800
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict/caseA-settings-old/state/settings.toml 2026-11-09 05:30:00.000000000 +0800
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict/caseA-settings-old/state/xdg 2026-11-08 22:54:41.530045705 +0800
+probe:  [ui-probe] theme=xinghuang
+settings@exit: uiTheme = "xinghuang"
+archive@exit:  xinghuang
+
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict/caseB-settings-new/state/session.json 2026-11-09 05:30:00.000000000 +0800
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict/caseB-settings-new/state/settings.toml 2026-11-09 06:30:00.000000000 +0800
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict/caseB-settings-new/state/xdg 2026-11-08 22:54:44.531191833 +0800
+probe:  [ui-probe] theme=bohe
+settings@exit: uiTheme = "bohe"
+archive@exit:  bohe
+
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict/caseC-settings-invalid/state/session.json 2026-11-09 06:30:00.000000000 +0800
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict/caseC-settings-invalid/state/settings.toml 2026-11-09 05:30:00.000000000 +0800
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict/caseC-settings-invalid/state/xdg 2026-11-08 22:54:47.532337961 +0800
+probe:  [ui-probe] theme=bohe
+settings@exit: uiTheme = "bogus"
+archive@exit:  bohe

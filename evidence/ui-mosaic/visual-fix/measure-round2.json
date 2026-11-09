@@ -1,0 +1,70 @@
+[
+  {
+    "image": "evidence/ui-mosaic/screenshots/after-yunwu.png",
+    "theme": "yunwu",
+    "canvas": "#F4F4F2",
+    "cards": [
+      {
+        "x0": 931,
+        "y0": 74,
+        "x1": 1263,
+        "y1": 353
+      },
+      {
+        "x0": 931,
+        "y0": 370,
+        "x1": 1263,
+        "y1": 490
+      },
+      {
+        "x0": 931,
+        "y0": 507,
+        "x1": 1263,
+        "y1": 797
+      }
+    ],
+    "a_vertical_canvas_run_px": 10,
+    "a_ok": true,
+    "b_edges_px": {
+      "top": 3,
+      "bottom": 5,
+      "left": 4,
+      "right": 4
+    },
+    "b_ok": true
+  },
+  {
+    "image": "evidence/ui-mosaic/screenshots/after-yaoshi.png",
+    "theme": "yaoshi",
+    "canvas": "#131315",
+    "cards": [
+      {
+        "x0": 931,
+        "y0": 74,
+        "x1": 1263,
+        "y1": 353
+      },
+      {
+        "x0": 931,
+        "y0": 370,
+        "x1": 1263,
+        "y1": 490
+      },
+      {
+        "x0": 931,
+        "y0": 507,
+        "x1": 1263,
+        "y1": 797
+      }
+    ],
+    "a_vertical_canvas_run_px": 16,
+    "a_ok": true,
+    "b_edges_px": {
+      "top": 0,
+      "bottom": 0,
+      "left": 0,
+      "right": 0
+    },
+    "b_ok": false
+  }
+]

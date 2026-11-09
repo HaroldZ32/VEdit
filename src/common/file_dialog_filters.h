@@ -159,4 +159,40 @@ inline void configureOpenFileDialog(QFileDialog &dialog)
     applySelectedFilterToModel(dialog);
 }
 
+// V12: ONE switch that keeps every file picker on Qt's OWN widget dialog.
+//
+// Why this is not optional: QFileDialog falls back to the platform chooser when
+// the running desktop supplies one (portal / GTK platform theme). A native
+// dialog is painted by the desktop, so neither this application's stylesheet
+// nor its palette reach its context menu — a bug there cannot be fixed in QSS.
+// Forcing Qt's own dialog makes the application's styling authoritative and
+// makes the menu visible to the menu diagnostics (ApplicationShell event
+// filter), which is how the reported black context menu is located.
+//
+// Qt has no application-wide equivalent of this option, so every creation point
+// goes through these helpers instead of spelling the flag again.
+
+/// Force `dialog` to be Qt's widget dialog rather than a native/portal one.
+inline void useOwnFileDialog(QFileDialog &dialog)
+{
+    dialog.setOption(QFileDialog::DontUseNativeDialog);
+}
+
+/// getExistingDirectory() with the native fallback disabled.
+inline QString chooseExistingDirectory(QWidget *parent, const QString &caption,
+                                       const QString &directory)
+{
+    return QFileDialog::getExistingDirectory(parent, caption, directory,
+                                             QFileDialog::ShowDirsOnly
+                                                 | QFileDialog::DontUseNativeDialog);
+}
+
+/// getSaveFileName() with the native fallback disabled.
+inline QString chooseSaveFileName(QWidget *parent, const QString &caption,
+                                  const QString &directory, const QString &filter = QString())
+{
+    return QFileDialog::getSaveFileName(parent, caption, directory, filter, nullptr,
+                                        QFileDialog::DontUseNativeDialog);
+}
+
 } // namespace vedit::common

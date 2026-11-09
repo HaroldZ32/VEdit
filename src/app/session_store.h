@@ -18,6 +18,11 @@
 //     "project": "/abs/project/root",     // empty => no project. The project lane
 //                                         // reads this same key: project_integration.cpp
 //     "theme": "Breeze Dark",             // empty => theme default
+//     "uiTheme": "bohe",                  // UI-Mosaic T3: product theme id;
+//                                         // empty => not chosen yet. Read and
+//                                         // written by ApplicationShell itself
+//                                         // (restoreSession/saveSession) so this
+//                                         // store's typed contract is unchanged.
 //     "geometry": "<base64>",             // QMainWindow::saveGeometry()
 //     "dockState": "<base64>",            // QMainWindow::saveState()
 //     "panels": ["file-tree", "outline"], // inserted dock ids, in insert order
@@ -101,6 +106,10 @@ struct SessionState {
     int version = kCurrentVersion;
     QString projectRoot;
     QString theme;
+    // UI-Mosaic T3: the product (chrome) theme id. Empty means "not chosen yet".
+    // ApplicationShell serialises this ONE key itself (see the archive format
+    // note above), which is why toJson()/fromJson() do not mention it.
+    QString uiTheme;
     QByteArray geometry;
     QByteArray dockState;
     QStringList panels;

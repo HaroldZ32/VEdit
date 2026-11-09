@@ -1,0 +1,26 @@
+== actionIcon(name, ##1f2328) @24px ==
+new       iconNull=0 opaquePixels=195 OK
+open      iconNull=0 opaquePixels=172 OK
+save      iconNull=0 opaquePixels=240 OK
+save-as   iconNull=0 opaquePixels=212 OK
+undo      iconNull=0 opaquePixels=117 OK
+redo      iconNull=0 opaquePixels=117 OK
+find      iconNull=0 opaquePixels=139 OK
+replace   iconNull=0 opaquePixels=132 OK
+sidebar   iconNull=0 opaquePixels=216 OK
+terminal  iconNull=0 opaquePixels=227 OK
+build     iconNull=0 opaquePixels=208 OK
+vcs       iconNull=0 opaquePixels=156 OK
+settings  iconNull=0 opaquePixels=177 OK
+theme     iconNull=0 opaquePixels=108 OK
+help      iconNull=0 opaquePixels=210 OK
+== appIcon PNG opaque @64px ==
+appIcon(dark) opaquePixels=3708 OK
+appIcon(light) opaquePixels=3708 OK
+appIconMono    opaquePixels=3708 OK
+== recolour difference (theme.svg, ink vs #f4f4f2) ==
+differingPixels=108 OK
+== root-cause reproduction (new.svg raw) ==
+HexArgb(#ff1f2328) opaquePixels=0 (expected 0)
+HexRgb (#1f2328)   opaquePixels=195 (expected >0)
+ICONS-PROBE PASS

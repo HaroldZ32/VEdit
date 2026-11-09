@@ -1,0 +1,40 @@
+16: Test command: /vedit-build/target/qt6-build/src/app/vedit-app-ui-theme-selftest
+16: Working Directory: /vedit-build/target/qt6-build/src/app
+16: Environment variables: 
+16:  QT_QPA_PLATFORM=offscreen
+16:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/src/app/xdg-runtime-ui-theme
+16: Test timeout computed to be: 120
+16: ok   product.themes.count
+16: ok   product.themes.order
+16: ok   product.themes.lookup
+16: ok   product.themes.unknown-null
+16: ok   product.themes.darkness
+16: ok   product.themes.darkness-unknown-false
+16: ok   product.stylesheet.render
+16: ok   product.palette.contrast
+16: ok   icons.app.dark
+16: ok   icons.app.light
+16: ok   icons.app.mono
+16: ok   icons.actions.list
+16: ok   icons.actions.render
+16: ok   manager.default-ui-theme
+16: ok   manager.ui-theme-ids
+16: ok   manager.unknown-rejected
+16: ok   manager.unknown-keeps-state
+16: ok   manager.apply
+16: ok   manager.current
+16: ok   manager.palette-applied
+16: ok   manager.stylesheet-applied
+16: ok   manager.window-icon-applied
+16: ok   manager.syntax-keeps-product-theme
+16: ok   manager.empty-id-default
+16: ok   manager.stylesheet-card-renders
+16: PASS: 0 failure(s)
+1/1 Test #16: vedit-app-ui-theme-selftest ......   Passed    0.03 sec
+
+The following tests passed:
+	vedit-app-ui-theme-selftest
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.03 sec

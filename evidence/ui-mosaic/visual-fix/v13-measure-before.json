@@ -1,0 +1,12 @@
+{
+  "label": "before",
+  "theme": "yunwu",
+  "surface": "#FFFFFF",
+  "surfaceAlt": "#F8F8F7",
+  "border": "#E4E5E5",
+  "headerCount": 0,
+  "panelWideHeaderRows": 0,
+  "contentWideBorderRows": [],
+  "sections": [],
+  "gaps": []
+}

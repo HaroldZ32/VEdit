@@ -1,0 +1,44 @@
+== M1: translatable product-theme display names ==
+en  status-theme=Theme: Sky Blue / Breeze Light style=2 toolbarIconSize=20x20
+zh  status-theme=主题：晴空蓝 / Breeze Light style=2 toolbarIconSize=20x20
+PASS  M1: English UI shows the English source name 'Sky Blue'
+PASS  M1: zh_CN UI shows the hand-written translation 晴空蓝
+PASS  M1: the persisted id is still qingkong (display text does not change it)
+ids in product_theme.cpp: yunwu,xinghuang,bohe,qingkong,yaoshi,shenye
+PASS  M1: product_theme.cpp carries the English source "Cloud White"
+PASS  M1: product_theme.cpp carries the English source "Warm Apricot"
+PASS  M1: product_theme.cpp carries the English source "Mint Green"
+PASS  M1: product_theme.cpp carries the English source "Sky Blue"
+PASS  M1: product_theme.cpp carries the English source "Obsidian"
+PASS  M1: product_theme.cpp carries the English source "Deep Navy"
+PASS  M1: displayName is built through QCoreApplication::translate("product_theme")
+PASS  M1: vedit_zh_CN.ts maps Cloud White -> 云雾白
+PASS  M1: vedit_zh_CN.ts maps Warm Apricot -> 暖杏黄
+PASS  M1: vedit_zh_CN.ts maps Mint Green -> 薄荷绿
+PASS  M1: vedit_zh_CN.ts maps Sky Blue -> 晴空蓝
+PASS  M1: vedit_zh_CN.ts maps Obsidian -> 曜石黑
+PASS  M1: vedit_zh_CN.ts maps Deep Navy -> 深夜蓝
+
+== M3: verify-f2-isolation.sh asserts every hicolor tier ==
+hicolor tiers asserted by the extracted function: 8
+PASS  M3: 16x16 is asserted
+PASS  M3: 24x24 is asserted
+PASS  M3: 32x32 is asserted
+PASS  M3: 48x48 is asserted
+PASS  M3: 64x64 is asserted
+PASS  M3: 128x128 is asserted
+PASS  M3: 256x256 is asserted
+PASS  M3: 512x512 is asserted
+PASS  M3: verify-f2-isolation.sh parses (bash -n)
+PASS  M3: positive control — an AppDir with all eight tiers passes (14 assertions)
+PASS  M3: negative control — the missing 48x48 tier is reported as a FAIL
+
+== M4: one icon source in main.cpp ==
+PASS  M4: main.cpp no longer hard-codes any :/icons/app/ resource path
+1856:    // UI-Mosaic R1/M4: ONE source for the launcher icon. `themed_icons::appIcon(false)`
+1859:    QApplication::setWindowIcon(vedit::app::themed_icons::appIcon(false));
+PASS  M4: main.cpp calls themed_icons::appIcon(false) (the single source)
+PASS  M4: main.cpp includes themed_icons.h
+
+== summary: pass=30 fail=0 ==
+M1-M3-M4 PASS

@@ -22,6 +22,16 @@
 <context>
     <name>VEdit</name>
     <message>
+        <location filename="../src/app/theme_manager.cpp" line="198"/>
+        <source>unknown UI theme '%1'</source>
+        <translation>未知界面主题“%1”</translation>
+    </message>
+    <message>
+        <location filename="../src/app/theme_manager.cpp" line="208"/>
+        <source>cannot apply a UI theme without a QApplication</source>
+        <translation>没有 QApplication 实例，无法应用界面主题</translation>
+    </message>
+    <message>
         <location filename="../src/app/app_shell.cpp" line="334"/>
         <location filename="../src/app/editor_provider.h" line="125"/>
         <location filename="../src/editor/kernel/document_io.cpp" line="29"/>
@@ -4718,6 +4728,10 @@ root: %1</source>
         <source>Not analysed yet (queued, or excluded because the buffer has unsaved changes)</source>
         <translation>尚未分析（排队中，或因缓冲区有未保存的更改而排除）</translation>
     </message>
+    <message>
+        <source>the settings store did not answer</source>
+        <translation>设置存储没有响应</translation>
+    </message>
 </context>
 <context>
     <name>vedit::app::ApplicationShell</name>
@@ -5168,6 +5182,34 @@ root: %1</source>
         <location filename="../src/app/app_shell.cpp" line="1837"/>
         <source>Restarting to apply interface language %1</source>
         <translation>正在重启以应用界面语言 %1</translation>
+    </message>
+    <message>
+        <source>&amp;Theme</source>
+        <translation>主题(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Theme</source>
+        <translation>主题</translation>
+    </message>
+    <message>
+        <source>Theme: %1 / %2</source>
+        <translation>主题：%1 / %2</translation>
+    </message>
+    <message>
+        <source>Theme &apos;%1&apos; could not be applied: %2</source>
+        <translation>主题“%1”无法应用：%2</translation>
+    </message>
+    <message>
+        <source>Ignoring unknown interface theme &apos;%1&apos; (from %2)</source>
+        <translation>忽略未知的界面主题“%1”（来自 %2）</translation>
+    </message>
+    <message>
+        <source>Interface theme &apos;%1&apos; was applied but not stored: no settings store is available.</source>
+        <translation>界面主题“%1”已应用但未保存：当前没有可用的设置存储。</translation>
+    </message>
+    <message>
+        <source>Interface theme &apos;%1&apos; was applied but could not be stored.</source>
+        <translation>界面主题“%1”已应用但无法保存。</translation>
     </message>
 </context>
 <context>
@@ -6565,6 +6607,57 @@ Use &quot;Open...&quot; to browse a project.</source>
         <location filename="../src/workspace/settings/settings_panel.cpp" line="1731"/>
         <source>%1: %2 also used by the editor (%3)</source>
         <translation>%1：%2 也被编辑器使用（%3）</translation>
+    </message>
+    <message>
+        <source>Interface theme:</source>
+        <translation>界面主题：</translation>
+    </message>
+    <message>
+        <source>Applied immediately and stored as `uiTheme` by the Rust service.</source>
+        <translation>立即生效，由 Rust 服务以 `uiTheme` 存储。</translation>
+    </message>
+    <message>
+        <source>Interface theme &apos;%1&apos; could not be applied.</source>
+        <translation>界面主题“%1”无法应用。</translation>
+    </message>
+    <message>
+        <source>Interface theme &apos;%1&apos; could not be applied: %2</source>
+        <translation>界面主题“%1”无法应用：%2</translation>
+    </message>
+    <message>
+        <source>Interface theme &apos;%1&apos; applied and stored by the Rust service.</source>
+        <translation>界面主题“%1”已应用并由 Rust 服务保存。</translation>
+    </message>
+    <message>
+        <source>Ignoring unknown interface theme &apos;%1&apos; (from %2)</source>
+        <translation>忽略未知的界面主题“%1”（来自 %2）</translation>
+    </message>
+</context>
+<context>
+    <name>product_theme</name>
+    <message>
+        <source>Cloud White</source>
+        <translation>云雾白</translation>
+    </message>
+    <message>
+        <source>Warm Apricot</source>
+        <translation>暖杏黄</translation>
+    </message>
+    <message>
+        <source>Mint Green</source>
+        <translation>薄荷绿</translation>
+    </message>
+    <message>
+        <source>Sky Blue</source>
+        <translation>晴空蓝</translation>
+    </message>
+    <message>
+        <source>Obsidian</source>
+        <translation>曜石黑</translation>
+    </message>
+    <message>
+        <source>Deep Navy</source>
+        <translation>深夜蓝</translation>
     </message>
 </context>
 </TS>

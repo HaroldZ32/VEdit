@@ -1,0 +1,8 @@
+== dock 标题栏按钮（区域 38x16 内 border 色像素，0=未被卡片体规则污染）==
+old(before)=0  patched(after)=0
+== QTabBar 滚动按钮（全局 QToolButton padding 是否撑大）==
+old(before)=[QToolButton 16x30][QToolButton 16x30]
+patched(after)=[QToolButton 16x30][QToolButton 16x30]
+== KTextEditor 状态栏 18px 按钮（13px 字体，darkTextPixels 越大越完整）==
+old(before)    darkTextPixels=25
+patched(after) darkTextPixels=210

@@ -1,0 +1,242 @@
+
+===== yunwu (dark=False) window=[0, 0, 1279, 819] A-E=False ALL=False =====
+  A left-card            (255, 255, 255) d=0 share=1.0 OK
+  A editor-card-chrome   (255, 255, 255) d=0 share=1.0 OK
+  A right-card           (255, 255, 255) d=0 share=1.0 OK
+  A viewport(editor text): (255, 255, 255) (by design)
+  B left-card left     @16 (228, 229, 229) dSurf=27 dCanvas=16 dDerived=0 OK
+  B left-card bottom   @797 (228, 229, 229) dSurf=27 dCanvas=16 dDerived=0 OK
+  B left-card top      @74 (228, 229, 229) dSurf=27 dCanvas=16 dDerived=0 OK
+  B editor-card top    @82 (228, 229, 229) dSurf=27 dCanvas=16 dDerived=0 OK
+  B editor-card bottom @789 (228, 229, 229) dSurf=27 dCanvas=16 dDerived=0 OK
+  B right-card right   @1263 (228, 229, 229) dSurf=27 dCanvas=16 dDerived=0 OK
+  B right-card bottom  @797 (228, 229, 229) dSurf=27 dCanvas=16 dDerived=0 OK
+  C left-card left     band=3px deltas=[8, 5, 3] FAIL
+  C left-card bottom   band=4px deltas=[12, 8, 5, 3] OK
+  C left-card top      band=0px deltas=[] FAIL
+  C editor-card top    band=2px deltas=[5, 3] FAIL
+  C editor-card bottom band=4px deltas=[12, 8, 5, 3] OK
+  C right-card right   band=3px deltas=[9, 6, 3] FAIL
+  C right-card bottom  band=4px deltas=[12, 8, 5, 3] OK
+  D buttons found=11 ok=11 OK
+      box=[1227, 30, 21, 36] fill=(255, 255, 255) dLum=48.1 corner=4 OK
+      box=[40, 31, 65, 33] fill=(255, 255, 255) dLum=48.1 corner=4 OK
+      box=[122, 31, 83, 33] fill=(255, 255, 255) dLum=48.1 corner=4 OK
+      box=[222, 31, 123, 33] fill=(255, 255, 255) dLum=48.1 corner=4 OK
+      box=[362, 31, 135, 33] fill=(255, 255, 255) dLum=48.1 corner=4 OK
+      box=[514, 31, 68, 33] fill=(255, 255, 255) dLum=48.1 corner=4 OK
+  E border_lighter=False L(surf)=255.0 L(bord)=228.8 OK
+  F1 left   bad_in_8px=0 first_noncanvas=None first_card=16 OK ex=[]
+  F1 right  bad_in_8px=0 first_noncanvas=None first_card=16 OK ex=[]
+  F1 top    bad_in_8px=132 first_noncanvas=5 first_card=30 FAIL ex=[(5, 39, 5, (241, 214, 149))]
+  F1 bottom bad_in_8px=1184 first_noncanvas=1 first_card=11 FAIL ex=[(1, 1252, 818, (248, 248, 247))]
+  F2 h-300     longest_canvas=12px OK gaps=[{'span': [586, 603], 'len': 16, 'canvas_run': 12}, {'span': [914, 931], 'len': 16, 'canvas_run': 12}]
+  F2 h-600     longest_canvas=12px OK gaps=[{'span': [586, 603], 'len': 16, 'canvas_run': 12}, {'span': [914, 931], 'len': 16, 'canvas_run': 12}]
+  F2 v-right   longest_canvas=2px FAIL gaps=[{'span': [360, 369], 'len': 8, 'canvas_run': 2}, {'span': [491, 500], 'len': 8, 'canvas_run': 2}]
+  F2 v-editor  longest_canvas=0px FAIL gaps=[]
+  F3 h-300     OK gaps=[{'span': [586, 603], 'distinct': 8}, {'span': [914, 931], 'distinct': 6}]
+  F3 h-600     OK gaps=[{'span': [586, 603], 'distinct': 8}, {'span': [914, 931], 'distinct': 6}]
+  F3 v-right   OK gaps=[{'span': [360, 369], 'distinct': 6}, {'span': [491, 500], 'distinct': 6}]
+  F3 v-editor  FAIL gaps=[]
+
+===== xinghuang (dark=False) window=[0, 0, 1279, 819] A-E=False ALL=False =====
+  A left-card            (255, 253, 246) d=0 share=1.0 OK
+  A editor-card-chrome   (255, 253, 246) d=0 share=1.0 OK
+  A right-card           (255, 253, 246) d=0 share=1.0 OK
+  A viewport(editor text): (253, 246, 227) (by design)
+  B left-card left     @16 (228, 227, 221) dSurf=27 dCanvas=21 dDerived=0 OK
+  B left-card bottom   @797 (228, 227, 221) dSurf=27 dCanvas=21 dDerived=0 OK
+  B left-card top      @74 (228, 227, 221) dSurf=27 dCanvas=21 dDerived=0 OK
+  B editor-card top    @82 (228, 227, 221) dSurf=27 dCanvas=21 dDerived=0 OK
+  B editor-card bottom @789 (228, 227, 221) dSurf=27 dCanvas=21 dDerived=0 OK
+  B right-card right   @1263 (228, 227, 221) dSurf=27 dCanvas=21 dDerived=0 OK
+  B right-card bottom  @797 (228, 227, 221) dSurf=27 dCanvas=21 dDerived=0 OK
+  C left-card left     band=3px deltas=[8, 5, 3] FAIL
+  C left-card bottom   band=4px deltas=[13, 8, 5, 3] OK
+  C left-card top      band=0px deltas=[] FAIL
+  C editor-card top    band=2px deltas=[5, 3] FAIL
+  C editor-card bottom band=4px deltas=[13, 8, 5, 3] OK
+  C right-card right   band=3px deltas=[9, 6, 3] FAIL
+  C right-card bottom  band=4px deltas=[13, 8, 5, 3] OK
+  D buttons found=11 ok=11 OK
+      box=[1227, 30, 21, 36] fill=(255, 253, 246) dLum=48.0 corner=4 OK
+      box=[40, 31, 65, 33] fill=(255, 253, 246) dLum=48.0 corner=4 OK
+      box=[122, 31, 83, 33] fill=(255, 253, 246) dLum=48.0 corner=4 OK
+      box=[222, 31, 123, 33] fill=(255, 253, 246) dLum=48.0 corner=4 OK
+      box=[362, 31, 135, 33] fill=(255, 253, 246) dLum=48.0 corner=4 OK
+      box=[514, 31, 68, 33] fill=(255, 253, 246) dLum=48.0 corner=4 OK
+  E border_lighter=False L(surf)=252.9 L(bord)=226.8 OK
+  F1 left   bad_in_8px=0 first_noncanvas=None first_card=16 OK ex=[]
+  F1 right  bad_in_8px=0 first_noncanvas=None first_card=16 OK ex=[]
+  F1 top    bad_in_8px=132 first_noncanvas=5 first_card=30 FAIL ex=[(5, 39, 5, (246, 212, 140))]
+  F1 bottom bad_in_8px=1217 first_noncanvas=1 first_card=7 FAIL ex=[(1, 1252, 818, (251, 247, 236))]
+  F2 h-300     longest_canvas=12px OK gaps=[{'span': [586, 603], 'len': 16, 'canvas_run': 12}, {'span': [603, 914], 'len': 310, 'canvas_run': 1}, {'span': [914, 931], 'len': 16, 'canvas_run': 12}]
+  F2 h-600     longest_canvas=12px OK gaps=[{'span': [586, 603], 'len': 16, 'canvas_run': 12}, {'span': [603, 914], 'len': 310, 'canvas_run': 1}, {'span': [914, 931], 'len': 16, 'canvas_run': 12}]
+  F2 v-right   longest_canvas=2px FAIL gaps=[{'span': [360, 369], 'len': 8, 'canvas_run': 2}, {'span': [491, 500], 'len': 8, 'canvas_run': 2}]
+  F2 v-editor  longest_canvas=0px FAIL gaps=[]
+  F3 h-300     OK gaps=[{'span': [586, 603], 'distinct': 8}, {'span': [603, 914], 'distinct': 5}, {'span': [914, 931], 'distinct': 6}]
+  F3 h-600     OK gaps=[{'span': [586, 603], 'distinct': 8}, {'span': [603, 914], 'distinct': 5}, {'span': [914, 931], 'distinct': 6}]
+  F3 v-right   OK gaps=[{'span': [360, 369], 'distinct': 6}, {'span': [491, 500], 'distinct': 6}]
+  F3 v-editor  FAIL gaps=[]
+
+===== bohe (dark=False) window=[0, 0, 1279, 819] A-E=False ALL=False =====
+  A left-card            (255, 255, 255) d=0 share=1.0 OK
+  A editor-card-chrome   (255, 255, 255) d=0 share=1.0 OK
+  A right-card           (255, 255, 255) d=0 share=1.0 OK
+  A viewport(editor text): (255, 255, 255) (by design)
+  B left-card left     @16 (228, 229, 229) dSurf=27 dCanvas=15 dDerived=0 OK
+  B left-card bottom   @797 (228, 229, 229) dSurf=27 dCanvas=15 dDerived=0 OK
+  B left-card top      @74 (228, 229, 229) dSurf=27 dCanvas=15 dDerived=0 OK
+  B editor-card top    @82 (228, 229, 229) dSurf=27 dCanvas=15 dDerived=0 OK
+  B editor-card bottom @789 (228, 229, 229) dSurf=27 dCanvas=15 dDerived=0 OK
+  B right-card right   @1263 (228, 229, 229) dSurf=27 dCanvas=15 dDerived=0 OK
+  B right-card bottom  @797 (228, 229, 229) dSurf=27 dCanvas=15 dDerived=0 OK
+  C left-card left     band=3px deltas=[8, 5, 3] FAIL
+  C left-card bottom   band=4px deltas=[12, 8, 5, 3] OK
+  C left-card top      band=0px deltas=[] FAIL
+  C editor-card top    band=2px deltas=[5, 3] FAIL
+  C editor-card bottom band=4px deltas=[12, 8, 5, 3] OK
+  C right-card right   band=3px deltas=[9, 6, 3] FAIL
+  C right-card bottom  band=4px deltas=[12, 8, 5, 3] OK
+  D buttons found=11 ok=11 OK
+      box=[1227, 30, 21, 36] fill=(255, 255, 255) dLum=48.1 corner=4 OK
+      box=[40, 31, 65, 33] fill=(255, 255, 255) dLum=48.1 corner=4 OK
+      box=[122, 31, 83, 33] fill=(255, 255, 255) dLum=48.1 corner=4 OK
+      box=[222, 31, 123, 33] fill=(255, 255, 255) dLum=48.1 corner=4 OK
+      box=[362, 31, 135, 33] fill=(255, 255, 255) dLum=48.1 corner=4 OK
+      box=[514, 31, 68, 33] fill=(255, 255, 255) dLum=48.1 corner=4 OK
+  E border_lighter=False L(surf)=255.0 L(bord)=228.8 OK
+  F1 left   bad_in_8px=0 first_noncanvas=None first_card=16 OK ex=[]
+  F1 right  bad_in_8px=0 first_noncanvas=None first_card=16 OK ex=[]
+  F1 top    bad_in_8px=132 first_noncanvas=5 first_card=30 FAIL ex=[(5, 39, 5, (235, 214, 147))]
+  F1 bottom bad_in_8px=1166 first_noncanvas=1 first_card=13 FAIL ex=[(1, 1252, 818, (243, 248, 244))]
+  F2 h-300     longest_canvas=12px OK gaps=[{'span': [586, 603], 'len': 16, 'canvas_run': 12}, {'span': [914, 931], 'len': 16, 'canvas_run': 12}]
+  F2 h-600     longest_canvas=12px OK gaps=[{'span': [586, 603], 'len': 16, 'canvas_run': 12}, {'span': [914, 931], 'len': 16, 'canvas_run': 12}]
+  F2 v-right   longest_canvas=2px FAIL gaps=[{'span': [361, 369], 'len': 7, 'canvas_run': 2}, {'span': [492, 500], 'len': 7, 'canvas_run': 2}]
+  F2 v-editor  longest_canvas=0px FAIL gaps=[]
+  F3 h-300     OK gaps=[{'span': [586, 603], 'distinct': 8}, {'span': [914, 931], 'distinct': 6}]
+  F3 h-600     OK gaps=[{'span': [586, 603], 'distinct': 8}, {'span': [914, 931], 'distinct': 6}]
+  F3 v-right   OK gaps=[{'span': [361, 369], 'distinct': 5}, {'span': [492, 500], 'distinct': 5}]
+  F3 v-editor  FAIL gaps=[]
+
+===== qingkong (dark=False) window=[0, 0, 1279, 819] A-E=False ALL=False =====
+  A left-card            (255, 255, 255) d=0 share=1.0 OK
+  A editor-card-chrome   (255, 255, 255) d=0 share=1.0 OK
+  A right-card           (255, 255, 255) d=0 share=1.0 OK
+  A viewport(editor text): (255, 255, 255) (by design)
+  B left-card left     @16 (228, 229, 229) dSurf=27 dCanvas=18 dDerived=0 OK
+  B left-card bottom   @797 (228, 229, 229) dSurf=27 dCanvas=18 dDerived=0 OK
+  B left-card top      @74 (228, 229, 229) dSurf=27 dCanvas=18 dDerived=0 OK
+  B editor-card top    @82 (228, 229, 229) dSurf=27 dCanvas=18 dDerived=0 OK
+  B editor-card bottom @789 (228, 229, 229) dSurf=27 dCanvas=18 dDerived=0 OK
+  B right-card right   @1263 (228, 229, 229) dSurf=27 dCanvas=18 dDerived=0 OK
+  B right-card bottom  @797 (228, 229, 229) dSurf=27 dCanvas=18 dDerived=0 OK
+  C left-card left     band=3px deltas=[8, 5, 3] FAIL
+  C left-card bottom   band=4px deltas=[13, 8, 5, 3] OK
+  C left-card top      band=0px deltas=[] FAIL
+  C editor-card top    band=2px deltas=[5, 3] FAIL
+  C editor-card bottom band=4px deltas=[13, 8, 5, 3] OK
+  C right-card right   band=3px deltas=[9, 6, 3] FAIL
+  C right-card bottom  band=4px deltas=[13, 8, 5, 3] OK
+  D buttons found=11 ok=11 OK
+      box=[1227, 30, 21, 36] fill=(255, 255, 255) dLum=48.1 corner=4 OK
+      box=[40, 31, 65, 33] fill=(255, 255, 255) dLum=48.1 corner=4 OK
+      box=[122, 31, 83, 33] fill=(255, 255, 255) dLum=48.1 corner=4 OK
+      box=[222, 31, 123, 33] fill=(255, 255, 255) dLum=48.1 corner=4 OK
+      box=[362, 31, 135, 33] fill=(255, 255, 255) dLum=48.1 corner=4 OK
+      box=[514, 31, 68, 33] fill=(255, 255, 255) dLum=48.1 corner=4 OK
+  E border_lighter=False L(surf)=255.0 L(bord)=228.8 OK
+  F1 left   bad_in_8px=0 first_noncanvas=None first_card=16 OK ex=[]
+  F1 right  bad_in_8px=0 first_noncanvas=None first_card=16 OK ex=[]
+  F1 top    bad_in_8px=132 first_noncanvas=5 first_card=30 FAIL ex=[(5, 39, 5, (233, 210, 152))]
+  F1 bottom bad_in_8px=1157 first_noncanvas=1 first_card=7 FAIL ex=[(1, 1252, 818, (242, 245, 250))]
+  F2 h-300     longest_canvas=12px OK gaps=[{'span': [586, 603], 'len': 16, 'canvas_run': 12}, {'span': [914, 931], 'len': 16, 'canvas_run': 12}]
+  F2 h-600     longest_canvas=12px OK gaps=[{'span': [586, 603], 'len': 16, 'canvas_run': 12}, {'span': [914, 931], 'len': 16, 'canvas_run': 12}]
+  F2 v-right   longest_canvas=2px FAIL gaps=[{'span': [360, 369], 'len': 8, 'canvas_run': 2}, {'span': [491, 500], 'len': 8, 'canvas_run': 2}]
+  F2 v-editor  longest_canvas=0px FAIL gaps=[]
+  F3 h-300     OK gaps=[{'span': [586, 603], 'distinct': 8}, {'span': [914, 931], 'distinct': 6}]
+  F3 h-600     OK gaps=[{'span': [586, 603], 'distinct': 8}, {'span': [914, 931], 'distinct': 6}]
+  F3 v-right   OK gaps=[{'span': [360, 369], 'distinct': 6}, {'span': [491, 500], 'distinct': 6}]
+  F3 v-editor  FAIL gaps=[]
+
+===== yaoshi (dark=True) window=[0, 0, 1279, 819] A-E=False ALL=False =====
+  A left-card            (29, 29, 32) d=0 share=1.0 OK
+  A editor-card-chrome   (29, 29, 32) d=0 share=1.0 OK
+  A right-card           (29, 29, 32) d=0 share=1.0 OK
+  A viewport(editor text): (35, 38, 41) (by design)
+  B left-card left     @16 (53, 53, 56) dSurf=24 dCanvas=35 dDerived=0 OK
+  B left-card bottom   @797 (53, 53, 56) dSurf=24 dCanvas=35 dDerived=0 OK
+  B left-card top      @74 (53, 53, 56) dSurf=24 dCanvas=35 dDerived=0 OK
+  B editor-card top    @82 (53, 53, 56) dSurf=24 dCanvas=35 dDerived=0 OK
+  B editor-card bottom @789 (53, 53, 56) dSurf=24 dCanvas=35 dDerived=0 OK
+  B right-card right   @1263 (53, 53, 56) dSurf=24 dCanvas=35 dDerived=0 OK
+  B right-card bottom  @797 (53, 53, 56) dSurf=24 dCanvas=35 dDerived=0 OK
+  C left-card left     band=3px deltas=[7, 5, 3] FAIL
+  C left-card bottom   band=4px deltas=[11, 7, 5, 3] OK
+  C left-card top      band=0px deltas=[] FAIL
+  C editor-card top    band=2px deltas=[5, 3] FAIL
+  C editor-card bottom band=4px deltas=[11, 7, 5, 3] OK
+  C right-card right   band=0px deltas=[] FAIL
+  C right-card bottom  band=4px deltas=[11, 7, 5, 3] OK
+  D buttons found=11 ok=11 OK
+      box=[1227, 30, 21, 36] fill=(29, 29, 32) dLum=44.8 corner=4 OK
+      box=[40, 31, 65, 33] fill=(29, 29, 32) dLum=44.8 corner=4 OK
+      box=[122, 31, 83, 33] fill=(29, 29, 32) dLum=44.8 corner=4 OK
+      box=[222, 31, 123, 33] fill=(29, 29, 32) dLum=44.8 corner=4 OK
+      box=[362, 31, 135, 33] fill=(29, 29, 32) dLum=44.8 corner=4 OK
+      box=[514, 31, 68, 33] fill=(29, 29, 32) dLum=44.8 corner=4 OK
+  E border_lighter=True L(surf)=29.2 L(bord)=53.2 OK
+  F1 left   bad_in_8px=0 first_noncanvas=None first_card=16 OK ex=[]
+  F1 right  bad_in_8px=0 first_noncanvas=None first_card=16 OK ex=[]
+  F1 top    bad_in_8px=132 first_noncanvas=5 first_card=30 FAIL ex=[(5, 39, 5, (21, 50, 120))]
+  F1 bottom bad_in_8px=1166 first_noncanvas=1 first_card=2 FAIL ex=[(1, 1252, 818, (102, 102, 104))]
+  F2 h-300     longest_canvas=14px OK gaps=[{'span': [586, 603], 'len': 16, 'canvas_run': 12}, {'span': [914, 931], 'len': 16, 'canvas_run': 14}]
+  F2 h-600     longest_canvas=12px OK gaps=[{'span': [586, 603], 'len': 16, 'canvas_run': 12}, {'span': [914, 931], 'len': 16, 'canvas_run': 12}]
+  F2 v-right   longest_canvas=8px OK gaps=[{'span': [135, 166], 'len': 30, 'canvas_run': 0}, {'span': [360, 369], 'len': 8, 'canvas_run': 8}, {'span': [491, 500], 'len': 8, 'canvas_run': 7}]
+  F2 v-editor  longest_canvas=0px FAIL gaps=[]
+  F3 h-300     OK gaps=[{'span': [586, 603], 'distinct': 8}, {'span': [914, 931], 'distinct': 6}]
+  F3 h-600     OK gaps=[{'span': [586, 603], 'distinct': 8}, {'span': [914, 931], 'distinct': 6}]
+  F3 v-right   FAIL gaps=[{'span': [135, 166], 'distinct': 6}, {'span': [360, 369], 'distinct': 2}, {'span': [491, 500], 'distinct': 4}]
+  F3 v-editor  FAIL gaps=[]
+
+===== shenye (dark=True) window=[0, 0, 1279, 819] A-E=False ALL=False =====
+  A left-card            (22, 31, 46) d=0 share=1.0 OK
+  A editor-card-chrome   (22, 31, 46) d=0 share=1.0 OK
+  A right-card           (22, 31, 46) d=0 share=1.0 OK
+  A viewport(editor text): (35, 38, 41) (by design)
+  B left-card left     @16 (47, 55, 69) dSurf=25 dCanvas=35 dDerived=0 OK
+  B left-card bottom   @797 (47, 55, 69) dSurf=25 dCanvas=35 dDerived=0 OK
+  B left-card top      @74 (47, 55, 69) dSurf=25 dCanvas=35 dDerived=0 OK
+  B editor-card top    @82 (47, 55, 69) dSurf=25 dCanvas=35 dDerived=0 OK
+  B editor-card bottom @789 (47, 55, 69) dSurf=25 dCanvas=35 dDerived=0 OK
+  B right-card right   @1263 (47, 55, 69) dSurf=25 dCanvas=35 dDerived=0 OK
+  B right-card bottom  @797 (47, 55, 69) dSurf=25 dCanvas=35 dDerived=0 OK
+  C left-card left     band=4px deltas=[12, 8, 5, 3] OK
+  C left-card bottom   band=5px deltas=[17, 12, 8, 5, 3] OK
+  C left-card top      band=0px deltas=[] FAIL
+  C editor-card top    band=3px deltas=[8, 5, 3] FAIL
+  C editor-card bottom band=5px deltas=[17, 12, 8, 5, 3] OK
+  C right-card right   band=0px deltas=[] FAIL
+  C right-card bottom  band=5px deltas=[17, 12, 8, 5, 3] OK
+  D buttons found=11 ok=11 OK
+      box=[1227, 30, 21, 36] fill=(22, 31, 46) dLum=44.3 corner=4 OK
+      box=[40, 31, 65, 33] fill=(22, 31, 46) dLum=44.3 corner=4 OK
+      box=[122, 31, 83, 33] fill=(22, 31, 46) dLum=44.3 corner=4 OK
+      box=[222, 31, 123, 33] fill=(22, 31, 46) dLum=44.3 corner=4 OK
+      box=[362, 31, 135, 33] fill=(22, 31, 46) dLum=44.3 corner=4 OK
+      box=[514, 31, 68, 33] fill=(22, 31, 46) dLum=44.3 corner=4 OK
+  E border_lighter=True L(surf)=30.2 L(bord)=54.3 OK
+  F1 left   bad_in_8px=0 first_noncanvas=None first_card=16 OK ex=[]
+  F1 right  bad_in_8px=0 first_noncanvas=None first_card=16 OK ex=[]
+  F1 top    bad_in_8px=132 first_noncanvas=5 first_card=30 FAIL ex=[(5, 39, 5, (18, 52, 127))]
+  F1 bottom bad_in_8px=1188 first_noncanvas=1 first_card=7 FAIL ex=[(1, 1252, 818, (100, 104, 112))]
+  F2 h-300     longest_canvas=13px OK gaps=[{'span': [586, 603], 'len': 16, 'canvas_run': 9}, {'span': [914, 931], 'len': 16, 'canvas_run': 13}]
+  F2 h-600     longest_canvas=10px OK gaps=[{'span': [586, 603], 'len': 16, 'canvas_run': 9}, {'span': [914, 931], 'len': 16, 'canvas_run': 10}]
+  F2 v-right   longest_canvas=8px OK gaps=[{'span': [135, 166], 'len': 30, 'canvas_run': 0}, {'span': [360, 369], 'len': 8, 'canvas_run': 8}, {'span': [491, 500], 'len': 8, 'canvas_run': 6}]
+  F2 v-editor  longest_canvas=0px FAIL gaps=[]
+  F3 h-300     OK gaps=[{'span': [586, 603], 'distinct': 12}, {'span': [914, 931], 'distinct': 9}]
+  F3 h-600     OK gaps=[{'span': [586, 603], 'distinct': 12}, {'span': [914, 931], 'distinct': 8}]
+  F3 v-right   OK gaps=[{'span': [135, 166], 'distinct': 6}, {'span': [360, 369], 'distinct': 5}, {'span': [491, 500], 'distinct': 6}]
+  F3 v-editor  FAIL gaps=[]
+
+SUMMARY: 6 images; failing themes: ['yunwu', 'xinghuang', 'bohe', 'qingkong', 'yaoshi', 'shenye']

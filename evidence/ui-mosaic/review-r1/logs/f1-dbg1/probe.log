@@ -1,0 +1,66 @@
+++ date -Is
++ echo '=== F1 probe entry=view label=dbg1 bin=/vedit-build/evidence/ui-mosaic/review-r1/logs/prefix-vedit-app at 2026-11-08T22:52:42+08:00 ==='
+=== F1 probe entry=view label=dbg1 bin=/vedit-build/evidence/ui-mosaic/review-r1/logs/prefix-vedit-app at 2026-11-08T22:52:42+08:00 ===
++ docker exec review-r1-x bash -lc 'pkill -f "[v]edit-app" || true; rm -f /state/session.json; mkdir -p /state; printf "uiTheme = \"bohe\"\n" > /state/settings.toml'
++ sleep 1
++ start_app 900000
++ local hold=900000
++ docker exec -d review-r1-x bash -lc 'DISPLAY=:99 QT_QPA_PLATFORM=xcb VEDIT_UI_PROBE=1 /vedit-build/evidence/ui-mosaic/review-r1/logs/prefix-vedit-app --state-dir /state --hold 900000 >/tmp/app.log 2>&1'
++ sleep 13
++ python3 /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/geometry.py app
+app win=0x200007 geom=(x=0,y=0,w=1280,h=820)
++ read -r WX WY WW WH
+++ app_geom
+++ python3 /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/geometry.py app
+++ sed -E 's/.*geom=\(x=([0-9-]+),y=([0-9-]+),w=([0-9]+),h=([0-9]+)\).*/\1 \2 \3 \4/'
++ echo 'app origin=(0,0) size=1280x820'
+app origin=(0,0) size=1280x820
++ x11 'shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-dbg1/01-start.png'
++ python3 /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/x11.py chain 'shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-dbg1/01-start.png'
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-dbg1/01-start.png (1680, 1050)
++ echo settings@start:
+settings@start:
++ settings
++ state 'cat /state/settings.toml 2>/dev/null'
++ docker exec review-r1-x bash -lc 'cat /state/settings.toml 2>/dev/null'
+uiTheme = "bohe"
+++ archive_theme
+++ state 'python3 -c "import json;print(json.load(open(\"/state/session.json\")).get(\"uiTheme\"))" 2>/dev/null'
+++ docker exec review-r1-x bash -lc 'python3 -c "import json;print(json.load(open(\"/state/session.json\")).get(\"uiTheme\"))" 2>/dev/null'
+++ true
++ echo 'archive@start: '
+archive@start: 
++ '[' view = view ']'
++ x11 'click 127 11; sleep 900'
++ python3 /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/x11.py chain 'click 127 11; sleep 900'
++ read -r PX PY PW PH
+++ last_popup
+++ python3 /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/geometry.py windows
+++ awk '/override=1/{last=$0} END{print last}'
+++ sed -E 's/.*geom=\(([0-9-]+),([0-9-]+) ([0-9]+)x([0-9]+)\).*/\1 \2 \3 \4/'
++ echo 'view menu popup=(103,22 353x576)'
+view menu popup=(103,22 353x576)
++ x11 'shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-dbg1/02-viewmenu.png'
++ python3 /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/x11.py chain 'shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-dbg1/02-viewmenu.png'
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-dbg1/02-viewmenu.png (1680, 1050)
++ x11 'click 163 584; sleep 1000'
++ python3 /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/x11.py chain 'click 163 584; sleep 1000'
++ read -r SX SY SW SH
+++ last_popup
+++ python3 /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/geometry.py windows
+++ awk '/override=1/{last=$0} END{print last}'
+++ sed -E 's/.*geom=\(([0-9-]+),([0-9-]+) ([0-9]+)x([0-9]+)\).*/\1 \2 \3 \4/'
++ echo 'theme submenu=(449,562 86x166)'
+theme submenu=(449,562 86x166)
++ x11 'shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-dbg1/03-themesubmenu.png'
++ python3 /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/x11.py chain 'shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-dbg1/03-themesubmenu.png'
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-dbg1/03-themesubmenu.png (1680, 1050)
++ click_item '449 562 86 166' 3 6 40
++ local 'geom=449 562 86 166' idx=3 count=6 xoff=40
++ set -- 449 562 86 166
++ local px=449 py=562 pw=86 ph=166
+++ python3 -c 'print(int(562 + (3 + 0.5) * 166 / 6))'
++ local cy=658
++ x11 'click 489 658'
++ python3 /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/x11.py chain 'click 489 658'
++ sleep 1500

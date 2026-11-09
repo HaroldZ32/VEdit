@@ -1,0 +1,136 @@
+[
+  {
+    "image": "evidence/ui-mosaic/screenshots/after-yunwu.png",
+    "theme": "yunwu",
+    "canvas": "#F4F4F2",
+    "cards": [
+      {
+        "name": "Module Tree",
+        "rect": [
+          931,
+          74,
+          1263,
+          353
+        ],
+        "edges_px": {
+          "top": 0,
+          "bottom": 5,
+          "left": 4,
+          "right": 4
+        },
+        "ok": false
+      },
+      {
+        "name": "Interface",
+        "rect": [
+          931,
+          370,
+          1263,
+          490
+        ],
+        "edges_px": {
+          "top": 3,
+          "bottom": 5,
+          "left": 4,
+          "right": 4
+        },
+        "ok": true
+      },
+      {
+        "name": "Outline",
+        "rect": [
+          931,
+          507,
+          1263,
+          797
+        ],
+        "edges_px": {
+          "top": 3,
+          "bottom": 5,
+          "left": 4,
+          "right": 4
+        },
+        "ok": true
+      }
+    ],
+    "gaps": [
+      {
+        "between": "Module Tree -> Interface",
+        "canvas_run_px": 10
+      },
+      {
+        "between": "Interface -> Outline",
+        "canvas_run_px": 10
+      }
+    ],
+    "edges_ok": false,
+    "gaps_ok": true
+  },
+  {
+    "image": "evidence/ui-mosaic/screenshots/after-yaoshi.png",
+    "theme": "yaoshi",
+    "canvas": "#131315",
+    "cards": [
+      {
+        "name": "Module Tree",
+        "rect": [
+          931,
+          74,
+          1263,
+          353
+        ],
+        "edges_px": {
+          "top": 0,
+          "bottom": 5,
+          "left": 4,
+          "right": 4
+        },
+        "ok": false
+      },
+      {
+        "name": "Interface",
+        "rect": [
+          931,
+          370,
+          1263,
+          490
+        ],
+        "edges_px": {
+          "top": 2,
+          "bottom": 5,
+          "left": 4,
+          "right": 4
+        },
+        "ok": false
+      },
+      {
+        "name": "Outline",
+        "rect": [
+          931,
+          507,
+          1263,
+          797
+        ],
+        "edges_px": {
+          "top": 2,
+          "bottom": 5,
+          "left": 4,
+          "right": 4
+        },
+        "ok": false
+      }
+    ],
+    "gaps": [
+      {
+        "between": "Module Tree -> Interface",
+        "canvas_run_px": 10
+      },
+      {
+        "between": "Interface -> Outline",
+        "canvas_run_px": 10
+      }
+    ],
+    "edges_ok": false,
+    "gaps_ok": true
+  }
+]

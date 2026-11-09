@@ -1,0 +1,27 @@
+=== F1 probe entry=view label=r1-view bin=/vedit-build/target/qt6-build/src/app/vedit-app at 2026-11-08T22:58:56+08:00 ===
+focus win=0x200007
+app win=0x200007 geom=(x=0,y=0,w=1280,h=820)
+app origin=(0,0) size=1280x820
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-r1-view/01-start.png (1680, 1050)
+settings@start:
+uiTheme = "bohe"
+archive@start: 
+view menu popup=(103,22 353x576)
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-r1-view/02-viewmenu.png (1680, 1050)
+theme submenu=(449,562 146x166)
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-r1-view/03-themesubmenu.png (1680, 1050)
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-r1-view/06-after-switch.png (1680, 1050)
+settings@after-switch:
+uiTheme = "qingkong"
+archive@after-switch: 
+focus win=0x200007
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-r1-view/07-prefs-after-switch.png (1680, 1050)
+color-after-switch=(238, 243, 248) color-with-prefs-open=(238, 243, 248)
+no app window to focus
+settings@after-quit:
+uiTheme = "bohe"
+archive@after-quit: 
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-r1-view/08-after-quit.png (1680, 1050)
+restart-probe:
+theme=bohe
+status-theme=Theme:

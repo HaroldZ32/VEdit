@@ -1,0 +1,48 @@
+{
+    "dockState": "AAAA/wAAAAD9AAAAAgAAAAAAAAI5AAAC1PwCAAAAAvsAAAAYAGQAbwBjAGsALQBwAHIAbwBqAGUAYwB0AAAAAAD/////AAAB2gD////7AAAAHABkAG8AYwBrAC0AZgBpAGwAZQAtAHQAcgBlAGUBAAAASgAAAtQAAACfAP///wAAAAEAAAFLAAAC1PwCAAAAA/sAAAAgAGQAbwBjAGsALQBtAG8AZAB1AGwAZQAtAHQAcgBlAGUBAAAASgAAAR8AAACiAP////sAAAAoAGQAbwBjAGsALQBpAG4AdABlAHIAZgBhAGMAZQAtAHAAYQBuAGUAbAEAAAFxAAAAewAAAFoA////+wAAABgAZABvAGMAawAtAG8AdQB0AGwAaQBuAGUBAAAB9AAAASoAAACmAP///wAAAWwAAALUAAAABAAAAAQAAAAIAAAACPwAAAABAAAAAgAAAAIAAAAkAHYAZQBkAGkAdAAtAG0AYQBpAG4ALQB0AG8AbwBsAGIAYQByAQAAAAD/////AAAAAAAAAAAAAAAmAHYAZQBkAGkAdAAtAHQAaABlAG0AZQAtAHQAbwBvAGwAYgBhAHIBAAAEyP////8AAAAAAAAAAA==",
+    "editorLayout": {
+        "active": "pane-2",
+        "nextPane": 3,
+        "root": {
+            "first": {
+                "activeTab": 0,
+                "documents": [
+                    {
+                        "caret": {
+                            "column": 0,
+                            "line": 0
+                        },
+                        "path": "/vedit-build/evidence/ui-mosaic/review-r1/r2/fixtures/multi-syntax.sv",
+                        "scroll": 0
+                    }
+                ],
+                "pane": "pane-1",
+                "provider": "ktexteditor",
+                "type": "leaf"
+            },
+            "orientation": "horizontal",
+            "ratio": 0.5,
+            "second": {
+                "activeTab": -1,
+                "documents": [
+                ],
+                "pane": "pane-2",
+                "provider": "ktexteditor",
+                "type": "leaf"
+            },
+            "type": "split"
+        },
+        "version": 2
+    },
+    "geometry": "AdnQywADAAAAAAAAAAAAAAAABP8AAAMzAAAAAAAAAAAAAAT/AAADMwAAAAAAAAAABpAAAAAAAAAAAAAABP8AAAMz",
+    "panels": [
+        "file-tree",
+        "outline",
+        "module-tree",
+        "interface-panel"
+    ],
+    "project": "",
+    "theme": "Breeze Light",
+    "uiTheme": "yunwu",
+    "version": 2
+}

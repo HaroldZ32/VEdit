@@ -1,0 +1,75 @@
+=== direct run: vedit-app-ui-theme-selftest ===
+ok   product.themes.count
+ok   product.themes.order
+ok   product.themes.lookup
+ok   product.themes.unknown-null
+ok   product.themes.darkness
+ok   product.themes.darkness-unknown-false
+ok   product.stylesheet.render
+ok   product.palette.contrast
+ok   icons.app.dark
+ok   icons.app.light
+ok   icons.app.mono
+ok   icons.actions.list
+ok   icons.actions.render
+ok   manager.default-ui-theme
+ok   manager.ui-theme-ids
+ok   manager.unknown-rejected
+ok   manager.unknown-keeps-state
+ok   manager.apply
+ok   manager.current
+ok   manager.palette-applied
+ok   manager.stylesheet-applied
+ok   manager.window-icon-applied
+ok   manager.syntax-keeps-product-theme
+ok   manager.empty-id-default
+ok   manager.stylesheet-card-renders
+PASS: 0 failure(s)
+exit=0
+
+=== ctest -R vedit-app-ui-theme-selftest -V ===
+/vedit-build/target/qt6-build/src/app/vedit-app-ui-theme-selftest
+/vedit-build/target/qt6-build/src/app/Release/vedit-app-ui-theme-selftest
+/vedit-build/target/qt6-build/src/app/Release/vedit-app-ui-theme-selftest
+/vedit-build/target/qt6-build/src/app/Debug/vedit-app-ui-theme-selftest
+/vedit-build/target/qt6-build/src/app/Debug/vedit-app-ui-theme-selftest
+/vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app-ui-theme-selftest
+/vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app-ui-theme-selftest
+/vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app-ui-theme-selftest
+/vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app-ui-theme-selftest
+/vedit-build/target/qt6-build/src/app/Deployment/vedit-app-ui-theme-selftest
+/vedit-build/target/qt6-build/src/app/Deployment/vedit-app-ui-theme-selftest
+/vedit-build/target/qt6-build/src/app/Development/vedit-app-ui-theme-selftest
+/vedit-build/target/qt6-build/src/app/Development/vedit-app-ui-theme-selftest
+vedit-build/target/qt6-build/src/app/vedit-app-ui-theme-selftest
+vedit-build/target/qt6-build/src/app/vedit-app-ui-theme-selftest
+vedit-build/target/qt6-build/src/app/Release/vedit-app-ui-theme-selftest
+vedit-build/target/qt6-build/src/app/Release/vedit-app-ui-theme-selftest
+vedit-build/target/qt6-build/src/app/Debug/vedit-app-ui-theme-selftest
+vedit-build/target/qt6-build/src/app/Debug/vedit-app-ui-theme-selftest
+vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app-ui-theme-selftest
+vedit-build/target/qt6-build/src/app/MinSizeRel/vedit-app-ui-theme-selftest
+vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app-ui-theme-selftest
+vedit-build/target/qt6-build/src/app/RelWithDebInfo/vedit-app-ui-theme-selftest
+vedit-build/target/qt6-build/src/app/Deployment/vedit-app-ui-theme-selftest
+vedit-build/target/qt6-build/src/app/Deployment/vedit-app-ui-theme-selftest
+vedit-build/target/qt6-build/src/app/Development/vedit-app-ui-theme-selftest
+vedit-build/target/qt6-build/src/app/Development/vedit-app-ui-theme-selftest
+
+16: Test command: 
+16: Working Directory: /src/target/qt6-build/src/app
+16: Environment variables: 
+16:  QT_QPA_PLATFORM=offscreen
+16:  XDG_RUNTIME_DIR=/vedit-build/target/qt6-build/src/app/xdg-runtime-ui-theme
+Unable to find executable: /vedit-build/target/qt6-build/src/app/vedit-app-ui-theme-selftest
+1/1 Test #16: vedit-app-ui-theme-selftest ......***Not Run   0.00 sec
+
+0% tests passed, 1 tests failed out of 1
+
+Total Test time (real) =   0.00 sec
+
+The following tests FAILED:
+	 16 - vedit-app-ui-theme-selftest (Not Run)
+Errors while running CTest
+Output from these tests are in: /src/target/qt6-build/Testing/Temporary/LastTest.log
+Use "--rerun-failed --output-on-failure" to re-run the failed cases verbosely.
