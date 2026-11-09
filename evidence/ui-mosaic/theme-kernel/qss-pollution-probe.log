@@ -1,0 +1,5 @@
+dock card: gap=8 corner=#fff4f4f2 titleBorder=#fff5f5f4 bodyLeft=#fff5f5f4 bodyMid=#ffffffff
+dock title buttons: pixels==border in top-right 47x20 = 1 (expect 0)
+QTabBar scroller QToolButton count=2 [QToolButton 16x30] [QToolButton 16x30]
+old      18px QPushButton: darkTextPixels=25 opaquePixels=1080
+patched  18px QPushButton: darkTextPixels=210 opaquePixels=210

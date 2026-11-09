@@ -22,6 +22,7 @@
 #include "path_display.h"
 #include "terminal_panel.h"
 #include "theme_manager.h"
+#include "themed_icons.h"
 #if defined(VEDIT_HAVE_EDIT_CORE)
 #include "kernel/cross_boundary.h"
 #include "kernel/edit_core_selftest.h"
@@ -60,6 +61,7 @@
 #include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
+#include <QIcon>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QKeyEvent>
@@ -1847,8 +1849,16 @@ int main(int argc, char **argv)
 #endif
 
     QApplication app(argc, argv);
+    // UI-Mosaic A4：桌面条目、窗口图标与 WM_CLASS 必须指向同一个 id，否则任务栏/
+    // 窗口切换器会退回通用图标，且 .desktop 条目无法把自己的窗口归组。深浅切换由
+    // ThemeManager::applyUiTheme 覆盖，这里只是启动瞬间的兜底图标。
+    QGuiApplication::setDesktopFileName(QStringLiteral("io.github.vedit.VEdit"));
+    // UI-Mosaic R1/M4: ONE source for the launcher icon. `themed_icons::appIcon(false)`
+    // is the same light 512px PNG this line used to spell out, so the file name lives
+    // only in themed_icons.cpp. The dark/light switch itself is ThemeManager::applyUiTheme.
+    QApplication::setWindowIcon(vedit::app::themed_icons::appIcon(false));
     QCoreApplication::setApplicationName(QStringLiteral("vedit-app"));
-    QCoreApplication::setApplicationVersion(QStringLiteral("0.2.1"));
+    QCoreApplication::setApplicationVersion(QStringLiteral("0.2.2"));
     QCoreApplication::setOrganizationName(QStringLiteral("VEdit"));
 
     QCommandLineParser parser;
@@ -2030,6 +2040,54 @@ int main(int argc, char **argv)
     vedit::app::i18n::setRestartHandler(
         [&shell](const QString &tag, const vedit::app::i18n::PersistLanguage &persist,
                  QString *error) { return shell.restartForLanguageChange(tag, persist, error); });
+#if defined(VEDIT_HAVE_APPEARANCE_SETTINGS)
+    // UI-Mosaic R1/F1: a product-theme switch from the View submenu or the toolbar
+    // button must write the SAME `uiTheme` key the Preferences dropdown writes,
+    // through the SAME SettingsClient. The dependency only exists in this
+    // direction (`vedit_workspace_settings` links `vedit_app_shell`), so the shell
+    // exposes a seam and the product entry point installs the real store here.
+    {
+        namespace settings = vedit::workspace::settings;
+        const QString settingsPath = vedit::app::i18n::settingsFilePath(options.stateDir);
+        shell.setUiThemePersister([settingsPath](const QString &id, QString *error) {
+            settings::SettingsClient client(settingsPath);
+            settings::Snapshot snapshot;
+            bool delivered = false;
+            client.load([&snapshot, &delivered](settings::Snapshot loaded) {
+                snapshot = loaded;
+                delivered = true;
+            });
+            if (!client.flush() || !delivered || !snapshot.completed) {
+                if (error != nullptr) {
+                    *error = snapshot.error.isEmpty()
+                                 ? QCoreApplication::translate("VEdit",
+                                                               "the settings store did not answer")
+                                 : snapshot.error;
+                }
+                return false;
+            }
+            QVector<settings::Entry> entries = snapshot.entries;
+            settings::SettingsClient::setValue(&entries, QStringLiteral("uiTheme"), id);
+            bool saved = false;
+            QString saveError;
+            client.save(entries, [&saved, &saveError](bool ok, const QString &message) {
+                saved = ok;
+                saveError = message;
+            });
+            if (!client.flush()) {
+                if (error != nullptr) {
+                    *error = QCoreApplication::translate("VEdit",
+                                                         "the settings store did not answer");
+                }
+                return false;
+            }
+            if (!saved && error != nullptr) {
+                *error = saveError;
+            }
+            return saved;
+        });
+    }
+#endif // VEDIT_HAVE_APPEARANCE_SETTINGS
 #if defined(VEDIT_HAVE_EDIT_CORE)
     // Slice 1 (AC-S1.1): the product editor is the KTextEditor editing kernel.
     // A deferred start makes the restored panes use it directly (no re-creation

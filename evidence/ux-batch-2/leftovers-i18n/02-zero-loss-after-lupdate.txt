@@ -1,0 +1,19 @@
+old messages: 1244  new messages: 1259
+old finished+translated: 1244
+new finished+translated: 1241
+ADDED: 15  REMOVED: 0  CHANGED: 0  LOST: 0
+  ADDED  ctx='VEdit' src=' · top: %1' kind=unfinished
+  ADDED  ctx='VEdit' src='%1 file(s) outside the top %2 are not analysed' kind=unfinished
+  ADDED  ctx='VEdit' src='All Files (*)' kind=unfinished
+  ADDED  ctx='VEdit' src='All files (*)' kind=unfinished
+  ADDED  ctx='VEdit' src='Auto' kind=unfinished
+  ADDED  ctx='VEdit' src='Top module for the module tree and the lint scope (empty = Auto)' kind=unfinished
+  ADDED  ctx='VEdit' src='Top:' kind=unfinished
+  ADDED  ctx='VEdit' src='Verilog filelists (%1)' kind=unfinished
+  ADDED  ctx='VEdit' src='Verilog/SystemVerilog (*.v *.sv *.svh *.vh)' kind=unfinished
+  ADDED  ctx='VEdit' src='Verilog/SystemVerilog/filelist (%1 *.v *.sv *.svh *.vh)' kind=unfinished
+  ADDED  ctx='VEdit' src='active' kind=unfinished
+  ADDED  ctx='vedit::app::ApplicationShell' src='&Next Tab' kind=unfinished
+  ADDED  ctx='vedit::app::ApplicationShell' src='Pre&vious Tab' kind=unfinished
+  ADDED  ctx='vedit::app::ApplicationShell' src='desktop: %1' kind=unfinished
+  ADDED  ctx='vedit::app::ApplicationShell' src='editor: %1' kind=unfinished

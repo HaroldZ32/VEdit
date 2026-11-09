@@ -1,0 +1,58 @@
+kf.sonnet.core: Sonnet: No speller backends available!
+CHECK PASS split.fixture
+PROJECT-EXPAND-INPUTS root='/tmp/vedit-split-pane-mouse-e2e-dkYxtt/project' filelists=0 variables=0 settings='/tmp/vedit-split-pane-mouse-e2e-dkYxtt/state/settings.toml'
+This plugin does not support propagateSizeHints()
+CHECK PASS split.controller
+PROJECT-ROOT-FILES root='/tmp/vedit-split-pane-mouse-e2e-dkYxtt/project' files=2
+PROJECT-ROOT-ENV root='/tmp/vedit-split-pane-mouse-e2e-dkYxtt/project' source=project pinned=1 include-dirs=0 defines=0 env=''
+LINT-PROJECT-OPEN engine=slang files=2 skipped-open=0 automatic=1
+LINT-PASS-FINISHED automatic=1 errors=1 files=2 dialogs=0 notice=1
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+[edit-core] syntax highlighting: 'SystemVerilog' resolves to author 'Sean O'Boyle (seanoboyle@intelligentdv.com)' (not VEdit); accepted as a repository fallback — the delivered runtime narrows the definition search path to VEdit's own
+This plugin does not support propagateSizeHints()
+CHECK PASS split.covered  a=1 b=1 pass=0
+CHECK PASS split.pane-a
+CHECK PASS split.open-a
+CHECK PASS split.action-exists
+CHECK PASS split.pane-count  panes=2
+CHECK PASS split.new-pane-active
+CHECK PASS split.open-b
+CHECK PASS split.views
+CHECK PASS split.view-docs
+CHECK PASS split.b-visible
+CHECK PASS split.focus-action
+CHECK PASS split.a-active  activeIsA=1
+CHECK PASS hover.state-known
+CHECK PASS hover.b-point  92,15
+DIAG-HOVER file='/tmp/vedit-split-pane-mouse-e2e-dkYxtt/project/b.sv' line=2 column=3 severity=2 rule='line-length' pending=1 probe-count=0
+OBSERVED hover.after-move alive=1 diagnostic=1 rule='line-length' path='/tmp/vedit-split-pane-mouse-e2e-dkYxtt/project/b.sv' line=1 parentIsActiveView=0
+CHECK PASS hover.popup-alive
+CHECK PASS hover.shows-b-diagnostic  rule='line-length' line=1 path='/tmp/vedit-split-pane-mouse-e2e-dkYxtt/project/b.sv'
+CHECK PASS hover.popup-widget
+CHECK PASS hover.popup-parented-to-inactive-b  B
+CHECK PASS hover.popup-inside-b-geometry  popup=110,37 382x56 bView=638x701
+CHECK PASS hover.popup-visible
+CHECK PASS hover.parent-is-not-the-active-view
+DIAG-HOVER-PROBE rule='line-length' fixable=0 async-count=1
+OBSERVED hover.after-poll alive=1 visible=1 rule='line-length' path='/tmp/vedit-split-pane-mouse-e2e-dkYxtt/project/b.sv' parent='B'
+CHECK PASS poll.does-not-steal-bubble  diagnostic=1 visible=1 parentB=1
+CHECK PASS poll.bubble-survives-b-active  activeB=1 parentB=1
+CHECK PASS poll.bubble-does-not-jump-to-active-a  activeA=1 parentB=1 visible=1
+CHECK PASS hover.control-non-diagnostic-hides  diagnostic=0 visible=0
+CHECK PASS gesture.controllers
+OBSERVED gesture.ctrl-alt-click a=1->1 b=1->2 clicked-in-b=1
+CHECK PASS gesture.b-gained-cursor  b=1->2
+CHECK PASS gesture.cursor-at-click-point  cursors=2
+CHECK PASS gesture.a-unchanged  a=1->1
+CHECK PASS gesture.native-view-cursors  b=2 a=1
+CHECK PASS definition.action-exists
+OBSERVED definition.ctrl-click enabled=1 triggers=1 b-caret=0:8 a-caret=0:0 doc='/tmp/vedit-split-pane-mouse-e2e-dkYxtt/project/b.sv'
+CHECK PASS definition.action-enabled
+CHECK PASS definition.ctrl-click-dispatches  triggers=1
+CHECK PASS definition.b-caret-at-click  b-caret=0:8
+CHECK PASS definition.b-document-is-b
+CHECK PASS definition.a-carets-untouched  a=0:0
+VE-SPLIT-PANE-MOUSE-E2E checks=38 failures=0

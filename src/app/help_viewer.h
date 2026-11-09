@@ -27,7 +27,7 @@ public:
 
     // The Markdown source shipped in the binary (empty when the resource is
     // missing, e.g. a build tree without the .qrc); the manual's first H1
-    // heading ("VEdit 用户指南"); and the window title.
+    // heading ("VEdit 用户手册"); and the window title.
     static QString manualMarkdown();
     static QString manualTitle();
 

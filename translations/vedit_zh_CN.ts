@@ -22,7 +22,17 @@
 <context>
     <name>VEdit</name>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="318"/>
+        <location filename="../src/app/theme_manager.cpp" line="198"/>
+        <source>unknown UI theme '%1'</source>
+        <translation>未知界面主题“%1”</translation>
+    </message>
+    <message>
+        <location filename="../src/app/theme_manager.cpp" line="208"/>
+        <source>cannot apply a UI theme without a QApplication</source>
+        <translation>没有 QApplication 实例，无法应用界面主题</translation>
+    </message>
+    <message>
+        <location filename="../src/app/app_shell.cpp" line="334"/>
         <location filename="../src/app/editor_provider.h" line="125"/>
         <location filename="../src/editor/kernel/document_io.cpp" line="29"/>
         <location filename="../src/editor/kernel/ktexteditor_provider.cpp" line="156"/>
@@ -30,70 +40,67 @@
         <translation>无法打开 %1：不是常规文件</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="343"/>
+        <location filename="../src/app/app_shell.cpp" line="359"/>
         <location filename="../src/workspace/search/search_jump_target.cpp" line="126"/>
         <source>cannot open %1</source>
         <translation>无法打开 %1</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="508"/>
+        <location filename="../src/app/app_shell.cpp" line="524"/>
         <source>Empty state: no project open. This panel stays usable and empty.</source>
         <translation>空状态：未打开工程。此面板保持可用但为空。</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="509"/>
+        <location filename="../src/app/app_shell.cpp" line="525"/>
         <source>Empty state: nothing to show for this project yet.</source>
         <translation>空状态：此工程暂无可显示内容。</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="511"/>
+        <location filename="../src/app/app_shell.cpp" line="527"/>
         <location filename="../src/workspace/vcs/vcs_history.cpp" line="528"/>
         <source>Files</source>
         <translation>文件</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="512"/>
+        <location filename="../src/app/app_shell.cpp" line="528"/>
         <location filename="../src/workspace/vcs/vcs_history.cpp" line="143"/>
         <source>Search</source>
         <translation>搜索</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="513"/>
+        <location filename="../src/app/app_shell.cpp" line="529"/>
         <source>Terminal</source>
         <translation>终端</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="514"/>
+        <location filename="../src/app/app_shell.cpp" line="530"/>
         <source>Source Control</source>
         <translation>版本控制</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="518"/>
+        <location filename="../src/app/app_shell.cpp" line="534"/>
         <source>Outline</source>
         <translation>大纲</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="702"/>
+        <location filename="../src/app/app_shell.cpp" line="738"/>
+        <location filename="../src/app/file_dialog_filters_selftest.cpp" line="382"/>
+        <location filename="../src/app/file_dialog_filters_selftest.cpp" line="417"/>
         <source>Open File</source>
         <translation>打开文件</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1277"/>
+        <location filename="../src/app/app_shell.cpp" line="1330"/>
         <source>Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;All Files (*)</source>
         <translation>Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;所有文件 (*)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="830"/>
+        <location filename="../src/app/app_shell.cpp" line="883"/>
         <source>About VEdit</source>
         <translation>关于 VEdit</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="47"/>
-        <source>Verilog/SystemVerilog/filelist (*.v *.sv *.svh *.vh *.f *.F *.flist);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F *.flist);;All Files (*)</source>
-        <translation>Verilog/SystemVerilog/filelist (*.v *.sv *.svh *.vh *.f *.F *.flist);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F *.flist);;所有文件 (*)</translation>
-    </message>
-    <message>
-        <location filename="../src/app/app_shell.cpp" line="831"/>
+        <location filename="../src/app/app_shell.cpp" line="884"/>
         <source>VEdit application shell (app-shell lane).
 
 Editor provider: %1
@@ -110,139 +117,144 @@ Diagnostics: %5</source>
 诊断：%5</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1066"/>
+        <location filename="../src/app/app_shell.cpp" line="1119"/>
         <source>session mentions unknown panel &apos;%1&apos;</source>
         <translation>会话提到未知面板“%1”</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1090"/>
+        <location filename="../src/app/app_shell.cpp" line="1143"/>
         <source>theme fallback: %1</source>
         <translation>主题回退：%1</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1141"/>
+        <location filename="../src/app/app_shell.cpp" line="1194"/>
         <source>dock layout could not be restored (KTextEditor/version mismatch?)</source>
         <translation>无法恢复停靠布局（KTextEditor/版本不匹配？）</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1147"/>
+        <location filename="../src/app/app_shell.cpp" line="1200"/>
         <source>editor layout: %1</source>
         <translation>编辑器布局：%1</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1158"/>
+        <location filename="../src/app/app_shell.cpp" line="1211"/>
         <source>window geometry could not be restored</source>
         <translation>无法恢复窗口几何</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1192"/>
+        <location filename="../src/app/app_shell.cpp" line="1245"/>
         <source>Save failed: %1</source>
         <translation>保存失败：%1</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1199"/>
-        <location filename="../src/app/app_shell.cpp" line="1262"/>
+        <location filename="../src/app/app_shell.cpp" line="1252"/>
+        <location filename="../src/app/app_shell.cpp" line="1315"/>
         <source>no active editor pane</source>
         <translation>没有活动的编辑器窗格</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1210"/>
-        <location filename="../src/app/app_shell.cpp" line="1298"/>
+        <location filename="../src/app/app_shell.cpp" line="1263"/>
+        <location filename="../src/app/app_shell.cpp" line="1351"/>
         <source>the editor provider refused the save</source>
         <translation>编辑器 provider 拒绝了保存</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1240"/>
+        <location filename="../src/app/app_shell.cpp" line="1293"/>
         <source>Save As refused (headless): %1 exists and cannot be overwritten without confirmation</source>
         <translation>另存为已被拒绝（无界面）：%1 已存在，未经确认无法覆盖</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1256"/>
+        <location filename="../src/app/app_shell.cpp" line="1309"/>
         <source>Save As failed: %1</source>
         <translation>另存为失败：%1</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1526"/>
+        <location filename="../src/app/app_shell.cpp" line="1579"/>
         <source>VEdit — %1[*]</source>
         <translation>VEdit — %1[*]</translation>
     </message>
     <message>
-        <location filename="../src/app/command_registry.cpp" line="35"/>
+        <location filename="../src/app/command_registry.cpp" line="37"/>
         <source>cannot read shortcut store %1</source>
         <translation>无法读取快捷键存储 %1</translation>
     </message>
     <message>
-        <location filename="../src/app/command_registry.cpp" line="43"/>
+        <location filename="../src/app/command_registry.cpp" line="45"/>
         <source>invalid shortcut store %1: %2</source>
         <translation>无效快捷键存储 %1：%2</translation>
     </message>
     <message>
-        <location filename="../src/app/command_registry.cpp" line="85"/>
+        <location filename="../src/app/command_registry.cpp" line="87"/>
         <source>cannot create shortcut store directory %1</source>
         <translation>无法创建快捷键存储目录 %1</translation>
     </message>
     <message>
-        <location filename="../src/app/command_registry.cpp" line="100"/>
+        <location filename="../src/app/command_registry.cpp" line="102"/>
         <source>cannot write shortcut store %1</source>
         <translation>无法写入快捷键存储 %1</translation>
     </message>
     <message>
-        <location filename="../src/app/command_registry.cpp" line="107"/>
+        <location filename="../src/app/command_registry.cpp" line="109"/>
         <source>cannot commit shortcut store %1</source>
         <translation>无法提交快捷键存储 %1</translation>
     </message>
     <message>
-        <location filename="../src/app/command_registry.cpp" line="345"/>
+        <location filename="../src/app/command_registry.cpp" line="400"/>
         <source>no shortcut store configured</source>
         <translation>未配置快捷键存储</translation>
     </message>
     <message>
-        <location filename="../src/app/editor_area.cpp" line="256"/>
+        <location filename="../src/app/editor_area.cpp" line="253"/>
+        <source>active</source>
+        <translation>活动</translation>
+    </message>
+    <message>
+        <location filename="../src/app/editor_area.cpp" line="260"/>
         <source>Close Pane</source>
         <translation>关闭窗格</translation>
     </message>
     <message>
-        <location filename="../src/app/editor_area.cpp" line="408"/>
+        <location filename="../src/app/editor_area.cpp" line="412"/>
         <source>No editor provider connected.</source>
         <translation>未连接编辑器 provider。</translation>
     </message>
     <message>
-        <location filename="../src/app/editor_area.cpp" line="437"/>
+        <location filename="../src/app/editor_area.cpp" line="441"/>
         <source>Close File</source>
         <translation>关闭文件</translation>
     </message>
     <message>
-        <location filename="../src/app/editor_area.cpp" line="896"/>
+        <location filename="../src/app/editor_area.cpp" line="900"/>
         <source>open: the pane has no editor provider</source>
         <translation>打开：窗格没有编辑器 provider</translation>
     </message>
     <message>
-        <location filename="../src/app/editor_area.cpp" line="1943"/>
+        <location filename="../src/app/editor_area.cpp" line="1947"/>
         <source>leaf node without pane id</source>
         <translation>叶子节点缺少窗格 id</translation>
     </message>
     <message>
-        <location filename="../src/app/editor_area.cpp" line="1982"/>
+        <location filename="../src/app/editor_area.cpp" line="1986"/>
         <source>split node without a valid orientation</source>
         <translation>分割节点缺少有效方向</translation>
     </message>
     <message>
-        <location filename="../src/app/editor_area.cpp" line="1990"/>
+        <location filename="../src/app/editor_area.cpp" line="1994"/>
         <source>split node needs two object children</source>
         <translation>分割节点需要两个对象子节点</translation>
     </message>
     <message>
-        <location filename="../src/app/editor_area.cpp" line="2010"/>
+        <location filename="../src/app/editor_area.cpp" line="2014"/>
         <source>unknown layout node type &apos;%1&apos;</source>
         <translation>未知布局节点类型“%1”</translation>
     </message>
     <message>
-        <location filename="../src/app/editor_area.cpp" line="2034"/>
+        <location filename="../src/app/editor_area.cpp" line="2038"/>
         <source>layout has no root object</source>
         <translation>布局没有根对象</translation>
     </message>
     <message>
-        <location filename="../src/app/editor_area.cpp" line="2054"/>
+        <location filename="../src/app/editor_area.cpp" line="2058"/>
         <source>layout parse failed</source>
         <translation>布局解析失败</translation>
     </message>
@@ -254,59 +266,59 @@ Diagnostics: %5</source>
     <message>
         <location filename="../src/app/editor_provider.h" line="132"/>
         <location filename="../src/editor/kernel/document_io.cpp" line="36"/>
-        <location filename="../src/workspace/project/project_state.cpp" line="147"/>
+        <location filename="../src/workspace/project/project_state.cpp" line="164"/>
         <source>cannot read %1: %2</source>
         <translation>无法读取 %1：%2</translation>
     </message>
     <message>
         <location filename="../src/app/editor_provider.h" line="259"/>
-        <location filename="../src/workspace/project/project_state.cpp" line="186"/>
+        <location filename="../src/workspace/project/project_state.cpp" line="203"/>
         <source>cannot write %1: %2</source>
         <translation>无法写入 %1：%2</translation>
     </message>
     <message>
-        <location filename="../src/app/main.cpp" line="911"/>
+        <location filename="../src/app/main.cpp" line="939"/>
         <source>search panel from a registered factory</source>
         <translation>来自已注册工厂的搜索面板</translation>
     </message>
     <message>
-        <location filename="../src/app/main.cpp" line="1165"/>
-        <location filename="../src/app/main.cpp" line="1168"/>
+        <location filename="../src/app/main.cpp" line="1193"/>
+        <location filename="../src/app/main.cpp" line="1196"/>
         <source>Save failed</source>
         <translation>保存失败</translation>
     </message>
     <message>
-        <location filename="../src/app/main.cpp" line="1827"/>
+        <location filename="../src/app/main.cpp" line="1855"/>
         <source>VEdit application shell (Qt6/KTextEditor rewrite).</source>
         <translation>VEdit 应用外壳（Qt6/KTextEditor 重写版）。</translation>
     </message>
     <message>
-        <location filename="../src/app/main.cpp" line="1834"/>
+        <location filename="../src/app/main.cpp" line="1862"/>
         <source>Directory for session.json and shortcuts.json.</source>
         <translation>session.json 与 shortcuts.json 的目录。</translation>
     </message>
     <message>
-        <location filename="../src/app/main.cpp" line="1838"/>
+        <location filename="../src/app/main.cpp" line="1866"/>
         <source>KSyntaxHighlighting theme name.</source>
         <translation>KSyntaxHighlighting 主题名称。</translation>
     </message>
     <message>
-        <location filename="../src/app/main.cpp" line="1852"/>
+        <location filename="../src/app/main.cpp" line="1880"/>
         <source>Capture split-state screenshots into this directory and exit.</source>
         <translation>把分屏状态截图保存到该目录后退出。</translation>
     </message>
     <message>
-        <location filename="../src/app/main.cpp" line="1855"/>
+        <location filename="../src/app/main.cpp" line="1883"/>
         <source>Ignore an existing session file at startup.</source>
         <translation>启动时忽略已有的会话文件。</translation>
     </message>
     <message>
-        <location filename="../src/app/main.cpp" line="1856"/>
+        <location filename="../src/app/main.cpp" line="1884"/>
         <source>Keep the window for this many ms.</source>
         <translation>让窗口保持该毫秒数。</translation>
     </message>
     <message>
-        <location filename="../src/app/main.cpp" line="2017"/>
+        <location filename="../src/app/main.cpp" line="2045"/>
         <source>Use &amp;tree-sitter parsing</source>
         <translation>使用 &amp;tree-sitter 解析</translation>
     </message>
@@ -561,48 +573,48 @@ Diagnostics: %5</source>
         <translation>私有语法目录缺失：%1/syntax（设置 VEDIT_SYNTAX_DIR）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="243"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="253"/>
         <source>no effective file set</source>
         <translation>没有有效文件集</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="249"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="259"/>
         <source>reparsing %1 file(s)</source>
         <translation>正在重新解析 %1 个文件</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="337"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="347"/>
         <location filename="../src/workspace/diagnostics/ffi_backends.cpp" line="897"/>
         <source>no LSP backend in this build</source>
         <translation>此构建没有 LSP 后端</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="347"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="357"/>
         <source>LSP backend is not configured (no workspace root)</source>
         <translation>LSP 后端未配置（无工作区根目录）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="355"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="365"/>
         <source>session started over %1 file(s)</source>
         <translation>会话已在 %1 个文件上启动</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="373"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="383"/>
         <source>no SLANG backend in this build</source>
         <translation>此构建没有 SLANG 后端</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="460"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="478"/>
         <source>the LSP session did not start</source>
         <translation>LSP 会话未启动</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="479"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="500"/>
         <source>no SLANG backend</source>
         <translation>没有 SLANG 后端</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="747"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="771"/>
         <source>no navigation request in flight</source>
         <translation>没有进行中的导航请求</translation>
     </message>
@@ -728,7 +740,7 @@ Diagnostics: %5</source>
     <message>
         <location filename="../src/workspace/diagnostics/ffi_backends.cpp" line="205"/>
         <location filename="../src/workspace/diagnostics/ffi_backends.cpp" line="591"/>
-        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="244"/>
+        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="262"/>
         <source>the Rust service handle could not be created</source>
         <translation>无法创建 Rust 服务句柄</translation>
     </message>
@@ -910,8 +922,8 @@ Diagnostics: %5</source>
     </message>
     <message>
         <location filename="../src/workspace/filetree/file_tree_widget.cpp" line="75"/>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="91"/>
-        <location filename="../src/workspace/project/project_panel.cpp" line="177"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="92"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="178"/>
         <location filename="../src/workspace/vcs/vcs_history.cpp" line="146"/>
         <location filename="../src/workspace/vcs/vcs_panel.cpp" line="767"/>
         <source>Refresh</source>
@@ -1063,7 +1075,7 @@ Diagnostics: %5</source>
     </message>
     <message>
         <location filename="../src/workspace/palette/palette_bench.cpp" line="101"/>
-        <location filename="../src/workspace/project/project_state.cpp" line="179"/>
+        <location filename="../src/workspace/project/project_state.cpp" line="196"/>
         <source>cannot create %1</source>
         <translation>无法创建 %1</translation>
     </message>
@@ -1073,224 +1085,246 @@ Diagnostics: %5</source>
         <translation>转到文件(&amp;G)…</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_model.cpp" line="136"/>
+        <location filename="../src/workspace/project/project_model.cpp" line="146"/>
         <source>no project is open</source>
         <translation>未打开工程</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_model.cpp" line="381"/>
+        <location filename="../src/workspace/project/project_model.cpp" line="415"/>
         <location filename="../src/workspace/project/project_selftest.cpp" line="363"/>
         <source>No project open</source>
         <translation>未打开工程</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_model.cpp" line="419"/>
+        <location filename="../src/workspace/project/project_model.cpp" line="453"/>
         <source> (expanding…)</source>
         <translation>（展开中…）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_model.cpp" line="421"/>
+        <location filename="../src/workspace/project/project_model.cpp" line="455"/>
         <source> (refresh failed)</source>
         <translation>（刷新失败）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_model.cpp" line="423"/>
+        <location filename="../src/workspace/project/project_model.cpp" line="457"/>
         <source> (restored from last session)</source>
         <translation>（已从上次会话恢复）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_model.cpp" line="425"/>
+        <location filename="../src/workspace/project/project_model.cpp" line="459"/>
         <source> (live)</source>
         <translation>（实时）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_model.cpp" line="560"/>
+        <location filename="../src/workspace/project/project_model.cpp" line="594"/>
         <source>the project service did not answer in %1 ms</source>
         <translation>项目服务未在 %1 毫秒内响应</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_model.cpp" line="586"/>
+        <location filename="../src/workspace/project/project_model.cpp" line="620"/>
         <source>the project job was rejected by the service</source>
         <translation>项目作业被服务拒绝</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_model.cpp" line="609"/>
+        <location filename="../src/workspace/project/project_model.cpp" line="643"/>
         <source>the project service failed</source>
         <translation>项目服务失败</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="179"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="180"/>
         <source>Import Filelist…</source>
         <translation>导入 filelist…</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="182"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="183"/>
         <source>Add one or more .f filelists to the project file set</source>
         <translation>向工程文件集添加一个或多个 .f 文件清单</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="189"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="190"/>
         <source>Open a folder from the File Tree (or pass --project &lt;dir&gt;); the expanded file list, include dirs and defines appear here.</source>
         <translation>从文件树打开文件夹（或传入 --project &lt;dir&gt;）；展开后的文件列表、包含目录和宏定义会显示在这里。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="196"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="197"/>
         <source>Filelists (0)</source>
         <translation>filelist（0）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="203"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="204"/>
         <source>Imported .f filelists; double-click to open one</source>
         <translation>已导入的 .f filelist；双击可打开</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="207"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="208"/>
         <source>Remove Selected Filelist</source>
         <translation>移除所选 filelist</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="213"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="214"/>
         <source>Files (0)</source>
         <translation>文件（0）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="219"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="220"/>
         <source>Double-click a file to open it (AC-7.4)</source>
         <translation>双击文件即可打开（AC-7.4）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="259"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="260"/>
         <source>Include dirs (-I) (0)</source>
         <translation>包含目录 (-I)（0）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="268"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="269"/>
         <source>Defines (-D) (0)</source>
         <translation>宏定义 (-D)（0）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="277"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="278"/>
         <source>Variables (0)</source>
         <translation>变量（0）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="284"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="285"/>
         <source>Project variable table; wins over the environment</source>
         <translation>工程变量表；优先于环境变量</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="288"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="289"/>
         <source>Edit Variables…</source>
         <translation>编辑变量…</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="294"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="295"/>
         <source>Diagnostics (0)</source>
         <translation>诊断 (0)</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="352"/>
-        <location filename="../src/workspace/project/project_panel.cpp" line="380"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="353"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="381"/>
         <source>No project model is attached</source>
         <translation>未附加工程模型</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="364"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="365"/>
         <source>Already imported: nothing changed (use Refresh to re-read an edited filelist)</source>
         <translation>已导入：内容未变化（修改过的文件清单请用「刷新」重新读取）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="368"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="369"/>
         <source>Imported %1 filelist%2</source>
         <translation>已导入 %1 个文件清单%2</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="384"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="385"/>
         <source>%1 is not an imported filelist</source>
         <translation>%1 不是已导入的 filelist</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="387"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="388"/>
         <source>Removed %1; the file set is being re-expanded</source>
         <translation>已移除 %1；正在重新展开文件集</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="422"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="423"/>
         <source>%1 unresolved filelist variable(s): %2</source>
         <translation>%1 个未解析的文件清单变量：%2</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="431"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="432"/>
         <source>Import completed with %1 unresolved variable(s); the affected .f lines stay listed below</source>
         <translation>导入完成，有 %1 个未解析变量；受影响的 .f 行仍列在下方</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="501"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="502"/>
         <source>Saved %1 variable(s); re-expanding</source>
         <translation>已保存 %1 个变量；正在重新展开</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="444"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="445"/>
         <source>Open a folder before editing variables</source>
         <translation>请先打开文件夹再编辑变量</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="496"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="497"/>
         <source>Project variables unchanged</source>
         <translation>工程变量未变化</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="531"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="532"/>
         <source>Cannot open %1: no editor jump target is registered</source>
         <translation>无法打开 %1：没有注册编辑器跳转目标</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="537"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="538"/>
         <source>Cannot open %1: this build has no jump seam</source>
         <translation>无法打开 %1：此构建没有跳转接缝</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="621"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="622"/>
         <source>Open a folder before importing a filelist</source>
         <translation>请先打开文件夹再导入 filelist</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="625"/>
+        <location filename="../src/app/file_dialog_filters_selftest.cpp" line="346"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="629"/>
         <source>Import Filelist</source>
         <translation>导入 filelist</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="626"/>
-        <source>Verilog filelists (*.f *.F *.flist);;All files (*)</source>
-        <translation>Verilog filelist (*.f *.F *.flist);;所有文件 (*)</translation>
+        <location filename="../src/common/file_dialog_filters.h" line="76"/>
+        <source>Verilog/SystemVerilog/filelist (%1 *.v *.sv *.svh *.vh)</source>
+        <translation>Verilog/SystemVerilog/filelist (%1 *.v *.sv *.svh *.vh)</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="656"/>
+        <location filename="../src/common/file_dialog_filters.h" line="78"/>
+        <source>Verilog/SystemVerilog (*.v *.sv *.svh *.vh)</source>
+        <translation>Verilog/SystemVerilog (*.v *.sv *.svh *.vh)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/file_dialog_filters.h" line="79"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="666"/>
         <source>Filelists (%1)</source>
         <translation>filelist（%1）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="668"/>
+        <location filename="../src/common/file_dialog_filters.h" line="80"/>
+        <source>All Files (*)</source>
+        <translation>所有文件 (*)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/file_dialog_filters.h" line="89"/>
+        <source>Verilog filelists (%1)</source>
+        <translation>Verilog filelist (%1)</translation>
+    </message>
+    <message>
+        <location filename="../src/common/file_dialog_filters.h" line="96"/>
+        <source>All files (*)</source>
+        <translation>所有文件 (*)</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/project/project_panel.cpp" line="678"/>
         <source>Files (%1)</source>
         <translation>文件（%1）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="677"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="687"/>
         <source>Include dirs (-I) (%1)</source>
         <translation>包含目录 (-I)（%1）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="682"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="692"/>
         <source>Defines (-D) (%1)</source>
         <translation>宏定义 (-D)（%1）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="687"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="697"/>
         <source>Variables (%1)</source>
         <translation>变量（%1）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_panel.cpp" line="695"/>
+        <location filename="../src/workspace/project/project_panel.cpp" line="705"/>
         <source>Diagnostics (%1)</source>
         <translation>诊断（%1）</translation>
     </message>
@@ -1300,13 +1334,13 @@ Diagnostics: %5</source>
         <translation>Rust 项目服务不可用</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_state.cpp" line="140"/>
-        <location filename="../src/workspace/project/project_state.cpp" line="173"/>
+        <location filename="../src/workspace/project/project_state.cpp" line="157"/>
+        <location filename="../src/workspace/project/project_state.cpp" line="190"/>
         <source>no state directory is available</source>
         <translation>没有可用的状态目录</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_state.cpp" line="193"/>
+        <location filename="../src/workspace/project/project_state.cpp" line="210"/>
         <source>cannot commit %1: %2</source>
         <translation>无法提交 %1：%2</translation>
     </message>
@@ -1373,7 +1407,7 @@ Diagnostics: %5</source>
     </message>
     <message>
         <location filename="../src/workspace/settings/settings_client.cpp" line="165"/>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="995"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1004"/>
         <source>the Rust settings store rejected the write</source>
         <translation>Rust 设置存储拒绝了写入</translation>
     </message>
@@ -1423,53 +1457,53 @@ Diagnostics: %5</source>
         <translation>主题“%1”已应用并由 Rust 服务存储。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="882"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="885"/>
         <source>Shortcut for &apos;%1&apos; set to %2 and stored by the Rust service.</source>
         <translation>“%1”的快捷键已设为 %2，并由 Rust 服务保存。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="898"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="901"/>
         <source>Shortcut for &apos;%1&apos; cleared (default restored).</source>
         <translation>已清除“%1”的快捷键（恢复默认）。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="964"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="973"/>
         <source>Select a command in the table first.</source>
         <translation>请先在表中选择一个命令。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="979"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="988"/>
         <source>Preview — press Apply or OK to store it, Cancel to discard.</source>
         <translation>预览——按“应用”或“确定”保存，按“取消”放弃。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="998"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1007"/>
         <source>The settings change was applied but could not be stored; see the diagnostics.</source>
         <translation>设置更改已应用但无法保存；请查看诊断。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1003"/>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1067"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1012"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1076"/>
         <source>Stored by the Rust service in %1</source>
         <translation>已由 Rust 服务存储到 %1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1094"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1103"/>
         <source>Changes discarded; nothing was stored.</source>
         <translation>更改已丢弃；未存储任何内容。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1107"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1116"/>
         <source>No configuration problems reported by the Rust store.</source>
         <translation>Rust 存储未报告配置问题。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1682"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1691"/>
         <source>No conflicting shortcuts.</source>
         <translation>没有冲突的快捷键。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1686"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1695"/>
         <source>Conflicting shortcuts: %1</source>
         <translation>快捷键冲突：%1</translation>
     </message>
@@ -1614,7 +1648,7 @@ Open a directory that is a Git or Subversion working tree to see its branch, cha
         <translation>%1：%2（第 %3 行）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="958"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="961"/>
         <source>Selected LSP backend and CLI lint engine</source>
         <translation>已选 LSP 后端与 CLI lint 引擎</translation>
     </message>
@@ -1625,12 +1659,12 @@ Open a directory that is a Git or Subversion working tree to see its branch, cha
         <translation>重命名</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1682"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1785"/>
         <source>New name:</source>
         <translation>新名称：</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2451"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2578"/>
         <source>LSP backend=%1 · lint=%2 · %3</source>
         <translation>LSP 后端=%1 · lint=%2 · %3</translation>
     </message>
@@ -1670,37 +1704,37 @@ Open a directory that is a Git or Subversion working tree to see its branch, cha
         <translation>无法重新运行本轮</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_integration.cpp" line="296"/>
+        <location filename="../src/workspace/module_tree/module_tree_integration.cpp" line="318"/>
         <source>No project open — open a folder to build the module catalog.</source>
         <translation>未打开工程——请打开文件夹以构建模块目录。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_integration.cpp" line="413"/>
+        <location filename="../src/workspace/module_tree/module_tree_integration.cpp" line="510"/>
         <source>module catalog: retrying after the project model…</source>
         <translation>模块目录：工程模型就绪后重试…</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_integration.cpp" line="457"/>
+        <location filename="../src/workspace/module_tree/module_tree_integration.cpp" line="556"/>
         <source>Module Tree</source>
         <translation>模块树</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_integration.cpp" line="462"/>
+        <location filename="../src/workspace/module_tree/module_tree_integration.cpp" line="561"/>
         <source>Empty state: no module catalog yet. Open a project and press Refresh.</source>
         <translation>空状态：尚无模块目录。请打开工程并按“刷新”。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_integration.cpp" line="468"/>
+        <location filename="../src/workspace/module_tree/module_tree_integration.cpp" line="567"/>
         <source>Interface</source>
         <translation>接口</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_integration.cpp" line="474"/>
+        <location filename="../src/workspace/module_tree/module_tree_integration.cpp" line="573"/>
         <source>Empty state: the focused module&apos;s ports appear here once the module catalog is ready.</source>
         <translation>空状态：模块目录就绪后，焦点模块的端口将显示在此处。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="874"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="877"/>
         <location filename="../src/workspace/module_tree/interface_panel.cpp" line="89"/>
         <source>Location</source>
         <translation>位置</translation>
@@ -1856,57 +1890,57 @@ Open a directory that is a Git or Subversion working tree to see its branch, cha
         <translation>行</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="238"/>
+        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="256"/>
         <source>this build has no Rust service layer (vd-ffi), so the module catalog cannot run</source>
         <translation>此构建不含 Rust 服务层（vd-ffi），因此模块目录无法运行</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="273"/>
+        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="291"/>
         <source>no project root: open a folder or start vedit-app with --project &lt;dir&gt;</source>
         <translation>无工程根目录：请打开文件夹，或以 --project &lt;dir&gt; 启动 vedit-app</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="329"/>
+        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="347"/>
         <source>project expansion was rejected: %1</source>
         <translation>工程展开被拒绝：%1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="338"/>
+        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="356"/>
         <source>expanding the project file set…</source>
         <translation>正在展开工程文件集…</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="366"/>
+        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="384"/>
         <source>the project has no source files, so there is no module catalog to build</source>
         <translation>此工程没有源文件，因此没有可构建的模块目录</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="404"/>
+        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="427"/>
         <source>module catalog was rejected: %1</source>
         <translation>模块目录被拒绝：%1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="409"/>
+        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="432"/>
         <source>cataloguing %1 project file(s)…</source>
         <translation>正在编目 %1 个工程文件…</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="436"/>
+        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="459"/>
         <source>the module catalog service did not answer within 300 s</source>
         <translation>模块目录服务在 300 秒内没有响应</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="449"/>
+        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="472"/>
         <source>project expansion failed: %1</source>
         <translation>工程展开失败：%1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="470"/>
+        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="493"/>
         <source>module catalog failed: %1</source>
         <translation>模块目录失败：%1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="506"/>
+        <location filename="../src/workspace/module_tree/catalog_client.cpp" line="529"/>
         <source>unknown error</source>
         <translation>未知错误</translation>
     </message>
@@ -1931,57 +1965,57 @@ Open a directory that is a Git or Subversion working tree to see its branch, cha
         <translation>工程</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_model.cpp" line="385"/>
+        <location filename="../src/workspace/project/project_model.cpp" line="419"/>
         <source>Project: %1 — %2 %3</source>
         <translation>工程：%1 — %2 %3</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_model.cpp" line="389"/>
+        <location filename="../src/workspace/project/project_model.cpp" line="423"/>
         <source>file</source>
         <translation>个文件</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_model.cpp" line="390"/>
+        <location filename="../src/workspace/project/project_model.cpp" line="424"/>
         <source>files</source>
         <translation>个文件</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_model.cpp" line="415"/>
+        <location filename="../src/workspace/project/project_model.cpp" line="449"/>
         <source> · %1 unresolved</source>
         <translation> · %1 个未解析变量</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="232"/>
+        <location filename="../src/app/app_shell.cpp" line="242"/>
         <source>Session could not be restored (%1) — starting clean</source>
         <translation>会话无法恢复（%1）— 已从干净状态启动</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1215"/>
+        <location filename="../src/app/app_shell.cpp" line="1268"/>
         <source>Saved</source>
         <translation>已保存</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1216"/>
+        <location filename="../src/app/app_shell.cpp" line="1269"/>
         <source>Saved %1</source>
         <translation>已保存 %1</translation>
     </message>
     <message>
-        <location filename="../src/app/editor_area.cpp" line="1007"/>
+        <location filename="../src/app/editor_area.cpp" line="1011"/>
         <source>Save As: the pane has no active document</source>
         <translation>另存为：该面板没有活动文档</translation>
     </message>
     <message>
-        <location filename="../src/app/editor_area.cpp" line="1014"/>
+        <location filename="../src/app/editor_area.cpp" line="1018"/>
         <source>Save As: %1 is not an absolute file path</source>
         <translation>另存为：%1 不是绝对文件路径</translation>
     </message>
     <message>
-        <location filename="../src/app/editor_area.cpp" line="1037"/>
+        <location filename="../src/app/editor_area.cpp" line="1041"/>
         <source>Save As: %1 could not be written</source>
         <translation>另存为：无法写入 %1</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1523"/>
+        <location filename="../src/app/app_shell.cpp" line="1576"/>
         <source>no project</source>
         <translation>无工程</translation>
     </message>
@@ -1991,173 +2025,179 @@ Open a directory that is a Git or Subversion working tree to see its branch, cha
         <translation>此文件没有诊断</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1148"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1151"/>
         <source>Backend switch failed: %1</source>
         <translation>后端切换失败：%1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1242"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1245"/>
         <source>%1 (%2) — %3 action(s)</source>
         <translation>%1（%2）— %3 个动作</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1244"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1247"/>
         <source>no table</source>
         <translation>无能力表</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1247"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1250"/>
         <source>unknown basis</source>
         <translation>未知依据</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1274"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1277"/>
         <source>Hover needs a KTextEditor view</source>
         <translation>悬停信息需要 KTextEditor 视图</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1289"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1292"/>
         <source>Hover request refused by %1</source>
         <translation>%1 拒绝了悬停请求</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1469"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1557"/>
         <source>Hover · %1</source>
         <translation>悬停 · %1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1533"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1629"/>
         <source>checking whether the engine can fix this…</source>
         <translation>正在检查引擎能否修复…</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1610"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1713"/>
         <source>The fix could not be applied: the document refused the edit (is it read-only?)</source>
         <translation>无法应用修复：文档拒绝了此次编辑（是否为只读？）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1623"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1726"/>
         <source>Fixed %1 with verible-verilog-lint (one undo reverts it)</source>
         <translation>已用 verible-verilog-lint 修复 %1（一次撤销即可还原）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1646"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1749"/>
         <source>Rename is not available: %1</source>
         <translation>无法使用重命名：%1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1664"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1767"/>
         <source>Rename needs the cursor on a symbol (line %1, column %2 has none)</source>
         <translation>重命名需要光标位于符号上（第 %1 行第 %2 列没有符号）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1675"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1778"/>
         <source>Rename is not possible here: %1</source>
         <translation>此处无法重命名：%1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1681"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1784"/>
         <source>Rename %1</source>
         <translation>重命名 %1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1692"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1795"/>
         <source>%1 refused the rename request</source>
         <translation>%1 拒绝了重命名请求</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1700"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1803"/>
         <source>Rename was refused: %1</source>
         <translation>重命名被拒绝：%1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1729"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1832"/>
         <source>Formatting failed: %1</source>
         <translation>格式化失败：%1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1745"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1848"/>
         <source>Formatted with verible-verilog-format</source>
         <translation>已用 verible-verilog-format 格式化</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1746"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1849"/>
         <source>Already formatted (verible-verilog-format)</source>
         <translation>已是格式化状态（verible-verilog-format）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1846"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1875"/>
+        <location filename="../src/workspace/module_tree/module_tree_integration.cpp" line="388"/>
+        <source>%1 file(s) outside the top %2 are not analysed</source>
+        <translation>%1 个文件位于顶层 %2 之外，未被分析</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1973"/>
         <source>The project file set is still loading — try again in a moment</source>
         <translation>工程文件集仍在加载——请稍后再试</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1848"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1975"/>
         <source>No project file set — open a folder first</source>
         <translation>没有工程文件集 — 请先打开一个文件夹</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1874"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2001"/>
         <source>Project lint did not start: %1</source>
         <translation>工程级 lint 未启动：%1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1895"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2022"/>
         <source>Linting project with %1…</source>
         <translation>正在用 %1 做工程级 lint…</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1951"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2078"/>
         <source>Project lint failed: %1</source>
         <translation>工程 lint 失败：%1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2209"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2336"/>
         <source>%1 needs a KTextEditor view</source>
         <translation>%1 需要 KTextEditor 视图</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2228"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2355"/>
         <source>%1 was refused by %2 — the backend session is not ready yet</source>
         <translation>%1 被 %2 拒绝——后端会话尚未就绪</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2266"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2393"/>
         <source>No hover from %1 here</source>
         <translation>%1 在这里没有悬停信息</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2325"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2452"/>
         <source>No definition found</source>
         <translation>未找到定义</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2348"/>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2413"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2475"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2540"/>
         <source>%1 reference(s) from %2</source>
         <translation>来自 %2 的 %1 处引用</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2773"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2995"/>
         <source>&amp;Lint Project</source>
         <translation>检查工程(&amp;L)</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2776"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2998"/>
         <source>Show Backend &amp;Capabilities</source>
         <translation>显示后端能力(&amp;C)</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2779"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="3001"/>
         <source>Reload Backend Settings</source>
         <translation>重新加载后端设置</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2819"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="3041"/>
         <source>&amp;Diagnostics</source>
         <translation>诊断(&amp;D)</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2830"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="3057"/>
         <source>Re&amp;parse Project</source>
         <translation>重新解析工程(&amp;P)</translation>
     </message>
@@ -2172,7 +2212,7 @@ Open a directory that is a Git or Subversion working tree to see its branch, cha
         <translation>已从 %1 载入设置（%2 个警告）；文件无效处的设置已保留内置默认值。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1108"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1117"/>
         <source>%1 configuration problem(s) — the built-in defaults were kept where needed:</source>
         <translation>%1 个配置问题 — 需要时已保留内置默认值：</translation>
     </message>
@@ -2203,25 +2243,25 @@ Open a directory that is a Git or Subversion working tree to see its branch, cha
     </message>
     <message>
         <location filename="../src/editor/kernel/lsp_actions.cpp" line="348"/>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2750"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2972"/>
         <source>Find &amp;References</source>
         <translation>查找引用(&amp;R)</translation>
     </message>
     <message>
         <location filename="../src/editor/kernel/lsp_actions.cpp" line="350"/>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2754"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2976"/>
         <source>&amp;Rename Symbol...</source>
         <translation>重命名符号(&amp;R)…</translation>
     </message>
     <message>
         <location filename="../src/editor/kernel/lsp_actions.cpp" line="352"/>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2758"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2980"/>
         <source>&amp;Format Document</source>
         <translation>格式化文档(&amp;F)</translation>
     </message>
     <message>
         <location filename="../src/editor/kernel/lsp_actions.cpp" line="354"/>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2770"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2992"/>
         <source>Show &amp;Hover</source>
         <translation>显示悬停(&amp;H)</translation>
     </message>
@@ -2256,52 +2296,52 @@ Open a directory that is a Git or Subversion working tree to see its branch, cha
         <translation>KTextEditor 拒绝替换 %1:%2</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2301"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2428"/>
         <source>Rename failed: %1</source>
         <translation>重命名失败：%1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2318"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2445"/>
         <source>Rename needs the KTextEditor editor</source>
         <translation>重命名需要 KTextEditor 编辑器</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="862"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="865"/>
         <source>References</source>
         <translation>引用</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="875"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="878"/>
         <source>Snippet</source>
         <translation>片段</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="892"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="895"/>
         <source>the symbol under the cursor</source>
         <translation>光标处的符号</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="894"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="897"/>
         <source>%1 reference(s) for %2</source>
         <translation>%2 有 %1 处引用</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="897"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="900"/>
         <source>No references found for %1 — the backend returned no location.</source>
         <translation>没有找到 %1 的引用 — 后端未返回任何位置。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1016"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1019"/>
         <source>Automatic project lint did not start: %1</source>
         <translation>自动工程 lint 未启动：%1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2408"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2535"/>
         <source>No references found for %1</source>
         <translation>没有找到 %1 的引用</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2409"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2536"/>
         <source>this symbol</source>
         <translation>该符号</translation>
     </message>
@@ -2564,16 +2604,16 @@ Open a directory that is a Git or Subversion working tree to see its branch, cha
     <message>
         <location filename="../src/workspace/module_tree/interface_panel.cpp" line="118"/>
         <location filename="../src/workspace/module_tree/interface_panel.cpp" line="163"/>
-        <location filename="../src/workspace/module_tree/module_tree_integration.cpp" line="279"/>
-        <location filename="../src/workspace/module_tree/module_tree_integration.cpp" line="304"/>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="141"/>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="153"/>
+        <location filename="../src/workspace/module_tree/module_tree_integration.cpp" line="301"/>
+        <location filename="../src/workspace/module_tree/module_tree_integration.cpp" line="399"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="162"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="174"/>
         <source>No module catalog yet: open a project and press Refresh.</source>
         <translation>尚无模块目录：请打开工程并按“刷新”。</translation>
     </message>
     <message>
         <location filename="../src/workspace/module_tree/interface_panel.cpp" line="170"/>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="163"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="184"/>
         <source>No modules found: slang reported no module definitions for this project.</source>
         <translation>未找到模块：slang 未报告此工程的任何模块定义。</translation>
     </message>
@@ -2635,34 +2675,34 @@ Open a directory that is a Git or Subversion working tree to see its branch, cha
     </message>
     <message>
         <location filename="../src/workspace/module_tree/interface_panel.cpp" line="372"/>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="361"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="382"/>
         <location filename="../src/workspace/vcs/vcs_history.cpp" line="592"/>
         <source>%1 → %2</source>
         <translation>%1 → %2</translation>
     </message>
     <message>
         <location filename="../src/workspace/module_tree/interface_panel.cpp" line="375"/>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="366"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="387"/>
         <source>%1: no jump target is registered (the editor lane is not installed), so nothing was opened</source>
         <translation>%1：未注册跳转目标（未安装编辑器 lane），因此未打开任何内容</translation>
     </message>
     <message>
         <location filename="../src/workspace/module_tree/interface_panel.cpp" line="386"/>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="377"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="398"/>
         <source>%1: the editor rejected the jump to %2 — %3</source>
         <translation>%1：编辑器拒绝了跳转到 %2 的请求 —— %3</translation>
     </message>
     <message>
         <location filename="../src/workspace/module_tree/interface_panel.cpp" line="394"/>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="385"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="406"/>
         <source>%1: the jump request (%2) was refused — %3</source>
         <translation>%1：跳转请求（%2）被拒绝 —— %3</translation>
     </message>
     <message>
         <location filename="../src/workspace/module_tree/interface_panel.cpp" line="390"/>
         <location filename="../src/workspace/module_tree/interface_panel.cpp" line="397"/>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="381"/>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="389"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="402"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="410"/>
         <source>no reason was reported</source>
         <translation>未报告原因</translation>
     </message>
@@ -4181,39 +4221,39 @@ This cannot be undone.</source>
         <translation>问题</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_model.cpp" line="399"/>
+        <location filename="../src/workspace/project/project_model.cpp" line="433"/>
         <source> · %1 filelist</source>
         <translation> · %1 个文件列表</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_model.cpp" line="400"/>
+        <location filename="../src/workspace/project/project_model.cpp" line="434"/>
         <source> · %1 filelists</source>
         <translation> · %1 个文件列表</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_model.cpp" line="405"/>
+        <location filename="../src/workspace/project/project_model.cpp" line="439"/>
         <source> · %1 variable</source>
         <translation> · %1 个变量</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_model.cpp" line="406"/>
+        <location filename="../src/workspace/project/project_model.cpp" line="440"/>
         <source> · %1 variables</source>
         <translation> · %1 个变量</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_model.cpp" line="410"/>
+        <location filename="../src/workspace/project/project_model.cpp" line="444"/>
         <source> · %1 line skipped</source>
         <translation> · 跳过 %1 行</translation>
     </message>
     <message>
-        <location filename="../src/workspace/project/project_model.cpp" line="411"/>
+        <location filename="../src/workspace/project/project_model.cpp" line="445"/>
         <source> · %1 lines skipped</source>
         <translation> · 跳过 %1 行</translation>
     </message>
     <message>
-        <location filename="../src/app/ux_selftest.cpp" line="412"/>
+        <location filename="../src/app/ux_selftest.cpp" line="422"/>
         <location filename="../src/editor/kernel/lsp_actions.cpp" line="346"/>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2747"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2969"/>
         <source>Go to &amp;Definition</source>
         <translation>跳转到定义(&amp;D)</translation>
     </message>
@@ -4269,49 +4309,49 @@ This cannot be undone.</source>
         <translation>无法启动 lint 工具</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostic_hover.cpp" line="51"/>
+        <location filename="../src/workspace/diagnostics/diagnostic_hover.cpp" line="55"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostic_hover.cpp" line="53"/>
+        <location filename="../src/workspace/diagnostics/diagnostic_hover.cpp" line="57"/>
         <source>Warning</source>
         <translation>警告</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostic_hover.cpp" line="55"/>
+        <location filename="../src/workspace/diagnostics/diagnostic_hover.cpp" line="59"/>
         <source>Information</source>
         <translation>信息</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostic_hover.cpp" line="57"/>
+        <location filename="../src/workspace/diagnostics/diagnostic_hover.cpp" line="61"/>
         <source>Hint</source>
         <translation>提示</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostic_hover.cpp" line="59"/>
+        <location filename="../src/workspace/diagnostics/diagnostic_hover.cpp" line="63"/>
         <source>Diagnostic</source>
         <translation>诊断</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostic_hover.cpp" line="77"/>
+        <location filename="../src/workspace/diagnostics/diagnostic_hover.cpp" line="81"/>
         <source>this backend offers no autofix for this diagnostic</source>
         <translation>此后端不为此诊断提供自动修复</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostic_hover.cpp" line="87"/>
+        <location filename="../src/workspace/diagnostics/diagnostic_hover.cpp" line="91"/>
         <source>Checking for an automatic fix…</source>
         <translation>正在检查自动修复…</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostic_hover.cpp" line="88"/>
-        <location filename="../src/workspace/diagnostics/diagnostic_hover.cpp" line="132"/>
-        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1591"/>
+        <location filename="../src/workspace/diagnostics/diagnostic_hover.cpp" line="92"/>
+        <location filename="../src/workspace/diagnostics/diagnostic_hover.cpp" line="136"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1694"/>
         <source>No automatic fix: %1</source>
         <translation>无自动修复：%1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostic_hover.cpp" line="112"/>
+        <location filename="../src/workspace/diagnostics/diagnostic_hover.cpp" line="116"/>
         <source>Fix</source>
         <translation>修复</translation>
     </message>
@@ -4337,7 +4377,7 @@ This cannot be undone.</source>
     </message>
     <message>
         <location filename="../src/workspace/module_tree/module_catalog.cpp" line="51"/>
-        <location filename="../src/workspace/module_tree/module_tree_integration.cpp" line="166"/>
+        <location filename="../src/workspace/module_tree/module_tree_integration.cpp" line="182"/>
         <source>module catalog: %1</source>
         <translation>模块目录：%1</translation>
     </message>
@@ -4357,27 +4397,32 @@ This cannot be undone.</source>
         <translation> · ⚠ %1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_catalog.cpp" line="117"/>
+        <location filename="../src/workspace/module_tree/module_catalog.cpp" line="74"/>
+        <source> · top: %1</source>
+        <translation> · 顶层：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/module_tree/module_catalog.cpp" line="120"/>
         <source>the ABI reported no type string for this port</source>
         <translation>ABI 未报告此端口的类型字符串</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_catalog.cpp" line="138"/>
+        <location filename="../src/workspace/module_tree/module_catalog.cpp" line="141"/>
         <source>the type `%1` has an unclosed packed dimension</source>
         <translation>类型 `%1` 存在未闭合的打包维度</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_catalog.cpp" line="146"/>
+        <location filename="../src/workspace/module_tree/module_catalog.cpp" line="149"/>
         <source>the packed range `[%1]` in `%2` is not a literal msb:lsb pair, so the width cannot be derived</source>
         <translation>`%2` 中的打包范围 `[%1]` 不是字面量 msb:lsb 对，因此无法推导位宽</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_catalog.cpp" line="158"/>
+        <location filename="../src/workspace/module_tree/module_catalog.cpp" line="161"/>
         <source>the packed range `[%1]` in `%2` is too large to represent</source>
         <translation>`%2` 中的打包范围 `[%1]` 过大，无法表示</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_catalog.cpp" line="166"/>
+        <location filename="../src/workspace/module_tree/module_catalog.cpp" line="169"/>
         <source>the packed dimensions in `%1` exceed the supported width</source>
         <translation>`%1` 中的打包维度超出支持的位宽</translation>
     </message>
@@ -4403,84 +4448,102 @@ This cannot be undone.</source>
         <translation>未为 `%1` 编目到模块定义</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="43"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="44"/>
         <source>cycle: %1</source>
         <translation>循环：%1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="45"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="46"/>
         <source>depth limit (%1) reached</source>
         <translation>已达深度上限（%1）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="48"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="49"/>
         <source>tree truncated (%1 rows)</source>
         <translation>树已截断（%1 行）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="93"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="94"/>
         <source>Re-run the module catalog for the whole project</source>
         <translation>为整个工程重新运行模块目录</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="97"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="100"/>
+        <source>Top:</source>
+        <translation>顶层：</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="107"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="491"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="536"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="540"/>
+        <source>Auto</source>
+        <translation>自动</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="108"/>
+        <source>Top module for the module tree and the lint scope (empty = Auto)</source>
+        <translation>模块树与 lint 范围使用的顶层模块（留空 = 自动）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="118"/>
         <source>Filter modules…</source>
         <translation>过滤模块…</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="105"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="126"/>
         <source>Module</source>
         <translation>模块</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="106"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="127"/>
         <source>Instantiations</source>
         <translation>例化次数</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="107"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="128"/>
         <source>Definition</source>
         <translation>定义位置</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="130"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="151"/>
         <source>nothing to refresh: no catalog client</source>
         <translation>无可刷新内容：没有模块目录客户端</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="172"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="193"/>
         <source>No top module: every catalogued module is instantiated by another module, so the hierarchy has no root.</source>
         <translation>无顶层模块：所有已编目的模块都被其他模块例化，因此层次结构没有根。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="180"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="201"/>
         <source>
 root: %1</source>
         <translation>
 根目录：%1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="184"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="205"/>
         <source>Module tree ready — double-click a module to open its declaration.</source>
         <translation>模块树就绪——双击模块即可打开其声明。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="273"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="294"/>
         <source>Double-click: open this module&apos;s declaration</source>
         <translation>双击：打开此模块的声明</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="407"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="428"/>
         <source>this marker row has no location</source>
         <translation>此标记行没有位置</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="418"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="439"/>
         <source>%1 has no definition position in the module catalog, so nothing was opened</source>
         <translation>%1 在模块目录中没有定义位置，因此未打开任何内容</translation>
     </message>
     <message>
-        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="425"/>
+        <location filename="../src/workspace/module_tree/module_tree_panel.cpp" line="446"/>
         <source>%1 definition</source>
         <translation>%1 的定义</translation>
     </message>
@@ -4525,12 +4588,12 @@ root: %1</source>
         <translation>替换：%1：第 %2 行：读取期间文档发生变化；该文件未写入任何内容（请重新搜索）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="165"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="166"/>
         <source>cancelled — %1/%2 file(s)</source>
         <translation>已取消 — %1/%2 文件</translation>
     </message>
     <message>
-        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="604"/>
+        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="628"/>
         <source>%1/%2 file(s) scanned — %3 CLI diagnostics</source>
         <translation>%1/%2 文件已扫描 — %3 条 CLI 诊断</translation>
     </message>
@@ -4665,436 +4728,488 @@ root: %1</source>
         <source>Not analysed yet (queued, or excluded because the buffer has unsaved changes)</source>
         <translation>尚未分析（排队中，或因缓冲区有未保存的更改而排除）</translation>
     </message>
+    <message>
+        <source>the settings store did not answer</source>
+        <translation>设置存储没有响应</translation>
+    </message>
 </context>
 <context>
     <name>vedit::app::ApplicationShell</name>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1076"/>
+        <location filename="../src/app/app_shell.cpp" line="1129"/>
         <source>no project</source>
         <translation>无工程</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="542"/>
+        <location filename="../src/app/app_shell.cpp" line="558"/>
         <source>&amp;File</source>
         <translation>文件(&amp;F)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="544"/>
+        <location filename="../src/app/app_shell.cpp" line="560"/>
         <source>&amp;View</source>
         <translation>视图(&amp;V)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="546"/>
+        <location filename="../src/app/app_shell.cpp" line="562"/>
         <source>&amp;Help</source>
         <translation>帮助(&amp;H)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="562"/>
+        <location filename="../src/app/app_shell.cpp" line="583"/>
         <source>&amp;Preferences…</source>
         <translation>首选项(&amp;P)…</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="570"/>
+        <location filename="../src/app/app_shell.cpp" line="591"/>
         <source>&amp;Open…</source>
         <translation>打开(&amp;O)…</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="579"/>
+        <location filename="../src/app/app_shell.cpp" line="600"/>
         <source>Open F&amp;older…</source>
         <translation>打开文件夹(&amp;O)…</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="587"/>
+        <location filename="../src/app/app_shell.cpp" line="608"/>
         <source>S&amp;witch Project…</source>
         <translation>切换工程(&amp;W)…</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="418"/>
+        <location filename="../src/app/app_shell.cpp" line="434"/>
         <source>Open Folder</source>
         <translation>打开文件夹</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="425"/>
+        <location filename="../src/app/app_shell.cpp" line="441"/>
         <source>Cannot open %1: not a folder</source>
         <translation>无法打开 %1：不是文件夹</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="589"/>
+        <location filename="../src/app/app_shell.cpp" line="610"/>
         <source>&amp;New Empty Layout</source>
         <translation>新建空布局(&amp;N)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="595"/>
+        <location filename="../src/app/app_shell.cpp" line="616"/>
         <source>&amp;Save</source>
         <translation>保存(&amp;S)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="599"/>
+        <location filename="../src/app/app_shell.cpp" line="620"/>
         <source>Save &amp;As…</source>
         <translation>另存为(&amp;A)…</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1276"/>
+        <location filename="../src/app/app_shell.cpp" line="1329"/>
         <source>Save As</source>
         <translation>另存为</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1282"/>
-        <location filename="../src/app/app_shell.cpp" line="1292"/>
+        <location filename="../src/app/app_shell.cpp" line="1335"/>
+        <location filename="../src/app/app_shell.cpp" line="1345"/>
         <source>Save As cancelled</source>
         <translation>已取消另存为</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1287"/>
+        <location filename="../src/app/app_shell.cpp" line="1340"/>
         <source>%1 is not a file path</source>
         <translation>%1 不是文件路径</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1302"/>
+        <location filename="../src/app/app_shell.cpp" line="1355"/>
         <source>Saved as %1</source>
         <translation>已另存为 %1</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1246"/>
+        <location filename="../src/app/app_shell.cpp" line="1299"/>
         <source>Overwrite file?</source>
         <translation>覆盖文件？</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1247"/>
+        <location filename="../src/app/app_shell.cpp" line="1300"/>
         <source>%1 already exists. Overwrite it?</source>
         <translation>%1 已存在。要覆盖它吗？</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1391"/>
-        <location filename="../src/app/app_shell.cpp" line="1434"/>
+        <location filename="../src/app/app_shell.cpp" line="1444"/>
+        <location filename="../src/app/app_shell.cpp" line="1487"/>
         <source>To&amp;ggle %1 Panel</source>
         <translation>切换%1面板(&amp;G)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="607"/>
+        <location filename="../src/app/app_shell.cpp" line="628"/>
         <source>&amp;Save Session Now</source>
         <translation>立即保存会话(&amp;S)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="611"/>
+        <location filename="../src/app/app_shell.cpp" line="632"/>
         <source>&amp;Close Pane</source>
         <translation>关闭窗格(&amp;C)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="613"/>
+        <location filename="../src/app/app_shell.cpp" line="634"/>
         <source>&amp;Quit</source>
         <translation>退出(&amp;Q)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="621"/>
+        <location filename="../src/app/app_shell.cpp" line="642"/>
         <source>Split Pane &amp;Horizontally</source>
         <translation>水平分屏(&amp;H)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="623"/>
+        <location filename="../src/app/app_shell.cpp" line="644"/>
         <source>Split Pane &amp;Vertically</source>
         <translation>垂直分屏(&amp;V)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="625"/>
+        <location filename="../src/app/app_shell.cpp" line="646"/>
         <source>&amp;Focus Next Pane</source>
         <translation>聚焦下一个窗格(&amp;F)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="627"/>
+        <location filename="../src/app/app_shell.cpp" line="648"/>
         <source>&amp;Mixed Split (demo)</source>
         <translation>混合分屏(&amp;M)（演示）</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="629"/>
+        <location filename="../src/app/app_shell.cpp" line="650"/>
         <source>&amp;Reset Layout</source>
         <translation>重置布局(&amp;R)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="692"/>
+        <location filename="../src/app/app_shell.cpp" line="723"/>
         <source>&amp;About VEdit</source>
         <translation>关于 VEdit(&amp;A)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1492"/>
+        <location filename="../src/app/app_shell.cpp" line="1545"/>
         <source>● Unsaved changes</source>
         <translation>● 未保存的更改</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1494"/>
+        <location filename="../src/app/app_shell.cpp" line="1547"/>
         <source>unsaved document</source>
         <translation>未保存的文档</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="401"/>
-        <location filename="../src/app/app_shell.cpp" line="1497"/>
+        <location filename="../src/app/app_shell.cpp" line="417"/>
+        <location filename="../src/app/app_shell.cpp" line="1550"/>
         <source>Project: %1</source>
         <translation>项目：%1</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1501"/>
+        <location filename="../src/app/app_shell.cpp" line="1554"/>
         <source>Theme: %1</source>
         <translation>主题：%1</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1501"/>
+        <location filename="../src/app/app_shell.cpp" line="1554"/>
         <source>(default)</source>
         <translation>（默认）</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1505"/>
+        <location filename="../src/app/app_shell.cpp" line="1558"/>
         <source>Panes: %1 · active: %2 · tabs: %3</source>
         <translation>窗格：%1 · 活动：%2 · 标签：%3</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="354"/>
+        <location filename="../src/app/app_shell.cpp" line="370"/>
         <source>Opened %1 file(s)</source>
         <translation>已打开 %1 个文件</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="162"/>
-        <location filename="../src/app/app_shell.cpp" line="163"/>
-        <location filename="../src/app/app_shell.cpp" line="1588"/>
-        <location filename="../src/app/app_shell.cpp" line="1589"/>
-        <location filename="../src/app/app_shell.cpp" line="1672"/>
-        <location filename="../src/app/app_shell.cpp" line="1673"/>
+        <location filename="../src/app/app_shell.cpp" line="120"/>
+        <source>desktop: %1</source>
+        <translation>桌面：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/app/app_shell.cpp" line="133"/>
+        <source>editor: %1</source>
+        <translation>编辑器：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/app/app_shell.cpp" line="172"/>
+        <location filename="../src/app/app_shell.cpp" line="173"/>
+        <location filename="../src/app/app_shell.cpp" line="1641"/>
+        <location filename="../src/app/app_shell.cpp" line="1642"/>
+        <location filename="../src/app/app_shell.cpp" line="1725"/>
+        <location filename="../src/app/app_shell.cpp" line="1726"/>
         <source>Save failed: %1</source>
         <translation>保存失败：%1</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="177"/>
-        <location filename="../src/app/app_shell.cpp" line="1539"/>
+        <location filename="../src/app/app_shell.cpp" line="187"/>
+        <location filename="../src/app/app_shell.cpp" line="1592"/>
         <source>Close blocked: %1 has unsaved changes</source>
         <translation>已阻止关闭：%1 有未保存的更改</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="543"/>
-        <location filename="../src/app/main.cpp" line="383"/>
+        <location filename="../src/app/app_shell.cpp" line="559"/>
+        <location filename="../src/app/main.cpp" line="385"/>
         <source>&amp;Edit</source>
         <translation>编辑(&amp;E)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="545"/>
+        <location filename="../src/app/app_shell.cpp" line="561"/>
         <source>&amp;Project</source>
         <translation>项目(&amp;P)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="556"/>
+        <location filename="../src/app/app_shell.cpp" line="572"/>
         <source>&amp;Undo</source>
         <translation>撤销(&amp;U)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="558"/>
+        <location filename="../src/app/app_shell.cpp" line="574"/>
         <source>&amp;Redo</source>
         <translation>重做(&amp;R)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="568"/>
+        <location filename="../src/app/app_shell.cpp" line="589"/>
         <source>&amp;New</source>
         <translation>新建(&amp;N)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="605"/>
+        <location filename="../src/app/app_shell.cpp" line="626"/>
         <source>Save A&amp;ll</source>
         <translation>全部保存(&amp;L)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="634"/>
+        <location filename="../src/app/app_shell.cpp" line="658"/>
         <source>&amp;Toolbar</source>
         <translation>工具栏(&amp;T)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="643"/>
+        <location filename="../src/app/app_shell.cpp" line="667"/>
         <source>Search in &amp;Files</source>
         <translation>在文件中搜索(&amp;F)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="653"/>
+        <location filename="../src/app/app_shell.cpp" line="672"/>
+        <source>&amp;Next Tab</source>
+        <translation>下一个标签页(&amp;N)</translation>
+    </message>
+    <message>
+        <location filename="../src/app/app_shell.cpp" line="674"/>
+        <source>Pre&amp;vious Tab</source>
+        <translation>上一个标签页(&amp;P)</translation>
+    </message>
+    <message>
+        <location filename="../src/app/app_shell.cpp" line="684"/>
         <source>To&amp;ggle Files Panel</source>
         <translation>切换文件面板(&amp;G)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="654"/>
+        <location filename="../src/app/app_shell.cpp" line="685"/>
         <source>To&amp;ggle Search Panel</source>
         <translation>切换搜索面板(&amp;G)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="655"/>
+        <location filename="../src/app/app_shell.cpp" line="686"/>
         <source>To&amp;ggle Terminal Panel</source>
         <translation>切换终端面板(&amp;G)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="658"/>
+        <location filename="../src/app/app_shell.cpp" line="689"/>
         <source>To&amp;ggle Source Control Panel</source>
         <translation>切换源代码管理面板(&amp;G)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="659"/>
+        <location filename="../src/app/app_shell.cpp" line="690"/>
         <source>To&amp;ggle Outline Panel</source>
         <translation>切换大纲面板(&amp;G)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="690"/>
+        <location filename="../src/app/app_shell.cpp" line="721"/>
         <source>&amp;User Manual</source>
         <translation>用户手册(&amp;U)</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="738"/>
+        <location filename="../src/app/app_shell.cpp" line="779"/>
         <source>Session saved (%1)</source>
         <translation>会话已保存（%1）</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="894"/>
+        <location filename="../src/app/app_shell.cpp" line="947"/>
         <source>Main Toolbar</source>
         <translation>主工具栏</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1000"/>
+        <location filename="../src/app/app_shell.cpp" line="1053"/>
         <source>The built-in user manual could not be opened</source>
         <translation>无法打开内置用户手册</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1043"/>
+        <location filename="../src/app/app_shell.cpp" line="1096"/>
         <source>Save All failed for %1 document(s)</source>
         <translation>保存全部失败：%1 个文档</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1049"/>
+        <location filename="../src/app/app_shell.cpp" line="1102"/>
         <source>Saved %1 document(s); %2 untitled document(s) need Save As</source>
         <translation>已保存 %1 个文档；%2 个未命名文档需要另存为</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1054"/>
+        <location filename="../src/app/app_shell.cpp" line="1107"/>
         <source>Saved %1 document(s)</source>
         <translation>已保存 %1 个文档</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1537"/>
+        <location filename="../src/app/app_shell.cpp" line="1590"/>
         <source>close refused (headless): %1 has unsaved changes</source>
         <translation>已拒绝关闭（无界面）：%1 有未保存的更改</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1545"/>
-        <location filename="../src/app/app_shell.cpp" line="1707"/>
+        <location filename="../src/app/app_shell.cpp" line="1598"/>
+        <location filename="../src/app/app_shell.cpp" line="1760"/>
         <source>Unsaved changes</source>
         <translation>未保存的更改</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1546"/>
+        <location filename="../src/app/app_shell.cpp" line="1599"/>
         <source>%1 has unsaved changes.</source>
         <translation>%1 有未保存的更改。</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1549"/>
+        <location filename="../src/app/app_shell.cpp" line="1602"/>
         <source>This document has no file path yet, so it cannot be saved here.</source>
         <translation>此文档尚无文件路径，无法在此保存。</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1550"/>
+        <location filename="../src/app/app_shell.cpp" line="1603"/>
         <source>Close it and discard the changes?</source>
         <translation>关闭并丢弃更改？</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1552"/>
+        <location filename="../src/app/app_shell.cpp" line="1605"/>
         <source>Save the document before closing, or discard the changes?</source>
         <translation>关闭前保存文档，或丢弃更改？</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1553"/>
+        <location filename="../src/app/app_shell.cpp" line="1606"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1554"/>
+        <location filename="../src/app/app_shell.cpp" line="1607"/>
         <source>Discard</source>
         <translation>丢弃</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1555"/>
-        <location filename="../src/app/app_shell.cpp" line="1718"/>
+        <location filename="../src/app/app_shell.cpp" line="1608"/>
+        <location filename="../src/app/app_shell.cpp" line="1771"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1698"/>
+        <location filename="../src/app/app_shell.cpp" line="1751"/>
         <source>close refused (headless): %1 documents have unsaved changes</source>
         <translation>已拒绝关闭（无界面）：%1 个文档有未保存的更改</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1687"/>
-        <location filename="../src/app/app_shell.cpp" line="1701"/>
+        <location filename="../src/app/app_shell.cpp" line="1740"/>
+        <location filename="../src/app/app_shell.cpp" line="1754"/>
         <source>Close blocked: %1 documents have unsaved changes</source>
         <translation>已阻止关闭：%1 个文档有未保存的更改</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1708"/>
+        <location filename="../src/app/app_shell.cpp" line="1761"/>
         <source>%1 documents have unsaved changes.</source>
         <translation>%1 个文档有未保存的更改。</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1714"/>
+        <location filename="../src/app/app_shell.cpp" line="1767"/>
         <source>Save all of them before continuing, or discard the changes?</source>
         <translation>继续前保存全部，或丢弃更改？</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1716"/>
+        <location filename="../src/app/app_shell.cpp" line="1769"/>
         <source>Save All</source>
         <translation>全部保存</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1717"/>
+        <location filename="../src/app/app_shell.cpp" line="1770"/>
         <source>Discard All</source>
         <translation>全部丢弃</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1641"/>
+        <location filename="../src/app/app_shell.cpp" line="1694"/>
         <source>untitled</source>
         <translation>未命名</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1749"/>
+        <location filename="../src/app/app_shell.cpp" line="1802"/>
         <source>Language not switched: restart cancelled</source>
         <translation>语言未切换：重启已取消</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1758"/>
+        <location filename="../src/app/app_shell.cpp" line="1811"/>
         <source>No language store is available; the language was not changed.</source>
         <translation>无可用的语言存储；语言未更改。</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1765"/>
+        <location filename="../src/app/app_shell.cpp" line="1818"/>
         <source>The interface language could not be stored.</source>
         <translation>界面语言无法保存。</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1766"/>
+        <location filename="../src/app/app_shell.cpp" line="1819"/>
         <source>The interface language could not be stored: %1</source>
         <translation>界面语言无法保存：%1</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1773"/>
+        <location filename="../src/app/app_shell.cpp" line="1826"/>
         <source>The session archive could not be written.</source>
         <translation>会话存档无法写入。</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1774"/>
+        <location filename="../src/app/app_shell.cpp" line="1827"/>
         <source>The session archive could not be written: %1</source>
         <translation>会话存档无法写入：%1</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1781"/>
+        <location filename="../src/app/app_shell.cpp" line="1834"/>
         <source>The application could not restart.</source>
         <translation>应用无法重启。</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1782"/>
+        <location filename="../src/app/app_shell.cpp" line="1835"/>
         <source>The application could not restart: %1</source>
         <translation>应用无法重启：%1</translation>
     </message>
     <message>
-        <location filename="../src/app/app_shell.cpp" line="1784"/>
+        <location filename="../src/app/app_shell.cpp" line="1837"/>
         <source>Restarting to apply interface language %1</source>
         <translation>正在重启以应用界面语言 %1</translation>
+    </message>
+    <message>
+        <source>&amp;Theme</source>
+        <translation>主题(&amp;T)</translation>
+    </message>
+    <message>
+        <source>Theme</source>
+        <translation>主题</translation>
+    </message>
+    <message>
+        <source>Theme: %1 / %2</source>
+        <translation>主题：%1 / %2</translation>
+    </message>
+    <message>
+        <source>Theme &apos;%1&apos; could not be applied: %2</source>
+        <translation>主题“%1”无法应用：%2</translation>
+    </message>
+    <message>
+        <source>Ignoring unknown interface theme &apos;%1&apos; (from %2)</source>
+        <translation>忽略未知的界面主题“%1”（来自 %2）</translation>
+    </message>
+    <message>
+        <source>Interface theme &apos;%1&apos; was applied but not stored: no settings store is available.</source>
+        <translation>界面主题“%1”已应用但未保存：当前没有可用的设置存储。</translation>
+    </message>
+    <message>
+        <source>Interface theme &apos;%1&apos; was applied but could not be stored.</source>
+        <translation>界面主题“%1”已应用但无法保存。</translation>
     </message>
 </context>
 <context>
@@ -5907,12 +6022,12 @@ Use &quot;Open...&quot; to browse a project.</source>
     </message>
     <message>
         <location filename="../src/workspace/settings/settings_panel.cpp" line="559"/>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1295"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1304"/>
         <source>The interface language is applied on the next start.</source>
         <translation>界面语言在下次启动时生效。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1293"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1302"/>
         <source>Restart to apply.</source>
         <translation>重启后生效。</translation>
     </message>
@@ -6127,302 +6242,302 @@ Use &quot;Open...&quot; to browse a project.</source>
         <translation>FIM 默认关闭：未配置端点时 VEdit 从不访问网络。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1303"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1312"/>
         <source>The settings store is unavailable.</source>
         <translation>设置存储不可用。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1324"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1333"/>
         <source>The settings store did not answer.</source>
         <translation>设置存储未响应。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1330"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1339"/>
         <source>The settings store refused the write.</source>
         <translation>设置存储拒绝了写入。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1345"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1354"/>
         <source>The interface language is already the stored one.</source>
         <translation>界面语言已是当前保存的值。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1358"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1367"/>
         <source>Restarting to apply the interface language…</source>
         <translation>正在重启以应用界面语言…</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1363"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1372"/>
         <source>Language not switched: restart cancelled</source>
         <translation>语言未切换：重启已取消</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1367"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1376"/>
         <source>The interface language could not be changed.</source>
         <translation>界面语言未能更改。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1483"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1492"/>
         <source>settings.toml held a plaintext `fim.api_key`; it is ignored and will be removed on the next save — use %1 or the owner-only key file instead.</source>
         <translation>settings.toml 中曾以明文保存 `fim.api_key`；它已被忽略，并将在下次保存时移除 — 请改用 %1 或仅所有者可读的密钥文件。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1525"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1534"/>
         <source>Key source: environment variable %1 — it takes priority and is never written to disk.</source>
         <translation>密钥来源：环境变量 %1 — 它优先且永不写入磁盘。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1531"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1540"/>
         <source>Key source: owner-only key file (0600) %1</source>
         <translation>密钥来源：仅所有者可读的密钥文件 (0600) %1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1535"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1544"/>
         <source>Key source: %1 is readable by other users, so it is IGNORED. Run `chmod 600` on it, or use %2.</source>
         <translation>密钥来源：%1 可被其他用户读取，因此被忽略。请对其运行 `chmod 600`，或使用 %2。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1541"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1550"/>
         <source>Key source: none — set %1 or save a key here.</source>
         <translation>密钥来源：无 — 请设置 %1 或在此保存密钥。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1571"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1580"/>
         <source>cannot create the settings directory %1; the API key was NOT stored</source>
         <translation>无法创建设置目录 %1；API 密钥未存储</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1580"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1589"/>
         <source>cannot write the API key file %1: %2; the API key was NOT stored</source>
         <translation>无法写入 API 密钥文件 %1：%2；API 密钥未存储</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1592"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1601"/>
         <source>the API key is empty; nothing was stored</source>
         <translation>API 密钥为空；未存储任何内容</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1603"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1612"/>
         <source>cannot remove the API key file %1</source>
         <translation>无法删除 API 密钥文件 %1</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1614"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1623"/>
         <source>The owner-only key file was removed; %1 is still set and still wins.</source>
         <translation>仅所有者可读的密钥文件已删除；%1 仍被设置且仍然优先。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1617"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1626"/>
         <source>The API key file was removed; FIM has no key.</source>
         <translation>API 密钥文件已删除；FIM 没有密钥。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1873"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1882"/>
         <source>Interface</source>
         <translation>界面</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1880"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1889"/>
         <source>Follow the system</source>
         <translation>跟随系统</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1882"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1891"/>
         <source>ui.font_point_size: application font size in points. Applied immediately; &quot;Follow the system&quot; stores no value at all.</source>
         <translation>ui.font_point_size：应用字体大小（磅）。立即生效；选择「跟随系统」时不保存任何值。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1884"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1893"/>
         <source>Font size:</source>
         <translation>字体大小：</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1892"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1901"/>
         <source>ui.scale_percent: interface zoom. Qt reads QT_SCALE_FACTOR once, when the application is constructed, so this takes effect on the next start.</source>
         <translation>ui.scale_percent：界面缩放。Qt 只在应用构造时读取一次 QT_SCALE_FACTOR，因此下次启动才生效。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1894"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1903"/>
         <source>Interface scale:</source>
         <translation>界面缩放：</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1903"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1912"/>
         <source>The font applies to the whole interface immediately. The editor&apos;s own font is a KTextEditor setting and belongs to the editor lane.</source>
         <translation>字体立即作用于整个界面。编辑器自身的字体是 KTextEditor 的设置，属于编辑器 lane。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1921"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1930"/>
         <source>The options of the selected lint engine (Tools → Lint engine). The page shows one set of controls; both engines keep their own settings, so switching the engine never loses the other one.</source>
         <translation>所选 Lint 引擎的选项（工具 → Lint 引擎）。本页只有一套控件；两个引擎各自保存自己的设置，切换引擎不会丢失另一套。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1928"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1937"/>
         <source>verible-verilog-lint</source>
         <translation>verible-verilog-lint</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1940"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1949"/>
         <source>No flag (verible default)</source>
         <translation>不传标志（verible 默认）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1944"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1953"/>
         <source>Rule set (--ruleset):</source>
         <translation>规则集（--ruleset）：</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1948"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1957"/>
         <source>empty: verible&apos;s built-in rule set</source>
         <translation>空：使用 verible 内置规则集</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1949"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1958"/>
         <source>Rules (--rules):</source>
         <translation>规则（--rules）：</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1952"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1961"/>
         <source>Rules file (--rules_config):</source>
         <translation>规则文件（--rules_config）：</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1959"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1968"/>
         <source>empty: no waiver files (one path per line)</source>
         <translation>空：不使用豁免文件（每行一个路径）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1961"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1970"/>
         <source>Waiver files (--waiver_files):</source>
         <translation>豁免文件（--waiver_files）：</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1965"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1974"/>
         <source>No flag (verible default: no)</source>
         <translation>不传标志（verible 默认：否）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1971"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1980"/>
         <source>Autofix (--autofix):</source>
         <translation>自动修复（--autofix）：</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1974"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1983"/>
         <source>slang</source>
         <translation>slang</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1985"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1994"/>
         <source>empty: slang&apos;s own selection (one -W value per line, e.g. everything)</source>
         <translation>空：使用 slang 自身的选择（每行一个 -W 值，例如 everything）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1987"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1996"/>
         <source>Warnings (-W):</source>
         <translation>警告（-W）：</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1991"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2000"/>
         <source>empty: slang&apos;s own limit</source>
         <translation>空：使用 slang 自身的上限</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1993"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2002"/>
         <source>Error limit (--error-limit):</source>
         <translation>错误上限（--error-limit）：</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="2021"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2030"/>
         <source>Options for verible-verilog-format. An empty value means &quot;use the formatter&apos;s own default&quot;: no flag is passed at all, so an untouched page formats exactly as before.</source>
         <translation>verible-verilog-format 的选项。留空表示「使用格式化器自身的默认值」：完全不传标志，未改动的页面与以前完全一致。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="2028"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2037"/>
         <source>Formatting</source>
         <translation>格式化选项</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="2048"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2057"/>
         <source>Advanced options</source>
         <translation>高级选项</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="2074"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2083"/>
         <source>Restore defaults</source>
         <translation>恢复默认</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="2077"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2086"/>
         <source>Clears every format option, so the formatter&apos;s own defaults apply and no flag is passed.</source>
         <translation>清空所有格式化选项，改用格式化器自身的默认值，不传任何标志。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="2127"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2136"/>
         <source>Scale 100 %: no QT_SCALE_FACTOR override is set.</source>
         <translation>缩放 100%：不设置 QT_SCALE_FACTOR。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="2128"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2137"/>
         <source>Scale %1 %: the next start sets QT_SCALE_FACTOR=%2 — restart VEdit to apply it.</source>
         <translation>缩放 %1%：下次启动将设置 QT_SCALE_FACTOR=%2 —— 重启 VEdit 生效。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="2208"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2217"/>
         <source>verible-verilog-lint (selected)</source>
         <translation>verible-verilog-lint（已选中）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="2209"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2218"/>
         <source>verible-verilog-lint (not the selected engine)</source>
         <translation>verible-verilog-lint（非当前引擎）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="2213"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2222"/>
         <source>slang (selected)</source>
         <translation>slang（已选中）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="2214"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2223"/>
         <source>slang (not the selected engine)</source>
         <translation>slang（非当前引擎）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="2288"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2297"/>
         <source>%1 is sent to the selected lint job.</source>
         <translation>会向所选 Lint 任务发送 %1。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="2295"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2304"/>
         <source>Active engine. --ruleset, --rules, --rules_config and --waiver_files are applied to the lint job; --autofix is stored only (the lint job&apos;s C ABI has no field for it).</source>
         <translation>当前引擎。--ruleset、--rules、--rules_config 与 --waiver_files 会应用到 Lint 任务；--autofix 仅保存（Lint 任务的 C ABI 没有对应字段）。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="2304"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2313"/>
         <source>Active engine. -W and --error-limit are applied to the lint job.</source>
         <translation>当前引擎。-W 与 --error-limit 会应用到 Lint 任务。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="2316"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2325"/>
         <source>Stored but not applied yet (the lint job&apos;s C ABI has no field for them): %1. The values stay in settings.toml and are never sent as a silent no-op.</source>
         <translation>已保存但尚未应用（Lint 任务的 C ABI 没有对应字段）：%1。这些值保留在 settings.toml 中，不会作为静默空操作发送。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="2298"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2307"/>
         <source>Not the selected engine — these controls are disabled. Switch Tools → Lint engine to verible-verilog-lint to edit them; their values are kept.</source>
         <translation>不是当前引擎——这些控件已禁用。切换到 工具 → Lint 引擎 → verible-verilog-lint 即可编辑；它们的值会保留。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="2305"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2314"/>
         <source>Not the selected engine — these controls are disabled. Switch Tools → Lint engine to slang to edit them; their values are kept.</source>
         <translation>不是当前引擎——这些控件已禁用。切换到 工具 → Lint 引擎 → slang 即可编辑；它们的值会保留。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="2313"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2322"/>
         <source>Every option of the selected engine is applied to the lint job.</source>
         <translation>所选引擎的全部选项都会应用到 Lint 任务。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="2378"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2387"/>
         <source>Format options restored to verible&apos;s defaults (no flags are passed).</source>
         <translation>格式化选项已恢复为 verible 默认值（不传任何标志）。</translation>
     </message>
@@ -6437,29 +6552,29 @@ Use &quot;Open...&quot; to browse a project.</source>
         <translation>默认</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="906"/>
         <location filename="../src/workspace/settings/settings_panel.cpp" line="909"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="919"/>
         <source>(unbound)</source>
         <translation>（未绑定）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="916"/>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="919"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="925"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="928"/>
         <source>(none)</source>
         <translation>（无）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="928"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="937"/>
         <source>custom</source>
         <translation>自定义</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="931"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="940"/>
         <source>unbound</source>
         <translation>未绑定</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="933"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="942"/>
         <source>default</source>
         <translation>默认</translation>
     </message>
@@ -6474,12 +6589,12 @@ Use &quot;Open...&quot; to browse a project.</source>
         <translation>全部恢复默认</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="956"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="965"/>
         <source>Every shortcut is back to its default.</source>
         <translation>所有快捷键已恢复默认。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="867"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="870"/>
         <source>Shortcut %1 is already used by %2 — nothing was changed.</source>
         <translation>快捷键 %1 已被 %2 占用，未做任何更改。</translation>
     </message>
@@ -6489,14 +6604,60 @@ Use &quot;Open...&quot; to browse a project.</source>
         <translation>%1（%2）</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="863"/>
-        <source>%1 (the editor&apos;s own action)</source>
-        <translation>%1（编辑器自带操作）</translation>
-    </message>
-    <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="1722"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1731"/>
         <source>%1: %2 also used by the editor (%3)</source>
         <translation>%1：%2 也被编辑器使用（%3）</translation>
+    </message>
+    <message>
+        <source>Interface theme:</source>
+        <translation>界面主题：</translation>
+    </message>
+    <message>
+        <source>Applied immediately and stored as `uiTheme` by the Rust service.</source>
+        <translation>立即生效，由 Rust 服务以 `uiTheme` 存储。</translation>
+    </message>
+    <message>
+        <source>Interface theme &apos;%1&apos; could not be applied.</source>
+        <translation>界面主题“%1”无法应用。</translation>
+    </message>
+    <message>
+        <source>Interface theme &apos;%1&apos; could not be applied: %2</source>
+        <translation>界面主题“%1”无法应用：%2</translation>
+    </message>
+    <message>
+        <source>Interface theme &apos;%1&apos; applied and stored by the Rust service.</source>
+        <translation>界面主题“%1”已应用并由 Rust 服务保存。</translation>
+    </message>
+    <message>
+        <source>Ignoring unknown interface theme &apos;%1&apos; (from %2)</source>
+        <translation>忽略未知的界面主题“%1”（来自 %2）</translation>
+    </message>
+</context>
+<context>
+    <name>product_theme</name>
+    <message>
+        <source>Cloud White</source>
+        <translation>云雾白</translation>
+    </message>
+    <message>
+        <source>Warm Apricot</source>
+        <translation>暖杏黄</translation>
+    </message>
+    <message>
+        <source>Mint Green</source>
+        <translation>薄荷绿</translation>
+    </message>
+    <message>
+        <source>Sky Blue</source>
+        <translation>晴空蓝</translation>
+    </message>
+    <message>
+        <source>Obsidian</source>
+        <translation>曜石黑</translation>
+    </message>
+    <message>
+        <source>Deep Navy</source>
+        <translation>深夜蓝</translation>
     </message>
 </context>
 </TS>

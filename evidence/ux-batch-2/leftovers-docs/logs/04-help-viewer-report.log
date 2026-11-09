@@ -1,0 +1,29 @@
+$ head -1 docs/USER_GUIDE.md
+# VEdit 用户手册
+
+$ git diff -- src/app/help_viewer.h
+diff --git a/src/app/help_viewer.h b/src/app/help_viewer.h
+index 00e0a80..2dd2d35 100644
+--- a/src/app/help_viewer.h
++++ b/src/app/help_viewer.h
+@@ -27,7 +27,7 @@ public:
+ 
+     // The Markdown source shipped in the binary (empty when the resource is
+     // missing, e.g. a build tree without the .qrc); the manual's first H1
+-    // heading ("VEdit 用户指南"); and the window title.
++    // heading ("VEdit 用户手册"); and the window title.
+     static QString manualMarkdown();
+     static QString manualTitle();
+ 
+
+$ sed -n "30p" src/app/help_viewer.h
+    // heading ("VEdit 用户手册"); and the window title.
+
+$ stat -c "%y" src/app/help_viewer.h
+2026-11-07 00:12:21.985677464 +0800
+
+$ grep -n "kManualTitle" -A2 src/app/ux_selftest.cpp
+188:const QString kManualTitle = QStringLiteral("VEdit 用户手册");
+189-
+190-void testStructure(const QString &directory)
+--

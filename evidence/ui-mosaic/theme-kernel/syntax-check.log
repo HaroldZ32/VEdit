@@ -1,0 +1,9 @@
+== src/app/product_theme.cpp
+   OK
+== src/app/themed_icons.cpp
+   OK
+== src/app/theme_manager.cpp
+   OK
+== src/app/ui_theme_selftest.cpp
+   OK
+ALL-SYNTAX-OK

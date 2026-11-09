@@ -1,6 +1,10 @@
 #pragma once
 
-// FIX 2: opening a `.f` / `.F` / `.flist` filelist imports it as the project.
+// FIX 2: opening a `.f` / `.F` filelist imports it as the project.
+//
+// (`.flist` is not a filelist extension: only `f`, case-insensitive, decided by
+// the parser — crates/vd-config/src/project.rs. The set has one definition,
+// src/common/file_dialog_filters.h.)
 //
 // The app layer only says "this document was opened" (one lane-agnostic
 // ApplicationShell::fileOpened signal). THIS lane decides what an extension
@@ -21,7 +25,7 @@ namespace vedit::workspace::project {
 
 // What the project lane should do with an opened document path.
 struct OpenedFilelistPlan {
-    // The document is a filelist (extension .f/.F/.flist, case-insensitive).
+    // The document is a filelist (extension .f/.F, case-insensitive).
     bool isFilelist = false;
     // No project is open, so `root` must be set before importing.
     bool needsRoot = false;

@@ -44,6 +44,22 @@ public:
     // (the shell reparents it into the pane). Must return a non-null widget.
     virtual QWidget *createEditor(QWidget *parent) = 0;
 
+    // --- syntax-theme seam (UI-Mosaic F2) -----------------------------------
+    // Hands the ACTIVE syntax theme name (ThemeManager::syntaxThemeName()) to
+    // the editor implementation, which renders it with its OWN theme support.
+    // This is the consumer the 30 KSyntaxHighlighting themes were always meant
+    // to have: once a product theme owns the chrome, applyTheme() no longer
+    // repaints the application palette (contract §1.5), so without this seam a
+    // syntax theme change would have no visible effect at all.
+    //
+    // The shell calls it on every successful ThemeManager::applyTheme(), and
+    // once with the already-current name when a provider is installed (the
+    // product start applies the theme, then the editor lane swaps the
+    // provider). An implementation must apply it to every view it created and
+    // to every view created later; a provider whose widget simply follows the
+    // application palette keeps the default no-op.
+    virtual void applySyntaxTheme(const QString &themeName);
+
     // --- document seam (edit-core, Slice 1) --------------------------------
     // Open/save the file shown in one editor widget. Callers (the shell, the
     // workspace lanes) use this instead of casting the widget themselves; the
@@ -155,6 +171,11 @@ inline QString EditorProvider::currentFilePath(QWidget *editor) const
         return QString();
     }
     return editor->property("vedit.openFilePath").toString();
+}
+
+inline void EditorProvider::applySyntaxTheme(const QString &themeName)
+{
+    Q_UNUSED(themeName);
 }
 
 inline QString EditorProvider::statusText(QWidget *editor) const

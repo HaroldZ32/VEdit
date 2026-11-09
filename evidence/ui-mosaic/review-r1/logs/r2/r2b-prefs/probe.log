@@ -1,0 +1,41 @@
+=== F1 probe entry=prefs label=r2b-prefs bin=/vedit-build/evidence/ui-mosaic/review-r1/logs/review-r1-binary at 2026-11-08T23:34:37+08:00 ===
+focus win=0x200007
+app win=0x200007 geom=(x=0,y=0,w=1280,h=820)
+app origin=(0,0) size=1280x820
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/r2/r2b-prefs/01-start.png (1680, 1050)
+settings@start:
+uiTheme = "bohe"
+archive@start: 
+focus win=0x200007
+preferences dialog=(180,0 900x948)
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/r2/r2b-prefs/02-prefs.png (1680, 1050)
+ui theme combo popup=(323,7 721x144)
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/r2/r2b-prefs/03-uicombo.png (1680, 1050)
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/r2/r2b-prefs/04-picked.png (1680, 1050)
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/r2/r2b-prefs/05-ok.png (1680, 1050)
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/r2/r2b-prefs/06-after-switch.png (1680, 1050)
+settings@after-switch:
+"fim.enabled" = "false"
+"fim.ghost_text" = "false"
+"fim.max_tokens" = "64"
+"fim.protocol" = "open_ai"
+"fim.timeout_ms" = "5000"
+"tools.lint_engine" = "slang"
+"tools.lsp_backend" = "verible"
+uiTheme = "qingkong"
+archive@after-switch: 
+focus win=0x200007
+settings@after-quit:
+"fim.enabled" = "false"
+"fim.ghost_text" = "false"
+"fim.max_tokens" = "64"
+"fim.protocol" = "open_ai"
+"fim.timeout_ms" = "5000"
+"tools.lint_engine" = "slang"
+"tools.lsp_backend" = "verible"
+uiTheme = "qingkong"
+archive@after-quit: qingkong
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/r2/r2b-prefs/08-after-quit.png (1680, 1050)
+restart-probe:
+theme=qingkong
+status-theme=Theme:

@@ -1,0 +1,15 @@
+CHECK PASS negative: vedit.desktop carries Icon=io.github.vedit.VEdit
+CHECK PASS negative: vedit.desktop carries StartupWMClass=io.github.vedit.VEdit
+CHECK PASS negative: icon artifact present: io.github.vedit.VEdit.png (34447 bytes)
+CHECK PASS negative: icon artifact present: .DirIcon (34447 bytes)
+CHECK PASS negative: icon artifact present: usr/share/icons/hicolor/16x16/apps/io.github.vedit.VEdit.png (629 bytes)
+CHECK FAIL negative: icon artifact missing or empty: usr/share/icons/hicolor/24x24/apps/io.github.vedit.VEdit.png
+CHECK PASS negative: icon artifact present: usr/share/icons/hicolor/32x32/apps/io.github.vedit.VEdit.png (1946 bytes)
+CHECK PASS negative: icon artifact present: usr/share/icons/hicolor/48x48/apps/io.github.vedit.VEdit.png (3331 bytes)
+CHECK PASS negative: icon artifact present: usr/share/icons/hicolor/64x64/apps/io.github.vedit.VEdit.png (5073 bytes)
+CHECK PASS negative: icon artifact present: usr/share/icons/hicolor/128x128/apps/io.github.vedit.VEdit.png (12061 bytes)
+CHECK PASS negative: icon artifact present: usr/share/icons/hicolor/256x256/apps/io.github.vedit.VEdit.png (34447 bytes)
+CHECK PASS negative: icon artifact present: usr/share/icons/hicolor/512x512/apps/io.github.vedit.VEdit.png (122932 bytes)
+CHECK PASS negative: io.github.vedit.VEdit.png is a PNG (magic ok)
+CHECK PASS negative: .DirIcon is a PNG (magic ok)
+SUMMARY label=negative ok=13 bad=1

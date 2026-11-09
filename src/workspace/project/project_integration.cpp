@@ -1,6 +1,7 @@
 #include "project_integration.h"
 
 #include "app_shell.h"
+#include "panel_registry.h"
 #include "project_filelist.h"
 #include "project_model.h"
 #include "project_panel.h"
@@ -83,6 +84,9 @@ void installProject(vedit::app::ApplicationShell &shell, const IntegrationOption
     dock->setObjectName(QStringLiteral("dock-project"));
     dock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
     dock->setWidget(panel);
+    // 这张 dock 由 lane 自己创建，绕过了 PanelRegistry::insert()；补上同一套
+    // 卡片外观（veditDockCard 属性 + 投影/描边 + 调色板监听）。
+    vedit::app::PanelRegistry::applyCardChrome(dock);
     shell.addDockWidget(Qt::LeftDockWidgetArea, dock);
 
     // The dock exists from the start (so opening a folder has somewhere to

@@ -1,0 +1,81 @@
+{
+  "surface": "#FFFFFF",
+  "results": [
+    {
+      "tag": "menu",
+      "style": "fusion",
+      "menuOpened": true,
+      "bbox": [
+        700,
+        420,
+        870,
+        474
+      ],
+      "area": 9180,
+      "pureBlack": 0,
+      "pureBlackPass": true,
+      "dominant": "#FFFFFF",
+      "dominantShare": 0.824,
+      "surface": "#FFFFFF",
+      "dominantDeltaMax": 0,
+      "dominantPass": true
+    },
+    {
+      "tag": "view",
+      "style": "fusion",
+      "menuOpened": true,
+      "bbox": [
+        119,
+        0,
+        472,
+        514
+      ],
+      "area": 181442,
+      "pureBlack": 0,
+      "pureBlackPass": true,
+      "dominant": "#FFFFFF",
+      "dominantShare": 0.826,
+      "surface": "#FFFFFF",
+      "dominantDeltaMax": 0,
+      "dominantPass": true
+    },
+    {
+      "tag": "menu",
+      "style": "windows",
+      "menuOpened": true,
+      "bbox": [
+        700,
+        420,
+        869,
+        474
+      ],
+      "area": 9126,
+      "pureBlack": 0,
+      "pureBlackPass": true,
+      "dominant": "#FFFFFF",
+      "dominantShare": 0.823,
+      "surface": "#FFFFFF",
+      "dominantDeltaMax": 0,
+      "dominantPass": true
+    },
+    {
+      "tag": "view",
+      "style": "windows",
+      "menuOpened": true,
+      "bbox": [
+        101,
+        0,
+        454,
+        514
+      ],
+      "area": 181442,
+      "pureBlack": 0,
+      "pureBlackPass": true,
+      "dominant": "#FFFFFF",
+      "dominantShare": 0.826,
+      "surface": "#FFFFFF",
+      "dominantDeltaMax": 0,
+      "dominantPass": true
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+=== A1/R3 mtime arbitration, binary e9ede03e03fe82273be14e6706cdde8eb91b2db506045ad059b60be9a6c25fcd ===
+--- mtimes (epoch + human) ---
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict-v2/caseA-settings-old/state/settings.toml mtime=1794148550 (2026-11-08 22:35:50.000000000 +0800)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict-v2/caseA-settings-old/state/session.json mtime=1794152090 (2026-11-08 23:34:50.000000000 +0800)
+--- original values ---
+settings: uiTheme = "xinghuang"
+archive : bohe
+probe:         [ui-probe] theme=bohe
+diagnostic:    
+settings@exit: uiTheme = "xinghuang"
+archive@exit:  bohe
+
+--- mtimes (epoch + human) ---
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict-v2/caseB-settings-new/state/settings.toml mtime=1794152090 (2026-11-08 23:34:50.000000000 +0800)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict-v2/caseB-settings-new/state/session.json mtime=1794148550 (2026-11-08 22:35:50.000000000 +0800)
+--- original values ---
+settings: uiTheme = "bohe"
+archive : xinghuang
+probe:         [ui-probe] theme=bohe
+diagnostic:    
+settings@exit: uiTheme = "bohe"
+archive@exit:  bohe
+
+--- mtimes (epoch + human) ---
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict-v2/caseC-equal-mtime/state/settings.toml mtime=1794151550 (2026-11-08 23:25:50.000000000 +0800)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict-v2/caseC-equal-mtime/state/session.json mtime=1794151550 (2026-11-08 23:25:50.000000000 +0800)
+--- original values ---
+settings: uiTheme = "bohe"
+archive : xinghuang
+probe:         [ui-probe] theme=bohe
+diagnostic:    
+settings@exit: uiTheme = "bohe"
+archive@exit:  bohe
+
+--- mtimes (epoch + human) ---
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict-v2/caseD1-invalid-settings/state/settings.toml mtime=1794152090 (2026-11-08 23:34:50.000000000 +0800)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict-v2/caseD1-invalid-settings/state/session.json mtime=1794148550 (2026-11-08 22:35:50.000000000 +0800)
+--- original values ---
+settings: uiTheme = "bogus"
+archive : bohe
+probe:         [ui-probe] theme=bohe
+diagnostic:    [ui-probe] diagnostic=Ignoring unknown interface theme 'bogus' (from settings.toml)
+settings@exit: uiTheme = "bogus"
+archive@exit:  bohe
+
+--- mtimes (epoch + human) ---
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict-v2/caseD2-invalid-archive/state/settings.toml mtime=1794152090 (2026-11-08 23:34:50.000000000 +0800)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict-v2/caseD2-invalid-archive/state/session.json mtime=1794148550 (2026-11-08 22:35:50.000000000 +0800)
+--- original values ---
+settings: uiTheme = "bohe"
+archive : bogus
+probe:         [ui-probe] theme=bohe
+diagnostic:    [ui-probe] diagnostic=Ignoring unknown interface theme 'bogus' (from session archive)
+settings@exit: uiTheme = "bohe"
+archive@exit:  bohe
+
+--- mtimes (epoch + human) ---
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict-v2/caseD3-both-invalid/state/settings.toml mtime=1794152090 (2026-11-08 23:34:50.000000000 +0800)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/f1-conflict-v2/caseD3-both-invalid/state/session.json mtime=1794148550 (2026-11-08 22:35:50.000000000 +0800)
+--- original values ---
+settings: uiTheme = "bogus"
+archive : bogus
+probe:         [ui-probe] theme=yunwu
+diagnostic:    [ui-probe] diagnostic=Ignoring unknown interface theme 'bogus' (from settings.toml)
+settings@exit: uiTheme = "bogus"
+archive@exit:  yunwu
+
+--- mtimes (epoch + human) ---
+--- original values ---
+settings: <absent>
+archive : <absent>
+probe:         [ui-probe] theme=yunwu
+diagnostic:    
+settings@exit: <absent>
+archive@exit:  yunwu

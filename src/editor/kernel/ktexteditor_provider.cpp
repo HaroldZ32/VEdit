@@ -20,6 +20,9 @@
 #include <KTextEditor/Editor>
 #include <KTextEditor/View>
 
+#include <KSyntaxHighlighting/Repository>
+#include <KSyntaxHighlighting/Theme>
+
 #include <QFileInfo>
 #include <QPlainTextEdit>
 #include <QPointer>
@@ -33,6 +36,41 @@ namespace vedit::editor {
 namespace {
 
 constexpr auto kOpenFilePathProperty = "vedit.openFilePath";
+
+// UI-Mosaic F2: the theme name KTextEditor can actually render, or an empty
+// string when even the repository default is unusable (KTextEditor missing).
+// KTextEditor renders with its OWN KSyntaxHighlighting repository
+// (KateHlManager's singleton), which is NOT the repository ThemeManager
+// enumerates (T127), so the name is validated against the editor's repository:
+// an unknown name falls back to the editor's current global theme instead of
+// leaving the view in an undefined state.
+QString ktextEditorThemeName(const QString &requested)
+{
+    KTextEditor::Editor *editor = KTextEditor::Editor::instance();
+    if (editor == nullptr) {
+        return QString();
+    }
+    const KSyntaxHighlighting::Repository &repository = editor->repository();
+    if (!requested.isEmpty() && repository.theme(requested).isValid()) {
+        return requested;
+    }
+    const KSyntaxHighlighting::Theme current = editor->theme();
+    if (current.isValid()) {
+        return current.name();
+    }
+    return repository.defaultTheme(KSyntaxHighlighting::Repository::LightTheme).name();
+}
+
+// One view's syntax theme. The "theme" config key is the documented per-view
+// switch (ViewPrivate applies the KSyntaxHighlighting theme to the renderer);
+// it is what renders backgrounds, text and the per-token styles.
+void applyThemeToView(KTextEditor::View *view, const QString &themeName)
+{
+    if (view == nullptr || themeName.isEmpty()) {
+        return;
+    }
+    view->setConfigValue(QStringLiteral("theme"), themeName);
+}
 
 KTextEditor::View *viewFrom(QWidget *widget)
 {
@@ -97,6 +135,11 @@ QWidget *EditCoreProvider::createEditor(QWidget *parent)
     // the widget (EditorPane deletes it when the provider changes).
     document->setParent(view);
     view->setObjectName(QStringLiteral("ktexteditor-view"));
+    // UI-Mosaic F2: this view renders the syntax theme the shell selected. The
+    // setting is per VIEW (KTextEditor keeps one theme per view, not per
+    // document), so every newly created view has to be told; a later switch is
+    // pushed into all open views by applySyntaxTheme().
+    applyThemeToView(view, syntaxTheme_);
 #if defined(VEDIT_EDIT_CORE_HAVE_FOLDING)
     // T94: the live wiring of the folding/breadcrumb lanes. The binding is a
     // child of the view, so it dies with it; the provider only forwards status
@@ -140,6 +183,32 @@ QWidget *EditCoreProvider::createEditor(QWidget *parent)
     vedit::editor::SignatureHelp::install(view);
     vedit::editor::EditorAdvanced::install(view);
     return view;
+}
+
+void EditCoreProvider::applySyntaxTheme(const QString &themeName)
+{
+    const QString resolved = ktextEditorThemeName(themeName);
+    if (resolved.isEmpty()) {
+        // KTextEditor is unavailable in this build: createEditor() already
+        // falls back to the read-only plain-text stub, so there is no renderer
+        // to configure and nothing to report as a failure.
+        return;
+    }
+    syntaxTheme_ = resolved;
+    KTextEditor::Editor *editor = KTextEditor::Editor::instance();
+    if (editor == nullptr) {
+        return;
+    }
+    const QList<KTextEditor::Document *> documents = editor->documents();
+    for (KTextEditor::Document *document : documents) {
+        if (document == nullptr) {
+            continue;
+        }
+        const QList<KTextEditor::View *> views = document->views();
+        for (KTextEditor::View *view : views) {
+            applyThemeToView(view, syntaxTheme_);
+        }
+    }
 }
 
 bool EditCoreProvider::openFile(QWidget *editor, const QString &absolutePath, QString *error)

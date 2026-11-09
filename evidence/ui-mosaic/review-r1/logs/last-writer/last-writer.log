@@ -1,0 +1,15 @@
+=== F1 last-writer probe 2026-11-08T23:18:06+08:00 ===
+focus win=0x200007
+origin=(0,0)
+settings@start: uiTheme = "bohe"
+settings@after-switch-1: uiTheme = "qingkong"
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/last-writer/01-after-switch-1.png (1680, 1050)
+toolbar popup=(1236,66 146x166)
+settings@after-switch-2: uiTheme = "yaoshi"
+shot /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/review-r1/logs/last-writer/02-after-switch-2.png (1680, 1050)
+focus win=0x200007
+settings@after-quit: uiTheme = "yaoshi"
+archive@after-quit: yaoshi
+restart-probe:
+theme=yaoshi
+status-theme=Theme: Obsidian / Breeze Dark style=2 toolbarIconSize=20x20

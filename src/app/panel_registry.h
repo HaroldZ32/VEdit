@@ -37,6 +37,11 @@ public:
     PanelRegistry();
     ~PanelRegistry();
 
+    // 给 dock 装上卡片外观（veditDockCard 属性 + 浅色投影 + 调色板监听）。注册表
+    // 插入的 dock 自动调用；lane 自建、绕过注册表的 dock（Project）也要调它，
+    // 两边才会长得一样。
+    static void applyCardChrome(QDockWidget *dock);
+
     void addPanel(PanelSpec spec);
     bool contains(const QString &id) const;
     // AC-1.3 (batch 1b): the registered title, so the shell can build a View-menu

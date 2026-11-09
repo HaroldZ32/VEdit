@@ -25,7 +25,28 @@ set -uo pipefail
 
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 EVID="$ROOT/evidence/m0-hostmatrix"
-APPIMAGE=${VEDIT_APPIMAGE:-$ROOT/packaging/runtime/out/VEdit-0.1.1-x86_64.probe.AppImage}
+# Default artefact: the NEWEST VEdit-*x86_64*.AppImage in the delivery directory.
+# The old default pinned the 0.1.1 probe name, which stopped existing after the
+# 0.2.1 bump (and never matched a real file: the release writes
+# `VEdit-<version>-x86_64.AppImage`). Newest-by-mtime keeps this helper working
+# across releases without editing it again; the final fallback names the current
+# release so the "no AppImage at ..." error stays actionable on a fresh checkout.
+pick_default_appimage() {
+    local best="" best_stamp=0 candidate stamp
+    for candidate in "$ROOT"/packaging/runtime/out/VEdit-*x86_64*.AppImage; do
+        [ -f "$candidate" ] || continue
+        stamp=$(stat -c %Y "$candidate" 2>/dev/null || stat -f %m "$candidate" 2>/dev/null || echo 0)
+        if [ "$stamp" -ge "$best_stamp" ]; then
+            best_stamp=$stamp
+            best=$candidate
+        fi
+    done
+    printf '%s' "$best"
+}
+APPIMAGE=${VEDIT_APPIMAGE:-$(pick_default_appimage)}
+if [ -z "$APPIMAGE" ]; then
+    APPIMAGE=$ROOT/packaging/runtime/out/VEdit-0.2.1-x86_64.AppImage
+fi
 SIDECAR=vedit-hostmatrix-xside:local
 NET=vedit-hm-net
 CENTOS=docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4

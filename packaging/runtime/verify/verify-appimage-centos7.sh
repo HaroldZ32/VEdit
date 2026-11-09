@@ -2,7 +2,7 @@
 # verify-appimage-centos7.sh — one-file, no-network, no-install acceptance check
 # for the VEdit AppImage on a real CentOS 7 machine (kernel 3.10 / glibc 2.17).
 #
-#   scp VEdit-0.2.1-x86_64.AppImage verify-appimage-centos7.sh  <user>@<vm>:~/
+#   scp VEdit-0.2.2-x86_64.AppImage verify-appimage-centos7.sh  <user>@<vm>:~/
 #   bash verify-appimage-centos7.sh
 #
 # What it does (every item is evidence, not "looks right"):
@@ -85,12 +85,12 @@ APPIMAGE=""
 if [ $# -gt 0 ] && [ -f "$1" ]; then
     APPIMAGE="$1"
 else
-    for cand in "$SCRIPT_DIR/VEdit-0.2.1-x86_64.AppImage" "$SCRIPT_DIR"/VEdit-*x86_64.AppImage; do
+    for cand in "$SCRIPT_DIR/VEdit-0.2.2-x86_64.AppImage" "$SCRIPT_DIR"/VEdit-*x86_64.AppImage; do
         [ -f "$cand" ] && { APPIMAGE="$cand"; break; }
     done
 fi
 if [ -z "$APPIMAGE" ]; then
-    result FAIL appimage.found expected="VEdit-0.2.1-x86_64.AppImage next to this script" \
+    result FAIL appimage.found expected="VEdit-0.2.2-x86_64.AppImage next to this script" \
         actual="not found in $SCRIPT_DIR" note="copy the AppImage and this script into the same directory"
     record ""
     record "SUMMARY: PASS=$PASS FAIL=$FAIL SKIP=$SKIP"

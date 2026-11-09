@@ -1,0 +1,17 @@
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/visual-fix/driver_v11.py:86: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  nonblack = sum(1 for p in im.getdata() if sum(p) > 30)
+shot v11-dialog-fusion (1680, 1050)
+shot v11-menu-fusion (1680, 1050)
+shot v11-closed-fusion (1680, 1050)
+shot v11-view-before-fusion (1680, 1050)
+shot v11-view-fusion (1680, 1050)
+done
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/visual-fix/driver_v11.py:86: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  nonblack = sum(1 for p in im.getdata() if sum(p) > 30)
+shot v11-dialog-windows (1680, 1050)
+shot v11-menu-windows (1680, 1050)
+shot v11-closed-windows (1680, 1050)
+shot v11-view-before-windows (1680, 1050)
+shot v11-view-windows (1680, 1050)
+done
+OK: screenshots in /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/visual-fix

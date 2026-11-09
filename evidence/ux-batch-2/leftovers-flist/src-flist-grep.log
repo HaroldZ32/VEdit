@@ -1,0 +1,21 @@
+src/workspace/project/project_filelist.cpp:19:    // `.flist` spelling is NOT a filelist.
+src/workspace/project/project_filelist.h:5:// (`.flist` is not a filelist extension: only `f`, case-insensitive, decided by
+src/workspace/project/project_selftest.cpp:239:    // extension: `.flist` is NOT one (see the ruling in 6c below).
+src/workspace/project/project_selftest.cpp:555:        // Ruling: `.flist` is not a filelist extension; only `f` case-insensitive,
+src/workspace/project/project_selftest.cpp:559:        const auto flist =
+src/workspace/project/project_selftest.cpp:560:            vedit::workspace::project::planOpenedFilelist(QStringLiteral("/p/run.flist"), true);
+src/workspace/project/project_selftest.cpp:561:        check("filelist.plan.flist-not-a-filelist",
+src/workspace/project/project_selftest.cpp:562:              !flist.isFilelist && !flist.needsRoot && flist.absolutePath.isEmpty());
+src/app/app_shell.cpp:48:    // literal here advertised `.flist`, which no producer/consumer of a filelist
+src/app/app_shell.h:217:    // case-insensitive, so a `.flist` is not a filelist.
+src/app/file_dialog_filters_selftest.cpp:10://     `.flist`),
+src/app/file_dialog_filters_selftest.cpp:165:    check("shared.not-filelist-flist",
+src/app/file_dialog_filters_selftest.cpp:166:          !vedit::common::isFilelistPath(QStringLiteral("top.flist")));
+src/app/file_dialog_filters_selftest.cpp:172:    // filelist-claiming entries carried the guessed `*.flist`.)
+src/app/file_dialog_filters_selftest.cpp:202:    // No entry anywhere may advertise the guessed `.flist`.
+src/app/file_dialog_filters_selftest.cpp:205:            QStringLiteral("open.entry%1.no-guessed-flist").arg(index).toUtf8();
+src/app/file_dialog_filters_selftest.cpp:206:        check(name.constData(), !openTable.at(index).contains(QStringLiteral("*.flist")),
+src/app/main.cpp:800:        // The old check demanded the GUESSED `*.flist` as well; that glob is gone
+src/app/main.cpp:807:        check("open.filter.no-guessed-flist", !filter.contains(QStringLiteral("*.flist")),
+src/common/file_dialog_filters.h:8:// (`*.f *.F *.flist` in the open dialog and in the import dialog), while the
+src/common/file_dialog_filters.h:18:// So `.flist` was a UI GUESS that no producer/consumer of filelists recognises:

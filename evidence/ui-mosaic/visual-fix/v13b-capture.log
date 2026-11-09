@@ -1,0 +1,7 @@
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/visual-fix/driver_v13b.py:28: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  nonblack = sum(1 for p in im.getdata() if sum(p) > 30)
+shot v13b-project-yunwu full=(1680, 1050) crop=(0, 60, 620, 640)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/visual-fix/driver_v13b.py:28: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  nonblack = sum(1 for p in im.getdata() if sum(p) > 30)
+shot v13b-project-yaoshi full=(1680, 1050) crop=(0, 60, 620, 640)
+OK: V13b screenshots in /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/visual-fix

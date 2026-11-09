@@ -1,0 +1,31 @@
+ok   product.themes.count
+ok   product.themes.order
+ok   product.themes.lookup
+ok   product.themes.unknown-null
+ok   product.themes.darkness
+ok   product.themes.darkness-unknown-false
+ok   product.stylesheet.render
+ok   product.palette.contrast
+ok   icons.app.dark
+ok   icons.app.light
+ok   icons.app.mono
+ok   icons.actions.list
+ok   icons.actions.render
+ok   manager.default-ui-theme
+ok   manager.ui-theme-ids
+ok   manager.unknown-rejected
+ok   manager.unknown-keeps-state
+ok   manager.apply
+ok   manager.current
+ok   manager.palette-applied
+ok   manager.stylesheet-applied
+ok   manager.window-icon-applied
+ok   manager.syntax-keeps-product-theme
+ok   manager.empty-id-default
+ok   manager.stylesheet-card-renders
+ok   manager.dock-separator-gap
+ok   manager.dock-card-title-border
+ok   manager.dock-card-body
+ok   manager.dock-card-round-corner
+PASS: 0 failure(s)
+exit=0

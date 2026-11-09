@@ -1,0 +1,22 @@
+old messages: 1244  new messages: 1256
+old finished+translated: 1244
+new finished+translated: 1256
+ADDED: 15  REMOVED: 3  CHANGED: 0  LOST: 0
+  REMOVED ctx='VEdit' src='Verilog filelists (*.f *.F *.flist);;All files (*)' kind=finished val='Verilog filelist (*.f *.F *.flist);;所有文件 (*)'
+  REMOVED ctx='VEdit' src='Verilog/SystemVerilog/filelist (*.v *.sv *.svh *.vh *.f *.F *.flist);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F *.flist);;All Files (*)' kind=finished val='Verilog/SystemVerilog/filelist (*.v *.sv *.svh *.vh *.f *.F *.flist);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F *.flist);;所有文件 (*)'
+  REMOVED ctx='vedit::workspace::settings::SettingsPanel' src="%1 (the editor's own action)" kind=finished val='%1（编辑器自带操作）'
+  ADDED  ctx='VEdit' src=' · top: %1' kind=finished
+  ADDED  ctx='VEdit' src='%1 file(s) outside the top %2 are not analysed' kind=finished
+  ADDED  ctx='VEdit' src='All Files (*)' kind=finished
+  ADDED  ctx='VEdit' src='All files (*)' kind=finished
+  ADDED  ctx='VEdit' src='Auto' kind=finished
+  ADDED  ctx='VEdit' src='Top module for the module tree and the lint scope (empty = Auto)' kind=finished
+  ADDED  ctx='VEdit' src='Top:' kind=finished
+  ADDED  ctx='VEdit' src='Verilog filelists (%1)' kind=finished
+  ADDED  ctx='VEdit' src='Verilog/SystemVerilog (*.v *.sv *.svh *.vh)' kind=finished
+  ADDED  ctx='VEdit' src='Verilog/SystemVerilog/filelist (%1 *.v *.sv *.svh *.vh)' kind=finished
+  ADDED  ctx='VEdit' src='active' kind=finished
+  ADDED  ctx='vedit::app::ApplicationShell' src='&Next Tab' kind=finished
+  ADDED  ctx='vedit::app::ApplicationShell' src='Pre&vious Tab' kind=finished
+  ADDED  ctx='vedit::app::ApplicationShell' src='desktop: %1' kind=finished
+  ADDED  ctx='vedit::app::ApplicationShell' src='editor: %1' kind=finished

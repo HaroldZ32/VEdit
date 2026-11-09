@@ -1,0 +1,42 @@
+ packaging/runtime/assemble-appdir.sh     | 42 +++++++++++++++++++++++++++---
+ packaging/runtime/assets/vedit.desktop   |  1 +
+ packaging/runtime/verify-f2-isolation.sh | 44 +++++++++++++++++++++++++++++++-
+ src/app/main.cpp                         |  6 +++++
+ 4 files changed, 89 insertions(+), 4 deletions(-)
+
+diff --git a/packaging/runtime/assets/vedit.desktop b/packaging/runtime/assets/vedit.desktop
+index 059cffa..69d93d9 100644
+--- a/packaging/runtime/assets/vedit.desktop
++++ b/packaging/runtime/assets/vedit.desktop
+@@ -5,6 +5,7 @@ GenericName=Text Editor
+ Comment=Verilog/SystemVerilog editor built on Qt6 + KTextEditor
+ Exec=AppRun %F
+ Icon=io.github.vedit.VEdit
++StartupWMClass=io.github.vedit.VEdit
+ Terminal=false
+ Categories=Development;IDE;TextEditor;
+ MimeType=text/x-svsrc;text/x-verilog;text/x-systemverilog;text/x-verilog-src;text/x-systemverilog-src;text/verilog;
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+index d73b143..2c2b1ed 100644
+--- a/src/app/main.cpp
++++ b/src/app/main.cpp
+@@ -60,6 +60,7 @@
+ #include <QElapsedTimer>
+ #include <QFile>
+ #include <QFileInfo>
++#include <QIcon>
+ #include <QJsonDocument>
+ #include <QJsonObject>
+ #include <QKeyEvent>
+@@ -1847,6 +1848,11 @@ int main(int argc, char **argv)
+ #endif
+ 
+     QApplication app(argc, argv);
++    // UI-Mosaic A4：桌面条目、窗口图标与 WM_CLASS 必须指向同一个 id，否则任务栏/
++    // 窗口切换器会退回通用图标，且 .desktop 条目无法把自己的窗口归组。深浅切换由
++    // ThemeManager::applyUiTheme 覆盖，这里只是启动瞬间的兜底图标。
++    QGuiApplication::setDesktopFileName(QStringLiteral("io.github.vedit.VEdit"));
++    QApplication::setWindowIcon(QIcon(QStringLiteral(":/icons/app/vedit-light.png")));
+     QCoreApplication::setApplicationName(QStringLiteral("vedit-app"));
+     QCoreApplication::setApplicationVersion(QStringLiteral("0.2.1"));
+     QCoreApplication::setOrganizationName(QStringLiteral("VEdit"));

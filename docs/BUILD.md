@@ -153,11 +153,11 @@ KTextEditor / 自建 KSyntaxHighlighting / tree-sitter / 字体，并带 `bin/tr
 （该 README 把 `out/AppDir/` 明确列为**中间产物**；产物大小与 sha256 以 `out/SHA256SUMS`
 与实际文件为准，不在文档里写死）。
 
-**版本号说明**：代码、构建与文档现在统一为 **0.2.1**。打包脚本从工作区 `Cargo.toml` 的
+**版本号说明**：代码、构建与文档现在统一为 **0.2.2**。打包脚本从工作区 `Cargo.toml` 的
 `version` 取值（`packaging/runtime/build-appimage.sh:53`），`CMakeLists.txt` 与
 `src/terminal/CMakeLists.txt` 的 `project(... VERSION ...)`、`src/app/main.cpp` 与
 `cmake/smoke/qt6_window_smoke.cpp` 的 `setApplicationVersion()` 都是同一个值，所以产物名
-`VEdit-0.2.1-x86_64.AppImage` 与应用内版本 0.2.1 一致。
+`VEdit-0.2.2-x86_64.AppImage` 与应用内版本 0.2.2 一致。
 
 ### 7.2 旧版 GTK 产物（不是 Qt 交付物）
 

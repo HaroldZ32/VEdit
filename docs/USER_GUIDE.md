@@ -28,13 +28,13 @@ VEdit 是面向 Verilog / SystemVerilog 工程的桌面编辑器。打开一个�
 从上到下、从左到右，主窗口分成六块：
 
 1. **菜单栏**：固定的五个菜单 `File` / `Edit` / `View` / `Project` / `Help`。
-2. **主工具栏**：最常用的命令，从左到右是 `New`、`Open…`、`Open Folder…`、`Switch Project…`、`Save`、`Save All`、`Undo`、`Redo`，然后是 `Search in Files`、`Lint Project`、`Format Document`。
+2. **主工具栏**：最常用的命令，每个按钮带一个随主题着色的线性图标和文字，从左到右是 `New`、`Open…`、`Open Folder…`、`Switch Project…`、`Save`、`Save All`、`Undo`、`Redo`，然后是 `Search in Files`、`Lint Project`、`Format Document`。工具栏最右端是**主题按钮**（一个彩色圆点图标），点开就是六套界面配色的切换菜单。
 3. **编辑区**：每个标签页是一份打开的文件；可以水平或垂直分成多个分屏，当前分屏右上角有 `active` 标记。
 4. **左侧停靠区**：`Files`（文件树）、`Project`（工程，只在有工程时出现）、`Source Control`（版本控制）。
 5. **右侧停靠区**：`Module Tree`（模块树）、`Interface`（接口）、`Outline`（上半是大纲符号，下半是诊断列表）。
 6. **底部停靠区**：`Search`（工程搜索）、`Terminal`（内置终端）。
 
-底部的**状态栏**：左侧是工程名 `Project: …` 和只停留几秒的一次性提示（例如「已保存」「打开失败」）；右侧依次是未保存标记 `● Unsaved changes`、主题 `Theme: …`、分屏与标签统计 `Panes: … · active: … · tabs: …`，以及诊断徽标 `LSP backend=… · lint=…`。
+底部的**状态栏**：左侧是工程名 `Project: …` 和只停留几秒的一次性提示（例如「已保存」「打开失败」）；右侧依次是未保存标记 `● Unsaved changes`、主题 `Theme: <界面主题> / <语法主题>`、分屏与标签统计 `Panes: … · active: … · tabs: …`，以及诊断徽标 `LSP backend=… · lint=…`。
 
 ### 1.2 每个面板是干什么的
 
@@ -70,7 +70,7 @@ VEdit 是面向 Verilog / SystemVerilog 工程的桌面编辑器。打开一个�
 
 ### 2.1 打开文件
 
-- `File → Open…`（`Ctrl+O`）打开一个文件。文件对话框的过滤器分三组：`Verilog/SystemVerilog (*.v *.sv *.svh *.vh)`、`Filelists (*.f *.F *.flist)`、`All Files (*)`。
+- `File → Open…`（`Ctrl+O`）打开一个文件。文件对话框的过滤器分三组：`Verilog/SystemVerilog (*.v *.sv *.svh *.vh)`、`Filelists (*.f *.F)`、`All Files (*)`。过滤器只列 `*.f` / `*.F`；`.flist` 长拼写不在过滤器里，可通过 `All Files (*)` 当作普通文本文件打开，但**不会**按 filelist 导入。
 - 也可以在启动时把文件路径作为参数：`./VEdit-<版本>-x86_64.AppImage path/to/top.sv`；给多个文件时，每个文件各占一个分屏。
 - 从 `Files` 树双击文件，或从 `Project` 面板双击文件，也会打开它。
 
@@ -93,7 +93,7 @@ VEdit 是面向 Verilog / SystemVerilog 工程的桌面编辑器。打开一个�
 
 ### 2.3 打开 filelist（`.f`）会发生什么
 
-打开一个 `.f` / `.F` / `.flist`：
+打开一个 `.f` / `.F`（`.flist` 长拼写只能用对话框的 `All Files (*)` 当普通文本打开，不会按 filelist 导入）：
 
 - 如果**当前没有工程**：该 filelist 所在目录成为工程根，并把它导入工程；
 - 如果**已经有工程**：只把它导入当前工程，**不切换**工程；
@@ -150,7 +150,7 @@ VEdit 是面向 Verilog / SystemVerilog 工程的桌面编辑器。打开一个�
 - 工程根；
 - 分屏布局、活动分屏、每个分屏里打开的文件、光标位置与滚动位置；
 - 打开过的面板与停靠布局、窗口大小；
-- 主题。
+- 界面主题与语法主题。
 
 不恢复：终端历史、搜索面板的临时结果、补全的临时预览。
 
@@ -388,7 +388,8 @@ VEdit 是面向 Verilog / SystemVerilog 工程的桌面编辑器。打开一个�
 
 `Edit → Preferences…`（`Ctrl+,`）打开首选项对话框。从上到下是：
 
-- 顶部 **Theme** 下拉框（立即生效）；
+- 顶部 **Interface theme** 下拉框（六套界面配色，立即生效）；
+- 其下的 **Theme** 下拉框（编辑器语法配色，立即生效）；
 - 页签：`Shortcuts`、`Tools`、`FIM`、`Appearance`、`Lint`、`Format`；
 - 底部的 **Diagnostics** 框：显示设置文件的读取/保存诊断，以及 `Reload from disk`（从磁盘重新读取设置）；
 - 最下面一行状态：保存成功或失败的原因。
@@ -397,7 +398,14 @@ VEdit 是面向 Verilog / SystemVerilog 工程的桌面编辑器。打开一个�
 
 ### 8.2 主题
 
-`Theme` 下拉框列出所有可用配色，选中即应用到整个界面；点 `Apply` 或 `OK` 后写进设置。状态栏的 `Theme: …` 显示当前主题。主题只改配色，不改文件类型与高亮定义。
+主题分两层，互不干扰：
+
+- **界面主题**（`Interface theme` 下拉框，在 `Theme` 上方）决定窗口本身的配色：画布、面板卡片、工具栏、标签页、状态栏与强调色。共六套，中文界面显示 `云雾白`、`暖杏黄`、`薄荷绿`、`晴空蓝`、`曜石黑`、`深夜蓝`，英文界面显示 `Cloud White`、`Warm Apricot`、`Mint Green`、`Sky Blue`、`Obsidian`、`Deep Navy`（前四套浅色、后两套深色）。切换入口有三个，效果完全一致：`View → 主题` 子菜单、工具栏最右端的主题按钮、以及首选项的这个下拉框。**任一次切换都会立即生效并写入设置的 `uiTheme` 键**，重启读回最后一次选择。其中「主题」子菜单与工具栏按钮是同一个主题菜单的两处入口，与首选项下拉写的是同一个键。
+- **语法主题**（`Theme` 下拉框）只决定**编辑器内部**的配色：背景、文字、选中、禁用态与各类语法记号。它来自 KSyntaxHighlighting 的整套配色（`Breeze Light`、`Solarized Dark`、`Nord`、`Dracula` 等数十种），选中即应用。
+
+状态栏的 `Theme: … / …` 同时显示两者：前面是界面主题，后面是语法主题。切换界面主题**不会**覆盖你手动选过的语法主题；界面主题只在你从未手动选过语法主题时，为浅色/深色配对一个合适的默认语法主题。
+
+主题只改配色，不改文件类型与高亮定义。
 
 ### 8.3 快捷键
 
@@ -601,15 +609,15 @@ bash scripts/build-qt.sh --no-test    # 只构建
 
 | 文件 | 内容 |
 |---|---|
-| `settings.toml` | 首选项：主题、界面语言、字体与缩放、工具路径、Lint 与格式化选项 |
-| `session.json` | 会话：工程根、分屏布局、打开的文件与光标/滚动位置、面板与窗口状态、主题 |
+| `settings.toml` | 首选项：界面主题（`uiTheme`）、语法主题、界面语言、字体与缩放、工具路径、Lint 与格式化选项 |
+| `session.json` | 会话：工程根、分屏布局、打开的文件与光标/滚动位置、面板与窗口状态、界面主题与语法主题 |
 | `shortcuts.json` | 你改过的快捷键（只存覆盖项） |
 | `project-model.json` | 当前工程的 filelist、变量表与展开结果缓存 |
 | `fim_api_key` | 可选的 FIM 密钥文件，权限 `0600`；只由设置页写入 |
 
 工程内的文件：
 
-- `*.f` / `*.F` / `*.flist`：filelist；
+- `*.f` / `*.F`：filelist（对话框只筛这两种；`.flist` 拼写可用 `All Files (*)` 当普通文本打开，但**不**按 filelist 导入）；
 - `.rules.verible_lint`：工程级 verible 规则文件，存在时自动发现；不存在时用内置规则，不报错。
 
 常用启动参数（把 `vedit-app` 换成你的启动方式）：

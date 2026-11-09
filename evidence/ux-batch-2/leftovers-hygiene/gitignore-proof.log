@@ -1,0 +1,18 @@
+=== [B] .gitignore: explicit packaging cache rule
+rule_line=75
+packaging/**/.cache/
+--- probe path with NO lane-local .gitignore (the future-lane case)
+--- BEFORE (rule temporarily removed):
+before_exit=1
+--- AFTER (rule restored):
+.gitignore:75:packaging/**/.cache/	packaging/hygiene-probe/.cache/payload.txt
+after_exit=0
+--- the REAL 243 MB cache, with its lane-local rule present:
+packaging/appimage/.gitignore:4:.cache/	packaging/appimage/.cache/src-head/THIRD_PARTY_NOTICES.md
+--- the same real path with the lane-local rule moved aside (root rule alone):
+.gitignore:75:packaging/**/.cache/	packaging/appimage/.cache/src-head/THIRD_PARTY_NOTICES.md
+root_rule_exit=0
+nested .gitignore restored-identical=yes
+--- after restore, the lane-local rule is in charge again (deeper file wins):
+packaging/appimage/.gitignore:4:.cache/	packaging/appimage/.cache/src-head/THIRD_PARTY_NOTICES.md
+--- packaging status after cleanup (expect empty):

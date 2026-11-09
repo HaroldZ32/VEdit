@@ -68,6 +68,12 @@ evidence/**/probe/*-probe
 # Same for the ksh-env probe binaries a previous batch left in scratch AppDirs.
 evidence/**/vedit-*-probe
 
+# Build caches under packaging/: a cached source snapshot plus downloaded tools
+# (packaging/appimage/.cache was 243 MB when this rule was added). Each lane has
+# its own .gitignore today; this root rule exists so a future `git add packaging/`
+# can never swallow a cache directory, whichever lane creates the next one.
+packaging/**/.cache/
+
 # Generated fixtures (AST dumps, scale trees) under evidence/: reproducible, hundreds of MB each.
 evidence/**/scratch/
 

@@ -1,0 +1,498 @@
+{
+  "label": "after",
+  "theme": "yunwu",
+  "surface": "#FFFFFF",
+  "surfaceAlt": "#F8F8F7",
+  "border": "#E4E5E5",
+  "headerCount": 4,
+  "panelWideHeaderRows": 88,
+  "contentWideBorderRows": [
+    104,
+    127,
+    134,
+    189,
+    196,
+    219,
+    226,
+    288,
+    295,
+    318,
+    325,
+    387,
+    428,
+    451,
+    458,
+    513
+  ],
+  "sections": [
+    {
+      "name": "Files",
+      "headerFillBBox": [
+        26,
+        105,
+        576,
+        126
+      ],
+      "titleTopBorderY": 104,
+      "titleBottomBorderY": 127,
+      "titleTopBorder": "#E4E5E5",
+      "titleBottomBorder": "#E4E5E5",
+      "titleBorderDeltaTop": 26,
+      "titleBorderDeltaBottom": 26,
+      "titleTopBorderRun": 541,
+      "titleBottomBorderRun": 541,
+      "titleFillDelta": 7,
+      "titleBorderBrighter": false,
+      "content": {
+        "bbox": [
+          25,
+          134,
+          577,
+          189
+        ],
+        "leftBorderX": 25,
+        "rightBorderX": 577,
+        "topBorderY": 134,
+        "bottomBorderY": 189,
+        "leftBorder": "#E4E5E5",
+        "rightBorder": "#E4E5E5",
+        "leftDelta": 26,
+        "rightDelta": 26,
+        "leftBrighter": false,
+        "rightBrighter": false,
+        "leftRun": 44,
+        "rightRun": 44
+      }
+    },
+    {
+      "name": "Include dirs",
+      "headerFillBBox": [
+        26,
+        197,
+        576,
+        218
+      ],
+      "titleTopBorderY": 196,
+      "titleBottomBorderY": 219,
+      "titleTopBorder": "#E4E5E5",
+      "titleBottomBorder": "#E4E5E5",
+      "titleBorderDeltaTop": 26,
+      "titleBorderDeltaBottom": 26,
+      "titleTopBorderRun": 541,
+      "titleBottomBorderRun": 541,
+      "titleFillDelta": 7,
+      "titleBorderBrighter": false,
+      "content": {
+        "bbox": [
+          25,
+          226,
+          577,
+          288
+        ],
+        "leftBorderX": 25,
+        "rightBorderX": 577,
+        "topBorderY": 226,
+        "bottomBorderY": 288,
+        "leftBorder": "#E4E5E5",
+        "rightBorder": "#E4E5E5",
+        "leftDelta": 26,
+        "rightDelta": 26,
+        "leftBrighter": false,
+        "rightBrighter": false,
+        "leftRun": 51,
+        "rightRun": 51
+      }
+    },
+    {
+      "name": "Defines",
+      "headerFillBBox": [
+        26,
+        296,
+        576,
+        317
+      ],
+      "titleTopBorderY": 295,
+      "titleBottomBorderY": 318,
+      "titleTopBorder": "#E4E5E5",
+      "titleBottomBorder": "#E4E5E5",
+      "titleBorderDeltaTop": 26,
+      "titleBorderDeltaBottom": 26,
+      "titleTopBorderRun": 541,
+      "titleBottomBorderRun": 541,
+      "titleFillDelta": 7,
+      "titleBorderBrighter": false,
+      "content": {
+        "bbox": [
+          25,
+          325,
+          577,
+          387
+        ],
+        "leftBorderX": 25,
+        "rightBorderX": 577,
+        "topBorderY": 325,
+        "bottomBorderY": 387,
+        "leftBorder": "#E4E5E5",
+        "rightBorder": "#E4E5E5",
+        "leftDelta": 26,
+        "rightDelta": 26,
+        "leftBrighter": false,
+        "rightBrighter": false,
+        "leftRun": 51,
+        "rightRun": 51
+      }
+    },
+    {
+      "name": "Diagnostics",
+      "headerFillBBox": [
+        26,
+        429,
+        576,
+        450
+      ],
+      "titleTopBorderY": 428,
+      "titleBottomBorderY": 451,
+      "titleTopBorder": "#E4E5E5",
+      "titleBottomBorder": "#E4E5E5",
+      "titleBorderDeltaTop": 26,
+      "titleBorderDeltaBottom": 26,
+      "titleTopBorderRun": 541,
+      "titleBottomBorderRun": 541,
+      "titleFillDelta": 7,
+      "titleBorderBrighter": false,
+      "content": {
+        "bbox": [
+          25,
+          458,
+          577,
+          513
+        ],
+        "leftBorderX": 25,
+        "rightBorderX": 577,
+        "topBorderY": 458,
+        "bottomBorderY": 513,
+        "leftBorder": "#E4E5E5",
+        "rightBorder": "#E4E5E5",
+        "leftDelta": 26,
+        "rightDelta": 26,
+        "leftBrighter": false,
+        "rightBrighter": false,
+        "leftRun": 44,
+        "rightRun": 44
+      }
+    }
+  ],
+  "gaps": [
+    {
+      "after": "Files",
+      "before": "Include dirs",
+      "spanRows": 6,
+      "pureRuns": [
+        {
+          "start": 190,
+          "end": 195,
+          "rows": 6
+        }
+      ],
+      "maxPureRun": 6,
+      "firstPureRun": 6,
+      "lastPureRun": 6
+    },
+    {
+      "after": "Include dirs",
+      "before": "Defines",
+      "spanRows": 6,
+      "pureRuns": [
+        {
+          "start": 289,
+          "end": 294,
+          "rows": 6
+        }
+      ],
+      "maxPureRun": 6,
+      "firstPureRun": 6,
+      "lastPureRun": 6
+    },
+    {
+      "after": "Defines",
+      "before": "Diagnostics",
+      "spanRows": 40,
+      "pureRuns": [
+        {
+          "start": 388,
+          "end": 393,
+          "rows": 6
+        },
+        {
+          "start": 422,
+          "end": 427,
+          "rows": 6
+        }
+      ],
+      "maxPureRun": 6,
+      "firstPureRun": 6,
+      "lastPureRun": 6
+    }
+  ]
+}
+{
+  "label": "after",
+  "theme": "yaoshi",
+  "surface": "#1D1D20",
+  "surfaceAlt": "#171719",
+  "border": "#353538",
+  "headerCount": 4,
+  "panelWideHeaderRows": 88,
+  "contentWideBorderRows": [
+    104,
+    127,
+    134,
+    189,
+    196,
+    219,
+    226,
+    288,
+    295,
+    318,
+    325,
+    387,
+    428,
+    451,
+    458,
+    513
+  ],
+  "sections": [
+    {
+      "name": "Files",
+      "headerFillBBox": [
+        26,
+        105,
+        576,
+        126
+      ],
+      "titleTopBorderY": 104,
+      "titleBottomBorderY": 127,
+      "titleTopBorder": "#353538",
+      "titleBottomBorder": "#353538",
+      "titleBorderDeltaTop": 24,
+      "titleBorderDeltaBottom": 24,
+      "titleTopBorderRun": 542,
+      "titleBottomBorderRun": 542,
+      "titleFillDelta": 6,
+      "titleBorderBrighter": true,
+      "content": {
+        "bbox": [
+          25,
+          134,
+          577,
+          189
+        ],
+        "leftBorderX": 25,
+        "rightBorderX": 577,
+        "topBorderY": 134,
+        "bottomBorderY": 189,
+        "leftBorder": "#353538",
+        "rightBorder": "#353538",
+        "leftDelta": 24,
+        "rightDelta": 24,
+        "leftBrighter": true,
+        "rightBrighter": true,
+        "leftRun": 45,
+        "rightRun": 45
+      }
+    },
+    {
+      "name": "Include dirs",
+      "headerFillBBox": [
+        26,
+        197,
+        576,
+        218
+      ],
+      "titleTopBorderY": 196,
+      "titleBottomBorderY": 219,
+      "titleTopBorder": "#353538",
+      "titleBottomBorder": "#353538",
+      "titleBorderDeltaTop": 24,
+      "titleBorderDeltaBottom": 24,
+      "titleTopBorderRun": 542,
+      "titleBottomBorderRun": 542,
+      "titleFillDelta": 6,
+      "titleBorderBrighter": true,
+      "content": {
+        "bbox": [
+          25,
+          226,
+          577,
+          288
+        ],
+        "leftBorderX": 25,
+        "rightBorderX": 577,
+        "topBorderY": 226,
+        "bottomBorderY": 288,
+        "leftBorder": "#353538",
+        "rightBorder": "#353538",
+        "leftDelta": 24,
+        "rightDelta": 24,
+        "leftBrighter": true,
+        "rightBrighter": true,
+        "leftRun": 52,
+        "rightRun": 52
+      }
+    },
+    {
+      "name": "Defines",
+      "headerFillBBox": [
+        26,
+        296,
+        576,
+        317
+      ],
+      "titleTopBorderY": 295,
+      "titleBottomBorderY": 318,
+      "titleTopBorder": "#353538",
+      "titleBottomBorder": "#353538",
+      "titleBorderDeltaTop": 24,
+      "titleBorderDeltaBottom": 24,
+      "titleTopBorderRun": 542,
+      "titleBottomBorderRun": 542,
+      "titleFillDelta": 6,
+      "titleBorderBrighter": true,
+      "content": {
+        "bbox": [
+          25,
+          325,
+          577,
+          387
+        ],
+        "leftBorderX": 25,
+        "rightBorderX": 577,
+        "topBorderY": 325,
+        "bottomBorderY": 387,
+        "leftBorder": "#353538",
+        "rightBorder": "#353538",
+        "leftDelta": 24,
+        "rightDelta": 24,
+        "leftBrighter": true,
+        "rightBrighter": true,
+        "leftRun": 52,
+        "rightRun": 52
+      }
+    },
+    {
+      "name": "Diagnostics",
+      "headerFillBBox": [
+        26,
+        429,
+        576,
+        450
+      ],
+      "titleTopBorderY": 428,
+      "titleBottomBorderY": 451,
+      "titleTopBorder": "#353538",
+      "titleBottomBorder": "#353538",
+      "titleBorderDeltaTop": 24,
+      "titleBorderDeltaBottom": 24,
+      "titleTopBorderRun": 542,
+      "titleBottomBorderRun": 542,
+      "titleFillDelta": 6,
+      "titleBorderBrighter": true,
+      "content": {
+        "bbox": [
+          25,
+          458,
+          577,
+          513
+        ],
+        "leftBorderX": 25,
+        "rightBorderX": 577,
+        "topBorderY": 458,
+        "bottomBorderY": 513,
+        "leftBorder": "#353538",
+        "rightBorder": "#353538",
+        "leftDelta": 24,
+        "rightDelta": 24,
+        "leftBrighter": true,
+        "rightBrighter": true,
+        "leftRun": 45,
+        "rightRun": 45
+      }
+    }
+  ],
+  "gaps": [
+    {
+      "after": "Files",
+      "before": "Include dirs",
+      "spanRows": 6,
+      "pureRuns": [
+        {
+          "start": 190,
+          "end": 195,
+          "rows": 6
+        }
+      ],
+      "maxPureRun": 6,
+      "firstPureRun": 6,
+      "lastPureRun": 6
+    },
+    {
+      "after": "Include dirs",
+      "before": "Defines",
+      "spanRows": 6,
+      "pureRuns": [
+        {
+          "start": 289,
+          "end": 294,
+          "rows": 6
+        }
+      ],
+      "maxPureRun": 6,
+      "firstPureRun": 6,
+      "lastPureRun": 6
+    },
+    {
+      "after": "Defines",
+      "before": "Diagnostics",
+      "spanRows": 40,
+      "pureRuns": [
+        {
+          "start": 388,
+          "end": 393,
+          "rows": 6
+        },
+        {
+          "start": 422,
+          "end": 427,
+          "rows": 6
+        }
+      ],
+      "maxPureRun": 6,
+      "firstPureRun": 6,
+      "lastPureRun": 6
+    }
+  ]
+}
+
+BEFORE: {
+  "label": "before",
+  "theme": "yunwu",
+  "surface": "#FFFFFF",
+  "surfaceAlt": "#F8F8F7",
+  "border": "#E4E5E5",
+  "headerCount": 0,
+  "panelWideHeaderRows": 0,
+  "contentWideBorderRows": [],
+  "sections": [],
+  "gaps": []
+}
+
+| theme | section | title top/bottom border y | Δ top/bottom | content L/R x | Δ L/R | gap rows after |
+|---|---|---|---|---|---|---|
+| yunwu | Files | 104/127 | 26/26 | 25/577 | 26/26 | 6 |
+| yunwu | Include dirs | 196/219 | 26/26 | 25/577 | 26/26 | 6 |
+| yunwu | Defines | 295/318 | 26/26 | 25/577 | 26/26 | 6 |
+| yunwu | Diagnostics | 428/451 | 26/26 | 25/577 | 26/26 | - |
+| yaoshi | Files | 104/127 | 24/24 | 25/577 | 24/24 | 6 |
+| yaoshi | Include dirs | 196/219 | 24/24 | 25/577 | 24/24 | 6 |
+| yaoshi | Defines | 295/318 | 24/24 | 25/577 | 24/24 | 6 |
+| yaoshi | Diagnostics | 428/451 | 24/24 | 25/577 | 24/24 | - |

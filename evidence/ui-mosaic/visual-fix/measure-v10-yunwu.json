@@ -1,0 +1,25 @@
+{
+  "theme": "yunwu",
+  "menu_bg": "#FFFFFF",
+  "row": {
+    "top": 705,
+    "bottom": 726,
+    "height": 22,
+    "surface": "#FFFFFF",
+    "selected": "#E1E1E1",
+    "surface_L": 100.0,
+    "selected_L": 89.5,
+    "delta_L": 10.5,
+    "delta_srgb_max": 30,
+    "text_pixel": "#242631",
+    "contrast_authored_text": 12.08,
+    "contrast_measured_text": 11.5
+  },
+  "menu_hover": {
+    "top": 725,
+    "bottom": 742,
+    "background": "#E1E1E1",
+    "delta_L_vs_surface": 10.5,
+    "contrast_authored_text": 12.08
+  }
+}

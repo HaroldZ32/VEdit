@@ -357,6 +357,35 @@ if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL AND VEDIT_DIAGNOSTICS_FFI)
   )
 endif()
 
+# --- UX batch 2 / RM-10 follow-up (T46): SPLIT PANES with a REAL mouse -------
+# The gap two reviewers named: no test drove the hover-follows-the-pane or the
+# multi-cursor/Ctrl+click gestures on a two-pane layout. This binary builds the
+# split through the REAL `view.split.horizontal` command, opens two documents,
+# sends REAL mouse moves/clicks into KatePart's inner widget of the INACTIVE
+# pane, and asserts the popup's parent/geometry/content, that the 400 ms poll
+# does not steal the cross-pane bubble, that `view.focus.next` (keyboard, no
+# mouse) does not move it, that Ctrl+Alt+click adds a cursor in B only, and that
+# Ctrl+click dispatches the definition action from B's document.
+if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL AND VEDIT_DIAGNOSTICS_FFI)
+  add_executable(vedit-split-pane-mouse-e2e selftests/split_pane_mouse_e2e.cpp)
+  target_link_libraries(vedit-split-pane-mouse-e2e PRIVATE
+    vedit_workspace_diagnostics
+  )
+  target_include_directories(vedit-split-pane-mouse-e2e PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../editor/kernel"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../app"
+  )
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-split-pane-mouse-e2e PRIVATE
+      -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  add_test(NAME vedit-split-pane-mouse-e2e COMMAND vedit-split-pane-mouse-e2e)
+  set_tests_properties(vedit-split-pane-mouse-e2e PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-diagnostics;VEDIT_QUIET=1"
+    TIMEOUT 300
+  )
+endif()
+
 # --- UX batch 2 / RM-2: switching projects in ONE window --------------------
 # The real-machine defect: after switching folders in the same window the file
 # set and the backends' -I/-D still described the previous project. This binary
