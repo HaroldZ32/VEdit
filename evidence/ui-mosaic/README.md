@@ -166,3 +166,13 @@
 - 包内实测日志实际落点：`~/.config/VEdit/vedit-app/ui-menu-diag.log`。
 - 产物：`3ee5b07d607bfdd5739e79acea5b54480b1b1872595b25723b45043c5cc186a7`（`138,811,896` 字节），构建 `steps_failed=0`。
 - **仍未证明**：用户实机纯黑无法在本环境复现；强制自绘能否修复取决于其原对话框是否为原生实现，需用户实机复跑并回传上述日志。
+
+### AppImage 在 CentOS 7 上报 "无法读取 squashfs"（2026-11-09）
+
+用户实机（CentOS 7 桌面）打开 `3ee5b07d…` 报 `Something went wrong trying to read the squashfs image.`。本地核查：
+
+- 产物完整：`--appimage-version` 正常、`--appimage-extract` **exit 0**、squashfs 在标准偏移 `944632`，`sha256=3ee5b07d…`；
+- 与上一版（`5f433086…`）的**内嵌 runtime 版本完全相同**（`AppImage/type2-runtime@fedfad5`），差异只在镜像内容 → **不是 runtime 版本回归**；
+- 结论：包本身可用，故障点在目标机的 **FUSE 挂载**环节（AppImage type2 需要 `libfuse2` + `fusermount` + `/dev/fuse`）。
+
+备用交付（免 FUSE）：`packaging/runtime/out/VEdit-0.2.1-x86_64-appdir.tar.gz`（159,663,474 字节，sha256 `2fe5c98ea91f5a0512874643303b7aeccd253932fb1395e15803b3d32edce730`），内容为完整的 AppDir（359 文件），解包后 `./AppRun` 直接运行，已在容器内验证可执行（`--selfcheck-ffi` 正常响应）。
