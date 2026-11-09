@@ -1858,7 +1858,7 @@ int main(int argc, char **argv)
     // only in themed_icons.cpp. The dark/light switch itself is ThemeManager::applyUiTheme.
     QApplication::setWindowIcon(vedit::app::themed_icons::appIcon(false));
     QCoreApplication::setApplicationName(QStringLiteral("vedit-app"));
-    QCoreApplication::setApplicationVersion(QStringLiteral("0.2.1"));
+    QCoreApplication::setApplicationVersion(QStringLiteral("0.2.2"));
     QCoreApplication::setOrganizationName(QStringLiteral("VEdit"));
 
     QCommandLineParser parser;

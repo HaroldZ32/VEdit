@@ -98,7 +98,7 @@ bash packaging/runtime/build.sh          # 组装 → 许可闸门 → 自检 �
 - `build.sh` writes `out/SHA256SUMS` for the single-file AppImage and copies the
   evidence into `evidence/slice3-pack/`.
 
-**Delivery baseline:** the AppImage is `out/VEdit-0.2.1-x86_64.AppImage`, and its
+**Delivery baseline:** the AppImage is `out/VEdit-0.2.2-x86_64.AppImage`, and its
 sha256 is recorded in `out/SHA256SUMS` (written by `build.sh`) rather than restated
 here, so a rebuild cannot leave a stale hash in the docs. Any source or
 packaging-script change invalidates a published AppImage and requires a rebuild.
