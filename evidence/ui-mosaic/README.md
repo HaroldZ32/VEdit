@@ -118,3 +118,9 @@
 
 最终六套量化（`screenshots/after-*.png`）：下/左/右阴影 4–5px（深色 0–1px 属"无阴影"）；纵向画布 10px（深色 16px）；横向 18–21px；角点弧线六套一致。
 项目态证据：`screenshots/project-yunwu.png`（`--project tests/fixtures/verilog-project`）。
+
+### 第三次打包（V8/V9 之后）
+
+- AppImage `138,799,608` 字节，sha256 `eb2d8e1eef5ca197cb440ac090f3e6f5f27da4ec2c7f6cd3594058e19f6a8327`（与 `out/SHA256SUMS` 一致）。
+- 包内实跑（深色 `yaoshi` + `--project tests/fixtures/verilog-project`）截图 `screenshots/appimage-project-yaoshi.png`：
+  左栏上半区 surface 占比 **0.931**（Project 面板已是卡片）；卡片右缘外侧亮度恒为 canvas 19.2（**深色无阴影带**）；纵向连续画布 **16px**。
