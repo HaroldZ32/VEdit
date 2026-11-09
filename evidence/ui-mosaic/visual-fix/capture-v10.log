@@ -1,0 +1,11 @@
+shot yunwu-tree-selected (1680, 1050)
+shot yunwu-ctxmenu (1680, 1050)
+shot yunwu-ctxmenu-hover (1680, 1050)
+hover row y=705 offset=30
+done
+shot yaoshi-tree-selected (1680, 1050)
+shot yaoshi-ctxmenu (1680, 1050)
+shot yaoshi-ctxmenu-hover (1680, 1050)
+hover row y=705 offset=30
+done
+OK: screenshots in /home/haroldzhao/MyProj/DshProj/VEdit/evidence/ui-mosaic/visual-fix/shots-v10

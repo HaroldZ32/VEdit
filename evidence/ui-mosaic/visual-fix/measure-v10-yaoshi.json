@@ -1,0 +1,25 @@
+{
+  "theme": "yaoshi",
+  "menu_bg": "#1D1D20",
+  "row": {
+    "top": 705,
+    "bottom": 726,
+    "height": 22,
+    "surface": "#1D1D20",
+    "selected": "#514222",
+    "surface_L": 10.9,
+    "selected_L": 28.8,
+    "delta_L": 17.9,
+    "delta_srgb_max": 52,
+    "text_pixel": "#E2E5E2",
+    "contrast_authored_text": 7.95,
+    "contrast_measured_text": 7.68
+  },
+  "menu_hover": {
+    "top": 725,
+    "bottom": 742,
+    "background": "#514222",
+    "delta_L_vs_surface": 17.9,
+    "contrast_authored_text": 7.95
+  }
+}

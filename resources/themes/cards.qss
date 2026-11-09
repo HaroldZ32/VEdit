@@ -121,7 +121,7 @@ QWidget[veditDockCard="true"] {
  * 只列这三个类，不写 QAbstractScrollArea：QPlainTextEdit / QTextEdit 也是它的
  * 子类，终端面板需要自己的深底，不能被卡片作用域透明化。视图的底色改为透明后，
  * 容器的 @surface@ 与下方两角圆角就是最终看到的卡片体；选中/悬停仍由
- * ::item:selected / ::item:hover 的 accent / surfaceAlt 画，不受影响。 */
+ * ::item:selected / ::item:hover 的 selection / surfaceAlt 画，不受影响。 */
 QWidget[veditDockCard="true"] QTreeView,
 QWidget[veditDockCard="true"] QTableView,
 QWidget[veditDockCard="true"] QListView {
@@ -324,8 +324,8 @@ QMenu::item {
 }
 
 QMenu::item:selected {
-    background: @accent@;
-    color: @accentText@;
+    background: @selection@;
+    color: @text@;
 }
 
 QMenu::item:disabled {
@@ -492,8 +492,8 @@ QComboBox QAbstractItemView {
     border: 1px solid @border@;
     border-radius: @radiusSm@;
     outline: none;
-    selection-background-color: @accent@;
-    selection-color: @accentText@;
+    selection-background-color: @selection@;
+    selection-color: @text@;
 }
 
 QCheckBox {
@@ -538,8 +538,8 @@ QTableView {
     border: none;
     outline: none;
     alternate-background-color: @surfaceAlt@;
-    selection-background-color: @accent@;
-    selection-color: @accentText@;
+    selection-background-color: @selection@;
+    selection-color: @text@;
 }
 
 QTreeView::item,
@@ -557,8 +557,8 @@ QTableView::item:hover {
 QTreeView::item:selected,
 QListView::item:selected,
 QTableView::item:selected {
-    background: @accent@;
-    color: @accentText@;
+    background: @selection@;
+    color: @text@;
 }
 
 QTreeView:disabled,

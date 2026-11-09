@@ -124,3 +124,12 @@
 - AppImage `138,799,608` 字节，sha256 `eb2d8e1eef5ca197cb440ac090f3e6f5f27da4ec2c7f6cd3594058e19f6a8327`（与 `out/SHA256SUMS` 一致）。
 - 包内实跑（深色 `yaoshi` + `--project tests/fixtures/verilog-project`）截图 `screenshots/appimage-project-yaoshi.png`：
   左栏上半区 surface 占比 **0.931**（Project 面板已是卡片）；卡片右缘外侧亮度恒为 canvas 19.2（**深色无阴影带**）；纵向连续画布 **16px**。
+
+### 选中行近黑带修复（V10，用户第三轮反馈："浅色模式下点右键出来一坨黑"）
+
+根因：把**强调色当大面积填充**。云雾白 `accent = #2A2A28`（近黑，本意只用于小元素），却被用作树/表的**选中行背景**，实测 x=200 纵向 `y=683..704` 是一条 22px 的 `#2A2A28` 带（ΔL\* 83）。
+
+修复：`ProductTheme` 新增 `selection` = `surface` 向 `accent` 混合（浅色 14% / 深色 28%），新增 `@selection@` 令牌；`cards.qss` 把 `QTreeView/QListView/QTableView`（`selection-background-color` 与 `::item:selected`）、`QMenu::item:selected`、`QComboBox` 弹层选中行改为 `@selection@` 底 + `@text@` 字。按钮 / 下划线 / 文本选择等**小面积** accent 用法未动。
+
+实测（XTest 真鼠标点选）：yunwu `#E1E1E1` vs `#FFFFFF`（ΔL\* 10.5、文字对比度 12.08）；yaoshi `#514222` vs `#1D1D20`（ΔL\* 17.9、对比度 7.95）；浅色右键菜单白底可读、hover `#E1E1E1`。
+已知：其余四套浅色主题按同一 14% 公式派生，ΔL\* 约 5.7–6.3（可见但更淡）；若需要更强，调 `kSelectionBlendPercentLight`。

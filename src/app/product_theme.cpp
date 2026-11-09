@@ -28,6 +28,13 @@ constexpr int kSurfaceAltBlendPercent = 60;
 constexpr int kBorderBlendPercent = 12;
 constexpr int kBorderStrongBlendPercent = 22;
 
+// 选中项是**整行**填充，不能直接用 accent：云雾白的 accent #2A2A28 铺满一行
+// 就是一条近黑带（V10 实机缺陷）。选中底色改为 surface 向 accent 混合——
+// 浅色 14%（#E1E1E1），深色 28%（#514222）——都用 text 文字，两档主题的
+// 选中行 L* 亮度差落在 8~40 之间，文字对比度 ≥ 4.5。
+constexpr int kSelectionBlendPercentLight = 14;
+constexpr int kSelectionBlendPercentDark = 28;
+
 // Disabled 文字向它所在的底色混合 40%。40% 是算出来的而不是猜的：语法主题
 // 调色板用的 55% 在云雾白上只剩约 2.7:1，低于需求 A3 的 3:1 下限；40% 在六套
 // 主题上实测均 ≥ 4:1。`vedit-app-ui-theme-selftest` 把它变成断言，而不是让这段
@@ -62,6 +69,9 @@ ProductTheme makeTheme(const char *id, const char *displayName, bool dark, QRgb 
     theme.syntaxTheme = QString::fromLatin1(syntaxTheme);
 
     theme.surfaceAlt = blendToward(theme.surface, theme.canvas, kSurfaceAltBlendPercent);
+    theme.selection = blendToward(
+        theme.surface, theme.accent,
+        dark ? kSelectionBlendPercentDark : kSelectionBlendPercentLight);
     // 描边向 text 混色，所以 text 必须先确定。
     theme.text = dark ? QColor(0xE6, 0xE8, 0xEC) : QColor(0x1F, 0x23, 0x28);
     theme.border = blendToward(theme.surface, theme.text, kBorderBlendPercent);
@@ -192,6 +202,7 @@ QString renderStyleSheet(const ProductTheme &theme)
         {"@borderStrong@", theme.borderStrong.name()},
         {"@text@", theme.text.name()},           {"@textMuted@", theme.textMuted.name()},
         {"@accent@", theme.accent.name()},       {"@accentText@", theme.accentText.name()},
+        {"@selection@", theme.selection.name()},
         // 契约只要求“至少”这些令牌；@textDisabled@ 是额外的一个：QSS 里普通的
         // color 规则会连禁用态一起上色，所以每个带文字的控件都需要一个显式的
         // 禁用色，而它必须达到 A3 的 3:1 下限（textMuted 在浅色主题上约 2.9:1，

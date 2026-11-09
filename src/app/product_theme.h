@@ -36,6 +36,7 @@ struct ProductTheme {
     QColor  textMuted;    // 次要文本
     QColor  accent;       // 强调色（按钮/选中/焦点）
     QColor  accentText;   // 强调色之上的文字
+    QColor  selection;    // 选中项整行底色：surface 与 accent 的淡混合，不是 accent 本身
     QString syntaxTheme;  // 配对的 KSyntaxHighlighting 主题名
 };
 
