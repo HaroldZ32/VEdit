@@ -186,3 +186,8 @@
 - 实测：标题分隔线 ΔL 26（yunwu）/24（yaoshi）≥15，标题底色 ΔL 7/6 ≥5，内容框左右描边 ΔL 26/24，块间 6px 纯卡片色；深色下边框 `#353538` 比卡片底 `#1D1D20` **更亮**。
 - 末行回归修复：初版标题 4px 上下 padding 把列表压缩 10–20px 导致半行裁切（`SIMULATION` 被切）；改为紧凑标题后 `Defines` viewport 61→71px、行高 18px、四条文字带均 9px 全高，`SIMULATION` 完整可见（`v13b-defines-*-2x.png`）。
 - 未改：`Diagnostics` 的长句换行 item 仍被下沿裁一点，**与改版前基线截图一致**（既有现象，非本次引入）。
+
+### 最新交付产物（V13c 之后）
+
+- AppImage：`138,811,896` 字节，sha256 `23cf32f21bb5aae75000442bd62ae35c4a94f1453acbb3e1aa77aabc4fd9ed82`；包内 `bin/vd-app` sha256 `9adb3bad…` 与构建产物一致（确认 V13c 的 QSS 在包内）。
+- 免 FUSE 包（完整 AppDir tar.gz）：`159,673,503` 字节，sha256 `0a1bab69bd5f4085542e986480af4113951b362f1ffba1dab43098b901882582`。
