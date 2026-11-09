@@ -1,0 +1,34 @@
+# residual 0.2.1 occurrences after the freeze — 2026-11-09T16:01:46Z
+# (excludes Cargo.lock dependency versions, evidence/, probes/, build/gui-spike/, crates/*/evidence, docs/rust-crates.txt, THIRD_PARTY_NOTICES.md)
+
+CMakeLists.txt:19:project(VEdit VERSION 0.2.1 LANGUAGES C CXX)
+Cargo.toml:25:version = "0.2.1"
+cmake/smoke/qt6_window_smoke.cpp:133:    QCoreApplication::setApplicationVersion(QStringLiteral("0.2.1"));
+docs/BUILD.md:156:**版本号说明**：代码、构建与文档现在统一为 **0.2.1**。打包脚本从工作区 `Cargo.toml` 的
+docs/BUILD.md:160:`VEdit-0.2.1-x86_64.AppImage` 与应用内版本 0.2.1 一致。
+docs/BUILD.md:175:- 体积不同：旧管线 47,745,528 字节 vs Qt 交付物 137,079,288 字节（0.1.1 时期同机同日实测；0.2.1 重建后以实际文件为准）；
+docs/RELEASING.md:74:- 预发布：`v0.2.1-rc.1`（后缀递增）。
+docs/RELEASING.md:79:git tag -a v0.2.1 -m "VEdit 0.2.1 — Qt6 desktop editor for CentOS 7"
+docs/RELEASING.md:80:git push origin v0.2.1
+docs/RELEASING.md:127:# 合入 dev 后按第 6 节发一个 PATCH：release/v0.2.1 → main → tag
+packaging/runtime/README.md:101:**Delivery baseline:** the AppImage is `out/VEdit-0.2.1-x86_64.AppImage`, and its
+packaging/runtime/hostmatrix.sh:16:APPIMAGE=${VEDIT_APPIMAGE:-$ROOT/packaging/runtime/out/VEdit-0.2.1-x86_64.AppImage}
+packaging/runtime/verify/STEPS.md:12:| `VEdit-0.2.1-x86_64.AppImage` | 仓库 `packaging/runtime/out/` | **必须**（交付物本体） |
+packaging/runtime/verify/STEPS.md:22:scp VEdit-0.2.1-x86_64.AppImage SHA256SUMS <用户名>@<VM_IP>:~/
+packaging/runtime/verify/STEPS.md:28:> `packaging/runtime/out/VEdit-0.2.1-x86_64.AppImage` 和
+packaging/runtime/verify/STEPS.md:41:chmod +x VEdit-0.2.1-x86_64.AppImage verify-appimage-centos7.sh
+packaging/runtime/verify/STEPS.md:109:1. 文件管理器里**双击** `VEdit-0.2.1-x86_64.AppImage`（或 `./VEdit-0.2.1-x86_64.AppImage`）；
+packaging/runtime/verify/STEPS.md:133:`VEdit-0.2.1-x86_64.AppImage`（或 `VEdit-*x86_64.AppImage`）。
+packaging/runtime/verify/verify-appimage-centos7.sh:5:#   scp VEdit-0.2.1-x86_64.AppImage verify-appimage-centos7.sh  <user>@<vm>:~/
+packaging/runtime/verify/verify-appimage-centos7.sh:88:    for cand in "$SCRIPT_DIR/VEdit-0.2.1-x86_64.AppImage" "$SCRIPT_DIR"/VEdit-*x86_64.AppImage; do
+packaging/runtime/verify/verify-appimage-centos7.sh:93:    result FAIL appimage.found expected="VEdit-0.2.1-x86_64.AppImage next to this script" \
+packaging/tarball/README.md:11:> 它不代表 0.2.1 的产物，也不是当前交付物（Qt 交付物见 `packaging/runtime/README.md`）。
+src/app/main.cpp:1861:    QCoreApplication::setApplicationVersion(QStringLiteral("0.2.1"));
+src/terminal/CMakeLists.txt:16:  project(VEditTerminal VERSION 0.2.1 LANGUAGES CXX)
+src/workspace/settings/settings_selftest.cpp:549:    // AC-10.2.1: Preferences carries the three pages in a QTabWidget.
+tests/packaging/hostmatrix.sh:30:# 0.2.1 bump (and never matched a real file: the release writes
+tests/packaging/hostmatrix.sh:48:    APPIMAGE=$ROOT/packaging/runtime/out/VEdit-0.2.1-x86_64.AppImage
+
+# 0.2.2 occurrences (the freeze)
+docs/rust-crates.txt:87:num-conv	0.2.2	MIT OR Apache-2.0	https://github.com/jhpratt/num-conv
+src/workspace/settings/settings_selftest.cpp:162:    // AC-10.2.2: the commands the other lanes register (project re-run, FIM)
