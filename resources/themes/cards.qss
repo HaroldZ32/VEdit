@@ -782,3 +782,57 @@ QFileDialog QLabel {
     background-color: @surface@;
     color: @text@;
 }
+
+/* --- V13：Project 面板的子区块边界 ------------------------------------------
+ *
+ * 实机反馈：Project 卡片里的 Files / Include dirs / Defines / Diagnostics 只是
+ * “加粗标题 + 列表”，标题没有底色、列表没有描边，整列文字在卡片 surface 上连成
+ * 一片，看不出每个子单元框在哪里。这里给每个子区块的标题画一块 surfaceAlt 的
+ * 标签底，给内容画 1px 描边，两者都复用现有令牌（不新增颜色常量）。
+ *
+ * 选择器用 #project-panel 限域并带控件 id：卡片作用域的
+ * `QWidget[veditDockCard="true"] QListView { background: transparent; }` 会把
+ * 列表底复位成透明，必须用更高的特异性把内容底色与描边拿回来；不写全局
+ * QListView / QLabel 规则，树/表/其它面板不受影响。
+ * 子区块间距沿用 ProjectPanel 自己的 QVBoxLayout spacing(6)，不在 QSS 里加
+ * margin，避免把已有的 6px 叠成 12px。
+ */
+
+QWidget#project-panel QLabel#project-filelists-header,
+QWidget#project-panel QLabel#project-files-header,
+QWidget#project-panel QLabel#project-include-header,
+QWidget#project-panel QLabel#project-defines-header,
+QWidget#project-panel QLabel#project-variables-header,
+QWidget#project-panel QLabel#project-diagnostics-header {
+    background-color: @surfaceAlt@;
+    border: 1px solid @border@;
+    border-radius: 6px;
+    padding: 1px 8px;
+    color: @text@;
+    font-weight: 600;
+}
+
+QWidget#project-panel QListWidget#project-filelist-list,
+QWidget#project-panel QListWidget#project-file-list,
+QWidget#project-panel QListWidget#project-include-dirs,
+QWidget#project-panel QListWidget#project-defines,
+QWidget#project-panel QListWidget#project-variables,
+QWidget#project-panel QListWidget#project-diagnostics {
+    background-color: @surface@;
+    border: 1px solid @border@;
+    border-radius: 6px;
+}
+
+/* V13c：工程面板的四个子区块标题改为紧凑型（底色 + 底部 1px 分隔线），
+   把垂直占用降到最低，避免固定高度 dock 里把列表末行挤出半行。 */
+QWidget#project-panel QLabel#project-files-header,
+QWidget#project-panel QLabel#project-include-header,
+QWidget#project-panel QLabel#project-defines-header,
+QWidget#project-panel QLabel#project-diagnostics-header {
+    padding: 0px 8px;
+    border: none;
+    border-bottom: 1px solid @border@;
+    border-radius: 0px;
+    background-color: @surfaceAlt@;
+    color: @text@;
+}

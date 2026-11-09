@@ -1,0 +1,21 @@
+| theme | section | viewport h | item h | remainder | full rows | last band | band full glyph | clip | lists needed |
+|---|---|---|---|---|---|---|---|---|---|
+| yunwu | Files | 54 | 18 | 0 | 3 | {'start': 168, 'end': 178, 'height': 11} | True | 0 | 3 |
+| yunwu | Include dirs | 71 | 18 | 17 | 3 | {'start': 272, 'end': 284, 'height': 13} | True | 1 | 4 |
+| yunwu | Defines | 71 | 18 | 17 | 3 | {'start': 376, 'end': 384, 'height': 9} | True | 1 | 4 |
+| yunwu | Diagnostics | 54 | 32 | 22 | 1 | {'start': 490, 'end': 508, 'height': 19} | False | 10 | 2 |
+| yaoshi | Files | 54 | 18 | 0 | 3 | {'start': 168, 'end': 178, 'height': 11} | True | 0 | 3 |
+| yaoshi | Include dirs | 71 | 18 | 17 | 3 | {'start': 272, 'end': 284, 'height': 13} | True | 1 | 4 |
+| yaoshi | Defines | 71 | 18 | 17 | 3 | {'start': 376, 'end': 384, 'height': 9} | True | 1 | 4 |
+| yaoshi | Diagnostics | 54 | 32 | 22 | 1 | {'start': 490, 'end': 508, 'height': 19} | False | 10 | 2 |
+
+| theme | section | title border ΔL top/bottom | title fill ΔL | gaps |
+|---|---|---|---|---|
+| yunwu | Files | 26/26 | 7 | 6 |
+| yunwu | Include dirs | 26/26 | 7 | 6 |
+| yunwu | Defines | 26/26 | 7 | 6 |
+| yunwu | Diagnostics | 26/26 | 7 | - |
+| yaoshi | Files | 24/24 | 6 | 6 |
+| yaoshi | Include dirs | 24/24 | 6 | 6 |
+| yaoshi | Defines | 24/24 | 6 | 6 |
+| yaoshi | Diagnostics | 24/24 | 6 | - |

@@ -176,3 +176,13 @@
 - 结论：包本身可用，故障点在目标机的 **FUSE 挂载**环节（AppImage type2 需要 `libfuse2` + `fusermount` + `/dev/fuse`）。
 
 备用交付（免 FUSE）：`packaging/runtime/out/VEdit-0.2.1-x86_64-appdir.tar.gz`（159,663,474 字节，sha256 `2fe5c98ea91f5a0512874643303b7aeccd253932fb1395e15803b3d32edce730`），内容为完整的 AppDir（359 文件），解包后 `./AppRun` 直接运行，已在容器内验证可执行（`--selfcheck-ffi` 正常响应）。
+
+### 工程面板子区块边界（V13/V13b/V13c）
+
+用户反馈：`Project` 卡片里的 `Files / Include dirs / Defines / Diagnostics` 四个子单元"看不清框在哪，和背景融为一体"。
+
+- 结构（未改 C++）：`ProjectPanel(QWidget#project-panel)` 内是 `QLabel` 标题 + `QListWidget` 内容，objectName 已稳定（`project-files-header`/`project-file-list` 等，测试引用）。
+- QSS（`cards.qss` 末尾）：标题 `@surfaceAlt@` 底 + 底部 1px `@border@` 分隔（紧凑型，零垂直 padding），内容 `@surface@` 底 + 1px `@border@` 描边 + 6px 圆角；块间沿用 layout spacing 6px。
+- 实测：标题分隔线 ΔL 26（yunwu）/24（yaoshi）≥15，标题底色 ΔL 7/6 ≥5，内容框左右描边 ΔL 26/24，块间 6px 纯卡片色；深色下边框 `#353538` 比卡片底 `#1D1D20` **更亮**。
+- 末行回归修复：初版标题 4px 上下 padding 把列表压缩 10–20px 导致半行裁切（`SIMULATION` 被切）；改为紧凑标题后 `Defines` viewport 61→71px、行高 18px、四条文字带均 9px 全高，`SIMULATION` 完整可见（`v13b-defines-*-2x.png`）。
+- 未改：`Diagnostics` 的长句换行 item 仍被下沿裁一点，**与改版前基线截图一致**（既有现象，非本次引入）。

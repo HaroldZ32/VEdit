@@ -1,0 +1,425 @@
+{
+  "label": "after",
+  "theme": "yunwu",
+  "surface": "#FFFFFF",
+  "surfaceAlt": "#F8F8F7",
+  "border": "#E4E5E5",
+  "headerCount": 4,
+  "panelWideHeaderRows": 64,
+  "contentWideBorderRows": [
+    104,
+    121,
+    128,
+    183,
+    190,
+    207,
+    214,
+    286,
+    293,
+    310,
+    317,
+    389,
+    430,
+    447,
+    454,
+    509
+  ],
+  "sections": [
+    {
+      "name": "Files",
+      "headerFillBBox": [
+        26,
+        105,
+        576,
+        120
+      ],
+      "titleTopBorderY": 104,
+      "titleBottomBorderY": 121,
+      "titleTopBorder": "#E4E5E5",
+      "titleBottomBorder": "#E4E5E5",
+      "titleBorderDeltaTop": 26,
+      "titleBorderDeltaBottom": 26,
+      "titleTopBorderRun": 541,
+      "titleBottomBorderRun": 541,
+      "titleFillDelta": 7,
+      "titleBorderBrighter": false,
+      "content": {
+        "bbox": [
+          25,
+          128,
+          577,
+          183
+        ],
+        "leftBorderX": 25,
+        "rightBorderX": 577,
+        "topBorderY": 128,
+        "bottomBorderY": 183,
+        "leftBorder": "#E4E5E5",
+        "rightBorder": "#E4E5E5",
+        "leftDelta": 26,
+        "rightDelta": 26,
+        "leftBrighter": false,
+        "rightBrighter": false,
+        "leftRun": 44,
+        "rightRun": 44
+      }
+    },
+    {
+      "name": "Include dirs",
+      "headerFillBBox": [
+        26,
+        191,
+        576,
+        206
+      ],
+      "titleTopBorderY": 190,
+      "titleBottomBorderY": 207,
+      "titleTopBorder": "#E4E5E5",
+      "titleBottomBorder": "#E4E5E5",
+      "titleBorderDeltaTop": 26,
+      "titleBorderDeltaBottom": 26,
+      "titleTopBorderRun": 541,
+      "titleBottomBorderRun": 541,
+      "titleFillDelta": 7,
+      "titleBorderBrighter": false,
+      "content": {
+        "bbox": [
+          25,
+          214,
+          577,
+          286
+        ],
+        "leftBorderX": 25,
+        "rightBorderX": 577,
+        "topBorderY": 214,
+        "bottomBorderY": 286,
+        "leftBorder": "#E4E5E5",
+        "rightBorder": "#E4E5E5",
+        "leftDelta": 26,
+        "rightDelta": 26,
+        "leftBrighter": false,
+        "rightBrighter": false,
+        "leftRun": 61,
+        "rightRun": 61
+      }
+    },
+    {
+      "name": "Defines",
+      "headerFillBBox": [
+        26,
+        294,
+        576,
+        309
+      ],
+      "titleTopBorderY": 293,
+      "titleBottomBorderY": 310,
+      "titleTopBorder": "#E4E5E5",
+      "titleBottomBorder": "#E4E5E5",
+      "titleBorderDeltaTop": 26,
+      "titleBorderDeltaBottom": 26,
+      "titleTopBorderRun": 541,
+      "titleBottomBorderRun": 541,
+      "titleFillDelta": 7,
+      "titleBorderBrighter": false,
+      "content": {
+        "bbox": [
+          25,
+          317,
+          577,
+          389
+        ],
+        "leftBorderX": 25,
+        "rightBorderX": 577,
+        "topBorderY": 317,
+        "bottomBorderY": 389,
+        "leftBorder": "#E4E5E5",
+        "rightBorder": "#E4E5E5",
+        "leftDelta": 26,
+        "rightDelta": 26,
+        "leftBrighter": false,
+        "rightBrighter": false,
+        "leftRun": 61,
+        "rightRun": 61
+      }
+    },
+    {
+      "name": "Diagnostics",
+      "headerFillBBox": [
+        26,
+        431,
+        576,
+        446
+      ],
+      "titleTopBorderY": 430,
+      "titleBottomBorderY": 447,
+      "titleTopBorder": "#E4E5E5",
+      "titleBottomBorder": "#E4E5E5",
+      "titleBorderDeltaTop": 26,
+      "titleBorderDeltaBottom": 26,
+      "titleTopBorderRun": 541,
+      "titleBottomBorderRun": 541,
+      "titleFillDelta": 7,
+      "titleBorderBrighter": false,
+      "content": {
+        "bbox": [
+          25,
+          454,
+          577,
+          509
+        ],
+        "leftBorderX": 25,
+        "rightBorderX": 577,
+        "topBorderY": 454,
+        "bottomBorderY": 509,
+        "leftBorder": "#E4E5E5",
+        "rightBorder": "#E4E5E5",
+        "leftDelta": 26,
+        "rightDelta": 26,
+        "leftBrighter": false,
+        "rightBrighter": false,
+        "leftRun": 44,
+        "rightRun": 44
+      }
+    }
+  ],
+  "gaps": [
+    {
+      "after": "Files",
+      "before": "Include dirs",
+      "spanRows": 6,
+      "pureRuns": [
+        {
+          "start": 184,
+          "end": 189,
+          "rows": 6
+        }
+      ],
+      "maxPureRun": 6,
+      "firstPureRun": 6,
+      "lastPureRun": 6
+    },
+    {
+      "after": "Include dirs",
+      "before": "Defines",
+      "spanRows": 6,
+      "pureRuns": [
+        {
+          "start": 287,
+          "end": 292,
+          "rows": 6
+        }
+      ],
+      "maxPureRun": 6,
+      "firstPureRun": 6,
+      "lastPureRun": 6
+    },
+    {
+      "after": "Defines",
+      "before": "Diagnostics",
+      "spanRows": 40,
+      "pureRuns": [
+        {
+          "start": 390,
+          "end": 395,
+          "rows": 6
+        },
+        {
+          "start": 424,
+          "end": 429,
+          "rows": 6
+        }
+      ],
+      "maxPureRun": 6,
+      "firstPureRun": 6,
+      "lastPureRun": 6
+    }
+  ],
+  "rows": [
+    {
+      "section": "Files",
+      "frame": [
+        25,
+        128,
+        577,
+        183
+      ],
+      "viewportHeight": 54,
+      "rowHeight": 18,
+      "remainder": 0,
+      "fullRows": 3,
+      "clipDeficit": 0,
+      "lastRowComplete": true,
+      "bandPitches": [
+        18,
+        18
+      ],
+      "textBands": [
+        {
+          "start": 132,
+          "end": 144,
+          "height": 13
+        },
+        {
+          "start": 150,
+          "end": 160,
+          "height": 11
+        },
+        {
+          "start": 168,
+          "end": 178,
+          "height": 11
+        }
+      ],
+      "glyphHeightMedian": 11,
+      "lastBand": {
+        "start": 168,
+        "end": 178,
+        "height": 11
+      },
+      "lastBandFullGlyph": true,
+      "lastBandInsideViewport": true,
+      "rowsNeeded": 3
+    },
+    {
+      "section": "Include dirs",
+      "frame": [
+        25,
+        214,
+        577,
+        286
+      ],
+      "viewportHeight": 71,
+      "rowHeight": 18,
+      "remainder": 17,
+      "fullRows": 3,
+      "clipDeficit": 1,
+      "lastRowComplete": true,
+      "bandPitches": [
+        18,
+        18,
+        18
+      ],
+      "textBands": [
+        {
+          "start": 218,
+          "end": 230,
+          "height": 13
+        },
+        {
+          "start": 236,
+          "end": 248,
+          "height": 13
+        },
+        {
+          "start": 254,
+          "end": 266,
+          "height": 13
+        },
+        {
+          "start": 272,
+          "end": 284,
+          "height": 13
+        }
+      ],
+      "glyphHeightMedian": 13,
+      "lastBand": {
+        "start": 272,
+        "end": 284,
+        "height": 13
+      },
+      "lastBandFullGlyph": true,
+      "lastBandInsideViewport": true,
+      "rowsNeeded": 4
+    },
+    {
+      "section": "Defines",
+      "frame": [
+        25,
+        317,
+        577,
+        389
+      ],
+      "viewportHeight": 71,
+      "rowHeight": 18,
+      "remainder": 17,
+      "fullRows": 3,
+      "clipDeficit": 1,
+      "lastRowComplete": true,
+      "bandPitches": [
+        18,
+        18,
+        18
+      ],
+      "textBands": [
+        {
+          "start": 322,
+          "end": 330,
+          "height": 9
+        },
+        {
+          "start": 340,
+          "end": 348,
+          "height": 9
+        },
+        {
+          "start": 358,
+          "end": 366,
+          "height": 9
+        },
+        {
+          "start": 376,
+          "end": 384,
+          "height": 9
+        }
+      ],
+      "glyphHeightMedian": 9,
+      "lastBand": {
+        "start": 376,
+        "end": 384,
+        "height": 9
+      },
+      "lastBandFullGlyph": true,
+      "lastBandInsideViewport": true,
+      "rowsNeeded": 4
+    },
+    {
+      "section": "Diagnostics",
+      "frame": [
+        25,
+        454,
+        577,
+        509
+      ],
+      "viewportHeight": 54,
+      "rowHeight": 32,
+      "remainder": 22,
+      "fullRows": 1,
+      "clipDeficit": 10,
+      "lastRowComplete": false,
+      "bandPitches": [
+        32
+      ],
+      "textBands": [
+        {
+          "start": 458,
+          "end": 484,
+          "height": 27
+        },
+        {
+          "start": 490,
+          "end": 508,
+          "height": 19
+        }
+      ],
+      "glyphHeightMedian": 23,
+      "lastBand": {
+        "start": 490,
+        "end": 508,
+        "height": 19
+      },
+      "lastBandFullGlyph": false,
+      "lastBandInsideViewport": true,
+      "rowsNeeded": 2
+    }
+  ]
+}
