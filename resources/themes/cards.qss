@@ -718,3 +718,67 @@ QAbstractItemView QLineEdit {
     max-height: none;
     border-radius: 3px;
 }
+
+/* --- 弹层加固（V11）--------------------------------------------------------
+ *
+ * 实机反馈：文件对话框的右键菜单整块纯黑（纯黑底 + 1px 浅色圆角边 + 浅灰字），
+ * 即弹层的背景没有被真正画出来。Qt 在弹层声明 border-radius 时会启用半透明
+ * 窗口（WA_TranslucentBackground）；背景填充一旦在某个平台/合成器/调色板组合
+ * 下丢失，露出的就是黑底。无头环境未复现，故这里做防御性加固。
+ *
+ * 收法：末尾的规则覆盖前面的圆角弹层——菜单改方角，并显式写 background-color
+ * （不是只写 background）；文本、选中态、分隔线与图标一并复位。tooltip 与
+ * 下拉列表同样显式填 surface；文件对话框内部控件再兜一层底色。
+ * 注意：QFileDialog QLineEdit 只补底色，不复位 padding（保持全局输入框观感）。
+ */
+
+QMenu {
+    background-color: @surface@;
+    color: @text@;
+    border: 1px solid @border@;
+    border-radius: 0px;
+}
+
+QMenu::item {
+    padding: 4px 18px;
+    color: @text@;
+    background: transparent;
+}
+
+QMenu::item:selected {
+    background-color: @selection@;
+    color: @text@;
+}
+
+QMenu::separator {
+    height: 1px;
+    background: @border@;
+    margin: 4px 8px;
+}
+
+QMenu::icon {
+    padding-left: 4px;
+}
+
+QToolTip {
+    background-color: @surface@;
+    color: @text@;
+    border: 1px solid @border@;
+}
+
+QComboBox QAbstractItemView {
+    background-color: @surface@;
+    color: @text@;
+    selection-background-color: @selection@;
+    selection-color: @text@;
+    border: 1px solid @border@;
+}
+
+QFileDialog QTreeView,
+QFileDialog QListView,
+QFileDialog QComboBox,
+QFileDialog QLineEdit,
+QFileDialog QLabel {
+    background-color: @surface@;
+    color: @text@;
+}

@@ -140,3 +140,16 @@
 - **处置**：从本地已发布的 AppImage 中提取 type2 runtime（**长度 944632 字节**，即 `hsqs` 的第二个命中；第一次命中 194183 是 runtime 内部的误报，按它截取会得到截断 runtime、打出来的包 `--appimage-extract` 段错误），用 `packaging/appimage/vendor/appimagetool-x86_64 --runtime-file` 手工打包。
 - **本次产物**：`138,795,512` 字节，sha256 `b4c725f193b79b01cbce48b282d20ddd74f18da947f15d06bfc4c7f321a1b124`；`--appimage-version` 正常返回 type2 runtime 版本；包内实跑（Xvfb+xcb）截图 `screenshots/appimage-selection-yunwu.png`，选中行为 `#E1E1E1`（修复前 `#2A2A28` 近黑带）。
 - **未跑**：脚本第 6/7 步（包内 selfcheck 与 AppImage 形态的 F2 隔离）——`verify-f2-isolation.sh` 不接受直接传 AppImage 路径（输出 `unknown: <path>`），本次未追到其正确调用形式。AppDir 内容与上一次全绿构建一致（仅二进制与 cards.qss 更新），图标链等检查基于 AppDir 路径，未受影响。
+
+### 弹层加固（V11，用户反馈"文件对话框里点右键出一坨黑"）
+
+用户实机：**只有 QFileDialog 里的右键菜单**整块纯黑（浅灰字几乎不可见），应用自身菜单正常；主题暖杏黄；X11 带合成器。
+无头 Xvfb（无合成器）下**无法复现**（改动前后菜单都是白底），故按症状做**防御性加固**——纯黑 + 1px 浅色圆角边 + 浅字是"弹层被置为半透明但背景未被填充"的典型形态，而 QSS 给弹层设 `border-radius` 会让 Qt 启用半透明窗口。
+
+`cards.qss` 末尾 +64 行：
+- `QMenu`：**方角**（`border-radius: 0px`）+ 显式 `background-color: @surface@` + `color: @text@` + 1px `@border@`；`QMenu::item`/`::item:selected`/`::separator`/`::icon` 配套；
+- `QToolTip`、`QComboBox QAbstractItemView` 同样显式底色、不做半透明；
+- `QFileDialog` 内部 `QTreeView/QListView/QComboBox/QLineEdit/QLabel` 底色保底（`QLineEdit` 只补底色，不动 padding）。
+
+验证：构建 exit 0 + ctest 62/62；`QT_STYLE_OVERRIDE=fusion|windows` 两风格下，文件对话框右键菜单与 View 菜单**纯黑像素均为 0**、主导色 = surface；包内（暖杏黄 + windows 风格）截图 `screenshots/pkg-ctxmenu-xinghuang.png` 菜单 `#FFFDF6` 可读、方角、无纯黑。
+**未证明**：实机合成器路径、QToolTip 与下拉列表实拍——无头环境缺这些条件，需用户实机复核。
