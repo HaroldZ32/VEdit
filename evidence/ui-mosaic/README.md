@@ -96,3 +96,11 @@
 
 最终验收（船长自测，六套主题，`screenshots/after-*.png`）：外圈 8px 卡片像素 **0**；纵向连续画布 **10px**、横向 **16–18px**；卡片下/左/右阴影 **3–5px**；描边 Δ **24–26**；按钮轮廓 Δ **48–55**（均圆角）。顶部边阴影被子控件重绘覆盖属 Qt 绘制顺序，已按 `CONTRACT.md §5` 豁免并留痕。
 构建 `bash scripts/build-qt.sh` exit 0，全量 ctest **62/62**。`vedit-app-ui-theme-selftest` 的 `dock-separator-gap` 期望值随冻结常量 8→16 同步（仅此一处，见 §5「间隙语义」）。
+
+### 重新打包（视觉修复后）
+
+`bash packaging/runtime/build.sh` → `steps_failed=0`，`BUILD: F2 runtime OK`，`F2-ISOLATION PASS`，CentOS 7 探针 PASS。
+
+- AppImage `138,795,512` 字节，sha256 `3cfd24f06dea154990d6ed08da7932231760923737e8286085f451766844dadb`（与 `out/SHA256SUMS` 一致）。
+- 包内实跑截图 `screenshots/appimage-verify.png`：卡片白底 + 可见描边 + 阴影 + 画布间隙 + 按钮轮廓，状态栏 `Theme: Cloud White / Breeze Light` —— 证明修复已进入交付物。
+- 包内 `F1/T2` 复测（同一口径）：外圈 8px 卡片像素 **0**、纵向连续画布 **10px**。
