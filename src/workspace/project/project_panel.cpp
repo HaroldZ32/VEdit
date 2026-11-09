@@ -629,6 +629,7 @@ void ProjectPanel::onImportRequested()
     QFileDialog dialog(this, QCoreApplication::translate("VEdit", "Import Filelist"),
                        model_->projectRoot());
     dialog.setObjectName(QStringLiteral("project-import-filelist-dialog"));
+    vedit::common::useOwnFileDialog(dialog);
     vedit::common::configureImportFilelistDialog(dialog);
     if (dialog.exec() != QDialog::Accepted) {
         return;

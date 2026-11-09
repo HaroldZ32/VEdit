@@ -4,6 +4,7 @@
 #include "file_ops.h"
 #include "file_status_delegate.h"
 #include "file_tree_model.h"
+#include "file_dialog_filters.h" // src/common: every file picker stays Qt's own dialog
 
 #include <QAction>
 #include <QDir>
@@ -473,7 +474,7 @@ void FileTreeWidget::onOpenFolder()
     }
     const QString start = model_->rootPath().isEmpty() ? QDir::homePath() : model_->rootPath();
     const QString directory =
-        QFileDialog::getExistingDirectory(this, tr("Open Folder"), start);
+        vedit::common::chooseExistingDirectory(this, tr("Open Folder"), start);
     if (directory.isEmpty()) {
         return;
     }

@@ -333,12 +333,21 @@ private:
     void updateStatusBar();
     void syncPanelToggleStates();
     void addDiagnostic(const QString &message);
+    // V12: append one line to <stateDir>/ui-menu-diag.log. Pure observation:
+    // never changes the event, and a failed write is ignored.
+    void logMenuDiagnostics(QMenu *menu);
 
 protected:
     // A product theme is applied through the application palette; the toolbar
     // icons must follow it. ApplicationPaletteChange is the Qt 6 replacement of
     // the deprecated QGuiApplication::paletteChanged signal.
     void changeEvent(QEvent *event) override;
+
+    // V12: the application-wide menu diagnostics. Qt's file dialog builds its
+    // context menu from the same QMenu class as the app menus, so recording
+    // every QMenu Show is the only way to see — from the user's machine — which
+    // menu (and whose style/palette) actually paints the reported black popup.
+    bool eventFilter(QObject *watched, QEvent *event) override;
 
 private:
     ShellOptions options_;

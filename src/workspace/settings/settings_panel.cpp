@@ -276,9 +276,14 @@ QWidget *makePathRow(QWidget *owner, QLineEdit **edit, const QString &objectName
     browse->setToolTip(QObject::tr("Choose %1").arg(title));
     browse->setMaximumWidth(32);
     QObject::connect(browse, &QPushButton::clicked, container, [edit, container, title]() {
+        // V12: never the native/portal chooser; only Qt's own dialog obeys this
+        // application's stylesheet and palette. Spelled here rather than through
+        // src/common/file_dialog_filters.h because this lane also builds
+        // standalone, without that include path.
         const QString chosen =
             QFileDialog::getOpenFileName(container, QObject::tr("Select %1").arg(title),
-                                         (*edit)->text());
+                                         (*edit)->text(), QString(), nullptr,
+                                         QFileDialog::DontUseNativeDialog);
         if (!chosen.isEmpty()) {
             (*edit)->setText(chosen);
         }

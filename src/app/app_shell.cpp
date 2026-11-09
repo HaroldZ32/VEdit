@@ -32,6 +32,7 @@
 #include <QImage>
 #include <QHash>
 #include <QJsonArray>
+#include <QJsonDocument>
 #include <QJsonObject>
 #include <QKeySequence>
 #include <QLabel>
@@ -39,6 +40,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QPalette>
 #include <QPointer>
 #include <QPushButton>
 #include <QRegularExpression>
@@ -46,6 +48,7 @@
 #include <QStandardPaths>
 #include <QStatusBar>
 #include <QStringLiteral>
+#include <QStyle>
 #include <QTimer>
 #include <QToolBar>
 #include <QToolButton>
@@ -154,6 +157,14 @@ ApplicationShell::ApplicationShell(ShellOptions options, QWidget *parent)
         options_.stateDir = base.isEmpty() ? QDir::homePath() + QStringLiteral("/.config/vedit") : base;
     }
     session_ = std::make_unique<SessionStore>(options_.stateDir + QStringLiteral("/session.json"));
+    // V12: every QMenu that is shown (application menu, editor context menu AND
+    // the file dialog's own context menu) leaves one line in
+    // <stateDir>/ui-menu-diag.log. An application-level filter is required
+    // because the file dialog's menu is not a child of the shell. Observation
+    // only: the filter never consumes the event, and a failed write is ignored.
+    if (QApplication::instance() != nullptr) {
+        QApplication::instance()->installEventFilter(this);
+    }
     // AC-1.1 (batch 1): the workspace root must be known BEFORE the lanes
     // register their panel factories — main.cpp calls installPanels() after this
     // constructor and before startSession(), so the ordinary start (no
@@ -394,6 +405,12 @@ void ApplicationShell::startSession()
 
 ApplicationShell::~ApplicationShell()
 {
+    // V12: the menu diagnostics filter is installed on the application, not on
+    // this window; remove it explicitly so a destroyed shell can never be called
+    // for a later menu (several shells live in one process under ctest).
+    if (QApplication::instance() != nullptr) {
+        QApplication::instance()->removeEventFilter(this);
+    }
     if (panels_ != nullptr) {
         panels_->setVisibilityListener(nullptr);
     }
@@ -550,7 +567,7 @@ void ApplicationShell::openProjectFolderDialog()
     const QString directory =
         openFolderDialogProvider_
             ? openFolderDialogProvider_()
-            : QFileDialog::getExistingDirectory(this, tr("Open Folder"), start);
+            : vedit::common::chooseExistingDirectory(this, tr("Open Folder"), start);
     if (directory.isEmpty()) {
         return; // cancelled: nothing changes, nothing is persisted
     }
@@ -870,6 +887,7 @@ void ApplicationShell::registerCommands()
             // view had not applied yet (the user's "must click the type once").
             QFileDialog dialog(this, QCoreApplication::translate("VEdit", "Open File"), start);
             dialog.setObjectName(QStringLiteral("file-open-dialog"));
+            vedit::common::useOwnFileDialog(dialog);
             vedit::common::configureOpenFileDialog(dialog);
             if (dialog.exec() == QDialog::Accepted) {
                 path = dialog.selectedFiles().value(0);
@@ -1366,6 +1384,62 @@ void ApplicationShell::changeEvent(QEvent *event)
         refreshToolBarIcons();
         syncThemeMenuChecks();
     }
+}
+
+bool ApplicationShell::eventFilter(QObject *watched, QEvent *event)
+{
+    if (event != nullptr && event->type() == QEvent::Show) {
+        if (auto *menu = qobject_cast<QMenu *>(watched); menu != nullptr) {
+            logMenuDiagnostics(menu);
+        }
+    }
+    return QMainWindow::eventFilter(watched, event);
+}
+
+void ApplicationShell::logMenuDiagnostics(QMenu *menu)
+{
+    if (menu == nullptr || options_.stateDir.isEmpty()) {
+        return;
+    }
+    // Same directory as session.json (ShellOptions::stateDir); created on the
+    // first menu, so a fresh --state-dir run still produces the file.
+    if (!QDir().mkpath(options_.stateDir)) {
+        return;
+    }
+    QFile file(QDir(options_.stateDir).filePath(QStringLiteral("ui-menu-diag.log")));
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
+        return;
+    }
+    const QPalette palette = menu->palette();
+    const QObject *parent = menu->parent();
+    QJsonObject record;
+    record.insert(QStringLiteral("ts"), QDateTime::currentDateTime().toString(Qt::ISODateWithMs));
+    record.insert(QStringLiteral("class"), QString::fromLatin1(menu->metaObject()->className()));
+    record.insert(QStringLiteral("objectName"), menu->objectName());
+    record.insert(QStringLiteral("parentClass"),
+                  parent != nullptr ? QString::fromLatin1(parent->metaObject()->className())
+                                    : QString());
+    record.insert(QStringLiteral("parentObjectName"),
+                  parent != nullptr ? parent->objectName() : QString());
+    record.insert(QStringLiteral("isWindow"), menu->isWindow());
+    record.insert(QStringLiteral("translucent"),
+                  menu->testAttribute(Qt::WA_TranslucentBackground));
+    record.insert(QStringLiteral("width"), menu->width());
+    record.insert(QStringLiteral("height"), menu->height());
+    record.insert(QStringLiteral("paletteWindow"), palette.color(QPalette::Window).name());
+    record.insert(QStringLiteral("paletteBase"), palette.color(QPalette::Base).name());
+    record.insert(QStringLiteral("paletteText"), palette.color(QPalette::Text).name());
+    record.insert(QStringLiteral("paletteButton"), palette.color(QPalette::Button).name());
+    QStyle *appStyle = qApp->style();
+    record.insert(QStringLiteral("styleObjectName"),
+                  appStyle != nullptr ? appStyle->objectName() : QString());
+    record.insert(QStringLiteral("styleClass"),
+                  appStyle != nullptr ? QString::fromLatin1(appStyle->metaObject()->className())
+                                      : QString());
+    // Emptiness only: the stylesheet itself is far too large for a log line.
+    record.insert(QStringLiteral("styleSheetEmpty"), menu->styleSheet().isEmpty());
+    file.write(QJsonDocument(record).toJson(QJsonDocument::Compact));
+    file.write("\n");
 }
 
 void ApplicationShell::syncOwnedShortcuts()
@@ -1932,7 +2006,7 @@ bool ApplicationShell::saveActiveDocumentAs()
     const QString selected =
         saveAsDialogProvider_
             ? saveAsDialogProvider_(start)
-            : QFileDialog::getSaveFileName(
+            : vedit::common::chooseSaveFileName(
                   this, tr("Save As"), start,
                   QCoreApplication::translate("VEdit",
                                               "Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;"
