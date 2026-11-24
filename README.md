@@ -1,82 +1,54 @@
-# VEdit — 面向 Verilog / SystemVerilog 的桌面编辑器
+# VEdit
 
-VEdit 是 **Qt6 + KF6 + KTextEditor** 的 Verilog / SystemVerilog 桌面编辑器，目标环境是
-**CentOS 7.9 x86_64（glibc 2.17）**：免安装、无 root、可完全离线运行。
+VEdit 是面向 Verilog 和 SystemVerilog 工程的 Linux 桌面编辑器。导入仿真或综合用的 `.f` 文件清单，就可以沿模块实例阅读 RTL，从信号跳到驱动端或负载端，也可以在编辑器里比较工作文件与 SVN 历史修订。
 
-当前交付物是**一个单文件 AppImage**（Qt6 产品 `vedit-app`）：包内自带私有运行时和全部外部工具链，
-目标机不需要另外安装 Qt/KDE、verible、slang 或 git/svn。
+[下载 Linux AppImage](https://github.com/HaroldZ32/VEdit/releases/latest) · [用户手册](docs/USER_GUIDE.md) · [报告问题](https://github.com/HaroldZ32/VEdit/issues)
 
-## 交付物
+![VEdit 中文工作台：中央编辑 top.sv，右侧展示展开的模块树和 mem 模块的五个端口](docs/images/vedit-workbench.png)
 
-| 项目 | 内容 |
-|---|---|
-| 构建 | `bash packaging/runtime/build.sh` |
-| 产物 | `packaging/runtime/out/VEdit-<ver>-x86_64.AppImage` + `packaging/runtime/out/SHA256SUMS` |
-| 运行 | `chmod +x VEdit-<ver>-x86_64.AppImage` 后直接执行；没有 FUSE 时用 `--appimage-extract-and-run`（或 `APPIMAGE_EXTRACT_AND_RUN=1`） |
-| 包内入口 | Qt6 版 `vedit-app`（AppDir 内 `bin/vd-app`），`AppRun` 经包内 loader 启动 |
-| 平台 | CentOS 7.9 x86_64（glibc 2.17）及更新的主流发行版；已在 CentOS 7 / Ubuntu 24.04 / Rocky Linux 9 / Ubuntu 26.04 的容器环境验证启动与基本功能 |
+## 安装与运行
 
-运行时是 **F2 私有运行时**：包内自带 loader、glibc、Qt6、KF6、KTextEditor、自建
-KSyntaxHighlighting、tree-sitter 与字体；语法定义查找收窄到 AppDir 白名单；启动时可观测到
-`TOOLCHAIN source=…` / `VCS-TOOLCHAIN …` 行。契约与隔离证据见
-[`packaging/runtime/README.md`](packaging/runtime/README.md)。
-
-## 能做什么
-
-| 能力 | 说明 |
-|---|---|
-| 编辑 | KTextEditor：多标签、分屏、多光标/块选择、原生撤销栈、原生折叠；`.v/.vh` 与 `.sv/.svh` |
-| 工程 | 文件夹即工程；`.f` filelist（`$VAR` / `${}` / `$()` / `$$` / `~/`、`+incdir+`、`+define+`、嵌套 `-f`）；Project 面板；工程变量按工程根记忆 |
-| 导航 | 跳转到定义、查找引用、重命名（文件作用域）、符号大纲、转到文件（`Ctrl+P`）、面包屑 |
-| 诊断 | verible LSP 逐文件诊断 + 工程 lint（verible 或 slang 深度 lint）；保存后自动分析；诊断面板、悬浮修复、文件状态点 |
-| 搜索替换 | 当前文件 PCRE / 整个工程 RE2；替换前校验并先落盘；结果可双击跳转 |
-| 模块视图 | 模块树（根 = 从未被例化的顶层模块）+ 接口面板（端口方向/类型/位宽/位置，双击跳声明） |
-| 版本控制 | Source Control 面板：Git / Subversion 的工作区与历史（stage/commit/branch/tag/stash/worktree/blame/diff 等） |
-| 其他 | 内置终端；可选 FIM 补全（默认关闭）；界面语言中/英；中文注释与中文翻译随包（CJK 宽度约 1.60× 的已知取舍） |
-
-以上行为的细节、快捷键与已知限制见 [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md)。
-
-## 自带工具链（无需在目标机安装）
-
-- **Verible**：`verible-verilog-ls` / `verible-verilog-lint` / `verible-verilog-format`（Apache-2.0）
-- **slang** 12.1（MIT）：深度 lint 与模块目录
-- **Git** 2.53.0 与 **Subversion** 1.14.5（`usr/lib/vcs/`）：版本控制面板；解析顺序
-  **bundled > PATH > env**，可设 `VEDIT_GIT` / `VEDIT_SVN` 覆盖
-- Qt6 / KF6 / KTextEditor / tree-sitter / 字体：随 AppImage 的私有运行时
-
-## 从源码构建
+从 [Releases](https://github.com/HaroldZ32/VEdit/releases) 下载 x86_64 AppImage 和同一版本的 `SHA256SUMS`，放在同一目录。以下命令适用于 0.4.0。
 
 ```sh
-bash scripts/build-qt.sh          # 固定镜像 → Rust 服务层 → CMake configure/build/ctest → xcb 冒烟
-bash packaging/runtime/build.sh   # 组装 AppDir → 许可/F2 隔离 → 单文件 AppImage + SHA256SUMS
+sha256sum -c SHA256SUMS
+chmod +x VEdit-0.4.0-x86_64.AppImage
+./VEdit-0.4.0-x86_64.AppImage
 ```
 
-`build-qt.sh` 的裸二进制在 `target/qt6-build/src/app/vedit-app`；直接运行它需要宿主提供 KF6/Qt6、
-`libtree-sitter` 0.25 与 Qt 平台插件（版本矩阵见 [`docs/BUILD.md`](docs/BUILD.md) §12）。完整构建、
-固定版本与可复现性说明见 BUILD.md。门禁：`bash build/gates/qt6-cxx.sh`（Qt 车道）、
-`bash scripts/gates.sh`（Rust 服务层）、`bash build/gates/lrelease.sh`（翻译目录）、
-`bash build/gates/docs.sh`（文档）。
+AppImage 随附 Qt、HDL 分析工具、Git 和 Subversion，普通用户即可运行。已在 CentOS 7.9 和 Rocky Linux 9.3 的 x86_64 用户态环境验证启动。机器没有 FUSE 时，可用 `./VEdit-0.4.0-x86_64.AppImage --appimage-extract-and-run` 启动。
 
-## 旧版 GTK3 产品线（不是交付物）
+## 打开第一个工程
 
-仓库还保留**旧 Rust/GTK3 产品** `vd-app` 的构建与打包：`bash scripts/build.sh` 产出
-`build/artifacts/vd-app`，`packaging/appimage/` 与 `packaging/tarball/` 是它的 AppImage / tar.gz /
-`.run` 管线（按需求非目标 5 保留）。**它不是本仓库的 Qt 交付物**；管线自述也写着
-“Legacy GTK product packaging … do not present this pipeline as the final Qt AppImage”。
-两条产品线的区别与实测校验见 [`docs/BUILD.md`](docs/BUILD.md) §7.2。
+1. 用 **File → Open Folder…** 选择 RTL 工程根目录。如果只想编辑一个源文件，直接按 `Ctrl+O` 打开即可。
+2. 在 **Project** 面板点击 **Import Filelist…**，选择工程的 `.f`。VEdit 会解析嵌套的 `-f`、`+incdir+` 和 `+define+`，并在后台生成模块树。
+3. 在 **Module Tree** 中双击模块打开定义，或在 **Interface** 面板查看端口方向、类型和位宽。将光标放在已保存源码的信号名上，右键选择 **Trace Driver** 或 **Trace Load** 查看直接连接。要展开跨实例的分支，选择 **Show Driver Chain** 或 **Show Load Chain**。
 
-## 文档
+想试试信号追踪，可以打开仓库中的示例目录，导入 `sources.f`，再从 `top.sv` 的 `merged` 信号查看驱动链。[打开示例](tests/fixtures/signal_trace)
 
-| 文档 | 内容 |
-|---|---|
-| [`docs/USER_GUIDE.md`](docs/USER_GUIDE.md) | 内置用户手册：界面、工程、编辑/搜索、诊断、模块树、设置、语言与已知限制 |
-| [`docs/BUILD.md`](docs/BUILD.md) | Qt6/KF6 构建底座、打包入口（§7）、固定版本与可复现性 |
-| [`docs/RELEASING.md`](docs/RELEASING.md) | 分支模型、提交规范、SemVer 与 Qt 发版流程 |
-| [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) | 全部第三方组件、版本、许可与源码获取说明 |
-| [`docs/licenses/`](docs/licenses/) | 许可全文 |
+## 编辑、诊断与版本控制
 
-## 许可
+- **代码导航**　`F12` 跳到定义，`Shift+F12` 查找引用，`Ctrl+P` 按文件名定位。分屏、多光标、代码折叠和工程搜索适合对照阅读多个模块。
+- **HDL 诊断**　Verilog/SystemVerilog 默认使用 slang-server 提供语义导航，也可选择 Verible。编辑时在 **Outline** 查看当前文件的诊断，需要检查完整工程时运行 **Project → Lint Project**。
+- **双栏比较**　从 **File → Compare Files…** 或文件树右键菜单选择两个文件。差异块按行对齐，中间箭头可向任一可写侧应用当前块，支持撤销和单侧保存。
+- **Git 与 SVN**　在 **Source Control** 中查看变更、提交和历史。SVN 支持变更列表、分支、合并和多个工作副本；`BASE`、`HEAD`、指定修订和工作文件可以在同一个比较窗口中打开。
 
-- 项目自身代码以 **MIT** 许可发布：见根目录 [`LICENSE`](LICENSE)。
-- 第三方组件各自保留其许可，见 [`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md)（其中 §1–§8
-  描述旧 GTK3 产物、§9 描述 Qt6 产品线的语法数据与工具链；范围以该文件为准）。
+## 构建与贡献
+
+在装有 Git 和 Docker 的 Linux 主机上，克隆仓库后运行构建脚本。
+
+```sh
+git clone https://github.com/HaroldZ32/VEdit.git
+cd VEdit
+bash scripts/fetch-verible.sh
+bash build/slang/build.sh
+bash scripts/build-qt.sh
+  ```
+
+VEdit 使用 Qt 6、KDE Frameworks、KTextEditor 和 Rust。构建脚本编译并运行测试，生成 `target/qt6-build/src/app/vedit-app`。工具链、AppImage 打包和各项测试的独立入口见[构建指南](docs/BUILD.md)。
+
+欢迎提交 Issue 或 Pull Request。报告 HDL 分析问题时，请附上可公开的最小源码、相关 `.f` 和预期结果。代码和文档改动从 `dev` 创建分支，并向 `dev` 提交 PR。[贡献与发布流程](docs/RELEASING.md)
+
+## 许可证
+
+VEdit 使用 [MIT 许可证](LICENSE)。随包第三方组件的许可证和源码来源见[第三方声明](THIRD_PARTY_NOTICES.md)。
