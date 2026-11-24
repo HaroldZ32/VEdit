@@ -127,13 +127,13 @@ step "5/7 build the AppImage"
 bash packaging/runtime/build-appimage.sh "$OUT/AppDir" > "$EVID/50-appimage.log" 2>&1
 rc=$?; echo "appimagetool exit=$rc" | tee -a "$EVID/50-appimage.log"
 grep -E 'APPIMAGE|sha256|SOURCE_DATE' "$EVID/50-appimage.log"
-[ "$rc" -eq 0 ] || { echo "AppImage build failed"; exit 1; }
+[ "$rc" -eq 0 ] || { cat "$EVID/50-appimage.log" >&2; exit "$rc"; }
 APPIMAGE=$(grep -m1 '^APPIMAGE=' "$EVID/50-appimage.log" | cut -d= -f2-)
-if [ -n "$APPIMAGE" ] && [ -f "$APPIMAGE" ]; then
-  ( cd "$(dirname "$APPIMAGE")" && sha256sum "$(basename "$APPIMAGE")" > SHA256SUMS )
-  cp "$(dirname "$APPIMAGE")/SHA256SUMS" "$EVID/SHA256SUMS"
-  echo "SHA256SUMS:"; cat "$EVID/SHA256SUMS"
-fi
+[ -n "$APPIMAGE" ] && [ -f "$APPIMAGE" ] || { echo "ERROR: packaged AppImage is missing" >&2; exit 1; }
+( cd "$(dirname "$APPIMAGE")" && sha256sum "$(basename "$APPIMAGE")" > SHA256SUMS ) \
+  && cp "$(dirname "$APPIMAGE")/SHA256SUMS" "$EVID/SHA256SUMS" \
+  || { echo "ERROR: could not write the AppImage checksum" >&2; exit 1; }
+echo "SHA256SUMS:"; cat "$EVID/SHA256SUMS"
 
 step "6/7 self-check + F2 isolation on the AppImage"
 bash packaging/runtime/selfcheck.sh --appimage "$APPIMAGE" > "$EVID/60-selfcheck-appimage.log" 2>&1
