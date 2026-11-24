@@ -77,6 +77,7 @@ jobs:
         with:
           artifact-ids: ${{ needs.build.outputs.artifact-id }}
           path: ${{ runner.temp }}/vedit-release
+          merge-multiple: true
       - name: Check the transferred pair and publish the existing tag
         shell: bash
         working-directory: ${{ runner.temp }}/vedit-release

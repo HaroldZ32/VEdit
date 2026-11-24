@@ -78,6 +78,7 @@ jobs:
         with:
           artifact-ids: ${{ needs.slang.outputs.artifact-id }}
           path: ${{ runner.temp }}
+          merge-multiple: true
       - name: Build and check Rust services
         run: |
           tar -xf "$RUNNER_TEMP/slang.tar"
