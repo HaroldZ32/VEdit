@@ -1,0 +1,865 @@
+VEdit M0 private runtime — F2 build (2026-11-09T15:40:15Z)
+
+===== preflight =====
+image: vedit-qt6-build:local
+image_id=sha256:1ae6e99bcf424bdaadffa2fe1d801fe9d225a04b28a83f1961252d1de33be19b size=2183723690
+vd-app: /home/haroldzhao/MyProj/DshProj/VEdit/target/qt6-build/src/app/vedit-app
+  sha256=8a4212d2fc6dfb097a3bc4cd8456609f6b396c483c3a9c8822ff356add902449
+probe: /home/haroldzhao/MyProj/DshProj/VEdit/target/qt6-build/cmake/smoke/vedit-ksh-env-probe
+  sha256=2a6d6ff3c6966f591d8e112a1e55f7b728d0ee35a25b617443d32556437fc87e
+f2 install: /home/haroldzhao/MyProj/DshProj/VEdit/target/ksh-selfbuild/F2/install
+aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6  /home/haroldzhao/MyProj/DshProj/VEdit/target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0
+whitelist: 5 xml in resources/syntax/
+toolchain: verible=/home/haroldzhao/MyProj/DshProj/VEdit/.mpd/recon/verible/bin slang=/home/haroldzhao/MyProj/DshProj/VEdit/build/slang/out/slang
+  07bf6b456dae27815cc1d6f9952beb232a5d4b3242c5e11a417028b64e67b845  /home/haroldzhao/MyProj/DshProj/VEdit/.mpd/recon/verible/bin/verible-verilog-ls
+  63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  /home/haroldzhao/MyProj/DshProj/VEdit/build/slang/out/slang
+appimagetool: vendored=/home/haroldzhao/MyProj/DshProj/VEdit/packaging/appimage/vendor/appimagetool-x86_64 cache=/home/haroldzhao/MyProj/DshProj/VEdit/packaging/appimage/.cache/appimagetool.AppImage
+	libfuse3.so.4 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libfuse3.so.4
+
+===== 1/7 assemble AppDir (F2: self-built library + whitelist) =====
+assemble exit=0
+APPDIR_FORM=F2
+APPDIR_FILES=359
+APPDIR_BYTES=403287326
+APPDIR_WHITELIST=Markdown,SystemVerilog,Tcl,VHDL,Verilog
+assemble exit=0
+
+===== 1b/7 delivery invariants (T31: vd-app, Qt plugins, static FFI, toolchain) =====
+   0x0000000000000001 (NEEDED)             Shared library: [libQt6Svg.so.6]
+   0x0000000000000001 (NEEDED)             Shared library: [libKF6TextEditor.so.6]
+   0x0000000000000001 (NEEDED)             Shared library: [libKF6Parts.so.6]
+   0x0000000000000001 (NEEDED)             Shared library: [libQt6Widgets.so.6]
+   0x0000000000000001 (NEEDED)             Shared library: [libtree-sitter.so.0.25]
+   0x0000000000000001 (NEEDED)             Shared library: [libKF6SyntaxHighlighting.so.6]
+   0x0000000000000001 (NEEDED)             Shared library: [libQt6Gui.so.6]
+   0x0000000000000001 (NEEDED)             Shared library: [libQt6Core.so.6]
+   0x0000000000000001 (NEEDED)             Shared library: [libstdc++.so.6]
+   0x0000000000000001 (NEEDED)             Shared library: [libm.so.6]
+   0x0000000000000001 (NEEDED)             Shared library: [libgcc_s.so.1]
+   0x0000000000000001 (NEEDED)             Shared library: [libc.so.6]
+
+===== 2/7 licence / not-shipped gate (delivery mode: must be all green) =====
+not-shipped exit=0
+CHECK PASS  no KDE systemverilog.xml / verilog.xml by sha256
+CHECK PASS  no file named systemverilog.xml / verilog.xml
+CHECK PASS  no syntax-bundled/ directory (F2 C5)
+CHECK PASS  active definitions == whitelist [Markdown,SystemVerilog,Tcl,VHDL,Verilog]
+CHECK PASS  library embeds no strict-GPL syntax definition
+CHECK PASS  no probe stamp
+CHECK PASS  packaged loader present
+CHECK PASS  packaged libc present
+== summary: pass=8 fail=0 expected_red=0 ==
+
+===== 3/7 runtime self-check (AppDir, clean env) =====
+selfcheck(appdir) exit=0
+KSH-ENV defs=5 hash=7a004024007d64ae2f042f288bba900a60601d453b599c6ada6feac3be34d294 hash_files=f1e8ae3c88926f6ed3227bb6dd855ef718caa0baff92d39ef5a8692dea210a58
+KSH-GUARD PASS whitelist=Markdown,SystemVerilog,Tcl,VHDL,Verilog
+TOOLCHAIN source=verible:bundled slang:bundled missing=[] aux source=slang-server:missing verible-format:bundled verible-lint:bundled missing=[slang-server] local=[/home/haroldzhao/MyProj/DshProj/VEdit/build/slang/out,/home/haroldzhao/MyProj/DshProj/VEdit/.mpd/recon/verible/bin]
+CHECK path.display.under-root PASS rtl/top.sv
+CHECK path.display.under-root.normalized-root PASS
+CHECK path.display.outside-root PASS /tmp/tmp.ym4sHbgDLV/tmp/vedit-app-KBQvxH/display-outside/top.sv
+CHECK path.display.no-root PASS /tmp/tmp.ym4sHbgDLV/tmp/vedit-app-KBQvxH/display-outside/top.sv
+CHECK path.display.sibling-prefix-outside PASS
+CHECK path.display.root-itself-absolute PASS
+CHECK path.display.root-normalized PASS /tmp/tmp.ym4sHbgDLV/tmp/vedit-app-KBQvxH/display-root
+CHECK empty.no-project-label PASS
+CHECK empty.one-pane PASS
+CHECK empty.window-title PASS
+CHECK panels.no-settings-dock PASS
+CHECK panels.registry.five PASS
+CHECK panels.registered.file-tree PASS
+CHECK panels.registered.search PASS
+CHECK panels.registered.terminal PASS
+CHECK panels.registered.vcs PASS
+CHECK panels.registered.outline PASS
+CHECK panels.none-inserted-by-default PASS
+CHECK panels.show.file-tree PASS
+CHECK panels.toggle-hide.file-tree PASS
+CHECK panels.toggle-show.file-tree PASS
+CHECK panels.show.search PASS
+CHECK panels.toggle-hide.search PASS
+CHECK panels.toggle-show.search PASS
+CHECK panels.show.terminal PASS
+CHECK panels.toggle-hide.terminal PASS
+CHECK panels.toggle-show.terminal PASS
+CHECK panels.show.vcs PASS
+CHECK panels.toggle-hide.vcs PASS
+CHECK panels.toggle-show.vcs PASS
+CHECK panels.show.outline PASS
+CHECK panels.toggle-hide.outline PASS
+CHECK panels.toggle-show.outline PASS
+CHECK panels.five-docks PASS
+CHECK menus.file PASS
+CHECK menus.view PASS
+CHECK menus.edit PASS
+CHECK menus.help PASS
+CHECK settings.preferences.exists PASS
+CHECK settings.preferences.menu PASS
+CHECK settings.preferences.shortcut PASS Ctrl+,
+CHECK settings.preferences.unique-shortcut PASS bindings=1
+TOOLCHAIN source=verible:bundled slang:bundled missing=[] aux source=slang-server:missing verible-format:bundled verible-lint:bundled missing=[slang-server] local=[/home/haroldzhao/MyProj/DshProj/VEdit/build/slang/out,/home/haroldzhao/MyProj/DshProj/VEdit/.mpd/recon/verible/bin]
+VCS-TOOLCHAIN git=/home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/AppDir/usr/lib/vcs/bin/git version=2.53.0 svn=/home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/AppDir/usr/lib/vcs/bin/svn version=1.14.5 source=bundled git_source=bundled svn_source=bundled
+CHECK menus.five.registered PASS all five
+CHECK menus.five.order PASS menu-file,menu-edit,menu-view,menu-project,menu-help
+CHECK menus.preferences.in-edit-registry PASS edit-actions=3
+CHECK menus.preferences.only-edit PASS
+CHECK menus.preferences.last-in-edit PASS
+CHECK commands.no-duplicate-shortcuts PASS
+CHECK commands.no-desktop-global-shortcuts PASS
+CHECK shortcut.format.registry-equals-fallback PASS registry=Ctrl+Shift+F fallback=Ctrl+Shift+F
+CHECK commands.action.file.new-layout PASS
+CHECK commands.action.file.close-pane PASS
+CHECK commands.action.file.quit PASS
+CHECK commands.action.view.split.horizontal PASS
+CHECK commands.action.view.split.vertical PASS
+CHECK commands.action.view.focus.next PASS
+CHECK commands.action.view.layout.reset PASS
+CHECK commands.action.help.about PASS
+CHECK commands.action.view.panel.file-tree PASS
+CHECK commands.action.view.panel.outline PASS
+CHECK commands.file-menu-actions PASS
+CHECK commands.view-panel-actions-checkable PASS
+CHECK panels.sync.closed.file-tree PASS
+CHECK panels.sync.action-show.file-tree PASS
+CHECK panels.sync.close-clears-check.file-tree PASS
+CHECK panels.sync.one-click-reopen.file-tree PASS
+CHECK panels.sync.closed.search PASS
+CHECK panels.sync.action-show.search PASS
+CHECK panels.sync.close-clears-check.search PASS
+CHECK panels.sync.one-click-reopen.search PASS
+CHECK panels.sync.closed.terminal PASS
+CHECK panels.sync.action-show.terminal PASS
+CHECK panels.sync.close-clears-check.terminal PASS
+CHECK panels.sync.one-click-reopen.terminal PASS
+CHECK panels.sync.closed.vcs PASS
+CHECK panels.sync.action-show.vcs PASS
+CHECK panels.sync.close-clears-check.vcs PASS
+CHECK panels.sync.one-click-reopen.vcs PASS
+CHECK panels.sync.closed.outline PASS
+CHECK panels.sync.action-show.outline PASS
+CHECK panels.sync.close-clears-check.outline PASS
+CHECK panels.sync.one-click-reopen.outline PASS
+CHECK panels.sync.reverse-precondition PASS
+CHECK panels.sync.reverse-control PASS
+CHECK split.horizontal.pane-count PASS
+CHECK split.horizontal.root-orientation PASS
+CHECK split.vertical.pane-count PASS
+CHECK split.vertical.root-orientation PASS
+CHECK panes.three PASS
+CHECK focus.set-second PASS
+CHECK focus.next-wraps PASS
+CHECK close.pane-count PASS
+CHECK reset.one-pane PASS
+CHECK close.last-pane.keeps-one PASS
+CHECK close.last-pane.active PASS
+CHECK close.command.exists PASS
+CHECK close.command.in-view PASS
+CHECK close.command.shortcut-ctrl-w PASS
+CHECK close.shortcuts.no-conflicts PASS
+CHECK close.shortcuts.binding-count PASS
+CHECK close.split.pane-count PASS
+CHECK close.split.editor-editable PASS
+CHECK close.unsaved.blocked PASS
+CHECK close.reverse-control PASS
+CHECK close.unsaved-saved-close PASS
+CHECK close.remaining-editable PASS
+CHECK close.last-single-view PASS
+CHECK close.button.split PASS
+CHECK close.button.present PASS
+CHECK close.button.single-view PASS
+CHECK open.command.exists PASS
+CHECK open.command.in-file-menu PASS
+CHECK open.command.shortcut-ctrl-o PASS
+CHECK open.fixture-a PASS
+CHECK open.fixture-b PASS
+CHECK open.missing.rejected PASS
+CHECK open.missing.nonzero-readable PASS
+CHECK open.multiple.ok PASS
+CHECK open.multiple.pane-count PASS
+CHECK open.multiple.paths PASS
+CHECK open.multiple.active-second PASS
+CHECK open.dialog.action-opens PASS
+CHECK path.display.title.absolute-no-root PASS VEdit — /tmp/tmp.ym4sHbgDLV/tmp/vedit-app-KBQvxH/open-a.sv[*]
+CHECK path.display.tab-tooltip.absolute-no-root PASS /tmp/tmp.ym4sHbgDLV/tmp/vedit-app-KBQvxH/open-a.sv
+CHECK open.filter.filelist PASS Verilog/SystemVerilog/filelist (*.f *.F *.v *.sv *.svh *.vh);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F);;All Files (*)
+CHECK open.filter.no-guessed-flist PASS Verilog/SystemVerilog/filelist (*.f *.F *.v *.sv *.svh *.vh);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F);;All Files (*)
+CHECK open.filter.keeps-existing-types PASS Verilog/SystemVerilog/filelist (*.f *.F *.v *.sv *.svh *.vh);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F);;All Files (*)
+CHECK open.signal.opens PASS
+CHECK open.signal.one-per-open PASS /tmp/tmp.ym4sHbgDLV/tmp/vedit-app-KBQvxH/open-a.sv,/tmp/tmp.ym4sHbgDLV/tmp/vedit-app-KBQvxH/open-b.sv
+CHECK open.signal.failed-open-silent PASS
+CHECK open.signal.direct-pane-open PASS
+CHECK theme.catalogue PASS
+CHECK theme.apply PASS
+CHECK theme.invalid.rejected PASS
+CHECK theme.invalid.keeps-palette PASS
+CHECK shortcut.override.applied PASS
+CHECK session.save PASS
+CHECK restore.pane-count PASS
+CHECK restore.layout-tree PASS
+CHECK restore.active-pane PASS
+CHECK restore.theme PASS
+CHECK restore.panel-visible PASS
+CHECK restore.shortcut PASS
+CHECK panel-seam.seed-session PASS
+CHECK panel-seam.deferred-nothing-inserted PASS
+CHECK panel-seam.dock-restored PASS
+CHECK panel-seam.terminal-content PASS
+CHECK panel-seam.search-content PASS
+CHECK panel-seam.no-placeholder PASS
+CHECK panel-seam.editor-layout-restored PASS panes=2
+CHECK broken.config.survives PASS
+CHECK broken.config.diagnostics PASS
+CHECK stress.one-pane-initial PASS
+CHECK stress.pane-invariant PASS
+CHECK stress.non-null-active PASS
+CHECK save.command.registered PASS
+CHECK save.shortcut.ctrl-s PASS
+CHECK save.menu.file-item PASS
+CHECK save.demo.open PASS
+CHECK save.demo.action.disk-bytes PASS
+CHECK save.demo.action.path-unchanged PASS
+CHECK save.demo.action.no-temp-file PASS
+CHECK editor.provider.id PASS
+CHECK editor.pane.ktexteditor-widget PASS
+CHECK save.shortcut.unique PASS bindings=1
+CHECK save.shortcut.authority PASS
+CHECK save.shortcut.runtime-duplicate-enumerated PASS bindings=2
+CHECK save.shortcut.runtime-unguarded-turn-keeps-duplicate PASS bindings=2
+CHECK save.shortcut.runtime-guard-clears PASS bindings=1
+CHECK save.shortcut.runtime-guard-authority PASS
+CHECK save.shortcut.runtime-guard-entry-point PASS removed=1 bindings=1
+CHECK save.shortcut.runtime-guard-timer PASS
+CHECK editor.pane.open PASS
+CHECK editor.pane.open-path PASS /tmp/tmp.ym4sHbgDLV/tmp/vedit-app-KBQvxH/pane-open.v
+CHECK editor.pane.save PASS
+CHECK save.ktexteditor.document PASS
+CHECK save.shortcut.window PASS
+CHECK save.shortcut.disk-bytes PASS
+CHECK save.shortcut.modified-cleared PASS
+CHECK save.shortcut.path-unchanged PASS
+CHECK save.menu.disk-bytes PASS
+CHECK save.menu.path-unchanged PASS
+CHECK save.no-temp-file PASS
+CHECK save.failure.disk-unchanged PASS
+CHECK save.failure.status-bar PASS
+CHECK save.failure.diagnostic PASS
+CHECK save.failure.still-modified PASS
+CHECK save.recovery.disk-bytes PASS
+CHECK save.recovery.not-modified PASS
+CHECK save.shortcut.unique.multi-pane PASS bindings=1
+CHECK fold.native.pane PASS
+CHECK fold.native.open PASS
+CHECK fold.native.view PASS
+CHECK fold.native.highlight-mode PASS SystemVerilog
+CHECK fold.native.binding PASS
+CHECK fold.native.no-auto-folds PASS hidden=0
+CHECK fold.native.breadcrumb.describe PASS module:m0 > function:inc
+CHECK fold.native.breadcrumb.pane-bar PASS m0 > inc
+CHECK fold.native.breadcrumb.no-invention PASS describe='' bar=''
+CHECK fold.native.second-open PASS
+CHECK fold.native.second-view PASS
+CHECK fold.native.second-cursor PASS
+CHECK editcore.scratch PASS
+CHECK editcore.ktexteditor.instance PASS
+CHECK editcore.document.create PASS
+CHECK editcore.undo.metaobject-slot PASS
+CHECK editcore.document.setText PASS
+CHECK editcore.open.fixture-written PASS
+CHECK editcore.open.file PASS
+CHECK editcore.open.records-path PASS /tmp/tmp.ym4sHbgDLV/tmp/vedit-app-nXkVYN/open.v
+CHECK editcore.highlight.verilog.fixture PASS
+CHECK editcore.highlight.verilog.open PASS
+CHECK editcore.highlight.verilog.mode PASS mode='Verilog' expected='Verilog'
+CHECK editcore.highlight.verilog.definition PASS Verilog
+CHECK editcore.highlight.verilog.format-ranges PASS 30
+CHECK editcore.highlight.verilog.folding-regions PASS begins=2 ends=2
+CHECK editcore.highlight.systemverilog.fixture PASS
+CHECK editcore.highlight.systemverilog.open PASS
+CHECK editcore.highlight.systemverilog.mode PASS mode='SystemVerilog' expected='SystemVerilog'
+CHECK editcore.highlight.systemverilog.definition PASS SystemVerilog
+CHECK editcore.highlight.systemverilog.format-ranges PASS 29
+CHECK editcore.highlight.systemverilog.folding-regions PASS begins=1 ends=1
+CHECK editcore.atomic.fresh-file PASS
+CHECK editcore.atomic.fresh-content PASS
+CHECK editcore.atomic.no-temp-left PASS
+CHECK editcore.atomic.replace PASS
+CHECK editcore.atomic.replace-no-temp PASS
+CHECK editcore.atomic.fault.write-fails PASS
+CHECK editcore.atomic.fault.write-keeps-target PASS
+CHECK editcore.atomic.fault.write-cleans-temp PASS
+CHECK editcore.atomic.fault.rename-fails PASS
+CHECK editcore.atomic.fault.rename-keeps-target PASS
+CHECK editcore.atomic.fault.rename-cleans-temp PASS
+CHECK editcore.atomic.fault.dir-fsync-nonfatal PASS atomic save: injected directory fsync failure;directory fsync skipped by fault injection
+CHECK editcore.atomic.fault.dir-fsync-content PASS
+CHECK editcore.save.kernel PASS
+CHECK editcore.save.bytes PASS
+CHECK editcore.save.clears-modified PASS
+CHECK editcore.find.count PASS 3
+CHECK editcore.find.adjacent PASS
+CHECK editcore.replace.count PASS found=3 replaced=3
+CHECK editcore.replace.text PASS zz bbb zz ccc zz
+CHECK editcore.replace.one-undo PASS
+CHECK editcore.replace.redo PASS
+CHECK editcore.goto.line PASS
+CHECK editcore.goto.clamp-low PASS
+CHECK editcore.goto.clamp-high PASS line=3
+CHECK editcore.goto.column-zero PASS
+CHECK editcore.undo.100-operations PASS 100
+CHECK editcore.undo.100-back-to-original PASS mismatches=0 error=
+CHECK editcore.redo.100-forwards PASS mismatches=0
+CHECK editcore.multicursor.native-api PASS
+CHECK editcore.multicursor.native-read-back PASS
+CHECK editcore.multicursor.native-insert-call PASS
+CHECK editcore.multicursor.native-insert-primary PASS 1
+CHECK editcore.multicursor.batch-insert PASS
+CHECK editcore.multicursor.batch-text PASS XaXaXa
+CHECK editcore.multicursor.batch-one-undo PASS
+CHECK editcore.multicursor.batch-redo PASS
+CHECK editcore.wsedit.fixture-open PASS
+CHECK editcore.wsedit.fixture-disk PASS
+CHECK editcore.wsedit.view PASS
+CHECK editcore.wsedit.open-visible PASS 3
+CHECK editcore.wsedit.applied PASS
+CHECK editcore.wsedit.counts PASS edits=3 files=2 editor=1 disk=1
+CHECK editcore.wsedit.open-text PASS module top;
+CHECK editcore.wsedit.open-dirty PASS
+CHECK editcore.wsedit.disk-text PASS // new_name
+CHECK editcore.wsedit.summary PASS Rename applied: 3 edit(s) in 2 file(s) — 1 document(s) changed in the editor, 1 file(s) written on disk
+CHECK editcore.wsedit.one-undo PASS
+CHECK editcore.wsedit.one-redo PASS
+CHECK editcore.wsedit.out-of-range-refused PASS /tmp/tmp.ym4sHbgDLV/tmp/vedit-app-nXkVYN/rename-open.sv: edit line 1000-1000 is outside rename-open.sv (5 line(s))
+CHECK editcore.wsedit.refusal-keeps-buffer PASS
+CHECK editcore.wsedit.refusal-keeps-file PASS // new_name
+CHECK editcore.wsedit.missing-file-refused PASS cannot change /tmp/tmp.ym4sHbgDLV/tmp/vedit-app-nXkVYN/does-not-exist.sv: No such file or directory
+CHECK editcore.wsedit.empty-refused PASS
+CHECK editcore.references.empty PASS
+CHECK editcore.references.count PASS 2
+CHECK editcore.references.ordered PASS
+CHECK editcore.references.open-snippet PASS wire new_name;
+CHECK editcore.references.location-text PASS /tmp/tmp.ym4sHbgDLV/tmp/vedit-app-nXkVYN/rename-open.sv:2:8
+CHECK editcore.references.disk-snippet PASS // new_name
+CHECK editcore.gates.document PASS
+CHECK editcore.gates.view PASS
+CHECK editcore.gates.channel PASS
+CHECK editcore.gates.rename-disabled PASS verible does not advertise renameProvider for this session
+CHECK editcore.gates.rename-real-reason PASS verible does not advertise renameProvider for this session
+CHECK editcore.gates.rename-action-greyed PASS
+CHECK editcore.gates.rename-refused PASS verible does not advertise renameProvider for this session
+CHECK editcore.gates.rename-enabled PASS
+CHECK editcore.gates.rename-action-enabled PASS
+CHECK editcore.provider.id PASS ktexteditor
+CHECK editcore.provider.creates-view PASS
+CHECK editcore.provider.fixture PASS
+CHECK editcore.provider.open PASS
+CHECK editcore.provider.open-records-path PASS /tmp/tmp.ym4sHbgDLV/tmp/vedit-app-LdhOIW/provider.v
+CHECK editcore.provider.document PASS
+CHECK editcore.provider.save PASS
+CHECK editcore.provider.save-bytes PASS
+CHECK editcore.boundary.zero-calls PASS before=0 after=0
+CHECK editcore.boundary.counter-live PASS before=0 after=1
+CHECK root.restored-before-install PASS /tmp/tmp.ym4sHbgDLV/tmp/vedit-app-KBQvxH/project-a
+CHECK root.explicit-wins PASS /tmp/tmp.ym4sHbgDLV/tmp/vedit-app-KBQvxH/project-b
+CHECK path.display.under-root.open PASS
+CHECK path.display.window-title.relative PASS VEdit — rtl/foo.sv[*]
+CHECK path.display.tab-tooltip.relative PASS rtl/foo.sv
+CHECK path.display.open-key-still-absolute PASS /tmp/tmp.ym4sHbgDLV/tmp/vedit-app-KBQvxH/project-a/rtl/foo.sv
+CHECK path.display.outside-root.open PASS
+CHECK path.display.window-title.outside-absolute PASS VEdit — /tmp/tmp.ym4sHbgDLV/tmp/vedit-app-KBQvxH/outside/other.sv[*]
+CHECK path.display.tab-tooltip.outside-absolute PASS /tmp/tmp.ym4sHbgDLV/tmp/vedit-app-KBQvxH/outside/other.sv
+CHECK root.switch-broadcast PASS /tmp/tmp.ym4sHbgDLV/tmp/vedit-app-KBQvxH/project-b
+CHECK root.switch-value PASS /tmp/tmp.ym4sHbgDLV/tmp/vedit-app-KBQvxH/project-b
+CHECK root.switch-label PASS project-b
+CHECK root.switch-idempotent PASS events=1
+CHECK root.open-folder-command PASS
+CHECK root.open-folder-menu PASS
+CHECK root.open-folder-switches PASS /tmp/tmp.ym4sHbgDLV/tmp/vedit-app-KBQvxH/project-a
+CHECK root.open-folder-broadcast PASS events=2
+CHECK root.open-folder-cancel PASS events=2
+CHECK root.switch.persisted PASS
+CHECK root.switch.persisted-value PASS
+APP-SHELL-SELFTEST ok=1 checks=321 failures=0 state=/tmp/tmp.ym4sHbgDLV/tmp/vedit-app-KBQvxH/state
+CHECK PASS  apprun.syntax
+CHECK PASS  default.slang-bundled
+CHECK PASS  default.verible-bundled
+CHECK PASS  override.slang-preserved
+CHECK PASS  override.verible-preserved
+CHECK PASS  absent.slang-not-exported
+CHECK PASS  absent.verible-not-exported
+CHECK PASS  absent.slang-caller-preserved
+CHECK PASS  non-executable.slang-not-exported
+CHECK PASS  AppRun preserves caller tool overrides
+CHECK PASS  ksh_guard under LC_ALL=C (C locale)
+CHECK PASS  ksh_guard under LC_ALL=zh_CN.UTF-8 (non-C locale; A3 blocker 1)
+CHECK PASS  APP-SHELL-SELFTEST ok=1
+CHECK PASS  toolchain source=bundled, missing=[]
+CHECK PASS  our syntax definitions loaded (all five XMLs, order-insensitive)
+CHECK PASS  KTextEditor kernel
+CHECK PASS  native folding available and no auto-folds
+CHECK PASS  packaged CJK font present (19484784 bytes)
+CHECK PASS  packaged OFL text present and carries the copyright
+CHECK PASS  packaged loader in process maps
+CHECK PASS  no system loader in process maps
+CHECK PASS  packaged libc in process maps
+SELFCHECK PASS
+
+===== 4/7 F2 isolation with a simulated KDE host + user definitions =====
+isolation(appdir) exit=0
+CHECK PASS  appdir: defs=5 (whitelist entries)
+CHECK PASS  appdir: names == whitelist [Markdown,SystemVerilog,Tcl,VHDL,Verilog]
+CHECK PASS  appdir: every whitelist name wins from /app/usr/share/org.kde.syntax-highlighting/syntax
+CHECK PASS  appdir: all 5 loaded definitions win from the AppDir
+CHECK PASS  appdir: HostLeakProbe invisible
+CHECK PASS  appdir: UserLeakProbe invisible
+CHECK PASS  appdir: vedit.desktop carries Icon=io.github.vedit.VEdit
+CHECK PASS  appdir: vedit.desktop carries StartupWMClass=io.github.vedit.VEdit
+CHECK PASS  appdir: icon artifact present: io.github.vedit.VEdit.png (34447 bytes)
+CHECK PASS  appdir: icon artifact present: .DirIcon (34447 bytes)
+CHECK PASS  appdir: icon artifact present: usr/share/icons/hicolor/16x16/apps/io.github.vedit.VEdit.png (629 bytes)
+CHECK PASS  appdir: icon artifact present: usr/share/icons/hicolor/24x24/apps/io.github.vedit.VEdit.png (1129 bytes)
+CHECK PASS  appdir: icon artifact present: usr/share/icons/hicolor/32x32/apps/io.github.vedit.VEdit.png (1946 bytes)
+CHECK PASS  appdir: icon artifact present: usr/share/icons/hicolor/48x48/apps/io.github.vedit.VEdit.png (3331 bytes)
+CHECK PASS  appdir: icon artifact present: usr/share/icons/hicolor/64x64/apps/io.github.vedit.VEdit.png (5073 bytes)
+CHECK PASS  appdir: icon artifact present: usr/share/icons/hicolor/128x128/apps/io.github.vedit.VEdit.png (12061 bytes)
+CHECK PASS  appdir: icon artifact present: usr/share/icons/hicolor/256x256/apps/io.github.vedit.VEdit.png (34447 bytes)
+CHECK PASS  appdir: icon artifact present: usr/share/icons/hicolor/512x512/apps/io.github.vedit.VEdit.png (122932 bytes)
+CHECK PASS  appdir: io.github.vedit.VEdit.png is a PNG (magic ok)
+CHECK PASS  appdir: .DirIcon is a PNG (magic ok)
+CHECK PASS  appdir-reverse: reverse control reproduces the host leak (defs=406 > whitelist 5)
+CHECK PASS  appdir-reverse-user: XDG_DATA_HOME=$HOME/.local/share makes the user definition visible (defs=6 > 5; UserLeakProbe=/root/.local/share/org.kde.syntax-highlighting/syntax/UserLeakProbe.xml)
+CHECK PASS  appdir-shadow: higher-version same-name host Tcl.xml wins when visible (/shadow/org.kde.syntax-highlighting/syntax/Tcl.xml)
+CHECK PASS  appdir-shadow: the winner-path assertion REPORTS the shadowed Tcl (offenders: Tcl=/shadow/org.kde.syntax-highlighting/syntax/Tcl.xml)
+CHECK PASS  appdir-shadow: shadow leaves the name set unchanged (defs=5) - why names alone are insufficient
+== summary: pass=25 fail=0 ==
+F2-ISOLATION PASS
+
+===== 5/7 build the AppImage =====
+appimagetool exit=0
+appimagetool sha256 OK (793fca0ce4bcc309dc65d3f66669f58e3755643e4dadbe03932e7b436128494f)
+SOURCE_DATE_EPOCH=1794238280
+APPIMAGE=/home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/VEdit-0.2.2-x86_64.AppImage
+APPIMAGE_BYTES=138811896
+APPIMAGE_SHA256=2eae6145e399ccbf9ca226c3e4c9759f6016a650643d512b9462737cb98b1cca
+SHA256SUMS:
+2eae6145e399ccbf9ca226c3e4c9759f6016a650643d512b9462737cb98b1cca  VEdit-0.2.2-x86_64.AppImage
+
+===== 6/7 self-check + F2 isolation on the AppImage =====
+selfcheck(appimage) exit=0
+isolation(appimage) exit=0
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK path.display.under-root PASS rtl/top.sv
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK path.display.under-root.normalized-root PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK path.display.outside-root PASS /tmp/tmp.qd1d2cBikR/tmp/vedit-app-ehUnav/display-outside/top.sv
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK path.display.no-root PASS /tmp/tmp.qd1d2cBikR/tmp/vedit-app-ehUnav/display-outside/top.sv
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK path.display.sibling-prefix-outside PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK path.display.root-itself-absolute PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK path.display.root-normalized PASS /tmp/tmp.qd1d2cBikR/tmp/vedit-app-ehUnav/display-root
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK empty.no-project-label PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK empty.one-pane PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK empty.window-title PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.no-settings-dock PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.registry.five PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.registered.file-tree PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.registered.search PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.registered.terminal PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.registered.vcs PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.registered.outline PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.none-inserted-by-default PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.show.file-tree PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.toggle-hide.file-tree PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.toggle-show.file-tree PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.show.search PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.toggle-hide.search PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.toggle-show.search PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.show.terminal PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.toggle-hide.terminal PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.toggle-show.terminal PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.show.vcs PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.toggle-hide.vcs PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.toggle-show.vcs PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.show.outline PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.toggle-hide.outline PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.toggle-show.outline PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.five-docks PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK menus.file PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK menus.view PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK menus.edit PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK menus.help PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK settings.preferences.exists PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK settings.preferences.menu PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK settings.preferences.shortcut PASS Ctrl+,
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK settings.preferences.unique-shortcut PASS bindings=1
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK menus.five.registered PASS all five
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK menus.five.order PASS menu-file,menu-edit,menu-view,menu-project,menu-help
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK menus.preferences.in-edit-registry PASS edit-actions=3
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK menus.preferences.only-edit PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK menus.preferences.last-in-edit PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK commands.no-duplicate-shortcuts PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK commands.no-desktop-global-shortcuts PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK shortcut.format.registry-equals-fallback PASS registry=Ctrl+Shift+F fallback=Ctrl+Shift+F
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK commands.action.file.new-layout PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK commands.action.file.close-pane PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK commands.action.file.quit PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK commands.action.view.split.horizontal PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK commands.action.view.split.vertical PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK commands.action.view.focus.next PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK commands.action.view.layout.reset PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK commands.action.help.about PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK commands.action.view.panel.file-tree PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK commands.action.view.panel.outline PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK commands.file-menu-actions PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK commands.view-panel-actions-checkable PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.closed.file-tree PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.action-show.file-tree PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.close-clears-check.file-tree PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.one-click-reopen.file-tree PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.closed.search PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.action-show.search PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.close-clears-check.search PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.one-click-reopen.search PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.closed.terminal PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.action-show.terminal PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.close-clears-check.terminal PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.one-click-reopen.terminal PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.closed.vcs PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.action-show.vcs PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.close-clears-check.vcs PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.one-click-reopen.vcs PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.closed.outline PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.action-show.outline PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.close-clears-check.outline PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.one-click-reopen.outline PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.reverse-precondition PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panels.sync.reverse-control PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK split.horizontal.pane-count PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK split.horizontal.root-orientation PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK split.vertical.pane-count PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK split.vertical.root-orientation PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panes.three PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK focus.set-second PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK focus.next-wraps PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK close.pane-count PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK reset.one-pane PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK close.last-pane.keeps-one PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK close.last-pane.active PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK close.command.exists PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK close.command.in-view PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK close.command.shortcut-ctrl-w PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK close.shortcuts.no-conflicts PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK close.shortcuts.binding-count PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK close.split.pane-count PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK close.split.editor-editable PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK close.unsaved.blocked PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK close.reverse-control PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK close.unsaved-saved-close PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK close.remaining-editable PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK close.last-single-view PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK close.button.split PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK close.button.present PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK close.button.single-view PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK open.command.exists PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK open.command.in-file-menu PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK open.command.shortcut-ctrl-o PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK open.fixture-a PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK open.fixture-b PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK open.missing.rejected PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK open.missing.nonzero-readable PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK open.multiple.ok PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK open.multiple.pane-count PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK open.multiple.paths PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK open.multiple.active-second PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK open.dialog.action-opens PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK path.display.title.absolute-no-root PASS VEdit — /tmp/tmp.qd1d2cBikR/tmp/vedit-app-ehUnav/open-a.sv[*]
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK path.display.tab-tooltip.absolute-no-root PASS /tmp/tmp.qd1d2cBikR/tmp/vedit-app-ehUnav/open-a.sv
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK open.filter.filelist PASS Verilog/SystemVerilog/filelist (*.f *.F *.v *.sv *.svh *.vh);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F);;All Files (*)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK open.filter.no-guessed-flist PASS Verilog/SystemVerilog/filelist (*.f *.F *.v *.sv *.svh *.vh);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F);;All Files (*)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK open.filter.keeps-existing-types PASS Verilog/SystemVerilog/filelist (*.f *.F *.v *.sv *.svh *.vh);;Verilog/SystemVerilog (*.v *.sv *.svh *.vh);;Filelists (*.f *.F);;All Files (*)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK open.signal.opens PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK open.signal.one-per-open PASS /tmp/tmp.qd1d2cBikR/tmp/vedit-app-ehUnav/open-a.sv,/tmp/tmp.qd1d2cBikR/tmp/vedit-app-ehUnav/open-b.sv
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK open.signal.failed-open-silent PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK open.signal.direct-pane-open PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK theme.catalogue PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK theme.apply PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK theme.invalid.rejected PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK theme.invalid.keeps-palette PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK shortcut.override.applied PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK session.save PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK restore.pane-count PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK restore.layout-tree PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK restore.active-pane PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK restore.theme PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK restore.panel-visible PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK restore.shortcut PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panel-seam.seed-session PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panel-seam.deferred-nothing-inserted PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panel-seam.dock-restored PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panel-seam.terminal-content PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panel-seam.search-content PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panel-seam.no-placeholder PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK panel-seam.editor-layout-restored PASS panes=2
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK broken.config.survives PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK broken.config.diagnostics PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK stress.one-pane-initial PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK stress.pane-invariant PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK stress.non-null-active PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.command.registered PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.shortcut.ctrl-s PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.menu.file-item PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.demo.open PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.demo.action.disk-bytes PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.demo.action.path-unchanged PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.demo.action.no-temp-file PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editor.provider.id PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editor.pane.ktexteditor-widget PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.shortcut.unique PASS bindings=1
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.shortcut.authority PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.shortcut.runtime-duplicate-enumerated PASS bindings=2
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.shortcut.runtime-unguarded-turn-keeps-duplicate PASS bindings=2
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.shortcut.runtime-guard-clears PASS bindings=1
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.shortcut.runtime-guard-authority PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.shortcut.runtime-guard-entry-point PASS removed=1 bindings=1
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.shortcut.runtime-guard-timer PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editor.pane.open PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editor.pane.open-path PASS /tmp/tmp.qd1d2cBikR/tmp/vedit-app-ehUnav/pane-open.v
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editor.pane.save PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.ktexteditor.document PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.shortcut.window PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.shortcut.disk-bytes PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.shortcut.modified-cleared PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.shortcut.path-unchanged PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.menu.disk-bytes PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.menu.path-unchanged PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.no-temp-file PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.failure.disk-unchanged PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.failure.status-bar PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.failure.diagnostic PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.failure.still-modified PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.recovery.disk-bytes PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.recovery.not-modified PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK save.shortcut.unique.multi-pane PASS bindings=1
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK fold.native.pane PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK fold.native.open PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK fold.native.view PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK fold.native.highlight-mode PASS SystemVerilog
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK fold.native.binding PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK fold.native.no-auto-folds PASS hidden=0
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK fold.native.breadcrumb.describe PASS module:m0 > function:inc
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK fold.native.breadcrumb.pane-bar PASS m0 > inc
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK fold.native.breadcrumb.no-invention PASS describe='' bar=''
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK fold.native.second-open PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK fold.native.second-view PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK fold.native.second-cursor PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.scratch PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.ktexteditor.instance PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.document.create PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.undo.metaobject-slot PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.document.setText PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.open.fixture-written PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.open.file PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.open.records-path PASS /tmp/tmp.qd1d2cBikR/tmp/vedit-app-VjKIkP/open.v
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.highlight.verilog.fixture PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.highlight.verilog.open PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.highlight.verilog.mode PASS mode='Verilog' expected='Verilog'
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.highlight.verilog.definition PASS Verilog
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.highlight.verilog.format-ranges PASS 30
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.highlight.verilog.folding-regions PASS begins=2 ends=2
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.highlight.systemverilog.fixture PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.highlight.systemverilog.open PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.highlight.systemverilog.mode PASS mode='SystemVerilog' expected='SystemVerilog'
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.highlight.systemverilog.definition PASS SystemVerilog
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.highlight.systemverilog.format-ranges PASS 29
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.highlight.systemverilog.folding-regions PASS begins=1 ends=1
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.atomic.fresh-file PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.atomic.fresh-content PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.atomic.no-temp-left PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.atomic.replace PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.atomic.replace-no-temp PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.atomic.fault.write-fails PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.atomic.fault.write-keeps-target PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.atomic.fault.write-cleans-temp PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.atomic.fault.rename-fails PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.atomic.fault.rename-keeps-target PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.atomic.fault.rename-cleans-temp PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.atomic.fault.dir-fsync-nonfatal PASS atomic save: injected directory fsync failure;directory fsync skipped by fault injection
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.atomic.fault.dir-fsync-content PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.save.kernel PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.save.bytes PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.save.clears-modified PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.find.count PASS 3
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.find.adjacent PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.replace.count PASS found=3 replaced=3
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.replace.text PASS zz bbb zz ccc zz
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.replace.one-undo PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.replace.redo PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.goto.line PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.goto.clamp-low PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.goto.clamp-high PASS line=3
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.goto.column-zero PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.undo.100-operations PASS 100
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.undo.100-back-to-original PASS mismatches=0 error=
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.redo.100-forwards PASS mismatches=0
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.multicursor.native-api PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.multicursor.native-read-back PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.multicursor.native-insert-call PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.multicursor.native-insert-primary PASS 1
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.multicursor.batch-insert PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.multicursor.batch-text PASS XaXaXa
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.multicursor.batch-one-undo PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.multicursor.batch-redo PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.wsedit.fixture-open PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.wsedit.fixture-disk PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.wsedit.view PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.wsedit.open-visible PASS 3
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.wsedit.applied PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.wsedit.counts PASS edits=3 files=2 editor=1 disk=1
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.wsedit.open-text PASS module top;
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.wsedit.open-dirty PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.wsedit.disk-text PASS // new_name
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.wsedit.summary PASS Rename applied: 3 edit(s) in 2 file(s) — 1 document(s) changed in the editor, 1 file(s) written on disk
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.wsedit.one-undo PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.wsedit.one-redo PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.wsedit.out-of-range-refused PASS /tmp/tmp.qd1d2cBikR/tmp/vedit-app-VjKIkP/rename-open.sv: edit line 1000-1000 is outside rename-open.sv (5 line(s))
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.wsedit.refusal-keeps-buffer PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.wsedit.refusal-keeps-file PASS // new_name
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.wsedit.missing-file-refused PASS cannot change /tmp/tmp.qd1d2cBikR/tmp/vedit-app-VjKIkP/does-not-exist.sv: No such file or directory
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.wsedit.empty-refused PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.references.empty PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.references.count PASS 2
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.references.ordered PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.references.open-snippet PASS wire new_name;
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.references.location-text PASS /tmp/tmp.qd1d2cBikR/tmp/vedit-app-VjKIkP/rename-open.sv:2:8
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.references.disk-snippet PASS // new_name
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.gates.document PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.gates.view PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.gates.channel PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.gates.rename-disabled PASS verible does not advertise renameProvider for this session
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.gates.rename-real-reason PASS verible does not advertise renameProvider for this session
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.gates.rename-action-greyed PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.gates.rename-refused PASS verible does not advertise renameProvider for this session
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.gates.rename-enabled PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.gates.rename-action-enabled PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.provider.id PASS ktexteditor
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.provider.creates-view PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.provider.fixture PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.provider.open PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.provider.open-records-path PASS /tmp/tmp.qd1d2cBikR/tmp/vedit-app-IzvScD/provider.v
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.provider.document PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.provider.save PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.provider.save-bytes PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.boundary.zero-calls PASS before=0 after=0
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK editcore.boundary.counter-live PASS before=0 after=1
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK root.restored-before-install PASS /tmp/tmp.qd1d2cBikR/tmp/vedit-app-ehUnav/project-a
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK root.explicit-wins PASS /tmp/tmp.qd1d2cBikR/tmp/vedit-app-ehUnav/project-b
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK path.display.under-root.open PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK path.display.window-title.relative PASS VEdit — rtl/foo.sv[*]
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK path.display.tab-tooltip.relative PASS rtl/foo.sv
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK path.display.open-key-still-absolute PASS /tmp/tmp.qd1d2cBikR/tmp/vedit-app-ehUnav/project-a/rtl/foo.sv
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK path.display.outside-root.open PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK path.display.window-title.outside-absolute PASS VEdit — /tmp/tmp.qd1d2cBikR/tmp/vedit-app-ehUnav/outside/other.sv[*]
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK path.display.tab-tooltip.outside-absolute PASS /tmp/tmp.qd1d2cBikR/tmp/vedit-app-ehUnav/outside/other.sv
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK root.switch-broadcast PASS /tmp/tmp.qd1d2cBikR/tmp/vedit-app-ehUnav/project-b
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK root.switch-value PASS /tmp/tmp.qd1d2cBikR/tmp/vedit-app-ehUnav/project-b
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK root.switch-label PASS project-b
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK root.switch-idempotent PASS events=1
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK root.open-folder-command PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK root.open-folder-menu PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK root.open-folder-switches PASS /tmp/tmp.qd1d2cBikR/tmp/vedit-app-ehUnav/project-a
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK root.open-folder-broadcast PASS events=2
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK root.open-folder-cancel PASS events=2
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK root.switch.persisted PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK root.switch.persisted-value PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  apprun.syntax
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  default.slang-bundled
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  default.verible-bundled
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  override.slang-preserved
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  override.verible-preserved
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  absent.slang-not-exported
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  absent.verible-not-exported
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  absent.slang-caller-preserved
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  non-executable.slang-not-exported
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  AppRun preserves caller tool overrides
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  ksh_guard under LC_ALL=C (C locale)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  ksh_guard under LC_ALL=zh_CN.UTF-8 (non-C locale; A3 blocker 1)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  APP-SHELL-SELFTEST ok=1
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  toolchain source=bundled, missing=[]
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  our syntax definitions loaded (all five XMLs, order-insensitive)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  KTextEditor kernel
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  native folding available and no auto-folds
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  packaged CJK font present (19484784 bytes)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  packaged OFL text present and carries the copyright
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  packaged loader in process maps
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  no system loader in process maps
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:CHECK PASS  packaged libc in process maps
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/60-selfcheck-appimage.log:SELFCHECK PASS
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir: defs=5 (whitelist entries)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir: names == whitelist [Markdown,SystemVerilog,Tcl,VHDL,Verilog]
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir: every whitelist name wins from /app/usr/share/org.kde.syntax-highlighting/syntax
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir: all 5 loaded definitions win from the AppDir
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir: HostLeakProbe invisible
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir: UserLeakProbe invisible
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir: vedit.desktop carries Icon=io.github.vedit.VEdit
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir: vedit.desktop carries StartupWMClass=io.github.vedit.VEdit
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir: icon artifact present: io.github.vedit.VEdit.png (34447 bytes)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir: icon artifact present: .DirIcon (34447 bytes)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir: icon artifact present: usr/share/icons/hicolor/16x16/apps/io.github.vedit.VEdit.png (629 bytes)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir: icon artifact present: usr/share/icons/hicolor/24x24/apps/io.github.vedit.VEdit.png (1129 bytes)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir: icon artifact present: usr/share/icons/hicolor/32x32/apps/io.github.vedit.VEdit.png (1946 bytes)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir: icon artifact present: usr/share/icons/hicolor/48x48/apps/io.github.vedit.VEdit.png (3331 bytes)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir: icon artifact present: usr/share/icons/hicolor/64x64/apps/io.github.vedit.VEdit.png (5073 bytes)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir: icon artifact present: usr/share/icons/hicolor/128x128/apps/io.github.vedit.VEdit.png (12061 bytes)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir: icon artifact present: usr/share/icons/hicolor/256x256/apps/io.github.vedit.VEdit.png (34447 bytes)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir: icon artifact present: usr/share/icons/hicolor/512x512/apps/io.github.vedit.VEdit.png (122932 bytes)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir: io.github.vedit.VEdit.png is a PNG (magic ok)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir: .DirIcon is a PNG (magic ok)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir-reverse: reverse control reproduces the host leak (defs=406 > whitelist 5)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir-reverse-user: XDG_DATA_HOME=$HOME/.local/share makes the user definition visible (defs=6 > 5; UserLeakProbe=/root/.local/share/org.kde.syntax-highlighting/syntax/UserLeakProbe.xml)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir-shadow: higher-version same-name host Tcl.xml wins when visible (/shadow/org.kde.syntax-highlighting/syntax/Tcl.xml)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir-shadow: the winner-path assertion REPORTS the shadowed Tcl (offenders: Tcl=/shadow/org.kde.syntax-highlighting/syntax/Tcl.xml)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appdir-shadow: shadow leaves the name set unchanged (defs=5) - why names alone are insufficient
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage: defs=5 (whitelist entries)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage: names == whitelist [Markdown,SystemVerilog,Tcl,VHDL,Verilog]
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage: every whitelist name wins from /app/usr/share/org.kde.syntax-highlighting/syntax
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage: all 5 loaded definitions win from the AppDir
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage: HostLeakProbe invisible
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage: UserLeakProbe invisible
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage: vedit.desktop carries Icon=io.github.vedit.VEdit
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage: vedit.desktop carries StartupWMClass=io.github.vedit.VEdit
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage: icon artifact present: io.github.vedit.VEdit.png (34447 bytes)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage: icon artifact present: .DirIcon (34447 bytes)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage: icon artifact present: usr/share/icons/hicolor/16x16/apps/io.github.vedit.VEdit.png (629 bytes)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage: icon artifact present: usr/share/icons/hicolor/24x24/apps/io.github.vedit.VEdit.png (1129 bytes)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage: icon artifact present: usr/share/icons/hicolor/32x32/apps/io.github.vedit.VEdit.png (1946 bytes)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage: icon artifact present: usr/share/icons/hicolor/48x48/apps/io.github.vedit.VEdit.png (3331 bytes)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage: icon artifact present: usr/share/icons/hicolor/64x64/apps/io.github.vedit.VEdit.png (5073 bytes)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage: icon artifact present: usr/share/icons/hicolor/128x128/apps/io.github.vedit.VEdit.png (12061 bytes)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage: icon artifact present: usr/share/icons/hicolor/256x256/apps/io.github.vedit.VEdit.png (34447 bytes)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage: icon artifact present: usr/share/icons/hicolor/512x512/apps/io.github.vedit.VEdit.png (122932 bytes)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage: io.github.vedit.VEdit.png is a PNG (magic ok)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage: .DirIcon is a PNG (magic ok)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage-reverse: reverse control reproduces the host leak (defs=406 > whitelist 5)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage-reverse-user: XDG_DATA_HOME=$HOME/.local/share makes the user definition visible (defs=6 > 5; UserLeakProbe=/root/.local/share/org.kde.syntax-highlighting/syntax/UserLeakProbe.xml)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage-shadow: higher-version same-name host Tcl.xml wins when visible (/shadow/org.kde.syntax-highlighting/syntax/Tcl.xml)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage-shadow: the winner-path assertion REPORTS the shadowed Tcl (offenders: Tcl=/shadow/org.kde.syntax-highlighting/syntax/Tcl.xml)
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:CHECK PASS  appimage-shadow: shadow leaves the name set unchanged (defs=5) - why names alone are insufficient
+/home/haroldzhao/MyProj/DshProj/VEdit/evidence/slice3-pack/61-f2-isolation-appimage.log:F2-ISOLATION PASS
+
+===== 7/7 CentOS 7.9 mechanism probe (T12 owns the formal matrix) =====
+TOOLCHAIN source=verible:bundled slang:bundled missing=[] aux source=slang-server:missing verible-format:bundled verible-lint:bundled missing=[slang-server] local=[]
+TOOLCHAIN source=verible:bundled slang:bundled missing=[] aux source=slang-server:missing verible-format:bundled verible-lint:bundled missing=[slang-server] local=[]
+VCS-TOOLCHAIN git=/app/usr/lib/vcs/bin/git version=2.53.0 svn=/app/usr/lib/vcs/bin/svn version=1.14.5 source=bundled git_source=bundled svn_source=bundled
+APP-SHELL-SELFTEST ok=1 checks=321 failures=0 state=/tmp/vedit-app-ejkPYp/state
+centos7_smoke_exit=0
+CHECK PASS  CentOS 7 mechanism probe
+CHECK PASS  bundled VCS toolchain in the clean container
+
+===== summary =====
+form=F2
+appdir=/home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/AppDir
+appdir_files=359
+whitelist=Markdown,SystemVerilog,Tcl,VHDL,Verilog
+kshlib_sha256=aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
+appimage=/home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/VEdit-0.2.2-x86_64.AppImage
+appimage_bytes=138811896
+appimage_sha256=2eae6145e399ccbf9ca226c3e4c9759f6016a650643d512b9462737cb98b1cca
+steps_failed=0
+BUILD: F2 runtime OK
+EXIT=0

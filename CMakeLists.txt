@@ -16,7 +16,7 @@ cmake_minimum_required(VERSION 3.25)
 # (e.g. src/syntax/provider's test fixture grammar parser.c). A CXX-only root
 # project cannot link such a target: CMake fails with "cannot determine linker
 # language for target". T63 found this when the provider lane was first wired in.
-project(VEdit VERSION 0.2.1 LANGUAGES C CXX)
+project(VEdit VERSION 0.2.2 LANGUAGES C CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(VEditVersions)

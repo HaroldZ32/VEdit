@@ -13,7 +13,7 @@
 # prove a real CentOS 7 (kernel 3.10) machine; that row stays UNTESTED.
 set -uo pipefail
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
-APPIMAGE=${VEDIT_APPIMAGE:-$ROOT/packaging/runtime/out/VEdit-0.2.1-x86_64.AppImage}
+APPIMAGE=${VEDIT_APPIMAGE:-$ROOT/packaging/runtime/out/VEdit-0.2.2-x86_64.AppImage}
 EVID=${VEDIT_MATRIX_EVIDENCE:-$ROOT/evidence/slice3-pack/final-206033c/matrix}
 CENTOS=docker.m.daocloud.io/library/centos:7
 IMAGES=(
