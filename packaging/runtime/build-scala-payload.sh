@@ -54,6 +54,12 @@ set -a; . "$ROOT/scripts/versions-scala.env"; set +a
 : "${CHISEL_COORD:?}" "${CHISEL_PLUGIN_COORD:?}" "${CHISEL_SCALA_VERSION:?}" "${FIRTOOL_RESOLVER_COORD:?}"
 
 mkdir -p "$CACHE" "$OUT" "$OUT/licenses"
+# sbt's Unix socket must live in a writable, short path independent of the host
+# session and the potentially long workspace path.
+XDG_RUNTIME_DIR=$(mktemp -d "${TMPDIR:-/tmp}/vedit-scala.XXXXXX")
+export XDG_RUNTIME_DIR
+trap 'rm -rf -- "$XDG_RUNTIME_DIR"' EXIT
+export XDG_CACHE_HOME="$CACHE/host-cache" XDG_CONFIG_HOME="$CACHE/host-config"
 
 # Pinned download with a hard sha256 check (same rule as the VHDL payload).
 fetch() {
@@ -164,9 +170,9 @@ else
   printf '//> using scala %s\n' "$SCALA_MAIN_VERSION" \
     > "$CACHE/prewarm-scala-cli/project.scala"
   log "prewarming scala-cli cache (one online compile)"
-  COURSIER_CACHE="$SCALA_CLI_CACHE" \
-    "$OUT/scala-cli/scala-cli" compile --server=false \
-      "$CACHE/prewarm-scala-cli" > "$SCALA_CLI_CACHE/prewarm.log" 2>&1 || {
+  ( cd "$CACHE/prewarm-scala-cli" && COURSIER_CACHE="$SCALA_CLI_CACHE" \
+    "$OUT/scala-cli/scala-cli" compile --server=false . ) \
+      > "$SCALA_CLI_CACHE/prewarm.log" 2>&1 || {
     echo "ERROR: scala-cli prewarm failed (log: $SCALA_CLI_CACHE/prewarm.log)" >&2
     tail -30 "$SCALA_CLI_CACHE/prewarm.log" >&2
     exit 1
@@ -311,9 +317,9 @@ else
 object Hello3 { def main(args: Array[String]): Unit = println("hello3") }
 SCALA
   log "prewarming the scala-cli Scala-3 default (one online compile)"
-  COURSIER_CACHE="$SCALA_CLI_CACHE" \
-    "$OUT/scala-cli/scala-cli" compile --server=false --jvm system \
-      "$CACHE/prewarm-scala-cli3" > "$SCALA_CLI_CACHE/prewarm-scala3.log" 2>&1 || {
+  ( cd "$CACHE/prewarm-scala-cli3" && COURSIER_CACHE="$SCALA_CLI_CACHE" \
+    "$OUT/scala-cli/scala-cli" compile --server=false --jvm system . ) \
+      > "$SCALA_CLI_CACHE/prewarm-scala3.log" 2>&1 || {
     echo "ERROR: scala-cli Scala-3 prewarm failed (log: $SCALA_CLI_CACHE/prewarm-scala3.log)" >&2
     tail -30 "$SCALA_CLI_CACHE/prewarm-scala3.log" >&2
     exit 1

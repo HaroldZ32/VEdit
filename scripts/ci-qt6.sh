@@ -66,7 +66,9 @@ package() {
   export SOURCE_DATE_EPOCH
   SOURCE_DATE_EPOCH=$(git show -s --format=%ct HEAD)
   docker pull "$VEDIT_CENTOS_PROBE_IMAGE"
+  df -h "$ROOT" "${RUNNER_TEMP:?}"
   bash packaging/runtime/build.sh
+  df -h "$ROOT" "$RUNNER_TEMP"
   # shellcheck source=../build/slang/versions.env
   source build/slang/versions.env
   # shellcheck source=versions-vhdl.env
@@ -86,13 +88,20 @@ package() {
   cmp target/qt6-build/cmake/smoke/vedit-ksh-env-probe "$extracted/bin/vedit-ksh-env-probe"
   cmp target/ksh-selfbuild/F2/install/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6 \
     "$extracted/lib/libKF6SyntaxHighlighting.so.6"
+  cmp target/qt6-build/src/app/translations/vedit_zh_CN.qm "$extracted/bin/translations/vedit_zh_CN.qm"
+  cmp target/qt6-build/src/app/translations/qtbase_zh_CN.qm "$extracted/bin/translations/qtbase_zh_CN.qm"
 
   # Exercise the outer AppImage runtime and the extracted payload on the glibc
   # 2.17 userspace, with the original source fixtures on a read-only mount.
   docker run --rm --network none -v "$out/$appimage:/payload:ro" \
     "$VEDIT_CENTOS_PROBE_IMAGE" /payload --appimage-version
-  docker run --rm --network none -e HOME=/tmp -e LANG=C.UTF-8 -e QT_QPA_PLATFORM=offscreen \
-    -v "$extracted:/app:ro" -v "$ROOT/crates/vd-ffi/tests/fixtures/project:/fixture:ro" \
+  local user_args=()
+  if ! docker info --format '{{json .SecurityOptions}}' | grep '"name=rootless"' >/dev/null; then
+    user_args=(--user "$(id -u):$(id -g)")
+  fi
+  docker run --rm --network none "${user_args[@]}" \
+    -e HOME=/tmp -e LANG=C.UTF-8 -e QT_QPA_PLATFORM=offscreen \
+    -v "$extracted:/app:ro" -v "$ROOT:/source:ro" \
     "$VEDIT_CENTOS_PROBE_IMAGE" bash -euc '
       run_version() {
         local want=$1 output
@@ -103,7 +112,7 @@ package() {
       }
       test "$(getconf GNU_LIBC_VERSION)" = "glibc 2.17"
       test "$(/app/AppRun --version)" = "vedit-app $1"
-      /app/AppRun --selfcheck-ffi /fixture
+      /app/AppRun --selfcheck-ffi /source/crates/vd-ffi/tests/fixtures/project
       run_version "slang version $2" /app/bin/slang --version
       run_version "slang-server version $3" /app/bin/slang-server --version
       run_version "built at $4" /app/bin/verible-verilog-ls --version

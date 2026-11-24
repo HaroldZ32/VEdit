@@ -54,7 +54,7 @@ echo "appimagetool sha256 OK ($got)"
 # explicitly so rebuilding a tag never depends on the current continuous build.
 RUNTIME="$ROOT/packaging/appimage/.cache/runtime-x86_64"
 mkdir -p "$(dirname "$RUNTIME")"
-if ! printf '%s  %s\n' "$APPIMAGE_RUNTIME_SHA256" "$RUNTIME" | sha256sum -c --status; then
+if [ ! -f "$RUNTIME" ] || ! printf '%s  %s\n' "$APPIMAGE_RUNTIME_SHA256" "$RUNTIME" | sha256sum -c --status; then
   tmp_runtime=$(mktemp "$RUNTIME.XXXXXX")
   trap 'rm -f -- "$tmp_runtime"' EXIT
   curl -fsSL --retry 3 --connect-timeout 20 -H 'Accept: application/octet-stream' \

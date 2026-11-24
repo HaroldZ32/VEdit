@@ -113,8 +113,8 @@ annotated tag（如 `v0.4.0`）。`release` 校验 tag 和 `main` 的第一父�
 
 Qt6 镜像由固定 Ubuntu 镜像摘要、签名的 2026-11-01 APT 快照和 SHA-256 锁定包构建。
 Rust、Qt6、Scala 与打包使用独立的 Ubuntu 24.04 托管 runner。验证包包含 VHDL 和预热的
-Scala 工具链，打包后对实际 AppImage 字节执行离线工具校验。三个构建日志目录在
-`target/ci-logs/` 下，打包日志作为独立的 Actions artifact 保留。CentOS 7 容器验证 glibc
+Scala 工具链，打包后对实际 AppImage 字节执行离线工具校验。构建日志写入 `target/ci-logs/`，
+Qt6 和打包日志作为独立的 Actions artifacts 保留。CentOS 7 容器验证 glibc
 2.17 用户空间，容器使用托管 runner 的内核。
 
 ### 本地发布前检查单

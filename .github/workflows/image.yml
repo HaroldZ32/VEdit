@@ -17,6 +17,10 @@ on:
 permissions:
   contents: read
 
+defaults:
+  run:
+    shell: bash
+
 # All source builds use the event commit in fresh hosted jobs. Only the pinned
 # upstream slang binary is cached. Transfers between jobs are tar archives to
 # preserve symlinks and executable bits.
@@ -114,6 +118,7 @@ jobs:
           merge-multiple: true
       - name: Build product and run CTest, Xvfb and translation gates
         run: |
+          df -h "$GITHUB_WORKSPACE" "$RUNNER_TEMP"
           tar -xf "$RUNNER_TEMP/slang.tar"
           tar -xf "$RUNNER_TEMP/ffi.tar"
           bash scripts/fetch-verible.sh
@@ -189,6 +194,7 @@ jobs:
       - name: Build and verify the AppImage
         id: pack
         run: |
+          df -h "$GITHUB_WORKSPACE" "$RUNNER_TEMP"
           tar -xf "$RUNNER_TEMP/slang.tar"
           tar --zstd -xf "$RUNNER_TEMP/qt6.tar.zst"
           tar --zstd -xf "$RUNNER_TEMP/scala.tar.zst"

@@ -28,7 +28,7 @@ jobs:
           ref: ${{ github.sha }}
           fetch-depth: 0
           persist-credentials: false
-      - name: Require the annotated version tag to be reachable from main
+      - name: Require an annotated version tag on a main merge
         id: check
         shell: bash
         run: |
