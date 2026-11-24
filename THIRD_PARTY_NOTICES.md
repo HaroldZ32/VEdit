@@ -452,6 +452,7 @@ VEdit 通过 `usr/lib/vedit/file-compare/diff` 包装脚本使用私有加载器
 ## 15. Qt6 AppImage 启动器
 
 外层启动器取自 AppImage Type 2 runtime 的 `fedfad51acc2860b2916a1eef32ba4a500ff31ef`
-提交，对应上游发布资产 `657374641`。打包脚本按 `scripts/versions.env` 校验启动器的 SHA-256。
+提交，对应上游发布资产 `657374641`。该资产以原始字节存于
+`packaging/appimage/vendor/type2-runtime-x86_64`，打包脚本按 `scripts/versions.env` 校验其 SHA-256。
 AppDir 内的 `usr/share/doc/vedit/licenses/appimage-type2-runtime.txt` 包含上游 MIT 许可全文与
 静态链接库的许可出处。对应源码、构建说明和上游许可见 [AppImage Type 2 runtime 源码](https://github.com/AppImage/type2-runtime/tree/fedfad51acc2860b2916a1eef32ba4a500ff31ef)。

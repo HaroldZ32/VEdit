@@ -1,5 +1,9 @@
 # VEdit 0.4.0 发布前验收
 
+## GitHub 发布候选
+
+功能 PR [#15](https://github.com/HaroldZ32/VEdit/pull/15) 已通过 [Qt6 托管检查](https://github.com/HaroldZ32/VEdit/actions/runs/45369378878)，以合并提交 `c70d0a6c7872794a9b79a2958599e11f8311012a` 进入 `dev`。`release/0.4.0` 从该提交切出。在面向 `main` 的发布 PR 中，完整打包作业还会检查真实 AppImage 和相邻 `SHA256SUMS`。
+
 ## 产品和来源
 
 本地候选使用 Qt 6.10.2、KF6 6.24.0 和 Rust 1.99.0。发布前整合覆盖 1,000 个 HDL 文件、10,000 次实例化的实际 filelist 导入、显式重开和会话恢复，以及 SVN 真实工作副本、双栏比较和 slang 跨实例导航。公开分支从 `dev` 建立，保留已发布的 `main` 记录，导入已验证的产品和构建输入。早期完整运行日志包含宿主机路径与临时工作副本信息，本页给出可公开的结果。
