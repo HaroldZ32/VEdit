@@ -86,7 +86,7 @@ git push origin v0.2.1
 
 | 附件 | 说明 |
 |---|---|
-| `VEdit-<ver>-x86_64.AppImage` | 单文件 Qt6 交付物（F2 私有运行时，含 verible / slang / git / svn / 字体 / 翻译）；需要 FUSE，没有时用 `--appimage-extract-and-run` 或 `APPIMAGE_EXTRACT_AND_RUN=1` |
+| `VEdit-<ver>-x86_64.AppImage` | 单文件 Qt6 交付物（F2 私有运行时，含 verible / slang / git / svn / GNU diff / 字体 / 翻译）；需要 FUSE，没有时用 `--appimage-extract-and-run` 或 `APPIMAGE_EXTRACT_AND_RUN=1` |
 | `SHA256SUMS` | 与 AppImage 配套，由打包脚本写在 `packaging/runtime/out/SHA256SUMS` |
 
 **产物绝不提交到 git**（仓库 `.gitignore` 已忽略 `packaging/*/out/`、`*.AppImage` 等）。

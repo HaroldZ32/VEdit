@@ -183,11 +183,10 @@ KTextEditor / 自建 KSyntaxHighlighting / tree-sitter / 字体，并带 `bin/tr
 （该 README 把 `out/AppDir/` 明确列为**中间产物**；产物大小与 sha256 以 `out/SHA256SUMS`
 与实际文件为准，不在文档里写死）。
 
-**版本号说明**：代码、构建与文档现在统一为 **0.2.1**。打包脚本从工作区 `Cargo.toml` 的
-`version` 取值（`packaging/runtime/build-appimage.sh:53`），`CMakeLists.txt` 与
-`src/terminal/CMakeLists.txt` 的 `project(... VERSION ...)`、`src/app/main.cpp` 与
-`cmake/smoke/qt6_window_smoke.cpp` 的 `setApplicationVersion()` 都是同一个值，所以产物名
-`VEdit-0.2.1-x86_64.AppImage` 与应用内版本 0.2.1 一致。
+**版本号说明**：当前版本为 **0.4.0**。`packaging/runtime/build-appimage.sh` 与
+`assemble-appdir.sh` 从工作区 `Cargo.toml` 读取版本，生成 `VEdit-0.4.0-x86_64.AppImage`
+和桌面文件的 `X-AppImage-Version=0.4.0`。根目录与终端的 CMake 项目、应用与窗口冒烟测试的
+`setApplicationVersion()` 同步使用 0.4.0。应用的 About 与 `--version` 显示该版本。
 
 ### 7.2 旧版 GTK 产物（不是 Qt 交付物）
 
@@ -223,6 +222,7 @@ AppImage 除了 Qt/KF6/KTextEditor/KSyntaxHighlighting/tree-sitter/字体/中文
 | `slang` | v12.1（CentOS 7 源码构建） | 模块树、deep lint、工程级 rename 的 AST | §6 |
 | `slang-server` | 0.3.1+2ad996f（源码构建） | 第二个 LSP 后端 | §13 |
 | `git` / `subversion` | 2.53.0 / 1.14.5 | 版本控制面板；`svnadmin` **只**用于构建 E2E 夹具，不随包 | `evidence/vcs-toolchain/` |
+| GNU `diff` | 3.3（CentOS 7 `diffutils-3.3-5.el7`） | 双栏文件和 SVN 快照比较 | `evidence/workbench-upgrade/release/preflight/` |
 | `vhdl_ls` | 0.88.0 | VHDL LSP | `evidence/batch-20261110c/vhdl/01-lsp.log` |
 | `ghdl` | 6.0.0（mcode） | VHDL 分析（合并 lint；VSG 格式化的语法门） | `evidence/batch-20261110c/vhdl/03-merged-lint.log` |
 | `vsg` + 随包 CPython | 3.36.0（Python 3.12.8） | VHDL 风格 lint 与 `--fix` 格式化 | `evidence/batch-20261110c/vhdl/04-format.log` |
@@ -235,6 +235,7 @@ AppImage 除了 Qt/KF6/KTextEditor/KSyntaxHighlighting/tree-sitter/字体/中文
 
 运行时解析顺序统一为 **bundled → local checkout → PATH → env**（工具各自的 env 名见 §10.1、
 `docs/USER_GUIDE.md` 附录 B）；工具缺失时产品给**一条**可操作的状态行，不按文件重复报错。
+文件比较优先使用 AppImage 内的私有 GNU `diff`，源码构建从 `PATH` 查找 GNU diffutils。
 
 ### 7.4 运行期离线证明（交付物）
 
