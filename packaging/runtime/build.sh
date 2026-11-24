@@ -83,6 +83,9 @@ step "1b/7 delivery invariants (T31: vd-app, Qt plugins, static FFI, toolchain)"
            plugins/kf6/parts/katepart.so bin/verible-verilog-ls bin/slang \
            bin/git bin/svn usr/lib/vcs/libexec/git usr/lib/vcs/libexec/svn \
            usr/share/vedit/vcs-toolchain.txt \
+           usr/lib/vedit/file-compare/diff usr/lib/vedit/file-compare/diff.bin \
+           usr/share/doc/vedit/diffutils/GPL-3.0.txt \
+           "usr/share/doc/vedit/diffutils/$DIFFUTILS_SOURCE_RPM" \
            usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml; do
     if [ -e "$OUT/AppDir/$f" ]; then echo "OK   $f"; else echo "MISS $f"; fail=1; fi
   done

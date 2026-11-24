@@ -45,7 +45,7 @@ pick_default_appimage() {
 }
 APPIMAGE=${VEDIT_APPIMAGE:-$(pick_default_appimage)}
 if [ -z "$APPIMAGE" ]; then
-    APPIMAGE=$ROOT/packaging/runtime/out/VEdit-0.2.1-x86_64.AppImage
+    APPIMAGE=$ROOT/packaging/runtime/out/VEdit-0.4.0-x86_64.AppImage
 fi
 SIDECAR=vedit-hostmatrix-xside:local
 NET=vedit-hm-net

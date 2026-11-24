@@ -790,6 +790,23 @@ svn_ver=$("$VCS/bin/svn" --version --quiet 2>/dev/null)
 } > "$OUT/usr/share/vedit/vcs-toolchain.txt"
 log "vcs: git=$git_ver svn=$svn_ver libs=$(find "$VCS/lib" -type f | wc -l) git-core=$(find "$VCS/git-core" -maxdepth 1 | wc -l) (svnadmin build-only, not shipped)"
 
+# --- 5d. private GNU diff for file comparison -------------------------------
+DIFF_ASSETS="$ROOT/packaging/runtime/assets/diffutils"
+DIFF_DIR="$OUT/usr/lib/vedit/file-compare"
+DIFF_DOC="$OUT/usr/share/doc/vedit/diffutils"
+printf '%s  %s\n' \
+  "$DIFFUTILS_BIN_SHA256" "$DIFF_ASSETS/diff.bin" \
+  "$DIFFUTILS_LICENSE_SHA256" "$DIFF_ASSETS/GPL-3.0.txt" \
+  "$DIFFUTILS_SOURCE_SHA256" "$DIFF_ASSETS/$DIFFUTILS_SOURCE_RPM" | sha256sum --check
+install -D -m 0755 "$DIFF_ASSETS/run-diff.sh" "$DIFF_DIR/diff"
+install -m 0755 "$DIFF_ASSETS/diff.bin" "$DIFF_DIR/diff.bin"
+install -D -m 0644 "$DIFF_ASSETS/GPL-3.0.txt" "$DIFF_DOC/GPL-3.0.txt"
+install -m 0644 "$DIFF_ASSETS/$DIFFUTILS_SOURCE_RPM" "$DIFF_DOC/"
+diff_version=$("$DIFF_DIR/diff" --version)
+[ "${diff_version%%$'\n'*}" = "diff (GNU diffutils) $DIFFUTILS_VERSION" ] || {
+  echo "ERROR: unexpected private GNU diff version: $diff_version" >&2; exit 1; }
+log "file comparison: private GNU diff $DIFFUTILS_VERSION ($DIFFUTILS_SOURCE_RPM ships in usr/share/doc/vedit/diffutils/)"
+
 # --- 6. data: fonts, testdata, desktop/icon ---------------------------------
 for f in DejaVuSans.ttf DejaVuSansMono.ttf; do
   [ -f "/usr/share/fonts/truetype/dejavu/$f" ] && install -m 0644 "/usr/share/fonts/truetype/dejavu/$f" "$OUT/share/fonts/$f"
@@ -1018,6 +1035,8 @@ log "delivery invariants: vd-app + Qt platform plugins + toolchain + whitelist p
   echo "Subversion (bundled) ${VCS_SVN_VERSION}  Apache-2.0    bin/svn -> usr/lib/vcs/  licence: usr/share/doc/vedit/licenses/Apache-2.0.txt"
   echo "  bundled with: APR / APR-util / serf (Apache-2.0), utf8proc (MIT), and the runtime libraries they link."
   echo "  svnadmin is NOT shipped (build-only tool under build/vcs-tools/)."
+  echo "GNU diff (bundled)  ${DIFFUTILS_VERSION}  GPL-3.0-or-later  usr/lib/vedit/file-compare/diff"
+  echo "  licence and corresponding source: usr/share/doc/vedit/diffutils/{GPL-3.0.txt,${DIFFUTILS_SOURCE_RPM}}"
   echo
   if [ "$BUNDLED_VERIBLE" -eq 1 ]; then
     echo "Verible (bundled)    ${VERIBLE_VERSION:-pinned by versions.env}  Apache-2.0  bin/verible-verilog-{ls,lint,format}"

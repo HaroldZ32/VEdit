@@ -81,13 +81,11 @@ DejaVu 字体为 Bitstream Vera 许可 + DejaVu 修改部分进入公有领域�
 
 ## 6. Rust crates
 
-`docs/rust-crates.txt` 由 `cargo metadata`（数据源 `Cargo.lock`）生成，共 **192** 个 crate，
-逐项列出 name / version / license / repository。许可分布（生成时统计）：
+`docs/rust-crates.txt` 由 `cargo metadata`（数据源 `Cargo.lock`）生成，共 **217** 个 crate，
+逐项列出 name / version / license / repository。数量最多的许可条目是 `MIT OR Apache-2.0`
+（117）、`MIT`（39）、`Unicode-3.0`（18）和 `Apache-2.0 OR MIT`（10）。
 
-- `MIT OR Apache-2.0` 101；`MIT` 37；`Unicode-3.0` 18；`Apache-2.0 OR MIT` 9；
-  `MIT/Apache-2.0` 5；`Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT` 3；
-  `ISC` 2；`LGPL-2.1-or-later` 2；其余单项若干（Unlicense OR MIT、BSD-3-Clause、CDLA-Permissive-2.0 等）。
-- 其中 7 个 `vd-*` 是**本项目自有 crate**，许可随项目根 `LICENSE`。
+- 其中 11 个 `vd-*` 是**本项目自有 crate**，许可随项目根 `LICENSE`。
 - **TLS 纪律**：HTTP 栈用 **rustls**，依赖树中**没有** `openssl` / `native-tls`
   （由 `scripts/gates.sh` 的 lock 策略门禁强制），因此产物不链接系统 OpenSSL。
 
@@ -439,3 +437,14 @@ Scala 版本（2.13.12 / 2.13.18）的 mtags 全部安装到 AppDir，运行时*
   `evidence/batch-20261110/scala-pack/01-offline-verify.log` 的 ELF 段。
 - **可复现与验证**：每个 pin 的 sha256 在 `build-scala-payload.sh` 里强校验，`PAYLOAD.env`
   记录版本与产物大小；离线验证日志见 `evidence/batch-20261110/scala-pack/`。
+
+## 14. Qt6 产品线：文件比较随包 GNU diff
+
+GNU `diff` 3.3（CentOS 7 的 `diffutils-3.3-5.el7.x86_64.rpm`，GPL-3.0-or-later）以独立进程运行。
+二进制与 pinned CentOS 7 基础镜像的 `/usr/bin/diff` 逐字节一致。发行包位于
+[CentOS 7.9.2009 Vault](https://vault.centos.org/7.9.2009/os/x86_64/Packages/diffutils-3.3-5.el7.x86_64.rpm)。
+AppImage 在 `usr/share/doc/vedit/diffutils/` 同时携带 GPL 许可全文和完整对应源码
+`diffutils-3.3-5.el7.src.rpm`，内含上游源码、发行版补丁及 RPM 构建说明。
+源码包也可从 [CentOS Vault 源码归档](https://vault.centos.org/7.9.2009/os/Source/SPackages/diffutils-3.3-5.el7.src.rpm) 获取。
+`assemble-appdir.sh` 按 `scripts/versions.env` 核对二进制、许可和源码的 SHA-256。
+VEdit 通过 `usr/lib/vedit/file-compare/diff` 包装脚本使用私有加载器启动该程序。
