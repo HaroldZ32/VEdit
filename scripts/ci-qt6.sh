@@ -37,9 +37,14 @@ qt_gates() {
   run_in_qt6_container bash scripts/build-qt-in-container.sh --tests
   run_in_qt6_container bash build/gates/lrelease.sh
   bash build/gates/docs.sh
-  local actual
+  local expected actual
+  expected="vedit-app $(version)"
   actual=$(run_in_qt6_container env QT_QPA_PLATFORM=offscreen target/qt6-build/src/app/vedit-app --version)
-  test "$actual" = "vedit-app $(version)"
+  if [[ "$actual" != "$expected" ]]; then
+    printf 'Expected CLI version %s, got %s\n' "$expected" "$actual" >&2
+    return 1
+  fi
+  printf 'Compiled CLI version %s\n' "$actual"
 }
 
 f2_inputs() {
@@ -60,6 +65,7 @@ package() {
   run_in_qt6_container bash packaging/runtime/build-vhdl-payload.sh
   # shellcheck source=versions.env
   source scripts/versions.env
+  export VEDIT_QT6_BUILD_IMAGE="$QT_BUILD_IMAGE_TAG"
   export VEDIT_CENTOS_PROBE_IMAGE="docker.io/library/centos@$VEDIT_BASE_IMAGE_DIGEST"
   export VEDIT_PACK_EVIDENCE="$ROOT/${VEDIT_CI_LOG_DIR:?}/package"
   export VEDIT_F2_EVIDENCE="$VEDIT_PACK_EVIDENCE"
@@ -131,14 +137,11 @@ package() {
       "$VHDL_LS_VERSION" "$GHDL_VERSION" "$VSG_VERSION" "$SCALA_CLI_VERSION" "${SCALA_JDK_VERSION%_*}" \
       2>&1 | tee "$VEDIT_PACK_EVIDENCE/80-delivered-tools.log"
 
-  local release_dir="${RUNNER_TEMP:?}/vedit-release"
-  mkdir "$release_dir"
-  cp -- "$out/$appimage" "$out/SHA256SUMS" "$release_dir/"
   (
-    cd "$release_dir"
+    cd "$out"
     sha256sum --check --strict SHA256SUMS
   )
-  sha256=$(sha256sum "$release_dir/$appimage" | cut -d' ' -f1)
+  sha256=$(sha256sum "$out/$appimage" | cut -d' ' -f1)
   printf 'appimage=%s\nsha256=%s\n' "$appimage" "$sha256" >> "${GITHUB_OUTPUT:?}"
 }
 

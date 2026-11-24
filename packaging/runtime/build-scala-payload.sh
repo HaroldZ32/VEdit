@@ -41,6 +41,15 @@ while [ $# -gt 0 ]; do
   esac
 done
 
+# Prewarming changes directories. Resolve caller-relative paths once before
+# preparing or replacing any of the payload and cache subdirectories.
+OUT=$(realpath -m -- "$OUT")
+CACHE=$(realpath -m -- "$CACHE")
+if [[ "$OUT" == / || "$CACHE" == / || "$OUT" == "$CACHE" ]]; then
+  echo "ERROR: --out and --cache must name different non-root directories" >&2
+  exit 2
+fi
+
 log() { printf '[scala-payload] %s\n' "$*"; }
 
 # shellcheck source=../../scripts/versions-scala.env
