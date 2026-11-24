@@ -1009,6 +1009,8 @@ log "icon invariants: vedit.desktop + StartupWMClass + root/16/64/256/512 PNGs p
 log "delivery invariants: vd-app + Qt platform plugins + toolchain + whitelist present"
 
 # --- 8. manifest + notices ---------------------------------------------------
+install -D -m 0644 "$ROOT/packaging/runtime/assets/licenses/appimage-type2-runtime.txt" \
+  "$OUT/usr/share/doc/vedit/licenses/appimage-type2-runtime.txt"
 {
   echo "# VEdit private runtime manifest (F2)"
   echo "# form=F2 qrc_syntax=OFF no_standard_paths=OFF"

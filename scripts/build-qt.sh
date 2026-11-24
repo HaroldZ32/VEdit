@@ -22,6 +22,7 @@
 #
 #   bash scripts/build-qt.sh              # Rust layer + configure + build + ctest + xcb smoke
 #   bash scripts/build-qt.sh --no-test    # Rust layer + configure + build only
+#   bash scripts/build-qt.sh --rust-only  # Rust library, tests and generated header for CI
 #
 # Environment (all optional):
 #   VEDIT_QT6_BUILD_IMAGE_REF=ghcr.io/<owner>/vedit-qt6-build:latest   reuse/push ref
@@ -38,21 +39,24 @@ load_qt_versions
 load_versions
 
 run_tests=1
+rust_only=0
 for arg in "$@"; do
   case "$arg" in
     --no-test) run_tests=0 ;;
+    --rust-only) rust_only=1 ;;
     -h | --help) sed -n '2,33p' "${BASH_SOURCE[0]}"; exit 0 ;;
     *)
-      echo "FATAL: unknown argument: $arg (supported: --no-test)" >&2
+      echo "FATAL: unknown argument: $arg (supported: --no-test, --rust-only)" >&2
       exit 2
       ;;
   esac
 done
 
 EVID="$QT_EVIDENCE_DIR"
-mkdir -p "$EVID"
-RUST_EVID="$ROOT/evidence/ffi-abi/logs"
-mkdir -p "$RUST_EVID"
+RUST_LOG_DIR="${VEDIT_CI_LOG_DIR:+$VEDIT_CI_LOG_DIR/rust}"
+RUST_LOG_DIR="${RUST_LOG_DIR:-evidence/ffi-abi/logs}"
+RUST_EVID="$ROOT/$RUST_LOG_DIR"
+mkdir -p "$EVID" "$RUST_EVID"
 
 # --- Rust service layer (crates/vd-ffi, Slice 0 / task T4) -------------------
 # Same rule as the Qt6 image: build it when it is absent, reuse the local tag
@@ -79,11 +83,12 @@ run_in_build_container bash -lc '
   source scripts/versions.env
   export RUSTFLAGS="${RUSTFLAGS:-} ${RELEASE_RUSTFLAGS:?RELEASE_RUSTFLAGS is defined in scripts/versions.env}"
   export CARGO_INCREMENTAL=0
-  EVID=evidence/ffi-abi/logs
+  EVID="${VEDIT_CI_LOG_DIR:+$VEDIT_CI_LOG_DIR/rust}"
+  EVID="${EVID:-evidence/ffi-abi/logs}"
   mkdir -p "$EVID"
 
   echo "== cargo build -p vd-ffi --release (verbose: the target list is in the log) =="
-  cargo build -p vd-ffi --release -v 2>&1 | tee "$EVID/20-cargo-build-release.log"
+  cargo build --locked -p vd-ffi --release -v 2>&1 | tee "$EVID/20-cargo-build-release.log"
   test -f target/release/libvd_ffi.a
   ls -l target/release/libvd_ffi.a | tee "$EVID/21-staticlib.txt"
 
@@ -95,10 +100,10 @@ run_in_build_container bash -lc '
   test -s "$EVID/22-rust-targets.txt"
 
   echo "== cargo test (the service unit tests, AC-0.2) =="
-  cargo test -p vd-ffi -p vd-search -p vd-settings -p vd-vcs 2>&1 | tee "$EVID/23-cargo-test.log"
+  cargo test --locked -p vd-ffi -p vd-search -p vd-settings -p vd-vcs 2>&1 | tee "$EVID/23-cargo-test.log"
 
   echo "== cargo tree (GTK isolation, AC-0.3 / AC-S0.5) =="
-  cargo tree -p vd-ffi > "$EVID/24-cargo-tree-vd-ffi.txt"
+  cargo tree --locked -p vd-ffi > "$EVID/24-cargo-tree-vd-ffi.txt"
   if grep -Eq "gtk|sourceview4|vd-editor|vd-syntax" "$EVID/24-cargo-tree-vd-ffi.txt"; then
     echo "FATAL: the vd-ffi dependency tree contains GTK or an editor crate (AC-0.3)" >&2
     exit 1
@@ -129,6 +134,11 @@ run_in_build_container bash -lc '
   fi
   echo "header check: no Rust type outside comments"
 ' 2>&1 | tee "$RUST_EVID/19-rust-stage-console.log"
+
+if [ "$rust_only" = "1" ]; then
+  echo "[rust-ffi] PASS: release library, unit tests, dependency tree and generated header"
+  exit 0
+fi
 
 echo "[qt6] pinned matrix: Qt ${VEDIT_QT6_VERSION} / KF6 ${VEDIT_KF6_VERSION} / KTextEditor ${VEDIT_KTEXTEDITOR_VERSION} / KSyntaxHighlighting ${VEDIT_KSYNTAXHIGHLIGHTING_VERSION} / tree-sitter ${VEDIT_TREE_SITTER_VERSION}"
 echo "[qt6] build image: ${QT_BUILD_IMAGE_TAG} (stage ${QT_BUILD_STAGE} of scripts/docker/Dockerfile.build, base $(qt6_base_image_ref))"

@@ -448,3 +448,10 @@ AppImage 在 `usr/share/doc/vedit/diffutils/` 同时携带 GPL 许可全文和�
 源码包也可从 [CentOS Vault 源码归档](https://vault.centos.org/7.9.2009/os/Source/SPackages/diffutils-3.3-5.el7.src.rpm) 获取。
 `assemble-appdir.sh` 按 `scripts/versions.env` 核对二进制、许可和源码的 SHA-256。
 VEdit 通过 `usr/lib/vedit/file-compare/diff` 包装脚本使用私有加载器启动该程序。
+
+## 15. Qt6 AppImage 启动器
+
+外层启动器取自 AppImage Type 2 runtime 的 `fedfad51acc2860b2916a1eef32ba4a500ff31ef`
+提交，对应上游发布资产 `657374641`。打包脚本按 `scripts/versions.env` 校验启动器的 SHA-256。
+AppDir 内的 `usr/share/doc/vedit/licenses/appimage-type2-runtime.txt` 包含上游 MIT 许可全文与
+静态链接库的许可出处。对应源码、构建说明和上游许可见 [AppImage Type 2 runtime 源码](https://github.com/AppImage/type2-runtime/tree/fedfad51acc2860b2916a1eef32ba4a500ff31ef)。

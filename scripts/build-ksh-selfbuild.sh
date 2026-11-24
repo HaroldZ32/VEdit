@@ -67,7 +67,8 @@ else
   evid_sub="build-logs-form-$form_tag"
 fi
 build_root="$KSH_BUILD_ROOT/$form"
-EVID="$ROOT/$KSH_EVIDENCE_DIR/$evid_sub"
+KSH_LOG_DIR="${VEDIT_CI_LOG_DIR:+$VEDIT_CI_LOG_DIR/ksh}"
+EVID="$ROOT/${KSH_LOG_DIR:-$KSH_EVIDENCE_DIR}/$evid_sub"
 mkdir -p "$EVID" "$ROOT/$build_root"
 
 echo "[ksh] self-build KSyntaxHighlighting ${KSH_VERSION} (tag ${KSH_TAG}, commit ${KSH_COMMIT:0:12})"

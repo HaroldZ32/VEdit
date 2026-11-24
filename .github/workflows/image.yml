@@ -1,88 +1,212 @@
-name: image
-
-# Builds the pinned CentOS 7 build image and publishes it to GHCR so that every
-# other job can reuse it instead of paying a cold build. The image is what makes
-# this repository's gates trustworthy: CentOS 7.9.2009, Rust 1.99.0, GTK 3.22.30
-# and a GtkSourceView 4.6.1 built from source.
-#
-# On a pull request the image is built (and the GHA layer cache is exercised)
-# but not pushed; only pushes to dev/main publish it.
+name: Qt6 build and package
 
 on:
-  push:
-    branches: [dev, main]
-    paths:
-      - 'scripts/docker/**'
-      - 'scripts/versions.env'
-      - 'scripts/lib.sh'
-      - 'scripts/build-image.sh'
-  pull_request:
-    paths:
-      - 'scripts/docker/**'
-      - 'scripts/versions.env'
-      - 'scripts/lib.sh'
-      - 'scripts/build-image.sh'
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      package:
+        type: boolean
+        required: true
+    outputs:
+      artifact-id:
+        value: ${{ jobs.package.outputs.artifact-id }}
+      appimage:
+        value: ${{ jobs.package.outputs.appimage }}
+      sha256:
+        value: ${{ jobs.package.outputs.sha256 }}
 
 permissions:
   contents: read
-  packages: write
 
-concurrency:
-  group: image-${{ github.ref }}
-  cancel-in-progress: true
+# All source builds use the event commit in fresh hosted jobs. Only the pinned
+# upstream slang binary is cached. Transfers between jobs are tar archives to
+# preserve symlinks and executable bits.
+env:
+  VEDIT_CI_LOG_DIR: target/ci-logs
+  VEDIT_QT6_BUILD_JOBS: '3'
+  VEDIT_CONTAINER_USER: '1'
+  VEDIT_BASE_IMAGE: docker.io/library/centos
+  CENTOS_VAULT_BASE: https://vault.centos.org/7.9.2009
+  SLANG_BUILD_IMAGE: docker.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
 
 jobs:
-  publish:
-    name: build the pinned image
-    runs-on: ubuntu-latest
+  slang:
+    name: Pinned slang dependency
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
+    outputs:
+      artifact-id: ${{ steps.upload.outputs.artifact-id }}
     steps:
-      - name: Check out
-        uses: actions/checkout@v4
-
-      - name: Log in to GHCR (best effort; pull requests do not push)
-        continue-on-error: true
-        uses: docker/login-action@v3
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      # The default docker driver cannot export a GHA cache; the container driver can.
-      - name: Set up buildx
-        uses: docker/setup-buildx-action@v3
-
-      # buildx's type=gha backend did not materialise a cache on these runners (no
-      # buildkit cache entry, zero CACHED on a repeat build), so the layer cache is
-      # persisted through actions/cache instead and handed to buildx as type=local.
-      - name: Restore the buildx layer cache
-        uses: actions/cache@v4
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
-          path: /tmp/vedit-buildx-cache
-          key: buildx-${{ runner.os }}-${{ hashFiles('scripts/docker/**', 'scripts/versions.env') }}
-          restore-keys: |
-            buildx-${{ runner.os }}-
-
-      - name: Build the pinned image with a layer cache
-        shell: bash
-        env:
-          VEDIT_BUILD_CACHE_FROM: type=local,src=/tmp/vedit-buildx-cache
-          VEDIT_BUILD_CACHE_TO: type=local,dest=/tmp/vedit-buildx-cache,mode=min
+          path: build/slang/out/slang
+          key: qt6-slang-${{ runner.arch }}-${{ hashFiles('scripts/versions.env', 'build/slang/versions.env', 'build/slang/*.sh', 'build/slang/scripts/**', 'build/slang/patches/**') }}
+      - name: Rebuild on cache miss and check the binary pin
         run: |
-          set -euo pipefail
-          owner="$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
-          repo="ghcr.io/${owner}/vedit-build"
-          VEDIT_BUILD_IMAGE_REF="${repo}:${GITHUB_SHA}" bash scripts/build-image.sh
-          echo "IMAGE_REF=${repo}:${GITHUB_SHA}" >> "$GITHUB_ENV"
-          echo "IMAGE_REPO=${repo}" >> "$GITHUB_ENV"
+          export VEDIT_SLANG_EVIDENCE_DIR="$GITHUB_WORKSPACE/$VEDIT_CI_LOG_DIR/slang"
+          if [[ ! -x build/slang/out/slang ]]; then
+            bash build/slang/build.sh
+          fi
+          source scripts/versions.env
+          printf '%s  build/slang/out/slang\n' "$SLANG_BIN_SHA256" | sha256sum --check --strict
+          tar -cf "$RUNNER_TEMP/slang.tar" build/slang/out/slang
+      - name: Save verified slang
+        id: upload
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: slang-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/slang.tar
+          if-no-files-found: error
+          retention-days: 3
 
-      - name: Push to GHCR (pushes and manual runs only, never a pull request)
-        if: github.event_name != 'pull_request'
-        shell: bash
+  rust:
+    name: Rust services and C ABI
+    needs: slang
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    outputs:
+      artifact-id: ${{ steps.upload.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          artifact-ids: ${{ needs.slang.outputs.artifact-id }}
+          path: ${{ runner.temp }}
+      - name: Build and check Rust services
         run: |
-          set -euo pipefail
-          docker tag "$IMAGE_REF" "$IMAGE_REPO:latest"
-          docker push "$IMAGE_REF"
-          docker push "$IMAGE_REPO:latest"
-          echo "published ${IMAGE_REF} and ${IMAGE_REPO}:latest"
+          tar -xf "$RUNNER_TEMP/slang.tar"
+          bash scripts/fetch-verible.sh
+          bash scripts/build-qt.sh --rust-only
+          bash scripts/ci-qt6.sh rust-gates
+          tar -cf "$RUNNER_TEMP/ffi.tar" target/release/libvd_ffi.a crates/vd-ffi/include/vd_ffi.h
+      - name: Save inspected C ABI inputs
+        id: upload
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ffi-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/ffi.tar
+          if-no-files-found: error
+          retention-days: 3
+
+  qt:
+    name: Qt6 build and gates
+    needs: [slang, rust]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    outputs:
+      artifact-id: ${{ steps.upload.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          artifact-ids: ${{ needs.slang.outputs.artifact-id }},${{ needs.rust.outputs.artifact-id }}
+          path: ${{ runner.temp }}
+          merge-multiple: true
+      - name: Build product and run CTest, Xvfb and translation gates
+        run: |
+          tar -xf "$RUNNER_TEMP/slang.tar"
+          tar -xf "$RUNNER_TEMP/ffi.tar"
+          bash scripts/fetch-verible.sh
+          bash scripts/ci-qt6.sh qt
+      - name: Build F2 highlighting and collect package inputs
+        if: inputs.package
+        run: bash scripts/ci-qt6.sh f2
+      - name: Save Qt6 package inputs
+        if: inputs.package
+        id: upload
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: qt6-package-inputs-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/qt6.tar.zst
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 3
+      - name: Save Qt build logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: qt6-build-logs-${{ github.run_attempt }}
+          path: target/ci-logs/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  scala:
+    name: Offline Scala dependencies
+    if: inputs.package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    outputs:
+      artifact-id: ${{ steps.upload.outputs.artifact-id }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Build the pinned Scala payload and prewarm its offline caches
+        run: |
+          ROOT="$GITHUB_WORKSPACE" bash packaging/runtime/build-scala-payload.sh
+          tar --zstd -cf "$RUNNER_TEMP/scala.tar.zst" packaging/runtime/out/scala-payload
+      - name: Save the offline payload
+        id: upload
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: scala-payload-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/scala.tar.zst
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 3
+
+  package:
+    name: Qt6 AppImage and CentOS 7 verification
+    needs: [slang, qt, scala]
+    if: inputs.package
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    outputs:
+      artifact-id: ${{ steps.upload.outputs.artifact-id }}
+      appimage: ${{ steps.pack.outputs.appimage }}
+      sha256: ${{ steps.pack.outputs.sha256 }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          artifact-ids: ${{ needs.slang.outputs.artifact-id }},${{ needs.qt.outputs.artifact-id }},${{ needs.scala.outputs.artifact-id }}
+          path: ${{ runner.temp }}
+          merge-multiple: true
+      - name: Build and verify the AppImage
+        id: pack
+        run: |
+          tar -xf "$RUNNER_TEMP/slang.tar"
+          tar --zstd -xf "$RUNNER_TEMP/qt6.tar.zst"
+          tar --zstd -xf "$RUNNER_TEMP/scala.tar.zst"
+          rm -- "$RUNNER_TEMP/scala.tar.zst" "$RUNNER_TEMP/qt6.tar.zst"
+          bash scripts/ci-qt6.sh package
+      - name: Save the verified release pair
+        id: upload
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: qt6-appimage-${{ github.sha }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/vedit-release/
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 7
+      - name: Save packaging logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: qt6-packaging-logs-${{ github.run_attempt }}
+          path: target/ci-logs/
+          if-no-files-found: ignore
+          retention-days: 7

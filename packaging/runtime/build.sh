@@ -26,7 +26,7 @@ PROBE="$ROOT/target/qt6-build/cmake/smoke/vedit-ksh-env-probe"
 KSH_F2="$ROOT/target/ksh-selfbuild/F2/install"
 CENTOS_PROBE=1
 [ "${1:-}" = "--no-centos-probe" ] && CENTOS_PROBE=0
-CENTOS_IMAGE="docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4"
+CENTOS_IMAGE=${VEDIT_CENTOS_PROBE_IMAGE:-docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4}
 
 mkdir -p "$EVID" "$ROOT/packaging/appimage/.cache"
 # The AppImage tool is pinned by URL + sha256; fetch it once into the cache.
@@ -147,8 +147,9 @@ grep -E 'CHECK |F2-ISOLATION|SELFCHECK' "$EVID/60-selfcheck-appimage.log" "$EVID
 if [ "$CENTOS_PROBE" -eq 1 ]; then
   step "7/7 CentOS 7.9 mechanism probe (T12 owns the formal matrix)"
   rm -rf "$OUT/centos7-appdir" "$OUT/squashfs-root"
-  ( cd "$OUT" && APPIMAGE_EXTRACT_AND_RUN=1 "$APPIMAGE" --appimage-extract >/dev/null 2>&1 ) || true
-  [ -d "$OUT/squashfs-root" ] && mv "$OUT/squashfs-root" "$OUT/centos7-appdir"
+  ( cd "$OUT" && APPIMAGE_EXTRACT_AND_RUN=1 "$APPIMAGE" --appimage-extract >/dev/null 2>&1 ) \
+    && mv "$OUT/squashfs-root" "$OUT/centos7-appdir" \
+    || { echo "CentOS 7 probe: AppImage extraction failed" >&2; exit 1; }
   {
     echo "host: $(docker run --rm "$CENTOS_IMAGE" cat /etc/centos-release 2>&1 | head -1)"
     echo "glibc: $(docker run --rm "$CENTOS_IMAGE" ldd --version 2>&1 | head -1)"

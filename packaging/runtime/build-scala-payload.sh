@@ -128,13 +128,14 @@ if [ -f "$SBT_HOME/.prewarmed" ]; then
   log "sbt homes already prewarmed at $SBT_HOME"
 else
   rm -rf "$SBT_HOME" "$PREWARM"
-  mkdir -p "$SBT_HOME" "$PREWARM/project" "$PREWARM/src/main/scala"
+  mkdir -p "$SBT_HOME/home" "$PREWARM/project" "$PREWARM/src/main/scala"
   printf 'sbt.version=%s\n' "$SBT_VERSION" > "$PREWARM/project/build.properties"
   printf 'scalaVersion := "%s"\n' "$SCALA_MAIN_VERSION" > "$PREWARM/build.sbt"
   printf 'object Hello { def main(args: Array[String]): Unit = println("hello") }\n' \
     > "$PREWARM/src/main/scala/Hello.scala"
   log "prewarming sbt (boot/ivy/coursier) — one online run, then offline forever"
-  ( cd "$PREWARM" && "$OUT/sbt/bin/sbt" -batch \
+  ( cd "$PREWARM" && HOME="$SBT_HOME/home" COURSIER_CACHE="$SBT_HOME/coursier" \
+      "$OUT/sbt/bin/sbt" -batch -Duser.home="$SBT_HOME/home" \
       -Dsbt.boot.directory="$SBT_HOME/boot" \
       -Dsbt.ivy.home="$SBT_HOME/ivy" \
       -Dsbt.coursier.home="$SBT_HOME/coursier" \
@@ -443,10 +444,10 @@ prewarm_example() {
   mkdir -p "$home/home"
   log "prewarming example $name (one online run, then offline forever)"
   ( cd "$dir" && \
-    HOME="$home/home" \
+    HOME="$home/home" COURSIER_CACHE="$home/coursier" \
     CHISEL_FIRTOOL_CACHE="$home/firtool-cache" \
     JAVA_HOME="$OUT/jdk" PATH="$OUT/jdk/bin:$PATH" \
-    "$OUT/sbt/bin/sbt" -batch \
+    "$OUT/sbt/bin/sbt" -batch -Duser.home="$home/home" \
       -Dsbt.boot.directory="$home/boot" \
       -Dsbt.ivy.home="$home/ivy" \
       -Dsbt.coursier.home="$home/coursier" \

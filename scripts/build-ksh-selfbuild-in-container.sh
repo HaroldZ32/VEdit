@@ -27,7 +27,8 @@ KSH_ROOT="$WORK/$KSH_BUILD_ROOT/$form"
 SRC="$KSH_ROOT/src"
 BUILD="$KSH_ROOT/build"
 PREFIX="$KSH_ROOT/install"
-EVID="$WORK/$KSH_EVIDENCE_DIR/$evid_sub"
+KSH_LOG_DIR="${VEDIT_CI_LOG_DIR:+$VEDIT_CI_LOG_DIR/ksh}"
+EVID="$WORK/${KSH_LOG_DIR:-$KSH_EVIDENCE_DIR}/$evid_sub"
 # Compile parallelism is capped (default 4): unbounded --parallel "$(nproc)" is a
 # measured OOM risk in this image, not a repository rule. The variable is
 # forwarded by scripts/lib-qt.sh::run_in_qt6_container.

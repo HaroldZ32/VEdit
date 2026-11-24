@@ -9,7 +9,8 @@ set -euo pipefail
 
 WORK="${VEDIT_WORKSPACE:-/vedit-build}"
 BUILD_DIR="$WORK/target/qt6-build"
-EVID="$WORK/evidence/m0-build/build-logs"
+QT_LOG_DIR="${VEDIT_CI_LOG_DIR:+$VEDIT_CI_LOG_DIR/qt}"
+EVID="$WORK/${QT_LOG_DIR:-evidence/m0-build/build-logs}"
 RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp/xdg-runtime}"
 mkdir -p "$BUILD_DIR" "$EVID" "$RUNTIME_DIR"
 chmod 700 "$RUNTIME_DIR" 2>/dev/null || true

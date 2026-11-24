@@ -273,6 +273,7 @@ run_in_build_container() {
     -e RUSTUP_TOOLCHAIN="$RUST_TOOLCHAIN" \
     -e SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:-}" \
     -e NO_AT_BRIDGE=1 \
+    -e VEDIT_CI_LOG_DIR \
     -v "$ROOT:/vedit-build" \
     -w /vedit-build \
     "$BUILD_IMAGE_TAG" "$@"
