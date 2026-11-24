@@ -5,9 +5,14 @@
 //! fails loudly with a remediation message when neither exists — it never skips
 //! silently.
 
+use std::fs;
 use std::path::PathBuf;
+use std::time::Duration;
 
-use vd_deeplint::{lint, EditorPosition, EditorRange, LintOptions, Severity};
+use vd_deeplint::{
+    lint, lint_with, BatchHandle, BatchReport, EditorPosition, EditorRange, EngineOptions,
+    LintEngine, LintOptions, Severity,
+};
 
 fn fixture(name: &str) -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
@@ -256,5 +261,220 @@ fn real_slang_binary_attempts_are_recorded_even_on_success() {
     assert_eq!(
         report.binary.attempts[0].source,
         vd_deeplint::AttemptSource::ExplicitOption
+    );
+}
+
+/// The project options: the real binary, a project-scale timeout, slang.
+fn project_options() -> EngineOptions {
+    EngineOptions {
+        engine: LintEngine::Slang,
+        slang_binary: Some(slang_binary()),
+        timeout: Duration::from_secs(30),
+        ..EngineOptions::default()
+    }
+}
+
+/// Run ONE whole-project batch pass over `files` and wait for its report.
+fn project_batch(files: Vec<PathBuf>) -> BatchReport {
+    let handle = BatchHandle::start(files, project_options())
+        .unwrap_or_else(|error| panic!("batch start: {}", error.user_message()));
+    let deadline = std::time::Instant::now() + Duration::from_secs(120);
+    loop {
+        if let Some(report) = handle.take_report() {
+            return report;
+        }
+        assert!(
+            std::time::Instant::now() < deadline,
+            "the project pass did not finish"
+        );
+        std::thread::sleep(Duration::from_millis(10));
+    }
+}
+
+/// The batch rows attributed to `file`.
+fn rows_for<'a>(report: &'a BatchReport, file: &PathBuf) -> Vec<&'a vd_deeplint::BatchDiagnostic> {
+    report
+        .diagnostics
+        .iter()
+        .filter(|entry| &entry.file == file)
+        .collect()
+}
+
+/// THE cross-file macro matrix (batch 20261110d, T3).
+///
+/// `a.sv` only defines a macro; `b.sv` only uses it. Before this fix the pass
+/// spawned one slang per file, so b's process started with an empty preprocessor
+/// and reported `UnknownDirective` - the RED control below is that exact
+/// per-file invocation, kept as a live assertion. The green half runs ONE
+/// `--single-unit` process over the set, and the reverse control changes the
+/// macro VALUE to prove b sees the *current* definition (not merely that the
+/// error disappeared). The isolation half proves a genuinely undefined macro
+/// still errors, in the file that names it.
+#[test]
+fn real_slang_one_project_pass_sees_a_macro_defined_in_an_earlier_file() {
+    let dir = tempfile::Builder::new()
+        .prefix("vd-project-macro-")
+        .tempdir()
+        .unwrap_or_else(|error| panic!("tempdir: {error}"));
+    let a = dir.path().join("a.sv");
+    let b = dir.path().join("b.sv");
+    let c = dir.path().join("c.sv");
+    fs::write(&a, "`define W 8\n").unwrap_or_else(|error| panic!("write a.sv: {error}"));
+    fs::write(
+        &b,
+        "module b;\n  logic [`W-1:0] x;\n  logic [15:0] y;\n  assign y = x;\nendmodule\n",
+    )
+    .unwrap_or_else(|error| panic!("write b.sv: {error}"));
+    fs::write(&c, "module c;\n  logic [`NOTDEF-1:0] z;\nendmodule\n")
+        .unwrap_or_else(|error| panic!("write c.sv: {error}"));
+
+    // RED control (the pre-fix path, still public as the single-file API): one
+    // process per file cannot see a's macro.
+    let per_file = lint_with(&b, &project_options());
+    assert!(per_file.is_success(), "{:?}", per_file.failure);
+    let unknown = per_file
+        .diagnostics
+        .iter()
+        .find(|diagnostic| diagnostic.code == "UnknownDirective")
+        .unwrap_or_else(|| {
+            panic!(
+                "the per-file invocation cannot see a cross-file define: {:?}",
+                per_file.diagnostics
+            )
+        });
+    assert_eq!(unknown.severity, Severity::Error);
+    assert!(
+        unknown.message.contains("`W"),
+        "the RED control names the macro it cannot find: {}",
+        unknown.message
+    );
+
+    // GREEN: one single-unit process, a before b.
+    let report = project_batch(vec![a.clone(), b.clone()]);
+    assert_eq!(
+        report.fallback,
+        None,
+        "the project pass must not fall back here: {}",
+        report.summary()
+    );
+    assert!(report.failures.is_empty(), "{:?}", report.failures);
+    let b_rows = rows_for(&report, &b);
+    assert!(
+        b_rows
+            .iter()
+            .all(|entry| entry.diagnostic.code != "UnknownDirective"),
+        "b must see `W from a: {:?}",
+        b_rows
+            .iter()
+            .map(|entry| &entry.diagnostic)
+            .collect::<Vec<_>>()
+    );
+    let width = b_rows
+        .iter()
+        .find(|entry| entry.diagnostic.code == "WidthExpand")
+        .unwrap_or_else(|| {
+            panic!(
+                "b must see W=8 (an 8->16 width expansion): {:?}",
+                b_rows
+                    .iter()
+                    .map(|entry| &entry.diagnostic)
+                    .collect::<Vec<_>>()
+            )
+        });
+    assert_eq!(width.diagnostic.severity, Severity::Warning);
+    assert!(
+        width.diagnostic.message.contains("8 to 16"),
+        "the warning measures the macro VALUE: {}",
+        width.diagnostic.message
+    );
+
+    // REVERSE control: change the macro in a; b must see the NEW value.
+    fs::write(&a, "`define W 16\n").unwrap_or_else(|error| panic!("rewrite a.sv: {error}"));
+    let report = project_batch(vec![a.clone(), b.clone()]);
+    assert_eq!(report.fallback, None, "{}", report.summary());
+    assert!(
+        rows_for(&report, &b).is_empty(),
+        "with W=16 b no longer expands 8->16, so it has no finding: {:?}",
+        rows_for(&report, &b)
+            .iter()
+            .map(|entry| &entry.diagnostic)
+            .collect::<Vec<_>>()
+    );
+
+    // ISOLATION: an undefined macro still errors, in the file that uses it.
+    let report = project_batch(vec![a, b.clone(), c.clone()]);
+    assert_eq!(report.fallback, None, "{}", report.summary());
+    let c_rows = rows_for(&report, &c);
+    assert_eq!(c_rows.len(), 1, "c has exactly one finding: {c_rows:?}");
+    assert_eq!(c_rows[0].diagnostic.code, "UnknownDirective");
+    assert_eq!(c_rows[0].diagnostic.severity, Severity::Error);
+    assert!(
+        c_rows[0].diagnostic.message.contains("NOTDEF"),
+        "the error names the undefined macro: {}",
+        c_rows[0].diagnostic.message
+    );
+    assert!(
+        rows_for(&report, &b).is_empty(),
+        "c's error is not attributed to b"
+    );
+}
+
+/// A relative `` `include `` resolves against the INCLUDING file's directory
+/// (measured on slang 12.1, independent of the child's cwd), so the one project
+/// process resolves it exactly like the per-file pass did — this test keeps that
+/// invariant, because a cwd-based resolution would have been a silent difference
+/// between the two invocation shapes.
+#[test]
+fn real_slang_project_pass_resolves_a_relative_include_from_the_files_own_directory() {
+    let dir = tempfile::Builder::new()
+        .prefix("vd-project-include-")
+        .tempdir()
+        .unwrap_or_else(|error| panic!("tempdir: {error}"));
+    let rtl = dir.path().join("rtl");
+    let tb = dir.path().join("tb");
+    fs::create_dir_all(&rtl).unwrap_or_else(|error| panic!("mkdir rtl: {error}"));
+    fs::create_dir_all(&tb).unwrap_or_else(|error| panic!("mkdir tb: {error}"));
+    let a = rtl.join("a.sv");
+    let b = tb.join("b.sv");
+    let defs = tb.join("defs.svh");
+    fs::write(&a, "module a;\nendmodule\n").unwrap_or_else(|error| panic!("write a: {error}"));
+    fs::write(&defs, "`define W 8\n").unwrap_or_else(|error| panic!("write defs: {error}"));
+    fs::write(
+        &b,
+        "`include \"defs.svh\"\nmodule b;\n  logic [`W-1:0] x;\n  logic [15:0] y;\n  assign y = x;\nendmodule\n",
+    )
+    .unwrap_or_else(|error| panic!("write b: {error}"));
+
+    // rtl/a.sv is first, so the ONE process runs from rtl/ — yet b's own
+    // directory is where its include must be found.
+    let report = project_batch(vec![a, b.clone()]);
+    assert_eq!(
+        report.phase,
+        vd_deeplint::BatchPhase::Finished,
+        "{}",
+        report.summary()
+    );
+    assert_eq!(
+        report.fallback,
+        None,
+        "the include resolves per file, so the project pass must not fall back: {}",
+        report.summary()
+    );
+    let rows = rows_for(&report, &b);
+    let width = rows
+        .iter()
+        .find(|entry| entry.diagnostic.code == "WidthExpand")
+        .unwrap_or_else(|| {
+            panic!(
+                "b saw tb/defs.svh (W=8), so it expands 8->16: {:?}",
+                rows.iter()
+                    .map(|entry| &entry.diagnostic)
+                    .collect::<Vec<_>>()
+            )
+        });
+    assert!(
+        width.diagnostic.message.contains("8 to 16"),
+        "the value came from b's own directory: {}",
+        width.diagnostic.message
     );
 }

@@ -64,6 +64,8 @@ pub(crate) struct DeeplintDiagnostic {
     pub(crate) key: String,
     /// 1 LSP, 2 CLI, 3 both.
     pub(crate) origin: i32,
+    /// The engine's typed option name (`optionName`), when it reported one.
+    pub(crate) option_name: Option<String>,
 }
 
 /// All diagnostics of one run.
@@ -98,6 +100,10 @@ impl DeeplintData {
                 file: diagnostic.file.as_deref().map_or(ptr::null_mut(), c_string),
                 key: c_string(&diagnostic.key),
                 origin: diagnostic.origin,
+                option_name: diagnostic
+                    .option_name
+                    .as_deref()
+                    .map_or(ptr::null_mut(), c_string),
             })
             .collect();
         VdDiagnostics {
@@ -105,6 +111,20 @@ impl DeeplintData {
             items: Box::into_raw(items.into_boxed_slice()) as *mut VdDiagnostic,
         }
     }
+}
+
+/// The engine's typed option name for one diagnostic.
+///
+/// slang reports it as `optionName` on the JSON object, and the crate LIFTS it
+/// into [`vd_deeplint::Diagnostic::option_name`] while parsing; it is the value
+/// a slang waiver is written from (`diagnostic = "implicit-net"`). This boundary
+/// therefore only projects the typed field onto the C ABI — no caller has to
+/// reach into `raw`, and the UI/waiver lane consumes it as a first-class field.
+fn option_name_of(diagnostic: &vd_deeplint::Diagnostic) -> Option<String> {
+    diagnostic
+        .option_name
+        .clone()
+        .filter(|name| !name.is_empty())
 }
 
 fn severity_code(severity: &vd_deeplint::Severity) -> i32 {
@@ -115,6 +135,18 @@ fn severity_code(severity: &vd_deeplint::Severity) -> i32 {
         vd_deeplint::Severity::Ignored => 3,
         vd_deeplint::Severity::Unknown(_) => 4,
     }
+}
+
+/// The binary resolution the lint engine would use for one explicit override.
+///
+/// T8 / AC-T8.1: the product order FALLS BACK, so "my explicit setting did not
+/// take effect" must stay OBSERVABLE. This is a Rust-only helper (NOT part of
+/// the C ABI — no `#[no_mangle]`, so `vd_ffi.h` is unchanged); the ABI tests use
+/// it to assert that the explicit stage was attempted and missed and which later
+/// stage supplied the tool.
+#[must_use]
+pub fn lint_binary_resolution(explicit: Option<&Path>) -> vd_deeplint::BinaryResolution {
+    vd_deeplint::resolve_binary_for_current_process(explicit)
 }
 
 /// Run one lint with an explicit engine and map its diagnostics.
@@ -165,6 +197,7 @@ fn diagnostics_from_report(file: &Path, report: &vd_deeplint::LintReport) -> Dee
                 file: Some(path.clone()),
                 key: diagnostic_key(&path, line, class, &diagnostic.message),
                 origin: DiagnosticSource::Cli.code(),
+                option_name: option_name_of(diagnostic),
             }
         })
         .collect();
@@ -341,11 +374,13 @@ unsafe fn build_options(
 
 /// Apply the typed per-engine lint knobs from [`VdLintBatchOptions`].
 ///
-/// Every value is validated by the crate (`vd_deeplint::parse_*`) BEFORE a job
-/// starts: a bad character set is a typed ABI error, never a tool argument. The
-/// knobs the selected engine does not support are documented no-ops — they are
-/// accepted (a settings page may keep the other engine's values) and produce NO
-/// argv; see [`vd_deeplint::unsupported_knobs`].
+/// Every value is validated by the crate (`vd_deeplint::parse_*`,
+/// [`vd_deeplint::validate_slang_waiver_file`]) BEFORE a job starts: a bad
+/// character set or an unloadable waiver document is a typed ABI error, never a
+/// tool argument the child would reject. The knobs the selected engine does not
+/// support are documented no-ops — they are accepted (a settings page may keep
+/// the other engine's values) and produce NO argv; see
+/// [`vd_deeplint::unsupported_knobs`].
 ///
 /// # Safety
 ///
@@ -378,6 +413,33 @@ unsafe fn apply_lint_knobs(
     }
     if batch.error_limit > 0 {
         options.error_limit = Some(batch.error_limit);
+    }
+    // Verible `--autofix=`: 0 is "send no flag" (verible's own `no`); 1..=5 are
+    // the documented values. An unknown code is rejected, never defaulted.
+    if batch.verible_autofix != 0 {
+        let Some(autofix) = vd_deeplint::VeribleAutofix::from_code(batch.verible_autofix) else {
+            return Err(format!(
+                "verible_autofix must be 0 (no flag) or 1..=5, got {}",
+                batch.verible_autofix
+            ));
+        };
+        options.autofix = Some(autofix);
+    }
+    // SAFETY: the caller contract makes each non-null pointer a valid string.
+    options.autofix_output_file =
+        unsafe { optional_path(batch.autofix_output_file, "autofix_output_file") }?;
+    // SAFETY: same contract.
+    let waiver_file = unsafe { optional_path(batch.slang_waiver_file, "slang_waiver_file") }?;
+    if let Some(path) = waiver_file {
+        if options.engine == LintEngine::Slang {
+            // The child must not be handed a document slang itself would refuse:
+            // an unknown key is a hard error there (measured on 12.1.0).
+            vd_deeplint::validate_slang_waiver_file(&path)?;
+        }
+        // A verible pass accepts the value as a documented no-op (the verible
+        // arm never emits `--waiver-file`), exactly like rules/waiver_files on
+        // the slang arm; the file is not read when it cannot be used.
+        options.slang_waiver_file = Some(path);
     }
     Ok(())
 }
@@ -598,10 +660,12 @@ pub unsafe extern "C" fn vd_diagnostics_free(diagnostics: *mut VdDiagnostics) {
             free_string(item.message);
             free_string(item.file);
             free_string(item.key);
+            free_string(item.option_name);
             item.code = std::ptr::null_mut();
             item.message = std::ptr::null_mut();
             item.file = std::ptr::null_mut();
             item.key = std::ptr::null_mut();
+            item.option_name = std::ptr::null_mut();
         }
         drop(Box::from_raw(std::ptr::slice_from_raw_parts_mut(
             diagnostics.items,
@@ -643,6 +707,23 @@ fn progress_to_c(progress: &vd_deeplint::BatchProgress, tool: &str) -> VdLintPro
         tool: c_string(tool),
         stage: progress.stage.map_or(ptr::null_mut(), c_string),
         message: c_string(&progress.message),
+    }
+}
+
+/// One optional C string path: null and the empty string both mean "not set".
+///
+/// # Safety
+///
+/// `text` must be null or a valid NUL-terminated string.
+unsafe fn optional_path(text: *const c_char, what: &str) -> Result<Option<PathBuf>, String> {
+    if text.is_null() {
+        return Ok(None);
+    }
+    // SAFETY: the caller contract states a non-null pointer is a valid string.
+    match unsafe { c_str(text) } {
+        Some("") => Ok(None),
+        Some(value) => Ok(Some(PathBuf::from(value))),
+        None => Err(format!("{what} must be valid UTF-8 or null")),
     }
 }
 
@@ -877,6 +958,7 @@ pub unsafe extern "C" fn vd_deeplint_batch_poll(
                     file: Some(path.clone()),
                     key: diagnostic_key(&path, line, class, &diagnostic.message),
                     origin: DiagnosticSource::Cli.code(),
+                    option_name: option_name_of(diagnostic),
                 }
             })
             .collect(),
@@ -955,7 +1037,13 @@ pub unsafe extern "C" fn vd_lint_progress_free(progress: *mut VdLintProgress) {
 const FIRST_HIER_ID: u64 = 1 << 48;
 
 struct HierarchySlot {
-    report: Mutex<Option<HierarchyReport>>,
+    result: Mutex<Option<HierarchyResult>>,
+    cancel: AtomicBool,
+}
+
+enum HierarchyResult {
+    Report(HierarchyReport),
+    Trace(vd_deeplint::TraceIndex, Option<Vec<PathBuf>>),
 }
 
 static NEXT_HIERARCHY: AtomicU64 = AtomicU64::new(0);
@@ -1122,6 +1210,39 @@ pub unsafe extern "C" fn vd_hier_start(
     files: *const VdStringList,
     options: *const VdHierOptions,
 ) -> u64 {
+    // SAFETY: forwards the existing hierarchy inputs unchanged.
+    unsafe { start_hierarchy(service, files, options, None) }
+}
+
+/// Start a cached signal trace index in the absolute project directory.
+/// Release its job id with `vd_hier_release` when the project snapshot changes.
+///
+/// # Safety
+/// Same pointer contracts as `vd_hier_start`; `root` is a readable C string.
+#[no_mangle]
+pub unsafe extern "C" fn vd_hier_trace_start(
+    service: *mut VdService,
+    files: *const VdStringList,
+    options: *const VdHierOptions,
+    root: *const c_char,
+) -> u64 {
+    // SAFETY: root is null or a readable C string per the caller contract.
+    let Some(root) = (unsafe { c_str(root) })
+        .map(PathBuf::from)
+        .filter(|root| root.is_absolute())
+    else {
+        return 0;
+    };
+    // SAFETY: forwards the existing hierarchy inputs unchanged.
+    unsafe { start_hierarchy(service, files, options, Some(root)) }
+}
+
+unsafe fn start_hierarchy(
+    service: *mut VdService,
+    files: *const VdStringList,
+    options: *const VdHierOptions,
+    root: Option<PathBuf>,
+) -> u64 {
     let Some(state) = service_state(service) else {
         return 0;
     };
@@ -1150,27 +1271,54 @@ pub unsafe extern "C" fn vd_hier_start(
         return 0;
     }
     // SAFETY: the option pointers are null or valid strings per the contract.
-    let hierarchy = match unsafe { build_hierarchy_options(&options) } {
+    let mut hierarchy = match unsafe { build_hierarchy_options(&options) } {
         Ok(built) => built,
         Err(message) => {
             state.record_error(VdError::new(VD_ERR_INVALID_ARGUMENT, &message));
             return 0;
         }
     };
+    if root.is_some() {
+        if file_set.len() > 2000 {
+            state.record_error(VdError::new(
+                VD_ERR_INVALID_ARGUMENT,
+                "signal tracing supports up to 2000 source files",
+            ));
+            return 0;
+        }
+        hierarchy.max_json_bytes = 96 * 1024 * 1024;
+    }
     let id = FIRST_HIER_ID + NEXT_HIERARCHY.fetch_add(1, Ordering::Relaxed);
     let slot = Arc::new(HierarchySlot {
-        report: Mutex::new(None),
+        result: Mutex::new(None),
+        cancel: AtomicBool::new(false),
     });
     hierarchies().insert(id, Arc::clone(&slot));
     let worker_slot = Arc::clone(&slot);
     let spawned = std::thread::Builder::new()
         .name(format!("vd-hier-{id}"))
         .spawn(move || {
-            let report = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                vd_deeplint::elaborate(&file_set, &hierarchy)
+            let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                let Some(root) = root else {
+                    return HierarchyResult::Report(vd_deeplint::elaborate(&file_set, &hierarchy));
+                };
+                let (report, dependencies) = vd_deeplint::elaborate_navigation(
+                    &file_set,
+                    &hierarchy,
+                    &root,
+                    &worker_slot.cancel,
+                );
+                if report.failure.is_some() || worker_slot.cancel.load(Ordering::SeqCst) {
+                    HierarchyResult::Report(report)
+                } else {
+                    HierarchyResult::Trace(
+                        vd_deeplint::TraceIndex::from_report(report),
+                        Some(dependencies),
+                    )
+                }
             }))
             .unwrap_or_else(|_| {
-                let mut failed = HierarchyReport {
+                HierarchyResult::Report(HierarchyReport {
                     tool: "slang".to_string(),
                     top: hierarchy.top.clone(),
                     instances: Vec::new(),
@@ -1182,12 +1330,10 @@ pub unsafe extern "C" fn vd_hier_start(
                         message: "the elaboration job panicked; its result was discarded"
                             .to_string(),
                     }),
-                };
-                failed.peak_rss_kb = 0;
-                failed
+                })
             });
-            if let Ok(mut slot) = worker_slot.report.lock() {
-                *slot = Some(report);
+            if let Ok(mut slot) = worker_slot.result.lock() {
+                *slot = Some(result);
             }
         });
     if spawned.is_err() {
@@ -1232,14 +1378,15 @@ pub unsafe extern "C" fn vd_hier_poll(
         return POLL_MISUSE;
     };
     let report = {
-        let mut guard = match slot.report.lock() {
-            Ok(guard) => guard,
-            Err(poisoned) => poisoned.into_inner(),
-        };
-        guard.take()
+        let mut guard = slot.result.lock().unwrap_or_else(|err| err.into_inner());
+        match guard.as_ref() {
+            None => return VD_STATUS_PENDING,
+            Some(HierarchyResult::Trace(..)) => return POLL_MISUSE,
+            Some(HierarchyResult::Report(_)) => guard.take(),
+        }
     };
-    let Some(report) = report else {
-        return VD_STATUS_PENDING;
+    let Some(HierarchyResult::Report(report)) = report else {
+        return POLL_MISUSE;
     };
     hierarchies().remove(&job);
     if let Some(failure) = &report.failure {
@@ -1254,8 +1401,76 @@ pub unsafe extern "C" fn vd_hier_poll(
     VD_STATUS_READY
 }
 
+/// Poll the trace index and query the tree at an absolute source position.
+/// `line` and UTF-16 `column` are zero-based; `column` is the token start.
+/// Directions 0 and 1 return direct drivers and loads. Directions 2 and 3
+/// return the full driver or load tree. Ready returns owned UTF-8
+/// JSON (including empty results); free it with `vd_string_free`. The same job
+/// can answer repeated queries until `vd_hier_release`. Poll errors are available
+/// through `vd_service_error`.
+///
+/// # Safety
+/// `service` must be live, `file` a readable C string and `out` writable for
+/// one pointer. No output ownership transfers on pending or failure.
+#[no_mangle]
+pub unsafe extern "C" fn vd_hier_trace_poll(
+    service: *mut VdService,
+    job: u64,
+    file: *const c_char,
+    line: u32,
+    column: u32,
+    direction: u32,
+    out: *mut *mut c_char,
+) -> i32 {
+    let Some(state) = service_state(service) else {
+        return POLL_MISUSE;
+    };
+    // SAFETY: a non-null file must be a readable C string per the caller contract.
+    let Some(file) = (unsafe { c_str(file) }) else {
+        return POLL_MISUSE;
+    };
+    if out.is_null() || direction > 3 {
+        return POLL_MISUSE;
+    }
+    let Some(slot) = hierarchies().get(&job).cloned() else {
+        return POLL_MISUSE;
+    };
+    let mut guard = slot
+        .result
+        .lock()
+        .unwrap_or_else(|error| error.into_inner());
+    match guard.as_mut() {
+        None => VD_STATUS_PENDING,
+        Some(HierarchyResult::Trace(index, dependencies)) => {
+            let mut json = index.query(
+                Path::new(file),
+                line,
+                column,
+                direction.is_multiple_of(2),
+                direction >= 2,
+            );
+            if let Some(files) = dependencies.take() {
+                json["dependencies"] = serde_json::json!(files);
+            }
+            // SAFETY: out is writable for one pointer; the caller owns the string.
+            unsafe { *out = c_string(&json.to_string()) };
+            VD_STATUS_READY
+        }
+        Some(HierarchyResult::Report(report)) => {
+            let Some(failure) = &report.failure else {
+                return POLL_MISUSE;
+            };
+            state.record_error(VdError::new(
+                crate::capi::VD_ERR_SERVICE,
+                &failure.user_message(),
+            ));
+            VD_STATUS_FAILED
+        }
+    }
+}
+
 /// Release an elaboration job without delivering its result (null-safe for an
-/// unknown id). A running job finishes into memory nobody reads.
+/// unknown id). A running trace releases its child on the next cancellation check.
 ///
 /// # Safety
 ///
@@ -1263,7 +1478,11 @@ pub unsafe extern "C" fn vd_hier_poll(
 #[no_mangle]
 pub unsafe extern "C" fn vd_hier_release(service: *mut VdService, job: u64) -> i32 {
     let _ = service;
-    i32::from(hierarchies().remove(&job).is_some())
+    let slot = hierarchies().remove(&job);
+    if let Some(slot) = &slot {
+        slot.cancel.store(true, Ordering::SeqCst);
+    }
+    i32::from(slot.is_some())
 }
 
 /// Release a filled [`VdHierarchy`]; null-safe and idempotent.
@@ -1391,13 +1610,13 @@ unsafe fn free_signal_lists(signals: &mut VdHierSignalList) {
 #[cfg(test)]
 mod tests {
     use super::{
-        vd_deeplint_batch_cancel, vd_deeplint_batch_poll, vd_deeplint_batch_progress,
-        vd_deeplint_batch_release, vd_deeplint_batch_start, vd_lint_command_line,
-        vd_lint_progress_free,
+        empty_options, vd_deeplint_batch_cancel, vd_deeplint_batch_poll,
+        vd_deeplint_batch_progress, vd_deeplint_batch_release, vd_deeplint_batch_start,
+        vd_lint_command_line, vd_lint_progress_free,
     };
     use crate::capi::{
         vd_diagnostic_key, vd_string_free, VdDiagnostics, VdError, VdLintBatchOptions,
-        VdLintProgress, VdStringList, VD_STATUS_FAILED, VD_STATUS_PENDING, VD_STATUS_READY,
+        VdLintProgress, VdStringList, VD_STATUS_PENDING, VD_STATUS_READY,
     };
     use crate::service::{vd_service_create, vd_service_destroy};
     use std::ffi::{c_char, CStr, CString};
@@ -1405,6 +1624,7 @@ mod tests {
     use std::path::{Path, PathBuf};
     use std::ptr;
     use std::time::{Duration, Instant};
+    use vd_deeplint::LintEngine;
 
     /// Owned C strings plus the `VdStringList` that borrows them; keeps both
     /// alive for the duration of a call.
@@ -1628,6 +1848,9 @@ mod tests {
             waiver_files: ptr::null(),
             slang_suppressions: ptr::null(),
             error_limit: 0,
+            verible_autofix: 0,
+            autofix_output_file: ptr::null(),
+            slang_waiver_file: ptr::null(),
         }
     }
 
@@ -1887,6 +2110,13 @@ mod tests {
         }
     }
 
+    /// Batch 20261110b (authorised contract change): the resolver walks the
+    /// product-wide order, so an explicit path that does not exist FALLS BACK
+    /// instead of failing the job. The old assertion (`VD_STATUS_FAILED`, error
+    /// code `VD_ERR_SERVICE`) pinned the pre-T8 behaviour where a broken
+    /// explicit setting was a dead end. The test function and its assertion
+    /// count are kept; the old→new basis is recorded in
+    /// `evidence/batch-20261110b/lint-engine/AUTHORIZATION.md`.
     #[test]
     fn a_missing_slang_binary_fails_the_elaboration_with_its_tool_name() {
         let dir = tempdir("vd-ffi-hier-");
@@ -1928,14 +2158,38 @@ mod tests {
             assert!(Instant::now() < deadline, "the job never finished");
             std::thread::sleep(Duration::from_millis(10));
         };
-        assert_eq!(status, VD_STATUS_FAILED);
-        // SAFETY: VdError is a plain C struct of integers and an array.
-        let mut error = unsafe { std::mem::zeroed::<VdError>() };
-        // SAFETY: the service is live and `out` is writable.
-        unsafe { crate::service::vd_service_error(service, &mut error) };
-        assert_eq!(error.code, crate::capi::VD_ERR_SERVICE);
-        // SAFETY: the service was created above.
-        unsafe { vd_service_destroy(service) };
+        // The explicit stage is recorded as NOT FOUND, and a LATER stage of the
+        // product order supplies the tool, so the elaboration itself succeeds.
+        assert_eq!(status, VD_STATUS_READY);
+        // The same resolution inputs the C ABI call used (explicit path + top).
+        let engine_options = vd_deeplint::HierarchyOptions {
+            slang_binary: Some(PathBuf::from("/nonexistent/slang")),
+            top: Some("top".to_string()),
+            ..Default::default()
+        };
+        let resolution = vd_deeplint::hierarchy_resolution(&engine_options);
+        let chosen = resolution.chosen.clone().unwrap_or_else(|| {
+            panic!(
+                "no slang binary resolved at any stage: {}",
+                resolution.describe()
+            )
+        });
+        assert!(
+            resolution.attempts.iter().any(|attempt| {
+                attempt.outcome == vd_deeplint::AttemptOutcome::Found
+                    && attempt.path.as_deref() == Some(chosen.as_path())
+                    && attempt.source.stage() >= 2
+            }),
+            "the source must be a later stage, never the broken explicit path: {}",
+            resolution.describe()
+        );
+        // SAFETY: the struct was filled by the poll above and is not freed yet.
+        unsafe { super::vd_hierarchy_free(&mut out) };
+        // SAFETY: the service is live; the id was consumed by the poll.
+        unsafe {
+            super::vd_hier_release(service, job);
+            vd_service_destroy(service);
+        }
     }
 
     #[test]
@@ -2001,5 +2255,149 @@ mod tests {
             vd_deeplint_batch_release(service, job);
             vd_service_destroy(service);
         }
+    }
+
+    /// Batch 20261110: `optionName` becomes a typed field, so a waiver action
+    /// never has to parse it out of the message. The crate keeps the whole JSON
+    /// object in `raw`, which is where the value comes from.
+    #[test]
+    fn the_engine_option_name_is_lifted_into_a_typed_field() {
+        let with_name = vd_deeplint::Diagnostic {
+            severity: vd_deeplint::Severity::Warning,
+            message: "implicit net".to_string(),
+            code: "ImplicitNet".to_string(),
+            option_name: Some("implicit-net".to_string()),
+            location: None,
+            ranges: Vec::new(),
+            symbol_path: None,
+            raw: serde_json::json!({"code": "ImplicitNet", "optionName": "implicit-net"}),
+            editor_range: None,
+            conversion_note: None,
+            parse_note: None,
+            repeat: 1,
+        };
+        assert_eq!(
+            super::option_name_of(&with_name),
+            Some("implicit-net".to_string())
+        );
+
+        let without_name = vd_deeplint::Diagnostic {
+            raw: serde_json::json!({"code": "UndeclaredIdentifier"}),
+            code: "UndeclaredIdentifier".to_string(),
+            severity: vd_deeplint::Severity::Error,
+            option_name: None,
+            ..with_name.clone()
+        };
+        assert_eq!(
+            super::option_name_of(&without_name),
+            None,
+            "an error normally has no optionName; the field must stay null, never a guess"
+        );
+
+        let empty_name = vd_deeplint::Diagnostic {
+            raw: serde_json::json!({"optionName": ""}),
+            ..without_name
+        };
+        assert_eq!(super::option_name_of(&empty_name), None);
+    }
+
+    /// Batch 20261110b: the three frozen knobs are REAL now — the refusal
+    /// branch is gone, so this pins the transport: the ABI value reaches
+    /// `EngineOptions` and the engine's argv. The old assertions (and the
+    /// deleted refusal helper they called) are recorded in
+    /// `evidence/batch-20261110b/lint-engine/AUTHORIZATION.md`.
+    #[test]
+    fn frozen_autofix_and_waiver_knobs_are_refused_not_ignored() {
+        // SAFETY: a zeroed POD options struct is the documented default.
+        let default: VdLintBatchOptions = unsafe { std::mem::zeroed() };
+        let output = CString::new("/tmp/x.patch").unwrap_or_default();
+
+        // --autofix=generate-waiver + its output file, through the real mapping.
+        let batch = VdLintBatchOptions {
+            verible_autofix: 5,
+            autofix_output_file: output.as_ptr(),
+            ..default
+        };
+        let mut options = empty_options(LintEngine::Verible);
+        // SAFETY: every string pointer in `batch` is null or valid.
+        unsafe { super::apply_lint_knobs(&mut options, &batch) }
+            .unwrap_or_else(|error| panic!("a valid autofix must be accepted: {error}"));
+        assert_eq!(
+            options.autofix,
+            Some(vd_deeplint::VeribleAutofix::GenerateWaiver)
+        );
+        assert_eq!(
+            options.autofix_output_file,
+            Some(PathBuf::from("/tmp/x.patch"))
+        );
+        let args: Vec<String> =
+            vd_deeplint::command_args_for(LintEngine::Verible, Path::new("f.sv"), None, &options)
+                .into_iter()
+                .map(|argument| argument.to_string_lossy().into_owned())
+                .collect();
+        assert!(
+            args.contains(&"--autofix=generate-waiver".to_string()),
+            "{args:?}"
+        );
+        assert!(
+            args.contains(&"--autofix_output_file=/tmp/x.patch".to_string()),
+            "{args:?}"
+        );
+
+        // An unknown code is rejected, never defaulted to `no`.
+        let invalid = VdLintBatchOptions {
+            verible_autofix: 6,
+            ..default
+        };
+        let mut options = empty_options(LintEngine::Verible);
+        let error = match unsafe { super::apply_lint_knobs(&mut options, &invalid) } {
+            Ok(()) => panic!("an unknown autofix code must be refused"),
+            Err(error) => error,
+        };
+        assert!(error.contains("verible_autofix"), "{error}");
+
+        // slang's `--waiver-file <toml>`: the document is LOADED and validated,
+        // and an unknown key is refused before any child is spawned.
+        let directory = tempfile::tempdir().unwrap_or_else(|error| panic!("tempdir: {error}"));
+        let waiver_path = directory.path().join("waivers.toml");
+        fs::write(
+            &waiver_path,
+            "[[waivers]]\nfile = \"f.sv\"\ndiagnostic = \"implicit-net\"\n",
+        )
+        .unwrap_or_else(|error| panic!("write: {error}"));
+        let waiver = CString::new(waiver_path.to_string_lossy().into_owned()).unwrap_or_default();
+        let batch = VdLintBatchOptions {
+            slang_waiver_file: waiver.as_ptr(),
+            ..default
+        };
+        let mut options = empty_options(LintEngine::Slang);
+        unsafe { super::apply_lint_knobs(&mut options, &batch) }
+            .unwrap_or_else(|error| panic!("a valid waiver file must be accepted: {error}"));
+        assert_eq!(options.slang_waiver_file, Some(waiver_path.clone()));
+        let args: Vec<String> =
+            vd_deeplint::command_args_for(LintEngine::Slang, Path::new("f.sv"), None, &options)
+                .into_iter()
+                .map(|argument| argument.to_string_lossy().into_owned())
+                .collect();
+        assert!(
+            args.windows(2)
+                .any(|pair| pair[0] == "--waiver-file" && pair[1] == waiver_path.to_string_lossy()),
+            "slang must get --waiver-file <toml>: {args:?}"
+        );
+
+        let bad_path = directory.path().join("bad.toml");
+        fs::write(&bad_path, "[[waivers]]\nfile = \"f.sv\"\nbogus = \"x\"\n")
+            .unwrap_or_else(|error| panic!("write: {error}"));
+        let bad = CString::new(bad_path.to_string_lossy().into_owned()).unwrap_or_default();
+        let batch = VdLintBatchOptions {
+            slang_waiver_file: bad.as_ptr(),
+            ..default
+        };
+        let mut options = empty_options(LintEngine::Slang);
+        let error = match unsafe { super::apply_lint_knobs(&mut options, &batch) } {
+            Ok(()) => panic!("a waiver file with an unknown key must be refused"),
+            Err(error) => error,
+        };
+        assert!(error.contains("unknown key"), "{error}");
     }
 }

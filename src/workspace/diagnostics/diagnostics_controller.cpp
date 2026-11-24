@@ -55,6 +55,56 @@ QString describeState(BackendState state)
 /// C11: over this many files the pass says so explicitly (cancel stays usable).
 constexpr int kLargePassWarningFiles = 1000;
 
+/// batch-20261117 (AC-4): the ONE bound of the buffer-settle window.
+///
+/// After a didChange the controller keeps re-asking for diagnostics until the
+/// server publishes a snapshot that is newer than the applied buffer. That
+/// window is bounded: when it expires the round settles on whatever the server
+/// currently has (the historical semantics), so a server that never publishes
+/// cannot leave the panel in Reparsing forever. `refresh()` opens the window and
+/// `collectLspDiagnostics()` accepts a poll at this bound; `finaliseState()`
+/// keeps the round open until the same bound.
+constexpr qint64 kBufferSettleMs = 2500;
+
+/// batch-20261118 AC-2: how long the controller keeps re-asking for a document
+/// the server has no diagnostics entry for. The re-ask exists so the analysis
+/// the build context triggers (AC-1) is noticed even when it publishes after
+/// the first request; after this bound the panel settles on the attributable
+/// "the server did not analyse this file" state instead of asking forever.
+constexpr qint64 kServerSilentReaskMs = 5000;
+
+/// The ONE view a registered waiver file cannot reach, said out loud.
+///
+/// A waiver is a CLI-engine input: the project pass hands `--waiver_files`
+/// (verible) / `--waiver-file` (slang) to the child. The language-server rows
+/// come from `verible-verilog-ls` / the slang server, started through
+/// `vd_lsp_session_start_v2`, whose C ABI has no waiver parameter at all (the
+/// verible server itself WOULD accept `--waiver_files=`; the ABI cannot pass
+/// it). So when a waiver is registered, the project pass is clean while the
+/// language-server rows still carry the diagnostic.
+///
+/// The rule is "no silent disagreement": the status line names the side that
+/// does not apply the waiver instead of showing two views that contradict each
+/// other. Closing the gap needs an ABI `_v3` (follow-up card); it is NOT fixed
+/// by dropping the waiver from the pass.
+QString waiverScopeNote()
+{
+#if defined(VEDIT_DIAGNOSTICS_HAVE_LINT_OPTIONS)
+    const settings::LintValues &values = settings::currentLintValues();
+    const bool waiverRegistered = !values.verible.waiverFiles.trimmed().isEmpty()
+        || !values.slang.waiverFile.trimmed().isEmpty();
+    if (!waiverRegistered) {
+        return QString();
+    }
+    return QCoreApplication::translate(
+        "VEdit",
+        " · waiver: the registered waiver file is applied by the project pass only; "
+        "the language-server rows do not apply it");
+#else
+    return QString();
+#endif
+}
+
 int canonicalSeverity(int severity, DiagnosticOrigin origin)
 {
     if (origin == DiagnosticOrigin::Cli) {
@@ -83,8 +133,35 @@ QString normalizedMessage(const QString &message)
     return out;
 }
 
-/// CLI entries reach the display layer in the C ABI's severity scale; the panel
-/// renders the LSP scale (1 error, 2 warning...), so convert once.
+/// CLI entries reach the display layer in the C ABI's severity scale (0 error,
+/// 1 warning, ...); the panel renders the LSP scale (1 error, 2 warning, ...).
+/// BOTH CLI producers cross this conversion: the project-pass rows at display
+/// time, the per-file rows when `collectLints()` stores them. A producer that
+/// AC-6.4 (T15): the rows a LANE named for one file, across every source.
+///
+/// A lane is a lower-layer producer (VHDL's GHDL+VSG merge). The caller keeps
+/// the per-source identity; this helper answers "did any lane evaluate `file`,
+/// and with what". An EMPTY result means no lane spoke about the file - the
+/// caller must not read that as "clean": a clean lane CLEARS its rows, so
+/// absence is "no verdict", never "no findings".
+QVector<DiagnosticEntry> laneRowsForFile(
+    const QHash<QString, QVector<DiagnosticEntry>> &laneRows, const QString &file)
+{
+    QVector<DiagnosticEntry> rows;
+    if (file.isEmpty()) {
+        return rows;
+    }
+    for (auto it = laneRows.constBegin(); it != laneRows.constEnd(); ++it) {
+        for (const DiagnosticEntry &entry : it.value()) {
+            if (entry.file == file) {
+                rows.append(entry);
+            }
+        }
+    }
+    return rows;
+}
+
+/// skips it paints a warning as an error (and an error as unknown).
 DiagnosticEntry toDisplayEntry(const DiagnosticEntry &entry)
 {
     DiagnosticEntry converted = entry;
@@ -177,6 +254,7 @@ DiagnosticsController::~DiagnosticsController()
 {
     if (lsp_ && lspStarted_) {
         lsp_->stop();
+        ++lspStops_;
     }
 }
 
@@ -191,14 +269,45 @@ void DiagnosticsController::setConfiguration(const QString &lsPath,
 
 void DiagnosticsController::setFileSet(const QStringList &files)
 {
-    // RM-9: the project set is its own member. `files_` is the ACTIVE analysis
-    // set (analyzeFile() narrows it to the focused document); a file outside the
-    // active analysis is still a project file and must keep a visible state -
-    // either its retained verdict or an explicit "not analysed" mark.
+    // batch-20261116 L1.1: the PROJECT set and the REALTIME session are two
+    // different sets, and confusing them was the defect: every file-set arrival
+    // called reparse(), which initialized the language server over the WHOLE
+    // project and then requested diagnostics for all of it every tick. A 20k-file
+    // project therefore never became Ready and produced zero rows.
+    //
+    // This method records the project set only (the project-pass filter and the
+    // per-file status marks read it). It must NOT touch a running realtime
+    // session: at startup the project set can arrive AFTER the first
+    // analyzeFile(), and restarting/clearing there would blank the editor.
     projectFiles_ = files;
     projectFileSet_ = QSet<QString>(files.begin(), files.end());
-    files_ = files;
-    reparse();
+    if (!analysisFile_.isEmpty()) {
+        // A realtime analysis is live: keep its session and set; only the
+        // project-layer observations (done/pending marks) move. The project
+        // membership itself is a structural change for the status map.
+        invalidateView();
+        refresh();
+        return;
+    }
+    // No realtime analysis yet: this is a project-layer update, not a reparse.
+    // There is deliberately no `files_ = files` and no startLsp()/startLints().
+    files_.clear();
+    report_ = FileSetReport{};
+    report_.slangAvailable = slang_ && slang_->available();
+    session_ = SessionSnapshot{};
+    if (files.isEmpty()) {
+        state_ = BackendState::Idle;
+        session_.state = BackendState::Idle;
+        session_.message = QCoreApplication::translate("VEdit", "no effective file set");
+    } else {
+        // L1.1's user-visible half: a project file set alone runs no server.
+        state_ = BackendState::Idle;
+        session_.state = BackendState::Idle;
+        session_.message = QCoreApplication::translate(
+                               "VEdit", "project file set: %1 file(s) — open a file to analyse")
+                               .arg(files.size());
+    }
+    invalidateView();
 }
 
 void DiagnosticsController::setToolchainReport(const ToolchainReport &report)
@@ -209,11 +318,77 @@ void DiagnosticsController::setToolchainReport(const ToolchainReport &report)
     }
 }
 
+void DiagnosticsController::restartRealtimeSession()
+{
+    // B1 (batch-20261116): the project-environment repin and every settings /
+    // backend apply stop the LSP server through
+    // `FfiLspSessionBackend::selectBackend()` (unconditional `stop()`), while
+    // this controller's `lspStarted_`/`files_` are unchanged. `analyzeFile()`
+    // would then see "same set, session started" and reuse a server that is
+    // gone - the realtime LINT stays dead until the application restarts.
+    //
+    // Restart over the SAME realtime set, and KEEP the rendered lower rows: the
+    // user keeps the last verdict until the fresh answer replaces it (no blank
+    // editor on every `.f` import or settings save).
+    if (analysisFile_.isEmpty()) {
+        // Nothing analysed yet: the project set must still start no session.
+        return;
+    }
+    if (files_.isEmpty()) {
+        files_ = QStringList{analysisFile_};
+    }
+    if (lsp_ && lspStarted_) {
+        lsp_->stop(); // idempotent; the backend may already have stopped itself
+        ++lspStops_;
+    }
+    lspStarted_ = false;
+    lspDiagnosticsRequested_ = false;
+    lspDiagnostics_.clear();
+    lints_.clear();
+    lastDiagnosticsRequestFiles_.clear();
+    // A brand-new session has seen neither the editor buffer nor a symbol
+    // request: reset those one-shot gates so refresh() pushes the buffer and
+    // asks for the outline again. Diagnostics/outline themselves stay visible.
+    bufferApplied_ = false;
+    bufferAppliedMs_ = 0;
+    bufferGenerationAtApply_ = 0;
+    bufferDiagnosticsSeen_ = false;
+    symbolsRequested_ = false;
+    // AC-1/AC-2 (batch-20261118): a fresh server has received no build context
+    // and has published nothing; both must be re-established.
+    buildContextPushed_ = false;
+    publishedDiagnosticsFiles_.clear();
+    serverSilentSinceMs_ = 0;
+    realtimeRequestFiles_.clear();
+    lastError_.clear();
+    session_ = SessionSnapshot{};
+    report_ = FileSetReport{};
+    report_.files = files_;
+    report_.slangAvailable = false; // realtime file scope: the LSP is the fast path
+    if (workspaceRoot_.isEmpty()) {
+        workspaceRoot_ = QFileInfo(analysisFile_).absolutePath();
+    }
+    ++generation_;
+    invalidateView();
+    state_ = BackendState::Reparsing;
+    session_.state = BackendState::Reparsing;
+    session_.message = QCoreApplication::translate(
+                           "VEdit", "restarting the realtime analysis over %1 file(s)")
+                           .arg(files_.size());
+    startLsp();
+    refresh();
+}
+
 void DiagnosticsController::reparse()
 {
+    // batch-20261116 L1.1: a reparse restarts the REALTIME session - the set the
+    // current analysis was started with (current file + level-1 closure) - never
+    // the project set. `project.reparse` is a manual command; it is the one place
+    // that drives BOTH backends (A3c) over that bounded set.
     ++generation_;
     if (lsp_ && lspStarted_) {
         lsp_->stop();
+        ++lspStops_;
     }
     lspStarted_ = false;
     lspDiagnosticsRequested_ = false;
@@ -230,7 +405,7 @@ void DiagnosticsController::reparse()
     retainedLowerRows_.clear();
     retainedLowerEvaluated_.clear();
     notAnalyzedReason_.clear();
-    // RM-17b: every setFileSet() re-parses and the clear above would erase the
+    // RM-17b: every reparse clears the reasons above, which would erase the
     // ACTIVE scope's reasons, turning an excluded file green on the next paint.
     // Re-apply them from the ONE derivation (the excluded set).
     if (!topScopeTop_.isEmpty()) {
@@ -243,14 +418,29 @@ void DiagnosticsController::reparse()
     lastError_.clear();
     invalidateView();
     session_ = SessionSnapshot{};
+    // batch-20261117 (AC-4): a reparse starts a BRAND-NEW backend session, so its
+    // diagnostics-generation counter restarts with it. The buffer settle floor
+    // belongs to the session that recorded it: without this reset the new
+    // session's counter could never clear a floor from the old one and the round
+    // would sit through the whole settle window. Reset the one-shot gates so the
+    // new session receives the editor buffer (same rule restartRealtimeSession()
+    // already applies to a session it had to recreate).
+    bufferApplied_ = false;
+    bufferAppliedMs_ = 0;
+    bufferGenerationAtApply_ = 0;
+    bufferDiagnosticsSeen_ = false;
     report_ = FileSetReport{};
+    if (files_.isEmpty() && !analysisFile_.isEmpty()) {
+        files_ = QStringList{analysisFile_}; // the session of one file survives
+    }
     report_.files = files_;
     report_.slangAvailable = slang_ && slang_->available();
 
     if (files_.isEmpty()) {
         state_ = BackendState::Idle;
         session_.state = BackendState::Idle;
-        session_.message = QCoreApplication::translate("VEdit", "no effective file set");
+        session_.message = QCoreApplication::translate(
+            "VEdit", "no realtime file set — open a file to analyse");
         return;
     }
 
@@ -295,17 +485,60 @@ bool DiagnosticsController::analyzeFile(const QString &file, const QString &buff
         markNotAnalyzed(file, QStringLiteral("pending"));
     }
 
-    const bool sameFile = files_.size() == 1 && files_.first() == file;
+    // batch-20261115 AC-5.1 / A61.3: the session covers a STABLE set - the union
+    // of the level-1 module closures of every open document (`setRealtimeSession
+    // Files`). Switching between documents inside that union must NOT stop and
+    // start the language server: the session is reused and only the analysed
+    // file's buffer/diagnostics move. A set the running session does not cover
+    // still needs a (single) restart, because the server resolves modules across
+    // the files it was opened with.
+    //
+    // batch-20261116 L1.1: the check is EXACT EQUALITY with the realtime desired
+    // set, not "desired is a subset of whatever was opened". The old subset test
+    // was satisfied by the PROJECT set (setFileSet assigned it to `files_`), so
+    // no realtime session was ever started and refresh() requested diagnostics
+    // for every project file on every tick.
+    //
+    // G1-a/G1-c (batch-20261120): the session set is the compiler input, so the
+    // analysed document may not widen it. `activeDocumentJoinsProjectSession()`
+    // is the watcher's answer to "is this document a golden member that the
+    // catalog did not shadow?"; when it is false the session is `{file}` ALONE -
+    // before this, an outside file was PREPENDED to the project session and a
+    // duplicate loser was compiled next to the winner it lost to, which handed
+    // `slang` a second authority over the same module (the reported defect).
+    QStringList desired;
+    if (!activeDocumentInSession_) {
+        desired = QStringList{file};
+    } else {
+        desired = realtimeSessionFiles_;
+        if (desired.isEmpty() || !desired.contains(file)) {
+            desired.append(file);
+        }
+    }
+    const auto sameSet = [](const QStringList &left, const QStringList &right) {
+        if (left.size() != right.size()) {
+            return false;
+        }
+        for (const QString &candidate : right) {
+            if (!left.contains(candidate)) {
+                return false;
+            }
+        }
+        return true;
+    };
+    const bool unionCovered = lspStarted_ && !files_.isEmpty() && sameSet(files_, desired);
+    const bool sameFile = unionCovered && files_.contains(file);
     if (!sameFile || !lspStarted_) {
-        // A file-scope analysis uses a session over exactly this file: the
-        // project-scope session (if any) is replaced, and `project.reparse`
-        // restores the project file set.
+        // A file-scope analysis uses a session over EXACTLY the stable realtime
+        // set; the project set is never a session set (L1.1).
         if (lsp_ && lspStarted_) {
             lsp_->stop();
+            ++lspStops_;
         }
-        files_ = QStringList{file};
+        files_ = desired;
         lspStarted_ = false;
         lspDiagnosticsRequested_ = false;
+        lastDiagnosticsRequestFiles_.clear();
         lints_.clear();
         lspDiagnostics_.clear();
         diagnostics_.clear();
@@ -316,6 +549,11 @@ bool DiagnosticsController::analyzeFile(const QString &file, const QString &buff
         lowerAnalyzed_.clear();
         outline_.clear();
         lastError_.clear();
+        // AC-1/AC-2 (batch-20261118): a NEW session has no build context and
+        // has published nothing for any file yet.
+        buildContextPushed_ = false;
+        publishedDiagnosticsFiles_.clear();
+        serverSilentSinceMs_ = 0;
         session_ = SessionSnapshot{};
         report_ = FileSetReport{};
         report_.files = files_;
@@ -341,6 +579,147 @@ bool DiagnosticsController::analyzeFile(const QString &file, const QString &buff
     return lspStarted_;
 }
 
+void DiagnosticsController::setActiveDocumentJoinsProjectSession(bool joins)
+{
+    // G1-a/G1-c: one bit, decided by the watcher from the golden and shadowed
+    // sets. A false value is consumed by the NEXT analyzeFile()/restart as the
+    // `{file}` session (`realtime_file_scope.h` holds the rule itself); the
+    // running session is not torn down here, because a watcher publishes this
+    // on every tick and a session that is still correct must not be restarted
+    // for a state it already satisfies.
+    activeDocumentInSession_ = joins;
+}
+
+void DiagnosticsController::setRealtimeSessionFiles(const QStringList &files)
+{
+    QStringList normalized;
+    normalized.reserve(files.size());
+    for (const QString &file : files) {
+        if (!file.isEmpty() && !normalized.contains(file)) {
+            normalized.append(file);
+        }
+    }
+    // Sorted: the union's ORDER must not differ between two switches that cover
+    // the same documents, or the reuse check would restart for nothing.
+    std::sort(normalized.begin(), normalized.end());
+    realtimeSessionFiles_ = normalized;
+}
+
+void DiagnosticsController::setRealtimeRequestFiles(const QStringList &files)
+{
+    QStringList normalized;
+    normalized.reserve(files.size());
+    for (const QString &file : files) {
+        if (!file.isEmpty() && !normalized.contains(file)) {
+            normalized.append(file);
+        }
+    }
+    std::sort(normalized.begin(), normalized.end());
+    // AC-5 (batch-20261118): the REQUEST scope changes when the ACTIVE tab
+    // changes, so a new scope must be asked for even when the session set (the
+    // union of the open documents) did not move at all.
+    if (normalized != realtimeRequestFiles_) {
+        lspDiagnosticsRequested_ = false;
+        symbolsRequested_ = false;
+        lastDiagnosticsRequestFiles_.clear();
+    }
+    realtimeRequestFiles_ = normalized;
+}
+
+void DiagnosticsController::setDocumentAnalysisAvailability(const QString &path, bool available,
+                                                            const QString &reason)
+{
+    if (path.isEmpty()) {
+        documentPath_.clear();
+        documentReason_.clear();
+        documentAvailable_ = true;
+        return;
+    }
+    documentPath_ = path;
+    documentAvailable_ = available;
+    documentReason_ = available ? QString() : reason;
+    invalidateView();
+}
+
+QString DiagnosticsController::realtimeReason() const
+{
+    // batch-20261116 L1.2: a document with NO analysis path is the first reason.
+    // The watcher publishes it before it returns (a `.f` manifest / a `.md` has
+    // no analyzer; a file above the byte cap is never read), so the panel can
+    // print one explicit line instead of the historical blank "No diagnostics".
+    if (!documentPath_.isEmpty() && !documentAvailable_) {
+        return documentReason_.isEmpty()
+            ? QCoreApplication::translate("VEdit", "this document has no analyzer")
+            : documentReason_;
+    }
+    if (analysisFile_.isEmpty()) {
+        return QString();
+    }
+    // batch-20261118 AC-2/AC-3: a FAILED session is the first attributable
+    // reason - the document was not analysed because the session died, and the
+    // status line carries the server's own last words.
+    if (lspStarted_ && session_.state == BackendState::Failed) {
+        const QString detail = session_.message.isEmpty()
+            ? QCoreApplication::translate("VEdit", "no reason was reported")
+            : session_.message;
+        return QCoreApplication::translate(
+                   "VEdit", "the language server session failed — %1")
+            .arg(detail);
+    }
+    // AC-2: the server produced neither diagnostics nor symbols for this file.
+    // That is "not analysed", never "0 problems"; name the likely causes.
+    if (serverSilent()) {
+        return QCoreApplication::translate(
+            "VEdit",
+            "the language server did not analyse this file — no build context / no "
+            "response / the session failed");
+    }
+    // RM-17b: exclusion by the user's own top scope is authoritative and must be
+    // NAMED; silently dropping the request left the panel blank.
+    if (isScopeExcluded(analysisFile_)) {
+        const QString prefix = QStringLiteral("outside-top:");
+        const QString stored = notAnalyzedReason_.value(analysisFile_);
+        const QString top = stored.startsWith(prefix) ? stored.mid(prefix.size()) : topScopeTop_;
+        return QCoreApplication::translate(
+                   "VEdit", "not analysed: %1 is outside the active top scope %2")
+            .arg(QFileInfo(analysisFile_).fileName(), top);
+    }
+    const QString stored = notAnalyzedReason_.value(analysisFile_);
+    if (stored == QStringLiteral("modified")) {
+        return QCoreApplication::translate(
+            "VEdit", "not analysed yet: the editor buffer has unsaved changes");
+    }
+    if (stored == QStringLiteral("pending")) {
+        return QCoreApplication::translate("VEdit", "analysis is starting");
+    }
+    if (stored == QStringLiteral("server-silent")) {
+        return QCoreApplication::translate(
+            "VEdit",
+            "the language server did not analyse this file — no build context / no "
+            "response / the session failed");
+    }
+    return QString();
+}
+
+bool DiagnosticsController::serverSilent() const
+{
+    // AC-2 (batch-20261118): the analysed document is "server silent" when the
+    // watcher flagged it (no publishDiagnostics after the bounded settle) OR the
+    // outline request came back with no symbols while no set was ever published
+    // for it. Only a real publication clears the state.
+    if (analysisFile_.isEmpty()) {
+        return false;
+    }
+    if (notAnalyzedReason_.value(analysisFile_) == QStringLiteral("server-silent")) {
+        return true;
+    }
+    // The other half of AC-2: no documentSymbol either, and no set was ever
+    // published for the file. Both surfaces empty is "not analysed", not "a
+    // clean file with no symbols".
+    return navigation_ == 0 && lspStarted_ && session_.state == BackendState::Ready
+        && outline_.isEmpty() && !publishedDiagnosticsFiles_.contains(analysisFile_);
+}
+
 void DiagnosticsController::startLsp()
 {
     if (!lsp_) {
@@ -362,6 +741,7 @@ void DiagnosticsController::startLsp()
     QString error;
     if (lsp_->start(lsPath_, workspaceRoot_, rulesPath_, files_, &error)) {
         lspStarted_ = true;
+        ++lspStarts_;
         report_.lspMessage = QCoreApplication::translate("VEdit", "session started over %1 file(s)").arg(files_.size());
     } else {
         lastError_ = error;
@@ -411,9 +791,16 @@ void DiagnosticsController::refresh()
         // back) changes the merged view while the LSP is not reparsing. The
         // user-visible session count must follow it, not stay at the lower
         // layer's last number.
-        if (viewRevision_ != lastSessionMessageRevision_) {
+        // T9: a per-file edit moves the count too, so the combined token drives
+        // this - never the structural revision alone.
+        if (changeSerial_ != lastSessionMessageRevision_) {
             composeSessionMessage();
         }
+        // batch-20261118 AC-2: a bounded re-ask for a document the server has
+        // published nothing for. It runs OUTSIDE the analysis round, so the
+        // "not analysed" state is visible immediately (a late publish - e.g.
+        // right after the AC-1 build context - is still picked up).
+        pollServerSilence();
         return;
     }
 
@@ -428,6 +815,32 @@ void DiagnosticsController::refresh()
         }
         if (session_.state == BackendState::Ready) {
             const qint64 now = QDateTime::currentMSecsSinceEpoch();
+            // batch-20261118 AC-3: a lazily restarted server is a NEW process
+            // with NO build context and no published sets. The restart count is
+            // the observable that says so.
+            if (session_.restarts != lastRestartsSeen_) {
+                lastRestartsSeen_ = session_.restarts;
+                buildContextPushed_ = false;
+                publishedDiagnosticsFiles_.clear();
+                serverSilentSinceMs_ = 0;
+            }
+            // batch-20261118 AC-1: the project's include dirs / defines / build
+            // files reach slang-server through `workspace/executeCommand` once
+            // the session is Ready (and again after every re-selection, which
+            // resets this flag). A rejection is a visible message, never
+            // silence; a success re-arms both requests so the context's fresh
+            // analysis is picked up.
+            if (!buildContextPushed_) {
+                QString contextError;
+                if (lsp_->pushBuildContext(&contextError)) {
+                    buildContextPushed_ = true;
+                    lspDiagnosticsRequested_ = false;
+                    symbolsRequested_ = false;
+                    serverSilentSinceMs_ = 0;
+                } else if (report_.lspMessage.isEmpty()) {
+                    report_.lspMessage = contextError;
+                }
+            }
             // T118: push the EDITOR BUFFER into the session before asking for
             // diagnostics, so what gets linted is the text the user sees.
             if (!analysisFile_.isEmpty() && !bufferApplied_ && files_.contains(analysisFile_)) {
@@ -435,6 +848,14 @@ void DiagnosticsController::refresh()
                 if (lsp_->changeBuffer(analysisFile_, analysisText_, &bufferError)) {
                     bufferApplied_ = true;
                     bufferAppliedMs_ = now;
+                    // batch-20261117 (AC-4): the status read at the top of this
+                    // tick predates the didChange, so its generation is one
+                    // command stale (a publish that raced in with the PRE-edit
+                    // rows may already have moved it). Re-read AFTER the command
+                    // and only then record the floor the settle window must
+                    // clear: a poll at or below it is still the pre-edit set.
+                    session_ = lsp_->status();
+                    session_.state = backendState(session_.state);
                     bufferGenerationAtApply_ = session_.generation;
                     bufferDiagnosticsSeen_ = false;
                     // Re-ask on the next tick: the server publishes the new
@@ -451,21 +872,36 @@ void DiagnosticsController::refresh()
             // request returns the CURRENT snapshot immediately.
             const bool bufferSettling =
                 bufferApplied_ && !bufferDiagnosticsSeen_ && !analysisFile_.isEmpty()
-                && now - bufferAppliedMs_ < 2500;
+                && now - bufferAppliedMs_ < kBufferSettleMs;
             if (bufferSettling) {
                 lspDiagnosticsRequested_ = false;
             }
             if (!lspDiagnosticsRequested_) {
                 lspDiagnosticsRequested_ = true;
-                for (const QString &file : files_) {
+                // batch-20261116 L1.1: the request set is the REALTIME session
+                // set (current file + level-1 closure, bounded), never `files_`
+                // as a stand-in for the project. The previous code looped over
+                // the whole project because setFileSet() had put it in `files_`.
+                lastDiagnosticsRequestFiles_.clear();
+                // batch-20261118 AC-5: the REQUEST scope is the active
+                // document's one-level closure, never the union of every open
+                // tab. The session may still hold the union (reuse); only the
+                // active closure is asked for and considered. An empty scope
+                // keeps the historical session-wide request.
+                const QStringList &requestScope =
+                    realtimeRequestFiles_.isEmpty() ? files_ : realtimeRequestFiles_;
+                for (const QString &file : requestScope) {
                     if (isScopeExcluded(file)) {
                         continue; // RM-17b: an excluded file is not requested
                     }
                     const quint64 id = lsp_->requestDiagnostics(file);
                     if (id != 0) {
                         lspDiagnostics_.append(DiagnosticTicket{id, file});
+                        lastDiagnosticsRequestFiles_.append(file);
                     }
                 }
+                diagnosticsRequestCount_ +=
+                    static_cast<quint64>(lastDiagnosticsRequestFiles_.size());
             }
 
             if (!analysisFile_.isEmpty() && !symbolsRequested_) {
@@ -515,7 +951,14 @@ void DiagnosticsController::collectLints()
             if (entry.source.isEmpty()) {
                 entry.source = slang_ ? slang_->description() : QStringLiteral("slang");
             }
-            diagnostics_.append(entry);
+            // T64: `SlangBackend::pollLint()` answers in the C ABI's VdDiagnostic
+            // scale (0 error, 1 warning, ...), while the LSP leg below already
+            // speaks the display scale (1 error, 2 warning, ...). Normalize the
+            // CLI row HERE, at the collection boundary, so `diagnostics_` (and
+            // the retained per-file store copied from it) carries ONE scale: the
+            // panel, the squiggles, the file dot and the merge key then cannot
+            // paint the same warning differently in the two layers.
+            diagnostics_.append(toDisplayEntry(entry));
         }
         // RM-9: keep this file's rows in the retained per-file store (the SAME
         // rows the merged view reads) and lift the "pending" mark.
@@ -549,7 +992,48 @@ void DiagnosticsController::collectLspDiagnostics()
             }
             continue;
         }
+        if (!polled.published) {
+            // AC-2 (batch-20261118): the server has NO diagnostics entry for
+            // this document. An empty answer here used to be recorded as a
+            // clean verdict - the false "no problems reported" the user saw.
+            // Keep the explicit not-analysed state and re-ask inside a bounded
+            // window, so a publish that lands just after the build context was
+            // accepted (AC-1) is still picked up.
+            markNotAnalyzed(ticket.file, QStringLiteral("server-silent"));
+            if (ticket.file == analysisFile_) {
+                // The server ANSWERED for the post-edit text (with "no entry"),
+                // so the buffer-settle wait is over. This does NOT read as
+                // "0 problems": the file keeps the not-analysed state until a
+                // set is really published.
+                bufferDiagnosticsSeen_ = true;
+            }
+            if (serverSilentSinceMs_ == 0) {
+                serverSilentSinceMs_ = QDateTime::currentMSecsSinceEpoch();
+            }
+            // The round is NOT kept open here: the terminal state must land
+            // immediately (a server that never publishes cannot leave the panel
+            // "analyzing" forever). The bounded re-ask continues outside the
+            // round (pollServerSilence), so a late publish is still picked up.
+            invalidateView();
+            continue;
+        }
+        publishedDiagnosticsFiles_.insert(ticket.file);
+        serverSilentSinceMs_ = 0;
         if (bufferApplied_ && ticket.file == analysisFile_) {
+            // batch-20261117 (AC-4): a poll answers the CURRENT server snapshot,
+            // so the first completed poll after didChange may still carry the
+            // PRE-edit rows. Accept it only once the session's diagnostics
+            // generation moved past the floor recorded when the buffer was
+            // applied, or once the settle window expired (the existing bound at
+            // which the round settles on whatever the server has). Otherwise
+            // DROP the ticket: the next tick sees bufferSettling and re-requests,
+            // so a publish that lands later in the window is still picked up.
+            const bool generationMoved = session_.generation > bufferGenerationAtApply_;
+            const bool windowExpired =
+                QDateTime::currentMSecsSinceEpoch() - bufferAppliedMs_ >= kBufferSettleMs;
+            if (!generationMoved && !windowExpired) {
+                continue;
+            }
             bufferDiagnosticsSeen_ = true;
         }
         // One analysis = one truth per file: replace the previous entries of
@@ -579,6 +1063,34 @@ void DiagnosticsController::collectLspDiagnostics()
         invalidateView();
     }
     lspDiagnostics_ = pending;
+}
+
+void DiagnosticsController::pollServerSilence()
+{
+    if (analysisFile_.isEmpty() || !lspStarted_ || !lsp_) {
+        return;
+    }
+    if (notAnalyzedReason_.value(analysisFile_) != QStringLiteral("server-silent")) {
+        return;
+    }
+    const qint64 now = QDateTime::currentMSecsSinceEpoch();
+    if (serverSilentSinceMs_ == 0 || now - serverSilentSinceMs_ > kServerSilentReaskMs) {
+        return; // the window is over: the not-analysed state stands
+    }
+    if (lspDiagnostics_.isEmpty()) {
+        const QStringList &scope = realtimeRequestFiles_.isEmpty() ? files_
+                                                                   : realtimeRequestFiles_;
+        for (const QString &file : scope) {
+            if (isScopeExcluded(file)) {
+                continue;
+            }
+            const quint64 id = lsp_->requestDiagnostics(file);
+            if (id != 0) {
+                lspDiagnostics_.append(DiagnosticTicket{id, file});
+            }
+        }
+    }
+    collectLspDiagnostics();
 }
 
 void DiagnosticsController::pollProjectPass()
@@ -625,10 +1137,19 @@ void DiagnosticsController::pollProjectPass()
             pass_.message = lintCancelledMessage(pass_.done, pass_.total);
         } else {
             pass_.phase = LintPhase::Finished;
-            pass_.message = QCoreApplication::translate("VEdit", "%1/%2 file(s) scanned — %3 CLI diagnostics")
-                                .arg(pass_.done)
-                                .arg(pass_.total)
-                                .arg(cliDiagnostics_.size());
+            // The Rust pass summary names every file whose engine failed and
+            // why (e.g. "1 file(s) failed: bad.sv (terminated by signal 11)").
+            // A finished pass is not automatically a CLEAN pass: overwriting
+            // that line with "N/M file(s) scanned" would destroy the only
+            // witness and show a crashed file as having no problems.
+            if (progress.message.contains(QStringLiteral("file(s) failed"))) {
+                pass_.message = progress.message;
+            } else {
+                pass_.message = QCoreApplication::translate("VEdit", "%1/%2 file(s) scanned — %3 CLI diagnostics")
+                                    .arg(pass_.done)
+                                    .arg(pass_.total)
+                                    .arg(cliDiagnostics().size());
+            }
         }
     }
     passRunning_ = false;
@@ -646,7 +1167,7 @@ void DiagnosticsController::finaliseState()
     // and the panel stops polling before the edit's diagnostics exist.
     const bool bufferPublishing =
         bufferApplied_ && !bufferDiagnosticsSeen_ && !analysisFile_.isEmpty()
-        && QDateTime::currentMSecsSinceEpoch() - bufferAppliedMs_ <= 2500;
+        && QDateTime::currentMSecsSinceEpoch() - bufferAppliedMs_ <= kBufferSettleMs;
     if (lspPending || bufferPublishing || !lints_.isEmpty() || !lspDiagnostics_.isEmpty()) {
         return;
     }
@@ -681,14 +1202,23 @@ void DiagnosticsController::composeSessionMessage()
     // wrote `diagnostics_.size()` (lower layer only) here while the panel
     // appended the merged count, so the status line and the header could
     // disagree by construction (R2: "不得两套各算一遍").
-    const int mergedCount = mergedDiagnostics().size();
+    // batch-20261115 AC-3.2: the status line is a REALTIME surface, so with an
+    // active document it reports that document's rows - the same view the panel
+    // and the squiggles show. Without one it keeps the whole merged count.
+    const int mergedCount = analysisFile_.isEmpty()
+        ? mergedDiagnosticCount()
+        : static_cast<int>(mergedDiagnosticsForFile(analysisFile_).size());
     session_.diagnostics = mergedCount;
     session_.message = QStringLiteral("%1: lsp %2/%3 file(s), diagnostics %4")
                            .arg(describeState(state_))
                            .arg(report_.lspFilesOpened)
                            .arg(files_.size())
                            .arg(mergedCount);
-    lastSessionMessageRevision_ = viewRevision_;
+    // AC-5.8: a registered waiver is a CLI-engine input; the language-server
+    // rows cannot carry one through the C ABI. Name that side (never a silent
+    // disagreement between the pass and the server rows).
+    session_.message += waiverScopeNote();
+    lastSessionMessageRevision_ = changeSerial_;
 }
 
 quint64 DiagnosticsController::requestDefinition(const QString &file, int line, int character)
@@ -975,7 +1505,9 @@ void DiagnosticsController::cancelProjectPass()
 
 void DiagnosticsController::clearProjectDiagnostics()
 {
+    cliByFile_.clear();
     cliDiagnostics_.clear();
+    cliFlatDirty_ = false;
     coveredFiles_.clear();
     lowerAnalyzed_.clear();
     // RM-9: the retained per-file store belongs to the project being left. A
@@ -996,29 +1528,33 @@ void DiagnosticsController::clearProjectDiagnostics()
 
 QVector<DisplayDiagnostic> DiagnosticsController::displayDiagnostics() const
 {
+    ++workStats_.displayRebuilds;
     // R2: one layered view. A file with a live upper layer contributes ONLY its
     // project-pass rows (a clean covered file contributes none); every other
     // file contributes its lower (per-file/LSP) rows. `Both` can no longer
     // occur: stacking the two layers for one file is exactly what R2 forbids.
     QVector<DisplayDiagnostic> rows;
     QSet<QString> keys;
-    for (const DiagnosticEntry &entry : cliDiagnostics_) {
-        if (!coveredFiles_.contains(entry.file)) {
+    for (auto bucket = cliByFile_.constBegin(); bucket != cliByFile_.constEnd(); ++bucket) {
+        if (!coveredFiles_.contains(bucket.key())) {
             continue;
         }
-        const QString key = diagnosticMergeKey(entry, DiagnosticOrigin::Cli);
-        if (keys.contains(key)) {
-            continue;
+        for (const DiagnosticEntry &entry : bucket.value()) {
+            const QString key = diagnosticMergeKey(entry, DiagnosticOrigin::Cli);
+            if (keys.contains(key)) {
+                continue;
+            }
+            keys.insert(key);
+            DisplayDiagnostic row;
+            // The upper layer arrives in the C ABI's CLI scale (0 error, 1
+            // warning, 2/3 note); every display surface speaks the LSP scale.
+            // Convert ONCE, here, or a project-pass ERROR would be painted as
+            // information.
+            row.entry = toDisplayEntry(entry);
+            row.origin = DiagnosticOrigin::Cli;
+            row.key = key;
+            rows.append(row);
         }
-        keys.insert(key);
-        DisplayDiagnostic row;
-        // The upper layer arrives in the C ABI's CLI scale (0 error, 1 warning,
-        // 2/3 note); every display surface speaks the LSP scale. Convert ONCE,
-        // here, or a project-pass ERROR would be painted as information.
-        row.entry = toDisplayEntry(entry);
-        row.origin = DiagnosticOrigin::Cli;
-        row.key = key;
-        rows.append(row);
     }
     for (const DiagnosticEntry &entry : diagnostics_) {
         if (coveredFiles_.contains(entry.file)) {
@@ -1030,10 +1566,36 @@ QVector<DisplayDiagnostic> DiagnosticsController::displayDiagnostics() const
         }
         keys.insert(key);
         DisplayDiagnostic row;
+        // The lower layer is ALREADY in the display scale: the CLI leg was
+        // normalized by collectLints() when it entered `diagnostics_`, and the
+        // LSP leg arrives in the LSP scale. Converting again here would shift a
+        // warning to information - the asymmetric bug T64 fixed.
         row.entry = entry;
         row.origin = DiagnosticOrigin::Lsp;
         row.key = key;
         rows.append(row);
+    }
+    // AC-6.4: the LANES' rows (the VHDL lane's GHDL+VSG merge). They are a
+    // LOWER-layer source: a file the finished project pass covers keeps the
+    // pass's verdict (one file, one truth), and the rows are ALREADY in the
+    // display scale (origin Lsp is the scale marker here, not the producer -
+    // `entry.source` names it: "ghdl" / "vsg").
+    for (auto it = laneRows_.constBegin(); it != laneRows_.constEnd(); ++it) {
+        for (const DiagnosticEntry &entry : it.value()) {
+            if (coveredFiles_.contains(entry.file)) {
+                continue;
+            }
+            const QString key = diagnosticMergeKey(entry, DiagnosticOrigin::Lsp);
+            if (keys.contains(key)) {
+                continue;
+            }
+            keys.insert(key);
+            DisplayDiagnostic row;
+            row.entry = entry;
+            row.origin = DiagnosticOrigin::Lsp;
+            row.key = key;
+            rows.append(row);
+        }
     }
     std::sort(rows.begin(), rows.end(),
               [](const DisplayDiagnostic &left, const DisplayDiagnostic &right) {
@@ -1058,18 +1620,9 @@ bool DiagnosticsController::hasUpperLayer(const QString &file) const
 
 QStringList DiagnosticsController::upperLayerFiles() const
 {
-    QStringList files;
-    for (const DiagnosticEntry &entry : cliDiagnostics_) {
-        if (coveredFiles_.contains(entry.file) && !files.contains(entry.file)) {
-            files.append(entry.file);
-        }
-    }
-    // A covered file with no rows (a clean verdict) is still an upper-layer file.
-    for (const QString &file : coveredFiles_) {
-        if (!files.contains(file)) {
-            files.append(file);
-        }
-    }
+    // T9: the covered SET is the answer; scanning the row store (and a
+    // contains() per row) made this O(rows x files) on every 400 ms poll.
+    QStringList files(coveredFiles_.begin(), coveredFiles_.end());
     files.sort();
     return files;
 }
@@ -1077,8 +1630,11 @@ QStringList DiagnosticsController::upperLayerFiles() const
 QVector<DiagnosticEntry> DiagnosticsController::upperLayerDiagnostics() const
 {
     QVector<DiagnosticEntry> rows;
-    for (const DiagnosticEntry &entry : cliDiagnostics_) {
-        if (coveredFiles_.contains(entry.file)) {
+    for (auto bucket = cliByFile_.constBegin(); bucket != cliByFile_.constEnd(); ++bucket) {
+        if (!coveredFiles_.contains(bucket.key())) {
+            continue;
+        }
+        for (const DiagnosticEntry &entry : bucket.value()) {
             rows.append(toDisplayEntry(entry));
         }
     }
@@ -1100,28 +1656,50 @@ void DiagnosticsController::markFileEdited(const QString &file)
         return;
     }
     editSeq_.insert(file, ++editCounter_);
+    // T9: only a change of the FILE'S VISIBLE STATE is a view event. The first
+    // keystroke of a covered file drops its upper layer and marks it modified;
+    // every later keystroke changes only the edit sequence, which no surface
+    // reads. Bumping the view for those would make every consumer rebuild the
+    // project for a state that did not move.
+    bool visibleChange = false;
     if (coveredFiles_.remove(file)) {
         // R2: an edited file's upper rows are void. Drop them from the store as
         // well, so a later pass cannot resurrect a stale row by dedupe key.
         dropUpperRows(file);
+        visibleChange = true;
     }
     // RM-9 / R2: the edit voids the LOWER verdict too - it was computed on the
     // text from BEFORE this edit. Retaining it would keep a green dot alive on a
     // file whose verdict no longer describes its buffer. The file shows the
     // explicit "excluded" state until the next analysis lands (active buffer) or
     // the next pass covers it.
-    clearRetainedRows(file);
-    markNotAnalyzed(file, QStringLiteral("modified"));
-    invalidateView();
+    if (retainedLowerEvaluated_.contains(file) || retainedLowerRows_.contains(file)) {
+        clearRetainedRows(file);
+        visibleChange = true;
+    }
+    if (notAnalyzedReason_.value(file) != QStringLiteral("modified")) {
+        markNotAnalyzed(file, QStringLiteral("modified"));
+        visibleChange = true;
+    }
+    if (visibleChange) {
+        // ONE file moved: the publisher repaints that file, never the project.
+        invalidateFile(file);
+    }
 }
 
 void DiagnosticsController::dropUpperRows(const QString &file)
 {
-    for (int index = cliDiagnostics_.size() - 1; index >= 0; --index) {
-        if (cliDiagnostics_.at(index).file == file) {
-            cliDiagnostics_.removeAt(index);
-        }
+    // T9: the upper store is per file, so this is O(that file's rows), not
+    // O(the project's rows). The counter records the exact work for the
+    // edit-jank benchmark.
+    const auto bucket = cliByFile_.constFind(file);
+    if (bucket == cliByFile_.constEnd()) {
+        return;
     }
+    workStats_.upperRowsScannedOnEdit += static_cast<quint64>(bucket.value().size());
+    cliByFile_.erase(bucket);
+    cliFlatDirty_ = true;
+    invalidateFile(file);
 }
 
 /// The ONE classification rule for a set of already-collected rows: error
@@ -1150,18 +1728,21 @@ static int classifyStatusRows(const QVector<DiagnosticEntry> &rows, bool cliScal
 
 QVector<DiagnosticEntry> DiagnosticsController::mergedDiagnostics() const
 {
+    ++workStats_.mergedRebuilds;
     QVector<DiagnosticEntry> rows;
     QSet<QString> keys;
-    for (const DiagnosticEntry &entry : cliDiagnostics_) {
-        if (!coveredFiles_.contains(entry.file)) {
+    for (auto bucket = cliByFile_.constBegin(); bucket != cliByFile_.constEnd(); ++bucket) {
+        if (!coveredFiles_.contains(bucket.key())) {
             continue;
         }
-        const QString key = diagnosticMergeKey(entry, DiagnosticOrigin::Cli);
-        if (keys.contains(key)) {
-            continue;
+        for (const DiagnosticEntry &entry : bucket.value()) {
+            const QString key = diagnosticMergeKey(entry, DiagnosticOrigin::Cli);
+            if (keys.contains(key)) {
+                continue;
+            }
+            keys.insert(key);
+            rows.append(toDisplayEntry(entry));
         }
-        keys.insert(key);
-        rows.append(toDisplayEntry(entry));
     }
     // LOWER: the RETAINED per-file verdicts, for every file the upper layer
     // does not cover. This is the same store the dots and the panel read, so a
@@ -1173,6 +1754,22 @@ QVector<DiagnosticEntry> DiagnosticsController::mergedDiagnostics() const
             continue;
         }
         for (const DiagnosticEntry &entry : it.value()) {
+            const QString key = diagnosticMergeKey(entry, DiagnosticOrigin::Lsp);
+            if (keys.contains(key)) {
+                continue;
+            }
+            keys.insert(key);
+            rows.append(entry);
+        }
+    }
+    // AC-6.4: the LANES' rows, under the same rule as every other lower source
+    // (a covered file keeps the pass's verdict). This is what makes the panel,
+    // the session count and `statusValueForFile()` agree about a VHDL file.
+    for (auto it = laneRows_.constBegin(); it != laneRows_.constEnd(); ++it) {
+        for (const DiagnosticEntry &entry : it.value()) {
+            if (coveredFiles_.contains(entry.file)) {
+                continue;
+            }
             const QString key = diagnosticMergeKey(entry, DiagnosticOrigin::Lsp);
             if (keys.contains(key)) {
                 continue;
@@ -1213,10 +1810,15 @@ QVector<DiagnosticEntry> DiagnosticsController::mergedDiagnosticsForFile(const Q
         rows.append(origin == DiagnosticOrigin::Cli ? toDisplayEntry(entry) : entry);
     };
     if (upper) {
-        for (const DiagnosticEntry &entry : cliDiagnostics_) {
-            if (entry.file == file) {
-                take(entry, DiagnosticOrigin::Cli);
-            }
+        // T9: one bucket lookup, not a scan of every project row.
+        for (const DiagnosticEntry &entry : cliByFile_.value(file)) {
+            take(entry, DiagnosticOrigin::Cli);
+        }
+    } else if (!laneRowsForFile(laneRows_, file).isEmpty()) {
+        // AC-6.4: a lane evaluated this file (GHDL+VSG). Its rows are already in
+        // the display scale, so they are taken verbatim.
+        for (const DiagnosticEntry &entry : laneRowsForFile(laneRows_, file)) {
+            take(entry, DiagnosticOrigin::Lsp);
         }
     } else if (retainedLowerEvaluated_.contains(file)) {
         // The retained per-file verdict - the SAME store the dot reads. A file
@@ -1237,6 +1839,25 @@ QVector<DiagnosticEntry> DiagnosticsController::mergedDiagnosticsForFile(const Q
         return left.severity < right.severity;
     });
     return rows;
+}
+
+void DiagnosticsController::setLaneDiagnostics(const QString &source,
+                                               const QVector<DiagnosticEntry> &rows)
+{
+    if (source.isEmpty()) {
+        return;
+    }
+    if (rows.isEmpty()) {
+        // An empty set CLEARS the source: a re-lint that found nothing must not
+        // leave the previous rows behind (they would read as a live verdict).
+        if (laneRows_.remove(source) > 0) {
+            invalidateView();
+        }
+        return;
+    }
+    // Same source => REPLACE (a lane re-analyses; it never stacks).
+    laneRows_.insert(source, rows);
+    invalidateView();
 }
 
 DiagnosticsController::FileStatus DiagnosticsController::statusForFile(const QString &file) const
@@ -1266,13 +1887,16 @@ int DiagnosticsController::statusValueForFile(const QString &file) const
     // 1) UPPER layer: the project pass covered this file and the file was not
     //    edited since. Its rows are the verdict (empty = clean).
     if (coveredFiles_.contains(file)) {
-        QVector<DiagnosticEntry> rows;
-        for (const DiagnosticEntry &entry : cliDiagnostics_) {
-            if (entry.file == file) {
-                rows.append(entry);
-            }
-        }
-        return classifyStatusRows(rows, true);
+        // T9: the file's own bucket, not a scan of every project row.
+        return classifyStatusRows(cliByFile_.value(file), true);
+    }
+    // 2a) AC-6.4: a LANE's verdict (the VHDL lane's GHDL+VSG merge). The rows are
+    //     already in the display scale, so `cliScale` is false. An empty answer
+    //     is "no verdict", never "clean": a clean lane CLEARS its rows, so only a
+    //     file a lane actually named reaches this branch.
+    const QVector<DiagnosticEntry> laneRows = laneRowsForFile(laneRows_, file);
+    if (!laneRows.isEmpty()) {
+        return classifyStatusRows(laneRows, false);
     }
     // 2) A FRESH lower verdict (analysed after the last edit). This wins over
     //    the "excluded" mark: the user's rule is that a file with a real
@@ -1314,14 +1938,14 @@ void DiagnosticsController::retainLowerRows(const QString &file)
     }
     retainedLowerRows_.insert(file, rows);
     retainedLowerEvaluated_.insert(file);
-    invalidateView();
+    invalidateFile(file);
 }
 
 void DiagnosticsController::clearRetainedRows(const QString &file)
 {
     retainedLowerRows_.remove(file);
     retainedLowerEvaluated_.remove(file);
-    invalidateView();
+    invalidateFile(file);
 }
 
 void DiagnosticsController::markNotAnalyzed(const QString &file, const QString &reason)
@@ -1330,13 +1954,13 @@ void DiagnosticsController::markNotAnalyzed(const QString &file, const QString &
         return;
     }
     notAnalyzedReason_.insert(file, reason);
-    invalidateView();
+    invalidateFile(file);
 }
 
 void DiagnosticsController::clearNotAnalyzed(const QString &file)
 {
     if (notAnalyzedReason_.remove(file) > 0) {
-        invalidateView();
+        invalidateFile(file);
     }
 }
 
@@ -1371,6 +1995,159 @@ void DiagnosticsController::setTopScope(const QString &top, const QStringList &a
     invalidateView();
 }
 
+const QVector<DiagnosticEntry> &DiagnosticsController::cliDiagnostics() const
+{
+    rebuildCliFlat();
+    return cliDiagnostics_;
+}
+
+const QVector<DiagnosticEntry> &DiagnosticsController::upperDiagnostics() const
+{
+    rebuildCliFlat();
+    return cliDiagnostics_;
+}
+
+void DiagnosticsController::rebuildCliFlat() const
+{
+    if (!cliFlatDirty_) {
+        return;
+    }
+    cliFlatDirty_ = false;
+    cliDiagnostics_.clear();
+    cliDiagnostics_.reserve(static_cast<int>(cliByFile_.size()));
+    for (auto it = cliByFile_.constBegin(); it != cliByFile_.constEnd(); ++it) {
+        cliDiagnostics_ += it.value();
+    }
+}
+
+void DiagnosticsController::invalidateFile(const QString &file)
+{
+    if (file.isEmpty()) {
+        return;
+    }
+    pendingFileChanges_.insert(file);
+    countDirtyFiles_.insert(file);
+    ++fileViewRevision_;
+    ++changeSerial_;
+}
+
+int DiagnosticsController::mergedRowCountForFile(const QString &file) const
+{
+    // Same layering and same key as mergedDiagnostics()/mergedDiagnosticsForFile().
+    QSet<QString> keys;
+    const auto take = [&keys](const DiagnosticEntry &entry, DiagnosticOrigin origin) {
+        keys.insert(diagnosticMergeKey(entry, origin));
+    };
+    if (coveredFiles_.contains(file)) {
+        for (const DiagnosticEntry &entry : cliByFile_.value(file)) {
+            take(entry, DiagnosticOrigin::Cli);
+        }
+        return keys.size();
+    }
+    const QVector<DiagnosticEntry> lane = laneRowsForFile(laneRows_, file);
+    if (!lane.isEmpty()) {
+        for (const DiagnosticEntry &entry : lane) {
+            take(entry, DiagnosticOrigin::Lsp);
+        }
+        return keys.size();
+    }
+    if (retainedLowerEvaluated_.contains(file)) {
+        for (const DiagnosticEntry &entry : retainedLowerRows_.value(file)) {
+            take(entry, DiagnosticOrigin::Lsp);
+        }
+    }
+    return keys.size();
+}
+
+int DiagnosticsController::upperLayerDiagnosticCount() const
+{
+    int total = 0;
+    for (const QString &file : coveredFiles_) {
+        total += cliByFile_.value(file).size();
+    }
+    return total;
+}
+
+int DiagnosticsController::mergedDiagnosticCount() const
+{
+    if (countsAllDirty_) {
+        countsAllDirty_ = false;
+        countDirtyFiles_.clear();
+        mergedCountByFile_.clear();
+        mergedCountTotal_ = 0;
+        QSet<QString> files(coveredFiles_.begin(), coveredFiles_.end());
+        for (auto it = retainedLowerEvaluated_.constBegin();
+             it != retainedLowerEvaluated_.constEnd(); ++it) {
+            files.insert(*it);
+        }
+        for (auto it = laneRows_.constBegin(); it != laneRows_.constEnd(); ++it) {
+            for (const DiagnosticEntry &entry : it.value()) {
+                files.insert(entry.file);
+            }
+        }
+        for (const QString &file : files) {
+            const int count = mergedRowCountForFile(file);
+            mergedCountByFile_.insert(file, count);
+            mergedCountTotal_ += count;
+        }
+    } else if (!countDirtyFiles_.isEmpty()) {
+        for (const QString &file : countDirtyFiles_) {
+            const int previous = mergedCountByFile_.value(file, 0);
+            const int count = mergedRowCountForFile(file);
+            if (count == 0) {
+                mergedCountByFile_.remove(file);
+            } else {
+                mergedCountByFile_.insert(file, count);
+            }
+            mergedCountTotal_ += count - previous;
+        }
+        countDirtyFiles_.clear();
+    }
+    return mergedCountTotal_;
+}
+
+LivePublish DiagnosticsController::takeLivePublish()
+{
+    LivePublish publish;
+    publish.viewRevision = viewRevision_;
+    publish.fileRevision = fileViewRevision_;
+    if (viewRevision_ != publishedViewRevision_) {
+        // STRUCTURAL: the whole view may differ. One rebuild, one map.
+        publishedViewRevision_ = viewRevision_;
+        publishedFileRevision_ = fileViewRevision_;
+        pendingFileChanges_.clear();
+        publish.full = true;
+        publish.statuses = fileStatuses();
+        publish.mergedCount = mergedDiagnosticCount();
+        // The display ROWS are only needed by a caller that lists them (the
+        // DIAG-ROW dump); computing them here would be a second full merge on
+        // every structural change. -1 = not computed.
+        publish.displayCount = -1;
+        publish.upperCount = upperLayerDiagnosticCount();
+        ++workStats_.fullPublishes;
+        workStats_.statusEntriesPublished += static_cast<quint64>(publish.statuses.size());
+        return publish;
+    }
+    if (fileViewRevision_ != publishedFileRevision_) {
+        publishedFileRevision_ = fileViewRevision_;
+        if (pendingFileChanges_.isEmpty()) {
+            return publish; // only internal bookkeeping moved
+        }
+        // PER-FILE: publish just the files whose verdict moved.
+        publish.changedFiles = QStringList(pendingFileChanges_.begin(), pendingFileChanges_.end());
+        publish.changedFiles.sort();
+        pendingFileChanges_.clear();
+        for (const QString &file : publish.changedFiles) {
+            publish.statuses.insert(file, statusValueForFile(file));
+        }
+        publish.mergedCount = mergedDiagnosticCount();
+        publish.upperCount = upperLayerDiagnosticCount();
+        ++workStats_.deltaPublishes;
+        workStats_.statusEntriesPublished += static_cast<quint64>(publish.changedFiles.size());
+    }
+    return publish;
+}
+
 QHash<QString, int> DiagnosticsController::fileStatuses() const
 {
     QHash<QString, int> statuses;
@@ -1385,19 +2162,22 @@ QHash<QString, int> DiagnosticsController::fileStatuses() const
         }
         statuses.insert(file, static_cast<int>(FileStatus::Clean));
     }
-    for (const DiagnosticEntry &entry : cliDiagnostics_) {
-        if (scopeActive && scopeExcluded_.contains(entry.file)) {
+    for (auto bucket = cliByFile_.constBegin(); bucket != cliByFile_.constEnd(); ++bucket) {
+        const QString &file = bucket.key();
+        if (scopeActive && scopeExcluded_.contains(file)) {
             continue;
         }
-        if (!coveredFiles_.contains(entry.file)) {
+        if (!coveredFiles_.contains(file)) {
             continue;
         }
-        const int severity = canonicalSeverity(entry.severity, DiagnosticOrigin::Cli);
-        if (severity == 1) {
-            statuses.insert(entry.file, static_cast<int>(FileStatus::Error));
-        } else if (severity == 2
-                   && statuses.value(entry.file, 0) != static_cast<int>(FileStatus::Error)) {
-            statuses.insert(entry.file, static_cast<int>(FileStatus::Warning));
+        for (const DiagnosticEntry &entry : bucket.value()) {
+            const int severity = canonicalSeverity(entry.severity, DiagnosticOrigin::Cli);
+            if (severity == 1) {
+                statuses.insert(file, static_cast<int>(FileStatus::Error));
+            } else if (severity == 2
+                       && statuses.value(file, 0) != static_cast<int>(FileStatus::Error)) {
+                statuses.insert(file, static_cast<int>(FileStatus::Warning));
+            }
         }
     }
     // LOWER: the retained per-file store - the same rows mergedDiagnostics()
@@ -1447,17 +2227,16 @@ void DiagnosticsController::replaceUpperLayer(const QStringList &files,
         keys.insert(key);
         fresh.append(entry);
     }
-    QVector<DiagnosticEntry> kept;
-    kept.reserve(cliDiagnostics_.size() + fresh.size());
-    for (const DiagnosticEntry &entry : cliDiagnostics_) {
-        if (!linted.contains(entry.file)) {
-            // This pass did not look at the file (it was skipped as an open
-            // document): its previous verdict stands until it is edited.
-            kept.append(entry);
-        }
+    // T9: the store is per file. Files this pass did not look at (skipped as
+    // open documents) keep their previous verdict; the linted files' rows are
+    // replaced by the fresh ones, grouped by their own file.
+    for (const QString &file : files) {
+        cliByFile_.remove(file);
     }
-    kept += fresh;
-    cliDiagnostics_ = kept;
+    for (const DiagnosticEntry &entry : fresh) {
+        cliByFile_[entry.file].append(entry);
+    }
+    cliFlatDirty_ = true;
 
     QSet<QString> live;
     for (const QString &file : coveredFiles_) {
@@ -1665,6 +2444,15 @@ public:
             entry.endColumn = static_cast<int>(item.end_column);
             entry.severity = item.severity;
             entry.code = textOrEmpty(item.code);
+            // AC-5.8 / AC-N3: the typed slang warning option name travels with a
+            // PROJECT-PASS row exactly like a per-file one (see
+            // FfiSlangBackend::pollLint in ffi_backends.cpp). Without it the
+            // upper layer - the only layer the panel shows for a file a finished
+            // pass covered - could not offer the per-diagnostic slang waiver and
+            // would fall back to a whole-file waiver, which AC-5.8 forbids.
+            // `code` above stays what the producer sent: it is never substituted
+            // for the option name.
+            entry.optionName = textOrEmpty(item.option_name);
             entry.message = textOrEmpty(item.message);
             entry.source = QStringLiteral("cli:%1").arg(toolName());
             polled.diagnostics.append(entry);

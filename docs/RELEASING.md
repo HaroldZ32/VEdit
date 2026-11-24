@@ -86,7 +86,7 @@ git push origin v0.2.1
 
 | 附件 | 说明 |
 |---|---|
-| `VEdit-<ver>-x86_64.AppImage` | 单文件 Qt6 交付物（F2 私有运行时，含 verible / slang / git / svn / 字体 / 翻译）；需要 FUSE，没有时用 `--appimage-extract-and-run` 或 `APPIMAGE_EXTRACT_AND_RUN=1` |
+| `VEdit-<ver>-x86_64.AppImage` | 单文件 Qt6 交付物（F2 私有运行时，含 verible / slang / git / svn / GNU diff / 字体 / 翻译）；需要 FUSE，没有时用 `--appimage-extract-and-run` 或 `APPIMAGE_EXTRACT_AND_RUN=1` |
 | `SHA256SUMS` | 与 AppImage 配套，由打包脚本写在 `packaging/runtime/out/SHA256SUMS` |
 
 **产物绝不提交到 git**（仓库 `.gitignore` 已忽略 `packaging/*/out/`、`*.AppImage` 等）。
@@ -98,7 +98,26 @@ bash packaging/runtime/build.sh
 # 校验：packaging/runtime/out/SHA256SUMS
 ```
 
-## 6. 发布前检查单（Qt 产品线）
+## 6. GitHub Actions 验证与发布（Qt 产品线）
+
+功能 PR 合入 `dev` 前，`ci` 运行 Rust 服务、C ABI、Qt6 构建、CTest、Xvfb、翻译和文档检查。
+从 `dev` 切出 `release/<ver>` 后向 `main` 开 PR。同一个 `ci` 工作流在该 PR 的合并测试提交上
+增加完整 AppImage 打包、自检、F2 隔离和 CentOS 7 验证，可在 Actions 中下载本次 AppImage 与
+`SHA256SUMS`。需要提前检查开发分支时，可在 Actions 手动运行 `ci` 并选中该分支，前提是默认分支
+已经登记了工作流。手动运行 `release` 也只生成验证产物。
+
+发布 PR 以 merge commit 合入 `main` 后，在该合并提交创建并推送匹配 Cargo 和 CLI 版本的
+annotated tag（如 `v0.4.0`）。`release` 校验 tag 和 `main` 的第一父提交链，并从 tag 的提交
+重新构建及验证。发布步骤使用同一工作流的已验证产物，只发布 AppImage 和 `SHA256SUMS`。
+`docs/releases/<ver>.md` 存在时用作发布说明，否则使用 GitHub 生成的说明。
+
+Qt6 镜像由固定 Ubuntu 镜像摘要、签名的 2026-11-01 APT 快照和 SHA-256 锁定包构建。
+Rust、Qt6、Scala 与打包使用独立的 Ubuntu 24.04 托管 runner。验证包包含 VHDL 和预热的
+Scala 工具链，打包后对实际 AppImage 字节执行离线工具校验。构建日志写入 `target/ci-logs/`，
+Qt6 和打包日志作为独立的 Actions artifacts 保留。CentOS 7 容器验证 glibc
+2.17 用户空间，容器使用托管 runner 的内核。
+
+### 本地发布前检查单
 
 1. `git switch dev && git pull --ff-only`；工作区干净。
 2. `bash build/gates/qt6-cxx.sh` 全绿（Qt6/KF6 C++ 车道：configure + build + ctest + xcb 冒烟）。

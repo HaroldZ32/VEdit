@@ -81,13 +81,11 @@ DejaVu 字体为 Bitstream Vera 许可 + DejaVu 修改部分进入公有领域�
 
 ## 6. Rust crates
 
-`docs/rust-crates.txt` 由 `cargo metadata`（数据源 `Cargo.lock`）生成，共 **192** 个 crate，
-逐项列出 name / version / license / repository。许可分布（生成时统计）：
+`docs/rust-crates.txt` 由 `cargo metadata`（数据源 `Cargo.lock`）生成，共 **217** 个 crate，
+逐项列出 name / version / license / repository。数量最多的许可条目是 `MIT OR Apache-2.0`
+（117）、`MIT`（39）、`Unicode-3.0`（18）和 `Apache-2.0 OR MIT`（10）。
 
-- `MIT OR Apache-2.0` 101；`MIT` 37；`Unicode-3.0` 18；`Apache-2.0 OR MIT` 9；
-  `MIT/Apache-2.0` 5；`Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT` 3；
-  `ISC` 2；`LGPL-2.1-or-later` 2；其余单项若干（Unlicense OR MIT、BSD-3-Clause、CDLA-Permissive-2.0 等）。
-- 其中 7 个 `vd-*` 是**本项目自有 crate**，许可随项目根 `LICENSE`。
+- 其中 11 个 `vd-*` 是**本项目自有 crate**，许可随项目根 `LICENSE`。
 - **TLS 纪律**：HTTP 栈用 **rustls**，依赖树中**没有** `openssl` / `native-tls`
   （由 `scripts/gates.sh` 的 lock 策略门禁强制），因此产物不链接系统 OpenSSL。
 
@@ -197,6 +195,48 @@ GPL/BSD、`vhdl.xml` = MIT——见下条），不能沿用本节结论。
   把它们映射到 `Tcl`（用户裁定）。映射由 ctest `vedit-highlight-mode-selftest` 断言。
 
 证据：`evidence/ux-batch-2/a3/`（上游参照文件原件 + sha256、许可核对、ctest 与 AppDir 断言日志）。
+
+#### 9.1.2（批次 20261110b / T17）新增定义：`vedit-scala.xml`
+
+与 9.1 / 9.1.1 同一条目性质（**本仓库自有、独立编写**、`author="VEdit"`、
+`license="LGPL-2.1-or-later"`，许可全文 `docs/licenses/LGPL-2.1.txt`，随包
+`resources/syntax/LICENSE-LGPL-2.1`）：
+
+| 项 | `vedit-scala.xml` |
+|---|---|
+| 语言名 | `Scala` |
+| 许可 | **LGPL-2.1-or-later** |
+| 仓库路径 | `resources/syntax/vedit-scala.xml` |
+| `extensions=` | `*.scala;*.sbt`（`build.sbt` 是 Scala DSL，共用一份定义） |
+| 行数 / 字节 | 126 / 7,885 B |
+| **sha256** | `bf9b5f1eeba77e42a1e8119cf11d94b1d39bb59fb458de91d126df12e283e9e4` |
+| 安装落点（AppDir） | `usr/share/org.kde.syntax-highlighting/syntax/vedit-scala.xml` |
+| 上游功能参照（**非复制**） | KDE `syntax-highlighting` v6.24.0 `data/syntax/scala.xml`（15,869 B，sha256 `9115aee0684b1ad82feb3894f49f16f87bbef94438447e69688e96089140e2ec`，文件自述 `license="LGPL"`，作者 Stephane Micheloud，注释写明 adapted from `java.xml`） |
+| 参照文件 URL | `https://invent.kde.org/frameworks/syntax-highlighting/-/raw/v6.24.0/data/syntax/scala.xml` |
+
+**编写方式（BINDING，与 9.1.1 同一纪律）**：独立编写；上游 `scala.xml` 只作
+**功能参照**（关键词/构造清单的交叉核对，并确认它同样把 `*.scala;*.sbt` 归在
+`Scala` 名下），**没有复制**任何上游的文件结构、注释、列表顺序或正则。因此按本仓库
+自己的许可登记为 **LGPL-2.1-or-later**，而不是按上游许可登记；若将来有人把它改成
+"改编自上游 scala.xml"，那一份**必须**改写为上游的 LGPL 许可，不能沿用本条结论。
+
+> **生效定义（AC-7.8 诚实边界，不改写 AGENT.md §9）**：本文件是**随包的私有数据文件**，
+> 不等于"编辑器实际渲染用的定义"。批次证据
+> `evidence/batch-20261110b/scala-syntax/01-syntax.log` 用产品自带的
+> `vedit-ksh-env-probe`（打印每个定义**胜出的** `Definition::filePath()`，含
+> `--editor-repo` 的 KTextEditor 仓库）实测了两种形态：
+> 链接发行版 KSyntaxHighlighting（ctest 构建形态，库内**嵌入** KDE 定义）时，`Scala`
+> 在普通仓库与 KTextEditor 仓库里胜出的都是**库内嵌的**
+> `:/org.kde.syntax-highlighting/syntax/scala.xml`（KDE 定义，非本文件），与 AGENT.md §9
+> 记录的 Verilog/SystemVerilog 现象一致；链接自建 F2 库（`QRC_SYNTAX=OFF`，交付形态）且
+> `XDG_DATA_DIRS` 只指向本目录时，两个仓库里 `Scala` 胜出的都是**本文件**（此时 KTextEditor
+> 仓库恰好只有 6 份白名单定义），产品自测也量到 `format-ranges=4`、`definition-file=…/vedit-scala.xml`。
+> 产品自己的私有加载器（`KsyntaxData` 的自定义搜索路径）同样把 `Scala` 解析到本文件。
+> 因此：**不得**笼统声称本文件在所有形态下驱动渲染；在 ctest/开发形态下渲染来自 KDE 的
+> `Scala` 定义，在 F2 交付形态下来自本文件（两者都有实测输出）。
+
+证据：`evidence/batch-20261110b/scala-syntax/`（上游参照文件原件 + sha256、私有/交付两形态的
+`filePath` 探针输出、打包白名单与 ctest 日志）。
 
 ### 9.2 MIT `tree-sitter-verilog`（静态编入）
 
@@ -327,3 +367,91 @@ git 或 svn。两个客户端及其依赖库都来自 `scripts/versions.env` 中
 - **可复现与验证**：deb 的 URL + sha256、AppDir 内两个二进制的 sha256、`svnadmin` 缺席、
   捆绑版本（`git --version` ≥ 2.43、`svn --version --quiet` ≥ 1.14）与干净容器内的
   `AppRun --selfcheck` 证据见 `evidence/vcs-toolchain/`。
+
+## 12. Qt6 产品线：随包 VHDL 工具链（vhdl_ls / GHDL / CPython / VSG，T11 / AC-6.5、AC-6.8）
+
+产品自带运行环境，因此也**自带 VHDL 工具链**，目标机不需要安装 Python、GHDL 或任何 VHDL 工具。
+四个组件全部来自 `scripts/versions-vhdl.env` 中 **URL + sha256 固定**的上游产物（未修改），
+由 `packaging/runtime/build-vhdl-payload.sh` 校验/构建，`packaging/runtime/assemble-appdir.sh`
+安装到 AppDir，运行时**零网络**（探针在 `--network none` 容器内跑通，见
+`evidence/batch-20261110/vhdl-pack/`）。
+
+| 组件 | 版本 | 许可 | 来源（固定方式） | 分发形态 |
+|---|---|---|---|---|
+| **vhdl_ls**（VHDL 语言服务器） | `0.88.0` | **MPL-2.0** | `VHDL_LS_URL` + `VHDL_LS_SHA256`（上游 `x86_64-unknown-linux-musl` release，**static-pie**） | `usr/lib/vhdl/vhdl_ls` + `bin/vhdl_ls` 包装脚本 |
+| **GHDL**（mcode 版） | `6.0.0` | **GPL-2.0-or-later**（含 GCC 运行时例外） | `GHDL_URL` + `GHDL_SHA256`（上游 `ghdl-mcode-6.0.0-ubuntu24.04-x86_64` release） | `usr/lib/vhdl/ghdl/`（bin + lib/ghdl 的 std/ieee 库）+ `bin/ghdl` 包装脚本 |
+| **CPython** | `3.12.8` | **PSF-2.0** | `VHDL_PYTHON_URL` + `VHDL_PYTHON_SHA256`（python.org 源码包，构建时编入同一 glibc） | `usr/lib/vhdl/python/` + `bin/python3` 包装脚本 |
+| **VSG**（VHDL Style Guide） | `3.36.0` | **GPL-3.0** | `VSG_WHEEL_URL` + `VSG_WHEEL_SHA256`（PyPI `py3-none-any` wheel，构建时装入随包 CPython） | `bin/vsg`（`python -E -s vsg_launcher.py`） |
+| **PyYAML**（VSG 唯一运行期依赖） | `6.0.3` | **MIT** | `PYYAML_WHEEL_URL` + `PYYAML_WHEEL_SHA256`（manylinux_2_17 wheel） | 随包 CPython 的 `site-packages` |
+
+- **启动隔离**：四个 `bin/` 包装脚本都先 `unset LD_LIBRARY_PATH LOCPATH`，再经 AppDir 自带的
+  `ld-linux-x86-64.so.2 --library-path "$APPDIR/lib"` 启动（`bin/vhdl_ls` 是 static-pie，走同一
+  路径以保持统一），宿主机的库与 locale 不会被继承。GHDL 需要的 `GHDL_PREFIX` 指向
+  `usr/lib/vhdl/ghdl/lib/ghdl`（std/ieee 预编译库所在处）。
+- **许可全文随包**：`usr/share/doc/vedit/licenses/{vhdl_ls-MPL-2.0,ghdl-GPL-2.0,vsg-GPL-3.0,Python-2.0}.txt`
+  （前三个来自仓库 `packaging/runtime/assets/licenses/`，PSF 文本取自 CPython 源码包的 `LICENSE`）。
+- **源码可得性（GPL §3 / MPL-2.0 §3.2 的对应做法）**：
+  - vhdl_ls 0.88.0：`https://github.com/VHDL-LS/rust_hdl`（tag `v0.88.0`）。
+  - GHDL 6.0.0：`https://github.com/ghdl/ghdl`（tag `v6.0.0`；GCC 运行时例外见其 `COPYING.runtime`）。
+  - CPython 3.12.8：`https://www.python.org/ftp/python/3.12.8/Python-3.12.8.tgz`（与二进制同一 pin）。
+  - VSG 3.36.0：`https://github.com/jeremiah-c-leary/vhdl-style-guide`（tag `v3.36.0`）；
+    PyYAML 6.0.3：`https://github.com/yaml/pyyaml`（tag `6.0.3`）。
+- **可复现与验证**：`sha256sum` 逐件校验、`PAYLOAD.env` 记录每个 pin、AppDir 内版本探针与
+  `--network none` 干净环境运行日志见 `evidence/batch-20261110/vhdl-pack/`。
+
+## 11. Qt6 产品线：离线 Scala 工具链（JDK21 / scala-cli / sbt / Metals，T12）
+
+**整包离线**：JDK 21、scala-cli、sbt（含预热 boot/ivy/coursier 缓存）、Bloop、Metals 与两个
+Scala 版本（2.13.12 / 2.13.18）的 mtags 全部安装到 AppDir，运行时**零网络**
+（验证在 `--network none` 容器内跑通，见 `evidence/batch-20261110/scala-pack/`）。
+
+| 组件 | 版本 | 许可 | 来源（固定方式） | 分发形态 |
+|---|---|---|---|---|
+| **Eclipse Temurin JDK** | `21.0.13+9` | **GPL-2.0 + Classpath Exception** | `SCALA_JDK_URL` + `SCALA_JDK_SHA256`（上游 release 的 `x64_linux_hotspot` tarball，glibc 2.17+ 构建） | `usr/lib/scala/jdk/` + `bin/java` 包装脚本 |
+| **scala-cli** | `1.18.0` | **Apache-2.0** | `SCALA_CLI_URL` + `SCALA_CLI_SHA256`（上游 `x86_64-pc-linux-static` 静态原生镜像） | `usr/lib/scala/scala-cli/scala-cli` + `bin/scala-cli` |
+| **sbt** | `1.13.1` | **Apache-2.0** | `SBT_URL` + `SBT_SHA256`（上游 `sbt-1.13.1.tgz`） | `usr/lib/scala/sbt/` + `usr/lib/scala/sbt-home/{boot,coursier,global}`（构建期预热）+ `bin/sbt` |
+| **coursier `cs`** | `2.1.26` | **Apache-2.0** | `CS_URL` + `CS_SHA256`（上游 `x86_64-pc-linux-static`） | `usr/lib/scala/cs/cs`（Metals 启动器 + 离线解析器） |
+| **Metals** | `1.6.9` | **Apache-2.0** | `METALS_COORD`（Maven Central `org.scalameta:metals_2.13:1.6.9`，构建期解析进随包 coursier 缓存） | `usr/lib/scala/coursier-cache/` + `bin/metals` |
+| **Bloop**（构建服务器） | `1.5.18` | **Apache-2.0** | `BLOOP_COORD`（`ch.epfl.scala:bloop-frontend_2.12:1.5.18`） | 同上（随包 coursier 缓存） |
+| **mtags**（编译器桥） | `2.13.12 → 1.5.1`，`2.13.18 → 1.6.9` | **Apache-2.0** | `MTAGS_LEGACY_COORD` / `MTAGS_MAIN_COORD`（按 Scala 版本分别发布，见 `scripts/versions-scala.env` 注释） | 同上 |
+| **Scala 标准库/编译器**（随缓存） | `2.13.18` / `2.13.12` | **Apache-2.0** | 构建期由 sbt / scala-cli 解析进预热缓存 | `usr/lib/scala/{sbt-home,scala-cli-cache}/` |
+
+- **缓存与守护目录全部重定向到 AppDir**：`bin/sbt` 用 `SBT_OPTS` 把
+  `sbt.boot.directory` / `sbt.ivy.home` / `sbt.coursier.home` / `sbt.global.base` 指到
+  `usr/lib/scala/sbt-home/`，并置 `COURSIER_CACHE` + `COURSIER_MODE=offline`；`bin/scala-cli`
+  与 `bin/metals` 同样把 `COURSIER_CACHE` 指进 AppDir。验证中故意用一个**不存在的 `$HOME`**
+  跑 sbt，`$HOME` 不会被创建（写路径没有泄漏到宿主）。
+- **无 Bloop 守护依赖**：`bin/scala-cli` 不强制 Bloop 服务器；离线冒烟用
+  `scala-cli --power run --server=false --offline`。`bin/sbt` 以 `-batch --java-home` 直接驱动
+  随包 JDK。
+- **许可全文随包**：`usr/share/doc/vedit/licenses/{temurin-GPL-2.0,temurin-Classpath-Exception,
+  scala-cli-Apache-2.0,sbt-Apache-2.0,coursier-Apache-2.0,metals-Apache-2.0,bloop-Apache-2.0,
+  scala-Apache-2.0}.txt`（GPL/CE 文本取自 JDK 自带的 `legal/`，Apache 文本为
+  `packaging/runtime/assets/licenses/Apache-2.0.txt`）。
+- **源码可得性（GPLv2+CE §3 的对应做法）**：`usr/share/doc/vedit/licenses/scala-sources-offer.txt`
+  记录 Temurin/OpenJDK 21.0.13+9 的源码取得方式（同一 release 页的 source tree，至少三年），
+  并随 `usr/lib/scala/SOURCES.txt` 一起分发；其余组件均为 Apache-2.0，按 §4 只需附许可文本。
+- **符号/加载器基线**：`eclipse temurin` 的 ELF 全部 ≤ `GLIBC_2.15`，scala-cli 与 cs 为静态
+  原生镜像；sbt 自带的 `sbtn` 客户端（`GLIBC_2.34`，且本产品不使用）被**移除**而不是随包
+  带一个在 CentOS 7 上无法启动的二进制。逐文件 `readelf -V` 报告见
+  `evidence/batch-20261110/scala-pack/01-offline-verify.log` 的 ELF 段。
+- **可复现与验证**：每个 pin 的 sha256 在 `build-scala-payload.sh` 里强校验，`PAYLOAD.env`
+  记录版本与产物大小；离线验证日志见 `evidence/batch-20261110/scala-pack/`。
+
+## 14. Qt6 产品线：文件比较随包 GNU diff
+
+GNU `diff` 3.3（CentOS 7 的 `diffutils-3.3-5.el7.x86_64.rpm`，GPL-3.0-or-later）以独立进程运行。
+二进制与 pinned CentOS 7 基础镜像的 `/usr/bin/diff` 逐字节一致。发行包位于
+[CentOS 7.9.2009 Vault](https://vault.centos.org/7.9.2009/os/x86_64/Packages/diffutils-3.3-5.el7.x86_64.rpm)。
+AppImage 在 `usr/share/doc/vedit/diffutils/` 同时携带 GPL 许可全文和完整对应源码
+`diffutils-3.3-5.el7.src.rpm`，内含上游源码、发行版补丁及 RPM 构建说明。
+源码包也可从 [CentOS Vault 源码归档](https://vault.centos.org/7.9.2009/os/Source/SPackages/diffutils-3.3-5.el7.src.rpm) 获取。
+`assemble-appdir.sh` 按 `scripts/versions.env` 核对二进制、许可和源码的 SHA-256。
+VEdit 通过 `usr/lib/vedit/file-compare/diff` 包装脚本使用私有加载器启动该程序。
+
+## 15. Qt6 AppImage 启动器
+
+外层启动器取自 AppImage Type 2 runtime 的 `fedfad51acc2860b2916a1eef32ba4a500ff31ef`
+提交，对应上游发布资产 `657374641`。打包脚本按 `scripts/versions.env` 校验启动器的 SHA-256。
+AppDir 内的 `usr/share/doc/vedit/licenses/appimage-type2-runtime.txt` 包含上游 MIT 许可全文与
+静态链接库的许可出处。对应源码、构建说明和上游许可见 [AppImage Type 2 runtime 源码](https://github.com/AppImage/type2-runtime/tree/fedfad51acc2860b2916a1eef32ba4a500ff31ef)。

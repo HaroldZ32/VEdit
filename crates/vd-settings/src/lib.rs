@@ -111,6 +111,21 @@ pub fn load(path: &Path) -> Loaded {
     for (key, value) in document {
         match value {
             toml::Value::String(text) => loaded.entries.push(Entry { key, value: text }),
+            toml::Value::Table(nested) => {
+                // A bare dotted key (`tools.lsp_backend = "slang"`) is valid TOML
+                // that parses as a NESTED table, while the store is flat. Name
+                // the key the user meant, so a hand-edited file says how to fix
+                // itself instead of silently meaning defaults.
+                let flat: Vec<String> = nested
+                    .keys()
+                    .map(|name| format!("\"{key}.{name}\""))
+                    .collect();
+                loaded.warnings.push(format!(
+                    "{}: `{key}` is a table but the store holds flat keys; write {} = \"…\" (one quoted key) instead",
+                    path.display(),
+                    flat.join(" / ")
+                ));
+            }
             other => loaded.warnings.push(format!(
                 "{}: `{key}` is {} but the store holds strings; ignored",
                 path.display(),
@@ -245,6 +260,93 @@ mod tests {
         assert_eq!(loaded.entries, vec![entry("theme", "Breeze")]);
         assert_eq!(loaded.warnings.len(), 1);
         assert!(loaded.warnings[0].contains("font_size"));
+    }
+
+    #[test]
+    fn a_bare_dotted_key_names_the_flat_key_to_write() {
+        let Ok(dir) = tempfile::tempdir() else {
+            return;
+        };
+        let path = dir.path().join("settings.toml");
+        // The exact shape a hand-edited store produces: a dotted key outside the
+        // quotes. It is valid TOML, so parsing alone cannot reject it.
+        let written = std::fs::write(&path, "tools.lsp_backend = \"slang\"\n");
+        assert!(written.is_ok());
+        let loaded = load(&path);
+        assert!(
+            loaded.entries.is_empty(),
+            "a nested table is not a flat entry: {:?}",
+            loaded.entries
+        );
+        assert_eq!(loaded.warnings.len(), 1, "{:?}", loaded.warnings);
+        let warning = &loaded.warnings[0];
+        assert!(
+            warning.contains("\"tools.lsp_backend\""),
+            "the warning names the key the user meant: {warning}"
+        );
+        assert!(
+            warning.contains("quoted"),
+            "the warning says how to fix the file: {warning}"
+        );
+    }
+
+    #[test]
+    fn a_refused_tool_value_is_explained_and_never_dropped() {
+        let Ok(dir) = tempfile::tempdir() else {
+            return;
+        };
+        let path = dir.path().join("settings.toml");
+        let written = std::fs::write(&path, "\"tools.lsp_backend\" = \"emacs\"\n");
+        assert!(written.is_ok());
+        // The loader keeps the value it read; refusing/canonicalising is the
+        // schema step the ABI seam runs, and it must hand back a warning.
+        let mut loaded = load(&path);
+        assert_eq!(loaded.entries, vec![entry("tools.lsp_backend", "emacs")]);
+        let warnings = schema::normalize_tool_entries(&mut loaded.entries);
+        assert_eq!(warnings.len(), 1, "{warnings:?}");
+        assert!(
+            warnings[0].contains("emacs"),
+            "names the refused value: {}",
+            warnings[0]
+        );
+        assert!(
+            warnings[0].contains("slang-server"),
+            "lists the accepted spellings: {}",
+            warnings[0]
+        );
+        assert_eq!(loaded.entries, vec![entry("tools.lsp_backend", "slang")]);
+    }
+
+    #[test]
+    fn a_canonical_pair_survives_a_fresh_load() {
+        let Ok(dir) = tempfile::tempdir() else {
+            return;
+        };
+        let path = dir.path().join("settings.toml");
+        let entries = vec![
+            entry("tools.lsp_backend", "slang"),
+            entry("tools.lint_engine", "verible"),
+        ];
+        assert_eq!(save(&path, &entries), Ok(()));
+        // A restart is a NEW load of the same store: both reads must agree with
+        // what was written, so the pair does not depend on process state.
+        let first = load(&path);
+        let second = load(&path);
+        // The table is key-sorted on the read side; compare as a set of pairs.
+        let mut observed: Vec<(String, String)> = first
+            .entries
+            .iter()
+            .map(|entry| (entry.key.clone(), entry.value.clone()))
+            .collect();
+        observed.sort();
+        let mut expected: Vec<(String, String)> = entries
+            .iter()
+            .map(|entry| (entry.key.clone(), entry.value.clone()))
+            .collect();
+        expected.sort();
+        assert_eq!(observed, expected);
+        assert_eq!(second.entries, first.entries);
+        assert!(first.warnings.is_empty(), "{:?}", first.warnings);
     }
 
     #[test]

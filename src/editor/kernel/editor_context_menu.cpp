@@ -17,6 +17,12 @@ namespace vedit::editor {
 namespace {
 
 constexpr auto kMenuObjectName = "vedit-editor-context-menu";
+/// The engineering-wide rename command the rename lane registers
+/// (src/workspace/rename/rename_integration.cpp). The registry names every
+/// action `action-<id>` (command_registry.cpp), the convention `shellActionFor`
+/// already uses for the language server items.
+constexpr auto kProjectRenameCommandId = "rename.symbol";
+constexpr auto kProjectRenameObjectName = "vedit.action.rename.symbol";
 
 QString shortcutSuffix(const QKeySequence &shortcut)
 {
@@ -91,6 +97,56 @@ QAction *appendItem(QMenu *menu, const KTextEditor::View *view, EditorAction act
     if (channel != nullptr) {
         QObject::connect(item, &QAction::triggered, menu,
                          [channel, action]() { channel->dispatch(action); });
+    }
+    menu->addAction(item);
+    return item;
+}
+
+/// The shell action of one registry command, found the same way `shellActionFor`
+/// finds an LSP action (`action-<command id>` under the shell window).
+QAction *shellActionForCommand(const KTextEditor::View *view, const QString &commandId)
+{
+    QWidget *host = view != nullptr ? view->window() : nullptr;
+    if (host == nullptr || commandId.isEmpty()) {
+        return nullptr;
+    }
+    return host->findChild<QAction *>(QStringLiteral("action-") + commandId);
+}
+
+/// The project-wide (slang AST) rename, kept SEPARATE from the document-scoped
+/// language server `&Rename Symbol...` item: one list entry never changes the
+/// meaning of the other.
+///
+/// No second gating rule lives here. The item mirrors the registry action's live
+/// enabled state and tooltip, and that action is the rename lane's rendering of
+/// the ONE pure rule (`renameEntryGate`: open HDL document + slang present +
+/// project root + project file set). An unavailable command stays visible and
+/// greyed with the lane's one-line reason, exactly like the Project menu entry.
+QAction *appendProjectRename(QMenu *menu, const KTextEditor::View *view)
+{
+    QAction *wired = shellActionForCommand(view, QString::fromLatin1(kProjectRenameCommandId));
+    // Same source spelling the rename lane registers, so one catalogue entry
+    // serves the Project menu and this item; only a lane-less build uses it.
+    const QString text = wired != nullptr && !wired->text().isEmpty()
+                             ? wired->text()
+                             : QCoreApplication::translate("VEdit", "Rename Symbol in &Project…");
+    const QKeySequence shortcut =
+        wired != nullptr ? wired->shortcut() : QKeySequence();
+    auto *item = new QAction(text + shortcutSuffix(shortcut), menu);
+    item->setObjectName(QString::fromLatin1(kProjectRenameObjectName));
+    item->setData(QString::fromLatin1(kProjectRenameCommandId));
+    item->setEnabled(wired != nullptr && wired->isEnabled());
+    const QString tip =
+        wired != nullptr
+            ? wired->toolTip()
+            : QCoreApplication::translate(
+                  "VEdit", "The project-wide rename command is not installed in this build.");
+    item->setToolTip(tip);
+    item->setStatusTip(tip);
+    if (wired != nullptr) {
+        // Dispatch the SAME action the Project menu / Ctrl+Shift+F2 dispatch, so
+        // the two surfaces can never drift apart.
+        QObject::connect(item, &QAction::triggered, menu, [wired]() { wired->trigger(); });
     }
     menu->addAction(item);
     return item;
@@ -176,14 +232,50 @@ bool EditorContextMenu::eventFilter(QObject *watched, QEvent *event)
         return QObject::eventFilter(watched, event);
     }
     auto *contextEvent = static_cast<QContextMenuEvent *>(event);
-    // The same menu the product's own command registry offers, built from the
-    // capability gate at this instant; an unavailable action stays visible and
-    // greyed with its reason.
-    if (showMenu(contextEvent->globalPos()) != nullptr) {
-        event->accept();
-        return true;
+    const bool keyboard = contextEvent->reason() == QContextMenuEvent::Keyboard;
+    const QPoint global = contextEvent->globalPos();
+    const auto caret = keyboard ? view_->cursorPosition()
+                                : view_->coordinatesToCursor(view_->mapFromGlobal(global));
+    if (!keyboard) {
+        view_->setFocus(Qt::MouseFocusReason);
+        if (caret.isValid()) {
+            if (view_->selection() && !view_->selectionRange().contains(caret)) {
+                view_->removeSelection();
+            }
+            view_->setCursorPosition(caret);
+        }
     }
-    return QObject::eventFilter(watched, event);
+    QMenu *menu = buildMenu();
+    if (menu == nullptr) {
+        return QObject::eventFilter(watched, event);
+    }
+    if (!caret.isValid()) {
+        const QString reason = QCoreApplication::translate("VEdit", "No text at this position");
+        for (const auto action : {EditorAction::Definition, EditorAction::References,
+                                  EditorAction::Rename, EditorAction::Hover}) {
+            if (auto *item = menu->findChild<QAction *>(QStringLiteral("vedit.action.") +
+                                                       editorActionName(action))) {
+                item->setEnabled(false);
+                item->setToolTip(reason);
+            }
+        }
+        if (auto *rename = menu->findChild<QAction *>(QString::fromLatin1(kProjectRenameObjectName))) {
+            rename->setEnabled(false);
+            rename->setToolTip(reason);
+        }
+        for (auto *item : menu->actions()) {
+            if (item->objectName().startsWith(QStringLiteral("vedit.action.signal.trace."))) {
+                item->setEnabled(false);
+                item->setToolTip(reason);
+            }
+        }
+    }
+    menu->setAttribute(Qt::WA_DeleteOnClose);
+    const QPoint caretPoint = keyboard && caret.isValid() ? view_->cursorToCoordinate(caret)
+                                                            : QPoint(-1, -1);
+    menu->popup(caretPoint.x() >= 0 ? view_->mapToGlobal(caretPoint) : global);
+    event->accept();
+    return true;
 }
 
 QList<QAction *> EditorContextMenu::appendTo(QMenu *menu)
@@ -205,6 +297,26 @@ QList<QAction *> EditorContextMenu::appendTo(QMenu *menu)
                                          EditorAction::Hover};
     for (EditorAction action : lspActions) {
         added.append(appendItem(menu, view_, action, backend));
+    }
+
+    // The project-wide rename (slang AST) is its own section: it is not a
+    // language server action, and it never replaces the LSP `&Rename Symbol...`
+    // item above.
+    menu->addSeparator();
+    if (QAction *header = menu->addSection(QCoreApplication::translate("VEdit", "Project"))) {
+        added.append(header);
+    }
+    added.append(appendProjectRename(menu, view_));
+    for (const auto *id : {"signal.trace.driver", "signal.trace.load",
+                           "signal.trace.driver.chain", "signal.trace.load.chain"}) {
+        if (auto *wired = shellActionForCommand(view_, QString::fromLatin1(id))) {
+            auto *item = menu->addAction(wired->text() + shortcutSuffix(wired->shortcut()));
+            item->setObjectName(QStringLiteral("vedit.action.") + QString::fromLatin1(id));
+            item->setEnabled(wired->isEnabled());
+            item->setToolTip(wired->toolTip());
+            QObject::connect(item, &QAction::triggered, wired, &QAction::trigger);
+            added.append(item);
+        }
     }
 
     menu->addSeparator();

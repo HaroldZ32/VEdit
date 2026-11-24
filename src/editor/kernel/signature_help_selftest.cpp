@@ -299,6 +299,30 @@ int main(int argc, char **argv)
     check(QStringLiteral("sig.scan-function-bar"), sawBar);
     check(QStringLiteral("sig.scan-module-sub"), sawSub);
 
+    // --- 10. T9: one document copy per text change, NONE per cursor move ----
+    // The old refresh copied document->text() three times per call and ran on
+    // every keystroke and every cursor step. The fix caches the text per
+    // document revision and debounces text changes by 150 ms.
+    document->setText(fullText());
+    QApplication::processEvents();
+    help->refresh();
+    const quint64 copiesAfterRefresh = help->documentTextCopies();
+    placeCursor(view, 13, 12); // pure cursor move: the text did not change
+    QApplication::processEvents();
+    check(QStringLiteral("sig.cursor-move-copies-nothing"),
+          help->documentTextCopies() == copiesAfterRefresh,
+          QString::number(help->documentTextCopies() - copiesAfterRefresh));
+    document->insertText(KTextEditor::Cursor(13, 0), QStringLiteral(" "));
+    QApplication::processEvents();
+    check(QStringLiteral("sig.text-change-is-debounced"), help->refreshPending());
+    check(QStringLiteral("sig.debounce-copies-nothing-immediately"),
+          help->documentTextCopies() == copiesAfterRefresh,
+          QString::number(help->documentTextCopies() - copiesAfterRefresh));
+    QTest::qWait(250);
+    check(QStringLiteral("sig.debounce-refreshes-once"),
+          !help->refreshPending() && help->documentTextCopies() == copiesAfterRefresh + 1,
+          QString::number(help->documentTextCopies() - copiesAfterRefresh));
+
     std::printf("SUMMARY checks=%d failures=%d\n", g_checks, g_failures);
     return g_failures == 0 ? 0 : 1;
 }

@@ -108,6 +108,15 @@ public:
     virtual BackendCapabilities sessionCapabilities() const;
     /// The exact argv the next start() would use (AC-2.5's dump).
     virtual QString commandLine() const { return QString(); }
+
+    /// Push the selected project build context (include dirs / defines) to a
+    /// session that is already Ready (batch-20261118 AC-1). The implementation
+    /// holds the values `selectBackend()` was given. Returns false with `error`
+    /// filled when the server rejected the context; the caller surfaces it
+    /// instead of silently linting without it. The project's imported `.f` lists
+    /// are deliberately NOT part of this channel (G1-d/G1-g): the generated
+    /// context compiles the session's own file set.
+    virtual bool pushBuildContext(QString *error);
 };
 
 inline const CapabilityRow *BackendCapabilities::row(const QString &action) const
@@ -169,6 +178,14 @@ inline quint64 LspSessionBackend::requestSignatureHelp(const QString &file, int 
     (void)line;
     (void)character;
     return 0;
+}
+
+inline bool LspSessionBackend::pushBuildContext(QString *error)
+{
+    (void)error;
+    // A backend without a build-context channel (the headless fakes, or one
+    // whose argv already carries it) has nothing to push - not an error.
+    return true;
 }
 
 inline bool LspSessionBackend::changeBuffer(const QString &file, const QString &text,

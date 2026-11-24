@@ -14,6 +14,7 @@
 // panel is still fully exercised by the lane's own demo and ctest suite.
 
 #include "../integration.h"
+#include "file_tree_widget.h"
 
 class QWidget;
 
@@ -27,7 +28,8 @@ class FileTreeWidget;
 
 // Registers the `file-tree` panel factory and replaces the shell's placeholder
 // content when the dock was already inserted at first start. Idempotent.
-void installFileTree(vedit::app::ApplicationShell &shell, const IntegrationOptions &options);
+void installFileTree(vedit::app::ApplicationShell &shell, const IntegrationOptions &options,
+                     FileTreeWidget::ContextMenuExtension contextMenu = {});
 
 // The lane's shell-facing open seam: loads `path` into the shell's active editor
 // pane, records it as the widget property `vedit.openFilePath`, and reports it in

@@ -97,6 +97,15 @@ public:
     // provider (lane tests, standalone use) the shared hub's path is used.
     void setCurrentFileProvider(std::function<QString()> provider);
 
+    // The project's file set (batch 20261110d): the SAME membership the file
+    // tree and the lint pass consume, published by the project model. The panel
+    // reads it at SCAN time (never once at construction), so a `.f` imported
+    // after the dock was built joins the next search; the provider returns
+    // absolute paths. An empty list (no project model yet) selects the
+    // historical directory walk instead of searching zero files.
+    void setProjectFilesProvider(std::function<QStringList()> provider);
+    QStringList projectFiles() const;
+
     // Hand-off from the Ctrl+F bar: adopt its query + options AND run the
     // project search (the bar never searches the project itself).
     void applyHandoff(const vedit::search::SearchHandoff &handoff);
@@ -254,6 +263,7 @@ private:
     FileRewriter rewriter_;
     ReplaceConfirmHandler confirmHandler_;
     std::function<QString()> currentFileProvider_;
+    std::function<QStringList()> projectFilesProvider_;
 
     QLineEdit *query_ = nullptr;
     QToolButton *caseButton_ = nullptr;

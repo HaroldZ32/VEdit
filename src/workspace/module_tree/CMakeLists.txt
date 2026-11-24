@@ -187,3 +187,47 @@ if(TARGET vedit_app_shell AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/module_tree_ca
     TIMEOUT 240
   )
 endif()
+
+# --- batch-20261116 Lane B: failure semantics and the large-project gate ----
+# Drives the PRODUCT shell: a real `slang` for the success precondition, then a
+# fake tool that records every start and outlives the child's budget. Asserts AC
+# M1.1 (only an unknown top may drop the user's top), M1.2 (a failure does not
+# re-run itself), M1.3 (single flight), M1.5 (the large-project gate) and M1.7
+# (the closure is cleared on failure).
+if(TARGET vedit_app_shell AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/module_tree_lane_b_test.cpp")
+  add_executable(vedit-module-tree-lane-b-test module_tree_lane_b_test.cpp)
+  target_link_libraries(vedit-module-tree-lane-b-test PRIVATE
+    vedit_workspace_module_tree
+    Qt6::Test)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-module-tree-lane-b-test PRIVATE
+      -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  add_test(NAME vedit-module-tree-lane-b-test
+           COMMAND vedit-module-tree-lane-b-test
+                   "${VEDIT_MODULE_TREE_CATALOG_FIXTURE}"
+                   "${VEDIT_MODULE_TREE_SLANG}")
+  set_tests_properties(vedit-module-tree-lane-b-test PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-module-tree-lane-b"
+    TIMEOUT 420
+  )
+endif()
+
+# --- batch-20261116 AC L3: the project-lint dock UI -------------------------
+# The dock is shell-owned, so its layout rules are asserted on the real shell:
+# bottom edge, readable minimum size, restoreState normalisation, toggle safety.
+if(TARGET vedit_app_shell AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/project_lint_dock_test.cpp")
+  add_executable(vedit-project-lint-dock-test project_lint_dock_test.cpp)
+  target_link_libraries(vedit-project-lint-dock-test PRIVATE
+    vedit_app_shell
+    Qt6::Test)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-project-lint-dock-test PRIVATE
+      -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  add_test(NAME vedit-project-lint-dock-test COMMAND vedit-project-lint-dock-test)
+  set_tests_properties(vedit-project-lint-dock-test PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-project-lint-dock"
+    TIMEOUT 180
+  )
+endif()

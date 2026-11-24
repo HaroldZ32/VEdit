@@ -16,10 +16,13 @@
 #include "diagnostics_integration.h"
 #include "diagnostics_panel.h"
 
+#include "runtime_init.h"
+
 #include "app_shell.h"
 #include "editor_area.h"
 #include "editor_provider.h"
 #include "diagnostics_annotations.h"
+#include "i18n.h"
 #include "ktexteditor_provider.h"
 #include "panel_registry.h"
 
@@ -31,6 +34,7 @@
 
 #include <QApplication>
 #include <QCoreApplication>
+#include <QDir>
 #include <QElapsedTimer>
 #include <QFile>
 #include <QPlainTextEdit>
@@ -97,7 +101,25 @@ void setBufferText(QWidget *editor, const QString &text)
 
 int main(int argc, char **argv)
 {
+    // T134 / AGENT.md §4: this selftest builds the REAL shell and lets the
+    // diagnostics lane drive a REAL Verible LSP child through the Rust service
+    // layer, so install the Rust runtime's SIGPIPE default before anything else.
+    vedit_runtime_init();
+    // batch-20261117 / AC-1: pin the XDG config home BEFORE QApplication, so
+    // the AppConfigLocation the Preferences dialog writes to is a private
+    // directory this test owns. The regression below needs the REAL store
+    // location — the one Qt computes for the product's identity — not a guess.
+    QTemporaryDir xdgConfigHome;
+    if (xdgConfigHome.isValid()) {
+        qputenv("XDG_CONFIG_HOME", xdgConfigHome.path().toUtf8());
+    }
     QApplication app(argc, argv);
+    // batch-20261117 / AC-1: `src/app/main.cpp` sets these two names before
+    // installPanels(); AppConfigLocation is composed from them, so the
+    // normal-launch install below must run under the same identity to observe
+    // the very path the product stores its settings in.
+    QCoreApplication::setOrganizationName(QStringLiteral("VEdit"));
+    QCoreApplication::setApplicationName(QStringLiteral("vedit-app"));
     QTemporaryDir dir;
     if (!dir.isValid()) {
         skip("seam.temp-dir", QCoreApplication::translate("VEdit", "no temporary directory"));
@@ -116,6 +138,73 @@ int main(int argc, char **argv)
         QFile onDisk(file);
         check("seam.file-written", onDisk.open(QIODevice::WriteOnly)
                                       && onDisk.write(goodText.toUtf8()) == goodText.toUtf8().size());
+    }
+
+    // ---- batch-20261117 / AC-1 (Fix A): the NORMAL launch has no --state-dir.
+    // The diagnostics lane must read the SAME `settings.toml` the Preferences
+    // dialog writes (Qt's AppConfigLocation under XDG_CONFIG_HOME), never
+    // `<applicationDirPath()>/settings.toml`: inside an AppImage the latter is
+    // the read-only squashfs, where no store can exist, so SettingsWatcher
+    // never fires and the tools-page backend / include dirs / defines / rules
+    // are silently never applied. RED on the pre-fix code (that fallback).
+    if (!xdgConfigHome.isValid()) {
+        skip("seam.normal-launch-settings-path",
+             QStringLiteral("no temporary XDG config home"));
+    } else {
+        vedit::app::ShellOptions normalOptions; // stateDir deliberately UNSET
+        normalOptions.restoreSession = false;
+        normalOptions.showDefaultPanels = false;
+        vedit::app::DemoEditorProvider normalProvider;
+        std::unique_ptr<vedit::app::ApplicationShell> normalShell(
+            new vedit::app::ApplicationShell(normalOptions));
+        normalShell->editorArea()->setProvider(&normalProvider);
+        normalShell->editorArea()->ensurePane();
+        vedit::workspace::IntegrationOptions normalIntegration;
+        normalIntegration.projectRoot = QString();
+        normalIntegration.stateDir = QString(); // no --state-dir: the double-click launch
+        vedit::workspace::installDiagnostics(*normalShell, normalIntegration);
+
+        // `vedit.diagnostics.projectEnv` is the lane's own published seam
+        // (BackendWiring::publishProjectEnvironment) and carries the store path
+        // it will hand the settings reader. A root switch publishes it
+        // synchronously, so the assertion reads the same wiring the timeline
+        // uses — no second implementation to trust.
+        const QString normalRoot = dir.path() + QStringLiteral("/normal-launch-project");
+        QDir().mkpath(normalRoot);
+        QFile normalSource(normalRoot + QStringLiteral("/normal.sv"));
+        if (normalSource.open(QIODevice::WriteOnly)) {
+            normalSource.write("module normal; endmodule\n");
+            normalSource.close();
+        }
+        normalShell->setProjectRoot(normalRoot);
+        QCoreApplication::processEvents();
+        const QVariantMap normalEnv =
+            normalShell->property("vedit.diagnostics.projectEnv").toMap();
+        const QString observedSettings =
+            normalEnv.value(QStringLiteral("settingsPath")).toString();
+        const QString expectedSettings = vedit::app::i18n::settingsFilePath(QString());
+        std::printf("OBSERVED normal-launch settings-path observed='%s' expected='%s' "
+                    "applicationDirPath='%s'\n",
+                    qPrintable(observedSettings), qPrintable(expectedSettings),
+                    qPrintable(QCoreApplication::applicationDirPath()));
+        check("seam.normal-launch-settings-published",
+              normalEnv.contains(QStringLiteral("settingsPath")),
+              QStringLiteral("keys=%1").arg(normalEnv.keys().join(QLatin1Char(','))));
+        check("seam.normal-launch-settings-path", observedSettings == expectedSettings,
+              QStringLiteral("observed='%1' expected='%2'")
+                  .arg(observedSettings, expectedSettings));
+        check("seam.normal-launch-settings-not-appdir",
+              !observedSettings.startsWith(QCoreApplication::applicationDirPath()
+                                           + QLatin1Char('/')),
+              observedSettings);
+        // The product identity set in main.cpp puts the store at THIS path; a
+        // helper that silently drifted would move the file away from the
+        // Preferences dialog again, so pin the product path itself.
+        check("seam.normal-launch-settings-xdg-product-path",
+              expectedSettings
+                  == QDir(xdgConfigHome.path())
+                         .filePath(QStringLiteral("VEdit/vedit-app/settings.toml")),
+              expectedSettings);
     }
 
     vedit::app::ShellOptions options;

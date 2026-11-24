@@ -5,6 +5,7 @@
 #include "editor_provider.h"
 #include "path_display.h"
 #include "product_theme.h"
+#include "workbench_interaction.h"
 
 #if defined(VEDIT_APP_HAVE_BREADCRUMB)
 #include "breadcrumb_bar.h"
@@ -13,6 +14,11 @@
 #include <QAction>
 #include <QApplication>
 #include <QCoreApplication>
+#include <QContextMenuEvent>
+#include <QDrag>
+#include <QDragEnterEvent>
+#include <QDragMoveEvent>
+#include <QDropEvent>
 #include <QEvent>
 #include <QFileInfo>
 #include <QFont>
@@ -21,7 +27,11 @@
 #include <QJsonValue>
 #include <QKeySequence>
 #include <QHBoxLayout>
+#include <QClipboard>
+#include <QGuiApplication>
 #include <QLabel>
+#include <QMenu>
+#include <QMimeData>
 #include <QPalette>
 #include <QPointer>
 #include <QScrollBar>
@@ -224,10 +234,173 @@ QAction *findEditorAction(QWidget *editor, const QStringList &objectNames)
 // dirty flag is never cached here: it is read from the provider on every refresh
 // so a document changed behind the pane's back (a jump target, a diagnostics
 // fix, a save) can never leave a stale marker.
+TabDropZone tabDropZoneAt(const QRect &paneRect, const QRect &tabBarRect, const QPoint &pos)
+{
+    if (paneRect.isEmpty() || !paneRect.contains(pos)) {
+        return TabDropZone::None;
+    }
+    if (tabBarRect.contains(pos)) {
+        return TabDropZone::TabBar;
+    }
+    const int editorTop = tabBarRect.bottom() + 1;
+    const QRect editor(paneRect.left(), editorTop, paneRect.width(),
+                       std::max(0, paneRect.bottom() - editorTop + 1));
+    if (!editor.contains(pos)) {
+        return TabDropZone::None;
+    }
+    // Normalised distance to each edge; the nearest edge owns the drop unless all
+    // four are far away (the middle eighth), which means "this very pane".
+    const qreal x = static_cast<qreal>(pos.x() - editor.left()) / std::max(1, editor.width());
+    const qreal y = static_cast<qreal>(pos.y() - editor.top()) / std::max(1, editor.height());
+    const qreal left = x;
+    const qreal right = 1.0 - x;
+    const qreal top = y;
+    const qreal bottom = 1.0 - y;
+    const qreal nearest = std::min(std::min(left, right), std::min(top, bottom));
+    if (nearest > 0.30) {
+        return TabDropZone::Center;
+    }
+    if (nearest == left) {
+        return TabDropZone::Left;
+    }
+    if (nearest == right) {
+        return TabDropZone::Right;
+    }
+    if (nearest == top) {
+        return TabDropZone::Top;
+    }
+    return TabDropZone::Bottom;
+}
+
+const char *tabDropZoneName(TabDropZone zone)
+{
+    switch (zone) {
+    case TabDropZone::TabBar:
+        return "tab-bar";
+    case TabDropZone::Left:
+        return "left";
+    case TabDropZone::Right:
+        return "right";
+    case TabDropZone::Top:
+        return "top";
+    case TabDropZone::Bottom:
+        return "bottom";
+    case TabDropZone::Center:
+        return "center";
+    case TabDropZone::None:
+        break;
+    }
+    return "none";
+}
+
 struct EditorPane::Document {
     QWidget *editor = nullptr;
     QString path;
+    // T5: identity a tab drag carries. It follows the Document record through an
+    // in-bar reorder, so a drop resolves the tab's CURRENT index.
+    quint64 serial = 0;
 };
+
+namespace {
+
+// T5: document serials are unique for the whole process; the drag payload names
+// the document, not a tab index (a native reorder can change the index).
+quint64 newDocumentSerial()
+{
+    static quint64 next = 1;
+    return next++;
+}
+
+bool isEditorTabMime(const QMimeData *data)
+{
+    return data != nullptr && data->hasFormat(QString::fromLatin1(kEditorTabMimeType));
+}
+
+// T5: the tab strip's only job in a drag is to notice the gesture. The drop is
+// resolved by the pane overlays, so QTabBar's OWN drag is never allowed to start:
+// that path emits tabMoved mid-drag and permutes documents_ behind the drop's
+// back (the "suppress tabMoved" half of AC-6).
+class DocumentTabBar final : public QTabBar {
+public:
+    explicit DocumentTabBar(QWidget *parent = nullptr) : QTabBar(parent) {}
+
+    void setOnDragRequested(std::function<void(int)> callback)
+    {
+        onDragRequested_ = std::move(callback);
+    }
+
+    std::function<void(int, const QPoint &)> onContextMenu;
+
+protected:
+    void contextMenuEvent(QContextMenuEvent *event) override
+    {
+        const bool keyboard = event->reason() == QContextMenuEvent::Keyboard;
+        const int index = keyboard ? currentIndex() : tabAt(event->pos());
+        if (index >= 0 && onContextMenu) {
+            const QPoint anchor = keyboard ? mapToGlobal(tabRect(index).bottomLeft())
+                                           : event->globalPos();
+            onContextMenu(index, anchor);
+            event->accept();
+            return;
+        }
+        event->ignore();
+    }
+
+    void mousePressEvent(QMouseEvent *event) override
+    {
+        if (event != nullptr && event->button() == Qt::LeftButton) {
+            pressIndex_ = tabAt(event->position().toPoint());
+            pressPos_ = event->position().toPoint();
+            dragArmed_ = pressIndex_ >= 0;
+            dragStarted_ = false;
+            // Select on press: with movable tabs QTabBar defers the selection to
+            // the release, and the release is consumed by the drag's own loop.
+            if (dragArmed_) {
+                setCurrentIndex(pressIndex_);
+            }
+        }
+        QTabBar::mousePressEvent(event);
+    }
+
+    void mouseMoveEvent(QMouseEvent *event) override
+    {
+        if (dragArmed_ && !dragStarted_ && event != nullptr
+            && (event->buttons() & Qt::LeftButton)
+            && (event->position().toPoint() - pressPos_).manhattanLength()
+                   >= QApplication::startDragDistance()) {
+            dragStarted_ = true;
+            dragArmed_ = false;
+            if (onDragRequested_) {
+                onDragRequested_(pressIndex_);
+            }
+            return;
+        }
+        if (dragStarted_) {
+            return;
+        }
+        QTabBar::mouseMoveEvent(event);
+    }
+
+    void mouseReleaseEvent(QMouseEvent *event) override
+    {
+        if (dragStarted_) {
+            dragStarted_ = false;
+            dragArmed_ = false;
+            return;
+        }
+        dragArmed_ = false;
+        QTabBar::mouseReleaseEvent(event);
+    }
+
+private:
+    std::function<void(int)> onDragRequested_;
+    QPoint pressPos_;
+    int pressIndex_ = -1;
+    bool dragArmed_ = false;
+    bool dragStarted_ = false;
+};
+
+} // namespace
 
 EditorPane::EditorPane(QString paneId, EditorProvider *provider, QWidget *parent)
     : QWidget(parent)
@@ -250,7 +423,11 @@ EditorPane::EditorPane(QString paneId, EditorProvider *provider, QWidget *parent
     tabRowLayout->setContentsMargins(0, 0, 0, 0);
     tabRowLayout->setSpacing(0);
 
-    tabs_ = new QTabBar(tabRow);
+    // T5: the tab strip is a drag-aware QTabBar; a gesture that crosses the
+    // drag threshold becomes a document drag (see DocumentTabBar).
+    auto *documentTabs = new DocumentTabBar(tabRow);
+    tabs_ = documentTabs;
+    documentTabs->setOnDragRequested([this](int index) { startTabDrag(index); });
     tabs_->setObjectName(QStringLiteral("editor-tab-bar"));
     tabs_->setDocumentMode(true);
     tabs_->setDrawBase(false);
@@ -259,8 +436,15 @@ EditorPane::EditorPane(QString paneId, EditorProvider *provider, QWidget *parent
     // AC-9.5: an overflowing strip scrolls inside this row instead of widening
     // the pane (a QTabBar's minimumSizeHint stays small with scroll buttons).
     tabs_->setUsesScrollButtons(true);
-    tabs_->setMovable(false);
-    tabs_->setFocusPolicy(Qt::NoFocus);
+    // Batch 20261110d (T7): tabs are reorderable AND draggable. A QTabBar move
+    // alone would leave the parallel `documents_` list at the old indices — the
+    // pane would then show the wrong file under the clicked tab — so `tabMoved`
+    // permutes `documents_` in the same step.
+    tabs_->setMovable(true);
+    documentTabs->onContextMenu = [this](int index, const QPoint &anchor) {
+        showTabContextMenu(index, anchor);
+    };
+    tabs_->setFocusPolicy(Qt::TabFocus);
     tabs_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     tabs_->setSelectionBehaviorOnRemove(QTabBar::SelectRightTab);
     tabRowLayout->addWidget(tabs_, 1);
@@ -329,12 +513,38 @@ EditorPane::EditorPane(QString paneId, EditorProvider *provider, QWidget *parent
         }
         requestFocus();
     });
+    QObject::connect(tabs_, &QTabBar::tabMoved, this, [this](int from, int to) {
+        if (from == to || from < 0 || to < 0 || from >= documents_.size() ||
+            to >= documents_.size()) {
+            return;
+        }
+        documents_.move(from, to);
+        // The stack and the current editor are derived from the tab index, so a
+        // single resync keeps "the selected tab" and "the shown document" equal.
+        syncCurrentEditor();
+        updateBreadcrumb();
+        notifyStateChanged();
+    });
 
     applyTabStyle();
     addTabForDocument(createEditorWidget());
     tabs_->setCurrentIndex(0);
     syncCurrentEditor();
     updateActiveBadge();
+
+    // T5: the drop surface. It covers the WHOLE pane, so a drag that arrives over
+    // the tab strip and a drag that arrives over the editor land on the same
+    // handler; it exists only while a tab drag is running, so the editor's own
+    // drag handling (text drops, selections) is untouched the rest of the time.
+    dropOverlay_ = new QWidget(this);
+    dropOverlay_->setObjectName(QStringLiteral("editor-drop-overlay"));
+    dropOverlay_->setAcceptDrops(true);
+    dropOverlay_->installEventFilter(this);
+    dropOverlay_->hide();
+    dropHighlight_ = new QFrame(dropOverlay_);
+    dropHighlight_->setObjectName(QStringLiteral("editor-drop-highlight"));
+    dropHighlight_->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+    dropHighlight_->hide();
 }
 
 EditorPane::~EditorPane()
@@ -454,6 +664,7 @@ void EditorPane::addTabForDocument(QWidget *editor, const QString &absolutePath)
     auto *document = new Document;
     document->editor = editor;
     document->path = absolutePath;
+    document->serial = newDocumentSerial();
     documents_.append(document);
     stack_->addWidget(editor);
     wireEditor(editor);
@@ -489,6 +700,44 @@ void EditorPane::addTabForDocument(QWidget *editor, const QString &absolutePath)
     });
     tabs_->setTabButton(index, QTabBar::RightSide, close);
     refreshTab(index);
+}
+
+void EditorPane::showSharedDocument(QWidget *editor, const QString &absolutePath)
+{
+    if (editor == nullptr) {
+        return;
+    }
+    // A pane is born with one untouched empty tab. Splitting should SHOW the
+    // shared document, not leave that blank tab next to it, so the fresh tab is
+    // replaced only while it is provably untouched (no path, not modified).
+    Document *current = documentAt(0);
+    const bool untouchedEmptyPane =
+        documents_.size() == 1 && current != nullptr && current->editor != nullptr &&
+        current->path.isEmpty() && provider_ != nullptr &&
+        provider_->currentFilePath(current->editor).isEmpty() &&
+        !provider_->isModified(current->editor);
+    if (untouchedEmptyPane) {
+        QWidget *stale = current->editor;
+        unwireEditor(provider_, stale);
+        const int stackIndex = stack_->indexOf(stale);
+        if (stackIndex >= 0) {
+            stack_->removeWidget(stale);
+        }
+        current->editor = editor;
+        current->path = absolutePath;
+        stack_->addWidget(editor);
+        wireEditor(editor);
+        stale->setParent(nullptr);
+        delete stale;
+        refreshTab(0);
+        tabs_->setCurrentIndex(0);
+    } else {
+        addTabForDocument(editor, absolutePath);
+        tabs_->setCurrentIndex(documents_.size() - 1);
+    }
+    syncCurrentEditor();
+    updateBreadcrumb();
+    notifyStateChanged();
 }
 
 void EditorPane::removeTab(int index)
@@ -691,8 +940,30 @@ void EditorPane::applyTabStyle()
 
 void EditorPane::notifyStateChanged()
 {
+    // batch-20261115 AC-5.3: during a bulk close the shell gets ONE refresh at
+    // the end of the batch (endTabCloseBatch) instead of one per closed tab.
+    if (tabCloseBatchDepth_ > 0) {
+        return;
+    }
     if (onStateChanged_ != nullptr) {
         onStateChanged_();
+    }
+}
+
+void EditorPane::beginTabCloseBatch()
+{
+    ++tabCloseBatchDepth_;
+}
+
+void EditorPane::endTabCloseBatch()
+{
+    if (tabCloseBatchDepth_ > 0) {
+        --tabCloseBatchDepth_;
+    }
+    if (tabCloseBatchDepth_ == 0) {
+        // One final refresh for the whole batch, even when a Cancel stopped it
+        // early (the tabs that DID close still need the status bar updated).
+        notifyStateChanged();
     }
 }
 
@@ -1189,6 +1460,95 @@ QTabBar *EditorPane::tabBar() const
     return tabs_;
 }
 
+QMenu *EditorPane::createTabContextMenu(int index)
+{
+    if (index < 0 || index >= documents_.size()) {
+        return nullptr;
+    }
+    const Document *document = documents_.at(index);
+    auto *menu = new QMenu(this);
+    menu->setObjectName(QStringLiteral("editor-tab-context-menu"));
+    const auto add = [menu](const QString &text, const QString &name, bool enabled = true) {
+        QAction *action = menu->addAction(text);
+        action->setObjectName(QStringLiteral("tab-menu.") + name);
+        action->setEnabled(enabled);
+        return action;
+    };
+    QAction *close = add(tr("Close"), QStringLiteral("close"));
+    QAction *closeOthers =
+        add(tr("Close Others"), QStringLiteral("close-others"), documents_.size() > 1);
+    QAction *closeLeft = add(tr("Close to the Left"), QStringLiteral("close-left"), index > 0);
+    QAction *closeRight = add(tr("Close to the Right"), QStringLiteral("close-right"),
+                              index + 1 < documents_.size());
+    QAction *closeAll = add(tr("Close All"), QStringLiteral("close-all"));
+    menu->addSeparator();
+    QAction *copyPath = add(tr("Copy Path"), QStringLiteral("copy-path"),
+                            document != nullptr && !document->path.isEmpty());
+    // Every close runs the SAME helper the per-tab X button uses, so a dirty
+    // document reaches `onTabCloseRequested_` (save / discard / cancel) no
+    // matter which entry the user picked.
+    const quint64 serial = tabSerial(index);
+    const auto bindTab = [this, serial](QAction *action, auto handler) {
+        QObject::connect(action, &QAction::triggered, this, [this, serial, handler]() {
+            const int current = tabIndexForSerial(serial);
+            if (current >= 0) {
+                handler(current);
+            }
+        });
+    };
+    bindTab(close, [this](int current) { closeTab(current); });
+    bindTab(closeOthers, [this](int current) { closeTabsExcept(current); });
+    bindTab(closeLeft, [this](int current) { closeTabsInRange(0, current - 1); });
+    bindTab(closeRight, [this](int current) { closeTabsInRange(current + 1, documents_.size() - 1); });
+    QObject::connect(closeAll, &QAction::triggered, this, [this]() {
+        closeTabsInRange(0, documents_.size() - 1);
+    });
+    bindTab(copyPath, [this](int index) {
+        const Document *current = documentAt(index);
+        if (current != nullptr && !current->path.isEmpty()) {
+            QGuiApplication::clipboard()->setText(current->path);
+        }
+    });
+    return menu;
+}
+
+void EditorPane::showTabContextMenu(int index, const QPoint &anchor)
+{
+    if (QMenu *menu = createTabContextMenu(index)) {
+        menu->setAttribute(Qt::WA_DeleteOnClose);
+        menu->popup(anchor);
+    }
+}
+
+void EditorPane::closeTabsInRange(int first, int last)
+{
+    // Reverse order: closing removes entries and would shift every later index.
+    // A refused close (Cancel on a dirty document) stops the whole range so the
+    // user's "cancel" never closes the remaining tabs behind their back.
+    // batch-20261115 AC-5.3: the whole range is ONE state notification.
+    beginTabCloseBatch();
+    for (int index = last; index >= first; --index) {
+        if (!closeTab(index)) {
+            break;
+        }
+    }
+    endTabCloseBatch();
+}
+
+void EditorPane::closeTabsExcept(int keep)
+{
+    beginTabCloseBatch();
+    for (int index = documents_.size() - 1; index >= 0; --index) {
+        if (index == keep) {
+            continue;
+        }
+        if (!closeTab(index)) {
+            break;
+        }
+    }
+    endTabCloseBatch();
+}
+
 void EditorPane::setOnTabCloseRequested(std::function<SaveDecision(EditorPane *, int)> callback)
 {
     onTabCloseRequested_ = std::move(callback);
@@ -1207,6 +1567,184 @@ void EditorPane::setOnFileOpened(std::function<void(const QString &)> callback)
 void EditorPane::setOnDocumentSaved(std::function<void(const QString &, bool)> callback)
 {
     onDocumentSaved_ = std::move(callback);
+}
+
+quint64 EditorPane::tabSerial(int index) const
+{
+    const Document *document = documentAt(index);
+    return document != nullptr ? document->serial : 0;
+}
+
+int EditorPane::tabIndexForSerial(quint64 serial) const
+{
+    if (serial == 0) {
+        return -1;
+    }
+    for (int index = 0; index < documents_.size(); ++index) {
+        if (documents_.at(index) != nullptr && documents_.at(index)->serial == serial) {
+            return index;
+        }
+    }
+    return -1;
+}
+
+QWidget *EditorPane::detachTab(int index, QString *absolutePath)
+{
+    Document *document = documentAt(index);
+    if (document == nullptr) {
+        return nullptr;
+    }
+    QWidget *editor = document->editor;
+    if (absolutePath != nullptr) {
+        *absolutePath = document->path;
+    }
+    documents_.removeAt(index);
+    if (editor != nullptr) {
+        // Stop the listeners, but do NOT delete the widget: the receiving pane
+        // adopts the very same editor, so the buffer, its undo history and its
+        // caret never leave the process (no disk re-read, no close prompt).
+        pendingPositions_.remove(editor);
+        unwireEditor(provider_, editor);
+        const int stackIndex = stack_->indexOf(editor);
+        if (stackIndex >= 0) {
+            stack_->removeWidget(editor);
+        }
+        editor->setParent(nullptr);
+    }
+    delete document;
+    tabs_->removeTab(index);
+    if (documents_.isEmpty()) {
+        // A pane always shows one tab; losing the last one leaves a fresh empty
+        // document, exactly like closing the last tab (AC-6.2).
+        addTabForDocument(createEditorWidget());
+        tabs_->setCurrentIndex(0);
+    } else {
+        tabs_->setCurrentIndex(std::clamp(index, 0, tabCount() - 1));
+    }
+    syncCurrentEditor();
+    updateBreadcrumb();
+    notifyStateChanged();
+    return editor;
+}
+
+int EditorPane::adoptTab(QWidget *editor, const QString &absolutePath, int insertAt)
+{
+    if (editor == nullptr) {
+        return -1;
+    }
+    addTabForDocument(editor, absolutePath);
+    int index = documents_.size() - 1;
+    if (insertAt >= 0 && insertAt < index) {
+        // tabMoved permutes documents_ in the same step (see the constructor);
+        // the moved tab is the one the user dropped.
+        tabs_->moveTab(index, insertAt);
+        index = insertAt;
+    }
+    setActiveTab(index);
+    return index;
+}
+
+void EditorPane::setOnTabDragRequested(std::function<void(EditorPane *, int)> callback)
+{
+    onTabDragRequested_ = std::move(callback);
+}
+
+void EditorPane::setOnTabDrop(std::function<void(EditorPane *, TabDropZone, int)> callback)
+{
+    onTabDrop_ = std::move(callback);
+}
+
+void EditorPane::startTabDrag(int index)
+{
+    if (onTabDragRequested_ == nullptr || documentAt(index) == nullptr) {
+        return;
+    }
+    onTabDragRequested_(this, index);
+}
+
+void EditorPane::showDropOverlay(bool visible)
+{
+    if (dropOverlay_ == nullptr) {
+        return;
+    }
+    if (visible) {
+        dropOverlay_->setGeometry(rect());
+        dropOverlay_->raise();
+        dropOverlay_->show();
+    } else {
+        dropOverlay_->hide();
+        updateDropHighlight(TabDropZone::None);
+    }
+}
+
+bool EditorPane::dropOverlayVisible() const
+{
+    return dropOverlay_ != nullptr && dropOverlay_->isVisible();
+}
+
+QRect EditorPane::tabBarRect() const
+{
+    if (tabs_ == nullptr) {
+        return QRect();
+    }
+    return QRect(tabs_->mapTo(this, QPoint(0, 0)), tabs_->size());
+}
+
+TabDropZone EditorPane::dropZoneAt(const QPoint &pos) const
+{
+    return tabDropZoneAt(rect(), tabBarRect(), pos);
+}
+
+void EditorPane::updateDropHighlight(TabDropZone zone)
+{
+    if (dropHighlight_ == nullptr || dropOverlay_ == nullptr) {
+        return;
+    }
+    if (zone == TabDropZone::None) {
+        dropHighlight_->hide();
+        return;
+    }
+    dropOverlay_->setGeometry(rect());
+    const QRect tabRect = tabBarRect();
+    const int editorTop = tabRect.bottom() + 1;
+    const QRect editor(rect().left(), editorTop, rect().width(),
+                       std::max(0, rect().bottom() - editorTop + 1));
+    QRect highlight;
+    switch (zone) {
+    case TabDropZone::TabBar:
+        highlight = tabRect;
+        break;
+    case TabDropZone::Left:
+        highlight = QRect(editor.left(), editor.top(), editor.width() / 2, editor.height());
+        break;
+    case TabDropZone::Right:
+        highlight = QRect(editor.left() + editor.width() / 2, editor.top(),
+                          editor.width() - editor.width() / 2, editor.height());
+        break;
+    case TabDropZone::Top:
+        highlight = QRect(editor.left(), editor.top(), editor.width(), editor.height() / 2);
+        break;
+    case TabDropZone::Bottom:
+        highlight = QRect(editor.left(), editor.top() + editor.height() / 2, editor.width(),
+                          editor.height() - editor.height() / 2);
+        break;
+    case TabDropZone::Center:
+        highlight = editor;
+        break;
+    case TabDropZone::None:
+        break;
+    }
+    const QColor accent = palette().color(QPalette::Highlight);
+    dropHighlight_->setStyleSheet(
+        QStringLiteral("background-color: rgba(%1, %2, %3, 70); border: 2px solid %4;")
+            .arg(accent.red())
+            .arg(accent.green())
+            .arg(accent.blue())
+            .arg(accent.name(QColor::HexRgb)));
+    dropHighlight_->setGeometry(highlight);
+    dropHighlight_->setProperty("dropZone", QString::fromLatin1(tabDropZoneName(zone)));
+    dropHighlight_->show();
+    dropHighlight_->raise();
 }
 
 void EditorPane::setDisplayRoot(const QString &root)
@@ -1310,6 +1848,48 @@ void EditorPane::mousePressEvent(QMouseEvent *event)
 
 bool EditorPane::eventFilter(QObject *watched, QEvent *event)
 {
+    // T5: the drop surface. Only OUR mime is accepted, so a text/URL drag that
+    // happens to pass over the pane cannot restructure the layout.
+    if (dropOverlay_ != nullptr && watched == dropOverlay_ && event != nullptr) {
+        switch (event->type()) {
+        case QEvent::DragEnter:
+        case QEvent::DragMove: {
+            auto *dragMove = static_cast<QDragMoveEvent *>(event);
+            if (!isEditorTabMime(dragMove->mimeData())) {
+                dragMove->ignore();
+                return true;
+            }
+            updateDropHighlight(dropZoneAt(dragMove->position().toPoint()));
+            dragMove->setDropAction(Qt::MoveAction);
+            dragMove->accept();
+            return true;
+        }
+        case QEvent::DragLeave:
+            updateDropHighlight(TabDropZone::None);
+            return true;
+        case QEvent::Drop: {
+            auto *dropEvent = static_cast<QDropEvent *>(event);
+            if (!isEditorTabMime(dropEvent->mimeData())) {
+                dropEvent->ignore();
+                return true;
+            }
+            const QPoint pos = dropEvent->position().toPoint();
+            const TabDropZone zone = dropZoneAt(pos);
+            const int index = zone == TabDropZone::TabBar && tabs_ != nullptr
+                                  ? tabs_->tabAt(pos)
+                                  : -1;
+            updateDropHighlight(TabDropZone::None);
+            if (zone != TabDropZone::None && onTabDrop_ != nullptr) {
+                onTabDrop_(this, zone, index);
+            }
+            dropEvent->setDropAction(Qt::MoveAction);
+            dropEvent->accept();
+            return true;
+        }
+        default:
+            break;
+        }
+    }
     bool watchedIsDocument = false;
     for (const Document *document : documents_) {
         if (document != nullptr && document->editor == watched) {
@@ -1600,6 +2180,41 @@ EditorPane *EditorArea::createPane(const QString &paneId)
     if (onDocumentSaved_ != nullptr) {
         pane->setOnDocumentSaved(onDocumentSaved_);
     }
+    // T5: the drag source and the drop target. The source pane starts the drag
+    // (a real QDrag with our own mime, so no foreign drop can move a tab); the
+    // target pane's overlay reports the drop and this area performs the ONE
+    // transfer in dropTab().
+    pane->setOnTabDragRequested([this](EditorPane *source, int index) {
+        if (source == nullptr) {
+            return;
+        }
+        const quint64 serial = source->tabSerial(index);
+        auto *bar = source->tabBar();
+        if (serial == 0 || bar == nullptr) {
+            return;
+        }
+        beginTabDrag(source, serial);
+        auto *drag = new QDrag(bar);
+        auto *mime = new QMimeData;
+        mime->setData(QString::fromLatin1(kEditorTabMimeType),
+                      QStringLiteral("%1/%2").arg(source->paneId()).arg(serial).toUtf8());
+        drag->setMimeData(mime);
+        const QRect tabRect = bar->tabRect(index);
+        if (tabRect.isValid()) {
+            drag->setPixmap(bar->grab(tabRect));
+        }
+        const QPointer<QLabel> badge = showWorkbenchDragFeedback(window(), bar->tabText(index));
+        const auto action = drag->exec(Qt::MoveAction, Qt::MoveAction);
+        delete drag;
+        endTabDrag();
+        finishWorkbenchDragFeedback(badge, action == Qt::MoveAction);
+    });
+    pane->setOnTabDrop([this](EditorPane *target, TabDropZone zone, int index) {
+        if (dragSourcePane_ == nullptr || dragSerial_ == 0) {
+            return;
+        }
+        dropTab(dragSourcePane_, dragSerial_, target, zone, index);
+    });
     return pane;
 }
 
@@ -1791,12 +2406,13 @@ void EditorArea::rebuild()
     }
 }
 
-EditorPane *EditorArea::splitActive(Qt::Orientation orientation)
+EditorPane *EditorArea::splitPane(EditorPane *pane, Qt::Orientation orientation,
+                                  bool newPaneFirst)
 {
-    if (active_ == nullptr) {
-        ensurePane();
+    if (pane == nullptr) {
+        return nullptr;
     }
-    Node *leaf = findLeaf(root_.get(), active_);
+    Node *leaf = findLeaf(root_.get(), pane);
     if (leaf == nullptr) {
         return nullptr;
     }
@@ -1804,17 +2420,177 @@ EditorPane *EditorArea::splitActive(Qt::Orientation orientation)
     if (slot == nullptr) {
         return nullptr;
     }
-    auto *newPane = createPane();
+    EditorPane *newPane = createPane();
     auto split = std::make_unique<Node>();
     split->kind = Node::Kind::Split;
     split->orientation = orientation;
     split->ratio = 0.5;
-    split->first = std::move(*slot);
-    split->second.reset(newLeaf(newPane));
+    if (newPaneFirst) {
+        split->first.reset(newLeaf(newPane));
+        split->second = std::move(*slot);
+    } else {
+        split->first = std::move(*slot);
+        split->second.reset(newLeaf(newPane));
+    }
     *slot = std::move(split);
     setActivePane(newPane);
     rebuild();
     return newPane;
+}
+
+EditorPane *EditorArea::splitActive(Qt::Orientation orientation)
+{
+    if (active_ == nullptr) {
+        ensurePane();
+    }
+    EditorPane *source = active_;
+    EditorPane *newPane = splitPane(source, orientation, /*newPaneFirst=*/false);
+    if (newPane == nullptr) {
+        return nullptr;
+    }
+    // Batch 20261110d (split view): put the CURRENT document into the new pane.
+    // The provider creates a second View over the active pane's document, so the
+    // two panes share ONE buffer (typing in either is visible in both, and
+    // closing one pane cannot discard the other's unsaved changes). A provider
+    // without document sharing returns nullptr and the pane stays empty.
+    if (source != nullptr && provider_ != nullptr) {
+        QWidget *sourceEditor = source->editorWidget();
+        if (sourceEditor != nullptr) {
+            QWidget *shared = provider_->createEditorForExistingDocument(sourceEditor, newPane);
+            if (shared != nullptr) {
+                newPane->showSharedDocument(shared, provider_->currentFilePath(sourceEditor));
+            }
+        }
+    }
+    return newPane;
+}
+
+void EditorArea::beginTabDrag(EditorPane *source, quint64 serial)
+{
+    dragSourcePane_ = source;
+    dragSerial_ = serial;
+    for (EditorPane *pane : panes()) {
+        if (pane != nullptr) {
+            pane->showDropOverlay(true);
+        }
+    }
+}
+
+void EditorArea::endTabDrag()
+{
+    dragSourcePane_ = nullptr;
+    dragSerial_ = 0;
+    for (EditorPane *pane : panes()) {
+        if (pane != nullptr) {
+            pane->showDropOverlay(false);
+        }
+    }
+}
+
+bool EditorArea::isTabDragActive() const
+{
+    return dragSourcePane_ != nullptr && dragSerial_ != 0;
+}
+
+bool EditorArea::moveTabIntoPane(EditorPane *source, int sourceIndex, EditorPane *target,
+                                 int insertAt)
+{
+    if (source == nullptr || target == nullptr) {
+        return false;
+    }
+    QString path;
+    // The SAME editor widget travels: its document (text, dirty flag, undo stack,
+    // caret) never passes through a file or a copy.
+    QWidget *editor = source->detachTab(sourceIndex, &path);
+    if (editor == nullptr) {
+        return false;
+    }
+    int adopted = -1;
+    // A freshly split pane starts with one untouched empty tab. Install the moved
+    // document into THAT tab (the same rule openFile() uses) instead of leaving an
+    // empty strip next to the document the user dropped.
+    const bool replaceUnusedEmptyTab =
+        target->tabCount() == 1 && target->currentFilePath().isEmpty() && !target->isTabModified(0);
+    if (replaceUnusedEmptyTab) {
+        target->showSharedDocument(editor, path);
+        adopted = 0;
+    } else {
+        adopted = target->adoptTab(editor, path, insertAt);
+    }
+    if (adopted < 0) {
+        // A refused move must never lose a buffer: put it back where it came from.
+        source->adoptTab(editor, path);
+        return false;
+    }
+    target->setActiveTab(adopted);
+    setActivePane(target);
+    if (QWidget *editorWidget = target->editorWidget()) {
+        editorWidget->setFocus(Qt::OtherFocusReason);
+    }
+    if (onLayoutChanged_ != nullptr) {
+        onLayoutChanged_();
+    }
+    return true;
+}
+
+bool EditorArea::dropTab(EditorPane *source, quint64 serial, EditorPane *target,
+                         TabDropZone zone, int targetIndex)
+{
+    if (source == nullptr || target == nullptr || zone == TabDropZone::None) {
+        return false;
+    }
+    const QList<EditorPane *> all = panes();
+    if (!all.contains(source) || !all.contains(target)) {
+        return false;
+    }
+    const int sourceIndex = source->tabIndexForSerial(serial);
+    if (sourceIndex < 0) {
+        return false;
+    }
+    const bool horizontal = zone == TabDropZone::Left || zone == TabDropZone::Right;
+    const bool newPaneFirst = zone == TabDropZone::Left || zone == TabDropZone::Top;
+    const Qt::Orientation orientation = horizontal ? Qt::Horizontal : Qt::Vertical;
+
+    if (target == source) {
+        if (zone == TabDropZone::TabBar) {
+            // In-bar reorder: QTabBar::moveTab emits tabMoved, which permutes
+            // documents_ in the same step (the existing T7 contract).
+            if (source->tabBar() == nullptr || source->tabCount() < 2) {
+                return false;
+            }
+            int to = targetIndex;
+            if (to < 0 || to >= source->tabCount()) {
+                to = source->tabCount() - 1;
+            }
+            if (to != sourceIndex) {
+                source->tabBar()->moveTab(sourceIndex, to);
+            }
+            return true;
+        }
+        if (zone == TabDropZone::Center) {
+            // Dropping a tab on the middle of its own editor cannot move it
+            // anywhere; say so instead of performing a silent no-op split.
+            return false;
+        }
+        // An edge of its own pane splits that pane; the dragged document moves to
+        // the new side and the old pane keeps the usual fresh empty tab.
+        EditorPane *created = splitPane(source, orientation, newPaneFirst);
+        if (created == nullptr) {
+            return false;
+        }
+        return moveTabIntoPane(source, sourceIndex, created);
+    }
+
+    if (zone == TabDropZone::TabBar || zone == TabDropZone::Center) {
+        return moveTabIntoPane(source, sourceIndex, target, targetIndex);
+    }
+    // An edge of ANOTHER pane splits that pane in the drop direction and installs
+    // the SAME document there (the tab's buffer), removing the source tab.
+    EditorPane *created = splitPane(target, orientation, newPaneFirst);
+    if (created == nullptr) {
+        return false;
+    }
+    return moveTabIntoPane(source, sourceIndex, created);
 }
 
 bool EditorArea::closeActivePane()
@@ -1916,6 +2692,56 @@ bool EditorArea::activeEditorActionEnabled(const QStringList &objectNames) const
 {
     const EditorPane *pane = activePane();
     return pane != nullptr && pane->editorActionEnabled(objectNames);
+}
+
+namespace {
+
+// The editor kernel's multi-cursor controller, found by the object name the
+// kernel gives it. The app layer deliberately does NOT include the kernel header
+// (KTextEditor types stay in the editor lane) and the two are not link-edge
+// neighbours, so the seam is a Q_INVOKABLE call on the controller object.
+QObject *multiCursorControllerFor(QWidget *editorWidget)
+{
+    if (editorWidget == nullptr) {
+        return nullptr;
+    }
+    return editorWidget->findChild<QObject *>(QStringLiteral("vedit-multi-cursor"));
+}
+
+} // namespace
+
+bool EditorArea::blockSelectionMode() const
+{
+    EditorPane *pane = activePane();
+    QObject *controller =
+        pane != nullptr ? multiCursorControllerFor(pane->editorWidget()) : nullptr;
+    if (controller == nullptr) {
+        return false;
+    }
+    bool enabled = false;
+    return QMetaObject::invokeMethod(controller, "blockSelectionMode", Qt::DirectConnection,
+                                     Q_RETURN_ARG(bool, enabled)) &&
+           enabled;
+}
+
+bool EditorArea::setBlockSelectionMode(bool enabled)
+{
+    EditorPane *pane = activePane();
+    QObject *controller =
+        pane != nullptr ? multiCursorControllerFor(pane->editorWidget()) : nullptr;
+    return controller != nullptr &&
+           QMetaObject::invokeMethod(controller, "setBlockSelectionMode",
+                                     Qt::DirectConnection, Q_ARG(bool, enabled));
+}
+
+bool EditorArea::addCursorsAtSelectionLineEnds()
+{
+    EditorPane *pane = activePane();
+    QObject *controller =
+        pane != nullptr ? multiCursorControllerFor(pane->editorWidget()) : nullptr;
+    return controller != nullptr &&
+           QMetaObject::invokeMethod(controller, "addCursorsAtSelectionLineEnds",
+                                     Qt::DirectConnection);
 }
 
 void EditorArea::deletePane(EditorPane *pane)

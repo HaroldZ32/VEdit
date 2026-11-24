@@ -21,6 +21,10 @@
 #include "search_panel.h"
 #include "search_types.h"
 
+#if defined(VEDIT_SEARCH_HAVE_FFI)
+#include "vd_ffi.h"
+#endif
+
 #ifdef VEDIT_WORKSPACE_SEARCH_HAVE_SHELL
 #include "app_shell.h"
 #include "editor_area.h"
@@ -60,6 +64,7 @@
 #include <QStatusBar>
 #endif
 
+#include <algorithm>
 #include <cstdio>
 #include <functional>
 #include <memory>
@@ -226,6 +231,19 @@ const SearchHit *findHitData(const SearchPanel &panel, const QString &relativePa
         }
     }
     return nullptr;
+}
+
+// True when the result list holds a hit for `file` (compared as absolute paths,
+// which is the panel's open/jump key).
+bool hasHitForFile(const SearchPanel &panel, const QString &file)
+{
+    const QString absolute = QFileInfo(file).absoluteFilePath();
+    for (const SearchHit &hit : panel.hits()) {
+        if (hit.filePath == absolute) {
+            return true;
+        }
+    }
+    return false;
 }
 
 // Clicks the tree row of `hit` with a real mouse event (the user's action, the
@@ -510,6 +528,396 @@ void testExtensions()
               !vedit::workspace::search::isVerilogFileName(QStringLiteral("test.txt")));
 }
 
+// Batch 20261110d: the panel searches the UNION of the folder and the project
+// file set. The fixture below is the `.f` shape from the report: the opened
+// folder is `filelists/` and the source lives next to it (`../tb/`), so a
+// directory walk of the root can never see it. The union must also keep the
+// folder's own non-source files searchable (the product is a text editor, not
+// an HDL-only tool).
+void testExplicitFileSet()
+{
+    QTemporaryDir temp;
+    check("explicit.fixture", temp.isValid());
+    if (!temp.isValid()) {
+        return;
+    }
+    const QString root = temp.path() + QStringLiteral("/filelists");
+    const QString inside = root + QStringLiteral("/notes.md");
+    const QString outside = temp.path() + QStringLiteral("/tb/tb_top.sv");
+    const QString noteOnly = root + QStringLiteral("/readme_only.md");
+    writeFile(inside, "scope_probe inside\n");
+    writeFile(outside, "scope_probe outside\n");
+    writeFile(noteOnly, "md_token_alpha only in a folder note\n");
+
+    // 1) No provider = no project model yet: the plain walk. This is the RED
+    // evidence for the reported bug — the sibling file is invisible.
+    {
+        SearchPanel panel;
+        panel.setRootPath(root);
+        panel.setQuery(QStringLiteral("scope_probe"));
+        panel.startSearch();
+        check("explicit.walk.terminates", waitForSearch(panel));
+        check("explicit.walk.root-file", panel.hits().size() == 1);
+        check("explicit.walk.misses-outside", !hasHitForFile(panel, outside));
+        check("explicit.walk.not-named-as-set", !panel.lastSummary().usedProjectFileSet);
+    }
+
+    // 2) The union: the member OUTSIDE the root is searched AND the folder's own
+    // files stay searchable; the member is listed in the set AND walked, and is
+    // still scanned exactly once.
+    {
+        SearchPanel panel;
+        panel.setRootPath(root);
+        panel.setProjectFilesProvider(
+            [inside, outside]() { return QStringList{inside, outside}; });
+        panel.setQuery(QStringLiteral("scope_probe"));
+        panel.startSearch();
+        check("explicit.set.terminates", waitForSearch(panel));
+        const SearchSummary summary = panel.lastSummary();
+        check("explicit.set.both-files", panel.hits().size() == 2);
+        check("explicit.set.finds-outside", hasHitForFile(panel, outside));
+        check("explicit.set.dedup",
+              summary.usedProjectFileSet && summary.filesInProjectSet == 2 &&
+                  summary.filesScanned == 3);
+        check("explicit.set.summary-text",
+              panel.summaryLabel()->text().contains(QStringLiteral("whole folder")));
+
+        // 3) NEGATIVE CONTROL: drop the member from the set -> it is no longer
+        // searched. The scan cannot be passing through the directory.
+        panel.setProjectFilesProvider([inside]() { return QStringList{inside}; });
+        panel.startSearch();
+        check("explicit.set.negative-control-terminates", waitForSearch(panel));
+        check("explicit.set.negative-control-count", panel.hits().size() == 1);
+        check("explicit.set.negative-control-no-outside", !hasHitForFile(panel, outside));
+        check("explicit.set.negative-control-scanned", panel.lastSummary().filesScanned == 2);
+
+        // 4) The captain's explicit expectation: a file INSIDE the root that is
+        // NOT (or no longer) in the project set is STILL searched — the union is
+        // not the set. `notes.md` leaves the set, the outside member stays in.
+        panel.setProjectFilesProvider([outside]() { return QStringList{outside}; });
+        panel.startSearch();
+        check("explicit.union.terminates", waitForSearch(panel));
+        check("explicit.union.folder-file-still-hit", hasHitForFile(panel, inside));
+        check("explicit.union.member-hit", hasHitForFile(panel, outside));
+        check("explicit.union.count", panel.hits().size() == 2);
+        check("explicit.union.set-size", panel.lastSummary().filesInProjectSet == 1);
+        check("explicit.union.scanned-both", panel.lastSummary().filesScanned == 3);
+
+        // 5) A folder `.md` with a token that exists nowhere else: with a
+        // project set supplied it must still be found (no narrowing to HDL).
+        panel.setQuery(QStringLiteral("md_token_alpha"));
+        panel.startSearch();
+        check("explicit.union.md-terminates", waitForSearch(panel));
+        check("explicit.union.md-hit",
+              hasHitForFile(panel, noteOnly) && panel.hits().size() == 1);
+    }
+
+    // 6) An EMPTY provider must fall back to the plain walk, never scan zero
+    // files.
+    {
+        SearchPanel panel;
+        panel.setRootPath(root);
+        panel.setProjectFilesProvider([]() { return QStringList{}; });
+        panel.setQuery(QStringLiteral("scope_probe"));
+        panel.startSearch();
+        check("explicit.empty-provider.falls-back",
+              waitForSearch(panel) && panel.hits().size() == 1 &&
+                  !panel.lastSummary().usedProjectFileSet);
+    }
+}
+
+// The explicit set is a SCOPE change only: the match options must report the
+// SAME ranges in both modes (no silent capability regression).
+void testExplicitFileSetParity()
+{
+    QTemporaryDir temp;
+    check("parity.fixture", temp.isValid());
+    if (!temp.isValid()) {
+        return;
+    }
+    const QString root = temp.path() + QStringLiteral("/root");
+    const QString inside = root + QStringLiteral("/a.sv");
+    const QString outside = temp.path() + QStringLiteral("/tb/b.sv");
+    const QByteArray content("foo foo foofoo\nFOO\nfoo\n");
+    writeFile(inside, content);
+    writeFile(outside, content);
+
+    struct OptionCase {
+        const char *name;
+        QString query;
+        bool caseSensitive;
+        bool wholeWords;
+        bool regex;
+    };
+    const OptionCase cases[] = {
+        {"default", QStringLiteral("foo"), false, false, false},
+        {"case-sensitive", QStringLiteral("FOO"), true, false, false},
+        {"whole-word", QStringLiteral("foo"), false, true, false},
+        {"regex", QStringLiteral("f.o"), false, false, true},
+    };
+    const auto rangesFor = [](const SearchPanel &panel, const QString &file) {
+        QStringList ranges;
+        const QString absolute = QFileInfo(file).absoluteFilePath();
+        for (const SearchHit &hit : panel.hits()) {
+            if (hit.filePath != absolute) {
+                continue;
+            }
+            ranges.append(QStringLiteral("%1:%2:%3:%4")
+                              .arg(hit.line)
+                              .arg(hit.column)
+                              .arg(hit.endColumn)
+                              .arg(hit.matchLength));
+        }
+        return ranges;
+    };
+    for (const OptionCase &optionCase : cases) {
+        SearchPanel walkPanel;
+        walkPanel.setRootPath(root);
+        walkPanel.setQuery(optionCase.query);
+        walkPanel.setCaseSensitive(optionCase.caseSensitive);
+        walkPanel.setWholeWords(optionCase.wholeWords);
+        walkPanel.setRegex(optionCase.regex);
+        walkPanel.startSearch();
+        const bool walkDone = waitForSearch(walkPanel);
+        // Capture the walk result BEFORE the second panel exists: two panels
+        // share the ONE SearchHub, and a later publish on the second invalidates
+        // the first's rows (product behaviour, one dock per window).
+        const QStringList walkRanges = rangesFor(walkPanel, inside);
+        const int walkHits = static_cast<int>(walkPanel.hits().size());
+        const int walkScanned = walkPanel.lastSummary().filesScanned;
+
+        SearchPanel setPanel;
+        setPanel.setRootPath(root);
+        setPanel.setProjectFilesProvider(
+            [inside, outside]() { return QStringList{inside, outside}; });
+        setPanel.setQuery(optionCase.query);
+        setPanel.setCaseSensitive(optionCase.caseSensitive);
+        setPanel.setWholeWords(optionCase.wholeWords);
+        setPanel.setRegex(optionCase.regex);
+        setPanel.startSearch();
+        const bool setDone = waitForSearch(setPanel);
+
+        const QString checkName = QStringLiteral("parity.") + QLatin1String(optionCase.name);
+        check(qPrintable(checkName + QStringLiteral(".terminates")), walkDone && setDone);
+
+        const QStringList setRanges = rangesFor(setPanel, inside);
+        std::printf("PARITY %s walk-hits=%d set-hits=%d walk-ranges='%s' set-ranges='%s'\n",
+                    optionCase.name, walkHits, static_cast<int>(setPanel.hits().size()),
+                    qPrintable(walkRanges.join(QLatin1Char(','))),
+                    qPrintable(setRanges.join(QLatin1Char(','))));
+        std::fflush(stdout);
+        check(qPrintable(checkName + QStringLiteral(".same-ranges")), walkRanges == setRanges);
+        check(qPrintable(checkName + QStringLiteral(".set-adds-member")),
+              static_cast<int>(setPanel.hits().size()) == walkHits * 2);
+        check(qPrintable(checkName + QStringLiteral(".walk-count")),
+              walkScanned == 1 && setPanel.lastSummary().filesScanned == 2);
+    }
+}
+
+#if defined(VEDIT_SEARCH_HAVE_FFI) && defined(VEDIT_SEARCH_EXPANSION_FIXTURE)
+// Expand a project root with the SAME entry point the lint lane uses, so the
+// file set compared by the probe below is the published project model and not
+// a test helper with its own rules.
+QStringList expandProjectFiles(const QString &root, QString *error)
+{
+    QStringList files;
+    VdService *service = vd_service_create();
+    if (service == nullptr) {
+        *error = QStringLiteral("cannot create the Rust service handle");
+        return files;
+    }
+    const QByteArray rootPath = root.toUtf8();
+    const quint64 job = vd_project_expand_v3(service, rootPath.constData(), nullptr, nullptr,
+                                             nullptr, nullptr, nullptr);
+    if (job == 0) {
+        VdError ffiError{};
+        *error = vd_service_error(service, &ffiError) == VD_STATUS_READY
+                     ? QString::fromUtf8(ffiError.message)
+                     : QStringLiteral("the project expansion was rejected without a reason");
+        vd_service_destroy(service);
+        return files;
+    }
+    QElapsedTimer timer;
+    timer.start();
+    for (;;) {
+        VdProjectInfo info{};
+        const qint32 status = vd_project_poll(service, job, &info);
+        if (status == VD_STATUS_READY) {
+            for (size_t index = 0; index < info.files.count; ++index) {
+                files.append(QString::fromUtf8(info.files.items[index]));
+            }
+            vd_project_info_free(&info);
+            break;
+        }
+        if (status != VD_STATUS_PENDING) {
+            VdError ffiError{};
+            *error = vd_service_error(service, &ffiError) == VD_STATUS_READY
+                         ? QString::fromUtf8(ffiError.message)
+                         : QStringLiteral("the project expansion failed without a reason");
+            break;
+        }
+        if (timer.elapsed() > 60000) {
+            *error = QStringLiteral("the project expansion did not finish in 60 s");
+            break;
+        }
+        QCoreApplication::processEvents();
+        QTest::qWait(2);
+    }
+    vd_service_destroy(service);
+    return files;
+}
+
+bool listContainsFile(const QStringList &files, const QString &fileName)
+{
+    for (const QString &file : files) {
+        if (QFileInfo(file).fileName() == fileName) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// Batch 20261110d real-fixture probe. Root = the fixture's `filelists/` folder,
+// whose `.f` files name sources in `../tb/` and `../rtl/` — a directory walk of
+// the root finds NOTHING, while the project model names 2+ files. The folder
+// carries its own `vedit.toml` with `[project] auto_discover = true` (the
+// 2026-11-18 file-set decision makes declared filelists the default; see
+// docs/USER_GUIDE.md §2.8).
+//
+//   * three-way count at the data level: the scan reads exactly the set the
+//     lint pass and the file tree publish (same expansion, same count);
+//   * negative control: remove `-f nested/tb_aux.f` from `tb.f` and the member
+//     it added leaves the set AND the results, while the rest still matches.
+void testProjectExpansionScope()
+{
+    const QString fixture = QStringLiteral(VEDIT_SEARCH_EXPANSION_FIXTURE);
+    if (!QFileInfo(fixture).isDir()) {
+        skipCheck("projectexp.fixture", "the repository fixture is not present in this build");
+        return;
+    }
+    QString error;
+    const QStringList files = expandProjectFiles(fixture, &error);
+    std::printf("PROJECT-EXPANSION root='%s' files=%d error='%s'\n", qPrintable(fixture),
+                static_cast<int>(files.size()), qPrintable(error));
+    std::fflush(stdout);
+    check("projectexp.expansion", error.isEmpty() && files.size() >= 2);
+    if (!error.isEmpty() || files.size() < 2) {
+        skipCheck("projectexp.search", "the project expansion did not produce the pinned set");
+        return;
+    }
+    const QString prefix = QFileInfo(fixture).absoluteFilePath() + QLatin1Char('/');
+    int outside = 0;
+    for (const QString &file : files) {
+        if (!QFileInfo(file).absoluteFilePath().startsWith(prefix)) {
+            ++outside;
+        }
+    }
+    check("projectexp.expansion.all-outside-root", outside == files.size());
+
+    SearchPanel panel;
+    panel.setRootPath(fixture);
+    panel.setProjectFilesProvider([files]() { return files; });
+    panel.setQuery(QStringLiteral("tb_aux"));
+    panel.startSearch();
+    check("projectexp.search.terminates", waitForSearch(panel));
+    const SearchSummary summary = panel.lastSummary();
+    check("projectexp.search.scanned-the-set",
+          summary.usedProjectFileSet && summary.filesScanned >= files.size() &&
+              summary.filesInProjectSet == files.size());
+    std::printf("PROJECT-EXPANSION-SCAN filesScanned=%d set=%d\n", summary.filesScanned,
+                summary.filesInProjectSet);
+    std::fflush(stdout);
+    bool hitOutside = false;
+    for (const SearchHit &hit : panel.hits()) {
+        if (!hit.filePath.startsWith(prefix)) {
+            hitOutside = true;
+        }
+    }
+    check("projectexp.search.finds-outside-root", hitOutside && !panel.hits().isEmpty());
+
+    // The union's other half at the real fixture: `+define+SIMULATION` lives in
+    // `filelists/tb.f`, a folder file that is NOT a project SOURCE member. It
+    // must still be searchable (searching the set alone would miss it).
+    panel.setQuery(QStringLiteral("SIMULATION"));
+    panel.startSearch();
+    check("projectexp.search.folder-file-still-hit",
+          waitForSearch(panel) && panel.hits().size() == 1 &&
+              panel.hits().at(0).filePath.startsWith(prefix));
+
+    // --- negative control on a COPY of the real fixture ---------------------
+    QTemporaryDir copy;
+    check("projectexp.copy", copy.isValid());
+    if (!copy.isValid()) {
+        return;
+    }
+    // `fixture` is the `filelists/` folder (the opened root); the project the
+    // copy mirrors is its parent.
+    const QString fixtureProject = QFileInfo(fixture).absolutePath();
+    const auto copyFile = [&copy, &fixtureProject](const QString &relative) {
+        const QString target = copy.path() + QLatin1Char('/') + relative;
+        QDir().mkpath(QFileInfo(target).absolutePath());
+        return QFile::copy(fixtureProject + QLatin1Char('/') + relative, target);
+    };
+    const bool copiedExtra = copyFile(QStringLiteral("filelists/extra.f"));
+    // The opened root's own `vedit.toml` is what declares the legacy
+    // `auto_discover` switch; without it the copied root names no file and the
+    // negative control would have nothing to assert (2026-11-18 file-set
+    // decision, docs/USER_GUIDE.md §2.8).
+    const bool copiedConfig = copyFile(QStringLiteral("filelists/vedit.toml"));
+    const bool copiedTop = copyFile(QStringLiteral("tb/tb_top.sv"));
+    const bool copiedAux = copyFile(QStringLiteral("tb/tb_aux.sv"));
+    const bool copiedHeader = copyFile(QStringLiteral("tb/include/tb_defs.vh"));
+    const bool copiedMem = copyFile(QStringLiteral("rtl/mem.sv"));
+    const bool copied = copiedExtra && copiedTop && copiedAux && copiedHeader && copiedMem;
+    // tb.f without the nested `-f` line: the second-level member disappears.
+    QString tbFile;
+    {
+        QFile source(fixtureProject + QStringLiteral("/filelists/tb.f"));
+        if (source.open(QIODevice::ReadOnly)) {
+            QStringList lines = QString::fromUtf8(source.readAll()).split(QLatin1Char('\n'));
+            lines.erase(std::remove_if(lines.begin(), lines.end(),
+                                       [](const QString &line) {
+                                           return line.trimmed() == QStringLiteral("-f nested/tb_aux.f");
+                                       }),
+                        lines.end());
+            tbFile = lines.join(QLatin1Char('\n'));
+        }
+    }
+    QDir().mkpath(copy.path() + QStringLiteral("/filelists"));
+    writeFile(copy.path() + QStringLiteral("/filelists/tb.f"), tbFile.toUtf8());
+    std::printf("PROJECTEXP-COPY extra=%d config=%d tb_top=%d tb_aux=%d header=%d mem=%d "
+                "tb-file-bytes=%d\n",
+                copiedExtra ? 1 : 0, copiedConfig ? 1 : 0, copiedTop ? 1 : 0,
+                copiedAux ? 1 : 0, copiedHeader ? 1 : 0, copiedMem ? 1 : 0,
+                static_cast<int>(tbFile.toUtf8().size()));
+    std::fflush(stdout);
+    check("projectexp.copy.files", copied && !tbFile.isEmpty());
+
+    const QString copyRoot = copy.path() + QStringLiteral("/filelists");
+    error.clear();
+    const QStringList withoutAux = expandProjectFiles(copyRoot, &error);
+    std::printf("PROJECT-EXPANSION-NEG root='%s' files=%d error='%s'\n", qPrintable(copyRoot),
+                static_cast<int>(withoutAux.size()), qPrintable(error));
+    std::fflush(stdout);
+    check("projectexp.negative.expansion", error.isEmpty() && !withoutAux.isEmpty());
+    check("projectexp.negative.member-removed", !listContainsFile(withoutAux, QStringLiteral("tb_aux.sv")));
+    check("projectexp.negative.other-member-kept",
+          listContainsFile(withoutAux, QStringLiteral("tb_top.sv")));
+
+    SearchPanel negative;
+    negative.setRootPath(copyRoot);
+    negative.setProjectFilesProvider([withoutAux]() { return withoutAux; });
+    negative.setQuery(QStringLiteral("tb_aux"));
+    negative.startSearch();
+    check("projectexp.negative.terminates", waitForSearch(negative));
+    check("projectexp.negative.no-hit", negative.hits().isEmpty());
+    negative.setQuery(QStringLiteral("tb_top"));
+    negative.startSearch();
+    check("projectexp.negative.other-member-hits",
+          waitForSearch(negative) && !negative.hits().isEmpty());
+}
+#endif // VEDIT_SEARCH_HAVE_FFI && VEDIT_SEARCH_EXPANSION_FIXTURE
+
 void testJump(const Fixture &fixture)
 {
     SearchPanel panel;
@@ -603,6 +1011,26 @@ void testShellSeam(const Fixture &fixture)
         panel->startSearch();
         waitForSearch(*panel);
         check("seam.search-in-shell", panel->hits().size() == 7);
+
+        // Batch 20261110d: the PRODUCT wiring (installSearch -> the published
+        // `vedit.diagnostics.projectFiles` property) makes a project member
+        // that lives OUTSIDE the shell root searchable. Not the panel API: the
+        // property is what the project model publishes.
+        QTemporaryDir outsideDir;
+        const QString outsideFile = outsideDir.path() + QStringLiteral("/tb_member.sv");
+        writeFile(outsideFile, "seam_probe only outside the root\n");
+        shell.setProperty("vedit.diagnostics.projectFiles",
+                          QStringList{QFileInfo(fixture.path(QStringLiteral("a.v")))
+                                          .absoluteFilePath(),
+                                      outsideFile});
+        panel->setQuery(QStringLiteral("seam_probe"));
+        panel->startSearch();
+        waitForSearch(*panel);
+        check("seam.project-set.used", panel->lastSummary().usedProjectFileSet);
+        // Union: the shell root's own files are scanned as well, so the scan
+        // count is at least the two members.
+        check("seam.project-set.scans-members", panel->lastSummary().filesScanned >= 2);
+        check("seam.project-set.finds-outside-member", hasHitForFile(*panel, outsideFile));
     }
 }
 
@@ -1231,6 +1659,13 @@ int main(int argc, char **argv)
         testProductJump(fixture);
 #endif
     }
+    // Batch 20261110d: the project file set is the search scope. These build
+    // their own `.f`-shaped fixtures, so they do not depend on the shared one.
+    testExplicitFileSet();
+    testExplicitFileSetParity();
+#if defined(VEDIT_SEARCH_HAVE_FFI) && defined(VEDIT_SEARCH_EXPANSION_FIXTURE)
+    testProjectExpansionScope();
+#endif
     testLargeFileAndCancel();
     testDestructionJoinsWorker();
     testDestructorAgainstStalledRead();

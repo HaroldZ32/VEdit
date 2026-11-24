@@ -30,6 +30,11 @@
 
 namespace vedit::app {
 
+struct RevisionMark {
+    int line = 0;
+    bool deletion = false;
+};
+
 class EditorProvider {
 public:
     virtual ~EditorProvider() = default;
@@ -43,6 +48,19 @@ public:
     // Creates the editor widget for one pane. Ownership passes to the caller
     // (the shell reparents it into the pane). Must return a non-null widget.
     virtual QWidget *createEditor(QWidget *parent) = 0;
+
+    // Split view (batch 20261110d): creates a SECOND editor widget that shows
+    // the SAME document as `sourceEditor`, or nullptr when this provider cannot
+    // share a document (the demo placeholder, a widget from another provider,
+    // a null source). Ownership passes to the caller, exactly like
+    // createEditor().
+    //
+    // The two widgets must share ONE buffer: a change typed into either must be
+    // visible in both, and the document must outlive closing EITHER widget so an
+    // unsaved change is never discarded by closing one pane. A provider that
+    // cannot honour that contract returns nullptr and the caller keeps today's
+    // empty-pane split behaviour.
+    virtual QWidget *createEditorForExistingDocument(QWidget *sourceEditor, QWidget *parent);
 
     // --- syntax-theme seam (UI-Mosaic F2) -----------------------------------
     // Hands the ACTIVE syntax theme name (ThemeManager::syntaxThemeName()) to
@@ -72,6 +90,11 @@ public:
     virtual bool saveFile(QWidget *editor, QString *error = nullptr);
     // T130: closing a pane must not silently discard an unsaved document.
     virtual bool isModified(QWidget *editor) const;
+    virtual QString comparisonText(QWidget *editor) const;
+    virtual bool replaceComparisonText(QWidget *editor, qsizetype start, qsizetype length,
+                                       const QString &text);
+    virtual void setComparisonModified(QWidget *editor, bool modified);
+    virtual void setRevisionMarks(QWidget *, const QList<RevisionMark> &) {}
 
     // --- breadcrumb/status seam (T94) --------------------------------------
     // One line of positional context for a pane (the semantic breadcrumb path).
@@ -165,6 +188,33 @@ inline bool EditorProvider::openFile(QWidget *editor, const QString &absolutePat
     return true;
 }
 
+inline QString EditorProvider::comparisonText(QWidget *editor) const
+{
+    const auto *plain = qobject_cast<QPlainTextEdit *>(editor);
+    return plain ? plain->toPlainText() : QString();
+}
+
+inline bool EditorProvider::replaceComparisonText(QWidget *editor, qsizetype start,
+                                                  qsizetype length, const QString &text)
+{
+    auto *plain = qobject_cast<QPlainTextEdit *>(editor);
+    if (!plain || plain->isReadOnly()) {
+        return false;
+    }
+    QTextCursor cursor(plain->document());
+    cursor.setPosition(static_cast<int>(start));
+    cursor.setPosition(static_cast<int>(start + length), QTextCursor::KeepAnchor);
+    cursor.insertText(text);
+    return true;
+}
+
+inline void EditorProvider::setComparisonModified(QWidget *editor, bool modified)
+{
+    if (auto *plain = qobject_cast<QPlainTextEdit *>(editor)) {
+        plain->document()->setModified(modified);
+    }
+}
+
 inline QString EditorProvider::currentFilePath(QWidget *editor) const
 {
     if (editor == nullptr) {
@@ -176,6 +226,16 @@ inline QString EditorProvider::currentFilePath(QWidget *editor) const
 inline void EditorProvider::applySyntaxTheme(const QString &themeName)
 {
     Q_UNUSED(themeName);
+}
+
+// The demo/placeholder editor has no document object to share, so the honest
+// answer is "cannot": the area then keeps the empty-pane split behaviour.
+inline QWidget *EditorProvider::createEditorForExistingDocument(QWidget *sourceEditor,
+                                                               QWidget *parent)
+{
+    Q_UNUSED(sourceEditor);
+    Q_UNUSED(parent);
+    return nullptr;
 }
 
 inline QString EditorProvider::statusText(QWidget *editor) const

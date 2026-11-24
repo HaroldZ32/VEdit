@@ -2,8 +2,9 @@
 
 单文件 AppImage 的私有运行时：包内自带 `ld-linux` + glibc + Qt6 + KF6 +
 KTextEditor + **自建** KSyntaxHighlighting + tree-sitter + 字体，`AppRun` 显式经包内
-loader 启动，并把语法定义查找**收窄到 AppDir 白名单**。交付二进制要求
-`GLIBC_2.34`，目标是 CentOS 7.9（glibc 2.17），所以自带运行时是**运行前提**（C2）。
+loader 启动，并把语法定义查找**收窄到 AppDir 白名单**。CentOS 7.9 的系统 glibc 是
+2.17，`AppRun` 使用随包的 loader 和 glibc 满足应用 ELF 的版本要求（C2）。每次构建的
+ELF 需求以对应发布证据中的 `readelf` 结果为准。
 
 ## 一键
 
@@ -15,9 +16,12 @@ bash packaging/runtime/build.sh          # 组装 → 许可闸门 → 自检 �
 
 | 路径 | 说明 |
 |---|---|
-| `packaging/runtime/out/AppDir/` | **中间产物**（不是交付物）：202 个文件，约 283 MB；`bin/vd-app` 的 sha256 与交付 AppImage 内的同一份（当前 `b93f8cf4…`）。目录内容来自最终基线，仅用于检查/调试。 |
-| `packaging/runtime/out/VEdit-<ver>-x86_64.AppImage` | **唯一交付物**：单文件 AppImage（sha256 见 `out/SHA256SUMS`，不在文档里写死）；`out/SHA256SUMS` 与之配套。 |
-| `evidence/slice3-pack/` | 最终打包证据（`final-<commit>/`：C9、构建、干净容器 selfcheck、四容器矩阵）。 |
+| 打包目录的 `packaging/runtime/out/AppDir/` | 打包过程的中间目录。该次运行的 AppImage 从同一个 AppDir 生成。 |
+| `packaging/runtime/out/VEdit-<ver>-x86_64.AppImage` | 单文件交付物，配套校验文件为 `out/SHA256SUMS`。 |
+| `evidence/workbench-upgrade/release/` | 0.4.0 的打包日志、产物校验与干净容器实测。 |
+
+0.4.0 在独立暂存目录中组装 AppDir。交付目录只更新 AppImage 和校验文件，
+其中原有的 `out/AppDir/` 属于此前的构建。检查 0.4.0 包内文件时请解包本次 AppImage。
 
 ## F2 形态（T61 定案；缺一条就会泄漏宿主定义）
 
@@ -98,12 +102,12 @@ bash packaging/runtime/build.sh          # 组装 → 许可闸门 → 自检 �
 - `build.sh` writes `out/SHA256SUMS` for the single-file AppImage and copies the
   evidence into `evidence/slice3-pack/`.
 
-**Delivery baseline:** the AppImage is `out/VEdit-0.2.1-x86_64.AppImage`, and its
+**Delivery baseline:** the AppImage is `out/VEdit-0.4.0-x86_64.AppImage`, and its
 sha256 is recorded in `out/SHA256SUMS` (written by `build.sh`) rather than restated
 here, so a rebuild cannot leave a stale hash in the docs. Any source or
 packaging-script change invalidates a published AppImage and requires a rebuild.
-`out/AppDir/` is an intermediate inspection tree (its `bin/vd-app` sha matches the
-AppImage), not a deliverable.
+The 0.4.0 AppImage uses the `bin/vd-app` assembled in the release staging directory.
+Extract the delivered image to inspect its contents.
 
 
 ## CJK font fallback (T119)

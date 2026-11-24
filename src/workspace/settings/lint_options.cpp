@@ -6,15 +6,6 @@
 
 namespace vedit::workspace::settings {
 
-namespace {
-
-QString translate(const char *text)
-{
-    return QCoreApplication::translate("VEdit", text);
-}
-
-} // namespace
-
 QString lintKnobFlagName(LintKnob knob)
 {
     switch (knob) {
@@ -42,7 +33,57 @@ bool isVeribleKnob(LintKnob knob)
     return knob != LintKnob::SlangWarnings && knob != LintKnob::SlangErrorLimit;
 }
 
+/// The no-TTY reason both interactive autofix modes carry (batch 20261110b).
+QString interactiveAutofixReason(const char *flag)
+{
+    return QCoreApplication::translate(
+               "VEdit",
+               "%1 is not available: verible-verilog-lint prompts on a terminal for this "
+               "mode, and the product always starts it with pipes (no TTY). Use a "
+               "non-interactive mode instead.")
+        .arg(QString::fromLatin1(flag));
+}
+
 } // namespace
+
+QVector<LintAutofixValue> lintAutofixValues()
+{
+    const auto entry = [](const char *value, quint8 code) {
+        LintAutofixValue item;
+        item.value = QString::fromLatin1(value);
+        item.code = code;
+        return item;
+    };
+    QVector<LintAutofixValue> values;
+    values.append(entry("", 0)); // the "No flag" entry (verible's own `no`)
+    values.append(entry(keys::kAutofixNo, 0));
+    values.append(entry(keys::kAutofixPatch, 1));
+    LintAutofixValue patchInteractive = entry(keys::kAutofixPatchInteractive, 2);
+    patchInteractive.available = false;
+    patchInteractive.reason = interactiveAutofixReason(keys::kAutofixPatchInteractive);
+    values.append(patchInteractive);
+    values.append(entry(keys::kAutofixInplace, 3));
+    LintAutofixValue inplaceInteractive = entry(keys::kAutofixInplaceInteractive, 4);
+    inplaceInteractive.available = false;
+    inplaceInteractive.reason = interactiveAutofixReason(keys::kAutofixInplaceInteractive);
+    values.append(inplaceInteractive);
+    values.append(entry(keys::kAutofixGenerateWaiver, 5));
+    return values;
+}
+
+LintAutofixValue lintAutofixValue(const QString &stored)
+{
+    const QString value = stored.trimmed().toLower();
+    const QVector<LintAutofixValue> values = lintAutofixValues();
+    for (const LintAutofixValue &item : values) {
+        if (item.value == value) {
+            return item;
+        }
+    }
+    // An unknown/empty stored value is the no-flag entry (the store's typed
+    // parse refuses unknown values, so this cannot lose a real setting).
+    return values.isEmpty() ? LintAutofixValue{} : values.first();
+}
 
 LintBackend lintBackendFromSetting(const QString &value)
 {
@@ -69,44 +110,43 @@ LintKnobState lintKnobState(LintBackend backend, LintKnob knob)
         state.kind = LintKnobStateKind::BackendUnsupported;
         if (veribleKnob) {
             if (knob == LintKnob::RulesConfig) {
-                state.reason = translate(
+                state.reason = QCoreApplication::translate(
+                    "VEdit",
                     "Not available: slang has no .rules.verible_lint (this is a "
                     "verible-verilog-lint option).");
             } else if (knob == LintKnob::WaiverFiles) {
-                state.reason = translate(
+                state.reason = QCoreApplication::translate(
+                    "VEdit",
                     "Not available: slang takes no verible waiver files (this is a "
                     "verible-verilog-lint option).");
             } else if (knob == LintKnob::Autofix) {
-                state.reason = translate(
+                state.reason = QCoreApplication::translate(
+                    "VEdit",
                     "Not available: slang has no automatic fixing (this is a "
                     "verible-verilog-lint option).");
             } else {
-                state.reason = translate(
+                state.reason = QCoreApplication::translate(
+                    "VEdit",
                     "Not available: slang has no rule set / rule selection (this is "
                     "a verible-verilog-lint option).");
             }
         } else {
             state.reason = knob == LintKnob::SlangWarnings
-                ? translate("Not available: verible-verilog-lint has no -W warning "
-                            "selection (this is a slang option).")
-                : translate("Not available: verible-verilog-lint has no --error-limit "
-                            "(this is a slang option).");
+                ? QCoreApplication::translate("VEdit",
+                                              "Not available: verible-verilog-lint has no -W warning "
+                                              "selection (this is a slang option).")
+                : QCoreApplication::translate("VEdit",
+                                              "Not available: verible-verilog-lint has no --error-limit "
+                                              "(this is a slang option).");
         }
         return state;
     }
 
     // --- case 2: the engine supports it; is it carried by the lint job? ----
-    // U6 wired ruleset / rules / waiver_files / -W / --error-limit through
-    // VdLintBatchOptions. `--autofix` is the last one without a field: the value
-    // is persisted and usable, but it is NOT sent (R1: no silent no-op).
-    if (knob == LintKnob::Autofix) {
-        state.kind = LintKnobStateKind::TransportPending;
-        state.reason = translate(
-            "%1 is stored, but the lint job's C ABI has no field for it (transport "
-            "pending).")
-                           .arg(lintKnobFlagName(knob));
-        return state;
-    }
+    // Batch 20261110b: every knob below is carried by VdLintBatchOptions
+    // (ruleset / rules / waiver_files / autofix / autofix_output_file /
+    // slang_waiver_file / -W / --error-limit), so none of them is a
+    // "stored but not sent" value any more.
     state.kind = LintKnobStateKind::Supported;
     return state;
 }
@@ -124,6 +164,9 @@ LintValues lintValuesFromEntries(const QVector<Entry> &entries)
     values.verible.autofix = text(keys::kLintVeribleAutofix);
     values.slang.warnings = text(keys::kLintSlangWarnings);
     values.slang.errorLimit = text(keys::kLintSlangErrorLimit);
+    // Read-only on this page: the waiver lane registers this file, so the value
+    // is transported but never rewritten (see writeLintEntries).
+    values.slang.waiverFile = text(kLintSlangWaiverFile);
     return values;
 }
 

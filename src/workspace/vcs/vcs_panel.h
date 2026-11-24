@@ -34,6 +34,7 @@ class QFileSystemWatcher;
 class QLabel;
 class QLineEdit;
 class QListWidget;
+class QMenu;
 class QPlainTextEdit;
 class QPushButton;
 class QSplitter;
@@ -230,6 +231,22 @@ public:
     void setConfirmProvider(ConfirmProvider provider);
 
     QString selectedPath() const { return selected_path_; }
+    quint64 svnSelectionEpoch() const { return svnSelectionEpoch_; }
+
+    Q_SIGNAL void svnWorkingComparisonRequested(const QString &path, SvnRevision revision);
+    Q_SIGNAL void svnFileHistoryRequested(const QString &path, std::function<bool()> stillCurrent = {});
+    Q_SIGNAL void svnWorkingSnapshotRequested(const QString &path, SvnRevision revision);
+    Q_SIGNAL void svnOpenFileRequested(const QString &path);
+    Q_SIGNAL void svnOpenCheckoutRequested(const QString &path);
+    Q_SIGNAL void svnFileRenamed(const QString &oldAbsolute, const QString &newAbsolute);
+    Q_SIGNAL void svnStatusReady();
+    void promptSvnCheckout();
+    void refreshSvnRemote(bool interactive = false);
+    void promptSvnFileAction(WriteOp op, const QString &path, std::function<bool()> stillCurrent = {}, bool promptIgnorePattern = true);
+    void showSvnFileHistory(const QString &path, std::function<bool()> stillCurrent = {});
+    void compareSvnFile(const QString &path, SvnRevision revision, std::function<bool()> stillCurrent = {});
+    bool svnSelectionCurrent() const { return !externalSelection_ || externalSelection_(); }
+
     bool stageSelected();
     bool unstageSelected();
     bool discardSelected();
@@ -415,11 +432,26 @@ private:
     void renderChanges();
     void renderRefs(const Info &info);
     void watchPaths(const Status &status);
+    void scanSvnWatches();
+    void installWatchPaths(const QSet<QString> &wanted);
+    void renderHeader();
+    void refreshWithReason(const QString &reason);
     void updateActions();
     void showDiff(const std::string &path);
     void manualRefresh();
     void onRefreshTimer();
     void promptCommit();
+    void buildSvnMenu(QMenu &menu, bool context);
+    void updateSvnActions();
+    QStringList selectedSvnPaths() const;
+    QString svnChangelist(const QString &path) const;
+    int svnChangeKind(const QString &path) const;
+    void promptSvnCommit(QStringList paths, QString changelist = {});
+    void promptSvnBranch(WriteOp op);
+    void confirmSvnPaths(WriteOp op, const QStringList &paths);
+    void readSvnWorking(HistoryKind kind, const QStringList &paths = {}, const QString &changelist = {}, bool interactive = true);
+    void showSvnIncoming(const HistoryData &data, bool interactive);
+    void showSvnPatch(const QString &patch);
     void showRefContextMenu(const QPoint &position);
     // A second, stronger confirmation for irreversible operations; false when
     // either step is declined or cannot be asked (headless with no provider).
@@ -454,6 +486,12 @@ private:
     // it performed; see evidence/vcs-ui/README.md for that boundary.
     QSet<QString> staged_overlay_;
     QString selected_path_;
+    quint64 svnSelectionEpoch_ = 0;
+    std::function<bool()> externalSelection_;
+    QPushButton *svnCompare_ = nullptr;
+    QPushButton *svnActions_ = nullptr;
+    bool svnRemoteRead_ = false;
+    int svnIncomingCount_ = -1;
 
     QLabel *header_ = nullptr;
     QLabel *empty_ = nullptr;
@@ -530,6 +568,12 @@ private:
     int merged_refresh_count_ = 0;
     QString last_refresh_reason_;
     QString pending_reason_;
+    QString nextStatusReason_;
+    quint64 rootEpoch_ = 0;
+    quint64 diffEpoch_ = 0;
+    bool statusInFlight_ = false;
+    bool needWatchScan_ = true;
+    bool watchScanInFlight_ = false;
 };
 
 } // namespace vedit::workspace::vcs

@@ -6,15 +6,19 @@ the user asked for.
 ## What it does
 
 * Reads the project's effective file set from **the project model's persisted
-  state** (`<state dir>/project-model.json`: root + the union of the imported
-  `.f` files and the folder scan + the tools page's `-I`/`-D`). If that state
-  does not exist yet, the lane starts the same `vd_project_expand_v2` job the
+  state** (`<state dir>/project-model.json`: root + the expansion of the
+  DECLARED filelists + the tools page's `-I`/`-D`). Since the 2026-11-18
+  file-set decision the folder scan and root-level `*.f` discovery are **off**
+  by default; `[project] auto_discover = true` in the root's `vedit.toml`
+  restores that legacy union (`docs/USER_GUIDE.md` §2.8). If that state does
+  not exist yet, the lane starts the same `vd_project_expand_v2` job the
   project panel uses.
 * **The watch converges, it never swallows an event.** A fresh state directory
-  is the normal first open: the holder's first run is the root-scan fallback
-  while the project lane expands asynchronously and only then saves
-  `project-model.json`. The holder therefore tracks (a) the change token
-  (`mtime|size`) it last observed, (b) the token the current catalog run
+  is the normal first open: the holder's first run is the expansion fallback
+  (the root's declared filelists, plus the legacy scan only when
+  `auto_discover` is on) while the project lane expands asynchronously and only
+  then saves `project-model.json`. The holder therefore tracks (a) the change
+  token (`mtime|size`) it last observed, (b) the token the current catalog run
   actually read, and (c) a dirty flag for a change observed **while a run is in
   flight**; when the run answers or fails, one follow-up run is scheduled
   (`CatalogClient::start` loads the persisted model synchronously, so the token
@@ -41,6 +45,17 @@ the user asked for.
     a typed reason naming the measured depth — never a stack risk, never an
     unreported empty tree. Up to that cap the walk runs on a 64 MiB-stack thread
     (reserved virtual; measured to add no resident memory).
+* **The summary/status lines are FIXED-HEIGHT scrollers (R2-a…R2-e,
+  batch-20261119).** `module-tree-summary` / `module-tree-status` are frameless
+  `QScrollArea`s whose body is a `QLabel` with `setWordWrap(false)`, selectable and
+  keyboard-focusable (so Ctrl+C works). The body paints the **full** text — the
+  `\nroot: …` / `\n<topNote>` newlines are kept and nothing is elided — while the
+  container's height is `2 * lineSpacing` (`3 *` when the text carries a newline)
+  **plus the horizontal bar's height**, applied with `setFixedHeight`. A bar
+  appearing therefore cannot move the layout, and the table keeps its ≥ 6-row
+  viewport under a multi-thousand-character warning. `summaryText()`/`statusText()`
+  and the tooltip still carry the whole text. (R1-c's one elided line was rejected
+  on the real machine: the error could not be read.)
 * **`module-tree` dock — a PURE MODULE HIERARCHY** (item 1):
   * roots are the modules with `is_top` (no module instantiates them; one or
     several);
@@ -89,9 +104,12 @@ ctest --test-dir target/qt6-build -R 'module-tree' --output-on-failure
 * `vedit-module-tree-catalog-test` — the REAL acceptance run: the lane fixture
   under `fixtures/ux-batch-2/` is catalogued by the real slang binary through the
   real product client, the product docks are used, and the jumps are verified on
-  the product's KTextEditor jump target. It also carries the two project-model
-  regressions (a seeded model whose file set differs from the root scan, and a
-  model written while a catalog run is in flight) and the declaration-≠-
+  the product's KTextEditor jump target. The fixture carries its own
+  `vedit.toml` with `[project] auto_discover = true`, because the new default
+  would name no file for a bare folder of sources (`docs/USER_GUIDE.md` §2.8).
+  It also carries the two project-model regressions (a seeded model whose file
+  set differs from the fallback file set the auto-discovery switch produces, and
+  a model written while a catalog run is in flight) and the declaration-≠-
   instantiation check on `shared`, which has two instance sites. The fixture is
   in-tree and slang is a build dependency, so a missing one **fails** the test
   (exit 1) instead of printing SKIP and exiting 0; a green run also asserts that

@@ -397,4 +397,87 @@ AutofixOutcome AutofixEngine::fix(const QString &rule, const QString &filePathHi
     return autofixRuleInTempCopy(lintBinary_, rule, filePathHint, text, rulesConfig_);
 }
 
+QString autofixModeName(AutofixMode mode)
+{
+    switch (mode) {
+    case AutofixMode::NoFlag:
+        return QString();
+    case AutofixMode::No:
+        return QStringLiteral("no");
+    case AutofixMode::Patch:
+        return QStringLiteral("patch");
+    case AutofixMode::PatchInteractive:
+        return QStringLiteral("patch-interactive");
+    case AutofixMode::Inplace:
+        return QStringLiteral("inplace");
+    case AutofixMode::InplaceInteractive:
+        return QStringLiteral("inplace-interactive");
+    case AutofixMode::GenerateWaiver:
+        return QStringLiteral("generate-waiver");
+    }
+    return QString();
+}
+
+AutofixModeCheck checkAutofixMode(const QString &stored)
+{
+    AutofixModeCheck check;
+    const QString value = stored.trimmed().toLower();
+    const auto accept = [&check, &value](AutofixMode mode, AutofixEffect effect) {
+        check.valid = true;
+        check.available = true;
+        check.mode = mode;
+        check.effect = effect;
+        check.value = value;
+    };
+    const auto interactive = [&check, &value](AutofixMode mode, AutofixEffect effect) {
+        check.valid = true;
+        check.available = false;
+        check.interactive = true;
+        check.mode = mode;
+        check.effect = effect;
+        check.value = value;
+        check.reason = QCoreApplication::translate(
+            "VEdit",
+            "verible asks for an answer on its own stdin for this mode and VEdit has no terminal "
+            "to give one: only `no`, `patch`, `inplace` and `generate-waiver` can be driven");
+    };
+
+    // The empty value is the page's "no flag" entry: a coherent, available state.
+    if (value.isEmpty()) {
+        accept(AutofixMode::NoFlag, AutofixEffect::None);
+        return check;
+    }
+    if (value == QLatin1String("no")) {
+        accept(AutofixMode::No, AutofixEffect::None);
+        return check;
+    }
+    if (value == QLatin1String("patch")) {
+        accept(AutofixMode::Patch, AutofixEffect::PrintsPatch);
+        return check;
+    }
+    if (value == QLatin1String("inplace")) {
+        accept(AutofixMode::Inplace, AutofixEffect::WritesInPlace);
+        return check;
+    }
+    if (value == QLatin1String("generate-waiver")) {
+        accept(AutofixMode::GenerateWaiver, AutofixEffect::GeneratesWaiver);
+        return check;
+    }
+    if (value == QLatin1String("patch-interactive")) {
+        interactive(AutofixMode::PatchInteractive, AutofixEffect::PrintsPatch);
+        return check;
+    }
+    if (value == QLatin1String("inplace-interactive")) {
+        interactive(AutofixMode::InplaceInteractive, AutofixEffect::WritesInPlace);
+        return check;
+    }
+    check.value = value;
+    check.reason = QCoreApplication::translate(
+                       "VEdit",
+                       "`%1` is not a verible autofix mode (expected no, patch, "
+                       "patch-interactive, inplace, inplace-interactive or generate-waiver)")
+                       .arg(value);
+    return check;
+}
+
 } // namespace vedit::workspace::diagnostics

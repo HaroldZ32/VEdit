@@ -27,6 +27,7 @@
 
 class QFrame;
 class QLabel;
+class QTimer;
 class QKeyEvent;
 class QWidget;
 
@@ -72,8 +73,16 @@ public:
     void refreshIndex();
 
     // Recompute the context/signature for the current cursor and paint or hide
-    // the popup. Called on cursor moves and text changes; public for the test.
+    // the popup. IMMEDIATE (the test drives it directly); the view signals go
+    // through the 150 ms debounce below (T9).
     void refresh();
+    /// Start/restart the 150 ms refresh debounce (TEXT changes: the expensive
+    /// trigger). Exposed so the selftest can prove the debounce.
+    void scheduleRefresh();
+    /// A cursor move: when the text is unchanged the cache and the parsed tree
+    /// are current, so the refresh is cheap and IMMEDIATE (leaving a call must
+    /// close the popup at once). After a text change it defers to the debounce.
+    void onCursorMoved();
     void dismiss();
 
     // Observables (the lane selftest asserts these).
@@ -84,6 +93,11 @@ public:
     int activeParameter() const;
     bool parameterListContext() const;
     QString statusText() const; // last reason nothing was shown (diagnostics)
+    /// T9 observability: how many full `document->text()` copies the refresh
+    /// path made (was 3 per call; one per text change after the fix).
+    quint64 documentTextCopies() const { return textCopies_; }
+    /// True while the 150 ms debounce is pending (the test reads this).
+    bool refreshPending() const;
 
     // Context detection is public so the test can check it without a popup.
     CallContext contextAtCursor() const;
@@ -107,7 +121,7 @@ private:
     // candidates in the current document (rescanned on text change) and the index
     QList<SignatureInfo> candidatesFor(const QString &callee, const QString &kind,
                                        bool parameterList, QString *origin) const;
-    void refreshDocumentScan();
+    void refreshDocumentScan(const QString &text);
     int byteOffsetAt(const KTextEditor::Cursor &cursor) const;
 
     KTextEditor::View *view_ = nullptr;
@@ -120,6 +134,14 @@ private:
     QHash<QString, QList<SignatureInfo>> index_;
     QList<SignatureInfo> documentSignatures_;
     QString scannedDocumentText_;
+    /// T9: the document text is copied ONCE per document revision, not three
+    /// times per refresh. A cursor move reuses the cache.
+    QString cachedText_;
+    qint64 cachedRevision_ = -1;
+    KTextEditor::Document *cachedDocument_ = nullptr;
+    bool textCached_ = false;
+    quint64 textCopies_ = 0;
+    QTimer *refreshTimer_ = nullptr;
     QString popupText_;
     QString callee_;
     QString callKind_;

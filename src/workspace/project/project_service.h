@@ -28,6 +28,12 @@ struct ExpansionPayload {
     QStringList defines;
     QStringList diagnostics;
     QStringList missingVariables; // ADDENDUM A-9: unresolved, unique, sorted
+    // batch-20261114 E1: every filelist variable name the expansion REFERENCED
+    // (unique, sorted by name) and, in the same order, the layer that resolved it:
+    // "project" / "imported" / "environment" / "missing". `missingVariables` stays
+    // the subset whose layer is "missing"; this is the set a consumer filters by.
+    QStringList referencedVariables;
+    QStringList referencedVariableLayers;
     int skipped = 0;              // lines that produced no entry (never silent)
 };
 
@@ -50,12 +56,16 @@ public:
     ProjectService &operator=(const ProjectService &) = delete;
 
     // Starts an expansion of `projectRoot` using the imported `.f` files, the
-    // project variable table (`NAME=VALUE`, ADDENDUM A-9) and the settings store
-    // at `settingsPath` (empty => no tools-page values). The table wins over the
-    // process environment. The call returns without waiting; the returned job
-    // id is polled below.
+    // project variable table (`NAME=VALUE`, ADDENDUM A-9), the project panel's
+    // own editable `-I`/`-D` entries (AC-1.5, in the user's spelling; the Rust
+    // expansion resolves them against the root, de-duplicates them and refuses a
+    // value it cannot turn into an argument) and the settings store at
+    // `settingsPath` (empty => no tools-page values). The variable table wins
+    // over the process environment. The call returns without waiting; the
+    // returned job id is polled below.
     Start start(const QString &projectRoot, const QStringList &filelists,
-                const QStringList &variables, const QString &settingsPath, quint64 *job);
+                const QStringList &variables, const QStringList &projectIncludeDirs,
+                const QStringList &projectDefines, const QString &settingsPath, quint64 *job);
 
     // Polls one job. On READY the payload is filled; on FAILED the reason is
     // available through lastError().

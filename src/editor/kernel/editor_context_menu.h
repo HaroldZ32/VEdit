@@ -17,6 +17,13 @@
 //     when the backend capability table AND this build's request path AND the
 //     wired shell action all allow it, with the reason as the item's tooltip - an
 //     unavailable action is greyed WITH its reason, never silently missing.
+//   * a third section mirrors the PROJECT-WIDE rename command (`rename.symbol`,
+//     the slang AST index): the engineering-wide rename is reachable from the
+//     editor, NEXT TO - never replacing - the document-scoped language server
+//     `&Rename Symbol...` item above. Its state is the rename lane's own
+//     rendering of its pure gate (enabled flag + one-line reason), so the menu
+//     carries no second gating rule and the item can never disagree with the
+//     Project menu entry / Ctrl+Shift+F2.
 //
 // The menu is built on every right-click; no capability value is cached. When a
 // composition DOES provide the KatePart shared menu, the object also appends to

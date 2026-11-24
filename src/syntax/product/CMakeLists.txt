@@ -137,26 +137,30 @@ function(vedit_syntax_link_product)
   # own-xml= is the private *.xml files the loader FOUND (KsyntaxData appends a
   # file name before/without resolving it), so on its own it only proves file
   # presence: a corrupt vedit-tcl.xml (e.g. "<syntax></syntax>") still listed the
-  # five names and stayed green (independent U4 review, U4-F1). The field is
+  # six names and stayed green (independent U4 review, U4-F1). The field is
   # built from QDirIterator, so its ORDER is not stable — hence the entry pattern
-  # is repeated five times rather than written in one fixed order.
+  # is repeated six times rather than written in one fixed order.
   #
   # U4b: definitions-ok= is what the loader RESOLVED from those files: a private
   # file counts only when it parses as a usable definition (well-formed XML,
   # <language name=...> root, contexts) AND the repository resolves that name.
   # The names are sorted, so a fixed order is safe. A file that is present but
   # corrupt (e.g. "<syntax></syntax>") yields no name, drops out of this list,
-  # and fails the assertion. The five-name whitelist is deliberate: a sixth
-  # shipped definition fails the test on purpose. The field is printed LAST on
-  # the line, after `startup-hook=1`, so the pre-U4b predicate (which ended
-  # there) keeps matching — which is what makes the negative control honest.
-  set(_u4_definition "vedit-(markdown|systemverilog|tcl|verilog|vhdl)\\.xml")
+  # and fails the assertion. The six-name whitelist is deliberate: a SEVENTH
+  # shipped definition fails the test on purpose. That is the negative control —
+  # "a definition nobody listed is rejected" — and it moved from the sixth to the
+  # seventh entry when T17 added vedit-scala.xml (batch 20261110b); deleting it
+  # instead of shifting it would silently drop that guarantee. The field is
+  # printed LAST on the line, after `startup-hook=1`, so the pre-U4b predicate
+  # (which ended there) keeps matching — which is what makes the negative control
+  # honest.
+  set(_u4_definition "vedit-(markdown|scala|systemverilog|tcl|verilog|vhdl)\\.xml")
   set(_u4_own_xml "${_u4_definition}")
-  foreach(_u4_repeat RANGE 3)
+  foreach(_u4_repeat RANGE 4)
     string(APPEND _u4_own_xml ",${_u4_definition}")
   endforeach()
-  # Sorted by KsyntaxData::load(): the five shipped definitions, nothing else.
-  set(_u4_resolved_definitions "Markdown,SystemVerilog,Tcl,VHDL,Verilog")
+  # Sorted by KsyntaxData::load(): the six shipped definitions, nothing else.
+  set(_u4_resolved_definitions "Markdown,Scala,SystemVerilog,Tcl,VHDL,Verilog")
   set_tests_properties(vedit-app-syntax-startup PROPERTIES
     ENVIRONMENT
       "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime;VEDIT_SYNTAX_DIR=${syntax_resources_dir}"

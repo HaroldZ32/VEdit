@@ -1,0 +1,10 @@
+# Project configuration for the UX batch 2 module-tree fixture.
+#
+# The fixture is a bare folder of `.sv` files (no `.f`): since the 2026-11-18
+# file-set decision a root only contributes files named by a DECLARED filelist,
+# and the module-tree acceptance test catalogues this folder as an opened
+# project. `auto_discover = true` (default `false`) restores the legacy
+# recursive root scan the test was written against, so all seven sources are
+# catalogued. See `docs/USER_GUIDE.md` §2.8.
+[project]
+auto_discover = true

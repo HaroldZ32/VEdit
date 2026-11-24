@@ -17,6 +17,10 @@
 #include <unistd.h>
 #include <vector>
 
+#if defined(VEDIT_TERMINAL_HAVE_FFI)
+#include "vd_ffi.h"
+#endif
+
 extern char **environ;
 
 namespace vedit::terminal {
@@ -124,8 +128,43 @@ bool PtySession::start(const QString &shell,
         plan.arguments.emplace_back(argument.toStdString());
     }
     for (char **entry = environ; entry != nullptr && *entry != nullptr; ++entry) {
+        // The child is the HOST shell: AppRun exports LD_LIBRARY_PATH=<AppDir>/lib
+        // (packaged glibc) and LOCPATH=<AppDir>/usr/lib/locale for the PRODUCT
+        // process. Inherited, the host loader (e.g. EL7 glibc 2.17) tries to load
+        // the packaged glibc and the shell dies before its first prompt with
+        // "version 'GLIBC_2.35' not found". The same rule is documented in
+        // crates/vd-deeplint/src/binary.rs::sanitize_tool_child_env (and applied by
+        // the vd-vcs runners and workspace/vcs/vcs_toolchain.cpp::toolVersion).
+        if (std::strncmp(*entry, "LD_LIBRARY_PATH=", 16) == 0 || std::strncmp(*entry, "LOCPATH=", 8) == 0) {
+            continue;
+        }
         plan.environment.emplace_back(*entry);
     }
+#if defined(VEDIT_TERMINAL_HAVE_FFI)
+    // batch-20261115 AC-1.3: the terminal is the one child the Rust side does not
+    // spawn, so it reads the imported environment selection from the same store
+    // through the C ABI instead of guessing. Values are real (a secret-named one
+    // included) and are never printed. The packaged loader variables are skipped:
+    // the same "never reach a host child" rule the loop above applies to `environ`.
+    if (VdService *service = vd_service_create()) {
+        VdEnvSnapshot snapshot{};
+        if (vd_env_effective_snapshot(service, &snapshot) == 1) {
+            for (size_t index = 0; index < snapshot.count; ++index) {
+                const VdEnvSnapshotEntry &row = snapshot.items[index];
+                if (row.name == nullptr || row.value == nullptr) {
+                    continue;
+                }
+                if (std::strcmp(row.name, "LD_LIBRARY_PATH") == 0
+                    || std::strcmp(row.name, "LOCPATH") == 0) {
+                    continue;
+                }
+                setEnvironment(plan, row.name, row.value);
+            }
+        }
+        vd_env_snapshot_free(&snapshot);
+        vd_service_destroy(service);
+    }
+#endif
     setEnvironment(plan, "TERM", "xterm-256color");
     setEnvironment(plan, "COLORTERM", "truecolor");
     setEnvironment(plan, "TERM_PROGRAM", "VEdit");

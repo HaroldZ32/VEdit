@@ -1,11 +1,14 @@
 # Project panel (`src/workspace/project/`)
 
 Task T6 (project model). The Qt side of the project model: opening a folder makes
-it the **project root**, importing `.f` filelists adds them to the project, the
-file set is the union of the `.f` expansion and a directory scan, and the panel
-shows the file count, the member list, the imported filelists, the include dirs,
-the defines and every bad `.f` entry with `file:line + reason`. Everything
-persists across a restart (`<state dir>/project-model.json`).
+it the **project root**, importing `.f` filelists adds them to the project, and
+the file set is exactly what the DECLARED filelists name. Since the 2026-11-18
+file-set decision the legacy union with a directory scan and the root-level
+`*.f` auto-discovery are **off** by default; `[project] auto_discover = true` in
+the root's `vedit.toml` restores that old union (`docs/USER_GUIDE.md` §2.8).
+The panel shows the file count, the member list, the imported filelists, the
+include dirs, the defines and every bad `.f` entry with `file:line + reason`.
+Everything persists across a restart (`<state dir>/project-model.json`).
 
 The filelist semantics are **not** implemented here. `crates/vd-config` resolves
 the project root, the `.f` files (`+incdir+`, `+define+`, nested `-f`, `//` and
@@ -42,10 +45,13 @@ the T14 fixture contract.
   folder IS the root (the Rust expansion pins it; it never walks up to a parent
   `.git`). The dock is created hidden and becomes visible with the first project.
 * **AC-2.2** — “Import Filelist…” adds one or more `.f` files (removable);
-  the file set is `scan(root)` (`.v/.sv/.vh/.svh`, hidden directories skipped)
-  ∪ the `.f` expansion, de-duplicated by canonical path. The panel shows the
-  file count, the list, the filelists, the include dirs, the defines and the
-  `.f` diagnostics.
+  the file set is exactly the expansion of the declared filelists (the imported
+  ones ∪ `vedit.toml [project] filelists`), de-duplicated by canonical path.
+  The legacy `scan(root)` (`.v/.sv/.vh/.svh`, hidden directories skipped) and
+  root-level `*.f` discovery are opt-in: `[project] auto_discover = true`
+  restores their union with the declared filelists (`docs/USER_GUIDE.md` §2.8).
+  The panel shows the file count, the list, the filelists, the include dirs,
+  the defines and the `.f` diagnostics.
 * **AC-2.3** — every bad `.f` line is reported as `code: <file>:<line>: <reason>`
   by `crates/vd-config`; the three required cases are covered by Rust tests
   (missing `+incdir+` directory, unknown directive, missing nested `-f`) and by
@@ -89,7 +95,14 @@ service diagnostic, never as an empty project.
 ## Restart persistence (AC-2.4)
 
 `<state dir>/project-model.json` records `projectRoot`, `filelists`, `files`,
-`includeDirs`, `defines`, `diagnostics` and the capture time. On start the panel
+`includeDirs`, `defines`, `diagnostics`, the capture time and
+`inputsFingerprint` — a stable FNV-1a hash of the authored inputs that produced
+`files` (the ordered filelist paths **and their contents**, the root
+`vedit.toml`'s `[project] auto_discover`, the project/effective `-I`/`-D` and the
+variable tables). A load recomputes it; when it differs (or an older file has no
+such key) `files` is dropped and `filesStale` makes the catalog re-expand live,
+so an externally edited `.f` can never leave a silently stale file set behind.
+On start the panel
 restores that state first (so the project and its members are visible even before
 the service answers, and stay visible if it fails), then re-expands the root and
 replaces the members with the live result. The state directory is the shell's

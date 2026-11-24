@@ -85,6 +85,10 @@ private:
     bool jumpToInstantiation();
 
     ModuleCatalog catalog_;
+    /// Bumped by setCatalog: a port table rendered from a DIFFERENT catalog must
+    /// be re-rendered even when the focused module's name is unchanged.
+    int catalogGeneration_ = 0;
+    int renderedGeneration_ = -1;
     QString treeSelection_;
     QString caretFile_;
     int caretLine0_ = -1;

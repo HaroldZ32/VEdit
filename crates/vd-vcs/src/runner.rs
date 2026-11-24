@@ -190,6 +190,8 @@ pub const GIT_WRITE: &[&str] = &[
 
 /// Write subcommands that must never run for Subversion.
 pub const SVN_WRITE: &[&str] = &[
+    "checkout",
+    "co",
     "commit",
     "update",
     "up",
@@ -323,32 +325,35 @@ impl CommandRunner for SystemRunner {
         working_tree: &Path,
         args: &[String],
     ) -> Result<CommandOutput, String> {
-        ensure_read_only(program, args)?;
-        // Resolve BEFORE spawning: bundled (AppDir) > PATH > env. The gate above
-        // only ever sees the logical program name, so this cannot widen it.
-        let resolved = crate::toolchain::resolve_or_error(program)?;
-        let output = Command::new(&resolved.path)
-            .current_dir(working_tree)
-            .args(args)
-            // The product runs with the AppDir's LD_LIBRARY_PATH; the bundled
-            // git/svn wrapper starts with the HOST loader and then re-execs the
-            // AppDir loader itself, so the bundle must not leak into the shell
-            // that starts the wrapper (a 2.17 ld.so cannot load the bundled
-            // glibc; measured on CentOS 7).
-            .env_remove("LD_LIBRARY_PATH")
-            .output()
-            .map_err(|error| {
-                format!(
-                    "cannot run {program} ({}): {error}",
-                    resolved.path.display()
-                )
-            })?;
+        let output = read_output(program, working_tree, args)?;
         Ok(CommandOutput {
             success: output.status.success(),
             stdout: String::from_utf8_lossy(&output.stdout).into_owned(),
             stderr: String::from_utf8_lossy(&output.stderr).into_owned(),
         })
     }
+}
+
+/// Capture raw bytes for consumers that need strict encoding checks.
+pub(crate) fn read_output(
+    program: &str,
+    working_tree: &Path,
+    args: &[String],
+) -> Result<std::process::Output, String> {
+    ensure_read_only(program, args)?;
+    let resolved = crate::toolchain::resolve_or_error(program)?;
+    Command::new(&resolved.path)
+        .current_dir(working_tree)
+        .args(args)
+        // The bundled wrapper starts with the host loader before invoking its own.
+        .env_remove("LD_LIBRARY_PATH")
+        .output()
+        .map_err(|error| {
+            format!(
+                "cannot run {program} ({}): {error}",
+                resolved.path.display()
+            )
+        })
 }
 
 /// Stub runner for tests: records every invocation and answers from a fixed

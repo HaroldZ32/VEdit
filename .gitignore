@@ -81,3 +81,10 @@ evidence/**/scratch/
 evidence/**/bigdesign*/
 # Compiled probe executable with an underscore name (the -probe rule misses it).
 evidence/**/probe/*_probe
+
+# generated probe work dirs (maven cache / javap dumps), never deliverable
+probes/*/.work/
+
+# large "before" product binaries kept on disk for the startup measurement only
+# (302 MB of duplicates); their sha256 is recorded in the commit message and README
+evidence/batch-20261110d/startup/before/vd-app.*

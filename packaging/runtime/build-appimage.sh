@@ -50,6 +50,21 @@ got=$(sha256sum "$TOOL" | cut -d' ' -f1)
 [ "$got" = "$want" ] || { echo "ERROR: appimagetool sha256 mismatch: want=$want got=$got" >&2; exit 1; }
 echo "appimagetool sha256 OK ($got)"
 
+# The tool downloads its runtime by default. Supply the exact upstream asset
+# explicitly so rebuilding a tag never depends on the current continuous build.
+RUNTIME="$ROOT/packaging/appimage/.cache/runtime-x86_64"
+mkdir -p "$(dirname "$RUNTIME")"
+if [ ! -f "$RUNTIME" ] || ! printf '%s  %s\n' "$APPIMAGE_RUNTIME_SHA256" "$RUNTIME" | sha256sum -c --status; then
+  tmp_runtime=$(mktemp "$RUNTIME.XXXXXX")
+  trap 'rm -f -- "$tmp_runtime"' EXIT
+  curl -fsSL --retry 3 --connect-timeout 20 -H 'Accept: application/octet-stream' \
+    "$APPIMAGE_RUNTIME_URL" -o "$tmp_runtime"
+  printf '%s  %s\n' "$APPIMAGE_RUNTIME_SHA256" "$tmp_runtime" | sha256sum -c -
+  mv -- "$tmp_runtime" "$RUNTIME"
+  trap - EXIT
+fi
+printf '%s  %s\n' "$APPIMAGE_RUNTIME_SHA256" "$RUNTIME" | sha256sum -c -
+
 VERSION=$(awk -F'"' '/^version = / {print $2; exit}' "$ROOT/Cargo.toml" 2>/dev/null || echo 0.0.0)
 SUFFIX=""
 [ "$PROBE" -eq 1 ] && SUFFIX=".probe"
@@ -66,7 +81,7 @@ echo "SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH"
 
 echo "\$ appimagetool --no-appstream $APPDIR $OUTFILE"
 APPIMAGE_EXTRACT_AND_RUN=1 ARCH=x86_64 SOURCE_DATE_EPOCH="$SOURCE_DATE_EPOCH" \
-  "$TOOL" --no-appstream "$APPDIR" "$OUTFILE"
+  "$TOOL" --no-appstream --runtime-file "$RUNTIME" "$APPDIR" "$OUTFILE"
 rc=$?
 echo "EXIT=$rc"
 [ "$rc" -eq 0 ] || exit "$rc"

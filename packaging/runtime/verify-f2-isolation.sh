@@ -27,11 +27,11 @@
 set -uo pipefail
 
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
-EVID="$ROOT/evidence/m0-runtime"
+EVID=${VEDIT_F2_EVIDENCE:-"$ROOT/evidence/m0-runtime"}
 APPDIR="$ROOT/packaging/runtime/out/AppDir"
 APPIMAGE=""
 KEEP=0
-CENTOS=docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4
+CENTOS=${VEDIT_CENTOS_PROBE_IMAGE:-docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4}
 while [ $# -gt 0 ]; do
   case "$1" in
     --appdir) APPDIR=${2:?}; shift 2 ;;
@@ -310,6 +310,6 @@ if [ -n "$APPIMAGE" ]; then
 fi
 
 echo "== summary: pass=$ok fail=$bad ==" | tee -a "$LOG"
-[ "$KEEP" -eq 1 ] || rm -rf "$WORK/host" "$WORK/home"
+[ "$KEEP" -eq 1 ] || rm -rf "$WORK/host" "$WORK/home" "$WORK/img"
 if [ "$bad" -ne 0 ]; then exit 1; fi
 echo "F2-ISOLATION PASS"

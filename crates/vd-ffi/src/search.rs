@@ -159,6 +159,42 @@ fn tree_query(
     })
 }
 
+/// Map the C option struct onto the Rust scan options.
+///
+/// The only failure is a `VdStringList` contract violation in `extensions`; the
+/// message is recorded by the caller. A null struct keeps the documented
+/// defaults (case-insensitive literal, first match per line, default caps).
+///
+/// # Safety
+///
+/// `options` must be null or point to a readable [`VdSearchOptions`].
+unsafe fn read_tree_options(
+    options: *const VdSearchOptions,
+) -> Result<vd_search::TreeOptions, String> {
+    let mut tree_options = vd_search::TreeOptions::default();
+    if options.is_null() {
+        return Ok(tree_options);
+    }
+    // SAFETY: the caller contract guarantees a readable struct.
+    let options = unsafe { *options };
+    tree_options.case_sensitive = options.case_sensitive != 0;
+    tree_options.whole_word = options.whole_word != 0;
+    tree_options.regex = options.regex != 0;
+    tree_options.all_matches = options.all_matches != 0;
+    if options.max_results > 0 {
+        tree_options.max_results = options.max_results;
+    }
+    if options.max_file_bytes > 0 {
+        tree_options.max_file_bytes = options.max_file_bytes;
+    }
+    if options.max_duration_ms > 0 {
+        tree_options.max_duration_ms = options.max_duration_ms;
+    }
+    // SAFETY: a non-null list satisfies read_string_list's contract.
+    tree_options.extensions = unsafe { read_string_list(&raw const options.extensions) }?;
+    Ok(tree_options)
+}
+
 /// Start a tree-search job (walk + match, T21).
 ///
 /// `case_sensitive`/`verilog_only` are `u8` booleans (0/1). The result is read
@@ -246,30 +282,77 @@ pub unsafe extern "C" fn vd_search_tree_query_ex(
         ));
         return 0;
     };
-    let mut tree_options = vd_search::TreeOptions::default();
-    if !options.is_null() {
-        // SAFETY: the caller contract guarantees a readable struct.
-        let options = unsafe { *options };
-        tree_options.case_sensitive = options.case_sensitive != 0;
-        tree_options.whole_word = options.whole_word != 0;
-        tree_options.regex = options.regex != 0;
-        tree_options.all_matches = options.all_matches != 0;
-        if options.max_results > 0 {
-            tree_options.max_results = options.max_results;
+    // SAFETY: the caller contract guarantees a readable struct (or null).
+    let tree_options = match unsafe { read_tree_options(options) } {
+        Ok(options) => options,
+        Err(message) => {
+            state.record_error(VdError::new(VD_ERR_INVALID_ARGUMENT, &message));
+            return 0;
         }
-        if options.max_file_bytes > 0 {
-            tree_options.max_file_bytes = options.max_file_bytes;
+    };
+    let root = PathBuf::from(root);
+    let needle = needle.to_string();
+    state.start(move || tree_query(&root, &needle, tree_options).map(JobValue::Search))
+}
+
+/// Start an EXTENDED tree-search job over the UNION of the walk and an explicit
+/// file set.
+///
+/// Same matcher, options, limits, counters and [`vd_search_tree_poll`] result as
+/// [`vd_search_tree_query_ex`]; the difference is the SCOPE. When `files` is
+/// non-null and non-empty `root` is STILL walked (a `.md`, a script or a `.f`
+/// inside the folder stays searchable) AND every listed file is scanned too,
+/// including one outside the folder or under a pruned directory name. Each path
+/// is read once. An empty or null list is the plain walk, so a caller without a
+/// project file set is unchanged.
+///
+/// This is how project search covers the project model: a `.f` filelist may
+/// name sources OUTSIDE the opened folder (`root=filelists/`, members in
+/// `../tb/`), which a directory walk can never see — and the folder's own files
+/// are not narrowed away to get them. A member that is missing, binary,
+/// oversized or unreadable is counted in the summary's `skipped_*` fields
+/// exactly like a walked file — never silently dropped.
+///
+/// # Safety
+///
+/// `service` must be null or live; `root`/`needle` must be null or valid
+/// NUL-terminated strings; `options` must be null or point to a readable
+/// [`VdSearchOptions`] whose extension list satisfies the string-list contract;
+/// `files` must be null or satisfy the same contract for its own entries.
+#[no_mangle]
+pub unsafe extern "C" fn vd_search_tree_query_files(
+    service: *mut VdService,
+    root: *const c_char,
+    needle: *const c_char,
+    options: *const VdSearchOptions,
+    files: *const crate::capi::VdStringList,
+) -> u64 {
+    let Some(state) = service_state(service) else {
+        return 0;
+    };
+    let (Some(root), Some(needle)) = (crate::capi::c_str(root), crate::capi::c_str(needle)) else {
+        state.record_error(VdError::new(
+            VD_ERR_INVALID_ARGUMENT,
+            "root and needle must be valid UTF-8 strings",
+        ));
+        return 0;
+    };
+    // SAFETY: the caller contract guarantees a readable struct (or null).
+    let mut tree_options = match unsafe { read_tree_options(options) } {
+        Ok(options) => options,
+        Err(message) => {
+            state.record_error(VdError::new(VD_ERR_INVALID_ARGUMENT, &message));
+            return 0;
         }
-        if options.max_duration_ms > 0 {
-            tree_options.max_duration_ms = options.max_duration_ms;
+    };
+    // SAFETY: a non-null list satisfies read_string_list's contract.
+    match unsafe { read_string_list(files) } {
+        Ok(members) => {
+            tree_options.files = members.into_iter().map(PathBuf::from).collect();
         }
-        // SAFETY: a non-null list satisfies read_string_list's contract.
-        match unsafe { read_string_list(&raw const options.extensions) } {
-            Ok(extensions) => tree_options.extensions = extensions,
-            Err(message) => {
-                state.record_error(VdError::new(VD_ERR_INVALID_ARGUMENT, &message));
-                return 0;
-            }
+        Err(message) => {
+            state.record_error(VdError::new(VD_ERR_INVALID_ARGUMENT, &message));
+            return 0;
         }
     }
     let root = PathBuf::from(root);

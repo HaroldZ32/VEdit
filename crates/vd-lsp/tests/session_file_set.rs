@@ -228,7 +228,10 @@ fn effective_file_set_is_opened_and_navigation_outline_format_answer() -> Result
         },
         REQUEST_BUDGET,
     )?;
-    let SessionResponse::Diagnostics(diagnostics) = diagnostics else {
+    let SessionResponse::Diagnostics {
+        rows: diagnostics, ..
+    } = diagnostics
+    else {
         bail!("diagnostics returned the wrong response kind");
     };
     println!("OBSERVED alu_pkg.sv diagnostics={}", diagnostics.len());

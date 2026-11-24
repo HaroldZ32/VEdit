@@ -62,6 +62,20 @@ int highlightedRanges(const QString &text, const QString &definitionName)
     return ranges;
 }
 
+// The winning definition file for `definitionName` in the PRIVATE repository
+// (the one the loader added the private search path to). Empty = unresolved.
+// Printed next to the format-range count so the evidence names WHICH file was
+// measured instead of only the definition name: KSyntaxHighlighting keeps one
+// definition per name, and a host/KDE definition can win that name (AGENT.md §9).
+QString definitionFile(const QString &definitionName)
+{
+    KSyntaxHighlighting::Repository *repository = vedit::syntax::product::repository();
+    if (repository == nullptr) {
+        return {};
+    }
+    return repository->definitionForName(definitionName).filePath();
+}
+
 } // namespace
 
 int main(int argc, char **argv)
@@ -98,6 +112,12 @@ int main(int argc, char **argv)
     check("data.own-verilog-xml", report.syntax_private_files.contains(QStringLiteral("vedit-verilog.xml")));
     check("data.own-systemverilog-xml",
           report.syntax_private_files.contains(QStringLiteral("vedit-systemverilog.xml")));
+    // T17: the Scala definition (batch 20261110b) is installed, parses, and
+    // resolves through the private loader. `own-xml=` only proves file presence;
+    // `definitions-ok=` (syntax_resolved_definitions) proves the loader could
+    // actually resolve a usable definition from it.
+    check("data.own-scala-xml", report.syntax_private_files.contains(QStringLiteral("vedit-scala.xml")));
+    check("data.scala-definition", report.syntax_resolved_definitions.contains(QStringLiteral("Scala")));
     check("data.verilog-definition", report.verilog_definition);
     check("data.systemverilog-definition", report.systemverilog_definition);
     check("data.no-embargoed-definition", report.embargoed_definitions.isEmpty());
@@ -115,6 +135,17 @@ int main(int argc, char **argv)
         QStringLiteral("SystemVerilog"));
     std::printf("HIGHLIGHT systemverilog format-ranges=%d\n", systemVerilogRanges);
     check("highlight.systemverilog-attributes", systemVerilogRanges > 0);
+
+    // T17 (Scala): the document-level fact the user-visible colours are made of,
+    // plus the winning file so the evidence itself states WHICH definition was
+    // measured (private loader -> our vedit-scala.xml; see AGENT.md §9).
+    const int scalaRanges = highlightedRanges(
+        QStringLiteral("object Main extends App {\n  val xs = List(1, 2, 3)\n"
+                       "  def inc(x: Int): Int = x + 1\n}\n"),
+        QStringLiteral("Scala"));
+    std::printf("HIGHLIGHT scala format-ranges=%d definition-file=%s\n", scalaRanges,
+                qPrintable(definitionFile(QStringLiteral("Scala"))));
+    check("highlight.scala-attributes", scalaRanges > 0);
 
     if (!report.diagnostics.isEmpty()) {
         std::printf("DIAGNOSTICS %s\n", qPrintable(report.diagnostics.join(QStringLiteral(" | "))));

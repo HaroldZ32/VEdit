@@ -49,6 +49,7 @@
 #include <QTimer>
 #include <QWidget>
 
+#include <csignal>
 #include <cstdio>
 #include <functional>
 #include <memory>
@@ -168,6 +169,15 @@ private:
 
 int main(int argc, char **argv)
 {
+    // AGENT.md §4 ("Rust is statically linked into a C++ host", T134): Rust's
+    // runtime init does not run in this host, so its process-wide
+    // `SIGPIPE -> SIG_IGN` default is not installed either. This binary drives
+    // the REAL Rust LSP session (verible-verilog-ls) through the product lanes;
+    // without the default, a write to a child that already exited kills the
+    // TEST with SIGPIPE (observed: ctest reports the test as `SIGPIPE`, with no
+    // failing CHECK line at all). The product does the same in src/app/main.cpp,
+    // and the sibling lane selftests already install it.
+    std::signal(SIGPIPE, SIG_IGN);
     QApplication app(argc, argv);
     QString veribleLs;
     for (int index = 1; index < argc; ++index) {

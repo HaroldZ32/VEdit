@@ -40,7 +40,8 @@ QString backendName(Backend backend);
 
 struct Change {
     std::string path;
-    int kind = 0; // 1 added, 2 modified, 3 deleted, 4 renamed, 5 conflict, 6 unknown
+    int kind = 0; // 1 added, 2 modified, 3 deleted, 4 renamed, 5 conflict, 6 unknown, 7 unversioned
+    std::string changelist{};
 };
 
 QString changeKindName(int kind);
@@ -163,6 +164,17 @@ enum class WriteOp : int {
     GitWorktreeRemove = 37, // git worktree remove <path>     (irreversible)
     GitSubmoduleInit = 38,  // git submodule init
     GitSubmoduleUpdate = 39, // git submodule update --init
+    SvnCheckout = 51,
+    SvnChangelist = 52,
+    SvnChangelistRemove = 53,
+    SvnBranchCreate = 54,
+    SvnSwitch = 55,
+    SvnMerge = 56,
+    SvnResolve = 57,
+    SvnRename = 58,
+    SvnIgnore = 59,
+    SvnCleanup = 60,
+    SvnDeleteUnversioned = 62,
 };
 
 const char *writeOpName(WriteOp op);
@@ -226,7 +238,22 @@ enum class HistoryKind : int {
     FileHistory = 3, // one page of a single file's history
     Blame = 4,      // one file's blame
     Compare = 5,    // `git diff <from> <to>`
+    SvnSnapshot = 6,
+    SvnPrevious = 7,
+    SvnPatch = 8,
+    SvnIncoming = 9,
+    SvnRemoteLog = 10,
+    SvnRemoteDetail = 11,
+    SvnRemoteSnapshot = 12,
+    SvnRemotePrevious = 13,
 };
+
+enum class SvnRevisionKind : int { Base = 1, Head = 2, Number = 3 };
+struct SvnRevision {
+    SvnRevisionKind kind = SvnRevisionKind::Number;
+    quint64 number = 0;
+};
+inline constexpr quint64 kDefaultSvnPeg = static_cast<quint64>(-1);
 
 const char *historyKindName(HistoryKind kind);
 
@@ -266,7 +293,11 @@ struct HistoryRequest {
     std::string path;   // FileHistory / Blame
     std::string from;   // Compare
     std::string to;     // Compare
-    std::string query;  // Commits (literal, case-insensitive)
+    std::string query;  // Commits search text or SVN patch changelist
+    std::vector<std::string> paths; // selected SVN patch scope
+    std::string url; // saved SVN repository history
+    SvnRevision revision;
+    quint64 peg = kDefaultSvnPeg;
     int offset = 0;
     int limit = 50;
 };
@@ -292,6 +323,7 @@ struct HistoryData {
     // The read FAILED (git reported an error) as opposed to being empty (an
     // empty repository, an untouched path) — the two are different panel states.
     bool error = false;
+    bool snapshotMissing = false;
     long long time = 0;
     std::string note;
 };

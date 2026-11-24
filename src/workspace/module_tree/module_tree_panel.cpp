@@ -1,14 +1,22 @@
 #include "module_tree_panel.h"
+#include "../../common/item_context_menu.h"
 
 #include "jump/jump_registry.h"
 
 #include <QCoreApplication>
+#include <QElapsedTimer>
+#include <QThread>
+#include <QTimer>
+
+#include <memory>
 #include <QFileInfo>
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QComboBox>
 #include <QLabel>
 #include <QLineEdit>
+#include <QScrollArea>
+#include <QScrollBar>
 #include <QToolButton>
 #include <QTreeWidget>
 #include <QVBoxLayout>
@@ -33,6 +41,46 @@ QString oneLine(QString text)
 {
     text.replace(QLatin1Char('\n'), QLatin1Char(' '));
     return text.simplified();
+}
+
+// R1-c (batch-20261119) rendered the summary/status as ONE elided line so a huge
+// warning could not grow them. The user rejected that on the real machine: an
+// error that does not fit one line cannot be READ, and a tooltip is not a reading
+// surface. R2-a keeps the height bound but removes the information loss: each
+// line is a FIXED-HEIGHT read-only scroller whose body carries the whole text -
+// newlines included - so the user reads it line by line and drags a bar for the
+// rest. The height is a function of the LINE COUNT only (2 lines, 3 when the text
+// keeps a newline), plus the horizontal bar's height reserved up front, so a bar
+// appearing or disappearing can never move the layout.
+constexpr int kScrollableLines = 2;
+constexpr int kScrollableLinesMultiline = 3;
+
+int scrollableHeight(const QScrollArea *area, int lines)
+{
+    return area->fontMetrics().lineSpacing() * lines
+        + area->horizontalScrollBar()->sizeHint().height() + 2 * area->frameWidth();
+}
+
+void configureScrollableBody(QScrollArea *area, QLabel *body)
+{
+    area->setFrameShape(QFrame::NoFrame);
+    // The body is as wide as its text (thousands of pixels for a real warning), so
+    // the scroll range is the body's own size. A resizable widget would be squeezed
+    // into the viewport and there would be nothing to drag.
+    area->setWidgetResizable(false);
+    area->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    area->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    // The R1 failure was a label demanding a huge HEIGHT; the mirror-image trap is
+    // a body demanding a huge WIDTH from the dock layout. Neither may happen.
+    area->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
+    body->setTextFormat(Qt::PlainText);
+    body->setWordWrap(false);
+    // R2-c: selectable AND keyboard-focusable. `TextSelectableByKeyboard` is what
+    // gives the label a focus policy at all, i.e. what makes Ctrl+C reach the text
+    // control the selection lives in (mouse-only selection would be a dead end).
+    body->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
+    body->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    area->setWidget(body);
 }
 
 QString rowLabel(const ModuleTreeNode &node)
@@ -93,6 +141,16 @@ ModuleTreePanel::ModuleTreePanel(QWidget *parent)
     refresh_->setToolTip(
         QCoreApplication::translate("VEdit", "Re-run the module catalog for the whole project"));
     toolbar->addWidget(refresh_);
+    // AC M1.4: the ONE way to stop a run. A 20k-project elaboration can take
+    // minutes; before this the only exit was releasing the handle, which left
+    // `slang` running.
+    cancel_ = new QToolButton(this);
+    cancel_->setObjectName(QStringLiteral("module-tree-cancel"));
+    cancel_->setText(QCoreApplication::translate("VEdit", "Cancel"));
+    cancel_->setToolTip(
+        QCoreApplication::translate("VEdit", "Stop the running module catalog (kills slang)"));
+    cancel_->setEnabled(false);
+    toolbar->addWidget(cancel_);
     // RM-17: the ONE place the top is chosen. Auto = today's behaviour (every
     // uninstantiated module is a root); the list holds the detected candidates;
     // typing a name the list does not know is allowed (slang reports the name
@@ -108,9 +166,13 @@ ModuleTreePanel::ModuleTreePanel(QWidget *parent)
     top_->setToolTip(QCoreApplication::translate(
         "VEdit", "Top module for the module tree and the lint scope (empty = Auto)"));
     toolbar->addWidget(top_, 1);
+    // AC M1.3: a top is committed by an EXPLICIT gesture only - choosing an entry
+    // or pressing Enter. The old `editingFinished` also fired on focus loss, so
+    // clicking anywhere else started a whole-project catalog nobody asked for
+    // (and a second one per extra click).
     QObject::connect(top_, &QComboBox::activated, this, [this](int) { emitTopChoice(); });
     if (top_->lineEdit() != nullptr) {
-        QObject::connect(top_->lineEdit(), &QLineEdit::editingFinished, this,
+        QObject::connect(top_->lineEdit(), &QLineEdit::returnPressed, this,
                          [this]() { emitTopChoice(); });
     }
     filter_ = new QLineEdit(this);
@@ -133,15 +195,26 @@ ModuleTreePanel::ModuleTreePanel(QWidget *parent)
     tree_->header()->setSectionResizeMode(0, QHeaderView::Stretch);
     tree_->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
     tree_->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    // R1-d (batch-20261119): the table keeps SIX visible rows even under a long
+    // warning. A minimum on the tree alone is short by its chrome: the viewport
+    // is the tree minus the header and the frame, so both are charged here
+    // explicitly (plus half a line of style slack).
+    const int rowHeight = tree_->fontMetrics().height();
+    const int chrome = tree_->header()->sizeHint().height() + 2 * tree_->frameWidth();
+    tree_->setMinimumHeight(rowHeight * 6 + chrome + rowHeight / 2);
     layout->addWidget(tree_, 1);
 
-    summary_ = new QLabel(this);
+    summary_ = new QScrollArea(this);
     summary_->setObjectName(QStringLiteral("module-tree-summary"));
-    summary_->setWordWrap(true);
+    auto *summaryBody = new QLabel();
+    summaryBody->setObjectName(QStringLiteral("module-tree-summary-text"));
+    configureScrollableBody(summary_, summaryBody);
     layout->addWidget(summary_);
-    status_ = new QLabel(this);
+    status_ = new QScrollArea(this);
     status_->setObjectName(QStringLiteral("module-tree-status"));
-    status_->setWordWrap(true);
+    auto *statusBody = new QLabel();
+    statusBody->setObjectName(QStringLiteral("module-tree-status-text"));
+    configureScrollableBody(status_, statusBody);
     layout->addWidget(status_);
 
     QObject::connect(refresh_, &QToolButton::clicked, this, [this]() {
@@ -152,24 +225,46 @@ ModuleTreePanel::ModuleTreePanel(QWidget *parent)
                 "VEdit", "nothing to refresh: no catalog client"));
         }
     });
+    QObject::connect(cancel_, &QToolButton::clicked, this, [this]() {
+        if (preparing_ && !catalogRunning_) {
+            setNoProject(QCoreApplication::translate("VEdit", "Module tree preparation cancelled."));
+        } else if (cancelHandler_ != nullptr) {
+            cancelHandler_();
+        }
+    });
     QObject::connect(filter_, &QLineEdit::textChanged, this,
                      [this](const QString &needle) { applyFilter(needle); });
     QObject::connect(tree_, &QTreeWidget::itemDoubleClicked, this,
                      [this](QTreeWidgetItem *item, int) { activateItem(item); });
     QObject::connect(tree_, &QTreeWidget::currentItemChanged, this,
                      [this](QTreeWidgetItem *, QTreeWidgetItem *) { notifySelection(); });
+    new vedit::common::ItemContextMenu(tree_, [this](QMenu &menu, const QPersistentModelIndex &hit) {
+        const QModelIndex row = hit.sibling(hit.row(), 0);
+        const QString file = row.data(kFileRole).toString();
+        QAction *open = menu.addAction(tr("Go to Definition"), this, [this, hit]() {
+            if (hit.isValid()) {
+                activateItem(tree_->itemFromIndex(hit));
+            }
+        });
+        open->setEnabled(!file.isEmpty() && row.data(kLineRole).toInt() > 0 &&
+                         row.data(kKindRole).toInt() == static_cast<int>(ModuleRowKind::Module));
+        vedit::common::addCopyAction(menu, tr("Copy Instance Path"), row.data(kPathRole).toString());
+    });
 
     setStatus(QCoreApplication::translate(
         "VEdit", "No module catalog yet: open a project and press Refresh."));
 }
 
-void ModuleTreePanel::setCatalog(const ModuleCatalog &catalog)
+void ModuleTreePanel::setCatalog(const ModuleCatalog &catalog, bool deferRendering)
 {
+    ++treeGeneration_;
+    pendingRows_.clear();
+    setPreparing(false);
     catalog_ = catalog;
     if (!catalog_.valid || !catalog_.error.isEmpty()) {
         tree_->clear();
         roots_.clear();
-        summary_->clear();
+        setScrollableText(summary_, QString());
         setStatus(catalog_.error.isEmpty()
                       ? QCoreApplication::translate(
                             "VEdit", "No module catalog yet: open a project and press Refresh.")
@@ -180,7 +275,7 @@ void ModuleTreePanel::setCatalog(const ModuleCatalog &catalog)
     if (catalog_.modules.isEmpty()) {
         tree_->clear();
         roots_.clear();
-        summary_->setText(catalog_.summaryLine());
+        setScrollableText(summary_, catalog_.summaryLine());
         setStatus(QCoreApplication::translate(
             "VEdit", "No modules found: slang reported no module definitions for this project."));
         notifySelection();
@@ -189,7 +284,7 @@ void ModuleTreePanel::setCatalog(const ModuleCatalog &catalog)
     if (catalog_.topModuleNames().isEmpty()) {
         tree_->clear();
         roots_.clear();
-        summary_->setText(catalog_.summaryLine());
+        setScrollableText(summary_, catalog_.summaryLine());
         setStatus(QCoreApplication::translate(
             "VEdit", "No top module: every catalogued module is instantiated by another "
                      "module, so the hierarchy has no root."));
@@ -200,42 +295,128 @@ void ModuleTreePanel::setCatalog(const ModuleCatalog &catalog)
     if (!catalog_.projectRoot.isEmpty()) {
         summary += QCoreApplication::translate("VEdit", "\nroot: %1").arg(catalog_.projectRoot);
     }
-    summary_->setText(summary);
-    rebuildTree();
-    setStatus(QCoreApplication::translate(
-        "VEdit", "Module tree ready — double-click a module to open its declaration."));
+    if (!topNote_.isEmpty()) {
+        summary += QCoreApplication::translate("VEdit", "\n%1").arg(topNote_);
+    }
+    setScrollableText(summary_, summary);
+    if (deferRendering && catalog_.modules.size() > 300) {
+        prepareTree();
+    } else {
+        rebuildTree();
+    }
 }
 
 void ModuleTreePanel::setNoProject(const QString &reason)
 {
+    ++treeGeneration_;
+    pendingRows_.clear();
+    setPreparing(false);
     catalog_ = ModuleCatalog{};
     roots_.clear();
     tree_->clear();
-    summary_->clear();
+    setScrollableText(summary_, QString());
     setStatus(oneLine(reason));
     notifySelection();
 }
 
 void ModuleTreePanel::setFailure(const QString &message)
 {
+    ++treeGeneration_;
+    pendingRows_.clear();
+    setPreparing(false);
+    // F6 (batch-20261118 review): a FAILED run must be observable AS a failed
+    // catalog. `catalog()` is this panel's published answer, so a failure that
+    // left `error` empty was indistinguishable from "the run has not answered
+    // yet" — consumers can only test `valid || !error.isEmpty()`, and the
+    // acceptance test waited out its full 60 s timeout on a catalog that had
+    // already failed. The recorded error is always non-empty.
+    const QString failure = oneLine(message);
     catalog_ = ModuleCatalog{};
+    catalog_.error =
+        failure.isEmpty()
+            ? QCoreApplication::translate("VEdit", "the module catalog failed without a reason")
+            : failure;
     roots_.clear();
     tree_->clear();
-    summary_->clear();
-    setStatus(oneLine(message));
+    setScrollableText(summary_, QString());
+    setStatus(catalog_.error);
     notifySelection();
 }
 
 void ModuleTreePanel::setStatus(const QString &text)
 {
-    if (status_ != nullptr) {
-        status_->setText(text);
+    setScrollableText(status_, text);
+}
+
+void ModuleTreePanel::setScrollableText(QScrollArea *area, const QString &text)
+{
+    if (area == nullptr) {
+        return;
+    }
+    auto *body = qobject_cast<QLabel *>(area->widget());
+    if (body == nullptr) {
+        return;
+    }
+    if (area == summary_) {
+        summaryFull_ = text;
+    } else if (area == status_) {
+        statusFull_ = text;
+    }
+    // The FULL text stays one hover away (and is what summaryText()/statusText()
+    // publish); the body shows that very text, VERBATIM - newlines preserved, no
+    // elision - so a multi-thousand character warning is readable line by line and
+    // copyable, and only the bar is needed for what does not fit.
+    if (area->toolTip() != text) {
+        area->setToolTip(text);
+    }
+    if (body->toolTip() != text) {
+        body->setToolTip(text);
+    }
+    if (body->text() != text) {
+        body->setText(text);
+    }
+    // widgetResizable is OFF, so the scroll range is the body's own size: give it
+    // its unconstrained text size. Only the BODY grows; the container's height is
+    // derived from the line count below and never from the text's length.
+    const QSize wanted = body->sizeHint();
+    if (body->size() != wanted) {
+        body->resize(wanted);
+    }
+    const int lines =
+        text.contains(QLatin1Char('\n')) ? kScrollableLinesMultiline : kScrollableLines;
+    const int height = scrollableHeight(area, lines);
+    if (area->height() != height) {
+        area->setFixedHeight(height);
     }
 }
 
 void ModuleTreePanel::setRefreshHandler(std::function<void()> handler)
 {
     refreshHandler_ = std::move(handler);
+}
+
+void ModuleTreePanel::setOnCancel(std::function<void()> handler)
+{
+    cancelHandler_ = std::move(handler);
+}
+
+void ModuleTreePanel::setCancelEnabled(bool enabled)
+{
+    catalogRunning_ = enabled;
+    if (cancel_ != nullptr) {
+        cancel_->setEnabled(catalogRunning_ || preparing_);
+    }
+}
+
+void ModuleTreePanel::setPreparing(bool preparing)
+{
+    preparing_ = preparing;
+    setCancelEnabled(catalogRunning_);
+}
+
+bool ModuleTreePanel::cancelEnabled() const
+{
+    return cancel_ != nullptr && cancel_->isEnabled();
 }
 
 void ModuleTreePanel::setOnSelectionChanged(std::function<void(const QString &)> callback)
@@ -262,7 +443,8 @@ QString ModuleTreePanel::selectedModuleName() const
     return selectedModule_;
 }
 
-void ModuleTreePanel::addRow(QTreeWidgetItem *parent, const ModuleTreeNode &node)
+QTreeWidgetItem *ModuleTreePanel::addRow(QTreeWidgetItem *parent, const ModuleTreeNode &node,
+                                         bool descendants)
 {
     auto *item = parent != nullptr ? new QTreeWidgetItem(parent) : new QTreeWidgetItem();
     item->setText(0, rowLabel(node));
@@ -303,16 +485,23 @@ void ModuleTreePanel::addRow(QTreeWidgetItem *parent, const ModuleTreeNode &node
         item->setToolTip(2, node.note);
     }
 
-    for (const ModuleTreeNode &child : node.children) {
-        addRow(item, child);
+    if (descendants) {
+        for (const ModuleTreeNode &child : node.children) {
+            addRow(item, child);
+        }
     }
     if (parent == nullptr) {
         tree_->addTopLevelItem(item);
     }
+    return item;
 }
 
 void ModuleTreePanel::rebuildTree()
 {
+    // AC M1.8: the WHOLE tree is rebuilt on a catalog answer only. A selection or
+    // an editor switch must never reach this function; the probe counts calls so
+    // the latency test can assert exactly that.
+    ++moduleTreeProbe().treeRebuilds;
     const QString previous = selectedModule_;
     tree_->clear();
     roots_ = buildModuleTree(catalog_);
@@ -328,7 +517,65 @@ void ModuleTreePanel::rebuildTree()
     } else {
         tree_->expandToDepth(0);
     }
-    applyFilter(filter_ != nullptr ? filter_->text() : QString());
+    finishTree(previous);
+}
+
+void ModuleTreePanel::prepareTree()
+{
+    ++moduleTreeProbe().treeRebuilds;
+    selectionBeforeBuild_ = selectedModule_;
+    tree_->clear();
+    roots_.clear();
+    setPreparing(true);
+    setStatus(QCoreApplication::translate("VEdit", "Preparing the module tree…"));
+    const quint64 generation = treeGeneration_;
+    auto result = std::make_shared<QVector<ModuleTreeNode>>();
+    auto *worker = QThread::create([catalog = catalog_, result]() {
+        *result = buildModuleTree(catalog);
+    });
+    connect(worker, &QThread::finished, worker, &QObject::deleteLater);
+    connect(worker, &QThread::finished, this, [this, generation, result]() {
+        if (generation == treeGeneration_) {
+            roots_ = std::move(*result);
+            for (auto it = roots_.crbegin(); it != roots_.crend(); ++it) {
+                pendingRows_.append({nullptr, &*it});
+            }
+            appendPreparedRows(generation);
+        }
+    });
+    worker->start();
+}
+
+void ModuleTreePanel::appendPreparedRows(quint64 generation)
+{
+    if (generation != treeGeneration_) {
+        return;
+    }
+    QElapsedTimer batch;
+    batch.start();
+    do {
+        if (pendingRows_.isEmpty()) {
+            finishTree(selectionBeforeBuild_);
+            return;
+        }
+        const PendingRow row = pendingRows_.takeLast();
+        auto *item = addRow(row.parent, *row.node, false);
+        if (row.parent != nullptr && row.parent->parent() == nullptr && row.parent->childCount() == 1) {
+            row.parent->setExpanded(true);
+        }
+        for (auto child = row.node->children.crbegin(); child != row.node->children.crend(); ++child) {
+            pendingRows_.append({item, &*child});
+        }
+    } while (batch.elapsed() < 4);
+    QTimer::singleShot(0, this, [this, generation]() { appendPreparedRows(generation); });
+}
+
+void ModuleTreePanel::finishTree(const QString &previous)
+{
+    setPreparing(false);
+    if (filter_ != nullptr && !filter_->text().trimmed().isEmpty()) {
+        applyFilter(filter_->text());
+    }
     if (!previous.isEmpty() && catalog_.find(previous) != nullptr) {
         for (int index = 0; index < tree_->topLevelItemCount(); ++index) {
             if (QTreeWidgetItem *found = findModuleRow(tree_->topLevelItem(index), previous)) {
@@ -338,6 +585,8 @@ void ModuleTreePanel::rebuildTree()
         }
     }
     notifySelection();
+    setStatus(QCoreApplication::translate(
+        "VEdit", "Module tree ready — double-click a module to open its declaration."));
 }
 
 void ModuleTreePanel::applyFilter(const QString &needle)
@@ -480,6 +729,25 @@ void ModuleTreePanel::setScopeNote(const QString &text)
     }
 }
 
+void ModuleTreePanel::setTopNote(const QString &text)
+{
+    // Stored only: setCatalog() appends it to the SUMMARY line, which is where
+    // AC-7.3 wants the fallback explained. The transient status line belongs to
+    // the run that is about to start.
+    topNote_ = text;
+}
+
+void ModuleTreePanel::setTopEnabled(bool enabled)
+{
+    if (top_ == nullptr) {
+        return;
+    }
+    top_->setEnabled(enabled);
+    if (QLabel *label = findChild<QLabel *>(QStringLiteral("module-tree-top-label"))) {
+        label->setEnabled(enabled);
+    }
+}
+
 void ModuleTreePanel::setTopCandidates(const QStringList &candidates)
 {
     if (top_ == nullptr) {
@@ -550,17 +818,31 @@ void ModuleTreePanel::emitTopChoice()
     if (settingTop_ || topHandler_ == nullptr) {
         return;
     }
+    // AC M1.3: ONE gesture starts at most ONE catalog. Both signals stay
+    // connected - `activated` covers the drop-down choice, `returnPressed` covers
+    // a typed name the list does not know - but Qt answers a single Return press
+    // on an editable combo by emitting BOTH (its own return handler emits
+    // `activated`, then the line edit emits `returnPressed`). The twin arrives in
+    // the same event delivery, so the flag is cleared on the next event-loop turn:
+    // no wall-clock window, and a second deliberate gesture with the SAME value
+    // still commits (which is how a scoped run is retried).
+    if (sameGestureCommit_) {
+        return;
+    }
+    sameGestureCommit_ = true;
+    QMetaObject::invokeMethod(
+        this, [this]() { sameGestureCommit_ = false; }, Qt::QueuedConnection);
     topHandler_(effectiveTop());
 }
 
 QString ModuleTreePanel::summaryText() const
 {
-    return summary_ != nullptr ? summary_->text() : QString();
+    return summaryFull_;
 }
 
 QString ModuleTreePanel::statusText() const
 {
-    return status_ != nullptr ? status_->text() : QString();
+    return statusFull_;
 }
 
 int ModuleTreePanel::jumpAttempts() const

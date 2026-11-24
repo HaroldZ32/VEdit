@@ -51,12 +51,15 @@
 
 mod ast_prune;
 mod batch;
-mod binary;
+pub mod binary;
 mod catalog;
 mod dedup;
 mod diagnostic;
 mod engine;
 mod hierarchy;
+mod process;
+mod rename_apply;
+mod rename_index;
 mod service;
 mod tool_paths;
 
@@ -69,8 +72,9 @@ pub use binary::{
     BinaryResolution,
 };
 pub use catalog::{
-    build_catalog, parse_catalog_json, parse_catalog_json_in, CatalogModule, CatalogOptions,
-    ModuleCatalog, ModuleInstance, ModulePort, PortDirection,
+    build_catalog, parse_catalog_json, parse_catalog_json_in, parse_catalog_json_with_files,
+    CatalogModule, CatalogOptions, ModuleCatalog, ModuleInstance, ModulePort, ParsedCatalog,
+    PortDirection,
 };
 pub use dedup::{
     class_of_cli_code, class_of_deeplint, class_of_lsp, diagnostic_key, normalize_message,
@@ -82,13 +86,21 @@ pub use diagnostic::{
 };
 pub use engine::{
     command_args, command_args_for, command_line, command_line_for, knobs_note, parse_rules_list,
-    parse_slang_suppressions, parse_waiver_files, unsupported_knobs, LintEngine, Ruleset,
+    parse_slang_suppressions, parse_waiver_files, unsupported_knobs, validate_slang_waiver_file,
+    LintEngine, Ruleset, VeribleAutofix,
 };
 pub use hierarchy::{
-    elaborate, is_empty, parse_ast_json, resolution as hierarchy_resolution, Endpoint,
-    EndpointKind, HierarchyOptions, HierarchyReport, InstanceNode, SignalInfo, DEFAULT_MAX_FILES,
-    DEFAULT_MAX_INSTANCES, DEFAULT_MAX_JSON_BYTES as DEFAULT_HIERARCHY_JSON_BYTES,
+    elaborate, elaborate_navigation, is_empty, parse_ast_json, resolution as hierarchy_resolution,
+    Endpoint, EndpointKind, HierarchyOptions, HierarchyReport, InstanceNode, SignalInfo,
+    TraceIndex, DEFAULT_MAX_FILES, DEFAULT_MAX_INSTANCES,
+    DEFAULT_MAX_JSON_BYTES as DEFAULT_HIERARCHY_JSON_BYTES,
     DEFAULT_TIMEOUT as DEFAULT_HIERARCHY_TIMEOUT,
+};
+pub use rename_apply::{apply, ApplyOutcome, ApplyStatus};
+pub use rename_index::{
+    check_new_name, index as rename_index, is_legal_identifier, plan as rename_plan, resolve,
+    Declaration, FilePlan, IndexSummary, Occurrence, PlanOutcome, Project as RenameProject,
+    Reference, RenameError, RenameIndex, RenamePlan, SymbolClass,
 };
 pub use service::{lint, lint_with, LintReport, LintService};
 
@@ -180,6 +192,10 @@ pub struct EngineOptions {
     /// Project defines (`-D<name>=<value>`; slang only — see [`knobs_note`]).
     pub defines: Vec<String>,
     /// Wall-clock budget for one lint process.
+    ///
+    /// The whole-project pass is ONE process over N files, so it gets this
+    /// budget per file (the same worst case the per-file pass had); every
+    /// single-file run uses the value as-is.
     pub timeout: Duration,
     /// Maximum number of DISTINCT diagnostics kept per file (the `--diag-json`
     /// document is streamed; there is no byte cap).
@@ -202,6 +218,17 @@ pub struct EngineOptions {
     pub slang_suppressions: Vec<String>,
     /// Slang `--error-limit=N`. `None` (or 0 at the ABI) sends no flag.
     pub error_limit: Option<u32>,
+    /// Verible `--autofix=` mode. `None` sends NO flag (verible's own `no`).
+    /// The interactive values are transported faithfully, but the product runs
+    /// the tool with pipes and no TTY, so its UI marks them unavailable.
+    pub autofix: Option<VeribleAutofix>,
+    /// Verible `--autofix_output_file=`. `None` sends no flag; the mode that
+    /// needs it (`patch*`, `generate-waiver`) decides whether it is meaningful.
+    pub autofix_output_file: Option<PathBuf>,
+    /// Slang's own `--waiver-file <toml>`: ONE TOML waiver document
+    /// (`[[waivers]]` blocks). Distinct from [`Self::waiver_files`], which is
+    /// verible's comma-joined `--waiver_files=` list. `None` sends no flag.
+    pub slang_waiver_file: Option<PathBuf>,
 }
 
 impl Default for EngineOptions {
@@ -221,6 +248,9 @@ impl Default for EngineOptions {
             waiver_files: Vec::new(),
             slang_suppressions: Vec::new(),
             error_limit: None,
+            autofix: None,
+            autofix_output_file: None,
+            slang_waiver_file: None,
         }
     }
 }
@@ -258,6 +288,11 @@ pub enum LintFailure {
     /// The process exited without producing a usable JSON file.
     MissingOutput {
         exit_code: Option<i32>,
+        /// The Unix signal that terminated the tool when it crashed instead of
+        /// exiting (`None` for a normal exit and on non-Unix hosts). Without it
+        /// a crash is indistinguishable from "no result", so `SIGSEGV` /
+        /// `SIGABRT` would be lost before the message reaches the UI.
+        signal: Option<i32>,
         stderr: String,
     },
     /// The JSON file could not be parsed.
@@ -309,15 +344,32 @@ impl LintFailure {
             ),
             Self::Spawn { message } => format!("slang could not start: {message}"),
             Self::Timeout { after } => {
-                format!("slang timed out after {} ms", after.as_millis())
+                // "at N seconds" is what a user reads; the millisecond count
+                // stays for the exact configured bound.
+                format!(
+                    "slang timed out at {} seconds ({} ms)",
+                    after.as_secs_f64(),
+                    after.as_millis()
+                )
             }
             Self::Cancelled => "lint cancelled".to_string(),
-            Self::MissingOutput { exit_code, stderr } => {
-                let base = match exit_code {
-                    Some(code) => {
+            Self::MissingOutput {
+                exit_code,
+                signal,
+                stderr,
+            } => {
+                let base = match (exit_code, signal) {
+                    (_, Some(signal)) => format!(
+                        "the lint tool was terminated by signal {signal}{}",
+                        match signal_name(*signal) {
+                            Some(name) => format!(" ({name})"),
+                            None => String::new(),
+                        }
+                    ),
+                    (Some(code), None) => {
                         format!("the lint tool exited with code {code} and produced no diagnostics")
                     }
-                    None => "the lint tool terminated without a result".to_string(),
+                    (None, None) => "the lint tool terminated without a result".to_string(),
                 };
                 // The child's stderr is the only witness when a tool dies before
                 // it can write JSON (e.g. the loader's `GLIBC_… not found`);
@@ -361,6 +413,25 @@ impl LintFailure {
     }
 }
 
+/// The familiar name of a Unix signal, for the crash sentence. `None` for a
+/// number this code does not name: the number itself is still shown.
+pub(crate) const fn signal_name(signal: i32) -> Option<&'static str> {
+    Some(match signal {
+        2 => "SIGINT",
+        3 => "SIGQUIT",
+        4 => "SIGILL",
+        5 => "SIGTRAP",
+        6 => "SIGABRT",
+        8 => "SIGFPE",
+        9 => "SIGKILL",
+        11 => "SIGSEGV",
+        13 => "SIGPIPE",
+        14 => "SIGALRM",
+        15 => "SIGTERM",
+        _ => return None,
+    })
+}
+
 impl fmt::Display for LintFailure {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
@@ -374,9 +445,13 @@ impl fmt::Display for LintFailure {
             Self::Spawn { message } => write!(f, "spawn failed: {message}"),
             Self::Timeout { after } => write!(f, "timed out after {after:?}"),
             Self::Cancelled => f.write_str("cancelled"),
-            Self::MissingOutput { exit_code, stderr } => write!(
+            Self::MissingOutput {
+                exit_code,
+                signal,
+                stderr,
+            } => write!(
                 f,
-                "no JSON output (exit {exit_code:?}); stderr: {}",
+                "no JSON output (exit {exit_code:?}, signal {signal:?}); stderr: {}",
                 stderr.lines().next().unwrap_or("")
             ),
             Self::InvalidJson { message, .. } => write!(f, "invalid diagnostics JSON: {message}"),
@@ -419,6 +494,7 @@ mod tests {
     fn missing_output_message_names_the_first_non_empty_stderr_line() {
         let failure = LintFailure::MissingOutput {
             exit_code: Some(1),
+            signal: None,
             stderr: "\n  version `GLIBC_2.35' not found (required by libc.so.6)\nmore\n"
                 .to_string(),
         };
@@ -508,11 +584,26 @@ mod tests {
     fn missing_output_message_without_stderr_keeps_the_short_form() {
         let failure = LintFailure::MissingOutput {
             exit_code: None,
+            signal: None,
             stderr: String::new(),
         };
         assert_eq!(
             failure.user_message(),
             "the lint tool terminated without a result"
+        );
+    }
+
+    #[test]
+    fn missing_output_message_names_the_signal_that_killed_the_tool() {
+        let failure = LintFailure::MissingOutput {
+            exit_code: None,
+            signal: Some(11),
+            stderr: String::new(),
+        };
+        let message = failure.user_message();
+        assert!(
+            message.contains("signal 11") && message.contains("SIGSEGV"),
+            "a crash names its signal instead of reading as 'no result': {message}"
         );
     }
 }

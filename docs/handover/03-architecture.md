@@ -10,7 +10,7 @@
 
 ## 0. 三行结论
 
-- 能跑的是**应用外壳**：主窗口、菜单、6 个 dock、分屏、会话、主题；`vedit-app` 确实被构建（`src/app/CMakeLists.txt:42`）。
+- 能跑的是**应用外壳**：主窗口、菜单、5 个 dock（file-tree / search / terminal / vcs / outline）、分屏、会话、主题；`vedit-app` 确实被构建（`src/app/CMakeLists.txt:42`）。
 - **编辑器和 tree-sitter 着色没有进产品**：`vedit-app` 用 `DemoEditorProvider`（QPlainTextEdit），syntax 三个 lane 只编译成静态库并跑 ctest（§6 G1/G2）。
 - **打包链装的不是 `vedit-app`**：`packaging/runtime/` 把 M0 smoke 装成 `bin/vedit-m0-smoke`（§6 G7）。
 
@@ -95,22 +95,28 @@ C13 说明了为什么需要这些接缝：语义高亮必须走 KTextEditor 宿
 2. 解析命令行：`--state-dir`、`--project`、`--theme`、`--selfcheck`、`--screenshots`、`--no-session-restore`、`--hold`（`:357-383`）。
 3. `--selfcheck` 走 `runSelfCheck()`（`:385-387`）；`--screenshots` 走 `captureScreenshots()`（`:388-390`）；两者都在 `installPanels()` 之前返回（§6 G6）。
 4. 交互模式构造 `ApplicationShell shell(options)`（`src/app/main.cpp:392`）。构造函数（`src/app/app_shell.cpp:31-92`）依次：解析 stateDir（`:39-42`）→ `SessionStore`/`ShortcutStore`（`:43-50`）→ `PanelRegistry`/`CommandRegistry`/`ThemeManager`（`:52-55`）→ `EditorArea` + `DemoEditorProvider`（`:34,57-59`）→ `buildUi()`/`registerPanels()`/`registerCommands()`/`buildMenuBar()`（`:66-69`）→ 恢复会话或建默认布局（`:71-89`）。
-5. `installPanels(shell, {projectRoot, stateDir})`（`src/app/main.cpp:393`）→ `src/workspace/integration.cpp:17-31`：按编译宏调用 `installPalette` / `installFileTree` / `installSearch`。
+5. `installPanels(shell, {projectRoot, stateDir})`（`src/app/main.cpp`）→ `src/workspace/integration.cpp`：按 `VEDIT_WORKSPACE_HAVE_<LANE>` 宏依次调用 `installJump` / `installPalette` / `installFileTree` / `installSearch` / `installProject` / `installModuleTree` / `installDiagnostics` / `installVcs` / `installSettings`，batch 20261110 起再追加 `installRename` / `installVhdl` / `installScala`（三条 lane 的宏在目录与 `<lane>/<lane>_integration.cpp` 同时存在时才定义，落地前不参与编译）。
 6. `shell.panels()->setFactory("terminal", terminalPanelFactory())`（`src/app/main.cpp:396-397`）把终端 lane 的工厂装进 `terminal` dock。
 7. `shell.show()` + `app.exec()`（`:398-404`）。
 
 ### 3.2 面板注册
 
-`ApplicationShell::registerPanels()`（`src/app/app_shell.cpp:156-179`）只注册 **spec**（id/title/owner/area），不创建内容；`PanelRegistry::createContent()` 在没有 factory 时返回占位控件（`src/app/panel_registry.cpp:97-105`；占位实现 `:15-44`）。`setFactory()` 只影响**之后**的插入（`panel_registry.cpp:84-90`）。
+`ApplicationShell::registerPanels()` 只注册 **spec**（id/title/owner/area），不创建内容；`setFactory()` 只影响**之后**的插入。
+
+**Batch 20261110 更正（本节以代码为准）：**
+
+- **占位 seam 已删除。** spec 没有 factory（或 factory 返回 `nullptr`）时 `PanelRegistry::insert()` 直接返回 `nullptr`，**dock 根本不创建**，不会再往 dock 里塞开发文本（旧的 `Content seam: … lane` / `panel-placeholder-*` 已随 `makePlaceholder()`、`createContent()` 一起删除）。`setPlaceholderHint()` 保留为**空实现**，只因为 `src/workspace/module_tree/module_tree_integration.cpp` 仍在调用它（该文件不在本任务的写范围内）。
+- **`settings` 不是面板。** T132 起设置是模态 Preferences 对话框（`ApplicationShell::setPreferencesOpener()` → `src/workspace/settings/settings_integration.cpp`），`registerPanels()` 里没有 `settings` spec；旧表把它写成「占位 dock」是错的。
+- **`vcs` 与 `outline` 都有 factory。** `installVcs()`（`src/workspace/vcs/vcs_integration.cpp`）注册 `vcs`；diagnostics lane 的 `installDiagnostics()`（`src/workspace/diagnostics/diagnostics_integration.cpp`）注册 `outline`。
 
 | 面板 id | shell 里登记的 owner | 工厂现状 | 内容现状 |
 |---|---|---|---|
-| `file-tree` | `workspace`（`app_shell.cpp:174`） | `installFileTree()` → `setFactory`（`filetree_integration.cpp:26`） | 真实文件树 |
-| `search` | `workspace`（`:175`） | `installSearch()` → `setFactory`（`search_integration.cpp:17`） | 真实搜索面板 |
-| `terminal` | `tools`（`:176`） | `main.cpp:396-397` | 真实终端 |
-| `vcs` | `vcs`（`:177`） | **无** | 占位（`panel_registry.cpp:15-44`） |
-| `settings` | `settings`（`:178`） | **无** | 占位 |
-| `outline` | `editor/syntax`（`:179`） | **无** | 占位 |
+| `file-tree` | `workspace` | `installFileTree()` → `setFactory` | 真实文件树 |
+| `search` | `workspace` | `installSearch()` → `setFactory` | 真实搜索面板 |
+| `terminal` | `tools` | `main.cpp` 的 `terminalPanelFactory()` | 真实终端 |
+| `vcs` | `vcs` | `installVcs()` → `setFactory` | 真实 VCS 面板 |
+| `outline` | `editor/syntax` | diagnostics lane 的 `installDiagnostics()` → `setFactory` | 真实 outline |
+| ~~`settings`~~ | — | — | **不是 dock**：模态 Preferences 对话框（T132） |
 
 ### 3.3 `src/app` 怎么把 lane 装起来
 
@@ -207,7 +213,7 @@ KSyntaxHighlighting 通过 `QStandardPaths` 找定义（F2 形态保留 `NO_STAN
 | G2 | **syntax 三个 lane 编译了但没链接进产品** | `src/app/CMakeLists.txt:30-35,43,47-49,108` 只链 app_shell/terminal/workspace；本机 `target/qt6-build/build.ninja:1185` 的 `vedit-app` 链接行没有 `libvedit_syntax_provider.a`/`libvedit_syntax_kde.a`/`libvedit_syntax_grammars.a` | 产品里没有 `SyntaxProvider`、没有 `KsyntaxData`、没有 tree-sitter；`ctest` 里的 provider/grammar/kde 测试只证明库自己可用，不证明产品可用 |
 | G3 | **根 configure 的编译期 grammar 是 `none`** | `src/syntax/provider/CMakeLists.txt:25` 先写 cache `VEDIT_SYNTAX_GRAMMAR=none`；`src/syntax/grammars/CMakeLists.txt:36` 的 `set(... CACHE ...)` 不会覆盖已有 cache；生成头 `target/qt6-build/src/syntax/provider/generated/grammar_config_generated.h:5` 为 `kCompiledGrammar="none"`；`SyntaxService` 构造因此不设 `active_`（`syntax_service.cpp:15-21`），`available()==false`（`:62-70`） | 即使按 G2 把库链进去，provider 默认也不工作；必须在启动时 `activate("verilog")` 或把 configure 改成 `-DVEDIT_SYNTAX_GRAMMAR=verilog` |
 | G4 | **overlay lane 不存在，C16/C17 没落点** | 根 `CMakeLists.txt:66` 列了 `src/syntax/overlay`，目录不存在，configure 跳过（`target/build-qt-green.log:117`）；`src/` 内无 `MovingRange`/`OverlayRegistry` 产品代码；`OwnerArbiter` 只有单测调用（`test_syntax_provider.cpp:59-61`） | 没有 tree-sitter 着色；C16 的单一 owner 策略没有执行者；C17 的 1024/行、应用侧主题解析等结论只停在证据里 |
-| G5 | **6 个 dock 只有 3 个有内容** | 6 个 spec 在 `app_shell.cpp:174-179`；只有 file-tree/search/terminal 注册 factory；vcs/settings/outline 永远走占位（`panel_registry.cpp:97-105`、`:15-44`） | 侧栏/底部有界面但点开是空状态；VCS、设置、outline 三条 lane 在树里不存在（本轮 `ls src` 无 `vcs/`、`settings/`、`tools/`） |
+| G5 | ~~**6 个 dock 只有 3 个有内容**~~ **（batch 20261110 复核：已不成立，行保留为历史记录）** | 复核结果：`vcs` 有 `installVcs()`、`outline` 有 diagnostics lane 的 factory、`settings` 从来不是 dock（T132 模态对话框）；占位 seam 已删除（`PanelRegistry::insert()` 无 factory 时返回 `nullptr`），旧证据 `panel_registry.cpp:97-105`/`:15-44` 已不存在 | 不再有「点开是占位/空状态」的 dock；一个没有被任何 lane 拥有的 spec **不渲染**，也不出现开发文本 |
 | G6 | **app-shell 自测不测 lane 接线** | `--selfcheck` 只查注册表/布局（`main.cpp:110-131`）并在 `:385-387` 返回；`installPanels`/`setFactory` 在 `:392-397` 才执行；截图模式同样不装 lane（`:301-332`） | `vedit-app-shell-selftest` 通过 ≠ 面板有内容；它测的是 shell 骨架 |
 | G7 | **AppImage 装的是 M0 smoke，不是 `vedit-app`** | `assemble-appdir.sh:27,62` 只把 `cmake/smoke/vedit-m0-smoke` 装成 `bin/vedit-m0-smoke`；`AppRun:67-68` 先找 `bin/vd-app`（从未安装，本轮 `grep -rn vd-app packaging/runtime` 只命中 `AppRun:67` 这一处引用，无安装步骤），再回退 smoke；`build.sh:19` 的 preflight 也只引用 smoke | 打包链、AppRun、F2 隔离、CentOS 探针全绿，但跑的是冒烟程序；`vedit-app` 的终端/工作区/主题没有被交付验证过 |
 | G8 | **filetree 不在根 ctest，palette bench 不是测试** | `src/workspace/filetree/CMakeLists.txt:67-69` 让测试默认跟随 standalone，根构建 standalone=OFF，所以 filetree 的 demo/ctest 不构建；本机 cache 也是 `VEDIT_BUILD_FILETREE_TESTS:BOOL=OFF`（`target/qt6-build/CMakeCache.txt:463`）；本机 9 个 ctest（`target/build-qt-green.log:254-272`）没有 `vedit-filetree-tests`；palette bench 只 `add_executable`（`src/workspace/palette/CMakeLists.txt:43-45`） | 「ctest 全绿」不覆盖文件树行为；文件树也没有独立评审 verdict（`docs/plans/v2-slices.md:48-51`） |
@@ -219,7 +225,7 @@ KSyntaxHighlighting 通过 `QStandardPaths` 找定义（F2 形态保留 `NO_STAN
 1. **先提交**现有 3 个修改文件；否则下面都只存在于工作树。
 2. 在 `main.cpp:392` 之后加**编辑内核注入**（一行，类需 T14 先实现）：`shell.setEditorProvider(std::make_unique<vedit::editor::KTextEditorProvider>())`。目前 `setEditorProvider()` 只有定义、没有调用（`app_shell.cpp:126-133`）。
 3. 在 `src/app/CMakeLists.txt:43` 之后把 `vedit_syntax_provider`/`vedit_syntax_kde`/`vedit_syntax_grammars` 链进 `vedit-app`，并在启动时 `SyntaxService::instance().activate("verilog")`（或把根 configure 的 `VEDIT_SYNTAX_GRAMMAR` 改为 `verilog`）。
-4. 为 `vcs`/`settings`/`outline` 各加一条 `shell.panels()->setFactory(...)`（各自 lane 落地后；目前三条 lane 都不存在）。
+4. ~~为 `vcs`/`settings`/`outline` 各加一条 `shell.panels()->setFactory(...)`~~ **（batch 20261110 更正：`vcs`/`outline` 的 factory 已存在；`settings` 是模态对话框、不是 dock。剩余动作是删掉 `module_tree_integration.cpp` 里两处 `setPlaceholderHint()` 调用，随后删除该空实现）。**
 5. 打包侧把 `assemble-appdir.sh:62` 的 smoke 换成 `target/qt6-build/src/app/vedit-app`，装成 `bin/vd-app`（`AppRun:67` 已经在找这个名字）。
 
 ### `src/editor` 当前状态

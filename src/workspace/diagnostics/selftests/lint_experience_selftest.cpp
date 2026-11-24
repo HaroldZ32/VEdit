@@ -14,6 +14,7 @@
 #include "diagnostic_hover.h"
 #include "diagnostics_controller.h"
 #include "diagnostics_integration.h"
+#include "diagnostics_panel.h"
 #include "project_lint_notice.h"
 #include "project_lint_trigger.h"
 #include "symbol_scan.h"
@@ -140,6 +141,12 @@ class FakeLsp final : public LspSessionBackend {
 public:
     BackendCapabilities capabilities;
     QVector<DiagnosticEntry> rowsForFile; ///< what requestDiagnostics answers
+    /// AC-2 (batch-20261118): model a server that answers the request but never
+    /// PUBLISHES a diagnostics set for the document.
+    bool neverPublishes = false;
+    /// AC-1 (batch-20261118): how often the controller pushed the project build
+    /// context to this backend once the session was Ready.
+    int buildContextPushes = 0;
     QStringList startedFiles;
     int startCount = 0;
     bool started = false;
@@ -180,10 +187,16 @@ public:
         polled.pending = false;
         polled.ready = true;
         polled.kind = ResponseKind::Diagnostics;
-        polled.diagnostics = rowsForFile;
+        polled.published = !neverPublishes;
+        polled.diagnostics = neverPublishes ? QVector<DiagnosticEntry>{} : rowsForFile;
         return polled;
     }
 
+    bool pushBuildContext(QString *) override
+    {
+        ++buildContextPushes;
+        return true;
+    }
     BackendCapabilities staticCapabilities() const override { return capabilities; }
     BackendCapabilities sessionCapabilities() const override { return capabilities; }
     QString backendName() const override { return QStringLiteral("fake-lsp"); }
@@ -530,6 +543,63 @@ int main(int argc, char **argv)
         check("dot.never-analyzed-unknown",
               controller.statusForFile(dir.filePath(QStringLiteral("nope.sv")))
                   == DiagnosticsController::FileStatus::Unknown);
+    }
+    {
+        // ===================================================================
+        // AC-2 (batch-20261118): a server that never publishes is NOT clean.
+        // The LSP answers the request but holds NO diagnostics set and returns
+        // no symbols. The panel must name the state; "no problems reported"
+        // would be a verdict nothing earned.
+        // ===================================================================
+        QTemporaryDir dir;
+        const QString a = projectFile(dir, QStringLiteral("a.sv"),
+                                      QStringLiteral("module a;\n  logic x;\nendmodule\n"));
+        auto lsp = std::make_unique<FakeLsp>();
+        FakeLsp *lspRaw = lsp.get();
+        lspRaw->neverPublishes = true;
+        auto slang = std::make_unique<FakeSlang>();
+        DiagnosticsController controller(std::move(lsp), std::move(slang));
+        controller.setConfiguration(QStringLiteral("/fake/slang-server"), dir.path());
+        // A PRESENT toolchain: the "backend is missing" line must not mask the
+        // not-analysed state this case is about.
+        ToolchainReport found;
+        found.verible.kind = ToolKind::Verible;
+        found.verible.name = QStringLiteral("verible-verilog-ls");
+        found.verible.path = QStringLiteral("/fake/verible-verilog-ls");
+        found.verible.source = ToolSource::Bundled;
+        found.slang.kind = ToolKind::Slang;
+        found.slang.name = QStringLiteral("slang");
+        found.slang.path = QStringLiteral("/fake/slang");
+        found.slang.source = ToolSource::Bundled;
+        controller.setToolchainReport(found);
+        check("ac2.analyze",
+              controller.analyzeFile(a, QStringLiteral("module a;\n  logic x;\nendmodule\n"),
+                                     false));
+        waitForRefresh(controller, [&controller]() { return controller.serverSilent(); }, 5000);
+        check("ac2.server-silent", controller.serverSilent());
+        // AC-1: the controller pushes the build context EXACTLY once the session
+        // is Ready (the fake counts the calls).
+        check("ac1.context-pushed-after-ready", lspRaw->buildContextPushes >= 1,
+              QStringLiteral("pushes=%1").arg(lspRaw->buildContextPushes));
+        check("ac2.not-counted-as-evaluated", !controller.lowerLayerAnalyzed(a),
+              QStringLiteral("analyzed=%1").arg(controller.lowerLayerAnalyzed(a) ? 1 : 0));
+        check("ac2.not-clean",
+              controller.statusForFile(a) != DiagnosticsController::FileStatus::Clean,
+              QStringLiteral("status=%1")
+                  .arg(static_cast<int>(controller.statusForFile(a))));
+        const QString reason = controller.realtimeReason();
+        check("ac2.reason-names-the-cause",
+              reason.contains(QStringLiteral("did not analyse this file")), reason);
+        DiagnosticsPanel panel(&controller);
+        panel.refreshFromController();
+        const QString text = panel.diagnosticsEmptyStateText();
+        check("ac2.empty-state-not-the-clean-text",
+              text.contains(QStringLiteral("Not analysed"))
+                  && !text.contains(QStringLiteral("no problems reported")),
+              text);
+        check("ac2.outline-state-names-the-cause",
+              panel.emptyStateText().contains(QStringLiteral("did not analyse this file")),
+              panel.emptyStateText());
     }
     {
         // N1: the CLEAN verdict belongs to the CURRENT analysis. A file the LSP

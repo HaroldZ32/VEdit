@@ -1,9 +1,14 @@
 //! A project-wide lint pass: job + progress + real cancellation (T138).
 //!
 //! One batch runs the selected engine over the project's file set on a worker
-//! thread, one file at a time (the tools are heavy; parallel instances would
-//! compete for the same machine and make progress meaningless). The caller never
-//! blocks:
+//! thread. Slang runs as ONE single-unit process over the whole set, because
+//! only that shares preprocessor state across files - a `` `define `` in one
+//! file can then reach the next (batch 20261110d). When that single pass cannot
+//! be used faithfully it FALLS BACK to one process per file and records the
+//! reason ([`BatchReport::fallback`]); verible always runs per file, since its
+//! textual findings have no cross-file unit. Files are never run in parallel:
+//! the tools are heavy and parallel instances would compete for the same
+//! machine. The caller never blocks:
 //!
 //! * [`BatchHandle::start`] returns immediately;
 //! * [`BatchHandle::progress`] is a cheap snapshot (`done` / `total` / the current
@@ -25,9 +30,10 @@ use std::sync::{Arc, Mutex, MutexGuard};
 use std::thread::JoinHandle;
 use std::time::Instant;
 
-use crate::diagnostic::Diagnostic;
+use crate::binary::BinaryResolution;
+use crate::diagnostic::{Diagnostic, Severity};
 use crate::engine::LintEngine;
-use crate::service::LintService;
+use crate::service::{LintService, ProjectPass};
 use crate::{EngineOptions, LintFailure};
 
 /// Lifecycle of one project-wide pass.
@@ -154,6 +160,23 @@ pub struct BatchReport {
     pub failure: Option<LintFailure>,
     /// Per-file failures that did not stop the pass.
     pub failures: Vec<BatchFileFailure>,
+    /// Set when the ONE whole-project slang pass was attempted and abandoned:
+    /// the reason, in one line. The pass then falls back to per-file linting.
+    ///
+    /// A fallback is NEVER silent: the whole-set result is refused whenever the
+    /// split cannot reproduce the per-file verdict faithfully (the reason is
+    /// recorded here), instead of publishing a verdict the per-file pass would
+    /// not produce (`crate::service::LintService::lint_project`).
+    pub fallback: Option<String>,
+    /// How the engine's binary was resolved (the FIRST file's resolution; the
+    /// pass resolves once per run and every file walks the same stages).
+    ///
+    /// T8 / AC-T8.1: the product order FALLS BACK (explicit -> bundled -> local
+    /// -> imported -> PATH -> env), so a pass that succeeds with a broken
+    /// explicit setting must still SHOW which stage supplied the tool and that
+    /// the explicit stage was attempted and missed — otherwise "my setting did
+    /// not take effect" becomes invisible.
+    pub resolution: Option<BinaryResolution>,
     /// Completion counter at the end.
     pub done: usize,
     /// Snapshot size.
@@ -226,6 +249,11 @@ impl BatchReport {
                             String::new()
                         }
                     ));
+                }
+                if let Some(reason) = &self.fallback {
+                    // Naming the fallback keeps a per-file pass from looking
+                    // like the single project pass the fix introduced.
+                    line.push_str(&format!(", project pass fell back: {reason}"));
                 }
                 line
             }
@@ -375,6 +403,37 @@ impl Drop for BatchHandle {
     }
 }
 
+/// Fold one diagnostic into the pass rows: de-duplicate by (file, position,
+/// code, message), count repeats that collapse, and count what the pass cap
+/// dropped. ONE helper for the project pass and the per-file pass so the two
+/// paths cannot count differently.
+fn retain_row(
+    diagnostics: &mut Vec<BatchDiagnostic>,
+    seen: &mut std::collections::HashMap<String, usize>,
+    file: &std::path::Path,
+    diagnostic: Diagnostic,
+    max_pass: usize,
+    collapsed: &mut usize,
+    dropped: &mut usize,
+) {
+    let key = batch_dedupe_key(file, &diagnostic);
+    if let Some(&retained) = seen.get(&key) {
+        diagnostics[retained].diagnostic.repeat += diagnostic.repeat;
+        *collapsed += diagnostic.repeat;
+    } else if diagnostics.len() < max_pass {
+        seen.insert(key, diagnostics.len());
+        // The parser already collapses repetitions, so a new row may stand for
+        // more than one raw finding.
+        *collapsed += diagnostic.repeat.saturating_sub(1);
+        diagnostics.push(BatchDiagnostic {
+            file: file.to_path_buf(),
+            diagnostic,
+        });
+    } else {
+        *dropped += diagnostic.repeat;
+    }
+}
+
 fn run_batch(inner: &Arc<BatchInner>, files: Vec<PathBuf>, options: EngineOptions) {
     let started = Instant::now();
     let service = LintService::new();
@@ -403,80 +462,161 @@ fn run_batch(inner: &Arc<BatchInner>, files: Vec<PathBuf>, options: EngineOption
         format!("running: 0/{}", files.len()),
     );
 
-    for file in &files {
-        if inner.cancel.load(Ordering::SeqCst) {
-            break;
-        }
+    let mut resolution: Option<BinaryResolution> = None;
+    let mut fallback: Option<String> = None;
+    let mut project_covered = false;
+
+    // Slang gets ONE process for the whole file set: only a single-unit run can
+    // carry a `define from one file into the next (a per-file pass starts every
+    // process with an empty preprocessor, so cross-file macros are structurally
+    // impossible there). Verible stays per file: its findings are textual and
+    // it has no cross-file unit. A single file needs no project pass - the two
+    // invocations are the same process shape.
+    if options.engine == LintEngine::Slang && files.len() > 1 {
         inner.set(
             BatchPhase::Running,
-            done,
-            Some(file.clone()),
-            format!("linting {} ({}/{})", file.display(), done + 1, files.len()),
+            0,
+            None,
+            format!(
+                "one project pass: {} file(s) (cross-file defines visible)",
+                files.len()
+            ),
         );
-        let report = service.lint_with_cancel(file, &options, Arc::clone(&inner.cancel));
-        if let Some(failure) = &report.failure {
-            if matches!(
-                failure,
-                LintFailure::BinaryNotFound { .. } | LintFailure::Spawn { .. }
-            ) {
-                let (stage, tool) = (report.stage, report.tool.clone());
-                {
-                    let mut progress = inner.lock_progress();
-                    progress.stage = Some(stage);
+        match service.lint_project(&files, &options, Arc::clone(&inner.cancel)) {
+            ProjectPass::Ready(project) => {
+                resolution = Some(project.resolution);
+                total_diagnostics += project.total_diagnostics;
+                dropped += project.dropped;
+                truncated |= project.truncated;
+                for (file, diagnostic) in project.rows {
+                    retain_row(
+                        &mut diagnostics,
+                        &mut seen,
+                        &file,
+                        diagnostic,
+                        max_pass,
+                        &mut collapsed,
+                        &mut dropped,
+                    );
                 }
-                inner.set(
-                    BatchPhase::Failed,
-                    done,
-                    Some(file.clone()),
-                    format!("failed at {stage} ({tool}): {}", failure.user_message()),
-                );
-                unrecoverable = Some(LintFailure::Spawn {
-                    message: format!(
-                        "{} at {} while linting {}: {}",
-                        tool,
-                        stage,
-                        file.display(),
-                        failure.user_message()
-                    ),
-                });
-                break;
+                done = files.len();
+                project_covered = true;
             }
-            if matches!(failure, LintFailure::Cancelled) {
-                // Our own cancel reached the runner: stop without recording the
-                // file as failed.
-                break;
+            ProjectPass::Cancelled => {
+                // The flag stays raised; the per-file loop below stops before
+                // starting any file, so the report is Cancelled with 0 rows.
             }
-            failures.push(BatchFileFailure {
-                file: file.clone(),
-                message: failure.user_message(),
-                stage: report.stage,
-                tool: report.tool.clone(),
-            });
-            done += 1;
-            continue;
+            ProjectPass::Unusable(reason) => {
+                // Recorded, never silent: the report names why the single pass
+                // could not be used, and the rows below come from the per-file
+                // verdict instead.
+                fallback = Some(reason);
+            }
         }
-        total_diagnostics += report.total_diagnostics;
-        dropped += report.dropped;
-        truncated |= report.truncated;
-        for diagnostic in report.diagnostics {
-            let key = batch_dedupe_key(file, &diagnostic);
-            if let Some(&retained) = seen.get(&key) {
-                diagnostics[retained].diagnostic.repeat += diagnostic.repeat;
-                collapsed += diagnostic.repeat;
-            } else if diagnostics.len() < max_pass {
-                seen.insert(key, diagnostics.len());
-                // The per-file parser already collapses repetitions, so a new
-                // row may stand for more than one raw finding.
-                collapsed += diagnostic.repeat.saturating_sub(1);
+    }
+
+    if !project_covered {
+        for file in &files {
+            if inner.cancel.load(Ordering::SeqCst) {
+                break;
+            }
+            inner.set(
+                BatchPhase::Running,
+                done,
+                Some(file.clone()),
+                format!("linting {} ({}/{})", file.display(), done + 1, files.len()),
+            );
+            let report = service.lint_with_cancel(file, &options, Arc::clone(&inner.cancel));
+            if resolution.is_none() {
+                // The first run is the pass's resolution: none of the inputs change
+                // between files.
+                resolution = Some(report.binary.clone());
+            }
+            if let Some(failure) = &report.failure {
+                if matches!(
+                    failure,
+                    LintFailure::BinaryNotFound { .. } | LintFailure::Spawn { .. }
+                ) {
+                    let (stage, tool) = (report.stage, report.tool.clone());
+                    {
+                        let mut progress = inner.lock_progress();
+                        progress.stage = Some(stage);
+                    }
+                    inner.set(
+                        BatchPhase::Failed,
+                        done,
+                        Some(file.clone()),
+                        format!("failed at {stage} ({tool}): {}", failure.user_message()),
+                    );
+                    unrecoverable = Some(LintFailure::Spawn {
+                        message: format!(
+                            "{} at {} while linting {}: {}",
+                            tool,
+                            stage,
+                            file.display(),
+                            failure.user_message()
+                        ),
+                    });
+                    break;
+                }
+                if matches!(failure, LintFailure::Cancelled) {
+                    // Our own cancel reached the runner: stop without recording the
+                    // file as failed.
+                    break;
+                }
+                failures.push(BatchFileFailure {
+                    file: file.clone(),
+                    message: failure.user_message(),
+                    stage: report.stage,
+                    tool: report.tool.clone(),
+                });
+                // A file the engine could not process is NOT a clean file. The UI
+                // treats a covered file with zero rows as "no problems" and hides
+                // that file's other-engine rows, so the failure must travel as a
+                // diagnostic ROW. It is a status witness, not a finding: it bypasses
+                // the `max_pass` cap and is never counted in `total_diagnostics` /
+                // `dropped`. One row per failed file, whatever killed the engine.
                 diagnostics.push(BatchDiagnostic {
                     file: file.clone(),
-                    diagnostic,
+                    diagnostic: Diagnostic {
+                        severity: Severity::Error,
+                        message: format!(
+                            "{} failed at {}: {}",
+                            report.tool,
+                            report.stage,
+                            failure.user_message()
+                        ),
+                        code: "engine-failed".to_string(),
+                        option_name: None,
+                        location: None,
+                        ranges: Vec::new(),
+                        symbol_path: None,
+                        raw: serde_json::Value::Null,
+                        editor_range: None,
+                        conversion_note: None,
+                        parse_note: None,
+                        repeat: 1,
+                    },
                 });
-            } else {
-                dropped += diagnostic.repeat;
+                done += 1;
+                continue;
             }
+            total_diagnostics += report.total_diagnostics;
+            dropped += report.dropped;
+            truncated |= report.truncated;
+            for diagnostic in report.diagnostics {
+                retain_row(
+                    &mut diagnostics,
+                    &mut seen,
+                    file,
+                    diagnostic,
+                    max_pass,
+                    &mut collapsed,
+                    &mut dropped,
+                );
+            }
+            done += 1;
         }
-        done += 1;
     }
 
     let cancelled = inner.cancel.load(Ordering::SeqCst);
@@ -500,6 +640,8 @@ fn run_batch(inner: &Arc<BatchInner>, files: Vec<PathBuf>, options: EngineOption
         files_linted: done,
         failure,
         failures,
+        fallback,
+        resolution,
         done,
         total: files.len(),
         elapsed: started.elapsed(),
@@ -542,6 +684,7 @@ fn batch_dedupe_key(file: &std::path::Path, diagnostic: &Diagnostic) -> String {
 #[cfg(test)]
 mod tests {
     use super::{BatchHandle, BatchPhase};
+    use crate::binary::{AttemptOutcome, AttemptSource};
     use crate::{EngineOptions, LintEngine};
     use std::path::PathBuf;
     use std::time::{Duration, Instant};
@@ -557,12 +700,21 @@ mod tests {
         assert!(BatchPhase::Cancelled.is_terminal());
     }
 
+    /// Batch 20261110b (authorised contract change, AC-T8.1): the product order
+    /// FALLS BACK, so a broken explicit path no longer ends the pass — it is the
+    /// FIRST stage's miss and a later stage supplies the tool. The old assertions
+    /// (`phase == Failed`, `failure.is_some()`, summary contains "failed") pinned
+    /// the pre-T8 dead end. The function and its assertion count are kept (the
+    /// count is HIGHER now), and the report must NAME the stage/tool that ran and
+    /// show that the explicit stage was attempted and missed. Old->new basis and
+    /// the before/after logs: evidence/batch-20261110b/lint-engine/AUTHORIZATION.md.
     #[test]
     fn a_missing_binary_fails_the_pass_with_its_stage_and_tool() {
         let files = vec![PathBuf::from("/tmp/does-not-exist.sv")];
+        let explicit = PathBuf::from("/nonexistent/slang-binary");
         let options = EngineOptions {
             engine: LintEngine::Slang,
-            slang_binary: Some(PathBuf::from("/nonexistent/slang-binary")),
+            slang_binary: Some(explicit.clone()),
             timeout: Duration::from_millis(500),
             ..EngineOptions::default()
         };
@@ -576,9 +728,64 @@ mod tests {
             assert!(Instant::now() < deadline, "batch did not finish");
             std::thread::sleep(Duration::from_millis(10));
         };
-        assert_eq!(report.phase, BatchPhase::Failed);
-        assert_eq!(report.done, 0);
-        assert!(report.failure.is_some());
-        assert!(report.summary().contains("failed"));
+        // (1) The pass ran to completion: the explicit miss fell back instead of
+        // ending the pass (the new order's contract).
+        assert_eq!(report.phase, BatchPhase::Finished);
+        // (2) The report NAMES which stage supplied the tool.
+        let resolution = report.resolution.clone().unwrap_or_else(|| {
+            panic!("the report must carry the resolution: {}", report.summary())
+        });
+        let chosen = resolution.chosen.clone().unwrap_or_else(|| {
+            panic!(
+                "a fallback stage must supply the tool: {}",
+                resolution.describe()
+            )
+        });
+        let found = resolution
+            .attempts
+            .iter()
+            .find(|attempt| attempt.outcome == AttemptOutcome::Found)
+            .unwrap_or_else(|| {
+                panic!(
+                    "a Found attempt must be recorded: {}",
+                    resolution.describe()
+                )
+            });
+        assert_eq!(found.path.as_deref(), Some(chosen.as_path()));
+        assert!(
+            found.source.stage() >= 2,
+            "the tool came from a FALLBACK stage, not the explicit one: {}",
+            found.source.stage_label()
+        );
+        assert_eq!(
+            chosen.file_name().and_then(|name| name.to_str()),
+            Some(report.tool.as_str()),
+            "the report's tool names the binary that ran"
+        );
+        // (3) The explicit stage is VISIBLY attempted and missed, so a broken
+        // user setting cannot hide behind a successful fallback.
+        let explicit_attempt = resolution
+            .attempts
+            .iter()
+            .find(|attempt| attempt.source == AttemptSource::ExplicitOption)
+            .unwrap_or_else(|| {
+                panic!(
+                    "the explicit stage must be recorded: {}",
+                    resolution.describe()
+                )
+            });
+        assert_eq!(explicit_attempt.outcome, AttemptOutcome::NotFound);
+        assert_eq!(explicit_attempt.path.as_deref(), Some(explicit.as_path()));
+        // (4) The missing SOURCE file is still reported per file (the pass keeps
+        // going, and the report says which file it lost).
+        assert!(
+            report
+                .failures
+                .iter()
+                .any(|failure| failure.message.contains("does-not-exist")),
+            "the per-file failure names the file: {:?}",
+            report.failures
+        );
+        assert!(report.summary().contains("slang"), "{}", report.summary());
     }
 }

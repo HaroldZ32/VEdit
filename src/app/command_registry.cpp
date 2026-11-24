@@ -138,6 +138,10 @@ void CommandRegistry::setStore(IShortcutStore *store)
 {
     store_ = store;
     refreshShortcuts();
+    // batch-20261110d (T5): a store installed AFTER commands exist must obey the
+    // same invariant as registration — a persisted override that collides with
+    // another command's binding is dropped, not shipped as a dead key.
+    repairStoredShortcutOverrides();
 }
 
 IShortcutStore *CommandRegistry::store() const
@@ -159,23 +163,6 @@ QAction *CommandRegistry::add(CommandSpec spec)
     const QList<QKeySequence> initial = effectiveFor(spec.id, entry);
     action->setShortcuts(initial);
     action->setShortcutVisibleInContextMenu(true);
-    const QKeySequence shortcut = initial.isEmpty() ? QKeySequence() : initial.first();
-
-    // U3-F1 (A2 review H1): a duplicate default is a product defect — Qt treats
-    // the sequence as ambiguous and drops BOTH bindings, and Preferences shows
-    // the same sequence for two commands. Warn at registration so the class can
-    // never recur silently; the product selfcheck also asserts the table is
-    // duplicate-free and prints the bindings.
-    if (!shortcut.isEmpty()) {
-        for (auto it = entries_.constBegin(); it != entries_.constEnd(); ++it) {
-            if (it->action != nullptr && it->action->shortcut() == shortcut) {
-                qWarning("CommandRegistry: duplicate shortcut '%s' for '%s' and '%s'",
-                         qPrintable(shortcut.toString()), qPrintable(it.key()),
-                         qPrintable(spec.id));
-                break;
-            }
-        }
-    }
 
     if (!menus_.contains(spec.menu)) {
         menus_.append(spec.menu);
@@ -184,6 +171,32 @@ QAction *CommandRegistry::add(CommandSpec spec)
     const QString commandId = spec.id;
     entry.spec = std::move(spec);
     entries_.insert(commandId, entry);
+
+    // batch-20261110d (T5): a PERSISTED override that collides with a command
+    // registered earlier is dropped here, so it can never become a dead
+    // ambiguous key. Runs BEFORE the duplicate warning below, so a repaired
+    // legacy binding is not reported as a shipped defect.
+    repairStoredShortcutOverrides();
+
+    // U3-F1 (A2 review H1): a duplicate default is a product defect — Qt treats
+    // the sequence as ambiguous and drops BOTH bindings, and Preferences shows
+    // the same sequence for two commands. Warn at registration so the class can
+    // never recur silently; the product selfcheck also asserts the table is
+    // duplicate-free and prints the bindings.
+    const QKeySequence registeredShortcut = action->shortcut();
+    if (!registeredShortcut.isEmpty()) {
+        for (auto it = entries_.constBegin(); it != entries_.constEnd(); ++it) {
+            if (it.key() == commandId || it->action == nullptr) {
+                continue;
+            }
+            if (it->action->shortcut() == registeredShortcut) {
+                qWarning("CommandRegistry: duplicate shortcut '%s' for '%s' and '%s'",
+                         qPrintable(registeredShortcut.toString()), qPrintable(it.key()),
+                         qPrintable(commandId));
+                break;
+            }
+        }
+    }
 
     QObject::connect(action, &QAction::triggered, action, [this, commandId]() {
         const auto it = entries_.constFind(commandId);
@@ -309,6 +322,78 @@ bool CommandRegistry::reassignDefaultShortcut(const QString &id, const QKeySeque
     it->spec.defaultShortcut = sequence;
     it->action->setShortcuts(effectiveFor(id, it.value()));
     return true;
+}
+
+void CommandRegistry::repairStoredShortcutOverrides()
+{
+    if (store_ == nullptr) {
+        return;
+    }
+    // One repair per pass, then re-scan: dropping an override makes the command's
+    // DEFAULT set effective again, and that default may itself collide with a
+    // command registered later. The bound is order_.size() passes — every pass
+    // either repairs one command (a strictly smaller set of overrides) or stops.
+    for (int pass = 0; pass < order_.size(); ++pass) {
+        bool repaired = false;
+        for (int i = 0; i < order_.size() && !repaired; ++i) {
+            const QString id = order_.at(i);
+            auto entry = entries_.find(id);
+            if (entry == entries_.end() || entry->action == nullptr) {
+                continue;
+            }
+            const QList<QKeySequence> mine = entry->action->shortcuts();
+            for (int j = 0; j < order_.size() && !repaired; ++j) {
+                if (i == j) {
+                    continue;
+                }
+                const QString otherId = order_.at(j);
+                auto other = entries_.find(otherId);
+                if (other == entries_.end() || other->action == nullptr) {
+                    continue;
+                }
+                for (const QKeySequence &sequence : other->action->shortcuts()) {
+                    if (sequence.isEmpty() || !mine.contains(sequence)) {
+                        continue;
+                    }
+                    // Only a PERSISTED override is repaired. Two shipped defaults
+                    // that collide stay untouched: that is a product defect and
+                    // duplicateShortcuts()/the selfcheck must report it, not lose
+                    // it to a silent rewrite.
+                    QString kept;
+                    QString dropped;
+                    if (hasUserOverride(id)) {
+                        kept = otherId;
+                        dropped = id;
+                        store_->clearShortcut(id);
+                        entry->action->setShortcuts(effectiveFor(id, entry.value()));
+                    } else if (hasUserOverride(otherId)) {
+                        kept = id;
+                        dropped = otherId;
+                        store_->clearShortcut(otherId);
+                        other->action->setShortcuts(effectiveFor(otherId, other.value()));
+                    }
+                    if (dropped.isEmpty()) {
+                        break;
+                    }
+                    const QString line =
+                        QStringLiteral("%1: kept %2, dropped the stored binding of %3")
+                            .arg(sequence.toString(QKeySequence::PortableText), kept, dropped);
+                    repairs_.append(line);
+                    qWarning("CommandRegistry: %s", qPrintable(line));
+                    repaired = true;
+                    break;
+                }
+            }
+        }
+        if (!repaired) {
+            break;
+        }
+    }
+}
+
+QStringList CommandRegistry::shortcutRepairs() const
+{
+    return repairs_;
 }
 
 void CommandRegistry::refreshShortcuts()

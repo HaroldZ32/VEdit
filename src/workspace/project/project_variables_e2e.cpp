@@ -35,6 +35,7 @@
 #include <QStringList>
 #include <QTemporaryDir>
 #include <QThread>
+#include <QVariantMap>
 
 #include <cstdio>
 #include <functional>
@@ -116,6 +117,25 @@ bool applyDialog(vedit::workspace::project::ProjectPanel &panel,
     return panel.applyVariableTable(dialog.variableTable());
 }
 
+/// A61.7 (batch-20261115): open `root` and EXPLICITLY import its manifest - the
+/// step the product's Import Filelist / `.f` open performs. `open()` alone no
+/// longer expands anything (AC-2.1/2.5: no filelist, no project), which was this
+/// harness's implicit premise. The import starts the asynchronous expansion, so
+/// the existing `settled()`/wait checks become meaningful again.
+bool activateProject(vedit::workspace::project::ProjectModel &model, const QString &root)
+{
+    model.open(root);
+    QString error;
+    const bool imported =
+        model.importFilelists({QDir(root).absoluteFilePath(QStringLiteral("sources.f"))},
+                              &error);
+    if (!imported) {
+        std::printf("OBSERVED activate.failed root='%s' error='%s'\n", qPrintable(root),
+                    qPrintable(error));
+    }
+    return imported;
+}
+
 bool hasEntry(const QStringList &table, const QString &name)
 {
     for (const QString &entry : table) {
@@ -149,6 +169,15 @@ int main(int argc, char **argv)
     writeFile(sharedDir + QStringLiteral("/v1.sv"), QStringLiteral("module v1; endmodule\n"));
     writeFile(sharedDir + QStringLiteral("/v2.sv"), QStringLiteral("module v2; endmodule\n"));
     writeFile(rootB + QStringLiteral("/project.f"), QStringLiteral("../shared/$BVAR.sv\n"));
+    // A61.7 (batch-20261115): a folder is a PROJECT only once a filelist is
+    // EXPLICITLY imported (AC-2.1/2.5), so every root the harness opens needs its
+    // own manifest to import. The manifest carries the same line as `project.f`
+    // on purpose: the expansion resolves `$VAR` from the IMPORTED list, so the
+    // variable assertions no longer depend on root discovery picking `project.f`
+    // up. Duplicates are de-duplicated by canonical path (and the variable sets
+    // are name-keyed), so adding it changes no expectation.
+    writeFile(rootA + QStringLiteral("/sources.f"), QStringLiteral("../shared/$NEWVAR.sv\n"));
+    writeFile(rootB + QStringLiteral("/sources.f"), QStringLiteral("../shared/$BVAR.sv\n"));
     writeFile(sharedDir + QStringLiteral("/vb.sv"), QStringLiteral("module vb; endmodule\n"));
     const QString listedA = QFileInfo(sharedDir + QStringLiteral("/v1.sv")).absoluteFilePath();
     const QString listedB = QFileInfo(sharedDir + QStringLiteral("/vb.sv")).absoluteFilePath();
@@ -207,17 +236,56 @@ int main(int argc, char **argv)
               dialog.note());
     }
 
+    // batch-20261114 E2: the dialog says WHICH layer provides a name, from the
+    // same four tokens the Rust expansion reports.
+    {
+        ProjectVariablesDialog layered(
+            {QStringLiteral("REQ"), QStringLiteral("ENV")},
+            {{QStringLiteral("KNOWN"), QStringLiteral("1")}}, nullptr,
+            {{QStringLiteral("REQ"), QStringLiteral("missing")},
+             {QStringLiteral("KNOWN"), QStringLiteral("project")},
+             {QStringLiteral("ENV"), QStringLiteral("environment")}});
+        check("e2m.dialog.layer-project",
+              layered.rowLayer(QStringLiteral("KNOWN")) == QStringLiteral("project"),
+              layered.rowLayer(QStringLiteral("KNOWN")));
+        check("e2m.dialog.layer-environment",
+              layered.rowLayer(QStringLiteral("ENV")) == QStringLiteral("environment"),
+              layered.rowLayer(QStringLiteral("ENV")));
+        check("e2m.dialog.layer-required-missing",
+              layered.rowLayer(QStringLiteral("REQ")) == QStringLiteral("missing"),
+              layered.rowLayer(QStringLiteral("REQ")));
+        check("e2m.dialog.unknown-row-has-no-layer",
+              layered.rowLayer(QStringLiteral("NOT-A-ROW")).isEmpty());
+    }
+
     // =====================================================================
     // 2. The panel replaces the model's table; the expansion uses the value
     // =====================================================================
     const QString stateDir = dir.filePath(QStringLiteral("state"));
     auto model = std::make_unique<ProjectModel>(stateDir);
-    model->open(rootA);
+    check("rm3.gate.a-manifest-import", activateProject(*model, rootA));
     check("rm3.expand.missing-reported",
           waitFor([&]() { return model->missingVariables().contains(QStringLiteral("NEWVAR")); },
                   30000)
               && model->missingVariables() == QStringList{QStringLiteral("NEWVAR")},
           model->missingVariables().join(QLatin1Char(',')));
+
+    // batch-20261114 E1/E2: the model mirrors the ABI's referenced set + layer,
+    // and the payload the project lane publishes on `vedit.project.inputs`
+    // carries the SAME two parallel lists (the Environment page filters by them).
+    check("e2m.references.names",
+          model->referencedVariables() == QStringList{QStringLiteral("NEWVAR")},
+          model->referencedVariables().join(QLatin1Char(',')));
+    check("e2m.references.layer-missing",
+          model->referencedVariableLayer(QStringLiteral("NEWVAR")) == QStringLiteral("missing"),
+          model->referencedVariableLayer(QStringLiteral("NEWVAR")));
+    const QVariantMap published = model->expansionInputs();
+    check("e2m.inputs.referenced",
+          published.value(QStringLiteral("referencedVariables")).toStringList()
+                  == model->referencedVariables()
+              && published.value(QStringLiteral("referencedVariableLayers")).toStringList()
+                     == model->referencedVariableLayers(),
+          QStringLiteral("keys=%1").arg(published.keys().join(QLatin1Char(','))));
 
     ProjectPanel panel(model.get());
     panel.setInteractiveDialogs(false); // headless: the dialog is driven directly
@@ -233,6 +301,9 @@ int main(int argc, char **argv)
           model->files().join(QLatin1Char(',')));
     check("rm3.table-has-added", hasEntry(model->variables(), QStringLiteral("NEWVAR")),
           model->variables().join(QLatin1Char(',')));
+    check("e2m.references.layer-project",
+          model->referencedVariableLayer(QStringLiteral("NEWVAR")) == QStringLiteral("project"),
+          model->referencedVariableLayer(QStringLiteral("NEWVAR")));
 
     // ADD a second variable, then DELETE it (a different one stays).
     check("rm3.panel.add-second",
@@ -266,14 +337,14 @@ int main(int argc, char **argv)
     check("rm3.restart.variables-restored",
           restarted->variables().contains(QStringLiteral("NEWVAR=v1")),
           restarted->variables().join(QLatin1Char(',')));
-    restarted->open(rootA);
+    check("rm3.gate.restart-a-manifest-import", activateProject(*restarted, rootA));
     check("rm3.restart.re-expands-with-table",
           settled(*restarted, rootA) && restarted->files().contains(listedA));
 
     // =====================================================================
     // 4. SWITCH A -> B -> A: per-root tables, nothing leaks
     // =====================================================================
-    restarted->open(rootB);
+    check("rm3.gate.b-manifest-import", activateProject(*restarted, rootB));
     check("rm3.switch.b-settled", settled(*restarted, rootB));
     check("rm3.switch.b-has-no-a-variable",
           !hasEntry(restarted->variables(), QStringLiteral("NEWVAR")),
@@ -291,7 +362,7 @@ int main(int argc, char **argv)
     check("rm3.switch.b-substitutes",
           settled(*restarted, rootB) && restarted->files().contains(listedB));
 
-    restarted->open(rootA);
+    check("rm3.gate.switch-back-a-manifest-import", activateProject(*restarted, rootA));
     check("rm3.switch.back-to-a-settled", settled(*restarted, rootA));
     check("rm3.switch.a-table-restored",
           hasEntry(restarted->variables(), QStringLiteral("NEWVAR"))

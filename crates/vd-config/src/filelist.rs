@@ -1,8 +1,9 @@
 //! A `.f` filelist preprocessor + parser covering the verible-relevant subset.
 //!
-//! Supported: one path per line, `//` and `#` comments, `+incdir+DIR`,
-//! `+define+NAME[=VALUE]`, nested `-f FILE` (relative to the containing
-//! filelist, cycle- and depth-guarded) and variable references (ADDENDUM A-9):
+//! Supported: one path per line, `//` and `#` comments, `+incdir+DIR` and
+//! `-IDIR` / `-I DIR`, `+define+NAME[=VALUE]` and `-DNAME[=VALUE]`, nested
+//! `-f FILE` (relative to the containing filelist, cycle- and depth-guarded)
+//! and variable references (ADDENDUM A-9):
 //! `$VAR`, `${VAR}`, `$(VAR)`, `$$` as a literal `$`, and a leading `~` for the
 //! home directory. A `$` that starts none of those forms is a **literal `$`**
 //! (ADDENDUM A-17, the shell rule), so `out_dollar$.sv` and `out_tail.sv$` are
@@ -22,10 +23,10 @@
 //! pointed at the containing directory could not be told apart from its
 //! siblings).
 
-use std::collections::BTreeSet;
+use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
-use crate::project::{parse_define, Define, Filelist, Variables};
+use crate::project::{parse_define, Define, Filelist, VariableLayer, Variables};
 use crate::warnings::{Warning, WarningCode};
 
 /// Maximum nesting depth for `-f` recursion.
@@ -40,22 +41,34 @@ pub(crate) const MAX_DEPTH: u32 = 16;
 pub(crate) fn parse(path: &Path, warnings: &mut Vec<Warning>) -> Option<Filelist> {
     let variables = Variables::from_pairs(&[]);
     let mut missing = BTreeSet::new();
+    let mut referenced = BTreeMap::new();
     let mut skipped = 0usize;
-    parse_with(path, warnings, &variables, &mut missing, &mut skipped)
+    parse_with(
+        path,
+        warnings,
+        &variables,
+        &mut missing,
+        &mut referenced,
+        &mut skipped,
+    )
 }
 
 /// Parse one top-level filelist with an explicit variable table (ADDENDUM A-9).
 ///
-/// `missing` collects every unresolved variable name (unique, sorted); `skipped`
-/// counts the lines that produced no entry because of a missing variable, an
-/// unusable variable reference, an unknown token, a malformed define or a
-/// missing/cyclic nested filelist. The caller reports both so "the file set
-/// silently lost files" cannot happen.
+/// `missing` collects every unresolved variable name (unique, sorted);
+/// `referenced` collects EVERY variable name the `.f` referenced, once, with the
+/// layer that satisfied it (`Project` / `Imported` / `Environment`, or `Missing`
+/// for a name no layer has — batch-20261114 E1). `skipped` counts the lines that
+/// produced no entry because of a missing variable, an unusable variable
+/// reference, an unknown token, a malformed define or a missing/cyclic nested
+/// filelist. The caller reports all of them so "the file set silently lost
+/// files" cannot happen.
 pub(crate) fn parse_with(
     path: &Path,
     warnings: &mut Vec<Warning>,
     variables: &Variables,
     missing: &mut BTreeSet<String>,
+    referenced: &mut BTreeMap<String, VariableLayer>,
     skipped: &mut usize,
 ) -> Option<Filelist> {
     if !path.is_file() {
@@ -65,7 +78,7 @@ pub(crate) fn parse_with(
         );
         return None;
     }
-    let mut parser = Parser::new(warnings, variables, missing, skipped);
+    let mut parser = Parser::new(warnings, variables, missing, referenced, skipped);
     parser.visit(path, 0);
     let (entries, include_dirs, defines) = parser.finish();
     Some(Filelist {
@@ -87,6 +100,8 @@ struct Parser<'a> {
     visiting: Vec<(PathBuf, PathBuf)>,
     variables: &'a Variables,
     missing: &'a mut BTreeSet<String>,
+    /// Every name the filelist referenced, with the layer that answered it.
+    referenced: &'a mut BTreeMap<String, VariableLayer>,
     skipped: &'a mut usize,
     warnings: &'a mut Vec<Warning>,
 }
@@ -96,6 +111,7 @@ impl<'a> Parser<'a> {
         warnings: &'a mut Vec<Warning>,
         variables: &'a Variables,
         missing: &'a mut BTreeSet<String>,
+        referenced: &'a mut BTreeMap<String, VariableLayer>,
         skipped: &'a mut usize,
     ) -> Self {
         Self {
@@ -108,6 +124,7 @@ impl<'a> Parser<'a> {
             visiting: Vec::new(),
             variables,
             missing,
+            referenced,
             skipped,
             warnings,
         }
@@ -191,6 +208,13 @@ impl<'a> Parser<'a> {
             *self.skipped += 1;
             return;
         }
+        // E1 (batch-20261114): EVERY reference is recorded with the layer that
+        // satisfied it — a later `missing` early-return must not lose the names
+        // that did resolve on the same line. One entry per name; the layer for a
+        // name is a property of the variable table, not of the occurrence.
+        for (name, layer) in expanded.referenced {
+            self.referenced.insert(name, layer);
+        }
         if !expanded.missing.is_empty() {
             for name in expanded.missing {
                 self.missing.insert(name.clone());
@@ -221,8 +245,14 @@ impl<'a> Parser<'a> {
             self.consume_defines(rest, file, line);
             return;
         }
-        if let Some(nested) = filelist_argument(line_text) {
-            self.consume_nested(base, file, nested, line, depth);
+        if let Some(argument) = filelist_argument(line_text) {
+            match argument {
+                FilelistArgument::Nested(nested) => {
+                    self.consume_nested(base, file, nested, line, depth);
+                }
+                FilelistArgument::Define(rest) => self.consume_define(rest, "-D", file, line),
+                FilelistArgument::IncludeDir(dir) => self.consume_incdir(base, dir, file, line),
+            }
             return;
         }
         if line_text.starts_with('+') || line_text.starts_with('-') {
@@ -292,48 +322,58 @@ impl<'a> Parser<'a> {
     /// a new variant would change that contract.
     fn consume_incdirs(&mut self, base: &Path, rest: &str, file: &Path, line: u32) {
         for dir in rest.split('+').filter(|part| !part.trim().is_empty()) {
-            let dir = dir.trim();
-            let resolved = resolve(base, dir);
-            if !resolved.is_dir() {
-                self.warnings.push(
-                    Warning::new(
-                        WarningCode::FilelistMissing,
-                        format!(
-                            "include directory `{dir}` does not exist (resolved to `{}`, or it \
-                             is not a directory); the -I entry is kept so it works once the \
-                             directory appears",
-                            resolved.display()
-                        ),
-                    )
-                    .with_file(file)
-                    .with_line(line),
-                );
-            }
-            if self.include_seen.insert(resolved.clone()) {
-                self.include_dirs.push(resolved);
-            }
+            self.consume_incdir(base, dir.trim(), file, line);
+        }
+    }
+
+    /// One include directory, from `+incdir+` or `-I`, resolved against the
+    /// filelist that named it and deduplicated first-wins.
+    fn consume_incdir(&mut self, base: &Path, dir: &str, file: &Path, line: u32) {
+        let resolved = resolve(base, dir);
+        if !resolved.is_dir() {
+            self.warnings.push(
+                Warning::new(
+                    WarningCode::FilelistMissing,
+                    format!(
+                        "include directory `{dir}` does not exist (resolved to `{}`, or it \
+                         is not a directory); the -I entry is kept so it works once the \
+                         directory appears",
+                        resolved.display()
+                    ),
+                )
+                .with_file(file)
+                .with_line(line),
+            );
+        }
+        if self.include_seen.insert(resolved.clone()) {
+            self.include_dirs.push(resolved);
         }
     }
 
     fn consume_defines(&mut self, rest: &str, file: &Path, line: u32) {
         for token in rest.split('+').filter(|part| !part.trim().is_empty()) {
-            match parse_define(token) {
-                Some(define) => {
-                    if self.define_seen.insert(define.clone()) {
-                        self.defines.push(define);
-                    }
+            self.consume_define(token.trim(), "+define+", file, line);
+        }
+    }
+
+    /// One macro definition, from `+define+` or `-D`; deduplicated first-wins.
+    fn consume_define(&mut self, token: &str, form: &str, file: &Path, line: u32) {
+        match parse_define(token) {
+            Some(define) => {
+                if self.define_seen.insert(define.clone()) {
+                    self.defines.push(define);
                 }
-                None => {
-                    self.warnings.push(
-                        Warning::new(
-                            WarningCode::FilelistDefineInvalid,
-                            "malformed +define+ token; skipped",
-                        )
-                        .with_file(file)
-                        .with_line(line),
-                    );
-                    *self.skipped += 1;
-                }
+            }
+            None => {
+                self.warnings.push(
+                    Warning::new(
+                        WarningCode::FilelistDefineInvalid,
+                        format!("malformed {form} token; skipped"),
+                    )
+                    .with_file(file)
+                    .with_line(line),
+                );
+                *self.skipped += 1;
             }
         }
     }
@@ -401,6 +441,9 @@ impl<'a> Parser<'a> {
 struct ExpandedLine {
     text: String,
     missing: Vec<String>,
+    /// Every variable name the line referenced, with the layer that answered it
+    /// (`Missing` for a name no layer has) — E1.
+    referenced: Vec<(String, VariableLayer)>,
     /// At least one `$NAME`/`${NAME}`/`$(NAME)`/leading-`~` reference was
     /// substituted. `$$` is an escape, not a substitution.
     substituted: bool,
@@ -412,6 +455,7 @@ impl ExpandedLine {
         Self {
             text: String::new(),
             missing: Vec::new(),
+            referenced: Vec::new(),
             substituted: false,
             invalid: Some(reason.into()),
         }
@@ -428,6 +472,7 @@ fn expand_line(text: &str, variables: &Variables) -> ExpandedLine {
     let bytes = text.as_bytes();
     let mut out = String::with_capacity(text.len());
     let mut missing: Vec<String> = Vec::new();
+    let mut referenced: Vec<(String, VariableLayer)> = Vec::new();
     let mut substituted = false;
     let mut index = 0usize;
     while index < bytes.len() {
@@ -502,18 +547,23 @@ fn expand_line(text: &str, variables: &Variables) -> ExpandedLine {
             index = after;
             continue;
         };
-        match variables.resolve(&name) {
-            Some(value) => {
+        match variables.resolve_with_layer(&name) {
+            Some((value, layer)) => {
                 out.push_str(value);
                 substituted = true;
+                referenced.push((name, layer));
             }
-            None => missing.push(name),
+            None => {
+                referenced.push((name.clone(), VariableLayer::Missing));
+                missing.push(name);
+            }
         }
         index = consumed_end;
     }
     ExpandedLine {
         text: out,
         missing,
+        referenced,
         substituted,
         invalid: None,
     }
@@ -528,18 +578,42 @@ fn at_token_boundary(out: &str) -> bool {
     }
 }
 
-/// The argument of a `-f FILE` / `-F FILE` line, if this line is one.
-fn filelist_argument(line: &str) -> Option<&str> {
-    let rest = line
-        .strip_prefix("-f")
-        .or_else(|| line.strip_prefix("-F"))?;
-    let trimmed = rest.trim_start();
-    if trimmed.len() == rest.len() {
-        // No whitespace after the flag: `-ffoo` is not a form we understand.
-        return None;
+/// One classified filelist flag line: the argument it carries.
+enum FilelistArgument<'a> {
+    /// `-f FILE` / `-F FILE`: a nested filelist to visit.
+    Nested(&'a str),
+    /// `-DNAME[=VALUE]`: one macro definition.
+    Define(&'a str),
+    /// `-IDIR` / `-I DIR`: one include directory.
+    IncludeDir(&'a str),
+}
+
+/// Classify a `-f`/`-F`/`-D`/`-I` line and return the argument it carries.
+///
+/// `-f` requires whitespace after the flag (`-ffoo` stays an unknown token),
+/// while the VCS-style `-D`/`-I` forms accept the argument attached or separated
+/// by whitespace (`-I` also tolerates a trailing slash, which path
+/// normalization removes). An empty argument is not classified, so a bare
+/// `-D`/`-I` still reaches the unknown-token diagnostic.
+fn filelist_argument(line: &str) -> Option<FilelistArgument<'_>> {
+    if let Some(rest) = line.strip_prefix("-f").or_else(|| line.strip_prefix("-F")) {
+        let trimmed = rest.trim_start();
+        if trimmed.len() == rest.len() {
+            // No whitespace after the flag: `-ffoo` is not a form we understand.
+            return None;
+        }
+        let argument = trimmed.trim();
+        return (!argument.is_empty()).then_some(FilelistArgument::Nested(argument));
     }
-    let argument = trimmed.trim();
-    (!argument.is_empty()).then_some(argument)
+    if let Some(rest) = line.strip_prefix("-D") {
+        let argument = rest.trim();
+        return (!argument.is_empty()).then_some(FilelistArgument::Define(argument));
+    }
+    if let Some(rest) = line.strip_prefix("-I") {
+        let argument = rest.trim();
+        return (!argument.is_empty()).then_some(FilelistArgument::IncludeDir(argument));
+    }
+    None
 }
 
 /// Drop `//` comments anywhere and `#` comments at line start or after space.
@@ -644,6 +718,129 @@ mod tests {
         Ok(())
     }
 
+    /// VCS-style filelists configure macros and include directories with `-D`
+    /// and `-I` instead of the `+define+`/`+incdir+` forms. Both families fill
+    /// the same collections: order is the file order and the first occurrence
+    /// wins, exactly as the `+` forms already behave.
+    #[test]
+    fn parses_vcs_define_and_include_flags() -> Result<(), Box<dyn std::error::Error>> {
+        let temp = tempfile::tempdir()?;
+        let root = temp.path();
+        for dir in ["inc", "inc2", "inc3"] {
+            std::fs::create_dir_all(root.join(dir))?;
+        }
+        write(
+            &root.join("top.f"),
+            "-DFOO=1\n\
+             -DBAR\n\
+             -I./inc\n\
+             -I ./inc2\n\
+             -I./inc3/\n\
+             +incdir+./inc3\n\
+             +define+BAZ=2\n\
+             +define+FOO=1\n",
+        )?;
+        let mut warnings = Vec::new();
+        let filelist = require(parse(&root.join("top.f"), &mut warnings))?;
+        let defines: Vec<(&str, Option<&str>)> = filelist
+            .defines
+            .iter()
+            .map(|define| (define.name.as_str(), define.value.as_deref()))
+            .collect();
+        assert_eq!(
+            defines,
+            vec![("FOO", Some("1")), ("BAR", None), ("BAZ", Some("2"))],
+            "the `-D` forms must fill the same defines collection, first occurrence first"
+        );
+        assert_eq!(
+            filelist.include_dirs,
+            vec![root.join("inc"), root.join("inc2"), root.join("inc3")],
+            "`-I` (attached, separate and trailing-slash) must fill the include dirs; \
+             the duplicate `+incdir+` must not repeat it"
+        );
+        assert!(
+            warnings.is_empty(),
+            "recognised `-D`/`-I` lines must not warn: {warnings:?}"
+        );
+        Ok(())
+    }
+
+    /// `-D`/`-I` in a nested `-f` filelist propagate to the flattened result and
+    /// resolve relative to the filelist that contains them.
+    #[test]
+    fn vcs_flags_in_a_nested_filelist_propagate() -> Result<(), Box<dyn std::error::Error>> {
+        let temp = tempfile::tempdir()?;
+        let root = temp.path();
+        std::fs::create_dir_all(root.join("inc"))?;
+        std::fs::create_dir_all(root.join("sub/inc"))?;
+        write(&root.join("top.f"), "-DPARENT=1\n-I./inc\n-f sub/child.f\n")?;
+        write(&root.join("sub/child.f"), "-DCHILD\n-I./inc\n")?;
+        let mut warnings = Vec::new();
+        let filelist = require(parse(&root.join("top.f"), &mut warnings))?;
+        let defines: Vec<(&str, Option<&str>)> = filelist
+            .defines
+            .iter()
+            .map(|define| (define.name.as_str(), define.value.as_deref()))
+            .collect();
+        assert_eq!(
+            defines,
+            vec![("PARENT", Some("1")), ("CHILD", None)],
+            "the child filelist's `-D` must reach the flattened result"
+        );
+        assert_eq!(
+            filelist.include_dirs,
+            vec![root.join("inc"), root.join("sub/inc")],
+            "each `-I` resolves against its own containing filelist"
+        );
+        assert!(warnings.is_empty(), "{warnings:?}");
+        Ok(())
+    }
+
+    /// The classifier is not a catch-all: a flag we cannot use is still reported
+    /// with its `file:line` and counted as skipped, and a malformed `-D` is
+    /// reported instead of being silently accepted.
+    #[test]
+    fn an_unclassifiable_token_is_still_reported() -> Result<(), Box<dyn std::error::Error>> {
+        let temp = tempfile::tempdir()?;
+        let root = temp.path();
+        write(
+            &root.join("top.f"),
+            "-P WIDTH=8\n-y rtl/lib\n-D\n-D9BAD=1\n",
+        )?;
+        let vars = variables(&[], &[]);
+        let (filelist, warnings, missing, skipped) = parse_expanding(&root.join("top.f"), &vars);
+        let filelist = require(filelist)?;
+        assert!(filelist.defines.is_empty(), "{:?}", filelist.defines);
+        assert!(filelist.include_dirs.is_empty());
+        assert!(missing.is_empty());
+        assert_eq!(
+            skipped, 4,
+            "every unusable line must be counted: {warnings:?}"
+        );
+        let unknown: Vec<_> = warnings
+            .iter()
+            .filter(|warning| warning.code == WarningCode::FilelistUnknownToken)
+            .collect();
+        assert_eq!(unknown.len(), 3, "{warnings:?}");
+        assert!(unknown
+            .iter()
+            .any(|warning| warning.line == Some(1) && warning.message.contains("-P")));
+        assert!(unknown
+            .iter()
+            .any(|warning| warning.line == Some(2) && warning.message.contains("-y")));
+        assert!(unknown
+            .iter()
+            .any(|warning| warning.line == Some(3) && warning.message.contains("-D")));
+        let invalid: Vec<_> = warnings
+            .iter()
+            .filter(|warning| warning.code == WarningCode::FilelistDefineInvalid)
+            .collect();
+        assert_eq!(invalid.len(), 1, "{warnings:?}");
+        assert_eq!(invalid[0].line, Some(4));
+        assert!(invalid[0].message.contains("-D"), "{}", invalid[0].message);
+        Ok(())
+    }
+
     #[test]
     fn parent_components_are_normalized() -> Result<(), Box<dyn std::error::Error>> {
         let temp = tempfile::tempdir()?;
@@ -726,8 +923,16 @@ mod tests {
     ) {
         let mut warnings = Vec::new();
         let mut missing = BTreeSet::new();
+        let mut referenced = std::collections::BTreeMap::new();
         let mut skipped = 0usize;
-        let filelist = parse_with(path, &mut warnings, vars, &mut missing, &mut skipped);
+        let filelist = parse_with(
+            path,
+            &mut warnings,
+            vars,
+            &mut missing,
+            &mut referenced,
+            &mut skipped,
+        );
         (filelist, warnings, missing.into_iter().collect(), skipped)
     }
 

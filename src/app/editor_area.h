@@ -13,9 +13,12 @@
 // the old "pane-1 · KTextEditor (edit-core) ◀ active" header line, which leaked
 // the provider name and never told the user which file was being edited or
 // whether it was saved.
+#include <QCoreApplication>
 #include <QJsonObject>
 #include <QHash>
 #include <QList>
+#include <QPoint>
+#include <QRect>
 #include <QString>
 #include <QStringList>
 #include <QWidget>
@@ -28,9 +31,11 @@
 
 class QAction;
 class QEvent;
+class QFrame;
 class QTimer;
 class QLabel;
 class QMouseEvent;
+class QMenu;
 class QTabBar;
 class QStackedWidget;
 class QToolButton;
@@ -54,10 +59,31 @@ class EditorProvider;
 // save may answer Save and the pane writes it before closing.
 enum class SaveDecision { Save, Discard, Cancel };
 
+// batch-20261115 (T5): where a dragged tab is dropped. TabBar is the tab strip
+// itself (reorder in the same pane, move in another); Left/Right/Top/Bottom are
+// the editor's four drop bands (split in that direction); Center is the editor
+// middle (move to that pane).
+enum class TabDropZone { None, TabBar, Left, Right, Top, Bottom, Center };
+
+// The ONE drop-zone rule, free of widgets so a test can call it directly
+// (AC-6.6). `paneRect`, `tabBarRect` and `pos` are in the same coordinate
+// system; the tab bar is excluded from the edge bands because a drop on it means
+// "the tab strip", not "the top strip of the editor".
+TabDropZone tabDropZoneAt(const QRect &paneRect, const QRect &tabBarRect, const QPoint &pos);
+// Stable name of a zone ("tab-bar", "left", …) for the highlight's test property
+// and diagnostics.
+const char *tabDropZoneName(TabDropZone zone);
+
+// The mime type a VEdit tab drag carries; the drop overlays accept nothing else,
+// so a text/URL drag from another application can never restructure the layout.
+inline constexpr char kEditorTabMimeType[] = "application/x-vedit-tab";
+
 // One editor pane: a tab bar of documents and one editor widget per document
 // (the provider creates them). The pane asks for activation on click and on
 // focus-in of any editor widget.
 class EditorPane final : public QWidget {
+    Q_DECLARE_TR_FUNCTIONS(EditorPane)
+
 public:
     EditorPane(QString paneId, EditorProvider *provider, QWidget *parent = nullptr);
     ~EditorPane() override;
@@ -101,6 +127,15 @@ public:
     // *error filled; the caller owns the dialog and the overwrite question.
     bool saveAsFile(const QString &absolutePath, QString *error = nullptr);
 
+    // Batch 20261110d (split view): installs `editor` — a second view over the
+    // document another pane already shows (see
+    // EditorProvider::createEditorForExistingDocument) — as this pane's ONLY
+    // tab while it is still the untouched empty tab it was created with;
+    // otherwise as a new tab. `absolutePath` is the shared document's file path
+    // (empty for an untitled document); a null editor is refused. The caller
+    // owns the split-layout decision; this method only fills the pane.
+    void showSharedDocument(QWidget *editor, const QString &absolutePath);
+
     // --- T12: document tabs -------------------------------------------------
     int tabCount() const;
     int activeTabIndex() const;
@@ -141,6 +176,13 @@ public:
     bool editorActionEnabled(const QStringList &objectNames) const;
     // Test/inspection seam: the pane's tab bar widget.
     QTabBar *tabBar() const;
+    // Batch 20261110d (T7): the RIGHT-CLICK tab menu, built without a modal
+    // loop so the lane test can trigger the very actions the user clicks. The
+    // pane exec()s the same menu in `showTabContextMenu`. Every close item goes
+    // through closeTab(), i.e. through `onTabCloseRequested_` for a dirty
+    // document. Items are named `tab-menu.close|close-others|close-left|
+    // close-right|close-all|copy-path`; nullptr for an invalid index.
+    QMenu *createTabContextMenu(int index);
     // Drops every provider subscription this pane holds. The AREA calls it
     // before destroying a pane while the provider is still alive; the destructor
     // deliberately does not (the provider can already be gone when a window's
@@ -211,6 +253,30 @@ public:
     void setOwnedShortcuts(const QStringList &portableSequences);
     QStringList ownedShortcuts() const;
 
+    // --- T5: tab drag & drop -------------------------------------------------
+    // The document identity a drag carries. Stable across an in-bar reorder (the
+    // Document record moves with its tab), so a drop resolves the CURRENT index
+    // of the dragged tab instead of trusting a stale one.
+    quint64 tabSerial(int index) const;
+    int tabIndexForSerial(quint64 serial) const;
+    // Removes a tab WITHOUT destroying its editor widget: the widget (and with it
+    // the buffer, undo history and caret) is handed to the caller, which adopts it
+    // in another pane. This is why a cross-pane move never re-reads the file and
+    // never prompts for unsaved changes. A pane that loses its last tab keeps the
+    // existing "a pane always has one tab" rule (a fresh empty tab).
+    QWidget *detachTab(int index, QString *absolutePath = nullptr);
+    // The other half of detachTab: installs an existing editor widget as a tab,
+    // optionally at `insertAt` (a tab-bar drop position). Returns the new index.
+    int adoptTab(QWidget *editor, const QString &absolutePath, int insertAt = -1);
+    // Drag source: the tab-bar gesture crossed the drag threshold.
+    void setOnTabDragRequested(std::function<void(EditorPane *, int)> callback);
+    // Drop target: a drop landed on this pane's overlay.
+    void setOnTabDrop(std::function<void(EditorPane *, TabDropZone, int)> callback);
+    // The full-pane drop surface, shown for every pane only while a tab drag is
+    // running. The editor view keeps its own drag handling the rest of the time.
+    void showDropOverlay(bool visible);
+    bool dropOverlayVisible() const;
+
 protected:
     void mousePressEvent(QMouseEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
@@ -236,6 +302,25 @@ private:
     QWidget *fallbackEditor();
     Document *documentAt(int index);
     const Document *documentAt(int index) const;
+    // Batch 20261110d (T7): the tab context menu. Every close item goes through
+    // `closeTab()`, so a dirty document still reaches `onTabCloseRequested_`
+    // (save / discard / cancel) instead of disappearing.
+    void showTabContextMenu(int index, const QPoint &anchor);
+    void closeTabsInRange(int first, int last);
+    void closeTabsExcept(int keep);
+    // batch-20261115 (AC-5.3): a bulk close must notify the shell ONCE, not once
+    // per tab (each notification repaints the status bar and re-syncs every
+    // command). notifyStateChanged() is suppressed while a batch is open and
+    // emitted by the closing batch.
+    void beginTabCloseBatch();
+    void endTabCloseBatch();
+    // T5: the drag gesture reached the threshold (the tab bar calls this).
+    void startTabDrag(int index);
+    // T5: pane-local zone of `pos` (the overlay covers the pane, so its
+    // coordinates ARE the pane's).
+    TabDropZone dropZoneAt(const QPoint &pos) const;
+    void updateDropHighlight(TabDropZone zone);
+    QRect tabBarRect() const;
     QString documentLabel(const Document &document) const;
     void requestFocus();
     // T19: applies an archived caret/scroll exactly once, and only while the
@@ -268,6 +353,9 @@ private:
     std::function<SaveDecision(EditorPane *, int)> onTabCloseRequested_;
     std::function<void()> onStateChanged_;
     std::function<void(const QString &)> onFileOpened_;
+    // T5: the drag in flight (only one tab drag can run at a time).
+    EditorPane *dragSourcePane_ = nullptr;
+    quint64 dragSerial_ = 0;
     std::function<void(const QString &, bool)> onDocumentSaved_;
     // FIX 1: the root the tab tooltip is rendered against; the OPEN path stays
     // absolute (Document::path), only the rendering consults this.
@@ -279,6 +367,14 @@ private:
     QString tabStyleSheet_;
     bool applyingTabStyle_ = false;
     bool active_ = false;
+    // batch-20261115 AC-5.3: >0 while closeTabsInRange()/closeTabsExcept() run.
+    int tabCloseBatchDepth_ = 0;
+    // T5: the tab-drag hand-off. `dropOverlay_` is a full-pane child shown only
+    // during a drag; `dropHighlight_` is the translucent zone rectangle.
+    QWidget *dropOverlay_ = nullptr;
+    QFrame *dropHighlight_ = nullptr;
+    std::function<void(EditorPane *, int)> onTabDragRequested_;
+    std::function<void(EditorPane *, TabDropZone, int)> onTabDrop_;
     // T19: archived positions of restored tabs, keyed by editor widget. An entry
     // is consumed the first time its editor is shown (see applyPendingPosition).
     QHash<QWidget *, SessionDocument> pendingPositions_;
@@ -303,12 +399,35 @@ public:
     void setActivePane(EditorPane *pane);
 
     // Splits the active pane. Qt::Horizontal puts the new pane to the right,
-    // Qt::Vertical puts it below; the new pane becomes active (returned).
+    // Qt::Vertical puts it below; the new pane becomes active (returned). The
+    // new pane shows the SAME document as the active pane when the provider can
+    // create a second view over it (one shared buffer); a provider that cannot
+    // share documents keeps the historical empty-pane behaviour.
     EditorPane *splitActive(Qt::Orientation orientation);
+    // T5: the ONE tree mutation every split shares. `newPaneFirst` decides which
+    // side of the splitter receives the new pane (a drop on the LEFT/TOP band).
+    // The new pane starts empty; the caller installs the document it carries.
+    EditorPane *splitPane(EditorPane *pane, Qt::Orientation orientation, bool newPaneFirst);
     bool closeActivePane();
     // T130: close a specific pane (the per-pane X button); returns false when
     // the close was blocked (unsaved modifications).
     bool closePane(EditorPane *pane);
+    // T5: the one tab-drag transfer. `serial` identifies the dragged document in
+    // `source`; `target`/`zone` say where it landed. TabBar/Center on ANOTHER pane
+    // MOVES the tab (the SAME editor widget travels, so the buffer survives
+    // verbatim); an edge zone splits `target` in that direction and installs the
+    // document in the new pane. Same-pane TabBar is the in-bar reorder; a
+    // same-pane edge splits the pane itself. Public so the drop logic is directly
+    // callable from tests (AC-6.6).
+    bool dropTab(EditorPane *source, quint64 serial, EditorPane *target, TabDropZone zone,
+                 int targetIndex = -1);
+    // The drag lifecycle shared by the real QDrag and the offscreen test: every
+    // pane's overlay appears, the source document's identity is remembered, and
+    // endTabDrag() clears both. `beginTabDrag` is what the tab bar calls when its
+    // gesture threshold is crossed.
+    void beginTabDrag(EditorPane *source, quint64 serial);
+    void endTabDrag();
+    bool isTabDragActive() const;
     void focusNextPane();
     void resetLayout();
 
@@ -323,6 +442,16 @@ public:
     // The state the shell mirrors on its Undo/Redo commands; false while there
     // is no active editor widget (the "no active view => greyed out" rule).
     bool activeEditorActionEnabled(const QStringList &objectNames) const;
+    // Batch 20261110d (T7): the checkable `edit.block-selection` command drives
+    // the ACTIVE view's native block/column mode (KTextEditor::View::
+    // blockSelection). False when there is no active editor or it is not a
+    // KTextEditor view (the demo provider), so the command never claims a state
+    // it could not set.
+    bool blockSelectionMode() const;
+    bool setBlockSelectionMode(bool enabled);
+    // "Add a cursor at the end of every selected line" — the feature that until
+    // now only existed as the undiscoverable Alt+Shift+I kernel action.
+    bool addCursorsAtSelectionLineEnds();
 
     QJsonObject saveLayout() const;
     // Replaces the current tree. Returns false (with *error) only for a
@@ -391,6 +520,11 @@ private:
     void rebuild();
     void clearTree();
     void deletePane(EditorPane *pane);
+    // T5: detach + adopt in one step, with a rollback that re-adopts the widget
+    // into the source pane when the target refuses it (a move must never lose a
+    // buffer).
+    bool moveTabIntoPane(EditorPane *source, int sourceIndex, EditorPane *target,
+                         int insertAt = -1);
     // UX batch 2: picks the pane whose editor subtree contains `widget`.
     void activatePaneContaining(const QWidget *widget);
 
@@ -406,6 +540,9 @@ private:
     std::function<SaveDecision(EditorPane *, int)> onTabCloseRequested_;
     std::function<void()> onStateChanged_;
     std::function<void(const QString &)> onFileOpened_;
+    // T5: the drag in flight (only one tab drag can run at a time).
+    EditorPane *dragSourcePane_ = nullptr;
+    quint64 dragSerial_ = 0;
     std::function<void(const QString &, bool)> onDocumentSaved_;
     // FIX 1: applied to every pane at creation and on a root switch.
     QString displayRoot_;

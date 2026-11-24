@@ -20,6 +20,7 @@
 
 class QLabel;
 class QModelIndex;
+class QShowEvent;
 class QTimer;
 class QTreeView;
 class QTreeWidget;
@@ -53,6 +54,9 @@ public:
     int informationCount() const;
     /// "Errors: 1 · Warnings: 2 · Information: 0" - always computed, even zero.
     QString countsText() const;
+    /// How many times the issue list was rebuilt from the merged view (T9
+    /// observability: a hidden dock or an unchanged view must not rebuild).
+    int rebuildCount() const { return rebuildCount_; }
     /// The palette shared with the editor's inline squiggle (AC-6.2).
     QColor errorColor() const;
     QColor warningColor() const;
@@ -67,6 +71,13 @@ public:
     QString diagnosticsEmptyStateText() const;
     bool diagnosticsEmptyStateVisible() const;
 
+    /// AC-3 (batch-20261117): the persistent hint under the issues list. It is
+    /// not a diagnostic row - it never changes a row, a position or a count.
+    /// `hintVisible()` is false while the hint does not apply; `hintText()` is
+    /// the exact rendered sentence (empty while hidden).
+    bool hintVisible() const;
+    QString hintText() const;
+
     /// The controller this panel renders (the self-test reads its entry counts).
     DiagnosticsController *controller() const;
 
@@ -78,11 +89,17 @@ public:
 
     /// Copy the controller's outline + state + diagnostics into the widgets.
     void refreshFromController();
+    /// The 300 ms poll the timer runs: advance the controller, then rebuild the
+    /// widgets ONLY when the view moved and the dock is visible (T9). Public so
+    /// the edit-jank benchmark drives the product path, not a copy of it.
+    void poll();
+
+protected:
+    /// T9: a hidden dock skips the list rebuild; becoming visible again must
+    /// show the current state at once (no stale rows behind a re-shown dock).
+    void showEvent(QShowEvent *event) override;
 
 private:
-    /// T118: the panel owns the polling loop, so an asynchronous analysis result
-    /// always reaches the widgets without the user touching anything.
-    void poll();
     void rebuildDiagnostics();
     void jumpToOutline(const QModelIndex &index);
     void jumpToIssue(QTreeWidgetItem *item);
@@ -94,11 +111,23 @@ private:
     QTreeWidget *issues_ = nullptr;
     QLabel *counts_ = nullptr;
     QLabel *diagnosticsEmpty_ = nullptr;
+    /// AC-3: the persistent Verible preprocessing-error hint (empty/hidden when
+    /// it does not apply).
+    QLabel *hint_ = nullptr;
     OutlineModel *model_ = nullptr;
     QTreeView *view_ = nullptr;
     QLabel *status_ = nullptr;
     QLabel *emptyState_ = nullptr;
     int issueRowCount_ = 0;
+    int rebuildCount_ = 0;
+    /// T9: the change token of the last full refresh, and whether the dock was
+    /// hidden when the view moved (a re-show must refresh once).
+    quint64 lastRefreshedChangeSerial_ = 0;
+    bool staleWhileHidden_ = false;
+    /// True once the dock has been shown at least once. A panel that has never
+    /// been shown keeps the legacy behaviour (tests construct it headless); a
+    /// dock the user actually hid is the case T9 stops paying for.
+    bool shownOnce_ = false;
     int errorCount_ = 0;
     int warningCount_ = 0;
     int informationCount_ = 0;

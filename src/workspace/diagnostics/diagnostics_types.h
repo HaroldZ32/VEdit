@@ -30,7 +30,22 @@ struct DiagnosticEntry {
     int endLine = 0;   ///< zero-based end line
     int endColumn = 0; ///< zero-based UTF-16 end column
     int severity = 0;  ///< 1 error, 2 warning, 3 information, 4 hint, 0 unknown
-    QString code;      ///< rule/code when the producer supplied one
+    /// The producer's rule/code. When a producer supplies none but spells the
+    /// rule inside the message (verible-verilog-ls sends no `code` at all and
+    /// writes `… [Style: x][rule-id]`), the rule id is derived by the LSP mapper
+    /// (`ruleFromMessage()` in ffi_backends.cpp, a mirror of the Rust
+    /// `vd_lsp::diagnostic_rule()`); the derived value is the identifier
+    /// verible's own `waive --rule=` takes, and a row still without one cannot be
+    /// waived per diagnostic.
+    QString code;
+    /// AC-5.8 / AC-N3: the engine's typed warning OPTION name
+    /// (`VdDiagnostic.option_name`, a slang `-W` option), the ONLY valid
+    /// `diagnostic` scope for a slang `[[waivers]]` entry. Carried verbatim from
+    /// the producer: it is never parsed out of `message` and never replaced by
+    /// the JSON `code`. Empty for LSP rows and for diagnostics that have no
+    /// option (a typical error) - such a row is refused a slang waiver instead
+    /// of being widened to the whole file.
+    QString optionName;
     QString source;    ///< "verible" / "slang" / backend name
     QString message;
 };
@@ -72,6 +87,13 @@ struct SessionSnapshot {
     quint64 generation = 0;
     int serverPid = 0;
     int restarts = 0;
+    /// The LSP backend that produced this session (`verible` / `slang`), filled
+    /// from `VdLspStatus.backend_name`. The Outline's preprocessing-error hint
+    /// (AC-3) keys on it: the sentence is true only for Verible, and the backend
+    /// that PRODUCED the rows decides - not the requested setting. Defaults to
+    /// `verible`, the only backend before T11/T138 and the conservative answer
+    /// when no session exists.
+    QString backendName = QStringLiteral("verible");
     QString message;
     QStringList skipped; ///< "path: reason"
 };
@@ -100,6 +122,11 @@ struct LspPolled {
     bool failed = false;
     QString error;
     ResponseKind kind = ResponseKind::None;
+    /// Diagnostics only (batch-20261118 AC-2): true when the server really
+    /// published a set for the file. False means it holds no entry at all -
+    /// an empty list with `published == false` is "not analysed", never a
+    /// clean "0 problems" verdict.
+    bool published = true;
     QVector<LspLocation> locations;
     QVector<OutlineSymbol> symbols;
     QVector<LspTextEdit> edits;

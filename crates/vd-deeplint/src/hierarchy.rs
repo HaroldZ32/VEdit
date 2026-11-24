@@ -31,9 +31,11 @@
 //! show, so an oversized project is never silently slow.
 
 use std::collections::HashMap;
-use std::io::Read;
+use std::fs::File;
+use std::io::{BufRead, BufReader, Read};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::time::{Duration, Instant};
 
 use serde_json::Value;
@@ -41,7 +43,11 @@ use serde_json::Value;
 use crate::binary::{
     resolve_binary_for_current_process, sanitize_tool_child_env, BinaryResolution,
 };
+use crate::process::{receive_capped, spawn_reader, terminate, termination_signal};
 use crate::LintFailure;
+
+mod navigation;
+pub use navigation::TraceIndex;
 
 /// Default budget for one elaboration run.
 pub const DEFAULT_TIMEOUT: Duration = Duration::from_secs(30);
@@ -179,6 +185,7 @@ pub struct SignalInfo {
     pub loads: Vec<Endpoint>,
     /// Driver chain that continues inside a child instance (AC-3.2).
     pub chain: Vec<Endpoint>,
+    occurrences: Vec<(PathBuf, u32, u32)>,
 }
 
 /// One elaboration result.
@@ -247,7 +254,26 @@ fn empty_report(top: Option<String>) -> HierarchyReport {
 /// Elaborate `files` and return the hierarchy + driver/load report.
 #[must_use]
 pub fn elaborate(files: &[PathBuf], options: &HierarchyOptions) -> HierarchyReport {
-    elaborate_impl(files, options, None)
+    elaborate_impl(files, options, None, None, None)
+}
+
+/// Elaborate the explicit filelist from its project root for editor navigation.
+#[must_use]
+pub fn elaborate_navigation(
+    files: &[PathBuf],
+    options: &HierarchyOptions,
+    root: &Path,
+    cancel: &AtomicBool,
+) -> (HierarchyReport, Vec<PathBuf>) {
+    let mut dependencies = Vec::new();
+    let report = elaborate_impl(
+        files,
+        options,
+        None,
+        Some(cancel),
+        Some((root, &mut dependencies)),
+    );
+    (report, dependencies)
 }
 
 /// Elaborate `files` and let `parse` interpret the raw `--ast-json` document
@@ -267,6 +293,22 @@ pub(crate) fn run_ast_json<T>(
     options: &HierarchyOptions,
     parse: impl FnOnce(&Path, Option<i32>, &str) -> Result<T, LintFailure>,
 ) -> (HierarchyReport, Option<T>) {
+    run_ast_json_cancellable(files, options, parse, None)
+}
+
+/// [`run_ast_json`] with a cancellation flag the caller can raise from another
+/// thread; raising it kills the `slang` child and reports
+/// [`LintFailure::Cancelled`].
+///
+/// Separate from [`run_ast_json`] so the callers that have no job to cancel (the
+/// rename index) keep their signature: a cancellation seam that every caller must
+/// spell is a seam nobody uses.
+pub(crate) fn run_ast_json_cancellable<T>(
+    files: &[PathBuf],
+    options: &HierarchyOptions,
+    parse: impl FnOnce(&Path, Option<i32>, &str) -> Result<T, LintFailure>,
+    cancel: Option<&AtomicBool>,
+) -> (HierarchyReport, Option<T>) {
     let mut captured: Option<T> = None;
     let report = {
         let mut parse = Some(parse);
@@ -285,7 +327,7 @@ pub(crate) fn run_ast_json<T>(
                     Err(failure) => Err(failure),
                 }
             };
-        elaborate_impl(files, options, Some(&mut sink))
+        elaborate_impl(files, options, Some(&mut sink), cancel, None)
     };
     (report, captured)
 }
@@ -297,6 +339,8 @@ fn elaborate_impl(
     files: &[PathBuf],
     options: &HierarchyOptions,
     mut on_json: JsonSink<'_>,
+    cancel: Option<&AtomicBool>,
+    navigation: Option<(&Path, &mut Vec<PathBuf>)>,
 ) -> HierarchyReport {
     let started = Instant::now();
     let mut report = empty_report(options.top.clone());
@@ -306,18 +350,6 @@ fn elaborate_impl(
         });
         return report;
     }
-    let binary = resolve_binary_for_current_process(options.slang_binary.as_deref());
-    let Some(chosen) = binary.chosen.clone() else {
-        report.failure = Some(LintFailure::BinaryNotFound {
-            attempts: binary.attempts.clone(),
-        });
-        return report;
-    };
-    report.tool = chosen
-        .file_name()
-        .map(|name| name.to_string_lossy().into_owned())
-        .unwrap_or_else(|| "slang".to_string());
-
     let temp = match tempfile::Builder::new().prefix("vd-hier-").tempdir() {
         Ok(temp) => temp,
         Err(error) => {
@@ -328,83 +360,59 @@ fn elaborate_impl(
         }
     };
     let json_path = temp.path().join("ast.json");
+    let dep_path = temp.path().join("deps.txt");
 
-    let mut command = Command::new(&chosen);
-    sanitize_tool_child_env(&mut command);
+    let mut argv: Vec<std::ffi::OsString> = Vec::new();
     if let Some(top) = &options.top {
-        command.arg("--top").arg(top);
+        argv.push(std::ffi::OsString::from("--top"));
+        argv.push(std::ffi::OsString::from(top));
     }
-    command
-        .arg("--ast-json")
-        .arg(&json_path)
-        .arg("--ast-json-source-info");
+    argv.push(std::ffi::OsString::from("--ast-json"));
+    argv.push(json_path.as_os_str().to_os_string());
+    argv.push(std::ffi::OsString::from("--ast-json-source-info"));
+    if navigation.is_some() {
+        argv.push(std::ffi::OsString::from("--Mall"));
+        argv.push(dep_path.as_os_str().to_os_string());
+    }
     for directory in &options.include_dirs {
         let mut value = std::ffi::OsString::from("-I");
         value.push(directory.as_os_str());
-        command.arg(value);
+        argv.push(value);
     }
     for define in &options.defines {
         let define = define.trim();
         if !define.is_empty() {
             let mut value = std::ffi::OsString::from("-D");
             value.push(define);
-            command.arg(value);
+            argv.push(value);
         }
     }
-    command
-        .args(files)
-        .current_dir(project_root(files))
-        .stdin(Stdio::null())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped());
-
-    let mut child = match command.spawn() {
-        Ok(child) => child,
-        Err(error) => {
-            report.failure = Some(LintFailure::Spawn {
-                message: format!("{}: {error}", chosen.display()),
-            });
-            return report;
-        }
-    };
-
-    let mut peak_rss_kb = 0_u64;
-    let wait_started = Instant::now();
-    let outcome = loop {
-        if let Ok(status) = read_peak_rss(child.id()) {
-            peak_rss_kb = peak_rss_kb.max(status);
-        }
-        match child.try_wait() {
-            Ok(Some(status)) => break Ok(status.code()),
-            Ok(None) => {}
-            Err(error) => break Err(format!("waiting for slang failed: {error}")),
-        }
-        if wait_started.elapsed() >= options.timeout {
-            let _ = child.kill();
-            let _ = child.wait();
-            report.failure = Some(LintFailure::Timeout {
-                after: options.timeout,
-            });
-            report.elapsed = started.elapsed();
-            report.peak_rss_kb = peak_rss_kb;
-            return report;
-        }
-        std::thread::sleep(POLL_INTERVAL);
-    };
-    report.peak_rss_kb = peak_rss_kb;
-
-    let mut stderr = String::new();
-    if let Some(mut handle) = child.stderr.take() {
-        let _ = handle.read_to_string(&mut stderr);
+    for file in files {
+        argv.push(file.as_os_str().to_os_string());
     }
-    let exit_code = match outcome {
-        Err(message) => {
-            report.failure = Some(LintFailure::Io { message });
-            report.elapsed = started.elapsed();
-            return report;
-        }
-        Ok(code) => code,
-    };
+
+    // The ONE whole-set invocation: the same runner the project lint pass uses,
+    // so the two products cannot disagree on the child's cwd, timeout, signal or
+    // capture discipline.
+    let root = navigation
+        .as_ref()
+        .map_or_else(|| project_root(files), |(root, _)| root.to_path_buf());
+    let run = run_tool_at(
+        &root,
+        options.slang_binary.as_deref(),
+        &argv,
+        options.timeout,
+        cancel,
+    );
+    report.tool = run.tool;
+    report.peak_rss_kb = run.peak_rss_kb;
+    report.elapsed = started.elapsed();
+    if let Some(failure) = run.failure {
+        report.failure = Some(failure);
+        return report;
+    }
+    let exit_code = run.exit_code;
+    let stderr = run.stderr;
     // A nonzero exit WITH an AST JSON is a normal result: slang exits 1 when it
     // reported errors but still wrote the elaborated tree (the crate rule in
     // lib.rs). Only a run that produced no usable file is MissingOutput, and
@@ -458,10 +466,22 @@ fn elaborate_impl(
             return report;
         }
     };
-    match parse_design_at(&text, Some(&project_root(files))) {
+    match parse_design_at(&text, Some(&root), navigation.is_some()) {
         Ok(design) => {
             report.instances = design.instances;
             report.signals = design.signals;
+            if let Some((_, dependencies)) = navigation {
+                if let Ok(input) = File::open(&dep_path) {
+                    *dependencies = BufReader::new(input)
+                        .take(4 * 1024 * 1024)
+                        .lines()
+                        .map_while(Result::ok)
+                        .filter(|path| !path.is_empty())
+                        .take(4001)
+                        .map(|path| root.join(path))
+                        .collect();
+                }
+            }
             if files.len() > options.max_files {
                 report.warning = Some(format!(
                     "the project has {} files (limit {}): elaboration may take longer than usual",
@@ -492,10 +512,194 @@ fn elaborate_impl(
     report
 }
 
+/// The outcome of one whole-project tool invocation.
+///
+/// Both the elaboration/catalog/rename runners (`--ast-json`) and the project
+/// lint pass (`--diag-json`) need exactly one process over the whole file set;
+/// this carries what each of them needs to report honestly: which binary ran,
+/// how it ended (exit code AND signal), how long it took, the captured stderr,
+/// and the typed failure when it produced nothing.
+pub(crate) struct ToolRun {
+    /// The binary's file name (`slang`), or `slang` when none was resolved.
+    pub tool: String,
+    /// Every binary-resolution attempt, in the product order.
+    pub resolution: BinaryResolution,
+    /// Wall-clock time of the run.
+    pub elapsed: Duration,
+    /// Peak RSS of the child in KiB (sampled from `/proc/<pid>/status`).
+    pub peak_rss_kb: u64,
+    /// The child's exit code, when it exited normally.
+    pub exit_code: Option<i32>,
+    /// The Unix signal that ended the child, when it did not exit normally.
+    pub signal: Option<i32>,
+    /// The child's captured stderr (capped; a truncation marker is appended).
+    pub stderr: String,
+    /// `None` when the child ran to completion; a typed failure otherwise.
+    pub failure: Option<LintFailure>,
+}
+
+/// Run ONE tool process over the whole project file set and wait for it.
+///
+/// `argv` is the complete argument list (the caller owns the product-specific
+/// flags); the child always runs with `current_dir = project_root(files)`,
+/// because slang reports paths relative to its own cwd. `cancel` kills the child
+/// and reports [`LintFailure::Cancelled`]; `timeout` does the same with
+/// [`LintFailure::Timeout`]. Every path kills and reaps the child.
+pub(crate) fn run_tool_once(
+    files: &[PathBuf],
+    slang_binary: Option<&Path>,
+    argv: &[std::ffi::OsString],
+    timeout: Duration,
+    cancel: Option<&AtomicBool>,
+) -> ToolRun {
+    run_tool_at(&project_root(files), slang_binary, argv, timeout, cancel)
+}
+
+fn run_tool_at(
+    root: &Path,
+    slang_binary: Option<&Path>,
+    argv: &[std::ffi::OsString],
+    timeout: Duration,
+    cancel: Option<&AtomicBool>,
+) -> ToolRun {
+    let started = Instant::now();
+    let resolution = resolve_binary_for_current_process(slang_binary);
+    let mut run = ToolRun {
+        tool: "slang".to_string(),
+        resolution: resolution.clone(),
+        elapsed: Duration::ZERO,
+        peak_rss_kb: 0,
+        exit_code: None,
+        signal: None,
+        stderr: String::new(),
+        failure: None,
+    };
+    let Some(chosen) = resolution.chosen.clone() else {
+        run.failure = Some(LintFailure::BinaryNotFound {
+            attempts: resolution.attempts.clone(),
+        });
+        run.elapsed = started.elapsed();
+        return run;
+    };
+    run.tool = chosen
+        .file_name()
+        .map(|name| name.to_string_lossy().into_owned())
+        .unwrap_or_else(|| "slang".to_string());
+
+    let mut command = Command::new(&chosen);
+    sanitize_tool_child_env(&mut command);
+    command
+        .args(argv)
+        .current_dir(root)
+        .stdin(Stdio::null())
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
+    let mut child = match command.spawn() {
+        Ok(child) => child,
+        Err(error) => {
+            run.failure = Some(LintFailure::Spawn {
+                message: format!("{}: {error}", chosen.display()),
+            });
+            run.elapsed = started.elapsed();
+            return run;
+        }
+    };
+
+    let stdout_reader = child.stdout.take().map(spawn_reader);
+    let stderr_reader = child.stderr.take().map(spawn_reader);
+
+    let wait_started = Instant::now();
+    let outcome = loop {
+        if cancel.is_some_and(|flag| flag.load(Ordering::SeqCst)) {
+            break ToolStop::Cancelled(terminate(&mut child).err());
+        }
+        if let Ok(status) = read_peak_rss(child.id()) {
+            run.peak_rss_kb = run.peak_rss_kb.max(status);
+        }
+        match child.try_wait() {
+            Ok(Some(status)) => {
+                break ToolStop::Finished {
+                    exit_code: status.code(),
+                    signal: termination_signal(&status),
+                };
+            }
+            Ok(None) => {}
+            Err(error) => {
+                break ToolStop::WaitFailed {
+                    message: format!("waiting for slang failed: {error}"),
+                    cleanup: terminate(&mut child).err(),
+                };
+            }
+        }
+        if wait_started.elapsed() >= timeout {
+            break ToolStop::TimedOut(terminate(&mut child).err());
+        }
+        std::thread::sleep(POLL_INTERVAL);
+    };
+
+    // Drain stdout (slang's human summary); only stderr is part of the result.
+    if let Some(reader) = stdout_reader.as_ref() {
+        let _ = receive_capped(reader);
+    }
+    if let Some(reader) = stderr_reader.as_ref() {
+        let (mut stderr, truncated) = receive_capped(reader);
+        if truncated {
+            stderr.push_str("\n[output truncated by vd-deeplint]\n");
+        }
+        run.stderr = stderr;
+    }
+
+    match outcome {
+        ToolStop::Finished { exit_code, signal } => {
+            run.exit_code = exit_code;
+            run.signal = signal;
+        }
+        ToolStop::TimedOut(cleanup_error) => {
+            append_cleanup_error(&mut run.stderr, cleanup_error);
+            run.failure = Some(LintFailure::Timeout { after: timeout });
+        }
+        ToolStop::Cancelled(cleanup_error) => {
+            append_cleanup_error(&mut run.stderr, cleanup_error);
+            run.failure = Some(LintFailure::Cancelled);
+        }
+        ToolStop::WaitFailed { message, cleanup } => {
+            append_cleanup_error(&mut run.stderr, cleanup);
+            run.failure = Some(LintFailure::Io { message });
+        }
+    }
+    run.elapsed = started.elapsed();
+    run
+}
+
+/// How one whole-set child process stopped.
+enum ToolStop {
+    Finished {
+        exit_code: Option<i32>,
+        signal: Option<i32>,
+    },
+    TimedOut(Option<String>),
+    Cancelled(Option<String>),
+    WaitFailed {
+        message: String,
+        cleanup: Option<String>,
+    },
+}
+
+fn append_cleanup_error(stderr: &mut String, cleanup_error: Option<String>) {
+    let Some(error) = cleanup_error else {
+        return;
+    };
+    if !stderr.is_empty() {
+        stderr.push('\n');
+    }
+    stderr.push_str(&format!("[vd-deeplint] {error}\n"));
+}
+
 /// The failure for a child that exited without a usable AST JSON.
 fn missing_output(exit_code: Option<i32>, stderr: &str) -> LintFailure {
     LintFailure::MissingOutput {
         exit_code,
+        signal: None,
         stderr: stderr.to_string(),
     }
 }
@@ -810,12 +1014,16 @@ fn push_generate_blocks<'a>(
 
 /// Parse the `--ast-json` document into the report's two lists.
 fn parse_design(text: &str) -> Result<Design, String> {
-    parse_design_at(text, None)
+    parse_design_at(text, None, false)
 }
 
 /// Parse with the directory the tool ran in, so every reported path becomes
 /// absolute (see [`crate::tool_paths`]).
-fn parse_design_at(text: &str, tool_dir: Option<&Path>) -> Result<Design, String> {
+fn parse_design_at(
+    text: &str,
+    tool_dir: Option<&Path>,
+    navigation: bool,
+) -> Result<Design, String> {
     let mut document: Value = serde_json::from_str(text)
         .map_err(|error| format!("the AST JSON is malformed: {error}"))?;
     if let Some(tool_dir) = tool_dir {
@@ -846,9 +1054,20 @@ fn parse_design_at(text: &str, tool_dir: Option<&Path>) -> Result<Design, String
     let mut signals = Vec::new();
     for root in roots {
         let name = root.get("name").and_then(Value::as_str).unwrap_or("");
-        walk_instance(root, name, &bodies, &mut instances, &mut signals);
+        walk_instance(
+            root,
+            name,
+            &bodies,
+            &mut instances,
+            &mut signals,
+            navigation,
+        );
     }
-    link_chains(&mut signals);
+    if navigation {
+        navigation::connect_parent_ports(&mut signals);
+    } else {
+        link_chains(&mut signals);
+    }
     Ok(Design { instances, signals })
 }
 
@@ -858,6 +1077,7 @@ fn walk_instance<'a>(
     bodies: &Bodies<'a>,
     instances: &mut Vec<InstanceNode>,
     signals: &mut Vec<SignalInfo>,
+    navigation: bool,
 ) {
     let Some(body) = bodies.of(instance) else {
         return;
@@ -907,11 +1127,29 @@ fn walk_instance<'a>(
             drivers: Vec::new(),
             loads: Vec::new(),
             chain: Vec::new(),
+            occurrences: Vec::new(),
         });
     }
 
+    if navigation {
+        navigation::record_scope(&members, &scoped, &mut local);
+    } else {
+        record_legacy_endpoints(path, &members, &scoped, &mut local);
+    }
+    signals.extend(local);
+    for (child, child_path) in &scoped {
+        walk_instance(child, child_path, bodies, instances, signals, navigation);
+    }
+}
+
+fn record_legacy_endpoints(
+    path: &str,
+    members: &[&Value],
+    scoped: &[(&Value, String)],
+    local: &mut [SignalInfo],
+) {
     // Instance port connections (instances inside generate blocks included).
-    for (member, child_path) in &scoped {
+    for (member, child_path) in scoped {
         let member: &Value = member;
         let Some(Value::Array(connections)) = member.get("connections") else {
             continue;
@@ -966,7 +1204,7 @@ fn walk_instance<'a>(
     }
 
     // Continuous assignments: LHS drives, RHS reads.
-    for member in &members {
+    for member in members {
         if member.get("kind").and_then(Value::as_str) != Some("ContinuousAssign") {
             continue;
         }
@@ -1011,7 +1249,7 @@ fn walk_instance<'a>(
     }
 
     // Procedural blocks: any LHS inside drives.
-    for member in &members {
+    for member in members {
         if member.get("kind").and_then(Value::as_str) != Some("ProceduralBlock") {
             continue;
         }
@@ -1040,13 +1278,6 @@ fn walk_instance<'a>(
                 ));
             }
         }
-    }
-
-    signals.extend(local);
-
-    // Children last, so the report is breadth-ordered by path.
-    for (child, child_path) in &scoped {
-        walk_instance(child, child_path, bodies, instances, signals);
     }
 }
 

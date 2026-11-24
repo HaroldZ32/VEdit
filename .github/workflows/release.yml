@@ -1,142 +1,117 @@
 name: release
 
-# Cuts the three shipped artefacts from a tag and publishes them with the GitHub
-# release: build the slang binary, run the release build with the GLIBC <= 2.17
-# assertion, package the AppImage and the tar.gz/.run pair with their clean-room
-# acceptance runs, then publish SHA256SUMS for the artefacts and the bundled
-# external binaries.
-
 on:
   push:
     tags: ['v*']
   workflow_dispatch:
 
 permissions:
-  contents: write
-  packages: read
+  contents: read
 
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
-  package:
-    name: build and publish the release artefacts
-    runs-on: ubuntu-latest
-    timeout-minutes: 360
+  source:
+    name: Check release source
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      version: ${{ steps.check.outputs.version }}
+      commit: ${{ steps.check.outputs.commit }}
+      tag-object: ${{ steps.check.outputs.tag-object }}
+      notes-present: ${{ steps.check.outputs.notes-present }}
     steps:
-      - name: "Check out (full history: SOURCE_DATE_EPOCH and git archive)"
-        uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
+          ref: ${{ github.sha }}
           fetch-depth: 0
-
-      - name: Cache the container cargo home
-        uses: actions/cache@v4
-        with:
-          path: |
-            target/cargo-home
-            target/home
-          key: cargo-${{ runner.os }}-${{ hashFiles('Cargo.lock') }}
-          restore-keys: |
-            cargo-${{ runner.os }}-
-
-      - name: Log in to GHCR (best effort; falls back to a local image build)
-        continue-on-error: true
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Resolve the pinned build image
-        id: image
+          persist-credentials: false
+      - name: Require an annotated version tag on a main merge
+        id: check
         shell: bash
         run: |
           set -euo pipefail
-          owner="$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
-          ref="ghcr.io/${owner}/vedit-build:latest"
-          if docker pull "$ref"; then
-            echo "using the published image ${ref}"
-            echo "ref=${ref}" >> "$GITHUB_OUTPUT"
-          else
-            echo "::warning::published image unavailable; building it in this job"
-            VEDIT_BUILD_IMAGE_REF=vedit-build:local bash scripts/build-image.sh
-            echo "ref=vedit-build:local" >> "$GITHUB_OUTPUT"
+          version=$(bash scripts/ci-qt6.sh version)
+          commit=$(git rev-parse HEAD)
+          test "$commit" = "$(git rev-parse "$GITHUB_SHA^{commit}")"
+          printf 'version=%s\ncommit=%s\n' "$version" "$commit" >> "$GITHUB_OUTPUT"
+          if [[ -f "docs/releases/$version.md" ]]; then
+            echo 'notes-present=true' >> "$GITHUB_OUTPUT"
+          fi
+          if [[ "$GITHUB_EVENT_NAME" == push ]]; then
+            if [[ "$GITHUB_REF" != "refs/tags/v$version" ]]; then
+              echo "::error::Expected refs/tags/v$version for the workspace Cargo version"
+              exit 1
+            fi
+            if [[ "$(git cat-file -t "$GITHUB_REF")" != tag ]]; then
+              echo "::error::Use an annotated release tag"
+              exit 1
+            fi
+            test "$(git rev-parse "$GITHUB_REF^{commit}")" = "$commit"
+            if ! git rev-list --first-parent --merges refs/remotes/origin/main | grep -Fx -- "$commit" >/dev/null; then
+              echo "::error::The tagged commit must be on origin/main first-parent history"
+              exit 1
+            fi
+            printf 'tag-object=%s\n' "$(git rev-parse "$GITHUB_REF")" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Build the slang deep-lint binary
-        shell: bash
-        run: bash build/slang/build.sh
+  build:
+    name: Validate and package Qt6
+    needs: source
+    uses: ./.github/workflows/image.yml
+    with:
+      package: true
 
-      - name: Fetch the pinned Verible binaries
+  publish:
+    name: Publish verified AppImage and SHA256SUMS
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    needs: [source, build]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          artifact-ids: ${{ needs.build.outputs.artifact-id }}
+          path: ${{ runner.temp }}/vedit-release
+          merge-multiple: true
+      - name: Check the transferred pair and publish the existing tag
         shell: bash
-        run: bash scripts/fetch-verible.sh
-
-      - name: Release build, Xvfb selftest and GLIBC assertion
-        shell: bash
+        working-directory: ${{ runner.temp }}/vedit-release
         env:
-          VEDIT_SKIP_IMAGE_BUILD: '1'
-          VEDIT_BUILD_IMAGE_REF: ${{ steps.image.outputs.ref }}
-          # build.sh runs containers and then writes to the workspace from the host,
-          # so those containers must use the runner's uid. The packaging lanes below
-          # install packages inside their containers and need root there.
-          VEDIT_CONTAINER_USER: '1'
-        run: bash scripts/build.sh
-
-      - name: AppImage with its clean-room acceptance
-        shell: bash
-        env:
-          VEDIT_SKIP_IMAGE_BUILD: '1'
-          VEDIT_BUILD_IMAGE_REF: ${{ steps.image.outputs.ref }}
-        run: bash packaging/appimage/run-evidence.sh
-
-      - name: tar.gz and .run with their clean-room acceptance
-        shell: bash
-        env:
-          VEDIT_SKIP_IMAGE_BUILD: '1'
-          VEDIT_BUILD_IMAGE_REF: ${{ steps.image.outputs.ref }}
-        run: bash packaging/tarball/build.sh
-
-      - name: Collect the artefacts and write SHA256SUMS
-        shell: bash
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+          TAG_OBJECT: ${{ needs.source.outputs.tag-object }}
+          COMMIT: ${{ needs.source.outputs.commit }}
+          VERSION: ${{ needs.source.outputs.version }}
+          APPIMAGE: ${{ needs.build.outputs.appimage }}
+          SHA256: ${{ needs.build.outputs.sha256 }}
+          NOTES_PRESENT: ${{ needs.source.outputs.notes-present }}
         run: |
           set -euo pipefail
-          version="$(awk -F'"' '/^version = /{print $2; exit}' Cargo.toml)"
-          echo "version=${version}"
-          mkdir -p dist
-          cp "packaging/appimage/out/VEdit-${version}-x86_64.AppImage" dist/
-          cp "packaging/tarball/out/vedit-${version}-linux-x86_64.tar.gz" dist/
-          cp "packaging/tarball/out/VEdit-${version}-x86_64.run" dist/
-          ( cd dist && sha256sum VEdit-*-x86_64.AppImage vedit-*-linux-x86_64.tar.gz VEdit-*-x86_64.run > SHA256SUMS )
-          rm -rf /tmp/vedit-package
-          mkdir -p /tmp/vedit-package
-          tar xzf "dist/vedit-${version}-linux-x86_64.tar.gz" -C /tmp/vedit-package
-          ( cd /tmp/vedit-package && sha256sum VEdit/bin/verible-verilog-ls VEdit/bin/verible-verilog-lint \
-              VEdit/bin/verible-verilog-format VEdit/bin/slang >> "${GITHUB_WORKSPACE}/dist/SHA256SUMS" )
-          cat dist/SHA256SUMS
+          test "$TAG" = "v$VERSION"
+          test "$APPIMAGE" = "VEdit-$VERSION-x86_64.AppImage"
+          [[ "$SHA256" =~ ^[a-f0-9]{64}$ ]]
+          shopt -s dotglob nullglob
+          files=(*)
+          test "${#files[@]}" -eq 2
+          test -f "$APPIMAGE" && test ! -L "$APPIMAGE"
+          test -f SHA256SUMS && test ! -L SHA256SUMS
+          printf '%s  %s\n' "$SHA256" "$APPIMAGE" | cmp - SHA256SUMS
+          sha256sum --check --strict SHA256SUMS
+          test "$(gh api "repos/$GH_REPO/git/ref/tags/$TAG" --jq .object.sha)" = "$TAG_OBJECT"
 
-      - name: Hand the workspace back to the runner user
-        if: always()
-        shell: bash
-        run: sudo chown -R "$(id -u):$(id -g)" target build || true
-
-      - name: Publish the GitHub release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            dist/*.AppImage
-            dist/*.tar.gz
-            dist/*.run
-            dist/SHA256SUMS
-          fail_on_unmatched_files: true
-          generate_release_notes: true
-
-      - name: Upload the release evidence
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-evidence
-          path: |
-            build/evidence/
-            evidence/appimage/
-          if-no-files-found: warn
+          notes=(--generate-notes)
+          note_path="docs/releases/$VERSION.md"
+          if [[ "$NOTES_PRESENT" == true ]]; then
+            gh api -H 'Accept: application/vnd.github.raw+json' \
+              "repos/$GH_REPO/contents/$note_path?ref=$COMMIT" > "$RUNNER_TEMP/release-notes.md"
+            notes=(--notes-file "$RUNNER_TEMP/release-notes.md")
+          fi
+          if [[ "$VERSION" == *-* ]]; then notes+=(--prerelease); fi
+          gh release create "$TAG" --verify-tag --title "VEdit $VERSION" \
+            "${notes[@]}" "$APPIMAGE" SHA256SUMS

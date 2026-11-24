@@ -13,7 +13,7 @@
 # Qt6 Core/Gui/Widgets and the POSIX pty API in libc. See README.md.
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
   cmake_minimum_required(VERSION 3.25)
-  project(VEditTerminal VERSION 0.2.1 LANGUAGES CXX)
+  project(VEditTerminal VERSION 0.4.0 LANGUAGES CXX)
   set(CMAKE_CXX_STANDARD 20)
   set(CMAKE_CXX_STANDARD_REQUIRED ON)
   set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -59,8 +59,63 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../app/panel_registry.h")
   endif()
 endif()
 
+# batch-20261115 AC-1.3: the pty child receives the imported environment selection
+# through the C ABI. Resolution order: the root build's imported target `vd_ffi`
+# (cmake/VEditRustFfi.cmake), then the checkout's release archive (the same default
+# the settings lane uses), so a standalone lane build exercises the seam too.
+if(TARGET vd_ffi)
+  set(VEDIT_TERMINAL_FFI_TARGET vd_ffi)
+else()
+  set(VEDIT_TERMINAL_FFI_HEADER "${CMAKE_CURRENT_SOURCE_DIR}/../../crates/vd-ffi/include/vd_ffi.h")
+  set(VEDIT_TERMINAL_FFI_LIB "${CMAKE_CURRENT_SOURCE_DIR}/../../target/release/libvd_ffi.a")
+  if(DEFINED VEDIT_RUST_FFI_INCLUDE AND VEDIT_RUST_FFI_INCLUDE)
+    set(VEDIT_TERMINAL_FFI_HEADER "${VEDIT_RUST_FFI_INCLUDE}/vd_ffi.h")
+  endif()
+  if(DEFINED VEDIT_RUST_FFI_LIB AND VEDIT_RUST_FFI_LIB)
+    set(VEDIT_TERMINAL_FFI_LIB "${VEDIT_RUST_FFI_LIB}")
+  endif()
+  if(EXISTS "${VEDIT_TERMINAL_FFI_HEADER}" AND EXISTS "${VEDIT_TERMINAL_FFI_LIB}")
+    get_filename_component(VEDIT_TERMINAL_FFI_INCLUDE_DIR "${VEDIT_TERMINAL_FFI_HEADER}" DIRECTORY)
+    target_include_directories(vedit_terminal PUBLIC "${VEDIT_TERMINAL_FFI_INCLUDE_DIR}")
+    target_link_libraries(vedit_terminal PUBLIC "${VEDIT_TERMINAL_FFI_LIB}")
+    set(VEDIT_TERMINAL_FFI_TARGET "${VEDIT_TERMINAL_FFI_LIB}")
+  endif()
+endif()
+if(VEDIT_TERMINAL_FFI_TARGET)
+  # The link carries the header's INTERFACE include directory as well, so the
+  # compile definition alone never reaches pty_session.cpp without `vd_ffi.h`.
+  target_link_libraries(vedit_terminal PUBLIC ${VEDIT_TERMINAL_FFI_TARGET})
+  target_compile_definitions(vedit_terminal PUBLIC VEDIT_TERMINAL_HAVE_FFI=1)
+  message(STATUS "terminal: pty child receives the imported environment (${VEDIT_TERMINAL_FFI_TARGET})")
+else()
+  message(STATUS "terminal: no vd-ffi library found; the pty child inherits only the launch environment")
+endif()
+
 add_test(NAME vedit-terminal-selftest COMMAND vedit-terminal-selftest --selfcheck)
 set_tests_properties(vedit-terminal-selftest PROPERTIES
   ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime;LANG=C.UTF-8"
   TIMEOUT 180
 )
+
+# batch-20261114 E3: the terminal panel's shell inherits the environment VEdit was
+# LAUNCHED with. The probe name cannot exist naturally, and ctest supplies it in
+# this case's ENVIRONMENT, so the inherited value provably comes from the process
+# launch; the test's negative control removes it in-process and must see <unset>.
+add_test(NAME vedit-terminal-env-inheritance
+         COMMAND vedit-terminal-selftest --selfcheck-env-inheritance)
+set_tests_properties(vedit-terminal-env-inheritance PROPERTIES
+  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime;LANG=C.UTF-8;VEDIT_TERM_ENV_PROBE=vedit-ctest-launch-env-7f3a9c"
+  TIMEOUT 120
+)
+
+# batch-20261115 AC-1.3: the imported environment selection (applied through the real
+# C ABI) reaches the pty child, an unselected name stays <unset>, and the packaged
+# loader variable does not leak into the host shell.
+if(VEDIT_TERMINAL_FFI_TARGET)
+  add_test(NAME vedit-terminal-env-imported
+           COMMAND vedit-terminal-selftest --selfcheck-env-imported)
+  set_tests_properties(vedit-terminal-env-imported PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime;LANG=C.UTF-8"
+    TIMEOUT 120
+  )
+endif()

@@ -1,19 +1,28 @@
 #include "vcs_history.h"
 
+#include <QClipboard>
+#include <QComboBox>
 #include <QCoreApplication>
+#include <QGuiApplication>
 #include <QDateTime>
 #include <QFont>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QInputDialog>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMessageBox>
+#include <QMenu>
+#include <QRegularExpression>
 #include <QPlainTextEdit>
 #include <QPushButton>
+#include <QSignalBlocker>
 #include <QSplitter>
 #include <QTabWidget>
 #include <QTreeWidget>
 #include <QVBoxLayout>
 
+#include <algorithm>
 #include <cstdio>
 #include <utility>
 
@@ -135,6 +144,32 @@ void VcsHistoryPanel::buildUi()
     message_->setVisible(false);
     layout->addWidget(message_);
 
+    auto *repositories = new QHBoxLayout();
+    repository_ = new QComboBox(this);
+    repository_->setObjectName(QStringLiteral("svn-saved-repositories"));
+    repository_->addItem(tr("Working-copy repository"), QString());
+    addRepository_ = new QPushButton(tr("Add SVN Repository…"), this);
+    addRepository_->setObjectName(QStringLiteral("svn-repository-add"));
+    removeRepository_ = new QPushButton(tr("Remove Saved Repository"), this);
+    removeRepository_->setObjectName(QStringLiteral("svn-repository-remove"));
+    repositories->addWidget(repository_, 1);
+    repositories->addWidget(addRepository_);
+    repositories->addWidget(removeRepository_);
+    layout->addLayout(repositories);
+    connect(addRepository_, &QPushButton::clicked, this, [this] { addSavedRepository(); });
+    connect(removeRepository_, &QPushButton::clicked, this, [this] { removeSavedRepository(); });
+    connect(repository_, &QComboBox::currentIndexChanged, this, [this] {
+        ++generation_;
+        ++svnSelectionEpoch_;
+        svnHistoryPath_.clear();
+        svnDetailRevision_.clear();
+        svnRevisionFiles_.clear();
+        path_->clear();
+        commits_->clear();
+        detail_->clear();
+        loadPage(0);
+    });
+
     // --- search + paging ---------------------------------------------------
     auto *searchRow = new QHBoxLayout();
     search_ = new QLineEdit(this);
@@ -148,6 +183,9 @@ void VcsHistoryPanel::buildUi()
     searchRow->addWidget(search_);
     searchRow->addWidget(search_button_);
     searchRow->addWidget(refresh_button_);
+    svnRevisionsButton_ = new QPushButton(tr("Compare Revisions…"), this);
+    svnRevisionsButton_->setObjectName(QStringLiteral("svn-history-compare-revisions"));
+    searchRow->addWidget(svnRevisionsButton_);
     searchRow->addStretch(1);
     layout->addLayout(searchRow);
 
@@ -164,6 +202,7 @@ void VcsHistoryPanel::buildUi()
     pageRow->addSpacing(12);
     path_ = new QLineEdit(this);
     path_->setObjectName(QStringLiteral("vcs-history-path"));
+    path_->setClearButtonEnabled(true);
     path_->setPlaceholderText(QCoreApplication::translate("VEdit", "File path (repository-relative)"));
     file_button_ = new QPushButton(QCoreApplication::translate("VEdit", "File history"), this);
     file_button_->setObjectName(QStringLiteral("vcs-history-action-file"));
@@ -175,6 +214,9 @@ void VcsHistoryPanel::buildUi()
     pageRow->addWidget(file_button_);
     pageRow->addWidget(blame_button_);
     pageRow->addWidget(compare_button_);
+    svnWorkingButton_ = new QPushButton(tr("Compare With Working Copy"), this);
+    svnWorkingButton_->setObjectName(QStringLiteral("svn-history-compare-working"));
+    pageRow->addWidget(svnWorkingButton_);
     layout->addLayout(pageRow);
 
     // --- commits + detail tabs --------------------------------------------
@@ -229,15 +271,71 @@ void VcsHistoryPanel::buildUi()
     connect(file_button_, &QPushButton::clicked, this, [this]() { openFileHistory(path_->text()); });
     connect(blame_button_, &QPushButton::clicked, this, [this]() { showBlame(path_->text()); });
     connect(compare_button_, &QPushButton::clicked, this, [this]() { compareSelected(); });
+    commits_->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(commits_, &QWidget::customContextMenuRequested, this, [this](const QPoint &pos) {
+        if (backend_ != Backend::Subversion) { return; }
+        auto *item = commits_->itemAt(pos);
+        if (item == nullptr) { return; }
+        if (!item->isSelected()) { commits_->setCurrentItem(item); }
+        const QString revision = item->data(0, Qt::UserRole).toString();
+        const QString message = item->data(0, Qt::UserRole + 2).toString();
+        const QString selectedAddress = repository_->currentData().toString();
+        const QString remote = selectedAddress.isEmpty() ? svnDetailRepository_ : selectedAddress;
+        const auto epoch = svnSelectionEpoch_;
+        QMenu menu(this);
+        menu.addAction(tr("Copy Revision Number"), this, [revision] { QGuiApplication::clipboard()->setText(revision); });
+        menu.addAction(tr("Copy Commit Message"), this, [message] { QGuiApplication::clipboard()->setText(message); });
+        if (!svnHistoryPath_.isEmpty()) {
+            auto *comparison = menu.addAction(tr("Compare Revisions"), this, [this] { compareSvnSelection(false); });
+            const auto count = commits_->selectedItems().size();
+            comparison->setEnabled(count == 1 || count == 2);
+            menu.addAction(tr("Compare This Revision With BASE"), this, [this, revision, epoch] {
+                if (epoch == svnSelectionEpoch_) { emit svnBaseComparisonRequested(svnHistoryPath_, revision.toULongLong(), svnPeg_); }
+            });
+            menu.addAction(tr("Open This Revision"), this, [this, revision] {
+                emit svnSnapshotRequested(svnHistoryPath_, revision.toULongLong(), svnPeg_);
+            });
+            menu.addAction(tr("Open Working File"), this, [this] { emit svnWorkingFileRequested(svnHistoryPath_); });
+        } else if (svnDetailRevision_ == revision) {
+            auto *files = menu.addMenu(tr("Changed Files"));
+            for (const auto &path : svnRevisionFiles_) {
+                auto *file = files->addMenu(path);
+                if (selectedAddress.isEmpty() && !svnCheckoutPrefix_.isEmpty() && path.startsWith(svnCheckoutPrefix_)) {
+                    const auto relative = path.sliced(svnCheckoutPrefix_.size());
+                    file->addAction(tr("Open Working File"), this, [this, relative, epoch] {
+                        if (epoch == svnSelectionEpoch_) { emit svnWorkingFileRequested(relative); }
+                    });
+                }
+                file->addAction(tr("Open This Revision"), this, [this, path, revision, remote, epoch] {
+                    if (epoch != svnSelectionEpoch_) { return; }
+                    if (!remote.isEmpty()) { emit svnRemoteFileRequested(remote, path, revision.toULongLong(), svnDeletedRevisionFiles_.contains(path), false); }
+                });
+                file->addAction(tr("Compare Revisions"), this, [this, path, revision, remote, epoch] {
+                    if (epoch != svnSelectionEpoch_) { return; }
+                    if (!remote.isEmpty()) { emit svnRemoteFileRequested(remote, path, revision.toULongLong(), svnDeletedRevisionFiles_.contains(path), true); }
+                });
+            }
+            files->setEnabled(!svnRevisionFiles_.isEmpty());
+        }
+        menu.exec(commits_->viewport()->mapToGlobal(pos));
+    });
+    connect(svnWorkingButton_, &QPushButton::clicked, this, [this] { compareSvnSelection(true); });
+    connect(svnRevisionsButton_, &QPushButton::clicked, this, [this] { promptSvnRevisions(); });
+    connect(path_, &QLineEdit::textChanged, this, [this] {
+        ++svnSelectionEpoch_;
+        ++fileRequestEpoch_;
+        updateActions();
+    });
+    connect(path_, &QLineEdit::returnPressed, this, [this] { openFileHistory(path_->text()); });
     connect(commits_, &QTreeWidget::itemSelectionChanged, this, [this]() { onSelectionChanged(); });
     updateActions();
 }
 
-void VcsHistoryPanel::setSource(std::unique_ptr<VcsSource> source)
+void VcsHistoryPanel::setSource(std::unique_ptr<VcsSource> source, bool deferRefresh)
 {
     source_ = std::move(source);
     ++generation_;
-    refresh();
+    if (!deferRefresh) { refresh(); }
 }
 
 void VcsHistoryPanel::setRoot(const std::string &root)
@@ -247,6 +345,13 @@ void VcsHistoryPanel::setRoot(const std::string &root)
     }
     root_ = root;
     ++generation_;
+    ++svnSelectionEpoch_;
+    backend_ = Backend::None;
+    svnHistoryPath_.clear();
+    svnDetailRevision_.clear();
+    svnRevisionFiles_.clear();
+    path_->clear();
+    svnPeg_ = kDefaultSvnPeg;
     commits_->clear();
     detail_->clear();
     file_history_->clear();
@@ -299,18 +404,26 @@ void VcsHistoryPanel::issue(const HistoryRequest &request)
         return;
     }
     const quint64 generation = generation_;
-    source_->requestHistory(request, [this, generation, kind = request.kind](HistoryData data) {
+    const quint64 fileRequest = request.kind == HistoryKind::FileHistory ? ++fileRequestEpoch_ : 0;
+    const quint64 pageRequest = request.kind == HistoryKind::Commits || request.kind == HistoryKind::SvnRemoteLog ? ++historyPageEpoch_ : 0;
+    const quint64 detail = request.kind == HistoryKind::Commit || request.kind == HistoryKind::SvnRemoteDetail ? ++detailEpoch_ : 0;
+    const auto guard = fileRequest != 0 ? historySelectionGuard_ : std::function<bool()>{};
+    source_->requestHistory(request, [this, generation, fileRequest, pageRequest, detail, guard, kind = request.kind](HistoryData data) {
         --in_flight_;
         loading_->setVisible(in_flight_ > 0);
-        if (generation != generation_) {
-            return; // the panel moved to another working copy / source
+        updateActions();
+        if (generation != generation_ || (guard && !guard()) || (fileRequest != 0 && fileRequest != fileRequestEpoch_) ||
+            (pageRequest != 0 && pageRequest != historyPageEpoch_) || (detail != 0 && detail != detailEpoch_)) {
+            return;
         }
         data.kind = kind;
         switch (kind) {
         case HistoryKind::Commits:
+        case HistoryKind::SvnRemoteLog:
             applyCommits(std::move(data));
             break;
         case HistoryKind::Commit:
+        case HistoryKind::SvnRemoteDetail:
             applyCommit(std::move(data));
             break;
         case HistoryKind::FileHistory:
@@ -322,13 +435,24 @@ void VcsHistoryPanel::issue(const HistoryRequest &request)
         case HistoryKind::Compare:
             applyCompare(std::move(data));
             break;
+        case HistoryKind::SvnSnapshot:
+        case HistoryKind::SvnPrevious:
+        case HistoryKind::SvnPatch:
+        case HistoryKind::SvnIncoming:
+        case HistoryKind::SvnRemoteSnapshot:
+        case HistoryKind::SvnRemotePrevious:
+            break;
         }
     });
 }
 
 void VcsHistoryPanel::refresh()
 {
-    loadPage(0);
+    if (backend_ == Backend::Subversion && !path_->text().isEmpty()) {
+        openFileHistory(path_->text());
+    } else {
+        loadPage(0);
+    }
 }
 
 void VcsHistoryPanel::loadPage(int offset)
@@ -337,7 +461,8 @@ void VcsHistoryPanel::loadPage(int offset)
         offset = 0;
     }
     HistoryRequest request;
-    request.kind = HistoryKind::Commits;
+    request.url = repository_->currentData().toString().toStdString();
+    request.kind = request.url.empty() ? HistoryKind::Commits : HistoryKind::SvnRemoteLog;
     request.root = root_;
     request.offset = offset;
     request.limit = page_size_;
@@ -352,7 +477,11 @@ void VcsHistoryPanel::search(const QString &query)
     if (search_->text() != current_query_) {
         search_->setText(current_query_);
     }
-    loadPage(0);
+    if (backend_ == Backend::Subversion && !path_->text().trimmed().isEmpty()) {
+        openFileHistory(path_->text());
+    } else {
+        loadPage(0);
+    }
 }
 
 void VcsHistoryPanel::nextPage()
@@ -380,7 +509,9 @@ void VcsHistoryPanel::selectCommit(const QString &hash)
         return; // the selection change issued the detail read
     }
     HistoryRequest request;
-    request.kind = HistoryKind::Commit;
+    request.url = repository_->currentData().toString().toStdString();
+    request.kind = request.url.empty() ? HistoryKind::Commit : HistoryKind::SvnRemoteDetail;
+    request.revision.number = hash.toULongLong();
     request.root = root_;
     request.hash = hash.toStdString();
     issue(request);
@@ -388,28 +519,38 @@ void VcsHistoryPanel::selectCommit(const QString &hash)
 
 void VcsHistoryPanel::onSelectionChanged()
 {
+    ++svnSelectionEpoch_;
     const QTreeWidgetItem *item = commits_->currentItem();
     if (item == nullptr || item->data(0, Qt::UserRole).toString().isEmpty()) {
         updateActions();
         return;
     }
     selected_hash_ = item->data(0, Qt::UserRole).toString();
-    selectCommit(selected_hash_);
+    if (backend_ != Backend::Subversion || svnHistoryPath_.isEmpty()) { selectCommit(selected_hash_); }
     updateActions();
 }
 
-void VcsHistoryPanel::openFileHistory(const QString &path)
+void VcsHistoryPanel::openFileHistory(const QString &path, std::function<bool()> stillCurrent)
 {
-    const QString value = path.trimmed();
-    if (value.isEmpty() || !source_) {
+    if (repository_->currentIndex() > 0) {
+        const QSignalBlocker block(repository_);
+        repository_->setCurrentIndex(0);
+        ++generation_;
+    }
+    historySelectionGuard_ = std::move(stillCurrent);
+    if (path.isEmpty() || !source_) {
         return;
     }
+    if (path_->text() != path) {
+        path_->setText(path);
+    }
+    ++svnSelectionEpoch_;
     HistoryRequest request;
     request.kind = HistoryKind::FileHistory;
     request.root = root_;
-    request.path = value.toStdString();
+    request.path = path.toStdString();
     request.offset = 0;
-    request.limit = page_size_;
+    request.limit = backend_ == Backend::Subversion ? kMaxHistoryPage : page_size_;
     issue(request);
 }
 
@@ -426,8 +567,56 @@ void VcsHistoryPanel::showBlame(const QString &path)
     issue(request);
 }
 
+void VcsHistoryPanel::compareSvnSelection(bool workingCopy)
+{
+    if (backend_ != Backend::Subversion || svnHistoryPath_ != path_->text()) {
+        return;
+    }
+    QList<quint64> revisions;
+    for (const auto *item : commits_->selectedItems()) {
+        bool ok = false;
+        const quint64 revision = item->data(0, Qt::UserRole).toString().toULongLong(&ok);
+        if (ok) {
+            revisions.append(revision);
+        }
+    }
+    if (revisions.isEmpty() || revisions.size() > (workingCopy ? 1 : 2)) {
+        return;
+    }
+    std::sort(revisions.begin(), revisions.end());
+    emit svnComparisonRequested(svnHistoryPath_, revisions, svnPeg_, workingCopy);
+}
+
+void VcsHistoryPanel::promptSvnRevisions()
+{
+    const QString path = path_->text();
+    const quint64 epoch = svnSelectionEpoch_;
+    bool accepted = false;
+    const QString text = QInputDialog::getText(this, tr("Compare SVN Revisions"),
+        tr("Enter two revisions separated by a comma, for example r12, r34."), QLineEdit::Normal, {}, &accepted);
+    if (!accepted || epoch != svnSelectionEpoch_) {
+        return;
+    }
+    static const QRegularExpression pattern(QStringLiteral(R"(^\s*[rR]?(\d+)\s*,\s*[rR]?(\d+)\s*$)"));
+    const auto match = pattern.match(text);
+    bool leftOk = false;
+    bool rightOk = false;
+    const auto left = match.capturedView(1).toULongLong(&leftOk);
+    const auto right = match.capturedView(2).toULongLong(&rightOk);
+    if (!leftOk || !rightOk || left == kDefaultSvnPeg || right == kDefaultSvnPeg || left == right) {
+        QMessageBox::information(this, tr("Compare SVN Revisions"), tr("Enter two different revision numbers."));
+        return;
+    }
+    const auto peg = path == svnHistoryPath_ ? svnPeg_ : kDefaultSvnPeg;
+    emit svnComparisonRequested(path, {left, right}, peg, false);
+}
+
 void VcsHistoryPanel::compareSelected()
 {
+    if (backend_ == Backend::Subversion) {
+        compareSvnSelection(false);
+        return;
+    }
     if (!source_) {
         return;
     }
@@ -460,6 +649,19 @@ void VcsHistoryPanel::showState(const QString &message, bool error)
 
 void VcsHistoryPanel::applyCommits(HistoryData data)
 {
+    backend_ = data.backend;
+    const bool svn = backend_ == Backend::Subversion;
+    if (svn && !path_->text().trimmed().isEmpty()) {
+        if (svnHistoryPath_ != path_->text()) { openFileHistory(path_->text()); }
+        return;
+    }
+    if (svn) {
+        svnHistoryPath_.clear();
+        selected_hash_.clear();
+        detail_->clear();
+        search_->setPlaceholderText(tr("Search text or revision (r123)"));
+    }
+    const QString title = svn ? tr("Subversion Repository History") : QCoreApplication::translate("VEdit", "Git history");
     offset_ = data.offset;
     has_more_ = data.hasMore;
     error_->setVisible(false);
@@ -471,7 +673,7 @@ void VcsHistoryPanel::applyCommits(HistoryData data)
         error_->setText(data.note.empty() ? QCoreApplication::translate("VEdit", "The history read failed.") : QCoreApplication::translate("VEdit", "The history read failed: %1")
                               .arg(QString::fromStdString(data.note)));
         error_->setVisible(true);
-        header_->setText(QCoreApplication::translate("VEdit", "Git history"));
+        header_->setText(title);
         page_->setText(QString());
         empty_->setVisible(false);
         updateActions();
@@ -479,11 +681,12 @@ void VcsHistoryPanel::applyCommits(HistoryData data)
     }
     empty_state_ = data.commits.empty();
     ready_ = true;
-    header_->setText(data.commits.empty()
-        ? QCoreApplication::translate("VEdit", "Git history")
+    header_->setText(svn || data.commits.empty() ? title
         : QCoreApplication::translate("VEdit", "Git history · %1 commit(s) on this page").arg(static_cast<int>(data.commits.size())));
     // Newest first; the hash rides in UserRole so a probe never parses the text.
     commits_->clear();
+    commits_->setColumnCount(4);
+    commits_->setHeaderLabels({QCoreApplication::translate("VEdit", "Commit"), QCoreApplication::translate("VEdit", "Date"), QCoreApplication::translate("VEdit", "Author"), QCoreApplication::translate("VEdit", "Subject")});
     for (const CommitEntry &commit : data.commits) {
         auto *item = new QTreeWidgetItem(commits_);
         item->setText(0, QString::fromStdString(commit.shortHash));
@@ -492,6 +695,7 @@ void VcsHistoryPanel::applyCommits(HistoryData data)
         item->setText(3, QString::fromStdString(commit.subject));
         item->setData(0, Qt::UserRole, QString::fromStdString(commit.hash));
         item->setData(0, Qt::UserRole + 1, QString::fromStdString(commit.shortHash));
+        item->setData(0, Qt::UserRole + 2, QString::fromStdString(commit.subject));
     }
     const int first = data.commits.empty() ? 0 : offset_ + 1;
     const int last = offset_ + static_cast<int>(data.commits.size());
@@ -524,7 +728,21 @@ void VcsHistoryPanel::applyCommit(HistoryData data)
         return;
     }
     QString text = commitMetaText(data);
-    if (!data.files.empty()) {
+    if (data.backend == Backend::Subversion) {
+        const QString revision = QString::fromStdString(data.hash);
+        svnDetailRevision_ = revision.startsWith(u'r') ? revision.sliced(1) : revision;
+        svnDetailRepository_ = QString::fromStdString(data.from);
+        svnCheckoutPrefix_ = QString::fromStdString(data.to);
+        if (!svnCheckoutPrefix_.isEmpty() && !svnCheckoutPrefix_.endsWith(u'/')) { svnCheckoutPrefix_.append(u'/'); }
+        svnRevisionFiles_.clear();
+        svnDeletedRevisionFiles_.clear();
+        for (const auto &file : data.files) {
+            const auto path = QString::fromStdString(file.path);
+            svnRevisionFiles_.append(path);
+            if (file.deletions > 0) { svnDeletedRevisionFiles_.insert(path); }
+        }
+    }
+    if (data.backend != Backend::Subversion && !data.files.empty()) {
         text += QLatin1Char('\n') + QCoreApplication::translate("VEdit", "Files") + QLatin1Char('\n') + fileStatText(data.files);
     }
     if (!data.patch.empty()) {
@@ -537,6 +755,47 @@ void VcsHistoryPanel::applyCommit(HistoryData data)
 
 void VcsHistoryPanel::applyFileHistory(HistoryData data)
 {
+    if (data.backend == Backend::Subversion) {
+        backend_ = data.backend;
+        svnHistoryPath_ = QString::fromStdString(data.path);
+        bool pegOk = false;
+        svnPeg_ = QString::fromStdString(data.hash).toULongLong(&pegOk);
+        if (!pegOk) {
+            svnPeg_ = kDefaultSvnPeg;
+        }
+        header_->setText(tr("Subversion File History"));
+        commits_->clear();
+        commits_->setColumnCount(4);
+        commits_->setHeaderLabels({tr("Revision"), QCoreApplication::translate("VEdit", "Date"),
+                                  QCoreApplication::translate("VEdit", "Author"), QCoreApplication::translate("VEdit", "Subject")});
+        const QString query = current_query_;
+        const QRegularExpression rev(QStringLiteral("^r?([0-9]+)$"));
+        const auto revisionQuery = rev.match(query);
+        for (const auto &revision : data.commits) {
+            const auto id = QString::fromStdString(revision.hash);
+            const auto author = QString::fromStdString(revision.author);
+            const auto message = QString::fromStdString(revision.subject);
+            if (!query.isEmpty() && (revisionQuery.hasMatch() ? id != revisionQuery.captured(1)
+                : !message.contains(query, Qt::CaseInsensitive) && !author.contains(query, Qt::CaseInsensitive))) { continue; }
+            auto *item = new QTreeWidgetItem(commits_);
+            item->setText(0, QString::fromStdString(revision.shortHash));
+            item->setText(1, formatTime(revision.time));
+            item->setText(2, author);
+            item->setText(3, message.section(u'\n', 0, 0));
+            item->setData(0, Qt::UserRole, id);
+            item->setData(0, Qt::UserRole + 2, message);
+        }
+        const bool hasRevisions = commits_->topLevelItemCount() > 0;
+        splitter_->setVisible(hasRevisions);
+        empty_->setVisible(!data.error && !hasRevisions);
+        empty_->setText(query.isEmpty() ? tr("No revisions touch this file.") : tr("No file revisions match the search."));
+        error_->setVisible(data.error);
+        error_->setText(QString::fromStdString(data.note));
+        error_->setTextFormat(Qt::PlainText);
+        tabs_->hide();
+        updateActions();
+        return;
+    }
     if (data.error) {
         file_history_->setPlainText(data.note.empty() ? QCoreApplication::translate("VEdit", "The file history could not be read.")
                                                       : QCoreApplication::translate("VEdit", "The file history could not be read: %1")
@@ -608,13 +867,32 @@ void VcsHistoryPanel::updateActions()
 {
     const bool idle = in_flight_ == 0;
     const bool hasSource = source_ != nullptr;
+    const bool svn = backend_ == Backend::Subversion;
+    const qsizetype selected = commits_->selectedItems().size();
+    const bool svnSelection = hasSource && idle && !svnHistoryPath_.isEmpty() && svnHistoryPath_ == path_->text();
+    svnWorkingButton_->setVisible(svn);
+    svnWorkingButton_->setEnabled(svnSelection && selected == 1);
+    svnRevisionsButton_->setVisible(svn);
+    svnRevisionsButton_->setEnabled(svn && hasSource && idle && !path_->text().isEmpty());
+    const bool repositoryHistory = !svn || svnHistoryPath_.isEmpty();
+    const bool remoteHistory = repository_->currentIndex() > 0;
+    removeRepository_->setEnabled(remoteHistory);
+    path_->setEnabled(!remoteHistory);
+    previous_button_->setVisible(repositoryHistory);
+    next_button_->setVisible(repositoryHistory);
+    page_->setVisible(repositoryHistory);
+    blame_button_->setVisible(!svn);
+    tabs_->setVisible(repositoryHistory);
+    for (int index = 1; index < tabs_->count(); ++index) { tabs_->setTabVisible(index, !svn); }
+    compare_button_->setText(svn && selected == 1 ? tr("Compare With Previous Revision") : tr("Compare selected"));
     search_button_->setEnabled(hasSource && idle);
     refresh_button_->setEnabled(hasSource && idle);
     previous_button_->setEnabled(hasSource && idle && offset_ > 0);
     next_button_->setEnabled(hasSource && idle && has_more_);
-    file_button_->setEnabled(hasSource && idle && !path_->text().trimmed().isEmpty());
+    file_button_->setEnabled(hasSource && idle && !remoteHistory && !path_->text().isEmpty());
     blame_button_->setEnabled(hasSource && idle && !path_->text().trimmed().isEmpty());
-    compare_button_->setEnabled(hasSource && idle && commits_->selectedItems().size() >= 2);
+    compare_button_->setEnabled(svn ? svnSelection && (selected == 1 || selected == 2)
+                                   : hasSource && idle && selected >= 2);
 }
 
 int VcsHistoryPanel::commitCount() const

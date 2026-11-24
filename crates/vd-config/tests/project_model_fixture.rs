@@ -10,7 +10,15 @@
 //! `scripts/verify-fixture.sh` expands the filelists in bash; this test proves
 //! the Rust project model returns the same lists, and — importantly — that the
 //! fixture folder resolves to itself as the project root even though it lives
-//! inside the VEdit git checkout (`RootSource::Filelist`).
+//! inside the VEdit git checkout (its own `vedit.toml`, so
+//! `RootSource::VeditToml`).
+//!
+//! CONTRACT CHANGE (2026-11-18 file-set decision, A-5): the fixture used to be
+//! rooted by its root-level `.f` alone (`RootSource::Filelist`). A root-level
+//! `.f` is no longer auto-discovered, so the fixture declares
+//! `[project] filelists = ["project.f"]` in `vedit.toml` (and opts into the
+//! legacy `auto_discover` switch to keep the 11-file acceptance set). The
+//! expanded lists are unchanged; only the root marker is.
 
 use std::path::{Path, PathBuf};
 
@@ -82,7 +90,7 @@ fn the_repository_fixture_expands_to_the_checked_in_expectations() -> Result<()>
         loaded.project.root, root,
         "the fixture folder is its own project root (it is nested inside the VEdit git checkout)"
     );
-    assert_eq!(loaded.project.root_source, RootSource::Filelist);
+    assert_eq!(loaded.project.root_source, RootSource::VeditToml);
 
     let mut files = Vec::new();
     for filelist in &loaded.project.filelists {
@@ -194,6 +202,51 @@ fn the_repository_fixture_expands_to_the_checked_in_expectations() -> Result<()>
     Ok(())
 }
 
+/// A-2/A-5 on the repository fixture: its `vedit.toml` declares the filelist
+/// explicitly AND opts into the legacy `auto_discover` switch, so the old
+/// 11-file set (the 7 declared sources plus the 4 `.vh` headers the recursive
+/// scan finds) is still reproducible here — the C++ acceptance suite asserts
+/// the same 11 files through the C ABI.
+#[test]
+fn the_fixture_reproduces_the_legacy_eleven_file_set() -> Result<()> {
+    let root = fixture_root()?;
+    let loaded = load(&root)?;
+    assert!(
+        loaded.config.project.auto_discover,
+        "the fixture's vedit.toml must opt into the legacy file set"
+    );
+
+    let expansion = vd_config::project::expand(&root, &[], &[], &[])?;
+    let files: Vec<String> = expansion
+        .files
+        .iter()
+        .map(|file| relative(file, &root))
+        .collect();
+    assert_eq!(
+        files.len(),
+        11,
+        "7 declared sources + 4 scanned headers: {files:?}"
+    );
+    let declared = expected_lines(&root, "files.txt")?;
+    assert_eq!(
+        &files[..declared.len()],
+        &declared[..],
+        "the declared filelist order comes first"
+    );
+    let scanned: Vec<String> = files[declared.len()..].to_vec();
+    assert_eq!(
+        scanned,
+        vec![
+            "inc/defs.vh",
+            "inc/generated/width.vh",
+            "rtl/include/rtl_defs.vh",
+            "tb/include/tb_defs.vh",
+        ],
+        "then the sorted recursive scan"
+    );
+    Ok(())
+}
+
 #[test]
 fn bad_entries_name_the_filelist_file_and_line() -> Result<()> {
     let temp = tempfile::tempdir()?;
@@ -203,11 +256,17 @@ fn bad_entries_name_the_filelist_file_and_line() -> Result<()> {
         "+define+1BAD=1\n+libext+.v\n-f missing.f\nrtl/a.sv\n",
     )?;
     write(&root.join("rtl/a.sv"), "module a; endmodule\n")?;
+    // CONTRACT CHANGE (2026-11-18 file-set decision, A-5): the broken filelist
+    // is declared explicitly; a root-level `.f` is not auto-discovered anymore.
+    write(
+        &root.join("vedit.toml"),
+        "[project]\nfilelists = [\"project.f\"]\n",
+    )?;
 
     let loaded = load(&root)?;
     let root_absolute = std::path::absolute(&root)?;
     assert_eq!(loaded.project.root, root_absolute);
-    assert_eq!(loaded.project.root_source, RootSource::Filelist);
+    assert_eq!(loaded.project.root_source, RootSource::VeditToml);
     assert_eq!(
         loaded.project.filelists[0].entries,
         vec![root_absolute.join("rtl/a.sv")],

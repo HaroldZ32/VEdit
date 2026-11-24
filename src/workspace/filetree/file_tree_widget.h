@@ -16,8 +16,9 @@
 
 class QAction;
 class QLabel;
+class QMenu;
 class QModelIndex;
-class QPoint;
+class QPersistentModelIndex;
 class QStackedWidget;
 class QToolBar;
 class QTimer;
@@ -84,9 +85,14 @@ public:
     void activateIndex(const QModelIndex &index);
     QModelIndex currentIndex() const;
     void selectPath(const QString &path);
+    void refreshMovedFile(const QString &oldPath, const QString &newPath);
+
+    using ContextMenuExtension = std::function<void(QMenu &, const QString &, std::function<bool()>)>;
+    void setContextMenuExtension(ContextMenuExtension extension);
 
 signals:
     void openFileRequested(const QString &path);
+    void compareFileRequested(const QString &path);
     void directoryOpened(const QString &path);
     void operationFailed(const QString &message);
 
@@ -109,7 +115,7 @@ private:
     void onActivated(const QModelIndex &index);
     void onCurrentChanged(const QModelIndex &current, const QModelIndex &previous);
     void showKindForIndex(const QModelIndex &index);
-    void onContextMenu(const QPoint &pos);
+    void populateContextMenu(QMenu &menu, const QPersistentModelIndex &hit);
 
     FileTreeModel *model_ = nullptr;
     QTreeView *view_ = nullptr;
@@ -132,6 +138,8 @@ private:
     QAction *deleteAction_ = nullptr;
     QAction *refreshAction_ = nullptr;
     QAction *collapseAction_ = nullptr;
+    ContextMenuExtension contextMenuExtension_;
+    quint64 contextMenuEpoch_ = 0;
     bool interactive_ = true;
     QString emptyText_;
     bool emptyVisible_ = false;

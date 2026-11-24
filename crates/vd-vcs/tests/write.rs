@@ -74,7 +74,7 @@ fn every_operation_code_round_trips_and_unknown_codes_are_refused() {
             op.code()
         );
     }
-    for code in [0, -1, 40, 99, 999] {
+    for code in [0, -1, 40, 50, 61, 99, 999] {
         assert_eq!(WriteOp::from_code(code), None, "code {code} was accepted");
     }
     // The codes are the ones the C ABI documents.
@@ -93,7 +93,9 @@ fn every_operation_code_round_trips_and_unknown_codes_are_refused() {
     assert_eq!(WriteOp::GitWorktreeRemove.code(), 37);
     assert_eq!(WriteOp::GitSubmoduleInit.code(), 38);
     assert_eq!(WriteOp::GitSubmoduleUpdate.code(), 39);
-    assert_eq!(WriteOp::ALL.len(), 39);
+    assert_eq!(WriteOp::SvnCheckout.code(), 51);
+    assert_eq!(WriteOp::SvnCleanup.code(), 60);
+    assert_eq!(WriteOp::ALL.len(), 50);
     // Irreversible operations are marked for the UI confirmation (AC-5.3).
     assert!(WriteOp::GitDiscard.is_irreversible());
     assert!(WriteOp::SvnRevert.is_irreversible());
@@ -298,12 +300,20 @@ fn accepted_operations_build_exactly_one_documented_invocation() {
             "--no-auth-cache",
             "-m",
             "svn message",
+            "--depth",
+            "empty",
+            "--",
             "trunk/a.sv",
         ])
     );
     assert_eq!(
         invocations[5].args,
-        args(&["update", "--non-interactive", "--no-auth-cache"])
+        args(&[
+            "update",
+            "--non-interactive",
+            "--no-auth-cache",
+            "--ignore-externals"
+        ])
     );
     assert_eq!(invocations[4].working_tree, svn_tree);
 }

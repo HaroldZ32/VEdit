@@ -207,6 +207,11 @@ fn read_and_write_tables_are_disjoint_and_default_deny() {
             op.subcommand()
         );
         let list = args(&[subcommand]);
+        if op == WriteOp::SvnDeleteUnversioned {
+            assert!(!is_write_allowed(program, &list));
+            assert!(!is_allowed(program, &list));
+            continue;
+        }
         assert!(
             is_write_allowed(program, &list),
             "{} {} is not on the write allow-list",
