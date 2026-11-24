@@ -114,11 +114,11 @@ ProjectModel::~ProjectModel()
     }
 }
 
-bool ProjectModel::restoreFromDisk(QString *error)
+bool ProjectModel::restoreFromDisk(QString *error, bool restoreCachedFiles)
 {
     bool ok = false;
     QString loadError;
-    ProjectState state = store_.load(&ok, &loadError);
+    ProjectState state = store_.load(&ok, &loadError, restoreCachedFiles);
     if (!ok) {
         if (error != nullptr) {
             *error = loadError;

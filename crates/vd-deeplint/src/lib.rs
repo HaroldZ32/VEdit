@@ -90,9 +90,10 @@ pub use engine::{
     LintEngine, Ruleset, VeribleAutofix,
 };
 pub use hierarchy::{
-    elaborate, is_empty, parse_ast_json, resolution as hierarchy_resolution, Endpoint,
-    EndpointKind, HierarchyOptions, HierarchyReport, InstanceNode, SignalInfo, DEFAULT_MAX_FILES,
-    DEFAULT_MAX_INSTANCES, DEFAULT_MAX_JSON_BYTES as DEFAULT_HIERARCHY_JSON_BYTES,
+    elaborate, elaborate_navigation, is_empty, parse_ast_json, resolution as hierarchy_resolution,
+    Endpoint, EndpointKind, HierarchyOptions, HierarchyReport, InstanceNode, SignalInfo,
+    TraceIndex, DEFAULT_MAX_FILES, DEFAULT_MAX_INSTANCES,
+    DEFAULT_MAX_JSON_BYTES as DEFAULT_HIERARCHY_JSON_BYTES,
     DEFAULT_TIMEOUT as DEFAULT_HIERARCHY_TIMEOUT,
 };
 pub use rename_apply::{apply, ApplyOutcome, ApplyStatus};

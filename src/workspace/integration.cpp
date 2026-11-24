@@ -13,6 +13,9 @@
 #endif
 #if defined(VEDIT_WORKSPACE_HAVE_FILETREE)
 #include "filetree/filetree_integration.h"
+#if defined(VEDIT_WORKSPACE_HAVE_VCS)
+#include "filetree/svn_explorer_integration.h"
+#endif
 #endif
 #if defined(VEDIT_WORKSPACE_HAVE_SEARCH)
 #include "search/search_integration.h"
@@ -45,6 +48,9 @@
 #if defined(VEDIT_WORKSPACE_HAVE_SCALA)
 #include "scala/scala_integration.h"
 #endif
+#if defined(VEDIT_WORKSPACE_HAVE_SIGNAL_TRACE)
+#include "signal_trace/signal_trace_integration.h"
+#endif
 
 namespace vedit::workspace {
 
@@ -71,7 +77,11 @@ void installPanels(vedit::app::ApplicationShell &shell, const IntegrationOptions
     installPalette(shell, options);
 #endif
 #if defined(VEDIT_WORKSPACE_HAVE_FILETREE)
+#if defined(VEDIT_WORKSPACE_HAVE_VCS)
+    installFileTree(shell, options, svnExplorerMenu(shell));
+#else
     installFileTree(shell, options);
+#endif
 #endif
 #if defined(VEDIT_WORKSPACE_HAVE_SEARCH)
     installSearch(shell, options);
@@ -104,6 +114,9 @@ void installPanels(vedit::app::ApplicationShell &shell, const IntegrationOptions
 #endif
 #if defined(VEDIT_WORKSPACE_HAVE_SCALA)
     installScala(shell, options);
+#endif
+#if defined(VEDIT_WORKSPACE_HAVE_SIGNAL_TRACE)
+    installSignalTrace(shell, options);
 #endif
 }
 

@@ -33,6 +33,7 @@ namespace vedit::workspace {
 struct IntegrationOptions {
     QString projectRoot; // empty => the shell starts without a project
     QString stateDir;    // effective session/shortcut directory (may be empty)
+    bool startWithLiveProjectFiles = false;
 };
 
 // Registers every workspace lane that is part of this build. Safe to call with

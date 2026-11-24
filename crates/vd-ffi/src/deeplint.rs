@@ -1037,7 +1037,13 @@ pub unsafe extern "C" fn vd_lint_progress_free(progress: *mut VdLintProgress) {
 const FIRST_HIER_ID: u64 = 1 << 48;
 
 struct HierarchySlot {
-    report: Mutex<Option<HierarchyReport>>,
+    result: Mutex<Option<HierarchyResult>>,
+    cancel: AtomicBool,
+}
+
+enum HierarchyResult {
+    Report(HierarchyReport),
+    Trace(vd_deeplint::TraceIndex, Option<Vec<PathBuf>>),
 }
 
 static NEXT_HIERARCHY: AtomicU64 = AtomicU64::new(0);
@@ -1204,6 +1210,39 @@ pub unsafe extern "C" fn vd_hier_start(
     files: *const VdStringList,
     options: *const VdHierOptions,
 ) -> u64 {
+    // SAFETY: forwards the existing hierarchy inputs unchanged.
+    unsafe { start_hierarchy(service, files, options, None) }
+}
+
+/// Start a cached signal trace index in the absolute project directory.
+/// Release its job id with `vd_hier_release` when the project snapshot changes.
+///
+/// # Safety
+/// Same pointer contracts as `vd_hier_start`; `root` is a readable C string.
+#[no_mangle]
+pub unsafe extern "C" fn vd_hier_trace_start(
+    service: *mut VdService,
+    files: *const VdStringList,
+    options: *const VdHierOptions,
+    root: *const c_char,
+) -> u64 {
+    // SAFETY: root is null or a readable C string per the caller contract.
+    let Some(root) = (unsafe { c_str(root) })
+        .map(PathBuf::from)
+        .filter(|root| root.is_absolute())
+    else {
+        return 0;
+    };
+    // SAFETY: forwards the existing hierarchy inputs unchanged.
+    unsafe { start_hierarchy(service, files, options, Some(root)) }
+}
+
+unsafe fn start_hierarchy(
+    service: *mut VdService,
+    files: *const VdStringList,
+    options: *const VdHierOptions,
+    root: Option<PathBuf>,
+) -> u64 {
     let Some(state) = service_state(service) else {
         return 0;
     };
@@ -1232,27 +1271,54 @@ pub unsafe extern "C" fn vd_hier_start(
         return 0;
     }
     // SAFETY: the option pointers are null or valid strings per the contract.
-    let hierarchy = match unsafe { build_hierarchy_options(&options) } {
+    let mut hierarchy = match unsafe { build_hierarchy_options(&options) } {
         Ok(built) => built,
         Err(message) => {
             state.record_error(VdError::new(VD_ERR_INVALID_ARGUMENT, &message));
             return 0;
         }
     };
+    if root.is_some() {
+        if file_set.len() > 2000 {
+            state.record_error(VdError::new(
+                VD_ERR_INVALID_ARGUMENT,
+                "signal tracing supports up to 2000 source files",
+            ));
+            return 0;
+        }
+        hierarchy.max_json_bytes = 96 * 1024 * 1024;
+    }
     let id = FIRST_HIER_ID + NEXT_HIERARCHY.fetch_add(1, Ordering::Relaxed);
     let slot = Arc::new(HierarchySlot {
-        report: Mutex::new(None),
+        result: Mutex::new(None),
+        cancel: AtomicBool::new(false),
     });
     hierarchies().insert(id, Arc::clone(&slot));
     let worker_slot = Arc::clone(&slot);
     let spawned = std::thread::Builder::new()
         .name(format!("vd-hier-{id}"))
         .spawn(move || {
-            let report = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
-                vd_deeplint::elaborate(&file_set, &hierarchy)
+            let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+                let Some(root) = root else {
+                    return HierarchyResult::Report(vd_deeplint::elaborate(&file_set, &hierarchy));
+                };
+                let (report, dependencies) = vd_deeplint::elaborate_navigation(
+                    &file_set,
+                    &hierarchy,
+                    &root,
+                    &worker_slot.cancel,
+                );
+                if report.failure.is_some() || worker_slot.cancel.load(Ordering::SeqCst) {
+                    HierarchyResult::Report(report)
+                } else {
+                    HierarchyResult::Trace(
+                        vd_deeplint::TraceIndex::from_report(report),
+                        Some(dependencies),
+                    )
+                }
             }))
             .unwrap_or_else(|_| {
-                let mut failed = HierarchyReport {
+                HierarchyResult::Report(HierarchyReport {
                     tool: "slang".to_string(),
                     top: hierarchy.top.clone(),
                     instances: Vec::new(),
@@ -1264,12 +1330,10 @@ pub unsafe extern "C" fn vd_hier_start(
                         message: "the elaboration job panicked; its result was discarded"
                             .to_string(),
                     }),
-                };
-                failed.peak_rss_kb = 0;
-                failed
+                })
             });
-            if let Ok(mut slot) = worker_slot.report.lock() {
-                *slot = Some(report);
+            if let Ok(mut slot) = worker_slot.result.lock() {
+                *slot = Some(result);
             }
         });
     if spawned.is_err() {
@@ -1314,14 +1378,15 @@ pub unsafe extern "C" fn vd_hier_poll(
         return POLL_MISUSE;
     };
     let report = {
-        let mut guard = match slot.report.lock() {
-            Ok(guard) => guard,
-            Err(poisoned) => poisoned.into_inner(),
-        };
-        guard.take()
+        let mut guard = slot.result.lock().unwrap_or_else(|err| err.into_inner());
+        match guard.as_ref() {
+            None => return VD_STATUS_PENDING,
+            Some(HierarchyResult::Trace(..)) => return POLL_MISUSE,
+            Some(HierarchyResult::Report(_)) => guard.take(),
+        }
     };
-    let Some(report) = report else {
-        return VD_STATUS_PENDING;
+    let Some(HierarchyResult::Report(report)) = report else {
+        return POLL_MISUSE;
     };
     hierarchies().remove(&job);
     if let Some(failure) = &report.failure {
@@ -1336,8 +1401,76 @@ pub unsafe extern "C" fn vd_hier_poll(
     VD_STATUS_READY
 }
 
+/// Poll the trace index and query the tree at an absolute source position.
+/// `line` and UTF-16 `column` are zero-based; `column` is the token start.
+/// Directions 0 and 1 return direct drivers and loads. Directions 2 and 3
+/// return the full driver or load tree. Ready returns owned UTF-8
+/// JSON (including empty results); free it with `vd_string_free`. The same job
+/// can answer repeated queries until `vd_hier_release`. Poll errors are available
+/// through `vd_service_error`.
+///
+/// # Safety
+/// `service` must be live, `file` a readable C string and `out` writable for
+/// one pointer. No output ownership transfers on pending or failure.
+#[no_mangle]
+pub unsafe extern "C" fn vd_hier_trace_poll(
+    service: *mut VdService,
+    job: u64,
+    file: *const c_char,
+    line: u32,
+    column: u32,
+    direction: u32,
+    out: *mut *mut c_char,
+) -> i32 {
+    let Some(state) = service_state(service) else {
+        return POLL_MISUSE;
+    };
+    // SAFETY: a non-null file must be a readable C string per the caller contract.
+    let Some(file) = (unsafe { c_str(file) }) else {
+        return POLL_MISUSE;
+    };
+    if out.is_null() || direction > 3 {
+        return POLL_MISUSE;
+    }
+    let Some(slot) = hierarchies().get(&job).cloned() else {
+        return POLL_MISUSE;
+    };
+    let mut guard = slot
+        .result
+        .lock()
+        .unwrap_or_else(|error| error.into_inner());
+    match guard.as_mut() {
+        None => VD_STATUS_PENDING,
+        Some(HierarchyResult::Trace(index, dependencies)) => {
+            let mut json = index.query(
+                Path::new(file),
+                line,
+                column,
+                direction.is_multiple_of(2),
+                direction >= 2,
+            );
+            if let Some(files) = dependencies.take() {
+                json["dependencies"] = serde_json::json!(files);
+            }
+            // SAFETY: out is writable for one pointer; the caller owns the string.
+            unsafe { *out = c_string(&json.to_string()) };
+            VD_STATUS_READY
+        }
+        Some(HierarchyResult::Report(report)) => {
+            let Some(failure) = &report.failure else {
+                return POLL_MISUSE;
+            };
+            state.record_error(VdError::new(
+                crate::capi::VD_ERR_SERVICE,
+                &failure.user_message(),
+            ));
+            VD_STATUS_FAILED
+        }
+    }
+}
+
 /// Release an elaboration job without delivering its result (null-safe for an
-/// unknown id). A running job finishes into memory nobody reads.
+/// unknown id). A running trace releases its child on the next cancellation check.
 ///
 /// # Safety
 ///
@@ -1345,7 +1478,11 @@ pub unsafe extern "C" fn vd_hier_poll(
 #[no_mangle]
 pub unsafe extern "C" fn vd_hier_release(service: *mut VdService, job: u64) -> i32 {
     let _ = service;
-    i32::from(hierarchies().remove(&job).is_some())
+    let slot = hierarchies().remove(&job);
+    if let Some(slot) = &slot {
+        slot.cancel.store(true, Ordering::SeqCst);
+    }
+    i32::from(slot.is_some())
 }
 
 /// Release a filled [`VdHierarchy`]; null-safe and idempotent.

@@ -155,6 +155,7 @@ private:
     QListWidget *filelists_ = nullptr;
     QLabel *filesHeader_ = nullptr;
     QListWidget *fileList_ = nullptr;
+    QStringList displayedFilePaths_;
     QLabel *includeHeader_ = nullptr;
     QListWidget *includeDirs_ = nullptr;
     QPushButton *addIncludeButton_ = nullptr;

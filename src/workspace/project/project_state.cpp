@@ -352,7 +352,7 @@ QString ProjectStateStore::path() const
     return QDir(directory).filePath(fileName());
 }
 
-ProjectState ProjectStateStore::load(bool *ok, QString *error) const
+ProjectState ProjectStateStore::load(bool *ok, QString *error, bool restoreCachedFiles) const
 {
     const auto fail = [ok, error](const QString &reason) {
         if (ok != nullptr) {
@@ -381,7 +381,16 @@ ProjectState ProjectStateStore::load(bool *ok, QString *error) const
         return fail(QStringLiteral("%1 is not a project state file: %2")
                         .arg(filePath, parseError.errorString()));
     }
-    ProjectState state = ProjectState::fromJson(document.object());
+    QJsonObject archive = document.object();
+    if (!restoreCachedFiles) {
+        // Only authored settings are useful before the live expansion. Avoid
+        // decoding stale rows or re-reading filelists on the GUI startup path.
+        archive.remove(QStringLiteral("files"));
+        archive.remove(QStringLiteral("includeDirs"));
+        archive.remove(QStringLiteral("defines"));
+        archive.remove(QStringLiteral("diagnostics"));
+    }
+    ProjectState state = ProjectState::fromJson(archive);
     if (!state.isValid()) {
         return fail(QStringLiteral("%1 carries no project root").arg(filePath));
     }
@@ -397,8 +406,8 @@ ProjectState ProjectStateStore::load(bool *ok, QString *error) const
     //     no fingerprint at all, means no current input reproduces that list, so
     //     the derived list is dropped and the next live expansion refills it.
     // Everything the user AUTHORED (filelists, top, -I/-D, variables) stays.
-    const QString recomputed = state.computeInputsFingerprint();
-    if (state.filesStale || state.inputsFingerprint != recomputed) {
+    if (!restoreCachedFiles || state.filesStale ||
+        state.inputsFingerprint != state.computeInputsFingerprint()) {
         state.files.clear();
         state.filesStale = true;
     }

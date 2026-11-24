@@ -60,6 +60,8 @@ public:
     /// (120 s). The test seam for the timeout rules in AC M1.1/M1.2.
     void setTimeoutMs(int milliseconds);
 
+    void startFromFileSet(const QString &root, const QStringList &files,
+                          const QStringList &includeDirs, const QStringList &defines);
     bool isRunning() const;
     QString projectRoot() const;
     /// What the last completed run actually covered (project source of truth).

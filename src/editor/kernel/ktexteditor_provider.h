@@ -65,6 +65,11 @@ public:
     QString currentFilePath(QWidget *editor) const override;
     bool saveFile(QWidget *editor, QString *error) override;
     bool isModified(QWidget *editor) const override;
+    QString comparisonText(QWidget *editor) const override;
+    bool replaceComparisonText(QWidget *editor, qsizetype start, qsizetype length,
+                               const QString &text) override;
+    void setComparisonModified(QWidget *editor, bool modified) override;
+    void setRevisionMarks(QWidget *editor, const QList<vedit::app::RevisionMark> &marks) override;
 
     // Breadcrumb seam (T94): the pane renders the semantic path of the cursor
     // for this editor widget; an empty string hides the bar.

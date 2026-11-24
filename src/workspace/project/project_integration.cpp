@@ -257,7 +257,7 @@ void installProject(vedit::app::ApplicationShell &shell, const IntegrationOption
 
     // Restore before choosing a root: a persisted project is listed immediately,
     // then the live expansion replaces it.
-    model->restoreFromDisk();
+    model->restoreFromDisk(nullptr, !options.startWithLiveProjectFiles);
     // AC-1.1 (batch 1): shell.projectRoot() is the ONE root — the shell resolved
     // --project else the persisted session archive BEFORE the lanes installed, so
     // an ordinary start expands the restored project on this very pass. The lane

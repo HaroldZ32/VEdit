@@ -1539,8 +1539,10 @@ public:
             // The store may not exist yet (defaults apply); remember the state
             // so creating it later is noticed.
             lastStamp_ = QDateTime();
+            changed_({}, {});
             return;
         }
+        lastStamp_ = QFileInfo(path_).lastModified();
         const QByteArray path = path_.toUtf8();
         job_ = vd_settings_load(service_, path.constData());
         if (job_ == 0) {
@@ -2157,7 +2159,7 @@ public:
             }
             // AC-T9.2: an axis that DID apply goes live even though the other
             // one could not; only a total failure leaves the analysis untouched.
-            if (badge.lsp.applied || badge.lint.applied) {
+            if (!badge.lsp.path.isEmpty() || badge.lint.applied) {
                 adoptAppliedSelection();
             }
             publishBadge();

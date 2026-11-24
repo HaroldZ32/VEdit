@@ -6,6 +6,7 @@
 #include "file_dialog_filters.h"
 
 #include "editor_area.h"
+#include "file_compare.h"
 #include "editor_provider.h"
 #include "help_viewer.h"
 #include "panel_registry.h"
@@ -14,6 +15,7 @@
 #include "session_store.h"
 #include "theme_manager.h"
 #include "themed_icons.h"
+#include "workbench_interaction.h"
 
 #include <QAction>
 #include <QActionGroup>
@@ -46,7 +48,6 @@
 #include <QPalette>
 #include <QPointer>
 #include <QPushButton>
-#include <QRegularExpression>
 #include <QSizePolicy>
 #include <QStackedLayout>
 #include <QStandardPaths>
@@ -118,31 +119,6 @@ const ProductTheme &paletteProductTheme()
         }
     }
     return defaultProductTheme();
-}
-
-// Reads ONE string pair out of the flat Rust settings store, mirroring the
-// language reader in i18n.cpp (the store quotes dotted keys, a hand-written file
-// may not). This is not a second TOML parser: every other line is ignored.
-QString readSettingsString(const QString &settingsPath, const QString &key)
-{
-    QFile file(settingsPath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        return {};
-    }
-    const QRegularExpression pair(
-        QStringLiteral("^\\s*(?:\"%1\"|'%1'|%1)\\s*=\\s*(?:\"([^\"]*)\"|'([^']*)')\\s*(?:#.*)?$")
-            .arg(QRegularExpression::escape(key)));
-    while (!file.atEnd()) {
-        const QString line = QString::fromUtf8(file.readLine()).trimmed();
-        if (line.isEmpty() || line.startsWith(QLatin1Char('#'))) {
-            continue;
-        }
-        const QRegularExpressionMatch match = pair.match(line);
-        if (match.hasMatch()) {
-            return match.captured(1).isEmpty() ? match.captured(2) : match.captured(1);
-        }
-    }
-    return {};
 }
 
 } // namespace
@@ -667,6 +643,7 @@ void ApplicationShell::buildUi()
     statusTheme_ = theme;
     statusLayout_ = layout;
     createProjectLintDock();
+    installWorkbenchInteraction(this);
 }
 
 void ApplicationShell::createProjectLintDock()
@@ -880,6 +857,8 @@ void ApplicationShell::registerCommands()
                QKeySequence(QStringLiteral("Ctrl+N")), 1);
     addCommand(QStringLiteral("file.open"), tr("&Open…"), QStringLiteral("file"),
                QKeySequence(QStringLiteral("Ctrl+O")), 5);
+    addCommand(QStringLiteral("file.compare"), tr("Compare Files…"), QStringLiteral("file"),
+               QKeySequence(), 8);
     // AC-1.2 (batch 1): the user-facing entry that switches the workspace root
     // at runtime. It is a real File command (not only the Files panel toolbar
     // button) so the one broadcast path is reachable from the menu bar too.
@@ -1048,6 +1027,7 @@ void ApplicationShell::registerCommands()
             statusBar()->showMessage(error, 8000);
         }
     });
+    commands_->setHandler(QStringLiteral("file.compare"), [this]() { chooseFilesToCompare(*this); });
     commands_->setHandler(QStringLiteral("file.open-folder"), [this]() {
         openProjectFolderDialog();
     });
@@ -1829,7 +1809,7 @@ void ApplicationShell::applyStartupThemes(const QString &archiveSyntaxTheme,
     // decides the case a write failed, a file was edited by hand, or the process
     // died between the two writes.
     const QString settingsUiTheme =
-        readSettingsString(settingsPath, QStringLiteral("uiTheme")).trimmed();
+        i18n::readSettingsString(settingsPath, QStringLiteral("uiTheme")).trimmed();
     const QString archiveUiThemeId = archiveUiTheme.trimmed();
     const QString seamUiTheme = options_.uiTheme.trimmed();
     const bool settingsUiThemeValid =
@@ -1882,7 +1862,7 @@ void ApplicationShell::applyStartupThemes(const QString &archiveSyntaxTheme,
     // chrome must not keep a light syntax palette.
     QString syntaxTheme = options_.themeName;
     if (syntaxTheme.isEmpty()) {
-        syntaxTheme = readSettingsString(settingsPath, QStringLiteral("theme"));
+        syntaxTheme = i18n::readSettingsString(settingsPath, QStringLiteral("theme"));
     }
     if (syntaxTheme.isEmpty()) {
         const bool archiveIsChoice = !archiveSyntaxTheme.isEmpty()
@@ -1925,7 +1905,7 @@ void ApplicationShell::applyPairedSyntaxTheme()
     if (!options_.themeName.isEmpty()) {
         return;
     }
-    if (!readSettingsString(i18n::settingsFilePath(options_.stateDir),
+    if (!i18n::readSettingsString(i18n::settingsFilePath(options_.stateDir),
                             QStringLiteral("theme")).isEmpty()) {
         return;
     }

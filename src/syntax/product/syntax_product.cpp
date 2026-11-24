@@ -170,6 +170,9 @@ QString describe()
 // function that calls this name unqualified.
 static void veditSyntaxProductStartup()
 {
+    if (qEnvironmentVariableIsSet("VEDIT_STARTUP_WELCOME_CHILD")) {
+        return;
+    }
     vedit::syntax::product::initialize();
     vedit::syntax::product::noteStartupHook();
     if (!qEnvironmentVariableIsSet("VEDIT_QUIET")) {

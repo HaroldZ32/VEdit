@@ -964,13 +964,16 @@ void ProjectPanel::updateUi()
     removeButton_->setVisible(!lists.isEmpty());
     removeButton_->setEnabled(filelists_->currentRow() >= 0);
 
-    const QStringList files = model_->displayFiles();
-    filesHeader_->setText(QCoreApplication::translate("VEdit", "Files (%1)").arg(files.size()));
-    fileList_->clear();
-    for (int row = 0; row < files.size(); ++row) {
-        auto *item = new QListWidgetItem(files.at(row), fileList_);
-        // The absolute path the jump target needs (the row shows it relative).
-        item->setData(Qt::UserRole, model_->files().value(row));
+    const QStringList paths = model_->files();
+    if (paths != displayedFilePaths_) {
+        displayedFilePaths_ = paths;
+        const QStringList files = model_->displayFiles();
+        filesHeader_->setText(QCoreApplication::translate("VEdit", "Files (%1)").arg(files.size()));
+        fileList_->clear();
+        for (int row = 0; row < files.size(); ++row) {
+            auto *item = new QListWidgetItem(files.at(row), fileList_);
+            item->setData(Qt::UserRole, paths.at(row));
+        }
     }
 
     // AC-1.5: the list shows the project's OWN entries as typed (editable rows)

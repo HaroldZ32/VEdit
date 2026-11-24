@@ -39,7 +39,7 @@ public:
     // Loads the persisted project (root, imported filelists, members). Returns
     // true when one was restored; `error` receives why not (empty for "nothing
     // saved yet").
-    bool restoreFromDisk(QString *error = nullptr);
+    bool restoreFromDisk(QString *error = nullptr, bool restoreCachedFiles = true);
 
     // Opens `projectRoot` (switching projects clears the previous members and
     // imported filelists) and starts an asynchronous expansion.

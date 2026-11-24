@@ -314,7 +314,7 @@ mod tests {
             "lists the accepted spellings: {}",
             warnings[0]
         );
-        assert_eq!(loaded.entries, vec![entry("tools.lsp_backend", "verible")]);
+        assert_eq!(loaded.entries, vec![entry("tools.lsp_backend", "slang")]);
     }
 
     #[test]

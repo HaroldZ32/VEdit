@@ -30,6 +30,11 @@
 
 namespace vedit::app {
 
+struct RevisionMark {
+    int line = 0;
+    bool deletion = false;
+};
+
 class EditorProvider {
 public:
     virtual ~EditorProvider() = default;
@@ -85,6 +90,11 @@ public:
     virtual bool saveFile(QWidget *editor, QString *error = nullptr);
     // T130: closing a pane must not silently discard an unsaved document.
     virtual bool isModified(QWidget *editor) const;
+    virtual QString comparisonText(QWidget *editor) const;
+    virtual bool replaceComparisonText(QWidget *editor, qsizetype start, qsizetype length,
+                                       const QString &text);
+    virtual void setComparisonModified(QWidget *editor, bool modified);
+    virtual void setRevisionMarks(QWidget *, const QList<RevisionMark> &) {}
 
     // --- breadcrumb/status seam (T94) --------------------------------------
     // One line of positional context for a pane (the semantic breadcrumb path).
@@ -176,6 +186,33 @@ inline bool EditorProvider::openFile(QWidget *editor, const QString &absolutePat
     text->document()->setModified(false);
     editor->setProperty("vedit.openFilePath", info.absoluteFilePath());
     return true;
+}
+
+inline QString EditorProvider::comparisonText(QWidget *editor) const
+{
+    const auto *plain = qobject_cast<QPlainTextEdit *>(editor);
+    return plain ? plain->toPlainText() : QString();
+}
+
+inline bool EditorProvider::replaceComparisonText(QWidget *editor, qsizetype start,
+                                                  qsizetype length, const QString &text)
+{
+    auto *plain = qobject_cast<QPlainTextEdit *>(editor);
+    if (!plain || plain->isReadOnly()) {
+        return false;
+    }
+    QTextCursor cursor(plain->document());
+    cursor.setPosition(static_cast<int>(start));
+    cursor.setPosition(static_cast<int>(start + length), QTextCursor::KeepAnchor);
+    cursor.insertText(text);
+    return true;
+}
+
+inline void EditorProvider::setComparisonModified(QWidget *editor, bool modified)
+{
+    if (auto *plain = qobject_cast<QPlainTextEdit *>(editor)) {
+        plain->document()->setModified(modified);
+    }
 }
 
 inline QString EditorProvider::currentFilePath(QWidget *editor) const

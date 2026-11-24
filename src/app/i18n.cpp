@@ -33,20 +33,18 @@ QPointer<QTranslator> g_qtbaseTranslator;
 RestartHandler g_restartHandler;
 std::function<bool(QString *)> g_restartApplicationHandler;
 
-// Reads the one `ui.language` pair out of the flat settings.toml. The Rust store
-// writes dotted keys as quoted TOML keys ("ui.language" = "..."), so both the
-// quoted and the bare spelling are accepted; a hand-written file may use either.
-// Everything else in the file is ignored — this is a single-key reader, not a
-// second TOML parser.
-QString readLanguageSetting(const QString &settingsPath)
+} // namespace
+
+// Read one string pair from the flat Rust settings store.
+QString readSettingsString(const QString &settingsPath, const QString &key)
 {
     QFile file(settingsPath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return {};
     }
-    static const QRegularExpression pair(
-        QStringLiteral("^\\s*(?:\"ui\\.language\"|'ui\\.language'|ui\\.language)\\s*=\\s*"
-                       "(?:\"([^\"]*)\"|'([^']*)')\\s*(?:#.*)?$"));
+    const QRegularExpression pair(
+        QStringLiteral("^\\s*(?:\"%1\"|'%1'|%1)\\s*=\\s*(?:\"([^\"]*)\"|'([^']*)')\\s*(?:#.*)?$")
+            .arg(QRegularExpression::escape(key)));
     while (!file.atEnd()) {
         const QString line = QString::fromUtf8(file.readLine()).trimmed();
         if (line.isEmpty() || line.startsWith(QLatin1Char('#'))) {
@@ -59,6 +57,8 @@ QString readLanguageSetting(const QString &settingsPath)
     }
     return {};
 }
+
+namespace {
 
 void removeTranslator()
 {
@@ -178,7 +178,7 @@ InstallResult installTranslations(const QString &settingsPath, const QString &tr
     removeTranslator();
 
     InstallResult result;
-    result.setting = readLanguageSetting(settingsPath);
+    result.setting = readSettingsString(settingsPath, languageKey());
     result.selection = languageFromSetting(result.setting);
     // Normalize the reported setting so callers never propagate an unknown
     // spelling; the file itself is only rewritten when the user picks a value.

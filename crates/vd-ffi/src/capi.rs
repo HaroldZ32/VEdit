@@ -398,8 +398,10 @@ pub struct VdSearchResults {
 pub struct VdVcsChange {
     /// Path relative to the working tree root.
     pub path: *mut c_char,
-    /// 1 added, 2 modified, 3 deleted, 4 renamed, 5 conflict, 6 unknown.
+    /// 1 added, 2 modified, 3 deleted, 4 renamed, 5 conflict, 6 unknown, 7 unversioned.
     pub kind: i32,
+    /// Owned SVN changelist name, or NULL.
+    pub changelist: *mut c_char,
 }
 
 /// The VCS status of one working tree.

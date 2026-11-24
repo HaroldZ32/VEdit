@@ -1,4 +1,5 @@
 #include "diagnostics_panel.h"
+#include "../../common/item_context_menu.h"
 
 #include "diagnostics_controller.h"
 #include "diagnostics_hint.h"
@@ -146,6 +147,12 @@ DiagnosticsPanel::DiagnosticsPanel(DiagnosticsController *controller, QWidget *p
     // panel implements no file opening of its own.
     connect(view_, &QTreeView::doubleClicked, this,
             [this](const QModelIndex &index) { jumpToOutline(index); });
+    new vedit::common::ItemContextMenu(view_, [this](QMenu &menu, const QPersistentModelIndex &hit) {
+        QAction *open = menu.addAction(tr("Go to Symbol"), this, [this, hit]() { jumpToOutline(hit); });
+        open->setEnabled(hit.isValid() && model_ != nullptr && model_->symbolAt(hit.row()) != nullptr &&
+                         controller_ != nullptr && !controller_->analyzeFileName().isEmpty());
+        vedit::common::addCopyAction(menu, tr("Copy Symbol"), hit.sibling(hit.row(), 0).data().toString());
+    });
     connect(issues_, &QTreeWidget::itemDoubleClicked, this,
             [this](QTreeWidgetItem *item, int) { jumpToIssue(item); });
 

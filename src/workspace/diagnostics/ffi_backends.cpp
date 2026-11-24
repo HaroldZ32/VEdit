@@ -942,7 +942,7 @@ QString canonicalLspBackend(const QString &raw, bool *known)
         return QStringLiteral("slang");
     }
     *known = false;
-    // Keep what was written, so the badge can show `emacs→verible`.
+    // Keep what was written, so the badge can show `emacs→slang`.
     return value;
 }
 
@@ -967,7 +967,7 @@ QString unknownLspMessage(const QString &raw)
 {
     return QStringLiteral("tools.lsp_backend: `%1` is not a known language server backend; "
                           "expected verible | verible-verilog-ls | slang | slang-server; "
-                          "using `verible`")
+                          "using `slang`")
         .arg(raw);
 }
 
@@ -1150,7 +1150,7 @@ bool BackendSwitchState::apply(const DiagnosticsBackendSettings &settings,
     settingsDefines_ = settings.defines;
 
     // --- LSP axis ---------------------------------------------------------
-    const bool wantSlang = requestedLsp_ == QStringLiteral("slang");
+    const bool wantSlang = !lspKnown || requestedLsp_ == QStringLiteral("slang");
     const diagnostics::LspBackendKind lspKind = wantSlang
         ? diagnostics::LspBackendKind::Slang
         : diagnostics::LspBackendKind::Verible;
@@ -1187,6 +1187,19 @@ bool BackendSwitchState::apply(const DiagnosticsBackendSettings &settings,
                 ? QCoreApplication::translate("VEdit", "%1 refused the selection")
                       .arg(lspBackendName())
                 : selectError;
+        }
+    }
+
+    // Keep a working selection; on a fresh launch try the other installed server.
+    if (!lspOk && lsp_ != nullptr && lspPath_.isEmpty()) {
+        const auto fallback = wantSlang ? diagnostics::LspBackendKind::Verible
+                                        : diagnostics::LspBackendKind::Slang;
+        const QString fallbackPath = wantSlang ? toolchain_.verible.path
+                                               : toolchain_.slangServer.path;
+        if (!fallbackPath.isEmpty() && lsp_->selectBackend(
+                fallback, fallbackPath, effectiveIncludeDirs(), effectiveDefines(), nullptr)) {
+            lspKind_ = fallback;
+            lspPath_ = fallbackPath;
         }
     }
 
@@ -1334,7 +1347,7 @@ BadgeState BackendSwitchState::badge(const QString &languageId) const
     }
 
     out.lsp.requested = requestedLsp_;
-    out.lsp.effective = lspBackendName();
+    out.lsp.effective = lspPath_.isEmpty() ? QString() : lspBackendName();
     out.lsp.path = lspPath_;
     out.lsp.applied = lspReason_ == BadgeReasonCode::Ok
         && out.lsp.requested.compare(out.lsp.effective, Qt::CaseInsensitive) == 0;

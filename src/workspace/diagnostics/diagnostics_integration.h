@@ -66,7 +66,7 @@ class DiagnosticsController;
 /// The user's backend choices (the `tools.*` settings keys; the key spellings
 /// are owned by the settings lane, see `settings_keys.h`).
 struct DiagnosticsBackendSettings {
-    QString lspBackend = QStringLiteral("verible"); ///< `verible` / `slang`
+    QString lspBackend = QStringLiteral("slang"); ///< `verible` / `slang`
     QString lintEngine = QStringLiteral("slang");    ///< `slang` / `verible`
     QString veribleLs;     ///< `tools.verible_ls`
     QString slang;         ///< `tools.slang`
@@ -241,9 +241,9 @@ private:
     diagnostics::LspBackendKind lspKind_ = diagnostics::LspBackendKind::Verible;
     diagnostics::LintEngineKind lintKind_ = diagnostics::LintEngineKind::Slang;
     /// What the LAST apply() asked for (canonical; an unknown spelling is kept
-    /// as written so the badge can show `emacs→verible`). Defaults mirror the
+    /// as written so the badge can show `emacs→slang`). Defaults mirror the
     /// documented default pair, so a first launch has a coherent request.
-    QString requestedLsp_ = QStringLiteral("verible");
+    QString requestedLsp_ = QStringLiteral("slang");
     QString requestedLint_ = QStringLiteral("slang");
     BadgeReasonCode lspReason_ = BadgeReasonCode::Ok;
     BadgeReasonCode lintReason_ = BadgeReasonCode::Ok;

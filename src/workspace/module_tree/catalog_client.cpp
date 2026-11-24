@@ -337,6 +337,20 @@ void CatalogClient::start(const QString &projectRoot)
 #endif
 }
 
+void CatalogClient::startFromFileSet(const QString &root, const QStringList &files,
+                                     const QStringList &includeDirs, const QStringList &defines)
+{
+    resetJobs();
+    projectRoot_ = root;
+    if (service_ == nullptr) {
+        fail(QCoreApplication::translate("VEdit", "the Rust service handle could not be created"),
+             CatalogFailureKind::ToolError);
+        return;
+    }
+    beginCatalog(files, includeDirs, defines, root, static_cast<int>(files.size()),
+                 QStringLiteral("live project file set"));
+}
+
 void CatalogClient::beginProjectFallback()
 {
 #if defined(VEDIT_MODULE_TREE_HAVE_FFI)

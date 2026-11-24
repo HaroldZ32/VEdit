@@ -24,6 +24,8 @@
 #include <KSyntaxHighlighting/Theme>
 
 #include <QFileInfo>
+#include <QIcon>
+#include <QPainter>
 #include <QPlainTextEdit>
 #include <QPointer>
 #include <QTimer>
@@ -510,6 +512,71 @@ QString EditCoreProvider::currentFilePath(QWidget *editor) const
     }
     KTextEditor::Document *document = documentFor(editor);
     return document != nullptr ? document->url().toLocalFile() : QString();
+}
+
+QString EditCoreProvider::comparisonText(QWidget *editor) const
+{
+    const auto *document = documentFor(editor);
+    return document ? document->text() : EditorProvider::comparisonText(editor);
+}
+
+bool EditCoreProvider::replaceComparisonText(QWidget *editor, qsizetype start, qsizetype length,
+                                            const QString &text)
+{
+    auto *document = documentFor(editor);
+    if (!document) {
+        return EditorProvider::replaceComparisonText(editor, start, length, text);
+    }
+    if (!document->isReadWrite()) {
+        return false;
+    }
+    const KTextEditor::Range range(document->offsetToCursor(static_cast<int>(start)),
+                                   document->offsetToCursor(static_cast<int>(start + length)));
+    KTextEditor::Document::EditingTransaction transaction(document);
+    return document->replaceText(range, text);
+}
+
+void EditCoreProvider::setComparisonModified(QWidget *editor, bool modified)
+{
+    if (auto *document = documentFor(editor)) {
+        document->setModified(modified);
+    } else {
+        EditorProvider::setComparisonModified(editor, modified);
+    }
+}
+
+void EditCoreProvider::setRevisionMarks(QWidget *editor, const QList<vedit::app::RevisionMark> &marks)
+{
+    auto *view = viewFor(editor);
+    if (!view) { return; }
+    auto *document = view->document();
+    constexpr auto changed = KTextEditor::Document::markType27;
+    constexpr auto deleted = KTextEditor::Document::markType28;
+    const auto previous = document->marks().keys();
+    for (int line : previous) {
+        document->removeMark(line, changed | deleted);
+    }
+    if (marks.isEmpty()) { return; }
+    const auto marker = [view](QPalette::ColorRole role, bool deletion) {
+        QPixmap indicator(12, 12);
+        indicator.fill(Qt::transparent);
+        QPainter painter(&indicator);
+        painter.fillRect(deletion ? QRect(2, 6, 8, 3) : QRect(4, 1, 4, 10), view->palette().color(role));
+        painter.end();
+        return QIcon(indicator);
+    };
+    document->setMarkIcon(changed, marker(QPalette::Highlight, false));
+    document->setMarkIcon(deleted, marker(QPalette::Text, true));
+    document->setMarkDescription(changed, QCoreApplication::translate("VEdit", "SVN working-copy change"));
+    document->setMarkDescription(deleted, QCoreApplication::translate("VEdit", "SVN working-copy deletion"));
+    for (const auto &mark : marks) {
+        if (document->lines() > 0) {
+            document->addMark(std::clamp(mark.line, 0, document->lines() - 1), mark.deletion ? deleted : changed);
+        }
+    }
+    for (auto *documentView : document->views()) {
+        documentView->setConfigValue(QStringLiteral("icon-bar"), true);
+    }
 }
 
 bool EditCoreProvider::saveFile(QWidget *editor, QString *error)

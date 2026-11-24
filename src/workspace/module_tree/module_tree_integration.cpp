@@ -189,8 +189,10 @@ public:
             // uninstantiated (learning continues across Auto runs; a scoped run
             // only holds the subtree). The effective value comes from the model.
             if (catalog_.top.isEmpty()) {
+                QSet<QString> known(topCandidates_.cbegin(), topCandidates_.cend());
                 for (const QString &candidate : catalog_.topModuleNames()) {
-                    if (!topCandidates_.contains(candidate)) {
+                    if (!known.contains(candidate)) {
+                        known.insert(candidate);
                         topCandidates_.append(candidate);
                     }
                 }
@@ -286,6 +288,7 @@ public:
                          [this](const QString &) { updateCaretContext(true); });
         QTimer::singleShot(0, this, [this]() { refresh(); });
 #if defined(VEDIT_MODULE_TREE_HAVE_PROJECT)
+        projectModel();
         watchTimer_.start();
 #endif
         caretTimer_.start();
@@ -347,6 +350,7 @@ public:
             // Cancel BEFORE clearing: a run for the previous root may still be in
             // flight, and its late answer must never paint under "no project".
             client_->cancel();
+            panelCancellable(false);
             catalog_ = module_tree::ModuleCatalog{};
             selectedModule_.clear();
             topCandidates_.clear();
@@ -404,6 +408,12 @@ public:
         ++catalogRuns_;
         setProperty("catalogRuns", catalogRuns_);
         panelCancellable(true);
+#if defined(VEDIT_MODULE_TREE_HAVE_PROJECT)
+        if (auto *model = projectModel(); model != nullptr && model->projectRoot() == projectRoot_) {
+            client_->startFromFileSet(projectRoot_, model->files(), model->includeDirs(), model->defines());
+            return;
+        }
+#endif
         client_->start(projectRoot_);
     }
 
@@ -452,6 +462,20 @@ public:
         if (model_ == nullptr && shell_ != nullptr) {
             model_ = shell_->findChild<project::ProjectModel *>();
             if (model_ != nullptr) {
+                QObject::connect(model_, &project::ProjectModel::filelistsChanged, this, [this]() {
+                    if (model_->projectRoot() == projectRoot_) {
+                        client_->cancel();
+                        panelCancellable(false);
+                        catalog_ = module_tree::ModuleCatalog{};
+                        publishScope();
+                        publishClosure();
+                        status_ = model_->hasFilelist()
+                            ? QCoreApplication::translate("VEdit", "Importing the project file set…")
+                            : noFilelistReason();
+                        pushToTreePanel();
+                        pushToInterfacePanel();
+                    }
+                });
                 QObject::connect(model_, &project::ProjectModel::refreshFinished, this,
                                  [this](bool, const QString &) {
                                      // AC M1.6: the top typed while the expansion
@@ -459,11 +483,24 @@ public:
                                      // reads the model (the expansion's own save may
                                      // have written the previous value back).
                                      applyPendingTop();
-                                     if (!deferred_) {
+                                     if (!model_->hasFilelist()) {
+                                         if (property("projectGate").toBool()) {
+                                             refresh();
+                                         }
+                                         return;
+                                     }
+                                     const QString stamp = projectModelStamp(stateDirectory_);
+                                     if (!deferred_ && (stamp.isEmpty() || stamp == runModelStamp_)) {
                                          return;
                                      }
                                      deferred_ = false;
-                                     refresh();
+                                     modelStamp_ = stamp;
+                                     QTimer::singleShot(0, this, [this, root = projectRoot_, stamp]() {
+                                         if (root == projectRoot_ &&
+                                             (stamp.isEmpty() || stamp != runModelStamp_)) {
+                                             refresh();
+                                         }
+                                     });
                                  });
             }
         }
@@ -488,6 +525,7 @@ public:
         if (root == projectRoot_) {
             return;
         }
+        client_->cancel();
         projectRoot_ = root;
         setProperty("projectRoot", projectRoot_);
         // RM-17: the model restores the NEW root's own top; read it before the
@@ -715,7 +753,7 @@ private:
         treePanel_->setTopCandidates(topCandidates_);
         treePanel_->setEffectiveTop(effectiveTop());
         if (catalog_.valid) {
-            treePanel_->setCatalog(catalog_);
+            treePanel_->setCatalog(catalog_, true);
         } else if (!catalog_.error.isEmpty()) {
             treePanel_->setFailure(catalog_.error);
         } else {

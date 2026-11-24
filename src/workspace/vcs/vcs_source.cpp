@@ -52,6 +52,8 @@ QString changeKindName(int kind)
         return QCoreApplication::translate("VEdit", "renamed");
     case 5:
         return QCoreApplication::translate("VEdit", "conflict");
+    case 7:
+        return QCoreApplication::translate("VEdit", "unversioned");
     default:
         return QCoreApplication::translate("VEdit", "unknown");
     }
@@ -137,6 +139,28 @@ const char *writeOpName(WriteOp op)
         return "svn-add";
     case WriteOp::SvnRemove:
         return "svn-remove";
+    case WriteOp::SvnCheckout:
+        return "svn-checkout";
+    case WriteOp::SvnChangelist:
+        return "svn-changelist";
+    case WriteOp::SvnChangelistRemove:
+        return "svn-changelist-remove";
+    case WriteOp::SvnBranchCreate:
+        return "svn-branch-create";
+    case WriteOp::SvnSwitch:
+        return "svn-switch";
+    case WriteOp::SvnMerge:
+        return "svn-merge";
+    case WriteOp::SvnResolve:
+        return "svn-resolve";
+    case WriteOp::SvnRename:
+        return "svn-rename";
+    case WriteOp::SvnIgnore:
+        return "svn-ignore";
+    case WriteOp::SvnCleanup:
+        return "svn-cleanup";
+    case WriteOp::SvnDeleteUnversioned:
+        return "svn-delete-unversioned";
     case WriteOp::GitStashSave:
         return "stash-save";
     case WriteOp::GitStashPop:
@@ -172,6 +196,22 @@ const char *historyKindName(HistoryKind kind)
         return "blame";
     case HistoryKind::Compare:
         return "compare";
+    case HistoryKind::SvnSnapshot:
+        return "svn-snapshot";
+    case HistoryKind::SvnPrevious:
+        return "svn-previous";
+    case HistoryKind::SvnPatch:
+        return "svn-patch";
+    case HistoryKind::SvnIncoming:
+        return "svn-incoming";
+    case HistoryKind::SvnRemoteLog:
+        return "svn-remote-log";
+    case HistoryKind::SvnRemoteDetail:
+        return "svn-remote-detail";
+    case HistoryKind::SvnRemoteSnapshot:
+        return "svn-remote-snapshot";
+    case HistoryKind::SvnRemotePrevious:
+        return "svn-remote-previous";
     }
     return "commits";
 }
@@ -232,7 +272,8 @@ bool writeOpIsGit(WriteOp op)
 bool writeOpIsSvn(WriteOp op)
 {
     return op == WriteOp::SvnCommit || op == WriteOp::SvnUpdate || op == WriteOp::SvnRevert
-        || op == WriteOp::SvnAdd || op == WriteOp::SvnRemove;
+        || op == WriteOp::SvnAdd || op == WriteOp::SvnRemove
+        || (op >= WriteOp::SvnCheckout && op <= WriteOp::SvnCleanup) || op == WriteOp::SvnDeleteUnversioned;
 }
 
 bool writeOpIsNetwork(WriteOp op)
@@ -469,10 +510,13 @@ Status takeStatus(const VdVcsStatus &raw)
     result.backend = fromI32(raw.backend);
     result.branch = copyText(raw.branch);
     result.note = copyText(raw.note);
+    result.error = result.backend != Backend::None && !result.note.empty();
+    result.changes.reserve(raw.count);
     for (std::size_t index = 0; index < raw.count; ++index) {
         Change change;
         change.path = copyText(raw.changes[index].path);
         change.kind = raw.changes[index].kind;
+        change.changelist = copyText(raw.changes[index].changelist);
         result.changes.push_back(std::move(change));
     }
     return result;
@@ -594,6 +638,8 @@ HistoryData takeHistory(const VdVcsHistoryResult &raw)
     data.subject = copyText(raw.subject);
     data.body = copyText(raw.body);
     data.patch = copyText(raw.patch);
+    data.snapshotMissing = (data.kind == HistoryKind::SvnSnapshot || data.kind == HistoryKind::SvnRemoteSnapshot)
+        && raw.patch == nullptr && !data.error;
     data.path = copyText(raw.path);
     data.from = copyText(raw.from);
     data.to = copyText(raw.to);
@@ -628,6 +674,29 @@ unsigned long long startHistoryJob(VdService *service, const HistoryRequest &req
     case HistoryKind::Compare:
         return vd_vcs_history_compare_job(service, request.root.c_str(), request.from.c_str(),
                                           request.to.c_str());
+    case HistoryKind::SvnSnapshot:
+        return vd_vcs_svn_snapshot_job(service, request.root.c_str(), request.path.c_str(),
+                                       static_cast<int>(request.revision.kind), request.revision.number, request.peg);
+    case HistoryKind::SvnPrevious:
+        return vd_vcs_svn_previous_job(service, request.root.c_str(), request.path.c_str(),
+                                       request.revision.number, request.peg);
+    case HistoryKind::SvnRemoteLog:
+    case HistoryKind::SvnRemoteDetail:
+    case HistoryKind::SvnRemoteSnapshot:
+    case HistoryKind::SvnRemotePrevious:
+        return vd_vcs_svn_remote_job(service, request.root.c_str(), static_cast<int>(request.kind), request.url.c_str(),
+                                      request.query.c_str(), request.path.c_str(), request.revision.number,
+                                      request.peg, offset, static_cast<unsigned long long>(limit));
+    case HistoryKind::SvnPatch:
+    case HistoryKind::SvnIncoming: {
+        std::vector<const char *> paths;
+        paths.reserve(request.paths.size());
+        for (const auto &path : request.paths) {
+            paths.push_back(path.c_str());
+        }
+        return vd_vcs_svn_working_job(service, request.root.c_str(), static_cast<int>(request.kind),
+                                       paths.data(), paths.size(), request.query.empty() ? nullptr : request.query.c_str());
+    }
     }
     return 0;
 }
@@ -737,6 +806,7 @@ void FfiVcsSource::requestInfo(const std::string &root, InfoCallback done)
         }
         return;
     }
+    if (info_job_) { vd_job_cancel(service_, info_job_->job); }
     info_job_ = std::make_unique<PendingInfo>();
     info_job_->job = job;
     info_job_->done = std::move(done);
@@ -810,6 +880,7 @@ void FfiVcsSource::requestDiff(const std::string &root, const std::string &path,
         }
         return;
     }
+    if (diff_job_) { vd_job_cancel(service_, diff_job_->job); }
     diff_job_ = std::make_unique<PendingDiff>();
     diff_job_->job = job;
     diff_job_->path = path;

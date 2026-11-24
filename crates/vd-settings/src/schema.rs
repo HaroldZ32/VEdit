@@ -10,7 +10,7 @@
 //!
 //! | key | values | default |
 //! | --- | --- | --- |
-//! | `tools.lsp_backend` | `verible` (`verible-verilog-ls`), `slang` (`slang-server`) | `verible` |
+//! | `tools.lsp_backend` | `verible` (`verible-verilog-ls`), `slang` (`slang-server`) | `slang` |
 //! | `tools.lint_engine` | `slang`, `verible` (`verible-verilog-lint`) | `slang` |
 //! | `tools.verible_ls` | path to `verible-verilog-ls` | empty (resolver decides) |
 //! | `tools.slang` | path to `slang` | empty |
@@ -185,10 +185,10 @@ pub const API_KEY_FILE_MODE: u32 = 0o600;
 /// Which language server serves the open files.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum LspBackend {
-    /// `verible-verilog-ls` — the baseline backend.
-    #[default]
+    /// `verible-verilog-ls`.
     Verible,
-    /// `slang-server`.
+    /// `slang-server` — the default backend.
+    #[default]
     Slang,
 }
 
@@ -1424,7 +1424,7 @@ mod tests {
     fn an_empty_store_yields_the_baseline_defaults() {
         let tools = ToolSettings::from_entries(&[]);
         assert_eq!(tools, ToolSettings::default());
-        assert_eq!(tools.lsp_backend, LspBackend::Verible);
+        assert_eq!(tools.lsp_backend, LspBackend::Slang);
         assert_eq!(tools.lint_engine, LintEngine::Slang);
         assert!(tools.include_dirs.is_empty());
         assert!(tools.defines.is_empty());
@@ -1462,7 +1462,9 @@ mod tests {
             entry(keys::LSP_BACKEND, "emacs"),
             entry(keys::LINT_ENGINE, "verible"),
         ]);
-        assert_eq!(tools.lsp_backend, LspBackend::Verible);
+        assert_eq!(tools.lsp_backend, LspBackend::Slang);
+        let explicit = ToolSettings::from_entries(&[entry(keys::LSP_BACKEND, "verible")]);
+        assert_eq!(explicit.lsp_backend, LspBackend::Verible);
         assert_eq!(tools.lint_engine, LintEngine::Verible);
     }
 
@@ -1503,7 +1505,7 @@ mod tests {
         assert_eq!(
             warnings[0],
             "tools.lsp_backend: `emacs` is not a known language server backend; \
-             expected verible | verible-verilog-ls | slang | slang-server; using `verible`"
+             expected verible | verible-verilog-ls | slang | slang-server; using `slang`"
         );
 
         let mut engine = vec![entry(keys::LINT_ENGINE, "slang-server")];

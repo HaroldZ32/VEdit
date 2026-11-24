@@ -1,4 +1,5 @@
 #include "search_panel.h"
+#include "../../common/item_context_menu.h"
 
 #include "jump/jump_registry.h"
 #include "search_query.h"
@@ -207,6 +208,20 @@ void SearchPanel::buildUi()
 
 void SearchPanel::connectSignals()
 {
+    new vedit::common::ItemContextMenu(tree_, [this](QMenu &menu, const QPersistentModelIndex &hit) {
+        const QModelIndex first = hit.sibling(hit.row(), 0);
+        const QVariant match = first.data(Qt::UserRole);
+        QAction *open = menu.addAction(tr("Open Match"), this, [this, hit]() {
+            if (hit.isValid()) {
+                activateItem(tree_->itemFromIndex(hit));
+            }
+        });
+        open->setEnabled(match.isValid());
+        const int index = match.toInt();
+        const QString text = match.isValid() && index >= 0 && index < hits_.size()
+            ? hits_.at(index).text : QString();
+        vedit::common::addCopyAction(menu, tr("Copy Match"), text);
+    });
     connect(searchButton_, &QPushButton::clicked, this, &SearchPanel::startSearch);
     connect(cancelButton_, &QPushButton::clicked, this, &SearchPanel::cancelSearch);
     connect(query_, &QLineEdit::returnPressed, this, &SearchPanel::startSearch);

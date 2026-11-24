@@ -31,6 +31,8 @@
 //! show, so an oversized project is never silently slow.
 
 use std::collections::HashMap;
+use std::fs::File;
+use std::io::{BufRead, BufReader, Read};
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -43,6 +45,9 @@ use crate::binary::{
 };
 use crate::process::{receive_capped, spawn_reader, terminate, termination_signal};
 use crate::LintFailure;
+
+mod navigation;
+pub use navigation::TraceIndex;
 
 /// Default budget for one elaboration run.
 pub const DEFAULT_TIMEOUT: Duration = Duration::from_secs(30);
@@ -180,6 +185,7 @@ pub struct SignalInfo {
     pub loads: Vec<Endpoint>,
     /// Driver chain that continues inside a child instance (AC-3.2).
     pub chain: Vec<Endpoint>,
+    occurrences: Vec<(PathBuf, u32, u32)>,
 }
 
 /// One elaboration result.
@@ -248,7 +254,26 @@ fn empty_report(top: Option<String>) -> HierarchyReport {
 /// Elaborate `files` and return the hierarchy + driver/load report.
 #[must_use]
 pub fn elaborate(files: &[PathBuf], options: &HierarchyOptions) -> HierarchyReport {
-    elaborate_impl(files, options, None, None)
+    elaborate_impl(files, options, None, None, None)
+}
+
+/// Elaborate the explicit filelist from its project root for editor navigation.
+#[must_use]
+pub fn elaborate_navigation(
+    files: &[PathBuf],
+    options: &HierarchyOptions,
+    root: &Path,
+    cancel: &AtomicBool,
+) -> (HierarchyReport, Vec<PathBuf>) {
+    let mut dependencies = Vec::new();
+    let report = elaborate_impl(
+        files,
+        options,
+        None,
+        Some(cancel),
+        Some((root, &mut dependencies)),
+    );
+    (report, dependencies)
 }
 
 /// Elaborate `files` and let `parse` interpret the raw `--ast-json` document
@@ -302,7 +327,7 @@ pub(crate) fn run_ast_json_cancellable<T>(
                     Err(failure) => Err(failure),
                 }
             };
-        elaborate_impl(files, options, Some(&mut sink), cancel)
+        elaborate_impl(files, options, Some(&mut sink), cancel, None)
     };
     (report, captured)
 }
@@ -315,6 +340,7 @@ fn elaborate_impl(
     options: &HierarchyOptions,
     mut on_json: JsonSink<'_>,
     cancel: Option<&AtomicBool>,
+    navigation: Option<(&Path, &mut Vec<PathBuf>)>,
 ) -> HierarchyReport {
     let started = Instant::now();
     let mut report = empty_report(options.top.clone());
@@ -334,6 +360,7 @@ fn elaborate_impl(
         }
     };
     let json_path = temp.path().join("ast.json");
+    let dep_path = temp.path().join("deps.txt");
 
     let mut argv: Vec<std::ffi::OsString> = Vec::new();
     if let Some(top) = &options.top {
@@ -343,6 +370,10 @@ fn elaborate_impl(
     argv.push(std::ffi::OsString::from("--ast-json"));
     argv.push(json_path.as_os_str().to_os_string());
     argv.push(std::ffi::OsString::from("--ast-json-source-info"));
+    if navigation.is_some() {
+        argv.push(std::ffi::OsString::from("--Mall"));
+        argv.push(dep_path.as_os_str().to_os_string());
+    }
     for directory in &options.include_dirs {
         let mut value = std::ffi::OsString::from("-I");
         value.push(directory.as_os_str());
@@ -363,8 +394,11 @@ fn elaborate_impl(
     // The ONE whole-set invocation: the same runner the project lint pass uses,
     // so the two products cannot disagree on the child's cwd, timeout, signal or
     // capture discipline.
-    let run = run_tool_once(
-        files,
+    let root = navigation
+        .as_ref()
+        .map_or_else(|| project_root(files), |(root, _)| root.to_path_buf());
+    let run = run_tool_at(
+        &root,
         options.slang_binary.as_deref(),
         &argv,
         options.timeout,
@@ -432,10 +466,22 @@ fn elaborate_impl(
             return report;
         }
     };
-    match parse_design_at(&text, Some(&project_root(files))) {
+    match parse_design_at(&text, Some(&root), navigation.is_some()) {
         Ok(design) => {
             report.instances = design.instances;
             report.signals = design.signals;
+            if let Some((_, dependencies)) = navigation {
+                if let Ok(input) = File::open(&dep_path) {
+                    *dependencies = BufReader::new(input)
+                        .take(4 * 1024 * 1024)
+                        .lines()
+                        .map_while(Result::ok)
+                        .filter(|path| !path.is_empty())
+                        .take(4001)
+                        .map(|path| root.join(path))
+                        .collect();
+                }
+            }
             if files.len() > options.max_files {
                 report.warning = Some(format!(
                     "the project has {} files (limit {}): elaboration may take longer than usual",
@@ -506,6 +552,16 @@ pub(crate) fn run_tool_once(
     timeout: Duration,
     cancel: Option<&AtomicBool>,
 ) -> ToolRun {
+    run_tool_at(&project_root(files), slang_binary, argv, timeout, cancel)
+}
+
+fn run_tool_at(
+    root: &Path,
+    slang_binary: Option<&Path>,
+    argv: &[std::ffi::OsString],
+    timeout: Duration,
+    cancel: Option<&AtomicBool>,
+) -> ToolRun {
     let started = Instant::now();
     let resolution = resolve_binary_for_current_process(slang_binary);
     let mut run = ToolRun {
@@ -534,7 +590,7 @@ pub(crate) fn run_tool_once(
     sanitize_tool_child_env(&mut command);
     command
         .args(argv)
-        .current_dir(project_root(files))
+        .current_dir(root)
         .stdin(Stdio::null())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
@@ -958,12 +1014,16 @@ fn push_generate_blocks<'a>(
 
 /// Parse the `--ast-json` document into the report's two lists.
 fn parse_design(text: &str) -> Result<Design, String> {
-    parse_design_at(text, None)
+    parse_design_at(text, None, false)
 }
 
 /// Parse with the directory the tool ran in, so every reported path becomes
 /// absolute (see [`crate::tool_paths`]).
-fn parse_design_at(text: &str, tool_dir: Option<&Path>) -> Result<Design, String> {
+fn parse_design_at(
+    text: &str,
+    tool_dir: Option<&Path>,
+    navigation: bool,
+) -> Result<Design, String> {
     let mut document: Value = serde_json::from_str(text)
         .map_err(|error| format!("the AST JSON is malformed: {error}"))?;
     if let Some(tool_dir) = tool_dir {
@@ -994,9 +1054,20 @@ fn parse_design_at(text: &str, tool_dir: Option<&Path>) -> Result<Design, String
     let mut signals = Vec::new();
     for root in roots {
         let name = root.get("name").and_then(Value::as_str).unwrap_or("");
-        walk_instance(root, name, &bodies, &mut instances, &mut signals);
+        walk_instance(
+            root,
+            name,
+            &bodies,
+            &mut instances,
+            &mut signals,
+            navigation,
+        );
     }
-    link_chains(&mut signals);
+    if navigation {
+        navigation::connect_parent_ports(&mut signals);
+    } else {
+        link_chains(&mut signals);
+    }
     Ok(Design { instances, signals })
 }
 
@@ -1006,6 +1077,7 @@ fn walk_instance<'a>(
     bodies: &Bodies<'a>,
     instances: &mut Vec<InstanceNode>,
     signals: &mut Vec<SignalInfo>,
+    navigation: bool,
 ) {
     let Some(body) = bodies.of(instance) else {
         return;
@@ -1055,11 +1127,29 @@ fn walk_instance<'a>(
             drivers: Vec::new(),
             loads: Vec::new(),
             chain: Vec::new(),
+            occurrences: Vec::new(),
         });
     }
 
+    if navigation {
+        navigation::record_scope(&members, &scoped, &mut local);
+    } else {
+        record_legacy_endpoints(path, &members, &scoped, &mut local);
+    }
+    signals.extend(local);
+    for (child, child_path) in &scoped {
+        walk_instance(child, child_path, bodies, instances, signals, navigation);
+    }
+}
+
+fn record_legacy_endpoints(
+    path: &str,
+    members: &[&Value],
+    scoped: &[(&Value, String)],
+    local: &mut [SignalInfo],
+) {
     // Instance port connections (instances inside generate blocks included).
-    for (member, child_path) in &scoped {
+    for (member, child_path) in scoped {
         let member: &Value = member;
         let Some(Value::Array(connections)) = member.get("connections") else {
             continue;
@@ -1114,7 +1204,7 @@ fn walk_instance<'a>(
     }
 
     // Continuous assignments: LHS drives, RHS reads.
-    for member in &members {
+    for member in members {
         if member.get("kind").and_then(Value::as_str) != Some("ContinuousAssign") {
             continue;
         }
@@ -1159,7 +1249,7 @@ fn walk_instance<'a>(
     }
 
     // Procedural blocks: any LHS inside drives.
-    for member in &members {
+    for member in members {
         if member.get("kind").and_then(Value::as_str) != Some("ProceduralBlock") {
             continue;
         }
@@ -1188,13 +1278,6 @@ fn walk_instance<'a>(
                 ));
             }
         }
-    }
-
-    signals.extend(local);
-
-    // Children last, so the report is breadth-ordered by path.
-    for (child, child_path) in &scoped {
-        walk_instance(child, child_path, bodies, instances, signals);
     }
 }
 

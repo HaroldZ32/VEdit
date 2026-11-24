@@ -15,6 +15,7 @@ class ApplicationShell;
 
 namespace vedit::workspace {
 
+QString svnWorkingCopyRoot(const QString &path);
 void installVcs(vedit::app::ApplicationShell &shell, const IntegrationOptions &options);
 
 } // namespace vedit::workspace

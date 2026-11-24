@@ -1490,7 +1490,7 @@ void SettingsPanel::applyToolEntries()
     ToolValues values;
     values.lspBackend = keyText(entries_, keys::kLspBackend);
     if (values.lspBackend.isEmpty()) {
-        values.lspBackend = key(keys::kLspBackendVerible);
+        values.lspBackend = key(keys::kLspBackendSlang);
     }
     values.lintEngine = keyText(entries_, keys::kLintEngine);
     if (values.lintEngine.isEmpty()) {

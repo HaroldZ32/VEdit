@@ -1,8 +1,14 @@
 #include "module_tree_panel.h"
+#include "../../common/item_context_menu.h"
 
 #include "jump/jump_registry.h"
 
 #include <QCoreApplication>
+#include <QElapsedTimer>
+#include <QThread>
+#include <QTimer>
+
+#include <memory>
 #include <QFileInfo>
 #include <QHBoxLayout>
 #include <QHeaderView>
@@ -220,7 +226,9 @@ ModuleTreePanel::ModuleTreePanel(QWidget *parent)
         }
     });
     QObject::connect(cancel_, &QToolButton::clicked, this, [this]() {
-        if (cancelHandler_ != nullptr) {
+        if (preparing_ && !catalogRunning_) {
+            setNoProject(QCoreApplication::translate("VEdit", "Module tree preparation cancelled."));
+        } else if (cancelHandler_ != nullptr) {
             cancelHandler_();
         }
     });
@@ -230,13 +238,28 @@ ModuleTreePanel::ModuleTreePanel(QWidget *parent)
                      [this](QTreeWidgetItem *item, int) { activateItem(item); });
     QObject::connect(tree_, &QTreeWidget::currentItemChanged, this,
                      [this](QTreeWidgetItem *, QTreeWidgetItem *) { notifySelection(); });
+    new vedit::common::ItemContextMenu(tree_, [this](QMenu &menu, const QPersistentModelIndex &hit) {
+        const QModelIndex row = hit.sibling(hit.row(), 0);
+        const QString file = row.data(kFileRole).toString();
+        QAction *open = menu.addAction(tr("Go to Definition"), this, [this, hit]() {
+            if (hit.isValid()) {
+                activateItem(tree_->itemFromIndex(hit));
+            }
+        });
+        open->setEnabled(!file.isEmpty() && row.data(kLineRole).toInt() > 0 &&
+                         row.data(kKindRole).toInt() == static_cast<int>(ModuleRowKind::Module));
+        vedit::common::addCopyAction(menu, tr("Copy Instance Path"), row.data(kPathRole).toString());
+    });
 
     setStatus(QCoreApplication::translate(
         "VEdit", "No module catalog yet: open a project and press Refresh."));
 }
 
-void ModuleTreePanel::setCatalog(const ModuleCatalog &catalog)
+void ModuleTreePanel::setCatalog(const ModuleCatalog &catalog, bool deferRendering)
 {
+    ++treeGeneration_;
+    pendingRows_.clear();
+    setPreparing(false);
     catalog_ = catalog;
     if (!catalog_.valid || !catalog_.error.isEmpty()) {
         tree_->clear();
@@ -276,13 +299,18 @@ void ModuleTreePanel::setCatalog(const ModuleCatalog &catalog)
         summary += QCoreApplication::translate("VEdit", "\n%1").arg(topNote_);
     }
     setScrollableText(summary_, summary);
-    rebuildTree();
-    setStatus(QCoreApplication::translate(
-        "VEdit", "Module tree ready — double-click a module to open its declaration."));
+    if (deferRendering && catalog_.modules.size() > 300) {
+        prepareTree();
+    } else {
+        rebuildTree();
+    }
 }
 
 void ModuleTreePanel::setNoProject(const QString &reason)
 {
+    ++treeGeneration_;
+    pendingRows_.clear();
+    setPreparing(false);
     catalog_ = ModuleCatalog{};
     roots_.clear();
     tree_->clear();
@@ -293,6 +321,9 @@ void ModuleTreePanel::setNoProject(const QString &reason)
 
 void ModuleTreePanel::setFailure(const QString &message)
 {
+    ++treeGeneration_;
+    pendingRows_.clear();
+    setPreparing(false);
     // F6 (batch-20261118 review): a FAILED run must be observable AS a failed
     // catalog. `catalog()` is this panel's published answer, so a failure that
     // left `error` empty was indistinguishable from "the run has not answered
@@ -371,9 +402,16 @@ void ModuleTreePanel::setOnCancel(std::function<void()> handler)
 
 void ModuleTreePanel::setCancelEnabled(bool enabled)
 {
+    catalogRunning_ = enabled;
     if (cancel_ != nullptr) {
-        cancel_->setEnabled(enabled);
+        cancel_->setEnabled(catalogRunning_ || preparing_);
     }
+}
+
+void ModuleTreePanel::setPreparing(bool preparing)
+{
+    preparing_ = preparing;
+    setCancelEnabled(catalogRunning_);
 }
 
 bool ModuleTreePanel::cancelEnabled() const
@@ -405,7 +443,8 @@ QString ModuleTreePanel::selectedModuleName() const
     return selectedModule_;
 }
 
-void ModuleTreePanel::addRow(QTreeWidgetItem *parent, const ModuleTreeNode &node)
+QTreeWidgetItem *ModuleTreePanel::addRow(QTreeWidgetItem *parent, const ModuleTreeNode &node,
+                                         bool descendants)
 {
     auto *item = parent != nullptr ? new QTreeWidgetItem(parent) : new QTreeWidgetItem();
     item->setText(0, rowLabel(node));
@@ -446,12 +485,15 @@ void ModuleTreePanel::addRow(QTreeWidgetItem *parent, const ModuleTreeNode &node
         item->setToolTip(2, node.note);
     }
 
-    for (const ModuleTreeNode &child : node.children) {
-        addRow(item, child);
+    if (descendants) {
+        for (const ModuleTreeNode &child : node.children) {
+            addRow(item, child);
+        }
     }
     if (parent == nullptr) {
         tree_->addTopLevelItem(item);
     }
+    return item;
 }
 
 void ModuleTreePanel::rebuildTree()
@@ -475,7 +517,65 @@ void ModuleTreePanel::rebuildTree()
     } else {
         tree_->expandToDepth(0);
     }
-    applyFilter(filter_ != nullptr ? filter_->text() : QString());
+    finishTree(previous);
+}
+
+void ModuleTreePanel::prepareTree()
+{
+    ++moduleTreeProbe().treeRebuilds;
+    selectionBeforeBuild_ = selectedModule_;
+    tree_->clear();
+    roots_.clear();
+    setPreparing(true);
+    setStatus(QCoreApplication::translate("VEdit", "Preparing the module tree…"));
+    const quint64 generation = treeGeneration_;
+    auto result = std::make_shared<QVector<ModuleTreeNode>>();
+    auto *worker = QThread::create([catalog = catalog_, result]() {
+        *result = buildModuleTree(catalog);
+    });
+    connect(worker, &QThread::finished, worker, &QObject::deleteLater);
+    connect(worker, &QThread::finished, this, [this, generation, result]() {
+        if (generation == treeGeneration_) {
+            roots_ = std::move(*result);
+            for (auto it = roots_.crbegin(); it != roots_.crend(); ++it) {
+                pendingRows_.append({nullptr, &*it});
+            }
+            appendPreparedRows(generation);
+        }
+    });
+    worker->start();
+}
+
+void ModuleTreePanel::appendPreparedRows(quint64 generation)
+{
+    if (generation != treeGeneration_) {
+        return;
+    }
+    QElapsedTimer batch;
+    batch.start();
+    do {
+        if (pendingRows_.isEmpty()) {
+            finishTree(selectionBeforeBuild_);
+            return;
+        }
+        const PendingRow row = pendingRows_.takeLast();
+        auto *item = addRow(row.parent, *row.node, false);
+        if (row.parent != nullptr && row.parent->parent() == nullptr && row.parent->childCount() == 1) {
+            row.parent->setExpanded(true);
+        }
+        for (auto child = row.node->children.crbegin(); child != row.node->children.crend(); ++child) {
+            pendingRows_.append({item, &*child});
+        }
+    } while (batch.elapsed() < 4);
+    QTimer::singleShot(0, this, [this, generation]() { appendPreparedRows(generation); });
+}
+
+void ModuleTreePanel::finishTree(const QString &previous)
+{
+    setPreparing(false);
+    if (filter_ != nullptr && !filter_->text().trimmed().isEmpty()) {
+        applyFilter(filter_->text());
+    }
     if (!previous.isEmpty() && catalog_.find(previous) != nullptr) {
         for (int index = 0; index < tree_->topLevelItemCount(); ++index) {
             if (QTreeWidgetItem *found = findModuleRow(tree_->topLevelItem(index), previous)) {
@@ -485,6 +585,8 @@ void ModuleTreePanel::rebuildTree()
         }
     }
     notifySelection();
+    setStatus(QCoreApplication::translate(
+        "VEdit", "Module tree ready — double-click a module to open its declaration."));
 }
 
 void ModuleTreePanel::applyFilter(const QString &needle)

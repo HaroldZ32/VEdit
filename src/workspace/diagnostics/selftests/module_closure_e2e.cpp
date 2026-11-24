@@ -541,15 +541,14 @@ int main(int argc, char **argv)
                   .arg(nestedFilelists.join(QLatin1Char(','))));
         // The generated slang build FILE itself (include dirs + defines + the
         // session set) is written by the Rust session worker into a private
-        // directory; this e2e has no handle on it, and the default backend here
-        // is verible, which never receives one. Its content is locked by
+        // directory; this e2e has no handle on it. Its content is locked by
         // `crates/vd-ffi/tests/build_context_no_filelist.rs`, which reads the
         // generated file back and asserts neither `-f` nor the project `.f` path
         // appears (run by `cargo test -p vd-ffi`). This e2e asserts the boundary
         // that file is generated from: the session set above.
         skip("g1d.build-context-file",
              "the generated slang build file is owned by the Rust session worker (no handle "
-             "here; verible is the default backend); content locked by "
+             "here); content locked by "
              "crates/vd-ffi/tests/build_context_no_filelist.rs");
     } else {
         skip("g1d.realtime-set", "no editor pane in this shell");

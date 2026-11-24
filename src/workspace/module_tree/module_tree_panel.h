@@ -38,7 +38,7 @@ public:
     explicit ModuleTreePanel(QWidget *parent = nullptr);
 
     /// Renders one catalog answer (an empty catalog => visible empty state).
-    void setCatalog(const ModuleCatalog &catalog);
+    void setCatalog(const ModuleCatalog &catalog, bool deferRendering = false);
     /// "No project open" state: one concise line naming the reason.
     void setNoProject(const QString &reason);
     /// One-line failure from the client; never per-file errors.
@@ -97,14 +97,27 @@ private:
     /// rest. The container's height follows the LINE COUNT only, never the text.
     void setScrollableText(QScrollArea *area, const QString &text);
     void rebuildTree();
+    void prepareTree();
+    void appendPreparedRows(quint64 generation);
+    void finishTree(const QString &previous);
+    void setPreparing(bool preparing);
     void applyFilter(const QString &needle);
-    void addRow(QTreeWidgetItem *parent, const ModuleTreeNode &node);
+    QTreeWidgetItem *addRow(QTreeWidgetItem *parent, const ModuleTreeNode &node, bool descendants = true);
     bool deliver(const ModuleJump &jump, const QString &description);
     void setActionStatus(const QString &text);
     void notifySelection();
 
     ModuleCatalog catalog_;
     QVector<ModuleTreeNode> roots_;
+    quint64 treeGeneration_ = 0;
+    QString selectionBeforeBuild_;
+    struct PendingRow {
+        QTreeWidgetItem *parent;
+        const ModuleTreeNode *node;
+    };
+    QVector<PendingRow> pendingRows_;
+    bool preparing_ = false;
+    bool catalogRunning_ = false;
     QTreeWidget *tree_ = nullptr;
     /// R2-a (batch-20261119): a FIXED-HEIGHT scroller, not a content-sized label.
     /// R1-c's one elided line was rejected on the real machine ("the error cannot

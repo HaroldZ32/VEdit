@@ -472,10 +472,7 @@ mod tests {
         // loud — default kept, warning carried by the ABI.
         let path = store(dir.path(), &[("tools.lsp_backend", "emacs")]);
         let data = load(&path);
-        assert_eq!(
-            lookup(&data, "tools.lsp_backend").as_deref(),
-            Some("verible")
-        );
+        assert_eq!(lookup(&data, "tools.lsp_backend").as_deref(), Some("slang"));
         assert_eq!(data.warnings.len(), 1, "{:?}", data.warnings);
         assert!(data.warnings[0].contains("emacs"), "{:?}", data.warnings);
         assert!(

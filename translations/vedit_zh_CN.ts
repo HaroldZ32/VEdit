@@ -22,6 +22,198 @@
 <context>
     <name>VEdit</name>
     <message>
+        <source>Checking SVN status…</source>
+        <translation>正在检查 SVN 状态…</translation>
+    </message>
+    <message>
+        <source>Ignore File…</source>
+        <translation>忽略文件…</translation>
+    </message>
+    <message>
+        <source>Ignore Pattern…</source>
+        <translation>忽略匹配模式…</translation>
+    </message>
+    <message>
+        <source>Rename With SVN…</source>
+        <translation>通过 SVN 重命名…</translation>
+    </message>
+    <message>
+        <source>Revert SVN Changes…</source>
+        <translation>还原 SVN 更改…</translation>
+    </message>
+    <message>
+        <source>File History</source>
+        <translation>文件历史</translation>
+    </message>
+    <message>
+        <source>Compare With BASE</source>
+        <translation>与基准版本 (BASE) 比较</translation>
+    </message>
+    <message>
+        <source>Compare With HEAD</source>
+        <translation>与最新版本 (HEAD) 比较</translation>
+    </message>
+    <message>
+        <source>SVN status is unavailable for this item.</source>
+        <translation>无法获取此项的 SVN 状态。</translation>
+    </message>
+    <message>
+        <source>SVN status changed; reopen the menu to retry.</source>
+        <translation>SVN 状态已变化。请重新打开菜单后再试。</translation>
+    </message>
+    <message>
+        <source>Subversion: add, commit, revert, remove and update. Use SVN Actions for changelists, branches, conflict resolution and patches.</source>
+        <translation>Subversion 支持添加、提交、还原、移除和更新。使用“SVN 操作”管理变更列表、分支、冲突和补丁。</translation>
+    </message>
+    <message>
+        <source>SVN working-copy change</source>
+        <translation>SVN 工作副本更改</translation>
+    </message>
+    <message>
+        <source>SVN working-copy deletion</source>
+        <translation>SVN 工作副本删除</translation>
+    </message>
+    <message>
+        <source>Importing the project file set…</source>
+        <translation>正在导入工程文件集…</translation>
+    </message>
+    <message>
+        <source>Module tree preparation cancelled.</source>
+        <translation>已取消准备模块树。</translation>
+    </message>
+    <message>
+        <source>Preparing the module tree…</source>
+        <translation>正在准备模块树…</translation>
+    </message>
+    <message>
+        <source> · no filelist (tools use the open file)</source>
+        <translation> · 未导入文件清单（工具仅处理当前打开的文件）</translation>
+    </message>
+    <message>
+        <source>No filelist — import a .f filelist (Project ▸ Import Filelist…) to build the module tree; until then every tool works on the open file.</source>
+        <translation>未导入文件清单。请通过“工程 ▸ 导入 filelist…”导入 .f 文件以构建模块树。在此之前，工具仅处理当前打开的文件。</translation>
+    </message>
+    <message>
+        <source>No filelist — import a .f filelist (Project ▸ Import Filelist…) to build the project; until then every tool works on the open file only</source>
+        <translation>未导入文件清单。请通过“工程 ▸ 导入 filelist…”导入 .f 文件以构建工程。在此之前，工具仅处理当前打开的文件。</translation>
+    </message>
+    <message>
+        <source>unversioned</source>
+        <translation>未纳入版本控制</translation>
+    </message>
+    <message>
+        <source>Trace Driver</source>
+        <translation>追踪驱动</translation>
+    </message>
+    <message>
+        <source>Trace Load</source>
+        <translation>追踪负载</translation>
+    </message>
+    <message>
+        <source>Show Driver Chain</source>
+        <translation>查看驱动链</translation>
+    </message>
+    <message>
+        <source>Show Load Chain</source>
+        <translation>查看负载链</translation>
+    </message>
+    <message>
+        <source>Import a project file list to trace signals.</source>
+        <translation>请先导入工程文件清单，再追踪信号。</translation>
+    </message>
+    <message>
+        <source>Signal tracing needs an expanded project file list.</source>
+        <translation>信号追踪需要已展开的工程文件清单。</translation>
+    </message>
+    <message>
+        <source>Signal tracing requires the slang compiler. Check Preferences → Tools.</source>
+        <translation>信号追踪需要 slang 编译器。请检查“首选项 → 工具”。</translation>
+    </message>
+    <message>
+        <source>Signal tracing supports up to %1 project files.</source>
+        <translation>信号追踪最多支持 %1 个工程文件。</translation>
+    </message>
+    <message>
+        <source>Open a Verilog or SystemVerilog file to trace signals.</source>
+        <translation>请打开 Verilog 或 SystemVerilog 文件以追踪信号。</translation>
+    </message>
+    <message>
+        <source>Save this file before tracing signals.</source>
+        <translation>请先保存此文件，再追踪信号。</translation>
+    </message>
+    <message>
+        <source>Project inputs changed. Run the trace again.</source>
+        <translation>工程输入已更改，请重新追踪。</translation>
+    </message>
+    <message>
+        <source>Place the cursor on a signal identifier.</source>
+        <translation>请将光标放在信号标识符上。</translation>
+    </message>
+    <message>
+        <source>Could not start signal tracing. %1</source>
+        <translation>无法启动信号追踪。%1</translation>
+    </message>
+    <message>
+        <source>Analyzing project signals with slang…</source>
+        <translation>正在使用 slang 分析工程信号…</translation>
+    </message>
+    <message>
+        <source>Signal tracing failed. %1</source>
+        <translation>信号追踪失败。%1</translation>
+    </message>
+    <message>
+        <source>Signal trace discarded because the editor position changed.</source>
+        <translation>编辑器位置已改变，已丢弃追踪结果。</translation>
+    </message>
+    <message>
+        <source>No elaborated signal at the cursor.</source>
+        <translation>光标处没有展开的信号。</translation>
+    </message>
+    <message>
+        <source>No drivers found.</source>
+        <translation>未找到驱动。</translation>
+    </message>
+    <message>
+        <source>No loads found.</source>
+        <translation>未找到负载。</translation>
+    </message>
+    <message>
+        <source>Signal instance</source>
+        <translation>信号实例</translation>
+    </message>
+    <message>
+        <source>Connection</source>
+        <translation>连接</translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation>源位置</translation>
+    </message>
+    <message>
+        <source>Jump to Source</source>
+        <translation>跳转到源位置</translation>
+    </message>
+    <message>
+        <source> · Cycle</source>
+        <translation> · 循环</translation>
+    </message>
+    <message>
+        <source>Trace limited to 512 rows and 32 levels.</source>
+        <translation>追踪最多显示 512 行、32 层。</translation>
+    </message>
+    <message>
+        <source>Opening the workbench…</source>
+        <translation>正在打开工作台…</translation>
+    </message>
+    <message>
+        <source>Startup in progress</source>
+        <translation>正在启动</translation>
+    </message>
+    <message>
+        <source>No text at this position</source>
+        <translation>此位置没有文本</translation>
+    </message>
+    <message>
         <location filename="../src/app/theme_manager.cpp" line="198"/>
         <source>unknown UI theme '%1'</source>
         <translation>未知界面主题“%1”</translation>
@@ -5607,6 +5799,10 @@ root: %1</source>
 <context>
     <name>vedit::app::ApplicationShell</name>
     <message>
+        <source>Compare Files…</source>
+        <translation>比较文件…</translation>
+    </message>
+    <message>
         <location filename="../src/app/app_shell.cpp" line="1129"/>
         <source>no project</source>
         <translation>无工程</translation>
@@ -6299,6 +6495,22 @@ root: %1</source>
 <context>
     <name>vedit::workspace::FileTreeWidget</name>
     <message>
+        <source>Expand Folder</source>
+        <translation>展开文件夹</translation>
+    </message>
+    <message>
+        <source>Open File</source>
+        <translation>打开文件</translation>
+    </message>
+    <message>
+        <source>Copy Path</source>
+        <translation>复制路径</translation>
+    </message>
+    <message>
+        <source>Compare With…</source>
+        <translation>比较对象…</translation>
+    </message>
+    <message>
         <location filename="../src/workspace/filetree/file_tree_widget.cpp" line="476"/>
         <source>Open Folder</source>
         <translation>打开文件夹</translation>
@@ -6378,6 +6590,14 @@ Use &quot;Open...&quot; to browse a project.</source>
 </context>
 <context>
     <name>vedit::workspace::search::SearchPanel</name>
+    <message>
+        <source>Open Match</source>
+        <translation>打开匹配项</translation>
+    </message>
+    <message>
+        <source>Copy Match</source>
+        <translation>复制匹配项</translation>
+    </message>
     <message>
         <location filename="../src/workspace/search/search_panel.cpp" line="37"/>
         <location filename="../src/workspace/search/search_panel.cpp" line="284"/>
@@ -8130,6 +8350,886 @@ Use &quot;Open...&quot; to browse a project.</source>
         <location filename="../src/workspace/settings/settings_dialog.cpp" line="398"/>
         <source>value</source>
         <translation>值</translation>
+    </message>
+</context>
+<context>
+    <name>EditorPane</name>
+    <message>
+        <source>Close</source>
+        <translation>关闭</translation>
+    </message>
+    <message>
+        <source>Close Others</source>
+        <translation>关闭其他标签页</translation>
+    </message>
+    <message>
+        <source>Close to the Left</source>
+        <translation>关闭左侧标签页</translation>
+    </message>
+    <message>
+        <source>Close to the Right</source>
+        <translation>关闭右侧标签页</translation>
+    </message>
+    <message>
+        <source>Close All</source>
+        <translation>关闭所有标签页</translation>
+    </message>
+    <message>
+        <source>Copy Path</source>
+        <translation>复制路径</translation>
+    </message>
+</context>
+<context>
+    <name>FileComparison</name>
+    <message>
+        <source>Cannot read %1.</source>
+        <translation>无法读取 %1。</translation>
+    </message>
+    <message>
+        <source>%1 exceeds the 8 MiB text comparison limit.</source>
+        <translation>%1 超过 8 MiB 的文本比较上限。</translation>
+    </message>
+    <message>
+        <source>%1 is binary or uses an unsupported encoding. Comparison requires UTF-8 text.</source>
+        <translation>%1 是二进制文件或使用了不受支持的编码。比较需要 UTF-8 文本。</translation>
+    </message>
+    <message>
+        <source>%1 differs from the open editor. Reload it before comparing.</source>
+        <translation>%1 与编辑器中的内容不同。请重新加载后再比较。</translation>
+    </message>
+    <message>
+        <source>%1 exceeds the text comparison limit (8 MiB or 100,000 lines).</source>
+        <translation>%1 超过文本比较上限（8 MiB 或 100,000 行）。</translation>
+    </message>
+    <message>
+        <source>Added</source>
+        <translation>新增</translation>
+    </message>
+    <message>
+        <source>Removed</source>
+        <translation>删除</translation>
+    </message>
+    <message>
+        <source>Changed</source>
+        <translation>替换</translation>
+    </message>
+    <message>
+        <source>  [no final newline]</source>
+        <translation>  [末尾无换行符]</translation>
+    </message>
+    <message>
+        <source>Previous difference</source>
+        <translation>上一处差异</translation>
+    </message>
+    <message>
+        <source>Next difference</source>
+        <translation>下一处差异</translation>
+    </message>
+    <message>
+        <source>Undo hunk</source>
+        <translation>撤销差异应用</translation>
+    </message>
+    <message>
+        <source>Compare Files</source>
+        <translation>比较文件</translation>
+    </message>
+    <message>
+        <source>Save left</source>
+        <translation>保存左侧</translation>
+    </message>
+    <message>
+        <source>Save right</source>
+        <translation>保存右侧</translation>
+    </message>
+    <message>
+        <source>Apply selected difference to the left</source>
+        <translation>将选中的差异应用到左侧</translation>
+    </message>
+    <message>
+        <source>Apply selected difference to the right</source>
+        <translation>将选中的差异应用到右侧</translation>
+    </message>
+    <message>
+        <source>Close</source>
+        <translation>关闭</translation>
+    </message>
+    <message>
+        <source>Cannot prepare comparison input.</source>
+        <translation>无法准备待比较的内容。</translation>
+    </message>
+    <message>
+        <source>Comparison could not run: %1</source>
+        <translation>无法执行比较：%1</translation>
+    </message>
+    <message>
+        <source>Comparison could not run. GNU diff is required.</source>
+        <translation>无法执行比较，需要 GNU diff。</translation>
+    </message>
+    <message>
+        <source>  ·  Absent at this revision</source>
+        <translation>  ·  此修订中不存在</translation>
+    </message>
+    <message>
+        <source>  ·  Read-only</source>
+        <translation>  ·  只读</translation>
+    </message>
+    <message>
+        <source>Comparing…</source>
+        <translation>正在比较…</translation>
+    </message>
+    <message>
+        <source>No differences</source>
+        <translation>没有差异</translation>
+    </message>
+    <message>
+        <source>Difference %1 of %2</source>
+        <translation>第 %1 处差异，共 %2 处</translation>
+    </message>
+    <message>
+        <source>%1 differences</source>
+        <translation>共 %1 处差异</translation>
+    </message>
+    <message>
+        <source>Applying this difference would exceed the text comparison limit.</source>
+        <translation>应用此差异将超过文本比较上限。</translation>
+    </message>
+    <message>
+        <source>The open editor buffer changed. Reopen the comparison before applying a difference.</source>
+        <translation>编辑器缓冲区已更改。请重新打开比较后再应用差异。</translation>
+    </message>
+    <message>
+        <source>The open editor buffer changed. Undo could not be applied.</source>
+        <translation>编辑器缓冲区已更改，无法撤销。</translation>
+    </message>
+    <message>
+        <source>%1 changed outside this comparison. Reopen it before saving.</source>
+        <translation>%1 已在比较窗口之外更改。请重新打开比较后再保存。</translation>
+    </message>
+    <message>
+        <source>Cannot save %1: %2</source>
+        <translation>无法保存 %1：%2</translation>
+    </message>
+    <message>
+        <source>Saved %1</source>
+        <translation>已保存 %1</translation>
+    </message>
+    <message>
+        <source>Discard comparison changes?</source>
+        <translation>要放弃比较中的更改吗？</translation>
+    </message>
+    <message>
+        <source>Discard the applied differences that have not been saved?</source>
+        <translation>要放弃已应用但尚未保存的差异吗？</translation>
+    </message>
+    <message>
+        <source>The open editor buffer changed. Its current text has been preserved.</source>
+        <translation>编辑器缓冲区已更改，当前文本已保留。</translation>
+    </message>
+    <message>
+        <source>Choose two different files to compare.</source>
+        <translation>请选择两个不同的文件进行比较。</translation>
+    </message>
+    <message>
+        <source>Choose left file</source>
+        <translation>选择左侧文件</translation>
+    </message>
+    <message>
+        <source>Choose right file</source>
+        <translation>选择右侧文件</translation>
+    </message>
+</context>
+<context>
+    <name>SignalTrace</name>
+    <message>
+        <source>In</source>
+        <translation>输入</translation>
+    </message>
+    <message>
+        <source>Out</source>
+        <translation>输出</translation>
+    </message>
+    <message>
+        <source>InOut</source>
+        <translation>双向</translation>
+    </message>
+    <message>
+        <source>Port %1 (%2)</source>
+        <translation>端口 %1（%2）</translation>
+    </message>
+    <message>
+        <source>assign</source>
+        <translation>连续赋值 (assign)</translation>
+    </message>
+    <message>
+        <source>procedural</source>
+        <translation>过程赋值</translation>
+    </message>
+    <message>
+        <source>Always</source>
+        <translation>过程块 (always)</translation>
+    </message>
+    <message>
+        <source>AlwaysComb</source>
+        <translation>组合逻辑块 (always_comb)</translation>
+    </message>
+    <message>
+        <source>AlwaysFF</source>
+        <translation>时序逻辑块 (always_ff)</translation>
+    </message>
+    <message>
+        <source>AlwaysLatch</source>
+        <translation>锁存器逻辑块 (always_latch)</translation>
+    </message>
+    <message>
+        <source>Initial</source>
+        <translation>初始块 (initial)</translation>
+    </message>
+    <message>
+        <source>Final</source>
+        <translation>结束块 (final)</translation>
+    </message>
+</context>
+<context>
+    <name>SvnWorkspaces</name>
+    <message>
+        <source>Working copy:</source>
+        <translation>工作副本：</translation>
+    </message>
+    <message>
+        <source>SVN working copies</source>
+        <translation>SVN 工作副本</translation>
+    </message>
+    <message>
+        <source>%1 (%2 changed)</source>
+        <translation>%1（%2 项已更改）</translation>
+    </message>
+    <message>
+        <source>%1 (closed)</source>
+        <translation>%1（已关闭）</translation>
+    </message>
+    <message>
+        <source>%1 (status unavailable)</source>
+        <translation>%1（状态不可用）</translation>
+    </message>
+    <message>
+        <source>Close working copy</source>
+        <translation>关闭工作副本</translation>
+    </message>
+    <message>
+        <source>Reopen working copy</source>
+        <translation>重新打开工作副本</translation>
+    </message>
+    <message>
+        <source>Project repository</source>
+        <translation>工程仓库</translation>
+    </message>
+    <message>
+        <source>Working copy options</source>
+        <translation>工作副本选项</translation>
+    </message>
+    <message>
+        <source>Rescan for working copies</source>
+        <translation>重新扫描工作副本</translation>
+    </message>
+    <message>
+        <source>Search more project folders</source>
+        <translation>搜索更多工程文件夹</translation>
+    </message>
+    <message>
+        <source>Check incoming changes every 5 minutes</source>
+        <translation>每 5 分钟检查一次传入更改</translation>
+    </message>
+    <message>
+        <source>This working copy is closed.</source>
+        <translation>此工作副本已关闭。</translation>
+    </message>
+    <message>
+        <source>Working-copy search reached its limit.</source>
+        <translation>已达到工作副本搜索上限。</translation>
+    </message>
+    <message>
+        <source>No SVN working copies found.</source>
+        <translation>未找到 SVN 工作副本。</translation>
+    </message>
+    <message>
+        <source>An SVN write is still running.</source>
+        <translation>SVN 写入操作仍在运行。</translation>
+    </message>
+</context>
+<context>
+    <name>SvnComparison</name>
+    <message>
+        <source>Reading SVN revisions…</source>
+        <translation>正在读取 SVN 修订…</translation>
+    </message>
+    <message>
+        <source>%1 at %2</source>
+        <translation>%1（%2）</translation>
+    </message>
+    <message>
+        <source>This file did not exist at that revision.</source>
+        <translation>此文件在该修订中不存在。</translation>
+    </message>
+    <message>
+        <source>Cannot read SVN comparison: %1</source>
+        <translation>无法读取 SVN 比较数据：%1</translation>
+    </message>
+    <message>
+        <source>The working file is outside the SVN working copy or is not a regular file.</source>
+        <translation>工作文件位于 SVN 工作副本之外，或并非常规文件。</translation>
+    </message>
+    <message>
+        <source>%1 · Working Copy</source>
+        <translation>%1 · 工作副本</translation>
+    </message>
+</context>
+<context>
+    <name>WorkbenchInteraction</name>
+    <message>
+        <source>Dock Panel</source>
+        <translation>停靠面板</translation>
+    </message>
+    <message>
+        <source>Float Panel</source>
+        <translation>浮动面板</translation>
+    </message>
+    <message>
+        <source>Hide Panel</source>
+        <translation>隐藏面板</translation>
+    </message>
+    <message>
+        <source>Moving %1</source>
+        <translation>正在移动 %1</translation>
+    </message>
+</context>
+<context>
+    <name>vedit::workspace::diagnostics::DiagnosticsPanel</name>
+    <message>
+        <source>Go to Symbol</source>
+        <translation>转到符号</translation>
+    </message>
+    <message>
+        <source>Copy Symbol</source>
+        <translation>复制符号</translation>
+    </message>
+</context>
+<context>
+    <name>vedit::workspace::diagnostics::ProjectLintPanel</name>
+    <message>
+        <source>Go to Diagnostic</source>
+        <translation>转到诊断位置</translation>
+    </message>
+    <message>
+        <source>Copy File Path</source>
+        <translation>复制文件路径</translation>
+    </message>
+</context>
+<context>
+    <name>vedit::workspace::module_tree::InterfacePanel</name>
+    <message>
+        <source>Go to Port Declaration</source>
+        <translation>转到端口声明</translation>
+    </message>
+    <message>
+        <source>Copy Cell</source>
+        <translation>复制单元格</translation>
+    </message>
+</context>
+<context>
+    <name>vedit::workspace::module_tree::ModuleTreePanel</name>
+    <message>
+        <source>Go to Definition</source>
+        <translation>转到定义</translation>
+    </message>
+    <message>
+        <source>Copy Instance Path</source>
+        <translation>复制实例路径</translation>
+    </message>
+</context>
+<context>
+    <name>vedit::workspace::vcs::VcsHistoryPanel</name>
+    <message>
+        <source>Working-copy repository</source>
+        <translation>工作副本的仓库</translation>
+    </message>
+    <message>
+        <source>Add SVN Repository…</source>
+        <translation>添加 SVN 仓库…</translation>
+    </message>
+    <message>
+        <source>Remove Saved Repository</source>
+        <translation>移除已保存的仓库</translation>
+    </message>
+    <message>
+        <source>Compare This Revision With BASE</source>
+        <translation>将此修订与基准版本 (BASE) 比较</translation>
+    </message>
+    <message>
+        <source>Add SVN Repository</source>
+        <translation>添加 SVN 仓库</translation>
+    </message>
+    <message>
+        <source>Repository URL</source>
+        <translation>仓库 URL</translation>
+    </message>
+    <message>
+        <source>Enter a valid SVN repository URL without embedded credentials.</source>
+        <translation>请输入有效的 SVN 仓库 URL，且 URL 中不能包含凭据。</translation>
+    </message>
+    <message>
+        <source>Could not create the SVN repository settings directory.</source>
+        <translation>无法创建 SVN 仓库设置目录。</translation>
+    </message>
+    <message>
+        <source>Could not save SVN repositories: %1</source>
+        <translation>无法保存 SVN 仓库：%1</translation>
+    </message>
+    <message>
+        <source>Changed Files</source>
+        <translation>已更改的文件</translation>
+    </message>
+    <message>
+        <source>Open Working File</source>
+        <translation>打开工作副本文件</translation>
+    </message>
+    <message>
+        <source>Compare Revisions…</source>
+        <translation>比较修订…</translation>
+    </message>
+    <message>
+        <source>Compare With Working Copy</source>
+        <translation>与工作副本比较</translation>
+    </message>
+    <message>
+        <source>Copy Revision Number</source>
+        <translation>复制修订号</translation>
+    </message>
+    <message>
+        <source>Copy Commit Message</source>
+        <translation>复制提交说明</translation>
+    </message>
+    <message>
+        <source>Compare Revisions</source>
+        <translation>比较修订</translation>
+    </message>
+    <message>
+        <source>Open This Revision</source>
+        <translation>打开此修订</translation>
+    </message>
+    <message>
+        <source>Compare SVN Revisions</source>
+        <translation>比较 SVN 修订</translation>
+    </message>
+    <message>
+        <source>Enter two revisions separated by a comma, for example r12, r34.</source>
+        <translation>请输入两个以逗号分隔的修订号，例如 r12, r34。</translation>
+    </message>
+    <message>
+        <source>Enter two different revision numbers.</source>
+        <translation>请输入两个不同的修订号。</translation>
+    </message>
+    <message>
+        <source>Search text or revision (r123)</source>
+        <translation>搜索文本或修订号（r123）</translation>
+    </message>
+    <message>
+        <source>Subversion Repository History</source>
+        <translation>Subversion 仓库历史</translation>
+    </message>
+    <message>
+        <source>Subversion File History</source>
+        <translation>Subversion 文件历史</translation>
+    </message>
+    <message>
+        <source>Revision</source>
+        <translation>修订</translation>
+    </message>
+    <message>
+        <source>No revisions touch this file.</source>
+        <translation>此文件没有相关修订。</translation>
+    </message>
+    <message>
+        <source>No file revisions match the search.</source>
+        <translation>没有符合搜索条件的文件修订。</translation>
+    </message>
+    <message>
+        <source>Compare With Previous Revision</source>
+        <translation>与上次修订比较</translation>
+    </message>
+    <message>
+        <source>Compare selected</source>
+        <translation>比较选中项</translation>
+    </message>
+</context>
+<context>
+    <name>vedit::workspace::vcs::VcsPanel</name>
+    <message>
+        <source>Open HEAD Revision</source>
+        <translation>打开最新修订 (HEAD)</translation>
+    </message>
+    <message>
+        <source>Entire working copy</source>
+        <translation>整个工作副本</translation>
+    </message>
+    <message>
+        <source>Use Previous Message…</source>
+        <translation>使用以前的提交说明…</translation>
+    </message>
+    <message>
+        <source>No previous commit messages.</source>
+        <translation>没有以前的提交说明。</translation>
+    </message>
+    <message>
+        <source>Previous SVN Commit Messages</source>
+        <translation>以前的 SVN 提交说明</translation>
+    </message>
+    <message>
+        <source>Commit message</source>
+        <translation>提交说明</translation>
+    </message>
+    <message>
+        <source>Renamed %1 to %2.</source>
+        <translation>已将 %1 重命名为 %2。</translation>
+    </message>
+    <message>
+        <source>Delete Unversioned Paths…</source>
+        <translation>删除未纳入版本控制的路径…</translation>
+    </message>
+    <message>
+        <source>Delete Unversioned Paths?</source>
+        <translation>要删除未纳入版本控制的路径吗？</translation>
+    </message>
+    <message>
+        <source>Permanently delete these selected paths and any contained files?
+%1</source>
+        <translation>要永久删除以下选中的路径及其中的所有文件吗？
+%1</translation>
+    </message>
+    <message>
+        <source>Confirm Permanent Deletion</source>
+        <translation>确认永久删除</translation>
+    </message>
+    <message>
+        <source>SVN cannot recover unversioned files.</source>
+        <translation>SVN 无法恢复未纳入版本控制的文件。</translation>
+    </message>
+    <message>
+        <source>Compare With…</source>
+        <translation>比较对象…</translation>
+    </message>
+    <message>
+        <source>BASE</source>
+        <translation>基准版本 (BASE)</translation>
+    </message>
+    <message>
+        <source>HEAD</source>
+        <translation>最新版本 (HEAD)</translation>
+    </message>
+    <message>
+        <source>Revision…</source>
+        <translation>指定修订…</translation>
+    </message>
+    <message>
+        <source>Compare With SVN Revision</source>
+        <translation>与 SVN 修订比较</translation>
+    </message>
+    <message>
+        <source>Revision number</source>
+        <translation>修订号</translation>
+    </message>
+    <message>
+        <source>Enter a revision such as r42.</source>
+        <translation>请输入修订号，例如 r42。</translation>
+    </message>
+    <message>
+        <source>File History…</source>
+        <translation>文件历史…</translation>
+    </message>
+    <message>
+        <source>SVN Actions</source>
+        <translation>SVN 操作</translation>
+    </message>
+    <message>
+        <source>· %1 incoming</source>
+        <translation>· %1 项传入更改</translation>
+    </message>
+    <message>
+        <source>%1 SVN conflict(s) need attention.</source>
+        <translation>有 %1 个 SVN 冲突需要处理。</translation>
+    </message>
+    <message>
+        <source>Checked out %1.</source>
+        <translation>已检出 %1。</translation>
+    </message>
+    <message>
+        <source>Check working-copy status for partial changes.</source>
+        <translation>请检查工作副本状态，确认是否已应用部分更改。</translation>
+    </message>
+    <message>
+        <source>Check Out SVN Repository…</source>
+        <translation>检出 SVN 仓库…</translation>
+    </message>
+    <message>
+        <source>Open Working File</source>
+        <translation>打开工作副本文件</translation>
+    </message>
+    <message>
+        <source>File History</source>
+        <translation>文件历史</translation>
+    </message>
+    <message>
+        <source>Compare With BASE</source>
+        <translation>与基准版本 (BASE) 比较</translation>
+    </message>
+    <message>
+        <source>Compare With HEAD</source>
+        <translation>与最新版本 (HEAD) 比较</translation>
+    </message>
+    <message>
+        <source>Commit Selected…</source>
+        <translation>提交选中项…</translation>
+    </message>
+    <message>
+        <source>Commit Changelist…</source>
+        <translation>提交变更列表…</translation>
+    </message>
+    <message>
+        <source>Set Changelist…</source>
+        <translation>设置变更列表…</translation>
+    </message>
+    <message>
+        <source>Set Changelist</source>
+        <translation>设置变更列表</translation>
+    </message>
+    <message>
+        <source>Changelist name</source>
+        <translation>变更列表名称</translation>
+    </message>
+    <message>
+        <source>Remove From Changelist</source>
+        <translation>从变更列表移除</translation>
+    </message>
+    <message>
+        <source>Resolve Selected…</source>
+        <translation>解决选中项的冲突…</translation>
+    </message>
+    <message>
+        <source>Resolve All Conflicts…</source>
+        <translation>解决所有冲突…</translation>
+    </message>
+    <message>
+        <source>Revert All Changes…</source>
+        <translation>还原所有更改…</translation>
+    </message>
+    <message>
+        <source>Rename With SVN…</source>
+        <translation>通过 SVN 重命名…</translation>
+    </message>
+    <message>
+        <source>Rename With SVN</source>
+        <translation>通过 SVN 重命名</translation>
+    </message>
+    <message>
+        <source>New working-copy relative path</source>
+        <translation>新的工作副本相对路径</translation>
+    </message>
+    <message>
+        <source>Ignore File or Pattern…</source>
+        <translation>忽略文件或匹配模式…</translation>
+    </message>
+    <message>
+        <source>Ignore in SVN</source>
+        <translation>在 SVN 中忽略</translation>
+    </message>
+    <message>
+        <source>Pattern in this directory (blank for this exact name)</source>
+        <translation>当前目录中的匹配模式（留空则仅忽略此名称）</translation>
+    </message>
+    <message>
+        <source>Show Patch for Selected</source>
+        <translation>显示选中项的补丁</translation>
+    </message>
+    <message>
+        <source>Show Patch for All Changes</source>
+        <translation>显示所有更改的补丁</translation>
+    </message>
+    <message>
+        <source>Show Patch for Changelist</source>
+        <translation>显示变更列表的补丁</translation>
+    </message>
+    <message>
+        <source>Create Branch…</source>
+        <translation>创建分支…</translation>
+    </message>
+    <message>
+        <source>Switch Branch…</source>
+        <translation>切换分支…</translation>
+    </message>
+    <message>
+        <source>Merge Branch…</source>
+        <translation>合并分支…</translation>
+    </message>
+    <message>
+        <source>Clean Up Working Copy</source>
+        <translation>清理工作副本</translation>
+    </message>
+    <message>
+        <source>Refresh Remote Changes</source>
+        <translation>刷新远程更改</translation>
+    </message>
+    <message>
+        <source>Check Out SVN Repository</source>
+        <translation>检出 SVN 仓库</translation>
+    </message>
+    <message>
+        <source>Choose Parent Directory…</source>
+        <translation>选择上级目录…</translation>
+    </message>
+    <message>
+        <source>Repository URL</source>
+        <translation>仓库 URL</translation>
+    </message>
+    <message>
+        <source>Local parent directory</source>
+        <translation>本地上级目录</translation>
+    </message>
+    <message>
+        <source>New directory name</source>
+        <translation>新目录名称</translation>
+    </message>
+    <message>
+        <source>Choose Parent Directory</source>
+        <translation>选择上级目录</translation>
+    </message>
+    <message>
+        <source>Changelist %1</source>
+        <translation>变更列表 %1</translation>
+    </message>
+    <message>
+        <source>Commit to SVN</source>
+        <translation>提交到 SVN</translation>
+    </message>
+    <message>
+        <source>Commit message for
+%1</source>
+        <translation>以下内容的提交说明
+%1</translation>
+    </message>
+    <message>
+        <source>Create SVN Branch</source>
+        <translation>创建 SVN 分支</translation>
+    </message>
+    <message>
+        <source>Switch SVN Branch</source>
+        <translation>切换 SVN 分支</translation>
+    </message>
+    <message>
+        <source>Merge SVN Branch</source>
+        <translation>合并 SVN 分支</translation>
+    </message>
+    <message>
+        <source>Repository-relative URL (for example ^/branches/topic)</source>
+        <translation>相对于仓库的 URL（例如 ^/branches/topic）</translation>
+    </message>
+    <message>
+        <source>Commit message for the repository copy</source>
+        <translation>仓库复制操作的提交说明</translation>
+    </message>
+    <message>
+        <source>Apply %1 to this working copy? Local changes may conflict.</source>
+        <translation>要将 %1 应用到此工作副本吗？本地更改可能会发生冲突。</translation>
+    </message>
+    <message>
+        <source>Mark SVN Conflicts Resolved?</source>
+        <translation>要将 SVN 冲突标记为已解决吗？</translation>
+    </message>
+    <message>
+        <source>Use the current working contents of these paths?
+%1</source>
+        <translation>要使用以下路径在工作副本中的当前内容吗？
+%1</translation>
+    </message>
+    <message>
+        <source>Confirm Conflict Resolution</source>
+        <translation>确认解决冲突</translation>
+    </message>
+    <message>
+        <source>Confirm you have reviewed the working contents and resolved the conflicts.</source>
+        <translation>请确认已检查工作副本内容并解决冲突。</translation>
+    </message>
+    <message>
+        <source>Revert SVN Changes?</source>
+        <translation>要还原 SVN 更改吗？</translation>
+    </message>
+    <message>
+        <source>Discard local changes in these paths?
+%1</source>
+        <translation>要放弃以下路径中的本地更改吗？
+%1</translation>
+    </message>
+    <message>
+        <source>Confirm Permanent Revert</source>
+        <translation>确认永久还原</translation>
+    </message>
+    <message>
+        <source>The reverted local edits cannot be recovered from SVN.</source>
+        <translation>已还原的本地编辑无法从 SVN 恢复。</translation>
+    </message>
+    <message>
+        <source>Checking for incoming changes…</source>
+        <translation>正在检查传入更改…</translation>
+    </message>
+    <message>
+        <source>Generating SVN patch…</source>
+        <translation>正在生成 SVN 补丁…</translation>
+    </message>
+    <message>
+        <source>Incoming SVN Changes</source>
+        <translation>SVN 传入更改</translation>
+    </message>
+    <message>
+        <source>The working copy is up to date.</source>
+        <translation>工作副本已是最新版本。</translation>
+    </message>
+    <message>
+        <source>Update Selected</source>
+        <translation>更新选中项</translation>
+    </message>
+    <message>
+        <source>Update Selected SVN Paths?</source>
+        <translation>要更新选中的 SVN 路径吗？</translation>
+    </message>
+    <message>
+        <source>SVN Patch</source>
+        <translation>SVN 补丁</translation>
+    </message>
+    <message>
+        <source>There are no versioned changes in this scope.</source>
+        <translation>此范围内没有受版本控制的更改。</translation>
+    </message>
+    <message>
+        <source>Copy Patch</source>
+        <translation>复制补丁</translation>
+    </message>
+    <message>
+        <source>Save Patch…</source>
+        <translation>保存补丁…</translation>
+    </message>
+    <message>
+        <source>Save SVN Patch</source>
+        <translation>保存 SVN 补丁</translation>
+    </message>
+    <message>
+        <source>Patch files (*.patch *.diff)</source>
+        <translation>补丁文件 (*.patch *.diff)</translation>
+    </message>
+    <message>
+        <source>Could not save SVN patch: %1</source>
+        <translation>无法保存 SVN 补丁：%1</translation>
+    </message>
+    <message>
+        <source>The working file is unavailable.</source>
+        <translation>工作副本文件不可用。</translation>
     </message>
 </context>
 </TS>

@@ -1847,16 +1847,15 @@ void checkSvnCapabilities()
           QStringLiteral("rows=%1").arg(svnTable.size()));
     for (const PanelAction action : {PanelAction::Add, PanelAction::Revert, PanelAction::Commit,
                                      PanelAction::Remove, PanelAction::Update,
-                                     PanelAction::Refresh}) {
+                                     PanelAction::Refresh, PanelAction::Branch, PanelAction::History}) {
         check(qPrintable(QStringLiteral("vcs.capability.svn.%1-supported")
                              .arg(QString::fromLatin1(panelActionToken(action)))),
               capabilityFor(Backend::Subversion, action).supported);
     }
     for (const PanelAction action : {PanelAction::Unstage, PanelAction::Fetch, PanelAction::Pull,
-                                     PanelAction::Push, PanelAction::Branch, PanelAction::Tag,
+                                     PanelAction::Push, PanelAction::Tag,
                                      PanelAction::Remote, PanelAction::Workspace,
-                                     PanelAction::Continue, PanelAction::Abort,
-                                     PanelAction::History}) {
+                                     PanelAction::Continue, PanelAction::Abort}) {
         const auto row = capabilityFor(Backend::Subversion, action);
         check(qPrintable(QStringLiteral("vcs.capability.svn.%1-unsupported")
                              .arg(QString::fromLatin1(panelActionToken(action)))),
@@ -1878,12 +1877,8 @@ void checkSvnCapabilities()
           capabilityFor(Backend::Subversion, PanelAction::Remote).reason.contains(
               QStringLiteral("URL")),
           capabilityFor(Backend::Subversion, PanelAction::Remote).reason);
-    check("vcs.capability.svn.history-reason",
-          capabilityFor(Backend::Subversion, PanelAction::History).reason.contains(
-              QStringLiteral("accepted read set")),
-          capabilityFor(Backend::Subversion, PanelAction::History).reason);
     check("vcs.capability.svn.disabled-count",
-          disabledActionReasons(Backend::Subversion).size() == 11,
+          disabledActionReasons(Backend::Subversion).size() == 9,
           QStringLiteral("disabled=%1").arg(disabledActionReasons(Backend::Subversion).size()));
     check("vcs.capability.svn.report",
           capabilityReport(Backend::Subversion).startsWith(QStringLiteral("svn refresh=yes add=yes"))
@@ -4678,13 +4673,10 @@ void checkI18n()
               && zh("Revert changes?") != QStringLiteral("Revert changes?")
               && zh("Remove the file?") != QStringLiteral("Remove the file?")
               && zh("Added %1.") != QStringLiteral("Added %1.")
-              && zh("Subversion: add, commit, revert, remove and update are available. Staging, "
-                   "fetches, pushes, branches, tags, remotes, stashes, worktrees and conflict "
-                   "continuation are not — hover a disabled action for its reason.")
-                  != QStringLiteral("Subversion: add, commit, revert, remove and update are "
-                                    "available. Staging, fetches, pushes, branches, tags, "
-                                    "remotes, stashes, worktrees and conflict continuation are "
-                                    "not — hover a disabled action for its reason."),
+              && zh("Subversion: add, commit, revert, remove and update. Use SVN Actions for changelists, "
+                     "branches, conflict resolution and patches.")
+                   != QStringLiteral("Subversion: add, commit, revert, remove and update. Use SVN Actions for changelists, "
+                                     "branches, conflict resolution and patches."),
           zh("Revert changes?") + QStringLiteral(" / ") + zh("Remove the file?"));
     // The SVN button labels are set at runtime (Stage↔Add, Discard↔Revert,
     // Pull↔Update); they MUST be in the compiled catalogue, which is only true

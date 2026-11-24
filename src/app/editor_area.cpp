@@ -5,6 +5,7 @@
 #include "editor_provider.h"
 #include "path_display.h"
 #include "product_theme.h"
+#include "workbench_interaction.h"
 
 #if defined(VEDIT_APP_HAVE_BREADCRUMB)
 #include "breadcrumb_bar.h"
@@ -13,6 +14,7 @@
 #include <QAction>
 #include <QApplication>
 #include <QCoreApplication>
+#include <QContextMenuEvent>
 #include <QDrag>
 #include <QDragEnterEvent>
 #include <QDragMoveEvent>
@@ -327,7 +329,23 @@ public:
         onDragRequested_ = std::move(callback);
     }
 
+    std::function<void(int, const QPoint &)> onContextMenu;
+
 protected:
+    void contextMenuEvent(QContextMenuEvent *event) override
+    {
+        const bool keyboard = event->reason() == QContextMenuEvent::Keyboard;
+        const int index = keyboard ? currentIndex() : tabAt(event->pos());
+        if (index >= 0 && onContextMenu) {
+            const QPoint anchor = keyboard ? mapToGlobal(tabRect(index).bottomLeft())
+                                           : event->globalPos();
+            onContextMenu(index, anchor);
+            event->accept();
+            return;
+        }
+        event->ignore();
+    }
+
     void mousePressEvent(QMouseEvent *event) override
     {
         if (event != nullptr && event->button() == Qt::LeftButton) {
@@ -423,8 +441,10 @@ EditorPane::EditorPane(QString paneId, EditorProvider *provider, QWidget *parent
     // pane would then show the wrong file under the clicked tab — so `tabMoved`
     // permutes `documents_` in the same step.
     tabs_->setMovable(true);
-    tabs_->setContextMenuPolicy(Qt::CustomContextMenu);
-    tabs_->setFocusPolicy(Qt::NoFocus);
+    documentTabs->onContextMenu = [this](int index, const QPoint &anchor) {
+        showTabContextMenu(index, anchor);
+    };
+    tabs_->setFocusPolicy(Qt::TabFocus);
     tabs_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     tabs_->setSelectionBehaviorOnRemove(QTabBar::SelectRightTab);
     tabRowLayout->addWidget(tabs_, 1);
@@ -493,12 +513,6 @@ EditorPane::EditorPane(QString paneId, EditorProvider *provider, QWidget *parent
         }
         requestFocus();
     });
-    // T7: right-click anywhere on a tab (or the strip's empty area) opens the
-    // tab menu. `tabAt` returns -1 on empty space, which closes the menu.
-    QObject::connect(tabs_, &QWidget::customContextMenuRequested, this,
-                     [this](const QPoint &position) {
-                         showTabContextMenu(tabs_->tabAt(position));
-                     });
     QObject::connect(tabs_, &QTabBar::tabMoved, this, [this](int from, int to) {
         if (from == to || from < 0 || to < 0 || from >= documents_.size() ||
             to >= documents_.size()) {
@@ -1473,18 +1487,24 @@ QMenu *EditorPane::createTabContextMenu(int index)
     // Every close runs the SAME helper the per-tab X button uses, so a dirty
     // document reaches `onTabCloseRequested_` (save / discard / cancel) no
     // matter which entry the user picked.
-    QObject::connect(close, &QAction::triggered, this, [this, index]() { closeTab(index); });
-    QObject::connect(closeOthers, &QAction::triggered, this,
-                     [this, index]() { closeTabsExcept(index); });
-    QObject::connect(closeLeft, &QAction::triggered, this,
-                     [this, index]() { closeTabsInRange(0, index - 1); });
-    QObject::connect(closeRight, &QAction::triggered, this,
-                     [this, index]() { closeTabsInRange(index + 1, documents_.size() - 1); });
+    const quint64 serial = tabSerial(index);
+    const auto bindTab = [this, serial](QAction *action, auto handler) {
+        QObject::connect(action, &QAction::triggered, this, [this, serial, handler]() {
+            const int current = tabIndexForSerial(serial);
+            if (current >= 0) {
+                handler(current);
+            }
+        });
+    };
+    bindTab(close, [this](int current) { closeTab(current); });
+    bindTab(closeOthers, [this](int current) { closeTabsExcept(current); });
+    bindTab(closeLeft, [this](int current) { closeTabsInRange(0, current - 1); });
+    bindTab(closeRight, [this](int current) { closeTabsInRange(current + 1, documents_.size() - 1); });
     QObject::connect(closeAll, &QAction::triggered, this, [this]() {
         closeTabsInRange(0, documents_.size() - 1);
     });
-    QObject::connect(copyPath, &QAction::triggered, this, [this, index]() {
-        const Document *current = documents_.at(index);
+    bindTab(copyPath, [this](int index) {
+        const Document *current = documentAt(index);
         if (current != nullptr && !current->path.isEmpty()) {
             QGuiApplication::clipboard()->setText(current->path);
         }
@@ -1492,14 +1512,12 @@ QMenu *EditorPane::createTabContextMenu(int index)
     return menu;
 }
 
-void EditorPane::showTabContextMenu(int index)
+void EditorPane::showTabContextMenu(int index, const QPoint &anchor)
 {
-    QMenu *menu = createTabContextMenu(index);
-    if (menu == nullptr) {
-        return;
+    if (QMenu *menu = createTabContextMenu(index)) {
+        menu->setAttribute(Qt::WA_DeleteOnClose);
+        menu->popup(anchor);
     }
-    menu->exec(tabs_->mapToGlobal(tabs_->tabRect(index).center()));
-    menu->deleteLater();
 }
 
 void EditorPane::closeTabsInRange(int first, int last)
@@ -2171,24 +2189,25 @@ EditorPane *EditorArea::createPane(const QString &paneId)
             return;
         }
         const quint64 serial = source->tabSerial(index);
-        if (serial == 0) {
+        auto *bar = source->tabBar();
+        if (serial == 0 || bar == nullptr) {
             return;
         }
         beginTabDrag(source, serial);
-        auto *drag = new QDrag(source->tabBar());
+        auto *drag = new QDrag(bar);
         auto *mime = new QMimeData;
         mime->setData(QString::fromLatin1(kEditorTabMimeType),
                       QStringLiteral("%1/%2").arg(source->paneId()).arg(serial).toUtf8());
         drag->setMimeData(mime);
-        if (source->tabBar() != nullptr) {
-            const QRect tabRect = source->tabBar()->tabRect(index);
-            if (tabRect.isValid()) {
-                drag->setPixmap(source->tabBar()->grab(tabRect));
-            }
+        const QRect tabRect = bar->tabRect(index);
+        if (tabRect.isValid()) {
+            drag->setPixmap(bar->grab(tabRect));
         }
-        drag->exec(Qt::MoveAction, Qt::MoveAction);
+        const QPointer<QLabel> badge = showWorkbenchDragFeedback(window(), bar->tabText(index));
+        const auto action = drag->exec(Qt::MoveAction, Qt::MoveAction);
         delete drag;
         endTabDrag();
+        finishWorkbenchDragFeedback(badge, action == Qt::MoveAction);
     });
     pane->setOnTabDrop([this](EditorPane *target, TabDropZone zone, int index) {
         if (dragSourcePane_ == nullptr || dragSerial_ == 0) {

@@ -24,6 +24,10 @@
 pub mod history;
 pub mod runner;
 pub mod service;
+pub mod svn_compare;
+pub mod svn_read;
+pub mod svn_remote;
+mod svn_write;
 pub mod toolchain;
 pub mod workspace;
 pub mod write;

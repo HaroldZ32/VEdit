@@ -21,6 +21,7 @@
 #include "../workspace/diagnostics/toolchain.h"
 #include "panel_registry.h"
 #include "path_display.h"
+#include "startup_welcome.h"
 #include "terminal_panel.h"
 #include "theme_manager.h"
 #include "themed_icons.h"
@@ -2052,6 +2053,13 @@ int main(int argc, char **argv)
     // Do not add SA_RESETHAND: the ignore must stay for the whole process.
     std::signal(SIGPIPE, SIG_IGN);
 
+    if (vedit::app::isStartupWelcome(argc, argv)) {
+        const QString settingsPath = argc > 2 ? QString::fromLocal8Bit(argv[2]) : QString();
+        QApplication welcomeApp(argc, argv);
+        return vedit::app::runStartupWelcome(settingsPath);
+    }
+    qunsetenv("VEDIT_STARTUP_WELCOME_CHILD");
+
     // UX batch 2 / A4: the interface scale is a RESTART switch — Qt reads
     // QT_SCALE_FACTOR once, while the QApplication is being constructed — so the
     // value has to be in the environment BEFORE the next statement. 100 % (the
@@ -2077,7 +2085,7 @@ int main(int argc, char **argv)
     // only in themed_icons.cpp. The dark/light switch itself is ThemeManager::applyUiTheme.
     QApplication::setWindowIcon(vedit::app::themed_icons::appIcon(false));
     QCoreApplication::setApplicationName(QStringLiteral("vedit-app"));
-    QCoreApplication::setApplicationVersion(QStringLiteral("0.2.1"));
+    QCoreApplication::setApplicationVersion(QStringLiteral("0.4.0"));
     QCoreApplication::setOrganizationName(QStringLiteral("VEdit"));
 
     QCommandLineParser parser;
@@ -2132,6 +2140,27 @@ int main(int argc, char **argv)
                       QStringLiteral("signal")});
     parser.process(app);
 
+    const QString stateDir = parser.value(QStringLiteral("state-dir"));
+    const QStringList requestedFiles = parser.positionalArguments();
+    const bool interactive = !parser.isSet(QStringLiteral("selfcheck")) &&
+        !parser.isSet(QStringLiteral("selfcheck-ffi")) &&
+        !parser.isSet(QStringLiteral("screenshots")) &&
+        !parser.isSet(QStringLiteral("env-apply-probe")) &&
+        !parser.isSet(QStringLiteral("ui-scale-echo")) &&
+        !parser.isSet(QStringLiteral("crash-test"));
+    vedit::app::StartupWelcome welcome;
+    if (interactive) {
+        for (const QString &raw : requestedFiles) {
+            const QFileInfo info(raw);
+            if (!info.exists() || !info.isFile()) {
+                std::fprintf(stderr, "vedit-app: cannot open %s: %s\n", qPrintable(raw),
+                             info.exists() ? "not a regular file" : "no such file or directory");
+                return 2;
+            }
+        }
+        welcome.start(vedit::app::i18n::settingsFilePath(stateDir));
+    }
+
 #if defined(VEDIT_HAVE_APPEARANCE_SETTINGS)
     // UX batch 2 / A4, part 2: the font applies to the running application, and
     // the format/lint configuration has to be in the process-wide holders before
@@ -2141,23 +2170,21 @@ int main(int argc, char **argv)
         namespace settings = vedit::workspace::settings;
         const QString settingsPath = existingSettingsPath(
             startupSettingsCandidates(parser.value(QStringLiteral("state-dir"))));
+        const auto appearance = settings::ui_scale::readValues(settingsPath);
         settings::ui_scale::rememberStartupFont();
-        settings::ui_scale::applyFontPointSize(
-            settings::ui_scale::readValues(settingsPath).fontPointSize);
-        settings::SettingsClient client(settingsPath);
-        settings::Snapshot snapshot;
-        bool delivered = false;
-        client.load([&snapshot, &delivered](settings::Snapshot loaded) {
-            snapshot = std::move(loaded);
-            delivered = true;
-        });
-        // flush() pumps the store job; it is the same wait a restart-free
-        // Preferences reload does. A store that does not answer leaves the
-        // defaults in place — startup never fails over settings.
-        if (client.flush() && delivered && snapshot.completed) {
-            settings::setCurrentFormatValues(settings::formatValuesFromEntries(snapshot.entries));
-            settings::setCurrentLintValues(settings::lintValuesFromEntries(snapshot.entries));
+        settings::ui_scale::applyFontPointSize(appearance.fontPointSize);
+        // An absent store already has the built-in format and lint defaults.
+        // Avoid creating a Rust service and waiting for its first poll in that case.
+        if (QFileInfo::exists(settingsPath)) {
+            settings::Snapshot snapshot;
+            settings::SettingsClient client(settingsPath);
+            client.load([&snapshot](settings::Snapshot loaded) { snapshot = std::move(loaded); });
+            if (client.flush() && snapshot.completed) {
+                settings::setCurrentFormatValues(settings::formatValuesFromEntries(snapshot.entries));
+                settings::setCurrentLintValues(settings::lintValuesFromEntries(snapshot.entries));
+            }
         }
+        startupTrace(startupTimer, "settings-ready");
         // The restart path is observable from the OUTSIDE (the ctest runs the
         // real binary): the line reports both the stored value and what the
         // environment carries AFTER the QApplication was constructed.
@@ -2167,7 +2194,7 @@ int main(int argc, char **argv)
             const QByteArray factor = qgetenv("QT_SCALE_FACTOR");
             std::printf("UI-SCALE scale_percent=%d qt_scale_factor=%s font_point_size=%d "
                         "settings=%s\n",
-                        settings::ui_scale::readValues(settingsPath).scalePercent,
+                        appearance.scalePercent,
                         factor.isEmpty() ? "<unset>" : factor.constData(),
                         QApplication::font().pointSize(), qPrintable(settingsPath));
             std::fflush(stdout);
@@ -2208,7 +2235,7 @@ int main(int argc, char **argv)
     }
 
     ShellOptions options;
-    options.stateDir = parser.value(QStringLiteral("state-dir"));
+    options.stateDir = stateDir;
     options.projectRoot = parser.value(QStringLiteral("project"));
     options.themeName = parser.value(QStringLiteral("theme"));
     options.restoreSession = !parser.isSet(QStringLiteral("no-session-restore"));
@@ -2225,20 +2252,6 @@ int main(int argc, char **argv)
     if (parser.isSet(QStringLiteral("env-apply-probe"))) {
         return runEnvApplyProbe(parser.value(QStringLiteral("env-apply-probe")),
                                 parser.value(QStringLiteral("env-probe-expect")));
-    }
-
-    // T137: validate positional files before creating the shell, so a typo
-    // prints one readable line and exits non-zero instead of opening an empty
-    // window. The same validation lives in ApplicationShell::openPaths for
-    // File -> Open; this early pass only exists to avoid constructing the GUI.
-    const QStringList requestedFiles = parser.positionalArguments();
-    for (const QString &raw : requestedFiles) {
-        const QFileInfo info(raw);
-        if (!info.exists() || !info.isFile()) {
-            std::fprintf(stderr, "vedit-app: cannot open %s: %s\n", qPrintable(raw),
-                         info.exists() ? "not a regular file" : "no such file or directory");
-            return 2;
-        }
     }
 
     // Session restore is deferred until the lanes registered their panel
@@ -2365,7 +2378,7 @@ int main(int argc, char **argv)
         });
     }
 #endif
-    vedit::workspace::installPanels(shell, {options.projectRoot, options.stateDir});
+    vedit::workspace::installPanels(shell, {options.projectRoot, options.stateDir, true});
     startupTrace(startupTimer, "panels-installed");
     // Terminal panel lane (T35): the shell created the "terminal" panel spec with
     // an empty factory; the widget lives in the terminal lane.
@@ -2373,19 +2386,29 @@ int main(int argc, char **argv)
                                vedit::terminal::terminalPanelFactory());
     shell.startSession();
     startupTrace(startupTimer, "session-started");
-    if (!requestedFiles.isEmpty()) {
-        QString openError;
-        if (!shell.openPaths(requestedFiles, &openError)) {
-            std::fprintf(stderr, "vedit-app: %s\n", qPrintable(openError));
-            return 1;
-        }
-    }
     shell.show();
     startupTrace(startupTimer, "window-shown");
+    welcome.finish();
 
     const int holdMs = parser.value(QStringLiteral("hold")).toInt();
-    if (holdMs > 0) {
-        QTimer::singleShot(holdMs, &app, &QCoreApplication::quit);
+    const auto openRequestedFiles = [&]() {
+        QString openError;
+        if (!requestedFiles.isEmpty() && !shell.openPaths(requestedFiles, &openError)) {
+            std::fprintf(stderr, "vedit-app: %s\n", qPrintable(openError));
+            app.exit(1);
+            return;
+        }
+        startupTrace(startupTimer, "launch-ready");
+        if (holdMs > 0) {
+            QTimer::singleShot(holdMs, &app, &QCoreApplication::quit);
+        }
+    };
+    // An explicit .f can open the import confirmation. Let it be parented to
+    // an already shown workbench, and let the event loop paint it immediately.
+    if (requestedFiles.isEmpty()) {
+        openRequestedFiles();
+    } else {
+        vedit::app::afterFirstWorkbenchPaint(&shell, openRequestedFiles);
     }
     return app.exec();
 }

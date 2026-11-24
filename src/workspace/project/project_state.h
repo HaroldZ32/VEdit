@@ -117,7 +117,7 @@ public:
     QString path() const;
 
     // `ok` is true when a readable state file with a non-empty root was loaded.
-    ProjectState load(bool *ok, QString *error = nullptr) const;
+    ProjectState load(bool *ok, QString *error = nullptr, bool restoreCachedFiles = true) const;
     // Atomic write (temp file + rename); the parent directory is created.
     bool save(const ProjectState &state, QString *error = nullptr) const;
 

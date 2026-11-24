@@ -13,6 +13,7 @@
 // the old "pane-1 · KTextEditor (edit-core) ◀ active" header line, which leaked
 // the provider name and never told the user which file was being edited or
 // whether it was saved.
+#include <QCoreApplication>
 #include <QJsonObject>
 #include <QHash>
 #include <QList>
@@ -81,6 +82,8 @@ inline constexpr char kEditorTabMimeType[] = "application/x-vedit-tab";
 // (the provider creates them). The pane asks for activation on click and on
 // focus-in of any editor widget.
 class EditorPane final : public QWidget {
+    Q_DECLARE_TR_FUNCTIONS(EditorPane)
+
 public:
     EditorPane(QString paneId, EditorProvider *provider, QWidget *parent = nullptr);
     ~EditorPane() override;
@@ -302,7 +305,7 @@ private:
     // Batch 20261110d (T7): the tab context menu. Every close item goes through
     // `closeTab()`, so a dirty document still reaches `onTabCloseRequested_`
     // (save / discard / cancel) instead of disappearing.
-    void showTabContextMenu(int index);
+    void showTabContextMenu(int index, const QPoint &anchor);
     void closeTabsInRange(int first, int last);
     void closeTabsExcept(int keep);
     // batch-20261115 (AC-5.3): a bulk close must notify the shell ONCE, not once

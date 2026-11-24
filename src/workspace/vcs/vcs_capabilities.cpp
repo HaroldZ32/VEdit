@@ -120,11 +120,7 @@ QVector<PanelCapability> capabilitiesFor(Backend backend)
                         QT_TRANSLATE_NOOP("VEdit",
                                           "Subversion has no push: a commit publishes directly "
                                           "to the repository the working copy is bound to.")),
-            unsupported(PanelAction::Branch,
-                        QT_TRANSLATE_NOOP("VEdit",
-                                          "Branches in Subversion are repository-side copies; "
-                                          "branch creation is not part of this build's accepted "
-                                          "Subversion surface.")),
+            supported(PanelAction::Branch),
             unsupported(PanelAction::Tag,
                         QT_TRANSLATE_NOOP("VEdit",
                                           "Tags in Subversion are repository-side copies; tag "
@@ -147,11 +143,7 @@ QVector<PanelCapability> capabilitiesFor(Backend backend)
                         QT_TRANSLATE_NOOP("VEdit",
                                           "Subversion has no multi-step merge or rebase to abort; "
                                           "revert restores a conflicted or modified file.")),
-            unsupported(PanelAction::History,
-                        QT_TRANSLATE_NOOP("VEdit",
-                                          "The history view reads Git's log; Subversion's log "
-                                          "(available in svn 1.14.5) is outside this build's "
-                                          "accepted read set.")),
+            supported(PanelAction::History),
         };
     case Backend::None:
         break;
@@ -195,9 +187,8 @@ QString capabilitySummary(Backend backend)
                      "conflict resolution are available.");
     case Backend::Subversion:
         return QCoreApplication::translate(
-            "VEdit", "Subversion: add, commit, revert, remove and update are available. Staging, "
-                     "fetches, pushes, branches, tags, remotes, stashes, worktrees and conflict "
-                     "continuation are not — hover a disabled action for its reason.");
+            "VEdit", "Subversion: add, commit, revert, remove and update. Use SVN Actions for changelists, "
+                      "branches, conflict resolution and patches.");
     case Backend::None:
         break;
     }

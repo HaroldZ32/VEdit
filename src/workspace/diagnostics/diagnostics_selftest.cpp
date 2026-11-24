@@ -1088,15 +1088,17 @@ int main(int argc, char **argv)
         // slang-server deliberately absent (REPORT.md D1).
 
         DiagnosticsBackendSettings settings;
-        settings.lspBackend = QStringLiteral("slang");
+        check("badge.fresh.requests-slang", settings.lspBackend == QStringLiteral("slang")
+                  && settings.lintEngine == QStringLiteral("slang"));
         QString error;
         const bool refused = state.apply(settings, toolchain, &error);
         check("badge.regression.apply-refused", !refused && !error.isEmpty(), error);
         BadgeState badge = state.badge();
         check("badge.regression.requested-visible",
               badge.lsp.requested == QStringLiteral("slang"), badge.summary());
-        check("badge.regression.effective-unchanged",
-              badge.lsp.effective == QStringLiteral("verible"), badge.lsp.effective);
+        check("badge.missing-slang.applies-verible-fallback",
+              badge.lsp.effective == QStringLiteral("verible")
+                  && state.lspServerPath() == toolchain.verible.path, badge.summary());
         check("badge.regression.reason-code",
               badge.lsp.reason == BadgeReasonCode::ToolMissing,
               badgeReasonCodeName(badge.lsp.reason));
@@ -1126,6 +1128,11 @@ int main(int argc, char **argv)
         toolchain.slangServer.name = QStringLiteral("slang-server");
         toolchain.slangServer.path = QStringLiteral("/fixture/slang-server");
         toolchain.slangServer.source = ToolSource::Bundled;
+        BackendSwitchState fresh(lsp.get(), slang.get());
+        check("badge.fresh.applies-installed-slang",
+              fresh.apply(DiagnosticsBackendSettings{}, toolchain, &error)
+                  && fresh.lspServerPath() == toolchain.slangServer.path
+                  && fresh.badge().lsp.applied, fresh.badge().summary());
         const bool applied = state.apply(settings, toolchain, &error);
         badge = state.badge();
         check("badge.regression.applied",
@@ -1135,8 +1142,8 @@ int main(int argc, char **argv)
               !badge.summary().contains(QStringLiteral("→")), badge.summary());
         settings.lspBackend = QStringLiteral("verible");
         state.apply(settings, toolchain, &error);
-        check("badge.regression.switch-back",
-              state.badge().lsp.effective == QStringLiteral("verible"),
+        check("badge.explicit-verible-beats-available-slang",
+              state.badge().lsp.applied && state.lspServerPath() == toolchain.verible.path,
               state.badge().summary());
     }
 

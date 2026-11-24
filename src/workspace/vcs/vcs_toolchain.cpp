@@ -298,7 +298,9 @@ namespace {
 // Q_COREAPP_STARTUP_FUNCTION (its implementation token-pastes the name).
 void startVcsToolchainProbe()
 {
-    vedit::workspace::vcs::warmToolchainProbe();
+    if (!qEnvironmentVariableIsSet("VEDIT_STARTUP_WELCOME_CHILD")) {
+        vedit::workspace::vcs::warmToolchainProbe();
+    }
 }
 
 } // namespace

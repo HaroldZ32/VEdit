@@ -1,4 +1,5 @@
 #include "interface_panel.h"
+#include "../../common/item_context_menu.h"
 
 #include "jump/jump_registry.h"
 
@@ -101,6 +102,19 @@ InterfacePanel::InterfacePanel(QWidget *parent)
     table_->setToolTip(activationTooltip());
     heading_->setToolTip(activationTooltip());
     table->onDoubleClick = [this](int row, bool control) { activatePortRow(row, control); };
+    new vedit::common::ItemContextMenu(table_, [this](QMenu &menu, const QPersistentModelIndex &hit) {
+        const QModelIndex name = hit.sibling(hit.row(), 0);
+        const ModuleDefinition *module = catalog_.find(focusedName_);
+        const int index = name.data(kPortIndexRole).toInt();
+        QAction *open = menu.addAction(tr("Go to Port Declaration"), this, [this, hit]() {
+            if (hit.isValid()) {
+                activatePortRow(hit.row(), false);
+            }
+        });
+        open->setEnabled(name.isValid() && module != nullptr && index >= 0 &&
+                         index < module->ports.size() && jumpFromPort(module->ports.at(index)).isValid());
+        vedit::common::addCopyAction(menu, tr("Copy Cell"), hit.data().toString());
+    });
     layout->addWidget(table_, 1);
 
     empty_ = new QLabel(this);

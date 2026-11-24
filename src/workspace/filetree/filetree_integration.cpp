@@ -7,6 +7,7 @@
 
 #include "app_shell.h"
 #include "editor_area.h"
+#include "file_compare.h"
 #include "panel_registry.h"
 
 #include <QDebug>
@@ -60,7 +61,8 @@ bool openFileInEditor(vedit::app::ApplicationShell &shell, const QString &path, 
 #endif
 }
 
-void installFileTree(vedit::app::ApplicationShell &shell, const IntegrationOptions &options)
+void installFileTree(vedit::app::ApplicationShell &shell, const IntegrationOptions &options,
+                     FileTreeWidget::ContextMenuExtension contextMenu)
 {
 #if defined(VEDIT_FILETREE_HAVE_APP_SHELL)
     (void)options;
@@ -76,11 +78,14 @@ void installFileTree(vedit::app::ApplicationShell &shell, const IntegrationOptio
     // it), and a dock re-inserted after a runtime switch must start at the NEW
     // root. The folder this panel opens becomes the workspace root through
     // setProjectRoot(), which is the switch AC-1.2 observes.
-    const auto factory = [&shell]() {
+    const auto factory = [&shell, contextMenu = std::move(contextMenu)]() {
         QWidget *panel = makeFileTreePanel(shell.projectRoot());
         if (auto *tree = qobject_cast<FileTreeWidget *>(panel)) {
+            tree->setContextMenuExtension(contextMenu);
             QObject::connect(tree, &FileTreeWidget::openFileRequested, &shell,
                              [&shell](const QString &path) { openFileInEditor(shell, path); });
+            QObject::connect(tree, &FileTreeWidget::compareFileRequested, &shell,
+                             [&shell](const QString &path) { vedit::app::chooseFilesToCompare(shell, path); });
             QObject::connect(tree, &FileTreeWidget::directoryOpened, &shell,
                              [&shell](const QString &path) { shell.setProjectRoot(path); });
             // item 10: the dots come from the diagnostics lane's R2 merged view,
@@ -195,6 +200,7 @@ void installFileTree(vedit::app::ApplicationShell &shell, const IntegrationOptio
 #else
     (void)shell;
     (void)options;
+    (void)contextMenu;
 #endif
 }
 

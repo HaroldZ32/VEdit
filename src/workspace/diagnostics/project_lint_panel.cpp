@@ -1,4 +1,5 @@
 #include "project_lint_panel.h"
+#include "../../common/item_context_menu.h"
 
 #include "app_shell.h"
 #include "command_registry.h"
@@ -175,10 +176,19 @@ ProjectLintPanel::ProjectLintPanel(DiagnosticsController *controller,
             }
         });
     }
-    if (tree_ != nullptr) {
-        QObject::connect(tree_, &QTreeWidget::itemDoubleClicked, this,
-                         [this](QTreeWidgetItem *item, int) { jumpToItem(item); });
-    }
+    QObject::connect(tree_, &QTreeWidget::itemDoubleClicked, this,
+                     [this](QTreeWidgetItem *item, int) { jumpToItem(item); });
+    new vedit::common::ItemContextMenu(tree_, [this](QMenu &menu, const QPersistentModelIndex &hit) {
+        const QModelIndex row = hit.sibling(hit.row(), 0);
+        const QString file = row.data(Qt::UserRole).toString();
+        QAction *open = menu.addAction(tr("Go to Diagnostic"), this, [this, hit]() {
+            if (hit.isValid()) {
+                jumpToItem(tree_->itemFromIndex(hit));
+            }
+        });
+        open->setEnabled(!file.isEmpty() && row.data(Qt::UserRole + 1).isValid());
+        vedit::common::addCopyAction(menu, tr("Copy File Path"), file);
+    });
 
     timer_ = new QTimer(this);
     timer_->setInterval(300);

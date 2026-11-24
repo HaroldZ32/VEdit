@@ -74,6 +74,7 @@ pub(crate) enum JobValue {
     VcsHistoryBlame(Box<crate::vcs::VcsHistoryData>),
     /// Batch 4b: a two-commit comparison (typed, batch 7).
     VcsHistoryCompare(Box<crate::vcs::VcsHistoryData>),
+    VcsSvnSnapshot(Box<crate::vcs::VcsHistoryData>),
     /// One file's VCS diff (T99: job-based, GUI thread never blocks).
     VcsDiff(crate::vcs::VcsDiffData),
     /// One VCS write operation (batch 3a: separate from the read jobs above).

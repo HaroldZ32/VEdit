@@ -5,6 +5,7 @@
 #include "file_status_delegate.h"
 #include "file_tree_model.h"
 #include "file_dialog_filters.h" // src/common: every file picker stays Qt's own dialog
+#include "item_context_menu.h"
 
 #include <QAction>
 #include <QDir>
@@ -17,6 +18,7 @@
 #include <QLineEdit>
 #include <QMenu>
 #include <QMessageBox>
+#include <QPointer>
 #include <QStackedWidget>
 #include <QTimer>
 #include <QToolBar>
@@ -101,7 +103,6 @@ void FileTreeWidget::buildUi()
     view_->setExpandsOnDoubleClick(true);
     view_->setSelectionMode(QAbstractItemView::SingleSelection);
     view_->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    view_->setContextMenuPolicy(Qt::CustomContextMenu);
     view_->setTextElideMode(Qt::ElideMiddle);
     // item 10: the status dot is painted between the icon and the name.
     statusDelegate_ = new FileStatusDotDelegate(this);
@@ -173,7 +174,9 @@ void FileTreeWidget::buildUi()
     connect(refreshAction_, &QAction::triggered, this, &FileTreeWidget::onRefresh);
     connect(collapseAction_, &QAction::triggered, this, &FileTreeWidget::onCollapseAll);
     connect(view_, &QTreeView::doubleClicked, this, &FileTreeWidget::onActivated);
-    connect(view_, &QTreeView::customContextMenuRequested, this, &FileTreeWidget::onContextMenu);
+    new vedit::common::ItemContextMenu(view_, [this](QMenu &menu, const QPersistentModelIndex &hit) {
+        populateContextMenu(menu, hit);
+    });
     connect(view_->selectionModel(), &QItemSelectionModel::currentChanged, this,
             &FileTreeWidget::onCurrentChanged);
     connect(model_, &FileTreeModel::rootStateChanged, this, &FileTreeWidget::applyRootState);
@@ -391,6 +394,17 @@ bool FileTreeWidget::deleteEntry(const QString &path, bool recursive, QString *e
     return true;
 }
 
+void FileTreeWidget::refreshMovedFile(const QString &oldPath, const QString &newPath)
+{
+    const QString selection = targetEntryPath();
+    const QString oldDirectory = QFileInfo(oldPath).absolutePath();
+    const QString newDirectory = QFileInfo(newPath).absolutePath();
+    if (oldDirectory != newDirectory) {
+        model_->refreshDirectory(oldDirectory);
+    }
+    refreshAfterOperation(newDirectory, selection == oldPath ? newPath : selection);
+}
+
 void FileTreeWidget::refreshAfterOperation(const QString &directory, const QString &entryToSelect)
 {
     model_->refreshDirectory(directory);
@@ -606,6 +620,7 @@ void FileTreeWidget::onActivated(const QModelIndex &index)
 void FileTreeWidget::onCurrentChanged(const QModelIndex &current, const QModelIndex &previous)
 {
     Q_UNUSED(previous);
+    ++contextMenuEpoch_;
     showKindForIndex(current);
 }
 
@@ -620,27 +635,51 @@ void FileTreeWidget::showKindForIndex(const QModelIndex &index)
                   .arg(QFileInfo(path).fileName(), fileKindLabel(fileKindForPath(path, directory))));
 }
 
-void FileTreeWidget::onContextMenu(const QPoint &pos)
+void FileTreeWidget::setContextMenuExtension(ContextMenuExtension extension)
 {
-    const QModelIndex index = view_->indexAt(pos);
-    if (index.isValid()) {
-        view_->setCurrentIndex(index);
+    contextMenuExtension_ = std::move(extension);
+}
+
+void FileTreeWidget::populateContextMenu(QMenu &menu, const QPersistentModelIndex &hit)
+{
+    const quint64 epoch = ++contextMenuEpoch_;
+    const QString path = model_->pathForIndex(hit);
+    const bool directory = hit.isValid() && model_->isDirectory(hit);
+    QAction *open = menu.addAction(directory ? tr("Expand Folder") : tr("Open File"),
+                                   this, [this, hit]() { activateIndex(hit); });
+    open->setEnabled(!path.isEmpty());
+    vedit::common::addCopyAction(menu, tr("Copy Path"), path);
+    auto *compare = menu.addAction(tr("Compare With…"), this, [this, hit] {
+        if (hit.isValid()) {
+            emit compareFileRequested(model_->pathForIndex(hit));
+        }
+    });
+    compare->setEnabled(!path.isEmpty() && !directory);
+    if (!path.isEmpty() && !directory && contextMenuExtension_) {
+        contextMenuExtension_(menu, path, [tree = QPointer(this), hit, path, epoch] {
+            return tree && hit.isValid() && tree->contextMenuEpoch_ == epoch &&
+                   tree->model_->pathForIndex(hit) == path;
+        });
     }
-    QMenu menu(this);
-    const bool directory = index.isValid() && model_->isDirectory(index);
-    if (directory) {
-        menu.addAction(newFileAction_);
-        menu.addAction(newFolderAction_);
-        menu.addSeparator();
-    }
-    if (index.isValid()) {
-        menu.addAction(renameAction_);
-        menu.addAction(deleteAction_);
-        menu.addSeparator();
-    }
+    menu.addSeparator();
+    const auto addTargetAction = [this, &menu, hit](QAction *source, bool enabled) {
+        QAction *action = menu.addAction(source->text(), this, [this, hit, source]() {
+            if (hit.isValid()) {
+                view_->setCurrentIndex(hit);
+                source->trigger();
+            }
+        });
+        action->setEnabled(enabled && source->isEnabled());
+    };
+    addTargetAction(newFileAction_, directory && !path.isEmpty());
+    addTargetAction(newFolderAction_, directory && !path.isEmpty());
+    const bool canModify = !path.isEmpty() && path != model_->rootPath();
+    addTargetAction(renameAction_, canModify);
+    addTargetAction(deleteAction_, canModify);
+    menu.addSeparator();
+    menu.addAction(openAction_);
     menu.addAction(refreshAction_);
     menu.addAction(collapseAction_);
-    menu.exec(view_->viewport()->mapToGlobal(pos));
 }
 
 // ---------------------------------------------------------------------------

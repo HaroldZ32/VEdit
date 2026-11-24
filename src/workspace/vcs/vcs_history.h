@@ -10,11 +10,13 @@
 // error and ready.
 #include "vcs_source.h"
 
+#include <QSet>
 #include <QWidget>
 
 #include <functional>
 #include <memory>
 
+class QComboBox;
 class QLabel;
 class QLineEdit;
 class QPlainTextEdit;
@@ -33,7 +35,7 @@ public:
     explicit VcsHistoryPanel(QWidget *parent = nullptr);
     ~VcsHistoryPanel() override;
 
-    void setSource(std::unique_ptr<VcsSource> source);
+    void setSource(std::unique_ptr<VcsSource> source, bool deferRefresh = false);
     void setRoot(const std::string &root);
     std::string root() const { return root_; }
 
@@ -46,9 +48,18 @@ public:
     void nextPage();
     void previousPage();
     void selectCommit(const QString &hash); // loads the detail
-    void openFileHistory(const QString &path);
+    void openFileHistory(const QString &path, std::function<bool()> stillCurrent = {});
+    void setSavedRepositoriesFile(const QString &path);
     void showBlame(const QString &path);
-    void compareSelected(); // the two selected commits, in list order
+    void compareSelected();
+    quint64 svnSelectionEpoch() const { return svnSelectionEpoch_; }
+
+    Q_SIGNAL void svnSnapshotRequested(const QString &path, quint64 revision, quint64 peg);
+    Q_SIGNAL void svnWorkingFileRequested(const QString &path);
+    Q_SIGNAL void svnBaseComparisonRequested(const QString &path, quint64 revision, quint64 peg);
+    Q_SIGNAL void svnRemoteFileRequested(const QString &url, const QString &path, quint64 revision, bool deleted, bool compare);
+    Q_SIGNAL void svnComparisonRequested(const QString &path, const QList<quint64> &revisions,
+                                         quint64 peg, bool workingCopy);
 
     // --- probe-readable surface -------------------------------------------
     int commitCount() const;
@@ -93,7 +104,29 @@ private:
     void showState(const QString &message, bool error);
     void updateActions();
     void onSelectionChanged();
+    void compareSvnSelection(bool workingCopy);
+    void promptSvnRevisions();
 
+    Backend backend_ = Backend::None;
+    quint64 svnSelectionEpoch_ = 0;
+    quint64 fileRequestEpoch_ = 0;
+    quint64 svnPeg_ = kDefaultSvnPeg;
+    QString svnHistoryPath_;
+    QString svnDetailRevision_;
+    QString svnDetailRepository_;
+    QString svnCheckoutPrefix_;
+    QStringList svnRevisionFiles_;
+    QSet<QString> svnDeletedRevisionFiles_;
+    std::function<bool()> historySelectionGuard_;
+    QString savedRepositoriesFile_;
+    QComboBox *repository_ = nullptr;
+    QPushButton *addRepository_ = nullptr;
+    QPushButton *removeRepository_ = nullptr;
+    void addSavedRepository();
+    void removeSavedRepository();
+    void storeSavedRepositories();
+    QPushButton *svnWorkingButton_ = nullptr;
+    QPushButton *svnRevisionsButton_ = nullptr;
     std::unique_ptr<VcsSource> source_;
     std::string root_;
     int page_size_ = kDefaultPageSize;
@@ -109,6 +142,8 @@ private:
     QString selected_hash_;
 
     quint64 generation_ = 0;
+    quint64 historyPageEpoch_ = 0;
+    quint64 detailEpoch_ = 0;
     QLabel *header_ = nullptr;
     QLabel *loading_ = nullptr;
     QLabel *page_ = nullptr;

@@ -32,6 +32,7 @@ set(VEDIT_APP_SHELL_SOURCES
   crash_reporter.cpp
   editor_area.cpp
   editor_provider.cpp
+  file_compare.cpp
   help_viewer.cpp
   i18n.cpp
   panel_registry.cpp
@@ -39,6 +40,7 @@ set(VEDIT_APP_SHELL_SOURCES
   session_store.cpp
   theme_manager.cpp
   themed_icons.cpp
+  workbench_interaction.cpp
   "${CMAKE_CURRENT_SOURCE_DIR}/../../resources/help/user_manual.qrc"
 )
 
@@ -88,7 +90,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(vedit_app_shell PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 
-add_executable(vedit-app main.cpp ${VEDIT_APP_THEME_RESOURCES})
+add_executable(vedit-app main.cpp startup_welcome.cpp ${VEDIT_APP_THEME_RESOURCES})
 target_link_libraries(vedit-app PRIVATE vedit_app_shell)
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   # `-rdynamic` lets backtrace_symbols_fd() print function names in a crash
@@ -210,7 +212,7 @@ set_tests_properties(vedit-app-shell-selftest PROPERTIES
 # so landing this list before the lane directories is safe: `rename`, `vhdl`
 # and `scala` appear in the build the moment their own task lands them.
 set(VEDIT_WORKSPACE_LANES jump filetree palette search project module_tree diagnostics vcs settings
-                          rename vhdl scala)
+                          rename vhdl scala signal_trace)
 foreach(lane IN LISTS VEDIT_WORKSPACE_LANES)
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../workspace/${lane}/CMakeLists.txt")
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../workspace/${lane}"
@@ -227,7 +229,8 @@ set(VEDIT_WORKSPACE_SEARCH_TARGET vedit_workspace_search)
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../workspace/integration.cpp")
   add_library(vedit_workspace_integration STATIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/../workspace/integration.cpp")
+    "${CMAKE_CURRENT_SOURCE_DIR}/../workspace/integration.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../workspace/filetree/svn_explorer_integration.cpp")
   target_include_directories(vedit_workspace_integration PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/../workspace")
   target_link_libraries(vedit_workspace_integration PUBLIC vedit_app_shell)
@@ -253,6 +256,19 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../workspace/integration.cpp")
   endforeach()
   target_link_libraries(vedit-app PRIVATE vedit_workspace_integration)
   message(STATUS "VEdit: workspace integration enabled (src/workspace/integration.cpp)")
+endif()
+
+find_package(Qt6 QUIET COMPONENTS Test)
+if(TARGET vedit_workspace_signal_trace AND TARGET vedit_editor_core AND TARGET Qt6::Test)
+  set(trace_fixture "${CMAKE_SOURCE_DIR}/tests/fixtures/signal_trace")
+  add_executable(vedit-signal-trace-selftest signal_trace_selftest.cpp)
+  target_link_libraries(vedit-signal-trace-selftest PRIVATE vedit_workspace_integration
+    vedit_editor_core KF6::TextEditor Qt6::Test)
+  target_include_directories(vedit-signal-trace-selftest PRIVATE "../editor/kernel")
+  add_test(NAME vedit-signal-trace-selftest COMMAND vedit-signal-trace-selftest
+    "${trace_fixture}" "${CMAKE_SOURCE_DIR}/build/slang/out/slang")
+  set_tests_properties(vedit-signal-trace-selftest PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;VEDIT_NO_ENV_AUTOCAPTURE=1" SKIP_RETURN_CODE 77 TIMEOUT 40)
 endif()
 
 
@@ -352,6 +368,28 @@ if(TARGET vedit_editor_core AND TARGET Qt6::Test)
 endif()
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(vedit-editor-area-selftest PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+if(TARGET vedit_editor_core AND TARGET vedit_workspace_vcs)
+  add_executable(vedit-file-compare-selftest file_compare_selftest.cpp)
+  target_link_libraries(vedit-file-compare-selftest PRIVATE vedit_app_shell vedit_editor_core vedit_workspace_vcs)
+  target_include_directories(vedit-file-compare-selftest PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../editor/kernel")
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-file-compare-selftest PRIVATE -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  add_test(NAME vedit-file-compare-selftest COMMAND vedit-file-compare-selftest)
+  add_test(NAME vedit-file-compare-close-active-diff COMMAND vedit-file-compare-selftest --close-active-diff)
+  add_test(NAME vedit-file-compare-exit-active-diff COMMAND vedit-file-compare-selftest --exit-active-diff)
+  set_tests_properties(vedit-file-compare-selftest vedit-file-compare-close-active-diff vedit-file-compare-exit-active-diff
+                       PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=offscreen" TIMEOUT 60)
+  add_executable(vedit-svn-workbench-selftest svn_workbench_selftest.cpp)
+  target_link_libraries(vedit-svn-workbench-selftest PRIVATE vedit_app_shell vedit_editor_core vedit_workspace_vcs)
+  target_include_directories(vedit-svn-workbench-selftest PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../editor/kernel")
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-svn-workbench-selftest PRIVATE -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  add_test(NAME vedit-svn-workbench-selftest COMMAND vedit-svn-workbench-selftest)
+  set_tests_properties(vedit-svn-workbench-selftest PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen" TIMEOUT 60 SKIP_RETURN_CODE 77)
 endif()
 add_test(NAME vedit-editor-area-selftest COMMAND vedit-editor-area-selftest)
 set_tests_properties(vedit-editor-area-selftest PROPERTIES
