@@ -37,9 +37,17 @@ namespace vedit::workspace::project {
 class ProjectVariablesDialog : public QDialog {
     Q_OBJECT
 public:
+    // `layers` (batch-20261114 E2) maps a name to the layer that currently
+    // satisfies it — `project` / `imported` / `environment` / `missing`, the same
+    // tokens the Rust expansion reports. Every row shows it ("provided by: …"),
+    // so the dialog answers "who provides this name" and not only "what is its
+    // value". A name the map does not mention falls back to `project` (it is a
+    // row of this table) or `missing` (the project asked for it and nothing
+    // satisfies it).
     ProjectVariablesDialog(const QStringList &names,
                            const QMap<QString, QString> &known,
-                           QWidget *parent = nullptr);
+                           QWidget *parent = nullptr,
+                           const QMap<QString, QString> &layers = QMap<QString, QString>());
 
     // One row per distinct name: the requested order first, then any known name
     // the caller did not list. Add/delete change this count while the dialog is
@@ -63,6 +71,8 @@ public:
     bool removeVariable(const QString &name);
     // The inline reason for a row ("" when the row is valid).
     QString rowReason(const QString &name) const;
+    // The layer shown for a row (the four Rust tokens); "" for an unknown name.
+    QString rowLayer(const QString &name) const;
     // Paint every row's reason; false means "do not accept".
     bool validateRows();
     // The feedback line under the table ("Removed X …"), for probes/tests.
@@ -83,10 +93,16 @@ private:
         QLineEdit *valueEdit = nullptr;
         QPushButton *removeButton = nullptr;
         QLabel *reason = nullptr;
-        bool required = false; ///< the project asked for it (currently missing)
+        QLabel *layer = nullptr; ///< "provided by: …" (E2)
+        bool required = false;   ///< the project asked for it (currently missing)
     };
 
     void appendRow(const QString &name, const QString &value, bool required);
+    // The layer token a row shows: the caller's map first, then the row's own
+    // nature (a table entry provides `project`, a required one is `missing`).
+    QString layerFor(const QString &name, bool required) const;
+    // The token phrased for the row's label (one translation point).
+    static QString layerLabel(const QString &layer);
     void removeRowAt(int index);
     Row *rowFor(const QString &name);
     const Row *rowFor(const QString &name) const;
@@ -95,6 +111,7 @@ private:
 
     QVector<Row> rows_;
     QStringList knownNames_;
+    QMap<QString, QString> layers_;
     QLabel *note_ = nullptr;
     QPushButton *addButton_ = nullptr;
 };

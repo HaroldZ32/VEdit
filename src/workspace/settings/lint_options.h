@@ -16,21 +16,27 @@
 //
 //   * [`LintKnobStateKind::BackendUnsupported`] — the notion does not exist in
 //     this engine at all (slang has no ruleset, no `.rules.verible_lint`, no
-//     waivers, no autofix; verible-verilog-lint has no `-W`/`--error-limit`).
-//     The control is GREYED OUT and the tooltip says why. The engine's no-op
-//     list comes from the C ABI itself ([`lintUnsupportedKnobGroups`] wraps
-//     `vd_lint_unsupported_knobs`), so the page cannot drift from the Rust side.
-//   * [`LintKnobStateKind::TransportPending`] — the engine does support it, but
-//     the lint job's C ABI (`VdLintBatchOptions`) has no field for it. The
-//     control stays USABLE and the value is persisted (so nothing the user typed
-//     is lost), but the reason is reported: the value is stored, not applied.
-//     ONLY `lint.verible.autofix` is in this state: `VdLintBatchOptions` carries
-//     `ruleset` / `rules` / `waiver_files` / `slang_suppressions` /
-//     `error_limit` but has no autofix field (ux-batch-2 U6 finding; the real
-//     autofix path is the hover one-click fix, not the batch pass).
+//     verible waivers, no autofix; verible-verilog-lint has no `-W`/
+//     `--error-limit`). The control is GREYED OUT and the tooltip says why. The
+//     engine's no-op list comes from the C ABI itself
+//     ([`lintUnsupportedKnobGroups`] wraps `vd_lint_unsupported_knobs`), so the
+//     page cannot drift from the Rust side.
+//   * [`LintKnobStateKind::Unavailable`] — the engine DOES support it, but THIS
+//     product cannot supply the input it needs. Only the two interactive
+//     `--autofix` values are in this state: verible prompts on a terminal and
+//     the product always starts it with pipes (no TTY), so the mode can never
+//     complete. The control stays visible, the tooltip states the reason, and
+//     the value is still transported verbatim if it is stored (the engine
+//     reports verible's own error rather than the page silently rewriting the
+//     user's setting). See [`lintAutofixValueState`].
+//   * [`LintKnobStateKind::TransportPending`] — the engine supports it, but the
+//     lint job's C ABI (`VdLintBatchOptions`) has no field for it. NO knob is in
+//     this state since batch 20261110b wired `autofix`, `autofix_output_file`
+//     and slang's `waiver_file`; the kind is kept because the page's hint path
+//     still reads it, and it is the honest state for a future knob.
 //
 // `lint.verible.rules_config` is carried by `VdLintBatchOptions.rules_path`;
-// the other five wired knobs reach the same struct through
+// the other eight knobs reach the same struct through
 // [`buildLintJobOptions`] + [`fillLintBatchOptions`].
 //
 // The mechanism is deliberately one seam: the diagnostics lane (which builds the
@@ -79,6 +85,9 @@ enum class LintKnobStateKind {
     Supported,
     BackendUnsupported,
     TransportPending,
+    // The engine supports it, but this product cannot provide the input it
+    // needs (the interactive autofix modes: no TTY).
+    Unavailable,
 };
 
 struct LintKnobState {
@@ -86,8 +95,13 @@ struct LintKnobState {
     // Already translated (the caller shows it in a tooltip as-is).
     QString reason;
 
-    bool enabled() const { return kind != LintKnobStateKind::BackendUnsupported; }
+    bool enabled() const
+    {
+        return kind != LintKnobStateKind::BackendUnsupported
+            && kind != LintKnobStateKind::Unavailable;
+    }
     bool pending() const { return kind == LintKnobStateKind::TransportPending; }
+    bool unavailable() const { return kind == LintKnobStateKind::Unavailable; }
 };
 
 // "verible" (any case) selects verible; everything else is slang, which is the
@@ -99,6 +113,51 @@ QString lintBackendSetting(LintBackend backend); // "verible" / "slang"
 
 // The state of one knob for one engine (see the two cases in the header comment).
 LintKnobState lintKnobState(LintBackend backend, LintKnob knob);
+
+// One `--autofix` value as the page offers it. `code` is exactly
+// `VdLintBatchOptions.verible_autofix` (0 = send no flag, verible's own `no`).
+struct LintAutofixValue {
+    QString value;   // the stored spelling ("" is the "No flag" entry)
+    quint8 code = 0; // the C ABI code
+    bool available = true;
+    // Already translated; empty when available. Only the two interactive modes
+    // carry one (the product has no TTY for verible's prompts).
+    QString reason;
+};
+
+// The six values in the order the page offers them (no flag, no, patch,
+// patch-interactive, inplace, inplace-interactive, generate-waiver).
+QVector<LintAutofixValue> lintAutofixValues();
+// One stored value's availability; an unknown/absent value is the no-flag entry.
+LintAutofixValue lintAutofixValue(const QString &stored);
+
+// `--autofix` code: "" / "no" -> 0 (NO flag), then verible's documented order;
+// an unknown stored value is 0 too (the same convention as `lintRulesetCode`,
+// because the store's typed parse already refuses unknown values). The ABI
+// rejects any code above 5.
+inline quint8 lintAutofixCode(const QString &stored)
+{
+    const QString value = stored.trimmed().toLower();
+    if (value.isEmpty() || value == QLatin1String(keys::kAutofixNo)) {
+        return 0;
+    }
+    if (value == QLatin1String(keys::kAutofixPatch)) {
+        return 1;
+    }
+    if (value == QLatin1String(keys::kAutofixPatchInteractive)) {
+        return 2;
+    }
+    if (value == QLatin1String(keys::kAutofixInplace)) {
+        return 3;
+    }
+    if (value == QLatin1String(keys::kAutofixInplaceInteractive)) {
+        return 4;
+    }
+    if (value == QLatin1String(keys::kAutofixGenerateWaiver)) {
+        return 5;
+    }
+    return 0;
+}
 
 // The value struct of the page. Both halves are always present and always
 // persisted, which is exactly what makes "switching the engine keeps the other
@@ -114,7 +173,16 @@ struct LintVeribleValues {
 struct LintSlangValues {
     QString warnings;   // `-W` values, one per line
     QString errorLimit; // `--error-limit`, "" = no flag
+    // slang's own `--waiver-file <toml>`. The WAIVER lane owns this value
+    // (`vd_waiver_register_start` writes it); the page only reads it so the
+    // lint pass can transport it. It is deliberately NOT written back by
+    // `writeLintEntries`, so saving the page can never erase a registered file.
+    QString waiverFile;
 };
+
+// The slang waiver key. `settings_keys.h` does not own it because the settings
+// page never writes it: `crates/vd-ffi/src/waiver.rs` does (`SLANG_WAIVER_KEY`).
+inline constexpr char kLintSlangWaiverFile[] = "lint.slang.waiver_file";
 
 struct LintValues {
     LintVeribleValues verible;
@@ -212,9 +280,16 @@ struct LintJobOptions {
     QStringList waiverFiles;     // one path per entry; empty = no flag
     QStringList slangWarnings;   // each a "-W..." token; empty = no flag
     quint32 slangErrorLimit = 0; // 0 = NO --error-limit flag
-    // `lint.verible.autofix` is deliberately absent: VdLintBatchOptions has no
-    // autofix field, so the value is never composed (and the knob stays
-    // TransportPending) - R1 forbids sending an unsupported knob as a no-op.
+    // Wired through VdLintBatchOptions (batch 20261110b / T8):
+    quint8 autofix = 0;          // --autofix code (0 = NO flag)
+    // --autofix_output_file=: the patch file the `patch*` modes write, or the
+    // waiver file `generate-waiver` writes. Empty = no flag. The project root
+    // is known only to the caller that composes the pass (the diagnostics
+    // lane), so this page never invents a path.
+    QString autofixOutputFile;
+    // slang's own `--waiver-file <toml>` (read from the store; the waiver lane
+    // registers it). Empty = no flag.
+    QString slangWaiverFile;
 };
 
 // `--ruleset` code: "all" -> 1, "none" -> 2, anything else ("" / "default" /
@@ -281,6 +356,8 @@ inline LintJobOptions buildLintJobOptions(const LintValues &values, LintBackend 
         if (!lintKnobBackendUnsupported(backend, LintKnob::SlangErrorLimit)) {
             options.slangErrorLimit = lintErrorLimitValue(values.slang.errorLimit);
         }
+        // slang's own waiver document (registered by the waiver lane).
+        options.slangWaiverFile = values.slang.waiverFile.trimmed();
         return options;
     }
     const QStringList candidates{
@@ -304,6 +381,12 @@ inline LintJobOptions buildLintJobOptions(const LintValues &values, LintBackend 
     if (!lintKnobBackendUnsupported(backend, LintKnob::WaiverFiles)) {
         options.waiverFiles = lintLineList(values.verible.waiverFiles);
     }
+    if (!lintKnobBackendUnsupported(backend, LintKnob::Autofix)) {
+        // The stored value is transported verbatim; the two interactive modes
+        // are marked unavailable by `lintAutofixValueState` (no TTY), but the
+        // page never silently rewrites what the user stored.
+        options.autofix = lintAutofixCode(values.verible.autofix);
+    }
     return options;
 }
 
@@ -316,6 +399,8 @@ struct LintBatchAbiStorage {
     QByteArray rules;
     QByteArray waiverFiles;
     QByteArray slangSuppressions;
+    QByteArray autofixOutputFile;
+    QByteArray slangWaiverFile;
 };
 
 // Fill the lint job's C ABI struct from the composed options - the ONE mapping
@@ -340,6 +425,15 @@ inline void fillLintBatchOptions(const LintJobOptions &options, VdLintBatchOptio
     abi->slang_suppressions =
         storage->slangSuppressions.isEmpty() ? nullptr : storage->slangSuppressions.constData();
     abi->error_limit = options.slangErrorLimit;
+    // Batch 20261110b: the three fields from the T8 lane.
+    abi->verible_autofix = options.autofix;
+    storage->autofixOutputFile = options.autofixOutputFile.toUtf8();
+    abi->autofix_output_file = storage->autofixOutputFile.isEmpty()
+        ? nullptr
+        : storage->autofixOutputFile.constData();
+    storage->slangWaiverFile = options.slangWaiverFile.toUtf8();
+    abi->slang_waiver_file =
+        storage->slangWaiverFile.isEmpty() ? nullptr : storage->slangWaiverFile.constData();
 }
 #endif
 

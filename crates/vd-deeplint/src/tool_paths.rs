@@ -93,7 +93,7 @@ pub(crate) fn absolutize_ast(value: &mut Value, base: &Path) {
 /// Lexical normalisation: drop `.`, collapse `..` against a normal component.
 /// Kept lexical on purpose — canonicalising would resolve symlinks and rewrite
 /// the spelling the user and the tools agreed on.
-fn lexical(path: &Path) -> PathBuf {
+pub(crate) fn lexical(path: &Path) -> PathBuf {
     let mut out = PathBuf::new();
     for component in path.components() {
         match component {

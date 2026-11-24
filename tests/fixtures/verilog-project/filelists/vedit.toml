@@ -1,0 +1,12 @@
+# The search lane's project-expansion probe opens THIS folder as its project
+# root: the `.f` lists here name sources in `../tb/` and `../rtl/`, and a walk
+# of the folder itself finds no source file at all.
+#
+# Since the 2026-11-18 file-set decision a root contributes exactly the files
+# its DECLARED filelists name, so this nested root opts into the legacy
+# discovery (`[project] auto_discover = true`, default `false`) that the probe
+# was written against: both root-level `.f` lists are discovered and expanded.
+# The enclosing fixture keeps its own `vedit.toml`; the switch and its default
+# are documented in `docs/USER_GUIDE.md` §2.8.
+[project]
+auto_discover = true

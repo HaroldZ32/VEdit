@@ -1,0 +1,34 @@
+# Artifact verification — 2026-11-09T16:00:49Z
+$ cd packaging/runtime/out && sha256sum -c SHA256SUMS
+VEdit-0.2.2-x86_64.AppImage: OK
+rc=0
+
+$ ls -l packaging/runtime/out/VEdit-0.2.2-x86_64.AppImage packaging/runtime/out/SHA256SUMS
+-rw-rw-r-- 1 haroldzhao haroldzhao        94 Nov  9 23:40 packaging/runtime/out/SHA256SUMS
+-rwxr-xr-x 1 haroldzhao haroldzhao 138811896 Nov  9 23:40 packaging/runtime/out/VEdit-0.2.2-x86_64.AppImage
+bytes=138811896
+
+$ packaging/runtime/out/VEdit-0.2.2-x86_64.AppImage --appimage-version
+AppImage runtime version: https://github.com/AppImage/type2-runtime/commit/fedfad5
+rc=0  (type2 runtime prints its version on stderr)
+
+$ (cd /tmp/tmp.3r3fmzsyn6 && /home/haroldzhao/MyProj/DshProj/VEdit/packaging/runtime/out/VEdit-0.2.2-x86_64.AppImage --appimage-extract)
+extract_rc=0
+extracted_files=359
+$ sha256sum squashfs-root/bin/vd-app target/qt6-build/src/app/vedit-app
+8a4212d2fc6dfb097a3bc4cd8456609f6b396c483c3a9c8822ff356add902449  /tmp/tmp.3r3fmzsyn6/squashfs-root/bin/vd-app
+8a4212d2fc6dfb097a3bc4cd8456609f6b396c483c3a9c8822ff356add902449  /home/haroldzhao/MyProj/DshProj/VEdit/target/qt6-build/src/app/vedit-app
+hash_match=yes
+
+$ HOME=<fresh> QT_QPA_PLATFORM=offscreen squashfs-root/bin/vd-app --version  (packaged loader)
+vedit-app 0.2.2
+rc=0
+
+$ HOME=<fresh> QT_QPA_PLATFORM=offscreen squashfs-root/AppRun --hold 500  (window created, quits by timer)
+launch_rc=0 elapsed_s=1
+--- launch stdout tail ---
+PROJECT-EXPAND-INPUTS root='' filelists=0 variables=0 settings='/tmp/tmp.jT2DKJ2ZPV/.config/VEdit/vedit-app/settings.toml'
+--- launch stderr tail ---
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+diagnostics: the project job failed: the project root  does not exist or is not a directory

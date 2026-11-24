@@ -23,6 +23,18 @@ export APPDIR
 # started from the package. No host utility is shadowed (bin/ only has ours).
 export PATH="$APPDIR/bin${PATH:+:$PATH}"
 
+# --- crash report: bounded AppImage hashing (batch-20261110d) ----------------
+# The crash reporter records the AppImage sha256 in install(), i.e. on the
+# STARTUP path, when the caller did not supply the hash. Its old hardcoded cap
+# (160 MiB) never fired for a 95-139 MB AppImage, so the whole file was hashed
+# before the window existed. The budget is part of the launch contract and is
+# exported here; the reporter reads this SAME variable (default 4 MiB, ≈5-20 ms;
+# a larger image gets a clearly-marked PREFIX hash instead of a full one). Set
+# VEDIT_APPIMAGE_SHA256_BUDGET_MIB=0 to skip hashing entirely at launch.
+if [ -n "${APPIMAGE:-}" ] && [ -z "${VEDIT_APPIMAGE_SHA256_BUDGET_MIB:-}" ]; then
+    export VEDIT_APPIMAGE_SHA256_BUDGET_MIB=4
+fi
+
 # --- bundled toolchain: the launch contract names the tools ------------------
 # AppRun is the launch contract, and it enters the product through the private
 # loader, so the process's executable directory is the AppDir ROOT rather than
@@ -126,6 +138,71 @@ else
     export QT_LOGGING_RULES="$VEDIT_NOISE_RULES"
 fi
 
+# --- KF6 config location that cannot be written (diagnosis 2026-11-16) ------
+# KF6 KConfig answers a non-writable config file with a MODAL kdialog
+# ("Configuration file ... not writable") and the product WAITS for it: the
+# KTextEditor singleton (KateGlobalConfig) is built inside QApplication's
+# constructor by veditSyntaxProductStartup(), so EVERY launch -- including
+# --version / --help / --selfcheck -- blocks until that dialog is answered, and
+# a headless (offscreen) launch can never answer it. KDE_HOME_READONLY degrades
+# the failure to a warning instead of the dialog. Exported only when the
+# location really is unusable, so a normal desktop is untouched.
+#
+# "Unusable" means KF6 could not create/write its files there, NOT `-w` on the
+# config directory alone: a fresh account has no .config yet and KConfig
+# CREATES it, so a missing directory whose nearest existing parent is writable
+# is usable. (The first form of this guard exported KDE_HOME_READONLY=1 for
+# every brand-new HOME, disabling config writes on a writable desktop; fixed
+# in batch-20261115/fix2.)
+#
+# A path that EXISTS but is not a directory is UNUSABLE, not "not this guard's
+# failure mode": KF6 wants `<config>/vd-apprc`, gets ENOTDIR, and answers with
+# the same MODAL kdialog -- the product hangs exactly as it does on a read-only
+# HOME. This covers a regular file, a device/FIFO, a symlink to one, and a
+# DANGLING symlink: `-e` follows links, so `-L` is the fallback. Trailing
+# slashes are stripped first, because `<file>/` makes both tests false and the
+# guard would slide into the "missing directory" branch. (fix2 answered usable
+# for all of these -> pack/fix2-review Finding 1; fixed in fix3.)
+VEDIT_CONFIG_HOME="${XDG_CONFIG_HOME:-${HOME:-/nonexistent}/.config}"
+vd_config_usable() {
+    # `/` keeps its slash: the loop would otherwise leave an empty path.
+    vd_path=$VEDIT_CONFIG_HOME
+    while [ -n "${vd_path%/}" ] && [ "${vd_path%/}" != "$vd_path" ]; do
+        vd_path=${vd_path%/}
+    done
+    if [ -d "$vd_path" ]; then
+        [ -w "$vd_path" ] || return 1
+        for vd_name in vd-apprc vedit-apprc; do
+            if [ -e "$vd_path/$vd_name" ] && [ ! -w "$vd_path/$vd_name" ]; then
+                return 1
+            fi
+        done
+        return 0
+    fi
+    if [ -e "$vd_path" ] || [ -L "$vd_path" ]; then
+        return 1
+    fi
+    # Missing directory: KF6 may create it, so check the nearest existing
+    # parent DIRECTORY instead. An EXISTING non-directory ancestor is a
+    # blocker, not a step to skip: nothing below it can ever be created, and
+    # the product hangs on the same kdialog (measured on the fix2 image:
+    # XDG_CONFIG_HOME=<regular file>/.config -> --version rc=124).
+    vd_probe=$vd_path
+    while [ -n "$vd_probe" ] && [ ! -d "$vd_probe" ]; do
+        if [ -e "$vd_probe" ] || [ -L "$vd_probe" ]; then
+            return 1
+        fi
+        case $vd_probe in
+            */*) vd_probe=${vd_probe%/*}; [ -n "$vd_probe" ] || vd_probe=/ ;;
+            *) vd_probe=. ;;
+        esac
+    done
+    [ -n "$vd_probe" ] && [ -w "$vd_probe" ]
+}
+if ! vd_config_usable; then
+    export KDE_HOME_READONLY=1
+fi
+
 # --- C7 runtime guard: fail closed if the whitelist is not the visible set ---
 # Canonical form of a comma-separated definition-name list. The whitelist is
 # written by assemble-appdir.sh with Python's sorted() (code-point order), while
@@ -143,10 +220,34 @@ ksh_guard() {
     [ -x "$APPDIR/bin/vedit-ksh-env-probe" ] || return 0
     [ -s "$APPDIR/usr/share/vedit/ksh-whitelist.txt" ] || return 0
     wl=$(canonical_names "$(cat "$APPDIR/usr/share/vedit/ksh-whitelist.txt")")
+    # batch-20261110d: this probe used to run UNBOUNDED from `out=$(...)`, with
+    # the desktop environment and stdin inherited. `--editor-repo` makes the
+    # probe initialise KTextEditor's singleton, whose KF6/D-Bus work blocks: the
+    # same command did not return within 25 s under `env -i` and within 90 s
+    # with the host KDE data visible — every launch waited on it ("30-second
+    # startup"). Three rules:
+    #   1. the probe is not asked for the KTextEditor repository: the guard's
+    #      comparison consumes `KSH-ENV def name=` lines, which the PLAIN
+    #      repository emits (measured 51 ms instead of "never returns"). The
+    #      editor view stays observable through the F2 experiment script, which
+    #      invokes the probe directly;
+    #   2. stdin is /dev/null and the work is capped at 5 s, so a future probe
+    #      that blocks cannot hold the launcher;
+    #   3. a timeout fails OPEN with a NAMED line. The guard exists to catch a
+    #      WRONG visible set; no answer is not a wrong answer, and a silent skip
+    #      is not allowed either.
+    if ! command -v timeout >/dev/null 2>&1; then
+        echo "KSH-GUARD SKIP: timeout(1) is not available; visible definitions not verified" >&2
+        return 0
+    fi
     out=$(QT_QPA_PLATFORM=offscreen LOCPATH="$APPDIR/usr/lib/locale" \
-            "$APPDIR/ld-linux-x86-64.so.2" --library-path "$APPDIR/lib" \
-            "$APPDIR/bin/vedit-ksh-env-probe" --list --editor-repo 2>&1)
+            timeout 5 "$APPDIR/ld-linux-x86-64.so.2" --library-path "$APPDIR/lib" \
+            "$APPDIR/bin/vedit-ksh-env-probe" --list < /dev/null 2>&1)
     rc=$?
+    if [ "$rc" -eq 124 ]; then
+        echo "KSH-GUARD SKIP: probe exceeded 5s; visible definitions not verified (fail-open)" >&2
+        return 0
+    fi
     # The trailing `file="..."` (R2) is deliberately ignored here: the guard
     # compares the visible NAME SET; the F2 script asserts the winning paths.
     seen=$(printf '%s\n' "$out" | sed -n 's/^KSH-ENV def name="\([^"]*\)".*$/\1/p' \

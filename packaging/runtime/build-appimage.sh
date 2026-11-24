@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 # Turn the assembled AppDir into a single-file AppImage (T11).
 #
-# The tool is the pinned appimagetool from scripts/versions.env (cached under
-# packaging/appimage/.cache); its sha256 is checked before it runs. FUSE is not
-# required to BUILD — `APPIMAGE_EXTRACT_AND_RUN=1` lets the tool run extracted.
+# The tool and Type 2 runtime are checked against scripts/versions.env before
+# use. `APPIMAGE_EXTRACT_AND_RUN=1` lets appimagetool build without FUSE.
 #
 # A probe AppDir (stamped PROBE-NOT-FOR-DELIVERY.txt) can only be built with
 # --probe, and the output keeps the `.probe` suffix so it can never be mistaken
@@ -50,6 +49,17 @@ got=$(sha256sum "$TOOL" | cut -d' ' -f1)
 [ "$got" = "$want" ] || { echo "ERROR: appimagetool sha256 mismatch: want=$want got=$got" >&2; exit 1; }
 echo "appimagetool sha256 OK ($got)"
 
+# Supply the vendored launcher explicitly. Appimagetool otherwise downloads
+# the current upstream runtime during packaging.
+RUNTIME="$ROOT/packaging/appimage/vendor/type2-runtime-x86_64"
+: "${APPIMAGE_RUNTIME_SHA256:?APPIMAGE_RUNTIME_SHA256 missing from scripts/versions.env}"
+[ -f "$RUNTIME" ] || { echo "ERROR: pinned AppImage runtime missing: $RUNTIME" >&2; exit 1; }
+if ! printf '%s  %s\n' "$APPIMAGE_RUNTIME_SHA256" "$RUNTIME" | sha256sum -c --status; then
+  echo "ERROR: AppImage runtime sha256 mismatch: $RUNTIME" >&2
+  exit 1
+fi
+echo "AppImage runtime sha256 OK ($APPIMAGE_RUNTIME_SHA256)"
+
 VERSION=$(awk -F'"' '/^version = / {print $2; exit}' "$ROOT/Cargo.toml" 2>/dev/null || echo 0.0.0)
 SUFFIX=""
 [ "$PROBE" -eq 1 ] && SUFFIX=".probe"
@@ -66,7 +76,7 @@ echo "SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH"
 
 echo "\$ appimagetool --no-appstream $APPDIR $OUTFILE"
 APPIMAGE_EXTRACT_AND_RUN=1 ARCH=x86_64 SOURCE_DATE_EPOCH="$SOURCE_DATE_EPOCH" \
-  "$TOOL" --no-appstream "$APPDIR" "$OUTFILE"
+  "$TOOL" --no-appstream --runtime-file "$RUNTIME" "$APPDIR" "$OUTFILE"
 rc=$?
 echo "EXIT=$rc"
 [ "$rc" -eq 0 ] || exit "$rc"

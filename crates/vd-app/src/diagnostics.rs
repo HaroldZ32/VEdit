@@ -246,6 +246,10 @@ mod tests {
                 severity: vd_deeplint::Severity::Error,
                 message: "too many errors".to_string(),
                 code: "TooManyErrors".to_string(),
+                // T8 typed field: this synthetic report's `raw` carries no
+                // `optionName` (an error normally has none), so the lifted
+                // field stays empty — same value a real error produces.
+                option_name: None,
                 location: None,
                 ranges: Vec::new(),
                 symbol_path: None,

@@ -26,7 +26,7 @@ PROBE="$ROOT/target/qt6-build/cmake/smoke/vedit-ksh-env-probe"
 KSH_F2="$ROOT/target/ksh-selfbuild/F2/install"
 CENTOS_PROBE=1
 [ "${1:-}" = "--no-centos-probe" ] && CENTOS_PROBE=0
-CENTOS_IMAGE="docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4"
+CENTOS_IMAGE=${VEDIT_CENTOS_PROBE_IMAGE:-docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4}
 
 mkdir -p "$EVID" "$ROOT/packaging/appimage/.cache"
 # The AppImage tool is pinned by URL + sha256; fetch it once into the cache.
@@ -83,6 +83,9 @@ step "1b/7 delivery invariants (T31: vd-app, Qt plugins, static FFI, toolchain)"
            plugins/kf6/parts/katepart.so bin/verible-verilog-ls bin/slang \
            bin/git bin/svn usr/lib/vcs/libexec/git usr/lib/vcs/libexec/svn \
            usr/share/vedit/vcs-toolchain.txt \
+           usr/lib/vedit/file-compare/diff usr/lib/vedit/file-compare/diff.bin \
+           usr/share/doc/vedit/diffutils/GPL-3.0.txt \
+           "usr/share/doc/vedit/diffutils/$DIFFUTILS_SOURCE_RPM" \
            usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml; do
     if [ -e "$OUT/AppDir/$f" ]; then echo "OK   $f"; else echo "MISS $f"; fail=1; fi
   done
@@ -124,13 +127,13 @@ step "5/7 build the AppImage"
 bash packaging/runtime/build-appimage.sh "$OUT/AppDir" > "$EVID/50-appimage.log" 2>&1
 rc=$?; echo "appimagetool exit=$rc" | tee -a "$EVID/50-appimage.log"
 grep -E 'APPIMAGE|sha256|SOURCE_DATE' "$EVID/50-appimage.log"
-[ "$rc" -eq 0 ] || { echo "AppImage build failed"; exit 1; }
+[ "$rc" -eq 0 ] || { cat "$EVID/50-appimage.log" >&2; exit "$rc"; }
 APPIMAGE=$(grep -m1 '^APPIMAGE=' "$EVID/50-appimage.log" | cut -d= -f2-)
-if [ -n "$APPIMAGE" ] && [ -f "$APPIMAGE" ]; then
-  ( cd "$(dirname "$APPIMAGE")" && sha256sum "$(basename "$APPIMAGE")" > SHA256SUMS )
-  cp "$(dirname "$APPIMAGE")/SHA256SUMS" "$EVID/SHA256SUMS"
-  echo "SHA256SUMS:"; cat "$EVID/SHA256SUMS"
-fi
+[ -n "$APPIMAGE" ] && [ -f "$APPIMAGE" ] || { echo "ERROR: packaged AppImage is missing" >&2; exit 1; }
+( cd "$(dirname "$APPIMAGE")" && sha256sum "$(basename "$APPIMAGE")" > SHA256SUMS ) \
+  && cp "$(dirname "$APPIMAGE")/SHA256SUMS" "$EVID/SHA256SUMS" \
+  || { echo "ERROR: could not write the AppImage checksum" >&2; exit 1; }
+echo "SHA256SUMS:"; cat "$EVID/SHA256SUMS"
 
 step "6/7 self-check + F2 isolation on the AppImage"
 bash packaging/runtime/selfcheck.sh --appimage "$APPIMAGE" > "$EVID/60-selfcheck-appimage.log" 2>&1
@@ -144,8 +147,9 @@ grep -E 'CHECK |F2-ISOLATION|SELFCHECK' "$EVID/60-selfcheck-appimage.log" "$EVID
 if [ "$CENTOS_PROBE" -eq 1 ]; then
   step "7/7 CentOS 7.9 mechanism probe (T12 owns the formal matrix)"
   rm -rf "$OUT/centos7-appdir" "$OUT/squashfs-root"
-  ( cd "$OUT" && APPIMAGE_EXTRACT_AND_RUN=1 "$APPIMAGE" --appimage-extract >/dev/null 2>&1 ) || true
-  [ -d "$OUT/squashfs-root" ] && mv "$OUT/squashfs-root" "$OUT/centos7-appdir"
+  ( cd "$OUT" && APPIMAGE_EXTRACT_AND_RUN=1 "$APPIMAGE" --appimage-extract >/dev/null 2>&1 ) \
+    && mv "$OUT/squashfs-root" "$OUT/centos7-appdir" \
+    || { echo "CentOS 7 probe: AppImage extraction failed" >&2; exit 1; }
   {
     echo "host: $(docker run --rm "$CENTOS_IMAGE" cat /etc/centos-release 2>&1 | head -1)"
     echo "glibc: $(docker run --rm "$CENTOS_IMAGE" ldd --version 2>&1 | head -1)"

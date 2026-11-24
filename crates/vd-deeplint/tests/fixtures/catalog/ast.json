@@ -42,14 +42,14 @@
       {
         "name": "orphan",
         "kind": "Instance",
-        "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+        "source_file": "orphan.sv",
         "source_line": 1,
         "source_column": 8,
         "addr": 6455622834800,
         "body": {
           "name": "orphan",
           "kind": "InstanceBody",
-          "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+          "source_file": "orphan.sv",
           "source_line": 1,
           "source_column": 8,
           "addr": 6455622834496,
@@ -57,7 +57,7 @@
             {
               "name": "a",
               "kind": "Port",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+              "source_file": "orphan.sv",
               "source_line": 1,
               "source_column": 28,
               "addr": 6455622840488,
@@ -68,7 +68,7 @@
             {
               "name": "a",
               "kind": "Net",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+              "source_file": "orphan.sv",
               "source_line": 1,
               "source_column": 28,
               "addr": 6455622840608,
@@ -83,7 +83,7 @@
             {
               "name": "b",
               "kind": "Port",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+              "source_file": "orphan.sv",
               "source_line": 1,
               "source_column": 44,
               "addr": 6455622840768,
@@ -94,7 +94,7 @@
             {
               "name": "b",
               "kind": "Variable",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+              "source_file": "orphan.sv",
               "source_line": 1,
               "source_column": 44,
               "addr": 6455622840888,
@@ -104,13 +104,13 @@
             {
               "name": "",
               "kind": "ContinuousAssign",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+              "source_file": "orphan.sv",
               "source_line": 2,
               "source_column": 10,
               "addr": 6455622841040,
               "assignment": {
-                "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
-                "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+                "source_file_start": "orphan.sv",
+                "source_file_end": "orphan.sv",
                 "source_line_start": 2,
                 "source_line_end": 2,
                 "source_column_start": 10,
@@ -118,8 +118,8 @@
                 "kind": "Assignment",
                 "type": "logic",
                 "left": {
-                  "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
-                  "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+                  "source_file_start": "orphan.sv",
+                  "source_file_end": "orphan.sv",
                   "source_line_start": 2,
                   "source_line_end": 2,
                   "source_column_start": 10,
@@ -129,8 +129,8 @@
                   "symbol": "6455622840888 b"
                 },
                 "right": {
-                  "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
-                  "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+                  "source_file_start": "orphan.sv",
+                  "source_file_end": "orphan.sv",
                   "source_line_start": 2,
                   "source_line_end": 2,
                   "source_column_start": 14,
@@ -151,14 +151,14 @@
       {
         "name": "top_a",
         "kind": "Instance",
-        "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+        "source_file": "top_a.sv",
         "source_line": 1,
         "source_column": 8,
         "addr": 6455622835560,
         "body": {
           "name": "top_a",
           "kind": "InstanceBody",
-          "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+          "source_file": "top_a.sv",
           "source_line": 1,
           "source_column": 8,
           "addr": 6455622834928,
@@ -166,7 +166,7 @@
             {
               "name": "clk",
               "kind": "Port",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_file": "top_a.sv",
               "source_line": 1,
               "source_column": 27,
               "addr": 6455622841464,
@@ -177,7 +177,7 @@
             {
               "name": "clk",
               "kind": "Net",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_file": "top_a.sv",
               "source_line": 1,
               "source_column": 27,
               "addr": 6455622841584,
@@ -192,7 +192,7 @@
             {
               "name": "pad",
               "kind": "Port",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_file": "top_a.sv",
               "source_line": 1,
               "source_column": 43,
               "addr": 6455622841744,
@@ -203,7 +203,7 @@
             {
               "name": "pad",
               "kind": "Net",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_file": "top_a.sv",
               "source_line": 1,
               "source_column": 43,
               "addr": 6455622841864,
@@ -218,7 +218,7 @@
             {
               "name": "y",
               "kind": "Port",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_file": "top_a.sv",
               "source_line": 1,
               "source_column": 67,
               "addr": 6455622842024,
@@ -229,7 +229,7 @@
             {
               "name": "y",
               "kind": "Variable",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_file": "top_a.sv",
               "source_line": 1,
               "source_column": 67,
               "addr": 6455622842144,
@@ -239,14 +239,14 @@
             {
               "name": "bus",
               "kind": "Instance",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_file": "top_a.sv",
               "source_line": 2,
               "source_column": 10,
               "addr": 6455622842304,
               "body": {
                 "name": "bus_if",
                 "kind": "InstanceBody",
-                "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/bus.sv",
+                "source_file": "bus.sv",
                 "source_line": 1,
                 "source_column": 11,
                 "addr": 6455622842432,
@@ -254,7 +254,7 @@
                   {
                     "name": "req",
                     "kind": "Variable",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/bus.sv",
+                    "source_file": "bus.sv",
                     "source_line": 2,
                     "source_column": 9,
                     "addr": 6455622842608,
@@ -264,7 +264,7 @@
                   {
                     "name": "ack",
                     "kind": "Variable",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/bus.sv",
+                    "source_file": "bus.sv",
                     "source_line": 3,
                     "source_column": 9,
                     "addr": 6455622842744,
@@ -274,7 +274,7 @@
                   {
                     "name": "master",
                     "kind": "Modport",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/bus.sv",
+                    "source_file": "bus.sv",
                     "source_line": 4,
                     "source_column": 11,
                     "addr": 6455622848760,
@@ -282,7 +282,7 @@
                       {
                         "name": "req",
                         "kind": "ModportPort",
-                        "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/bus.sv",
+                        "source_file": "bus.sv",
                         "source_line": 4,
                         "source_column": 26,
                         "addr": 6455622848872,
@@ -293,7 +293,7 @@
                       {
                         "name": "ack",
                         "kind": "ModportPort",
-                        "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/bus.sv",
+                        "source_file": "bus.sv",
                         "source_line": 4,
                         "source_column": 37,
                         "addr": 6455622849088,
@@ -312,7 +312,7 @@
             {
               "name": "link",
               "kind": "Variable",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_file": "top_a.sv",
               "source_line": 3,
               "source_column": 9,
               "addr": 6455622835232,
@@ -322,14 +322,14 @@
             {
               "name": "u_shared",
               "kind": "Instance",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_file": "top_a.sv",
               "source_line": 4,
               "source_column": 10,
               "addr": 6455622842944,
               "body": {
                 "name": "shared",
                 "kind": "InstanceBody",
-                "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                "source_file": "shared.sv",
                 "source_line": 1,
                 "source_column": 8,
                 "addr": 6455622843072,
@@ -337,7 +337,7 @@
                   {
                     "name": "a",
                     "kind": "Port",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_file": "shared.sv",
                     "source_line": 1,
                     "source_column": 28,
                     "addr": 6455622849304,
@@ -348,7 +348,7 @@
                   {
                     "name": "a",
                     "kind": "Net",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_file": "shared.sv",
                     "source_line": 1,
                     "source_column": 28,
                     "addr": 6455622849424,
@@ -363,7 +363,7 @@
                   {
                     "name": "y",
                     "kind": "Port",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_file": "shared.sv",
                     "source_line": 1,
                     "source_column": 50,
                     "addr": 6455622849584,
@@ -374,7 +374,7 @@
                   {
                     "name": "y",
                     "kind": "Variable",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_file": "shared.sv",
                     "source_line": 1,
                     "source_column": 50,
                     "addr": 6455622849704,
@@ -384,13 +384,13 @@
                   {
                     "name": "",
                     "kind": "ContinuousAssign",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_file": "shared.sv",
                     "source_line": 2,
                     "source_column": 10,
                     "addr": 6455622849856,
                     "assignment": {
-                      "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
-                      "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                      "source_file_start": "shared.sv",
+                      "source_file_end": "shared.sv",
                       "source_line_start": 2,
                       "source_line_end": 2,
                       "source_column_start": 10,
@@ -398,8 +398,8 @@
                       "kind": "Assignment",
                       "type": "logic[3:0]",
                       "left": {
-                        "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
-                        "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                        "source_file_start": "shared.sv",
+                        "source_file_end": "shared.sv",
                         "source_line_start": 2,
                         "source_line_end": 2,
                         "source_column_start": 10,
@@ -409,8 +409,8 @@
                         "symbol": "6455622849704 y"
                       },
                       "right": {
-                        "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
-                        "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                        "source_file_start": "shared.sv",
+                        "source_file_end": "shared.sv",
                         "source_line_start": 2,
                         "source_line_end": 2,
                         "source_column_start": 14,
@@ -418,8 +418,8 @@
                         "kind": "Replication",
                         "type": "logic[3:0]",
                         "count": {
-                          "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
-                          "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                          "source_file_start": "shared.sv",
+                          "source_file_end": "shared.sv",
                           "source_line_start": 2,
                           "source_line_end": 2,
                           "source_column_start": 15,
@@ -430,8 +430,8 @@
                           "constant": "4"
                         },
                         "concat": {
-                          "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
-                          "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                          "source_file_start": "shared.sv",
+                          "source_file_end": "shared.sv",
                           "source_line_start": 2,
                           "source_line_end": 2,
                           "source_column_start": 16,
@@ -440,8 +440,8 @@
                           "type": "logic[0:0]",
                           "operands": [
                             {
-                              "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
-                              "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                              "source_file_start": "shared.sv",
+                              "source_file_end": "shared.sv",
                               "source_line_start": 2,
                               "source_line_end": 2,
                               "source_column_start": 17,
@@ -464,7 +464,7 @@
                   "port": {
                     "name": "a",
                     "kind": "Port",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_file": "shared.sv",
                     "source_line": 1,
                     "source_column": 28,
                     "addr": 6455622849304,
@@ -473,8 +473,8 @@
                     "internalSymbol": "6455622849424 a"
                   },
                   "expr": {
-                    "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
-                    "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+                    "source_file_start": "top_a.sv",
+                    "source_file_end": "top_a.sv",
                     "source_line_start": 4,
                     "source_line_end": 4,
                     "source_column_start": 23,
@@ -488,7 +488,7 @@
                   "port": {
                     "name": "y",
                     "kind": "Port",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_file": "shared.sv",
                     "source_line": 1,
                     "source_column": 50,
                     "addr": 6455622849584,
@@ -497,8 +497,8 @@
                     "internalSymbol": "6455622849704 y"
                   },
                   "expr": {
-                    "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
-                    "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+                    "source_file_start": "top_a.sv",
+                    "source_file_end": "top_a.sv",
                     "source_line_start": 4,
                     "source_line_end": 4,
                     "source_column_start": 32,
@@ -506,8 +506,8 @@
                     "kind": "Assignment",
                     "type": "logic[3:0]",
                     "left": {
-                      "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
-                      "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+                      "source_file_start": "top_a.sv",
+                      "source_file_end": "top_a.sv",
                       "source_line_start": 4,
                       "source_line_end": 4,
                       "source_column_start": 32,
@@ -517,8 +517,8 @@
                       "symbol": "6455622842144 y"
                     },
                     "right": {
-                      "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
-                      "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+                      "source_file_start": "top_a.sv",
+                      "source_file_end": "top_a.sv",
                       "source_line_start": 4,
                       "source_line_end": 4,
                       "source_column_start": 32,
@@ -534,14 +534,14 @@
             {
               "name": "u_consumer",
               "kind": "Instance",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_file": "top_a.sv",
               "source_line": 5,
               "source_column": 12,
               "addr": 6455622843376,
               "body": {
                 "name": "consumer",
                 "kind": "InstanceBody",
-                "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                "source_file": "consumer.sv",
                 "source_line": 1,
                 "source_column": 8,
                 "addr": 6455622843504,
@@ -549,7 +549,7 @@
                   {
                     "name": "bus",
                     "kind": "InterfacePort",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                    "source_file": "consumer.sv",
                     "source_line": 1,
                     "source_column": 25,
                     "addr": 6455622851096,
@@ -559,7 +559,7 @@
                   {
                     "name": "clk",
                     "kind": "Port",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                    "source_file": "consumer.sv",
                     "source_line": 1,
                     "source_column": 42,
                     "addr": 6455622851208,
@@ -570,7 +570,7 @@
                   {
                     "name": "clk",
                     "kind": "Net",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                    "source_file": "consumer.sv",
                     "source_line": 1,
                     "source_column": 42,
                     "addr": 6455622851328,
@@ -585,7 +585,7 @@
                   {
                     "name": "y",
                     "kind": "Port",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                    "source_file": "consumer.sv",
                     "source_line": 1,
                     "source_column": 66,
                     "addr": 6455622851488,
@@ -596,7 +596,7 @@
                   {
                     "name": "y",
                     "kind": "Variable",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                    "source_file": "consumer.sv",
                     "source_line": 1,
                     "source_column": 66,
                     "addr": 6455622851608,
@@ -606,13 +606,13 @@
                   {
                     "name": "",
                     "kind": "ContinuousAssign",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                    "source_file": "consumer.sv",
                     "source_line": 2,
                     "source_column": 10,
                     "addr": 6455622851768,
                     "assignment": {
-                      "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
-                      "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                      "source_file_start": "consumer.sv",
+                      "source_file_end": "consumer.sv",
                       "source_line_start": 2,
                       "source_line_end": 2,
                       "source_column_start": 10,
@@ -620,8 +620,8 @@
                       "kind": "Assignment",
                       "type": "logic[3:0]",
                       "left": {
-                        "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
-                        "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                        "source_file_start": "consumer.sv",
+                        "source_file_end": "consumer.sv",
                         "source_line_start": 2,
                         "source_line_end": 2,
                         "source_column_start": 10,
@@ -631,8 +631,8 @@
                         "symbol": "6455622851608 y"
                       },
                       "right": {
-                        "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
-                        "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                        "source_file_start": "consumer.sv",
+                        "source_file_end": "consumer.sv",
                         "source_line_start": 2,
                         "source_line_end": 2,
                         "source_column_start": 14,
@@ -640,8 +640,8 @@
                         "kind": "Replication",
                         "type": "logic[3:0]",
                         "count": {
-                          "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
-                          "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                          "source_file_start": "consumer.sv",
+                          "source_file_end": "consumer.sv",
                           "source_line_start": 2,
                           "source_line_end": 2,
                           "source_column_start": 15,
@@ -652,8 +652,8 @@
                           "constant": "4"
                         },
                         "concat": {
-                          "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
-                          "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                          "source_file_start": "consumer.sv",
+                          "source_file_end": "consumer.sv",
                           "source_line_start": 2,
                           "source_line_end": 2,
                           "source_column_start": 16,
@@ -662,8 +662,8 @@
                           "type": "logic[0:0]",
                           "operands": [
                             {
-                              "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
-                              "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                              "source_file_start": "consumer.sv",
+                              "source_file_end": "consumer.sv",
                               "source_line_start": 2,
                               "source_line_end": 2,
                               "source_column_start": 17,
@@ -686,7 +686,7 @@
                   "port": {
                     "name": "bus",
                     "kind": "InterfacePort",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                    "source_file": "consumer.sv",
                     "source_line": 1,
                     "source_column": 25,
                     "addr": 6455622851096,
@@ -699,7 +699,7 @@
                   "port": {
                     "name": "clk",
                     "kind": "Port",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                    "source_file": "consumer.sv",
                     "source_line": 1,
                     "source_column": 42,
                     "addr": 6455622851208,
@@ -708,8 +708,8 @@
                     "internalSymbol": "6455622851328 clk"
                   },
                   "expr": {
-                    "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
-                    "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+                    "source_file_start": "top_a.sv",
+                    "source_file_end": "top_a.sv",
                     "source_line_start": 5,
                     "source_line_end": 5,
                     "source_column_start": 40,
@@ -723,7 +723,7 @@
                   "port": {
                     "name": "y",
                     "kind": "Port",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+                    "source_file": "consumer.sv",
                     "source_line": 1,
                     "source_column": 66,
                     "addr": 6455622851488,
@@ -737,14 +737,14 @@
             {
               "name": "u_ref",
               "kind": "Instance",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+              "source_file": "top_a.sv",
               "source_line": 6,
               "source_column": 11,
               "addr": 6455622843808,
               "body": {
                 "name": "reflink",
                 "kind": "InstanceBody",
-                "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/reflink.sv",
+                "source_file": "reflink.sv",
                 "source_line": 1,
                 "source_column": 8,
                 "addr": 6455622843936,
@@ -752,7 +752,7 @@
                   {
                     "name": "x",
                     "kind": "Port",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/reflink.sv",
+                    "source_file": "reflink.sv",
                     "source_line": 1,
                     "source_column": 27,
                     "addr": 6455622853032,
@@ -763,7 +763,7 @@
                   {
                     "name": "x",
                     "kind": "Variable",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/reflink.sv",
+                    "source_file": "reflink.sv",
                     "source_line": 1,
                     "source_column": 27,
                     "addr": 6455622853152,
@@ -778,7 +778,7 @@
                   "port": {
                     "name": "x",
                     "kind": "Port",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/reflink.sv",
+                    "source_file": "reflink.sv",
                     "source_line": 1,
                     "source_column": 27,
                     "addr": 6455622853032,
@@ -787,8 +787,8 @@
                     "internalSymbol": "6455622853152 x"
                   },
                   "expr": {
-                    "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
-                    "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+                    "source_file_start": "top_a.sv",
+                    "source_file_end": "top_a.sv",
                     "source_line_start": 6,
                     "source_line_end": 6,
                     "source_column_start": 21,
@@ -809,14 +809,14 @@
       {
         "name": "top_b",
         "kind": "Instance",
-        "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+        "source_file": "top_b.sv",
         "source_line": 1,
         "source_column": 8,
         "addr": 6455622840336,
         "body": {
           "name": "top_b",
           "kind": "InstanceBody",
-          "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+          "source_file": "top_b.sv",
           "source_line": 1,
           "source_column": 8,
           "addr": 6455622835688,
@@ -824,7 +824,7 @@
             {
               "name": "clk",
               "kind": "Port",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+              "source_file": "top_b.sv",
               "source_line": 1,
               "source_column": 27,
               "addr": 6455622853488,
@@ -835,7 +835,7 @@
             {
               "name": "clk",
               "kind": "Net",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+              "source_file": "top_b.sv",
               "source_line": 1,
               "source_column": 27,
               "addr": 6455622853608,
@@ -850,7 +850,7 @@
             {
               "name": "y",
               "kind": "Port",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+              "source_file": "top_b.sv",
               "source_line": 1,
               "source_column": 51,
               "addr": 6455622853768,
@@ -861,7 +861,7 @@
             {
               "name": "y",
               "kind": "Variable",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+              "source_file": "top_b.sv",
               "source_line": 1,
               "source_column": 51,
               "addr": 6455622853888,
@@ -871,7 +871,7 @@
             {
               "name": "u_shared",
               "kind": "Instance",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+              "source_file": "top_b.sv",
               "source_line": 2,
               "source_column": 10,
               "addr": 6455622854040,
@@ -881,7 +881,7 @@
                   "port": {
                     "name": "a",
                     "kind": "Port",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_file": "shared.sv",
                     "source_line": 1,
                     "source_column": 28,
                     "addr": 6455622855192,
@@ -890,8 +890,8 @@
                     "internalSymbol": "6455622855312 a"
                   },
                   "expr": {
-                    "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
-                    "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+                    "source_file_start": "top_b.sv",
+                    "source_file_end": "top_b.sv",
                     "source_line_start": 2,
                     "source_line_end": 2,
                     "source_column_start": 23,
@@ -905,7 +905,7 @@
                   "port": {
                     "name": "y",
                     "kind": "Port",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_file": "shared.sv",
                     "source_line": 1,
                     "source_column": 50,
                     "addr": 6455622855472,
@@ -914,8 +914,8 @@
                     "internalSymbol": "6455622855592 y"
                   },
                   "expr": {
-                    "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
-                    "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+                    "source_file_start": "top_b.sv",
+                    "source_file_end": "top_b.sv",
                     "source_line_start": 2,
                     "source_line_end": 2,
                     "source_column_start": 32,
@@ -923,8 +923,8 @@
                     "kind": "Assignment",
                     "type": "logic[3:0]",
                     "left": {
-                      "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
-                      "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+                      "source_file_start": "top_b.sv",
+                      "source_file_end": "top_b.sv",
                       "source_line_start": 2,
                       "source_line_end": 2,
                       "source_column_start": 32,
@@ -934,8 +934,8 @@
                       "symbol": "6455622853888 y"
                     },
                     "right": {
-                      "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
-                      "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+                      "source_file_start": "top_b.sv",
+                      "source_file_end": "top_b.sv",
                       "source_line_start": 2,
                       "source_line_end": 2,
                       "source_column_start": 32,
@@ -951,7 +951,7 @@
             {
               "name": "spare",
               "kind": "Variable",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+              "source_file": "top_b.sv",
               "source_line": 3,
               "source_column": 9,
               "addr": 6455622835992,
@@ -961,7 +961,7 @@
             {
               "name": "u_shared_2",
               "kind": "Instance",
-              "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+              "source_file": "top_b.sv",
               "source_line": 4,
               "source_column": 10,
               "addr": 6455622854472,
@@ -971,7 +971,7 @@
                   "port": {
                     "name": "a",
                     "kind": "Port",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_file": "shared.sv",
                     "source_line": 1,
                     "source_column": 28,
                     "addr": 6455622856488,
@@ -980,8 +980,8 @@
                     "internalSymbol": "6455622860816 a"
                   },
                   "expr": {
-                    "source_file_start": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
-                    "source_file_end": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+                    "source_file_start": "top_b.sv",
+                    "source_file_end": "top_b.sv",
                     "source_line_start": 4,
                     "source_line_end": 4,
                     "source_column_start": 25,
@@ -995,7 +995,7 @@
                   "port": {
                     "name": "y",
                     "kind": "Port",
-                    "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+                    "source_file": "shared.sv",
                     "source_line": 1,
                     "source_column": 50,
                     "addr": 6455622860976,
@@ -1018,7 +1018,7 @@
     {
       "name": "bus_if",
       "kind": "Definition",
-      "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/bus.sv",
+      "source_file": "bus.sv",
       "source_line": 1,
       "source_column": 11,
       "addr": 6455605028352,
@@ -1031,7 +1031,7 @@
     {
       "name": "consumer",
       "kind": "Definition",
-      "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/consumer.sv",
+      "source_file": "consumer.sv",
       "source_line": 1,
       "source_column": 8,
       "addr": 6455605029120,
@@ -1044,7 +1044,7 @@
     {
       "name": "orphan",
       "kind": "Definition",
-      "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/orphan.sv",
+      "source_file": "orphan.sv",
       "source_line": 1,
       "source_column": 8,
       "addr": 6455605029888,
@@ -1057,7 +1057,7 @@
     {
       "name": "reflink",
       "kind": "Definition",
-      "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/reflink.sv",
+      "source_file": "reflink.sv",
       "source_line": 1,
       "source_column": 8,
       "addr": 6455605030656,
@@ -1070,7 +1070,7 @@
     {
       "name": "shared",
       "kind": "Definition",
-      "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/shared.sv",
+      "source_file": "shared.sv",
       "source_line": 1,
       "source_column": 8,
       "addr": 6455605031424,
@@ -1083,7 +1083,7 @@
     {
       "name": "top_a",
       "kind": "Definition",
-      "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_a.sv",
+      "source_file": "top_a.sv",
       "source_line": 1,
       "source_column": 8,
       "addr": 6455605032192,
@@ -1096,7 +1096,7 @@
     {
       "name": "top_b",
       "kind": "Definition",
-      "source_file": "crates/vd-deeplint/tests/fixtures/catalog/project/top_b.sv",
+      "source_file": "top_b.sv",
       "source_line": 1,
       "source_column": 8,
       "addr": 6455605032960,

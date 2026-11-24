@@ -8,15 +8,20 @@
 #include <QAction>
 #include <QChar>
 #include <QComboBox>
+#include <QContextMenuEvent>
 #include <QEvent>
 #include <QFileInfo>
+#include <QGridLayout>
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QKeySequence>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMenu>
+#include <QMouseEvent>
 #include <QRegularExpression>
 #include <QShortcut>
+#include <QSignalBlocker>
 #include <QToolButton>
 #include <QUrl>
 #include <QVBoxLayout>
@@ -30,6 +35,10 @@ namespace {
 // A hard ceiling so a pathological pattern (e.g. an empty regex match at every
 // position) cannot freeze the GUI; the status line says how to narrow it.
 constexpr int kMaxMatches = 100000;
+
+// The overlay keeps this distance from the viewport edges and is never moved
+// (or resized) outside it (AC-8.1).
+constexpr int kOverlayMargin = 10;
 
 KTextEditor::Cursor advanceOneCharacter(KTextEditor::Document *document,
                                         const KTextEditor::Cursor &position)
@@ -373,14 +382,19 @@ void FindReplaceBar::buildUi()
     outer->setContentsMargins(8, 6, 8, 6);
     outer->setSpacing(4);
 
-    auto *findRow = new QHBoxLayout();
-    findRow->setSpacing(4);
-    findEdit_ = new QLineEdit(this);
+    // The find row is a grid, not a fixed row: at narrow widths the controls
+    // reflow onto extra rows so every option and the close button stay
+    // reachable (AC-8.2). `layoutFindRow()` owns the placement.
+    findRow_ = new QWidget(this);
+    findGrid_ = new QGridLayout(findRow_);
+    findGrid_->setContentsMargins(0, 0, 0, 0);
+    findGrid_->setSpacing(4);
+    findGrid_->setColumnStretch(0, 1);
+    findEdit_ = new QLineEdit(findRow_);
     findEdit_->setObjectName(QStringLiteral("vedit-find-pattern"));
     findEdit_->setPlaceholderText(tr("Find"));
     findEdit_->setClearButtonEnabled(true);
     findEdit_->setMinimumWidth(200);
-    findRow->addWidget(findEdit_, 1);
 
     caseButton_ = makeToggle(this, QStringLiteral("Aa"), QStringLiteral("vedit-find-case"),
                              tr("Case sensitive"));
@@ -402,35 +416,38 @@ void FindReplaceBar::buildUi()
     selectionButton_ =
         makeToggle(this, QStringLiteral("Sel"), QStringLiteral("vedit-find-scope-selection"),
                    tr("Search and replace only inside the selection"));
-    findRow->addWidget(caseButton_);
-    findRow->addWidget(wholeButton_);
-    findRow->addWidget(regexButton_);
-    findRow->addWidget(scopeCombo_);
-    findRow->addWidget(selectionButton_);
 
-    auto *previous = new QToolButton(this);
-    previous->setObjectName(QStringLiteral("vedit-find-prev"));
-    previous->setText(tr("Prev"));
-    previous->setToolTip(tr("Previous match (Shift+F3)"));
-    auto *next = new QToolButton(this);
-    next->setObjectName(QStringLiteral("vedit-find-next"));
-    next->setText(tr("Next"));
-    next->setToolTip(tr("Next match (F3)"));
-    findRow->addWidget(previous);
-    findRow->addWidget(next);
+    previousButton_ = new QToolButton(this);
+    previousButton_->setObjectName(QStringLiteral("vedit-find-prev"));
+    previousButton_->setText(tr("Prev"));
+    previousButton_->setToolTip(tr("Previous match (Shift+F3)"));
+    nextButton_ = new QToolButton(this);
+    nextButton_->setObjectName(QStringLiteral("vedit-find-next"));
+    nextButton_->setText(tr("Next"));
+    nextButton_->setToolTip(tr("Next match (F3)"));
 
     status_ = new QLabel(this);
     status_->setObjectName(QStringLiteral("vedit-find-status"));
     status_->setMinimumWidth(90);
-    findRow->addWidget(status_);
 
-    auto *close = new QToolButton(this);
-    close->setObjectName(QStringLiteral("vedit-find-close"));
-    close->setText(QStringLiteral("x"));
-    close->setToolTip(tr("Close (Esc)"));
-    close->setAutoRaise(true);
-    findRow->addWidget(close);
-    outer->addLayout(findRow);
+    closeButton_ = new QToolButton(this);
+    closeButton_->setObjectName(QStringLiteral("vedit-find-close"));
+    closeButton_->setText(QStringLiteral("x"));
+    closeButton_->setToolTip(tr("Close (Esc)"));
+    closeButton_->setAutoRaise(true);
+
+    // Replace disclosure (batch 20261110d): the replace row is only reachable
+    // through Ctrl+H today; this chevron lets a user reveal it from the bar
+    // itself. Collapsed by default on every open (`openBar()` resets it), and
+    // the state drives `replaceRowVisible()` so the two never disagree.
+    disclosureButton_ = new QToolButton(this);
+    disclosureButton_->setObjectName(QStringLiteral("vedit-find-disclosure"));
+    disclosureButton_->setCheckable(true);
+    disclosureButton_->setAutoRaise(true);
+    disclosureButton_->setChecked(false);
+    disclosureButton_->setArrowType(Qt::RightArrow);
+    disclosureButton_->setToolTip(tr("Show replace options"));
+    outer->addWidget(findRow_);
 
     replaceRow_ = new QWidget(this);
     auto *replaceLayout = new QHBoxLayout(replaceRow_);
@@ -460,15 +477,7 @@ void FindReplaceBar::buildUi()
         }
         publishToHub();
     });
-    connect(findEdit_, &QLineEdit::returnPressed, this, [this]() {
-        // In project scope the Enter key runs the project search through the
-        // dock (the bar does not search the tree itself).
-        if (projectScope()) {
-            requestProjectSearch();
-        } else {
-            findNext();
-        }
-    });
+    connect(findEdit_, &QLineEdit::returnPressed, this, [this]() { findFromField(false); });
     connect(replaceEdit_, &QLineEdit::returnPressed, this, [this]() { replaceCurrent(); });
     for (QToolButton *toggle : {caseButton_, wholeButton_, regexButton_}) {
         connect(toggle, &QToolButton::toggled, this, [this](bool) {
@@ -506,17 +515,56 @@ void FindReplaceBar::buildUi()
     });
     connect(selectionButton_, &QToolButton::toggled, this,
             [this](bool checked) { applySelectionToggle(checked); });
-    connect(previous, &QToolButton::clicked, this, [this]() { findPrevious(); });
-    connect(next, &QToolButton::clicked, this, [this]() { findNext(); });
+    connect(previousButton_, &QToolButton::clicked, this, [this]() { findPrevious(); });
+    connect(nextButton_, &QToolButton::clicked, this, [this]() { findNext(); });
     connect(replaceOneButton, &QToolButton::clicked, this, [this]() { replaceCurrent(); });
     connect(replaceAllButton, &QToolButton::clicked, this, [this]() { replaceAllMatches(); });
-    connect(close, &QToolButton::clicked, this, [this]() { closeBar(); });
+    connect(closeButton_, &QToolButton::clicked, this, [this]() { closeBar(); });
+    connect(disclosureButton_, &QToolButton::toggled, this, [this](bool expanded) {
+        if (disclosureButton_ != nullptr) {
+            disclosureButton_->setArrowType(expanded ? Qt::DownArrow : Qt::RightArrow);
+            disclosureButton_->setToolTip(expanded ? tr("Hide replace options")
+                                                   : tr("Show replace options"));
+        }
+        if (replaceRow_ != nullptr) {
+            replaceRow_->setVisible(expanded);
+        }
+        // The two forms differ by a row: re-measure, then keep the bar inside
+        // the viewport at its new height.
+        if (isVisible()) {
+            adjustSize();
+            positionOverlay();
+        }
+    });
 
     auto *escape = new QShortcut(QKeySequence(Qt::Key_Escape), this);
     escape->setContext(Qt::WidgetWithChildrenShortcut);
     connect(escape, &QShortcut::activated, this, [this]() { closeBar(); });
 
+    layoutFindRow(false);
+    // The wide form's PREFERRED width is the reflow threshold (batch 20261110d):
+    // `minimumSizeHint().width()` only reported the field's 200 px minimum, so
+    // the bar stayed in the one-row form long after the controls no longer fit
+    // (the reported "~700 px preferred, measured ~minimum" defect). Measured
+    // from the widgets, never a guessed pixel count (AC-8.2).
+    wideMinimumWidth_ = findRow_->sizeHint().width();
+    wideLayoutPreferredWidth_ = wideMinimumWidth_;
+    wideLayoutMinimumWidth_ = findRow_->minimumSizeHint().width();
+    // The frame background is the drag handle (AC-8.1), so the bar advertises
+    // the grab cursor; controls keep an ordinary pointer so a hand never
+    // promises a drag over a button.
+    setCursor(Qt::OpenHandCursor);
+    for (QToolButton *button : findChildren<QToolButton *>()) {
+        button->setCursor(Qt::ArrowCursor);
+    }
+    if (scopeCombo_ != nullptr) {
+        scopeCombo_->setCursor(Qt::ArrowCursor);
+    }
+    for (QLineEdit *field : findChildren<QLineEdit *>()) {
+        field->setCursor(Qt::IBeamCursor);
+    }
     updateStatus();
+
 }
 
 void FindReplaceBar::installKeyHandling()
@@ -606,15 +654,19 @@ void FindReplaceBar::clearKernelFindShortcuts()
 
 void FindReplaceBar::openFind()
 {
-    openBar(false);
+    openBar();
 }
 
 void FindReplaceBar::openReplace()
 {
-    openBar(true);
+    openBar();
 }
 
-void FindReplaceBar::openBar(bool withReplace)
+// Batch 20261110d: BOTH entry points open the bar with the replace row
+// COLLAPSED. Ctrl+H keeps its shortcut and still opens the bar, but the replace
+// row is revealed by the disclosure chevron instead of appearing silently — the
+// default state is folded, and `openReplace()` does not override it.
+void FindReplaceBar::openBar()
 {
     if (view_ == nullptr || view_->document() == nullptr) {
         return;
@@ -624,7 +676,15 @@ void FindReplaceBar::openBar(bool withReplace)
     if (!path.isEmpty()) {
         vedit::search::SearchHub::instance().setCurrentFilePath(path);
     }
-    replaceRow_->setVisible(withReplace);
+    // Default folded on every open; the chevron and the row are set together so
+    // `replaceRowVisible()` can never disagree with the button.
+    {
+        const QSignalBlocker blocker(disclosureButton_);
+        disclosureButton_->setChecked(false);
+        disclosureButton_->setArrowType(Qt::RightArrow);
+        disclosureButton_->setToolTip(tr("Show replace options"));
+    }
+    replaceRow_->setVisible(false);
     captureScopeAtOpen();
     refreshDocumentConnection();
     // The kernel may create its find actions lazily; clear their sequences again
@@ -652,8 +712,10 @@ void FindReplaceBar::openBar(bool withReplace)
 void FindReplaceBar::closeBar()
 {
     hide();
+    // Esc and the close button hand the keyboard back to the editor (AC-8.4);
+    // the view forwards focus to KatePart's inner widget.
     if (view_ != nullptr) {
-        view_->setFocus();
+        view_->setFocus(Qt::OtherFocusReason);
     }
 }
 
@@ -662,10 +724,208 @@ void FindReplaceBar::positionOverlay()
     if (view_ == nullptr) {
         return;
     }
+    // The overlay may never need more width than the viewport leaves it, and
+    // the form it chooses depends on that width (AC-8.1/AC-8.2).
+    const int available = std::max(240, view_->width() - 2 * kOverlayMargin);
+    setMaximumWidth(available);
+    layoutFindRow(wideMinimumWidth_ > 0 && available < wideMinimumWidth_);
     adjustSize();
-    const int margin = 10;
-    const int x = std::max(margin, view_->width() - width() - margin);
-    move(x, margin);
+    move(clampToViewport(customPosition_ ? customPositionValue_ : defaultPosition()));
+}
+
+QPoint FindReplaceBar::clampToViewport(const QPoint &position) const
+{
+    if (view_ == nullptr) {
+        return position;
+    }
+    const int maxX = std::max(0, view_->width() - width());
+    const int maxY = std::max(0, view_->height() - height());
+    return QPoint(std::clamp(position.x(), 0, maxX), std::clamp(position.y(), 0, maxY));
+}
+
+QPoint FindReplaceBar::defaultPosition() const
+{
+    if (view_ == nullptr) {
+        return QPoint(kOverlayMargin, kOverlayMargin);
+    }
+    return QPoint(std::max(kOverlayMargin, view_->width() - width() - kOverlayMargin),
+                  kOverlayMargin);
+}
+
+bool FindReplaceBar::isCustomPosition() const
+{
+    return customPosition_;
+}
+
+bool FindReplaceBar::compactLayout() const
+{
+    return compact_;
+}
+
+void FindReplaceBar::restoreDefaultPosition()
+{
+    customPosition_ = false;
+    if (isVisible()) {
+        positionOverlay();
+    }
+}
+
+void FindReplaceBar::layoutFindRow(bool compact)
+{
+    if (findGrid_ == nullptr || findEdit_ == nullptr || caseButton_ == nullptr ||
+        wholeButton_ == nullptr || regexButton_ == nullptr || selectionButton_ == nullptr ||
+        scopeCombo_ == nullptr || previousButton_ == nullptr || nextButton_ == nullptr ||
+        status_ == nullptr || closeButton_ == nullptr) {
+        return;
+    }
+    if (findRowLaidOut_ && compact_ == compact) {
+        return;
+    }
+    findRowLaidOut_ = true;
+    compact_ = compact;
+    // Moving a widget between grid cells is `addWidget` again: Qt relocates an
+    // existing layout item, it does not duplicate it.
+    if (compact) {
+        // Narrow form (AC-8.2): the field keeps the first row with the close
+        // button, the options reflow below, and Prev/Next/status share the
+        // third row. Every control stays on screen at 360 px.
+        findEdit_->setMinimumWidth(120);
+        findGrid_->addWidget(findEdit_, 0, 0, 1, 4);
+        findGrid_->addWidget(closeButton_, 0, 4);
+        findGrid_->addWidget(caseButton_, 1, 0);
+        findGrid_->addWidget(wholeButton_, 1, 1);
+        findGrid_->addWidget(regexButton_, 1, 2);
+        findGrid_->addWidget(scopeCombo_, 1, 3);
+        findGrid_->addWidget(selectionButton_, 1, 4);
+        findGrid_->addWidget(previousButton_, 2, 0);
+        findGrid_->addWidget(nextButton_, 2, 1);
+        findGrid_->addWidget(status_, 2, 2, 1, 3);
+        findGrid_->addWidget(disclosureButton_, 0, 5);
+        for (int column = 1; column < 6; ++column) {
+            findGrid_->setColumnStretch(column, 0);
+        }
+        findGrid_->setColumnStretch(0, 1);
+    } else {
+        findEdit_->setMinimumWidth(200);
+        findGrid_->addWidget(findEdit_, 0, 0);
+        findGrid_->addWidget(caseButton_, 0, 1);
+        findGrid_->addWidget(wholeButton_, 0, 2);
+        findGrid_->addWidget(regexButton_, 0, 3);
+        findGrid_->addWidget(scopeCombo_, 0, 4);
+        findGrid_->addWidget(selectionButton_, 0, 5);
+        findGrid_->addWidget(previousButton_, 0, 6);
+        findGrid_->addWidget(nextButton_, 0, 7);
+        findGrid_->addWidget(status_, 0, 8);
+        findGrid_->addWidget(closeButton_, 0, 9);
+        findGrid_->addWidget(disclosureButton_, 0, 10);
+        for (int column = 1; column <= 10; ++column) {
+            findGrid_->setColumnStretch(column, 0);
+        }
+        findGrid_->setColumnStretch(0, 1);
+    }
+
+    // Pin the find row's height after EVERY form switch (batch 20261110d): the
+    // grid moves controls between rows and the bar had no minimum height, so a
+    // switch could let the rows overlap while the geometry settled. Measured
+    // again on each switch, so the wide form releases the compact form's extra
+    // height instead of keeping it forever.
+    findGrid_->activate();
+    const int rowHeight = findRow_->sizeHint().height();
+    if (rowHeight > 0) {
+        findRow_->setMinimumHeight(rowHeight);
+    }
+}
+
+void FindReplaceBar::findFromField(bool backwards)
+{
+    // In project scope the Enter key runs the project search through the dock
+    // (the bar does not search the tree itself).
+    if (projectScope()) {
+        requestProjectSearch();
+    } else if (backwards) {
+        findPrevious();
+    } else {
+        findNext();
+    }
+    // Return searches; it does not hand the keyboard to the document (AC-8.3).
+    // The field is only re-focused when something took it, so ordinary typing
+    // is never disturbed.
+    if (findEdit_ != nullptr && !findEdit_->hasFocus()) {
+        findEdit_->setFocus(Qt::OtherFocusReason);
+    }
+}
+
+void FindReplaceBar::replaceFromField(bool backwards)
+{
+    // Return in the replace field replaces the CURRENT match and continues
+    // walking forward (`replaceCurrent()` lands on the next match once the
+    // replaced one is gone); Shift+Return replaces it and steps back one match.
+    // Both arms are claimed by the event filter, so the key never reaches the
+    // document (a Return there would insert a newline — the F1 defect).
+    replaceCurrent();
+    if (backwards) {
+        findPrevious();
+    }
+    if (replaceEdit_ != nullptr && !replaceEdit_->hasFocus()) {
+        replaceEdit_->setFocus(Qt::OtherFocusReason);
+    }
+}
+
+void FindReplaceBar::mousePressEvent(QMouseEvent *event)
+{
+    // A press that reaches the frame landed on its background: every control is
+    // a child widget and handles its own press, so the background is exactly
+    // the drag handle (AC-8.1).
+    if (event->button() != Qt::LeftButton || view_ == nullptr) {
+        QFrame::mousePressEvent(event);
+        return;
+    }
+    dragging_ = true;
+    dragMoved_ = false;
+    dragStartGlobal_ = event->globalPosition().toPoint();
+    dragStartPosition_ = pos();
+    raise();
+    event->accept();
+}
+
+void FindReplaceBar::mouseMoveEvent(QMouseEvent *event)
+{
+    if (!dragging_) {
+        QFrame::mouseMoveEvent(event);
+        return;
+    }
+    const QPoint delta = event->globalPosition().toPoint() - dragStartGlobal_;
+    if (!delta.isNull()) {
+        dragMoved_ = true;
+    }
+    move(clampToViewport(dragStartPosition_ + delta));
+    event->accept();
+}
+
+void FindReplaceBar::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() != Qt::LeftButton || !dragging_) {
+        QFrame::mouseReleaseEvent(event);
+        return;
+    }
+    dragging_ = false;
+    if (dragMoved_) {
+        // The position belongs to this view for the rest of its session: the
+        // bar reopens where the user left it until they reset it.
+        customPosition_ = true;
+        customPositionValue_ = pos();
+    }
+    event->accept();
+}
+
+void FindReplaceBar::contextMenuEvent(QContextMenuEvent *event)
+{
+    QMenu menu(this);
+    QAction *reset = menu.addAction(tr("Reset position"));
+    reset->setEnabled(customPosition_);
+    connect(reset, &QAction::triggered, this, [this]() { restoreDefaultPosition(); });
+    menu.exec(event->globalPos());
+    event->accept();
 }
 
 bool FindReplaceBar::eventFilter(QObject *watched, QEvent *event)
@@ -687,6 +947,35 @@ bool FindReplaceBar::eventFilter(QObject *watched, QEvent *event)
             positionOverlay();
         }
         return QFrame::eventFilter(watched, event);
+    }
+    if ((watched == findEdit_ || watched == replaceEdit_) &&
+        (event->type() == QEvent::ShortcutOverride || event->type() == QEvent::KeyPress)) {
+        auto *key = static_cast<QKeyEvent *>(event);
+        const bool returnKey = key->key() == Qt::Key_Return || key->key() == Qt::Key_Enter;
+        const Qt::KeyboardModifiers modifiers =
+            key->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier | Qt::AltModifier |
+                                Qt::MetaModifier);
+        if (returnKey && (modifiers == Qt::NoModifier || modifiers == Qt::ShiftModifier)) {
+            // BOTH fields are claimed, not just the find field. QLineEdit ignores
+            // the key AFTER emitting returnPressed, and an ignored key propagates
+            // up the parent chain into KatePart, where EditorEnhancements'
+            // Return handling inserts a newline at the document cursor. That is
+            // how a Return in the REPLACE field used to corrupt the document
+            // (`alpha alpha` -> `X \nalpha`): no claim existed there at all.
+            // Find field: Return = find-next, Shift+Return = find-previous.
+            // Replace field: Return = replace the current match and keep
+            // walking forward, Shift+Return = replace it and step back one
+            // match (see replaceFromField()).
+            if (event->type() == QEvent::KeyPress) {
+                if (watched == replaceEdit_) {
+                    replaceFromField(modifiers == Qt::ShiftModifier);
+                } else {
+                    findFromField(modifiers == Qt::ShiftModifier);
+                }
+            }
+            event->accept();
+            return true;
+        }
     }
     if (event->type() == QEvent::ShortcutOverride || event->type() == QEvent::KeyPress) {
         if (handleShortcutKey(static_cast<QKeyEvent *>(event),
@@ -845,6 +1134,9 @@ void FindReplaceBar::findNext()
         requestProjectSearch();
         return;
     }
+    // Batch 20261110d: a RUN search enters the shared bounded history. F3/Enter
+    // both land here; a repeat is deduped by the hub, not appended again.
+    vedit::search::SearchHub::instance().noteQuery(findEdit_->text());
     if (findEdit_->text().isEmpty()) {
         openFind();
         return;
@@ -878,6 +1170,7 @@ void FindReplaceBar::findPrevious()
         requestProjectSearch();
         return;
     }
+    vedit::search::SearchHub::instance().noteQuery(findEdit_->text());
     if (findEdit_->text().isEmpty()) {
         openFind();
         return;
@@ -1139,6 +1432,7 @@ void FindReplaceBar::requestProjectSearch()
         return;
     }
     vedit::search::SearchHub::instance().setCurrentFilePath(documentPath(view_));
+    vedit::search::SearchHub::instance().noteQuery(request.text);
     emit projectSearchRequested(request);
     const bool delivered =
         vedit::search::SearchHub::instance().requestProjectSearch(request);

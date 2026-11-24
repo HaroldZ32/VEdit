@@ -67,6 +67,36 @@ bash scripts/build.sh
 外加 `Cargo.lock` 策略检查）。宿主没有 GTK 开发文件时，编译类门禁会自动放进 pinned 镜像里跑并
 **明确打印这一降级**。这条 lane 的其余细节见 §3–§5、§8、§10、§11，打包见 §7.2。
 
+### 2.2 Rust 服务层：`cargo +stable` 与 `CARGO_HOME`
+
+Rust 服务层（`crates/vd-*`）的门禁由 `scripts/gates.sh` 执行；它调用普通 `cargo`，在宿主缺 GTK
+开发包时自动放进 pinned 镜像（`scripts/lib.sh:run_in_build_container`，镜像内
+`CARGO_HOME=/vedit-build/target/cargo-home`）。**在宿主上直接跑 Rust 命令时**，用这一对：
+
+```sh
+export CARGO_HOME=$PWD/target/cargo-home
+cargo +stable test -p vd-config -p vd-ffi -p vd-deeplint
+cargo +stable clippy --workspace --all-targets -- -D warnings
+cargo +stable fmt -p vd-ffi -- --check
+```
+
+为什么必须这样（实测，2026-11-12）：
+
+```text
+$ cargo --version
+error: the 'cargo' binary, normally provided by the 'cargo' component, is not
+applicable to the '1.99.0-x86_64-unknown-linux-gnu' toolchain
+$ CARGO_HOME=$PWD/target/cargo-home cargo +stable --version
+cargo 1.99.0 (5f94df478 2026-08-27)
+```
+
+- pinned 的 1.99.0 工具链**没有 cargo 组件**（`rustc 1.99.0` 在，`cargo` 不在），裸 `cargo` 会直接报错；
+  `+stable` 解析到带 cargo 组件的 stable 工具链（实测 `cargo 1.99.0`，与 pin 同版本），命令照常执行。
+- 宿主 `$HOME/.cargo` 是**只读**的：cargo 的 registry/git 缓存必须落到工作区内的
+  `target/cargo-home`，不设置 `CARGO_HOME` 的宿主构建会因写缓存失败而失败。
+- 这两条是**环境事实**，不是代码缺陷；`cargo check -p vd-app` 在宿主还会死在 GTK 的 pkg-config，
+  产品构建与 ctest 走 pinned 镜像（见 §12.5）。
+
 ## 3. 固定输入（旧版 lane 与共用工具：`scripts/versions.env` 是唯一来源）
 
 > Qt6 车道的版本矩阵不在这里：它在 `scripts/versions-qt.env` 与
@@ -153,11 +183,10 @@ KTextEditor / 自建 KSyntaxHighlighting / tree-sitter / 字体，并带 `bin/tr
 （该 README 把 `out/AppDir/` 明确列为**中间产物**；产物大小与 sha256 以 `out/SHA256SUMS`
 与实际文件为准，不在文档里写死）。
 
-**版本号说明**：代码、构建与文档现在统一为 **0.2.2**。打包脚本从工作区 `Cargo.toml` 的
-`version` 取值（`packaging/runtime/build-appimage.sh:53`），`CMakeLists.txt` 与
-`src/terminal/CMakeLists.txt` 的 `project(... VERSION ...)`、`src/app/main.cpp` 与
-`cmake/smoke/qt6_window_smoke.cpp` 的 `setApplicationVersion()` 都是同一个值，所以产物名
-`VEdit-0.2.2-x86_64.AppImage` 与应用内版本 0.2.2 一致。
+**版本号说明**：当前版本为 **0.4.0**。`packaging/runtime/build-appimage.sh` 与
+`assemble-appdir.sh` 从工作区 `Cargo.toml` 读取版本，生成 `VEdit-0.4.0-x86_64.AppImage`
+和桌面文件的 `X-AppImage-Version=0.4.0`。根目录与终端的 CMake 项目、应用与窗口冒烟测试的
+`setApplicationVersion()` 同步使用 0.4.0。应用的 About 与 `--version` 显示该版本。
 
 ### 7.2 旧版 GTK 产物（不是 Qt 交付物）
 
@@ -178,6 +207,75 @@ bash packaging/tarball/build.sh           # 旧 vd-app 的 tar.gz + 自解压 .r
 
 旧管线自身的断言（pinned 输入 + sha256、GLIBC ≤ 2.17 全量断言、RPATH/RUNPATH 白名单）仍然有效，
 但它们证明的是**旧产物**的性质，不能用来证明 Qt 交付物。
+
+### 7.3 交付物随包的外部工具
+
+AppImage 除了 Qt/KF6/KTextEditor/KSyntaxHighlighting/tree-sitter/字体/中文翻译，还随包下列
+**外部工具**。每个都由 `packaging/runtime/assemble-appdir.sh` 安装；组装的必检清单（`REQUIRED_*`
+与自检）缺少条目时**硬失败**，不会悄悄产出一个缺工具的包。版本台账见
+`scripts/versions.env`、`scripts/versions-qt.env`、`scripts/versions-scala.env` 与
+`packaging/runtime/out/*-payload/PAYLOAD.env`。
+
+| 工具 | 版本（实测） | 用途 | 证据 |
+|---|---|---|---|
+| `verible-verilog-ls` / `verible-verilog-format` / `verible-verilog-lint` | `v0.0-4298-g085eef05` | Verilog LSP / 格式化 / lint | §3 |
+| `slang` | v12.1（CentOS 7 源码构建） | 模块树、deep lint、工程级 rename 的 AST | §6 |
+| `slang-server` | 0.3.1+2ad996f（源码构建） | 第二个 LSP 后端 | §13 |
+| `git` / `subversion` | 2.53.0 / 1.14.5 | 版本控制面板；`svnadmin` **只**用于构建 E2E 夹具，不随包 | `evidence/vcs-toolchain/` |
+| GNU `diff` | 3.3（CentOS 7 `diffutils-3.3-5.el7`） | 双栏文件和 SVN 快照比较 | `evidence/workbench-upgrade/release/preflight/` |
+| `vhdl_ls` | 0.88.0 | VHDL LSP | `evidence/batch-20261110c/vhdl/01-lsp.log` |
+| `ghdl` | 6.0.0（mcode） | VHDL 分析（合并 lint；VSG 格式化的语法门） | `evidence/batch-20261110c/vhdl/03-merged-lint.log` |
+| `vsg` + 随包 CPython | 3.36.0（Python 3.12.8） | VHDL 风格 lint 与 `--fix` 格式化 | `evidence/batch-20261110c/vhdl/04-format.log` |
+| JDK（Temurin） | 21.0.13+9 | Scala 运行 / Metals | `scripts/versions-scala.env` |
+| `scala-cli` | 1.18.0（static native） | Scala 运行 lane | `evidence/batch-20261110c/scala/01-run.log` |
+| `sbt` | 1.13.1 | sbt 工程运行 | `scripts/versions-scala.env` |
+| `metals` / `cs`（coursier） | 1.6.9 / 2.1.26 | Metals 启动器与离线解析 | `scripts/versions-scala.env` |
+| Bloop | 1.5.18（sbt）/ 2.1.2（scala-cli BSP） | Metals 的构建服务器 | `evidence/batch-20261110c/scala/metals-matrix.md` |
+| 预置缓存 | SpinalHDL 1.15.1 / Scala 2.13.12；Chisel 7.16.0 / Scala 2.13.18 + firtool | 两个示例的离线构建 | `evidence/batch-20261110c/scala/03-cache-manifest.txt`、`scala-payload/` |
+
+运行时解析顺序统一为 **bundled → local checkout → PATH → env**（工具各自的 env 名见 §10.1、
+`docs/USER_GUIDE.md` 附录 B）；工具缺失时产品给**一条**可操作的状态行，不按文件重复报错。
+文件比较优先使用 AppImage 内的私有 GNU `diff`，源码构建从 `PATH` 查找 GNU diffutils。
+
+### 7.4 运行期离线证明（交付物）
+
+要求是“构建期允许下载，**运行期零网络**”。证明方式是**把交付物解包后只读挂载、在
+`docker run --network none` 里跑真实会话，并用 `strace` 统计外部连接**：
+
+- 两个 Scala 示例（`bin/scala-example spinalhdl|chisel`）：只读挂载 + `--network none` 下
+  `EXIT=0`，分别产出 `Counter.v` / `Counter.sv`；两套预置 home 互不污染（污染计数为 0）。
+  证据：`evidence/batch-20261110c/scala-payload/01-appimage-offline.log`。
+- Metals 出厂 wrapper（`bin/metals`）：真实 LSP 会话在只读 AppDir + `--network none` 下
+  `initialized=True`、BSP 连接 7.25 s、编译 2.9 s、6 次 `publishDiagnostics`；
+  `Error downloading=0`、`Read-only file system=0`、**外部 TCP 443/80 = 0**。
+  证据：`evidence/batch-20261110c/scala-metals-launch/01-launch-session.log`。
+- **诚实边界**：`strace` 仍记录到 DNS（UDP 53）尝试，全部 `ENETUNREACH`（scala-cli 的
+  `api.github.com` 提交探测与 JVM 的本机名查询）。因此本仓库**不声称“零系统调用”**；
+  要真正零尝试需要 BSP 层的 `--offline`，该 argv 由 Metals 的 scala-cli 集成生成，不归本仓库控制。
+  矩阵与审计见 `evidence/batch-20261110c/scala/05-network-audit.md`、
+  `evidence/batch-20261110c/scala/metals-matrix.md` §A–§D。
+
+### 7.5 C ABI 的加法增长与重建要求（以 `VdRenameOptions` 为例）
+
+重命名的 `-I` / `-D` 是通过**在结构体末尾追加字段**接入的（T72）：`VdRenameOptions` 尾部新增
+`struct VdStringList include_dirs` 与 `defines`，原有字段一个也没有移动。仓库的演进规则写在
+`crates/vd-ffi/src/lib.rs` 的 `VD_ABI_VERSION` 注释里：
+
+- `VD_ABI_VERSION` 在**已导出签名的含义变化**时增加，**也**在**由提供方填充的结构体增长**时增加：
+  追加字段保住的是每个既有**偏移**，不是 `sizeof`，而 `vd_*_poll` 写的是整个当前结构体
+  （G1-c 的 `vd_catalog_poll` 写 112 字节；旧头消费者只分配 88 字节 → 越界写 24 字节）。
+  `VdModuleCatalog` 的扩展因此把版本从 1 升到 **2**；
+- 结构体**按指针传递**且 Rust 端**无条件读取**追加字段（`crates/vd-ffi/src/rename.rs` 的
+  `read_options`），所以用**旧 header** 编译过的下游 C 调用方**必须重编**，否则会读到旧结构体
+  末尾之外；
+- header 由 `build.rs`/cbindgen 从声明生成，本仓库的 C++ 与 Rust 永远同树构建，因此同树消费者
+  总是匹配；零默认（`VdRenameOptions options{}`）= 空列表 = T72 之前的行为；
+- 追加字段的类型与拼写沿用既有 ABI（`VdStringList`，与 `VdLintBatchOptions.defines` 相同），
+  没有新增导出函数、没有删除或重排字段。
+
+**重命名的回滚/原子性边界**（用户视角见 `docs/USER_GUIDE.md` §7.1）：每个文件先写临时文件再原子
+替换；任一文件失败则按校验和回滚已写文件，并点名失败的文件；预览、`Cancel`、以及 `Apply` 之前都
+不写盘。多文件写入是**回滚**而不是文件系统事务（两个文件之间崩溃不会回滚）。
 
 ## 8. 可复现性（旧版 lane 的边界）
 
@@ -226,13 +324,21 @@ cargo metadata --format-version 1 --all-features > meta.json
 | `verible-verilog-ls` / `slang` 找不到 | 运行期按 **随包 → 本地取 → PATH → env** 解析（见 §10.1）；裸构建里先跑 `bash scripts/fetch-verible.sh` 与 `bash build/slang/build.sh`，或用 `VEDIT_VERIBLE_LS` / `VEDIT_SLANG` 指定 |
 | `--selftest all` 失败在 `lsp` 的 definition 检查 | 运行目录里没有 fixtures：设置 `VEDIT_SELFTEST_FIXTURES=<share>/vedit/testdata` |
 
-### 10.1 运行期工具链发现（Qt 产品：诊断 / 大纲：随包 / 本地取 / env）
+### 10.1 运行期工具链发现（Qt 产品：Verilog / VHDL / Scala：随包 / 本地取 / env）
 
-`vedit-app` 的诊断/大纲面板需要 `verible-verilog-ls`（LSP）与 `slang`（deep lint）。
-解析顺序固定为 **bundled → local checkout → PATH → env**，并把结果打印出来
-（`--selfcheck` 的 `TOOLCHAIN source=verible:<source> slang:<source> missing=[...] local=[...]`）：
+`vedit-app` 的各条 lane 需要不同的外部工具，但它们走**同一个解析器**
+（`src/workspace/diagnostics/toolchain.cpp`），顺序固定为
+**bundled → local checkout → PATH → env**，并把结果打印出来：
 
-1. **随包（bundled）**：把两个二进制放进 `vd-app` 同目录的 `bin/`（AppDir/AppImage
+- Verilog/SystemVerilog：`verible-verilog-ls`（LSP）与 `slang`（deep lint、模块树、
+  工程级 rename 的 AST）——`--selfcheck` 的 `TOOLCHAIN source=verible:<source> slang:<source>
+  missing=[...] local=[...]`；
+- VHDL：`vhdl_ls`、`ghdl`、`vsg`（+ 随包 CPython）——`VHDL-TOOLCHAIN source=vhdl_ls:… ghdl:…
+  vsg:… missing=[...]`；
+- Scala：`java`、`scala-cli`、`sbt`、`metals`——同一 `TOOLCHAIN` 行尾的 `scala source=…`；
+- 版本控制：`git`、`svn` ——`VCS-TOOLCHAIN git=… version=… svn=… version=… source=bundled`。
+
+1. **随包（bundled）**：把二进制放进 `vd-app` 同目录的 `bin/`（AppDir/AppImage
    形态；打包后不需要任何额外配置）。
 2. **本地取（local checkout，裸构建用这条）**：在源码树里执行
    ```sh
@@ -242,13 +348,15 @@ cargo metadata --format-version 1 --all-features > meta.json
    ```
    解析器从 `target/qt6-build/src/app/vedit-app` 向上找到 checkout 根（标记
    `scripts/fetch-verible.sh`）后自动探测上述产物，**不需要设置任何环境变量**。
-3. **env 指定**：`VEDIT_VERIBLE_LS=/path/verible-verilog-ls`、
-   `VEDIT_SLANG=/path/slang`（也支持 `VEDIT_VERIBLE_LS_DIR` / `VEDIT_SLANG_DIR`
-   指向目录）。
+3. **env 指定**：`VEDIT_VERIBLE_LS`、`VEDIT_SLANG`、`VEDIT_VHDL_LS`、`VEDIT_GHDL`、
+   `VEDIT_VSG`、`VEDIT_GIT`、`VEDIT_SVN`（诊断类工具都支持 `_DIR` 形式指向目录）。
+   Scala 的 `java` / `scala-cli` / `sbt` / `metals` 走**同一个解析器**（bundled → local
+   checkout → PATH；设置页暂无它们的路径字段），本批次不声称它们接受 `VEDIT_*` 覆盖。
 
-缺工具时，diagnostics/outline 面板只显示**一条**面板级状态（缺什么、影响什么、
-三条修复路径），outline 保持空表 + 一行原因；不会按文件/请求重复报错，也不把
-“环境未满足”当作文件级 Error。
+缺工具时，对应面板/状态栏只显示**一条**状态（缺什么、影响什么、三条修复路径），
+outline 保持空表 + 一行原因；不会按文件/请求重复报错，也不把“环境未满足”当作文件级 Error。
+VHDL 的三条工具缺失文案与 Scala 的随包解析细节见 `docs/USER_GUIDE.md` §9.4 / §9.5，
+随包版本台账见本文 §7.3。
 
 ## 11. GitHub Actions（旧版 lane 的 CI / 镜像 / 发版）
 
@@ -426,6 +534,34 @@ C++ lane 没有独立的 MPD gate id（ledger 的 id 表是固定的），因此
 | `KTextEditor::Editor::instance()` 为 null | 缺 katepart 插件（`libkf6texteditor-katepart`，已锁定） |
 | 想复用已发布镜像 | `VEDIT_QT6_BUILD_IMAGE_REF=… VEDIT_QT6_BUILD_IMAGE_PULL=1 bash scripts/build-qt.sh` |
 
+### 12.8 ctest 基线与已知红点
+
+- **基线随卡增长，以当时的 `ctest -N` 为准（不是固定数字）**：仓库只冻结过一个历史参照——release
+  0.2.1 的 `100% tests passed, 0 tests failed out of 60`
+  （`evidence/ux-batch-2/release-0.2.1/gates/qt6-lane.log:1415`）。用例数随 lane 增加：本批次窗口
+  实测 63（`evidence/batch-20261110c/gate-fixes/logs/20-window-ctest-full.log`），同一工作树后续
+  再实测 **65**（`evidence/batch-20261110c/vhdl/02-config.log:226-231`，16:15 终态树：438 个构建
+  目标、`0 failed out of 65`、`CTEST_EXIT=0`）。所以判据是：**先跑 `ctest -N` 记下当时注册数 N，
+  再要求 `ctest` 100% 通过且总数等于 N**；60 只是历史参照值，不是当前阈值。示例：注册 65 条 ↔
+  T14 终态树（16:15，其他卡的编辑已落定）。
+- **已知 flaky（不是产品缺陷），已由 batch-20261114 T1 修测试消除**：`vedit-rm9-status-dots-e2e` 的
+  `rm9.tree-group-status-matches-map` / `rm9.panel-status-matches-map` /
+  `rm9.panel-renders-status-mark` 曾在同批二进制上偶发失败（隔离复跑 55 次中 6 次，≈11%）。
+  根因：测试在 “From filelist” 分组出现后立即断言状态点，而状态点由 400 ms 的 `liveTimer_` 轮询
+  发布；分组由 `projectFilesRevision` **同步发布**，但**文件树在自己的 500 ms tick 上消费**（分组与
+  状态点一并重算），两条链路各自计时 —— 之前写成「分组是同步的、所以没有差拍」是**半真**的，
+  差拍正来自「发布同步、消费不同步」。定性、复跑数据与失败日志：`evidence/batch-20261110c/gate-fixes/README.md`
+  §2.3 与 `gate-fixes/logs/`。
+  **batch-20261114 T1（契约 §4/§8 A53）已修测试**：三条断言前先等发布出去的
+  `vedit.diagnostics.viewRevision` 越过本次 pass 的完成点（`rm9.published-past-pass`），不睡固定时长，
+  也不放宽断言；验收 50 连跑 + `taskset -c 0` 负载下 10 跑全绿，
+  证据 `evidence/batch-20261114/t1/`。本条不再适用「不得通过改测试消除它」——那是上一批在
+  「根因未证实、只观察到 flaky」时的裁定；本批先复现 RED 再定根因在测试，故允许且要求改测试。
+- **`vedit-rename-e2e` 的 SIGPIPE**：真缺陷（T134 类：Rust 静态链进 C++ 宿主，Rust 运行时的
+  `SIGPIPE -> SIG_IGN` 不执行）；已在用例入口装 `std::signal(SIGPIPE, SIG_IGN)`（只此一处），
+  隔离 2/2 与窗口内全量 ctest 全绿。证据同目录 §2.1。
+- **`vedit-workspace-vcs-selftest` 的陈旧 e2e 二进制**：全量重建后无代码改动即绿（非产品缺陷）。
+
 ## 13. slang-server（LSP 后端二）：spike 结论与构建/运行方式
 
 `slang-server` **不随 slang 发布**，是第三方项目
@@ -496,3 +632,25 @@ spike 的 kill 判据是 **>30 s 或 >1 GiB**：两个引擎都远低于该门�
   `slang.getInstancesOfModule`、`slang.searchHierarchy`、`slang.getDriversWithLocation`、
   `slang.getLoadsWithLocation`、`slang.setTopLevel`、`slang.setBuildFile`；响应形状见
   `evidence/w2-spike/06-hierarchy-lsp-shape.txt`。
+
+## 14. MPD gate ids 的两个已知缺陷（记录，不修）
+
+本仓库的 gate 定义映射在 `package.json`（`verify:*` → `build/gates/*.sh`），随仓库一起交付，
+但真正的判定走 MPD ledger。有两个 **ledger 侧的已知缺陷**，按需求“不改任何 gate 定义、只记录并
+附原因与输出”处理；`manifest` 也不得顶替 `gates` 作为 PASS 证据。
+
+1. **`tests` id 对 Rust/C++ 产品不可达**：ledger 的固定 argv 是 `bun test packages`，而本仓库没有
+   `packages/` 目录、也没有任何 `bun test` 套件，所以该 id 必然红。真实的测试入口是
+   `build/gates/gates.sh`（ledger 可达的 `gates` id 把一个完整重活跑完：slang ELF 断言 +
+   `scripts/gates.sh` 的 Rust 全套 + `build/gates/qt6-cxx.sh` 的 configure/build/ctest/xcb 冒烟）；
+   `build/gates/tests.sh` 是**人工入口**，不是 evidence 来源（脚本首行注释即写明）。
+   记录出处：`package.json` 的 `description`、`build/gates/tests.sh` 文件头、
+   `build/gates/gates.sh` 尾部注释、`evidence/final-acceptance-2/AC-MATRIX.md:35`。
+2. **G10：`comments` / `rows` 是 MPD-bundle 的门禁，本产品没有对应实体**：`comments` 依赖 MPD
+   bundle 的 comment-checker 二进制；`rows` 检查 MPD ledger 的行纪律。两者在本仓库都**没有**
+   可检查的对象，脚本按“诚实红”处理（`no_gate` 打印原因，不伪装绿）。
+   记录出处：`build/gates/comments.sh`、`build/gates/rows.sh`、
+   `evidence/batch-20261110/shell-cleanup/AUTHORIZATION.md:70`。
+
+这两条都不在本仓库的修复范围（改 gate 定义会破坏 ledger 的冻结口径，也违反“不得改 gate 通关”）；
+验收矩阵把它们记为**已记录的已知缺陷/豁免**，而不是 PASS。

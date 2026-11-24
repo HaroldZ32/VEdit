@@ -1,7 +1,8 @@
 # Project fixture for the C ABI smoke test (Slice 0, task T4).
 #
-# The filelist lives under rtl/ on purpose: the project root is auto-scanned for
-# `*.f` files, so a list in the root would be discovered twice and the expected
-# file order would stop being the thing the test asserts.
+# The default file set is exactly the DECLARED filelists (this `[project]
+# filelists` entry): no root-level `*.f` discovery and no recursive source scan.
+# `[project] auto_discover = true` would restore the legacy union (see
+# docs/USER_GUIDE.md §2.8).
 [project]
 filelists = ["rtl/files.f"]

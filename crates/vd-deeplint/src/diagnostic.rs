@@ -119,6 +119,11 @@ pub struct Diagnostic {
     pub message: String,
     /// slang diagnostic code (`UndeclaredIdentifier`, …).
     pub code: String,
+    /// The engine's typed option name: slang's `optionName` (`implicit-net`,
+    /// `unused-variable`, …), when it reports one. It is NOT the JSON `code`
+    /// and it is what a slang waiver is written from (`diagnostic = "…"`), so it
+    /// crosses this model as a typed field instead of living only in `raw`.
+    pub option_name: Option<String>,
     /// Primary location, when slang reported one (`TooManyErrors` has none).
     pub location: Option<RawLocation>,
     /// All ranges as reported (empty for `ImplicitNet` and `TooManyErrors`).
@@ -299,6 +304,7 @@ pub(crate) struct ParsedDiagnostic {
     pub severity: Severity,
     pub message: String,
     pub code: String,
+    pub option_name: Option<String>,
     pub location: Option<RawLocation>,
     pub ranges: Vec<RawRange>,
     pub symbol_path: Option<String>,
@@ -500,10 +506,16 @@ fn parse_wire_element(
             None,
         ),
     };
+    let option_name = value
+        .get("optionName")
+        .and_then(serde_json::Value::as_str)
+        .filter(|name| !name.is_empty())
+        .map(str::to_string);
     Ok(ParsedDiagnostic {
         severity: Severity::from_wire(&wire.severity),
         message: wire.message,
         code: wire.code,
+        option_name,
         location,
         ranges: wire
             .ranges
@@ -587,6 +599,7 @@ pub(crate) fn convert_diagnostic(
         severity: parsed.severity,
         message: parsed.message,
         code: parsed.code,
+        option_name: parsed.option_name,
         location: parsed.location,
         ranges: parsed.ranges,
         symbol_path: parsed.symbol_path,
@@ -692,6 +705,11 @@ mod tests {
                 .and_then(|value| value.as_str()),
             Some("implicit-net"),
             "unknown keys must survive in raw"
+        );
+        assert_eq!(
+            diagnostic.option_name.as_deref(),
+            Some("implicit-net"),
+            "optionName is a TYPED field now, not only a raw-JSON key"
         );
     }
 

@@ -6,6 +6,8 @@
 #include <QFileInfo>
 #include <QStringLiteral>
 
+#include <algorithm>
+
 #include <utility>
 #include <QCoreApplication>
 
@@ -23,6 +25,55 @@ constexpr int kSettingsDebounceMs = 150;
 // mounts, containers without inotify): a changed stamp re-expands within a
 // second, so an edited `-I`/`-D` still takes effect without a restart.
 constexpr int kSettingsPollMs = 1000;
+
+// One project `-D` entry normalised for comparison: `NAME`, `NAME=VALUE` with
+// the whitespace around `=` dropped (the spelling the Rust parser accepts).
+QString normalizedDefineEntry(const QString &entry)
+{
+    const QString trimmed = entry.trimmed();
+    const int equals = trimmed.indexOf(QLatin1Char('='));
+    if (equals < 0) {
+        return trimmed;
+    }
+    return trimmed.left(equals).trimmed() + QLatin1Char('=')
+           + trimmed.mid(equals + 1).trimmed();
+}
+
+// The Rust `parse_define` rule (crates/vd-config/src/project.rs): an ASCII
+// identifier, optionally followed by `=VALUE`. Kept identical so the panel never
+// stores an entry the expansion would refuse.
+bool isDefineIdentifier(const QString &name)
+{
+    if (name.isEmpty()) {
+        return false;
+    }
+    const QChar first = name.at(0);
+    if (!(first.unicode() < 128 && first.isLetter()) && first != QLatin1Char('_')) {
+        return false;
+    }
+    for (int index = 1; index < name.size(); ++index) {
+        const QChar character = name.at(index);
+        if (character.unicode() >= 128
+            || !(character.isLetterOrNumber() || character == QLatin1Char('_'))) {
+            return false;
+        }
+    }
+    return true;
+}
+
+// A path entry that cannot be spelled safely in a filelist line or an argv slot.
+bool hasUnsafeEntryCharacters(const QString &entry)
+{
+    for (const QChar character : entry) {
+        if (character.category() == QChar::Other_Control) {
+            return true;
+        }
+        if (character == QLatin1Char('"')) {
+            return true;
+        }
+    }
+    return false;
+}
 
 } // namespace
 
@@ -63,11 +114,11 @@ ProjectModel::~ProjectModel()
     }
 }
 
-bool ProjectModel::restoreFromDisk(QString *error)
+bool ProjectModel::restoreFromDisk(QString *error, bool restoreCachedFiles)
 {
     bool ok = false;
     QString loadError;
-    ProjectState state = store_.load(&ok, &loadError);
+    ProjectState state = store_.load(&ok, &loadError, restoreCachedFiles);
     if (!ok) {
         if (error != nullptr) {
             *error = loadError;
@@ -90,6 +141,8 @@ bool ProjectModel::restoreFromDisk(QString *error)
     }
     relativeFiles_.clear();
     missingVariables_.clear();
+    referencedVariables_.clear();
+    referencedVariableLayers_.clear();
     skipped_ = 0;
     restored_ = true;
     lastError_.clear();
@@ -125,6 +178,8 @@ void ProjectModel::open(const QString &projectRoot)
         state_.top = topByRoot.value(absolute);
         relativeFiles_.clear();
         missingVariables_.clear();
+        referencedVariables_.clear();
+        referencedVariableLayers_.clear();
         skipped_ = 0;
         restored_ = false;
         emit filelistsChanged();
@@ -221,6 +276,51 @@ QStringList ProjectModel::missingVariables() const
     return missingVariables_;
 }
 
+QStringList ProjectModel::referencedVariables() const
+{
+    return referencedVariables_;
+}
+
+QStringList ProjectModel::referencedVariableLayers() const
+{
+    return referencedVariableLayers_;
+}
+
+QString ProjectModel::referencedVariableLayer(const QString &name) const
+{
+    // The two lists are parallel by contract (E1); stop at the shorter one so a
+    // malformed payload can never read past the end.
+    const int count = std::min(referencedVariables_.size(), referencedVariableLayers_.size());
+    for (int index = 0; index < count; ++index) {
+        if (referencedVariables_.at(index) == name) {
+            return referencedVariableLayers_.at(index);
+        }
+    }
+    return {};
+}
+
+QVariantMap ProjectModel::expansionInputs() const
+{
+    QVariantMap inputs;
+    inputs.insert(QStringLiteral("root"), projectRoot());
+    inputs.insert(QStringLiteral("filelists"), filelists());
+    inputs.insert(QStringLiteral("variables"), variables());
+    inputs.insert(QStringLiteral("projectIncludeDirs"), projectIncludeDirs());
+    inputs.insert(QStringLiteral("projectDefines"), projectDefines());
+    inputs.insert(QStringLiteral("settingsPath"), settingsPath());
+    inputs.insert(QStringLiteral("expansions"), static_cast<qulonglong>(expansionCount()));
+    // batch-20261115 AC-2.1/AC-2.2: the ONE gate the consumers share. True means
+    // "this root is a project": the module tree may catalogue it and the
+    // diagnostics lane may expand its file set. Publishing it here (instead of
+    // letting each lane re-derive the rule) keeps a single answer for one root.
+    inputs.insert(QStringLiteral("hasFilelist"), hasFilelist());
+    // batch-20261114 E1/E2: the referenced set + the layer each name resolved in.
+    // Parallel lists (the ABI's own shape), empty until the first expansion.
+    inputs.insert(QStringLiteral("referencedVariables"), referencedVariables_);
+    inputs.insert(QStringLiteral("referencedVariableLayers"), referencedVariableLayers_);
+    return inputs;
+}
+
 int ProjectModel::skippedCount() const
 {
     return skipped_;
@@ -281,6 +381,12 @@ void ProjectModel::setTop(const QString &top)
 {
     const QString trimmed = top.trimmed();
     if (trimmed == state_.top) {
+        // AC-7.2 (batch-20261115): choosing the SAME top again is not a no-op.
+        // The tree/catalog may not be running that top (a failed run, a root
+        // switch that has not finished), so the choice must re-announce itself
+        // and let the module-tree holder force its catalog run. Nothing is
+        // persisted again: the stored value is already this one.
+        emit stateChanged();
         return;
     }
     state_.top = trimmed;
@@ -334,6 +440,30 @@ void ProjectModel::reloadSettings()
 bool ProjectModel::hasProject() const
 {
     return state_.isValid();
+}
+
+bool ProjectModel::hasFilelist() const
+{
+    // AC-2.1/AC-2.5 + A61.2: "this folder is a project" means the user
+    // EXPLICITLY imported a filelist (the Project panel's `Import Filelist…`
+    // action, or the explicit "Import" answer to the question the open seam asks
+    // for a `.f`). Merely OPENING a `.f` never imports it, and a `.f` merely
+    // sitting in the root is NOT an import. Since the 2026-11-18 file-set
+    // decision the Rust expansion only auto-discovers such a file when the root
+    // opts in with `[project] auto_discover = true` (default `false`), and even
+    // then it adds FILES to an existing project - it never turns a folder into
+    // one by itself (docs/USER_GUIDE.md §2.8).
+    return !state_.filelists.isEmpty();
+}
+
+QString ProjectModel::noFilelistReason() const
+{
+    // AC-2.1: the empty state names the ONE action that turns the folder into a
+    // project, instead of an empty tree with no explanation.
+    return QCoreApplication::translate(
+        "VEdit",
+        "No filelist — import a .f filelist (Project ▸ Import Filelist…) to build the "
+        "project; until then every tool works on the open file only");
 }
 
 bool ProjectModel::isPending() const
@@ -397,6 +527,186 @@ QStringList ProjectModel::defines() const
     return state_.defines;
 }
 
+QStringList ProjectModel::projectIncludeDirs() const
+{
+    return state_.projectIncludeDirs;
+}
+
+QStringList ProjectModel::projectDefines() const
+{
+    return state_.projectDefines;
+}
+
+QString ProjectModel::resolveProjectIncludeDir(const QString &entry) const
+{
+    const QString trimmed = entry.trimmed();
+    if (trimmed.isEmpty()) {
+        return QString();
+    }
+    const QFileInfo info(trimmed);
+    if (info.isAbsolute()) {
+        return QDir::cleanPath(trimmed);
+    }
+    return QDir::cleanPath(QDir(state_.root).filePath(trimmed));
+}
+
+QStringList ProjectModel::resolvedIncludeDirs() const
+{
+    QStringList resolved;
+    for (const QString &entry : state_.projectIncludeDirs) {
+        const QString path = resolveProjectIncludeDir(entry);
+        if (!path.isEmpty()) {
+            resolved.append(path);
+        }
+    }
+    return resolved;
+}
+
+bool ProjectModel::validateProjectEntry(const QString &entry, bool includeDir, QString *error) const
+{
+    const QString trimmed = entry.trimmed();
+    if (trimmed.isEmpty()) {
+        if (error != nullptr) {
+            *error = includeDir
+                         ? QCoreApplication::translate("VEdit", "An include dir cannot be empty")
+                         : QCoreApplication::translate("VEdit", "A define cannot be empty");
+        }
+        return false;
+    }
+    if (hasUnsafeEntryCharacters(trimmed)) {
+        if (error != nullptr) {
+            *error = QCoreApplication::translate(
+                         "VEdit", "\"%1\" contains a control character or a double quote")
+                         .arg(trimmed);
+        }
+        return false;
+    }
+    if (includeDir) {
+        const QString candidate = QDir::cleanPath(
+            QFileInfo(trimmed).isAbsolute() ? trimmed : QDir(state_.root).filePath(trimmed));
+        for (const QString &existing : state_.projectIncludeDirs) {
+            if (resolveProjectIncludeDir(existing) == candidate) {
+                if (error != nullptr) {
+                    *error = QCoreApplication::translate("VEdit", "\"%1\" is already an include dir")
+                                 .arg(trimmed);
+                }
+                return false;
+            }
+        }
+        return true;
+    }
+    const int equals = trimmed.indexOf(QLatin1Char('='));
+    const QString name = (equals < 0 ? trimmed : trimmed.left(equals)).trimmed();
+    if (!isDefineIdentifier(name)) {
+        if (error != nullptr) {
+            *error = QCoreApplication::translate(
+                         "VEdit", "\"%1\" is not NAME or NAME=VALUE (the name must be an identifier)")
+                         .arg(trimmed);
+        }
+        return false;
+    }
+    const QString normalized = normalizedDefineEntry(trimmed);
+    for (const QString &existing : state_.projectDefines) {
+        if (normalizedDefineEntry(existing) == normalized) {
+            if (error != nullptr) {
+                *error = QCoreApplication::translate("VEdit", "\"%1\" is already a define")
+                             .arg(trimmed);
+            }
+            return false;
+        }
+    }
+    return true;
+}
+
+bool ProjectModel::addIncludeDir(const QString &entry, QString *error)
+{
+    if (!validateProjectEntry(entry, true, error)) {
+        return false;
+    }
+    state_.projectIncludeDirs.append(entry.trimmed());
+    saveState();
+    startExpansion(true);
+    emit stateChanged();
+    return true;
+}
+
+bool ProjectModel::removeIncludeDir(const QString &entry)
+{
+    const QString trimmed = entry.trimmed();
+    const QString wanted = resolveProjectIncludeDir(trimmed);
+    for (int index = 0; index < state_.projectIncludeDirs.size(); ++index) {
+        const QString &existing = state_.projectIncludeDirs.at(index);
+        if (existing.trimmed() == trimmed || resolveProjectIncludeDir(existing) == wanted) {
+            state_.projectIncludeDirs.removeAt(index);
+            saveState();
+            startExpansion(true);
+            emit stateChanged();
+            return true;
+        }
+    }
+    return false;
+}
+
+bool ProjectModel::addDefine(const QString &entry, QString *error)
+{
+    if (!validateProjectEntry(entry, false, error)) {
+        return false;
+    }
+    state_.projectDefines.append(normalizedDefineEntry(entry));
+    saveState();
+    startExpansion(true);
+    emit stateChanged();
+    return true;
+}
+
+bool ProjectModel::removeDefine(const QString &entry)
+{
+    const QString normalized = normalizedDefineEntry(entry);
+    for (int index = 0; index < state_.projectDefines.size(); ++index) {
+        if (normalizedDefineEntry(state_.projectDefines.at(index)) == normalized) {
+            state_.projectDefines.removeAt(index);
+            saveState();
+            startExpansion(true);
+            emit stateChanged();
+            return true;
+        }
+    }
+    return false;
+}
+
+QStringList ProjectModel::displayIncludeDirs() const
+{
+    QStringList display = state_.projectIncludeDirs;
+    QStringList covered;
+    for (const QString &entry : state_.projectIncludeDirs) {
+        const QString path = resolveProjectIncludeDir(entry);
+        if (!path.isEmpty()) {
+            covered.append(path);
+        }
+    }
+    for (const QString &effective : state_.includeDirs) {
+        if (!covered.contains(QDir::cleanPath(effective))) {
+            display.append(effective);
+        }
+    }
+    return display;
+}
+
+QStringList ProjectModel::displayDefines() const
+{
+    QStringList display = state_.projectDefines;
+    QStringList covered;
+    for (const QString &entry : state_.projectDefines) {
+        covered.append(normalizedDefineEntry(entry));
+    }
+    for (const QString &effective : state_.defines) {
+        if (!covered.contains(normalizedDefineEntry(effective))) {
+            display.append(effective);
+        }
+    }
+    return display;
+}
+
 QStringList ProjectModel::diagnostics() const
 {
     QStringList out = state_.diagnostics;
@@ -449,6 +759,22 @@ QString ProjectModel::summary() const
         text += QCoreApplication::translate("VEdit", " · %1 unresolved")
                     .arg(missingVariables_.size());
     }
+    // AC-7.1 (batch-20261115): the module tree's root follows the user's top, so
+    // the summary names it - the one line that says WHY the tree shows a
+    // subtree instead of every uninstantiated module.
+    if (!state_.top.isEmpty()) {
+        text += QCoreApplication::translate("VEdit", " · top %1").arg(state_.top);
+    }
+    if (!hasFilelist()) {
+        // AC-2.1: the folder is open but it is not a project yet; the file set is
+        // empty on purpose, so the summary must say so rather than "0 files".
+        text += QCoreApplication::translate("VEdit", " · no filelist (tools use the open file)");
+    }
+    if (!hasFilelist()) {
+        // The "no filelist" segment above IS this project's state: no expansion
+        // ran (or is running), so none of the live/restored suffixes is true.
+        return text;
+    }
     if (pending_) {
         text += QCoreApplication::translate("VEdit", " (expanding…)");
     } else if (!lastError_.isEmpty()) {
@@ -463,12 +789,34 @@ QString ProjectModel::summary() const
 
 QString ProjectModel::backendArguments() const
 {
+    // AC-1.5 + AC-2.5: the project's own typed entries come first (an `-I` is
+    // resolved against the root, exactly as the expansion passes it), then the
+    // effective entries the filelist/project file/tools page contributed that no
+    // project entry already covers. This is the projection the child argv gets
+    // once the re-expansion settles, and it is already correct for a freshly
+    // typed entry.
+    QStringList dirs = resolvedIncludeDirs();
+    for (const QString &effective : state_.includeDirs) {
+        const QString cleaned = QDir::cleanPath(effective);
+        if (!dirs.contains(cleaned)) {
+            dirs.append(cleaned);
+        }
+    }
+    QStringList defines;
+    for (const QString &entry : state_.projectDefines) {
+        defines.append(normalizedDefineEntry(entry));
+    }
+    for (const QString &effective : state_.defines) {
+        if (!defines.contains(normalizedDefineEntry(effective))) {
+            defines.append(effective);
+        }
+    }
     QStringList arguments;
-    arguments.reserve(state_.includeDirs.size() + state_.defines.size());
-    for (const QString &dir : state_.includeDirs) {
+    arguments.reserve(dirs.size() + defines.size());
+    for (const QString &dir : dirs) {
         arguments.append(QStringLiteral("-I%1").arg(dir));
     }
-    for (const QString &define : state_.defines) {
+    for (const QString &define : defines) {
         arguments.append(QStringLiteral("-D%1").arg(define));
     }
     return arguments.join(QLatin1Char(' '));
@@ -548,6 +896,46 @@ bool ProjectModel::saveState()
 
 void ProjectModel::startExpansion(bool force)
 {
+    // A root that no longer exists is a VISIBLE failure, never an empty tree -
+    // and it stays reported now that the filelist gate below would otherwise
+    // short-circuit with "nothing to expand" (the restored session and a moved
+    // project both land here).
+    if (!state_.root.isEmpty() && !QFileInfo(state_.root).isDir()) {
+        recordFailure(QCoreApplication::translate("VEdit", "the project root does not exist: %1")
+                          .arg(state_.root));
+        return;
+    }
+    // AC-2.1/AC-2.5 (batch-20261115): without a filelist the folder is NOT a
+    // project. Nothing is scanned, no service job is started and the file set
+    // stays empty - the panel shows `noFilelistReason()` and every tool works on
+    // the open file. Importing the first `.f` turns the same root into a project
+    // (this gate then passes) without re-opening it.
+    if (!hasFilelist()) {
+        if (job_ != 0) {
+            service_.cancel(job_);
+            job_ = 0;
+        }
+        pending_ = false;
+        pendingRoot_.clear();
+        pendingFilelists_.clear();
+        pendingVariables_.clear();
+        pendingIncludeDirs_.clear();
+        pendingDefines_.clear();
+        pollTimer_.stop();
+        lastError_.clear();
+        relativeFiles_.clear();
+        missingVariables_.clear();
+        referencedVariables_.clear();
+        referencedVariableLayers_.clear();
+        skipped_ = 0;
+        state_.files.clear();
+        state_.includeDirs.clear();
+        state_.defines.clear();
+        state_.diagnostics.clear();
+        emit stateChanged();
+        emit refreshFinished(true, QString());
+        return;
+    }
     // RM-2: ONE expansion per project switch. One root change is announced by
     // several live surfaces (the file tree's `directoryOpened`, the shell's
     // `projectRootChanged`, the `.f` importer / a restore), and each report
@@ -556,7 +944,9 @@ void ProjectModel::startExpansion(bool force)
     // for an explicit Refresh or a settings-file change, where the inputs are
     // unchanged but the answer must be recomputed.
     if (!force && pending_ && job_ != 0 && pendingRoot_ == state_.root
-        && pendingFilelists_ == state_.filelists && pendingVariables_ == state_.variables) {
+        && pendingFilelists_ == state_.filelists && pendingVariables_ == state_.variables
+        && pendingIncludeDirs_ == state_.projectIncludeDirs
+        && pendingDefines_ == state_.projectDefines) {
         return;
     }
     if (pending_ && job_ != 0) {
@@ -564,7 +954,8 @@ void ProjectModel::startExpansion(bool force)
         job_ = 0;
     }
     quint64 id = 0;
-    if (service_.start(state_.root, state_.filelists, state_.variables, settingsPath(), &id)
+    if (service_.start(state_.root, state_.filelists, state_.variables,
+                       state_.projectIncludeDirs, state_.projectDefines, settingsPath(), &id)
         != ProjectService::Start::Started) {
         recordFailure(service_.lastError());
         return;
@@ -574,6 +965,8 @@ void ProjectModel::startExpansion(bool force)
     pendingRoot_ = state_.root;
     pendingFilelists_ = state_.filelists;
     pendingVariables_ = state_.variables;
+    pendingIncludeDirs_ = state_.projectIncludeDirs;
+    pendingDefines_ = state_.projectDefines;
     ++expansionCount_;
     lastError_.clear();
     deadline_.start();
@@ -628,11 +1021,19 @@ void ProjectModel::adopt(const ExpansionPayload &payload)
     state_.files = payload.files;
     relativeFiles_ = payload.relativeFiles;
     missingVariables_ = payload.missingVariables;
+    referencedVariables_ = payload.referencedVariables;
+    referencedVariableLayers_ = payload.referencedVariableLayers;
     skipped_ = payload.skipped;
     state_.includeDirs = payload.includeDirs;
     state_.defines = payload.defines;
     state_.diagnostics = payload.diagnostics;
     state_.capturedAt = ProjectState::nowUtc();
+    // G1-e (review): record WHICH authored inputs produced this file set. Saving
+    // the fingerprint here (not recomputing it on every save) is what makes the
+    // check meaningful: an import/top/variable change saves the OLD fingerprint
+    // until the next answer replaces it, so the next load sees that the declared
+    // inputs moved on and refuses the file set that answered the previous ones.
+    state_.inputsFingerprint = state_.computeInputsFingerprint();
     restored_ = false;
     lastError_.clear();
     saveState();

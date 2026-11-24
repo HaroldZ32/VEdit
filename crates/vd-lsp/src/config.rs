@@ -19,6 +19,7 @@
 //! [`LspConfig::command_line`] renders the exact program plus argv, which is the
 //! dump AC-2.5 asks for (it spawns nothing).
 
+use std::collections::BTreeMap;
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use std::time::Duration;
@@ -50,6 +51,11 @@ pub struct LspConfig {
     pub request_timeout: Duration,
     /// Budget for the graceful `shutdown`/`exit` sequence.
     pub shutdown_timeout: Duration,
+    /// Variables the server process receives on top of the inherited
+    /// environment (the imported selection, AC-1.3). Empty means "inherit".
+    /// `LD_LIBRARY_PATH`/`LOCPATH` are removed by the spawn regardless, the same
+    /// rule the tool children apply.
+    pub environment: BTreeMap<String, String>,
 }
 
 impl LspConfig {
@@ -67,6 +73,7 @@ impl LspConfig {
             init_timeout: Duration::from_secs(10),
             request_timeout: Duration::from_secs(15),
             shutdown_timeout: Duration::from_secs(5),
+            environment: BTreeMap::new(),
         }
     }
 
@@ -103,6 +110,12 @@ impl LspConfig {
     /// Append an extra argument.
     pub fn with_extra_arg(mut self, argument: impl Into<OsString>) -> Self {
         self.extra_args.push(argument.into());
+        self
+    }
+
+    /// Give the server process the imported selection (AC-1.3).
+    pub fn with_environment(mut self, environment: BTreeMap<String, String>) -> Self {
+        self.environment = environment;
         self
     }
 

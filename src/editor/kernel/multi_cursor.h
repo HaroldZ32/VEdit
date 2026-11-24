@@ -59,6 +59,13 @@ namespace vedit::editor {
 // widget ignores (Qt propagates unhandled key presses to the parent), but it
 // silently loses any key the kernel consumes — which is how a dead shortcut can
 // pass a lane test that addresses the View directly.
+//
+// Rule 3 is FOCUS AWARENESS: the tree below the view also holds overlay
+// controls (the find/replace bar's fields, its scope selector). A key delivered
+// to a text-entry control belongs to that control, so a kernel filter must
+// decline it (`isTextEntryControl`) instead of editing the document — otherwise
+// Return in the find field inserts a newline instead of searching, and the key
+// propagates on into KatePart even when the field does handle it.
 void installEditorEventFilter(KTextEditor::View *view, QObject *filter);
 bool isEditorOwnedWidget(const KTextEditor::View *view, const QObject *watched);
 
@@ -111,6 +118,22 @@ public:
     QList<KTextEditor::Cursor> cursors() const;
     int cursorCount() const;
     bool blockSelectionActive() const;
+    // True only while a block DRAG gesture is in progress (the stale-state flag
+    // batch 20261110d resets on press/focus-out; the regression test reads it).
+    bool blockDragInProgress() const { return blockDragging_; }
+    // The native block/column mode of this view (`View::blockSelection()`), the
+    // switch the checkable `edit.block-selection` command drives (Ctrl+Shift+B).
+    // Q_INVOKABLE: the shell reaches this seam through the object name (the app
+    // layer deliberately does not include this header — KTextEditor types stay in
+    // the editor lane), so the command handler can toggle the mode without a
+    // link/include edge.
+    Q_INVOKABLE bool blockSelectionMode() const;
+    Q_INVOKABLE void setBlockSelectionMode(bool enabled);
+    // Batch 20261110d: "add a cursor at the end of every selected line" — the
+    // feature the kernel exposes only as the undiscoverable Alt+Shift+I action.
+    // Works on any selection (including a block rectangle); returns false when
+    // there is no selection or the document is empty.
+    Q_INVOKABLE bool addCursorsAtSelectionLineEnds();
 
     // Actions — the same code the mouse and keys run (the lane test drives them
     // directly where a key/mouse event would only re-test Qt's event routing).
@@ -153,8 +176,11 @@ private:
     KTextEditor::Cursor blockAnchor_;
     KTextEditor::Cursor blockExtent_;
     bool blockDragging_ = false;
-    bool blockActive_ = false;
     KTextEditor::Cursor altPressAnchor_;
+    // Where the Alt press landed, in view coordinates: the click/drag decision
+    // uses the platform drag distance, so a short drag can no longer become a
+    // stray multi-cursor (batch 20261110d).
+    QPoint altPressPoint_;
     bool altPressActive_ = false;
     bool definitionClickActive_ = false;
     bool definitionNoticeShown_ = false;

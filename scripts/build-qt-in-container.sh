@@ -9,7 +9,8 @@ set -euo pipefail
 
 WORK="${VEDIT_WORKSPACE:-/vedit-build}"
 BUILD_DIR="$WORK/target/qt6-build"
-EVID="$WORK/evidence/m0-build/build-logs"
+QT_LOG_DIR="${VEDIT_CI_LOG_DIR:+$VEDIT_CI_LOG_DIR/qt}"
+EVID="$WORK/${QT_LOG_DIR:-evidence/m0-build/build-logs}"
 RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp/xdg-runtime}"
 mkdir -p "$BUILD_DIR" "$EVID" "$RUNTIME_DIR"
 chmod 700 "$RUNTIME_DIR" 2>/dev/null || true
@@ -59,7 +60,13 @@ cmake -S "$WORK" -B "$BUILD_DIR" -G Ninja \
   -DVEDIT_RUST_FFI_INCLUDE="$RUST_INC" 2>&1 | tee "$EVID/31-qt6-configure.log"
 
 echo "[qt6] cmake build"
-cmake --build "$BUILD_DIR" --parallel "$(nproc)" 2>&1 | tee "$EVID/32-qt6-build.log"
+# Compile parallelism is capped (default 4). `nproc` is the host's core count and
+# an unbounded --parallel over it measurably OOMs this lane's container; the cap
+# is a measured memory bound, not a repository rule. VEDIT_QT6_BUILD_JOBS
+# overrides it; scripts/lib-qt.sh forwards the variable into the container.
+JOBS="${VEDIT_QT6_BUILD_JOBS:-4}"
+echo "[qt6] cmake --parallel $JOBS"
+cmake --build "$BUILD_DIR" --parallel "$JOBS" 2>&1 | tee "$EVID/32-qt6-build.log"
 
 SMOKE="$BUILD_DIR/cmake/smoke/vedit-m0-smoke"
 if [ ! -x "$SMOKE" ]; then

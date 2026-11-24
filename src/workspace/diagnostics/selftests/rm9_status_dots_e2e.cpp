@@ -203,7 +203,13 @@ int main(int argc, char **argv)
         // The imported list is OUTSIDE the opened folder and references a file
         // that is outside too: only a consumer that expands the imported `.f`
         // can see it, and the directory tree never shows it.
-        && writeFile(listPath, QStringLiteral("../shared/outside.sv\n"));
+        && writeFile(listPath, QStringLiteral("../shared/outside.sv\n"))
+        // The folder's own sources are a project set only when declared; this
+        // harness opts into the legacy root scan (default `false`, the
+        // 2026-11-18 file-set decision, docs/USER_GUIDE.md §2.8), so `a.sv`
+        // and `b.sv` stay in the set alongside the imported `outside.sv`.
+        && writeFile(QDir(root).filePath(QStringLiteral("vedit.toml")),
+                     QStringLiteral("[project]\nauto_discover = true\n"));
     check("rm9.fixture", fixture);
     if (!fixture) {
         std::printf("SUMMARY checks=%d failures=%d\n", g_checks, g_failures);
@@ -288,7 +294,25 @@ int main(int argc, char **argv)
     check("rm9.analysis-set-has-outside", adopted,
           QStringLiteral("files=%1").arg(controller->projectFiles().size()));
 
-    // (b) the project-open pass runs over the WHOLE expanded set, and after it
+    // A61.1 (batch-20261115) supersedes "a project OPEN is a FULL analysis":
+    // opening a folder, importing a filelist and adopting a file set start NO
+    // project pass any more. The NEGATIVE assertion comes first, so re-adding an
+    // automatic pass is caught here; the coverage the old on-open checks carried
+    // is kept by running the same pass MANUALLY below.
+    check("rm9.no-pass-without-request",
+          fake->startCount == 0 && controller->projectPassSerial() == 0,
+          QStringLiteral("starts=%1 serial=%2")
+              .arg(fake->startCount)
+              .arg(static_cast<qulonglong>(controller->projectPassSerial())));
+    check("rm9.no-automatic-pass-flag", !controller->lastPassWasAutomatic());
+    QAction *firstLintAction = shell->commands() != nullptr
+                                   ? shell->commands()->action(QStringLiteral("project.lint"))
+                                   : nullptr;
+    check("rm9.manual-lint-action", firstLintAction != nullptr);
+    if (firstLintAction != nullptr) {
+        firstLintAction->trigger();
+    }
+    // (b) the MANUAL project pass runs over the WHOLE expanded set, and after it
     // every file has a verdict - including the two nobody opened.
     const bool passSawWholeSet = waitUntil(
         [fake, &aPath, &bPath, &outsidePath]() {
@@ -296,15 +320,45 @@ int main(int argc, char **argv)
                    && fake->filesSeen.contains(outsidePath);
         },
         15000);
-    check("rm9.on-open-pass-covers-whole-set", passSawWholeSet,
+    check("rm9.manual-pass-covers-whole-set", passSawWholeSet,
           QStringLiteral("files=%1").arg(fake->filesSeen.join(QLatin1Char(','))));
-    check("rm9.on-open-pass-is-automatic", controller->lastPassWasAutomatic()
-              || controller->projectPassRunning() || !controller->upperLayerFiles().isEmpty(),
+    check("rm9.manual-pass-is-explicit", !controller->lastPassWasAutomatic(),
           QStringLiteral("automatic=%1").arg(controller->lastPassWasAutomatic() ? 1 : 0));
     const bool passDone =
         waitUntil([controller]() { return !controller->projectPassRunning(); }, 15000);
-    check("rm9.on-open-pass-finished", passDone);
+    check("rm9.manual-pass-finished", passDone);
     QCoreApplication::processEvents();
+
+    // batch-20261114 T1 (contract §4 T1 / §8 A53): "the pass is finished" does NOT
+    // mean "its verdicts are visible". The pass's verdicts reach the three
+    // consumer assertions below through a SECOND, independent clock:
+    // `refreshLiveState()` publishes the full status map on the 400 ms
+    // `liveTimer_`, while every readiness signal this test waited for so far came
+    // from the 300 ms pass timer (or the tree's 500 ms tick). Nothing ordered the
+    // two, so the assertions could read the map published BEFORE this pass
+    // completed - a stale status (0 = no verdict, or an older per-file value).
+    //
+    // Wait for the PUBLISHED snapshot to pass this pass's completion point: the
+    // controller's `viewRevision`, which the pass finalise bumped. This is not a
+    // longer sleep - a publisher that never catches up makes the wait time out
+    // and the assertions below fail with the stale value they actually saw.
+    // Both consumers (`FileTreeModel::FileStatusRole`, `ProjectPanel::fileStatusAt`)
+    // read the shell property lazily on every query and refresh their cache when
+    // `viewRevision` moves, so publication is the whole dependency; the 500 ms
+    // ticks only repaint.
+    const quint64 passCompletedRevision = controller->viewRevision();
+    const bool publishedPastPass = waitUntil(
+        [&shell, passCompletedRevision]() {
+            return shell->property("vedit.diagnostics.viewRevision").toULongLong()
+                   >= passCompletedRevision;
+        },
+        15000);
+    std::printf("OBSERVED rm9.published-past-pass ok=%d published=%llu completed=%llu\n",
+                publishedPastPass ? 1 : 0,
+                static_cast<unsigned long long>(
+                    shell->property("vedit.diagnostics.viewRevision").toULongLong()),
+                static_cast<unsigned long long>(passCompletedRevision));
+    std::fflush(stdout);
 
     // (b) every file of the project set has a verdict, none is "no verdict".
     const QHash<QString, int> statuses = controller->fileStatuses();

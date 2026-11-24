@@ -207,22 +207,47 @@ QString stateRootFromEnvironment()
     return QDir::tempPath() + QStringLiteral("/vedit-state");
 }
 
+quint64 appImageHashBudgetMiB()
+{
+    // batch-20261110d: the budget for the startup-time hash. It used to be a
+    // hardcoded 160 MiB cap, which never fired for the 47-139 MB AppImage the
+    // product ships — so install(), on the startup path, hashed the WHOLE file
+    // (measured 230-240 ms here, more on a slow disk) before the window existed.
+    // The budget is part of the launch contract: AppRun exports
+    // VEDIT_APPIMAGE_SHA256_BUDGET_MIB (4 MiB); its value is the fallback for a
+    // launch that bypasses AppRun (gates, direct starts). 0 means "do not hash
+    // at launch at all"; the report then says so instead of paying the cost.
+    bool ok = false;
+    const QByteArray raw = qgetenv("VEDIT_APPIMAGE_SHA256_BUDGET_MIB");
+    if (!raw.isEmpty()) {
+        const quint64 value = raw.toULongLong(&ok);
+        if (ok) {
+            return value;
+        }
+    }
+    return 4;
+}
+
 QString appImageSha256(const QString &path)
 {
-    // A 95 MB AppImage takes a moment; cap the work so startup stays snappy.
     // AppRun may export the hash directly, which is instant.
     const QByteArray exported = qgetenv("VEDIT_APPIMAGE_SHA256");
     if (!exported.isEmpty()) {
         return QString::fromLatin1(exported.left(kAppImageShaSize - 1));
+    }
+    const quint64 budgetMiB = appImageHashBudgetMiB();
+    if (budgetMiB == 0) {
+        return QStringLiteral("<hash skipped: budget 0 MiB>");
     }
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly)) {
         return QStringLiteral("<unreadable>");
     }
     QCryptographicHash hash(QCryptographicHash::Sha256);
-    const quint64 cap = 160ull * 1024ull * 1024ull;
+    const quint64 budget = budgetMiB * 1024ull * 1024ull;
+    const quint64 total = static_cast<quint64>(file.size());
     quint64 consumed = 0;
-    while (!file.atEnd() && consumed < cap) {
+    while (!file.atEnd() && consumed < budget) {
         const QByteArray chunk = file.read(1 << 20);
         if (chunk.isEmpty()) {
             break;
@@ -230,8 +255,13 @@ QString appImageSha256(const QString &path)
         hash.addData(chunk);
         consumed += static_cast<quint64>(chunk.size());
     }
-    if (consumed >= cap) {
-        return QStringLiteral("<too large to hash>");
+    if (consumed < total) {
+        // A PREFIX hash, explicitly marked: the startup cost is the budget and
+        // never the whole file, and the report states exactly which bytes the
+        // value covers, so it can never be mistaken for the full sha256.
+        return QStringLiteral("prefix:%1/%2")
+            .arg(QString::fromLatin1(hash.result().toHex().left(32)))
+            .arg(total);
     }
     return QString::fromLatin1(hash.result().toHex());
 }

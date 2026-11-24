@@ -458,6 +458,11 @@ fn batch_options(engine: i32) -> VdLintBatchOptions {
         waiver_files: std::ptr::null(),
         slang_suppressions: std::ptr::null(),
         error_limit: 0,
+        // Batch 20261110 froze these three knobs; the default (unset) is what this
+        // test exercises.
+        verible_autofix: 0,
+        autofix_output_file: std::ptr::null(),
+        slang_waiver_file: std::ptr::null(),
     }
 }
 

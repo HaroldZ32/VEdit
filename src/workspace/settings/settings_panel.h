@@ -26,6 +26,7 @@
 #include <QVector>
 #include <QWidget>
 
+#include <atomic>
 #include <functional>
 #include <memory>
 
@@ -256,8 +257,13 @@ public:
 
     QCheckBox *fimEnabledCheck() const { return fimEnabledCheck_; }
     QComboBox *fimProtocolCombo() const { return fimProtocolCombo_; }
+    // batch-20261113 T5: the provider preset (Custom / DeepSeek / OpenAI /
+    // Ollama / llama.cpp) that writes Endpoint + Protocol on selection.
+    QComboBox *fimProviderCombo() const { return fimProviderCombo_; }
     QLineEdit *fimEndpointEdit() const { return fimEndpointEdit_; }
-    QLineEdit *fimModelEdit() const { return fimModelEdit_; }
+    // Editable: the sidecar's detected models plus whatever the user types. The
+    // stored value is still exactly `fim.model` (writeFimEntries semantics).
+    QComboBox *fimModelCombo() const { return fimModelCombo_; }
     QSpinBox *fimTimeoutSpin() const { return fimTimeoutSpin_; }
     QSpinBox *fimMaxTokensSpin() const { return fimMaxTokensSpin_; }
     QLineEdit *fimApiKeyEdit() const { return fimApiKeyEdit_; }
@@ -265,6 +271,14 @@ public:
     QLabel *fimKeySourceLabel() const { return fimKeySourceLabel_; }
     QPushButton *fimKeySaveButton() const { return fimKeySaveButton_; }
     QPushButton *fimKeyClearButton() const { return fimKeyClearButton_; }
+    // batch-20261113 T5 Pass B: the "Detect" probe and its result line.
+    QPushButton *fimDetectButton() const { return fimDetectButton_; }
+    QLabel *fimDetectStatusLabel() const { return fimDetectStatusLabel_; }
+    // TEST SEAM: the thread that actually called vd_fim_detect (nullptr until a
+    // probe completed). The selftest compares it with the GUI thread id to prove
+    // the synchronous C ABI call does not run on the GUI thread. Product code
+    // never reads it.
+    Qt::HANDLE fimDetectCallThreadId() const { return fimDetectCallThreadId_.load(); }
 
 signals:
     void themeChanged(const QString &name);
@@ -306,8 +320,41 @@ private:
     void updateLanguageHint();
     void applyToolValues(const ToolValues &values);
     void applyFimValues(const FimValues &values);
+    // batch-20261113 T5: writes the endpoint/protocol a provider preset needs.
+    // "custom" changes nothing (and returns false).
+    bool applyFimProviderPreset(const QString &providerId);
+    // The non-secret detected-model cache beside settings.toml (T5). Loading it
+    // is best-effort: absent, empty, malformed or non-string entries are all
+    // ignored so a broken cache can never stop the page from opening.
+    QString fimModelsSidecarPath() const;
+    void loadFimModelsSidecar();
+    void writeFimModelsSidecar(const QStringList &models);
+    // batch-20261113 T5 Pass B: the Detect button. The probe is synchronous and
+    // runs on a worker thread; finishFimDetect() runs back on the GUI thread and
+    // owns every widget update (success write-back, failure keeps the input).
+    void startFimDetect();
+    void finishFimDetect(int result, const QString &json);
     void writeToolEntries(const ToolValues &values);
     void writeFimEntries(const FimValues &values);
+    // The FIM fields a write may carry, one bit each (batch-20261113 F1, §13).
+    enum class FimField : unsigned {
+        Enabled,
+        Protocol,
+        Endpoint,
+        Model,
+        TimeoutMs,
+        MaxTokens,
+        GhostText,
+    };
+    // batch-20261113 B1 (contract §12) + F1 (§13) + F2 (H1): records that the USER
+    // expressed ONE FIM field in this dialog session — she changed that control,
+    // or a successful Detect reported and wrote it back. Per-field on purpose:
+    // both promotion paths write only the fields expressed here (the first one
+    // also deletes the existing `fim.*` keys nobody expressed), so promoting or
+    // keeping ownership never changes a value the user did not express. The
+    // programmatic backfill runs with updating_ == true and never counts.
+    void markFimExpressed(FimField field);
+    bool fimFieldExpressed(FimField field) const;
     // Writes the value typed into the write-only field to the key file; a no-op
     // when the field is empty. Returns false after adding a diagnostic.
     bool persistTypedFimKey();
@@ -393,13 +440,36 @@ private:
 
     QCheckBox *fimEnabledCheck_ = nullptr;
     QComboBox *fimProtocolCombo_ = nullptr;
+    QComboBox *fimProviderCombo_ = nullptr;
     QLineEdit *fimEndpointEdit_ = nullptr;
-    QLineEdit *fimModelEdit_ = nullptr;
+    QComboBox *fimModelCombo_ = nullptr;
     QSpinBox *fimTimeoutSpin_ = nullptr;
     QSpinBox *fimMaxTokensSpin_ = nullptr;
     QLineEdit *fimApiKeyEdit_ = nullptr;
     QCheckBox *fimGhostCheck_ = nullptr;
     QLabel *fimKeySourceLabel_ = nullptr;
+    QPushButton *fimDetectButton_ = nullptr;
+    QLabel *fimDetectStatusLabel_ = nullptr;
+    bool fimDetectInFlight_ = false;
+    std::atomic<Qt::HANDLE> fimDetectCallThreadId_{nullptr};
+    // batch-20261113 B1 (contract §12): "the user expressed the FIM page in THIS
+    // dialog session". Cleared by the store backfill (applyFimEntries), set by a
+    // real control change / Detect result, and only then does writeFimEntries
+    // write the FIM keys at all.
+    bool fimUiOwned_ = false;
+    // batch-20261113 F1 (§13) + F2 (H1): the union of (fields the user edited
+    // here) and (fields a successful Detect reported), as FimField bits. BOTH
+    // promotion paths write only these fields, and an empty mask means
+    // writeFimEntries changes nothing at all (not even the marker).
+    quint32 fimExpressedFields_ = 0;
+    // Whether the STORE already carried `fim.ui_owned="true"` when this panel
+    // loaded it — re-captured on every reload, which counts as a fresh load. It
+    // selects the promotion path: the first one also drops the pre-existing
+    // `fim.*` keys nobody expressed; the repeated one only writes the expressed
+    // fields and deletes nothing. Our own first promotion writes the marker into
+    // `entries_`, and that must not turn the same session into a "non-first" one.
+    bool fimStoreOwnedAtLoad_ = false;
+    bool fimLoadCaptured_ = false;
     QPushButton *fimKeySaveButton_ = nullptr;
     QPushButton *fimKeyClearButton_ = nullptr;
 };

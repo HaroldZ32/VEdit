@@ -76,9 +76,20 @@ public:
     quint64 breadcrumbUpdates() const;
     quint64 breadcrumbChanges() const;
     bool semanticActive() const;
+    /// T9 observability: full `document->text()` copies made by the breadcrumb
+    /// refresh. A cursor move must reuse the cached text (0 copies); a text
+    /// change copies once.
+    quint64 documentTextCopies() const { return textCopies_; }
 
     // The pane registers a listener so a cursor move repaints the bar.
     void setStatusListener(std::function<void()> listener);
+
+    // TEST SEAM (batch-20261113 T3): whether a status listener is installed on
+    // this binding right now. The lifetime probe asserts that an unsubscribe
+    // clears it (the pre-fix `setStatusListener(editor, nullptr)` returned
+    // before reaching it); product code never calls this. See
+    // .mpd/plans/batch-20261113-fim-detect.md §8 T3.
+    bool hasStatusListener() const;
 
 signals:
     void breadcrumbChanged(const QString &display);
@@ -98,6 +109,16 @@ private:
     QTimer *breadcrumbDebounce_ = nullptr;
     std::function<void()> statusListener_;
     QString textCache_;
+    /// T9: the text is copied once per document REVISION. A cursor move walks the
+    /// cached text (or skips entirely when the line did not move).
+    qint64 cachedRevision_ = -1;
+    KTextEditor::Document *cachedDocument_ = nullptr;
+    bool textCached_ = false;
+    bool textDirty_ = true;
+    bool forceNextRefresh_ = false;
+    bool pathPublished_ = false;
+    int lastLine_ = -1;
+    quint64 textCopies_ = 0;
     bool sourcesReady_ = false;
     bool opened_ = false;
 };

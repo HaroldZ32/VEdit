@@ -1,0 +1,94 @@
+# version freeze as committed on main — 2026-11-09T16:04:56Z
+# main f2fda0a = merge of release/0.2.2; release commit 5e71ef3 chore(release): 冻结版本 0.2.2; annotated tag v0.2.2
+# (the earlier pre-purge equivalent was e4cf68a/d371d0b; the parent replayed the release during a repo purge)
+
+commit 5e71ef3 chore(release): 冻结版本 0.2.2
+
+ CMakeLists.txt                                     |    2 +-
+ Cargo.lock                                         |   22 +-
+ Cargo.toml                                         |    2 +-
+ cmake/smoke/qt6_window_smoke.cpp                   |    2 +-
+ docs/BUILD.md                                      |    4 +-
+ evidence/release-0.2.2/RELEASE-NOTES.md            |   58 +
+ evidence/release-0.2.2/logs/01-gate-qt6-cxx.log    | 1449 ++++++++++++++++++++
+ evidence/release-0.2.2/logs/02-gate-rust.log       |  996 ++++++++++++++
+ evidence/release-0.2.2/logs/03-gate-lrelease.log   |    7 +
+ evidence/release-0.2.2/logs/04-gate-docs.log       |    2 +
+ evidence/release-0.2.2/logs/05-gate-packaging.log  |  865 ++++++++++++
+ packaging/runtime/README.md                        |    2 +-
+ packaging/runtime/hostmatrix.sh                    |    2 +-
+ packaging/runtime/verify/STEPS.md                  |   12 +-
+ .../runtime/verify/verify-appimage-centos7.sh      |    6 +-
+ src/app/main.cpp                                   |    2 +-
+ src/terminal/CMakeLists.txt                        |    2 +-
+ 17 files changed, 3406 insertions(+), 29 deletions(-)
+
+## per-file diff (version declarations + doc/packaging consumers)
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+@@ -19 +19 @@ cmake_minimum_required(VERSION 3.25)
+-project(VEdit VERSION 0.2.1 LANGUAGES C CXX)
++project(VEdit VERSION 0.2.2 LANGUAGES C CXX)
+diff --git a/Cargo.toml b/Cargo.toml
+@@ -25 +25 @@ members = [
+-version = "0.2.1"
++version = "0.2.2"
+diff --git a/cmake/smoke/qt6_window_smoke.cpp b/cmake/smoke/qt6_window_smoke.cpp
+@@ -133 +133 @@ int main(int argc, char **argv)
+-    QCoreApplication::setApplicationVersion(QStringLiteral("0.2.1"));
++    QCoreApplication::setApplicationVersion(QStringLiteral("0.2.2"));
+diff --git a/docs/BUILD.md b/docs/BUILD.md
+@@ -156 +156 @@ KTextEditor / 自建 KSyntaxHighlighting / tree-sitter / 字体，并带 `bin/tr
+-**版本号说明**：代码、构建与文档现在统一为 **0.2.1**。打包脚本从工作区 `Cargo.toml` 的
++**版本号说明**：代码、构建与文档现在统一为 **0.2.2**。打包脚本从工作区 `Cargo.toml` 的
+@@ -160 +160 @@ KTextEditor / 自建 KSyntaxHighlighting / tree-sitter / 字体，并带 `bin/tr
+-`VEdit-0.2.1-x86_64.AppImage` 与应用内版本 0.2.1 一致。
++`VEdit-0.2.2-x86_64.AppImage` 与应用内版本 0.2.2 一致。
+diff --git a/packaging/runtime/README.md b/packaging/runtime/README.md
+@@ -101 +101 @@ bash packaging/runtime/build.sh          # 组装 → 许可闸门 → 自检 
+-**Delivery baseline:** the AppImage is `out/VEdit-0.2.1-x86_64.AppImage`, and its
++**Delivery baseline:** the AppImage is `out/VEdit-0.2.2-x86_64.AppImage`, and its
+diff --git a/packaging/runtime/hostmatrix.sh b/packaging/runtime/hostmatrix.sh
+@@ -16 +16 @@ ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+-APPIMAGE=${VEDIT_APPIMAGE:-$ROOT/packaging/runtime/out/VEdit-0.2.1-x86_64.AppImage}
++APPIMAGE=${VEDIT_APPIMAGE:-$ROOT/packaging/runtime/out/VEdit-0.2.2-x86_64.AppImage}
+diff --git a/packaging/runtime/verify/STEPS.md b/packaging/runtime/verify/STEPS.md
+@@ -12 +12 @@
+-| `VEdit-0.2.1-x86_64.AppImage` | 仓库 `packaging/runtime/out/` | **必须**（交付物本体） |
++| `VEdit-0.2.2-x86_64.AppImage` | 仓库 `packaging/runtime/out/` | **必须**（交付物本体） |
+@@ -22 +22 @@ cd <仓库目录>/packaging/runtime/out
+-scp VEdit-0.2.1-x86_64.AppImage SHA256SUMS <用户名>@<VM_IP>:~/
++scp VEdit-0.2.2-x86_64.AppImage SHA256SUMS <用户名>@<VM_IP>:~/
+@@ -28 +28 @@ scp verify-appimage-centos7.sh <用户名>@<VM_IP>:~/
+-> `packaging/runtime/out/VEdit-0.2.1-x86_64.AppImage` 和
++> `packaging/runtime/out/VEdit-0.2.2-x86_64.AppImage` 和
+@@ -41 +41 @@ cd ~
+-chmod +x VEdit-0.2.1-x86_64.AppImage verify-appimage-centos7.sh
++chmod +x VEdit-0.2.2-x86_64.AppImage verify-appimage-centos7.sh
+@@ -109 +109 @@ RESULT PASS|FAIL|SKIP <检查名> | expected=… | actual=… | note=…
+-1. 文件管理器里**双击** `VEdit-0.2.1-x86_64.AppImage`（或 `./VEdit-0.2.1-x86_64.AppImage`）；
++1. 文件管理器里**双击** `VEdit-0.2.2-x86_64.AppImage`（或 `./VEdit-0.2.2-x86_64.AppImage`）；
+@@ -133 +133 @@ RESULT PASS|FAIL|SKIP <检查名> | expected=… | actual=… | note=…
+-`VEdit-0.2.1-x86_64.AppImage`（或 `VEdit-*x86_64.AppImage`）。
++`VEdit-0.2.2-x86_64.AppImage`（或 `VEdit-*x86_64.AppImage`）。
+diff --git a/packaging/runtime/verify/verify-appimage-centos7.sh b/packaging/runtime/verify/verify-appimage-centos7.sh
+@@ -5 +5 @@
+-#   scp VEdit-0.2.1-x86_64.AppImage verify-appimage-centos7.sh  <user>@<vm>:~/
++#   scp VEdit-0.2.2-x86_64.AppImage verify-appimage-centos7.sh  <user>@<vm>:~/
+@@ -88 +88 @@ else
+-    for cand in "$SCRIPT_DIR/VEdit-0.2.1-x86_64.AppImage" "$SCRIPT_DIR"/VEdit-*x86_64.AppImage; do
++    for cand in "$SCRIPT_DIR/VEdit-0.2.2-x86_64.AppImage" "$SCRIPT_DIR"/VEdit-*x86_64.AppImage; do
+@@ -93 +93 @@ if [ -z "$APPIMAGE" ]; then
+-    result FAIL appimage.found expected="VEdit-0.2.1-x86_64.AppImage next to this script" \
++    result FAIL appimage.found expected="VEdit-0.2.2-x86_64.AppImage next to this script" \
+diff --git a/src/app/main.cpp b/src/app/main.cpp
+@@ -1861 +1861 @@ int main(int argc, char **argv)
+-    QCoreApplication::setApplicationVersion(QStringLiteral("0.2.1"));
++    QCoreApplication::setApplicationVersion(QStringLiteral("0.2.2"));
+diff --git a/src/terminal/CMakeLists.txt b/src/terminal/CMakeLists.txt
+@@ -16 +16 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+-  project(VEditTerminal VERSION 0.2.1 LANGUAGES CXX)
++  project(VEditTerminal VERSION 0.2.2 LANGUAGES CXX)
+
+## Cargo.lock (generated by cargo)
+     11 +version = "0.2.2"
+     11 -version = "0.2.1"

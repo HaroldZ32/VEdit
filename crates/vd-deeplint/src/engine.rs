@@ -127,13 +127,15 @@ pub const fn knobs_note(engine: LintEngine) -> &'static str {
         LintEngine::Slang => {
             "include dirs and defines are passed as -I<dir> / -D<name>=<value> in the real argv; \
              extra -W… suppressions are appended after -Weverything and --error-limit=N is applied; \
-             the verible knobs (ruleset / rules / waiver files) are a documented no-op here"
+             --waiver-file <toml> is sent when set; the verible knobs (ruleset / rules / \
+             waiver files / autofix) are a documented no-op here"
         }
         LintEngine::Verible => {
             "verible-verilog-lint accepts neither -I nor -D (measured with --helpfull: no include/define/\
              file_list_path flag); project include dirs and defines are not applied by this engine; \
-             --ruleset= / --rules= / --waiver_files= are sent only when set, and the slang knobs \
-             (suppressions / error limit) are a documented no-op here"
+             --ruleset= / --rules= / --waiver_files= / --autofix= / --autofix_output_file= are sent \
+             only when set, and the slang knobs (suppressions / error limit / waiver-file) are a \
+             documented no-op here"
         }
     }
 }
@@ -180,6 +182,256 @@ impl Ruleset {
             Self::Default => "default",
             Self::All => "all",
             Self::None => "none",
+        }
+    }
+}
+
+/// The `verible-verilog-lint` `--autofix=` mode.
+///
+/// The six values are verible's own (measured with `--helpfull` on the pinned
+/// `v0.0-4298-g085eef05`). The C ABI's `VdLintBatchOptions.verible_autofix`
+/// uses the codes [`Self::code`] returns, where `0` means "send NO flag"
+/// (verible's default `no`); the engine's [`EngineOptions::autofix`] therefore
+/// stays `None` for "no flag" and carries the other five values explicitly.
+///
+/// `patch-interactive` and `inplace-interactive` are transported faithfully,
+/// but the product runs the tool with pipes and no TTY: its settings page
+/// marks exactly those two values unavailable with that reason.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum VeribleAutofix {
+    /// `no` — verible's default (no fix; equivalent to sending no flag).
+    #[default]
+    No,
+    /// `patch` — print a unified diff; the file is NOT modified.
+    Patch,
+    /// `patch-interactive` — prompts on a TTY (unavailable in this product).
+    PatchInteractive,
+    /// `inplace` — rewrite the file in place.
+    Inplace,
+    /// `inplace-interactive` — prompts on a TTY (unavailable in this product).
+    InplaceInteractive,
+    /// `generate-waiver` — write waivers for the findings.
+    GenerateWaiver,
+}
+
+impl VeribleAutofix {
+    /// Every value, in verible's documented order.
+    pub const ALL: [Self; 6] = [
+        Self::No,
+        Self::Patch,
+        Self::PatchInteractive,
+        Self::Inplace,
+        Self::InplaceInteractive,
+        Self::GenerateWaiver,
+    ];
+
+    /// The value passed to `--autofix=`.
+    #[must_use]
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::No => "no",
+            Self::Patch => "patch",
+            Self::PatchInteractive => "patch-interactive",
+            Self::Inplace => "inplace",
+            Self::InplaceInteractive => "inplace-interactive",
+            Self::GenerateWaiver => "generate-waiver",
+        }
+    }
+
+    /// The C ABI code (`VdLintBatchOptions.verible_autofix`).
+    #[must_use]
+    pub const fn code(self) -> u8 {
+        match self {
+            Self::No => 0,
+            Self::Patch => 1,
+            Self::PatchInteractive => 2,
+            Self::Inplace => 3,
+            Self::InplaceInteractive => 4,
+            Self::GenerateWaiver => 5,
+        }
+    }
+
+    /// Parse the C ABI code; an unknown code is rejected, never defaulted.
+    #[must_use]
+    pub const fn from_code(code: u8) -> Option<Self> {
+        match code {
+            0 => Some(Self::No),
+            1 => Some(Self::Patch),
+            2 => Some(Self::PatchInteractive),
+            3 => Some(Self::Inplace),
+            4 => Some(Self::InplaceInteractive),
+            5 => Some(Self::GenerateWaiver),
+            _ => None,
+        }
+    }
+
+    /// Parse a stored value (the settings store's spelling).
+    #[must_use]
+    pub fn parse(value: &str) -> Option<Self> {
+        match value.trim().to_ascii_lowercase().as_str() {
+            "no" => Some(Self::No),
+            "patch" => Some(Self::Patch),
+            "patch-interactive" => Some(Self::PatchInteractive),
+            "inplace" => Some(Self::Inplace),
+            "inplace-interactive" => Some(Self::InplaceInteractive),
+            "generate-waiver" => Some(Self::GenerateWaiver),
+            _ => None,
+        }
+    }
+
+    /// True for the two values that need a terminal verible does not have here.
+    #[must_use]
+    pub const fn is_interactive(self) -> bool {
+        matches!(self, Self::PatchInteractive | Self::InplaceInteractive)
+    }
+
+    /// True when verible documents `--autofix_output_file` for this mode
+    /// (`patch*` writes the patch there, `generate-waiver` the waiver file).
+    #[must_use]
+    pub const fn writes_output_file(self) -> bool {
+        matches!(
+            self,
+            Self::Patch | Self::PatchInteractive | Self::GenerateWaiver
+        )
+    }
+}
+
+/// The keys a slang waiver document may carry inside one `[[waivers]]` table.
+///
+/// Measured on slang 12.1.0: `file`/`hier` name the scope (exactly one per
+/// block), `diagnostic`/`regex` select the findings, and any other key is a
+/// hard error (`unknown key 'bogus'`, exit 1).
+const SLANG_WAIVER_KEYS: [&str; 4] = ["file", "hier", "diagnostic", "regex"];
+
+/// Load and validate a slang waiver TOML document (`--waiver-file <path>`).
+///
+/// The engine refuses a document slang itself would refuse BEFORE spawning the
+/// child, so the user sees the offending line instead of a tool failure. This
+/// is the reading side only: `crates/vd-ffi/src/waiver.rs` owns writing (its
+/// parser is private to that crate, so the two sides share the FORMAT, not the
+/// code).
+///
+/// Returns the number of `[[waivers]]` blocks.
+///
+/// # Errors
+///
+/// Names the file line that does not fit the documented schema (unknown key,
+/// unquoted value, repeated/scoped key, or a block without a scope).
+pub fn validate_slang_waiver_file(path: &Path) -> Result<usize, String> {
+    let text = std::fs::read_to_string(path).map_err(|error| {
+        format!(
+            "slang waiver file {} could not be read: {error}",
+            path.display()
+        )
+    })?;
+    validate_slang_waiver_toml(&text)
+        .map_err(|error| format!("slang waiver file {}: {error}", path.display()))
+}
+
+/// The schema check behind [`validate_slang_waiver_file`] (pure; testable).
+pub(crate) fn validate_slang_waiver_toml(text: &str) -> Result<usize, String> {
+    // Scope keys seen in the CURRENT block: `file` and `hier` are mutually
+    // exclusive, and exactly one of them is required per block.
+    let mut scope: Option<&'static str> = None;
+    let mut diagnostic_seen = false;
+    let mut blocks = 0usize;
+    for (index, line) in text.lines().enumerate() {
+        let number = index + 1;
+        let line = line.trim();
+        if line.is_empty() || line.starts_with('#') {
+            continue;
+        }
+        if line == "[[waivers]]" {
+            if scope.is_none() && blocks > 0 {
+                return Err(format!(
+                    "line {number}: the previous `[[waivers]]` block has no `file` or `hier` scope"
+                ));
+            }
+            blocks += 1;
+            scope = None;
+            diagnostic_seen = false;
+            continue;
+        }
+        if line.starts_with('[') {
+            return Err(format!(
+                "line {number}: only `[[waivers]]` tables are allowed, found `{line}`"
+            ));
+        }
+        if blocks == 0 {
+            return Err(format!(
+                "line {number}: `{line}` is outside a `[[waivers]]` table"
+            ));
+        }
+        let Some((key, value)) = line.split_once('=') else {
+            return Err(format!(
+                "line {number}: expected `key = \"value\"`, found `{line}`"
+            ));
+        };
+        let key = key.trim();
+        if !SLANG_WAIVER_KEYS.contains(&key) {
+            return Err(format!(
+                "line {number}: unknown key `{key}` — slang refuses a waiver file with an \
+                 unknown key (allowed: file, hier, diagnostic, regex)"
+            ));
+        }
+        let Some(_value) = parse_toml_string(value.trim()) else {
+            return Err(format!(
+                "line {number}: `{key}` must be a quoted string, found `{}`",
+                value.trim()
+            ));
+        };
+        match key {
+            "file" | "hier" => {
+                if scope.is_some() {
+                    return Err(format!(
+                        "line {number}: `{key}` repeats the scope key (exactly one of `file` or \
+                         `hier` is allowed per waiver)"
+                    ));
+                }
+                scope = Some(if key == "file" { "file" } else { "hier" });
+            }
+            "diagnostic" => {
+                if diagnostic_seen {
+                    return Err(format!("line {number}: `diagnostic` repeats a key"));
+                }
+                diagnostic_seen = true;
+            }
+            _ => {}
+        }
+    }
+    if scope.is_none() && blocks > 0 {
+        return Err("the last `[[waivers]]` block has no `file` or `hier` scope".to_string());
+    }
+    Ok(blocks)
+}
+
+/// Parse one TOML basic string (`"…"`), unescaping `\"`, `\\`, `\n`, `\r`,
+/// `\t`; a trailing comment is allowed. `None` when the value is not exactly
+/// one quoted string.
+fn parse_toml_string(text: &str) -> Option<String> {
+    let rest = text.strip_prefix('"')?;
+    let mut value = String::new();
+    let mut characters = rest.chars();
+    loop {
+        match characters.next()? {
+            '"' => {
+                let tail: String = characters.collect();
+                let tail = tail.trim_start();
+                return if tail.is_empty() || tail.starts_with('#') {
+                    Some(value)
+                } else {
+                    None
+                };
+            }
+            '\\' => match characters.next()? {
+                '"' => value.push('"'),
+                '\\' => value.push('\\'),
+                'n' => value.push('\n'),
+                'r' => value.push('\r'),
+                't' => value.push('\t'),
+                _ => return None,
+            },
+            other => value.push(other),
         }
     }
 }
@@ -327,41 +579,9 @@ pub fn command_args_for(
     let mut args: Vec<OsString> = Vec::new();
     match engine {
         LintEngine::Slang => {
-            args.extend(
-                [
-                    "--lint-only",
-                    "-Weverything",
-                    "--diag-column-unit",
-                    "byte",
-                    "--diag-json",
-                ]
-                .into_iter()
-                .map(OsString::from),
-            );
-            if let Some(json_path) = json_path {
-                args.push(json_path.as_os_str().to_os_string());
-            } else {
-                args.push(OsString::from("<diagnostics.json>"));
-            }
-            for directory in &options.include_dirs {
-                let mut value = OsString::from("-I");
-                value.push(directory.as_os_str());
-                args.push(value);
-            }
-            for define in &options.defines {
-                let define = define.trim();
-                if !define.is_empty() {
-                    let mut value = OsString::from("-D");
-                    value.push(define);
-                    args.push(value);
-                }
-            }
-            for suppression in &options.slang_suppressions {
-                args.push(OsString::from(suppression));
-            }
-            if let Some(limit) = options.error_limit {
-                args.push(OsString::from(format!("--error-limit={limit}")));
-            }
+            push_slang_front(&mut args, false);
+            push_json_path(&mut args, json_path);
+            push_slang_knobs(&mut args, options);
         }
         LintEngine::Verible => {
             if let Some(rules) = &options.rules_config {
@@ -387,10 +607,106 @@ pub fn command_args_for(
                 }
                 args.push(value);
             }
+            if let Some(autofix) = options.autofix {
+                args.push(OsString::from(format!("--autofix={}", autofix.as_str())));
+            }
+            if let Some(output) = &options.autofix_output_file {
+                let mut value = OsString::from("--autofix_output_file=");
+                value.push(output.as_os_str());
+                args.push(value);
+            }
         }
     }
     args.push(file.as_os_str().to_os_string());
     args
+}
+
+/// The argv (without argv[0]) for ONE slang run over the WHOLE project file set.
+///
+/// This is the crate's project-wide invocation for lint: the same knobs a
+/// per-file run sends, plus `--single-unit` (measured on slang 12.1: without it
+/// every input file is its own compilation unit, so a `` `define `` in one file
+/// is invisible in the next). A per-file pass can never produce that, because
+/// each process starts with an empty preprocessor.
+///
+/// `files` are emitted in the caller's order: with `--single-unit` the order IS
+/// the compilation order, so a macro defined earlier is visible later.
+///
+/// Only `slang` has this mode. `verible-verilog-lint` keeps its per-file pass
+/// (its diagnostics are textual and per-file anyway).
+#[must_use]
+pub(crate) fn project_command_args_for(
+    files: &[PathBuf],
+    json_path: Option<&Path>,
+    options: &EngineOptions,
+) -> Vec<OsString> {
+    debug_assert_eq!(
+        options.engine,
+        LintEngine::Slang,
+        "the whole-project invocation exists for slang only"
+    );
+    let mut args: Vec<OsString> = Vec::new();
+    push_slang_front(&mut args, true);
+    push_json_path(&mut args, json_path);
+    push_slang_knobs(&mut args, options);
+    for file in files {
+        args.push(file.as_os_str().to_os_string());
+    }
+    args
+}
+
+/// The slang flags before the report path. `single_unit` adds `--single-unit`,
+/// which is what shares preprocessor state across the files of one invocation.
+fn push_slang_front(args: &mut Vec<OsString>, single_unit: bool) {
+    args.extend(
+        ["--lint-only", "-Weverything", "--diag-column-unit", "byte"]
+            .into_iter()
+            .map(OsString::from),
+    );
+    if single_unit {
+        args.push(OsString::from("--single-unit"));
+    }
+    args.push(OsString::from("--diag-json"));
+}
+
+/// The `--diag-json` report path (a placeholder for the settings-page echo).
+fn push_json_path(args: &mut Vec<OsString>, json_path: Option<&Path>) {
+    if let Some(json_path) = json_path {
+        args.push(json_path.as_os_str().to_os_string());
+    } else {
+        args.push(OsString::from("<diagnostics.json>"));
+    }
+}
+
+/// Every slang knob `options` carries, in the order the tool has always seen.
+/// Shared by the per-file and the whole-project argv so a knob cannot reach one
+/// pass and silently miss the other.
+fn push_slang_knobs(args: &mut Vec<OsString>, options: &EngineOptions) {
+    for directory in &options.include_dirs {
+        let mut value = OsString::from("-I");
+        value.push(directory.as_os_str());
+        args.push(value);
+    }
+    for define in &options.defines {
+        let define = define.trim();
+        if !define.is_empty() {
+            let mut value = OsString::from("-D");
+            value.push(define);
+            args.push(value);
+        }
+    }
+    for suppression in &options.slang_suppressions {
+        args.push(OsString::from(suppression));
+    }
+    if let Some(limit) = options.error_limit {
+        args.push(OsString::from(format!("--error-limit={limit}")));
+    }
+    if let Some(waiver) = &options.slang_waiver_file {
+        // slang's own flag takes the path as a SEPARATE token:
+        // `--waiver-file <toml>` (measured on 12.1.0).
+        args.push(OsString::from("--waiver-file"));
+        args.push(waiver.as_os_str().to_os_string());
+    }
 }
 
 /// The argv (without argv[0]) this engine runs for one file (legacy form).
@@ -572,11 +888,16 @@ fn parse_verible_line(line: &str) -> Option<Diagnostic> {
     }
 
     let (message, rule) = split_rule(raw_message);
+    // The verible rule name IS this engine's typed option name: it is what a
+    // verible waiver is written from (`waive --rule=<rule>`), so it crosses the
+    // model as `option_name` as well as `code` (batch 20261110, AC-5.1/S4).
+    let option_name = (!rule.is_empty()).then(|| rule.clone());
     let end_column = end_column.unwrap_or(column);
     Some(Diagnostic {
         severity: Severity::Warning,
         message,
         code: rule,
+        option_name,
         location: Some(RawLocation {
             file: file.to_string(),
             line: line_number,
@@ -629,7 +950,7 @@ mod tests {
     use super::{
         command_args, command_args_for, command_line, command_line_for, knobs_note,
         parse_rules_list, parse_slang_suppressions, parse_verible_line, parse_verible_output,
-        parse_waiver_files, unsupported_knobs, LintEngine, Ruleset,
+        parse_waiver_files, unsupported_knobs, LintEngine, Ruleset, VeribleAutofix,
     };
     use crate::diagnostic::{Severity, SourceLines};
     use crate::EngineOptions;
@@ -784,6 +1105,9 @@ mod tests {
             include_dirs: vec![PathBuf::from("/inc")],
             defines: vec!["WIDTH=8".to_string()],
             rules_config: Some(PathBuf::from("/p/.rules.verible_lint")),
+            autofix: Some(VeribleAutofix::Patch),
+            autofix_output_file: Some(PathBuf::from("/tmp/fixes.patch")),
+            slang_waiver_file: Some(PathBuf::from("/p/slang-waivers.toml")),
             ..EngineOptions::default()
         }
     }
@@ -806,6 +1130,8 @@ mod tests {
                 "--rules=",
                 "--waiver_files=",
                 "--error-limit=",
+                "--autofix",
+                "--waiver-file",
                 "-Wno-",
                 "-Wwarn=",
             ] {
@@ -868,14 +1194,172 @@ mod tests {
         assert!(args.contains(&"-Wno-unused".to_string()), "{args:?}");
         assert!(args.contains(&"-Werror=foo".to_string()), "{args:?}");
         assert!(args.contains(&"--error-limit=7".to_string()), "{args:?}");
+        // slang's own waiver file is TWO argv tokens, and the path follows.
+        let waiver = args
+            .windows(2)
+            .find(|pair| pair[0] == "--waiver-file")
+            .unwrap_or_else(|| panic!("slang must receive --waiver-file: {args:?}"));
+        assert_eq!(waiver[1], "/p/slang-waivers.toml");
         assert!(
             !args
                 .iter()
                 .any(|argument| argument.starts_with("--ruleset=")
                     || argument.starts_with("--rules=")
-                    || argument.starts_with("--waiver_files=")),
+                    || argument.starts_with("--waiver_files=")
+                    || argument.starts_with("--autofix")),
             "verible-only knobs must not reach slang: {args:?}"
         );
+    }
+
+    #[test]
+    fn verible_receives_autofix_and_never_the_slang_waiver_file() {
+        let options = full_options(LintEngine::Verible);
+        let args = joined(command_args_for(
+            LintEngine::Verible,
+            Path::new("top.sv"),
+            None,
+            &options,
+        ));
+        assert!(args.contains(&"--autofix=patch".to_string()), "{args:?}");
+        assert!(
+            args.contains(&"--autofix_output_file=/tmp/fixes.patch".to_string()),
+            "{args:?}"
+        );
+        assert!(
+            !args.iter().any(|argument| argument == "--waiver-file"),
+            "slang's --waiver-file is two tokens and must never reach verible: {args:?}"
+        );
+    }
+
+    #[test]
+    fn every_autofix_value_reaches_the_child_argv_verbatim() {
+        for value in VeribleAutofix::ALL {
+            let options = EngineOptions {
+                engine: LintEngine::Verible,
+                autofix: Some(value),
+                ..EngineOptions::default()
+            };
+            let args = joined(command_args_for(
+                LintEngine::Verible,
+                Path::new("top.sv"),
+                None,
+                &options,
+            ));
+            assert!(
+                args.contains(&format!("--autofix={}", value.as_str())),
+                "{} must be transported: {args:?}",
+                value.as_str()
+            );
+        }
+        // `None` is the documented "no flag" state (verible's own `no`).
+        let options = EngineOptions {
+            engine: LintEngine::Verible,
+            ..EngineOptions::default()
+        };
+        let args = joined(command_args_for(
+            LintEngine::Verible,
+            Path::new("top.sv"),
+            None,
+            &options,
+        ));
+        assert!(
+            !args
+                .iter()
+                .any(|argument| argument.starts_with("--autofix")),
+            "no flag is the default: {args:?}"
+        );
+        // The output file is ONE argv element and only the writing modes
+        // document it; the transport never edits the mode.
+        let options = EngineOptions {
+            engine: LintEngine::Verible,
+            autofix: Some(VeribleAutofix::GenerateWaiver),
+            autofix_output_file: Some(PathBuf::from("/tmp/waivers.toml")),
+            ..EngineOptions::default()
+        };
+        let args = joined(command_args_for(
+            LintEngine::Verible,
+            Path::new("top.sv"),
+            None,
+            &options,
+        ));
+        assert!(
+            args.contains(&"--autofix=generate-waiver".to_string()),
+            "{args:?}"
+        );
+        assert!(
+            args.contains(&"--autofix_output_file=/tmp/waivers.toml".to_string()),
+            "{args:?}"
+        );
+        assert!(VeribleAutofix::GenerateWaiver.writes_output_file());
+        assert!(!VeribleAutofix::Inplace.writes_output_file());
+        assert!(VeribleAutofix::InplaceInteractive.is_interactive());
+        assert!(!VeribleAutofix::Patch.is_interactive());
+    }
+
+    #[test]
+    fn autofix_codes_round_trip_and_unknown_codes_are_rejected() {
+        for (code, value) in [
+            (0_u8, VeribleAutofix::No),
+            (1, VeribleAutofix::Patch),
+            (2, VeribleAutofix::PatchInteractive),
+            (3, VeribleAutofix::Inplace),
+            (4, VeribleAutofix::InplaceInteractive),
+            (5, VeribleAutofix::GenerateWaiver),
+        ] {
+            assert_eq!(value.code(), code);
+            assert_eq!(VeribleAutofix::from_code(code), Some(value));
+            assert_eq!(VeribleAutofix::parse(value.as_str()), Some(value));
+        }
+        assert_eq!(VeribleAutofix::from_code(6), None);
+        assert_eq!(VeribleAutofix::parse("bogus"), None);
+    }
+
+    #[test]
+    fn slang_waiver_toml_validation_matches_the_measured_schema() {
+        let directory = tempfile::tempdir().unwrap_or_else(|error| panic!("tempdir: {error}"));
+        let write = |name: &str, text: &str| {
+            let path = directory.path().join(name);
+            std::fs::write(&path, text).unwrap_or_else(|error| panic!("write: {error}"));
+            path
+        };
+        let refusal = |path: &Path| match super::validate_slang_waiver_file(path) {
+            Ok(blocks) => panic!(
+                "expected a refusal of {}, got {blocks} block(s)",
+                path.display()
+            ),
+            Err(error) => error,
+        };
+        let valid = write(
+            "valid.toml",
+            "# a real document\n[[waivers]]\nfile = \"src/a.sv\"\ndiagnostic = \"unused-variable\"\n\
+             \n[[waivers]]\nhier = \"top.u_leaf\"\nregex = \".*\"\n",
+        );
+        assert_eq!(
+            super::validate_slang_waiver_file(&valid),
+            Ok(2),
+            "two well-formed blocks"
+        );
+        let unknown = write(
+            "unknown.toml",
+            "[[waivers]]\nfile = \"src/a.sv\"\nbogus = \"x\"\n",
+        );
+        let error = refusal(&unknown);
+        assert!(error.contains("unknown key `bogus`"), "{error}");
+        let unquoted = write("unquoted.toml", "[[waivers]]\nfile = src/a.sv\n");
+        let error = refusal(&unquoted);
+        assert!(error.contains("must be a quoted string"), "{error}");
+        let two_scopes = write(
+            "two-scopes.toml",
+            "[[waivers]]\nfile = \"a.sv\"\nhier = \"top\"\n",
+        );
+        assert!(refusal(&two_scopes).contains("repeats the scope key"));
+        let no_scope = write("no-scope.toml", "[[waivers]]\ndiagnostic = \"x\"\n");
+        assert!(refusal(&no_scope).contains("no `file` or `hier` scope"));
+        let missing = directory.path().join("missing.toml");
+        assert!(refusal(&missing).contains("could not be read"));
+        // The pure core refuses the same documents without touching the disk.
+        assert!(super::validate_slang_waiver_toml("file = \"a.sv\"\n").is_err());
+        assert_eq!(super::validate_slang_waiver_toml(""), Ok(0));
     }
 
     #[test]

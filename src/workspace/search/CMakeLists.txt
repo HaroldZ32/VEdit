@@ -147,6 +147,20 @@ if(VEDIT_WORKSPACE_SEARCH_HAVE_SHELL)
       VEDIT_SEARCH_HAVE_EDITOR_CORE=1)
   endif()
 endif()
+if(VEDIT_WORKSPACE_SEARCH_HAVE_FFI)
+  # Batch 20261110d: the self-check drives the Rust service directly for the
+  # project-file-set probe. It expands the repository fixture with the SAME
+  # `vd_project_expand_v3` the lint lane uses, then searches that set — the
+  # three-way file-count check at the data level, plus the `.f` negative
+  # control. The fixture path is a compile definition; a build without the
+  # repository (standalone lane) reports a named SKIP instead of failing.
+  target_compile_definitions(vedit-workspace-search-selftest PRIVATE
+    VEDIT_SEARCH_HAVE_FFI=1)
+  set(VEDIT_SEARCH_EXPANSION_FIXTURE
+      "${CMAKE_CURRENT_SOURCE_DIR}/../../../tests/fixtures/verilog-project/filelists")
+  target_compile_definitions(vedit-workspace-search-selftest PRIVATE
+    VEDIT_SEARCH_EXPANSION_FIXTURE="${VEDIT_SEARCH_EXPANSION_FIXTURE}")
+endif()
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(vedit-workspace-search-selftest PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()

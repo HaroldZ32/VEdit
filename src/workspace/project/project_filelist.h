@@ -1,6 +1,10 @@
 #pragma once
 
-// FIX 2: opening a `.f` / `.F` filelist imports it as the project.
+// G1-a: OPENING a `.f` / `.F` filelist NEVER imports it. The project file set is
+// widened only by an EXPLICIT import (`Project ▸ Import Filelist…` — the Project
+// panel's button — or the "Import" answer to the one question the open seam
+// asks). `planOpenedFilelist` therefore describes what an explicit "Import"
+// would do; `needsRoot`/`root` are meaningful on that path only.
 //
 // (`.flist` is not a filelist extension: only `f`, case-insensitive, decided by
 // the parser — crates/vd-config/src/project.rs. The set has one definition,
@@ -12,10 +16,15 @@
 // decision is a pure function here (no src/app, no Qt widgets) so a lane-only
 // build can test it:
 //
-//   * no project open  -> the filelist's own directory becomes the root first
-//     (RootSource::Filelist in crates/vd-config/src/project.rs), then import;
-//   * project open     -> import into the CURRENT root; re-opening the root
-//     would clear the filelists already imported.
+//   * no project open  -> on an explicit "Import", the filelist's own directory
+//     becomes the root first (RootSource::Filelist in
+//     crates/vd-config/src/project.rs), then the list is imported;
+//   * project open     -> on an explicit "Import", the list is imported into the
+//     CURRENT root; re-opening the root would clear the filelists already
+//     imported;
+//   * a project that ALREADY has a filelist imports nothing: the question is not
+//     asked and the document only opens as text. The default answer ("Open
+//     Only") never imports in the other two cases either.
 //
 // The parse is never re-implemented: ProjectModel::importFilelists() drives the
 // Rust parser (crates/vd-config/src/filelist.rs) and its diagnostics.
@@ -27,9 +36,10 @@ namespace vedit::workspace::project {
 struct OpenedFilelistPlan {
     // The document is a filelist (extension .f/.F, case-insensitive).
     bool isFilelist = false;
-    // No project is open, so `root` must be set before importing.
+    // No project is open: the explicit `Import` answer must set `root` first.
     bool needsRoot = false;
-    // The filelist's directory (only meaningful when needsRoot).
+    // The filelist's directory (only meaningful when needsRoot, i.e. on the
+    // explicit `Import` path).
     QString root;
     // The absolute spelling of the document (the import key).
     QString absolutePath;

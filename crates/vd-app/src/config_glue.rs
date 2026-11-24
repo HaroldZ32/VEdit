@@ -28,7 +28,8 @@ impl Default for EditorSettings {
     }
 }
 
-/// Resolved tool paths (each keeps its attempt list; `PATH` is never consulted).
+/// Resolved tool paths (each keeps its attempt list; sources in order: setting, bundled,
+/// imported project/global variables, then the process `PATH` and `VEDIT_*` environment).
 #[derive(Debug, Clone, Default)]
 pub struct ToolPaths {
     pub ls: Option<PathBuf>,

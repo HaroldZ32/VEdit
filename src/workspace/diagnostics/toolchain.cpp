@@ -26,12 +26,21 @@ QString readableCandidates(const QStringList &searched)
     return searched.join(QStringLiteral(", "));
 }
 
-/// Resolve one tool with the delivery order bundled > PATH > env.
+/// Resolve one tool in the product-wide order: explicit setting -> bundled ->
+/// local checkout -> imported project -> imported global -> PATH -> env.
+///
+/// The two imported stages are RESERVED: the product's contexts pass empty maps
+/// (the merged selection lives in the Rust service layer and the C ABI exposes
+/// no synchronous read); only an injected context populates them. The branches
+/// stay because the order is a contract the self-test exercises.
 ToolResolution resolveOne(ToolKind kind,
                           const QString &name,
                           const QString &envName,
                           const QStringList &bundledDirs,
                           const QStringList &localDirs,
+                          const QHash<QString, QString> &explicitPaths,
+                          const QHash<QString, QString> &importedProjectVars,
+                          const QHash<QString, QString> &importedGlobalVars,
                           const QStringList &pathDirs,
                           const QHash<QString, QString> &env)
 {
@@ -49,63 +58,99 @@ ToolResolution resolveOne(ToolKind kind,
         return info.isFile() && info.isExecutable();
     };
 
-    // 1) bundled: next to the product binary.
+    const auto accept = [&resolution](const QString &candidate, ToolSource source) {
+        resolution.path = QFileInfo(candidate).absoluteFilePath();
+        resolution.source = source;
+        return resolution;
+    };
+
+    // 1) explicit setting: the `tools.*` path wins over every discovered source.
+    //    A set-but-unusable path is recorded and resolution falls through.
+    const QString setting = explicitPaths.value(name).trimmed();
+    if (probe(setting)) {
+        return accept(setting, ToolSource::Settings);
+    }
+
+    // 2) bundled: next to the product binary.
     for (const QString &dir : bundledDirs) {
         if (dir.isEmpty()) {
             continue;
         }
         const QString candidate = dir + QLatin1Char('/') + name;
         if (probe(candidate)) {
-            resolution.path = QFileInfo(candidate).absoluteFilePath();
-            resolution.source = ToolSource::Bundled;
-            return resolution;
+            return accept(candidate, ToolSource::Bundled);
         }
     }
 
-    // 2) local checkout: the source tree's own toolchain artifacts (bare build).
+    // 3) local checkout: the source tree's own toolchain artifacts (bare build).
     for (const QString &dir : localDirs) {
         if (dir.isEmpty()) {
             continue;
         }
         const QString candidate = dir + QLatin1Char('/') + name;
         if (probe(candidate)) {
-            resolution.path = QFileInfo(candidate).absoluteFilePath();
-            resolution.source = ToolSource::Local;
-            return resolution;
+            return accept(candidate, ToolSource::Local);
         }
     }
 
-    // 3) PATH.
+    // 4-5) imported variables: the project's layer first, then the global one.
+    //      Each layer is the `VEDIT_<TOOL>` override plus its `_DIR` form.
+    //      RESERVED in the product: both maps are empty there (see toolchain.h);
+    //      this branch is reached only by a context that injects them.
+    const auto probeVariableLayer = [&](const QHash<QString, QString> &vars,
+                                        ToolSource source) -> bool {
+        const QString override = vars.value(envName).trimmed();
+        if (probe(override)) {
+            resolution.path = QFileInfo(override).absoluteFilePath();
+            resolution.source = source;
+            return true;
+        }
+        const QString dirOverride = vars.value(envName + QStringLiteral("_DIR")).trimmed();
+        if (!dirOverride.isEmpty()) {
+            const QString candidate = dirOverride + QLatin1Char('/') + name;
+            if (probe(candidate)) {
+                resolution.path = QFileInfo(candidate).absoluteFilePath();
+                resolution.source = source;
+                return true;
+            }
+        }
+        // The Verible trio shares one legacy `VEDIT_VERIBLE_DIR`. The Rust
+        // resolver honours it, so this half must too: one variable, one answer.
+        if (envName.startsWith(QStringLiteral("VEDIT_VERIBLE_"))) {
+            const QString legacy = vars.value(QStringLiteral("VEDIT_VERIBLE_DIR")).trimmed();
+            if (!legacy.isEmpty()) {
+                const QString candidate = legacy + QLatin1Char('/') + name;
+                if (probe(candidate)) {
+                    resolution.path = QFileInfo(candidate).absoluteFilePath();
+                    resolution.source = source;
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+    if (probeVariableLayer(importedProjectVars, ToolSource::ImportedProject)) {
+        return resolution;
+    }
+    if (probeVariableLayer(importedGlobalVars, ToolSource::ImportedGlobal)) {
+        return resolution;
+    }
+
+    // 6) PATH.
     for (const QString &dir : pathDirs) {
         if (dir.isEmpty()) {
             continue;
         }
         const QString candidate = dir + QLatin1Char('/') + name;
         if (probe(candidate)) {
-            resolution.path = QFileInfo(candidate).absoluteFilePath();
-            resolution.source = ToolSource::Path;
-            return resolution;
+            return accept(candidate, ToolSource::Path);
         }
     }
 
-    // 4) env: explicit override, last (never silently preferred over bundled/local/PATH).
-    const QString override = env.value(envName).trimmed();
-    if (!override.isEmpty()) {
-        if (probe(override)) {
-            resolution.path = QFileInfo(override).absoluteFilePath();
-            resolution.source = ToolSource::Env;
-            return resolution;
-        }
-    }
-    // `*_DIR` form: directory holding the tool under its canonical name.
-    const QString dirOverride = env.value(envName + QStringLiteral("_DIR")).trimmed();
-    if (!dirOverride.isEmpty()) {
-        const QString candidate = dirOverride + QLatin1Char('/') + name;
-        if (probe(candidate)) {
-            resolution.path = QFileInfo(candidate).absoluteFilePath();
-            resolution.source = ToolSource::Env;
-            return resolution;
-        }
+    // 7) env: explicit override, last (never silently preferred over
+    //    bundled/local/imported/PATH).
+    if (probeVariableLayer(env, ToolSource::Env)) {
+        return resolution;
     }
 
     resolution.source = ToolSource::Missing;
@@ -178,6 +223,10 @@ QString toolSourceLabel(ToolSource source, const QString &envName)
         return envName.isEmpty() ? QStringLiteral("env") : QStringLiteral("env:") + envName;
     case ToolSource::Settings:
         return QStringLiteral("settings");
+    case ToolSource::ImportedProject:
+        return QStringLiteral("imported-project");
+    case ToolSource::ImportedGlobal:
+        return QStringLiteral("imported-global");
     case ToolSource::Missing:
         return QStringLiteral("missing");
     }
@@ -205,6 +254,20 @@ const ToolResolution &ToolchainReport::toolFor(ToolKind kind) const
         return veribleFormat;
     case ToolKind::VeribleLint:
         return veribleLint;
+    case ToolKind::VhdlLs:
+        return vhdlLs;
+    case ToolKind::Ghdl:
+        return ghdl;
+    case ToolKind::Vsg:
+        return vsg;
+    case ToolKind::ScalaJava:
+        return scalaJava;
+    case ToolKind::ScalaCli:
+        return scalaCli;
+    case ToolKind::Sbt:
+        return sbt;
+    case ToolKind::Metals:
+        return metals;
     }
     return slang;
 }
@@ -243,6 +306,93 @@ QString ToolchainReport::auxiliaryStatusLine() const
              veribleFormat.sourceLabel(),
              veribleLint.sourceLabel(),
              auxiliaryMissing().join(QStringLiteral(", ")));
+}
+
+QStringList ToolchainReport::scalaMissing() const
+{
+    QStringList absent;
+    for (const ToolResolution *tool : {&scalaJava, &scalaCli, &sbt, &metals}) {
+        if (!tool->found()) {
+            absent.append(tool->name);
+        }
+    }
+    return absent;
+}
+
+QString ToolchainReport::scalaStatusLine() const
+{
+    return QStringLiteral("source=java:%1 scala-cli:%2 sbt:%3 metals:%4 missing=[%5]")
+        .arg(scalaJava.sourceLabel(), scalaCli.sourceLabel(), sbt.sourceLabel(),
+             metals.sourceLabel(), scalaMissing().join(QStringLiteral(", ")));
+}
+
+QStringList ToolchainReport::vhdlMissing() const
+{
+    QStringList absent;
+    for (const ToolResolution *tool : {&vhdlLs, &ghdl, &vsg}) {
+        if (!tool->found()) {
+            absent.append(tool->name);
+        }
+    }
+    return absent;
+}
+
+QString ToolchainReport::vhdlStatusLine() const
+{
+    return QStringLiteral("source=vhdl_ls:%1 ghdl:%2 vsg:%3 missing=[%4]")
+        .arg(vhdlLs.sourceLabel(), ghdl.sourceLabel(), vsg.sourceLabel(),
+             vhdlMissing().join(QStringLiteral(", ")));
+}
+
+QString ToolchainReport::vhdlImpact() const
+{
+    if (vhdlMissing().isEmpty()) {
+        return QString();
+    }
+    // T60: one clause PER MISSING TOOL, so a missing GHDL is never described as
+    // a navigation problem (navigation is `vhdl_ls`'s job). The clauses are
+    // translated: the same text reaches the status bar, the tooltip and the
+    // shell diagnostic.
+    QStringList parts;
+    if (!vhdlLs.found()) {
+        parts.append(QCoreApplication::translate(
+            "VEdit", "VHDL diagnostics, hover and go-to-definition are unavailable"));
+    }
+    if (!ghdl.found() && !vsg.found()) {
+        parts.append(QCoreApplication::translate("VEdit", "GHDL+VSG VHDL lint is unavailable"));
+    } else if (!ghdl.found()) {
+        parts.append(QCoreApplication::translate(
+            "VEdit",
+            "GHDL analysis and the merged GHDL+VSG VHDL lint are unavailable"));
+    } else if (!vsg.found()) {
+        parts.append(QCoreApplication::translate(
+            "VEdit", "the VSG VHDL style rules and their --fix formatting are unavailable"));
+    }
+    return parts.join(QStringLiteral("; ")) + QLatin1Char('.');
+}
+
+QString ToolchainReport::vhdlFixHint() const
+{
+    if (vhdlMissing().isEmpty()) {
+        return QString();
+    }
+    return QCoreApplication::translate(
+        "VEdit", "Fix: bundle `vhdl_ls`/`ghdl`/`vsg` in the product's bin/ next to vd-app "
+                 "(bash packaging/runtime/build-vhdl-payload.sh), install them on PATH, or "
+                 "set VEDIT_VHDL_LS / VEDIT_GHDL / VEDIT_VSG.");
+}
+
+QString ToolchainReport::vhdlUserMessage() const
+{
+    const QStringList absent = vhdlMissing();
+    if (absent.isEmpty()) {
+        // AC-6.7: a healthy VHDL toolchain is silent — no status line at all.
+        return {};
+    }
+    return QCoreApplication::translate(
+               "VEdit", "VHDL tools unavailable: %1 not found (bundled, local checkout, "
+                        "imported vars, PATH and env all empty). Impact: %2 %3")
+        .arg(absent.join(QStringLiteral(", ")), vhdlImpact(), vhdlFixHint());
 }
 
 QString ToolchainReport::statusLine() const
@@ -303,9 +453,31 @@ QString ToolchainReport::missingMessage(ToolKind kind) const
     case ToolKind::VeribleLint:
         fallback = QStringLiteral("verible-verilog-lint");
         break;
+    case ToolKind::VhdlLs:
+        fallback = QStringLiteral("vhdl_ls");
+        break;
+    case ToolKind::Ghdl:
+        fallback = QStringLiteral("ghdl");
+        break;
+    case ToolKind::Vsg:
+        fallback = QStringLiteral("vsg");
+        break;
+    case ToolKind::ScalaJava:
+        fallback = QStringLiteral("java");
+        break;
+    case ToolKind::ScalaCli:
+        fallback = QStringLiteral("scala-cli");
+        break;
+    case ToolKind::Sbt:
+        fallback = QStringLiteral("sbt");
+        break;
+    case ToolKind::Metals:
+        fallback = QStringLiteral("metals");
+        break;
     }
     const QString name = tool.name.isEmpty() ? fallback : tool.name;
-    return QStringLiteral("%1 not found (bundled, local checkout, PATH and env all empty)")
+    return QStringLiteral("%1 not found (bundled, local checkout, imported vars, PATH and "
+                          "env all empty)")
         .arg(name);
 }
 
@@ -327,6 +499,11 @@ QString ToolchainReport::probeDetail() const
         parts.append(QStringLiteral("verible-verilog-lint probed: %1")
                          .arg(readableCandidates(veribleLint.searched)));
     }
+    for (const ToolResolution *tool : {&vhdlLs, &ghdl, &vsg}) {
+        if (!tool->searched.isEmpty() || tool->found()) {
+            parts.append(QStringLiteral("%1 probed: %2").arg(tool->name, readableCandidates(tool->searched)));
+        }
+    }
     return parts.join(QStringLiteral(" | "));
 }
 
@@ -345,8 +522,16 @@ QString ToolchainReport::userMessage() const
     if (!slang.found()) {
         absent.append(slang.name.isEmpty() ? QStringLiteral("slang") : slang.name);
     }
+    // NOTE (E5): the three user-facing "not found" messages (this one and the
+    // two above) still name "imported vars" among the places probed. The
+    // catalogue translations (`translations/vedit_zh_CN.ts`) carry those exact
+    // source strings and the lrelease gate requires zero untranslated entries,
+    // so the wording is kept as-is in this batch; the imported stages are
+    // RESERVED and empty (see `applicationToolchainContext()`), so they can
+    // never be the reason a tool was found. Removing the phrase needs a
+    // translation update, not a comment change.
     return QStringLiteral("Diagnostics unavailable: %1 not found (bundled, local checkout, "
-                          "PATH and env all empty). Impact: %2 %3")
+                          "imported vars, PATH and env all empty). Impact: %2 %3")
         .arg(absent.join(QStringLiteral(", ")), impact(), fixHint())
         .simplified();
 }
@@ -359,6 +544,9 @@ ToolchainReport resolveToolchain(const ToolchainSearchContext &context)
                                 QStringLiteral("VEDIT_VERIBLE_LS"),
                                 context.bundledDirs,
                                 context.localDirs,
+                                context.explicitPaths,
+                                context.importedProjectVars,
+                                context.importedGlobalVars,
                                 context.pathDirs,
                                 context.env);
     report.slang = resolveOne(ToolKind::Slang,
@@ -366,6 +554,9 @@ ToolchainReport resolveToolchain(const ToolchainSearchContext &context)
                               QStringLiteral("VEDIT_SLANG"),
                               context.bundledDirs,
                               context.localDirs,
+                              context.explicitPaths,
+                              context.importedProjectVars,
+                              context.importedGlobalVars,
                               context.pathDirs,
                               context.env);
     report.slangServer = resolveOne(ToolKind::SlangServer,
@@ -373,6 +564,9 @@ ToolchainReport resolveToolchain(const ToolchainSearchContext &context)
                                     QStringLiteral("VEDIT_SLANG_SERVER"),
                                     context.bundledDirs,
                                     context.localDirs,
+                                    context.explicitPaths,
+                                    context.importedProjectVars,
+                                    context.importedGlobalVars,
                                     context.pathDirs,
                                     context.env);
     report.veribleFormat = resolveOne(ToolKind::VeribleFormat,
@@ -380,6 +574,9 @@ ToolchainReport resolveToolchain(const ToolchainSearchContext &context)
                                       QStringLiteral("VEDIT_VERIBLE_FORMAT"),
                                       context.bundledDirs,
                                       context.localDirs,
+                                      context.explicitPaths,
+                                      context.importedProjectVars,
+                                      context.importedGlobalVars,
                                       context.pathDirs,
                                       context.env);
     report.veribleLint = resolveOne(ToolKind::VeribleLint,
@@ -387,8 +584,85 @@ ToolchainReport resolveToolchain(const ToolchainSearchContext &context)
                                     QStringLiteral("VEDIT_VERIBLE_LINT"),
                                     context.bundledDirs,
                                     context.localDirs,
+                                    context.explicitPaths,
+                                    context.importedProjectVars,
+                                    context.importedGlobalVars,
                                     context.pathDirs,
                                     context.env);
+    report.vhdlLs = resolveOne(ToolKind::VhdlLs,
+                               context.vhdlLsName,
+                               QStringLiteral("VEDIT_VHDL_LS"),
+                               context.bundledDirs,
+                               context.localDirs,
+                               context.explicitPaths,
+                               context.importedProjectVars,
+                               context.importedGlobalVars,
+                               context.pathDirs,
+                               context.env);
+    report.ghdl = resolveOne(ToolKind::Ghdl,
+                             context.ghdlName,
+                             QStringLiteral("VEDIT_GHDL"),
+                             context.bundledDirs,
+                             context.localDirs,
+                             context.explicitPaths,
+                             context.importedProjectVars,
+                             context.importedGlobalVars,
+                             context.pathDirs,
+                             context.env);
+    report.vsg = resolveOne(ToolKind::Vsg,
+                            context.vsgName,
+                            QStringLiteral("VEDIT_VSG"),
+                            context.bundledDirs,
+                            context.localDirs,
+                            context.explicitPaths,
+                            context.importedProjectVars,
+                            context.importedGlobalVars,
+                            context.pathDirs,
+                            context.env);
+    // T12: the offline Scala toolchain. Bundled means `bin/java`, `bin/scala-cli`,
+    // `bin/sbt`, `bin/metals` next to the product binary — the wrappers the
+    // AppDir installs, each of which redirects the cache/daemon homes inside the
+    // AppDir (see THIRD_PARTY_NOTICES.md §11).
+    report.scalaJava = resolveOne(ToolKind::ScalaJava,
+                                  context.scalaJavaName,
+                                  QStringLiteral("VEDIT_JAVA"),
+                                  context.bundledDirs,
+                                  context.localDirs,
+                                  context.explicitPaths,
+                                  context.importedProjectVars,
+                                  context.importedGlobalVars,
+                                  context.pathDirs,
+                                  context.env);
+    report.scalaCli = resolveOne(ToolKind::ScalaCli,
+                                 context.scalaCliName,
+                                 QStringLiteral("VEDIT_SCALA_CLI"),
+                                 context.bundledDirs,
+                                 context.localDirs,
+                                 context.explicitPaths,
+                                 context.importedProjectVars,
+                                 context.importedGlobalVars,
+                                 context.pathDirs,
+                                 context.env);
+    report.sbt = resolveOne(ToolKind::Sbt,
+                            context.sbtName,
+                            QStringLiteral("VEDIT_SBT"),
+                            context.bundledDirs,
+                            context.localDirs,
+                            context.explicitPaths,
+                            context.importedProjectVars,
+                            context.importedGlobalVars,
+                            context.pathDirs,
+                            context.env);
+    report.metals = resolveOne(ToolKind::Metals,
+                               context.metalsName,
+                               QStringLiteral("VEDIT_METALS"),
+                               context.bundledDirs,
+                               context.localDirs,
+                               context.explicitPaths,
+                               context.importedProjectVars,
+                               context.importedGlobalVars,
+                               context.pathDirs,
+                               context.env);
     return report;
 }
 
@@ -420,11 +694,42 @@ ToolchainSearchContext applicationToolchainContext()
     };
     remember("VEDIT_VERIBLE_LS");
     remember("VEDIT_VERIBLE_LS_DIR");
+    remember("VEDIT_VERIBLE_DIR");
     remember("VEDIT_SLANG");
     remember("VEDIT_SLANG_DIR");
     remember("VEDIT_SLANG_SERVER");
+    remember("VEDIT_SLANG_SERVER_DIR");
     remember("VEDIT_VERIBLE_FORMAT");
+    remember("VEDIT_VERIBLE_FORMAT_DIR");
     remember("VEDIT_VERIBLE_LINT");
+    remember("VEDIT_VERIBLE_LINT_DIR");
+    remember("VEDIT_VHDL_LS");
+    remember("VEDIT_VHDL_LS_DIR");
+    remember("VEDIT_GHDL");
+    remember("VEDIT_GHDL_DIR");
+    remember("VEDIT_VSG");
+    remember("VEDIT_VSG_DIR");
+    // The Scala group (T12/E5): `resolveOne` passes exactly these four names for
+    // java / scala-cli / sbt / metals. They were missing from this table, so
+    // `env:VEDIT_JAVA` (and the other three) could never resolve.
+    remember("VEDIT_JAVA");
+    remember("VEDIT_SCALA_CLI");
+    remember("VEDIT_SBT");
+    remember("VEDIT_METALS");
+
+    // `explicitPaths` stays empty here: the `tools.*` settings keys reach the
+    // report through `applyToolOverrides` (this lane has no settings dependency).
+    //
+    // `importedProjectVars` / `importedGlobalVars` stay empty here PERMANENTLY as
+    // far as this function is concerned, and that is a design limit, not a TODO:
+    // the imported shell selection is merged in the Rust service layer
+    // (`vd_deeplint::binary::set_imported_environment`) and handed to CHILD
+    // processes; the C ABI has no synchronous accessor, so C++ discovery cannot
+    // read it. Do NOT "fix" this by exporting the selection into the process
+    // environment: that would leak every imported value (including revealed
+    // secrets) into every child and the terminal, and it needs a user decision.
+    // Imported variables therefore reach lint/catalog/hierarchy children and
+    // filelist expansion — never this resolver. See `toolchain.h` and E5.
 
     ToolchainSearchContext context = contextFor(bundledDirs, pathDirs, env);
     context.localDirs = localDirs;
@@ -435,9 +740,13 @@ QString toolchainStatusLine()
 {
     const ToolchainSearchContext context = applicationToolchainContext();
     const ToolchainReport report = resolveToolchain(context);
-    return QStringLiteral("TOOLCHAIN %1 %2 local=[%3]")
+    // T12: the Scala group is reported in the same line, with its own chosen
+    // source, so a machine-readable selfcheck shows whether the offline payload
+    // (or a user's own toolchain) answered for java/scala-cli/sbt/metals.
+    return QStringLiteral("TOOLCHAIN %1 %2 local=[%3] vhdl %4 scala %5")
         .arg(report.statusLine(), report.auxiliaryStatusLine(),
-             context.localDirs.join(QLatin1Char(',')));
+             context.localDirs.join(QLatin1Char(',')), report.vhdlStatusLine(),
+             report.scalaStatusLine());
 }
 
 namespace {
@@ -480,6 +789,10 @@ void applyToolOverrides(ToolchainReport *report, const QHash<QString, QString> &
             continue;
         }
         const QFileInfo info(value);
+        // Record the explicit probe even when it is unusable: stage 1 was
+        // attempted, so a stale settings path must be visible rather than
+        // silently replaced by the discovered tool.
+        tool->searched.prepend(value);
         if (!info.isFile() || !info.isExecutable()) {
             continue;
         }

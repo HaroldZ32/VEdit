@@ -275,9 +275,10 @@ int main(int argc, char **argv)
     const QString manifest = QDir(rootA).filePath(QStringLiteral("sources.f"));
     const QString noteFile = QDir(rootA).filePath(QStringLiteral("notes.md"));
     const QString scriptFile = QDir(rootA).filePath(QStringLiteral("run.tcl"));
-    // NOT inside project-a: a root-level `.f` is auto-discovered by the scan,
-    // so only an imported list from elsewhere proves the analysis side honours
-    // the panel's imported-list input.
+    // NOT inside project-a: a root-level `.f` is auto-discovered by the scan
+    // only when the project opts in (`[project] auto_discover = true`, which
+    // this fixture writes), so an imported list from elsewhere proves the
+    // analysis side honours the panel's imported-list input on its own.
     const QString importedList = dir.filePath(QStringLiteral("lists/a-imported.f"));
     const bool fixture =
         writeFile(aSource, QStringLiteral("module a;\n  logic x;\nendmodule\n"))
@@ -293,10 +294,17 @@ int main(int argc, char **argv)
                      QStringLiteral("a.sv\n../shared/listed.sv\nnotes.md\nrun.tcl\n"))
         && writeFile(QDir(rootA).filePath(QStringLiteral("vedit.toml")),
                      QStringLiteral("[project]\ninclude_dirs = [\"a_inc\"]\ndefines = "
-                                    "[\"A_ONLY=1\"]\n"))
+                                    "[\"A_ONLY=1\"]\nauto_discover = true\n"))
+        // A61.2c: every root needs a manifest of its OWN - a project exists only
+        // after an explicit import, and rootB is a switch target. The legacy
+        // `auto_discover` switch is what makes the root's own `.f` and source
+        // scan contribute to the set (default `false`, the 2026-11-18
+        // file-set decision; docs/USER_GUIDE.md §2.8).
+        && writeFile(QDir(rootB).filePath(QStringLiteral("sources.f")),
+                     QStringLiteral("b.sv\n"))
         && writeFile(QDir(rootB).filePath(QStringLiteral("vedit.toml")),
                      QStringLiteral("[project]\ninclude_dirs = [\"b_inc\"]\ndefines = "
-                                    "[\"B_ONLY=1\"]\n"))
+                                    "[\"B_ONLY=1\"]\nauto_discover = true\n"))
         // The restored model of the LAST session: root A with its imported list.
         && writePersistedState(stateDir, rootA, {importedList},
                                {aSource, outsideSource});
@@ -395,7 +403,7 @@ int main(int argc, char **argv)
         const QVariantMap state = diagnosticsProject();
         return state.value(QStringLiteral("root")).toString() == root
             && !state.value(QStringLiteral("pending")).toBool()
-            && !controller->fileSet().isEmpty();
+            && !controller->projectFiles().isEmpty();
     };
     const auto projectSettled = [&project](const QString &root) {
         return project->projectRoot() == root && !project->isPending() && !project->files().isEmpty();
@@ -404,7 +412,7 @@ int main(int argc, char **argv)
         bool ok = false;
         const QJsonObject object = readPersistedState(stateDir, &ok);
         return ok && object.value(QStringLiteral("projectRoot")).toString() == root
-            && jsonStrings(object, "files").size() == controller->fileSet().size();
+            && jsonStrings(object, "files").size() == controller->projectFiles().size();
     };
 
     // --- startup: the RESTORED project's imported list reaches BOTH sides --
@@ -413,7 +421,10 @@ int main(int argc, char **argv)
             return diagnosticsSettled(rootA) && projectSettled(rootA)
                 && persistedMatches(rootA);
         }, 15000);
-    const QStringList startSet = controller->fileSet();
+    // batch-20261116 L1.1: the PROJECT set (project-pass filter + panel) is
+    // `projectFiles()`; `fileSet()` is the realtime session set and no longer
+    // exists before a document is analysed.
+    const QStringList startSet = controller->projectFiles();
     std::printf("RM2-START root='%s' analysis-files=%d panel-files=%d imported='%s'\n",
                 qPrintable(rootA), static_cast<int>(startSet.size()),
                 static_cast<int>(project->files().size()), qPrintable(importedList));
@@ -687,6 +698,16 @@ int main(int argc, char **argv)
         // schedule a second expansion for it. This is the duplicate the user's
         // machine produced from more than one widget.
         project->openRoot(step.target);
+        // A61.2c (batch-20261115): switching to a root does NOT make it a project
+        // (A61.2). The user imports that root's filelist, exactly like the
+        // Import Filelist action, and THAT is the one expansion this switch
+        // schedules. The coverage assertions are unchanged.
+        {
+            const QString targetList =
+                QDir(step.target).filePath(QStringLiteral("sources.f"));
+            check(name("manifest-import").toUtf8().constData(),
+                  project->importFilelists({targetList}));
+        }
         ++expectedExpansions;
         const bool settled =
             waitUntil([&]() {
@@ -695,7 +716,7 @@ int main(int argc, char **argv)
             }, 15000);
         QCoreApplication::processEvents();
 
-        const QStringList analysis = controller->fileSet();
+        const QStringList analysis = controller->projectFiles();
         const QVariantMap diag = diagnosticsProject();
         const QVariantMap inputs = projectInputs();
         const QVariantMap env = projectEnvironment();
@@ -774,8 +795,14 @@ int main(int argc, char **argv)
               QStringLiteral("defines='%1'").arg(envDefines.join(QLatin1Char(','))));
         // The panel's inputs are the new root's (a switch never carries the
         // previous project's imported lists).
-        check(name("inputs-filelists-cleared").toUtf8().constData(),
-              inputs.value(QStringLiteral("filelists")).toStringList().isEmpty());
+        // A61.2c: after the switch the inputs carry the TARGET's OWN manifest -
+        // the point is that the PREVIOUS project's list did not leak across.
+        const QStringList inputLists =
+            inputs.value(QStringLiteral("filelists")).toStringList();
+        const QString targetManifest =
+            QDir(step.target).filePath(QStringLiteral("sources.f"));
+        check(name("inputs-filelists-target-only").toUtf8().constData(),
+              inputLists == QStringList{targetManifest}, inputLists.join(QLatin1Char(',')));
         check(name("inputs-settings-path").toUtf8().constData(),
               inputs.value(QStringLiteral("settingsPath")).toString()
                   == QDir(stateDir).filePath(QStringLiteral("settings.toml")));

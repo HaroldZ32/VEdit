@@ -8,6 +8,7 @@
 #include "search_panel.h"
 #include "search_query.h"
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <QMainWindow>
 #include <QString>
@@ -49,6 +50,16 @@ void installSearch(vedit::app::ApplicationShell &shell, const IntegrationOptions
             auto *pane = area != nullptr ? area->activePane() : nullptr;
             return pane != nullptr ? pane->currentFilePath() : QString();
         });
+        // Batch 20261110d: the search SCOPE is the project file set, read from
+        // the ONE published membership (the file tree and the lint pass consume
+        // the same property). A function, not a snapshot: a `.f` imported after
+        // the dock was built reaches the next search, and the root-change
+        // handler below (plus the publisher's empty set) makes a stale project
+        // unsearchable by construction. An empty set means "no project model
+        // yet" and the scan falls back to the directory walk.
+        panel->setProjectFilesProvider([&shell]() {
+            return shell.property("vedit.diagnostics.projectFiles").toStringList();
+        });
         return panel;
     };
     shell.panels()->setFactory(QStringLiteral("search"), factory);
@@ -86,6 +97,32 @@ void installSearch(vedit::app::ApplicationShell &shell, const IntegrationOptions
             }
             return apply(shell.findChild<search::SearchPanel *>());
         });
+
+    // Batch 20261110d: the bounded search history lives on the ONE SearchHub so
+    // both surfaces (this dock and the Ctrl+F bar) feed the same list. The store
+    // is INJECTED here instead of being a link edge: the editor kernel is a
+    // lower layer and must never include a workspace lane. File IO happens
+    // exactly twice — one read at startup and one atomic write at quit — so a
+    // search itself never touches the disk (the hub's saver stays null; the
+    // quit hook reads the in-memory list once).
+    const QString historyDir = options.stateDir;
+    if (!vedit::search::searchHistoryPath(historyDir).isEmpty()) {
+        vedit::search::SearchHub::instance().setHistoryStore(
+            [historyDir]() { return vedit::search::loadSearchHistoryFile(historyDir); },
+            nullptr);
+        // Keep only the latest hook: a later install (a new shell in the same
+        // process, or a test) supersedes the previous state directory.
+        static QMetaObject::Connection historyFlush;
+        if (historyFlush) {
+            QObject::disconnect(historyFlush);
+        }
+        historyFlush = QObject::connect(
+            QCoreApplication::instance(), &QCoreApplication::aboutToQuit, &shell,
+            [historyDir]() {
+                vedit::search::saveSearchHistoryFile(historyDir,
+                                             vedit::search::SearchHub::instance().history());
+            });
+    }
 
     if (qEnvironmentVariableIsSet("VEDIT_DEBUG")) {
         qInfo("search: installSearch projectRoot='%s' jumpTarget=registry(editor)",

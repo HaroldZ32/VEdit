@@ -205,7 +205,13 @@ int main(int argc, char **argv)
     const QString bPath = QDir(project).filePath(QStringLiteral("b.sv"));
     const bool fixture =
         writeFile(aPath, QStringLiteral("module a;\n  logic x;   \nendmodule\n"))
-        && writeFile(bPath, QStringLiteral("module b;\n  logic y;\nendmodule\n"));
+        && writeFile(bPath, QStringLiteral("module b;\n  logic y;\nendmodule\n"))
+        // Since the 2026-11-18 file-set decision a root contributes exactly the
+        // files its DECLARED filelists name; this harness has no `.f`, so it
+        // opts into the legacy root scan to keep the two sources it asserts
+        // (default `false`, docs/USER_GUIDE.md §2.8).
+        && writeFile(QDir(project).filePath(QStringLiteral("vedit.toml")),
+                     QStringLiteral("[project]\nauto_discover = true\n"));
     check("split.fixture", fixture);
     if (!fixture) {
         std::printf("SUMMARY checks=%d failures=%d\n", g_checks, g_failures);
@@ -249,7 +255,26 @@ int main(int argc, char **argv)
     shell->show();
     QCoreApplication::processEvents();
 
-    // ---- the project-open pass covers both files (deterministic squiggles) --
+    // ---- a MANUAL project pass covers both files (deterministic squiggles) --
+    // A61.1c (batch-20261115, supersedes "the project-open pass covers both"):
+    // opening a project no longer runs a full pass (AC-2.4), so the harness
+    // triggers the one explicit run - `Project > Lint Project` - itself. The
+    // coverage this section needs (both files carry an upper-layer verdict) is
+    // unchanged; only what starts the pass moved.
+    QAction *lintAction = shell->commands() != nullptr
+                              ? shell->commands()->action(QStringLiteral("project.lint"))
+                              : nullptr;
+    check("split.lint-action", lintAction != nullptr);
+    // The explicit run needs the project file set: the poller expands it
+    // asynchronously, so wait for it BEFORE clicking (an early click would report
+    // "still loading" and start nothing - the old automatic pass gave this wait
+    // for free).
+    check("split.file-set-arrives",
+          waitUntil([controller]() { return !controller->projectFiles().isEmpty(); }, 20000),
+          QStringLiteral("files=%1").arg(controller->projectFiles().size()));
+    if (lintAction != nullptr) {
+        lintAction->trigger();
+    }
     const bool covered = waitUntil(
         [controller, &aPath, &bPath]() {
             return controller->hasUpperLayer(aPath) && controller->hasUpperLayer(bPath)

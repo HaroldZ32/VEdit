@@ -1,0 +1,24 @@
+# Launch finding — packaged app under a KDE-configured $HOME — 2026-11-09T16:01:14Z
+# NOT a regression of the 0.2.1->0.2.2 freeze: the 0.2.1 artifact reproduces it identically.
+# Host Xvfb: absent (xcb launch not testable on this host)
+
+## 0.2.2, real HOME (/home/haroldzhao), offscreen, --version  (expected: vedit-app 0.2.2 + rc=0)
+0.2.2 realHOME --version -> rc=124 elapsed_s=10 stdout=[] stderr_last=[This plugin does not support propagateSizeHints()]
+
+## 0.2.2, real HOME but XDG_CONFIG_HOME fresh (isolates ~/.config as the trigger)
+0.2.2 realHOME+fresh XDG_CONFIG_HOME --version -> rc=0 elapsed_s=0 stdout=[vedit-app 0.2.2 ] stderr_last=[QThreadStorage: entry 0 destroyed before end of thread 0x55557d7b7a40]
+
+## Control: 0.2.1 artifact (pre-freeze) under the same real HOME
+0.2.1 realHOME --version -> rc=124 elapsed_s=10 stdout=[] stderr_last=[This plugin does not support propagateSizeHints()]
+0.2.1 freshHOME --version -> rc=0 elapsed_s=0 stdout=[vedit-app 0.2.1 ] stderr_last=[QThreadStorage: entry 0 destroyed before end of thread 0x55558456da40]
+
+## Where it blocks (strace, 10 s window, 0.2.2, real HOME)
+last file ops before the kill:
+65    access("/usr/lib/x86_64-linux-gnu/qt6/plugins/iconengines/libqsvgicon.so.avx2", F_OK) = -1 ENOENT (No such file or directory)
+65    openat(AT_FDCWD, "/usr/lib/x86_64-linux-gnu/qt6/plugins/iconengines/libqsvgicon.so", O_RDONLY|O_CLOEXEC) = 11
+65    openat(AT_FDCWD, "/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 11
+65    openat(AT_FDCWD, "/usr/lib/x86_64-linux-gnu/libQt6Svg.so.6", O_RDONLY|O_CLOEXEC) = 11
+
+## Reading: the only failing ingredient is the real ~/.config (KDE: kdeglobals/katevirc/vd-apprc were opened).
+## With a fresh HOME or a fresh XDG_CONFIG_HOME the same bytes exit 0 and print 0.2.2.
+## Scope: observed under QT_QPA_PLATFORM=offscreen; xcb is NOT testable on this host (no Xvfb).

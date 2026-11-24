@@ -131,6 +131,27 @@ if(NOT VEDIT_WORKSPACE_PROJECT_STANDALONE)
     VEDIT_PROJECT_HAVE_APP_SHELL=1)
 endif()
 
+# G1-a: opening a `.f` never imports it. Drives the REAL ApplicationShell + the
+# REAL project lane and asserts that `filelists()`/`files()` stay identical when
+# an already-imported project opens another filelist, that the "Open Only" answer
+# imports nothing, that "Import" reproduces the explicit behaviour, and that the
+# explicit action still works. Root build only (needs the app shell).
+if(NOT VEDIT_WORKSPACE_PROJECT_STANDALONE)
+  add_executable(vedit-filelist-open-e2e filelist_open_e2e.cpp)
+  target_link_libraries(vedit-filelist-open-e2e PRIVATE vedit_workspace_project)
+  target_compile_definitions(vedit-filelist-open-e2e PRIVATE
+    VEDIT_PROJECT_HAVE_APP_SHELL=1)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-filelist-open-e2e PRIVATE
+      -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  add_test(NAME vedit-filelist-open-e2e COMMAND vedit-filelist-open-e2e)
+  set_tests_properties(vedit-filelist-open-e2e PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-project"
+    TIMEOUT 180
+  )
+endif()
+
 # RM-3: the project variables dialog (add / delete / inline validation) and the
 # per-root persistence of the table, driven without a modal dialog: the test
 # builds the REAL dialog and the REAL ProjectPanel/ProjectModel.

@@ -52,13 +52,263 @@
 pub mod capi;
 pub mod catalog;
 pub mod deeplint;
+pub mod env;
 pub mod fim;
+pub mod fim_detect;
 pub mod lsp;
 pub mod project;
+pub mod rename;
+pub mod scala;
 pub mod search;
 pub mod service;
 pub mod settings;
 pub mod vcs;
+pub mod waiver;
 
-/// Version of the C ABI. Bumped when an existing signature changes meaning.
-pub const VD_ABI_VERSION: u32 = 1;
+/// The shared async-job gate of the batch's new lanes (env / rename / scala /
+/// waiver).
+///
+/// [`service`] owns the job registry of the seven original services, but its
+/// payload enum is closed and the new lanes carry their own typed payloads. They
+/// therefore keep their own registries — exactly like the project-wide lint pass
+/// and the hierarchy job — and share the slot mechanics here, so every lane job
+/// has the same contract: `start` returns an id immediately and never touches the
+/// file system or spawns a process on the calling thread, `poll` takes the result
+/// exactly once, and a job that is cancelled or exceeds its budget reports a typed
+/// `VD_ERR_CANCELLED` / `VD_ERR_TIMEOUT` instead of a late result.
+pub(crate) mod jobgate {
+    use crate::capi::VdError;
+    use std::collections::HashMap;
+    use std::panic::{self, AssertUnwindSafe};
+    use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
+    use std::sync::{Arc, Mutex, MutexGuard, OnceLock};
+    use std::time::{Duration, Instant};
+
+    /// The id space of this gate: far above the service jobs (from 1), the lint
+    /// batch (`1 << 32`) and the hierarchy job (`1 << 48`).
+    const FIRST_ID: u64 = 1 << 60;
+    /// Lane selector: shell environment capture.
+    pub(crate) const LANE_ENV: u64 = 1;
+    /// Lane selector: engineering-wide rename.
+    pub(crate) const LANE_RENAME: u64 = 2;
+    /// Lane selector: one-click Scala run.
+    pub(crate) const LANE_SCALA: u64 = 3;
+    /// Lane selector: LINT waiver operations.
+    pub(crate) const LANE_WAIVER: u64 = 4;
+
+    static NEXT: AtomicU64 = AtomicU64::new(0);
+
+    /// Reserve a job id inside one lane's range. A streaming job that keeps its
+    /// own slot (see [`crate::scala`]) uses this too, so lane ids never collide.
+    pub(crate) fn next_id(lane: u64) -> u64 {
+        FIRST_ID | (lane << 48) | NEXT.fetch_add(1, Ordering::Relaxed)
+    }
+
+    fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
+        mutex
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner())
+    }
+
+    // `#[allow(clippy::large_enum_variant)]`: [`VdError`] is the C ABI's fixed
+    // 256-byte message struct, so the failure variant is large by construction —
+    // the same reason the crate allows `clippy::result_large_err`. Boxing it would
+    // add an allocation on every error path for no gain.
+    #[allow(clippy::large_enum_variant)]
+    enum Outcome<T> {
+        Pending,
+        Done(T),
+        Failed(VdError),
+        Consumed,
+    }
+
+    /// What one poll of a lane job found.
+    ///
+    /// `#[allow(clippy::large_enum_variant)]`: see [`Outcome`] — the error payload
+    /// is the C ABI's 256-byte message struct.
+    #[allow(clippy::large_enum_variant)]
+    pub(crate) enum Taken<T> {
+        /// Still running; poll again.
+        Pending,
+        /// Finished; the payload is owned by this poll.
+        Value(T),
+        /// Finished with a typed failure (including cancel and timeout).
+        Error(VdError),
+        /// The id is unknown, or the result was already taken.
+        Consumed,
+    }
+
+    /// One running or finished lane job.
+    pub(crate) struct Slot<T> {
+        cancel: AtomicBool,
+        deadline: Option<Instant>,
+        outcome: Mutex<Outcome<T>>,
+    }
+
+    impl<T> Slot<T> {
+        fn new(timeout_ms: u64) -> Self {
+            Self {
+                cancel: AtomicBool::new(false),
+                deadline: (timeout_ms > 0)
+                    .then(|| Instant::now() + Duration::from_millis(timeout_ms)),
+                outcome: Mutex::new(Outcome::Pending),
+            }
+        }
+
+        /// Ask the engine to stop. A job that already finished keeps its result;
+        /// an engine checks this between its steps and returns early.
+        pub(crate) fn cancel(&self) {
+            self.cancel.store(true, Ordering::SeqCst);
+        }
+
+        /// Whether the caller cancelled this job.
+        pub(crate) fn is_cancelled(&self) -> bool {
+            self.cancel.load(Ordering::SeqCst)
+        }
+
+        /// The cancel flag itself, for an engine that takes `&AtomicBool` (the
+        /// environment capture kills its child when the caller cancels).
+        pub(crate) fn cancel_flag(&self) -> &AtomicBool {
+            &self.cancel
+        }
+
+        /// Record the engine's result. A result that arrives after a cancel is
+        /// dropped here, so a stale completion can never overwrite the cancel.
+        fn finish(&self, result: Result<T, VdError>) {
+            let mut slot = lock(&self.outcome);
+            if !matches!(&*slot, Outcome::Pending) {
+                return;
+            }
+            *slot = match result {
+                Ok(value) => Outcome::Done(value),
+                Err(error) => Outcome::Failed(error),
+            };
+        }
+
+        /// Take the outcome once. Cancelled and overdue jobs report a typed error
+        /// instead of a late payload.
+        pub(crate) fn take(&self) -> Taken<T> {
+            let mut slot = lock(&self.outcome);
+            if matches!(&*slot, Outcome::Pending) {
+                if self.is_cancelled() {
+                    *slot = Outcome::Consumed;
+                    return Taken::Error(VdError::new(
+                        crate::capi::VD_ERR_CANCELLED,
+                        "the job was cancelled and its result discarded",
+                    ));
+                }
+                let overdue = self
+                    .deadline
+                    .is_some_and(|deadline| Instant::now() >= deadline);
+                if overdue {
+                    *slot = Outcome::Consumed;
+                    return Taken::Error(VdError::new(
+                        crate::capi::VD_ERR_TIMEOUT,
+                        "the job exceeded its wall-clock budget and its result was discarded",
+                    ));
+                }
+                return Taken::Pending;
+            }
+            match std::mem::replace(&mut *slot, Outcome::Consumed) {
+                Outcome::Done(value) => Taken::Value(value),
+                Outcome::Failed(error) => Taken::Error(error),
+                Outcome::Pending | Outcome::Consumed => Taken::Consumed,
+            }
+        }
+    }
+
+    /// The typed job registry of ONE lane. A lane keeps one static registry, so
+    /// its polls can never see another lane's payload.
+    pub(crate) struct Registry<T> {
+        slots: OnceLock<Mutex<HashMap<u64, Arc<Slot<T>>>>>,
+    }
+
+    impl<T> Registry<T> {
+        /// An empty registry (no threads, no I/O).
+        pub(crate) const fn new() -> Self {
+            Self {
+                slots: OnceLock::new(),
+            }
+        }
+
+        fn map(&self) -> &Mutex<HashMap<u64, Arc<Slot<T>>>> {
+            self.slots.get_or_init(|| Mutex::new(HashMap::new()))
+        }
+
+        /// Register and start one job; returns its id immediately.
+        pub(crate) fn start<F>(&'static self, lane: u64, timeout_ms: u64, work: F) -> u64
+        where
+            T: Send + 'static,
+            F: FnOnce(&Slot<T>) -> Result<T, VdError> + Send + 'static,
+        {
+            let id = next_id(lane);
+            let slot = Arc::new(Slot::new(timeout_ms));
+            lock(self.map()).insert(id, Arc::clone(&slot));
+            spawn("lane", slot, work);
+            id
+        }
+
+        /// The slot of one job, when the id belongs to this lane.
+        pub(crate) fn get(&self, id: u64) -> Option<Arc<Slot<T>>> {
+            lock(self.map()).get(&id).cloned()
+        }
+
+        /// Drop one job (and, for a running one, ask it to stop).
+        pub(crate) fn remove(&self, id: u64) -> Option<Arc<Slot<T>>> {
+            lock(self.map()).remove(&id)
+        }
+    }
+
+    /// Run `work` on its own worker thread; a panic becomes a typed failure, so a
+    /// bug can never leave the caller polling a job that will never finish.
+    pub(crate) fn spawn<T, F>(lane: &'static str, slot: Arc<Slot<T>>, work: F)
+    where
+        T: Send + 'static,
+        F: FnOnce(&Slot<T>) -> Result<T, VdError> + Send + 'static,
+    {
+        let worker = Arc::clone(&slot);
+        let spawned = std::thread::Builder::new()
+            .name(format!("vd-ffi-{lane}"))
+            .spawn(move || {
+                let outcome = panic::catch_unwind(AssertUnwindSafe(|| work(&worker)));
+                let result = match outcome {
+                    Ok(result) => result,
+                    Err(_) => Err(VdError::new(
+                        crate::capi::VD_ERR_INTERNAL,
+                        "an ABI job panicked; its result was discarded",
+                    )),
+                };
+                worker.finish(result);
+            });
+        if spawned.is_err() {
+            slot.finish(Err(VdError::new(
+                crate::capi::VD_ERR_INTERNAL,
+                "cannot start a worker thread for the ABI job",
+            )));
+        }
+    }
+}
+
+/// Version of the C ABI. Bumped when an existing signature changes meaning, and
+/// also when a struct a provider FILLS gains a field (version 2, see below).
+///
+/// **This number does NOT promise binary compatibility of the C STRUCTS.**
+/// The header is regenerated from these declarations by `build.rs`/cbindgen, and
+/// every target of this repository is rebuilt from the same tree, so a same-tree
+/// consumer always matches. Across headers it does NOT:
+///
+/// * The provider writes the WHOLE current struct. `vd_catalog_poll()` assigns
+///   `sizeof(VdModuleCatalog)` bytes into the caller's buffer, so a consumer
+///   that allocated the struct from an older header (88 bytes before G1-c, 112
+///   today) is written past its end. Appending fields at the end preserves every
+///   existing OFFSET; it does not preserve the SIZE, and size is what a by-pointer
+///   out-parameter needs.
+/// * A consumer that passes a smaller struct by pointer likewise has its appended
+///   fields read UNCONDITIONALLY (`rename.rs`'s `read_options`).
+///
+/// Version 2 exists because `VdModuleCatalog` was EXTENDED (`shadowed_files`,
+/// `shadowed_warning`, G1-c): a v1 consumer must be recompiled against this
+/// header, and the version is the signal that says so. Appending fields was
+/// previously kept inside version 1 (T72's `VdRenameOptions`); that rule is
+/// retired - a filled struct that grows is a consumer-visible ABI change.
+pub const VD_ABI_VERSION: u32 = 2;

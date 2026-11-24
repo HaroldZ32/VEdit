@@ -179,8 +179,35 @@ void GlobalSearch::runScan(const SearchOptions &options, quint64 generation,
             ffiOptions.max_results = static_cast<size_t>(options.maxResults);
             ffiOptions.max_file_bytes = static_cast<quint64>(options.maxFileBytes);
             ffiOptions.max_duration_ms = static_cast<quint64>(options.maxDurationMs);
-            const quint64 job = vd_search_tree_query_ex(service, rootPath.constData(),
-                                                        query.constData(), &ffiOptions);
+
+            // The project file set (batch 20261110d): the scan's SCOPE is the
+            // UNION — the folder walk plus these members (a `.f` member may live
+            // outside the folder). Built in its own storage AFTER the extension
+            // pointers, for the same reallocation reason. An empty set is the
+            // plain walk — never a scan of zero files — so a project that is
+            // still loading keeps today's behaviour instead of reporting "no
+            // results" for nothing searched.
+            QList<QByteArray> fileStorage;
+            fileStorage.reserve(options.files.size());
+            for (const QString &file : options.files) {
+                fileStorage.append(file.toUtf8());
+            }
+            QList<char *> filePointers;
+            filePointers.reserve(fileStorage.size());
+            for (QByteArray &bytes : fileStorage) {
+                filePointers.append(bytes.data());
+            }
+            VdStringList files{};
+            files.count = static_cast<size_t>(filePointers.size());
+            files.items = filePointers.isEmpty() ? nullptr : filePointers.data();
+
+            const bool scoped = !options.files.isEmpty();
+            const quint64 job =
+                scoped
+                    ? vd_search_tree_query_files(service, rootPath.constData(),
+                                                 query.constData(), &ffiOptions, &files)
+                    : vd_search_tree_query_ex(service, rootPath.constData(),
+                                              query.constData(), &ffiOptions);
             if (job == 0) {
                 summary.state = SearchState::Failed;
                 summary.error = serviceError(service);
@@ -226,6 +253,13 @@ void GlobalSearch::runScan(const SearchOptions &options, quint64 generation,
                         vd_search_results_free(&results);
                         summary.state = SearchState::Done;
                         summary.filesScanned = static_cast<int>(ffiSummary.files_scanned);
+                        // Name the scope the scan actually used: the project set
+                        // is the UNION with the walk, so `filesScanned` counts
+                        // folder files too; the set size is reported beside it
+                        // instead of being presented as the scan's file count.
+                        summary.usedProjectFileSet = scoped;
+                        summary.filesInProjectSet =
+                            scoped ? static_cast<int>(options.files.size()) : 0;
                         summary.filesMatched = static_cast<int>(ffiSummary.files_matched);
                         summary.hitCount = static_cast<int>(ffiSummary.hit_count);
                         // The dock's "current file" scope: the walk is the Rust

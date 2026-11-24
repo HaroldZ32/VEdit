@@ -43,6 +43,28 @@ impl Protocol {
             Self::LlamaCpp => "/infill",
         }
     }
+
+    /// Whether `base` already names a complete request URL for this protocol.
+    ///
+    /// Frozen contract §6: OpenAi treats any `/completions` suffix as complete
+    /// (that is what makes DeepSeek's `…/beta/completions` usable verbatim),
+    /// LlamaCpp its `/infill` suffix.
+    #[must_use]
+    fn ends_with_completion_path(self, base: &str) -> bool {
+        match self {
+            Self::OpenAi => base.ends_with("/completions"),
+            Self::LlamaCpp => base.ends_with(self.request_path()),
+        }
+    }
+
+    /// The protocol's name in the frozen detect-JSON vocabulary (contract §4).
+    #[must_use]
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::OpenAi => "open_ai",
+            Self::LlamaCpp => "llama_cpp",
+        }
+    }
 }
 
 /// Everything the FIM transport needs, and nothing else.
@@ -125,12 +147,15 @@ impl FimSettings {
         if self.unavailable().is_some() {
             return None;
         }
-        Some(join_url(&self.endpoint, self.protocol.request_path()))
+        Some(join_url(&self.endpoint, self.protocol))
     }
 }
 
 /// True for `http://host...` / `https://host...` with a non-empty, space-free host.
-fn valid_endpoint(endpoint: &str) -> bool {
+///
+/// Shared with [`crate::detect`] so detection refuses exactly the endpoints a
+/// completion would refuse (frozen contract §5.1).
+pub(crate) fn valid_endpoint(endpoint: &str) -> bool {
     let rest = endpoint
         .trim()
         .strip_prefix("https://")
@@ -142,13 +167,19 @@ fn valid_endpoint(endpoint: &str) -> bool {
     !host.is_empty() && !host.contains(char::is_whitespace)
 }
 
-/// Appends `path` to `base` without doubling a path the user already typed.
-fn join_url(base: &str, path: &str) -> String {
+/// Appends the protocol path to `base` without doubling a path the user typed.
+///
+/// A base that already ends with the protocol's completion path is returned
+/// verbatim (frozen contract §6), so a real completion URL such as
+/// `https://api.deepseek.com/beta/completions` is requested exactly as typed; a
+/// bare base still receives `/v1/completions` or `/infill`, which keeps the
+/// pre-existing behaviour.
+fn join_url(base: &str, protocol: Protocol) -> String {
     let base = base.trim().trim_end_matches('/');
-    if base.ends_with(path) {
+    if protocol.ends_with_completion_path(base) {
         base.to_string()
     } else {
-        format!("{base}{path}")
+        format!("{base}{}", protocol.request_path())
     }
 }
 
@@ -200,15 +231,15 @@ mod tests {
     #[test]
     fn url_join_uses_the_protocol_path_without_doubling_it() {
         assert_eq!(
-            join_url("http://127.0.0.1:8080", "/v1/completions"),
+            join_url("http://127.0.0.1:8080", Protocol::OpenAi),
             "http://127.0.0.1:8080/v1/completions"
         );
         assert_eq!(
-            join_url("http://127.0.0.1:8080/", "/infill"),
+            join_url("http://127.0.0.1:8080/", Protocol::LlamaCpp),
             "http://127.0.0.1:8080/infill"
         );
         assert_eq!(
-            join_url("http://127.0.0.1:8080/v1/completions", "/v1/completions"),
+            join_url("http://127.0.0.1:8080/v1/completions", Protocol::OpenAi),
             "http://127.0.0.1:8080/v1/completions"
         );
         let mut settings = enabled();
@@ -234,5 +265,82 @@ mod tests {
         assert_eq!(settings.token_budget(), 1);
         settings.max_tokens = 100_000;
         assert_eq!(settings.token_budget(), 512);
+    }
+
+    // Frozen contract §6: a completion URL the user typed is requested verbatim,
+    // so DeepSeek's own `https://api.deepseek.com/beta/completions` works without
+    // a proxy rewriting the path.
+
+    #[test]
+    fn a_deepseek_completion_endpoint_is_used_verbatim() {
+        let mut settings = enabled();
+        settings.endpoint = "https://api.deepseek.com/beta/completions".to_string();
+        assert_eq!(
+            settings.request_url().as_deref(),
+            Some("https://api.deepseek.com/beta/completions")
+        );
+    }
+
+    #[test]
+    fn a_bare_base_still_receives_the_protocol_path() {
+        let mut settings = enabled();
+        settings.endpoint = "http://127.0.0.1:8080".to_string();
+        assert_eq!(
+            settings.request_url().as_deref(),
+            Some("http://127.0.0.1:8080/v1/completions")
+        );
+
+        settings.protocol = Protocol::LlamaCpp;
+        assert_eq!(
+            settings.request_url().as_deref(),
+            Some("http://127.0.0.1:8080/infill")
+        );
+    }
+
+    #[test]
+    fn a_full_completion_path_is_not_doubled() {
+        let mut settings = enabled();
+        settings.endpoint = "http://127.0.0.1:8080/v1/completions".to_string();
+        assert_eq!(
+            settings.request_url().as_deref(),
+            Some("http://127.0.0.1:8080/v1/completions")
+        );
+
+        // llama.cpp's own completion path, and a bare `/completions` suffix.
+        settings.protocol = Protocol::LlamaCpp;
+        settings.endpoint = "http://127.0.0.1:8080/infill".to_string();
+        assert_eq!(
+            settings.request_url().as_deref(),
+            Some("http://127.0.0.1:8080/infill")
+        );
+        settings.protocol = Protocol::OpenAi;
+        settings.endpoint = "http://127.0.0.1:8080/completions".to_string();
+        assert_eq!(
+            settings.request_url().as_deref(),
+            Some("http://127.0.0.1:8080/completions")
+        );
+    }
+
+    #[test]
+    fn a_trailing_slash_is_dropped_before_the_verbatim_check() {
+        let mut settings = enabled();
+        settings.endpoint = "https://api.deepseek.com/beta/completions/".to_string();
+        assert_eq!(
+            settings.request_url().as_deref(),
+            Some("https://api.deepseek.com/beta/completions")
+        );
+
+        settings.protocol = Protocol::LlamaCpp;
+        settings.endpoint = "http://127.0.0.1:8080/infill/".to_string();
+        assert_eq!(
+            settings.request_url().as_deref(),
+            Some("http://127.0.0.1:8080/infill")
+        );
+    }
+
+    #[test]
+    fn protocol_names_match_the_frozen_json_vocabulary() {
+        assert_eq!(Protocol::OpenAi.as_str(), "open_ai");
+        assert_eq!(Protocol::LlamaCpp.as_str(), "llama_cpp");
     }
 }

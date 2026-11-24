@@ -166,3 +166,55 @@ fn the_secret_is_only_reachable_through_the_explicit_accessor() -> Result<()> {
     }
     Ok(())
 }
+
+// Batch 20261110 (AC-4.8): an imported environment is a NEW way for a credential
+// to reach a log line, so the masking policy has its own discipline test: the
+// name decides, the value never appears in a display string.
+#[test]
+fn imported_environment_values_are_masked_by_name_and_never_rendered() -> Result<()> {
+    use vd_config::env::{diff, EnvChange};
+
+    let process = vd_config::Env::from_pairs([("PATH", "/usr/bin")]);
+    let captured: Vec<(String, String)> = vec![
+        ("PATH".to_string(), "/usr/bin".to_string()),
+        ("WIDTH".to_string(), "8".to_string()),
+        (
+            "GITHUB_TOKEN".to_string(),
+            "ghp-imported-secret-0001".to_string(),
+        ),
+        ("DB_PASSWORD".to_string(), "hunter2-imported".to_string()),
+        ("API_KEY".to_string(), "key-imported-0002".to_string()),
+    ];
+    let changes: Vec<EnvChange> = diff(&process, &captured);
+    let rendered = format!("{changes:?}");
+    let displays: Vec<&str> = changes.iter().map(EnvChange::display_value).collect();
+    let joined = displays.join("\n");
+    for secret in [
+        "ghp-imported-secret-0001",
+        "hunter2-imported",
+        "key-imported-0002",
+    ] {
+        assert!(!joined.contains(secret), "display leaked {secret}");
+    }
+    // The raw value IS still available for the merge path, under a name that
+    // makes the intent explicit at the call site.
+    let token = changes
+        .iter()
+        .find(|change| change.name == "GITHUB_TOKEN")
+        .ok_or_else(|| anyhow::anyhow!("the token change is missing"))?;
+    assert!(token.is_masked());
+    assert_eq!(token.after, "ghp-imported-secret-0001");
+    assert_eq!(token.display_value(), "<masked>");
+    // A non-secret name is visible.
+    let width = changes
+        .iter()
+        .find(|change| change.name == "WIDTH")
+        .ok_or_else(|| anyhow::anyhow!("the width change is missing"))?;
+    assert!(!width.is_masked());
+    assert_eq!(width.display_value(), "8");
+    // `{changes:?}` must not carry the raw secret values either.
+    for secret in ["ghp-imported-secret-0001", "hunter2-imported"] {
+        assert!(!rendered.contains(secret), "Debug leaked {secret}");
+    }
+    Ok(())
+}

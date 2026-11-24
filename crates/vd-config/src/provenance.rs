@@ -41,6 +41,82 @@ impl std::fmt::Display for Source {
     }
 }
 
+/// The product-wide runtime tool-resolution order.
+///
+/// Declared in probe order, so [`ResolutionStage::ORDER`] and `Ord` agree: a
+/// LOWER stage is probed EARLIER and therefore WINS over a higher one. This is
+/// the single written order that the Rust config layer
+/// (`crate::tools::resolve_tool`) and the C++ diagnostics toolchain
+/// (`src/workspace/diagnostics/toolchain.cpp`) both implement:
+///
+/// 1. [`ResolutionStage::ExplicitSetting`] — a path the user set (`tools.*` in
+///    `settings.toml`, `[verible].*` in a configuration file);
+/// 2. [`ResolutionStage::Bundled`] — the payload shipped next to the product;
+/// 3. [`ResolutionStage::LocalCheckout`] — a source checkout's own build
+///    artifact (development trees only: the C++ lane discovers it, the config
+///    layer has no checkout to walk);
+/// 4. [`ResolutionStage::ImportedProject`] — a variable imported from the
+///    PROJECT's shell environment;
+/// 5. [`ResolutionStage::ImportedGlobal`] — a variable imported from the USER's
+///    global shell environment (project wins over global);
+/// 6. [`ResolutionStage::ProcessPath`] — the first executable on the process
+///    `PATH`;
+/// 7. [`ResolutionStage::ProcessEnv`] — the process environment's `VEDIT_*`
+///    override (the documented last resort: `bundled > … > PATH > env`).
+///
+/// `git`/`svn` are resolved by `crates/vd-vcs`, whose order (bundled -> PATH ->
+/// env) is this order with stages 1 and 3–5 absent — the same precedence, not a
+/// different one.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ResolutionStage {
+    /// An explicit setting (`tools.*`, `[verible].*`).
+    ExplicitSetting,
+    /// The payload shipped next to the executable.
+    Bundled,
+    /// A source checkout's own artifact (development trees only).
+    LocalCheckout,
+    /// A variable imported from the project's shell environment.
+    ImportedProject,
+    /// A variable imported from the user's global shell environment.
+    ImportedGlobal,
+    /// A directory on the process `PATH`.
+    ProcessPath,
+    /// The process environment's explicit override.
+    ProcessEnv,
+}
+
+impl ResolutionStage {
+    /// Every stage, in probe order — the written order itself.
+    pub const ORDER: [Self; 7] = [
+        Self::ExplicitSetting,
+        Self::Bundled,
+        Self::LocalCheckout,
+        Self::ImportedProject,
+        Self::ImportedGlobal,
+        Self::ProcessPath,
+        Self::ProcessEnv,
+    ];
+
+    /// Stable string form, used in the `TOOLCHAIN source=` line and in errors.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::ExplicitSetting => "setting",
+            Self::Bundled => "bundled",
+            Self::LocalCheckout => "local",
+            Self::ImportedProject => "imported-project",
+            Self::ImportedGlobal => "imported-global",
+            Self::ProcessPath => "PATH",
+            Self::ProcessEnv => "env",
+        }
+    }
+
+    /// The zero-based precedence of this stage (lower wins).
+    pub fn precedence(self) -> usize {
+        self as usize
+    }
+}
+
 /// A redaction-safe view of one configuration value.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(tag = "kind", rename_all = "snake_case")]

@@ -121,11 +121,33 @@ pub enum WriteOp {
     /// `git submodule update --init`: check the submodules out at their pinned
     /// commits (`--init` makes it work in a fresh clone too).
     GitSubmoduleUpdate = 39,
+    /// Checkout into a new child of an explicitly chosen local parent directory.
+    SvnCheckout = 51,
+    /// Set a changelist on selected files.
+    SvnChangelist = 52,
+    /// Remove selected files from their changelists.
+    SvnChangelistRemove = 53,
+    /// Copy the current repository location at HEAD to a repository-relative URL.
+    SvnBranchCreate = 54,
+    /// Switch the working copy to a repository-relative URL.
+    SvnSwitch = 55,
+    /// Merge from a repository-relative URL into the working copy.
+    SvnMerge = 56,
+    /// Mark selected, explicitly reviewed files as resolved using working contents.
+    SvnResolve = 57,
+    /// Move one versioned path to a new working-copy path.
+    SvnRename = 58,
+    /// Append one name or pattern to the parent directory's svn:ignore.
+    SvnIgnore = 59,
+    /// Repair working-copy locks without removing local files.
+    SvnCleanup = 60,
+    /// Delete explicitly selected unversioned regular files.
+    SvnDeleteUnversioned = 62,
 }
 
 impl WriteOp {
     /// Every operation the write seam accepts, in code order.
-    pub const ALL: [Self; 39] = [
+    pub const ALL: [Self; 50] = [
         Self::GitStage,
         Self::GitUnstage,
         Self::GitDiscard,
@@ -165,6 +187,17 @@ impl WriteOp {
         Self::GitWorktreeRemove,
         Self::GitSubmoduleInit,
         Self::GitSubmoduleUpdate,
+        Self::SvnCheckout,
+        Self::SvnChangelist,
+        Self::SvnChangelistRemove,
+        Self::SvnBranchCreate,
+        Self::SvnSwitch,
+        Self::SvnMerge,
+        Self::SvnResolve,
+        Self::SvnRename,
+        Self::SvnIgnore,
+        Self::SvnCleanup,
+        Self::SvnDeleteUnversioned,
     ];
 
     /// Stable integer for the C ABI.
@@ -221,7 +254,18 @@ impl WriteOp {
             | Self::SvnUpdate
             | Self::SvnRevert
             | Self::SvnAdd
-            | Self::SvnRemove => Backend::Svn,
+            | Self::SvnRemove
+            | Self::SvnCheckout
+            | Self::SvnChangelist
+            | Self::SvnChangelistRemove
+            | Self::SvnBranchCreate
+            | Self::SvnSwitch
+            | Self::SvnMerge
+            | Self::SvnResolve
+            | Self::SvnRename
+            | Self::SvnIgnore
+            | Self::SvnCleanup
+            | Self::SvnDeleteUnversioned => Backend::Svn,
         }
     }
 
@@ -261,6 +305,16 @@ impl WriteOp {
             Self::SvnRevert => "revert",
             Self::SvnAdd => "add",
             Self::SvnRemove => "remove",
+            Self::SvnCheckout => "checkout",
+            Self::SvnChangelist | Self::SvnChangelistRemove => "changelist",
+            Self::SvnBranchCreate => "copy",
+            Self::SvnSwitch => "switch",
+            Self::SvnMerge => "merge",
+            Self::SvnResolve => "resolve",
+            Self::SvnRename => "move",
+            Self::SvnIgnore => "propset",
+            Self::SvnCleanup => "cleanup",
+            Self::SvnDeleteUnversioned => "delete unversioned files",
         }
     }
 
@@ -301,6 +355,12 @@ impl WriteOp {
                 | Self::SvnRevert
                 | Self::SvnAdd
                 | Self::SvnRemove
+                | Self::SvnChangelist
+                | Self::SvnChangelistRemove
+                | Self::SvnResolve
+                | Self::SvnRename
+                | Self::SvnIgnore
+                | Self::SvnDeleteUnversioned
                 | Self::GitClean
         )
     }
@@ -443,6 +503,8 @@ impl WriteOp {
                 | Self::GitWorktreeRemove
                 | Self::SvnRevert
                 | Self::SvnRemove
+                | Self::SvnResolve
+                | Self::SvnDeleteUnversioned
         )
     }
 }
@@ -478,7 +540,22 @@ pub const GIT_WRITE_ALLOWED: &[&str] = &[
 /// Subversion write subcommands the write seam may issue.
 ///
 /// Separate from [`crate::runner::SVN_READ_ONLY`], which is unchanged.
-pub const SVN_WRITE_ALLOWED: &[&str] = &["commit", "update", "revert", "add", "remove"];
+pub const SVN_WRITE_ALLOWED: &[&str] = &[
+    "commit",
+    "update",
+    "revert",
+    "add",
+    "remove",
+    "checkout",
+    "changelist",
+    "copy",
+    "switch",
+    "merge",
+    "resolve",
+    "move",
+    "propset",
+    "cleanup",
+];
 
 fn write_table(program: &str) -> Option<&'static [&'static str]> {
     match program {
@@ -592,8 +669,11 @@ impl std::fmt::Debug for WriteRequest {
             .field("amend", &self.amend)
             .field("name", &self.name)
             .field("target", &self.target)
-            .field("url", &self.url)
-            .field("credential_user", &self.credential_user)
+            .field("url", &self.url.as_deref().map(redact_url_userinfo))
+            .field(
+                "credential_user",
+                &self.credential_user.as_ref().map(|_| "***"),
+            )
             .field(
                 "credential_password",
                 &self.credential_password.as_ref().map(|_| "***"),
@@ -659,6 +739,11 @@ impl WriteRequest {
                 "not a directory: {}",
                 self.root.display()
             )));
+        }
+        if self.op == WriteOp::SvnCheckout {
+            return self.root.canonicalize().map_err(|error| {
+                WriteError::Invalid(format!("cannot resolve the checkout parent: {error}"))
+            });
         }
         let (backend, found) = detect(&self.root);
         let Some(working_tree) = found else {
@@ -862,6 +947,9 @@ impl WriteRequest {
     /// [`WriteError::Invalid`] when the request does not satisfy the operation's
     /// contract; no process is spawned in that case.
     pub fn invocation(&self) -> Result<WriteInvocation, WriteError> {
+        if self.op.backend() == Backend::Svn {
+            return crate::svn_write::invocation(self, self.working_tree()?);
+        }
         let working_tree = self.working_tree()?;
         self.validate_parameters()?;
         let op = self.op;
@@ -1104,29 +1192,23 @@ impl WriteRequest {
                 // operation covers "initialize and update".
                 args.push("--init".to_string());
             }
-            WriteOp::SvnCommit => {
-                // AC-6.4: a commit may contact a remote repository, so it must
-                // never wait on a terminal prompt and must never store credentials
-                // on disk. (`svn update` gets the same two flags below.)
-                args.push("--non-interactive".to_string());
-                args.push("--no-auth-cache".to_string());
-                args.push("-m".to_string());
-                args.push(
-                    self.message
-                        .as_deref()
-                        .map(str::trim)
-                        .unwrap_or_default()
-                        .to_string(),
-                );
-                args.extend(self.paths.iter().cloned());
-            }
-            WriteOp::SvnUpdate => {
-                args.push("--non-interactive".to_string());
-                args.push("--no-auth-cache".to_string());
-                args.extend(self.paths.iter().cloned());
-            }
-            WriteOp::SvnRevert | WriteOp::SvnAdd | WriteOp::SvnRemove => {
-                args.extend(self.paths.iter().cloned());
+            WriteOp::SvnCommit
+            | WriteOp::SvnUpdate
+            | WriteOp::SvnRevert
+            | WriteOp::SvnAdd
+            | WriteOp::SvnRemove
+            | WriteOp::SvnCheckout
+            | WriteOp::SvnChangelist
+            | WriteOp::SvnChangelistRemove
+            | WriteOp::SvnBranchCreate
+            | WriteOp::SvnSwitch
+            | WriteOp::SvnMerge
+            | WriteOp::SvnResolve
+            | WriteOp::SvnRename
+            | WriteOp::SvnIgnore
+            | WriteOp::SvnCleanup
+            | WriteOp::SvnDeleteUnversioned => {
+                return Err(WriteError::Invalid("expected a Git operation".into()))
             }
         }
         Ok(WriteInvocation {
@@ -1454,7 +1536,7 @@ fn redact(text: &str, request: &WriteRequest) -> String {
 
 /// `scheme://user:pass@host` -> `scheme://***@host` (and the same for any other
 /// URL userinfo git may echo).
-fn redact_url_userinfo(text: &str) -> String {
+pub(crate) fn redact_url_userinfo(text: &str) -> String {
     let mut output = String::with_capacity(text.len());
     let mut rest = text;
     while let Some(position) = rest.find("://") {
@@ -1478,5 +1560,8 @@ fn redact_url_userinfo(text: &str) -> String {
 ///
 /// As [`execute`].
 pub fn write(request: &WriteRequest) -> Result<WriteOutcome, WriteError> {
+    if request.op == WriteOp::SvnDeleteUnversioned {
+        return crate::svn_write::delete_unversioned(request, &request.working_tree()?);
+    }
     execute(request, &SystemWriteRunner)
 }

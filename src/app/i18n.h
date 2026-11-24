@@ -35,6 +35,7 @@ QString languageTag(UiLanguage language);
 
 // `<stateDir>/settings.toml` with the same fallback chain as the settings lane.
 QString settingsFilePath(const QString &stateDir);
+QString readSettingsString(const QString &settingsPath, const QString &key);
 
 struct InstallResult {
     UiLanguage selection = UiLanguage::Auto;

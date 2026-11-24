@@ -18,6 +18,9 @@ set(CMAKE_AUTOMOC ON)
 set(VEDIT_WORKSPACE_VCS_SOURCES
   vcs_source.cpp
   vcs_panel.cpp
+  vcs_svn_panel.cpp
+  vcs_svn_repositories.cpp
+  svn_workspaces.cpp
   vcs_history.cpp
   vcs_toolchain.cpp
   # Batch 6b: the per-backend capability table the action bar is gated by.
@@ -59,12 +62,21 @@ endif()
 
 add_executable(vedit-workspace-vcs-selftest vcs_selftest.cpp)
 target_link_libraries(vedit-workspace-vcs-selftest PRIVATE vedit_workspace_vcs)
+add_executable(vedit-svn-workspaces-selftest svn_workspaces_selftest.cpp)
+target_link_libraries(vedit-svn-workspaces-selftest PRIVATE vedit_workspace_vcs)
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(vedit-workspace-vcs-selftest PRIVATE -Wall -Wextra -Wpedantic -Werror)
+  target_compile_options(vedit-svn-workspaces-selftest PRIVATE -Wall -Wextra -Wpedantic -Werror)
   target_compile_options(vedit_workspace_vcs PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 add_test(NAME vedit-workspace-vcs-selftest COMMAND vedit-workspace-vcs-selftest --selfcheck)
 set_tests_properties(vedit-workspace-vcs-selftest PROPERTIES
   ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-vcs"
   TIMEOUT 120
+)
+add_test(NAME vedit-svn-workspaces-selftest COMMAND vedit-svn-workspaces-selftest)
+set_tests_properties(vedit-svn-workspaces-selftest PROPERTIES
+  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-vcs"
+  SKIP_RETURN_CODE 77
+  TIMEOUT 45
 )

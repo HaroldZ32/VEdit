@@ -15,7 +15,7 @@
 use std::collections::HashMap;
 use std::path::PathBuf;
 use std::ptr;
-use std::sync::atomic::{AtomicU64, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, MutexGuard, OnceLock};
 
 use vd_deeplint::{
@@ -25,8 +25,8 @@ use vd_deeplint::{
 use crate::capi::{
     c_str, c_string, free_string, VdCatalogOptions, VdError, VdModule, VdModuleCatalog,
     VdModuleInstance, VdModuleInstanceList, VdModuleList, VdModulePort, VdModulePortList,
-    VdStringList, VD_ERR_INVALID_ARGUMENT, VD_ERR_JOB_UNKNOWN, VD_STATUS_FAILED, VD_STATUS_PENDING,
-    VD_STATUS_READY,
+    VdStringList, VD_ERR_CANCELLED, VD_ERR_INVALID_ARGUMENT, VD_ERR_JOB_UNKNOWN, VD_ERR_SERVICE,
+    VD_ERR_TIMEOUT, VD_ERR_UNKNOWN_TOP, VD_STATUS_FAILED, VD_STATUS_PENDING, VD_STATUS_READY,
 };
 use crate::deeplint::read_string_list;
 use crate::service::{service_state, VdService, POLL_MISUSE};
@@ -37,6 +37,10 @@ const FIRST_CATALOG_ID: u64 = 1 << 52;
 
 struct CatalogSlot {
     catalog: Mutex<Option<ModuleCatalog>>,
+    /// Raised by [`vd_catalog_cancel`]; the worker hands a clone to the catalog
+    /// options, where it kills the `slang` child instead of letting it run to
+    /// completion into a slot nobody reads (the old `release` behaviour).
+    cancel: Arc<AtomicBool>,
 }
 
 static NEXT_CATALOG: AtomicU64 = AtomicU64::new(0);
@@ -132,6 +136,11 @@ unsafe fn catalog_to_c(catalog: &ModuleCatalog) -> VdModuleCatalog {
         .iter()
         .map(|path| path.to_string_lossy().into_owned())
         .collect();
+    let shadowed: Vec<String> = catalog
+        .shadowed_files
+        .iter()
+        .map(|path| path.to_string_lossy().into_owned())
+        .collect();
     VdModuleCatalog {
         tool: c_string(&catalog.tool),
         elapsed_ms: catalog.elapsed.as_millis() as u64,
@@ -141,6 +150,11 @@ unsafe fn catalog_to_c(catalog: &ModuleCatalog) -> VdModuleCatalog {
         top: catalog.top.as_deref().map_or(ptr::null_mut(), c_string),
         reachable_files: strings_to_c(&reachable),
         outside_modules: strings_to_c(&catalog.outside_modules),
+        shadowed_files: strings_to_c(&shadowed),
+        shadowed_warning: catalog
+            .shadowed_warning
+            .as_deref()
+            .map_or(ptr::null_mut(), c_string),
     }
 }
 
@@ -272,14 +286,18 @@ pub unsafe extern "C" fn vd_catalog_start(
         }
     };
     let id = FIRST_CATALOG_ID + NEXT_CATALOG.fetch_add(1, Ordering::Relaxed);
+    let cancel = Arc::new(AtomicBool::new(false));
     let slot = Arc::new(CatalogSlot {
         catalog: Mutex::new(None),
+        cancel: Arc::clone(&cancel),
     });
     catalogs().insert(id, Arc::clone(&slot));
     let worker_slot = Arc::clone(&slot);
     let spawned = std::thread::Builder::new()
         .name(format!("vd-catalog-{id}"))
         .spawn(move || {
+            let mut catalog_options = catalog_options;
+            catalog_options.cancel = Some(cancel);
             let catalog = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                 vd_deeplint::build_catalog(&file_set, &catalog_options)
             }))
@@ -292,6 +310,8 @@ pub unsafe extern "C" fn vd_catalog_start(
                 top: None,
                 reachable_files: Vec::new(),
                 outside_modules: Vec::new(),
+                shadowed_files: Vec::new(),
+                shadowed_warning: None,
                 failure: Some(LintFailure::Io {
                     message: "the catalog job panicked; its result was discarded".to_string(),
                 }),
@@ -355,9 +375,11 @@ pub unsafe extern "C" fn vd_catalog_poll(
     if let Some(message) = catalog.failure_message() {
         // The catalog re-words every failure in its own vocabulary (the AST
         // JSON), so an oversized AST dump can never be reported as a lint
-        // diagnostic flood.
+        // diagnostic flood. The CODE carries the class the UI acts on: only
+        // `UnknownTop` may fall back to Auto, and a timeout must keep the user's
+        // top instead of clearing it (AC M1.1).
         state.record_error(VdError::new(
-            crate::capi::VD_ERR_SERVICE,
+            failure_code(catalog.failure.as_ref()),
             &format!("{} failed: {message}", catalog.tool),
         ));
         return VD_STATUS_FAILED;
@@ -367,8 +389,49 @@ pub unsafe extern "C" fn vd_catalog_poll(
     VD_STATUS_READY
 }
 
+/// The ABI error code for one typed failure.
+///
+/// Only the classes a UI decision depends on are typed apart: `UnknownTop` (the
+/// module tree may fall back to Auto once), `Timeout` and `Cancelled`. Everything
+/// else stays [`VD_ERR_SERVICE`], which is what the previous catalogue reported
+/// for all of them.
+fn failure_code(failure: Option<&LintFailure>) -> i32 {
+    match failure {
+        Some(LintFailure::UnknownTop { .. }) => VD_ERR_UNKNOWN_TOP,
+        Some(LintFailure::Timeout { .. }) => VD_ERR_TIMEOUT,
+        Some(LintFailure::Cancelled) => VD_ERR_CANCELLED,
+        _ => VD_ERR_SERVICE,
+    }
+}
+
+/// Cancel a catalog job: the `slang` child is killed and the run stops before the
+/// streamed parse, instead of finishing into memory nobody reads.
+///
+/// Returns 1 when the job was found and the flag raised, 0 for an unknown id
+/// (already consumed or released). The job stays in the map: the worker answers
+/// with a `Cancelled` failure, so a later [`vd_catalog_poll`] reports
+/// `VD_STATUS_FAILED` with `VD_ERR_CANCELLED` rather than "unknown job" — the
+/// caller that does not care releases it right after (cancel-then-release is the
+/// pair the module tree uses).
+///
+/// # Safety
+///
+/// `service` must be null or live.
+#[no_mangle]
+pub unsafe extern "C" fn vd_catalog_cancel(service: *mut VdService, job: u64) -> i32 {
+    let _ = service;
+    match catalogs().get(&job) {
+        Some(slot) => {
+            slot.cancel.store(true, Ordering::SeqCst);
+            1
+        }
+        None => 0,
+    }
+}
+
 /// Release a catalog job without delivering its result (null-safe for an unknown
-/// id). A running job finishes into memory nobody reads.
+/// id). A running job finishes into memory nobody reads — pair it with
+/// [`vd_catalog_cancel`] to actually stop the work.
 ///
 /// # Safety
 ///
@@ -399,10 +462,14 @@ pub unsafe extern "C" fn vd_module_catalog_free(catalog: *mut VdModuleCatalog) {
         free_module_list(&mut catalog.modules);
         free_string_list(&mut catalog.reachable_files);
         free_string_list(&mut catalog.outside_modules);
+        // G1-c: the two appended fields are owned exactly like the ones above.
+        free_string_list(&mut catalog.shadowed_files);
+        free_string(catalog.shadowed_warning);
     }
     catalog.tool = ptr::null_mut();
     catalog.warning = ptr::null_mut();
     catalog.top = ptr::null_mut();
+    catalog.shadowed_warning = ptr::null_mut();
 }
 
 /// # Safety
@@ -506,6 +573,187 @@ mod tests {
     }
 
     #[test]
+    fn the_failure_code_carries_the_class_the_ui_acts_on() {
+        use std::time::Duration;
+        // Only a name slang cannot elaborate may fall back to Auto (AC M1.1).
+        assert_eq!(
+            failure_code(Some(&LintFailure::UnknownTop {
+                name: "nope".to_string()
+            })),
+            VD_ERR_UNKNOWN_TOP
+        );
+        // A timeout keeps the user's top: it is NOT an unknown top.
+        assert_eq!(
+            failure_code(Some(&LintFailure::Timeout {
+                after: Duration::from_secs(120)
+            })),
+            VD_ERR_TIMEOUT
+        );
+        assert_eq!(
+            failure_code(Some(&LintFailure::Cancelled)),
+            VD_ERR_CANCELLED
+        );
+        assert_eq!(
+            failure_code(Some(&LintFailure::Io {
+                message: "boom".to_string()
+            })),
+            VD_ERR_SERVICE
+        );
+        assert_eq!(failure_code(None), VD_ERR_SERVICE);
+    }
+
+    #[test]
+    fn cancelling_an_unknown_job_is_a_no_op() {
+        // SAFETY: a null service is documented as "no state".
+        let raised = unsafe { vd_catalog_cancel(ptr::null_mut(), FIRST_CATALOG_ID + 99_999) };
+        assert_eq!(raised, 0, "an unknown job cannot be signalled");
+    }
+
+    /// AC M1.4: cancel is a REAL cancellation. A fake tool that only ends by a
+    /// signal proves it: nothing but the kill can make the 30 s sleep finish in
+    /// under a second.
+    #[cfg(unix)]
+    #[test]
+    fn cancelling_a_running_job_kills_the_tool_and_reports_cancelled() {
+        use std::ffi::{c_char, CString};
+        use std::os::unix::fs::PermissionsExt;
+        use std::time::{Duration, Instant};
+
+        let Ok(dir) = tempfile::tempdir() else {
+            return;
+        };
+        let marker = dir.path().join("started.marker");
+        let script = dir.path().join("fake-slang.sh");
+        let body = format!("#!/bin/sh\n: > '{}'\nsleep 30\nexit 0\n", marker.display());
+        if std::fs::write(&script, body).is_err() {
+            return;
+        }
+        let Ok(mut permissions) = std::fs::metadata(&script).map(|meta| meta.permissions()) else {
+            return;
+        };
+        permissions.set_mode(0o755);
+        if std::fs::set_permissions(&script, permissions).is_err() {
+            return;
+        }
+        let source = dir.path().join("top.sv");
+        if std::fs::write(&source, "module top; endmodule\n").is_err() {
+            return;
+        }
+
+        let file = CString::new(source.display().to_string()).unwrap_or_default();
+        let slang = CString::new(script.display().to_string()).unwrap_or_default();
+        let pointers: Vec<*mut c_char> = vec![file.as_ptr().cast_mut()];
+        let boxed = pointers.into_boxed_slice();
+        let files = VdStringList {
+            count: boxed.len(),
+            items: Box::into_raw(boxed) as *mut *mut c_char,
+        };
+        let service = crate::service::vd_service_create();
+        let job = {
+            let options = VdCatalogOptions {
+                slang_binary: slang.as_ptr(),
+                include_dirs: VdStringList {
+                    count: 0,
+                    items: ptr::null_mut(),
+                },
+                defines: VdStringList {
+                    count: 0,
+                    items: ptr::null_mut(),
+                },
+                timeout_ms: 60_000,
+                max_json_bytes: 0,
+                max_files: 0,
+                top: ptr::null(),
+            };
+            // SAFETY: every pointer is valid for the call and the list layout is
+            // the ABI's.
+            unsafe { vd_catalog_start(service, &files, &options) }
+        };
+        // The ABI borrows the list; the job has copied what it needs.
+        // SAFETY: the pointer came from Box::into_raw of this boxed slice.
+        drop(unsafe {
+            Box::from_raw(std::ptr::slice_from_raw_parts_mut(files.items, files.count))
+        });
+        assert_ne!(job, 0, "the catalog job was rejected");
+        // Wait until the child is really running before cancelling, so the test
+        // cannot pass by cancelling a job that had not started yet.
+        let started = Instant::now();
+        while !marker.exists() && started.elapsed() < Duration::from_secs(5) {
+            std::thread::sleep(Duration::from_millis(10));
+        }
+        assert!(marker.exists(), "the fake tool never started");
+        let cancel_sent = Instant::now();
+        // SAFETY: `job` came from vd_catalog_start on this service.
+        let raised = unsafe { vd_catalog_cancel(service, job) };
+        assert_eq!(raised, 1, "the running job must be signalled");
+
+        let mut catalog: VdModuleCatalog = unsafe { std::mem::zeroed() };
+        let status = loop {
+            // SAFETY: `out` is writable and the job belongs to this service.
+            let status = unsafe { vd_catalog_poll(service, job, &mut catalog) };
+            if status != VD_STATUS_PENDING || cancel_sent.elapsed() > Duration::from_secs(20) {
+                break status;
+            }
+            std::thread::sleep(Duration::from_millis(20));
+        };
+        assert_eq!(
+            status, VD_STATUS_FAILED,
+            "a cancelled job is not a ready one"
+        );
+        assert!(
+            cancel_sent.elapsed() < Duration::from_secs(10),
+            "the kill must not wait for the tool's own 30 s sleep: {:?}",
+            cancel_sent.elapsed()
+        );
+        let mut error: VdError = unsafe { std::mem::zeroed() };
+        // SAFETY: `out` is writable for one VdError.
+        let has_error = unsafe { crate::service::vd_service_error(service, &mut error) };
+        assert_ne!(has_error, 0, "a failed job records its reason");
+        assert_eq!(error.code, VD_ERR_CANCELLED, "the class is Cancelled");
+        // SAFETY: the service handle came from vd_service_create and is live.
+        unsafe { crate::service::vd_service_destroy(service) };
+    }
+
+    #[test]
+    fn a_catalog_warning_reaches_the_abi_verbatim() {
+        // batch-20261118 B: the duplicate-module sentence is produced by
+        // `vd_deeplint` and carried to the module tree ONLY through
+        // `VdModuleCatalog.warning`; this conversion is the single hop between
+        // them, so a dropped or reworded warning would make the whole diagnostic
+        // invisible to C++ (the tree renders that field in its summary line).
+        let warning = "module 'uart' is defined in both sim/uart.v and rtl/uart.v; \
+                       using rtl/uart.v";
+        let catalog = ModuleCatalog {
+            tool: "slang".to_string(),
+            modules: Vec::new(),
+            elapsed: std::time::Duration::ZERO,
+            peak_rss_kb: 0,
+            warning: Some(warning.to_string()),
+            top: None,
+            reachable_files: Vec::new(),
+            outside_modules: Vec::new(),
+            shadowed_files: Vec::new(),
+            shadowed_warning: None,
+            failure: None,
+        };
+        // SAFETY: the conversion owns its strings, the read happens before the
+        // paired free, and the free is the one documented for this value.
+        unsafe {
+            let mut converted = catalog_to_c(&catalog);
+            assert!(
+                !converted.warning.is_null(),
+                "the warning must be delivered"
+            );
+            let carried = std::ffi::CStr::from_ptr(converted.warning)
+                .to_str()
+                .unwrap_or_else(|error| panic!("the warning must be UTF-8: {error}"));
+            assert_eq!(carried, warning);
+            vd_module_catalog_free(&raw mut converted);
+            assert!(converted.warning.is_null(), "the free clears the pointer");
+        }
+    }
+
+    #[test]
     fn an_empty_catalog_converts_and_frees_cleanly() {
         let catalog = ModuleCatalog {
             tool: "slang".to_string(),
@@ -516,6 +764,8 @@ mod tests {
             top: None,
             reachable_files: Vec::new(),
             outside_modules: Vec::new(),
+            shadowed_files: Vec::new(),
+            shadowed_warning: None,
             failure: None,
         };
         // SAFETY: the conversion owns its strings, and the free is the paired one.
@@ -526,6 +776,67 @@ mod tests {
             vd_module_catalog_free(&raw mut converted);
             assert!(converted.tool.is_null());
             assert!(converted.modules.items.is_null());
+            assert_eq!(converted.shadowed_files.count, 0);
+            assert!(converted.shadowed_files.items.is_null());
+            assert!(converted.shadowed_warning.is_null());
+        }
+    }
+
+    #[test]
+    fn the_shadowed_file_list_reaches_the_abi_and_is_freed() {
+        // G1-c: the losing-definition files are published on their own fields so
+        // a C++ consumer can subtract them from the compiler input. The B-2
+        // warning is NOT reworded: the two channels stay separate.
+        let warning = "module 'uart' is defined in both sim/uart.v and rtl/uart.v; \
+                       using rtl/uart.v";
+        let sentence = "sim/uart.v is excluded from the compiler input because every module it \
+                        defines lost the duplicate pick";
+        let catalog = ModuleCatalog {
+            tool: "slang".to_string(),
+            modules: Vec::new(),
+            elapsed: std::time::Duration::ZERO,
+            peak_rss_kb: 0,
+            warning: Some(warning.to_string()),
+            top: None,
+            reachable_files: Vec::new(),
+            outside_modules: Vec::new(),
+            shadowed_files: vec![PathBuf::from("sim/uart.v")],
+            shadowed_warning: Some(sentence.to_string()),
+            failure: None,
+        };
+        // SAFETY: the conversion owns its strings, the read happens before the
+        // paired free, and the free is the one documented for this value.
+        unsafe {
+            let mut converted = catalog_to_c(&catalog);
+            assert_eq!(converted.shadowed_files.count, 1);
+            assert!(!converted.shadowed_files.items.is_null());
+            let items = std::slice::from_raw_parts(
+                converted.shadowed_files.items,
+                converted.shadowed_files.count,
+            );
+            let published: Vec<String> = items
+                .iter()
+                .map(|item| {
+                    std::ffi::CStr::from_ptr(*item)
+                        .to_str()
+                        .unwrap_or_else(|error| panic!("a published path must be UTF-8: {error}"))
+                        .to_string()
+                })
+                .collect();
+            assert_eq!(published, vec!["sim/uart.v".to_string()]);
+            assert!(!converted.shadowed_warning.is_null());
+            let carried = std::ffi::CStr::from_ptr(converted.shadowed_warning)
+                .to_str()
+                .unwrap_or_else(|error| panic!("the sentence must be UTF-8: {error}"));
+            assert_eq!(carried, sentence);
+            let kept = std::ffi::CStr::from_ptr(converted.warning)
+                .to_str()
+                .unwrap_or_else(|error| panic!("the warning must be UTF-8: {error}"));
+            assert_eq!(kept, warning, "the B-2 sentence is not merged with it");
+            vd_module_catalog_free(&raw mut converted);
+            assert_eq!(converted.shadowed_files.count, 0);
+            assert!(converted.shadowed_files.items.is_null());
+            assert!(converted.shadowed_warning.is_null());
         }
     }
 }

@@ -7,6 +7,7 @@
 
 #include "app_shell.h"
 #include "editor_area.h"
+#include "file_compare.h"
 #include "panel_registry.h"
 
 #include <QDebug>
@@ -60,7 +61,8 @@ bool openFileInEditor(vedit::app::ApplicationShell &shell, const QString &path, 
 #endif
 }
 
-void installFileTree(vedit::app::ApplicationShell &shell, const IntegrationOptions &options)
+void installFileTree(vedit::app::ApplicationShell &shell, const IntegrationOptions &options,
+                     FileTreeWidget::ContextMenuExtension contextMenu)
 {
 #if defined(VEDIT_FILETREE_HAVE_APP_SHELL)
     (void)options;
@@ -76,11 +78,14 @@ void installFileTree(vedit::app::ApplicationShell &shell, const IntegrationOptio
     // it), and a dock re-inserted after a runtime switch must start at the NEW
     // root. The folder this panel opens becomes the workspace root through
     // setProjectRoot(), which is the switch AC-1.2 observes.
-    const auto factory = [&shell]() {
+    const auto factory = [&shell, contextMenu = std::move(contextMenu)]() {
         QWidget *panel = makeFileTreePanel(shell.projectRoot());
         if (auto *tree = qobject_cast<FileTreeWidget *>(panel)) {
+            tree->setContextMenuExtension(contextMenu);
             QObject::connect(tree, &FileTreeWidget::openFileRequested, &shell,
                              [&shell](const QString &path) { openFileInEditor(shell, path); });
+            QObject::connect(tree, &FileTreeWidget::compareFileRequested, &shell,
+                             [&shell](const QString &path) { vedit::app::chooseFilesToCompare(shell, path); });
             QObject::connect(tree, &FileTreeWidget::directoryOpened, &shell,
                              [&shell](const QString &path) { shell.setProjectRoot(path); });
             // item 10: the dots come from the diagnostics lane's R2 merged view,
@@ -92,9 +97,14 @@ void installFileTree(vedit::app::ApplicationShell &shell, const IntegrationOptio
             // O(files) per painted item. The cached copy is rebuilt only when
             // the diagnostics view revision moves, so a repaint is one hash
             // lookup and the project is never rescanned.
+            // T9: a STRUCTURAL publish replaces the map; a PER-FILE publish is
+            // a small delta applied on top (the revision pair tells them apart).
+            // Typing therefore costs one hash insert per edited file, not a
+            // rebuild of the whole project's map.
             struct StatusCache {
                 QHash<QString, int> map;
                 quint64 revision = 0;
+                quint64 deltaRevision = 0;
             };
             auto cache = std::make_shared<StatusCache>();
             tree->setFileStatusSource(
@@ -109,11 +119,30 @@ void installFileTree(vedit::app::ApplicationShell &shell, const IntegrationOptio
                         for (auto it = map.constBegin(); it != map.constEnd(); ++it) {
                             cache->map.insert(it.key(), it.value().toInt());
                         }
+                        // The full map already contains every delta published
+                        // before it; only later deltas must be applied.
+                        cache->deltaRevision = shell
+                                                   .property("vedit.diagnostics.fileStatusDeltaRevision")
+                                                   .toULongLong();
+                        return cache->map.value(path, 0);
+                    }
+                    const quint64 delta = shell
+                                              .property("vedit.diagnostics.fileStatusDeltaRevision")
+                                              .toULongLong();
+                    if (delta != cache->deltaRevision) {
+                        cache->deltaRevision = delta;
+                        const QVariantMap changed =
+                            shell.property("vedit.diagnostics.fileStatusDelta").toMap();
+                        for (auto it = changed.constBegin(); it != changed.constEnd(); ++it) {
+                            cache->map.insert(it.key(), it.value().toInt());
+                        }
                     }
                     return cache->map.value(path, 0);
                 },
                 [&shell]() -> quint64 {
-                    return shell.property("vedit.diagnostics.viewRevision").toULongLong();
+                    // T9: moves for a delta too, or an edited file's dot would
+                    // never repaint. The cache above decides HOW to refresh.
+                    return shell.property("vedit.diagnostics.statusRevision").toULongLong();
                 });
             // RM-9: the project's EXPANDED set (directory scan + imported `.f`
             // lists), published by the diagnostics lane. Members outside this
@@ -171,6 +200,7 @@ void installFileTree(vedit::app::ApplicationShell &shell, const IntegrationOptio
 #else
     (void)shell;
     (void)options;
+    (void)contextMenu;
 #endif
 }
 

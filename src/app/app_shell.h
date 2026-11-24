@@ -21,9 +21,11 @@
 #include <memory>
 
 class QCloseEvent;
+class QDockWidget;
 class QEvent;
 class QLabel;
 class QMenu;
+class QStackedLayout;
 class QToolBar;
 class QToolButton;
 
@@ -31,12 +33,12 @@ namespace vedit::app {
 
 // The File -> Open name filter, as one testable function instead of a literal
 // buried in the dialog call. A filelist (the project recognises the `f`
-// extension, case-insensitively) is an openable document: opening one also
-// imports it as the project (the project lane subscribes to
-// ApplicationShell::fileOpened). The table itself lives in
-// src/common/file_dialog_filters.h, so it cannot drift from the parser or from
-// the import-filelist dialog. The existing source types stay in front of it, so
-// Ctrl+O still offers them first.
+// extension, case-insensitively) is an openable document: opening one NEVER
+// imports it; the project lane subscribes to ApplicationShell::fileOpened and,
+// when no filelist is imported yet, asks once whether to import (default: Open
+// Only). The table itself lives in src/common/file_dialog_filters.h, so it
+// cannot drift from the parser or from the import-filelist dialog. The existing
+// source types stay in front of it, so Ctrl+O still offers them first.
 QString openFileDialogFilter();
 
 class CommandRegistry;
@@ -63,9 +65,9 @@ struct ShellOptions {
     // Defer the session restore (and the no-session defaults) until the caller
     // calls startSession(). A lane registers its panel factory through
     // PanelRegistry::setFactory(), which only affects FUTURE inserts, so a
-    // restore that runs before the factories exist leaves every restored dock a
-    // shell placeholder (review M1: the terminal and search docks). The product
-    // entry point therefore defers, registers the factories, then starts.
+    // restore that runs before the factories exist creates NO dock for those
+    // panels (batch 20261110 / AC-1.6: an unowned dock does not render). The
+    // product entry point therefore defers, registers the factories, then starts.
     bool deferSessionRestore = false;
 };
 
@@ -89,6 +91,36 @@ public:
     // exercised without a modal dialog. Clearing it restores QFileDialog.
     void setOpenFileDialogProvider(std::function<QString()> provider);
     ThemeManager *themes() const;
+
+    // AC-4.1 (batch-20261115, lane C): the bottom "Project Lint" dock shell.
+    //
+    // The SHELL owns the dock (stable objectName/panel id `project-lint`, the
+    // "Project Lint" title, the bottom area and saveState/restoreState
+    // persistence). The diagnostics lane owns the CONTENT and installs it
+    // through this frozen accessor (contract §4.1.1) instead of creating a dock.
+    //
+    // The returned widget is a plain container with objectName
+    // `project-lint-host`: parent the panel widget to it (or install a layout on
+    // it) and the dock's empty state yields. Empty while no content is installed.
+    QWidget *projectLintHost() const;
+
+    // AC L3 (batch-20261116): the shell's dock itself, for the lane's own
+    // self-test. Production code reaches the dock through `projectLintHost()`;
+    // this accessor exists so a test can assert area / minimum size / toggle
+    // behaviour without searching by object name string.
+    QDockWidget *projectLintDock() const;
+
+    // AC L3.1/L3.2: the minimum readable height of the project-lint dock in
+    // device-independent pixels (the contract asks for >= 180). Public so a
+    // self-test asserts the shipped number instead of a copy of it.
+    static constexpr int kProjectLintMinimumHeight = 180;
+
+    // AC L3.2: the ONE normaliser for the project-lint dock. It puts the dock back
+    // on the bottom edge when a restored session left it floating, tabified, on
+    // the left/top edge or squeezed below a readable height, and keeps a
+    // deliberately closed dock closed. Called after restoreState() and by the View
+    // menu toggle, so "open" can never mean "opens and vanishes".
+    void normalizeProjectLintDock();
 
     // T132: the settings lane installs the modal Preferences dialog behind the
     // `Settings -> Preferences...` menu command (Ctrl+,). The shell knows no
@@ -203,6 +235,13 @@ public:
     // a second call is a no-op, so a deferred shell can never restore twice.
     void startSession();
 
+    // Batch 20261110 (AC-1.1): the About dialog's body, as product text — the
+    // product name, the build version the application entry point publishes, a
+    // one-line description, the licence and the homepage/docs links. It is a
+    // method so the selftest can assert the user-visible text without opening a
+    // modal dialog, and so the About box has exactly one source of truth.
+    QString aboutText() const;
+
     QStringList diagnostics() const;
     /// Append a diagnostic line that is also visible to the user (status bar)
     /// and in `--selfcheck` output. Used by lanes to surface startup problems
@@ -252,6 +291,14 @@ private:
     bool confirmPaneClose(EditorPane *pane);
 
     void buildUi();
+    // AC-4.1: creates the bottom project-lint dock once, before the session is
+    // restored, so restoreState() can apply the persisted dock state to it.
+    void createProjectLintDock();
+    // AC-7.5: after restoreState(), if the right dock column has no visible,
+    // non-floating dock, re-dock a known right-area dock and show it — a
+    // QMainWindow with no right dock has no right separator at all, so the user
+    // can never drag the column back.
+    void normalizeDockLayout();
     void registerPanels();
     void registerCommands();
     void buildMenuBar();
@@ -391,6 +438,11 @@ private:
     QToolButton *themeButton_ = nullptr;
     QMenu *viewThemeMenu_ = nullptr;
     QMenu *themeButtonMenu_ = nullptr;
+    // AC-4.1: the shell-owned project-lint dock and the content host the
+    // diagnostics lane installs into (see projectLintHost()).
+    QDockWidget *projectLintDock_ = nullptr;
+    QWidget *projectLintHost_ = nullptr;
+    QStackedLayout *projectLintStack_ = nullptr;
     bool sessionStarted_ = false;
 };
 

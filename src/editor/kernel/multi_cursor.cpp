@@ -8,11 +8,15 @@
 #include <KTextEditor/Range>
 #include <KTextEditor/View>
 
+#include <QAbstractSpinBox>
 #include <QAction>
+#include <QApplication>
+#include <QComboBox>
 #include <QEvent>
 #include <QFont>
 #include <QKeyEvent>
 #include <QKeySequence>
+#include <QLineEdit>
 #include <QMainWindow>
 #include <QMouseEvent>
 #include <QStatusBar>
@@ -104,6 +108,19 @@ void installOnWidgetTree(QObject *root, QObject *filter)
             installOnWidgetTree(child, filter);
         }
     }
+}
+
+// A text-entry control in an overlay owns the keys typed into it. Both editor
+// filters are installed on the whole widget tree under the view — the find
+// bar's fields included — so without this guard Return (and Backspace, and
+// auto-pair) would be applied to the DOCUMENT while the user is typing into a
+// control: Ctrl+F then Return must go to the next match, never insert a
+// newline (AC-8.3).
+bool isTextEntryControl(const QObject *watched)
+{
+    return qobject_cast<const QLineEdit *>(watched) != nullptr
+           || qobject_cast<const QAbstractSpinBox *>(watched) != nullptr
+           || qobject_cast<const QComboBox *>(watched) != nullptr;
 }
 
 bool hasSelection(KTextEditor::View *view)
@@ -396,6 +413,14 @@ void MultiCursorController::installCursors(const QList<KTextEditor::Cursor> &pos
     if (view_ == nullptr || positions.isEmpty()) {
         return;
     }
+    // KTextEditor refuses a cursor set while block mode is on ("Multicursors
+    // not allowed because ... blockSelection: true"). A CURSOR gesture is the
+    // user leaving block mode, so end it here instead of failing silently
+    // (batch 20261110d: the block selection itself is never converted to
+    // cursors — that was the defect — but a later cursor gesture may end it).
+    if (view_->blockSelection()) {
+        view_->setBlockSelection(false);
+    }
     view_->setCursorPositions(positions);
 }
 
@@ -427,17 +452,56 @@ void MultiCursorController::finishBlock()
         return;
     }
     blockDragging_ = false;
-    const int firstLine = std::min(blockAnchor_.line(), blockExtent_.line());
-    const int lastLine = std::max(blockAnchor_.line(), blockExtent_.line());
-    const int column = std::min(blockAnchor_.column(), blockExtent_.column());
+    // Batch 20261110d: KEEP the rectangle. The old code turned block mode off,
+    // called removeSelection() and installed one cursor per line, which
+    // destroyed the selection the user had just drawn ("the UI draws it but it
+    // does not stick") and made Delete/Copy act on cursors instead of the
+    // block. The mode stays ON, exactly like KTextEditor's own Ctrl+Shift+B
+    // mode, so the native block selection survives release: one Delete removes
+    // the whole rectangle and Copy yields its rectangular text. The user turns
+    // the mode off with the checkable `edit.block-selection` command.
+    view_->setBlockSelection(true);
+}
+
+bool MultiCursorController::addCursorsAtSelectionLineEnds()
+{
+    if (view_ == nullptr || view_->document() == nullptr) {
+        return false;
+    }
+    if (!view_->selection()) {
+        return false;
+    }
+    const KTextEditor::Range selection = view_->selectionRange();
+    const int firstLine = std::min(selection.start().line(), selection.end().line());
+    const int lastLine = std::max(selection.start().line(), selection.end().line());
     QList<KTextEditor::Cursor> positions;
     for (int line = firstLine; line <= lastLine; ++line) {
         positions.append(
-            KTextEditor::Cursor(line, std::min(column, view_->document()->lineLength(line))));
+            KTextEditor::Cursor(line, view_->document()->lineLength(line)));
     }
-    view_->setBlockSelection(false);
-    view_->removeSelection();
+    if (positions.isEmpty()) {
+        return false;
+    }
     installCursors(positions);
+    return true;
+}
+
+bool MultiCursorController::blockSelectionMode() const
+{
+    return view_ != nullptr && view_->blockSelection();
+}
+
+void MultiCursorController::setBlockSelectionMode(bool enabled)
+{
+    if (view_ == nullptr) {
+        return;
+    }
+    view_->setBlockSelection(enabled);
+    if (!enabled) {
+        // Leaving the mode ends any in-progress gesture; the selection itself
+        // is the kernel's and is left as the user had it.
+        blockDragging_ = false;
+    }
 }
 
 void MultiCursorController::addCursor(const KTextEditor::Cursor &position)
@@ -631,6 +695,12 @@ bool MultiCursorController::handleMouse(QWidget *watched, QMouseEvent *event)
         // be delivered elsewhere.
         definitionClickActive_ = false;
         altPressActive_ = false;
+        // Batch 20261110d: a fresh press always ends any previous block gesture.
+        // A release delivered after the press (focus loss, a synchronous
+        // navigation) used to leave blockDragging_ set, which then turned every
+        // later ordinary drag into a block drag.
+        blockDragging_ = false;
+        altPressPoint_ = viewPointFor(watched, event);
         const bool ctrl = event->modifiers().testFlag(Qt::ControlModifier);
         const KTextEditor::Cursor clicked =
             view_->coordinatesToCursor(viewPointFor(watched, event));
@@ -725,13 +795,26 @@ bool MultiCursorController::handleMouse(QWidget *watched, QMouseEvent *event)
         }
         if (altPressActive_) {
             altPressActive_ = false;
+            const QPoint releasePoint = viewPointFor(watched, event);
+            const bool moved = (releasePoint - altPressPoint_).manhattanLength() >=
+                               QApplication::startDragDistance();
             if (blockDragging_) {
-                const KTextEditor::Cursor extent =
-                    view_->coordinatesToCursor(viewPointFor(watched, event));
+                const KTextEditor::Cursor extent = view_->coordinatesToCursor(releasePoint);
                 if (extent.isValid()) {
                     extendBlock(extent);
                 }
                 finishBlock();
+            } else if (moved) {
+                // Batch 20261110d: a SHORT drag whose move events never reached
+                // the filter must still become the block the user drew — not a
+                // stray multi-cursor. The pixel threshold is the platform drag
+                // distance, so a click with jitter is still a click.
+                const KTextEditor::Cursor extent = view_->coordinatesToCursor(releasePoint);
+                if (extent.isValid()) {
+                    beginBlock(altPressAnchor_);
+                    extendBlock(extent);
+                    finishBlock();
+                }
             } else {
                 // Alt+click (no drag): add the cursor, or remove it when the
                 // click lands exactly on one that is already there.
@@ -829,6 +912,22 @@ bool MultiCursorController::eventFilter(QObject *watched, QEvent *event)
         return QObject::eventFilter(watched, event);
     }
     if (!isEditorOwnedWidget(view_, watched)) {
+        return QObject::eventFilter(watched, event);
+    }
+    if (isTextEntryControl(watched)) {
+        // Focus-aware grab: a key typed into the find/replace bar's field (or
+        // any other text-entry control in an overlay) is that control's, not
+        // the document's — the controller neither claims nor edits for it.
+        return QObject::eventFilter(watched, event);
+    }
+    if (event->type() == QEvent::FocusOut || event->type() == QEvent::Hide) {
+        // Batch 20261110d: a release delivered after the view lost focus never
+        // reaches this filter, so the gesture state must be dropped here —
+        // otherwise one lost release turned every later ordinary drag into a
+        // block drag (the reported leak).
+        blockDragging_ = false;
+        altPressActive_ = false;
+        definitionClickActive_ = false;
         return QObject::eventFilter(watched, event);
     }
     switch (event->type()) {
@@ -1042,6 +1141,11 @@ bool EditorEnhancements::eventFilter(QObject *watched, QEvent *event)
         }
     }
     if (!isEditorOwnedWidget(view_, watched)) {
+        return QObject::eventFilter(watched, event);
+    }
+    if (isTextEntryControl(watched)) {
+        // Focus-aware grab: Return/Backspace/typing over the find bar's field
+        // belongs to the field, never to the document (AC-8.3).
         return QObject::eventFilter(watched, event);
     }
     if (event->type() == QEvent::ShortcutOverride) {

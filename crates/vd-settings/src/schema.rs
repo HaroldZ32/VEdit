@@ -10,8 +10,8 @@
 //!
 //! | key | values | default |
 //! | --- | --- | --- |
-//! | `tools.lsp_backend` | `verible`, `slang` | `verible` |
-//! | `tools.lint_engine` | `slang`, `verible` | `slang` |
+//! | `tools.lsp_backend` | `verible` (`verible-verilog-ls`), `slang` (`slang-server`) | `slang` |
+//! | `tools.lint_engine` | `slang`, `verible` (`verible-verilog-lint`) | `slang` |
 //! | `tools.verible_ls` | path to `verible-verilog-ls` | empty (resolver decides) |
 //! | `tools.slang` | path to `slang` | empty |
 //! | `tools.slang_server` | path to `slang-server` | empty |
@@ -32,6 +32,17 @@
 //! Booleans accept `true`/`false`, `1`/`0`, `yes`/`no` and `on`/`off`, in any
 //! case; an unparsable value falls back to the default instead of failing — the
 //! AC-S3.4 "bad configuration degrades" rule.
+//!
+//! # The two tool axes are normalised before use
+//!
+//! [`normalize_tool_entries`] rewrites `tools.lsp_backend` / `tools.lint_engine`
+//! to their canonical stored value, so every accepted spelling (the display
+//! labels `verible-verilog-ls` / `slang-server` included) means the same thing
+//! everywhere. A value that is not a backend or engine at all keeps the
+//! documented default **and is reported as a warning** — a request the app
+//! cannot honour is explained, never silently turned into `verible`. The Qt half
+//! selects a backend by comparing the stored string, so this one seam is what
+//! keeps the two halves from disagreeing about what the file says.
 //!
 //! # The FIM API key has no store key
 //!
@@ -174,10 +185,10 @@ pub const API_KEY_FILE_MODE: u32 = 0o600;
 /// Which language server serves the open files.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum LspBackend {
-    /// `verible-verilog-ls` — the baseline backend.
-    #[default]
+    /// `verible-verilog-ls`.
     Verible,
-    /// `slang-server`.
+    /// `slang-server` — the default backend.
+    #[default]
     Slang,
 }
 
@@ -211,6 +222,12 @@ impl LspBackend {
             "slang" | "slang-server" => Some(Self::Slang),
             _ => None,
         }
+    }
+
+    /// The canonical stored spelling of `value`, or `None` when it is not a backend.
+    #[must_use]
+    pub fn canonical(value: &str) -> Option<&'static str> {
+        Self::parse(value).map(Self::as_str)
     }
 }
 
@@ -254,6 +271,12 @@ impl LintEngine {
             "verible" | "verible-verilog-lint" => Some(Self::Verible),
             _ => None,
         }
+    }
+
+    /// The canonical stored spelling of `value`, or `None` when it is not an engine.
+    #[must_use]
+    pub fn canonical(value: &str) -> Option<&'static str> {
+        Self::parse(value).map(Self::as_str)
     }
 }
 
@@ -337,6 +360,59 @@ impl ToolSettings {
             defines: list(entries, keys::DEFINES),
         }
     }
+}
+
+/// Rewrite the two tool-axis values to their canonical stored spelling.
+///
+/// Every accepted spelling of `tools.lsp_backend` / `tools.lint_engine` becomes
+/// [`LspBackend::as_str`] / [`LintEngine::as_str`], so a display label written
+/// by hand (`slang-server`, `verible-verilog-ls`) selects the same backend as the
+/// canonical token. A value that is not a backend/engine at all is replaced by
+/// the documented default **and returned as a warning**, phrased for the UI: it
+/// names the key, the refused value, the accepted spellings and the default that
+/// took its place. Nothing about the request is dropped silently.
+///
+/// # Examples
+///
+/// ```
+/// let mut entries = vec![vd_settings::Entry {
+///     key: "tools.lsp_backend".to_string(),
+///     value: "slang-server".to_string(),
+/// }];
+/// assert!(vd_settings::schema::normalize_tool_entries(&mut entries).is_empty());
+/// assert_eq!(entries[0].value, "slang");
+/// ```
+#[must_use]
+pub fn normalize_tool_entries(entries: &mut [Entry]) -> Vec<String> {
+    let mut warnings = Vec::new();
+    for entry in entries {
+        let (label, accepted, canonical, fallback) = match entry.key.as_str() {
+            keys::LSP_BACKEND => (
+                "language server backend",
+                "verible | verible-verilog-ls | slang | slang-server",
+                LspBackend::canonical as fn(&str) -> Option<&'static str>,
+                LspBackend::default().as_str(),
+            ),
+            keys::LINT_ENGINE => (
+                "lint engine",
+                "slang | verible | verible-verilog-lint",
+                LintEngine::canonical as fn(&str) -> Option<&'static str>,
+                LintEngine::default().as_str(),
+            ),
+            _ => continue,
+        };
+        match canonical(&entry.value) {
+            Some(value) => entry.value = value.to_string(),
+            None => {
+                warnings.push(format!(
+                    "{}: `{}` is not a known {}; expected {}; using `{}`",
+                    entry.key, entry.value, label, accepted, fallback
+                ));
+                entry.value = fallback.to_string();
+            }
+        }
+    }
+    warnings
 }
 
 /// Values of the Preferences "FIM" page.
@@ -1348,7 +1424,7 @@ mod tests {
     fn an_empty_store_yields_the_baseline_defaults() {
         let tools = ToolSettings::from_entries(&[]);
         assert_eq!(tools, ToolSettings::default());
-        assert_eq!(tools.lsp_backend, LspBackend::Verible);
+        assert_eq!(tools.lsp_backend, LspBackend::Slang);
         assert_eq!(tools.lint_engine, LintEngine::Slang);
         assert!(tools.include_dirs.is_empty());
         assert!(tools.defines.is_empty());
@@ -1386,8 +1462,74 @@ mod tests {
             entry(keys::LSP_BACKEND, "emacs"),
             entry(keys::LINT_ENGINE, "verible"),
         ]);
-        assert_eq!(tools.lsp_backend, LspBackend::Verible);
+        assert_eq!(tools.lsp_backend, LspBackend::Slang);
+        let explicit = ToolSettings::from_entries(&[entry(keys::LSP_BACKEND, "verible")]);
+        assert_eq!(explicit.lsp_backend, LspBackend::Verible);
         assert_eq!(tools.lint_engine, LintEngine::Verible);
+    }
+
+    #[test]
+    fn every_accepted_tool_spelling_normalises_to_the_canonical_token() {
+        // 4 accepted spellings per axis (canonical token + display label, in any
+        // case and with surrounding whitespace) and 1 unusable value.
+        let backends = [
+            ("verible", "verible"),
+            ("verible-verilog-ls", "verible"),
+            (" slang ", "slang"),
+            ("SLANG-SERVER", "slang"),
+        ];
+        for (stored, canonical) in backends {
+            let mut entries = vec![entry(keys::LSP_BACKEND, stored)];
+            assert!(
+                normalize_tool_entries(&mut entries).is_empty(),
+                "{stored:?} is an accepted spelling and must not warn"
+            );
+            assert_eq!(entries[0].value, canonical, "stored {stored:?}");
+        }
+
+        let engines = [
+            ("slang", "slang"),
+            ("verible", "verible"),
+            ("verible-verilog-lint", "verible"),
+        ];
+        for (stored, canonical) in engines {
+            let mut entries = vec![entry(keys::LINT_ENGINE, stored)];
+            assert!(normalize_tool_entries(&mut entries).is_empty());
+            assert_eq!(entries[0].value, canonical, "stored {stored:?}");
+        }
+
+        let mut backend = vec![entry(keys::LSP_BACKEND, "emacs")];
+        let warnings = normalize_tool_entries(&mut backend);
+        assert_eq!(backend[0].value, LspBackend::default().as_str());
+        assert_eq!(warnings.len(), 1, "an unknown backend must be reported");
+        assert_eq!(
+            warnings[0],
+            "tools.lsp_backend: `emacs` is not a known language server backend; \
+             expected verible | verible-verilog-ls | slang | slang-server; using `slang`"
+        );
+
+        let mut engine = vec![entry(keys::LINT_ENGINE, "slang-server")];
+        let warnings = normalize_tool_entries(&mut engine);
+        assert_eq!(engine[0].value, LintEngine::default().as_str());
+        assert_eq!(warnings.len(), 1, "slang-server is a server, not an engine");
+        assert_eq!(
+            warnings[0],
+            "tools.lint_engine: `slang-server` is not a known lint engine; \
+             expected slang | verible | verible-verilog-lint; using `slang`"
+        );
+    }
+
+    #[test]
+    fn unrelated_keys_are_left_alone_by_normalisation() {
+        let mut entries = vec![
+            entry(keys::SLANG_SERVER, "slang-server"),
+            entry("theme", "slang"),
+            entry(keys::VERIBLE_LS, "verible-verilog-ls"),
+        ];
+        assert!(normalize_tool_entries(&mut entries).is_empty());
+        assert_eq!(entries[0].value, "slang-server");
+        assert_eq!(entries[1].value, "slang");
+        assert_eq!(entries[2].value, "verible-verilog-ls");
     }
 
     #[test]

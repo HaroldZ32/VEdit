@@ -30,6 +30,11 @@
 #include <QLineEdit>
 #include <QComboBox>
 #include <QApplication>
+#include <QElapsedTimer>
+#include <QLabel>
+#include <QScrollArea>
+#include <QScrollBar>
+#include <QToolButton>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -463,11 +468,19 @@ void checkPanels()
         QString seen;
         treePanel.setOnTopChanged([&seen](const QString &value) { seen = value; });
         treePanel.setEffectiveTop(QStringLiteral("typed_name"));
-        top->lineEdit()->editingFinished();
+        // RE-ANCHORED for batch-20261116 AC M1.3: the commit gesture is Enter
+        // (`returnPressed`) or choosing an entry (`activated`). `editingFinished`
+        // - i.e. "the field lost focus" - was REMOVED because clicking anywhere
+        // else started a whole-project catalog nobody asked for. Same value, same
+        // handler, new gesture: the assertion is re-anchored, not weakened.
+        emit top->lineEdit()->returnPressed();
         check("top.free-text-emits", seen == QStringLiteral("typed_name"),
               QStringLiteral("seen=%1").arg(seen));
+        // Two DELIBERATE gestures are two event-loop turns (the twin-signal guard
+        // is cleared at the end of the turn it was raised in).
+        QCoreApplication::processEvents();
         treePanel.setEffectiveTop(QString());
-        top->lineEdit()->editingFinished();
+        emit top->lineEdit()->returnPressed();
         check("top.cleared-means-auto",
               treePanel.effectiveTop().isEmpty() && seen.isEmpty(),
               QStringLiteral("effective='%1' seen='%2'")
@@ -528,6 +541,183 @@ void checkPanels()
               !cleanPanel.summaryText().contains(warning)
                   && !cleanPanel.summaryText().contains(QStringLiteral("⚠")),
               cleanPanel.summaryText());
+    }
+
+    // batch-20261118 B: the duplicate-module sentence the SERVICE sends reaches
+    // the panel verbatim (the Rust catalog resolves the collision and puts the
+    // sentence into `VdModuleCatalog.warning`), and the C++ model refuses to drop
+    // a duplicate silently even if one ever reaches it.
+    {
+        const QString duplicateWarning = QStringLiteral(
+            "module 'uart' is defined in both sim/uart.v and rtl/uart.v; using rtl/uart.v");
+        ModuleCatalog duplicateWarned = catalog;
+        duplicateWarned.warning = duplicateWarning;
+        ModuleTreePanel duplicateWarnedPanel;
+        duplicateWarnedPanel.setCatalog(duplicateWarned);
+        check("panel.summary.shows-duplicate-module-warning",
+              duplicateWarnedPanel.summaryText().contains(duplicateWarning),
+              duplicateWarnedPanel.summaryText());
+
+        ModuleCatalog duplicated = catalog;
+        duplicated.modules.append(definition(
+            QStringLiteral("top_a"), QStringLiteral("/proj/rtl/uart.v"), 0, 7, true,
+            {port(QStringLiteral("done"), QStringLiteral("Out"), QStringLiteral("logic"),
+                  QStringLiteral("/proj/rtl/uart.v"), 0, 20)}));
+        const ModuleDefinition *first = duplicated.find(QStringLiteral("top_a"));
+        check("catalog.duplicate.find-keeps-first",
+              first != nullptr && first->file == QLatin1String("/proj/top_a.sv"),
+              first != nullptr ? first->file : QStringLiteral("<none>"));
+        const QStringList notes = duplicated.duplicateNotes();
+        const QString note = notes.isEmpty() ? QString() : notes.first();
+        check("catalog.duplicate.note-names-both-files",
+              notes.size() == 1 && note.contains(QStringLiteral("/proj/rtl/uart.v"))
+                  && note.contains(QStringLiteral("/proj/top_a.sv"))
+                  && note.endsWith(QStringLiteral("; using /proj/top_a.sv")),
+              note);
+        ModuleTreePanel duplicatedPanel;
+        duplicatedPanel.setCatalog(duplicated);
+        check("panel.summary.shows-duplicate-note",
+              !note.isEmpty() && duplicatedPanel.summaryText().contains(note),
+              duplicatedPanel.summaryText());
+    }
+
+    // batch-20261119 R1-c/R1-d, revised in R2: the real-machine shape of the
+    // defect. The service can emit a warning of a few THOUSAND characters (a
+    // module defined 96 times, every copy's absolute path spelled out). Before R1
+    // the two word-wrapped labels paid their whole heightForWidth minimum first and
+    // the QTreeWidget was left with ONE visible row. R1 then capped them to one
+    // ELIDED line, which the user rejected on the real machine ("the error cannot
+    // be read" - a tooltip is not a reading surface). R2 keeps the height bound but
+    // shows the FULL text in a fixed-height scroller, so the shape to pin down is:
+    // the full text is painted, the bar really moves, the height ignores the text,
+    // the full text is still a tooltip, and the table is still >= 6 rows tall.
+    {
+        QStringList samePath;
+        for (int index = 0; index < 96; ++index) {
+            samePath.append(QStringLiteral("/proj/rtl/stdcell.v"));
+        }
+        const QString longWarning =
+            QStringLiteral("module 'ANDX2' is defined 96 times (")
+            + samePath.join(QStringLiteral(", ")) + QStringLiteral("); using /proj/rtl/stdcell.v");
+        ModuleCatalog longWarned = catalog;
+        longWarned.warning = longWarning;
+        ModuleTreePanel longPanel;
+        longPanel.setCatalog(longWarned);
+        // A DOCK-SIZED panel, not a full window: the measured pre-fix layout
+        // still leaves 6 rows at 620x680, so that size would not discriminate.
+        // At 620x360 the word-wrapped summary alone claims 222 px and the
+        // viewport falls to 50 px (< 6 * 14), which is the user's screenshot.
+        longPanel.resize(620, 360);
+        longPanel.show();
+        QApplication::processEvents();
+        auto *summary = longPanel.findChild<QScrollArea *>(QStringLiteral("module-tree-summary"));
+        auto *summaryBody =
+            longPanel.findChild<QLabel *>(QStringLiteral("module-tree-summary-text"));
+        QTreeWidget *tree = longPanel.tree();
+        const int lineSpacing = summary != nullptr ? summary->fontMetrics().lineSpacing() : 0;
+        const int scrollBarHeight =
+            summary != nullptr ? summary->horizontalScrollBar()->sizeHint().height() : 0;
+        const int frameWidth = summary != nullptr ? summary->frameWidth() : 0;
+        // R2-b/R2-c: the body paints the FULL text - newlines kept, nothing elided -
+        // and that is exactly what summaryText() publishes.
+        check("panel.summary.full-text-shown",
+              summaryBody != nullptr && summaryBody->text() == longPanel.summaryText()
+                  && summaryBody->text().contains(longWarning),
+              QStringLiteral("body=%1 chars summary=%2 chars")
+                  .arg(summaryBody != nullptr ? summaryBody->text().size() : -1)
+                  .arg(longPanel.summaryText().size()));
+        // R2-c: the body must be selectable/copyable, not a picture of text. This
+        // pins the FLAGS (mouse selection + the focus policy keyboard copy needs);
+        // it cannot drive a real Ctrl+C in an offscreen run, which stays a
+        // manual/visual item in the report.
+        check("panel.summary.selectable",
+              summaryBody != nullptr
+                  && summaryBody->textInteractionFlags().testFlag(Qt::TextSelectableByMouse)
+                  && summaryBody->textInteractionFlags().testFlag(Qt::TextSelectableByKeyboard),
+              QStringLiteral("flags=0x%1")
+                  .arg(static_cast<int>(summaryBody != nullptr
+                                            ? summaryBody->textInteractionFlags()
+                                            : Qt::NoTextInteraction),
+                       0, 16));
+        // R2-a: ~2078 characters in a ~600 px wide dock must leave a REAL
+        // horizontal range, not a bar that exists and cannot move.
+        check("panel.summary.scrollable",
+              summary != nullptr && summary->horizontalScrollBar()->maximum() > 0,
+              QStringLiteral("maximum=%1 viewport=%2 body=%3")
+                  .arg(summary != nullptr ? summary->horizontalScrollBar()->maximum() : -1)
+                  .arg(summary != nullptr ? summary->viewport()->width() : -1)
+                  .arg(summaryBody != nullptr ? summaryBody->width() : -1));
+        check("panel.tree.keeps-height",
+              tree != nullptr && tree->viewport()->height() >= 6 * tree->fontMetrics().height(),
+              QStringLiteral("viewport=%1 font=%2")
+                  .arg(tree != nullptr ? tree->viewport()->height() : -1)
+                  .arg(tree != nullptr ? tree->fontMetrics().height() : -1));
+        check("panel.summary.tooltip-has-full-text",
+              summary != nullptr && summary->toolTip().contains(longWarning),
+              QStringLiteral("tooltip=%1 chars")
+                  .arg(summary != nullptr ? summary->toolTip().size() : -1));
+        // R2-a, replacing R1-c's `panel.summary.single-line` (height <= 2 lines,
+        // the shape the user rejected): the height is capped at 3 lines + the
+        // reserved bar + slack AND it does not move when the text gets LONGER. The
+        // longer text is asserted to have landed, so the equality is not vacuous.
+        const int heightBefore = summary != nullptr ? summary->height() : -1;
+        ModuleCatalog longerWarned = longWarned;
+        longerWarned.warning = longWarning + QStringLiteral(" ") + longWarning;
+        longPanel.setCatalog(longerWarned);
+        QApplication::processEvents();
+        const int heightAfter = summary != nullptr ? summary->height() : -1;
+        const int heightCap = 3 * lineSpacing + scrollBarHeight + 2 * frameWidth + lineSpacing / 2;
+        check("panel.summary.fixed-height",
+              summary != nullptr && heightBefore > 0 && heightAfter == heightBefore
+                  && heightAfter >= 2 * lineSpacing && heightAfter <= heightCap
+                  && summaryBody != nullptr
+                  && summaryBody->text().contains(longerWarned.warning),
+              QStringLiteral("height=%1 before=%2 cap=%3 line=%4 bar=%5 body=%6 chars")
+                  .arg(heightAfter)
+                  .arg(heightBefore)
+                  .arg(heightCap)
+                  .arg(lineSpacing)
+                  .arg(scrollBarHeight)
+                  .arg(summaryBody != nullptr ? summaryBody->text().size() : -1));
+        // R2-a/R2-b: a summary that carries a newline (`\nroot: …`, `\n<topNote>`)
+        // gets THREE lines - never more, never a fold back to one line.
+        ModuleCatalog rooted = catalog;
+        rooted.projectRoot = QStringLiteral("/proj");
+        rooted.warning = longWarning;
+        ModuleTreePanel rootedPanel;
+        rootedPanel.setCatalog(rooted);
+        rootedPanel.resize(620, 360);
+        rootedPanel.show();
+        QApplication::processEvents();
+        auto *rootedSummary =
+            rootedPanel.findChild<QScrollArea *>(QStringLiteral("module-tree-summary"));
+        auto *rootedBody =
+            rootedPanel.findChild<QLabel *>(QStringLiteral("module-tree-summary-text"));
+        const int rootedLineSpacing =
+            rootedSummary != nullptr ? rootedSummary->fontMetrics().lineSpacing() : 0;
+        const int rootedBarHeight = rootedSummary != nullptr
+            ? rootedSummary->horizontalScrollBar()->sizeHint().height()
+            : 0;
+        check("panel.summary.keeps-newlines",
+              rootedSummary != nullptr
+                  && rootedPanel.summaryText().contains(QStringLiteral("\nroot: /proj"))
+                  && rootedBody != nullptr && rootedBody->text().contains(QLatin1Char('\n'))
+                  && rootedSummary->height()
+                      <= 3 * rootedLineSpacing + rootedBarHeight
+                          + 2 * rootedSummary->frameWidth(),
+              QStringLiteral("height=%1 cap=%2 root=%3")
+                  .arg(rootedSummary != nullptr ? rootedSummary->height() : -1)
+                  .arg(3 * rootedLineSpacing + rootedBarHeight)
+                  .arg(rootedPanel.summaryText().contains(QStringLiteral("\nroot: /proj"))));
+        // The STATUS line is the same container through the same ONE write path;
+        // an overlong failure is as unreadable in one elided line as the summary.
+        auto *status = longPanel.findChild<QScrollArea *>(QStringLiteral("module-tree-status"));
+        longPanel.setStatus(longWarning);
+        QApplication::processEvents();
+        check("panel.status.scrollable",
+              status != nullptr && status->horizontalScrollBar()->maximum() > 0,
+              QStringLiteral("maximum=%1")
+                  .arg(status != nullptr ? status->horizontalScrollBar()->maximum() : -1));
     }
 
     QString selected;
@@ -780,6 +970,356 @@ void checkToolchainWiring()
 
 } // namespace
 
+/// batch-20261115 AC-7.1/7.3: the tree's ROOT follows the user's top.
+void checkTopScopedRoot()
+{
+    ModuleCatalog catalog;
+    catalog.valid = true;
+    catalog.tool = QStringLiteral("slang");
+    // A instantiates B; C is independent. Auto => A and C are both roots.
+    catalog.modules = {
+        definition(QStringLiteral("A"), QStringLiteral("/p/a.sv"), 0, 0, /*isTop=*/true,
+                   {}, {[] {
+                       ModuleInstance instance;
+                       instance.module = QStringLiteral("B");
+                       instance.path = QStringLiteral("A.u_b");
+                       instance.file = QStringLiteral("/p/a.sv");
+                       return instance;
+                   }()}),
+        definition(QStringLiteral("B"), QStringLiteral("/p/b.sv"), 0, 0, /*isTop=*/false),
+        definition(QStringLiteral("C"), QStringLiteral("/p/c.sv"), 0, 0, /*isTop=*/true),
+    };
+    const QVector<ModuleTreeNode> autoRoots = buildModuleTree(catalog, ModuleTreeOptions{});
+    check("ac7.1.auto-roots", autoRoots.size() == 2,
+          QString::number(autoRoots.size()));
+
+    // AC-7.1: an explicit top re-roots the tree to THAT module's subtree.
+    catalog.top = QStringLiteral("B");
+    const QVector<ModuleTreeNode> scopedRoots = buildModuleTree(catalog, ModuleTreeOptions{});
+    check("ac7.1.scoped-single-root", scopedRoots.size() == 1,
+          QString::number(scopedRoots.size()));
+    check("ac7.1.scoped-root-is-top",
+          scopedRoots.size() == 1 && scopedRoots.first().moduleName == QStringLiteral("B"),
+          scopedRoots.isEmpty() ? QString() : scopedRoots.first().moduleName);
+    check("ac7.1.summary-names-top",
+          catalog.summaryLine().contains(QStringLiteral("top: B")),
+          catalog.summaryLine());
+
+    // AC-7.3: a top the catalog does not define FALLS BACK to is_top instead of
+    // producing an empty tree, and never crashes.
+    catalog.top = QStringLiteral("NOPE");
+    const QVector<ModuleTreeNode> fallbackRoots = buildModuleTree(catalog, ModuleTreeOptions{});
+    check("ac7.3.unknown-top-falls-back", fallbackRoots.size() == 2,
+          QString::number(fallbackRoots.size()));
+}
+
+/// batch-20261115 AC-3.1: the one-level module closure the diagnostics lane
+/// consumes (`vedit.moduleTree.closure`). The holder only publishes this map, so
+/// the CONTENT rule is asserted here on a synthetic catalog: top.sv -> sub.sv,
+/// NEVER the grandchild, plus the empty-entry and invalid-catalog cases.
+void checkModuleClosure()
+{
+    ModuleCatalog catalog;
+    catalog.valid = true;
+    // `top` (top.sv) instantiates `sub` (sub.sv) and `sibling` (same file);
+    // `sub` instantiates `grand` (grand.sv) and an undefined `missing`. The
+    // doubled slash on top.sv's own path is there on purpose: the closure keys
+    // are cleanPath-normalised because the consumer keys whole documents the
+    // same way, and an un-normalised key would silently match nothing.
+    ModuleDefinition top = definition(QStringLiteral("top"), QStringLiteral("/p//top.sv"), 0, 0,
+                                      /*isTop=*/true);
+    top.children = {
+        [] {
+            ModuleInstance instance;
+            instance.module = QStringLiteral("sub");
+            instance.file = QStringLiteral("/p/top.sv");
+            return instance;
+        }(),
+        [] {
+            ModuleInstance instance;
+            instance.module = QStringLiteral("sibling");
+            instance.file = QStringLiteral("/p/top.sv");
+            return instance;
+        }(),
+    };
+    ModuleDefinition sub = definition(QStringLiteral("sub"), QStringLiteral("/p/sub.sv"), 0, 0,
+                                      /*isTop=*/false);
+    sub.children = {
+        [] {
+            ModuleInstance instance;
+            instance.module = QStringLiteral("grand");
+            instance.file = QStringLiteral("/p/sub.sv");
+            return instance;
+        }(),
+        [] {
+            ModuleInstance instance;
+            instance.module = QStringLiteral("missing");
+            instance.file = QStringLiteral("/p/sub.sv");
+            return instance;
+        }(),
+    };
+    catalog.modules = {top, sub,
+                       definition(QStringLiteral("sibling"), QStringLiteral("/p/top.sv"), 0, 0,
+                                  /*isTop=*/false),
+                       definition(QStringLiteral("grand"), QStringLiteral("/p/grand.sv"), 0, 0,
+                                  /*isTop=*/false)};
+
+    const QHash<QString, QStringList> closure = buildModuleClosure(catalog);
+    const QString topKey = QStringLiteral("/p/top.sv");
+    const QString subKey = QStringLiteral("/p/sub.sv");
+    const QString grandKey = QStringLiteral("/p/grand.sv");
+    check("closure.direct-child", closure.value(topKey) == QStringList{subKey},
+          QStringLiteral("top -> [%1]").arg(closure.value(topKey).join(QLatin1Char(','))));
+    check("closure.no-grandchild", !closure.value(topKey).contains(grandKey),
+          QStringLiteral("top -> [%1]").arg(closure.value(topKey).join(QLatin1Char(','))));
+    check("closure.grandchild-under-sub", closure.value(subKey) == QStringList{grandKey},
+          QStringLiteral("sub -> [%1]").arg(closure.value(subKey).join(QLatin1Char(','))));
+    check("closure.same-file-edge-skipped",
+          !closure.value(topKey).contains(topKey)
+              && !closure.value(subKey).contains(subKey),
+          QStringLiteral("top=[%1] sub=[%2]")
+              .arg(closure.value(topKey).join(QLatin1Char(',')),
+                   closure.value(subKey).join(QLatin1Char(','))));
+    check("closure.keys-cleaned", closure.contains(topKey) && !closure.contains(QStringLiteral("/p//top.sv")),
+          QStringLiteral("keys=[%1]").arg(QStringList(closure.keys()).join(QLatin1Char(','))));
+    check("closure.childless-file-has-empty-entry",
+          closure.contains(grandKey) && closure.value(grandKey).isEmpty(),
+          QStringLiteral("grand=[%1]").arg(closure.value(grandKey).join(QLatin1Char(','))));
+    check("closure.modules-counted", closure.size() == 3,
+          QStringLiteral("files=%1").arg(closure.size()));
+    check("closure.invalid-catalog-empty", buildModuleClosure(ModuleCatalog{}).isEmpty());
+}
+
+// --- AC M1.1 / M1.5: the failure and large-project RULES --------------------
+//
+// These are the decisions the fix hangs on, so they are asserted as pure
+// functions: a timeout must never be classified as an unknown top (that
+// classification is what cleared the persisted top and re-ran the whole
+// project), and a large file set must not start an automatic catalog.
+void checkFailureAndLargeProjectRules()
+{
+    check("failure.unknown-top-code-is-typed",
+          catalogFailureKind(10) == CatalogFailureKind::UnknownTop);
+    check("failure.timeout-is-not-unknown-top",
+          catalogFailureKind(9) == CatalogFailureKind::Timeout
+              && !mayFallBackToAuto(CatalogFailureKind::Timeout),
+          QStringLiteral("kind=%1").arg(static_cast<int>(catalogFailureKind(9))));
+    check("failure.cancelled-is-its-own-class",
+          catalogFailureKind(4) == CatalogFailureKind::Cancelled);
+    check("failure.tool-error-is-the-default",
+          catalogFailureKind(3) == CatalogFailureKind::ToolError
+              && catalogFailureKind(0) == CatalogFailureKind::ToolError
+              && catalogFailureKind(999) == CatalogFailureKind::ToolError);
+    check("failure.only-unknown-top-falls-back",
+          mayFallBackToAuto(CatalogFailureKind::UnknownTop)
+              && !mayFallBackToAuto(CatalogFailureKind::Timeout)
+              && !mayFallBackToAuto(CatalogFailureKind::Cancelled)
+              && !mayFallBackToAuto(CatalogFailureKind::ToolError));
+
+    check("large.threshold-is-5000", kLargeProjectFileThreshold == 5000);
+    check("large.automatic-run-withheld",
+          !shouldAutoCatalog(6000, /*hasTop=*/false, kLargeProjectFileThreshold,
+                             /*userRequested=*/false));
+    check("large.named-top-runs",
+          shouldAutoCatalog(6000, /*hasTop=*/true, kLargeProjectFileThreshold, false));
+    check("large.explicit-refresh-runs",
+          shouldAutoCatalog(6000, /*hasTop=*/false, kLargeProjectFileThreshold,
+                            /*userRequested=*/true));
+    check("large.small-project-runs",
+          shouldAutoCatalog(1200, false, kLargeProjectFileThreshold, false));
+    check("large.threshold-zero-disables-the-gate", shouldAutoCatalog(60000, false, 0, false));
+    const QString hint = largeProjectHint(6123);
+    check("large.hint-names-the-count-and-both-ways-forward",
+          hint.contains(QStringLiteral("6123")) && hint.contains(QStringLiteral("Refresh")),
+          hint);
+}
+
+// --- AC M1.3 / M1.4 / M1.6: the top input and the Cancel button ------------
+void checkPanelGestures()
+{
+    ModuleTreePanel panel;
+    panel.resize(900, 600);
+    panel.show();
+    QCoreApplication::processEvents();
+    auto *combo = panel.findChild<QComboBox *>(QStringLiteral("module-tree-top"));
+    auto *cancel = panel.findChild<QToolButton *>(QStringLiteral("module-tree-cancel"));
+    check("gesture.top-combo-exists", combo != nullptr && combo->isEditable());
+    check("gesture.cancel-exists", cancel != nullptr);
+    check("gesture.cancel-starts-disabled",
+          cancel != nullptr && !cancel->isEnabled() && !panel.cancelEnabled());
+
+    int topChoices = 0;
+    QString lastTop;
+    panel.setOnTopChanged([&topChoices, &lastTop](const QString &top) {
+        ++topChoices;
+        lastTop = top;
+    });
+    int cancels = 0;
+    panel.setOnCancel([&cancels]() { ++cancels; });
+
+    combo->lineEdit()->setText(QStringLiteral("my_top"));
+    QCoreApplication::processEvents();
+    check("gesture.typing-does-not-start-a-run", topChoices == 0,
+          QStringLiteral("choices=%1").arg(topChoices));
+    // The old code also committed on `editingFinished`, i.e. when the field lost
+    // focus — that is the "click anywhere and a whole-project catalog starts"
+    // symptom. Move the focus away and assert nothing happened.
+    auto *filter = panel.findChild<QLineEdit *>(QStringLiteral("module-tree-filter"));
+    if (filter != nullptr) {
+        filter->setFocus();
+    }
+    QCoreApplication::processEvents();
+    check("gesture.focus-loss-does-not-start-a-run", topChoices == 0,
+          QStringLiteral("choices=%1").arg(topChoices));
+    QTest::keyClick(combo->lineEdit(), Qt::Key_Return);
+    QCoreApplication::processEvents();
+    check("gesture.enter-starts-one-run",
+          topChoices == 1 && lastTop == QStringLiteral("my_top"),
+          QStringLiteral("choices=%1 top='%2'").arg(topChoices).arg(lastTop));
+
+    panel.setCancelEnabled(true);
+    QTest::mouseClick(cancel, Qt::LeftButton);
+    QCoreApplication::processEvents();
+    check("gesture.cancel-click-invokes-the-handler", cancels == 1,
+          QStringLiteral("cancels=%1").arg(cancels));
+    panel.setCancelEnabled(false);
+    check("gesture.cancel-disabled-again", !panel.cancelEnabled());
+}
+
+// --- AC M1.8: a 20k-module project's selection/open path -------------------
+//
+// The measured defects: every selection ran the focus rule over ALL modules
+// (`ModuleCatalog::find` + `moduleAtCaret`) and the caret rule paid two realpath
+// syscalls per module (40k on a 20k project), plus the port table was rebuilt on
+// every push. This test drives the REAL panels through the same wiring the
+// integration uses and asserts the counts and the p95 budget.
+void checkOpenLatency20k()
+{
+    constexpr int kModules = 20000;
+    constexpr int kFiles = 200;
+    ModuleCatalog catalog;
+    catalog.valid = true;
+    catalog.tool = QStringLiteral("slang");
+    catalog.fileSetSize = kFiles;
+    catalog.modules.reserve(kModules);
+    for (int index = 0; index < kModules; ++index) {
+        const QString file = QStringLiteral("/proj/src/file%1.sv")
+                                 .arg(index % kFiles, 3, 10, QLatin1Char('0'));
+        catalog.modules.append(definition(QStringLiteral("mod%1").arg(index, 5, 10, QLatin1Char('0')),
+                                          file, index % 200, 0, /*isTop=*/true,
+                                          {port(QStringLiteral("clk"), QStringLiteral("In"),
+                                                QStringLiteral("logic"), file, 1, 0),
+                                           port(QStringLiteral("q"), QStringLiteral("Out"),
+                                                QStringLiteral("logic[3:0]"), file, 2, 0)}));
+    }
+
+    ModuleTreePanel treePanel;
+    treePanel.resize(1200, 800);
+    treePanel.show();
+    InterfacePanel interfacePanel;
+    interfacePanel.resize(600, 400);
+    interfacePanel.show();
+    // Exactly the integration's wiring: a tree selection is pushed to the
+    // interface panel (focus rule (a)); the caret context is pushed as well (rule
+    // (b)) and must not cost a full scan.
+    treePanel.setOnSelectionChanged([&interfacePanel](const QString &moduleName) {
+        interfacePanel.setTreeSelection(moduleName);
+    });
+    QCoreApplication::processEvents();
+
+    QElapsedTimer buildTimer;
+    buildTimer.start();
+    treePanel.setCatalog(catalog);
+    interfacePanel.setCatalog(catalog);
+    const qint64 buildMs = buildTimer.elapsed();
+    check("scale.tree-built", treePanel.tree()->topLevelItemCount() == kModules,
+          QStringLiteral("rows=%1").arg(treePanel.tree()->topLevelItemCount()));
+    // Idempotent: a second call (a second panel, a re-attached dock) must not pay
+    // for a second scan of 20k modules.
+    catalog.buildIndex();
+    catalog.buildIndex();
+    check("scale.catalog-index-built-once", catalog.indexBuilds() == 1,
+          QStringLiteral("builds=%1").arg(catalog.indexBuilds()));
+
+    jump::Registry::instance().reset();
+    RecordingTarget target;
+    jump::setTarget(&target);
+
+    resetModuleTreeProbe();
+    const int rebuildsAfterBuild = moduleTreeProbe().treeRebuilds;
+    QVector<qint64> selectionSamples;
+    QVector<qint64> openSamples;
+    selectionSamples.reserve(200);
+    openSamples.reserve(200);
+    for (int iteration = 0; iteration < 200; ++iteration) {
+        const int index = (iteration * 97) % kModules;
+        QTreeWidgetItem *item = treePanel.tree()->topLevelItem(index);
+        QElapsedTimer timer;
+        timer.start();
+        treePanel.tree()->setCurrentItem(item);
+        QCoreApplication::processEvents();
+        selectionSamples.append(timer.nsecsElapsed());
+        timer.restart();
+        // "open": the double-click path (jump dispatch included).
+        treePanel.activateItem(item);
+        openSamples.append(timer.nsecsElapsed());
+    }
+    const auto percentile = [](QVector<qint64> samples, double fraction) {
+        std::sort(samples.begin(), samples.end());
+        const int last = static_cast<int>(samples.size()) - 1;
+        const int at = std::min(last, static_cast<int>(fraction * static_cast<double>(samples.size())));
+        return samples.at(at);
+    };
+    const qint64 selectionP95Ms = percentile(selectionSamples, 0.95) / 1000000;
+    const qint64 openP95Ms = percentile(openSamples, 0.95) / 1000000;
+    check("scale.selection-p95-under-500ms", selectionP95Ms < 500,
+          QStringLiteral("p95=%1ms build=%2ms").arg(selectionP95Ms).arg(buildMs));
+    check("scale.open-p95-under-500ms", openP95Ms < 500,
+          QStringLiteral("p95=%1ms").arg(openP95Ms));
+    check("scale.selection-never-rebuilds-the-tree",
+          moduleTreeProbe().treeRebuilds == rebuildsAfterBuild,
+          QStringLiteral("rebuilds=%1 (after catalog=%2)")
+              .arg(moduleTreeProbe().treeRebuilds)
+              .arg(rebuildsAfterBuild));
+    check("scale.selection-never-copies-the-catalog",
+          moduleTreeProbe().catalogCopies == 0,
+          QStringLiteral("copies=%1").arg(moduleTreeProbe().catalogCopies));
+    check("scale.port-table-rendered-only-on-a-focus-change",
+          moduleTreeProbe().portRenders > 0 && moduleTreeProbe().portRenders <= 200,
+          QStringLiteral("renders=%1").arg(moduleTreeProbe().portRenders));
+    check("scale.open-jumps-delivered", target.calls == 200,
+          QStringLiteral("jumps=%1").arg(target.calls));
+
+    // The caret rule: 100 lookups over the SAME files the catalog uses. The old
+    // implementation resolved two paths per module (40k syscalls per lookup).
+    resetModuleTreeProbe();
+    const int iterations = 100;
+    interfacePanel.setTreeSelection(QString());
+    QElapsedTimer caretTimer;
+    caretTimer.start();
+    for (int iteration = 0; iteration < iterations; ++iteration) {
+        const QString file = QStringLiteral("/proj/src/file%1.sv")
+                                 .arg(iteration % kFiles, 3, 10, QLatin1Char('0'));
+        interfacePanel.setCaretContext(file, iteration % 200);
+    }
+    const qint64 caretMs = caretTimer.elapsed();
+    check("scale.caret-lookup-does-not-resolve-per-module",
+          moduleTreeProbe().canonicalPathCalls <= 2 * iterations,
+          QStringLiteral("canonicalCalls=%1 lookups=%2")
+              .arg(moduleTreeProbe().canonicalPathCalls)
+              .arg(iterations));
+    check("scale.caret-lookups-p95-budget",
+          caretMs < 500LL * (iterations / 20 + 1),
+          QStringLiteral("%1ms for %2 lookups").arg(caretMs).arg(iterations));
+    // The focus rule still finds the enclosing module: file 042's module 42 lives
+    // at line 42 % 200 = 42, so a caret below it focuses that module.
+    interfacePanel.setCaretContext(QStringLiteral("/proj/src/file042.sv"), 60);
+    interfacePanel.setCaretContext(QStringLiteral("/proj/src/file042.sv"), 61);
+    check("scale.caret-focus-resolves", !interfacePanel.focusedModuleName().isEmpty(),
+          interfacePanel.focusedModuleName());
+    jump::setTarget(nullptr);
+}
+
 int main(int argc, char **argv)
 {
     QApplication application(argc, argv);
@@ -787,6 +1327,11 @@ int main(int argc, char **argv)
     checkWidthsAndFocus();
     checkPanels();
     checkToolchainWiring();
+    checkTopScopedRoot();
+    checkModuleClosure();
+    checkFailureAndLargeProjectRules();
+    checkPanelGestures();
+    checkOpenLatency20k();
     std::printf("%s: %d check(s), %d failure(s)\n", g_failures == 0 ? "PASS" : "FAIL", g_checks,
                 g_failures);
     return g_failures == 0 ? 0 : 1;

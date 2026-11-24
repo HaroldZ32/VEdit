@@ -32,7 +32,8 @@ set +a
 IMAGE="$SLANG_BUILD_IMAGE"
 OBJDUMP=${OBJDUMP:-objdump}
 
-mkdir -p "$HERE/out" "$HERE/evidence" "$HERE/cache"
+EVID="${VEDIT_SLANG_EVIDENCE_DIR:-$HERE/evidence}"
+mkdir -p "$HERE/out" "$EVID" "$HERE/cache"
 
 echo "== stage 0: make the build image available (bounded retry + Docker Hub fallback) =="
 bash "$HERE/fetch-image.sh"
@@ -46,9 +47,10 @@ docker run --rm \
   -e PYTHON_VERSION -e PYTHON_URL -e PYTHON_SHA256 \
   -e CENTOS_VAULT_BASE \
   -v "$HERE:/work" \
+  -v "$EVID:/work/evidence" \
   -w /work \
   "$IMAGE" /bin/bash /work/scripts/build-in-container.sh \
-  2>&1 | tee "$HERE/evidence/00-build-console.log"
+  2>&1 | tee "$EVID/00-build-console.log"
 build_rc=${PIPESTATUS[0]}
 set -e
 if [ "$build_rc" -ne 0 ]; then
@@ -63,7 +65,7 @@ if [ ! -x "$BIN" ]; then
 fi
 
 echo "== stage 2: ELF checks on the host =="
-elf_report="$HERE/evidence/05-elf-check.txt"
+elf_report="$EVID/05-elf-check.txt"
 {
   echo "# generated $(date -u +%Y-%m-%dT%H:%M:%SZ) by build.sh stage 2"
   "$OBJDUMP" -p "$BIN" | sed -n '1,20p'
@@ -100,10 +102,10 @@ docker run --rm \
   -e SLANG_VERSION \
   -v "$HERE/out:/out:ro" \
   -v "$HERE/fixtures:/fixtures:ro" \
-  -v "$HERE/evidence:/evidence" \
+  -v "$EVID:/evidence" \
   -v "$HERE/scripts:/scripts:ro" \
   "$IMAGE" /bin/bash /scripts/verify-offline.sh \
-  2>&1 | tee "$HERE/evidence/06-offline-console.log"
+  2>&1 | tee "$EVID/06-offline-console.log"
 smoke_rc=${PIPESTATUS[0]}
 set -e
 if [ "$smoke_rc" -ne 0 ]; then

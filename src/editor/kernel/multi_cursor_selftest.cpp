@@ -23,6 +23,8 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QClipboard>
+#include <QGuiApplication>
 #include <QDir>
 #include <QFont>
 #include <QHBoxLayout>
@@ -243,47 +245,81 @@ int main(int argc, char **argv)
     QTest::mouseRelease(blockTarget, Qt::LeftButton, Qt::AltModifier,
                         pointInTarget(blockTarget, view, blockEnd));
     QApplication::processEvents();
-    check(QStringLiteral("edit.block.cursor-count"), multi->cursorCount() == 3,
+    // CONTRACT CHANGE (batch 20261110d; old/new assertions and the strictness
+    // argument are recorded in evidence/batch-20261110d/editor-ux/AUTHORIZATION.md):
+    // the release KEEPS the native block selection. It no longer turns block
+    // mode off, removes the selection and installs one cursor per line.
+    check(QStringLiteral("edit.block.cursor-count"), multi->cursorCount() == 1,
           QString::number(multi->cursorCount()));
-    bool leftColumn = true;
-    bool expectedLines = true;
-    const QList<KTextEditor::Cursor> blockCursors = multi->cursors();
-    for (int index = 0; index < static_cast<int>(blockCursors.size()); ++index) {
-        const KTextEditor::Cursor &cursor = blockCursors.at(index);
-        if (cursor.column() != 0) {
-            leftColumn = false;
-        }
-        if (cursor != KTextEditor::Cursor(index + 1, 0)) {
-            expectedLines = false;
-        }
-    }
-    check(QStringLiteral("edit.block.left-column"), leftColumn);
-    // The rectangle must be the one the pointer described: lines 1..3 at column
-    // 0. An inner-widget coordinate mistake shifts it and fails here.
-    check(QStringLiteral("edit.block.cursor-lines"), expectedLines,
-          QStringLiteral("cursors=%1").arg(blockCursors.size()));
-    check(QStringLiteral("edit.block.native-mode-off"), !view->blockSelection());
-    const QString blockOriginal = document->text();
-    check(QStringLiteral("edit.real-focus.block-typing-target"),
-          keyTarget() != view && view->isAncestorOf(keyTarget()),
-          keyTarget() != nullptr ? QString(keyTarget()->metaObject()->className())
-                                 : QStringLiteral("none"));
-    QTest::keyClicks(keyTarget(), QStringLiteral("X"));
+    check(QStringLiteral("edit.block.native-mode-on"), view->blockSelection());
+    check(QStringLiteral("edit.block.selection-kept"), view->selection());
+    // The rectangle must be the one the pointer described: (1,0)..(3,2).
+    const KTextEditor::Range blockRectangle = view->selectionRange();
+    check(QStringLiteral("edit.block.rectangle-range"),
+          blockRectangle ==
+              KTextEditor::Range(KTextEditor::Cursor(1, 0), KTextEditor::Cursor(3, 2)),
+          QStringLiteral("%1,%2 -> %3,%4")
+              .arg(blockRectangle.start().line())
+              .arg(blockRectangle.start().column())
+              .arg(blockRectangle.end().line())
+              .arg(blockRectangle.end().column()));
+    // Copy: the rectangle text is what Ctrl+C puts on the clipboard.
+    const QString rectangleText = view->selectionText();
+    check(QStringLiteral("edit.block.copy-rectangle"),
+          rectangleText == QStringLiteral("tw\nth\nfo"), rectangleText);
+    QGuiApplication::clipboard()->clear();
+    QTest::keyClick(keyTarget(), Qt::Key_C, Qt::ControlModifier);
     QApplication::processEvents();
-    check(QStringLiteral("edit.block.rectangular-insert"),
-          lineText(document, 0) == QStringLiteral("one") &&
-              lineText(document, 1) == QStringLiteral("Xtwo") &&
-              lineText(document, 2) == QStringLiteral("Xthree") &&
-              lineText(document, 3) == QStringLiteral("Xfour"),
+    check(QStringLiteral("edit.block.copy-clipboard"),
+          QGuiApplication::clipboard()->text() == rectangleText,
+          QGuiApplication::clipboard()->text());
+    const QString blockOriginal = document->text();
+    // Delete ONCE removes the whole rectangle; the line outside it is untouched
+    // (the negative control the acceptance asks for).
+    QTest::keyClick(keyTarget(), Qt::Key_Delete);
+    QApplication::processEvents();
+    check(QStringLiteral("edit.block.delete-block"),
+          lineText(document, 1) == QStringLiteral("o") &&
+              lineText(document, 2) == QStringLiteral("ree") &&
+              lineText(document, 3) == QStringLiteral("ur"),
           detailedLines(document, 4));
-    if (!screenshotDirectory.isEmpty()) {
-        view->grab().save(screenshotDirectory + QStringLiteral("/multi-cursor-result.png"));
-    }
+    check(QStringLiteral("edit.block.delete-outside-line"),
+          lineText(document, 0) == QStringLiteral("one"), detailedLines(document, 4));
     QString undoError;
     check(QStringLiteral("edit.block.one-undo"),
           vedit::editor::documentUndo(document, &undoError) &&
               document->text() == blockOriginal,
           undoError);
+    // Leave block mode for the following sections (in the product the checkable
+    // `edit.block-selection` command does this; a cursor gesture also leaves it).
+    multi->setBlockSelectionMode(false);
+    check(QStringLiteral("edit.block.mode-left"), !view->blockSelection());
+
+    // ① state leak (batch 20261110d): a gesture whose release never arrived
+    // leaves the drag flag set; the NEXT ordinary press must clear it, otherwise
+    // every later drag is treated as a block drag. `beginBlock()` simulates the
+    // lost release; the plain press below is the user's next click.
+    {
+        multi->beginBlock(KTextEditor::Cursor(1, 0));
+        check(QStringLiteral("edit.block.leak-simulated"), multi->blockDragInProgress());
+        const QPoint plainStart = view->cursorToCoordinate(KTextEditor::Cursor(1, 0));
+        QWidget *plainTarget = deliveryTarget(view, plainStart);
+        QTest::mousePress(plainTarget, Qt::LeftButton, Qt::NoModifier,
+                          pointInTarget(plainTarget, view, plainStart));
+        check(QStringLiteral("edit.block.lost-release-resets"),
+              !multi->blockDragInProgress(),
+              QStringLiteral("blockDragging=%1").arg(multi->blockDragInProgress() ? 1 : 0));
+        QTest::mouseRelease(plainTarget, Qt::LeftButton, Qt::NoModifier,
+                            pointInTarget(plainTarget, view, plainStart));
+        QApplication::processEvents();
+        // The plain click did not start a block; leave the native mode clean for
+        // the following sections.
+        multi->setBlockSelectionMode(false);
+        check(QStringLiteral("edit.block.mode-left-after-leak"), !view->blockSelection());
+    }
+    if (!screenshotDirectory.isEmpty()) {
+        view->grab().save(screenshotDirectory + QStringLiteral("/block-selection-result.png"));
+    }
 
     // --- Alt+click adds, Alt+click on an existing cursor removes -----------
     // UX batch 2 (item 13): the add-cursor gesture moved from Ctrl+click to
@@ -355,31 +391,37 @@ int main(int argc, char **argv)
         QTest::mouseRelease(target, Qt::LeftButton, Qt::ShiftModifier | Qt::AltModifier,
                             pointInTarget(target, view, end));
         QApplication::processEvents();
-        check(QStringLiteral("rm6.shift-alt-block.cursor-count"), multi->cursorCount() == 3,
+        // CONTRACT CHANGE (batch 20261110d): the Shift+Alt primary keeps the
+        // rectangle too (see AUTHORIZATION.md — same old/new pairs as the plain
+        // Alt section).
+        check(QStringLiteral("rm6.shift-alt-block.cursor-count"), multi->cursorCount() == 1,
               QString::number(multi->cursorCount()));
-        bool sameRectangle = true;
-        const QList<KTextEditor::Cursor> blockCursors = multi->cursors();
-        for (int index = 0; index < static_cast<int>(blockCursors.size()); ++index) {
-            if (blockCursors.at(index) != KTextEditor::Cursor(index + 1, 0)) {
-                sameRectangle = false;
-            }
-        }
-        check(QStringLiteral("rm6.shift-alt-block.rectangle"), sameRectangle,
-              QStringLiteral("cursors=%1").arg(blockCursors.size()));
-        check(QStringLiteral("rm6.shift-alt-block.native-mode-off"), !view->blockSelection());
+        check(QStringLiteral("rm6.shift-alt-block.native-mode-on"), view->blockSelection());
+        const KTextEditor::Range shiftAltRectangle = view->selectionRange();
+        check(QStringLiteral("rm6.shift-alt-block.rectangle-range"),
+              shiftAltRectangle ==
+                  KTextEditor::Range(KTextEditor::Cursor(1, 0), KTextEditor::Cursor(3, 2)),
+              QStringLiteral("%1,%2 -> %3,%4")
+                  .arg(shiftAltRectangle.start().line())
+                  .arg(shiftAltRectangle.start().column())
+                  .arg(shiftAltRectangle.end().line())
+                  .arg(shiftAltRectangle.end().column()));
+        check(QStringLiteral("rm6.shift-alt-block.copy-rectangle"),
+              view->selectionText() == QStringLiteral("tw\nth\nfo"), view->selectionText());
         const QString blockOriginal = document->text();
-        QTest::keyClick(keyTarget(), Qt::Key_X);
+        QTest::keyClick(keyTarget(), Qt::Key_Delete);
         QApplication::processEvents();
-        check(QStringLiteral("rm6.shift-alt-block.rectangular-insert"),
-              lineText(document, 1) == QStringLiteral("xtwo")
-                  && lineText(document, 2) == QStringLiteral("xthree")
-                  && lineText(document, 3) == QStringLiteral("xfour"),
+        check(QStringLiteral("rm6.shift-alt-block.delete-block"),
+              lineText(document, 1) == QStringLiteral("o")
+                  && lineText(document, 2) == QStringLiteral("ree")
+                  && lineText(document, 3) == QStringLiteral("ur"),
               detailedLines(document, 4));
         undoError.clear();
         check(QStringLiteral("rm6.shift-alt-block.one-undo"),
               vedit::editor::documentUndo(document, &undoError)
                   && document->text() == blockOriginal,
               undoError);
+        multi->setBlockSelectionMode(false);
     }
 
     // Ctrl+Alt+click adds a cursor, a second one on the same place removes it.

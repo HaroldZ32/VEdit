@@ -143,13 +143,15 @@ consequences, and the rule they imply:
   installed either. Any new behaviour that relies on Rust's runtime init must be
   set up explicitly by the C++ host and documented here.
 - Lane selftests that spawn real LSP children and link Rust have the same latent
-  issue; a death there is a visible test crash, not a user crash, but a shared
-  `vedit_runtime_init()` should be used when those entry points grow one.
+  issue; a death there is a visible test crash, not a user crash. They call the
+  shared `vedit_runtime_init()` (`src/common/runtime_init.h`, header-only) as the
+  first statement of `main()`; any new entry point that links Rust does the same.
 
 ### Runtime toolchain discovery (diagnostics / outline)
 
 The diagnostics and outline panels need `verible-verilog-ls` (LSP) and `slang`
-(deep lint). Resolution order is **bundled > local checkout > PATH > env**, and
+(deep lint). Resolution order is **bundled > local checkout > PATH > env**, where
+`env` includes the imported environment layer (see the environment section below), and
 the chosen source is reported (`TOOLCHAIN source=verible:... slang:... missing=[...]`
 from `--selfcheck`; the same line names the local candidates as `local=[...]`).
 Three ways to satisfy it, in delivery order:
@@ -171,6 +173,35 @@ When a tool is missing, the panels show **one** concise status line (what is
 missing, what it disables, the three fixes); the outline stays an empty table
 with a one-line reason — a missing environment is never rendered as per-file
 errors.
+
+### Environment import (batch-20261115)
+
+Startup now captures the login shell environment **once**: `vd_env_autocapture_start`
+detects `$SHELL` (bash / zsh / sh / ksh / fish / csh / tcsh), keeps only variables the
+shell changed, and stores them in the **global** layer (marker
+`<stateDir>/environment.auto.json`, no names/values in it; manual selections are never
+overwritten). `VEDIT_NO_ENV_AUTOCAPTURE=1` disables it. The imported layer now reaches
+(a) filelist variable expansion, (b) deeplint/slang children, (c) verible LSP children
+(`LspConfig.environment`), (d) the integrated terminal PTY, and (e) C++ toolchain
+resolution — the latter through the C ABI `vd_env_effective_snapshot` /
+`vd_env_snapshot_free` (values may be secrets: never print or log them). **VCS children
+still receive only the process environment.** Changing the imported layer requires a
+restart.
+
+### Project mode is filelist-gated; LINT is split (batch-20261115)
+
+Project mode requires an **explicitly imported filelist** (`ProjectModel` state
+`filelists` non-empty). Opening a folder does **no** project-wide work: no expansion,
+no `slang` catalog, no full-project lint. Importing a filelist runs a **catalog-only**
+pass (no lint); setting the top module re-runs the catalog with `--top` and re-roots the
+module tree. Full-project lint is **manual only** (`project.lint`); the save-triggered
+and open-triggered passes are gone. Its results live in the bottom `project-lint` dock,
+never in the `Outline` diagnostics. Realtime lint is the only automatic lint: it analyzes
+the current file plus the **one-level** child-module definition files (caps: 64 files per
+file, 128 total) and displays only the current file. LSP sessions are reused across file
+switches (`vd_lsp_session_change`, no stop/start); do not reintroduce a session restart
+per active-file change. Regression ctests: `vedit-realtime-depth-switch-e2e`,
+`vedit-app-batch-layout-selftest`, `vedit-editor-open-bench`.
 
 Dependency ownership: the root `Cargo.toml`, `Cargo.lock` and
 `rust-toolchain.toml` are workspace-level and owned by the skeleton task. The
@@ -247,7 +278,9 @@ KTextEditor 的 `KSyntaxHighlighting::Repository` **不认**我们随包的两�
 所以“高亮是好的”与“我们的 XML”没有关系；要改我们的定义，必须走我们自己的扫描路径，
 不能指望 KTextEditor 加载它。
 
-**xcb 实测（T127）**：不加载任何 `FoldInjector`，在 Xvfb+xcb 下真实鼠标点 gutter 折叠标记，
+**xcb 实测（T127）**：不加载任何 `FoldInjector`，在 xcb+Xvfb 真图形路径下用命中测试合成事件（`widgetAt`+`sendEvent`）
+点 gutter 折叠标记（`QApplication::widgetAt(global)` 命中 widget，再 `QApplication::sendEvent` 投递 press/release 的
+`QMouseEvent`；这是 Qt 级合成事件，**不是**操作系统级指针注入），
 模块行可以**双向**折叠/展开（`hidden 0→38→0`、`scroll_max 939→901→939`），非 region 行同列负控制无变化。
 → KDE 原生折叠可用；VEdit 自建的 `exec("fold")` 注入层是与它打架的根源，应删除。
 
@@ -257,10 +290,11 @@ VEdit **不再注入折叠**（T128 删掉了 `FoldInjector` 的 `exec("fold")` 
 `unfoldRegistered()` 和所有绕光标的 unfold 逻辑）。文件打开时**不自动折叠**（VS Code/Kate/CLion 同款行为），
 折叠由 KTextEditor 从 KSyntaxHighlighting 定义计算，用户点 gutter 标记按需折叠/展开。
 
-- 依据：T127 的 xcb 真点击实验（`evidence/fold-gutter-click/`）在**零注入**下证明标记存在且双向可用
+- 依据：T127 的 xcb+Xvfb 命中测试合成事件实验（`evidence/fold-gutter-click/`）在**零注入**下证明标记存在且双向可用
   （`hidden 0→38→0`、`scroll_max 939→901→939`，非 region 行负控制无变化）。
-- 旧判据 `hidden-975` / `registry-200` / `firstopen-full-count` **已废弃**，替换为真交互判据：
-  `vedit-fold-gutter-click`（xcb+Xvfb，实际点 marker 两个方向；无 xvfb 时显式 SKIP）与
+- 旧判据 `hidden-975` / `registry-200` / `firstopen-full-count` **已废弃**，替换为交互判据
+  （合成点击：`widgetAt` 命中 + `sendEvent` 投递，非 OS 级指针注入）：
+  `vedit-fold-gutter-click`（xcb+Xvfb，按命中点向 marker 两个方向投递合成点击；无 xvfb 时显式 SKIP）与
   `vedit-native-fold-tests`（10k 行 open ≤2 s、二次打开不崩、折叠时移动光标不崩、打开无自动折叠）。
 - 删除清单：`src/syntax/folding/fold_injector.{h,cpp}`、`tests/folding_tests.cpp`、
   以及 `FoldBreadcrumbBinding` 里的折叠字段/方法；面包屑保留不变。
@@ -268,8 +302,8 @@ VEdit **不再注入折叠**（T128 删掉了 `FoldInjector` 的 `exec("fold")` 
   `syntax_fold_source.*`、`ksyntax_fold_source.*`、`README.md`）、静态库 `vedit_syntax_folding`、
   它在 `src/editor/CMakeLists.txt` 的 `add_subdirectory`/链接，以及 2 个测试可执行一并删除；
   `grep -r vedit_syntax_folding`（源码/CMake/脚本）= 0。证据 `evidence/dead-code/`。
-- **真实点击判据没有随之消失**：`vedit-fold-gutter-click`（xcb+Xvfb 下真实鼠标点 KDE 自带 gutter
-  标记，双向折叠，非 region 行负控制）的源码迁到 `src/editor/kernel/fold_gutter_click_probe.cpp`，
+- **点击判据没有随之消失**：`vedit-fold-gutter-click`（xcb+Xvfb，以命中测试合成事件（`widgetAt`+`sendEvent`）
+  点 KDE 自带 gutter 标记，双向折叠，非 region 行负控制）的源码迁到 `src/editor/kernel/fold_gutter_click_probe.cpp`，
   在 `src/editor/CMakeLists.txt` 重新注册，**ctest id 不变**；实测 `hidden 0→38→0`、
   `scroll_max 939→901→939`，`NATIVE-GUI result ok=1`。它只依赖 KTextEditor/Qt，不依赖已删的库。
 - `resources/queries/**` 保留：`highlights/folds/structure.scm` 被 `src/syntax/grammars` 嵌入构建产物，

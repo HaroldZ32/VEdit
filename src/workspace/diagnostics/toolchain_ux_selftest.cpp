@@ -31,6 +31,7 @@
 #include <QThread>
 
 #include <chrono>
+#include <csignal>
 #include <cstdio>
 #include <memory>
 
@@ -139,6 +140,10 @@ void missingScenario()
         }
     }
     controller.setFileSet(files);
+    // L1.1: the project set alone starts nothing; the REALTIME analysis is the
+    // path that must report a missing toolchain instead of pretending to work.
+    controller.analyzeFile(files.first(), QStringLiteral("module f0;\nendmodule\n"), false);
+    controller.reparse();
     controller.refresh();
 
     DiagnosticsPanel panel(&controller);
@@ -316,7 +321,18 @@ void availableScenario(const QString &fixtureRoot)
     DiagnosticsController controller(createFfiLspSessionBackend(), createFfiSlangBackend());
     controller.setToolchainReport(report);
     controller.setConfiguration(veriblePath, fixtureRoot);
+    // L1.1: the project set is recorded, but the session belongs to the realtime
+    // analysis of the current document.
     controller.setFileSet(QStringList{top});
+    QString topText;
+    {
+        QFile topFile(top);
+        if (topFile.open(QIODevice::ReadOnly)) {
+            topText = QString::fromUtf8(topFile.readAll());
+        }
+    }
+    check("available.realtime-source-present", !topText.isEmpty(), top);
+    controller.analyzeFile(top, topText, false);
     const bool terminal = waitForTerminal(controller, 200);
     check("available.real-session-terminal", terminal, QString::number(static_cast<int>(controller.state())));
     check("available.real-session-ready-not-failed", controller.state() != BackendState::Failed,
@@ -347,6 +363,11 @@ void availableScenario(const QString &fixtureRoot)
 
 int main(int argc, char **argv)
 {
+    // T134: this selftest links the Rust service layer and lets it drive real
+    // LSP children, so the Rust runtime's own `SIGPIPE -> SIG_IGN` default never
+    // runs here; a write to a child that just died would terminate the test with
+    // "Broken pipe". Same cure as src/app/main.cpp, installed before Qt starts.
+    std::signal(SIGPIPE, SIG_IGN);
     QApplication app(argc, argv);
     QCoreApplication::setApplicationName(QStringLiteral("vedit-toolchain-ux-selftest"));
     QString fixtureRoot;

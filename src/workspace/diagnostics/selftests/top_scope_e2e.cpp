@@ -215,6 +215,19 @@ Harness makeHarness(const QString &stateDir, const QString &root, bool fakeAvail
         return harness;
     }
 
+    // A61.2b (batch-20261115, supersedes "a root with a .f is a project"):
+    // opening the folder no longer expands it, so the harness IMPORTS the
+    // fixture's own filelist here. The top scope / exclusion assertions and the
+    // fixture are untouched; only WHEN the folder becomes a project moved.
+    {
+        const QString filelist = QDir(root).filePath(QStringLiteral("sources.f"));
+        if (!harness.projectModel->importFilelists({filelist})) {
+            std::printf("OBSERVED harness import-filelist failed '%s'\n",
+                        qPrintable(filelist));
+            return harness;
+        }
+    }
+
     // Install the deterministic backend BEFORE the first event-loop turn: a
     // project open starts the automatic pass as soon as the set is adopted.
     auto owned = std::make_unique<FakeProjectLint>();
@@ -461,7 +474,11 @@ int main(int argc, char **argv)
         }
         const bool adopted = waitForProjectFiles(harness, {topPath, bPath, cPath});
         check("rm17b.s2.project-set", adopted);
-        // CONTROL: with no top set the on-open pass covers C (it is analysed).
+        // CONTROL: with no top set a pass covers C (it is analysed).
+        // A61.1 (batch-20261115): opening a project no longer runs a full pass,
+        // so the harness triggers the ONE explicit run itself. The CONTROL's
+        // point - with no top every file is analysed - is unchanged.
+        check("rm17b.s2.control-pass-runs", runExplicitPass(harness));
         const bool controlPass = waitUntil(
             [&harness, &cPath]() {
                 return harness.fake->filesSeen.contains(QDir::cleanPath(cPath))

@@ -24,10 +24,13 @@
 #include <KSyntaxHighlighting/Theme>
 
 #include <QFileInfo>
+#include <QIcon>
+#include <QPainter>
 #include <QPlainTextEdit>
 #include <QPointer>
 #include <QTimer>
 #include <QUrl>
+#include <QVariant>
 
 #include <algorithm>
 #include <QCoreApplication>
@@ -36,6 +39,56 @@ namespace vedit::editor {
 namespace {
 
 constexpr auto kOpenFilePathProperty = "vedit.openFilePath";
+constexpr auto kDocumentKeeperProperty = "vedit.documentKeeper";
+
+// Batch 20261110d (split view): the lifetime of ONE document.
+//
+// The pre-split provider parented the document to its only view, so deleting
+// the pane deleted the document. Split view gives a document several views, and
+// that ownership becomes a data-loss bug: closing either pane would free the
+// buffer (and its unsaved changes) the other pane is still showing. The keeper
+// owns the document instead, counts its views, and deletes the document only
+// when the LAST view is destroyed. It deliberately has NO QObject parent: the
+// KTextEditor Editor singleton tears its children down while its own private
+// state is already gone, and a live document deleted at that point segfaults
+// inside DocumentPrivate (measured by vedit-native-fold-tests, which leaks its
+// probe view). A parentless keeper also survives provider swaps, so a view
+// destroyed later still reaches the right lifecycle hook.
+class DocumentKeeper final : public QObject
+{
+public:
+    explicit DocumentKeeper(KTextEditor::Document *document)
+        : document_(document)
+    {
+    }
+
+    void watchView(KTextEditor::View *view)
+    {
+        ++liveViews_;
+        // The keeper is the receiver, not the provider: a view destroyed after
+        // the provider swap still reaches the right lifecycle hook.
+        QObject::connect(view, &QObject::destroyed, this, [this]() { viewDestroyed(); });
+    }
+
+private:
+    void viewDestroyed()
+    {
+        --liveViews_;
+        if (liveViews_ > 0 || document_.isNull()) {
+            return;
+        }
+        // KTextEditor removes the view from document->views() before QObject's
+        // destroyed() is emitted, so this really is the last view and deleting
+        // the document cannot pull a live view out from under its pane.
+        KTextEditor::Document *doomed = document_.data();
+        document_ = nullptr;
+        delete doomed;
+        deleteLater();
+    }
+
+    QPointer<KTextEditor::Document> document_;
+    int liveViews_ = 0;
+};
 
 // UI-Mosaic F2: the theme name KTextEditor can actually render, or an empty
 // string when even the repository default is unusable (KTextEditor missing).
@@ -126,14 +179,62 @@ QWidget *EditCoreProvider::createEditor(QWidget *parent)
     if (document == nullptr) {
         return unavailableEditor(parent);
     }
+    // Batch 20261110d: since split view a document can have more than one View,
+    // so it must NOT die with the view that happened to create it. The keeper
+    // owns it and deletes it after the LAST view is destroyed.
+    auto *keeper = new DocumentKeeper(document);
+    document->setParent(keeper);
+    document->setProperty(kDocumentKeeperProperty, QVariant::fromValue<QObject *>(keeper));
     KTextEditor::View *view = document->createView(parent);
     if (view == nullptr) {
-        delete document;
+        delete keeper;
         return unavailableEditor(parent);
     }
-    // One document per pane, and the document dies with its view. The pane owns
-    // the widget (EditorPane deletes it when the provider changes).
-    document->setParent(view);
+    keeper->watchView(view);
+    configureView(view);
+    return view;
+}
+
+QWidget *EditCoreProvider::createEditorForExistingDocument(QWidget *sourceEditor, QWidget *parent)
+{
+    KTextEditor::View *sourceView = viewFrom(sourceEditor);
+    if (sourceView == nullptr) {
+        return nullptr;
+    }
+    KTextEditor::Document *document = sourceView->document();
+    if (document == nullptr) {
+        return nullptr;
+    }
+    // RTTI, not qobject_cast: the keeper is an implementation detail of this
+    // translation unit and deliberately has no Q_OBJECT macro (it exposes no
+    // signals/slots of its own), so the Qt cast would not compile.
+    auto *keeper = dynamic_cast<DocumentKeeper *>(
+        document->property(kDocumentKeeperProperty).value<QObject *>());
+    if (keeper == nullptr) {
+        // Not a document this provider owns: sharing its buffer is not ours to
+        // manage, so the caller keeps the empty-pane split behaviour.
+        return nullptr;
+    }
+    KTextEditor::View *view = document->createView(parent);
+    if (view == nullptr) {
+        return nullptr;
+    }
+    keeper->watchView(view);
+    // openFile() records the path on the VIEW; the second view must report the
+    // same path so the tab label, Save and the session archive agree.
+    const QVariant path = sourceEditor->property(kOpenFilePathProperty);
+    if (path.isValid()) {
+        view->setProperty(kOpenFilePathProperty, path);
+    }
+    configureView(view);
+    return view;
+}
+
+void EditCoreProvider::configureView(KTextEditor::View *view)
+{
+    if (view == nullptr) {
+        return;
+    }
     view->setObjectName(QStringLiteral("ktexteditor-view"));
     // UI-Mosaic F2: this view renders the syntax theme the shell selected. The
     // setting is per VIEW (KTextEditor keeps one theme per view, not per
@@ -148,7 +249,16 @@ QWidget *EditCoreProvider::createEditor(QWidget *parent)
     // the folding bar is enabled instead of relying on a user config default.
     view->setConfigValue(QStringLiteral("folding-bar"), true);
     auto *binding = new FoldBreadcrumbBinding(view, view);
-    binding->setStatusListener([this, view]() { notifyStatus(view); });
+    // batch-20261113 T3: the binding is a child of the VIEW and outlives the
+    // provider on window close, so its lambda must not capture `this`. It holds
+    // a weak relay plus the view; after the provider is gone the lock fails and
+    // the call is a no-op.
+    binding->setStatusListener(
+        [weakRelay = std::weak_ptr<StatusRelay>(statusRelay_), view]() {
+            if (const std::shared_ptr<StatusRelay> relay = weakRelay.lock()) {
+                relay->notify(view);
+            }
+        });
 #endif
 #if defined(VEDIT_EDIT_CORE_HAVE_FIM)
     // T104: one FIM binding per view, a child of the view so it dies with the
@@ -182,7 +292,6 @@ QWidget *EditCoreProvider::createEditor(QWidget *parent)
     // advanced-feature controller (Ctrl+Alt+A menu, honest capability gating).
     vedit::editor::SignatureHelp::install(view);
     vedit::editor::EditorAdvanced::install(view);
-    return view;
 }
 
 void EditCoreProvider::applySyntaxTheme(const QString &themeName)
@@ -264,15 +373,52 @@ void EditCoreProvider::setStatusListener(QWidget *editor, std::function<void()> 
         return;
     }
     if (!listener) {
-        statusListeners_.remove(editor);
+        statusRelay_->remove(editor);
+#if defined(VEDIT_EDIT_CORE_HAVE_FOLDING)
+        // batch-20261113 T3: clearing the registry entry is only half of an
+        // unsubscribe. The view's binding still stores the forwarding lambda,
+        // and the pre-fix code returned right here, leaving it installed so the
+        // pane kept receiving updates it had already unsubscribed from.
+        if (auto *binding = FoldBreadcrumbBinding::instanceFor(editor)) {
+            binding->setStatusListener({});
+        }
+#endif
         return;
     }
-    statusListeners_.insert(editor, std::move(listener));
+    statusRelay_->set(editor, std::move(listener));
 #if defined(VEDIT_EDIT_CORE_HAVE_FOLDING)
     if (auto *binding = FoldBreadcrumbBinding::instanceFor(editor)) {
-        binding->setStatusListener([this, editor]() { notifyStatus(editor); });
+        const std::weak_ptr<StatusRelay> weakRelay = statusRelay_;
+        binding->setStatusListener([weakRelay, editor]() {
+            if (const std::shared_ptr<StatusRelay> relay = weakRelay.lock()) {
+                relay->notify(editor);
+            }
+        });
     }
 #endif
+    // batch-20261113 T3: a view that Qt destroys WITHOUT an unsubscribe must not
+    // leave a dangling key in the registry. The connection's context is the view
+    // itself, so it disappears with the view; the captured pointer is only used
+    // as a key, never dereferenced.
+    QObject::connect(editor, &QObject::destroyed, editor,
+                     [weakRelay = std::weak_ptr<StatusRelay>(statusRelay_), editor]() {
+                         if (const std::shared_ptr<StatusRelay> relay = weakRelay.lock()) {
+                             relay->remove(editor);
+                         }
+                     });
+}
+
+int EditCoreProvider::statusListenerCount() const
+{
+    return statusRelay_ != nullptr ? statusRelay_->size() : 0;
+}
+
+EditCoreProvider::~EditCoreProvider()
+{
+    // batch-20261113 T3: this runs BEFORE the views die (app_shell.h declaration
+    // order). Dropping the provider's reference is the whole teardown: the
+    // bindings' weak_ptrs expire, so any later invocation is a silent no-op.
+    statusRelay_.reset();
 }
 
 void EditCoreProvider::setModifiedListener(QWidget *editor, std::function<void(bool)> listener)
@@ -292,8 +438,8 @@ void EditCoreProvider::setModifiedListener(QWidget *editor, std::function<void(b
         EditorProvider::setModifiedListener(editor, std::move(listener));
         return;
     }
-    // The view is the connection's context: the document is its child, so both
-    // die together and the subscription can never outlive the tab's editor.
+    // The view is the connection's context: destroying this pane's view drops
+    // its subscription even though the shared document outlives it (split view).
     const QMetaObject::Connection connection = QObject::connect(
         document, &KTextEditor::Document::modifiedChanged, editor,
         [document, listener](KTextEditor::Document *) {
@@ -302,13 +448,6 @@ void EditCoreProvider::setModifiedListener(QWidget *editor, std::function<void(b
             }
         });
     modifiedConnections_.insert(editor, connection);
-}
-
-void EditCoreProvider::notifyStatus(QWidget *editor)
-{    const auto it = statusListeners_.constFind(editor);
-    if (it != statusListeners_.constEnd() && it.value()) {
-        it.value()();
-    }
 }
 
 bool EditCoreProvider::isModified(QWidget *editor) const
@@ -373,6 +512,71 @@ QString EditCoreProvider::currentFilePath(QWidget *editor) const
     }
     KTextEditor::Document *document = documentFor(editor);
     return document != nullptr ? document->url().toLocalFile() : QString();
+}
+
+QString EditCoreProvider::comparisonText(QWidget *editor) const
+{
+    const auto *document = documentFor(editor);
+    return document ? document->text() : EditorProvider::comparisonText(editor);
+}
+
+bool EditCoreProvider::replaceComparisonText(QWidget *editor, qsizetype start, qsizetype length,
+                                            const QString &text)
+{
+    auto *document = documentFor(editor);
+    if (!document) {
+        return EditorProvider::replaceComparisonText(editor, start, length, text);
+    }
+    if (!document->isReadWrite()) {
+        return false;
+    }
+    const KTextEditor::Range range(document->offsetToCursor(static_cast<int>(start)),
+                                   document->offsetToCursor(static_cast<int>(start + length)));
+    KTextEditor::Document::EditingTransaction transaction(document);
+    return document->replaceText(range, text);
+}
+
+void EditCoreProvider::setComparisonModified(QWidget *editor, bool modified)
+{
+    if (auto *document = documentFor(editor)) {
+        document->setModified(modified);
+    } else {
+        EditorProvider::setComparisonModified(editor, modified);
+    }
+}
+
+void EditCoreProvider::setRevisionMarks(QWidget *editor, const QList<vedit::app::RevisionMark> &marks)
+{
+    auto *view = viewFor(editor);
+    if (!view) { return; }
+    auto *document = view->document();
+    constexpr auto changed = KTextEditor::Document::markType27;
+    constexpr auto deleted = KTextEditor::Document::markType28;
+    const auto previous = document->marks().keys();
+    for (int line : previous) {
+        document->removeMark(line, changed | deleted);
+    }
+    if (marks.isEmpty()) { return; }
+    const auto marker = [view](QPalette::ColorRole role, bool deletion) {
+        QPixmap indicator(12, 12);
+        indicator.fill(Qt::transparent);
+        QPainter painter(&indicator);
+        painter.fillRect(deletion ? QRect(2, 6, 8, 3) : QRect(4, 1, 4, 10), view->palette().color(role));
+        painter.end();
+        return QIcon(indicator);
+    };
+    document->setMarkIcon(changed, marker(QPalette::Highlight, false));
+    document->setMarkIcon(deleted, marker(QPalette::Text, true));
+    document->setMarkDescription(changed, QCoreApplication::translate("VEdit", "SVN working-copy change"));
+    document->setMarkDescription(deleted, QCoreApplication::translate("VEdit", "SVN working-copy deletion"));
+    for (const auto &mark : marks) {
+        if (document->lines() > 0) {
+            document->addMark(std::clamp(mark.line, 0, document->lines() - 1), mark.deletion ? deleted : changed);
+        }
+    }
+    for (auto *documentView : document->views()) {
+        documentView->setConfigValue(QStringLiteral("icon-bar"), true);
+    }
 }
 
 bool EditCoreProvider::saveFile(QWidget *editor, QString *error)

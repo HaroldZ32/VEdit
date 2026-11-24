@@ -34,6 +34,7 @@
 #![forbid(unsafe_code)]
 
 pub mod backends;
+pub mod detect;
 pub mod error;
 pub mod protocol;
 pub mod secret;
@@ -46,6 +47,7 @@ pub use backends::{
     backend_from_settings, BackendSpec, CompletionBackend, CompletionRequest, LlamaCppBackend,
     OpenAiBackend,
 };
+pub use detect::{detect, detect_http, DetectReport, Provider};
 pub use error::{FimError, TransportCategory, MAX_REASON_CHARS};
 pub use protocol::{
     llama_cpp_request_body, openai_request_body, parse_llama_cpp_response, parse_openai_response,

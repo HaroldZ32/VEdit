@@ -1,0 +1,11 @@
+# Project configuration for the rename acceptance fixture.
+#
+# The fixture is a self-contained mini project: `project.f` declares the RTL
+# sources and their `+incdir+`, and the probe also creates files under
+# `zbroken/` and `rtl_apply/` for its multi-file scenario. A project's file set
+# is exactly what its DECLARED filelists name since the 2026-11-18 decision, so
+# the fixture opts into the legacy recursive scan (`auto_discover = true`,
+# default `false`) to keep the pre-decision set the probe asserts. See
+# `docs/USER_GUIDE.md` §2.8.
+[project]
+auto_discover = true

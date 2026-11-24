@@ -243,9 +243,17 @@ impl<R: CommandRunner> VcsService for ProcessVcsService<R> {
                 // svn resolves it against the process cwd (the working-copy root),
                 // so the diff header says `Index: rtl/a.sv` exactly like the Git
                 // panel's `a/rtl/a.sv` instead of an absolute path.
-                let text = self
-                    .svn(&working_tree, &["diff", "--internal-diff", path])
-                    .unwrap_or_default();
+                if path != "." {
+                    if let Err(error) = crate::svn_write::scoped_path(&working_tree, path) {
+                        return FileDiff::empty(path, error.message());
+                    }
+                }
+                let target = crate::svn_write::literal_target(path);
+                let text =
+                    match self.svn(&working_tree, &["diff", "--internal-diff", "--", &target]) {
+                        Ok(text) => text,
+                        Err(reason) => return FileDiff::empty(path, &reason),
+                    };
                 if text.trim().is_empty() {
                     return FileDiff::empty(path, "no diff to show (unchanged, added or binary)");
                 }

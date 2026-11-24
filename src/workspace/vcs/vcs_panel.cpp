@@ -10,6 +10,8 @@
 #include <QFileInfo>
 #include <QFileSystemWatcher>
 #include <QFont>
+#include <QFutureWatcher>
+#include <QPromise>
 #include <QFormLayout>
 #include <QGuiApplication>
 #include <QHBoxLayout>
@@ -25,6 +27,7 @@
 #include <QSignalBlocker>
 #include <QSplitter>
 #include <QStringList>
+#include <QThreadPool>
 #include <QTimer>
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
@@ -39,12 +42,10 @@ namespace {
 
 // Every user-visible string in this lane uses the "VEdit" translation context,
 // the same one the rest of the workspace lanes use (and the one
-// translations/vedit_zh_CN.ts already carries).
-QString t(const char *text)
-{
-    return QCoreApplication::translate("VEdit", text);
-}
-
+// translations/vedit_zh_CN.ts already carries). Call
+// QCoreApplication::translate("VEdit", "…") directly with LITERAL arguments:
+// lupdate extracts only literals passed straight to a recognized function, and a
+// local wrapper hides them from the catalogue (the lint_options.cpp blind spot).
 QLabel *makeTitle(const QString &text, QWidget *parent, const char *objectName)
 {
     auto *label = new QLabel(text, parent);
@@ -606,13 +607,23 @@ VcsPanel::VcsPanel(QWidget *parent)
         // A save implemented with a rename (QSaveFile and friends) replaces the
         // file, which silently drops the watch: re-add it so the NEXT save is
         // still noticed.
-        if (!watcher_->files().contains(path) && QFileInfo::exists(path)) {
+        if (!watcher_->files().contains(path) && QFileInfo::exists(path) && !QFileInfo(path).isSymLink()) {
             watcher_->addPath(path);
         }
-        noteFileSaved(path);
+        if (backend_ == Backend::Subversion) {
+            scheduleRefresh(path.endsWith(QStringLiteral("/.svn/wc.db")) ? QStringLiteral("svn-metadata")
+                                                                         : QStringLiteral("watcher"));
+        } else {
+            noteFileSaved(path);
+        }
     });
     connect(watcher_, &QFileSystemWatcher::directoryChanged, this, [this](const QString &) {
-        scheduleRefresh(QStringLiteral("filesystem"));
+        if (backend_ == Backend::Subversion) {
+            needWatchScan_ = true;
+            scheduleRefresh(QStringLiteral("watcher"));
+        } else {
+            scheduleRefresh(QStringLiteral("filesystem"));
+        }
     });
 
     // AC-3.5: coming back to the window refreshes the panel. The application
@@ -790,6 +801,56 @@ void VcsPanel::buildUi()
     actions->addWidget(discard_button_);
     actions->addWidget(commit_button_);
     actions->addWidget(remove_button_);
+    svnCompare_ = new QPushButton(tr("Compare With…"), this);
+    svnCompare_->setObjectName(QStringLiteral("vcs-svn-compare"));
+    auto *svnMenu = new QMenu(svnCompare_);
+    svnMenu->addAction(tr("BASE"), this, [this] {
+        emit svnWorkingComparisonRequested(selected_path_, {SvnRevisionKind::Base, 0});
+    });
+    svnMenu->addAction(tr("HEAD"), this, [this] {
+        emit svnWorkingComparisonRequested(selected_path_, {SvnRevisionKind::Head, 0});
+    });
+    svnMenu->addAction(tr("Revision…"), this, [this] {
+        const QString path = selected_path_;
+        const quint64 selection = svnSelectionEpoch_;
+        const std::string root = root_;
+        bool accepted = false;
+        QString text = QInputDialog::getText(this, tr("Compare With SVN Revision"), tr("Revision number"),
+                                              QLineEdit::Normal, {}, &accepted).trimmed();
+        if (!accepted || root != root_ || selection != svnSelectionEpoch_ || path != selected_path_) {
+            return;
+        }
+        if (text.startsWith(QLatin1Char('r'), Qt::CaseInsensitive)) {
+            text.remove(0, 1);
+        }
+        bool valid = false;
+        const quint64 number = text.toULongLong(&valid);
+        if (!valid || number == kDefaultSvnPeg) {
+            QMessageBox::information(this, tr("Compare With SVN Revision"), tr("Enter a revision such as r42."));
+            return;
+        }
+        emit svnWorkingComparisonRequested(path, {SvnRevisionKind::Number, number});
+    });
+    svnMenu->addAction(tr("File History…"), this, [this] {
+        emit svnFileHistoryRequested(selected_path_);
+    });
+    svnCompare_->setMenu(svnMenu);
+    actions->addWidget(svnCompare_);
+    svnActions_ = new QPushButton(tr("SVN Actions"), this);
+    svnActions_->setObjectName(QStringLiteral("vcs-svn-actions"));
+    auto *operations = new QMenu(svnActions_);
+    svnActions_->setMenu(operations);
+    connect(operations, &QMenu::aboutToShow, this, [this, operations] { buildSvnMenu(*operations, false); });
+    actions->addWidget(svnActions_);
+    changes_->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(changes_, &QWidget::customContextMenuRequested, this, [this](const QPoint &pos) {
+        if (backend_ != Backend::Subversion) { return; }
+        auto *hit = changes_->itemAt(pos);
+        if (hit != nullptr && !hit->isSelected()) { changes_->setCurrentItem(hit); }
+        QMenu menu(this);
+        buildSvnMenu(menu, true);
+        menu.exec(changes_->viewport()->mapToGlobal(pos));
+    });
     actions->addStretch(1);
     layout->addLayout(actions);
 
@@ -885,6 +946,8 @@ void VcsPanel::buildUi()
     });
 
     const auto onCurrent = [this](QListWidgetItem *current, QListWidgetItem *) {
+        ++svnSelectionEpoch_;
+        externalSelection_ = {};
         if (current == nullptr) {
             return;
         }
@@ -906,6 +969,13 @@ void VcsPanel::buildUi()
 
 void VcsPanel::setSource(std::unique_ptr<VcsSource> source)
 {
+    ++rootEpoch_;
+    write_in_flight_ = false;
+    has_followup_ = false;
+    clearCredentials();
+    statusInFlight_ = false;
+    watchScanInFlight_ = false;
+    needWatchScan_ = true;
     source_ = std::move(source);
     refresh();
 }
@@ -916,6 +986,20 @@ void VcsPanel::setRoot(const std::string &root)
         return;
     }
     root_ = root;
+    ++rootEpoch_;
+    ++svnSelectionEpoch_;
+    externalSelection_ = {};
+    coalesce_->stop();
+    pending_reason_.clear();
+    nextStatusReason_.clear();
+    has_followup_ = false;
+    svnRemoteRead_ = false;
+    svnIncomingCount_ = -1;
+    needWatchScan_ = true;
+    watchScanInFlight_ = false;
+    changes_snapshot_.clear();
+    changes_->clear();
+    staged_->clear();
     // A different working copy has its own index: the session-local staging
     // overlay must not leak across it.
     staged_overlay_.clear();
@@ -944,6 +1028,18 @@ void VcsPanel::setRoot(const std::string &root)
 
 void VcsPanel::refresh()
 {
+    refreshWithReason(backend_ == Backend::None ? QStringLiteral("initial") : QStringLiteral("refresh"));
+}
+
+void VcsPanel::refreshWithReason(const QString &reason)
+{
+    if (statusInFlight_) {
+        if (nextStatusReason_.isEmpty() || reason == QStringLiteral("manual") || reason == QStringLiteral("write")) {
+            nextStatusReason_ = reason;
+        }
+        return;
+    }
+    last_refresh_reason_ = reason;
     ++refresh_count_;
     if (!source_) {
         loading_->setVisible(false);
@@ -960,7 +1056,30 @@ void VcsPanel::refresh()
         // repository" while the first read runs would be a lie.
         header_->setText(QString());
     }
-    source_->requestStatus(root_, [this](Status status) { applyStatus(std::move(status)); });
+    statusInFlight_ = true;
+    const quint64 epoch = rootEpoch_;
+    const bool benchmark = qEnvironmentVariableIsSet("VEDIT_VCS_BENCH");
+    if (benchmark) {
+        qInfo("VCS-STATUS phase=start reason=%s", qPrintable(reason));
+    }
+    source_->requestStatus(root_, [panel = QPointer(this), epoch, reason, benchmark](Status status) {
+        if (!panel) {
+            return;
+        }
+        panel->statusInFlight_ = false;
+        if (epoch == panel->rootEpoch_) {
+            const bool ready = !status.error && status.backend != Backend::None;
+            panel->applyStatus(std::move(status));
+            if (benchmark) {
+                qInfo("VCS-STATUS phase=%s reason=%s rows=%d", ready ? "ready" : "unavailable",
+                      qPrintable(reason), panel->fileCount());
+            }
+        }
+        const QString next = std::exchange(panel->nextStatusReason_, {});
+        if (!next.isEmpty()) {
+            panel->refreshWithReason(next);
+        }
+    });
 }
 
 void VcsPanel::applyStatus(Status status)
@@ -980,7 +1099,8 @@ void VcsPanel::applyStatus(Status status)
     error_->setVisible(false);
     splitter_->setVisible(true);
 
-    changes_snapshot_ = status.changes;
+    watchPaths(status);
+    changes_snapshot_ = std::move(status.changes);
     {
         QSet<QString> present;
         present.reserve(static_cast<int>(changes_snapshot_.size()));
@@ -991,14 +1111,21 @@ void VcsPanel::applyStatus(Status status)
     }
     renderChanges();
     renderConflictBanner();
-    // Batch 4a: the refs column is driven by the info read that follows; until
-    // it answers, keep the last snapshot rather than blanking the column.
-    renderRefs(info_snapshot_);
-    watchPaths(status);
-    if (source_) {
-        source_->requestInfo(root_, [this](Info info) { applyInfo(std::move(info)); });
+    if (backend_ == Backend::Subversion && info_snapshot_.backend == Backend::Subversion) {
+        renderHeader();
+    }
+    if (source_ && (backend_ != Backend::Subversion || info_snapshot_.backend == Backend::None ||
+                    last_refresh_reason_ == QStringLiteral("manual") || last_refresh_reason_.startsWith(QStringLiteral("write")) ||
+                    last_refresh_reason_ == QStringLiteral("svn-metadata"))) {
+        const quint64 epoch = rootEpoch_;
+        source_->requestInfo(root_, [panel = QPointer(this), epoch](Info info) {
+            if (panel && epoch == panel->rootEpoch_ && panel->splitter_->isVisibleTo(panel)) {
+                panel->applyInfo(std::move(info));
+            }
+        });
     }
     updateActions();
+    if (backend_ == Backend::Subversion) { emit svnStatusReady(); }
 }
 
 void VcsPanel::applyInfo(Info info)
@@ -1006,7 +1133,16 @@ void VcsPanel::applyInfo(Info info)
     if (info.backend != Backend::None) {
         backend_ = info.backend;
     }
-    info_snapshot_ = info;
+    info_snapshot_ = std::move(info);
+    renderHeader();
+    renderRefs(info_snapshot_);
+    renderConflictBanner();
+    updateActions();
+}
+
+void VcsPanel::renderHeader()
+{
+    const Info &info = info_snapshot_;
     QStringList parts;
     parts << backendName(backend_);
     if (!info.branch.empty()) {
@@ -1019,15 +1155,16 @@ void VcsPanel::applyInfo(Info info)
         parts << QStringLiteral("@ ") + QString::fromStdString(info.revision);
     }
     parts << QCoreApplication::translate("VEdit", "· %1 changed file(s)").arg(fileCount());
+    if (backend_ == Backend::Subversion && svnIncomingCount_ >= 0) {
+        parts << tr("· %1 incoming").arg(svnIncomingCount_);
+    }
     header_->setText(parts.join(QStringLiteral(" ")));
-    renderRefs(info);
-    renderConflictBanner();
-    updateActions();
 }
 
 void VcsPanel::renderChanges()
 {
     const QString keep = selected_path_;
+    const QStringList selected = backend_ == Backend::Subversion ? selectedSvnPaths() : QStringList{};
     {
         // Rebuilding the rows must not fire a diff request per row; the diff for
         // the kept selection is requested once, below.
@@ -1040,6 +1177,10 @@ void VcsPanel::renderChanges()
             auto *item = new QListWidgetItem(
                 QStringLiteral("%1  %2").arg(path, changeKindName(change.kind)));
             item->setData(Qt::UserRole, path);
+            const QString changelist = QString::fromStdString(change.changelist);
+            if (!changelist.isEmpty()) {
+                item->setText(QStringLiteral("%1  ·  %2").arg(item->text(), changelist));
+            }
             item->setToolTip(path);
             if (staged_overlay_.contains(path)) {
                 staged_->addItem(item);
@@ -1052,7 +1193,11 @@ void VcsPanel::renderChanges()
             for (QListWidget *list : {changes_, staged_}) {
                 for (int row = 0; row < list->count(); ++row) {
                     if (list->item(row)->data(Qt::UserRole).toString() == keep) {
-                        list->setCurrentRow(row);
+                        if (backend_ == Backend::Subversion) {
+                            list->setCurrentRow(row, QItemSelectionModel::NoUpdate);
+                        } else {
+                            list->setCurrentRow(row);
+                        }
                         restored = true;
                         break;
                     }
@@ -1060,6 +1205,12 @@ void VcsPanel::renderChanges()
                 if (restored) {
                     break;
                 }
+            }
+        }
+        for (int row = 0; row < changes_->count() && !selected.isEmpty(); ++row) {
+            auto *item = changes_->item(row);
+            if (selected.contains(item->data(Qt::UserRole).toString())) {
+                item->setSelected(true);
             }
         }
         if (!restored) {
@@ -1215,9 +1366,15 @@ void VcsPanel::watchPaths(const Status &status)
     if (watcher_ == nullptr || root_.empty()) {
         return;
     }
-    QStringList wanted;
     const QDir root(QString::fromStdString(root_));
-    wanted << root.absolutePath();
+    if (status.backend == Backend::Subversion) {
+        if (!watcher_->directories().contains(root.absolutePath())) {
+            watcher_->addPath(root.absolutePath());
+        }
+        scanSvnWatches();
+        return;
+    }
+    QSet<QString> wanted{root.absolutePath()};
     int considered = 0;
     for (const Change &change : status.changes) {
         // Bounded watch count: a status with thousands of files must not exhaust
@@ -1231,19 +1388,78 @@ void VcsPanel::watchPaths(const Status &status)
         }
         wanted << info.absolutePath();
     }
-    wanted.removeDuplicates();
+    installWatchPaths(wanted);
+}
 
-    QStringList current = watcher_->files();
-    current += watcher_->directories();
-    for (const QString &path : current) {
-        if (!wanted.contains(path)) {
-            watcher_->removePath(path);
-        }
+void VcsPanel::scanSvnWatches()
+{
+    if (!needWatchScan_ || watchScanInFlight_) {
+        return;
     }
-    for (const QString &path : wanted) {
-        if (!current.contains(path)) {
-            watcher_->addPath(path);
+    needWatchScan_ = false;
+    watchScanInFlight_ = true;
+    const auto epoch = rootEpoch_;
+    auto *scan = new QFutureWatcher<QSet<QString>>(this);
+    connect(scan, &QFutureWatcherBase::finished, this, [this, scan, epoch] {
+        scan->deleteLater();
+        if (epoch != rootEpoch_) {
+            return;
         }
+        watchScanInFlight_ = false;
+        if (backend_ == Backend::Subversion && splitter_->isVisibleTo(this)) {
+            installWatchPaths(scan->result());
+            scanSvnWatches();
+        }
+    });
+    QPromise<QSet<QString>> promise;
+    scan->setFuture(promise.future());
+    const QString root = QDir(QString::fromStdString(root_)).absolutePath();
+    QThreadPool::globalInstance()->start([root, promise = std::move(promise)]() mutable {
+        constexpr qsizetype maxPaths = 8192;
+        QSet<QString> wanted{root};
+        const QString metadata = QDir(root).filePath(QStringLiteral(".svn/wc.db"));
+        if (QFileInfo::exists(metadata)) { wanted.insert(metadata); }
+        QStringList pending{root};
+        promise.start();
+        while (!pending.isEmpty() && wanted.size() < maxPaths) {
+            const auto entries = QDir(pending.takeFirst()).entryInfoList(
+                QDir::Files | QDir::Dirs | QDir::Hidden | QDir::NoDotAndDotDot | QDir::NoSymLinks,
+                QDir::NoSort);
+            for (const auto &entry : entries) {
+                const QString name = entry.fileName();
+                if (name == QStringLiteral(".svn") || name == QStringLiteral(".git")) {
+                    continue;
+                }
+                const QString path = entry.absoluteFilePath();
+                if (entry.isDir() && (QDir(path).exists(QStringLiteral(".svn/wc.db")) ||
+                                      QDir(path).exists(QStringLiteral(".git")))) {
+                    continue;
+                }
+                wanted.insert(path);
+                if (entry.isDir()) {
+                    pending.append(path);
+                }
+                if (wanted.size() == maxPaths) {
+                    break;
+                }
+            }
+        }
+        promise.addResult(std::move(wanted));
+        promise.finish();
+    });
+}
+
+void VcsPanel::installWatchPaths(const QSet<QString> &wanted)
+{
+    const QStringList existing = watcher_->files() + watcher_->directories();
+    const QSet<QString> current(existing.cbegin(), existing.cend());
+    const auto removed = current - wanted;
+    const auto added = wanted - current;
+    if (!removed.isEmpty()) {
+        watcher_->removePaths(removed.values());
+    }
+    if (!added.isEmpty()) {
+        watcher_->addPaths(added.values());
     }
 }
 
@@ -1304,7 +1520,14 @@ void VcsPanel::showDiff(const std::string &path)
         diff_->setPlainText(QCoreApplication::translate("VEdit", "No VCS backend available."));
         return;
     }
-    source_->requestDiff(root_, path, [this, path](Diff diff) { applyDiff(path, std::move(diff)); });
+    const quint64 rootEpoch = rootEpoch_;
+    const quint64 diffEpoch = ++diffEpoch_;
+    source_->requestDiff(root_, path, [panel = QPointer(this), path, rootEpoch, diffEpoch](Diff diff) {
+        if (panel && rootEpoch == panel->rootEpoch_ && diffEpoch == panel->diffEpoch_ &&
+            panel->selected_path_ == QString::fromStdString(path)) {
+            panel->applyDiff(path, std::move(diff));
+        }
+    });
 }
 
 void VcsPanel::applyDiff(const std::string &path, Diff diff)
@@ -1368,6 +1591,14 @@ void VcsPanel::updateActions()
     const bool selection = !selected_path_.isEmpty();
     const bool pending = info_snapshot_.operation != GitOperation::None;
     const bool svn = backend_ == Backend::Subversion;
+    svnCompare_->setVisible(svn);
+    svnCompare_->setEnabled(svn && hasSource && selection && svnChangeKind(selected_path_) != 7);
+    updateSvnActions();
+    refs_->parentWidget()->setVisible(!svn);
+    for (auto *button : {unstage_button_, fetch_button_, push_button_, branch_button_, tag_button_,
+                         remote_button_, workspace_button_, continue_button_, abort_button_}) {
+        button->setVisible(!svn);
+    }
 
     // The pull button is Git's `Pull` and Subversion's `Update`.
     refresh_button_->setEnabled(hasSource);
@@ -1379,7 +1610,7 @@ void VcsPanel::updateActions()
     applyCapability(fetch_button_, PanelAction::Fetch, true);
     applyCapability(pull_button_, svn ? PanelAction::Update : PanelAction::Pull, true);
     applyCapability(push_button_, PanelAction::Push, true);
-    applyCapability(branch_button_, PanelAction::Branch, true);
+    applyCapability(branch_button_, PanelAction::Branch, !svn);
     applyCapability(tag_button_, PanelAction::Tag, true);
     applyCapability(remote_button_, PanelAction::Remote, true);
     applyCapability(workspace_button_, PanelAction::Workspace, true);
@@ -1387,9 +1618,9 @@ void VcsPanel::updateActions()
     applyCapability(abort_button_, PanelAction::Abort, pending);
 
     // The SAME three-column widget, with the backend's own verbs on the buttons.
-    // These are DIRECT translate() calls (not the t() helper) because lupdate only
-    // extracts literals passed straight to QCoreApplication::translate: a `t("…")`
-    // label would silently stay untranslated in the compiled catalogue.
+    // These are DIRECT translate() calls because lupdate only extracts literals
+    // passed straight to QCoreApplication::translate: a wrapper such as the
+    // retired `t("…")` helper would silently stay untranslated in the catalogue.
     stage_button_->setText(svn ? QCoreApplication::translate("VEdit", "Add")
                                : QCoreApplication::translate("VEdit", "Stage"));
     discard_button_->setText(svn ? QCoreApplication::translate("VEdit", "Revert…")
@@ -1454,6 +1685,13 @@ bool VcsPanel::stagedColumnVisible() const
 void VcsPanel::renderConflictBanner()
 {
     const GitOperation operation = info_snapshot_.operation;
+    if (backend_ == Backend::Subversion) {
+        const auto conflicts = std::count_if(changes_snapshot_.cbegin(), changes_snapshot_.cend(),
+                                             [](const Change &change) { return change.kind == 5; });
+        conflict_banner_->setText(conflicts == 0 ? QString() : tr("%1 SVN conflict(s) need attention.").arg(conflicts));
+        conflict_banner_->setVisible(conflicts > 0);
+        return;
+    }
     if (operation == GitOperation::None) {
         conflict_banner_->clear();
         conflict_banner_->setVisible(false);
@@ -1894,6 +2132,7 @@ bool VcsPanel::removeSelected()
 
 bool VcsPanel::issueWrite(const WriteRequest &request)
 {
+    if (write_in_flight_) { return false; }
     return issueWriteInternal(request, false);
 }
 
@@ -1927,7 +2166,16 @@ bool VcsPanel::issueWriteInternal(const WriteRequest &request, bool is_retry)
     // A stub answers synchronously (so write_in_flight_ is already false when
     // this returns); the production source answers from its poll timer. The
     // request WAS issued either way, which is what the callers report.
-    source_->requestWrite(request, [this](WriteResult result) { applyWriteResult(std::move(result)); });
+    const auto epoch = rootEpoch_;
+    source_->requestWrite(request, [this, epoch](WriteResult result) {
+        if (epoch != rootEpoch_) {
+            write_in_flight_ = false;
+            clearCredentials();
+            updateActions();
+            return;
+        }
+        applyWriteResult(std::move(result));
+    });
     return true;
 }
 
@@ -2143,6 +2391,20 @@ void VcsPanel::applyWriteResult(WriteResult result)
             message_->setText(QCoreApplication::translate("VEdit", verb).arg(path));
             break;
         }
+        case WriteOp::SvnRename: {
+            const QDir working(QString::fromStdString(pending_request_.root));
+            const auto target = QString::fromStdString(pending_request_.target);
+            emit svnFileRenamed(working.absoluteFilePath(pending_path_), working.absoluteFilePath(target));
+            message_->setText(tr("Renamed %1 to %2.").arg(pending_path_, target));
+            break;
+        }
+        case WriteOp::SvnCheckout: {
+            const auto path = QDir(QString::fromStdString(pending_request_.root))
+                .absoluteFilePath(QString::fromStdString(pending_request_.target));
+            QTimer::singleShot(0, this, [this, path] { emit svnOpenCheckoutRequested(path); });
+            message_->setText(tr("Checked out %1.").arg(path));
+            break;
+        }
         case WriteOp::SvnCommit:
             message_->setText(QCoreApplication::translate("VEdit", "Committed the working copy."));
             break;
@@ -2154,6 +2416,9 @@ void VcsPanel::applyWriteResult(WriteResult result)
             break;
         }
         message_->setVisible(true);
+        if (writeOpIsSvn(op)) {
+            svnIncomingCount_ = -1;
+        }
         // The staging overlay changed, so the rows move NOW; the backend truth
         // still arrives through the coalesced refresh below.
         renderChanges();
@@ -2177,7 +2442,8 @@ void VcsPanel::applyWriteResult(WriteResult result)
         // summary is the honest one-line reason then.
         if (message_->text().isEmpty() || message_->text().startsWith(
                 QCoreApplication::translate("VEdit", "Working…"))) {
-            message_->setText(QCoreApplication::translate("VEdit", "Nothing was written."));
+            message_->setText(writeOpIsSvn(op) ? tr("Check working-copy status for partial changes.")
+                                                   : QCoreApplication::translate("VEdit", "Nothing was written."));
         }
         message_->setVisible(true);
         // The tool may have half-applied a change; re-read rather than assume.
@@ -2189,6 +2455,10 @@ void VcsPanel::applyWriteResult(WriteResult result)
 
 void VcsPanel::promptCommit()
 {
+    if (backend_ == Backend::Subversion) {
+        promptSvnCommit({});
+        return;
+    }
     CommitDialog dialog(this);
     if (dialog.exec() != QDialog::Accepted) {
         message_->setText(QCoreApplication::translate("VEdit", "Commit cancelled; nothing was written."));
@@ -2265,7 +2535,7 @@ QString VcsPanel::credentialPromptText(WriteOp op) const
     if (url.isEmpty()) {
         url = remote;
     }
-    const QString action = t(writeOpName(op));
+    const QString action = QCoreApplication::translate("VEdit", writeOpName(op));
     if (url.isEmpty()) {
         return QCoreApplication::translate(
                    "VEdit", "The %1 operation needs credentials for the remote. "
@@ -3151,10 +3421,15 @@ void VcsPanel::scheduleRefresh(const QString &reason)
         // AC-3.5: everything inside one window merges into the ONE refresh that
         // window already has scheduled.
         ++merged_refresh_count_;
+        if (reason.startsWith(QStringLiteral("write")) || (reason == QStringLiteral("svn-metadata")
+            && !pending_reason_.startsWith(QStringLiteral("write")))) {
+            pending_reason_ = reason;
+        }
         return;
     }
     pending_reason_ = reason;
-    coalesce_->start(coalesce_ms_);
+    const bool svnChange = reason == QStringLiteral("watcher") || reason == QStringLiteral("svn-metadata");
+    coalesce_->start(svnChange ? std::min(coalesce_ms_, 220) : coalesce_ms_);
 }
 
 void VcsPanel::noteFileSaved(const QString &path)
@@ -3165,20 +3440,22 @@ void VcsPanel::noteFileSaved(const QString &path)
 
 void VcsPanel::noteActivated()
 {
-    scheduleRefresh(QStringLiteral("activated"));
+    if (!(statusInFlight_ && backend_ == Backend::None) && backend_ != Backend::Subversion) {
+        scheduleRefresh(QStringLiteral("activated"));
+    }
 }
 
 void VcsPanel::manualRefresh()
 {
-    last_refresh_reason_ = QStringLiteral("manual");
-    refresh();
+    coalesce_->stop();
+    pending_reason_.clear();
+    refreshWithReason(QStringLiteral("manual"));
 }
 
 void VcsPanel::onRefreshTimer()
 {
-    last_refresh_reason_ = pending_reason_.isEmpty() ? QStringLiteral("scheduled") : pending_reason_;
-    pending_reason_.clear();
-    refresh();
+    const QString reason = std::exchange(pending_reason_, {});
+    refreshWithReason(reason.isEmpty() ? QStringLiteral("scheduled") : reason);
 }
 
 void VcsPanel::setCoalesceWindowMs(int milliseconds)

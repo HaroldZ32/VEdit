@@ -28,12 +28,16 @@
 #include <QFrame>
 #include <QList>
 #include <QMetaObject>
+#include <QPoint>
 #include <QString>
 
 class QComboBox;
+class QContextMenuEvent;
+class QGridLayout;
 class QLabel;
 class QLineEdit;
 class QKeyEvent;
+class QMouseEvent;
 class QToolButton;
 
 namespace KTextEditor {
@@ -133,6 +137,24 @@ public:
     vedit::search::SearchHandoff handoff() const;
     KTextEditor::View *view() const;
 
+    // Overlay geometry (AC-8.1/AC-8.2). The bar is dragged by its own
+    // background — never by one of its controls — and always stays inside the
+    // editor viewport. The position survives close/reopen for the life of the
+    // view; `restoreDefaultPosition()` (also on the bar's context menu) puts it
+    // back on the top-right corner. `compactLayout()` reports the narrow form,
+    // chosen from the width the view leaves for the bar.
+    bool isCustomPosition() const;
+    QPoint defaultPosition() const;
+    void restoreDefaultPosition();
+    bool compactLayout() const;
+    // Batch 20261110d observability: the reflow threshold and the two
+    // measurements it was chosen from, all taken in the WIDE arrangement before
+    // any switch. The lane test asserts the threshold is the preferred width
+    // (not the field's minimum) without guessing a pixel count.
+    int wideLayoutThreshold() const { return wideMinimumWidth_; }
+    int wideLayoutPreferredWidth() const { return wideLayoutPreferredWidth_; }
+    int wideLayoutMinimumWidth() const { return wideLayoutMinimumWidth_; }
+
     // Direct setters (used by the test, and mirrors typing/clicking).
     void setPattern(const QString &pattern);
     void setReplacement(const QString &text);
@@ -151,6 +173,10 @@ signals:
 
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void contextMenuEvent(QContextMenuEvent *event) override;
 
 private:
     explicit FindReplaceBar(KTextEditor::View *view);
@@ -159,8 +185,12 @@ private:
     void installKeyHandling();
     void clearKernelFindShortcuts();
     bool handleShortcutKey(QKeyEvent *event, bool overridePhase);
-    void openBar(bool withReplace);
+    void openBar();
     void positionOverlay();
+    void layoutFindRow(bool compact);
+    QPoint clampToViewport(const QPoint &position) const;
+    void findFromField(bool backwards);
+    void replaceFromField(bool backwards);
     void refreshDocumentConnection();
     void captureScopeAtOpen();
     void applySelectionToggle(bool checked);
@@ -185,13 +215,39 @@ private:
 
     QLineEdit *findEdit_ = nullptr;
     QLineEdit *replaceEdit_ = nullptr;
+    QWidget *findRow_ = nullptr;
+    QGridLayout *findGrid_ = nullptr;
     QWidget *replaceRow_ = nullptr;
     QToolButton *caseButton_ = nullptr;
     QToolButton *wholeButton_ = nullptr;
     QToolButton *regexButton_ = nullptr;
     QToolButton *selectionButton_ = nullptr;
+    QToolButton *previousButton_ = nullptr;
+    QToolButton *nextButton_ = nullptr;
+    QToolButton *closeButton_ = nullptr;
+    // Reveals the replace row (batch 20261110d); folded by default on every open.
+    QToolButton *disclosureButton_ = nullptr;
     QComboBox *scopeCombo_ = nullptr;
     QLabel *status_ = nullptr;
+
+    // Overlay geometry (AC-8.1/AC-8.2): the user's drag position, and the
+    // narrow form of the find row when the viewport cannot hold the wide one.
+    bool compact_ = false;
+    bool findRowLaidOut_ = false;
+    bool dragging_ = false;
+    bool dragMoved_ = false;
+    bool customPosition_ = false;
+    QPoint dragStartGlobal_;
+    QPoint dragStartPosition_;
+    QPoint customPositionValue_;
+    // The viewport width at which the single-row form stops fitting, measured
+    // once from the wide arrangement (never a magic number).
+    int wideMinimumWidth_ = 0;
+    // The two candidates the threshold was chosen from, measured once in the
+    // wide arrangement (batch 20261110d): the preferred width is the threshold,
+    // the minimum is what the old code wrongly used.
+    int wideLayoutPreferredWidth_ = 0;
+    int wideLayoutMinimumWidth_ = 0;
 
     QList<KTextEditor::Range> ranges_;
     KTextEditor::Range scope_;

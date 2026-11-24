@@ -73,10 +73,10 @@ pub use lsp_types::Location as SessionLocation;
 pub use lsp_types::Range as SessionRange;
 
 pub use session::{
-    range_parts, severity_code, HoverResult, PollOutcome, SessionDiagnostic, SessionHandle,
-    SessionPhase, SessionRequest, SessionResponse, SessionStatus, SignatureHelpResult,
-    SignatureInfo, SkippedFile, SymbolNode, WorkspaceTextEdit, DEFAULT_DIAGNOSTICS_BUDGET,
-    DEFAULT_STOP_BUDGET, DEFAULT_TAB_SIZE,
+    build_context_text, range_parts, severity_code, HoverResult, PollOutcome, SessionDiagnostic,
+    SessionHandle, SessionPhase, SessionRequest, SessionResponse, SessionStatus,
+    SignatureHelpResult, SignatureInfo, SkippedFile, SymbolNode, WorkspaceTextEdit,
+    DEFAULT_DIAGNOSTICS_BUDGET, DEFAULT_STOP_BUDGET, DEFAULT_TAB_SIZE,
 };
 
 /// Version of this crate, from its manifest.

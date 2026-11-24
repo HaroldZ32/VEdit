@@ -1,0 +1,16 @@
+# Project configuration for the repository-owned Verilog acceptance fixture.
+#
+# Since the 2026-11-18 file-set decision a project's file set is exactly what
+# its DECLARED filelists name, so this fixture declares its top-level filelist
+# explicitly instead of relying on the old root-level `*.f` auto-discovery.
+[project]
+filelists = ["project.f"]
+
+# The fixture also pins the PRE-decision file set that the Rust and Qt
+# acceptance suites assert: the 7 filelist sources PLUS the 4 `.vh` headers the
+# recursive scan finds (11 files). `auto_discover = true` restores exactly that
+# legacy behaviour (`.f` auto-discovery + recursive root scan) and is the only
+# place the fixture opts into it; the NEW default is exercised by
+# `crates/vd-config/tests/file_set_contract.rs` and
+# `tests/fixtures/dup-basename/`.
+auto_discover = true

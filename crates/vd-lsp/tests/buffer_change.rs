@@ -66,7 +66,9 @@ fn diagnostics_of(session: &SessionHandle, file: &Path) -> Result<Vec<SessionDia
     loop {
         match session.poll(id) {
             PollOutcome::Pending => {}
-            PollOutcome::Ready(SessionResponse::Diagnostics(diagnostics)) => {
+            PollOutcome::Ready(SessionResponse::Diagnostics {
+                rows: diagnostics, ..
+            }) => {
                 return Ok(diagnostics);
             }
             PollOutcome::Ready(other) => bail!("unexpected response: {other:?}"),

@@ -13,14 +13,14 @@ use std::time::Duration;
 
 use anyhow::{anyhow, bail, Context, Result};
 use async_lsp::router::Router;
-use async_lsp::{AnyNotification, MainLoop, ServerSocket};
+use async_lsp::{AnyNotification, AnyRequest, ErrorCode, MainLoop, ResponseError, ServerSocket};
 use lsp_types::notification::{
     DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument, DidSaveTextDocument, Exit,
     LogMessage, PublishDiagnostics, ShowMessage,
 };
 use lsp_types::request::{
-    CodeActionRequest, DocumentHighlightRequest, DocumentSymbolRequest, Formatting, GotoDefinition,
-    HoverRequest, References, Rename, Request, Shutdown, SignatureHelpRequest,
+    CodeActionRequest, DocumentHighlightRequest, DocumentSymbolRequest, ExecuteCommand, Formatting,
+    GotoDefinition, HoverRequest, References, Rename, Request, Shutdown, SignatureHelpRequest,
 };
 use lsp_types::{
     ClientCapabilities, ClientInfo, CodeActionOrCommand, CodeActionParams,
@@ -147,6 +147,15 @@ impl LspClient {
         self.session
             .as_ref()
             .is_some_and(|session| !session.mainloop.is_finished())
+    }
+
+    /// True when a session was started and its main loop has since ended (the
+    /// child exited or the transport closed). Distinguishes "never started",
+    /// where nothing is wrong, from "died after Ready", which AC-3 must report.
+    pub fn session_ended(&self) -> bool {
+        self.session
+            .as_ref()
+            .is_some_and(|session| session.mainloop.is_finished())
     }
 
     /// PID of the running server, for lifecycle evidence.
@@ -471,6 +480,26 @@ impl LspClient {
         Ok(response.unwrap_or_default())
     }
 
+    /// Send `workspace/executeCommand` and return the server's answer.
+    ///
+    /// Used for the build context (batch-20261118 AC-1): slang-server 0.3.1
+    /// ignores argv `-I`/`-D`, so the project's include dirs / defines / build
+    /// file only reach it through its command surface. The answer is returned
+    /// verbatim (most commands answer `null`); an error is the server's own
+    /// message, never swallowed.
+    pub async fn execute_command(
+        &mut self,
+        command: &str,
+        arguments: Vec<Value>,
+    ) -> Result<Option<Value>> {
+        self.request::<ExecuteCommand>(lsp_types::ExecuteCommandParams {
+            work_done_progress_params: Default::default(),
+            command: command.to_string(),
+            arguments,
+        })
+        .await
+    }
+
     /// Graceful shutdown: `shutdown` request, `exit` notification, then reap.
     ///
     /// # Errors
@@ -554,20 +583,28 @@ impl LspClient {
                 self.restarts
             );
         }
-        let mut child = Command::new(&self.config.ls_path)
+        let mut command = Command::new(&self.config.ls_path);
+        command
             .args(self.config.command_args())
             .current_dir(self.config.child_working_dir())
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped())
-            .kill_on_drop(true)
-            .spawn()
-            .with_context(|| {
-                format!(
-                    "spawning verible-verilog-ls at {}",
-                    self.config.ls_path.display()
-                )
-            })?;
+            .kill_on_drop(true);
+        // batch-20261115 AC-1.3: the imported selection reaches the language
+        // server too. The packaged loader variables are still stripped: verible is
+        // a bundled host-loader binary and the packaged glibc aborts it before
+        // `main` (same rule as crates/vd-deeplint/src/binary.rs).
+        for (name, value) in &self.config.environment {
+            command.env(name, value);
+        }
+        command.env_remove("LD_LIBRARY_PATH").env_remove("LOCPATH");
+        let mut child = command.spawn().with_context(|| {
+            format!(
+                "spawning verible-verilog-ls at {}",
+                self.config.ls_path.display()
+            )
+        })?;
         let pid = child.id().unwrap_or_default();
         let stdout = child
             .stdout
@@ -627,6 +664,32 @@ impl LspClient {
                     ControlFlow::Continue(())
                 },
             );
+            // batch-20261118 AC-3: `client/registerCapability` is a server
+            // request this client never acts on (slang-server registers a file
+            // watcher fire-and-forget). Answer null instead of the default
+            // MethodNotFound and log it, so the refusal is not mistaken for a
+            // server fault.
+            router.request::<lsp_types::request::RegisterCapability, _>(
+                |state: &mut ClientState, params: lsp_types::RegistrationParams| {
+                    state.record_log(format!(
+                        "[unhandled request] client/registerCapability ({} registration(s))",
+                        params.registrations.len()
+                    ));
+                    async move { Ok(()) }
+                },
+            );
+            // Anything else stays METHOD_NOT_FOUND (the spec default); only a
+            // log line is added, so the semantics do not change.
+            router.unhandled_request(|state: &mut ClientState, request: AnyRequest| {
+                state.record_log(format!("[unhandled request] {}", request.method));
+                let method = request.method;
+                async move {
+                    Err(ResponseError::new(
+                        ErrorCode::METHOD_NOT_FOUND,
+                        format!("No such method {method}"),
+                    ))
+                }
+            });
             router
         });
         let mainloop = tokio::spawn(async move {

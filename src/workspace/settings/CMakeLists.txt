@@ -76,7 +76,14 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
 endif()
 
 add_executable(vedit-workspace-settings-selftest settings_selftest.cpp)
-target_link_libraries(vedit-workspace-settings-selftest PRIVATE vedit_workspace_settings)
+# batch-20261113 T5 Pass B: the Detect selftest runs a REAL local QTcpServer
+# (127.0.0.1, ephemeral port) so the button is proven against a real socket. Only
+# the TEST needs Qt Network; the product code uses the Rust C ABI.
+find_package(Qt6 REQUIRED COMPONENTS Network)
+target_link_libraries(vedit-workspace-settings-selftest PRIVATE
+  vedit_workspace_settings
+  Qt6::Network
+)
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(vedit-workspace-settings-selftest PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
@@ -97,6 +104,15 @@ if(TARGET vedit_workspace_diagnostics)
   target_compile_definitions(vedit-workspace-settings-selftest PRIVATE
     VEDIT_HAVE_DIAGNOSTICS_FORMAT=1)
 endif()
+# batch-20261114 E2: the Environment candidate filter is asserted against the
+# REAL project model (a real `.f` expansion producing the referenced names and
+# their layers), never a hand-written map, so the self-test consumes the same
+# `expansionInputs()` payload the product publishes on the shell property.
+if(TARGET vedit_workspace_project)
+  target_link_libraries(vedit-workspace-settings-selftest PRIVATE vedit_workspace_project)
+  target_compile_definitions(vedit-workspace-settings-selftest PRIVATE
+    VEDIT_HAVE_PROJECT_LANE=1)
+endif()
 add_test(NAME vedit-workspace-settings-selftest COMMAND vedit-workspace-settings-selftest --selfcheck)
 set_tests_properties(vedit-workspace-settings-selftest PROPERTIES
   ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-settings"
@@ -111,3 +127,25 @@ set_tests_properties(vedit-ui-scale-restart PROPERTIES
   ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-settings"
   TIMEOUT 300
 )
+
+# Batch 20261110c (AC-4.3/4.4, AC-N5): the Preferences → Environment page under a
+# REAL window. Every interaction in `--env-ui-probe` is a hit-test click
+# (QApplication::widgetAt + sendEvent on the widget under the point), following
+# the `vedit-fold-gutter-click` pattern; without xvfb-run the row SKIPs with its
+# reason (exit 77, the ctest SKIP_RETURN_CODE) instead of passing silently.
+find_program(VEDIT_ENV_UI_XVFB_RUN xvfb-run)
+if(VEDIT_ENV_UI_XVFB_RUN)
+  add_test(NAME vedit-env-import-ui
+    COMMAND ${VEDIT_ENV_UI_XVFB_RUN} -a -s "-screen 0 1600x1200x24"
+            $<TARGET_FILE:vedit-workspace-settings-selftest>
+            --env-ui-probe "${CMAKE_CURRENT_BINARY_DIR}/env-ui-probe")
+  set_tests_properties(vedit-env-import-ui PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=xcb;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-env-ui"
+    SKIP_RETURN_CODE 77
+    TIMEOUT 300
+  )
+else()
+  add_test(NAME vedit-env-import-ui
+    COMMAND bash -c "echo 'SKIP: xvfb-run not available'; exit 77")
+  set_tests_properties(vedit-env-import-ui PROPERTIES SKIP_RETURN_CODE 77)
+endif()

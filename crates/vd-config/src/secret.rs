@@ -11,6 +11,26 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 
 const REDACTED: &str = "<redacted>";
 
+/// The placeholder shown instead of an imported variable whose NAME says it may
+/// carry a secret (batch 20261110, AC-4.8).
+pub const MASKED_VALUE: &str = "<masked>";
+
+/// True when `name` must be masked by default: the name contains `TOKEN`,
+/// `SECRET`, `PASSWORD` or `KEY` (ASCII case-insensitive).
+///
+/// The match is deliberately by SUBSTRING and deliberately over-inclusive: a
+/// variable called `HOTKEY_PATH` is masked too, because the cost of masking a
+/// harmless name is one click ("show value") while the cost of leaking a real
+/// one is a credential in a log. The selection is still stored as the user
+/// approved it — only display and logs are masked.
+#[must_use]
+pub fn is_secret_name(name: &str) -> bool {
+    let upper = name.to_ascii_uppercase();
+    ["TOKEN", "SECRET", "PASSWORD", "KEY"]
+        .iter()
+        .any(|marker| upper.contains(marker))
+}
+
 /// A secret API key read from the user configuration file or an environment
 /// variable. Never printed, never serialized, never written to a log.
 #[derive(Clone, PartialEq, Eq)]
@@ -76,6 +96,26 @@ mod tests {
         let rendered = serde_json::to_string(&key).unwrap_or_else(|_| String::from("<error>"));
         assert_eq!(rendered, "\"<redacted>\"");
         assert!(!rendered.contains(SECRET));
+    }
+
+    #[test]
+    fn secret_names_are_masked_by_name() {
+        use super::{is_secret_name, MASKED_VALUE};
+        for name in [
+            "GITHUB_TOKEN",
+            "npm_TOKEN",
+            "MY_SECRET",
+            "DB_PASSWORD",
+            "API_KEY",
+            "SSH_KEY_PATH",
+            "hotkey_path",
+        ] {
+            assert!(is_secret_name(name), "{name} must be masked");
+        }
+        for name in ["PATH", "HOME", "JAVA_HOME", "LANG", "MONTH"] {
+            assert!(!is_secret_name(name), "{name} must stay visible");
+        }
+        assert_eq!(MASKED_VALUE, "<masked>");
     }
 
     #[test]

@@ -176,16 +176,26 @@ int main(int argc, char **argv)
               report.probeDetail().contains(QStringLiteral("probed"))
                   && !message.contains(report.probeDetail()));
 
-        // Discovery order: bundled > local checkout > PATH > env. Build one
-        // candidate directory per tier with a fake executable and check which
-        // tier wins as the earlier ones are removed.
+        // The product-wide order: setting -> bundled -> local checkout ->
+        // imported project -> imported global -> PATH -> env. Build one
+        // candidate directory per stage with a fake executable and check which
+        // stage wins as the earlier ones are removed.
         QTemporaryDir tiers;
         check("local.order.temp-dir", tiers.isValid());
+        const QString settingDir = tiers.path() + QStringLiteral("/setting");
         const QString bundledDir = tiers.path() + QStringLiteral("/bundled");
         const QString localDir = tiers.path() + QStringLiteral("/local");
+        const QString projectDir = tiers.path() + QStringLiteral("/imported-project");
+        const QString globalDir = tiers.path() + QStringLiteral("/imported-global");
         const QString pathDir = tiers.path() + QStringLiteral("/path");
         const QString envDir = tiers.path() + QStringLiteral("/env");
-        for (const QString &dir : {bundledDir, localDir, pathDir, envDir}) {
+        for (const QString &dir : {settingDir,
+                                   bundledDir,
+                                   localDir,
+                                   projectDir,
+                                   globalDir,
+                                   pathDir,
+                                   envDir}) {
             QDir().mkpath(dir);
         }
         const auto writeFake = [](const QString &path) {
@@ -201,13 +211,26 @@ int main(int argc, char **argv)
         const QString veribleName = QStringLiteral("verible-verilog-ls");
         QHash<QString, QString> orderEnv;
         orderEnv.insert(QStringLiteral("VEDIT_VERIBLE_LS"), envDir + QLatin1Char('/') + veribleName);
-        const auto resolveOrder = [&](bool withBundled, bool withLocal, bool withPath) {
+        const auto resolveStages = [&](bool withSetting, bool withBundled, bool withLocal,
+                                       bool withProject, bool withGlobal, bool withPath) {
             ToolchainSearchContext orderContext;
+            if (withSetting) {
+                orderContext.explicitPaths.insert(
+                    veribleName, settingDir + QLatin1Char('/') + veribleName);
+            }
             if (withBundled) {
                 orderContext.bundledDirs = QStringList{bundledDir};
             }
             if (withLocal) {
                 orderContext.localDirs = QStringList{localDir};
+            }
+            if (withProject) {
+                orderContext.importedProjectVars.insert(
+                    QStringLiteral("VEDIT_VERIBLE_LS"), projectDir + QLatin1Char('/') + veribleName);
+            }
+            if (withGlobal) {
+                orderContext.importedGlobalVars.insert(
+                    QStringLiteral("VEDIT_VERIBLE_LS"), globalDir + QLatin1Char('/') + veribleName);
             }
             if (withPath) {
                 orderContext.pathDirs = QStringList{pathDir};
@@ -217,22 +240,99 @@ int main(int argc, char **argv)
         };
         check("local.order.fake-env-written", writeFake(envDir + QLatin1Char('/') + veribleName));
         check("local.order.env-fallback",
-              resolveOrder(false, false, false).verible.sourceLabel().startsWith(
-                  QStringLiteral("env:")),
-              resolveOrder(false, false, false).verible.describe());
+              resolveStages(false, false, false, false, false, false)
+                      .verible.sourceLabel()
+                      .startsWith(QStringLiteral("env:")),
+              resolveStages(false, false, false, false, false, false).verible.describe());
         check("local.order.fake-path-written", writeFake(pathDir + QLatin1Char('/') + veribleName));
         check("local.order.path-over-env",
-              resolveOrder(false, false, true).verible.sourceLabel() == QStringLiteral("PATH"),
-              resolveOrder(false, false, true).verible.describe());
+              resolveStages(false, false, false, false, false, true).verible.sourceLabel()
+                  == QStringLiteral("PATH"),
+              resolveStages(false, false, false, false, false, true).verible.describe());
         check("local.order.fake-local-written", writeFake(localDir + QLatin1Char('/') + veribleName));
         check("local.order.local-over-path",
-              resolveOrder(false, true, true).verible.sourceLabel() == QStringLiteral("local"),
-              resolveOrder(false, true, true).verible.describe());
+              resolveStages(false, false, true, false, false, true).verible.sourceLabel()
+                  == QStringLiteral("local"),
+              resolveStages(false, false, true, false, false, true).verible.describe());
+        check("imported.order.fake-global-written",
+              writeFake(globalDir + QLatin1Char('/') + veribleName));
+        check("imported.order.global-over-path",
+              resolveStages(false, false, false, false, true, true).verible.sourceLabel()
+                  == QStringLiteral("imported-global"),
+              resolveStages(false, false, false, false, true, true).verible.describe());
+        check("imported.order.fake-project-written",
+              writeFake(projectDir + QLatin1Char('/') + veribleName));
+        check("imported.order.project-over-global",
+              resolveStages(false, false, false, true, true, true).verible.sourceLabel()
+                  == QStringLiteral("imported-project"),
+              resolveStages(false, false, false, true, true, true).verible.describe());
+        check("imported.order.local-over-project",
+              resolveStages(false, false, true, true, true, false).verible.sourceLabel()
+                  == QStringLiteral("local"),
+              resolveStages(false, false, true, true, true, false).verible.describe());
         check("local.order.fake-bundled-written",
               writeFake(bundledDir + QLatin1Char('/') + veribleName));
         check("local.order.bundled-over-all",
-              resolveOrder(true, true, true).verible.sourceLabel() == QStringLiteral("bundled"),
-              resolveOrder(true, true, true).verible.describe());
+              resolveStages(false, true, true, true, true, true).verible.sourceLabel()
+                  == QStringLiteral("bundled"),
+              resolveStages(false, true, true, true, true, true).verible.describe());
+        check("setting.order.fake-setting-written",
+              writeFake(settingDir + QLatin1Char('/') + veribleName));
+        check("setting.order.setting-over-all",
+              resolveStages(true, true, true, true, true, true).verible.sourceLabel()
+                  == QStringLiteral("settings"),
+              resolveStages(true, true, true, true, true, true).verible.describe());
+        // R2: the legacy `VEDIT_VERIBLE_DIR` must resolve in BOTH halves. The
+        // Rust resolver honours it (vd-config tools.rs), so the mirror must too.
+        const QString legacyDir = tiers.path() + QStringLiteral("/legacy-dir");
+        QDir().mkpath(legacyDir);
+        check("legacy.order.fake-dir-written", writeFake(legacyDir + QLatin1Char('/') + veribleName));
+        const ToolchainReport legacy = [&]() {
+            ToolchainSearchContext legacyContext;
+            legacyContext.env.insert(QStringLiteral("VEDIT_VERIBLE_DIR"), legacyDir);
+            return resolveToolchain(legacyContext);
+        }();
+        check("legacy.order.VEDIT_VERIBLE_DIR-resolves",
+              legacy.verible.sourceLabel().startsWith(QStringLiteral("env:")),
+              legacy.verible.describe());
+
+        // A stale imported variable is a failed probe, not a silent miss: the
+        // recorded attempts stay ordered and the env override still resolves.
+        const ToolchainReport stale = [&]() {
+            ToolchainSearchContext staleContext;
+            staleContext.importedProjectVars.insert(
+                QStringLiteral("VEDIT_VERIBLE_LS"),
+                tiers.path() + QStringLiteral("/gone/") + veribleName);
+            staleContext.env = orderEnv;
+            return resolveToolchain(staleContext);
+        }();
+        check("imported.order.stale-falls-through-to-env",
+              stale.verible.sourceLabel().startsWith(QStringLiteral("env:")),
+              stale.verible.describe());
+        check("imported.order.stale-probe-recorded",
+              stale.verible.searched.contains(tiers.path() + QStringLiteral("/gone/") + veribleName),
+              stale.probeDetail());
+
+        // E5 (batch-20261114): the four Scala env names must be registered by the
+        // application context. Before the fix the table omitted them, so
+        // `env:VEDIT_JAVA` (and the other three) could never resolve even with the
+        // variable set. PATH is cleared for the call so the env stage is the only
+        // one that can answer; it is restored immediately afterwards.
+        const QString fakeJava = tiers.path() + QStringLiteral("/env-java");
+        check("application.env.fake-java-written", writeFake(fakeJava));
+        qputenv("VEDIT_JAVA", fakeJava.toLocal8Bit());
+        const QByteArray savedPath = qgetenv("PATH");
+        qputenv("PATH", QByteArray());
+        const ToolchainSearchContext application = applicationToolchainContext();
+        const ToolchainReport applicationReport = resolveToolchain(application);
+        qputenv("PATH", savedPath);
+        qunsetenv("VEDIT_JAVA");
+        check("application.env.VEDIT_JAVA-registered",
+              application.env.contains(QStringLiteral("VEDIT_JAVA")),
+              QStringList(application.env.keys()).join(QLatin1Char(',')));
+        check("application.env.VEDIT_JAVA-resolves",
+              applicationReport.scalaJava.sourceLabel() == QStringLiteral("env:VEDIT_JAVA"),
+              applicationReport.scalaJava.describe());
     }
 
     std::printf("VER-TOOLCHAIN-SELFTEST expect=%s checks=%d failures=%d\n",

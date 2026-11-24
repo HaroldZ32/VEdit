@@ -30,7 +30,8 @@ QT_BUILD_STAGE="qt6-build"
 #   * target/              -> gitignored build output (CMake build tree),
 #   * evidence/m0-build/   -> the task's evidence directory (committed).
 QT_BUILD_DIR="$ROOT/target/qt6-build"
-QT_EVIDENCE_DIR="$ROOT/evidence/m0-build/build-logs"
+QT_LOG_DIR="${VEDIT_CI_LOG_DIR:+$VEDIT_CI_LOG_DIR/qt}"
+QT_EVIDENCE_DIR="$ROOT/${QT_LOG_DIR:-evidence/m0-build/build-logs}"
 
 # Export every pinned input of the Qt6 lane, then refuse to continue when one is
 # missing: a half-pinned image must never be built silently.
@@ -118,11 +119,15 @@ run_in_qt6_container() {
   if ! docker info --format '{{json .SecurityOptions}}' 2>/dev/null | grep -q '"name=rootless"'; then
     user_args=(--user "$(id -u):$(id -g)")
   fi
+  # Forward the compile-parallelism cap: the container script reads it and falls
+  # back to 4 when unset. Without this -e the host override never reaches the build.
   docker run --rm "${user_args[@]}" \
     -v "$ROOT":/vedit-build \
     -w /vedit-build \
     -e HOME=/tmp \
     -e XDG_RUNTIME_DIR=/tmp/xdg-runtime \
     -e LANG=C.UTF-8 \
+    -e VEDIT_QT6_BUILD_JOBS \
+    -e VEDIT_CI_LOG_DIR \
     "$QT_BUILD_IMAGE_TAG" "$@"
 }

@@ -7,11 +7,20 @@ project: the user's own tree stays an optional smoke test only.
 Layout:
 
 ```text
-project.f                      top-level filelist (the only .f at the project root,
-                               so `*.f` discovery finds exactly one project)
+project.f                      top-level filelist (declared explicitly in
+                               vedit.toml, so the project's file set does not
+                               depend on `*.f` auto-discovery)
+vedit.toml                     `[project] filelists = ["project.f"]` (the new
+                               default declaration) plus the legacy
+                               `auto_discover = true` switch, which keeps the
+                               pre-2026-11-18 11-file set this fixture pins
 filelists/tb.f                 nested filelist: testbench sources (+define+, +incdir+)
 filelists/nested/tb_aux.f      second nesting level (project.f -> tb.f -> here)
 filelists/extra.f              nested filelist with a duplicate entry
+filelists/vedit.toml           nested root config: the search lane opens
+                               `filelists/` as a project root, so that root
+                               declares the legacy `auto_discover = true`
+                               (a walk of the folder finds no source by itself)
 rtl/alu_pkg.sv                 package: shared enum + function
 rtl/alu.sv                     module alu (imports alu_pkg, includes rtl/include header)
 rtl/counter.v                  plain Verilog-2001 module (fixture mixes .v and .sv)

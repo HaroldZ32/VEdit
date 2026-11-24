@@ -13,8 +13,7 @@ use std::time::{Duration, Instant};
 use vd_ffi::capi::{
     VdDiagnostics, VdError, VdFimResult, VdLspInfo, VdProjectInfo, VdSearchResults, VdSettingInput,
     VdSettings, VdStringList, VdVcsStatus, VD_ERR_INVALID_ARGUMENT, VD_ERR_JOB_UNKNOWN,
-    VD_ERR_NOT_FOUND, VD_ERR_SERVICE, VD_ERR_WRONG_JOB_KIND, VD_STATUS_FAILED, VD_STATUS_PENDING,
-    VD_STATUS_READY,
+    VD_ERR_NOT_FOUND, VD_ERR_WRONG_JOB_KIND, VD_STATUS_FAILED, VD_STATUS_PENDING, VD_STATUS_READY,
 };
 use vd_ffi::deeplint::{vd_deeplint_lint, vd_deeplint_poll, vd_diagnostics_free};
 use vd_ffi::fim::{vd_fim_complete, vd_fim_poll, vd_fim_result_free};
@@ -115,8 +114,13 @@ fn basename(path: &str) -> String {
 }
 
 #[test]
-fn abi_version_is_one() {
-    assert_eq!(vd_abi_version(), 1);
+fn abi_version_is_two() {
+    // Version 2 (G1-c review F5): `VdModuleCatalog` grew `shadowed_files` /
+    // `shadowed_warning`. Appending fields keeps every existing OFFSET but not
+    // the SIZE, and `vd_catalog_poll` writes the whole current struct, so a
+    // consumer built against a v1 header must be recompiled - the version is the
+    // only signal that says so.
+    assert_eq!(vd_abi_version(), 2);
 }
 
 #[test]
@@ -267,6 +271,13 @@ fn lsp_configures_lazily_without_starting_the_server() {
     }
 }
 
+/// Batch 20261110b (authorised contract change, AC-T8.1): the product order
+/// FALLS BACK, so a missing explicit path no longer fails the call — the
+/// explicit stage is ATTEMPTED AND MISSED and a LATER stage supplies the tool.
+/// The old assertions (`VD_STATUS_FAILED` + `VD_ERR_SERVICE`) pinned the pre-T8
+/// dead end where a broken explicit setting was fatal. The function is kept and
+/// its assertion count is HIGHER (nothing removed). Basis and before/after logs:
+/// evidence/batch-20261110b/lint-engine/AUTHORIZATION.md.
 #[test]
 fn deeplint_reports_a_missing_binary_as_a_typed_failure() {
     let source = fixture_server();
@@ -283,10 +294,50 @@ fn deeplint_reports_a_missing_binary_as_a_typed_failure() {
             || vd_deeplint_poll(service, job, &mut diagnostics),
             Duration::from_secs(30),
         );
-        assert_eq!(status, VD_STATUS_FAILED);
-        let (code, message) = last_error(service);
-        assert_eq!(code, VD_ERR_SERVICE);
-        assert!(message.contains("slang"), "message: {message}");
+        // (1) The call RAN: the explicit miss fell back to a real tool, which
+        // really linted the fixture (rtl_a.sv has an implicit net).
+        assert_eq!(status, VD_STATUS_READY);
+        assert!(
+            diagnostics.count > 0,
+            "the fallback tool must really have linted the fixture"
+        );
+        // (2) The explicit stage was ATTEMPTED AND MISSED — "my explicit setting
+        // did not take effect" must not hide behind a successful fallback.
+        let resolution =
+            vd_ffi::deeplint::lint_binary_resolution(Some(Path::new("/nonexistent/slang")));
+        assert_eq!(
+            resolution.attempts[0].source.as_str(),
+            "options.binary",
+            "the explicit stage is the FIRST recorded attempt"
+        );
+        assert_eq!(
+            resolution.attempts[0].outcome.as_str(),
+            "not found",
+            "the broken explicit path is recorded, never silently dropped"
+        );
+        // (3) …and a LATER stage of the product order supplied the tool.
+        let chosen = resolution
+            .chosen
+            .clone()
+            .unwrap_or_else(|| panic!("no tool resolved at any stage: {}", resolution.describe()));
+        let found = resolution
+            .attempts
+            .iter()
+            .find(|attempt| attempt.outcome.as_str() == "found")
+            .unwrap_or_else(|| panic!("a Found attempt must exist: {}", resolution.describe()));
+        assert_eq!(found.path.as_deref(), Some(chosen.as_path()));
+        assert!(
+            found.source.stage() >= 2,
+            "the tool came from a FALLBACK stage, not the explicit one: {}",
+            found.source.stage_label()
+        );
+        println!(
+            "T8-RESULT explicit miss: first attempt {} / {}; used stage={} ({})",
+            resolution.attempts[0].source.as_str(),
+            resolution.attempts[0].outcome.as_str(),
+            found.source.stage_label(),
+            chosen.display()
+        );
         vd_diagnostics_free(&mut diagnostics);
         vd_service_destroy(service);
     }
