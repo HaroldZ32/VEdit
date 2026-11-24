@@ -205,7 +205,12 @@ set_tests_properties(vedit-app-shell-selftest PROPERTIES
 # `jump` first: it is the process-wide jump contract the panel lanes consume
 # (their CMakeLists may link vedit_workspace_jump at configure time), and it has
 # no dependency on the shell or on another lane.
-set(VEDIT_WORKSPACE_LANES jump filetree palette search project module_tree diagnostics vcs settings)
+# Batch 20261110: the new workspace lanes of this batch. A lane is only wired
+# when its directory AND its <lane>/<lane>_integration.cpp exist (the guard below),
+# so landing this list before the lane directories is safe: `rename`, `vhdl`
+# and `scala` appear in the build the moment their own task lands them.
+set(VEDIT_WORKSPACE_LANES jump filetree palette search project module_tree diagnostics vcs settings
+                          rename vhdl scala)
 foreach(lane IN LISTS VEDIT_WORKSPACE_LANES)
   if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../workspace/${lane}/CMakeLists.txt")
     add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/../workspace/${lane}"
@@ -327,6 +332,33 @@ target_link_libraries(vedit-app-ui-theme-selftest PRIVATE vedit_app_shell)
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(vedit-app-ui-theme-selftest PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
+# T7 (batch 20261110d): the editor TAB STRIP — right-click menu, real drag
+# reorder (documents_/tab/editor alignment), the dirty close prompt, the honest
+# split result — plus the two new Edit commands. Hand-written main() with a
+# failure counter, like the app selftests above; real interactions, offscreen.
+add_executable(vedit-editor-area-selftest editor_area_selftest.cpp)
+target_link_libraries(vedit-editor-area-selftest PRIVATE vedit_app_shell)
+# Split view: the demo-provider checks run everywhere; the real "one document,
+# two views" proof needs the edit-core lane and Qt6::Test's synthetic keystrokes.
+# Test is requested here (idempotent) because the shared find_package below runs
+# after this target.
+find_package(Qt6 QUIET COMPONENTS Test)
+if(TARGET vedit_editor_core AND TARGET Qt6::Test)
+  target_link_libraries(vedit-editor-area-selftest PRIVATE vedit_editor_core Qt6::Test)
+  target_compile_definitions(vedit-editor-area-selftest PRIVATE
+    VEDIT_EDIT_AREA_HAVE_EDIT_CORE=1)
+  target_include_directories(vedit-editor-area-selftest PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/../editor/kernel")
+endif()
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(vedit-editor-area-selftest PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+add_test(NAME vedit-editor-area-selftest COMMAND vedit-editor-area-selftest)
+set_tests_properties(vedit-editor-area-selftest PROPERTIES
+  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_CURRENT_BINARY_DIR}/xdg-runtime-editor-area"
+  TIMEOUT 120
+)
+
 add_test(NAME vedit-app-ui-theme-selftest COMMAND vedit-app-ui-theme-selftest)
 set_tests_properties(vedit-app-ui-theme-selftest PROPERTIES
   ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_CURRENT_BINARY_DIR}/xdg-runtime-ui-theme"
@@ -532,3 +564,75 @@ if(TARGET vedit_file_tree AND TARGET vedit-app-disabled-look-selftest)
     VEDIT_DISABLED_LOOK_HAVE_FILETREE=1)
   message(STATUS "VEdit: disabled-look selftest covers the file-status dot (RM-7b/M2)")
 endif()
+
+# --- batch-20261115 AC-5.4: the 10k-line OPEN benchmark ----------------------
+# The same binary/command is run before and after the breadcrumb deferral; the
+# acceptance compares the recorded p50/p95 (ratio <= 1.1) in the lane evidence.
+# The measured path is the real product open (EditCoreProvider + breadcrumb
+# seed); without the editor lane the entry is an explicit SKIP (exit 77).
+add_executable(vedit-editor-open-bench editor_open_bench_test.cpp)
+target_link_libraries(vedit-editor-open-bench PRIVATE vedit_app_shell)
+if(TARGET vedit_editor_core)
+  target_link_libraries(vedit-editor-open-bench PRIVATE vedit_editor_core)
+  target_compile_definitions(vedit-editor-open-bench PRIVATE
+    VEDIT_OPEN_BENCH_HAVE_EDIT_CORE=1)
+  target_include_directories(vedit-editor-open-bench PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/../editor/kernel")
+endif()
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(vedit-editor-open-bench PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+add_test(NAME vedit-editor-open-bench COMMAND vedit-editor-open-bench)
+set_tests_properties(vedit-editor-open-bench PROPERTIES
+  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_CURRENT_BINARY_DIR}/xdg-runtime-open-bench"
+  TIMEOUT 180
+  SKIP_RETURN_CODE 77
+)
+
+# --- batch-20261115 lane C regression tests (AC-4.1/4.5, AC-5.3, AC-7.4/7.5/7.6)
+# One offscreen executable drives the real shell widgets: the project-lint dock +
+# host seam and its session persistence, the stylesheet token assertions on every
+# product theme, the restoreState normalisation of the right dock column (the
+# invalid precondition is asserted first), and closing 10 tabs with the demo AND
+# the real KTextEditor provider (state-refresh merge + < 200 ms).
+add_executable(vedit-app-batch-layout-selftest batch_layout_selftest.cpp ${VEDIT_APP_THEME_RESOURCES})
+target_link_libraries(vedit-app-batch-layout-selftest PRIVATE vedit_app_shell)
+if(TARGET vedit_editor_core)
+  target_link_libraries(vedit-app-batch-layout-selftest PRIVATE vedit_editor_core)
+  target_compile_definitions(vedit-app-batch-layout-selftest PRIVATE
+    VEDIT_BATCH_LAYOUT_HAVE_EDIT_CORE=1)
+  target_include_directories(vedit-app-batch-layout-selftest PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/../editor/kernel")
+endif()
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(vedit-app-batch-layout-selftest PRIVATE
+    -Wall -Wextra -Wpedantic -Werror)
+endif()
+add_test(NAME vedit-app-batch-layout-selftest COMMAND vedit-app-batch-layout-selftest)
+set_tests_properties(vedit-app-batch-layout-selftest PROPERTIES
+  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_CURRENT_BINARY_DIR}/xdg-runtime-batch-layout"
+  TIMEOUT 180
+)
+
+# --- batch-20261115 AC-6: tab drag & drop (split / cross-pane move) ---------
+# One offscreen executable: the drop-zone rule and EditorArea::dropTab() called
+# directly, synthetic QDragEnter/QDragMove/QDrop events through the pane's own
+# drop overlay (highlight + drop), dirty-buffer preservation for the demo and the
+# real KTextEditor provider, and saveLayout/restoreLayout after a move.
+add_executable(vedit-editor-tab-drag-tests tab_drag_test.cpp)
+target_link_libraries(vedit-editor-tab-drag-tests PRIVATE vedit_app_shell)
+if(TARGET vedit_editor_core)
+  target_link_libraries(vedit-editor-tab-drag-tests PRIVATE vedit_editor_core)
+  target_compile_definitions(vedit-editor-tab-drag-tests PRIVATE
+    VEDIT_TAB_DRAG_HAVE_EDIT_CORE=1)
+  target_include_directories(vedit-editor-tab-drag-tests PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/../editor/kernel")
+endif()
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(vedit-editor-tab-drag-tests PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+add_test(NAME vedit-editor-tab-drag-tests COMMAND vedit-editor-tab-drag-tests)
+set_tests_properties(vedit-editor-tab-drag-tests PROPERTIES
+  ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_CURRENT_BINARY_DIR}/xdg-runtime-tab-drag"
+  TIMEOUT 180
+)

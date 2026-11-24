@@ -147,6 +147,17 @@ QVector<ModuleTreeNode> buildModuleTree(const ModuleCatalog &catalog,
     state.maxRows = options.maxRows > 0 ? options.maxRows : kModuleTreeMaxRows;
     state.maxDepth = options.maxDepth > 0 ? options.maxDepth : kModuleTreeMaxDepth;
 
+    // AC-7.1 (batch-20261115): when the user named a top, the tree is THAT
+    // module's subtree - the catalog's own `is_top` flags describe the
+    // uninstantiated modules of the whole design and must not win over an
+    // explicit choice. Auto (empty `top`, or a name the catalog does not define)
+    // falls back to `is_top`, which is the historical behaviour.
+    if (!catalog.top.isEmpty()) {
+        if (const ModuleDefinition *chosen = catalog.find(catalog.top)) {
+            roots.append(buildNode(*chosen, chosen->name, 1, {}, 0, state));
+            return roots;
+        }
+    }
     for (const ModuleDefinition &module : catalog.modules) {
         if (!module.isTop) {
             continue;

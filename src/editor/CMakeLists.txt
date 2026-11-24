@@ -197,6 +197,65 @@ else()
   set_tests_properties(vedit-fold-gutter-click PROPERTIES SKIP_RETURN_CODE 77)
 endif()
 
+# --- T5 / F2: the find bar drags by its BACKGROUND under a real pointer -------
+# T26 (record rec-20261110T025554-a0cf8f, repair rep-20261110T025554-8ed3e2) refused
+# the synthetic-object drag: delivering QMouseEvents straight to the bar bypasses
+# the child-widget hit test and Qt's implicit grab, so AC-8.1 "draggable" and its
+# negative control ("a press on a control must not drag") were not proven. This
+# probe follows the xcb pattern above: it resolves the widget under a REAL global
+# pointer position with QApplication::widgetAt(), drags the background (must move,
+# must stay clamped inside the viewport) and drags the Next button (must not move).
+# Without xvfb it SKIPs with the reason printed, exactly like vedit-fold-gutter-click.
+add_executable(find-bar-drag-probe kernel/find_bar_drag_probe.cpp)
+target_link_libraries(find-bar-drag-probe PRIVATE vedit_editor_core)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(find-bar-drag-probe PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+if(VEDIT_XVFB_RUN)
+  add_test(NAME vedit-find-bar-drag
+           COMMAND ${VEDIT_XVFB_RUN} -a -s "-screen 0 1280x1024x24"
+                   $<TARGET_FILE:find-bar-drag-probe>)
+  set_tests_properties(vedit-find-bar-drag PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=xcb;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-findbar"
+    SKIP_RETURN_CODE 77
+    TIMEOUT 120
+  )
+else()
+  add_test(NAME vedit-find-bar-drag
+           COMMAND bash -c "echo 'SKIP: xvfb-run not available'; exit 77")
+  set_tests_properties(vedit-find-bar-drag PROPERTIES SKIP_RETURN_CODE 77)
+endif()
+
+# --- T7: block selection by a REAL pointer drag under Xvfb+xcb ---------------
+# The lane selftest drives the controller's actions; this probe proves the
+# ROUTING and the user-visible contract: resolve the widget under a REAL global
+# pointer position (QApplication::widgetAt), drag a rectangle (Shift+Alt), and
+# then assert the native block selection SURVIVES the release — Copy yields the
+# rectangle text, Delete once removes the whole block, and a line outside the
+# rectangle is untouched (negative control). Qt-level synthetic events on the
+# real delivery target, NOT OS-level pointer injection (AGENT.md §9/§10).
+# Without xvfb it SKIPs with the reason printed, like the two probes above.
+find_package(Qt6 REQUIRED COMPONENTS Test)
+add_executable(block-selection-xcb-probe kernel/block_selection_xcb_probe.cpp)
+target_link_libraries(block-selection-xcb-probe PRIVATE vedit_editor_core Qt6::Test)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+  target_compile_options(block-selection-xcb-probe PRIVATE -Wall -Wextra -Wpedantic -Werror)
+endif()
+if(VEDIT_XVFB_RUN)
+  add_test(NAME vedit-block-selection-drag
+           COMMAND ${VEDIT_XVFB_RUN} -a -s "-screen 0 1280x1024x24"
+                   $<TARGET_FILE:block-selection-xcb-probe>)
+  set_tests_properties(vedit-block-selection-drag PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=xcb;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-block"
+    SKIP_RETURN_CODE 77
+    TIMEOUT 120
+  )
+else()
+  add_test(NAME vedit-block-selection-drag
+           COMMAND bash -c "echo 'SKIP: xvfb-run not available'; exit 77")
+  set_tests_properties(vedit-block-selection-drag PROPERTIES SKIP_RETURN_CODE 77)
+endif()
+
 add_test(NAME vedit-edit-core-selftest COMMAND vedit-edit-core-selftest)
 set_tests_properties(vedit-edit-core-selftest PROPERTIES
   ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime"
@@ -374,4 +433,39 @@ if(TARGET vedit_app_shell AND TARGET Qt6::Test)
   message(STATUS "VEdit edit-core: undo/view-lifetime regression enabled (RM-5a)")
 else()
   message(STATUS "VEdit edit-core: undo/view-lifetime regression NOT built (no shell target)")
+endif()
+
+# --- batch-20261113 T3: setStatusListener lifetime ---------------------------
+# One probe binary, one ctest case per assertion (the argument selects the
+# scenario) because the contract names the three cases separately. The probe
+# drives the PRODUCT seam — a real EditCoreProvider view, the real
+# FoldBreadcrumbBinding the provider installs, and the shared StatusRelay — and
+# it needs both the breadcrumb lane (the binding) and the src/app seam (the
+# provider). `after-unsubscribe-the-binding-has-no-listener` is the RED case:
+# before the fix the unsubscribe returned before clearing the binding lambda.
+if(VEDIT_EDIT_CORE_HAVE_FOLDING AND VEDIT_EDIT_CORE_HAVE_APP_SEAM)
+  add_executable(status-listener-lifetime-probe
+                 kernel/status_listener_lifetime_probe.cpp)
+  target_link_libraries(status-listener-lifetime-probe PRIVATE vedit_editor_core)
+  # The provider header includes the shell's EditorProvider seam (src/app); the
+  # kernel library keeps that include private, so the probe states it itself.
+  target_include_directories(status-listener-lifetime-probe PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}/../app")
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(status-listener-lifetime-probe PRIVATE
+      -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  foreach(case_name
+      after-unsubscribe-the-binding-has-no-listener
+      destroyed-view-leaves-no-registry-entry
+      relay-outlived-by-a-captured-lambda-is-a-no-op)
+    add_test(NAME ${case_name} COMMAND status-listener-lifetime-probe ${case_name})
+    set_tests_properties(${case_name} PROPERTIES
+      ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-status-relay"
+      TIMEOUT 120
+    )
+  endforeach()
+  message(STATUS "VEdit edit-core: status-listener lifetime probe enabled (batch-20261113 T3)")
+else()
+  message(STATUS "VEdit edit-core: status-listener lifetime probe NOT built (no breadcrumb lane or src/app seam)")
 endif()

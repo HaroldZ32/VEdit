@@ -84,10 +84,8 @@ impl BackendSpec {
     fn headers(&self) -> Vec<(&'static str, String)> {
         let mut headers: Vec<(&'static str, String)> =
             vec![("Content-Type", "application/json".to_string())];
-        if let Some(key) = &self.api_key {
-            if !key.is_empty() {
-                headers.push(("Authorization", format!("Bearer {}", key.expose_secret())));
-            }
+        if let Some(header) = bearer_header(self.api_key.as_ref()) {
+            headers.push(header);
         }
         headers
     }
@@ -104,6 +102,17 @@ impl BackendSpec {
             .collect();
         transport.post_json(&self.url, &borrowed, body, self.timeout, MAX_RESPONSE_BYTES)
     }
+}
+
+/// The bearer-header rule shared by completions and endpoint detection: a
+/// non-empty key adds `Authorization: Bearer <key>`, an empty one adds nothing.
+///
+/// This is the only place a key becomes a header value, so detection
+/// (`crate::detect`) sends exactly the credential a completion would.
+pub(crate) fn bearer_header(api_key: Option<&ApiKey>) -> Option<(&'static str, String)> {
+    api_key
+        .filter(|key| !key.is_empty())
+        .map(|key| ("Authorization", format!("Bearer {}", key.expose_secret())))
 }
 
 /// OpenAI-compatible `/v1/completions` adapter (`prompt` + `suffix`).

@@ -138,6 +138,15 @@ ModuleCatalog toCatalog(const VdModuleCatalog &catalog, const QString &root, int
     snapshot.top = fromC(catalog.top);
     snapshot.reachableFiles = toStringList(catalog.reachable_files);
     snapshot.outsideModules = toStringList(catalog.outside_modules);
+    // G1-c: the files whose every module declaration lost the duplicate pick, and
+    // the sentence saying they leave the compiler input. Same normalisation as a
+    // module's own file (`absoluteSourcePath`): consumers compare these paths with
+    // document paths, so a relative spelling from the service would never match.
+    snapshot.shadowedFiles = toStringList(catalog.shadowed_files);
+    for (QString &file : snapshot.shadowedFiles) {
+        file = absoluteSourcePath(file, root);
+    }
+    snapshot.shadowedWarning = fromC(catalog.shadowed_warning);
     snapshot.fileSetSize = fileCount;
     snapshot.valid = true;
     snapshot.modules.reserve(static_cast<int>(catalog.modules.count));
@@ -234,6 +243,11 @@ void CatalogClient::resetJobs()
     timer_->stop();
 #if defined(VEDIT_MODULE_TREE_HAVE_FFI)
     if (job_ != 0 && catalogPhase_ && service_ != nullptr) {
+        // AC M1.4: CANCEL, then release. Release alone left the `slang` child
+        // running for its whole (now 120 s) budget into a slot nobody reads, so
+        // one superseded run and the next one overlapped: 2-3 concurrent slang
+        // processes per user gesture.
+        vd_catalog_cancel(static_cast<VdService *>(service_), job_);
         vd_catalog_release(static_cast<VdService *>(service_), job_);
     }
 #endif
@@ -247,6 +261,21 @@ void CatalogClient::cancel()
     resetJobs();
 }
 
+void CatalogClient::setLargeProjectThreshold(int sources)
+{
+    largeProjectThreshold_ = sources;
+}
+
+void CatalogClient::setAllowLargeCatalog(bool allow)
+{
+    allowLargeCatalog_ = allow;
+}
+
+void CatalogClient::setTimeoutMs(int milliseconds)
+{
+    timeoutMs_ = milliseconds;
+}
+
 void CatalogClient::start(const QString &projectRoot)
 {
     resetJobs();
@@ -254,17 +283,22 @@ void CatalogClient::start(const QString &projectRoot)
 #if !defined(VEDIT_MODULE_TREE_HAVE_FFI)
     Q_UNUSED(projectRoot);
     fail(QCoreApplication::translate(
-        "VEdit",
-        "this build has no Rust service layer (vd-ffi), so the module catalog cannot run"));
+             "VEdit",
+             "this build has no Rust service layer (vd-ffi), so the module catalog cannot run"),
+         CatalogFailureKind::ToolError);
     return;
 #else
     if (service_ == nullptr) {
-        fail(QCoreApplication::translate("VEdit", "the Rust service handle could not be created"));
+        fail(QCoreApplication::translate("VEdit", "the Rust service handle could not be created"),
+             CatalogFailureKind::ToolError);
         return;
     }
     // 1) The project model's persisted state is the single source of truth for
-    //    the root and the effective file set: the union of the imported .f files
-    //    and the folder scan, with the tools page's -I/-D.
+    //    the root and the effective file set: the expansion of the DECLARED
+    //    filelists (imported `.f` ∪ `vedit.toml [project] filelists`), with the
+    //    tools page's -I/-D. The legacy folder scan and root-level `.f`
+    //    discovery are opt-in per project (`[project] auto_discover = true`,
+    //    default `false`; docs/USER_GUIDE.md §2.8).
 #if defined(VEDIT_MODULE_TREE_HAVE_PROJECT)
     {
         project::ProjectStateStore store(stateDirectory_);
@@ -273,7 +307,16 @@ void CatalogClient::start(const QString &projectRoot)
         const project::ProjectState state = store.load(&ok, &loadError);
         const bool rootMatches =
             !state.root.isEmpty() && (projectRoot.isEmpty() || state.root == projectRoot);
-        if (ok && rootMatches && !state.files.isEmpty()) {
+        // G1-e: `filesStale` is set when the file's `files` cannot be trusted -
+        // a version-5-and-older file (that list may be an `auto_discover`
+        // folder scan this build never asked for) OR a current-version file
+        // whose authored-inputs fingerprint no longer matches the `.f` bytes /
+        // `vedit.toml` / -I/-D / variables on disk (an externally edited
+        // filelist). That was the exact way a stale file set used to become
+        // authoritative ("root matches + files non-empty"). Never adopt it:
+        // fall through to the live expansion below, which runs with the SAME
+        // authored inputs the panel has.
+        if (ok && rootMatches && !state.filesStale && !state.files.isEmpty()) {
             beginCatalog(state.files, state.includeDirs, state.defines, state.root,
                          static_cast<int>(state.files.size()),
                          QStringLiteral("project model (%1)")
@@ -289,7 +332,8 @@ void CatalogClient::start(const QString &projectRoot)
         return;
     }
     fail(QCoreApplication::translate(
-        "VEdit", "no project root: open a folder or start vedit-app with --project <dir>"));
+             "VEdit", "no project root: open a folder or start vedit-app with --project <dir>"),
+         CatalogFailureKind::ToolError);
 #endif
 }
 
@@ -345,7 +389,8 @@ void CatalogClient::beginProjectFallback()
     ticks_ = 0;
     if (job_ == 0) {
         fail(QCoreApplication::translate("VEdit", "project expansion was rejected: %1")
-                 .arg(serviceError()));
+                 .arg(serviceError()),
+             CatalogFailureKind::ToolError);
         return;
     }
     source_ = QStringLiteral("vd_project_expand_v2(%1, filelists=%2, settings=%3)")
@@ -382,7 +427,36 @@ void CatalogClient::beginCatalog(const QStringList &files, const QStringList &in
 #endif
     if (sources.isEmpty()) {
         fail(QCoreApplication::translate(
-            "VEdit", "the project has no source files, so there is no module catalog to build"));
+                 "VEdit",
+                 "the project has no source files, so there is no module catalog to build"),
+             CatalogFailureKind::ToolError);
+        return;
+    }
+    // AC M1.5: an AUTOMATIC run over a very large file set is withheld. The old
+    // behaviour catalogued everything, timed out after 120 s and left the panel
+    // empty while the next gesture started ANOTHER whole-project elaboration.
+    // A named top (a scoped `--top` run) or an explicit Refresh still starts it.
+    const int sourceCount = static_cast<int>(sources.size());
+    const bool userRequested = allowLargeCatalog_;
+    allowLargeCatalog_ = false;
+    lastFileSet_ = files;
+    source_ = source;
+    fileCount_ = sourceCount;
+    projectRoot_ = root.isEmpty() ? projectRoot_ : root;
+    if (!shouldAutoCatalog(sourceCount, !top_.isEmpty(), largeProjectThreshold_,
+                           userRequested)) {
+        job_ = 0;
+        catalogPhase_ = false;
+        ticks_ = 0;
+        timer_->stop();
+        if (qEnvironmentVariableIsSet("VEDIT_DEBUG")) {
+            std::fprintf(stderr,
+                         "module-catalog: withheld (large project) files=%d threshold=%d top='%s'\n",
+                         sourceCount, largeProjectThreshold_, qPrintable(top_));
+        }
+        if (onLargeProject_ != nullptr) {
+            onLargeProject_(sourceCount);
+        }
         return;
     }
     BorrowedList fileList;
@@ -404,7 +478,14 @@ void CatalogClient::beginCatalog(const QStringList &files, const QStringList &in
     options.slang_binary = slang.isEmpty() ? nullptr : slang.constData();
     options.include_dirs = includeView;
     options.defines = defineView;
-    options.timeout_ms = 0;      // the catalog default (120 s for the slang child)
+    // 0 keeps the catalog default (120 s for the slang child). The explicit
+    // setter and the `VEDIT_CATALOG_TIMEOUT_MS` probe are the test seams that make
+    // the timeout rules (AC M1.1/M1.2) assertable without a 120 s test.
+    int budgetMs = timeoutMs_;
+    if (budgetMs <= 0) {
+        budgetMs = qEnvironmentVariableIntValue("VEDIT_CATALOG_TIMEOUT_MS");
+    }
+    options.timeout_ms = static_cast<uint64_t>(std::max(0, budgetMs));
     options.max_json_bytes = 0;  // the service default (a 256 MiB warning threshold; the document is streamed)
     options.max_files = 0;       // the service default (oversize warning)
     // RM-17: the named top ("" = Auto) — the SAME run feeds the tree and the
@@ -412,10 +493,6 @@ void CatalogClient::beginCatalog(const QStringList &files, const QStringList &in
     const QByteArray topName = top_.toUtf8();
     options.top = topName.isEmpty() ? nullptr : topName.constData();
 
-    lastFileSet_ = files;
-    source_ = source;
-    fileCount_ = static_cast<int>(sources.size());
-    projectRoot_ = root.isEmpty() ? projectRoot_ : root;
     if (qEnvironmentVariableIsSet("VEDIT_DEBUG")) {
         std::fprintf(stderr, "module-catalog: run source='%s' files=%d kept=%d root='%s'\n",
                      qPrintable(source), fileCount, fileCount_, qPrintable(projectRoot_));
@@ -425,7 +502,8 @@ void CatalogClient::beginCatalog(const QStringList &files, const QStringList &in
     ticks_ = 0;
     if (job_ == 0) {
         fail(QCoreApplication::translate("VEdit", "module catalog was rejected: %1")
-                 .arg(serviceError()));
+                 .arg(serviceError()),
+             CatalogFailureKind::ToolError);
         return;
     }
     if (onProgress_ != nullptr) {
@@ -455,9 +533,12 @@ void CatalogClient::poll()
     // single-file-lint budget) turned a large but healthy project into
     // "did not answer" after the 256 MiB AST cap stopped being the limit.
     if (++ticks_ > 6000) {
+        // The watchdog KILLS the child (AC M1.4): the old path only dropped the
+        // handle, so a wedged slang kept running for minutes.
         resetJobs();
         fail(QCoreApplication::translate(
-            "VEdit", "the module catalog service did not answer within 300 s"));
+                 "VEdit", "the module catalog service did not answer within 300 s"),
+             CatalogFailureKind::Timeout);
         return;
     }
     if (!catalogPhase_) {
@@ -470,7 +551,8 @@ void CatalogClient::poll()
             job_ = 0;
             timer_->stop();
             fail(QCoreApplication::translate("VEdit", "project expansion failed: %1")
-                     .arg(serviceError()));
+                     .arg(serviceError()),
+                 CatalogFailureKind::ToolError);
             return;
         }
         const QStringList files = toStringList(info.files);
@@ -490,8 +572,10 @@ void CatalogClient::poll()
     if (status != VD_STATUS_READY) {
         job_ = 0;
         timer_->stop();
-        fail(QCoreApplication::translate("VEdit", "module catalog failed: %1")
-                 .arg(serviceError()));
+        int code = 0;
+        const QString message = serviceError(&code);
+        fail(QCoreApplication::translate("VEdit", "module catalog failed: %1").arg(message),
+             catalogFailureKind(code));
         return;
     }
     const ModuleCatalog catalog = toCatalog(raw, projectRoot_, fileCount_);
@@ -509,19 +593,25 @@ void CatalogClient::finish(const ModuleCatalog &catalog)
     }
 }
 
-void CatalogClient::fail(const QString &message)
+void CatalogClient::fail(const QString &message, CatalogFailureKind kind)
 {
     if (onFailed_ != nullptr) {
-        onFailed_(message);
+        onFailed_(message, kind);
     }
 }
 
-QString CatalogClient::serviceError() const
+QString CatalogClient::serviceError(int *code) const
 {
+    if (code != nullptr) {
+        *code = 0;
+    }
 #if defined(VEDIT_MODULE_TREE_HAVE_FFI)
     if (service_ != nullptr) {
         VdError error{};
         if (vd_service_error(static_cast<VdService *>(service_), &error) != 0) {
+            if (code != nullptr) {
+                *code = error.code;
+            }
             return QString::fromUtf8(error.message);
         }
     }
@@ -534,9 +624,15 @@ void CatalogClient::setOnReady(std::function<void(const ModuleCatalog &)> callba
     onReady_ = std::move(callback);
 }
 
-void CatalogClient::setOnFailed(std::function<void(const QString &)> callback)
+void CatalogClient::setOnFailed(
+    std::function<void(const QString &, CatalogFailureKind)> callback)
 {
     onFailed_ = std::move(callback);
+}
+
+void CatalogClient::setOnLargeProject(std::function<void(int)> callback)
+{
+    onLargeProject_ = std::move(callback);
 }
 
 void CatalogClient::setOnProgress(std::function<void(const QString &)> callback)

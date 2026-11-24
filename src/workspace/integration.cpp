@@ -32,6 +32,19 @@
 #if defined(VEDIT_WORKSPACE_HAVE_SETTINGS)
 #include "settings/settings_integration.h"
 #endif
+// Batch 20261110: the new workspace lanes. Each header/entry point is the same
+// convention as the lanes above (<lane>/<lane>_integration.h, install<Lane>), and
+// the VEDIT_WORKSPACE_HAVE_<LANE> macro is only defined when the lane's directory
+// and its integration file exist — so this block is inert until its task lands.
+#if defined(VEDIT_WORKSPACE_HAVE_RENAME)
+#include "rename/rename_integration.h"
+#endif
+#if defined(VEDIT_WORKSPACE_HAVE_VHDL)
+#include "vhdl/vhdl_integration.h"
+#endif
+#if defined(VEDIT_WORKSPACE_HAVE_SCALA)
+#include "scala/scala_integration.h"
+#endif
 
 namespace vedit::workspace {
 
@@ -39,6 +52,17 @@ void installPanels(vedit::app::ApplicationShell &shell, const IntegrationOptions
 {
     (void)shell;
     (void)options;
+
+    // T63 (batch 20261110c, AC-4.7): the imported environment selection must be
+    // in place BEFORE any lane installs — installing a lane creates panels, and
+    // a panel's first refresh can already start a tool child (lint / language
+    // server / VCS / terminal). The shell constructor only read the session
+    // archive, so nothing has spawned yet; this is the last safe moment, and
+    // `installSettings()` is deliberately NOT the owner (it runs after every
+    // other lane).
+#if defined(VEDIT_WORKSPACE_HAVE_SETTINGS)
+    applyEnvironmentSelection(options);
+#endif
 
 #if defined(VEDIT_WORKSPACE_HAVE_JUMP)
     installJump(shell, options);
@@ -68,6 +92,18 @@ void installPanels(vedit::app::ApplicationShell &shell, const IntegrationOptions
 #endif
 #if defined(VEDIT_WORKSPACE_HAVE_SETTINGS)
     installSettings(shell, options);
+#endif
+    // Batch 20261110: the new lanes install last. `rename` consumes the project
+    // model (installed above) and the editor; `vhdl` and `scala` are independent
+    // of the other lanes and of each other.
+#if defined(VEDIT_WORKSPACE_HAVE_RENAME)
+    installRename(shell, options);
+#endif
+#if defined(VEDIT_WORKSPACE_HAVE_VHDL)
+    installVhdl(shell, options);
+#endif
+#if defined(VEDIT_WORKSPACE_HAVE_SCALA)
+    installScala(shell, options);
 #endif
 }
 

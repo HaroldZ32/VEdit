@@ -6,10 +6,12 @@ use anyhow::{bail, Result};
 use vd_config::{render_table, to_json, Env, Loader, RootSource, Source, ValueView, WarningCode};
 
 fn write(path: &Path, text: &str) -> Result<()> {
+    use std::os::unix::fs::PermissionsExt;
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent)?;
     }
     std::fs::write(path, text)?;
+    std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o755))?;
     Ok(())
 }
 
@@ -240,21 +242,41 @@ fn environment_variables_override_fim_settings_and_record_their_source() -> Resu
     Ok(())
 }
 
+/// CONTRACT CHANGE (2026-11-18 file-set decision, A-5): this test used to rely
+/// on the unconditional root-level `.f` auto-discovery and asserted a
+/// `RootSource::GitDir` root. The filelist is now a `[project] filelists`
+/// declaration (which always applies), so the fixture carries a `vedit.toml`
+/// and the root source is `VeditToml`. The include/define/rules assertions are
+/// unchanged, and `stray.f` is the negative control for the dropped discovery.
 #[test]
-fn project_discovery_finds_filelists_rules_includes_defines_and_upward_rules() -> Result<()> {
+fn a_configured_filelist_is_expanded_and_the_upward_rules_are_found() -> Result<()> {
     let (temp, home, project, exe_dir) = fixture()?;
     write(
         &project.join("top.f"),
         "rtl/a.sv\n+incdir+inc\n+define+FOO=1\n",
+    )?;
+    write(&project.join("stray.f"), "rtl/b.sv\n")?;
+    write(
+        &project_config(&project),
+        "[project]\nfilelists = [\"top.f\"]\n",
     )?;
     let parent_rules = temp.path().join(".rules.verible_lint");
     write(&parent_rules, "line-length: 120\n")?;
     let loaded = loader(&home, &project, &exe_dir, &[]).load()?;
 
     assert_eq!(loaded.project.root, std::path::absolute(&project)?);
-    assert_eq!(loaded.project.root_source, RootSource::GitDir);
+    assert_eq!(loaded.project.root_source, RootSource::VeditToml);
     assert_eq!(loaded.project.filelists.len(), 1);
     assert_eq!(loaded.project.filelists[0].path, project.join("top.f"));
+    assert!(
+        loaded
+            .project
+            .filelists
+            .iter()
+            .all(|filelist| !filelist.path.ends_with("stray.f")),
+        "an undeclared root-level `.f` must not be auto-discovered: {:?}",
+        loaded.project.filelists
+    );
     assert_eq!(
         loaded.project.filelists[0].entries,
         vec![project.join("rtl/a.sv")]
@@ -271,8 +293,49 @@ fn project_discovery_finds_filelists_rules_includes_defines_and_upward_rules() -
     Ok(())
 }
 
+/// R1 of the 2026-11-18 file-set decision at the `Loader` level: with no
+/// `[project]` declaration the project has NO filelist, even when `.f` files
+/// sit in the root. The explicit switch is the only way back.
 #[test]
-fn configured_filelists_and_project_settings_are_merged_with_discovered_ones() -> Result<()> {
+fn a_root_filelist_is_not_auto_discovered_by_default() -> Result<()> {
+    let (_temp, home, project, exe_dir) = fixture()?;
+    write(&project.join("top.f"), "rtl/a.sv\n")?;
+    write(&project.join("second.f"), "rtl/b.sv\n")?;
+
+    let by_default = loader(&home, &project, &exe_dir, &[]).load()?;
+    assert!(
+        by_default.project.filelists.is_empty(),
+        "default state: no declared filelist, no discovery: {:?}",
+        by_default.project.filelists
+    );
+    assert_eq!(by_default.project.root_source, RootSource::GitDir);
+
+    write(
+        &project_config(&project),
+        "[project]\nauto_discover = true\n",
+    )?;
+    let with_switch = loader(&home, &project, &exe_dir, &[]).load()?;
+    let paths: Vec<PathBuf> = with_switch
+        .project
+        .filelists
+        .iter()
+        .map(|filelist| filelist.path.clone())
+        .collect();
+    assert_eq!(
+        paths,
+        vec![project.join("second.f"), project.join("top.f")],
+        "the switch restores root-level `.f` auto-discovery (sorted)"
+    );
+    assert_eq!(with_switch.project.root_source, RootSource::VeditToml);
+    Ok(())
+}
+
+/// CONTRACT CHANGE (2026-11-18 file-set decision, A-5): the old assertion
+/// (`auto.f` ∪ `extra.f`, i.e. discovery and configuration merged by default)
+/// is split in two: the configured filelist alone is the default, and the old
+/// merged set is asserted with the switch on.
+#[test]
+fn configured_filelists_always_apply_and_the_switch_adds_discovered_ones() -> Result<()> {
     let (_temp, home, project, exe_dir) = fixture()?;
     write(&project.join("auto.f"), "auto.sv\n")?;
     write(&project.join("extra.f"), "extra.sv\n")?;
@@ -280,22 +343,48 @@ fn configured_filelists_and_project_settings_are_merged_with_discovered_ones() -
         &project_config(&project),
         "[project]\nfilelists = [\"extra.f\"]\ninclude_dirs = [\"cfg_inc\"]\ndefines = [\"BAR\", \"BAZ=2\"]\n",
     )?;
-    let loaded = loader(&home, &project, &exe_dir, &[]).load()?;
 
-    let paths: Vec<PathBuf> = loaded
+    let by_default = loader(&home, &project, &exe_dir, &[]).load()?;
+    let paths: Vec<PathBuf> = by_default
+        .project
+        .filelists
+        .iter()
+        .map(|filelist| filelist.path.clone())
+        .collect();
+    assert_eq!(
+        paths,
+        vec![project.join("extra.f")],
+        "default: the configured filelist applies, the root-level `auto.f` does not"
+    );
+    assert_eq!(
+        by_default.project.include_dirs,
+        vec![project.join("cfg_inc")]
+    );
+
+    // The switch restores the old merged set (the pre-decision contract).
+    write(
+        &project_config(&project),
+        "[project]\nfilelists = [\"extra.f\"]\nauto_discover = true\n\
+         include_dirs = [\"cfg_inc\"]\ndefines = [\"BAR\", \"BAZ=2\"]\n",
+    )?;
+    let with_switch = loader(&home, &project, &exe_dir, &[]).load()?;
+    let paths: Vec<PathBuf> = with_switch
         .project
         .filelists
         .iter()
         .map(|filelist| filelist.path.clone())
         .collect();
     assert_eq!(paths, vec![project.join("auto.f"), project.join("extra.f")]);
-    assert_eq!(loaded.project.include_dirs, vec![project.join("cfg_inc")]);
-    assert!(loaded
+    assert_eq!(
+        with_switch.project.include_dirs,
+        vec![project.join("cfg_inc")]
+    );
+    assert!(with_switch
         .project
         .defines
         .iter()
         .any(|define| define.name == "BAR" && define.value.is_none()));
-    assert!(loaded
+    assert!(with_switch
         .project
         .defines
         .iter()
@@ -349,7 +438,40 @@ fn tool_resolution_records_every_attempt_even_on_success() -> Result<()> {
         .error
         .as_deref()
         .ok_or_else(|| anyhow::anyhow!("missing tool must carry an error"))?;
-    assert!(error.contains("PATH is never consulted"));
+    assert!(error.contains("verible-verilog-format") && error.contains("stage=bundled"));
+
+    let path_dir = project.join("tools-on-path");
+    write(
+        &path_dir.join("verible-verilog-format"),
+        "#!/bin/sh\nexit 0\n",
+    )?;
+    let path_value = path_dir.display().to_string();
+    let path_only = loader(&home, &project, &exe_dir, &[("PATH", path_value.as_str())]).load()?;
+    assert_eq!(
+        path_only.tools.format.source,
+        Some(vd_config::ToolSource::Path)
+    );
+    assert_eq!(
+        path_only.tools.format.path.as_deref(),
+        Some(path_dir.join("verible-verilog-format").as_path())
+    );
+
+    let explicit = project.join("tools/verible-verilog-format");
+    write(&explicit, "#!/bin/sh\nexit 0\n")?;
+    write(
+        &project_config(&project),
+        "[verible]\nformat = \"tools/verible-verilog-format\"\n",
+    )?;
+    let with_setting =
+        loader(&home, &project, &exe_dir, &[("PATH", path_value.as_str())]).load()?;
+    assert_eq!(
+        with_setting.tools.format.source,
+        Some(vd_config::ToolSource::Config)
+    );
+    assert_eq!(
+        with_setting.tools.format.path.as_deref(),
+        Some(explicit.as_path())
+    );
 
     let json = to_json(&loaded);
     let attempts = json["tools"]["ls"]["attempts"]

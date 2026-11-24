@@ -62,6 +62,20 @@ RUN set -eux; \
       $(awk '!/^#/ && NF {print $1}' /opt/vedit/qt6-locked-packages.txt); \
     rm -rf /var/lib/apt/lists/*
 
+# csh/tcsh/fish are the three non-POSIX shells the settings selftest exercises
+# (env-fail.{csh,tcsh,fish}.capture). The probe calls QStandardPaths::findExecutable
+# inside THIS image, so packages installed on the host cannot satisfy it: without
+# these three the assertions report SKIP and never actually run. They live in
+# their own layer so the sha256-locked layer above keeps its cache: replaying
+# that layer is no longer possible because the archive has superseded the locked
+# libc6 patch (2.43-2ubuntu2.4 -> 2.43-2ubuntu2 / .7). The lock assertion below
+# still verifies every locked package in the resulting image.
+RUN set -eux; \
+    apt-get update; \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+      csh tcsh fish; \
+    rm -rf /var/lib/apt/lists/*
+
 # Assert the installed versions equal the lock again (defence in depth: the
 # download check proves the archive, this proves the image), then record the
 # facts the lane's evidence and the CMake guards rely on.

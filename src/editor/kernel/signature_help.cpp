@@ -15,6 +15,7 @@
 #include <QKeyEvent>
 #include <QLabel>
 #include <QRegularExpression>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
 
@@ -397,6 +398,14 @@ SignatureHelp::SignatureHelp(KTextEditor::View *view)
     , view_(view)
 {
     setObjectName(QStringLiteral("vedit-signature-help-controller"));
+    // T9: one refresh per typing pause instead of one per keystroke and per
+    // cursor step. The IMMEDIATE refresh() stays available for the selftest and
+    // for explicit calls.
+    refreshTimer_ = new QTimer(this);
+    refreshTimer_->setObjectName(QStringLiteral("signatureRefreshDebounce"));
+    refreshTimer_->setSingleShot(true);
+    refreshTimer_->setInterval(150);
+    connect(refreshTimer_, &QTimer::timeout, this, [this]() { refresh(); });
 }
 
 SignatureHelp::~SignatureHelp()
@@ -425,13 +434,17 @@ SignatureHelp *SignatureHelp::install(KTextEditor::View *view)
     auto *help = new SignatureHelp(view);
     installEditorEventFilter(view, help);
     help->ensurePopup();
+    // T9: both triggers go through the 150 ms debounce; the popup follows the
+    // typing pause, not every intermediate keystroke/cursor step.
     QObject::connect(view, &KTextEditor::View::cursorPositionChanged, help,
-                     [help](KTextEditor::View *, const KTextEditor::Cursor &) { help->refresh(); });
+                     [help](KTextEditor::View *, const KTextEditor::Cursor &) {
+                         help->onCursorMoved();
+                     });
     help->connectedDocument_ = view->document();
     if (help->connectedDocument_ != nullptr) {
         help->textConnection_ =
             QObject::connect(help->connectedDocument_, &KTextEditor::Document::textChanged, help,
-                             [help](KTextEditor::Document *) { help->refresh(); });
+                             [help](KTextEditor::Document *) { help->scheduleRefresh(); });
     }
     return help;
 }
@@ -448,6 +461,39 @@ SignatureHelp *SignatureHelp::instanceFor(QWidget *editorWidget)
 KTextEditor::View *SignatureHelp::view() const
 {
     return view_;
+}
+
+void SignatureHelp::scheduleRefresh()
+{
+    if (refreshTimer_ == nullptr) {
+        refresh();
+        return;
+    }
+    // Restart on every trigger: a burst of keystrokes yields ONE refresh.
+    refreshTimer_->start();
+}
+
+void SignatureHelp::onCursorMoved()
+{
+    KTextEditor::Document *document = view_ != nullptr ? view_->document() : nullptr;
+    if (document == nullptr) {
+        return;
+    }
+    if (textCached_ && cachedDocument_ == document && cachedRevision_ == document->revision()) {
+        // Pure cursor movement: the text cache and the parsed tree are current,
+        // so this refresh copies nothing and parses nothing. Immediate, because
+        // leaving a call context must close the popup at once.
+        refresh();
+        return;
+    }
+    // The buffer changed (typing also moves the cursor): the debounce owns the
+    // expensive work.
+    scheduleRefresh();
+}
+
+bool SignatureHelp::refreshPending() const
+{
+    return refreshTimer_ != nullptr && refreshTimer_->isActive();
 }
 
 void SignatureHelp::ensurePopup()
@@ -511,7 +557,7 @@ void SignatureHelp::rebuildIndex()
     }
 }
 
-void SignatureHelp::refreshDocumentScan()
+void SignatureHelp::refreshDocumentScan(const QString &text)
 {
     KTextEditor::Document *document = view_ != nullptr ? view_->document() : nullptr;
     if (document == nullptr) {
@@ -526,9 +572,10 @@ void SignatureHelp::refreshDocumentScan()
         connectedDocument_ = document;
         textConnection_ =
             QObject::connect(document, &KTextEditor::Document::textChanged, this,
-                             [this](KTextEditor::Document *) { refresh(); });
+                             [this](KTextEditor::Document *) { scheduleRefresh(); });
     }
-    const QString text = document->text();
+    // The caller copied the document ONCE (T9); this compares that copy instead
+    // of taking a second one.
     if (text == scannedDocumentText_) {
         return;
     }
@@ -826,18 +873,34 @@ void SignatureHelp::refresh()
         hidePopup(QStringLiteral("no document"));
         return;
     }
-    if (document->text().size() > kMaxDocumentChars) {
+    // T9: ONE copy per document REVISION, not three copies per call. A cursor
+    // move (revision unchanged) reuses the cached text and the parsed tree.
+    const qint64 revision = document->revision();
+    const bool textChanged =
+        !textCached_ || cachedDocument_ != document || cachedRevision_ != revision;
+    if (textChanged) {
+        cachedText_ = document->text();
+        cachedDocument_ = document;
+        cachedRevision_ = revision;
+        textCached_ = true;
+        ++textCopies_;
+    }
+    const QString &text = cachedText_;
+    if (text.size() > kMaxDocumentChars) {
         hidePopup(QStringLiteral("document too large for local signature help"));
         return;
     }
-    refreshDocumentScan();
+    if (textChanged) {
+        // ONE scan per document revision. A pure cursor move reuses it, so it
+        // never compares (let alone copies) the whole document.
+        refreshDocumentScan(text);
+    }
 
 #if VEDIT_SIGNATURE_HELP_TREESITTER
     if (tree_ == nullptr) {
         tree_ = new TreeState;
     }
-    const QString text = document->text();
-    if (tree_->tree == nullptr || tree_->parsed != text) {
+    if (textChanged && (tree_->tree == nullptr || tree_->parsed != text)) {
         if (tree_->parser == nullptr) {
             tree_->parser = ts_parser_new();
             ts_parser_set_language(tree_->parser, tree_sitter_verilog());

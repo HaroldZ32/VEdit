@@ -54,6 +54,18 @@ struct SearchOptions {
     // defaultExcludedDirNames().
     QStringList excludedDirNames;
 
+    // Extra files scanned IN ADDITION to the folder walk (batch 20261110d):
+    // the project file set, whose `.f` members may live OUTSIDE rootPath
+    // (root=filelists/, sources in ../tb/) or under a pruned directory — the
+    // very files a directory walk can never see. The SCOPE is the UNION, never
+    // the set alone: a `.md`/`.txt`/script inside the folder keeps being
+    // searched, and each path is scanned once even when it is also walked.
+    //
+    // Empty means "no project file set exists yet": the plain walk, so a
+    // project that is still loading keeps today's behaviour instead of
+    // searching zero files.
+    QStringList files;
+
     int maxResults = 2000;
     // Files larger than this are skipped and counted (never read into memory).
     qint64 maxFileBytes = 8LL * 1024 * 1024;
@@ -117,6 +129,14 @@ struct SearchSummary {
     int skippedUnreadable = 0; // unreadable files and directories
     bool truncated = false;    // maxResults reached
     bool timedOut = false;     // maxDurationMs reached
+    // The SCOPE actually scanned (batch 20261110d): true when a project file
+    // set was supplied, in which case the scope was the UNION (folder walk ∪
+    // set) and `filesInProjectSet` names how many members the set added. The
+    // set is not a file count of the scan: `filesScanned` may exceed it with
+    // folder files (a `.md`, a `.f`), and a member the walk also visited is
+    // counted once.
+    bool usedProjectFileSet = false;
+    int filesInProjectSet = 0;
     qint64 elapsedMs = 0;
     QString error; // set when state == Failed
 };

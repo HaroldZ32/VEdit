@@ -111,6 +111,17 @@ public:
     // Qt treats a duplicated sequence as ambiguous and drops BOTH bindings.
     QStringList duplicateShortcuts() const;
 
+    // batch-20261110d (T5): a PERSISTED shortcut override that collides with
+    // another command's effective binding is dropped while the registry is
+    // built/reapplied, so the command's default applies again and the product
+    // can never carry a dead ambiguous key because of a legacy `shortcuts.json`
+    // (the real-machine case: `diagnostics.format` stored Ctrl+Alt+F, which the
+    // Files-panel toggle owns). A default-vs-default collision is NEVER repaired
+    // — that is a shipped defect and must stay visible to duplicateShortcuts()
+    // and the product selfcheck. One line per repair, in repair order:
+    // "<sequence>: kept <id>, dropped the stored binding of <id>".
+    QStringList shortcutRepairs() const;
+
     // --- RM-5b: effective binding + ownership introspection -----------------
     // The registered default (independent of any user override) — what
     // reset-to-default restores and what the Shortcuts page shows as "default".
@@ -151,11 +162,18 @@ private:
     // the primary AND drops the extras; otherwise primary + extras.
     QList<QKeySequence> effectiveFor(const QString &id, const Entry &entry) const;
     bool reassignDefaultShortcut(const QString &id, const QKeySequence &sequence);
+    // batch-20261110d (T5): drop every persisted override that collides with
+    // another command's effective binding (see shortcutRepairs()). Called at the
+    // end of add() and refreshShortcuts(), so the invariant holds for commands
+    // registered at any time (the shell's own, a lane's, a late one) and after a
+    // store reapply.
+    void repairStoredShortcutOverrides();
 
     QHash<QString, Entry> entries_;
     QStringList order_;
     QStringList menus_;
     QHash<QString, QString> menuLabels_;
+    QStringList repairs_;
     IShortcutStore *store_ = nullptr;
     QObject *actionOwner_ = nullptr;
     std::function<QList<ForeignShortcut>()> foreignProvider_;

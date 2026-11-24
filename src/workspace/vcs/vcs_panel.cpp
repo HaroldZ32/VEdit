@@ -39,12 +39,10 @@ namespace {
 
 // Every user-visible string in this lane uses the "VEdit" translation context,
 // the same one the rest of the workspace lanes use (and the one
-// translations/vedit_zh_CN.ts already carries).
-QString t(const char *text)
-{
-    return QCoreApplication::translate("VEdit", text);
-}
-
+// translations/vedit_zh_CN.ts already carries). Call
+// QCoreApplication::translate("VEdit", "…") directly with LITERAL arguments:
+// lupdate extracts only literals passed straight to a recognized function, and a
+// local wrapper hides them from the catalogue (the lint_options.cpp blind spot).
 QLabel *makeTitle(const QString &text, QWidget *parent, const char *objectName)
 {
     auto *label = new QLabel(text, parent);
@@ -1387,9 +1385,9 @@ void VcsPanel::updateActions()
     applyCapability(abort_button_, PanelAction::Abort, pending);
 
     // The SAME three-column widget, with the backend's own verbs on the buttons.
-    // These are DIRECT translate() calls (not the t() helper) because lupdate only
-    // extracts literals passed straight to QCoreApplication::translate: a `t("…")`
-    // label would silently stay untranslated in the compiled catalogue.
+    // These are DIRECT translate() calls because lupdate only extracts literals
+    // passed straight to QCoreApplication::translate: a wrapper such as the
+    // retired `t("…")` helper would silently stay untranslated in the catalogue.
     stage_button_->setText(svn ? QCoreApplication::translate("VEdit", "Add")
                                : QCoreApplication::translate("VEdit", "Stage"));
     discard_button_->setText(svn ? QCoreApplication::translate("VEdit", "Revert…")
@@ -2265,7 +2263,7 @@ QString VcsPanel::credentialPromptText(WriteOp op) const
     if (url.isEmpty()) {
         url = remote;
     }
-    const QString action = t(writeOpName(op));
+    const QString action = QCoreApplication::translate("VEdit", writeOpName(op));
     if (url.isEmpty()) {
         return QCoreApplication::translate(
                    "VEdit", "The %1 operation needs credentials for the remote. "

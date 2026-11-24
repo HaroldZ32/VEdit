@@ -27,6 +27,7 @@
 //! task extends, not its final performance work.
 #![forbid(unsafe_code)]
 
+use std::collections::HashSet;
 use std::fmt;
 use std::path::{Path, PathBuf};
 
@@ -225,6 +226,16 @@ pub struct TreeOptions {
     pub verilog_only: bool,
     /// Directory basenames pruned from the walk (default: [`DEFAULT_EXCLUDED_DIRS`]).
     pub excluded_dir_names: Vec<String>,
+    /// Extra files scanned IN ADDITION to the walk (batch 20261110d): the
+    /// project file set, whose `.f` members may live outside `root` and under
+    /// a pruned directory. The SCOPE is the UNION — the folder walk plus these
+    /// members — so a file that is merely inside the folder (a `.md`, a script,
+    /// a `.f`) keeps being searched, and no project member is ever missed.
+    ///
+    /// Every path is scanned ONCE even when it is both walked and listed here
+    /// (the scanner keeps a visited set). Empty is the plain walk, so a caller
+    /// with no project set is unchanged.
+    pub files: Vec<PathBuf>,
     /// Stop after this many hits (`truncated` is set).
     pub max_results: usize,
     /// Files larger than this are skipped as too large (never read).
@@ -246,6 +257,7 @@ impl Default for TreeOptions {
                 .iter()
                 .map(|name| (*name).to_string())
                 .collect(),
+            files: Vec::new(),
             max_results: DEFAULT_TREE_MAX_RESULTS,
             max_file_bytes: DEFAULT_TREE_MAX_FILE_BYTES,
             max_duration_ms: DEFAULT_TREE_MAX_DURATION_MS,
@@ -316,6 +328,11 @@ struct TreeScanner<'a> {
     started: std::time::Instant,
     hits: Vec<TreeHit>,
     summary: TreeSummary,
+    /// Paths this scan already visited, so the union of the walk and the
+    /// explicit project members scans every file exactly once (a member that is
+    /// also inside the folder is not read twice, and its skip is not counted
+    /// twice).
+    visited: HashSet<PathBuf>,
 }
 
 impl TreeScanner<'_> {
@@ -374,8 +391,35 @@ impl TreeScanner<'_> {
         }
     }
 
+    /// Scan exactly the caller's file set (batch 20261110d). No directory is
+    /// read and no exclusion applies: an explicit member is a member even when
+    /// it lives outside `root` or under a pruned directory name. Sorted by
+    /// path so two runs of the same set report hits in a stable order, which
+    /// is the same determinism the walk gets from sorting directory entries.
+    /// Scan the caller's extra project members (batch 20261110d). The walk has
+    /// already run, so this is the SECOND half of the union: every member the
+    /// walk did not reach is read here (outside `root`, or under a pruned
+    /// directory), while a member the walk already visited is skipped by the
+    /// visited set. Sorted by path, so hits from this half are deterministic.
+    fn scan_file_set(&mut self) {
+        let mut files: Vec<&PathBuf> = self.options.files.iter().collect();
+        files.sort();
+        for file in files {
+            if self.stopped() {
+                return;
+            }
+            self.scan_file(file);
+        }
+    }
+
     fn scan_file(&mut self, path: &Path) {
         if self.stopped() {
+            return;
+        }
+        // The union scans one file once. Recording the visit BEFORE the filters
+        // is deliberate: a member the extension filter excludes must not be
+        // re-visited by the second half either.
+        if !self.visited.insert(path.to_path_buf()) {
             return;
         }
         if !self.extensions.is_empty() {
@@ -538,6 +582,11 @@ fn next_char_boundary(text: &str, at: usize) -> usize {
 /// binary / oversized / unreadable files with a counter, stops at
 /// `max_results` (truncated) or `max_duration_ms` (timed out).
 ///
+/// When [`TreeOptions::files`] is non-empty the SCOPE is the UNION of the walk
+/// and those members: the folder is still walked (a `.md` or a `.f` inside it
+/// stays searchable) AND every explicit member is scanned, including one outside
+/// the folder or under a pruned directory name. Each path is read once.
+///
 /// The query is matched by one engine for both modes: a literal needle is
 /// escaped and compiled, a `regex` needle is compiled as written, and
 /// `case_sensitive` / `whole_word` are compile options. Every hit carries its
@@ -570,9 +619,14 @@ pub fn search_tree(
         started,
         hits: Vec::new(),
         summary: TreeSummary::default(),
+        visited: HashSet::new(),
     };
     if !needle.is_empty() {
+        // The scope is the UNION: the folder walk plus the project members the
+        // walk cannot reach. `scan_file_set` is a no-op for an empty list, and
+        // the visited set makes an inside-the-folder member cost nothing.
         scanner.walk(root, 0);
+        scanner.scan_file_set();
     }
     scanner.summary.elapsed_ms = u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX);
     Ok(TreeOutcome {
@@ -1000,6 +1054,197 @@ mod tests {
             &TreeOptions::default(),
         );
         assert!(matches!(result, Err(IndexError::MissingRoot(_))));
+    }
+
+    #[test]
+    fn tree_explicit_file_set_is_a_union_with_the_walk() {
+        let Some(dir) = tempfile::tempdir().ok() else {
+            return;
+        };
+        // The `.f` shape this set exists for: the scanned root is one folder and
+        // a member lives NEXT TO it (root=filelists/, source in ../tb/). A note
+        // INSIDE the folder and a source under a pruned directory name cover the
+        // other two halves of the union.
+        write(dir.path(), "root/inside.sv", "needle inside\n");
+        write(dir.path(), "root/notes.md", "needle in a note\n");
+        write(dir.path(), "root/build/gen.sv", "needle generated\n");
+        write(dir.path(), "tb/outside.sv", "needle outside\n");
+        let root = dir.path().join("root");
+        let inside = root.join("inside.sv");
+        let outside = dir.path().join("tb").join("outside.sv");
+
+        // The supplied set does NOT narrow the search: the `.md` inside the
+        // folder is still found, the pruned directory's explicit member is
+        // found, and the sibling member is found. `inside.sv` is listed AND
+        // walked, and is still scanned exactly once.
+        let set = TreeOptions {
+            files: vec![
+                outside.clone(),
+                inside.clone(),
+                root.join("build").join("gen.sv"),
+            ],
+            ..TreeOptions::default()
+        };
+        let Ok(scoped) = search_tree(&root, "needle", &set) else {
+            return;
+        };
+        assert_eq!(
+            scoped.summary.files_scanned, 4,
+            "walk (inside, notes, pruned build member via the set) + outside, each once"
+        );
+        assert_eq!(scoped.summary.files_matched, 4);
+        assert_eq!(scoped.hits.len(), 4);
+        let paths: Vec<PathBuf> = scoped
+            .hits
+            .iter()
+            .map(|hit| hit.relative_path.clone())
+            .collect();
+        assert!(paths.contains(&PathBuf::from("inside.sv")));
+        assert!(
+            paths.contains(&PathBuf::from("notes.md")),
+            "a folder file that is NOT a project member stays searchable: {paths:?}"
+        );
+        assert!(paths.contains(&PathBuf::from("build/gen.sv")));
+        assert!(
+            paths.contains(&outside),
+            "an explicit member outside the root keeps its absolute path: {paths:?}"
+        );
+
+        // Negative control: removing the sibling member from the set removes it
+        // from the scan, so the search cannot be passing through the directory.
+        let only_inside = TreeOptions {
+            files: vec![inside.clone()],
+            ..TreeOptions::default()
+        };
+        let Ok(negative) = search_tree(&root, "needle", &only_inside) else {
+            return;
+        };
+        assert_eq!(
+            negative.summary.files_scanned, 2,
+            "the walk still reads inside.sv and notes.md; build/ is pruned"
+        );
+        assert!(
+            negative.hits.iter().all(|hit| hit.relative_path != outside),
+            "the removed member is gone"
+        );
+
+        // A root file removed from the set is STILL searched (it is walked):
+        // the union is not the set.
+        let only_outside = TreeOptions {
+            files: vec![outside.clone()],
+            ..TreeOptions::default()
+        };
+        let Ok(union) = search_tree(&root, "needle", &only_outside) else {
+            return;
+        };
+        assert!(
+            union
+                .hits
+                .iter()
+                .any(|hit| hit.relative_path.as_path() == Path::new("notes.md")),
+            "a folder file keeps being searched after leaving the project set"
+        );
+
+        // An empty set is the plain walk: the sibling member is invisible, the
+        // folder files are not.
+        let Ok(walk) = search_tree(&root, "needle", &TreeOptions::default()) else {
+            return;
+        };
+        assert_eq!(walk.summary.files_scanned, 2);
+        assert!(walk.hits.iter().all(|hit| hit.relative_path != outside));
+    }
+
+    #[test]
+    fn tree_explicit_file_set_keeps_every_match_option() {
+        let Some(dir) = tempfile::tempdir().ok() else {
+            return;
+        };
+        write(dir.path(), "root/a.sv", "foo foo foofoo\nFOO\n");
+        write(dir.path(), "tb/b.sv", "foo foo foofoo\nFOO\n");
+        let root = dir.path().join("root");
+        let files = vec![root.join("a.sv"), dir.path().join("tb").join("b.sv")];
+
+        // The explicit set is a SCOPE change only: for the file both modes see,
+        // every option must report the same ranges (no silent feature loss).
+        for options in [
+            TreeOptions::default(),
+            TreeOptions {
+                all_matches: true,
+                ..TreeOptions::default()
+            },
+            TreeOptions {
+                case_sensitive: true,
+                ..TreeOptions::default()
+            },
+            TreeOptions {
+                whole_word: true,
+                ..TreeOptions::default()
+            },
+            TreeOptions {
+                regex: true,
+                ..TreeOptions::default()
+            },
+        ] {
+            let needle = if options.regex { "f.o" } else { "foo" };
+            let Ok(walk) = search_tree(&root, needle, &options) else {
+                return;
+            };
+            let scoped_options = TreeOptions {
+                files: files.clone(),
+                ..options.clone()
+            };
+            let Ok(scoped) = search_tree(&root, needle, &scoped_options) else {
+                return;
+            };
+            let ranges = |hits: &[TreeHit]| -> Vec<(u32, u32, u32, u32)> {
+                hits.iter()
+                    .map(|hit| (hit.line, hit.column, hit.end_column, hit.match_length))
+                    .collect()
+            };
+            let walk_ranges = ranges(&walk.hits);
+            let scoped_a: Vec<TreeHit> = scoped
+                .hits
+                .iter()
+                .filter(|hit| hit.relative_path.as_path() == Path::new("a.sv"))
+                .cloned()
+                .collect();
+            assert_eq!(
+                walk_ranges,
+                ranges(&scoped_a),
+                "the explicit set changed the match ranges for {options:?}"
+            );
+            assert_eq!(scoped.summary.files_scanned, 2);
+        }
+    }
+
+    #[test]
+    fn tree_explicit_file_set_names_every_skip() {
+        let Some(dir) = tempfile::tempdir().ok() else {
+            return;
+        };
+        write(dir.path(), "root/a.sv", "needle\n");
+        let binary = dir.path().join("root").join("b.bin");
+        assert!(std::fs::write(&binary, [b'n', 0, b'x']).is_ok());
+        let large = dir.path().join("root").join("big.v");
+        assert!(std::fs::write(&large, vec![b'x'; 64]).is_ok());
+        let missing = dir.path().join("tb").join("gone.sv");
+
+        let set = TreeOptions {
+            max_file_bytes: 32,
+            files: vec![dir.path().join("root").join("a.sv"), binary, large, missing],
+            ..TreeOptions::default()
+        };
+        let Ok(outcome) = search_tree(&dir.path().join("root"), "needle", &set) else {
+            return;
+        };
+        assert_eq!(outcome.hits.len(), 1);
+        assert_eq!(outcome.summary.files_scanned, 1);
+        assert_eq!(outcome.summary.skipped_binary, 1);
+        assert_eq!(outcome.summary.skipped_too_large, 1);
+        assert_eq!(
+            outcome.summary.skipped_unreadable, 1,
+            "a missing member is counted, never silently dropped"
+        );
     }
 
     #[test]

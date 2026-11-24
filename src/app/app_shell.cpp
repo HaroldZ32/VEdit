@@ -19,8 +19,11 @@
 #include <QActionGroup>
 #include <QApplication>
 #include <QByteArray>
+#include <QChildEvent>
 #include <QCloseEvent>
 #include <QDebug>
+#include <QDialog>
+#include <QDialogButtonBox>
 #include <QDir>
 #include <QDockWidget>
 #include <QEvent>
@@ -45,6 +48,7 @@
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QSizePolicy>
+#include <QStackedLayout>
 #include <QStandardPaths>
 #include <QStatusBar>
 #include <QStringLiteral>
@@ -56,6 +60,8 @@
 #include <QVector>
 #include <QWidget>
 #include <QCoreApplication>
+
+#include <algorithm>
 
 namespace vedit::app {
 
@@ -367,6 +373,12 @@ void ApplicationShell::startSession()
         if (options_.showDefaultPanels) {
             panels_->showPanel(QStringLiteral("file-tree"), this);
             panels_->showPanel(QStringLiteral("outline"), this);
+            // AC-4.1: the project-lint dock belongs to the default layout; its
+            // empty state tells the user how to fill it (AC-4.5). A restored
+            // session keeps whatever the user saved instead.
+            if (projectLintDock_ != nullptr) {
+                projectLintDock_->show();
+            }
         }
         editorArea_->ensurePane();
     }
@@ -654,6 +666,123 @@ void ApplicationShell::buildUi()
     statusProject_ = project;
     statusTheme_ = theme;
     statusLayout_ = layout;
+    createProjectLintDock();
+}
+
+void ApplicationShell::createProjectLintDock()
+{
+    // batch-20261115 (AC-4.1): the whole-project LINT output gets its own bottom
+    // dock, separate from the real-time diagnostics that stay in the Outline
+    // dock. The dock is SHELL-owned on purpose: the --selfcheck contract pins
+    // the registry to five panels (panels.registry.five), and the diagnostics
+    // lane installs its content through projectLintHost() instead.
+    auto *dock = new QDockWidget(
+        QCoreApplication::translate("VEdit", "Project Lint"), this);
+    dock->setObjectName(QStringLiteral("project-lint"));
+    // AC L3.3 (batch-20261116): it is a BOTTOM panel that the user may also dock
+    // on the right edge, and it may always be floated (Qt does not treat floating
+    // as an area). The old Bottom|Top-only set is why a drag to the right edge —
+    // the one place a wide lint table fits — was refused.
+    dock->setAllowedAreas(Qt::BottomDockWidgetArea | Qt::RightDockWidgetArea);
+    // AC L3.1: a readable minimum even before any layout is applied, so the very
+    // first show cannot land as a one-line strip.
+    dock->setMinimumHeight(kProjectLintMinimumHeight);
+
+    auto *content = new QWidget(dock);
+    content->setObjectName(QStringLiteral("project-lint-content"));
+    content->setMinimumSize(320, kProjectLintMinimumHeight);
+    auto *stack = new QStackedLayout(content);
+    stack->setContentsMargins(0, 0, 0, 0);
+
+    // AC-4.5: an empty dock must show a reason and the way to fill it, never a
+    // blank card. The page is replaced by the host page the moment a content
+    // widget is parented to the host (see eventFilter).
+    auto *emptyPage = new QWidget(content);
+    emptyPage->setObjectName(QStringLiteral("project-lint-empty-state"));
+    auto *emptyLayout = new QVBoxLayout(emptyPage);
+    emptyLayout->setContentsMargins(12, 12, 12, 12);
+    auto *empty = new QLabel(
+        QCoreApplication::translate(
+            "VEdit",
+            "No whole-project lint results yet. Run Project → Lint Project to analyze "
+            "the project's files."),
+        emptyPage);
+    empty->setObjectName(QStringLiteral("project-lint-empty"));
+    empty->setAlignment(Qt::AlignCenter);
+    empty->setWordWrap(true);
+    emptyLayout->addWidget(empty);
+
+    auto *host = new QWidget(content);
+    host->setObjectName(QStringLiteral("project-lint-host"));
+    // AC L3.1: the CONTENT host carries the same floor, so a lane that installs
+    // its panel here cannot be squeezed into a sliver by an old dock state.
+    host->setMinimumSize(320, kProjectLintMinimumHeight);
+    stack->addWidget(emptyPage);
+    stack->addWidget(host);
+    stack->setCurrentWidget(emptyPage);
+
+    dock->setWidget(content);
+    PanelRegistry::applyCardChrome(dock);
+    addDockWidget(Qt::BottomDockWidgetArea, dock);
+    // One accessor is the whole frozen interface (contract §4.1.1), so the
+    // empty state must yield to ANY content widget the diagnostics lane
+    // parents to the host — not only to a specific installer call.
+    host->installEventFilter(this);
+
+    projectLintDock_ = dock;
+    projectLintHost_ = host;
+    projectLintStack_ = stack;
+}
+
+QWidget *ApplicationShell::projectLintHost() const
+{
+    return projectLintHost_;
+}
+
+QDockWidget *ApplicationShell::projectLintDock() const
+{
+    return projectLintDock_;
+}
+
+void ApplicationShell::normalizeProjectLintDock()
+{
+    QDockWidget *dock = projectLintDock_;
+    if (dock == nullptr) {
+        return;
+    }
+    // AC L3.2: a restored session can carry a layout this dock cannot survive —
+    // floating on a monitor that is gone, tabified behind another bottom dock (so
+    // "open" makes it the hidden tab: the user's "click and it disappears"),
+    // docked on the left/top edge, or squeezed to a few pixels. Normalise ALL of
+    // it back to a bottom dock with a readable height. A dock the user
+    // deliberately closed stays closed: only placement and size are repaired.
+    const bool wasVisible = dock->isVisible();
+    const Qt::DockWidgetArea area = dockWidgetArea(dock);
+    const bool tabified = !tabifiedDockWidgets(dock).isEmpty();
+    const bool misplaced = dock->isFloating() || tabified
+        || (area != Qt::BottomDockWidgetArea && area != Qt::NoDockWidgetArea);
+    if (misplaced) {
+        // setFloating(false) FIRST: while the dock is a floating window,
+        // removeDockWidget() merely hides it and the floating state survives, so
+        // the repaired dock would still be a separate top-level window.
+        dock->setFloating(false);
+        // Then take it out of any tab group: addDockWidget() alone leaves a
+        // tabified dock behind its tab mate.
+        removeDockWidget(dock);
+        addDockWidget(Qt::BottomDockWidgetArea, dock);
+    }
+    // A degenerate minimum (an old state, a lane's own content) is repaired here
+    // as well, so the dock can never be squeezed into a one-line strip.
+    if (dock->minimumHeight() < kProjectLintMinimumHeight) {
+        dock->setMinimumHeight(kProjectLintMinimumHeight);
+    }
+    if (wasVisible) {
+        dock->show();
+        dock->raise();
+    }
+    if (dock->height() < kProjectLintMinimumHeight) {
+        resizeDocks({dock}, {kProjectLintMinimumHeight}, Qt::Vertical);
+    }
 }
 
 void ApplicationShell::registerPanels()
@@ -666,13 +795,10 @@ void ApplicationShell::registerPanels()
         spec.owner = owner;
         spec.area = area;
         // No factory yet: the owning lane registers one through
-        // PanelRegistry::setFactory(id, ...); until then the registry inserts
-        // the shell placeholder (empty state, never a crash).
+        // PanelRegistry::setFactory(id, ...). Batch 20261110 (AC-1.6): a spec
+        // without a factory no longer renders a shell placeholder, so the dock
+        // does not appear at all until its lane owns it.
         panels_->addPanel(spec);
-        panels_->setPlaceholderHint(
-            id, options_.projectRoot.isEmpty()
-                    ? QCoreApplication::translate("VEdit", "Empty state: no project open. This panel stays usable and empty.")
-                    : QCoreApplication::translate("VEdit", "Empty state: nothing to show for this project yet."));
     };
     addPanel(QStringLiteral("file-tree"), QCoreApplication::translate("VEdit", "Files"), QStringLiteral("workspace"), Qt::LeftDockWidgetArea);
     addPanel(QStringLiteral("search"), QCoreApplication::translate("VEdit", "Search"), QStringLiteral("workspace"), Qt::BottomDockWidgetArea);
@@ -728,6 +854,20 @@ void ApplicationShell::registerCommands()
     // override replaces the whole set, and the Shortcuts page lists both.
     commands_->addExtraDefaultShortcut(QStringLiteral("edit.redo"),
                                        QKeySequence(QStringLiteral("Ctrl+Y")));
+    // Batch 20261110d (T7): block/column selection becomes a CHECKABLE command
+    // with the kernel's own Ctrl+Shift+B. Until now the gesture lived only in
+    // MultiCursorController (Alt+drag / Shift+Alt+drag), which duelled with the
+    // editor's block mode; the menu entry and the view flag are now ONE state.
+    addCommand(QStringLiteral("edit.block-selection"), tr("&Block Selection"),
+               QStringLiteral("edit"), QKeySequence(QStringLiteral("Ctrl+Shift+B")), 30,
+               /*checkable=*/true);
+    // The "cursor at every line end" gesture already existed inside KTextEditor
+    // as Alt+Shift+I, reachable only by typing the key; this makes it a menu
+    // command (the implementation runs our own controller so it works on the
+    // product view without depending on the editor's action collection).
+    addCommand(QStringLiteral("edit.multi-cursor-from-selection"),
+               tr("Add Cursor at Line &Ends"), QStringLiteral("edit"),
+               QKeySequence(QStringLiteral("Alt+Shift+I")), 40);
     // Preferences (T132): the modal Preferences dialog, moved here from the
     // removed Settings menu. Ctrl+, is unchanged.
     addCommand(QStringLiteral("settings.preferences"), tr("&Preferences…"),
@@ -795,7 +935,7 @@ void ApplicationShell::registerCommands()
                QStringLiteral("view"), QKeySequence(QStringLiteral("Ctrl+Shift+V")), 20);
     addCommand(QStringLiteral("view.focus.next"), tr("&Focus Next Pane"),
                QStringLiteral("view"), QKeySequence(QStringLiteral("F6")), 30);
-    addCommand(QStringLiteral("view.layout.mixed"), tr("&Mixed Split (demo)"),
+    addCommand(QStringLiteral("view.layout.mixed"), tr("&Mixed Split Layout"),
                QStringLiteral("view"), QKeySequence(QStringLiteral("Ctrl+Alt+M")), 40);
     addCommand(QStringLiteral("view.layout.reset"), tr("&Reset Layout"),
                QStringLiteral("view"), QKeySequence(QStringLiteral("Ctrl+Alt+R")), 50, false, true);
@@ -837,7 +977,13 @@ void ApplicationShell::registerCommands()
         // RM-5b: Ctrl+Alt+V is KTextEditor's input-mode switch (ambiguous, both
         // dead); Ctrl+Alt+C is free and keeps the Ctrl+Alt panel family.
         {"vcs", tr("To&ggle Source Control Panel"), "Ctrl+Alt+C"},
-        {"outline", tr("To&ggle Outline Panel"), "Ctrl+Alt+O"},
+        // AC-1.3 / AC-N3 E4: the panel's menu entry carries the dock's own title
+        // ("Outline", registerPanels() above) and the checkable item already says
+        // it toggles (exactly like &Toolbar below). Before this, the diagnostics
+        // lane registered a second "Diagnostics" entry for the SAME dock, so one
+        // dock had two user-visible commands with two different names.
+        // Ctrl+Alt+O is unchanged.
+        {"outline", tr("&Outline"), "Ctrl+Alt+O"},
     };
     int order = 100;
     for (const auto &panelCommand : panelCommands) {
@@ -951,10 +1097,16 @@ void ApplicationShell::registerCommands()
     commands_->setHandler(QStringLiteral("view.split.horizontal"), [this]() {
         editorArea_->splitActive(Qt::Horizontal);
         updateStatusBar();
+        if (statusBar() != nullptr) {
+            statusBar()->showMessage(tr("Split the current document into two panes."), 5000);
+        }
     });
     commands_->setHandler(QStringLiteral("view.split.vertical"), [this]() {
         editorArea_->splitActive(Qt::Vertical);
         updateStatusBar();
+        if (statusBar() != nullptr) {
+            statusBar()->showMessage(tr("Split the current document into two panes."), 5000);
+        }
     });
     commands_->setHandler(QStringLiteral("view.focus.next"), [this]() {
         editorArea_->focusNextPane();
@@ -1007,6 +1159,28 @@ void ApplicationShell::registerCommands()
         updateStatusBar();
         syncEditorCommandStates();
     });
+    commands_->setHandler(QStringLiteral("edit.block-selection"), [this]() {
+        const bool next = !(editorArea_ != nullptr && editorArea_->blockSelectionMode());
+        const bool applied = editorArea_ != nullptr && editorArea_->setBlockSelectionMode(next);
+        if (QAction *action = commands_->action(QStringLiteral("edit.block-selection"))) {
+            action->setChecked(applied && next);
+        }
+        if (!applied && statusBar() != nullptr) {
+            statusBar()->showMessage(
+                tr("Block selection needs an open editor with a KTextEditor view."), 5000);
+        }
+    });
+    commands_->setHandler(QStringLiteral("edit.multi-cursor-from-selection"), [this]() {
+        if (editorArea_ != nullptr && editorArea_->addCursorsAtSelectionLineEnds()) {
+            return;
+        }
+        if (statusBar() != nullptr) {
+            statusBar()->showMessage(
+                tr("Select a range first: the command puts one cursor at each selected "
+                   "line end."),
+                5000);
+        }
+    });
     commands_->setHandler(QStringLiteral("edit.redo"), [this]() {
         editorArea_->triggerActiveEditorAction(
             {QStringLiteral("edit_redo"), QStringLiteral("redo")}, QStringLiteral("redo"));
@@ -1029,16 +1203,33 @@ void ApplicationShell::registerCommands()
         }
     });
 
+    // Batch 20261110 (AC-1.1): the About box is product text, not a shell debug
+    // dump. It was the last place that leaked shell-lane vocabulary (the lane
+    // name, the editor provider and the pane count); `aboutText()` owns it now.
+    // A QLabel with setOpenExternalLinks(true) is what makes the homepage/docs
+    // anchors really open — a QMessageBox gives no such knob.
     const auto about = [this]() {
-        QMessageBox::about(
-            this, QCoreApplication::translate("VEdit", "About VEdit"),
-            QCoreApplication::translate("VEdit", "VEdit application shell (app-shell lane).\n\n"
-                           "Editor provider: %1\nTheme: %2\nPanes: %3\nState: %4\n"
-                           "Diagnostics: %5")
-                .arg(provider_->displayName(), themes_->currentTheme())
-                .arg(editorArea_->paneCount())
-                .arg(session_->path())
-                .arg(diagnostics_.size()));
+        QDialog dialog(this);
+        dialog.setObjectName(QStringLiteral("about-dialog"));
+        dialog.setWindowTitle(tr("About VEdit"));
+        auto *layout = new QVBoxLayout(&dialog);
+        if (!windowIcon().isNull()) {
+            auto *icon = new QLabel(&dialog);
+            icon->setPixmap(windowIcon().pixmap(48, 48));
+            icon->setAlignment(Qt::AlignHCenter);
+            layout->addWidget(icon);
+        }
+        auto *text = new QLabel(aboutText(), &dialog);
+        text->setObjectName(QStringLiteral("about-text"));
+        text->setTextFormat(Qt::RichText);
+        text->setTextInteractionFlags(Qt::TextBrowserInteraction);
+        text->setOpenExternalLinks(true);
+        text->setWordWrap(true);
+        layout->addWidget(text);
+        auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok, &dialog);
+        connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
+        layout->addWidget(buttons);
+        dialog.exec();
     };
     commands_->setHandler(QStringLiteral("help.about"), about);
 }
@@ -1388,6 +1579,18 @@ void ApplicationShell::changeEvent(QEvent *event)
 
 bool ApplicationShell::eventFilter(QObject *watched, QEvent *event)
 {
+    // AC-4.5: the diagnostics lane installs its panel by parenting a widget to
+    // the frozen host (contract §4.1.1); from that moment the empty state must
+    // yield to the real panel. ChildAdded fires for QLayout children too, so
+    // only a WIDGET counts as content.
+    if (watched == projectLintHost_ && event != nullptr &&
+        event->type() == QEvent::ChildAdded) {
+        auto *childEvent = static_cast<QChildEvent *>(event);
+        if (projectLintStack_ != nullptr &&
+            qobject_cast<QWidget *>(childEvent->child()) != nullptr) {
+            projectLintStack_->setCurrentWidget(projectLintHost_);
+        }
+    }
     if (event != nullptr && event->type() == QEvent::Show) {
         if (auto *menu = qobject_cast<QMenu *>(watched); menu != nullptr) {
             logMenuDiagnostics(menu);
@@ -1576,6 +1779,30 @@ QString ApplicationShell::projectLabel() const
     }
     const QString name = QFileInfo(options_.projectRoot).fileName();
     return name.isEmpty() ? options_.projectRoot : name;
+}
+
+QString ApplicationShell::aboutText() const
+{
+    // Batch 20261110 (AC-1.1): product-grade About text. Everything here is a
+    // fact the build can stand behind: the version comes from the entry point
+    // (QCoreApplication::setApplicationVersion in main.cpp), the licence is the
+    // repository LICENSE (MIT), and the two links are the project's real remote
+    // (git remote origin) and the USER_GUIDE.md that ships at that path.
+    const QString version = QCoreApplication::applicationVersion();
+    const QString versionLine = version.isEmpty()
+        ? tr("Development build")
+        : tr("Version %1").arg(version);
+    return tr("<h3>VEdit</h3>"
+              "<p>%1</p>"
+              "<p>A code editor for hardware description languages, with an integrated "
+              "language-server and lint toolchain, a project model, source control and "
+              "offline HDL toolchains.</p>"
+              "<p>License: MIT. Qt and KDE Frameworks are used under their own licenses.</p>"
+              "<p>Homepage: <a href=\"https://github.com/HaroldZ32/VEdit\">"
+              "https://github.com/HaroldZ32/VEdit</a><br/>"
+              "Documentation: <a href=\"https://github.com/HaroldZ32/VEdit/blob/main/"
+              "docs/USER_GUIDE.md\">USER_GUIDE.md</a> (or Help &rarr; User Manual, F1)</p>")
+        .arg(versionLine);
 }
 
 void ApplicationShell::applyThemeForStartup()
@@ -1868,6 +2095,15 @@ bool ApplicationShell::restoreSession(QString *error)
     if (!state.dockState.isEmpty() && !restoreState(state.dockState)) {
         addDiagnostic(QCoreApplication::translate("VEdit", "dock layout could not be restored (KTextEditor/version mismatch?)"));
     }
+    // AC-7.5: a restored layout whose right column lost its visible dock must be
+    // normalised BEFORE the caller starts adding/raising panels, otherwise the
+    // right separator does not exist at all.
+    normalizeDockLayout();
+    // AC L3.2 (batch-20261116): the project-lint dock gets its own repair pass.
+    // It is not a PanelRegistry panel, so normalizeDockLayout() above cannot see
+    // it, and an old session's floating/tabified/left-docked copy is exactly the
+    // "opens as a narrow strip and vanishes" state the user reported.
+    normalizeProjectLintDock();
 
     if (!state.editorLayout.isEmpty()) {
         QString layoutError;
@@ -1888,6 +2124,58 @@ bool ApplicationShell::restoreSession(QString *error)
     syncPanelToggleStates();
     updateStatusBar();
     return true;
+}
+
+void ApplicationShell::normalizeDockLayout()
+{
+    // batch-20261115 (AC-7.5): QMainWindow draws the left/right separator only
+    // while a dock actually occupies that side. A saved layout whose right docks
+    // are all hidden, floating (a monitor that is gone) or tabified-away leaves
+    // the editor with no right splitter at all, and the user cannot drag the
+    // column back. Re-dock the first known right-area dock that still exists and
+    // show it; nothing is created when the session had no right dock at all (a
+    // user who never opened one keeps that state).
+    bool rightColumnPresent = false;
+    for (QDockWidget *dock : findChildren<QDockWidget *>()) {
+        if (dock == nullptr || !dock->isVisible() || dock->isFloating()) {
+            continue;
+        }
+        if (dockWidgetArea(dock) == Qt::RightDockWidgetArea) {
+            rightColumnPresent = true;
+            break;
+        }
+    }
+    if (rightColumnPresent) {
+        return;
+    }
+    // Outline first: it is the shell's own right-hand diagnostics dock and the
+    // one every product start creates; lane panels follow registry order.
+    QStringList candidates{QStringLiteral("outline")};
+    for (const QString &id : panels_->ids()) {
+        if (!candidates.contains(id)) {
+            candidates.append(id);
+        }
+    }
+    QDockWidget *target = nullptr;
+    for (const QString &id : candidates) {
+        if (panels_->area(id) != Qt::RightDockWidgetArea) {
+            continue;
+        }
+        if (QDockWidget *dock = panels_->dock(id)) {
+            target = dock;
+            break;
+        }
+    }
+    if (target == nullptr) {
+        return;
+    }
+    // addDockWidget re-parents a floating dock into this window and pulls a
+    // hidden/tabified one out of its group; show() restores a dock the user had
+    // closed so the separator exists again.
+    addDockWidget(Qt::RightDockWidgetArea, target);
+    target->setFloating(false);
+    target->show();
+    target->raise();
 }
 
 bool ApplicationShell::saveSession(QString *error)
@@ -2181,6 +2469,14 @@ void ApplicationShell::syncDockPanelCommands()
             const bool show = !target->isVisible();
             target->setVisible(show);
             if (show) {
+                // AC L3.3: "open" must never mean "opens and vanishes". A dock
+                // restored as a hidden TAB or as a floating window on a monitor
+                // that is gone becomes visible but invisible to the user; the
+                // project-lint dock therefore re-normalises itself to a bottom
+                // dock with a readable height before it is raised.
+                if (target == projectLintDock_) {
+                    normalizeProjectLintDock();
+                }
                 target->raise();
             }
             if (QAction *action = commands_->action(commandId)) {

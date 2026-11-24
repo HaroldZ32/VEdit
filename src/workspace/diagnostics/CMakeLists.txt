@@ -63,14 +63,18 @@ endif()
 
 set(VEDIT_DIAGNOSTICS_SOURCES
   autofix.cpp
+  badge_text.cpp
   diagnostic_hover.cpp
   diagnostics_controller.cpp
+  diagnostics_hint.cpp
   diagnostics_outline_model.cpp
   ffi_backends.cpp
   lint_progress.cpp
+  project_lint_notice.cpp
   project_lint_trigger.cpp
   symbol_scan.cpp
   toolchain.cpp
+  waiver_actions.cpp
 )
 if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL)
   list(APPEND VEDIT_DIAGNOSTICS_SOURCES
@@ -78,6 +82,7 @@ if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL)
     diagnostics_panel.cpp
     diagnostics_integration.cpp
     project_lint_notice.cpp
+    project_lint_panel.cpp
   )
 endif()
 
@@ -131,6 +136,13 @@ add_executable(vedit-workspace-diagnostics-selftest diagnostics_selftest.cpp)
 target_link_libraries(vedit-workspace-diagnostics-selftest PRIVATE
   vedit_workspace_diagnostics
 )
+# AC-N2/AC-5.1: the waiver action checks drive the REAL Rust service (the lane
+# links vd_ffi transitively); the macro must reach the self-test's own compile
+# unit or those checks would silently disappear from the evidence.
+if(VEDIT_DIAGNOSTICS_FFI)
+  target_compile_definitions(vedit-workspace-diagnostics-selftest PRIVATE
+    VEDIT_DIAGNOSTICS_HAVE_FFI=1)
+endif()
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   target_compile_options(vedit-workspace-diagnostics-selftest PRIVATE
     -Wall -Wextra -Wpedantic -Werror)
@@ -157,6 +169,29 @@ endif()
 
 add_test(NAME vedit-workspace-diagnostics-selftest
          COMMAND vedit-workspace-diagnostics-selftest --selfcheck)
+
+# --- T9 (batch 20261110d): per-keystroke view-pipeline benchmark ------------
+# The user-visible defect: typing in a large project rebuilds the project view
+# on every key. This target drives the REAL controller + panel with a fake pass
+# backend and a deterministic keystroke cadence, and prints one BENCH line per
+# scenario (wall time + exact call/volume counts). --files 100 vs --files 1000
+# is the acceptance comparison. The panel is part of the app-shell build only.
+if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL)
+  add_executable(vedit-edit-jank-bench selftests/edit_jank_bench.cpp)
+  target_link_libraries(vedit-edit-jank-bench PRIVATE vedit_workspace_diagnostics)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-edit-jank-bench PRIVATE
+      -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  foreach(_files 100 1000)
+    add_test(NAME vedit-edit-jank-bench-${_files}
+             COMMAND vedit-edit-jank-bench --files ${_files} --keys 200 --current --warmup --assert)
+    set_tests_properties(vedit-edit-jank-bench-${_files} PROPERTIES
+      ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-jank"
+      TIMEOUT 600
+    )
+  endforeach()
+endif()
 
 # --- RM-9 (T20): per-file verdict retention (fakes; standalone-buildable) ----
 # The user-visible defect: a dot existed only for the document being displayed.
@@ -251,6 +286,38 @@ if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL AND VEDIT_DIAGNOSTICS_FFI)
   )
 endif()
 
+# --- Active-file watcher cap (BLOCKER fix, batch 20261110d) ------------------
+# The 400 ms watcher used to copy the whole active document every tick and died
+# with std::bad_alloc on a large file while the user was idle. This test drives
+# the REAL shell + KTextEditor document + diagnostics lane, generates its
+# oversized document at runtime (nothing large is committed), and asserts from
+# the watcher's published counters (`vedit.diagnostics.activeWatch`) that the
+# oversized document is copied ZERO times while a small file is still analysed.
+# Headless, offscreen, no external toolchain needed.
+if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL)
+  add_executable(vedit-active-watcher-cap-selftest
+                 selftests/active_watcher_cap_selftest.cpp)
+  target_link_libraries(vedit-active-watcher-cap-selftest PRIVATE
+    vedit_workspace_diagnostics
+    vedit_app_shell
+  )
+  target_include_directories(vedit-active-watcher-cap-selftest PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../app"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../editor/kernel"
+  )
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-active-watcher-cap-selftest PRIVATE
+      -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  add_test(NAME vedit-active-watcher-cap-selftest
+           COMMAND vedit-active-watcher-cap-selftest)
+  set_tests_properties(vedit-active-watcher-cap-selftest PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-diagnostics;VEDIT_QUIET=1"
+    TIMEOUT 180
+  )
+endif()
+
 # --- UX batch 2 / B3: the diagnostics experience (R2/R3 + items 9/10/12) -----
 # Offscreen; the two backends and the project pass are fakes. The engine-driven
 # autofix legs use the REAL verible-verilog-lint and SKIP explicitly when it is
@@ -308,14 +375,20 @@ endif()
 # Explicit `project.lint` -> modal jumpable list; a save-triggered pass -> the
 # clickable status-bar notice and NO dialog. SKIPs (exit 0) when the toolchain
 # or the project file set never arrives.
-if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL AND VEDIT_DIAGNOSTICS_FFI)
+if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL AND VEDIT_DIAGNOSTICS_FFI
+   AND TARGET vedit_workspace_project)
   add_executable(vedit-project-lint-e2e selftests/project_lint_e2e.cpp)
   target_link_libraries(vedit-project-lint-e2e PRIVATE
     vedit_workspace_diagnostics
+    # G1-a review finding 1: the e2e's first scenario uses the REAL project lane
+    # (`installProject`) as the publisher, so the dock's failed branch and the
+    # Run retry are exercised with a project lane present, as in the product.
+    vedit_workspace_project
   )
   target_include_directories(vedit-project-lint-e2e PRIVATE
     "${CMAKE_CURRENT_SOURCE_DIR}/../../editor/kernel"
     "${CMAKE_CURRENT_SOURCE_DIR}/../../app"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../project"
   )
   if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     target_compile_options(vedit-project-lint-e2e PRIVATE
@@ -325,6 +398,62 @@ if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL AND VEDIT_DIAGNOSTICS_FFI)
   set_tests_properties(vedit-project-lint-e2e PROPERTIES
     ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-diagnostics;VEDIT_QUIET=1"
     TIMEOUT 300
+  )
+endif()
+
+# --- batch-20261115 lane B: realtime depth + file-switch cost --------------
+# AC-3.1 (one-level module closure), AC-3.2 (current file's rows only), AC-3.4
+# (bounded closure, published bound), AC-5.1 (a switch between OPEN documents
+# starts no new LSP session) and AC-5.2 (per-switch UI cost p95 < 50 ms).
+if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL AND VEDIT_DIAGNOSTICS_FFI)
+  add_executable(vedit-realtime-depth-switch-e2e
+                 selftests/realtime_depth_switch_e2e.cpp)
+  target_link_libraries(vedit-realtime-depth-switch-e2e PRIVATE
+    vedit_workspace_diagnostics
+    vedit_app_shell
+  )
+  target_include_directories(vedit-realtime-depth-switch-e2e PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../editor/kernel"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../app"
+  )
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-realtime-depth-switch-e2e PRIVATE
+      -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  add_test(NAME vedit-realtime-depth-switch-e2e
+           COMMAND vedit-realtime-depth-switch-e2e)
+  set_tests_properties(vedit-realtime-depth-switch-e2e PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-diagnostics;VEDIT_QUIET=1"
+    TIMEOUT 300
+  )
+endif()
+
+# --- batch-20261118 AC-1: the build context reaches slang-server ------------
+# The PRODUCT's own FFI backend against the REAL slang-server 0.3.1 and a
+# synthetic project whose inc/defs.svh is outside the file's directory: before
+# the context push the include is unresolved, after it the outline has the
+# module and a deleted semicolon is a real `expected ';'`. SKIPs (never fails)
+# when no slang-server is resolvable.
+if(VEDIT_DIAGNOSTICS_FFI)
+  add_executable(vedit-slang-build-context-e2e
+                 selftests/slang_build_context_e2e.cpp)
+  target_link_libraries(vedit-slang-build-context-e2e PRIVATE
+    vedit_workspace_diagnostics
+  )
+  target_include_directories(vedit-slang-build-context-e2e PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../common"
+  )
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-slang-build-context-e2e PRIVATE
+      -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  add_test(NAME vedit-slang-build-context-e2e
+           COMMAND vedit-slang-build-context-e2e)
+  set_tests_properties(vedit-slang-build-context-e2e PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-diagnostics;VEDIT_QUIET=1;VEDIT_SLANG_SERVER=${CMAKE_SOURCE_DIR}/packaging/runtime/out/AppDir/bin/slang-server"
+    TIMEOUT 180
   )
 endif()
 
@@ -517,5 +646,74 @@ if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL)
   set_tests_properties(vedit-toolchain-ux-selftest PROPERTIES
     ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-diagnostics"
     TIMEOUT 240
+  )
+endif()
+
+# --- batch-20261117 (fix C): the Verible preprocessing-error hint ------------
+# The pinned verible-verilog-ls cannot expand the macros a design pulls in
+# through `include` / `+define+`: one `preprocessing error at "<MACRO>" ...
+# might not be defined before.` row hides the real syntax error. The Outline
+# shows ONE persistent hint naming the cause and the fix. A tiny fake LSP reports
+# the backend name the snapshot carries, and the REAL panel is asserted; no
+# language server, no Rust service, offscreen.
+if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL)
+  add_executable(vedit-verible-preprocess-hint-selftest
+                 selftests/verible_preprocess_hint_selftest.cpp)
+  target_link_libraries(vedit-verible-preprocess-hint-selftest PRIVATE
+    vedit_workspace_diagnostics
+  )
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-verible-preprocess-hint-selftest PRIVATE
+      -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  add_test(NAME vedit-verible-preprocess-hint-selftest
+           COMMAND vedit-verible-preprocess-hint-selftest)
+  set_tests_properties(vedit-verible-preprocess-hint-selftest PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-diagnostics;VEDIT_QUIET=1"
+    TIMEOUT 120
+  )
+endif()
+
+# --- batch-20261115 lane B (T14 repair): the REAL catalog -> closure path -----
+# One shell installs the project + module-tree + diagnostics lanes (the product's
+# own order) and asserts: AC-3.1 the closure the REAL slang catalog publishes
+# (`vedit.moduleTree.closure`, one level only), AC-2.2 "exactly ONE catalog per
+# filelist import and no lint pass", AC-2.3b `--top` re-runs including the
+# same-value case, AC-2.1/2.5 the filelist gate (top disabled, poller builds no
+# file set) and AC-7.3 the invalid-top fallback sentence.
+#
+# argv[1] is the built slang. It is EMPTY when the tool was not built, and the
+# real-catalog groups then SKIP with the reason printed by the test (the
+# filelist-gate group still runs, because it needs no tool).
+if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL AND VEDIT_DIAGNOSTICS_FFI
+   AND TARGET vedit_workspace_module_tree AND TARGET vedit_workspace_project)
+  # Passed UNCONDITIONALLY: a slang built after this configure step must be
+  # picked up by the next ctest run, and the test itself SKIPs with the honest
+  # reason when the path is not an executable.
+  set(VEDIT_MODULE_CLOSURE_SLANG
+      "${CMAKE_CURRENT_SOURCE_DIR}/../../../build/slang/out/slang")
+  add_executable(vedit-module-closure-e2e selftests/module_closure_e2e.cpp)
+  target_link_libraries(vedit-module-closure-e2e PRIVATE
+    vedit_workspace_diagnostics
+    vedit_workspace_module_tree
+    vedit_workspace_project
+    vedit_app_shell
+  )
+  target_include_directories(vedit-module-closure-e2e PRIVATE
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../module_tree"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../project"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../app"
+    "${CMAKE_CURRENT_SOURCE_DIR}/../../editor/kernel"
+  )
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-module-closure-e2e PRIVATE
+      -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  add_test(NAME vedit-module-closure-e2e
+           COMMAND vedit-module-closure-e2e "${VEDIT_MODULE_CLOSURE_SLANG}")
+  set_tests_properties(vedit-module-closure-e2e PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-diagnostics;VEDIT_QUIET=1"
+    TIMEOUT 420
   )
 endif()

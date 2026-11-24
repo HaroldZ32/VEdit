@@ -1,5 +1,7 @@
 #include "project_panel.h"
 
+#include <algorithm>
+
 #include "file_dialog_filters.h" // src/common: the ONE file-dialog filter table (RM-16)
 #include "file_status.h" // src/common: the ONE status vocabulary (RM-9)
 #include "project_model.h"
@@ -12,8 +14,12 @@
 #include <QAbstractItemView>
 #include <QApplication>
 #include <QFileDialog>
+#include <QHash>
 #include <QHelpEvent>
+#include <QInputDialog>
+#include <QLineEdit>
 #include <QMap>
+#include <QMessageBox>
 #include <QFont>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -30,6 +36,8 @@
 #include <QVBoxLayout>
 #include <QVariant>
 #include <QCoreApplication>
+
+#include <memory>
 
 namespace vedit::workspace::project {
 
@@ -225,19 +233,49 @@ ProjectPanel::ProjectPanel(ProjectModel *model, QWidget *parent)
     // Default production source: the diagnostics lane publishes the map and its
     // revision on the top-level window (the shell), exactly like the file tree
     // reads it. No link dependency, and project_integration.cpp is untouched.
+    // T9: the source is asked once per PAINTED row; converting the whole shell
+    // map on every ask would be O(project files) per row. One cache, replaced by
+    // a structural publish and patched by a per-file delta.
+    struct StatusCache {
+        QHash<QString, int> map;
+        quint64 revision = 0;
+        quint64 deltaRevision = 0;
+    };
+    auto statusCache = std::make_shared<StatusCache>();
     setFileStatusSource(
-        [this](const QString &path) -> int {
+        [this, statusCache](const QString &path) -> int {
             QWidget *top = window();
             if (top == nullptr) {
                 return 0;
             }
-            const QVariantMap map = top->property("vedit.diagnostics.fileStatus").toMap();
-            return map.value(path, 0).toInt();
+            const quint64 revision = top->property("vedit.diagnostics.viewRevision").toULongLong();
+            if (revision != statusCache->revision) {
+                statusCache->revision = revision;
+                statusCache->map.clear();
+                const QVariantMap map = top->property("vedit.diagnostics.fileStatus").toMap();
+                for (auto it = map.constBegin(); it != map.constEnd(); ++it) {
+                    statusCache->map.insert(it.key(), it.value().toInt());
+                }
+                statusCache->deltaRevision =
+                    top->property("vedit.diagnostics.fileStatusDeltaRevision").toULongLong();
+                return statusCache->map.value(path, 0);
+            }
+            const quint64 delta =
+                top->property("vedit.diagnostics.fileStatusDeltaRevision").toULongLong();
+            if (delta != statusCache->deltaRevision) {
+                statusCache->deltaRevision = delta;
+                const QVariantMap changed =
+                    top->property("vedit.diagnostics.fileStatusDelta").toMap();
+                for (auto it = changed.constBegin(); it != changed.constEnd(); ++it) {
+                    statusCache->map.insert(it.key(), it.value().toInt());
+                }
+            }
+            return statusCache->map.value(path, 0);
         },
         [this]() -> quint64 {
             QWidget *top = window();
             return top != nullptr
-                       ? top->property("vedit.diagnostics.viewRevision").toULongLong()
+                       ? top->property("vedit.diagnostics.statusRevision").toULongLong()
                        : 0;
         });
     // A revision bump only repaints the viewport: the delegate asks the source
@@ -245,6 +283,11 @@ ProjectPanel::ProjectPanel(ProjectModel *model, QWidget *parent)
     statusTimer_ = new QTimer(this);
     statusTimer_->setInterval(500);
     connect(statusTimer_, &QTimer::timeout, this, [this]() {
+        // T9 fix (4): a hidden panel does no status work; the delegate reads the
+        // source at paint time, so a re-shown list is correct immediately.
+        if (!isVisible()) {
+            return;
+        }
         const quint64 revision = statusRevisionSource_ ? statusRevisionSource_() : 0;
         if (revision == statusRevision_) {
             return;
@@ -266,6 +309,17 @@ ProjectPanel::ProjectPanel(ProjectModel *model, QWidget *parent)
     includeDirs_->setMaximumHeight(80);
     layout->addWidget(includeDirs_);
 
+    auto *includeButtons = new QHBoxLayout();
+    addIncludeButton_ = new QPushButton(QCoreApplication::translate("VEdit", "Add Include Dir…"), this);
+    addIncludeButton_->setObjectName(QStringLiteral("project-add-include"));
+    removeIncludeButton_ = new QPushButton(QCoreApplication::translate("VEdit", "Remove"), this);
+    removeIncludeButton_->setObjectName(QStringLiteral("project-remove-include"));
+    removeIncludeButton_->setEnabled(false);
+    includeButtons->addWidget(addIncludeButton_);
+    includeButtons->addWidget(removeIncludeButton_);
+    includeButtons->addStretch(1);
+    layout->addLayout(includeButtons);
+
     definesHeader_ = new QLabel(QCoreApplication::translate("VEdit", "Defines (-D) (0)"), this);
     definesHeader_->setObjectName(QStringLiteral("project-defines-header"));
     makeHeader(definesHeader_);
@@ -274,6 +328,17 @@ ProjectPanel::ProjectPanel(ProjectModel *model, QWidget *parent)
     defines_ = makeList(this, QStringLiteral("project-defines"));
     defines_->setMaximumHeight(80);
     layout->addWidget(defines_);
+
+    auto *defineButtons = new QHBoxLayout();
+    addDefineButton_ = new QPushButton(QCoreApplication::translate("VEdit", "Add Define…"), this);
+    addDefineButton_->setObjectName(QStringLiteral("project-add-define"));
+    removeDefineButton_ = new QPushButton(QCoreApplication::translate("VEdit", "Remove"), this);
+    removeDefineButton_->setObjectName(QStringLiteral("project-remove-define"));
+    removeDefineButton_->setEnabled(false);
+    defineButtons->addWidget(addDefineButton_);
+    defineButtons->addWidget(removeDefineButton_);
+    defineButtons->addStretch(1);
+    layout->addLayout(defineButtons);
 
     variablesHeader_ = new QLabel(QCoreApplication::translate("VEdit", "Variables (0)"), this);
     variablesHeader_->setObjectName(QStringLiteral("project-variables-header"));
@@ -311,6 +376,17 @@ ProjectPanel::ProjectPanel(ProjectModel *model, QWidget *parent)
     connect(removeButton_, &QPushButton::clicked, this, &ProjectPanel::onRemoveRequested);
     connect(editVariablesButton_, &QPushButton::clicked, this,
             &ProjectPanel::onEditVariablesRequested);
+    connect(addIncludeButton_, &QPushButton::clicked, this, &ProjectPanel::onAddIncludeRequested);
+    connect(addDefineButton_, &QPushButton::clicked, this, &ProjectPanel::onAddDefineRequested);
+    connect(removeIncludeButton_, &QPushButton::clicked, this,
+            &ProjectPanel::removeSelectedIncludeDir);
+    connect(removeDefineButton_, &QPushButton::clicked, this, &ProjectPanel::removeSelectedDefine);
+    connect(includeDirs_, &QListWidget::currentRowChanged, this, [this](int row) {
+        removeIncludeButton_->setEnabled(row >= 0);
+    });
+    connect(defines_, &QListWidget::currentRowChanged, this, [this](int row) {
+        removeDefineButton_->setEnabled(row >= 0);
+    });
     connect(fileList_, &QListWidget::itemActivated, this, [this](QListWidgetItem *item) {
         onFileActivated(fileList_->row(item));
     });
@@ -375,6 +451,46 @@ bool ProjectPanel::importFilelists(const QStringList &paths)
     return true;
 }
 
+// G1-a: the ONE question a `.f` opened as a document may ask. The modal's
+// default button is "Open Only": "open a file" means "show it", and importing a
+// forgotten list into the project is exactly the accident this guards against.
+// A test replaces the answer; a non-interactive panel never shows the modal and
+// answers OpenOnly, so an unattended run cannot import by accident either.
+FilelistOpenChoice ProjectPanel::confirmFilelistImport(const QString &absolutePath)
+{
+    if (filelistOpenConfirmation_) {
+        return filelistOpenConfirmation_(absolutePath);
+    }
+    if (!interactive_) {
+        return FilelistOpenChoice::OpenOnly;
+    }
+    QMessageBox box(this);
+    box.setObjectName(QStringLiteral("filelist-import-confirm"));
+    box.setIcon(QMessageBox::Question);
+    box.setWindowTitle(QCoreApplication::translate("VEdit", "Import Filelist?"));
+    box.setText(QCoreApplication::translate(
+        "VEdit", "This is a project file list (.f).\n\nImport it as the project file list?"));
+    box.setInformativeText(QCoreApplication::translate(
+        "VEdit", "Importing adds its files to the project file set. Opening it as text changes "
+                 "nothing; you can import it later with Project \u25b8 Import Filelist."));
+    box.setDetailedText(absolutePath);
+    QPushButton *importButton =
+        box.addButton(QCoreApplication::translate("VEdit", "Import"), QMessageBox::AcceptRole);
+    QPushButton *openOnlyButton = box.addButton(
+        QCoreApplication::translate("VEdit", "Open Only"), QMessageBox::RejectRole);
+    box.setDefaultButton(openOnlyButton);
+    box.setEscapeButton(openOnlyButton);
+    box.exec();
+    return box.clickedButton() == importButton ? FilelistOpenChoice::Import
+                                               : FilelistOpenChoice::OpenOnly;
+}
+
+void ProjectPanel::setFilelistOpenConfirmation(
+    std::function<FilelistOpenChoice(const QString &)> confirmation)
+{
+    filelistOpenConfirmation_ = std::move(confirmation);
+}
+
 bool ProjectPanel::removeFilelist(const QString &path)
 {
     if (model_ == nullptr) {
@@ -388,6 +504,150 @@ bool ProjectPanel::removeFilelist(const QString &path)
     setStatus(QCoreApplication::translate("VEdit", "Removed %1; the file set is being re-expanded").arg(path), false);
     updateUi();
     return true;
+}
+
+bool ProjectPanel::addIncludeDir(const QString &entry, QString *error)
+{
+    if (model_ == nullptr) {
+        const QString reason =
+            QCoreApplication::translate("VEdit", "No project model is attached");
+        setStatus(reason, true);
+        if (error != nullptr) {
+            *error = reason;
+        }
+        return false;
+    }
+    QString reason;
+    if (!model_->addIncludeDir(entry, &reason)) {
+        setStatus(reason, true);
+        if (error != nullptr) {
+            *error = reason;
+        }
+        return false;
+    }
+    // The model persisted the typed spelling and re-expanded; the list now shows
+    // it among the project's own rows.
+    setStatus(QCoreApplication::translate("VEdit", "Added -I %1").arg(entry.trimmed()), false);
+    updateUi();
+    if (error != nullptr) {
+        error->clear();
+    }
+    return true;
+}
+
+bool ProjectPanel::addDefine(const QString &entry, QString *error)
+{
+    if (model_ == nullptr) {
+        const QString reason =
+            QCoreApplication::translate("VEdit", "No project model is attached");
+        setStatus(reason, true);
+        if (error != nullptr) {
+            *error = reason;
+        }
+        return false;
+    }
+    QString reason;
+    if (!model_->addDefine(entry, &reason)) {
+        setStatus(reason, true);
+        if (error != nullptr) {
+            *error = reason;
+        }
+        return false;
+    }
+    setStatus(QCoreApplication::translate("VEdit", "Added -D %1").arg(entry.trimmed()), false);
+    updateUi();
+    if (error != nullptr) {
+        error->clear();
+    }
+    return true;
+}
+
+bool ProjectPanel::removeIncludeDir(const QString &entry)
+{
+    if (model_ == nullptr) {
+        setStatus(QCoreApplication::translate("VEdit", "No project model is attached"), true);
+        return false;
+    }
+    if (!model_->removeIncludeDir(entry)) {
+        // An effective row that came from the filelist/project file/tools page is
+        // not this project's entry to delete here; say so instead of nothing.
+        setStatus(QCoreApplication::translate(
+                      "VEdit", "%1 is not a project entry (it comes from a filelist, vedit.toml or the tools page)")
+                      .arg(entry),
+                  true);
+        return false;
+    }
+    setStatus(QCoreApplication::translate("VEdit", "Removed -I %1; re-expanding").arg(entry),
+              false);
+    updateUi();
+    return true;
+}
+
+bool ProjectPanel::removeDefine(const QString &entry)
+{
+    if (model_ == nullptr) {
+        setStatus(QCoreApplication::translate("VEdit", "No project model is attached"), true);
+        return false;
+    }
+    if (!model_->removeDefine(entry)) {
+        setStatus(QCoreApplication::translate(
+                      "VEdit", "%1 is not a project entry (it comes from a filelist, vedit.toml or the tools page)")
+                      .arg(entry),
+                  true);
+        return false;
+    }
+    setStatus(QCoreApplication::translate("VEdit", "Removed -D %1; re-expanding").arg(entry),
+              false);
+    updateUi();
+    return true;
+}
+
+bool ProjectPanel::removeSelectedIncludeDir()
+{
+    if (includeDirs_ == nullptr || includeDirs_->currentRow() < 0) {
+        return false;
+    }
+    QListWidgetItem *item = includeDirs_->currentItem();
+    return item != nullptr && removeIncludeDir(item->data(Qt::UserRole).toString());
+}
+
+bool ProjectPanel::removeSelectedDefine()
+{
+    if (defines_ == nullptr || defines_->currentRow() < 0) {
+        return false;
+    }
+    QListWidgetItem *item = defines_->currentItem();
+    return item != nullptr && removeDefine(item->data(Qt::UserRole).toString());
+}
+
+void ProjectPanel::onAddIncludeRequested()
+{
+    if (!interactive_) {
+        return;
+    }
+    bool accepted = false;
+    const QString entry = QInputDialog::getText(
+        this, QCoreApplication::translate("VEdit", "Add Include Dir"),
+        QCoreApplication::translate("VEdit", "Directory (relative paths resolve against the project root):"),
+        QLineEdit::Normal, QString(), &accepted);
+    if (accepted) {
+        addIncludeDir(entry);
+    }
+}
+
+void ProjectPanel::onAddDefineRequested()
+{
+    if (!interactive_) {
+        return;
+    }
+    bool accepted = false;
+    const QString entry = QInputDialog::getText(
+        this, QCoreApplication::translate("VEdit", "Add Define"),
+        QCoreApplication::translate("VEdit", "Define (NAME or NAME=VALUE):"), QLineEdit::Normal,
+        QString(), &accepted);
+    if (accepted) {
+        addDefine(entry);
+    }
 }
 
 void ProjectPanel::activateFile(int row)
@@ -427,7 +687,7 @@ bool ProjectPanel::promptForMissingVariables()
         return false;
     }
     const QMap<QString, QString> known = ProjectVariablesDialog::parseTable(model_->variables());
-    ProjectVariablesDialog dialog(variableRowNames(), known, this);
+    ProjectVariablesDialog dialog(variableRowNames(), known, this, variableLayers());
     if (dialog.exec() != QDialog::Accepted) {
         setStatus(QCoreApplication::translate("VEdit", "Import completed with %1 unresolved variable(s); the affected "
                                  ".f lines stay listed below")
@@ -451,7 +711,7 @@ bool ProjectPanel::editVariables()
     const QMap<QString, QString> known = ProjectVariablesDialog::parseTable(model_->variables());
     // RM-3: an EMPTY table still opens the dialog — adding a variable is the
     // whole point, so "the project uses none yet" is not a reason to refuse.
-    ProjectVariablesDialog dialog(variableRowNames(), known, this);
+    ProjectVariablesDialog dialog(variableRowNames(), known, this, variableLayers());
     if (dialog.exec() != QDialog::Accepted) {
         return false;
     }
@@ -462,6 +722,35 @@ bool ProjectPanel::editVariables()
 void ProjectPanel::onEditVariablesRequested()
 {
     editVariables();
+}
+
+QMap<QString, QString> ProjectPanel::variableLayers() const
+{
+    QMap<QString, QString> layers;
+    if (model_ == nullptr) {
+        return layers;
+    }
+    // A table entry BELONGS to the project layer (highest priority), so it answers
+    // `project` even when the same name is also exported in the process env: the
+    // table is what wins, and that is what the dialog must say.
+    for (const QString &name : ProjectVariablesDialog::parseTable(model_->variables()).keys()) {
+        layers.insert(name, QStringLiteral("project"));
+    }
+    // The expansion's own answer for the names it referenced. A projected name is
+    // already `project` above; every other layer is added verbatim.
+    const QStringList referenced = model_->referencedVariables();
+    const QStringList referencedLayers = model_->referencedVariableLayers();
+    const int count = std::min(referenced.size(), referencedLayers.size());
+    for (int index = 0; index < count; ++index) {
+        if (!layers.contains(referenced.at(index))) {
+            layers.insert(referenced.at(index), referencedLayers.at(index));
+        }
+    }
+    // Required (still unresolved) names: nothing provides them.
+    for (const QString &missing : model_->missingVariables()) {
+        layers.insert(missing, QStringLiteral("missing"));
+    }
+    return layers;
 }
 
 QStringList ProjectPanel::variableRowNames() const
@@ -684,15 +973,34 @@ void ProjectPanel::updateUi()
         item->setData(Qt::UserRole, model_->files().value(row));
     }
 
-    const QStringList includeDirs = model_->includeDirs();
+    // AC-1.5: the list shows the project's OWN entries as typed (editable rows)
+    // followed by the effective entries the expansion contributed. The raw value
+    // travels in UserRole, so Remove acts on what the row really is.
+    const QStringList includeDirs = model_->displayIncludeDirs();
     includeHeader_->setText(QCoreApplication::translate("VEdit", "Include dirs (-I) (%1)").arg(includeDirs.size()));
     includeDirs_->clear();
-    includeDirs_->addItems(includeDirs);
+    for (const QString &row : includeDirs) {
+        auto *item = new QListWidgetItem(row, includeDirs_);
+        item->setData(Qt::UserRole, row);
+        item->setToolTip(row);
+    }
+    removeIncludeButton_->setEnabled(includeDirs_->currentRow() >= 0);
 
-    const QStringList defines = model_->defines();
+    const QStringList defines = model_->displayDefines();
     definesHeader_->setText(QCoreApplication::translate("VEdit", "Defines (-D) (%1)").arg(defines.size()));
     defines_->clear();
-    defines_->addItems(defines);
+    for (const QString &row : defines) {
+        auto *item = new QListWidgetItem(row, defines_);
+        item->setData(Qt::UserRole, row);
+        item->setToolTip(row);
+    }
+    removeDefineButton_->setEnabled(defines_->currentRow() >= 0);
+    if (addIncludeButton_ != nullptr) {
+        addIncludeButton_->setEnabled(model_->hasProject());
+    }
+    if (addDefineButton_ != nullptr) {
+        addDefineButton_->setEnabled(model_->hasProject());
+    }
 
     const QStringList variables = model_->variables();
     variablesHeader_->setText(QCoreApplication::translate("VEdit", "Variables (%1)").arg(variables.size()));

@@ -29,37 +29,6 @@ PanelRegistry::~PanelRegistry()
 
 namespace {
 
-QWidget *makePlaceholder(const PanelSpec &spec, const QString &hint)
-{
-    auto *placeholder = new QWidget();
-    placeholder->setObjectName(QStringLiteral("panel-placeholder-") + spec.id);
-    auto *layout = new QVBoxLayout(placeholder);
-    layout->setContentsMargins(10, 10, 10, 10);
-
-    auto *title = new QLabel(QStringLiteral("%1").arg(spec.title), placeholder);
-    QFont titleFont = title->font();
-    titleFont.setBold(true);
-    title->setFont(titleFont);
-    layout->addWidget(title);
-
-    auto *seam = new QLabel(
-        QStringLiteral("Content seam: %1 lane\nThis dock is the shell's placeholder; the lane replaces the\n"
-                       "factory through PanelRegistry::setFactory(\"%2\", ...).")
-            .arg(spec.owner, spec.id),
-        placeholder);
-    seam->setWordWrap(true);
-    layout->addWidget(seam);
-
-    auto *empty = new QLabel(hint.isEmpty() ? QCoreApplication::translate("VEdit", "Empty state: no project / no data.")
-                                            : hint,
-                             placeholder);
-    empty->setWordWrap(true);
-    empty->setObjectName(QStringLiteral("panel-empty-state-") + spec.id);
-    layout->addWidget(empty);
-    layout->addStretch(1);
-    return placeholder;
-}
-
 // 卡片投影（UI-Mosaic V5/V6）：浅色主题轻量、柔和——blur 12、offset (0,1)、α22。
 // 深色主题（V8）不加投影：画布本身接近黑色，黑投影既看不见，又把卡片之间压成
 // 一片，"暗色模式就别阴影了太黑了直接描边吧"——只保留 1px 描边。
@@ -192,23 +161,19 @@ void PanelRegistry::setFactory(const QString &id, std::function<QWidget *()> fac
 
 void PanelRegistry::setPlaceholderHint(const QString &id, const QString &hint)
 {
-    hints_.insert(id, hint);
+    // Batch 20261110 (AC-1.6): the placeholder it used to feed is gone, so this
+    // stores nothing. Kept as a compile-time seam for the ONE call site this task
+    // does not own (src/workspace/module_tree/module_tree_integration.cpp:560 and
+    // :571); whoever touches that lane should delete the two calls and then this
+    // method with them.
+    Q_UNUSED(id);
+    Q_UNUSED(hint);
 }
 
 void PanelRegistry::setVisibilityListener(
     std::function<void(const QString &id, bool visible)> listener)
 {
     visibilityListener_ = std::move(listener);
-}
-
-QWidget *PanelRegistry::createContent(const PanelSpec &spec) const
-{
-    if (spec.factory) {
-        if (QWidget *widget = spec.factory()) {
-            return widget;
-        }
-    }
-    return makePlaceholder(spec, hints_.value(spec.id));
 }
 
 QDockWidget *PanelRegistry::insert(const QString &id, QMainWindow *window)
@@ -230,10 +195,23 @@ QDockWidget *PanelRegistry::insert(const QString &id, QMainWindow *window)
         return nullptr;
     }
     const PanelSpec &spec = it.value();
+    // Batch 20261110 (AC-1.6): an UNOWNED panel does not render. The shell used to
+    // insert a placeholder widget here that named the owning lane and the factory
+    // seam; by the time the product inserts a dock its lane has registered the
+    // factory, so that branch only ever produced developer text inside a real dock.
+    // A spec with no factory — or a factory that declines by returning nullptr —
+    // therefore creates NO dock, and toggle()/showPanel() report "not available"
+    // instead of showing an apology.
+    if (!spec.factory) {
+        return nullptr;
+    }
+    QWidget *content = spec.factory();
+    if (content == nullptr) {
+        return nullptr;
+    }
     auto *dock = new QDockWidget(spec.title, window_);
     dock->setObjectName(QStringLiteral("dock-") + spec.id);
     dock->setAllowedAreas(Qt::AllDockWidgetAreas);
-    QWidget *content = createContent(spec);
     dock->setWidget(content);
     applyCardChrome(dock);
     window_->addDockWidget(spec.area, dock);

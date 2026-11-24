@@ -1,6 +1,7 @@
 #include "diagnostics_panel.h"
 
 #include "diagnostics_controller.h"
+#include "diagnostics_hint.h"
 #include "diagnostics_outline_model.h"
 
 #include "jump/jump_registry.h"
@@ -116,6 +117,17 @@ DiagnosticsPanel::DiagnosticsPanel(DiagnosticsController *controller, QWidget *p
     issues_->setVisible(false);
     layout->addWidget(issues_);
 
+    // AC-3 (batch-20261117): ONE persistent hint under the issues list. It is
+    // deliberately not a diagnostic row: Verible's preprocessing error keeps its
+    // position and the counts stay untouched; the hint only names the cause and
+    // the fix. Empty text and hidden until the rows say otherwise.
+    hint_ = new QLabel(this);
+    hint_->setObjectName(QStringLiteral("diagnosticsPreprocessHint"));
+    hint_->setWordWrap(true);
+    hint_->setContentsMargins(6, 0, 6, 0);
+    hint_->setVisible(false);
+    layout->addWidget(hint_);
+
     // AC-6.4 / AC-10.3.3: an explicit empty state that names the next step.
     diagnosticsEmpty_ = new QLabel(this);
     diagnosticsEmpty_->setObjectName(QStringLiteral("diagnosticsIssuesEmpty"));
@@ -152,9 +164,38 @@ DiagnosticsPanel::DiagnosticsPanel(DiagnosticsController *controller, QWidget *p
 void DiagnosticsPanel::poll()
 {
     if (controller_ != nullptr) {
+        // The controller poll advances the LSP/CLI analysis; the panel is its
+        // only driver, so hiding the dock must NEVER stall the backends (T9):
+        // only the WIDGET rebuild below is skipped.
         controller_->refresh();
+        // T9 fix (4): a dock the user cannot see does no list work.
+        if (!isVisible() && shownOnce_) {
+            staleWhileHidden_ = true;
+            return;
+        }
+        // T9 fix (3): one rebuild per CHANGE, not per 300 ms tick. The token
+        // moves for structural AND per-file changes, so nothing is missed.
+        const quint64 token = controller_->changeSerial();
+        if (!staleWhileHidden_ && token == lastRefreshedChangeSerial_) {
+            return;
+        }
+        lastRefreshedChangeSerial_ = token;
     }
+    staleWhileHidden_ = false;
     refreshFromController();
+}
+
+void DiagnosticsPanel::showEvent(QShowEvent *event)
+{
+    QWidget::showEvent(event);
+    shownOnce_ = true;
+    // The dock may have been hidden while the view moved: show the CURRENT
+    // state immediately instead of waiting for the next 300 ms tick.
+    staleWhileHidden_ = false;
+    refreshFromController();
+    if (controller_ != nullptr) {
+        lastRefreshedChangeSerial_ = controller_->changeSerial();
+    }
 }
 
 QString DiagnosticsPanel::statusText() const
@@ -233,6 +274,23 @@ QString DiagnosticsPanel::diagnosticsEmptyStateText() const
     if (controller_ == nullptr) {
         return QString();
     }
+    // batch-20261116 L1.2: when there IS no analysis path, the panel NAMES it -
+    // one explicit line (no analyzer for a `.f`/`.md`, above the byte cap, top
+    // scope excluded, buffer pending). The old text said "no problems reported
+    // for <file>", which reads as a clean verdict for a file nothing analysed.
+    // batch-20261118 AC-2: the server produced NEITHER diagnostics NOR symbols
+    // for this file. "No diagnostics — no problems reported" would be a clean
+    // verdict nothing earned; the state names what actually happened.
+    if (controller_->serverSilent()) {
+        return QCoreApplication::translate(
+            "VEdit",
+            "Not analysed — the language server produced no symbols and no diagnostics "
+            "for this file (no build context / no response / the session failed).");
+    }
+    const QString reason = controller_->realtimeReason();
+    if (!reason.isEmpty()) {
+        return QCoreApplication::translate("VEdit", "No diagnostics — %1.").arg(reason);
+    }
     const QStringList missing = controller_->toolchainReport().missing();
     QString nextStep;
     if (!controller_->analyzeFileName().isEmpty()) {
@@ -253,6 +311,16 @@ QString DiagnosticsPanel::diagnosticsEmptyStateText() const
 bool DiagnosticsPanel::diagnosticsEmptyStateVisible() const
 {
     return diagnosticsEmpty_ != nullptr && diagnosticsEmpty_->isVisibleTo(this);
+}
+
+bool DiagnosticsPanel::hintVisible() const
+{
+    return hint_ != nullptr && hint_->isVisibleTo(this);
+}
+
+QString DiagnosticsPanel::hintText() const
+{
+    return hint_ != nullptr ? hint_->text() : QString();
 }
 
 QWidget *DiagnosticsPanel::outlineWidget() const
@@ -293,18 +361,32 @@ void DiagnosticsPanel::refreshFromController()
         if (!toolchain.isEmpty()) {
             status_->setText(toolchain);
         } else if (!controller_->analyzeFileName().isEmpty()) {
-            const QDateTime at = controller_->lastAnalysisAt();
-            status_->setText(QCoreApplication::translate("VEdit", "%1 — analyzed %2 (%3): %4 diagnostic(s)")
-                                 .arg(QFileInfo(controller_->analyzeFileName()).fileName(),
-                                      at.isValid() ? at.toString(QStringLiteral("HH:mm:ss"))
-                                                   : QCoreApplication::translate("VEdit", "pending"),
-                                      controller_->analyzeWasDirty()
-                                          ? QCoreApplication::translate("VEdit", "editor buffer, not saved yet")
-                                          : QCoreApplication::translate("VEdit", "saved file"),
-                                      QString::number(controller_->mergedDiagnostics().size())));
+            // batch-20261118 AC-3: a session that went Failed after Ready is a
+            // STATE on this line (with the bounded restart count and the
+            // server's own stderr tail), not a silent "pending" analysis.
+            const SessionSnapshot session = controller_->session();
+            if (session.state == BackendState::Failed) {
+                status_->setText(
+                    QCoreApplication::translate("VEdit",
+                                                "%1 — session FAILED (restarts %2): %3")
+                        .arg(QFileInfo(controller_->analyzeFileName()).fileName())
+                        .arg(session.restarts)
+                        .arg(session.message));
+            } else {
+                const QDateTime at = controller_->lastAnalysisAt();
+                status_->setText(
+                    QCoreApplication::translate("VEdit", "%1 — analyzed %2 (%3): %4 diagnostic(s)")
+                        .arg(QFileInfo(controller_->analyzeFileName()).fileName(),
+                             at.isValid() ? at.toString(QStringLiteral("HH:mm:ss"))
+                                          : QCoreApplication::translate("VEdit", "pending"),
+                             controller_->analyzeWasDirty()
+                                 ? QCoreApplication::translate("VEdit", "editor buffer, not saved yet")
+                                 : QCoreApplication::translate("VEdit", "saved file"),
+                             QString::number(controller_->mergedDiagnosticCount())));
+            }
         } else {
             const QString message = controller_->session().message;
-            const int merged = controller_->mergedDiagnostics().size();
+            const int merged = controller_->mergedDiagnosticCount();
             // composeSessionMessage() already ends with "diagnostics N".
             // Appending the same merged count again printed it twice
             // ("diagnostics 2 — 2 diagnostic(s)"); only append when the message
@@ -327,6 +409,14 @@ void DiagnosticsPanel::refreshFromController()
                                                 "See the status line above for the one-line fix.")
                                      .arg(missing.join(QStringLiteral(", "))));
             emptyState_->setVisible(true);
+        } else if (!controller_->realtimeReason().isEmpty()) {
+            // L1.2: the same one-line reason reaches the outline surface, so a
+            // `.f`/capped/excluded document does not look like "analysis is
+            // starting" forever.
+            emptyState_->setText(
+                QCoreApplication::translate("VEdit", "No symbols — %1.")
+                    .arg(controller_->realtimeReason()));
+            emptyState_->setVisible(true);
         } else if (!controller_->analyzeFileName().isEmpty()) {
             emptyState_->setText(QCoreApplication::translate("VEdit", "No symbols yet for %1 — analysis is starting, "
                                                 "or this file has no structure.")
@@ -346,6 +436,7 @@ void DiagnosticsPanel::rebuildDiagnostics()
     if (issues_ == nullptr) {
         return;
     }
+    ++rebuildCount_;
     issues_->clear();
     issueRowCount_ = 0;
     errorCount_ = 0;
@@ -355,10 +446,38 @@ void DiagnosticsPanel::rebuildDiagnostics()
     QVector<DiagnosticEntry> errors;
     QVector<DiagnosticEntry> warnings;
     QVector<DiagnosticEntry> others;
+    // The rows this rebuild renders: the hint below reads the SAME set, so the
+    // sentence and the list can never disagree (AC-3).
+    QVector<DiagnosticEntry> rows;
     if (controller_ != nullptr) {
         // R2: the panel renders the ONE merged view (project pass = upper,
         // per-file/LSP = lower), never both layers of the same file.
-        for (const DiagnosticEntry &entry : controller_->mergedDiagnostics()) {
+        //
+        // batch-20261115 AC-3.2 + AC-4.3: this is the REALTIME surface. It lists
+        // the ACTIVE document's LOWER (per-file/LSP) rows only:
+        //   * the session covers the open documents' level-1 closures (AC-3.1), so
+        //     a submodule's rows exist in the store but must not appear - or be
+        //     jumped to - while another file is being edited;
+        //   * the whole-project (upper) rows live in the dedicated Project Lint
+        //     dock, so the two panels never show the same row (AC-4.3).
+        // No analysed document (headless pass, no editor) keeps the historical
+        // whole merged view.
+        // F2 (Review B, High): NO whole-view fallback. The Outline is the
+        // realtime surface and never shows an upper (whole-project) row: with no
+        // analysed document it is EMPTY (its empty state names the reason), not a
+        // window onto the project result - that result has its own dock.
+        //
+        // batch-20261116 L1.2: when the document in front of the user has NO
+        // analysis path (`.f`/`.md`, above the byte cap, an empty buffer), the
+        // panel reads the WATCHER's document - not the previous HDL file's - so
+        // a stale row of the file the user just switched away from can never be
+        // painted under the new document.
+        const QString displayFile = controller_->documentAnalysisAvailable()
+            ? controller_->realtimeDisplayFile()
+            : controller_->documentAnalysisPath();
+        rows = displayFile.isEmpty() ? QVector<DiagnosticEntry>{}
+                                     : controller_->lowerRowsForFile(displayFile);
+        for (const DiagnosticEntry &entry : rows) {
             switch (groupForSeverity(entry.severity)) {
             case 1:
                 errors.append(entry);
@@ -450,6 +569,16 @@ void DiagnosticsPanel::rebuildDiagnostics()
             diagnosticsEmpty_->setText(diagnosticsEmptyStateText());
             diagnosticsEmpty_->setVisible(true);
         }
+    }
+    if (hint_ != nullptr) {
+        // AC-3: refreshed from the same rows this rebuild rendered, and keyed on
+        // the backend that produced them. An empty answer clears the label, so a
+        // stale sentence never outlives its rows (edit, undo, backend switch).
+        const QString hint = controller_ != nullptr
+            ? veriblePreprocessHint(controller_->session().backendName, rows)
+            : QString();
+        hint_->setText(hint);
+        hint_->setVisible(!hint.isEmpty());
     }
 }
 

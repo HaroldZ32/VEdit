@@ -59,7 +59,9 @@ use std::path::{Path, PathBuf};
 
 use anyhow::{Context, Result};
 
-pub use env::{Env, XdgDirs};
+pub use env::{
+    CaptureError, CaptureOutcome, Env, EnvironmentSelection, ShellInit, ShellKind, XdgDirs,
+};
 pub use language::{Capability, LanguageSpec, LANGUAGES};
 pub use model::{
     Config, EditorConfig, FimConfig, FimProtocol, KeysConfig, ProjectSettings, UiConfig,
@@ -387,7 +389,10 @@ const KNOWN_SECTIONS: &[(&str, &[&str])] = &[
     ),
     ("keys", &[]),
     ("verible", &["ls", "format", "lint"]),
-    ("project", &["filelists", "include_dirs", "defines"]),
+    (
+        "project",
+        &["filelists", "include_dirs", "defines", "auto_discover"],
+    ),
     (
         "fim",
         &[

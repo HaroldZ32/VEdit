@@ -41,8 +41,27 @@ fn tempdir(label: &str) -> tempfile::TempDir {
         .unwrap_or_else(|error| panic!("tempdir failed: {error}"))
 }
 
+/// One spawning test at a time.
+///
+/// Fake tools are written to disk and then exec'd. A `fork` in ANOTHER test
+/// thread can inherit a script's write descriptor for a moment; exec'ing that
+/// script while such a child still holds the descriptor fails with `ETXTBSY`
+/// ("Text file busy"). `fake_binary.rs`, `catalog.rs` and `hierarchy.rs` already
+/// serialize their spawning bodies for this reason; this file now spawns more
+/// tools (the project pass and its fallback), so it serializes too. Test-only
+/// synchronization: no assertion changed, nothing is retried.
+static SPAWN_SERIAL: std::sync::Mutex<()> = std::sync::Mutex::new(());
+
+fn spawn_serial() -> std::sync::MutexGuard<'static, ()> {
+    match SPAWN_SERIAL.lock() {
+        Ok(guard) => guard,
+        Err(poisoned) => poisoned.into_inner(),
+    }
+}
+
 #[test]
 fn the_slang_argv_carries_the_project_include_dirs_and_defines() {
+    let _serial = spawn_serial();
     let dir = tempdir("vd-argv-");
     let argv_file = dir.path().join("argv.txt");
     // A fake slang: dump the raw argv, then write a valid empty JSON report.
@@ -99,6 +118,7 @@ fn the_slang_argv_carries_the_project_include_dirs_and_defines() {
 
 #[test]
 fn the_verible_engine_parses_findings_and_records_its_tool() {
+    let _serial = spawn_serial();
     let dir = tempdir("vd-verible-");
     let fake = script(
         dir.path(),
@@ -145,6 +165,7 @@ fn the_verible_engine_parses_findings_and_records_its_tool() {
 
 #[test]
 fn a_batch_reports_progress_and_finishes_over_the_whole_set() {
+    let _serial = spawn_serial();
     let dir = tempdir("vd-batch-");
     let fake = script(
         dir.path(),
@@ -188,6 +209,7 @@ fn a_batch_reports_progress_and_finishes_over_the_whole_set() {
 
 #[test]
 fn cancel_stops_the_pass_and_no_later_file_is_linted() {
+    let _serial = spawn_serial();
     let dir = tempdir("vd-cancel-");
     let marker = dir.path().join("invocations.txt");
     // Every invocation records itself, then sleeps: the pass must be cancellable
@@ -309,6 +331,7 @@ fn run_pass(handle: &BatchHandle) -> vd_deeplint::BatchReport {
 
 #[test]
 fn a_warning_flood_is_deduped_and_never_fails_the_pass() {
+    let _serial = spawn_serial();
     let dir = tempdir("vd-flood-");
     let pid_file = dir.path().join("child.pid");
     let json = flood_json(300, 50);
@@ -388,6 +411,7 @@ fn a_warning_flood_is_deduped_and_never_fails_the_pass() {
 
 #[test]
 fn the_pass_count_bound_drops_but_reports_and_never_fails() {
+    let _serial = spawn_serial();
     let dir = tempdir("vd-passcap-");
     let fake = diagnostics_script(dir.path(), "slang", &flood_json(0, 60));
     let file = dir.path().join("cap.sv");
@@ -421,6 +445,7 @@ fn the_pass_count_bound_drops_but_reports_and_never_fails() {
 
 #[test]
 fn a_failed_file_is_named_with_its_reason_and_the_other_files_still_report() {
+    let _serial = spawn_serial();
     let dir = tempdir("vd-failnamed-");
     let fake = script(
         dir.path(),
@@ -439,12 +464,42 @@ fn a_failed_file_is_named_with_its_reason_and_the_other_files_still_report() {
         timeout: Duration::from_secs(5),
         ..EngineOptions::default()
     };
-    let handle = BatchHandle::start(vec![good, bad], options)
+    let handle = BatchHandle::start(vec![good.clone(), bad.clone()], options)
         .unwrap_or_else(|error| panic!("batch start: {}", error.user_message()));
     let report = run_pass(&handle);
 
     assert_eq!(report.phase, BatchPhase::Finished, "{}", report.summary());
-    assert_eq!(report.diagnostics.len(), 1, "the good file still reports");
+    // AUTHORIZATION (batch 20261110d, T3 "lint one project pass"): the captain
+    // ruled this assertion may be replaced. `fix-engine-failed` added ONE
+    // `engine-failed` Error row for a failed file, and this pass now first tries
+    // one whole-project slang process (the fake writes malformed JSON for it, so
+    // the pass falls back to per-file). The replacement is STRONGER, not weaker:
+    // it still requires the good file's real row and additionally requires the
+    // failed file to be named by its own row. Old -> new and the ruling:
+    // evidence/batch-20261110d/fix-cross-file-defines/AUTHORIZATION.md
+    assert!(
+        report
+            .diagnostics
+            .iter()
+            .any(|entry| entry.file == good && entry.diagnostic.code == "W1"),
+        "the good file still reports: {:?}",
+        report.diagnostics
+    );
+    assert!(
+        report
+            .diagnostics
+            .iter()
+            .any(|entry| entry.file == bad && entry.diagnostic.code == "engine-failed"),
+        "the failed file is named by its own error row, not shown as clean: {:?}",
+        report.diagnostics
+    );
+    // The whole-project attempt must have been tried and its abandonment NAMED:
+    // the fake cannot answer a single invocation over both files.
+    assert!(
+        report.fallback.is_some(),
+        "the fallback to per-file linting is recorded: {}",
+        report.summary()
+    );
     assert_eq!(
         report.failures.len(),
         1,
@@ -469,6 +524,386 @@ fn a_failed_file_is_named_with_its_reason_and_the_other_files_still_report() {
     assert!(
         summary.contains("1 file(s) failed"),
         "the pass summary counts the failure: {summary}"
+    );
+}
+
+#[test]
+fn a_crashed_engine_is_a_named_error_row_not_a_clean_verdict() {
+    let _serial = spawn_serial();
+    let dir = tempdir("vd-crash-");
+    let fake = script(
+        dir.path(),
+        "slang",
+        "#!/bin/sh\nprev=\"\"\nfor arg in \"$@\"; do\n  if [ \"$prev\" = \"--diag-json\" ]; then out=\"$arg\"; fi\n  prev=\"$arg\"\ndone\ncase \"$*\" in\n  *bad.sv*) echo 'slang: internal error' >&2; kill -SEGV $$ ;;\n  *) printf '%s' '[{\"severity\":\"warning\",\"message\":\"ok\",\"code\":\"W1\",\"location\":\"good.sv:1:1\"}]' > \"$out\" ;;\nesac\nexit 1\n",
+    );
+    let good = dir.path().join("good.sv");
+    let bad = dir.path().join("bad.sv");
+    fs::write(&good, "module good;\nendmodule\n")
+        .unwrap_or_else(|error| panic!("write good: {error}"));
+    fs::write(&bad, "module bad;\nendmodule\n")
+        .unwrap_or_else(|error| panic!("write bad: {error}"));
+    let options = EngineOptions {
+        engine: LintEngine::Slang,
+        slang_binary: Some(fake),
+        timeout: Duration::from_secs(5),
+        ..EngineOptions::default()
+    };
+    let control = BatchHandle::start(vec![good.clone()], options.clone())
+        .unwrap_or_else(|error| panic!("control batch start: {}", error.user_message()));
+    let control = run_pass(&control);
+    let handle = BatchHandle::start(vec![good.clone(), bad.clone()], options)
+        .unwrap_or_else(|error| panic!("batch start: {}", error.user_message()));
+    let report = run_pass(&handle);
+
+    assert_eq!(report.phase, BatchPhase::Finished, "{}", report.summary());
+    // (a) ONE honest Error row for the crashed file: never "covered + no rows".
+    let crashed: Vec<&vd_deeplint::BatchDiagnostic> = report
+        .diagnostics
+        .iter()
+        .filter(|entry| entry.file == bad && entry.diagnostic.code == "engine-failed")
+        .collect();
+    assert_eq!(
+        crashed.len(),
+        1,
+        "exactly one engine-failed row for the crashed file: {:?}",
+        report.diagnostics
+    );
+    assert_eq!(crashed[0].diagnostic.severity, Severity::Error);
+    assert_eq!(crashed[0].diagnostic.repeat, 1);
+    assert!(
+        crashed[0].diagnostic.editor_range.is_none(),
+        "a crashed engine has no position"
+    );
+    assert!(
+        crashed[0].diagnostic.message.contains("slang")
+            && crashed[0].diagnostic.message.contains("signal 11")
+            && crashed[0].diagnostic.message.contains("SIGSEGV"),
+        "the row names the tool and the signal: {}",
+        crashed[0].diagnostic.message
+    );
+    // (b) the good file's real diagnostics still report.
+    let good_rows: Vec<&vd_deeplint::BatchDiagnostic> = report
+        .diagnostics
+        .iter()
+        .filter(|entry| entry.file == good && entry.diagnostic.code == "W1")
+        .collect();
+    assert_eq!(good_rows.len(), 1, "the good file still reports");
+    // (c) no temporary path leaks into any user-visible message.
+    let mut messages: Vec<&str> = report
+        .diagnostics
+        .iter()
+        .map(|entry| entry.diagnostic.message.as_str())
+        .collect();
+    messages.extend(
+        report
+            .failures
+            .iter()
+            .map(|failure| failure.message.as_str()),
+    );
+    let summary = report.summary();
+    messages.push(&summary);
+    for message in messages {
+        assert!(
+            !message.contains("vd-deeplint-") && !message.contains("diagnostics.json"),
+            "a temporary path leaked into the verdict: {message}"
+        );
+    }
+    assert_eq!(
+        report.failures.len(),
+        1,
+        "the crashed file is still recorded as a per-file failure"
+    );
+    // (d) the good file's row count is unchanged by the crash next to it.
+    assert_eq!(
+        good_rows.len(),
+        control
+            .diagnostics
+            .iter()
+            .filter(|entry| entry.file == good && entry.diagnostic.code == "W1")
+            .count(),
+        "the crash changed the good file's row count"
+    );
+    assert_eq!(report.total_diagnostics, control.total_diagnostics);
+}
+
+/// A fake slang that distinguishes ONE-file invocations from the whole-set
+/// invocation. It records every invocation's argv and its `*.sv` argument count,
+/// writes `single_json`/`multi_json` to the `--diag-json` path and exits with the
+/// matching code. That is exactly the two shapes the batch can produce.
+fn project_aware_slang(
+    dir: &Path,
+    single_json: &str,
+    multi_json: &str,
+    single_code: i32,
+    multi_code: i32,
+) -> (PathBuf, PathBuf, PathBuf) {
+    let argv_file = dir.join("argv.txt");
+    let runs_file = dir.join("runs.txt");
+    let single = single_json.replace('\'', "'\\''");
+    let multiple = multi_json.replace('\'', "'\\''");
+    let fake = script(
+        dir,
+        "slang",
+        &format!(
+            "#!/bin/sh\nprintf '%s\\n' \"$@\" >> '{argv}'\necho '---' >> '{runs}'\nprev=\"\"\ncount=0\nfor arg in \"$@\"; do\n  if [ \"$prev\" = \"--diag-json\" ]; then out=\"$arg\"; fi\n  case \"$arg\" in *.sv) count=$((count+1));; esac\n  prev=\"$arg\"\ndone\necho \"$count\" >> '{runs}'\nif [ \"$count\" -gt 1 ]; then\n  printf '%s' '{multiple}' > \"$out\"\n  exit {multi_code}\nfi\nprintf '%s' '{single}' > \"$out\"\nexit {single_code}\n",
+            argv = argv_file.display(),
+            runs = runs_file.display(),
+        ),
+    );
+    (fake, argv_file, runs_file)
+}
+
+fn batch_over(fake: PathBuf, files: Vec<PathBuf>) -> vd_deeplint::BatchReport {
+    let options = EngineOptions {
+        engine: LintEngine::Slang,
+        slang_binary: Some(fake),
+        timeout: Duration::from_secs(10),
+        ..EngineOptions::default()
+    };
+    run_pass(
+        &BatchHandle::start(files, options)
+            .unwrap_or_else(|error| panic!("batch start: {}", error.user_message())),
+    )
+}
+
+#[test]
+fn a_slang_batch_lints_the_project_in_one_single_unit_invocation() {
+    let _serial = spawn_serial();
+    let dir = tempdir("vd-project-pass-");
+    let (fake, argv_file, runs_file) = project_aware_slang(dir.path(), "[]", "[]", 0, 0);
+    let mut files = Vec::new();
+    for index in 0..3 {
+        let file = dir.path().join(format!("p{index}.sv"));
+        fs::write(&file, "module m;\nendmodule\n")
+            .unwrap_or_else(|error| panic!("write source: {error}"));
+        files.push(file);
+    }
+    // Every knob the per-file pass sent must reach the ONE project invocation:
+    // a knob that silently missed the set pass would be an invisible regression.
+    let options = EngineOptions {
+        engine: LintEngine::Slang,
+        slang_binary: Some(fake),
+        include_dirs: vec![dir.path().join("inc")],
+        defines: vec!["WIDTH=8".to_string()],
+        slang_suppressions: vec!["-Wno-unused".to_string()],
+        error_limit: Some(7),
+        timeout: Duration::from_secs(10),
+        ..EngineOptions::default()
+    };
+    let report = run_pass(
+        &BatchHandle::start(files.clone(), options)
+            .unwrap_or_else(|error| panic!("batch start: {}", error.user_message())),
+    );
+
+    assert_eq!(report.phase, BatchPhase::Finished, "{}", report.summary());
+    assert_eq!(report.done, 3, "the project pass covers every file");
+    assert_eq!(report.files_linted, 3);
+    assert!(report.fallback.is_none(), "{}", report.summary());
+    let runs = fs::read_to_string(&runs_file).unwrap_or_else(|error| panic!("runs: {error}"));
+    let counts: Vec<&str> = runs.lines().filter(|line| *line != "---").collect();
+    assert_eq!(
+        counts.as_slice(),
+        ["3"],
+        "ONE invocation received all three files, observed runs: {runs}"
+    );
+    let argv = fs::read_to_string(&argv_file).unwrap_or_else(|error| panic!("argv: {error}"));
+    assert!(
+        argv.lines().any(|arg| arg == "--single-unit"),
+        "the pass asks for ONE compilation unit (cross-file defines): {argv}"
+    );
+    for file in &files {
+        assert!(
+            argv.lines().any(|arg| arg == file.to_string_lossy()),
+            "{} is in the one invocation: {argv}",
+            file.display()
+        );
+    }
+    let incdir = format!("-I{}", dir.path().join("inc").display());
+    assert!(
+        argv.lines().any(|arg| arg == incdir),
+        "the include dir reaches the one pass: {argv}"
+    );
+    assert!(
+        argv.lines().any(|arg| arg == "-DWIDTH=8"),
+        "the project define reaches the one pass: {argv}"
+    );
+    assert!(
+        argv.lines().any(|arg| arg == "-Wno-unused"),
+        "the slang suppression reaches the one pass: {argv}"
+    );
+    assert!(
+        argv.lines().any(|arg| arg == "--error-limit=7"),
+        "the error limit reaches the one pass: {argv}"
+    );
+}
+
+#[test]
+fn a_failed_project_pass_falls_back_to_per_file_and_names_the_reason() {
+    let _serial = spawn_serial();
+    let dir = tempdir("vd-project-fail-");
+    let (fake, _argv_file, runs_file) = project_aware_slang(
+        dir.path(),
+        "[{\"severity\":\"warning\",\"message\":\"per file\",\"code\":\"W1\",\"location\":\"good.sv:1:1\"}]",
+        "{ this is not json",
+        1,
+        1,
+    );
+    let good = dir.path().join("good.sv");
+    let other = dir.path().join("other.sv");
+    for file in [&good, &other] {
+        fs::write(file, "module m;\nendmodule\n")
+            .unwrap_or_else(|error| panic!("write source: {error}"));
+    }
+    let report = batch_over(fake, vec![good.clone(), other.clone()]);
+
+    assert_eq!(report.phase, BatchPhase::Finished, "{}", report.summary());
+    let reason = report
+        .fallback
+        .clone()
+        .unwrap_or_else(|| panic!("the abandoned project pass is named: {}", report.summary()));
+    assert!(
+        reason.contains("whole-project") && reason.contains("JSON"),
+        "the reason names the stage that failed: {reason}"
+    );
+    assert!(
+        report.summary().contains("project pass fell back"),
+        "the pass summary names the fallback: {}",
+        report.summary()
+    );
+    assert_eq!(
+        report.diagnostics.len(),
+        2,
+        "the per-file verdict ran for both files: {:?}",
+        report.diagnostics
+    );
+    assert!(
+        report
+            .diagnostics
+            .iter()
+            .all(|entry| entry.diagnostic.code == "W1"),
+        "the rows are the per-file ones: {:?}",
+        report.diagnostics
+    );
+    assert!(report.failures.is_empty(), "{:?}", report.failures);
+    let runs = fs::read_to_string(&runs_file).unwrap_or_else(|error| panic!("runs: {error}"));
+    let counts: Vec<&str> = runs.lines().filter(|line| *line != "---").collect();
+    assert_eq!(
+        counts.first().copied(),
+        Some("2"),
+        "the first attempt was ONE call over both files: {runs}"
+    );
+    assert_eq!(counts.len(), 3, "then one call per file: {runs}");
+}
+
+#[test]
+fn an_unattributable_finding_falls_back_instead_of_guessing_a_file() {
+    let _serial = spawn_serial();
+    let dir = tempdir("vd-project-unattributed-");
+    let (fake, _argv_file, _runs_file) = project_aware_slang(
+        dir.path(),
+        "[{\"severity\":\"warning\",\"message\":\"per file\",\"code\":\"W1\",\"location\":\"u0.sv:1:1\"}]",
+        "[{\"severity\":\"error\",\"message\":\"too many errors\",\"code\":\"TooManyErrors\"}]",
+        1,
+        1,
+    );
+    let mut files = Vec::new();
+    for index in 0..2 {
+        let file = dir.path().join(format!("u{index}.sv"));
+        fs::write(&file, "module m;\nendmodule\n")
+            .unwrap_or_else(|error| panic!("write source: {error}"));
+        files.push(file);
+    }
+    let report = batch_over(fake, files);
+
+    assert_eq!(report.phase, BatchPhase::Finished, "{}", report.summary());
+    let reason = report
+        .fallback
+        .clone()
+        .unwrap_or_else(|| panic!("the unattributable row is named: {}", report.summary()));
+    assert!(
+        reason.contains("without a position") && reason.contains("attributed"),
+        "the reason says the row has no file: {reason}"
+    );
+    assert_eq!(
+        report.diagnostics.len(),
+        2,
+        "the fallback per-file verdict is published: {:?}",
+        report.diagnostics
+    );
+}
+
+#[test]
+fn a_finding_outside_the_project_set_falls_back_instead_of_naming_a_stranger() {
+    let _serial = spawn_serial();
+    let dir = tempdir("vd-project-stranger-");
+    let (fake, _argv_file, _runs_file) = project_aware_slang(
+        dir.path(),
+        "[{\"severity\":\"warning\",\"message\":\"per file\",\"code\":\"W1\",\"location\":\"s0.sv:1:1\"}]",
+        "[{\"severity\":\"warning\",\"message\":\"vendor header\",\"code\":\"W1\",\"location\":\"stranger.svh:3:1\"}]",
+        1,
+        1,
+    );
+    let mut files = Vec::new();
+    for index in 0..2 {
+        let file = dir.path().join(format!("s{index}.sv"));
+        fs::write(&file, "module m;\nendmodule\n")
+            .unwrap_or_else(|error| panic!("write source: {error}"));
+        files.push(file);
+    }
+    let report = batch_over(fake, files);
+
+    assert_eq!(report.phase, BatchPhase::Finished, "{}", report.summary());
+    let reason = report
+        .fallback
+        .clone()
+        .unwrap_or_else(|| panic!("the outside row is named: {}", report.summary()));
+    assert!(
+        reason.contains("stranger.svh") && reason.contains("not in the project file set"),
+        "the reason names the row outside the set: {reason}"
+    );
+}
+
+/// The task boundary: ONLY slang gets the one-process project pass. Verible's
+/// findings are textual and per file, so its batch keeps one process per file.
+#[test]
+fn the_verible_batch_stays_per_file() {
+    let _serial = spawn_serial();
+    let dir = tempdir("vd-verible-per-file-");
+    let runs_file = dir.path().join("runs.txt");
+    let fake = script(
+        dir.path(),
+        "verible-verilog-lint",
+        &format!(
+            "#!/bin/sh\ncount=0\nfor arg in \"$@\"; do\n  case \"$arg\" in *.sv) count=$((count+1));; esac\ndone\necho \"$count\" >> '{}'\nexit 0\n",
+            runs_file.display()
+        ),
+    );
+    let mut files = Vec::new();
+    for index in 0..2 {
+        let file = dir.path().join(format!("v{index}.sv"));
+        fs::write(&file, "module m;\nendmodule\n")
+            .unwrap_or_else(|error| panic!("write source: {error}"));
+        files.push(file);
+    }
+    let options = EngineOptions {
+        engine: LintEngine::Verible,
+        verible_binary: Some(fake),
+        timeout: Duration::from_secs(10),
+        ..EngineOptions::default()
+    };
+    let report = run_pass(
+        &BatchHandle::start(files, options)
+            .unwrap_or_else(|error| panic!("batch start: {}", error.user_message())),
+    );
+
+    assert_eq!(report.phase, BatchPhase::Finished, "{}", report.summary());
+    assert!(report.fallback.is_none(), "verible has no project pass");
+    assert_eq!(report.done, 2);
+    let runs = fs::read_to_string(&runs_file).unwrap_or_else(|error| panic!("runs: {error}"));
+    assert_eq!(
+        runs.lines().collect::<Vec<_>>(),
+        vec!["1", "1"],
+        "one verible process per file, observed: {runs}"
     );
 }
 

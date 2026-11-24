@@ -36,6 +36,12 @@ inline constexpr char kFimModel[] = "fim.model";
 inline constexpr char kFimTimeoutMs[] = "fim.timeout_ms";
 inline constexpr char kFimMaxTokens[] = "fim.max_tokens";
 inline constexpr char kFimGhostText[] = "fim.ghost_text";
+// batch-20261113 B1 (contract §12): the ownership marker. The page is only the
+// owner of the FIM keys once the user has edited the FIM page (or the store
+// already carries this key with the value "true"). Without it, a store written
+// by an older build — or by a user who never opened the FIM page — must NOT take
+// over the request path; the vedit.toml [fim] configuration keeps working.
+inline constexpr char kFimUiOwned[] = "fim.ui_owned";
 
 // Secret material: an environment variable and an optional owner-only file.
 inline constexpr char kFimApiKeyEnvironment[] = "VEDIT_FIM_API_KEY";

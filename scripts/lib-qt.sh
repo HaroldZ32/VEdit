@@ -118,11 +118,14 @@ run_in_qt6_container() {
   if ! docker info --format '{{json .SecurityOptions}}' 2>/dev/null | grep -q '"name=rootless"'; then
     user_args=(--user "$(id -u):$(id -g)")
   fi
+  # Forward the compile-parallelism cap: the container script reads it and falls
+  # back to 4 when unset. Without this -e the host override never reaches the build.
   docker run --rm "${user_args[@]}" \
     -v "$ROOT":/vedit-build \
     -w /vedit-build \
     -e HOME=/tmp \
     -e XDG_RUNTIME_DIR=/tmp/xdg-runtime \
     -e LANG=C.UTF-8 \
+    -e VEDIT_QT6_BUILD_JOBS \
     "$QT_BUILD_IMAGE_TAG" "$@"
 }

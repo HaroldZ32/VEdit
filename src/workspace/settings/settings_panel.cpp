@@ -17,6 +17,10 @@
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonValue>
 #include <QKeySequenceEdit>
 #include <QLabel>
 #include <QLineEdit>
@@ -26,7 +30,12 @@
 #include <QTabWidget>
 #include <QToolButton>
 #include <QTableWidget>
+#include <QThread>
 #include <QVBoxLayout>
+
+#if defined(VEDIT_SETTINGS_HAVE_FFI)
+#include "vd_ffi.h"
+#endif
 
 #include <utility>
 
@@ -42,6 +51,64 @@
 #include <QCoreApplication>
 #endif
 
+// batch-20261113 T5 Pass B — the Detect probe runner.
+//
+// `vd_fim_detect` is SYNCHRONOUS (it can block for up to ~2x the configured
+// timeout), so calling it from the page would freeze the window. This QObject is
+// executed in a QThread and reports back through a QUEUED signal: the panel
+// applies the result on the GUI thread, and if the dialog is destroyed while the
+// probe runs the connection dies with the receiver (the runner still deletes
+// itself), so no completion can touch a freed widget.
+class FimDetectRunner final : public QObject
+{
+    Q_OBJECT
+public:
+    FimDetectRunner(QString endpoint, QByteArray apiKey, int timeoutMs)
+        : endpoint_(std::move(endpoint))
+        , apiKey_(std::move(apiKey))
+        , timeoutMs_(timeoutMs)
+    {
+    }
+
+    void run()
+    {
+        const Qt::HANDLE threadId = QThread::currentThreadId();
+        char *raw = nullptr;
+#if defined(VEDIT_SETTINGS_HAVE_FFI)
+        const QByteArray endpointBytes = endpoint_.toUtf8();
+        const int result = vd_fim_detect(endpointBytes.constData(),
+                                         apiKey_.isEmpty() ? nullptr : apiKey_.constData(),
+                                         static_cast<uint32_t>(timeoutMs_), &raw);
+#else
+        const int result = -1;
+#endif
+        if (result != 0 || raw == nullptr) {
+            // -1 = unusable arguments. Network/auth failures are NOT this path:
+            // they are a successful probe whose JSON says ok=false.
+#if defined(VEDIT_SETTINGS_HAVE_FFI)
+            if (raw != nullptr) {
+                vd_fim_detect_free(raw);
+            }
+#endif
+            emit finished(-1, QString(), reinterpret_cast<qulonglong>(threadId));
+            return;
+        }
+        const QByteArray json(raw);
+#if defined(VEDIT_SETTINGS_HAVE_FFI)
+        vd_fim_detect_free(raw);
+#endif
+        emit finished(0, QString::fromUtf8(json), reinterpret_cast<qulonglong>(threadId));
+    }
+
+signals:
+    void finished(int result, const QString &json, qulonglong threadId);
+
+private:
+    QString endpoint_;
+    QByteArray apiKey_; // in memory only: never logged, never written to disk
+    int timeoutMs_ = 5000;
+};
+
 namespace vedit::workspace::settings {
 
 // T18: the interface-language runtime lives in the application shell; the panel
@@ -55,6 +122,10 @@ const char *const kThemeKey = "theme";
 // shared state, not a private detail of this panel.
 const char *const kUiThemeKey = "uiTheme";
 const char *const kKeymapPrefix = "keymap.";
+// batch-20261113 T5: the last detected model list, a NON-secret cache beside
+// settings.toml (same directory derivation as the API key file). It only feeds
+// the editable Model combo; nothing here ever carries a key.
+const char *const kFimModelsFileName = "fim_models.json";
 
 // FIM timeout/token bounds; the Rust transport clamps to the same range, so a
 // hand-edited file cannot make the UI spin outside it.
@@ -468,17 +539,69 @@ void SettingsPanel::buildUi()
     connect(definesEdit_, &QPlainTextEdit::textChanged, this,
             [this]() { persistFromWidgets(); });
 
-    // FIM page.
-    connect(fimEnabledCheck_, &QCheckBox::toggled, this, [this]() { persistFromWidgets(); });
-    connect(fimGhostCheck_, &QCheckBox::toggled, this, [this]() { persistFromWidgets(); });
-    connect(fimProtocolCombo_, &QComboBox::currentIndexChanged, this,
-            [this]() { persistFromWidgets(); });
-    for (QLineEdit *edit : {fimEndpointEdit_, fimModelEdit_}) {
-        connect(edit, &QLineEdit::editingFinished, this, [this]() { persistFromWidgets(); });
+    // FIM page. batch-20261113 B1 (contract §12) + F1 (§13): every one of these
+    // handlers is a USER expression of ONE field, so it records that field (and
+    // claims ownership) before persisting; the programmatic backfill is filtered
+    // by updating_ inside markFimExpressed.
+    connect(fimEnabledCheck_, &QCheckBox::toggled, this, [this]() {
+        markFimExpressed(FimField::Enabled);
+        persistFromWidgets();
+    });
+    connect(fimGhostCheck_, &QCheckBox::toggled, this, [this]() {
+        markFimExpressed(FimField::GhostText);
+        persistFromWidgets();
+    });
+    connect(fimProtocolCombo_, &QComboBox::currentIndexChanged, this, [this]() {
+        markFimExpressed(FimField::Protocol);
+        persistFromWidgets();
+    });
+    // batch-20261113 T5: a provider choice writes the endpoint (and protocol) the
+    // provider needs; the persist below stores both. Programmatic loads set
+    // updating_, so restoring the page never overwrites a stored endpoint.
+    // F1: the preset expresses exactly those two fields; "custom" expresses none.
+    connect(fimProviderCombo_, &QComboBox::currentIndexChanged, this, [this]() {
+        if (updating_) {
+            return;
+        }
+        if (applyFimProviderPreset(fimProviderCombo_->currentData().toString())) {
+            markFimExpressed(FimField::Endpoint);
+            markFimExpressed(FimField::Protocol);
+        }
+        persistFromWidgets();
+    });
+    // The first keystroke already claims the page: the value itself is written on
+    // editingFinished / Apply, but ownership must not depend on the field having
+    // lost focus first (a programmatic backfill is filtered by updating_).
+    connect(fimEndpointEdit_, &QLineEdit::textChanged, this,
+            [this]() { markFimExpressed(FimField::Endpoint); });
+    connect(fimEndpointEdit_, &QLineEdit::editingFinished, this, [this]() {
+        markFimExpressed(FimField::Endpoint);
+        persistFromWidgets();
+    });
+    // The Model field is an EDITABLE combo: choosing an item and typing a name
+    // both reach `fim.model`, exactly like the QLineEdit it replaced. The user-pick
+    // signal is `activated` (not currentIndexChanged) so a half-typed name is not
+    // written on every keystroke; editingFinished writes the final text.
+    connect(fimModelCombo_, &QComboBox::activated, this, [this]() {
+        markFimExpressed(FimField::Model);
+        persistFromWidgets();
+    });
+    if (fimModelCombo_->lineEdit() != nullptr) {
+        connect(fimModelCombo_->lineEdit(), &QLineEdit::textChanged, this,
+                [this]() { markFimExpressed(FimField::Model); });
+        connect(fimModelCombo_->lineEdit(), &QLineEdit::editingFinished, this, [this]() {
+            markFimExpressed(FimField::Model);
+            persistFromWidgets();
+        });
     }
-    connect(fimTimeoutSpin_, &QSpinBox::valueChanged, this, [this]() { persistFromWidgets(); });
-    connect(fimMaxTokensSpin_, &QSpinBox::valueChanged, this,
-            [this]() { persistFromWidgets(); });
+    connect(fimTimeoutSpin_, &QSpinBox::valueChanged, this, [this]() {
+        markFimExpressed(FimField::TimeoutMs);
+        persistFromWidgets();
+    });
+    connect(fimMaxTokensSpin_, &QSpinBox::valueChanged, this, [this]() {
+        markFimExpressed(FimField::MaxTokens);
+        persistFromWidgets();
+    });
     connect(fimKeySaveButton_, &QPushButton::clicked, this, [this]() {
         if (fimApiKeyEdit_->text().isEmpty()) {
             statusLabel_->setText(tr("Type the API key first; the field is write-only."));
@@ -491,6 +614,7 @@ void SettingsPanel::buildUi()
         refreshFimKeySource();
     });
     connect(fimKeyClearButton_, &QPushButton::clicked, this, [this]() { clearFimKey(); });
+    connect(fimDetectButton_, &QPushButton::clicked, this, [this]() { startFimDetect(); });
 
     // Appearance page: the font applies to the running application at once; the
     // scale is a restart switch (the hint says so).
@@ -675,8 +799,10 @@ QWidget *SettingsPanel::buildToolsPage()
     toolsForm_->addRow(tr("Defines (-D):"), definesEdit_);
 
     auto *hint = new QLabel(
-        tr("Stored in settings.toml. The backend and lint-engine choices apply on the next "
-           "parse; -I/-D are handed to the project-wide lint."),
+        tr("Stored in settings.toml. A saved change is applied live — the running app reads "
+           "the file within about 300 ms, no restart needed: the realtime LSP session "
+           "restarts with the selected backend, and the lint engine applies to the next "
+           "Lint Project run. -I/-D are handed to the project-wide lint."),
         toolsPage_);
     hint->setWordWrap(true);
     toolsForm_->addRow(hint);
@@ -703,6 +829,18 @@ QWidget *SettingsPanel::buildFimPage()
     fimGhostCheck_->setObjectName(QStringLiteral("settings-fim-ghost-text"));
     form->addRow(fimGhostCheck_);
 
+    // batch-20261113 T5: the provider preset. Choosing one writes Endpoint and
+    // Protocol (see applyFimProviderPreset); "Custom" never touches them, so a
+    // hand-configured endpoint survives a visit to this page.
+    fimProviderCombo_ = new QComboBox(fimPage_);
+    fimProviderCombo_->setObjectName(QStringLiteral("settings-fim-provider"));
+    fimProviderCombo_->addItem(tr("Custom"), QStringLiteral("custom"));
+    fimProviderCombo_->addItem(tr("DeepSeek"), QStringLiteral("deepseek"));
+    fimProviderCombo_->addItem(tr("OpenAI"), QStringLiteral("openai"));
+    fimProviderCombo_->addItem(tr("Ollama"), QStringLiteral("ollama"));
+    fimProviderCombo_->addItem(tr("llama.cpp"), QStringLiteral("llama_cpp"));
+    form->addRow(tr("Provider:"), fimProviderCombo_);
+
     fimProtocolCombo_ = new QComboBox(fimPage_);
     fimProtocolCombo_->setObjectName(QStringLiteral("settings-fim-protocol"));
     fimProtocolCombo_->addItem(QStringLiteral("OpenAI-compatible (/v1/completions)"),
@@ -716,10 +854,17 @@ QWidget *SettingsPanel::buildFimPage()
     fimEndpointEdit_->setPlaceholderText(QStringLiteral("http://127.0.0.1:8080"));
     form->addRow(tr("Endpoint:"), fimEndpointEdit_);
 
-    fimModelEdit_ = new QLineEdit(fimPage_);
-    fimModelEdit_->setObjectName(QStringLiteral("settings-fim-model"));
-    fimModelEdit_->setPlaceholderText(tr("model name (required for the OpenAI protocol)"));
-    form->addRow(tr("Model:"), fimModelEdit_);
+    // batch-20261113 T5: editable combo — the detected models from the sidecar
+    // plus anything the user types. The stored value is still `fim.model`.
+    fimModelCombo_ = new QComboBox(fimPage_);
+    fimModelCombo_->setObjectName(QStringLiteral("settings-fim-model"));
+    fimModelCombo_->setEditable(true);
+    fimModelCombo_->setInsertPolicy(QComboBox::NoInsert);
+    if (fimModelCombo_->lineEdit() != nullptr) {
+        fimModelCombo_->lineEdit()->setPlaceholderText(
+            tr("model name (required for the OpenAI protocol)"));
+    }
+    form->addRow(tr("Model:"), fimModelCombo_);
 
     fimTimeoutSpin_ = new QSpinBox(fimPage_);
     fimTimeoutSpin_->setObjectName(QStringLiteral("settings-fim-timeout"));
@@ -736,6 +881,21 @@ QWidget *SettingsPanel::buildFimPage()
     form->addRow(tr("Max tokens:"), fimMaxTokensSpin_);
 
     layout->addLayout(form);
+
+    // batch-20261113 T5 Pass B: detection is MANUAL by decision — one button, one
+    // result line. No request is ever sent without this click (the FIM guarantee
+    // stays "off by default, zero network").
+    auto *detectRow = new QHBoxLayout();
+    fimDetectButton_ = new QPushButton(tr("Detect"), fimPage_);
+    fimDetectButton_->setObjectName(QStringLiteral("settings-fim-detect"));
+    fimDetectButton_->setToolTip(
+        tr("Check the endpoint and authentication, and list its models. Sends GET only."));
+    fimDetectStatusLabel_ = new QLabel(fimPage_);
+    fimDetectStatusLabel_->setObjectName(QStringLiteral("settings-fim-detect-status"));
+    fimDetectStatusLabel_->setWordWrap(true);
+    detectRow->addWidget(fimDetectButton_);
+    detectRow->addWidget(fimDetectStatusLabel_, 1);
+    layout->addLayout(detectRow);
 
     auto *keyGroup = new QGroupBox(tr("API key"), fimPage_);
     auto *keyLayout = new QVBoxLayout(keyGroup);
@@ -778,6 +938,9 @@ QWidget *SettingsPanel::buildFimPage()
     hint->setWordWrap(true);
     layout->addWidget(hint);
     layout->addStretch(1);
+    // The cache is best-effort: a missing/corrupt file must never stop the page
+    // from opening (see loadFimModelsSidecar).
+    loadFimModelsSidecar();
     return fimPage_;
 }
 
@@ -804,6 +967,11 @@ void SettingsPanel::reload()
         applyThemeFromEntries();
         applyKeymapFromEntries();
         applyToolEntries();
+        // batch-20261113 F2 (M2): a reload is a FRESH load of the store — the
+        // ownership answer must be re-captured from what is on disk now, not kept
+        // from the moment the dialog opened (the file may have gained the marker,
+        // or lost it, since then).
+        fimLoadCaptured_ = false;
         applyFimEntries();
         applyAppearanceEntries();
         applyLintEntries();
@@ -1476,8 +1644,8 @@ FimValues SettingsPanel::fimValues() const
     if (fimEndpointEdit_ != nullptr) {
         values.endpoint = fimEndpointEdit_->text().trimmed();
     }
-    if (fimModelEdit_ != nullptr) {
-        values.model = fimModelEdit_->text().trimmed();
+    if (fimModelCombo_ != nullptr) {
+        values.model = fimModelCombo_->currentText().trimmed();
     }
     if (fimTimeoutSpin_ != nullptr) {
         values.timeoutMs = fimTimeoutSpin_->value();
@@ -1493,6 +1661,14 @@ FimValues SettingsPanel::fimValues() const
 void SettingsPanel::setFimValues(const FimValues &values)
 {
     applyFimValues(values);
+    // The programmatic editor is an explicit request to STORE these values (its
+    // documented contract), so it expresses EVERY field and owns the FIM keys.
+    // The dialog's own backfill goes through applyFimEntries(), never through here.
+    for (const FimField field :
+         {FimField::Enabled, FimField::Protocol, FimField::Endpoint, FimField::Model,
+          FimField::TimeoutMs, FimField::MaxTokens, FimField::GhostText}) {
+        markFimExpressed(field);
+    }
     writeFimEntries(values);
     persist();
 }
@@ -1513,8 +1689,14 @@ void SettingsPanel::applyFimValues(const FimValues &values)
     if (fimEndpointEdit_ != nullptr) {
         fimEndpointEdit_->setText(values.endpoint);
     }
-    if (fimModelEdit_ != nullptr) {
-        fimModelEdit_->setText(values.model);
+    if (fimModelCombo_ != nullptr) {
+        // The sidecar only holds what a detect saw; the stored model may be older
+        // or hand-typed. Add it first, then select it, so the current value is
+        // ALWAYS present — a missing cache can never silently drop `fim.model`.
+        if (!values.model.isEmpty() && fimModelCombo_->findText(values.model) < 0) {
+            fimModelCombo_->addItem(values.model);
+        }
+        fimModelCombo_->setCurrentText(values.model);
     }
     if (fimTimeoutSpin_ != nullptr) {
         fimTimeoutSpin_->setValue(values.timeoutMs);
@@ -1530,24 +1712,346 @@ void SettingsPanel::applyFimValues(const FimValues &values)
     updating_ = false;
 }
 
+// batch-20261113 T5: the provider presets. Only "custom" leaves the widgets
+// untouched; every other entry writes the protocol AND the endpoint it needs.
+// DeepSeek is the one that is NOT derivable from a bare host: its FIM route is
+// `/beta/completions`, while OpenAi-compatible servers use `/v1/completions`. A
+// bare `https://api.deepseek.com` would make the Rust transport request
+// `/beta/v1/completions`, which looks plausible and always fails — hence the FULL
+// completion URL here.
+//
+// Returns whether a preset was applied: batch-20261113 F1 uses that answer to
+// record the two fields the user expressed ("custom" expresses none).
+bool SettingsPanel::applyFimProviderPreset(const QString &providerId)
+{
+    QString endpoint;
+    QString protocol = QString::fromLatin1(keys::kFimProtocolOpenAi);
+    if (providerId == QStringLiteral("deepseek")) {
+        endpoint = QStringLiteral("https://api.deepseek.com/beta/completions");
+    } else if (providerId == QStringLiteral("openai")) {
+        endpoint = QStringLiteral("https://api.openai.com");
+    } else if (providerId == QStringLiteral("ollama")) {
+        endpoint = QStringLiteral("http://127.0.0.1:11434");
+    } else if (providerId == QStringLiteral("llama_cpp")) {
+        endpoint = QStringLiteral("http://127.0.0.1:8080");
+        protocol = QString::fromLatin1(keys::kFimProtocolLlamaCpp);
+    } else {
+        // "custom": keep whatever the user configured.
+        return false;
+    }
+    if (fimEndpointEdit_ != nullptr) {
+        fimEndpointEdit_->setText(endpoint);
+    }
+    if (fimProtocolCombo_ != nullptr) {
+        const int index = fimProtocolCombo_->findData(protocol);
+        if (index >= 0) {
+            fimProtocolCombo_->setCurrentIndex(index);
+        }
+    }
+    return true;
+}
+
+QString SettingsPanel::fimModelsSidecarPath() const
+{
+    // Same directory as settings.toml (and the API key file): the state
+    // directory the caller handed to SettingsClient.
+    const QFileInfo info(client_->path());
+    return info.absolutePath() + QLatin1Char('/') + QString::fromLatin1(kFimModelsFileName);
+}
+
+void SettingsPanel::loadFimModelsSidecar()
+{
+    if (fimModelCombo_ == nullptr) {
+        return;
+    }
+    QFile file(fimModelsSidecarPath());
+    if (!file.open(QIODevice::ReadOnly)) {
+        return; // absent: the combo simply starts empty (the stored model is added)
+    }
+    // No error object on purpose: empty, malformed and wrong-shape files all
+    // produce a null/non-object document and are ignored the same way.
+    const QJsonDocument document = QJsonDocument::fromJson(file.readAll());
+    if (!document.isObject()) {
+        return;
+    }
+    const QJsonArray models = document.object().value(QStringLiteral("models")).toArray();
+    for (const QJsonValue &value : models) {
+        if (!value.isString()) {
+            continue; // a hand-edited cache must stay harmless
+        }
+        const QString model = value.toString().trimmed();
+        if (!model.isEmpty() && fimModelCombo_->findText(model) < 0) {
+            fimModelCombo_->addItem(model);
+        }
+    }
+}
+
+void SettingsPanel::writeFimModelsSidecar(const QStringList &models)
+{
+    QJsonArray array;
+    for (const QString &model : models) {
+        array.append(model);
+    }
+    QJsonObject sidecar;
+    sidecar.insert(QStringLiteral("models"), array);
+    QFile file(fimModelsSidecarPath());
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+        // The cache is a convenience: failing to write it is not a user-visible
+        // error, and it must never affect the detection result above.
+        return;
+    }
+    file.write(QJsonDocument(sidecar).toJson(QJsonDocument::Compact));
+}
+
+void SettingsPanel::startFimDetect()
+{
+    if (fimDetectButton_ == nullptr || fimDetectInFlight_) {
+        return;
+    }
+    // Deferred preview mode: read the WIDGETS, never `entries_`.
+    const FimValues values = fimValues();
+    // The key never lives in the store: pass what the user typed right now, or
+    // nullptr so the Rust side resolves the stored key itself.
+    const QString typedKey =
+        fimApiKeyEdit_ != nullptr ? fimApiKeyEdit_->text().trimmed() : QString();
+    fimDetectInFlight_ = true;
+    fimDetectButton_->setEnabled(false);
+    fimDetectStatusLabel_->setText(tr("Detecting…"));
+
+    auto *runner = new FimDetectRunner(values.endpoint, typedKey.toUtf8(), values.timeoutMs);
+    connect(runner, &FimDetectRunner::finished, this,
+            [this](int result, const QString &json, qulonglong threadId) {
+                fimDetectCallThreadId_ = reinterpret_cast<Qt::HANDLE>(threadId);
+                fimDetectInFlight_ = false;
+                finishFimDetect(result, json);
+            },
+            Qt::QueuedConnection);
+    connect(runner, &FimDetectRunner::finished, runner, &QObject::deleteLater,
+            Qt::QueuedConnection);
+    QThread *thread = QThread::create([runner]() { runner->run(); });
+    connect(thread, &QThread::finished, thread, &QObject::deleteLater);
+    thread->start();
+}
+
+void SettingsPanel::finishFimDetect(int result, const QString &json)
+{
+    if (fimDetectButton_ != nullptr) {
+        fimDetectButton_->setEnabled(true);
+    }
+    if (fimDetectStatusLabel_ == nullptr) {
+        return;
+    }
+    if (result != 0) {
+        // An ARGUMENT problem, never a network/auth verdict (those arrive as a
+        // successful probe with ok=false). It should not happen from this page.
+        qWarning("settings: FIM detect could not run (invalid arguments)");
+        fimDetectStatusLabel_->setText(
+            tr("Detect failed: %1").arg(tr("invalid request parameters")));
+        return;
+    }
+    const QJsonDocument document = QJsonDocument::fromJson(json.toUtf8());
+    if (!document.isObject()) {
+        qWarning("settings: FIM detect returned an unreadable report");
+        fimDetectStatusLabel_->setText(
+            tr("Detect failed: %1").arg(tr("unreadable probe response")));
+        return;
+    }
+    const QJsonObject report = document.object();
+    if (!report.value(QStringLiteral("ok")).toBool()) {
+        // A failed probe writes NOTHING back: the user's endpoint/model/protocol
+        // stay exactly as typed, and the reason is shown verbatim.
+        const QString reason = report.value(QStringLiteral("reason")).toString().trimmed();
+        fimDetectStatusLabel_->setText(
+            tr("Detect failed: %1").arg(reason.isEmpty() ? tr("unknown reason") : reason));
+        return;
+    }
+    // ok=true: Endpoint becomes the NORMALIZED completion URL, the protocol
+    // follows the report, and the model combo is refilled from the detected list.
+    const QString completionUrl = report.value(QStringLiteral("completion_url")).toString();
+    const QString protocol = report.value(QStringLiteral("protocol")).toString();
+    QStringList models;
+    for (const QJsonValue &value : report.value(QStringLiteral("models")).toArray()) {
+        if (!value.isString()) {
+            continue;
+        }
+        const QString model = value.toString().trimmed();
+        if (!model.isEmpty() && !models.contains(model)) {
+            models.append(model);
+        }
+    }
+    const QString previousModel =
+        fimModelCombo_ != nullptr ? fimModelCombo_->currentText().trimmed() : QString();
+    // Which detected fields this slot really wrote back (each update below is
+    // conditional, and only an applied value may be claimed as expressed).
+    bool wroteProtocol = false;
+    bool wroteModel = false;
+    updating_ = true;
+    if (fimEndpointEdit_ != nullptr && !completionUrl.isEmpty()) {
+        fimEndpointEdit_->setText(completionUrl);
+    }
+    if (fimProtocolCombo_ != nullptr) {
+        const int index = fimProtocolCombo_->findData(protocol);
+        if (index >= 0) {
+            fimProtocolCombo_->setCurrentIndex(index);
+            wroteProtocol = true;
+        }
+    }
+    if (fimModelCombo_ != nullptr) {
+        fimModelCombo_->clear();
+        for (const QString &model : models) {
+            fimModelCombo_->addItem(model);
+        }
+        // Keep the previous pick when the probe listed it; otherwise keep it as an
+        // entry (the stored `fim.model` must never silently disappear). A blank
+        // pick takes the first detected model.
+        if (!previousModel.isEmpty()) {
+            if (fimModelCombo_->findText(previousModel) < 0) {
+                fimModelCombo_->addItem(previousModel);
+            }
+            fimModelCombo_->setCurrentText(previousModel);
+            wroteModel = true;
+        } else if (!models.isEmpty()) {
+            fimModelCombo_->setCurrentIndex(0);
+            wroteModel = true;
+        }
+    }
+    updating_ = false;
+    // The widget updates above are programmatic, but they are the result of an
+    // explicit user action (the Detect click) and write the endpoint/model the
+    // user just accepted — so those fields are EXPRESSED by the user.
+    // batch-20261113 F1 (§13): claim ONLY the fields the probe reported and this
+    // slot wrote back. `fim.enabled` is never claimed by a Detect: the probe has
+    // no opinion about it, and writing the page's (possibly inherited-default)
+    // checkbox value was the destructive takeover this fix removes.
+    if (fimEndpointEdit_ != nullptr && !completionUrl.isEmpty()) {
+        markFimExpressed(FimField::Endpoint);
+    }
+    if (wroteProtocol) {
+        markFimExpressed(FimField::Protocol);
+    }
+    if (wroteModel) {
+        markFimExpressed(FimField::Model);
+    }
+    persistFromWidgets();
+    writeFimModelsSidecar(models);
+    fimDetectStatusLabel_->setText(
+        tr("Detect succeeded: %1, %2 models (%3 ms)")
+            .arg(report.value(QStringLiteral("provider")).toString())
+            .arg(static_cast<int>(models.size()))
+            .arg(report.value(QStringLiteral("latency_ms")).toInteger()));
+}
+
+void SettingsPanel::markFimExpressed(FimField field)
+{
+    // Guarded by updating_: the page is re-filled from the store on load, revert
+    // and reload, and that backfill must never look like a user edit.
+    if (updating_) {
+        return;
+    }
+    fimUiOwned_ = true;
+    fimExpressedFields_ |= 1U << static_cast<unsigned>(field);
+}
+
+bool SettingsPanel::fimFieldExpressed(FimField field) const
+{
+    return (fimExpressedFields_ & (1U << static_cast<unsigned>(field))) != 0;
+}
+
 void SettingsPanel::writeFimEntries(const FimValues &values)
 {
+    // batch-20261113 B1 (contract §12): the page is NOT the owner of the FIM
+    // keys until the user expresses the FIM page in this session, or the store
+    // already declares the page as the owner. Seeding the defaults into a store
+    // the user never configured is exactly the defect this guards: the next FIM
+    // request would see `fim.enabled=false` in the store and silently disable a
+    // configuration that lives in vedit.toml (§7).
+    // The marker is compared EXACTLY as the contract spells it ("true"), so the
+    // C++ half and the Rust `has_fim_entries` half agree on what ownership is.
+    const bool storeOwnsFim =
+        keyText(entries_, keys::kFimUiOwned).trimmed() == QStringLiteral("true");
+    if (!fimUiOwned_ && !storeOwnsFim) {
+        // Not ours: write no fim.* key at all and never remove an existing one.
+        return;
+    }
+    // batch-20261113 F2 (H1): ownership is a permission, not an instruction. A
+    // session that expressed NO field — OK/Apply pressed on a store that already
+    // owns FIM while the user never opened the FIM page — must not change a single
+    // byte, not even the marker. Writing here would seed the page's defaults
+    // (`fim.enabled=false`, timeout, max_tokens) into a store that owns FIM but
+    // never carried them, and the Rust side treats a stored key as explicit, so
+    // the inherited vedit.toml value would be overridden.
+    if (fimExpressedFields_ == 0) {
+        return;
+    }
     const auto key = [](const char *name) { return QString::fromLatin1(name); };
-    SettingsClient::setValue(&entries_, key(keys::kFimEnabled),
-                             values.enabled ? QStringLiteral("true") : QStringLiteral("false"));
-    SettingsClient::setValue(&entries_, key(keys::kFimProtocol), values.protocol);
-    SettingsClient::setValue(&entries_, key(keys::kFimEndpoint), values.endpoint);
-    SettingsClient::setValue(&entries_, key(keys::kFimModel), values.model);
-    SettingsClient::setValue(&entries_, key(keys::kFimTimeoutMs),
-                             QString::number(values.timeoutMs));
-    SettingsClient::setValue(&entries_, key(keys::kFimMaxTokens),
-                             QString::number(values.maxTokens));
-    SettingsClient::setValue(&entries_, key(keys::kFimGhostText),
-                             values.ghostText ? QStringLiteral("true") : QStringLiteral("false"));
+    SettingsClient::setValue(&entries_, key(keys::kFimUiOwned), QStringLiteral("true"));
+    // Ownership must be NON-DESTRUCTIVE in BOTH promotion paths (F1 for the first
+    // one, F2/H1 for the repeated one): only the fields this session expressed
+    // (edited by the user, or reported by a successful Detect) may be written —
+    // the page's defaults for a field nobody touched must never reach the store,
+    // because a stored `fim.enabled=false` would override the enabled state
+    // inherited from vedit.toml.
+    QStringList expressedKeys;
+    expressedKeys.append(key(keys::kFimUiOwned));
+    const auto write = [&](FimField field, const char *name, const QString &value) {
+        if (!fimFieldExpressed(field)) {
+            return;
+        }
+        SettingsClient::setValue(&entries_, key(name), value);
+        expressedKeys.append(key(name));
+    };
+    write(FimField::Enabled, keys::kFimEnabled,
+          values.enabled ? QStringLiteral("true") : QStringLiteral("false"));
+    write(FimField::Protocol, keys::kFimProtocol, values.protocol);
+    write(FimField::Endpoint, keys::kFimEndpoint, values.endpoint);
+    write(FimField::Model, keys::kFimModel, values.model);
+    write(FimField::TimeoutMs, keys::kFimTimeoutMs, QString::number(values.timeoutMs));
+    write(FimField::MaxTokens, keys::kFimMaxTokens, QString::number(values.maxTokens));
+    write(FimField::GhostText, keys::kFimGhostText,
+          values.ghostText ? QStringLiteral("true") : QStringLiteral("false"));
+    if (fimStoreOwnedAtLoad_) {
+        // NON-FIRST promotion: the store already owned the FIM block before this
+        // session. Only the expressed fields above were written; an existing key
+        // the user did not express keeps whatever authority it already had, so
+        // nothing is deleted here (deleting would be a second way to change a
+        // value the user never expressed).
+        return;
+    }
+    // FIRST promotion (batch-20261113 F1, contract §13): every existing `fim.*`
+    // key nobody expressed has no authority yet — nothing has ever read it — and
+    // keeping it would override the inherited value just the same, so it is
+    // deleted here.
+    for (int index = entries_.size() - 1; index >= 0; --index) {
+        const QString &storedKey = entries_.at(index).key;
+        if (storedKey.startsWith(QStringLiteral("fim.")) && !expressedKeys.contains(storedKey)) {
+            entries_.removeAt(index);
+        }
+    }
 }
 
 void SettingsPanel::applyFimEntries()
 {
+    // Filling the page from the store is a BACKFILL, never a user edit: this is
+    // the one place the two can be confused, and getting it wrong would seed the
+    // defaults on the first Apply (contract §12 B1). Ownership is re-read from
+    // the store below; only markFimExpressed() sets the session flags.
+    fimUiOwned_ = false;
+    // batch-20261113 F2 (M2): the per-field mask describes the dialog session
+    // being replaced by this backfill. A Reload discards those edits (and a
+    // Revert discards them too), so their bits must go with them: leaving them set
+    // would write the RE-FILLED page value of a field the user no longer
+    // expresses, and `false` / an integer default are not empty strings, so
+    // SettingsClient::setValue would happily store them.
+    fimExpressedFields_ = 0;
+    // batch-20261113 F1 (§13) + F2 (M2): whether the STORE already owned the FIM
+    // block at the last LOAD. Captured once per load (reload() drops the flag, so
+    // a reload re-captures) — our own promotion writes the marker into `entries_`,
+    // and that must not turn the rest of the same session into a "non-first" one.
+    if (!fimLoadCaptured_) {
+        fimStoreOwnedAtLoad_ =
+            keyText(entries_, keys::kFimUiOwned).trimmed() == QStringLiteral("true");
+        fimLoadCaptured_ = true;
+    }
     const auto key = [](const char *name) { return QString::fromLatin1(name); };
     FimValues values;
     values.enabled = keyBool(entries_, keys::kFimEnabled);
@@ -1856,11 +2360,6 @@ void SettingsPanel::addDiagnostic(const QString &text)
 
 namespace {
 
-QString translated(const char *text)
-{
-    return QCoreApplication::translate("VEdit", text);
-}
-
 // The one widget-value bridge the three new pages share: every knob is stored as
 // a string, and "" always means "no value configured" (the tool's own default).
 QString widgetValue(const QWidget *widget)
@@ -1915,7 +2414,7 @@ QWidget *makeFormatKnobWidget(const FormatKnobSpec &knob, QWidget *parent)
         spin->setRange(0, maximum);
         // 0 is not a verible value for any of these knobs, so it can carry the
         // "not set" state without ambiguity.
-        spin->setSpecialValueText(translated("Default (verible)"));
+        spin->setSpecialValueText(QCoreApplication::translate("VEdit", "Default (verible)"));
         return spin;
     }
     case FormatKnobKind::Boolean:
@@ -1929,25 +2428,25 @@ QWidget *makeFormatKnobWidget(const FormatKnobSpec &knob, QWidget *parent)
         };
         switch (knob.kind) {
         case FormatKnobKind::Boolean:
-            add(translated("Default (verible)"), QString());
+            add(QCoreApplication::translate("VEdit", "Default (verible)"), QString());
             add(QStringLiteral("true"), QStringLiteral("true"));
             add(QStringLiteral("false"), QStringLiteral("false"));
             break;
         case FormatKnobKind::LineTerminator:
-            add(translated("Default (verible: auto)"), QString());
+            add(QCoreApplication::translate("VEdit", "Default (verible: auto)"), QString());
             add(QStringLiteral("CRLF"), QStringLiteral("CRLF"));
             add(QStringLiteral("LF"), QStringLiteral("LF"));
             add(QStringLiteral("auto"), QStringLiteral("auto"));
             break;
         case FormatKnobKind::Alignment:
-            add(translated("Default (verible: infer)"), QString());
+            add(QCoreApplication::translate("VEdit", "Default (verible: infer)"), QString());
             add(QStringLiteral("align"), QStringLiteral("align"));
             add(QStringLiteral("flush-left"), QStringLiteral("flush-left"));
             add(QStringLiteral("preserve"), QStringLiteral("preserve"));
             add(QStringLiteral("infer"), QStringLiteral("infer"));
             break;
         case FormatKnobKind::Indentation:
-            add(translated("Default (verible: wrap)"), QString());
+            add(QCoreApplication::translate("VEdit", "Default (verible: wrap)"), QString());
             add(QStringLiteral("indent"), QStringLiteral("indent"));
             add(QStringLiteral("wrap"), QStringLiteral("wrap"));
             break;
@@ -2391,9 +2890,11 @@ void SettingsPanel::refreshLintKnobStates()
     if (lintVeribleStatus_ != nullptr) {
         lintVeribleStatus_->setText(
             lintBackend_ == LintBackend::Verible
-                ? tr("Active engine. --ruleset, --rules, --rules_config and --waiver_files "
-                     "are applied to the lint job; --autofix is stored only (the lint job's "
-                     "C ABI has no field for it).")
+                ? tr("Active engine. --ruleset, --rules, --rules_config, --waiver_files and "
+                     "--autofix are applied to the lint job; a stored --autofix value is sent "
+                     "verbatim. patch-interactive and inplace-interactive need a terminal this "
+                     "product does not have, so they are offered as unavailable with that "
+                     "reason.")
                 : tr("Not the selected engine — these controls are disabled. Switch Tools → "
                      "Lint engine to verible-verilog-lint to edit them; their values are kept."));
     }
@@ -2411,9 +2912,14 @@ void SettingsPanel::refreshLintKnobStates()
         lintTransportHint_->setText(
             tr("Every option of the selected engine is applied to the lint job."));
     } else {
+        // No knob is in the TransportPending state today (batch 20261110b wired
+        // `autofix`, `autofix_output_file` and slang's `waiver_file`); this
+        // branch stays for a knob a future C ABI does not carry yet, and it never
+        // claims the option is in force when it is not.
         lintTransportHint_->setText(
-            tr("Stored but not applied yet (the lint job's C ABI has no field for them): %1. "
-               "The values stay in settings.toml and are never sent as a silent no-op.")
+            tr("This build cannot send %1 to the lint job yet (the C ABI has no field for "
+               "them); the control is disabled with this reason, and the value is kept so "
+               "nothing is silently rewritten.")
                 .arg(pending.join(QStringLiteral(", "))));
     }
 }
@@ -2507,3 +3013,5 @@ QString SettingsPanel::selectedCommand() const
 }
 
 } // namespace vedit::workspace::settings
+
+#include "settings_panel.moc"

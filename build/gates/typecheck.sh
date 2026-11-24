@@ -105,14 +105,18 @@ docker image inspect "$BUILD_IMAGE_TAG" --format 'image_id={{.Id}}' | tee "$EVID
 # inside the pinned image (container facts printed from inside the container).
 # Force the build script to run so cbindgen really rewrites the header in this
 # run: cargo caches build-script execution, and a cached run would leave a
-# hand-edited header untouched and make the drift check blind (T123 reverse
-# control). Touching a declared rerun-if-changed input is mtime-only; content is
-# unchanged.
-touch "$ROOT/crates/vd-ffi/build.rs"
+# hand-edited (committed) header untouched and make the drift check blind (T123
+# reverse control). The generated header is written INTO THE SOURCE TREE, not
+# OUT_DIR, and is not a declared rerun-if-changed input — deleting it does not
+# rerun cbindgen. The only equivalent is invalidating the package's build-script
+# fingerprint: `cargo clean -p vd-ffi` does that WITHOUT touching a source file's
+# mtime (the previous version touched crates/vd-ffi/build.rs, polluting it).
 run_in_build_container bash -lc '
   set -euo pipefail
   echo "[typecheck] container facts: $(head -1 /etc/centos-release) | $(rustc --version) | $(cargo --version)"
   cd /vedit-build
+  echo "[typecheck] cargo clean -p vd-ffi (invalidate the build-script fingerprint; cbindgen must rerun)"
+  cargo clean -p vd-ffi
   echo "[typecheck] cargo clippy --workspace --all-targets -- -D warnings"
   cargo clippy --workspace --all-targets -- -D warnings
 '

@@ -1,0 +1,1 @@
+`define RENAME_WIDTH 8

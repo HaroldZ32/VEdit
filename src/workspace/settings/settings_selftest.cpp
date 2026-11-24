@@ -18,6 +18,9 @@
 #include "settings_panel.h"
 #include "theme_manager.h"
 #include "ui_scale.h"
+#if defined(VEDIT_HAVE_PROJECT_LANE)
+#include "project_model.h"
+#endif
 #if defined(VEDIT_HAVE_DIAGNOSTICS_FORMAT)
 #include "toolchain.h" // the REAL formatVerilog the product command uses
 #endif
@@ -27,24 +30,41 @@
 #include <QCheckBox>
 #include <QComboBox>
 #include <QCoreApplication>
+#include <QDialogButtonBox>
 #include <QDir>
 #include <QElapsedTimer>
+#include <QEventLoop>
+#include <QHash>
+#include <QHostAddress>
 #include <QFile>
 #include <QFileInfo>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QKeySequence>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMouseEvent>
 #include <QObject>
 #include <QPixmap>
 #include <QProcess>
 #include <QProcessEnvironment>
 #include <QPlainTextEdit>
+#include <QPushButton>
+#include <QScrollArea>
+#include <QScrollBar>
 #include <QSpinBox>
+#include <QStandardPaths>
+#include <QStyle>
+#include <QStyleOptionViewItem>
 #include <QToolButton>
 #include <QString>
 #include <QTabWidget>
 #include <QTableWidget>
+#include <QTcpServer>
+#include <QTcpSocket>
 #include <QTemporaryDir>
+#include <QThread>
 #include <QTimer>
 
 #include <cstdio>
@@ -61,10 +81,14 @@ using vedit::app::CommandSpec;
 using vedit::app::JsonShortcutStore;
 using vedit::app::ThemeManager;
 using vedit::workspace::settings::FimValues;
+using vedit::workspace::settings::EnvImportPage;
 using vedit::workspace::settings::SettingsClient;
 using vedit::workspace::settings::SettingsDialog;
 using vedit::workspace::settings::SettingsPanel;
 using vedit::workspace::settings::ToolValues;
+#if defined(VEDIT_HAVE_PROJECT_LANE)
+using vedit::workspace::project::ProjectModel;
+#endif
 
 namespace {
 
@@ -531,6 +555,96 @@ bool exactlyOwnerReadWrite(const QString &path)
     return (mode & ownerReadWrite) == ownerReadWrite && (mode & anythingElse) == 0;
 }
 
+// batch-20261113 T5 Pass B: a REAL local HTTP endpoint for the Detect button.
+// Everything stays on 127.0.0.1 with an ephemeral port (the contract forbids the
+// network); it records the paths it was asked for and answers every GET with the
+// status/body the test selects, then closes the connection.
+class FakeFimEndpoint : public QObject
+{
+public:
+    explicit FakeFimEndpoint(QObject *parent = nullptr)
+        : server_(new QTcpServer(parent))
+    {
+        QObject::connect(server_, &QTcpServer::newConnection, server_, [this]() {
+            while (QTcpSocket *socket = server_->nextPendingConnection()) {
+                QObject::connect(socket, &QTcpSocket::readyRead, socket,
+                                 [this, socket]() { onReadyRead(socket); });
+                QObject::connect(socket, &QTcpSocket::disconnected, socket,
+                                 &QObject::deleteLater);
+            }
+        });
+    }
+
+    bool listen() { return server_->listen(QHostAddress::LocalHost, 0); }
+    QString baseUrl() const
+    {
+        return QStringLiteral("http://127.0.0.1:%1").arg(server_->serverPort());
+    }
+    void setStatus(int status) { status_ = status; }
+    void setBody(const QByteArray &body) { body_ = body; }
+    QStringList requestedPaths() const { return requestedPaths_; }
+
+private:
+    void onReadyRead(QTcpSocket *socket)
+    {
+        buffers_[socket] += socket->readAll();
+        const int headerEnd = buffers_[socket].indexOf("\r\n\r\n");
+        if (headerEnd < 0) {
+            return;
+        }
+        const QByteArray request = buffers_.take(socket);
+        const QByteArray requestLine = request.left(request.indexOf("\r\n"));
+        const QList<QByteArray> parts = requestLine.split(' ');
+        if (parts.size() >= 2) {
+            requestedPaths_.append(QString::fromUtf8(parts.at(1)));
+        }
+        QByteArray reason = "OK";
+        if (status_ == 401) {
+            reason = "Unauthorized";
+        } else if (status_ != 200) {
+            reason = "Error";
+        }
+        QByteArray response = "HTTP/1.1 " + QByteArray::number(status_) + " " + reason + "\r\n";
+        response += "Content-Type: application/json\r\n";
+        response += "Content-Length: " + QByteArray::number(body_.size()) + "\r\n";
+        response += "Connection: close\r\n\r\n";
+        response += body_;
+        socket->write(response);
+        socket->disconnectFromHost();
+    }
+
+    QTcpServer *server_ = nullptr;
+    QHash<QTcpSocket *, QByteArray> buffers_;
+    QStringList requestedPaths_;
+    int status_ = 200;
+    QByteArray body_ = QByteArrayLiteral("{\"data\":[]}");
+};
+
+bool comboHasItem(const QComboBox *combo, const QString &text)
+{
+    return combo != nullptr && combo->findText(text) >= 0;
+}
+
+// Pumps the GUI event loop until the Detect probe's completion slot ran (the
+// button is re-enabled by it) or the timeout expires.
+bool waitForFimDetect(SettingsPanel *panel, int timeoutMs)
+{
+    if (panel == nullptr) {
+        return false;
+    }
+    QElapsedTimer timer;
+    timer.start();
+    while (timer.elapsed() < timeoutMs) {
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 20);
+        QPushButton *button = panel->fimDetectButton();
+        if (button != nullptr && button->isEnabled()) {
+            return true;
+        }
+        QThread::msleep(1);
+    }
+    return false;
+}
+
 void checkPages(const QString &directory)
 {
     namespace keys = vedit::workspace::settings::keys;
@@ -541,6 +655,20 @@ void checkPages(const QString &directory)
         return;
     }
     check("settings.pages.ffi.available", true);
+
+    // batch-20261113 T5 PASS A: the NON-secret model cache a previous detect
+    // wrote beside settings.toml. It is what the editable Model combo opens with;
+    // it must never replace the stored `fim.model`.
+    {
+        QJsonArray models;
+        models.append(QStringLiteral("deepseek-flash"));
+        models.append(QStringLiteral("deepseek-v4-pro"));
+        QJsonObject sidecar;
+        sidecar.insert(QStringLiteral("models"), models);
+        check("fim.models-sidecar.fixture-written",
+              writeText(directory + QStringLiteral("/fim_models.json"),
+                        QJsonDocument(sidecar).toJson(QJsonDocument::Compact)));
+    }
 
     Harness harness;
     check("settings.pages.loaded", buildHarness(&harness, settingsPath, shortcutPath));
@@ -590,7 +718,8 @@ void checkPages(const QString &directory)
     // write-only.
     check("settings.pages.fim-fields",
           panel->fimEnabledCheck() != nullptr && panel->fimProtocolCombo() != nullptr
-              && panel->fimEndpointEdit() != nullptr && panel->fimModelEdit() != nullptr
+              && panel->fimProviderCombo() != nullptr
+              && panel->fimEndpointEdit() != nullptr && panel->fimModelCombo() != nullptr
               && panel->fimTimeoutSpin() != nullptr && panel->fimApiKeyEdit() != nullptr
               && panel->fimGhostCheck() != nullptr);
     check("settings.pages.fim-key-write-only",
@@ -639,6 +768,171 @@ void checkPages(const QString &directory)
     Harness fimRestart;
     check("settings.pages.fim-restart-load", buildHarness(&fimRestart, settingsPath, shortcutPath + QStringLiteral(".fim")));
     check("settings.pages.fim-restart", sameFim(fimRestart.panel->fimValues(), fim));
+
+    // batch-20261113 T5 PASS A — the provider preset writes the provider's
+    // endpoint AND protocol. DeepSeek's assertion is the EXACT completion URL on
+    // purpose: a bare host still looks plausible but makes the transport request
+    // `/beta/v1/completions`, so "starts with api.deepseek.com" is not enough.
+    if (QComboBox *provider = fimRestart.panel->fimProviderCombo()) {
+        const int deepseekIndex = provider->findData(QStringLiteral("deepseek"));
+        check("fim.provider-preset.deepseek-present", deepseekIndex >= 0);
+        if (deepseekIndex >= 0) {
+            provider->setCurrentIndex(deepseekIndex);
+            const FimValues preset = fimRestart.panel->fimValues();
+            check("fim.provider-preset.deepseek-writes-the-full-completion-url",
+                  preset.endpoint == QStringLiteral("https://api.deepseek.com/beta/completions")
+                      && preset.protocol == QString::fromLatin1(keys::kFimProtocolOpenAi),
+                  preset.endpoint + QStringLiteral(" ") + preset.protocol);
+        }
+    } else {
+        check("fim.provider-preset.provider-combo", false);
+    }
+    // The Model combo opens with the sidecar's list and STILL selects the stored
+    // `fim.model` (the cache is a convenience, never the source of truth).
+    check("fim.models-sidecar.loads-into-the-combo",
+          fimRestart.panel->fimModelCombo() != nullptr
+              && fimRestart.panel->fimModelCombo()->findText(QStringLiteral("deepseek-flash")) >= 0
+              && fimRestart.panel->fimModelCombo()->findText(QStringLiteral("deepseek-v4-pro")) >= 0);
+    check("fim.models-sidecar.keeps-the-stored-model",
+          fimRestart.panel->fimModelCombo() != nullptr
+              && fimRestart.panel->fimModelCombo()->currentText() == fim.model,
+          fimRestart.panel->fimModelCombo() != nullptr
+              ? fimRestart.panel->fimModelCombo()->currentText()
+              : QStringLiteral("<no combo>"));
+    // A corrupt cache is HARMLESS: the page still opens, the malformed content is
+    // ignored, and the stored model is still present/selected. The harness is
+    // built in its OWN statement: a `check(...)` argument list is evaluated in an
+    // unspecified order, so dereferencing a not-yet-built panel from the detail
+    // argument would be a null dereference.
+    {
+        // Settle the store write the preset above triggered BEFORE opening a
+        // second client on the same file (every other harness in this test is
+        // built after a flush for exactly this reason).
+        check("fim.provider-preset.flushed", fimRestart.panel->flush());
+        const QString sidecarPath = directory + QStringLiteral("/fim_models.json");
+        check("fim.models-sidecar.malformed-fixture-written",
+              writeText(sidecarPath, QByteArrayLiteral("{ this is not json, models: [oops")));
+        Harness malformedCache;
+        const bool malformedBuilt =
+            buildHarness(&malformedCache, settingsPath, shortcutPath + QStringLiteral(".corrupt"));
+        const QString malformedModel = malformedCache.panel != nullptr
+                && malformedCache.panel->fimModelCombo() != nullptr
+            ? malformedCache.panel->fimModelCombo()->currentText()
+            : QStringLiteral("<no combo>");
+        check("fim.models-sidecar.malformed-is-harmless",
+              malformedBuilt && malformedModel == fim.model, malformedModel);
+
+        // A well-formed object whose "models" array mixes types: only the string
+        // entries are taken, the rest is ignored, and the page still opens.
+        check("fim.models-sidecar.non-string-fixture-written",
+              writeText(sidecarPath,
+                        QByteArrayLiteral("{\"models\": [\"only-string\", 7, null]}")));
+        Harness mixedCache;
+        const bool mixedBuilt =
+            buildHarness(&mixedCache, settingsPath, shortcutPath + QStringLiteral(".mixed"));
+        const bool onlyStringTaken = mixedCache.panel != nullptr
+                && mixedCache.panel->fimModelCombo() != nullptr
+            ? mixedCache.panel->fimModelCombo()->findText(QStringLiteral("only-string")) >= 0
+                && mixedCache.panel->fimModelCombo()->findText(QStringLiteral("7")) < 0
+                && mixedCache.panel->fimModelCombo()->currentText() == fim.model
+            : false;
+        const QString mixedDetail = mixedCache.panel != nullptr
+                && mixedCache.panel->fimModelCombo() != nullptr
+            ? mixedCache.panel->fimModelCombo()->currentText()
+            : QStringLiteral("<no combo>");
+        check("fim.models-sidecar.non-string-entries-are-harmless",
+              mixedBuilt && onlyStringTaken, mixedDetail);
+    }
+
+    // batch-20261113 T5 Pass B: the manual Detect button, driven exactly like a
+    // user click (QPushButton::click) against a REAL local HTTP server on
+    // 127.0.0.1 with an ephemeral port — nothing leaves the machine. The probe is
+    // synchronous, so `fim.detect.runs-off-the-gui-thread` is the load-bearing
+    // assertion: it compares the thread that called vd_fim_detect with this one.
+    {
+        FakeFimEndpoint fakeEndpoint;
+        const bool serverUp = fakeEndpoint.listen();
+        check("fim.detect.fake-server", serverUp, fakeEndpoint.baseUrl());
+        QPushButton *detect = fimRestart.panel->fimDetectButton();
+        QLabel *detectStatus = fimRestart.panel->fimDetectStatusLabel();
+        check("fim.detect.widgets", detect != nullptr && detectStatus != nullptr);
+        if (serverUp && detect != nullptr && detectStatus != nullptr) {
+            // ---- success: models filled, endpoint normalized to completion_url
+            fakeEndpoint.setBody(
+                QByteArrayLiteral("{\"data\":[{\"id\":\"alpha\"},{\"id\":\"beta\"}]}"));
+            // The probe reads the WIDGETS (the page is a deferred preview), never
+            // the pending `entries_`.
+            fimRestart.panel->fimEndpointEdit()->setText(fakeEndpoint.baseUrl());
+            fimRestart.panel->fimModelCombo()->setCurrentText(QStringLiteral("user-model"));
+            const Qt::HANDLE guiThread = QThread::currentThreadId();
+            detect->click();
+            // startFimDetect disables the button synchronously, before the worker
+            // can report back through the queued signal.
+            check("fim.detect.disabled-while-running", !detect->isEnabled());
+            // Compute the wait BEFORE reading the label: a check() argument list
+            // has an unspecified evaluation order, and this detail must describe
+            // the state AFTER the probe settled, not the "Detecting…" moment.
+            const bool successFinished = waitForFimDetect(fimRestart.panel.get(), 15000);
+            check("fim.detect.finishes", successFinished, detectStatus->text());
+            const Qt::HANDLE probeThread = fimRestart.panel->fimDetectCallThreadId();
+            check("fim.detect.runs-off-the-gui-thread",
+                  probeThread != nullptr && probeThread != guiThread,
+                  QStringLiteral("probe-thread=0x%1 gui-thread=0x%2")
+                      .arg(reinterpret_cast<quintptr>(probeThread), 0, 16)
+                      .arg(reinterpret_cast<quintptr>(guiThread), 0, 16));
+            check("fim.detect.success-fills-model-combo",
+                  comboHasItem(fimRestart.panel->fimModelCombo(), QStringLiteral("alpha"))
+                      && comboHasItem(fimRestart.panel->fimModelCombo(), QStringLiteral("beta"))
+                      && fimRestart.panel->fimModelCombo()->currentText()
+                          == QStringLiteral("user-model"),
+                  fimRestart.panel->fimModelCombo()->currentText());
+            check("fim.detect.success-writes-the-normalized-endpoint",
+                  fimRestart.panel->fimEndpointEdit()->text()
+                      == fakeEndpoint.baseUrl() + QStringLiteral("/v1/completions"),
+                  fimRestart.panel->fimEndpointEdit()->text());
+            check("fim.detect.status-succeeded",
+                  detectStatus->text().contains(QStringLiteral("Detect succeeded")),
+                  detectStatus->text());
+            check("fim.detect.writes-the-sidecar",
+                  readText(directory + QStringLiteral("/fim_models.json"))
+                      .contains(QStringLiteral("alpha")));
+            check("fim.detect.requests-reached-the-server",
+                  !fakeEndpoint.requestedPaths().isEmpty(),
+                  fakeEndpoint.requestedPaths().join(QLatin1Char(',')));
+
+            // ---- failure: a 401 is a REAL failure (ok=false JSON with reason),
+            // not the -1 argument path. Endpoint/model must stay as typed.
+            fakeEndpoint.setStatus(401);
+            fakeEndpoint.setBody(QByteArrayLiteral("{\"error\":\"unauthorized\"}"));
+            fimRestart.panel->fimEndpointEdit()->setText(fakeEndpoint.baseUrl());
+            fimRestart.panel->fimModelCombo()->setCurrentText(QStringLiteral("keep-me"));
+            detect->click();
+            const bool failureFinished = waitForFimDetect(fimRestart.panel.get(), 15000);
+            check("fim.detect.failure-finishes", failureFinished, detectStatus->text());
+            check("fim.detect.failure-keeps-the-users-input",
+                  fimRestart.panel->fimEndpointEdit()->text() == fakeEndpoint.baseUrl()
+                      && fimRestart.panel->fimModelCombo()->currentText()
+                          == QStringLiteral("keep-me"),
+                  fimRestart.panel->fimEndpointEdit()->text());
+            check("fim.detect.failure-shows-the-reason",
+                  detectStatus->text().contains(QStringLiteral("FIM HTTP 401")),
+                  detectStatus->text());
+
+            // ---- an empty endpoint is a JSON failure ("FIM 端点无效"), not -1 and
+            // not a request: report it and keep the user's input.
+            fimRestart.panel->fimEndpointEdit()->clear();
+            fimRestart.panel->fimModelCombo()->setCurrentText(QStringLiteral("keep-empty"));
+            detect->click();
+            const bool emptyFinished = waitForFimDetect(fimRestart.panel.get(), 15000);
+            check("fim.detect.empty-endpoint-finishes", emptyFinished, detectStatus->text());
+            check("fim.detect.empty-endpoint-is-a-json-failure",
+                  detectStatus->text().contains(QStringLiteral("Detect failed"))
+                      && fimRestart.panel->fimEndpointEdit()->text().isEmpty()
+                      && fimRestart.panel->fimModelCombo()->currentText()
+                          == QStringLiteral("keep-empty"),
+                  detectStatus->text());
+        }
+    }
 
     // AC-10.2.5: the key is written owner-only, never to settings.toml, never
     // echoed back. FimValues has no key field, so the only programmatic way in is
@@ -763,9 +1057,16 @@ void checkPages(const QString &directory)
           buildHarness(&dialogHarness, dialogPath, shortcutPath + QStringLiteral(".dialog")));
     {
         SettingsDialog dialog(&dialogHarness.themes, &dialogHarness.commands, dialogPath, nullptr);
+        // Batch 20261110c appended the Environment page: the count grows from
+        // 6 to 7 and the NEW check below pins that the extra tab IS that page
+        // (the assertion is strengthened, never relaxed).
         check("settings.pages.dialog-tabs",
               dialog.panel() != nullptr && dialog.panel()->tabs() != nullptr
-                  && dialog.panel()->tabs()->count() == 6);
+                  && dialog.panel()->tabs()->count() == 7);
+        check("settings.pages.dialog-env-tab",
+              dialog.panel() != nullptr && dialog.panel()->tabs() != nullptr
+                  && dialog.environmentPage() != nullptr
+                  && dialog.panel()->tabs()->widget(6) == dialog.environmentPage());
         check("settings.pages.dialog-deferred", dialog.panel()->deferredPersistence());
         check("settings.pages.dialog-load", dialog.panel()->flush());
         dialog.panel()->setFimValues(sampleFim());
@@ -797,6 +1098,556 @@ void checkPages(const QString &directory)
               readText(dialogPath).contains(QStringLiteral("fim.endpoint"))
                   && !readText(dialogPath).contains(QString::fromLatin1(kSecret)));
     }
+}
+
+// --- batch-20261113 B1 (§12): FIM store ownership --------------------------
+//
+// The Preferences page must never SEED the FIM defaults into a store the user
+// never configured: if it did, `fim.enabled = false` took over the request path
+// and silently disabled a FIM configuration that lives in vedit.toml. Every case
+// below drives the PRODUCT path (SettingsDialog -> deferred preview -> Apply ->
+// SettingsPanel::commitPending) and reads the file the Rust store actually wrote;
+// only the *fixture* (the pre-existing "old" store) is written by hand.
+QStringList fimKeysInStore(const QString &text)
+{
+    QStringList keys;
+    for (const QString &line : text.split(QLatin1Char('\n'))) {
+        if (!line.startsWith(QStringLiteral("\"fim."))) {
+            continue;
+        }
+        const int separator = line.indexOf(QStringLiteral("\" ="));
+        if (separator > 0) {
+            keys.append(line.mid(1, separator - 1));
+        }
+    }
+    keys.sort();
+    return keys;
+}
+
+QString storedFimValue(const QString &text, const QString &key)
+{
+    const QString prefix = QStringLiteral("\"%1\" = \"").arg(key);
+    for (const QString &line : text.split(QLatin1Char('\n'))) {
+        if (!line.startsWith(prefix)) {
+            continue;
+        }
+        const int start = prefix.size();
+        const int end = line.lastIndexOf(QLatin1Char('"'));
+        if (end >= start) {
+            return line.mid(start, end - start);
+        }
+    }
+    return {};
+}
+
+void checkFimStoreOwnership(const QString &directory)
+{
+    namespace keys = vedit::workspace::settings::keys;
+    if (!SettingsClient::ffiAvailable()) {
+        check("fim.ownership.ffi", false, "lane built without the vd-ffi settings ABI");
+        return;
+    }
+    const QString shortcutBase = directory + QStringLiteral("/fim-ownership-shortcuts");
+
+    // (a) empty store: open the dialog, never touch the FIM page, press Apply.
+    const QString emptyPath = directory + QStringLiteral("/fim-ownership-empty.toml");
+    QFile::remove(emptyPath);
+    {
+        Harness harness;
+        check("fim.ownership.empty-harness",
+              buildHarness(&harness, emptyPath, shortcutBase + QStringLiteral(".empty")));
+        SettingsDialog dialog(&harness.themes, &harness.commands, emptyPath, nullptr);
+        check("fim.ownership.empty-load", dialog.panel() != nullptr && dialog.panel()->flush());
+        dialog.applyPending();
+        check("fim.ownership.empty-apply-flush",
+              dialog.panel() != nullptr && dialog.panel()->flush());
+    }
+    const QString emptyStore = readText(emptyPath);
+    check("fim.ownership.empty-store-has-no-fim-keys", fimKeysInStore(emptyStore).isEmpty(),
+          fimKeysInStore(emptyStore).join(QLatin1Char(',')));
+
+    // (a2) the dialog's OK button routes to the same commitPending; prove that
+    // entry point on a fresh empty store too.
+    const QString okPath = directory + QStringLiteral("/fim-ownership-ok.toml");
+    QFile::remove(okPath);
+    {
+        Harness harness;
+        check("fim.ownership.ok-harness",
+              buildHarness(&harness, okPath, shortcutBase + QStringLiteral(".ok")));
+        SettingsDialog dialog(&harness.themes, &harness.commands, okPath, nullptr);
+        check("fim.ownership.ok-load", dialog.panel() != nullptr && dialog.panel()->flush());
+        dialog.accept(); // OK: persist + close
+        check("fim.ownership.ok-flush", dialog.panel() != nullptr && dialog.panel()->flush());
+    }
+    const QString okStore = readText(okPath);
+    check("fim.ownership.ok-store-has-no-fim-keys", fimKeysInStore(okStore).isEmpty(),
+          fimKeysInStore(okStore).join(QLatin1Char(',')));
+
+    // (b) same flow, but the user switches the Provider once: that IS "the user
+    // edited the FIM page", so the page writes the ownership marker and owns the
+    // fields the provider preset really expresses (endpoint + protocol); the
+    // other fim.* fields stay unexpressed and keep inheriting vedit.toml.
+    const QString editedPath = directory + QStringLiteral("/fim-ownership-edited.toml");
+    QFile::remove(editedPath);
+    {
+        Harness harness;
+        check("fim.ownership.edited-harness",
+              buildHarness(&harness, editedPath, shortcutBase + QStringLiteral(".edited")));
+        SettingsDialog dialog(&harness.themes, &harness.commands, editedPath, nullptr);
+        check("fim.ownership.edited-load", dialog.panel() != nullptr && dialog.panel()->flush());
+        QComboBox *provider =
+            dialog.panel() != nullptr ? dialog.panel()->fimProviderCombo() : nullptr;
+        const int deepseek =
+            provider != nullptr ? provider->findData(QStringLiteral("deepseek")) : -1;
+        check("fim.ownership.provider-preset-present", deepseek >= 0);
+        if (deepseek >= 0) {
+            // Exactly the currentIndexChanged signal a real click emits.
+            provider->setCurrentIndex(deepseek);
+        }
+        dialog.applyPending();
+        check("fim.ownership.edited-apply-flush",
+              dialog.panel() != nullptr && dialog.panel()->flush());
+    }
+    const QString editedStore = readText(editedPath);
+    check("fim.ownership.edited-writes-marker",
+          storedFimValue(editedStore, QStringLiteral("fim.ui_owned")) == QStringLiteral("true"),
+          fimKeysInStore(editedStore).join(QLatin1Char(',')));
+    check("fim.ownership.edited-writes-endpoint",
+          storedFimValue(editedStore, QStringLiteral("fim.endpoint"))
+              == QStringLiteral("https://api.deepseek.com/beta/completions"),
+          storedFimValue(editedStore, QStringLiteral("fim.endpoint")));
+    check("fim.ownership.edited-writes-protocol",
+          storedFimValue(editedStore, QStringLiteral("fim.protocol"))
+              == QString::fromLatin1(keys::kFimProtocolOpenAi),
+          storedFimValue(editedStore, QStringLiteral("fim.protocol")));
+
+    // (c) poisoned legacy store: an OLD build wrote `fim.enabled=false` without
+    // the ownership marker. Apply must neither add the marker nor any other fim.*
+    // key, and must not delete the key that was already there.
+    const QString poisonedPath = directory + QStringLiteral("/fim-ownership-poisoned.toml");
+    check("fim.ownership.poisoned-fixture",
+          writeText(poisonedPath, QByteArray("\"fim.enabled\" = \"false\"\n")));
+    {
+        Harness harness;
+        check("fim.ownership.poisoned-harness",
+              buildHarness(&harness, poisonedPath, shortcutBase + QStringLiteral(".poisoned")));
+        SettingsDialog dialog(&harness.themes, &harness.commands, poisonedPath, nullptr);
+        check("fim.ownership.poisoned-load", dialog.panel() != nullptr && dialog.panel()->flush());
+        dialog.applyPending();
+        check("fim.ownership.poisoned-apply-flush",
+              dialog.panel() != nullptr && dialog.panel()->flush());
+    }
+    const QString poisonedStore = readText(poisonedPath);
+    check("fim.ownership.poisoned-no-marker",
+          storedFimValue(poisonedStore, QStringLiteral("fim.ui_owned")).isEmpty());
+    check("fim.ownership.poisoned-keeps-the-existing-key",
+          storedFimValue(poisonedStore, QStringLiteral("fim.enabled")) == QStringLiteral("false"),
+          storedFimValue(poisonedStore, QStringLiteral("fim.enabled")));
+    check("fim.ownership.poisoned-writes-no-other-fim-keys",
+          fimKeysInStore(poisonedStore) == QStringList{QStringLiteral("fim.enabled")},
+          fimKeysInStore(poisonedStore).join(QLatin1Char(',')));
+
+    // (d) THE BACKFILL TRAP (§12 B1 requirement 3): every control is filled
+    // programmatically from a store whose values ALL differ from the defaults, so
+    // applyFimValues() really does toggle/set every widget. None of that is a user
+    // edit: Apply must not create the marker, and every stored value must survive.
+    const QString backfillPath = directory + QStringLiteral("/fim-ownership-backfill.toml");
+    QByteArray backfillFixture;
+    backfillFixture.append("\"fim.enabled\" = \"true\"\n");
+    backfillFixture.append("\"fim.protocol\" = \"llama_cpp\"\n");
+    backfillFixture.append("\"fim.endpoint\" = \"http://127.0.0.1:8080\"\n");
+    backfillFixture.append("\"fim.model\" = \"qwen\"\n");
+    backfillFixture.append("\"fim.timeout_ms\" = \"2500\"\n");
+    backfillFixture.append("\"fim.max_tokens\" = \"128\"\n");
+    backfillFixture.append("\"fim.ghost_text\" = \"true\"\n");
+    check("fim.ownership.backfill-fixture", writeText(backfillPath, backfillFixture));
+    {
+        Harness harness;
+        check("fim.ownership.backfill-harness",
+              buildHarness(&harness, backfillPath, shortcutBase + QStringLiteral(".backfill")));
+        SettingsDialog dialog(&harness.themes, &harness.commands, backfillPath, nullptr);
+        check("fim.ownership.backfill-load", dialog.panel() != nullptr && dialog.panel()->flush());
+        // Prove the backfill really ran: a negative check on a page that was never
+        // filled proves nothing.
+        const FimValues shown =
+            dialog.panel() != nullptr ? dialog.panel()->fimValues() : FimValues{};
+        check("fim.ownership.backfill-filled-the-widgets",
+              shown.enabled && shown.ghostText
+                  && shown.protocol == QString::fromLatin1(keys::kFimProtocolLlamaCpp)
+                  && shown.endpoint == QStringLiteral("http://127.0.0.1:8080")
+                  && shown.model == QStringLiteral("qwen") && shown.timeoutMs == 2500
+                  && shown.maxTokens == 128);
+        dialog.applyPending();
+        check("fim.ownership.backfill-apply-flush",
+              dialog.panel() != nullptr && dialog.panel()->flush());
+    }
+    const QString backfillStore = readText(backfillPath);
+    check("fim.ownership.backfill-no-marker",
+          storedFimValue(backfillStore, QStringLiteral("fim.ui_owned")).isEmpty(),
+          storedFimValue(backfillStore, QStringLiteral("fim.ui_owned")));
+    check("fim.ownership.backfill-keeps-every-value",
+          storedFimValue(backfillStore, QStringLiteral("fim.enabled")) == QStringLiteral("true")
+              && storedFimValue(backfillStore, QStringLiteral("fim.protocol"))
+                  == QStringLiteral("llama_cpp")
+              && storedFimValue(backfillStore, QStringLiteral("fim.endpoint"))
+                  == QStringLiteral("http://127.0.0.1:8080")
+              && storedFimValue(backfillStore, QStringLiteral("fim.model"))
+                  == QStringLiteral("qwen")
+              && storedFimValue(backfillStore, QStringLiteral("fim.timeout_ms"))
+                  == QStringLiteral("2500")
+              && storedFimValue(backfillStore, QStringLiteral("fim.max_tokens"))
+                  == QStringLiteral("128")
+              && storedFimValue(backfillStore, QStringLiteral("fim.ghost_text"))
+                  == QStringLiteral("true"),
+          fimKeysInStore(backfillStore).join(QLatin1Char(',')));
+
+    // (e) NON-FIRST promotion is non-destructive too (batch-20261113 F2, H1). The
+    // store already declares ownership, but that only says the FIM page is
+    // ALLOWED to own the block — it does not make every page value an expressed
+    // one. A store that owns FIM but carries no `fim.enabled` (exactly what a
+    // first promotion that never expressed Enabled leaves behind) must not gain
+    // `fim.enabled=false` plus the page's timeout / max_tokens defaults just
+    // because the user pressed Apply without touching the FIM page: the Rust side
+    // inherits those fields from vedit.toml, and a seeded false would override it.
+    //
+    // This REPLACES the old `fim.ownership.owned-writes-the-page-values` check,
+    // which demanded exactly that whole block and therefore locked the H1 defect
+    // in as the expected behaviour.
+    const QString ownedPath = directory + QStringLiteral("/fim-ownership-owned.toml");
+    check("fim.ownership.owned-fixture",
+          writeText(ownedPath, QByteArray("\"fim.ui_owned\" = \"true\"\n")));
+    {
+        Harness harness;
+        check("fim.ownership.owned-harness",
+              buildHarness(&harness, ownedPath, shortcutBase + QStringLiteral(".owned")));
+        SettingsDialog dialog(&harness.themes, &harness.commands, ownedPath, nullptr);
+        check("fim.ownership.owned-load", dialog.panel() != nullptr && dialog.panel()->flush());
+        dialog.applyPending();
+        check("fim.ownership.owned-apply-flush",
+              dialog.panel() != nullptr && dialog.panel()->flush());
+    }
+    const QString ownedStore = readText(ownedPath);
+    check("fim.ownership.owned-marker-written",
+          storedFimValue(ownedStore, QStringLiteral("fim.ui_owned")) == QStringLiteral("true"),
+          fimKeysInStore(ownedStore).join(QLatin1Char(',')));
+    check("fim.ownership.owned-writes-no-unexpressed-fields",
+          fimKeysInStore(ownedStore) == QStringList{QStringLiteral("fim.ui_owned")},
+          fimKeysInStore(ownedStore).join(QLatin1Char(',')));
+
+    // (e2) H1's exact shape through the OK button: the store a first Detect
+    // promotion leaves behind (marker + endpoint/protocol/model, and NO
+    // `fim.enabled`, no timeout, no max_tokens). Open the dialog, press OK with
+    // the FIM page never touched: nothing about the block may change. Before the
+    // fix this wrote `fim.enabled=false`, `fim.timeout_ms=5000`, `fim.max_tokens=64`
+    // and `fim.ghost_text=false` — a silent "off" for a vedit.toml user.
+    const QString ownedOkPath = directory + QStringLiteral("/fim-ownership-owned-ok.toml");
+    QByteArray ownedOkFixture;
+    ownedOkFixture.append("\"fim.ui_owned\" = \"true\"\n");
+    ownedOkFixture.append("\"fim.endpoint\" = \"https://api.deepseek.com/beta/completions\"\n");
+    ownedOkFixture.append("\"fim.protocol\" = \"open_ai\"\n");
+    ownedOkFixture.append("\"fim.model\" = \"deepseek-flash\"\n");
+    check("fim.ownership.owned-ok-fixture", writeText(ownedOkPath, ownedOkFixture));
+    {
+        Harness harness;
+        check("fim.ownership.owned-ok-harness",
+              buildHarness(&harness, ownedOkPath, shortcutBase + QStringLiteral(".owned-ok")));
+        SettingsDialog dialog(&harness.themes, &harness.commands, ownedOkPath, nullptr);
+        check("fim.ownership.owned-ok-load",
+              dialog.panel() != nullptr && dialog.panel()->flush());
+        dialog.accept(); // OK -> commitPending, with no FIM edit in this session
+        check("fim.ownership.owned-ok-flush",
+              dialog.panel() != nullptr && dialog.panel()->flush());
+    }
+    const QString ownedOkStore = readText(ownedOkPath);
+    check("fim.ownership.owned-ok-no-fim-enabled",
+          storedFimValue(ownedOkStore, QStringLiteral("fim.enabled")).isEmpty(),
+          storedFimValue(ownedOkStore, QStringLiteral("fim.enabled")));
+    check("fim.ownership.owned-ok-no-page-defaults",
+          storedFimValue(ownedOkStore, QStringLiteral("fim.timeout_ms")).isEmpty()
+              && storedFimValue(ownedOkStore, QStringLiteral("fim.max_tokens")).isEmpty()
+              && storedFimValue(ownedOkStore, QStringLiteral("fim.ghost_text")).isEmpty(),
+          fimKeysInStore(ownedOkStore).join(QLatin1Char(',')));
+    check("fim.ownership.owned-ok-keeps-the-existing-keys",
+          fimKeysInStore(ownedOkStore)
+              == QStringList{QStringLiteral("fim.endpoint"), QStringLiteral("fim.model"),
+                             QStringLiteral("fim.protocol"), QStringLiteral("fim.ui_owned")},
+          fimKeysInStore(ownedOkStore).join(QLatin1Char(',')));
+
+    // (e3) the other half of the frozen rule: a NON-FIRST promotion still writes
+    // what the user DID express — and only that. Max tokens is edited; the
+    // existing enabled / endpoint keys must survive untouched and no
+    // protocol / timeout / ghost_text key may be seeded from the page.
+    const QString partialPath = directory + QStringLiteral("/fim-ownership-partial.toml");
+    QByteArray partialFixture;
+    partialFixture.append("\"fim.ui_owned\" = \"true\"\n");
+    partialFixture.append("\"fim.enabled\" = \"true\"\n");
+    partialFixture.append("\"fim.endpoint\" = \"http://127.0.0.1:9000\"\n");
+    check("fim.ownership.partial-fixture", writeText(partialPath, partialFixture));
+    {
+        Harness harness;
+        check("fim.ownership.partial-harness",
+              buildHarness(&harness, partialPath, shortcutBase + QStringLiteral(".partial")));
+        SettingsDialog dialog(&harness.themes, &harness.commands, partialPath, nullptr);
+        check("fim.ownership.partial-load",
+              dialog.panel() != nullptr && dialog.panel()->flush());
+        if (QSpinBox *tokens = dialog.panel() != nullptr
+                                   ? dialog.panel()->fimMaxTokensSpin()
+                                   : nullptr) {
+            tokens->setValue(384); // the real user edit: valueChanged -> expressed
+            check("fim.ownership.partial-edit", true);
+        } else {
+            check("fim.ownership.partial-edit", false);
+        }
+        dialog.applyPending();
+        check("fim.ownership.partial-apply-flush",
+              dialog.panel() != nullptr && dialog.panel()->flush());
+    }
+    const QString partialStore = readText(partialPath);
+    check("fim.ownership.owned-writes-only-the-expressed-field",
+          storedFimValue(partialStore, QStringLiteral("fim.max_tokens")) == QStringLiteral("384")
+              && storedFimValue(partialStore, QStringLiteral("fim.enabled"))
+                  == QStringLiteral("true")
+              && storedFimValue(partialStore, QStringLiteral("fim.endpoint"))
+                  == QStringLiteral("http://127.0.0.1:9000")
+              && fimKeysInStore(partialStore)
+                  == QStringList{QStringLiteral("fim.enabled"), QStringLiteral("fim.endpoint"),
+                                 QStringLiteral("fim.max_tokens"), QStringLiteral("fim.ui_owned")},
+          fimKeysInStore(partialStore).join(QLatin1Char(',')));
+
+    // (f1) M2 — Reload must clear the per-field mask. The user edits Timeout, then
+    // presses Reload (the store never carried `fim.timeout_ms`), then Apply: the
+    // discarded edit must not resurrect as the page's 5000 ms default, which is an
+    // unexpressed field being written. Before the fix `fim.timeout_ms=5000` landed
+    // in the store even though the store never had it and the edit was discarded.
+    const QString reloadPath = directory + QStringLiteral("/fim-ownership-reload.toml");
+    QByteArray reloadFixture;
+    reloadFixture.append("\"fim.ui_owned\" = \"true\"\n");
+    reloadFixture.append("\"fim.enabled\" = \"true\"\n");
+    check("fim.ownership.reload-fixture", writeText(reloadPath, reloadFixture));
+    {
+        Harness harness;
+        check("fim.ownership.reload-harness",
+              buildHarness(&harness, reloadPath, shortcutBase + QStringLiteral(".reload")));
+        SettingsDialog dialog(&harness.themes, &harness.commands, reloadPath, nullptr);
+        check("fim.ownership.reload-load", dialog.panel() != nullptr && dialog.panel()->flush());
+        if (QSpinBox *timeout = dialog.panel() != nullptr
+                                    ? dialog.panel()->fimTimeoutSpin()
+                                    : nullptr) {
+            timeout->setValue(3500); // expresses TimeoutMs in this session
+            check("fim.ownership.reload-edit", true);
+        } else {
+            check("fim.ownership.reload-edit", false);
+        }
+        if (dialog.panel() != nullptr) {
+            dialog.panel()->reload(); // the Reload button's slot
+        }
+        check("fim.ownership.reload-flush", dialog.panel() != nullptr && dialog.panel()->flush());
+        dialog.applyPending();
+        check("fim.ownership.reload-apply-flush",
+              dialog.panel() != nullptr && dialog.panel()->flush());
+    }
+    const QString reloadStore = readText(reloadPath);
+    check("fim.ownership.reload-mask-cleared",
+          fimKeysInStore(reloadStore)
+              == QStringList{QStringLiteral("fim.enabled"), QStringLiteral("fim.ui_owned")},
+          fimKeysInStore(reloadStore).join(QLatin1Char(',')));
+    check("fim.ownership.reload-writes-no-default-timeout",
+          storedFimValue(reloadStore, QStringLiteral("fim.timeout_ms")).isEmpty(),
+          storedFimValue(reloadStore, QStringLiteral("fim.timeout_ms")));
+
+    // (f2) M2 — Reload must re-capture whether the STORE already carries the
+    // marker. The file gains `fim.ui_owned` on disk between load and reload; after
+    // the reload the panel must treat the store as the owner (NON-first
+    // promotion), so the first-promotion branch's deletion of the pre-existing,
+    // never-expressed `fim.enabled` must not run.
+    const QString recapturePath = directory + QStringLiteral("/fim-ownership-recapture.toml");
+    check("fim.ownership.recapture-fixture",
+          writeText(recapturePath, QByteArray("\"fim.enabled\" = \"false\"\n")));
+    {
+        Harness harness;
+        check("fim.ownership.recapture-harness",
+              buildHarness(&harness, recapturePath, shortcutBase + QStringLiteral(".recapture")));
+        SettingsDialog dialog(&harness.themes, &harness.commands, recapturePath, nullptr);
+        check("fim.ownership.recapture-load",
+              dialog.panel() != nullptr && dialog.panel()->flush());
+        check("fim.ownership.recapture-store-edit",
+              writeText(recapturePath, QByteArray("\"fim.enabled\" = \"false\"\n"
+                                                  "\"fim.ui_owned\" = \"true\"\n")));
+        if (dialog.panel() != nullptr) {
+            dialog.panel()->reload();
+        }
+        check("fim.ownership.recapture-reload-flush",
+              dialog.panel() != nullptr && dialog.panel()->flush());
+        if (QSpinBox *tokens = dialog.panel() != nullptr
+                                   ? dialog.panel()->fimMaxTokensSpin()
+                                   : nullptr) {
+            tokens->setValue(384); // expresses MaxTokens after the reload
+            check("fim.ownership.recapture-edit", true);
+        } else {
+            check("fim.ownership.recapture-edit", false);
+        }
+        dialog.applyPending();
+        check("fim.ownership.recapture-apply-flush",
+              dialog.panel() != nullptr && dialog.panel()->flush());
+    }
+    const QString recaptureStore = readText(recapturePath);
+    check("fim.ownership.recapture-keeps-the-unexpressed-key",
+          storedFimValue(recaptureStore, QStringLiteral("fim.enabled")) == QStringLiteral("false"),
+          fimKeysInStore(recaptureStore).join(QLatin1Char(',')));
+}
+
+// --- batch-20261113 F1 (§13): Detect must not hand the store the WHOLE block --
+//
+// A legacy store (written by an older build's Apply) carries `fim.enabled=false`
+// and an endpoint but NO ownership marker. The frozen rule is that ownership is
+// promoted NON-destructively: the first promotion writes the marker plus only the
+// fields the user expressed in this session (edited, or reported by a successful
+// Detect) and DELETES the pre-existing `fim.*` keys that had no authority yet.
+// Before the fix, one Detect click wrote the page's whole block — marker AND
+// `fim.enabled=false` — so the store took over the request path and silently
+// disabled a `[fim]`-in-vedit.toml user, the B1 defect one click away.
+void checkFimDetectPromotion(const QString &directory)
+{
+    namespace keys = vedit::workspace::settings::keys;
+    if (!SettingsClient::ffiAvailable()) {
+        check("fim.detect-promotion.ffi", false, "lane built without the vd-ffi settings ABI");
+        return;
+    }
+    const QString shortcutBase = directory + QStringLiteral("/fim-detect-promotion-shortcuts");
+
+    // (C1/C2) the legacy store, and a REAL local server the Detect click reaches.
+    FakeFimEndpoint fakeEndpoint;
+    const bool serverUp = fakeEndpoint.listen();
+    check("fim.detect-promotion.server", serverUp, fakeEndpoint.baseUrl());
+    if (!serverUp) {
+        return;
+    }
+    fakeEndpoint.setBody(QByteArrayLiteral("{\"data\":[{\"id\":\"alpha\"},{\"id\":\"beta\"}]}"));
+    const QString legacyPath = directory + QStringLiteral("/fim-detect-legacy.toml");
+    QByteArray legacyFixture;
+    legacyFixture.append("\"fim.enabled\" = \"false\"\n");
+    legacyFixture.append("\"fim.endpoint\" = \"" + fakeEndpoint.baseUrl().toUtf8() + "\"\n");
+    legacyFixture.append("\"fim.timeout_ms\" = \"1234\"\n");
+    legacyFixture.append("\"fim.max_tokens\" = \"99\"\n");
+    check("fim.detect-promotion.legacy-fixture", writeText(legacyPath, legacyFixture));
+    {
+        Harness harness;
+        check("fim.detect-promotion.legacy-harness",
+              buildHarness(&harness, legacyPath, shortcutBase + QStringLiteral(".legacy")));
+        SettingsDialog dialog(&harness.themes, &harness.commands, legacyPath, nullptr);
+        check("fim.detect-promotion.legacy-load",
+              dialog.panel() != nullptr && dialog.panel()->flush());
+        // Prove the page really shows the legacy values (a page that was never
+        // filled would make the negative checks below prove nothing).
+        const FimValues shown =
+            dialog.panel() != nullptr ? dialog.panel()->fimValues() : FimValues{};
+        check("fim.detect-promotion.legacy-page-filled",
+              !shown.enabled && shown.endpoint == fakeEndpoint.baseUrl() && shown.timeoutMs == 1234,
+              QStringLiteral("enabled=%1 endpoint=[%2] timeout=%3")
+                  .arg(shown.enabled ? 1 : 0)
+                  .arg(shown.endpoint)
+                  .arg(shown.timeoutMs));
+        QPushButton *detect =
+            dialog.panel() != nullptr ? dialog.panel()->fimDetectButton() : nullptr;
+        check("fim.detect-promotion.detect-button", detect != nullptr);
+        if (detect == nullptr) {
+            return;
+        }
+        // The ONLY user action: one Detect click. The FIM page is never edited.
+        detect->click();
+        const bool finished = waitForFimDetect(dialog.panel(), 15000);
+        check("fim.detect-promotion.detect-succeeded", finished,
+              dialog.panel() != nullptr && dialog.panel()->fimDetectStatusLabel() != nullptr
+                  ? dialog.panel()->fimDetectStatusLabel()->text()
+                  : QString());
+        dialog.applyPending();
+        check("fim.detect-promotion.legacy-apply-flush",
+              dialog.panel() != nullptr && dialog.panel()->flush());
+    }
+    const QString legacyStore = readText(legacyPath);
+    check("fim.detect-promotion.legacy-marker",
+          storedFimValue(legacyStore, QStringLiteral("fim.ui_owned")) == QStringLiteral("true"),
+          fimKeysInStore(legacyStore).join(QLatin1Char(',')));
+    // C1 RED before the fix (`fim.enabled=false` survived into the promoted
+    // store); C2 GREEN after it: the key was neither edited nor detected, so the
+    // first promotion deletes it.
+    check("fim.detect-promotion.legacy-no-fim-enabled",
+          !legacyStore.contains(QStringLiteral("\"fim.enabled\"")),
+          storedFimValue(legacyStore, QStringLiteral("fim.enabled")));
+    check("fim.detect-promotion.legacy-detected-fields",
+          storedFimValue(legacyStore, QStringLiteral("fim.endpoint"))
+                  == fakeEndpoint.baseUrl() + QStringLiteral("/v1/completions")
+              && storedFimValue(legacyStore, QStringLiteral("fim.protocol"))
+                  == QString::fromLatin1(keys::kFimProtocolOpenAi)
+              && storedFimValue(legacyStore, QStringLiteral("fim.model"))
+                  == QStringLiteral("alpha"),
+          QStringLiteral("endpoint=[%1] protocol=[%2] model=[%3]")
+              .arg(storedFimValue(legacyStore, QStringLiteral("fim.endpoint")),
+                   storedFimValue(legacyStore, QStringLiteral("fim.protocol")),
+                   storedFimValue(legacyStore, QStringLiteral("fim.model"))));
+    check("fim.detect-promotion.legacy-drops-unexpressed",
+          fimKeysInStore(legacyStore)
+              == QStringList{QStringLiteral("fim.endpoint"), QStringLiteral("fim.model"),
+                             QStringLiteral("fim.protocol"), QStringLiteral("fim.ui_owned")},
+          fimKeysInStore(legacyStore).join(QLatin1Char(',')));
+
+    // (C3a) empty store, FIM page never touched, Apply: still not one fim.* key.
+    const QString emptyPath = directory + QStringLiteral("/fim-detect-empty.toml");
+    QFile::remove(emptyPath);
+    {
+        Harness harness;
+        check("fim.detect-promotion.empty-harness",
+              buildHarness(&harness, emptyPath, shortcutBase + QStringLiteral(".empty")));
+        SettingsDialog dialog(&harness.themes, &harness.commands, emptyPath, nullptr);
+        check("fim.detect-promotion.empty-load",
+              dialog.panel() != nullptr && dialog.panel()->flush());
+        dialog.applyPending();
+        check("fim.detect-promotion.empty-flush",
+              dialog.panel() != nullptr && dialog.panel()->flush());
+    }
+    const QString emptyStore = readText(emptyPath);
+    check("fim.detect-promotion.empty-store-still-empty",
+          fimKeysInStore(emptyStore).isEmpty(),
+          fimKeysInStore(emptyStore).join(QLatin1Char(',')));
+
+    // (C3b) empty store + ONE Provider switch + Apply: the marker plus the two
+    // fields the preset wrote — and NOT `fim.enabled` (nothing expressed it).
+    const QString presetPath = directory + QStringLiteral("/fim-detect-preset.toml");
+    QFile::remove(presetPath);
+    {
+        Harness harness;
+        check("fim.detect-promotion.preset-harness",
+              buildHarness(&harness, presetPath, shortcutBase + QStringLiteral(".preset")));
+        SettingsDialog dialog(&harness.themes, &harness.commands, presetPath, nullptr);
+        check("fim.detect-promotion.preset-load",
+              dialog.panel() != nullptr && dialog.panel()->flush());
+        QComboBox *provider =
+            dialog.panel() != nullptr ? dialog.panel()->fimProviderCombo() : nullptr;
+        const int deepseek =
+            provider != nullptr ? provider->findData(QStringLiteral("deepseek")) : -1;
+        check("fim.detect-promotion.preset-present", deepseek >= 0);
+        if (deepseek >= 0) {
+            provider->setCurrentIndex(deepseek);
+        }
+        dialog.applyPending();
+        check("fim.detect-promotion.preset-flush",
+              dialog.panel() != nullptr && dialog.panel()->flush());
+    }
+    const QString presetStore = readText(presetPath);
+    check("fim.detect-promotion.preset-no-fim-enabled",
+          !presetStore.contains(QStringLiteral("\"fim.enabled\"")),
+          storedFimValue(presetStore, QStringLiteral("fim.enabled")));
+    check("fim.detect-promotion.preset-keys",
+          fimKeysInStore(presetStore)
+              == QStringList{QStringLiteral("fim.endpoint"), QStringLiteral("fim.protocol"),
+                             QStringLiteral("fim.ui_owned")},
+          fimKeysInStore(presetStore).join(QLatin1Char(',')));
+    check("fim.detect-promotion.preset-values",
+          storedFimValue(presetStore, QStringLiteral("fim.endpoint"))
+                  == QStringLiteral("https://api.deepseek.com/beta/completions")
+              && storedFimValue(presetStore, QStringLiteral("fim.protocol"))
+                  == QString::fromLatin1(keys::kFimProtocolOpenAi),
+          storedFimValue(presetStore, QStringLiteral("fim.endpoint")));
 }
 
 // The contract asks for a record that the typed key never lands in
@@ -1139,16 +1990,39 @@ void checkLintPage(const QString &directory)
                       == a4::LintKnobStateKind::Supported
               && a4::lintKnobState(a4::LintBackend::Verible, a4::LintKnob::WaiverFiles).kind
                       == a4::LintKnobStateKind::Supported);
-    // ... but `--autofix` has no field in VdLintBatchOptions, so it stays
-    // pending (R1: never silently sent as a no-op).
-    check("settings.a4.lint.state.autofix-pending",
+    // Batch 20261110b (authorised contract change): `--autofix` is WIRED.
+    // `VdLintBatchOptions` carries `verible_autofix` / `autofix_output_file`, so
+    // the knob is supported and the value is transported (the old
+    // `settings.a4.lint.state.autofix-pending` assertion pinned "stored but not
+    // sent"; the old->new basis and logs are in
+    // `evidence/batch-20261110b/lint-engine/AUTHORIZATION.md`).
+    check("settings.a4.lint.state.autofix-transported",
           a4::lintKnobState(a4::LintBackend::Verible, a4::LintKnob::Autofix).kind
-                      == a4::LintKnobStateKind::TransportPending
-              && a4::lintKnobState(a4::LintBackend::Verible, a4::LintKnob::Autofix).pending()
+                      == a4::LintKnobStateKind::Supported
               && a4::lintKnobState(a4::LintBackend::Verible, a4::LintKnob::Autofix).enabled()
+              && !a4::lintKnobState(a4::LintBackend::Verible, a4::LintKnob::Autofix).pending()
               && a4::lintKnobState(a4::LintBackend::Verible, a4::LintKnob::Autofix)
-                     .reason.contains(QStringLiteral("transport pending")),
+                     .reason.isEmpty()
+              && a4::lintAutofixCode(QString::fromLatin1(keys::kAutofixPatch)) == 1
+              && a4::lintAutofixCode(QString::fromLatin1(keys::kAutofixGenerateWaiver)) == 5,
           a4::lintKnobState(a4::LintBackend::Verible, a4::LintKnob::Autofix).reason);
+
+    // AC-1.4 / AC-T8.2: the two interactive modes are NOT pretend-supported:
+    // they carry the no-TTY reason, while every non-interactive value stays
+    // available (the engine still transports a stored interactive value).
+    const a4::LintAutofixValue patchInteractive =
+        a4::lintAutofixValue(QString::fromLatin1(keys::kAutofixPatchInteractive));
+    const a4::LintAutofixValue inplaceInteractive =
+        a4::lintAutofixValue(QString::fromLatin1(keys::kAutofixInplaceInteractive));
+    check("settings.a4.lint.state.autofix-interactive-unavailable",
+          !patchInteractive.available && !inplaceInteractive.available
+              && patchInteractive.reason.contains(QStringLiteral("TTY"))
+              && inplaceInteractive.reason.contains(QStringLiteral("TTY"))
+              && patchInteractive.code == 2 && inplaceInteractive.code == 4
+              && a4::lintAutofixValue(QString::fromLatin1(keys::kAutofixPatch)).available
+              && a4::lintAutofixValue(QString::fromLatin1(keys::kAutofixInplace)).available
+              && a4::lintAutofixValue(QString::fromLatin1(keys::kAutofixGenerateWaiver)).available,
+          patchInteractive.reason);
     check("settings.a4.lint.state.supported",
           a4::lintKnobState(a4::LintBackend::Verible, a4::LintKnob::RulesConfig).kind
                   == a4::LintKnobStateKind::Supported
@@ -1341,15 +2215,46 @@ void checkLintPage(const QString &directory)
           waiverArgv.contains(QStringLiteral("--waiver_files=/p/a.waiver,/p/b.waiver")),
           waiverArgv);
 
-    // (4) --autofix: NO ABI field -> the value must NOT reach the argv (R1),
-    // and the knob must still report itself as pending.
+    // (4) --autofix: the ABI carries it now, so the stored value reaches the
+    // real argv (batch 20261110b; this replaces the old "not sent" assertion).
     knob = a4::LintValues{};
     knob.verible.autofix = QString::fromLatin1(keys::kAutofixPatch);
     const QString autofixArgv = batchArgv(knob, a4::LintBackend::Verible);
-    check("settings.a4.lint.argv.autofix-not-sent",
-          !autofixArgv.contains(QStringLiteral("--autofix"))
-              && a4::lintKnobState(a4::LintBackend::Verible, a4::LintKnob::Autofix).pending(),
-          autofixArgv);
+    check("settings.a4.lint.argv.autofix",
+          autofixArgv.contains(QStringLiteral("--autofix=patch")), autofixArgv);
+
+    // (4b) --autofix_output_file and slang's own --waiver-file are filled by
+    // the same one mapping (fillLintBatchOptions), not by a second path.
+    a4::LintJobOptions fixJob =
+        a4::buildLintJobOptions(knob, a4::LintBackend::Verible, QString(), QString());
+    fixJob.autofixOutputFile = QStringLiteral("/tmp/vedit-fixes.patch");
+    VdLintBatchOptions fixAbi{};
+    a4::LintBatchAbiStorage fixStorage;
+    a4::fillLintBatchOptions(fixJob, &fixAbi, &fixStorage);
+    char *fixLine = vd_lint_batch_command_line(&fixAbi, "f.sv");
+    QString fixArgv = fixLine != nullptr ? QString::fromUtf8(fixLine) : QString();
+    if (fixLine != nullptr) {
+        vd_string_free(fixLine);
+    }
+    const int fixNote = fixArgv.indexOf(QStringLiteral(" | "));
+    if (fixNote >= 0) {
+        fixArgv.truncate(fixNote);
+    }
+    check("settings.a4.lint.argv.autofix-output-file",
+          fixArgv.contains(QStringLiteral("--autofix_output_file=/tmp/vedit-fixes.patch")),
+          fixArgv);
+
+    const QString waiverPath = directory + QStringLiteral("/slang-waivers.toml");
+    const bool waiverWritten = writeText(
+        waiverPath,
+        QByteArray("[[waivers]]\nfile = \"f.sv\"\ndiagnostic = \"implicit-net\"\n"));
+    a4::LintValues slangWaiver;
+    slangWaiver.slang.waiverFile = waiverPath;
+    const QString slangWaiverArgv = batchArgv(slangWaiver, a4::LintBackend::Slang);
+    check("settings.a4.lint.argv.slang-waiver-file",
+          waiverWritten
+              && slangWaiverArgv.contains(QStringLiteral("--waiver-file ") + waiverPath),
+          slangWaiverArgv);
 
     // (5) -W (the page stores bare values; each becomes its own token)
     knob = a4::LintValues{};
@@ -1429,6 +2334,1130 @@ void checkLintPage(const QString &directory)
     check("settings.a4.lint.holder",
           a4::currentLintValues().verible.autofix == QString::fromLatin1(keys::kAutofixPatch)
               && a4::currentLintValues().slang.errorLimit == QStringLiteral("25"));
+}
+
+// --- batch 20261110c: Preferences → Environment (AC-4.3/4.4, AC-N5) --------
+
+void pumpGuiEvents(int rounds = 20)
+{
+    for (int round = 0; round < rounds; ++round) {
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 10);
+    }
+}
+
+// Batch 20261110e: the Preferences dialog now scrolls its content (size
+// discipline, batch 20261110d), so a control below the fold is NOT under the
+// screen point it maps to until the viewport is scrolled — `widgetAt` returns
+// null there. A real user scrolls the wheel before clicking; the probe does the
+// same: every QScrollArea between the widget and the dialog is scrolled just
+// enough to bring the widget's rect inside its viewport, and the layout is
+// pumped before the hit test computes the GLOBAL point. A widget that still
+// cannot be brought into view is left where it is — the hit test then fails and
+// the probe reports it, rather than silently clicking a wrong control.
+void scrollTargetIntoView(QWidget *target)
+{
+    if (target == nullptr) {
+        return;
+    }
+    constexpr int kMargin = 12;
+    for (QWidget *ancestor = target->parentWidget(); ancestor != nullptr;
+         ancestor = ancestor->parentWidget()) {
+        auto *area = qobject_cast<QScrollArea *>(ancestor);
+        if (area == nullptr || !area->viewport()->isAncestorOf(target)) {
+            continue;
+        }
+        QWidget *viewport = area->viewport();
+        const QRect rect(target->mapTo(viewport, QPoint(0, 0)), target->size());
+        const QRect visible = viewport->rect();
+        int delta = 0;
+        if (rect.height() >= visible.height() - 2 * kMargin) {
+            // Taller than the viewport: its top edge is what a user can reach first.
+            delta = rect.top() - (visible.top() + kMargin);
+        } else if (rect.top() < visible.top() + kMargin) {
+            delta = rect.top() - (visible.top() + kMargin);
+        } else if (rect.bottom() > visible.bottom() - kMargin) {
+            delta = rect.bottom() - (visible.bottom() - kMargin);
+        }
+        if (delta != 0) {
+            QScrollBar *bar = area->verticalScrollBar();
+            bar->setValue(bar->value() + delta);
+            pumpGuiEvents();
+            std::printf("ENV-UI probe: scrolled %s into view by %d (scroll=%d)\n",
+                        target->objectName().isEmpty() ? target->metaObject()->className()
+                                                       : qPrintable(target->objectName()),
+                        delta, bar->value());
+        }
+    }
+}
+
+// Real hit test + delivery (the xcb pattern of `vedit-fold-gutter-click`): the
+// widget under the GLOBAL point is resolved with QApplication::widgetAt and the
+// press/release go to THAT widget. `target` is the widget we believe owns the
+// point; an ancestor/descendant of it is accepted (a viewport/child), anything
+// else fails the check instead of silently clicking the wrong control.
+bool clickUnderPoint(QWidget *target, const QPoint &global, const char *label)
+{
+    if (target == nullptr) {
+        std::printf("ENV-UI probe: no target for %s\n", label);
+        return false;
+    }
+    QWidget *under = QApplication::widgetAt(global);
+    if (under == nullptr
+        || (under != target && !target->isAncestorOf(under) && !under->isAncestorOf(target))) {
+        std::printf("ENV-UI probe: no hit for %s at %d,%d under=%s\n", label, global.x(),
+                    global.y(),
+                    under == nullptr ? "null" : qPrintable(under->objectName()));
+        return false;
+    }
+    const QPoint local = under->mapFromGlobal(global);
+    QMouseEvent press(QEvent::MouseButtonPress, QPointF(local), QPointF(global), Qt::LeftButton,
+                      Qt::LeftButton, Qt::NoModifier);
+    QApplication::sendEvent(under, &press);
+    QMouseEvent release(QEvent::MouseButtonRelease, QPointF(local), QPointF(global),
+                        Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QApplication::sendEvent(under, &release);
+    pumpGuiEvents();
+    return true;
+}
+
+bool clickCenter(QWidget *widget, const char *label)
+{
+    if (widget == nullptr) {
+        std::printf("ENV-UI probe: no widget for %s\n", label);
+        return false;
+    }
+    // Scroll the control into the visible part of a scrolling Preferences page
+    // BEFORE computing its screen point (batch 20261110d made the content scroll).
+    scrollTargetIntoView(widget);
+    return clickUnderPoint(widget, widget->mapToGlobal(widget->rect().center()), label);
+}
+
+int environmentRowNamed(const EnvImportPage &page, const QString &name)
+{
+    for (int row = 0; row < page.diffRowCount(); ++row) {
+        if (page.diffName(row) == name) {
+            return row;
+        }
+    }
+    return -1;
+}
+
+int storedRowNamed(const EnvImportPage &page, const QString &name, const QString &root,
+                   QString *value)
+{
+    for (int row = 0; row < page.selectionRowCount(); ++row) {
+        if (page.selectionName(row) == name && page.selectionRoot(row) == root) {
+            if (value != nullptr) {
+                *value = page.selectionValue(row);
+            }
+            return row;
+        }
+    }
+    return -1;
+}
+
+// The fixture the diff checks use: three assignments a shell-only environment
+// changes, one secret-shaped name, and one that is identical in the process.
+bool writeEnvironmentFixture(const QString &path)
+{
+    return writeText(path, QByteArray("export VEDIT_ENV_UI_ADDED=from-shell\n"
+                                      "export VEDIT_ENV_UI_CHANGED=from-shell\n"
+                                      "export VEDIT_ENV_UI_UNCHANGED=unchanged\n"
+                                      "export VEDIT_ENV_UI_SECRET_TOKEN=fixture-secret-value\n"));
+}
+
+void prepareEnvironmentFixtureProcess()
+{
+    qputenv("VEDIT_ENV_UI_CHANGED", "from-process");
+    qputenv("VEDIT_ENV_UI_UNCHANGED", "unchanged");
+    qunsetenv("VEDIT_ENV_UI_ADDED");
+    qunsetenv("VEDIT_ENV_UI_SECRET_TOKEN");
+}
+
+void checkEnvironmentPage(const QString &directory)
+{
+    if (!SettingsClient::ffiAvailable()) {
+        check("env-import.ffi.available", false,
+              "lane built without the vd-ffi environment ABI");
+        return;
+    }
+    check("env-import.ffi.available", true);
+    const QString base = directory + QStringLiteral("/env-import");
+    check("env-import.mkdir", QDir().mkpath(base));
+    const QString settingsPath = base + QStringLiteral("/settings.toml");
+    const QString rcPath = base + QStringLiteral("/fixture.rc");
+    check("env-import.fixture.rc", writeEnvironmentFixture(rcPath));
+    prepareEnvironmentFixtureProcess();
+
+    EnvImportPage page(settingsPath);
+    const bool initialLoaded = page.flush();
+    check("env-import.initial-load", initialLoaded, page.statusText());
+    check("env-import.initial-empty", page.selectionRowCount() == 0,
+          QStringLiteral("rows=%1").arg(page.selectionRowCount()));
+    page.setProjectRoot(base);
+    page.setProjectScope(false);
+    page.setShellCode(0);
+    page.setSourceFile(rcPath);
+    check("env-import.scope.default-project", !page.projectScope());
+    const bool captureStarted = page.startCapture();
+    check("env-import.capture.start", captureStarted, page.statusText());
+    const bool captureFinished = page.flush(60000);
+    check("env-import.capture.done", captureFinished, page.captureReport());
+
+    const int addedRow = environmentRowNamed(page, QStringLiteral("VEDIT_ENV_UI_ADDED"));
+    const int changedRow = environmentRowNamed(page, QStringLiteral("VEDIT_ENV_UI_CHANGED"));
+    const int unchangedRow = environmentRowNamed(page, QStringLiteral("VEDIT_ENV_UI_UNCHANGED"));
+    const int secretRow = environmentRowNamed(page, QStringLiteral("VEDIT_ENV_UI_SECRET_TOKEN"));
+    check("env-import.diff.added", addedRow >= 0 && page.diffKind(addedRow) == QStringLiteral("added"),
+          QStringLiteral("row=%1").arg(addedRow));
+    check("env-import.diff.changed",
+          changedRow >= 0 && page.diffKind(changedRow) == QStringLiteral("changed"),
+          QStringLiteral("row=%1 kind=%2")
+              .arg(changedRow)
+              .arg(changedRow >= 0 ? page.diffKind(changedRow) : QString()));
+    check("env-import.diff.unchanged-absent", unchangedRow < 0,
+          QStringLiteral("row=%1").arg(unchangedRow));
+    bool noneChecked = true;
+    for (int row = 0; row < page.diffRowCount(); ++row) {
+        if (page.diffChecked(row)) {
+            noneChecked = false;
+        }
+    }
+    check("env-import.diff.default-unchecked", noneChecked,
+          QStringLiteral("rows=%1").arg(page.diffRowCount()));
+    check("env-import.diff.mask",
+          secretRow >= 0 && page.diffDisplayValue(secretRow) == QStringLiteral("<masked>")
+              && page.diffCapturedValue(secretRow) == QStringLiteral("fixture-secret-value"),
+          QStringLiteral("row=%1").arg(secretRow));
+    check("env-import.diff.changed-value",
+          changedRow >= 0 && page.diffDisplayValue(changedRow) == QStringLiteral("from-shell")
+              && page.diffCapturedValue(changedRow) == QStringLiteral("from-shell"));
+    check("env-import.stage.refuse-none", !page.stageImport());
+
+    // Check the two ordinary rows and the secret-shaped one: the ordinary rows
+    // are staged, the secret-shaped row is refused (masked, not persisted).
+    if (addedRow >= 0) {
+        page.setDiffChecked(addedRow, true);
+    }
+    if (changedRow >= 0) {
+        page.setDiffChecked(changedRow, true);
+    }
+    if (secretRow >= 0) {
+        page.setDiffChecked(secretRow, true);
+    }
+    const bool staged = page.stageImport();
+    check("env-import.stage.selected", staged, page.statusText());
+    check("env-import.stage.rows", page.selectionRowCount() == 2,
+          QStringLiteral("rows=%1").arg(page.selectionRowCount()));
+    check("env-import.stage.pending", page.hasPendingChanges());
+    check("env-import.stage.no-write", !QFileInfo::exists(page.selectionPath()),
+          page.selectionPath());
+    QString stagedValue;
+    check("env-import.stage.project-layer",
+          storedRowNamed(page, QStringLiteral("VEDIT_ENV_UI_ADDED"), base, &stagedValue) >= 0
+              && stagedValue == QStringLiteral("from-shell"),
+          stagedValue);
+    check("env-import.stage.secret-skipped",
+          storedRowNamed(page, QStringLiteral("VEDIT_ENV_UI_SECRET_TOKEN"), base, nullptr) < 0);
+    // Remove goes through the same draft path the "Remove checked" button uses.
+    check("env-import.remove.none-checked", !page.removeSelectedStored());
+    page.setSelectionRemoveChecked(0, true);
+    const bool removed = page.removeSelectedStored();
+    check("env-import.remove.checked", removed, page.statusText());
+    check("env-import.remove.rows", page.selectionRowCount() == 1,
+          QStringLiteral("rows=%1").arg(page.selectionRowCount()));
+    page.discardPending();
+    check("env-import.discard",
+          !page.hasPendingChanges() && page.selectionRowCount() == 0,
+          QStringLiteral("rows=%1").arg(page.selectionRowCount()));
+
+    // Manual NAME=VALUE rows: one project row and one global row with the SAME
+    // name, plus validation of the name rule the C ABI store applies.
+    if (addedRow >= 0) {
+        page.setDiffChecked(addedRow, true);
+    }
+    page.stageImport();
+    check("env-import.add.validate-empty", !page.addVariable(QString(), QStringLiteral("x")));
+    check("env-import.add.validate-equals",
+          !page.addVariable(QStringLiteral("A=B"), QStringLiteral("x")));
+    check("env-import.add.validate-control",
+          !page.addVariable(QStringLiteral("A") + QChar(0x1b), QStringLiteral("x")));
+    page.setProjectScope(false);
+    const bool projectAdded =
+        page.addVariable(QStringLiteral("VEDIT_ENV_UI_SCOPE"), QStringLiteral("project-value"));
+    check("env-import.add.project", projectAdded, page.statusText());
+    page.setProjectScope(true);
+    const bool globalAdded =
+        page.addVariable(QStringLiteral("VEDIT_ENV_UI_SCOPE"), QStringLiteral("global-value"));
+    check("env-import.add.global", globalAdded, page.statusText());
+    page.setProjectScope(false);
+    check("env-import.effective.project-wins",
+          page.effectiveValue(QStringLiteral("VEDIT_ENV_UI_SCOPE"))
+              == QStringLiteral("project-value"),
+          page.effectiveValue(QStringLiteral("VEDIT_ENV_UI_SCOPE")));
+    const bool commitStarted = page.commitPending();
+    check("env-import.commit", commitStarted, page.statusText());
+    const bool commitFinished = page.flush();
+    check("env-import.commit.done", commitFinished, page.statusText());
+    check("env-import.commit.no-pending", !page.hasPendingChanges());
+    const QString stored = readText(page.selectionPath());
+    check("env-import.file.exists", QFileInfo::exists(page.selectionPath()),
+          page.selectionPath());
+    check("env-import.file.both-layers",
+          stored.contains(QStringLiteral("\"root\":\"") + base + QStringLiteral("\""))
+              && stored.contains(QStringLiteral("VEDIT_ENV_UI_SCOPE"))
+              && stored.contains(QStringLiteral("\"value\":\"global-value\""))
+              && stored.contains(QStringLiteral("\"value\":\"project-value\"")),
+          stored);
+    check("env-import.file.secret-absent",
+          !stored.contains(QStringLiteral("fixture-secret-value")));
+    check("env-import.file.no-wholesale",
+          !stored.contains(QStringLiteral("\"name\":\"VEDIT_ENV_UI_UNCHANGED\""))
+              && !stored.contains(QStringLiteral("\"name\":\"PATH\"")));
+
+    // Restart round-trip: a NEW page reads the same file through the C ABI.
+    {
+        EnvImportPage restarted(settingsPath);
+        const bool restartLoaded = restarted.flush();
+        check("env-import.restart.load", restartLoaded, restarted.statusText());
+        restarted.setProjectRoot(base);
+        QString roundTripped;
+        check("env-import.restart.project-row",
+              storedRowNamed(restarted, QStringLiteral("VEDIT_ENV_UI_ADDED"), base, &roundTripped)
+                      >= 0
+                  && roundTripped == QStringLiteral("from-shell"),
+              roundTripped);
+        check("env-import.restart.global-row",
+              storedRowNamed(restarted, QStringLiteral("VEDIT_ENV_UI_SCOPE"), QString(), nullptr)
+                  >= 0);
+        check("env-import.restart.effective",
+              restarted.effectiveValue(QStringLiteral("VEDIT_ENV_UI_SCOPE"))
+                  == QStringLiteral("project-value"));
+        check("env-import.restart.no-pending", !restarted.hasPendingChanges());
+    }
+
+    // A hand-broken file degrades to an empty selection plus a warning; it never
+    // crashes the page (AC-4.4).
+    check("env-import.broken.write",
+          writeText(base + QStringLiteral("/environment.json"),
+                    QByteArray("{\"version\": 1, \"global\": [ this is not json\n")));
+    {
+        EnvImportPage broken(settingsPath);
+        const bool brokenLoaded = broken.flush();
+        check("env-import.broken.no-crash", brokenLoaded, broken.statusText());
+        check("env-import.broken.empty", broken.selectionRowCount() == 0,
+              QStringLiteral("rows=%1").arg(broken.selectionRowCount()));
+        check("env-import.broken.warning", !broken.warnings().isEmpty(),
+              broken.warnings().join(QStringLiteral("; ")));
+    }
+
+    // --- E2 (batch-20261114): the candidate list is the capture diff filtered by
+    // the names the project's filelist actually REFERENCES, never by a name
+    // blacklist. "A PATH-like variable the project never mentions" is the user's
+    // own example. The referenced set + the layer each name resolved in come from
+    // the REAL project model expansion (the same `expansionInputs()` payload the
+    // product publishes on `vedit.project.inputs`).
+#if defined(VEDIT_HAVE_PROJECT_LANE)
+    const QString e2Base = base + QStringLiteral("/e2");
+    check("e2.mkdir", QDir().mkpath(e2Base));
+    check("e2.fixture.file", writeText(e2Base + QStringLiteral("/file.v"),
+                                       QByteArray("module m;\nendmodule\n")));
+    // Four referenced names with three different providers, plus one name the
+    // filelist never mentions (the "PATH/API key" case). `VEDIT_E2_ENVIRONMENT`
+    // is exported in THIS process before the expansion, so its layer is
+    // `environment`; `VEDIT_E2_PROJECTED` lives in the project table; the other
+    // two are referenced but unresolved (layer `missing`).
+    const QString e2Filelist = e2Base + QStringLiteral("/project.f");
+    check("e2.fixture.filelist",
+          writeText(e2Filelist,
+                    QByteArray("$VEDIT_E2_ENVIRONMENT/file.v\n"
+                               "$VEDIT_E2_PROJECTED/file.v\n"
+                               "$VEDIT_E2_MISSING/file.v\n"
+                               "$VEDIT_E2_REFERENCED/file.v\n")));
+    qputenv("VEDIT_E2_ENVIRONMENT", QByteArray("."));
+    qunsetenv("VEDIT_E2_PROJECTED");
+    qunsetenv("VEDIT_E2_MISSING");
+    qunsetenv("VEDIT_E2_REFERENCED");
+    qunsetenv("VEDIT_E2_UNREFERENCED");
+    const QString e2Rc = e2Base + QStringLiteral("/candidates.rc");
+    check("e2.fixture.rc",
+          writeText(e2Rc, QByteArray("export VEDIT_E2_ENVIRONMENT=from-shell\n"
+                                     "export VEDIT_E2_PROJECTED=from-shell\n"
+                                     "export VEDIT_E2_MISSING=from-shell\n"
+                                     "export VEDIT_E2_REFERENCED=from-shell\n"
+                                     "export VEDIT_E2_UNREFERENCED=from-shell\n")));
+
+    // A real expansion of the real `.f`: no fake payload, no hand-written map.
+    ProjectModel model(e2Base + QStringLiteral("/state"));
+    bool e2Settled = false;
+    QObject::connect(&model, &ProjectModel::refreshFinished,
+                     [&e2Settled](bool, const QString &) { e2Settled = true; });
+    model.open(e2Base);
+    model.importFilelists({e2Filelist});
+    e2Settled = false;
+    model.setVariables({QStringLiteral("VEDIT_E2_PROJECTED=.")});
+    const bool e2Expanded = [&]() {
+        QElapsedTimer timer;
+        timer.start();
+        while (timer.elapsed() < 20000) {
+            if (e2Settled && !model.isPending()
+                && model.referencedVariables().contains(QStringLiteral("VEDIT_E2_PROJECTED"))) {
+                return true;
+            }
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 20);
+            QThread::msleep(5);
+        }
+        return false;
+    }();
+    check("e2.expansion.finished", e2Expanded, model.lastError());
+    check("e2.references.names",
+          model.referencedVariables()
+              == QStringList{QStringLiteral("VEDIT_E2_ENVIRONMENT"),
+                             QStringLiteral("VEDIT_E2_MISSING"),
+                             QStringLiteral("VEDIT_E2_PROJECTED"),
+                             QStringLiteral("VEDIT_E2_REFERENCED")},
+          model.referencedVariables().join(QStringLiteral(",")));
+    check("e2.references.layers",
+          model.referencedVariableLayers()
+              == QStringList{QStringLiteral("environment"), QStringLiteral("missing"),
+                             QStringLiteral("project"), QStringLiteral("missing")},
+          model.referencedVariableLayers().join(QStringLiteral(",")));
+    const QVariantMap e2Inputs = model.expansionInputs();
+    check("e2.inputs.payload",
+          e2Inputs.value(QStringLiteral("referencedVariables")).toStringList()
+                  == model.referencedVariables()
+              && e2Inputs.value(QStringLiteral("referencedVariableLayers")).toStringList()
+                     == model.referencedVariableLayers(),
+          QStringLiteral("keys=%1").arg(e2Inputs.keys().join(QStringLiteral(","))));
+
+    // (1) + (2) + (4): the candidate list is the referenced set, with layers, and
+    // the unreferenced shell variable never appears.
+    {
+        EnvImportPage page(settingsPath);
+        page.flush();
+        page.setProjectInputs(e2Inputs);
+        check("e2.project-context", page.hasProjectContext());
+        page.setProjectRoot(e2Base);
+        page.setShellCode(0);
+        page.setSourceFile(e2Rc);
+        check("e2.capture.start", page.startCapture(), page.statusText());
+        check("e2.capture.done", page.flush(60000), page.captureReport());
+        QStringList listed;
+        for (int row = 0; row < page.diffRowCount(); ++row) {
+            listed.append(page.diffName(row));
+        }
+        const QString unrefLayerFacts =
+            QStringLiteral("rows=%1 names=%2 hidden=%3")
+                .arg(page.diffRowCount())
+                .arg(listed.join(QStringLiteral(",")))
+                .arg(page.hiddenDiffRowCount());
+        check("e2.candidates-only-referenced", listed == model.referencedVariables(), unrefLayerFacts);
+        check("e2.not-referenced.absent",
+              !listed.contains(QStringLiteral("VEDIT_E2_UNREFERENCED"))
+                  && page.hiddenDiffRowCount() >= 1,
+              unrefLayerFacts);
+        const auto layerOf = [&page](const QString &name) {
+            const int row = environmentRowNamed(page, name);
+            return row < 0 ? QStringLiteral("<no row>") : page.diffLayer(row);
+        };
+        check("e2.layer.environment", layerOf(QStringLiteral("VEDIT_E2_ENVIRONMENT"))
+                                          == QStringLiteral("environment"),
+              layerOf(QStringLiteral("VEDIT_E2_ENVIRONMENT")));
+        check("e2.layer.project",
+              layerOf(QStringLiteral("VEDIT_E2_PROJECTED")) == QStringLiteral("project"),
+              layerOf(QStringLiteral("VEDIT_E2_PROJECTED")));
+        check("e2.layer.missing",
+              layerOf(QStringLiteral("VEDIT_E2_REFERENCED")) == QStringLiteral("missing")
+                  && layerOf(QStringLiteral("VEDIT_E2_MISSING")) == QStringLiteral("missing"),
+              layerOf(QStringLiteral("VEDIT_E2_REFERENCED")));
+        // (2) explicit: the named CONTROL is off by default and reveals exactly
+        // the rows the filter folded away.
+        check("e2.show-all.default-off",
+              page.showAllCandidatesCheck() != nullptr
+                  && !page.showAllCandidatesCheck()->isChecked() && !page.showAllCandidates());
+        page.setShowAllCandidates(true);
+        check("e2.show-all.reveals",
+              page.hiddenDiffRowCount() == 0
+                  && environmentRowNamed(page, QStringLiteral("VEDIT_E2_UNREFERENCED")) >= 0,
+              unrefLayerFacts);
+        check("e2.show-all.unreferenced-has-no-layer",
+              page.diffLayer(environmentRowNamed(page, QStringLiteral("VEDIT_E2_UNREFERENCED")))
+                  .isEmpty());
+        page.setShowAllCandidates(false);
+        check("e2.show-all.hides-again",
+              environmentRowNamed(page, QStringLiteral("VEDIT_E2_UNREFERENCED")) < 0);
+    }
+
+    // (3) a project whose filelist references no variable: the list is empty and
+    // says why.
+    {
+        const QString e2Empty = base + QStringLiteral("/e2-empty");
+        check("e2.empty.mkdir", QDir().mkpath(e2Empty));
+        check("e2.empty.fixture",
+              writeText(e2Empty + QStringLiteral("/plain.v"),
+                        QByteArray("module plain;\nendmodule\n"))
+                  && writeText(e2Empty + QStringLiteral("/plain.f"),
+                               QByteArray("plain.v\n")));
+        ProjectModel emptyModel(e2Empty + QStringLiteral("/state"));
+        bool emptySettled = false;
+        QObject::connect(&emptyModel, &ProjectModel::refreshFinished,
+                         [&emptySettled](bool, const QString &) { emptySettled = true; });
+        emptyModel.open(e2Empty);
+        emptyModel.importFilelists({e2Empty + QStringLiteral("/plain.f")});
+        const bool emptyExpanded = [&]() {
+            QElapsedTimer timer;
+            timer.start();
+            while (timer.elapsed() < 20000) {
+                if (emptySettled && !emptyModel.isPending()
+                    && emptyModel.files().contains(e2Empty + QStringLiteral("/plain.v"))) {
+                    return true;
+                }
+                QCoreApplication::processEvents(QEventLoop::AllEvents, 20);
+                QThread::msleep(5);
+            }
+            return false;
+        }();
+        check("e2.empty.expansion", emptyExpanded, emptyModel.lastError());
+        check("e2.empty.references", emptyModel.referencedVariables().isEmpty(),
+              emptyModel.referencedVariables().join(QStringLiteral(",")));
+        EnvImportPage emptyPage(settingsPath);
+        emptyPage.flush();
+        emptyPage.setProjectInputs(emptyModel.expansionInputs());
+        emptyPage.setProjectRoot(e2Empty);
+        emptyPage.setShellCode(0);
+        emptyPage.setSourceFile(e2Rc);
+        check("e2.empty.capture.start", emptyPage.startCapture(), emptyPage.statusText());
+        check("e2.empty.capture.done", emptyPage.flush(60000), emptyPage.captureReport());
+        check("e2.empty.list", emptyPage.diffRowCount() == 0,
+              QStringLiteral("visible=%1 hidden=%2")
+                  .arg(emptyPage.diffRowCount())
+                  .arg(emptyPage.hiddenDiffRowCount()));
+        check("e2.empty.explained",
+              emptyPage.candidateHint().contains(QStringLiteral("references no variables")),
+              emptyPage.candidateHint());
+    }
+    qunsetenv("VEDIT_E2_ENVIRONMENT");
+#endif
+}
+
+// --- batch 20261110c: env masking + the four failure modes (AC-4.8/4.9) ----
+
+// One executable script under the temporary directory (the lane's fake-format
+// pattern: write, then grant owner-execute).
+bool writeScript(const QString &path, const QByteArray &body)
+{
+    return writeText(path, QByteArray("#!/bin/sh\n") + body)
+        && QFile::setPermissions(path, QFileDevice::ReadOwner | QFileDevice::WriteOwner
+                                           | QFileDevice::ExeOwner);
+}
+
+// AC-4.8: a value must never enter this process's stdout. Every assertion about a
+// secret value is therefore a BOOLEAN; this helper only exists so the negative
+// case ("the value is nowhere in the text") reads as one expression.
+QString redactionFacts(const QString &text, const QString &value)
+{
+    return QStringLiteral("bytes=%1 value_present=%2 mask_present=%3")
+        .arg(text.size())
+        .arg(!value.isEmpty() && text.contains(value) ? 1 : 0)
+        .arg(text.contains(QStringLiteral("<masked>")) ? 1 : 0);
+}
+
+// The masking + failure-mode half of the Environment page (AC-4.8/4.9). It runs
+// against its OWN directory and its own capture fixtures so the AC-4.3/4.4
+// checks above keep their exact row counts.
+void checkEnvironmentMaskAndFailures(const QString &directory)
+{
+    if (!SettingsClient::ffiAvailable()) {
+        check("env-mask.ffi.available", false,
+              "lane built without the vd-ffi environment ABI");
+        return;
+    }
+    check("env-mask.ffi.available", true);
+    const QString base = directory + QStringLiteral("/env-mask");
+    check("env-mask.mkdir", QDir().mkpath(base));
+    const QString settingsPath = base + QStringLiteral("/settings.toml");
+
+    // The AC-4.8 shapes in one rc file: a secret-shaped name, a NON-secret
+    // control, and a value that contains BOTH '=' and a real newline.
+    const QString rcPath = base + QStringLiteral("/mask.rc");
+    check("env-mask.fixture.rc",
+          writeText(rcPath, QByteArray("export VEDIT_MASK_API_KEY='fixture-key-material-7c1d'\n"
+                                      "export VEDIT_MASK_VISIBLE='visible-control-value'\n"
+                                      "export VEDIT_MASK_MULTILINE='one=1\ntwo=2'\n")));
+    const QString secretValue = QStringLiteral("fixture-key-material-7c1d");
+    const QString visibleValue = QStringLiteral("visible-control-value");
+    const QString multilineValue = QStringLiteral("one=1\ntwo=2");
+    qunsetenv("VEDIT_MASK_API_KEY");
+    qunsetenv("VEDIT_MASK_VISIBLE");
+    qunsetenv("VEDIT_MASK_MULTILINE");
+
+    // AC-4.8: the name rule is exactly the Rust one (substring, case-insensitive,
+    // deliberately over-inclusive) — asserted here so a UI-only rule cannot drift.
+    check("env-mask.matcher.names",
+          EnvImportPage::isSecretShapedName(QStringLiteral("GITHUB_TOKEN"))
+              && EnvImportPage::isSecretShapedName(QStringLiteral("my_secret"))
+              && EnvImportPage::isSecretShapedName(QStringLiteral("DB_PASSWORD"))
+              && EnvImportPage::isSecretShapedName(QStringLiteral("API_KEY"))
+              && EnvImportPage::isSecretShapedName(QStringLiteral("hotkey_path"))
+              && !EnvImportPage::isSecretShapedName(QStringLiteral("PATH"))
+              && !EnvImportPage::isSecretShapedName(QStringLiteral("MONTH")));
+
+    EnvImportPage page(settingsPath);
+    const bool maskLoaded = page.flush();
+    check("env-mask.load", maskLoaded, page.statusText());
+    page.setProjectRoot(base);
+    page.setProjectScope(false);
+    page.setShellCode(0);
+    page.setSourceFile(rcPath);
+    check("env-mask.reveal.default-off", !page.secretsRevealed());
+    check("env-mask.reveal.box-default",
+          page.revealSecretsCheck() != nullptr && !page.revealSecretsCheck()->isChecked());
+    const bool maskCaptureStarted = page.startCapture();
+    check("env-mask.capture.start", maskCaptureStarted, page.statusText());
+    const bool maskCaptured = page.flush(60000);
+    check("env-mask.capture.done", maskCaptured, page.captureReport());
+
+    const int secretRow = environmentRowNamed(page, QStringLiteral("VEDIT_MASK_API_KEY"));
+    const int visibleRow = environmentRowNamed(page, QStringLiteral("VEDIT_MASK_VISIBLE"));
+    const int multilineRow = environmentRowNamed(page, QStringLiteral("VEDIT_MASK_MULTILINE"));
+    check("env-mask.diff.rows", secretRow >= 0 && visibleRow >= 0 && multilineRow >= 0,
+          QStringLiteral("rows=%1").arg(page.diffRowCount()));
+
+    // THE mask criterion, and the reason "no output" would not pass it: the cell
+    // the table PAINTS is `<masked>` while the value underneath still EXISTS.
+    // Deleting the field would satisfy a bare "value absent" test; it fails here.
+    const bool secretCellMasked =
+        secretRow >= 0 && page.diffTable() != nullptr
+        && page.diffTable()->item(secretRow, 4) != nullptr
+        && page.diffTable()->item(secretRow, 4)->text() == QStringLiteral("<masked>");
+    check("env-mask.diff.painted-mask", secretCellMasked,
+          QStringLiteral("row=%1 cell_is_mask=%2").arg(secretRow).arg(secretCellMasked ? 1 : 0));
+    check("env-mask.diff.underlying-value",
+          secretRow >= 0 && page.diffCapturedValue(secretRow) == secretValue,
+          QStringLiteral("row=%1 raw_present=%2")
+              .arg(secretRow)
+              .arg(secretRow >= 0 && page.diffCapturedValue(secretRow) == secretValue ? 1 : 0));
+    check("env-mask.diff.control-visible",
+          visibleRow >= 0 && page.diffDisplayValue(visibleRow) == visibleValue
+              && page.diffTable()->item(visibleRow, 4) != nullptr
+              && page.diffTable()->item(visibleRow, 4)->text() == visibleValue);
+    check("env-mask.diff.equals-newline",
+          multilineRow >= 0 && page.diffCapturedValue(multilineRow) == multilineValue
+              && page.diffDisplayValue(multilineRow) == QStringLiteral("one=1\\ntwo=2"),
+          QStringLiteral("row=%1 raw_len=%2 display_len=%3")
+              .arg(multilineRow)
+              .arg(multilineRow >= 0 ? page.diffCapturedValue(multilineRow).size() : -1)
+              .arg(multilineRow >= 0 ? page.diffDisplayValue(multilineRow).size() : -1));
+    check("env-mask.status.no-secret",
+          !(page.statusText() + page.captureReport()).contains(secretValue),
+          redactionFacts(page.statusText() + page.captureReport(), secretValue));
+
+    // Unrevealed: checking a secret-shaped row stages NOTHING and says why.
+    page.setDiffChecked(secretRow, true);
+    page.setDiffChecked(visibleRow, true);
+    const bool unrevealedStaged = page.stageImport();
+    check("env-mask.stage.unrevealed", unrevealedStaged, page.statusText());
+    check("env-mask.stage.unrevealed-skipped",
+          storedRowNamed(page, QStringLiteral("VEDIT_MASK_API_KEY"), base, nullptr) < 0
+              && storedRowNamed(page, QStringLiteral("VEDIT_MASK_VISIBLE"), base, nullptr) >= 0);
+    check("env-mask.stage.unrevealed-explained",
+          page.statusText().contains(QStringLiteral("secret-shaped")), page.statusText());
+    page.discardPending();
+
+    // The EXPLICIT expansion: the painted cell now carries the real value, and the
+    // reveal (not the value) is what the user just approved.
+    page.setSecretsRevealed(true);
+    const bool revealedCellRaw =
+        secretRow >= 0 && page.diffTable()->item(secretRow, 4) != nullptr
+        && page.diffTable()->item(secretRow, 4)->text() == secretValue;
+    check("env-mask.reveal.api", page.secretsRevealed());
+    check("env-mask.reveal.box-checked",
+          page.revealSecretsCheck() != nullptr && page.revealSecretsCheck()->isChecked());
+    check("env-mask.reveal.painted-raw", revealedCellRaw,
+          QStringLiteral("row=%1 cell_is_raw=%2").arg(secretRow).arg(revealedCellRaw ? 1 : 0));
+    check("env-mask.reveal.display-raw", page.diffDisplayValue(secretRow) == secretValue);
+
+    page.setDiffChecked(secretRow, true);
+    const bool revealedStaged = page.stageImport();
+    check("env-mask.stage.revealed", revealedStaged, page.statusText());
+    QString stagedValue;
+    check("env-mask.stage.revealed-row",
+          storedRowNamed(page, QStringLiteral("VEDIT_MASK_API_KEY"), base, &stagedValue) >= 0
+              && stagedValue == secretValue,
+          QStringLiteral("staged=%1")
+              .arg(storedRowNamed(page, QStringLiteral("VEDIT_MASK_API_KEY"), base, nullptr) >= 0
+                       ? 1
+                       : 0));
+    const bool commitStarted = page.commitPending();
+    check("env-mask.commit.started", commitStarted, page.statusText());
+    const bool commitFinished = page.flush();
+    check("env-mask.commit.done", commitFinished, page.statusText());
+    const QString stored = readText(page.selectionPath());
+    check("env-mask.file.value-stored", stored.contains(secretValue),
+          redactionFacts(stored, secretValue));
+    check("env-mask.file.no-mask-marker",
+          !stored.contains(QStringLiteral("<masked>"))
+              && !stored.contains(QStringLiteral("reveal")));
+
+    // "Not persisted" = the REVEAL is not persisted: a new page starts masked,
+    // while the value it masks is still there underneath.
+    {
+        EnvImportPage restarted(settingsPath);
+        const bool restartedLoaded = restarted.flush();
+        check("env-mask.restart.load", restartedLoaded, restarted.statusText());
+        QString roundTripped;
+        const int row = storedRowNamed(restarted, QStringLiteral("VEDIT_MASK_API_KEY"), base,
+                                       &roundTripped);
+        const bool restartedCellMasked =
+            row >= 0 && restarted.selectionTable() != nullptr
+            && restarted.selectionTable()->item(row, 3) != nullptr
+            && restarted.selectionTable()->item(row, 3)->text() == QStringLiteral("<masked>");
+        check("env-mask.restart.default-masked", !restarted.secretsRevealed());
+        check("env-mask.restart.box-unchecked",
+              restarted.revealSecretsCheck() != nullptr
+                  && !restarted.revealSecretsCheck()->isChecked());
+        check("env-mask.restart.painted-mask", restartedCellMasked,
+              QStringLiteral("row=%1 cell_is_mask=%2").arg(row).arg(restartedCellMasked ? 1 : 0));
+        check("env-mask.restart.value-underneath", row >= 0 && roundTripped == secretValue,
+              QStringLiteral("row=%1 raw_present=%2")
+                  .arg(row)
+                  .arg(row >= 0 && roundTripped == secretValue ? 1 : 0));
+    }
+
+    // The manual NAME=VALUE path is a second write path into the same store and
+    // obeys the same rule: no secret-shaped value while it is masked.
+    page.setSecretsRevealed(false);
+    const int rowsBeforeAdd = page.selectionRowCount();
+    const bool unrevealedAddRefused =
+        !page.addVariable(QStringLiteral("VEDIT_MASK_MANUAL_TOKEN"),
+                          QStringLiteral("manual-secret-value"));
+    check("env-mask.add.unrevealed-refused", unrevealedAddRefused, page.statusText());
+    check("env-mask.add.unrevealed-no-row", page.selectionRowCount() == rowsBeforeAdd);
+    page.setSecretsRevealed(true);
+    const bool revealedAddAllowed =
+        page.addVariable(QStringLiteral("VEDIT_MASK_MANUAL_TOKEN"),
+                         QStringLiteral("manual-secret-value"));
+    check("env-mask.add.revealed-allowed", revealedAddAllowed, page.statusText());
+    page.discardPending(); // the manual row is only needed to prove the gate
+
+    // A shell can echo a secret to stderr; the tail is REDACTED against the
+    // capture's own secret-shaped values before it is painted or reported.
+    const QString echoRc = base + QStringLiteral("/echo.rc");
+    check("env-mask.fixture.echo-rc",
+          writeText(echoRc, QByteArray("export VEDIT_MASK_ECHO_TOKEN='fixture-echo-canary-4b8e'\n"
+                                      "echo \"token=$VEDIT_MASK_ECHO_TOKEN\" >&2\n")));
+    const QString echoCanary = QStringLiteral("fixture-echo-canary-4b8e");
+    const QString echoRowName = QStringLiteral("VEDIT_MASK_ECHO_TOKEN");
+    page.setShellCode(0);
+    page.setShellPath(QString());
+    page.setSourceFile(echoRc);
+    // A new capture is new data: the explicit reveal must be asked for AGAIN.
+    page.setSecretsRevealed(true);
+    const bool echoCaptureStarted = page.startCapture();
+    check("env-mask.reveal.reset-on-capture",
+          echoCaptureStarted && !page.secretsRevealed(),
+          QStringLiteral("capture=%1 revealed=%2")
+              .arg(echoCaptureStarted ? 1 : 0)
+              .arg(page.secretsRevealed() ? 1 : 0));
+    check("env-mask.stderr.capture-start", echoCaptureStarted, page.statusText());
+    const bool echoCaptured = page.flush(60000);
+    check("env-mask.stderr.capture-done", echoCaptured, page.captureReport());
+    check("env-mask.stderr.tail-redacted",
+          page.captureStderrTail().contains(QStringLiteral("token=<masked>")),
+          redactionFacts(page.captureStderrTail(), echoCanary));
+    check("env-mask.stderr.value-absent", !page.captureStderrTail().contains(echoCanary),
+          redactionFacts(page.captureStderrTail(), echoCanary));
+    check("env-mask.stderr.report-absent", !page.captureReport().contains(echoCanary),
+          redactionFacts(page.captureReport(), echoCanary));
+    const int echoRow = environmentRowNamed(page, echoRowName);
+    check("env-mask.stderr.row-masked",
+          echoRow >= 0 && page.diffDisplayValue(echoRow) == QStringLiteral("<masked>")
+              && page.diffCapturedValue(echoRow) == echoCanary,
+          QStringLiteral("row=%1").arg(echoRow));
+
+    // An AMBIENT secret (unchanged in this process, therefore NOT in the diff at
+    // all) echoed by the child must be redacted too: a diff-only rule would leak
+    // exactly the credentials the user already has in their environment.
+    const QString ambientProgram = base + QStringLiteral("/ambient-env.sh");
+    check("env-mask.ambient.fixture",
+          writeScript(ambientProgram, QByteArray("printf 'VEDIT_MASK_AMBIENT_MARKER=ok\\n'\n"
+                                                "echo \"ambient=$VEDIT_MASK_AMBIENT_TOKEN\" >&2\n")));
+    const QString ambientCanary = QStringLiteral("ambient-canary-5e2a");
+    qputenv("VEDIT_MASK_AMBIENT_TOKEN", ambientCanary.toUtf8());
+    page.setShellCode(7); // custom program
+    page.setShellPath(ambientProgram);
+    page.setSourceFile(QString());
+    const bool ambientStarted = page.startCapture();
+    check("env-mask.ambient.capture-start", ambientStarted, page.statusText());
+    const bool ambientDone = page.flush(60000);
+    check("env-mask.ambient.capture-done", ambientDone, page.captureReport());
+    check("env-mask.ambient.tail-redacted",
+          page.captureStderrTail().contains(QStringLiteral("ambient=<masked>")),
+          redactionFacts(page.captureStderrTail(), ambientCanary));
+    check("env-mask.ambient.value-absent",
+          !page.captureStderrTail().contains(ambientCanary),
+          redactionFacts(page.captureStderrTail(), ambientCanary));
+    check("env-mask.ambient.row-absent",
+          environmentRowNamed(page, QStringLiteral("VEDIT_MASK_AMBIENT_TOKEN")) < 0);
+    qunsetenv("VEDIT_MASK_AMBIENT_TOKEN");
+
+    // --- AC-4.9: the four failure classes --------------------------------
+    // Baseline for the "no half-apply" claims: the selection file written above.
+    const QString fileBefore = readText(page.selectionPath());
+    // A staged but uncommitted draft: a failed capture must leave it alone.
+    check("env-fail.draft.before",
+          page.addVariable(QStringLiteral("VEDIT_MASK_KEEP"), QStringLiteral("keep-value")));
+    check("env-fail.draft.pending", page.hasPendingChanges());
+    const int draftRows = page.selectionRowCount();
+
+    // (1) rc file MISSING: the shell exits non-zero, the environment is still
+    // read, and the exit status + stderr tail stay visible.
+    page.setShellCode(0);
+    page.setShellPath(QString());
+    page.setSourceFile(base + QStringLiteral("/no-such-rc-file"));
+    const bool rcMissingStarted = page.startCapture();
+    check("env-fail.rc-missing.start", rcMissingStarted, page.statusText());
+    const bool rcMissingDone = page.flush(60000);
+    check("env-fail.rc-missing.done", rcMissingDone, page.captureReport());
+    check("env-fail.rc-missing.exit-status", page.captureExitCode() != 0,
+          QStringLiteral("exit=%1").arg(page.captureExitCode()));
+    check("env-fail.rc-missing.stderr-tail",
+          page.captureStderrTail().contains(QStringLiteral("no-such-rc-file")));
+    check("env-fail.rc-missing.user-visible",
+          page.statusText().contains(QStringLiteral("exit status")), page.statusText());
+
+    // (2) rc file UNREADABLE: a directory cannot be sourced; same reporting.
+    const QString rcDirectory = base + QStringLiteral("/rc-as-directory");
+    check("env-fail.rc-unreadable.fixture", QDir().mkpath(rcDirectory));
+    page.setSourceFile(rcDirectory);
+    const bool rcUnreadableStarted = page.startCapture();
+    check("env-fail.rc-unreadable.start", rcUnreadableStarted, page.statusText());
+    const bool rcUnreadableDone = page.flush(60000);
+    check("env-fail.rc-unreadable.done", rcUnreadableDone, page.captureReport());
+    check("env-fail.rc-unreadable.exit-status", page.captureExitCode() != 0,
+          QStringLiteral("exit=%1").arg(page.captureExitCode()));
+    check("env-fail.rc-unreadable.stderr-tail", !page.captureStderrTail().trimmed().isEmpty(),
+          redactionFacts(page.captureStderrTail(), secretValue));
+    check("env-fail.rc-unreadable.user-visible",
+          page.statusText().contains(QStringLiteral("exit status")), page.statusText());
+
+    // (3) shell MISSING: the job fails with VD_ERR_NOT_FOUND and the sentence
+    // names the program that could not start.
+    page.setShellPath(QStringLiteral("/nonexistent/vedit-no-such-shell"));
+    page.setSourceFile(QString());
+    const bool shellMissingStarted = page.startCapture();
+    check("env-fail.shell-missing.start", shellMissingStarted, page.statusText());
+    const bool shellMissingDone = page.flush(60000);
+    check("env-fail.shell-missing.done", shellMissingDone, page.statusText());
+    check("env-fail.shell-missing.explained",
+          page.statusText().contains(QStringLiteral("could not be started"))
+              && page.statusText().contains(QStringLiteral("vedit-no-such-shell")),
+          page.statusText());
+    check("env-fail.shell-missing.no-rows", page.diffRowCount() == 0,
+          QStringLiteral("rows=%1").arg(page.diffRowCount()));
+    check("env-fail.shell-missing.no-exit-status", page.captureExitCode() == -1,
+          QStringLiteral("exit=%1").arg(page.captureExitCode()));
+
+    // (4) NON-NUL output: a custom program that prints newline-separated
+    // NAME=VALUE. The engine accepts it as a fallback WITH a warning, and a value
+    // containing '=' survives because the split is at the FIRST '='.
+    const QString newlineProgram = base + QStringLiteral("/newline-env.sh");
+    check("env-fail.non-nul.fixture",
+          writeScript(newlineProgram, QByteArray("printf 'VEDIT_FAIL_NONNUL=value-with=equals\\n'\n"
+                                                "printf 'VEDIT_FAIL_SECOND=two\\n'\n")));
+    page.setShellCode(7); // custom program
+    page.setShellPath(newlineProgram);
+    const bool nonNulStarted = page.startCapture();
+    check("env-fail.non-nul.start", nonNulStarted, page.statusText());
+    const bool nonNulDone = page.flush(60000);
+    check("env-fail.non-nul.done", nonNulDone, page.captureReport());
+    check("env-fail.non-nul.warning",
+          page.warnings().join(QStringLiteral("; ")).contains(QStringLiteral("newline-separated")),
+          page.warnings().join(QStringLiteral("; ")));
+    check("env-fail.non-nul.equals-value",
+          environmentRowNamed(page, QStringLiteral("VEDIT_FAIL_NONNUL")) >= 0
+              && page.diffCapturedValue(environmentRowNamed(page,
+                                                            QStringLiteral("VEDIT_FAIL_NONNUL")))
+                     == QStringLiteral("value-with=equals"));
+    check("env-fail.non-nul.exit-status", page.captureExitCode() == 0,
+          QStringLiteral("exit=%1").arg(page.captureExitCode()));
+
+    // (5) TIMEOUT: the budget is lowered so the check is fast; the sentence says
+    // it timed out and nothing is applied.
+    const QString slowProgram = base + QStringLiteral("/slow-env.sh");
+    check("env-fail.timeout.fixture",
+          writeScript(slowProgram, QByteArray("sleep 20\n"
+                                             "printf 'VEDIT_FAIL_SLOW=late\\n'\n")));
+    page.setShellCode(7);
+    page.setShellPath(slowProgram);
+    page.setCaptureTimeoutMs(400);
+    const bool timeoutStarted = page.startCapture();
+    check("env-fail.timeout.start", timeoutStarted, page.statusText());
+    const bool timeoutDone = page.flush(60000);
+    check("env-fail.timeout.done", timeoutDone, page.statusText());
+    check("env-fail.timeout.explained", page.statusText().contains(QStringLiteral("timed out")),
+          page.statusText());
+    check("env-fail.timeout.no-rows", page.diffRowCount() == 0,
+          QStringLiteral("rows=%1").arg(page.diffRowCount()));
+
+    // (6) CANCEL: the user stops the capture that is in flight.
+    page.setCaptureTimeoutMs(15000);
+    page.setShellPath(slowProgram);
+    const bool cancelStarted = page.startCapture();
+    check("env-fail.cancel.start", cancelStarted, page.statusText());
+    const bool cancelEnabled =
+        page.cancelButton() != nullptr && page.cancelButton()->isEnabled();
+    check("env-fail.cancel.button-enabled", cancelEnabled,
+          QStringLiteral("enabled=%1").arg(cancelEnabled ? 1 : 0));
+    const bool cancellationAsked = page.cancelCapture();
+    check("env-fail.cancel.while-running", cancellationAsked, page.statusText());
+    const bool cancelDone = page.flush(60000);
+    check("env-fail.cancel.done", cancelDone, page.statusText());
+    const bool cancelDisabled =
+        page.cancelButton() != nullptr && !page.cancelButton()->isEnabled();
+    check("env-fail.cancel.button-disabled", cancelDisabled,
+          QStringLiteral("enabled=%1").arg(cancelDisabled ? 0 : 1));
+    check("env-fail.cancel.explained", page.statusText().contains(QStringLiteral("cancelled")),
+          page.statusText());
+    check("env-fail.cancel.no-rows", page.diffRowCount() == 0,
+          QStringLiteral("rows=%1").arg(page.diffRowCount()));
+
+    // "No half-apply" for every failure above: the store is byte-identical and
+    // the staged draft survived.
+    check("env-fail.no-half-apply.file", readText(page.selectionPath()) == fileBefore);
+    check("env-fail.no-half-apply.draft",
+          page.hasPendingChanges() && page.selectionRowCount() == draftRows);
+    page.discardPending();
+
+    // (7) csh/tcsh/fish: every family is captured through `env -0`, so the NUL
+    // block is authoritative for all three and no newline-fallback warning may
+    // appear. The family only exists if the target machine has the shell; missing
+    // is reported as an explicit SKIP WITH ITS REASON, never as a silent pass
+    // (the newline fallback itself is covered by the custom program in (4)).
+    struct FamilyProbe {
+        const char *name;
+        int code;
+        bool fish_syntax;
+    };
+    const FamilyProbe families[] = {
+        {"csh", 2, false}, {"tcsh", 3, false}, {"fish", 4, true}};
+    for (const FamilyProbe &family : families) {
+        const QString name = QString::fromLatin1(family.name);
+        const QString familyProgram = QStandardPaths::findExecutable(name);
+        if (familyProgram.isEmpty()) {
+            std::printf("SKIP env-fail.%s.capture reason=%s-not-on-PATH "
+                        "(the verification image must provide it; see "
+                        "evidence/batch-20261114/a50)\n",
+                        family.name, family.name);
+            std::fflush(stdout);
+            continue;
+        }
+        const QString familyRc = base + QStringLiteral("/family-") + name + QStringLiteral(".rc");
+        check(qPrintable(QStringLiteral("env-fail.%1.fixture").arg(name)),
+              writeText(familyRc,
+                        QByteArray(family.fish_syntax
+                                       ? "set -gx VEDIT_FAMILY_MARKER 'family-value=with=equals'\n"
+                                       : "setenv VEDIT_FAMILY_MARKER 'family-value=with=equals'\n")));
+        page.setShellCode(family.code);
+        page.setShellPath(QString());
+        page.setSourceFile(familyRc);
+        page.setCaptureTimeoutMs(15000);
+        const QByteArray startLabel =
+            QStringLiteral("env-fail.%1.capture-start").arg(name).toUtf8();
+        if (!page.startCapture()) {
+            check(startLabel.constData(), false, page.statusText());
+            continue;
+        }
+        check(startLabel.constData(), true);
+        const bool familyCaptured = page.flush(60000);
+        check(qPrintable(QStringLiteral("env-fail.%1.capture-done").arg(name)),
+              familyCaptured, page.captureReport());
+        check(qPrintable(QStringLiteral("env-fail.%1.equals-value").arg(name)),
+              environmentRowNamed(page, QStringLiteral("VEDIT_FAMILY_MARKER")) >= 0
+                  && page.diffCapturedValue(environmentRowNamed(
+                         page, QStringLiteral("VEDIT_FAMILY_MARKER")))
+                         == QStringLiteral("family-value=with=equals"));
+        // A51: csh/tcsh are captured through `env -0` exactly like POSIX and
+        // fish, so the NUL block is authoritative for every family and the
+        // newline-fallback warning must be ABSENT. (The fallback still exists for
+        // a custom program; (4) exercises that path with its warning.)
+        check(qPrintable(QStringLiteral("env-fail.%1.nul-path").arg(name)),
+              !page.warnings().join(QStringLiteral("; "))
+                   .contains(QStringLiteral("newline-separated")),
+              page.warnings().join(QStringLiteral("; ")));
+    }
+}
+
+// The Xvfb + xcb probe: every step is a REAL hit test on a real window (see
+// `clickUnderPoint`), not a direct slot call. Without an xcb display the probe
+// prints its reason and exits 77 (the ctest SKIP_RETURN_CODE).
+int runEnvironmentProbe(const QString &directory)
+{
+    if (!SettingsClient::ffiAvailable()) {
+        std::printf("ENV-UI SKIP reason=no-vd-ffi-environment-abi\n");
+        return 77;
+    }
+    if (QApplication::platformName() != QLatin1String("xcb")) {
+        std::printf("ENV-UI SKIP platform=%s (needs xcb + Xvfb)\n",
+                    qPrintable(QApplication::platformName()));
+        return 77;
+    }
+    // A rerun must start from an EMPTY selection: a persisted row from the
+    // previous probe would make "staged" a no-op (import replaces, it does not
+    // duplicate) and hide the transition under test.
+    QDir(directory).removeRecursively();
+    if (!QDir().mkpath(directory)) {
+        std::printf("ENV-UI PROBE ok=0 reason=no-directory\n");
+        return 1;
+    }
+    const QString rcPath = directory + QStringLiteral("/probe.rc");
+    check("env-ui.probe.fixture", writeEnvironmentFixture(rcPath));
+    prepareEnvironmentFixtureProcess();
+    const QString settingsPath = directory + QStringLiteral("/settings.toml");
+
+    Harness harness;
+    check("env-ui.probe.harness",
+          buildHarness(&harness, settingsPath, directory + QStringLiteral("/shortcuts.json")));
+    SettingsDialog dialog(&harness.themes, &harness.commands, settingsPath);
+    dialog.show();
+    dialog.raise();
+    dialog.activateWindow();
+    EnvImportPage *page = dialog.environmentPage();
+    check("env-ui.probe.page", page != nullptr);
+    if (page == nullptr) {
+        return 1;
+    }
+    if (QTabWidget *tabs = dialog.panel() == nullptr ? nullptr : dialog.panel()->tabs();
+        tabs != nullptr) {
+        tabs->setCurrentWidget(page);
+    }
+    pumpGuiEvents(40);
+    {
+        QTabWidget *tabs = dialog.panel() == nullptr ? nullptr : dialog.panel()->tabs();
+        std::printf("ENV-UI probe geometry dialog.visible=%d dialog.size=%dx%d tabs=%d current=%d "
+                    "pageIndex=%d page.visible=%d page.size=%dx%d button.visible=%d\n",
+                    dialog.isVisible() ? 1 : 0, dialog.width(), dialog.height(),
+                    tabs == nullptr ? -1 : tabs->count(),
+                    tabs == nullptr ? -1 : tabs->currentIndex(),
+                    tabs == nullptr ? -2 : tabs->indexOf(page), page->isVisible() ? 1 : 0,
+                    page->width(), page->height(),
+                    page->captureButton() != nullptr && page->captureButton()->isVisible() ? 1 : 0);
+    }
+    check("env-ui.probe.page-visible", page->isVisible());
+    page->setProjectRoot(directory);
+    page->setProjectScope(false);
+    page->setSourceFile(rcPath);
+    page->setShellCode(0);
+    const bool probeLoaded = page->flush();
+    check("env-ui.probe.load", probeLoaded, page->statusText());
+
+    check("env-ui.probe.capture.hit", clickCenter(page->captureButton(), "capture"));
+    const bool probeCaptured = page->flush(60000);
+    check("env-ui.probe.capture.done", probeCaptured, page->captureReport());
+    const int addedRow = environmentRowNamed(*page, QStringLiteral("VEDIT_ENV_UI_ADDED"));
+    check("env-ui.probe.capture.rows",
+          page->diffRowCount() > 0 && addedRow >= 0,
+          QStringLiteral("rows=%1").arg(page->diffRowCount()));
+    // AC-4.8 through the REAL window: the painted cell is `<masked>` while the
+    // value exists underneath, the reveal checkbox (hit-test click) shows it, and
+    // a second click masks it again (the reveal is not sticky).
+    const int probeSecretRow =
+        environmentRowNamed(*page, QStringLiteral("VEDIT_ENV_UI_SECRET_TOKEN"));
+    check("env-ui.probe.secret.row", probeSecretRow >= 0);
+    if (probeSecretRow >= 0 && page->diffTable() != nullptr) {
+        QTableWidget *table = page->diffTable();
+        const bool maskedCell = table->item(probeSecretRow, 4) != nullptr
+                                && table->item(probeSecretRow, 4)->text()
+                                       == QStringLiteral("<masked>");
+        check("env-ui.probe.secret.painted-mask", maskedCell,
+              QStringLiteral("cell_is_mask=%1").arg(maskedCell ? 1 : 0));
+        const bool rawUnderneath =
+            page->diffCapturedValue(probeSecretRow) == QStringLiteral("fixture-secret-value");
+        check("env-ui.probe.secret.underlying-value", rawUnderneath,
+              QStringLiteral("raw_present=%1").arg(rawUnderneath ? 1 : 0));
+        check("env-ui.probe.secret.reveal-hit",
+              clickCenter(page->revealSecretsCheck(), "reveal-secrets"));
+        const bool revealedCell = table->item(probeSecretRow, 4) != nullptr
+                                  && table->item(probeSecretRow, 4)->text()
+                                         == QStringLiteral("fixture-secret-value");
+        check("env-ui.probe.secret.revealed", page->secretsRevealed() && revealedCell,
+              QStringLiteral("revealed=%1 cell_is_raw=%2")
+                  .arg(page->secretsRevealed() ? 1 : 0)
+                  .arg(revealedCell ? 1 : 0));
+        check("env-ui.probe.secret.hide-hit",
+              clickCenter(page->revealSecretsCheck(), "hide-secrets"));
+        const bool remasked = table->item(probeSecretRow, 4) != nullptr
+                              && table->item(probeSecretRow, 4)->text()
+                                     == QStringLiteral("<masked>");
+        check("env-ui.probe.secret.remasked", !page->secretsRevealed() && remasked,
+              QStringLiteral("revealed=%1 cell_is_mask=%2")
+                  .arg(page->secretsRevealed() ? 1 : 0)
+                  .arg(remasked ? 1 : 0));
+    }
+    if (addedRow >= 0 && page->diffTable() != nullptr) {
+        QTableWidget *table = page->diffTable();
+        QTableWidgetItem *checkItem = table->item(addedRow, 0);
+        table->scrollToItem(checkItem);
+        pumpGuiEvents();
+        // The table lives inside the scrolling page too: bring its viewport into
+        // the dialog's viewport before the indicator point is computed.
+        scrollTargetIntoView(table->viewport());
+        pumpGuiEvents();
+        const QRect cellRect = table->visualItemRect(checkItem);
+        QStyleOptionViewItem option;
+        option.initFrom(table->viewport());
+        option.rect = cellRect;
+        option.features = QStyleOptionViewItem::HasCheckIndicator;
+        const QRect indicator = table->style()->subElementRect(
+            QStyle::SE_ItemViewItemCheckIndicator, &option, table);
+        check("env-ui.probe.checkbox.starts-unchecked", !page->diffChecked(addedRow));
+        check("env-ui.probe.checkbox.hit",
+              clickUnderPoint(table->viewport(),
+                              table->viewport()->mapToGlobal(indicator.center()), "diff-check"));
+        check("env-ui.probe.checkbox.checked", page->diffChecked(addedRow));
+    }
+    check("env-ui.probe.import.hit", clickCenter(page->importButton(), "import"));
+    const bool probeStaged = page->hasPendingChanges();
+    check("env-ui.probe.import.staged", probeStaged, page->statusText());
+    check("env-ui.probe.import.no-write", !QFileInfo::exists(page->selectionPath()),
+          page->selectionPath());
+    QPushButton *apply = dialog.buttons() == nullptr
+                             ? nullptr
+                             : dialog.buttons()->button(QDialogButtonBox::Apply);
+    check("env-ui.probe.apply.hit", clickCenter(apply, "apply"));
+    const bool probeStored = page->flush() && !page->hasPendingChanges();
+    check("env-ui.probe.apply.stored", probeStored, page->statusText());
+    const QString stored = readText(page->selectionPath());
+    check("env-ui.probe.file",
+          stored.contains(QStringLiteral("\"name\":\"VEDIT_ENV_UI_ADDED\""))
+              && stored.contains(QStringLiteral("from-shell")),
+          page->selectionPath());
+    check("env-ui.probe.no-wholesale",
+          !stored.contains(QStringLiteral("\"name\":\"VEDIT_ENV_UI_UNCHANGED\""))
+              && !stored.contains(QStringLiteral("\"name\":\"PATH\"")));
+
+    // Restart round-trip through a second dialog on the same file.
+    {
+        SettingsDialog restarted(&harness.themes, &harness.commands, settingsPath);
+        restarted.show();
+        pumpGuiEvents(40);
+        EnvImportPage *again = restarted.environmentPage();
+        check("env-ui.probe.restart.load", again != nullptr && again->flush());
+        QString value;
+        check("env-ui.probe.restart.row",
+              again != nullptr
+                  && storedRowNamed(*again, QStringLiteral("VEDIT_ENV_UI_ADDED"), directory, &value)
+                         >= 0
+                  && value == QStringLiteral("from-shell"),
+              value);
+        restarted.reject();
+        pumpGuiEvents();
+    }
+    dialog.reject();
+    std::printf("ENV-UI PROBE ok=%d checks=%d failures=%d\n", g_failures == 0 ? 1 : 0, g_checks,
+                g_failures);
+    std::fflush(stdout);
+    return g_failures == 0 ? 0 : 1;
 }
 
 void checkLegacyStore(const QString &directory)
@@ -1732,11 +3761,94 @@ void captureScreenshots(const QString &directory)
 
 } // namespace
 
+
+// Batch 20261110d: the Preferences dialog's SIZE DISCIPLINE. The real-machine
+// window measured 1510×1741 — taller than the screen — so the OK/Apply/Cancel
+// row sat below the bottom edge and was unreachable. Two invariants:
+//   * the dialog is CAPPED to 90% of the screen's available height (never above
+//     the preferred 760), and
+//   * the CONTENT scrolls while the QDialogButtonBox stays OUTSIDE the scroll
+//     area, pinned at the bottom.
+// Both reference viewports (1366×768 and 1920×1080) are checked by building the
+// dialog at exactly the height the constructor would choose on that screen.
+void checkDialogSizeDiscipline(const QString &directory)
+{
+    const QSize laptop(1366, 768);
+    const QSize desktop(1920, 1080);
+    check("settings.discipline.cap-1366x768",
+          SettingsDialog::cappedHeightFor(laptop) == 691,
+          QString::number(SettingsDialog::cappedHeightFor(laptop)));
+    check("settings.discipline.cap-1920x1080",
+          SettingsDialog::cappedHeightFor(desktop) == SettingsDialog::kPreferredHeight,
+          QString::number(SettingsDialog::cappedHeightFor(desktop)));
+    check("settings.discipline.cap-invalid",
+          SettingsDialog::cappedHeightFor(QSize()) == SettingsDialog::kPreferredHeight);
+
+    const QString settingsPath = directory + QStringLiteral("/discipline-settings.toml");
+    Harness harness;
+    check("settings.discipline.harness",
+          buildHarness(&harness, settingsPath,
+                       directory + QStringLiteral("/discipline-shortcuts.json")));
+
+    for (const QSize &available : {laptop, desktop}) {
+        const QString tag =
+            QStringLiteral("%1x%2").arg(available.width()).arg(available.height());
+        const int capped = SettingsDialog::cappedHeightFor(available);
+        SettingsDialog dialog(&harness.themes, &harness.commands, settingsPath, nullptr);
+        // The offscreen test screen is smaller than either reference viewport:
+        // apply the cap the constructor would apply on THAT screen, then size
+        // the dialog exactly as it would appear there.
+        dialog.setMaximumHeight(std::max(SettingsDialog::kMinimumHeight,
+                                         available.height() * 9 / 10));
+        dialog.resize(SettingsDialog::kPreferredWidth, capped);
+        dialog.show();
+        QApplication::processEvents();
+
+        QDialogButtonBox *buttons = dialog.buttons();
+        QScrollArea *scroll = dialog.contentScroll();
+        check(qPrintable(QStringLiteral("settings.discipline.scroll-") + tag),
+              scroll != nullptr && scroll->widget() == dialog.panel());
+        check(qPrintable(QStringLiteral("settings.discipline.capped-") + tag), dialog.height() <= capped,
+              QStringLiteral("height=%1 cap=%2").arg(dialog.height()).arg(capped));
+        check(qPrintable(QStringLiteral("settings.discipline.buttons-visible-") + tag),
+              buttons != nullptr && buttons->isVisible());
+        // The action row is NOT inside the scrolling content.
+        check(qPrintable(QStringLiteral("settings.discipline.buttons-not-in-scroll-") + tag),
+              buttons != nullptr && buttons->parentWidget() == &dialog);
+        const QRect buttonsRect =
+            buttons != nullptr
+                ? QRect(buttons->mapTo(&dialog, QPoint(0, 0)), buttons->size())
+                : QRect();
+        const QRect scrollRect = scroll != nullptr
+                                     ? QRect(scroll->mapTo(&dialog, QPoint(0, 0)), scroll->size())
+                                     : QRect();
+        check(qPrintable(QStringLiteral("settings.discipline.buttons-inside-dialog-") + tag),
+              buttons != nullptr && dialog.rect().contains(buttonsRect),
+              QStringLiteral("buttons=%1,%2 %3x%4 dialog=%5x%6")
+                  .arg(buttonsRect.x())
+                  .arg(buttonsRect.y())
+                  .arg(buttonsRect.width())
+                  .arg(buttonsRect.height())
+                  .arg(dialog.width())
+                  .arg(dialog.height()));
+        check(qPrintable(QStringLiteral("settings.discipline.buttons-below-content-") + tag),
+              scroll != nullptr && scrollRect.bottom() < buttonsRect.top(),
+              QStringLiteral("scroll-bottom=%1 buttons-top=%2")
+                  .arg(scrollRect.bottom())
+                  .arg(buttonsRect.top()));
+        std::printf("DIALOG-GEOMETRY %s dialog=%dx%d scroll=%d,%d %dx%d buttons=%d,%d %dx%d\n",
+                    qPrintable(tag), dialog.width(), dialog.height(), scrollRect.x(),
+                    scrollRect.y(), scrollRect.width(), scrollRect.height(), buttonsRect.x(),
+                    buttonsRect.y(), buttonsRect.width(), buttonsRect.height());
+    }
+}
+
 int main(int argc, char **argv)
 {
     bool selfcheck = false;
     QString screenshotDir;
     QString scaleRestartDir;
+    QString environmentProbeDir;
     for (int index = 1; index < argc; ++index) {
         if (std::strcmp(argv[index], "--selfcheck") == 0) {
             selfcheck = true;
@@ -1746,7 +3858,19 @@ int main(int argc, char **argv)
             // UX batch 2 / A4, acceptance ⑥: ONLY the restart path, so the
             // dedicated ctest row names exactly what it asserts.
             scaleRestartDir = QString::fromLocal8Bit(argv[++index]);
+        } else if (std::strcmp(argv[index], "--env-ui-probe") == 0 && index + 1 < argc) {
+            // Batch 20261110c: the Xvfb + xcb hit-test probe for the Environment
+            // page; a real QApplication is needed for widgetAt/sendEvent.
+            environmentProbeDir = QString::fromLocal8Bit(argv[++index]);
         }
+    }
+    if (!environmentProbeDir.isEmpty()) {
+        QApplication probeApp(argc, argv);
+        std::printf("ENV-UI PROBE start dir=%s platform=%s\n",
+                    qPrintable(environmentProbeDir), qPrintable(QApplication::platformName()));
+        const int result = runEnvironmentProbe(environmentProbeDir);
+        std::fflush(stdout);
+        return result;
     }
     if (!scaleRestartDir.isEmpty()) {
         QApplication scaleApp(argc, argv);
@@ -1762,7 +3886,8 @@ int main(int argc, char **argv)
         return g_failures == 0 ? 0 : 1;
     }
     if (!selfcheck) {
-        std::printf("usage: %s --selfcheck [--screenshot <dir>]\n", argv[0]);
+        std::printf("usage: %s --selfcheck [--screenshot <dir>] | --scale-restart <dir> | "
+                    "--env-ui-probe <dir>\n", argv[0]);
         return 2;
     }
     QApplication app(argc, argv);
@@ -1783,9 +3908,14 @@ int main(int argc, char **argv)
                              temp.path() + QStringLiteral("/shortcuts.json"));
     checkNonBlocking();
     checkPages(temp.path());
+    checkFimStoreOwnership(temp.path());
+    checkFimDetectPromotion(temp.path());
+    checkDialogSizeDiscipline(temp.path());
     checkAppearancePage(temp.path());
     checkFormatPage(temp.path());
     checkLintPage(temp.path());
+    checkEnvironmentPage(temp.path());
+    checkEnvironmentMaskAndFailures(temp.path());
     checkLegacyStore(temp.path());
     checkScaleRestartPath(temp.path());
     if (!screenshotDir.isEmpty()) {

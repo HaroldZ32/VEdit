@@ -28,6 +28,10 @@ SRC="$KSH_ROOT/src"
 BUILD="$KSH_ROOT/build"
 PREFIX="$KSH_ROOT/install"
 EVID="$WORK/$KSH_EVIDENCE_DIR/$evid_sub"
+# Compile parallelism is capped (default 4): unbounded --parallel "$(nproc)" is a
+# measured OOM risk in this image, not a repository rule. The variable is
+# forwarded by scripts/lib-qt.sh::run_in_qt6_container.
+JOBS="${VEDIT_QT6_BUILD_JOBS:-4}"
 mkdir -p "$KSH_ROOT" "$EVID"
 export XDG_RUNTIME_DIR=/tmp/xdg-runtime
 mkdir -p "$XDG_RUNTIME_DIR"
@@ -60,8 +64,8 @@ cmake -S "$SRC" -B "$BUILD" -G Ninja \
   -DKSYNTAXHIGHLIGHTING_USE_GUI="$KSH_USE_GUI" \
   2>&1 | tee "$EVID/10-configure.log"
 
-echo "== [3/7] build + install =="
-cmake --build "$BUILD" --parallel "$(nproc)" 2>&1 | tee "$EVID/11-build.log"
+echo "== [3/7] build + install (--parallel $JOBS) =="
+cmake --build "$BUILD" --parallel "$JOBS" 2>&1 | tee "$EVID/11-build.log"
 rm -rf "$PREFIX"
 cmake --install "$BUILD" 2>&1 | tee "$EVID/12-install.log"
 
@@ -172,7 +176,7 @@ echo "== [6/7] build the M0 smoke target =="
 cmake -S "$WORK" -B "$WORK/target/qt6-build" -G Ninja \
   -DCMAKE_BUILD_TYPE=RelWithDebInfo \
   -DCMAKE_CXX_FLAGS="-Wall -Wextra" 2>&1 | tee "$EVID/40-smoke-configure.log"
-cmake --build "$WORK/target/qt6-build" --parallel "$(nproc)" \
+cmake --build "$WORK/target/qt6-build" --parallel "$JOBS" \
   --target vedit-m0-smoke vedit-ksh-env-probe \
   2>&1 | tee "$EVID/41-smoke-build.log"
 SMOKE="$WORK/target/qt6-build/cmake/smoke/vedit-m0-smoke"

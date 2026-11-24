@@ -17,6 +17,7 @@
 #include "editor_area.h"
 #include "i18n.h"
 #include "integration.h"
+#include "../workspace/diagnostics/slang_backend.h"
 #include "../workspace/diagnostics/toolchain.h"
 #include "panel_registry.h"
 #include "path_display.h"
@@ -82,6 +83,7 @@
 #include <QWidget>
 #include <QWindow>
 
+#include <chrono>
 #include <cstdio>
 #include <cstring>
 #include <utility>
@@ -356,6 +358,21 @@ int runSelfCheck()
         check(("panels.registered." + id.toStdString()).c_str(), shell->panels()->contains(id));
     }
     check("panels.none-inserted-by-default", shell->panels()->insertedIds().isEmpty());
+
+    // Batch 20261110 (AC-1.6): a panel spec without a factory no longer renders a
+    // shell placeholder dock, so this selfcheck installs a probe factory per panel
+    // before it exercises insert/toggle/visibility. The no-factory rule itself is
+    // covered by vedit-app-ux-selftest ("a3.unowned.*").
+    const auto probeFactory = [](const QString &id) {
+        return [id]() -> QWidget * {
+            auto *probe = new QLabel(QStringLiteral("selfcheck panel %1").arg(id));
+            probe->setObjectName(QStringLiteral("selfcheck-panel-probe-") + id);
+            return probe;
+        };
+    };
+    for (const QString &id : expectedPanels) {
+        shell->panels()->setFactory(id, probeFactory(id));
+    }
 
     // On-demand insertion + toggle for every panel.
     for (const QString &id : expectedPanels) {
@@ -886,8 +903,18 @@ int runSelfCheck()
 
     ShellOptions restoredOptions = options;
     restoredOptions.restoreSession = true;
+    // Batch 20261110 (AC-1.6): a panel without a factory does not render, so the
+    // restore is exercised in the PRODUCT order — defer the session, register the
+    // factories the lanes register, then start — instead of relying on placeholder
+    // docks to make the restored panel visible. No assertion changes.
+    restoredOptions.deferSessionRestore = true;
     auto restored = std::make_unique<ApplicationShell>(restoredOptions);
+    for (const QString &id : expectedPanels) {
+        restored->panels()->setFactory(id, probeFactory(id));
+    }
     restored->show();
+    pump();
+    restored->startSession();
     pump();
     check("restore.pane-count", restored->editorArea()->paneCount() == panesBefore);
     check("restore.layout-tree",
@@ -916,6 +943,14 @@ int runSelfCheck()
         seamOptions.showDefaultPanels = false;
         seamOptions.restoreSession = false;
         auto seed = std::make_unique<ApplicationShell>(seamOptions);
+        // Batch 20261110 (AC-1.6): seed the session through factories, because a
+        // panel without one no longer produces a dock (and a dock is what a session
+        // records). The probe content never reaches the restored shell: it installs
+        // its own terminal/search factories below.
+        seed->panels()->setFactory(QStringLiteral("terminal"),
+                                   probeFactory(QStringLiteral("terminal")));
+        seed->panels()->setFactory(QStringLiteral("search"),
+                                   probeFactory(QStringLiteral("search")));
         seed->panels()->showPanel(QStringLiteral("terminal"), seed.get());
         seed->panels()->showPanel(QStringLiteral("search"), seed.get());
         // A non-default editor layout as well: the deferred start must restore it
@@ -950,6 +985,12 @@ int runSelfCheck()
         check("panel-seam.terminal-content",
               terminalDock != nullptr &&
                   qobject_cast<vedit::terminal::TerminalPanel *>(terminalDock->widget()) != nullptr);
+        // The panel exists but may still be a dead shell: this is the assertion
+        // whose absence let the AppRun LD_LIBRARY_PATH break ship.
+        auto *seamTerminal = terminalDock != nullptr
+                                 ? qobject_cast<vedit::terminal::TerminalPanel *>(terminalDock->widget())
+                                 : nullptr;
+        check("panel-seam.terminal-running", seamTerminal != nullptr && seamTerminal->isRunning());
         check("panel-seam.search-content",
               searchDock != nullptr && searchDock->widget() != nullptr &&
                   searchDock->widget()->objectName() == QStringLiteral("search-panel-probe"));
@@ -1269,8 +1310,18 @@ int runSelfCheck()
                       QStringLiteral("hidden=%1").arg(hidden));
 
                 // Breadcrumb still follows the cursor into the function body.
+                // T9 (batch 20261110d): a cursor move is debounced by 150 ms, so
+                // pump the loop until the debounced refresh lands (bounded; the
+                // assertion below is unchanged).
                 foldView->setCursorPosition(KTextEditor::Cursor(7, 4));
-                pump();
+                for (int waitTick = 0; waitTick < 40; ++waitTick) {
+                    pump();
+                    QThread::msleep(10);
+                    if (binding->breadcrumbDescribe()
+                        == QStringLiteral("module:m0 > function:inc")) {
+                        break;
+                    }
+                }
                 std::printf("FOLD-NATIVE breadcrumb describe='%s' bar='%s'\n",
                             qPrintable(binding->breadcrumbDescribe()),
                             qPrintable(foldPane->breadcrumbText()));
@@ -1763,6 +1814,145 @@ int captureScreenshots(const QString &directory)
     return ok ? 0 : 1;
 }
 
+// ---------------------------------------------------------------------------
+// T63: the environment-apply product probe (test-only)
+// ---------------------------------------------------------------------------
+
+#ifdef VEDIT_HAVE_RUST_FFI
+
+// Drive the REAL startup wiring and then ONE real lint child:
+//
+//   ApplicationShell -> installPanels() -> applyEnvironmentSelection()
+//   -> the product's FFI slang backend (ffi_backends.cpp) -> the fake tool
+//
+// The fake tool (`probe-tool.sh`, prepared by the evidence harness) dumps its
+// OWN environment and answers slang's `--diag-json` with `[]`, so the run ends
+// READY with zero diagnostics. `expect` ("present" / "absent", optional) makes
+// the probe assert the `SEAM_PROBE` variable of the CHILD's environment; the
+// harness runs the same command on a fresh process with the selection present,
+// removed and broken.
+int runEnvApplyProbe(const QString &directory, const QString &expect)
+{
+    // Absolute on purpose: the Rust lint engine runs the tool in the LINTED
+    // FILE's directory, so a relative state dir would make the fake tool's dump
+    // and this reader disagree about where "here" is.
+    const QString stateDir = QFileInfo(directory).absoluteFilePath();
+    const QDir dir(stateDir);
+    const QString selectionPath = dir.filePath(QStringLiteral("environment.json"));
+    const QString sourcePath = dir.filePath(QStringLiteral("probe.sv"));
+    const QString toolPath = dir.filePath(QStringLiteral("probe-tool.sh"));
+    const QString dumpPath = dir.filePath(QStringLiteral("child-env.dump"));
+    std::printf("ENV-APPLY-PROBE start dir=%s selection=%s expect=%s\n", qPrintable(stateDir),
+                qPrintable(selectionPath), qPrintable(expect));
+    std::fflush(stdout);
+    for (const QString &required : {sourcePath, toolPath}) {
+        if (!QFileInfo::exists(required)) {
+            std::printf("ENV-APPLY-PROBE ok=0 reason=missing-fixture path=%s\n",
+                        qPrintable(required));
+            return 2;
+        }
+    }
+    if (!expect.isEmpty() && expect != QStringLiteral("present")
+        && expect != QStringLiteral("absent")) {
+        std::printf("ENV-APPLY-PROBE ok=0 reason=bad-expect value=%s (use present|absent)\n",
+                    qPrintable(expect));
+        return 2;
+    }
+
+    ShellOptions probeOptions;
+    probeOptions.stateDir = stateDir;
+    probeOptions.projectRoot = stateDir;
+    probeOptions.restoreSession = false;
+    probeOptions.showDefaultPanels = false;
+    probeOptions.deferSessionRestore = true;
+
+    ApplicationShell shell(probeOptions);
+    probeOptions.projectRoot = shell.projectRoot();
+    // The product's real startup sequence: the environment apply is the FIRST
+    // thing installPanels() does, before any lane can spawn a child.
+    vedit::workspace::installPanels(
+        shell, {probeOptions.projectRoot, probeOptions.stateDir});
+
+    // ONE real lint through the same backend class the diagnostics panel uses.
+    auto backend = vedit::workspace::diagnostics::createFfiSlangBackend(toolPath);
+    if (backend == nullptr || !backend->available()) {
+        std::printf("ENV-APPLY-PROBE ok=0 reason=backend-unavailable\n");
+        return 1;
+    }
+    backend->selectEngine(vedit::workspace::diagnostics::LintEngineKind::Slang, toolPath,
+                          QString(), QStringList(), QStringList(), QString());
+    QString startError;
+    const int ticket = backend->startLint(sourcePath, &startError);
+    check("env-apply.lint.started", ticket != 0, startError);
+    if (ticket == 0) {
+        std::printf("ENV-APPLY-PROBE ok=0 checks=%d failures=%d\n", g_checks, g_failures);
+        std::fflush(stdout);
+        return 1;
+    }
+    bool ready = false;
+    QString backendError;
+    QElapsedTimer lintTimer;
+    lintTimer.start();
+    while (lintTimer.elapsed() < 30000) {
+        const vedit::workspace::diagnostics::LspPolled polled = backend->pollLint(ticket);
+        QCoreApplication::processEvents();
+        if (!polled.pending) {
+            ready = polled.ready;
+            backendError = polled.ready ? QString() : polled.error;
+            break;
+        }
+        QThread::msleep(5);
+    }
+    check("env-apply.lint.ready", ready, backendError);
+
+    // The child's OWN environment dump — never the parent's, never the store.
+    QStringList childEnv;
+    QString probeValue = QStringLiteral("<absent>");
+    QFile dump(dumpPath);
+    if (dump.exists() && dump.open(QIODevice::ReadOnly)) {
+        const QByteArray bytes = dump.readAll();
+        for (const QByteArray &entry : bytes.split('\0')) {
+            if (entry.isEmpty()) {
+                continue;
+            }
+            const QString text = QString::fromUtf8(entry);
+            const int equals = text.indexOf(QLatin1Char('='));
+            if (equals > 0 && text.left(equals) == QStringLiteral("SEAM_PROBE")) {
+                probeValue = text.mid(equals + 1);
+            }
+            childEnv.append(text);
+        }
+    }
+    check("env-apply.child.dump", !childEnv.isEmpty(),
+          QStringLiteral("vars=%1 dump=%2").arg(childEnv.size()).arg(dumpPath));
+    std::printf("CHILD-ENV count=%d SEAM_PROBE=%s\n", static_cast<int>(childEnv.size()),
+                qPrintable(probeValue));
+    std::fflush(stdout);
+
+    if (!expect.isEmpty()) {
+        const bool present = probeValue != QStringLiteral("<absent>");
+        const bool ok = expect == QStringLiteral("present") ? present : !present;
+        check("env-apply.child.SEAM_PROBE", ok,
+              QStringLiteral("expect=%1 actual=%2").arg(expect, probeValue));
+    }
+
+    std::printf("ENV-APPLY-PROBE ok=%d checks=%d failures=%d\n", g_failures == 0 ? 1 : 0,
+                g_checks, g_failures);
+    std::fflush(stdout);
+    return g_failures == 0 ? 0 : 1;
+}
+
+#else // VEDIT_HAVE_RUST_FFI
+
+int runEnvApplyProbe(const QString &, const QString &)
+{
+    std::printf("ENV-APPLY-PROBE ok=0 reason=built-without-rust-ffi\n");
+    std::fflush(stdout);
+    return 1;
+}
+
+#endif // VEDIT_HAVE_RUST_FFI
+
 } // namespace
 
 namespace {
@@ -1821,10 +2011,35 @@ QString existingSettingsPath(const QStringList &candidates)
 }
 #endif // VEDIT_HAVE_APPEARANCE_SETTINGS
 
+// batch-20261110d (startup budget): one machine-readable line per startup
+// milestone, printed only when VEDIT_STARTUP_TRACE is set. `t_ms` is measured
+// from the first statement of main(); `wall_ms` is the epoch millisecond, so a
+// harness that also times the launcher can separate the AppRun/loader cost from
+// Qt's own initialisation instead of lumping them together. This is the
+// measurement the batch's before/after table is built from; it changes no
+// behaviour and costs one getenv when the variable is unset.
+void startupTrace(const QElapsedTimer &timer, const char *milestone)
+{
+    if (!qEnvironmentVariableIsSet("VEDIT_STARTUP_TRACE")) {
+        return;
+    }
+    const auto wall = std::chrono::duration_cast<std::chrono::milliseconds>(
+                          std::chrono::system_clock::now().time_since_epoch())
+                          .count();
+    std::printf("STARTUP-TRACE t_ms=%lld wall_ms=%lld %s\n",
+                static_cast<long long>(timer.elapsed()), static_cast<long long>(wall), milestone);
+    std::fflush(stdout);
+}
+
 } // namespace
 
 int main(int argc, char **argv)
 {
+    // batch-20261110d: the measurement anchor for every STARTUP-TRACE line.
+    QElapsedTimer startupTimer;
+    startupTimer.start();
+    startupTrace(startupTimer, "main-entry");
+
     // T134: Rust is STATICALLY LINKED into this C++ host (crates/vd-lsp drives
     // the verible/verible-verilog-ls child through tokio). The Rust runtime's
     // startup — the code that calls `signal(SIGPIPE, SIG_IGN)` in a Rust binary
@@ -1849,6 +2064,10 @@ int main(int argc, char **argv)
 #endif
 
     QApplication app(argc, argv);
+    // batch-20261110d: Qt's own initialisation is its own milestone — the
+    // before/after table must be able to price the platform plugin + font
+    // database separately from the product's lanes.
+    startupTrace(startupTimer, "qt-init-done");
     // UI-Mosaic A4：桌面条目、窗口图标与 WM_CLASS 必须指向同一个 id，否则任务栏/
     // 窗口切换器会退回通用图标，且 .desktop 条目无法把自己的窗口归组。深浅切换由
     // ThemeManager::applyUiTheme 覆盖，这里只是启动瞬间的兜底图标。
@@ -1858,7 +2077,7 @@ int main(int argc, char **argv)
     // only in themed_icons.cpp. The dark/light switch itself is ThemeManager::applyUiTheme.
     QApplication::setWindowIcon(vedit::app::themed_icons::appIcon(false));
     QCoreApplication::setApplicationName(QStringLiteral("vedit-app"));
-    QCoreApplication::setApplicationVersion(QStringLiteral("0.2.2"));
+    QCoreApplication::setApplicationVersion(QStringLiteral("0.2.1"));
     QCoreApplication::setOrganizationName(QStringLiteral("VEdit"));
 
     QCommandLineParser parser;
@@ -1889,6 +2108,17 @@ int main(int argc, char **argv)
     parser.addOption({QStringLiteral("screenshots"),
                       QCoreApplication::translate("VEdit", "Capture split-state screenshots into this directory and exit."),
                       QStringLiteral("dir")});
+    // T63: the product-level proof that the imported environment selection
+    // reaches a REAL lint child. Test-only, like --selfcheck/--screenshots: the
+    // run exits before the window is shown.
+    parser.addOption({QStringLiteral("env-apply-probe"),
+                      QStringLiteral("Run the environment-apply probe against this state "
+                                     "directory and exit. Test-only."),
+                      QStringLiteral("dir")});
+    parser.addOption({QStringLiteral("env-probe-expect"),
+                      QStringLiteral("With --env-apply-probe: assert SEAM_PROBE is present or "
+                                     "absent in the lint child's environment."),
+                      QStringLiteral("present|absent")});
     parser.addOption({QStringLiteral("no-session-restore"),
                       QCoreApplication::translate("VEdit", "Ignore an existing session file at startup.")});
     parser.addOption({QStringLiteral("hold"), QCoreApplication::translate("VEdit", "Keep the window for this many ms."),
@@ -1958,6 +2188,7 @@ int main(int argc, char **argv)
         vedit::app::crash::install(buildInfo);
         vedit::app::crash::event("start argv0=%s", argv[0]);
     }
+    startupTrace(startupTimer, "crash-install-done");
     if (parser.isSet(QStringLiteral("crash-test"))) {
         const QString which = parser.value(QStringLiteral("crash-test")).trimmed().toLower();
         int signal = SIGSEGV;
@@ -1990,6 +2221,10 @@ int main(int argc, char **argv)
     }
     if (parser.isSet(QStringLiteral("screenshots"))) {
         return captureScreenshots(parser.value(QStringLiteral("screenshots")));
+    }
+    if (parser.isSet(QStringLiteral("env-apply-probe"))) {
+        return runEnvApplyProbe(parser.value(QStringLiteral("env-apply-probe")),
+                                parser.value(QStringLiteral("env-probe-expect")));
     }
 
     // T137: validate positional files before creating the shell, so a typo
@@ -2034,6 +2269,7 @@ int main(int argc, char **argv)
     // tree / palette / diagnostics), so no lane needs a second session peek and
     // an ordinary start (no --project) shows the restored project everywhere.
     options.projectRoot = shell.projectRoot();
+    startupTrace(startupTimer, "shell-constructed");
     // T18/AC-4.2: the Preferences page drives the one restart path through this
     // handler; the shell owns the strict ordering (guard -> persist ->
     // saveSession -> relaunch), so the dialog never touches shell internals.
@@ -2130,11 +2366,13 @@ int main(int argc, char **argv)
     }
 #endif
     vedit::workspace::installPanels(shell, {options.projectRoot, options.stateDir});
+    startupTrace(startupTimer, "panels-installed");
     // Terminal panel lane (T35): the shell created the "terminal" panel spec with
     // an empty factory; the widget lives in the terminal lane.
     shell.panels()->setFactory(QStringLiteral("terminal"),
                                vedit::terminal::terminalPanelFactory());
     shell.startSession();
+    startupTrace(startupTimer, "session-started");
     if (!requestedFiles.isEmpty()) {
         QString openError;
         if (!shell.openPaths(requestedFiles, &openError)) {
@@ -2143,6 +2381,7 @@ int main(int argc, char **argv)
         }
     }
     shell.show();
+    startupTrace(startupTimer, "window-shown");
 
     const int holdMs = parser.value(QStringLiteral("hold")).toInt();
     if (holdMs > 0) {

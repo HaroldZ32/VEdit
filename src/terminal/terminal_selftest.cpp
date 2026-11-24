@@ -26,12 +26,20 @@
 #include <QMainWindow>
 #include <QPalette>
 #include <QStringList>
+#include <QTemporaryDir>
 #include <QThread>
 #include <QToolButton>
 
+#if defined(VEDIT_TERMINAL_HAVE_FFI)
+#include "vd_ffi.h"
+#endif
+
 #include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <functional>
 #include <memory>
+#include <string>
 
 using vedit::terminal::PtySession;
 using vedit::terminal::Screen;
@@ -335,6 +343,249 @@ void checkPtyBadShell()
     check("pty.bad-shell.error", !error.isEmpty());
     check("pty.bad-shell.not-running", !session.isRunning());
 }
+
+// The child is the HOST shell, so it must not inherit the packaged loader
+// environment AppRun exports for the product process. Under the AppImage,
+// LD_LIBRARY_PATH=<AppDir>/lib made the host loader (e.g. EL7 glibc 2.17) load
+// the packaged glibc and the shell died before its first prompt with
+// "version 'GLIBC_2.35' not found" — the panel then showed a dead shell. This
+// check fails on exactly that defect: the child prints what it received.
+void checkPtyChildLoaderEnvironment()
+{
+    const QString packaged = QDir::temp().filePath(QStringLiteral("vedit-terminal-packaged-runtime"));
+    QDir().mkpath(packaged);
+    const QByteArray packagedPath = packaged.toLocal8Bit();
+
+    const bool hadLdLibraryPath = qEnvironmentVariableIsSet("LD_LIBRARY_PATH");
+    const bool hadLocPath = qEnvironmentVariableIsSet("LOCPATH");
+    const QByteArray savedLdLibraryPath = qgetenv("LD_LIBRARY_PATH");
+    const QByteArray savedLocPath = qgetenv("LOCPATH");
+    qputenv("LD_LIBRARY_PATH", packagedPath);
+    qputenv("LOCPATH", packagedPath);
+
+    PtySession session;
+    QByteArray output;
+    QObject::connect(&session, &PtySession::outputReady, &session,
+                     [&output](const QByteArray &data) { output += data; });
+    QString error;
+    const bool started =
+        session.start(QStringLiteral("/bin/sh"), QString(),
+                      QStringList{QStringLiteral("-c"),
+                                  QStringLiteral("printf '%s|%s' \"${LD_LIBRARY_PATH-<unset>}\" "
+                                                 "\"${LOCPATH-<unset>}\"")},
+                      80, 24, &error);
+    check("pty.child-env.start", started, error);
+    const bool finished = started && waitFor([&session]() { return !session.isRunning(); });
+    check("pty.child-env.finished", finished);
+    check("pty.child-env.loader-vars-unset", output.contains("<unset>|<unset>"),
+          QStringLiteral("child-printed=%1").arg(QString::fromLocal8Bit(output).trimmed()));
+    if (finished) {
+        check("pty.child-env.exit-code", session.exitCode() == 0);
+    }
+
+    if (hadLdLibraryPath) {
+        qputenv("LD_LIBRARY_PATH", savedLdLibraryPath);
+    } else {
+        qunsetenv("LD_LIBRARY_PATH");
+    }
+    if (hadLocPath) {
+        qputenv("LOCPATH", savedLocPath);
+    } else {
+        qunsetenv("LOCPATH");
+    }
+}
+
+// batch-20261114 E3: the child is the HOST shell, so it must also SEE the
+// environment VEdit was launched with. Stripping the AppDir loader variables
+// above must not degrade into a scrubbed environment: the editor settings'
+// Environment page and the user's own `export` both land in `environ`, which
+// PtySession copies verbatim.
+//
+// The probe name cannot exist naturally, so the positive check can only pass by
+// real inheritance. The negative control runs the SAME child command with the
+// probe removed from this process's environment: it must print <unset>| and
+// therefore differ from the positive run, which is what proves the assertion is
+// not vacuously true. When ctest launches this case it supplies the probe in the
+// test ENVIRONMENT, so the inherited value comes from the process launch itself.
+struct ChildProbeRun {
+    bool started = false;
+    bool finished = false;
+    QString error;
+    QString observed;
+    int exitCode = -1;
+};
+
+ChildProbeRun runChildEnvironmentProbe(const QString &command)
+{
+    ChildProbeRun run;
+    PtySession session;
+    QByteArray output;
+    QObject::connect(&session, &PtySession::outputReady, &session,
+                     [&output](const QByteArray &data) { output += data; });
+    run.started = session.start(QStringLiteral("/bin/sh"), QString(),
+                                QStringList{QStringLiteral("-c"), command}, 80, 24, &run.error);
+    if (run.started) {
+        run.finished = waitFor([&session]() { return !session.isRunning(); });
+        run.exitCode = session.exitCode();
+    }
+    run.observed = QString::fromLocal8Bit(output).trimmed();
+    return run;
+}
+
+void checkPtyChildInheritsLauncherEnvironment()
+{
+    const char *const probeName = "VEDIT_TERM_ENV_PROBE";
+    const QString fallbackProbeValue = QStringLiteral("vedit-terminal-env-probe-7f3a9c");
+    const QString packagedLoaderPath = QStringLiteral("/opt/appdir/vedit/lib");
+    // ONE child reports both facts, so the probe and the stripped loader variable
+    // belong to the same execve(): "<probe>|<LD_LIBRARY_PATH>".
+    const QString command = QStringLiteral(
+        "printf \"%s|%s\" \"${VEDIT_TERM_ENV_PROBE-<unset>}\" \"${LD_LIBRARY_PATH-<unset>}\"");
+
+    const char *const ambientProbe = std::getenv(probeName);
+    const QString expectedProbe =
+        ambientProbe != nullptr ? QString::fromLocal8Bit(ambientProbe) : fallbackProbeValue;
+    if (ambientProbe == nullptr) {
+        ::setenv(probeName, fallbackProbeValue.toLocal8Bit().constData(), 1);
+    }
+
+    const char *const savedProbeRaw = ambientProbe;
+    const std::string savedProbe = savedProbeRaw != nullptr ? savedProbeRaw : std::string();
+    const bool hadProbe = savedProbeRaw != nullptr;
+    const char *const savedLoaderRaw = std::getenv("LD_LIBRARY_PATH");
+    const bool hadLoader = savedLoaderRaw != nullptr;
+    const std::string savedLoader = savedLoaderRaw != nullptr ? savedLoaderRaw : std::string();
+
+    // AppRun exports LD_LIBRARY_PATH for the product; the child must strip it in
+    // BOTH runs, so the positive check cannot pass by leaking the loader path.
+    ::setenv("LD_LIBRARY_PATH", packagedLoaderPath.toLocal8Bit().constData(), 1);
+
+    const ChildProbeRun inherited = runChildEnvironmentProbe(command);
+    check("pty.child-env.launcher-variable.start", inherited.started, inherited.error);
+    check("pty.child-env.launcher-variable.finished", inherited.finished);
+    check("pty.child-env.inherits-launcher-variable",
+          inherited.observed == expectedProbe + QStringLiteral("|<unset>"),
+          QStringLiteral("expected=%1|<unset> child-printed=%2").arg(expectedProbe, inherited.observed));
+    check("pty.child-env.launcher-variable.exit-code", inherited.exitCode == 0);
+
+    // Negative control: identical child command, identical loader variable, probe
+    // removed from this process's environment. <unset>| here and <value>| above is
+    // exactly what shows the assertion follows the launch environment.
+    ::unsetenv(probeName);
+    const ChildProbeRun absent = runChildEnvironmentProbe(command);
+    check("pty.child-env.negative-control.start", absent.started, absent.error);
+    check("pty.child-env.negative-control.finished", absent.finished);
+    check("pty.child-env.negative-control-unset",
+          absent.observed == QStringLiteral("<unset>|<unset>"),
+          QStringLiteral("child-printed=%1").arg(absent.observed));
+    check("pty.child-env.negative-control-differs", absent.observed != inherited.observed,
+          QStringLiteral("positive=%1 control=%2").arg(inherited.observed, absent.observed));
+
+    if (hadProbe) {
+        ::setenv(probeName, savedProbe.c_str(), 1);
+    } else {
+        ::unsetenv(probeName);
+    }
+    if (hadLoader) {
+        ::setenv("LD_LIBRARY_PATH", savedLoader.c_str(), 1);
+    } else {
+        ::unsetenv("LD_LIBRARY_PATH");
+    }
+}
+
+#if defined(VEDIT_TERMINAL_HAVE_FFI)
+// batch-20261115 AC-1.3: the environment the user captured from their shell reaches
+// the PTY child. The terminal is the one consumer the Rust side does not spawn, so
+// it reads the imported selection through the C ABI (vd_env_effective_snapshot /
+// vd_env_apply_selection). This drives the REAL verbs the product calls at startup
+// and then a REAL /bin/sh under a real pty, with a negative control that applies an
+// empty selection first: only the selected value may appear, the packaged loader
+// variable must still be stripped, and the snapshot the toolchain resolver reads
+// must agree with the child.
+void checkPtyChildReceivesImportedEnvironment()
+{
+    QTemporaryDir scratch(QStringLiteral("/tmp/vedit-term-imported-XXXXXX"));
+    check("pty.imported-env.scratch-dir", scratch.isValid());
+    if (!scratch.isValid()) {
+        return;
+    }
+    const QString selectionPath = scratch.filePath(QStringLiteral("environment.json"));
+    {
+        QFile file(selectionPath);
+        const bool opened = file.open(QIODevice::WriteOnly | QIODevice::Text);
+        check("pty.imported-env.selection-written", opened, selectionPath);
+        if (!opened) {
+            return;
+        }
+        file.write("{\"version\":1,\"global\":"
+                   "[{\"name\":\"VEDIT_TERM_IMPORTED_PROBE\",\"value\":\"imported-ok\"},"
+                   "{\"name\":\"LD_LIBRARY_PATH\",\"value\":\"/imported/must-not-leak\"}],"
+                   "\"projects\":[]}");
+    }
+    VdService *service = vd_service_create();
+    check("pty.imported-env.service", service != nullptr);
+    if (service == nullptr) {
+        return;
+    }
+    const QByteArray path = selectionPath.toUtf8();
+    char *warnings = nullptr;
+    const int applied = vd_env_apply_selection(service, path.constData(), nullptr, &warnings);
+    if (warnings != nullptr) {
+        vd_string_free(warnings);
+    }
+    check("pty.imported-env.applied", applied == 1);
+
+    // The toolchain resolver's read path must see the same layer.
+    VdEnvSnapshot snapshot{};
+    const bool snapshotFilled = vd_env_effective_snapshot(service, &snapshot) == 1;
+    bool snapshotHasProbe = false;
+    if (snapshotFilled) {
+        for (size_t index = 0; index < snapshot.count; ++index) {
+            const VdEnvSnapshotEntry &row = snapshot.items[index];
+            if (row.name != nullptr && row.value != nullptr
+                && std::strcmp(row.name, "VEDIT_TERM_IMPORTED_PROBE") == 0
+                && std::strcmp(row.value, "imported-ok") == 0) {
+                snapshotHasProbe = true;
+            }
+        }
+    }
+    vd_env_snapshot_free(&snapshot);
+    check("pty.imported-env.snapshot-carries-selection", snapshotFilled && snapshotHasProbe);
+
+    const QString command = QStringLiteral(
+        "printf \"%s|%s|%s\" \"${VEDIT_TERM_IMPORTED_PROBE-<unset>}\" "
+        "\"${VEDIT_TERM_NOT_SELECTED-<unset>}\" \"${LD_LIBRARY_PATH-<unset>}\"");
+    const ChildProbeRun imported = runChildEnvironmentProbe(command);
+    check("pty.imported-env.child.start", imported.started, imported.error);
+    check("pty.imported-env.child.finished", imported.finished);
+    check("pty.imported-env.child-sees-selection",
+          imported.observed == QStringLiteral("imported-ok|<unset>|<unset>"),
+          QStringLiteral("child-printed=%1").arg(imported.observed));
+
+    // Negative control: the SAME child command after an EMPTY selection is applied.
+    const QString emptyPath = scratch.filePath(QStringLiteral("environment-empty.json"));
+    {
+        QFile file(emptyPath);
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            file.write("{\"version\":1,\"global\":[],\"projects\":[]}");
+        }
+    }
+    warnings = nullptr;
+    const int cleared = vd_env_apply_selection(service, emptyPath.toUtf8().constData(), nullptr,
+                                               &warnings);
+    if (warnings != nullptr) {
+        vd_string_free(warnings);
+    }
+    check("pty.imported-env.negative-control.applied", cleared == 1);
+    const ChildProbeRun absent = runChildEnvironmentProbe(command);
+    check("pty.imported-env.negative-control.child",
+          absent.started && absent.observed == QStringLiteral("<unset>|<unset>|<unset>"),
+          QStringLiteral("child-printed=%1").arg(absent.observed));
+    check("pty.imported-env.negative-control-differs", absent.observed != imported.observed,
+          QStringLiteral("positive=%1 control=%2").arg(imported.observed, absent.observed));
+    vd_service_destroy(service);
+}
+#endif
 
 // Review M2: the child must not inherit the master side of its own pty. The
 // fork()ed child gets a copy of every open fd, and only the slave belongs there;
@@ -670,6 +921,8 @@ int runSelfCheck()
     checkPtyInteractive();
     checkPtyResize();
     checkPtyBadShell();
+    checkPtyChildLoaderEnvironment();
+    checkPtyChildInheritsLauncherEnvironment();
     checkPtyMasterFdNotInherited();
     checkPtyMasterFdDescendants();
     checkPtyReadLimit();
@@ -687,6 +940,28 @@ int runSelfCheck()
     std::fflush(stdout);
     return g_failures == 0 ? 0 : 1;
 }
+
+// batch-20261114 E3: the terminal panel's shell inherits the launch environment.
+// A dedicated ctest case runs ONLY this check, so its log is unambiguous.
+int runEnvironmentInheritanceCheck()
+{
+    checkPtyChildInheritsLauncherEnvironment();
+    std::printf("TERMINAL-ENV-INHERITANCE ok=%d checks=%d failures=%d\n",
+                g_failures == 0 ? 1 : 0, g_checks, g_failures);
+    std::fflush(stdout);
+    return g_failures == 0 ? 0 : 1;
+}
+
+#if defined(VEDIT_TERMINAL_HAVE_FFI)
+int runImportedEnvironmentCheck()
+{
+    checkPtyChildReceivesImportedEnvironment();
+    std::printf("TERMINAL-ENV-IMPORTED ok=%d checks=%d failures=%d\n",
+                g_failures == 0 ? 1 : 0, g_checks, g_failures);
+    std::fflush(stdout);
+    return g_failures == 0 ? 0 : 1;
+}
+#endif
 
 int runScreenshots(const QString &directory)
 {
@@ -799,10 +1074,18 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription(QStringLiteral("Terminal panel self-check (T35)"));
     parser.addHelpOption();
     const QCommandLineOption selfcheck(QStringLiteral("selfcheck"), QStringLiteral("Run the headless checks."));
+    const QCommandLineOption envInheritance(
+        QStringLiteral("selfcheck-env-inheritance"),
+        QStringLiteral("Run only the terminal-shell launch-environment checks."));
+    const QCommandLineOption envImported(
+        QStringLiteral("selfcheck-env-imported"),
+        QStringLiteral("Run only the imported-environment PTY checks (batch-20261115 AC-1.3)."));
     const QCommandLineOption screenshots(QStringLiteral("screenshots"),
                                         QStringLiteral("Capture the panel screenshots into <dir>."),
                                         QStringLiteral("dir"));
     parser.addOption(selfcheck);
+    parser.addOption(envInheritance);
+    parser.addOption(envImported);
     parser.addOption(screenshots);
     parser.process(application);
 
@@ -812,6 +1095,15 @@ int main(int argc, char *argv[])
     if (parser.isSet(selfcheck)) {
         return runSelfCheck();
     }
-    std::printf("usage: vedit-terminal-selftest --selfcheck | --screenshots <dir>\n");
+    if (parser.isSet(envInheritance)) {
+        return runEnvironmentInheritanceCheck();
+    }
+#if defined(VEDIT_TERMINAL_HAVE_FFI)
+    if (parser.isSet(envImported)) {
+        return runImportedEnvironmentCheck();
+    }
+#endif
+    std::printf("usage: vedit-terminal-selftest --selfcheck | --selfcheck-env-inheritance | "
+                "--selfcheck-env-imported | --screenshots <dir>\n");
     return 2;
 }

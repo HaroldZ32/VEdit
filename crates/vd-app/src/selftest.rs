@@ -1129,6 +1129,10 @@ fn probe_lint_report() -> vd_deeplint::LintReport {
             severity: vd_deeplint::Severity::Error,
             message: "AC-6 probe diagnostic".to_string(),
             code: "Ac6Probe".to_string(),
+            // T8 typed field: the probe's `raw` carries no `optionName`, so the
+            // lifted field is empty (the probe tests the polling path, not a
+            // waiver name).
+            option_name: None,
             location: None,
             ranges: Vec::new(),
             symbol_path: None,

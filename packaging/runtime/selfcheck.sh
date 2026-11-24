@@ -121,13 +121,13 @@ grep -q 'TOOLCHAIN source=verible:bundled slang:bundled missing=\[\]' "$OUT_FILE
   && echo "CHECK PASS  toolchain source=bundled, missing=[]" \
   || { echo "CHECK FAIL  toolchain is not fully bundled"; fail=1; }
 SYNTAX_LINE=$(printf '%s\n' "$OUT" | grep -m1 'syntax-product:')
-# C5/A3: the package ships FIVE definitions — Verilog, SystemVerilog, VHDL,
-# Markdown, Tcl (usr/share/vedit/ksh-whitelist.txt). This check used to grep the
+# C5/A3/T17: the package ships SIX definitions — Verilog, SystemVerilog, VHDL,
+# Markdown, Tcl, Scala (usr/share/vedit/ksh-whitelist.txt). This check used to grep the
 # two Verilog XMLs only, so a package that had lost the other three STILL passed
 # the self-check. Every definition is required now and the check stays
 # fail-closed: anything missing from own-xml= fails the run.
 SYNTAX_DEFINITIONS=(vedit-verilog.xml vedit-systemverilog.xml vedit-vhdl.xml
-                    vedit-markdown.xml vedit-tcl.xml)
+                    vedit-markdown.xml vedit-tcl.xml vedit-scala.xml)
 # own-xml= lists what the loader really loaded, in QDirIterator order (not
 # sorted), so membership is tested per entry instead of by surrounding text.
 OWN_XML=$(printf '%s\n' "$SYNTAX_LINE" | sed -n 's/.*own-xml=\(\[[^]]*\]\).*/\1/p')

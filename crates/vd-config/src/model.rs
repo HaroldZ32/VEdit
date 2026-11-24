@@ -197,6 +197,15 @@ pub struct ProjectSettings {
     pub include_dirs: Vec<PathBuf>,
     /// Extra defines, `NAME` or `NAME=VALUE`.
     pub defines: Vec<String>,
+    /// Restore the legacy automatic file-set discovery.
+    ///
+    /// Default `false`: the project file set is exactly what the declared
+    /// filelists name (the imported `.f` files plus [`Self::filelists`]).
+    /// `true` re-enables BOTH legacy behaviours at once: the auto-discovery of
+    /// the `*.f` files sitting directly in the project root, and the recursive
+    /// scan of the root for source files — the pre-2026-11-18 file set. The
+    /// explicitly configured [`Self::filelists`] apply either way.
+    pub auto_discover: bool,
 }
 
 /// FIM completion settings. Defaults: disabled, no endpoint, no key.
@@ -264,6 +273,10 @@ mod tests {
         assert_eq!(config.fim.timeout_ms, 5_000);
         assert!(config.verible.ls.is_none());
         assert!(config.project.filelists.is_empty());
+        assert!(
+            !config.project.auto_discover,
+            "the legacy automatic file-set discovery must default to off"
+        );
     }
 
     #[test]

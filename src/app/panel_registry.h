@@ -2,13 +2,13 @@
 
 // Panel seam of the application shell.
 //
-// The shell owns the QMainWindow and the docks; the six panels the product
-// needs (file tree, search, terminal, VCS, settings, outline) are registered
-// here as *specs* and inserted as docks only when asked for. Panel *content*
-// belongs to the owning lane: each spec carries a factory, and until a lane
-// registers one the shell inserts a clearly-labelled placeholder (empty state,
-// never a crash). src/workspace, src/tools, src/vcs and src/settings replace
-// the factories through ApplicationShell/PanelRegistry::setFactory().
+// The shell owns the QMainWindow and the docks; the panels the product needs
+// (file tree, search, terminal, VCS, outline) are registered here as *specs* and
+// inserted as docks only when asked for. Panel *content* belongs to the owning
+// lane: each spec carries a factory. Batch 20261110 (AC-1.6): a spec WITHOUT a
+// factory does not render at all — there is no shell placeholder any more, so an
+// unowned dock simply does not appear (it used to show developer text). Lanes
+// register their factories through ApplicationShell/PanelRegistry::setFactory().
 #include <QHash>
 #include <QMetaObject>
 #include <QList>
@@ -29,7 +29,7 @@ struct PanelSpec {
     QString title;                    // dock title
     QString owner;                    // lane that owns the content
     Qt::DockWidgetArea area = Qt::LeftDockWidgetArea;
-    std::function<QWidget *()> factory; // empty => shell placeholder
+    std::function<QWidget *()> factory; // empty => the dock does not render (AC-1.6)
 };
 
 class PanelRegistry {
@@ -51,6 +51,9 @@ public:
     QStringList ids() const;                 // registration order
     QStringList insertedIds() const;         // docks that currently exist
     void setFactory(const QString &id, std::function<QWidget *()> factory);
+    // Batch 20261110 (AC-1.6): INERT. It is kept only because the module-tree lane
+    // (outside this task's write scope) still calls it; the placeholder it used to
+    // configure no longer exists. Delete the calls, then this declaration.
     void setPlaceholderHint(const QString &id, const QString &hint);
     // T129: the shell installs this once; every dock reports visibility changes
     // (X button / menu / programmatic hide/show) so the View-menu check state
@@ -58,7 +61,8 @@ public:
     void setVisibilityListener(std::function<void(const QString &id, bool visible)> listener);
 
     // Creates and inserts the dock on first request; later calls return the
-    // existing dock. `window` is remembered for show/toggle operations.
+    // existing dock. Returns nullptr for an unknown id, before a window is known,
+    // or when the spec has no factory (AC-1.6: an unowned panel does not render).
     QDockWidget *insert(const QString &id, QMainWindow *window);
     QDockWidget *dock(const QString &id) const;
     bool isInserted(const QString &id) const;
@@ -71,10 +75,7 @@ public:
     Qt::DockWidgetArea area(const QString &id) const;
 
 private:
-    QWidget *createContent(const PanelSpec &spec) const;
-
     QHash<QString, PanelSpec> specs_;
-    QHash<QString, QString> hints_;
     QHash<QString, QDockWidget *> docks_;
     std::function<void(const QString &id, bool visible)> visibilityListener_;
     QList<QMetaObject::Connection> visibilityConnections_;

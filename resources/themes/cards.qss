@@ -17,18 +17,21 @@ QMainWindow {
     color: @text@;
 }
 
-/* dock 之间的真实留白：QMainWindow::separator 是 dock 布局自己的分隔条，
- * 给它 @gap@ 画布色就得到卡片间隙，不需要在控件树里加任何包裹（接线车道实测
- * 包裹 QFrame 会打红 4 条既有断言）。 */
+/* dock 之间的分隔条：QMainWindow::separator 是 dock 布局自己的分隔条，
+ * 不需要在控件树里加任何包裹（接线车道实测包裹 QFrame 会打红 4 条既有断言）。
+ * batch-20261115 AC-7.4：静止用 @border@，不再用 @canvas@——与画布同色时整条
+ * 分隔条在静止状态完全不可见（用户找不到左右分栏的拖拽点）；hover 升到
+ * @borderStrong@，给「这里可以拖」的反馈。宽度仍取 @gap@（8px，≥6px 的验收下限），
+ * 高度 16px 是 ui_theme_selftest 冻结的设计常量。 */
 QMainWindow::separator {
-    background: @canvas@;
+    background: @border@;
     width: @gap@;
     height: 16px;
 }
 
-/* 拖动分隔条时不出现刺眼高亮：保持画布色，鼠标指针本身会变成分隔形状。 */
+/* 拖动分隔条时不出现刺眼高亮：只比静止深一档，鼠标指针本身还会变成分隔形状。 */
 QMainWindow::separator:hover {
-    background: @canvas@;
+    background: @borderStrong@;
 }
 
 /* 对话框是卡片而不是画布：V1 的实机缺陷里对话框/弹层的默认底色跟着
@@ -698,12 +701,14 @@ QToolTip {
     padding: 4px 8px;
 }
 
+/* 编辑器分屏 / VCS 面板的 QSplitter handle 用同一套可见样式（AC-7.5）：静止
+ * @border@、hover @borderStrong@，与上面的 QMainWindow::separator 一致。 */
 QSplitter::handle {
-    background: @canvas@;
+    background: @border@;
 }
 
 QSplitter::handle:hover {
-    background: @border@;
+    background: @borderStrong@;
 }
 
 /* 树/表格/列表里的内联编辑框（文件树新建/重命名）行高只有 ~20px：

@@ -23,6 +23,7 @@
 #include <QFileInfo>
 #include <QHash>
 #include <QStringList>
+#include <algorithm>
 #include <cstdint>
 #include <QVector>
 
@@ -49,7 +50,67 @@ BackendState mapPhase(int phase)
     }
 }
 
-DiagnosticEntry mapDiagnostic(const VdLspDiagnostic &raw, const QString &file)
+/// The lint rule of a diagnostic whose producer sends it inside the MESSAGE.
+///
+/// `verible-verilog-ls` publishes **no `code` at all**: measured against the
+/// pinned v0.0-4298 server, a whole published diagnostic is
+/// `{"message", "range", "severity", "source"}` and the rule is spelled
+/// `"Remove trailing spaces. [Style: trailing-spaces][no-trailing-spaces] (fix
+/// available)"`. The rule id is the LAST bracketed token (Verible's `[Style: x]`
+/// class prefix is stripped).
+///
+/// THE AUTHORITATIVE IMPLEMENTATION IS THE RUST `vd_lsp::diagnostic_rule()`
+/// (crates/vd-lsp/src/diagnostics.rs): it prefers the protocol `code` and
+/// otherwise parses the trailing bracketed tokens exactly this way. This is a
+/// deliberate MIRROR of it, because `normalise_diagnostics()` in vd-lsp is the
+/// one place that should call it and this lane cannot reach that code; the
+/// canonical fix is to have the normaliser use the helper and delete this copy
+/// (follow-up card - see evidence/batch-20261110c/diag-data/REPORT.md). The
+/// mirror is pinned by a cross-check against the Rust helper on the SAME real
+/// server messages (same evidence file).
+///
+/// One deliberate difference from the Rust helper: a PURELY NUMERIC token is not
+/// a rule id - a `[12]` inside a message is a value, and a waiver written with
+/// `--rule=12` would be a fabricated suppression. The scan therefore remembers
+/// the last token that is bracket-delimited, space-free and carries at least one
+/// letter.
+QString ruleFromMessage(const QString &message)
+{
+    QString candidate;
+    int cursor = 0;
+    while (cursor < message.size()) {
+        const int open = message.indexOf(QLatin1Char('['), cursor);
+        if (open < 0) {
+            break;
+        }
+        const int close = message.indexOf(QLatin1Char(']'), open + 1);
+        if (close < 0) {
+            break;
+        }
+        QString token = message.mid(open + 1, close - open - 1).trimmed();
+        const QString stylePrefix = QStringLiteral("Style: ");
+        if (token.startsWith(stylePrefix)) {
+            token = token.mid(stylePrefix.size()).trimmed();
+        }
+        const bool hasLetter = std::any_of(token.cbegin(), token.cend(), [](QChar character) {
+            return character.isLetter();
+        });
+        if (!token.isEmpty() && !token.contains(QLatin1Char(' ')) && hasLetter) {
+            candidate = token; // the last well-formed token wins
+        }
+        cursor = close + 1;
+    }
+    return candidate;
+}
+
+/// Map one C ABI diagnostic. `defaultSource` is the SESSION BACKEND's name and
+/// labels a row the server sent without a source (batch-20261117 F4): slang-
+/// server's rows carried `[verible]` in the Outline because the empty ABI field
+/// fell through to a hard-coded verible default, which misreports provenance.
+/// A source the server DID send is kept verbatim - verible rows stay verible -
+/// and message/range/severity/code are untouched.
+DiagnosticEntry mapDiagnostic(const VdLspDiagnostic &raw, const QString &file,
+                              const QString &defaultSource)
 {
     DiagnosticEntry entry;
     entry.file = file;
@@ -58,9 +119,18 @@ DiagnosticEntry mapDiagnostic(const VdLspDiagnostic &raw, const QString &file)
     entry.endLine = static_cast<int>(raw.range.end_line);
     entry.endColumn = static_cast<int>(raw.range.end_character);
     entry.severity = raw.severity;
-    entry.code = raw.code != nullptr ? QString::fromUtf8(raw.code) : QString();
-    entry.source = raw.source != nullptr ? QString::fromUtf8(raw.source) : QString();
+    const QString serverSource =
+        raw.source != nullptr ? QString::fromUtf8(raw.source) : QString();
+    entry.source = serverSource.isEmpty() ? defaultSource : serverSource;
     entry.message = raw.message != nullptr ? QString::fromUtf8(raw.message) : QString();
+    entry.code = raw.code != nullptr ? QString::fromUtf8(raw.code) : QString();
+    if (entry.code.isEmpty()) {
+        // AC-5.8: a row without a rule id cannot be waived per diagnostic
+        // (waiver_actions.cpp refuses it), so a verible row would be
+        // un-waivable from the panel. The rule the server spelled into the
+        // message IS the identifier verible's own `waive --rule=` takes.
+        entry.code = ruleFromMessage(entry.message);
+    }
     return entry;
 }
 
@@ -272,6 +342,11 @@ public:
         snapshot.restarts = static_cast<int>(raw.restarts);
         const QString backend = raw.backend_name != nullptr ? QString::fromUtf8(raw.backend_name)
                                                             : backendName();
+        // AC-3 (batch-20261117): the Outline's preprocessing-error hint keys on
+        // the backend that PRODUCED this session, so the snapshot carries the
+        // same token the status line prints (never the requested setting, which
+        // may already name a backend that has not started).
+        snapshot.backendName = backend;
         const QString rawMessage =
             raw.message != nullptr ? QString::fromUtf8(raw.message) : QString();
         // T11/AC-1.2: the observable status line always names the backend that
@@ -383,9 +458,20 @@ public:
             break;
         case VD_LSP_RES_DIAGNOSTICS:
             polled.kind = ResponseKind::Diagnostics;
+            polled.published = true;
             for (size_t index = 0; index < raw.diagnostics.count; ++index) {
-                polled.diagnostics.append(mapDiagnostic(raw.diagnostics.items[index], QString()));
+                // F4: a source-less row is labelled with the backend that
+                // produced this session (verible / slang), never a fixed token.
+                polled.diagnostics.append(
+                    mapDiagnostic(raw.diagnostics.items[index], QString(), backendName()));
             }
+            break;
+        case VD_LSP_RES_DIAGNOSTICS_UNPUBLISHED:
+            // Batch-20261118 AC-2: the server never published a set for this
+            // document. An empty answer here is "not analysed", NOT "0
+            // problems" - the controller decides the state from `published`.
+            polled.kind = ResponseKind::Diagnostics;
+            polled.published = false;
             break;
         case VD_LSP_RES_HOVER:
             polled.kind = ResponseKind::Hover;
@@ -439,6 +525,48 @@ public:
         defines_ = defines;
         staticCapabilitiesCache_ = BackendCapabilities{};
         commandLine_.clear();
+        return true;
+    }
+
+    /// Batch-20261118 AC-1: deliver the project build context to a Ready slang
+    /// session. The `-I`/`-D` lists are held here (set by `selectBackend`), so
+    /// the controller only has to say "now". Verible is deliberately a no-op:
+    /// its `-I`/`-D` already travel in the file list it is started with, and its
+    /// behaviour must not change.
+    ///
+    /// G1-g (batch-20261119): the project's imported `.f` lists are NOT part of
+    /// this call any more. The C ABI keeps its third parameter for compatibility
+    /// but ignores it (the generated context compiles the SESSION's file set, see
+    /// `vd_lsp_session_set_build_context`), and nesting the project `.f` with
+    /// `-f` is exactly the G1-d defect: the server re-expanded the whole project
+    /// and its own last-processed rule picked a definition the module tree never
+    /// chose. So the argument is always null and no `.f` is forwarded.
+    bool pushBuildContext(QString *error) override
+    {
+        if (session_ == 0 || service_.get() == nullptr) {
+            if (error != nullptr) {
+                *error = QCoreApplication::translate("VEdit", "no LSP session");
+            }
+            return false;
+        }
+        if (backend_ != LspBackendKind::Slang) {
+            return true;
+        }
+        FileList includeList(includeDirs_);
+        FileList defineList(defines_);
+        const VdStringList includeView = includeList.view();
+        const VdStringList defineView = defineList.view();
+        const int status = vd_lsp_session_set_build_context(
+            service_.get(), session_,
+            includeDirs_.isEmpty() ? nullptr : &includeView,
+            defines_.isEmpty() ? nullptr : &defineView,
+            nullptr);
+        if (status != VD_STATUS_READY) {
+            if (error != nullptr) {
+                *error = service_.lastError();
+            }
+            return false;
+        }
         return true;
     }
 
@@ -544,6 +672,22 @@ public:
         : slangPath_(std::move(slangPath))
     {
     }
+    FfiSlangBackend(const FfiSlangBackend &) = delete;
+    FfiSlangBackend &operator=(const FfiSlangBackend &) = delete;
+    ~FfiSlangBackend() override
+    {
+        // A ticket the controller abandoned (another file was analysed first,
+        // or the file set was replaced) still holds a one-file batch slot in the
+        // Rust service: cancel it and release the id instead of leaving the
+        // child running for the lifetime of the process.
+        if (service_.get() == nullptr) {
+            return;
+        }
+        for (quint64 job : jobs_) {
+            vd_deeplint_batch_cancel(service_.get(), job);
+            vd_deeplint_batch_release(service_.get(), job);
+        }
+    }
 
     bool available() const override
     {
@@ -592,58 +736,67 @@ public:
             }
             return 0;
         }
-        const QByteArray path = file.toUtf8();
+        // R2 + AC-5.8: ONE knob composition for BOTH layers.
+        //
+        // This per-file lint used to go through `vd_deeplint_lint_v2`, whose ABI
+        // carries `rules` / include dirs / defines and NO waiver field, while
+        // the project pass goes through `vd_deeplint_batch_start`, whose options
+        // carry the registered `--waiver_files` (verible) / `--waiver-file`
+        // (slang) and the ruleset / `-W` / error-limit knobs. The two layers
+        // therefore disagreed BY CONSTRUCTION: a waived diagnostic vanished from
+        // the project pass and reappeared from this run - and this is the row
+        // the panel shows for a file a finished pass does not cover (an edited
+        // file, or a view without a pass), so the user saw "I waived it and it
+        // is still reported".
+        //
+        // A ONE-FILE batch is the same engine invocation with the same options,
+        // so the layered view cannot disagree with itself any more. The
+        // language-server path is untouched: `analyzeFile()` runs LSP-only
+        // (diagnostics_controller.cpp: "file scope: the LSP is the fast path"),
+        // and its rows never come from here.
+        VdLintBatchOptions options{};
+        options.engine = static_cast<int32_t>(engine_);
         const QByteArray slang = slangPath_.toUtf8();
         const QByteArray verible = veribleLintPath_.toUtf8();
-        // UX batch 2 / A4 + U6 / §0.1 R1: the rules file comes from the SAME
-        // composition function the Preferences page and the project pass use —
-        // the dedicated `lint.verible.rules_config` first, then the legacy
-        // `tools.verible_rules` path, then the project's DISCOVERED
-        // `.rules.verible_lint` (`VdProjectInfo.rules_path`, published by the
-        // integration when the project file set arrives).
-#if defined(VEDIT_DIAGNOSTICS_HAVE_LINT_OPTIONS)
-        const vedit::workspace::settings::LintJobOptions jobOptions =
-            vedit::workspace::settings::buildLintJobOptions(
-                vedit::workspace::settings::currentLintValues(),
-                engine_ == LintEngineKind::VeribleLint
-                    ? vedit::workspace::settings::LintBackend::Verible
-                    : vedit::workspace::settings::LintBackend::Slang,
-                rulesPath_, vedit::workspace::settings::currentDiscoveredRulesPath());
-        const QByteArray rules = jobOptions.rulesPath.toUtf8();
-#else
-        const QByteArray rules = rulesPath_.toUtf8();
-#endif
+        options.slang_binary = slang.isEmpty() ? nullptr : slang.constData();
+        options.verible_binary = verible.isEmpty() ? nullptr : verible.constData();
         FileList includeList(includeDirs_);
         FileList defineList(defines_);
-        const VdStringList includeView = includeList.view();
-        const VdStringList defineView = defineList.view();
-        const quint64 job = vd_deeplint_lint_v2(service_.get(),
-                                                path.constData(),
-                                                static_cast<int32_t>(engine_),
-                                                slang.isEmpty() ? nullptr : slang.constData(),
-                                                verible.isEmpty() ? nullptr : verible.constData(),
-#if defined(VEDIT_DIAGNOSTICS_HAVE_LINT_OPTIONS)
-                                                jobOptions.rulesPath.isEmpty()
-                                                    ? nullptr
-                                                    : rules.constData(),
+        options.include_dirs = includeList.view();
+        options.defines = defineList.view();
+#if defined(VEDIT_DIAGNOSTICS_HAVE_LINT_OPTIONS) && defined(VEDIT_LINT_OPTIONS_HAVE_ABI)
+        // UX batch 2 / A4 + U6 / §0.1 R1: the SAME composition function the
+        // Preferences page and the project pass use - the dedicated
+        // `lint.verible.rules_config` first, then the legacy
+        // `tools.verible_rules` path, then the project's DISCOVERED
+        // `.rules.verible_lint` (`VdProjectInfo.rules_path`). The storage must
+        // outlive the start call, and it does: both live in this scope.
+        settings::LintBatchAbiStorage abiStrings;
+        const settings::LintJobOptions jobOptions = settings::buildLintJobOptions(
+            settings::currentLintValues(),
+            engine_ == LintEngineKind::VeribleLint ? settings::LintBackend::Verible
+                                                   : settings::LintBackend::Slang,
+            rulesPath_, settings::currentDiscoveredRulesPath());
+        settings::fillLintBatchOptions(jobOptions, &options, &abiStrings);
 #else
-                                                rulesPath_.isEmpty() ? nullptr : rules.constData(),
+        const QByteArray rules = rulesPath_.toUtf8();
+        options.rules_path = rulesPath_.isEmpty() ? nullptr : rules.constData();
 #endif
-                                                includeDirs_.isEmpty() ? nullptr : &includeView,
-                                                defines_.isEmpty() ? nullptr : &defineView);
+        FileList fileList(QStringList{file});
+        const VdStringList files = fileList.view();
+        const quint64 job = vd_deeplint_batch_start(service_.get(), &files, &options);
         if (job == 0) {
             if (error != nullptr) {
                 *error = service_.lastError();
             }
             return 0;
         }
-        if (job > static_cast<quint64>(INT32_MAX)) {
-            if (error != nullptr) {
-                *error = QCoreApplication::translate("VEdit", "the SLANG job id does not fit the backend ticket type");
-            }
-            return 0;
-        }
-        return static_cast<int>(job);
+        // The batch job id starts at 1<<32 (`FIRST_BATCH_ID` in
+        // crates/vd-ffi/src/deeplint.rs) and this interface's ticket is an int,
+        // so a small local ticket is handed out and the ABI id kept behind it.
+        const int ticket = ++nextTicket_;
+        jobs_.insert(ticket, job);
+        return ticket;
     }
 
     LspPolled pollLint(int ticket) override
@@ -651,12 +804,19 @@ public:
         if (service_.get() == nullptr || ticket <= 0) {
             return LspPolled::failure(QCoreApplication::translate("VEdit", "no SLANG ticket to poll"));
         }
+        const quint64 job = jobs_.value(ticket, 0);
+        if (job == 0) {
+            return LspPolled::failure(QCoreApplication::translate("VEdit", "no SLANG ticket to poll"));
+        }
         VdDiagnostics raw{};
-        const int status =
-            vd_deeplint_poll(service_.get(), static_cast<quint64>(ticket), &raw);
+        const int status = vd_deeplint_batch_poll(service_.get(), job, &raw);
         if (status == VD_STATUS_PENDING) {
             return LspPolled::pendingResult();
         }
+        // Terminal: the ABI hands its result over exactly once, so the job is
+        // released here whether it finished, failed or was cancelled.
+        jobs_.remove(ticket);
+        vd_deeplint_batch_release(service_.get(), job);
         if (status != VD_STATUS_READY) {
             return LspPolled::failure(service_.lastError());
         }
@@ -667,12 +827,19 @@ public:
         for (size_t index = 0; index < raw.count; ++index) {
             const VdDiagnostic &item = raw.items[index];
             DiagnosticEntry entry;
+            entry.file = item.file != nullptr ? QString::fromUtf8(item.file) : QString();
             entry.line = static_cast<int>(item.line);
             entry.column = static_cast<int>(item.column);
             entry.endLine = static_cast<int>(item.end_line);
             entry.endColumn = static_cast<int>(item.end_column);
             entry.severity = item.severity;
             entry.code = item.code != nullptr ? QString::fromUtf8(item.code) : QString();
+            // AC-5.8 / AC-N3: the typed slang warning option name travels with
+            // the row. Without it the panel could only offer a whole-file slang
+            // waiver, which AC-5.8 forbids; nothing is derived from `message`.
+            entry.optionName = item.option_name != nullptr
+                ? QString::fromUtf8(item.option_name)
+                : QString();
             entry.source = engineName();
             entry.message = item.message != nullptr ? QString::fromUtf8(item.message) : QString();
             polled.diagnostics.append(entry);
@@ -689,6 +856,9 @@ private:
     QStringList includeDirs_;
     QStringList defines_;
     QString rulesPath_;
+    /// Local ticket -> the ABI's one-file batch job (ids are 64-bit).
+    QHash<int, quint64> jobs_;
+    int nextTicket_ = 0;
 };
 
 } // namespace
@@ -748,6 +918,67 @@ std::unique_ptr<SlangBackend> createFfiSlangBackend(const QString &)
 // Defined outside the FFI guard so a no-FFI build and a harness can link the
 // same implementation the product uses; the backends themselves are injected.
 namespace vedit::workspace {
+
+namespace {
+
+/// The spellings `crates/vd-settings/src/schema.rs` accepts (case-insensitive,
+/// trimmed). The Qt half must agree with it (AC-3.3): a legal spelling is never
+/// silently a different backend, and an unknown value is never silently the
+/// default.
+QString trimmedLower(const QString &value)
+{
+    return value.trimmed().toLower();
+}
+
+QString canonicalLspBackend(const QString &raw, bool *known)
+{
+    const QString value = trimmedLower(raw);
+    if (value == QStringLiteral("verible") || value == QStringLiteral("verible-verilog-ls")) {
+        *known = true;
+        return QStringLiteral("verible");
+    }
+    if (value == QStringLiteral("slang") || value == QStringLiteral("slang-server")) {
+        *known = true;
+        return QStringLiteral("slang");
+    }
+    *known = false;
+    // Keep what was written, so the badge can show `emacs→verible`.
+    return value;
+}
+
+QString canonicalLintEngine(const QString &raw, bool *known)
+{
+    const QString value = trimmedLower(raw);
+    if (value == QStringLiteral("slang")) {
+        *known = true;
+        return QStringLiteral("slang");
+    }
+    if (value == QStringLiteral("verible") || value == QStringLiteral("verible-verilog-lint")) {
+        *known = true;
+        return QStringLiteral("verible");
+    }
+    *known = false;
+    return value;
+}
+
+/// The same sentences the Rust normaliser emits, so the two layers cannot tell
+/// the user different things about one value.
+QString unknownLspMessage(const QString &raw)
+{
+    return QStringLiteral("tools.lsp_backend: `%1` is not a known language server backend; "
+                          "expected verible | verible-verilog-ls | slang | slang-server; "
+                          "using `verible`")
+        .arg(raw);
+}
+
+QString unknownLintMessage(const QString &raw)
+{
+    return QStringLiteral("tools.lint_engine: `%1` is not a known lint engine; "
+                          "expected slang | verible | verible-verilog-lint; using `slang`")
+        .arg(raw);
+}
+
+} // namespace
 
 CapabilityDecision decideActionGate(const diagnostics::BackendCapabilities &capabilities,
                                     const QString &action,
@@ -892,12 +1123,6 @@ bool BackendSwitchState::apply(const DiagnosticsBackendSettings &settings,
                                const diagnostics::ToolchainReport &toolchain,
                                QString *error)
 {
-    if (lsp_ == nullptr) {
-        if (error != nullptr) {
-            *error = QCoreApplication::translate("VEdit", "no LSP backend in this build");
-        }
-        return false;
-    }
     toolchain_ = toolchain;
     QHash<QString, QString> overrides;
     overrides.insert(QStringLiteral("verible-verilog-ls"), settings.veribleLs);
@@ -907,38 +1132,13 @@ bool BackendSwitchState::apply(const DiagnosticsBackendSettings &settings,
     overrides.insert(QStringLiteral("verible-verilog-lint"), settings.veribleLint);
     diagnostics::applyToolOverrides(&toolchain_, overrides);
 
-    const bool wantSlang = settings.lspBackend.compare(QStringLiteral("slang"),
-                                                       Qt::CaseInsensitive) == 0;
-    const diagnostics::LspBackendKind lspKind = wantSlang
-        ? diagnostics::LspBackendKind::Slang
-        : diagnostics::LspBackendKind::Verible;
-    const QString serverPath = wantSlang ? toolchain_.slangServer.path
-                                         : toolchain_.verible.path;
-    if (serverPath.isEmpty()) {
-        if (error != nullptr) {
-            *error = wantSlang
-                ? toolchain_.missingMessage(diagnostics::ToolKind::SlangServer)
-                : toolchain_.missingMessage(diagnostics::ToolKind::Verible);
-        }
-        return false;
-    }
-
-    // "verible" selects the verible-verilog-lint engine; anything else is slang.
-    const bool wantVeribleLint = settings.lintEngine.compare(QStringLiteral("verible"),
-                                                             Qt::CaseInsensitive) == 0;
-    const diagnostics::LintEngineKind lintKind = wantVeribleLint
-        ? diagnostics::LintEngineKind::VeribleLint
-        : diagnostics::LintEngineKind::Slang;
-    const QString lintPath = wantVeribleLint ? toolchain_.veribleLint.path
-                                             : toolchain_.slang.path;
-    if (lintPath.isEmpty()) {
-        if (error != nullptr) {
-            *error = wantVeribleLint
-                ? toolchain_.missingMessage(diagnostics::ToolKind::VeribleLint)
-                : toolchain_.missingMessage(diagnostics::ToolKind::Slang);
-        }
-        return false;
-    }
+    // AC-3.3: the accepted spellings normalise identically on both sides. A
+    // value that is not a backend/engine keeps the documented default and is
+    // REPORTED through the badge (reason + message), never silently swallowed.
+    bool lspKnown = true;
+    bool lintKnown = true;
+    requestedLsp_ = canonicalLspBackend(settings.lspBackend, &lspKnown);
+    requestedLint_ = canonicalLintEngine(settings.lintEngine, &lintKnown);
 
     // RM-2: the settings values are the FALLBACK environment, not the whole
     // one. Once a project has delivered its `-I`/`-D` (they already include the
@@ -948,23 +1148,92 @@ bool BackendSwitchState::apply(const DiagnosticsBackendSettings &settings,
     // and falls back to these when it has none.
     settingsIncludeDirs_ = settings.includeDirs;
     settingsDefines_ = settings.defines;
-    QString selectError;
-    if (!lsp_->selectBackend(lspKind, serverPath, effectiveIncludeDirs(), effectiveDefines(),
-                             &selectError)) {
+
+    // --- LSP axis ---------------------------------------------------------
+    const bool wantSlang = requestedLsp_ == QStringLiteral("slang");
+    const diagnostics::LspBackendKind lspKind = wantSlang
+        ? diagnostics::LspBackendKind::Slang
+        : diagnostics::LspBackendKind::Verible;
+    const QString serverPath = wantSlang ? toolchain_.slangServer.path
+                                         : toolchain_.verible.path;
+    lspReason_ = BadgeReasonCode::Ok;
+    lspReasonMessage_.clear();
+    bool lspOk = true;
+    if (!lspKnown) {
+        lspReason_ = BadgeReasonCode::UnknownValue;
+        lspReasonMessage_ = unknownLspMessage(settings.lspBackend);
+    }
+    if (lsp_ == nullptr) {
+        lspOk = false;
+        lspReason_ = BadgeReasonCode::NoBackend;
+        lspReasonMessage_ =
+            QCoreApplication::translate("VEdit", "no LSP backend in this build");
+    } else if (serverPath.isEmpty()) {
+        lspOk = false;
+        lspReason_ = BadgeReasonCode::ToolMissing;
+        lspReasonMessage_ = wantSlang
+            ? toolchain_.missingMessage(diagnostics::ToolKind::SlangServer)
+            : toolchain_.missingMessage(diagnostics::ToolKind::Verible);
+    } else {
+        QString selectError;
+        if (lsp_->selectBackend(lspKind, serverPath, effectiveIncludeDirs(),
+                                effectiveDefines(), &selectError)) {
+            lspKind_ = lspKind;
+            lspPath_ = serverPath;
+        } else {
+            lspOk = false;
+            lspReason_ = BadgeReasonCode::SelectFailed;
+            lspReasonMessage_ = selectError.isEmpty()
+                ? QCoreApplication::translate("VEdit", "%1 refused the selection")
+                      .arg(lspBackendName())
+                : selectError;
+        }
+    }
+
+    // --- Lint axis (INDEPENDENT of the LSP axis: AC-T9.2) -----------------
+    // "verible" selects the verible-verilog-lint engine; slang is the default.
+    const bool wantVeribleLint = requestedLint_ == QStringLiteral("verible");
+    const diagnostics::LintEngineKind lintKind = wantVeribleLint
+        ? diagnostics::LintEngineKind::VeribleLint
+        : diagnostics::LintEngineKind::Slang;
+    const QString lintPath = wantVeribleLint ? toolchain_.veribleLint.path
+                                             : toolchain_.slang.path;
+    lintReason_ = BadgeReasonCode::Ok;
+    lintReasonMessage_.clear();
+    bool lintOk = true;
+    if (!lintKnown) {
+        lintReason_ = BadgeReasonCode::UnknownValue;
+        lintReasonMessage_ = unknownLintMessage(settings.lintEngine);
+    }
+    if (lintPath.isEmpty()) {
+        lintOk = false;
+        lintReason_ = BadgeReasonCode::ToolMissing;
+        lintReasonMessage_ = wantVeribleLint
+            ? toolchain_.missingMessage(diagnostics::ToolKind::VeribleLint)
+            : toolchain_.missingMessage(diagnostics::ToolKind::Slang);
+    } else {
+        if (lint_ != nullptr) {
+            lint_->selectEngine(lintKind, toolchain_.slang.path, toolchain_.veribleLint.path,
+                                effectiveIncludeDirs(), effectiveDefines(), settings.veribleRules);
+        }
+        lintKind_ = lintKind;
+        lintPath_ = lintPath;
+        rulesPath_ = settings.veribleRules;
+    }
+
+    if (!lspOk || !lintOk) {
         if (error != nullptr) {
-            *error = selectError;
+            QStringList failures;
+            if (!lspOk) {
+                failures.append(lspReasonMessage_);
+            }
+            if (!lintOk) {
+                failures.append(lintReasonMessage_);
+            }
+            *error = failures.join(QStringLiteral("; "));
         }
         return false;
     }
-    if (lint_ != nullptr) {
-        lint_->selectEngine(lintKind, toolchain_.slang.path, toolchain_.veribleLint.path,
-                            effectiveIncludeDirs(), effectiveDefines(), settings.veribleRules);
-    }
-    lspKind_ = lspKind;
-    lintKind_ = lintKind;
-    lspPath_ = serverPath;
-    lintPath_ = lintPath;
-    rulesPath_ = settings.veribleRules;
     return true;
 }
 
@@ -979,6 +1248,123 @@ QString BackendSwitchState::lintEngineName() const
     return lintKind_ == diagnostics::LintEngineKind::VeribleLint
         ? QStringLiteral("verible-verilog-lint")
         : QStringLiteral("slang");
+}
+
+QString badgeReasonCodeName(BadgeReasonCode code)
+{
+    switch (code) {
+    case BadgeReasonCode::Ok:
+        return QStringLiteral("ok");
+    case BadgeReasonCode::UnknownValue:
+        return QStringLiteral("unknown-value");
+    case BadgeReasonCode::ToolMissing:
+        return QStringLiteral("tool-missing");
+    case BadgeReasonCode::SelectFailed:
+        return QStringLiteral("select-failed");
+    case BadgeReasonCode::NoBackend:
+        return QStringLiteral("no-backend");
+    }
+    return QStringLiteral("unknown");
+}
+
+QString BadgeState::summary() const
+{
+    const auto axisText = [](const QString &name, const BadgeAxis &axis) {
+        const QString effective = axis.effective.isEmpty()
+            ? QCoreApplication::translate("VEdit", "unavailable")
+            : axis.effective;
+        if (axis.applied) {
+            return QStringLiteral("%1=%2").arg(name, effective);
+        }
+        const QString why = axis.reasonMessage.isEmpty()
+            ? badgeReasonCodeName(axis.reason)
+            : axis.reasonMessage;
+        return QStringLiteral("%1=%2→%3 · %4").arg(name, axis.requested, effective, why);
+    };
+    return QStringLiteral("%1 %2 · basis=%3")
+        .arg(axisText(QStringLiteral("lsp"), lsp),
+             axisText(QStringLiteral("lint"), lint), basis);
+}
+
+void BackendSwitchState::setLoadWarnings(const QStringList &warnings)
+{
+    loadWarnings_ = warnings;
+}
+
+BadgeState BackendSwitchState::badge(const QString &languageId) const
+{
+    BadgeState out;
+    out.basis = capabilities().basis;
+    if (out.basis.isEmpty()) {
+        out.basis = QStringLiteral("unknown");
+    }
+    out.language = languageId;
+    // AC-T9.1: the store's own explanation travels with the badge facts.
+    out.warnings = loadWarnings_;
+
+    // AC-3.5: a VHDL file is NEVER answered by the Verilog backend. The route
+    // comes from the same toolchain report the rest of the lane uses, so a
+    // missing vhdl_ls is reported as missing instead of naming a backend that
+    // cannot run.
+    if (languageId.compare(QStringLiteral("vhdl"), Qt::CaseInsensitive) == 0) {
+        const bool lsFound = toolchain_.vhdlLs.found();
+        out.lsp.requested = QStringLiteral("vhdl_ls");
+        out.lsp.effective = lsFound ? QStringLiteral("vhdl_ls") : QString();
+        out.lsp.path = toolchain_.vhdlLs.path;
+        out.lsp.applied = lsFound;
+        out.lsp.reason = lsFound ? BadgeReasonCode::Ok : BadgeReasonCode::ToolMissing;
+        out.lsp.reasonMessage =
+            lsFound ? QString() : toolchain_.missingMessage(diagnostics::ToolKind::VhdlLs);
+
+        const bool ghdlFound = toolchain_.ghdl.found();
+        const bool vsgFound = toolchain_.vsg.found();
+        const bool lintFound = ghdlFound && vsgFound;
+        out.lint.requested = QStringLiteral("ghdl+vsg");
+        out.lint.effective = lintFound ? QStringLiteral("ghdl+vsg") : QString();
+        out.lint.path = QStringList{toolchain_.ghdl.path, toolchain_.vsg.path}.join(
+            QStringLiteral(" "));
+        out.lint.applied = lintFound;
+        out.lint.reason = lintFound ? BadgeReasonCode::Ok : BadgeReasonCode::ToolMissing;
+        if (!lintFound) {
+            out.lint.reasonMessage = toolchain_.missingMessage(
+                ghdlFound ? diagnostics::ToolKind::Vsg : diagnostics::ToolKind::Ghdl);
+        }
+        out.languageBackend = lsFound ? QStringLiteral("vhdl_ls") : QString();
+        return out;
+    }
+
+    out.lsp.requested = requestedLsp_;
+    out.lsp.effective = lspBackendName();
+    out.lsp.path = lspPath_;
+    out.lsp.applied = lspReason_ == BadgeReasonCode::Ok
+        && out.lsp.requested.compare(out.lsp.effective, Qt::CaseInsensitive) == 0;
+    if (out.lsp.applied) {
+        out.lsp.reason = BadgeReasonCode::Ok;
+    } else {
+        out.lsp.reason = lspReason_;
+        out.lsp.reasonMessage = lspReasonMessage_;
+    }
+
+    out.lint.requested = requestedLint_;
+    out.lint.effective = lintEngineName();
+    out.lint.path = lintPath_;
+    // The request names the ENGINE (`verible`), the effective name is the
+    // BINARY (`verible-verilog-lint`): compare the selected kind, not the
+    // strings, so a legitimately applied engine is never reported as a mismatch.
+    out.lint.applied = lintReason_ == BadgeReasonCode::Ok
+        && (requestedLint_ == QStringLiteral("verible"))
+            == (lintKind_ == diagnostics::LintEngineKind::VeribleLint);
+    if (out.lint.applied) {
+        out.lint.reason = BadgeReasonCode::Ok;
+    } else {
+        out.lint.reason = lintReason_;
+        out.lint.reasonMessage = lintReasonMessage_;
+    }
+
+    // "Never name a backend that cannot run": with no resolved binary the
+    // language route stays empty until an apply() succeeds.
+    out.languageBackend = lspPath_.isEmpty() ? QString() : lspBackendName();
+    return out;
 }
 
 QString BackendSwitchState::statusLine() const

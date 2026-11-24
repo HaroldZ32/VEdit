@@ -63,6 +63,7 @@
 #include <QTextEdit>
 #include <QToolBar>
 #include <QVBoxLayout>
+#include <QWidget>
 
 #include <cstdio>
 #include <functional>
@@ -331,6 +332,77 @@ void testStructure(const QString &directory)
           shell.panels()->isVisible(QStringLiteral("search")));
     check(QStringLiteral("a2.toolbar.search-focuses-query"),
           query != nullptr && (query->hasFocus() || QApplication::focusWidget() == query));
+}
+
+// Batch 20261110 (AC-1.1/1.2/1.6): the shell's user-visible text and the
+// "an unowned dock does not render" rule.
+//
+// The About box used to be a shell debug dump ("app-shell lane", "Editor
+// provider:", "Panes:"); it is product text now, and `aboutText()` is the one
+// source of that text so this can be asserted without a modal dialog. The View
+// menu no longer carries a demo suffix, and a panel spec without a factory
+// produces NO dock (and no placeholder widget) instead of an apology inside one.
+void testShellChrome(const QString &directory)
+{
+    // The About box reads the version the application entry point publishes; the
+    // selftest publishes a known one so the assertion is about the text.
+    QCoreApplication::setApplicationVersion(QStringLiteral("9.9.9-selftest"));
+
+    vedit::app::ApplicationShell shell(testOptions(directory));
+    const QString about = shell.aboutText();
+    check(QStringLiteral("a3.about.product-name"), about.contains(QStringLiteral("VEdit")),
+          about.left(120));
+    check(QStringLiteral("a3.about.version"), about.contains(QStringLiteral("9.9.9-selftest")),
+          about.left(200));
+    check(QStringLiteral("a3.about.licence"), about.contains(QStringLiteral("MIT")),
+          about.left(300));
+    check(QStringLiteral("a3.about.homepage-link"),
+          about.contains(QStringLiteral("https://github.com/HaroldZ32/VEdit")), about);
+    check(QStringLiteral("a3.about.docs-link"), about.contains(QStringLiteral("USER_GUIDE.md")),
+          about);
+    // The exact developer strings AC-1.1 forbids in the About box.
+    const QStringList banned{QStringLiteral("lane"),
+                             QStringLiteral("Editor provider:"),
+                             QStringLiteral("Theme:"),
+                             QStringLiteral("Panes:"),
+                             QStringLiteral("State:"),
+                             QStringLiteral("Diagnostics:")};
+    for (const QString &needle : banned) {
+        check(QStringLiteral("a3.about.no-") + needle,
+              !about.contains(needle, Qt::CaseInsensitive), needle);
+    }
+
+    QAction *mixed = shell.commands()->action(QStringLiteral("view.layout.mixed"));
+    check(QStringLiteral("a3.menu.mixed-title"),
+          mixed != nullptr && !mixed->text().contains(QStringLiteral("demo"), Qt::CaseInsensitive),
+          mixed != nullptr ? mixed->text() : QStringLiteral("no action"));
+    // Rerouting the LABEL must not lose the shortcut the command already owned.
+    check(QStringLiteral("a3.menu.mixed-shortcut"),
+          mixed != nullptr && mixed->shortcut() == QKeySequence(QStringLiteral("Ctrl+Alt+M")),
+          mixed != nullptr ? mixed->shortcut().toString() : QString());
+
+    // An unowned panel renders nothing at all.
+    vedit::app::PanelSpec ownerless;
+    ownerless.id = QStringLiteral("selftest-unowned");
+    ownerless.title = QStringLiteral("Unowned");
+    ownerless.owner = QStringLiteral("no-lane");
+    shell.panels()->addPanel(ownerless);
+    shell.show();
+    QApplication::processEvents();
+    check(QStringLiteral("a3.unowned.no-dock"),
+          shell.panels()->insert(QStringLiteral("selftest-unowned"), &shell) == nullptr);
+    check(QStringLiteral("a3.unowned.not-inserted"),
+          shell.panels()->dock(QStringLiteral("selftest-unowned")) == nullptr);
+    check(QStringLiteral("a3.unowned.toggle-refused"),
+          !shell.panels()->toggle(QStringLiteral("selftest-unowned"), &shell));
+    bool placeholder = false;
+    const QList<QWidget *> widgets = shell.findChildren<QWidget *>();
+    for (QWidget *widget : widgets) {
+        if (widget->objectName().startsWith(QStringLiteral("panel-placeholder-"))) {
+            placeholder = true;
+        }
+    }
+    check(QStringLiteral("a3.unowned.no-placeholder-widget"), !placeholder);
 }
 
 void testHelpViewer(const QString &directory)
@@ -642,6 +714,157 @@ int runScreenshots(const QString &directory)
     return ok ? 0 : 1;
 }
 
+// batch-20261110d T5 — the shortcut conflict the real machine showed:
+// Ctrl+Alt+F was effective for BOTH `view.panel.file-tree` and
+// `diagnostics.format`, yet `commands.no-duplicate-shortcuts` stayed green.
+// The gate only ever built a registry with a FRESH shortcut store, so it could
+// not see a collision that comes from the PERSISTED store: a legacy
+// `shortcuts.json` entry `diagnostics.format: Ctrl+Alt+F` (written when that
+// WAS the shipped default, before U3 moved it to Ctrl+Shift+F) is applied on top
+// of the new default and collides with the Files-panel toggle. This test builds
+// that exact machine state and asserts the registry-level properties the
+// product must hold on it.
+void testShortcutConflicts(const QString &directory)
+{
+    if (!QDir().mkpath(directory)) {
+        check(QStringLiteral("a2.shortcuts.temp-dir"), false, directory);
+        return;
+    }
+    const QString storePath = directory + QStringLiteral("/shortcuts.json");
+    {
+        QFile file(storePath);
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+            check(QStringLiteral("a2.shortcuts.legacy-store-written"), false, storePath);
+            return;
+        }
+        file.write("{\"version\":1,\"shortcuts\":{\"diagnostics.format\":\"Ctrl+Alt+F\"}}\n");
+    }
+    vedit::app::JsonShortcutStore store(storePath);
+    QString storeError;
+    store.load(&storeError);
+    check(QStringLiteral("a2.shortcuts.legacy-store-loaded"),
+          storeError.isEmpty()
+              && store.shortcut(QStringLiteral("diagnostics.format"), QKeySequence())
+                     == QKeySequence(QStringLiteral("Ctrl+Alt+F")),
+          storeError.isEmpty()
+              ? store.shortcut(QStringLiteral("diagnostics.format"), QKeySequence()).toString()
+              : storeError);
+
+    QObject owner;
+    vedit::app::CommandRegistry registry(&owner);
+    registry.setStore(&store);
+
+    // The two real commands, with their real defaults (app_shell.cpp /
+    // diagnostics_integration.cpp): the Files-panel toggle owns Ctrl+Alt+F and
+    // the format command's pinned primary is Ctrl+Shift+F (plus Shift+Alt+F as
+    // the VS Code alternative).
+    vedit::app::CommandSpec fileTree;
+    fileTree.id = QStringLiteral("view.panel.file-tree");
+    fileTree.text = QStringLiteral("To&ggle Files Panel");
+    fileTree.menu = QStringLiteral("view");
+    fileTree.defaultShortcut = QKeySequence(QStringLiteral("Ctrl+Alt+F"));
+    check(QStringLiteral("a2.shortcuts.file-tree-registered"), registry.add(fileTree) != nullptr);
+
+    vedit::app::CommandSpec format;
+    format.id = QStringLiteral("diagnostics.format");
+    format.text = QStringLiteral("&Format Document");
+    format.menu = QStringLiteral("project");
+    format.defaultShortcut = QKeySequence(QStringLiteral("Ctrl+Shift+F"));
+    format.extraDefaultShortcuts = {QKeySequence(QStringLiteral("Shift+Alt+F"))};
+    check(QStringLiteral("a2.shortcuts.format-registered"), registry.add(format) != nullptr);
+
+    // RED before the repair: the stale override is applied on top of the current
+    // default, collides with the Files-panel toggle, and Qt drops BOTH keys.
+    const QStringList duplicates = registry.duplicateShortcuts();
+    check(QStringLiteral("a2.shortcuts.legacy-store-conflict-free"), duplicates.isEmpty(),
+          duplicates.join(QStringLiteral(" | ")));
+
+    // GREEN: the stale override was DROPPED, so the format command falls back to
+    // its current default while the Files-panel toggle keeps Ctrl+Alt+F, and the
+    // dropped binding is NAMED (a repair is never silent).
+    check(QStringLiteral("a2.shortcuts.file-tree-keeps-default"),
+          registry.effectiveShortcut(QStringLiteral("view.panel.file-tree"))
+              == QKeySequence(QStringLiteral("Ctrl+Alt+F")),
+          registry.effectiveShortcut(QStringLiteral("view.panel.file-tree"))
+              .toString(QKeySequence::PortableText));
+    check(QStringLiteral("a2.shortcuts.format-falls-back"),
+          registry.effectiveShortcut(QStringLiteral("diagnostics.format"))
+              == QKeySequence(QStringLiteral("Ctrl+Shift+F")),
+          registry.effectiveShortcut(QStringLiteral("diagnostics.format"))
+              .toString(QKeySequence::PortableText));
+    check(QStringLiteral("a2.shortcuts.override-dropped"),
+          !registry.hasUserOverride(QStringLiteral("diagnostics.format")));
+    const QString repairs = registry.shortcutRepairs().join(QStringLiteral(" | "));
+    check(QStringLiteral("a2.shortcuts.repair-named"),
+          repairs.contains(QStringLiteral("diagnostics.format"))
+              && repairs.contains(QStringLiteral("Ctrl+Alt+F"))
+              && repairs.contains(QStringLiteral("view.panel.file-tree")),
+          repairs);
+
+    // T5 (2): the check must cover the WHOLE registry — every registered command
+    // × every sequence it carries now (primary, extra defaults and any applied
+    // override) must appear in the bindings dump the product selfcheck prints.
+    // A command registered late (like a lane's) is included by construction; this
+    // asserts it instead of assuming it.
+    vedit::app::CommandSpec rename;
+    rename.id = QStringLiteral("rename.symbol");
+    rename.text = QStringLiteral("Rename Symbol in &Project…");
+    rename.menu = QStringLiteral("project");
+    // The batch's stop rule: this command's Ctrl+Shift+F2 must NOT move.
+    rename.defaultShortcut = QKeySequence(QStringLiteral("Ctrl+Shift+F2"));
+    registry.add(rename);
+    const QStringList bindings = registry.shortcutBindings();
+    QStringList missing;
+    for (const QString &id : registry.ids()) {
+        for (const QKeySequence &sequence : registry.effectiveShortcuts(id)) {
+            if (!sequence.isEmpty()
+                && !bindings.contains(sequence.toString() + QLatin1Char('\t') + id)) {
+                missing.append(id);
+            }
+        }
+    }
+    check(QStringLiteral("a2.shortcuts.scan-covers-every-command"), missing.isEmpty(),
+          missing.join(QStringLiteral(",")));
+    check(QStringLiteral("a2.shortcuts.rename-symbol-untouched"),
+          registry.effectiveShortcut(QStringLiteral("rename.symbol"))
+              == QKeySequence(QStringLiteral("Ctrl+Shift+F2"))
+              && !registry.shortcutRepairs().join(QStringLiteral(" | "))
+                      .contains(QStringLiteral("rename.symbol")),
+          registry.effectiveShortcut(QStringLiteral("rename.symbol"))
+              .toString(QKeySequence::PortableText));
+
+    // NEGATIVE CONTROL (T5 ③): inject a DIFFERENT duplicate by hand — two
+    // shipped defaults sharing Ctrl+Alt+M — and prove the detector still fires
+    // and that two defaults are never silently rewritten. The registry is a
+    // local object, so destroying it reverts the injection; nothing shipped is
+    // touched.
+    {
+        QObject controlOwner;
+        vedit::app::CommandRegistry control(&controlOwner);
+        vedit::app::CommandSpec first;
+        first.id = QStringLiteral("test.duplicate.one");
+        first.text = QStringLiteral("First");
+        first.menu = QStringLiteral("view");
+        first.defaultShortcut = QKeySequence(QStringLiteral("Ctrl+Alt+M"));
+        vedit::app::CommandSpec second;
+        second.id = QStringLiteral("test.duplicate.two");
+        second.text = QStringLiteral("Second");
+        second.menu = QStringLiteral("view");
+        second.defaultShortcut = QKeySequence(QStringLiteral("Ctrl+Alt+M"));
+        control.add(first);
+        control.add(second);
+        const QStringList found = control.duplicateShortcuts();
+        check(QStringLiteral("a2.shortcuts.duplicate-detected"),
+              found.size() == 1 && found.first().contains(QStringLiteral("Ctrl+Alt+M"))
+                  && found.first().contains(QStringLiteral("test.duplicate.one"))
+                  && found.first().contains(QStringLiteral("test.duplicate.two")),
+              found.join(QStringLiteral(" | ")));
+        check(QStringLiteral("a2.shortcuts.defaults-not-repaired"),
+              control.shortcutRepairs().isEmpty(),
+              control.shortcutRepairs().join(QStringLiteral(" | ")));
+    }
+}
+
 } // namespace
 
 int main(int argc, char **argv)
@@ -668,6 +891,8 @@ int main(int argc, char **argv)
     const QString root = temporary.path();
 
     testStructure(root + QStringLiteral("/structure"));
+    testShortcutConflicts(root + QStringLiteral("/shortcuts"));
+    testShellChrome(root + QStringLiteral("/chrome"));
     testHelpViewer(root + QStringLiteral("/help"));
     testChinese(root + QStringLiteral("/i18n"));
 #if defined(VEDIT_UX_HAVE_TERMINAL)

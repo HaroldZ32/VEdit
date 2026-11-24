@@ -83,6 +83,11 @@
         <translation>大纲</translation>
     </message>
     <message>
+        <location filename="../src/app/app_shell.cpp" line="678"/>
+        <source>Project Lint</source>
+        <translation>工程 LINT</translation>
+    </message>
+    <message>
         <location filename="../src/app/app_shell.cpp" line="738"/>
         <location filename="../src/app/file_dialog_filters_selftest.cpp" line="382"/>
         <location filename="../src/app/file_dialog_filters_selftest.cpp" line="417"/>
@@ -728,6 +733,11 @@ Diagnostics: %5</source>
         <location filename="../src/workspace/diagnostics/diagnostics_panel.cpp" line="431"/>
         <source>%1:%2:%3 — %4</source>
         <translation>%1:%2:%3——%4</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/diagnostics_hint.cpp" line="31"/>
+        <source>Verible stopped at a macro preprocessing error — the real syntax error (for example a missing semicolon) is hidden. Switch the LSP backend to slang in Preferences → Tools to see it.</source>
+        <translation>Verible 卡在宏预处理错误上——真正的语法错误（例如缺少分号）被掩盖了。请在 Preferences → Tools 把 LSP 后端切到 slang 查看。</translation>
     </message>
     <message>
         <location filename="../src/workspace/diagnostics/diagnostics_selftest.cpp" line="554"/>
@@ -4732,6 +4742,867 @@ root: %1</source>
         <source>the settings store did not answer</source>
         <translation>设置存储没有响应</translation>
     </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="246"/>
+        <source>  - preview truncated; applying this file is refused</source>
+        <translation>  - 预览已被截断；拒绝应用此文件</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="286"/>
+        <source> A truncated file refuses its own apply (no partial plan).</source>
+        <translation> 被截断的文件会拒绝自身的应用（不产生部分计划）。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="330"/>
+        <source> The cancel arrived after the apply had finished; the rename stands.</source>
+        <translation> 取消在应用完成之后才到达；重命名已生效。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="300"/>
+        <source> [the engine reason reached the C ABI's 255-byte cap; the declaration list above may be cut]</source>
+        <translation> [引擎给出的原因已达到 C ABI 的 255 字节上限；上面的声明列表可能被截断]</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/diagnostics_controller.cpp" line="81"/>
+        <source> · waiver: the registered waiver file is applied by the project pass only; the language-server rows do not apply it</source>
+        <translation> · 豁免：已注册的豁免文件只由工程整体检查生效；语言服务器返回的行不应用它</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/project/project_model.cpp" line="497"/>
+        <source>"%1" contains a control character or a double quote</source>
+        <translation>“%1”包含控制字符或双引号</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/project/project_model.cpp" line="531"/>
+        <source>"%1" is already a define</source>
+        <translation>“%1”已是宏定义</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/project/project_model.cpp" line="509"/>
+        <source>"%1" is already an include dir</source>
+        <translation>“%1”已是包含目录</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/project/project_model.cpp" line="521"/>
+        <source>"%1" is not NAME or NAME=VALUE (the name must be an identifier)</source>
+        <translation>“%1”不是 NAME 或 NAME=VALUE（名称必须是标识符）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_integration.cpp" line="104"/>
+        <source>%1 exited with code %2.</source>
+        <translation>%1 以代码 %2 退出。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_integration.cpp" line="109"/>
+        <source>%1 failed.</source>
+        <translation>%1 失败。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_integration.cpp" line="110"/>
+        <source>%1 failed: %2</source>
+        <translation>%1 失败：%2</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/project/project_panel.cpp" line="493"/>
+        <source>%1 is not a project entry (it comes from a filelist, vedit.toml or the tools page)</source>
+        <translation>%1 不是工程条目（它来自 filelist、vedit.toml 或工具页面）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/ffi_backends.cpp" line="1120"/>
+        <source>%1 refused the selection</source>
+        <translation>%1 拒绝了所选内容</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_integration.cpp" line="116"/>
+        <source>%1 timed out; its process tree was killed.</source>
+        <translation>%1 超时；其进程树已被终止。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_integration.cpp" line="112"/>
+        <source>%1 was cancelled; its process tree was killed.</source>
+        <translation>%1 已取消；其进程树已被终止。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="362"/>
+        <source>%1: %2 - the apply job did not start, so nothing was written.</source>
+        <translation>%1：%2 — 应用作业未启动，因此没有写入任何内容。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_integration.cpp" line="187"/>
+        <source>&amp;Run Scala Project</source>
+        <translation>运行 Scala 工程(&amp;R)</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_integration.cpp" line="199"/>
+        <source>&amp;Stop Scala Run</source>
+        <translation>停止 Scala 运行(&amp;S)</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="3898"/>
+        <source>&amp;Waive Diagnostic…</source>
+        <translation>豁免诊断(&amp;W)…</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/project/project_model.cpp" line="491"/>
+        <source>A define cannot be empty</source>
+        <translation>宏定义不能为空</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="476"/>
+        <source>A rename job is running: press Cancel job to stop it, then close.</source>
+        <translation>重命名作业正在运行：请按“取消作业”停止它，然后关闭。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/project/project_panel.cpp" line="564"/>
+        <source>Add Define</source>
+        <translation>添加宏定义</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/project/project_panel.cpp" line="292"/>
+        <source>Add Define…</source>
+        <translation>添加宏定义…</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/project/project_panel.cpp" line="549"/>
+        <source>Add Include Dir</source>
+        <translation>添加包含目录</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/project/project_panel.cpp" line="272"/>
+        <source>Add Include Dir…</source>
+        <translation>添加包含目录…</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/project/project_panel.cpp" line="476"/>
+        <source>Added -D %1</source>
+        <translation>已添加 -D %1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/project/project_panel.cpp" line="449"/>
+        <source>Added -I %1</source>
+        <translation>已添加 -I %1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/vhdl/vhdl_integration.cpp" line="283"/>
+        <source>Already formatted (VSG)</source>
+        <translation>已是格式化状态（VSG）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/project/project_model.cpp" line="490"/>
+        <source>An include dir cannot be empty</source>
+        <translation>包含目录不能为空</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="319"/>
+        <source>Applied %1 in %2; verified=%3. The files hold the new name.</source>
+        <translation>已在 %2 中应用 %1；verified=%3。文件已持有新名称。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="344"/>
+        <source>Apply failed at %1: </source>
+        <translation>应用在 %1 处失败：</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="342"/>
+        <source>Apply failed: </source>
+        <translation>应用失败：</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1976"/>
+        <source>Apply the fix?</source>
+        <translation>应用此修复？</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="218"/>
+        <source>Applying atomically: every planned file is written, or every written file is restored.</source>
+        <translation>原子应用：要么写入全部计划文件，要么恢复所有已写入的文件。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="155"/>
+        <source>Cancel job</source>
+        <translation>取消作业</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="390"/>
+        <source>Cancel requested - waiting for the job to stop...</source>
+        <translation>已请求取消 — 正在等待作业停止…</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="311"/>
+        <source>Cancelled while planning: nothing was written.</source>
+        <translation>在规划阶段取消：没有写入任何内容。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="381"/>
+        <source>Cancelled, but at least one file could not be restored; inspect the project before retrying.</source>
+        <translation>已取消，但至少有一个文件无法恢复；重试前请先检查工程。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="378"/>
+        <source>Cancelled: nothing was renamed (every written file was restored).</source>
+        <translation>已取消：没有重命名任何内容（所有已写入的文件均已恢复）。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="375"/>
+        <source>Cancelled: nothing was renamed; no file was written.</source>
+        <translation>已取消：没有重命名任何内容；没有写入任何文件。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/project/project_panel.cpp" line="565"/>
+        <source>Define (NAME or NAME=VALUE):</source>
+        <translation>宏定义（NAME 或 NAME=VALUE）：</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/project/project_panel.cpp" line="550"/>
+        <source>Directory (relative paths resolve against the project root):</source>
+        <translation>目录（相对路径相对于工程根目录解析）：</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1278"/>
+        <source>Environment</source>
+        <translation>环境</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/toolchain.cpp" line="372"/>
+        <source>Fix: bundle `vhdl_ls`/`ghdl`/`vsg` in the product's bin/ next to vd-app (bash packaging/runtime/build-vhdl-payload.sh), install them on PATH, or set VEDIT_VHDL_LS / VEDIT_GHDL / VEDIT_VSG.</source>
+        <translation>修复：把 `vhdl_ls`/`ghdl`/`vsg` 随包放进产品 bin/（与 vd-app 同级，`bash packaging/runtime/build-vhdl-payload.sh`），或安装到 PATH，或设置 VEDIT_VHDL_LS / VEDIT_GHDL / VEDIT_VSG。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/vhdl/vhdl_integration.cpp" line="313"/>
+        <source>Formatted with VSG (VHDL)</source>
+        <translation>已用 VSG 格式化（VHDL）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/toolchain.cpp" line="357"/>
+        <source>GHDL analysis and the merged GHDL+VSG VHDL lint are unavailable</source>
+        <translation>GHDL 分析与合并的 GHDL+VSG VHDL Lint 不可用</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/toolchain.cpp" line="355"/>
+        <source>GHDL+VSG VHDL lint is unavailable</source>
+        <translation>GHDL+VSG VHDL Lint 不可用</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1280"/>
+        <source>Import variables from your shell; a project value overrides a global value with the same name.</source>
+        <translation>从 Shell 导入变量；同名时工程值优先于全局值。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="270"/>
+        <source>Index warnings: </source>
+        <translation>索引警告：</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="114"/>
+        <source>Not renamable by this engine (each class is refused WHOLE - this product never falls back to text replacement):</source>
+        <translation>此引擎无法重命名的类别（每一类都整体拒绝——本产品从不退化为文本替换）：</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="277"/>
+        <source>Plan ready: %1 in %2. Review every file:line above, then Apply once.</source>
+        <translation>计划就绪：%2 中有 %1。请逐条检查上面的 文件:行，然后应用一次。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="210"/>
+        <source>Planning the rename: indexing the project and resolving `%1`...</source>
+        <translation>正在规划重命名：索引工程并解析“%1”…</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="150"/>
+        <source>Preview</source>
+        <translation>预览</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="126"/>
+        <source>Preview first, then Apply once. Apply writes every file or none; Cancel and closing this dialog write nothing.</source>
+        <translation>请先预览，再应用一次。应用会写入全部文件或一个都不写；取消和关闭此对话框不会写入任何内容。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/project/project_panel.cpp" line="274"/>
+        <source>Remove</source>
+        <translation>移除</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/project/project_panel.cpp" line="518"/>
+        <source>Removed -D %1; re-expanding</source>
+        <translation>已移除 -D %1；正在重新展开</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/project/project_panel.cpp" line="499"/>
+        <source>Removed -I %1; re-expanding</source>
+        <translation>已移除 -I %1；正在重新展开</translation>
+    </message>
+    <message>
+        <location filename="../src/editor/kernel/editor_context_menu.cpp" line="132"/>
+        <source>Rename Symbol in &amp;Project…</source>
+        <translation>在工程中重命名符号(&amp;P)…</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="65"/>
+        <source>Rename Symbol in Project</source>
+        <translation>在工程中重命名符号</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="188"/>
+        <source>Rename `%1` across the project. Every planned site is listed by file:line with its before/after text.</source>
+        <translation>在工程范围内重命名“%1”。每个计划修改点都会按 文件:行 列出修改前后的文本。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_integration.cpp" line="786"/>
+        <source>Rename apply refused: %1</source>
+        <translation>重命名应用被拒绝：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_integration.cpp" line="66"/>
+        <source>Rename is unavailable: the slang binary was not found (bundled, PATH or VEDIT_SLANG).</source>
+        <translation>重命名不可用：未找到 slang 可执行文件（随包、PATH 或 VEDIT_SLANG）。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_integration.cpp" line="331"/>
+        <source>Rename is unavailable: this build carries no service layer (vd-ffi).</source>
+        <translation>重命名不可用：此构建不含服务层（vd-ffi）。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_integration.cpp" line="336"/>
+        <source>Rename is unavailable: this build carries no toolchain resolver.</source>
+        <translation>重命名不可用：此构建不含工具链解析器。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_integration.cpp" line="81"/>
+        <source>Rename is waiting for the project file set (the scan has not finished yet).</source>
+        <translation>重命名正在等待工程文件集（扫描尚未完成）。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_integration.cpp" line="58"/>
+        <source>Rename needs a Verilog/SystemVerilog file (%1); %2 is not one.</source>
+        <translation>重命名需要 Verilog/SystemVerilog 文件（%1）；%2 不是。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_integration.cpp" line="52"/>
+        <source>Rename needs an open document.</source>
+        <translation>重命名需要已打开的文档。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_integration.cpp" line="72"/>
+        <source>Rename needs an open project folder (the index is engineering-wide).</source>
+        <translation>重命名需要已打开的工程文件夹（索引覆盖整个工程）。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_integration.cpp" line="438"/>
+        <source>Rename needs the cursor on a SystemVerilog identifier.</source>
+        <translation>重命名需把光标放在 SystemVerilog 标识符上。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_integration.cpp" line="775"/>
+        <source>Rename preview refused: %1</source>
+        <translation>重命名预览被拒绝：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_integration.cpp" line="343"/>
+        <source>Rename the symbol at the cursor across the project (slang AST index)</source>
+        <translation>在工程范围内重命名光标处的符号（slang AST 索引）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_integration.cpp" line="420"/>
+        <source>Rename: a rename job is already in progress.</source>
+        <translation>重命名：已有一个重命名作业正在进行。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2550"/>
+        <source>Select a diagnostic in the Diagnostics panel (or put the caret on one) first.</source>
+        <translation>请先在诊断面板中选择一条诊断（或把光标放在某条诊断上）。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1263"/>
+        <source>Settings problems:</source>
+        <translation>设置问题：</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/vhdl/vhdl_integration.cpp" line="296"/>
+        <source>The buffer changed while VSG ran; nothing was applied.</source>
+        <translation>VSG 运行期间缓冲区发生了变化；未应用任何内容。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/vhdl/vhdl_integration.cpp" line="314"/>
+        <source>The formatting could not be applied: the document refused the edit (is it read-only?)</source>
+        <translation>无法应用格式化：文档拒绝了此次编辑（是只读文件吗？）</translation>
+    </message>
+    <message>
+        <location filename="../src/editor/kernel/editor_context_menu.cpp" line="142"/>
+        <source>The project-wide rename command is not installed in this build.</source>
+        <translation>此构建未安装工程范围的重命名命令。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1977"/>
+        <source>The stored --autofix mode is `inplace`, so verible-verilog-lint rewrites the file. Apply the fix for `%1` to this document? It becomes one undoable edit; the file changes when you save.</source>
+        <translation>已存储的 --autofix 模式为 `inplace`，因此 verible-verilog-lint 会改写文件。要把 `%1` 的修复应用到本文档吗？它会成为一次可撤销的编辑；保存时文件才会改变。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2291"/>
+        <source>The waiver was written but could not be registered: %1</source>
+        <translation>豁免已写入但无法注册：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="438"/>
+        <source>This build has no rename job: the preview cannot start.</source>
+        <translation>此构建没有重命名作业：预览无法启动。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1999"/>
+        <source>This build has no waiver service, so it cannot generate a waiver.</source>
+        <translation>此构建没有豁免服务，因此无法生成豁免。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="432"/>
+        <source>Type the new name first: the preview needs the target identifier.</source>
+        <translation>请先输入新名称：预览需要目标标识符。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="172"/>
+        <source>Type the new name, then Preview. Nothing is written before Apply.</source>
+        <translation>输入新名称，然后预览。应用之前不会写入任何内容。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/toolchain.cpp" line="351"/>
+        <source>VHDL diagnostics, hover and go-to-definition are unavailable</source>
+        <translation>VHDL 诊断、悬停与转到定义不可用</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/vhdl/vhdl_integration.cpp" line="272"/>
+        <source>VHDL formatting failed: %1</source>
+        <translation>VHDL 格式化失败：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/vhdl/vhdl_integration.cpp" line="492"/>
+        <source>VHDL language configuration: %1</source>
+        <translation>VHDL 语言配置：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/vhdl/vhdl_integration.cpp" line="446"/>
+        <source>VHDL language server: %1</source>
+        <translation>VHDL 语言服务器：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/vhdl/vhdl_integration.cpp" line="435"/>
+        <source>VHDL library configuration rejected: %1</source>
+        <translation>VHDL 库配置被拒绝：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/vhdl/vhdl_integration.cpp" line="214"/>
+        <source>VHDL lint: %1</source>
+        <translation>VHDL Lint：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/vhdl/vhdl_integration.cpp" line="217"/>
+        <source>VHDL lint: %1 is not installed, so its half is missing</source>
+        <translation>VHDL Lint：%1 未安装，因此缺少它负责的那一半</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/vhdl/vhdl_integration.cpp" line="54"/>
+        <source>VHDL tools missing: %1 — %2 Fix: bin/, PATH, or VEDIT_VHDL_LS/VEDIT_GHDL/VEDIT_VSG.</source>
+        <translation>缺少 VHDL 工具：%1 — %2 修复：bin/、PATH，或 VEDIT_VHDL_LS/VEDIT_GHDL/VEDIT_VSG。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/toolchain.cpp" line="385"/>
+        <source>VHDL tools unavailable: %1 not found (bundled, local checkout, imported vars, PATH and env all empty). Impact: %2 %3</source>
+        <translation>VHDL 工具不可用：未找到 %1（随包、本地检出、导入变量、PATH 与环境全部为空）。影响：%2 %3</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/vhdl/vhdl_integration.cpp" line="90"/>
+        <source>VHDL tools unavailable: this build has no diagnostics lane, so no toolchain can be resolved.</source>
+        <translation>VHDL 工具不可用：此构建没有诊断通道，因此无法解析工具链。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2381"/>
+        <source>Waive with slang ([[waivers]])</source>
+        <translation>用 slang 豁免（[[waivers]]）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2376"/>
+        <source>Waive with verible-verilog-lint</source>
+        <translation>用 verible-verilog-lint 豁免</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2227"/>
+        <source>Waiver failed: %1</source>
+        <translation>豁免失败：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2186"/>
+        <source>Waiver refused: %1</source>
+        <translation>豁免被拒绝：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2307"/>
+        <source>Waiver written to %1</source>
+        <translation>豁免已写入 %1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/waiver_actions.cpp" line="174"/>
+        <source>`%1` is not a slang warning option name (letters, digits, `_`, `-`)</source>
+        <translation>“%1”不是 slang 警告选项名（字母、数字、`_`、`-`）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/autofix.cpp" line="475"/>
+        <source>`%1` is not a verible autofix mode (expected no, patch, patch-interactive, inplace, inplace-interactive or generate-waiver)</source>
+        <translation>“%1”不是 verible 自动修复模式（期望 no、patch、patch-interactive、inplace、inplace-interactive 或 generate-waiver）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/waiver_actions.cpp" line="193"/>
+        <source>`%1` is not a verible rule id (letters, digits, `_`, `-`)</source>
+        <translation>“%1”不是 verible 规则 id（字母、数字、`_`、`-`）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_run.cpp" line="220"/>
+        <source>a Scala run is already active.</source>
+        <translation>已有 Scala 运行在进行中。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_integration.cpp" line="130"/>
+        <source>a Scala run is already active; stop it first.</source>
+        <translation>已有 Scala 运行在进行中；请先停止它。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_integration.cpp" line="210"/>
+        <source>cancelling the run (the process tree is killed)…</source>
+        <translation>正在取消运行（进程树将被终止）…</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_run.cpp" line="239"/>
+        <source>cannot create the Rust service handle.</source>
+        <translation>无法创建 Rust 服务句柄。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_integration.cpp" line="140"/>
+        <source>cannot run: %1</source>
+        <translation>无法运行：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="39"/>
+        <source>instance name - the instance prefix of a hierarchical reference (`u_a.sig`) has no AST binding, so the rename would leave it behind</source>
+        <translation>实例名——层次化引用（“u_a.sig”）的实例前缀没有 AST 绑定，重命名会把它留下未改</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/waiver_actions.cpp" line="304"/>
+        <source>line %1: `%2` is outside a `[[waivers]]` table</source>
+        <translation>第 %1 行：“%2”位于 `[[waivers]]` 表之外</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/waiver_actions.cpp" line="320"/>
+        <source>line %1: `%2` must be a quoted string, found `%3`</source>
+        <translation>第 %1 行：“%2”必须是带引号的字符串，实际为“%3”</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/waiver_actions.cpp" line="328"/>
+        <source>line %1: `%2` repeats a scope key (exactly one `file` or `hier` is allowed per waiver)</source>
+        <translation>第 %1 行：“%2”重复了作用域键（每个豁免只允许一个 `file` 或 `hier`）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/waiver_actions.cpp" line="338"/>
+        <source>line %1: `diagnostic` repeats a key</source>
+        <translation>第 %1 行：`diagnostic` 重复了键</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/waiver_actions.cpp" line="311"/>
+        <source>line %1: expected `key = "value"`, found `%2`</source>
+        <translation>第 %1 行：期望 `key = "value"`，实际为“%2”</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/waiver_actions.cpp" line="298"/>
+        <source>line %1: only `[[waivers]]` tables are allowed, found `%2`</source>
+        <translation>第 %1 行：只允许 `[[waivers]]` 表，实际为“%2”</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/waiver_actions.cpp" line="346"/>
+        <source>line %1: unknown key `%2` — slang refuses a waiver file with an unknown key</source>
+        <translation>第 %1 行：未知键“%2”——slang 会拒绝含未知键的豁免文件</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_run.cpp" line="149"/>
+        <source>no Scala project here: add build.sbt (sbt) or a Scala source file / project.scala (scala-cli).</source>
+        <translation>此处没有 Scala 工程：请添加 build.sbt（sbt）或 Scala 源文件 / project.scala（scala-cli）。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_integration.cpp" line="206"/>
+        <source>no Scala run is active.</source>
+        <translation>没有正在进行的 Scala 运行。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_run.cpp" line="118"/>
+        <source>no project is open: open a folder before running a Scala project.</source>
+        <translation>未打开工程：运行 Scala 工程前请先打开文件夹。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2193"/>
+        <source>no waiver file is configured and there is no project root to create one in</source>
+        <translation>未配置豁免文件，且没有可创建豁免的工程根目录</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/waiver_actions.cpp" line="501"/>
+        <source>no waiver job to poll</source>
+        <translation>没有可轮询的豁免作业</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_integration.cpp" line="170"/>
+        <source>older output was dropped: the run produced more than the engine keeps.</source>
+        <translation>较早的输出已被丢弃：运行产生的输出超过了引擎保留的上限。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="36"/>
+        <source>parameter/constant - a type-dimension use (`[WIDTH-1:0]`) has no AST position, so the rename would leave the dimension behind</source>
+        <translation>参数/常量——类型维度用法（“[WIDTH-1:0]”）没有 AST 位置，重命名会把这个维度留下未改</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="42"/>
+        <source>port connected at an instantiation - the `.port` connection label has no AST position, so the rename would leave the label behind</source>
+        <translation>实例化处连接的端口——`.port` 连接标签没有 AST 位置，重命名会把这个标签留下未改</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="242"/>
+        <source>replacement</source>
+        <translation>替换</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="243"/>
+        <source>replacements</source>
+        <translation>处替换</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="350"/>
+        <source>rolled back=0 - at least one file could not be restored; inspect the listed file before retrying.</source>
+        <translation>rolled back=0 — 至少有一个文件无法恢复；重试前请检查所列文件。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="347"/>
+        <source>rolled back=1 - every file that was already written was restored byte for byte; nothing was renamed.</source>
+        <translation>rolled back=1 — 所有已写入的文件都已逐字节恢复；没有重命名任何内容。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_run.cpp" line="125"/>
+        <source>sbt project detected (build.sbt): running `sbt run` offline.</source>
+        <translation>检测到 sbt 工程（build.sbt）：正在离线运行 `sbt run`。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_run.cpp" line="168"/>
+        <source>sbt was not found: the Scala toolchain is missing. Point VEDIT_SBT at sbt (or put it on PATH).</source>
+        <translation>未找到 sbt：缺少 Scala 工具链。请用 VEDIT_SBT 指向 sbt（或把它加入 PATH）。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_run.cpp" line="134"/>
+        <source>scala-cli project detected (%1): running `scala-cli run` offline.</source>
+        <translation>检测到 scala-cli 工程（%1）：正在离线运行 `scala-cli run`。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_run.cpp" line="177"/>
+        <source>scala-cli was not found: the Scala toolchain is missing. Point VEDIT_SCALA_CLI at scala-cli (or put it on PATH).</source>
+        <translation>未找到 scala-cli：缺少 Scala 工具链。请用 VEDIT_SCALA_CLI 指向 scala-cli（或把它加入 PATH）。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="45"/>
+        <source>symbol reached through a hierarchical reference - `u_a.sig` binds only the leaf name, never the instance path</source>
+        <translation>通过层次化引用访问的符号——`u_a.sig` 只绑定叶子名称，从不绑定实例路径</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_run.cpp" line="261"/>
+        <source>the Rust engine rejected the run request.</source>
+        <translation>Rust 引擎拒绝了运行请求。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/waiver_actions.cpp" line="474"/>
+        <source>the Rust service layer is not available, so no waiver can be registered</source>
+        <translation>Rust 服务层不可用，因此无法注册豁免</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/waiver_actions.cpp" line="411"/>
+        <source>the Rust service layer is not available, so no waiver can be written</source>
+        <translation>Rust 服务层不可用，因此无法写入豁免</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/toolchain.cpp" line="361"/>
+        <source>the VSG VHDL style rules and their --fix formatting are unavailable</source>
+        <translation>VSG VHDL 风格规则及其 --fix 格式化不可用</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="1965"/>
+        <source>the configured --autofix mode cannot run here</source>
+        <translation>配置的 --autofix 模式在此无法运行</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/waiver_actions.cpp" line="163"/>
+        <source>the diagnostic names no file, so no waiver can be scoped</source>
+        <translation>该诊断未指明文件，因此无法确定豁免作用域</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_integration.cpp" line="588"/>
+        <source>the engine rejected the apply request</source>
+        <translation>引擎拒绝了应用请求</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_integration.cpp" line="529"/>
+        <source>the engine rejected the plan request</source>
+        <translation>引擎拒绝了规划请求</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_integration.cpp" line="738"/>
+        <source>the engine reported a failed apply job</source>
+        <translation>引擎报告应用作业失败</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_integration.cpp" line="662"/>
+        <source>the engine reported a failed plan job</source>
+        <translation>引擎报告规划作业失败</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_preview.cpp" line="81"/>
+        <source>the new SystemVerilog identifier</source>
+        <translation>新的 SystemVerilog 标识符</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_integration.cpp" line="496"/>
+        <source>the project has no file set to index</source>
+        <translation>工程没有可索引的文件集</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_integration.cpp" line="480"/>
+        <source>the rename needs both the current and the new identifier</source>
+        <translation>重命名需要当前标识符和新标识符</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_run.cpp" line="317"/>
+        <source>the run job disappeared before it reached a state.</source>
+        <translation>运行作业在进入任何状态之前就消失了。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_run.cpp" line="228"/>
+        <source>the run plan has no program.</source>
+        <translation>运行计划没有可执行程序。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_integration.cpp" line="490"/>
+        <source>the service layer could not be created</source>
+        <translation>无法创建服务层</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/waiver_actions.cpp" line="478"/>
+        <source>the settings path must not be empty to register a waiver file</source>
+        <translation>注册豁免文件时设置路径不能为空</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/waiver_actions.cpp" line="415"/>
+        <source>the waiver file path must not be empty</source>
+        <translation>豁免文件路径不能为空</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/diagnostics_integration.cpp" line="2322"/>
+        <source>the waiver job failed</source>
+        <translation>豁免作业失败</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_integration.cpp" line="560"/>
+        <source>there is no previewed plan to apply</source>
+        <translation>没有可应用的已预览计划</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/rename/rename_integration.cpp" line="547"/>
+        <source>this build carries no service layer (vd-ffi)</source>
+        <translation>此构建不含服务层（vd-ffi）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/scala/scala_run.cpp" line="232"/>
+        <source>this build has no Rust service layer (vd-ffi): the Scala run cannot start.</source>
+        <translation>此构建不含 Rust 服务层（vd-ffi）：Scala 运行无法启动。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/waiver_actions.cpp" line="188"/>
+        <source>this diagnostic carries no rule id, so it cannot be waived by verible</source>
+        <translation>该诊断没有规则 id，因此无法用 verible 豁免</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/waiver_actions.cpp" line="145"/>
+        <source>this diagnostic has no option name (an error usually has none), so slang can only waive its whole scope — that would waive every diagnostic of the file, and VEdit refuses to widen it</source>
+        <translation>该诊断没有选项名（错误通常没有），因此 slang 只能豁免其整个作用域——那会豁免该文件的每一条诊断，VEdit 拒绝这样扩大范围</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/waiver_actions.cpp" line="419"/>
+        <source>this entry cannot be waived</source>
+        <translation>此条目无法豁免</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/ffi_backends.cpp" line="1207"/>
+        <source>unavailable</source>
+        <translation>不可用</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/autofix.cpp" line="439"/>
+        <source>verible asks for an answer on its own stdin for this mode and VEdit has no terminal to give one: only `no`, `patch`, `inplace` and `generate-waiver` can be driven</source>
+        <translation>该模式下 verible 会从自身 stdin 请求应答，而 VEdit 没有终端可以提供：只能驱动 `no`、`patch`、`inplace` 和 `generate-waiver`</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/vhdl/vhdl_integration.cpp" line="141"/>
+        <source>vhdl_ls · %1</source>
+        <translation>vhdl_ls · %1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/diagnostics/waiver_actions.cpp" line="356"/>
+        <source>waiver %1: no scope — exactly one `file` or `hier` is required</source>
+        <translation>豁免 %1：没有作用域——必须恰好指定一个 `file` 或 `hier`</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/lint_options.cpp" line="39"/>
+        <source>%1 is not available: verible-verilog-lint prompts on a terminal for this mode, and the product always starts it with pipes (no TTY). Use a non-interactive mode instead.</source>
+        <translation>%1 不可用：verible-verilog-lint 在此模式下会从终端请求输入，而本产品始终用管道启动它（没有 TTY）。请改用非交互模式。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/lint_options.cpp" line="113"/>
+        <source>Not available: slang has no .rules.verible_lint (this is a verible-verilog-lint option).</source>
+        <translation>不可用：slang 没有 .rules.verible_lint（这是 verible-verilog-lint 的选项）。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/lint_options.cpp" line="118"/>
+        <source>Not available: slang takes no verible waiver files (this is a verible-verilog-lint option).</source>
+        <translation>不可用：slang 不接受 verible 的豁免文件（这是 verible-verilog-lint 的选项）。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/lint_options.cpp" line="123"/>
+        <source>Not available: slang has no automatic fixing (this is a verible-verilog-lint option).</source>
+        <translation>不可用：slang 没有自动修复（这是 verible-verilog-lint 的选项）。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/lint_options.cpp" line="128"/>
+        <source>Not available: slang has no rule set / rule selection (this is a verible-verilog-lint option).</source>
+        <translation>不可用：slang 没有规则集/规则选择（这是 verible-verilog-lint 的选项）。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/lint_options.cpp" line="135"/>
+        <source>Not available: verible-verilog-lint has no -W warning selection (this is a slang option).</source>
+        <translation>不可用：verible-verilog-lint 没有 -W 警告选择（这是 slang 的选项）。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/lint_options.cpp" line="138"/>
+        <source>Not available: verible-verilog-lint has no --error-limit (this is a slang option).</source>
+        <translation>不可用：verible-verilog-lint 没有 --error-limit（这是 slang 的选项）。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1913"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1927"/>
+        <source>Default (verible)</source>
+        <translation>默认（verible）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1932"/>
+        <source>Default (verible: auto)</source>
+        <translation>默认（verible：auto）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1938"/>
+        <source>Default (verible: infer)</source>
+        <translation>默认（verible：infer）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1945"/>
+        <source>Default (verible: wrap)</source>
+        <translation>默认（verible：wrap）</translation>
+    </message>
 </context>
 <context>
     <name>vedit::app::ApplicationShell</name>
@@ -4861,6 +5732,12 @@ root: %1</source>
         <location filename="../src/app/app_shell.cpp" line="644"/>
         <source>Split Pane &amp;Vertically</source>
         <translation>垂直分屏(&amp;V)</translation>
+    </message>
+    <message>
+        <location filename="../src/app/app_shell.cpp" line="974"/>
+        <location filename="../src/app/app_shell.cpp" line="981"/>
+        <source>Split the current document into two panes.</source>
+        <translation>将当前文档拆分到两个窗格。</translation>
     </message>
     <message>
         <location filename="../src/app/app_shell.cpp" line="646"/>
@@ -5211,6 +6088,36 @@ root: %1</source>
         <source>Interface theme &apos;%1&apos; was applied but could not be stored.</source>
         <translation>界面主题“%1”已应用但无法保存。</translation>
     </message>
+    <message>
+        <location filename="../src/app/app_shell.cpp" line="797"/>
+        <source>&amp;Mixed Split Layout</source>
+        <translation>混合分屏布局(&amp;M)</translation>
+    </message>
+    <message>
+        <location filename="../src/app/app_shell.cpp" line="845"/>
+        <source>&amp;Outline</source>
+        <translation>大纲(&amp;O)</translation>
+    </message>
+    <message>
+        <location filename="../src/app/app_shell.cpp" line="1045"/>
+        <source>About VEdit</source>
+        <translation>关于 VEdit</translation>
+    </message>
+    <message>
+        <location filename="../src/app/app_shell.cpp" line="1612"/>
+        <source>Development build</source>
+        <translation>开发版</translation>
+    </message>
+    <message>
+        <location filename="../src/app/app_shell.cpp" line="1613"/>
+        <source>Version %1</source>
+        <translation>版本 %1</translation>
+    </message>
+    <message>
+        <location filename="../src/app/app_shell.cpp" line="1614"/>
+        <source>&lt;h3&gt;VEdit&lt;/h3&gt;&lt;p&gt;%1&lt;/p&gt;&lt;p&gt;A code editor for hardware description languages, with an integrated language-server and lint toolchain, a project model, source control and offline HDL toolchains.&lt;/p&gt;&lt;p&gt;License: MIT. Qt and KDE Frameworks are used under their own licenses.&lt;/p&gt;&lt;p&gt;Homepage: &lt;a href="https://github.com/HaroldZ32/VEdit"&gt;https://github.com/HaroldZ32/VEdit&lt;/a&gt;&lt;br/&gt;Documentation: &lt;a href="https://github.com/HaroldZ32/VEdit/blob/main/docs/USER_GUIDE.md"&gt;USER_GUIDE.md&lt;/a&gt; (or Help &amp;rarr; User Manual, F1)&lt;/p&gt;</source>
+        <translation>&lt;h3&gt;VEdit&lt;/h3&gt;&lt;p&gt;%1&lt;/p&gt;&lt;p&gt;面向硬件描述语言的代码编辑器，内置语言服务器与 Lint 工具链、工程模型、源码控制以及离线 HDL 工具链。&lt;/p&gt;&lt;p&gt;许可证：MIT。Qt 与 KDE Frameworks 依其各自许可证使用。&lt;/p&gt;&lt;p&gt;主页：&lt;a href="https://github.com/HaroldZ32/VEdit"&gt;https://github.com/HaroldZ32/VEdit&lt;/a&gt;&lt;br/&gt;文档：&lt;a href="https://github.com/HaroldZ32/VEdit/blob/main/docs/USER_GUIDE.md"&gt;USER_GUIDE.md&lt;/a&gt;（或 帮助 &amp;rarr; 用户手册，F1）&lt;/p&gt;</translation>
+    </message>
 </context>
 <context>
     <name>vedit::app::HelpViewer</name>
@@ -5382,6 +6289,11 @@ root: %1</source>
         <location filename="../src/editor/kernel/find_replace.cpp" line="1147"/>
         <source>Whole project: open the Search panel to search the project</source>
         <translation>整个工程：打开搜索面板以搜索整个工程</translation>
+    </message>
+    <message>
+        <location filename="../src/editor/kernel/find_replace.cpp" line="865"/>
+        <source>Reset position</source>
+        <translation>重置位置</translation>
     </message>
 </context>
 <context>
@@ -6168,8 +7080,8 @@ Use &quot;Open...&quot; to browse a project.</source>
     </message>
     <message>
         <location filename="../src/workspace/settings/settings_panel.cpp" line="623"/>
-        <source>Stored in settings.toml. The backend and lint-engine choices apply on the next parse; -I/-D are handed to the project-wide lint.</source>
-        <translation>存储在 settings.toml。后端与 lint 引擎的选择在下次解析时生效；-I/-D 交给工程级 lint。</translation>
+        <source>Stored in settings.toml. A saved change is applied live — the running app reads the file within about 300 ms, no restart needed: the realtime LSP session restarts with the selected backend, and the lint engine applies to the next Lint Project run. -I/-D are handed to the project-wide lint.</source>
+        <translation>存储在 settings.toml。保存后的改动无需重启即会生效——运行中的程序约 300 ms 内读入：实时 LSP 会话用选中的后端重启，lint 引擎在下次 Lint Project 时生效。-I/-D 交给工程级 lint。</translation>
     </message>
     <message>
         <location filename="../src/workspace/settings/settings_panel.cpp" line="642"/>
@@ -6180,6 +7092,36 @@ Use &quot;Open...&quot; to browse a project.</source>
         <location filename="../src/workspace/settings/settings_panel.cpp" line="646"/>
         <source>Show the suggestion as ghost text in the editor</source>
         <translation>在编辑器中将建议显示为幽灵文本</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="807"/>
+        <source>Provider:</source>
+        <translation>服务商：</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="802"/>
+        <source>Custom</source>
+        <translation>自定义</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="803"/>
+        <source>DeepSeek</source>
+        <translation>DeepSeek</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="804"/>
+        <source>OpenAI</source>
+        <translation>OpenAI</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="805"/>
+        <source>Ollama</source>
+        <translation>Ollama</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="806"/>
+        <source>llama.cpp</source>
+        <translation>llama.cpp</translation>
     </message>
     <message>
         <location filename="../src/workspace/settings/settings_panel.cpp" line="657"/>
@@ -6210,6 +7152,48 @@ Use &quot;Open...&quot; to browse a project.</source>
         <location filename="../src/workspace/settings/settings_panel.cpp" line="681"/>
         <source>Max tokens:</source>
         <translation>最大 token 数：</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="854"/>
+        <source>Detect</source>
+        <translation>检测</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="857"/>
+        <source>Check the endpoint and authentication, and list its models. Sends GET only.</source>
+        <translation>检查端点与鉴权，并列出可用模型。只发送 GET 请求。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1767"/>
+        <source>Detecting…</source>
+        <translation>正在检测…</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1863"/>
+        <source>Detect succeeded: %1, %2 models (%3 ms)</source>
+        <translation>检测成功：%1，%2 个模型（%3 ms）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1797"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1804"/>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1813"/>
+        <source>Detect failed: %1</source>
+        <translation>检测失败：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1797"/>
+        <source>invalid request parameters</source>
+        <translation>请求参数无效</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1804"/>
+        <source>unreadable probe response</source>
+        <translation>检测响应无法解析</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="1813"/>
+        <source>unknown reason</source>
+        <translation>未知原因</translation>
     </message>
     <message>
         <location filename="../src/workspace/settings/settings_panel.cpp" line="685"/>
@@ -6507,19 +7491,9 @@ Use &quot;Open...&quot; to browse a project.</source>
         <translation>会向所选 Lint 任务发送 %1。</translation>
     </message>
     <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="2304"/>
-        <source>Active engine. --ruleset, --rules, --rules_config and --waiver_files are applied to the lint job; --autofix is stored only (the lint job&apos;s C ABI has no field for it).</source>
-        <translation>当前引擎。--ruleset、--rules、--rules_config 与 --waiver_files 会应用到 Lint 任务；--autofix 仅保存（Lint 任务的 C ABI 没有对应字段）。</translation>
-    </message>
-    <message>
         <location filename="../src/workspace/settings/settings_panel.cpp" line="2313"/>
         <source>Active engine. -W and --error-limit are applied to the lint job.</source>
         <translation>当前引擎。-W 与 --error-limit 会应用到 Lint 任务。</translation>
-    </message>
-    <message>
-        <location filename="../src/workspace/settings/settings_panel.cpp" line="2325"/>
-        <source>Stored but not applied yet (the lint job&apos;s C ABI has no field for them): %1. The values stay in settings.toml and are never sent as a silent no-op.</source>
-        <translation>已保存但尚未应用（Lint 任务的 C ABI 没有对应字段）：%1。这些值保留在 settings.toml 中，不会作为静默空操作发送。</translation>
     </message>
     <message>
         <location filename="../src/workspace/settings/settings_panel.cpp" line="2307"/>
@@ -6632,6 +7606,16 @@ Use &quot;Open...&quot; to browse a project.</source>
         <source>Ignoring unknown interface theme &apos;%1&apos; (from %2)</source>
         <translation>忽略未知的界面主题“%1”（来自 %2）</translation>
     </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2394"/>
+        <source>Active engine. --ruleset, --rules, --rules_config, --waiver_files and --autofix are applied to the lint job; a stored --autofix value is sent verbatim. patch-interactive and inplace-interactive need a terminal this product does not have, so they are offered as unavailable with that reason.</source>
+        <translation>当前引擎。--ruleset、--rules、--rules_config、--waiver_files 与 --autofix 都会应用到 Lint 任务；已存储的 --autofix 值会原样发送。patch-interactive 与 inplace-interactive 需要本产品没有的终端，因此以该原因标记为不可用。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_panel.cpp" line="2421"/>
+        <source>This build cannot send %1 to the lint job yet (the C ABI has no field for them); the control is disabled with this reason, and the value is kept so nothing is silently rewritten.</source>
+        <translation>此构建尚无法把 %1 发送给 Lint 任务（C ABI 没有对应字段）；该控件因此被禁用，值会保留，不会静默改写任何内容。</translation>
+    </message>
 </context>
 <context>
     <name>product_theme</name>
@@ -6658,6 +7642,494 @@ Use &quot;Open...&quot; to browse a project.</source>
     <message>
         <source>Deep Navy</source>
         <translation>深夜蓝</translation>
+    </message>
+</context>
+<context>
+    <name>vedit::workspace::settings::EnvImportPage</name>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="825"/>
+        <source> %1 secret-shaped row(s) were skipped: they stay masked until you reveal them explicitly.</source>
+        <translation> 已跳过 %1 个形似机密的行：在你显式显示它们之前，它们保持遮盖。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1096"/>
+        <source> · stderr tail: %1</source>
+        <translation> · stderr 尾部：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="820"/>
+        <source>%1 checked variable(s) staged for the %2 layer — press OK or Apply to store them.</source>
+        <translation>已把 %1 个勾选的变量暂存到%2层 — 按“确定”或“应用”存储。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1048"/>
+        <source>%1 imported variable(s) read from %2.</source>
+        <translation>已从 %2 读取 %1 个导入变量。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1213"/>
+        <source>%1 problem(s): %2</source>
+        <translation>%1 个问题：%2</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="854"/>
+        <source>%1 stored variable(s) removed from the draft — press OK or Apply to store the result.</source>
+        <translation>已从草稿中移除 %1 个已存储变量 — 按“确定”或“应用”存储结果。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1109"/>
+        <source>%1 variable(s) were added or changed; none is selected.</source>
+        <translation>有 %1 个变量被新增或修改；未选中任何变量。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="270"/>
+        <source>(no rc file: only the shell's own environment)</source>
+        <translation>（无 rc 文件：只读取 Shell 自身的环境）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="596"/>
+        <source>(not set)</source>
+        <translation>（未设置）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="262"/>
+        <source>(the shell family's default program)</source>
+        <translation>（该 Shell 家族的默认程序）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1090"/>
+        <source>(unknown)</source>
+        <translation>（未知）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="493"/>
+        <source>A request is already in flight; wait for it to finish.</source>
+        <translation>已有请求在处理中；请等待它完成。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="599"/>
+        <source>A secret-shaped name is masked until you reveal it; the value is stored as captured when you check it while revealed.</source>
+        <translation>形似机密的名称会被遮盖，直到你显示它；在已显示状态下勾选时，值会按捕获到的样子存储。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="872"/>
+        <source>A variable name must not contain '='.</source>
+        <translation>变量名不得包含 '='。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="877"/>
+        <source>A variable name must not contain control characters.</source>
+        <translation>变量名不得包含控制字符。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="400"/>
+        <source>Add / update</source>
+        <translation>添加 / 更新</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1217"/>
+        <source>Add / update in the global layer</source>
+        <translation>在全局层添加 / 更新</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1218"/>
+        <source>Add / update in the project layer</source>
+        <translation>在工程层添加 / 更新</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="328"/>
+        <source>Added or changed in your shell (nothing is selected)</source>
+        <translation>在 Shell 中新增或修改（未选中任何项）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="272"/>
+        <source>An rc file to source before the environment is read. A broken rc file is reported with its exit status; the capture still returns the environment.</source>
+        <translation>在读取环境之前要 source 的 rc 文件。损坏的 rc 文件会连同退出状态一起报告；捕获仍会返回环境。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="363"/>
+        <source>Both layers stay in one file; importing never replaces the variables you did not select. Selection file: %1</source>
+        <translation>两个层保存在同一个文件中；导入永不替换你未选中的变量。选择文件：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="312"/>
+        <source>Cancel capture</source>
+        <translation>取消捕获</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="544"/>
+        <source>Cancelling the capture…</source>
+        <translation>正在取消捕获…</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="307"/>
+        <source>Capture from shell</source>
+        <translation>从 Shell 捕获</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="244"/>
+        <source>Capture from your shell</source>
+        <translation>从你的 Shell 捕获</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="530"/>
+        <source>Capturing from the shell…</source>
+        <translation>正在从 Shell 捕获…</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="236"/>
+        <source>Capturing starts one child shell and runs its start-up files. It never changes this application's own environment and it never applies the whole environment — only the variables you select are stored.</source>
+        <translation>捕获会启动一个子 Shell 并执行其启动文件。它从不更改本应用自身的环境，也从不应用整个环境 — 只存储你选中的变量。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="775"/>
+        <source>Choose a project root before storing into the project layer.</source>
+        <translation>在存储到工程层之前，请先选择工程根目录。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="334"/>
+        <source>Current</source>
+        <translation>当前</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="293"/>
+        <source>Current folder</source>
+        <translation>当前文件夹</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="354"/>
+        <source>Explicitly reveals a secret-shaped value for THIS view: the reveal is not remembered, never reaches a log, and a secret-shaped row can only be stored while it is revealed.</source>
+        <translation>为“本次视图”显式显示形似机密的值：显示状态不会被记住，也永不写入日志；形似机密的行只有在已显示时才能存储。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="334"/>
+        <source>From shell</source>
+        <translation>来自 Shell</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="682"/>
+        <source>Global</source>
+        <translation>全局</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="301"/>
+        <source>Global (all projects)</source>
+        <translation>全局（所有工程）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="343"/>
+        <source>Import selected</source>
+        <translation>导入所选</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="374"/>
+        <source>Layer</source>
+        <translation>层</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="394"/>
+        <source>NAME</source>
+        <translation>NAME</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="549"/>
+        <source>No capture is running.</source>
+        <translation>没有正在进行的捕获。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1047"/>
+        <source>No imported variables are stored yet.</source>
+        <translation>尚未存储任何导入变量。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1212"/>
+        <source>No problems reported by the last request.</source>
+        <translation>上一次请求未报告任何问题。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="409"/>
+        <source>No problems reported.</source>
+        <translation>未报告任何问题。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="849"/>
+        <source>No stored row is checked; nothing was removed.</source>
+        <translation>未勾选任何已存储行；未移除任何内容。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="815"/>
+        <source>No variable is checked; nothing was staged.</source>
+        <translation>未勾选任何变量；未暂存任何内容。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="340"/>
+        <source>Only variables the capture ADDED or CHANGED are listed; check the ones to import. A secret-shaped name is masked until you reveal it explicitly.</source>
+        <translation>只列出捕获过程中新增或修改的变量；请勾选要导入的项。形似机密的名称会被遮盖，直到你显式显示它。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="264"/>
+        <source>Optional explicit program (absolute, or a name on PATH). Required for a custom program.</source>
+        <translation>可选的显式程序（绝对路径或 PATH 上的名称）。自定义程序时必填。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="266"/>
+        <source>Program:</source>
+        <translation>程序：</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="300"/>
+        <source>Project (overrides global)</source>
+        <translation>工程（覆盖全局）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="296"/>
+        <source>Project root:</source>
+        <translation>工程根目录：</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="683"/>
+        <source>Project: %1</source>
+        <translation>工程：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="274"/>
+        <source>RC file:</source>
+        <translation>rc 文件：</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1202"/>
+        <source>Reading the stored selection…</source>
+        <translation>正在读取已存储的选择…</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="385"/>
+        <source>Reload from disk</source>
+        <translation>从磁盘重新加载</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="382"/>
+        <source>Remove checked</source>
+        <translation>移除勾选项</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="423"/>
+        <source>Secret-shaped values are masked again.</source>
+        <translation>形似机密的值已重新遮盖。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="421"/>
+        <source>Secret-shaped values are shown for this view only; the reveal is not remembered and never reaches a log.</source>
+        <translation>形似机密的值仅在本次视图中显示；显示状态不会被记住，也永不写入日志。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="258"/>
+        <source>Shell:</source>
+        <translation>Shell：</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="350"/>
+        <source>Show secret-shaped values</source>
+        <translation>显示形似机密的值</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="993"/>
+        <source>Staged changes discarded; the stored selection is unchanged.</source>
+        <translation>已丢弃暂存的更改；已存储的选择未变。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="346"/>
+        <source>Stages the checked variables into the selected layer; Apply or OK stores them.</source>
+        <translation>把勾选的变量暂存到所选层；“应用”或“确定”会存储它们。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="276"/>
+        <source>Start a login shell (-l)</source>
+        <translation>启动登录 Shell (-l)</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="278"/>
+        <source>Start an interactive shell (-i)</source>
+        <translation>启动交互式 Shell (-i)</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="315"/>
+        <source>Stops the capture that is in flight. The environment is not applied and the list stays as it was.</source>
+        <translation>停止正在进行的捕获。环境不会被应用，列表保持原样。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="305"/>
+        <source>Store into:</source>
+        <translation>存储到：</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1150"/>
+        <source>Stored %1 variable(s) in %2.</source>
+        <translation>已在 %2 中存储 %1 个变量。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="360"/>
+        <source>Stored selection</source>
+        <translation>已存储的选择</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="973"/>
+        <source>Storing %1 variable(s) in %2…</source>
+        <translation>正在把 %1 个变量存储到 %2…</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="812"/>
+        <source>The %1 checked variable(s) are secret-shaped and stay masked; reveal them explicitly before importing.</source>
+        <translation>勾选的 %1 个变量形似机密并保持遮盖；导入前请显式显示它们。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1136"/>
+        <source>The capture failed (%1); nothing was changed.</source>
+        <translation>捕获失败（%1）；未更改任何内容。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1108"/>
+        <source>The capture found no variable that was added or changed.</source>
+        <translation>捕获未发现任何新增或修改的变量。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1130"/>
+        <source>The capture timed out and was stopped; nothing was changed. (%1)</source>
+        <translation>捕获超时已被停止；未更改任何内容。（%1）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1128"/>
+        <source>The capture was cancelled; nothing was changed.</source>
+        <translation>捕获已取消；未更改任何内容。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="514"/>
+        <source>The capture was refused: %1</source>
+        <translation>捕获被拒绝：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="287"/>
+        <source>The project root of the project layer. Project values override global values with the same name.</source>
+        <translation>工程层的工程根目录。同名时工程值覆盖全局值。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1158"/>
+        <source>The selection could not be stored (%1); the draft is kept and the file is unchanged.</source>
+        <translation>无法存储选择（%1）；草稿保留，文件未变。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="969"/>
+        <source>The selection was refused: %1</source>
+        <translation>选择被拒绝：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1133"/>
+        <source>The shell could not be started; nothing was changed. (%1)</source>
+        <translation>无法启动 Shell；未更改任何内容。（%1）</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="257"/>
+        <source>The shell family whose start-up chain is captured.</source>
+        <translation>要捕获其启动链的 Shell 家族。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1103"/>
+        <source>The shell reported a problem (exit status %1); the environment was still read — see the capture report for the stderr tail.</source>
+        <translation>Shell 报告了问题（退出状态 %1）；环境仍被读取 — 请查看捕获报告中的 stderr 尾部。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1060"/>
+        <source>The stored selection could not be read (%1); the page keeps working and nothing was changed.</source>
+        <translation>无法读取已存储的选择（%1）；页面继续可用，未更改任何内容。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1196"/>
+        <source>The stored selection could not be read: %1</source>
+        <translation>无法读取已存储的选择：%1</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="868"/>
+        <source>The variable name must not be empty.</source>
+        <translation>变量名不能为空。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="935"/>
+        <source>There is nothing to store.</source>
+        <translation>没有可存储的内容。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="498"/>
+        <source>This build has no vd-ffi environment ABI.</source>
+        <translation>此构建没有 vd-ffi 环境 ABI。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="374"/>
+        <source>Value</source>
+        <translation>值</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="334"/>
+        <source>Variable</source>
+        <translation>变量</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="912"/>
+        <source>Variable %1 %2 in the %3 layer — press OK or Apply to store it.</source>
+        <translation>变量 %1：%2（%3层）— 按“确定”或“应用”存储它。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="885"/>
+        <source>Variable %1 is secret-shaped and stays masked; reveal secret values explicitly before adding it.</source>
+        <translation>变量 %1 形似机密并保持遮盖；添加前请显式显示机密值。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="303"/>
+        <source>Where the selected variables are stored. The project layer is the default; a project value overrides a global value with the same name.</source>
+        <translation>所选变量存储的位置。默认是工程层；同名时工程值覆盖全局值。</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="914"/>
+        <source>added</source>
+        <translation>已新增</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="256"/>
+        <source>custom program</source>
+        <translation>自定义程序</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="823"/>
+        <source>global</source>
+        <translation>全局</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="823"/>
+        <source>project</source>
+        <translation>工程</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1089"/>
+        <source>shell: %1 · exit status: %2</source>
+        <translation>shell: %1 · 退出状态：%2</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1125"/>
+        <source>the capture did not produce an environment</source>
+        <translation>捕获未产生环境</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="1062"/>
+        <source>unknown reason</source>
+        <translation>未知原因</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="914"/>
+        <source>updated</source>
+        <translation>已更新</translation>
+    </message>
+    <message>
+        <location filename="../src/workspace/settings/settings_dialog.cpp" line="398"/>
+        <source>value</source>
+        <translation>值</translation>
     </message>
 </context>
 </TS>

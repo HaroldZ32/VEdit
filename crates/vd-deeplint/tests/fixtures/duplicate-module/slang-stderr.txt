@@ -1,0 +1,6 @@
+sim/uart.v:1:8: error: duplicate definition of 'uart' [-Wduplicate-definition]
+module uart (input clk, output done);
+       ^
+rtl/uart.v:1:8: note: previous definition here
+module uart (input clk, input [7:0] din, output [7:0] dout);
+       ^

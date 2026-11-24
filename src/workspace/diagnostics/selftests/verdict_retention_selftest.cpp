@@ -195,14 +195,27 @@ int main(int argc, char **argv)
         check("rm9.a-retained-rows-feed-merged",
               controller.mergedDiagnosticsForFile(a).size() == 1,
               QString::number(controller.mergedDiagnosticsForFile(a).size()));
-        check("rm9.count-follows-retained", controller.session().diagnostics == 1,
-              QStringLiteral("count=%1").arg(controller.session().diagnostics));
+        // A61.6 (batch-20261115): AC-3.2's counting rule is "the ACTIVE document
+        // only". A's verdict is still retained (the three checks above), but the
+        // status-line count follows the document in front of the user - B, which
+        // is clean, so the count is 0. The old assertion expected A's retained
+        // row count here, which contradicts the frozen AC-3.2.
+        check("rm9.count-follows-active-document", controller.session().diagnostics == 0,
+              QStringLiteral("count=%1 active='%2'")
+                  .arg(controller.session().diagnostics)
+                  .arg(controller.realtimeDisplayFile()));
 
         check("rm9.analyze-a-again", controller.analyzeFile(a, QStringLiteral("module a;\n"), false));
         settle(controller);
         check("rm9.a-still-error-after-return",
               controller.statusForFile(a) == DiagnosticsController::FileStatus::Error,
               QString::number(statusInt(controller, a)));
+        // ... and the count follows the active document BACK to A's single row:
+        // the rule is reversible, not "always zero".
+        check("rm9.count-returns-to-active", controller.session().diagnostics == 1,
+              QStringLiteral("count=%1 active='%2'")
+                  .arg(controller.session().diagnostics)
+                  .arg(controller.realtimeDisplayFile()));
     }
 
     // -----------------------------------------------------------------------
@@ -220,7 +233,19 @@ int main(int argc, char **argv)
         fake->rowsByFile.insert(d, QVector<DiagnosticEntry>{});
         DiagnosticsController controller(std::move(lsp), std::make_unique<RetentionFakeSlang>());
         controller.setConfiguration(QStringLiteral("/fake/verible-ls"), dir.path());
-        controller.setFileSet(QStringList{a, c, d}); // none of the three is opened
+        // batch-20261116 L1.1: the controller no longer opens a project-wide
+        // session from setFileSet() - that behaviour was the 20k-file defect. The
+        // RM-9 guarantee ("a verdict belongs to the FILE, not to the focused tab")
+        // is asserted across three successive REALTIME analyses. The verdict of a
+        // never-opened project file now comes from the project PASS and is covered
+        // end to end by vedit-rm9-status-dots-e2e.
+        controller.setFileSet(QStringList{a, c, d});
+        check("rm9.project-set-recorded", controller.projectFiles() == QStringList{a, c, d});
+        check("rm9.analyze-a", controller.analyzeFile(a, QStringLiteral("module a;\n"), false));
+        settle(controller);
+        check("rm9.analyze-c", controller.analyzeFile(c, QStringLiteral("module c;\n"), false));
+        settle(controller);
+        check("rm9.analyze-d", controller.analyzeFile(d, QStringLiteral("module d;\n"), false));
         settle(controller);
         check("rm9.project-every-file-verdict",
               controller.fileStatuses().value(a, 0) == 1
@@ -232,7 +257,7 @@ int main(int argc, char **argv)
                   .arg(controller.fileStatuses().value(d, -1)));
         check("rm9.project-no-file-left-as-no-verdict", controller.fileStatuses().size() == 3,
               QStringLiteral("size=%1").arg(controller.fileStatuses().size()));
-        check("rm9.project-never-opened-not-unknown",
+        check("rm9.three-file-verdicts-retained",
               controller.statusForFile(c) != DiagnosticsController::FileStatus::Unknown);
     }
 

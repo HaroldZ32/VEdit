@@ -28,6 +28,19 @@ pub trait Transport: Send + Sync {
         timeout: Duration,
         max_response_bytes: usize,
     ) -> Result<String, FimError>;
+
+    /// GETs `url` and returns the response text of a 2xx answer.
+    ///
+    /// Detection is GET-only on purpose: probing an endpoint must never spend
+    /// completion tokens. A non-2xx answer is [`FimError::HttpStatus`] (the code
+    /// only), so the caller can rank failures without reading a body.
+    fn get(
+        &self,
+        url: &str,
+        headers: &[(&str, &str)],
+        timeout: Duration,
+        max_response_bytes: usize,
+    ) -> Result<String, FimError>;
 }
 
 /// The real transport: `ureq` over rustls, one fresh agent per request so the
@@ -52,10 +65,7 @@ impl Transport for HttpTransport {
         timeout: Duration,
         max_response_bytes: usize,
     ) -> Result<String, FimError> {
-        let config = ureq::Agent::config_builder()
-            .timeout_global(Some(timeout))
-            .build();
-        let agent = ureq::Agent::new_with_config(config);
+        let agent = agent(timeout);
         let mut request = agent.post(url);
         for (name, value) in headers {
             request = request.header(*name, *value);
@@ -63,15 +73,51 @@ impl Transport for HttpTransport {
         let response = request
             .send_json(body)
             .map_err(|error| map_ureq_error(&error, timeout))?;
-        let limit = max_response_bytes.saturating_add(1) as u64;
-        let text = response
-            .into_body()
-            .with_config()
-            .limit(limit)
-            .read_to_string()
-            .map_err(|error| map_ureq_error(&error, timeout))?;
-        enforce_response_cap(text, max_response_bytes)
+        read_capped(response, max_response_bytes, timeout)
     }
+
+    fn get(
+        &self,
+        url: &str,
+        headers: &[(&str, &str)],
+        timeout: Duration,
+        max_response_bytes: usize,
+    ) -> Result<String, FimError> {
+        let agent = agent(timeout);
+        let mut request = agent.get(url);
+        for (name, value) in headers {
+            request = request.header(*name, *value);
+        }
+        let response = request
+            .call()
+            .map_err(|error| map_ureq_error(&error, timeout))?;
+        read_capped(response, max_response_bytes, timeout)
+    }
+}
+
+/// One fresh agent per request, so the configured timeout applies without
+/// touching global state.
+fn agent(timeout: Duration) -> ureq::Agent {
+    let config = ureq::Agent::config_builder()
+        .timeout_global(Some(timeout))
+        .build();
+    ureq::Agent::new_with_config(config)
+}
+
+/// Reads a response body within `max_response_bytes` and enforces the cap.
+fn read_capped(
+    response: ureq::http::Response<ureq::Body>,
+    max_response_bytes: usize,
+    timeout: Duration,
+) -> Result<String, FimError> {
+    let limit = max_response_bytes.saturating_add(1) as u64;
+    let text = response
+        .into_body()
+        .with_config()
+        .limit(limit)
+        .read_to_string()
+        .map_err(|error| map_ureq_error(&error, timeout))?;
+    enforce_response_cap(text, max_response_bytes)
 }
 
 /// Rejects a body over the configured cap instead of buffering it.

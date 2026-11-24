@@ -26,6 +26,7 @@
 #include <QString>
 #include <QStringList>
 #include <QTimer>
+#include <QVariantMap>
 
 namespace vedit::workspace::project {
 
@@ -45,7 +46,11 @@ public:
     void open(const QString &projectRoot);
 
     // Re-expands the current root; no-op with a failed signal when none is open.
-    void refresh();
+    // Q_INVOKABLE so a consumer that only sees the model as the published
+    // `vedit.project.model` QObject (the diagnostics lane's Run retry, G1-a
+    // review finding 1) can ask the lane that OWNS the expansion to run it
+    // again, without a link edge between the two lanes.
+    Q_INVOKABLE void refresh();
 
     // AC-2.2: "Import Filelist…". Adds one or more `.f` files (absolute paths,
     // import order, duplicates rejected) and re-expands. Atomic: an unreadable
@@ -72,6 +77,20 @@ public:
     void setVariables(const QStringList &variables);
     void setVariable(const QString &name, const QString &value);
     QStringList missingVariables() const;
+    // batch-20261114 E1 (consumed by E2): every filelist variable name the LAST
+    // expansion REFERENCED and, in the same order, the layer that resolved it
+    // (`project` / `imported` / `environment` / `missing`). Live like
+    // `missingVariables()`: a root switch or a restore-from-disk clears them until
+    // the next expansion answers.
+    QStringList referencedVariables() const;
+    QStringList referencedVariableLayers() const;
+    // One name's layer, or `QString()` when the last expansion did not reference it.
+    QString referencedVariableLayer(const QString &name) const;
+    // The payload the lane publishes through the `vedit.project.inputs` shell
+    // property (RM-2): the expansion INPUTS plus the expansion COUNT plus the
+    // referenced set above. One builder for the publisher and its tests, so the
+    // property can never drift from the model it describes.
+    QVariantMap expansionInputs() const;
     int skippedCount() const;
 
     // RM-17: the module-tree TOP the user named for this project (a module
@@ -81,6 +100,16 @@ public:
     void setTop(const QString &top);
 
     bool hasProject() const;
+    // batch-20261115 AC-2.1/AC-2.5: a PROJECT is a folder PLUS a filelist.
+    // Without one the model neither scans the root nor asks the service to
+    // expand: every tool works on the single open file. Only an EXPLICIT import
+    // (or a restored imported list) counts; a `.f` sitting in the root is
+    // discovered only when the project opts in with
+    // `[project] auto_discover = true` (default `false`), and that still
+    // requires an existing project (docs/USER_GUIDE.md §2.8).
+    bool hasFilelist() const;
+    // The one line a panel shows instead of an empty file list (AC-2.1).
+    QString noFilelistReason() const;
     bool isPending() const;
     bool restoredFromDisk() const;
     QString projectRoot() const;
@@ -97,6 +126,33 @@ public:
     QStringList displayFiles() const;
     QStringList includeDirs() const;
     QStringList defines() const;
+
+    // AC-1.5: the project panel's OWN editable `-I`/`-D` entries, exactly as the
+    // user typed them (persisted in project-model.json and passed to the next
+    // expansion, which resolves a relative `-I` against the project root and
+    // de-duplicates it). `includeDirs()`/`defines()` above stay the EFFECTIVE
+    // result of the last expansion, so the AC-2.4 observable is unchanged.
+    QStringList projectIncludeDirs() const;
+    QStringList projectDefines() const;
+    // Add one entry. Rejects (with a reason naming the problem) an empty value,
+    // one containing a control character or a double quote, and a duplicate of
+    // an entry the project already has (compared after resolution, so `inc`,
+    // `./inc` and the absolute twin are the same entry). A define must be
+    // `NAME` or `NAME=VALUE` with an identifier name. On success the entry is
+    // persisted and the project re-expands immediately (no restart, no manual
+    // refresh).
+    bool addIncludeDir(const QString &entry, QString *error = nullptr);
+    bool removeIncludeDir(const QString &entry);
+    bool addDefine(const QString &entry, QString *error = nullptr);
+    bool removeDefine(const QString &entry);
+    // The project entries with a relative `-I` resolved against the root: the
+    // exact arguments the expansion (and therefore lint/LSP/rename) receives.
+    QStringList resolvedIncludeDirs() const;
+    // What the panel lists for each kind: the project entries in the user's
+    // spelling first, then the effective entries the expansion contributed that
+    // no project entry explains (filelist / vedit.toml / tools page).
+    QStringList displayIncludeDirs() const;
+    QStringList displayDefines() const;
     // Service diagnostics plus any state-store/service failure, phrased for the UI.
     QStringList diagnostics() const;
 
@@ -142,6 +198,8 @@ private:
     void recordFailure(const QString &error);
     bool saveState();
     QStringList normalizedVariables(const QStringList &values) const;
+    QString resolveProjectIncludeDir(const QString &entry) const;
+    bool validateProjectEntry(const QString &entry, bool includeDir, QString *error) const;
     QString settingsStamp() const;
     void watchSettings();
     void onStateDirectoryChanged();
@@ -160,6 +218,8 @@ private:
     ProjectState state_;
     QStringList relativeFiles_;
     QStringList missingVariables_;
+    QStringList referencedVariables_;
+    QStringList referencedVariableLayers_;
     int skipped_ = 0;
     QString lastError_;
     QString stateError_;
@@ -169,6 +229,8 @@ private:
     QString pendingRoot_;
     QStringList pendingFilelists_;
     QStringList pendingVariables_;
+    QStringList pendingIncludeDirs_;
+    QStringList pendingDefines_;
     bool pending_ = false;
     bool restored_ = false;
 };

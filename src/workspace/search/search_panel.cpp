@@ -363,6 +363,33 @@ void SearchPanel::setCurrentFileProvider(std::function<QString()> provider)
     currentFileProvider_ = std::move(provider);
 }
 
+void SearchPanel::setProjectFilesProvider(std::function<QStringList()> provider)
+{
+    projectFilesProvider_ = std::move(provider);
+}
+
+QStringList SearchPanel::projectFiles() const
+{
+    // Normalised at the boundary: the scan takes absolute paths (the Rust side
+    // joins a member against the root only when it is relative), duplicates are
+    // dropped so one member is one file, and blank entries are refused here
+    // rather than becoming a mystery path on the worker thread.
+    QStringList files;
+    if (!projectFilesProvider_) {
+        return files;
+    }
+    const QStringList provided = projectFilesProvider_();
+    files.reserve(provided.size());
+    for (const QString &file : provided) {
+        const QString trimmed = file.trimmed();
+        if (!trimmed.isEmpty()) {
+            files.append(QFileInfo(trimmed).absoluteFilePath());
+        }
+    }
+    files.removeDuplicates();
+    return files;
+}
+
 QString SearchPanel::resolveCurrentFile() const
 {
     if (currentFileProvider_) {
@@ -487,6 +514,18 @@ SearchOptions SearchPanel::buildOptions(bool allMatches) const
     options.maxDurationMs = timeBudgetMs_;
     if (scope() == vedit::search::SearchScope::CurrentFile) {
         options.fileFilter = resolveCurrentFile();
+        // The active document is the WHOLE scope: searching exactly it keeps a
+        // file opened from outside the project searchable (the project set is
+        // not consulted), and it costs one file instead of a set.
+        if (!options.fileFilter.isEmpty()) {
+            options.files = QStringList{QFileInfo(options.fileFilter).absoluteFilePath()};
+        }
+    } else {
+        // Whole project (batch 20261110d): the project file set is the scope,
+        // read LIVE so a `.f` imported since the dock was built is honoured.
+        // Empty means no set exists yet — the scan falls back to the directory
+        // walk instead of searching zero files.
+        options.files = projectFiles();
     }
     return options;
 }
@@ -513,6 +552,10 @@ bool SearchPanel::beginScan(const SearchOptions &options, ReplaceScanPhase phase
     activeScanQuery_ = ReplaceQuery{options.query, options.caseSensitive, options.wholeWords,
                                     options.regex};
     activeScanOptions_ = options;
+    // Batch 20261110d: a dock search joins the shared bounded history. The hub
+    // is the ONE store; the Ctrl+F bar records through the same call, so both
+    // surfaces feed one list (and a repeated query is deduped, not appended).
+    vedit::search::SearchHub::instance().noteQuery(options.query);
     scanInputChanged_ = false;
     emptyLabel_->hide();
     tree_->show();
@@ -528,11 +571,12 @@ bool SearchPanel::beginScan(const SearchOptions &options, ReplaceScanPhase phase
 
     // AC-1.2 evidence hook (unconditional, see setRootPath): the root actually
     // handed to the scan, plus the shared options (ux-batch-2 B2).
-    qInfo("search: query root='%s' query='%s' case=%d whole=%d regex=%d all=%d filter='%s'",
+    qInfo("search: query root='%s' query='%s' case=%d whole=%d regex=%d all=%d filter='%s' "
+          "files=%d",
           qPrintable(options.rootPath), qPrintable(options.query),
           options.caseSensitive ? 1 : 0, options.wholeWords ? 1 : 0,
           options.regex ? 1 : 0, options.allMatches ? 1 : 0,
-          qPrintable(options.fileFilter));
+          qPrintable(options.fileFilter), static_cast<int>(options.files.size()));
 
     if (!search_.start(options)) {
         searching_ = false;
@@ -1158,7 +1202,12 @@ bool SearchPanel::sameLiveIdentity(const FrozenScan &frozen, QString *error) con
         liveOptions.wholeWords != frozen.options.wholeWords ||
         liveOptions.regex != frozen.options.regex ||
         liveOptions.verilogOnly != frozen.options.verilogOnly ||
-        liveOptions.fileFilter != frozen.options.fileFilter) {
+        liveOptions.fileFilter != frozen.options.fileFilter ||
+        // Batch 20261110d: the SCOPE is part of the frozen identity. A member
+        // added to / removed from the project set between the scan and the
+        // replace means the hits describe a different file set, so the ranges
+        // are not trustworthy and the write is refused like any option change.
+        liveOptions.files != frozen.options.files) {
         *error = tr("the search scope or options changed since the scan; run the search again "
                     "before replacing");
         return false;
@@ -1837,6 +1886,12 @@ QString SearchPanel::summaryText(const SearchSummary &summary) const
     }
 
     QStringList notes;
+    if (summary.usedProjectFileSet) {
+        // Batch 20261110d: name the scope. The scan is the UNION of the folder
+        // and the project file set, and "nothing matched" must never be
+        // confusable with "a narrower/different scope was searched".
+        notes.append(tr("whole folder + %1 project files").arg(summary.filesInProjectSet));
+    }
     if (summary.truncated) {
         notes.append(tr("result limit %1 reached").arg(resultLimit_));
     }

@@ -14,8 +14,9 @@ namespace vedit::workspace::project {
 
 ProjectVariablesDialog::ProjectVariablesDialog(const QStringList &names,
                                                const QMap<QString, QString> &known,
-                                               QWidget *parent)
-    : QDialog(parent)
+                                               QWidget *parent,
+                                               const QMap<QString, QString> &layers)
+    : QDialog(parent), layers_(layers)
 {
     setObjectName(QStringLiteral("project-variables-dialog"));
     setWindowTitle(QCoreApplication::translate("VEdit", "Filelist variables"));
@@ -128,6 +129,19 @@ void ProjectVariablesDialog::appendRow(const QString &name, const QString &value
 
     containerLayout->addWidget(rowWidget);
 
+    // batch-20261114 E2: "will be satisfied by which layer". The value describes
+    // the name this row OPENED with; a renamed row becomes a project-table entry,
+    // which is exactly the `project` label a fresh row gets.
+    row.layer = new QLabel(container);
+    row.layer->setObjectName(
+        name.isEmpty() ? QStringLiteral("project-variable-layer-new")
+                       : QStringLiteral("project-variable-layer-%1").arg(name));
+    row.layer->setWordWrap(true);
+    row.layer->setStyleSheet(QStringLiteral("color: #5f6368;"));
+    row.layer->setText(QCoreApplication::translate("VEdit", "provided by: %1")
+                           .arg(layerLabel(layerFor(name, required))));
+    containerLayout->addWidget(row.layer);
+
     row.reason = new QLabel(container);
     row.reason->setObjectName(QStringLiteral("project-variable-reason-%1").arg(name));
     row.reason->setWordWrap(true);
@@ -154,6 +168,44 @@ void ProjectVariablesDialog::appendRow(const QString &name, const QString &value
 
     rows_.append(row);
     updateNote(QString());
+}
+
+QString ProjectVariablesDialog::layerLabel(const QString &layer)
+{
+    if (layer == QLatin1String("project")) {
+        return QCoreApplication::translate("VEdit", "Project (this table)");
+    }
+    if (layer == QLatin1String("imported")) {
+        return QCoreApplication::translate("VEdit", "Imported (Preferences → Environment)");
+    }
+    if (layer == QLatin1String("environment")) {
+        return QCoreApplication::translate("VEdit", "Environment (the process)");
+    }
+    if (layer == QLatin1String("missing")) {
+        return QCoreApplication::translate("VEdit", "Missing (no layer provides it)");
+    }
+    return layer;
+}
+
+QString ProjectVariablesDialog::layerFor(const QString &name, bool required) const
+{
+    // The expansion's own answer wins; otherwise the row's nature decides. The
+    // fallbacks exist so a caller that has no layer map (a standalone dialog) still
+    // paints an honest line: a table entry is the project layer, a required name
+    // with no provider is missing.
+    if (layers_.contains(name)) {
+        return layers_.value(name);
+    }
+    return required ? QStringLiteral("missing") : QStringLiteral("project");
+}
+
+QString ProjectVariablesDialog::rowLayer(const QString &name) const
+{
+    const Row *row = rowFor(name);
+    if (row == nullptr) {
+        return {};
+    }
+    return layerFor(name, row->required);
 }
 
 void ProjectVariablesDialog::removeRowAt(int index)

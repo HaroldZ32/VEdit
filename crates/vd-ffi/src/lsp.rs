@@ -244,6 +244,12 @@ pub const VD_LSP_RES_EDITS: i32 = 3;
 /// Response kind: diagnostics.
 pub const VD_LSP_RES_DIAGNOSTICS: i32 = 4;
 
+/// Response kind: the server holds NO diagnostics entry for the document
+/// (batch-20261118 AC-2). The list is empty, but this is "not analysed", never
+/// a clean "0 problems" verdict: only [`VD_LSP_RES_DIAGNOSTICS`] may be read as
+/// a published set.
+pub const VD_LSP_RES_DIAGNOSTICS_UNPUBLISHED: i32 = 9;
+
 /// Request kind: `textDocument/hover` (T16).
 pub const VD_LSP_REQ_HOVER: i32 = 7;
 
@@ -470,7 +476,9 @@ pub struct VdLspStatus {
 #[repr(C)]
 #[derive(Clone, Copy)]
 pub struct VdLspResponse {
-    /// 1 locations, 2 symbols, 3 edits, 4 diagnostics.
+    /// 1 locations, 2 symbols, 3 edits, 4 diagnostics, 5 hover,
+    /// 6 signature help, 9 diagnostics-unpublished (an empty list that is NOT a
+    /// clean "0 problems" verdict).
     pub kind: i32,
     /// Human-readable note (may be null).
     pub message: *mut c_char,
@@ -671,9 +679,13 @@ fn response_to_c(response: SessionResponse) -> VdLspResponse {
             out.kind = VD_LSP_RES_EDITS;
             out.edits = edits_to_c(edits);
         }
-        SessionResponse::Diagnostics(diagnostics) => {
-            out.kind = VD_LSP_RES_DIAGNOSTICS;
-            out.diagnostics = diagnostics_to_c(diagnostics);
+        SessionResponse::Diagnostics { rows, published } => {
+            out.kind = if published {
+                VD_LSP_RES_DIAGNOSTICS
+            } else {
+                VD_LSP_RES_DIAGNOSTICS_UNPUBLISHED
+            };
+            out.diagnostics = diagnostics_to_c(rows);
         }
         SessionResponse::Hover(hover) => {
             out.kind = VD_LSP_RES_HOVER;
@@ -853,6 +865,10 @@ unsafe fn start_session_impl(
     };
     let mut config =
         LspConfig::new(Path::new(ls_path), Path::new(workspace_root)).with_backend(backend);
+    // batch-20261115 AC-1.3: the imported environment selection reaches the
+    // language-server child through the same store the tool children use, so the
+    // two can never disagree about what was imported.
+    config = config.with_environment(vd_deeplint::binary::imported_environment());
     if let Some(rules) = rules {
         config = config.with_rules_config(rules);
     }
@@ -1232,6 +1248,99 @@ pub unsafe extern "C" fn vd_lsp_session_change(
             state.record_error(VdError::new(
                 VD_ERR_SERVICE,
                 &format!("cannot change the document: {error}"),
+            ));
+            POLL_MISUSE
+        }
+    }
+}
+
+/// Push the project's **tool settings** to a running session (batch-20261118
+/// AC-1, repaired by batch-20261118 F1; the compile scope corrected in
+/// batch-20261119).
+///
+/// `include_dirs` and `defines` may each be null. For the slang backend the
+/// worker sends ONE `slang.setBuildFile` naming a generated `.f` in a private
+/// temp directory: every include directory as `+incdir+`, every define as
+/// `-D<name>[=<value>]`, and - as the file list itself - the SESSION's own file
+/// set (the file the user sees plus its one-level module closure), one absolute
+/// path per line. The project's imported `.f` lists are deliberately NOT nested
+/// with `-f`: that made slang-server compile the whole project, so a same-named
+/// module from another directory could win slang's own last-processed rule and
+/// disagree with the module tree's deterministic choice - the realtime "module
+/// has no such port" false positives this corrects. `include_dirs` / `defines`
+/// are unaffected by that removal.
+///
+/// `build_files` is retained ONLY for C ABI compatibility (same symbol, same
+/// parameter count/order/types) and is ignored; the session's file set already
+/// travels with `vd_lsp_session_start_v2`'s `files`. `slang.addDefine` is
+/// deliberately not used: on 0.3.1 it persists
+/// `<workspace>/.slang/local/server.json` inside the user's project and keeps
+/// applying those defines to later sessions. Nothing here writes into the
+/// project directory. The verible backend is untouched: its build context
+/// already travels in its file list.
+///
+/// Returns `VD_STATUS_READY` when the command was queued; `POLL_MISUSE` for an
+/// unknown session id or an unreadable list (see `vd_service_error`).
+///
+/// # Safety
+///
+/// `service` must be null or live; every `*const VdStringList` must be null or
+/// satisfy [`read_file_list`]'s contract.
+#[no_mangle]
+pub unsafe extern "C" fn vd_lsp_session_set_build_context(
+    service: *mut VdService,
+    session: u64,
+    include_dirs: *const VdStringList,
+    defines: *const VdStringList,
+    build_files: *const VdStringList,
+) -> i32 {
+    let Some(state) = service_state(service) else {
+        return POLL_MISUSE;
+    };
+    // The project's imported `.f` list stays in the C ABI for compatibility but
+    // is IGNORED: the build context compiles the session's own file set, which
+    // travels with `vd_lsp_session_start_v2`'s `files` (see the doc comment).
+    let _ = build_files;
+    let Some(slot) = session_for(session) else {
+        state.record_error(VdError::new(VD_ERR_NOT_FOUND, "unknown LSP session id"));
+        return POLL_MISUSE;
+    };
+    let read_paths = |list: *const VdStringList| -> Result<Vec<PathBuf>, String> {
+        if list.is_null() {
+            // SAFETY: a null list means "none of these".
+            return Ok(Vec::new());
+        }
+        // SAFETY: the caller contract of this function is read_file_list's.
+        unsafe { read_file_list(list) }
+    };
+    let read_defines = |list: *const VdStringList| -> Result<Vec<String>, String> {
+        if list.is_null() {
+            // SAFETY: a null list means "none of these".
+            return Ok(Vec::new());
+        }
+        // SAFETY: the caller contract of this function is read_string_list's.
+        unsafe { read_string_list(list) }
+    };
+    let include_dirs = match read_paths(include_dirs) {
+        Ok(paths) => paths,
+        Err(message) => {
+            state.record_error(VdError::new(VD_ERR_INVALID_ARGUMENT, &message));
+            return POLL_MISUSE;
+        }
+    };
+    let defines = match read_defines(defines) {
+        Ok(values) => values,
+        Err(message) => {
+            state.record_error(VdError::new(VD_ERR_INVALID_ARGUMENT, &message));
+            return POLL_MISUSE;
+        }
+    };
+    match slot.handle.set_build_context(include_dirs, defines) {
+        Ok(()) => VD_STATUS_READY,
+        Err(error) => {
+            state.record_error(VdError::new(
+                VD_ERR_SERVICE,
+                &format!("cannot push the build context: {error}"),
             ));
             POLL_MISUSE
         }

@@ -40,6 +40,17 @@ pub const VD_ERR_WRONG_JOB_KIND: i32 = 5;
 pub const VD_ERR_INTERNAL: i32 = 6;
 /// Error code: the job id is unknown or was already consumed.
 pub const VD_ERR_JOB_UNKNOWN: i32 = 7;
+/// Error code: the operation is frozen in the C ABI but this build's engine
+/// layer does not implement it yet. The message names the lane that does
+/// (batch 20261110: `env-core`, `rename-core`, `scala-run`, `lint-engine`).
+pub const VD_ERR_UNIMPLEMENTED: i32 = 8;
+/// Error code: the job exceeded its wall-clock budget; its result was discarded.
+pub const VD_ERR_TIMEOUT: i32 = 9;
+/// Error code: the named top-level module could not be elaborated. Typed apart
+/// from [`VD_ERR_SERVICE`] because it is a USER answer, not a tool failure: the
+/// module tree may fall back to Auto exactly once for it, and must never do that
+/// for a timeout or a broken toolchain.
+pub const VD_ERR_UNKNOWN_TOP: i32 = 10;
 
 /// Capacity of [`VdError::message`], including the terminating NUL.
 pub const VD_ERROR_MESSAGE_CAPACITY: usize = 256;
@@ -134,6 +145,20 @@ pub struct VdProjectInfo {
     /// when none was found. This is what the Lint settings page and the lint
     /// pass consume; it is not a user-typed path.
     pub rules_path: *mut c_char,
+    /// Every filelist variable name the expansion referenced, unique and sorted
+    /// by name (batch-20261114 E1). This is the "referenced" set, NOT the
+    /// "available" one: a name no `.f` line mentions never appears here, and
+    /// `missing_variables` keeps its existing meaning — its names are the
+    /// `"missing"` entries of this list.
+    pub referenced_variables: VdStringList,
+    /// One entry per [`Self::referenced_variables`] name, same count and order:
+    /// `"project"` (the project's `NAME=VALUE` table), `"imported"` (the
+    /// Settings → Environment selection), `"environment"` (the process
+    /// environment) or `"missing"` (no layer has it). The layer recorded is the
+    /// one resolution actually used, i.e. project > imported > environment when
+    /// several layers carry the same name. The two lists are parallel exactly
+    /// like `files` / `relative_files`.
+    pub referenced_variable_layers: VdStringList,
 }
 
 /// One lint diagnostic.
@@ -163,6 +188,12 @@ pub struct VdDiagnostic {
     pub key: *mut c_char,
     /// 0 unknown, 1 LSP, 2 CLI, 3 both (the source column, AC-2.13).
     pub origin: i32,
+    /// The engine's typed option name for this diagnostic — the `optionName`
+    /// slang reports (`implicit-net`, `unused-variable`, …), the verible rule
+    /// that fired, or null when the engine reported none (a slang error
+    /// typically has no option name). It is what a waiver is written from, so
+    /// the display layer never parses it out of `message`.
+    pub option_name: *mut c_char,
 }
 
 /// All diagnostics of one deep-lint run.
@@ -264,6 +295,19 @@ pub struct VdLintBatchOptions {
     pub slang_suppressions: *const c_char,
     /// Slang `--error-limit=N`; 0 sends no flag. Slang-only knob.
     pub error_limit: u32,
+    /// Verible `--autofix=` mode: `0` sends no flag (verible's own `no`),
+    /// `1` = `patch`, `2` = `patch-interactive`, `3` = `inplace`,
+    /// `4` = `inplace-interactive`, `5` = `generate-waiver`; any other value is
+    /// rejected. Verible-only knob.
+    pub verible_autofix: u8,
+    /// Verible `--autofix_output_file=`: the patch file the `patch*` modes write,
+    /// or the waiver file `generate-waiver` writes; null/empty sends no flag.
+    /// Verible-only knob.
+    pub autofix_output_file: *const c_char,
+    /// Slang's own `--waiver-file`: ONE TOML waiver file (`[[waivers]]` blocks),
+    /// or null/empty for no flag. Distinct from `waiver_files` above, which is
+    /// verible's `--waiver_files=` list. Slang-only knob.
+    pub slang_waiver_file: *const c_char,
 }
 
 /// State of one Verible LSP session.
@@ -448,6 +492,21 @@ pub(crate) unsafe fn free_string(text: *mut c_char) {
     if !text.is_null() {
         drop(CString::from_raw(text));
     }
+}
+
+/// Release an owned byte block produced by this crate (a NUL-separated
+/// environment blob, which is not a C string and carries its own length).
+///
+/// # Safety
+///
+/// `block` must be null or a pointer this crate returned with exactly `len`
+/// bytes, and it must not be freed twice.
+pub(crate) unsafe fn free_bytes(block: *mut c_char, len: usize) {
+    if block.is_null() || len == 0 {
+        return;
+    }
+    // SAFETY: the caller states the block came from `Box<[u8]>::into_raw`.
+    drop(unsafe { Box::from_raw(ptr::slice_from_raw_parts_mut(block as *mut u8, len)) });
 }
 
 /// Release a list produced by [`c_string_list`], including every string in it.
@@ -786,6 +845,18 @@ pub struct VdModuleCatalog {
     pub reachable_files: VdStringList,
     /// RM-17: module definitions outside the top (empty in Auto), sorted.
     pub outside_modules: VdStringList,
+    /// G1-c: the files whose every module declaration lost the duplicate pick, so
+    /// the compiler input no longer needs them. Sorted; empty when nothing is
+    /// shadowed. APPENDED at the end of the struct: every offset above it is
+    /// unchanged, but the STRUCT GREW (88 -> 112 bytes) and the provider writes
+    /// the whole current struct in `vd_catalog_poll`, so a consumer built against
+    /// an older header must be RECOMPILED - offsets are stable, the size is not
+    /// (`VD_ABI_VERSION` = 2).
+    pub shadowed_files: VdStringList,
+    /// G1-c: the sentence saying those files are excluded from the compiler
+    /// input, or null. Meant to be shown right AFTER `warning` (the B-2
+    /// duplicate sentence), never merged into it: that sentence is frozen.
+    pub shadowed_warning: *mut c_char,
 }
 
 /// Inputs of one catalog run (borrowed for the duration of the call).
@@ -810,6 +881,393 @@ pub struct VdCatalogOptions {
     pub max_files: usize,
     /// RM-17: top-level module NAME to elaborate from, or null = Auto.
     pub top: *const c_char,
+}
+
+// --- batch 20261110: shell environment capture (the `env-core` lane) ---------
+//
+// The surface is frozen here, ahead of the engine that fills it: every entry
+// point below is request -> poll -> free, with real cancel and a wall-clock
+// timeout, so the settings UI can run the capture without ever blocking. The
+// engine that implements it is `crates/vd-ffi/src/env.rs`'s owner lane
+// (`env-core`); until it lands, the job fails with `VD_ERR_UNIMPLEMENTED` and
+// names the lane, and no call panics.
+
+/// Shell family the capture initialises: bash.
+pub const VD_ENV_SHELL_BASH: i32 = 0;
+/// Shell family the capture initialises: zsh.
+pub const VD_ENV_SHELL_ZSH: i32 = 1;
+/// Shell family the capture initialises: csh.
+pub const VD_ENV_SHELL_CSH: i32 = 2;
+/// Shell family the capture initialises: tcsh.
+pub const VD_ENV_SHELL_TCSH: i32 = 3;
+/// Shell family the capture initialises: fish.
+pub const VD_ENV_SHELL_FISH: i32 = 4;
+/// Shell family the capture initialises: sh (POSIX).
+pub const VD_ENV_SHELL_SH: i32 = 5;
+/// Shell family the capture initialises: ksh.
+pub const VD_ENV_SHELL_KSH: i32 = 6;
+/// An explicit command line: `shell_path` is the program and `extra_argv` is its
+/// complete argv (no `-c` is added).
+pub const VD_ENV_SHELL_CUSTOM: i32 = 7;
+
+/// Inputs of one shell environment capture (borrowed for the duration of the
+/// call). Every string is null or valid UTF-8; a zeroed struct is a plain
+/// non-interactive `bash` capture that sources no file.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct VdEnvCaptureOptions {
+    /// One of the `VD_ENV_SHELL_*` values.
+    pub shell: i32,
+    /// Explicit shell binary (absolute, or a bare name resolved on PATH); null
+    /// resolves the shell family's default, and `VD_ENV_SHELL_CUSTOM` requires it.
+    pub shell_path: *const c_char,
+    /// The rc file to source before the environment is read, or null for none.
+    pub source_file: *const c_char,
+    /// Working directory of the capture, or null to inherit this process's.
+    pub workdir: *const c_char,
+    /// Extra argv entries appended after the shell's own (`-i`, `-l`, …).
+    pub extra_argv: VdStringList,
+    /// Wall-clock budget in milliseconds; 0 selects the engine's default.
+    pub timeout_ms: u64,
+    /// 1 starts a login shell, 0 (default) starts a plain one.
+    pub login: u8,
+    /// 1 starts an interactive shell (`-i`), 0 (default) starts a
+    /// non-interactive one.
+    pub interactive: u8,
+}
+
+/// The complete environment one capture produced.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct VdEnvCaptureResult {
+    /// Number of entries in `items`.
+    pub count: usize,
+    /// Owned array of owned `NAME=VALUE` strings in the order the shell emitted
+    /// them. A name the chain overrides keeps BOTH entries, so the caller can
+    /// see the override instead of a silently collapsed value.
+    pub items: *mut *mut c_char,
+    /// The environment as ONE NUL-separated blob, exactly as the child printed
+    /// it: every entry is `NAME=VALUE` followed by `\0`, and the blob ends with
+    /// a second `\0`. A value that contains spaces or newlines survives intact.
+    /// The caller reads `raw_len` bytes; the block is a plain byte buffer, not a
+    /// C string.
+    pub raw: *mut c_char,
+    /// Length of `raw` in bytes, NULs included; 0 when no blob was produced.
+    pub raw_len: usize,
+    /// The shell binary that ran (absolute when it was resolved), or null.
+    pub shell: *mut c_char,
+    /// The child's exit code; `-1` when a signal ended it.
+    pub exit_code: i32,
+    /// Truncated stderr of the capture, or null when it printed none.
+    pub stderr: *mut c_char,
+    /// Non-fatal problems (an entry without `=`, a masked name, …).
+    pub warnings: VdStringList,
+}
+
+// --- batch 20261110c: the persisted environment selection (the `env-ui` lane) -
+//
+// The selection is the two layers the Settings page writes (`environment.json`):
+// the GLOBAL layer every project inherits, and one layer per project root that
+// overrides it (AC-4.4 project wins over global). `EnvironmentSelection::save`
+// and `::load` own the file format — the sibling-temporary-plus-rename atomic
+// write, and the "a broken file is the empty selection plus warnings" rule — so
+// these verbs only transport ROWS: the Qt side never re-implements the JSON
+// schema and the two sides cannot drift apart.
+
+/// One stored selection row, as a load job returns it.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct VdEnvSelectionEntry {
+    /// The layer this row belongs to: null for the global layer, otherwise the
+    /// project root exactly as it is stored.
+    pub project_root: *mut c_char,
+    /// Variable name; never null and never empty.
+    pub name: *mut c_char,
+    /// The value exactly as stored. The store is the user's own file, so a
+    /// secret-named value is stored as the user selected it; the UI masks it for
+    /// DISPLAY, not before storage (a child needs the real value).
+    pub value: *mut c_char,
+}
+
+/// The selection a load job read, plus the non-fatal problems it found.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct VdEnvSelection {
+    /// Number of rows in `items`.
+    pub count: usize,
+    /// Owned rows: the global layer first, then every project layer in ascending
+    /// root order, each layer in its stored order.
+    pub items: *mut VdEnvSelectionEntry,
+    /// Non-fatal problems. A broken file degrades to an EMPTY selection plus a
+    /// warning here; it is never a failed job (AC-4.4).
+    pub warnings: VdStringList,
+}
+
+/// One name/value pair of an effective-environment snapshot (batch-20261115,
+/// AC-1.3 / contract §4.1.2).
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct VdEnvSnapshotEntry {
+    /// Variable name; owned, never null and never empty.
+    pub name: *mut c_char,
+    /// The value a child would receive. It is the REAL value (a secret-named
+    /// value included): the caller uses it to start a child and must never log
+    /// it (AC-1.5).
+    pub value: *mut c_char,
+}
+
+/// The environment a child of this process should see: the process environment
+/// with the imported selection applied on top (`process < global < project`).
+///
+/// Released with [`crate::env::vd_env_snapshot_free`]. This is a READ: it never
+/// spawns a process and never touches the disk.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct VdEnvSnapshot {
+    /// Number of rows in `items`.
+    pub count: usize,
+    /// Owned rows, in ascending name order.
+    pub items: *mut VdEnvSnapshotEntry,
+}
+
+/// One row a save job stores. Borrowed for the duration of the call, and the
+/// same shape as [`VdEnvSelectionEntry`] so a loaded selection can be saved back
+/// unchanged.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct VdEnvSelectionInput {
+    /// The layer of this row: null or empty for the global layer, otherwise the
+    /// project root. The empty string is accepted as "global" because a C caller
+    /// has no `Option`.
+    pub project_root: *const c_char,
+    /// Variable name: non-empty, without `=` and without control characters (a
+    /// name with `=` cannot exist in a process environment either).
+    pub name: *const c_char,
+    /// The value, byte for byte: `=` and newlines are preserved (AC-4.9).
+    pub value: *const c_char,
+}
+
+// --- batch 20261110: engineering-wide rename (the `rename-core` lane) --------
+
+/// Options of one engineering-wide rename job. A zeroed struct is the default:
+/// whole identifiers only, really apply, engine defaults for the bounds, and no
+/// project `-I`/`-D` (a project that needs an include dir must pass it).
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct VdRenameOptions {
+    /// 1 (default) treats `from`/`to` as whole SystemVerilog identifiers only;
+    /// 0 is refused, because this ABI never falls back to text replacement.
+    pub whole_identifier: u8,
+    /// 1 makes an APPLY job check that every target file is writable without
+    /// writing anything; 0 (default) really applies.
+    pub dry_run: u8,
+    /// Preview entries kept per file; 0 selects the engine's default (200).
+    pub max_entries_per_file: usize,
+    /// Wall-clock budget in milliseconds; 0 selects the engine's default.
+    pub timeout_ms: u64,
+    /// The project expansion's EFFECTIVE `-I` include directories — the SAME
+    /// list the lint / language-server children receive (T72). Empty keeps the
+    /// pre-T72 behaviour: only the including file's own directory is searched,
+    /// so a project whose file needs `-I inc` could not be elaborated.
+    pub include_dirs: VdStringList,
+    /// `-D` defines, `NAME` or `NAME=VALUE` — the SAME spelling and meaning the
+    /// lint batch options carry (`VdLintBatchOptions.defines`). Empty = none.
+    pub defines: VdStringList,
+}
+
+/// The index phase: what the project contains and how often the symbol occurs.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct VdRenameIndex {
+    /// Files the index parsed.
+    pub files: usize,
+    /// Distinct identifiers the index holds.
+    pub identifiers: usize,
+    /// Occurrences of the symbol being renamed.
+    pub occurrences: usize,
+    /// Non-fatal problems (an unreadable file, an unsupported construct, …).
+    pub warnings: VdStringList,
+}
+
+/// One planned replacement site.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct VdRenameHit {
+    /// 0-based line.
+    pub line: u32,
+    /// 0-based start column (UTF-16 code units).
+    pub column: u32,
+    /// 0-based end column (UTF-16 code units, exclusive).
+    pub end_column: u32,
+    /// Byte offset of the identifier in the file — the apply anchor.
+    pub byte_offset: u64,
+    /// Length of the identifier in bytes.
+    pub byte_len: u64,
+    /// The source line before the edit (trimmed and capped; never null).
+    pub before: *mut c_char,
+    /// The same line after the edit (never null).
+    pub after: *mut c_char,
+}
+
+/// The preview of one file.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct VdRenameFilePlan {
+    /// Absolute path of the file.
+    pub file: *mut c_char,
+    /// Number of entries in `items`.
+    pub count: usize,
+    /// Owned array of hits.
+    pub items: *mut VdRenameHit,
+    /// 1 when the engine kept fewer hits than it found (`count` is a prefix).
+    pub truncated: u8,
+}
+
+/// A rename plan: every file and every replacement, ready to apply.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct VdRenamePlan {
+    /// The project root the plan was built for (never null), so the apply job
+    /// never has to guess it.
+    pub root: *mut c_char,
+    /// The identifier being renamed (never null).
+    pub from: *mut c_char,
+    /// The new identifier (never null).
+    pub to: *mut c_char,
+    /// Files the index parsed.
+    pub files: usize,
+    /// Total occurrences in the plan.
+    pub occurrences: usize,
+    /// Number of entries in `items`.
+    pub count: usize,
+    /// Owned array of per-file previews, in file order.
+    pub items: *mut VdRenameFilePlan,
+    /// Non-fatal problems.
+    pub warnings: VdStringList,
+}
+
+/// The result of one atomic apply.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct VdRenameApplyResult {
+    /// Files written (0 for a dry run).
+    pub applied_files: usize,
+    /// Replacements written (0 for a dry run).
+    pub applied_occurrences: usize,
+    /// The file that could not be written, or null when every write succeeded.
+    pub failed_file: *mut c_char,
+    /// 1 when a failure restored every previously written file byte for byte.
+    pub rolled_back: u8,
+    /// 1 when every written file was re-read and the expected replacements were
+    /// found there.
+    pub verified: u8,
+}
+
+// --- batch 20261110: one-click Scala run (the `scala-run` lane) --------------
+
+/// Inputs of one Scala run (borrowed for the duration of the call).
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct VdScalaRunOptions {
+    /// Project root the program runs in; null inherits this process's cwd.
+    pub root: *const c_char,
+    /// The complete argv; `items[0]` is the program. Required and never empty.
+    pub argv: VdStringList,
+    /// Extra `NAME=VALUE` entries applied on top of the sanitized child
+    /// environment; empty for none.
+    pub env: VdStringList,
+    /// Wall-clock budget in milliseconds; 0 runs until the program exits.
+    pub timeout_ms: u64,
+    /// 1 merges stderr into the streamed output; 0 (default) streams stdout only.
+    pub merge_stderr: u8,
+}
+
+/// State and the NEW output of one Scala run.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct VdScalaRunStatus {
+    /// 0 running, 1 exited, 2 failed, 3 cancelled, 4 timed out.
+    pub state: i32,
+    /// The exit code when `state` is 1; `-1` otherwise.
+    pub exit_code: i32,
+    /// The output produced since the PREVIOUS poll of this job (never null; the
+    /// empty string when there was none). Append it to the terminal: the next
+    /// poll yields only the bytes after it, so nothing is delivered twice.
+    pub output: *mut c_char,
+    /// Length of `output` in bytes (UTF-8; invalid bytes are replaced).
+    pub output_len: usize,
+    /// 1 when the retained stream hit the engine's cap and older output was
+    /// dropped.
+    pub truncated: u8,
+    /// The program that ran (`argv[0]`), or null before it starts.
+    pub tool: *mut c_char,
+}
+
+// --- batch 20261110: LINT waivers (both engines) ----------------------------
+
+/// Verible's waiver file: `waive --rule=… --line=… --location="…"` lines.
+pub const VD_WAIVER_FORMAT_VERIBLE: i32 = 0;
+/// Slang's waiver TOML: `[[waivers]]` blocks with exactly one scope field
+/// (`file` or `hier`) plus `diagnostic`/`regex` — and nothing else: slang refuses
+/// an unknown key, which the append path checks before it writes.
+pub const VD_WAIVER_FORMAT_SLANG: i32 = 1;
+
+/// One waiver to append (borrowed for the duration of the call).
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct VdWaiverEntry {
+    /// Verible rule name (`line-length`, `module-filename`, …); null for a slang
+    /// entry, which is scoped by `option_name` instead.
+    pub rule: *const c_char,
+    /// The file the waiver is scoped to. Required. Verible derives its anchored
+    /// `--location` regex from it; slang writes it as the `file` scope.
+    pub file: *const c_char,
+    /// 1-based line the waiver applies to; 0 writes a file-wide verible waiver
+    /// (no `--line`) and is ignored for slang, whose waivers have no line scope.
+    pub line: u32,
+    /// The last line of a verible line RANGE (`--line=N:M`); 0 or the same value
+    /// as `line` writes the single line `N`. Ignored for slang.
+    pub line_end: u32,
+    /// The engine's option name (`implicit-net`, `unused-variable`, …). Required
+    /// for a slang entry: a diagnostic without one (typically an error) can only
+    /// be waived for its whole scope, and this ABI refuses to silently widen it.
+    pub option_name: *const c_char,
+    /// An explicit verible `--location` value (a RE2 regex); null derives
+    /// `(^|/)<escaped file name>$` from `file`.
+    pub location: *const c_char,
+}
+
+/// Options of one waiver operation. A zeroed struct is the default: entries are
+/// deduplicated and the target's parent directory must already exist.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct VdWaiverOptions {
+    /// 1 (default) skips an entry the file already carries.
+    pub dedupe: u8,
+    /// 1 creates the waiver file's missing parent directories; 0 (default)
+    /// requires the parent to exist and reports the missing path.
+    pub create_parent_dirs: u8,
+}
+
+/// The outcome of one waiver operation.
+#[repr(C)]
+#[derive(Clone, Copy)]
+pub struct VdWaiverResult {
+    /// 1 when a file was written; 0 for a preview-only generate.
+    pub written: u8,
+    /// 1 when the entry was already present, so nothing was written.
+    pub deduped: u8,
+    /// The file the operation touched, or null.
+    pub path: *mut c_char,
+    /// The resulting file content (for a settings registration: the new stored
+    /// value). Never null, so a caller can always preview before writing.
+    pub content: *mut c_char,
+    /// Entries in the resulting file (for a registration: paths in the value).
+    pub entries: usize,
+    /// Diagnostics that could not become a waiver (generate only).
+    pub skipped: usize,
+    /// Why an entry was skipped or a path refused; non-fatal.
+    pub warnings: VdStringList,
 }
 
 #[cfg(test)]

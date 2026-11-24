@@ -7,11 +7,9 @@
 //! `tests/fake_binary.rs`).
 
 use std::fs;
-use std::io::Read;
 use std::path::Path;
-use std::process::{Child, Command, Stdio};
+use std::process::{Command, Stdio};
 use std::sync::atomic::{AtomicBool, Ordering};
-use std::sync::mpsc::{self, Receiver};
 use std::sync::{Arc, Mutex, MutexGuard};
 use std::thread;
 use std::time::{Duration, Instant};
@@ -20,18 +18,17 @@ use crate::binary::{
     resolve_binary_for_current_process, resolve_verible_lint_for_current_process,
     sanitize_tool_child_env, BinaryResolution,
 };
-use crate::diagnostic::{convert_diagnostic, Diagnostic, Severity, SourceLines};
-use crate::engine::{parse_verible_output, LintEngine};
+use crate::diagnostic::{
+    convert_diagnostic, parse_diagnostics_reader, Diagnostic, Severity, SourceLines,
+};
+use crate::engine::{parse_verible_output, project_command_args_for, LintEngine};
+use crate::hierarchy::{project_root, run_tool_once};
+use crate::process::{receive_capped, spawn_reader, terminate, termination_signal};
+use crate::tool_paths::absolute_path;
 use crate::{command_args_for, EngineOptions, LintFailure, LintOptions};
 
-/// Cap for captured stdout/stderr (each); longer streams are truncated.
-const STREAM_CAPTURE_LIMIT: usize = 64 * 1024;
 /// How often the child is checked for exit / cancellation / timeout.
 const POLL_INTERVAL: Duration = Duration::from_millis(5);
-/// How long to wait for the output readers after the child was reaped. A
-/// grandchild that inherited the pipe could otherwise block us for as long as it
-/// lives; the run is already over, so the output is best-effort past this point.
-const READER_GRACE: Duration = Duration::from_millis(250);
 
 /// One lint result: diagnostics, limits, the binary resolution and any failure.
 #[derive(Debug)]
@@ -307,24 +304,8 @@ impl LintService {
         // a bounded wait below keeps a grandchild that inherited a pipe from
         // stalling the lint result (and the no-zombie guarantee only covers the
         // child we spawned).
-        let (stdout_sender, stdout_reader) = mpsc::channel();
-        let (stderr_sender, stderr_reader) = mpsc::channel();
-        if let Some(stdout) = child.stdout.take() {
-            thread::spawn(move || {
-                let result = read_capped(stdout, STREAM_CAPTURE_LIMIT);
-                if stdout_sender.send(result).is_err() {
-                    eprintln!("vd-deeplint: output reader lost its receiver");
-                }
-            });
-        }
-        if let Some(stderr) = child.stderr.take() {
-            thread::spawn(move || {
-                let result = read_capped(stderr, STREAM_CAPTURE_LIMIT);
-                if stderr_sender.send(result).is_err() {
-                    eprintln!("vd-deeplint: stderr reader lost its receiver");
-                }
-            });
-        }
+        let stdout_reader = child.stdout.take().map(spawn_reader);
+        let stderr_reader = child.stderr.take().map(spawn_reader);
 
         report.stage = "run";
         let wait_started = Instant::now();
@@ -333,7 +314,14 @@ impl LintService {
                 break ExitOutcome::Cancelled(terminate(&mut child).err());
             }
             match child.try_wait() {
-                Ok(Some(status)) => break ExitOutcome::Finished(status.code()),
+                Ok(Some(status)) => {
+                    break ExitOutcome::Finished {
+                        exit_code: status.code(),
+                        // `code()` is `None` for BOTH a signal death and an exit
+                        // without a code; the signal is the missing witness.
+                        signal: termination_signal(&status),
+                    };
+                }
                 Ok(None) => {}
                 Err(error) => {
                     break ExitOutcome::WaitFailed {
@@ -348,8 +336,12 @@ impl LintService {
             thread::sleep(POLL_INTERVAL);
         };
 
-        let (stdout, stdout_truncated) = receive_capped(&stdout_reader);
-        let (stderr, stderr_truncated) = receive_capped(&stderr_reader);
+        let (stdout, stdout_truncated) = stdout_reader
+            .as_ref()
+            .map_or_else(|| (String::new(), false), receive_capped);
+        let (stderr, stderr_truncated) = stderr_reader
+            .as_ref()
+            .map_or_else(|| (String::new(), false), receive_capped);
         report.stdout = stdout;
         report.stderr = stderr;
         if stdout_truncated || stderr_truncated {
@@ -359,13 +351,18 @@ impl LintService {
         }
 
         match outcome {
-            ExitOutcome::Finished(code) => {
-                report.exit_code = code;
+            ExitOutcome::Finished { exit_code, signal } => {
+                report.exit_code = exit_code;
                 match options.engine {
-                    LintEngine::Slang => {
-                        read_json(&mut report, &json_path, file, options, tool_dir.as_deref())
-                    }
-                    LintEngine::Verible => read_verible(&mut report, file, options),
+                    LintEngine::Slang => read_json(
+                        &mut report,
+                        &json_path,
+                        file,
+                        options,
+                        tool_dir.as_deref(),
+                        signal,
+                    ),
+                    LintEngine::Verible => read_verible(&mut report, file, options, signal),
                 }
             }
             ExitOutcome::TimedOut(cleanup_error) => {
@@ -388,6 +385,261 @@ impl LintService {
     }
 }
 
+/// The outcome of ONE whole-project slang invocation.
+///
+/// The project-wide lint pass (`batch.rs`) prefers this over N per-file
+/// processes: a `` `define `` in one file can only reach the next when both are
+/// compiled by the same process. The batch still owns progress, de-duplication
+/// and the pass cap; this layer owns the invocation, the split and the reasons a
+/// split is not usable.
+pub(crate) enum ProjectPass {
+    /// The pass produced usable rows, each attributed to its OWN file.
+    Ready(ProjectReport),
+    /// The caller cancelled the pass; no verdict is published.
+    Cancelled,
+    /// The pass could not be used. The batch falls back to per-file linting and
+    /// NAMES this reason, so a fallback is never silent.
+    Unusable(String),
+}
+
+/// The usable result of one whole-project slang invocation.
+pub(crate) struct ProjectReport {
+    /// Every binary-resolution attempt, in the product order.
+    pub resolution: BinaryResolution,
+    /// One row per retained finding, paired with the project file it belongs to.
+    pub rows: Vec<(std::path::PathBuf, Diagnostic)>,
+    /// Raw findings the document contained (retained + dropped).
+    pub total_diagnostics: usize,
+    /// Distinct findings dropped by the per-file count bound (or the stream's
+    /// distinct-finding bound).
+    pub dropped: usize,
+    /// Whether `rows` was truncated by a count bound.
+    pub truncated: bool,
+}
+
+/// The file a finding must be attributed to: the first range's file (that is
+/// what [`convert_diagnostic`] converts), falling back to the location string.
+fn reported_file(parsed: &crate::diagnostic::ParsedDiagnostic) -> Option<&str> {
+    parsed
+        .ranges
+        .first()
+        .map(|range| range.file.as_str())
+        .filter(|file| !file.is_empty())
+        .or_else(|| {
+            parsed
+                .location
+                .as_ref()
+                .map(|location| location.file.as_str())
+                .filter(|file| !file.is_empty())
+        })
+}
+
+impl LintService {
+    /// Run ONE slang process over `files` and split the findings back by the
+    /// file each one names.
+    ///
+    /// # Why one process
+    ///
+    /// `slang` starts every input file as its own compilation unit unless
+    /// `--single-unit` is passed (measured on 12.1.0): only the single-unit run
+    /// carries a `` `define `` from an earlier file into a later one. N per-file
+    /// processes therefore can never see a project's cross-file macros.
+    ///
+    /// # Why the caller must handle a fallback
+    ///
+    /// The single process has ONE cwd (the file set's first directory), while
+    /// the per-file pass gave every file its own directory. That is enough to
+    /// keep, but not enough to trust blindly: this method returns
+    /// [`ProjectPass::Unusable`] with a named reason whenever the split cannot
+    /// reproduce the per-file verdict faithfully:
+    ///
+    /// * the process failed, timed out or wrote no/invalid JSON;
+    /// * a finding has no position, or names a file outside the project set
+    ///   (`location.file` is the only attribution the document carries, so
+    ///   guessing a file would publish a row under the wrong file);
+    /// * a row's source file cannot be read to convert its position.
+    ///
+    /// Relative `` `include `` resolution is NOT such a case: slang resolves it
+    /// against the including file's directory (measured on 12.1.0, independent
+    /// of the child's cwd), so the set pass and the per-file pass agree.
+    ///
+    /// The batch then lints per file and records the reason (never a silent
+    /// fallback, never a false verdict).
+    pub(crate) fn lint_project(
+        &self,
+        files: &[std::path::PathBuf],
+        options: &EngineOptions,
+        cancel: Arc<AtomicBool>,
+    ) -> ProjectPass {
+        debug_assert_eq!(
+            options.engine,
+            LintEngine::Slang,
+            "only slang has a one-process project invocation"
+        );
+        let temp = match tempfile::Builder::new()
+            .prefix("vd-deeplint-project-")
+            .tempdir()
+        {
+            Ok(temp) => temp,
+            Err(error) => {
+                return ProjectPass::Unusable(format!(
+                    "creating a temporary directory failed: {error}"
+                ));
+            }
+        };
+        let json_path = temp.path().join("diagnostics.json");
+        let argv = project_command_args_for(files, Some(&json_path), options);
+        // A whole-set run is bounded by the per-file budget times the file
+        // count: the same worst case the per-file pass had, and a project of
+        // N files cannot be expected to finish inside one file's budget.
+        let files_bound = u32::try_from(files.len()).unwrap_or(u32::MAX).max(1);
+        let timeout = options.timeout.saturating_mul(files_bound);
+        let run = run_tool_once(
+            files,
+            options.slang_binary.as_deref(),
+            &argv,
+            timeout,
+            Some(&cancel),
+        );
+        if matches!(run.failure, Some(LintFailure::Cancelled)) {
+            return ProjectPass::Cancelled;
+        }
+        if let Some(failure) = run.failure {
+            return ProjectPass::Unusable(format!(
+                "the whole-project {} run failed: {}",
+                run.tool,
+                failure.user_message()
+            ));
+        }
+        let base = project_root(files);
+        let clean = ProjectReport {
+            resolution: run.resolution.clone(),
+            rows: Vec::new(),
+            total_diagnostics: 0,
+            dropped: 0,
+            truncated: false,
+        };
+        match fs::metadata(&json_path) {
+            Ok(metadata) if metadata.len() > 0 => {}
+            // A zero-byte report carries no findings; only a failed process
+            // makes that a degraded verdict.
+            Ok(_) if run.exit_code == Some(0) => return ProjectPass::Ready(clean),
+            Ok(_) => {
+                return ProjectPass::Unusable(
+                    LintFailure::MissingOutput {
+                        exit_code: run.exit_code,
+                        signal: run.signal,
+                        stderr: run.stderr.clone(),
+                    }
+                    .user_message(),
+                );
+            }
+            Err(_) if run.exit_code == Some(0) => return ProjectPass::Ready(clean),
+            Err(_) => {
+                return ProjectPass::Unusable(
+                    LintFailure::MissingOutput {
+                        exit_code: run.exit_code,
+                        signal: run.signal,
+                        stderr: run.stderr.clone(),
+                    }
+                    .user_message(),
+                );
+            }
+        }
+
+        // The document is STREAMED, and the bound is the pass bound: the batch
+        // applies the per-file caps after the split (see below), so reading with
+        // the per-file cap here would drop OTHER files' rows before they are
+        // attributed.
+        let max_pass = if options.max_pass_diagnostics == 0 {
+            crate::DEFAULT_MAX_PASS_DIAGNOSTICS
+        } else {
+            options.max_pass_diagnostics
+        };
+        let stream = match fs::File::open(&json_path)
+            .map_err(|error| error.to_string())
+            .and_then(|handle| {
+                parse_diagnostics_reader(handle, max_pass).map_err(|error| error.to_string())
+            }) {
+            Ok(stream) => stream,
+            Err(error) => {
+                return ProjectPass::Unusable(format!(
+                    "the whole-project diagnostics JSON could not be read: {error}"
+                ));
+            }
+        };
+
+        let mut buckets: Vec<Vec<crate::diagnostic::ParsedDiagnostic>> =
+            (0..files.len()).map(|_| Vec::new()).collect();
+        let mut index_of: std::collections::HashMap<std::path::PathBuf, usize> =
+            std::collections::HashMap::new();
+        for (index, file) in files.iter().enumerate() {
+            index_of.entry(absolute_path(file, &base)).or_insert(index);
+        }
+        for parsed in stream.diagnostics {
+            let Some(reported) = reported_file(&parsed) else {
+                return ProjectPass::Unusable(
+                    "a finding without a position cannot be attributed to a project file, so the whole-project pass cannot be split"
+                        .to_string(),
+                );
+            };
+            let resolved = absolute_path(Path::new(reported), &base);
+            let Some(&index) = index_of.get(&resolved) else {
+                return ProjectPass::Unusable(format!(
+                    "the whole-project pass reported a finding in `{}`, which is not in the project file set",
+                    resolved.display()
+                ));
+            };
+            buckets[index].push(parsed);
+        }
+        let mut rows: Vec<(std::path::PathBuf, Diagnostic)> = Vec::new();
+        let mut dropped = stream.dropped;
+        let mut truncated = stream.dropped > 0;
+        for (index, bucket) in buckets.into_iter().enumerate() {
+            if bucket.is_empty() {
+                continue;
+            }
+            let file = &files[index];
+            let resolved = absolute_path(file, &base);
+            let source = match SourceLines::from_path(&resolved) {
+                Ok(source) => source,
+                Err(crate::ConvertError::InvalidUtf8) => {
+                    return ProjectPass::Unusable(format!(
+                        "{} is not valid UTF-8, so its positions cannot be converted",
+                        resolved.display()
+                    ));
+                }
+                Err(error) => {
+                    return ProjectPass::Unusable(format!(
+                        "reading {} failed: {error}",
+                        resolved.display()
+                    ));
+                }
+            };
+            let mut kept = 0usize;
+            for parsed in bucket {
+                if kept >= options.max_diagnostics {
+                    dropped += parsed.repeat;
+                    truncated = true;
+                    continue;
+                }
+                kept += 1;
+                rows.push((
+                    file.clone(),
+                    convert_diagnostic(parsed, &source, Some(&base)),
+                ));
+            }
+        }
+        ProjectPass::Ready(ProjectReport {
+            resolution: run.resolution,
+            rows,
+            total_diagnostics: stream.total,
+            dropped,
+            truncated,
+        })
+    }
+}
+
 /// Convenience wrapper for a single run of the default (slang) engine.
 #[must_use]
 pub fn lint(file: &Path, options: &LintOptions) -> LintReport {
@@ -401,7 +653,11 @@ pub fn lint_with(file: &Path, options: &EngineOptions) -> LintReport {
 }
 
 enum ExitOutcome {
-    Finished(Option<i32>),
+    Finished {
+        exit_code: Option<i32>,
+        /// Unix signal that ended the child, when it did not exit on its own.
+        signal: Option<i32>,
+    },
     TimedOut(Option<String>),
     Cancelled(Option<String>),
     WaitFailed {
@@ -420,51 +676,6 @@ fn append_cleanup_error(report: &mut LintReport, cleanup_error: Option<String>) 
     report.stderr.push_str(&format!("[vd-deeplint] {error}\n"));
 }
 
-fn terminate(child: &mut Child) -> Result<(), String> {
-    if let Err(error) = child.kill() {
-        if error.kind() != std::io::ErrorKind::NotFound {
-            return Err(format!("killing slang failed: {error}"));
-        }
-    }
-    child
-        .wait()
-        .map(|_| ())
-        .map_err(|error| format!("reaping slang failed: {error}"))
-}
-
-fn receive_capped(reader: &Receiver<(String, bool)>) -> (String, bool) {
-    match reader.recv_timeout(READER_GRACE) {
-        Ok(result) => result,
-        Err(_) => (String::new(), true),
-    }
-}
-
-fn read_capped(mut reader: impl Read, limit: usize) -> (String, bool) {
-    let mut buffer = Vec::new();
-    let mut truncated = false;
-    let mut chunk = [0u8; 8192];
-    loop {
-        match reader.read(&mut chunk) {
-            Ok(0) => break,
-            Ok(read) => {
-                let remaining = limit.saturating_sub(buffer.len());
-                if remaining > 0 {
-                    buffer.extend_from_slice(&chunk[..read.min(remaining)]);
-                }
-                if read > remaining {
-                    truncated = true;
-                }
-            }
-            Err(error) if error.kind() == std::io::ErrorKind::Interrupted => continue,
-            Err(_) => {
-                truncated = true;
-                break;
-            }
-        }
-    }
-    (String::from_utf8_lossy(&buffer).into_owned(), truncated)
-}
-
 /// Parse `verible-verilog-lint`'s text findings (T138).
 ///
 /// Verible writes one `path:line:col[-end]: message [Category] [rule]` line per
@@ -474,7 +685,12 @@ fn read_capped(mut reader: impl Read, limit: usize) -> (String, bool) {
 /// lines on stdout and an empty stderr). Both streams are parsed. The tool exits
 /// `1` when it found any — a nonzero exit *with* findings is a normal result,
 /// exactly like slang's.
-fn read_verible(report: &mut LintReport, file: &Path, options: &EngineOptions) {
+fn read_verible(
+    report: &mut LintReport,
+    file: &Path,
+    options: &EngineOptions,
+    signal: Option<i32>,
+) {
     report.stage = "parse";
     let source = SourceLines::from_path(file);
     let source = match source {
@@ -499,6 +715,7 @@ fn read_verible(report: &mut LintReport, file: &Path, options: &EngineOptions) {
             captured.push_str(&report.stderr);
             report.failure = Some(LintFailure::MissingOutput {
                 exit_code: report.exit_code,
+                signal,
                 stderr: captured,
             });
         }
@@ -516,25 +733,25 @@ fn read_json(
     file: &Path,
     options: &EngineOptions,
     tool_dir: Option<&Path>,
+    signal: Option<i32>,
 ) {
     match fs::metadata(json_path) {
         Ok(_) => {}
-        Err(error) => {
+        Err(_) => {
             if report.exit_code == Some(0) {
                 // slang exited successfully but wrote no report: treat as a
                 // clean file rather than an error.
                 return;
             }
-            if report.exit_code.is_none() {
-                report.failure = Some(LintFailure::Io {
-                    message: format!("stat {} failed: {error}", json_path.display()),
-                });
-            } else {
-                report.failure = Some(LintFailure::MissingOutput {
-                    exit_code: report.exit_code,
-                    stderr: report.stderr.clone(),
-                });
-            }
+            // A crashed or timed-out engine leaves no report: the only witness
+            // is how the child terminated plus its own stderr. The temp path
+            // that could not be stat'ed is an implementation detail, never a
+            // user-visible reason.
+            report.failure = Some(LintFailure::MissingOutput {
+                exit_code: report.exit_code,
+                signal,
+                stderr: report.stderr.clone(),
+            });
             return;
         }
     }
@@ -544,8 +761,10 @@ fn read_json(
     let handle = match fs::File::open(json_path) {
         Ok(handle) => handle,
         Err(error) => {
+            // The report path is a per-run temp file: its name is an
+            // implementation detail, never a user-visible reason.
             report.failure = Some(LintFailure::InvalidJson {
-                message: format!("reading {} failed: {error}", json_path.display()),
+                message: format!("reading the lint report failed: {error}"),
                 stderr: report.stderr.clone(),
             });
             return;
@@ -571,6 +790,7 @@ fn read_json(
         if report.exit_code != Some(0) {
             report.failure = Some(LintFailure::MissingOutput {
                 exit_code: report.exit_code,
+                signal,
                 stderr: report.stderr.clone(),
             });
         }
@@ -603,6 +823,7 @@ fn read_json(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::process::read_capped;
 
     #[test]
     fn stream_capture_truncates_at_the_limit() {
@@ -631,6 +852,11 @@ mod tests {
             after: Duration::from_millis(250),
         };
         assert!(failure.user_message().contains("250"));
+        assert!(
+            failure.user_message().contains("seconds"),
+            "a timeout is phrased in seconds for the user: {}",
+            failure.user_message()
+        );
         let failure = LintFailure::BinaryNotFound {
             attempts: Vec::new(),
         };

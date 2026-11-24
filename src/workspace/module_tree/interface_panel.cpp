@@ -122,6 +122,10 @@ InterfacePanel::InterfacePanel(QWidget *parent)
 void InterfacePanel::setCatalog(const ModuleCatalog &catalog)
 {
     catalog_ = catalog;
+    ++catalogGeneration_;
+    // AC M1.8: the name/file indexes are built ONCE per catalog answer; every
+    // focus update after this is a hash lookup instead of a 20k-entry scan.
+    catalog_.buildIndex();
     refreshFocus();
 }
 
@@ -139,14 +143,41 @@ void InterfacePanel::setFailure(const QString &message)
 
 void InterfacePanel::setTreeSelection(const QString &moduleName)
 {
+    if (moduleName == treeSelection_) {
+        // Idempotent: the integration pushes the same selection on every catalog
+        // answer and every dock re-attach, and there is nothing to redraw.
+        return;
+    }
     treeSelection_ = moduleName;
-    refreshFocus();
+    // AC-2.1 (batch-20261115): with no catalog the empty state names the REASON
+    // ("No project open" / the no-filelist line / the failure). A focus update
+    // must not replace that reason with the generic "no catalog yet" hint - the
+    // next setCatalog() re-runs the focus rule anyway.
+    if (catalog_.valid) {
+        refreshFocus();
+    }
 }
 
 void InterfacePanel::setCaretContext(const QString &file, int caretLine0)
 {
+    if (file == caretFile_ && caretLine0 == caretLine0_) {
+        return;
+    }
     caretFile_ = file;
     caretLine0_ = caretLine0;
+    // Same rule as setTreeSelection(): the caret timer fires every 250 ms and its
+    // late tick used to overwrite a reason the panel had just been given.
+    if (!catalog_.valid) {
+        return;
+    }
+    // AC M1.8: focus rule (a) wins. While the module tree HAS a selection in this
+    // catalog, the caret cannot change the focus - so the fileOpened signal, the
+    // 250 ms caret tick and the selection push must not each run the focus rule.
+    // That double refreshFocus (selection + fileOpened) was the measured cost of
+    // opening a file from the module tree.
+    if (!treeSelection_.isEmpty() && catalog_.find(treeSelection_) != nullptr) {
+        return;
+    }
     refreshFocus();
 }
 
@@ -184,6 +215,13 @@ void InterfacePanel::refreshFocus()
                      "inside a module definition."));
         return;
     }
+    if (focusedName_ == module->name && renderedGeneration_ == catalogGeneration_
+        && table_->isVisible()) {
+        // Nothing the panel shows changed: same module, same catalog, table already
+        // up. Re-rendering the ports here cost a full table rebuild per caret tick
+        // on a 20k-module project (AC M1.8).
+        return;
+    }
     focusedName_ = module->name;
     emptyText_.clear();
     empty_->hide();
@@ -192,6 +230,7 @@ void InterfacePanel::refreshFocus()
                           .arg(module->name)
                           .arg(module->ports.size()));
     renderPorts();
+    renderedGeneration_ = catalogGeneration_;
 }
 
 void InterfacePanel::clearTable(const QString &reason)
@@ -218,6 +257,7 @@ void InterfacePanel::renderPorts()
     if (module == nullptr || table_ == nullptr) {
         return;
     }
+    ++moduleTreeProbe().portRenders;
     table_->clearContents();
     table_->setRowCount(module->ports.size());
     for (int row = 0; row < module->ports.size(); ++row) {

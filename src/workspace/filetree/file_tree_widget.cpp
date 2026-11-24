@@ -112,6 +112,11 @@ void FileTreeWidget::buildUi()
         if (model_ == nullptr) {
             return;
         }
+        // T9 fix (4): a dock/hidden page does no status work. The delegate reads
+        // the source at paint time, so a re-shown tree is correct immediately.
+        if (!isVisible()) {
+            return;
+        }
         // RM-9: the project set moves rarely (one revision per expansion). The
         // timer reads it only when the revision changed - never a rescan per
         // tick - and the synthetic group then carries the same status dots.

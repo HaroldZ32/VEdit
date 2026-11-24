@@ -111,4 +111,61 @@ private:
 /// (a read-only document) - the caller must not report success in that case.
 bool applyAutofixToDocument(KTextEditor::Document *document, const QString &fixedText);
 
+// --- AC-1.4: the autofix MODE validation -------------------------------------
+//
+// verible's `--autofix` accepts six values. Two of them are interactive: the
+// tool asks on its own stdin and waits for an answer, and the product has no
+// terminal, so they can never be driven from the panel - the page must offer
+// them as UNAVAILABLE with that reason instead of pretending, and an unknown
+// stored value must be refused instead of being silently mapped to "no flag".
+//
+// The settings page owns the stored-spelling -> ABI-code mapping
+// (`settings/lint_options.h`: `lintAutofixValue` / `lintAutofixCode`); this
+// declaration is the diagnostics lane's transport-independent view of the same
+// six values, because the hover and the panel decide from HERE whether to offer
+// a fix and what it will do to the user's files.
+
+/// The six verible values plus "send no flag" (the page's empty choice).
+enum class AutofixMode {
+    NoFlag = 0,          ///< "" - no `--autofix` argument at all
+    No,                  ///< "no" - verible's own explicit off
+    Patch,               ///< "patch" - the diff goes to stdout, no file changes
+    PatchInteractive,    ///< "patch-interactive" - unavailable (needs a TTY)
+    Inplace,             ///< "inplace" - files change; the caller confirms first
+    InplaceInteractive,  ///< "inplace-interactive" - unavailable (needs a TTY)
+    GenerateWaiver,      ///< "generate-waiver" - writes (and registers) a waiver
+};
+
+/// What an AVAILABLE mode does to the user's files, so the UI asks for the right
+/// confirmation and describes the effect truthfully.
+enum class AutofixEffect {
+    None = 0,            ///< no flag / `no`: nothing runs
+    PrintsPatch = 1,     ///< `patch`: the diff is printed; no file changes
+    WritesInPlace = 2,   ///< `inplace`: files change -> confirm before running
+    GeneratesWaiver = 3, ///< `generate-waiver`: writes a waiver file and registers it
+};
+
+struct AutofixModeCheck {
+    /// A KNOWN verible mode (the stored value is one of the six spellings).
+    bool valid = false;
+    /// This product can really drive it (the interactive pair cannot).
+    bool available = false;
+    bool interactive = false;
+    AutofixMode mode = AutofixMode::NoFlag;
+    AutofixEffect effect = AutofixEffect::None;
+    /// The canonical spelling ("" = send no flag).
+    QString value;
+    /// Why it is unavailable/invalid; EMPTY when available.
+    QString reason;
+};
+
+/// Validate one stored/requested `--autofix` value (trimmed, case-insensitive,
+/// exactly how the page stores it). An unknown value is INVALID with a reason
+/// naming the accepted values - never silently treated as "no flag".
+AutofixModeCheck checkAutofixMode(const QString &stored);
+
+/// The stable token of one mode: "" / "no" / "patch" / "patch-interactive" /
+/// "inplace" / "inplace-interactive" / "generate-waiver".
+QString autofixModeName(AutofixMode mode);
+
 } // namespace vedit::workspace::diagnostics

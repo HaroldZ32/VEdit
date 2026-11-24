@@ -404,25 +404,59 @@ fn a_new_run_cancels_the_previous_one() {
     assert!(wait_for_process_gone(pid), "old child {pid} is still alive");
 }
 
+/// T8 / AC-T8.1 (contract change): the product order FALLS BACK, so a missing
+/// explicit path is the FIRST recorded attempt and the resolver keeps walking.
+/// In a source checkout a later stage supplies the tool, so the run succeeds;
+/// the pure "no tool anywhere" failure is covered by
+/// `binary::tests::all_attempts_are_listed_when_nothing_is_found`, and the
+/// invariant asserted here (a missing explicit path is never chosen and never
+/// the CAUSE of `BinaryNotFound`) holds in both environments.
 #[test]
 fn missing_binary_lists_every_attempt() {
     let _serial = serial();
     let dir = TestDir::new("missing-bin");
-    let mut options = base_options(dir.file("does-not-exist"));
+    let missing = dir.file("does-not-exist");
+    let mut options = base_options(missing.clone());
     options.timeout = Duration::from_millis(100);
     let report = vd_deeplint::lint(&fixture("undeclared.sv"), &options);
-    assert!(!report.is_success());
-    match &report.failure {
-        Some(vd_deeplint::LintFailure::BinaryNotFound { attempts }) => {
-            assert!(!attempts.is_empty());
-            assert_eq!(attempts[0].source, AttemptSource::ExplicitOption);
-            assert_eq!(attempts[0].outcome, AttemptOutcome::NotFound);
-        }
-        other => panic!("expected BinaryNotFound, got {other:?}"),
-    }
-    assert!(report.summary().contains("VEDIT_SLANG"));
+    assert!(!report.binary.attempts.is_empty());
+    assert_eq!(
+        report.binary.attempts[0].source,
+        AttemptSource::ExplicitOption
+    );
+    assert_eq!(report.binary.attempts[0].outcome, AttemptOutcome::NotFound);
+    // Every stage of the product order is probed, in order.
+    let stages: Vec<usize> = report
+        .binary
+        .attempts
+        .iter()
+        .map(|attempt| attempt.source.stage())
+        .collect();
+    let mut sorted = stages.clone();
+    sorted.sort_unstable();
+    assert_eq!(stages, sorted, "attempts are recorded in STAGE_ORDER");
+    // The missing path is never chosen.
+    assert_ne!(report.binary.chosen.as_deref(), Some(missing.as_path()));
+    // A chosen tool means the pass ran; otherwise NO tool was found at all —
+    // never "the explicit path failed" after a fallback was available.
+    assert!(
+        report.is_success()
+            || matches!(
+                report.failure,
+                Some(vd_deeplint::LintFailure::BinaryNotFound { .. })
+            ),
+        "unexpected failure: {:?}",
+        report.failure
+    );
+    println!(
+        "T8-RESULT missing explicit: chosen={:?} failure={:?}",
+        report.binary.chosen, report.failure
+    );
 }
 
+/// T8 / AC-T8.1 (contract change): a non-executable explicit path is recorded
+/// as `NotExecutable` in the FIRST attempt and the resolver moves on, exactly
+/// like a missing one (see `missing_binary_lists_every_attempt`).
 #[test]
 fn non_executable_binary_is_not_found() {
     let _serial = serial();
@@ -440,14 +474,33 @@ fn non_executable_binary_is_not_found() {
             }
         }
     }
-    let report = vd_deeplint::lint(&fixture("undeclared.sv"), &base_options(binary));
-    assert!(!report.is_success());
-    match &report.failure {
-        Some(vd_deeplint::LintFailure::BinaryNotFound { attempts }) => {
-            assert_eq!(attempts[0].outcome, AttemptOutcome::NotExecutable);
-        }
-        other => panic!("expected BinaryNotFound, got {other:?}"),
-    }
+    let report = vd_deeplint::lint(&fixture("undeclared.sv"), &base_options(binary.clone()));
+    assert_eq!(
+        report.binary.attempts[0].source,
+        AttemptSource::ExplicitOption
+    );
+    assert_eq!(
+        report.binary.attempts[0].outcome,
+        AttemptOutcome::NotExecutable
+    );
+    assert_ne!(
+        report.binary.chosen.as_deref(),
+        Some(binary.as_path()),
+        "a non-executable file is never chosen"
+    );
+    assert!(
+        report.is_success()
+            || matches!(
+                report.failure,
+                Some(vd_deeplint::LintFailure::BinaryNotFound { .. })
+            ),
+        "unexpected failure: {:?}",
+        report.failure
+    );
+    println!(
+        "T8-RESULT non-executable explicit: chosen={:?} failure={:?}",
+        report.binary.chosen, report.failure
+    );
 }
 
 #[test]

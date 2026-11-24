@@ -28,11 +28,13 @@
 //!   blocking call and exists for tests and shutdown paths.
 
 use std::collections::HashMap;
+use std::ffi::OsStr;
+use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex, MutexGuard};
 use std::thread::JoinHandle;
-use std::time::{Duration, Instant};
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 use anyhow::{anyhow, Result};
 use lsp_types::{
@@ -40,10 +42,11 @@ use lsp_types::{
     ParameterLabel, Position, Range, SignatureHelp, TextDocumentContentChangeEvent, TextEdit, Url,
     WorkspaceEdit,
 };
+use serde_json::Value;
 use tokio::sync::mpsc;
 
 use crate::backend::{capabilities_from_server, BackendCapabilities, LspBackend};
-use crate::client::LspClient;
+use crate::client::{LspClient, MAX_RESTARTS};
 use crate::config::LspConfig;
 use crate::diagnostics::PublishedDiagnostics;
 
@@ -280,8 +283,16 @@ pub enum SessionResponse {
     Symbols(Vec<SymbolNode>),
     /// Edits to apply (formatting or rename).
     Edits(Vec<WorkspaceTextEdit>),
-    /// Diagnostics for one file.
-    Diagnostics(Vec<SessionDiagnostic>),
+    /// Diagnostics for one file. `published` is false when the server has no
+    /// entry for the document at all (it never sent `publishDiagnostics` for
+    /// it): an empty list with `published == false` is "not analysed", not
+    /// "clean" (batch-20261118 AC-2).
+    Diagnostics {
+        /// The rows the server currently holds for the document.
+        rows: Vec<SessionDiagnostic>,
+        /// Whether the server ever published a diagnostics set for it.
+        published: bool,
+    },
     /// Hover text (T16).
     Hover(HoverResult),
     /// Signature help (T16).
@@ -318,6 +329,14 @@ enum Command {
     Change {
         path: PathBuf,
         text: String,
+    },
+    /// Push the session's build context to the server (batch-20261118 AC-1):
+    /// include dirs and defines. The files slang compiles are the SESSION's own
+    /// file set, which the worker already owns, so they are not carried here.
+    /// Applied through `workspace/executeCommand`, never argv.
+    BuildContext {
+        include_dirs: Vec<PathBuf>,
+        defines: Vec<String>,
     },
     Stop,
 }
@@ -415,6 +434,38 @@ impl Inner {
         status.generation = generation;
         status.diagnostics = diagnostics;
     }
+
+    /// A command succeeded: a session that had been marked `Failed` is answering
+    /// again, so it leaves the failed state (batch-20261118 AC-3). The restart
+    /// count stays visible; the message keeps the reason it had failed for.
+    fn note_success(&self, message: String, restarts: u32) {
+        let mut status = self.lock_status();
+        status.restarts = restarts;
+        if status.phase == SessionPhase::Failed {
+            status.phase = SessionPhase::Ready;
+            status.message = format!("recovered: {message}");
+        } else if status.phase == SessionPhase::Ready && !message.is_empty() {
+            status.message = message;
+        }
+    }
+}
+
+/// The bounded tail of the child's stderr, for the `Failed` status line
+/// (batch-20261118 AC-3: the reason must name what the server said, without an
+/// ABI change - `VdLspStatus.message` is the existing string channel).
+fn stderr_tail_text(client: &LspClient) -> String {
+    const TAIL_LINES: usize = 5;
+    const TAIL_CHARS: usize = 400;
+    let tail = client.stderr_tail();
+    if tail.is_empty() {
+        return String::new();
+    }
+    let start = tail.len().saturating_sub(TAIL_LINES);
+    let mut joined = tail[start..].join(" | ");
+    if joined.chars().count() > TAIL_CHARS {
+        joined = joined.chars().take(TAIL_CHARS).collect::<String>() + "…";
+    }
+    format!(" — server stderr: {joined}")
 }
 
 /// A running LSP session over one effective file set.
@@ -571,6 +622,41 @@ impl SessionHandle {
             .map_err(|_| anyhow!("the LSP session worker is not running"))
     }
 
+    /// Push the project build context to the session (batch-20261118 AC-1).
+    ///
+    /// For slang-server this is the ONLY channel that reaches the server:
+    /// 0.3.1 ignores argv `-I`/`-D`. The worker turns the context into ONE
+    /// generated `.f` - `+incdir+` per include directory, `-D<name>[=<value>]`
+    /// per define, and then the SESSION's own file set, one absolute path per
+    /// line - and pushes it with a single `slang.setBuildFile`. The session
+    /// file set is what slang compiles; the project's imported `.f` lists are
+    /// deliberately not nested, because that made the server compile the WHOLE
+    /// project and let slang's own last-processed rule pick a same-named module
+    /// that disagrees with the module tree (the realtime "module has no such
+    /// port" false positives). `slang.addDefine` is deliberately unused: on
+    /// 0.3.1 it persists `<workspace>/.slang/local/server.json` in the user's
+    /// project (and keeps applying to later sessions), so nothing here writes
+    /// into the project directory. The verible backend is untouched - its build
+    /// context already travels in the file list it is started with.
+    ///
+    /// # Errors
+    ///
+    /// When the session worker has already ended; a server-side rejection is
+    /// reported through the status message of the session.
+    pub fn set_build_context(
+        &self,
+        include_dirs: Vec<PathBuf>,
+        defines: Vec<String>,
+    ) -> Result<()> {
+        self.inner
+            .commands
+            .send(Command::BuildContext {
+                include_dirs,
+                defines,
+            })
+            .map_err(|_| anyhow!("the LSP session worker is not running"))
+    }
+
     /// Consume one finished request; `Unknown` once the id was polled.
     pub fn poll(&self, id: u64) -> PollOutcome {
         let mut requests = self.inner.lock_requests();
@@ -723,38 +809,406 @@ async fn session_loop(
         capabilities,
     );
 
-    while let Some(command) = commands.recv().await {
+    // batch-20261118 AC-3: a command failure, a child exit or the end of the
+    // main loop after Ready is a SESSION state, not a log line. One witness
+    // flag keeps the periodic check from re-reporting the same death.
+    let backend = inner.lock_status().backend;
+    let mut child_exit_noted = false;
+    let mut context_file: Option<ContextFile> = None;
+    loop {
+        let command = tokio::select! {
+            command = commands.recv() => command,
+            () = tokio::time::sleep(Duration::from_millis(250)) => {
+                if !child_exit_noted && client.session_ended() {
+                    child_exit_noted = true;
+                    let message = format!(
+                        "the language server exited after Ready ({}/{} restart(s)){}",
+                        client.restart_count(),
+                        MAX_RESTARTS,
+                        stderr_tail_text(&client)
+                    );
+                    inner.fail(message);
+                }
+                continue;
+            }
+        };
+        let Some(command) = command else {
+            break;
+        };
         match command {
             Command::Stop => break,
             Command::Request { id, request } => {
                 let outcome = serve(&mut client, request).await;
+                let error = outcome.as_ref().err().map(ToString::to_string);
                 inner.finish_request(id, outcome);
+                match error {
+                    Some(error) => {
+                        child_exit_noted = client.session_ended();
+                        inner.fail(format!(
+                            "request failed: {error} ({}/{} restart(s)){}",
+                            client.restart_count(),
+                            MAX_RESTARTS,
+                            stderr_tail_text(&client)
+                        ));
+                    }
+                    None if client.session_ended() => {
+                        child_exit_noted = true;
+                        inner.fail(format!(
+                            "the language server exited after Ready ({}/{} restart(s)){}",
+                            client.restart_count(),
+                            MAX_RESTARTS,
+                            stderr_tail_text(&client)
+                        ));
+                    }
+                    None => inner.note_success(String::new(), client.restart_count()),
+                }
                 let snapshot_generation = client.diagnostics_generation();
                 let count = client.diagnostics().borrow().diagnostic_count();
                 inner.refresh_from(snapshot_generation, count);
             }
             Command::Change { path, text } => {
                 let outcome = apply_buffer_change(&mut client, &path, text).await;
-                {
-                    let mut status = inner.lock_status();
-                    status.message = match &outcome {
-                        Ok(bytes) => {
-                            format!("buffer changed ({} bytes): {}", bytes, path.display())
-                        }
-                        Err(error) => format!("buffer change failed: {error}"),
-                    };
+                match outcome {
+                    Ok(bytes) => {
+                        child_exit_noted = false;
+                        inner.note_success(
+                            format!("buffer changed ({} bytes): {}", bytes, path.display()),
+                            client.restart_count(),
+                        );
+                    }
+                    Err(error) => {
+                        child_exit_noted = client.session_ended();
+                        inner.fail(format!(
+                            "buffer change failed: {error} ({}/{} restart(s)){}",
+                            client.restart_count(),
+                            MAX_RESTARTS,
+                            stderr_tail_text(&client)
+                        ));
+                    }
                 }
                 let snapshot_generation = client.diagnostics_generation();
                 let count = client.diagnostics().borrow().diagnostic_count();
                 inner.refresh_from(snapshot_generation, count);
             }
+            Command::BuildContext {
+                include_dirs,
+                defines,
+            } => {
+                let outcome = apply_build_context(
+                    &mut client,
+                    backend,
+                    &include_dirs,
+                    &defines,
+                    &files,
+                    &mut context_file,
+                )
+                .await;
+                match outcome {
+                    Ok(note) => {
+                        child_exit_noted = false;
+                        if !note.is_empty() {
+                            inner.note_success(note, client.restart_count());
+                        }
+                    }
+                    Err(error) => {
+                        child_exit_noted = client.session_ended();
+                        inner.fail(format!(
+                            "build context was not accepted: {error}{}",
+                            stderr_tail_text(&client)
+                        ));
+                    }
+                }
+            }
         }
     }
+    // F5: the guard removes the generated file AND its private directory on
+    // every exit path this loop can take - a normal stop, a closed command
+    // channel, or an unwinding panic. A `SIGKILL` cannot run it; under
+    // `XDG_RUNTIME_DIR` the session manager removes the directory then.
+    drop(context_file);
 
     if let Err(error) = client.shutdown().await {
         inner.lock_status().message = format!("shutdown reported: {error}");
     }
     inner.stopped();
+}
+
+/// The generated slang build file and the private directory holding it.
+///
+/// The `Drop` guard removes both, so no exit path of the session worker leaves
+/// the project's absolute include paths (and its defines) behind. The file is
+/// never created inside the project: it lives in a fresh 0700 directory under
+/// `XDG_RUNTIME_DIR` (or the system temp directory).
+#[derive(Debug)]
+struct ContextFile {
+    path: PathBuf,
+    directory: PathBuf,
+}
+
+impl Drop for ContextFile {
+    fn drop(&mut self) {
+        let _ = std::fs::remove_file(&self.path);
+        let _ = std::fs::remove_dir(&self.directory);
+    }
+}
+
+/// Candidate directories for the generated context, in preference order:
+/// `XDG_RUNTIME_DIR` when the session environment provides an absolute,
+/// existing one (its owner - the session manager - removes it at logout, which
+/// also covers a crashed process), then the system temp directory as a fallback
+/// for a runtime directory that disappeared or is not writable.
+fn context_base_dirs() -> Vec<PathBuf> {
+    context_base_dirs_from(
+        std::env::var_os("XDG_RUNTIME_DIR").as_deref(),
+        std::env::temp_dir(),
+    )
+}
+
+/// [`context_base_dirs`] with its two inputs spelled out, so the selection is
+/// testable without mutating the process environment.
+fn context_base_dirs_from(runtime: Option<&OsStr>, temp: PathBuf) -> Vec<PathBuf> {
+    let mut bases = Vec::new();
+    if let Some(value) = runtime {
+        let path = PathBuf::from(value);
+        if path.is_absolute() && path.is_dir() && path != temp {
+            bases.push(path);
+        }
+    }
+    bases.push(temp);
+    bases
+}
+
+/// Create one private directory (`0700` on unix). `create_dir` never adopts an
+/// existing path, so a planted symlink or directory of the same name fails the
+/// call instead of being followed.
+fn create_private_dir(path: &Path) -> std::io::Result<()> {
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::DirBuilderExt;
+        std::fs::DirBuilder::new().mode(0o700).create(path)
+    }
+    #[cfg(not(unix))]
+    {
+        std::fs::create_dir(path)
+    }
+}
+
+/// Create one context file exclusively (`create_new`) and not world-readable
+/// (`0600` on unix). `create_new` is `O_CREAT | O_EXCL`, which refuses a
+/// pre-planted symlink instead of writing through it.
+fn create_private_file(path: &Path, text: &str) -> std::io::Result<()> {
+    let mut options = std::fs::OpenOptions::new();
+    options.write(true).create_new(true);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        options.mode(0o600);
+    }
+    let mut file = options.open(path)?;
+    file.write_all(text.as_bytes())?;
+    file.flush()
+}
+
+/// Write `text` into one fresh private directory under `base` and return the
+/// guard for it. The name is unpredictable (pid + wall-clock nanoseconds + sequence)
+/// and both the directory and the file are created exclusively, so a planted
+/// path is refused instead of followed.
+fn create_context_file(base: &Path, text: &str) -> Result<ContextFile> {
+    create_context_file_with(base, text, create_private_file)
+}
+
+/// [`create_context_file`] with its file writer spelled out, so the cleanup after
+/// a failed write is testable without a full disk.
+fn create_context_file_with(
+    base: &Path,
+    text: &str,
+    write: impl FnOnce(&Path, &str) -> std::io::Result<()>,
+) -> Result<ContextFile> {
+    static NEXT: AtomicU64 = AtomicU64::new(0);
+    let mut attempts = 0;
+    loop {
+        let unique = format!(
+            "vedit-slang-context-{}-{:x}-{}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .map(|value| value.as_nanos())
+                .unwrap_or_default(),
+            NEXT.fetch_add(1, Ordering::Relaxed)
+        );
+        let directory = base.join(unique);
+        match create_private_dir(&directory) {
+            Ok(()) => {}
+            Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
+                attempts += 1;
+                if attempts >= 16 {
+                    return Err(anyhow!(
+                        "cannot create a private build-context directory in {}: {error}",
+                        base.display()
+                    ));
+                }
+                continue;
+            }
+            Err(error) => {
+                return Err(anyhow!(
+                    "cannot create the build-context directory {}: {error}",
+                    directory.display()
+                ));
+            }
+        }
+        let path = directory.join("context.f");
+        if let Err(error) = write(&path, text) {
+            // A write/flush failure can leave a partial file behind; the private
+            // directory then cannot be removed until that file is gone. Remove
+            // both, so a failed push leaves no 0600 artefact in the temp tree.
+            let _ = std::fs::remove_file(&path);
+            let _ = std::fs::remove_dir(&directory);
+            return Err(anyhow!(
+                "cannot write the build-context file {}: {error}",
+                path.display()
+            ));
+        }
+        return Ok(ContextFile { path, directory });
+    }
+}
+
+/// Quote one argument for the line-based slang build file.
+///
+/// The parser splits a line like a command line, so an unquoted argument loses
+/// everything after its first whitespace: a legal include directory such as
+/// `/home/user/project with space/inc` becomes two tokens and the include stays
+/// unresolved. Measured on the shipped slang-server 0.3.1: wrapping the whole
+/// argument in double quotes (`+incdir+"…"`, `-D"NAME=VALUE"`, `"…/a.sv"`) keeps
+/// it one token, and a backslash escapes a literal `"` or `\` inside the
+/// quotes. A line break cannot be represented by the line-based format, so it
+/// is refused instead of silently truncating the value.
+fn push_quoted_argument(text: &mut String, prefix: &str, value: &str, kind: &str) -> Result<()> {
+    if value.contains(['\n', '\r']) {
+        return Err(anyhow!("a {kind} must not contain a line break: {value:?}"));
+    }
+    text.push_str(prefix);
+    text.push('"');
+    for character in value.chars() {
+        if character == '"' || character == '\\' {
+            text.push('\\');
+        }
+        text.push(character);
+    }
+    text.push('"');
+    text.push('\n');
+    Ok(())
+}
+
+/// The text of the slang build context: every include directory as
+/// `+incdir+"<escaped path>"`, every project define as `-D"<escaped
+/// name[=value]>"`, then the session's own files, ONE quoted absolute path per
+/// line.
+///
+/// The trailing lines make this text a file list: slang compiles exactly the
+/// session file set (the current file plus the one-level module closure the
+/// module tree selected), so the realtime diagnostics and the module tree agree
+/// on which definition of a same-named module is in force. The project's
+/// imported `.f` is deliberately NOT nested with `-f`: that made slang-server
+/// compile the whole project, and slang's own last-processed rule then picked a
+/// definition the catalog never chose - a module from another directory could
+/// win and every instantiation of it reported a bogus "no such port".
+///
+/// Measured on slang-server 0.3.1: a later `setBuildFile` REPLACES the previous
+/// driver, so one file carries the whole context and re-pushing it is
+/// idempotent (no define accumulates). The verible backend uses
+/// [`crate::filelist_text`] for the same semantics (`+incdir+` / `+define+` /
+/// bare paths) on its command line.
+pub fn build_context_text(
+    include_dirs: &[PathBuf],
+    defines: &[String],
+    files: &[PathBuf],
+) -> Result<String> {
+    let mut text = String::new();
+    for directory in include_dirs {
+        push_quoted_argument(
+            &mut text,
+            "+incdir+",
+            &directory.display().to_string(),
+            "include directory",
+        )?;
+    }
+    for define in defines {
+        push_quoted_argument(&mut text, "-D", define, "define")?;
+    }
+    for file in files {
+        push_quoted_argument(&mut text, "", &file.display().to_string(), "session file")?;
+    }
+    Ok(text)
+}
+
+/// Write the generated slang build file into a fresh private directory.
+///
+/// `slang.addDefine` is deliberately NOT used: measured on the same build, it
+/// creates `<workspace>/.slang/local/server.json` inside the user's project and
+/// merges into it on every call (batch-20261118 AC-1 forbids touching the
+/// project), and the accumulated flags outlive the session.
+fn write_context_file(
+    include_dirs: &[PathBuf],
+    defines: &[String],
+    files: &[PathBuf],
+) -> Result<ContextFile> {
+    let text = build_context_text(include_dirs, defines, files)?;
+
+    let mut last_error = None;
+    for base in context_base_dirs() {
+        match create_context_file(&base, &text) {
+            Ok(context) => return Ok(context),
+            Err(error) => last_error = Some(error),
+        }
+    }
+    Err(last_error.unwrap_or_else(|| anyhow!("no writable directory for the build context")))
+}
+
+/// Deliver the session's build context to the server (AC-1).
+///
+/// slang-server 0.3.1 ignores argv `-I`/`-D`; its `workspace/executeCommand`
+/// surface is the channel that works. ONE `slang.setBuildFile` call carries the
+/// whole context - include dirs, defines and the SESSION's own file set - as a
+/// generated file list in a private temp directory, so the user's project is
+/// never written to. The file set, not the project's imported `.f`, is what
+/// slang compiles (see [`build_context_text`]). `slang.addDefine` is NOT used
+/// (it persists `<workspace>/.slang/local/server.json` in the project, measured
+/// on 0.3.1). `slang.setIncludeContext` is NOT this channel - it selects among
+/// the locations an already-resolved file was included from.
+async fn apply_build_context(
+    client: &mut LspClient,
+    backend: LspBackend,
+    include_dirs: &[PathBuf],
+    defines: &[String],
+    files: &[PathBuf],
+    context_file: &mut Option<ContextFile>,
+) -> Result<String> {
+    if backend != LspBackend::Slang {
+        // Verible's build context already reaches it as a file list on its
+        // command line; pushing anything here would change its behaviour.
+        return Ok(String::new());
+    }
+    if include_dirs.is_empty() && defines.is_empty() && files.is_empty() {
+        return Ok(String::new());
+    }
+    let context = write_context_file(include_dirs, defines, files)?;
+    let argument = Value::String(context.path.display().to_string());
+    // A rejected push returns here; `context` drops with it, so the generated
+    // file and its private directory are removed on that path too.
+    client
+        .execute_command("slang.setBuildFile", vec![argument])
+        .await?;
+    if let Some(previous) = context_file.replace(context) {
+        // A later push REPLACES the driver; the previous generated file (and
+        // its private directory) is removed by the guard.
+        drop(previous);
+    }
+    Ok(format!(
+        "build context: {} include dir(s), {} define(s), {} session file(s)",
+        include_dirs.len(),
+        defines.len(),
+        files.len()
+    ))
 }
 
 /// Apply the editor buffer's text to one document: open it when the session does
@@ -845,11 +1299,15 @@ async fn serve(client: &mut LspClient, request: SessionRequest) -> Result<Sessio
         }
         SessionRequest::Diagnostics { .. } => {
             let snapshot = client.diagnostics().borrow().clone();
-            let diagnostics = snapshot
-                .for_uri(&uri)
-                .map(normalise_diagnostics)
-                .unwrap_or_default();
-            Ok(SessionResponse::Diagnostics(diagnostics))
+            // "No entry" and "an empty published set" are different answers:
+            // only the second one is a clean verdict (AC-2). The server's
+            // silence is never manufactured into "0 problems".
+            let published = snapshot.for_uri(&uri);
+            let rows = published.map(normalise_diagnostics).unwrap_or_default();
+            Ok(SessionResponse::Diagnostics {
+                rows,
+                published: published.is_some(),
+            })
         }
         SessionRequest::Hover { .. } => Ok(SessionResponse::Hover(
             client
@@ -1098,15 +1556,19 @@ pub const fn range_parts(range: Range) -> (u32, u32, u32, u32) {
 #[cfg(test)]
 mod tests {
     use super::{
+        context_base_dirs, context_base_dirs_from, create_context_file_with, create_private_file,
         flatten_symbols, flatten_workspace_edit, hover_text, language_id, parameter_label_text,
-        severity_code, signature_help_result,
+        severity_code, signature_help_result, write_context_file,
     };
+    use anyhow::Result;
     use lsp_types::{
         DocumentSymbol, DocumentSymbolResponse, Location, SymbolInformation, SymbolKind, TextEdit,
         Url, WorkspaceEdit,
     };
     use std::collections::HashMap;
-    use std::path::Path;
+    use std::ffi::OsStr;
+    use std::path::{Path, PathBuf};
+    use std::time::{SystemTime, UNIX_EPOCH};
 
     #[test]
     fn language_ids_cover_the_product_extensions() {
@@ -1272,5 +1734,213 @@ mod tests {
             parameter_label_text("a,b", lsp_types::ParameterLabel::LabelOffsets([2, 99])),
             "b"
         );
+    }
+
+    // --- batch-20261118 F1/F2, batch-20261119 lint scope: the generated file --
+
+    #[test]
+    fn the_context_file_carries_incdirs_defines_and_the_session_files() -> Result<()> {
+        let context = write_context_file(
+            &[PathBuf::from("/project/inc")],
+            &["WIDTH=8".to_string(), "SIM".to_string()],
+            &[
+                PathBuf::from("/project/rtl/top.sv"),
+                PathBuf::from("/project/rtl/uart.v"),
+            ],
+        )?;
+        let text = std::fs::read_to_string(&context.path)?;
+        assert_eq!(
+            text,
+            "+incdir+\"/project/inc\"\n-D\"WIDTH=8\"\n-D\"SIM\"\n\
+             \"/project/rtl/top.sv\"\n\"/project/rtl/uart.v\"\n"
+        );
+        // The context is a file list, so the files it names are what slang
+        // compiles. The project's imported `.f` must NOT be nested: `-f` made
+        // the server compile the whole project, and slang's own selection then
+        // disagreed with the module tree.
+        assert!(!text.contains("-f "), "{text}");
+        assert!(context_base_dirs()
+            .iter()
+            .any(|base| context.path.starts_with(base)));
+        Ok(())
+    }
+
+    /// H1: every value is one quoted token, and `"` / `\` inside it are escaped
+    /// so the file-list parser cannot split or terminate it early.
+    #[test]
+    fn the_context_file_quotes_and_escapes_every_argument() -> Result<()> {
+        let context = write_context_file(
+            &[
+                PathBuf::from("/project/inc dir"),
+                PathBuf::from("/project/q\"uote\\dir"),
+            ],
+            &["WIDTH=8 + 4".to_string(), "MSG=\"hi\"".to_string()],
+            &[PathBuf::from("/project/build dir/top file.sv")],
+        )?;
+        let text = std::fs::read_to_string(&context.path)?;
+        assert_eq!(
+            text.lines().collect::<Vec<_>>(),
+            vec![
+                r#"+incdir+"/project/inc dir""#,
+                r#"+incdir+"/project/q\"uote\\dir""#,
+                r#"-D"WIDTH=8 + 4""#,
+                r#"-D"MSG=\"hi\"""#,
+                r#""/project/build dir/top file.sv""#,
+            ]
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn a_path_with_a_line_break_is_refused() {
+        let error = match write_context_file(&[PathBuf::from("/project/a\nb")], &[], &[]) {
+            Ok(_) => panic!("a line break inside an include directory must be refused"),
+            Err(error) => error,
+        };
+        assert!(error.to_string().contains("line break"), "{error}");
+        let error = match write_context_file(&[], &[], &[PathBuf::from("/project/a\rb")]) {
+            Ok(_) => panic!("a line break inside a session file must be refused"),
+            Err(error) => error,
+        };
+        assert!(error.to_string().contains("line break"), "{error}");
+    }
+
+    #[test]
+    fn a_define_with_a_line_break_is_refused() {
+        let error = match write_context_file(&[], &["A=1\n-DEVIL".to_string()], &[]) {
+            Ok(_) => panic!("a line break inside a define must be refused"),
+            Err(error) => error,
+        };
+        assert!(error.to_string().contains("line break"), "{error}");
+    }
+
+    /// N1: a write/flush error after the private file exists must remove the
+    /// partial file AND its directory, not leave the 0600 artefact behind.
+    #[test]
+    fn a_failed_context_write_removes_the_partial_file_and_its_directory() -> Result<()> {
+        let base = std::env::temp_dir().join(format!(
+            "vedit-context-fail-{}-{:x}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .map(|value| value.as_nanos())
+                .unwrap_or_default()
+        ));
+        std::fs::create_dir_all(&base)?;
+        let partial = std::cell::RefCell::new(None);
+        let result = create_context_file_with(&base, "-D\"WIDTH=8\"\n", |path, _text| {
+            std::fs::write(path, "partial")?;
+            *partial.borrow_mut() = Some(path.to_path_buf());
+            Err(std::io::Error::new(
+                std::io::ErrorKind::StorageFull,
+                "simulated write failure",
+            ))
+        });
+        let path = partial.into_inner().ok_or_else(|| {
+            anyhow::anyhow!("the writer must have been called with the context path")
+        })?;
+        assert!(
+            result.is_err(),
+            "the simulated write failure must be reported"
+        );
+        assert!(!path.exists(), "the partial context file must be removed");
+        let directory = path
+            .parent()
+            .ok_or_else(|| anyhow::anyhow!("the context file must have a parent"))?;
+        assert!(
+            !directory.exists(),
+            "the private context directory must be removed too"
+        );
+        assert!(
+            base.exists(),
+            "the base directory is not the context directory"
+        );
+        let _ = std::fs::remove_dir_all(&base);
+        Ok(())
+    }
+
+    #[test]
+    fn the_runtime_dir_is_preferred_and_a_bad_one_falls_back_to_temp() -> Result<()> {
+        let temp = std::env::temp_dir();
+        assert_eq!(
+            context_base_dirs_from(None, temp.clone()),
+            vec![temp.clone()]
+        );
+        assert_eq!(
+            context_base_dirs_from(Some(OsStr::new("/does/not/exist")), temp.clone()),
+            vec![temp.clone()]
+        );
+        assert_eq!(
+            context_base_dirs_from(Some(OsStr::new("relative/path")), temp.clone()),
+            vec![temp.clone()]
+        );
+        assert_eq!(
+            context_base_dirs_from(Some(temp.as_os_str()), temp.clone()),
+            vec![temp.clone()]
+        );
+        let runtime = temp.join(format!(
+            "vedit-context-runtime-{}-{:x}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .map(|value| value.as_nanos())
+                .unwrap_or_default()
+        ));
+        std::fs::create_dir_all(&runtime)?;
+        assert_eq!(
+            context_base_dirs_from(Some(runtime.as_os_str()), temp.clone()),
+            vec![runtime.clone(), temp.clone()]
+        );
+        let _ = std::fs::remove_dir_all(&runtime);
+        Ok(())
+    }
+
+    #[test]
+    fn the_context_directory_and_file_are_private_and_removed_by_the_guard() -> Result<()> {
+        let context = write_context_file(&[], &["WIDTH=8".to_string()], &[])?;
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let directory = std::fs::symlink_metadata(&context.directory)?;
+            assert!(directory.file_type().is_dir());
+            assert_eq!(directory.permissions().mode() & 0o777, 0o700);
+            let file = std::fs::symlink_metadata(&context.path)?;
+            assert!(!file.file_type().is_symlink());
+            assert_eq!(file.permissions().mode() & 0o777, 0o600);
+        }
+        let (path, directory) = (context.path.clone(), context.directory.clone());
+        drop(context);
+        assert!(!path.exists(), "the guard must remove the context file");
+        assert!(
+            !directory.exists(),
+            "the guard must remove the private directory too"
+        );
+        Ok(())
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_planted_symlink_is_not_followed_or_truncated() -> Result<()> {
+        let base = std::env::temp_dir().join(format!(
+            "vedit-context-link-{}-{:x}",
+            std::process::id(),
+            SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .map(|value| value.as_nanos())
+                .unwrap_or_default()
+        ));
+        std::fs::create_dir_all(&base)?;
+        let victim = base.join("victim.txt");
+        std::fs::write(&victim, "ORIGINAL\n")?;
+        let link = base.join("context.f");
+        std::os::unix::fs::symlink(&victim, &link)?;
+        let error = match create_private_file(&link, "-DWIDTH=8\n") {
+            Ok(()) => panic!("create_new must refuse a pre-planted symlink"),
+            Err(error) => error,
+        };
+        assert_eq!(error.kind(), std::io::ErrorKind::AlreadyExists);
+        assert_eq!(std::fs::read_to_string(&victim)?, "ORIGINAL\n");
+        let _ = std::fs::remove_dir_all(&base);
+        Ok(())
     }
 }

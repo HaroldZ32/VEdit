@@ -10,10 +10,12 @@
 //     clears the cache and the next hover/navigation is clean;
 //   2 (HIGH) R2 tracks EVERY open document (background tab edited + switch);
 //   3 (HIGH) `projectRootChanged` re-pins the file set and clears old rows;
-//   5 (HIGH, ruling C8) the automatic pass includes the just-saved file and
-//     other unmodified open files, and excludes modified buffers;
-//   12 (MEDIUM e) the product assertion detects a RE-SHOW of the same dialog
-//     object (counter + visibility, not object count).
+//   5 (HIGH, ruling C8) an EXPLICIT pass (the only trigger left after A61.1)
+//     covers the just-saved file and the other unmodified project files, and
+//     excludes modified buffers;
+//   12 (MEDIUM e) a pass presents its rows WITHOUT any modal dialog (AC-4.4);
+//     the re-show counter stays at its invariant (0), so a returning dialog path
+//     turns the check red.
 //
 // Every observation is a shell property the lane publishes; a missing property
 // fails the check instead of being read as a pass.
@@ -319,11 +321,11 @@ int main(int argc, char **argv)
     vedit::workspace::installDiagnostics(*shell, integration);
     vedit::workspace::installFileTree(*shell, integration);
 
-    // RM-9: a project OPEN now starts a full automatic pass as soon as the file
-    // set is adopted, so this harness must own the lint backend BEFORE the first
-    // event-loop turn - otherwise the real backend would run (and be cancelled
-    // by the replacement below, leaving its partial rows). The accessor returns
-    // the very controller the panel will use.
+    // RM-9 (A61.1): a project OPEN starts NO pass - every pass below is an
+    // explicit `project.lint` trigger. The harness still owns the lint backend
+    // BEFORE the first event-loop turn so no real tool is ever spawned by a
+    // trigger that fires early in the run. The accessor returns the very
+    // controller the panel will use.
     auto *controller = vedit::workspace::diagnosticsControllerForShell(*shell);
     check("product.controller", controller != nullptr);
     auto fakeOwned = std::make_unique<FakeProjectLint>();
@@ -793,36 +795,55 @@ int main(int argc, char **argv)
     QString saveError;
     const int passesBeforeA = fake->startCount;
     check("c8.save-a", pane->saveFile(&saveError), saveError);
-    check("c8.auto-pass-after-save",
+    // A61.5 (batch-20261115): A61.1 removed the save-triggered incremental pass,
+    // so this section no longer asserts "a save starts a pass". The REMOVAL gets
+    // a reverse assertion (the coverage A61.1 asks for) and the passes below are
+    // EXPLICIT triggers; their coverage - the saved file is linted, a modified
+    // buffer is excluded, other verdicts survive - is unchanged.
+    const bool saveStartedPass =
+        waitUntil([fake, passesBeforeA]() { return fake->startCount > passesBeforeA; }, 2500);
+    check("c8.save-no-automatic-pass", !saveStartedPass,
+          QStringLiteral("passes %1 -> %2").arg(passesBeforeA).arg(fake->startCount));
+    lintAction->trigger();
+    check("c8.manual-pass-after-save",
           waitUntil([fake, passesBeforeA]() { return fake->startCount > passesBeforeA; }, 10000));
+    waitUntil([controller]() { return !controller->projectPassRunning(); }, 10000);
+    QCoreApplication::processEvents();
     std::printf("OBSERVED c8.after-save-a files='%s'\n", qPrintable(fake->filesSeen.join(QLatin1Char(','))));
     check("c8.saved-file-included", fake->filesSeen.contains(aPath),
           QStringLiteral("files=%1").arg(fake->filesSeen.join(QLatin1Char(','))));
-    // RM-9 save policy (T20 contract): the automatic pass is INCREMENTAL - it
-    // re-lints EXACTLY the file that reached disk. Before, every save re-linted
-    // the whole project, so the cost of a save grew with the project.
-    check("c8.save-pass-is-incremental", fake->filesSeen == QStringList{aPath},
+    // The old `save-pass-is-incremental` asserted the pass covered EXACTLY the
+    // saved file, which is a property of the removed trigger. The coverage that
+    // outlives it: one explicit run covers the whole project set on disk.
+    check("c8.manual-pass-covers-project",
+          fake->filesSeen.contains(aPath) && fake->filesSeen.contains(dPath)
+              && fake->filesSeen.contains(ePath) && fake->filesSeen.contains(renamePath),
           QStringLiteral("files=%1").arg(fake->filesSeen.join(QLatin1Char(','))));
     check("c8.dirty-buffer-excluded", !fake->filesSeen.contains(bPath),
           QStringLiteral("files=%1").arg(fake->filesSeen.join(QLatin1Char(','))));
     // ... and a file the pass did NOT lint (e.sv: never opened here) keeps its
-    // verdict - the incremental save must not void the rest of the project.
+    // verdict - a save must not void the rest of the project.
     check("c8.other-file-verdict-kept",
           waitUntil([&upperFiles, &ePath]() { return upperFiles().contains(ePath); }, 5000),
           QStringLiteral("upper=%1").arg(upperFiles().join(QLatin1Char(','))));
 
-    // After B is saved the next automatic pass covers B only - and A's verdict
-    // survives it (the half that must not regress).
+    // After B is saved, the next EXPLICIT pass covers B (now clean on disk) and
+    // A's verdict survives it (the half that must not regress).
     pane->setActiveTab(pane->tabIndexForPath(bPath));
     QCoreApplication::processEvents();
     const int passesBeforeB = fake->startCount;
     check("c8.save-b", pane->saveFile(&saveError), saveError);
-    check("c8.auto-pass-after-save-b",
+    const bool saveBStartedPass =
+        waitUntil([fake, passesBeforeB]() { return fake->startCount > passesBeforeB; }, 2500);
+    check("c8.save-b-no-automatic-pass", !saveBStartedPass,
+          QStringLiteral("passes %1 -> %2").arg(passesBeforeB).arg(fake->startCount));
+    lintAction->trigger();
+    check("c8.manual-pass-after-save-b",
           waitUntil([fake, passesBeforeB]() { return fake->startCount > passesBeforeB; }, 10000));
+    waitUntil([controller]() { return !controller->projectPassRunning(); }, 10000);
+    QCoreApplication::processEvents();
     std::printf("OBSERVED c8.after-save-b files='%s'\n", qPrintable(fake->filesSeen.join(QLatin1Char(','))));
     check("c8.saved-b-now-included", fake->filesSeen.contains(bPath),
-          QStringLiteral("files=%1").arg(fake->filesSeen.join(QLatin1Char(','))));
-    check("c8.save-b-pass-is-incremental", fake->filesSeen == QStringList{bPath},
           QStringLiteral("files=%1").arg(fake->filesSeen.join(QLatin1Char(','))));
     check("c8.unmodified-open-verdict-kept",
           waitUntil([&upperFiles, &aPath]() { return upperFiles().contains(aPath); }, 5000),
@@ -1037,11 +1058,14 @@ int main(int argc, char **argv)
     }
 
     // =======================================================================
-    // 12 (MEDIUM e) — a RE-SHOW of the same dialog is detected
+    // 12 (MEDIUM e) — a pass presents its rows with NO modal dialog
     // =======================================================================
-    // Every explicit pass above presented its dialog. What matters is that the
-    // AUTOMATIC pass does not call show() again on the SAME object: the old
-    // assertion counted QDialog children, which a re-show does not change.
+    // A61.5 (batch-20261115): the old section forced an AUTOMATIC pass by saving
+    // (the trigger A61.1 removed) and asserted it did not re-show the dialog
+    // object. Automatic passes no longer exist, and AC-4.4 went further: even the
+    // EXPLICIT run presents its rows in the dock + status bar and never opens a
+    // modal. The coverage that survives is exactly that, checked on the pass the
+    // user (and this harness) can actually trigger.
     {
         auto *explicitDialog = shell->findChild<QDialog *>(QStringLiteral("veditElabDialog"));
         if (explicitDialog != nullptr) {
@@ -1051,19 +1075,21 @@ int main(int argc, char **argv)
               explicitDialog == nullptr || !explicitDialog->isVisible());
         const int dialogsBeforeAuto =
             presentationState().value(QStringLiteral("dialogsShown"), -1).toInt();
-        const int passesBeforeModal = fake->startCount;
         // The serial BEFORE this pass: comparing against the bare current serial
         // is racy, because the previous presentation still carries that serial
         // until this pass reaches its terminal state (a stale read made this
         // assertion pass on an older map).
         const quint64 serialBeforeModal = controller->projectPassSerial();
-        // Force a FRESH automatic pass after the dialog was hidden: a re-show of
-        // the same object must show up in this pass's presentation.
         pane->setActiveTab(pane->tabIndexForPath(aPath));
         QCoreApplication::processEvents();
-        pane->saveFile(&saveError);
-        waitUntil([fake, passesBeforeModal]() { return fake->startCount > passesBeforeModal; },
-                  10000);
+        lintAction->trigger();
+        check("modal.pass-ran",
+              waitUntil([controller, serialBeforeModal]() {
+                  return controller->projectPassSerial() > serialBeforeModal
+                      && !controller->projectPassRunning();
+              }, 10000),
+              QStringLiteral("serial=%1").arg(static_cast<qulonglong>(
+                  controller->projectPassSerial())));
         waitUntil([&presentationState, controller, serialBeforeModal]() {
             const quint64 serial = controller->projectPassSerial();
             return serial > serialBeforeModal
@@ -1072,22 +1098,49 @@ int main(int argc, char **argv)
         const QVariantMap presentation = presentationState();
         const int dialogs = presentation.value(QStringLiteral("dialogsShown"), -1).toInt();
         std::printf("OBSERVED presentation automatic=%d dialogsBefore=%d dialogsAfter=%d rows=%d "
-                    "visible=%d\n",
+                    "visible=%d mode='%s'\n",
                     presentation.value(QStringLiteral("automatic")).toBool() ? 1 : 0,
                     dialogsBeforeAuto, dialogs,
                     presentation.value(QStringLiteral("rows")).toInt(),
-                    presentation.value(QStringLiteral("dialogVisible")).toBool() ? 1 : 0);
-        check("modal.automatic-never-shows",
-              presentation.value(QStringLiteral("automatic")).toBool()
-                  && dialogs == dialogsBeforeAuto,
-              QStringLiteral("automatic=%1 before=%2 after=%3")
-                  .arg(presentation.value(QStringLiteral("automatic")).toBool() ? 1 : 0)
+                    presentation.value(QStringLiteral("dialogVisible")).toBool() ? 1 : 0,
+                    qPrintable(presentation.value(QStringLiteral("mode")).toString()));
+        // AC-4.4: the pass opened NO dialog - the counter did not move and the
+        // dialog is invisible. `rows` is NOT required to be > 0 here: which
+        // errors survive to this pass depends on the sections above (a cancelled
+        // pass can leave a warning-only upper layer), and the no-dialog rule must
+        // hold in BOTH branches (rows presented, and the "nothing to guide"
+        // branch). The presentation having happened at all is proved by the
+        // notice count below, so the "no dialog" is not vacuous.
+        check("modal.no-dialog-for-pass",
+              dialogs == dialogsBeforeAuto
+                  && !presentation.value(QStringLiteral("dialogVisible")).toBool()
+                  && presentation.contains(QStringLiteral("noticesShown")),
+              QStringLiteral("rows=%1 before=%2 after=%3 visible=%4")
+                  .arg(presentation.value(QStringLiteral("rows")).toInt())
                   .arg(dialogsBeforeAuto)
-                  .arg(dialogs));
-        check("modal.dialog-not-visible-after-auto",
-              !presentation.value(QStringLiteral("dialogVisible")).toBool());
-        check("modal.counter-detects-reshow",
-              presentation.contains(QStringLiteral("dialogsShown")) && dialogsBeforeAuto >= 1);
+                  .arg(dialogs)
+                  .arg(presentation.value(QStringLiteral("dialogVisible")).toBool() ? 1 : 0));
+        // A positive control that the presentation surface was used in this run:
+        // the first explicit pass (with error rows) put the notice up, so the
+        // "no dialog" above cannot pass by presenting nothing at all.
+        check("modal.notice-was-presented", presentation.value(QStringLiteral("noticesShown")).toInt() >= 1,
+              QStringLiteral("notices=%1")
+                  .arg(presentation.value(QStringLiteral("noticesShown")).toInt()));
+        // The presentation's own labels are truthful: this run was an explicit
+        // trigger, and it was presented as such (never as "automatic").
+        check("modal.presentation-reports-explicit",
+              presentation.value(QStringLiteral("mode")).toString() == QStringLiteral("explicit")
+                  && !presentation.value(QStringLiteral("automatic")).toBool(),
+              QStringLiteral("mode='%1' automatic=%2")
+                  .arg(presentation.value(QStringLiteral("mode")).toString())
+                  .arg(presentation.value(QStringLiteral("automatic")).toBool() ? 1 : 0));
+        // The re-show counter is kept honest at its invariant: nothing in this
+        // whole run ever showed the dialog, so a returning dialog path (a
+        // regression to the pre-AC-4.4 policy) turns this red instead of hiding
+        // behind a ">= 1" premise that no longer has a producer.
+        check("modal.counter-stays-zero",
+              dialogsBeforeAuto == 0 && dialogs == 0,
+              QStringLiteral("before=%1 after=%2").arg(dialogsBeforeAuto).arg(dialogs));
     }
 
     // =======================================================================

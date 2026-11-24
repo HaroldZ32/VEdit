@@ -1,0 +1,161 @@
+{
+  "design": {
+    "name": "$root",
+    "kind": "Root",
+    "addr": 2844075302720,
+    "members": [
+      {
+        "name": "",
+        "kind": "CompilationUnit",
+        "addr": 2844078059984
+      },
+      {
+        "name": "",
+        "kind": "CompilationUnit",
+        "addr": 2844078060256
+      },
+      {
+        "name": "uart",
+        "kind": "Instance",
+        "source_file": "sim/uart.v",
+        "source_line": 1,
+        "source_column": 8,
+        "addr": 2844078060832,
+        "body": {
+          "name": "uart",
+          "kind": "InstanceBody",
+          "source_file": "sim/uart.v",
+          "source_line": 1,
+          "source_column": 8,
+          "addr": 2844078060528,
+          "members": [
+            {
+              "name": "clk",
+              "kind": "Port",
+              "source_file": "sim/uart.v",
+              "source_line": 1,
+              "source_column": 20,
+              "addr": 2844078060968,
+              "type": "logic",
+              "direction": "In",
+              "internalSymbol": "2844078061088 clk"
+            },
+            {
+              "name": "clk",
+              "kind": "Net",
+              "source_file": "sim/uart.v",
+              "source_line": 1,
+              "source_column": 20,
+              "addr": 2844078061088,
+              "type": "logic",
+              "netType": {
+                "name": "wire",
+                "kind": "NetType",
+                "addr": 2844075302240,
+                "type": "logic"
+              }
+            },
+            {
+              "name": "done",
+              "kind": "Port",
+              "source_file": "sim/uart.v",
+              "source_line": 1,
+              "source_column": 32,
+              "addr": 2844078061248,
+              "type": "logic",
+              "direction": "Out",
+              "internalSymbol": "2844078061368 done"
+            },
+            {
+              "name": "done",
+              "kind": "Net",
+              "source_file": "sim/uart.v",
+              "source_line": 1,
+              "source_column": 32,
+              "addr": 2844078061368,
+              "type": "logic",
+              "netType": {
+                "name": "wire",
+                "kind": "NetType",
+                "addr": 2844075302240,
+                "type": "logic"
+              }
+            },
+            {
+              "name": "",
+              "kind": "ContinuousAssign",
+              "source_file": "sim/uart.v",
+              "source_line": 2,
+              "source_column": 10,
+              "addr": 2844078061544,
+              "assignment": {
+                "source_file_start": "sim/uart.v",
+                "source_file_end": "sim/uart.v",
+                "source_line_start": 2,
+                "source_line_end": 2,
+                "source_column_start": 10,
+                "source_column_end": 20,
+                "kind": "Assignment",
+                "type": "logic",
+                "left": {
+                  "source_file_start": "sim/uart.v",
+                  "source_file_end": "sim/uart.v",
+                  "source_line_start": 2,
+                  "source_line_end": 2,
+                  "source_column_start": 10,
+                  "source_column_end": 14,
+                  "kind": "NamedValue",
+                  "type": "logic",
+                  "symbol": "2844078061368 done"
+                },
+                "right": {
+                  "source_file_start": "sim/uart.v",
+                  "source_file_end": "sim/uart.v",
+                  "source_line_start": 2,
+                  "source_line_end": 2,
+                  "source_column_start": 17,
+                  "source_column_end": 20,
+                  "kind": "NamedValue",
+                  "type": "logic",
+                  "symbol": "2844078061088 clk"
+                },
+                "isNonBlocking": false
+              }
+            }
+          ],
+          "definition": "2844074405632 uart"
+        },
+        "connections": [
+        ]
+      }
+    ]
+  },
+  "definitions": [
+    {
+      "name": "uart",
+      "kind": "Definition",
+      "source_file": "sim/uart.v",
+      "source_line": 1,
+      "source_column": 8,
+      "addr": 2844074405632,
+      "defaultNetType": "2844075302240 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    },
+    {
+      "name": "uart",
+      "kind": "Definition",
+      "source_file": "rtl/uart.v",
+      "source_line": 1,
+      "source_column": 8,
+      "addr": 2844074404864,
+      "defaultNetType": "2844075302240 wire",
+      "definitionKind": "Module",
+      "defaultLifetime": "Static",
+      "unconnectedDrive": "None",
+      "cellDefine": false
+    }
+  ]
+}

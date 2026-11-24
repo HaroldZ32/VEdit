@@ -118,7 +118,22 @@ The plan is `.mpd/plans/ux-batch-2/00-plan.md` §B3/§B5 and the BINDING rulings
   file no layer ever looked at stays dot-less.
 * `ActiveFileWatcher` subscribes to EVERY open document's own change signal (all
   panes, all tabs), not to the active tab's text at poll time: a background tab
-  edited before a tab switch invalidates its file at once.
+  edited before a tab switch invalidates its file at once. The 400 ms tick itself
+  copies **no text**: it follows the active path and an O(1) document revision
+  (see the cap section below).
+* **The realtime session is bounded by the GOLDEN project file set (G1-a,
+  batch-20261120).** The watcher reads `vedit.diagnostics.projectFiles` — the one
+  expansion this lane adopted from the project lane's inputs — and only a document
+  that is a member of it contributes to the session. `realtimeFileSetFor(file)` is
+  `{file} ∪ closure[file]` for a member and `{file}` **alone** for a file outside
+  the set (single-file diagnostics: no closure, no project file), and closure
+  children are filtered against the set again (G1-b defence). `realtimeSets`
+  publishes `goldenFileCount` and `outsideFileCount` so the exclusion is
+  observable. An EMPTY set (no imported filelist) means "no project file set":
+  the rule does not apply, and the module tree is gated on a filelist, so no
+  closure exists in that mode either. The rule lives in `realtime_file_scope.h`
+  and is asserted by `vedit-workspace-diagnostics-selftest` (unit) and
+  `vedit-module-closure-e2e` (real catalog, real session compile set).
 * `projectRootChanged` is followed: the file set, the session root and the rule
   context are re-pinned, the in-flight pass is cancelled and the previous
   project's rows are dropped, so Open Folder cannot lint the old project.
@@ -132,6 +147,46 @@ The plan is `.mpd/plans/ux-batch-2/00-plan.md` §B3/§B5 and the BINDING rulings
   `1 = error, 2 = warning`. Before this the upper layer's errors were painted as
   information (and its warnings as errors) on every surface. The conversion lives
   in the merge layer; `cliDiagnostics()` still returns the raw ABI scale.
+
+### Active-file watcher cap (batch 20261110d — BLOCKER crash fix)
+
+The 400 ms `ActiveFileWatcher` used to copy the **whole** active document on
+every tick (`document()->text()`), keep a second full copy in `lastText_`, and
+re-read the file (`readAll()` + `QString::fromUtf8`) on the first tick, with no
+size cap. A several-hundred-MB file therefore asked for >1.5 GB inside one
+event-loop callback and died with `std::bad_alloc` → `terminate` while the user
+was idle.
+
+The rule now is **cap the work, not just the string**:
+
+* `kActiveFileWatchByteCap` (`diagnostics_integration.h`) is **4 MiB**: larger
+  than any hand-written HDL source here (all < 1 MiB) and large enough for a
+  generated netlist, while bounding this path's own peak at ~5× cap = **20 MiB**
+  (disk bytes + UTF-8 `QString` + one document copy), independent of document
+  size. The tick itself allocates **nothing** proportional to the document.
+* `poll()` no longer reads text at all: edits arrive through each document's
+  `textChanged` signal, with `KTextEditor::Document::revision()` /
+  `QTextDocument::revision()` as an O(1) signal-miss fallback (consulted only
+  while the buffer is dirty, so a save changes nothing).
+* `analyze()` decides from **metadata first**: `QFileInfo::size()` (O(1)) and a
+  no-copy character count (`document()->lines()`/`lineLength()` with early exit,
+  `QTextDocument::characterCount()`). Above the cap neither the document nor the
+  file is read. The disk read is still bounded (`read(cap + 1)`, never
+  `readAll()`) so even a file that grows between stat and read cannot exceed the
+  cap.
+* Above the cap is a **named state**, never a silent "no diagnostics": one
+  `analysis disabled: file too large …` line (status bar + shell diagnostics,
+  emitted once per file), the `vedit.diagnostics.analysisAvailability` property
+  with `available:false` and the reason, and the counters published as
+  `vedit.diagnostics.activeWatch` (cap bytes, buffer copies, analyses, capped
+  skips/notices) so the bound is measurable rather than asserted.
+* `VEDIT_NO_ACTIVE_FILE_WATCHER=1` keeps its exact meaning: the constructor
+  returns before publishing stats, starting timers or subscribing to anything.
+* Regression lock: `vedit-active-watcher-cap-selftest` generates an oversized
+  document at runtime (never committed), asserts **zero** buffer copies and
+  exactly one named line, and proves a normal small file is still copied and
+  handed to the analysis. `vedit-diagnostics-product-seam` keeps proving the
+  end-to-end small-file analysis against the real verible LSP.
 
 ### R3 — project lint after every successful save
 
@@ -228,17 +283,68 @@ nothing at all (an empty modal is worse than none).
 unknown` from the SAME merged view; `src/workspace/filetree/file_status_delegate.*`
 paints the dot between the icon and the name (the text is shifted right, so the
 two never overlap). The map is published by this lane as the shell property
-`vedit.diagnostics.fileStatus` and refreshed only when
-`vedit.diagnostics.viewRevision` moves — the tree never rescans the project.
+`vedit.diagnostics.fileStatus`; the tree never rescans the project.
 
-### Project file set (found while testing R3)
+**T9 (batch 20261110d) changed the publish CONTRACT** — one keystroke must not
+rebuild the project view:
 
-`ProjectFileSetPoller` now calls `vd_project_expand()` (the C7 project model: the
-`.f` expansion UNION a recursive scan of the folder) instead of the legacy
-filelist-only `vd_project_parse()`. Measured: a folder of `.sv` files with no
-`.f` produced ZERO files with the legacy call, so "Lint Project" and every
-save-triggered pass reported "No project file set" — the feature was dead for
-exactly the projects a new user opens.
+| property | meaning |
+|---|---|
+| `vedit.diagnostics.fileStatus` | the last FULL map. Written on a structural change (finished pass, lane rows, scope), not per keystroke. |
+| `vedit.diagnostics.viewRevision` | token of that full map. |
+| `vedit.diagnostics.fileStatusDelta` | the entries whose verdict moved in the latest per-file publish (an edit, a retained verdict). |
+| `vedit.diagnostics.fileStatusDeltaRevision` | token of the delta; consumers apply the delta on top of the full map. |
+| `vedit.diagnostics.statusRevision` | moves for BOTH kinds — the single "something changed, repaint" token the file tree and the Project panel poll. |
+
+`DiagnosticsController::takeLivePublish()` is the ONE decision (full vs delta,
+plus cheap exact counts); the per-file upper-row store makes dropping one file's
+rows and reading one file's verdict O(that file). A hidden dock does no widget
+work (the 300 ms panel poll still advances the analysis, never the paint), and a
+typing burst publishes one delta for the edited file, not the project.
+
+**Three independent clocks — publishing is synchronous, CONSUMING is not**
+(batch-20261114 T1; corrects the earlier "the group is synchronous, so there is
+no phase difference" reading). The pieces move on different timers:
+
+| hop | clock |
+|---|---|
+| full status map published to the shell properties | 400 ms `liveTimer_` → `refreshLiveState()` |
+| "From filelist" grouping (`vedit.diagnostics.projectFilesRevision`) | published synchronously with the project set, **consumed by `FileTreeWidget` on its 500 ms tick** (`syncFileStatuses()`), which also reapplies the dots |
+| Project panel repaint | its own 500 ms tick (the delegate still reads `fileStatusAt()` lazily) |
+
+The property `vedit.diagnostics.viewRevision` is the token of the published full
+map: a consumer that refreshes lazily (the tree's `FileStatusRole`, the Project
+panel's `fileStatusAt()`) rebuilds its cache only when that token moves. So a
+reader that asserts a dot as soon as the group appears can still be reading the
+map published BEFORE the lint pass finished — a test-timing defect, never a
+product one (the product surface is eventually consistent by design). The RM-9
+end-to-end test now waits for `viewRevision` to pass the pass's completion point
+(`rm9_status_dots_e2e.cpp`, `OBSERVED rm9.published-past-pass`) instead of
+sleeping for a fixed period.
+
+Both consumers read the published revision lazily on every query, so a correct state is not
+tied to a tick at all — only the *first observation* can lag by up to one tick; after that the
+query itself refreshes the cache. "Late by one tick" is therefore a visibility delay, never a
+wrong dot.
+
+### Project file set (found while testing R3; G1-a "expand once" in batch-20261120)
+
+`ProjectFileSetPoller` no longer expands anything when a PROJECT LANE is
+installed: that lane owns the ONE expansion (`.f` expansion + `[project]
+filelists` + the tools page's `-I`/`-D`) and publishes it as
+`vedit.project.files` + `vedit.project.filesRevision` (with
+`includeDirs`/`defines`/`hasFilelist`/`filesPending`). This lane adopts that
+answer and republishes it as `vedit.diagnostics.projectFiles` — one publisher,
+one consumer, no second expansion. A shell WITHOUT a project lane (a standalone
+diagnostics harness) keeps the historical fallback to its own
+`vd_project_expand_v3` job: there, its expansion is the only one in the process.
+`vedit.diagnostics.projectFilesState.source` reports which path ran
+(`project-lane` / `self-expansion`), so a test never has to read a log line.
+
+History: the lane used to call the legacy filelist-only `vd_project_parse()`, so
+a folder of `.sv` files with no `.f` produced ZERO files and "Lint Project"
+reported "No project file set" — dead for exactly the projects a new user opens.
+The modern expansion replaced it, and AC-2.1 gated it on an imported filelist.
 
 ### B5 — Rename
 

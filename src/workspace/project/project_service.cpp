@@ -33,6 +33,8 @@ ExpansionPayload toPayload(const VdProjectInfo &info)
     payload.defines = toList(info.defines);
     payload.diagnostics = toList(info.warnings);
     payload.missingVariables = toList(info.missing_variables);
+    payload.referencedVariables = toList(info.referenced_variables);
+    payload.referencedVariableLayers = toList(info.referenced_variable_layers);
     payload.skipped = static_cast<int>(info.skipped_lines);
     return payload;
 }
@@ -74,8 +76,10 @@ ProjectService::~ProjectService()
 }
 
 ProjectService::Start ProjectService::start(const QString &projectRoot, const QStringList &filelists,
-                                            const QStringList &variables, const QString &settingsPath,
-                                            quint64 *job)
+                                            const QStringList &variables,
+                                            const QStringList &projectIncludeDirs,
+                                            const QStringList &projectDefines,
+                                            const QString &settingsPath, quint64 *job)
 {
     if (service_ == nullptr || job == nullptr) {
         return Start::Rejected;
@@ -84,9 +88,14 @@ ProjectService::Start ProjectService::start(const QString &projectRoot, const QS
     const QByteArray settings = settingsPath.toUtf8();
     BorrowedList lists(filelists);
     BorrowedList table(variables);
-    const quint64 id = static_cast<quint64>(vd_project_expand_v2(
+    // AC-1.5: the project panel's typed entries ride the ADDITIVE v3 call; the
+    // v1/v2 entry points stay untouched for every existing caller.
+    BorrowedList includes(projectIncludeDirs);
+    BorrowedList defines(projectDefines);
+    const quint64 id = static_cast<quint64>(vd_project_expand_v3(
         service_, path.constData(), &lists.list,
-        settings.isEmpty() ? nullptr : settings.constData(), &table.list));
+        settings.isEmpty() ? nullptr : settings.constData(), &table.list, &includes.list,
+        &defines.list));
     if (id == 0) {
         return Start::Rejected;
     }
