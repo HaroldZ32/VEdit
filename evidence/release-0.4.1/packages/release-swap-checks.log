@@ -1,0 +1,59 @@
+$ bash -n packaging/runtime/build.sh
+build syntax exit=0
+$ bash -n evidence/release-0.4.1/packages/release-swap-probe.sh
+probe syntax exit=0
+$ bash evidence/release-0.4.1/packages/release-swap-probe.sh baseline <(git show 6d79d0e:packaging/runtime/build.sh)
+Terminated                 PATH="$fixture/bin:$PATH" BUILD_ID="$1" FAULT="$2" VEDIT_PACK_EVIDENCE="$fixture/evidence-$1" bash "$fixture/packaging/runtime/build.sh" --no-centos-probe > "$fixture/$1.log" 2>&1
+interrupted exit=143
+baseline TERM removed both the public release and the staging directory
+baseline probe exit=0
+$ bash evidence/release-0.4.1/packages/release-swap-probe.sh
+interrupted exit=143
+release suite=old checksums=OK
+Restored previous release to /home/haroldzhao/MyProj/DshProj/VEdit/target/release-readiness-041/evidence/release-0.4.1/packages/.release-swap.U4NGur/term/packaging/runtime/out/release
+retry exit=0
+release suite=retry checksums=OK
+rejected exit=29
+release suite=old checksums=OK
+rename-failed exit=73
+release suite=old checksums=OK
+published exit=0
+release suite=published checksums=OK
+rollback-failed exit=73
+.release.previous suite=old checksums=OK
+ERROR: previous release retained in /home/haroldzhao/MyProj/DshProj/VEdit/target/release-readiness-041/evidence/release-0.4.1/packages/.release-swap.U4NGur/rollback-failure/packaging/runtime/out/.release.previous
+retry-rejected exit=29
+release suite=old checksums=OK
+evidence/release-0.4.1/packages/release-swap-probe.sh: line 97:  1132 Killed                     PATH="$fixture/bin:$PATH" BUILD_ID="$1" FAULT="$2" VEDIT_PACK_EVIDENCE="$fixture/evidence-$1" bash "$fixture/packaging/runtime/build.sh" --no-centos-probe > "$fixture/$1.log" 2>&1
+killed exit=137
+.release.previous suite=old checksums=OK
+retry-rejected exit=29
+release suite=old checksums=OK
+Restored previous release to /home/haroldzhao/MyProj/DshProj/VEdit/target/release-readiness-041/evidence/release-0.4.1/packages/.release-swap.U4NGur/kill/packaging/runtime/out/release
+retry exit=0
+release suite=retry checksums=OK
+evidence/release-0.4.1/packages/release-swap-probe.sh: line 97:  1494 Killed                     PATH="$fixture/bin:$PATH" BUILD_ID="$1" FAULT="$2" VEDIT_PACK_EVIDENCE="$fixture/evidence-$1" bash "$fixture/packaging/runtime/build.sh" --no-centos-probe > "$fixture/$1.log" 2>&1
+published-before-kill exit=137
+release suite=published-before-kill checksums=OK
+.release.previous suite=old checksums=OK
+retry-rejected exit=29
+release suite=published-before-kill checksums=OK
+contender exit=1
+.release.previous suite=old checksums=OK
+release suite=first checksums=OK
+contender exit=0
+release suite=contender checksums=OK
+first-publish exit=0
+release suite=first-publish checksums=OK
+release swap probe passed
+fixed probe exit=0
+
+$ (cd packaging/runtime/out/release && sha256sum --check --strict SHA256SUMS)
+VEdit-0.4.1-x86_64.AppImage: OK
+VEdit-0.4.1-x86_64.run: OK
+vedit-0.4.1-linux-x86_64.tar.gz: OK
+existing release checksums exit=0
+
+$ bash build/gates/pack.sh
+[pack] 本项目暂无 tar.gz 目录包（T25 负责）：未找到 *.tar.gz
+pack gate exit=1

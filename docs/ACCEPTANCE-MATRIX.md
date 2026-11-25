@@ -1,8 +1,7 @@
 # T25 / T22 集成验收 — 验收矩阵（公开镜像）
 
-> **本轮最终矩阵**：cell `cell-20261103T123639841Z`（requirements rev3）的验收矩阵不在本文件，
-> 而是 `docs/FINAL-ACCEPTANCE-MATRIX.md`（权威版 `evidence/final-acceptance-2/AC-MATRIX.md`）。
-> 本文件仍镜像**上一轮**的 46-AC 矩阵（`evidence/final-acceptance/AC-MATRIX.md`），未改写其判定。
+> 本页保存早期的 46-AC 矩阵。后续 `cell-20261103T123639841Z` 验收见[最终验收矩阵](FINAL-ACCEPTANCE-MATRIX.md)。
+> 当前版本的发版步骤见[发布指南](RELEASING.md)。
 
 <!-- 本文件是证据目录的公开镜像；权威版本与全部逐条证据指针在 evidence/final-acceptance/AC-MATRIX.md -->
 

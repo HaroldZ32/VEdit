@@ -1,0 +1,4 @@
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1 definitions-ok=[]
+QThreadStorage: entry 1 destroyed before end of thread 0x5f7118b6da40
+QThreadStorage: entry 0 destroyed before end of thread 0x5f7118b6da40
+vedit-app 0.4.1

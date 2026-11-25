@@ -59,6 +59,46 @@ f2_inputs() {
     target/ksh-selfbuild/F2/install/lib
 }
 
+release_assets() (
+  local release_version name path bytes checksums checksum
+  release_version=$(version)
+  cd -P -- "${1:?release directory required}"
+  local packages=(
+    "VEdit-$release_version-x86_64.AppImage"
+    "VEdit-$release_version-x86_64.run"
+    "vedit-$release_version-linux-x86_64.tar.gz"
+  )
+  shopt -s dotglob nullglob
+  local files=(*)
+  if [[ ${#files[@]} -ne 4 ]]; then
+    printf 'Expected exactly three packages and SHA256SUMS in %s\n' "$PWD" >&2
+    return 1
+  fi
+  local sizes=()
+  for name in "${packages[@]}" SHA256SUMS; do
+    path="$PWD/$name"
+    if [[ ! -f "$path" || -L "$path" || ! -s "$path" ]]; then
+      printf 'Missing, empty or non-regular release asset: %s\n' "$path" >&2
+      return 1
+    fi
+    bytes=$(stat -c '%s' -- "$path")
+    if (( bytes >= 2 * 1024 * 1024 * 1024 )); then
+      printf 'GitHub release asset is at or above 2 GiB: %s (%s bytes)\n' "$name" "$bytes" >&2
+      return 1
+    fi
+    sizes+=("$bytes")
+  done
+
+  checksums=$(sha256sum -- "${packages[@]}")
+  diff -u --label expected --label SHA256SUMS <(printf '%s\n' "$checksums") SHA256SUMS >&2
+  checksums+=$'\n'$(sha256sum -- SHA256SUMS)
+  local i=0
+  while read -r checksum name; do
+    printf '%s\t%s\tsha256:%s\n' "$name" "${sizes[i]}" "$checksum"
+    i=$((i + 1))
+  done <<< "$checksums"
+)
+
 package() {
   qt_image
   bash scripts/fetch-verible.sh
@@ -82,7 +122,7 @@ package() {
   # shellcheck source=versions-scala.env
   source scripts/versions-scala.env
 
-  local release_version out appimage extracted sha256
+  local release_version out appimage extracted manifest_sha256
   release_version=$(version)
   out="$ROOT/packaging/runtime/out"
   appimage="VEdit-$release_version-x86_64.AppImage"
@@ -99,7 +139,7 @@ package() {
 
   # Exercise the outer AppImage runtime and the extracted payload on the glibc
   # 2.17 userspace, with the original source fixtures on a read-only mount.
-  docker run --rm --network none -v "$out/$appimage:/payload:ro" \
+  docker run --rm --network none -v "$out/release/$appimage:/payload:ro" \
     "$VEDIT_CENTOS_PROBE_IMAGE" /payload --appimage-version
   local user_args=()
   if ! docker info --format '{{json .SecurityOptions}}' | grep '"name=rootless"' >/dev/null; then
@@ -135,12 +175,9 @@ package() {
       "$VHDL_LS_VERSION" "$GHDL_VERSION" "$VSG_VERSION" "$SCALA_CLI_VERSION" "${SCALA_JDK_VERSION%_*}" \
       2>&1 | tee "$VEDIT_PACK_EVIDENCE/80-delivered-tools.log"
 
-  (
-    cd "$out"
-    sha256sum --check --strict SHA256SUMS
-  )
-  sha256=$(sha256sum "$out/$appimage" | cut -d' ' -f1)
-  printf 'appimage=%s\nsha256=%s\n' "$appimage" "$sha256" >> "${GITHUB_OUTPUT:?}"
+  release_assets "$out/release" | tee "$VEDIT_PACK_EVIDENCE/81-release-assets.tsv"
+  manifest_sha256=$(sha256sum "$out/release/SHA256SUMS" | cut -d' ' -f1)
+  printf 'version=%s\nmanifest-sha256=%s\n' "$release_version" "$manifest_sha256" >> "${GITHUB_OUTPUT:?}"
 }
 
 case "${1:-}" in
@@ -149,5 +186,6 @@ case "${1:-}" in
   qt) qt_gates ;;
   f2) f2_inputs ;;
   package) package ;;
-  *) echo 'Usage: bash scripts/ci-qt6.sh {version|rust-gates|qt|f2|package}' >&2; exit 2 ;;
+  release-assets) release_assets "${2:-}" ;;
+  *) echo 'Usage: bash scripts/ci-qt6.sh {version|rust-gates|qt|f2|package|release-assets DIR}' >&2; exit 2 ;;
 esac

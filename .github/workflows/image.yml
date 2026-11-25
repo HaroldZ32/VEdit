@@ -7,12 +7,10 @@ on:
         type: boolean
         required: true
     outputs:
-      artifact-id:
-        value: ${{ jobs.package.outputs.artifact-id }}
-      appimage:
-        value: ${{ jobs.package.outputs.appimage }}
-      sha256:
-        value: ${{ jobs.package.outputs.sha256 }}
+      artifact-ids:
+        value: ${{ jobs.package.outputs.artifact-ids }}
+      manifest-sha256:
+        value: ${{ jobs.package.outputs.manifest-sha256 }}
 
 permissions:
   contents: read
@@ -172,15 +170,15 @@ jobs:
           retention-days: 3
 
   package:
-    name: Qt6 AppImage and CentOS 7 verification
+    name: Qt6 release packages and CentOS 7 verification
     needs: [slang, qt, scala]
     if: inputs.package
     runs-on: ubuntu-24.04
     timeout-minutes: 150
     outputs:
-      artifact-id: ${{ steps.upload.outputs.artifact-id }}
-      appimage: ${{ steps.pack.outputs.appimage }}
-      sha256: ${{ steps.pack.outputs.sha256 }}
+      artifact-ids: >-
+        ${{ steps.appimage.outputs.artifact-id }},${{ steps.tarball.outputs.artifact-id }},${{ steps.installer.outputs.artifact-id }},${{ steps.manifest.outputs.artifact-id }}
+      manifest-sha256: ${{ steps.pack.outputs.manifest-sha256 }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -191,24 +189,51 @@ jobs:
           artifact-ids: ${{ needs.slang.outputs.artifact-id }},${{ needs.qt.outputs.artifact-id }},${{ needs.scala.outputs.artifact-id }}
           path: ${{ runner.temp }}
           merge-multiple: true
-      - name: Build and verify the AppImage
+      - name: Build and verify all three formats
         id: pack
         run: |
           df -h "$GITHUB_WORKSPACE" "$RUNNER_TEMP"
           tar -xf "$RUNNER_TEMP/slang.tar"
+          rm -- "$RUNNER_TEMP/slang.tar"
           tar --zstd -xf "$RUNNER_TEMP/qt6.tar.zst"
+          rm -- "$RUNNER_TEMP/qt6.tar.zst"
           tar --zstd -xf "$RUNNER_TEMP/scala.tar.zst"
-          rm -- "$RUNNER_TEMP/scala.tar.zst" "$RUNNER_TEMP/qt6.tar.zst"
+          rm -- "$RUNNER_TEMP/scala.tar.zst"
           bash scripts/ci-qt6.sh package
-      - name: Save the verified release pair
-        id: upload
+      # Keep each already-compressed format in a separate streamed artifact.
+      - name: Save verified AppImage
+        id: appimage
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: qt6-appimage-${{ github.sha }}-${{ github.run_attempt }}
-          path: |
-            packaging/runtime/out/${{ steps.pack.outputs.appimage }}
-            packaging/runtime/out/SHA256SUMS
+          path: packaging/runtime/out/release/VEdit-${{ steps.pack.outputs.version }}-x86_64.AppImage
           compression-level: 0
+          if-no-files-found: error
+          retention-days: 7
+      - name: Save verified tarball
+        id: tarball
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: qt6-tarball-${{ github.sha }}-${{ github.run_attempt }}
+          path: packaging/runtime/out/release/vedit-${{ steps.pack.outputs.version }}-linux-x86_64.tar.gz
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 7
+      - name: Save verified installer
+        id: installer
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: qt6-installer-${{ github.sha }}-${{ github.run_attempt }}
+          path: packaging/runtime/out/release/VEdit-${{ steps.pack.outputs.version }}-x86_64.run
+          compression-level: 0
+          if-no-files-found: error
+          retention-days: 7
+      - name: Save release checksums
+        id: manifest
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: qt6-manifest-${{ github.sha }}-${{ github.run_attempt }}
+          path: packaging/runtime/out/release/SHA256SUMS
           if-no-files-found: error
           retention-days: 7
       - name: Save packaging logs

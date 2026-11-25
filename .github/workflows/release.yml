@@ -21,7 +21,6 @@ jobs:
       version: ${{ steps.check.outputs.version }}
       commit: ${{ steps.check.outputs.commit }}
       tag-object: ${{ steps.check.outputs.tag-object }}
-      notes-present: ${{ steps.check.outputs.notes-present }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
@@ -37,9 +36,6 @@ jobs:
           commit=$(git rev-parse HEAD)
           test "$commit" = "$(git rev-parse "$GITHUB_SHA^{commit}")"
           printf 'version=%s\ncommit=%s\n' "$version" "$commit" >> "$GITHUB_OUTPUT"
-          if [[ -f "docs/releases/$version.md" ]]; then
-            echo 'notes-present=true' >> "$GITHUB_OUTPUT"
-          fi
           if [[ "$GITHUB_EVENT_NAME" == push ]]; then
             if [[ "$GITHUB_REF" != "refs/tags/v$version" ]]; then
               echo "::error::Expected refs/tags/v$version for the workspace Cargo version"
@@ -65,53 +61,78 @@ jobs:
       package: true
 
   publish:
-    name: Publish verified AppImage and SHA256SUMS
+    name: Publish verified packages and SHA256SUMS
     if: github.event_name == 'push' && github.ref_type == 'tag'
     needs: [source, build]
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 60
     permissions:
       contents: write
+    env:
+      VERSION: ${{ needs.source.outputs.version }}
     steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ needs.source.outputs.commit }}
+          persist-credentials: false
+      - name: Record publisher disk space before transfer
+        run: df -h "$RUNNER_TEMP"
       - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
-          artifact-ids: ${{ needs.build.outputs.artifact-id }}
+          artifact-ids: ${{ needs.build.outputs.artifact-ids }}
           path: ${{ runner.temp }}/vedit-release
           merge-multiple: true
-      - name: Check the transferred pair and publish the existing tag
+      - name: Check transferred names, sizes and checksums
         shell: bash
-        working-directory: ${{ runner.temp }}/vedit-release
         env:
+          RELEASE_DIR: ${{ runner.temp }}/vedit-release
+          MANIFEST_SHA256: ${{ needs.build.outputs.manifest-sha256 }}
+        run: |
+          set -euo pipefail
+          df -h "$RUNNER_TEMP"
+          test "$(bash scripts/ci-qt6.sh version)" = "$VERSION"
+          [[ "$MANIFEST_SHA256" =~ ^[a-f0-9]{64}$ ]]
+          printf '%s  %s\n' "$MANIFEST_SHA256" "$RELEASE_DIR/SHA256SUMS" | sha256sum --check --strict
+          asset_metadata="$RUNNER_TEMP/vedit-release-assets.tsv"
+          bash scripts/ci-qt6.sh release-assets "$RELEASE_DIR" > "$asset_metadata"
+          LC_ALL=C sort -o "$asset_metadata" "$asset_metadata"
+          cat "$asset_metadata"
+      - name: Check all four uploaded assets before publishing the draft
+        shell: bash
+        env:
+          RELEASE_DIR: ${{ runner.temp }}/vedit-release
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           TAG: ${{ github.ref_name }}
           TAG_OBJECT: ${{ needs.source.outputs.tag-object }}
           COMMIT: ${{ needs.source.outputs.commit }}
-          VERSION: ${{ needs.source.outputs.version }}
-          APPIMAGE: ${{ needs.build.outputs.appimage }}
-          SHA256: ${{ needs.build.outputs.sha256 }}
-          NOTES_PRESENT: ${{ needs.source.outputs.notes-present }}
         run: |
           set -euo pipefail
           test "$TAG" = "v$VERSION"
-          test "$APPIMAGE" = "VEdit-$VERSION-x86_64.AppImage"
-          [[ "$SHA256" =~ ^[a-f0-9]{64}$ ]]
-          shopt -s dotglob nullglob
-          files=(*)
-          test "${#files[@]}" -eq 2
-          test -f "$APPIMAGE" && test ! -L "$APPIMAGE"
-          test -f SHA256SUMS && test ! -L SHA256SUMS
-          printf '%s  %s\n' "$SHA256" "$APPIMAGE" | cmp - SHA256SUMS
-          sha256sum --check --strict SHA256SUMS
-          test "$(gh api "repos/$GH_REPO/git/ref/tags/$TAG" --jq .object.sha)" = "$TAG_OBJECT"
+          test -n "$TAG_OBJECT"
+          remote_tag() { gh api "repos/$GH_REPO/git/ref/tags/$TAG" --jq '.object | select(.type == "tag") | .sha'; }
+          test "$(remote_tag)" = "$TAG_OBJECT"
+          release_api="repos/$GH_REPO/releases"
+          existing=$(gh api --paginate "$release_api?per_page=100" |
+            jq -r --arg tag "$TAG" '.[] | select(.tag_name == $tag) | .id')
+          if [[ -n "$existing" ]]; then
+            echo "::error::A release or draft already exists for $TAG (ID $existing)"
+            exit 1
+          fi
 
           notes=(--generate-notes)
-          note_path="docs/releases/$VERSION.md"
-          if [[ "$NOTES_PRESENT" == true ]]; then
-            gh api -H 'Accept: application/vnd.github.raw+json' \
-              "repos/$GH_REPO/contents/$note_path?ref=$COMMIT" > "$RUNNER_TEMP/release-notes.md"
-            notes=(--notes-file "$RUNNER_TEMP/release-notes.md")
+          if [[ -f "docs/releases/$VERSION.md" ]]; then
+            notes=(--notes-file "docs/releases/$VERSION.md")
           fi
           if [[ "$VERSION" == *-* ]]; then notes+=(--prerelease); fi
-          gh release create "$TAG" --verify-tag --title "VEdit $VERSION" \
-            "${notes[@]}" "$APPIMAGE" SHA256SUMS
+          gh release create "$TAG" --draft --verify-tag --target "$COMMIT" --title "VEdit $VERSION" \
+            "${notes[@]}" "$RELEASE_DIR/VEdit-$VERSION-x86_64.AppImage" \
+            "$RELEASE_DIR/vedit-$VERSION-linux-x86_64.tar.gz" "$RELEASE_DIR/VEdit-$VERSION-x86_64.run" \
+            "$RELEASE_DIR/SHA256SUMS"
+          release_id=$(gh release view "$TAG" --json isDraft,databaseId --jq 'select(.isDraft) | .databaseId')
+          [[ "$release_id" =~ ^[0-9]+$ ]]
+          gh api --paginate "$release_api/$release_id/assets" |
+            jq -r '.[] | [.name, .size, (if .state == "uploaded" then .digest else .state end)] | @tsv' |
+            LC_ALL=C sort | diff -u "$RUNNER_TEMP/vedit-release-assets.tsv" -
+          test "$(remote_tag)" = "$TAG_OBJECT"
+          gh api --method PATCH "$release_api/$release_id" -F draft=false --jq .html_url
