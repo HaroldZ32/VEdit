@@ -16,12 +16,14 @@
 #include <QDynamicPropertyChangeEvent>
 #include <QFileInfo>
 #include <QFileSystemWatcher>
+#include <QHeaderView>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QPointer>
 #include <QSet>
 #include <QStatusBar>
 #include <QTimer>
+#include <QTreeWidget>
 #include <vd_ffi.h>
 
 #include <array>
@@ -35,15 +37,16 @@ constexpr auto kSlangProperty = "vedit.diagnostics.toolchainSlang";
 struct Command {
     const char *id;
     const char *label;
+    const char *shortcut;
     bool driver;
     bool full;
 };
 
 constexpr std::array<Command, 4> kCommands{{
-    {"signal.trace.driver", QT_TRANSLATE_NOOP("VEdit", "Trace Driver"), true, false},
-    {"signal.trace.load", QT_TRANSLATE_NOOP("VEdit", "Trace Load"), false, false},
-    {"signal.trace.driver.chain", QT_TRANSLATE_NOOP("VEdit", "Show Driver Chain"), true, true},
-    {"signal.trace.load.chain", QT_TRANSLATE_NOOP("VEdit", "Show Load Chain"), false, true},
+    {"signal.trace.driver", QT_TRANSLATE_NOOP("VEdit", "Trace Driver"), "F7", true, false},
+    {"signal.trace.load", QT_TRANSLATE_NOOP("VEdit", "Trace Load"), "F9", false, false},
+    {"signal.trace.driver.chain", QT_TRANSLATE_NOOP("VEdit", "Show Driver Chain"), "Shift+F7", true, true},
+    {"signal.trace.load.chain", QT_TRANSLATE_NOOP("VEdit", "Show Load Chain"), "Shift+F9", false, true},
 }};
 
 class Strings {
@@ -75,6 +78,8 @@ public:
             vedit::app::CommandSpec spec;
             spec.id = QString::fromLatin1(command.id);
             spec.text = QCoreApplication::translate("VEdit", command.label);
+            spec.defaultShortcut = QKeySequence::fromString(QString::fromLatin1(command.shortcut),
+                                                            QKeySequence::PortableText);
             spec.menu = QStringLiteral("project");
             spec.order = 74 + static_cast<int>(i);
             actions_[i] = shell_.commands()->add(spec);
@@ -198,6 +203,7 @@ private:
     std::uint32_t tokenColumn_ = 0;
     Command command_ = kCommands.front();
     QPointer<QDialog> dialog_;
+    std::array<QByteArray, 2> headerStates_;
 };
 
 bool identifier(QChar ch)
@@ -347,7 +353,13 @@ void TraceLane::present(const QJsonObject &answer)
                                       .value(QStringLiteral("location")).toObject()));
         return;
     }
-    dialog_ = showResults(&shell_, QCoreApplication::translate("VEdit", command_.label), answer, command_.full);
+    const std::size_t mode = command_.full ? 1 : 0;
+    dialog_ = showResults(&shell_, QCoreApplication::translate("VEdit", command_.label), answer,
+                          command_.full, headerStates_[mode]);
+    auto *header = dialog_->findChild<QTreeWidget *>()->header();
+    connect(header, &QHeaderView::sectionResized, this, [this, header, mode]() {
+        headerStates_[mode] = header->saveState();
+    });
     shell_.statusBar()->clearMessage();
 }
 } // namespace

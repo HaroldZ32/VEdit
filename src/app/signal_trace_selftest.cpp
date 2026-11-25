@@ -8,6 +8,8 @@
 #include "project/project_integration.h"
 #include "project/project_model.h"
 #include "runtime_init.h"
+#include "settings/settings_dialog.h"
+#include "settings/settings_panel.h"
 
 #include <KTextEditor/Document>
 #include <KTextEditor/View>
@@ -17,10 +19,17 @@
 #include <QDir>
 #include <QElapsedTimer>
 #include <QFile>
-#include <QMenu>
+#include <QHeaderView>
+#include <QKeySequenceEdit>
 #include <QLabel>
+#include <QMenu>
+#include <QMouseEvent>
+#include <QPushButton>
 #include <QScreen>
+#include <QScrollBar>
+#include <QSignalSpy>
 #include <QStatusBar>
+#include <QTableWidget>
 #include <QTemporaryDir>
 #include <QTest>
 #include <QTreeWidget>
@@ -74,6 +83,52 @@ QTreeWidgetItem *row(QTreeWidget *tree, const QString &signal, const QString &de
     return nullptr;
 }
 
+QTreeWidgetItem *hop(QTreeWidget *tree, const char *from, const char *to, const char *detail = "")
+{
+    for (QTreeWidgetItemIterator it(tree); *it; ++it) {
+        if ((*it)->parent() && (*it)->text(0) == QLatin1String(from)
+            && (*it)->text(1) == QLatin1String(to) && (*it)->text(2).contains(QLatin1String(detail))) {
+            return *it;
+        }
+    }
+    return nullptr;
+}
+
+void pressShortcut(ApplicationShell &shell, Qt::Key key, Qt::KeyboardModifiers modifiers = Qt::NoModifier)
+{
+    shell.activateWindow();
+    view(shell)->setFocus();
+    QTest::qWait(20);
+    QTest::keyClick(view(shell), key, modifiers);
+}
+
+void dragFirstColumn(QTreeWidget *tree)
+{
+    auto *header = tree->header();
+    auto *viewport = header->viewport();
+    const QPoint start(header->sectionViewportPosition(0) + header->sectionSize(0) - 1,
+                       viewport->height() / 2);
+    const QPoint end = start + QPoint(84, 0);
+    QTest::mousePress(viewport, Qt::LeftButton, Qt::NoModifier, start);
+    QMouseEvent move(QEvent::MouseMove, end, viewport->mapToGlobal(end), Qt::NoButton,
+                     Qt::LeftButton, Qt::NoModifier);
+    QApplication::sendEvent(viewport, &move);
+    QTest::mouseRelease(viewport, Qt::LeftButton, Qt::NoModifier, end);
+    QApplication::processEvents();
+}
+
+int shortcutRow(QTableWidget *table, const QString &id)
+{
+    if (table != nullptr) {
+        for (int row = 0; row < table->rowCount(); ++row) {
+            if (table->item(row, 0)->text().endsWith(QStringLiteral("(%1)").arg(id))) {
+                return row;
+            }
+        }
+    }
+    return -1;
+}
+
 void capture(QTreeWidget *tree, const QString &file)
 {
     if (tree && !file.isEmpty()) {
@@ -106,6 +161,7 @@ int main(int argc, char **argv)
     options.projectRoot = project.path();
     options.stateDir = state.path();
     options.restoreSession = false;
+    options.deferSessionRestore = true;
     options.showDefaultPanels = false;
     ApplicationShell shell(options);
     shell.setEditorProvider(vedit::editor::makeEditCoreProvider());
@@ -126,11 +182,33 @@ int main(int argc, char **argv)
     if (!check("trace actions and project model", driver && load && drivers && loads && model)) {
         return 1;
     }
+    const auto *projectMenu = shell.findChild<QMenu *>(QStringLiteral("menu-project"));
+    check("Project menu owns the four live trace actions", projectMenu
+          && projectMenu->actions().contains(driver) && projectMenu->actions().contains(load)
+          && projectMenu->actions().contains(drivers) && projectMenu->actions().contains(loads));
     check("folder alone disables trace", !driver->isEnabled() && model->files().isEmpty());
     check("real filelist import", model->importFilelists({root.filePath(QStringLiteral("sources.f"))}));
     if (!check("import enables trace", until([&] { return driver->isEnabled(); }))) {
         return 1;
     }
+    vedit::workspace::settings::SettingsDialog preferences(shell.themes(), shell.commands(),
+                                                          state.filePath(QStringLiteral("settings.toml")));
+    check("Preferences loaded", preferences.panel()->flush());
+    auto *keys = preferences.findChild<QTableWidget *>(QStringLiteral("settings-keys"));
+    check("all four trace defaults are unique and conflict-free", [&] {
+        for (auto *action : {driver, load, drivers, loads}) {
+            const QString id = action->objectName().sliced(7);
+            const auto sequence = action->shortcut();
+            const int index = shortcutRow(keys, id);
+            if (sequence.isEmpty() || shell.commands()->shortcutOwnerIds(sequence) != QStringList{id}
+                || !shell.commands()->foreignShortcutOwners(sequence).isEmpty() || index < 0
+                || keys->item(index, 1)->text() != sequence.toString()
+                || keys->item(index, 2)->text() != sequence.toString()) {
+                return false;
+            }
+        }
+        return true;
+    }());
     view(shell)->setCursorPosition({5, 19});
     auto *context = vedit::editor::EditorContextMenu::instanceFor(view(shell));
     std::unique_ptr<QMenu> menu(context ? context->buildMenu() : nullptr);
@@ -138,12 +216,19 @@ int main(int argc, char **argv)
           && menu->findChild<QAction *>(QStringLiteral("vedit.action.definition"))
           && menu->findChild<QAction *>(QStringLiteral("vedit.action.references"))
           && menu->findChild<QAction *>(QStringLiteral("vedit.action.signal.trace.driver")));
-    QAction *direct = menu ? menu->findChild<QAction *>(QStringLiteral("vedit.action.signal.trace.driver")) : nullptr;
-    if (!direct) { return 1; }
+    check("editor menu displays all four trace shortcuts", menu && [&] {
+        for (auto *action : {driver, load, drivers, loads}) {
+            const auto *item = menu->findChild<QAction *>(QStringLiteral("vedit.action.") + action->objectName().sliced(7));
+            if (item == nullptr || !item->text().endsWith(QLatin1Char('\t') + action->shortcut().toString())) {
+                return false;
+            }
+        }
+        return true;
+    }());
     QElapsedTimer cold;
     cold.start();
-    direct->trigger();
-    if (!check("single driver opens across files", until([&] {
+    pressShortcut(shell, Qt::Key_F7);
+    if (!check("F7 single driver opens across files", until([&] {
             return view(shell)->document()->url().toLocalFile() == leaf;
         }))) {
         std::printf("status: %s\n", qPrintable(shell.statusBar()->currentMessage()));
@@ -152,29 +237,61 @@ int main(int argc, char **argv)
     std::printf("observed action to jump ms=%lld\n", static_cast<long long>(cold.elapsed()));
     check("driver jumps to child port declaration", view(shell)->cursorPosition() == KTextEditor::Cursor(0, 56));
     view(shell)->setCursorPosition({0, 56});
-    load->trigger();
-    if (!check("duplicate instances open direct chooser", until([&] { return tree(shell); }))) { return 1; }
-    check("chooser distinguishes both paths", row(tree(shell), QStringLiteral("top.u0.q"))
-          && row(tree(shell), QStringLiteral("top.u1.q")));
-    capture(tree(shell), args.value(3));
+    pressShortcut(shell, Qt::Key_F9);
+    if (!check("F9 duplicate instances open direct chooser", until([&] { return tree(shell); }))) { return 1; }
+    auto *directTree = tree(shell);
+    check("chooser distinguishes both paths", row(directTree, QStringLiteral("top.u0.q"))
+          && row(directTree, QStringLiteral("top.u1.q")));
+    check("direct chooser stays one hop", directTree->columnCount() == 3
+          && directTree->topLevelItem(0)->child(0)->childCount() == 0);
+    capture(directTree, args.value(3));
+    const int directInitialWidth = directTree->columnWidth(0);
+    dragFirstColumn(directTree);
+    const int directWidth = directTree->columnWidth(0);
+    directTree->window()->close();
+    pressShortcut(shell, Qt::Key_F9);
+    if (!check("direct chooser reopens", until([&] { return tree(shell); }))) { return 1; }
+    check("direct column size survives reopening", directWidth > directInitialWidth
+          && tree(shell)->columnWidth(0) == directWidth);
     tree(shell)->window()->close();
     view(shell)->setCursorPosition({0, 41});
-    loads->trigger();
-    if (!check("load chain across module boundary", until([&] { return tree(shell); }))) { return 1; }
+    pressShortcut(shell, Qt::Key_F9, Qt::ShiftModifier);
+    if (!check("Shift+F9 load chain across module boundary", until([&] { return tree(shell); }))) { return 1; }
     auto *loadTree = tree(shell);
-    check("load chain branches to both sinks", row(loadTree, QStringLiteral("top.out1"))
-          && row(loadTree, QStringLiteral("top.out2")));
+    auto *merger = hop(loadTree, "top.first", "top.merged", "assign");
+    auto *sink1 = hop(loadTree, "top.merged", "top.out1", "assign");
+    auto *sink2 = hop(loadTree, "top.merged", "top.out2", "assign");
+    check("load chain follows the actual signal and port sequence", hop(loadTree, "top.u0.d", "top.u0.state", "AlwaysFF")
+          && hop(loadTree, "top.u0.state", "top.u0.q", "assign")
+          && hop(loadTree, "top.u0.q", "top.first", "Port q (Out)")
+          && hop(loadTree, "top.u1.q", "top.second", "Port q (Out)")
+          && !hop(loadTree, "top.u0.q", "top.second"));
+    check("load chain branches at the same signal", merger && sink1 && sink2
+          && sink1->parent() == merger && sink2->parent() == merger);
     capture(loadTree, args.value(5));
+    const int initialWidth = loadTree->columnWidth(0);
+    dragFirstColumn(loadTree);
+    const int chainWidth = loadTree->columnWidth(0);
+    check("chain header drag enables horizontal scrolling", chainWidth > initialWidth
+          && loadTree->horizontalScrollBar()->maximum() > 0);
     loadTree->window()->close();
     check("open top again", shell.openPaths({top}));
     view(shell)->setCursorPosition({5, 10});
-    drivers->trigger();
-    if (!check("driver chain opens", until([&] { return tree(shell); }))) { return 1; }
+    pressShortcut(shell, Qt::Key_F7, Qt::ShiftModifier);
+    if (!check("Shift+F7 driver chain opens", until([&] { return tree(shell); }))) { return 1; }
     auto *driverTree = tree(shell);
-    check("driver walks both instance bodies", row(driverTree, QStringLiteral("top.u0.state"))
-          && row(driverTree, QStringLiteral("top.u1.state")));
+    auto *first = hop(driverTree, "top.first", "top.merged", "assign");
+    auto *second = hop(driverTree, "top.second", "top.merged", "assign");
+    auto *port = hop(driverTree, "top.u0.q", "top.first", "Port q (Out)");
+    auto *assignment = hop(driverTree, "top.u0.state", "top.u0.q", "assign");
+    check("driver upstream walk preserves direction and both branches", first && second && port && assignment
+          && first->parent() == second->parent() && port->parent() == first && assignment->parent() == port
+          && hop(driverTree, "top.a", "top.u0.d", "Port d (In)")
+          && hop(driverTree, "top.b", "top.u1.d", "Port d (In)")
+          && !hop(driverTree, "top.first", "top.u0.q"));
+    check("chain column size survives reopening in the opposite direction", driverTree->columnWidth(0) == chainWidth);
     capture(driverTree, args.value(4));
-    if (auto *target = row(driverTree, QStringLiteral("top.u0.q"))) {
+    if (auto *target = port) {
         const auto before = vedit::workspace::jump::Registry::instance().deliveredCount();
         driverTree->setCurrentItem(target);
         QTest::keyClick(driverTree, Qt::Key_Return);
@@ -189,16 +306,18 @@ int main(int argc, char **argv)
     view(shell)->setCursorPosition({8, 10});
     drivers->trigger();
     if (!check("cycle result opens", until([&] { return tree(shell); }))) { return 1; }
-    check("cycle terminates visibly", row(tree(shell), QStringLiteral("top.cycle_a"), QStringLiteral("Cycle")));
+    check("cycle terminates visibly", hop(tree(shell), "top.cycle_a", "top.cycle_b", "Cycle"));
     tree(shell)->window()->close();
     view(shell)->setCursorPosition({11, 16});
     drivers->trigger();
     if (!check("inout driver tree opens", until([&] { return tree(shell); }))) { return 1; }
-    check("inout includes a child driver", row(tree(shell), QStringLiteral("top.io0.pad"), QStringLiteral("assign")));
+    check("inout child-to-parent driver and terminal assign are explicit", hop(tree(shell), "top.io0.pad", "top.bidi", "Port pad (InOut)")
+          && hop(tree(shell), "No upstream signal identified", "top.io0.pad", "assign"));
     tree(shell)->window()->close();
     loads->trigger();
     if (!check("inout load tree opens", until([&] { return tree(shell); }))) { return 1; }
-    check("inout includes a child load", row(tree(shell), QStringLiteral("top.io0.readback")));
+    check("inout parent-to-child load is explicit", hop(tree(shell), "top.bidi", "top.io0.pad", "Port pad (InOut)")
+          && hop(tree(shell), "top.io0.pad", "top.io0.readback", "assign"));
     QFile changed(leaf);
     const bool edited = changed.open(QIODevice::Append) && changed.write("\n") == 1;
     changed.close();
@@ -218,8 +337,47 @@ int main(int argc, char **argv)
         warned |= label->text().contains(QStringLiteral("32 levels"));
     }
     check("depth cap is visible and omits deep endpoints", warned
-          && row(tree(shell), QStringLiteral("cap.n32"))
-          && !row(tree(shell), QStringLiteral("cap.n40")));
+          && hop(tree(shell), "cap.n31", "cap.n32")
+          && !hop(tree(shell), "cap.n39", "cap.n40"));
+    capture(tree(shell), args.value(6));
+    tree(shell)->window()->close();
+
+    const QString id = QStringLiteral("signal.trace.load.chain");
+    const QKeySequence custom(Qt::CTRL | Qt::SHIFT | Qt::Key_F9);
+    auto *keyEditor = preferences.findChild<QKeySequenceEdit *>(QStringLiteral("settings-shortcut-editor"));
+    auto *assign = preferences.findChild<QPushButton *>(QStringLiteral("settings-assign"));
+    const int bindingRow = shortcutRow(keys, id);
+    if (!check("Preferences exposes the trace rebind controls", keyEditor && assign && bindingRow >= 0)) {
+        return 1;
+    }
+    preferences.show();
+    keys->selectRow(bindingRow);
+    keyEditor->setKeySequence(custom);
+    assign->click();
+    check("rebind immediately updates the live QAction", loads->shortcut() == custom);
+    preferences.accept();
+    const bool flushed = preferences.panel()->flush();
+    vedit::app::JsonShortcutStore persisted(state.filePath(QStringLiteral("shortcuts.json")));
+    QString loadError;
+    persisted.load(&loadError);
+    check("trace rebind persisted", flushed && loadError.isEmpty() && persisted.shortcut(id, {}) == custom);
+    const auto traceReady = [&] {
+        return !model->isPending() && loads->isEnabled() && loads->shortcut() == custom;
+    };
+    check("load chain is ready after Preferences refresh", until(traceReady));
+    QSignalSpy traceTriggered(loads, &QAction::triggered);
+    pressShortcut(shell, Qt::Key_F9, Qt::ShiftModifier);
+    QTest::qWait(120);
+    check("rebind removes the old key", traceTriggered.isEmpty() && tree(shell) == nullptr);
+    until(traceReady);
+    pressShortcut(shell, Qt::Key_F9, Qt::ControlModifier | Qt::ShiftModifier);
+    if (!check("new shortcut triggers the same chain in the live editor", until([&] { return tree(shell); })
+               && traceTriggered.size() == 1)) {
+        std::printf("rebind triggers=%lld enabled=%d effective=%s shell-active=%d status=%s\n",
+                    static_cast<long long>(traceTriggered.size()), loads->isEnabled(),
+                    qPrintable(loads->shortcut().toString()), shell.isActiveWindow(),
+                    qPrintable(shell.statusBar()->currentMessage()));
+    }
     std::printf("failures=%d\n", failures);
     return failures != 0;
 }

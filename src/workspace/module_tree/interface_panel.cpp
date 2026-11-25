@@ -94,11 +94,13 @@ InterfacePanel::InterfacePanel(QWidget *parent)
     table_->setAlternatingRowColors(true);
     table_->verticalHeader()->setVisible(false);
     table_->horizontalHeader()->setStretchLastSection(false);
-    table_->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
-    table_->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-    table_->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-    table_->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
-    table_->horizontalHeader()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
+    table_->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+    table_->setColumnWidth(0, 95);
+    table_->setColumnWidth(1, 70);
+    table_->setColumnWidth(2, 96);
+    table_->setColumnWidth(3, 50);
+    table_->setColumnWidth(4, 110);
+    table_->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
     table_->setToolTip(activationTooltip());
     heading_->setToolTip(activationTooltip());
     table->onDoubleClick = [this](int row, bool control) { activatePortRow(row, control); };
