@@ -1,0 +1,12 @@
++ stat -c '%a %n' /dev/shm/vedit-qa.38HMZr/git
+755 /dev/shm/vedit-qa.38HMZr/git
++ test '!' -x /dev/shm/vedit-qa.38HMZr/git
++ PATH=/dev/shm/vedit-qa.38HMZr:/usr/bin:/bin
++ /package/AppRun --no-session-restore --state-dir /tmp/state --hold 250
++ awk '/VCS-TOOLCHAIN|window-shown|launch-ready/' /tmp/qa.out
+VCS-TOOLCHAIN git=/dev/shm/vedit-qa.38HMZr/git version=<missing> svn=<missing> version=<missing> source=mixed git_source=path svn_source=missing
+STARTUP-TRACE t_ms=69 wall_ms=1795572785336 window-shown
+STARTUP-TRACE t_ms=96 wall_ms=1795572785363 launch-ready
++ awk '/VCS-TOOLCHAIN.*git=\/dev\/shm\/.*version=<missing>/ {chosen=1} END{exit !chosen}' /tmp/qa.out
+Pre-repair AppDir selected an unexecutable candidate despite a real fallback.
++ printf 'Pre-repair AppDir selected an unexecutable candidate despite a real fallback.\n'

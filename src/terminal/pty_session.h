@@ -27,7 +27,7 @@ public:
     explicit PtySession(QObject *parent = nullptr);
     ~PtySession() override;
 
-    // Spawns `shell` (default: $SHELL, then /bin/bash, then /bin/sh) with
+    // Spawns `shell` (empty uses the persisted host shell preference) with
     // `arguments` on a fresh pty of `columns` x `rows`. Returns false and fills
     // `error` when the pty or the child cannot be created; nothing is left
     // running in that case.

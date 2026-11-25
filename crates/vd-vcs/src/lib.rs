@@ -3,7 +3,7 @@
 //! The backend is chosen by what is on disk, never by a setting: a working tree
 //! containing `.git` is **Git**, one containing `.svn` is **Subversion**, and
 //! anything else is the explicit empty state ("not a repository") rather than an
-//! error. Both backends shell out to the pinned tool (`git`/`svn`) — there is no
+//! error. Both backends shell out to the host tool (`git`/`svn`) — there is no
 //! library binding, which keeps the dependency tree free of C libraries and
 //! licenses the product does not already carry.
 //!
@@ -22,6 +22,7 @@
 #![forbid(unsafe_code)]
 
 pub mod history;
+pub mod host;
 pub mod runner;
 pub mod service;
 pub mod svn_compare;

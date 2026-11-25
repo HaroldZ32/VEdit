@@ -562,17 +562,7 @@ private:
         // idle (import a `.f`, switch the root) re-scopes the running session on
         // THIS tick - otherwise a document opened before the import would keep
         // its place in the compile set until the next keystroke.
-        if (goldenSetRevisionChanged()) {
-            refreshGoldenFiles(); // consume the change even if the buffer is skipped
-            lastRevision_ = bufferRevision(widget);
-            analyze();
-            return;
-        }
-        // G1-c: the catalog's shadowed list moved (a catalog run finished). A
-        // document that just became shadowed must leave the project session on
-        // this tick, or the loser keeps sharing a build context with the winner
-        // until the user happens to switch tabs.
-        if (shadowedSetChanged()) {
+        if (refreshProjectScope()) {
             lastRevision_ = bufferRevision(widget);
             analyze();
             return;
@@ -626,61 +616,32 @@ private:
         return shell_->property("vedit.moduleTree.closure").toMap();
     }
 
-    /// G1-a: the GOLDEN project file set - `vedit.diagnostics.projectFiles`, the
-    /// one set this lane adopted from the project lane's expansion (published
-    /// with its own revision below). The watcher needs it only for MEMBERSHIP: a
-    /// document outside it is analysed alone and never joins the compile set.
-    /// Re-read when the published revision moves, so an imported filelist or a
-    /// root switch takes effect without a restart.
-    void refreshGoldenFiles()
+    // The file-list expansion and the catalog arrive independently. Either can
+    // change the realtime scope while the active document remains open.
+    bool refreshProjectScope()
     {
         const QVariant revision = shell_->property("vedit.diagnostics.projectFilesRevision");
-        if (revision.isValid()) {
-            const qulonglong value = revision.toULongLong();
-            if (goldenRevisionValid_ && value == goldenRevision_) {
-                return;
-            }
-            goldenRevision_ = value;
-            goldenRevisionValid_ = true;
-        }
-        goldenFiles_ = diagnostics::realtime_scope::goldenFileSetFrom(
-            shell_->property("vedit.diagnostics.projectFiles").toStringList());
-    }
-
-    /// Has the published project file set revision moved since the last
-    /// `refreshGoldenFiles()`? One property read; the rebuild happens inside
-    /// `publishRealtimeSets()`. False when no publisher exists (nothing to follow).
-    bool goldenSetRevisionChanged() const
-    {
-        const QVariant revision = shell_->property("vedit.diagnostics.projectFilesRevision");
-        if (!revision.isValid()) {
+        const qulonglong catalogRevision = shell_->property("vedit.moduleTree.scopeRevision").toULongLong();
+        const QStringList shadowed = shell_->property("vedit.moduleTree.shadowedFiles").toStringList();
+        const bool project = shell_->property("vedit.project.hasFilelist").toBool();
+        if (revision == goldenRevision_ && catalogRevision == catalogRevision_
+            && shadowed == shadowedFiles_ && project == hasFilelist_) {
             return false;
         }
-        return !goldenRevisionValid_ || revision.toULongLong() != goldenRevision_;
-    }
-
-    /// G1-c: the catalog's shadowed list is published by the MODULE TREE lane
-    /// after a catalog run, i.e. it can arrive while a document is already open.
-    /// A document that BECOMES shadowed must lose its place in the compile set
-    /// on this tick - the user's report is exactly "open that file and it comes
-    /// back", which is this state arriving AFTER the tab did. The list is
-    /// usually empty, so the compare is one property read.
-    bool shadowedSetChanged()
-    {
-        const QStringList published =
-            shell_->property("vedit.moduleTree.shadowedFiles").toStringList();
-        if (!shadowedRevisionValid_) {
-            shadowedRevisionValid_ = true;
-            shadowedFiles_ = published;
-            // The FIRST observation only re-scopes when it already shadows
-            // something: an empty list must not cost every shell one extra
-            // analysis at startup.
-            return !published.isEmpty();
+        goldenRevision_ = revision;
+        catalogRevision_ = catalogRevision;
+        hasFilelist_ = project;
+        shadowedFiles_ = shadowed;
+        const QStringList members = shell_->property("vedit.diagnostics.projectFiles").toStringList();
+        goldenFiles_ = diagnostics::realtime_scope::goldenFileSetFrom(members);
+        QStringList indexCandidates = members;
+        if (!members.isEmpty()) {
+            indexCandidates.append(shell_->property("vedit.moduleTree.includedDefinitions").toStringList());
         }
-        if (published == shadowedFiles_) {
-            return false;
-        }
-        shadowedFiles_ = published;
+        projectIndex_ = diagnostics::realtime_scope::dropShadowedFiles(
+            indexCandidates, diagnostics::realtime_scope::shadowedFileSetFrom(shadowed));
+        projectIndex_.removeDuplicates();
+        projectIndex_.sort();
         return true;
     }
 
@@ -730,8 +691,8 @@ private:
     {
         // G1-a: membership is decided against the CURRENT golden set - a file set
         // that arrives (or changes) after a document was opened applies on this
-        // tick, never a restart later.
-        refreshGoldenFiles();
+        // tick.
+        refreshProjectScope();
         // G1-c: a file the catalog dropped from the compiler input never enters
         // the realtime compile set either. In practice the closure cannot name
         // one (it resolves a module to its ADOPTED definition file, and a
@@ -766,6 +727,8 @@ private:
         // published BEFORE the properties below (analyse() calls this method
         // before analyzeFile()).
         controller_->setActiveDocumentJoinsProjectSession(activeJoins);
+        controller_->setRealtimeProjectIndex(hasFilelist_ && activeJoins
+            ? (projectIndex_.isEmpty() ? QStringList{path} : projectIndex_) : QStringList{});
         shell_->setProperty("vedit.diagnostics.realtimeFileSet", analysisSet);
         shell_->setProperty("vedit.diagnostics.sessionFileSet", sessionSet);
         QVariantMap sets;
@@ -923,12 +886,11 @@ private:
     /// apply; the module tree is gated on a filelist, so no closure exists there
     /// either and the realtime set stays `{path}`.
     diagnostics::realtime_scope::GoldenFileSet goldenFiles_;
-    qulonglong goldenRevision_ = 0;
-    bool goldenRevisionValid_ = false;
-    /// G1-c: the last shadowed list this watcher saw, so a catalog run that
-    /// arrives after the document was opened still re-scopes the session.
+    QVariant goldenRevision_;
+    qulonglong catalogRevision_ = 0;
+    bool hasFilelist_ = false;
+    QStringList projectIndex_;
     QStringList shadowedFiles_;
-    bool shadowedRevisionValid_ = false;
     /// Open documents excluded from the session by the golden rule (published).
     int outsideFileCount_ = 0;
     /// One notice per truncation episode, not one per 400 ms tick.
@@ -3800,14 +3762,9 @@ public:
         lintNotice_->clear();
         controller_->clearProjectDiagnostics();
         controller_->setOpenFiles(QStringList());
+        controller_->invalidateRealtimeSession();
         controller_->setConfiguration(configuredLspPath(), workspaceRoot_, state_.rulesPath());
         controller_->setFileSet(QStringList{});
-        // L1.1: setFileSet() no longer re-parses (it must not touch a live
-        // realtime session). A root switch DOES have to re-pin the session's
-        // workspace root, so the explicit reparse belongs here - over the current
-        // realtime set, never over a project set.
-        controller_->reparse();
-        controller_->refresh();
         publishProjectState();
         publishProjectEnvironment(envCleared);
         // RM-9: the file tree's "From filelist" group and the status map
@@ -3831,23 +3788,13 @@ public:
                            const QStringList &defines)
     {
         setProjectFiles(files, includeDirs, defines);
-        // G1-g (batch-20261119): the imported `.f` lists are NOT forwarded to the
-        // LSP backend any more. The generated build context compiles the
-        // SESSION's file set (the current file plus the module tree's one-level
-        // closure); nesting the project `.f` with `-f` made slang-server
-        // re-expand the whole project and pick its own definition of a
-        // same-named module (G1-d). The C ABI keeps the parameter, the caller
-        // passes null.
         const bool envPinned = state_.setProjectEnvironment(includeDirs, defines);
+        // Recompute both scopes from the new revision before starting a server.
+        // The watcher starts it over open documents and their direct children;
+        // the expanded project list supplies its separate symbol index.
+        controller_->invalidateRealtimeSession();
         controller_->setConfiguration(configuredLspPath(), workspaceRoot_, state_.rulesPath());
         controller_->setFileSet(files);
-        // B1 (batch-20261116): `setProjectEnvironment()` stopped the LSP server
-        // through selectBackend(); `setFileSet()` deliberately starts nothing.
-        // Without this the controller still believes its old session is alive,
-        // `analyzeFile()` reuses it, and the realtime LINT never recovers.
-        // restartRealtimeSession() is a no-op when no document is analysed yet
-        // (L1.1: a project set alone opens no server) and keeps the lower rows.
-        controller_->restartRealtimeSession();
         publishProjectState();
         publishProjectEnvironment(envPinned);
         QStringList argv;

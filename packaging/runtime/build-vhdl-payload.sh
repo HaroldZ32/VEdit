@@ -4,7 +4,7 @@
 #
 #   vhdl_ls  — static musl binary (upstream release)
 #   GHDL     — mcode variant (upstream ubuntu24.04 release, run through the
-#              AppDir's own loader like bin/svn)
+#              AppDir's own loader)
 #   CPython  — built from source with the SAME glibc the AppDir ships
 #   VSG      — pure-Python wheel installed into that CPython (PyYAML alongside)
 #

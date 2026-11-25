@@ -1,0 +1,16 @@
+CHECK PASS  apprun.syntax
+CHECK PASS  default.slang-bundled
+CHECK PASS  default.verible-bundled
+CHECK PASS  override.slang-preserved
+CHECK PASS  override.verible-preserved
+CHECK PASS  absent.slang-not-exported
+CHECK PASS  absent.verible-not-exported
+CHECK PASS  absent.slang-caller-preserved
+CHECK PASS  non-executable.slang-not-exported
+CHECK PASS  host-path.preserved-before-appdir-path
+CHECK PASS  host-path.empty-preserved
+CHECK PASS  host-path.unset-preserved
+CHECK PASS  appimage.normal-launch-does-not-force-extraction
+CHECK PASS  appimage.extracted-run-preserves-extraction-for-restart
+APPRUN-ENV-PROBE ok=1 checks=14 failures=0
+exit=0

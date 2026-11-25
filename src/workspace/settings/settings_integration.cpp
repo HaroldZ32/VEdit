@@ -116,8 +116,10 @@ void installSettings(vedit::app::ApplicationShell &shell, const IntegrationOptio
 void applyEnvironmentSelection(const IntegrationOptions &options)
 {
 #if defined(VEDIT_SETTINGS_HAVE_FFI)
-    const QString selectionPath =
-        settingsDirectory(options.stateDir) + QStringLiteral("/environment.json");
+    const QString directory = settingsDirectory(options.stateDir);
+    const QByteArray settingsPath = (directory + QStringLiteral("/settings.toml")).toUtf8();
+    vd_host_use_settings_store(settingsPath.constData());
+    const QString selectionPath = directory + QStringLiteral("/environment.json");
     VdService *service = vd_service_create();
     if (service == nullptr) {
         std::fprintf(stderr,

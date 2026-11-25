@@ -59,15 +59,17 @@ bash packaging/runtime/build.sh          # 组装 → 许可闸门 → 自检 �
 - KDE `systemverilog.xml`（GPL-3.0-or-later）与 `verilog.xml`（许可未声明）——按 sha256 拦，改名也拦；
 - 发行版 `libKF6SyntaxHighlighting`（内嵌 450 定义 / 36 个严格 GPL）——按“库内 0 定义”拦；
 - `syntax-bundled/`（压缩定义会被自动加载）；
-- 任何不在白名单里的定义。
+- 任何不在白名单里的定义；
+- Git、Subversion、svnadmin 和 shell 可执行文件。随包脚本通过宿主机的 `/bin/sh` 启动。
 
-`verify-not-shipped.sh` 现在是 **delivery 模式全绿**（`pass=8 fail=0`，`DELIVERY_BLOCKED=no`）。
+交付模式要求 `verify-not-shipped.sh` 返回 0 并报告 `DELIVERY_BLOCKED=no`。
 
 ## AppRun 契约
 
 - `exec "$APPDIR/ld-linux-x86-64.so.2" --library-path "$APPDIR/lib" …`；
 - `QT_PLUGIN_PATH`/`QT_QPA_PLATFORM_PLUGIN_PATH`/`XDG_*`/`VEDIT_SYNTAX_DIR`/`FONTCONFIG_FILE` 全部指向包内；
 - **`LD_LIBRARY_PATH` 只在 exec 前导出**：提前导出会让宿主工具（`cat`/`sed`/`grep`）用宿主 loader 加载我们的 glibc 而失败（CentOS 7 实测 `GLIBC_2.35 not found`），从而让守卫读到空白名单、假 PASS；
+- `AppRun` 将启动时导出的 `PATH`（包括空值）保存到 `VEDIT_HOST_PATH`，设定 `APPDIR`，再为应用添加包内 `bin`。终端和版本控制使用过滤后的宿主机路径。重启应用时会恢复原来的 `PATH`，并移除上一挂载目录的私有库路径。CentOS 7 探针验证没有 Git / SVN 的工作台启动。
 - `AppRun --selfcheck` 额外传 `--ksh-selfbuild --expect-kshlib-prefix --expect-libc-prefix`。
 
 ## 复现性

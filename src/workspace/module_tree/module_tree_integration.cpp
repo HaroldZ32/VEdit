@@ -605,7 +605,22 @@ private:
         for (auto it = byFile.constBegin(); it != byFile.constEnd(); ++it) {
             closure.insert(it.key(), it.value());
         }
+        QStringList includedDefinitions;
+        for (const auto &module : catalog_.modules) {
+            if (!module.compilationUnit.isEmpty()) {
+                includedDefinitions.append(module.file);
+            }
+        }
+        includedDefinitions.removeDuplicates();
+        includedDefinitions.sort();
+        const bool closureChanged = closure != shell_->property("vedit.moduleTree.closure").toMap()
+            || includedDefinitions != shell_->property("vedit.moduleTree.includedDefinitions").toStringList();
         shell_->setProperty("vedit.moduleTree.closure", closure);
+        shell_->setProperty("vedit.moduleTree.includedDefinitions", includedDefinitions);
+        if (closureChanged) {
+            const auto revision = shell_->property("vedit.moduleTree.scopeRevision").toULongLong();
+            shell_->setProperty("vedit.moduleTree.scopeRevision", revision + 1);
+        }
         shell_->setProperty("vedit.moduleTree.closureModules",
                             catalog_.valid ? static_cast<int>(catalog_.modules.size()) : 0);
         // G1-c: the ONE duplicate-definition authority publishes the files it

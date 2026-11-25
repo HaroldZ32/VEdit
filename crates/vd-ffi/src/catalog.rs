@@ -348,6 +348,23 @@ pub unsafe extern "C" fn vd_catalog_poll(
     job: u64,
     out: *mut VdModuleCatalog,
 ) -> i32 {
+    // SAFETY: forwards the caller's contract; the optional list is omitted.
+    unsafe { vd_catalog_poll_v2(service, job, out, ptr::null_mut()) }
+}
+
+/// Poll a catalog with a parallel list of owning compilation units. An empty
+/// list entry means that the corresponding module is declared directly in its source.
+/// Release a filled list with `vd_catalog_compilation_units_free`.
+///
+/// # Safety
+/// Same as `vd_catalog_poll`. `units` must be null or writable for one `VdStringList`.
+#[no_mangle]
+pub unsafe extern "C" fn vd_catalog_poll_v2(
+    service: *mut VdService,
+    job: u64,
+    out: *mut VdModuleCatalog,
+    units: *mut VdStringList,
+) -> i32 {
     if out.is_null() {
         return POLL_MISUSE;
     }
@@ -384,9 +401,35 @@ pub unsafe extern "C" fn vd_catalog_poll(
         ));
         return VD_STATUS_FAILED;
     }
+    if !units.is_null() {
+        let paths: Vec<_> = catalog
+            .modules
+            .iter()
+            .map(|module| {
+                module
+                    .compilation_unit
+                    .as_deref()
+                    .map_or_else(String::new, |path| path.to_string_lossy().into_owned())
+            })
+            .collect();
+        // SAFETY: a non-null `units` is writable and its content is owned by the caller.
+        unsafe { *units = strings_to_c(&paths) };
+    }
     // SAFETY: `out` is writable for one VdModuleCatalog per the caller contract.
     unsafe { *out = catalog_to_c(&catalog) };
     VD_STATUS_READY
+}
+
+/// Free the compilation unit list returned by `vd_catalog_poll_v2`.
+///
+/// # Safety
+/// `units` must be null or point to a list filled by `vd_catalog_poll_v2`.
+#[no_mangle]
+pub unsafe extern "C" fn vd_catalog_compilation_units_free(units: *mut VdStringList) {
+    if !units.is_null() {
+        // SAFETY: only a list allocated by `strings_to_c` may reach here.
+        unsafe { free_string_list(&mut *units) };
+    }
 }
 
 /// The ABI error code for one typed failure.

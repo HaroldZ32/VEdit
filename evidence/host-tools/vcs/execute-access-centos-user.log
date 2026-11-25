@@ -1,0 +1,8 @@
+
+running 4 tests
+test an_empty_saved_host_path_does_not_fall_back_to_the_launcher_path ... ok
+test skips_candidates_without_execute_access_for_the_current_user ... ok
+test skips_nonexecutables_and_reports_removed_tools ... ok
+test effective_path_overrides_host_path_but_cannot_restore_appdir_tools ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s

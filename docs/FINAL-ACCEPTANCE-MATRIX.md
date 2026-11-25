@@ -22,7 +22,15 @@
 6.1…6.7 / 7.1…7.9）**逐条 PASS，未验 = 0**；旧 46 行矩阵**未改写**且仍为 PASS；七道门禁在终态树上
 全绿（§7 贴命令与退出码）；交付物为 Qt6 AppImage（§1）。
 
-## 1. 交付形态与工具链（AC-7.4 / AC-3.0 / AC-6.1 的终态汇总）
+## 当前交付的主机工具检查
+
+| 项 | 当前要求 | 证据 |
+|---|---|---|
+| AppDir / AppImage | 包内没有 Git、Subversion、svnadmin 和 shell 可执行文件。现有 HDL、文件比较及 Scala 工具仍随包交付 | `evidence/host-tools/packaging/` |
+| AppRun | 保留宿主机 `PATH`，包括空值。没有 Git 与 SVN 时可以启动，使用时显示处理方式 | `evidence/host-tools/packaging/`、`evidence/host-tools/terminal/` |
+| 工程 filelist | 实时 lint 和 Ctrl 点击使用导入文件中的模块定义，包括清单刷新和切换空工作区 | `evidence/host-tools/filelist/` |
+
+## 1. 历史交付形态与工具链（AC-7.4 / AC-3.0 / AC-6.1 的终态汇总）
 
 | 项 | 值 | 证据 |
 |---|---|---|

@@ -1,0 +1,44 @@
+Final source and launcher: 33a857224011daa1aadbb5b534a8d28eaa4a338c
+$ VEDIT_PACK_EVIDENCE=<WORKTREE>/target/packaging-build-logs/release VEDIT_F2_EVIDENCE=<same> bash packaging/runtime/build.sh
+befda885f7fd6cc20ff3ec4d4d04fd80c677b3a044d2bca2927a6ed21d78c3d2  packaging/runtime/AppRun
+target/qt6-build/src/app/vedit-app: OK
+target/qt6-build/cmake/smoke/vedit-ksh-env-probe: OK
+target/qt6-build/src/app/vedit-app: OK
+target/qt6-build/cmake/smoke/vedit-ksh-env-probe: OK
+assemble exit=0
+assemble exit=0
+not-shipped exit=0
+selfcheck(appdir) exit=0
+isolation(appdir) exit=0
+appimagetool exit=0
+SOURCE_DATE_EPOCH=1795574161
+selfcheck(appimage) exit=0
+isolation(appimage) exit=0
+centos7_smoke_exit=0
+centos7_no_vcs_exit=0
+CHECK PASS  launches without host Git and Subversion
+steps_failed=0
+BUILD: F2 runtime OK
+CHECK PASS  no packaged Git, Subversion or shell executables
+== summary: pass=9 fail=0 expected_red=0 ==
+host: CentOS Linux release 7.9.2009 (Core)
+glibc: ldd (GNU libc) 2.17
+VCS-TOOLCHAIN git=<missing> version=<missing> svn=<missing> version=<missing> source=missing git_source=missing svn_source=missing
+VCS-TOOLCHAIN git=<missing> version=<missing> svn=<missing> version=<missing> source=missing git_source=missing svn_source=missing
+STARTUP-TRACE t_ms=80 wall_ms=1795574246627 launch-ready
+centos7_no_vcs_exit=0
+exit=0
+
+form=F2
+appdir=<WORKTREE>/packaging/runtime/out/AppDir
+appdir_files=13665
+whitelist=Markdown,Scala,SystemVerilog,Tcl,VHDL,Verilog
+kshlib_sha256=aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
+appimage=<WORKTREE>/packaging/runtime/out/VEdit-0.4.0-x86_64.AppImage
+appimage_bytes=972487160
+appimage_sha256=1944cb913bab1e1938b9e1641d9543dfb37e2318a093d5aea0d9a72233e22993
+steps_failed=0
+
+$ (cd packaging/runtime/out && sha256sum --check --strict SHA256SUMS)
+VEdit-0.4.0-x86_64.AppImage: OK
+exit=0

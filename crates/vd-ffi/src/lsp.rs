@@ -770,7 +770,7 @@ unsafe fn read_file_list(files: *const VdStringList) -> Result<Vec<PathBuf>, Str
     Ok(paths)
 }
 
-/// The shared body of the two session-start entry points.
+/// The shared body of the session-start entry points.
 ///
 /// `backend` selects the server; `include_dirs` / `defines` are the project's
 /// tool settings. For the verible backend they are materialised into a Verible
@@ -793,6 +793,7 @@ unsafe fn start_session_impl(
     backend_code: i32,
     include_dirs: *const VdStringList,
     defines: *const VdStringList,
+    project_index: *const VdStringList,
 ) -> u64 {
     let Some(state) = service_state(service) else {
         return 0;
@@ -879,7 +880,23 @@ unsafe fn start_session_impl(
         config = config.with_define(define);
     }
     let mut filelist_path = None;
-    if backend == LspBackend::Verible
+    if !project_index.is_null() {
+        // SAFETY: the caller supplies a readable list of NUL-terminated paths.
+        let index = match unsafe { read_file_list(project_index) } {
+            Ok(index) => index,
+            Err(message) => {
+                state.record_error(VdError::new(VD_ERR_INVALID_ARGUMENT, &message));
+                return 0;
+            }
+        };
+        match config.with_project_index(&index) {
+            Ok(scoped) => config = scoped,
+            Err(error) => {
+                state.record_error(VdError::new(VD_ERR_SERVICE, &error.to_string()));
+                return 0;
+            }
+        }
+    } else if backend == LspBackend::Verible
         && config.file_list_path.is_none()
         && (!include_dirs.is_empty() || !defines.is_empty())
     {
@@ -966,6 +983,7 @@ pub unsafe extern "C" fn vd_lsp_session_start(
             LspBackend::Verible.code(),
             ptr::null(),
             ptr::null(),
+            ptr::null(),
         )
     }
 }
@@ -1004,6 +1022,43 @@ pub unsafe extern "C" fn vd_lsp_session_start_v2(
             backend,
             include_dirs,
             defines,
+            ptr::null(),
+        )
+    }
+}
+
+/// Start realtime LSP with separate open/compile files and project index files.
+/// A null `project_index` preserves the ordinary loose-file server discovery.
+///
+/// # Safety
+///
+/// The contract of [`vd_lsp_session_start_v2`] applies to its parameters. A
+/// non-null `project_index` must satisfy the same contract as `files`.
+#[no_mangle]
+#[allow(clippy::too_many_arguments)]
+pub unsafe extern "C" fn vd_lsp_session_start_v3(
+    service: *mut VdService,
+    ls_path: *const c_char,
+    workspace_root: *const c_char,
+    rules_path: *const c_char,
+    files: *const VdStringList,
+    backend: i32,
+    include_dirs: *const VdStringList,
+    defines: *const VdStringList,
+    project_index: *const VdStringList,
+) -> u64 {
+    // SAFETY: the caller contracts for both the strings and lists are identical.
+    unsafe {
+        start_session_impl(
+            service,
+            ls_path,
+            workspace_root,
+            rules_path,
+            files,
+            backend,
+            include_dirs,
+            defines,
+            project_index,
         )
     }
 }

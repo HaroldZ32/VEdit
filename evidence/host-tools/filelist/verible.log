@@ -1,0 +1,7 @@
+88: TREE imported=1 path=/tmp/vedit-filelist-authority-e2e-bpUJlT/project/included/deep/child.sv excluded=/tmp/vedit-filelist-authority-e2e-bpUJlT/project/rtl/child.sv
+88: ACTION action=definition dispatched=1 via='diagnostics.definition'
+88: DEFINITION backend=verible file='/tmp/vedit-filelist-authority-e2e-bpUJlT/project/included/deep/child.sv' line=1 column=8
+88: VERIBLE CTRL pass=1 canonical=/tmp/vedit-filelist-authority-e2e-bpUJlT/project/included/deep/child.sv
+2/2 Test #88: vedit-filelist-authority-verible-e2e ...   Passed    1.99 sec
+The following tests passed:
+100% tests passed, 0 tests failed out of 2

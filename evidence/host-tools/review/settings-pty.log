@@ -1,0 +1,174 @@
+8eb26ed04da6f83f066060429884e5141d4cd2b51e2b0c47a75fcb6d5d533aa8  target/host-tools-qt/src/app/workspace-lane-settings/vedit-host-shell-selftest
+adc359e75deb7aabcd314b754221bf597e7c816d74687582e68aa6ea1257d4c4  target/host-tools-qt/src/terminal/vedit-terminal-selftest
++ xvfb-run -a -s '-screen 0 1400x900x24' timeout 30s target/host-tools-qt/src/app/workspace-lane-settings/vedit-host-shell-selftest
+CHECK host-shell.auto-restores-host-path PASS
+CHECK host-shell.import-layer PASS
+CHECK host-shell.discovery PASS
+CHECK host-shell.cancel-keeps-auto PASS
+CHECK host-shell.preview-keeps-auto PASS
+CHECK host-shell.apply-used-by-next-session PASS
+CHECK host-shell.repeated-apply-uses-auto PASS
+CHECK host-shell.xcb-screenshot PASS
+CHECK host-shell.reopen-restores-manual PASS
+CHECK host-shell.restart-restores-manual PASS
+CHECK host-shell.stale-choice-shown PASS
+CHECK host-shell.stale-choice-actionable PASS
+CHECK host-shell.ok-recovers-auto PASS
++ for selector in --selfcheck --selfcheck-env-inheritance --selfcheck-env-imported
++ xvfb-run -a timeout 30s target/host-tools-qt/src/terminal/vedit-terminal-selftest --selfcheck
+CHECK vt.print PASS
+CHECK vt.cursor.after-print PASS
+CHECK vt.newline PASS
+CHECK vt.carriage-return PASS
+CHECK vt.backspace PASS
+CHECK vt.tab-stops PASS
+CHECK vt.utf8 PASS
+CHECK vt.wrap PASS
+CHECK vt.csi.cup PASS
+CHECK vt.csi.erase-to-end PASS
+CHECK vt.csi.delete-chars PASS
+CHECK vt.csi.insert-chars PASS
+CHECK vt.csi.erase-display PASS
+CHECK vt.csi.insert-lines PASS
+CHECK vt.csi.insert-lines.shift PASS
+CHECK vt.csi.dsr PASS
+CHECK vt.sgr.bold PASS
+CHECK vt.sgr.red PASS
+CHECK vt.sgr.reset PASS
+CHECK vt.sgr.rgb PASS
+CHECK vt.sgr.256 PASS
+CHECK vt.mode.app-cursor-keys PASS
+CHECK vt.mode.app-cursor-keys-off PASS
+CHECK vt.mode.bracketed-paste PASS
+CHECK vt.mode.cursor-hidden PASS
+CHECK vt.alt-screen PASS
+CHECK vt.osc.title PASS
+CHECK vt.scrollback.grew PASS
+CHECK vt.scrollback.last-line PASS
+CHECK vt.scrollback.keeps-row-count PASS
+CHECK vt.scrollback.offset PASS
+CHECK vt.scrollback.back-to-live PASS
+CHECK vt.scrollback.limit PASS
+CHECK vt.reply.cursor-position PASS
+CHECK vt.reply.device-attributes PASS
+CHECK vt.selection.text PASS
+CHECK vt.selection.reversed PASS
+CHECK vt.resize.columns PASS
+CHECK vt.resize.rows PASS
+CHECK vt.resize.keeps-text PASS
+CHECK pty.start PASS
+CHECK pty.start.error-empty PASS
+CHECK pty.pid PASS
+CHECK pty.finished PASS
+CHECK pty.output PASS
+CHECK pty.exit-code PASS
+CHECK pty.exit-known PASS
+CHECK pty.exit-description PASS
+CHECK pty.exit-description-visible PASS
+CHECK pty.signal.start PASS
+CHECK pty.signal.termination-signal PASS
+CHECK pty.signal.exit-code-128 PASS
+CHECK pty.signal.description PASS
+CHECK pty.interactive.start PASS
+CHECK pty.interactive.output PASS
+CHECK pty.interactive.exit PASS
+CHECK pty.resize.start PASS
+CHECK pty.resize.tty-size PASS
+CHECK pty.bad-shell.refused PASS
+CHECK pty.bad-shell.error PASS
+CHECK pty.bad-shell.not-running PASS
+CHECK pty.child-env.start PASS
+CHECK pty.child-env.finished PASS
+CHECK pty.child-env.loader-vars-unset PASS child-printed=<unset>|<unset>
+CHECK pty.child-env.exit-code PASS
+CHECK pty.child-env.launcher-variable.start PASS
+CHECK pty.child-env.launcher-variable.finished PASS
+CHECK pty.child-env.inherits-launcher-variable PASS expected=vedit-terminal-env-probe-7f3a9c|<unset> child-printed=vedit-terminal-env-probe-7f3a9c|<unset>
+CHECK pty.child-env.launcher-variable.exit-code PASS
+CHECK pty.child-env.negative-control.start PASS
+CHECK pty.child-env.negative-control.finished PASS
+CHECK pty.child-env.negative-control-unset PASS child-printed=<unset>|<unset>
+CHECK pty.child-env.negative-control-differs PASS positive=vedit-terminal-env-probe-7f3a9c|<unset> control=<unset>|<unset>
+CHECK pty.master-fd.start PASS
+CHECK pty.master-fd.readable PASS /proc/85/fd
+CHECK pty.master-fd.not-inherited PASS 0->/dev/pts/0, 1->/dev/pts/0, 10->/dev/tty, 2->/dev/pts/0
+CHECK pty.master-fd.descendant-start PASS
+CHECK pty.master-fd.descendant-listed PASS total 0  lr-x------ 1 root root 64 Nov 25 02:11 0 -> /dev/null  lrwx------ 1 root root 64 Nov 25 02:11 1 -> /dev/pts/0  lrwx------ 1 root root 64 Nov 25 02:11 2 -> /dev/pts/0
+CHECK pty.master-fd.descendant-not-inherited PASS total 0  lr-x------ 1 root root 64 Nov 25 02:11 0 -> /dev/null  lrwx------ 1 root root 64 Nov 25 02:11 1 -> /dev/pts/0  lrwx------ 1 root root 64 Nov 25 02:11 2 -> /dev/pts/0
+CHECK pty.read-limit.start PASS
+CHECK pty.read-limit.finished PASS
+CHECK pty.read-limit.delivered PASS delivered=4194304 produced=4194304
+CHECK pty.read-limit.max-per-activation PASS max=65536 limit=65536
+CHECK pty.read-limit.cap-engaged PASS capped=17
+CHECK panel.auto-start PASS
+CHECK panel.pid PASS
+CHECK panel.shell-path PASS
+CHECK panel.state-running PASS
+CHECK panel.state-has-pid PASS
+CHECK panel.banner-hidden PASS
+CHECK panel.output-reaches-screen PASS
+CHECK panel.renders PASS
+CHECK panel.renders.two-colors PASS
+CHECK panel.exit.start PASS
+CHECK panel.exit.finished PASS
+CHECK panel.exit.state-code PASS
+CHECK panel.exit.banner-visible PASS
+CHECK panel.exit.banner-hint PASS
+CHECK panel.exit.output-kept PASS
+CHECK panel.restart.start PASS
+CHECK panel.restart.running PASS
+CHECK panel.restart.new-pid PASS
+CHECK panel.restart.banner-cleared PASS
+CHECK panel.restart.state-running PASS
+CHECK panel.restart.screen-cleared PASS
+CHECK panel.enter-restarts PASS
+CHECK panel.dock.content PASS
+CHECK panel.dock.visible PASS
+CHECK panel.dock.area PASS
+CHECK panel.dock.float PASS
+CHECK panel.dock.closed PASS
+CHECK panel.dock.reopened PASS
+CHECK panel.dock.pty-size-follows-widget PASS
+CHECK panel.close-button.exists PASS
+CHECK panel.close-button.signal PASS
+CHECK panel.close-button.hides-dock PASS
+CHECK panel.restart-button.exists PASS
+CHECK panel.restart-button.new-pid PASS
+CHECK panel.restart-button.running PASS
+CHECK panel.factory.widget PASS
+CHECK panel.factory.type PASS
+CHECK panel.factory.starts-shell PASS
+CHECK panel.factory.function PASS
+CHECK widget.key-events-to-pty PASS
+TERMINAL-SELFTEST ok=1 checks=124 failures=0
++ for selector in --selfcheck --selfcheck-env-inheritance --selfcheck-env-imported
++ xvfb-run -a timeout 30s target/host-tools-qt/src/terminal/vedit-terminal-selftest --selfcheck-env-inheritance
+CHECK pty.child-env.launcher-variable.start PASS
+CHECK pty.child-env.launcher-variable.finished PASS
+CHECK pty.child-env.inherits-launcher-variable PASS expected=vedit-terminal-env-probe-7f3a9c|<unset> child-printed=vedit-terminal-env-probe-7f3a9c|<unset>
+CHECK pty.child-env.launcher-variable.exit-code PASS
+CHECK pty.child-env.negative-control.start PASS
+CHECK pty.child-env.negative-control.finished PASS
+CHECK pty.child-env.negative-control-unset PASS child-printed=<unset>|<unset>
+CHECK pty.child-env.negative-control-differs PASS positive=vedit-terminal-env-probe-7f3a9c|<unset> control=<unset>|<unset>
+TERMINAL-ENV-INHERITANCE ok=1 checks=8 failures=0
++ for selector in --selfcheck --selfcheck-env-inheritance --selfcheck-env-imported
++ xvfb-run -a timeout 30s target/host-tools-qt/src/terminal/vedit-terminal-selftest --selfcheck-env-imported
+CHECK pty.imported-env.scratch-dir PASS
+CHECK pty.imported-env.selection-written PASS /tmp/vedit-term-imported-aQkljC/environment.json
+CHECK pty.imported-env.service PASS
+CHECK pty.imported-env.applied PASS
+CHECK pty.imported-env.snapshot-carries-selection PASS
+CHECK pty.imported-env.child.start PASS
+CHECK pty.imported-env.child.finished PASS
+CHECK pty.imported-env.child-sees-selection PASS child-printed=imported-ok|<unset>|<unset>
+CHECK pty.imported-env.negative-control.applied PASS
+CHECK pty.imported-env.negative-control.child PASS child-printed=<unset>|<unset>|<unset>
+CHECK pty.imported-env.negative-control-differs PASS positive=imported-ok|<unset>|<unset> control=<unset>|<unset>|<unset>
+TERMINAL-ENV-IMPORTED ok=1 checks=11 failures=0
++ xvfb-run -a timeout 30s target/host-tools-qt/src/terminal/vedit-terminal-selftest --screenshots /review/terminal
+INFO terminal widget=1100x337 screen=139x21 cell=7x15
+SCREENSHOT OK /review/terminal/10-terminal-running.png
+SCREENSHOT OK /review/terminal/11-terminal-exited-code42.png
+TERMINAL-SCREENSHOTS ok=1 dir=/review/terminal
+Settings/PTY exit=0

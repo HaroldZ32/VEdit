@@ -1,0 +1,14 @@
+2df100a3fd89e8159a5e996b3fb6a9a85c1a532bad7904f30d216b286fddfbb4  /home/haroldzhao/MyProj/DshProj/VEdit/target/host-tools-pr/target/host-tools-rust/debug/deps/toolchain-8607fd3bdb90d9f4
++ id
+uid=1000 gid=1000 groups=1000
++ /toolchain-tests --nocapture
+
+running 4 tests
+test an_empty_saved_host_path_does_not_fall_back_to_the_launcher_path ... ok
+test skips_candidates_without_execute_access_for_the_current_user ... ok
+test skips_nonexecutables_and_reports_removed_tools ... ok
+test effective_path_overrides_host_path_but_cannot_restore_appdir_tools ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+Effective permission regression exit=0

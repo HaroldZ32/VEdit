@@ -56,6 +56,8 @@ mod documents;
 mod edits;
 mod position;
 mod session;
+mod slang_flags;
+mod slang_project;
 
 pub use backend::{
     capabilities, capabilities_from_server, filelist_text, ActionSupport, BackendCapabilities,

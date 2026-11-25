@@ -199,6 +199,8 @@ pub struct CatalogModule {
     pub name: String,
     /// File of the module definition (`InstanceBody.source_file`).
     pub file: PathBuf,
+    /// Source file to compile when the declaration was reached through an include.
+    pub compilation_unit: Option<PathBuf>,
     /// 0-based line of the module definition.
     pub line: u32,
     /// 0-based column of the module definition.
@@ -466,7 +468,7 @@ pub fn build_catalog_cancellable(
     let (report, scanned) = run_ast_json_cancellable(
         files,
         &run_options,
-        |path, exit_code, stderr| {
+        |path, exit_code, stderr, trace| {
             // RM-17: slang rejects a name it cannot elaborate with a named error
             // ("'<name>' is not a valid top-level module") and still writes a tiny
             // AST document. That is NOT a design: report the NAME.
@@ -521,7 +523,9 @@ pub fn build_catalog_cancellable(
             let run_top = options.top.clone().filter(|top| !top.trim().is_empty());
             // D2: the file set ORDER is the duplicate-module tie-break, so the walk
             // owns it (a list of paths, cloned once per run).
-            let ordered_files = files.to_vec();
+            let include_units = compiler_include_units(trace, files);
+            let mut ordered_files = files.to_vec();
+            ordered_files.extend(include_units.keys().cloned());
             // B-5: a non-zero exit WITH the JSON is a normal result (see the module
             // docs); the diagnostics that came with it are read before the walk so
             // they cannot be lost when the walk returns.
@@ -584,6 +588,14 @@ pub fn build_catalog_cancellable(
                     } else {
                         Vec::new()
                     };
+                    let modules = modules
+                        .into_iter()
+                        .map(|mut module| {
+                            module.compilation_unit =
+                                include_units.get(&real_path(&module.file)).cloned();
+                            module
+                        })
+                        .collect();
                     let scan = CatalogScan {
                         modules,
                         duplicate_warnings,
@@ -607,6 +619,7 @@ pub fn build_catalog_cancellable(
             })?
         },
         cancel,
+        true,
     );
     let mut catalog = ModuleCatalog {
         tool: report.tool,
@@ -697,6 +710,42 @@ pub fn build_catalog_cancellable(
 
 /// Every source file of an ELABORATED definition (module or interface), sorted
 /// and deduplicated. RM-17: with an explicit top this is the reachable set.
+fn compiler_include_units(trace: &str, files: &[PathBuf]) -> BTreeMap<PathBuf, PathBuf> {
+    let ranked: HashMap<_, _> = files
+        .iter()
+        .enumerate()
+        .rev()
+        .map(|(rank, file)| (real_path(file), rank))
+        .collect();
+    let mut owners = BTreeMap::<PathBuf, PathBuf>::new();
+    let mut unit = None;
+    for line in trace.lines() {
+        let Some((kind, path)) = line
+            .strip_prefix("Parsing ")
+            .and_then(|line| line.split_once(" file '"))
+        else {
+            continue;
+        };
+        let Some(path) = path.strip_suffix("'.") else {
+            continue;
+        };
+        let path = real_path(Path::new(path));
+        if kind != "include" {
+            unit = ranked.get_key_value(&path).map(|(path, _)| path);
+        } else if let Some(owner) = unit.filter(|_| !ranked.contains_key(&path)) {
+            owners
+                .entry(path)
+                .and_modify(|existing| {
+                    if ranked.get(owner) < ranked.get(existing) {
+                        *existing = owner.clone();
+                    }
+                })
+                .or_insert_with(|| owner.clone());
+        }
+    }
+    owners
+}
+
 fn reachable_source_files(document: &Value) -> Vec<PathBuf> {
     fn walk(value: &Value, out: &mut std::collections::BTreeSet<PathBuf>) {
         match value {
@@ -1079,6 +1128,7 @@ pub(crate) fn parse_catalog_value_in(
         parsed.modules.push(CatalogModule {
             name: name.clone(),
             file,
+            compilation_unit: None,
             line,
             column,
             is_top: false,

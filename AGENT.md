@@ -40,7 +40,9 @@ CentOS 7 image, because the deliverable must run on CentOS 7 (glibc 2.17).
   libraries, `libtree-sitter` 0.25 and the Qt platform plugins; the measured
   package names are in `evidence/runtime-deps/REPORT.md` §1 and the build matrix
   in `docs/BUILD.md` §12. **If you are verifying the v2 deliverable, use this
-  command.**
+  command.** Build the pinned `slang` first with `bash build/slang/build.sh` or
+  use the hash-checked CI artifact. The Rust tests need `build/slang/out/slang`
+  even when the Qt build uses `--no-test`.
 - Rust C ABI selfcheck of the product binary (T97): `target/qt6-build/src/app/vedit-app
   --selfcheck-ffi crates/vd-ffi/tests/fixtures/project` (offscreen:
   `QT_QPA_PLATFORM=offscreen`). `--selfcheck-ffi` asserts the **C ABI smoke
@@ -96,21 +98,14 @@ are allowed only through a per-operation allow-list":
   secret material stay at zero. Cancelling aborts the operation with git's real
   reason.
 
-Toolchain: the delivered AppDir bundles `git 2.53.0` and `subversion 1.14.5`
-under `usr/lib/vcs/` (57-library ldd closure, mutually non-shadowing with the
-product's own `lib/`); resolution is **bundled > PATH > env** and observable as
-`VCS-TOOLCHAIN git=… version=… svn=… version=… source=bundled`. `svnadmin` is
-**build-only** (used to create the E2E fixture, deliberately not shipped).
-
-Evidence: reads and writes are covered against REAL subprocesses — Git end to
-end (including `file://` bare-repo remotes, a 401 credential transport, history
-and workspace operations) and SVN with a real `svnadmin create` + `svn
-checkout` working copy driven by the bundled `svn` (`evidence/vcs-write/`,
-`evidence/vcs-toolchain/`, `evidence/vcs-git-remote/`, `evidence/vcs-git-history/`,
-`evidence/vcs-git-ops/`, `evidence/vcs-git-workspace/`, `evidence/svn-e2e/`).
-SVN is **no longer stub-only**: the `.svn` project path runs the bundled client.
-Still not claimed: real network / HTTPS / SSH transports — those are limited to
-local bare repositories and the local 401 auth fixture.
+The integrated terminal and VCS share the host shell selected in
+**Preferences → Tools → Host shell**. VCS resolves executable `git` and `svn`
+on the effective host `PATH`, then accepts absolute paths from `VEDIT_GIT` or
+`VEDIT_SVN`. The AppImage launches without either client. VCS operations report
+how to install or locate a missing client. Use the system `svnadmin` for SVN
+E2E fixtures. See `evidence/host-tools/` for the current runtime and packaging
+checks. Earlier local repository and credential fixture results are archived
+under `evidence/vcs-write/` and `evidence/svn-e2e/`.
 
 ### Project discovery: optional files are not errors (T114)
 
@@ -184,9 +179,11 @@ overwritten). `VEDIT_NO_ENV_AUTOCAPTURE=1` disables it. The imported layer now r
 (a) filelist variable expansion, (b) deeplint/slang children, (c) verible LSP children
 (`LspConfig.environment`), (d) the integrated terminal PTY, and (e) C++ toolchain
 resolution — the latter through the C ABI `vd_env_effective_snapshot` /
-`vd_env_snapshot_free` (values may be secrets: never print or log them). **VCS children
-still receive only the process environment.** Changing the imported layer requires a
-restart.
+`vd_env_snapshot_free` (values may be secrets: never print or log them). VCS
+jobs use the same effective host environment as the terminal. AppRun preserves
+the inherited `PATH` in `VEDIT_HOST_PATH`, including an empty value. The host
+child environment filters AppDir entries and removes `LD_LIBRARY_PATH` and
+`LOCPATH`. Changing the imported layer requires a restart.
 
 ### Project mode is filelist-gated; LINT is split (batch-20261115)
 

@@ -221,7 +221,6 @@ AppImage 除了 Qt/KF6/KTextEditor/KSyntaxHighlighting/tree-sitter/字体/中文
 | `verible-verilog-ls` / `verible-verilog-format` / `verible-verilog-lint` | `v0.0-4298-g085eef05` | Verilog LSP / 格式化 / lint | §3 |
 | `slang` | v12.1（CentOS 7 源码构建） | 模块树、deep lint、工程级 rename 的 AST | §6 |
 | `slang-server` | 0.3.1+2ad996f（源码构建） | 第二个 LSP 后端 | §13 |
-| `git` / `subversion` | 2.53.0 / 1.14.5 | 版本控制面板；`svnadmin` **只**用于构建 E2E 夹具，不随包 | `evidence/vcs-toolchain/` |
 | GNU `diff` | 3.3（CentOS 7 `diffutils-3.3-5.el7`） | 双栏文件和 SVN 快照比较 | `evidence/workbench-upgrade/release/preflight/` |
 | `vhdl_ls` | 0.88.0 | VHDL LSP | `evidence/batch-20261110c/vhdl/01-lsp.log` |
 | `ghdl` | 6.0.0（mcode） | VHDL 分析（合并 lint；VSG 格式化的语法门） | `evidence/batch-20261110c/vhdl/03-merged-lint.log` |
@@ -233,9 +232,11 @@ AppImage 除了 Qt/KF6/KTextEditor/KSyntaxHighlighting/tree-sitter/字体/中文
 | Bloop | 1.5.18（sbt）/ 2.1.2（scala-cli BSP） | Metals 的构建服务器 | `evidence/batch-20261110c/scala/metals-matrix.md` |
 | 预置缓存 | SpinalHDL 1.15.1 / Scala 2.13.12；Chisel 7.16.0 / Scala 2.13.18 + firtool | 两个示例的离线构建 | `evidence/batch-20261110c/scala/03-cache-manifest.txt`、`scala-payload/` |
 
-运行时解析顺序统一为 **bundled → local checkout → PATH → env**（工具各自的 env 名见 §10.1、
+上述 HDL / Scala 工具的运行时解析顺序为 **bundled → local checkout → PATH → env**（工具各自的 env 名见 §10.1、
 `docs/USER_GUIDE.md` 附录 B）；工具缺失时产品给**一条**可操作的状态行，不按文件重复报错。
 文件比较优先使用 AppImage 内的私有 GNU `diff`，源码构建从 `PATH` 查找 GNU diffutils。
+
+集成终端和版本控制使用宿主机上已安装的 shell。Git 和 SVN 客户端也由宿主机提供。打包门禁检查 AppDir 文件，并在空 `PATH` 下启动实际产品。真实 SVN 测试可用 `VEDIT_SVN_BIN` 和 `VEDIT_SVNADMIN` 指向测试环境中已安装的客户端和夹具工具。
 
 ### 7.4 运行期离线证明（交付物）
 
@@ -326,7 +327,7 @@ cargo metadata --format-version 1 --all-features > meta.json
 
 ### 10.1 运行期工具链发现（Qt 产品：Verilog / VHDL / Scala：随包 / 本地取 / env）
 
-`vedit-app` 的各条 lane 需要不同的外部工具，但它们走**同一个解析器**
+`vedit-app` 的 HDL 与 Scala 功能通过**同一个解析器**查找外部工具
 （`src/workspace/diagnostics/toolchain.cpp`），顺序固定为
 **bundled → local checkout → PATH → env**，并把结果打印出来：
 
@@ -336,7 +337,6 @@ cargo metadata --format-version 1 --all-features > meta.json
 - VHDL：`vhdl_ls`、`ghdl`、`vsg`（+ 随包 CPython）——`VHDL-TOOLCHAIN source=vhdl_ls:… ghdl:…
   vsg:… missing=[...]`；
 - Scala：`java`、`scala-cli`、`sbt`、`metals`——同一 `TOOLCHAIN` 行尾的 `scala source=…`；
-- 版本控制：`git`、`svn` ——`VCS-TOOLCHAIN git=… version=… svn=… version=… source=bundled`。
 
 1. **随包（bundled）**：把二进制放进 `vd-app` 同目录的 `bin/`（AppDir/AppImage
    形态；打包后不需要任何额外配置）。
@@ -349,11 +349,13 @@ cargo metadata --format-version 1 --all-features > meta.json
    解析器从 `target/qt6-build/src/app/vedit-app` 向上找到 checkout 根（标记
    `scripts/fetch-verible.sh`）后自动探测上述产物，**不需要设置任何环境变量**。
 3. **env 指定**：`VEDIT_VERIBLE_LS`、`VEDIT_SLANG`、`VEDIT_VHDL_LS`、`VEDIT_GHDL`、
-   `VEDIT_VSG`、`VEDIT_GIT`、`VEDIT_SVN`（诊断类工具都支持 `_DIR` 形式指向目录）。
+   `VEDIT_VSG`（诊断类工具都支持 `_DIR` 形式指向目录）。
    Scala 的 `java` / `scala-cli` / `sbt` / `metals` 走**同一个解析器**（bundled → local
    checkout → PATH；设置页暂无它们的路径字段），本批次不声称它们接受 `VEDIT_*` 覆盖。
 
-缺工具时，对应面板/状态栏只显示**一条**状态（缺什么、影响什么、三条修复路径），
+版本控制另用宿主机的有效 `PATH`，找不到时读取 `VEDIT_GIT` / `VEDIT_SVN` 中的绝对路径。诊断行 `VCS-TOOLCHAIN` 记录 `path`、`env` 或 `missing`。
+
+缺诊断工具时，对应面板/状态栏只显示**一条**状态（缺什么、影响什么、三条修复路径），
 outline 保持空表 + 一行原因；不会按文件/请求重复报错，也不把“环境未满足”当作文件级 Error。
 VHDL 的三条工具缺失文案与 Scala 的随包解析细节见 `docs/USER_GUIDE.md` §9.4 / §9.5，
 随包版本台账见本文 §7.3。
@@ -424,11 +426,12 @@ CentOS 7（kernel 3.10）仍然成立：镜像里的 glibc 2.43 编译下限是 
 ### 12.2 构建命令与产物
 
 ```sh
-bash scripts/build-qt.sh              # 镜像 → configure → build → ctest → xcb/软件渲染冒烟
-bash scripts/build-qt.sh --no-test    # 只 configure + build（即 C++ 静态检查）
+bash build/slang/build.sh             # 首次构建时生成固定版本的 slang
+bash scripts/build-qt.sh              # Rust 构建与测试 → Qt 构建、CTest、Xvfb
+bash scripts/build-qt.sh --no-test    # Rust 构建与测试 → Qt 构建
 ```
 
-与 §2 相同的一条命令；本节列出产物路径、运行期依赖与证据。
+Rust 服务层测试需要 `build/slang/out/slang`，`--no-test` 只跳过 Qt 的测试。CI 从固定的 slang 构建任务获取并校验同一产物。
 
 **产物路径：`target/qt6-build/src/app/vedit-app`**（CMake 构建树 `target/qt6-build/` 已被 gitignore）。
 `bash scripts/build.sh` 是旧 Rust/GTK3 产品，只写 `target/release/vd-app`，不产出 `vedit-app`。

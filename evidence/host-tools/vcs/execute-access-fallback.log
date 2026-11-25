@@ -1,0 +1,17 @@
+uid=1000(haroldzhao) gid=1000(haroldzhao) groups=1000(haroldzhao),65534(nogroup),65534(nogroup),65534(nogroup),65534(nogroup),65534(nogroup),65534(nogroup),65534(nogroup)
+
+running 1 test
+strace: Process 9 attached
+strace: Process 10 attached
+[pid    10] +++ exited with 127 +++
+[pid     8] --- SIGCHLD {si_signo=SIGCHLD, si_code=CLD_EXITED, si_pid=10, si_uid=1000, si_status=127, si_utime=0, si_stime=0} ---
+[pid     9] faccessat2(AT_FDCWD, "/tmp/.tmpDrhTvx/first/git", X_OK, AT_EACCESS) = -1 ENOSYS (Function not implemented) (INJECTED)
+[pid     9] faccessat(AT_FDCWD, "/tmp/.tmpDrhTvx/first/git", X_OK) = -1 EACCES (Permission denied)
+[pid     9] faccessat2(AT_FDCWD, "/tmp/.tmpDrhTvx/second/git", X_OK, AT_EACCESS) = -1 ENOSYS (Function not implemented) (INJECTED)
+[pid     9] faccessat(AT_FDCWD, "/tmp/.tmpDrhTvx/second/git", X_OK) = 0
+[pid     9] +++ exited with 0 +++
+test skips_candidates_without_execute_access_for_the_current_user ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
++++ exited with 0 +++

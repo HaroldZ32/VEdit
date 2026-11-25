@@ -1,0 +1,25 @@
+Final launcher commit 33a857224011daa1aadbb5b534a8d28eaa4a338c
+Observed 2026-11-25T10:36:43+08:00
+CHECK PASS  apprun.syntax
+CHECK PASS  default.slang-bundled
+CHECK PASS  default.verible-bundled
+CHECK PASS  override.slang-preserved
+CHECK PASS  override.verible-preserved
+CHECK PASS  absent.slang-not-exported
+CHECK PASS  absent.verible-not-exported
+CHECK PASS  absent.slang-caller-preserved
+CHECK PASS  non-executable.slang-not-exported
+CHECK PASS  host-path.preserved-before-appdir-path
+CHECK PASS  host-path.empty-preserved
+CHECK PASS  host-path.unset-preserved
+CHECK PASS  appimage.normal-launch-does-not-force-extraction
+CHECK PASS  appimage.extracted-run-preserves-extraction-for-restart
+APPRUN-ENV-PROBE ok=1 checks=14 failures=0
+[docs] PASS: README.md docs/BUILD.md docs/USER_GUIDE.md THIRD_PARTY_NOTICES.md
+[lrelease] /usr/lib/qt6/bin/lrelease /work/translations/vedit_zh_CN.ts -qm /tmp/tmp.HxG106FCHI/vedit_zh_CN.qm
+Updating '/tmp/tmp.HxG106FCHI/vedit_zh_CN.qm'...
+    Generated 1870 translation(s) (1870 finished and 0 unfinished)
+[lrelease] counts: 1870 translation(s) (1870 finished, 0 unfinished, 0 untranslated)
+[lrelease] qm: 206921 bytes sha256=6653fba03c6effd18ec8630b97de528f2ceab45522392c67834182d9371370ef
+[lrelease] PASS: 0 unfinished and 0 untranslated in /work/translations/vedit_zh_CN.ts
+Branch launcher, documentation and translation gates exit=0

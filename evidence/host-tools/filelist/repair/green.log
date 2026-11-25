@@ -1,0 +1,17 @@
+89: TREE imported=1 path=/tmp/vedit-filelist-authority-e2e-dFrZWo/project/included/deep/child.sv excluded=/tmp/vedit-filelist-authority-e2e-dFrZWo/project/rtl/child.sv
+89: LINT pass=1 backend=slang inputs=[/tmp/vedit-filelist-authority-e2e-dFrZWo/project/included/deep/child.sv,/tmp/vedit-filelist-authority-e2e-dFrZWo/project/rtl/top.sv] rows=[input port 'correct' has no connection|port 'intentional_missing' does not exist in 'child']
+89: CTRL pass=1 canonical=/tmp/vedit-filelist-authority-e2e-dFrZWo/project/included/deep/child.sv
+89: CTRL expected=/tmp/vedit-filelist-authority-e2e-dFrZWo/shared/signal.svh canonical=/tmp/vedit-filelist-authority-e2e-dFrZWo/shared/signal.svh
+1/3 Test #89: vedit-filelist-authority-config-e2e ....   Passed    3.36 sec
+90: TREE imported=1 path=/tmp/vedit-filelist-authority-e2e-HutteD/project/include/child.svh excluded=/tmp/vedit-filelist-authority-e2e-HutteD/project/rtl/child.sv
+90: LINT pass=1 backend=slang inputs=[/tmp/vedit-filelist-authority-e2e-HutteD/project/rtl/top.sv] rows=[input port 'correct' has no connection|port 'intentional_missing' does not exist in 'child']
+90: CTRL pass=1 canonical=/tmp/vedit-filelist-authority-e2e-HutteD/project/include/child.svh
+90: CTRL expected=/tmp/vedit-filelist-authority-e2e-HutteD/project/include/signal.svh canonical=/tmp/vedit-filelist-authority-e2e-HutteD/project/include/signal.svh
+2/3 Test #90: vedit-filelist-authority-include-e2e ...   Passed    3.00 sec
+91: TREE imported=1 path=/tmp/vedit-filelist-authority-e2e-IAbNOU/project/include/child.svh excluded=/tmp/vedit-filelist-authority-e2e-IAbNOU/project/rtl/child.sv
+91: LINT pass=1 backend=slang inputs=[/tmp/vedit-filelist-authority-e2e-IAbNOU/project/rtl/top.sv,/tmp/vedit-filelist-authority-e2e-IAbNOU/project/rtl/wrapper.sv] rows=[input port 'correct' has no connection|port 'intentional_missing' does not exist in 'child']
+91: CTRL pass=1 canonical=/tmp/vedit-filelist-authority-e2e-IAbNOU/project/include/child.svh
+91: CTRL expected=/tmp/vedit-filelist-authority-e2e-IAbNOU/project/include/signal.svh canonical=/tmp/vedit-filelist-authority-e2e-IAbNOU/project/include/signal.svh
+3/3 Test #91: vedit-filelist-authority-wrapper-e2e ...   Passed    2.08 sec
+The following tests passed:
+100% tests passed, 0 tests failed out of 3

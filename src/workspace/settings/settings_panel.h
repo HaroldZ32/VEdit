@@ -427,6 +427,7 @@ private:
     QComboBox *lspBackendCombo_ = nullptr;
     QComboBox *lintEngineCombo_ = nullptr;
     QComboBox *languageCombo_ = nullptr;
+    QComboBox *hostShellCombo_ = nullptr;
     QPushButton *languageRestartButton_ = nullptr;
     QLabel *languageHint_ = nullptr;
     QString languageStatus_;

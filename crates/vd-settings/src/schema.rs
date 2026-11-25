@@ -67,6 +67,8 @@ use crate::Entry;
 
 /// Store keys the settings pages read and write.
 pub mod keys {
+    /// Absolute host shell path for the terminal and VCS (absent means Auto).
+    pub const HOST_SHELL: &str = "tools.host_shell";
     /// LSP backend selector: which language server serves diagnostics/outline.
     pub const LSP_BACKEND: &str = "tools.lsp_backend";
     /// Lint engine selector: which tool runs the project-wide batch lint.

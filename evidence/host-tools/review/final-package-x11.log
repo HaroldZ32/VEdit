@@ -1,0 +1,168 @@
+Observed 2026-11-25T10:37:54+08:00
+Current revision 27378b589d9d9d3993bf1b758679e5f4a3e54dc0
+Review GUI scratch=/home/haroldzhao/MyProj/DshProj/VEdit/target/host-tools-pr/target/review-package-ui.iSWXsN
+befda885f7fd6cc20ff3ec4d4d04fd80c677b3a044d2bca2927a6ed21d78c3d2  /home/haroldzhao/MyProj/DshProj/VEdit/target/host-tools-pr/packaging/runtime/out/AppDir/AppRun
+89abbf55d4390954972887c9a3017b1a51a79e77746e83799bfc004386790d72  /home/haroldzhao/MyProj/DshProj/VEdit/target/host-tools-pr/packaging/runtime/out/AppDir/bin/vd-app
+Selecting previously unselected package libapr1t64:amd64.
+(Reading database ... 49215 files and directories currently installed.)
+Preparing to unpack .../libapr1t64_1.7.6-3_amd64.deb ...
+Unpacking libapr1t64:amd64 (1.7.6-3) ...
+Selecting previously unselected package libaprutil1t64:amd64.
+Preparing to unpack .../libaprutil1t64_1.6.3-3ubuntu3.1_amd64.deb ...
+Unpacking libaprutil1t64:amd64 (1.6.3-3ubuntu3.1) ...
+Selecting previously unselected package libutf8proc3:amd64.
+Preparing to unpack .../libutf8proc3_2.10.0-2_amd64.deb ...
+Unpacking libutf8proc3:amd64 (2.10.0-2) ...
+Selecting previously unselected package libserf-1-1:amd64.
+Preparing to unpack .../libserf-1-1_1.3.10-3ubuntu2_amd64.deb ...
+Unpacking libserf-1-1:amd64 (1.3.10-3ubuntu2) ...
+Selecting previously unselected package libsvn1:amd64.
+Preparing to unpack .../libsvn1_1.14.5-6build1_amd64.deb ...
+Unpacking libsvn1:amd64 (1.14.5-6build1) ...
+Selecting previously unselected package subversion.
+Preparing to unpack .../subversion_1.14.5-6build1_amd64.deb ...
+Unpacking subversion (1.14.5-6build1) ...
+Selecting previously unselected package zsh-common.
+Preparing to unpack .../zsh-common_5.9-8ubuntu3_all.deb ...
+Unpacking zsh-common (5.9-8ubuntu3) ...
+Selecting previously unselected package zsh.
+Preparing to unpack .../zsh_5.9-8ubuntu3_amd64.deb ...
+Unpacking zsh (5.9-8ubuntu3) ...
+Setting up libapr1t64:amd64 (1.7.6-3) ...
+Setting up libaprutil1t64:amd64 (1.6.3-3ubuntu3.1) ...
+Setting up libutf8proc3:amd64 (2.10.0-2) ...
+Setting up libserf-1-1:amd64 (1.3.10-3ubuntu2) ...
+Setting up libsvn1:amd64 (1.14.5-6build1) ...
+Setting up subversion (1.14.5-6build1) ...
+Setting up zsh-common (5.9-8ubuntu3) ...
+Setting up zsh (5.9-8ubuntu3) ...
+Processing triggers for libc-bin (2.43-2ubuntu2.4) ...
+Processing triggers for man-db (2.13.1-1build1) ...
+Processing triggers for debianutils (5.23.2build1) ...
++ xvfb-run -a timeout 55s /package/AppRun --selfcheck-ffi /review/project
+STARTUP-TRACE t_ms=0 wall_ms=1795574277178 main-entry
+STARTUP-TRACE t_ms=18 wall_ms=1795574277197 qt-init-done
+STARTUP-TRACE t_ms=21 wall_ms=1795574277200 settings-ready
+STARTUP-TRACE t_ms=21 wall_ms=1795574277200 crash-install-done
+FFI-ABI fixture=/review/project
+CHECK ffi.service.create PASS
+CHECK ffi.abi-version PASS
+CHECK ffi.project.start.returns-job PASS
+CHECK ffi.project.start.non-blocking PASS
+FFI-TIMING project-start-ms=0
+CHECK ffi.project.ready PASS
+CHECK ffi.project.file-count PASS actual=3 files=[/review/project/rtl/rtl_a.sv,/review/project/rtl/rtl_b.sv,/review/project/rtl/rtl_c.sv] (C ABI fixture expects 3)
+CHECK ffi.project.file-order PASS actual=[rtl_a.sv,rtl_b.sv,rtl_c.sv]
+CHECK ffi.project.include-dir PASS actual=[/review/project/rtl/inc]
+CHECK ffi.project.defines PASS actual=[WIDTH=8,SIM]
+CHECK ffi.project.unknown-job-rejected PASS
+CHECK ffi.fim.start PASS
+CHECK ffi.fim.disabled-by-default PASS
+CHECK ffi.vcs.start PASS
+CHECK ffi.vcs.backend-detected PASS
+CHECK ffi.settings.temp-dir PASS
+CHECK ffi.settings.save.start PASS
+CHECK ffi.settings.save.ready PASS
+CHECK ffi.settings.load.start PASS
+CHECK ffi.settings.load.ready PASS
+CHECK ffi.settings.round-trip PASS
+FFI-ABI-SELFTEST ok=1 checks=20 failures=0
++ app_pid=266
++ /package/AppRun --state-dir /review/profile --no-session-restore --project /review/project /review/project/rtl/rtl_a.sv --hold 12000
+++ seq 1 90
++ for attempt in $(seq 1 90)
++ awk '/launch-ready/{seen=1} END{exit !seen}' /review/app.log
++ kill -0 266
++ sleep .2
++ for attempt in $(seq 1 90)
++ awk '/launch-ready/{seen=1} END{exit !seen}' /review/app.log
++ kill -0 266
++ sleep .2
++ for attempt in $(seq 1 90)
++ awk '/launch-ready/{seen=1} END{exit !seen}' /review/app.log
++ break
++ awk '/VCS-TOOLCHAIN|window-shown|launch-ready/' /review/app.log
+VCS-TOOLCHAIN git=/review/bin/git version=2.53.0 svn=/review/bin/svn version=1.14.5 source=path git_source=path svn_source=path
+STARTUP-TRACE t_ms=131 wall_ms=1795574277449 window-shown
+STARTUP-TRACE t_ms=236 wall_ms=1795574277554 launch-ready
++ awk '/VCS-TOOLCHAIN.*git=\/review\/bin\/git.*svn=\/review\/bin\/svn/ {picked=1} /launch-ready/{ready=1} END{exit !(picked && ready)}' /review/app.log
+++ input windows
+++ LD_LIBRARY_PATH=/native-libs
+++ /native-x11 windows
+++ awk '/rtl_a.sv/ && !found++ {print $1}'
++ window=0x200007
++ input resize 0x200007 1440 960
++ LD_LIBRARY_PATH=/native-libs
++ /native-x11 resize 0x200007 1440 960
++ input key Control_L+Alt_L+j
++ LD_LIBRARY_PATH=/native-libs
++ /native-x11 key Control_L+Alt_L+j
+++ seq 1 30
++ for attempt in $(seq 1 30)
++ awk '/^selected-pty$/{seen=1} END{exit !seen}' /review/launches
++ sleep .1
++ for attempt in $(seq 1 30)
++ awk '/^selected-pty$/{seen=1} END{exit !seen}' /review/launches
++ break
++ awk '/^selected-pty$/{pty=1} /^selected-vcs$/{vcs=1} END{exit !(pty && vcs)}' /review/launches
++ awk '/^git$/{git=1} /^svn$/{svn=1} END{exit !(git && svn)}' /review/host-tools
++ sleep .4
++ input image 1440 960
++ LD_LIBRARY_PATH=/native-libs
++ /native-x11 image 1440 960
++ input key Control_L+Alt_L+c
++ LD_LIBRARY_PATH=/native-libs
++ /native-x11 key Control_L+Alt_L+c
+++ seq 1 30
++ for attempt in $(seq 1 30)
++ awk '/^git-status$/{seen=1} END{exit !seen}' /review/host-tools
++ sleep .1
++ for attempt in $(seq 1 30)
++ awk '/^git-status$/{seen=1} END{exit !seen}' /review/host-tools
++ break
++ awk '/^git-status$/{seen=1} END{exit !seen}' /review/host-tools
++ sleep .4
++ input image 1440 960
++ LD_LIBRARY_PATH=/native-libs
++ /native-x11 image 1440 960
++ wait 266
++ printf 'Selected shell, imported environment and sanitized loader variables reached the packaged PTY and VCS tools.\n'
+Selected shell, imported environment and sanitized loader variables reached the packaged PTY and VCS tools.
++ missing_pid=470
++ APPDIR=/package
++ PATH=
++ /package/AppRun --state-dir /review/profile-without-tools --no-session-restore --project /review/project /review/project/rtl/rtl_a.sv --hold 6000
+++ seq 1 25
++ for attempt in $(seq 1 25)
++ awk '/launch-ready/{seen=1} END{exit !seen}' /review/missing.log
++ kill -0 470
++ sleep .2
++ for attempt in $(seq 1 25)
++ awk '/launch-ready/{seen=1} END{exit !seen}' /review/missing.log
++ kill -0 470
++ sleep .2
++ for attempt in $(seq 1 25)
++ awk '/launch-ready/{seen=1} END{exit !seen}' /review/missing.log
++ break
++ awk '/VCS-TOOLCHAIN|window-shown|launch-ready/' /review/missing.log
+VCS-TOOLCHAIN git=<missing> version=<missing> svn=<missing> version=<missing> source=missing git_source=missing svn_source=missing
+STARTUP-TRACE t_ms=124 wall_ms=1795574290082 window-shown
+STARTUP-TRACE t_ms=241 wall_ms=1795574290199 launch-ready
++ awk '/VCS-TOOLCHAIN.*git=<missing>.*svn=<missing>/ {missing=1} /launch-ready/{ready=1} END{exit !(missing && ready)}' /review/missing.log
+++ input windows
+++ LD_LIBRARY_PATH=/native-libs
+++ /native-x11 windows
+++ awk '/rtl_a.sv/ && !found++ {print $1}'
++ window=0x200007
++ input resize 0x200007 1440 960
++ LD_LIBRARY_PATH=/native-libs
++ /native-x11 resize 0x200007 1440 960
++ input key Control_L+Alt_L+c
++ LD_LIBRARY_PATH=/native-libs
++ /native-x11 key Control_L+Alt_L+c
++ sleep .8
++ input image 1440 960
++ LD_LIBRARY_PATH=/native-libs
++ /native-x11 image 1440 960
++ wait 470
+AppDir packaged GUI verification exit=0

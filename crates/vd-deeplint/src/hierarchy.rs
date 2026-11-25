@@ -43,7 +43,9 @@ use serde_json::Value;
 use crate::binary::{
     resolve_binary_for_current_process, sanitize_tool_child_env, BinaryResolution,
 };
-use crate::process::{receive_capped, spawn_reader, terminate, termination_signal};
+use crate::process::{
+    receive_capped, spawn_reader, spawn_reader_with_limit, terminate, termination_signal,
+};
 use crate::LintFailure;
 
 mod navigation;
@@ -254,7 +256,7 @@ fn empty_report(top: Option<String>) -> HierarchyReport {
 /// Elaborate `files` and return the hierarchy + driver/load report.
 #[must_use]
 pub fn elaborate(files: &[PathBuf], options: &HierarchyOptions) -> HierarchyReport {
-    elaborate_impl(files, options, None, None, None)
+    elaborate_impl(files, options, None, None, None, false)
 }
 
 /// Elaborate the explicit filelist from its project root for editor navigation.
@@ -272,6 +274,7 @@ pub fn elaborate_navigation(
         None,
         Some(cancel),
         Some((root, &mut dependencies)),
+        false,
     );
     (report, dependencies)
 }
@@ -293,7 +296,13 @@ pub(crate) fn run_ast_json<T>(
     options: &HierarchyOptions,
     parse: impl FnOnce(&Path, Option<i32>, &str) -> Result<T, LintFailure>,
 ) -> (HierarchyReport, Option<T>) {
-    run_ast_json_cancellable(files, options, parse, None)
+    run_ast_json_cancellable(
+        files,
+        options,
+        |path, code, stderr, _| parse(path, code, stderr),
+        None,
+        false,
+    )
 }
 
 /// [`run_ast_json`] with a cancellation flag the caller can raise from another
@@ -306,34 +315,46 @@ pub(crate) fn run_ast_json<T>(
 pub(crate) fn run_ast_json_cancellable<T>(
     files: &[PathBuf],
     options: &HierarchyOptions,
-    parse: impl FnOnce(&Path, Option<i32>, &str) -> Result<T, LintFailure>,
+    parse: impl FnOnce(&Path, Option<i32>, &str, &str) -> Result<T, LintFailure>,
     cancel: Option<&AtomicBool>,
+    trace_includes: bool,
 ) -> (HierarchyReport, Option<T>) {
     let mut captured: Option<T> = None;
     let report = {
         let mut parse = Some(parse);
-        let mut sink =
-            |path: &Path, exit_code: Option<i32>, stderr: &str| -> Result<(), LintFailure> {
-                let Some(parse) = parse.take() else {
-                    return Err(LintFailure::Io {
-                        message: "the AST JSON document was handed to the sink twice".to_string(),
-                    });
-                };
-                match parse(path, exit_code, stderr) {
-                    Ok(value) => {
-                        captured = Some(value);
-                        Ok(())
-                    }
-                    Err(failure) => Err(failure),
-                }
+        let mut sink = |path: &Path,
+                        exit_code: Option<i32>,
+                        stderr: &str,
+                        stdout: &str|
+         -> Result<(), LintFailure> {
+            let Some(parse) = parse.take() else {
+                return Err(LintFailure::Io {
+                    message: "the AST JSON document was handed to the sink twice".to_string(),
+                });
             };
-        elaborate_impl(files, options, Some(&mut sink), cancel, None)
+            match parse(path, exit_code, stderr, stdout) {
+                Ok(value) => {
+                    captured = Some(value);
+                    Ok(())
+                }
+                Err(failure) => Err(failure),
+            }
+        };
+        elaborate_impl(
+            files,
+            options,
+            Some(&mut sink),
+            cancel,
+            None,
+            trace_includes,
+        )
     };
     (report, captured)
 }
 
 /// What the caller does with the `--ast-json` file while its tempdir is alive.
-type JsonSink<'a> = Option<&'a mut dyn FnMut(&Path, Option<i32>, &str) -> Result<(), LintFailure>>;
+type JsonSink<'a> =
+    Option<&'a mut dyn FnMut(&Path, Option<i32>, &str, &str) -> Result<(), LintFailure>>;
 
 fn elaborate_impl(
     files: &[PathBuf],
@@ -341,6 +362,7 @@ fn elaborate_impl(
     mut on_json: JsonSink<'_>,
     cancel: Option<&AtomicBool>,
     navigation: Option<(&Path, &mut Vec<PathBuf>)>,
+    trace_includes: bool,
 ) -> HierarchyReport {
     let started = Instant::now();
     let mut report = empty_report(options.top.clone());
@@ -370,6 +392,9 @@ fn elaborate_impl(
     argv.push(std::ffi::OsString::from("--ast-json"));
     argv.push(json_path.as_os_str().to_os_string());
     argv.push(std::ffi::OsString::from("--ast-json-source-info"));
+    if trace_includes {
+        argv.push(std::ffi::OsString::from("--show-parsed-files"));
+    }
     if navigation.is_some() {
         argv.push(std::ffi::OsString::from("--Mall"));
         argv.push(dep_path.as_os_str().to_os_string());
@@ -403,6 +428,7 @@ fn elaborate_impl(
         &argv,
         options.timeout,
         cancel,
+        trace_includes,
     );
     report.tool = run.tool;
     report.peak_rss_kb = run.peak_rss_kb;
@@ -441,7 +467,7 @@ fn elaborate_impl(
         // The catalog streams the document itself (so retained memory is bounded
         // by the catalog, not by the raw JSON); it owns the size policy and the
         // parse, and reports its own typed failure.
-        if let Err(failure) = sink(&json_path, exit_code, &stderr) {
+        if let Err(failure) = sink(&json_path, exit_code, &stderr, &run.stdout) {
             report.failure = Some(failure);
             report.elapsed = started.elapsed();
             return report;
@@ -534,6 +560,7 @@ pub(crate) struct ToolRun {
     pub signal: Option<i32>,
     /// The child's captured stderr (capped; a truncation marker is appended).
     pub stderr: String,
+    stdout: String,
     /// `None` when the child ran to completion; a typed failure otherwise.
     pub failure: Option<LintFailure>,
 }
@@ -552,7 +579,14 @@ pub(crate) fn run_tool_once(
     timeout: Duration,
     cancel: Option<&AtomicBool>,
 ) -> ToolRun {
-    run_tool_at(&project_root(files), slang_binary, argv, timeout, cancel)
+    run_tool_at(
+        &project_root(files),
+        slang_binary,
+        argv,
+        timeout,
+        cancel,
+        false,
+    )
 }
 
 fn run_tool_at(
@@ -561,6 +595,7 @@ fn run_tool_at(
     argv: &[std::ffi::OsString],
     timeout: Duration,
     cancel: Option<&AtomicBool>,
+    trace_includes: bool,
 ) -> ToolRun {
     let started = Instant::now();
     let resolution = resolve_binary_for_current_process(slang_binary);
@@ -572,6 +607,7 @@ fn run_tool_at(
         exit_code: None,
         signal: None,
         stderr: String::new(),
+        stdout: String::new(),
         failure: None,
     };
     let Some(chosen) = resolution.chosen.clone() else {
@@ -605,7 +641,13 @@ fn run_tool_at(
         }
     };
 
-    let stdout_reader = child.stdout.take().map(spawn_reader);
+    let stdout_reader = child.stdout.take().map(|reader| {
+        if trace_includes {
+            spawn_reader_with_limit(reader, 16 * 1024 * 1024)
+        } else {
+            spawn_reader(reader)
+        }
+    });
     let stderr_reader = child.stderr.take().map(spawn_reader);
 
     let wait_started = Instant::now();
@@ -637,9 +679,18 @@ fn run_tool_at(
         std::thread::sleep(POLL_INTERVAL);
     };
 
-    // Drain stdout (slang's human summary); only stderr is part of the result.
     if let Some(reader) = stdout_reader.as_ref() {
-        let _ = receive_capped(reader);
+        let (stdout, truncated) = receive_capped(reader);
+        if trace_includes {
+            if truncated {
+                run.failure = Some(LintFailure::Io {
+                    message: "compiler include trace exceeded the capture budget or was unreadable"
+                        .to_string(),
+                });
+            } else {
+                run.stdout = stdout;
+            }
+        }
     }
     if let Some(reader) = stderr_reader.as_ref() {
         let (mut stderr, truncated) = receive_capped(reader);

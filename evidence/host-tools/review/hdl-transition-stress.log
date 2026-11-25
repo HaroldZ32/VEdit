@@ -1,0 +1,15 @@
+35b4a8ba59c4d2a3712b4d507a6d7985a38369ecd3240993366bb32b41b3fcb9  /home/haroldzhao/MyProj/DshProj/VEdit/target/host-tools-pr/target/review-hdl-stress.qv16rz/hdl-test
+2026-11-25T02:34:49+00:00 --configured attempt 1 exit 0
+2026-11-25T02:34:54+00:00 --configured attempt 2 exit 0
+2026-11-25T02:34:59+00:00 --configured attempt 3 exit 0
+2026-11-25T02:35:04+00:00 --configured attempt 4 exit 0
+2026-11-25T02:35:09+00:00 --configured attempt 5 exit 0
+2026-11-25T02:35:14+00:00 --configured attempt 6 exit 0
+2026-11-25T02:35:19+00:00 --configured attempt 7 exit 0
+2026-11-25T02:35:24+00:00 --configured attempt 8 exit 0
+2026-11-25T02:35:29+00:00 --configured attempt 9 exit 0
+2026-11-25T02:35:33+00:00 --configured attempt 10 exit 0
+2026-11-25T02:35:38+00:00 --configured attempt 11 exit 0
+2026-11-25T02:35:43+00:00 --configured attempt 12 exit 0
+Stress failures=0
+Configured branch test repeat exit=0

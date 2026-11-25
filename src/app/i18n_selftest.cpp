@@ -1,6 +1,5 @@
-// Packaged-AppDir regressions for the translation lookup and the restart
-// launcher (T18 / T64). Both resolvers are pure functions, so this test needs
-// no GUI, no AppImage and no real loader: it builds the two layouts on disk.
+// Packaged-AppDir regressions for translation lookup, restart launcher selection
+// and restart environment. The test creates the launcher layouts on disk.
 //
 // FIX A: <AppDir>/bin/translations is the packaged location because AppRun
 //        starts the product through the bundled loader, which makes Qt's
@@ -13,6 +12,7 @@
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
+#include <QProcess>
 #include <QStringList>
 #include <QTemporaryDir>
 
@@ -20,13 +20,13 @@
 
 namespace {
 
-bool writeExecutable(const QString &path)
+bool writeExecutable(const QString &path, const QByteArray &contents = "#!/bin/sh\nexit 0\n")
 {
     QFile file(path);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
         return false;
     }
-    if (file.write("#!/bin/sh\nexit 0\n") < 0 || !file.flush()) {
+    if (file.write(contents) != contents.size() || !file.flush()) {
         return false;
     }
     file.close();
@@ -124,6 +124,42 @@ int main(int argc, char **argv)
     check("restart.appimage.program", appimage.program == image, appimage.program);
     check("restart.appimage.arguments", appimage.arguments == forwarded,
           appimage.arguments.join(QLatin1Char(' ')));
+    check("restart.packaged-targets", appimage.packaged && packaged.packaged && !plain.packaged);
+
+    const QString nextMount = root.path() + QStringLiteral("/next mount");
+    const QString nextLaunch = nextMount + QStringLiteral("/AppRun");
+    check("restart.remount.fixture", QDir().mkpath(nextMount) && writeExecutable(nextLaunch,
+        "#!/bin/sh\n"
+        "printf 'path='; /usr/bin/printenv PATH || printf '<unset>\\n'\n"
+        "printf 'ld=%s\\nlocale=%s\\nappdir=%s\\nslang=%s\\nverible=%s\\narg=%s\\n' "
+        "\"${LD_LIBRARY_PATH-<unset>}\" \"${LOCPATH-<unset>}\" \"${APPDIR-<unset>}\" "
+        "\"${VEDIT_SLANG-<unset>}\" \"$VEDIT_VERIBLE_LS\" \"$1\"\n"));
+    const QByteArray oldMount = QFile::encodeName(appDir.path());
+    qputenv("APPDIR", oldMount);
+    qputenv("PATH", oldMount + "/bin");
+    qputenv("LD_LIBRARY_PATH", oldMount + "/lib:/custom/lib");
+    qputenv("LOCPATH", oldMount + "/usr/lib/locale");
+    qputenv("VEDIT_SLANG", oldMount + "/bin/slang");
+    qputenv("VEDIT_VERIBLE_LS", "/custom/bin/verible with spaces");
+    const QString arg = QStringLiteral("argument with spaces;*");
+    const auto command = vedit::app::i18n::restartCommand(nextLaunch, appDir.path(), loader,
+                                                         {loader, arg});
+    const auto runNext = [&](const char *name, const QByteArray &expected) {
+        QProcess process;
+        vedit::app::i18n::configureRestartProcess(process, command, appDir.path());
+        process.start();
+        check(name, process.waitForFinished(5000) && process.exitCode() == 0
+                        && process.readAllStandardOutput() == expected);
+    };
+    const QByteArray nextOutput = "\nld=/custom/lib\nlocale=<unset>\nappdir=<unset>\nslang=<unset>\n"
+                                  "verible=/custom/bin/verible with spaces\narg=argument with spaces;*\n";
+    const QByteArray hostPath = QByteArray("/host path::/usr/bin:/host-") + char(0xff) + ':';
+    qputenv("VEDIT_HOST_PATH", hostPath);
+    runNext("restart.remount.restores-host-path-and-overrides", "path=" + hostPath + nextOutput);
+    qputenv("VEDIT_HOST_PATH", "");
+    runNext("restart.remount.preserves-empty-path", "path=" + nextOutput);
+    qunsetenv("VEDIT_HOST_PATH");
+    runNext("restart.remount.preserves-unset-path", "path=<unset>" + nextOutput);
 
     // A non-executable AppRun is not a launcher: fall back to the binary.
     const auto readOnly = QFileDevice::ReadOwner | QFileDevice::WriteOwner

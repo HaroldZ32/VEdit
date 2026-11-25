@@ -472,7 +472,8 @@ QHash<QString, QStringList> buildModuleClosure(const ModuleCatalog &catalog)
         return closure;
     }
     for (const ModuleDefinition &module : catalog.modules) {
-        const QString parentFile = QDir::cleanPath(module.file);
+        const QString parentFile = QDir::cleanPath(module.compilationUnit.isEmpty()
+            ? module.file : module.compilationUnit);
         if (parentFile.isEmpty()) {
             continue;
         }
@@ -485,7 +486,8 @@ QHash<QString, QStringList> buildModuleClosure(const ModuleCatalog &catalog)
             if (child == nullptr) {
                 continue;
             }
-            const QString childFile = QDir::cleanPath(child->file);
+            const QString childFile = QDir::cleanPath(child->compilationUnit.isEmpty()
+                ? child->file : child->compilationUnit);
             if (childFile.isEmpty() || childFile == parentFile) {
                 continue;
             }

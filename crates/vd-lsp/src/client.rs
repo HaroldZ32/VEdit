@@ -710,7 +710,7 @@ impl LspClient {
 
     #[allow(deprecated)] // the server (v0.0-4298) still reads the legacy root_uri
     async fn initialize(&mut self, server: &ServerSocket) -> Result<()> {
-        let root_uri = Url::from_directory_path(&self.config.workspace_root)
+        let root_uri = Url::from_directory_path(self.config.initialization_root())
             .map_err(|()| anyhow!("workspace root is not a valid file path"))?;
         let params = InitializeParams {
             process_id: Some(std::process::id()),

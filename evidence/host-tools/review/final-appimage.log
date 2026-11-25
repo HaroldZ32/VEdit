@@ -1,0 +1,67 @@
+Observed 2026-11-25T10:37:48+08:00
+Launch wrapper commit 33a857224011daa1aadbb5b534a8d28eaa4a338c
+Product source 8643809224affc9fc2c32be1fd73315b57075ab4
+Current revision 27378b589d9d9d3993bf1b758679e5f4a3e54dc0
+1944cb913bab1e1938b9e1641d9543dfb37e2318a093d5aea0d9a72233e22993  packaging/runtime/out/VEdit-0.4.0-x86_64.AppImage
+Packaged binary byte-identical to pinned Qt output.
+Packaged launcher byte-identical to committed AppRun.
+befda885f7fd6cc20ff3ec4d4d04fd80c677b3a044d2bca2927a6ed21d78c3d2  /home/haroldzhao/MyProj/DshProj/VEdit/target/host-tools-pr/packaging/runtime/out/AppDir/AppRun
+89abbf55d4390954972887c9a3017b1a51a79e77746e83799bfc004386790d72  /home/haroldzhao/MyProj/DshProj/VEdit/target/host-tools-pr/packaging/runtime/out/AppDir/bin/vd-app
+VEdit-0.4.0-x86_64.AppImage: OK
+== verify-not-shipped ==
+appdir: /home/haroldzhao/MyProj/DshProj/VEdit/target/host-tools-pr/packaging/runtime/out/AppDir
+CHECK PASS  no KDE systemverilog.xml / verilog.xml by sha256
+CHECK PASS  no file named systemverilog.xml / verilog.xml
+CHECK PASS  no syntax-bundled/ directory (F2 C5)
+CHECK PASS  active definitions == whitelist [Markdown,Scala,SystemVerilog,Tcl,VHDL,Verilog]
+-- shipped library: /home/haroldzhao/MyProj/DshProj/VEdit/target/host-tools-pr/packaging/runtime/out/AppDir/lib/libKF6SyntaxHighlighting.so.6
+   sha256: aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
+   detector: zstd scanner (evidence/r2-ksh-embedded/scan-embedded-defs.py)
+CHECK PASS  library embeds no strict-GPL syntax definition
+   == embedded-definition scan ==
+   library   : /home/haroldzhao/MyProj/DshProj/VEdit/target/host-tools-pr/packaging/runtime/out/AppDir/lib/libKF6SyntaxHighlighting.so.6
+   size      : 696480 B
+   sha256    : aac288a16e508d529e9ae275daf4e3766fe4309a68c2b93ed16083d252785fa6
+   resource names (utf-16le): xml=0 theme=30
+   zstd frames parsed as definitions: 0
+   license classes: {}
+   strict-GPL definitions embedded: 0
+     INFO SystemVerilog: not found among parsed definitions
+     INFO Verilog: not found among parsed definitions
+   RESULT: PASS - no strict-GPL definition embedded
+CHECK PASS  no probe stamp
+CHECK PASS  packaged loader present
+CHECK PASS  packaged libc present
+CHECK PASS  no packaged Git, Subversion or shell executables
+
+== summary: pass=9 fail=0 expected_red=0 ==
+DELIVERY_BLOCKED=no
++ command -v git
++ command -v svn
++ VEDIT_GIT=/legacy/bin/git
++ VEDIT_SVN=/legacy/usr/lib/vcs/bin/svn
++ /legacy/AppRun --no-session-restore --state-dir /tmp/review-appdir-state --hold 500
++ awk '/VCS-TOOLCHAIN|window-shown|launch-ready/' /tmp/review-startup.log
+VCS-TOOLCHAIN git=<missing> version=<missing> svn=<missing> version=<missing> source=missing git_source=missing svn_source=missing
+STARTUP-TRACE t_ms=54 wall_ms=1795574271229 window-shown
+STARTUP-TRACE t_ms=81 wall_ms=1795574271255 launch-ready
++ awk '/VCS-TOOLCHAIN.*git=<missing>.*svn=<missing>/ {missing=1} / window-shown/ {window_opened=1} / launch-ready/ {ready=1} END {exit !(missing && window_opened && ready)}' /tmp/review-startup.log
++ test '!' -e /tmp/host-tools-review-legacy-hit
++ APPIMAGE_EXTRACT_AND_RUN=1
++ timeout 150s /delivery/VEdit.AppImage --no-session-restore --state-dir /tmp/review-image-state --hold 500
++ awk '/KSH-GUARD|VCS-TOOLCHAIN|window-shown|launch-ready/' /tmp/review-image.log
+VCS-TOOLCHAIN git=<missing> version=<missing> svn=<missing> version=<missing> source=missing git_source=missing svn_source=missing
+STARTUP-TRACE t_ms=97 wall_ms=1795574276096 window-shown
+STARTUP-TRACE t_ms=123 wall_ms=1795574276122 launch-ready
++ awk '/VCS-TOOLCHAIN.*git=<missing>.*svn=<missing>/ {missing=1} / window-shown/ {window_opened=1} / launch-ready/ {ready=1} END {exit !(missing && window_opened && ready)}' /tmp/review-image.log
++ stat -c '%a %n' /dev/shm/vedit-qa.ie0jow/git
+755 /dev/shm/vedit-qa.ie0jow/git
++ test '!' -x /dev/shm/vedit-qa.ie0jow/git
++ PATH=/dev/shm/vedit-qa.ie0jow:/usr/bin:/bin
++ /package/AppRun --no-session-restore --state-dir /tmp/review-noexec-state --hold 500
++ awk '/VCS-TOOLCHAIN|window-shown|launch-ready/' /tmp/review-noexec.log
+VCS-TOOLCHAIN git=/usr/bin/git version=2.53.0 svn=<missing> version=<missing> source=mixed git_source=path svn_source=missing
+STARTUP-TRACE t_ms=61 wall_ms=1795574277591 window-shown
+STARTUP-TRACE t_ms=88 wall_ms=1795574277618 launch-ready
++ awk '/VCS-TOOLCHAIN.*git=\/usr\/bin\/git version=[0-9]/ {host=1} / launch-ready/ {ready=1} END {exit !(host && ready)}' /tmp/review-noexec.log
+Final package payload, AppDir, AppImage and noexec checks passed.

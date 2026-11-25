@@ -1,0 +1,46 @@
+ 1/12 Test #60: vedit-module-tree-selftest .............   Passed    0.62 sec
+ 2/12 Test #61: vedit-module-tree-catalog-test .........   Passed    3.99 sec
+ 3/12 Test #62: vedit-module-tree-lane-b-test ..........   Passed    5.36 sec
+ 4/12 Test #65: vedit-workspace-diagnostics-selftest ...   Passed    4.49 sec
+ 5/12 Test #76: vedit-realtime-depth-switch-e2e ........   Passed    6.97 sec
+ 6/12 Test #79: vedit-split-pane-mouse-e2e .............   Passed    4.15 sec
+ 7/12 Test #86: vedit-module-closure-e2e ...............   Passed   11.85 sec
+ 8/12 Test #87: vedit-filelist-authority-e2e ...........   Passed    5.60 sec
+ 9/12 Test #88: vedit-filelist-authority-verible-e2e ...   Passed    2.00 sec
+10/12 Test #89: vedit-filelist-authority-config-e2e ....   Passed    4.73 sec
+11/12 Test #90: vedit-filelist-authority-include-e2e ...   Passed    2.28 sec
+12/12 Test #91: vedit-filelist-authority-wrapper-e2e ...   Passed    2.90 sec
+100% tests passed, 0 tests failed out of 12
+TREE imported=1 path=/tmp/vedit-filelist-authority-e2e-XNgLAS/project/included/deep/child.sv excluded=/tmp/vedit-filelist-authority-e2e-XNgLAS/project/rtl/child.sv
+LINT pass=1 backend=slang inputs=[/tmp/vedit-filelist-authority-e2e-XNgLAS/project/included/deep/child.sv,/tmp/vedit-filelist-authority-e2e-XNgLAS/project/rtl/top.sv] rows=[input port 'correct' has no connection|port 'intentional_missing' does not exist in 'child']
+CTRL pass=1 canonical=/tmp/vedit-filelist-authority-e2e-XNgLAS/project/included/deep/child.sv
+CTRL expected=/tmp/vedit-filelist-authority-e2e-XNgLAS/project/include/signal.svh canonical=/tmp/vedit-filelist-authority-e2e-XNgLAS/project/include/signal.svh
+REFRESH ready=1 inputs=[/tmp/vedit-filelist-authority-e2e-XNgLAS/project/lib/child.sv,/tmp/vedit-filelist-authority-e2e-XNgLAS/project/rtl/top.sv]
+CTRL expected=/tmp/vedit-filelist-authority-e2e-XNgLAS/project/lib/child.sv canonical=/tmp/vedit-filelist-authority-e2e-XNgLAS/project/lib/child.sv
+LOOSE pass=1 canonical=/tmp/vedit-filelist-authority-e2e-XNgLAS/loose/child.sv
+TREE imported=1 path=/tmp/vedit-filelist-authority-e2e-rWcxzL/project/included/deep/child.sv excluded=/tmp/vedit-filelist-authority-e2e-rWcxzL/project/rtl/child.sv
+LINT pass=1 backend=slang inputs=[/tmp/vedit-filelist-authority-e2e-rWcxzL/project/included/deep/child.sv,/tmp/vedit-filelist-authority-e2e-rWcxzL/project/rtl/top.sv] rows=[input port 'correct' has no connection|port 'intentional_missing' does not exist in 'child']
+CTRL pass=1 canonical=/tmp/vedit-filelist-authority-e2e-rWcxzL/project/included/deep/child.sv
+CTRL expected=/tmp/vedit-filelist-authority-e2e-rWcxzL/shared/signal.svh canonical=/tmp/vedit-filelist-authority-e2e-rWcxzL/shared/signal.svh
+CTRL expected=/tmp/vedit-filelist-authority-e2e-rWcxzL/project/vendor/include/flagfile.svh canonical=/tmp/vedit-filelist-authority-e2e-rWcxzL/project/vendor/include/flagfile.svh
+TREE imported=1 path=/tmp/vedit-filelist-authority-e2e-trNBVw/project/include/child.svh excluded=/tmp/vedit-filelist-authority-e2e-trNBVw/project/rtl/child.sv
+LINT pass=1 backend=slang inputs=[/tmp/vedit-filelist-authority-e2e-trNBVw/project/rtl/top.sv] rows=[input port 'correct' has no connection|port 'intentional_missing' does not exist in 'child']
+CTRL pass=1 canonical=/tmp/vedit-filelist-authority-e2e-trNBVw/project/include/child.svh
+CTRL expected=/tmp/vedit-filelist-authority-e2e-trNBVw/project/include/signal.svh canonical=/tmp/vedit-filelist-authority-e2e-trNBVw/project/include/signal.svh
+TREE imported=1 path=/tmp/vedit-filelist-authority-e2e-GWDknB/project/include/child.svh excluded=/tmp/vedit-filelist-authority-e2e-GWDknB/project/rtl/child.sv
+LINT pass=1 backend=slang inputs=[/tmp/vedit-filelist-authority-e2e-GWDknB/project/rtl/top.sv,/tmp/vedit-filelist-authority-e2e-GWDknB/project/rtl/wrapper.sv] rows=[input port 'correct' has no connection|port 'intentional_missing' does not exist in 'child']
+CTRL pass=1 canonical=/tmp/vedit-filelist-authority-e2e-GWDknB/project/include/child.svh
+CTRL expected=/tmp/vedit-filelist-authority-e2e-GWDknB/project/include/signal.svh canonical=/tmp/vedit-filelist-authority-e2e-GWDknB/project/include/signal.svh
+TREE imported=1 path=/tmp/vedit-filelist-authority-e2e-eZMPLq/project/included/deep/child.sv excluded=/tmp/vedit-filelist-authority-e2e-eZMPLq/project/rtl/child.sv
+VERIBLE CTRL pass=1 canonical=/tmp/vedit-filelist-authority-e2e-eZMPLq/project/included/deep/child.sv
+TREE imported=1 path=/tmp/vedit-filelist-authority-e2e-KPVRnW/project/included/deep/child.sv excluded=/tmp/vedit-filelist-authority-e2e-KPVRnW/project/rtl/child.sv
+LINT pass=1 backend=slang inputs=[/tmp/vedit-filelist-authority-e2e-KPVRnW/project/included/deep/child.sv,/tmp/vedit-filelist-authority-e2e-KPVRnW/project/rtl/top.sv] rows=[input port 'correct' has no connection|port 'intentional_missing' does not exist in 'child']
+CTRL pass=1 canonical=/tmp/vedit-filelist-authority-e2e-KPVRnW/project/included/deep/child.sv
+CTRL expected=/tmp/vedit-filelist-authority-e2e-KPVRnW/shared/signal.svh canonical=/tmp/vedit-filelist-authority-e2e-KPVRnW/shared/signal.svh
+CTRL expected=/tmp/vedit-filelist-authority-e2e-KPVRnW/project/vendor/include/flagfile.svh canonical=/tmp/vedit-filelist-authority-e2e-KPVRnW/project/vendor/include/flagfile.svh
+TREE imported=1 path=/tmp/vedit-filelist-authority-e2e-hhIvEo/project/included/deep/child.sv excluded=/tmp/vedit-filelist-authority-e2e-hhIvEo/project/rtl/child.sv
+LINT pass=1 backend=slang inputs=[/tmp/vedit-filelist-authority-e2e-hhIvEo/project/included/deep/child.sv,/tmp/vedit-filelist-authority-e2e-hhIvEo/project/rtl/top.sv] rows=[input port 'correct' has no connection|port 'intentional_missing' does not exist in 'child']
+CTRL pass=1 canonical=/tmp/vedit-filelist-authority-e2e-hhIvEo/project/included/deep/child.sv
+CTRL expected=/tmp/vedit-filelist-authority-e2e-hhIvEo/shared/signal.svh canonical=/tmp/vedit-filelist-authority-e2e-hhIvEo/shared/signal.svh
+CTRL expected=/tmp/vedit-filelist-authority-e2e-hhIvEo/project/vendor/include/flagfile.svh canonical=/tmp/vedit-filelist-authority-e2e-hhIvEo/project/vendor/include/flagfile.svh
+FFI-ABI-SELFTEST ok=1 checks=20 failures=0

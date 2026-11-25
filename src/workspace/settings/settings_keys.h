@@ -18,6 +18,7 @@
 namespace vedit::workspace::settings::keys {
 
 // Tools page.
+inline constexpr char kHostShell[] = "tools.host_shell";
 inline constexpr char kLspBackend[] = "tools.lsp_backend";
 inline constexpr char kLintEngine[] = "tools.lint_engine";
 inline constexpr char kVeribleLs[] = "tools.verible_ls";
