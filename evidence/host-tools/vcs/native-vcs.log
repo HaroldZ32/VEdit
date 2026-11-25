@@ -25,7 +25,7 @@ EVIDENCE $ /usr/local/bin/svn checkout -q file:///tmp/.tmpF9KnC3/repo wc2
 EVIDENCE detect backend=Svn root=Some("/tmp/.tmpF9KnC3/wc")
 EVIDENCE product write svn add: SvnAdd
 EVIDENCE | A         a.sv
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE $ /usr/local/bin/svn status
 EVIDENCE | A       a.sv
 EVIDENCE product write svn commit: SvnCommit
@@ -33,7 +33,7 @@ EVIDENCE | Adding         a.sv
 EVIDENCE | Transmitting file data .done
 EVIDENCE | Committing transaction...
 EVIDENCE | Committed revision 1.
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE $ /usr/local/bin/svn log --xml file:///tmp/.tmpF9KnC3/repo
 EVIDENCE | <?xml version="1.0" encoding="UTF-8"?>
 EVIDENCE | <log>
@@ -58,7 +58,7 @@ Index: a.sv
 
 EVIDENCE product write svn revert: SvnRevert
 EVIDENCE | Reverted 'a.sv'
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE $ /usr/local/bin/svn status
 EVIDENCE $ /usr/local/bin/svn add b.sv
 EVIDENCE | A         b.sv
@@ -67,17 +67,17 @@ EVIDENCE product write svn update: SvnUpdate
 EVIDENCE | Updating '.':
 EVIDENCE | A    b.sv
 EVIDENCE | Updated to revision 2.
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE product write svn remove: SvnRemove
 EVIDENCE | D         b.sv
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE $ /usr/local/bin/svn status
 EVIDENCE | D       b.sv
 EVIDENCE product write svn commit remove: SvnCommit
 EVIDENCE | Deleting       b.sv
 EVIDENCE | Committing transaction...
 EVIDENCE | Committed revision 3.
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE $ /usr/local/bin/svn log --xml file:///tmp/.tmpF9KnC3/repo
 EVIDENCE | <?xml version="1.0" encoding="UTF-8"?>
 EVIDENCE | <log>
@@ -124,7 +124,7 @@ EVIDENCE svn log after remove:
 </log>
 
 EVIDENCE product write svn remove missing: SvnRemove
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE | svn: E200005: Use --force to override this restriction (local modifications may be lost)
 EVIDENCE | svn: E200005: '/tmp/.tmpF9KnC3/wc/missing.sv' is not under version control
 EVIDENCE svn remove missing stderr="svn: E200005: Use --force to override this restriction (local modifications may be lost)\nsvn: E200005: '/tmp/.tmpF9KnC3/wc/missing.sv' is not under version control\n"
@@ -133,34 +133,34 @@ EVIDENCE | Committing transaction...
 EVIDENCE | Committed revision 4.
 EVIDENCE product write checkout: SvnCheckout
 EVIDENCE | Checked out revision 4.
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE product write add two files: SvnAdd
 EVIDENCE | A         a space.sv
 EVIDENCE | A         b.sv
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE product write commit initial: SvnCommit
 EVIDENCE | Adding         a space.sv
 EVIDENCE | Adding         b.sv
 EVIDENCE | Transmitting file data ..done
 EVIDENCE | Committing transaction...
 EVIDENCE | Committed revision 5.
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE product write set changelist: SvnChangelist
 EVIDENCE | A [Second group] b.sv
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE reads selected/all/changelist scopes match fixture
 EVIDENCE product write commit selected: SvnCommit
 EVIDENCE | Sending        a space.sv
 EVIDENCE | Transmitting file data .done
 EVIDENCE | Committing transaction...
 EVIDENCE | Committed revision 6.
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE $ /usr/local/bin/svn status
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE | --- Changelist 'Second group':
 EVIDENCE | M       b.sv
 EVIDENCE $ /usr/local/bin/svn status
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE | --- Changelist 'Second group':
 EVIDENCE | M       b.sv
 EVIDENCE product write commit changelist: SvnCommit
@@ -168,21 +168,21 @@ EVIDENCE | Sending        b.sv
 EVIDENCE | Transmitting file data .done
 EVIDENCE | Committing transaction...
 EVIDENCE | Committed revision 7.
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE $ /usr/local/bin/svn status
 EVIDENCE product write set changelist again: SvnChangelist
 EVIDENCE | A [Second group] b.sv
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE product write remove changelist: SvnChangelistRemove
 EVIDENCE | D [Second group] b.sv
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE product write create branch: SvnBranchCreate
 EVIDENCE | Committing transaction...
 EVIDENCE | Committed revision 8.
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE product write switch to branch: SvnSwitch
 EVIDENCE | At revision 8.
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE $ /usr/local/bin/svn info --show-item url
 EVIDENCE | file:///tmp/.tmpF9KnC3/repo/branches/feature
 EVIDENCE product write commit feature change: SvnCommit
@@ -190,21 +190,21 @@ EVIDENCE | Sending        a space.sv
 EVIDENCE | Transmitting file data .done
 EVIDENCE | Committing transaction...
 EVIDENCE | Committed revision 9.
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE product write switch back: SvnSwitch
 EVIDENCE | U    a space.sv
 EVIDENCE | Updated to revision 9.
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE product write commit trunk change: SvnCommit
 EVIDENCE | Sending        a space.sv
 EVIDENCE | Transmitting file data .done
 EVIDENCE | Committing transaction...
 EVIDENCE | Committed revision 10.
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE product write update trunk before merging: SvnUpdate
 EVIDENCE | Updating '.':
 EVIDENCE | At revision 10.
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE product write merge creates real text conflict: SvnMerge
 EVIDENCE | --- Merging r8 through r10 into '.':
 EVIDENCE | C    a space.sv
@@ -212,25 +212,25 @@ EVIDENCE | --- Recording mergeinfo for merge of r8 through r10 into '.':
 EVIDENCE |  U   .
 EVIDENCE | Summary of conflicts:
 EVIDENCE |   Text conflicts: 1
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE product write mark working contents resolved: SvnResolve
 EVIDENCE | Merge conflicts in 'a space.sv' marked as resolved.
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE product write rename with spaces and at sign: SvnRename
 EVIDENCE | A         moved name@.sv
 EVIDENCE | D         b.sv
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE $ /usr/local/bin/svn propset svn:ignore existing.log .
 EVIDENCE | property 'svn:ignore' set on '.'
 EVIDENCE product write append svn:ignore: SvnIgnore
 EVIDENCE | property 'svn:ignore' set on '.'
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE $ /usr/local/bin/svn propget svn:ignore .
 EVIDENCE | existing.log
 EVIDENCE | generated.tmp
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE product write cleanup: SvnCleanup
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE scoped unversioned deletion refuses tracked and nested-repository paths, and deletes the selected scratch directory
 EVIDENCE $ /usr/local/bin/svn propset svn:ignore generated.tmp
 safeguard .
@@ -244,10 +244,9 @@ EVIDENCE | Adding         moved name@.sv
 EVIDENCE | Transmitting file data .done
 EVIDENCE | Committing transaction...
 EVIDENCE | Committed revision 11.
-EVIDENCE | 
+EVIDENCE |
 EVIDENCE real incoming status, text search, revision search, and changed paths matched
 EVIDENCE saved remote log, search, revision path, previous content and deletion matched
 test host_subversion_reads_and_writes_run_through_the_product_path ... ok
 
 test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.22s
-

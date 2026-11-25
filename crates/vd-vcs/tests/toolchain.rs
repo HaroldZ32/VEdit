@@ -124,6 +124,39 @@ fn skips_nonexecutables_and_reports_removed_tools() {
 }
 
 #[test]
+fn skips_candidates_without_execute_access_for_the_current_user() {
+    let fixture = tempfile::tempdir().unwrap_or_else(|error| panic!("fixture directory: {error}"));
+    let root = fixture.path();
+    let inaccessible = root.join("first/git");
+    let fallback = root.join("second/git");
+    write_executable(&inaccessible);
+    write_executable(&fallback);
+    // The fixture is owned by this user. The others' execute bit must not
+    // grant access to the owner. Privileged root can execute either file.
+    std::fs::set_permissions(&inaccessible, std::fs::Permissions::from_mode(0o645))
+        .unwrap_or_else(|error| panic!("fixture permissions: {error}"));
+    match std::process::Command::new(&inaccessible).status() {
+        Ok(status) if status.success() => {
+            eprintln!("SKIP execute access regression: this user can execute the fixture");
+            return;
+        }
+        Err(error) if error.kind() == std::io::ErrorKind::PermissionDenied => {}
+        result => panic!("unexpected exec result: {result:?}"),
+    }
+    let path = std::env::join_paths([root.join("first"), root.join("second")])
+        .unwrap_or_else(|error| panic!("fixture PATH: {error}"));
+    let host = HostEnvironment::new(
+        BTreeMap::from([("PATH".into(), path)]),
+        &BTreeMap::new(),
+        root,
+    );
+    assert_eq!(
+        resolve_in("git", &host).map(|tool| tool.path),
+        Some(fallback)
+    );
+}
+
+#[test]
 fn an_empty_saved_host_path_does_not_fall_back_to_the_launcher_path() {
     let fixture =
         tempfile::tempdir().unwrap_or_else(|error| panic!("fixture directory: {error:?}"));

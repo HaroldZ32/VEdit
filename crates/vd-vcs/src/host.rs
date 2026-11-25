@@ -2,7 +2,6 @@
 
 use std::collections::BTreeMap;
 use std::ffi::{OsStr, OsString};
-use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::sync::{OnceLock, RwLock};
@@ -103,10 +102,12 @@ impl HostEnvironment {
     }
 
     pub(crate) fn executable(&self, path: &Path) -> bool {
+        use rustix::fs::{accessat, Access, AtFlags, CWD};
+
         path.is_absolute()
             && !self.is_packaged(path)
-            && std::fs::metadata(path)
-                .is_ok_and(|info| info.is_file() && info.permissions().mode() & 0o111 != 0)
+            && std::fs::metadata(path).is_ok_and(|info| info.is_file())
+            && accessat(CWD, path, Access::EXEC_OK, AtFlags::EACCESS).is_ok()
     }
 
     pub(crate) fn on_path<'a>(&'a self, name: &'a str) -> impl Iterator<Item = PathBuf> + 'a {
