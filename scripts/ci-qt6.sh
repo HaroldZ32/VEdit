@@ -122,18 +122,16 @@ package() {
       run_version "slang version $2" /app/bin/slang --version
       run_version "slang-server version $3" /app/bin/slang-server --version
       run_version "built at $4" /app/bin/verible-verilog-ls --version
-      test "$(/app/bin/git --version)" = "git version $5"
-      test "$(/app/bin/svn --version --quiet)" = "$6"
-      run_version "diff (GNU diffutils) $7" /app/usr/lib/vedit/file-compare/diff --version
-      run_version "vhdl_ls $8" /app/bin/vhdl_ls --version
-      run_version "GHDL $9" /app/bin/ghdl --version
-      run_version "${10}" /app/bin/vsg --version
-      run_version "${11}" /app/bin/scala-cli version --offline
-      run_version "${12}" /app/bin/java -version
+      run_version "diff (GNU diffutils) $5" /app/usr/lib/vedit/file-compare/diff --version
+      run_version "vhdl_ls $6" /app/bin/vhdl_ls --version
+      run_version "GHDL $7" /app/bin/ghdl --version
+      run_version "$8" /app/bin/vsg --version
+      run_version "$9" /app/bin/scala-cli version --offline
+      run_version "${10}" /app/bin/java -version
       timeout 300 /app/bin/scala-example spinalhdl
       timeout 300 /app/bin/scala-example chisel
     ' _ "$release_version" "$SLANG_VERSION" "$SLANG_SERVER_VERSION" "$VERIBLE_VERSION" \
-      "$VCS_GIT_VERSION" "$VCS_SVN_VERSION" "$DIFFUTILS_VERSION" \
+      "$DIFFUTILS_VERSION" \
       "$VHDL_LS_VERSION" "$GHDL_VERSION" "$VSG_VERSION" "$SCALA_CLI_VERSION" "${SCALA_JDK_VERSION%_*}" \
       2>&1 | tee "$VEDIT_PACK_EVIDENCE/80-delivered-tools.log"
 

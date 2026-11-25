@@ -330,45 +330,9 @@ Qt 自带的标准对话框按钮（OK/Cancel/Open/Save/Apply/Close…）由 Qt 
   Qt 自身的 GPL 文本（项目原有 `docs/licenses/` 无 Qt 条目）。分发 AppImage/tar.gz 时
   上述「来源 + 版本 + 许可 + sha256」即为该数据文件的归属声明。
 
-## 11. Qt6 产品线：随包 VCS 工具链（git / Subversion，T23 / requirements rev3）
+## 11. Qt6 产品线：主机版本控制工具与 shell
 
-产品交付自带运行环境（含自有 glibc/Qt6），因此也**自带 VCS 工具**，目标机不需要安装
-git 或 svn。两个客户端及其依赖库都来自 `scripts/versions.env` 中 **URL + sha256 固定**
-的 Ubuntu 26.04 `.deb`（未修改的上游二进制），由 `packaging/runtime/assemble-appdir.sh`
-校验后解包到 AppDir 的 `usr/lib/vcs/`，通过 AppDir 自带的 loader 启动；
-解析顺序为 **bundled > PATH > env（`VEDIT_GIT`/`VEDIT_SVN`）**，产品 VCS lane 会在初始化时
-打印一行 `VCS-TOOLCHAIN ...`（`src/workspace/vcs/vcs_toolchain.cpp`）。
-
-| 组件 | 版本 | 许可 | 来源（固定方式） | 分发形态 |
-|---|---|---|---|---|
-| **git** | `2.53.0-1ubuntu1.1` | **GPL-2.0-only** | `VCS_DEB_URLS`/`VCS_DEB_SHA256S`（`scripts/versions.env`）；Ubuntu 26.04 `git` 包 | `usr/lib/vcs/libexec/git` + `git-core/` + `bin/git` 包装脚本 |
-| **Subversion**（`svn`） | `1.14.5-6build1` | **Apache-2.0** | 同上；Ubuntu 26.04 `subversion` 包 | `usr/lib/vcs/libexec/svn` + `bin/svn` 包装脚本 |
-| **libsvn1** | `1.14.5` | **Apache-2.0** | Ubuntu 26.04 `libsvn1` 包 | `usr/lib/vcs/lib/libsvn_*.so.1` |
-| **APR** | `1.7.6` | **Apache-2.0** | Ubuntu 26.04 `libapr1t64` 包 | `usr/lib/vcs/lib/libapr-1.so.0` |
-| **APR-util** | `1.6.3` | **Apache-2.0** | Ubuntu 26.04 `libaprutil1t64` 包 | `usr/lib/vcs/lib/libaprutil-1.so.0` |
-| **serf** | `1.3.10` | **Apache-2.0** | Ubuntu 26.04 `libserf-1-1` 包 | `usr/lib/vcs/lib/libserf-1.so.1` |
-| **utf8proc** | `2.10.0` | **MIT** | Ubuntu 26.04 `libutf8proc3` 包 | `usr/lib/vcs/lib/libutf8proc.so.3` |
-| git / svn 的其余共享库（libcurl-gnutls、OpenSSL、zlib、pcre2、SQLite、liblz4、expat、krb5、Berkeley DB 等） | 构建镜像同版本 | 各自的许可（MIT 系 / Apache-2.0 / OpenSSL / Zlib / LGPL-2.1 等） | 由同一固定镜像提供，`assemble-appdir.sh` 按 `ldd` 闭包复制到 `usr/lib/vcs/lib/` | 独立目录，与产品自己的 `lib/` 互不遮蔽 |
-
-- **svnadmin 不随包**：它只被解包到 `build/vcs-tools/` 供批 6b 的 E2E 使用；`assemble-appdir.sh`
-  会在离开前断言 AppDir 内不存在 `svnadmin`。
-- **许可全文随包**：`usr/share/doc/vedit/licenses/git-GPL-2.0.txt`（构建镜像的
-  `/usr/share/common-licenses/GPL-2`）与 `usr/share/doc/vedit/licenses/Apache-2.0.txt`
-  （仓库 `docs/licenses/Apache-2.0.txt`）。
-- **源码可得性（GPLv2 §3 / Apache-2.0 §4 的对应做法）**：
-  - git 2.53.0 上游源码：`https://git.kernel.org/pub/scm/git/git.git`（tag `v2.53.0`）；
-    对应 Debian 源码包：`apt-get source git=1:2.53.0-1ubuntu1.1`（archive.ubuntu.com，
-    与二进制包同一套固定 URL/sha256 记录在 `scripts/versions.env`）。
-  - Subversion 1.14.5：`https://svn.apache.org/repos/asf/subversion/`（tag `1.14.5`），
-    发行归档 `https://archive.apache.org/dist/subversion/`；Debian 源码包
-    `apt-get source subversion=1.14.5-6build1`。
-  - APR 1.7.6 / APR-util 1.6.3 / serf 1.3.10：`https://apr.apache.org/`、
-    `https://serf.apache.org/`（Apache 发行归档）；Debian 源码包同名可 `apt-get source`。
-  - utf8proc 2.10.0：`https://github.com/JuliaStrings/utf8proc`（tag `v2.10.0`）。
-  以上地址与版本即为分发时的源码指认；产品自身仍为 **MIT**，上述组件各自保留其许可。
-- **可复现与验证**：deb 的 URL + sha256、AppDir 内两个二进制的 sha256、`svnadmin` 缺席、
-  捆绑版本（`git --version` ≥ 2.43、`svn --version --quiet` ≥ 1.14）与干净容器内的
-  `AppRun --selfcheck` 证据见 `evidence/vcs-toolchain/`。
+VEdit 使用目标机提供的 Git、Subversion 与 shell。打包时检查 AppDir 中没有这些可执行文件及原有 VCS 专用运行库。随包启动脚本使用宿主机的 `/bin/sh`。历史交付的版本控制组件与源码来源见 `evidence/vcs-toolchain/`。
 
 ## 12. Qt6 产品线：随包 VHDL 工具链（vhdl_ls / GHDL / CPython / VSG，T11 / AC-6.5、AC-6.8）
 

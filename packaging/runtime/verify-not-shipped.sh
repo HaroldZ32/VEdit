@@ -136,6 +136,21 @@ fi
 [ -x "$APPDIR/ld-linux-x86-64.so.2" ] && ok "packaged loader present" || bad "packaged loader missing"
 [ -f "$APPDIR/lib/libc.so.6" ] && ok "packaged libc present" || bad "packaged libc missing"
 
+# Check files and links, including dangling launcher links.
+if host_tool=$(find "${APPDIR%/}" \( -name git -o -name git-core -o -name git-shell \
+  -o -name svn -o -name 'svnadmin*' -o -name 'libsvn_*.so*' \
+  -o -name bash -o -name csh -o -name tcsh -o -name zsh -o -name fish -o -name sh \
+  -o -name dash -o -name ash -o -name ksh -o -name ksh93 -o -name mksh \
+  -o -name busybox -o -path "${APPDIR%/}/usr/lib/vcs" -o -name vcs-toolchain.txt \) -print -quit); then
+  if [ -z "$host_tool" ]; then
+    ok "no packaged Git, Subversion or shell executables"
+  else
+    bad "host tool shipped in AppDir: $host_tool"
+  fi
+else
+  bad "could not scan AppDir for host tools"
+fi
+
 echo
 echo "== summary: pass=$pass fail=$fail expected_red=$expected_red =="
 echo "DELIVERY_BLOCKED=$blocked"

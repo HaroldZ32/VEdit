@@ -81,18 +81,12 @@ step "1b/7 delivery invariants (T31: vd-app, Qt plugins, static FFI, toolchain)"
   echo "== AppDir delivery invariants =="
   for f in bin/vd-app plugins/platforms/libqxcb.so plugins/platforms/libqoffscreen.so \
            plugins/kf6/parts/katepart.so bin/verible-verilog-ls bin/slang \
-           bin/git bin/svn usr/lib/vcs/libexec/git usr/lib/vcs/libexec/svn \
-           usr/share/vedit/vcs-toolchain.txt \
            usr/lib/vedit/file-compare/diff usr/lib/vedit/file-compare/diff.bin \
            usr/share/doc/vedit/diffutils/GPL-3.0.txt \
            "usr/share/doc/vedit/diffutils/$DIFFUTILS_SOURCE_RPM" \
            usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml; do
     if [ -e "$OUT/AppDir/$f" ]; then echo "OK   $f"; else echo "MISS $f"; fail=1; fi
   done
-  echo "== bundled VCS toolchain =="
-  "$OUT/AppDir/bin/git" --version || fail=1
-  "$OUT/AppDir/bin/svn" --version --quiet || fail=1
-  [ -z "$(find "$OUT/AppDir" -name 'svnadmin' -print -quit)" ] && echo "svnadmin=absent" || { echo "FAIL: svnadmin in the AppDir"; fail=1; }
   echo "== FFI linkage (static into vd-app) =="
   readelf -d "$OUT/AppDir/bin/vd-app" | grep -E 'NEEDED' | sed 's/^/  /'
   echo "  libvd_ffi.so NEEDED entries: $(readelf -d "$OUT/AppDir/bin/vd-app" | grep -c 'libvd_ffi' || true)"
@@ -156,18 +150,19 @@ if [ "$CENTOS_PROBE" -eq 1 ]; then
     docker run --rm -e HOME=/tmp -e QT_QPA_PLATFORM=offscreen -v "$OUT/centos7-appdir:/app:ro" \
       "$CENTOS_IMAGE" /app/AppRun --selfcheck 2>&1
     echo "centos7_smoke_exit=$?"
-    docker run --rm -v "$OUT/centos7-appdir:/app:ro" "$CENTOS_IMAGE" \
-      bash -lc '/app/bin/git --version; /app/bin/svn --version --quiet; test ! -e /app/svnadmin && echo svnadmin=absent' 2>&1
-    echo "centos7_vcs_exit=$?"
+    docker run --rm --network none -e HOME=/tmp -e QT_QPA_PLATFORM=offscreen \
+      -e VEDIT_NO_ENV_AUTOCAPTURE=1 -e VEDIT_STARTUP_TRACE=1 -v "$OUT/centos7-appdir:/app:ro" \
+      "$CENTOS_IMAGE" /usr/bin/env PATH= /app/AppRun --no-session-restore --hold 250 2>&1
+    echo "centos7_no_vcs_exit=$?"
   } > "$EVID/70-centos7-probe.log" 2>&1
-  grep -E 'APP-SHELL-SELFTEST|TOOLCHAIN|KSH-GUARD|centos7_smoke_exit' "$EVID/70-centos7-probe.log"
+  grep -E 'APP-SHELL-SELFTEST|TOOLCHAIN|KSH-GUARD|centos7_.*exit|launch-ready' "$EVID/70-centos7-probe.log"
   grep -q 'APP-SHELL-SELFTEST ok=1' "$EVID/70-centos7-probe.log" && grep -q 'centos7_smoke_exit=0' "$EVID/70-centos7-probe.log" \
     && echo "CHECK PASS  CentOS 7 mechanism probe" || { echo "CHECK FAIL  CentOS 7 mechanism probe"; fail=1; }
-  grep -q "git version ${VCS_GIT_VERSION}" "$EVID/70-centos7-probe.log" \
-    && grep -qx "${VCS_SVN_VERSION}" "$EVID/70-centos7-probe.log" \
-    && grep -q 'svnadmin=absent' "$EVID/70-centos7-probe.log" \
-    && echo "CHECK PASS  bundled VCS toolchain in the clean container" \
-    || { echo "CHECK FAIL  bundled VCS toolchain in the clean container"; fail=1; }
+  grep -qx 'centos7_no_vcs_exit=0' "$EVID/70-centos7-probe.log" \
+    && grep -q 'launch-ready' "$EVID/70-centos7-probe.log" \
+    && grep -q '^VCS-TOOLCHAIN git=<missing> version=<missing> svn=<missing> version=<missing> source=missing ' "$EVID/70-centos7-probe.log" \
+    && echo "CHECK PASS  launches without host Git and Subversion" \
+    || { echo "CHECK FAIL  launch without host Git and Subversion"; fail=1; }
 fi
 
 ( cd "$OUT/AppDir" && find . -type f | sort ) > "$EVID/appdir-files.txt"

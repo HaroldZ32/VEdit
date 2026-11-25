@@ -12,16 +12,18 @@
 # Usage: AppRun [--selfcheck] [--] [args]
 set -u
 
+# A host shell may initialize an unset PATH locally. Only save the value when
+# it was exported by the caller, and preserve an explicitly empty value.
+if /usr/bin/printenv PATH >/dev/null; then
+    export VEDIT_HOST_PATH="$PATH"
+else
+    unset VEDIT_HOST_PATH
+fi
+# Use system utilities for launcher setup even when the caller's PATH is empty.
+export PATH=/usr/bin:/bin
 HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
 APPDIR="$HERE"
 export APPDIR
-
-# --- bundled VCS tools (batch 6a) -------------------------------------------
-# The AppDir ships git/svn under bin/ (wrappers around the bundled binaries).
-# The product does not need this line — it resolves bundled tools relative to
-# its own executable — but it keeps `git`/`svn` consistent for hooks and shells
-# started from the package. No host utility is shadowed (bin/ only has ours).
-export PATH="$APPDIR/bin${PATH:+:$PATH}"
 
 # --- crash report: bounded AppImage hashing (batch-20261110d) ----------------
 # The crash reporter records the AppImage sha256 in install(), i.e. on the
@@ -276,6 +278,7 @@ BIN="$APPDIR/bin/vd-app"
 [ -x "$BIN" ] || { echo "AppRun: product binary missing: $BIN" >&2; exit 1; }
 
 run_app() {
+    export PATH="$APPDIR/bin${VEDIT_HOST_PATH:+:$VEDIT_HOST_PATH}"
     LIBPATH="$APPDIR/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
     if [ -n "$CHOSEN_LOCALE" ]; then
         exec /usr/bin/env LANG="$CHOSEN_LOCALE" LC_ALL="$CHOSEN_LOCALE" \

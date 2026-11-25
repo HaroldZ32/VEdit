@@ -48,7 +48,7 @@ make_appdir() {
     # Fake private loader: print the environment of the process AppRun starts.
     cat > "$dir/ld-linux-x86-64.so.2" <<'EOF'
 #!/bin/sh
-env | LC_ALL=C sort | sed -n 's/^\(VEDIT_[A-Z_]*\)=\(.*\)$/LOADER-SEEN \1=\2/p'
+/usr/bin/env | /usr/bin/sed -n 's/^\(VEDIT_[A-Z_]*\|APPDIR\|PATH\)=\(.*\)$/LOADER-SEEN \1=\2/p'
 exit 0
 EOF
     chmod +x "$dir/ld-linux-x86-64.so.2"
@@ -152,6 +152,31 @@ if has_var "$OUT_D" VEDIT_SLANG; then
     check "non-executable.slang-not-exported" 0
 else
     check "non-executable.slang-not-exported" 1
+fi
+
+# The launcher saves PATH before adding its bin directory. Empty means empty.
+CALLER_PATH="$TMP/host bin::/usr/bin:/bin:"
+OUT_E=$(run_apprun "$APP_A" "PATH=$CALLER_PATH" VEDIT_HOST_PATH=/stale)
+if has_env "$OUT_E" "LOADER-SEEN VEDIT_HOST_PATH=$CALLER_PATH" \
+    && has_env "$OUT_E" "LOADER-SEEN PATH=$APP_A/bin:$CALLER_PATH" \
+    && has_env "$OUT_E" "LOADER-SEEN APPDIR=$APP_A"; then
+    check "host-path.preserved-before-appdir-path" 1
+else
+    check "host-path.preserved-before-appdir-path" 0
+fi
+OUT_F=$(run_apprun "$APP_A" PATH=)
+if has_env "$OUT_F" "LOADER-SEEN VEDIT_HOST_PATH=" \
+    && has_env "$OUT_F" "LOADER-SEEN PATH=$APP_A/bin"; then
+    check "host-path.empty-preserved" 1
+else
+    check "host-path.empty-preserved" 0
+fi
+OUT_G=$(env -i HOME="$TMP/home" VEDIT_HOST_PATH=/stale "$APP_A/AppRun" 2>/dev/null)
+if ! has_var "$OUT_G" VEDIT_HOST_PATH \
+    && has_env "$OUT_G" "LOADER-SEEN PATH=$APP_A/bin"; then
+    check "host-path.unset-preserved" 1
+else
+    check "host-path.unset-preserved" 0
 fi
 
 echo "APPRUN-ENV-PROBE ok=$([ "$failures" -eq 0 ] && echo 1 || echo 0) checks=$checks failures=$failures"

@@ -16,7 +16,7 @@ chmod +x VEdit-0.4.0-x86_64.AppImage
 ./VEdit-0.4.0-x86_64.AppImage
 ```
 
-AppImage 随附 Qt、HDL 分析工具、Git 和 Subversion，普通用户即可运行。已在 CentOS 7.9 和 Rocky Linux 9.3 的 x86_64 用户态环境验证启动。机器没有 FUSE 时，可用 `./VEdit-0.4.0-x86_64.AppImage --appimage-extract-and-run` 启动。
+AppImage 随附 Qt 和 HDL 分析工具，普通用户即可运行。当前源码构建的 AppImage 使用系统 shell，版本控制功能需要在主机上安装 Git 或 Subversion。已在 CentOS 7.9 和 Rocky Linux 9.3 的 x86_64 用户态环境验证启动。机器没有 FUSE 时，可用 `./VEdit-0.4.0-x86_64.AppImage --appimage-extract-and-run` 启动。
 
 ## 打开第一个工程
 

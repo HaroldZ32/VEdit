@@ -174,6 +174,8 @@ VEdit 是面向 Verilog / SystemVerilog 的桌面编辑器。可以直接打开�
 
 默认状态**不会**自动发现工程根目录下的其它 `*.f`，也**不会**递归扫描目录里的源文件。所以一个只列 `rtl/uart.v` 的 `design.f` 就是工程的全部：同目录里同名、甚至同名 module 的 `sim/uart.v` 不会进入工程集，也就不会抢走端口/接口/模块树里显示的定义。
 
+工程内的实时 lint 和 `Ctrl`+点击跳转使用当前 filelist 展开后的模块定义。即使打开了未列入清单的同名文件，工程内的跳转和诊断也仍以导入的定义为准。修改清单（包括嵌套清单）后，在 `Project` 面板点 `Refresh` 即可应用新定义。未导入 filelist 的工作区保留普通文件的实时诊断与跳转。
+
 需要恢复旧行为时，在**工程根**的 `vedit.toml` 写：
 
 ```toml
@@ -711,9 +713,9 @@ preprocessing error at "`MACRO" Error expanding macro identifier, might not be d
 
 ### 8.10 环境变量导入（`Environment`）
 
-第 7 页 `Environment` 有两个来源：**启动自动采集**与**手工捕获**。启动时若还没有自动采集标记（`<状态目录>/environment.auto.json`），产品会在后台识别 `$SHELL`（支持 bash / zsh / sh / ksh / fish / csh / tcsh）并捕获一次，只把 **shell 改变过**的变量写进 **global 层**（不覆盖你已经手工选过的名字）；`VEDIT_NO_ENV_AUTOCAPTURE=1` 可关闭。手工捕获仍然是「点 `Capture from shell`、勾选、`Apply`」的显式流程，只写你勾选的那些。无论哪条路径，**保存后重启 VEdit**，变量会到达：(a) 工程 filelist 的变量展开；(b) lint / catalog / hierarchy 的子进程（slang、verible-verilog-lint 等）；(c) 语言服务器（verible-verilog-ls / slang-server）的 LSP 子进程；(d) 集成终端的 PTY；(e) 诊断 / 大纲 / Scala 的 C++ 工具链解析。它**不修改本程序自己的环境**，也**不会整包导入**。
+第 7 页 `Environment` 有两个来源：**启动自动采集**与**手工捕获**。启动时若还没有自动采集标记（`<状态目录>/environment.auto.json`），产品会在后台识别 `$SHELL`（支持 bash / zsh / sh / ksh / fish / csh / tcsh）并捕获一次，只把 **shell 改变过**的变量写进 **global 层**（不覆盖你已经手工选过的名字）；`VEDIT_NO_ENV_AUTOCAPTURE=1` 可关闭。手工捕获仍然是「点 `Capture from shell`、勾选、`Apply`」的显式流程，只写你勾选的那些。无论哪条路径，**保存后重启 VEdit**，变量会到达：(a) 工程 filelist 的变量展开；(b) lint / catalog / hierarchy 的子进程（slang、verible-verilog-lint 等）；(c) 语言服务器（verible-verilog-ls / slang-server）的 LSP 子进程；(d) 集成终端的 PTY；(e) 诊断 / 大纲 / Scala 的 C++ 工具链解析；(f) Git / SVN 工具查找与子进程。它**不修改本程序自己的环境**，也**不会整包导入**。
 
-**仍然不生效的地方**（明确边界）：**版本控制子进程**（git / svn）只继承启动 VEdit 时的进程环境，**收不到**导入层。语言服务器、终端与工具链解析本批已接入导入层（见上一条）。自动采集会把 shell 里改变过的变量（包括名字像密钥的变量）写进 global 层并交给上述子进程；如果不想这样，启动前设 `VEDIT_NO_ENV_AUTOCAPTURE=1`，或只用手工捕获并保持密钥未 reveal。
+集成终端与版本控制使用同一套宿主机环境。自动采集会把 shell 里改变过的变量（包括名字像密钥的变量）写进 global 层并交给上述子进程；如果不想这样，启动前设 `VEDIT_NO_ENV_AUTOCAPTURE=1`，或只用手工捕获并保持密钥未 reveal。
 
 - 捕获参数：`Shell:`（bash / zsh / fish / csh 等 shell 家族）、可选 `Program:`（自定义程序的绝对路径或 PATH 名）、`RC file:`（先 source 的文件）、`Start a login shell (-l)`、`Start an interactive shell (-i)`。点 `Capture from shell` 只启动**一个**子进程，界面不冻；同一时刻只允许一个捕获，再按会被拒绝并说明。
 - 结果只列**新增或变化**的变量（相对本进程环境）；相同值连名字都不出现。**默认全部不勾选**，不会误导入整包。
@@ -726,7 +728,7 @@ preprocessing error at "`MACRO" Error expanding macro identifier, might not be d
 - **秘密默认掩码**：名字含 `TOKEN` / `SECRET` / `PASSWORD` / `KEY`（子串、忽略大小写）的行显示为 `<masked>`；**未显式 reveal 时不会被存进文件**（勾选也会被跳过并说明）。已存的值重启后默认仍然掩码；值不会进状态栏/诊断文本，也不会进日志。
 - 已存选择表可逐行 `Remove checked`，或手工填 `NAME` / `value` 后 `Add / update`（同层同名是更新；变量名不能为空、不能含 `=`、不能含控制字符）；`Reload from disk` 重新读文件。
 - **失败是可见状态，且没有半应用**：rc 文件缺失/不可读 → 给出 shell 的退出码与 stderr 尾（环境仍会读到）；shell 起不来 → `nothing was changed`；超时/取消 → 结果丢弃、草稿保留；内置的 shell 家族（bash / zsh / sh / ksh / fish / csh / tcsh）一律用 `env -0` 的 NUL 形式捕获，值里含换行也会原样保留；只有 `Program:` 指定的**自定义程序**输出换行分隔（不是 NUL）环境时，含换行的值才会被拆开并给警告；名/值以**第一个** `=` 分隔。
-- 文件是 `<状态目录>/environment.json`（与 `settings.toml` 同级，见附录 B）；自动采集另留一个**不含变量名/值**的标记 `<状态目录>/environment.auto.json`。坏文件降级为**空选择 + 一条警告**，不崩。导入的变量只在**启动时**读取一次（改完必须重启 VEdit），并应用到 (a) 工程 filelist 的变量展开、(b) lint / catalog / hierarchy 子进程、(c) 语言服务器 LSP 子进程、(d) 集成终端 PTY、(e) C++ 工具链解析；VCS 子进程不在此列。设置里的工具路径与解析顺序不变（`bundled → 本地 checkout → PATH → 进程环境`），导入层作为「进程环境」的一部分参与查找。
+- 文件是 `<状态目录>/environment.json`（与 `settings.toml` 同级，见附录 B）；自动采集另留一个**不含变量名/值**的标记 `<状态目录>/environment.auto.json`。坏文件降级为**空选择 + 一条警告**，不崩。导入的变量只在**启动时**读取一次（改完必须重启 VEdit），并应用到 (a) 工程 filelist 的变量展开、(b) lint / catalog / hierarchy 子进程、(c) 语言服务器 LSP 子进程、(d) 集成终端 PTY、(e) C++ 工具链解析、(f) Git / SVN 工具查找与子进程。诊断工具与版本控制工具的查找顺序分别见附录 C 和 D.2。
 - 目标机上没装的 shell 家族会以“起不来”的原因显式报错；测试里这类情况可以显式 SKIP，不会静默通过。
 - 证据：`evidence/batch-20261110c/env-ui/`（对话框、掩码、四类失败）、`evidence/batch-20261110c/env-apply/`（启动顺序与子进程环境 dump）。
 
@@ -812,7 +814,7 @@ VHDL 走**独立的一条 lane**，不碰 verible / slang：
 13. **HDL 高亮按源文本识别**。宏展开生成的模块名或例化名可能沿用普通标识符的样式。
 14. **VHDL 只覆盖诊断 / 合并 lint / 格式化**：hover、跳转定义、outline、重命名、debug、全工程 elaborate 本版本没有产品入口；会话按磁盘内容打开、未接 `didChange`（未保存的修改不会推送）；默认只生成单库映射，多库工程请自备 `vhdl_ls.toml`。见 9.4。
 15. **Scala：运行 lane 之外的编辑器能力未接线**：Metals 随包、离线会话经实测可用，但编辑器内**没有** Metals LSP 会话（hover/定义等未接）；离线仍会尝试 DNS（全部失败，`ENETUNREACH`），**不声称零系统调用**；未预热依赖会点名缺失坐标。见 9.5。
-16. **环境变量导入的边界**：手工捕获默认存项目层（项目覆盖全局）；**启动自动采集**写 global 层、只取 shell 改变过的变量，`VEDIT_NO_ENV_AUTOCAPTURE=1` 可关闭。秘密形状名字在手工页默认掩码、未显式 reveal 时不落盘，但**自动采集会把 shell 改变过的密钥形状变量一并写入 global 层**并交给 LSP / 终端 / 工具链子进程（VCS 除外）；不想这样就用上面的开关或只用手工捕获。捕获按 shell 语法“最后赋值胜出”，内置 shell 家族（含 csh / tcsh / fish）都用 `env -0` 的 NUL 输出，值里含换行也能完整捕获（只有自定义程序输出换行分隔时才会被拆开并给警告）；目标机没装的 shell 家族会显式报错。见 8.10。
+16. **环境变量导入的边界**：手工捕获默认存项目层（项目覆盖全局）；**启动自动采集**写 global 层、只取 shell 改变过的变量，`VEDIT_NO_ENV_AUTOCAPTURE=1` 可关闭。秘密形状名字在手工页默认掩码、未显式 reveal 时不落盘，但**自动采集会把 shell 改变过的密钥形状变量一并写入 global 层**并交给 LSP、终端、版本控制和工具链子进程；不想这样就用上面的开关或只用手工捕获。捕获按 shell 语法“最后赋值胜出”，内置 shell 家族（含 csh / tcsh / fish）都用 `env -0` 的 NUL 输出，值里含换行也能完整捕获（只有自定义程序输出换行分隔时才会被拆开并给警告）；目标机没装的 shell 家族会显式报错。见 8.10。
 17. **环境变量候选清单是「打开 Preferences 时的工程快照」**：对话框开着的时候工程又展开了一次，需要重新打开 Preferences 才能看到新的引用集合。工程 filelist 不引用任何变量时清单为空并写明原因，而不是退回「全量列出」。见 8.10。
 17. **设置文件里的非法值不是“设置页坏了”**：载入层会把非法值替换成默认值并给一条警告；徽标显示 ` · ⚠ N`，而 `reason=ok` 只表示**请求已生效**，不代表设置文件完美。完整警告文本在徽标悬停提示与 `Preferences → Diagnostics` 框里。见 6.6 / 8.9。
 
@@ -876,7 +878,7 @@ bash scripts/build-qt.sh --no-test    # 只构建
 - `vhdl_ls.toml`：VHDL 的库映射。已有则**原样使用**；没有时打开 VHDL 文件会**生成**一份默认单库配置（见 9.4）；
 - `verible-waivers.txt` / `slang-waivers.toml`：waiver 的默认落点（verible 用 `--waiver_files`，slang 用 `lint.slang.waiver_file`；路径可由设置覆盖，见 6.7）。
 
-工具定位环境变量（诊断类工具都支持“直接给二进制”与 `_DIR` 给目录两种形式）：`VEDIT_VERIBLE_LS`、`VEDIT_SLANG`、`VEDIT_VHDL_LS`、`VEDIT_GHDL`、`VEDIT_VSG`、`VEDIT_GIT`、`VEDIT_SVN`。
+诊断工具定位环境变量支持直接给二进制路径或用 `_DIR` 指定目录：`VEDIT_VERIBLE_LS`、`VEDIT_SLANG`、`VEDIT_VHDL_LS`、`VEDIT_GHDL`、`VEDIT_VSG`。版本控制的 `VEDIT_GIT` 与 `VEDIT_SVN` 接受可执行文件的绝对路径。
 
 常用启动参数（把 `vedit-app` 换成你的启动方式）：
 
@@ -903,14 +905,14 @@ vedit-app --no-session-restore    # 忽略上次会话，干净启动
 | `Run Scala Project` 报找不到工具链 | `scala-cli` / `sbt` / `java` 按 **随包 → 本地 → PATH** 解析；优先使用交付的 AppImage（随包 JDK/scala-cli/sbt），或把工具放进 PATH / 产品 `bin/`（9.5） |
 | Scala 离线运行报缺少某个依赖坐标 | 该依赖不在随包预热缓存里；按随包 `usr/lib/scala/PREWARM-SCALA.txt` 预热，错误里会点名缺失的坐标（9.5） |
 | `Environment` 页捕获失败 | 页面警告会给出 shell 退出码与 stderr 尾；shell 起不来 / 超时 / 取消都是“什么都没改”，重试即可（8.10） |
-| 导入的环境变量没生效 | 先**重启程序**（变量只在启动时读取一次）。导入层只作用于**工程 filelist 的变量展开**与 **lint / catalog / hierarchy 子进程**；语言服务器、VCS、终端、工具链解析都**不使用**导入层（8.10）。再确认存到了正确的层（默认项目层，项目根要填对）。 |
+| 导入的环境变量没生效 | 先**重启程序**（变量只在启动时读取一次）。确认变量保存在正确的层（默认项目层，项目根要填对）。应用范围见 8.10。 |
 | `Outline` 面板一直为空 | 看面板顶部状态行：没有打开文件、后端缺失、工程目录未打开都会给出原因 |
 | 模块树为空 | 没有工程时显示原因；有工程时点 `Refresh`；`slang` 报错时状态行会写出错误 |
-| 保存后没有自动 lint | 自动 lint 需要工程文件集（filelist 或工程目录）；没有工程时只做文件级诊断 |
+| 保存后没有自动 lint | 实时 lint 检查当前文件；导入 filelist 后，实时 lint 使用展开后的直接子模块定义。全工程 lint 需手动运行 |
 | `Lint Project` 没反应 | 看状态栏的一次性提示（「没有工程」「工程 lint 没有启动：原因」） |
 | 快捷键按了没反应 | 到 `Preferences → Shortcuts` 看下方是否有红色冲突提示；编辑器内部手势（7.3）不在这个表里，不能在那里改 |
 | 会话没有恢复 | 检查是否用了 `--no-session-restore`；会话文件损坏时状态栏会说明并干净启动（2.6） |
-| 终端面板显示 `Not started` | 点面板工具栏的 `Restart` 启动 shell；shell 来自系统的 `SHELL` 环境变量 |
+| 终端面板显示 `Not started` | 在 `Preferences → Tools → Host shell` 确认所选 shell 已安装，或选择 `Auto`，然后用 `Restart` 启动新会话 |
 
 ## 附录 D 版本控制面板：能做什么、工具链与安全边界
 
@@ -931,9 +933,11 @@ vedit-app --no-session-restore    # 忽略上次会话，干净启动
 
 比较支持 UTF-8 文本，每侧最多 8 MiB、100,000 行。窗口显示末行是否缺少换行，并保留目标侧的 CRLF。文件在比较期间被其他程序修改时，保存会提示重新核对。
 
-### D.2 随包工具链
+### D.2 系统 shell 与版本控制工具
 
-交付的 AppImage 里**捆绑**了 `git` 与 `subversion` 及其依赖库，干净机器上不需要另装。解析顺序是 **bundled > PATH > env**；想强制使用系统自带的版本，可以设 `VEDIT_GIT` / `VEDIT_SVN`（或对应的 `_DIR`）指向自己的二进制。`svnadmin` 不随包。
+在 `Preferences → Tools → Host shell` 选择 `Auto` 或系统中已安装的 shell，如 bash、csh/tcsh 或 zsh。`Auto` 优先使用有效的 `$SHELL`，然后查找其他已安装的 shell。设置会保存，新终端会话和随后运行的 Git / SVN 操作会使用该设置。使用 `Restart` 可按新设置重开终端。
+
+Git / SVN 操作从宿主机的有效 `PATH` 查找 `git` 或 `svn`。也可以通过 `VEDIT_GIT` / `VEDIT_SVN` 提供找不到时使用的绝对路径。AppImage 可以在缺少两种工具时启动和编辑文件。需要使用版本控制时，请在主机上安装对应工具；工具或已选 shell 不可用时，相关操作会提示如何处理。
 
 双栏文件比较使用 AppImage 内置的 GNU `diff`。从源码构建运行时，请在系统上安装 GNU diffutils，并用 `diff --version` 确认 `PATH` 上的版本。
 
