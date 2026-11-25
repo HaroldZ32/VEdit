@@ -2092,9 +2092,9 @@ int main(int argc, char **argv)
     parser.setApplicationDescription(QCoreApplication::translate("VEdit", "VEdit application shell (Qt6/KTextEditor rewrite)."));
     parser.addHelpOption();
     parser.addVersionOption();
-    parser.addPositionalArgument(QStringLiteral("file"),
-                                 QStringLiteral("File(s) to open (each additional file gets a split)."),
-                                 QStringLiteral("[file...]"));
+    parser.addPositionalArgument(QStringLiteral("path"),
+                                 QStringLiteral("Optional workspace folder and files to open."),
+                                 QStringLiteral("[folder] [file...]"));
     parser.addOption({QStringLiteral("state-dir"),
                       QCoreApplication::translate("VEdit", "Directory for session.json and shortcuts.json."),
                       QStringLiteral("dir")});
@@ -2141,7 +2141,8 @@ int main(int argc, char **argv)
     parser.process(app);
 
     const QString stateDir = parser.value(QStringLiteral("state-dir"));
-    const QStringList requestedFiles = parser.positionalArguments();
+    QStringList requestedFiles;
+    QString requestedFolder = parser.value(QStringLiteral("project"));
     const bool interactive = !parser.isSet(QStringLiteral("selfcheck")) &&
         !parser.isSet(QStringLiteral("selfcheck-ffi")) &&
         !parser.isSet(QStringLiteral("screenshots")) &&
@@ -2150,13 +2151,26 @@ int main(int argc, char **argv)
         !parser.isSet(QStringLiteral("crash-test"));
     vedit::app::StartupWelcome welcome;
     if (interactive) {
-        for (const QString &raw : requestedFiles) {
+        for (const QString &raw : parser.positionalArguments()) {
             const QFileInfo info(raw);
-            if (!info.exists() || !info.isFile()) {
+            if (info.isDir()) {
+                if (!requestedFolder.isEmpty()) {
+                    std::fprintf(stderr, "vedit-app: specify only one workspace folder\n");
+                    return 2;
+                }
+                requestedFolder = info.absoluteFilePath();
+            } else if (info.isFile()) {
+                requestedFiles.append(info.absoluteFilePath());
+            } else {
                 std::fprintf(stderr, "vedit-app: cannot open %s: %s\n", qPrintable(raw),
                              info.exists() ? "not a regular file" : "no such file or directory");
                 return 2;
             }
+        }
+        if (!requestedFolder.isEmpty() && !QFileInfo(requestedFolder).isDir()) {
+            std::fprintf(stderr, "vedit-app: cannot open %s: not a folder\n",
+                         qPrintable(requestedFolder));
+            return 2;
         }
         welcome.start(vedit::app::i18n::settingsFilePath(stateDir));
     }
@@ -2236,7 +2250,8 @@ int main(int argc, char **argv)
 
     ShellOptions options;
     options.stateDir = stateDir;
-    options.projectRoot = parser.value(QStringLiteral("project"));
+    options.projectRoot = requestedFolder;
+    options.openStartupFiles = !requestedFiles.isEmpty();
     options.themeName = parser.value(QStringLiteral("theme"));
     options.restoreSession = !parser.isSet(QStringLiteral("no-session-restore"));
 
@@ -2386,12 +2401,15 @@ int main(int argc, char **argv)
                                vedit::terminal::terminalPanelFactory());
     shell.startSession();
     startupTrace(startupTimer, "session-started");
-    shell.show();
-    startupTrace(startupTimer, "window-shown");
-    welcome.finish();
+    if (qEnvironmentVariableIsSet("VEDIT_STARTUP_TRACE")) {
+        std::printf("WORKBENCH-TRACE topmost=%d\n",
+                    shell.windowFlags().testFlag(Qt::WindowStaysOnTopHint));
+        std::fflush(stdout);
+    }
 
     const int holdMs = parser.value(QStringLiteral("hold")).toInt();
     const auto openRequestedFiles = [&]() {
+        welcome.finish();
         QString openError;
         if (!requestedFiles.isEmpty() && !shell.openPaths(requestedFiles, &openError)) {
             std::fprintf(stderr, "vedit-app: %s\n", qPrintable(openError));
@@ -2403,12 +2421,10 @@ int main(int argc, char **argv)
             QTimer::singleShot(holdMs, &app, &QCoreApplication::quit);
         }
     };
-    // An explicit .f can open the import confirmation. Let it be parented to
-    // an already shown workbench, and let the event loop paint it immediately.
-    if (requestedFiles.isEmpty()) {
-        openRequestedFiles();
-    } else {
-        vedit::app::afterFirstWorkbenchPaint(&shell, openRequestedFiles);
-    }
+    // Keep the splash up through the first paint, then open explicit files so
+    // any filelist confirmation belongs to a visible, ready workbench.
+    vedit::app::afterFirstWorkbenchPaint(&shell, openRequestedFiles);
+    shell.show();
+    startupTrace(startupTimer, "window-shown");
     return app.exec();
 }

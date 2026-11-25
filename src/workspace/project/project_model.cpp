@@ -114,7 +114,8 @@ ProjectModel::~ProjectModel()
     }
 }
 
-bool ProjectModel::restoreFromDisk(QString *error, bool restoreCachedFiles)
+bool ProjectModel::restoreFromDisk(QString *error, bool restoreCachedFiles,
+                                   std::optional<QString> activeRoot)
 {
     bool ok = false;
     QString loadError;
@@ -125,7 +126,8 @@ bool ProjectModel::restoreFromDisk(QString *error, bool restoreCachedFiles)
         }
         return false;
     }
-    state_ = state;
+    stopExpansion();
+    state_ = std::move(state);
     // RM-3: a version-2 project-model.json has one live variable table and no
     // per-root map. Seed the entry for its own root so switching away and back
     // cannot lose what the user typed.
@@ -147,45 +149,55 @@ bool ProjectModel::restoreFromDisk(QString *error, bool restoreCachedFiles)
     restored_ = true;
     lastError_.clear();
     stateError_.clear();
+    if (activeRoot.has_value()) {
+        selectRoot(*activeRoot);
+    }
     emit stateChanged();
+    return true;
+}
+
+bool ProjectModel::selectRoot(const QString &root)
+{
+    const QString absolute = vedit::paths::normalizedRoot(root);
+    if (absolute == state_.root) {
+        return false;
+    }
+    stopExpansion();
+    if (!state_.root.isEmpty()) {
+        state_.inputsByRoot.insert(state_.root,
+                                   {state_.filelists, state_.projectIncludeDirs, state_.projectDefines});
+    }
+    ProjectState next;
+    next.root = absolute;
+    next.variables = state_.variablesByRoot.value(absolute);
+    next.top = state_.topByRoot.value(absolute);
+    const ProjectInputs authored = state_.inputsByRoot.value(absolute);
+    next.filelists = authored.filelists;
+    next.projectIncludeDirs = authored.includeDirs;
+    next.projectDefines = authored.defines;
+    next.filesStale = !authored.filelists.isEmpty();
+    next.variablesByRoot = std::move(state_.variablesByRoot);
+    next.topByRoot = std::move(state_.topByRoot);
+    next.inputsByRoot = std::move(state_.inputsByRoot);
+    state_ = std::move(next);
+    relativeFiles_.clear();
+    missingVariables_.clear();
+    referencedVariables_.clear();
+    referencedVariableLayers_.clear();
+    skipped_ = 0;
+    restored_ = false;
+    lastError_.clear();
+    stateError_.clear();
     return true;
 }
 
 void ProjectModel::open(const QString &projectRoot)
 {
-    if (projectRoot.isEmpty()) {
-        return;
-    }
-    // FIX 1: the root is stored in the SAME normalised spelling the shell keeps,
-    // so displayFiles()/displayFilelists() compute "inside the root" against the
-    // same string the project lane was opened with.
-    const QString absolute = vedit::paths::normalizedRoot(projectRoot);
-    if (absolute.isEmpty()) {
-        return;
-    }
-    if (absolute != state_.root) {
-        // RM-3: the wipe must NOT take the per-root variable tables with it.
-        // The NEW root's own table is restored (never the previous project's),
-        // so a switch A -> B -> A brings A's values back from the store.
-        const QMap<QString, QStringList> variablesByRoot = state_.variablesByRoot;
-        const QMap<QString, QString> topByRoot = state_.topByRoot;
-        state_ = ProjectState{};
-        state_.variablesByRoot = variablesByRoot;
-        state_.topByRoot = topByRoot;
-        state_.root = absolute;
-        state_.variables = variablesByRoot.value(absolute);
-        // RM-17: the NEW root's own top; never the previous project's.
-        state_.top = topByRoot.value(absolute);
-        relativeFiles_.clear();
-        missingVariables_.clear();
-        referencedVariables_.clear();
-        referencedVariableLayers_.clear();
-        skipped_ = 0;
-        restored_ = false;
-        emit filelistsChanged();
-        emit stateChanged();
-    }
+    const bool changed = selectRoot(projectRoot);
     startExpansion();
+    if (changed) {
+        emit filelistsChanged();
+    }
 }
 
 void ProjectModel::openRoot(const QString &projectRoot)
@@ -885,6 +897,9 @@ void ProjectModel::scheduleSettingsReload()
 
 bool ProjectModel::saveState()
 {
+    if (state_.root.isEmpty()) {
+        return true;
+    }
     QString error;
     if (!store_.save(state_, &error)) {
         stateError_ = error;
@@ -892,6 +907,21 @@ bool ProjectModel::saveState()
     }
     stateError_.clear();
     return true;
+}
+
+void ProjectModel::stopExpansion()
+{
+    if (job_ != 0) {
+        service_.cancel(job_);
+        job_ = 0;
+    }
+    pending_ = false;
+    pendingRoot_.clear();
+    pendingFilelists_.clear();
+    pendingVariables_.clear();
+    pendingIncludeDirs_.clear();
+    pendingDefines_.clear();
+    pollTimer_.stop();
 }
 
 void ProjectModel::startExpansion(bool force)
@@ -911,17 +941,7 @@ void ProjectModel::startExpansion(bool force)
     // the open file. Importing the first `.f` turns the same root into a project
     // (this gate then passes) without re-opening it.
     if (!hasFilelist()) {
-        if (job_ != 0) {
-            service_.cancel(job_);
-            job_ = 0;
-        }
-        pending_ = false;
-        pendingRoot_.clear();
-        pendingFilelists_.clear();
-        pendingVariables_.clear();
-        pendingIncludeDirs_.clear();
-        pendingDefines_.clear();
-        pollTimer_.stop();
+        stopExpansion();
         lastError_.clear();
         relativeFiles_.clear();
         missingVariables_.clear();
@@ -949,10 +969,7 @@ void ProjectModel::startExpansion(bool force)
         && pendingDefines_ == state_.projectDefines) {
         return;
     }
-    if (pending_ && job_ != 0) {
-        service_.cancel(job_);
-        job_ = 0;
-    }
+    stopExpansion();
     quint64 id = 0;
     if (service_.start(state_.root, state_.filelists, state_.variables,
                        state_.projectIncludeDirs, state_.projectDefines, settingsPath(), &id)
@@ -1042,12 +1059,7 @@ void ProjectModel::adopt(const ExpansionPayload &payload)
 void ProjectModel::recordFailure(const QString &error)
 {
     lastError_ = error.isEmpty() ? QCoreApplication::translate("VEdit", "the project service failed") : error;
-    if (job_ != 0) {
-        service_.cancel(job_);
-        job_ = 0;
-    }
-    pending_ = false;
-    pollTimer_.stop();
+    stopExpansion();
     emit stateChanged();
     emit refreshFinished(false, lastError_);
 }

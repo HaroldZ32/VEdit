@@ -4,12 +4,8 @@
 //   * AC-4.1: the bottom `project-lint` dock, its `project-lint-host` content
 //     seam, the empty state (AC-4.5) and the dock's persistence in the session
 //     archive;
-//   * AC-7.4: the rendered stylesheet's QMainWindow::separator is NOT the canvas
-//     colour, is >= 6 px and has hover feedback, on EVERY product theme;
-//   * AC-7.5: QSplitter::handle uses a visible style too, and a restored layout
-//     whose right dock column has no visible, non-floating dock is normalised
-//     back to a right-docked, visible dock (the precondition is asserted first,
-//     so the normalising restore is proven to matter);
+//   * Desktop AC3: narrow canvas-coloured dock/split separators stay draggable.
+//   * AC-7.5: a restored layout recovers a missing right dock column.
 //   * AC-5.3: closing 10 tabs is ONE state notification and < 200 ms on the UI
 //     thread (the demo provider always, the real KTextEditor provider when the
 //     editor lane is present).
@@ -31,6 +27,7 @@
 #include <QApplication>
 #include <QByteArray>
 #include <QCoreApplication>
+#include <QDir>
 #include <QDockWidget>
 #include <QElapsedTimer>
 #include <QFile>
@@ -38,7 +35,9 @@
 #include <QLabel>
 #include <QMainWindow>
 #include <QMenu>
+#include <QMouseEvent>
 #include <QRegularExpression>
+#include <QSplitter>
 #include <QStringList>
 #include <QTemporaryDir>
 #include <QWidget>
@@ -164,17 +163,11 @@ void checkThemeStylesheet()
             ruleBody(sheet, QStringLiteral("QMainWindow::separator:hover"));
         const QString restColour = backgroundColour(separator);
         const QString hoverColour = backgroundColour(separatorHover);
-        check(QStringLiteral("qss.separator.rest-visible.%1").arg(theme.id),
-              restColour == theme.border.name(QColor::HexRgb).toLower(),
-              QStringLiteral("rest=%1 border=%2")
-                  .arg(restColour, theme.border.name(QColor::HexRgb)));
-        check(QStringLiteral("qss.separator.not-canvas.%1").arg(theme.id),
-              !restColour.isEmpty() && restColour != theme.canvas.name(QColor::HexRgb).toLower(),
-              QStringLiteral("rest=%1 canvas=%2")
-                  .arg(restColour, theme.canvas.name(QColor::HexRgb)));
+        check(QStringLiteral("qss.separator.blends.%1").arg(theme.id),
+              restColour == theme.canvas.name(QColor::HexRgb), restColour);
         check(QStringLiteral("qss.separator.size.%1").arg(theme.id),
-              pixelSize(separator, QStringLiteral("width")) >= 6 &&
-                  pixelSize(separator, QStringLiteral("height")) >= 6,
+              pixelSize(separator, QStringLiteral("width")) == 5 &&
+                  pixelSize(separator, QStringLiteral("height")) == 5,
               QStringLiteral("width=%1 height=%2")
                   .arg(pixelSize(separator, QStringLiteral("width")))
                   .arg(pixelSize(separator, QStringLiteral("height"))));
@@ -184,9 +177,8 @@ void checkThemeStylesheet()
         const QString handle = ruleBody(sheet, QStringLiteral("QSplitter::handle"));
         const QString handleHover =
             ruleBody(sheet, QStringLiteral("QSplitter::handle:hover"));
-        check(QStringLiteral("qss.splitter.visible.%1").arg(theme.id),
-              !backgroundColour(handle).isEmpty() &&
-                  backgroundColour(handle) != theme.canvas.name(QColor::HexRgb).toLower(),
+        check(QStringLiteral("qss.splitter.blends.%1").arg(theme.id),
+              backgroundColour(handle) == theme.canvas.name(QColor::HexRgb),
               QStringLiteral("handle=%1 canvas=%2")
                   .arg(backgroundColour(handle), theme.canvas.name(QColor::HexRgb)));
         check(QStringLiteral("qss.splitter.hover.%1").arg(theme.id),
@@ -198,6 +190,83 @@ void checkThemeStylesheet()
     // dark product theme, not only the default.
     check(QStringLiteral("qss.light-and-dark"), hasLight && hasDark,
           QStringLiteral("light=%1 dark=%2").arg(hasLight).arg(hasDark));
+}
+
+void drag(QWidget *widget, const QPoint &local, const QPoint &delta)
+{
+    const QPoint global = widget->mapToGlobal(local);
+    QMouseEvent press(QEvent::MouseButtonPress, local, global, Qt::LeftButton,
+                      Qt::LeftButton, Qt::NoModifier);
+    QApplication::sendEvent(widget, &press);
+    QMouseEvent move(QEvent::MouseMove, local + delta, global + delta, Qt::NoButton,
+                     Qt::LeftButton, Qt::NoModifier);
+    QApplication::sendEvent(widget, &move);
+    // QMainWindow applies a separator move from a zero-interval timer while
+    // the button is held. Releasing first would cancel that pending move.
+    pump();
+    QMouseEvent release(QEvent::MouseButtonRelease, local + delta, global + delta,
+                        Qt::LeftButton, Qt::NoButton, Qt::NoModifier);
+    QApplication::sendEvent(widget, &release);
+    pump();
+}
+
+void checkResizeAffordance(const QString &stateDir)
+{
+    for (const QString &theme : {QStringLiteral("yunwu"), QStringLiteral("shenye")}) {
+        vedit::app::ShellOptions options;
+        options.stateDir = stateDir;
+        options.uiTheme = theme;
+        options.restoreSession = false;
+        options.showDefaultPanels = false;
+        vedit::app::ApplicationShell shell(options);
+        auto addDock = [&shell](const QString &title, Qt::DockWidgetArea area) {
+            auto *dock = new QDockWidget(title, &shell);
+            dock->setWidget(new QLabel(title));
+            shell.addDockWidget(area, dock);
+            return dock;
+        };
+        QDockWidget *left = addDock(QStringLiteral("Files"), Qt::LeftDockWidgetArea);
+        QDockWidget *bottom = addDock(QStringLiteral("Search"), Qt::BottomDockWidgetArea);
+        shell.editorArea()->splitActive(Qt::Horizontal);
+        shell.editorArea()->splitActive(Qt::Vertical);
+        shell.show();
+        shell.resizeDocks({left}, {200}, Qt::Horizontal);
+        shell.resizeDocks({bottom}, {150}, Qt::Vertical);
+        pump();
+
+        const QRect central = shell.centralWidget()->geometry();
+        const int dockGapX = central.left() - (left->geometry().right() + 1);
+        const int dockGapY = bottom->geometry().top() - (central.bottom() + 1);
+        check(QStringLiteral("dock.real-gaps.%1").arg(theme), dockGapX == 5 && dockGapY == 5,
+              QStringLiteral("horizontal=%1 vertical=%2").arg(dockGapX).arg(dockGapY));
+        const int widthBefore = left->width();
+        const int heightBefore = bottom->height();
+        drag(&shell, QPoint(central.left() - 2, central.center().y()), QPoint(40, 0));
+        drag(&shell, QPoint(central.center().x(), central.bottom() + 2), QPoint(0, -40));
+        check(QStringLiteral("dock.drag-left.%1").arg(theme), left->width() > widthBefore);
+        check(QStringLiteral("dock.drag-bottom.%1").arg(theme), bottom->height() > heightBefore);
+
+        for (const bool horizontal : {true, false}) {
+            const QString axis = horizontal ? QStringLiteral("h") : QStringLiteral("v");
+            auto *split = shell.findChild<QSplitter *>(QStringLiteral("splitter-") + axis);
+            check(QStringLiteral("splitter.present.%1.%2").arg(theme, axis), split != nullptr);
+            if (split == nullptr) {
+                continue;
+            }
+            QSplitterHandle *handle = split->handle(1);
+            check(QStringLiteral("splitter.real-gap.%1.%2").arg(theme, axis),
+                  (horizontal ? handle->width() : handle->height()) == 4);
+            const int sizeBefore = split->sizes().value(0);
+            drag(handle, handle->rect().center(), horizontal ? QPoint(40, 0) : QPoint(0, 40));
+            check(QStringLiteral("splitter.drag.%1.%2").arg(theme, axis),
+                  split->sizes().value(0) > sizeBefore);
+        }
+        const QString captureDir = qEnvironmentVariable("VEDIT_FOLDER_SCREENSHOT_DIR");
+        if (!captureDir.isEmpty()) {
+            const QString path = QDir(captureDir).filePath(QStringLiteral("shell-%1.png").arg(theme));
+            check(QStringLiteral("shell.capture.%1").arg(theme), shell.grab().save(path), path);
+        }
+    }
 }
 
 // --- AC-4.1 / AC-4.5: the project-lint dock shell --------------------------
@@ -515,6 +584,7 @@ int main(int argc, char **argv)
     QTemporaryDir dockState;
     check(QStringLiteral("dock.temp-dir"), dockState.isValid());
     if (dockState.isValid()) {
+        checkResizeAffordance(dockState.path());
         checkProjectLintDock(dockState.path());
         checkProjectLintDockRestored(dockState.path());
     }

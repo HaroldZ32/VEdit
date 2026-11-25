@@ -24,13 +24,16 @@
 // Headless: run with QT_QPA_PLATFORM=offscreen (the ctest entry sets it).
 
 #include "app_shell.h"
+#include "command_registry.h"
 #include "editor_area.h"
+#include "session_store.h"
 #include "project_integration.h"
 #include "project_model.h"
 #include "project_panel.h"
 
 #include "runtime_init.h"
 
+#include <QAction>
 #include <QApplication>
 #include <QCoreApplication>
 #include <QDir>
@@ -38,6 +41,8 @@
 #include <QEventLoop>
 #include <QFile>
 #include <QFileInfo>
+#include <QMenu>
+#include <QPlainTextEdit>
 #include <QString>
 #include <QStringList>
 #include <QTemporaryDir>
@@ -260,6 +265,96 @@ int main(int argc, char **argv)
     check("e2e.explicit-file-set",
           model->files().contains(QFileInfo(sourceA).absoluteFilePath()),
           describe(model->files()));
+
+    check("workspace.beta-include-authored", model->addIncludeDir(QStringLiteral("inc"), &error), error);
+    check("workspace.beta-define-authored", model->addDefine(QStringLiteral("BETA=1"), &error), error);
+    model->setTop(QStringLiteral("b"));
+    check("workspace.beta-settled", waitForCompletion(*model, 20000));
+    auto *dirty = qobject_cast<QPlainTextEdit *>(shell.editorArea()->activePane()->editorWidget());
+    check("workspace.dirty-editor", dirty != nullptr);
+    if (dirty != nullptr) {
+        dirty->insertPlainText(QStringLiteral("// unsaved"));
+    }
+    const auto betaLists = model->filelists();
+    const auto betaExpansions = model->expansionCount();
+    shell.setProjectRoot(rootA);
+    check("workspace.alpha-isolated", model->projectRoot() == rootA && !model->hasFilelist()
+          && model->projectIncludeDirs().isEmpty() && model->projectDefines().isEmpty()
+          && model->top().isEmpty() && model->expansionCount() == betaExpansions);
+    check("workspace.switch-keeps-dirty", dirty != nullptr && shell.editorArea()->activePane()->isModified()
+          && dirty->toPlainText().contains(QStringLiteral("// unsaved")));
+    check("workspace.alpha-import", model->importFilelists({listA}, &error), error);
+    check("workspace.alpha-define", model->addDefine(QStringLiteral("ALPHA=1"), &error), error);
+    check("workspace.alpha-settled", waitForCompletion(*model, 20000));
+    shell.setProjectRoot(rootB);
+    check("workspace.beta-return", waitForCompletion(*model, 20000)
+          && model->filelists() == betaLists && model->top() == QStringLiteral("b")
+          && model->projectIncludeDirs() == QStringList{QStringLiteral("inc")}
+          && model->projectDefines() == QStringList{QStringLiteral("BETA=1")});
+    check("workspace.recent-deduplicates", shell.sessionStore()->recentFolders()
+          == QStringList{rootB, rootA});
+
+    check("workspace.seed-archive", shell.saveSession(&error), error);
+    vedit::app::ShellOptions launch = shellOptions;
+    launch.restoreSession = true;
+    launch.openStartupFiles = true;
+    {
+        vedit::app::ApplicationShell standalone(launch);
+        vedit::workspace::installProject(standalone, {});
+        standalone.startSession();
+        auto *restored = vedit::workspace::projectModelForShell(standalone);
+        check("workspace.standalone-skips-archived-tabs",
+              standalone.editorArea()->activePane()->currentFilePath().isEmpty());
+        standalone.setOpenFileDialogProvider([sourceA]() { return sourceA; });
+        standalone.commands()->action(QStringLiteral("file.open"))->trigger();
+        check("workspace.file-open-standalone", standalone.projectRoot().isEmpty()
+              && standalone.editorArea()->activePane()->currentFilePath() == sourceA
+              && restored->projectRoot().isEmpty() && !restored->hasFilelist()
+              && restored->expansionCount() == 0);
+    }
+    launch.openStartupFiles = false;
+    {
+        vedit::app::ApplicationShell reopened(launch);
+        vedit::workspace::installProject(reopened, {});
+        reopened.startSession();
+        auto *restored = vedit::workspace::projectModelForShell(reopened);
+        check("workspace.restore-beta", reopened.projectRoot() == rootB
+              && restored->filelists() == betaLists && waitForCompletion(*restored, 20000));
+        auto *recent = reopened.findChild<QMenu *>(QStringLiteral("menu-recent-folders"));
+        check("workspace.recent-menu", recent != nullptr);
+        if (recent != nullptr) {
+            recent->popup(QPoint(80, 80));
+            const auto actions = recent->actions();
+            check("workspace.recent-list", actions.size() == 2 && actions.last()->text() == rootA);
+            if (actions.size() == 2) {
+                actions.last()->trigger();
+            }
+            recent->hide();
+        }
+        check("workspace.recent-select-restores-alpha", reopened.projectRoot() == rootA
+              && restored->filelists() == QStringList{listA}
+              && restored->projectDefines() == QStringList{QStringLiteral("ALPHA=1")}
+              && waitForCompletion(*restored, 20000));
+        auto *restore = reopened.findChild<QAction *>(QStringLiteral("action-restore-last-folder"));
+        check("workspace.restore-toggle-on", restore != nullptr && restore->isChecked());
+        if (restore != nullptr) {
+            restore->trigger();
+        }
+        reopened.commands()->action(QStringLiteral("file.close-folder"))->trigger();
+        check("workspace.close-folder-clears-model", reopened.projectRoot().isEmpty()
+              && restored->projectRoot().isEmpty() && !restored->hasFilelist()
+              && !restored->isPending() && reopened.sessionStore()->lastFolder().isEmpty()
+              && reopened.sessionStore()->recentFolders() == QStringList{rootA, rootB});
+    }
+    vedit::app::ApplicationShell restoreDisabled(launch);
+    check("workspace.restore-toggle-persisted", !restoreDisabled.sessionStore()->restoresLastFolder());
+    restoreDisabled.setProjectRoot(rootB);
+    vedit::app::ApplicationShell emptyLaunch(launch);
+    check("workspace.restore-disabled-leaves-root-empty", emptyLaunch.projectRoot().isEmpty());
+    launch.projectRoot = rootA;
+    launch.openStartupFiles = true;
+    vedit::app::ApplicationShell explicitLaunch(launch);
+    check("workspace.explicit-folder-with-file", explicitLaunch.projectRoot() == rootA);
 
     std::printf("SUMMARY checks=%d failures=%d\n", g_checks, g_failures);
     return g_failures == 0 ? 0 : 1;

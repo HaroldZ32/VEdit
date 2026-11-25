@@ -28,6 +28,8 @@
 #include <QTimer>
 #include <QVariantMap>
 
+#include <optional>
+
 namespace vedit::workspace::project {
 
 class ProjectModel : public QObject {
@@ -39,10 +41,13 @@ public:
     // Loads the persisted project (root, imported filelists, members). Returns
     // true when one was restored; `error` receives why not (empty for "nothing
     // saved yet").
-    bool restoreFromDisk(QString *error = nullptr, bool restoreCachedFiles = true);
+    // An explicit active root (including empty for standalone) controls which
+    // project's state is published while retaining other folders' authored inputs.
+    bool restoreFromDisk(QString *error = nullptr, bool restoreCachedFiles = true,
+                         std::optional<QString> activeRoot = std::nullopt);
 
-    // Opens `projectRoot` (switching projects clears the previous members and
-    // imported filelists) and starts an asynchronous expansion.
+    // Selects the folder's own authored inputs and starts an expansion when it
+    // has a filelist. An empty root closes the workspace.
     void open(const QString &projectRoot);
 
     // Re-expands the current root; no-op with a failed signal when none is open.
@@ -192,6 +197,8 @@ signals:
 private:
     /// `force` re-expands even when the same inputs are already in flight; the
     /// switch paths leave it false so a duplicate report is a no-op (RM-2).
+    bool selectRoot(const QString &root);
+    void stopExpansion();
     void startExpansion(bool force = false);
     void pollOnce();
     void adopt(const ExpansionPayload &payload);

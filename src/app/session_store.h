@@ -142,9 +142,16 @@ public:
     SessionState loadState(QString *error) const;
     bool saveState(const SessionState &state, QString *error) const;
 
+    QString lastFolder() const;
+    QStringList recentFolders() const;
+    void rememberFolder(const QString &folder) const;
+    bool restoresLastFolder() const;
+    void setRestoresLastFolder(bool enabled) const;
+
     static QString defaultFilePath();
 
 private:
+    QString workspaceSettingsPath() const;
     QString path_;
 };
 
