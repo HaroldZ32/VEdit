@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # One command for the VEdit private runtime — F2 form (T64).
 #   assemble (self-built KSyntaxHighlighting + whitelist) -> licence gate ->
-#   self-check (AppDir) -> F2 isolation -> AppImage -> self-check + isolation on
-#   the AppImage -> CentOS 7 mechanism probe.
+#   self-check (AppDir) -> F2 isolation -> three release packages -> extraction
+#   and launch checks -> runtime gates on the AppImage -> CentOS 7 mechanism probe.
 #
 # The F2 form (T61) makes the packaging the source of truth for which syntax
 # definitions exist: the library embeds none, AppRun narrows XDG to the AppDir,
@@ -18,8 +18,10 @@ ROOT=$(cd "$HERE/../.." && pwd)
 # script from another checkout cannot run the wrong build-appimage.sh (caught in
 # T31 phase 2: a relative call hashed the caller's appimagetool cache).
 cd "$ROOT"
-EVID=${VEDIT_PACK_EVIDENCE:-"$ROOT/evidence/slice3-pack"}
+EVID=${VEDIT_PACK_EVIDENCE:-"$ROOT/target/runtime-pack-evidence"}
 OUT="$ROOT/packaging/runtime/out"
+RELEASE="$OUT/release"
+VERSION=$(awk -F'"' '/^version = / {print $2; exit}' "$ROOT/Cargo.toml") || exit $?
 IMAGE=${VEDIT_QT6_BUILD_IMAGE:-vedit-qt6-build:local}
 APP="$ROOT/target/qt6-build/src/app/vedit-app"
 PROBE="$ROOT/target/qt6-build/cmake/smoke/vedit-ksh-env-probe"
@@ -28,7 +30,8 @@ CENTOS_PROBE=1
 [ "${1:-}" = "--no-centos-probe" ] && CENTOS_PROBE=0
 CENTOS_IMAGE=${VEDIT_CENTOS_PROBE_IMAGE:-docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4}
 
-mkdir -p "$EVID" "$ROOT/packaging/appimage/.cache"
+mkdir -p "$EVID" "$OUT" "$ROOT/packaging/appimage/.cache" || exit $?
+export VEDIT_F2_EVIDENCE=${VEDIT_F2_EVIDENCE:-"$EVID"}
 # The AppImage tool is pinned by URL + sha256; fetch it once into the cache.
 # shellcheck source=/dev/null
 set -a; . "$ROOT/scripts/versions.env"; set +a
@@ -55,9 +58,21 @@ step "preflight"
   echo "probe: $PROBE"; [ -x "$PROBE" ] && echo "  sha256=$(sha256sum "$PROBE" | cut -d' ' -f1)" || echo "FAIL: probe missing"
   echo "f2 install: $KSH_F2"; [ -d "$KSH_F2" ] && sha256sum "$KSH_F2"/lib/x86_64-linux-gnu/libKF6SyntaxHighlighting.so.6.24.0 2>/dev/null || echo "FAIL: F2 tree missing"
   echo "whitelist: $(ls "$ROOT/resources/syntax"/*.xml 2>/dev/null | wc -l) xml in resources/syntax/"
-  echo "toolchain: verible=$ROOT/.mpd/recon/verible/bin slang=$ROOT/build/slang/out/slang"
-  for t in "$ROOT/.mpd/recon/verible/bin/verible-verilog-ls" "$ROOT/build/slang/out/slang"; do
-    [ -x "$t" ] && echo "  $(sha256sum "$t" | cut -d' ' -f1)  $t" || echo "FAIL: toolchain artifact missing: $t"
+  for tool in verible-verilog-ls slang; do
+    case "$tool" in
+      verible-verilog-ls)
+        candidates=("$ROOT/.mpd/recon/verible/bin/$tool" "$ROOT"/target/verible-pin/extract/*/bin/"$tool") ;;
+      slang)
+        candidates=("$ROOT/build/slang/out/$tool" "$ROOT/target/slang/out/$tool") ;;
+    esac
+    found=0
+    for t in "${candidates[@]}"; do
+      [ -x "$t" ] || continue
+      sha256sum -- "$t" || echo "FAIL: cannot hash toolchain artifact: $t"
+      found=1
+      break
+    done
+    [ "$found" -eq 1 ] || echo "FAIL: toolchain artifact missing: $tool"
   done
   echo "appimagetool: vendored=$ROOT/packaging/appimage/vendor/appimagetool-x86_64 cache=$ROOT/packaging/appimage/.cache/appimagetool.AppImage"
   [ -x "$TOOL" ] || echo "FAIL: appimagetool missing (vendor and cache)"
@@ -117,41 +132,39 @@ rc=$?; echo "isolation(appdir) exit=$rc" | tee -a "$EVID/40-f2-isolation-appdir.
 grep -E 'CHECK |F2-ISOLATION|summary' "$EVID/40-f2-isolation-appdir.log"
 [ "$rc" -eq 0 ] || fail=1
 
-step "5/7 build the AppImage"
-bash packaging/runtime/build-appimage.sh "$OUT/AppDir" > "$EVID/50-appimage.log" 2>&1
-rc=$?; echo "appimagetool exit=$rc" | tee -a "$EVID/50-appimage.log"
-grep -E 'APPIMAGE|sha256|SOURCE_DATE' "$EVID/50-appimage.log"
-[ "$rc" -eq 0 ] || { cat "$EVID/50-appimage.log" >&2; exit "$rc"; }
-APPIMAGE=$(grep -m1 '^APPIMAGE=' "$EVID/50-appimage.log" | cut -d= -f2-)
-[ -n "$APPIMAGE" ] && [ -f "$APPIMAGE" ] || { echo "ERROR: packaged AppImage is missing" >&2; exit 1; }
-( cd "$(dirname "$APPIMAGE")" && sha256sum "$(basename "$APPIMAGE")" > SHA256SUMS ) \
-  && cp "$(dirname "$APPIMAGE")/SHA256SUMS" "$EVID/SHA256SUMS" \
-  || { echo "ERROR: could not write the AppImage checksum" >&2; exit 1; }
-echo "SHA256SUMS:"; cat "$EVID/SHA256SUMS"
+[ "$fail" -eq 0 ] || { echo "AppDir validation failed" >&2; exit 1; }
 
-step "6/7 self-check + F2 isolation on the AppImage"
-bash packaging/runtime/selfcheck.sh --appimage "$APPIMAGE" > "$EVID/60-selfcheck-appimage.log" 2>&1
+step "5/7 build the three release packages"
+WORK=$(mktemp -d "$OUT/.release.XXXXXX") || exit $?
+trap 'rm -rf -- "$WORK"' EXIT
+mkdir "$WORK/release" || exit $?
+bash packaging/runtime/build-release-packages.sh "$OUT/AppDir" "$WORK/release" "$VERSION" \
+  > "$EVID/50-release-packages.log" 2>&1
+rc=$?; echo "release packaging exit=$rc" | tee -a "$EVID/50-release-packages.log"
+[ "$rc" -eq 0 ] || { cat "$EVID/50-release-packages.log" >&2; exit "$rc"; }
+grep -E 'APPIMAGE|sha256|SOURCE_DATE|PACKAGE' "$EVID/50-release-packages.log"
+
+step "6/7 extract and launch all formats, then run the AppImage runtime gates"
+bash packaging/runtime/verify/verify-release-packages.sh "$OUT/AppDir" "$WORK/release" "$VERSION" "$WORK/appimage" \
+  2>&1 | tee "$EVID/62-verify-release-packages.log"
+rc=$?; [ "$rc" -eq 0 ] || exit "$rc"
+bash packaging/runtime/selfcheck.sh --appdir "$WORK/appimage" > "$EVID/60-selfcheck-appimage.log" 2>&1
 rc1=$?; echo "selfcheck(appimage) exit=$rc1" | tee -a "$EVID/60-selfcheck-appimage.log"
-bash packaging/runtime/verify-f2-isolation.sh --appdir "$OUT/AppDir" --appimage "$APPIMAGE" \
-  > "$EVID/61-f2-isolation-appimage.log" 2>&1
+bash packaging/runtime/verify-f2-isolation.sh --appdir "$WORK/appimage" > "$EVID/61-f2-isolation-appimage.log" 2>&1
 rc2=$?; echo "isolation(appimage) exit=$rc2" | tee -a "$EVID/61-f2-isolation-appimage.log"
 grep -E 'CHECK |F2-ISOLATION|SELFCHECK' "$EVID/60-selfcheck-appimage.log" "$EVID/61-f2-isolation-appimage.log"
 [ "$rc1" -eq 0 ] && [ "$rc2" -eq 0 ] || fail=1
 
 if [ "$CENTOS_PROBE" -eq 1 ]; then
   step "7/7 CentOS 7.9 mechanism probe (T12 owns the formal matrix)"
-  rm -rf "$OUT/centos7-appdir" "$OUT/squashfs-root"
-  ( cd "$OUT" && APPIMAGE_EXTRACT_AND_RUN=1 "$APPIMAGE" --appimage-extract >/dev/null 2>&1 ) \
-    && mv "$OUT/squashfs-root" "$OUT/centos7-appdir" \
-    || { echo "CentOS 7 probe: AppImage extraction failed" >&2; exit 1; }
   {
     echo "host: $(docker run --rm "$CENTOS_IMAGE" cat /etc/centos-release 2>&1 | head -1)"
     echo "glibc: $(docker run --rm "$CENTOS_IMAGE" ldd --version 2>&1 | head -1)"
-    docker run --rm -e HOME=/tmp -e QT_QPA_PLATFORM=offscreen -v "$OUT/centos7-appdir:/app:ro" \
+    docker run --rm -e HOME=/tmp -e QT_QPA_PLATFORM=offscreen -v "$WORK/appimage:/app:ro" \
       "$CENTOS_IMAGE" /app/AppRun --selfcheck 2>&1
     echo "centos7_smoke_exit=$?"
     docker run --rm --network none -e HOME=/tmp -e QT_QPA_PLATFORM=offscreen \
-      -e VEDIT_NO_ENV_AUTOCAPTURE=1 -e VEDIT_STARTUP_TRACE=1 -v "$OUT/centos7-appdir:/app:ro" \
+      -e VEDIT_NO_ENV_AUTOCAPTURE=1 -e VEDIT_STARTUP_TRACE=1 -v "$WORK/appimage:/app:ro" \
       "$CENTOS_IMAGE" /usr/bin/env PATH= /app/AppRun --no-session-restore --hold 250 2>&1
     echo "centos7_no_vcs_exit=$?"
   } > "$EVID/70-centos7-probe.log" 2>&1
@@ -164,6 +177,27 @@ if [ "$CENTOS_PROBE" -eq 1 ]; then
     && echo "CHECK PASS  launches without host Git and Subversion" \
     || { echo "CHECK FAIL  launch without host Git and Subversion"; fail=1; }
 fi
+
+[ "$fail" -eq 0 ] || { echo "BUILD: FAIL" >&2; exit 1; }
+# Keep the previous release available until every candidate gate passes. Use
+# directory moves on the same filesystem so completed packages are not copied.
+if [ -e "$RELEASE" ] || [ -L "$RELEASE" ]; then
+  mv -T -- "$RELEASE" "$WORK/previous-release" || exit $?
+fi
+if ! mv -T -- "$WORK/release" "$RELEASE"; then
+  if [ -e "$WORK/previous-release" ] || [ -L "$WORK/previous-release" ]; then
+    mv -T -- "$WORK/previous-release" "$RELEASE" || {
+      trap - EXIT
+      echo "ERROR: previous release retained in $WORK/previous-release" >&2
+    }
+  fi
+  exit 1
+fi
+rm -rf -- "$OUT/centos7-appdir" || exit $?
+mv -T -- "$WORK/appimage" "$OUT/centos7-appdir" || exit $?
+APPIMAGE="$RELEASE/VEdit-$VERSION-x86_64.AppImage"
+cp "$RELEASE/SHA256SUMS" "$EVID/SHA256SUMS" || exit $?
+echo "SHA256SUMS:"; cat "$EVID/SHA256SUMS"
 
 ( cd "$OUT/AppDir" && find . -type f | sort ) > "$EVID/appdir-files.txt"
 cp "$OUT/AppDir/runtime-manifest.txt" "$EVID/runtime-manifest.txt" 2>/dev/null || true
