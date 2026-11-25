@@ -267,6 +267,15 @@ QJsonObject ProjectState::toJson() const
                   inputsFingerprint.isEmpty() ? computeInputsFingerprint() : inputsFingerprint);
     object.insert(QStringLiteral("projectIncludeDirs"), toArray(projectIncludeDirs));
     object.insert(QStringLiteral("projectDefines"), toArray(projectDefines));
+    QJsonObject inputs;
+    for (auto it = inputsByRoot.cbegin(); it != inputsByRoot.cend(); ++it) {
+        inputs.insert(it.key(), QJsonObject{
+            {QStringLiteral("filelists"), toArray(it->filelists)},
+            {QStringLiteral("includeDirs"), toArray(it->includeDirs)},
+            {QStringLiteral("defines"), toArray(it->defines)},
+        });
+    }
+    object.insert(QStringLiteral("inputsByRoot"), inputs);
     object.insert(QStringLiteral("includeDirs"), toArray(includeDirs));
     object.insert(QStringLiteral("defines"), toArray(defines));
     object.insert(QStringLiteral("diagnostics"), toArray(diagnostics));
@@ -319,6 +328,16 @@ ProjectState ProjectState::fromJson(const QJsonObject &object)
     }
     state.projectIncludeDirs = stringList(object, "projectIncludeDirs");
     state.projectDefines = stringList(object, "projectDefines");
+    const QJsonObject inputs = object.value(QStringLiteral("inputsByRoot")).toObject();
+    for (auto it = inputs.constBegin(); it != inputs.constEnd(); ++it) {
+        if (it.key().isEmpty() || !it->isObject()) {
+            continue;
+        }
+        const QJsonObject authored = it->toObject();
+        state.inputsByRoot.insert(it.key(), {stringList(authored, "filelists"),
+                                            stringList(authored, "includeDirs"),
+                                            stringList(authored, "defines")});
+    }
     state.includeDirs = stringList(object, "includeDirs");
     state.defines = stringList(object, "defines");
     state.diagnostics = stringList(object, "diagnostics");

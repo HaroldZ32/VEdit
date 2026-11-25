@@ -83,6 +83,7 @@ public:
     // lookup only sees already materialised rows and never touches the disk.
     QModelIndex indexForPath(const QString &path, bool loadMissing = false);
     bool isDirectory(const QModelIndex &index) const;
+    bool isSymlink(const QModelIndex &index) const;
     bool isPopulated(const QModelIndex &index) const;  // readdir done for this folder
     bool isFullyLoaded(const QModelIndex &index) const; // every batch handed out
     void ensureLoaded(const QModelIndex &index);       // hand out one batch

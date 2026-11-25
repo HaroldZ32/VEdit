@@ -1,6 +1,7 @@
 #include "find_replace.h"
 
 #include "multi_cursor.h"
+#include "../../workspace/search/search_history_button.h"
 
 #include <KTextEditor/Document>
 #include <KTextEditor/View>
@@ -390,11 +391,17 @@ void FindReplaceBar::buildUi()
     findGrid_->setContentsMargins(0, 0, 0, 0);
     findGrid_->setSpacing(4);
     findGrid_->setColumnStretch(0, 1);
-    findEdit_ = new QLineEdit(findRow_);
+    findInput_ = new QWidget(findRow_);
+    auto *inputLayout = new QHBoxLayout(findInput_);
+    inputLayout->setContentsMargins(0, 0, 0, 0);
+    inputLayout->setSpacing(4);
+    findEdit_ = new QLineEdit(findInput_);
     findEdit_->setObjectName(QStringLiteral("vedit-find-pattern"));
     findEdit_->setPlaceholderText(tr("Find"));
     findEdit_->setClearButtonEnabled(true);
     findEdit_->setMinimumWidth(200);
+    inputLayout->addWidget(findEdit_, 1);
+    inputLayout->addWidget(vedit::search::createHistoryButton(findEdit_, findInput_));
 
     caseButton_ = makeToggle(this, QStringLiteral("Aa"), QStringLiteral("vedit-find-case"),
                              tr("Case sensitive"));
@@ -790,13 +797,13 @@ void FindReplaceBar::layoutFindRow(bool compact)
         // button, the options reflow below, and Prev/Next/status share the
         // third row. Every control stays on screen at 360 px.
         findEdit_->setMinimumWidth(120);
-        findGrid_->addWidget(findEdit_, 0, 0, 1, 4);
+        findGrid_->addWidget(findInput_, 0, 0, 1, 4);
         findGrid_->addWidget(closeButton_, 0, 4);
         findGrid_->addWidget(caseButton_, 1, 0);
         findGrid_->addWidget(wholeButton_, 1, 1);
         findGrid_->addWidget(regexButton_, 1, 2);
-        findGrid_->addWidget(scopeCombo_, 1, 3);
-        findGrid_->addWidget(selectionButton_, 1, 4);
+        findGrid_->addWidget(scopeCombo_, 1, 3, 1, 2);
+        findGrid_->addWidget(selectionButton_, 1, 5);
         findGrid_->addWidget(previousButton_, 2, 0);
         findGrid_->addWidget(nextButton_, 2, 1);
         findGrid_->addWidget(status_, 2, 2, 1, 3);
@@ -807,7 +814,7 @@ void FindReplaceBar::layoutFindRow(bool compact)
         findGrid_->setColumnStretch(0, 1);
     } else {
         findEdit_->setMinimumWidth(200);
-        findGrid_->addWidget(findEdit_, 0, 0);
+        findGrid_->addWidget(findInput_, 0, 0);
         findGrid_->addWidget(caseButton_, 0, 1);
         findGrid_->addWidget(wholeButton_, 0, 2);
         findGrid_->addWidget(regexButton_, 0, 3);
@@ -1212,6 +1219,7 @@ void FindReplaceBar::replaceCurrent()
         openFind();
         return;
     }
+    vedit::search::SearchHub::instance().noteQuery(findEdit_->text());
     if (dirty_) {
         recompute(false);
     }
@@ -1259,6 +1267,7 @@ void FindReplaceBar::replaceAllMatches()
         openFind();
         return;
     }
+    vedit::search::SearchHub::instance().noteQuery(findEdit_->text());
     suppressRefresh_ = true;
     const ReplaceResult result = replaceAll(document, findEdit_->text(), replaceEdit_->text(),
                                             options(), selectionScope());
@@ -1432,12 +1441,11 @@ void FindReplaceBar::requestProjectSearch()
         return;
     }
     vedit::search::SearchHub::instance().setCurrentFilePath(documentPath(view_));
-    vedit::search::SearchHub::instance().noteQuery(request.text);
     emit projectSearchRequested(request);
     const bool delivered =
         vedit::search::SearchHub::instance().requestProjectSearch(request);
     transient_ = delivered
-                     ? tr("Whole project: searching in the Search panel")
+                     ? tr("Whole project query sent to the Search panel")
                      : tr("Whole project: open the Search panel to search the project");
     updateStatus();
 }

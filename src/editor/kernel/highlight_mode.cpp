@@ -10,9 +10,17 @@
 #include <KSyntaxHighlighting/State>
 
 #include <QFileInfo>
+#include <QResource>
 #include <QString>
 #include <QStringList>
 #include <QCoreApplication>
+
+// Pull the generated resource object into static-library consumers. Its Qt
+// initializer registers syntax-addons before KTextEditor creates its repository.
+static void linkRenderedLanguageResources()
+{
+    Q_INIT_RESOURCE(rendered_languages);
+}
 
 namespace vedit::editor {
 namespace {
@@ -66,6 +74,7 @@ struct ExtensionDefinition {
 constexpr ExtensionDefinition kExtensionTable[] = {
     {"v", "Verilog"},      {"vh", "Verilog"},   {"vlg", "Verilog"},
     {"sv", "SystemVerilog"}, {"svh", "SystemVerilog"},
+    {"f", "None"}, // HDL filelist, which KDE otherwise treats as fixed-format Fortran.
     {"vhd", "VHDL"},       {"vhdl", "VHDL"},
     {"md", "Markdown"},    {"markdown", "Markdown"}, {"mdown", "Markdown"}, {"mkd", "Markdown"},
     {"tcl", "Tcl"},        {"tk", "Tcl"},       {"sdc", "Tcl"}, {"xdc", "Tcl"},
@@ -89,6 +98,8 @@ QString modeFromExtension(const QString &absolutePath)
 
 QString highlightModeForFile(const QString &absolutePath)
 {
+    static const bool resourcesLinked = [] { linkRenderedLanguageResources(); return true; }();
+    Q_UNUSED(resourcesLinked);
     // Explicit table FIRST (A3): a table hit is final, so `.v` never becomes the
     // host's "V" definition and `.sdc` / `.xdc` resolve to Tcl by decision.
     const QString byTable = modeFromExtension(absolutePath);
@@ -139,7 +150,8 @@ bool applyHighlightingMode(KTextEditor::Document *document, const QString &absol
         return false;
     }
     const KSyntaxHighlighting::Definition definition = editorDefinitionForMode(mode);
-    if (!definition.isValid()) {
+    const bool plain = mode == QLatin1String("None");
+    if (!plain && !definition.isValid()) {
         if (diagnostic != nullptr) {
             *diagnostic = QStringLiteral("the editor repository has no '%1' definition; "
                                          "the view would render without colors")
@@ -147,7 +159,7 @@ bool applyHighlightingMode(KTextEditor::Document *document, const QString &absol
         }
         return false;
     }
-    if (diagnostic != nullptr && definition.author() != QLatin1String(kVEditAuthor)) {
+    if (!plain && diagnostic != nullptr && definition.author() != QLatin1String(kVEditAuthor)) {
         // Informational only: A3 accepts any valid definition from the
         // repository. On a developer host this is normally a KDE definition
         // (the delivered runtime narrows the search path to VEdit's own).

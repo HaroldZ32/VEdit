@@ -3,6 +3,9 @@
 
 #include "lsp_actions.h"
 #include "multi_cursor.h"
+#if defined(VEDIT_EDIT_CORE_HAVE_FIM)
+#include "fim_wiring.h"
+#endif
 
 #include <KTextEditor/View>
 
@@ -286,6 +289,21 @@ QList<QAction *> EditorContextMenu::appendTo(QMenu *menu)
     }
     menu->setToolTipsVisible(true);
     const QString backend = publishedBackend(view_->window());
+
+#if defined(VEDIT_EDIT_CORE_HAVE_FIM)
+    if (auto *fim = FimBinding::instanceFor(view_)) {
+        menu->addSeparator();
+        auto *item = menu->addAction(
+            QCoreApplication::translate("VEdit", "Request FIM Completion")
+            + shortcutSuffix(FimBinding::triggerKey()));
+        item->setObjectName(QStringLiteral("vedit.action.fim.request"));
+        QObject::connect(item, &QAction::triggered, fim, [fim, view = view_]() {
+            view->setFocus();
+            fim->requestCompletion();
+        });
+        added.append(item);
+    }
+#endif
 
     menu->addSeparator();
     if (QAction *header = menu->addSection(QCoreApplication::translate("VEdit", "Language Server"))) {

@@ -14,7 +14,6 @@
 #include "product_theme.h"
 #include "session_store.h"
 #include "theme_manager.h"
-#include "themed_icons.h"
 #include "workbench_interaction.h"
 
 #include <QAction>
@@ -34,8 +33,6 @@
 #include <QDateTime>
 #include <QFileInfo>
 #include <QFrame>
-#include <QImage>
-#include <QHash>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -55,8 +52,6 @@
 #include <QStringLiteral>
 #include <QStyle>
 #include <QTimer>
-#include <QToolBar>
-#include <QToolButton>
 #include <QVBoxLayout>
 #include <QVector>
 #include <QWidget>
@@ -75,53 +70,6 @@ QString openFileDialogFilter()
     // import-filelist dialog again.
     return vedit::common::openFileDialogFilters().join(QStringLiteral(";;"));
 }
-
-namespace {
-
-// UI-Mosaic T3: one toolbar command -> one SVG in resources/app_icon.qrc. The
-// contract (§3.3) names `settings` as the fallback when a command has no
-// dedicated drawing, so no button is left blank and the missing mapping stays
-// visible in the report instead of being invented here.
-QString toolbarIconName(const QString &commandId)
-{
-    static const QHash<QString, QString> icons{
-        {QStringLiteral("file.new"), QStringLiteral("new")},
-        {QStringLiteral("file.open"), QStringLiteral("open")},
-        {QStringLiteral("file.open-folder"), QStringLiteral("open")},
-        // No dedicated "switch project" drawing yet: the folder-open glyph is
-        // the closest true meaning (both choose a project folder).
-        {QStringLiteral("file.switch-project"), QStringLiteral("open")},
-        {QStringLiteral("file.save"), QStringLiteral("save")},
-        {QStringLiteral("file.save-all"), QStringLiteral("save")},
-        {QStringLiteral("edit.undo"), QStringLiteral("undo")},
-        {QStringLiteral("edit.redo"), QStringLiteral("redo")},
-        {QStringLiteral("search.focus"), QStringLiteral("find")},
-        {QStringLiteral("project.lint"), QStringLiteral("build")},
-        // Contract §3.3 fallback: no formatter glyph is shipped this round.
-        {QStringLiteral("diagnostics.format"), QStringLiteral("settings")},
-    };
-    return icons.value(commandId);
-}
-
-// The product theme the application palette currently represents. The palette
-// is the ONE source both applyUiTheme() and any independent switch (the
-// Preferences combo) go through, so a widget that only sees the palette can find
-// the theme tokens without a second registration point. `canvas` is unique per
-// theme, which makes the match unambiguous; before any theme is applied the
-// contract default is the honest answer.
-const ProductTheme &paletteProductTheme()
-{
-    const QPalette palette = QApplication::palette();
-    const QColor window = palette.color(QPalette::Window);
-    for (const ProductTheme &theme : productThemes()) {
-        if (theme.canvas.rgb() == window.rgb()) {
-            return theme;
-        }
-    }
-    return defaultProductTheme();
-}
-
-} // namespace
 
 ApplicationShell::ApplicationShell(ShellOptions options, QWidget *parent)
     : QMainWindow(parent)
@@ -147,28 +95,20 @@ ApplicationShell::ApplicationShell(ShellOptions options, QWidget *parent)
     if (QApplication::instance() != nullptr) {
         QApplication::instance()->installEventFilter(this);
     }
-    // AC-1.1 (batch 1): the workspace root must be known BEFORE the lanes
-    // register their panel factories — main.cpp calls installPanels() after this
-    // constructor and before startSession(), so the ordinary start (no
-    // --project) has to resolve the persisted root here. restoreSession() later
-    // keeps whatever this line produced and still applies the theme/layout.
-    // The value is NOT validated against the filesystem: a root that disappeared
-    // must surface as a missing-root state in the panels, never be silently
-    // replaced by "no project".
-    if (options_.projectRoot.isEmpty() && options_.restoreSession) {
-        QString sessionError;
-        const QJsonObject archive = session_->load(&sessionError);
-        const QString savedRoot = archive.value(QStringLiteral("project")).toString();
-        if (!savedRoot.isEmpty()) {
-            options_.projectRoot = savedRoot;
-        }
+    // Resolve the anchor before any workspace panel is installed.
+    const QString savedFolder = options_.restoreSession ? session_->lastFolder() : QString();
+    if (options_.projectRoot.isEmpty() && !options_.openStartupFiles
+        && session_->restoresLastFolder()) {
+        options_.projectRoot = savedFolder;
     }
-    // FIX 1: the ONE root is normalised once, here, for every source (--project
-    // through ShellOptions, the restored session above, and setProjectRoot()
-    // later). A stable absolute spelling is what makes the shared display rule
-    // (src/common/path_display.h) answer "inside the root" correctly for a root
-    // that arrived with a trailing slash or a "." segment.
     options_.projectRoot = vedit::paths::normalizedRoot(options_.projectRoot);
+    if (QFileInfo(options_.projectRoot).isDir()) {
+        session_->rememberFolder(options_.projectRoot);
+    } else if (QFileInfo(savedFolder).isDir() && session_->recentFolders().isEmpty()) {
+        // Migrate a legacy last folder before a standalone session can replace
+        // its archive. It remains a history entry without becoming active.
+        session_->rememberFolder(vedit::paths::normalizedRoot(savedFolder));
+    }
     auto shortcutStore = std::make_unique<JsonShortcutStore>(options_.stateDir + QStringLiteral("/shortcuts.json"));
     QString shortcutError;
     shortcutStore->load(&shortcutError);
@@ -230,13 +170,13 @@ ApplicationShell::ApplicationShell(ShellOptions options, QWidget *parent)
         emit fileOpened(absolutePath);
     });
     // UI-Mosaic T3: the editor area is the main card. The plain central widget
-    // carries the 8px canvas gap (@gap@ in cards.qss) and the QFrame#veditCard
+    // carries a narrow canvas margin and the QFrame#veditCard
     // inside is what the stylesheet paints with surface/border/radius tokens.
     // QMainWindow keeps the canvas colour behind both.
     auto *centralCanvas = new QWidget(this);
     centralCanvas->setObjectName(QStringLiteral("veditCentralCanvas"));
     auto *centralLayout = new QVBoxLayout(centralCanvas);
-    centralLayout->setContentsMargins(8, 8, 8, 8); // must stay equal to @gap@
+    centralLayout->setContentsMargins(2, 2, 2, 2);
     centralLayout->setSpacing(0);
     auto *editorCard = new QFrame(centralCanvas);
     editorCard->setObjectName(QStringLiteral("veditCard"));
@@ -363,13 +303,10 @@ void ApplicationShell::startSession()
     }
     syncDockPanelCommands();
     syncPanelToggleStates();
-    // UX batch 2 (item 7): the menu bar and the main toolbar are materialised
-    // AFTER the lanes registered their commands (the Project menu and the
-    // Build/Format toolbar buttons belong to the diagnostics lane). Rebuilding
-    // unconditionally also covers a lane that only added menu commands, without
-    // a new dock.
     buildMenuBar();
-    buildToolBar();
+    if (qEnvironmentVariableIsSet("VEDIT_UI_PROBE")) {
+        QTimer::singleShot(2500, this, [this]() { logUiProbe(); });
+    }
     // RM-5c (review M2): the format command's primary is pinned by the editor
     // kernel (Ctrl+Shift+F, one source of truth), so VS Code's Shift+Alt+F is
     // added as an EXTRA default. The command only exists when the diagnostics
@@ -526,6 +463,9 @@ void ApplicationShell::setProjectRoot(const QString &root)
         return;
     }
     options_.projectRoot = normalized;
+    if (normalized.isEmpty() || QFileInfo(normalized).isDir()) {
+        session_->rememberFolder(normalized);
+    }
     if (qEnvironmentVariableIsSet("VEDIT_DEBUG")) {
         qInfo().noquote() << "[shell-root] project root ->"
                           << (normalized.isEmpty() ? QStringLiteral("<none>") : normalized);
@@ -551,14 +491,18 @@ void ApplicationShell::setOpenFolderDialogProvider(std::function<QString()> prov
 
 void ApplicationShell::openProjectFolderDialog()
 {
-    const QString start = options_.projectRoot.isEmpty() ? QDir::homePath() : options_.projectRoot;
+    const QString start = dialogDirectory();
     const QString directory =
         openFolderDialogProvider_
             ? openFolderDialogProvider_()
             : vedit::common::chooseExistingDirectory(this, tr("Open Folder"), start);
-    if (directory.isEmpty()) {
-        return; // cancelled: nothing changes, nothing is persisted
+    if (!directory.isEmpty()) {
+        openProjectFolder(directory);
     }
+}
+
+void ApplicationShell::openProjectFolder(const QString &directory)
+{
     const QFileInfo info(directory);
     if (!info.exists() || !info.isDir()) {
         const QString message =
@@ -568,6 +512,18 @@ void ApplicationShell::openProjectFolderDialog()
         return;
     }
     setProjectRoot(info.absoluteFilePath());
+}
+
+QString ApplicationShell::dialogDirectory() const
+{
+    if (QFileInfo(options_.projectRoot).isDir()) {
+        return options_.projectRoot;
+    }
+    if (const EditorPane *pane = editorArea_->activePane();
+        pane != nullptr && !pane->currentFilePath().isEmpty()) {
+        return QFileInfo(pane->currentFilePath()).absolutePath();
+    }
+    return QDir::homePath();
 }
 
 IShortcutStore *ApplicationShell::shortcutStore() const
@@ -859,23 +815,12 @@ void ApplicationShell::registerCommands()
                QKeySequence(QStringLiteral("Ctrl+O")), 5);
     addCommand(QStringLiteral("file.compare"), tr("Compare Files…"), QStringLiteral("file"),
                QKeySequence(), 8);
-    // AC-1.2 (batch 1): the user-facing entry that switches the workspace root
-    // at runtime. It is a real File command (not only the Files panel toolbar
-    // button) so the one broadcast path is reachable from the menu bar too.
-    // RM-2: `file.switch-project` below is the same reset path under the name
-    // the user asked for mid-session; both are in the File menu and toolbar.
-    // RM-5b: VS Code uses Ctrl+K Ctrl+O; a two-stroke sequence is awkward in an
-    // editable one-field shortcut UI, so the free single-stroke form is used.
     addCommand(QStringLiteral("file.open-folder"), tr("Open F&older…"), QStringLiteral("file"),
                QKeySequence(QStringLiteral("Ctrl+Shift+Alt+O")), 6);
-    // RM-2: the user's "switch project from the top" entry. Mid-session the
-    // action is a SWITCH, and a top-level label that says so was the missing
-    // part; it opens the same folder dialog and goes through the same reset
-    // path as Open Folder (`openProjectFolderDialog()` -> `setProjectRoot()`,
-    // which re-broadcasts `projectRootChanged` to every lane). It is a real
-    // File command AND a main-toolbar button (see `kToolBarOrder`).
     addCommand(QStringLiteral("file.switch-project"), tr("S&witch Project…"),
                QStringLiteral("file"), QKeySequence(QStringLiteral("Ctrl+Shift+Alt+P")), 7);
+    addCommand(QStringLiteral("file.close-folder"), tr("Close Folder"), QStringLiteral("file"),
+               QKeySequence(), 9);
     addCommand(QStringLiteral("file.new-layout"), tr("&New Empty Layout"),
                QStringLiteral("file"), QKeySequence(QStringLiteral("Ctrl+Alt+N")), 10);
     // Save (T71): the entry the editor is actually used through. It goes to the
@@ -918,21 +863,6 @@ void ApplicationShell::registerCommands()
                QStringLiteral("view"), QKeySequence(QStringLiteral("Ctrl+Alt+M")), 40);
     addCommand(QStringLiteral("view.layout.reset"), tr("&Reset Layout"),
                QStringLiteral("view"), QKeySequence(QStringLiteral("Ctrl+Alt+R")), 50, false, true);
-    // UX batch 2 (item 7): the toolbar is hideable from the menu (its own
-    // toggleViewAction is not part of the command registry, so the menu entry is
-    // declared here and kept in sync through QToolBar::visibilityChanged).
-    // RM-5c (review M1): Ctrl+Alt+T is the GNOME/Ubuntu "open terminal" global
-    // shortcut, so the desktop would consume it before us; Ctrl+Shift+Alt+T is
-    // in the family neither the desktop nor KTextEditor claims.
-    addCommand(QStringLiteral("view.toolbar"), tr("&Toolbar"), QStringLiteral("view"),
-               QKeySequence(QStringLiteral("Ctrl+Shift+Alt+T")), 55, /*checkable=*/true);
-    // UX batch 2 (item 7): the toolbar's Search button opens the panel AND puts
-    // the caret in the query field. It is a distinct id from the panel toggle so
-    // a click can never mean "hide the search panel".
-    // RM-5b: Ctrl+Shift+F is already the pinned default of `diagnostics.format`
-    // (single source: src/editor/kernel/lsp_actions.cpp editorActionShortcut();
-    // changing it is a cross-lane contract change), so the next free
-    // project-search sequence is used and the deviation is documented.
     addCommand(QStringLiteral("search.focus"), tr("Search in &Files"), QStringLiteral("view"),
                QKeySequence(QStringLiteral("Ctrl+Shift+Alt+F")), 90);
 
@@ -1000,8 +930,7 @@ void ApplicationShell::registerCommands()
 
     // Handlers that are not panel toggles.
     commands_->setHandler(QStringLiteral("file.open"), [this]() {
-        const QString start = options_.projectRoot.isEmpty() ? QDir::homePath()
-                                                             : options_.projectRoot;
+        const QString start = dialogDirectory();
         QString path;
         if (openFileDialogProvider_) {
             path = openFileDialogProvider_();
@@ -1028,6 +957,7 @@ void ApplicationShell::registerCommands()
         }
     });
     commands_->setHandler(QStringLiteral("file.compare"), [this]() { chooseFilesToCompare(*this); });
+    commands_->setHandler(QStringLiteral("file.close-folder"), [this]() { setProjectRoot({}); });
     commands_->setHandler(QStringLiteral("file.open-folder"), [this]() {
         openProjectFolderDialog();
     });
@@ -1169,20 +1099,6 @@ void ApplicationShell::registerCommands()
     });
     commands_->setHandler(QStringLiteral("search.focus"), [this]() { focusSearchPanel(); });
     commands_->setHandler(QStringLiteral("help.user-manual"), [this]() { openUserManual(); });
-    commands_->setHandler(QStringLiteral("view.toolbar"), [this]() {
-        if (mainToolBar_ == nullptr) {
-            buildToolBar();
-        }
-        if (mainToolBar_ == nullptr) {
-            return;
-        }
-        const bool show = !mainToolBar_->isVisible();
-        mainToolBar_->setVisible(show);
-        if (QAction *action = commands_->action(QStringLiteral("view.toolbar"))) {
-            action->setChecked(show);
-        }
-    });
-
     // Batch 20261110 (AC-1.1): the About box is product text, not a shell debug
     // dump. It was the last place that leaked shell-lane vocabulary (the lane
     // name, the editor provider and the pane count); `aboutText()` owns it now.
@@ -1254,6 +1170,30 @@ void ApplicationShell::buildMenuBar()
                 menu->addSeparator();
             }
             menu->addAction(action);
+            if (action == commands_->action(QStringLiteral("file.open-folder"))) {
+                QMenu *recent = menu->addMenu(tr("Recent Folders"));
+                recent->setObjectName(QStringLiteral("menu-recent-folders"));
+                connect(recent, &QMenu::aboutToShow, this, [this, recent]() {
+                    recent->clear();
+                    for (const QString &folder : session_->recentFolders()) {
+                        QString label = QDir::toNativeSeparators(folder);
+                        label.replace(QLatin1Char('&'), QStringLiteral("&&"));
+                        recent->addAction(label, this, [this, folder]() { openProjectFolder(folder); });
+                    }
+                    if (recent->isEmpty()) {
+                        recent->addAction(tr("No Recent Folders"))->setEnabled(false);
+                    }
+                });
+            }
+        }
+        if (menuId == QStringLiteral("file")) {
+            menu->addSeparator();
+            QAction *restore = menu->addAction(tr("Restore Last Folder on Startup"));
+            restore->setObjectName(QStringLiteral("action-restore-last-folder"));
+            restore->setCheckable(true);
+            restore->setChecked(session_->restoresLastFolder());
+            connect(restore, &QAction::toggled, this,
+                    [this](bool enabled) { session_->setRestoresLastFolder(enabled); });
         }
         // UI-Mosaic T3: the product-theme entry is a SUBMENU of View. Adding a
         // sixth top-level menu would break ux_selftest's five-menu contract.
@@ -1264,178 +1204,8 @@ void ApplicationShell::buildMenuBar()
     }
 }
 
-QToolBar *ApplicationShell::mainToolBar() const
-{
-    return mainToolBar_;
-}
-
-void ApplicationShell::buildToolBar()
-{
-    if (mainToolBar_ == nullptr) {
-        mainToolBar_ = new QToolBar(tr("Main Toolbar"), this);
-        mainToolBar_->setObjectName(QStringLiteral("vedit-main-toolbar"));
-        // Hideable and movable (the two properties the user asked for): the
-        // toolbar can be dragged to any dock area and floats when dragged out.
-        mainToolBar_->setMovable(true);
-        mainToolBar_->setFloatable(true);
-        mainToolBar_->setAllowedAreas(Qt::AllToolBarAreas);
-        // UI-Mosaic T3: icon + text on the toolbar buttons. The actions are
-        // SHARED with the menus, so `setIconVisibleInMenu(false)` below is what
-        // keeps the menus text-only without duplicating every action.
-        mainToolBar_->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        // UI-Mosaic T6: the toolbar row is the window width; eleven icon+text
-        // buttons at 24px left the theme toolbar only 30px, so its button was
-        // hidden as an overflow item. 20px icons free ~44px and keep the button
-        // inside the row at the default window size.
-        mainToolBar_->setIconSize(QSize(20, 20));
-        addToolBar(Qt::TopToolBarArea, mainToolBar_);
-        // Keep the View menu check state honest in both directions: the X/hide
-        // path and the menu path must agree.
-        QObject::connect(mainToolBar_, &QToolBar::visibilityChanged, this, [this](bool visible) {
-            if (commands_ != nullptr) {
-                if (QAction *action = commands_->action(QStringLiteral("view.toolbar"))) {
-                    action->setChecked(visible);
-                }
-            }
-        });
-    }
-    mainToolBar_->clear();
-
-    // The order the user specified: new, open, open folder, SWITCH PROJECT,
-    // save, save all, undo, redo | separator | search, build (Lint Project),
-    // format. The switch entry sits next to open-folder by request (RM-2).
-    // Each entry holds the command registry's OWN QAction, so a toolbar button
-    // and its menu entry can never diverge; an id a lane did not register (the
-    // diagnostics lane owns Build/Format) is skipped rather than faked.
-    static const char *const kToolBarOrder[] = {
-        "file.new",       "file.open",   "file.open-folder", "file.switch-project",
-        "file.save",      "file.save-all", "edit.undo",     "edit.redo",
-        nullptr, /* separator */ "search.focus", "project.lint", "diagnostics.format",
-    };
-    for (const char *id : kToolBarOrder) {
-        if (id == nullptr) {
-            mainToolBar_->addSeparator();
-            continue;
-        }
-        QAction *action = commands_->action(QString::fromLatin1(id));
-        if (action == nullptr) {
-            continue;
-        }
-        const QString iconName = toolbarIconName(QString::fromLatin1(id));
-        if (!iconName.isEmpty()) {
-            action->setIcon(themed_icons::actionIcon(iconName, paletteProductTheme().text));
-            // The toolbar button and the menu entry share this QAction; the menu
-            // must stay text-only, so the icon is hidden there.
-            action->setIconVisibleInMenu(false);
-        }
-        mainToolBar_->addAction(action);
-    }
-    // UI-Mosaic T3: the theme entry sits at the RIGHT end of the toolbar row.
-    // It cannot be an addWidget() on mainToolBar_: a toolbar widget action is
-    // also returned by QToolBar::actions(), and ux_selftest compares that list
-    // to the shipped order with an ordered equality. A second toolbar in the
-    // same TopToolBarArea shares the row; its expanding spacer pushes the one
-    // button to the window's right edge.
-    if (themeToolBar_ == nullptr) {
-        themeToolBar_ = new QToolBar(tr("Theme"), this);
-        themeToolBar_->setObjectName(QStringLiteral("vedit-theme-toolbar"));
-        themeToolBar_->setMovable(false);
-        themeToolBar_->setFloatable(false);
-        themeToolBar_->setAllowedAreas(Qt::TopToolBarArea);
-        // Guarantee the one button keeps its width even if the main toolbar
-        // grows; without this the layout gave the theme toolbar the 30px that
-        // was left and QToolBar hid the button as an overflow item.
-        themeToolBar_->setMinimumWidth(56);
-        addToolBar(Qt::TopToolBarArea, themeToolBar_);
-        auto *spacer = new QWidget(themeToolBar_);
-        spacer->setObjectName(QStringLiteral("theme-toolbar-spacer"));
-        spacer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-        themeToolBar_->addWidget(spacer);
-        themeButtonMenu_ = createThemeMenu(themeToolBar_, QStringLiteral("menu-theme-button"));
-        auto *button = new QToolButton(themeToolBar_);
-        button->setObjectName(QStringLiteral("theme-button"));
-        button->setPopupMode(QToolButton::InstantPopup);
-        button->setToolButtonStyle(Qt::ToolButtonIconOnly);
-        // A fixed size keeps QToolBarLayout from stretching the widget action:
-        // without it the layout gave the button a 100px width inside a 56px
-        // toolbar, so the toolbar treated it as an overflow item and hid it.
-        button->setFixedSize(36, 36);
-        button->setIconSize(QSize(22, 22));
-        button->setToolTip(tr("Theme"));
-        button->setMenu(themeButtonMenu_);
-        themeToolBar_->addWidget(button);
-        themeButton_ = button;
-    }
-    refreshToolBarIcons();
-    if (QAction *toggle = commands_->action(QStringLiteral("view.toolbar"))) {
-        toggle->setChecked(mainToolBar_->isVisible());
-    }
-    syncEditorCommandStates();
-    // UI-Mosaic T6 运行期探针：只在 VEDIT_UI_PROBE=1 时打印。存在的理由：
-    // 全透明图标能骗过 `QIcon::isNull()` 断言，只有数不透明像素才看得见；
-    // 工具栏是否真的分到宽度、KTextEditor 内部状态行是否被样式表压扁，也只能
-    // 在 show 之后量几何。探针本身不改任何状态。
-    if (qEnvironmentVariableIsSet("VEDIT_UI_PROBE")) {
-        QTimer::singleShot(2500, this, [this]() { logUiProbe(); });
-    }
-}
-
 void ApplicationShell::logUiProbe()
 {
-    if (!qEnvironmentVariableIsSet("VEDIT_UI_PROBE") || mainToolBar_ == nullptr) {
-        return;
-    }
-    qWarning("[ui-probe] theme=%s syntax=%s status-theme=%s style=%d toolbarIconSize=%dx%d",
-             qPrintable(themes_ != nullptr ? themes_->currentUiTheme() : QString()),
-             qPrintable(themes_ != nullptr ? themes_->currentTheme() : QString()),
-             statusTheme_ != nullptr ? qPrintable(statusTheme_->text()) : "null",
-             int(mainToolBar_->toolButtonStyle()), mainToolBar_->iconSize().width(),
-             mainToolBar_->iconSize().height());
-    // R1/M2: an ignored/invalid persisted theme must be OBSERVABLE from outside,
-    // so the probe prints every startup/switch diagnostic (it changes no state).
-    for (const QString &diagnostic : diagnostics_) {
-        qWarning("[ui-probe] diagnostic=%s", qPrintable(diagnostic));
-    }
-    for (QAction *action : mainToolBar_->actions()) {
-        if (action == nullptr || action->isSeparator()) {
-            continue;
-        }
-        const QImage image = action->icon().pixmap(24, 24).toImage();
-        int opaque = 0;
-        for (int y = 0; y < image.height(); ++y) {
-            for (int x = 0; x < image.width(); ++x) {
-                if (qAlpha(image.pixel(x, y)) > 0) {
-                    ++opaque;
-                }
-            }
-        }
-        qWarning("[ui-probe] action=%s iconNull=%d opaquePixels=%d",
-                 qPrintable(action->objectName()), int(action->icon().isNull()), opaque);
-    }
-    if (themeButton_ != nullptr) {
-        const QImage themeImage = themeButton_->icon().pixmap(24, 24).toImage();
-        int opaque = 0;
-        for (int y = 0; y < themeImage.height(); ++y) {
-            for (int x = 0; x < themeImage.width(); ++x) {
-                if (qAlpha(themeImage.pixel(x, y)) > 0) {
-                    ++opaque;
-                }
-            }
-        }
-        const QPoint pos = themeButton_->mapToGlobal(QPoint(0, 0));
-        qWarning("[ui-probe] themeButton global=%d,%d %dx%d visible=%d hint=%dx%d opaquePixels=%d",
-                 pos.x(), pos.y(), themeButton_->width(), themeButton_->height(),
-                 int(themeButton_->isVisible()), themeButton_->sizeHint().width(),
-                 themeButton_->sizeHint().height(), opaque);
-    }
-    qWarning("[ui-probe] toolbar mainGeom=%d,%d %dx%d themeGeom=%d,%d %dx%d themeVisible=%d",
-             mainToolBar_->x(), mainToolBar_->y(), mainToolBar_->width(),
-             mainToolBar_->height(),
-             themeToolBar_ != nullptr ? themeToolBar_->x() : -1,
-             themeToolBar_ != nullptr ? themeToolBar_->y() : -1,
-             themeToolBar_ != nullptr ? themeToolBar_->width() : -1,
-             themeToolBar_ != nullptr ? themeToolBar_->height() : -1,
-             int(themeToolBar_ != nullptr && themeToolBar_->isVisible()));
     if (editorArea_ == nullptr) {
         return;
     }
@@ -1512,48 +1282,10 @@ void ApplicationShell::syncThemeMenuChecks()
         return;
     }
     const QString current = themes_->currentUiTheme();
-    const QList<QMenu *> menus{viewThemeMenu_, themeButtonMenu_};
-    for (QMenu *menu : menus) {
-        if (menu == nullptr) {
-            continue;
-        }
-        for (QAction *action : menu->actions()) {
-            if (action->isSeparator()) {
-                continue;
-            }
+    if (viewThemeMenu_ != nullptr) {
+        for (QAction *action : viewThemeMenu_->actions()) {
             action->setChecked(action->data().toString() == current);
         }
-    }
-}
-
-void ApplicationShell::refreshToolBarIcons()
-{
-    const ProductTheme &theme = paletteProductTheme();
-    if (mainToolBar_ != nullptr) {
-        for (QAction *action : mainToolBar_->actions()) {
-            if (action->isSeparator()) {
-                continue;
-            }
-            const QString id = action->objectName().mid(QStringLiteral("action-").size());
-            const QString iconName = toolbarIconName(id);
-            if (iconName.isEmpty()) {
-                continue;
-            }
-            action->setIcon(themed_icons::actionIcon(iconName, theme.text));
-            action->setIconVisibleInMenu(false);
-        }
-    }
-    if (themeButton_ != nullptr) {
-        themeButton_->setIcon(themed_icons::actionIcon(QStringLiteral("theme"), theme.accent));
-    }
-}
-
-void ApplicationShell::changeEvent(QEvent *event)
-{
-    QMainWindow::changeEvent(event);
-    if (event != nullptr && event->type() == QEvent::ApplicationPaletteChange) {
-        refreshToolBarIcons();
-        syncThemeMenuChecks();
     }
 }
 
@@ -1952,7 +1684,6 @@ void ApplicationShell::applyProductUiTheme(const QString &id, bool reportFailure
         persistUiTheme(appliedId);
         applyPairedSyntaxTheme();
     }
-    refreshToolBarIcons();
     syncThemeMenuChecks();
     updateStatusBar();
 }
@@ -2045,25 +1776,6 @@ bool ApplicationShell::restoreSession(QString *error)
     }
     state.uiTheme = archive.value(QStringLiteral("uiTheme")).toString();
 
-    // T19: the project root is restored BEFORE the panels are inserted, so the
-    // project lane's install() already sees it on this start and expands the
-    // same file set (the file set itself lives in project-model.json, owned by
-    // that lane; the session only names the root, which is the key
-    // project_integration.cpp reads). AC-1.1 (batch 1): an ordinary start is
-    // already resolved in the constructor (before the lanes install), so this is
-    // the fallback for a shell that restored explicitly; it broadcasts for the
-    // same reason setProjectRoot() does, because panels may already exist.
-    if (options_.projectRoot.isEmpty() && !state.projectRoot.isEmpty()) {
-        // FIX 1: the archived root goes through the same normalisation as every
-        // other root source, and the panes are rebound before the broadcast so a
-        // receiver already reads the value the tab tooltips use.
-        options_.projectRoot = vedit::paths::normalizedRoot(state.projectRoot);
-        if (editorArea_ != nullptr) {
-            editorArea_->setDisplayRoot(options_.projectRoot);
-        }
-        emit projectRootChanged(options_.projectRoot);
-    }
-
     // UI-Mosaic T6: ONE startup decision shared with the no-archive path. The
     // archive contributes its syntax theme (an explicit API-level choice) and its
     // UI theme; the precedence and the product-theme pairing live in
@@ -2085,7 +1797,8 @@ bool ApplicationShell::restoreSession(QString *error)
     // "opens as a narrow strip and vanishes" state the user reported.
     normalizeProjectLintDock();
 
-    if (!state.editorLayout.isEmpty()) {
+    if (!options_.openStartupFiles && !state.editorLayout.isEmpty()
+        && vedit::paths::normalizedRoot(state.projectRoot) == options_.projectRoot) {
         QString layoutError;
         if (!editorArea_->restoreLayout(state.editorLayout, &layoutError)) {
             addDiagnostic(QCoreApplication::translate("VEdit", "editor layout: %1").arg(layoutError));
@@ -2489,6 +2202,9 @@ void ApplicationShell::syncDockPanelCommands()
 
 void ApplicationShell::updateStatusBar()
 {
+    if (QAction *closeFolder = commands_->action(QStringLiteral("file.close-folder"))) {
+        closeFolder->setEnabled(!options_.projectRoot.isEmpty());
+    }
     const EditorPane *active = editorArea_ != nullptr ? editorArea_->activePane() : nullptr;
     const QString path = active != nullptr ? active->currentFilePath() : QString();
     // FIX 1: every path this bar renders goes through the ONE display rule.

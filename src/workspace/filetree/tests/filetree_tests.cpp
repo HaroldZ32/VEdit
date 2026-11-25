@@ -14,11 +14,14 @@
 #include "filetree_panel.h"
 
 #include <QApplication>
+#include <QContextMenuEvent>
 #include <QDir>
 #include <QElapsedTimer>
 #include <QFile>
 #include <QFileInfo>
 #include <QImage>
+#include <QMenu>
+#include <QToolBar>
 #include <QPainter>
 #include <QSignalSpy>
 #include <QStringList>
@@ -28,6 +31,8 @@
 
 #include <unistd.h>
 
+#include <algorithm>
+#include <chrono>
 #include <cstdio>
 
 using vedit::workspace::FileKind;
@@ -121,6 +126,154 @@ bool treeContains(FileTreeModel *model, const QString &directory, const QString 
 // ---------------------------------------------------------------------------
 // file kind classification (the ".v" trap)
 // ---------------------------------------------------------------------------
+
+bool invokeTreeContextAction(FileTreeWidget &panel, const QString &label)
+{
+    QWidget *viewport = panel.view()->viewport();
+    const QPoint point(10, viewport->height() - 10);
+    QContextMenuEvent event(QContextMenuEvent::Mouse, point, viewport->mapToGlobal(point));
+    QApplication::sendEvent(viewport, &event);
+    auto *menu = qobject_cast<QMenu *>(QApplication::activePopupWidget());
+    if (menu == nullptr) {
+        return false;
+    }
+    for (QAction *action : menu->actions()) {
+        if (action->text() == label && action->isEnabled()) {
+            menu->close();
+            action->trigger();
+            return true;
+        }
+    }
+    menu->close();
+    return false;
+}
+
+void testBulkContextMenu(const QString &scratch)
+{
+    const QDir root(QDir(scratch).filePath(QStringLiteral("bulk")));
+    check("bulk.fixture", QDir().mkpath(root.filePath(QStringLiteral("one/deep"))) &&
+                              QDir().mkpath(root.filePath(QStringLiteral("two/deep"))) &&
+                              QFile::link(root.path(), root.filePath(QStringLiteral("two/loop"))) &&
+                              writeFile(root.filePath(QStringLiteral("two/deep/test.sv"))));
+    FileTreeWidget panel;
+    panel.resize(300, 400);
+    panel.setInteractiveDialogs(false);
+    panel.model()->setBatchSize(1);
+    panel.openDirectory(root.path());
+    panel.show();
+    pump();
+    check("bulk.no-toolbar", panel.findChildren<QToolBar *>().isEmpty());
+    QSignalSpy opened(&panel, &FileTreeWidget::openFileRequested);
+    check("bulk.background-expand", invokeTreeContextAction(panel, QStringLiteral("Expand All")));
+    pump();
+    const QModelIndex branch = panel.model()->indexForPath(root.filePath(QStringLiteral("two/deep")));
+    const QModelIndex loop = panel.model()->indexForPath(root.filePath(QStringLiteral("two/loop")));
+    check("bulk.nested-lazy-expanded", branch.isValid() && panel.view()->isExpanded(branch));
+    check("bulk.symlink-unread", loop.isValid() && !panel.model()->isPopulated(loop));
+    check("bulk.no-file-opened", opened.isEmpty());
+    panel.selectPath(root.filePath(QStringLiteral("two")));
+    check("bulk.background-create", invokeTreeContextAction(panel, QStringLiteral("New Folder")));
+    check("bulk.background-targets-root", QDir(root.filePath(QStringLiteral("new_folder"))).exists() &&
+                                               !QDir(root.filePath(QStringLiteral("two/new_folder"))).exists());
+    check("bulk.background-collapse", invokeTreeContextAction(panel, QStringLiteral("Collapse All")) &&
+                                           !panel.view()->isExpanded(panel.model()->index(0, 0)));
+}
+
+void testBulkExpansionContinuation(const QString &scratch)
+{
+    const QDir root(QDir(scratch).filePath(QStringLiteral("bulk-many")));
+    QStringList branches;
+    bool fixtureReady = true;
+    for (int i = 0; i < 520; ++i) {
+        const QString path = root.filePath(QStringLiteral("dir%1").arg(i, 3, 10, QLatin1Char('0')));
+        branches.append(path);
+        fixtureReady = QDir().mkpath(path) && writeFile(path + QStringLiteral("/entry.sv")) && fixtureReady;
+    }
+    const QString deep = branches.last() + QStringLiteral("/deep");
+    const QString fileTail = root.filePath(QStringLiteral("zzz-files"));
+    const QString outside = QDir(scratch).filePath(QStringLiteral("bulk-outside"));
+    fixtureReady = QDir().mkpath(deep) && writeFile(deep + QStringLiteral("/last.sv")) &&
+                   QDir().mkpath(fileTail) && QDir().mkpath(outside) && fixtureReady;
+    for (int i = 0; i < 80; ++i) {
+        fixtureReady = writeFile(fileTail + QStringLiteral("/entry%1.sv").arg(i)) && fixtureReady;
+    }
+    check("bulk-many.fixture", fixtureReady);
+    if (!fixtureReady) {
+        return;
+    }
+
+    FileTreeWidget panel;
+    panel.resize(300, 400);
+    panel.model()->setBatchSize(8);
+    panel.openDirectory(root.path());
+    panel.model()->setFilelistFiles({outside});
+    panel.show();
+    pump();
+    QSignalSpy opened(&panel, &FileTreeWidget::openFileRequested);
+    check("bulk-many.single-action", invokeTreeContextAction(panel, QStringLiteral("Expand All")));
+    const auto expanded = [&](const QString &path) {
+        return panel.view()->isExpanded(panel.model()->indexForPath(path));
+    };
+    const bool reachedLast = QTest::qWaitFor([&] { return expanded(deep) && expanded(fileTail); });
+    const auto expandedCount = std::count_if(branches.cbegin(), branches.cend(), expanded);
+    check("bulk-many.all-520-siblings-expanded", expandedCount == branches.size(),
+          QString::number(expandedCount));
+    check("bulk-many.reached-late-nested-and-file-branch", reachedLast);
+    const QModelIndex tail = panel.model()->indexForPath(fileTail);
+    check("bulk-many.file-tail-still-streaming", tail.isValid() && panel.model()->canFetchMore(tail));
+    const QModelIndex rootIndex = panel.model()->index(0, 0);
+    const QModelIndex group = panel.model()->index(panel.model()->rowCount(rootIndex) - 1, 0, rootIndex);
+    check("bulk-many.synthetic-group-unexpanded", panel.model()->filelistRowCount() == 2 &&
+          group.isValid() && panel.model()->pathForIndex(group).isEmpty() && !panel.view()->isExpanded(group));
+    check("bulk-many.no-file-opened", opened.isEmpty(), QString::number(opened.size()));
+
+    panel.openDirectory(root.path());
+    int scannedAtCollapse = -1;
+    bool collapseQueued = false;
+    bool collapseTriggered = false;
+    const auto collapseConnection = QObject::connect(panel.view(), &QTreeView::expanded, &panel,
+        [&](const QModelIndex &) {
+            if (collapseQueued) {
+                return;
+            }
+            collapseQueued = true;
+            // Force this slice to yield with traversal work still pending.
+            QTest::qSleep(std::chrono::milliseconds{12});
+            QMetaObject::invokeMethod(&panel, [&] {
+                scannedAtCollapse = panel.model()->scannedDirectories();
+                collapseTriggered = invokeTreeContextAction(panel, QStringLiteral("Collapse All"));
+            }, Qt::QueuedConnection);
+        });
+    check("bulk-cancel.expand-started", invokeTreeContextAction(panel, QStringLiteral("Expand All")));
+    const bool collapsed = QTest::qWaitFor([&] { return scannedAtCollapse >= 0; });
+    check("bulk-cancel.collapse-during-expansion", collapsed && collapseTriggered &&
+          scannedAtCollapse > 1 && scannedAtCollapse < branches.size(), QString::number(scannedAtCollapse));
+    QObject::disconnect(collapseConnection);
+    pump();
+    check("bulk-cancel.no-more-scans-or-reopens", panel.model()->scannedDirectories() == scannedAtCollapse &&
+          !panel.view()->isExpanded(panel.model()->index(0, 0)) && !expanded(deep));
+
+    panel.openDirectory(root.path());
+    check("bulk-reset.expand-queued", invokeTreeContextAction(panel, QStringLiteral("Expand All")));
+    const QString replacement = QDir(scratch).filePath(QStringLiteral("bulk"));
+    panel.openDirectory(replacement);
+    const int scannedAfterReset = panel.model()->scannedDirectories();
+    pump();
+    check("bulk-reset.new-root-not-expanded", panel.rootPath() == replacement &&
+          panel.model()->scannedDirectories() == scannedAfterReset &&
+          !expanded(QDir(replacement).filePath(QStringLiteral("one"))));
+    check("bulk-cancel.no-file-opened", opened.isEmpty(), QString::number(opened.size()));
+
+    {
+        FileTreeWidget closingPanel;
+        closingPanel.resize(300, 400);
+        closingPanel.openDirectory(root.path());
+        closingPanel.show();
+        pump();
+        check("bulk-destroy.expand-queued", invokeTreeContextAction(closingPanel, QStringLiteral("Expand All")));
+    }
+    pump();
+}
 
 void testFileKinds()
 {
@@ -793,6 +946,8 @@ int main(int argc, char **argv)
         testFileKinds();
         testRootStates(scratch);
         testTreeAndInteraction(scratch);
+        testBulkContextMenu(scratch);
+        testBulkExpansionContinuation(scratch);
         testLaziness(scratch);
         testFilelistGroupAndRepaint(scratch);
         testOperations(scratch);

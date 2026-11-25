@@ -1058,6 +1058,10 @@ public:
         , timer_(new QTimer(this))
         , watchTimer_(new QTimer(this))
     {
+        if (projectRoot_.isEmpty()) {
+            publishState(QStringLiteral("no-filelist"));
+            return;
+        }
         service_ = vd_service_create();
         if (service_ == nullptr) {
             qWarning("diagnostics: cannot create the Rust service handle for the project model");
@@ -1200,7 +1204,7 @@ private:
         // The publisher may still describe ANOTHER root for one tick (the root
         // switch reaches both lanes through the same signal). Never adopt it.
         const QString publishedRoot = shell_->property("vedit.project.filesRoot").toString();
-        if (!publishedRoot.isEmpty() && !projectRoot_.isEmpty() && publishedRoot != projectRoot_) {
+        if (publishedRoot != projectRoot_) {
             return true;
         }
         const bool hasFilelist = shell_->property("vedit.project.hasFilelist").toBool();
@@ -3514,7 +3518,7 @@ public:
                 8000);
             return;
         }
-        if (projectFiles_.isEmpty()) {
+        if (!projectKnown || projectFiles_.isEmpty()) {
             // L2.2: with no file set there is nothing to lint - and the DOCK
             // must keep saying why (it reads the same poller map), not just an
             // 8 s status-bar flash. The Run stays deterministic: the published

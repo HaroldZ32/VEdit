@@ -9,7 +9,7 @@
   regions, so .sv keeps folds when tree-sitter is switched off.
   File name deliberately differs from the prohibited KDE file name.
 -->
-<language name="SystemVerilog" version="1" kateversion="5.0" section="Hardware"
+<language name="SystemVerilog" version="12" kateversion="5.79" section="Hardware"
           extensions="*.sv;*.svh" mimetype="text/x-systemverilog"
           author="VEdit" license="LGPL-2.1-or-later">
   <highlighting>
@@ -18,73 +18,166 @@
       <item>always</item><item>and</item><item>assign</item><item>automatic</item>
       <item>buf</item><item>casex</item><item>casez</item><item>deassign</item>
       <item>default</item><item>defparam</item><item>disable</item><item>edge</item>
-      <item>else</item><item>endcase</item><item>endfunction</item><item>endgenerate</item>
-      <item>endmodule</item><item>endtask</item><item>for</item><item>force</item>
+      <item>endcase</item><item>endfunction</item><item>endgenerate</item>
+      <item>endtask</item><item>for</item><item>force</item>
       <item>forever</item><item>fork</item><item>function</item><item>generate</item>
-      <item>if</item><item>ifnone</item><item>initial</item><item>inout</item>
+      <item>ifnone</item><item>initial</item><item>inout</item>
       <item>input</item><item>integer</item><item>join</item><item>localparam</item>
-      <item>module</item><item>nand</item><item>negedge</item><item>nor</item>
+      <item>nand</item><item>negedge</item><item>nor</item>
       <item>not</item><item>or</item><item>output</item><item>parameter</item>
       <item>posedge</item><item>reg</item><item>release</item><item>repeat</item>
       <item>signed</item><item>supply0</item><item>supply1</item><item>task</item>
       <item>time</item><item>tri</item><item>triand</item><item>trior</item>
       <item>trireg</item><item>unsigned</item><item>wait</item><item>wand</item>
       <item>while</item><item>wire</item><item>wor</item><item>xnor</item><item>xor</item>
+      <item>bit</item><item>byte</item><item>int</item><item>logic</item><item>longint</item>
+      <item>shortint</item><item>string</item><item>struct</item><item>union</item><item>enum</item>
+      <item>typedef</item><item>const</item><item>static</item><item>return</item><item>void</item>
+      <item>virtual</item><item>extern</item><item>pure</item><item>import</item><item>export</item>
+      <item>assert</item><item>assume</item><item>cover</item><item>unique</item><item>priority</item>
     </list>
+    <list name="moduleStart"><item>module</item><item>macromodule</item></list>
+    <list name="moduleEnd"><item>endmodule</item></list>
+    <list name="blockStart"><item>begin</item></list>
+    <list name="blockEnd"><item>end</item></list>
+    <list name="conditional"><item>if</item><item>else</item></list>
+    <list name="subroutine"><item>function</item><item>task</item></list>
     <list name="veditFoldBegin">
-      <item>module</item><item>interface</item><item>program</item><item>class</item>
-      <item>package</item><item>generate</item><item>function</item><item>task</item>
-      <item>case</item><item>casex</item><item>casez</item><item>randcase</item><item>begin</item>
+      <item>interface</item><item>program</item><item>class</item>
+      <item>package</item><item>generate</item>
+      <item>case</item><item>casex</item><item>casez</item><item>randcase</item>
+      <item>fork</item><item>clocking</item><item>primitive</item><item>covergroup</item>
+      <item>checker</item><item>property</item><item>sequence</item><item>randsequence</item>
+      <item>specify</item><item>config</item><item>table</item>
     </list>
     <list name="veditFoldEnd">
-      <item>endmodule</item><item>endinterface</item><item>endprogram</item>
+      <item>endinterface</item><item>endprogram</item>
       <item>endclass</item><item>endpackage</item><item>endgenerate</item>
-      <item>endfunction</item><item>endtask</item><item>endcase</item><item>end</item>
+      <item>endfunction</item><item>endtask</item><item>endcase</item>
+      <item>join</item><item>join_any</item><item>join_none</item><item>endclocking</item>
+      <item>endprimitive</item><item>endgroup</item><item>endchecker</item><item>endproperty</item>
+      <item>endsequence</item><item>endspecify</item><item>endconfig</item><item>endtable</item>
     </list>
     <contexts>
       <context name="Normal" attribute="Normal Text" lineEndContext="#stay">
-        <!--
-          Folding, in the KDE keyword-list idiom that KSyntaxHighlighting 6.24
-          actually understands (task T45): the previous `<keyword String="module"/>`
-          form was resolved as a keyword-LIST name, failed with
-          "Unknown keyword list", and produced ZERO folding regions. The fold words
-          now live in two lists referenced by name:
-            veditFoldBegin: module, interface, program, class, package, generate,
-                            function, task, case, casex, casez, randcase, begin
-            veditFoldEnd:   endmodule, endinterface, endprogram, endclass,
-                            endpackage, endgenerate, endfunction, endtask,
-                            endcase, end
-          One region name; the begin/end events are counted, so nesting balances.
-        -->
+        <keyword attribute="Keyword" context="Module Name" String="moduleStart" beginRegion="Module"/>
+        <keyword attribute="Keyword" context="#stay" String="moduleEnd" endRegion="Module"/>
+        <keyword attribute="Block Delimiter" context="#stay" String="blockStart" beginRegion="Block"/>
+        <keyword attribute="Block Delimiter" context="#stay" String="blockEnd" endRegion="Block"/>
+        <keyword attribute="Conditional" context="#stay" String="conditional"/>
+        <keyword attribute="Keyword" context="Subroutine Header" String="subroutine" beginRegion="veditFold"/>
         <keyword attribute="Keyword" context="#stay" String="veditFoldBegin" beginRegion="veditFold"/>
         <keyword attribute="Keyword" context="#stay" String="veditFoldEnd" endRegion="veditFold"/>
-
         <keyword attribute="Keyword" context="#stay" String="keywords"/>
-
+        <RegExpr attribute="Normal Text" context="Parameter Open" String="(?:[A-Za-z_][\w$]*|\\\S+)(?=\h*#\h*(?:\(|$))"/>
+        <RegExpr attribute="Normal Text" context="Instance Name" String="(?:[A-Za-z_][\w$]*|\\\S+)(?=\h+(?:/\*[^*]*(?:\*+[^*/][^*]*)*\*+/\h*)?(?:[A-Za-z_][\w$]*|\\\S+)(?:\h*\[[^\]]*\])*\h*\()"/>
+        <RegExpr attribute="Normal Text" context="Possible Instance" firstNonSpace="true" String="(?:[A-Za-z_][\w$]*|\\\S+)(?=\h*(?://.*)?$)"/>
+        <IncludeRules context="Expression"/>
+      </context>
+      <context name="Subroutine Header" attribute="Normal Text" lineEndContext="#stay">
+        <DetectChar attribute="Normal Text" context="#pop" char=";"/>
+        <keyword attribute="Keyword" context="#stay" String="keywords"/>
+        <IncludeRules context="Expression"/>
+      </context>
+      <context name="Possible Instance" attribute="Normal Text" lineEndContext="#stay" fallthroughContext="#pop">
+        <DetectSpaces/>
+        <IncludeRules context="Comments"/>
+        <RegExpr attribute="Normal Text" context="#pop!Instance Name" lookAhead="true" String="(?:[A-Za-z_][\w$]*|\\\S+)(?:\h*\[[^\]]*\])*\h*\("/>
+      </context>
+      <context name="Module Name" attribute="Normal Text" lineEndContext="#stay" fallthroughContext="#pop">
+        <DetectSpaces/>
+        <IncludeRules context="Comments"/>
+        <RegExpr attribute="Keyword" context="#stay" String="(?:automatic|static)(?![\w$])"/>
+        <RegExpr attribute="Module Definition" context="#pop" String="[A-Za-z_][\w$]*|\\\S+"/>
+      </context>
+      <context name="Parameter Open" attribute="Normal Text" lineEndContext="#stay" fallthroughContext="#pop">
+        <DetectSpaces/>
+        <DetectChar attribute="Operator" context="#pop!Parameter Parenthesis" char="#"/>
+      </context>
+      <context name="Parameter Parenthesis" attribute="Normal Text" lineEndContext="#stay" fallthroughContext="#pop">
+        <DetectSpaces/>
+        <IncludeRules context="Comments"/>
+        <DetectChar attribute="Normal Text" context="#pop!Parameters" char="("/>
+      </context>
+      <context name="Parameters" attribute="Normal Text" lineEndContext="#stay">
+        <DetectChar attribute="Normal Text" context="#pop!Instance Name" char=")"/>
+        <IncludeRules context="Parentheses"/>
+      </context>
+      <context name="Instance Name" attribute="Normal Text" lineEndContext="#stay" fallthroughContext="#pop">
+        <DetectSpaces/>
+        <IncludeRules context="Comments"/>
+        <RegExpr attribute="Module Instance" context="#pop!Ports Open" String="[A-Za-z_][\w$]*|\\\S+"/>
+      </context>
+      <context name="Ports Open" attribute="Normal Text" lineEndContext="#stay" fallthroughContext="#pop">
+        <DetectSpaces/>
+        <IncludeRules context="Comments"/>
+        <DetectChar attribute="Bracket" context="Dimension" char="["/>
+        <DetectChar attribute="Normal Text" context="#pop!Ports" char="("/>
+      </context>
+      <context name="Dimension" attribute="Normal Text" lineEndContext="#stay">
+        <DetectChar attribute="Bracket" context="#pop" char="]"/>
+        <DetectChar attribute="Bracket" context="Dimension" char="["/>
+        <IncludeRules context="Expression"/>
+      </context>
+      <context name="Ports" attribute="Normal Text" lineEndContext="#stay">
+        <DetectChar attribute="Normal Text" context="#pop!Next Instance" char=")"/>
+        <IncludeRules context="Parentheses"/>
+      </context>
+      <context name="Next Instance" attribute="Normal Text" lineEndContext="#stay" fallthroughContext="#pop">
+        <DetectSpaces/>
+        <IncludeRules context="Comments"/>
+        <DetectChar attribute="Normal Text" context="#pop!Instance Name" char=","/>
+      </context>
+      <context name="Parentheses" attribute="Normal Text" lineEndContext="#stay">
+        <DetectChar attribute="Normal Text" context="#pop" char=")"/>
+        <DetectChar attribute="Normal Text" context="Parentheses" char="("/>
+        <IncludeRules context="Expression"/>
+      </context>
+      <context name="Expression" attribute="Normal Text" lineEndContext="#stay">
+        <IncludeRules context="Comments"/>
+        <DetectChar attribute="String" context="String" char="&quot;"/>
+        <DetectChar attribute="Bracket" context="#stay" char="{" beginRegion="Brace"/>
+        <DetectChar attribute="Bracket" context="#stay" char="}" endRegion="Brace"/>
+        <AnyChar attribute="Bracket" context="#stay" String="[]"/>
+        <RegExpr attribute="Number" context="#stay" String="\b\d[\d_]*'[sS]?[bBoOdDhH][0-9a-fA-FxXzZ_?]+"/>
+        <RegExpr attribute="Number" context="#stay" String="\b\d[\d_]*(\.\d[\d_]*)?\b"/>
+        <RegExpr attribute="Macro" context="#stay" String="`[A-Za-z_][\w$]*"/>
+        <RegExpr attribute="Operator" context="#stay" String="(?:/(?![/*])|[&amp;|^~!+\-*%&lt;&gt;=?:])+"/>
+        <RegExpr attribute="Normal Text" context="#stay" String="[A-Za-z_][\w$]*|\\\S+"/>
+      </context>
+      <context name="Comments" attribute="Normal Text" lineEndContext="#stay">
         <RegExpr attribute="Comment" context="#stay" String="//.*$"/>
         <Detect2Chars attribute="Comment" context="BlockComment" char="/" char1="*" beginRegion="Comment"/>
-        <DetectChar attribute="String" context="String" char="&quot;"/>
-        <RegExpr attribute="Number" context="#stay" String="\b\d+'[bBoOdDhH][0-9a-fA-FxXzZ_?]+\b"/>
-        <RegExpr attribute="Number" context="#stay" String="\b\d+(\.\d+)?\b"/>
-        <RegExpr attribute="Operator" context="#stay" String="[&amp;|^~!+\-*/%&lt;&gt;=?:]+"/>
-        <RegExpr attribute="Data Type" context="#stay" String="[A-Za-z_][A-Za-z0-9_$]*"/>
       </context>
       <context name="BlockComment" attribute="Comment" lineEndContext="#stay">
         <Detect2Chars attribute="Comment" context="#pop" char="*" char1="/" endRegion="Comment"/>
       </context>
       <context name="String" attribute="String" lineEndContext="#pop">
-        <Detect2Chars attribute="String" context="#stay" char="\" char1="&quot;"/>
+        <RegExpr attribute="String" context="#stay" String="\\."/>
+        <LineContinue attribute="String" context="#stay"/>
         <DetectChar attribute="String" context="#pop" char="&quot;"/>
       </context>
     </contexts>
     <itemDatas>
       <itemData name="Normal Text" defStyleNum="dsNormal"/>
       <itemData name="Keyword" defStyleNum="dsKeyword"/>
+      <itemData name="Block Delimiter" defStyleNum="dsKeyword"/>
+      <itemData name="Conditional" defStyleNum="dsControlFlow" italic="1"/>
+      <itemData name="Module Definition" defStyleNum="dsBuiltIn" bold="1"/>
+      <itemData name="Module Instance" defStyleNum="dsVariable"/>
+      <itemData name="Bracket" defStyleNum="dsPreprocessor"/>
       <itemData name="Comment" defStyleNum="dsComment"/>
       <itemData name="String" defStyleNum="dsString"/>
       <itemData name="Number" defStyleNum="dsDecVal"/>
       <itemData name="Operator" defStyleNum="dsOperator"/>
-      <itemData name="Data Type" defStyleNum="dsNormal"/>
+      <itemData name="Macro" defStyleNum="dsPreprocessor"/>
     </itemDatas>
   </highlighting>
+  <general>
+    <keywords weakDeliminator="$"/>
+    <comments>
+      <comment name="singleLine" start="//"/>
+      <comment name="multiLine" start="/*" end="*/" region="Comment"/>
+    </comments>
+  </general>
 </language>

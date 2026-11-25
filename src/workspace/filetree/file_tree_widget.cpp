@@ -9,10 +9,12 @@
 
 #include <QAction>
 #include <QDir>
+#include <QElapsedTimer>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QInputDialog>
 #include <QItemSelectionModel>
+#include <QKeyEvent>
 #include <QKeySequence>
 #include <QLabel>
 #include <QLineEdit>
@@ -21,7 +23,6 @@
 #include <QPointer>
 #include <QStackedWidget>
 #include <QTimer>
-#include <QToolBar>
 #include <QTreeView>
 #include <QVBoxLayout>
 #include <QCoreApplication>
@@ -48,44 +49,20 @@ void FileTreeWidget::buildUi()
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    toolBar_ = new QToolBar(this);
-    toolBar_->setObjectName(QStringLiteral("fileTreeToolBar"));
-    toolBar_->setMovable(false);
-    toolBar_->setFloatable(false);
-    toolBar_->setToolButtonStyle(Qt::ToolButtonTextOnly);
-    toolBar_->setIconSize(QSize(16, 16));
-
-    openAction_ = toolBar_->addAction(QCoreApplication::translate("VEdit", "Open..."));
-    openAction_->setToolTip(QCoreApplication::translate("VEdit", "Open a folder"));
-    openAction_->setShortcut(QKeySequence(QStringLiteral("Ctrl+Shift+O")));
-
-    newFileAction_ = toolBar_->addAction(QCoreApplication::translate("VEdit", "New File"));
-    newFileAction_->setToolTip(QCoreApplication::translate("VEdit", "Create a file here (Ctrl+N)"));
-    newFileAction_->setShortcut(QKeySequence(QStringLiteral("Ctrl+N")));
-
-    newFolderAction_ = toolBar_->addAction(QCoreApplication::translate("VEdit", "New Folder"));
-    newFolderAction_->setToolTip(QCoreApplication::translate("VEdit", "Create a folder here (Ctrl+Shift+N)"));
-    newFolderAction_->setShortcut(QKeySequence(QStringLiteral("Ctrl+Shift+N")));
-
-    renameAction_ = toolBar_->addAction(QCoreApplication::translate("VEdit", "Rename"));
-    renameAction_->setToolTip(QCoreApplication::translate("VEdit", "Rename the selection (F2)"));
-    renameAction_->setShortcut(QKeySequence(Qt::Key_F2));
-
-    deleteAction_ = toolBar_->addAction(QCoreApplication::translate("VEdit", "Delete"));
-    deleteAction_->setToolTip(QCoreApplication::translate("VEdit", "Delete the selection (Del)"));
-    deleteAction_->setShortcut(QKeySequence(Qt::Key_Delete));
-
-    refreshAction_ = toolBar_->addAction(QCoreApplication::translate("VEdit", "Refresh"));
-    refreshAction_->setToolTip(QCoreApplication::translate("VEdit", "Re-read the folder from disk (F5)"));
-    refreshAction_->setShortcut(QKeySequence(Qt::Key_F5));
-
-    collapseAction_ = toolBar_->addAction(QCoreApplication::translate("VEdit", "Collapse"));
-    collapseAction_->setToolTip(QCoreApplication::translate("VEdit", "Collapse every expanded folder"));
-
-    for (QAction *action : {openAction_, newFileAction_, newFolderAction_, renameAction_,
-                            deleteAction_, refreshAction_, collapseAction_}) {
+    const auto addTreeAction = [this](const QString &text, const QKeySequence &shortcut) {
+        auto *action = new QAction(text, this);
+        action->setShortcut(shortcut);
         action->setShortcutContext(Qt::WidgetWithChildrenShortcut);
-    }
+        addAction(action);
+        return action;
+    };
+    openAction_ = addTreeAction(tr("Open Folder"), QKeySequence(QStringLiteral("Ctrl+Shift+O")));
+    newFileAction_ = addTreeAction(QCoreApplication::translate("VEdit", "New File"), {});
+    newFolderAction_ = addTreeAction(QCoreApplication::translate("VEdit", "New Folder"),
+                                     QKeySequence(QStringLiteral("Ctrl+Shift+N")));
+    renameAction_ = addTreeAction(QCoreApplication::translate("VEdit", "Rename"), QKeySequence(Qt::Key_F2));
+    deleteAction_ = addTreeAction(QCoreApplication::translate("VEdit", "Delete"), QKeySequence(Qt::Key_Delete));
+    refreshAction_ = addTreeAction(QCoreApplication::translate("VEdit", "Refresh"), QKeySequence(Qt::Key_F5));
 
     stack_ = new QStackedWidget(this);
 
@@ -162,7 +139,6 @@ void FileTreeWidget::buildUi()
     statusLabel_->setContentsMargins(6, 3, 6, 3);
     statusLabel_->setTextInteractionFlags(Qt::TextSelectableByMouse);
 
-    layout->addWidget(toolBar_);
     layout->addWidget(stack_, 1);
     layout->addWidget(statusLabel_);
 
@@ -172,11 +148,31 @@ void FileTreeWidget::buildUi()
     connect(renameAction_, &QAction::triggered, this, &FileTreeWidget::onRename);
     connect(deleteAction_, &QAction::triggered, this, &FileTreeWidget::onDelete);
     connect(refreshAction_, &QAction::triggered, this, &FileTreeWidget::onRefresh);
-    connect(collapseAction_, &QAction::triggered, this, &FileTreeWidget::onCollapseAll);
+    expandTimer_ = new QTimer(this);
+    expandTimer_->setSingleShot(true);
+    connect(expandTimer_, &QTimer::timeout, this, &FileTreeWidget::continueExpandAll);
+    connect(view_, &QTreeView::collapsed, this, &FileTreeWidget::stopExpandAll);
+    connect(model_, &FileTreeModel::modelAboutToBeReset, this, &FileTreeWidget::stopExpandAll);
+    connect(model_, &FileTreeModel::rowsAboutToBeRemoved, this, &FileTreeWidget::stopExpandAll);
     connect(view_, &QTreeView::doubleClicked, this, &FileTreeWidget::onActivated);
     new vedit::common::ItemContextMenu(view_, [this](QMenu &menu, const QPersistentModelIndex &hit) {
         populateContextMenu(menu, hit);
     });
+    for (QWidget *background : {emptyPage_, static_cast<QWidget *>(hintLabel_),
+                                static_cast<QWidget *>(statusLabel_)}) {
+        background->setContextMenuPolicy(Qt::CustomContextMenu);
+        connect(background, &QWidget::customContextMenuRequested, this,
+                [this, background](const QPoint &point) {
+                    auto *menu = new QMenu(this);
+                    menu->setObjectName(QStringLiteral("fileTreeView-context-menu"));
+                    menu->setAttribute(Qt::WA_DeleteOnClose);
+                    populateContextMenu(*menu, {});
+                    menu->popup(background->mapToGlobal(point));
+                });
+    }
+    emptyPage_->setFocusPolicy(Qt::StrongFocus);
+    view_->installEventFilter(this);
+    emptyPage_->installEventFilter(this);
     connect(view_->selectionModel(), &QItemSelectionModel::currentChanged, this,
             &FileTreeWidget::onCurrentChanged);
     connect(model_, &FileTreeModel::rootStateChanged, this, &FileTreeWidget::applyRootState);
@@ -191,6 +187,22 @@ void FileTreeWidget::buildUi()
             });
 
     applyRootState();
+}
+
+bool FileTreeWidget::eventFilter(QObject *watched, QEvent *event)
+{
+    // The main window also owns Ctrl+N. Claim it only while Files has focus.
+    if (event->type() == QEvent::ShortcutOverride || event->type() == QEvent::KeyPress) {
+        auto *key = static_cast<QKeyEvent *>(event);
+        if (key->key() == Qt::Key_N && key->modifiers() == Qt::ControlModifier) {
+            key->accept();
+            if (event->type() == QEvent::KeyPress) {
+                newFileAction_->trigger();
+            }
+            return true;
+        }
+    }
+    return QWidget::eventFilter(watched, event);
 }
 
 // ---------------------------------------------------------------------------
@@ -436,7 +448,8 @@ QString FileTreeWidget::targetDirectory() const
     const QModelIndex current = view_->currentIndex();
     if (current.isValid()) {
         if (model_->isDirectory(current)) {
-            return model_->pathForIndex(current);
+            const QString directory = model_->pathForIndex(current);
+            return directory.isEmpty() ? model_->rootPath() : directory;
         }
         return QFileInfo(model_->pathForIndex(current)).dir().path();
     }
@@ -446,7 +459,8 @@ QString FileTreeWidget::targetDirectory() const
 QString FileTreeWidget::targetEntryPath() const
 {
     const QModelIndex current = view_->currentIndex();
-    return current.isValid() ? model_->pathForIndex(current) : QString();
+    const QString path = model_->pathForIndex(current);
+    return path == model_->rootPath() ? QString() : path;
 }
 
 QModelIndex FileTreeWidget::currentIndex() const
@@ -598,8 +612,65 @@ void FileTreeWidget::onRefresh()
     setStatus(QCoreApplication::translate("VEdit", "Refreshed '%1'").arg(QFileInfo(path).fileName()));
 }
 
+void FileTreeWidget::onExpandAll()
+{
+    const QModelIndex root = model_->index(0, 0);
+    if (!root.isValid() || !expandingBranches_.isEmpty()) {
+        return;
+    }
+    expandingBranches_.append({root, 0});
+    expandTimer_->start(0);
+}
+
+void FileTreeWidget::continueExpandAll()
+{
+    // Yield between slices. A single directory read still uses the normal model path.
+    QElapsedTimer elapsed;
+    elapsed.start();
+    while (!expandingBranches_.isEmpty() && elapsed.elapsed() < 8) {
+        const QPersistentModelIndex directory = expandingBranches_.last().index;
+        const int nextRow = expandingBranches_.last().nextRow;
+        if (nextRow == 0 && !view_->isExpanded(directory)) {
+            view_->setExpanded(directory, true);
+            if (expandingBranches_.isEmpty()) {
+                return;
+            }
+        }
+        if (nextRow >= model_->rowCount(directory)) {
+            if (model_->canFetchMore(directory)) {
+                model_->fetchMore(directory);
+                continue;
+            }
+            expandingBranches_.removeLast();
+            continue;
+        }
+        const QModelIndex child = model_->index(nextRow, 0, directory);
+        ++expandingBranches_.last().nextRow;
+        if (!model_->isDirectory(child) || model_->pathForIndex(child).isEmpty()) {
+            // The model puts files and the synthetic filelist group after real
+            // directories. Leave the remaining file batches to normal scrolling.
+            expandingBranches_.removeLast();
+            continue;
+        }
+        if (model_->isSymlink(child)) {
+            continue;
+        }
+        expandingBranches_.append({child, 0});
+    }
+    if (!expandingBranches_.isEmpty()) {
+        expandTimer_->start(0);
+    }
+}
+
+void FileTreeWidget::stopExpandAll()
+{
+    expandTimer_->stop();
+    expandingBranches_.clear();
+}
+
 void FileTreeWidget::onCollapseAll()
 {
+    stopExpandAll();
     view_->collapseAll();
 }
 
@@ -644,42 +715,50 @@ void FileTreeWidget::populateContextMenu(QMenu &menu, const QPersistentModelInde
 {
     const quint64 epoch = ++contextMenuEpoch_;
     const QString path = model_->pathForIndex(hit);
-    const bool directory = hit.isValid() && model_->isDirectory(hit);
-    QAction *open = menu.addAction(directory ? tr("Expand Folder") : tr("Open File"),
-                                   this, [this, hit]() { activateIndex(hit); });
-    open->setEnabled(!path.isEmpty());
-    vedit::common::addCopyAction(menu, tr("Copy Path"), path);
-    auto *compare = menu.addAction(tr("Compare With…"), this, [this, hit] {
-        if (hit.isValid()) {
-            emit compareFileRequested(model_->pathForIndex(hit));
+    if (hit.isValid()) {
+        const bool directory = model_->isDirectory(hit);
+        menu.addAction(directory ? tr("Expand Folder") : tr("Open File"),
+                       this, [this, hit]() { activateIndex(hit); });
+        vedit::common::addCopyAction(menu, tr("Copy Path"), path);
+        if (!directory) {
+            menu.addAction(tr("Compare With…"), this, [this, hit] {
+                if (hit.isValid()) {
+                    emit compareFileRequested(model_->pathForIndex(hit));
+                }
+            });
+            if (contextMenuExtension_) {
+                contextMenuExtension_(menu, path, [tree = QPointer(this), hit, path, epoch] {
+                    return tree && hit.isValid() && tree->contextMenuEpoch_ == epoch &&
+                           tree->model_->pathForIndex(hit) == path;
+                });
+            }
         }
-    });
-    compare->setEnabled(!path.isEmpty() && !directory);
-    if (!path.isEmpty() && !directory && contextMenuExtension_) {
-        contextMenuExtension_(menu, path, [tree = QPointer(this), hit, path, epoch] {
-            return tree && hit.isValid() && tree->contextMenuEpoch_ == epoch &&
-                   tree->model_->pathForIndex(hit) == path;
-        });
+        menu.addSeparator();
     }
-    menu.addSeparator();
-    const auto addTargetAction = [this, &menu, hit](QAction *source, bool enabled) {
-        QAction *action = menu.addAction(source->text(), this, [this, hit, source]() {
-            if (hit.isValid()) {
+    const QString root = model_->rootPath();
+    const bool ready = model_->rootState() == FileTreeModel::RootState::Ready ||
+                       model_->rootState() == FileTreeModel::RootState::EmptyFolder;
+    const auto addTargetAction = [this, &menu, hit, path, root](QAction *source, bool enabled) {
+        QAction *action = menu.addAction(source->text(), this, [this, hit, path, root, source]() {
+            if (model_->rootPath() == root && (path.isEmpty() || hit.isValid())) {
                 view_->setCurrentIndex(hit);
                 source->trigger();
             }
         });
-        action->setEnabled(enabled && source->isEnabled());
+        action->setEnabled(enabled);
     };
-    addTargetAction(newFileAction_, directory && !path.isEmpty());
-    addTargetAction(newFolderAction_, directory && !path.isEmpty());
-    const bool canModify = !path.isEmpty() && path != model_->rootPath();
-    addTargetAction(renameAction_, canModify);
-    addTargetAction(deleteAction_, canModify);
+    addTargetAction(newFileAction_, ready);
+    addTargetAction(newFolderAction_, ready);
+    if (!path.isEmpty() && path != root) {
+        addTargetAction(renameAction_, true);
+        addTargetAction(deleteAction_, true);
+    }
     menu.addSeparator();
     menu.addAction(openAction_);
     menu.addAction(refreshAction_);
-    menu.addAction(collapseAction_);
+    menu.addSeparator();
+    menu.addAction(tr("Expand All"), this, &FileTreeWidget::onExpandAll)->setEnabled(ready);
+    menu.addAction(tr("Collapse All"), this, &FileTreeWidget::onCollapseAll)->setEnabled(ready);
 }
 
 // ---------------------------------------------------------------------------
@@ -700,7 +779,7 @@ void FileTreeWidget::applyRootState()
         break;
     case FileTreeModel::RootState::NoRoot:
         treePage = false;
-        text = tr("No folder open.\nUse \"Open...\" to browse a project.");
+        text = tr("No folder open.\nRight-click here or choose File → Open Folder.");
         break;
     case FileTreeModel::RootState::Missing:
         treePage = false;
@@ -724,6 +803,7 @@ void FileTreeWidget::applyRootState()
     emptyText_ = text;
     emptyVisible_ = !text.isEmpty();
 
+    setFocusProxy(treePage ? static_cast<QWidget *>(view_) : emptyPage_);
     if (treePage) {
         hintLabel_->setText(text);
         hintLabel_->setVisible(!text.isEmpty());

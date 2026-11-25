@@ -1,6 +1,6 @@
 # VEdit 用户手册
 
-VEdit 是面向 Verilog / SystemVerilog 工程的桌面编辑器。打开一个工程文件夹后：左侧看文件与工程结构，中间写代码（支持多标签与分屏），右侧看模块层级与端口，底部做工程级搜索或开一个终端；保存后自动跑工程 lint，问题可以双击跳到源码。
+VEdit 是面向 Verilog / SystemVerilog 的桌面编辑器。可以直接打开单个文件，也可以打开文件夹来浏览和搜索工程。导入 filelist 后，右侧可查看模块层级和端口。编辑时会显示当前文件的实时诊断；需要检查整个工程时，选择 `Project → Lint Project`，双击结果即可跳到源码。
 
 本手册从**打开程序之后**讲起：界面每一块是做什么的、怎么打开和切换工程、怎么编辑与搜索、诊断怎么读、键位怎么改；最后是已知边界和安装、配置附录。文中菜单与按钮名使用程序里实际显示的英文标签，后面用中文说明它的作用。
 
@@ -23,16 +23,13 @@ VEdit 是面向 Verilog / SystemVerilog 工程的桌面编辑器。打开一个�
 
 ## 1. 这是什么：界面总览
 
-### 1.1 主窗口的六块区域
+### 1.1 主窗口布局
 
-从上到下、从左到右，主窗口分成六块：
-
-1. **菜单栏**：固定的五个菜单 `File` / `Edit` / `View` / `Project` / `Help`。
-2. **主工具栏**：最常用的命令，每个按钮带一个随主题着色的线性图标和文字，从左到右是 `New`、`Open…`、`Open Folder…`、`Switch Project…`、`Save`、`Save All`、`Undo`、`Redo`，然后是 `Search in Files`、`Lint Project`、`Format Document`。工具栏最右端是**主题按钮**（一个彩色圆点图标），点开就是六套界面配色的切换菜单。
-3. **编辑区**：每个标签页是一份打开的文件；可以水平或垂直分成多个分屏，当前分屏右上角有 `active` 标记。
-4. **左侧停靠区**：`Files`（文件树）、`Project`（工程，只在有工程时出现）、`Source Control`（版本控制）。
-5. **右侧停靠区**：`Module Tree`（模块树）、`Interface`（接口）、`Outline`（上半是大纲符号，下半是诊断列表）。
-6. **底部停靠区**：`Search`（工程搜索）、`Terminal`（内置终端）。
+- **菜单栏**提供 `File`、`Edit`、`View`、`Project` 和 `Help`。用 `File` 打开或保存文件，用 `View` 切换主题和停靠面板。
+- **编辑区**：每个标签页是一份打开的文件；可以水平或垂直分成多个分屏，当前分屏右上角有 `active` 标记。
+- **左侧停靠区**包含 `Files`（文件树）、`Project`（工程）和 `Source Control`（版本控制）。
+- **右侧停靠区**包含 `Module Tree`（模块树）、`Interface`（接口）和 `Outline`（大纲与诊断）。
+- **底部停靠区**包含 `Search`（搜索）和 `Terminal`（内置终端）。可拖动面板之间的分隔线调整宽度或高度。
 
 底部的**状态栏**：左侧是工程名 `Project: …` 和只停留几秒的一次性提示（例如「已保存」「打开失败」）；右侧依次是未保存标记 `● Unsaved changes`、主题 `Theme: <界面主题> / <语法主题>`、分屏与标签统计 `Panes: … · active: … · tabs: …`，以及诊断徽标 `<请求的 LSP>→<实际> · lint=<lint 引擎> · basis=<…> · reason=<…>`（请求与实际一致时没有箭头；末尾可能带 ` · ⚠ N`，表示设置文件里有 N 条载入警告。字段与原因码见 6.6）。
 
@@ -40,7 +37,7 @@ VEdit 是面向 Verilog / SystemVerilog 工程的桌面编辑器。打开一个�
 
 | 面板 | 默认位置 | 作用 |
 |---|---|---|
-| `Files` | 左侧 | 工程文件夹树。双击打开文件；工具栏可以新建文件/文件夹、重命名、删除、刷新；图标与文件名之间有诊断状态点 |
+| `Files` | 左侧 | 双击文件可打开。右键文件或空白处可管理文件、刷新、全部展开或全部折叠。展开时可随时用“全部折叠”中止，目录符号链接可手动展开 |
 | `Project` | 左侧（打开工程后出现） | filelist、展开出的文件、`-I` 包含目录、`-D` 宏、工程变量与解析诊断 |
 | `Source Control` | 左侧 | Git / Subversion 的工作区与历史（详见附录 D） |
 | `Search` | 底部 | 当前文件或整个工程的搜索与替换 |
@@ -60,9 +57,9 @@ VEdit 是面向 Verilog / SystemVerilog 工程的桌面编辑器。打开一个�
 ### 1.4 常用操作从哪里开始
 
 - 打开文件：`File → Open…`（`Ctrl+O`），或在 `Files` 树里双击。
-- 打开工程：`File → Open Folder…`，或工具栏的 `Open Folder…`。
+- 用 `File → Open Folder…` 打开工程，用 `File → Recent Folders` 回到最近打开过的文件夹。
 - 找东西：`Ctrl+F` 当前文件查找；`Ctrl+Alt+S` 打开 `Search` 面板搜整个工程。
-- 看问题：保存后自动 lint；`View → Outline`（`Ctrl+Alt+O`）打开大纲与诊断列表。
+- 用 `View → Outline`（`Ctrl+Alt+O`）看当前文件的实时诊断，用 `Project → Lint Project` 手动检查整个工程。
 - 改设置：`Edit → Preferences…`（`Ctrl+,`）。
 - 跳转：`F12` 定义，`Shift+F12` 引用，`F2` 重命名。
 
@@ -79,17 +76,13 @@ VEdit 是面向 Verilog / SystemVerilog 工程的桌面编辑器。打开一个�
 ### 2.2 打开工程与切换工程
 
 - `File → Open Folder…`：选一个目录作为工程打开。
-- `File → Switch Project…`（工具栏也有）：运行中换一个工程，走的是同一条路径。
-- 启动参数 `--project <目录>`：启动时直接以该目录作为工程。
+- `File → Switch Project…` 可切换到另一个文件夹，`File → Recent Folders` 可重开最近使用的文件夹。
+- 启动时可直接传入目录，或用 `--project <目录>` 指定工程根。只传文件路径时，VEdit 以独立文件模式打开；同时指定文件夹和文件时，文件夹决定工程根。
+- `File → Close Folder` 退出当前工程。切换或关闭文件夹都会保留已打开的标签页及未保存内容。
 
-**选中的目录本身就是工程根**，程序不会向上层目录继续查找。
+文件树和工程搜索以所选文件夹为根。每个文件夹分别记忆已导入的 filelist、包含目录、宏、工程变量和顶层模块。第一次只打开文件夹时可以浏览和编辑文件。需要 HDL 模块目录时导入 filelist，需要全工程检查时手动运行 `Project → Lint Project`。
 
-切换工程时：
-
-- 文件树、搜索、版本控制、模块树、接口、诊断这些**工程范围**的面板会一起切到新工程；
-- 已经打开的标签页**不会关闭**，未保存的内容也不会丢；
-- 新工程会随会话一起保存，正常退出后再启动会自动恢复；
-- 打开或切换工程后会**自动分析整个工程**（见 6.2），文件树与 `Project` 面板的状态点覆盖工程里的文件，而不只是打开过的文件。
+`File → Restore Last Folder on Startup` 默认勾选。不带路径启动时会恢复上次文件夹；取消勾选即可空启动，仍然可以从最近文件夹列表重开工程。
 
 ### 2.3 打开 filelist（`.f`）会发生什么
 
@@ -98,12 +91,14 @@ VEdit 是面向 Verilog / SystemVerilog 工程的桌面编辑器。打开一个�
 - 如果**当前已经有 filelist**：只打开文本，并在状态栏给一条约 8 秒的提示（说明未被导入、要导入请用 `Project` 面板的 `Import Filelist…`）。工程文件集一个字节都不变。
   该提示是信息性的：`File ▸ Open` 或命令行打开会在它之后显示 `Opened N file(s)` 把它覆盖掉，这是正常现象，**不代表发生了导入**。
 - 如果**当前还没有任何 filelist**：弹出一个确认框，两个动作 `Import` 与 `Open Only`，**默认、回车、关闭都是 `Open Only`**。只有点 `Import` 才会把该 filelist 所在目录设为工程根并导入；点 `Open Only` 什么都不导入，也不设置工程根。
-  注意：**没有工程时 `Project` 面板的 `Import Filelist…` 是禁用的**，所以首次设置工程根只能走这个确认框。
+  要为位于子目录的 filelist 指定项目根，可以先用 `File → Open Folder…` 打开项目目录，再从 `Project` 面板导入清单。
 - 已经有工程后要追加清单：用 `Project` 面板的 `Import Filelist…`；导入只作用于当前工程，**不切换**工程。
 
 导入之后，`Project` 面板会列出它展开出的文件、`-I` 包含目录与 `-D` 宏。**编辑 filelist 后按 `Project` 面板的 `Refresh` 重新展开**；重复导入同一个 filelist 是幂等的，会在面板底部提示 `Already imported: nothing changed (use Refresh to re-read an edited filelist)`。导入的清单随工程持久化，要移除用 `Remove Selected Filelist`。
 
 导入的 `.f` 与 `vedit.toml` 的 `[project] filelists` 就是工程文件集的全部来源；根目录下其它 `.f` 与未被声明的源文件默认不进入工程（见 2.8）。
+
+编辑本地 `.f` / `.F` 时，输入路径或按 `Ctrl+Space` 可查看目录中的文件和子目录。相对路径从当前 filelist 所在目录算起，例如输入 `../rtl/` 会列出相邻 `rtl` 目录里的内容。用回车接受文件名或进入子目录，`Esc` 关闭候选。普通路径、`-f`、`-F`、`-I` 和 `+incdir+` 都支持补全。
 
 通过 `.f` 导入、但不在工程目录内的文件会出现在 `Files` 树的 `From filelist (N)` 分组里（带诊断状态点），也会出现在 `Project` 面板的 `Files` 列表里（列表左侧有同样的标记）。
 
@@ -149,9 +144,9 @@ VEdit 是面向 Verilog / SystemVerilog 工程的桌面编辑器。打开一个�
 
 ### 2.6 恢复上次会话
 
-正常退出时，程序把下面这些写进会话文件，下次启动恢复：
+正常退出时会保存会话。不带文件参数启动时，可恢复以下内容：
 
-- 工程根；
+- 上次打开的工程根，取决于 `File → Restore Last Folder on Startup`；
 - 分屏布局、活动分屏、每个分屏里打开的文件、光标位置与滚动位置；
 - 打开过的面板与停靠布局、窗口大小；
 - 界面主题与语法主题。
@@ -162,7 +157,7 @@ VEdit 是面向 Verilog / SystemVerilog 工程的桌面编辑器。打开一个�
 - 启动时加 `--no-session-restore`：忽略已有会话，从干净状态开始。
 - 会话文件损坏时不会阻止启动：状态栏提示「Session could not be restored … — starting clean」，然后按干净状态启动。
 
-启动时，欢迎窗口的渐变条表示 VEdit 正在准备工作台。主窗口显示后即可操作；从命令行打开 `.f` 时，导入确认框会在主窗口出现之后显示。在 `Project` 面板可以查看 filelist 的展开状态。文件集就绪后，VEdit 在后台准备模块目录，并分批显示大型模块树。在目录准备期间可用 `Cancel` 取消。
+启动时，VEdit 会在其他窗口上方显示开屏图案。主窗口首次绘制后图案会自动消失，此时即可操作；从命令行打开 `.f` 时，导入确认框会在主窗口出现之后显示。在 `Project` 面板可以查看 filelist 的展开状态。文件集就绪后，VEdit 在后台准备模块目录，并分批显示大型模块树。在目录准备期间可用 `Cancel` 取消。
 
 需要减弱动效时，可在启动前设置环境变量 `VEDIT_REDUCED_MOTION=1`，欢迎窗口将显示静态渐变条。使用 `VEDIT_NO_STARTUP_WELCOME=1` 可直接打开工作台。
 
@@ -210,9 +205,7 @@ auto_discover = true
 
 ### 3.2 撤销与重做
 
-`Edit → Undo` / `Edit → Redo`，工具栏上的 `Undo` / `Redo` 是同一个命令。它们作用于**当前活动的分屏**，默认键位是 `Ctrl+Z` / `Ctrl+Shift+Z`（重做另有备用默认 `Ctrl+Y`，见 8.3）。编辑器自带的那一份键位已被移除，所以同一个按键只会触发这一个命令，不会两个动作抢键。
-
-工具栏的 `Undo` / `Redo` 只在该分屏确实可撤销/可重做时才可点。
+`Edit → Undo` 和 `Edit → Redo` 作用于当前活动的分屏。默认键位为 `Ctrl+Z` 和 `Ctrl+Shift+Z`；重做也可用 `Ctrl+Y`（见 8.3）。
 
 ### 3.3 保存
 
@@ -243,10 +236,14 @@ auto_discover = true
 三种打开方式，指向同一个面板：
 
 - `View → Toggle Search Panel`（`Ctrl+Alt+S`）；
-- 工具栏的 `Search in Files`（会打开面板并把光标放进输入框）；
+- `View → Search in Files` 会打开面板并将光标放入查询框；
 - 在 `Ctrl+F` 浮条里把范围选成 `Whole Project`，浮条会把查询交过来。
 
 面板里的控件：查询输入框、区分大小写 / 全词 / 正则三个开关、`Verilog` 过滤器（只搜 `.v` / `.vh` / `.sv` / `.svh`）、范围下拉框（`Current File` / `Whole Project`）、`Search` 与 `Cancel`、替换输入框与 `Replace` / `Replace All` 两个按钮。
+
+搜索面板和 `Ctrl+F` / `Ctrl+H` 共用最近 20 条已执行的查询。点查询框旁的历史按钮，或用 `Tab` 切到按钮、按空格打开，再用方向键和回车选词。选择后保留当前范围和匹配选项；重复的词会移到列表最前。历史在重启后仍可使用。
+
+搜索面板支持停靠在左侧、右侧或底部。在较窄的侧栏中，操作会分行排列，长结果可横向滚动查看。单独打开文件时，选 `Current File` 可搜索该文件已保存的内容并跳到匹配位置。若要查找尚未保存的编辑内容，可在编辑器内按 `Ctrl+F`。
 
 ### 4.2 搜索
 
@@ -331,7 +328,7 @@ auto_discover = true
 
 ### 6.3 显式 Lint Project
 
-菜单与工具栏的 `Lint Project` 是**唯一**的工程检查入口。它覆盖当前展开后的工程文件集（需要**已导入 filelist**；没有 filelist 时会说明需要先导入），跑完后结果显示在底部「工程 LINT」dock：文件树 + 问题列表，双击一条跳到它。**不再弹模态窗口**打断你；状态栏只给一条可点击的摘要提示。工程文件集展开慢时，dock 常驻显示状态；文件集 **300 秒**软超时后继续等待同一任务，不会丢结果或重开第二个展开。
+用 `Project → Lint Project` 启动工程检查。它覆盖当前展开后的工程文件集（需要**已导入 filelist**；没有 filelist 时会说明需要先导入），跑完后结果显示在底部「工程 LINT」dock：文件树 + 问题列表，双击一条跳到它。**不再弹模态窗口**打断你；状态栏只给一条可点击的摘要提示。工程文件集展开慢时，dock 常驻显示状态；文件集 **300 秒**软超时后继续等待同一任务，不会丢结果或重开第二个展开。
 
 ### 6.4 诊断面板与悬浮修复
 
@@ -438,7 +435,7 @@ preprocessing error at "`MACRO" Error expanding macro identifier, might not be d
 | 查找引用 | `Shift+F12`、`Project → Find References` | 结果显示在独立的引用列表里，双击跳转 |
 | 重命名符号（当前文件） | `F2`、`Project → Rename Symbol…`、右键 | 由所选 LSP 后端提供，会真正应用编辑；会话是文件作用域的 |
 | 工程级重命名 | `Ctrl+Shift+F2`、`Project → Rename Symbol in Project…`、右键 | 用 slang AST 索引整个工程文件集；先预览再应用，见下 |
-| 格式化文档 | `Ctrl+Shift+F`、`Project → Format Document`、工具栏 | 按语言分派：Verilog/SystemVerilog 调 `verible-verilog-format`；VHDL 走 `vsg --fix`（含 GHDL 语法门，见 9.4）。结果**一次撤销**可回退 |
+| 格式化文档 | `Ctrl+Shift+F`、`Project → Format Document` | 按语言分派：Verilog/SystemVerilog 调 `verible-verilog-format`；VHDL 走 `vsg --fix`（含 GHDL 语法门，见 9.4）。结果**一次撤销**可回退 |
 
 - `Ctrl+点击`：先把光标放到点击处，再走与 `F12` 相同的路径。后端不支持定义时，它**按普通点击处理**，并在状态栏说明一次原因，不会静默吞掉点击。
 - 重命名（`F2`，LSP）：光标必须落在**可改名的符号**上；不在符号上时**先给出原因**（第几行第几列没有符号），不会先让你输入新名字再失败。后端不提供重命名能力时，菜单与右键项**置灰并说明原因**，请求路径也会拒绝。重命名结果会应用到打开的文档；未打开的文件经原子保存写入磁盘；完成后报告编辑数量，并分别说明哪些文档在编辑器里改了、哪些文件写盘了。
@@ -448,7 +445,14 @@ preprocessing error at "`MACRO" Error expanding macro identifier, might not be d
 
 导入工程文件清单后，保存当前 Verilog/SystemVerilog 文件并将光标放在信号上。编辑器右键菜单和 `Project` 菜单提供 `Trace Driver`（追踪驱动）和 `Trace Load`（追踪负载）。只有一个直接结果时，编辑器会跳到源位置。有多个结果时，列表按完整实例路径分组，选中一项后按 Enter 或点“跳转到源位置”。
 
-`Show Driver Chain`（查看驱动链）和 `Show Load Chain`（查看负载链）展开可跳转的分支。循环有明确标记，树最多显示 512 行、32 层。追踪使用 slang 编译器和保存后的工程文件，支持常见端口与赋值，按信号而非位级精度追踪。
+| 操作 | 默认快捷键 |
+|---|---|
+| 查驱动 | `F7` |
+| 查负载 | `F9` |
+| 查看驱动链 | `Shift+F7` |
+| 查看负载链 | `Shift+F9` |
+
+在 `Edit → Preferences → Shortcuts` 中可分别改这四个键位。`Show Driver Chain` 和 `Show Load Chain` 按分支展开连接。每一跳列出信号从哪里来、流向哪里，可跳到对应源码。拖动表头分界线可看清较长的实例路径；接口表和模块树也支持拖动列宽。循环有明确标记，树最多显示 512 行、32 层。追踪使用 slang 编译器和保存后的工程文件，支持常见端口与赋值，按信号而非位级精度追踪。
 
 #### 工程级重命名（`Rename Symbol in Project…`）
 
@@ -542,12 +546,12 @@ preprocessing error at "`MACRO" Error expanding macro identifier, might not be d
 
 主题分两层，互不干扰：
 
-- **界面主题**（`Interface theme` 下拉框，在 `Theme` 上方）决定窗口本身的配色：画布、面板卡片、工具栏、标签页、状态栏与强调色。共六套，中文界面显示 `云雾白`、`暖杏黄`、`薄荷绿`、`晴空蓝`、`曜石黑`、`深夜蓝`，英文界面显示 `Cloud White`、`Warm Apricot`、`Mint Green`、`Sky Blue`、`Obsidian`、`Deep Navy`（前四套浅色、后两套深色）。切换入口有三个，效果完全一致：`View → 主题` 子菜单、工具栏最右端的主题按钮、以及首选项的这个下拉框。**任一次切换都会立即生效并写入设置的 `uiTheme` 键**，重启读回最后一次选择。其中「主题」子菜单与工具栏按钮是同一个主题菜单的两处入口，与首选项下拉写的是同一个键。
+- **界面主题**（`Interface theme` 下拉框，在 `Theme` 上方）决定窗口本身的配色：画布、面板卡片、工具栏、标签页、状态栏与强调色。共六套，中文界面显示 `云雾白`、`暖杏黄`、`薄荷绿`、`晴空蓝`、`曜石黑`、`深夜蓝`，英文界面显示 `Cloud White`、`Warm Apricot`、`Mint Green`、`Sky Blue`、`Obsidian`、`Deep Navy`（前四套浅色、后两套深色）。可从 `View → 主题` 或首选项的下拉框切换，两处共享 `uiTheme` 设置。切换立即生效，重启时沿用上次选择。
 - **语法主题**（`Theme` 下拉框）只决定**编辑器内部**的配色：背景、文字、选中、禁用态与各类语法记号。它来自 KSyntaxHighlighting 的整套配色（`Breeze Light`、`Solarized Dark`、`Nord`、`Dracula` 等数十种），选中即应用。
 
 状态栏的 `Theme: … / …` 同时显示两者：前面是界面主题，后面是语法主题。切换界面主题**不会**覆盖你手动选过的语法主题；界面主题只在你从未手动选过语法主题时，为浅色/深色配对一个合适的默认语法主题。
 
-主题只改配色，不改文件类型与高亮定义。
+`.md` 和 `.markdown` 文件自动高亮标题、强调、链接与代码。Verilog / SystemVerilog 区分模块定义名与例化名、`if` / `else` 与 `begin` / `end`，也会为 `[]` 和 `{}` 着色。具体颜色跟随编辑器语法主题。
 
 ### 8.3 快捷键
 
@@ -591,7 +595,6 @@ preprocessing error at "`MACRO" Error expanding macro identifier, might not be d
 | `View` | `Close Pane` | `Ctrl+W` | 关闭当前分屏 |
 | `View` | `Reset Layout` | `Ctrl+Alt+R` | 回到单分屏（有未保存文档时会先询问） |
 | `View` | `Mixed Split (demo)` | `Ctrl+Alt+M` | 混合分屏（演示；有未保存文档时会先询问） |
-| `View` | `Toolbar` | `Ctrl+Alt+Shift+T` | 显示/隐藏主工具栏 |
 | `View` | `Search in Files` | `Ctrl+Alt+Shift+F` | 打开搜索面板 |
 | `View` | `Toggle Files Panel` | `Ctrl+Alt+F` | 文件面板 |
 | `View` | `Toggle Search Panel` | `Ctrl+Alt+S` | 搜索面板 |
@@ -622,7 +625,6 @@ preprocessing error at "`MACRO" Error expanding macro identifier, might not be d
 
 - `Ctrl+Z` / `Ctrl+Shift+Z` / `Ctrl+S` / `Ctrl+Shift+S` / `Ctrl+P` 这几个键，编辑器自己也有一份动作。程序会把**编辑器那一份移除**，让按键只落到上面的命令上；否则 Qt 会把两个同键动作判为歧义、两个都不触发。所以它们不是死键：`Ctrl+P` 是“转到文件”，不是打印。
 - 旧版本用过的 `Ctrl+Shift+H`（分屏）与 `Ctrl+Alt+V`（版本控制面板）正好被编辑器自己的动作占用，已分别改为 `Ctrl+Alt+H` 与 `Ctrl+Alt+C`，不再出现在上表。
-- `Ctrl+Alt+T`（GNOME/Ubuntu：打开终端）与 `Ctrl+Alt+D`（KDE：显示桌面）是桌面全局快捷键，按键会在应用收到之前被桌面消费；因此工具栏的默认取 `Ctrl+Alt+Shift+T`，诊断/大纲面板的 View 菜单项用 `Ctrl+Alt+O`。
 - 查找/替换浮条与编辑器内部键位（`Ctrl+G`、`Ctrl+D` 等）不在这个页里，见 7.3。
 - 上表是默认值；你改过的键位会覆盖它（`State` 变成 `custom`），保存在 `shortcuts.json`（见附录 B）。备用默认（重做的 `Ctrl+Y`、格式化的 `Alt+Shift+F`）也是默认键位；一旦给该命令设了自己的键，就以你的键为准，备用默认不再附加。
 
@@ -674,7 +676,9 @@ preprocessing error at "`MACRO" Error expanding macro identifier, might not be d
 - API key 的顺序不受上面两条影响：`VEDIT_FIM_API_KEY` > 设置目录下权限 `0600` 的 `fim_api_key` > `vedit.toml` 里的值。
 - 没有绑定设置文件时（纯 `vedit.toml` 路径，此时不存在「设置文件同目录」），密钥顺序退化为 `VEDIT_FIM_API_KEY` > `vedit.toml` 里的值。
 
-使用时在编辑器里按 `Alt+\` 请求补全；`Tab` 接受，`Esc` 取消，继续输入会让建议作废。失败只在状态栏显示一句短提示，不阻塞编辑。
+配置服务并点 `Apply` 后，在编辑器中按 `Alt+\`，或右键选 `Request FIM Completion`。每次手动请求会把当前文档在光标处分成前文和后文发给所配服务。日常输入和移动光标都不会发请求。
+
+`Tab` 接受完整建议，`Esc` 取消。行中预览会避开光标后的正文；启用虚影时，行尾可直接显示建议。未启用、缺少配置或请求失败时，编辑器内会显示原因。
 
 ### 8.6 外观
 
@@ -804,8 +808,8 @@ VHDL 走**独立的一条 lane**，不碰 verible / slang：
 9. **界面语言的 `Auto` 在 AppImage 里通常落到英文**：包内只有 `C.UTF-8`；需要中文请显式选择（见 9.1）。
 10. **打包产物不加载用户自定义语法定义**：AppImage 只加载随包白名单里的语法定义；放在用户目录里的自定义定义在 AppImage 里不会生效。
 11. **没有真机 GUI 验证**：本版本的界面证据来自离屏 / 软件渲染环境与代码核对，没有在真实桌面上用鼠标逐项验收；实际观感、DPI、字体与中文渲染可能不同，需要在你的桌面上确认。软件渲染截图里缺 CJK 字体时，某些按钮（例如「修复」）会显示成方块——按钮存在且位置正确，不代表产品表现。
-12. **FIM 的错误提示只有中文**：FIM 不可用或失败时，状态栏显示的原因来自 Rust 服务，固定为中文短句（如 `FIM 未启用`、`FIM 超时（5000ms）`），不随界面语言切换。
-13. **语法定义的「同名遮蔽」**：随包的 5 份定义（Verilog / SystemVerilog / VHDL / Markdown / Tcl）都声明 `version="1"`。在**自己从源码构建、且系统装有 KDE 语法定义**的环境里，KF6 语法仓库同名时取版本高者，KDE 内嵌的 verilog / systemverilog / vhdl / markdown 会胜出——这 4 个名字实际生效的是 KDE 副本，只有 Tcl 用我们的定义。**交付的 AppImage 不受影响**：AppRun 收窄 XDG，私有语法库只含随包白名单的 5 份。把版本号提高是已登记但未做的决策。
+12. **FIM 预览长度**。预览会根据可用空间显示建议的首行；按 `Tab` 可插入完整内容。
+13. **HDL 高亮按源文本识别**。宏展开生成的模块名或例化名可能沿用普通标识符的样式。
 14. **VHDL 只覆盖诊断 / 合并 lint / 格式化**：hover、跳转定义、outline、重命名、debug、全工程 elaborate 本版本没有产品入口；会话按磁盘内容打开、未接 `didChange`（未保存的修改不会推送）；默认只生成单库映射，多库工程请自备 `vhdl_ls.toml`。见 9.4。
 15. **Scala：运行 lane 之外的编辑器能力未接线**：Metals 随包、离线会话经实测可用，但编辑器内**没有** Metals LSP 会话（hover/定义等未接）；离线仍会尝试 DNS（全部失败，`ENETUNREACH`），**不声称零系统调用**；未预热依赖会点名缺失坐标。见 9.5。
 16. **环境变量导入的边界**：手工捕获默认存项目层（项目覆盖全局）；**启动自动采集**写 global 层、只取 shell 改变过的变量，`VEDIT_NO_ENV_AUTOCAPTURE=1` 可关闭。秘密形状名字在手工页默认掩码、未显式 reveal 时不落盘，但**自动采集会把 shell 改变过的密钥形状变量一并写入 global 层**并交给 LSP / 终端 / 工具链子进程（VCS 除外）；不想这样就用上面的开关或只用手工捕获。捕获按 shell 语法“最后赋值胜出”，内置 shell 家族（含 csh / tcsh / fish）都用 `env -0` 的 NUL 输出，值里含换行也能完整捕获（只有自定义程序输出换行分隔时才会被拆开并给警告）；目标机没装的 shell 家族会显式报错。见 8.10。

@@ -1,5 +1,7 @@
 #include "session_store.h"
 
+#include "path_display.h"
+
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -8,6 +10,7 @@
 #include <QJsonParseError>
 #include <QJsonValue>
 #include <QSaveFile>
+#include <QSettings>
 #include <QStandardPaths>
 #include <QStringLiteral>
 #include <QCoreApplication>
@@ -263,6 +266,60 @@ bool SessionStore::save(const QJsonObject &object, QString *error) const
         return false;
     }
     return true;
+}
+
+QString SessionStore::workspaceSettingsPath() const
+{
+    return QFileInfo(path_).absoluteDir().filePath(QStringLiteral("workspace.ini"));
+}
+
+QString SessionStore::lastFolder() const
+{
+    const QSettings settings(workspaceSettingsPath(), QSettings::IniFormat);
+    if (settings.contains(QStringLiteral("lastFolder"))) {
+        return settings.value(QStringLiteral("lastFolder")).toString();
+    }
+    // Legacy sessions stored their workspace root only in the layout archive.
+    return load(nullptr).value(QStringLiteral("project")).toString();
+}
+
+QStringList SessionStore::recentFolders() const
+{
+    const QSettings settings(workspaceSettingsPath(), QSettings::IniFormat);
+    return settings.value(QStringLiteral("recentFolders")).toStringList();
+}
+
+void SessionStore::rememberFolder(const QString &folder) const
+{
+    QSettings settings(workspaceSettingsPath(), QSettings::IniFormat);
+    settings.setValue(QStringLiteral("lastFolder"), folder);
+    if (folder.isEmpty()) {
+        return;
+    }
+    // Keep the chosen spelling for display and project identity, while treating
+    // an alias of the same directory as the same entry in the menu.
+    const auto identity = [](const QString &path) {
+        const QString canonical = QFileInfo(path).canonicalFilePath();
+        return canonical.isEmpty() ? vedit::paths::normalizedRoot(path) : canonical;
+    };
+    QStringList recent = settings.value(QStringLiteral("recentFolders")).toStringList();
+    const QString selected = identity(folder);
+    recent.removeIf([&](const QString &path) { return identity(path) == selected; });
+    recent.prepend(folder);
+    constexpr qsizetype kRecentFolderLimit = 12;
+    settings.setValue(QStringLiteral("recentFolders"), recent.mid(0, kRecentFolderLimit));
+}
+
+bool SessionStore::restoresLastFolder() const
+{
+    const QSettings settings(workspaceSettingsPath(), QSettings::IniFormat);
+    return settings.value(QStringLiteral("restoreLastFolder"), true).toBool();
+}
+
+void SessionStore::setRestoresLastFolder(bool enabled) const
+{
+    QSettings settings(workspaceSettingsPath(), QSettings::IniFormat);
+    settings.setValue(QStringLiteral("restoreLastFolder"), enabled);
 }
 
 } // namespace vedit::app

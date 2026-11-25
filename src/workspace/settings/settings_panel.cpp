@@ -932,8 +932,11 @@ QWidget *SettingsPanel::buildFimPage()
     layout->addWidget(keyGroup);
 
     auto *hint = new QLabel(
-        tr("FIM is off by default: with no endpoint configured VEdit never touches the "
-           "network."),
+        tr("FIM is off by default. After enabling and applying provider settings, press "
+           "%1 or choose Request FIM Completion in the editor menu. Each request sends the "
+           "current document, split at the caret, to the configured endpoint. Tab inserts the "
+           "suggestion, and Esc dismisses it.")
+            .arg(QKeySequence(Qt::AltModifier | Qt::Key_Backslash).toString(QKeySequence::NativeText)),
         fimPage_);
     hint->setWordWrap(true);
     layout->addWidget(hint);

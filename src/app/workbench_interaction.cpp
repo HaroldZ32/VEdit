@@ -161,6 +161,26 @@ private:
                                              dock, [dock, floating]() { dock->setFloating(!floating); });
         placement->setEnabled(floating ? dock->allowedAreas() != Qt::NoDockWidgetArea
                                        : dock->features().testFlag(QDockWidget::DockWidgetFloatable));
+        if (dock->objectName() == QLatin1String("dock-search")) {
+            if (auto *window = qobject_cast<QMainWindow *>(dock->parentWidget())) {
+                menu->addSeparator();
+                const auto addPosition = [menu, window, dock, floating](const QString &label,
+                                                                        Qt::DockWidgetArea area) {
+                    QAction *action = menu->addAction(label, dock, [window, dock, area]() {
+                        window->addDockWidget(area, dock);
+                        dock->setFloating(false);
+                        dock->show();
+                        dock->raise();
+                    });
+                    action->setEnabled((floating || window->dockWidgetArea(dock) != area) &&
+                                       dock->allowedAreas().testFlag(area));
+                };
+                addPosition(tr("Dock Left"), Qt::LeftDockWidgetArea);
+                addPosition(tr("Dock Right"), Qt::RightDockWidgetArea);
+                addPosition(tr("Dock Bottom"), Qt::BottomDockWidgetArea);
+                menu->addSeparator();
+            }
+        }
         QAction *hide = menu->addAction(tr("Hide Panel"), dock, &QWidget::hide);
         hide->setEnabled(dock->features().testFlag(QDockWidget::DockWidgetClosable));
         menu->popup(global);

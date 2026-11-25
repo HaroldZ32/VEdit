@@ -229,6 +229,7 @@ so all pure-ASCII metrics change.
 
 ## 6. Git discipline
 
+- 每次修改代码，都要在交付前将本次改动提交并推送到远端任务分支，向 `dev` 创建 PR。若该任务已有打开的 PR，就推送到对应分支更新该 PR。交付时附上 PR 链接。
 - Work lands through pull requests; never commit directly to `main` or `dev`.
   `fix/<slug>`, `feat/<slug>`, `chore/<slug>` and `docs/<slug>` branch off `dev`,
   the PR merges into `dev` (a merge commit is allowed), and a release promotes
@@ -264,19 +265,11 @@ so all pure-ASCII metrics change.
 - Never commit or echo secrets, tokens or credentials.
 - Keep generated logs and evidence free of secret material.
 
-## 9. KTextEditor 语法定义仓库事实（T127，重要）
+## 9. KTextEditor 实际使用的语法定义
 
-KTextEditor 的 `KSyntaxHighlighting::Repository` **不认**我们随包的两份 XML
-（`resources/syntax/vedit-*.xml`）：解析 `SystemVerilog` / `Verilog` 时它指向 **KDE 自带的定义**
-（例如 SystemVerilog 的 author 是 `Sean O'Boyle (seanoboyle@intelligentdv.com)`）。
-`Repository::addCustomSearchPath()` 与私有 XDG 目录都改变不了这一点，
-因为 `KTextEditor::Editor::repository()` 返回 const，没有公共注入路径。
+`KTextEditor::Editor::repository()` 返回只读仓库。Qt6 开发构建通过 `src/editor/kernel/rendered_languages.qrc` 将 HDL 定义注册到 KDE 的 `syntax-addons` 资源入口；精简的 AppDir 从 `usr/share/org.kde.syntax-highlighting/syntax` 读取随包定义。修改 HDL 定义时同步核对 `THIRD_PARTY_NOTICES.md` 的资源哈希。Markdown 在开发构建中可使用 KDE 自带定义，精简包使用随包定义。
 
-**后果**：编辑器里实际生效的高亮/原生折叠来自 KDE 自带定义；我们的 XML 只被面包屑的语法扫描
-（`syntax_breadcrumb_source.*`，读 `resources/queries/*/structure.scm`）使用（T29 删掉折叠 lane 后
-已无第二个消费者）。
-所以“高亮是好的”与“我们的 XML”没有关系；要改我们的定义，必须走我们自己的扫描路径，
-不能指望 KTextEditor 加载它。
+用真实编辑器的 `View::lineAttributes()` 验证高亮，用 gutter 点击验证原生折叠。两个运行环境的命令和观测结果见 [编辑器语言验收](evidence/desktop-ux-20261124/languages/README.md)。面包屑继续使用 `resources/queries/*/structure.scm`。
 
 **xcb 实测（T127）**：不加载任何 `FoldInjector`，在 xcb+Xvfb 真图形路径下用命中测试合成事件（`widgetAt`+`sendEvent`）
 点 gutter 折叠标记（`QApplication::widgetAt(global)` 命中 widget，再 `QApplication::sendEvent` 投递 press/release 的

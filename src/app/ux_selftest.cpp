@@ -168,20 +168,6 @@ void installSearchPanelFactory(vedit::app::ApplicationShell &shell)
     });
 }
 
-struct ToolbarEntry {
-    const char *id;
-};
-
-// The SHIPPED toolbar order, exactly as `ApplicationShell` builds it
-// (app_shell.cpp `kToolBarOrder`). The comparison below is an ordered equality,
-// deliberately: the order is the requirement, not a subset. RM-2 added
-// `file.switch-project` next to Open Folder, so it must appear here too.
-const QList<const char *> kToolbarOrder{
-    "file.new",       "file.open",     "file.open-folder", "file.switch-project",
-    "file.save",      "file.save-all", "edit.undo",        "edit.redo",
-    nullptr, /* separator */ "search.focus", "project.lint", "diagnostics.format",
-};
-
 // The shipped H1 of docs/USER_GUIDE.md (RM-8 rewrote the manual). ONE constant
 // feeds both the header-accessor assertion and the rendered-viewer assertion so
 // the two cannot drift apart; it is the exact shipped title, not the old
@@ -196,7 +182,7 @@ void testStructure(const QString &directory)
 
     // ③a: no editor view yet => Undo/Redo are greyed out (never a dead button).
     QAction *earlyUndo = shell.commands()->action(QStringLiteral("edit.undo"));
-    check(QStringLiteral("a2.toolbar.undo-disabled-without-view"),
+    check(QStringLiteral("a2.action.undo-disabled-without-view"),
           earlyUndo != nullptr && !earlyUndo->isEnabled());
 
     shell.startSession();
@@ -220,56 +206,22 @@ void testStructure(const QString &directory)
     check(QStringLiteral("a2.menu.preferences-last-in-edit"),
           inEdit && editMenu->actions().last() == preferences);
 
-    // ③ the toolbar: exists, movable, exact action order, real commands.
-    QToolBar *toolbar = shell.mainToolBar();
-    check(QStringLiteral("a2.toolbar.exists"), toolbar != nullptr);
-    if (toolbar == nullptr) {
-        return;
-    }
-    check(QStringLiteral("a2.toolbar.movable"), toolbar->isMovable());
-    check(QStringLiteral("a2.toolbar.object-name"),
-          toolbar->objectName() == QStringLiteral("vedit-main-toolbar"));
-
-    QStringList actualOrder;
-    QStringList sharedActionProblems;
-    for (QAction *action : toolbar->actions()) {
-        if (action->isSeparator()) {
-            actualOrder.append(QStringLiteral("---"));
-            continue;
-        }
-        actualOrder.append(action->objectName());
-    }
-    QStringList expectedOrderNames;
-    for (const char *id : kToolbarOrder) {
-        expectedOrderNames.append(id == nullptr ? QStringLiteral("---")
-                                                : QStringLiteral("action-") + QString::fromLatin1(id));
-    }
-    check(QStringLiteral("a2.toolbar.action-order"), actualOrder == expectedOrderNames,
-          actualOrder.join(QLatin1Char(',')));
-    // Every non-separator toolbar action IS the registry action (same pointer).
-    for (QAction *action : toolbar->actions()) {
-        if (action->isSeparator()) {
-            continue;
-        }
-        const QString id = action->objectName().mid(QStringLiteral("action-").size());
-        if (shell.commands()->action(id) != action) {
-            sharedActionProblems.append(id);
-        }
-    }
-    check(QStringLiteral("a2.toolbar.shares-registry-actions"),
-          sharedActionProblems.isEmpty(), sharedActionProblems.join(QLatin1Char(',')));
-    // Hideable: the View menu command hides the toolbar and brings it back (the
-    // "可隐藏" half of the requirement; "可移动" is asserted above).
-    QAction *toolbarToggle = shell.commands()->action(QStringLiteral("view.toolbar"));
-    check(QStringLiteral("a2.toolbar.toggle-command"), toolbarToggle != nullptr);
-    if (toolbarToggle != nullptr) {
-        toolbarToggle->trigger();
-        QApplication::processEvents();
-        const bool hidden = !toolbar->isVisible();
-        toolbarToggle->trigger();
-        QApplication::processEvents();
-        check(QStringLiteral("a2.toolbar.hide-and-show"), hidden && toolbar->isVisible());
-    }
+    check(QStringLiteral("a2.toolbar.absent"), shell.findChildren<QToolBar *>().isEmpty());
+    check(QStringLiteral("a2.toolbar.no-toggle"),
+          shell.commands()->action(QStringLiteral("view.toolbar")) == nullptr);
+    const auto inMenu = [&shell](const char *id, const char *title) {
+        QMenu *menu = menuByStrippedTitle(shell, QString::fromLatin1(title));
+        QAction *action = shell.commands()->action(QString::fromLatin1(id));
+        return menu != nullptr && action != nullptr && menu->actions().contains(action);
+    };
+    check(QStringLiteral("a2.menu.former-toolbar-actions"),
+          inMenu("file.new", "File") && inMenu("file.open", "File")
+          && inMenu("file.open-folder", "File") && inMenu("file.switch-project", "File")
+          && inMenu("file.save", "File") && inMenu("file.save-all", "File")
+          && inMenu("edit.undo", "Edit") && inMenu("edit.redo", "Edit")
+          && inMenu("search.focus", "View") && inMenu("project.lint", "Project")
+          && inMenu("diagnostics.format", "Project")
+          && shell.findChild<QMenu *>(QStringLiteral("menu-theme")) != nullptr);
 
     // Build/Format are the diagnostics lane's commands and really run them.
     int lintRuns = 0;
@@ -278,17 +230,17 @@ void testStructure(const QString &directory)
     shell.commands()->setHandler(QStringLiteral("diagnostics.format"), [&formatRuns]() { ++formatRuns; });
     shell.commands()->action(QStringLiteral("project.lint"))->trigger();
     shell.commands()->action(QStringLiteral("diagnostics.format"))->trigger();
-    check(QStringLiteral("a2.toolbar.build-runs-command"), lintRuns == 1);
-    check(QStringLiteral("a2.toolbar.format-runs-command"), formatRuns == 1);
+    check(QStringLiteral("a2.action.build-runs-command"), lintRuns == 1);
+    check(QStringLiteral("a2.action.format-runs-command"), formatRuns == 1);
 
     // ③b New: a dirty tab gets a NEW document tab next to it.
     vedit::app::EditorPane *pane = shell.editorArea()->activePane();
-    check(QStringLiteral("a2.toolbar.active-pane"), pane != nullptr);
+    check(QStringLiteral("a2.action.active-pane"), pane != nullptr);
     if (pane == nullptr) {
         return;
     }
     auto *textEditor = qobject_cast<QPlainTextEdit *>(pane->editorWidget());
-    check(QStringLiteral("a2.toolbar.demo-editor"), textEditor != nullptr);
+    check(QStringLiteral("a2.action.demo-editor"), textEditor != nullptr);
     if (textEditor == nullptr) {
         return;
     }
@@ -299,23 +251,23 @@ void testStructure(const QString &directory)
     const int tabsBefore = pane->tabCount();
     shell.commands()->action(QStringLiteral("file.new"))->trigger();
     QApplication::processEvents();
-    check(QStringLiteral("a2.toolbar.new-opens-document"), pane->tabCount() == tabsBefore + 1,
+    check(QStringLiteral("a2.action.new-opens-document"), pane->tabCount() == tabsBefore + 1,
           QStringLiteral("tabs %1 -> %2").arg(tabsBefore).arg(pane->tabCount()));
 
     // ③c Undo/Redo really change the document (plain-text fallback path).
     pane->setActiveTab(0);
     QApplication::processEvents();
     QAction *undo = shell.commands()->action(QStringLiteral("edit.undo"));
-    check(QStringLiteral("a2.toolbar.undo-enabled-with-view"), undo != nullptr && undo->isEnabled());
+    check(QStringLiteral("a2.action.undo-enabled-with-view"), undo != nullptr && undo->isEnabled());
     undo->trigger();
     QApplication::processEvents();
-    check(QStringLiteral("a2.toolbar.undo-changes-document"),
+    check(QStringLiteral("a2.action.undo-changes-document"),
           textEditor->toPlainText() == beforeTyping, textEditor->toPlainText());
     QAction *redo = shell.commands()->action(QStringLiteral("edit.redo"));
-    check(QStringLiteral("a2.toolbar.redo-enabled"), redo != nullptr && redo->isEnabled());
+    check(QStringLiteral("a2.action.redo-enabled"), redo != nullptr && redo->isEnabled());
     redo->trigger();
     QApplication::processEvents();
-    check(QStringLiteral("a2.toolbar.redo-restores-document"),
+    check(QStringLiteral("a2.action.redo-restores-document"),
           textEditor->toPlainText() == afterTyping,
           textEditor->toPlainText());
 
@@ -328,9 +280,9 @@ void testStructure(const QString &directory)
     auto *query = searchContent != nullptr
                       ? searchContent->findChild<QLineEdit *>(QStringLiteral("search-query"))
                       : nullptr;
-    check(QStringLiteral("a2.toolbar.search-shows-panel"),
+    check(QStringLiteral("a2.action.search-shows-panel"),
           shell.panels()->isVisible(QStringLiteral("search")));
-    check(QStringLiteral("a2.toolbar.search-focuses-query"),
+    check(QStringLiteral("a2.action.search-focuses-query"),
           query != nullptr && (query->hasFocus() || QApplication::focusWidget() == query));
 }
 

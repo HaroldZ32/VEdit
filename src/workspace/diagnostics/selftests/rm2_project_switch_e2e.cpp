@@ -64,7 +64,6 @@
 #include <QStandardPaths>
 #include <QTemporaryDir>
 #include <QThread>
-#include <QToolBar>
 #include <QTimer>
 #include <QVariantMap>
 
@@ -367,17 +366,15 @@ int main(int argc, char **argv)
         tree->openDirectory(rootA);
     }
 
-    // The NEW top-level entry the user asked for: it must exist as a File
-    // command AND as a toolbar button, and both lead to the same reset path.
+    // The File menu still exposes the workspace switch after toolbar removal.
     QAction *switchAction = shell->commands() != nullptr
         ? shell->commands()->action(QStringLiteral("file.switch-project"))
         : nullptr;
-    auto *toolBar = shell->mainToolBar();
-    const bool onToolBar = toolBar != nullptr && switchAction != nullptr
-        && toolBar->actions().contains(switchAction);
+    const auto *fileMenu = shell->menuBar()->findChild<QMenu *>(QStringLiteral("menu-file"));
     check("rm2.switch-action", switchAction != nullptr,
           QStringLiteral("text='%1'").arg(switchAction != nullptr ? switchAction->text() : ""));
-    check("rm2.switch-action-on-toolbar", onToolBar);
+    check("rm2.switch-action-in-file-menu", fileMenu != nullptr && switchAction != nullptr
+          && fileMenu->actions().contains(switchAction));
     if (switchAction == nullptr) {
         std::printf("SUMMARY checks=%d failures=%d\n", g_checks, g_failures);
         return 1;
@@ -679,11 +676,11 @@ int main(int argc, char **argv)
         {"A-to-B", rootB, rootA, bSource, aSource, incB, incA, QStringLiteral("B_ONLY=1"),
          QStringLiteral("A_ONLY=1"), false},
         {"B-to-A", rootA, rootB, aSource, bSource, incA, incB, QStringLiteral("A_ONLY=1"),
-         QStringLiteral("B_ONLY=1"), false},
+         QStringLiteral("B_ONLY=1"), true},
         {"A-to-B-again", rootB, rootA, bSource, aSource, incB, incA, QStringLiteral("B_ONLY=1"),
          QStringLiteral("A_ONLY=1"), false},
         {"B-to-A-again", rootA, rootB, aSource, bSource, incA, incB, QStringLiteral("A_ONLY=1"),
-         QStringLiteral("B_ONLY=1"), false},
+         QStringLiteral("B_ONLY=1"), true},
     };
 
     quint64 expectedExpansions = project->expansionCount();
@@ -698,15 +695,16 @@ int main(int argc, char **argv)
         // schedule a second expansion for it. This is the duplicate the user's
         // machine produced from more than one widget.
         project->openRoot(step.target);
-        // A61.2c (batch-20261115): switching to a root does NOT make it a project
-        // (A61.2). The user imports that root's filelist, exactly like the
-        // Import Filelist action, and THAT is the one expansion this switch
-        // schedules. The coverage assertions are unchanged.
-        {
-            const QString targetList =
-                QDir(step.target).filePath(QStringLiteral("sources.f"));
+        // A is seeded with an external filelist. B starts with no import, then
+        // remembers its own manifest on its next visit.
+        const QStringList expectedLists = step.expectImportedEntry
+            ? QStringList{importedList}
+            : QStringList{QDir(step.target).filePath(QStringLiteral("sources.f"))};
+        if (QLatin1String(step.name) == QLatin1String("A-to-B")) {
+            check(name("no-implicit-import").toUtf8().constData(),
+                  !project->hasFilelist() && project->expansionCount() == before);
             check(name("manifest-import").toUtf8().constData(),
-                  project->importFilelists({targetList}));
+                  project->importFilelists(expectedLists));
         }
         ++expectedExpansions;
         const bool settled =
@@ -754,8 +752,7 @@ int main(int argc, char **argv)
                   .arg(before)
                   .arg(expansions)
                   .arg(expectedExpansions));
-        // (iii) the analysis set IS the panel's set: same root, same count, and
-        // the same imported-list behaviour (none after a switch: cleared).
+        // The analysis and panel agree on the active folder and its imported files.
         check(name("analysis-no-previous-file").toUtf8().constData(),
               !analysis.contains(step.previousSource)
                   && firstUnder(analysis, step.previous).isEmpty(),
@@ -770,7 +767,7 @@ int main(int argc, char **argv)
                   .arg(analysis.size())
                   .arg(project->files().size())
                   .arg(diag.value(QStringLiteral("files")).toInt()));
-        check(name("imported-list-cleared").toUtf8().constData(),
+        check(name("external-entry-only-in-own-workspace").toUtf8().constData(),
               analysis.contains(outsideSource) == step.expectImportedEntry,
               QStringLiteral("outside-in-set=%1")
                   .arg(analysis.contains(outsideSource) ? 1 : 0));
@@ -793,16 +790,10 @@ int main(int argc, char **argv)
         check(name("env-no-previous-defines").toUtf8().constData(),
               !envDefines.contains(step.previousDefine),
               QStringLiteral("defines='%1'").arg(envDefines.join(QLatin1Char(','))));
-        // The panel's inputs are the new root's (a switch never carries the
-        // previous project's imported lists).
-        // A61.2c: after the switch the inputs carry the TARGET's OWN manifest -
-        // the point is that the PREVIOUS project's list did not leak across.
         const QStringList inputLists =
             inputs.value(QStringLiteral("filelists")).toStringList();
-        const QString targetManifest =
-            QDir(step.target).filePath(QStringLiteral("sources.f"));
         check(name("inputs-filelists-target-only").toUtf8().constData(),
-              inputLists == QStringList{targetManifest}, inputLists.join(QLatin1Char(',')));
+               inputLists == expectedLists, inputLists.join(QLatin1Char(',')));
         check(name("inputs-settings-path").toUtf8().constData(),
               inputs.value(QStringLiteral("settingsPath")).toString()
                   == QDir(stateDir).filePath(QStringLiteral("settings.toml")));

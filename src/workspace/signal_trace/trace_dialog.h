@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QByteArray>
 #include <QJsonObject>
 #include <QString>
 
@@ -15,5 +16,6 @@ struct Location {
 
 Location locationOf(const QJsonObject &object);
 void jumpTo(QWidget *host, const Location &location);
-QDialog *showResults(QWidget *host, const QString &title, const QJsonObject &answer, bool full);
+QDialog *showResults(QWidget *host, const QString &title, const QJsonObject &answer, bool full,
+                     const QByteArray &headerState);
 }

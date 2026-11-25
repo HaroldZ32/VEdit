@@ -39,9 +39,8 @@ struct SearchOptions {
     // two matches would only replace the first one.
     bool allMatches = false;
 
-    // When non-empty, only hits whose absolute path equals this file are
-    // reported (the dock's "current file" scope). The walk still runs on the
-    // worker thread; Qt does not add a second file walk.
+    // An absolute path selects a single saved file. The worker skips the
+    // folder walk and project file set in this mode.
     QString fileFilter;
 
     // Restrict to Verilog / SystemVerilog source files. The classification is

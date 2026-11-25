@@ -1,0 +1,87 @@
+PASS fixtures
+PASS open lists/chip.f
+PASS typed relative directory active=1 entries=[rtl/]
+PASS replacement line 0   ../rtl/
+PASS accepted directory opens next level active=1 entries=[block space.sv, sub/]
+PASS capture filelist-completion
+PASS replacement line 0   ../rtl/block space.sv
+PASS replacement line 0   ../rtl/bl
+PASS second +incdir+ argument only active=1 entries=[include/]
+PASS replacement line 1 +incdir+../keep+../include/+../after # retain
+PASS manual -F completion in existing token active=1 entries=[child.f, chip.f]
+PASS replacement line 2 -F child.f  // retain
+PASS attached -I completion active=1 entries=[include/]
+PASS replacement line 3 -I../include/ # retain
+PASS lowercase -f completion active=1 entries=[child.f, chip.f]
+PASS replacement line 4 -f ./child.f
+PASS absolute path completion active=1 entries=[sub/]
+PASS absolute directory descends active=1 entries=[deep.v]
+PASS replacement line 5 /tmp/vedit-editor-language-tests-kMKEvR/rtl/sub/
+PASS no path candidates for comment, define and variable lines 6
+PASS Escape dismisses any native candidates
+PASS no path candidates for comment, define and variable lines 7
+PASS Escape dismisses any native candidates
+PASS no path candidates for comment, define and variable lines 8
+PASS Escape dismisses any native candidates
+PASS Return still inserts a line after dismissal
+PASS directory replacement before an existing path suffix active=1 entries=[rtl/]
+PASS replacement line 10 ../rtl/sub/deep.v # retain
+PASS literal dollar in a file name active=1 entries=[out$.sv]
+PASS replacement line 11 out$.sv
+PASS completion only edits the live buffer
+PASS open notes.md
+PASS notes.md Markdown theme spans  Markdown:Heading #1f1c1b bold=1 italic=0 | Markdown:Code #e31616 bold=0 italic=0 | Markdown:Bold #1f1c1b bold=1 italic=0 | Markdown:Link #644a9b bold=0 italic=0 | Markdown:Code Block #e31616 bold=0 italic=0
+PASS notes.md path model absent
+PASS capture notes.md-light
+PASS open notes.markdown
+PASS notes.markdown Markdown theme spans  Markdown:Heading #1f1c1b bold=1 italic=0 | Markdown:Code #e31616 bold=0 italic=0 | Markdown:Bold #1f1c1b bold=1 italic=0 | Markdown:Link #644a9b bold=0 italic=0 | Markdown:Code Block #e31616 bold=0 italic=0
+PASS notes.markdown path model absent
+PASS capture notes.markdown-light
+PASS open board.sv
+PASS board.sv light definition and instance  SystemVerilog:Module Definition #644a9b bold=1 italic=0 | SystemVerilog:Module Instance #0057ae bold=0 italic=0 | SystemVerilog:Module Instance #0057ae bold=0 italic=0 | SystemVerilog:Module Instance #0057ae bold=0 italic=0
+PASS board.sv light if/else vs begin/end  SystemVerilog:Conditional #1f1c1b bold=1 italic=1 | SystemVerilog:Block Delimiter #1f1c1b bold=1 italic=0
+PASS board.sv light square/curly brackets  SystemVerilog:Bracket #006e28 bold=0 italic=0 | SystemVerilog:Bracket #006e28 bold=0 italic=0 | plain #1f1c1b
+PASS board.sv light comment/string intact  SystemVerilog:Comment #898887 bold=0 italic=0 | SystemVerilog:String #bf0303 bold=0 italic=0 | SystemVerilog:Comment #898887 bold=0 italic=0
+PASS board.sv light mixed declarations  SystemVerilog:Module Instance #0057ae bold=0 italic=0 | SystemVerilog:Module Instance #0057ae bold=0 italic=0 | <unformatted>
+PASS capture board.sv-light
+PASS board.sv render refreshes on typed edit module renamed_board; | SystemVerilog:Module Definition #644a9b bold=1 italic=0
+PASS open board.v
+PASS board.v light definition and instance  SystemVerilog:Module Definition #644a9b bold=1 italic=0 | SystemVerilog:Module Instance #0057ae bold=0 italic=0 | SystemVerilog:Module Instance #0057ae bold=0 italic=0 | SystemVerilog:Module Instance #0057ae bold=0 italic=0
+PASS board.v light if/else vs begin/end  SystemVerilog:Conditional #1f1c1b bold=1 italic=1 | SystemVerilog:Block Delimiter #1f1c1b bold=1 italic=0
+PASS board.v light square/curly brackets  SystemVerilog:Bracket #006e28 bold=0 italic=0 | SystemVerilog:Bracket #006e28 bold=0 italic=0 | plain #1f1c1b
+PASS board.v light comment/string intact  SystemVerilog:Comment #898887 bold=0 italic=0 | SystemVerilog:String #bf0303 bold=0 italic=0 | SystemVerilog:Comment #898887 bold=0 italic=0
+PASS board.v light mixed declarations  SystemVerilog:Module Instance #0057ae bold=0 italic=0 | SystemVerilog:Module Instance #0057ae bold=0 italic=0 | SystemVerilog:Normal Text #1f1c1b bold=0 italic=0
+PASS capture board.v-light
+PASS board.v render refreshes on typed edit module renamed_board; | SystemVerilog:Module Definition #644a9b bold=1 italic=0
+PASS board.sv dark after tab switch definition and instance  SystemVerilog:Module Definition #609ca0 bold=1 italic=0 | SystemVerilog:Module Instance #27aeae bold=0 italic=0 | SystemVerilog:Module Instance #27aeae bold=0 italic=0 | SystemVerilog:Module Instance #27aeae bold=0 italic=0
+PASS board.sv dark after tab switch if/else vs begin/end  SystemVerilog:Conditional #fdbc4b bold=1 italic=1 | SystemVerilog:Block Delimiter #cfcfc2 bold=1 italic=0
+PASS board.sv dark after tab switch square/curly brackets  SystemVerilog:Bracket #27ae60 bold=0 italic=0 | SystemVerilog:Bracket #27ae60 bold=0 italic=0 | plain #cfcfc2
+PASS board.sv dark after tab switch comment/string intact  SystemVerilog:Comment #7a7c7d bold=0 italic=0 | SystemVerilog:String #f44f4f bold=0 italic=0 | SystemVerilog:Comment #7a7c7d bold=0 italic=0
+PASS board.sv dark after tab switch mixed declarations  SystemVerilog:Module Instance #27aeae bold=0 italic=0 | SystemVerilog:Module Instance #27aeae bold=0 italic=0 | <unformatted>
+PASS board.sv existing view applied dark theme
+PASS capture board.sv-dark
+PASS board.v dark after tab switch definition and instance  SystemVerilog:Module Definition #609ca0 bold=1 italic=0 | SystemVerilog:Module Instance #27aeae bold=0 italic=0 | SystemVerilog:Module Instance #27aeae bold=0 italic=0 | SystemVerilog:Module Instance #27aeae bold=0 italic=0
+PASS board.v dark after tab switch if/else vs begin/end  SystemVerilog:Conditional #fdbc4b bold=1 italic=1 | SystemVerilog:Block Delimiter #cfcfc2 bold=1 italic=0
+PASS board.v dark after tab switch square/curly brackets  SystemVerilog:Bracket #27ae60 bold=0 italic=0 | SystemVerilog:Bracket #27ae60 bold=0 italic=0 | plain #cfcfc2
+PASS board.v dark after tab switch comment/string intact  SystemVerilog:Comment #7a7c7d bold=0 italic=0 | SystemVerilog:String #f44f4f bold=0 italic=0 | SystemVerilog:Comment #7a7c7d bold=0 italic=0
+PASS board.v dark after tab switch mixed declarations  SystemVerilog:Module Instance #27aeae bold=0 italic=0 | SystemVerilog:Module Instance #27aeae bold=0 italic=0 | SystemVerilog:Normal Text #cfcfc2 bold=0 italic=0
+PASS board.v existing view applied dark theme
+PASS capture board.v-dark
+PASS notes.markdown dark after tab switch Markdown theme spans  Markdown:Heading #cfcfc2 bold=1 italic=0 | Markdown:Code #da4453 bold=0 italic=0 | Markdown:Bold #cfcfc2 bold=1 italic=0 | Markdown:Link #8e44ad bold=0 italic=0 | Markdown:Code Block #da4453 bold=0 italic=0
+PASS notes.markdown existing view applied dark theme
+PASS capture notes.markdown-dark
+PASS notes.md dark after tab switch Markdown theme spans  Markdown:Heading #cfcfc2 bold=1 italic=0 | Markdown:Code #da4453 bold=0 italic=0 | Markdown:Bold #cfcfc2 bold=1 italic=0 | Markdown:Link #8e44ad bold=0 italic=0 | Markdown:Code Block #da4453 bold=0 italic=0
+PASS notes.md existing view applied dark theme
+PASS capture notes.md-dark
+PASS close Markdown tab
+PASS open notes.md
+PASS notes.md reopened Markdown theme spans  Markdown:Heading #cfcfc2 bold=1 italic=0 | Markdown:Code #da4453 bold=0 italic=0 | Markdown:Bold #cfcfc2 bold=1 italic=0 | Markdown:Link #8e44ad bold=0 italic=0 | Markdown:Code Block #da4453 bold=0 italic=0
+PASS close SystemVerilog tab
+PASS open board.sv
+PASS board.sv reopened definition and instance  SystemVerilog:Module Definition #609ca0 bold=1 italic=0 | SystemVerilog:Module Instance #27aeae bold=0 italic=0 | SystemVerilog:Module Instance #27aeae bold=0 italic=0 | SystemVerilog:Module Instance #27aeae bold=0 italic=0
+PASS board.sv reopened if/else vs begin/end  SystemVerilog:Conditional #fdbc4b bold=1 italic=1 | SystemVerilog:Block Delimiter #cfcfc2 bold=1 italic=0
+PASS board.sv reopened square/curly brackets  SystemVerilog:Bracket #27ae60 bold=0 italic=0 | SystemVerilog:Bracket #27ae60 bold=0 italic=0 | plain #cfcfc2
+PASS board.sv reopened comment/string intact  SystemVerilog:Comment #7a7c7d bold=0 italic=0 | SystemVerilog:String #f44f4f bold=0 italic=0 | SystemVerilog:Comment #7a7c7d bold=0 italic=0
+PASS board.sv reopened mixed declarations  SystemVerilog:Module Instance #27aeae bold=0 italic=0 | SystemVerilog:Module Instance #27aeae bold=0 italic=0 | <unformatted>
+PASS filelist tab retained its edits on switch
+LANGUAGE TEST failures=0

@@ -2352,6 +2352,7 @@ QWidget *EditorArea::buildWidget(Node *node)
         return wrapper;
     }
     auto *splitter = new QSplitter(node->orientation);
+    splitter->setHandleWidth(4);
     splitter->setObjectName(QStringLiteral("splitter-") +
                             QString::fromLatin1(node->orientation == Qt::Horizontal ? "h" : "v"));
     splitter->setChildrenCollapsible(true);

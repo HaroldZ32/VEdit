@@ -4,10 +4,12 @@
 // folder, expands/collapses lazily, opens a file on double click, and performs
 // New / Rename / Delete on the real filesystem with a diagnosable failure path.
 //
-// The widget is self-contained: it owns its model, its toolbar and its status
+// The widget is self-contained: it owns its model, its actions and its status
 // line. The shell plugs it in through the panel seam (PanelRegistry id
 // "file-tree"); the only signal it needs from the host is openFileRequested().
 
+#include <QList>
+#include <QPersistentModelIndex>
 #include <QString>
 #include <QStringList>
 #include <QWidget>
@@ -18,9 +20,7 @@ class QAction;
 class QLabel;
 class QMenu;
 class QModelIndex;
-class QPersistentModelIndex;
 class QStackedWidget;
-class QToolBar;
 class QTimer;
 class QTreeView;
 
@@ -61,7 +61,7 @@ public:
     void setProjectFilesSource(std::function<QStringList()> files,
                                std::function<quint64()> revision);
 
-    // Operations, used both by the toolbar/context menu and directly by the
+    // Operations, used both by the context menu and directly by the
     // demo and the tests. On failure `error` (when given) receives the same
     // one-line diagnostic the status line shows; nothing is changed on disk and
     // the tree is not touched.
@@ -96,6 +96,9 @@ signals:
     void directoryOpened(const QString &path);
     void operationFailed(const QString &message);
 
+protected:
+    bool eventFilter(QObject *watched, QEvent *event) override;
+
 private:
     void buildUi();
     void applyRootState();
@@ -111,6 +114,9 @@ private:
     void onRename();
     void onDelete();
     void onRefresh();
+    void onExpandAll();
+    void continueExpandAll();
+    void stopExpandAll();
     void onCollapseAll();
     void onActivated(const QModelIndex &index);
     void onCurrentChanged(const QModelIndex &current, const QModelIndex &previous);
@@ -124,7 +130,12 @@ private:
     std::function<QStringList()> projectFilesSource_;
     std::function<quint64()> projectFilesRevisionSource_;
     quint64 projectFilesRevision_ = 0;
-    QToolBar *toolBar_ = nullptr;
+    struct ExpansionBranch {
+        QPersistentModelIndex index;
+        int nextRow = 0;
+    };
+    QList<ExpansionBranch> expandingBranches_;
+    QTimer *expandTimer_ = nullptr;
     QStackedWidget *stack_ = nullptr;
     QWidget *treePage_ = nullptr;
     QWidget *emptyPage_ = nullptr;
@@ -137,7 +148,6 @@ private:
     QAction *renameAction_ = nullptr;
     QAction *deleteAction_ = nullptr;
     QAction *refreshAction_ = nullptr;
-    QAction *collapseAction_ = nullptr;
     ContextMenuExtension contextMenuExtension_;
     quint64 contextMenuEpoch_ = 0;
     bool interactive_ = true;

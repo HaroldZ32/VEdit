@@ -31,7 +31,9 @@
 #include <QComboBox>
 #include <QApplication>
 #include <QElapsedTimer>
+#include <QHeaderView>
 #include <QLabel>
+#include <QMouseEvent>
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QToolButton>
@@ -431,6 +433,32 @@ void checkWidthsAndFocus()
 
 // --- C. the panels --------------------------------------------------------
 
+void checkColumnResize(QAbstractItemView *view, QHeaderView *header, const char *name,
+                       const std::function<void()> &repopulate)
+{
+    bool interactive = !header->stretchLastSection();
+    for (int column = 0; column < header->count(); ++column) {
+        interactive &= header->sectionResizeMode(column) == QHeaderView::Interactive;
+    }
+    const int before = header->sectionSize(0);
+    auto *viewport = header->viewport();
+    const QPoint start(header->sectionViewportPosition(0) + before - 1, viewport->height() / 2);
+    const QPoint end = start + QPoint(240, 0);
+    QTest::mousePress(viewport, Qt::LeftButton, Qt::NoModifier, start);
+    QMouseEvent move(QEvent::MouseMove, end, viewport->mapToGlobal(end), Qt::NoButton,
+                     Qt::LeftButton, Qt::NoModifier);
+    QApplication::sendEvent(viewport, &move);
+    QTest::mouseRelease(viewport, Qt::LeftButton, Qt::NoModifier, end);
+    const int after = header->sectionSize(0);
+    repopulate();
+    QApplication::processEvents();
+    check(name, interactive && after > before && header->sectionSize(0) == after
+          && view->horizontalScrollBar()->maximum() > 0,
+          QStringLiteral("before=%1 dragged=%2 refreshed=%3 scroll=%4")
+              .arg(before).arg(after).arg(header->sectionSize(0))
+              .arg(view->horizontalScrollBar()->maximum()));
+}
+
 void checkPanels()
 {
     jump::Registry::instance().reset();
@@ -444,6 +472,10 @@ void checkPanels()
     treePanel.resize(620, 680);
     treePanel.show();
     QApplication::processEvents();
+    checkColumnResize(treePanel.tree(), treePanel.tree()->header(), "panel.tree.resize-persists", [&] {
+        treePanel.setCatalog({});
+        treePanel.setCatalog(catalog);
+    });
     check("panel.tree.rows", treePanel.tree()->topLevelItemCount() == 3,
           QStringLiteral("roots=%1").arg(treePanel.tree()->topLevelItemCount()));
     check("panel.tree.shared-twice",
@@ -778,6 +810,10 @@ void checkPanels()
     interface.resize(560, 300);
     interface.show();
     QApplication::processEvents();
+    checkColumnResize(interface.table(), interface.table()->horizontalHeader(), "interface.table.resize-persists", [&] {
+        interface.setTreeSelection(QStringLiteral("top_b"));
+        interface.setTreeSelection(QStringLiteral("top_a"));
+    });
     check("interface.focus.tree-selection",
           interface.focusedModuleName() == QLatin1String("top_a"),
           interface.focusedModuleName());

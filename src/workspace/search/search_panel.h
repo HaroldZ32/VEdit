@@ -45,6 +45,8 @@
 #include <functional>
 
 class QComboBox;
+class QGridLayout;
+class QResizeEvent;
 class QLabel;
 class QLineEdit;
 class QPushButton;
@@ -65,6 +67,7 @@ class SearchPanel final : public QWidget {
 public:
     explicit SearchPanel(QWidget *parent = nullptr);
     ~SearchPanel() override;
+    QSize minimumSizeHint() const override;
 
     SearchPanel(const SearchPanel &) = delete;
     SearchPanel &operator=(const SearchPanel &) = delete;
@@ -178,8 +181,12 @@ signals:
     void searchFinished(int hitCount, bool truncated);
     void replaceFinished(const vedit::workspace::search::ReplaceOutcome &outcome);
 
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+
 private:
     void buildUi();
+    void layoutControls(bool compact);
     void connectSignals();
     void clearResults();
     void appendBatch(const QList<SearchHit> &hits);
@@ -193,6 +200,9 @@ private:
     // limits + the current-file filter when that scope is selected).
     SearchOptions buildOptions(bool allMatches) const;
     QString resolveCurrentFile() const;
+    QString unavailableScopeMessage(const QString &currentFile) const;
+    bool canScan(const SearchOptions &options);
+    bool currentFileChanged(const SearchOptions &options) const;
     bool beginScan(const SearchOptions &options, ReplaceScanPhase phase);
     void publishToHub();
     void adoptFromHub(const vedit::search::SearchHandoff &handoff);
@@ -265,6 +275,13 @@ private:
     std::function<QString()> currentFileProvider_;
     std::function<QStringList()> projectFilesProvider_;
 
+    QGridLayout *searchLayout_ = nullptr;
+    QGridLayout *replaceLayout_ = nullptr;
+    QWidget *queryInput_ = nullptr;
+    QWidget *matchOptions_ = nullptr;
+    QWidget *runButtons_ = nullptr;
+    int compactWidth_ = 0;
+    bool compactControls_ = true;
     QLineEdit *query_ = nullptr;
     QToolButton *caseButton_ = nullptr;
     QToolButton *wholeButton_ = nullptr;
