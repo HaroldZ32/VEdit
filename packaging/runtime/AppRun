@@ -25,6 +25,22 @@ HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
 APPDIR="$HERE"
 export APPDIR
 
+# The pinned type2 runtime consumes --appimage-extract-and-run. Preserve that
+# mode for a restart from its appimage_extracted_<32 hex digits> directory.
+case "${APPDIR##*/}" in
+    appimage_extracted_*)
+        extract_id=${APPDIR##*/appimage_extracted_}
+        case "$extract_id" in
+            *[!0-9a-f]*) ;;
+            *)
+                if [ "${#extract_id}" -eq 32 ] && [ -f "${APPIMAGE:-}" ]; then
+                    export APPIMAGE_EXTRACT_AND_RUN=1
+                fi
+                ;;
+        esac
+        ;;
+esac
+
 # --- crash report: bounded AppImage hashing (batch-20261110d) ----------------
 # The crash reporter records the AppImage sha256 in install(), i.e. on the
 # STARTUP path, when the caller did not supply the hash. Its old hardcoded cap

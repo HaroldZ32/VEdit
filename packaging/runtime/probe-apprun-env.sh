@@ -48,7 +48,7 @@ make_appdir() {
     # Fake private loader: print the environment of the process AppRun starts.
     cat > "$dir/ld-linux-x86-64.so.2" <<'EOF'
 #!/bin/sh
-/usr/bin/env | /usr/bin/sed -n 's/^\(VEDIT_[A-Z_]*\|APPDIR\|PATH\)=\(.*\)$/LOADER-SEEN \1=\2/p'
+/usr/bin/env | /usr/bin/sed -n 's/^\(VEDIT_[A-Z_]*\|APPDIR\|APPIMAGE_EXTRACT_AND_RUN\|PATH\)=\(.*\)$/LOADER-SEEN \1=\2/p'
 exit 0
 EOF
     chmod +x "$dir/ld-linux-x86-64.so.2"
@@ -177,6 +177,29 @@ if ! has_var "$OUT_G" VEDIT_HOST_PATH \
     check "host-path.unset-preserved" 1
 else
     check "host-path.unset-preserved" 0
+fi
+
+# Only the pinned runtime's extracted AppImage layout requests extraction again.
+EXTRACTED="$TMP/appimage_extracted_ABC"
+make_appdir "$EXTRACTED" absent absent
+IMAGE="$TMP/fixture.AppImage"
+: > "$IMAGE"
+OUT_H=$(run_apprun "$EXTRACTED" "APPIMAGE=$IMAGE")
+OUT_I=$(run_apprun "$APP_A" "APPIMAGE=$IMAGE")
+if ! has_var "$OUT_H" APPIMAGE_EXTRACT_AND_RUN && ! has_var "$OUT_I" APPIMAGE_EXTRACT_AND_RUN; then
+    check "appimage.normal-launch-does-not-force-extraction" 1
+else
+    check "appimage.normal-launch-does-not-force-extraction" 0
+fi
+EXTRACTED="$TMP/appimage_extracted_0123456789abcdef0123456789abcdef"
+make_appdir "$EXTRACTED" absent absent
+OUT_J=$(run_apprun "$EXTRACTED" "APPIMAGE=$IMAGE")
+OUT_K=$(run_apprun "$EXTRACTED")
+if has_env "$OUT_J" "LOADER-SEEN APPIMAGE_EXTRACT_AND_RUN=1" \
+    && ! has_var "$OUT_K" APPIMAGE_EXTRACT_AND_RUN; then
+    check "appimage.extracted-run-preserves-extraction-for-restart" 1
+else
+    check "appimage.extracted-run-preserves-extraction-for-restart" 0
 fi
 
 echo "APPRUN-ENV-PROBE ok=$([ "$failures" -eq 0 ] && echo 1 || echo 0) checks=$checks failures=$failures"
