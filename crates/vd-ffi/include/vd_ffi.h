@@ -4287,7 +4287,8 @@ uint64_t vd_search_tree_query_ex(struct VdService *service,
  inside the folder stays searchable) AND every listed file is scanned too,
  including one outside the folder or under a pruned directory name. Each path
  is read once. An empty or null list is the plain walk, so a caller without a
- project file set is unchanged.
+ project file set is unchanged. Pass an empty `root` with a nonempty list
+ of absolute file paths to scan only those files, without a directory walk.
 
  This is how project search covers the project model: a `.f` filelist may
  name sources OUTSIDE the opened folder (`root=filelists/`, members in

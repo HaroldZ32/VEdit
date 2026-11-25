@@ -125,13 +125,14 @@ void GlobalSearch::runScan(const SearchOptions &options, quint64 generation,
     clock.start();
     SearchSummary summary;
 
+    const bool singleFile = !options.fileFilter.isEmpty();
     const QFileInfo rootInfo(options.rootPath);
-    if (!rootInfo.exists() || !rootInfo.isDir()) {
+    if (!singleFile && (options.rootPath.isEmpty() || !rootInfo.isDir())) {
         summary.state = SearchState::Failed;
         summary.error = QCoreApplication::translate("VEdit", "search root does not exist or is not a directory: %1")
                             .arg(options.rootPath);
         summary.elapsedMs = clock.elapsed();
-    } else if (!rootInfo.isReadable()) {
+    } else if (!singleFile && !rootInfo.isReadable()) {
         summary.state = SearchState::Failed;
         summary.error = QCoreApplication::translate("VEdit", "search root is not readable: %1").arg(options.rootPath);
         summary.elapsedMs = clock.elapsed();
@@ -146,7 +147,9 @@ void GlobalSearch::runScan(const SearchOptions &options, quint64 generation,
             summary.state = SearchState::Failed;
             summary.error = QCoreApplication::translate("VEdit", "cannot create the Rust search service");
         } else {
-            const QByteArray rootPath = options.rootPath.toUtf8();
+            // An empty FFI root with explicit paths scans only those files.
+            const QByteArray rootPath = singleFile ? QByteArray("") : options.rootPath.toUtf8();
+            const QStringList scanFiles = singleFile ? QStringList{options.fileFilter} : options.files;
             const QByteArray query = options.query.toUtf8();
             // The extended query (ux-batch-2 A1): whole word, regex, every
             // occurrence per line (`allMatches`) and an extension filter.
@@ -188,8 +191,8 @@ void GlobalSearch::runScan(const SearchOptions &options, quint64 generation,
             // still loading keeps today's behaviour instead of reporting "no
             // results" for nothing searched.
             QList<QByteArray> fileStorage;
-            fileStorage.reserve(options.files.size());
-            for (const QString &file : options.files) {
+            fileStorage.reserve(scanFiles.size());
+            for (const QString &file : scanFiles) {
                 fileStorage.append(file.toUtf8());
             }
             QList<char *> filePointers;
@@ -201,9 +204,9 @@ void GlobalSearch::runScan(const SearchOptions &options, quint64 generation,
             files.count = static_cast<size_t>(filePointers.size());
             files.items = filePointers.isEmpty() ? nullptr : filePointers.data();
 
-            const bool scoped = !options.files.isEmpty();
+            const bool hasFiles = !scanFiles.isEmpty();
             const quint64 job =
-                scoped
+                hasFiles
                     ? vd_search_tree_query_files(service, rootPath.constData(),
                                                  query.constData(), &ffiOptions, &files)
                     : vd_search_tree_query_ex(service, rootPath.constData(),
@@ -234,8 +237,8 @@ void GlobalSearch::runScan(const SearchOptions &options, quint64 generation,
                             // FIX 1: the absolute path is the open/jump key and
                             // the display path comes from the ONE rule (relative
                             // when inside the project root, absolute otherwise).
-                            hit.filePath = QDir(options.rootPath)
-                                               .absoluteFilePath(QString::fromUtf8(item.path));
+                            const QString path = QString::fromUtf8(item.path);
+                            hit.filePath = singleFile ? path : QDir(options.rootPath).absoluteFilePath(path);
                             hit.relativePath =
                                 vedit::paths::displayPath(options.rootPath, hit.filePath);
                             hit.line = static_cast<int>(item.line);
@@ -257,33 +260,11 @@ void GlobalSearch::runScan(const SearchOptions &options, quint64 generation,
                         // is the UNION with the walk, so `filesScanned` counts
                         // folder files too; the set size is reported beside it
                         // instead of being presented as the scan's file count.
-                        summary.usedProjectFileSet = scoped;
+                        summary.usedProjectFileSet = hasFiles && !singleFile;
                         summary.filesInProjectSet =
-                            scoped ? static_cast<int>(options.files.size()) : 0;
+                            summary.usedProjectFileSet ? static_cast<int>(scanFiles.size()) : 0;
                         summary.filesMatched = static_cast<int>(ffiSummary.files_matched);
                         summary.hitCount = static_cast<int>(ffiSummary.hit_count);
-                        // The dock's "current file" scope: the walk is the Rust
-                        // one (never a Qt directory walk); this lane only drops
-                        // the hits outside the requested file and reports the
-                        // counters OF THE REPORTED SET, not of the whole walk.
-                        if (!options.fileFilter.isEmpty()) {
-                            const QString wanted = QFileInfo(options.fileFilter).absoluteFilePath();
-                            QList<SearchHit> filtered;
-                            QStringList matchedFiles;
-                            filtered.reserve(hits.size());
-                            for (const SearchHit &hit : hits) {
-                                if (hit.filePath != wanted) {
-                                    continue;
-                                }
-                                filtered.append(hit);
-                                if (!matchedFiles.contains(hit.filePath)) {
-                                    matchedFiles.append(hit.filePath);
-                                }
-                            }
-                            hits = filtered;
-                            summary.filesMatched = matchedFiles.size();
-                            summary.hitCount = filtered.size();
-                        }
                         summary.skippedBinary = static_cast<int>(ffiSummary.skipped_binary);
                         summary.skippedTooLarge = static_cast<int>(ffiSummary.skipped_too_large);
                         summary.skippedUnreadable = static_cast<int>(ffiSummary.skipped_unreadable);

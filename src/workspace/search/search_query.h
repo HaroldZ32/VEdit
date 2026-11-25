@@ -24,6 +24,7 @@
 // `regex` crate (RE2-style: no backreferences, no lookaround), while the
 // in-file search uses QRegularExpression (PCRE-like). The OPTIONS mean the same
 // thing on both sides; the pattern dialect does not.
+#include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QJsonArray>
@@ -46,10 +47,8 @@ constexpr int kSearchHistoryLimit = 20;
 
 // The ONE on-disk form of the search history: a small JSON array of strings,
 // newest first, next to the settings store. These helpers are header-only and
-// QtCore-only for the same reason the hub is (the editor kernel is a LOWER layer
-// and may include this header without a link edge); they never decide WHEN to
-// touch the disk — the integration does, once at startup and once at quit, so a
-// search itself performs no file IO.
+// QtCore-only so the editor and workspace can share the store without a link
+// dependency. The integration chooses when to load and save it.
 inline QString searchHistoryPath(const QString &stateDir)
 {
     if (stateDir.isEmpty()) {
@@ -83,8 +82,8 @@ inline QStringList loadSearchHistoryFile(const QString &stateDir)
         if (!value.isString()) {
             continue;
         }
-        const QString query = value.toString().trimmed();
-        if (query.isEmpty() || entries.contains(query)) {
+        const QString query = value.toString();
+        if (query.trimmed().isEmpty() || entries.contains(query)) {
             continue;
         }
         entries.append(query);
@@ -105,22 +104,24 @@ inline bool saveSearchHistoryFile(const QString &stateDir, const QStringList &hi
         return false;
     }
     QJsonArray array;
-    int kept = 0;
     for (const QString &entry : history) {
-        const QString query = entry.trimmed();
-        if (query.isEmpty()) {
+        if (entry.trimmed().isEmpty()) {
             continue;
         }
-        array.append(query);
-        if (++kept >= kSearchHistoryLimit) {
+        array.append(entry);
+        if (array.size() >= kSearchHistoryLimit) {
             break;
         }
+    }
+    if (!QDir().mkpath(stateDir)) {
+        return false;
     }
     QSaveFile file(path);
     if (!file.open(QIODevice::WriteOnly)) {
         return false;
     }
-    if (file.write(QJsonDocument(array).toJson(QJsonDocument::Compact)) < 0) {
+    const QByteArray bytes = QJsonDocument(array).toJson(QJsonDocument::Compact);
+    if (file.write(bytes) != bytes.size()) {
         file.cancelWriting();
         return false;
     }
@@ -292,9 +293,7 @@ public:
     using HistoryLoader = std::function<QStringList()>;
     using HistorySaver = std::function<void(const QStringList &)>;
 
-    // `loader` is read once, now (startup); `saver` is called on every change
-    // and may be null when the caller persists at another moment (the product
-    // saves once at quit, so a search does no file IO).
+    // Read once at startup and save when a submission changes the list.
     void setHistoryStore(HistoryLoader loader, HistorySaver saver)
     {
         historyLoader_ = std::move(loader);
@@ -308,13 +307,12 @@ public:
 
     void noteQuery(const QString &query)
     {
-        const QString trimmed = query.trimmed();
-        if (trimmed.isEmpty()) {
+        if (query.trimmed().isEmpty()) {
             return;
         }
         QStringList updated = boundedHistory(history_);
-        updated.removeAll(trimmed);
-        updated.prepend(trimmed);
+        updated.removeAll(query);
+        updated.prepend(query);
         while (updated.size() > kSearchHistoryLimit) {
             updated.removeLast();
         }
@@ -338,18 +336,16 @@ public:
         }
     }
 
-    // Trim, drop blanks, dedupe (first occurrence wins) and cap — the ONE
-    // normalisation both the file loader and the store adopt.
+    // Preserve exact patterns. Drop blanks and duplicates, and cap the list.
     static QStringList boundedHistory(const QStringList &input)
     {
         QStringList bounded;
         bounded.reserve(std::min<int>(input.size(), kSearchHistoryLimit));
         for (const QString &entry : input) {
-            const QString query = entry.trimmed();
-            if (query.isEmpty() || bounded.contains(query)) {
+            if (entry.trimmed().isEmpty() || bounded.contains(entry)) {
                 continue;
             }
-            bounded.append(query);
+            bounded.append(entry);
             if (bounded.size() >= kSearchHistoryLimit) {
                 break;
             }

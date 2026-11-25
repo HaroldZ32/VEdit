@@ -2,7 +2,7 @@
 #include "../../common/item_context_menu.h"
 
 #include "jump/jump_registry.h"
-#include "search_query.h"
+#include "search_history_button.h"
 
 #include <QComboBox>
 #include <QDateTime>
@@ -10,6 +10,7 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QFont>
+#include <QGridLayout>
 #include <QHBoxLayout>
 #include <QHash>
 #include <QHeaderView>
@@ -17,6 +18,8 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QResizeEvent>
+#include <QStackedLayout>
 #include <QStringList>
 #include <QToolButton>
 #include <QTreeWidget>
@@ -34,8 +37,7 @@ SearchPanel::SearchPanel(QWidget *parent)
 {
     buildUi();
     connectSignals();
-    updateRootLabel();
-    showEmptyState(tr("No project root. Open a project to search its files."));
+    invalidateResults(tr("Enter a query and press Search."));
 
     // The dock is the ONE project-search endpoint of the Ctrl+F bar's
     // "whole project" scope (ux-batch-2 B2): the bar publishes the query + the
@@ -85,43 +87,59 @@ void SearchPanel::buildUi()
     layout->setContentsMargins(6, 6, 6, 6);
     layout->setSpacing(4);
 
-    auto *toolbar = new QHBoxLayout();
-    toolbar->setSpacing(4);
+    auto *searchControls = new QWidget(this);
+    searchControls->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    searchLayout_ = new QGridLayout(searchControls);
+    searchLayout_->setContentsMargins(0, 0, 0, 0);
+    searchLayout_->setSpacing(4);
+    layout->addWidget(searchControls);
 
-    query_ = new QLineEdit(this);
+    queryInput_ = new QWidget(searchControls);
+    auto *queryLayout = new QHBoxLayout(queryInput_);
+    queryLayout->setContentsMargins(0, 0, 0, 0);
+    queryLayout->setSpacing(4);
+    query_ = new QLineEdit(queryInput_);
     query_->setObjectName(QStringLiteral("search-query"));
-    query_->setPlaceholderText(tr("Search text in the project…"));
+    query_->setPlaceholderText(tr("Search"));
+    query_->setAccessibleName(tr("Search text in the project…"));
     query_->setClearButtonEnabled(true);
-    toolbar->addWidget(query_, 1);
+    query_->setMinimumWidth(75);
+    queryLayout->addWidget(query_, 1);
+    queryLayout->addWidget(vedit::search::createHistoryButton(query_, queryInput_));
 
-    caseButton_ = new QToolButton(this);
+    matchOptions_ = new QWidget(searchControls);
+    auto *matchLayout = new QHBoxLayout(matchOptions_);
+    matchLayout->setContentsMargins(0, 0, 0, 0);
+    matchLayout->setSpacing(4);
+
+    caseButton_ = new QToolButton(matchOptions_);
     caseButton_->setObjectName(QStringLiteral("search-case"));
     caseButton_->setText(QStringLiteral("Aa"));
     caseButton_->setCheckable(true);
     caseButton_->setToolTip(tr("Match case"));
-    toolbar->addWidget(caseButton_);
+    matchLayout->addWidget(caseButton_);
 
     // The SAME option set the Ctrl+F bar exposes (search_query.h): whole word
     // and regex complete the four options the two surfaces share.
-    wholeButton_ = new QToolButton(this);
+    wholeButton_ = new QToolButton(matchOptions_);
     wholeButton_->setObjectName(QStringLiteral("search-whole"));
     wholeButton_->setText(QStringLiteral("W"));
     wholeButton_->setCheckable(true);
     wholeButton_->setToolTip(tr("Whole words"));
-    toolbar->addWidget(wholeButton_);
+    matchLayout->addWidget(wholeButton_);
 
-    regexButton_ = new QToolButton(this);
+    regexButton_ = new QToolButton(matchOptions_);
     regexButton_->setObjectName(QStringLiteral("search-regex"));
     regexButton_->setText(QStringLiteral(".*"));
     regexButton_->setCheckable(true);
     regexButton_->setToolTip(tr("Regular expression (project-wide: RE2 style, no backreferences "
                                 "or lookaround)"));
-    toolbar->addWidget(regexButton_);
+    matchLayout->addWidget(regexButton_);
 
     // The scope selector, item 4 of the shared model. The dock is a project
     // search panel, so its natural start is the whole project; the Ctrl+F bar
     // starts on the current file (a UI policy, not a semantic difference).
-    scopeCombo_ = new QComboBox(this);
+    scopeCombo_ = new QComboBox(searchControls);
     scopeCombo_->setObjectName(QStringLiteral("search-scope"));
     scopeCombo_->addItem(tr("Current File"),
                          static_cast<int>(vedit::search::SearchScope::CurrentFile));
@@ -129,47 +147,44 @@ void SearchPanel::buildUi()
                          static_cast<int>(vedit::search::SearchScope::WholeProject));
     scopeCombo_->setCurrentIndex(1);
     scopeCombo_->setToolTip(tr("Search the active document or the whole project"));
-    toolbar->addWidget(scopeCombo_);
 
-    verilogButton_ = new QToolButton(this);
+    verilogButton_ = new QToolButton(matchOptions_);
     verilogButton_->setObjectName(QStringLiteral("search-verilog-only"));
     verilogButton_->setText(QStringLiteral("Verilog"));
     verilogButton_->setCheckable(true);
     verilogButton_->setToolTip(tr("Only .v/.vh/.sv/.svh files (explicit extension table)"));
-    toolbar->addWidget(verilogButton_);
+    matchLayout->addWidget(verilogButton_);
 
-    searchButton_ = new QPushButton(tr("Search"), this);
+    runButtons_ = new QWidget(searchControls);
+    auto *runLayout = new QStackedLayout(runButtons_);
+    searchButton_ = new QPushButton(tr("Search"), runButtons_);
     searchButton_->setObjectName(QStringLiteral("search-run"));
-    toolbar->addWidget(searchButton_);
+    runLayout->addWidget(searchButton_);
 
-    cancelButton_ = new QPushButton(tr("Cancel"), this);
+    cancelButton_ = new QPushButton(tr("Cancel"), runButtons_);
     cancelButton_->setObjectName(QStringLiteral("search-cancel"));
-    cancelButton_->hide();
-    toolbar->addWidget(cancelButton_);
-
-    layout->addLayout(toolbar);
+    runLayout->addWidget(cancelButton_);
 
     // The replace row (ux-batch-2 B2): 「替换」 replaces the selected hit and
     // advances; 「全部替换」 confirms file/hit counts first, then applies every
     // range grouped per file. Both are plain actions, not a preview dialog.
     replaceRow_ = new QWidget(this);
     replaceRow_->setObjectName(QStringLiteral("search-replace-row"));
-    auto *replaceLayout = new QHBoxLayout(replaceRow_);
-    replaceLayout->setContentsMargins(0, 0, 0, 0);
-    replaceLayout->setSpacing(4);
+    replaceRow_->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    replaceLayout_ = new QGridLayout(replaceRow_);
+    replaceLayout_->setContentsMargins(0, 0, 0, 0);
+    replaceLayout_->setSpacing(4);
     replaceEdit_ = new QLineEdit(replaceRow_);
     replaceEdit_->setObjectName(QStringLiteral("search-replacement"));
     replaceEdit_->setPlaceholderText(tr("Replace with"));
-    replaceLayout->addWidget(replaceEdit_, 1);
+    replaceEdit_->setMinimumWidth(75);
     replaceButton_ = new QPushButton(tr("Replace"), replaceRow_);
     replaceButton_->setObjectName(QStringLiteral("search-replace"));
     replaceButton_->setToolTip(tr("Replace the current match and advance to the next one"));
-    replaceLayout->addWidget(replaceButton_);
     replaceAllButton_ = new QPushButton(tr("Replace All"), replaceRow_);
     replaceAllButton_->setObjectName(QStringLiteral("search-replace-all"));
     replaceAllButton_->setToolTip(tr("Replace every match (asks for confirmation with the "
                                      "file and hit counts first)"));
-    replaceLayout->addWidget(replaceAllButton_);
     layout->addWidget(replaceRow_);
 
     replaceStatus_ = new QLabel(this);
@@ -180,7 +195,8 @@ void SearchPanel::buildUi()
 
     rootLabel_ = new QLabel(this);
     rootLabel_->setObjectName(QStringLiteral("search-root"));
-    rootLabel_->setWordWrap(true);
+    rootLabel_->setTextFormat(Qt::PlainText);
+    rootLabel_->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
     layout->addWidget(rootLabel_);
 
     summaryLabel_ = new QLabel(this);
@@ -194,8 +210,7 @@ void SearchPanel::buildUi()
     tree_->setHeaderLabels({tr("File"), tr("Line"), tr("Match")});
     tree_->setUniformRowHeights(true);
     tree_->setAlternatingRowColors(true);
-    tree_->setColumnWidth(0, 260);
-    tree_->setColumnWidth(1, 60);
+    tree_->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
     tree_->hide();
     layout->addWidget(tree_, 1);
 
@@ -204,6 +219,60 @@ void SearchPanel::buildUi()
     emptyLabel_->setWordWrap(true);
     emptyLabel_->setAlignment(Qt::AlignCenter);
     layout->addWidget(emptyLabel_, 1);
+    for (QLabel *label : {replaceStatus_, summaryLabel_, emptyLabel_}) {
+        label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
+    }
+
+    layoutControls(true);
+    compactWidth_ = std::max(searchLayout_->minimumSize().width(),
+                             replaceLayout_->minimumSize().width()) + 12;
+}
+
+QSize SearchPanel::minimumSizeHint() const
+{
+    return QSize(compactWidth_, QWidget::minimumSizeHint().height());
+}
+
+void SearchPanel::layoutControls(bool compact)
+{
+    compactControls_ = compact;
+    searchLayout_->setColumnStretch(0, 1);
+    replaceLayout_->setColumnStretch(0, 1);
+    if (compact) {
+        searchLayout_->addWidget(queryInput_, 0, 0, 1, 3);
+        searchLayout_->addWidget(runButtons_, 0, 3);
+        searchLayout_->addWidget(matchOptions_, 1, 0, 1, 4, Qt::AlignLeft);
+        searchLayout_->addWidget(scopeCombo_, 2, 0, 1, 4, Qt::AlignLeft);
+        replaceLayout_->addWidget(replaceEdit_, 0, 0, 1, 3);
+        replaceLayout_->addWidget(replaceButton_, 1, 1);
+        replaceLayout_->addWidget(replaceAllButton_, 1, 2);
+    } else {
+        searchLayout_->addWidget(queryInput_, 0, 0);
+        searchLayout_->addWidget(matchOptions_, 0, 1);
+        searchLayout_->addWidget(scopeCombo_, 0, 2);
+        searchLayout_->addWidget(runButtons_, 0, 3);
+        replaceLayout_->addWidget(replaceEdit_, 0, 0);
+        replaceLayout_->addWidget(replaceButton_, 0, 1);
+        replaceLayout_->addWidget(replaceAllButton_, 0, 2);
+    }
+    tree_->header()->setStretchLastSection(!compact);
+    tree_->setColumnWidth(0, compact ? 110 : 260);
+    tree_->setColumnWidth(1, compact ? 44 : 60);
+    if (compact) {
+        tree_->setColumnWidth(2, 330);
+    }
+}
+
+void SearchPanel::resizeEvent(QResizeEvent *event)
+{
+    QWidget::resizeEvent(event);
+    const int wideWidth = queryInput_->sizeHint().width() + matchOptions_->sizeHint().width()
+                          + scopeCombo_->sizeHint().width() + runButtons_->sizeHint().width() + 24;
+    const bool compact = event->size().width() < wideWidth;
+    if (compact != compactControls_) {
+        layoutControls(compact);
+    }
+    updateRootLabel();
 }
 
 void SearchPanel::connectSignals()
@@ -291,15 +360,8 @@ void SearchPanel::setRootPath(const QString &rootPath)
     operationActive_ = false;
     operationInputChanged_ = false;
     scanInputChanged_ = false;
-    clearResults();
-    summaryLabel_->clear();
     updateControlState();
-    updateRootLabel();
-    if (rootPath_.isEmpty()) {
-        showEmptyState(tr("No project root. Open a project to search its files."));
-    } else {
-        showEmptyState(tr("Enter a query and press Search."));
-    }
+    invalidateResults(tr("Enter a query and press Search."));
 }
 
 QString SearchPanel::rootPath() const
@@ -376,6 +438,7 @@ void SearchPanel::setScope(vedit::search::SearchScope scope)
 void SearchPanel::setCurrentFileProvider(std::function<QString()> provider)
 {
     currentFileProvider_ = std::move(provider);
+    invalidateResults(tr("Enter a query and press Search."));
 }
 
 void SearchPanel::setProjectFilesProvider(std::function<QStringList()> provider)
@@ -407,18 +470,11 @@ QStringList SearchPanel::projectFiles() const
 
 QString SearchPanel::resolveCurrentFile() const
 {
-    if (currentFileProvider_) {
-        // High 5: the product provider resolves the ACTIVE pane's document at
-        // the moment of the search/replace, so a tab or pane switch is always
-        // followed. An empty result means "no current file" — never a stale
-        // path from the last bar/result click.
-        const QString active = currentFileProvider_();
-        if (!active.isEmpty()) {
-            vedit::search::SearchHub::instance().setCurrentFilePath(active);
-        }
-        return active;
-    }
-    return vedit::search::SearchHub::instance().currentFilePath();
+    // In the product the active pane is authoritative, including an untitled
+    // document with no path. Only panels without a provider use the hub.
+    const QString path = currentFileProvider_ ? currentFileProvider_()
+                                              : vedit::search::SearchHub::instance().currentFilePath();
+    return QFileInfo(path).isAbsolute() ? QDir::cleanPath(path) : QString();
 }
 
 vedit::search::SearchScope SearchPanel::scope() const
@@ -529,13 +585,7 @@ SearchOptions SearchPanel::buildOptions(bool allMatches) const
     options.maxDurationMs = timeBudgetMs_;
     if (scope() == vedit::search::SearchScope::CurrentFile) {
         options.fileFilter = resolveCurrentFile();
-        // The active document is the WHOLE scope: searching exactly it keeps a
-        // file opened from outside the project searchable (the project set is
-        // not consulted), and it costs one file instead of a set.
-        if (!options.fileFilter.isEmpty()) {
-            options.files = QStringList{QFileInfo(options.fileFilter).absoluteFilePath()};
-        }
-    } else {
+    } else if (!rootPath_.isEmpty()) {
         // Whole project (batch 20261110d): the project file set is the scope,
         // read LIVE so a `.f` imported since the dock was built is honoured.
         // Empty means no set exists yet — the scan falls back to the directory
@@ -543,6 +593,30 @@ SearchOptions SearchPanel::buildOptions(bool allMatches) const
         options.files = projectFiles();
     }
     return options;
+}
+
+QString SearchPanel::unavailableScopeMessage(const QString &currentFile) const
+{
+    if (scope() == vedit::search::SearchScope::CurrentFile) {
+        return currentFile.isEmpty()
+                   ? tr("No current file. Open a document or choose Whole Project.") : QString();
+    }
+    return rootPath_.isEmpty() ? tr("No project root. Open a project to search its files.")
+                               : QString();
+}
+
+bool SearchPanel::canScan(const SearchOptions &options)
+{
+    if (!unavailableScopeMessage(options.fileFilter).isEmpty() || options.query.isEmpty()) {
+        invalidateResults(tr("Enter a query and press Search."));
+        return false;
+    }
+    return true;
+}
+
+bool SearchPanel::currentFileChanged(const SearchOptions &options) const
+{
+    return !options.fileFilter.isEmpty() && options.fileFilter != resolveCurrentFile();
 }
 
 bool SearchPanel::beginScan(const SearchOptions &options, ReplaceScanPhase phase)
@@ -567,10 +641,6 @@ bool SearchPanel::beginScan(const SearchOptions &options, ReplaceScanPhase phase
     activeScanQuery_ = ReplaceQuery{options.query, options.caseSensitive, options.wholeWords,
                                     options.regex};
     activeScanOptions_ = options;
-    // Batch 20261110d: a dock search joins the shared bounded history. The hub
-    // is the ONE store; the Ctrl+F bar records through the same call, so both
-    // surfaces feed one list (and a repeated query is deduped, not appended).
-    vedit::search::SearchHub::instance().noteQuery(options.query);
     scanInputChanged_ = false;
     emptyLabel_->hide();
     tree_->show();
@@ -584,14 +654,15 @@ bool SearchPanel::beginScan(const SearchOptions &options, ReplaceScanPhase phase
     // began, so its hits and its stamp can describe different content.
     activeScanStartedMs_ = QDateTime::currentMSecsSinceEpoch();
 
-    // AC-1.2 evidence hook (unconditional, see setRootPath): the root actually
-    // handed to the scan, plus the shared options (ux-batch-2 B2).
+    // AC-1.2 evidence hook (unconditional, see setRootPath): report the
+    // effective scan scope and options.
+    const bool currentFile = !options.fileFilter.isEmpty();
     qInfo("search: query root='%s' query='%s' case=%d whole=%d regex=%d all=%d filter='%s' "
           "files=%d",
-          qPrintable(options.rootPath), qPrintable(options.query),
+          currentFile ? "" : qPrintable(options.rootPath), qPrintable(options.query),
           options.caseSensitive ? 1 : 0, options.wholeWords ? 1 : 0,
           options.regex ? 1 : 0, options.allMatches ? 1 : 0,
-          qPrintable(options.fileFilter), static_cast<int>(options.files.size()));
+          qPrintable(options.fileFilter), currentFile ? 1 : static_cast<int>(options.files.size()));
 
     if (!search_.start(options)) {
         searching_ = false;
@@ -600,6 +671,9 @@ bool SearchPanel::beginScan(const SearchOptions &options, ReplaceScanPhase phase
         updateControlState();
         showEmptyState(tr("The previous search did not stop in time; try again."));
         return false;
+    }
+    if (phase != ReplaceScanPhase::PostSave) {
+        vedit::search::SearchHub::instance().noteQuery(options.query);
     }
     return true;
 }
@@ -614,20 +688,8 @@ void SearchPanel::startSearch()
                             "it to finish and run the search again."));
         return;
     }
-    const QString queryText = query_->text().trimmed();
-    if (rootPath_.isEmpty()) {
-        showEmptyState(tr("No project root. Open a project to search its files."));
-        return;
-    }
-    if (queryText.isEmpty()) {
-        showEmptyState(tr("Enter a query and press Search."));
-        return;
-    }
     const SearchOptions options = buildOptions(false);
-    if (options.fileFilter.isEmpty() &&
-        scope() == vedit::search::SearchScope::CurrentFile) {
-        showEmptyState(
-            tr("No current file. Open a document or choose Whole Project."));
+    if (!canScan(options)) {
         return;
     }
     publishToHub();
@@ -655,6 +717,14 @@ SearchSummary SearchPanel::lastSummary() const
 bool SearchPanel::activateHit(int hitIndex)
 {
     if (hitIndex < 0 || hitIndex >= hits_.size()) {
+        return false;
+    }
+    if (scanInputChanged_ || currentFileChanged(activeScanOptions_)) {
+        if (searching_) {
+            scanInputChanged_ = true;
+            search_.cancel();
+        }
+        invalidateResults(tr("The result list is out of date; run the search again."));
         return false;
     }
     const SearchHit &hit = hits_.at(hitIndex);
@@ -784,6 +854,9 @@ void SearchPanel::clearResults()
 
 void SearchPanel::appendBatch(const QList<SearchHit> &hits)
 {
+    if (!searching_ || scanInputChanged_) {
+        return;
+    }
     for (SearchHit hit : hits) {
         // The matcher identity: this hit can only ever be applied through the
         // snapshot of the scan that produced it.
@@ -815,6 +888,9 @@ void SearchPanel::appendBatch(const QList<SearchHit> &hits)
 
 void SearchPanel::onSearchFinished(const SearchSummary &summary)
 {
+    if (!searching_) {
+        return;
+    }
     const ReplaceScanPhase phase = replaceScanPhase_;
     replaceScanPhase_ = ReplaceScanPhase::None;
     searching_ = false;
@@ -889,14 +965,9 @@ void SearchPanel::onSearchFinished(const SearchSummary &summary)
         emit searchFinished(0, false);
         return;
     }
-    if (scanInputChanged_) {
-        // The browse scan was started with a query the user has since changed;
-        // its rows must not stay clickable or replaceable.
-        clearResults();
-        lastScan_ = FrozenScan();
-        summaryLabel_->clear();
-        showEmptyState(tr("The query or options changed while the search was running; run the "
-                          "search again."));
+    if (scanInputChanged_ || currentFileChanged(activeScanOptions_)) {
+        invalidateResults(tr("The query or options changed while the search was running; run the "
+                             "search again."));
         updateControlState();
         emit searchFinished(0, false);
         return;
@@ -907,8 +978,10 @@ void SearchPanel::onSearchFinished(const SearchSummary &summary)
         } else if (summary.timedOut) {
             showEmptyState(tr("No results within the %1 ms time budget.").arg(timeBudgetMs_));
         } else {
+            const QString &location = activeScanOptions_.fileFilter.isEmpty()
+                                          ? activeScanOptions_.rootPath : activeScanOptions_.fileFilter;
             showEmptyState(tr("No results. Nothing matched \"%1\" in %2.")
-                               .arg(query_->text().trimmed(), rootPath_));
+                               .arg(activeScanOptions_.query, location));
         }
         lastScan_ = makeFrozenScan(activeScanOptions_, activeScanId_, activeScanQuery_);
         updateControlState();
@@ -954,7 +1027,13 @@ void SearchPanel::showEmptyState(const QString &text)
 
 void SearchPanel::updateRootLabel()
 {
-    rootLabel_->setText(rootPath_.isEmpty() ? tr("No project root.") : tr("In %1").arg(rootPath_));
+    const QString text = scope() == vedit::search::SearchScope::CurrentFile && rootPath_.isEmpty()
+                             ? scopeCombo_->currentText()
+                             : (rootPath_.isEmpty() ? tr("No project root.")
+                                                   : tr("In %1").arg(rootPath_));
+    rootLabel_->setToolTip(text);
+    rootLabel_->setText(rootLabel_->fontMetrics().elidedText(text, Qt::ElideMiddle,
+                                                           std::max(0, contentsRect().width() - 12)));
 }
 
 // --- replace (ux-batch-2 B2) ----------------------------------------------
@@ -978,7 +1057,7 @@ void SearchPanel::setBusy(bool busy)
 void SearchPanel::updateControlState()
 {
     const bool idle = !searching_ && !replacing_ && !operationActive_;
-    query_->setEnabled(idle);
+    queryInput_->setEnabled(idle);
     caseButton_->setEnabled(idle);
     wholeButton_->setEnabled(idle);
     regexButton_->setEnabled(idle);
@@ -988,7 +1067,8 @@ void SearchPanel::updateControlState()
     replaceButton_->setEnabled(idle);
     replaceAllButton_->setEnabled(idle);
     replaceEdit_->setEnabled(idle);
-    cancelButton_->setVisible(searching_);
+    static_cast<QStackedLayout *>(runButtons_->layout())->setCurrentWidget(
+        searching_ ? cancelButton_ : searchButton_);
 }
 
 // Item 4: a query/option change invalidates the rows the user could otherwise
@@ -1018,8 +1098,12 @@ void SearchPanel::invalidateResults(const QString &reason)
     clearResults();
     lastScan_ = FrozenScan();
     summaryLabel_->clear();
-    if (rootPath_.isEmpty()) {
-        showEmptyState(tr("No project root. Open a project to search its files."));
+    updateRootLabel();
+    const QString currentFile = scope() == vedit::search::SearchScope::CurrentFile
+                                    ? resolveCurrentFile() : QString();
+    const QString unavailable = unavailableScopeMessage(currentFile);
+    if (!unavailable.isEmpty()) {
+        showEmptyState(unavailable);
     } else if (query_->text().trimmed().isEmpty()) {
         showEmptyState(tr("Enter a query and press Search."));
     } else {
@@ -1282,23 +1366,14 @@ bool SearchPanel::ensureBuffersSaved(const QStringList &files, QStringList *save
 
 bool SearchPanel::replaceAllRequested()
 {
-    if (rootPath_.isEmpty()) {
-        showEmptyState(tr("No project root. Open a project to search its files."));
-        return false;
-    }
-    if (query_->text().trimmed().isEmpty()) {
-        showEmptyState(tr("Enter a query and press Search."));
-        return false;
-    }
     if (operationBusy()) {
         // Also covers the gap between the two counting scans and the
         // confirmation: a second 「全部替换」 must not take ownership of the
         // first one's operation state (b2-repair-r3 item 2).
         return false;
     }
-    if (scope() == vedit::search::SearchScope::CurrentFile &&
-        resolveCurrentFile().isEmpty()) {
-        showEmptyState(tr("No current file. Open a document or choose Whole Project."));
+    const SearchOptions options = buildOptions(true);
+    if (!canScan(options)) {
         return false;
     }
 
@@ -1312,7 +1387,6 @@ bool SearchPanel::replaceAllRequested()
     // request (root, scope, file filter, limits) before the first scan. Both
     // counting scans use this value and every later step compares the live
     // widgets against it; the write side never reads the widgets.
-    const SearchOptions options = buildOptions(true);
     operationActive_ = true;
     operationInputChanged_ = false;
     operationQuery_ = ReplaceQuery{options.query, options.caseSensitive, options.wholeWords,
@@ -1416,14 +1490,15 @@ void SearchPanel::finishPostSaveReplaceScan()
 
 bool SearchPanel::replaceCurrentHit()
 {
-    if (rootPath_.isEmpty()) {
-        showEmptyState(tr("No project root. Open a project to search its files."));
-        return false;
-    }
     if (operationBusy()) {
         return false;
     }
     if (hits_.isEmpty()) {
+        const QString unavailable = unavailableScopeMessage(resolveCurrentFile());
+        if (!unavailable.isEmpty()) {
+            showEmptyState(unavailable);
+            return false;
+        }
         setReplaceStatus(tr("No match to replace; run the search first."));
         return false;
     }

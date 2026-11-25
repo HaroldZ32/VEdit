@@ -233,8 +233,9 @@ pub struct TreeOptions {
     /// a `.f`) keeps being searched, and no project member is ever missed.
     ///
     /// Every path is scanned ONCE even when it is both walked and listed here
-    /// (the scanner keeps a visited set). Empty is the plain walk, so a caller
-    /// with no project set is unchanged.
+    /// (the scanner keeps a visited set). An empty set with a directory root is
+    /// the plain walk. An empty root requires a nonempty set of absolute paths
+    /// and searches only those files.
     pub files: Vec<PathBuf>,
     /// Stop after this many hits (`truncated` is set).
     pub max_results: usize,
@@ -391,16 +392,8 @@ impl TreeScanner<'_> {
         }
     }
 
-    /// Scan exactly the caller's file set (batch 20261110d). No directory is
-    /// read and no exclusion applies: an explicit member is a member even when
-    /// it lives outside `root` or under a pruned directory name. Sorted by
-    /// path so two runs of the same set report hits in a stable order, which
-    /// is the same determinism the walk gets from sorting directory entries.
-    /// Scan the caller's extra project members (batch 20261110d). The walk has
-    /// already run, so this is the SECOND half of the union: every member the
-    /// walk did not reach is read here (outside `root`, or under a pruned
-    /// directory), while a member the walk already visited is skipped by the
-    /// visited set. Sorted by path, so hits from this half are deterministic.
+    /// Scan explicit paths in stable order, skipping files already visited by
+    /// the directory walk when there is a root.
     fn scan_file_set(&mut self) {
         let mut files: Vec<&PathBuf> = self.options.files.iter().collect();
         files.sort();
@@ -433,6 +426,10 @@ impl TreeScanner<'_> {
             self.summary.skipped_unreadable += 1;
             return;
         };
+        if !metadata.is_file() {
+            self.summary.skipped_unreadable += 1;
+            return;
+        }
         if metadata.len() > self.options.max_file_bytes {
             self.summary.skipped_too_large += 1;
             return;
@@ -586,6 +583,8 @@ fn next_char_boundary(text: &str, at: usize) -> usize {
 /// and those members: the folder is still walked (a `.md` or a `.f` inside it
 /// stays searchable) AND every explicit member is scanned, including one outside
 /// the folder or under a pruned directory name. Each path is read once.
+/// An empty `root` searches only the provided files. It requires at least one
+/// member and all members must be absolute paths.
 ///
 /// The query is matched by one engine for both modes: a literal needle is
 /// escaped and compiled, a `regex` needle is compiled as written, and
@@ -603,11 +602,18 @@ pub fn search_tree(
     options: &TreeOptions,
 ) -> Result<TreeOutcome, IndexError> {
     let started = std::time::Instant::now();
-    if !root.is_dir() {
-        return Err(IndexError::MissingRoot(root.to_path_buf()));
-    }
-    if std::fs::read_dir(root).is_err() {
-        return Err(IndexError::UnreadableRoot(root.to_path_buf()));
+    let files_only = root.as_os_str().is_empty();
+    if files_only {
+        if options.files.is_empty() || options.files.iter().any(|file| !file.is_absolute()) {
+            return Err(IndexError::MissingRoot(root.to_path_buf()));
+        }
+    } else {
+        if !root.is_dir() {
+            return Err(IndexError::MissingRoot(root.to_path_buf()));
+        }
+        if std::fs::read_dir(root).is_err() {
+            return Err(IndexError::UnreadableRoot(root.to_path_buf()));
+        }
     }
     let matcher = compile_matcher(needle, options)?;
     let extensions = normalise_extensions(&options.extensions);
@@ -622,10 +628,9 @@ pub fn search_tree(
         visited: HashSet::new(),
     };
     if !needle.is_empty() {
-        // The scope is the UNION: the folder walk plus the project members the
-        // walk cannot reach. `scan_file_set` is a no-op for an empty list, and
-        // the visited set makes an inside-the-folder member cost nothing.
-        scanner.walk(root, 0);
+        if !files_only {
+            scanner.walk(root, 0);
+        }
         scanner.scan_file_set();
     }
     scanner.summary.elapsed_ms = u64::try_from(started.elapsed().as_millis()).unwrap_or(u64::MAX);
@@ -1054,6 +1059,37 @@ mod tests {
             &TreeOptions::default(),
         );
         assert!(matches!(result, Err(IndexError::MissingRoot(_))));
+    }
+
+    #[test]
+    fn tree_without_root_scans_only_explicit_absolute_files(
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        let dir = tempfile::tempdir()?;
+        write(dir.path(), "active.sv", "needle needle\n");
+        write(dir.path(), "sibling.sv", "needle sibling\n");
+        let active = dir.path().join("active.sv");
+        let options = TreeOptions {
+            files: vec![active.clone()],
+            all_matches: true,
+            ..TreeOptions::default()
+        };
+        let no_root = Path::new("");
+        let result = search_tree(no_root, "needle", &options)?;
+        assert_eq!(result.summary.files_scanned, 1);
+        assert_eq!(result.hits.len(), 2);
+        assert!(result.hits.iter().all(|hit| hit.relative_path == active));
+
+        for files in [Vec::new(), vec![PathBuf::from("active.sv")]] {
+            let invalid = TreeOptions {
+                files,
+                ..TreeOptions::default()
+            };
+            assert!(matches!(
+                search_tree(no_root, "needle", &invalid),
+                Err(IndexError::MissingRoot(_))
+            ));
+        }
+        Ok(())
     }
 
     #[test]
