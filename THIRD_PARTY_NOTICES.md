@@ -128,15 +128,17 @@ sha256）的原始输出见 [`evidence/docs-amendments/02-sha256-check.txt`](evi
 | 语言名 | `Verilog` | `SystemVerilog` |
 | 许可 | **LGPL-2.1-or-later** | **LGPL-2.1-or-later** |
 | 仓库路径 | `resources/syntax/vedit-verilog.xml` | `resources/syntax/vedit-systemverilog.xml` |
-| 行数 / 字节 | 85 / 5,111 B | 90 / 5,492 B |
-| **sha256** | `c6adc763c7b280d7493f48d06e5779d0b1e2068ac82f75fe7f31a07b0788a6c2` | `2abba3342d0878e71b99d358d96e510f857cd7f232786951be8602f513e0b992` |
+| 行数 / 字节 | 30 / 1,157 B | 183 / 11,659 B |
+| **sha256** | `d425aeb66a1e5d55562f47bab6c08135c2b681e6d83982b72ba0ced7fdf42995` | `269ac7519998efdd677bdf2e70c0d64a6e60420150ad5438ed1532a4288d1811` |
 | 安装落点（AppDir） | `usr/share/org.kde.syntax-highlighting/syntax/vedit-verilog.xml` | `usr/share/org.kde.syntax-highlighting/syntax/vedit-systemverilog.xml` |
 | 许可全文 | `docs/licenses/LGPL-2.1.txt`（亦随包 `resources/syntax/LICENSE-LGPL-2.1`，26,419 B） | 同左 |
 | 上游功能参照（非复制） | GtkSourceView 4.6.1 `verilog.lang`（475 行，sha256 `7670ddfd7b443f5f99c202bfa79de31834c1bd8968ed74c39474dca4f439d464`） | GtkSourceView 4.6.1 `systemverilog.lang`（262 行，sha256 `9d1f67411f2674d93f035620ce004da4beca5bbf469eb9955a83c332edb79b04`） |
 | 上游 tarball pin | `GSV_SHA256=63f487a7ab59612ffa9e7be1883dbd274ab1016afcede3239b93b0fc384df874`（`scripts/versions.env:24-26`） | 同左 |
 
-> **哈希变更记录（2026-10-31，T45）**：T45 把两份 XML 的折叠规则改写为 KDE 关键字列表惯用法
-> （`<list>` + `<keyword String="列表名" beginRegion/endRegion>`）后，行数 / 字节 / sha256 变为上表值；
+> **哈希变更记录（2026-11-24）**：两份定义通过 KDE 的 `syntax-addons` 入口用于实时高亮。Verilog 复用 SystemVerilog 的高亮和折叠规则。上表记录本次变更后的值。
+>
+> **历史记录（2026-10-31，T45）**：T45 把两份 XML 的折叠规则改写为 KDE 关键字列表惯用法
+> （`<list>` + `<keyword String="列表名" beginRegion/endRegion>`）；
 > 旧的 78 / 5,172 B `3d1ec41f…`、89 / 6,276 B `dc6e0a47…` 是 **T45 重写前的历史值**，只保留在旧证据与
 > 旧打包快照里（`evidence/highlight-v2/10-licensing-and-embargo.txt`、
 > `evidence/m0-runtime/runtime-manifest.txt`、`evidence/docs-amendments/02-sha256-check.txt`），不改写。

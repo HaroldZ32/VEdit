@@ -37,6 +37,7 @@ set(VEDIT_EDIT_CORE_SOURCES
   kernel/editor_advanced.cpp
   kernel/editor_context_menu.cpp
   kernel/edit_core_selftest.cpp
+  kernel/filelist_path_completion.cpp
   kernel/find_replace.cpp
   kernel/goto_line.cpp
   kernel/highlight_diagnosis.cpp
@@ -103,7 +104,8 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/fim/CMakeLists.txt")
   message(STATUS "VEdit edit-core: FIM inline-completion lane wired into the live editor (T104)")
 endif()
 
-add_library(vedit_editor_core STATIC ${VEDIT_EDIT_CORE_SOURCES})
+qt_add_resources(VEDIT_RENDERED_LANGUAGES kernel/rendered_languages.qrc)
+add_library(vedit_editor_core STATIC ${VEDIT_EDIT_CORE_SOURCES} ${VEDIT_RENDERED_LANGUAGES})
 target_include_directories(vedit_editor_core PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 target_link_libraries(vedit_editor_core PUBLIC
   Qt6::Core
@@ -383,9 +385,11 @@ else()
 endif()
 
 # T104: the FIM wiring has its own headless entry (real provider + real lane).
-if(VEDIT_EDIT_CORE_HAVE_FIM)
+if(VEDIT_EDIT_CORE_HAVE_FIM AND TARGET Qt6::Test
+    AND (TARGET vd_ffi OR (EXISTS "${VEDIT_FFI_STATICLIB}"
+                           AND EXISTS "${VEDIT_FFI_INCLUDE_DIR}/vd_ffi.h")))
   add_executable(vedit-fim-wiring-selftest kernel/fim_wiring_selftest.cpp)
-  target_link_libraries(vedit-fim-wiring-selftest PRIVATE vedit_editor_core)
+  target_link_libraries(vedit-fim-wiring-selftest PRIVATE vedit_editor_core Qt6::Test)
   if(VEDIT_EDIT_CORE_HAVE_APP_SEAM)
     target_include_directories(vedit-fim-wiring-selftest PRIVATE
       "${CMAKE_CURRENT_SOURCE_DIR}/../app")
@@ -410,6 +414,18 @@ endif()
 # It needs the shell (EditorArea lives there), so it exists only in the product
 # tree; a standalone kernel build skips it.
 if(TARGET vedit_app_shell AND TARGET Qt6::Test)
+  add_executable(vedit-editor-language-tests kernel/editor_language_test.cpp)
+  target_include_directories(vedit-editor-language-tests PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../app"
+                                                                "${CMAKE_CURRENT_SOURCE_DIR}/../common")
+  target_link_libraries(vedit-editor-language-tests PRIVATE vedit_editor_core vedit_app_shell Qt6::Test)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-editor-language-tests PRIVATE -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  add_test(NAME vedit-editor-language-tests COMMAND vedit-editor-language-tests)
+  set_tests_properties(vedit-editor-language-tests PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen;VEDIT_NO_ENV_AUTOCAPTURE=1"
+    TIMEOUT 35)
+
   add_executable(vedit-undo-view-lifetime-tests kernel/undo_view_lifetime_test.cpp)
   target_link_libraries(vedit-undo-view-lifetime-tests PRIVATE
     vedit_editor_core
