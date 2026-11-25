@@ -20,6 +20,8 @@
 
 #include <functional>
 
+class QProcess;
+
 namespace vedit::app::i18n {
 
 enum class UiLanguage { Auto, English, SimplifiedChinese };
@@ -83,10 +85,15 @@ QString translationsDirectoryFor(const QString &applicationDirPath);
 struct RestartCommand {
     QString program;
     QStringList arguments;
+    bool packaged = false;
 };
 RestartCommand restartCommand(const QString &appImage, const QString &applicationDirPath,
                               const QString &applicationFilePath,
                               const QStringList &arguments);
+
+// Prepares the launcher and restores host paths before re-entering a package.
+void configureRestartProcess(QProcess &process, const RestartCommand &launch,
+                             const QString &applicationDirPath);
 
 // Relaunches the application with the same arguments (detached) and returns true
 // once the child started. The launcher is $APPIMAGE when the AppImage runtime set
