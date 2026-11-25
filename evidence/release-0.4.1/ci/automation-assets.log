@@ -1,0 +1,8 @@
+Exact four files: exit 0
+Duplicate manifest entry: exit 1
+Extra manifest line: exit 1
+Modified package: exit 1
+Missing package: exit 1
+Symlink package: exit 1
+Package exactly 2 GiB: exit 1
+Extra hidden file: exit 1

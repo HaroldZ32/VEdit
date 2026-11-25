@@ -1,0 +1,30 @@
+138421454322	Check release source	success
+138421532127	Validate and package Qt6 / Pinned slang dependency	success
+138421532143	Validate and package Qt6 / Offline Scala dependencies	success
+138424534888	Validate and package Qt6 / Rust services and C ABI	success
+138427346952	Validate and package Qt6 / Qt6 build and gates	success
+138438427098	Validate and package Qt6 / Qt6 AppImage and CentOS 7 verification	success
+138445977485	Publish verified AppImage and SHA256SUMS	success
+qt6-appimage-97131668766270bfea3e92804e7b0444fa00288f-1	1085008750
+qt6-packaging-logs-1	720173
+qt6-build-logs-1	90772
+qt6-package-inputs-1	55604413
+slang-1	3447239
+ffi-1	16752337
+scala-payload-1	1307647873
+Validate and package Qt6 / Qt6 AppImage and CentOS 7 verification	UNKNOWN STEP	2026-11-24T12:19:46.5370744Z Filesystem            Size  Used Avail Use% Mounted on
+Validate and package Qt6 / Qt6 AppImage and CentOS 7 verification	UNKNOWN STEP	2026-11-24T12:28:07.2301782Z Filesystem            Size  Used Avail Use% Mounted on
+Validate and package Qt6 / Qt6 AppImage and CentOS 7 verification	UNKNOWN STEP	2026-11-24T12:28:58.2398279Z APPDIR_BYTES=2438918242
+Validate and package Qt6 / Qt6 AppImage and CentOS 7 verification	UNKNOWN STEP	2026-11-24T12:30:48.6938993Z appimage_bytes=1085008376
+Validate and package Qt6 / Qt6 AppImage and CentOS 7 verification	UNKNOWN STEP	2026-11-24T12:30:49.3989184Z Filesystem            Size  Used Avail Use% Mounted on
+Validate and package Qt6 / Qt6 AppImage and CentOS 7 verification	UNKNOWN STEP	2026-11-24T12:31:25.2209228Z Artifact qt6-appimage-97131668766270bfea3e92804e7b0444fa00288f-1 has been successfully uploaded! Final size is 1085008750 bytes. Artifact ID is 14920570844
+Validate and package Qt6 / Qt6 AppImage and CentOS 7 verification	UNKNOWN STEP	2026-11-24T12:31:27.0831395Z Artifact qt6-packaging-logs-1 has been successfully uploaded! Final size is 720173 bytes. Artifact ID is 14920117101
+Validate and package Qt6 / Qt6 AppImage and CentOS 7 verification	UNKNOWN STEP	2026-11-24T12:19:46.5370744Z Filesystem            Size  Used Avail Use% Mounted on
+Validate and package Qt6 / Qt6 AppImage and CentOS 7 verification	UNKNOWN STEP	2026-11-24T12:19:46.5371182Z /dev/mapper/cow-root  145G   58G   87G  40% /
+Validate and package Qt6 / Qt6 AppImage and CentOS 7 verification	UNKNOWN STEP	2026-11-24T12:19:46.5371688Z /dev/mapper/cow-root  145G   58G   87G  40% /
+Validate and package Qt6 / Qt6 AppImage and CentOS 7 verification	UNKNOWN STEP	2026-11-24T12:28:07.2301782Z Filesystem            Size  Used Avail Use% Mounted on
+Validate and package Qt6 / Qt6 AppImage and CentOS 7 verification	UNKNOWN STEP	2026-11-24T12:28:07.2302209Z /dev/mapper/cow-root  145G   61G   84G  42% /
+Validate and package Qt6 / Qt6 AppImage and CentOS 7 verification	UNKNOWN STEP	2026-11-24T12:28:07.2302646Z /dev/mapper/cow-root  145G   61G   84G  42% /
+Validate and package Qt6 / Qt6 AppImage and CentOS 7 verification	UNKNOWN STEP	2026-11-24T12:30:49.3989184Z Filesystem            Size  Used Avail Use% Mounted on
+Validate and package Qt6 / Qt6 AppImage and CentOS 7 verification	UNKNOWN STEP	2026-11-24T12:30:49.3989512Z /dev/mapper/cow-root  145G   67G   78G  46% /
+Validate and package Qt6 / Qt6 AppImage and CentOS 7 verification	UNKNOWN STEP	2026-11-24T12:30:49.3989751Z /dev/mapper/cow-root  145G   67G   78G  46% /

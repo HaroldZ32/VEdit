@@ -1,0 +1,21 @@
+Test project /vedit-build/target/qt6-build
+    Start  8: vedit-terminal-selftest
+1/8 Test  #8: vedit-terminal-selftest ..........   Passed    2.07 sec
+    Start  9: vedit-terminal-env-inheritance
+2/8 Test  #9: vedit-terminal-env-inheritance ...   Passed    0.02 sec
+    Start 10: vedit-terminal-env-imported
+3/8 Test #10: vedit-terminal-env-imported ......   Passed    0.03 sec
+    Start 12: vedit-app-ffi-abi-selftest
+4/8 Test #12: vedit-app-ffi-abi-selftest .......   Passed    0.11 sec
+    Start 13: vedit-app-shell-selftest
+5/8 Test #13: vedit-app-shell-selftest .........   Passed    2.48 sec
+    Start 18: vedit-app-i18n-selftest
+6/8 Test #18: vedit-app-i18n-selftest ..........   Passed    0.02 sec
+    Start 70: vedit-diagnostics-ffi-selftest
+7/8 Test #70: vedit-diagnostics-ffi-selftest ...   Passed    0.01 sec
+    Start 95: vedit-host-shell-selftest
+8/8 Test #95: vedit-host-shell-selftest ........   Passed    0.17 sec
+
+100% tests passed, 0 tests failed out of 8
+
+Total Test time (real) =   4.91 sec

@@ -1,0 +1,8 @@
+complete: exit 0, publish request sent
+missing: exit 1, publish request blocked
+digest: exit 1, publish request blocked
+size: exit 1, publish request blocked
+unexpected: exit 1, publish request blocked
+starter: exit 1, publish request blocked
+retag: exit 1, publish request blocked
+existing: exit 1, publish request blocked

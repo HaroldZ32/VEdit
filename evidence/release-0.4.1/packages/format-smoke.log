@@ -1,0 +1,27 @@
+VEdit-0.4.1-x86_64.AppImage: OK
+VEdit-0.4.1-x86_64.run: OK
+vedit-0.4.1-linux-x86_64.tar.gz: OK
+CHECK PASS  tar.gz matches AppDir contents and links
+QThreadStorage: entry 1 destroyed before end of thread 0x55557df6db10
+QThreadStorage: entry 0 destroyed before end of thread 0x55557df6db10
+vedit-app 0.4.1
+STARTUP-TRACE t_ms=99 wall_ms=1795579055545 launch-ready
+VCS-TOOLCHAIN git=/usr/bin/git version=2.53.0 svn=<missing> version=<missing> source=mixed git_source=path svn_source=missing
+CHECK PASS  tar.gz starts VEdit without FUSE
+CHECK PASS  .run matches AppDir contents and links
+QThreadStorage: entry 1 destroyed before end of thread 0x555594e37b20
+QThreadStorage: entry 0 destroyed before end of thread 0x555594e37b20
+vedit-app 0.4.1
+STARTUP-TRACE t_ms=104 wall_ms=1795579078215 launch-ready
+VCS-TOOLCHAIN git=<missing> version=<missing> svn=<missing> version=<missing> source=missing git_source=missing svn_source=missing
+CHECK PASS  .run starts VEdit without FUSE
+FFI-ABI fixture=/home/haroldzhao/MyProj/DshProj/VEdit/target/release-readiness-041/packaging/runtime/out/.release.IwOmLM/.verify-release.vOQFps/missing fixture
+FFI-ABI-SELFTEST ok=0 reason=wrong-fixture
+CHECK PASS  .run forwards arguments, preserves exit 2 and cleans up temporary extracts
+CHECK PASS  AppImage matches AppDir contents and links
+QThreadStorage: entry 1 destroyed before end of thread 0x55555c317b00
+QThreadStorage: entry 0 destroyed before end of thread 0x55555c317b00
+vedit-app 0.4.1
+STARTUP-TRACE t_ms=89 wall_ms=1795579091286 launch-ready
+VCS-TOOLCHAIN git=/usr/bin/git version=2.53.0 svn=<missing> version=<missing> source=mixed git_source=path svn_source=missing
+CHECK PASS  AppImage starts VEdit without FUSE
