@@ -29,3 +29,17 @@ The full packaging command exited 0. The shipping inventory gate passed 9 checks
 In the pinned CentOS 7 container (`glibc 2.17`), the executable AppImage reported its runtime version, and the actual tarball's `AppRun` and the `.run` both reached `launch-ready` with an empty host `PATH` and exited 0. The AppImage's extracted payload passed the CentOS runtime check in the full build. The standalone AppImage verifier reported 14 passes, one skip for optional project file-count output, and exit 1 for the host kernel check. A real CentOS 7 kernel 3.10 run remains unverified here. [CentOS format smoke](centos7-formats.log) [Standalone AppImage verification](standalone-appimage-checks.log)
 
 A small package fixture gave the tarball a relative symlink and a hard-linked file. Extraction preserved both, and the `.run` payload compared byte-for-byte with the standalone `.tar.gz`. A symlink to the `.run` in a path with spaces preserved its argv and child exit 23 and selected the resolved archive as the restart program. An existing `--extract` directory was refused. Truncating the embedded archive produced a nonzero exit and removed the incomplete extract. The fixture also ran on CentOS 7 userspace with an empty `PATH`.
+
+## Interrupted local publication
+
+The probe runs `packaging/runtime/build.sh` in disposable trees with small checksum manifests, stubbed package generation and gates, and real filesystem renames. A shim delivers TERM or SIGKILL immediately after the selected rename or returns an injected rename error. [Replay script](release-swap-probe.sh) [Command output](release-swap-checks.log)
+
+```bash
+bash evidence/release-0.4.1/packages/release-swap-probe.sh baseline \
+  <(git show 6d79d0e:packaging/runtime/build.sh)
+bash evidence/release-0.4.1/packages/release-swap-probe.sh
+```
+
+The baseline exited 143 on TERM and deleted both sets. The repaired script exited 143 on TERM and restored the old suite in place. When publication and immediate rollback both failed, it reported the retained backup and a retry restored it. SIGKILL between the renames left the previous suite in `out/.release.previous`. The next invocation restored it before validation, even when the retry failed. SIGKILL after the candidate rename left the candidate publicly available, and a failed retry kept it there. A concurrent invocation exited 1 before preflight while the first held the lock and published successfully on retry. Both normal replacement and first publication exited 0.
+
+The real package bytes already at `out/release/` passed `sha256sum --check --strict SHA256SUMS` for all three formats. The generic `build/gates/pack.sh` exited 1 because it scans only `build/artifacts/` and the repository root for archives. The publication repair was verified with the isolated probe and did not require a packaging or Qt/Rust rebuild. [Command output](release-swap-checks.log)

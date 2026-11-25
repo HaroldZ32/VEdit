@@ -21,6 +21,7 @@ cd "$ROOT"
 EVID=${VEDIT_PACK_EVIDENCE:-"$ROOT/target/runtime-pack-evidence"}
 OUT="$ROOT/packaging/runtime/out"
 RELEASE="$OUT/release"
+PREVIOUS_RELEASE="$OUT/.release.previous"
 VERSION=$(awk -F'"' '/^version = / {print $2; exit}' "$ROOT/Cargo.toml") || exit $?
 IMAGE=${VEDIT_QT6_BUILD_IMAGE:-vedit-qt6-build:local}
 APP="$ROOT/target/qt6-build/src/app/vedit-app"
@@ -30,7 +31,29 @@ CENTOS_PROBE=1
 [ "${1:-}" = "--no-centos-probe" ] && CENTOS_PROBE=0
 CENTOS_IMAGE=${VEDIT_CENTOS_PROBE_IMAGE:-docker.m.daocloud.io/library/centos@sha256:be65f488b7764ad3638f236b7b515b3678369a5124c47b8d32916d6487418ea4}
 
-mkdir -p "$EVID" "$OUT" "$ROOT/packaging/appimage/.cache" || exit $?
+mkdir -p "$OUT" || exit $?
+# Builds in this checkout share the AppDir, evidence and release paths.
+exec {release_lock}>"$OUT/.release.lock" || exit $?
+flock -n "$release_lock" || { echo "ERROR: cannot lock runtime build output $OUT" >&2; exit 1; }
+
+settle_release_swap() {
+  if [ -e "$PREVIOUS_RELEASE" ] || [ -L "$PREVIOUS_RELEASE" ]; then
+    if [ -e "$RELEASE" ] || [ -L "$RELEASE" ]; then
+      # The verified candidate already occupies the public path.
+      rm -rf -- "$PREVIOUS_RELEASE"
+    else
+      mv -T -- "$PREVIOUS_RELEASE" "$RELEASE" || {
+        echo "ERROR: previous release retained in $PREVIOUS_RELEASE" >&2
+        return 1
+      }
+      echo "Restored previous release to $RELEASE"
+    fi
+  fi
+}
+# Recover even if a killed builder could not run its EXIT trap.
+settle_release_swap || exit $?
+
+mkdir -p "$EVID" "$ROOT/packaging/appimage/.cache" || exit $?
 export VEDIT_F2_EVIDENCE=${VEDIT_F2_EVIDENCE:-"$EVID"}
 # The AppImage tool is pinned by URL + sha256; fetch it once into the cache.
 # shellcheck source=/dev/null
@@ -136,7 +159,8 @@ grep -E 'CHECK |F2-ISOLATION|summary' "$EVID/40-f2-isolation-appdir.log"
 
 step "5/7 build the three release packages"
 WORK=$(mktemp -d "$OUT/.release.XXXXXX") || exit $?
-trap 'rm -rf -- "$WORK"' EXIT
+trap 'settle_release_swap; rm -rf -- "$WORK"' EXIT
+trap 'exit 143' TERM
 mkdir "$WORK/release" || exit $?
 bash packaging/runtime/build-release-packages.sh "$OUT/AppDir" "$WORK/release" "$VERSION" \
   > "$EVID/50-release-packages.log" 2>&1
@@ -179,20 +203,13 @@ if [ "$CENTOS_PROBE" -eq 1 ]; then
 fi
 
 [ "$fail" -eq 0 ] || { echo "BUILD: FAIL" >&2; exit 1; }
-# Keep the previous release available until every candidate gate passes. Use
-# directory moves on the same filesystem so completed packages are not copied.
+# Both directories are on the same filesystem. Keep the previous release
+# outside WORK until the validated candidate has taken its place.
 if [ -e "$RELEASE" ] || [ -L "$RELEASE" ]; then
-  mv -T -- "$RELEASE" "$WORK/previous-release" || exit $?
+  mv -T -- "$RELEASE" "$PREVIOUS_RELEASE" || exit $?
 fi
-if ! mv -T -- "$WORK/release" "$RELEASE"; then
-  if [ -e "$WORK/previous-release" ] || [ -L "$WORK/previous-release" ]; then
-    mv -T -- "$WORK/previous-release" "$RELEASE" || {
-      trap - EXIT
-      echo "ERROR: previous release retained in $WORK/previous-release" >&2
-    }
-  fi
-  exit 1
-fi
+mv -T -- "$WORK/release" "$RELEASE" || exit $?
+settle_release_swap || exit $?
 rm -rf -- "$OUT/centos7-appdir" || exit $?
 mv -T -- "$WORK/appimage" "$OUT/centos7-appdir" || exit $?
 APPIMAGE="$RELEASE/VEdit-$VERSION-x86_64.AppImage"
