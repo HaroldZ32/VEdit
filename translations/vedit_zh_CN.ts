@@ -22,6 +22,14 @@
 <context>
     <name>VEdit</name>
     <message>
+        <source>Recent Searches</source>
+        <translation>最近搜索</translation>
+    </message>
+    <message>
+        <source>No Recent Searches</source>
+        <translation>暂无最近搜索</translation>
+    </message>
+    <message>
         <source>Checking SVN status…</source>
         <translation>正在检查 SVN 状态…</translation>
     </message>
@@ -2072,9 +2080,73 @@ Open a directory that is a Git or Subversion working tree to see its branch, cha
         <translation>case 语句</translation>
     </message>
     <message>
-        <location filename="../src/editor/kernel/fim_wiring.cpp" line="56"/>
-        <source>FIM ghost text: previews the first line only; Tab inserts the full suggestion.</source>
-        <translation>FIM 幽灵文本：仅预览第一行；Tab 插入完整建议。</translation>
+        <location filename="../src/editor/kernel/editor_context_menu.cpp"/>
+        <source>Request FIM Completion</source>
+        <translation>请求 FIM 补全</translation>
+    </message>
+    <message>
+        <location filename="../src/editor/kernel/fim_wiring.cpp"/>
+        <source>FIM needs an editable document</source>
+        <translation>FIM 需要可编辑的文档</translation>
+    </message>
+    <message>
+        <location filename="../src/editor/kernel/fim_wiring.cpp"/>
+        <source>FIM needs a single caret without a selection</source>
+        <translation>FIM 需要单一光标且没有选区</translation>
+    </message>
+    <message>
+        <location filename="../src/editor/kernel/fim_wiring.cpp"/>
+        <source>FIM suggestion ready. Tab inserts it. Esc dismisses it.</source>
+        <translation>FIM 建议已就绪。Tab 插入，Esc 取消。</translation>
+    </message>
+    <message>
+        <location filename="../src/editor/kernel/fim_wiring.cpp"/>
+        <source>FIM suggestion could not be shown at this caret</source>
+        <translation>无法在当前光标位置显示 FIM 建议</translation>
+    </message>
+    <message>
+        <source>FIM endpoint is missing</source>
+        <translation>FIM 未配置端点</translation>
+    </message>
+    <message>
+        <source>FIM model is missing</source>
+        <translation>FIM 未配置模型</translation>
+    </message>
+    <message>
+        <source>FIM endpoint is invalid</source>
+        <translation>FIM 端点无效</translation>
+    </message>
+    <message>
+        <source>FIM response is too large</source>
+        <translation>FIM 响应过大</translation>
+    </message>
+    <message>
+        <source>FIM response format is invalid</source>
+        <translation>FIM 响应格式错误</translation>
+    </message>
+    <message>
+        <source>FIM connection refused</source>
+        <translation>FIM 连接被拒绝</translation>
+    </message>
+    <message>
+        <source>FIM host could not be resolved</source>
+        <translation>FIM 域名解析失败</translation>
+    </message>
+    <message>
+        <source>FIM TLS failure</source>
+        <translation>FIM TLS 失败</translation>
+    </message>
+    <message>
+        <source>FIM network error</source>
+        <translation>FIM 网络错误</translation>
+    </message>
+    <message>
+        <source>FIM transport error</source>
+        <translation>FIM 传输失败</translation>
+    </message>
+    <message>
+        <source>FIM request timed out</source>
+        <translation>FIM 请求超时</translation>
     </message>
     <message>
         <location filename="../src/workspace/diagnostics/diagnostics_outline_model.cpp" line="56"/>
@@ -5838,6 +5910,22 @@ root: %1</source>
         <translation>打开文件夹(&amp;O)…</translation>
     </message>
     <message>
+        <source>Close Folder</source>
+        <translation>关闭文件夹</translation>
+    </message>
+    <message>
+        <source>Recent Folders</source>
+        <translation>最近使用的文件夹</translation>
+    </message>
+    <message>
+        <source>No Recent Folders</source>
+        <translation>没有最近使用的文件夹</translation>
+    </message>
+    <message>
+        <source>Restore Last Folder on Startup</source>
+        <translation>启动时恢复上次打开的文件夹</translation>
+    </message>
+    <message>
         <location filename="../src/app/app_shell.cpp" line="608"/>
         <source>S&amp;witch Project…</source>
         <translation>切换工程(&amp;W)…</translation>
@@ -6477,9 +6565,9 @@ root: %1</source>
         <translation>输入查询以搜索整个工程</translation>
     </message>
     <message>
-        <location filename="../src/editor/kernel/find_replace.cpp" line="1146"/>
-        <source>Whole project: searching in the Search panel</source>
-        <translation>整个工程：正在搜索面板中搜索</translation>
+        <location filename="../src/editor/kernel/find_replace.cpp" line="1448"/>
+        <source>Whole project query sent to the Search panel</source>
+        <translation>已将整个工程的查询发送到搜索面板</translation>
     </message>
     <message>
         <location filename="../src/editor/kernel/find_replace.cpp" line="1147"/>
@@ -6494,6 +6582,14 @@ root: %1</source>
 </context>
 <context>
     <name>vedit::workspace::FileTreeWidget</name>
+    <message>
+        <source>Expand All</source>
+        <translation>全部展开</translation>
+    </message>
+    <message>
+        <source>Collapse All</source>
+        <translation>全部折叠</translation>
+    </message>
     <message>
         <source>Expand Folder</source>
         <translation>展开文件夹</translation>
@@ -6568,9 +6664,9 @@ root: %1</source>
     <message>
         <location filename="../src/workspace/filetree/file_tree_widget.cpp" line="658"/>
         <source>No folder open.
-Use &quot;Open...&quot; to browse a project.</source>
+Right-click here or choose File → Open Folder.</source>
         <translation>未打开文件夹。
-使用“打开…”浏览工程。</translation>
+在此处点击右键，或选择“文件 → 打开文件夹”。</translation>
     </message>
     <message>
         <location filename="../src/workspace/filetree/file_tree_widget.cpp" line="663"/>
@@ -7442,8 +7538,8 @@ Use &quot;Open...&quot; to browse a project.</source>
     </message>
     <message>
         <location filename="../src/workspace/settings/settings_panel.cpp" line="720"/>
-        <source>FIM is off by default: with no endpoint configured VEdit never touches the network.</source>
-        <translation>FIM 默认关闭：未配置端点时 VEdit 从不访问网络。</translation>
+        <source>FIM is off by default. After enabling and applying provider settings, press %1 or choose Request FIM Completion in the editor menu. Each request sends the current document, split at the caret, to the configured endpoint. Tab inserts the suggestion, and Esc dismisses it.</source>
+        <translation>FIM 默认关闭。启用并应用服务商设置后，按 %1 或在编辑器菜单中选择“请求 FIM 补全”。每次请求会以光标为分界，将当前文档发送到所配置的端点。Tab 插入建议，Esc 取消。</translation>
     </message>
     <message>
         <location filename="../src/workspace/settings/settings_panel.cpp" line="1312"/>
@@ -8541,6 +8637,26 @@ Use &quot;Open...&quot; to browse a project.</source>
 <context>
     <name>SignalTrace</name>
     <message>
+        <source>From signal</source>
+        <translation>起点信号</translation>
+    </message>
+    <message>
+        <source>To signal</source>
+        <translation>终点信号</translation>
+    </message>
+    <message>
+        <source>Source location</source>
+        <translation>源码位置</translation>
+    </message>
+    <message>
+        <source>No upstream signal identified</source>
+        <translation>未识别到上游信号</translation>
+    </message>
+    <message>
+        <source>No downstream signal identified</source>
+        <translation>未识别到下游信号</translation>
+    </message>
+    <message>
         <source>In</source>
         <translation>输入</translation>
     </message>
@@ -8685,6 +8801,18 @@ Use &quot;Open...&quot; to browse a project.</source>
 </context>
 <context>
     <name>WorkbenchInteraction</name>
+    <message>
+        <source>Dock Left</source>
+        <translation>停靠在左侧</translation>
+    </message>
+    <message>
+        <source>Dock Right</source>
+        <translation>停靠在右侧</translation>
+    </message>
+    <message>
+        <source>Dock Bottom</source>
+        <translation>停靠在底部</translation>
+    </message>
     <message>
         <source>Dock Panel</source>
         <translation>停靠面板</translation>

@@ -10,6 +10,10 @@
 > · Owner Junior Engineer · Verifier **Architect**（T34）
 > 验收树：HEAD `4e2d0a57ca50db9568db5a5b040cc66f04c9a05f`（`4e2d0a5`，main，**零 git 动作**）
 
+## 后续交付记录
+
+VEdit 0.4.0 桌面体验修复的 14 项验收已通过。Qt 在补齐 SVN 工具后 93 项通过，Rust 工作区 850 项通过、4 项忽略。最终 AppImage 的范围、运行记录及校验值见[桌面体验验收](../desktop-ux-20261124/README.md)。
+
 ## 0. 一句话结论
 
 本轮 47 条 requirements AC（AC-0.1…0.5 / 1.1…1.5 / 2.1…2.4 / 3.0…3.7 / 4.1…4.5 / 5.1…5.4 /

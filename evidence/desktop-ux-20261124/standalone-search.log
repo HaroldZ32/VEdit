@@ -1,0 +1,10 @@
+9e64d89f18aa3ff1573ea91fd27b0c5b3dc6ca33800e78da100cc47c81306135  /delivery/VEdit.AppImage
+STARTUP-TRACE t_ms=233 wall_ms=1795544280280 launch-ready
+search: root='<none>' (no project root)
+search: query root='' query='beta' case=0 whole=0 regex=0 all=0 filter='/qa/source/active.sv' files=1
+search: jump opened '/qa/source/active.sv' line=3 column=8 (cursor=3:8)
+search: jump opened '/qa/source/active.sv' line=3 column=8 (cursor=3:8)
+search: query root='' query='neighboronly' case=0 whole=0 regex=0 all=0 filter='/qa/source/active.sv' files=1
+search: query root='' query='cwdonly' case=0 whole=0 regex=0 all=0 filter='/qa/source/active.sv' files=1
+Search filter and navigation log assertions exited 0.
+AppImage exited 0 after WM_DELETE_WINDOW.
