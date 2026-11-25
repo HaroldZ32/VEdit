@@ -940,16 +940,85 @@ async fn session_loop(
 /// never created inside the project: it lives in a fresh 0700 directory under
 /// `XDG_RUNTIME_DIR` (or the system temp directory).
 #[derive(Debug)]
-struct ContextFile {
+pub(crate) struct ContextFile {
     path: PathBuf,
-    directory: PathBuf,
+    pub(crate) directory: PathBuf,
 }
 
 impl Drop for ContextFile {
     fn drop(&mut self) {
-        let _ = std::fs::remove_file(&self.path);
-        let _ = std::fs::remove_dir(&self.directory);
+        let _ = std::fs::remove_dir_all(&self.directory);
     }
+}
+
+impl LspConfig {
+    /// Limit the workspace index to the effective HDL sources of the imported project.
+    /// The session's smaller compilation and open-document sets remain separate.
+    ///
+    /// # Errors
+    /// Returns an error if the private server configuration cannot be written.
+    pub fn with_project_index(mut self, files: &[PathBuf]) -> Result<Self> {
+        let mut failure = anyhow!("no writable directory for the project index");
+        for base in context_base_dirs() {
+            let result = create_context_file_with(&base, "", |path, _| match self.backend {
+                LspBackend::Verible => create_private_file(
+                    path,
+                    &crate::filelist_text(files, &self.include_dirs, &self.defines),
+                ),
+                LspBackend::Slang => write_slang_project_index(path, files),
+            });
+            match result {
+                Ok(index) => {
+                    match self.backend {
+                        LspBackend::Verible => self.file_list_path = Some(index.path.clone()),
+                        LspBackend::Slang => {
+                            // Slang merges ~/.slang/server.json into its workspace config.
+                            // Imported project inputs already supply the include dirs and defines.
+                            self.environment.insert(
+                                "HOME".to_string(),
+                                index.directory.join("home").to_string_lossy().into_owned(),
+                            );
+                        }
+                    }
+                    self.project_index = Some(Arc::new(index));
+                    return Ok(self);
+                }
+                Err(error) => failure = error,
+            }
+        }
+        Err(failure)
+    }
+}
+
+fn write_slang_project_index(context: &Path, files: &[PathBuf]) -> std::io::Result<()> {
+    let root = context
+        .parent()
+        .ok_or_else(|| std::io::Error::other("missing index directory"))?;
+    let settings = root.join(".slang");
+    std::fs::create_dir(&settings)?;
+    std::fs::create_dir(root.join("home"))?;
+    let mut patterns = Vec::with_capacity(files.len());
+    for (index, file) in files.iter().enumerate() {
+        let path = file.to_string_lossy();
+        // Slang's glob syntax has no literal escape. It canonicalizes matches,
+        // so an exact symlink alias keeps metacharacters from adding other files.
+        if path.contains(['*', '?']) || path.split('/').any(|part| part.starts_with("...")) {
+            #[cfg(unix)]
+            {
+                let alias = root.join(format!("source-{index}"));
+                std::os::unix::fs::symlink(file, &alias)?;
+                patterns.push(alias.to_string_lossy().into_owned());
+            }
+            #[cfg(not(unix))]
+            return Err(std::io::Error::other(format!(
+                "unsupported slang index path: {path}"
+            )));
+        } else {
+            patterns.push(path.into_owned());
+        }
+    }
+    let json = serde_json::json!({"index": [{"dirs": []}], "indexGlobs": patterns});
+    create_private_file(&settings.join("server.json"), &json.to_string())
 }
 
 /// Candidate directories for the generated context, in preference order:
@@ -1058,11 +1127,8 @@ fn create_context_file_with(
         }
         let path = directory.join("context.f");
         if let Err(error) = write(&path, text) {
-            // A write/flush failure can leave a partial file behind; the private
-            // directory then cannot be removed until that file is gone. Remove
-            // both, so a failed push leaves no 0600 artefact in the temp tree.
-            let _ = std::fs::remove_file(&path);
-            let _ = std::fs::remove_dir(&directory);
+            // The writer may have left a partial file or private settings behind.
+            let _ = std::fs::remove_dir_all(&directory);
             return Err(anyhow!(
                 "cannot write the build-context file {}: {error}",
                 path.display()

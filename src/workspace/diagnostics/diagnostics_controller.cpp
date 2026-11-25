@@ -318,6 +318,17 @@ void DiagnosticsController::setToolchainReport(const ToolchainReport &report)
     }
 }
 
+void DiagnosticsController::invalidateRealtimeSession()
+{
+    if (lsp_ && lspStarted_) {
+        lsp_->stop();
+        ++lspStops_;
+    }
+    lspStarted_ = false;
+    navigation_ = 0;
+    session_ = SessionSnapshot{};
+}
+
 void DiagnosticsController::restartRealtimeSession()
 {
     // B1 (batch-20261116): the project-environment repin and every settings /
@@ -337,11 +348,7 @@ void DiagnosticsController::restartRealtimeSession()
     if (files_.isEmpty()) {
         files_ = QStringList{analysisFile_};
     }
-    if (lsp_ && lspStarted_) {
-        lsp_->stop(); // idempotent; the backend may already have stopped itself
-        ++lspStops_;
-    }
-    lspStarted_ = false;
+    invalidateRealtimeSession();
     lspDiagnosticsRequested_ = false;
     lspDiagnostics_.clear();
     lints_.clear();
@@ -526,17 +533,14 @@ bool DiagnosticsController::analyzeFile(const QString &file, const QString &buff
         }
         return true;
     };
-    const bool unionCovered = lspStarted_ && !files_.isEmpty() && sameSet(files_, desired);
+    const bool unionCovered = lspStarted_ && !files_.isEmpty() && sameSet(files_, desired)
+        && runningProjectIndex_ == realtimeProjectIndex_;
     const bool sameFile = unionCovered && files_.contains(file);
     if (!sameFile || !lspStarted_) {
         // A file-scope analysis uses a session over EXACTLY the stable realtime
         // set; the project set is never a session set (L1.1).
-        if (lsp_ && lspStarted_) {
-            lsp_->stop();
-            ++lspStops_;
-        }
+        invalidateRealtimeSession();
         files_ = desired;
-        lspStarted_ = false;
         lspDiagnosticsRequested_ = false;
         lastDiagnosticsRequestFiles_.clear();
         lints_.clear();
@@ -739,7 +743,9 @@ void DiagnosticsController::startLsp()
         return;
     }
     QString error;
+    lsp_->setProjectIndex(realtimeProjectIndex_);
     if (lsp_->start(lsPath_, workspaceRoot_, rulesPath_, files_, &error)) {
+        runningProjectIndex_ = realtimeProjectIndex_;
         lspStarted_ = true;
         ++lspStarts_;
         report_.lspMessage = QCoreApplication::translate("VEdit", "session started over %1 file(s)").arg(files_.size());

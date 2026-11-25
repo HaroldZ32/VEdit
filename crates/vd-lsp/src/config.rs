@@ -22,6 +22,7 @@
 use std::collections::BTreeMap;
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 use std::time::Duration;
 
 use crate::backend::LspBackend;
@@ -56,6 +57,7 @@ pub struct LspConfig {
     /// `LD_LIBRARY_PATH`/`LOCPATH` are removed by the spawn regardless, the same
     /// rule the tool children apply.
     pub environment: BTreeMap<String, String>,
+    pub(crate) project_index: Option<Arc<crate::session::ContextFile>>,
 }
 
 impl LspConfig {
@@ -74,6 +76,7 @@ impl LspConfig {
             request_timeout: Duration::from_secs(15),
             shutdown_timeout: Duration::from_secs(5),
             environment: BTreeMap::new(),
+            project_index: None,
         }
     }
 
@@ -173,6 +176,13 @@ impl LspConfig {
             line.push_str(&argument.to_string_lossy());
         }
         line
+    }
+
+    pub(crate) fn initialization_root(&self) -> &Path {
+        match (&self.project_index, self.backend) {
+            (Some(index), LspBackend::Slang) => &index.directory,
+            _ => &self.workspace_root,
+        }
     }
 
     /// The working directory used for the child process.

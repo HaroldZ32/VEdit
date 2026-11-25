@@ -3712,6 +3712,25 @@ uint64_t vd_lsp_session_start_v2(struct VdService *service,
                                  const struct VdStringList *defines);
 
 /*
+ Start realtime LSP with separate open/compile files and project index files.
+ A null `project_index` preserves the ordinary loose-file server discovery.
+
+ # Safety
+
+ The contract of [`vd_lsp_session_start_v2`] applies to its parameters. A
+ non-null `project_index` must satisfy the same contract as `files`.
+ */
+uint64_t vd_lsp_session_start_v3(struct VdService *service,
+                                 const char *ls_path,
+                                 const char *workspace_root,
+                                 const char *rules_path,
+                                 const struct VdStringList *files,
+                                 int32_t backend,
+                                 const struct VdStringList *include_dirs,
+                                 const struct VdStringList *defines,
+                                 const struct VdStringList *project_index);
+
+/*
  Read the observable state of one session (A3d).
 
  Returns `VD_STATUS_READY` with `out` filled, or `POLL_MISUSE` when the id is

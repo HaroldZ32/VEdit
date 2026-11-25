@@ -61,6 +61,10 @@ public:
                        const QStringList &files,
                        QString *error) = 0;
 
+    /// Limit the next session's symbol index to effective project files. An empty
+    /// list keeps the server's ordinary discovery for a loose document.
+    virtual void setProjectIndex(const QStringList &) {}
+
     /// Request a cooperative shutdown (idempotent, non-blocking).
     virtual void stop() = 0;
 

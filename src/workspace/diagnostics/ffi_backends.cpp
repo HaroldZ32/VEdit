@@ -280,22 +280,25 @@ public:
         FileList fileList(files);
         FileList includeList(includeDirs_);
         FileList defineList(defines_);
+        FileList projectIndex(projectIndex_);
         const QByteArray ls = effectiveServer.toUtf8();
         const QByteArray root = workspaceRoot.toUtf8();
         const QByteArray rules = rulesPath.toUtf8();
         const VdStringList filesView = fileList.view();
         const VdStringList includeView = includeList.view();
         const VdStringList defineView = defineList.view();
+        const VdStringList projectIndexView = projectIndex.view();
         // AC-2.5: record the argv the session is about to use (no process yet).
         commandLine_ = readCommandLine(effectiveServer, workspaceRoot, rulesPath);
-        session_ = vd_lsp_session_start_v2(service_.get(),
+        session_ = vd_lsp_session_start_v3(service_.get(),
                                            ls.constData(),
                                            root.constData(),
                                            rulesPath.isEmpty() ? nullptr : rules.constData(),
                                            &filesView,
                                            static_cast<int32_t>(backend_),
                                            includeDirs_.isEmpty() ? nullptr : &includeView,
-                                           defines_.isEmpty() ? nullptr : &defineView);
+                                           defines_.isEmpty() ? nullptr : &defineView,
+                                           projectIndex_.isEmpty() ? nullptr : &projectIndexView);
         if (session_ == 0) {
             if (error != nullptr) {
                 *error = service_.lastError();
@@ -308,6 +311,8 @@ public:
         }
         return true;
     }
+
+    void setProjectIndex(const QStringList &files) override { projectIndex_ = files; }
 
     void stop() override
     {
@@ -658,6 +663,7 @@ private:
 
     ServiceHandle service_;
     quint64 session_ = 0;
+    QStringList projectIndex_;
     LspBackendKind backend_ = LspBackendKind::Verible;
     QString serverPath_;
     QStringList includeDirs_;

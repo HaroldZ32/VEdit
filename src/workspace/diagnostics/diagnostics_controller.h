@@ -157,6 +157,8 @@ public:
     /// realtime LINT stays dead (batch-20261116 B1). No-op when no document has
     /// been analysed yet (the project set must still start nothing).
     void restartRealtimeSession();
+    /// Stop using the current server before the watcher adopts new project inputs.
+    void invalidateRealtimeSession();
 
     /// Restart the reparse for the current set (manual `project.reparse`): stops
     /// the session, clears the rendered lower rows and re-runs both backends.
@@ -189,6 +191,7 @@ public:
     /// is trusted as given.
     void setActiveDocumentJoinsProjectSession(bool joins);
     bool activeDocumentJoinsProjectSession() const { return activeDocumentInSession_; }
+    void setRealtimeProjectIndex(const QStringList &files) { realtimeProjectIndex_ = files; }
     /// batch-20261118 AC-5: the REQUEST scope - the active document's one-level
     /// closure. The session may still cover the union of the open documents
     /// (reuse); only this set is asked for diagnostics and considered. Empty
@@ -602,6 +605,8 @@ private:
     QStringList projectFiles_; ///< the project set (setFileSet; NOT files_)
     /// AC-5.1: the stable session set the watcher computed (empty = per-file).
     QStringList realtimeSessionFiles_;
+    QStringList realtimeProjectIndex_;
+    QStringList runningProjectIndex_;
     /// G1-a/G1-c: false = the active document is analysed alone; the session
     /// above must not be widened with it. `true` by default (see the setter).
     bool activeDocumentInSession_ = true;

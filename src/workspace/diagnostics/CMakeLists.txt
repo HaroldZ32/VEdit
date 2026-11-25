@@ -716,4 +716,22 @@ if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL AND VEDIT_DIAGNOSTICS_FFI
     ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-diagnostics;VEDIT_QUIET=1"
     TIMEOUT 420
   )
+
+  if(TARGET vedit_workspace_search)
+    add_executable(vedit-filelist-authority-e2e selftests/filelist_authority_e2e.cpp)
+    target_link_libraries(vedit-filelist-authority-e2e PRIVATE
+      vedit_workspace_diagnostics vedit_workspace_module_tree vedit_workspace_project
+      vedit_workspace_search vedit_app_shell)
+    target_include_directories(vedit-filelist-authority-e2e PRIVATE
+      "${CMAKE_CURRENT_SOURCE_DIR}/.." "${CMAKE_CURRENT_SOURCE_DIR}/../module_tree"
+      "${CMAKE_CURRENT_SOURCE_DIR}/../project" "${CMAKE_CURRENT_SOURCE_DIR}/../../editor/kernel")
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+      target_compile_options(vedit-filelist-authority-e2e PRIVATE -Wall -Wextra -Wpedantic -Werror)
+    endif()
+    add_test(NAME vedit-filelist-authority-e2e COMMAND vedit-filelist-authority-e2e)
+    add_test(NAME vedit-filelist-authority-verible-e2e COMMAND vedit-filelist-authority-e2e --verible)
+    set_tests_properties(vedit-filelist-authority-e2e vedit-filelist-authority-verible-e2e PROPERTIES
+      ENVIRONMENT "QT_QPA_PLATFORM=offscreen;VEDIT_NO_ENV_AUTOCAPTURE=1"
+      SKIP_RETURN_CODE 77 TIMEOUT 60)
+  endif()
 endif()

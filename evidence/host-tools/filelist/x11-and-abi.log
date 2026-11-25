@@ -1,0 +1,32 @@
+TREE imported=1 path=/tmp/vedit-filelist-authority-e2e-GFgLHc/project/included/deep/child.sv excluded=/tmp/vedit-filelist-authority-e2e-GFgLHc/project/rtl/child.sv
+LINT pass=1 backend=slang inputs=[/tmp/vedit-filelist-authority-e2e-GFgLHc/project/included/deep/child.sv,/tmp/vedit-filelist-authority-e2e-GFgLHc/project/rtl/top.sv] rows=[input port 'correct' has no connection|port 'intentional_missing' does not exist in 'child']
+DEFINITION backend=slang file='/tmp/vedit-filelist-authority-e2e-GFgLHc/project/included/deep/child.sv' line=1 column=8
+CTRL pass=1 canonical=/tmp/vedit-filelist-authority-e2e-GFgLHc/project/included/deep/child.sv
+DEFINITION backend=slang file='/tmp/vedit-filelist-authority-e2e-GFgLHc/project/include/signal.svh' line=1 column=7
+CTRL expected=/tmp/vedit-filelist-authority-e2e-GFgLHc/project/include/signal.svh canonical=/tmp/vedit-filelist-authority-e2e-GFgLHc/project/include/signal.svh
+REFRESH ready=1 inputs=[/tmp/vedit-filelist-authority-e2e-GFgLHc/project/lib/child.sv,/tmp/vedit-filelist-authority-e2e-GFgLHc/project/rtl/top.sv]
+DEFINITION backend=slang file='/tmp/vedit-filelist-authority-e2e-GFgLHc/project/lib/child.sv' line=1 column=8
+CTRL expected=/tmp/vedit-filelist-authority-e2e-GFgLHc/project/lib/child.sv canonical=/tmp/vedit-filelist-authority-e2e-GFgLHc/project/lib/child.sv
+DEFINITION backend=slang file='/tmp/vedit-filelist-authority-e2e-GFgLHc/loose/child.sv' line=1 column=8
+LOOSE pass=1 canonical=/tmp/vedit-filelist-authority-e2e-GFgLHc/loose/child.sv
+CHECK ffi.service.create PASS
+CHECK ffi.abi-version PASS
+CHECK ffi.project.start.returns-job PASS
+CHECK ffi.project.start.non-blocking PASS
+CHECK ffi.project.ready PASS
+CHECK ffi.project.file-count PASS actual=3 files=[/src/crates/vd-ffi/tests/fixtures/project/rtl/rtl_a.sv,/src/crates/vd-ffi/tests/fixtures/project/rtl/rtl_b.sv,/src/crates/vd-ffi/tests/fixtures/project/rtl/rtl_c.sv] (C ABI fixture expects 3)
+CHECK ffi.project.file-order PASS actual=[rtl_a.sv,rtl_b.sv,rtl_c.sv]
+CHECK ffi.project.include-dir PASS actual=[/src/crates/vd-ffi/tests/fixtures/project/rtl/inc]
+CHECK ffi.project.defines PASS actual=[WIDTH=8,SIM]
+CHECK ffi.project.unknown-job-rejected PASS
+CHECK ffi.fim.start PASS
+CHECK ffi.fim.disabled-by-default PASS
+CHECK ffi.vcs.start PASS
+CHECK ffi.vcs.backend-detected PASS
+CHECK ffi.settings.temp-dir PASS
+CHECK ffi.settings.save.start PASS
+CHECK ffi.settings.save.ready PASS
+CHECK ffi.settings.load.start PASS
+CHECK ffi.settings.load.ready PASS
+CHECK ffi.settings.round-trip PASS
+FFI-ABI-SELFTEST ok=1 checks=20 failures=0

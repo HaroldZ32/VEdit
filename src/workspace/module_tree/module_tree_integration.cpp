@@ -605,7 +605,12 @@ private:
         for (auto it = byFile.constBegin(); it != byFile.constEnd(); ++it) {
             closure.insert(it.key(), it.value());
         }
+        const bool closureChanged = closure != shell_->property("vedit.moduleTree.closure").toMap();
         shell_->setProperty("vedit.moduleTree.closure", closure);
+        if (closureChanged) {
+            const auto revision = shell_->property("vedit.moduleTree.scopeRevision").toULongLong();
+            shell_->setProperty("vedit.moduleTree.scopeRevision", revision + 1);
+        }
         shell_->setProperty("vedit.moduleTree.closureModules",
                             catalog_.valid ? static_cast<int>(catalog_.modules.size()) : 0);
         // G1-c: the ONE duplicate-definition authority publishes the files it
