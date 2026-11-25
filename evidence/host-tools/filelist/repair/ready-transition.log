@@ -1,0 +1,3 @@
+89: CTRL expected=/tmp/vedit-filelist-authority-e2e-MSNOfg/project/vendor/include/flagfile.svh canonical=/tmp/vedit-filelist-authority-e2e-MSNOfg/project/vendor/include/flagfile.svh
+NAV-FAILED action=definition backend=slang reason='no navigation request in flight'
+CTRL expected=/tmp/vedit-filelist-authority-e2e-fsFCPN/project/vendor/include/flagfile.svh canonical=/tmp/vedit-filelist-authority-e2e-fsFCPN/project/rtl/top.sv

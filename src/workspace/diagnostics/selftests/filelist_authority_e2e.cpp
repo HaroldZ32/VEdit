@@ -246,8 +246,11 @@ int main(int argc, char **argv)
     std::printf("CTRL pass=%d canonical=%s\n", navigation, qPrintable(target));
 
     const auto jumpFromTop = [&](int line, int column, const QString &expected) {
-        if (!pane->openFile(top, &error) || !waitFor([&] {
-                return controller->session().state == diagnostics::BackendState::Ready
+        const QString previous = pane->currentFilePath();
+        if (!waitFor([&] { return controller->documentAnalysisPath() == previous; })
+            || !pane->openFile(top, &error) || !waitFor([&] {
+                return controller->documentAnalysisPath() == top
+                    && controller->session().state == diagnostics::BackendState::Ready
                     && definitionAction->isEnabled();
             })) {
             return false;
