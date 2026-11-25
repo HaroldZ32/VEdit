@@ -78,29 +78,70 @@ int main(int argc, char **argv)
     vedit_runtime_init();
     QApplication qt(argc, argv);
     const bool verible = qt.arguments().contains(u"--verible"_s);
+    const bool configured = qt.arguments().contains(u"--configured"_s);
+    const bool wrapper = qt.arguments().contains(u"--include-wrapper"_s);
+    const bool included = wrapper || qt.arguments().contains(u"--included"_s);
     const auto tools = diagnostics::resolveToolchain(diagnostics::applicationToolchainContext());
     if (!tools.slang.found() || (verible ? !tools.verible.found() : !tools.slangServer.found())) {
         std::puts("SKIP: requires slang and the selected HDL language server");
         return 77;
     }
-    const QByteArray topText("module top;\n  child u_child (.correct(1'b0));\n"
-                             "  `include \"signal.svh\"\n  assign observed = local_signal;\nendmodule\n");
+    QByteArray topText("module top;\n  child u_child (.correct(1'b0));\n"
+                       "  `include \"signal.svh\"\n  assign observed = local_signal;\nendmodule\n");
+    if (included && !wrapper) {
+        topText.append("`include \"child.svh\"\n");
+    }
     QTemporaryDir temp;
     const QString root = temp.filePath(u"project"_s);
     const QString state = temp.filePath(u"state"_s);
     const QString top = root + u"/rtl/top.sv"_s;
-    const QString wanted = root + u"/included/deep/child.sv"_s;
+    const QString wanted = root + (included ? u"/include/child.svh"_s : u"/included/deep/child.sv"_s);
     const QString decoy = root + u"/rtl/child.sv"_s;
     const QString filelist = root + u"/sources.f"_s;
     const QString nested = root + u"/included/nested.f"_s;
-    const QString header = root + u"/include/signal.svh"_s;
+    const QString header = configured ? temp.filePath(u"shared/signal.svh"_s)
+                                      : root + u"/include/signal.svh"_s;
     const QString replacement = root + u"/lib/child.sv"_s;
+    const QString owner = root + u"/rtl/wrapper.sv"_s;
+    QByteArray sources = included ? "rtl/top.sv\n+incdir+include\n"
+        : configured ? "rtl/top.sv\n-F included/nested.f\n"
+                     : "rtl/top.sv\n+incdir+include\n-F included/nested.f\n";
+    if (wrapper) {
+        sources.append("rtl/wrapper.sv\n");
+    }
+    if (configured) {
+        qputenv("HOME", QFile::encodeName(temp.filePath(u"home"_s)));
+        qunsetenv("SLANG_SERVER_TESTS");
+        topText.replace("  `include \"signal.svh\"\n", "  `include \"signal.svh\"\n"
+                        "  `include \"user.svh\"\n  `include \"local.svh\"\n"
+                        "  `include \"flagfile.svh\"\n  `include \"scoped.svh\"\n"
+                        "  assign scoped_sig = flag_sig[0];\n");
+    }
     if (!temp.isValid() || !writeFile(top, topText)
         || !writeFile(wanted, "module child(input logic correct);\nendmodule\n")
         || !writeFile(replacement, "module child(input logic correct);\nendmodule : child\n")
         || !writeFile(decoy, "module child(input logic decoy);\nendmodule\n")
         || !writeFile(header, "logic local_signal;\nlogic observed;\n")
-        || !writeFile(filelist, "rtl/top.sv\n+incdir+include\n-F included/nested.f\n")
+        || !writeFile(filelist, sources)
+        || (configured && !(writeFile(root + u"/.slang/server.json"_s,
+              "{ // Relative to the real workspace root\n"
+              "  \"incdirs\": [\"../shared\"],\n  \"indexGlobs\": [\"rtl/child.sv\"],\n"
+              "  \"flags\": \"-f cfg/compiler.f\",\n}\n")
+            && writeFile(temp.filePath(u"home/.slang/server.json"_s),
+                         "{\"incdirs\":[\"../user\"],\"indexGlobs\":[\"rtl/child.sv\"],"
+                         "\"flags\":\"-f missing-overridden.f\"}")
+            && writeFile(root + u"/.slang/local/server.json"_s,
+                         "{\"flags\":\"-I'../local path'\"}")
+            && writeFile(root + u"/cfg/compiler.f"_s,
+                         "-I vendor/include\n-f cfg/nested.f\n-F cfg/scoped.f\nrtl/child.sv\n")
+            && writeFile(root + u"/cfg/nested.f"_s, "-D FLAGFILE_NAME='\"data.sv\"'\n-D FLAGFILE_WIDTH=1\n")
+            && writeFile(root + u"/cfg/scoped.f"_s, "-I scoped\n")
+            && writeFile(root + u"/vendor/include/flagfile.svh"_s,
+                         "logic [`FLAGFILE_WIDTH:0] flag_sig;\nlocalparam string flag_name = `FLAGFILE_NAME;\n")
+            && writeFile(root + u"/cfg/scoped/scoped.svh"_s, "logic scoped_sig;\n")
+            && writeFile(temp.filePath(u"user/user.svh"_s), "logic user_sig;\n")
+            && writeFile(temp.filePath(u"local path/local.svh"_s), "logic local_sig;\n")))
+        || (wrapper && !writeFile(owner, "`include \"child.svh\"\n"))
         || !writeFile(nested, "deep/child.sv\n")
         || !writeFile(root + u"/verible.filelist"_s, "rtl/top.sv\nrtl/child.sv\n")
         || !writeFile(state + u"/settings.toml"_s, verible ? "\"tools.lsp_backend\" = \"verible\"\n"
@@ -140,7 +181,8 @@ int main(int argc, char **argv)
         const auto catalog = tree->catalog();
         const auto *definition = catalog.find(u"child"_s);
         return definition != nullptr && QFileInfo(definition->file).canonicalFilePath() == wanted
-            && controller->projectFiles().contains(wanted) && !controller->projectFiles().contains(decoy);
+            && controller->projectFiles().contains(wanted) != included
+            && !controller->projectFiles().contains(decoy);
     });
     std::printf("TREE imported=%d path=%s excluded=%s\n", listed, qPrintable(wanted), qPrintable(decoy));
     if (!listed || !pane->openFile(decoy, &error)
@@ -155,7 +197,9 @@ int main(int argc, char **argv)
     auto *definitionAction = shell.commands()->action(u"diagnostics.definition"_s);
     const bool ready = waitFor([&] {
         return controller->session().state == diagnostics::BackendState::Ready
-            && controller->fileSetReport().files.contains(wanted)
+            && controller->fileSetReport().files.contains(top)
+            && controller->fileSetReport().files.contains(wanted) != included
+            && controller->fileSetReport().files.contains(owner) == wrapper
             && definitionAction != nullptr && definitionAction->isEnabled();
     });
     if (!ready || view == nullptr) {
@@ -186,6 +230,10 @@ int main(int argc, char **argv)
     const QString diagnosticsText = messages.join(u'\n');
     const bool lint = diagnosed && !diagnosticsText.contains(u"'decoy'")
         && !diagnosticsText.contains(u"port 'correct' does not exist")
+        && !diagnosticsText.contains(u"No such file or directory")
+        && !diagnosticsText.contains(u"undeclared identifier")
+        && !diagnosticsText.contains(u"unknown macro")
+        && !diagnosticsText.contains(u"duplicate definition")
         && !controller->fileSetReport().files.contains(decoy);
     std::printf("LINT pass=%d backend=%s inputs=[%s] rows=[%s]\n", lint,
                 qPrintable(controller->session().backendName),
@@ -211,7 +259,14 @@ int main(int argc, char **argv)
         return actual == expected;
     };
     // Resolve an ordinary signal whose declaration is in the included header.
-    const bool include = jumpFromTop(3, 23, header);
+    const bool include = jumpFromTop(configured ? 8 : 3, 23, header);
+    if (configured) {
+        const bool flagfile = jumpFromTop(7, 24, root + u"/vendor/include/flagfile.svh"_s);
+        return lint && navigation && include && flagfile ? 0 : 1;
+    }
+    if (included) {
+        return lint && navigation && include ? 0 : 1;
+    }
     // Editing a nested file list changes the answer with the old target and decoy still open.
     if (!pane->openFile(top, &error) || !writeFile(nested, "../lib/child.sv\n")) {
         std::puts("FAIL: refresh fixture");

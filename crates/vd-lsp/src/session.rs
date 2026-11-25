@@ -721,11 +721,17 @@ impl Drop for SessionHandle {
 
 async fn session_loop(
     inner: Arc<Inner>,
-    config: LspConfig,
+    mut config: LspConfig,
     files: Vec<PathBuf>,
     diagnostics_budget: Duration,
     mut commands: mpsc::UnboundedReceiver<Command>,
 ) {
+    if let Some(index) = config.pending_slang_index.take() {
+        if let Err(error) = config.prepare_project_index(&index) {
+            inner.fail(format!("cannot prepare the project index: {error}"));
+            return;
+        }
+    }
     let mut client = LspClient::new(config);
     let mut opened: Vec<(Url, PathBuf)> = Vec::new();
     let mut skipped: Vec<SkippedFile> = Vec::new();
@@ -958,6 +964,14 @@ impl LspConfig {
     /// # Errors
     /// Returns an error if the private server configuration cannot be written.
     pub fn with_project_index(mut self, files: &[PathBuf]) -> Result<Self> {
+        match self.backend {
+            LspBackend::Slang => self.pending_slang_index = Some(files.to_vec()),
+            LspBackend::Verible => self.prepare_project_index(files)?,
+        }
+        Ok(self)
+    }
+
+    fn prepare_project_index(&mut self, files: &[PathBuf]) -> Result<()> {
         let mut failure = anyhow!("no writable directory for the project index");
         for base in context_base_dirs() {
             let result = create_context_file_with(&base, "", |path, _| match self.backend {
@@ -965,15 +979,13 @@ impl LspConfig {
                     path,
                     &crate::filelist_text(files, &self.include_dirs, &self.defines),
                 ),
-                LspBackend::Slang => write_slang_project_index(path, files),
+                LspBackend::Slang => write_slang_project_index(path, files, self),
             });
             match result {
                 Ok(index) => {
                     match self.backend {
                         LspBackend::Verible => self.file_list_path = Some(index.path.clone()),
                         LspBackend::Slang => {
-                            // Slang merges ~/.slang/server.json into its workspace config.
-                            // Imported project inputs already supply the include dirs and defines.
                             self.environment.insert(
                                 "HOME".to_string(),
                                 index.directory.join("home").to_string_lossy().into_owned(),
@@ -981,7 +993,7 @@ impl LspConfig {
                         }
                     }
                     self.project_index = Some(Arc::new(index));
-                    return Ok(self);
+                    return Ok(());
                 }
                 Err(error) => failure = error,
             }
@@ -990,13 +1002,14 @@ impl LspConfig {
     }
 }
 
-fn write_slang_project_index(context: &Path, files: &[PathBuf]) -> std::io::Result<()> {
+fn write_slang_project_index(
+    context: &Path,
+    files: &[PathBuf],
+    config: &LspConfig,
+) -> std::io::Result<()> {
     let root = context
         .parent()
         .ok_or_else(|| std::io::Error::other("missing index directory"))?;
-    let settings = root.join(".slang");
-    std::fs::create_dir(&settings)?;
-    std::fs::create_dir(root.join("home"))?;
     let mut patterns = Vec::with_capacity(files.len());
     for (index, file) in files.iter().enumerate() {
         let path = file.to_string_lossy();
@@ -1017,8 +1030,7 @@ fn write_slang_project_index(context: &Path, files: &[PathBuf]) -> std::io::Resu
             patterns.push(path.into_owned());
         }
     }
-    let json = serde_json::json!({"index": [{"dirs": []}], "indexGlobs": patterns});
-    create_private_file(&settings.join("server.json"), &json.to_string())
+    crate::slang_project::write_layers(root, &config.workspace_root, &config.environment, patterns)
 }
 
 /// Candidate directories for the generated context, in preference order:
@@ -1065,7 +1077,7 @@ fn create_private_dir(path: &Path) -> std::io::Result<()> {
 /// Create one context file exclusively (`create_new`) and not world-readable
 /// (`0600` on unix). `create_new` is `O_CREAT | O_EXCL`, which refuses a
 /// pre-planted symlink instead of writing through it.
-fn create_private_file(path: &Path, text: &str) -> std::io::Result<()> {
+pub(crate) fn create_private_file(path: &Path, text: &str) -> std::io::Result<()> {
     let mut options = std::fs::OpenOptions::new();
     options.write(true).create_new(true);
     #[cfg(unix)]

@@ -730,7 +730,12 @@ if(VEDIT_DIAGNOSTICS_HAVE_APP_SHELL AND VEDIT_DIAGNOSTICS_FFI
     endif()
     add_test(NAME vedit-filelist-authority-e2e COMMAND vedit-filelist-authority-e2e)
     add_test(NAME vedit-filelist-authority-verible-e2e COMMAND vedit-filelist-authority-e2e --verible)
-    set_tests_properties(vedit-filelist-authority-e2e vedit-filelist-authority-verible-e2e PROPERTIES
+    add_test(NAME vedit-filelist-authority-config-e2e COMMAND vedit-filelist-authority-e2e --configured)
+    add_test(NAME vedit-filelist-authority-include-e2e COMMAND vedit-filelist-authority-e2e --included)
+    add_test(NAME vedit-filelist-authority-wrapper-e2e COMMAND vedit-filelist-authority-e2e --include-wrapper)
+    set_tests_properties(vedit-filelist-authority-e2e vedit-filelist-authority-verible-e2e
+      vedit-filelist-authority-config-e2e vedit-filelist-authority-include-e2e
+      vedit-filelist-authority-wrapper-e2e PROPERTIES
       ENVIRONMENT "QT_QPA_PLATFORM=offscreen;VEDIT_NO_ENV_AUTOCAPTURE=1"
       SKIP_RETURN_CODE 77 TIMEOUT 60)
   endif()

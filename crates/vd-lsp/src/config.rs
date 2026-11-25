@@ -58,6 +58,7 @@ pub struct LspConfig {
     /// rule the tool children apply.
     pub environment: BTreeMap<String, String>,
     pub(crate) project_index: Option<Arc<crate::session::ContextFile>>,
+    pub(crate) pending_slang_index: Option<Vec<PathBuf>>,
 }
 
 impl LspConfig {
@@ -77,6 +78,7 @@ impl LspConfig {
             shutdown_timeout: Duration::from_secs(5),
             environment: BTreeMap::new(),
             project_index: None,
+            pending_slang_index: None,
         }
     }
 

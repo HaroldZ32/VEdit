@@ -2968,6 +2968,27 @@ uint64_t vd_catalog_start(struct VdService *service,
 int32_t vd_catalog_poll(struct VdService *service, uint64_t job, struct VdModuleCatalog *out);
 
 /*
+ Poll a catalog with a parallel list of owning compilation units. An empty
+ list entry means that the corresponding module is declared directly in its source.
+ Release a filled list with `vd_catalog_compilation_units_free`.
+
+ # Safety
+ Same as `vd_catalog_poll`. `units` must be null or writable for one `VdStringList`.
+ */
+int32_t vd_catalog_poll_v2(struct VdService *service,
+                           uint64_t job,
+                           struct VdModuleCatalog *out,
+                           struct VdStringList *units);
+
+/*
+ Free the compilation unit list returned by `vd_catalog_poll_v2`.
+
+ # Safety
+ `units` must be null or point to a list filled by `vd_catalog_poll_v2`.
+ */
+void vd_catalog_compilation_units_free(struct VdStringList *units);
+
+/*
  Cancel a catalog job: the `slang` child is killed and the run stops before the
  streamed parse, instead of finishing into memory nobody reads.
 

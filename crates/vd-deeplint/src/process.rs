@@ -26,9 +26,16 @@ const READER_GRACE: Duration = Duration::from_millis(250);
 /// the caller appends its own truncation marker, so a bounded capture is never
 /// silent.
 pub(crate) fn spawn_reader(reader: impl Read + Send + 'static) -> Receiver<(String, bool)> {
+    spawn_reader_with_limit(reader, STREAM_CAPTURE_LIMIT)
+}
+
+pub(crate) fn spawn_reader_with_limit(
+    reader: impl Read + Send + 'static,
+    limit: usize,
+) -> Receiver<(String, bool)> {
     let (sender, receiver) = mpsc::channel();
     std::thread::spawn(move || {
-        let result = read_capped(reader, STREAM_CAPTURE_LIMIT);
+        let result = read_capped(reader, limit);
         if sender.send(result).is_err() {
             eprintln!("vd-deeplint: output reader lost its receiver");
         }

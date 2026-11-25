@@ -634,8 +634,12 @@ private:
         shadowedFiles_ = shadowed;
         const QStringList members = shell_->property("vedit.diagnostics.projectFiles").toStringList();
         goldenFiles_ = diagnostics::realtime_scope::goldenFileSetFrom(members);
+        QStringList indexCandidates = members;
+        if (!members.isEmpty()) {
+            indexCandidates.append(shell_->property("vedit.moduleTree.includedDefinitions").toStringList());
+        }
         projectIndex_ = diagnostics::realtime_scope::dropShadowedFiles(
-            members, diagnostics::realtime_scope::shadowedFileSetFrom(shadowed));
+            indexCandidates, diagnostics::realtime_scope::shadowedFileSetFrom(shadowed));
         projectIndex_.removeDuplicates();
         projectIndex_.sort();
         return true;
