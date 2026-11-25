@@ -425,7 +425,7 @@ preprocessing error at "`MACRO" Error expanding macro identifier, might not be d
 
 切到 **slang**（随包 `slang-server`）后，同一个文件会给出真正的语法诊断（例如 `expected ';'`），位置就在删除点附近；这是本版推荐的读法。
 
-**已知限制**：随包 `slang-server` 0.3.1 忽略命令行 `-I` / `-D`，所以 `Preferences → Tools` 的 Include dirs / Defines 不会到达 slang-server 的 LSP 子进程；工程内同目录的 `` `include `` 不受影响，需要外部 include 目录或 `.f` 里 defines 的工程要等后续批次接线。Verible 侧 `--file_list_path` 里的 `+incdir+` / `+define+` 也改变不了这条预处理错误，本版不改 Verible 二进制/版本。
+导入 filelist 后，slang 的实时分析和定义跳转采用展开后的文件集、包含目录和宏，并保留工作区与用户的 slang 编译设置。`Preferences → Tools` 的 Include dirs / Defines 用于手动运行的工程级 lint。为 Verible 提供 `--file_list_path` 无法解决上面的宏预处理限制。
 
 ## 7. 代码导航与多光标
 
@@ -637,7 +637,8 @@ preprocessing error at "`MACRO" Error expanding macro identifier, might not be d
 - **Interface language**：`Auto` / `English` / `简体中文`。切换需要重启：选完点旁边的 `Restart now to apply`。详见第 9 节。
 - **LSP backend**：提供跳转、引用、重命名、大纲和悬停。Verilog/SystemVerilog 的新配置默认使用 `slang-server`。已有的显式选择继续生效。缺少所选服务器时，状态栏显示实际回退及原因。
 - **Lint engine**：独立选择 CLI lint 引擎，默认为 `slang`，显式 `verible` 选择继续生效。全工程 lint 由用户手动启动。
-- **工具路径**：`verible-verilog-ls`、`slang`、`slang-server`、`verible-verilog-format`、verible 规则文件。留空表示用随包（或自动发现）的那一份。
+- **工具路径**：`verible-verilog-ls`、`slang`、`slang-server`、`verible-verilog-format`、verible 规则文件。留空表示用随包或自动发现的版本。
+- **Host shell**：选择启动新终端和后续 Git/SVN 任务使用的宿主机 shell。详见附录 D。
 - **Include dirs (-I)**、**Defines (-D)**：一行一个，交给工程级 lint 使用。
 - 页底说明：这些值存在设置文件里；保存后的改动**立即生效**（运行中的程序约 300 ms 内读入设置文件）：实时 LSP 会话用新选择的后端重启并重新分析当前文件，lint 引擎在下一次 `Lint Project` 时生效，`-I` / `-D` 交给工程级 lint。
 
@@ -738,16 +739,16 @@ preprocessing error at "`MACRO" Error expanding macro identifier, might not be d
 
 - `Edit → Preferences… → Tools → Interface language`：`Auto`（跟随系统）、`English`、`简体中文`。
 - 切换后需要重启才能生效，页面提供 `Restart now to apply`。
-- `Auto` 跟随系统 locale。**AppImage 只带 `C.UTF-8` 一个 locale**，所以打包运行时 `Auto` 通常解析为英文；要看中文，请显式选 `简体中文` 再重启。
+- `Auto` 跟随系统 locale。**发布包只带 `C.UTF-8` 一个 locale**，所以打包运行时 `Auto` 通常解析为英文；要看中文，请显式选 `简体中文` 再重启。
 - 中文翻译文件随包（`bin/translations/`），不需要另外安装语言包。
 
 ### 9.2 中文输入
 
-VEdit 不自带输入法，中文输入依赖系统安装并正在运行的输入法（ibus / fcitx 等）。AppImage 没有随包携带 Qt 的输入法平台插件（`platforminputcontexts`），能否候选与上屏取决于系统输入法与 Qt xcb 平台插件的配合；如果输入法在 AppImage 里不可用，可以改用源码构建（使用宿主的 Qt 插件），或先确认系统输入法在其他程序里工作正常。输入法本身不可用是系统环境问题，不是编辑器功能。
+中文输入由系统输入法（ibus / fcitx 等）提供。发布包没有 Qt 的输入法平台插件（`platforminputcontexts`），候选与上屏取决于系统输入法与 Qt xcb 平台插件的配合。若输入法无法使用，先确认它在其他程序中正常运行，也可从源码构建并使用宿主 Qt 插件。
 
 ### 9.3 字体与中文宽度
 
-- AppImage 自带 `Noto Sans CJK`，中文注释与界面文字不会显示成方块。
+- 发布包提供 `Noto Sans CJK`，用于显示中文注释和界面文字。
 - 编辑器对拉丁字符使用 `DejaVu Sans Mono`，对中文字符回退到 `Noto Sans Mono CJK`。
 - 两种字体的字宽不同，所以**一个中文字符的宽度约为一个拉丁字符的 1.60 倍**，而不是排版上的 2.0 倍。纯中文内容仍然对齐；中英文混排的注释列对齐是近似的，这是有意的取舍（优先保证纯 ASCII 代码的宽度稳定）。
 
@@ -777,7 +778,7 @@ VHDL 走**独立的一条 lane**，不碰 verible / slang：
 - 有 `project.scala` / `scala-cli.conf` / `.scala` 源文件 → `scala-cli run --offline --server=false --jvm system <工程根>`；
 - 两者都没有 → **明确报错**（提示加 `build.sbt` 或 Scala 源文件），不会猜一个语言静默运行。
 
-运行细节：输出进**现有的 Terminal 面板**（带 `[scala]` 前缀），退出码可见；`Project → Stop Scala Run` 取消并**杀掉进程树**；运行是异步 job，界面不冻；不打开 debug 会话。工具解析与其它 lane 相同：**随包 → 本地 → PATH**；`scala-cli` 缺失会点名是哪个工具，AppImage 里这些工具都是随包的。
+运行细节：输出进**现有的 Terminal 面板**（带 `[scala]` 前缀），退出码可见；`Project → Stop Scala Run` 取消并**杀掉进程树**；运行是异步 job，界面不冻；不打开 debug 会话。工具解析与其它 lane 相同：**随包 → 本地 → PATH**；`scala-cli` 缺失时会显示相应工具名。发布包已包含这些工具。
 
 **离线**（交付物随包 JDK / scala-cli / sbt / Metals / Bloop / coursier 与两套预置缓存）：
 
@@ -807,54 +808,66 @@ VHDL 走**独立的一条 lane**，不碰 verible / slang：
 6. **`Alt` 手势可能被窗口管理器截获**：KDE / GNOME 默认用 `Alt+拖拽`（以及 `Alt+点击`）移动窗口，事件到不了应用。因此块选择与加光标的**主手势**是 `Shift+Alt+拖拽` 与 `Ctrl+Alt+点击`（窗口管理器不占用它们）；`Alt+...` 只作为次选手势保留。见 7.2。
 7. **中文宽度 1.60 倍**：中英文混排的注释列对齐是近似的（见 9.3）。
 8. **工程面板不能增删 `-I` / `-D`**：`Project` 面板里的 `Include dirs (-I)` 与 `Defines (-D)` 是从 filelist 展开得到的**只读**结果，没有按工程增删的入口。要调整交给工程级 lint 的 `-I` / `-D`，用 `Edit → Preferences… → Tools` 的全局设置（见 8.4）；要改变展开结果，改 filelist 后按 `Refresh`。
-9. **界面语言的 `Auto` 在 AppImage 里通常落到英文**：包内只有 `C.UTF-8`；需要中文请显式选择（见 9.1）。
-10. **打包产物不加载用户自定义语法定义**：AppImage 只加载随包白名单里的语法定义；放在用户目录里的自定义定义在 AppImage 里不会生效。
-11. **没有真机 GUI 验证**：本版本的界面证据来自离屏 / 软件渲染环境与代码核对，没有在真实桌面上用鼠标逐项验收；实际观感、DPI、字体与中文渲染可能不同，需要在你的桌面上确认。软件渲染截图里缺 CJK 字体时，某些按钮（例如「修复」）会显示成方块——按钮存在且位置正确，不代表产品表现。
+9. **发布包的 `Auto` 界面语言通常为英文**。包内只有 `C.UTF-8`，需要中文请显式选择（见 9.1）。
+10. **打包产物的语法定义范围**。发布包只加载随包白名单里的语法定义。
+11. **桌面验证范围**。合并到本版的交互改动在 X11/Xvfb 下验证。原生 Wayland、各桌面环境的 DPI、字体和输入法组合仍需单独验证。
 12. **FIM 预览长度**。预览会根据可用空间显示建议的首行；按 `Tab` 可插入完整内容。
 13. **HDL 高亮按源文本识别**。宏展开生成的模块名或例化名可能沿用普通标识符的样式。
 14. **VHDL 只覆盖诊断 / 合并 lint / 格式化**：hover、跳转定义、outline、重命名、debug、全工程 elaborate 本版本没有产品入口；会话按磁盘内容打开、未接 `didChange`（未保存的修改不会推送）；默认只生成单库映射，多库工程请自备 `vhdl_ls.toml`。见 9.4。
 15. **Scala：运行 lane 之外的编辑器能力未接线**：Metals 随包、离线会话经实测可用，但编辑器内**没有** Metals LSP 会话（hover/定义等未接）；离线仍会尝试 DNS（全部失败，`ENETUNREACH`），**不声称零系统调用**；未预热依赖会点名缺失坐标。见 9.5。
 16. **环境变量导入的边界**：手工捕获默认存项目层（项目覆盖全局）；**启动自动采集**写 global 层、只取 shell 改变过的变量，`VEDIT_NO_ENV_AUTOCAPTURE=1` 可关闭。秘密形状名字在手工页默认掩码、未显式 reveal 时不落盘，但**自动采集会把 shell 改变过的密钥形状变量一并写入 global 层**并交给 LSP、终端、版本控制和工具链子进程；不想这样就用上面的开关或只用手工捕获。捕获按 shell 语法“最后赋值胜出”，内置 shell 家族（含 csh / tcsh / fish）都用 `env -0` 的 NUL 输出，值里含换行也能完整捕获（只有自定义程序输出换行分隔时才会被拆开并给警告）；目标机没装的 shell 家族会显式报错。见 8.10。
 17. **环境变量候选清单是「打开 Preferences 时的工程快照」**：对话框开着的时候工程又展开了一次，需要重新打开 Preferences 才能看到新的引用集合。工程 filelist 不引用任何变量时清单为空并写明原因，而不是退回「全量列出」。见 8.10。
-17. **设置文件里的非法值不是“设置页坏了”**：载入层会把非法值替换成默认值并给一条警告；徽标显示 ` · ⚠ N`，而 `reason=ok` 只表示**请求已生效**，不代表设置文件完美。完整警告文本在徽标悬停提示与 `Preferences → Diagnostics` 框里。见 6.6 / 8.9。
-
-18. **Verible 的宏预处理遮挡与 slang-server 的 argv 限制**：Verible LSP 无法展开 `` `include `` / `` `+define+ `` 的宏，语法错误会被一条锚在第一个宏上的 `preprocessing error` 顶掉（`Outline` 会显示常驻提示，见 6.8）；切到 slang 后端能看到真正的诊断。但随包 `slang-server` 0.3.1 **忽略命令行 `-I` / `-D`**，`Preferences → Tools` 的 Include dirs / Defines 不会到达它的 LSP 子进程——工程内同目录 include 不受影响，外部 include 目录 / `.f` defines 要等后续批次接线。
+18. **设置文件里的非法值**。载入层用默认值替换非法值并显示警告。完整警告在诊断徽标的悬停提示与 `Preferences → Diagnostics` 中。见 6.6 / 8.9。
+19. **语言服务器切换与预处理**。刚切换文件时，如果分析会话仍在准备，请稍后重试 `Ctrl`+点击。Verible 遇到无法展开的宏时可能只报第一处预处理错误，见 6.8。
 
 ## 附录 A 产物形态与安装
 
-本节是**部署**说明，不影响日常使用。
+### A.1 下载、校验与启动
 
-### A.1 单文件 AppImage（当前交付物）
-
-VEdit 以**单文件 AppImage** 交付：
+从 [GitHub Releases](https://github.com/HaroldZ32/VEdit/releases) 下载所需的 Linux x86_64 格式及同版本的 `SHA256SUMS`。把文件放在同一目录。以下示例校验 AppImage，下载其他格式时把 `asset` 改成对应文件名。输出应为该文件的 `OK`。下载全部三种格式时，直接运行 `sha256sum --check --strict SHA256SUMS`。
 
 ```sh
-chmod +x VEdit-<版本>-x86_64.AppImage
-./VEdit-<版本>-x86_64.AppImage                # 空编辑器
-./VEdit-<版本>-x86_64.AppImage path/to/top.sv # 直接打开文件
+asset=VEdit-0.4.1-x86_64.AppImage
+awk -v asset="$asset" '$2 == asset' SHA256SUMS | sha256sum --check
 ```
 
-- 包内自带 Qt6 / KF6 / KTextEditor / tree-sitter、CJK 字体、`verible` 与 `slang`，以及 `slang-server`、`git` / `svn`、VHDL 的 `vhdl_ls` / `ghdl` / `vsg`、Scala 的 JDK / scala-cli / sbt / Metals 等随包工具（版本台账见 `docs/BUILD.md` §7.3）；目标机上不需要安装任何依赖。
-- 目标平台是 CentOS 7.9 x86_64（glibc 2.17）及更新的主流发行版；打包流程已在 CentOS 7、Ubuntu 24.04、Rocky Linux 9、Ubuntu 26.04 的容器环境验证启动与基本功能。
-- 直接运行需要宿主提供 FUSE（`libfuse2`）。没有 FUSE 时用：
+**AppImage**。直接运行需要 FUSE（`libfuse2`）。没有 FUSE 时使用下方的解包运行命令。
 
 ```sh
-./VEdit-<版本>-x86_64.AppImage --appimage-extract-and-run
-APPIMAGE_EXTRACT_AND_RUN=1 ./VEdit-<版本>-x86_64.AppImage
+chmod +x VEdit-0.4.1-x86_64.AppImage
+./VEdit-0.4.1-x86_64.AppImage path/to/top.sv
+./VEdit-0.4.1-x86_64.AppImage --appimage-extract-and-run path/to/top.sv
 ```
+
+**`.tar.gz` 目录包**。解开后从目录外运行 `AppRun`，保留整个目录供后续使用。
+
+```sh
+tar -xzf vedit-0.4.1-linux-x86_64.tar.gz
+./vedit-0.4.1-linux-x86_64/AppRun path/to/top.sv
+```
+
+**`.run` 自解压包**。直接运行会临时解包并启动，程序退出后清理临时目录。也可以用 `--extract` 将包解到指定的新目录，保留文件供后续启动。新目录的父目录须已存在。
+
+```sh
+chmod +x VEdit-0.4.1-x86_64.run
+./VEdit-0.4.1-x86_64.run path/to/top.sv
+./VEdit-0.4.1-x86_64.run --extract ./vedit-install
+./vedit-install/vedit-0.4.1-linux-x86_64/AppRun path/to/top.sv
+```
+
+三个包使用同一 Qt6 应用、运行库、字体和 HDL、VHDL、Scala 工具（见[构建指南](BUILD.md) §7.3）。`.tar.gz` 和 `.run` 使用宿主机上的标准解压工具，无需 FUSE。三种格式的启动脚本都需要宿主机的 `/bin/sh`，终端使用设置中选定的系统 shell。要使用版本控制，请在宿主安装所需的 `git` 或 `svn`，详见附录 D。
+
+目标平台为 CentOS 7.9 x86_64 用户态（glibc 2.17）及更新的 Linux。发布流程中的 CentOS 7 容器使用 runner 的内核。CentOS 7 自带 3.10 内核的机器或虚拟机需单独验证。
 
 ### A.2 从源码构建（开发用）
 
 ```sh
+bash scripts/fetch-verible.sh
+bash build/slang/build.sh
 bash scripts/build-qt.sh              # 构建 + 测试
-bash scripts/build-qt.sh --no-test    # 只构建
 ```
 
-产物是 `target/qt6-build/src/app/vedit-app`。在另一台机器直接运行它需要 KF6/Qt6 运行库、`libtree-sitter` 0.25 与 Qt 平台插件，版本与包名见 `docs/BUILD.md`。
-
-### A.3 不在本文范围的产物
-
-如果你手上是更早打包的 `tar.gz` 目录包或自解压 `.run` 单文件，那套产物对应的是**旧界面**，本文描述的面板、设置页与快捷键都不适用于它；日常使用请改用 A.1 的 AppImage。
+也可用 `bash scripts/build-qt.sh --no-test` 跳过 Qt 测试，Rust 构建仍需要先准备固定版本的 `slang`。产物是 `target/qt6-build/src/app/vedit-app`。在另一台机器直接运行它需要 KF6/Qt6 运行库、`libtree-sitter` 0.25 与 Qt 平台插件，版本与包名见[构建指南](BUILD.md)。
 
 ## 附录 B 配置文件与位置
 
@@ -894,15 +907,15 @@ vedit-app --no-session-restore    # 忽略上次会话，干净启动
 
 | 现象 | 原因 / 处理 |
 |---|---|
-| 界面是英文，设了中文也不变 | 切换语言后需要重启；用 `Tools → Interface language → Restart now to apply`。`Auto` 在 AppImage 里通常解析为英文（9.1） |
-| 中文显示成方块 | 用包内 AppImage 启动；自带字体没有生效时，先确认没有绕过 AppRun 自行启动解包目录 |
-| 输入法没有候选框 | 系统输入法（ibus / fcitx）没有安装或没有运行；AppImage 也没有随包输入法插件（见 9.2） |
+| 界面是英文，设了中文也不变 | 切换语言后需要重启；用 `Tools → Interface language → Restart now to apply`。`Auto` 在发布包里通常解析为英文（9.1） |
+| 中文显示成方块 | 检查是否通过 AppImage、`.run` 或解包后的 `AppRun` 启动，以便加载随包字体 |
+| 输入法没有候选框 | 检查系统输入法（ibus / fcitx）是否安装并运行。发布包的输入法插件限制见 9.2 |
 | AppImage 起不来，提示找不到 FUSE | 装 `libfuse2`，或用 `--appimage-extract-and-run` / `APPIMAGE_EXTRACT_AND_RUN=1`（A.1） |
-| 状态栏或面板提示找不到 `verible` / `slang` | AppImage 自带这两个工具；从源码运行时用 `bash scripts/fetch-verible.sh` 与 `bash build/slang/build.sh` 取得，或用环境变量 `VEDIT_VERIBLE_LS` / `VEDIT_SLANG` 指向实际路径 |
+| 状态栏或面板提示找不到 `verible` / `slang` | 发布包自带这两个工具；从源码运行时用 `bash scripts/fetch-verible.sh` 与 `bash build/slang/build.sh` 取得，或用环境变量 `VEDIT_VERIBLE_LS` / `VEDIT_SLANG` 指向实际路径 |
 | 状态栏诊断徽标显示 `…→… · reason=tool-missing` / `select-failed` / `unknown-value` | 看徽标的悬停提示：它给出人话原因与修复路径；`reason=ok` 只表示请求已生效，设置文件的非法值另以 ` · ⚠ N` 表示（6.6、8.9） |
 | VHDL 文件没有诊断 / 面板为空 | 看状态栏 `vhdl_ls · …` 与 lane 的一行状态：`vhdl_ls` / `ghdl` / `vsg` 缺失会点名；工程根没有 `vhdl_ls.toml` 时 lane 会生成默认单库配置，写不了会明确报错（9.4） |
 | 打开 VHDL 工程后根目录多出 `vhdl_ls.toml` | 这是 lane 生成的默认单库映射；你可以编辑它，产品不会覆盖已有文件（9.4） |
-| `Run Scala Project` 报找不到工具链 | `scala-cli` / `sbt` / `java` 按 **随包 → 本地 → PATH** 解析；优先使用交付的 AppImage（随包 JDK/scala-cli/sbt），或把工具放进 PATH / 产品 `bin/`（9.5） |
+| `Run Scala Project` 报找不到工具链 | `scala-cli` / `sbt` / `java` 按 **随包 → 本地 → PATH** 解析；使用包含 JDK、scala-cli 和 sbt 的发布包，或把工具放进 `PATH` / 产品 `bin/`（9.5） |
 | Scala 离线运行报缺少某个依赖坐标 | 该依赖不在随包预热缓存里；按随包 `usr/lib/scala/PREWARM-SCALA.txt` 预热，错误里会点名缺失的坐标（9.5） |
 | `Environment` 页捕获失败 | 页面警告会给出 shell 退出码与 stderr 尾；shell 起不来 / 超时 / 取消都是“什么都没改”，重试即可（8.10） |
 | 导入的环境变量没生效 | 先**重启程序**（变量只在启动时读取一次）。确认变量保存在正确的层（默认项目层，项目根要填对）。应用范围见 8.10。 |
@@ -937,9 +950,9 @@ vedit-app --no-session-restore    # 忽略上次会话，干净启动
 
 在 `Preferences → Tools → Host shell` 选择 `Auto` 或系统中已安装的 shell，如 bash、csh/tcsh 或 zsh。`Auto` 优先使用有效的 `$SHELL`，然后查找其他已安装的 shell。设置会保存，新终端会话和随后运行的 Git / SVN 操作会使用该设置。使用 `Restart` 可按新设置重开终端。
 
-Git / SVN 操作从宿主机的有效 `PATH` 查找 `git` 或 `svn`。也可以通过 `VEDIT_GIT` / `VEDIT_SVN` 提供找不到时使用的绝对路径。AppImage 可以在缺少两种工具时启动和编辑文件。需要使用版本控制时，请在主机上安装对应工具；工具或已选 shell 不可用时，相关操作会提示如何处理。
+Git / SVN 操作从宿主机的有效 `PATH` 查找 `git` 或 `svn`。也可以通过 `VEDIT_GIT` / `VEDIT_SVN` 提供找不到时使用的绝对路径。三种发布格式都可在缺少两种工具时启动和编辑文件。需要使用版本控制时，请在主机上安装对应工具。工具或所选 shell 不可用时，相关操作会提示如何处理。
 
-双栏文件比较使用 AppImage 内置的 GNU `diff`。从源码构建运行时，请在系统上安装 GNU diffutils，并用 `diff --version` 确认 `PATH` 上的版本。
+双栏文件比较使用发布包内置的 GNU `diff`。从源码构建运行时，请在系统上安装 GNU diffutils，并用 `diff --version` 确认 `PATH` 上的版本。
 
 ### D.3 能做什么
 

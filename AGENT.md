@@ -27,22 +27,20 @@ Operating instructions for any AI agent working in this repository. Replace ever
 
 ## 4. Commands
 
-The product is Rust (GTK3 + GtkSourceView 4.6.1) and is built inside a pinned
-CentOS 7 image, because the deliverable must run on CentOS 7 (glibc 2.17).
-`package.json` is verification orchestration ONLY (it maps the MPD gate ids to
-`build/gates/*.sh`) and is never a product runtime or build dependency.
+VEdit ships a Qt6/KF6 desktop application backed by Rust services. The build
+uses a pinned Ubuntu image. The Linux x86_64 packages include the application,
+its private runtime and HDL tools, with CentOS 7 (glibc 2.17) as the target
+userspace baseline. `package.json` maps MPD gate IDs to `build/gates/*.sh`.
 
-- Install dependencies: none on the host. The pinned image (base digest, Rust
-  1.99.0, GtkSourceView 4.6.1, meson/ninja) is built by `bash scripts/build.sh`;
-  every download's sha256 is pinned in `scripts/versions.env`.
-- Build the **delivered Qt6 product** (v2): `bash scripts/build-qt.sh` ->
-  `target/qt6-build/src/app/vedit-app`. Its runtime needs the KF6/Qt6 shared
-  libraries, `libtree-sitter` 0.25 and the Qt platform plugins; the measured
-  package names are in `evidence/runtime-deps/REPORT.md` §1 and the build matrix
-  in `docs/BUILD.md` §12. **If you are verifying the v2 deliverable, use this
-  command.** Build the pinned `slang` first with `bash build/slang/build.sh` or
-  use the hash-checked CI artifact. The Rust tests need `build/slang/out/slang`
-  even when the Qt build uses `--no-test`.
+- Build the Qt6 product with `bash build/slang/build.sh` followed by
+  `bash scripts/build-qt.sh`. CI can use the hash-checked `slang` artifact.
+  The Rust service step needs `build/slang/out/slang` even with the Qt
+  `--no-test` option. The bare binary is `target/qt6-build/src/app/vedit-app`.
+  See [BUILD.md](docs/BUILD.md) §12 for the KF6/Qt6, `libtree-sitter` and
+  platform-plugin build and runtime dependencies.
+- Package the Qt6 product with `bash packaging/runtime/build.sh`. The AppImage,
+  `.tar.gz`, `.run` and shared `SHA256SUMS` are in `packaging/runtime/out/release/`.
+  Follow [RELEASING.md](docs/RELEASING.md) for promotion checks and publication.
 - Rust C ABI selfcheck of the product binary (T97): `target/qt6-build/src/app/vedit-app
   --selfcheck-ffi crates/vd-ffi/tests/fixtures/project` (offscreen:
   `QT_QPA_PLATFORM=offscreen`). `--selfcheck-ffi` asserts the **C ABI smoke
@@ -101,11 +99,12 @@ are allowed only through a per-operation allow-list":
 The integrated terminal and VCS share the host shell selected in
 **Preferences → Tools → Host shell**. VCS resolves executable `git` and `svn`
 on the effective host `PATH`, then accepts absolute paths from `VEDIT_GIT` or
-`VEDIT_SVN`. The AppImage launches without either client. VCS operations report
-how to install or locate a missing client. Use the system `svnadmin` for SVN
-E2E fixtures. See `evidence/host-tools/` for the current runtime and packaging
-checks. Earlier local repository and credential fixture results are archived
-under `evidence/vcs-write/` and `evidence/svn-e2e/`.
+`VEDIT_SVN`. All three packages launch without either client. VCS operations
+report how to install or locate a missing client. Use the system `svnadmin`
+for SVN E2E fixtures. The host-tools acceptance in `evidence/host-tools/`
+records the source revisions and AppImage tested for PR #20. Earlier local
+repository and credential fixtures are under `evidence/vcs-write/` and
+`evidence/svn-e2e/`.
 
 ### Project discovery: optional files are not errors (T114)
 
@@ -195,9 +194,11 @@ module tree. Full-project lint is **manual only** (`project.lint`); the save-tri
 and open-triggered passes are gone. Its results live in the bottom `project-lint` dock,
 never in the `Outline` diagnostics. Realtime lint is the only automatic lint: it analyzes
 the current file plus the **one-level** child-module definition files (caps: 64 files per
-file, 128 total) and displays only the current file. LSP sessions are reused across file
-switches (`vd_lsp_session_change`, no stop/start); do not reintroduce a session restart
-per active-file change. Regression ctests: `vedit-realtime-depth-switch-e2e`,
+file, 128 total) and displays only the current file. With an imported filelist,
+realtime lint and Ctrl+click use its source set and module ownership, including
+legitimate includes. Preserve slang's compiler settings without adding source
+operands beyond the filelist. Reuse LSP sessions when switching files within
+an existing analysis scope (`vd_lsp_session_change`). Regression ctests: `vedit-realtime-depth-switch-e2e`,
 `vedit-app-batch-layout-selftest`, `vedit-editor-open-bench`.
 
 Dependency ownership: the root `Cargo.toml`, `Cargo.lock` and
@@ -231,7 +232,9 @@ so all pure-ASCII metrics change.
   `fix/<slug>`, `feat/<slug>`, `chore/<slug>` and `docs/<slug>` branch off `dev`,
   the PR merges into `dev` (a merge commit is allowed), and a release promotes
   `dev` through `release/<ver>` into `main`. `dev` is the integration line and
-  `main` is the release line: `main` only moves when a release merges into it.
+  `main` is the release line. After the release PR merges, push the matching
+  annotated `v<ver>` tag on the `main` merge commit to start Actions publication.
+  Verify the public packages and sync `main` back to `dev` through a PR.
   Published history is never rewritten (no amend/rebase/force-push).
 - Stage only your own task's declared write scope, with explicit paths; never
   `git add -A` and never `git commit -a`. If `index.lock` contends, retry instead
@@ -247,12 +250,11 @@ so all pure-ASCII metrics change.
 - Keep requirement, implementation and review as separate records.
 - Record evidence (command, observed result, path) on disk; a claim without evidence is
   incomplete.
-- Evidence lives in a per-batch directory under `evidence/` (one README plus its
-  raw logs), and every acceptance claim points at it. The final acceptance
-  matrix for a delivery is `evidence/final-acceptance-2/AC-MATRIX.md`: it lists
-  each requirement id, its verdict and its evidence pointer, and it carries the
-  known limitations and the carried (non-defect) exemptions. Do not overwrite an
-  older batch's evidence to make a new claim fit — add a new directory.
+- Keep each batch's evidence under `evidence/` with a README and the raw logs.
+  Record the tested commit, output hashes, limits and links per acceptance
+  criterion. `evidence/final-acceptance-2/AC-MATRIX.md` records the 2026-11-03
+  acceptance. A new release requires evidence from its own build and downloads
+  under `evidence/release-<ver>/`.
 - Gate evidence rows live under `.mpd/verify/evidence/` and verdict records under
   `.mpd/verify/records/`; a PASS names its sources (frozen contract, requirements,
   the batch evidence) and the gate evidence ids it rests on.

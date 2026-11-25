@@ -1,19 +1,13 @@
 # 构建 VEdit
 
-本文覆盖：**Qt6 交付物**的构建与打包（§2、§7.1、§12）、**旧 Rust/GTK3 产品线**的构建与打包
-（§2.1、§7.2，以及 §3–§5、§8、§10、§11 的 CentOS 7 / GTK 内容；§6 与 §9 为两条 lane 共用）、
-固定（pinned）输入与可复现性边界。
+本文说明 Qt6 产品的构建、打包与 CI（§2、§7.1、§11、§12），以及旧 Rust/GTK3 产品的构建与打包
+（§2.1、§3–§5、§7.2、§8、§10）。两条构建路径共用 §6 和 §9 的工具与许可说明。
 
-> **两条构建 lane 并存，交付物只有一条。**
+> **当前发布产品为 Qt6 `vedit-app`。** 先按 §2 构建，再按 §7.1 打成 AppImage、`.tar.gz` 和 `.run`，
+> 三种格式共用 `packaging/runtime/out/release/SHA256SUMS`。构建底座见 §12，发布流程见[发布指南](RELEASING.md)。
 >
-> - **Qt6 交付物**（`vedit-app`）：`bash scripts/build-qt.sh`（§2）→ `bash packaging/runtime/build.sh`
->   （§7.1）→ `packaging/runtime/out/VEdit-<ver>-x86_64.AppImage` + `out/SHA256SUMS`。
->   构建底座、版本矩阵与边界见 §12。
-> - **旧 Rust/GTK3 产品**（`vd-app`）：`bash scripts/build.sh`（§2.1）→ `build/artifacts/vd-app`，
->   打包见 §7.2。按需求非目标 5 保留，**不是交付物**。
->
-> 两条 lane 互不替代；§6 的 slang 二进制、§9 的 Rust crate 清单两条 lane 共用，§10.1 是 Qt 产品的
-> 运行期工具链发现。
+> 旧 Rust/GTK3 `vd-app` 的构建在 §2.1，历史打包流程在 §7.2。§6 的 slang 二进制、§9 的 Rust crate 清单
+> 可供两种构建共用。§10.1 说明 Qt 产品运行时如何定位工具。
 
 ## 1. 前提
 
@@ -21,23 +15,20 @@
 - 宿主操作系统不限（macOS/Linux 均可），真正的构建发生在**摘要固定**的镜像里：
   Qt6 交付物用 **Ubuntu 26.04** 镜像（§12.1），旧 GTK3 线用
   `docker.m.daocloud.io/library/centos:7`（§2.1）。
-- **构建期允许联网**：需要拉取固定版本的 tarball / deb / rpm / verible 发布包。
-  **产物运行期完全不需要网络**。
-- 磁盘：构建镜像 + Cargo 缓存 + CMake 构建树，建议预留 **≥ 8 GB**。
+- 构建期需要联网以获取固定版本的镜像和依赖。编辑、随包 HDL 分析和预热的 Scala 示例可离线运行。
+  可选的 FIM 服务、远端版本控制和未预热的 Scala 依赖按各自配置使用网络。
+- 安排磁盘空间时同时计入 Docker 镜像与缓存、Cargo/CMake 构建树、解包的 Scala 工具链、打包暂存和三份压缩产物。
 
-## 2. 一条命令（Qt6 交付物）
+## 2. 构建 Qt6 产品
 
 ```sh
+bash scripts/fetch-verible.sh
+bash build/slang/build.sh
 bash scripts/build-qt.sh          # 固定镜像 → Rust 服务层 → CMake configure/build/ctest → xcb/软件渲染冒烟
 ```
 
-产物：**`target/qt6-build/src/app/vedit-app`**（CMake 构建树 `target/qt6-build/` 已被 gitignore）。
-这一步只构建产品二进制；**交付物**是下一步的单文件 AppImage：
-
-```sh
-bash packaging/runtime/build.sh   # 组装 AppDir + 许可/F2 隔离 + AppImage + 自检/隔离 + CentOS 7 探针
-# -> packaging/runtime/out/VEdit-<ver>-x86_64.AppImage + out/SHA256SUMS
-```
+二进制在 `target/qt6-build/src/app/vedit-app`。Rust 服务构建需要固定版本的 `build/slang/out/slang`，
+包括使用 Qt 的 `--no-test` 时。生成发布包的步骤见 §7.1。
 
 门禁（当前命令）：
 
@@ -167,26 +158,35 @@ bash build/slang/build.sh
 
 ## 7. 打包：Qt 交付物与旧版产物
 
-### 7.1 Qt 交付物（唯一 AppImage）
+### 7.1 Qt 交付物
 
-**交付物 = `bash packaging/runtime/build.sh` 的产物 `packaging/runtime/out/VEdit-<ver>-x86_64.AppImage`（配 `out/SHA256SUMS`）。**
+在 Linux x86_64 上完成 §2 后，从仓库根目录准备打包输入并构建：
 
 ```sh
+bash scripts/build-ksh-selfbuild.sh --form F2
+docker run --rm -v "$PWD:/vedit-build" -w /vedit-build vedit-qt6-build:local \
+  bash packaging/runtime/build-vhdl-payload.sh
+ROOT="$PWD" bash packaging/runtime/build-scala-payload.sh
 bash packaging/runtime/build.sh
 ```
 
-这一条命令产出**唯一交付物**：单文件 AppImage
-`packaging/runtime/out/VEdit-<ver>-x86_64.AppImage`，以及配套的
-`packaging/runtime/out/SHA256SUMS`。它是 F2 私有运行时形态：包内自带 loader / glibc / Qt6 / KF6 /
-KTextEditor / 自建 KSyntaxHighlighting / tree-sitter / 字体，并带 `bin/translations/` 的中文翻译
-（`vedit_zh_CN.qm`、`qtbase_zh_CN.qm`）。流程、白名单与隔离契约见 `packaging/runtime/README.md`
-（该 README 把 `out/AppDir/` 明确列为**中间产物**；产物大小与 sha256 以 `out/SHA256SUMS`
-与实际文件为准，不在文档里写死）。
+Actions 从对应构建任务取得 F2、Qt6 和预热的 Scala 输入。它在打包任务中构建 VHDL 输入。
 
-**版本号说明**：当前版本为 **0.4.0**。`packaging/runtime/build-appimage.sh` 与
-`assemble-appdir.sh` 从工作区 `Cargo.toml` 读取版本，生成 `VEdit-0.4.0-x86_64.AppImage`
-和桌面文件的 `X-AppImage-Version=0.4.0`。根目录与终端的 CMake 项目、应用与窗口冒烟测试的
-`setApplicationVersion()` 同步使用 0.4.0。应用的 About 与 `--version` 显示该版本。
+从同一个暂存 AppDir 生成三种格式。发布文件在 `packaging/runtime/out/release/`：
+
+- `VEdit-<ver>-x86_64.AppImage`，支持 FUSE 挂载和解包运行。
+- `vedit-<ver>-linux-x86_64.tar.gz`，解包后运行顶层目录中的 `AppRun`。
+- `VEdit-<ver>-x86_64.run`，临时解包后启动，也支持 `--extract DIR`。
+- `SHA256SUMS`，包含上述三个包各一条 SHA-256 记录。
+
+三个包均包含私有 loader、glibc、Qt6、KF6、KTextEditor、自建 KSyntaxHighlighting、tree-sitter、字体
+和中文翻译（`bin/translations/vedit_zh_CN.qm`、`qtbase_zh_CN.qm`）。打包检查包内工具、许可和语法定义的
+隔离边界，并验证实际包的解包与启动。按[打包说明](../packaging/runtime/README.md)检查交付字节，暂存 AppDir
+是构建中间产物。如需复查用户安装命令，见[用户手册](USER_GUIDE.md#附录-a-产物形态与安装)。
+
+**版本号**为 **0.4.1**。`Cargo.toml` 的工作区版本必须与 `Cargo.lock`、根目录和终端的 CMake 项目版本、
+应用和窗口冒烟程序的版本一致。打包从工作区版本派生文件名和桌面文件的 `X-AppImage-Version`。
+应用的 About 与 `--version` 应显示同一版本。
 
 ### 7.2 旧版 GTK 产物（不是 Qt 交付物）
 
@@ -210,7 +210,7 @@ bash packaging/tarball/build.sh           # 旧 vd-app 的 tar.gz + 自解压 .r
 
 ### 7.3 交付物随包的外部工具
 
-AppImage 除了 Qt/KF6/KTextEditor/KSyntaxHighlighting/tree-sitter/字体/中文翻译，还随包下列
+三个 Qt6 发布包除 Qt/KF6/KTextEditor/KSyntaxHighlighting/tree-sitter、字体和中文翻译外，还提供下列
 **外部工具**。每个都由 `packaging/runtime/assemble-appdir.sh` 安装；组装的必检清单（`REQUIRED_*`
 与自检）缺少条目时**硬失败**，不会悄悄产出一个缺工具的包。版本台账见
 `scripts/versions.env`、`scripts/versions-qt.env`、`scripts/versions-scala.env` 与
@@ -234,14 +234,14 @@ AppImage 除了 Qt/KF6/KTextEditor/KSyntaxHighlighting/tree-sitter/字体/中文
 
 上述 HDL / Scala 工具的运行时解析顺序为 **bundled → local checkout → PATH → env**（工具各自的 env 名见 §10.1、
 `docs/USER_GUIDE.md` 附录 B）；工具缺失时产品给**一条**可操作的状态行，不按文件重复报错。
-文件比较优先使用 AppImage 内的私有 GNU `diff`，源码构建从 `PATH` 查找 GNU diffutils。
+文件比较优先使用包内的私有 GNU `diff`，源码构建从 `PATH` 查找 GNU diffutils。
 
 集成终端和版本控制使用宿主机上已安装的 shell。Git 和 SVN 客户端也由宿主机提供。打包门禁检查 AppDir 文件，并在空 `PATH` 下启动实际产品。真实 SVN 测试可用 `VEDIT_SVN_BIN` 和 `VEDIT_SVNADMIN` 指向测试环境中已安装的客户端和夹具工具。
 
-### 7.4 运行期离线证明（交付物）
+### 7.4 运行期离线验证
 
-要求是“构建期允许下载，**运行期零网络**”。证明方式是**把交付物解包后只读挂载、在
-`docker run --network none` 里跑真实会话，并用 `strace` 统计外部连接**：
+发布流水线从本次 AppImage 解包，在 `docker run --network none` 的 CentOS 7 环境中检查工具版本、
+运行 C ABI 自检并生成两个 Scala 示例的 RTL。下面是此前批次用只读挂载与 `strace` 采集的观测：
 
 - 两个 Scala 示例（`bin/scala-example spinalhdl|chisel`）：只读挂载 + `--network none` 下
   `EXIT=0`，分别产出 `Counter.v` / `Counter.sv`；两套预置 home 互不污染（污染计数为 0）。
@@ -360,20 +360,15 @@ outline 保持空表 + 一行原因；不会按文件/请求重复报错，也�
 VHDL 的三条工具缺失文案与 Scala 的随包解析细节见 `docs/USER_GUIDE.md` §9.4 / §9.5，
 随包版本台账见本文 §7.3。
 
-## 11. GitHub Actions（旧版 lane 的 CI / 镜像 / 发版）
-
-> 以下三条工作流仍针对旧 GTK3 线。Qt 交付物的构建与发布流程见 `docs/RELEASING.md` §6 与本文 §7.1；
-> 它们不是 Qt 交付物的发布路径。
-
-仓库有三条工作流（`.github/workflows/`），全部复用同一个 pinned CentOS 7 镜像：
+## 11. GitHub Actions 与旧 GTK3 镜像复用
 
 | 工作流 | 触发 | 做什么 |
 |---|---|---|
-| `ci.yml` | PR → `dev`/`main`；push → `dev` | `scripts/gates.sh` + `scripts/build.sh`（release build、Xvfb smoke、GLIBC ≤ 2.17 断言），上传 `build/evidence/` 与 `build/artifacts/vd-app` |
-| `image.yml` | `scripts/docker/**`、`scripts/versions.env`、`scripts/lib.sh`、`scripts/build-image.sh` 变更；手动 | 构建 pinned 镜像并推送 `ghcr.io/<owner>/vedit-build:<sha>` 与 `:latest` |
-| `release.yml` | tag `v*`；手动 | slang → `scripts/build.sh` → AppImage → tar.gz/.run → `SHA256SUMS` → GitHub Release |
+| `ci.yml` | PR → `dev`/`main`、push → `dev`、手动 | Rust、Qt6 和文档门禁。目标为 `main` 的 PR 和手动运行增加发布包验证 |
+| `image.yml` | 被调用 | 分开构建 Rust、Qt6 和 Scala 输入，打包时验证 Qt6 发布文件 |
+| `release.yml` | push `v*` tag、手动 | 构建并验证三种发布包。符合要求的 tag 推送触发 GitHub Release 发布 |
 
-工作流复用已发布的镜像、不重建时用三个脚本开关（`scripts/lib.sh`）：
+操作步骤和发布条件见[发布指南](RELEASING.md) §6。以下脚本选项用于本地旧 GTK3 构建，允许复用已有镜像：
 
 ```sh
 VEDIT_BUILD_IMAGE_REF=ghcr.io/<owner>/vedit-build:latest \
@@ -391,16 +386,13 @@ VEDIT_SKIP_IMAGE_BUILD=1 \
 
 - 镜像构建走 BuildKit，不再需要 `DOCKER_BUILDKIT=0`；`scripts/docker/Dockerfile.build` 用
   `COPY vault.repo.in` + `sed` 渲染 yum 源，两种 builder 语法都合法；
-- GHCR 包默认私有：同仓库的 `GITHUB_TOKEN` 可以拉取，fork PR 拉不到时工作流退回本地构建；
-- `scripts/build.sh` 在镜像内跑两处 `--selftest`：先 `--selftest smoke --probe-hold-ms 2500`
-  做 Xvfb 窗口冒烟，再跑套件集合——`VEDIT_SLANG` 与 `VEDIT_VERIBLE_LS` 同时可用时是一次 `all`
-  （6 个套件），否则**逐个**跑 `smoke highlight config fim`；任一套件非 0 即 `FATAL` 退出。
-  CI 会先 `bash build/slang/build.sh` 与 `bash scripts/fetch-verible.sh`，因此走 `all` 六套件。
+- 旧 `scripts/build.sh` 先在 Xvfb 下运行 `--selftest smoke --probe-hold-ms 2500`，然后运行套件。
+  设置 `VEDIT_SLANG` 与 `VEDIT_VERIBLE_LS` 时运行 `all`，否则逐个运行 `smoke highlight config fim`。
+  任一套件非零即退出。
 
 ## 12. Qt6 / KF6 C++ 构建底座（M0，T10）
 
-> 本节是 **Qt6 交付物**（`vedit-app`）的构建底座，也就是 §2 那条命令的细节；§2.1 与 §3–§5、§8、
-> §10、§11 是旧 Rust/GTK 线（§6 的 slang 二进制、§9 的 Rust crate 清单两条 lane 共用）。
+> 本节说明 §2 的 Qt6 构建与运行时依赖。§11 说明 Actions 工作流。
 
 ### 12.1 为什么用现代发行版做构建镜像
 
@@ -418,10 +410,8 @@ VEDIT_SKIP_IMAGE_BUILD=1 \
 原来的 CentOS 7 镜像**，所以不带 `--target` 的
 `docker build -f scripts/docker/Dockerfile.build` 行为与以前完全一致。
 
-CentOS 7（kernel 3.10）仍然成立：镜像里的 glibc 2.43 编译下限是 kernel **3.2.0**
-（`/lib/x86_64-linux-gnu/libc.so.6` 内嵌 `Minimum supported kernel: 3.2.0`，其
-`.note.ABI-tag` 也是 `ABI: 3.2.0`）；ELF 基线是普通 x86-64
-（`x86 ISA needed: x86-64-baseline`），不是 x86-64-v3。
+历史 ELF 检查中，镜像的 glibc 2.43 声明最低内核版本为 **3.2.0**，ISA 要求为 `x86-64-baseline`。
+实际的 CentOS 7 原生 3.10 内核运行结果需由对应发布包在物理机或虚拟机上验证。
 
 ### 12.2 构建命令与产物
 

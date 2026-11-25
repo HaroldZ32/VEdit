@@ -2,21 +2,23 @@
 
 VEdit 是面向 Verilog 和 SystemVerilog 工程的 Linux 桌面编辑器。导入仿真或综合用的 `.f` 文件清单，就可以沿模块实例阅读 RTL，从信号跳到驱动端或负载端，也可以在编辑器里比较工作文件与 SVN 历史修订。
 
-[下载 Linux AppImage](https://github.com/HaroldZ32/VEdit/releases/latest) · [用户手册](docs/USER_GUIDE.md) · [报告问题](https://github.com/HaroldZ32/VEdit/issues)
+[下载 Linux x86_64 版本](https://github.com/HaroldZ32/VEdit/releases/latest) · [用户手册](docs/USER_GUIDE.md) · [报告问题](https://github.com/HaroldZ32/VEdit/issues)
 
 ![VEdit 中文工作台：中央编辑 top.sv，右侧展示展开的模块树和 mem 模块的五个端口](docs/images/vedit-workbench.png)
 
 ## 安装与运行
 
-从 [Releases](https://github.com/HaroldZ32/VEdit/releases) 下载 x86_64 AppImage 和同一版本的 `SHA256SUMS`，放在同一目录。以下命令适用于 0.4.0。
+从 [Releases](https://github.com/HaroldZ32/VEdit/releases) 选择 Linux x86_64 的 AppImage、`.tar.gz` 或 `.run`，并下载同版本的 `SHA256SUMS`。以 0.4.1 的 AppImage 为例：
 
 ```sh
-sha256sum -c SHA256SUMS
-chmod +x VEdit-0.4.0-x86_64.AppImage
-./VEdit-0.4.0-x86_64.AppImage
+awk '$2 == "VEdit-0.4.1-x86_64.AppImage"' SHA256SUMS | sha256sum --check
+chmod +x VEdit-0.4.1-x86_64.AppImage
+./VEdit-0.4.1-x86_64.AppImage
 ```
 
-AppImage 随附 Qt 和 HDL 分析工具，普通用户即可运行。当前源码构建的 AppImage 使用系统 shell，版本控制功能需要在主机上安装 Git 或 Subversion。已在 CentOS 7.9 和 Rocky Linux 9.3 的 x86_64 用户态环境验证启动。机器没有 FUSE 时，可用 `./VEdit-0.4.0-x86_64.AppImage --appimage-extract-and-run` 启动。
+没有 FUSE 时，可以给 AppImage 加上 `--appimage-extract-and-run`，也可以使用无需 FUSE 的 `.tar.gz` 和 `.run`。[三种格式的启动命令](docs/USER_GUIDE.md#附录-a-产物形态与安装)
+
+三种格式均随附 Qt 和 HDL 分析工具，普通用户即可运行。集成终端使用宿主机的 shell，版本控制功能需要在宿主机安装 Git 或 Subversion。[0.4.1 发布说明](docs/releases/0.4.1.md)
 
 ## 打开第一个工程
 
@@ -43,9 +45,9 @@ cd VEdit
 bash scripts/fetch-verible.sh
 bash build/slang/build.sh
 bash scripts/build-qt.sh
-  ```
+```
 
-VEdit 使用 Qt 6、KDE Frameworks、KTextEditor 和 Rust。构建脚本编译并运行测试，生成 `target/qt6-build/src/app/vedit-app`。工具链、AppImage 打包和各项测试的独立入口见[构建指南](docs/BUILD.md)。
+VEdit 使用 Qt 6、KDE Frameworks、KTextEditor 和 Rust。构建脚本编译并运行测试，生成 `target/qt6-build/src/app/vedit-app`。工具链、三种格式的打包和各项测试入口见[构建指南](docs/BUILD.md)。
 
 欢迎提交 Issue 或 Pull Request。报告 HDL 分析问题时，请附上可公开的最小源码、相关 `.f` 和预期结果。代码和文档改动从 `dev` 创建分支，并向 `dev` 提交 PR。[贡献与发布流程](docs/RELEASING.md)
 

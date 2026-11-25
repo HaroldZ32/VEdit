@@ -1,27 +1,33 @@
 # packaging/runtime — VEdit 私有运行时（F2 形态，T64）
 
-单文件 AppImage 的私有运行时：包内自带 `ld-linux` + glibc + Qt6 + KF6 +
-KTextEditor + **自建** KSyntaxHighlighting + tree-sitter + 字体，`AppRun` 显式经包内
-loader 启动，并把语法定义查找**收窄到 AppDir 白名单**。CentOS 7.9 的系统 glibc 是
-2.17，`AppRun` 使用随包的 loader 和 glibc 满足应用 ELF 的版本要求（C2）。每次构建的
-ELF 需求以对应发布证据中的 `readelf` 结果为准。
+AppImage、`.tar.gz` 与 `.run` 从同一个 AppDir 生成。包内包含 `ld-linux`、glibc、Qt6、KF6、
+KTextEditor、自建 KSyntaxHighlighting、tree-sitter 和字体。`AppRun` 经包内 loader 启动，
+语法定义只从 AppDir 白名单加载。CentOS 7.9 的宿主 glibc 是 2.17。应用 ELF 的需求以本次构建的
+`readelf` 结果为准。
 
-## 一键
+## 构建与验证
+
+从仓库根目录运行。准备 Qt6 产品和随包依赖的步骤见[构建指南](../../docs/BUILD.md)。
 
 ```bash
-bash packaging/runtime/build.sh          # 组装 → 许可闸门 → 自检 → F2 隔离(正+反) → AppImage → AppImage 自检/隔离 → CentOS 7 机制探针
+bash packaging/runtime/build.sh
+(cd packaging/runtime/out/release && sha256sum --check --strict SHA256SUMS)
 ```
-
-产物：
 
 | 路径 | 说明 |
 |---|---|
-| 打包目录的 `packaging/runtime/out/AppDir/` | 打包过程的中间目录。该次运行的 AppImage 从同一个 AppDir 生成。 |
-| `packaging/runtime/out/VEdit-<ver>-x86_64.AppImage` | 单文件交付物，配套校验文件为 `out/SHA256SUMS`。 |
-| `evidence/workbench-upgrade/release/` | 0.4.0 的打包日志、产物校验与干净容器实测。 |
+| `packaging/runtime/out/AppDir/` | 三种格式共用的构建中间目录 |
+| `packaging/runtime/out/release/VEdit-<ver>-x86_64.AppImage` | AppImage，支持 FUSE 挂载或解包运行 |
+| `packaging/runtime/out/release/vedit-<ver>-linux-x86_64.tar.gz` | 解包后从 `vedit-<ver>-linux-x86_64/AppRun` 启动 |
+| `packaging/runtime/out/release/VEdit-<ver>-x86_64.run` | 临时解包后启动，`--extract DIR` 可保留解包目录 |
+| `packaging/runtime/out/release/SHA256SUMS` | 三包共用的 SHA-256 清单 |
 
-0.4.0 在独立暂存目录中组装 AppDir。交付目录只更新 AppImage 和校验文件，
-其中原有的 `out/AppDir/` 属于此前的构建。检查 0.4.0 包内文件时请解包本次 AppImage。
+构建先检查 AppDir 的许可、自检和 F2 隔离，再校验三个包的内容、版本和无 FUSE 启动。`.run` 额外检查参数转发、失败退出码及临时目录清理。
+AppImage 解包后再运行自检、隔离和 CentOS 7 用户态探针。`--no-centos-probe` 仅用于跳过本地容器探针，完整发布验证需要运行该探针。
+日志默认写到 `target/runtime-pack-evidence/`，可通过 `VEDIT_PACK_EVIDENCE` 指定目录。`50-release-packages.log` 记录打包过程，
+`62-verify-release-packages.log` 记录三种格式的检查，`60-selfcheck-appimage.log`、`61-f2-isolation-appimage.log` 和
+`70-centos7-probe.log` 分别记录 AppImage 自检、隔离与容器探针。物理机或虚拟机验证见 [CentOS 7 操作步骤](verify/STEPS.md)。
+保存发布证据时使用实际包的哈希及字节数。`evidence/workbench-upgrade/release/` 保存的是 0.4.0 的构建记录。
 
 ## F2 形态（T61 定案；缺一条就会泄漏宿主定义）
 
@@ -101,15 +107,10 @@ bash packaging/runtime/build.sh          # 组装 → 许可闸门 → 自检 �
   THIRD_PARTY_NOTICES hash ambiguous).
 - `selfcheck.sh` reads `/proc/<pid>/maps` of a real product process and proves
   the packaged loader + libc are used and the system loader is absent.
-- `build.sh` writes `out/SHA256SUMS` for the single-file AppImage and copies the
-  evidence into `evidence/slice3-pack/`.
-
-**Delivery baseline:** the AppImage is `out/VEdit-0.4.0-x86_64.AppImage`, and its
-sha256 is recorded in `out/SHA256SUMS` (written by `build.sh`) rather than restated
-here, so a rebuild cannot leave a stale hash in the docs. Any source or
-packaging-script change invalidates a published AppImage and requires a rebuild.
-The 0.4.0 AppImage uses the `bin/vd-app` assembled in the release staging directory.
-Extract the delivered image to inspect its contents.
+- `build.sh` writes `out/release/SHA256SUMS` for all three packages. Keep the
+  checksum file with the outputs it validates. Older `evidence/slice3-pack/`
+  records apply to their own builds. Check the final archives when inspecting
+  the bytes that users will receive.
 
 
 ## CJK font fallback (T119)

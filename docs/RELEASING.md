@@ -5,9 +5,7 @@
 `release/<ver>`，验证与打包通过后合入 `main`，并在 `main` 上打 tag。
 已发布的历史**永不重写**。
 
-> **当前发布线是 Qt6 产品**（`vedit-app`，单文件 AppImage，见 `docs/BUILD.md` §7.1）；本文第 5–6 节按它编写。
-> 旧 Rust/GTK3 线（`scripts/build.sh`、`packaging/appimage/`、`packaging/tarball/`）仍保留，但**不是发布路径**
-> （区别与实测校验见 `docs/BUILD.md` §7.2）。
+> Qt6 产品 `vedit-app` 以 AppImage、`.tar.gz`、`.run` 三种格式发布，见[构建指南](BUILD.md) §7。
 
 ## 1. 为什么是 dev + release，而不是单线
 
@@ -17,8 +15,7 @@
   未发版的中间状态不会被带进 `main`。
 - **发版走 `release/<ver>`**：从 `dev` 切出后只做"冻结 + 验证 + 打包 + 打 tag"，
   通过后合入 `main`；pre-release 的修正留在 release 分支内，不夹带 `dev` 上仍在进行的改动。
-- **发布产物不进 git**（见第 5 节）：一个 100 MB 量级的 AppImage 每次发版都进历史会让仓库迅速不可用，
-  产物作为 GitHub Release 附件分发。
+- **发布产物在 GitHub Releases 分发**。二进制与校验清单不提交到 Git。
 - **回滚直接**：`main` 上按 tag `git revert` 或重发一个 PATCH，不需要在分支图上找落点。
 
 ## 2. 分支
@@ -76,46 +73,45 @@ docs(evidence): workspace gate green at T19 delivery (T17 deeplint landed)
 
 ```sh
 git switch main && git pull --ff-only
-git tag -a v0.2.1 -m "VEdit 0.2.1 — Qt6 desktop editor for CentOS 7"
-git push origin v0.2.1
+git tag -a v0.4.1 -m "VEdit 0.4.1"
+git push origin refs/tags/v0.4.1
 ```
 
 ## 5. 发布产物（GitHub Release 附件，不进 git）
 
-发版时上传**一个交付物 + 校验文件**：
-
-| 附件 | 说明 |
+| 附件 | 用法 |
 |---|---|
-| `VEdit-<ver>-x86_64.AppImage` | 单文件 Qt6 交付物（F2 私有运行时，含 verible / slang / git / svn / GNU diff / 字体 / 翻译）；需要 FUSE，没有时用 `--appimage-extract-and-run` 或 `APPIMAGE_EXTRACT_AND_RUN=1` |
-| `SHA256SUMS` | 与 AppImage 配套，由打包脚本写在 `packaging/runtime/out/SHA256SUMS` |
+| `VEdit-<ver>-x86_64.AppImage` | 单文件，支持 FUSE 挂载。无 FUSE 时加 `--appimage-extract-and-run` |
+| `vedit-<ver>-linux-x86_64.tar.gz` | 解包后运行 `vedit-<ver>-linux-x86_64/AppRun`，无需 FUSE |
+| `VEdit-<ver>-x86_64.run` | 自解压后启动，也可 `--extract DIR` 后保留安装目录，无需 FUSE |
+| `SHA256SUMS` | 三个包各有一条 SHA-256 记录 |
 
-**产物绝不提交到 git**（仓库 `.gitignore` 已忽略 `packaging/*/out/`、`*.AppImage` 等）。
-生成方式（`build.sh` 已自动完成）：
+三个包来自同一个 Qt6 AppDir，包含相同的应用、私有运行时、工具和数据文件。Git、Subversion 和终端 shell 使用宿主机版本。
 
 ```sh
 bash packaging/runtime/build.sh
-# 产物：packaging/runtime/out/VEdit-<ver>-x86_64.AppImage
-# 校验：packaging/runtime/out/SHA256SUMS
+(cd packaging/runtime/out/release && sha256sum --check --strict SHA256SUMS)
 ```
 
 ## 6. GitHub Actions 验证与发布（Qt 产品线）
 
-功能 PR 合入 `dev` 前，`ci` 运行 Rust 服务、C ABI、Qt6 构建、CTest、Xvfb、翻译和文档检查。
-从 `dev` 切出 `release/<ver>` 后向 `main` 开 PR。同一个 `ci` 工作流在该 PR 的合并测试提交上
-增加完整 AppImage 打包、自检、F2 隔离和 CentOS 7 验证，可在 Actions 中下载本次 AppImage 与
-`SHA256SUMS`。需要提前检查开发分支时，可在 Actions 手动运行 `ci` 并选中该分支，前提是默认分支
-已经登记了工作流。手动运行 `release` 也只生成验证产物。
+目标为 `dev` 的 PR 和 `dev` 的 push 运行日常 CI，包括 Rust 服务、C ABI、Qt6 构建、CTest、Xvfb、
+翻译和文档检查。`release/<ver>` 向 `main` 提交 PR 时，`ci` 在合并测试提交上增加三个包的打包与验证。
+也可以在 Actions 手动运行 `ci`，选中开发分支提前验证，前提是默认分支已登记该工作流。手动运行
+`release` 只执行构建与验证。
 
-发布 PR 以 merge commit 合入 `main` 后，在该合并提交创建并推送匹配 Cargo 和 CLI 版本的
-annotated tag（如 `v0.4.0`）。`release` 校验 tag 和 `main` 的第一父提交链，并从 tag 的提交
-重新构建及验证。发布步骤使用同一工作流的已验证产物，只发布 AppImage 和 `SHA256SUMS`。
-`docs/releases/<ver>.md` 存在时用作发布说明，否则使用 GitHub 生成的说明。
+发布 PR 以 merge commit 合入 `main` 后，在该提交创建并推送与工作区和 `--version` 匹配的 annotated
+`v<ver>` tag。`release` 检查 tag 对象及 `main` 第一父链中的合并提交，从 tag 对应的源码构建并验证。
+三个已验证的包和校验清单分别上传为四个 Actions artifacts。发布步骤下载同次构建的四份文件并检查校验
+清单，随后上传到 GitHub Release 草稿。只有 GitHub 返回的全部附件名称、字节数和 SHA-256 与本地记录
+一致后，工作流才公开发布。发布说明来自 `docs/releases/<ver>.md`，缺少该文件时由 GitHub 生成。
+同一 tag 若已有发布或草稿，工作流会停下。重试前应先查看该草稿和失败日志。
 
-Qt6 镜像由固定 Ubuntu 镜像摘要、签名的 2026-11-01 APT 快照和 SHA-256 锁定包构建。
-Rust、Qt6、Scala 与打包使用独立的 Ubuntu 24.04 托管 runner。验证包包含 VHDL 和预热的
-Scala 工具链，打包后对实际 AppImage 字节执行离线工具校验。构建日志写入 `target/ci-logs/`，
-Qt6 和打包日志作为独立的 Actions artifacts 保留。CentOS 7 容器验证 glibc
-2.17 用户空间，容器使用托管 runner 的内核。
+Qt6 镜像使用固定 Ubuntu 镜像摘要、签名 APT 快照和锁定的包。Slang、Rust、Qt6、Scala 和打包使用独立
+的 Ubuntu 24.04 runner。预热的 Scala 缓存会增加包体积和暂存需求。单个 GitHub Release 附件须小于
+2 GiB，工作流在 Actions 上传前检查这一上限。上传的三个包已压缩，按独立 Actions artifacts 传输。用打包与
+发布 runner 的磁盘记录检查剩余空间，保留 `target/ci-logs/` 的日志和 Actions artifacts。
+CentOS 7 容器检查 glibc 2.17 用户空间，使用的是 runner 的内核。
 
 ### 本地发布前检查单
 
@@ -123,16 +119,16 @@ Qt6 和打包日志作为独立的 Actions artifacts 保留。CentOS 7 容器验
 2. `bash build/gates/qt6-cxx.sh` 全绿（Qt6/KF6 C++ 车道：configure + build + ctest + xcb 冒烟）。
 3. `bash scripts/gates.sh` 全绿（Rust 服务层：fmt / clippy / test / 依赖策略）。
 4. `bash build/gates/lrelease.sh` 与 `bash build/gates/docs.sh` 全绿（翻译目录零 unfinished/untranslated；文档齐备）。
-5. `bash packaging/runtime/build.sh` 成功：产出 `packaging/runtime/out/VEdit-<ver>-x86_64.AppImage` 与
-   `out/SHA256SUMS`；F2 隔离（正 + 反）与 CentOS 7 机制探针为绿。
-6. 从 `dev` 切出 `release/<ver>`，该分支只做冻结、验证与打包，**不要加新功能**。
-7. 证据目录里有本次运行的日志（带时间戳，**不要引用旧绿灯**）；文档与实际行为一致：
-   `README.md`、`docs/USER_GUIDE.md`、`THIRD_PARTY_NOTICES.md`。
-8. `release/<ver>` 以 PR 合入 `main`（merge commit），打 annotated tag，上传**一个 AppImage + `SHA256SUMS`**；
-   Release notes 写“变更 + 已知限制 + 证据路径”；若发版期间 `dev` 又有新提交，把 `main` 合回 `dev`。
-
-> 旧 GTK3 线的 `scripts/build.sh` / `packaging/appimage/run-evidence.sh` / `packaging/tarball/build.sh`
-> **不是**本检查单的一部分；它们是旧产品的发布路径（见 `docs/BUILD.md` §7.2）。
+5. 运行 `bash packaging/runtime/build.sh`，在 `packaging/runtime/out/release/` 对三个包执行严格校验。
+   确认 F2 隔离正反对照、CentOS 7 用户态探针、AppImage 解包启动及 `.tar.gz` / `.run` 无 FUSE 启动通过。
+   核对版本、包内应用与工具、缺少宿主 Git/SVN 时的启动，以及测试程序失败时的退出码。
+6. 从 `dev` 切出 `release/<ver>`，向 `main` 提交 PR。完成本轮 PR 的 Actions 完整打包并保存日志。
+7. 按 `README.md`、`docs/USER_GUIDE.md` 和 `THIRD_PARTY_NOTICES.md` 核对发布包。使用新的
+   `evidence/release-<ver>/` 记录测试提交、命令、时间和结果。
+8. 以 merge commit 合入 `main`，推送对应的 annotated tag，等待该 tag 的发布工作流通过。
+9. 核对公开发布页恰有三个同版本的包和 `SHA256SUMS`，记录资产字节数。下载实际资产重新执行
+   `sha256sum --check --strict SHA256SUMS`，或独立比对 Actions 产物与 GitHub 公共资产的 SHA-256。
+   保存核对结果，再向 `dev` 提交同步 PR。
 
 ## 7. 热修（hotfix）
 
@@ -143,7 +139,7 @@ git switch -c fix/crash-on-empty-file v0.2.0     # 注意：从上一个 release
 # … 修复 + 测试 …
 git push -u origin fix/crash-on-empty-file
 gh pr create --base dev --head fix/crash-on-empty-file
-# 合入 dev 后按第 6 节发一个 PATCH：release/v0.2.1 → main → tag
+# 合入 dev 后按第 6 节发一个 PATCH：release/0.2.1 → main → v0.2.1
 ```
 
 ## 8. 历史纪律
