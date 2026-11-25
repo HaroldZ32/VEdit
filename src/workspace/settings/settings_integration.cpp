@@ -1,7 +1,9 @@
 #include "settings_integration.h"
 
 #include "app_shell.h"
+#include "settings_client.h"
 #include "settings_dialog.h"
+#include "settings_keys.h"
 
 #if defined(VEDIT_SETTINGS_HAVE_FFI)
 #include "vd_ffi.h"
@@ -46,6 +48,21 @@ QString lastError(VdService *service)
 }
 #endif
 
+void refreshFimPresentation(settings::SettingsClient &client, QWidget &window)
+{
+    client.load([&window](settings::Snapshot snapshot) {
+        const auto value = [&snapshot](const char *key) {
+            return settings::SettingsClient::valueOf(snapshot.entries, QString::fromLatin1(key))
+                .trimmed();
+        };
+        const QString ghost = value(settings::keys::kFimGhostText).toLower();
+        const bool owned = value(settings::keys::kFimUiOwned) == QStringLiteral("true");
+        window.setProperty("vedit.fim.ghostText", snapshot.ok() && owned
+            && (ghost == QStringLiteral("true") || ghost == QStringLiteral("1")
+                || ghost == QStringLiteral("yes") || ghost == QStringLiteral("on")));
+    });
+}
+
 } // namespace
 
 void installSettings(vedit::app::ApplicationShell &shell, const IntegrationOptions &options)
@@ -76,15 +93,20 @@ void installSettings(vedit::app::ApplicationShell &shell, const IntegrationOptio
     // Ctrl+,), not a dock panel. The shell owns the menu command and calls the
     // opener installed here; this lane owns the dialog + the Rust store.
     vedit::app::ApplicationShell *shellPtr = &shell;
-    shell.setPreferencesOpener([shellPtr, path]() {
+    auto *fimPresentation = new settings::SettingsClient(path, shellPtr);
+    refreshFimPresentation(*fimPresentation, shell);
+    shell.setPreferencesOpener([shellPtr, path, fimPresentation]() {
         // batch-20261114 E2: the project lane publishes the filelist's referenced
         // variable set (E1 names + the layer each resolved in) through this
         // property. Taking the snapshot when the dialog OPENS is what makes the
         // candidate list "only what this project's filelist references" — the
         // dialog itself never runs an expansion and never owns a project.
-        settings::SettingsDialog dialog(shellPtr->themes(), shellPtr->commands(), path, shellPtr,
-                                        shellPtr->property("vedit.project.inputs").toMap());
-        dialog.exec();
+        {
+            settings::SettingsDialog dialog(shellPtr->themes(), shellPtr->commands(), path, shellPtr,
+                                            shellPtr->property("vedit.project.inputs").toMap());
+            dialog.exec();
+        }
+        refreshFimPresentation(*fimPresentation, *shellPtr);
     });
     if (qEnvironmentVariableIsSet("VEDIT_DEBUG")) {
         qInfo("settings: installSettings file='%s'", qPrintable(path));

@@ -2,19 +2,14 @@
 //
 //   vedit-fim-wiring-selftest --selfcheck
 //
-// Drives the REAL provider (EditCoreProvider::createEditor, the same call the
-// panes make) and the REAL FIM lane without a stub on the wiring side:
-//
-//   * default off: Alt+\ asks the state machine (which reports "disabled" and
-//     opens no socket) but a fake endpoint sitting on 127.0.0.1 gets ZERO
-//     connections, no ghost text appears and Tab/Esc keep their normal meaning;
-//   * configured (VEDIT_FIM_ENABLED=1 + a local fake endpoint): Alt+\ returns a
-//     suggestion, the ghost overlay shows it while the document text is
-//     untouched, Tab inserts it exactly once, Esc drops it without editing, and
-//     typing invalidates a pending suggestion (T27's state machine, not a
-//     bypass).
+// Drives the production KTextEditor provider with focused keystrokes and the
+// Rust transport with a temporary settings store and a loopback HTTP endpoint.
+#include "../../common/runtime_init.h"
+#include "editor_context_menu.h"
 #include "fim_wiring.h"
 #include "ktexteditor_provider.h"
+
+#include <vd_ffi.h>
 
 #include <KTextEditor/Cursor>
 #include <KTextEditor/Document>
@@ -22,8 +17,16 @@
 #include <KTextEditor/View>
 
 #include <QApplication>
+#include <QDir>
+#include <QJsonDocument>
+#include <QJsonObject>
 #include <QLabel>
-#include <QShortcut>
+#include <QLineEdit>
+#include <QMainWindow>
+#include <QMenu>
+#include <QSaveFile>
+#include <QTemporaryDir>
+#include <QTest>
 #include <QString>
 #include <QTimer>
 #include <QtGlobal>
@@ -70,8 +73,10 @@ void skip(const char *name, const char *reason)
 // answering while the GUI thread waits for the synchronous FIM request.
 class RawEndpoint {
 public:
-    explicit RawEndpoint(QByteArray body, int delayMs = 0, bool respond = true)
+    explicit RawEndpoint(QByteArray body, int delayMs = 0, bool respond = true,
+                         QByteArray status = QByteArrayLiteral("200 OK"))
         : response_(std::move(body))
+        , status_(std::move(status))
         , delayMs_(delayMs)
         , respond_(respond)
     {
@@ -106,11 +111,12 @@ public:
         stop_.store(true);
         if (listenFd_ >= 0) {
             ::shutdown(listenFd_, SHUT_RDWR);
-            ::close(listenFd_);
-            listenFd_ = -1;
         }
         if (thread_.joinable()) {
             thread_.join();
+        }
+        if (listenFd_ >= 0) {
+            ::close(listenFd_);
         }
     }
 
@@ -124,6 +130,17 @@ public:
         std::lock_guard<std::mutex> lock(mutex_);
         return requests_;
     }
+    bool received(const QString &prefix, const QString &suffix) const
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        const qsizetype split = lastRequest_.indexOf("\r\n\r\n");
+        const auto body = QJsonDocument::fromJson(lastRequest_.mid(split + 4)).object();
+        return lastRequest_.startsWith("POST /v1/completions HTTP/")
+            && body.value(QStringLiteral("prompt")).toString() == prefix
+            && body.value(QStringLiteral("suffix")).toString() == suffix
+            && body.value(QStringLiteral("model")).toString() == QStringLiteral("fake-local-model");
+    }
+
     QString endpoint() const
     {
         return QStringLiteral("http://127.0.0.1:%1").arg(port_);
@@ -137,6 +154,8 @@ private:
             if (client < 0) {
                 return;
             }
+            const timeval receiveTimeout{2, 0};
+            ::setsockopt(client, SOL_SOCKET, SO_RCVTIMEO, &receiveTimeout, sizeof(receiveTimeout));
             QByteArray raw;
             char chunk[2048];
             while (!stop_.load()) {
@@ -151,6 +170,7 @@ private:
             }
             if (!raw.isEmpty()) {
                 std::lock_guard<std::mutex> lock(mutex_);
+                lastRequest_ = std::move(raw);
                 ++requests_;
             }
             if (!respond_) {
@@ -165,7 +185,7 @@ private:
             if (delayMs_ > 0) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(delayMs_));
             }
-            QByteArray response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n";
+            QByteArray response = "HTTP/1.1 " + status_ + "\r\nContent-Type: application/json\r\n";
             response += "Content-Length: " + QByteArray::number(response_.size()) + "\r\n";
             response += "Connection: close\r\n\r\n";
             response += response_;
@@ -193,6 +213,7 @@ private:
     }
 
     QByteArray response_;
+    QByteArray status_;
     int delayMs_ = 0;
     bool respond_ = true;
     int listenFd_ = -1;
@@ -201,6 +222,7 @@ private:
     std::atomic<bool> stop_{false};
     mutable std::mutex mutex_;
     int requests_ = 0;
+    QByteArray lastRequest_;
 };
 
 void clearFimEnvironment()
@@ -211,17 +233,17 @@ void clearFimEnvironment()
     }
 }
 
-void configureFimEnvironment(const QString &endpoint)
+bool writeSettings(const QString &path, const QString &endpoint, bool enabled = true)
 {
-    qputenv("VEDIT_FIM_ENABLED", QByteArrayLiteral("1"));
-    qputenv("VEDIT_FIM_ENDPOINT", endpoint.toUtf8());
-    qputenv("VEDIT_FIM_MODEL", QByteArrayLiteral("fake-local-model"));
-    qputenv("VEDIT_FIM_TIMEOUT_MS", QByteArrayLiteral("3000"));
+    QSaveFile file(path);
+    const QByteArray content = QByteArrayLiteral(
+        "\"fim.ui_owned\" = \"true\"\n\"fim.model\" = \"fake-local-model\"\n"
+        "\"fim.timeout_ms\" = \"3000\"\n\"fim.enabled\" = ")
+        + (enabled ? "\"true\"\n" : "\"false\"\n")
+        + "\"fim.endpoint\" = \"" + endpoint.toUtf8() + "\"\n";
+    return file.open(QIODevice::WriteOnly) && file.write(content) == content.size() && file.commit();
 }
 
-// The shortcut signal is what Qt delivers to a key press that matches the
-// binding; invoking it exercises the same wiring without depending on
-// offscreen focus handling. The key sequence itself is asserted separately.
 void pumpFor(int milliseconds)
 {
     QElapsedTimer timer;
@@ -247,11 +269,22 @@ bool pumpUntil(Predicate predicate, int timeoutMs)
     return predicate();
 }
 
-void activate(QShortcut *shortcut)
+void key(Qt::Key code, Qt::KeyboardModifiers modifiers = Qt::NoModifier)
 {
-    if (shortcut != nullptr) {
-        QMetaObject::invokeMethod(shortcut, "activated", Qt::DirectConnection);
+    if (QWidget *focused = QApplication::focusWidget()) {
+        QTest::keyClick(focused, code, modifiers);
     }
+}
+
+bool showsMessage(KTextEditor::View *view, const QString &text)
+{
+    const auto widgets = view->findChildren<QWidget *>();
+    for (const auto *widget : widgets) {
+        if (widget->isVisible() && widget->property("text").toString().contains(text)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 const QString kDocument = QStringLiteral("module m;\n  assign x = 1;\nendmodule\n");
@@ -273,6 +306,14 @@ int main(int argc, char **argv)
         std::printf("usage: %s --selfcheck\n", argv[0]);
         return 2;
     }
+    vedit_runtime_init();
+    QTemporaryDir isolated;
+    if (!isolated.isValid() || !QDir::setCurrent(isolated.path())) {
+        return 1;
+    }
+    qputenv("HOME", isolated.path().toUtf8());
+    qputenv("XDG_CONFIG_HOME", (isolated.path() + QStringLiteral("/config")).toUtf8());
+    qputenv("XDG_DATA_HOME", (isolated.path() + QStringLiteral("/data")).toUtf8());
     QApplication app(argc, argv);
     std::printf("FIM-WIRING-SELFTEST start\n");
 
@@ -285,8 +326,8 @@ int main(int argc, char **argv)
 
     // --- the real provider installs the binding on the real view -------------
     auto provider = vedit::editor::makeEditCoreProvider();
-    QWidget parent;
-    parent.show(); // the ghost overlay is a child of the view: show the window
+    QMainWindow parent;
+    parent.resize(800, 560);
     QWidget *editorWidget = provider->createEditor(&parent);
     auto *view = qobject_cast<KTextEditor::View *>(editorWidget);
     check("fim.wiring.view", view != nullptr);
@@ -294,6 +335,16 @@ int main(int argc, char **argv)
         std::printf("FIM-WIRING-SELFTEST ok=0 checks=%d failures=%d\n", g_checks, g_failures);
         return 1;
     }
+    parent.setCentralWidget(view);
+    parent.show();
+    parent.activateWindow();
+    view->setFocus();
+    const bool editorFocused = pumpUntil([view]() {
+        return view->focusProxy() != nullptr && QApplication::focusWidget() == view->focusProxy();
+    }, 1000);
+    check("fim.wiring.native-focus", editorFocused,
+          editorFocused ? QString::fromLatin1(view->focusProxy()->metaObject()->className())
+                        : QStringLiteral("<editor input lacks focus>"));
     FimBinding *binding = FimBinding::instanceFor(view);
     check("fim.wiring.binding-installed", binding != nullptr);
     check("fim.wiring.binding-owned-by-view", binding != nullptr && binding->parent() == view);
@@ -308,17 +359,18 @@ int main(int argc, char **argv)
     // --- default off: Alt+\ asks the state machine, which opens no socket ----
     RawEndpoint endpoint(kFakeResponse);
     check("fim.wiring.default-off.endpoint", endpoint.listening(), endpoint.endpoint());
-    qputenv("VEDIT_FIM_ENDPOINT", endpoint.endpoint().toUtf8()); // configured, but NOT enabled
-    qunsetenv("VEDIT_FIM_ENABLED");
-    check("fim.wiring.default-off.trigger-key",
-          binding->triggerShortcut() != nullptr
-              && binding->triggerShortcut()->key() == QKeySequence(Qt::ALT | Qt::Key_Backslash),
-          binding->triggerShortcut() != nullptr ? binding->triggerShortcut()->key().toString()
-                                                : QStringLiteral("<missing>"));
-    check("fim.wiring.default-off.tab-free",
-          !binding->acceptShortcutActive() && !binding->cancelShortcutActive());
+    qputenv("VEDIT_FIM_ENDPOINT", endpoint.endpoint().toUtf8()); // Configured, but disabled.
+    const QString settingsPath = isolated.filePath(QStringLiteral("settings.toml"));
+    check("fim.wiring.settings.bound-before-first-apply",
+          vd_fim_use_settings_store(settingsPath.toUtf8().constData()) == 0);
+    auto *context = vedit::editor::EditorContextMenu::instanceFor(view);
+    std::unique_ptr<QMenu> menu(context ? context->buildMenu() : nullptr);
+    auto *action = menu ? menu->findChild<QAction *>(QStringLiteral("vedit.action.fim.request"))
+                        : nullptr;
+    check("fim.wiring.discoverable-menu-action", action != nullptr && action->isEnabled()
+          && action->text().endsWith(FimBinding::triggerKey().toString(QKeySequence::NativeText)));
     const quint64 requestsBefore = binding->requestCount();
-    activate(binding->triggerShortcut());
+    key(Qt::Key_Backslash, Qt::AltModifier);
     pumpUntil([binding]() { return binding->inFlightJobs() == 0; }, 3000);
     check("fim.wiring.default-off.state-machine-asked",
           binding->requestCount() == requestsBefore + 1, QString::number(binding->requestCount()));
@@ -330,16 +382,38 @@ int main(int argc, char **argv)
           QStringLiteral("connections=%1").arg(endpoint.requests()));
     check("fim.wiring.default-off.status-disabled",
           binding->statusText().contains(QStringLiteral("未启用")), binding->statusText());
+    check("fim.wiring.default-off.status-visible",
+          pumpUntil([view]() { return showsMessage(view, QStringLiteral("FIM disabled")); }, 1000));
 
-    // --- configured: the job starts, the suggestion arrives asynchronously ---
-    configureFimEnvironment(endpoint.endpoint());
-    activate(binding->triggerShortcut());
+    key(Qt::Key_Tab);
+    check("fim.wiring.default-off.tab-still-edits", document->text() != kDocument);
+    document->setText(kDocument);
+    view->setCursorPosition(KTextEditor::Cursor(1, 6));
+
+    qunsetenv("VEDIT_FIM_ENDPOINT");
+    check("fim.wiring.settings.missing-endpoint-written", writeSettings(settingsPath, {}));
+    key(Qt::Key_Backslash, Qt::AltModifier);
+    pumpUntil([binding]() { return binding->inFlightJobs() == 0; }, 3000);
+    check("fim.wiring.settings.unconfigured-visible-with-no-network",
+          pumpUntil([view]() { return showsMessage(view, QStringLiteral("FIM endpoint is missing")); }, 1000)
+              && endpoint.requests() == 0, binding->statusText());
+
+    // Applying the store while this view is already open takes effect on the next request.
+    check("fim.wiring.settings.configured", writeSettings(settingsPath, endpoint.endpoint()));
+    key(Qt::Key_Left);
+    key(Qt::Key_Right);
+    pumpFor(200);
+    check("fim.wiring.cursor-move-sends-nothing", endpoint.requests() == 0);
+    key(Qt::Key_Backslash, Qt::AltModifier);
     check("fim.wiring.configured.async-started",
           binding->inFlightJobs() == 1 || binding->hasSuggestion(),
           QStringLiteral("in_flight=%1").arg(binding->inFlightJobs()));
     const bool arrived = pumpUntil([binding]() { return binding->hasSuggestion(); }, 5000);
     check("fim.wiring.configured.request", endpoint.requests() >= 1,
           QStringLiteral("connections=%1").arg(endpoint.requests()));
+    check("fim.wiring.configured.request-splits-text-at-the-caret",
+          endpoint.received(QStringLiteral("module m;\n  assi"),
+                            QStringLiteral("gn x = 1;\nendmodule\n")));
     check("fim.wiring.configured.suggestion", arrived && binding->suggestion() == kSuggestion,
           binding->suggestion());
     check("fim.wiring.configured.ghost-visible", binding->ghostVisible());
@@ -347,53 +421,85 @@ int main(int argc, char **argv)
           binding->ghostText().contains(kSuggestion.trimmed()), binding->ghostText());
     check("fim.wiring.configured.document-untouched-before-tab",
           document->text() == kDocument, document->text().left(60));
-    check("fim.wiring.configured.tab-esc-armed",
-          binding->acceptShortcutActive() && binding->cancelShortcutActive());
+    check("fim.wiring.configured.preview-does-not-cover-the-suffix",
+          binding->ghostWidget()->y() > view->cursorToCoordinate(view->cursorPosition()).y());
+    check("fim.wiring.configured.status-shows-accept-and-dismiss-keys",
+          pumpUntil([view]() { return showsMessage(view, QStringLiteral("Tab inserts")); }, 1000));
     check("fim.wiring.configured.no-job-left", binding->inFlightJobs() == 0);
 
     // --- Tab accepts: the text changes here and exactly once ----------------
-    activate(binding->acceptShortcut());
+    key(Qt::Key_Tab);
     const QString expected = QStringLiteral("module m;\n  assi") + kSuggestion
         + QStringLiteral("gn x = 1;\nendmodule\n");
     check("fim.wiring.accept.text", document->text() == expected, document->text().left(80));
     check("fim.wiring.accept.exactly-once", document->text().count(kSuggestion) == 1);
-    check("fim.wiring.accept.shortcuts-removed",
-          !binding->acceptShortcutActive() && !binding->cancelShortcutActive());
+    check("fim.wiring.accept.status-cleared",
+          pumpUntil([view]() { return !showsMessage(view, QStringLiteral("Tab inserts")); }, 1000));
     check("fim.wiring.accept.ghost-hidden", !binding->ghostVisible());
     check("fim.wiring.accept.no-pending", !binding->hasSuggestion());
 
     // --- Esc cancels without editing ---------------------------------------
     view->setCursorPosition(KTextEditor::Cursor(1, 6));
     const QString beforeCancel = document->text();
-    activate(binding->triggerShortcut());
+    key(Qt::Key_Backslash, Qt::AltModifier);
     check("fim.wiring.cancel.suggestion",
           pumpUntil([binding]() { return binding->hasSuggestion(); }, 5000));
-    activate(binding->cancelShortcut());
+    key(Qt::Key_Escape);
     check("fim.wiring.cancel.dropped", !binding->hasSuggestion() && !binding->ghostVisible());
     check("fim.wiring.cancel.document-unchanged", document->text() == beforeCancel);
 
     // --- typing invalidates a pending suggestion (lane state machine) -------
     view->setCursorPosition(KTextEditor::Cursor(1, 6));
-    activate(binding->triggerShortcut());
+    key(Qt::Key_Backslash, Qt::AltModifier);
     check("fim.wiring.invalidate.suggestion",
           pumpUntil([binding]() { return binding->hasSuggestion(); }, 5000));
-    document->insertText(view->cursorPosition(), QStringLiteral("z"));
+    key(Qt::Key_Z);
     const QString afterTyping = document->text();
     check("fim.wiring.invalidate.typing-drops-it",
           !binding->hasSuggestion() && !binding->ghostVisible());
-    check("fim.wiring.invalidate.tab-disarmed", !binding->acceptShortcutActive());
+    const int requestsAfterTyping = endpoint.requests();
+    pumpFor(220);
+    check("fim.wiring.manual-only.typing-sends-nothing", endpoint.requests() == requestsAfterTyping);
     check("fim.wiring.invalidate.accept-inserts-nothing",
           !binding->acceptSuggestion() && document->text() == afterTyping,
           document->text().left(80));
 
-    // --- T106: a SLOW endpoint must not block the GUI thread -----------------
+    key(Qt::Key_Backslash, Qt::AltModifier);
+    check("fim.wiring.focus-change.got-suggestion",
+          pumpUntil([binding]() { return binding->hasSuggestion(); }, 3000));
+    QLineEdit unrelatedInput(view);
+    unrelatedInput.show();
+    unrelatedInput.setFocus();
+    const int requestsBeforeFind = endpoint.requests();
+    key(Qt::Key_Backslash, Qt::AltModifier);
+    pumpFor(170);
+    check("fim.wiring.focus-change.dismisses-and-blocks-other-input",
+          !binding->hasSuggestion() && endpoint.requests() == requestsBeforeFind);
+    unrelatedInput.hide();
+    view->setFocus();
+
+    RawEndpoint refused(QByteArrayLiteral("{\"error\":\"local fixture body\"}"), 0, true,
+                        QByteArrayLiteral("401 Unauthorized"));
+    check("fim.wiring.failure.endpoint-written", writeSettings(settingsPath, refused.endpoint()));
+    if (action != nullptr) {
+        action->trigger();
+    }
+    const bool failureShown = pumpUntil([view]() {
+        return showsMessage(view, QStringLiteral("HTTP 401"));
+    }, 3000);
+    check("fim.wiring.failure.menu-dispatches-and-status-is-safe",
+          failureShown && refused.requests() == 1
+              && !showsMessage(view, QStringLiteral("fixture body")),
+          binding->statusText());
+
+    // A slow endpoint must not block the GUI thread.
     RawEndpoint slow(kFakeResponse, 400);
     check("fim.async.slow-endpoint", slow.listening(), slow.endpoint());
-    configureFimEnvironment(slow.endpoint());
+    check("fim.async.slow-settings-written", writeSettings(settingsPath, slow.endpoint()));
     pumpFor(20);
     QElapsedTimer startTimer;
     startTimer.start();
-    activate(binding->triggerShortcut());
+    key(Qt::Key_Backslash, Qt::AltModifier);
     const qint64 startMs = startTimer.elapsed();
     check("fim.async.start-returns-fast", startMs < 50,
           QStringLiteral("start took %1 ms (the endpoint sleeps 400 ms)").arg(startMs));
@@ -419,14 +525,25 @@ int main(int argc, char **argv)
     binding->cancelSuggestion();
 
     // --- typing also cancels an IN-FLIGHT request ----------------------------
-    activate(binding->triggerShortcut());
+    key(Qt::Key_Backslash, Qt::AltModifier);
     check("fim.async.inflight-before-typing", binding->inFlightJobs() == 1);
-    document->insertText(view->cursorPosition(), QStringLiteral("q"));
+    key(Qt::Key_Q);
     check("fim.async.typing-cancels-inflight",
           binding->inFlightJobs() == 0 && !binding->hasSuggestion());
     pumpFor(600);
     check("fim.async.cancelled-never-arrives",
           !binding->hasSuggestion() && !binding->ghostVisible());
+
+    key(Qt::Key_Backslash, Qt::AltModifier);
+    check("fim.async.inflight-before-cursor-move", binding->inFlightJobs() == 1);
+    key(Qt::Key_Left);
+    check("fim.async.cursor-move-cancels-inflight", binding->inFlightJobs() == 0);
+    key(Qt::Key_Backslash, Qt::AltModifier);
+    check("fim.async.inflight-before-escape", binding->inFlightJobs() == 1);
+    key(Qt::Key_Escape);
+    pumpFor(900);
+    check("fim.async.escape-cancels-inflight-without-a-late-ghost",
+          binding->inFlightJobs() == 0 && !binding->hasSuggestion() && !binding->ghostVisible());
 
     // --- sensitivity: the same metric detects a blocked thread ---------------
     qint64 firedAtMs = -1;
@@ -441,15 +558,15 @@ int main(int argc, char **argv)
     // --- timeout: a black hole becomes a diagnostic, not a frozen window -----
     RawEndpoint blackHole(kFakeResponse, 0, false);
     check("fim.async.black-hole", blackHole.listening(), blackHole.endpoint());
-    configureFimEnvironment(blackHole.endpoint());
+    check("fim.async.timeout-settings-written", writeSettings(settingsPath, blackHole.endpoint()));
     binding->setPollBudgetMs(300);
     const QString beforeTimeout = document->text();
     QElapsedTimer timeoutTimer;
     timeoutTimer.start();
-    activate(binding->triggerShortcut());
+    key(Qt::Key_Backslash, Qt::AltModifier);
     const bool timedOut = pumpUntil([binding]() { return binding->inFlightJobs() == 0; }, 3000);
     const qint64 timeoutElapsed = timeoutTimer.elapsed();
-    binding->setPollBudgetMs(15000);
+    binding->setPollBudgetMs(61000);
     check("fim.async.timeout-fires", timedOut,
           QStringLiteral("after %1 ms with a 300 ms budget").arg(timeoutElapsed));
     check("fim.async.timeout-status",
@@ -458,6 +575,14 @@ int main(int argc, char **argv)
           !binding->hasSuggestion() && !binding->ghostVisible());
     check("fim.async.timeout-document-unchanged", document->text() == beforeTimeout);
 
+    const int requestsBeforeOptOut = endpoint.requests();
+    check("fim.wiring.opt-out.settings-written", writeSettings(settingsPath, endpoint.endpoint(), false));
+    key(Qt::Key_Backslash, Qt::AltModifier);
+    check("fim.wiring.opt-out.disabled-on-the-already-open-view",
+          pumpUntil([view]() { return showsMessage(view, QStringLiteral("FIM disabled")); }, 1000)
+              && endpoint.requests() == requestsBeforeOptOut && !binding->hasSuggestion());
+
+    check("fim.wiring.settings.unbound-after-test", vd_fim_use_settings_store(nullptr) == 0);
     clearFimEnvironment();
     std::printf("FIM-WIRING-SELFTEST ok=%d checks=%d failures=%d\n", g_failures == 0 ? 1 : 0,
                 g_checks, g_failures);
