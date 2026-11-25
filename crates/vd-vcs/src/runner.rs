@@ -20,7 +20,6 @@
 #![forbid(unsafe_code)]
 
 use std::path::{Path, PathBuf};
-use std::process::Command;
 use std::sync::{Arc, Mutex};
 
 /// One executed (or refused) tool invocation, as the tests see it.
@@ -341,19 +340,7 @@ pub(crate) fn read_output(
     args: &[String],
 ) -> Result<std::process::Output, String> {
     ensure_read_only(program, args)?;
-    let resolved = crate::toolchain::resolve_or_error(program)?;
-    Command::new(&resolved.path)
-        .current_dir(working_tree)
-        .args(args)
-        // The bundled wrapper starts with the host loader before invoking its own.
-        .env_remove("LD_LIBRARY_PATH")
-        .output()
-        .map_err(|error| {
-            format!(
-                "cannot run {program} ({}): {error}",
-                resolved.path.display()
-            )
-        })
+    crate::toolchain::run(program, working_tree, args, &[])
 }
 
 /// Stub runner for tests: records every invocation and answers from a fixed

@@ -192,9 +192,11 @@ ModuleTreePanel::ModuleTreePanel(QWidget *parent)
     tree_->setAlternatingRowColors(true);
     tree_->setRootIsDecorated(true);
     tree_->header()->setStretchLastSection(false);
-    tree_->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-    tree_->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-    tree_->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    tree_->header()->setSectionResizeMode(QHeaderView::Interactive);
+    tree_->setColumnWidth(0, 180);
+    tree_->setColumnWidth(1, 110);
+    tree_->setColumnWidth(2, 130);
+    tree_->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
     // R1-d (batch-20261119): the table keeps SIX visible rows even under a long
     // warning. A minimum on the tree alone is short by its chrome: the viewport
     // is the tree minus the header and the frame, so both are charged here

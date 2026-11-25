@@ -1,0 +1,10 @@
++ timeout 90s target/host-tools-qt/src/app/workspace-lane-vcs/vedit-workspace-vcs-selftest --selfcheck
++ awk '/headless|SELFTEST/' /tmp/host-tools-review-headless.log
+WORKSPACE-VCS-SELFTEST start
+CHECK vcs.cred.headless-push-issued PASS
+CHECK vcs.cred.headless-default-refusal PASS prompts=3
+CHECK vcs.cred.headless-no-modal PASS modals=0
+CHECK vcs.cred.headless-no-retry PASS writes=21
+CHECK vcs.cred.headless-says-aborted PASS Authentication cancelled; the operation was aborted and nothing was written.
+WORKSPACE-VCS-SELFTEST ok=1 checks=689 failures=0
+Offscreen VCS exit=0

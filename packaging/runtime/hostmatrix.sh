@@ -13,8 +13,9 @@
 # prove a real CentOS 7 (kernel 3.10) machine; that row stays UNTESTED.
 set -uo pipefail
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
-APPIMAGE=${VEDIT_APPIMAGE:-$ROOT/packaging/runtime/out/VEdit-0.4.0-x86_64.AppImage}
-EVID=${VEDIT_MATRIX_EVIDENCE:-$ROOT/evidence/slice3-pack/final-206033c/matrix}
+VERSION=$(awk -F'"' '/^version = / {print $2; exit}' "$ROOT/Cargo.toml") || exit $?
+APPIMAGE=${VEDIT_APPIMAGE:-$ROOT/packaging/runtime/out/release/VEdit-$VERSION-x86_64.AppImage}
+EVID=${VEDIT_MATRIX_EVIDENCE:-$ROOT/target/runtime-pack-evidence/matrix}
 CENTOS=docker.m.daocloud.io/library/centos:7
 IMAGES=(
   "$CENTOS"
@@ -52,7 +53,7 @@ for image in "${IMAGES[@]}"; do
     E="env -i PATH=/usr/bin:/bin HOME=/tmp QT_QPA_PLATFORM=offscreen LANG=C.UTF-8"
     echo "== selfcheck =="
     $E "$R/AppRun" --selfcheck > /tmp/self.log 2>&1; echo "selfcheck_exit=$?"
-    grep -E "APP-SHELL-SELFTEST|TOOLCHAIN source|syntax-product|fold.wiring.closed.hidden-975|CHECK FAIL" /tmp/self.log | head -8
+    grep -E "APP-SHELL-SELFTEST|TOOLCHAIN source|syntax-product|fold.native.(view|no-auto-folds)|CHECK FAIL" /tmp/self.log | head -8
     echo "highlight_lines=$(grep -cE "CHECK editcore.highlight.verilog.(mode|format-ranges|folding-regions) PASS" /tmp/self.log)"
     echo "== startup =="
     $E "$R/AppRun" --hold 300 >/tmp/start.log 2>&1; echo "startup_exit=$?"

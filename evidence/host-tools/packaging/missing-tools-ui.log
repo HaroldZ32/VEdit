@@ -1,0 +1,10 @@
+Candidate AppImage launched with APPIMAGE_EXTRACT_AND_RUN=1, PATH empty, clean HOME and Qt xcb in Xvfb.
+Opened Source Control with Ctrl+Alt+C on separate temporary .git and .svn marker folders.
+Selected text transcribed from the two live panels follows.
+The VCS backend failed: cannot run git: Cannot run git: host executable not found. Install git and add it to PATH or
+set VEDIT_GIT to its absolute path.
+PASS packaged Source Control shows missing Git remediation
+The VCS backend failed: Cannot run svn: host executable not found. Install svn and add it to PATH or set
+VEDIT_SVN to its absolute path.
+PASS packaged Source Control shows missing SVN remediation
+app exit=0 in both runs

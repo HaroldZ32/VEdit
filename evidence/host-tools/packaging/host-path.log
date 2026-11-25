@@ -1,0 +1,26 @@
+[Host tools] AppRun in network-disabled pinned Qt container. Host wrappers assert exact sanitized environment before exec of native tools.
+Host Git: git version 2.53.0
+Host SVN: 1.14.5
+Host SVN fixture tool: 1.14.5
+KSH-GUARD PASS whitelist=Markdown,Scala,SystemVerilog,Tcl,VHDL,Verilog
+VCS-TOOLCHAIN git=/tmp/host-bin/git version=2.53.0 svn=/tmp/host-bin/svn version=1.14.5 source=path git_source=path svn_source=path
+STARTUP-TRACE t_ms=70 wall_ms=1795574285469 window-shown
+STARTUP-TRACE t_ms=97 wall_ms=1795574285495 launch-ready
+PASS host-path AppRun exit=0
+sanitized git
+sanitized svn
+KSH-GUARD PASS whitelist=Markdown,Scala,SystemVerilog,Tcl,VHDL,Verilog
+VCS-TOOLCHAIN git=<missing> version=<missing> svn=<missing> version=<missing> source=missing git_source=missing svn_source=missing
+STARTUP-TRACE t_ms=58 wall_ms=1795574285941 window-shown
+STARTUP-TRACE t_ms=91 wall_ms=1795574285975 launch-ready
+PASS empty-path AppRun exit=0
+host-tools probe exit=0
+
+[Legacy negative] AppDir copy contains executable Git/SVN/bash launchers in old locations and corresponding links.
+CHECK FAIL  host tool shipped in AppDir: <WORKTREE>/target/packaging-release-legacy.AppDir/bin/git
+== summary: pass=8 fail=1 expected_red=0 ==
+negative gate exit=1
+KSH-GUARD PASS whitelist=Markdown,Scala,SystemVerilog,Tcl,VHDL,Verilog
+VCS-TOOLCHAIN git=<missing> version=<missing> svn=<missing> version=<missing> source=missing git_source=missing svn_source=missing
+STARTUP-TRACE t_ms=95 wall_ms=1795574289196 launch-ready
+legacy launch exit=0

@@ -26,6 +26,7 @@
 #include <QLineEdit>
 #include <QPlainTextEdit>
 #include <QPushButton>
+#include <QSignalBlocker>
 #include <QSpinBox>
 #include <QTabWidget>
 #include <QToolButton>
@@ -744,6 +745,27 @@ QWidget *SettingsPanel::buildToolsPage()
     connect(languageRestartButton_, &QPushButton::clicked, this,
             [this]() { requestLanguageRestart(); });
 
+    hostShellCombo_ = new QComboBox(toolsPage_);
+    hostShellCombo_->setObjectName(QStringLiteral("settings-tools-host-shell"));
+    hostShellCombo_->setToolTip(tr("Used by new terminal sessions and Git and SVN jobs."));
+    hostShellCombo_->addItem(tr("Auto"), QString());
+    hostShellCombo_->setEnabled(false);
+#if defined(VEDIT_SETTINGS_HAVE_FFI)
+    VdEnvSnapshot shells{};
+    vd_host_shell_choices(&shells);
+    for (size_t index = 0; index < shells.count; ++index) {
+        const QString path = QFile::decodeName(shells.items[index].name);
+        hostShellCombo_->addItem(path, path);
+    }
+    vd_env_snapshot_free(&shells);
+#endif
+    toolsForm_->addRow(tr("Host shell:"), hostShellCombo_);
+    connect(hostShellCombo_, &QComboBox::currentIndexChanged, this, [this](int) {
+        SettingsClient::setValue(&entries_, QString::fromLatin1(keys::kHostShell),
+                                 hostShellCombo_->currentData().toString());
+        persist();
+    });
+
     lspBackendCombo_ = new QComboBox(toolsPage_);
     lspBackendCombo_->setObjectName(QStringLiteral("settings-tools-lsp-backend"));
     lspBackendCombo_->addItem(QStringLiteral("verible-verilog-ls"),
@@ -932,8 +954,11 @@ QWidget *SettingsPanel::buildFimPage()
     layout->addWidget(keyGroup);
 
     auto *hint = new QLabel(
-        tr("FIM is off by default: with no endpoint configured VEdit never touches the "
-           "network."),
+        tr("FIM is off by default. After enabling and applying provider settings, press "
+           "%1 or choose Request FIM Completion in the editor menu. Each request sends the "
+           "current document, split at the caret, to the configured endpoint. Tab inserts the "
+           "suggestion, and Esc dismisses it.")
+            .arg(QKeySequence(Qt::AltModifier | Qt::Key_Backslash).toString(QKeySequence::NativeText)),
         fimPage_);
     hint->setWordWrap(true);
     layout->addWidget(hint);
@@ -1245,7 +1270,9 @@ void SettingsPanel::persist()
             addDiagnostic(shortcutError);
         }
     }
-    client_->save(entries_, [this](bool ok, const QString &error) {
+    const QString hostShellKey = QString::fromLatin1(keys::kHostShell);
+    const QString savedHostShell = SettingsClient::valueOf(entries_, hostShellKey);
+    client_->save(entries_, [this, hostShellKey, savedHostShell](bool ok, const QString &error) {
         if (!ok) {
             addDiagnostic(error.isEmpty() ? QCoreApplication::translate("VEdit", "the Rust settings store rejected "
                                                            "the write")
@@ -1255,6 +1282,7 @@ void SettingsPanel::persist()
             refreshWidgets();
             return;
         }
+        SettingsClient::setValue(&storedEntries_, hostShellKey, savedHostShell);
         statusLabel_->setText(QCoreApplication::translate("VEdit", "Stored by the Rust service in %1")
                                   .arg(client_->path()));
         refreshWidgets();
@@ -1312,10 +1340,19 @@ void SettingsPanel::commitPending()
     // the owner-only key file, and make the committed state the new snapshot.
     writeToolEntries(toolValues());
     writeFimEntries(fimValues());
+    const QString hostShellKey = QString::fromLatin1(keys::kHostShell);
+    const bool changedShell = SettingsClient::valueOf(entries_, hostShellKey)
+        != SettingsClient::valueOf(storedEntries_, hostShellKey);
     const bool wasDeferred = deferred_;
     deferred_ = false;
     persist();
     deferred_ = wasDeferred;
+    if (changedShell && (!client_->flush() || SettingsClient::valueOf(entries_, hostShellKey)
+            != SettingsClient::valueOf(storedEntries_, hostShellKey))) {
+        addDiagnostic(tr("The host shell preference could not be confirmed. Reload settings and try again."));
+        refreshWidgets();
+        return;
+    }
     dirty_ = false;
     committedEntries_ = entries_;
     snapshotOriginal();
@@ -1505,6 +1542,21 @@ void SettingsPanel::applyToolEntries()
     values.defines = keyText(entries_, keys::kDefines);
     applyToolValues(values);
     setLanguageSetting(SettingsClient::valueOf(entries_, i18n::languageKey()));
+
+    const QSignalBlocker blockHostShell(hostShellCombo_);
+    if (hostShellCombo_->property("unavailableShell").toBool()) {
+        hostShellCombo_->removeItem(hostShellCombo_->count() - 1);
+        hostShellCombo_->setProperty("unavailableShell", false);
+    }
+    const QString shell = SettingsClient::valueOf(entries_, key(keys::kHostShell));
+    int shellIndex = hostShellCombo_->findData(shell);
+    if (shellIndex < 0 && !shell.isEmpty()) {
+        hostShellCombo_->addItem(tr("%1 (unavailable)").arg(shell), shell);
+        hostShellCombo_->setProperty("unavailableShell", true);
+        shellIndex = hostShellCombo_->count() - 1;
+    }
+    hostShellCombo_->setCurrentIndex(std::max(0, shellIndex));
+    hostShellCombo_->setEnabled(client_->available());
 }
 
 // --- T18 interface language (AC-4.1 / AC-4.2) ------------------------------

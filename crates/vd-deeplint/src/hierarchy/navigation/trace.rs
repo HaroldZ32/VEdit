@@ -144,10 +144,20 @@ impl Walk<'_> {
                 Some(&next) if self.full && !cycle => self.children(next, depth + 1),
                 _ => Vec::new(),
             };
-            rows.push(
-                json!({"path": path, "detail": edge.detail, "cycle": cycle, "children": children,
-                "location": {"file": edge.file, "line": edge.line, "column": edge.column}}),
-            );
+            // `source` is the peer in the traversal direction. Keep the result's
+            // endpoints in signal-flow order even when walking upstream.
+            let peer_path = edge.source.as_deref();
+            let net_path = Some(net.path.as_str());
+            let (from, to) = if self.drivers {
+                (peer_path, net_path)
+            } else {
+                (net_path, peer_path)
+            };
+            rows.push(json!({
+                "path": path, "from": from, "to": to, "detail": edge.detail,
+                "cycle": cycle, "children": children,
+                "location": {"file": edge.file, "line": edge.line, "column": edge.column}
+            }));
         }
         self.ancestors.remove(&id);
         rows

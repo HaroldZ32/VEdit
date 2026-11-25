@@ -1207,12 +1207,14 @@ bool EditorEnhancements::handleKey(QKeyEvent *event, bool overridePhase)
     }
     const Qt::KeyboardModifiers modifiers = event->modifiers();
     const int key = event->key();
+    const bool returnKey = (key == Qt::Key_Return || key == Qt::Key_Enter) && modifiers == Qt::NoModifier;
+    if (returnKey && view_->isCompletionActive()) {
+        return false;
+    }
     if (overridePhase) {
         // Claim what this filter will handle, so a KatePart action shortcut does
         // not consume the key before the KeyPress arrives (Backspace and Return
         // are action-backed). Everything else stays the kernel's.
-        const bool returnKey =
-            (key == Qt::Key_Return || key == Qt::Key_Enter) && modifiers == Qt::NoModifier;
         if (returnKey || (key == Qt::Key_Backspace && modifiers == Qt::NoModifier &&
                           pairBackspaceAvailable())) {
             event->accept();
@@ -1220,7 +1222,7 @@ bool EditorEnhancements::handleKey(QKeyEvent *event, bool overridePhase)
         }
         return false;
     }
-    if ((key == Qt::Key_Return || key == Qt::Key_Enter) && modifiers == Qt::NoModifier) {
+    if (returnKey) {
         return handleReturn();
     }
     if (key == Qt::Key_Backspace && modifiers == Qt::NoModifier) {

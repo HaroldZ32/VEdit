@@ -26,8 +26,6 @@ class QEvent;
 class QLabel;
 class QMenu;
 class QStackedLayout;
-class QToolBar;
-class QToolButton;
 
 namespace vedit::app {
 
@@ -69,6 +67,9 @@ struct ShellOptions {
     // panels (batch 20261110 / AC-1.6: an unowned dock does not render). The
     // product entry point therefore defers, registers the factories, then starts.
     bool deferSessionRestore = false;
+    // Explicit startup files suppress the old folder and editor tabs unless
+    // the caller also supplies a folder, which still anchors those files.
+    bool openStartupFiles = false;
 };
 
 class ApplicationShell final : public QMainWindow {
@@ -137,24 +138,6 @@ public:
     using UiThemePersister = std::function<bool(const QString &id, QString *error)>;
     void setUiThemePersister(UiThemePersister persister);
 
-    // UX batch 2 (item 7): the main toolbar (New/Open/Open Folder/Save/Save All/
-    // Undo/Redo + separator + Search/Build/Format). It is created once, then
-    // rebuilt from the command registry (it holds the SAME QAction objects, so a
-    // toolbar button and its menu entry can never diverge). Movable and
-    // hideable; View -> Toolbar toggles it.
-    QToolBar *mainToolBar() const;
-
-    // AC-1.1/AC-1.2 (batch 1): the ONE workspace root.
-    //
-    // The constructor resolves it from the persisted session when --project is
-    // absent — i.e. BEFORE any lane registers a panel factory — so an ordinary
-    // start already knows the root the panels must show. main.cpp hands that
-    // value to installPanels() through IntegrationOptions.
-    //
-    // File -> Open Folder (and the Files panel's own Open Folder) go through
-    // setProjectRoot(): the new root is what the next session archive stores and
-    // is broadcast with projectRootChanged, so every LIVE panel rebinds instead
-    // of keeping the root it was constructed with.
     QString projectRoot() const;
     void setProjectRoot(const QString &root);
 
@@ -302,10 +285,6 @@ private:
     void registerPanels();
     void registerCommands();
     void buildMenuBar();
-    // UX batch 2 (item 7): materialise the main toolbar from the command
-    // registry. Built in startSession(), after every lane registered its
-    // commands, so Build/Format resolve to the diagnostics lane's real actions.
-    void buildToolBar();
     // UX batch 2 (item 7): mirror the active editor's own undo/redo availability
     // on the shell's commands (greyed out without an active view / undo step).
     void syncEditorCommandStates();
@@ -328,6 +307,8 @@ private:
     // AC-1.2: the File -> Open Folder command body. Asks the (injectable) folder
     // dialog, validates the answer and calls setProjectRoot().
     void openProjectFolderDialog();
+    void openProjectFolder(const QString &directory);
+    QString dialogDirectory() const;
     // AC-1.3 (batch 1b): make sure every dock the shell owns has a View-menu
     // toggle. Two cases the constructor's fixed command list cannot cover: a panel
     // a lane registered in PanelRegistry after the constructor (module tree), and
@@ -363,19 +344,8 @@ private:
     // UI-Mosaic R1 test seam: replays a product-theme switch through the real
     // View-menu QAction. Inert unless VEDIT_UI_THEME_SWITCH names an id.
     void applyScriptedThemeSwitch(const QString &id);
-    // Builds the SAME six-item, mutually exclusive theme menu for the View
-    // submenu and for the toolbar button. Both stay in sync through
-    // syncThemeMenuChecks().
     QMenu *createThemeMenu(QWidget *parent, const QString &objectName);
     void syncThemeMenuChecks();
-    // Re-colours the toolbar icons after a product-theme change. The colour is
-    // read from the CURRENT application palette (matched against productThemes())
-    // instead of ThemeManager, because the palette-change event is delivered
-    // while applyUiTheme() is still running.
-    void refreshToolBarIcons();
-    // UI-Mosaic T6: the VEDIT_UI_PROBE=1 runtime probe (transparent icons, real
-    // toolbar widths and the KTextEditor status row). Kept in the product because
-    // `QIcon::isNull()` cannot observe a rendered-but-empty icon.
     void logUiProbe();
     void updateStatusBar();
     void syncPanelToggleStates();
@@ -385,11 +355,6 @@ private:
     void logMenuDiagnostics(QMenu *menu);
 
 protected:
-    // A product theme is applied through the application palette; the toolbar
-    // icons must follow it. ApplicationPaletteChange is the Qt 6 replacement of
-    // the deprecated QGuiApplication::paletteChanged signal.
-    void changeEvent(QEvent *event) override;
-
     // V12: the application-wide menu diagnostics. Qt's file dialog builds its
     // context menu from the same QMenu class as the app menus, so recording
     // every QMenu Show is the only way to see — from the user's machine — which
@@ -429,15 +394,7 @@ private:
     // The persister pumps the event loop while the Rust store answers, so a second
     // switch arriving inside that wait must not start a second write.
     bool persistingUiTheme_ = false;
-    QToolBar *mainToolBar_ = nullptr;
-    // UI-Mosaic T3: the theme entry. It is a SECOND toolbar (instead of an
-    // addWidget() on mainToolBar_) because a toolbar widget action also lands in
-    // QToolBar::actions(), and ux_selftest compares that list to the shipped
-    // order with an ordered equality.
-    QToolBar *themeToolBar_ = nullptr;
-    QToolButton *themeButton_ = nullptr;
     QMenu *viewThemeMenu_ = nullptr;
-    QMenu *themeButtonMenu_ = nullptr;
     // AC-4.1: the shell-owned project-lint dock and the content host the
     // diagnostics lane installs into (see projectLintHost()).
     QDockWidget *projectLintDock_ = nullptr;

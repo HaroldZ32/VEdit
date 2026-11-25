@@ -1,8 +1,8 @@
 <!-- 本文件是证据目录的公开镜像；权威版本与全部逐条证据指针在 evidence/final-acceptance-2/AC-MATRIX.md -->
 
-> **镜像说明**：本文件内容与 `evidence/final-acceptance-2/AC-MATRIX.md` 一致（同一交付物，便于文档入口阅读）。
-> 若两者出现差异，**以 `evidence/final-acceptance-2/AC-MATRIX.md` 为准**（其同目录 `gates/` 为门禁原始日志）。
-> 旧的 46-AC 矩阵镜像仍是 `docs/ACCEPTANCE-MATRIX.md`（指向 `evidence/final-acceptance/`）。
+> 本页保留 2026-11-03 的验收判定，原始记录在 `evidence/final-acceptance-2/AC-MATRIX.md`，同目录 `gates/`
+> 存放当时的日志。下面另列 PR #20 的宿主工具检查。v0.4.1 的发布检查见[发布指南](RELEASING.md)。
+> 较早的 46-AC 矩阵见 [ACCEPTANCE-MATRIX.md](ACCEPTANCE-MATRIX.md)。
 
 # 最终验收矩阵 — cell `cell-20261103T123639841Z`（requirements rev3）
 
@@ -22,7 +22,15 @@
 6.1…6.7 / 7.1…7.9）**逐条 PASS，未验 = 0**；旧 46 行矩阵**未改写**且仍为 PASS；七道门禁在终态树上
 全绿（§7 贴命令与退出码）；交付物为 Qt6 AppImage（§1）。
 
-## 1. 交付形态与工具链（AC-7.4 / AC-3.0 / AC-6.1 的终态汇总）
+## PR #20 的主机工具检查
+
+| 项 | PR #20 验收条件 | 证据 |
+|---|---|---|
+| AppDir / AppImage | 包内没有 Git、Subversion、svnadmin 和 shell 可执行文件。现有 HDL、文件比较及 Scala 工具仍随包交付 | `evidence/host-tools/packaging/` |
+| AppRun | 保留宿主机 `PATH`，包括空值。没有 Git 与 SVN 时可以启动，使用时显示处理方式 | `evidence/host-tools/packaging/`、`evidence/host-tools/terminal/` |
+| 工程 filelist | 实时 lint 和 Ctrl 点击使用导入文件中的模块定义，包括清单刷新和切换空工作区 | `evidence/host-tools/filelist/` |
+
+## 1. 历史交付形态与工具链（AC-7.4 / AC-3.0 / AC-6.1 的终态汇总）
 
 | 项 | 值 | 证据 |
 |---|---|---|

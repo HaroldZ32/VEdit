@@ -1,0 +1,253 @@
+Source head 7ec35634c2b572d94a138265778bb46ac2614df4
+Started 2026-11-25T10:31:18+08:00
+d64edd1ccec9147b07aa61b3d1c17676e44358cfb48f36e734c970f5d1d8b6ca  target/filelist-qt/src/app/workspace-lane-diagnostics/vedit-filelist-authority-e2e
+8c0ae392446a4b644e2f81d211cd279fd372de7a333b28d75a77a6ddf86477d1  crates/vd-ffi/include/vd_ffi.h
++ for variant in default --verible --configured --included --include-wrapper
++ '[' default = default ']'
++ xvfb-run -a timeout 55s target/filelist-qt/src/app/workspace-lane-diagnostics/vedit-filelist-authority-e2e
+kf.sonnet.core: Sonnet: No speller backends available!
+TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:env:VEDIT_SLANG_SERVER verible-format:local verible-lint:local missing=[] local=[/src/build/slang/out,/src/.mpd/recon/verible/bin]
+BADGE requested-lsp=slang effective-lsp= lsp-ok=0 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=measured language= language-backend=<none> warnings=0 lsp-message='' lint-message=''
+BADGE-TEXT 'slang→unavailable · lint=slang · basis=measured · reason=not-applied'
+PROJECT-ROOT-FILES root='/tmp/vedit-filelist-authority-e2e-QizuXV/project' files=0
+PROJECT-ROOT-ENV root='/tmp/vedit-filelist-authority-e2e-QizuXV/project' source=project pinned=1 include-dirs=0 defines=0 env=''
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=1
+VIEW-PANEL id='view.panel.outline' label='Outline' dock-title='Outline' shortcut='Ctrl+Alt+O' title-equals-label=1 duplicate-command=0
+AUTOFIX-MODE stored='' mode='' valid=1 available=1 interactive=0 effect=0 reason=''
+SETTINGS-WARNINGS count=0
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=5
+BADGE requested-lsp=slang effective-lsp=slang lsp-ok=1 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=measured language= language-backend=slang warnings=0 lsp-message='' lint-message=''
+BADGE-TEXT 'slang · lint=slang · basis=measured · reason=ok'
+BACKEND-SWITCHED backend=slang lint=slang lsp=/hdl-tools/bin/slang-server engine=/src/build/slang/out/slang basis=measured argv=''
+BACKEND-AUX aux source=slang-server:env:VEDIT_SLANG_SERVER verible-format:local verible-lint:local missing=[]
+SWITCH elapsed-ms=0 backend=slang lint=slang basis=measured
+PROJECT-ROOT-FILES root='/tmp/vedit-filelist-authority-e2e-QizuXV/project' files=2
+PROJECT-ROOT-ENV root='/tmp/vedit-filelist-authority-e2e-QizuXV/project' source=project pinned=1 include-dirs=1 defines=0 env='-I/tmp/vedit-filelist-authority-e2e-QizuXV/project/include'
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=6
+TREE imported=1 path=/tmp/vedit-filelist-authority-e2e-QizuXV/project/included/deep/child.sv excluded=/tmp/vedit-filelist-authority-e2e-QizuXV/project/rtl/child.sv
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=7
+BADGE requested-lsp=slang effective-lsp=slang lsp-ok=1 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=measured language=systemverilog language-backend=slang warnings=0 lsp-message='' lint-message=''
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=8
+DIAG-ROWS-DELTA files=1 merged=0 revision=8
+BADGE requested-lsp=slang effective-lsp=slang lsp-ok=1 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=live language=systemverilog language-backend=slang warnings=0 lsp-message='' lint-message=''
+BADGE-TEXT 'slang · lint=slang · basis=live · reason=ok'
+DIAG-ROWS count=1 option-names=0 upper=0 lower=1 slang-req=0 slang-fail=0 slang-msg='' revision=12
+DIAG-ROW file='/tmp/vedit-filelist-authority-e2e-QizuXV/project/included/deep/child.sv' line=1 column=26 severity=2 code='unused-port' option='' source='slang' origin=0
+DIAG-ROWS count=1 option-names=0 upper=0 lower=1 slang-req=0 slang-fail=0 slang-msg='' revision=13
+DIAG-ROW file='/tmp/vedit-filelist-authority-e2e-QizuXV/project/included/deep/child.sv' line=1 column=26 severity=2 code='unused-port' option='' source='slang' origin=0
+DIAG-ROWS count=1 option-names=0 upper=0 lower=1 slang-req=0 slang-fail=0 slang-msg='' revision=15
+DIAG-ROW file='/tmp/vedit-filelist-authority-e2e-QizuXV/project/included/deep/child.sv' line=1 column=26 severity=2 code='unused-port' option='' source='slang' origin=0
+LINT pass=1 backend=slang inputs=[/tmp/vedit-filelist-authority-e2e-QizuXV/project/included/deep/child.sv,/tmp/vedit-filelist-authority-e2e-QizuXV/project/rtl/top.sv] rows=[input port 'correct' has no connection|port 'intentional_missing' does not exist in 'child']
+ACTION action=definition dispatched=1 via='diagnostics.definition'
+DEFINITION backend=slang file='/tmp/vedit-filelist-authority-e2e-QizuXV/project/included/deep/child.sv' line=1 column=8
+search: jump opened '/tmp/vedit-filelist-authority-e2e-QizuXV/project/included/deep/child.sv' line=1 column=8 (cursor=1:8)
+CTRL pass=1 canonical=/tmp/vedit-filelist-authority-e2e-QizuXV/project/included/deep/child.sv
+ACTION action=definition dispatched=1 via='diagnostics.definition'
+DEFINITION backend=slang file='/tmp/vedit-filelist-authority-e2e-QizuXV/project/include/signal.svh' line=1 column=7
+search: jump opened '/tmp/vedit-filelist-authority-e2e-QizuXV/project/include/signal.svh' line=1 column=7 (cursor=1:7)
+CTRL expected=/tmp/vedit-filelist-authority-e2e-QizuXV/project/include/signal.svh canonical=/tmp/vedit-filelist-authority-e2e-QizuXV/project/include/signal.svh
+DIAG-ROWS count=3 option-names=0 upper=0 lower=1 slang-req=0 slang-fail=0 slang-msg='' revision=19
+DIAG-ROW file='/tmp/vedit-filelist-authority-e2e-QizuXV/project/included/deep/child.sv' line=1 column=26 severity=2 code='unused-port' option='' source='slang' origin=0
+DIAG-ROW file='/tmp/vedit-filelist-authority-e2e-QizuXV/project/rtl/top.sv' line=5 column=9 severity=2 code='unconnected-input-port' option='' source='slang' origin=0
+DIAG-ROW file='/tmp/vedit-filelist-authority-e2e-QizuXV/project/rtl/top.sv' line=5 column=19 severity=1 code='' option='' source='slang' origin=0
+PROJECT-ROOT-FILES root='/tmp/vedit-filelist-authority-e2e-QizuXV/project' files=2
+PROJECT-ROOT-ENV root='/tmp/vedit-filelist-authority-e2e-QizuXV/project' source=project pinned=1 include-dirs=1 defines=0 env='-I/tmp/vedit-filelist-authority-e2e-QizuXV/project/include'
+DIAG-ROWS count=0 option-names=0 upper=0 lower=1 slang-req=0 slang-fail=0 slang-msg='' revision=22
+BADGE requested-lsp=slang effective-lsp=slang lsp-ok=1 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=measured language=systemverilog language-backend=slang warnings=0 lsp-message='' lint-message=''
+BADGE-TEXT 'slang · lint=slang · basis=measured · reason=ok'
+REFRESH ready=1 inputs=[/tmp/vedit-filelist-authority-e2e-QizuXV/project/lib/child.sv,/tmp/vedit-filelist-authority-e2e-QizuXV/project/rtl/top.sv]
+ACTION action=definition dispatched=1 via='diagnostics.definition'
+DEFINITION backend=slang file='/tmp/vedit-filelist-authority-e2e-QizuXV/project/lib/child.sv' line=1 column=8
+search: jump opened '/tmp/vedit-filelist-authority-e2e-QizuXV/project/lib/child.sv' line=1 column=8 (cursor=1:8)
+CTRL expected=/tmp/vedit-filelist-authority-e2e-QizuXV/project/lib/child.sv canonical=/tmp/vedit-filelist-authority-e2e-QizuXV/project/lib/child.sv
+PROJECT-ROOT-CHANGED root='/tmp/vedit-filelist-authority-e2e-QizuXV/loose' files=0 (waiting for the new file set)
+PROJECT-ROOT-ENV root='/tmp/vedit-filelist-authority-e2e-QizuXV/loose' source=cleared include-dirs=0 defines=0 env=''
+PROJECT-ROOT-FILES root='/tmp/vedit-filelist-authority-e2e-QizuXV/loose' files=0
+PROJECT-ROOT-ENV root='/tmp/vedit-filelist-authority-e2e-QizuXV/loose' source=project pinned=1 include-dirs=0 defines=0 env=''
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=26
+DEFINITION backend=slang file='/tmp/vedit-filelist-authority-e2e-QizuXV/loose/child.sv' line=1 column=8
+search: jump opened '/tmp/vedit-filelist-authority-e2e-QizuXV/loose/child.sv' line=1 column=8 (cursor=1:8)
+LOOSE pass=1 canonical=/tmp/vedit-filelist-authority-e2e-QizuXV/loose/child.sv
++ printf '\nHDL scenario %s exit=0\n' default
++ for variant in default --verible --configured --included --include-wrapper
++ '[' --verible = default ']'
++ xvfb-run -a timeout 55s target/filelist-qt/src/app/workspace-lane-diagnostics/vedit-filelist-authority-e2e --verible
+
+HDL scenario default exit=0
+kf.sonnet.core: Sonnet: No speller backends available!
+TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:env:VEDIT_SLANG_SERVER verible-format:local verible-lint:local missing=[] local=[/src/build/slang/out,/src/.mpd/recon/verible/bin]
+BADGE requested-lsp=slang effective-lsp= lsp-ok=0 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=measured language= language-backend=<none> warnings=0 lsp-message='' lint-message=''
+BADGE-TEXT 'slang→unavailable · lint=slang · basis=measured · reason=not-applied'
+PROJECT-ROOT-FILES root='/tmp/vedit-filelist-authority-e2e-UnGvTZ/project' files=0
+PROJECT-ROOT-ENV root='/tmp/vedit-filelist-authority-e2e-UnGvTZ/project' source=project pinned=1 include-dirs=0 defines=0 env=''
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=1
+VIEW-PANEL id='view.panel.outline' label='Outline' dock-title='Outline' shortcut='Ctrl+Alt+O' title-equals-label=1 duplicate-command=0
+AUTOFIX-MODE stored='' mode='' valid=1 available=1 interactive=0 effect=0 reason=''
+SETTINGS-WARNINGS count=0
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=5
+BADGE requested-lsp=verible effective-lsp=verible lsp-ok=1 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=measured language= language-backend=verible warnings=0 lsp-message='' lint-message=''
+BADGE-TEXT 'verible · lint=slang · basis=measured · reason=ok'
+BACKEND-SWITCHED backend=verible lint=slang lsp=/src/.mpd/recon/verible/bin/verible-verilog-ls engine=/src/build/slang/out/slang basis=measured argv=''
+BACKEND-AUX aux source=slang-server:env:VEDIT_SLANG_SERVER verible-format:local verible-lint:local missing=[]
+SWITCH elapsed-ms=0 backend=verible lint=slang basis=measured
+PROJECT-ROOT-FILES root='/tmp/vedit-filelist-authority-e2e-UnGvTZ/project' files=2
+PROJECT-ROOT-ENV root='/tmp/vedit-filelist-authority-e2e-UnGvTZ/project' source=project pinned=1 include-dirs=1 defines=0 env='-I/tmp/vedit-filelist-authority-e2e-UnGvTZ/project/include'
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=6
+TREE imported=1 path=/tmp/vedit-filelist-authority-e2e-UnGvTZ/project/included/deep/child.sv excluded=/tmp/vedit-filelist-authority-e2e-UnGvTZ/project/rtl/child.sv
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=7
+BADGE requested-lsp=verible effective-lsp=verible lsp-ok=1 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=measured language=systemverilog language-backend=verible warnings=0 lsp-message='' lint-message=''
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=8
+ACTION action=definition dispatched=1 via='diagnostics.definition'
+DEFINITION backend=verible file='/tmp/vedit-filelist-authority-e2e-UnGvTZ/project/included/deep/child.sv' line=1 column=8
+search: jump opened '/tmp/vedit-filelist-authority-e2e-UnGvTZ/project/included/deep/child.sv' line=1 column=8 (cursor=1:8)
+VERIBLE CTRL pass=1 canonical=/tmp/vedit-filelist-authority-e2e-UnGvTZ/project/included/deep/child.sv
++ printf '\nHDL scenario %s exit=0\n' --verible
++ for variant in default --verible --configured --included --include-wrapper
++ '[' --configured = default ']'
++ xvfb-run -a timeout 55s target/filelist-qt/src/app/workspace-lane-diagnostics/vedit-filelist-authority-e2e --configured
+
+HDL scenario --verible exit=0
+kf.sonnet.core: Sonnet: No speller backends available!
+TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:env:VEDIT_SLANG_SERVER verible-format:local verible-lint:local missing=[] local=[/src/build/slang/out,/src/.mpd/recon/verible/bin]
+BADGE requested-lsp=slang effective-lsp= lsp-ok=0 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=measured language= language-backend=<none> warnings=0 lsp-message='' lint-message=''
+BADGE-TEXT 'slang→unavailable · lint=slang · basis=measured · reason=not-applied'
+PROJECT-ROOT-FILES root='/tmp/vedit-filelist-authority-e2e-DkNZHc/project' files=0
+PROJECT-ROOT-ENV root='/tmp/vedit-filelist-authority-e2e-DkNZHc/project' source=project pinned=1 include-dirs=0 defines=0 env=''
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=1
+VIEW-PANEL id='view.panel.outline' label='Outline' dock-title='Outline' shortcut='Ctrl+Alt+O' title-equals-label=1 duplicate-command=0
+AUTOFIX-MODE stored='' mode='' valid=1 available=1 interactive=0 effect=0 reason=''
+SETTINGS-WARNINGS count=0
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=5
+BADGE requested-lsp=slang effective-lsp=slang lsp-ok=1 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=measured language= language-backend=slang warnings=0 lsp-message='' lint-message=''
+BADGE-TEXT 'slang · lint=slang · basis=measured · reason=ok'
+BACKEND-SWITCHED backend=slang lint=slang lsp=/hdl-tools/bin/slang-server engine=/src/build/slang/out/slang basis=measured argv=''
+BACKEND-AUX aux source=slang-server:env:VEDIT_SLANG_SERVER verible-format:local verible-lint:local missing=[]
+SWITCH elapsed-ms=0 backend=slang lint=slang basis=measured
+PROJECT-ROOT-FILES root='/tmp/vedit-filelist-authority-e2e-DkNZHc/project' files=2
+PROJECT-ROOT-ENV root='/tmp/vedit-filelist-authority-e2e-DkNZHc/project' source=project pinned=1 include-dirs=0 defines=0 env=''
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=6
+TREE imported=1 path=/tmp/vedit-filelist-authority-e2e-DkNZHc/project/included/deep/child.sv excluded=/tmp/vedit-filelist-authority-e2e-DkNZHc/project/rtl/child.sv
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=7
+BADGE requested-lsp=slang effective-lsp=slang lsp-ok=1 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=measured language=systemverilog language-backend=slang warnings=0 lsp-message='' lint-message=''
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=8
+DIAG-ROWS-DELTA files=1 merged=0 revision=8
+BADGE requested-lsp=slang effective-lsp=slang lsp-ok=1 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=live language=systemverilog language-backend=slang warnings=0 lsp-message='' lint-message=''
+BADGE-TEXT 'slang · lint=slang · basis=live · reason=ok'
+DIAG-ROWS count=1 option-names=0 upper=0 lower=1 slang-req=0 slang-fail=0 slang-msg='' revision=10
+DIAG-ROW file='/tmp/vedit-filelist-authority-e2e-DkNZHc/project/included/deep/child.sv' line=1 column=26 severity=2 code='unused-port' option='' source='slang' origin=0
+DIAG-ROWS count=1 option-names=0 upper=0 lower=1 slang-req=0 slang-fail=0 slang-msg='' revision=13
+DIAG-ROW file='/tmp/vedit-filelist-authority-e2e-DkNZHc/project/included/deep/child.sv' line=1 column=26 severity=2 code='unused-port' option='' source='slang' origin=0
+LINT pass=1 backend=slang inputs=[/tmp/vedit-filelist-authority-e2e-DkNZHc/project/included/deep/child.sv,/tmp/vedit-filelist-authority-e2e-DkNZHc/project/rtl/top.sv] rows=[input port 'correct' has no connection|port 'intentional_missing' does not exist in 'child']
+ACTION action=definition dispatched=1 via='diagnostics.definition'
+DEFINITION backend=slang file='/tmp/vedit-filelist-authority-e2e-DkNZHc/project/included/deep/child.sv' line=1 column=8
+search: jump opened '/tmp/vedit-filelist-authority-e2e-DkNZHc/project/included/deep/child.sv' line=1 column=8 (cursor=1:8)
+CTRL pass=1 canonical=/tmp/vedit-filelist-authority-e2e-DkNZHc/project/included/deep/child.sv
+DIAG-ROWS count=3 option-names=0 upper=0 lower=3 slang-req=0 slang-fail=0 slang-msg='' revision=17
+DIAG-ROW file='/tmp/vedit-filelist-authority-e2e-DkNZHc/project/included/deep/child.sv' line=1 column=26 severity=2 code='unused-port' option='' source='slang' origin=0
+DIAG-ROW file='/tmp/vedit-filelist-authority-e2e-DkNZHc/project/rtl/top.sv' line=10 column=9 severity=2 code='unconnected-input-port' option='' source='slang' origin=0
+DIAG-ROW file='/tmp/vedit-filelist-authority-e2e-DkNZHc/project/rtl/top.sv' line=10 column=19 severity=1 code='' option='' source='slang' origin=0
+ACTION action=definition dispatched=1 via='diagnostics.definition'
+DEFINITION backend=slang file='/tmp/vedit-filelist-authority-e2e-DkNZHc/shared/signal.svh' line=1 column=7
+search: jump opened '/tmp/vedit-filelist-authority-e2e-DkNZHc/shared/signal.svh' line=1 column=7 (cursor=1:7)
+CTRL expected=/tmp/vedit-filelist-authority-e2e-DkNZHc/shared/signal.svh canonical=/tmp/vedit-filelist-authority-e2e-DkNZHc/shared/signal.svh
+ACTION action=definition dispatched=1 via='diagnostics.definition'
+DEFINITION backend=slang file='/tmp/vedit-filelist-authority-e2e-DkNZHc/project/vendor/include/flagfile.svh' line=1 column=27
+search: jump opened '/tmp/vedit-filelist-authority-e2e-DkNZHc/project/vendor/include/flagfile.svh' line=1 column=27 (cursor=1:27)
+CTRL expected=/tmp/vedit-filelist-authority-e2e-DkNZHc/project/vendor/include/flagfile.svh canonical=/tmp/vedit-filelist-authority-e2e-DkNZHc/project/vendor/include/flagfile.svh
++ printf '\nHDL scenario %s exit=0\n' --configured
++ for variant in default --verible --configured --included --include-wrapper
++ '[' --included = default ']'
++ xvfb-run -a timeout 55s target/filelist-qt/src/app/workspace-lane-diagnostics/vedit-filelist-authority-e2e --included
+
+HDL scenario --configured exit=0
+kf.sonnet.core: Sonnet: No speller backends available!
+TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:env:VEDIT_SLANG_SERVER verible-format:local verible-lint:local missing=[] local=[/src/build/slang/out,/src/.mpd/recon/verible/bin]
+BADGE requested-lsp=slang effective-lsp= lsp-ok=0 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=measured language= language-backend=<none> warnings=0 lsp-message='' lint-message=''
+BADGE-TEXT 'slang→unavailable · lint=slang · basis=measured · reason=not-applied'
+PROJECT-ROOT-FILES root='/tmp/vedit-filelist-authority-e2e-GJNdiV/project' files=0
+PROJECT-ROOT-ENV root='/tmp/vedit-filelist-authority-e2e-GJNdiV/project' source=project pinned=1 include-dirs=0 defines=0 env=''
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=1
+VIEW-PANEL id='view.panel.outline' label='Outline' dock-title='Outline' shortcut='Ctrl+Alt+O' title-equals-label=1 duplicate-command=0
+TREE imported=1 path=/tmp/vedit-filelist-authority-e2e-GJNdiV/project/include/child.svh excluded=/tmp/vedit-filelist-authority-e2e-GJNdiV/project/rtl/child.sv
+AUTOFIX-MODE stored='' mode='' valid=1 available=1 interactive=0 effect=0 reason=''
+SETTINGS-WARNINGS count=0
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=6
+BADGE requested-lsp=slang effective-lsp=slang lsp-ok=1 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=measured language=systemverilog language-backend=slang warnings=0 lsp-message='' lint-message=''
+BADGE-TEXT 'slang · lint=slang · basis=measured · reason=ok'
+BACKEND-SWITCHED backend=slang lint=slang lsp=/hdl-tools/bin/slang-server engine=/src/build/slang/out/slang basis=measured argv='backend=slang program=/hdl-tools/bin/slang-server'
+BACKEND-AUX aux source=slang-server:env:VEDIT_SLANG_SERVER verible-format:local verible-lint:local missing=[]
+SWITCH elapsed-ms=0 backend=slang lint=slang basis=measured
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=7
+BADGE requested-lsp=slang effective-lsp=slang lsp-ok=1 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=live language=systemverilog language-backend=slang warnings=0 lsp-message='' lint-message=''
+BADGE-TEXT 'slang · lint=slang · basis=live · reason=ok'
+PROJECT-ROOT-FILES root='/tmp/vedit-filelist-authority-e2e-GJNdiV/project' files=1
+PROJECT-ROOT-ENV root='/tmp/vedit-filelist-authority-e2e-GJNdiV/project' source=project pinned=1 include-dirs=1 defines=0 env='-I/tmp/vedit-filelist-authority-e2e-GJNdiV/project/include'
+DIAG-ROWS count=0 option-names=0 upper=0 lower=1 slang-req=0 slang-fail=0 slang-msg='' revision=10
+BADGE requested-lsp=slang effective-lsp=slang lsp-ok=1 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=measured language=systemverilog language-backend=slang warnings=0 lsp-message='' lint-message=''
+BADGE-TEXT 'slang · lint=slang · basis=measured · reason=ok'
+DIAG-ROWS count=0 option-names=0 upper=0 lower=1 slang-req=0 slang-fail=0 slang-msg='' revision=11
+BADGE requested-lsp=slang effective-lsp=slang lsp-ok=1 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=live language=systemverilog language-backend=slang warnings=0 lsp-message='' lint-message=''
+BADGE-TEXT 'slang · lint=slang · basis=live · reason=ok'
+LINT pass=1 backend=slang inputs=[/tmp/vedit-filelist-authority-e2e-GJNdiV/project/rtl/top.sv] rows=[input port 'correct' has no connection|port 'intentional_missing' does not exist in 'child']
+ACTION action=definition dispatched=1 via='diagnostics.definition'
+DEFINITION backend=slang file='/tmp/vedit-filelist-authority-e2e-GJNdiV/project/include/child.svh' line=1 column=8
+search: jump opened '/tmp/vedit-filelist-authority-e2e-GJNdiV/project/include/child.svh' line=1 column=8 (cursor=1:8)
+CTRL pass=1 canonical=/tmp/vedit-filelist-authority-e2e-GJNdiV/project/include/child.svh
+DIAG-ROWS count=2 option-names=0 upper=0 lower=1 slang-req=0 slang-fail=0 slang-msg='' revision=13
+DIAG-ROW file='/tmp/vedit-filelist-authority-e2e-GJNdiV/project/rtl/top.sv' line=5 column=9 severity=2 code='unconnected-input-port' option='' source='slang' origin=0
+DIAG-ROW file='/tmp/vedit-filelist-authority-e2e-GJNdiV/project/rtl/top.sv' line=5 column=19 severity=1 code='' option='' source='slang' origin=0
+ACTION action=definition dispatched=1 via='diagnostics.definition'
+DEFINITION backend=slang file='/tmp/vedit-filelist-authority-e2e-GJNdiV/project/include/signal.svh' line=1 column=7
+search: jump opened '/tmp/vedit-filelist-authority-e2e-GJNdiV/project/include/signal.svh' line=1 column=7 (cursor=1:7)
+CTRL expected=/tmp/vedit-filelist-authority-e2e-GJNdiV/project/include/signal.svh canonical=/tmp/vedit-filelist-authority-e2e-GJNdiV/project/include/signal.svh
+
+HDL scenario --included exit=0
++ printf '\nHDL scenario %s exit=0\n' --included
++ for variant in default --verible --configured --included --include-wrapper
++ '[' --include-wrapper = default ']'
++ xvfb-run -a timeout 55s target/filelist-qt/src/app/workspace-lane-diagnostics/vedit-filelist-authority-e2e --include-wrapper
+kf.sonnet.core: Sonnet: No speller backends available!
+TOOLCHAIN source=verible:local slang:local missing=[] aux source=slang-server:env:VEDIT_SLANG_SERVER verible-format:local verible-lint:local missing=[] local=[/src/build/slang/out,/src/.mpd/recon/verible/bin]
+BADGE requested-lsp=slang effective-lsp= lsp-ok=0 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=measured language= language-backend=<none> warnings=0 lsp-message='' lint-message=''
+BADGE-TEXT 'slang→unavailable · lint=slang · basis=measured · reason=not-applied'
+PROJECT-ROOT-FILES root='/tmp/vedit-filelist-authority-e2e-jaueHQ/project' files=0
+PROJECT-ROOT-ENV root='/tmp/vedit-filelist-authority-e2e-jaueHQ/project' source=project pinned=1 include-dirs=0 defines=0 env=''
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=1
+VIEW-PANEL id='view.panel.outline' label='Outline' dock-title='Outline' shortcut='Ctrl+Alt+O' title-equals-label=1 duplicate-command=0
+TREE imported=1 path=/tmp/vedit-filelist-authority-e2e-jaueHQ/project/include/child.svh excluded=/tmp/vedit-filelist-authority-e2e-jaueHQ/project/rtl/child.sv
+AUTOFIX-MODE stored='' mode='' valid=1 available=1 interactive=0 effect=0 reason=''
+SETTINGS-WARNINGS count=0
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=6
+BADGE requested-lsp=slang effective-lsp=slang lsp-ok=1 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=measured language=systemverilog language-backend=slang warnings=0 lsp-message='' lint-message=''
+BADGE-TEXT 'slang · lint=slang · basis=measured · reason=ok'
+BACKEND-SWITCHED backend=slang lint=slang lsp=/hdl-tools/bin/slang-server engine=/src/build/slang/out/slang basis=measured argv='backend=slang program=/hdl-tools/bin/slang-server'
+BACKEND-AUX aux source=slang-server:env:VEDIT_SLANG_SERVER verible-format:local verible-lint:local missing=[]
+SWITCH elapsed-ms=0 backend=slang lint=slang basis=measured
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=7
+BADGE requested-lsp=slang effective-lsp=slang lsp-ok=1 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=live language=systemverilog language-backend=slang warnings=0 lsp-message='' lint-message=''
+BADGE-TEXT 'slang · lint=slang · basis=live · reason=ok'
+PROJECT-ROOT-FILES root='/tmp/vedit-filelist-authority-e2e-jaueHQ/project' files=2
+PROJECT-ROOT-ENV root='/tmp/vedit-filelist-authority-e2e-jaueHQ/project' source=project pinned=1 include-dirs=1 defines=0 env='-I/tmp/vedit-filelist-authority-e2e-jaueHQ/project/include'
+DIAG-ROWS count=0 option-names=0 upper=0 lower=1 slang-req=0 slang-fail=0 slang-msg='' revision=10
+BADGE requested-lsp=slang effective-lsp=slang lsp-ok=1 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=measured language=systemverilog language-backend=slang warnings=0 lsp-message='' lint-message=''
+BADGE-TEXT 'slang · lint=slang · basis=measured · reason=ok'
+DIAG-ROWS count=0 option-names=0 upper=0 lower=1 slang-req=0 slang-fail=0 slang-msg='' revision=12
+BADGE requested-lsp=slang effective-lsp=slang lsp-ok=1 lsp-reason=ok requested-lint=slang effective-lint=slang lint-ok=1 lint-reason=ok basis=live language=systemverilog language-backend=slang warnings=0 lsp-message='' lint-message=''
+BADGE-TEXT 'slang · lint=slang · basis=live · reason=ok'
+DIAG-ROWS count=0 option-names=0 upper=0 lower=1 slang-req=0 slang-fail=0 slang-msg='' revision=14
+LINT pass=1 backend=slang inputs=[/tmp/vedit-filelist-authority-e2e-jaueHQ/project/rtl/top.sv,/tmp/vedit-filelist-authority-e2e-jaueHQ/project/rtl/wrapper.sv] rows=[input port 'correct' has no connection|port 'intentional_missing' does not exist in 'child']
+ACTION action=definition dispatched=1 via='diagnostics.definition'
+DEFINITION backend=slang file='/tmp/vedit-filelist-authority-e2e-jaueHQ/project/include/child.svh' line=1 column=8
+search: jump opened '/tmp/vedit-filelist-authority-e2e-jaueHQ/project/include/child.svh' line=1 column=8 (cursor=1:8)
+CTRL pass=1 canonical=/tmp/vedit-filelist-authority-e2e-jaueHQ/project/include/child.svh
+ACTION action=definition dispatched=1 via='diagnostics.definition'
+DEFINITION backend=slang file='/tmp/vedit-filelist-authority-e2e-jaueHQ/project/include/signal.svh' line=1 column=7
+search: jump opened '/tmp/vedit-filelist-authority-e2e-jaueHQ/project/include/signal.svh' line=1 column=7 (cursor=1:7)
+CTRL expected=/tmp/vedit-filelist-authority-e2e-jaueHQ/project/include/signal.svh canonical=/tmp/vedit-filelist-authority-e2e-jaueHQ/project/include/signal.svh
++ printf '\nHDL scenario %s exit=0\n' --include-wrapper
+
+HDL scenario --include-wrapper exit=0
+++ pkg-config --cflags Qt6Core
++ g++ -std=c++17 -fsyntax-only -fPIC -I/usr/include/x86_64-linux-gnu/qt6/QtCore -I/usr/include/x86_64-linux-gnu/qt6 -DQT_CORE_LIB -I/usr/lib/x86_64-linux-gnu/qt6/mkspecs/linux-g++ -I crates/vd-ffi/include crates/vd-ffi/tests/qt_abi_guard.cpp
+Finished 2026-11-25T10:31:33+08:00
+HDL and Qt header compile exit=0

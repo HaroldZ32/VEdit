@@ -1,0 +1,7 @@
+87: TREE imported=1 path=/tmp/vedit-filelist-authority-e2e-WqybNT/project/included/deep/child.sv excluded=/tmp/vedit-filelist-authority-e2e-WqybNT/project/rtl/child.sv
+87: LINT pass=0 backend=slang inputs=[/tmp/vedit-filelist-authority-e2e-WqybNT/project/included/deep/child.sv,/tmp/vedit-filelist-authority-e2e-WqybNT/project/rtl/top.sv] rows=[input port 'decoy' has no connection|port 'correct' does not exist in 'child'|input port 'decoy' has no connection|port 'intentional_missing' does not exist in 'child']
+87: ACTION action=definition dispatched=1 via='diagnostics.definition'
+87: DEFINITION backend=slang file='/tmp/vedit-filelist-authority-e2e-WqybNT/project/rtl/child.sv' line=1 column=8
+87: CTRL pass=0 canonical=/tmp/vedit-filelist-authority-e2e-WqybNT/project/rtl/child.sv
+1/1 Test #87: vedit-filelist-authority-e2e .....***Failed    2.28 sec
+0% tests passed, 1 tests failed out of 1

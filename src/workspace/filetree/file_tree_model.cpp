@@ -341,6 +341,12 @@ bool FileTreeModel::isDirectory(const QModelIndex &index) const
     return node != nullptr && node->isDir;
 }
 
+bool FileTreeModel::isSymlink(const QModelIndex &index) const
+{
+    const Node *node = nodeForIndex(index);
+    return node != nullptr && node->isSymlink;
+}
+
 bool FileTreeModel::isPopulated(const QModelIndex &index) const
 {
     const Node *node = nodeForIndex(index);

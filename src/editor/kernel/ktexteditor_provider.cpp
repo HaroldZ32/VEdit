@@ -5,6 +5,7 @@
 #include "document_io.h"
 #include "editor_advanced.h"
 #include "editor_context_menu.h"
+#include "filelist_path_completion.h"
 #include "find_replace.h"
 #include "lsp_actions.h"
 #include "multi_cursor.h"
@@ -292,6 +293,7 @@ void EditCoreProvider::configureView(KTextEditor::View *view)
     // advanced-feature controller (Ctrl+Alt+A menu, honest capability gating).
     vedit::editor::SignatureHelp::install(view);
     vedit::editor::EditorAdvanced::install(view);
+    vedit::editor::installFilelistPathCompletion(view);
 }
 
 void EditCoreProvider::applySyntaxTheme(const QString &themeName)

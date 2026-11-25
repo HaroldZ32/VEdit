@@ -1,22 +1,8 @@
-//! Batch 6b (AC-6.2 / AC-6.5): the REAL Subversion backend against the
-//! **bundled** client (subversion 1.14.5, shipped in the AppDir by batch 6a).
+//! Exercise the real host Subversion backend and observe changes on disk.
 //!
-//! The host and every build image have no `svn` on `PATH`, so this test is
-//! env-gated: it runs only when BOTH variables name the bundled tools,
-//!
-//!   * `VEDIT_SVN_BIN`     — `<appdir>/bin/svn` (the AppDir loader wrapper)
-//!   * `VEDIT_SVNADMIN`    — `build/vcs-tools/svnadmin` (build-only, never shipped)
-//!
-//! and SKIPs with the reason otherwise, so the plain `cargo test` gate stays
-//! green on a machine without them. The product path is the one under test:
-//! `VEDIT_SVN` is set so `crates/vd-vcs/src/toolchain.rs` resolves the SAME
-//! client the fixture uses (bundled candidates do not apply to a test binary,
-//! PATH has no svn, so the env fallback is what the runner spawns), and every
-//! read/write goes through `vd_vcs::status` / `ProcessVcsService` /
-//! `vd_vcs::write::write` — never through a private shortcut.
-//!
-//! Every assertion is made with the real `svn`/`svnadmin` commands as well, so a
-//! green test means the repository state really changed.
+//! The test looks for the product's host `svn` and a fixture `svnadmin`.
+//! `VEDIT_SVN_BIN` and `VEDIT_SVNADMIN` can locate external fixtures when the
+//! build image has neither. Without both tools the test prints a skip reason.
 
 use std::path::{Path, PathBuf};
 use std::process::Command;
@@ -322,38 +308,33 @@ fn exercise_svn_parity(root: &Path, repository: &str, svn: &Path) -> Result<(), 
 }
 
 #[test]
-fn bundled_subversion_reads_and_writes_run_through_the_product_path() {
-    let Some(svn) = executable_from_env("VEDIT_SVN_BIN") else {
-        eprintln!(
-            "SKIP bundled subversion E2E: VEDIT_SVN_BIN is not set (expected the AppDir \
-             bin/svn loader wrapper); see evidence/svn-e2e/run-all.sh"
-        );
+fn host_subversion_reads_and_writes_run_through_the_product_path() {
+    let svn = vd_vcs::toolchain::resolve("svn")
+        .map(|tool| tool.path)
+        .or_else(|| executable_from_env("VEDIT_SVN_BIN"));
+    let svnadmin = executable_from_env("VEDIT_SVNADMIN").or_else(|| {
+        let path = std::env::var_os("PATH")?;
+        std::env::split_paths(&path)
+            .map(|dir| dir.join("svnadmin"))
+            .find(|path| path.is_absolute() && path.is_file())
+    });
+    let (Some(svn), Some(svnadmin)) = (svn, svnadmin) else {
+        eprintln!("SKIP host Subversion E2E: install svn and svnadmin or set VEDIT_SVN_BIN and VEDIT_SVNADMIN");
         return;
     };
-    let Some(svnadmin) = executable_from_env("VEDIT_SVNADMIN") else {
-        eprintln!(
-            "SKIP bundled subversion E2E: VEDIT_SVNADMIN is not set (expected \
-             build/vcs-tools/svnadmin)"
-        );
-        return;
-    };
-    // AC-6.2: the BUILD-IMAGE path is the fixture actor and the product spawns
-    // the bundled client. Record both versions so the log proves which binaries ran.
     let (svn_ok, svn_version) = run_tool(&svn, Path::new("/tmp"), &["--version", "--quiet"]);
     let (admin_ok, admin_version) =
         run_tool(&svnadmin, Path::new("/tmp"), &["--version", "--quiet"]);
-    assert!(svn_ok && admin_ok, "the bundled svn tools do not run");
+    assert!(svn_ok && admin_ok, "the host Subversion tools do not run");
     eprintln!(
-        "EVIDENCE bundled svn={} svnadmin={}",
+        "EVIDENCE host svn={} svnadmin={}",
         svn_version.trim(),
         admin_version.trim()
     );
-    // The product's resolver is bundled > PATH > env; a test binary has no
-    // AppDir and PATH carries no svn, so this env value is what it spawns.
     std::env::set_var("VEDIT_SVN", &svn);
 
     let Ok(temp) = tempfile::tempdir() else {
-        eprintln!("SKIP bundled subversion E2E: no temporary directory");
+        eprintln!("SKIP host Subversion E2E: no temporary directory");
         return;
     };
     let root = temp.path().to_path_buf();

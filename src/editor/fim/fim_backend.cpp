@@ -124,7 +124,12 @@ public:
             }
         } else if (status == VD_STATUS_FAILED) {
             reply.state = AsyncReply::State::Error;
-            reply.text = QCoreApplication::translate("VEdit", "FIM failed: %1").arg(serviceError(it->service));
+            reply.text = serviceError(it->service);
+            if (reply.text.startsWith(QStringLiteral("FIM: FIM "))) {
+                reply.text.remove(0, 5);
+            } else if (!reply.text.startsWith(QStringLiteral("FIM: "))) {
+                reply.text = QCoreApplication::translate("VEdit", "FIM failed: %1").arg(reply.text);
+            }
         } else {
             reply.state = AsyncReply::State::Error;
             reply.text = QCoreApplication::translate("VEdit", "FIM poll failed (state %1)").arg(status);

@@ -265,6 +265,7 @@ RestartCommand restartCommand(const QString &appImage, const QString &applicatio
         // The AppImage runtime sets $APPIMAGE; relaunching that file re-runs the
         // runtime and mounts a fresh image, which is exactly what a user expects.
         command.program = appImage;
+        command.packaged = true;
         return command;
     }
     if (!applicationDirPath.isEmpty()) {
@@ -275,6 +276,7 @@ RestartCommand restartCommand(const QString &appImage, const QString &applicatio
         const QFileInfo info(appRun);
         if (info.isFile() && info.isExecutable()) {
             command.program = appRun;
+            command.packaged = true;
             return command;
         }
     }
@@ -283,14 +285,58 @@ RestartCommand restartCommand(const QString &appImage, const QString &applicatio
     return command;
 }
 
+void configureRestartProcess(QProcess &process, const RestartCommand &launch,
+                             const QString &applicationDirPath)
+{
+    if (!launch.packaged) {
+        process.setProgram(launch.program);
+        process.setArguments(launch.arguments);
+        return;
+    }
+
+    auto environment = QProcessEnvironment::systemEnvironment();
+    const QString libraryKey = QStringLiteral("LD_LIBRARY_PATH");
+    const QString bundledLibrary = applicationDirPath + QStringLiteral("/lib");
+    const QString libraryPath = environment.value(libraryKey);
+    if (libraryPath == bundledLibrary) {
+        environment.remove(libraryKey);
+    } else if (libraryPath.startsWith(bundledLibrary + QLatin1Char(':'))) {
+        environment.insert(libraryKey, libraryPath.sliced(bundledLibrary.size() + 1));
+    }
+    const auto removeBundled = [&](const char *key, const char *suffix) {
+        const QString name = QString::fromLatin1(key);
+        if (environment.value(name) == applicationDirPath + QString::fromLatin1(suffix)) {
+            environment.remove(name);
+        }
+    };
+    removeBundled("APPDIR", "");
+    removeBundled("LOCPATH", "/usr/lib/locale");
+    removeBundled("VEDIT_SLANG", "/bin/slang");
+    removeBundled("VEDIT_VERIBLE_LS", "/bin/verible-verilog-ls");
+    removeBundled("VEDIT_VERIBLE_LINT", "/bin/verible-verilog-lint");
+    removeBundled("VEDIT_VERIBLE_FORMAT", "/bin/verible-verilog-format");
+    removeBundled("VEDIT_TRANSLATIONS_DIR", "/bin/translations");
+
+    // Restore PATH in the host shell so bytes, empty and unset survive the relaunch.
+    process.setProcessEnvironment(environment);
+    process.setProgram(QStringLiteral("/bin/sh"));
+    process.setArguments(QStringList{
+        QStringLiteral("-c"),
+        QStringLiteral("if [ \"${VEDIT_HOST_PATH+x}\" ]; then export PATH=\"$VEDIT_HOST_PATH\"; "
+                       "else unset PATH; fi; exec \"$@\""),
+        QStringLiteral("vedit-restart"), launch.program,
+    } + launch.arguments);
+}
+
 bool restartApplication(QString *error)
 {
     if (g_restartApplicationHandler) {
         return g_restartApplicationHandler(error);
     }
+    const QString appDir = QCoreApplication::applicationDirPath();
     const RestartCommand launch = restartCommand(
-        qEnvironmentVariable("APPIMAGE"), QCoreApplication::applicationDirPath(),
-        QCoreApplication::applicationFilePath(), QCoreApplication::arguments());
+        qEnvironmentVariable("APPIMAGE"), appDir, QCoreApplication::applicationFilePath(),
+        QCoreApplication::arguments());
     if (launch.program.isEmpty()) {
         if (error != nullptr) {
             *error = QStringLiteral("the application path is empty, so it cannot relaunch itself");
@@ -301,8 +347,11 @@ bool restartApplication(QString *error)
     // the loader silently and the successor exited before it could say why.
     std::fprintf(stderr, "VEDIT-RESTART program=%s args=%s\n", qPrintable(launch.program),
                  qPrintable(launch.arguments.join(QLatin1Char(' '))));
-    const QString workingDirectory = QDir::currentPath();
-    if (!QProcess::startDetached(launch.program, launch.arguments, workingDirectory)) {
+    QProcess process;
+    configureRestartProcess(process, launch, appDir);
+    process.setWorkingDirectory(QDir::currentPath());
+    if ((launch.packaged && !QFileInfo(launch.program).isExecutable())
+        || !process.startDetached()) {
         if (error != nullptr) {
             *error = QStringLiteral("could not start a new instance: %1 %2")
                          .arg(launch.program, launch.arguments.join(QLatin1Char(' ')));

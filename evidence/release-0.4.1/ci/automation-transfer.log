@@ -1,0 +1,2 @@
+Transfer checksum matches: exit 0
+Transfer checksum mismatches: exit 1

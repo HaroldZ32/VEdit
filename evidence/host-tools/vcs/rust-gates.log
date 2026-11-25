@@ -1,0 +1,208 @@
+   Compiling vd-vcs v0.4.0 (/work/crates/vd-vcs)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.58s
+     Running unittests src/lib.rs (target/host-tools-rust/debug/deps/vd_vcs-cda7946aebd4053d)
+
+running 22 tests
+test history::tests::a_page_requests_one_extra_row_to_detect_more ... ok
+test history::tests::parses_a_commit_header_with_body ... ok
+test history::tests::a_log_failure_is_an_error_and_an_empty_repository_is_not ... ok
+test history::tests::parses_a_log_page ... ok
+test history::tests::parses_numstat_with_binary ... ok
+test history::tests::parses_blame_porcelain ... ok
+test history::tests::refuses_an_escaping_path ... ok
+test history::tests::refuses_an_option_shaped_hash ... ok
+test service::tests::svn_info_xml_without_values_is_the_empty_state_not_a_panic ... ok
+test service::tests::svn_info_xml_yields_revision_and_url ... ok
+test tests::git_detached_head_has_no_branch ... ok
+test tests::git_porcelain_maps_statuses_and_branch ... ok
+test tests::svn_status_maps_codes ... ok
+test workspace::tests::malformed_stash_rows_are_skipped ... ok
+test workspace::tests::stash_rows_are_split_on_tabs ... ok
+test workspace::tests::a_bare_worktree_row_has_no_commit_id ... ok
+test workspace::tests::worktree_rows_survive_spaces_in_the_path ... ok
+test workspace::tests::stash_rows_keep_a_tab_in_the_subject ... ok
+test tests::nested_directory_finds_the_repository_above_it ... ok
+test tests::plain_directory_is_the_empty_state_not_an_error ... ok
+test tests::markers_select_the_backend ... ok
+test host::tests::native_shells_keep_empty_and_multiline_arguments ... ok
+
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/compat.rs (target/host-tools-rust/debug/deps/compat-f5c3e874a33a0395)
+
+running 3 tests
+test the_read_gate_still_refuses_every_write_subcommand_on_the_new_seam ... ok
+test read_path_returns_status_info_and_diff_on_the_installed_git ... ok
+test two_repositories_keep_their_own_working_tree ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/history.rs (target/host-tools-rust/debug/deps/history-04fead7c8fe5534a)
+
+running 9 tests
+test a_non_repository_and_a_foreign_backend_are_reported ... ok
+test an_empty_repository_is_an_empty_state_not_an_error ... ok
+test blame_attributes_each_line_to_its_commit ... ok
+test commit_search_is_literal_and_case_insensitive ... ok
+test comparison_lists_the_files_and_the_patch ... ok
+test commit_detail_reports_meta_files_and_patch ... ok
+test commit_pages_are_bounded_and_carry_has_more ... ok
+test file_history_lists_only_the_paths_commits ... ok
+test a_repository_with_many_commits_pages_without_reading_everything ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.46s
+
+     Running tests/host_execution.rs (target/host-tools-rust/debug/deps/host_execution-6500b0ecd5bd55eb)
+
+running 1 test
+test read_and_write_preserve_arguments_and_use_the_selected_shell_environment ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests/ops.rs (target/host-tools-rust/debug/deps/ops-1121b5176cb83db8)
+
+running 9 tests
+test a_non_repository_reports_the_empty_operation_state ... ok
+test the_no_edit_flags_are_present_so_no_editor_blocks ... ok
+test clean_removes_only_the_given_untracked_files ... ok
+test continue_and_abort_require_the_operation_in_progress ... ok
+test reset_soft_mixed_and_hard_move_different_state ... ok
+test cherry_pick_replays_one_commit_and_revert_undoes_it ... ok
+test merge_fast_forwards_and_merges_with_a_commit ... ok
+test a_merge_conflict_is_a_visible_state_that_continues_and_aborts ... ok
+test rebase_replays_the_branch_and_abort_restores_it ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.38s
+
+     Running tests/readonly.rs (target/host-tools-rust/debug/deps/readonly-c2ab9ed900fee75f)
+
+running 10 tests
+test allow_lists_are_disjoint_from_write_lists ... ok
+test every_git_write_subcommand_is_refused_before_spawn ... ok
+test every_svn_write_subcommand_is_refused_before_spawn ... ok
+test production_runner_gate_refuses_writes_without_spawning ... ok
+test stub_service_drives_the_panel_without_processes ... ok
+test read_and_write_tables_are_disjoint_and_default_deny ... ok
+test unknown_tool_and_empty_subcommand_are_refused ... ok
+test git_session_uses_only_read_only_subcommands ... ok
+test plain_directory_is_the_empty_state_in_every_query ... ok
+test svn_session_reads_status_info_and_diff ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/svn_e2e.rs (target/host-tools-rust/debug/deps/svn_e2e-7f445e9652faf0e6)
+
+running 1 test
+test host_subversion_reads_and_writes_run_through_the_product_path ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/toolchain.rs (target/host-tools-rust/debug/deps/toolchain-7126f658540e7263)
+
+running 3 tests
+test an_empty_saved_host_path_does_not_fall_back_to_the_launcher_path ... ok
+test skips_nonexecutables_and_reports_removed_tools ... ok
+test effective_path_overrides_host_path_but_cannot_restore_appdir_tools ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/workspace.rs (target/host-tools-rust/debug/deps/workspace-a105849107fe62a8)
+
+running 13 tests
+test stash_save_argv_is_positional_because_the_baseline_has_no_dash_m ... ok
+test stashes_on_a_plain_directory_are_empty_with_a_note_not_an_error ... ok
+test workspace_entries_are_plain_data_capped_by_the_reader ... ok
+test the_workspace_operations_are_git_only_and_parameter_checked ... ok
+test worktree_parameters_are_validated_before_any_process ... ok
+test stash_parameters_are_validated_before_any_process ... ok
+test worktree_add_list_remove_round_trip ... ok
+test worktree_list_reports_the_main_worktree_even_without_worktree_support ... ok
+test submodule_on_a_repository_without_submodules_is_a_normal_result ... ok
+test stash_operations_on_an_empty_stack_report_the_real_git_reason ... ok
+test stash_drop_and_pop_target_the_named_stash_only ... ok
+test submodule_init_and_update_check_out_the_pinned_commit ... ok
+test stash_save_pop_apply_and_drop_round_trip ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.35s
+
+     Running tests/worktree_e2e.rs (target/host-tools-rust/debug/deps/worktree_e2e-20f91e8928d92fb5)
+
+running 1 test
+test bundled_git_worktree_round_trip_runs_through_the_product_path ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/write.rs (target/host-tools-rust/debug/deps/write-f39bab26fe711050)
+
+running 13 tests
+test every_operation_code_round_trips_and_unknown_codes_are_refused ... ok
+test a_tool_failure_is_a_normal_result_not_a_rejected_request ... ok
+test a_directory_that_is_not_a_working_tree_is_refused ... ok
+test credentials_travel_in_the_environment_and_are_redacted ... ok
+test batch_4a_parameters_are_validated_before_any_process ... ok
+test batch_4a_operations_build_the_documented_invocations ... ok
+test the_read_gate_still_refuses_every_subcommand_the_write_path_runs ... ok
+test parameters_outside_the_operation_contract_are_refused ... ok
+test accepted_operations_build_exactly_one_documented_invocation ... ok
+test the_write_gate_is_also_enforced_by_the_runner ... ok
+test the_backend_must_match_the_operation ... ok
+test git_round_trip_runs_in_a_temp_fixture ... ok
+test git_remote_round_trip_against_a_local_bare_repository ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+
+   Doc-tests vd_vcs
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Compiling vd-ffi v0.4.0 (/work/crates/vd-ffi)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 4.48s
+     Running tests/abi.rs (target/host-tools-rust/debug/deps/abi-db93db17c3c757cc)
+
+running 9 tests
+test vcs_write_codes_are_stable ... ok
+test vcs_reports_the_empty_state_for_a_plain_directory ... ok
+test vcs_write_poll_misuse_is_typed ... ok
+test vcs_write_job_refuses_invalid_requests ... ok
+test vcs_read_jobs_return_status_info_and_diff_from_a_real_repository ... ok
+test vcs_write_job_runs_a_real_git_round_trip ... ok
+test vcs_history_jobs_return_pages_detail_blame_and_comparison ... ok
+test vcs_history_op_codes_and_operation_state_are_stable ... ok
+test vcs_workspace_codes_and_listings_are_stable ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.11s
+
+   Compiling vd-ffi v0.4.0 (/work/crates/vd-ffi)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.80s
+     Running tests/env_effective.rs (target/host-tools-rust/debug/deps/env_effective-1c6ac3cfe3e77cda)
+
+running 3 tests
+test effective_snapshot_carries_process_and_imported_entries ... ok
+test language_server_child_receives_the_imported_selection ... ok
+test product_lsp_session_start_injects_the_imported_selection ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests/qt_abi_guard.rs (target/host-tools-rust/debug/deps/qt_abi_guard-be632f283a24d8db)
+
+running 1 test
+test the_generated_header_compiles_together_with_a_real_qt_header ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Compiling vd-ffi v0.4.0 (/work/crates/vd-ffi)
+    Checking vd-vcs v0.4.0 (/work/crates/vd-vcs)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.19s
+Diff in /work/crates/vd-lsp/src/session.rs:1010:
+                 patterns.push(alias.to_string_lossy().into_owned());
+             }
+             #[cfg(not(unix))]
+-            return Err(std::io::Error::other(format!("unsupported slang index path: {path}")));
++            return Err(std::io::Error::other(format!(
++                "unsupported slang index path: {path}"
++            )));
+         } else {
+             patterns.push(path.into_owned());
+         }

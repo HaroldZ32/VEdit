@@ -47,6 +47,7 @@
 #include "kernel/ktexteditor_provider.h"
 #endif
 
+#include <QDockWidget>
 #include <QMainWindow>
 #endif
 
@@ -62,6 +63,7 @@
 #include <QHash>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMenu>
 #include <QMutex>
 #include <QMutexLocker>
 #include <QProcess>
@@ -802,6 +804,9 @@ void testShellHandoff(const QString &root)
             scopeCombo->findData(static_cast<int>(SearchScope::WholeProject)));
     }
 
+    check(QStringLiteral("shell-handoff.bar-status"),
+          bar->statusText() == QStringLiteral("Whole project query sent to the Search panel"),
+          bar->statusText());
     SearchPanel *dockPanel = nullptr;
     const bool created = waitUntil([&shell, &dockPanel]() {
         dockPanel = shell.findChild<SearchPanel *>();
@@ -2844,7 +2849,189 @@ void testCurrentFileScopeFollowsActivePane(const QString &)
     }
     vedit::search::SearchHub::instance().removeProjectSearchHandler(&shell);
 }
+
+void testStandaloneDock(const QString &evidenceRoot)
+{
+    QTemporaryDir dir;
+    const QString stateDir = QDir(dir.path()).filePath(QStringLiteral("profile"));
+    const QString active = QDir(dir.path()).filePath(QStringLiteral("active.sv"));
+    const QString neighbor = QDir(dir.path()).filePath(QStringLiteral("neighbor.sv"));
+    const QByteArray neighborText("// needle neighbor_only\n");
+    const QString term = QStringLiteral("needle");
+    writeText(active, QByteArray("module active;\n  // needle\n  // needle\nendmodule\n"));
+    writeText(neighbor, neighborText);
+    check(QStringLiteral("standalone.fixture"), dir.isValid() && QFileInfo::exists(active) &&
+          QFileInfo::exists(neighbor));
+
+    vedit::app::ShellOptions shellOptions;
+    shellOptions.stateDir = stateDir;
+    shellOptions.restoreSession = false;
+    shellOptions.showDefaultPanels = false;
+    vedit::workspace::IntegrationOptions integration;
+    integration.stateDir = stateDir;
+    const QString dockId = QStringLiteral("search");
+    const auto openStandalone = [&](vedit::app::ApplicationShell &shell) {
+        shell.setEditorProvider(vedit::editor::makeEditCoreProvider());
+        vedit::workspace::installSearch(shell, integration);
+        QString error;
+        check(QStringLiteral("standalone.open-without-root"),
+              shell.openPaths({active}, &error) && shell.projectRoot().isEmpty(), error);
+        shell.resize(1050, 760);
+        shell.show();
+        shell.panels()->showPanel(dockId, &shell);
+        return shell.findChild<SearchPanel *>();
+    };
+    {
+        vedit::app::ApplicationShell shell(shellOptions);
+        SearchPanel *panel = openStandalone(shell);
+        auto *pane = shell.editorArea()->activePane();
+        auto *view = vedit::editor::viewFor(pane->editorWidget());
+        auto *dock = shell.panels()->dock(dockId);
+        check(QStringLiteral("standalone.widgets"), panel && view && dock);
+        if (!panel || !view || !dock) {
+            return;
+        }
+        for (const auto area : {Qt::BottomDockWidgetArea, Qt::LeftDockWidgetArea,
+                                Qt::RightDockWidgetArea}) {
+            shell.addDockWidget(area, dock);
+            if (area != Qt::BottomDockWidgetArea) {
+                shell.resizeDocks({dock}, {230}, Qt::Horizontal);
+            }
+            panel->setScope(SearchScope::CurrentFile);
+            panel->setQuery(term);
+            QTest::keyClick(panel->queryEdit(), Qt::Key_Return);
+            const bool finished = waitForSearch(*panel);
+            const QString placement = QString::number(static_cast<int>(area));
+            check(QStringLiteral("standalone.hits-") + placement,
+                  finished && panel->hits().size() == 2 && panel->hits().front().filePath == active &&
+                      panel->lastSummary().filesScanned == 1 && panel->rootPath().isEmpty(),
+                  panel->emptyStateLabel()->text());
+            auto *tree = panel->resultsView();
+            auto *group = tree->topLevelItem(0);
+            if (group && group->childCount() == 2) {
+                auto *hit = group->child(0);
+                tree->setCurrentItem(hit);
+                if (area == Qt::BottomDockWidgetArea) {
+                    view->setCursorPosition(KTextEditor::Cursor(0, 0));
+                    QTest::keyClick(tree, Qt::Key_Return);
+                } else {
+                    tree->scrollToItem(hit);
+                    const QPoint point = tree->visualItemRect(hit)
+                                             .intersected(tree->viewport()->rect()).center();
+                    QTest::mouseClick(tree->viewport(), Qt::LeftButton, Qt::NoModifier, point);
+                    view->setCursorPosition(KTextEditor::Cursor(0, 0));
+                    QTest::mouseDClick(tree->viewport(), Qt::LeftButton, Qt::NoModifier, point);
+                }
+                const auto cursor = view->cursorPosition();
+                check(QStringLiteral("standalone.jump-") + placement,
+                      pane->currentFilePath() == active && cursor == KTextEditor::Cursor(1, 5),
+                      QStringLiteral("cursor=%1:%2 dockWidth=%3")
+                          .arg(cursor.line()).arg(cursor.column()).arg(dock->width()));
+                if (!evidenceRoot.isEmpty()) {
+                    shell.grab().save(QDir(evidenceRoot).filePath(
+                        QStringLiteral("standalone-%1.png").arg(placement)));
+                }
+            }
+        }
+        panel->setQuery(QStringLiteral("neighbor_only"));
+        QTest::keyClick(panel->queryEdit(), Qt::Key_Return);
+        check(QStringLiteral("standalone.neighbor-excluded"),
+              waitForSearch(*panel) && panel->hits().isEmpty() &&
+                  panel->lastSummary().filesScanned == 1);
+        int submissions = 0;
+        QObject::connect(panel, &SearchPanel::searchFinished, panel,
+                         [&submissions]() { ++submissions; });
+        auto *bar = vedit::editor::FindReplaceBar::instanceFor(pane->editorWidget());
+        check(QStringLiteral("standalone.find-bar"), bar != nullptr);
+        if (bar != nullptr) {
+            bar->openFind();
+            bar->setPattern(term);
+            bar->setScope(SearchScope::WholeProject);
+            QCoreApplication::processEvents();
+            check(QStringLiteral("standalone.find-handoff-status"),
+                  bar->isVisible() && bar->statusText() == QStringLiteral("Whole project query sent to the Search panel"),
+                  bar->statusText());
+            check(QStringLiteral("standalone.find-handoff-idle"),
+                  panel->scope() == SearchScope::WholeProject && panel->query() == term &&
+                      !panel->isSearching() && submissions == 0 && panel->hits().isEmpty() &&
+                      panel->emptyStateLabel()->text().contains(QStringLiteral("No project root")),
+                  panel->emptyStateLabel()->text());
+            if (!evidenceRoot.isEmpty()) {
+                shell.grab().save(QDir(evidenceRoot).filePath(QStringLiteral("standalone-find-handoff.png")));
+            }
+            bar->closeBar();
+        }
+        panel->setScope(SearchScope::WholeProject);
+        QTest::keyClick(panel->queryEdit(), Qt::Key_Return);
+        check(QStringLiteral("standalone.project-idle"),
+              !panel->isSearching() && submissions == 0 && panel->hits().isEmpty() &&
+                  panel->emptyStateLabel()->text().contains(QStringLiteral("No project root")) &&
+                  !panel->replaceAllRequested());
+        vedit::search::SearchHub::instance().removeProjectSearchHandler(&shell);
+    }
+    {
+        vedit::app::ApplicationShell shell(shellOptions);
+        SearchPanel *panel = openStandalone(shell);
+        if (!panel) {
+            return;
+        }
+        panel->setScope(SearchScope::CurrentFile);
+        panel->setWholeWords(true);
+        auto *menu = panel->findChild<QMenu *>(QStringLiteral("search-query-history-menu"));
+        if (menu) {
+            menu->popup(panel->mapToGlobal(QPoint(0, 0)));
+            for (QAction *action : menu->actions()) {
+                if (action->toolTip() == term) {
+                    action->trigger();
+                    break;
+                }
+            }
+            menu->hide();
+        }
+        QTest::keyClick(panel->queryEdit(), Qt::Key_Return);
+        check(QStringLiteral("standalone.recalled-current-file"),
+              panel->query() == term && panel->wholeWords() && waitForSearch(*panel) &&
+                  panel->hits().size() == 2);
+
+        auto *pane = shell.editorArea()->activePane();
+        pane->newDocument();
+        check(QStringLiteral("standalone.stale-jump-refused"),
+              !panel->activateHit(0) && pane->currentFilePath().isEmpty());
+        QTest::keyClick(panel->queryEdit(), Qt::Key_Return);
+        check(QStringLiteral("standalone.untitled-idle"),
+              !panel->isSearching() && panel->hits().isEmpty() &&
+                  panel->emptyStateLabel()->text().contains(QStringLiteral("No current file")));
+        QString error;
+        check(QStringLiteral("standalone.switch-to-neighbor"), pane->openFile(neighbor, &error),
+              error);
+        QTest::keyClick(panel->queryEdit(), Qt::Key_Return);
+        check(QStringLiteral("standalone.current-path-changed"),
+              waitForSearch(*panel) && panel->hits().size() == 1 &&
+                  panel->hits().front().filePath == neighbor);
+        check(QStringLiteral("standalone.switch-back"), pane->openFile(active, &error), error);
+        QTest::keyClick(panel->queryEdit(), Qt::Key_Return);
+        const bool ready = waitForSearch(*panel) && panel->hits().size() == 2;
+        panel->setReplaceText(QStringLiteral("replacement"));
+        check(QStringLiteral("standalone.replace-one"),
+              ready && panel->replaceCurrentHit() && waitForPanelIdle(*panel) &&
+                  panel->lastReplaceOutcome().ok && panel->lastReplaceOutcome().replacements == 1);
+        panel->setReplaceConfirmHandler([&active](const ReplacePlan &plan, const QStringList &) {
+            return plan.files == QStringList{active} && plan.hitCount == 1;
+        });
+        check(QStringLiteral("standalone.replace-all"),
+              panel->replaceAllRequested() && waitForPanelIdle(*panel) &&
+                  panel->lastReplaceOutcome().ok && panel->lastReplaceOutcome().replacements == 1 &&
+                  readText(active).count(QStringLiteral("replacement")) == 2 &&
+                  readBytes(neighbor) == neighborText);
+        vedit::search::SearchHub::instance().removeProjectSearchHandler(&shell);
+    }
+}
 #else
+void testStandaloneDock(const QString &)
+{
+    skip(QStringLiteral("standalone.dock"), QStringLiteral("no editor kernel or shell in this build"));
+}
+
 void testCurrentFileScopeFollowsActivePane(const QString &)
 {
     skip(QStringLiteral("current-file.active-pane"),
@@ -2924,6 +3111,7 @@ int main(int argc, char **argv)
     testPreviewCapDuplicateRefused();
     testPreviewCapLegitimateReplace();
     testCurrentFileScopeFollowsActivePane(fixture.path());
+    testStandaloneDock(evidenceRoot);
 
     std::printf("SUMMARY checks=%d failures=%d skips=%d\n", g_checks, g_failures, g_skips);
     return g_failures == 0 ? 0 : 1;

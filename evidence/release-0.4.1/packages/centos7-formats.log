@@ -1,0 +1,21 @@
+glibc 2.17
+AppImage runtime version: https://github.com/AppImage/type2-runtime/commit/fedfad5
+AppRun: locale 'C.UTF-8' (ANSI_X3.4-1968) -> 'C.UTF-8' (bundled UTF-8 fallback)
+QThreadStorage: entry 1 destroyed before end of thread 0x55557564ca90
+QThreadStorage: entry 0 destroyed before end of thread 0x55557564ca90
+AppRun: locale 'C.UTF-8' (ANSI_X3.4-1968) -> 'C.UTF-8' (bundled UTF-8 fallback)
+VCS-TOOLCHAIN git=<missing> version=<missing> svn=<missing> version=<missing> source=missing git_source=missing svn_source=missing
+vedit-app: FIM settings store bound: /work/home/.config/VEdit/vedit-app/settings.toml
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+STARTUP-TRACE t_ms=137 wall_ms=1795579165088 launch-ready
+CentOS tar startup exit 0
+AppRun: locale 'C.UTF-8' (ANSI_X3.4-1968) -> 'C.UTF-8' (bundled UTF-8 fallback)
+VCS-TOOLCHAIN git=<missing> version=<missing> svn=<missing> version=<missing> source=missing git_source=missing svn_source=missing
+vedit-app: FIM settings store bound: /work/home/.config/VEdit/vedit-app/settings.toml
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+This plugin does not support propagateSizeHints()
+STARTUP-TRACE t_ms=95 wall_ms=1795579176471 launch-ready
+CentOS .run startup exit 0 and extraction cleaned

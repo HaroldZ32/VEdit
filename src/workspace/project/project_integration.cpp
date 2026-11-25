@@ -5,13 +5,11 @@
 #include "project_filelist.h"
 #include "project_model.h"
 #include "project_panel.h"
-#include "project_subscription.h"
 #include "session_store.h"
 
 #include <QDockWidget>
 #include <QCoreApplication>
 #include <QFileInfo>
-#include <QJsonObject>
 #include <QString>
 #include <QStatusBar>
 #include <QVariantMap>
@@ -56,20 +54,6 @@ QString resolveStateDirectory(const vedit::app::ApplicationShell &shell,
         return QString();
     }
     return QFileInfo(store->path()).absolutePath();
-}
-
-// Fallback for the first start after an upgrade: the shell has persisted the
-// project root in its session for a long time; the lane's own state file only
-// appears once this panel has expanded a project once.
-QString sessionProjectRoot(const vedit::app::ApplicationShell &shell)
-{
-    const auto *store = shell.sessionStore();
-    if (store == nullptr) {
-        return QString();
-    }
-    QString error;
-    const QJsonObject session = store->load(&error);
-    return session.value(QStringLiteral("project")).toString();
 }
 
 } // namespace
@@ -184,11 +168,6 @@ void installProject(vedit::app::ApplicationShell &shell, const IntegrationOption
         dock->setVisible(model->hasProject());
     });
 
-    // The file tree announces the folder the user opened; that folder becomes
-    // the project root. Name-based binding keeps this lane independent
-    // (project_subscription.h).
-    project::subscribeDirectoryOpened(&shell, model);
-
     // FIX 2: ONE lane-agnostic app signal, emitted for every successful document
     // open (File > Open, CLI, Files tree, Ctrl+P, search jump, project-panel
     // double click). This lane decides what a filelist extension means; the app
@@ -243,40 +222,20 @@ void installProject(vedit::app::ApplicationShell &shell, const IntegrationOption
             panel->importFilelists({plan.absolutePath});
         });
 
-    // AC-1.2 (batch 1): a root switched from anywhere else (File -> Open Folder,
-    // the shell API) is the same event. Guarded on the model's current root, so
-    // the file tree's own directoryOpened — which already opened it through the
-    // subscription above — is never expanded twice.
+    // Only the shell selects the workspace. Loading an archive can recover
+    // authored inputs for later use without making its previous root active.
     QObject::connect(&shell, &vedit::app::ApplicationShell::projectRootChanged, &shell,
                      [model](const QString &root) {
-                         if (root.isEmpty() || root == model->projectRoot()) {
-                             return;
+                         if (root != model->projectRoot()) {
+                             model->openRoot(root);
                          }
-                         model->openRoot(root);
                      });
-
-    // Restore before choosing a root: a persisted project is listed immediately,
-    // then the live expansion replaces it.
-    model->restoreFromDisk(nullptr, !options.startWithLiveProjectFiles);
-    // AC-1.1 (batch 1): shell.projectRoot() is the ONE root — the shell resolved
-    // --project else the persisted session archive BEFORE the lanes installed, so
-    // an ordinary start expands the restored project on this very pass. The lane
-    // state and the raw session key stay as fallbacks for a shell that started
-    // without restore.
-    QString root = shell.projectRoot();
-    if (root.isEmpty() && model->hasProject()) {
-        root = model->projectRoot();
+    const QString root = shell.projectRoot();
+    model->restoreFromDisk(nullptr, !root.isEmpty() && !options.startWithLiveProjectFiles,
+                           root);
+    if (!root.isEmpty()) {
+        model->open(root);
     }
-    if (root.isEmpty()) {
-        root = sessionProjectRoot(shell);
-    }
-    if (root.isEmpty()) {
-        // Empty state: the panel stays empty and hidden until a folder is opened
-        // from the file tree.
-        return;
-    }
-    dock->show();
-    model->open(root);
 }
 
 project::ProjectModel *projectModelForShell(const vedit::app::ApplicationShell &shell)

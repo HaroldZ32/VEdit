@@ -47,6 +47,7 @@ struct ModuleInstance {
 struct ModuleDefinition {
     QString name;
     QString file;    ///< file of the module definition
+    QString compilationUnit; ///< owning source when the definition came from an include
     int line = -1;   ///< 0-based definition line
     int column = -1; ///< 0-based definition column
     bool isTop = false; ///< never instantiated anywhere == a design root

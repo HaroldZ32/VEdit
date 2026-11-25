@@ -183,7 +183,8 @@ int runStartupWelcome(const QString &settingsPath)
     const ProductTheme *savedTheme = productThemeById(themeId);
     const ProductTheme &theme = savedTheme == nullptr ? defaultProductTheme() : *savedTheme;
 
-    QWidget welcome(nullptr, Qt::SplashScreen | Qt::WindowDoesNotAcceptFocus);
+    QWidget welcome(nullptr, Qt::SplashScreen | Qt::WindowStaysOnTopHint
+                                 | Qt::WindowDoesNotAcceptFocus);
     welcome.setAttribute(Qt::WA_ShowWithoutActivating);
     welcome.setWindowTitle(QStringLiteral("VEdit"));
     welcome.setPalette(productPalette(theme));
@@ -213,6 +214,13 @@ int runStartupWelcome(const QString &settingsPath)
         return 0;
     }
     welcome.show();
+    if (qEnvironmentVariableIsSet("VEDIT_STARTUP_TRACE")) {
+        std::printf("WELCOME-TRACE window=%llu topmost=%d accepts_focus=%d\n",
+                    static_cast<unsigned long long>(welcome.winId()),
+                    welcome.windowFlags().testFlag(Qt::WindowStaysOnTopHint),
+                    !welcome.windowFlags().testFlag(Qt::WindowDoesNotAcceptFocus));
+        std::fflush(stdout);
+    }
     return app->exec();
 }
 

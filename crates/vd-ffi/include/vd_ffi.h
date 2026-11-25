@@ -2968,6 +2968,27 @@ uint64_t vd_catalog_start(struct VdService *service,
 int32_t vd_catalog_poll(struct VdService *service, uint64_t job, struct VdModuleCatalog *out);
 
 /*
+ Poll a catalog with a parallel list of owning compilation units. An empty
+ list entry means that the corresponding module is declared directly in its source.
+ Release a filled list with `vd_catalog_compilation_units_free`.
+
+ # Safety
+ Same as `vd_catalog_poll`. `units` must be null or writable for one `VdStringList`.
+ */
+int32_t vd_catalog_poll_v2(struct VdService *service,
+                           uint64_t job,
+                           struct VdModuleCatalog *out,
+                           struct VdStringList *units);
+
+/*
+ Free the compilation unit list returned by `vd_catalog_poll_v2`.
+
+ # Safety
+ `units` must be null or point to a list filled by `vd_catalog_poll_v2`.
+ */
+void vd_catalog_compilation_units_free(struct VdStringList *units);
+
+/*
  Cancel a catalog job: the `slang` child is killed and the run stops before the
  streamed parse, instead of finishing into memory nobody reads.
 
@@ -3288,8 +3309,7 @@ void vd_hierarchy_free(struct VdHierarchy *hierarchy);
  [`vd_deeplint::binary::set_imported_environment`], the seam every
  `vd-deeplint` tool child passes (`binary::sanitize_tool_child_env`).
  `project_root` selects the project layer of the selection (null or empty =
- the global layer only). Language server, VCS and terminal children are NOT
- covered (see [`apply_environment_selection`]).
+ the global layer only). See [`apply_environment_selection`] for the consumers.
 
  Synchronous on purpose: it runs once during startup, before the event loop
  exists and before a child can be spawned. It reads ONE small JSON file; a job
@@ -3589,6 +3609,55 @@ int32_t vd_fim_detect(const char *endpoint,
 void vd_fim_detect_free(char *json);
 
 /*
+ Bind the settings store used by subsequent PTY and VCS launches.
+ Null or empty clears the binding and selects Auto.
+
+ # Safety
+ `path` must be null or a readable, NUL-terminated settings file path.
+ */
+void vd_host_use_settings_store(const char *path);
+
+/*
+ Fill a snapshot with installed shell paths in `name`; `value` is null.
+ Release the rows with `vd_env_snapshot_free`.
+
+ # Safety
+ `out` must be null or writable for one unfilled snapshot.
+ */
+void vd_host_shell_choices(struct VdEnvSnapshot *out);
+
+/*
+ Fill the PTY shell path and environment. Returns 1 on success, or 0 with
+ a diagnostic in `shell_out` and the snapshot untouched. A null or empty
+ explicit shell uses the persisted preference. Null or empty cwd uses the
+ current directory. Release the string and snapshot with the usual ABI frees.
+
+ # Safety
+ The two inputs must be null or readable, NUL-terminated paths. Both outputs
+ must be null or writable for one unfilled value, and must not overlap.
+ */
+int32_t vd_host_terminal_plan(const char *explicit_shell,
+                              const char *cwd,
+                              char **shell_out,
+                              struct VdEnvSnapshot *environment_out);
+
+/*
+ Resolve a version probe's host tool, environment and launch argv. Returns
+ 1 for PATH, 2 for the environment fallback, or 0 when the tool is missing.
+ Launch rows carry the shell path then its arguments in `name`. A missing
+ shell leaves the launch rows empty. Release successful outputs with the
+ usual ABI frees.
+
+ # Safety
+ `tool` must be null or a readable NUL-terminated string. Each output must
+ be null or writable for one unfilled value, and must not overlap.
+ */
+int32_t vd_host_vcs_probe(const char *tool,
+                          char **path_out,
+                          struct VdEnvSnapshot *environment_out,
+                          struct VdEnvSnapshot *launch_out);
+
+/*
  Start an LSP configuration job.
 
  `rules_path` may be null. Returns the job id, or `0` when the arguments were
@@ -3662,6 +3731,25 @@ uint64_t vd_lsp_session_start_v2(struct VdService *service,
                                  int32_t backend,
                                  const struct VdStringList *include_dirs,
                                  const struct VdStringList *defines);
+
+/*
+ Start realtime LSP with separate open/compile files and project index files.
+ A null `project_index` preserves the ordinary loose-file server discovery.
+
+ # Safety
+
+ The contract of [`vd_lsp_session_start_v2`] applies to its parameters. A
+ non-null `project_index` must satisfy the same contract as `files`.
+ */
+uint64_t vd_lsp_session_start_v3(struct VdService *service,
+                                 const char *ls_path,
+                                 const char *workspace_root,
+                                 const char *rules_path,
+                                 const struct VdStringList *files,
+                                 int32_t backend,
+                                 const struct VdStringList *include_dirs,
+                                 const struct VdStringList *defines,
+                                 const struct VdStringList *project_index);
 
 /*
  Read the observable state of one session (A3d).
@@ -4287,7 +4375,8 @@ uint64_t vd_search_tree_query_ex(struct VdService *service,
  inside the folder stays searchable) AND every listed file is scanned too,
  including one outside the folder or under a pruned directory name. Each path
  is read once. An empty or null list is the plain walk, so a caller without a
- project file set is unchanged.
+ project file set is unchanged. Pass an empty `root` with a nonempty list
+ of absolute file paths to scan only those files, without a directory walk.
 
  This is how project search covers the project model: a `.f` filelist may
  name sources OUTSIDE the opened folder (`root=filelists/`, members in

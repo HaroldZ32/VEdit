@@ -55,6 +55,7 @@ pub mod deeplint;
 pub mod env;
 pub mod fim;
 pub mod fim_detect;
+pub mod host;
 pub mod lsp;
 pub mod project;
 pub mod rename;

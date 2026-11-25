@@ -1,0 +1,9 @@
+89: TREE imported=1 path=/tmp/vedit-filelist-authority-e2e-UjHPMM/project/included/deep/child.sv excluded=/tmp/vedit-filelist-authority-e2e-UjHPMM/project/rtl/child.sv
+89: LINT pass=0 backend=slang inputs=[/tmp/vedit-filelist-authority-e2e-UjHPMM/project/included/deep/child.sv,/tmp/vedit-filelist-authority-e2e-UjHPMM/project/rtl/top.sv] rows=['signal.svh': No such file or directory|implicit net 'observed' created|use of undeclared identifier 'local_signal'|input port 'correct' has no connection|port 'intentional_missing' does not exist in 'child'|implicit net 'observed' is unused elsewhere]
+89: CTRL pass=1 canonical=/tmp/vedit-filelist-authority-e2e-UjHPMM/project/included/deep/child.sv
+89: CTRL expected=/tmp/vedit-filelist-authority-e2e-UjHPMM/shared/signal.svh canonical=/tmp/vedit-filelist-authority-e2e-UjHPMM/project/rtl/top.sv
+1/2 Test #89: vedit-filelist-authority-config-e2e ....***Failed   11.36 sec
+90: TREE imported=0 path=/tmp/vedit-filelist-authority-e2e-Avsniv/project/include/child.svh excluded=/tmp/vedit-filelist-authority-e2e-Avsniv/project/rtl/child.sv
+90: FAIL: open fixture:
+2/2 Test #90: vedit-filelist-authority-include-e2e ...***Failed    8.12 sec
+0% tests passed, 2 tests failed out of 2

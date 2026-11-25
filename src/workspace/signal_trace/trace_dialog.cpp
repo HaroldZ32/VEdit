@@ -46,27 +46,40 @@ QString connectionText(const QString &detail)
     return source != nullptr ? QCoreApplication::translate("SignalTrace", source) : detail;
 }
 
-QTreeWidgetItem *addRow(QTreeWidgetItem *parent, const QJsonObject &node, bool descend)
+QTreeWidgetItem *addRow(QTreeWidgetItem *parent, const QJsonObject &node, bool full, bool root)
 {
     auto *row = new QTreeWidgetItem(parent);
     const auto source = node.value(QStringLiteral("location")).toObject();
     const Location location = locationOf(source);
-    row->setText(0, node.value(QStringLiteral("path")).toString());
     QString detail = connectionText(node.value(QStringLiteral("detail")).toString());
     if (node.value(QStringLiteral("cycle")).toBool()) {
         detail += QCoreApplication::translate("VEdit", " · Cycle");
     }
-    row->setText(1, detail);
+    if (full && !root) {
+        const auto from = node.value(QStringLiteral("from"));
+        const auto to = node.value(QStringLiteral("to"));
+        row->setText(0, from.toString(QCoreApplication::translate("SignalTrace", "No upstream signal identified")));
+        row->setText(1, to.toString(QCoreApplication::translate("SignalTrace", "No downstream signal identified")));
+        row->setToolTip(1, row->text(1));
+    } else {
+        row->setText(0, node.value(QStringLiteral("path")).toString());
+        if (full) {
+            detail = QCoreApplication::translate("VEdit", "Signal instance");
+        }
+    }
+    row->setToolTip(0, row->text(0));
+    const int detailColumn = full ? 2 : 1;
+    row->setText(detailColumn, detail);
+    row->setToolTip(detailColumn, detail);
     if (!location.file.isEmpty()) {
-        row->setText(2, QStringLiteral("%1:%2:%3").arg(QFileInfo(location.file).fileName())
-                        .arg(location.line + 1).arg(location.column + 1));
-        row->setToolTip(2, location.file);
+        const int locationColumn = detailColumn + 1;
+        row->setText(locationColumn, QStringLiteral("%1:%2:%3").arg(QFileInfo(location.file).fileName())
+                                     .arg(location.line + 1).arg(location.column + 1));
+        row->setToolTip(locationColumn, location.file);
         row->setData(0, kLocationRole, source.toVariantMap());
     }
-    if (descend) {
-        for (const auto &child : node.value(QStringLiteral("children")).toArray()) {
-            addRow(row, child.toObject(), true);
-        }
+    for (const auto &child : node.value(QStringLiteral("children")).toArray()) {
+        addRow(row, child.toObject(), full, false);
     }
     return row;
 }
@@ -91,13 +104,14 @@ void jumpTo(QWidget *host, const Location &location)
     }
 }
 
-QDialog *showResults(QWidget *host, const QString &title, const QJsonObject &answer, bool full)
+QDialog *showResults(QWidget *host, const QString &title, const QJsonObject &answer, bool full,
+                     const QByteArray &headerState)
 {
     auto *dialog = new QDialog(host);
     dialog->setObjectName(QStringLiteral("signal-trace-results"));
     dialog->setWindowTitle(title);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
-    dialog->resize(760, 440);
+    dialog->resize(full ? 880 : 760, 440);
     auto *layout = new QVBoxLayout(dialog);
     const QString warning = answer.value(QStringLiteral("warning")).toString();
     if (!warning.isEmpty() || answer.value(QStringLiteral("truncated")).toBool()) {
@@ -109,23 +123,36 @@ QDialog *showResults(QWidget *host, const QString &title, const QJsonObject &ans
         layout->addWidget(notice);
     }
     auto *tree = new QTreeWidget(dialog);
-    tree->setHeaderLabels({QCoreApplication::translate("VEdit", "Signal instance"),
-                           QCoreApplication::translate("VEdit", "Connection"),
-                           QCoreApplication::translate("VEdit", "Source")});
-    tree->header()->setStyleSheet(QStringLiteral("QHeaderView::section { color: palette(text); }"));
-    tree->header()->setSectionResizeMode(0, QHeaderView::Stretch);
-    tree->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    const QString connection = QCoreApplication::translate("VEdit", "Connection");
+    if (full) {
+        tree->setHeaderLabels({QCoreApplication::translate("SignalTrace", "From signal"),
+                               QCoreApplication::translate("SignalTrace", "To signal"), connection,
+                               QCoreApplication::translate("SignalTrace", "Source location")});
+        tree->setTreePosition(2);
+        tree->setIndentation(12);
+    } else {
+        tree->setHeaderLabels({QCoreApplication::translate("VEdit", "Signal instance"), connection,
+                               QCoreApplication::translate("VEdit", "Source")});
+    }
+    auto *header = tree->header();
+    header->setStyleSheet(QStringLiteral("QHeaderView::section { color: palette(text); }"));
+    header->setStretchLastSection(false);
+    header->setSectionResizeMode(QHeaderView::Interactive);
+    tree->setColumnWidth(0, full ? 270 : 330);
+    tree->setColumnWidth(1, full ? 235 : 200);
+    tree->setColumnWidth(2, 170);
+    if (full) {
+        tree->setColumnWidth(3, 160);
+    }
+    if (!headerState.isEmpty()) {
+        header->restoreState(headerState);
+    }
     tree->setUniformRowHeights(true);
+    tree->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
     layout->addWidget(tree);
     QTreeWidgetItem *first = nullptr;
     for (const auto &match : answer.value(QStringLiteral("roots")).toArray()) {
-        const auto root = match.toObject();
-        auto *group = addRow(tree->invisibleRootItem(), root, full);
-        if (!full) {
-            for (const auto &child : root.value(QStringLiteral("children")).toArray()) {
-                addRow(group, child.toObject(), false);
-            }
-        }
+        auto *group = addRow(tree->invisibleRootItem(), match.toObject(), full, true);
         if (first == nullptr && group->childCount() > 0) {
             first = group->child(0);
         }

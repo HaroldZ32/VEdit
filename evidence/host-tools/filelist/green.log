@@ -1,0 +1,24 @@
+1/8 Test #60: vedit-module-tree-selftest .............   Passed    0.55 sec
+2/8 Test #61: vedit-module-tree-catalog-test .........   Passed    3.83 sec
+3/8 Test #62: vedit-module-tree-lane-b-test ..........   Passed    4.97 sec
+4/8 Test #65: vedit-workspace-diagnostics-selftest ...   Passed    4.48 sec
+5/8 Test #76: vedit-realtime-depth-switch-e2e ........   Passed    6.87 sec
+6/8 Test #79: vedit-split-pane-mouse-e2e .............   Passed    4.14 sec
+7/8 Test #86: vedit-module-closure-e2e ...............   Passed   11.47 sec
+87: TREE imported=1 path=/tmp/vedit-filelist-authority-e2e-whMcHX/project/included/deep/child.sv excluded=/tmp/vedit-filelist-authority-e2e-whMcHX/project/rtl/child.sv
+87: LINT pass=1 backend=slang inputs=[/tmp/vedit-filelist-authority-e2e-whMcHX/project/included/deep/child.sv,/tmp/vedit-filelist-authority-e2e-whMcHX/project/rtl/top.sv] rows=[input port 'correct' has no connection|port 'intentional_missing' does not exist in 'child']
+87: ACTION action=definition dispatched=1 via='diagnostics.definition'
+87: DEFINITION backend=slang file='/tmp/vedit-filelist-authority-e2e-whMcHX/project/included/deep/child.sv' line=1 column=8
+87: CTRL pass=1 canonical=/tmp/vedit-filelist-authority-e2e-whMcHX/project/included/deep/child.sv
+87: ACTION action=definition dispatched=1 via='diagnostics.definition'
+87: DEFINITION backend=slang file='/tmp/vedit-filelist-authority-e2e-whMcHX/project/include/signal.svh' line=1 column=7
+87: CTRL expected=/tmp/vedit-filelist-authority-e2e-whMcHX/project/include/signal.svh canonical=/tmp/vedit-filelist-authority-e2e-whMcHX/project/include/signal.svh
+87: REFRESH ready=1 inputs=[/tmp/vedit-filelist-authority-e2e-whMcHX/project/lib/child.sv,/tmp/vedit-filelist-authority-e2e-whMcHX/project/rtl/top.sv]
+87: ACTION action=definition dispatched=1 via='diagnostics.definition'
+87: DEFINITION backend=slang file='/tmp/vedit-filelist-authority-e2e-whMcHX/project/lib/child.sv' line=1 column=8
+87: CTRL expected=/tmp/vedit-filelist-authority-e2e-whMcHX/project/lib/child.sv canonical=/tmp/vedit-filelist-authority-e2e-whMcHX/project/lib/child.sv
+87: DEFINITION backend=slang file='/tmp/vedit-filelist-authority-e2e-whMcHX/loose/child.sv' line=1 column=8
+87: LOOSE pass=1 canonical=/tmp/vedit-filelist-authority-e2e-whMcHX/loose/child.sv
+8/8 Test #87: vedit-filelist-authority-e2e ...........   Passed    4.70 sec
+The following tests passed:
+100% tests passed, 0 tests failed out of 8

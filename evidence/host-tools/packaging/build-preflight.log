@@ -1,0 +1,29 @@
+$ VEDIT_SKIP_IMAGE_BUILD=1 bash scripts/build-qt.sh --no-test (before slang was staged)
+test deeplint::tests::a_missing_slang_binary_fails_the_elaboration_with_its_tool_name ... FAILED
+assertion `left == right` failed
+  left: 2
+test result: FAILED. 86 passed; 1 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.52s
+exit=101
+
+$ sha256sum build/slang/out/slang
+63cb60a05f6ca57f648b8e2ef6de61ee0a3132c1c9d481f831dba52388832252  build/slang/out/slang
+
+$ sh packaging/runtime/probe-apprun-env.sh
+CHECK PASS  apprun.syntax
+CHECK PASS  default.slang-bundled
+CHECK PASS  default.verible-bundled
+CHECK PASS  override.slang-preserved
+CHECK PASS  override.verible-preserved
+CHECK PASS  absent.slang-not-exported
+CHECK PASS  absent.verible-not-exported
+CHECK PASS  absent.slang-caller-preserved
+CHECK PASS  non-executable.slang-not-exported
+CHECK PASS  host-path.preserved-before-appdir-path
+CHECK PASS  host-path.empty-preserved
+CHECK PASS  host-path.unset-preserved
+APPRUN-ENV-PROBE ok=1 checks=12 failures=0
+exit=0
+
+$ bash build/gates/docs.sh
+[docs] PASS: README.md docs/BUILD.md docs/USER_GUIDE.md THIRD_PARTY_NOTICES.md
+exit=0

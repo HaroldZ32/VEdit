@@ -157,7 +157,7 @@ int main(int argc, char **argv)
     // The commands that used to ship with NO default now carry one.
     for (const QString &id : {QStringLiteral("edit.undo"), QStringLiteral("edit.redo"),
                               QStringLiteral("file.new"), QStringLiteral("file.save-all"),
-                              QStringLiteral("search.focus"), QStringLiteral("view.toolbar")}) {
+                              QStringLiteral("search.focus"), QStringLiteral("file.open-folder")}) {
         check(QStringLiteral("defaults.%1-has-binding").arg(id),
               !commands->defaultShortcut(id).isEmpty(),
               commands->defaultShortcut(id).toString());
@@ -181,10 +181,6 @@ int main(int argc, char **argv)
                       .arg(sequence.toString(QKeySequence::PortableText), owner));
         }
     }
-    check(QStringLiteral("de.toolbar-moved-off-ctrl-alt-t"),
-          commands->effectiveShortcut(QStringLiteral("view.toolbar"))
-              == QKeySequence(QStringLiteral("Ctrl+Shift+Alt+T")),
-          commands->effectiveShortcut(QStringLiteral("view.toolbar")).toString());
     // RM-5c (review M2): Ctrl+Y is a real extra default on redo.
     check(QStringLiteral("de.redo-has-ctrl-y-extra"),
           commands->effectiveShortcuts(QStringLiteral("edit.redo"))
@@ -311,7 +307,7 @@ int main(int argc, char **argv)
     // dialog is on top (a modal dialog owns the keyboard), so the dialog is
     // accepted first and the key is then sent to the shell window.
     {
-        const QString dialogCommand = QStringLiteral("view.toolbar");
+        const QString dialogCommand = QStringLiteral("view.panel.file-tree");
         const QKeySequence dialogBinding(QStringLiteral("Ctrl+Alt+Shift+D"));
         vedit::workspace::settings::SettingsDialog dialog(
             shell.themes(), commands, dir.path() + QStringLiteral("/settings.toml"));

@@ -17,16 +17,11 @@ QMainWindow {
     color: @text@;
 }
 
-/* dock 之间的分隔条：QMainWindow::separator 是 dock 布局自己的分隔条，
- * 不需要在控件树里加任何包裹（接线车道实测包裹 QFrame 会打红 4 条既有断言）。
- * batch-20261115 AC-7.4：静止用 @border@，不再用 @canvas@——与画布同色时整条
- * 分隔条在静止状态完全不可见（用户找不到左右分栏的拖拽点）；hover 升到
- * @borderStrong@，给「这里可以拖」的反馈。宽度仍取 @gap@（8px，≥6px 的验收下限），
- * 高度 16px 是 ui_theme_selftest 冻结的设计常量。 */
+/* 停靠面板的原生拖拽区。静止时融入画布，悬停时显示边线。 */
 QMainWindow::separator {
-    background: @border@;
-    width: @gap@;
-    height: 16px;
+    background: @canvas@;
+    width: 5px;
+    height: 5px;
 }
 
 /* 拖动分隔条时不出现刺眼高亮：只比静止深一档，鼠标指针本身还会变成分隔形状。 */
@@ -48,7 +43,7 @@ QDialog {
  * 4 条既有断言（shell 的 panel-seam、ux 的 terminal-panel、terminal 的
  * dock.content、filetree 的占位面板替换逻辑），而「不许改测试来迁就实现」是
  * 硬约束。所以卡片外观只能由 QSS 画在 QDockWidget 自身上：底色 + 1px 描边 +
- * 12px 圆角，dock 之间的 8px 间隙由 QMainWindow::separator 提供。
+ * 12px 圆角，dock 之间的间隙由 QMainWindow::separator 提供。
  */
 
 /* 实测（Qt 6.10.2 / Fusion / offscreen，探针记录见
@@ -701,10 +696,9 @@ QToolTip {
     padding: 4px 8px;
 }
 
-/* 编辑器分屏 / VCS 面板的 QSplitter handle 用同一套可见样式（AC-7.5）：静止
- * @border@、hover @borderStrong@，与上面的 QMainWindow::separator 一致。 */
+/* 编辑器分屏和面板内分隔条保留原生拖拽与悬停反馈。 */
 QSplitter::handle {
-    background: @border@;
+    background: @canvas@;
 }
 
 QSplitter::handle:hover {

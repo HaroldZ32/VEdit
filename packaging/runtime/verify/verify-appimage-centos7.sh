@@ -2,7 +2,7 @@
 # verify-appimage-centos7.sh — one-file, no-network, no-install acceptance check
 # for the VEdit AppImage on a real CentOS 7 machine (kernel 3.10 / glibc 2.17).
 #
-#   scp VEdit-0.4.0-x86_64.AppImage verify-appimage-centos7.sh  <user>@<vm>:~/
+#   scp VEdit-<version>-x86_64.AppImage verify-appimage-centos7.sh  <user>@<vm>:~/
 #   bash verify-appimage-centos7.sh
 #
 # What it does (every item is evidence, not "looks right"):
@@ -12,7 +12,7 @@
 #   4  run.selfcheck             ./AppImage --selfcheck, FUSE first, extract-and-run fallback
 #   5  selfcheck.app-shell       APP-SHELL-SELFTEST ok=1 + checks/failures
 #   5  selfcheck.own-xml         own-xml=[vedit-verilog.xml, vedit-systemverilog.xml] verilog=1
-#   5  selfcheck.fold-975        fold.wiring.closed.hidden-975 PASS
+#   5  selfcheck.native-folding  native folding view and no automatic folds on open
 #   6  selfcheck.toolchain       TOOLCHAIN source=verible:bundled slang:bundled missing=[]
 #   6  loader.packaged           /proc/<pid>/maps contains <extract>/ld-linux-x86-64.so.2
 #   6  loader.no-system-loader   ... and NOT /lib64/ld-linux-x86-64.so.2
@@ -39,7 +39,7 @@ mkdir -p "$TMP" "$TMP/home" 2>/dev/null || true
 cleanup() { [ "${VEDIT_KEEP_TMP:-0}" = "1" ] || rm -rf "$TMP"; }
 trap cleanup EXIT
 
-# The release build writes out/SHA256SUMS; that row is the default pin. Set
+# The release build writes out/release/SHA256SUMS; that row is the default pin. Set
 # VEDIT_EXPECTED_SHA256 / VEDIT_EXPECTED_SIZE only when checking against a value
 # recorded elsewhere (a release note, a CI artefact). No stale hash lives here.
 EXPECTED_SHA256="${VEDIT_EXPECTED_SHA256:-}"
@@ -82,16 +82,22 @@ record ""
 # 0. locate the AppImage (script dir; an explicit first argument wins)
 # ---------------------------------------------------------------------------
 APPIMAGE=""
-if [ $# -gt 0 ] && [ -f "$1" ]; then
+if [ $# -gt 0 ]; then
     APPIMAGE="$1"
 else
-    for cand in "$SCRIPT_DIR/VEdit-0.4.0-x86_64.AppImage" "$SCRIPT_DIR"/VEdit-*x86_64.AppImage; do
-        [ -f "$cand" ] && { APPIMAGE="$cand"; break; }
+    for cand in "$SCRIPT_DIR"/VEdit-*-x86_64.AppImage; do
+        [ -f "$cand" ] || continue
+        if [ -n "$APPIMAGE" ]; then
+            result FAIL appimage.found expected="one AppImage next to this script" \
+                actual="multiple AppImages in $SCRIPT_DIR" note="pass the AppImage path explicitly"
+            exit 1
+        fi
+        APPIMAGE="$cand"
     done
 fi
-if [ -z "$APPIMAGE" ]; then
-    result FAIL appimage.found expected="VEdit-0.4.0-x86_64.AppImage next to this script" \
-        actual="not found in $SCRIPT_DIR" note="copy the AppImage and this script into the same directory"
+if [ ! -f "$APPIMAGE" ]; then
+    result FAIL appimage.found expected="an explicit AppImage path or one VEdit-*-x86_64.AppImage next to this script" \
+        actual="${APPIMAGE:-none in $SCRIPT_DIR}" note="pass the AppImage path or copy it next to this script"
     record ""
     record "SUMMARY: PASS=$PASS FAIL=$FAIL SKIP=$SKIP"
     record "Report: $REPORT"
@@ -139,9 +145,13 @@ if have sha256sum; then
     ACTUAL_SIZE=$(wc -c <"$APPIMAGE" 2>/dev/null | tr -d ' ')
     SUMS="$(dirname -- "$APPIMAGE")/SHA256SUMS"
     PIN_SOURCE="env VEDIT_EXPECTED_SHA256"
-    if [ -z "$EXPECTED_SHA256" ] && [ -f "$SUMS" ]; then
-        EXPECTED_SHA256=$(grep -F "$(basename -- "$APPIMAGE")" "$SUMS" 2>/dev/null | head -1 | awk '{print $1}')
-        [ -n "$EXPECTED_SHA256" ] && PIN_SOURCE="SHA256SUMS"
+    ROW=""
+    if [ -f "$SUMS" ]; then
+        ROW=$(awk -v name="$(basename -- "$APPIMAGE")" '$2 == name { row=$0; n++ } END { if (n == 1) print row }' "$SUMS")
+        if [ -z "$EXPECTED_SHA256" ] && [ -n "$ROW" ]; then
+            EXPECTED_SHA256=${ROW%% *}
+            PIN_SOURCE="SHA256SUMS"
+        fi
     fi
     if [ -z "$EXPECTED_SHA256" ]; then
         result SKIP appimage.sha256 expected="pinned sha256 (SHA256SUMS row or VEDIT_EXPECTED_SHA256)" \
@@ -159,13 +169,12 @@ if have sha256sum; then
             note="size differs from VEDIT_EXPECTED_SIZE"
     fi
     if [ -f "$SUMS" ]; then
-        ROW=$(grep -F "$(basename -- "$APPIMAGE")" "$SUMS" 2>/dev/null | head -1)
-        if [ -n "$ROW" ] && printf '%s' "$ROW" | grep -q "$ACTUAL_SHA"; then
+        if [ -n "$ROW" ] && [ "${ROW%% *}" = "$ACTUAL_SHA" ]; then
             result PASS appimage.sha256sums expected="SHA256SUMS row matches" actual="$(sanitize "$ROW")" note="cross-check passed"
         elif [ -n "$ROW" ]; then
             result FAIL appimage.sha256sums expected="SHA256SUMS row matches" actual="$(sanitize "$ROW")" note="local SHA256SUMS disagrees"
         else
-            result SKIP appimage.sha256sums expected="row for $(basename -- "$APPIMAGE")" actual="none" note="SHA256SUMS present but has no row for this file"
+            result FAIL appimage.sha256sums expected="one row for $(basename -- "$APPIMAGE")" actual="missing or duplicated"
         fi
     else
         result SKIP appimage.sha256sums expected="optional SHA256SUMS next to the AppImage" actual="absent" \
@@ -267,11 +276,13 @@ if [ -s "$SELFCHECK_OUT" ]; then
             actual="$(sanitize "$SYNTAX_LINE")" note="own syntax definitions are not the visible set"
     fi
 
-    FOLD_LINE=$(grep -m1 'fold.wiring.closed.hidden-975' "$SELFCHECK_OUT")
-    case "$FOLD_LINE" in
-        *PASS*) result PASS selfcheck.fold-975 expected="fold.wiring.closed.hidden-975 PASS" actual="$(sanitize "$FOLD_LINE")" note="the packaged XML really folds a 1k-line .sv" ;;
-        *)      result FAIL selfcheck.fold-975 expected="fold.wiring.closed.hidden-975 PASS" actual="$(sanitize "$FOLD_LINE")" note="folding did not reach 975 hidden lines" ;;
-    esac
+    FOLD_LINES=$(grep -E 'CHECK fold\.native\.(view|no-auto-folds)' "$SELFCHECK_OUT")
+    if grep -q 'CHECK fold.native.view PASS' "$SELFCHECK_OUT" \
+       && grep -q 'CHECK fold.native.no-auto-folds PASS hidden=0' "$SELFCHECK_OUT"; then
+        result PASS selfcheck.native-folding expected="native folding available and no automatic folds" actual="$(sanitize "$FOLD_LINES")"
+    else
+        result FAIL selfcheck.native-folding expected="native folding available and no automatic folds" actual="$(sanitize "$FOLD_LINES")"
+    fi
 
     TOOL_LINE=$(grep -m1 'TOOLCHAIN source=' "$SELFCHECK_OUT")
     if printf '%s' "$TOOL_LINE" | grep -q 'source=verible:bundled slang:bundled missing=\[\]'; then
@@ -284,7 +295,7 @@ if [ -s "$SELFCHECK_OUT" ]; then
 else
     result SKIP selfcheck.app-shell expected="selfcheck output" actual="none" note="no selfcheck run succeeded; see run.selfcheck"
     result SKIP selfcheck.own-xml expected="selfcheck output" actual="none" note="no selfcheck run succeeded"
-    result SKIP selfcheck.fold-975 expected="selfcheck output" actual="none" note="no selfcheck run succeeded"
+    result SKIP selfcheck.native-folding expected="selfcheck output" actual="none" note="no selfcheck run succeeded"
     result SKIP selfcheck.toolchain expected="selfcheck output" actual="none" note="no selfcheck run succeeded"
 fi
 

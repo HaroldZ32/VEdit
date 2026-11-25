@@ -1,0 +1,20 @@
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.03s
+uid=99(nobody) gid=99(nobody) groups=99(nobody)
+path=/tmp/tmp.rLinH5cqhb/first/git mode=744 uid=0 gid=0
+path=/tmp/tmp.rLinH5cqhb/second/git mode=755 uid=0 gid=0
+resolved=/tmp/tmp.rLinH5cqhb/second/git
+user::rwx
+user:nobody:r--
+group::r-x
+mask::r-x
+other::r-x
+
+user::rw-
+user:nobody:r-x
+group::r--
+mask::r-x
+other::r--
+
+resolved=/tmp/tmp.rLinH5cqhb/second/git
+path=/tmp/tmp.rLinH5cqhb/first/git mode=750 uid=0 gid=99
+resolved=/tmp/tmp.rLinH5cqhb/first/git

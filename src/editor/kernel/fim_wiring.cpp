@@ -6,14 +6,14 @@
 
 #include <KTextEditor/Cursor>
 #include <KTextEditor/Document>
+#include <KTextEditor/Message>
 #include <KTextEditor/View>
 
 #include <QEvent>
+#include <QFontDatabase>
+#include <QKeyEvent>
 #include <QLabel>
-#include <QShortcut>
 #include <QTimer>
-
-#include <utility>
 
 namespace vedit::editor {
 
@@ -23,11 +23,40 @@ namespace {
 // accept. A multi-line suggestion keeps its line break in the document.
 QString ghostPreview(const QString &suggestion)
 {
-    int newline = suggestion.indexOf(QLatin1Char('\n'));
-    if (newline < 0) {
-        return suggestion.left(120);
+    const qsizetype newline = suggestion.indexOf(QLatin1Char('\n'));
+    const QString firstLine = newline < 0 ? suggestion : suggestion.left(newline);
+    const QString preview = firstLine.size() > 120 ? firstLine.left(120) + QChar(0x2026) : firstLine;
+    return newline < 0 ? preview : preview + QStringLiteral(" \u21b5");
+}
+
+// The Rust C ABI reports these short, sanitized reasons in Chinese.
+QString localizedStatus(const QString &message)
+{
+    static constexpr struct {
+        const char *reason;
+        const char *source;
+    } reasons[] = {
+        {"FIM 未启用", QT_TRANSLATE_NOOP("VEdit", "FIM disabled (off by default)")},
+        {"FIM 未配置端点", QT_TRANSLATE_NOOP("VEdit", "FIM endpoint is missing")},
+        {"FIM 未配置模型", QT_TRANSLATE_NOOP("VEdit", "FIM model is missing")},
+        {"FIM 端点无效", QT_TRANSLATE_NOOP("VEdit", "FIM endpoint is invalid")},
+        {"FIM 响应过大", QT_TRANSLATE_NOOP("VEdit", "FIM response is too large")},
+        {"FIM 响应格式错误", QT_TRANSLATE_NOOP("VEdit", "FIM response format is invalid")},
+        {"FIM 连接被拒绝", QT_TRANSLATE_NOOP("VEdit", "FIM connection refused")},
+        {"FIM 域名解析失败", QT_TRANSLATE_NOOP("VEdit", "FIM host could not be resolved")},
+        {"FIM TLS 失败", QT_TRANSLATE_NOOP("VEdit", "FIM TLS failure")},
+        {"FIM 网络错误", QT_TRANSLATE_NOOP("VEdit", "FIM network error")},
+        {"FIM 传输失败", QT_TRANSLATE_NOOP("VEdit", "FIM transport error")},
+    };
+    for (const auto &reason : reasons) {
+        if (message == QString::fromUtf8(reason.reason)) {
+            return QCoreApplication::translate("VEdit", reason.source);
+        }
     }
-    return suggestion.left(newline) + QStringLiteral(" \u21b5");
+    if (message.startsWith(QStringLiteral("FIM 超时（"))) {
+        return QCoreApplication::translate("VEdit", "FIM request timed out");
+    }
+    return message;
 }
 
 } // namespace
@@ -46,23 +75,18 @@ FimBinding::FimBinding(KTextEditor::View *view, QObject *parent)
     ghost_->setAttribute(Qt::WA_TransparentForMouseEvents);
     ghost_->setFocusPolicy(Qt::NoFocus);
     ghost_->setTextInteractionFlags(Qt::NoTextInteraction);
-    ghost_->setStyleSheet(QStringLiteral(
-        "color: gray; background-color: rgba(160, 160, 160, 40); border-radius: 2px;"
-        " padding: 0px 2px;"));
-    QFont ghostFont = view_->font();
-    ghostFont.setItalic(true);
-    ghost_->setFont(ghostFont);
+    ghost_->setTextFormat(Qt::PlainText);
+    ghost_->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+    ghost_->setMargin(2);
     ghost_->hide();
-    ghost_->setToolTip(QCoreApplication::translate("VEdit", 
-        "FIM ghost text: previews the first line only; Tab inserts the full suggestion."));
 
     pollTimer_ = new QTimer(this);
     pollTimer_->setInterval(15);
     connect(pollTimer_, &QTimer::timeout, this, [this]() { pollJob(); });
 
-    trigger_ = new QShortcut(QKeySequence(Qt::ALT | Qt::Key_Backslash), view_);
-    trigger_->setContext(Qt::WidgetWithChildrenShortcut);
-    connect(trigger_, &QShortcut::activated, this, [this]() { requestCompletion(); });
+    if (QWidget *editor = view_->focusProxy()) {
+        editor->installEventFilter(this);
+    }
 
     if (KTextEditor::Document *document = view_->document(); document != nullptr) {
         connect(document, &KTextEditor::Document::textChanged, this,
@@ -70,6 +94,11 @@ FimBinding::FimBinding(KTextEditor::View *view, QObject *parent)
     }
     connect(view_, &KTextEditor::View::cursorPositionChanged, this,
             [this](KTextEditor::View *, KTextEditor::Cursor) { onCursorMoved(); });
+    connect(view_, &KTextEditor::View::selectionChanged, this, &FimBinding::onCursorMoved);
+    connect(view_, &KTextEditor::View::verticalScrollPositionChanged, this,
+            &FimBinding::onCursorMoved);
+    connect(view_, &KTextEditor::View::horizontalScrollPositionChanged, this,
+            &FimBinding::onCursorMoved);
     view_->installEventFilter(this);
 }
 
@@ -82,7 +111,6 @@ FimBinding::~FimBinding()
         completion_->cancelRequest(activeJob_);
         activeJob_ = 0;
     }
-    removeAcceptShortcuts();
     if (view_ != nullptr) {
         view_->removeEventFilter(this);
     }
@@ -103,7 +131,12 @@ bool FimBinding::requestCompletion()
         return false;
     }
     KTextEditor::Document *document = view_->document();
-    if (document == nullptr) {
+    if (document == nullptr || !document->isReadWrite()) {
+        publishStatus(QCoreApplication::translate("VEdit", "FIM needs an editable document"));
+        return false;
+    }
+    if (view_->selection() || view_->cursorPositions().size() > 1) {
+        publishStatus(QCoreApplication::translate("VEdit", "FIM needs a single caret without a selection"));
         return false;
     }
     const KTextEditor::Cursor cursor = view_->cursorPosition();
@@ -115,12 +148,12 @@ bool FimBinding::requestCompletion()
     timeoutStatus_.clear();
     const quint64 job = completion_->requestJob(document->text(), cursor.line(), cursor.column());
     if (job == 0) {
-        hideGhost();
-        removeAcceptShortcuts();
+        publishStatus(statusText());
         emit suggestionChanged(false);
         return false;
     }
     activeJob_ = job;
+    publishStatus(statusText(), 0);
     jobTimer_.start();
     // The QTimer is what makes the request asynchronous: start it BEFORE the
     // first poll so a pending job keeps being polled without any blocking wait.
@@ -131,29 +164,14 @@ bool FimBinding::requestCompletion()
 
 bool FimBinding::acceptSuggestion()
 {
-    if (view_ == nullptr || completion_ == nullptr || !completion_->hasSuggestion()) {
+    if (!ghostVisible() || !hasSuggestion()) {
         return false;
     }
-    if (activeJob_ != 0) {
-        completion_->cancelRequest(activeJob_);
-        activeJob_ = 0;
-        pollTimer_->stop();
-    }
-    QString text = completion_->accept();
-    removeAcceptShortcuts();
+    const QString text = completion_->accept();
+    clearStatus();
     hideGhost();
     emit suggestionChanged(false);
-    if (text.isEmpty()) {
-        return false;
-    }
-    KTextEditor::Document *document = view_->document();
-    if (document == nullptr) {
-        return false;
-    }
-    // The document is edited HERE and only here: the ghost was pure overlay, so
-    // nothing was written before the user pressed Tab.
-    document->insertText(view_->cursorPosition(), text);
-    return true;
+    return view_->document()->insertText(view_->cursorPosition(), text);
 }
 
 void FimBinding::cancelSuggestion()
@@ -168,7 +186,7 @@ void FimBinding::cancelSuggestion()
     if (pollTimer_ != nullptr) {
         pollTimer_->stop();
     }
-    removeAcceptShortcuts();
+    clearStatus();
     hideGhost();
 }
 
@@ -218,36 +236,14 @@ QString FimBinding::ghostText() const
     return ghost_ != nullptr ? ghost_->text() : QString();
 }
 
-bool FimBinding::acceptShortcutActive() const
+QKeySequence FimBinding::triggerKey()
 {
-    return accept_ != nullptr;
-}
-
-bool FimBinding::cancelShortcutActive() const
-{
-    return cancel_ != nullptr;
+    return QKeySequence(Qt::AltModifier | Qt::Key_Backslash);
 }
 
 void FimBinding::onDocumentEdited()
 {
-    if (completion_ == nullptr) {
-        return;
-    }
-    const bool hadJob = activeJob_ != 0;
-    if (hadJob) {
-        completion_->cancelRequest(activeJob_);
-        activeJob_ = 0;
-        pollTimer_->stop();
-    }
-    if (!completion_->hasSuggestion() && !hadJob) {
-        return;
-    }
-    // T27's invalidation: typing makes the pending suggestion (and an in-flight
-    // request) stale.
-    completion_->onTextEdited();
-    removeAcceptShortcuts();
-    hideGhost();
-    emit suggestionChanged(false);
+    onCursorMoved();
 }
 
 void FimBinding::onCursorMoved()
@@ -277,24 +273,27 @@ void FimBinding::pollJob()
             completion_->cancelRequest(activeJob_);
             activeJob_ = 0;
             pollTimer_->stop();
-            hideGhost();
-            removeAcceptShortcuts();
             timeoutStatus_ = QCoreApplication::translate("VEdit", "FIM timed out (%1 ms without a result; cancelled)").arg(pollBudgetMs_);
+            publishStatus(timeoutStatus_);
             emit suggestionChanged(false);
         }
         return;
     }
     activeJob_ = 0;
     pollTimer_->stop();
-    if (completion_->hasSuggestion()) {
+    if (hasSuggestion()) {
         showGhost();
-        installAcceptShortcuts();
-        emit suggestionChanged(true);
+        if (ghostVisible()) {
+            publishStatus(QCoreApplication::translate("VEdit", "FIM suggestion ready. Tab inserts it. Esc dismisses it."), 0);
+            emit suggestionChanged(true);
+            return;
+        }
+        cancelSuggestion();
+        publishStatus(QCoreApplication::translate("VEdit", "FIM suggestion could not be shown at this caret"));
     } else {
-        hideGhost();
-        removeAcceptShortcuts();
-        emit suggestionChanged(false);
+        publishStatus(statusText());
     }
+    emit suggestionChanged(false);
 }
 
 void FimBinding::showGhost()
@@ -306,17 +305,49 @@ void FimBinding::showGhost()
     if (suggestion.isEmpty()) {
         return;
     }
-    shownText_ = ghostPreview(suggestion);
-    ghost_->setText(shownText_);
-    ghost_->adjustSize();
-    const QPoint origin = view_->cursorToCoordinate(view_->cursorPosition());
-    if (origin.x() < 0 || origin.y() < 0) {
-        // The cursor is scrolled out of view: showing the ghost anywhere would
-        // point at the wrong place.
-        ghost_->hide();
+    const auto caret = view_->cursorPosition();
+    const QPoint origin = view_->cursorToCoordinate(caret);
+    QWidget *editor = view_->focusProxy();
+    if (editor == nullptr || !editor->hasFocus()) {
         return;
     }
-    ghost_->move(origin + QPoint(2, 0));
+    const QRect viewport(editor->mapTo(view_, QPoint()), editor->size());
+    if (!viewport.contains(origin)) {
+        return;
+    }
+
+    const bool inlineGhost = view_->window()->property("vedit.fim.ghostText").toBool()
+        && caret.column() == view_->document()->lineLength(caret.line());
+    QFont font = ghost_->font();
+    font.setItalic(inlineGhost);
+    ghost_->setFont(font);
+    ghost_->setStyleSheet(inlineGhost
+        ? QStringLiteral("color: palette(placeholder-text); background: transparent;")
+        : QStringLiteral("color: palette(tool-tip-text); background: palette(tool-tip-base);"
+                         " border: 1px solid palette(mid);"));
+    const int availableWidth = inlineGhost ? viewport.right() - origin.x() : viewport.width();
+    const QString preview = ghost_->fontMetrics().elidedText(
+        ghostPreview(suggestion), Qt::ElideRight, availableWidth - 2 * ghost_->margin() - 2);
+    if (preview.isEmpty()) {
+        return;
+    }
+    ghost_->setText(preview);
+    ghost_->adjustSize();
+    QPoint position = origin;
+    if (!inlineGhost) {
+        position.rx() = qMin(position.x(), viewport.right() - ghost_->width() + 1);
+        const QPoint nextLine = view_->cursorToCoordinate(KTextEditor::Cursor(caret.line() + 1, 0));
+        const int lineHeight = nextLine.y() > origin.y() ? nextLine.y() - origin.y()
+                                                        : ghost_->fontMetrics().height();
+        position.ry() += lineHeight;
+        if (position.y() + ghost_->height() > viewport.bottom()) {
+            position.ry() = origin.y() - ghost_->height();
+        }
+    }
+    if (!viewport.contains(QRect(position, ghost_->size()))) {
+        return;
+    }
+    ghost_->move(position);
     ghost_->show();
     ghost_->raise();
 }
@@ -327,55 +358,76 @@ void FimBinding::hideGhost()
         ghost_->hide();
         ghost_->clear();
     }
-    shownText_.clear();
 }
 
-void FimBinding::installAcceptShortcuts()
+void FimBinding::publishStatus(const QString &message, int milliseconds)
 {
-    if (view_ == nullptr) {
+    clearStatus();
+    auto *document = view_->document();
+    if (document == nullptr) {
         return;
     }
-    if (accept_ == nullptr) {
-        accept_ = new QShortcut(QKeySequence(Qt::Key_Tab), view_);
-        accept_->setContext(Qt::WidgetWithChildrenShortcut);
-        connect(accept_, &QShortcut::activated, this, [this]() { acceptSuggestion(); });
-    }
-    if (cancel_ == nullptr) {
-        cancel_ = new QShortcut(QKeySequence(Qt::Key_Escape), view_);
-        cancel_->setContext(Qt::WidgetWithChildrenShortcut);
-        connect(cancel_, &QShortcut::activated, this, [this]() {
-            cancelSuggestion();
-            emit suggestionChanged(false);
-        });
+    auto *notice = new KTextEditor::Message(localizedStatus(message).toHtmlEscaped());
+    notice->setView(view_);
+    notice->setPosition(KTextEditor::Message::BottomInView);
+    notice->setAutoHide(milliseconds == 0 ? -1 : milliseconds);
+    notice->setAutoHideMode(KTextEditor::Message::Immediate);
+    notice_ = notice;
+    if (!document->postMessage(notice)) {
+        clearStatus();
     }
 }
 
-void FimBinding::removeAcceptShortcuts()
+void FimBinding::clearStatus()
 {
-    delete accept_;
-    accept_ = nullptr;
-    delete cancel_;
-    cancel_ = nullptr;
+    delete notice_.data();
 }
 
 bool FimBinding::eventFilter(QObject *watched, QEvent *event)
 {
-    if (watched == view_ && event != nullptr) {
-        switch (event->type()) {
-        case QEvent::Wheel:
-            // Scrolling moves the text under the overlay: hide it (the pending
-            // suggestion stays accepted-able until the cursor moves or typing
-            // invalidates it).
-            hideGhost();
-            break;
-        case QEvent::Resize:
-            hideGhost();
-            break;
-        default:
-            break;
+    if (watched == view_) {
+        if (event->type() == QEvent::Resize || event->type() == QEvent::Hide) {
+            onCursorMoved();
         }
+        return false;
     }
-    return QObject::eventFilter(watched, event);
+    if (watched != view_->focusProxy()) {
+        return false;
+    }
+    if (event->type() == QEvent::FocusOut) {
+        acceptKeyDown_ = false;
+        onCursorMoved();
+        return false;
+    }
+    if (event->type() == QEvent::KeyRelease
+        && static_cast<QKeyEvent *>(event)->key() == Qt::Key_Tab
+        && !static_cast<QKeyEvent *>(event)->isAutoRepeat()) {
+        acceptKeyDown_ = false;
+    }
+    if (event->type() != QEvent::ShortcutOverride && event->type() != QEvent::KeyPress) {
+        return false;
+    }
+    auto *key = static_cast<QKeyEvent *>(event);
+    const bool request = key->keyCombination() == triggerKey()[0];
+    const bool accept = key->keyCombination() == QKeyCombination(Qt::Key_Tab)
+        && (acceptKeyDown_ || (ghostVisible() && !view_->isCompletionActive()));
+    const bool dismiss = key->keyCombination() == QKeyCombination(Qt::Key_Escape)
+        && (activeJob_ != 0 || hasSuggestion()) && !view_->isCompletionActive();
+    if (!request && !accept && !dismiss) {
+        return false;
+    }
+    key->accept();
+    if (event->type() == QEvent::ShortcutOverride || key->isAutoRepeat()) {
+        return true;
+    }
+    if (request) {
+        requestCompletion();
+    } else if (accept) {
+        acceptKeyDown_ = acceptSuggestion();
+    } else {
+        onCursorMoved();
+    }
+    return true;
 }
 
 } // namespace vedit::editor

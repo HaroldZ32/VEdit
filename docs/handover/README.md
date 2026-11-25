@@ -1,4 +1,6 @@
-# VEdit 交接文档
+# VEdit 交接文档（2026-10-31 快照）
+
+本目录保存迁移初期的交接记录。当前构建、安装和发版步骤见[构建指南](../BUILD.md)、[用户手册](../USER_GUIDE.md)和[发布指南](../RELEASING.md)。
 
 > 交接时间：**2026-10-31 16:40 (+08:00)** · 分支 `feat/qt6-ktexteditor-migration` · HEAD 见 `git log -1`
 > 上一轮编排（cellwork）已强制归档，原因与故障模式见 [`07-cellwork-postmortem.md`](07-cellwork-postmortem.md)。

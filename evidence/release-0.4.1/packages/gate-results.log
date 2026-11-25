@@ -1,0 +1,14 @@
+assemble exit=0
+assemble exit=0
+not-shipped exit=0
+selfcheck(appdir) exit=0
+isolation(appdir) exit=0
+release packaging exit=0
+selfcheck(appimage) exit=0
+isolation(appimage) exit=0
+centos7_smoke_exit=0
+centos7_no_vcs_exit=0
+CHECK PASS  CentOS 7 mechanism probe
+CHECK PASS  launches without host Git and Subversion
+steps_failed=0
+BUILD: F2 runtime OK

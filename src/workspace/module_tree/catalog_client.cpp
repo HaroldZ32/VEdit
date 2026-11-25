@@ -127,7 +127,8 @@ QString absoluteSourcePath(const QString &file, const QString &root)
     return QDir::cleanPath(QDir(root).absoluteFilePath(file));
 }
 
-ModuleCatalog toCatalog(const VdModuleCatalog &catalog, const QString &root, int fileCount)
+ModuleCatalog toCatalog(const VdModuleCatalog &catalog, const VdStringList &units,
+                        const QString &root, int fileCount)
 {
     ModuleCatalog snapshot;
     snapshot.projectRoot = root;
@@ -161,6 +162,9 @@ ModuleCatalog toCatalog(const VdModuleCatalog &catalog, const QString &root, int
         out.ports = toPorts(module.ports);
         out.children = toInstances(module.children);
         out.file = absoluteSourcePath(out.file, root);
+        if (index < units.count) {
+            out.compilationUnit = absoluteSourcePath(fromC(units.items[index]), root);
+        }
         for (ModulePort &port : out.ports) {
             port.file = absoluteSourcePath(port.file, root);
         }
@@ -579,7 +583,8 @@ void CatalogClient::poll()
         return;
     }
     VdModuleCatalog raw{};
-    const int status = vd_catalog_poll(static_cast<VdService *>(service_), job_, &raw);
+    VdStringList units{};
+    const int status = vd_catalog_poll_v2(static_cast<VdService *>(service_), job_, &raw, &units);
     if (status == VD_STATUS_PENDING) {
         return;
     }
@@ -592,7 +597,8 @@ void CatalogClient::poll()
              catalogFailureKind(code));
         return;
     }
-    const ModuleCatalog catalog = toCatalog(raw, projectRoot_, fileCount_);
+    const ModuleCatalog catalog = toCatalog(raw, units, projectRoot_, fileCount_);
+    vd_catalog_compilation_units_free(&units);
     vd_module_catalog_free(&raw);
     job_ = 0;
     timer_->stop();

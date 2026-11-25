@@ -347,7 +347,7 @@ int main(int argc, char **argv)
     // A2（dock 卡片化）：接线车道的既有测试不允许把面板内容包进 QFrame，所以
     // 「面板是圆角卡片」只能由 QSS 画在 QDockWidget 上。这里用真实的
     // QMainWindow + QDockWidget 验证四件事，全部是像素判据：
-    //   1. dock 与 central 之间真的留出 @gap@ 画布间隙（separator 宽度）；
+    //   1. dock 与 central 之间留出 5px 画布间隙；
     //   2. title 的上边框是 border 色（卡片头上半圈）；
     //   3. 内容层的左边框是 border 色、中心是 surface（卡片体）；
     //   4. 左上角是 canvas —— 12px 圆角让画布从卡片缺角透出来。
@@ -371,9 +371,7 @@ int main(int argc, char **argv)
         QCoreApplication::processEvents();
 
         const int gap = central->x() - dock->width();
-        // 纵向分隔条高度 16px 是 CONTRACT.md §5 冻结的设计常量（横向仍 8px）：
-        // 8px 缝扣掉卡片阴影只剩约 2px 连续画布，达不到 ≥6px。改期望值是跟随设计，不是放宽判据。
-        check("manager.dock-separator-gap", gap == 16, QStringLiteral("gap=%1").arg(gap));
+        check("manager.dock-separator-gap", gap == 5, QStringLiteral("gap=%1").arg(gap));
 
         const QImage dockImage = dock->grab().toImage();
         const int midX = dockImage.width() / 2;

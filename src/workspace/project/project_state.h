@@ -49,6 +49,12 @@
 
 namespace vedit::workspace::project {
 
+struct ProjectInputs {
+    QStringList filelists;
+    QStringList includeDirs;
+    QStringList defines;
+};
+
 struct ProjectState {
     /// The on-disk format this build writes and the OLDEST version whose `files`
     /// it still trusts. Version 6 redefined `files` as "the declared filelist
@@ -80,6 +86,7 @@ struct ProjectState {
     // them would silently change what AC-2.4 restores and what the backends get.
     QStringList projectIncludeDirs;
     QStringList projectDefines;
+    QMap<QString, ProjectInputs> inputsByRoot;
     QStringList includeDirs;    // EFFECTIVE `-I` paths of the last expansion
     QStringList defines;        // EFFECTIVE `-D` defines of the last expansion
     QStringList diagnostics;    // `.f`/scan/service problems, phrased for the UI

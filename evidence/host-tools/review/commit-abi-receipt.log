@@ -1,0 +1,23 @@
+Observed 2026-11-25T10:33:47+08:00
+Task branch feat/host-svn-shell
+Final source commit 8643809224affc9fc2c32be1fd73315b57075ab4
+Source and scripts equal the committed tree.
+Rust source file digest aa21b2c1355c07291d46c27f5e38c8bf3f6085feafc3613c73726f75d2816a56  -
+8c0ae392446a4b644e2f81d211cd279fd372de7a333b28d75a77a6ddf86477d1  crates/vd-ffi/include/vd_ffi.h
+d64edd1ccec9147b07aa61b3d1c17676e44358cfb48f36e734c970f5d1d8b6ca  target/filelist-qt/src/app/workspace-lane-diagnostics/vedit-filelist-authority-e2e
+Baseline C ABI declaration removals after preprocessing 0
+Current product exports
+vd_catalog_compilation_units_free
+vd_catalog_poll
+vd_catalog_poll_v2
+vd_host_shell_choices
+vd_host_terminal_plan
+vd_host_use_settings_store
+vd_host_vcs_probe
+vd_lsp_session_change
+vd_lsp_session_start
+vd_lsp_session_start_v2
+vd_lsp_session_start_v3
+Scoped rustfmt 23 paths exit=0
+git diff --check f90e30d exit=0
+Review replay shell syntax exit=0

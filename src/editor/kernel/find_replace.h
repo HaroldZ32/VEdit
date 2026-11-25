@@ -216,6 +216,7 @@ private:
     QLineEdit *findEdit_ = nullptr;
     QLineEdit *replaceEdit_ = nullptr;
     QWidget *findRow_ = nullptr;
+    QWidget *findInput_ = nullptr;
     QGridLayout *findGrid_ = nullptr;
     QWidget *replaceRow_ = nullptr;
     QToolButton *caseButton_ = nullptr;

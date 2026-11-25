@@ -1,0 +1,7 @@
+89: TREE imported=1 path=/tmp/vedit-filelist-authority-e2e-IirZoq/project/included/deep/child.sv excluded=/tmp/vedit-filelist-authority-e2e-IirZoq/project/rtl/child.sv
+89: LINT pass=0 backend=slang inputs=[/tmp/vedit-filelist-authority-e2e-IirZoq/project/included/deep/child.sv,/tmp/vedit-filelist-authority-e2e-IirZoq/project/rtl/top.sv] rows=['flagfile.svh': No such file or directory|'scoped.svh': No such file or directory|implicit net 'scoped_sig' created|use of undeclared identifier 'flag_sig'|input port 'correct' has no connection|port 'intentional_missing' does not exist in 'child'|implicit net 'scoped_sig' is unused elsewhere]
+89: CTRL pass=1 canonical=/tmp/vedit-filelist-authority-e2e-IirZoq/project/included/deep/child.sv
+89: CTRL expected=/tmp/vedit-filelist-authority-e2e-IirZoq/shared/signal.svh canonical=/tmp/vedit-filelist-authority-e2e-IirZoq/shared/signal.svh
+89: CTRL expected=/tmp/vedit-filelist-authority-e2e-IirZoq/project/vendor/include/flagfile.svh canonical=/tmp/vedit-filelist-authority-e2e-IirZoq/project/vendor/include/flagfile.svh
+1/1 Test #89: vedit-filelist-authority-config-e2e ...***Failed    3.64 sec
+0% tests passed, 1 tests failed out of 1
