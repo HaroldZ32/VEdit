@@ -1,0 +1,55 @@
+[RED] CentOS 7 prior mount /old runtime loader environment passed through unchanged (exit=1)
+/bin/sh: /lib64/ld-linux-x86-64.so.2: version `GLIBC_2.35' not found (required by /old/lib/libc.so.6)
+
+[RED] Prior mount /old/bin on inherited PATH and /new AppRun (exit=0)
+VCS-TOOLCHAIN git=/old/bin/git version=<missing> svn=/old/bin/svn version=<missing> source=path git_source=path svn_source=path
+STARTUP-TRACE t_ms=112 wall_ms=1795572520832 launch-ready
+
+[GREEN] Pinned Qt ctest vedit-app-i18n-selftest (exit=0)
+    Start 18: vedit-app-i18n-selftest
+1/1 Test #18: vedit-app-i18n-selftest ..........   Passed    0.02 sec
+100% tests passed, 0 tests failed out of 1
+
+[GREEN] CentOS 7 cross-mount invocation using production i18n::restartApplication (exit=0)
+VEDIT-RESTART program=/qa/remount args=--no-session-restore --hold 250
+restored host PATH is exported and empty; old mount values cleared
+KSH-GUARD PASS whitelist=Markdown,Scala,SystemVerilog,Tcl,VHDL,Verilog
+VCS-TOOLCHAIN git=<missing> version=<missing> svn=<missing> version=<missing> source=missing git_source=missing svn_source=missing
+STARTUP-TRACE t_ms=83 wall_ms=1795573007115 launch-ready
+
+[GREEN] Real AppDir X11 Preferences language restart beginning with PATH= (two launches)
+KSH-GUARD PASS whitelist=Markdown,Scala,SystemVerilog,Tcl,VHDL,Verilog
+VCS-TOOLCHAIN git=<missing> version=<missing> svn=<missing> version=<missing> source=missing git_source=missing svn_source=missing
+STARTUP-TRACE t_ms=125 wall_ms=1795572929206 launch-ready
+VEDIT-RESTART program=<WORKTREE>/target/packaging-restart.AppDir/AppRun args=--no-session-restore --state-dir <WORKTREE>/target/packaging-x11/state2 --hold 90000
+KSH-GUARD PASS whitelist=Markdown,Scala,SystemVerilog,Tcl,VHDL,Verilog
+VCS-TOOLCHAIN git=<missing> version=<missing> svn=<missing> version=<missing> source=missing git_source=missing svn_source=missing
+STARTUP-TRACE t_ms=149 wall_ms=1795572949810 launch-ready
+
+[GREEN] Real pre-final AppImage X11 Preferences language restart using extract-and-run and PATH= (exit=0)
+KSH-GUARD PASS whitelist=Markdown,Scala,SystemVerilog,Tcl,VHDL,Verilog
+VCS-TOOLCHAIN git=<missing> version=<missing> svn=<missing> version=<missing> source=missing git_source=missing svn_source=missing
+STARTUP-TRACE t_ms=235 wall_ms=1795573594832 launch-ready
+VEDIT-RESTART program=<WORKTREE>/packaging/runtime/out/VEdit-0.4.0-x86_64.AppImage args=--no-session-restore --state-dir <WORKTREE>/target/packaging-x11/candidate-appimage/state --hold 30000
+KSH-GUARD PASS whitelist=Markdown,Scala,SystemVerilog,Tcl,VHDL,Verilog
+VCS-TOOLCHAIN git=<missing> version=<missing> svn=<missing> version=<missing> source=missing git_source=missing svn_source=missing
+STARTUP-TRACE t_ms=200 wall_ms=1795573597930 launch-ready
+VEDIT-RESTART program=<WORKTREE>/packaging/runtime/out/VEdit-0.4.0-x86_64.AppImage args=--no-session-restore --state-dir <WORKTREE>/target/packaging-x11/candidate-appimage/state --hold 30000
+PASS Preferences AppImage extract-and-run restart with PATH=
+
+[RED] Real AppImage Preferences restart with --appimage-extract-and-run passed by CLI only (exit=1)
+STARTUP-TRACE t_ms=374 wall_ms=1795573945169 launch-ready
+VEDIT-RESTART program=<WORKTREE>/target/packaging-x11/candidate-for-cli.AppImage args=--no-session-restore --state-dir <WORKTREE>/target/packaging-x11/candidate-cli/state --hold 30000
+Error: No suitable fusermount binary found on the $PATH
+Cannot mount AppImage, please check your FUSE setup.
+
+[GREEN] Final AppImage Preferences restart with --appimage-extract-and-run passed on CLI only (exit=0)
+KSH-GUARD PASS whitelist=Markdown,Scala,SystemVerilog,Tcl,VHDL,Verilog
+VCS-TOOLCHAIN git=<missing> version=<missing> svn=<missing> version=<missing> source=missing git_source=missing svn_source=missing
+STARTUP-TRACE t_ms=3229 wall_ms=1795574292585 launch-ready
+VEDIT-RESTART program=<WORKTREE>/packaging/runtime/out/VEdit-0.4.0-x86_64.AppImage args=--no-session-restore --state-dir <WORKTREE>/target/packaging-x11/release-cli/state --hold 30000
+KSH-GUARD PASS whitelist=Markdown,Scala,SystemVerilog,Tcl,VHDL,Verilog
+VCS-TOOLCHAIN git=<missing> version=<missing> svn=<missing> version=<missing> source=missing git_source=missing svn_source=missing
+STARTUP-TRACE t_ms=195 wall_ms=1795574295644 launch-ready
+VEDIT-RESTART program=<WORKTREE>/packaging/runtime/out/VEdit-0.4.0-x86_64.AppImage args=--no-session-restore --state-dir <WORKTREE>/target/packaging-x11/release-cli/state --hold 30000
+PASS Preferences AppImage extract-and-run restart with PATH=

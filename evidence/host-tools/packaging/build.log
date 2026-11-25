@@ -1,0 +1,62 @@
+Compiled product source: 8643809224affc9fc2c32be1fd73315b57075ab4
+$ VEDIT_SKIP_IMAGE_BUILD=1 VEDIT_QT6_BUILD_JOBS=6 bash scripts/build-qt.sh --no-test
+[rust-ffi] pinned Rust image: vedit-build:local (toolchain 1.99.0)
+image_id=sha256:0798e93a6d3026424dfcda486014462298474a3e773e448e31856028f921a0e0
+test result: ok. 87 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.66s
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.22s
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.31s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 3.04s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.16s
+test result: ok. 29 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.08s
+test result: ok. 22 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.11s
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.37s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.36s
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.41s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.13s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+[qt6] pinned matrix: Qt 6.10.2 / KF6 6.24.0 / KTextEditor 6.24.0 / KSyntaxHighlighting 6.24.0 / tree-sitter 0.25.9
+image_id=sha256:809c8072ac65be85a15bfc010400f1a0b2cffa10966cfebd4e7dcd0b418360c1
+[qt6] PASS: Rust service layer + configure + build (warnings-as-errors) inside vedit-qt6-build:local; tests skipped (--no-test)
+89abbf55d4390954972887c9a3017b1a51a79e77746e83799bfc004386790d72  target/qt6-build/src/app/vedit-app
+2a6d6ff3c6966f591d8e112a1e55f7b728d0ee35a25b617443d32556437fc87e  target/qt6-build/cmake/smoke/vedit-ksh-env-probe
+exit=0
+
+$ bash scripts/ci-qt6.sh rust-gates
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.43s
+exit=0
+
+$ ctest --test-dir target/qt6-build --output-on-failure -R "^vedit-(app-i18n-selftest|app-ffi-abi|host-shell|terminal|workspace-settings)" (pinned Qt6 container)
+Test project /vedit-build/target/qt6-build
+    Start  8: vedit-terminal-selftest
+1/7 Test  #8: vedit-terminal-selftest .............   Passed    2.07 sec
+    Start  9: vedit-terminal-env-inheritance
+2/7 Test  #9: vedit-terminal-env-inheritance ......   Passed    0.03 sec
+    Start 10: vedit-terminal-env-imported
+3/7 Test #10: vedit-terminal-env-imported .........   Passed    0.03 sec
+    Start 12: vedit-app-ffi-abi-selftest
+4/7 Test #12: vedit-app-ffi-abi-selftest ..........   Passed    0.08 sec
+    Start 18: vedit-app-i18n-selftest
+5/7 Test #18: vedit-app-i18n-selftest .............   Passed    0.02 sec
+    Start 94: vedit-workspace-settings-selftest
+6/7 Test #94: vedit-workspace-settings-selftest ...   Passed    3.36 sec
+    Start 95: vedit-host-shell-selftest
+7/7 Test #95: vedit-host-shell-selftest ...........   Passed    0.17 sec
+
+100% tests passed, 0 tests failed out of 7
+
+Total Test time (real) =   5.76 sec
+exit=0

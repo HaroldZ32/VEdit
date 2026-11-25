@@ -1,0 +1,19 @@
+Final AppImage verification with the exact post-package body of scripts/ci-qt6.sh in the pinned CentOS 7 container.
+The built product, F2 probe, F2 library and both translations passed cmp against the extracted payload.
+AppImage runtime version: https://github.com/AppImage/type2-runtime/commit/fedfad5
+FFI-ABI-SELFTEST ok=1 checks=20 failures=0
+slang version 12.1.0+0
+slang-server version 0.3.1+
+Verible Verilog Language Server built at v0.0-4298-g085eef05
+diff (GNU diffutils) 3.3
+vhdl_ls 0.88.0
+GHDL 6.0.0 (6.0.0.r0.ge589c698c) [Dunoon edition]
+VHDL Style Guide (VSG) version: 3.36.0
+Scala CLI version: 1.18.0
+openjdk version "21.0.13" 2026-10-20 LTS
+SPINALHDL-OK width=8 rtl=rtl/Counter.v
+CHISEL-OK width=8 rtl=rtl/Counter.sv
+VEdit-0.4.0-x86_64.AppImage: OK
+CHECK PASS  no packaged Git, Subversion or shell executables
+== summary: pass=9 fail=0 expected_red=0 ==
+exit=0

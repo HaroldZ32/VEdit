@@ -1,0 +1,56 @@
+
+Pinned Rust fallback availability: absent (expected test exit 101)
+
+running 1 test
+
+thread 'deeplint::tests::a_missing_slang_binary_fails_the_elaboration_with_its_tool_name' (10) panicked at crates/vd-ffi/src/deeplint.rs:2163:9:
+assertion `left == right` failed
+  left: 2
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test deeplint::tests::a_missing_slang_binary_fails_the_elaboration_with_its_tool_name ... FAILED
+
+failures:
+
+failures:
+    deeplint::tests::a_missing_slang_binary_fails_the_elaboration_with_its_tool_name
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 86 filtered out; finished in 0.01s
+
+Unit test exit=101
+
+running 1 test
+
+thread 'deeplint_reports_a_missing_binary_as_a_typed_failure' (13) panicked at crates/vd-ffi/tests/abi.rs:299:9:
+assertion `left == right` failed
+  left: 2
+ right: 1
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+test deeplint_reports_a_missing_binary_as_a_typed_failure ... FAILED
+
+failures:
+
+failures:
+    deeplint_reports_a_missing_binary_as_a_typed_failure
+
+test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 20 filtered out; finished in 0.00s
+
+ABI test exit=101
+slang version 12.1.0+0
+
+Pinned Rust fallback availability: provided (expected test exit 0)
+
+running 1 test
+test deeplint::tests::a_missing_slang_binary_fails_the_elaboration_with_its_tool_name ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 86 filtered out; finished in 0.01s
+
+Unit test exit=0
+
+running 1 test
+T8-RESULT explicit miss: first attempt options.binary / not found; used stage=env (/hdl-tools/bin/slang)
+test deeplint_reports_a_missing_binary_as_a_typed_failure ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 20 filtered out; finished in 0.01s
+
+ABI test exit=0
