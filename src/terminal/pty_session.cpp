@@ -1,5 +1,6 @@
 #include "pty_session.h"
 
+#include <QFile>
 #include <QFileInfo>
 #include <QSocketNotifier>
 #include <QTimer>
@@ -21,7 +22,9 @@
 #include "vd_ffi.h"
 #endif
 
+#if !defined(VEDIT_TERMINAL_HAVE_FFI)
 extern char **environ;
+#endif
 
 namespace vedit::terminal {
 
@@ -51,6 +54,7 @@ void setEnvironment(ChildPlan &plan, const std::string &name, const std::string 
     plan.environment.push_back(prefix + value);
 }
 
+#if !defined(VEDIT_TERMINAL_HAVE_FFI)
 QString defaultShell()
 {
     const QString fromEnvironment = qEnvironmentVariable("SHELL");
@@ -62,6 +66,7 @@ QString defaultShell()
     }
     return QStringLiteral("/bin/sh");
 }
+#endif
 
 } // namespace
 
@@ -112,59 +117,46 @@ bool PtySession::start(const QString &shell,
         return fail(QStringLiteral("a shell session is already running (pid %1)").arg(pid_));
     }
 
-    const QString resolved = shell.isEmpty() ? defaultShell() : shell;
-    if (!QFileInfo(resolved).isExecutable()) {
-        return fail(QStringLiteral("shell is not executable: %1").arg(resolved));
-    }
-
     columns = std::max(1, columns);
     rows = std::max(1, rows);
 
     ChildPlan plan;
-    plan.shell = resolved.toStdString();
-    plan.workingDirectory = workingDirectory.toStdString();
-    plan.arguments.emplace_back(plan.shell);
-    for (const QString &argument : arguments) {
-        plan.arguments.emplace_back(argument.toStdString());
+    plan.workingDirectory = QFile::encodeName(workingDirectory).toStdString();
+#if defined(VEDIT_TERMINAL_HAVE_FFI)
+    const QByteArray explicitShell = QFile::encodeName(shell);
+    char *shellOrError = nullptr;
+    VdEnvSnapshot snapshot{};
+    if (vd_host_terminal_plan(explicitShell.constData(), plan.workingDirectory.c_str(),
+                              &shellOrError, &snapshot) != 1) {
+        const QString message = QString::fromUtf8(shellOrError);
+        vd_string_free(shellOrError);
+        return fail(message);
     }
+    plan.shell = shellOrError;
+    vd_string_free(shellOrError);
+    for (size_t index = 0; index < snapshot.count; ++index) {
+        const VdEnvSnapshotEntry &row = snapshot.items[index];
+        plan.environment.push_back(std::string(row.name) + '=' + row.value);
+    }
+    vd_env_snapshot_free(&snapshot);
+#else
+    const QString resolved = shell.isEmpty() ? defaultShell() : shell;
+    const QFileInfo shellInfo(resolved);
+    if (!shellInfo.isFile() || !shellInfo.isExecutable()) {
+        return fail(QStringLiteral("shell is not executable: %1").arg(resolved));
+    }
+    plan.shell = QFile::encodeName(resolved).toStdString();
     for (char **entry = environ; entry != nullptr && *entry != nullptr; ++entry) {
-        // The child is the HOST shell: AppRun exports LD_LIBRARY_PATH=<AppDir>/lib
-        // (packaged glibc) and LOCPATH=<AppDir>/usr/lib/locale for the PRODUCT
-        // process. Inherited, the host loader (e.g. EL7 glibc 2.17) tries to load
-        // the packaged glibc and the shell dies before its first prompt with
-        // "version 'GLIBC_2.35' not found". The same rule is documented in
-        // crates/vd-deeplint/src/binary.rs::sanitize_tool_child_env (and applied by
-        // the vd-vcs runners and workspace/vcs/vcs_toolchain.cpp::toolVersion).
         if (std::strncmp(*entry, "LD_LIBRARY_PATH=", 16) == 0 || std::strncmp(*entry, "LOCPATH=", 8) == 0) {
             continue;
         }
         plan.environment.emplace_back(*entry);
     }
-#if defined(VEDIT_TERMINAL_HAVE_FFI)
-    // batch-20261115 AC-1.3: the terminal is the one child the Rust side does not
-    // spawn, so it reads the imported environment selection from the same store
-    // through the C ABI instead of guessing. Values are real (a secret-named one
-    // included) and are never printed. The packaged loader variables are skipped:
-    // the same "never reach a host child" rule the loop above applies to `environ`.
-    if (VdService *service = vd_service_create()) {
-        VdEnvSnapshot snapshot{};
-        if (vd_env_effective_snapshot(service, &snapshot) == 1) {
-            for (size_t index = 0; index < snapshot.count; ++index) {
-                const VdEnvSnapshotEntry &row = snapshot.items[index];
-                if (row.name == nullptr || row.value == nullptr) {
-                    continue;
-                }
-                if (std::strcmp(row.name, "LD_LIBRARY_PATH") == 0
-                    || std::strcmp(row.name, "LOCPATH") == 0) {
-                    continue;
-                }
-                setEnvironment(plan, row.name, row.value);
-            }
-        }
-        vd_env_snapshot_free(&snapshot);
-        vd_service_destroy(service);
-    }
 #endif
+    plan.arguments.emplace_back(plan.shell);
+    for (const QString &argument : arguments) {
+        plan.arguments.emplace_back(argument.toStdString());
+    }
     setEnvironment(plan, "TERM", "xterm-256color");
     setEnvironment(plan, "COLORTERM", "truecolor");
     setEnvironment(plan, "TERM_PROGRAM", "VEdit");
@@ -232,6 +224,10 @@ bool PtySession::start(const QString &shell,
             }
         }
         ::execve(plan.shell.c_str(), plan.argv.data(), plan.envp.data());
+        constexpr char message[] =
+            "VEdit could not execute the host shell. Choose an installed shell in Preferences > Tools.\n";
+        const auto written = ::write(STDERR_FILENO, message, sizeof(message) - 1);
+        (void)written;
         ::_exit(127);
     }
 
@@ -246,7 +242,7 @@ bool PtySession::start(const QString &shell,
     exitKnown_ = false;
     exitCode_ = -1;
     terminationSignal_ = 0;
-    shellPath_ = resolved;
+    shellPath_ = QFile::decodeName(plan.shell.c_str());
     pendingWrite_.clear();
 
     notifier_ = new QSocketNotifier(master_, QSocketNotifier::Read, this);

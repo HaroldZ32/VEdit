@@ -118,6 +118,17 @@ set_tests_properties(vedit-workspace-settings-selftest PROPERTIES
   ENVIRONMENT "QT_QPA_PLATFORM=offscreen;XDG_RUNTIME_DIR=${CMAKE_BINARY_DIR}/xdg-runtime-settings"
   TIMEOUT 300
 )
+if(TARGET vedit_terminal AND EXISTS "${VEDIT_SETTINGS_FFI_LIB}")
+  add_executable(vedit-host-shell-selftest host_shell_selftest.cpp)
+  target_link_libraries(vedit-host-shell-selftest PRIVATE vedit_workspace_settings vedit_terminal)
+  if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(vedit-host-shell-selftest PRIVATE -Wall -Wextra -Wpedantic -Werror)
+  endif()
+  add_test(NAME vedit-host-shell-selftest COMMAND vedit-host-shell-selftest)
+  set_tests_properties(vedit-host-shell-selftest PROPERTIES
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen" TIMEOUT 30)
+endif()
+
 # The dedicated row for the restart switch (acceptance ⑥), so the acceptance
 # matrix can point at a test whose name says exactly what it proves.
 add_test(NAME vedit-ui-scale-restart

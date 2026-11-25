@@ -3288,8 +3288,7 @@ void vd_hierarchy_free(struct VdHierarchy *hierarchy);
  [`vd_deeplint::binary::set_imported_environment`], the seam every
  `vd-deeplint` tool child passes (`binary::sanitize_tool_child_env`).
  `project_root` selects the project layer of the selection (null or empty =
- the global layer only). Language server, VCS and terminal children are NOT
- covered (see [`apply_environment_selection`]).
+ the global layer only). See [`apply_environment_selection`] for the consumers.
 
  Synchronous on purpose: it runs once during startup, before the event loop
  exists and before a child can be spawned. It reads ONE small JSON file; a job
@@ -3587,6 +3586,55 @@ int32_t vd_fim_detect(const char *endpoint,
  yet.
  */
 void vd_fim_detect_free(char *json);
+
+/*
+ Bind the settings store used by subsequent PTY and VCS launches.
+ Null or empty clears the binding and selects Auto.
+
+ # Safety
+ `path` must be null or a readable, NUL-terminated settings file path.
+ */
+void vd_host_use_settings_store(const char *path);
+
+/*
+ Fill a snapshot with installed shell paths in `name`; `value` is null.
+ Release the rows with `vd_env_snapshot_free`.
+
+ # Safety
+ `out` must be null or writable for one unfilled snapshot.
+ */
+void vd_host_shell_choices(struct VdEnvSnapshot *out);
+
+/*
+ Fill the PTY shell path and environment. Returns 1 on success, or 0 with
+ a diagnostic in `shell_out` and the snapshot untouched. A null or empty
+ explicit shell uses the persisted preference. Null or empty cwd uses the
+ current directory. Release the string and snapshot with the usual ABI frees.
+
+ # Safety
+ The two inputs must be null or readable, NUL-terminated paths. Both outputs
+ must be null or writable for one unfilled value, and must not overlap.
+ */
+int32_t vd_host_terminal_plan(const char *explicit_shell,
+                              const char *cwd,
+                              char **shell_out,
+                              struct VdEnvSnapshot *environment_out);
+
+/*
+ Resolve a version probe's host tool, environment and launch argv. Returns
+ 1 for PATH, 2 for the environment fallback, or 0 when the tool is missing.
+ Launch rows carry the shell path then its arguments in `name`. A missing
+ shell leaves the launch rows empty. Release successful outputs with the
+ usual ABI frees.
+
+ # Safety
+ `tool` must be null or a readable NUL-terminated string. Each output must
+ be null or writable for one unfilled value, and must not overlap.
+ */
+int32_t vd_host_vcs_probe(const char *tool,
+                          char **path_out,
+                          struct VdEnvSnapshot *environment_out,
+                          struct VdEnvSnapshot *launch_out);
 
 /*
  Start an LSP configuration job.

@@ -22,7 +22,6 @@
 #![forbid(unsafe_code)]
 
 use std::path::{Component, Path, PathBuf};
-use std::process::Command;
 use std::sync::{Arc, Mutex};
 
 use crate::runner::{subcommand_index, subcommand_of, CommandOutput};
@@ -1413,25 +1412,12 @@ impl WriteRunner for SystemWriteRunner {
     fn run_write(&self, invocation: &WriteInvocation) -> Result<CommandOutput, String> {
         // The gate runs BEFORE the process exists, exactly like the read gate.
         ensure_write_allowed(invocation.program, &invocation.args)?;
-        // Same resolution order as the read path (bundled > PATH > env); the
-        // write allow-list above is untouched.
-        let resolved = crate::toolchain::resolve_or_error(invocation.program)?;
-        let output = Command::new(&resolved.path)
-            .current_dir(&invocation.working_tree)
-            .args(&invocation.args)
-            .envs(invocation.env.iter().map(|(key, value)| (key, value)))
-            // See the read path: the wrapper starts with the host loader and
-            // re-execs the AppDir loader, so the bundle's LD_LIBRARY_PATH must
-            // not leak into the shell that starts it.
-            .env_remove("LD_LIBRARY_PATH")
-            .output()
-            .map_err(|error| {
-                format!(
-                    "cannot run {} ({}): {error}",
-                    invocation.program,
-                    resolved.path.display()
-                )
-            })?;
+        let output = crate::toolchain::run(
+            invocation.program,
+            &invocation.working_tree,
+            &invocation.args,
+            &invocation.env,
+        )?;
         Ok(CommandOutput {
             success: output.status.success(),
             stdout: String::from_utf8_lossy(&output.stdout).into_owned(),

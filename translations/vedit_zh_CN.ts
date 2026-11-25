@@ -7249,6 +7249,22 @@ Right-click here or choose File → Open Folder.</source>
         <translation>界面语言：</translation>
     </message>
     <message>
+        <source>Host shell:</source>
+        <translation>宿主 Shell：</translation>
+    </message>
+    <message>
+        <source>Used by new terminal sessions and Git and SVN jobs.</source>
+        <translation>供新终端会话及 Git 和 SVN 任务使用。</translation>
+    </message>
+    <message>
+        <source>%1 (unavailable)</source>
+        <translation>%1（不可用）</translation>
+    </message>
+    <message>
+        <source>The host shell preference could not be confirmed. Reload settings and try again.</source>
+        <translation>无法确认宿主 Shell 设置。请重新加载设置后再试。</translation>
+    </message>
+    <message>
         <location filename="../src/workspace/settings/settings_panel.cpp" line="559"/>
         <location filename="../src/workspace/settings/settings_panel.cpp" line="1304"/>
         <source>The interface language is applied on the next start.</source>

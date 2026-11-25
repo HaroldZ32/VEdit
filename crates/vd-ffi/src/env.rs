@@ -211,8 +211,8 @@ fn capture(
 /// (`vd_env_effective_snapshot`, `src/terminal/pty_session.cpp`) and the C++
 /// toolchain resolver (the same verb → contract §4.1.2).
 ///
-/// Still NOT covered: the VCS runner (`vd-vcs` only removes `LD_LIBRARY_PATH`).
-/// Do not widen this list in prose without widening the code.
+/// The VCS runners and PTY share the host child environment. Both strip
+/// AppDir PATH entries and the product's loader and locale overrides.
 ///
 /// The parent process environment is NOT modified: the merge is applied to each
 /// `Command` as an explicit override.
@@ -221,6 +221,7 @@ pub fn apply_environment_selection(
     project_root: Option<&Path>,
 ) {
     let merged: BTreeMap<String, String> = selection.merged_for(project_root).into_iter().collect();
+    vd_vcs::host::set_imported_environment(merged.clone());
     vd_deeplint::binary::set_imported_environment(merged);
 }
 
@@ -313,8 +314,7 @@ pub fn effective_environment() -> BTreeMap<String, String> {
 /// [`vd_deeplint::binary::set_imported_environment`], the seam every
 /// `vd-deeplint` tool child passes (`binary::sanitize_tool_child_env`).
 /// `project_root` selects the project layer of the selection (null or empty =
-/// the global layer only). Language server, VCS and terminal children are NOT
-/// covered (see [`apply_environment_selection`]).
+/// the global layer only). See [`apply_environment_selection`] for the consumers.
 ///
 /// Synchronous on purpose: it runs once during startup, before the event loop
 /// exists and before a child can be spawned. It reads ONE small JSON file; a job

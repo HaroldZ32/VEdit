@@ -1,0 +1,124 @@
+[1/48] Automatic MOC for target vedit_terminal
+[2/47] Automatic MOC for target vedit_workspace_settings
+[3/47] Building CXX object src/app/workspace-lane-project/CMakeFiles/vedit_workspace_project.dir/project_service.cpp.o
+[4/47] Linking CXX static library src/app/workspace-lane-project/libvedit_workspace_project.a
+[5/47] Building CXX object src/app/editor-lane/fim-lane/CMakeFiles/vedit_editor_fim.dir/fim_backend.cpp.o
+[6/47] Linking CXX static library src/app/editor-lane/fim-lane/libvedit_editor_fim.a
+[7/47] Building CXX object src/terminal/CMakeFiles/vedit_terminal.dir/pty_session.cpp.o
+[8/47] Building CXX object src/app/workspace-lane-vcs/CMakeFiles/vedit_workspace_vcs.dir/vcs_toolchain.cpp.o
+[9/47] Building CXX object src/app/workspace-lane-vcs/CMakeFiles/vedit_workspace_vcs.dir/vcs_source.cpp.o
+[10/47] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/waiver_actions.cpp.o
+[11/47] Linking CXX static library src/terminal/libvedit_terminal.a
+[12/47] Building CXX object src/app/workspace-lane-module_tree/CMakeFiles/vedit_workspace_module_tree.dir/module_catalog.cpp.o
+[13/47] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/ffi_backends.cpp.o
+[14/47] Building CXX object src/app/workspace-lane-search/CMakeFiles/vedit_workspace_search.dir/global_search.cpp.o
+[15/47] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/diagnostics_controller.cpp.o
+[16/47] Building CXX object src/app/workspace-lane-settings/CMakeFiles/vedit_workspace_settings.dir/vedit_workspace_settings_autogen/mocs_compilation.cpp.o
+[17/47] Building CXX object src/app/workspace-lane-module_tree/CMakeFiles/vedit_workspace_module_tree.dir/catalog_client.cpp.o
+[18/47] Building CXX object src/app/workspace-lane-settings/CMakeFiles/vedit_workspace_settings.dir/lint_options.cpp.o
+[19/47] Building CXX object src/app/workspace-lane-settings/CMakeFiles/vedit_workspace_settings.dir/settings_client.cpp.o
+[20/47] Building CXX object src/app/workspace-lane-settings/CMakeFiles/vedit_workspace_settings.dir/settings_integration.cpp.o
+[21/47] Linking CXX static library src/app/workspace-lane-search/libvedit_workspace_search.a
+[22/47] Linking CXX static library src/app/workspace-lane-module_tree/libvedit_workspace_module_tree.a
+[23/47] Linking CXX static library src/app/workspace-lane-vcs/libvedit_workspace_vcs.a
+[24/47] Building CXX object src/app/workspace-lane-settings/CMakeFiles/vedit_workspace_settings.dir/settings_dialog.cpp.o
+[25/47] Building CXX object src/app/workspace-lane-diagnostics/CMakeFiles/vedit_workspace_diagnostics.dir/diagnostics_integration.cpp.o
+[26/47] Linking CXX static library src/app/workspace-lane-diagnostics/libvedit_workspace_diagnostics.a
+[27/47] Building CXX object src/app/workspace-lane-signal_trace/CMakeFiles/vedit_workspace_signal_trace.dir/signal_trace_integration.cpp.o
+[28/47] Building CXX object src/terminal/CMakeFiles/vedit-terminal-selftest.dir/terminal_selftest.cpp.o
+[29/47] Linking CXX static library src/app/workspace-lane-signal_trace/libvedit_workspace_signal_trace.a
+[30/47] Building CXX object src/app/workspace-lane-settings/CMakeFiles/vedit_workspace_settings.dir/settings_panel.cpp.o
+[31/47] Linking CXX static library src/app/workspace-lane-settings/libvedit_workspace_settings.a
+[32/47] Automatic MOC for target vedit-host-shell-selftest
+[33/46] Building CXX object src/app/workspace-lane-scala/CMakeFiles/vedit_workspace_scala.dir/scala_run.cpp.o
+[34/46] Linking CXX static library src/app/workspace-lane-scala/libvedit_workspace_scala.a
+[35/46] Building CXX object src/app/workspace-lane-rename/CMakeFiles/vedit_workspace_rename.dir/rename_integration.cpp.o
+[36/46] Linking CXX static library src/app/workspace-lane-rename/libvedit_workspace_rename.a
+[37/46] Linking CXX executable src/terminal/vedit-terminal-selftest
+[38/46] Building CXX object src/app/workspace-lane-settings/CMakeFiles/vedit-host-shell-selftest.dir/host_shell_selftest.cpp.o
+[39/46] Linking CXX executable src/app/workspace-lane-vcs/vedit-svn-workspaces-selftest
+[40/46] Linking CXX executable src/app/workspace-lane-settings/vedit-host-shell-selftest
+[41/46] Building CXX object src/app/workspace-lane-settings/CMakeFiles/vedit-workspace-settings-selftest.dir/settings_selftest.cpp.o
+[42/46] Building CXX object src/app/CMakeFiles/vedit-app.dir/main.cpp.o
+[43/46] Building CXX object src/app/workspace-lane-vcs/CMakeFiles/vedit-workspace-vcs-selftest.dir/vcs_selftest.cpp.o
+[44/46] Linking CXX executable src/app/workspace-lane-settings/vedit-workspace-settings-selftest
+[45/46] Linking CXX executable src/app/vedit-app
+[46/46] Linking CXX executable src/app/workspace-lane-vcs/vedit-workspace-vcs-selftest
+HOST_VERSIONS git version 2.53.0
+1.14.5
+zsh 5.9 (x86_64-ubuntu-linux-gnu)
+Test project /work/target/host-tools-qt
+    Start  8: vedit-terminal-selftest
+1/8 Test  #8: vedit-terminal-selftest .............   Passed    2.15 sec
+    Start  9: vedit-terminal-env-inheritance
+2/8 Test  #9: vedit-terminal-env-inheritance ......   Passed    0.03 sec
+    Start 10: vedit-terminal-env-imported
+3/8 Test #10: vedit-terminal-env-imported .........   Passed    0.03 sec
+    Start 88: vedit-workspace-vcs-selftest
+4/8 Test #88: vedit-workspace-vcs-selftest ........   Passed   15.80 sec
+    Start 89: vedit-svn-workspaces-selftest
+5/8 Test #89: vedit-svn-workspaces-selftest .......   Passed    2.08 sec
+    Start 90: vedit-workspace-settings-selftest
+6/8 Test #90: vedit-workspace-settings-selftest ...   Passed    3.34 sec
+    Start 91: vedit-host-shell-selftest
+7/8 Test #91: vedit-host-shell-selftest ...........   Passed    0.23 sec
+    Start 93: vedit-env-import-ui
+8/8 Test #93: vedit-env-import-ui .................   Passed    0.24 sec
+
+100% tests passed, 0 tests failed out of 8
+
+Total Test time (real) =  23.90 sec
+CHECK host-shell.auto-restores-host-path PASS
+CHECK host-shell.import-layer PASS
+CHECK host-shell.discovery PASS
+CHECK host-shell.cancel-keeps-auto PASS
+CHECK host-shell.preview-keeps-auto PASS
+CHECK host-shell.apply-used-by-next-session PASS
+CHECK host-shell.repeated-apply-uses-auto PASS
+CHECK host-shell.xcb-screenshot PASS
+CHECK host-shell.reopen-restores-manual PASS
+CHECK host-shell.restart-restores-manual PASS
+CHECK host-shell.stale-choice-shown PASS
+CHECK host-shell.stale-choice-actionable PASS
+CHECK host-shell.ok-recovers-auto PASS
+STARTUP-TRACE t_ms=0 wall_ms=1795571435609 main-entry
+syntax-product: grammar=verilog backend=1 registered=[systemverilog,verilog] active='verilog' backend-available=1 private-dir='' definitions=451 own-xml=[] themes=30 verilog=1 systemverilog=1 kernel='KTextEditor 6.24.0' embargoed=[] startup-hook=1 definitions-ok=[]
+STARTUP-TRACE t_ms=21 wall_ms=1795571435630 qt-init-done
+STARTUP-TRACE t_ms=24 wall_ms=1795571435633 settings-ready
+STARTUP-TRACE t_ms=24 wall_ms=1795571435633 crash-install-done
+STARTUP-TRACE t_ms=37 wall_ms=1795571435646 shell-constructed
+VCS-TOOLCHAIN git=<missing> version=<missing> svn=<missing> version=<missing> source=missing git_source=missing svn_source=missing
+[app-shell] Diagnostics unavailable: verible-verilog-ls, slang not found (bundled, local checkout, imported vars, PATH and env all empty). Impact: Verible diagnostics, navigation and the outline are unavailable; SLANG deep lint is unavailable. Fix: bundle `verible-verilog-ls`/`slang` in the product's bin/ next to vd-app, run `bash scripts/fetch-verible.sh` and `bash build/slang/build.sh` in a source checkout, install them on PATH, or set VEDIT_VERIBLE_LS / VEDIT_SLANG.
+TOOLCHAIN source=verible:missing slang:missing missing=[verible, slang] aux source=slang-server:missing verible-format:missing verible-lint:missing missing=[slang-server, verible-format, verible-lint] local=[/work/build/slang/out,/work/.mpd/recon/verible/bin]
+AUTOFIX-MODE stored='' mode='' valid=1 available=1 interactive=0 effect=0 reason=''
+SETTINGS-WARNINGS count=0
+SWITCH-FAILED from=slang requested-lsp=slang requested-lint=slang reason='slang-server not found (bundled, local checkout, imported vars, PATH and env all empty); slang not found (bundled, local checkout, imported vars, PATH and env all empty)'
+BADGE requested-lsp=slang effective-lsp= lsp-ok=0 lsp-reason=tool-missing requested-lint=slang effective-lint=slang lint-ok=0 lint-reason=tool-missing basis=measured language= language-backend=<none> warnings=0 lsp-message='slang-server not found (bundled, local checkout, imported vars, PATH and env all empty)' lint-message='slang not found (bundled, local checkout, imported vars, PATH and env all empty)'
+BADGE-TEXT 'slang→unavailable · lint=slang · basis=measured · reason=tool-missing'
+DIAG-ROWS count=0 option-names=0 upper=0 lower=0 slang-req=0 slang-fail=0 slang-msg='' revision=0
+VIEW-PANEL id='view.panel.outline' label='Outline' dock-title='Outline' shortcut='Ctrl+Alt+O' title-equals-label=1 duplicate-command=0
+vedit-app: FIM settings store bound: /tmp/host-tools-app-state/settings.toml
+RENAME-GATE enabled=0 reason='Rename needs an open document.' documents=0 project-files=0
+RENAME-ENTRY-CHECK name=registered ok=1 detail='rename.symbol'
+RENAME-ENTRY-CHECK name=action-identity ok=1
+RENAME-ENTRY-CHECK name=menu-entry ok=1 detail='project'
+RENAME-ENTRY-CHECK name=text ok=1 detail='Rename Symbol in &Project…'
+RENAME-ENTRY-CHECK name=shortcut ok=1 detail='effective='Ctrl+Shift+F2' expected='Ctrl+Shift+F2''
+RENAME-ENTRY-CHECK name=shortcut-unique ok=1 detail='rename.symbol'
+RENAME-ENTRY-CHECK name=enabled-matches-gate ok=1 detail='enabled=0 gate=0'
+RENAME-ENTRY command='rename.symbol' menu='project' text='Rename Symbol in &Project…' shortcut='Ctrl+Shift+F2' enabled=0 reason='Rename needs an open document.'
+RENAME-ENTRY-CHECKS passed=7 failed=0
+[app-shell] VHDL tools unavailable: vhdl_ls, ghdl, vsg not found (bundled, local checkout, imported vars, PATH and env all empty). Impact: VHDL diagnostics, hover and go-to-definition are unavailable; GHDL+VSG VHDL lint is unavailable. Fix: bundle `vhdl_ls`/`ghdl`/`vsg` in the product's bin/ next to vd-app (bash packaging/runtime/build-vhdl-payload.sh), install them on PATH, or set VEDIT_VHDL_LS / VEDIT_GHDL / VEDIT_VSG.
+VHDL-TOOLCHAIN source=vhdl_ls:missing ghdl:missing vsg:missing missing=[vhdl_ls, ghdl, vsg]
+VHDL-STATUS VHDL tools missing: vhdl_ls, ghdl, vsg — VHDL diagnostics, hover and go-to-definition are unavailable; GHDL+VSG VHDL lint is unavailable. Fix: bin/, PATH, or VEDIT_VHDL_LS/VEDIT_GHDL/VEDIT_VSG.
+STARTUP-TRACE t_ms=51 wall_ms=1795571435660 panels-installed
+STARTUP-TRACE t_ms=0 wall_ms=1795571435661 main-entry
+WELCOME-TRACE frame=1 elapsed_ms=5 phase=0.000 animated=1
+WELCOME-TRACE window=4194311 topmost=1 accepts_focus=0
+kf.sonnet.core: Sonnet: No speller backends available!
+STARTUP-TRACE t_ms=82 wall_ms=1795571435692 session-started
+WORKBENCH-TRACE topmost=0
+STARTUP-TRACE t_ms=89 wall_ms=1795571435699 window-shown
+WELCOME-TRACE frame=2 elapsed_ms=32 phase=0.004 animated=1
+STARTUP-TRACE t_ms=118 wall_ms=1795571435727 launch-ready
+HOST_MISSING_STARTUP_EXIT=0

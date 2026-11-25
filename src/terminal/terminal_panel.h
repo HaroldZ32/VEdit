@@ -23,7 +23,7 @@ class PtySession;
 class TerminalWidget;
 
 struct TerminalOptions {
-    QString shell;              // empty => $SHELL, then /bin/bash, then /bin/sh
+    QString shell;              // empty => persisted host shell preference (Auto by default)
     QString workingDirectory;   // empty => inherit the application's directory
     QStringList arguments;
     int columns = 80;

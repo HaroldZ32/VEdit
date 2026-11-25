@@ -31,6 +31,7 @@
 #endif
 #if defined(VEDIT_WORKSPACE_HAVE_VCS)
 #include "vcs/vcs_integration.h"
+#include "vcs/vcs_toolchain.h"
 #endif
 #if defined(VEDIT_WORKSPACE_HAVE_SETTINGS)
 #include "settings/settings_integration.h"
@@ -68,6 +69,9 @@ void installPanels(vedit::app::ApplicationShell &shell, const IntegrationOptions
     // other lane).
 #if defined(VEDIT_WORKSPACE_HAVE_SETTINGS)
     applyEnvironmentSelection(options);
+#endif
+#if defined(VEDIT_WORKSPACE_HAVE_VCS)
+    vcs::warmToolchainProbe();
 #endif
 
 #if defined(VEDIT_WORKSPACE_HAVE_JUMP)

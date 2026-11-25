@@ -1,185 +1,145 @@
-//! Resolution-order tests for the bundled VCS toolchain (AC-3.0).
-//!
-//! The resolver is pure: [`resolve_with`] takes the executable directory, the
-//! PATH value and the explicit env value, so every branch is tested without
-//! mutating the process environment.
+//! The same resolver feeds the VCS runners and the startup diagnostic.
 
-use std::ffi::OsStr;
-use std::os::unix::fs::PermissionsExt;
-use std::path::{Path, PathBuf};
+use std::collections::BTreeMap;
+use std::ffi::{OsStr, OsString};
+use std::os::unix::fs::{symlink, PermissionsExt};
+use std::path::Path;
 
-use vd_vcs::toolchain::{bundled_candidates, resolve_with, ToolSource};
+use vd_vcs::host::HostEnvironment;
+use vd_vcs::toolchain::{resolve_in, ToolSource};
 
 fn write_executable(path: &Path) {
-    if let Some(parent) = path.parent() {
-        std::fs::create_dir_all(parent).ok();
+    std::fs::create_dir_all(path.parent().unwrap_or_else(|| panic!("fixture parent")))
+        .unwrap_or_else(|error| panic!("fixture directory: {error:?}"));
+    std::fs::write(path, "#!/bin/sh\nexit 0\n")
+        .unwrap_or_else(|error| panic!("fixture tool: {error:?}"));
+    std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o755))
+        .unwrap_or_else(|error| panic!("fixture permissions: {error:?}"));
+}
+
+#[test]
+fn effective_path_overrides_host_path_but_cannot_restore_appdir_tools() {
+    let fixture =
+        tempfile::tempdir().unwrap_or_else(|error| panic!("fixture directory: {error:?}"));
+    let root = fixture.path();
+    let appdir = root.join("AppDir");
+    let appbin = appdir.join("bin");
+    let legacy = appdir.join("usr/lib/vcs/bin");
+    let hostbin = root.join("host bin");
+    let imported_bin = root.join("imported bin");
+    let alias = root.join("alias");
+    let tool_alias = root.join("symlink bin");
+    for directory in [&appbin, &legacy, &hostbin, &imported_bin] {
+        write_executable(&directory.join("git"));
     }
-    std::fs::write(path, "#!/bin/sh\nexit 0\n").ok();
-    if let Ok(metadata) = std::fs::metadata(path) {
-        let mut permissions = metadata.permissions();
-        permissions.set_mode(0o755);
-        std::fs::set_permissions(path, permissions).ok();
-    }
-}
-
-fn write_plain_file(path: &Path) {
-    if let Some(parent) = path.parent() {
-        std::fs::create_dir_all(parent).ok();
-    }
-    std::fs::write(path, "not executable\n").ok();
-}
-
-fn canonical(path: &Path) -> Option<PathBuf> {
-    std::fs::canonicalize(path).ok()
-}
-
-#[test]
-fn bundled_layout_wins() {
-    let Ok(dir) = tempfile::tempdir() else {
-        return;
-    };
-    let root = dir.path();
-    let exe_dir = root.join("bin");
-    std::fs::create_dir_all(&exe_dir).ok();
-    let bundled = root.join("usr/lib/vcs/bin/git");
-    write_executable(&bundled);
-
-    let resolved = resolve_with("git", &exe_dir, Some(OsStr::new("")), None);
-    let Some(resolved) = resolved else {
-        panic!("the bundled git must be found");
-    };
-    assert_eq!(resolved.source, ToolSource::Bundled);
-    assert_eq!(canonical(&resolved.path), canonical(&bundled));
-    assert_eq!(resolved.tool, "git");
-}
-
-#[test]
-fn next_to_the_binary_is_also_bundled() {
-    let Ok(dir) = tempfile::tempdir() else {
-        return;
-    };
-    let exe_dir = dir.path().join("bin");
-    let bundled = exe_dir.join("git");
-    write_executable(&bundled);
-    let resolved = resolve_with("git", &exe_dir, Some(OsStr::new("")), None);
-    assert_eq!(resolved.map(|tool| tool.source), Some(ToolSource::Bundled));
-}
-
-#[test]
-fn path_is_used_when_nothing_is_bundled() {
-    let Ok(dir) = tempfile::tempdir() else {
-        return;
-    };
-    let exe_dir = dir.path().join("bin");
-    std::fs::create_dir_all(&exe_dir).ok();
-    let path_dir = dir.path().join("usr-bin");
-    let on_path = path_dir.join("git");
-    write_executable(&on_path);
-    let path_env = std::env::join_paths([&path_dir]).ok();
-    let resolved = resolve_with("git", &exe_dir, path_env.as_deref(), None);
-    let Some(resolved) = resolved else {
-        panic!("PATH must provide git");
-    };
-    assert_eq!(resolved.source, ToolSource::Path);
-    assert_eq!(canonical(&resolved.path), canonical(&on_path));
-}
-
-#[test]
-fn env_is_the_last_resort() {
-    let Ok(dir) = tempfile::tempdir() else {
-        return;
-    };
-    let exe_dir = dir.path().join("bin");
-    std::fs::create_dir_all(&exe_dir).ok();
-    let explicit = dir.path().join("opt/git-2.53/bin/git");
-    write_executable(&explicit);
-    let resolved = resolve_with(
-        "git",
-        &exe_dir,
-        Some(OsStr::new("")),
-        Some(explicit.as_os_str()),
-    );
-    let Some(resolved) = resolved else {
-        panic!("the explicit env value must be used");
-    };
-    assert_eq!(resolved.source, ToolSource::Env);
-    assert_eq!(canonical(&resolved.path), canonical(&explicit));
-}
-
-#[test]
-fn order_is_bundled_then_path_then_env() {
-    let Ok(dir) = tempfile::tempdir() else {
-        return;
-    };
-    let root = dir.path();
-    let exe_dir = root.join("bin");
-    std::fs::create_dir_all(&exe_dir).ok();
-    let bundled = root.join("usr/lib/vcs/bin/svn");
-    let on_path = root.join("usr-bin/svn");
-    let explicit = root.join("opt/svn/svn");
-    write_executable(&bundled);
-    write_executable(&on_path);
-    write_executable(&explicit);
-    let path_env = std::env::join_paths([root.join("usr-bin")]).ok();
-    let env = Some(explicit.as_os_str());
-
-    let first = resolve_with("svn", &exe_dir, path_env.as_deref(), env);
-    assert_eq!(first.map(|tool| tool.source), Some(ToolSource::Bundled));
-
-    std::fs::remove_file(&bundled).ok();
-    let second = resolve_with("svn", &exe_dir, path_env.as_deref(), env);
-    assert_eq!(second.map(|tool| tool.source), Some(ToolSource::Path));
-
-    std::fs::remove_file(&on_path).ok();
-    let third = resolve_with("svn", &exe_dir, path_env.as_deref(), env);
-    assert_eq!(third.map(|tool| tool.source), Some(ToolSource::Env));
-
-    std::fs::remove_file(&explicit).ok();
-    assert!(resolve_with("svn", &exe_dir, path_env.as_deref(), env).is_none());
-}
-
-#[test]
-fn a_missing_tool_is_reported_as_none() {
-    let Ok(dir) = tempfile::tempdir() else {
-        return;
-    };
-    let exe_dir = dir.path().join("bin");
-    std::fs::create_dir_all(&exe_dir).ok();
-    // Empty PATH and no env value: nothing can satisfy the request.
-    assert!(resolve_with("git", &exe_dir, Some(OsStr::new("")), None).is_none());
-    assert!(resolve_with("unknown-tool", &exe_dir, None, None).is_none());
-}
-
-#[test]
-fn a_non_executable_candidate_is_skipped() {
-    let Ok(dir) = tempfile::tempdir() else {
-        return;
-    };
-    let root = dir.path();
-    let exe_dir = root.join("bin");
-    std::fs::create_dir_all(&exe_dir).ok();
-    write_plain_file(&root.join("usr/lib/vcs/bin/git"));
-    let path_dir = root.join("usr-bin");
-    let real = path_dir.join("git");
-    write_executable(&real);
-    let path_env = std::env::join_paths([&path_dir]).ok();
-    let resolved = resolve_with("git", &exe_dir, path_env.as_deref(), None);
-    assert_eq!(resolved.map(|tool| tool.source), Some(ToolSource::Path));
-}
-
-#[test]
-fn bundled_candidates_are_the_appdir_layout_first() {
-    let exe_dir = Path::new("/opt/vedit/bin");
-    let candidates = bundled_candidates("git", exe_dir);
-    assert_eq!(candidates.len(), 4);
+    symlink(&appbin, &alias).unwrap_or_else(|error| panic!("AppDir alias: {error:?}"));
+    std::fs::create_dir(&tool_alias)
+        .unwrap_or_else(|error| panic!("tool alias directory: {error:?}"));
+    symlink(legacy.join("git"), tool_alias.join("git"))
+        .unwrap_or_else(|error| panic!("legacy tool alias: {error:?}"));
+    let launch = BTreeMap::from([
+        ("APPDIR".into(), appdir.into_os_string()),
+        ("VEDIT_HOST_PATH".into(), hostbin.clone().into_os_string()),
+        ("PATH".into(), appbin.clone().into_os_string()),
+        ("LD_LIBRARY_PATH".into(), OsString::from("packaged-loader")),
+    ]);
+    let host = HostEnvironment::new(launch.clone(), &BTreeMap::new(), root);
     assert_eq!(
-        candidates[0],
-        PathBuf::from("/opt/vedit/bin/../usr/lib/vcs/bin/git")
+        resolve_in("git", &host)
+            .unwrap_or_else(|| panic!("host Git"))
+            .path,
+        hostbin.join("git")
     );
-    // Loader-launched layout: exe_dir IS the AppDir root.
+
+    let imported_path = std::env::join_paths([
+        appbin,
+        alias,
+        legacy,
+        tool_alias.clone(),
+        imported_bin.clone(),
+    ])
+    .unwrap_or_else(|error| panic!("imported PATH: {error:?}"))
+    .into_string()
+    .unwrap_or_else(|error| panic!("UTF-8 fixture: {error:?}"));
+    let imported = BTreeMap::from([
+        ("PATH".into(), imported_path),
+        ("LD_LIBRARY_PATH".into(), "imported-loader".into()),
+        ("LOCPATH".into(), "imported-locale".into()),
+        ("VEDIT_TEST_ENV".into(), "fixture-value".into()),
+    ]);
+    let host = HostEnvironment::new(launch, &imported, root);
+    let chosen = resolve_in("git", &host).unwrap_or_else(|| panic!("imported Git"));
+    assert_eq!(chosen.path, imported_bin.join("git"));
+    assert_eq!(chosen.source, ToolSource::Path);
+    let env = host.variables();
     assert_eq!(
-        candidates[1],
-        PathBuf::from("/opt/vedit/bin/usr/lib/vcs/bin/git")
+        env.get(OsStr::new("VEDIT_TEST_ENV")),
+        Some(&"fixture-value".into())
     );
-    assert_eq!(candidates[2], PathBuf::from("/opt/vedit/bin/git"));
+    assert_eq!(
+        env.get(OsStr::new("PATH")),
+        Some(
+            &std::env::join_paths([tool_alias, imported_bin])
+                .unwrap_or_else(|error| panic!("filtered PATH: {error:?}"))
+        )
+    );
+    for name in ["LD_LIBRARY_PATH", "LOCPATH", "VEDIT_HOST_PATH"] {
+        assert!(!env.contains_key(OsStr::new(name)), "{name}");
+    }
+}
+
+#[test]
+fn skips_nonexecutables_and_reports_removed_tools() {
+    let fixture =
+        tempfile::tempdir().unwrap_or_else(|error| panic!("fixture directory: {error:?}"));
+    let root = fixture.path();
+    std::fs::write(root.join("svn"), "not executable")
+        .unwrap_or_else(|error| panic!("plain file: {error:?}"));
+    let appdir = root.join("AppDir");
+    let old_tool = appdir.join("bin/svn");
+    let fallback = root.join("other/svn");
+    write_executable(&old_tool);
+    write_executable(&fallback);
+    let launch = BTreeMap::from([
+        ("APPDIR".into(), appdir.into_os_string()),
+        ("PATH".into(), root.as_os_str().to_owned()),
+        ("VEDIT_SVN".into(), fallback.clone().into_os_string()),
+    ]);
+    let host = HostEnvironment::new(launch.clone(), &BTreeMap::new(), root);
+    assert_eq!(
+        resolve_in("svn", &host)
+            .unwrap_or_else(|| panic!("fallback SVN"))
+            .source,
+        ToolSource::Env
+    );
+    std::fs::remove_file(fallback).unwrap_or_else(|error| panic!("remove fallback: {error:?}"));
+    assert!(resolve_in("svn", &host).is_none());
+    let host = HostEnvironment::new(
+        launch,
+        &BTreeMap::from([("VEDIT_SVN".into(), old_tool.to_string_lossy().into_owned())]),
+        root,
+    );
+    assert!(resolve_in("svn", &host).is_none());
+    assert!(resolve_in("unknown-tool", &host).is_none());
+}
+
+#[test]
+fn an_empty_saved_host_path_does_not_fall_back_to_the_launcher_path() {
+    let fixture =
+        tempfile::tempdir().unwrap_or_else(|error| panic!("fixture directory: {error:?}"));
+    let root = fixture.path();
+    write_executable(&root.join("git"));
+    let host = HostEnvironment::new(
+        BTreeMap::from([
+            ("PATH".into(), root.as_os_str().to_owned()),
+            ("VEDIT_HOST_PATH".into(), OsString::new()),
+        ]),
+        &BTreeMap::new(),
+        root,
+    );
+    assert!(resolve_in("git", &host).is_none());
+    assert_eq!(
+        host.variables().get(OsStr::new("PATH")),
+        Some(&OsString::new())
+    );
 }

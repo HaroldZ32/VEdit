@@ -598,10 +598,7 @@ void checkReadCompat()
 #endif
 }
 
-// Batch 6a (rev3): the product bundles git/svn, and the lane resolves them as
-// bundled > PATH > env (the same order as crates/vd-vcs/src/toolchain.rs). The
-// line is printed once at init; the production panel factory copies the values
-// into properties for the acceptance probes.
+// The diagnostic and panel properties reflect the host VCS resolver.
 void checkToolchain()
 {
     const vedit::workspace::vcs::ToolchainStatus &status =
@@ -611,8 +608,8 @@ void checkToolchain()
           line.startsWith(QStringLiteral("VCS-TOOLCHAIN ")) && line.contains(QStringLiteral("git="))
               && line.contains(QStringLiteral("svn=")) && line.contains(QStringLiteral("source=")),
           line.left(150));
-    const QStringList known{QStringLiteral("bundled"), QStringLiteral("path"),
-                            QStringLiteral("env"), QStringLiteral("missing")};
+    const QStringList known{QStringLiteral("path"), QStringLiteral("env"),
+                            QStringLiteral("missing")};
     check("vcs.toolchain.sources-known",
           known.contains(status.gitSource) && known.contains(status.svnSource),
           QStringLiteral("git_source=%1 svn_source=%2").arg(status.gitSource, status.svnSource));
@@ -645,32 +642,42 @@ void checkToolchain()
                   && propertyPanel.property("veditVcsSvnVersion").toString() == status.svnVersion,
               toolchainProperty.left(140));
     }
-    // The bundled layout must be preferred when it exists. A fake AppDir proves
-    // the rule without depending on the real package being installed here.
+#if defined(VEDIT_VCS_HAVE_FFI)
     QTemporaryDir fake;
     check("vcs.toolchain.fake-appdir", fake.isValid());
     if (!fake.isValid()) {
         return;
     }
-    const QString fakeAppDir = fake.path() + QStringLiteral("/bin");
-    QDir().mkpath(fakeAppDir);
-    QDir().mkpath(fake.path() + QStringLiteral("/usr/lib/vcs/bin"));
-    const QString fakeTool = fake.path() + QStringLiteral("/usr/lib/vcs/bin/git");
+    const QString fakeAppDir = fake.path() + QStringLiteral("/AppDir");
+    QDir().mkpath(fakeAppDir + QStringLiteral("/usr/lib/vcs/bin"));
+    const QString fakeTool = fakeAppDir + QStringLiteral("/usr/lib/vcs/bin/git");
     QFile tool(fakeTool);
     bool written = tool.open(QIODevice::WriteOnly);
     if (written) {
-        tool.write("#!/bin/sh\nexit 0\n");
+        tool.write("#!/bin/sh\nprintf 'git version should-never-run\\n'\n");
         tool.close();
         written = QFile::setPermissions(fakeTool, QFileDevice::ReadOwner | QFileDevice::WriteOwner
-                                                     | QFileDevice::ExeOwner | QFileDevice::ReadUser
-                                                     | QFileDevice::ExeUser | QFileDevice::ReadGroup
-                                                     | QFileDevice::ExeGroup | QFileDevice::ReadOther
-                                                     | QFileDevice::ExeOther);
+                                                     | QFileDevice::ExeOwner);
     }
-    const QString found =
-        vedit::workspace::vcs::bundledTool(fakeAppDir, QStringLiteral("git"));
-    check("vcs.toolchain.bundled-layout",
-          written && found == QFileInfo(fakeTool).absoluteFilePath(), found);
+    const QByteArray oldAppDir = qgetenv("APPDIR");
+    const QByteArray oldHostPath = qgetenv("VEDIT_HOST_PATH");
+    const QByteArray oldOverride = qgetenv("VEDIT_GIT");
+    qputenv("APPDIR", QFile::encodeName(fakeAppDir));
+    qputenv("VEDIT_HOST_PATH", QByteArray());
+    qputenv("VEDIT_GIT", QFile::encodeName(fakeTool));
+    const auto missing = vedit::workspace::vcs::detectToolchain();
+    for (const auto &[name, value] : {std::pair{"APPDIR", oldAppDir},
+                                    std::pair{"VEDIT_HOST_PATH", oldHostPath},
+                                    std::pair{"VEDIT_GIT", oldOverride}}) {
+        if (value.isNull()) {
+            qunsetenv(name);
+        } else {
+            qputenv(name, value);
+        }
+    }
+    check("vcs.toolchain.ignores-old-appdir", written && missing.gitPath.isEmpty()
+              && missing.gitSource == QStringLiteral("missing"));
+#endif
 }
 
 // T99 N-1 regression: the GUI thread must not wait for git. A fake `git` in
